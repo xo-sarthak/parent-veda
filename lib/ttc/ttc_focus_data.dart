@@ -125,7 +125,9 @@ extension TtcTileFormatCopy on TtcTileFormat {
   String get label => switch (this) {
         TtcTileFormat.masterclass => 'Masterclass',
         TtcTileFormat.tool => 'Tool',
-        TtcTileFormat.practice => 'Do',
+        // "Practice", not "Do" (launch sanity MB15, 2026-09-28): "Do" is not
+        // a word she would use for a kind of thing. Kept for revert: 'Do',
+        TtcTileFormat.practice => 'Practice',
         TtcTileFormat.checklist => 'Checklist',
         TtcTileFormat.guide => 'Guide',
         TtcTileFormat.talk => 'Talk',

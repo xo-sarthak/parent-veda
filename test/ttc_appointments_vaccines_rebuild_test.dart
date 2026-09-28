@@ -82,6 +82,20 @@ void main() {
       expect(find.textContaining('Past ·'), findsNothing,
           reason: 'nothing to switch to until a visit has passed');
       expect(find.text('Write a question'), findsOneWidget);
+      // Launch sanity T13 (2026-09-28): one Add on an empty screen. The
+      // header's "Add" waits until there is a list to add to.
+      expect(find.text(const TtcS(false).appointmentsAdd), findsNothing);
+      expect(find.byKey(const ValueKey('ttc_appt_add')), findsOneWidget);
+    });
+
+    testWidgets('T13: the header Add appears once there is a visit',
+        (tester) async {
+      TtcAppointmentsStore.instance
+          .add(title: 'Follicle scan', startsLocal: _inDays(2));
+      await _pump(tester, const TtcAppointmentsScreen());
+      expect(find.text('Add an appointment'), findsNothing);
+      expect(find.text(const TtcS(false).appointmentsAdd), findsOneWidget);
+      expect(find.byKey(const ValueKey('ttc_appt_add')), findsOneWidget);
     });
 
     testWidgets('the next visit is said as how soon it is', (tester) async {
@@ -336,6 +350,17 @@ void main() {
       expect(find.text("YOU'LL NEED TO ASK"), findsNothing,
           reason: 'folded into the tests box');
       expect(find.byKey(const ValueKey('ttc_vax_mmr_immune')), findsOneWidget);
+      // Launch sanity T8 (2026-09-28): one box on a first open, not the
+      // answer box saying "one blood test" above the tests box saying it
+      // again; the rubella line lives in the tests box now.
+      expect(find.text('One blood test settles most of this'), findsNothing);
+      expect(find.textContaining('Rubella is the one worth doing first'),
+          findsOneWidget);
+      // Four answers she can tell apart: how she knows is in the words.
+      expect(find.text('Immune (a test says so)'), findsWidgets);
+      expect(find.text('Had the jab'), findsWidgets);
+      expect(find.text('Already immune'), findsNothing,
+          reason: 'was: "Already immune" beside "Had it"');
     });
 
     testWidgets('an answered card says its answer, and Change brings the '

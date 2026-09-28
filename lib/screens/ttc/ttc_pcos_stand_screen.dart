@@ -56,6 +56,7 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/pv_fonts.dart';
+import '../../ttc/cycle_store.dart';
 import '../../ttc/ttc_pcos_stand.dart';
 import '../../ttc/ttc_selfcheck_store.dart';
 import '../../ttc/ttc_store.dart';
@@ -64,6 +65,7 @@ import '../v2/v2_palette.dart';
 import 'ttc_common.dart';
 import 'ttc_tool_chrome.dart';
 import 'ttc_pcos_check_screen.dart' show kPcosHue;
+import 'ttc_tool_hues.dart';
 import 'ttc_prepare_screen.dart';
 import 'ttc_focus_screen.dart' show openTtcArticle;
 
@@ -77,13 +79,20 @@ class TtcPcosStandScreen extends StatefulWidget {
 class _TtcPcosStandScreenState extends State<TtcPcosStandScreen> {
   @override
   Widget build(BuildContext context) {
+    // ⚠️ THE TOOLS COLOUR, NOT THE PCOS DOOR'S (launch sanity T6,
+    // 2026-09-28). This screen is what the Tools row "PCOS symptom check"
+    // opens, and every tool wears its Tools group's colour
+    // (ttc_tool_hues.dart). Inside the PCOS door the same questions render
+    // inline under the door's own photograph and keep the door's violet,
+    // because there the door is the frame. Kept for revert: hue: kPcosHue,
+    // and `TtcPcosStandBody()` with no hue.
     return const TtcToolScaffold(
-      hue: kPcosHue,
+      hue: kTtcToolHueBody,
       variant: 2,
       eyebrow: kPcosStandEyebrow,
       title: kPcosStandTitle,
       intro: kPcosStandIntro,
-      children: [TtcPcosStandBody()],
+      children: [TtcPcosStandBody(hue: kTtcToolHueBody)],
     );
   }
 }
@@ -122,7 +131,11 @@ const String kPcosStandIntro =
 /// `docs/STILL-OPEN.md` §18.5 says this screen is signed off and must not be
 /// redesigned; it has not been. It has been given a second container.
 class TtcPcosStandBody extends StatefulWidget {
-  const TtcPcosStandBody({super.key});
+  const TtcPcosStandBody({super.key, this.hue = kPcosHue});
+
+  /// The tint of the question cards and of the result it opens: the PCOS
+  /// door's violet inline in the door, the Tools colour from Tools (T6).
+  final double hue;
 
   @override
   State<TtcPcosStandBody> createState() => _TtcPcosStandBodyState();
@@ -133,7 +146,17 @@ class _TtcPcosStandBodyState extends State<TtcPcosStandBody> {
   // and "Clear my answers" puts a fresh one back. Kept for revert:
   // final _a = PcosStandAnswers();
   var _a = PcosStandAnswers();
-  late final PcosCycleFacts _facts = pcosCycleFacts();
+  // Not final since 2026-09-28 (launch sanity D9): read again once the cycle
+  // store has loaded, so a check opened before her dates arrive is not left
+  // asking a question her logs answer. Kept for revert:
+  // late final PcosCycleFacts _facts = pcosCycleFacts();
+  PcosCycleFacts _facts = pcosCycleFacts();
+
+  /// What Q1 was filled in with and where that came from, or nulls when it
+  /// is asked cold. The note shows only while her answer is still the
+  /// prefill: once she changes it, it is hers and needs no source.
+  PcosCycleLength? _q1Derived;
+  String? _q1Source;
 
   TtcSelfCheckStore get _saved => TtcSelfCheckStore.instance;
 
@@ -145,6 +168,27 @@ class _TtcPcosStandBodyState extends State<TtcPcosStandBody> {
       if (!mounted) return;
       setState(_restore);
     });
+    if (!CycleStore.instance.isLoaded) {
+      CycleStore.instance.addListener(_onCyclesLoaded);
+    }
+  }
+
+  /// Once, when her dates arrive after the screen opened (D9).
+  void _onCyclesLoaded() {
+    if (!CycleStore.instance.isLoaded) return;
+    CycleStore.instance.removeListener(_onCyclesLoaded);
+    if (!mounted) return;
+    setState(() {
+      _facts = pcosCycleFacts();
+      // Only fill what she has not answered herself.
+      if (_a.cycleLength == null) _prefillCycleLength();
+    });
+  }
+
+  @override
+  void dispose() {
+    CycleStore.instance.removeListener(_onCyclesLoaded);
+    super.dispose();
   }
 
   /// Her saved answers, over the prefills.
@@ -176,7 +220,8 @@ class _TtcPcosStandBodyState extends State<TtcPcosStandBody> {
     _saved.savePcos(_a);
     Navigator.of(context).push(MaterialPageRoute<void>(
       settings: const RouteSettings(name: 'ttc/pcos_stand_result'),
-      builder: (_) => TtcPcosStandResultScreen(result: pcosBuildStand(_a)),
+      builder: (_) => TtcPcosStandResultScreen(
+          result: pcosBuildStand(_a), hue: widget.hue),
     ));
   }
 
@@ -204,7 +249,8 @@ class _TtcPcosStandBodyState extends State<TtcPcosStandBody> {
     // applied to a question we can mostly answer ourselves. The chip is
     // selected but changeable — a prefill she cannot override is a claim, not
     // a convenience.
-    _a.cycleLength = _facts.suggestedLength;
+    // Kept for revert (2026-09-28): _a.cycleLength = _facts.suggestedLength;
+    _prefillCycleLength();
     // Q7 the same way (launch walk, 2026-09-27): the app knows how long she has
     // been trying, so it is selected and changeable rather than asked cold.
     final days = TtcStore.instance.daysTrying;
@@ -215,6 +261,66 @@ class _TtcPcosStandBodyState extends State<TtcPcosStandBody> {
               ? PcosTrying.sixToTwelve
               : PcosTrying.overAYear;
     }
+  }
+
+  /// ⚠️ DERIVE, NEVER ASK (launch sanity D9, 2026-09-28). Q1 was filled in
+  /// only from two or more counted cycles, so a woman with one logged cycle,
+  /// or who told us her usual length when she started, was asked a number
+  /// the app already held. Now, strongest source first:
+  ///   1. two or more counted cycles: their average (unchanged);
+  ///   2. one counted cycle: that cycle, said as one;
+  ///   3. none yet: the usual length she gave (`TtcStore.statedCycleLength`),
+  ///      the same number the cycle engine uses for her first estimate.
+  /// Every one is selected and changeable, and says where it came from.
+  void _prefillCycleLength() {
+    PcosCycleLength band(int days) => days < 21
+        ? PcosCycleLength.shorter
+        : days > 35
+            ? PcosCycleLength.longer
+            : PcosCycleLength.typical;
+    final lens = CycleStore.instance.cycleLengths;
+    final stated = TtcStore.instance.statedCycleLength;
+    final (PcosCycleLength?, String?) pick;
+    if (_facts.suggestedLength case final s?) {
+      pick = (
+        s,
+        'Filled in from your ${lens.length} logged cycles. Change it if '
+            'that looks wrong.'
+      );
+    } else if (lens.length == 1) {
+      pick = (
+        band(lens.single),
+        'Filled in from your one logged cycle, ${lens.single} days. Change '
+            "it if that isn't usual for you."
+      );
+    } else if (stated != null) {
+      pick = (
+        band(stated),
+        'Filled in from the usual length you gave us, about $stated days. '
+            'Change it if that looks wrong.'
+      );
+    } else {
+      pick = (null, null);
+    }
+    _q1Derived = pick.$1;
+    _q1Source = pick.$2;
+    _a.cycleLength = pick.$1;
+  }
+
+  /// Q7's source line, while her answer is still the one worked out from
+  /// when she started trying.
+  String? get _q7Source {
+    final days = TtcStore.instance.daysTrying;
+    if (days == null || _a.trying == null) return null;
+    final derived = days < 183
+        ? PcosTrying.underSix
+        : days < 365
+            ? PcosTrying.sixToTwelve
+            : PcosTrying.overAYear;
+    return _a.trying == derived
+        ? 'Filled in from when you told us you started trying. Change it if '
+            'that looks wrong.'
+        : null;
   }
 
   void _set(VoidCallback f) => setState(f);
@@ -272,13 +378,15 @@ class _TtcPcosStandBodyState extends State<TtcPcosStandBody> {
               const SizedBox(height: 12),
 
               ttcToolPad(TtcToolQuestion(
-                hue: kPcosHue,
+                hue: widget.hue,
                 n: 1,
                 title: 'How long are your cycles usually?',
-                note: _facts.suggestedLength == null
-                    ? null
-                    : 'Filled in from your logs. Change it if that looks '
-                        'wrong.',
+                // Says where the prefill came from (D9, 2026-09-28). Kept for
+                // revert: _facts.suggestedLength == null ? null : 'Filled in
+                // from your logs. Change it if that looks wrong.'
+                note: _q1Derived != null && _a.cycleLength == _q1Derived
+                    ? _q1Source
+                    : null,
                 child: _Chips<PcosCycleLength>(
                   value: _a.cycleLength,
                   options: const {
@@ -293,7 +401,7 @@ class _TtcPcosStandBodyState extends State<TtcPcosStandBody> {
               )),
 
               ttcToolPad(TtcToolQuestion(
-                hue: kPcosHue,
+                hue: widget.hue,
                 n: 2,
                 title: 'Have you gone 3 months or more without a period in '
                     'the last year?',
@@ -309,7 +417,7 @@ class _TtcPcosStandBodyState extends State<TtcPcosStandBody> {
               )),
 
               ttcToolPad(TtcToolQuestion(
-                hue: kPcosHue,
+                hue: widget.hue,
                 n: 3,
                 title: 'Have you noticed extra hair growth anywhere?',
                 note: 'Tap every area that applies.',
@@ -342,7 +450,7 @@ class _TtcPcosStandBodyState extends State<TtcPcosStandBody> {
               )),
 
               ttcToolPad(TtcToolQuestion(
-                hue: kPcosHue,
+                hue: widget.hue,
                 n: 4,
                 title: 'Any hair thinning or loss?',
                 note: kPcosDegreeHint,
@@ -353,7 +461,7 @@ class _TtcPcosStandBodyState extends State<TtcPcosStandBody> {
               )),
 
               ttcToolPad(TtcToolQuestion(
-                hue: kPcosHue,
+                hue: widget.hue,
                 n: 5,
                 title: "Acne for 6 months or more that skincare didn't fix?",
                 note: kPcosDegreeHint,
@@ -364,7 +472,7 @@ class _TtcPcosStandBodyState extends State<TtcPcosStandBody> {
               )),
 
               ttcToolPad(TtcToolQuestion(
-                hue: kPcosHue,
+                hue: widget.hue,
                 n: 6,
                 title: 'Darker, thicker skin on your neck, armpits or belly?',
                 child: _YesNo(
@@ -374,9 +482,11 @@ class _TtcPcosStandBodyState extends State<TtcPcosStandBody> {
               )),
 
               ttcToolPad(TtcToolQuestion(
-                hue: kPcosHue,
+                hue: widget.hue,
                 n: 7,
                 title: 'How long have you been trying?',
+                // Q7 is prefilled and now says so, like Q1 (D9, 2026-09-28).
+                note: _q7Source,
                 child: _Chips<PcosTrying>(
                   value: _a.trying,
                   options: const {
@@ -391,7 +501,7 @@ class _TtcPcosStandBodyState extends State<TtcPcosStandBody> {
               )),
 
               ttcToolPad(TtcToolQuestion(
-                hue: kPcosHue,
+                hue: widget.hue,
                 n: 8,
                 title: 'Has your mother or sister been told they have PCOS?',
                 note: 'Optional.',
@@ -525,14 +635,18 @@ class _FactsCard extends StatelessWidget {
 // -----------------------------------------------------------------------------
 
 class TtcPcosStandResultScreen extends StatelessWidget {
-  const TtcPcosStandResultScreen({super.key, required this.result});
+  const TtcPcosStandResultScreen(
+      {super.key, required this.result, this.hue = kPcosHue});
 
   final PcosStandResult result;
+
+  /// The header colour of the screen that opened it (T6, 2026-09-28).
+  final double hue;
 
   @override
   Widget build(BuildContext context) {
     return TtcToolScaffold(
-      hue: kPcosHue,
+      hue: hue,
       variant: 3,
       // One tool, one name (2026-09-27). Kept for revert: 'Your pattern'.
       eyebrow: kPcosStandEyebrow,
@@ -593,7 +707,7 @@ class TtcPcosStandResultScreen extends StatelessWidget {
                         settings:
                             const RouteSettings(name: 'ttc/pcos_checklist'),
                         builder: (_) =>
-                            TtcPcosChecklistScreen(result: result))),
+                            TtcPcosChecklistScreen(result: result, hue: hue))),
               )),
               const SizedBox(height: 10),
               _pad(TtcToolSecondary(
@@ -601,6 +715,8 @@ class TtcPcosStandResultScreen extends StatelessWidget {
                 label: 'Read: irregular periods, explained',
                 onTap: () => openTtcArticle(
                     context, 'ttc_read_pcos_irregular',
+                    // The read keeps its door's colour; only the tool's own
+                    // screens follow the Tools rule (T6).
                     hue: kPcosHue),
               )),
               const SizedBox(height: 10),
@@ -643,15 +759,19 @@ class TtcPcosStandResultScreen extends StatelessWidget {
 /// block with a rule under each label survives that; a rounded tinted card
 /// with an app's chrome around it looks like a share graphic.
 class TtcPcosChecklistScreen extends StatelessWidget {
-  const TtcPcosChecklistScreen({super.key, required this.result});
+  const TtcPcosChecklistScreen(
+      {super.key, required this.result, this.hue = kPcosHue});
 
   final PcosStandResult result;
+
+  /// The header colour of the screen that opened it (T6, 2026-09-28).
+  final double hue;
 
   @override
   Widget build(BuildContext context) {
 
     return TtcToolScaffold(
-      hue: kPcosHue,
+      hue: hue,
       variant: 4,
       // One tool, one name (2026-09-27). Kept for revert:
       // eyebrow: 'Appointment notes',

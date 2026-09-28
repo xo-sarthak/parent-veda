@@ -444,8 +444,8 @@ class _WalletRemindersScreenState extends State<WalletRemindersScreen> {
         ),
         Switch.adaptive(
           value: on,
-          activeTrackColor: ppPurple,
-            activeThumbColor: Colors.white,
+          // Kept for revert (2026-09-28, one black switch app-wide): activeTrackColor: ppPurple,
+            // Kept for revert (2026-09-28, one black switch app-wide): activeThumbColor: Colors.white,
           onChanged: (v) async {
             if (v) {
               WalletReminders.add(

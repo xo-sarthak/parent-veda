@@ -391,11 +391,16 @@ const List<TtcPractice> _breathe = [
   TtcPractice(
     id: 'mb_longout',
     kind: TtcPracticeKind.breathe,
-    title: 'Long out-breath, in four out six',
+    // Said in plain words (launch sanity MB7, 2026-09-28): "in four out six"
+    // was shorthand she had to decode. Kept for revert:
+    //   title: 'Long out-breath, in four out six',
+    //   blurb: 'The easiest way to calm your body. Breathing out for longer '
+    //       'than you breathe in is what does the work.',
+    title: 'Breathe in for 4, out for 6',
     duration: '1 minute',
     setting: 'Sitting or lying',
-    blurb: 'The easiest way to calm your body. Breathing out for longer than '
-        'you breathe in is what does the work.',
+    blurb: 'A long out-breath is the easiest way to calm your body. Breathing '
+        'out for longer than you breathe in is what does the work.',
     steps: [
       'Sit comfortably and let your shoulders drop.',
       'Breathe in through your nose while you count to four.',

@@ -117,10 +117,16 @@ class PvBreathingCircle extends StatelessWidget {
                     letterSpacing: 0.3,
                     color: ink)),
           ),
-          const SizedBox(height: 4),
-          Text(count,
-              style: pvFraunces(
-                  fontSize: 34, fontWeight: FontWeight.w600, color: ink)),
+          // ⚠️ THE COUNT LINE ONLY WHILE RUNNING (2026-09-28, launch walk
+          // MB12): an empty 34pt line under "Ready" pushed the word into the
+          // top third of the disc, which reads as a bug. Kept for revert: the
+          // gap and the Text(count) drawn always.
+          if (running) ...[
+            const SizedBox(height: 4),
+            Text(count,
+                style: pvFraunces(
+                    fontSize: 34, fontWeight: FontWeight.w600, color: ink)),
+          ],
           if (below case final b?) ...[const SizedBox(height: 2), b],
         ]),
       ]),

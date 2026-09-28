@@ -682,7 +682,11 @@ class _PvLearnScreenState extends State<PvLearnScreen> {
           lead: shown.isEmpty
               ? 'Nothing here yet for this stage. Tap ${(_kind?.plural ?? 'All').toLowerCase()} above to widen it.'
               : consults
-              ? '${shown.length} ${shown.length == 1 ? 'person' : 'people'} · 30-minute video, in the app'
+              // H16 (TTC launch sanity, 2026-09-28): people are counted as
+              // people and the length comes from the consults' own records.
+              // Kept for revert:
+              // '${shown.length} ${shown.length == 1 ? 'person' : 'people'} · 30-minute video, in the app'
+              ? pvConsultListLead(shown)
               : '${shown.length} on this stage',
         ),
       ),
@@ -694,14 +698,27 @@ class _PvLearnScreenState extends State<PvLearnScreen> {
                 // A person: her initials, her name, what she is, her fee.
                 // Never "Consult with X" over "X · 30 min" — the walk found
                 // the name said twice on every row.
-                PvLearnRow(
-                  initials: pvLearnInitials(v.expert.name),
-                  title: v.expert.name,
-                  sub: _roleLine(v),
-                  foot: _footLine(v),
-                  price: v.priceLabel,
-                  onTap: () => _open(v),
-                )
+                // H16 (2026-09-28): a consult the roster has no named
+                // person for is titled by what it is ("Male fertility
+                // consultation · An andrologist"), not as a nameless person
+                // with initials. Kept for revert: the person row always.
+                pvLearnHasNoNamedPerson(v)
+                    ? PvLearnRow(
+                        view: v,
+                        title: v.title,
+                        sub: v.expert.name,
+                        foot: _footLine(v),
+                        price: v.priceLabel,
+                        onTap: () => _open(v),
+                      )
+                    : PvLearnRow(
+                        initials: pvLearnInitials(v.expert.name),
+                        title: v.expert.name,
+                        sub: _roleLine(v),
+                        foot: _footLine(v),
+                        price: v.priceLabel,
+                        onTap: () => _open(v),
+                      )
               else
                 PvLearnRow(
                   view: v,
@@ -735,14 +752,23 @@ class _PvLearnScreenState extends State<PvLearnScreen> {
           child: Column(
             children: [
               for (final v in others)
-                PvLearnRow(
-                  initials: pvLearnInitials(v.expert.name),
-                  title: v.expert.name,
-                  sub: _roleLine(v),
-                  foot: _footLine(v),
-                  price: v.priceLabel,
-                  onTap: () => _open(v),
-                ),
+                pvLearnHasNoNamedPerson(v)
+                    ? PvLearnRow(
+                        view: v,
+                        title: v.title,
+                        sub: v.expert.name,
+                        foot: _footLine(v),
+                        price: v.priceLabel,
+                        onTap: () => _open(v),
+                      )
+                    : PvLearnRow(
+                        initials: pvLearnInitials(v.expert.name),
+                        title: v.expert.name,
+                        sub: _roleLine(v),
+                        foot: _footLine(v),
+                        price: v.priceLabel,
+                        onTap: () => _open(v),
+                      ),
             ],
           ),
         ),
@@ -913,4 +939,39 @@ class _PvLearnScreenState extends State<PvLearnScreen> {
       'Half an hour with someone whose registration we checked.',
     PvLearnKind.classPack => 'Four live classes, booked one at a time.',
   };
+}
+
+/// The line under "Who can help" on a consult list (TTC launch sanity H16,
+/// 2026-09-28). It said "6 people · 30-minute video" over six consults with
+/// five people (one doctor runs two) whose own pages say 45 minutes. Now it
+/// counts people as people, says how many consults when that differs, and
+/// takes the length from the consults' own records, saying one only when
+/// they all agree. A list whose records carry no length keeps the old words.
+String pvConsultListLead(List<PvOfferingView> shown) {
+  final people = shown.map((v) => v.expert.name).toSet().length;
+  String n(int k, String one, String many) => '$k ${k == 1 ? one : many}';
+  final who = people == shown.length
+      ? n(people, 'person', 'people')
+      : '${n(shown.length, 'consult', 'consults')} with '
+          '${n(people, 'person', 'people')}';
+  final mins = shown.map(pvConsultMinutes).toSet();
+  final String length;
+  if (mins.length == 1 && mins.first != null) {
+    length = '${mins.first}-minute video';
+  } else if (mins.every((m) => m == null)) {
+    length = '30-minute video';
+  } else {
+    length = 'video';
+  }
+  return '$who · $length, in the app';
+}
+
+/// A consult's length in minutes, from its record: its duration label, or a
+/// fact such as "45 min · video session". Null when the record says none.
+int? pvConsultMinutes(PvOfferingView v) {
+  for (final s in [v.durationLabel, for (final f in v.facts) f.value]) {
+    final m = RegExp(r'^(\d+)\s*min').firstMatch(s.trim());
+    if (m != null) return int.parse(m.group(1)!);
+  }
+  return null;
 }

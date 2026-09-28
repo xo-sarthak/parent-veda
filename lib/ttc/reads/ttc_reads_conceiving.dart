@@ -1023,4 +1023,204 @@ final List<PvRead> kTtcReadsConceiving = [
       'ttc_read_timing_myths',
     ],
   ),
+
+  // ===========================================================================
+  //  MORNING TEMPERATURE — written for the logger's link (launch sanity U3,
+  //  2026-09-28)
+  // ---------------------------------------------------------------------------
+  //  The temperature card's "How temperature tracking works" opened
+  //  "Ovulation kits: do they help?", which gives temperature two paragraphs
+  //  near its end. A link that names one thing and opens another is the
+  //  wrong-screen failure this stage keeps fixing, and there was no read to
+  //  point it at. This is that read, in the neighbours' shape: a short answer,
+  //  headings asked as her questions, short paragraphs, the doctor line, and
+  //  the sources. No personal chance of anything; it describes a signal.
+  // ===========================================================================
+  PvRead(
+    id: 'ttc_read_morning_temperature',
+    hue: 344,
+    kicker: _en('Fertile window'),
+    title: _en('Morning temperature: how it works'),
+    teaser: _en('Your resting temperature rises a little after you ovulate. '
+        "Here's what that shows, how to take it, and why you don't need it."),
+    shortAnswer: _en('After ovulation, your resting temperature rises by about '
+        '0.2 to 0.5 °C and stays up until your period. So it confirms that '
+        'you ovulated, after it happened. Over a few months it shows your '
+        "pattern. It can't tell you when to try this month."),
+    scaleSetter: _en("Temperature charting is optional. Plenty of couples "
+        'never take a single reading. Sex every day or two, and noticing your '
+        'discharge, already cover the days that count. If the morning '
+        "thermometer starts to feel like a test you have to pass, it's fine "
+        'to stop.'),
+    author: _en('ParentVeda team'),
+    authorRole: _en('Written from the sources listed at the end'),
+    reviewed: false,
+    sections: [
+      PvReadSection(
+        heading: _en('What does a morning temperature show?'),
+        paragraphs: [
+          _en('Your body at complete rest has a steady temperature. Doctors '
+              'call it basal body temperature, or BBT.'),
+          _en('After an egg is released, the ovary makes more progesterone. '
+              'That hormone nudges your resting temperature up by about 0.2 '
+              'to 0.5 °C. It stays higher until your next period, and then '
+              'drops again.'),
+          _en('So a chart usually has two levels: lower in the first part of '
+              'the cycle and slightly higher after ovulation.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('Why is it about last month, not this one?'),
+        paragraphs: [
+          _en('The rise comes after ovulation. By the time you see it, your '
+              'most fertile days have already passed.'),
+          _en("That's why it doesn't help with timing this cycle. It helps "
+              'over two or three months, when your charts show roughly which '
+              'cycle day you tend to ovulate on.'),
+          _en('It can also be useful to take to a doctor. A few months of '
+              'charts show whether a rise is happening at all.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('What does a typical chart look like?'),
+        paragraphs: [
+          _en('In the days after your period, the readings sit at a lower '
+              'level and wobble a little from morning to morning. That '
+              'wobble is normal.'),
+          _en('Around ovulation, the line steps up. The step is small, often '
+              'less than half a degree, and it can happen over a day or '
+              'over two or three days.'),
+          _en('The higher level usually lasts until your next period, which '
+              'is often 10 to 16 days later. Then the readings fall back '
+              'down as the new cycle starts.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('How do I tell a real rise from a bumpy morning?'),
+        paragraphs: [
+          _en('Many charting methods wait for three higher readings in a row '
+              'before they count a rise. Each of the three should sit above '
+              'the highest of the six readings before them.'),
+          _en("One high morning on its own doesn't mean much. A run of "
+              'higher mornings is what shows the change.'),
+          _en('It also helps to look at the whole cycle at once, not a week '
+              'at a time. The temperature chart in your daily log and the one in your '
+              'cycle report both lay your readings over your cycle for this '
+              'reason. Neither of them marks a day as "you ovulated here", '
+              'because a chart can suggest it but only your doctor can '
+              'confirm it.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en("What if I can't see a clear rise?"),
+        paragraphs: [
+          _en("That's more common than people expect, and it often has an "
+              'everyday reason: readings taken at different times, broken '
+              'sleep, or a cold in the middle of the month.'),
+          _en('Everyone has a cycle without ovulation now and then. One flat '
+              "chart isn't a sign that something is wrong."),
+          _en('If the line stays flat for several months in a row, bring the '
+              "charts to a doctor. They're a useful record, and a doctor can "
+              'check with a blood test or a scan what a thermometer only '
+              'hints at.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('How do I take it?'),
+        paragraphs: [
+          _en('The rise is small, so the reading has to be taken the same way '
+              'each morning.'),
+        ],
+        bullets: [
+          _en('Take it as soon as you wake, before you get up, talk, drink or '
+              'use the bathroom.'),
+          _en('Take it at about the same time every morning.'),
+          _en('Use the same thermometer each time. A basal thermometer that '
+              'reads to two decimal places is easiest.'),
+          _en('Take it after at least 3 hours of sleep in a row.'),
+          _en('Write it down straight away, in the daily log or on paper.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('What can throw a reading off?'),
+        paragraphs: [
+          _en('A single odd reading is normal. Look at the pattern over days, '
+              'not one morning.'),
+        ],
+        bullets: [
+          _en('A fever or a cold.'),
+          _en('A poor or broken night, or less than 3 hours of sleep.'),
+          _en('Alcohol the evening before.'),
+          _en('Shift work, or waking at a very different time.'),
+          _en('Travel, especially across time zones.'),
+        ],
+        tip: PvReadTip(
+          title: _en('Make a note, keep going'),
+          body: _en('If something like this happened, note it next to the '
+              "reading. It helps you and your doctor see which mornings to "
+              'read past.'),
+        ),
+      ),
+      PvReadSection(
+        heading: _en('Do I need to track it at all?'),
+        paragraphs: [
+          _en("No. It's one way of learning your cycle, and not the easiest."),
+          _en('Ovulation test strips and your discharge both look ahead. Strips '
+              'pick up the LH rise a day or so before ovulation. Clear, wet, '
+              'stretchy discharge shows up in the days before it too. Either '
+              'tells you more about this month than a thermometer can.'),
+          _en('If you enjoy charting and it feels calming, keep it. If it '
+              "adds stress to every morning, it's fine to let it go."),
+        ],
+      ),
+    ],
+    whenToSeeSomeone: PvCallout(
+      tone: PvCalloutTone.urgent,
+      title: _en('When to talk to a doctor'),
+      body: _en("If you've charted for three months or more and never see a "
+          "rise, it's worth asking a doctor. It can mean ovulation isn't "
+          'happening regularly, which is common and often treatable. The same '
+          'goes if your cycles are shorter than 21 days or longer than 35. A '
+          'chart is a record for you, not a diagnosis. Your doctor can check '
+          'ovulation properly with a blood test or a scan.'),
+    ),
+    faqs: [
+      PvReadFaq(
+        question: _en('Can a high temperature mean I am pregnant?'),
+        answer: _en('Sometimes a temperature stays up past the day your period '
+            "is due. That can happen in early pregnancy, but it isn't a "
+            'test. A pregnancy test from the day your period is late is the '
+            'way to know.'),
+      ),
+      PvReadFaq(
+        question: _en('Is a normal thermometer good enough?'),
+        answer: _en('It can work if it reads to one decimal place and you use '
+            'it the same way each morning. A basal thermometer reads to two, '
+            'which makes a small rise easier to see.'),
+      ),
+      // Added 2026-09-28 (launch sanity follow-up): the question people ask
+      // once they own a ring or a watch.
+      PvReadFaq(
+        question: _en('Does a wearable or a thermometer app count?'),
+        answer: _en('Yes, as the same kind of record. A ring or watch reads '
+            'your skin temperature while you sleep, so you skip the morning '
+            'routine, and studies show the same small rise after ovulation. '
+            'Like a thermometer, it sees the rise after it happens. An app '
+            'that turns those readings into "fertile days" is making an '
+            'estimate, so treat its dates as a guide, not a fact.'),
+      ),
+    ],
+    evidence: _en('Cleveland Clinic on basal body temperature; NHS guidance on '
+        'fertility awareness and natural family planning; ACOG FAQ on '
+        'fertility awareness-based methods; NICE fertility guideline CG156, '
+        'which advises against relying on temperature charts to time sex; '
+        'on wearables, Maijala et al. 2019 (nightly finger skin temperature, '
+        "BMC Women's Health) and Goodale et al. 2019 (a wrist sensor, J Med "
+        'Internet Res). Sources checked September 2026.'),
+    readNext: [
+      'ttc_read_ovulation_kits',
+      'ttc_read_how_conception_works',
+      'ttc_read_timing_myths',
+    ],
+  ),
 ];

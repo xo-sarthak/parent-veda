@@ -101,6 +101,13 @@ const String kCrisisHelplineHours =
 /// "you or your baby are in danger right now", never as the primary CTA.
 const String kEmergencyNumber = '112';
 
+/// India's ambulance number (2026-09-28). Real, not a placeholder: 108 is
+/// the free emergency ambulance service in most states, and it reaches an
+/// ambulance directly where 112 first reaches a call centre. Shown beside
+/// [kEmergencyNumber] where the danger is medical (a door's "Go to a
+/// hospital today" sheet, the Get help page), never on its own.
+const String kAmbulanceNumber = '108';
+
 // =============================================================================
 //  Feel - breathing
 // =============================================================================

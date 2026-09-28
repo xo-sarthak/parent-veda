@@ -42,8 +42,39 @@ class TtcPrepareScreen extends StatelessWidget {
   /// topic chips; kept on the facade so callers and tests keep one name.
   static List<(String, String, String)> get categories => ttcPrepareCategories;
 
+  /// The stage's courses, when the page is scoped to them.
+  static List<PvOfferingView> get ttcCourses => PvLearnCatalog.instance
+      .all(stage: LifeStage.tryingToConceive, kind: PvLearnKind.course);
+
   @override
-  Widget build(BuildContext context) => PvLearnScreen(
+  Widget build(BuildContext context) {
+    // ⚠️ ONE COURSE OPENS AS THE COURSE (launch sanity T9, 2026-09-28). The
+    // stage has one course, and "Courses" opened a catalogue around it: filter
+    // chips (All courses / Mind / Calm), a bookmark and a profile button, for
+    // content that does not exist, and a thumbnail borrowed from another page.
+    // With one course there is nothing to choose between, so the page IS that
+    // course, with its sessions (the free garbh course has its own screen,
+    // as `TtcOfferingScreenClassic` already decided). The catalogue comes
+    // back by itself the day a second course lands. Mobbin: Mindvalley and
+    // Moonly open a course as its own page, title then the lessons, with no
+    // catalogue chrome above it:
+    // https://mobbin.com/screens/faa52b2c-a18a-40ef-8ae5-b93ce809529e ,
+    // https://mobbin.com/screens/8c28da17-ed33-4f9d-bb3e-c8f02f8a0d88 .
+    // Kept for revert (2026-09-28): the PvLearnScreen below for 'courses'
+    // whatever the count.
+    if (onlyCategory == 'courses') {
+      final courses = ttcCourses;
+      if (courses.length == 1) {
+        final only = courses.single;
+        return only.id == kTtcOfferingGarbhCourse
+            ? const TtcGarbhCourseScreen()
+            : PvOfferingScreen(view: only);
+      }
+    }
+    return _learn();
+  }
+
+  Widget _learn() => PvLearnScreen(
         stage: LifeStage.tryingToConceive,
         // The page says what it holds (launch walk, 2026-09-27): "Talk to an
         // expert" opened a page titled "Learn".

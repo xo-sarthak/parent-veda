@@ -203,9 +203,12 @@ extension TtcMessageKindInfo on TtcMessageKind {
   /// When it arrives, said plainly. Used under the switch and in the empty
   /// state, which is this feature's advertisement.
   String get when => switch (this) {
+        // One name per idea (M3, 2026-09-28): the switch is "Your fertile
+        // window", so its line says the window opens. Kept for revert:
+        //   'The morning your fertile days start. Only when ...'
         TtcMessageKind.windowOpens =>
-          'The morning your fertile days start. Only when your own cycle sets '
-              'the timing, not a clinic.',
+          'The morning your fertile window opens. Only when your own cycle '
+              'sets the timing, not a clinic.',
         TtcMessageKind.periodCame =>
           'The evening you log a period. A few kind words and what it means.',
         TtcMessageKind.lateByOne =>
@@ -220,6 +223,60 @@ extension TtcMessageKindInfo on TtcMessageKind {
           'While your clinic runs a round. The evening before each scan, '
               'procedure and blood test, and a few kind words in the wait.',
       };
+}
+
+/// The words of a "fertile window" message, for the window that opens on
+/// [opens], as they read on [today] (launch sanity M1, M3, 2026-09-28).
+///
+/// ⚠️ WHY THE WORDS ARE DRAWN, NOT STORED. A delivered message was frozen at
+/// send time: one sent by a build that still counted a seven-day window said
+/// "your fertile days run from today to Sat 3 Oct" while the Fertile window
+/// tool, one tap away, said 27 Sep to 2 Oct, and a day later it still said
+/// "opens today". The id already carries the date the window opened, so the
+/// list redraws the words from it with the SAME rule the tool resolves
+/// (`ttcFertileWindowNow`: six days ending on the likely ovulation day,
+/// `ttcWindowOpensBeforeOvulation` + `ttcWindowClosesAfterOvulation`). An old
+/// message therefore reads right after an upgrade, and the tense follows the
+/// day she reads it.
+///
+/// One name per idea (M3): "fertile window" names the thing and the tool,
+/// "fertile days" are the days in it, and the first message says so once.
+(String, String) ttcWindowMessageText(DateTime opens, DateTime today) {
+  final o = _day(opens);
+  final t = _day(today);
+  final closes = o.add(const Duration(
+      days: ttcWindowOpensBeforeOvulation + ttcWindowClosesAfterOvulation));
+  const tail = " Sex every day or two in this time is plenty. It's an "
+      'estimate, so give or take a day.';
+  if (!t.isAfter(o)) {
+    return (
+      'Your fertile window opens today',
+      'Your fertile window is the ${ttcWindowOpensBeforeOvulation + ttcWindowClosesAfterOvulation + 1} '
+          'days ending on the day you most likely ovulate. Going by your dates, your fertile days run from today to '
+          '${ttcDayDate(closes)}.$tail',
+    );
+  }
+  if (!t.isAfter(closes)) {
+    final began = t.difference(o).inDays == 1
+        ? 'yesterday'
+        : 'on ${ttcDayDate(o)}';
+    return (
+      'Your fertile window is open',
+      'Going by your dates, your fertile days began $began and run to '
+          '${ttcDayDate(closes)}.$tail',
+    );
+  }
+  return (
+    'Your fertile window, ${ttcShortDay(o)} to ${ttcShortDay(closes)}',
+    'Going by your dates, your fertile days ran from ${ttcDayDate(o)} to '
+        "${ttcDayDate(closes)}. It was an estimate, so give or take a day.",
+  );
+}
+
+/// The date a message is about, from its id (`window:2026-09-27`).
+DateTime? _idDate(String id) {
+  final i = id.indexOf(':');
+  return i < 0 ? null : DateTime.tryParse(id.substring(i + 1));
 }
 
 /// One message, pending or delivered.
@@ -257,6 +314,17 @@ class TtcMessage {
 
   /// The surfaces a tap tries, best first.
   List<String> get destinations => to ?? kind.destinations;
+
+  /// The title and body as they read on [now] (M1, 2026-09-28). A fertile
+  /// window message is redrawn from the date in its id; every other kind
+  /// shows the words it was sent with.
+  (String, String) shownOn(DateTime now) {
+    if (kind == TtcMessageKind.windowOpens) {
+      final opens = _idDate(id);
+      if (opens != null) return ttcWindowMessageText(opens, now);
+    }
+    return (title, body);
+  }
 
   bool deliveredBy(DateTime now) => !at.isAfter(now);
 
@@ -484,14 +552,22 @@ List<TtcMessage> ttcMessageCandidates(TtcMessageFacts f, DateTime now) {
       opens != null &&
       closes != null &&
       !_day(opens).isBefore(today)) {
+    // ⚠️ THE WORDS COME FROM THE DATES, AND THE DATES FROM THE ONE RULE
+    // (launch sanity M1, M3, 2026-09-28). `ttcWindowMessageText` writes the
+    // same words the list later redraws from this id, so the message and
+    // the Fertile window tool can never name two different end dates.
+    // Kept for revert:
+    //   title: 'Your fertile window opens today',
+    //   body: 'Going by your dates, your fertile days run from today to '
+    //       "${ttcDayDate(closes)}. Sex every day or two in this time is "
+    //       "plenty. It's an estimate, so give or take a day.",
+    final (title, body) = ttcWindowMessageText(opens, _day(opens));
     out.add(TtcMessage(
       id: 'window:${_key(opens)}',
       kind: TtcMessageKind.windowOpens,
       at: _at(opens, 8),
-      title: 'Your fertile window opens today',
-      body: 'Going by your dates, your fertile days run from today to '
-          "${ttcDayDate(closes)}. Sex every day or two in this time is plenty. "
-          "It's an estimate, so give or take a day.",
+      title: title,
+      body: body,
     ));
   }
 

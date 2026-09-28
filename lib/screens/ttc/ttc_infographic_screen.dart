@@ -28,6 +28,8 @@ import 'package:flutter/material.dart';
 
 import '../../theme/pv_fonts.dart';
 import '../../ttc/ttc_focus_data.dart';
+import '../../ttc/ttc_expert_signoff.dart'
+    show ttcStoryReviewer, ttcStoryBylineIsPerson;
 import '../v2/v2_palette.dart';
 import '../v2/v3_hero_field.dart';
 import 'ttc_common.dart';
@@ -194,13 +196,27 @@ class TtcInfographicScreen extends StatelessWidget {
                     ),
                   ],
 
-                  if (tile.reviewedBy != null) ...[
+                  // ⚠️ NO "REVIEWED BY" AND NO TICK UNTIL SIGNED OFF (launch
+                  // sanity, H14's follow-up, 2026-09-28). Both PCOS
+                  // comparisons said "Reviewed by Dr Ruchika Sood" beside a
+                  // verified mark, and she has not read them. Until the
+                  // title is in her set in `kTtcSignedOffStories` the line
+                  // reads "By ParentVeda team", with no mark. Kept for
+                  // revert: the verified icon and `tile.reviewedBy!` always.
+                  if (ttcStoryReviewer(tile.reviewedBy, tile.title)
+                      case final shown?) ...[
                     const SizedBox(height: 18),
                     Row(children: [
-                      Icon(Icons.verified_outlined, size: 15, color: p.ink3),
-                      const SizedBox(width: 8),
+                      if (ttcStoryBylineIsPerson(shown)) ...[
+                        Icon(Icons.verified_outlined, size: 15, color: p.ink3),
+                        const SizedBox(width: 8),
+                      ],
                       Expanded(
-                        child: Text(tile.reviewedBy!,
+                        child: Text(
+                            ttcStoryBylineIsPerson(shown)
+                                ? shown
+                                : 'By ParentVeda team',
+                            key: const ValueKey('ttc_infographic_byline'),
                             style: ttcBody(11.5, color: ttcMuted,
                                 w: FontWeight.w700)),
                       ),

@@ -443,6 +443,38 @@ void main() {
       await tester.tap(find.byKey(const ValueKey('ttc_ov_adopt_yes')));
       await tester.pump();
       expect(CycleStore.instance.lhPositiveDay, 11);
+      // Launch sanity T3: day 11 against an estimate of day 14 is close, so
+      // nothing extra is said.
+      expect(find.byKey(const ValueKey('ttc_ov_adopt_far')), findsNothing);
+    });
+
+    // Launch sanity T3 (2026-09-28): a positive far from her pattern.
+    test('a positive far from the estimate is named early or late', () {
+      expect(ttcOvPositiveFar(6, 14), TtcOvFar.early);
+      expect(ttcOvPositiveFar(12, 14), isNull);
+      expect(ttcOvPositiveFar(16, 14), isNull);
+      expect(ttcOvPositiveFar(19, 14), TtcOvFar.late);
+      expect(ttcOvPositiveFar(6, null), isNull, reason: 'no estimate, no word');
+    });
+
+    testWidgets('an early positive is said before Use it, once, and Not now '
+        'moves nothing', (tester) async {
+      cycles(dayNow: 7);
+      ttcOvSetResult(_plus(-1), kTtcOvPositive); // cycle day 6
+      await _pump(tester, const TtcOvulationScreen());
+      expect(find.byKey(const ValueKey('ttc_ov_adopt')), findsOneWidget,
+          reason: 'the offer is drawn once');
+      expect(find.byKey(const ValueKey('ttc_ov_adopt_far')), findsOneWidget);
+      expect(find.textContaining("That's early for your cycle"),
+          findsOneWidget);
+      // It sits with the strip, above the Negative / Positive buttons.
+      expect(
+          tester.getTopLeft(find.byKey(const ValueKey('ttc_ov_adopt'))).dy,
+          lessThan(tester.getTopLeft(find.text(kTtcOvPositiveLabel)).dy));
+      await tester.tap(find.byKey(const ValueKey('ttc_ov_adopt_not_now')));
+      await tester.pump();
+      expect(CycleStore.instance.lhPositiveDay, isNull);
+      expect(find.byKey(const ValueKey('ttc_ov_adopt')), findsNothing);
     });
 
     testWidgets('it says when to start testing, from her own cycle', (

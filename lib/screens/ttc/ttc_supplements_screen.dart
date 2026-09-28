@@ -77,8 +77,10 @@ class _TtcSupplementsScreenState extends State<TtcSupplementsScreen> {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: Listenable.merge(
-          [TtcSupplementsStore.instance, TtcLang.instance]),
+      animation: Listenable.merge([
+        TtcSupplementsStore.instance,
+        TtcLang.instance,
+      ]),
       builder: (context, _) {
         final t = TtcS.current();
         final hi = t.hinglish;
@@ -92,18 +94,35 @@ class _TtcSupplementsScreenState extends State<TtcSupplementsScreen> {
         // added is on the list above, not a second time down here.
         final ideas = [
           for (final s in ttcSuggestedSupplements)
-            if (!store.has(s.name,
-                s.forPartner ? TtcAuthor.partner : TtcAuthor.me))
-              s
+            if (!store.has(
+              s.name,
+              s.forPartner ? TtcAuthor.partner : TtcAuthor.me,
+            ))
+              s,
         ];
+        // ⚠️ ONE ROW PER NAME (launch sanity T5, 2026-09-28). CoQ10 is two
+        // honest entries (her egg quality, his sperm), and the walk read the
+        // two rows as a duplicate. They are drawn as ONE row now, with both
+        // reasons and a "For you" / "For him" add each; once one side is on
+        // a list, the row carries only the other. The data keeps its two
+        // entries, so nothing saved moves.
+        final ideaGroups = <List<TtcSuggestedSupplement>>[];
+        for (final s in ideas) {
+          final same = ideaGroups.where((g) => g.first.name == s.name);
+          if (same.isEmpty) {
+            ideaGroups.add([s]);
+          } else {
+            same.first.add(s);
+          }
+        }
 
         Widget row(TtcSupplement s) => TtcDoseRow(
-              name: s.name,
-              detail: s.dose,
-              taken: store.isTaken(s.id, on: _day),
-              onTick: () => store.toggleTaken(s.id, on: _day),
-              onOpen: () => openTtcSupplement(context, s.id),
-            );
+          name: s.name,
+          detail: s.dose,
+          taken: store.isTaken(s.id, on: _day),
+          onTick: () => store.toggleTaken(s.id, on: _day),
+          onOpen: () => openTtcSupplement(context, s.id),
+        );
 
         return TtcToolScaffold(
           // Care and medicines' hue in Tools, the same as Medication.
@@ -118,132 +137,164 @@ class _TtcSupplementsScreenState extends State<TtcSupplementsScreen> {
           //     'tick it for today.',
           intro: store.items.isEmpty
               ? 'A daily list of the vitamins you each take. Add yours, then '
-                  'tick them off each day.'
+                    'tick them off each day.'
               : 'Tap the circle when you take one. Tap the name to see its '
-                  'days, change it or remove it.',
+                    'days, change it or remove it.',
           // The same "Add" Records and Appointments wear, top right.
           action: TtcDoseHeroAdd(onTap: () => editTtcSupplement(context, null)),
           children: [
-            ttcToolPad(Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const SizedBox(height: 22),
+            ttcToolPad(
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SizedBox(height: 22),
 
-                // Two rows of one name, from before the one-name rule.
-                for (final g in dupes) ...[
-                  _MergeNotice(group: g),
-                  const SizedBox(height: 14),
-                ],
+                  // Two rows of one name, from before the one-name rule.
+                  for (final g in dupes) ...[
+                    _MergeNotice(group: g),
+                    const SizedBox(height: 14),
+                  ],
 
-                if (store.items.isEmpty)
-                  // The empty state keeps its promise: its button opens a
-                  // form she can type into, and the suggestions sit below.
-                  TtcDoseEmpty(
-                    icon: Icons.eco_outlined,
-                    title: t.supplementsEmptyTitle,
-                    body: t.supplementsEmptyBody,
-                    cta: 'Add your own',
-                    onTap: () => editTtcSupplement(context, null),
-                  )
-                else ...[
-                  TtcDayStrip(
-                    selected: _day,
-                    onPick: (d) => setState(() => _day = d),
-                    anyTakenOn: store.anyTakenOn,
-                  ),
-                  const SizedBox(height: 16),
-                  // A count, never a percentage, and it says what it counts.
-                  // Kept for revert (2026-09-27): the "Taken today" card with
-                  // '${store.takenToday()} of ${store.items.length}'.
-                  Text.rich(
-                    key: const ValueKey('ttc_supp_count'),
-                    TextSpan(children: [
+                  if (store.items.isEmpty)
+                    // The empty state keeps its promise: its button opens a
+                    // form she can type into, and the suggestions sit below.
+                    TtcDoseEmpty(
+                      icon: Icons.eco_outlined,
+                      title: t.supplementsEmptyTitle,
+                      body: t.supplementsEmptyBody,
+                      cta: 'Add your own',
+                      onTap: () => editTtcSupplement(context, null),
+                    )
+                  else ...[
+                    TtcDayStrip(
+                      selected: _day,
+                      onPick: (d) => setState(() => _day = d),
+                      anyTakenOn: store.anyTakenOn,
+                    ),
+                    const SizedBox(height: 16),
+                    // A count, never a percentage, and it says what it counts.
+                    // Kept for revert (2026-09-27): the "Taken today" card with
+                    // '${store.takenToday()} of ${store.items.length}'.
+                    Text.rich(
+                      key: const ValueKey('ttc_supp_count'),
                       TextSpan(
-                          text: ttcDoseDayName(_day),
-                          style: pvManrope(
+                        children: [
+                          TextSpan(
+                            text: ttcDoseDayName(_day),
+                            style: pvManrope(
                               fontSize: 14,
                               fontWeight: FontWeight.w800,
-                              color: p.ink1)),
-                      TextSpan(
-                          text: '  ·  ${store.takenToday(on: _day)} of '
-                              '${store.items.length} taken',
-                          style: pvManrope(fontSize: 13.5, color: p.ink2)),
-                    ]),
-                  ),
-                  if (!isToday) ...[
-                    const SizedBox(height: 4),
-                    Text('Tick what you took that day.',
-                        style: pvManrope(fontSize: 12.5, color: p.ink2)),
-                  ],
-                  const SizedBox(height: 14),
-                  if (mine.isNotEmpty) ...[
-                    TtcDoseGroup(
+                              color: p.ink1,
+                            ),
+                          ),
+                          TextSpan(
+                            text:
+                                '  ·  ${store.takenToday(on: _day)} of '
+                                '${store.items.length} taken',
+                            style: pvManrope(fontSize: 13.5, color: p.ink2),
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (!isToday) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        'Tick what you took that day.',
+                        style: pvManrope(fontSize: 12.5, color: p.ink2),
+                      ),
+                    ],
+                    const SizedBox(height: 14),
+                    if (mine.isNotEmpty) ...[
+                      TtcDoseGroup(
                         label: hi ? 'Aapke' : 'Yours',
-                        children: [for (final s in mine) row(s)]),
-                    const SizedBox(height: 18),
-                  ],
-                  if (theirs.isNotEmpty) ...[
-                    TtcDoseGroup(
+                        children: [for (final s in mine) row(s)],
+                      ),
+                      const SizedBox(height: 18),
+                    ],
+                    if (theirs.isNotEmpty) ...[
+                      TtcDoseGroup(
                         label: hi ? 'Partner ke' : "Your partner's",
-                        children: [for (final s in theirs) row(s)]),
-                    const SizedBox(height: 18),
+                        children: [for (final s in theirs) row(s)],
+                      ),
+                      const SizedBox(height: 18),
+                    ],
                   ],
-                ],
 
-                const SizedBox(height: 8),
-                // What to Expect's vitamin log opens with one read; this is
-                // ours, where she is deciding what to take.
-                TtcDoseLinkRow(
-                  key: const ValueKey('ttc_supp_read'),
-                  icon: Icons.menu_book_outlined,
-                  eyebrow: 'Read',
-                  text: 'When to start what, and how early',
-                  onTap: () => openTtcSurface(
-                      context, '$kTtcReadPrefix$kTtcSupplementsRead'),
-                ),
+                  const SizedBox(height: 8),
+                  // What to Expect's vitamin log opens with one read; this is
+                  // ours, where she is deciding what to take.
+                  TtcDoseLinkRow(
+                    key: const ValueKey('ttc_supp_read'),
+                    icon: Icons.menu_book_outlined,
+                    eyebrow: 'Read',
+                    text: 'When to start what, and how early',
+                    onTap: () => openTtcSurface(
+                      context,
+                      '$kTtcReadPrefix$kTtcSupplementsRead',
+                    ),
+                  ),
 
-                if (ideas.isNotEmpty) ...[
-                  const SizedBox(height: 26),
-                  ttcDoseHeading(t.supplementsSuggested),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: Text(
+                  if (ideas.isNotEmpty) ...[
+                    const SizedBox(height: 26),
+                    ttcDoseHeading(t.supplementsSuggested),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: Text(
                         "Tap one to add it to your list. Listing one here "
                         "isn't advice to take it.",
                         style: pvManrope(
-                            fontSize: 12.5, height: 1.5, color: p.ink2)),
-                  ),
-                  // Offering is not recommending. The dose is left as "as
-                  // advised" on purpose for everything except folic acid,
-                  // where the guideline number is genuinely universal.
-                  TtcDoseGroup(children: [
-                    for (final s in ideas) _SuggestionRow(suggestion: s, t: t),
-                  ]),
-                ],
+                          fontSize: 12.5,
+                          height: 1.5,
+                          color: p.ink2,
+                        ),
+                      ),
+                    ),
+                    // Offering is not recommending. The dose is left as "as
+                    // advised" on purpose for everything except folic acid,
+                    // where the guideline number is genuinely universal.
+                    // Kept for revert (2026-09-28): one _SuggestionRow per entry.
+                    //   for (final s in ideas) _SuggestionRow(suggestion: s, t: t),
+                    TtcDoseGroup(
+                      children: [
+                        for (final g in ideaGroups)
+                          _SuggestionGroupRow(variants: g, t: t),
+                      ],
+                    ),
+                  ],
 
-                const SizedBox(height: 22),
-                // ⚠️ ONE PLAIN LINE ON THE DIFFERENCE, the mirror of the one
-                // on Medication: two tiles sit side by side in Tools, and
-                // nothing said which one a prescription goes in.
-                TtcDoseLinkRow(
-                  icon: Icons.medication_outlined,
-                  text: 'Something your clinic prescribed? That goes in '
-                      'Medication.',
-                  onTap: () => openTtcMedication(context),
-                ),
-                const SizedBox(height: 16),
-                Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Icon(Icons.info_outline_rounded, size: 15, color: p.ink3),
-                  const SizedBox(width: 9),
-                  Expanded(
-                    child: Text(t.supplementsDisclaimer,
-                        style: pvManrope(
-                            fontSize: 11.5, height: 1.5, color: p.ink3)),
+                  const SizedBox(height: 22),
+                  // ⚠️ ONE PLAIN LINE ON THE DIFFERENCE, the mirror of the one
+                  // on Medication: two tiles sit side by side in Tools, and
+                  // nothing said which one a prescription goes in.
+                  TtcDoseLinkRow(
+                    icon: Icons.medication_outlined,
+                    text:
+                        'Something your clinic prescribed? That goes in '
+                        'Medication.',
+                    onTap: () => openTtcMedication(context),
                   ),
-                ]),
-                const SizedBox(height: 26),
-              ],
-            )),
+                  const SizedBox(height: 16),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(Icons.info_outline_rounded, size: 15, color: p.ink3),
+                      const SizedBox(width: 9),
+                      Expanded(
+                        child: Text(
+                          t.supplementsDisclaimer,
+                          style: pvManrope(
+                            fontSize: 11.5,
+                            height: 1.5,
+                            color: p.ink3,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 26),
+                ],
+              ),
+            ),
           ],
         );
       },
@@ -251,78 +302,294 @@ class _TtcSupplementsScreenState extends State<TtcSupplementsScreen> {
   }
 }
 
-/// One suggestion, as a row. The whole row adds it.
-class _SuggestionRow extends StatelessWidget {
-  const _SuggestionRow({required this.suggestion, required this.t});
+// ⚠️ KEPT FOR REVERT (launch sanity T5, 2026-09-28): the row whose "Add" sat
+// after the name, half-way across (a `Flexible` name and a `Spacer` split the
+// free width between them), and which drew CoQ10 twice.
+// /// One suggestion, as a row. The whole row adds it.
+// class _SuggestionRow extends StatelessWidget {
+//   const _SuggestionRow({required this.suggestion, required this.t});
+//
+//   final TtcSuggestedSupplement suggestion;
+//   final TtcS t;
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     final p = V2PaletteStore.instance.current;
+//     final author = suggestion.forPartner ? TtcAuthor.partner : TtcAuthor.me;
+//     return InkWell(
+//       onTap: () {
+//         TtcSupplementsStore.instance.add(
+//           suggestion.name,
+//           dose: suggestion.dose,
+//           author: author,
+//         );
+//         // Tell her where it went: a partner's item lands in a list further
+//         // up the screen, out of sight of the thumb that added it.
+//         pvSnack(
+//             context,
+//             suggestion.forPartner
+//                 ? "Added to your partner's list"
+//                 : 'Added to your list',
+//             icon: Icons.check_rounded,
+//             lift: 24);
+//       },
+//       child: Padding(
+//         padding: const EdgeInsets.fromLTRB(16, 14, 14, 14),
+//         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+//           Row(children: [
+//             Flexible(
+//               child: Text(suggestion.name,
+//                   style: pvJakarta(
+//                       fontSize: 15,
+//                       fontWeight: FontWeight.w700,
+//                       color: p.ink1)),
+//             ),
+//             if (suggestion.forPartner) ...[
+//               const SizedBox(width: 8),
+//               Container(
+//                 padding:
+//                     const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+//                 decoration: BoxDecoration(
+//                   borderRadius: BorderRadius.circular(999),
+//                   border: Border.all(color: p.line),
+//                 ),
+//                 child: Text(t.forPartnerTag,
+//                     style: pvManrope(
+//                         fontSize: 10.5,
+//                         fontWeight: FontWeight.w700,
+//                         color: p.ink2)),
+//               ),
+//             ],
+//             const Spacer(),
+//             // Says what a tap does, in words, beside the name.
+//             Row(mainAxisSize: MainAxisSize.min, children: [
+//               Icon(Icons.add_rounded, size: 16, color: p.ink1),
+//               const SizedBox(width: 3),
+//               Text('Add',
+//                   style: pvManrope(
+//                       fontSize: 12.5,
+//                       fontWeight: FontWeight.w800,
+//                       color: p.ink1)),
+//             ]),
+//           ]),
+//           const SizedBox(height: 6),
+//           Text(suggestion.note(t.hinglish),
+//               style: pvManrope(fontSize: 12.5, height: 1.5, color: p.ink2)),
+//         ]),
+//       ),
+//     );
+//   }
+// }
 
-  final TtcSuggestedSupplement suggestion;
+/// One suggested supplement, as one row, whoever it is for.
+///
+/// ⚠️ THE ADD SITS IN A FIXED TRAILING COLUMN (launch sanity T5, 2026-09-28).
+/// The name and its reason take the flexible width; the add control always
+/// ends at the right edge, the same distance in on every row, so a column of
+/// Adds reads as a column rather than as a layout bug. Mobbin: Klarna's pick
+/// list keeps its control at the row's right edge whatever the name's length,
+/// https://mobbin.com/screens/bd9745d3-b6ac-486f-8d95-9dad4de43a38 .
+///
+/// [variants] is one entry, or two of the same name (hers and his, CoQ10).
+/// With one, the whole row adds it, as before. With two, each has its own
+/// add ("For you", "For him") and its own reason, because the reason differs.
+class _SuggestionGroupRow extends StatelessWidget {
+  const _SuggestionGroupRow({required this.variants, required this.t});
+
+  final List<TtcSuggestedSupplement> variants;
   final TtcS t;
+
+  void _add(BuildContext context, TtcSuggestedSupplement s) {
+    TtcSupplementsStore.instance.add(
+      s.name,
+      dose: s.dose,
+      author: s.forPartner ? TtcAuthor.partner : TtcAuthor.me,
+    );
+    // Tell her where it went: a partner's item lands in a list further up
+    // the screen, out of sight of the thumb that added it.
+    pvSnack(
+      context,
+      s.forPartner ? "Added to your partner's list" : 'Added to your list',
+      icon: Icons.check_rounded,
+      lift: 24,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final p = V2PaletteStore.instance.current;
-    final author = suggestion.forPartner ? TtcAuthor.partner : TtcAuthor.me;
-    return InkWell(
-      onTap: () {
-        TtcSupplementsStore.instance.add(
-          suggestion.name,
-          dose: suggestion.dose,
-          author: author,
-        );
-        // Tell her where it went: a partner's item lands in a list further
-        // up the screen, out of sight of the thumb that added it.
-        pvSnack(
-            context,
-            suggestion.forPartner
-                ? "Added to your partner's list"
-                : 'Added to your list',
-            icon: Icons.check_rounded,
-            lift: 24);
-      },
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 14, 14, 14),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [
-            Flexible(
-              child: Text(suggestion.name,
-                  style: pvJakarta(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                      color: p.ink1)),
+    final hi = t.hinglish;
+    final both = variants.length > 1;
+    final first = variants.first;
+
+    Widget addControl(String label, VoidCallback onTap, {Key? key}) =>
+        Semantics(
+          button: true,
+          label: '$label: ${first.name}',
+          excludeSemantics: true,
+          child: InkWell(
+            key: key,
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(999),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.add_rounded, size: 16, color: p.ink1),
+                  const SizedBox(width: 3),
+                  // Flexible so a large system font squeezes the word rather
+                  // than overflowing the fixed column.
+                  Flexible(
+                    child: Text(
+                      label,
+                      maxLines: 1,
+                      overflow: TextOverflow.fade,
+                      softWrap: false,
+                      style: pvManrope(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w800,
+                        color: p.ink1,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-            if (suggestion.forPartner) ...[
-              const SizedBox(width: 8),
+          ),
+        );
+
+    final noteStyle = pvManrope(fontSize: 12.5, height: 1.5, color: p.ink2);
+    final forLabelStyle = pvManrope(
+      fontSize: 12.5,
+      height: 1.5,
+      fontWeight: FontWeight.w700,
+      color: p.ink1,
+    );
+
+    final body = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // A Wrap, not a Row: in the narrower body the tag drops under the
+        // name instead of overflowing it at 360dp.
+        Wrap(
+          spacing: 8,
+          runSpacing: 4,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            Text(
+              first.name,
+              style: pvJakarta(
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+                color: p.ink1,
+              ),
+            ),
+            if (!both && first.forPartner) ...[
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(999),
                   border: Border.all(color: p.line),
                 ),
-                child: Text(t.forPartnerTag,
-                    style: pvManrope(
-                        fontSize: 10.5,
-                        fontWeight: FontWeight.w700,
-                        color: p.ink2)),
+                child: Text(
+                  t.forPartnerTag,
+                  style: pvManrope(
+                    fontSize: 10.5,
+                    fontWeight: FontWeight.w700,
+                    color: p.ink2,
+                  ),
+                ),
               ),
             ],
-            const Spacer(),
-            // Says what a tap does, in words, beside the name.
-            Row(mainAxisSize: MainAxisSize.min, children: [
-              Icon(Icons.add_rounded, size: 16, color: p.ink1),
-              const SizedBox(width: 3),
-              Text('Add',
-                  style: pvManrope(
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.w800,
-                      color: p.ink1)),
-            ]),
-          ]),
-          const SizedBox(height: 6),
-          Text(suggestion.note(t.hinglish),
-              style: pvManrope(fontSize: 12.5, height: 1.5, color: p.ink2)),
-        ]),
+          ],
+        ),
+        const SizedBox(height: 6),
+        if (!both)
+          Text(first.note(hi), style: noteStyle)
+        else
+          for (final v in variants) ...[
+            Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text: v.forPartner ? 'For him: ' : 'For you: ',
+                    style: forLabelStyle,
+                  ),
+                  TextSpan(text: v.note(hi)),
+                ],
+              ),
+              style: noteStyle,
+            ),
+            if (v != variants.last) const SizedBox(height: 6),
+          ],
+      ],
+    );
+
+    // The fixed trailing column: the same width on every row.
+    final trailing = SizedBox(
+      width: 92,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: both
+            ? [
+                for (final v in variants)
+                  addControl(
+                    v.forPartner ? 'For him' : 'For you',
+                    () => _add(context, v),
+                    key: ValueKey(
+                      'ttc_supp_idea_${v.name}_${v.forPartner ? 'him' : 'you'}',
+                    ),
+                  ),
+              ]
+            : [
+                // The whole row adds it; the word says what a tap does.
+                ExcludeSemantics(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 6,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.add_rounded, size: 16, color: p.ink1),
+                        const SizedBox(width: 3),
+                        Text(
+                          'Add',
+                          style: pvManrope(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w800,
+                            color: p.ink1,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
       ),
+    );
+
+    final row = Padding(
+      padding: const EdgeInsets.fromLTRB(16, 14, 8, 14),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(child: body),
+          const SizedBox(width: 10),
+          trailing,
+        ],
+      ),
+    );
+
+    if (both) return row;
+    return Semantics(
+      button: true,
+      label:
+          'Add ${first.name}'
+          '${first.forPartner ? ' to your partner\'s list' : ''}',
+      child: InkWell(onTap: () => _add(context, first), child: row),
     );
   }
 }
@@ -339,8 +606,9 @@ class _MergeNotice extends StatelessWidget {
     final p = V2PaletteStore.instance.current;
     final first = group.first;
     final dose = TtcSupplementsStore.mergedDose(group);
-    final whose =
-        first.author == TtcAuthor.partner ? "your partner's list" : 'your list';
+    final whose = first.author == TtcAuthor.partner
+        ? "your partner's list"
+        : 'your list';
     final times = group.length == 2 ? 'twice' : '${group.length} times';
     return Container(
       key: ValueKey('ttc_supp_dupe_${first.id}'),
@@ -350,30 +618,43 @@ class _MergeNotice extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: p.ink2, width: 1.2),
       ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text('${first.name} is on $whose $times',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '${first.name} is on $whose $times',
             style: pvJakarta(
-                fontSize: 15, fontWeight: FontWeight.w700, color: p.ink1)),
-        const SizedBox(height: 6),
-        Text(
+              fontSize: 15,
+              fontWeight: FontWeight.w700,
+              color: p.ink1,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
             'Merge them into one row: ${first.name}'
             '${dose.isEmpty ? '' : ', $dose'}. Every day you ticked either '
             'one is kept. Or open one below to change or remove it.',
-            style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2)),
-        const SizedBox(height: 12),
-        TtcDoseInkButton(
-          key: ValueKey('ttc_supp_merge_${first.id}'),
-          label: 'Merge them',
-          icon: Icons.call_merge_rounded,
-          onTap: () {
-            final kept = TtcSupplementsStore.instance.merge(group);
-            if (kept != null) {
-              pvSnack(context, '${kept.name} is one row now',
-                  icon: Icons.check_rounded, lift: 24);
-            }
-          },
-        ),
-      ]),
+            style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2),
+          ),
+          const SizedBox(height: 12),
+          TtcDoseInkButton(
+            key: ValueKey('ttc_supp_merge_${first.id}'),
+            label: 'Merge them',
+            icon: Icons.call_merge_rounded,
+            onTap: () {
+              final kept = TtcSupplementsStore.instance.merge(group);
+              if (kept != null) {
+                pvSnack(
+                  context,
+                  '${kept.name} is one row now',
+                  icon: Icons.check_rounded,
+                  lift: 24,
+                );
+              }
+            },
+          ),
+        ],
+      ),
     );
   }
 }
@@ -384,10 +665,12 @@ class _MergeNotice extends StatelessWidget {
 
 /// Opens one supplement: today's tick, its last four weeks, change, remove.
 void openTtcSupplement(BuildContext context, String id) {
-  Navigator.of(context).push(MaterialPageRoute<void>(
-    builder: (_) => TtcSupplementDetailScreen(id: id),
-    settings: const RouteSettings(name: 'ttc/supplement'),
-  ));
+  Navigator.of(context).push(
+    MaterialPageRoute<void>(
+      builder: (_) => TtcSupplementDetailScreen(id: id),
+      settings: const RouteSettings(name: 'ttc/supplement'),
+    ),
+  );
 }
 
 class TtcSupplementDetailScreen extends StatefulWidget {
@@ -421,7 +704,8 @@ class _TtcSupplementDetailScreenState extends State<TtcSupplementDetailScreen> {
             hue: kIvfHue,
             eyebrow: t.supplements,
             title: 'Not on the list any more.',
-            intro: 'It was removed, or merged into another row with the same '
+            intro:
+                'It was removed, or merged into another row with the same '
                 'name. Close this to go back to the list.',
             children: const [SizedBox(height: 40)],
           );
@@ -437,43 +721,49 @@ class _TtcSupplementDetailScreenState extends State<TtcSupplementDetailScreen> {
           ].join(' '),
           variant: 3,
           children: [
-            ttcToolPad(Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const SizedBox(height: 22),
-                TtcDoseTodayButton(
-                  taken: store.isTaken(s.id),
-                  onTap: () => store.toggleTaken(s.id),
-                ),
-                const SizedBox(height: 26),
-                ttcDoseHeading('The last four weeks'),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: Text(
+            ttcToolPad(
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SizedBox(height: 22),
+                  TtcDoseTodayButton(
+                    taken: store.isTaken(s.id),
+                    onTap: () => store.toggleTaken(s.id),
+                  ),
+                  const SizedBox(height: 26),
+                  ttcDoseHeading('The last four weeks'),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: Text(
                       'Each filled circle is a day it was ticked. Tap a day '
                       'to add or clear it.',
                       style: pvManrope(
-                          fontSize: 12.5, height: 1.5, color: p.ink2)),
-                ),
-                TtcDoseHistory(
-                  takenOn: (d) => store.isTaken(s.id, on: d),
-                  onToggle: (d) => store.toggleTaken(s.id, on: d),
-                ),
-                const SizedBox(height: 26),
-                TtcDoseLinkRow(
-                  key: const ValueKey('ttc_supp_change'),
-                  icon: Icons.edit_outlined,
-                  text: 'Change the name or dose',
-                  onTap: () => editTtcSupplement(context, s),
-                ),
-                const SizedBox(height: 14),
-                TtcDoseRemoveLine(
-                  label: 'Remove from the list',
-                  onTap: () => _remove(context, s),
-                ),
-                const SizedBox(height: 26),
-              ],
-            )),
+                        fontSize: 12.5,
+                        height: 1.5,
+                        color: p.ink2,
+                      ),
+                    ),
+                  ),
+                  TtcDoseHistory(
+                    takenOn: (d) => store.isTaken(s.id, on: d),
+                    onToggle: (d) => store.toggleTaken(s.id, on: d),
+                  ),
+                  const SizedBox(height: 26),
+                  TtcDoseLinkRow(
+                    key: const ValueKey('ttc_supp_change'),
+                    icon: Icons.edit_outlined,
+                    text: 'Change the name or dose',
+                    onTap: () => editTtcSupplement(context, s),
+                  ),
+                  const SizedBox(height: 14),
+                  TtcDoseRemoveLine(
+                    label: 'Remove from the list',
+                    onTap: () => _remove(context, s),
+                  ),
+                  const SizedBox(height: 26),
+                ],
+              ),
+            ),
           ],
         );
       },
@@ -482,8 +772,11 @@ class _TtcSupplementDetailScreenState extends State<TtcSupplementDetailScreen> {
 
   Future<void> _remove(BuildContext context, TtcSupplement s) async {
     final nav = Navigator.of(context);
-    final ok = await ttcConfirmRemove(context,
-        title: 'Remove ${s.name}?', body: 'The days you ticked it go too.');
+    final ok = await ttcConfirmRemove(
+      context,
+      title: 'Remove ${s.name}?',
+      body: 'The days you ticked it go too.',
+    );
     if (!ok || !context.mounted) return;
     pvSnack(context, '${s.name} removed', lift: 24);
     TtcSupplementsStore.instance.remove(s.id);
@@ -540,19 +833,22 @@ class _SupplementSheetState extends State<_SupplementSheet> {
     final e = widget.existing;
     if (e == null) {
       if (store.has(name, _whose)) {
-        setState(() => _problem = _whose == TtcAuthor.partner
-            ? "It's already on your partner's list."
-            : "It's already on your list.");
+        setState(
+          () => _problem = _whose == TtcAuthor.partner
+              ? "It's already on your partner's list."
+              : "It's already on your list.",
+        );
         return;
       }
       store.add(name, dose: _dose.text, author: _whose);
       pvSnack(
-          context,
-          _whose == TtcAuthor.partner
-              ? "Added to your partner's list"
-              : 'Added to your list',
-          icon: Icons.check_rounded,
-          lift: 24);
+        context,
+        _whose == TtcAuthor.partner
+            ? "Added to your partner's list"
+            : 'Added to your list',
+        icon: Icons.check_rounded,
+        lift: 24,
+      );
     } else if (!store.update(e.id, name: name, dose: _dose.text)) {
       setState(() => _problem = 'Another one on this list has that name.');
       return;
@@ -573,22 +869,25 @@ class _SupplementSheetState extends State<_SupplementSheet> {
           ttcDoseLabel('Whose is it'),
           TtcDoseWhose(
             partner: _whose == TtcAuthor.partner,
-            onPick: (partner) => setState(() =>
-                _whose = partner ? TtcAuthor.partner : TtcAuthor.me),
+            onPick: (partner) => setState(
+              () => _whose = partner ? TtcAuthor.partner : TtcAuthor.me,
+            ),
           ),
           const SizedBox(height: 16),
         ],
         TtcDoseField(
-            label: 'Name',
-            controller: _name,
-            hint: 'Vitamin D',
-            autofocus: !editing,
-            onChanged: _clearProblem),
+          label: 'Name',
+          controller: _name,
+          hint: 'Vitamin D',
+          autofocus: !editing,
+          onChanged: _clearProblem,
+        ),
         TtcDoseField(
-            label: 'Dose (optional)',
-            controller: _dose,
-            hint: 'What your doctor said, like 1000 IU daily',
-            onChanged: _clearProblem),
+          label: 'Dose (optional)',
+          controller: _dose,
+          hint: 'What your doctor said, like 1000 IU daily',
+          onChanged: _clearProblem,
+        ),
         const SizedBox(height: 4),
         TtcToolPrimary(
           key: const ValueKey('ttc_supp_save'),

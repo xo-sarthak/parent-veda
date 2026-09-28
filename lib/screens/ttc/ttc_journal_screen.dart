@@ -25,6 +25,8 @@ import '../v2/v2_palette.dart';
 import 'ttc_common.dart';
 import 'ttc_strings.dart';
 import 'ttc_today_screen.dart' show ttcEntryIcon;
+import 'ttc_tool_chrome.dart';
+import 'ttc_tool_hues.dart';
 
 /// Opens the journal from anywhere in the stage.
 void openTtcJournal(BuildContext context) {
@@ -103,7 +105,113 @@ class TtcJournalScreen extends StatelessWidget {
         builder: (context, _) => _build(context),
       );
 
+  // ===========================================================================
+  //  ⚠️ THE TOOL HEADER, AND ONE WAY TO WRITE (launch sanity T11, 2026-09-28)
+  // ---------------------------------------------------------------------------
+  //  On the phone this was the one tool on a plain white app bar with no hero,
+  //  so it looked like another app, and it had two write buttons stacked one
+  //  above the other: "Write something", then the prompt card's "Write about
+  //  this". Now it wears the tool shell every other tool wears, in the "Both of
+  //  you" colour (ttc_tool_hues.dart, the T6 rule), and has ONE write button.
+  //  Today's prompt stays, as a line under that button she can tap to start
+  //  from it, rather than a second card with a second button.
+  //  Mobbin: Bumble's prompt answer (the prompt is a tappable line that opens
+  //  the writer with it), and Day One's "Today's prompt" sitting under the
+  //  one new-entry action. The old page is `_buildPlain` below, unreached.
+  // ===========================================================================
   Widget _build(BuildContext context) {
+    final pal = V2PaletteStore.instance.current;
+    final t = TtcS.current();
+    final entries = TtcJournalStore.instance.entries;
+    final prompt = ttcPromptForToday(TtcStore.instance.today.chapter);
+    final promptText = prompt.text(t.hinglish);
+
+    return TtcToolScaffold(
+      hue: kTtcToolHueBoth,
+      eyebrow: t.journalTitle,
+      title: 'A notebook for the two of you.',
+      intro: 'Write a memory, a letter to your future child, a question for '
+          'the doctor or how today felt.',
+      children: [
+        const SizedBox(height: 22),
+        ttcToolPad(Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 2),
+                child:
+                    Icon(Icons.visibility_outlined, size: 16, color: pal.ink3),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(ttcJournalWhoSees(TtcStore.instance.partnerJoined),
+                    style: pvManrope(
+                        fontSize: 13, height: 1.45, color: pal.ink3)),
+              ),
+            ])),
+        const SizedBox(height: 16),
+        ttcToolPad(TtcToolPrimary(
+          key: const ValueKey('ttc_journal_write'),
+          label: 'Write something',
+          onTap: () {
+            pvCommitFeedback();
+            writeTtcEntry(context, kind: TtcEntryKind.memory);
+          },
+        )),
+        const SizedBox(height: 14),
+        // ---- today's prompt: a way into the same writer, not a second button
+        ttcToolPad(_JournalPromptLine(
+          pal: pal,
+          eyebrow: t.journalPromptEyebrow.toUpperCase(),
+          prompt: promptText,
+          onWrite: () => writeTtcEntry(context,
+              kind: TtcEntryKind.feeling, prompt: promptText),
+        )),
+        const SizedBox(height: 26),
+        ttcToolPad(entries.isEmpty
+            // A FEATURE IS NEVER HIDDEN: the empty page says what it is for,
+            // and the prompt above is the way in.
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(t.journalEmptyTitle,
+                      style: pvFraunces(fontSize: 20, color: pal.ink1)),
+                  const SizedBox(height: 6),
+                  Text(t.journalEmptyBody,
+                      style: pvManrope(
+                          fontSize: 14, height: 1.5, color: pal.ink2)),
+                ],
+              )
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Tap an entry to read it.',
+                      style: pvManrope(fontSize: 13, color: pal.ink3)),
+                  const SizedBox(height: 4),
+                  for (var i = 0; i < entries.length; i++) ...[
+                    if (i == 0 ||
+                        entries[i].date.month != entries[i - 1].date.month ||
+                        entries[i].date.year != entries[i - 1].date.year)
+                      TtcJournalMonthHead(pal: pal, date: entries[i].date)
+                    else
+                      Divider(height: 1, thickness: 1, color: pal.line),
+                    TtcJournalRow(
+                      pal: pal,
+                      entry: entries[i],
+                      onTap: () => openTtcJournalEntry(context, entries[i]),
+                    ),
+                  ],
+                ],
+              )),
+        const SizedBox(height: 12),
+      ],
+    );
+  }
+
+  // Kept for revert (2026-09-28): the plain white page with its app bar and
+  // the prompt card's second write button (T11). Not reached.
+  // ignore: unused_element
+  Widget _buildPlain(BuildContext context) {
     final pal = V2PaletteStore.instance.current;
     final t = TtcS.current();
     final entries = TtcJournalStore.instance.entries;
@@ -253,9 +361,70 @@ class TtcJournalMonthHead extends StatelessWidget {
       );
 }
 
+/// Today's prompt as ONE tappable line under the write button (T11,
+/// 2026-09-28): the small grey eyebrow, the question in the serif, and a
+/// pencil at the end. Tapping it opens the writer with the prompt on top.
+class _JournalPromptLine extends StatelessWidget {
+  const _JournalPromptLine({
+    required this.pal,
+    required this.eyebrow,
+    required this.prompt,
+    required this.onWrite,
+  });
+
+  final V2Palette pal;
+  final String eyebrow;
+  final String prompt;
+  final VoidCallback onWrite;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+        button: true,
+        label: 'Write about: $prompt',
+        child: Material(
+          color: Colors.white,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+              side: BorderSide(color: pal.line)),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            key: const ValueKey('ttc_journal_prompt'),
+            onTap: onWrite,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 13, 12, 14),
+              child: Row(children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(eyebrow,
+                          style: pvManrope(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 1.1,
+                              color: pal.ink3)),
+                      const SizedBox(height: 5),
+                      Text(prompt,
+                          style: pvFraunces(
+                              fontSize: 17, height: 1.3, color: pal.ink1)),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Icon(Icons.edit_outlined, size: 18, color: pal.ink2),
+              ]),
+            ),
+          ),
+        ),
+      );
+}
+
+/// Kept for revert (2026-09-28): the prompt as a card with its own "Write
+/// about this" button, the second write action T11 removed. Not reached.
 /// This screen's one prompt, drawn as the pregnancy journal's question card
 /// without its painting: a white card, a small grey eyebrow, the question in
 /// the serif, one ink pill.
+// ignore: unused_element
 class _JournalPromptCard extends StatelessWidget {
   const _JournalPromptCard({
     required this.pal,

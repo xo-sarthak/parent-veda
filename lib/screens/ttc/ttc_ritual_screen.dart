@@ -27,7 +27,11 @@ import '../products/pv_store_chrome.dart' show pvSnack;
 import '../v2/v2_palette.dart';
 import 'ttc_common.dart';
 import 'ttc_journal_screen.dart' show writeTtcEntry;
+import 'ttc_practice_card_parts.dart';
+import '../../ttc/ttc_mind_today.dart'
+    show ttcSanskarItems, ttcSanskarBreathPractice;
 import 'ttc_practice_player.dart' show TtcPracticeSession;
+import 'ttc_surface_router.dart' show openTtcSurface;
 import 'ttc_strings.dart';
 import 'ttc_tool_chrome.dart';
 
@@ -90,7 +94,11 @@ class _TtcRitualScreenState extends State<TtcRitualScreen> {
         final pal = V2PaletteStore.instance.current;
         final store = TtcRitualStore.instance;
         final chapter = widget.chapter;
-        final items = ttcRituals[chapter] ?? const <TtcRitualItem>[];
+        // One picker (launch sanity MB18, 2026-09-28): the breath part is
+        // Mind & body › Today's breath, the same list the home's Sanskar
+        // draws. Kept for revert:
+        //   final items = ttcRituals[chapter] ?? const <TtcRitualItem>[];
+        final items = ttcSanskarItems(chapter);
         if (!_openSet) {
           _openSet = true;
           _open = widget.focus ??
@@ -107,7 +115,11 @@ class _TtcRitualScreenState extends State<TtcRitualScreen> {
         return TtcToolScaffold(
           hue: kTtcRitualHue,
           // The tile's name is the eyebrow; the title says what the page is.
-          eyebrow: t.ritualTitle,
+          // ⚠️ ONE NAME (launch sanity H15, 2026-09-28): the home's band is
+          // "Daily Preconception Sanskar" and this page said "Your daily
+          // ritual". The home's own words, the same getter. Kept for revert:
+          //   eyebrow: t.ritualTitle,
+          eyebrow: t.sanskarTitle,
           title: 'Five small things for today',
           intro: "Each one takes about a minute. Do any one and that's "
               'enough for today.',
@@ -117,9 +129,12 @@ class _TtcRitualScreenState extends State<TtcRitualScreen> {
               children: [
                 // ⚠️ NO CHAPTER NAME ON ITS OWN (the user, 2026-09-27:
                 // "Trying Together... that word is not making any sense").
-                Text(
-                    'Picked for this part of your month. '
-                    '${ttcChapterPlainPart(chapter)}',
+                // One sentence, not two fragments (H15, 2026-09-28): "Picked
+                // for this part of your month. Your fertile days: the best
+                // time to try this month." Kept for revert:
+                //   'Picked for this part of your month. '
+                //   '${ttcChapterPlainPart(chapter)}',
+                Text(_pickedFor(chapter),
                     style: pvManrope(
                         fontSize: 13, height: 1.5, color: pal.ink2)),
                 const SizedBox(height: 12),
@@ -166,6 +181,17 @@ class _TtcRitualScreenState extends State<TtcRitualScreen> {
   }
 }
 
+/// Why these five, in one sentence, by where she is in her month (H15).
+String _pickedFor(TtcChapter c) => switch (c) {
+      TtcChapter.preparingTogether => 'Picked for the months of getting ready.',
+      TtcChapter.knowingYourRhythm =>
+        'Picked for the days before your fertile days.',
+      TtcChapter.tryingTogether => 'Picked for your fertile days.',
+      TtcChapter.theWaitingDays =>
+        'Picked for the wait after your fertile days.',
+      TtcChapter.aNewBeginning => 'Picked for after a positive test.',
+    };
+
 /// One part: a row with a hairline that opens in place.
 class _RitualRow extends StatelessWidget {
   const _RitualRow({
@@ -207,8 +233,154 @@ class _RitualRow extends StatelessWidget {
         lift: 24);
   }
 
+  // ⚠️ THE PRACTICE CARD FAMILY (2026-09-28). The user: "do this Headspace
+  // thing for ALL cards like this ... especially Preconception Sanskar". The
+  // row this replaces drew in four type styles (a Jakarta title, a Manrope
+  // reason, a Fraunces thought, a bold text-button), a circled icon, a hairline
+  // divider, a help line over the timer and "Tap again to undo." under the
+  // button. Now each part is the card she tapped on the home, in the same
+  // tint (`ttcRitualPartHue`): the title with a chevron and, once done, a
+  // "Done today" chip; today's words as the body (two lines closed, whole when
+  // open, the same words the home card shows, so opening it reveals rather
+  // than replaces); and the actions as one ink pill with a quieter white pill
+  // beside it. Headspace's session card with its one action
+  // (https://mobbin.com/screens/d05b1798-9389-4073-999b-693b84cca19e), Calm's
+  // gratitude check-in, prompt as the card's words
+  // (https://mobbin.com/screens/5685de5b-2537-43d8-80e9-f748a4d0ac2f).
+  // The old row is `_buildClassic` below, kept for revert.
   @override
   Widget build(BuildContext context) {
+    final hi = t.hinglish;
+    final tint = v2BlockTint(ttcRitualPartHue(item.part), pal);
+    final kind = _journalKind;
+    return Container(
+      decoration: BoxDecoration(
+        color: tint,
+        borderRadius: BorderRadius.circular(kTtcCardRadius),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Material(
+        type: MaterialType.transparency,
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Semantics(
+            button: true,
+            expanded: expanded,
+            child: InkWell(
+              onTap: onHeaderTap,
+              child: Padding(
+                // The foot comes from the open part, or the card's own 18.
+                padding: EdgeInsets.fromLTRB(kTtcCardPad.left, kTtcCardPad.top,
+                    kTtcCardPad.right, expanded ? 0 : kTtcCardPad.bottom),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Text(item.part.title(hi),
+                                  style: ttcCardTitle(pal)),
+                            ),
+                            if (done) ...[
+                              const SizedBox(width: 10),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 1),
+                                child: TtcCardChip.done(
+                                    t.sanskarDoneToday, tint),
+                              ),
+                            ],
+                            const SizedBox(width: 6),
+                            Icon(
+                                expanded
+                                    ? Icons.keyboard_arrow_up_rounded
+                                    : Icons.keyboard_arrow_down_rounded,
+                                size: 22,
+                                color: pal.ink2),
+                          ]),
+                      const SizedBox(height: 6),
+                      // Kept for revert (2026-09-28): item.part.why(hi) as the
+                      // line under the title, and the words in Fraunces 18
+                      // only once open.
+                      Text(item.text(hi),
+                          maxLines: expanded ? null : 2,
+                          overflow: expanded ? null : TextOverflow.ellipsis,
+                          style: ttcCardBody(pal)),
+                    ]),
+              ),
+            ),
+          ),
+          if (expanded)
+            Padding(
+              padding: EdgeInsets.fromLTRB(kTtcCardPad.left, 0,
+                  kTtcCardPad.right, kTtcCardPad.bottom),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // ---- the breath: a minute she can follow on the ring ----
+                    // Kept for revert (2026-09-28): the line over the timer,
+                    // 'Use this one-minute timer if it helps.' The ring and
+                    // its Start say what it is.
+                    // ⚠️ TODAY'S BREATH PRACTICE ITSELF (MB18, 2026-09-28):
+                    // the part's words are now Mind & body › Today's breath,
+                    // so its ring is that practice's ring (in and out, a
+                    // box, a count) rather than a plain minute. Finishing it
+                    // still ticks this part, with an undo. Kept for revert:
+                    //   TtcPracticeSession.sit(seconds: 60,
+                    //       onFinished: () => _finishBreath(context)),
+                    if (item.part == TtcRitualPart.breath) ...[
+                      const SizedBox(height: 14),
+                      TtcPracticeSession(
+                        practice: ttcSanskarBreathPractice(),
+                        onFinished: () => _finishBreath(context),
+                      ),
+                    ],
+                    const SizedBox(height: 16),
+                    // One ink pill; the journal is the quieter second choice.
+                    // Kept for revert (2026-09-28): the full-width 48pt toggle
+                    // reading t.ritualDone when done, with 'Tap again to
+                    // undo.' under it. "Mark not done" says it on the button
+                    // (not "Undo": the breath timer's snackbar offers one, and
+                    // two Undos on one screen is one too many).
+                    Wrap(spacing: 10, runSpacing: 10, children: [
+                      if (done)
+                        TtcQuietPill(
+                            label: 'Mark not done',
+                            icon: Icons.undo_rounded,
+                            onTap: () =>
+                                TtcRitualStore.instance.toggle(item.part))
+                      else
+                        TtcInkPill(
+                            label: t.ritualMarkDone,
+                            icon: Icons.check_rounded,
+                            onTap: () =>
+                                TtcRitualStore.instance.toggle(item.part)),
+                      // The breath's steps, on the practice's own page.
+                      if (item.part == TtcRitualPart.breath)
+                        TtcQuietPill(
+                          label: 'See the steps',
+                          icon: Icons.format_list_numbered_rounded,
+                          onTap: () => openTtcSurface(context,
+                              'ttc_practice/${ttcSanskarBreathPractice().id}'),
+                        ),
+                      if (kind != null)
+                        TtcQuietPill(
+                          label: 'Write about it in our journal',
+                          icon: Icons.edit_outlined,
+                          onTap: () => writeTtcEntry(context,
+                              kind: kind, prompt: item.text(hi)),
+                        ),
+                    ]),
+                  ]),
+            ),
+        ]),
+      ),
+    );
+  }
+
+  // Kept for revert (2026-09-28): the bordered row with the circled icon.
+  // Nothing calls it.
+  // ignore: unused_element
+  Widget _buildClassic(BuildContext context) {
     final hi = t.hinglish;
     final tint = v2BlockTint(kTtcRitualHue, pal);
     final kind = _journalKind;

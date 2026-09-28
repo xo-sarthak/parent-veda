@@ -405,7 +405,10 @@ class _MessageTile extends StatelessWidget {
                   children: [
                     Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Expanded(
-                        child: Text(message.title,
+                        // M1 (2026-09-28): the words as they read today, not
+                        // as they were frozen at send time. Kept for revert:
+                        // Text(message.title, ...) and Text(message.body, ...).
+                        child: Text(message.shownOn(DateTime.now()).$1,
                             style: pvManrope(
                                 fontSize: 15,
                                 height: 1.3,
@@ -418,7 +421,7 @@ class _MessageTile extends StatelessWidget {
                           style: pvManrope(fontSize: 12, color: p.ink3)),
                     ]),
                     const SizedBox(height: 4),
-                    Text(message.body,
+                    Text(message.shownOn(DateTime.now()).$2,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: pvManrope(

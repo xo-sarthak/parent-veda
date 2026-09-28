@@ -41,13 +41,22 @@ import 'ttc_cycle_palette.dart';
 import 'ttc_cycle_report_states.dart';
 import 'ttc_cycle_report_v3.dart';
 import 'ttc_symptom_log_screen.dart'
-    show TtcSymptomLogScreen, kTtcLogMeasurementsGroup;
+    show
+        TtcSymptomLogScreen,
+        kTtcLogMeasurementsGroup,
+        TtcMeasureKind,
+        showTtcMeasureSheet;
 import 'ttc_surface_router.dart';
 import 'ttc_strings.dart';
 import 'ttc_tool_chrome.dart';
 
 class TtcCycleReportScreen extends StatefulWidget {
-  const TtcCycleReportScreen({super.key});
+  const TtcCycleReportScreen({super.key, this.series});
+
+  /// Which number the chart opens on, when she came from that number's
+  /// "View chart" in the logger (launch sanity U2, 2026-09-28): the chart is
+  /// shown on that series and scrolled into view. Null opens as before.
+  final TtcMeasureKind? series;
 
   @override
   State<TtcCycleReportScreen> createState() => _TtcCycleReportScreenState();
@@ -55,7 +64,28 @@ class TtcCycleReportScreen extends StatefulWidget {
 
 class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
   int _index = 0;
-  bool _showTemp = false;
+  // U2 (2026-09-28): preset from `widget.series`. Kept for revert:
+  //   bool _showTemp = false;
+  late bool _showTemp = widget.series == TtcMeasureKind.temperature;
+
+  /// The "changes during the cycle" heading, so a "View chart" from the
+  /// logger lands on the chart instead of the top of the page.
+  final GlobalKey _chartKey = GlobalKey();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.series != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final c = _chartKey.currentContext;
+        if (c != null && c.mounted) {
+          Scrollable.ensureVisible(c,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeOutCubic);
+        }
+      });
+    }
+  }
 
   /// Whether the ⓘ panel is open. Not remembered between visits — it is an
   /// aside, and one she has read once she does not need reopened for her.
@@ -66,7 +96,17 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
   /// question in front of her, not to declare how she likes cycle reports. If
   /// it turns out people flip it every single time, that is the evidence for
   /// persisting it, and there is none yet.
-  TtcCycleView _view = TtcCycleView.dial;
+  ///
+  /// ⚠️ THE REPORT DRAWS THE DAYS, NOT THE RING (launch sanity H4,
+  /// 2026-09-28). The Cycle companion and this report both opened on the same
+  /// ring, the same four-part key and the same "Day 10" in the middle: two
+  /// screens, one picture, and no way to tell which to use. The ring is the
+  /// Companion's (where you are, this cycle, your dates); the report is each
+  /// cycle's days in order with what she logged on them, paged cycle by
+  /// cycle. The toggle below is commented out, not deleted. Kept for revert:
+  ///   TtcCycleView _view = TtcCycleView.dial;
+  // ignore: prefer_final_fields
+  TtcCycleView _view = TtcCycleView.calendar;
 
   static const _m = [
     'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
@@ -273,6 +313,57 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
           settings: const RouteSettings(name: 'ttc/symptom_log'),
           builder: (_) => const TtcSymptomLogScreen(
               focusGroup: kTtcLogMeasurementsGroup)));
+
+  /// ⚠️ THE NUMBER IS ADDED HERE, NOT IN THE LOGGER (launch sanity U2,
+  /// 2026-09-28). "Add today's temperature or weight" pushed the whole
+  /// symptom logger, scrolled to its foot; the user: "let the user add it
+  /// there only, instead user is taken to symptoms page bottom". Each link
+  /// now opens the logger's own number sheet (`showTtcMeasureSheet`, one
+  /// piece shared by both screens) over this page, saves to the same store,
+  /// and the chart above redraws the moment it closes. `_openLogToday` stays
+  /// for "Log how today went", which is about the day, not a number.
+  void _addNumber(BuildContext context, TtcMeasureKind kind) =>
+      showTtcMeasureSheet(context, kind, DateTime.now(), onChanged: () {
+        if (mounted) setState(() {});
+      });
+
+  /// Two links, one per number, where there was one link for both: the
+  /// choice is made on the card, so the sheet opens on the right number in
+  /// one tap. Stardust puts an "Add" on its Temperature row
+  /// (https://mobbin.com/screens/4fb4438f-6715-4122-a1c4-db54b4bee75e),
+  /// Lifesum an "Add new amount" under each measurement
+  /// (https://mobbin.com/screens/3e616b8e-f8d7-4a7f-aad2-957bf99a4c5d), and
+  /// Clue enters each measure in its own section of the day
+  /// (https://mobbin.com/screens/f4526107-52d1-43b1-8d75-f485432dfba4).
+  /// Under a chart it is one link for the series on show, because a chart
+  /// page's add is for that chart: Apple Health's + on Blood Pressure
+  /// (https://mobbin.com/screens/f6471b67-8921-4d71-826b-476849a1ec61) and
+  /// Future Pro's + on Weight, which opens the entry over the chart
+  /// (https://mobbin.com/screens/ffb9ac16-40be-4506-b607-97b9e292fe07).
+  /// Kept for revert (2026-09-28): one `_ReportLink` keyed
+  /// `ttc_report_add_numbers`, label `kTtcReportAddNumbers`, onTap
+  /// `_openLogToday(context)`.
+  Widget _addNumbers(BuildContext context, {TtcMeasureKind? only}) => Wrap(
+        key: const ValueKey('ttc_report_add_numbers'),
+        spacing: 8,
+        runSpacing: 8,
+        children: [
+          if (only != TtcMeasureKind.weight)
+          _ReportLink(
+            key: const ValueKey('ttc_report_add_temp'),
+            icon: Icons.thermostat_rounded,
+            label: kTtcReportAddTemp,
+            onTap: () => _addNumber(context, TtcMeasureKind.temperature),
+          ),
+          if (only != TtcMeasureKind.temperature)
+          _ReportLink(
+            key: const ValueKey('ttc_report_add_weight'),
+            icon: Icons.monitor_weight_outlined,
+            label: kTtcReportAddWeight,
+            onTap: () => _addNumber(context, TtcMeasureKind.weight),
+          ),
+        ],
+      );
 
   void _openSurface(BuildContext context, String id) =>
       openTtcSurface(context, id);
@@ -481,11 +572,13 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
                         : t.reportThisCycle,
                     style: ttcJakarta(16)),
               ),
-              const SizedBox(width: 10),
-              TtcCycleViewToggle(
-                view: _view,
-                onPick: (v) => setState(() => _view = v),
-              ),
+              // H4 (2026-09-28): no Circle / Calendar toggle on the report;
+              // the ring lives on the Cycle companion. Kept for revert:
+              // const SizedBox(width: 10),
+              // TtcCycleViewToggle(
+              //   view: _view,
+              //   onPick: (v) => setState(() => _view = v),
+              // ),
             ]),
             const SizedBox(height: 6),
             Text(
@@ -557,7 +650,8 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
             // section of its own. Changes-during-the-cycle is one section that
             // is sometimes full and sometimes an invitation; it is never a
             // different section.
-            ttcSectionTitle(t.reportChanges),
+            KeyedSubtree(
+                key: _chartKey, child: ttcSectionTitle(t.reportChanges)),
             if (hasSeries) ...[
               _CycleCard(
                 report: r,
@@ -569,12 +663,19 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
               // The way to add the next reading, under the chart it adds to
               // (2026-09-27).
               const SizedBox(height: 10),
-              _ReportLink(
-                key: const ValueKey('ttc_report_add_numbers'),
-                icon: Icons.add_rounded,
-                label: kTtcReportAddNumbers,
-                onTap: () => _openLogToday(context),
-              ),
+              // U2 (2026-09-28): adds in place. Kept for revert:
+              //   _ReportLink(
+              //     key: const ValueKey('ttc_report_add_numbers'),
+              //     icon: Icons.add_rounded,
+              //     label: kTtcReportAddNumbers,
+              //     onTap: () => _openLogToday(context),
+              //   ),
+              // Under a chart, the add is for the series the chart shows,
+              // as Apple Health's "Add Data" is for the chart it sits on.
+              _addNumbers(context,
+                  only: _showTemp
+                      ? TtcMeasureKind.temperature
+                      : TtcMeasureKind.weight),
               const SizedBox(height: 24),
             ] else ...[
               // ⚠️ THE LINE THAT ASKED HER TO ADD NUMBERS NOW HAS THE BUTTON
@@ -595,12 +696,14 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
                       Text(kTtcReportNoNumbers,
                           style: ttcBody(12.5, color: ttcMuted, h: 1.5)),
                       const SizedBox(height: 14),
-                      _ReportLink(
-                        key: const ValueKey('ttc_report_add_numbers'),
-                        icon: Icons.add_rounded,
-                        label: kTtcReportAddNumbers,
-                        onTap: () => _openLogToday(context),
-                      ),
+                      // U2 (2026-09-28): adds in place. Kept for revert:
+                      //   _ReportLink(
+                      //     key: const ValueKey('ttc_report_add_numbers'),
+                      //     icon: Icons.add_rounded,
+                      //     label: kTtcReportAddNumbers,
+                      //     onTap: () => _openLogToday(context),
+                      //   ),
+                      _addNumbers(context),
                     ]),
               ),
               const SizedBox(height: 24),
@@ -808,13 +911,22 @@ const String kTtcReportFourParts = 'The four parts of your cycle';
 // ---- the numbers, and the way to add them (2026-09-27) ---------------------
 
 /// Where weight and temperature are entered, said where the chart would be.
+// U2 (2026-09-28): the numbers are added right here now. Kept for revert:
+//   'Add a weight or a morning temperature in your daily log on any day, and '
+//   "a chart shows up here. You don't need either. This page works with "
+//   'symptoms alone.'
 const String kTtcReportNoNumbers =
-    'Add a weight or a morning temperature in your daily log on any day, and '
-    "a chart shows up here. You don't need either. This page works with "
-    'symptoms alone.';
+    'Add a morning temperature or a weight, here or in your daily log, and a '
+    "chart shows up after two readings. You don't need either. This page "
+    'works with symptoms alone.';
 
-/// The button that opens the daily log on today.
+/// The button that opened the daily log on today. Unused since U2
+/// (2026-09-28), kept for revert.
 const String kTtcReportAddNumbers = "Add today's temperature or weight";
+
+/// The two links that add a number in place (U2, 2026-09-28).
+const String kTtcReportAddTemp = "Add today's temperature";
+const String kTtcReportAddWeight = "Add today's weight";
 
 /// The button under "A start", for a cycle with little logged.
 const String kTtcReportLogToday = 'Log how today went';

@@ -76,7 +76,15 @@
 //  ⚠️ ADDING A DOOR OR A TAB IS DATA ONLY. A door is a `TtcFocusPage` in
 //  `lib/ttc/focus/` plus one line in `kTtcFocusPages`; a tab is a
 //  `TtcFocusGroup` (with a `mark`) plus sections naming its id. Nothing in
-//  this file is keyed on a bracket id.
+//  this file is keyed on a bracket id, except two small, commented lists
+//  (2026-09-28): the one tab that still opens on a safety line
+//  ([kTtcDoorFlagTabs]) and the tabs that end on "Get help now"
+//  ([kTtcDoorGetHelpTabs]). They are rules about safety, so they live in code
+//  beside the renderer, not in the door data.
+//
+//  ⚠️ SAFETY LINES, 2026-09-28 (the user's option B): item 4 above now
+//  applies to one tab only. The folded flag row came off the top of every
+//  other tab; see [kTtcDoorFlagTabs].
 // =============================================================================
 
 import 'package:flutter/foundation.dart' show ValueListenable;
@@ -94,10 +102,14 @@ import '../../../ttc/ttc_fertility_help_rules.dart'
 import '../../../ttc/ttc_fertility_help_store.dart';
 import '../../../ttc/ttc_focus_data.dart';
 import '../../../ttc/ttc_reads_data.dart';
+import '../../../ttc/ttc_practice_data.dart'
+    show TtcPractice, TtcPracticeKind, ttcPracticeById;
+import '../../../ttc/ttc_videos_data.dart' show ttcVideoBySlot;
 import '../../../widgets/pv_feedback.dart';
 import '../../brackets/hub/hub_intent_art.dart';
 import '../../doors/pv_door_chrome.dart';
 import '../../doors/pv_live_search.dart';
+import '../../products/pv_store_chrome.dart' show PvChip;
 import '../../v2/v2_palette.dart';
 import '../../v2/v3_bracket_art.dart';
 import '../../v2/v3_hero_field.dart';
@@ -106,6 +118,10 @@ import '../ttc_askveda_screen.dart' show openTtcAskVeda;
 // icon; the TTC section card draws the format's mark instead.
 import '../ttc_focus_screen.dart'
     show openTtcFocusTile, openTtcArticle, photoForTile;
+import '../../../data/mind_mood_data.dart'
+    show kEmergencyNumber, kAmbulanceNumber;
+import '../ttc_get_help_screen.dart'
+    show TtcGetHelpRow, openTtcGetHelp, ttcDialNumber, TtcDial;
 import '../ttc_intimate_offer.dart' show ttcMaybeOfferIntimateSwitch;
 import '../ttc_strings.dart';
 import '../ttc_surface_router.dart' show ttcInlineToolFor, openTtcSurface;
@@ -128,6 +144,80 @@ Key ttcDoorSectionRailKey(String heading) =>
     ValueKey('ttc-door-section-rail-$heading');
 
 const Key kTtcDoorHeroKey = ValueKey('ttc-door-hero');
+
+/// The compact bar that pins once the hero has scrolled away (D2).
+const Key kTtcDoorPinnedBarKey = ValueKey('ttc-door-pinned-bar');
+
+/// The line under "Nothing here by that name yet" (D6).
+const Key kTtcDoorSearchEmptyKey = ValueKey('ttc-door-search-empty');
+
+/// Words that find something on every door, offered when a search finds
+/// nothing (D6). Each one is a stage-wide topic with reads behind it, so a
+/// tap is never a second empty page (`ttc_door_screen_test` holds that).
+const List<String> kTtcDoorSearchSuggestions = [
+  'Fertile window',
+  'Ovulation tablets',
+  'Semen test',
+  'PCOS',
+  'Two-week wait',
+];
+
+/// A section of one piece, drawn as the one wide card (D13).
+Key ttcDoorSectionWideKey(String heading) =>
+    ValueKey('ttc-door-section-wide-$heading');
+
+/// A way to another door, drawn as a plain link row (MB20).
+Key ttcDoorLinkKey(String bracketId) => ValueKey('ttc-door-link-$bracketId');
+
+// -----------------------------------------------------------------------------
+//  Which tabs open on a safety line, and which end on "Get help now"
+// -----------------------------------------------------------------------------
+
+/// ⚠️ THE ONLY TABS THAT STILL OPEN ON A SAFETY LINE (the user, 2026-09-28,
+/// option B). Every door tab used to open on its pinned read's "When to see
+/// someone" list as a tinted row (Mind & body › Hard days opened on "When to
+/// get help for low mood or anxiety"), which put a warning above the content
+/// on nine tabs across six doors. The guidance is not gone: it is each read's
+/// own "When to see someone" section, which `PvReaderScreen` always draws, and
+/// every one of those reads is still a tile on its door.
+///
+/// The rule for this list: a tab keeps its line at the top ONLY when the
+/// topic can be a real emergency that should not wait for her to open a read.
+/// Today that is one tab: After a loss › Your body, whose read's list is heavy
+/// bleeding, severe pain, pain in the tip of the shoulder (a sign of an
+/// ectopic pregnancy), fever and fainting ("Go to a hospital today, not
+/// tomorrow"). Low mood is serious but is not routed by a banner: it has the
+/// calm "Get help now" page below. Keyed by bracket id, then tab id; the
+/// pinned read ids stay on the data (`TtcFocusGroup.pinnedRedFlagReadIds`)
+/// so turning a tab back on is one line here.
+const Map<String, Set<String>> kTtcDoorFlagTabs = {
+  'ttc_after_loss': {'body'},
+};
+
+/// Whether tab [groupId] of door [bracketId] opens on its safety line.
+bool ttcDoorShowsFlag(String bracketId, String groupId) =>
+    kTtcDoorFlagTabs[bracketId]?.contains(groupId) ?? false;
+
+/// ⚠️ THE TABS THAT END ON A WAY TO "GET HELP NOW" (2026-09-28). At the END of
+/// the tab, after its content, as a question ("Need to talk to someone
+/// now?"), never above it: an offer she can take, not a warning she is shown.
+///   · Mind & body › Hard days, where the removed low-mood line was.
+///   · Mind & body › Today, because it is the tab the door OPENS on, so the
+///     way to help is on the door without a hunt, and at the foot of a few
+///     calm minutes it reads as care rather than alarm. The alternative,
+///     under the tab rail on every tab, would have been the banner again.
+///   · Mind & body › Talk (launch sanity MB22, 2026-09-28): the tab about
+///     talking to someone. Its two pinned lists no longer open it (see
+///     [kTtcDoorFlagTabs]), so its one way to urgent help is this calm row
+///     at its end, not two alarms at its top.
+const Map<String, Set<String>> kTtcDoorGetHelpTabs = {
+  // Kept for revert (2026-09-28): 'ttc_mind_body': {'today', 'hard'},
+  'ttc_mind_body': {'today', 'hard', 'talk'},
+};
+
+/// Whether tab [groupId] of door [bracketId] ends on the Get help row.
+bool ttcDoorEndsOnGetHelp(String bracketId, String groupId) =>
+    kTtcDoorGetHelpTabs[bracketId]?.contains(groupId) ?? false;
 
 /// How far the photograph runs on under the sheet's rounded top. The rail
 /// lifts by `TtcDoorRail.overlap` on top of this; see `_Hero._bleed`.
@@ -239,9 +329,51 @@ IntentMark ttcDoorFormatMark(TtcTileFormat f) => switch (f) {
   TtcTileFormat.practice => IntentMark.lotusMark,
   TtcTileFormat.checklist => IntentMark.checkMark,
   TtcTileFormat.talk => IntentMark.askDoctor,
-  TtcTileFormat.guide => IntentMark.bookMark,
+  // ⚠️ AN "ARTICLE" CHIP WEARS THE PAGE MARK, WHATEVER ITS FORMAT (launch
+  // sanity MB16, 2026-09-28). A guide opens the reader and its chip says
+  // Article (`ttcDoorChip`), but it drew the open book, so one row of
+  // "Article" cards carried two different glyphs. One chip, one mark.
+  // Kept for revert: TtcTileFormat.guide => IntentMark.bookMark,
+  TtcTileFormat.guide => IntentMark.pageMark,
   TtcTileFormat.door => IntentMark.nextStep,
 };
+
+/// The practice a tile opens, when it opens one (`ttc_practice/<id>`).
+TtcPractice? ttcTilePractice(TtcTile t) => switch (t) {
+  TtcDoTile(:final surfaceId) when surfaceId.startsWith('ttc_practice/') =>
+    ttcPracticeById(surfaceId.substring('ttc_practice/'.length)),
+  _ => null,
+};
+
+/// ⚠️ A PRACTICE WEARS ITS KIND (launch sanity MB15, 2026-09-28). Every
+/// practice card on Mind & body › The practice drew the same lotus, so a
+/// stretch looked like a breath. A movement draws steps, a breath draws the
+/// wind; anything else keeps its format's mark. Everything else on a door is
+/// [ttcDoorFormatMark], one mark per chip.
+IntentMark ttcDoorTileMark(TtcTile t) => switch (ttcTilePractice(t)?.kind) {
+  TtcPracticeKind.move => IntentMark.stepsMark,
+  TtcPracticeKind.breathe => IntentMark.windMark,
+  null => ttcDoorFormatMark(t.format),
+};
+
+/// Whether [t] is a film that is not made yet: a video tile whose slot has
+/// no file (`PvVideoSlot.isLive`), or names no slot at all (D3, L3).
+bool ttcTileIsUnmadeFilm(TtcTile t) =>
+    t is TtcVideoTile && !(ttcVideoBySlot(t.slotId)?.isLive ?? false);
+
+/// The words an unmade film says on its card, in place of a duration.
+const String kTtcFilmComingSoon = 'Coming soon';
+
+/// A section's rail, in the order she should meet it (D3, 2026-09-28): the
+/// door tiles leave the rail for their own link rows (MB20), and a film that
+/// is not made yet goes LAST, behind everything she can open today. Order
+/// only; nothing is hidden, because the empty slot is the film's promise.
+List<TtcTile> ttcDoorRailTiles(List<TtcTile> tiles) => [
+  for (final t in tiles)
+    if (t is! TtcDoorTile && !ttcTileIsUnmadeFilm(t)) t,
+  for (final t in tiles)
+    if (t is! TtcDoorTile && ttcTileIsUnmadeFilm(t)) t,
+];
 
 /// One small fact above a card's title. The tile's own `meta` wins; else it
 /// is DERIVED, never typed: a read's minutes from its words, a film's
@@ -257,10 +389,18 @@ String? ttcDoorTileMeta(TtcTile t) {
   return switch (t) {
     TtcArticleTile(:final readId) => minutes(readId),
     TtcGuideTile(:final readId) => minutes(readId),
-    TtcVideoTile(:final duration) => '${duration.toLowerCase()} film',
+    // D3 (2026-09-28): an unmade film says so, never "6 min film". Kept for
+    // revert: TtcVideoTile(:final duration) => '${duration.toLowerCase()} film',
+    TtcVideoTile(:final duration) => ttcTileIsUnmadeFilm(t)
+        ? kTtcFilmComingSoon
+        : '${duration.toLowerCase()} film',
     TtcCarouselTile(:final cards) => '${cards.length} slides',
     TtcMythTile(:final slides) =>
       slides.isEmpty ? null : '${slides.length} slides',
+    // MB15 (2026-09-28): a practice says how long, from the library's own
+    // words, shortened: "About 3 minutes" is "About 3 min".
+    TtcDoTile() => ttcTilePractice(t)?.duration
+        .replaceAll(RegExp(r'\bminutes?\b'), 'min'),
     _ => null,
   };
 }
@@ -362,13 +502,43 @@ TtcFocusPage ttcDoorVisiblePage(
 /// disclaimer keeps the estimates line before the general one (D1).
 const Set<String> kTtcDoorsThatEstimate = {'ttc_conceiving'};
 
-/// The disclaimer at the foot of a door (D1).
-String ttcDoorDisclaimerFor(String bracketId) {
+/// ⚠️ THE ESTIMATES LINE ONLY UNDER TABS THAT ESTIMATE (launch sanity D5,
+/// 2026-09-28). The Fertile window door ended EVERY tab on "These are
+/// estimates, never guarantees…", Sex and closeness included, where nothing
+/// is estimated; a disclaimer that does not fit the page trains her to skip
+/// the one that does. By bracket id, then tab id: the tabs whose pieces
+/// work out dates (the fertile days, when to test). Every other tab keeps
+/// the general line only.
+const Map<String, Set<String>> kTtcDoorEstimateTabs = {
+  'ttc_conceiving': {'trying', 'waiting'},
+};
+
+/// The disclaimer at the foot of a door (D1), for tab [groupId] (D5). With
+/// no tab (a door with no rail, or a caller that does not know) the door's
+/// own rule stands, so the line is never lost where the door estimates.
+String ttcDoorDisclaimerFor(String bracketId, [String? groupId]) {
   final t = TtcS.current();
-  return kTtcDoorsThatEstimate.contains(bracketId)
+  final estimates = kTtcDoorsThatEstimate.contains(bracketId) &&
+      (groupId == null ||
+          (kTtcDoorEstimateTabs[bracketId]?.contains(groupId) ?? true));
+  // Kept for revert: kTtcDoorsThatEstimate.contains(bracketId) alone.
+  return estimates
       ? '${t.estimatesDisclaimer} ${t.doorDisclaimer}'
       : t.doorDisclaimer;
 }
+
+/// ⚠️ THE IVF DOOR'S ROUND PANEL SITS ON THE TABS ABOUT A ROUND (launch
+/// sanity D10, 2026-09-28). "Starting treatment? … Start" repeated at the
+/// top of every tab and pushed Money and clinics' own content down for an
+/// action that does not belong there. It stays where a round is the
+/// subject: Understand (what the treatments involve), Going through it and
+/// Track. The other tabs (Should I get help?, Age and second baby, Money
+/// and clinics) open on their own content.
+const Set<String> kTtcIvfPanelTabs = {'understand', 'going', 'track'};
+
+/// Whether the IVF door's round panel shows on tab [groupId].
+bool ttcIvfPanelShowsOn(String? groupId) =>
+    groupId == null || kTtcIvfPanelTabs.contains(groupId);
 
 /// The callout's body as one short line per sign (D2): split on its own line
 /// breaks, then into sentences. The words are the read's own, in order and
@@ -462,7 +632,11 @@ class TtcDoorScreen extends StatefulWidget {
     required this.page,
     required this.bracket,
     this.initialGroup,
+    this.dial = ttcDialNumber,
   });
+
+  /// How the flag sheet's call button dials. A test swaps it (D15).
+  final TtcDial dial;
 
   final TtcFocusPage page;
 
@@ -558,19 +732,43 @@ class _TtcDoorScreenState extends State<TtcDoorScreen> {
 
   /// The pinned flag's full list, in a sheet. The same `TtcDoorRedFlag`
   /// block the tab used to draw inline, so the words are the read's own.
+  ///
+  /// ⚠️ AND SOMETHING TO PRESS (launch sanity D15, 2026-09-28). "Go to a
+  /// hospital today, not tomorrow" listed the signs and gave her nothing to
+  /// do about them. A flag only opens a tab when the topic can be a real
+  /// emergency ([kTtcDoorFlagTabs]), so every flag sheet ends on one ink
+  /// button that dials the emergency number, through the same dialler as
+  /// the Get help page (`ttcDialNumber`), with the number from the one
+  /// constant that holds it. Kept for revert: the block alone.
   void _openFlag(String rid, PvCallout callout, AppLanguage lang, V2Palette p) {
     final hue = bracket.hue;
     showTtcDoorFlagSheet(
       context,
       p: p,
-      body: (sheet) => TtcDoorRedFlag(
-        callout: callout,
-        lang: lang,
-        p: p,
-        onOpen: () {
-          Navigator.of(sheet).pop();
-          openTtcArticle(context, rid, hue: hue);
-        },
+      body: (sheet) => Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TtcDoorRedFlag(
+            callout: callout,
+            lang: lang,
+            p: p,
+            onOpen: () {
+              Navigator.of(sheet).pop();
+              openTtcArticle(context, rid, hue: hue);
+            },
+          ),
+          const SizedBox(height: 16),
+          // 108 beside 112 (2026-09-28): every flag sheet is a medical
+          // emergency (kTtcDoorFlagTabs), so the ambulance number is
+          // offered under the emergency one. Kept for revert:
+          // TtcDoorCallButton(p: p, number: kEmergencyNumber, dial: widget.dial),
+          TtcDoorCallButton(
+              p: p,
+              number: kEmergencyNumber,
+              ambulance: kAmbulanceNumber,
+              dial: widget.dial),
+        ],
       ),
     );
   }
@@ -763,7 +961,10 @@ class _TtcDoorScreenState extends State<TtcDoorScreen> {
                           //     )),
                           //     const SizedBox(height: 22),
                           //   ],
-                          if (page.bracketId == kTtcIvfBracketId) ...[
+                          // D10 (2026-09-28): on the tabs about a round only.
+                          // Kept for revert: the bracket test alone.
+                          if (page.bracketId == kTtcIvfBracketId &&
+                              ttcIvfPanelShowsOn(group?.id)) ...[
                             pvDoorPad(TtcIvfRoundPanel(
                               onStart: () => openTtcSurface(
                                   context, kTtcIvfTopCardSurface),
@@ -794,7 +995,18 @@ class _TtcDoorScreenState extends State<TtcDoorScreen> {
                           //         openTtcArticle(context, rid, hue: hue),
                           //   )),
                           //   const SizedBox(height: 22),
+                          //
+                          // ONLY WHERE IT CAN BE AN EMERGENCY (2026-09-28, the
+                          // user's option B): `ttcDoorShowsFlag`, one tab
+                          // today (After a loss › Your body), and there one
+                          // compact line. Every other tab's list lives in its
+                          // read's own "When to see someone". Kept for revert,
+                          // the condition on every tab with a pinned read:
+                          //   if (group != null &&
+                          //       group.pinnedRedFlagReadIds
+                          //           .any((r) => ttcReadById(r) != null)) ...[
                           if (group != null &&
+                              ttcDoorShowsFlag(page.bracketId, group.id) &&
                               group.pinnedRedFlagReadIds
                                   .any((r) => ttcReadById(r) != null)) ...[
                             for (final rid in group.pinnedRedFlagReadIds)
@@ -804,6 +1016,8 @@ class _TtcDoorScreenState extends State<TtcDoorScreen> {
                                   child: pvDoorPad(
                                     TtcDoorFlagRow(
                                       key: ttcDoorFlagKey(rid),
+                                      // One short line (2026-09-28).
+                                      compact: true,
                                       callout: read.whenToSeeSomeone,
                                       lang: lang,
                                       p: p,
@@ -875,39 +1089,116 @@ class _TtcDoorScreenState extends State<TtcDoorScreen> {
                             //     meta: ttcDoorTileMeta(t),
                             //     onTap: () => _openTile(t),
                             //   ))
-                            SizedBox(
-                              key: ttcDoorSectionRailKey(section.heading),
-                              height: kTtcDoorCardHeight,
-                              child: ListView.separated(
-                                scrollDirection: Axis.horizontal,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: kPvDoorGutter,
+                            //
+                            // ⚠️ THREE SHAPES OF THE ONE CARD (launch sanity
+                            // D3, D13, MB20, 2026-09-28), chosen by what the
+                            // section holds, never by door:
+                            //   · two or more pieces: the rail, as before,
+                            //     with an unmade film last
+                            //     (`ttcDoorRailTiles`);
+                            //   · ONE piece: the same card at full width
+                            //     (`TtcDoorWideCard`). A lone 150-wide card
+                            //     beside empty space read as a load failure
+                            //     ("Read your own report", "Get it read");
+                            //   · a way to ANOTHER DOOR: a plain link row
+                            //     under the rail, never a card whose type
+                            //     says "Elsewhere". A signpost is not content.
+                            // Kept for revert: the rail over `section.tiles`,
+                            // every tile a card, whatever it was.
+                            if (ttcDoorRailTiles(section.tiles)
+                                case final tiles when tiles.length == 1)
+                              pvDoorPad(
+                                TtcDoorWideCard(
+                                  key: ttcDoorSectionWideKey(section.heading),
+                                  p: p,
+                                  hue: hue,
+                                  mark: ttcDoorTileMark(tiles.single),
+                                  icon: ttcTileIsUnmadeFilm(tiles.single)
+                                      ? Icons.schedule_rounded
+                                      : null,
+                                  kind: ttcDoorChip(tiles.single),
+                                  title: tiles.single.title,
+                                  blurb: tiles.single.blurb,
+                                  meta: ttcDoorTileMeta(tiles.single),
+                                  imageUrl: photoForTile(tiles.single),
+                                  onTap: () => _openTile(tiles.single),
                                 ),
-                                itemCount: section.tiles.length,
-                                separatorBuilder: (_, _) =>
-                                    const SizedBox(width: kPvRailGap),
-                                itemBuilder: (context, i) {
-                                  final t = section.tiles[i];
-                                  return TtcDoorSectionCard(
-                                    p: p,
-                                    hue: hue,
-                                    mark: ttcDoorFormatMark(t.format),
-                                    kind: ttcDoorChip(t),
-                                    title: t.title,
-                                    meta: ttcDoorTileMeta(t),
-                                    imageUrl: photoForTile(t),
-                                    onTap: () => _openTile(t),
-                                  );
-                                },
+                              )
+                            else if (ttcDoorRailTiles(section.tiles)
+                                case final tiles when tiles.isNotEmpty)
+                              SizedBox(
+                                key: ttcDoorSectionRailKey(section.heading),
+                                height: kTtcDoorCardHeight,
+                                child: ListView.separated(
+                                  scrollDirection: Axis.horizontal,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: kPvDoorGutter,
+                                  ),
+                                  itemCount: tiles.length,
+                                  separatorBuilder: (_, _) =>
+                                      const SizedBox(width: kPvRailGap),
+                                  itemBuilder: (context, i) {
+                                    final t = tiles[i];
+                                    return TtcDoorSectionCard(
+                                      p: p,
+                                      hue: hue,
+                                      mark: ttcDoorTileMark(t),
+                                      // D3: an unmade film wears a clock,
+                                      // never a play glyph.
+                                      icon: ttcTileIsUnmadeFilm(t)
+                                          ? Icons.schedule_rounded
+                                          : null,
+                                      kind: ttcDoorChip(t),
+                                      title: t.title,
+                                      meta: ttcDoorTileMeta(t),
+                                      imageUrl: photoForTile(t),
+                                      onTap: () => _openTile(t),
+                                    );
+                                  },
+                                ),
                               ),
-                            ),
+                            for (final t
+                                in section.tiles.whereType<TtcDoorTile>())
+                              pvDoorPad(
+                                TtcDoorLinkRow(
+                                  key: ttcDoorLinkKey(t.bracketId),
+                                  p: p,
+                                  door: bracketById(t.bracketId)
+                                          ?.label
+                                          .of(lang) ??
+                                      t.title,
+                                  line: t.blurb,
+                                  onTap: () => _openTile(t),
+                                ),
+                              ),
                             // Kept for revert (2026-09-27): 26.
                             const SizedBox(height: _kTtcDoorBlockGap),
                           ],
 
+                          // ---- "Need to talk to someone now?" (2026-09-28) --
+                          // At the END of the tabs `kTtcDoorGetHelpTabs`
+                          // names, after the content: the calm way to the one
+                          // "Get help now" page. See the constant for why
+                          // these tabs and why the end.
+                          if (group != null &&
+                              ttcDoorEndsOnGetHelp(
+                                  page.bracketId, group.id)) ...[
+                            pvDoorPad(
+                              TtcGetHelpRow(
+                                p: p,
+                                onTap: () => openTtcGetHelp(context),
+                              ),
+                            ),
+                            const SizedBox(height: _kTtcDoorBlockGap),
+                          ],
+
                           // ---- the closing line, unless the tab says it ---
+                          // MB9 (2026-09-28): nor when the hero's blurb
+                          // already says it. Kept for revert: the note test
+                          // alone.
                           if (page.closingLine case final line?
-                              when line != group?.note) ...[
+                              when line != group?.note &&
+                                  !(page.heroBlurb ?? '').contains(line)) ...[
                             pvDoorPad(
                               Text(
                                 line,
@@ -929,13 +1220,28 @@ class _TtcDoorScreenState extends State<TtcDoorScreen> {
                           pvDoorPad(
                             PvDoorDisclaimer(
                               p: p,
-                              text: ttcDoorDisclaimerFor(page.bracketId),
+                              // D5 (2026-09-28): per tab. Kept for revert:
+                              //   ttcDoorDisclaimerFor(page.bracketId),
+                              text: ttcDoorDisclaimerFor(
+                                page.bracketId,
+                                group?.id,
+                              ),
                             ),
                           ),
                         ],
                       ],
                     ),
                   ],
+                ),
+
+                // ---- the pinned bar, once the hero has gone (D2, MB19) ----
+                TtcDoorPinnedBar(
+                  key: kTtcDoorPinnedBarKey,
+                  scroll: _offset,
+                  search: _search,
+                  p: p,
+                  title: bracket.label.of(lang),
+                  onSearch: () => _search.focus.requestFocus(),
                 ),
               ],
             ),
@@ -964,6 +1270,41 @@ class _TtcDoorScreenState extends State<TtcDoorScreen> {
           style: ttcDoorHeadingStyle(p),
         ),
       ),
+      // ⚠️ NO RESULT IS NOT A BLANK PAGE (launch sanity D6, 2026-09-28). It
+      // used to be the heading and one Ask Veda row. Now it says what was
+      // searched (this door and every read in the stage, their words too)
+      // and offers a few words that do find things, as chips that run the
+      // search: the no-results shape of Headspace's and Calm's search, a
+      // line and suggestions rather than an empty list.
+      if (hits.isEmpty) ...[
+        pvDoorPad(
+          Text(
+            key: kTtcDoorSearchEmptyKey,
+            'We looked through $label and every read in Trying to conceive, '
+            'words and all. Try a shorter word, a medicine name, or one of '
+            'these:',
+            style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2),
+          ),
+        ),
+        const SizedBox(height: 12),
+        pvDoorPad(
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final w in kTtcDoorSearchSuggestions)
+                PvChip(
+                  label: w,
+                  selected: false,
+                  onTap: () {
+                    pvCommitFeedback();
+                    _search.run(w);
+                  },
+                ),
+            ],
+          ),
+        ),
+      ],
       const SizedBox(height: 6),
       for (var i = 0; i < hits.length && i < 30; i++)
         TtcDoorHitRow(
@@ -1224,17 +1565,35 @@ class _Hero extends StatelessWidget {
                   // fog. LIGHTER since 2026-09-27 (the photo is the picture,
                   // not a dark band), with shadows under the type instead.
                   // Kept for revert: 0.52 / 0.30 / 0.34 at 0 / 0.62 / 1.
+                  //
+                  // ⚠️ AND DARKER UNDER THE WORDS (launch sanity D8,
+                  // 2026-09-28): white body text sat on the brightest part of
+                  // the PCOS poha bowl and the Getting ready soup pot. The
+                  // scrim now rises through the headline to 0.72 under the
+                  // blurb, and stays lighter at the top so the picture is
+                  // still the picture. The arithmetic: a bright
+                  // photo patch of relative luminance 0.6 under 72% black is
+                  // 0.6 x 0.28 = 0.17, and white on 0.17 is (1.05 / 0.22) =
+                  // 4.8:1, over the 4.5:1 body-text line (WCAG AA), before
+                  // the type's own shadow. Kept for revert:
+                  //   colors: 0.42 / 0.20 / 0.44, stops: 0 / 0.45 / 1.
                   DecoratedBox(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          Colors.black.withValues(alpha: 0.42),
-                          Colors.black.withValues(alpha: 0.20),
-                          Colors.black.withValues(alpha: 0.44),
+                          Colors.black.withValues(alpha: 0.40),
+                          Colors.black.withValues(alpha: 0.30),
+                          Colors.black.withValues(alpha: 0.60),
+                          Colors.black.withValues(alpha: 0.72),
+                          Colors.black.withValues(alpha: 0.72),
                         ],
-                        stops: const [0, 0.45, 1],
+                        // The box runs on under the rail, so the words sit
+                        // at about 0.23 (eyebrow) to 0.57 (blurb's end) of
+                        // it: the headline on 0.45 to 0.6 (large text, 3:1),
+                        // the blurb on 0.65 to 0.72 (body text, 4.5:1).
+                        stops: const [0, 0.16, 0.36, 0.52, 1],
                       ),
                     ),
                   ),

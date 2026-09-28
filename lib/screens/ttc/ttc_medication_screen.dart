@@ -135,6 +135,38 @@ String _joinTimes(List<int> times) {
   return '${s.sublist(0, s.length - 1).join(', ')} and ${s.last}';
 }
 
+// ⚠️ A DOSE SAYS WHAT IT COUNTS (launch sanity T12, 2026-09-28). The walk
+// found "DHA · 3 · twice": a dose saved as a bare number reads as "3 twice",
+// and she cannot tell three what. The dose stays one free-text field in
+// `MedicineStore` (shared with pregnancy, so its shape does not move); what
+// changed is that a bare number is noticed. The sheet offers the unit as one
+// tap (tablets, mg, ml) under the field and asks once before saving a number
+// on its own, and a bare number already saved reads "Dose 3" rather than a
+// lone digit beside the frequency. Mobbin: an amount always travels with its
+// unit, as in Noom's glucose log (82 | mg/dL,
+// https://mobbin.com/screens/be69b417-b70a-4648-9963-2e77552218e9) and
+// MacroFactor's portion (unit chips over the amount,
+// https://mobbin.com/screens/498fce5f-7b08-4bf7-80d4-9d629e2f1351).
+final RegExp _kTtcBareDose = RegExp(r'^\d+([.,]\d+)?$');
+
+/// True when [dose] is only a number, with nothing saying what it counts.
+bool ttcDoseIsBare(String dose) => _kTtcBareDose.hasMatch(dose.trim());
+
+/// The units offered when a dose is a bare number.
+const List<String> kTtcDoseUnits = ['tablets', 'mg', 'ml'];
+
+/// [n] with [unit]: "1 tablet", "2 tablets", "500 mg".
+String ttcDoseWithUnit(String n, String unit) {
+  final v = n.trim();
+  final one = v == '1' || v == '1.0';
+  return '$v ${unit == 'tablets' && one ? 'tablet' : unit}';
+}
+
+/// How a saved dose is said on the list and the page: a bare number reads
+/// "Dose 3", never a lone digit.
+String ttcDoseShown(String dose) =>
+    ttcDoseIsBare(dose) ? 'Dose ${dose.trim()}' : dose.trim();
+
 class TtcMedicationScreen extends StatefulWidget {
   const TtcMedicationScreen({super.key});
 
@@ -240,7 +272,9 @@ class _TtcMedicationScreenState extends State<TtcMedicationScreen> {
                       for (final m in current)
                         TtcDoseRow(
                           name: m.name,
-                          detail: [m.dose, m.frequency]
+                          // T12: a bare number says it is a dose.
+                          // Kept for revert (2026-09-28): [m.dose, ...].
+                          detail: [ttcDoseShown(m.dose), m.frequency]
                               .where((s) => s.trim().isNotEmpty)
                               .join(' · '),
                           note: _reminderLine(m),
@@ -264,7 +298,8 @@ class _TtcMedicationScreenState extends State<TtcMedicationScreen> {
                         for (final m in finished)
                           TtcDoseRow(
                             name: m.name,
-                            detail: m.dose,
+                            // T12. Kept for revert (2026-09-28): m.dose.
+                            detail: ttcDoseShown(m.dose),
                             note: 'Last day was '
                                 '${ttcDoseShortDate(ttcMedLastDay(m)!)}',
                             onOpen: () => openTtcMedicine(context, m.id),
@@ -380,7 +415,8 @@ class _TtcMedicineDetailScreenState extends State<TtcMedicineDetailScreen> {
         final finished = ttcMedFinished(m);
         final last = ttcMedLastDay(m);
         final times = ttcMedTimes(m);
-        final what = [m.dose, m.frequency]
+        // T12. Kept for revert (2026-09-28): [m.dose, m.frequency].
+        final what = [ttcDoseShown(m.dose), m.frequency]
             .where((s) => s.trim().isNotEmpty)
             .join(' · ');
 
@@ -561,6 +597,10 @@ class _MedSheetState extends State<_MedSheet> {
   /// both: a clinic can prescribe one drug at two doses.
   bool _dupeWarned = false;
 
+  /// Set on the first Save of a dose that is only a number (T12): the sheet
+  /// asks what it counts once, and a second Save keeps the number as it is.
+  bool _unitAsked = false;
+
   @override
   void initState() {
     super.initState();
@@ -611,7 +651,38 @@ class _MedSheetState extends State<_MedSheet> {
                 });
               }
             }),
-        TtcDoseField(label: t.medDose, controller: _dose, hint: t.medDoseHint),
+        // Kept for revert (2026-09-28): the dose field with no onChanged.
+        TtcDoseField(
+            label: t.medDose,
+            controller: _dose,
+            hint: t.medDoseHint,
+            onChanged: (_) => setState(() => _unitAsked = false)),
+        // ⚠️ T12: a bare number gets its unit as one tap, right under it.
+        if (ttcDoseIsBare(_dose.text)) ...[
+          Transform.translate(
+            offset: const Offset(0, -6),
+            child: Text('${_dose.text.trim()} what?',
+                style: pvManrope(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w700,
+                    color: p.ink2)),
+          ),
+          Wrap(spacing: 8, runSpacing: 8, children: [
+            for (final u in kTtcDoseUnits)
+              _Pill(
+                key: ValueKey('ttc_med_unit_$u'),
+                label: u,
+                icon: Icons.add_rounded,
+                on: false,
+                semantics: 'The dose is ${ttcDoseWithUnit(_dose.text, u)}',
+                onTap: () => setState(() {
+                  _dose.text = ttcDoseWithUnit(_dose.text, u);
+                  _unitAsked = false;
+                }),
+              ),
+          ]),
+          const SizedBox(height: 14),
+        ],
         TtcDoseField(
             label: t.medFrequency, controller: _freq, hint: t.medFrequencyHint),
         TtcDoseField(
@@ -716,6 +787,10 @@ class _MedSheetState extends State<_MedSheet> {
         TtcToolPrimary(
             key: const ValueKey('ttc_med_save'), label: t.medSave, onTap: _save),
         if (_needsName) const TtcFormHint(text: 'Add a name to save.'),
+        if (_unitAsked && ttcDoseIsBare(_dose.text))
+          TtcFormHint(
+              text: 'The dose says ${_dose.text.trim()}. Pick tablets, mg or '
+                  'ml under it, or Save again to keep just the number.'),
         if (_dupeWarned)
           TtcFormHint(
               text: '${_name.text.trim()} is already on your list. Save '
@@ -767,6 +842,11 @@ class _MedSheetState extends State<_MedSheet> {
     // tap without a word, which reads as a broken button.
     if (name.isEmpty) {
       setState(() => _needsName = true);
+      return;
+    }
+    // T12: a dose that is only a number is asked about once.
+    if (ttcDoseIsBare(_dose.text) && !_unitAsked) {
+      setState(() => _unitAsked = true);
       return;
     }
     final nav = Navigator.of(context);

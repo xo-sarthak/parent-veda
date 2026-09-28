@@ -2148,7 +2148,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
             Switch.adaptive(
               value: on,
               onChanged: onChanged,
-              activeTrackColor: p.ink1, // was p.action (2026-09-19)
+              // Kept for revert (2026-09-28, one black switch app-wide): activeTrackColor: p.ink1, // was p.action (2026-09-19)
             ),
           ],
         ),

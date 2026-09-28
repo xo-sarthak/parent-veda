@@ -659,7 +659,7 @@ class _Settings extends StatelessWidget {
           contentPadding: EdgeInsets.zero,
           value: s.voiceAllowed,
           onChanged: s.setVoiceAllowed,
-          activeThumbColor: p.action,
+          // Kept for revert (2026-09-28, one black switch app-wide): activeThumbColor: p.action,
           title: Text('Let her record her voice',
               style: pvManrope(
                   fontSize: 14, fontWeight: FontWeight.w700, color: p.ink1)),
@@ -678,7 +678,7 @@ class _Settings extends StatelessWidget {
             contentPadding: EdgeInsets.zero,
             value: s.photosAllowed,
             onChanged: s.setPhotosAllowed,
-            activeThumbColor: p.action,
+            // Kept for revert (2026-09-28, one black switch app-wide): activeThumbColor: p.action,
             title: Text('Let her keep photos of what she made',
                 style: pvManrope(fontSize: 14, fontWeight: FontWeight.w700, color: p.ink1)),
             subtitle: Text(

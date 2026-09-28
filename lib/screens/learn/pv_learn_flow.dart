@@ -55,6 +55,10 @@ Future<void> pvLearnCommit(BuildContext context, PvOfferingView v) async {
   final commit = pvCommitFor(v, state, booking: booking);
   final o = v.offering;
   switch (commit.action) {
+    case PvCommitAction.comingSoon:
+      pvSnack(context,
+          "This consult opens once a specialist joins. We'll add them here.");
+      return;
     case PvCommitAction.play:
       _play(context, v);
       return;

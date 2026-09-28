@@ -217,6 +217,8 @@ class _TtcAppointmentsScreenState extends State<TtcAppointmentsScreen> {
         // With nothing in the past there is nothing to switch to, so the
         // switch is not drawn. It appears the day the first visit passes.
         final showPast = _past && past.isNotEmpty;
+        // The empty invitation is on screen (T13).
+        final emptyShowing = !showPast && upcoming.isEmpty;
 
         return TtcToolScaffold(
           hue: kIvfHue,
@@ -231,12 +233,21 @@ class _TtcAppointmentsScreenState extends State<TtcAppointmentsScreen> {
               'questions.',
           // ⚠️ AN INK PILL, NOT `ttcPurple` (tool rebuild, 2026-09-27): the
           // purple pill was the V1 look inside the new shell.
-          action: TtcApptInkPill(
-            key: const ValueKey('ttc_appt_add'),
-            label: t.appointmentsAdd,
-            icon: Icons.add_rounded,
-            onTap: () => addTtcAppointment(context),
-          ),
+          //
+          // ⚠️ ONE ADD ON AN EMPTY SCREEN (launch sanity T13, 2026-09-28).
+          // While the empty card is showing, it carries the only Add ("Add an
+          // appointment", with the same key so every path to adding is one
+          // control); the header Add appears once there is a list to add to.
+          // Two identical buttons on one empty screen read as a glitch.
+          // Kept for revert (2026-09-28): the header pill drawn always.
+          action: emptyShowing
+              ? null
+              : TtcApptInkPill(
+                  key: const ValueKey('ttc_appt_add'),
+                  label: t.appointmentsAdd,
+                  icon: Icons.add_rounded,
+                  onTap: () => addTtcAppointment(context),
+                ),
           children: [
             ttcToolPad(Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -274,6 +285,8 @@ class _TtcAppointmentsScreenState extends State<TtcAppointmentsScreen> {
                     title: t.appointmentsEmptyTitle,
                     body: t.appointmentsEmptyBody,
                     cta: 'Add an appointment',
+                    // T13: the one Add while the list is empty.
+                    ctaKey: const ValueKey('ttc_appt_add'),
                     onTap: () => addTtcAppointment(context),
                   )
                 else ...[
@@ -357,6 +370,7 @@ class _EmptyInvite extends StatelessWidget {
     required this.body,
     required this.cta,
     required this.onTap,
+    this.ctaKey,
   });
 
   final V2Palette p;
@@ -365,6 +379,7 @@ class _EmptyInvite extends StatelessWidget {
   final String body;
   final String cta;
   final VoidCallback onTap;
+  final Key? ctaKey;
 
   @override
   Widget build(BuildContext context) => Container(
@@ -384,7 +399,8 @@ class _EmptyInvite extends StatelessWidget {
           Text(body,
               style: pvManrope(fontSize: 13.5, height: 1.55, color: p.ink2)),
           const SizedBox(height: 14),
-          TtcApptInkPill(label: cta, icon: Icons.add_rounded, onTap: onTap),
+          TtcApptInkPill(
+              key: ctaKey, label: cta, icon: Icons.add_rounded, onTap: onTap),
         ]),
       );
 }
@@ -986,7 +1002,7 @@ class TtcApptRemindRow extends StatelessWidget {
             value: value,
             // Ink, not the brand purple: a switch is a control, not a
             // decoration.
-            activeTrackColor: ttcTitleInk,
+            // Kept for revert (2026-09-28, one black switch app-wide): activeTrackColor: ttcTitleInk,
             onChanged: onChanged,
           ),
         ]),
@@ -1976,7 +1992,7 @@ class _ApptSheetState extends State<_ApptSheet> {
                     Switch.adaptive(
                       key: const ValueKey('ttc_appt_remind'),
                       value: _remind,
-                      activeTrackColor: ttcPurple,
+                      // Kept for revert (2026-09-28, one black switch app-wide): activeTrackColor: ttcPurple,
                       onChanged: (v) {
                         setState(() => _remind = v);
                         if (v) {

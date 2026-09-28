@@ -38,8 +38,14 @@ extension TtcVerdictCopy on TtcVerdict {
       // Kept for revert: 'In moderation'.
       case TtcVerdict.moderate:
         return hi ? 'Thoda sa theek hai' : 'Yes, with a limit';
+      // ⚠️ A CLEAR NO (launch walk, 2026-09-28, the user's call). Smoking is
+      // the only card on this verdict and the one with the clearest evidence;
+      // an earlier audit (A-37) found "Better not" too soft for it. What to
+      // Expect's own piece says plainly that quitting helps. Warm, not a
+      // scold: "best to stop" rather than an order. Kept for revert:
+      // 'Better not'.
       case TtcVerdict.avoid:
-        return hi ? 'Behtar hai na karein' : 'Better not';
+        return hi ? 'Behtar hai na karein' : 'No, best to stop';
       case TtcVerdict.askDoctor:
         return hi ? 'Doctor se poochhein' : 'Ask your doctor';
     }
@@ -139,11 +145,22 @@ const List<TtcCanI> ttcCanI = [
   ),
   TtcCanI(
     id: 'smoking',
-    questionEn: 'Does smoking really matter?',
-    questionHi: 'Kya smoking sach mein maayne rakhti hai?',
+    // ⚠️ THE QUESTION IS ASKED THE WAY THE CHIP ANSWERS (launch sanity T7,
+    // 2026-09-28). The verdict chip is written for "Can I ...?", so a
+    // question asked the other way round ("Does it matter?") put "Better
+    // not" above an answer that began "Yes." Same meaning, same verdict:
+    // smoking is still the clear no. `test/ttc_can_i_polarity_test.dart`
+    // holds every entry to it.
+    // Kept for revert (2026-09-28):
+    //   questionEn: 'Does smoking really matter?',
+    //   questionHi: 'Kya smoking sach mein maayne rakhti hai?',
+    //   shortEn: "Yes. It's one of the two things where the evidence is clear.",
+    //   shortHi: 'Haan. Ye un do cheezon mein hai jinke saboot sach mein saaf hain.',
+    questionEn: 'Can I keep smoking while we try?',
+    questionHi: 'Kya main koshish ke dauraan smoking jaari rakh sakti hoon?',
     verdict: TtcVerdict.avoid,
-    shortEn: "Yes. It's one of the two things where the evidence is clear.",
-    shortHi: 'Haan. Ye un do cheezon mein hai jinke saboot sach mein saaf hain.',
+    shortEn: "No. It's one of the two things where the evidence is clear.",
+    shortHi: 'Nahi. Ye un do cheezon mein hai jinke saboot sach mein saaf hain.',
     whyEn:
         "Smoking is linked to lower fertility in both partners, to earlier menopause and to a higher risk of miscarriage. There's no safe amount here and no grey area. That's unusual, because most lifestyle advice on this topic is much less firm.",
     whyHi:
@@ -175,8 +192,15 @@ const List<TtcCanI> ttcCanI = [
     id: 'hot_bath',
     limitEn: 'normal baths, not long very hot ones or saunas',
     limitHi: 'normal baths, not long very hot ones or saunas',
-    questionEn: 'Can he take long hot baths?',
-    questionHi: 'Kya wo lambe garam paani ke nahaane le sakte hain?',
+    // Launch sanity T7 audit (2026-09-28): "Can he take LONG hot baths?"
+    // answered "Yes, with a limit: ... not long very hot ones" said yes and
+    // no to the same thing. The question now names the habit, and the limit
+    // carries the "not long, not very hot" part. Answer unchanged.
+    // Kept for revert (2026-09-28):
+    //   questionEn: 'Can he take long hot baths?',
+    //   questionHi: 'Kya wo lambe garam paani ke nahaane le sakte hain?',
+    questionEn: 'Can he take hot baths?',
+    questionHi: 'Kya wo garam paani se nahaa sakte hain?',
     forPartner: true,
     verdict: TtcVerdict.moderate,
     shortEn: 'A normal bath is fine. Long, very hot baths and saunas are worth cutting.',
@@ -194,8 +218,15 @@ const List<TtcCanI> ttcCanI = [
     id: 'exercise',
     limitEn: 'moderate exercise, not very hard training',
     limitHi: 'moderate exercise, not very hard training',
-    questionEn: 'Can I keep doing intense workouts?',
-    questionHi: 'Kya main tez workout jaari rakh sakti hoon?',
+    // Launch sanity T7 audit (2026-09-28): "Can I keep doing INTENSE
+    // workouts?" answered "Yes, with a limit: ... not very hard training"
+    // said yes and no to the same thing. The question now names the habit
+    // and the limit keeps it moderate. Answer unchanged.
+    // Kept for revert (2026-09-28):
+    //   questionEn: 'Can I keep doing intense workouts?',
+    //   questionHi: 'Kya main tez workout jaari rakh sakti hoon?',
+    questionEn: 'Can I keep up my workouts?',
+    questionHi: 'Kya main apna workout jaari rakh sakti hoon?',
     verdict: TtcVerdict.moderate,
     shortEn:
         "Moderate exercise helps. Very hard training, especially if you're not eating enough, can stop ovulation.",
@@ -244,11 +275,20 @@ const List<TtcCanI> ttcCanI = [
   ),
   TtcCanI(
     id: 'papaya',
-    questionEn: 'Should I avoid papaya and pineapple?',
-    questionHi: 'Kya mujhe papita aur ananas se bachna chahiye?',
+    // Launch sanity T7 (2026-09-28): "Should I avoid ...?" under a chip that
+    // says "Yes, this is fine" read as "yes, avoid it" on a food-safety
+    // card. Asked as "Can I eat ...?" the chip and the answer both say yes;
+    // the answer itself is unchanged (ripe fruit is fine).
+    // Kept for revert (2026-09-28):
+    //   questionEn: 'Should I avoid papaya and pineapple?',
+    //   questionHi: 'Kya mujhe papita aur ananas se bachna chahiye?',
+    //   shortEn: "No. Ripe fruit is fine. It doesn't stop conception, and it doesn't cause it.",
+    //   shortHi: 'Nahi. Paka phal theek hai, aur na ye conception rokta hai na karata hai.',
+    questionEn: 'Can I eat papaya and pineapple?',
+    questionHi: 'Kya main papita aur ananas kha sakti hoon?',
     verdict: TtcVerdict.safe,
-    shortEn: "No. Ripe fruit is fine. It doesn't stop conception, and it doesn't cause it.",
-    shortHi: 'Nahi. Paka phal theek hai, aur na ye conception rokta hai na karata hai.',
+    shortEn: "Yes. Ripe fruit is fine. It doesn't stop conception, and it doesn't cause it.",
+    shortHi: 'Haan. Paka phal theek hai, aur na ye conception rokta hai na karata hai.',
     whyEn:
         "The worry comes from unripe papaya. It contains latex, which has been studied at doses far higher than anyone eats. Ripe papaya is ordinary fruit. Pineapple comes up in the opposite myth, that eating the core helps implantation. There's no evidence for that either.",
     whyHi:
@@ -278,11 +318,22 @@ const List<TtcCanI> ttcCanI = [
   ),
   TtcCanI(
     id: 'sex_frequency',
-    questionEn: 'Can we have sex too often?',
-    questionHi: 'Kya hum zyada baar sex kar sakte hain?',
+    // Launch sanity T7 (2026-09-28): "Can we have sex too often?" asks
+    // whether there is a harm, so "Yes, this is fine" read as "yes, you can
+    // overdo it". Asked as the permission it really is; the answer is the
+    // same (there is no such thing as too often).
+    // Kept for revert (2026-09-28):
+    //   questionEn: 'Can we have sex too often?',
+    //   questionHi: 'Kya hum zyada baar sex kar sakte hain?',
+    //   shortEn: 'No such thing. Every day or every other day across the window is plenty.',
+    //   shortHi: 'Aisa kuch nahi hota. Window mein roz ya ek din chhod kar kaafi hai.',
+    questionEn: 'Can we have sex every day?',
+    questionHi: 'Kya hum roz sex kar sakte hain?',
     verdict: TtcVerdict.safe,
-    shortEn: 'No such thing. Every day or every other day across the window is plenty.',
-    shortHi: 'Aisa kuch nahi hota. Window mein roz ya ek din chhod kar kaafi hai.',
+    shortEn:
+        "Yes. There's no such thing as too often. Every day or every other day across the window is plenty.",
+    shortHi:
+        'Haan. Zyada jaisa kuch nahi hota. Window mein roz ya ek din chhod kar kaafi hai.',
     whyEn:
         'Having sex daily doesn\'t really lower sperm quality in men with normal counts. The old advice to "save it up" isn\'t backed by evidence. Waiting longer raises the count but lowers how well sperm move, and the two cancel out.',
     whyHi:

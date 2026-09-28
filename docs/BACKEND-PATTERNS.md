@@ -2224,6 +2224,52 @@ every old entry, so the rollout clears `veda_cache` rows under `ttc:%` once.
 app test reads the service's step map when both checkouts sit side by side. An unknown step fails safe to the old
 "not pregnant" framing rather than to "pregnant".
 
+## 16q. A delete is data too — the daily log's tombstones (`TtcLogStore`)
+
+**The situation.** On the phone walk of 2026-09-28 the home showed "Log sex" and a mood of "Energetic" after she
+had cleared both, but only after a cold start: "Sex logged" and "Calm" were back. The screen was not stale (it
+listens to the store, and every write notifies). The *data* had come back.
+
+**The mechanism.** Three ordinary choices, each right on its own, combined into the bug:
+
+1. `clear()` removed the value locally and sent **one** delete to Supabase, fire-and-forget
+   (`.catchError((_) {})`), as every cloud write in this app is.
+2. The pull on the next start is a **union**: for each cloud row, `putIfAbsent`. That is deliberate — a value
+   logged offline must not be overwritten by an older cloud row — and it means *anything the cloud still has comes
+   back*.
+3. Pushes are debounced and upsert every value. So the commonest case needed no network failure at all: she logs,
+   taps Undo a second later, the delete goes out, and then the push that was **already in flight** lands its upsert
+   *after* the delete. The cloud ends up holding the value she removed.
+
+So a cleared value returned whenever the delete failed (offline, a hiccup) or lost a race with an upsert. Nothing
+errored, nothing logged; the delete simply had no memory.
+
+**What we did: a tombstone.** `clear()` now also records the key and the time in `_cleared`, persisted next to the
+values (`ttc_logs_cleared` in `shared_preferences`). On every pull, a cloud row whose key is tombstoned is
+**skipped** (not merged back) and its delete is **sent again**. The tombstone is forgotten only when a pull no
+longer sees the row *and* the clear is at least a minute old, so an upsert that was in flight when she cleared
+cannot outlive it. Logging the same key again lifts its tombstone, because a new value is not a deletion.
+`test/ttc_launch_sanity_home_test.dart` (H12) holds the add and the lift.
+
+This is the same idea as the journal's tombstones (16l, point 3), met from a different direction: there the merge
+*replaced* the local list, here it *unions* into it, and both lose deletes for the same reason — the merge only
+sees what exists, and a deletion is the absence of something.
+
+**The trade-off, both sides.** What it costs: a few bytes per cleared value until the next clean sync, a repeated
+delete call while the cloud still disagrees, and one more piece of state that must be persisted and loaded
+correctly (lose `_cleared` and the bug is back). The minute's grace is a guess about network latency, not a
+guarantee: a push stalled for longer than that could still resurrect a value. What it buys: a clear that sticks
+through offline use, flaky networks and the Undo race, without giving up either the union merge (which protects
+offline logging) or fire-and-forget writes (which keep the UI instant). The alternatives were worse: making the
+delete awaited and blocking would not fix the race with an upsert already in flight, and "cloud wins" would lose
+offline logs instead.
+
+**The general lesson.** In any system that syncs two copies, **a delete is data, not the absence of data**. A merge
+can only act on what it can see; a row that is gone leaves nothing to compare, so the other copy's stale row wins
+by default. If a deletion must survive a merge, it has to be written down as a record (a tombstone, a `removed_at`
+column, a soft-delete flag) and kept until every copy has seen it. Replicated databases (Cassandra, CouchDB, CRDT
+sets) all do this for the same reason, and `saved_items.removed_at` (16d) is the server-side version of it here.
+
 ## 17. Reading list, in order
 
 1. `0001_create_profiles.sql` — the two layers (grant + RLS), own-row.

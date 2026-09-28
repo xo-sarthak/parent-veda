@@ -209,7 +209,10 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
           atHeading: 'Two things that get missed',
         ),
         TtcMythTile(
-          title: 'You can ovulate before your first period',
+          // D14 (2026-09-28): every myth card is titled as the question, so a
+          // true statement never sits under a Myth vs fact chip. Kept for
+          // revert: title: 'You can ovulate before your first period',
+          title: 'Can you ovulate before your first period?',
           blurb: "This matters a lot if you're not ready.",
           myth: "You can't get pregnant again until your period comes back.",
           fact: 'Ovulation usually comes back before the first period, often '
@@ -292,7 +295,10 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
         // Moved here from "Could this have been prevented?" (2026-09-27,
         // relevance audit).
         TtcMythTile(
-          title: "One miscarriage isn't a pattern",
+          // D14 (2026-09-28): every myth card is titled as the question, so a
+          // true statement never sits under a Myth vs fact chip. Kept for
+          // revert: title: "One miscarriage isn't a pattern",
+          title: 'Does one miscarriage mean another?',
           blurb: "One loss doesn't change what comes next.",
           myth: "One miscarriage means it's likely to happen again.",
           fact: 'After a single loss, the chance for a next pregnancy is close '
@@ -338,7 +344,10 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
           readId: _kTryingAgain,
         ),
         TtcMythTile(
-          title: 'The six-month wait, and where it came from',
+          // D14 (2026-09-28): every myth card is titled as the question, so a
+          // true statement never sits under a Myth vs fact chip. Kept for
+          // revert: title: 'The six-month wait, and where it came from',
+          title: 'Do you have to wait six months?',
           blurb: 'One 2007 recommendation, one study, and what the evidence '
               'has shown since.',
           myth: 'You have to wait three to six months before trying again.',

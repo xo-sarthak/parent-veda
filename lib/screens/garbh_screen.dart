@@ -1841,7 +1841,7 @@ class _SamvadScreenState extends State<SamvadScreen>
         Switch(
           value: on,
           onChanged: (_) => store.toggleCategory(key),
-          activeThumbColor: _accSamvad,
+          // Kept for revert (2026-09-28, one black switch app-wide): activeThumbColor: _accSamvad,
         ),
       ]),
     );

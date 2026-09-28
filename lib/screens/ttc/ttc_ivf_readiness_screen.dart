@@ -49,6 +49,7 @@ import '../../theme/pv_fonts.dart';
 import '../../ttc/ttc_fertility_help_rules.dart';
 import '../../ttc/ttc_fertility_help_store.dart';
 import '../../ttc/ttc_ivf_readiness.dart';
+import '../../ttc/ttc_records_store.dart';
 import '../../ttc/ttc_selfcheck_store.dart';
 import '../products/pv_store_chrome.dart' show pvSnack;
 import '../v2/v2_palette.dart';
@@ -59,7 +60,21 @@ import 'ttc_tool_chrome.dart';
 
 /// IVF & IUI is 206 on the controlled wheel — a tool opened from that door
 /// keeps the door's colour.
+///
+/// It is also the Tools tab's "Care and medicines" colour
+/// (`kTtcToolHueCare`, ttc_tool_hues.dart), the group this check sits in
+/// since launch sanity T6 (2026-09-28), so door and Tools agree.
 const double kIvfHue = 206;
+
+/// ⚠️ ONE NAME FOR THIS TOOL, EVERYWHERE (launch sanity D18, 2026-09-28).
+/// The walk found three on one path: the door card "Should I seek fertility
+/// help?", this screen's eyebrow "SEE A SPECIALIST?" and its title "Is it
+/// worth talking to someone yet?". The door card's name is the one the stage
+/// already uses most (the Taking a while and IVF doors, the journey step,
+/// the hub data and the surface list), so the Tools row and this screen take
+/// it word for word, and the title below says what the screen does instead
+/// of being a fourth name.
+const String kTtcFertilityHelpName = 'Should I seek fertility help?';
 
 class TtcIvfReadinessScreen extends StatefulWidget {
   const TtcIvfReadinessScreen({super.key});
@@ -88,6 +103,10 @@ class _TtcIvfReadinessScreenState extends State<TtcIvfReadinessScreen> {
     _saved.load().then((_) {
       if (!mounted) return;
       setState(_restore);
+    });
+    // Q5's note reads Records (D18, 2026-09-28); redraw once it has loaded.
+    TtcRecordsStore.instance.ensureLoaded().then((_) {
+      if (mounted) setState(() {});
     });
   }
 
@@ -179,6 +198,30 @@ class _TtcIvfReadinessScreenState extends State<TtcIvfReadinessScreen> {
     return IvfTrying.underSix;
   }
 
+  /// His latest semen test in Records, if there is one: the semen report
+  /// tool saves it under the `semen` test, and a hand-typed row names it.
+  TtcRecord? get _semenRecord {
+    for (final r in TtcRecordsStore.instance.records) {
+      if (r.testId == 'semen' || r.label.toLowerCase().contains('semen')) {
+        return r;
+      }
+    }
+    return null;
+  }
+
+  String? _semenRecordNote() {
+    final r = _semenRecord;
+    if (r == null) return null;
+    const months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+    ];
+    final d = r.takenOn;
+    return 'Your records hold his semen test from ${d.day} '
+        '${months[d.month - 1]} ${d.year}. Pick what his doctor said '
+        'about it.';
+  }
+
   void _set(VoidCallback f) => setState(f);
 
   int get _answered => [
@@ -199,8 +242,12 @@ class _TtcIvfReadinessScreenState extends State<TtcIvfReadinessScreen> {
       hue: kIvfHue,
       // ⚠️ ONE TOOL, ONE NAME (2026-09-27): the Tools tile's name, word for
       // word. Kept for revert: eyebrow: 'Should I get help?',
-      eyebrow: 'See a specialist?',
-      title: 'Is it worth talking\nto someone yet?',
+      // D18 (2026-09-28): the one name, and a title that describes rather
+      // than renames. Kept for revert (2026-09-28):
+      //   eyebrow: 'See a specialist?',
+      //   title: 'Is it worth talking\nto someone yet?',
+      eyebrow: kTtcFertilityHelpName,
+      title: 'Six questions,\nthen a plain answer.',
       // ⚠️ THE SKIP IS SAID UP FRONT (tools pass, 2026-09-27). A few of these
       // are personal (a miscarriage, his test), and "you can leave any blank"
       // used to sit under the button, after she had met them. Kept for
@@ -239,7 +286,11 @@ class _TtcIvfReadinessScreenState extends State<TtcIvfReadinessScreen> {
           // and the one most likely to feel like being judged. Saying what it
           // is for, in the same breath, is the difference between a question
           // and an interrogation.
-          note: "Your age only changes how soon it's worth talking to "
+          // D18 (2026-09-28): says where a prefilled age came from. Her age
+          // is one saved answer shared by this check, the IVF door and the
+          // "Trying after 35" read (`TtcFertilityHelpStore.ageBand`).
+          note: '${_ctx.ageBand != null && _a.age == _ctx.ageBand ? 'Filled in from your earlier answer. ' : ''}'
+              "Your age only changes how soon it's worth talking to "
               'someone. Nothing else here depends on it.',
           child: TtcToolChoice<FertilityAgeBand>(
             value: _a.age,
@@ -275,11 +326,18 @@ class _TtcIvfReadinessScreenState extends State<TtcIvfReadinessScreen> {
           // under the questions (2026-09-27), next to the answer it explains.
           // Kept for revert: 'Filled in from your logged dates. Change it if
           // that looks wrong.'
-          note: ivfSuggestedCycles(_ctx) == null
-              ? null
-              : 'Filled in from your ${_ctx.cyclesLogged} logged cycles, '
+          // D18 (2026-09-28): with one cycle logged it says what the app
+          // has and why that is not yet a pattern, rather than asking as if
+          // it knew nothing. Two or more still fill the answer in.
+          note: ivfSuggestedCycles(_ctx) != null
+              ? 'Filled in from your ${_ctx.cyclesLogged} logged cycles, '
                   '${_ctx.cycleShortest} to ${_ctx.cycleLongest} days long. '
-                  'Change it if that looks wrong.',
+                  'Change it if that looks wrong.'
+              : _ctx.cyclesLogged == 1
+                  ? 'You have one cycle logged so far, '
+                      '${_ctx.cycleShortest} days long. One cycle cannot '
+                      "show a pattern yet, so this one is yours to answer."
+                  : null,
           child: TtcToolChoice<IvfCycles>(
             value: _a.cycles,
             hue: kIvfHue,
@@ -337,8 +395,15 @@ class _TtcIvfReadinessScreenState extends State<TtcIvfReadinessScreen> {
           // ⚠️ THIS QUESTION IS THE ONE THE SHIPPED FLOW DID NOT ASK, and it is
           // about half the answer. A tool that investigates only her is a tool
           // that can send a couple down a year of the wrong road.
-          note: 'His side is part of the picture in about half of all cases. '
-              'The test is quick and not expensive.',
+          // D18 (2026-09-28): when Records holds his test, say so and ask
+          // only what the app cannot know (what his doctor made of it). The
+          // app never rates a semen report (ttc_semen_reading.dart: no
+          // verdict), so it does not pick "normal" or "an issue" for her.
+          // Kept for revert: the "His side is part of the picture" line on
+          // its own.
+          note: _semenRecordNote() ??
+              'His side is part of the picture in about half of all cases. '
+                  'The test is quick and not expensive.',
           child: TtcToolChoice<IvfSemen>(
             value: _a.semen,
             hue: kIvfHue,
@@ -526,7 +591,8 @@ class TtcIvfReadinessResultScreen extends StatelessWidget {
       hue: kIvfHue,
       variant: 3,
       // One tool, one name (2026-09-27). Kept for revert: 'Your answer'.
-      eyebrow: 'See a specialist?',
+      // D18 (2026-09-28). Kept for revert: eyebrow: 'See a specialist?',
+      eyebrow: kTtcFertilityHelpName,
       // ⚠️ THE TITLE DESCRIBES WHAT SHE IS HOLDING, NOT WHAT SHE IS. This is
       // where a "you may be infertile" would go on a worse version of this
       // screen, and it is the first place the eye lands.
@@ -644,7 +710,8 @@ class TtcIvfNotesScreen extends StatelessWidget {
         variant: 4,
         // One tool, one name (2026-09-27). Kept for revert:
         // eyebrow: 'Appointment notes',
-        eyebrow: 'See a specialist?',
+        // D18 (2026-09-28). Kept for revert: eyebrow: 'See a specialist?',
+        eyebrow: kTtcFertilityHelpName,
         title: 'What to take\nwith you.',
         // Copy is offered now (2026-09-27). Kept for revert: "Take a
         // screenshot, or read it out. It's six lines, all from your answers."
@@ -656,7 +723,8 @@ class TtcIvfNotesScreen extends StatelessWidget {
               rows: result.checklist, disclaimer: kIvfChecklistDisclaimer)),
           const SizedBox(height: 18),
           ttcToolPad(TtcToolCopyNotes(
-              heading: 'My notes: see a specialist?',
+              // D18 (2026-09-28). Kept for revert: 'My notes: see a specialist?'
+              heading: 'My notes: should I seek fertility help?',
               rows: result.checklist,
               disclaimer: kIvfChecklistDisclaimer)),
           const SizedBox(height: 10),

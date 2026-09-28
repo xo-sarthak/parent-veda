@@ -48,6 +48,8 @@ import '../saved_screen.dart';
 import '../skilling/sk_child_store.dart';
 import '../ttc/ttc_content_prefs_sheet.dart'
     show showTtcContentPrefsSheet, kTtcWhatYouSee, kTtcHideIntimate;
+import '../ttc/ttc_get_help_screen.dart'
+    show kTtcGetHelpTitle, openTtcGetHelp;
 import '../ttc/ttc_journal_screen.dart';
 import '../ttc/ttc_prepare_screen.dart' show TtcPrepareScreen;
 // Records now opens through the Tools table (Y2), which calls openTtcRecords.
@@ -485,6 +487,17 @@ final PvYouStageContent _trying = PvYouStageContent(
           const PvDetailsScreen(stageId: 'trying'),
           'you/details',
         ),
+      ),
+      // ⚠️ THE STANDING WAY TO A PERSON (2026-09-28, the user's option B).
+      // The low-mood lines came off the top of the door tabs; this row, and
+      // the end of Mind & body's Today and Hard days, open the one calm page
+      // of helplines instead (ttc_get_help_screen.dart). Last in the group,
+      // so it is found when looked for and never reads as a warning.
+      PvYouThing(
+        icon: Icons.phone_in_talk_outlined,
+        title: kTtcGetHelpTitle,
+        subtitle: 'Helplines you can call now, and who to call when',
+        open: (c) => openTtcGetHelp(c),
       ),
     ]),
     PvYouGroup(title: 'Your app', things: [

@@ -19,6 +19,8 @@
 //  thing to write and the hardest thing to remember exists.
 // =============================================================================
 
+import 'ttc_chapter.dart';
+import 'ttc_daily_data.dart';
 import 'ttc_garbh_course_store.dart';
 import 'ttc_log_store.dart';
 import 'ttc_practice_data.dart';
@@ -193,3 +195,75 @@ TtcPractice ttcTodaysBreathe({DateTime? on, int offset = 0}) {
 bool get ttcTodayIsHerPractice =>
     TtcGarbhCourseStore.instance.moveId != null ||
     TtcGarbhCourseStore.instance.breatheId != null;
+
+// -----------------------------------------------------------------------------
+//  One picker for "today's movement" and "today's breath" (2026-09-28)
+// -----------------------------------------------------------------------------
+//  ⚠️ LAUNCH SANITY MB18. The home's insight rail said "Today's movement: Take
+//  the stairs today" (a pick from the daily-tip list `ttcMovements`), the
+//  home's Sanskar said "Today's breath" (a line written per chapter in
+//  `ttcRituals`), and Mind & body › Today named a different movement and a
+//  different breath from the practice library. Three "today's" things on two
+//  screens that disagreed on the same day.
+//
+//  So the practice library is the one source and `ttcTodaysMove` /
+//  `ttcTodaysBreathe` are the one picker. The two functions below hand that
+//  pick to the two older shapes the home already renders, so the home's own
+//  code does not change shape:
+//
+//    · `ttcTodaysMoveTip` gives the rail a `TtcMovement` built from today's
+//      movement practice. The rail still opens it as a read (the daily-tip
+//      reader), and the read carries the practice's steps, so the tap lands on
+//      the same practice the Today tab names.
+//    · `ttcSanskarItems` gives the Sanskar its five parts with the breath part
+//      read from today's breath practice. The other four parts are the
+//      chapter's own words, untouched.
+//
+//  The trade-off, said plainly: the chapter-written breath lines ("Breathe
+//  together" in the fertile days, letting a thought about the test pass in
+//  the wait) stop showing in English. They stay in `ttcRituals`, and the
+//  Hindi side still shows them, because the practice library has no Hindi and
+//  shipped Hindi is not replaced with English. The daily-tip list
+//  `ttcMovements` stays too, untouched, for revert.
+
+/// Today's movement practice, in the daily-tip shape the home's rail renders.
+///
+/// The body is the blurb and then the steps, each a sentence already, so the
+/// read's short answer is the blurb's first line and the rest is how to do it.
+TtcMovement ttcTodaysMoveTip({DateTime? on}) {
+  final p = ttcTodaysMove(on: on);
+  final body = [p.blurb, ...p.steps].join(' ');
+  return TtcMovement(
+    id: p.id,
+    kind: 'stretch',
+    titleEn: p.title,
+    titleHi: p.title,
+    bodyEn: body,
+    bodyHi: body,
+    minutes: (p.anim.seconds / 60).ceil(),
+  );
+}
+
+/// The Sanskar's five parts for [chapter], its breath part being today's
+/// breath practice from the one picker.
+List<TtcRitualItem> ttcSanskarItems(TtcChapter chapter, {DateTime? on}) {
+  final items = ttcRituals[chapter] ?? const <TtcRitualItem>[];
+  final b = ttcTodaysBreathe(on: on);
+  return [
+    for (final i in items)
+      if (i.part == TtcRitualPart.breath)
+        TtcRitualItem(
+          part: i.part,
+          textEn: '${b.title}. ${b.blurb}',
+          // Shipped Hindi stays (see the note above).
+          textHi: i.textHi,
+        )
+      else
+        i,
+  ];
+}
+
+/// The practice the Sanskar's breath part runs today. The same card as
+/// Mind & body › Today's breath, by construction.
+TtcPractice ttcSanskarBreathPractice({DateTime? on}) =>
+    ttcTodaysBreathe(on: on);

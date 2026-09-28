@@ -2068,7 +2068,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
           ),
           Switch(
             value: _waOptIn,
-            activeThumbColor: _purple,
+            // Kept for revert (2026-09-28, one black switch app-wide): activeThumbColor: _purple,
             onChanged: (v) => setState(() => _waOptIn = v),
           ),
         ]),
@@ -2257,7 +2257,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
                       Text('Cycle length: $cycle days', style: lbl),
                       SliderTheme(
                         data: SliderTheme.of(ctx).copyWith(
-                            activeTrackColor: _purple, thumbColor: _purple),
+                            ) /* Kept for revert (2026-09-28): activeTrackColor: _purple, thumbColor: _purple */,
                         child: Slider(
                           value: cycle.toDouble(),
                           min: 21,

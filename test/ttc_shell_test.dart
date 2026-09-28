@@ -123,7 +123,9 @@ void main() {
       // ⚠️ 24 -> 25 ON 2026-09-26. "Talk to expert" left the V3 bar and
       // became a Tools tile (Care and medicines), opening the same consults.
       // ⚠️ 25 -> 24 ON 2026-09-27: Mood folded into "Symptoms and mood".
-      expect(TtcToolsScreen.toolCount, 24);
+      // ⚠️ 24 -> 22 ON 2026-09-28 (launch sanity T1): BMI folded into
+      // Weight, Products left the hub. Kept for revert: 24.
+      expect(TtcToolsScreen.toolCount, 22);
     });
 
     testWidgets('all nine Prepare categories render', (tester) async {

@@ -91,7 +91,14 @@ abstract final class TtcCycleColours {
   static const Color before = Color(0xFFE4DFEA);
 
   /// The wait after the fertile days, until the next period.
-  static const Color waiting = Color(0xFFC9C1D3);
+  ///
+  /// ⚠️ A WARM SAND, NOT A SECOND GREY (the user, 2026-09-28: "two colours
+  /// seem very same, that can cause confusion"). Two lilac-greys a little
+  /// apart in lightness read as one colour on the ring and in the legend. The
+  /// days before the window stay a cool light grey; the wait is warm, so the
+  /// two quiet parts differ in hue as well as lightness. Kept for revert:
+  /// Color(0xFFC9C1D3).
+  static const Color waiting = Color(0xFFDCCBB5);
 
   /// Text on either grey, and their small marks.
   static const Color quietInk = Color(0xFF4A4254);
@@ -136,7 +143,8 @@ abstract final class TtcCycleColours {
         TtcPhase.period => periodTint,
         TtcPhase.beforeWindow => const Color(0xFFF3F0F6),
         TtcPhase.fertileWindow => fertileTint,
-        TtcPhase.afterWindow => const Color(0xFFE9E5EE),
+        // Kept for revert (2026-09-28): Color(0xFFE9E5EE).
+        TtcPhase.afterWindow => const Color(0xFFF6EDE1),
       };
 
   /// Text naming a phase, on [tint] or white.
@@ -152,7 +160,8 @@ abstract final class TtcCycleColours {
         TtcPhase.period => period,
         TtcPhase.beforeWindow => const Color(0xFFB7AEC2),
         TtcPhase.fertileWindow => fertile,
-        TtcPhase.afterWindow => const Color(0xFF948AA1),
+        // Kept for revert (2026-09-28): Color(0xFF948AA1).
+        TtcPhase.afterWindow => const Color(0xFFB0875A),
       };
 
   // ---- the fertile days, graded ----------------------------------------------

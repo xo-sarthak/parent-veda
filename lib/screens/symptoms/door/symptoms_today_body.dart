@@ -491,8 +491,8 @@ class _SymptomsTodayBodyState extends State<SymptomsTodayBody>
                   Switch.adaptive(
                     value: reminderOn,
                     onChanged: _toggleReminder,
-                    activeThumbColor: p.ground,
-                    activeTrackColor: p.ink1,
+                    // Kept for revert (2026-09-28, one black switch app-wide): activeThumbColor: p.ground,
+                    // Kept for revert (2026-09-28, one black switch app-wide): activeTrackColor: p.ink1,
                   ),
                 ],
               ),

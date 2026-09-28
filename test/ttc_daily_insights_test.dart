@@ -23,6 +23,7 @@ import 'package:parentveda/screens/ttc/ttc_mood_face.dart';
 import 'package:parentveda/ttc/cycle_store.dart';
 import 'package:parentveda/ttc/ttc_care_pathway.dart';
 import 'package:parentveda/ttc/ttc_log_store.dart';
+import 'package:parentveda/ttc/ttc_reads_data.dart' show ttcReadById;
 import 'package:parentveda/ttc/ttc_store.dart';
 import 'package:parentveda/ttc/ttc_symptom_data.dart';
 import 'package:parentveda/ttc/ttc_treatment_store.dart';
@@ -56,6 +57,37 @@ void main() {
   String keyFor(DateTime d) => 'ttc_day_${d.year}-${d.month}-${d.day}';
 
   // ===========================================================================
+  // ⚠️ ONE CARD, ONE PLACE (the user on build 16, 2026-09-28: the Cycle report
+  // behind two cards "causes ambiguity"). Every day's cards, plus the fixed
+  // cards the home adds after them, land in different places.
+  group('no two cards on the rail open the same screen', () {
+    // The home's own cards after the day's (ttc_home_v3.dart): insight, myth,
+    // nutrition, movement, the report and today's pick.
+    const homeCards = {
+      'insight', 'myth', 'nutrition', 'movement', 'report', 'products'
+    };
+    test('with everything logged, on every day of a cycle', () {
+      history();
+      log('disch_eggwhite', 0);
+      log('cramping', 0);
+      log('calm', 0);
+      for (var back = -6; back <= 30; back++) {
+        final cards = ttcInsightsFor(day(back));
+        final seen = <String>{...homeCards};
+        for (final c in cards) {
+          final dest = ttcRailDestination(c);
+          expect(seen.add(dest), isTrue,
+              reason: '${c.id} on ${day(back)} opens $dest, which another '
+                  'card on the same rail already opens');
+          if (c.go == TtcInsightGo.read) {
+            expect(ttcReadById(c.readId!), isNotNull,
+                reason: '${c.id} opens a read that does not exist');
+          }
+        }
+      }
+    });
+  });
+
   group('which cards a day earns', () {
     test('a day with nothing logged is invited to log, not left blank', () {
       history();

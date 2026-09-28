@@ -335,9 +335,9 @@ class _Row extends StatelessWidget {
           value: on,
           // Purple, because a switch is the interactive thing in its row and
           // that is what purple is for here.
-          activeThumbColor: Colors.white,
-          activeTrackColor: ttcPurple,
-          inactiveTrackColor: ttcPanel,
+          // Kept for revert (2026-09-28, one black switch app-wide): activeThumbColor: Colors.white,
+          // Kept for revert (2026-09-28, one black switch app-wide): activeTrackColor: ttcPurple,
+          // Kept for revert (2026-09-28, one black switch app-wide): inactiveTrackColor: ttcPanel,
           onChanged: locked ? null : onChanged,
         ),
       ]),

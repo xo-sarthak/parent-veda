@@ -84,13 +84,18 @@ const TtcFocusPage kTtcBodyCycleFocus = TtcFocusPage(
       heading: 'How do you keep track of it?',
       group: 'cycle',
       tiles: [
+        // ⚠️ THE TOOL'S OWN NAME ON ITS CARD (launch sanity D16, 2026-09-28).
+        // "Your cycle" opened Cycle companion and "Note how you feel" opened
+        // Symptoms and mood: one tool, two names, one tap apart. The names
+        // are the Tools tab's (`ttc_tools_screen.dart`). Kept for revert:
+        //   title: 'Your cycle',  title: 'Note how you feel',
         TtcToolTile(
-          title: 'Your cycle',
+          title: 'Cycle companion',
           blurb: 'Log your period and see your own pattern build up.',
           surfaceId: 'ttc_cycle',
         ),
         TtcToolTile(
-          title: 'Note how you feel',
+          title: 'Symptoms and mood',
           blurb: 'Pain, spotting, discharge. A record you can show a doctor.',
           surfaceId: 'ttc_symptom_log',
         ),
@@ -277,6 +282,23 @@ const TtcFocusPage kTtcBodyCycleFocus = TtcFocusPage(
     // =========================================================================
     //  ⚠️ THE DOOR CLOSES ON A PERSON, the rule every TTC door keeps. The
     //  booking is the shared consult action, never a new booking flow.
+    // ⚠️ THE TAB LEADS WITH THE DOCTOR (launch sanity D17, 2026-09-28). A tab
+    // called "See a doctor" was three reads with the one way to a doctor
+    // fourth, off the end of the rail. The consult now comes first, as its
+    // own section of one, which the door draws full width; the reads follow.
+    TtcFocusSection(
+      heading: 'Want to talk to a doctor?',
+      group: 'doctor',
+      tiles: [
+        TtcTalkTile(
+          title: 'Talk to a doctor',
+          blurb: 'A private video consultation with a gynaecologist about '
+              'your own cycle.',
+          action: 'ttc_consult_gynae',
+        ),
+      ],
+    ),
+
     TtcFocusSection(
       heading: 'When is it worth a visit?',
       group: 'doctor',
@@ -312,12 +334,13 @@ const TtcFocusPage kTtcBodyCycleFocus = TtcFocusPage(
         //   blurb: 'A private video consultation about your own cycle.',
         //   action: kTtcActConsult,
         // ),
-        TtcTalkTile(
-          title: 'Talk to a doctor',
-          blurb: 'A private video consultation with a gynaecologist about '
-              'your own cycle.',
-          action: 'ttc_consult_gynae',
-        ),
+        // Moved to lead the tab (D17, 2026-09-28). Kept for revert:
+        // TtcTalkTile(
+        //   title: 'Talk to a doctor',
+        //   blurb: 'A private video consultation with a gynaecologist about '
+        //       'your own cycle.',
+        //   action: 'ttc_consult_gynae',
+        // ),
       ],
     ),
   ],

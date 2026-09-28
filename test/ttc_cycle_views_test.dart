@@ -172,10 +172,88 @@ void main() {
       final card = find.byKey(const ValueKey('ttc_report_numbers_empty'));
       await tester.ensureVisible(card);
       expect(card, findsOneWidget);
-      await tester.tap(find.byKey(const ValueKey('ttc_report_add_numbers')));
-      await tester.pumpAndSettle();
-      expect(find.byType(TtcSymptomLogScreen), findsOneWidget,
-          reason: '"add your temperature and weight" had nowhere to go');
+      // Kept for revert (2026-09-28, U2): the button used to push the whole
+      // logger, scrolled to its foot.
+      //   await tester.tap(find.byKey(const ValueKey('ttc_report_add_numbers')));
+      //   await tester.pumpAndSettle();
+      //   expect(find.byType(TtcSymptomLogScreen), findsOneWidget,
+      //       reason: '"add your temperature and weight" had nowhere to go');
+      expect(find.byKey(const ValueKey('ttc_report_add_numbers')),
+          findsOneWidget);
+      expect(find.byKey(const ValueKey('ttc_report_add_temp')), findsOneWidget);
+      expect(
+          find.byKey(const ValueKey('ttc_report_add_weight')), findsOneWidget);
+    });
+
+    // U2 (2026-09-28): "let the user add it there only, instead user is
+    // taken to symptoms page bottom".
+    testWidgets('a temperature is added in place, not in the logger',
+        (tester) async {
+      healthy();
+      await pumpTall(tester, const TtcCycleReportScreen());
+      final add = find.byKey(const ValueKey('ttc_report_add_temp'));
+      await tester.ensureVisible(add);
+      await tester.tap(add);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 600));
+      expect(find.byType(TtcSymptomLogScreen), findsNothing,
+          reason: 'the report must not push the logger any more');
+      // The logger's own sheet, over the report.
+      expect(find.byKey(const ValueKey('ttc_measure_save')), findsOneWidget);
+      expect(find.byKey(const ValueKey('ttc_measure_temp_how_to')),
+          findsOneWidget);
+      await tester.tap(find.byKey(const ValueKey('ttc_measure_save')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 600));
+      expect(
+          TtcLogStore.instance
+              .valueFor(kTtcTempTracker, kTtcTempField, on: DateTime.now())
+              ?.value,
+          36.5,
+          reason: 'saved to the same store the logger reads');
+      expect(find.byType(TtcCycleReportScreen), findsOneWidget);
+    });
+
+    testWidgets('a weight is added in place too', (tester) async {
+      healthy();
+      await pumpTall(tester, const TtcCycleReportScreen());
+      final add = find.byKey(const ValueKey('ttc_report_add_weight'));
+      await tester.ensureVisible(add);
+      await tester.tap(add);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 600));
+      expect(find.byType(TtcSymptomLogScreen), findsNothing);
+      await tester.tap(find.byKey(const ValueKey('ttc_measure_plus')));
+      await tester.pump();
+      await tester.tap(find.byKey(const ValueKey('ttc_measure_save')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 600));
+      expect(
+          TtcLogStore.instance
+              .valueFor(kTtcWeightTracker, kTtcWeightField, on: DateTime.now())
+              ?.value,
+          60.1);
+    });
+
+    testWidgets('the chart shows as soon as the second reading is saved',
+        (tester) async {
+      healthy();
+      TtcLogStore.instance.log(kTtcTempTracker, kTtcTempField, 36.4,
+          on: ago(1));
+      await pumpTall(tester, const TtcCycleReportScreen());
+      expect(find.byKey(const ValueKey('ttc_report_numbers_empty')),
+          findsOneWidget);
+      final add = find.byKey(const ValueKey('ttc_report_add_temp'));
+      await tester.ensureVisible(add);
+      await tester.tap(add);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 600));
+      await tester.tap(find.byKey(const ValueKey('ttc_measure_save')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 600));
+      expect(find.byKey(const ValueKey('ttc_report_numbers_empty')),
+          findsNothing,
+          reason: 'the report redraws the moment the sheet saves');
     });
 
     testWidgets('a cycle paged back comes home in one tap', (tester) async {

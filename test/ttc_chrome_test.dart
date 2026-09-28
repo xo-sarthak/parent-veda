@@ -174,7 +174,10 @@ void main() {
       final all = [for (final g in ttcToolGroups) ...g.tools];
       // 2026-09-27: the tile opens the same store as the bar's Products tab,
       // so it takes that one name. Kept for revert: 'Worth knowing about'.
-      expect(all.firstWhere((t) => t.id == 'guide').name(false), 'Products');
+      // 2026-09-28 (launch sanity T1): the row left the hub, because it
+      // opened a tab the bar already has. Kept for revert:
+      // expect(all.firstWhere((t) => t.id == 'guide').name(false), 'Products');
+      expect(all.any((t) => t.id == 'guide'), isFalse);
     });
   });
 

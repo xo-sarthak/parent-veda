@@ -934,7 +934,7 @@ class _PersonalizeSheetState extends State<_PersonalizeSheet> {
               Text(S.now.uiExpectingTwins, style: t.titleSmall),
               Text(S.now.uiWeLlSuggestFew, style: t.bodySmall?.copyWith(color: AppTheme.neutral600)),
             ])),
-            Switch(value: _ctx.twins, onChanged: (v) => _set(() => _ctx.setTwins(v)), activeThumbColor: AppTheme.primary),
+            Switch(value: _ctx.twins, onChanged: (v) => _set(() => _ctx.setTwins(v))), // Kept for revert (2026-09-28, one black switch app-wide): activeThumbColor: AppTheme.primary
           ]),
           const SizedBox(height: 8),
 

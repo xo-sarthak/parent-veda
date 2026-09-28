@@ -1137,7 +1137,7 @@ class _WhatsAppCardState extends State<_WhatsAppCard> {
           else
             Switch(
               value: _optIn,
-              activeThumbColor: waGreen,
+              // Kept for revert (2026-09-28, one black switch app-wide): activeThumbColor: waGreen,
               onChanged: _toggle,
             ),
         ]),

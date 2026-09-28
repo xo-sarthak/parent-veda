@@ -134,6 +134,29 @@ const String kTtcOvIntro =
     'likely release an egg (ovulate) in the next day or two.';
 const String kTtcOvTestsHeading = 'Your tests this cycle';
 const String kTtcOvLegend = 'Filled dot: positive. Ring: negative.';
+
+/// Which way a logged positive sits from where her cycle says ovulation
+/// usually falls (T3).
+enum TtcOvFar { early, late }
+
+/// A positive strip usually comes a day or two BEFORE ovulation. More than
+/// four days before the estimate, or more than three after it, is far enough
+/// from her pattern to be worth a word before it moves her window. Null when
+/// it is close, or when there is no estimate to compare with.
+TtcOvFar? ttcOvPositiveFar(int positiveDay, int? expectedOvulationDay) {
+  if (expectedOvulationDay == null) return null;
+  if (positiveDay < expectedOvulationDay - 4) return TtcOvFar.early;
+  if (positiveDay > expectedOvulationDay + 3) return TtcOvFar.late;
+  return null;
+}
+
+/// The kind word said before "Use it" when a positive is far from her
+/// pattern. Never a diagnosis; a question about the strip, not about her.
+String ttcOvFarLine(TtcOvFar far, int expectedOvulationDay) =>
+    "That's ${far == TtcOvFar.early ? 'early' : 'late'} for your cycle: "
+    'ovulation usually comes around day $expectedOvulationDay for you. A '
+    'faint line is easy to read as a positive. Was the test line as dark as '
+    'the control line, or darker?';
 const String kTtcOvNegativeLabel = 'Negative';
 const String kTtcOvPositiveLabel = 'Positive';
 const String kTtcOvMoved = 'Your fertile days now follow this test.';
@@ -170,6 +193,10 @@ class TtcOvulationTestsScreen extends StatefulWidget {
 
 class _TtcOvulationTestsScreenState extends State<TtcOvulationTestsScreen> {
   DateTime _day = _dayOnly(DateTime.now());
+
+  /// "Not now" on a positive far from her pattern (T3): the offer steps back
+  /// for this visit and nothing moves.
+  bool _adoptLeft = false;
 
   // ---- writes, each one said out loud ---------------------------------------
 
@@ -382,9 +409,16 @@ class _TtcOvulationTestsScreenState extends State<TtcOvulationTestsScreen> {
                 ),
               ),
               const SizedBox(height: 16),
+              // ⚠️ THE OFFER SITS UNDER THE STRIP, ONCE (launch sanity T3,
+              // 2026-09-28). It was drawn once, below the result buttons,
+              // and on a phone it scrolled past the fold and back into view,
+              // which the walk read as the same card twice. It now sits
+              // right under the strip whose dot it is about, above the
+              // buttons. Kept for revert (2026-09-28): the result block
+              // first, then `..._adoptCard(start, now, p)` after it.
+              ..._adoptCard(start, now, p, today.estimatedOvulationDay),
               ..._resultBlock(start, now, p),
               const SizedBox(height: 14),
-              ..._adoptCard(start, now, p),
               ttcToolPad(
                 Text(
                   t.ovulationLhWhat,
@@ -486,12 +520,24 @@ class _TtcOvulationTestsScreenState extends State<TtcOvulationTestsScreen> {
 
   /// A positive logged in the daily log, not yet moving her fertile days:
   /// offered, never adopted silently.
-  List<Widget> _adoptCard(DateTime start, DateTime now, V2Palette p) {
+  ///
+  /// ⚠️ A POSITIVE FAR FROM HER USUAL WINDOW IS SAID, NOT JUST OFFERED
+  /// (launch sanity T3, 2026-09-28). The walk had a positive on cycle day 6
+  /// against an estimate of day 14, and one tap would have moved her window
+  /// eight days. A strip that early or that late is often a faint line read
+  /// as a positive, so the card says it is early (or late) for her cycle and
+  /// asks whether the test line was as dark as the control line, before the
+  /// same "Use it". Never a diagnosis and never a refusal: her strip, her
+  /// call, and "Not now" leaves it where it is.
+  List<Widget> _adoptCard(
+      DateTime start, DateTime now, V2Palette p, int? expectedOv) {
     final cycle = CycleStore.instance;
     if (cycle.lhPositiveDay != null) return const [];
+    if (_adoptLeft) return const [];
     final first = ttcOvFirstPositiveDay(start, now);
     if (first == null) return const [];
     final on = start.add(Duration(days: first - 1));
+    final far = ttcOvPositiveFar(first, expectedOv);
     return [
       ttcToolPad(
         Container(
@@ -516,12 +562,32 @@ class _TtcOvulationTestsScreenState extends State<TtcOvulationTestsScreen> {
                   color: p.ink1,
                 ),
               ),
+              if (far != null) ...[
+                const SizedBox(height: 8),
+                Text(
+                  ttcOvFarLine(far, expectedOv!),
+                  key: const ValueKey('ttc_ov_adopt_far'),
+                  style: pvManrope(
+                    fontSize: 13,
+                    height: 1.5,
+                    color: p.ink2,
+                  ),
+                ),
+              ],
               const SizedBox(height: 12),
               TtcToolPrimary(
                 key: const ValueKey('ttc_ov_adopt_yes'),
-                label: 'Use it',
+                label: far == null ? 'Use it' : 'Yes, it was clear. Use it',
                 onTap: () => _adopt(first),
               ),
+              if (far != null) ...[
+                const SizedBox(height: 8),
+                TtcToolSecondary(
+                  key: const ValueKey('ttc_ov_adopt_not_now'),
+                  label: 'Not now',
+                  onTap: () => setState(() => _adoptLeft = true),
+                ),
+              ],
             ],
           ),
         ),

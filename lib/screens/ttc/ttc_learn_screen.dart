@@ -72,6 +72,8 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+
+import '../../data/reads/read_images.dart' show readImageFor;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../data/brackets/ttc_brackets.dart';
@@ -139,7 +141,13 @@ class TtcLearnShelf {
   final List<TtcLearnTab> tabs;
 
   String get label => bracket?.label.en ?? key;
-  String get title => bracket?.title.en ?? key;
+
+  /// ⚠️ THE DOOR'S OWN NAME (launch sanity L2, 2026-09-28). The shelf used
+  /// the bracket's long title ("Conceiving & the fertile window", "PCOS &
+  /// hormonal blocks", "Infertility & IVF"), so she could not tell a shelf
+  /// and its door were one place, and "Infertility" appeared nowhere else.
+  /// Kept for revert: bracket?.title.en ?? key.
+  String get title => bracket?.label.en ?? key;
   double get hue => bracket?.hue ?? 268;
 }
 
@@ -631,12 +639,28 @@ class _TtcLearnScreenState extends State<TtcLearnScreen> {
                   ],
                 ),
               ),
-              const Positioned(
-                left: 14,
-                right: 14,
-                bottom: 14,
-                child: SafeArea(
-                    top: false, child: TtcBottomNav(active: 1, v3: true)),
+              // ⚠️ THE BAR STEPS ASIDE FOR THE KEYBOARD (launch sanity L4,
+              // 2026-09-28): floating above the keyboard it covered a third
+              // of the results. It comes back the moment the keyboard goes.
+              if (MediaQuery.viewInsetsOf(context).bottom == 0)
+                const Positioned(
+                  left: 14,
+                  right: 14,
+                  bottom: 14,
+                  child: SafeArea(
+                      top: false, child: TtcBottomNav(active: 1, v3: true)),
+                ),
+              // Nothing slides under the clock (the D2 rule, here too): a
+              // strip of the page's own ground behind the status bar.
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: IgnorePointer(
+                  child: Container(
+                      height: MediaQuery.paddingOf(context).top,
+                      color: p.ground),
+                ),
               ),
             ]),
           ),
@@ -843,16 +867,24 @@ class _TtcLearnScreenState extends State<TtcLearnScreen> {
   Widget _films(V2Palette p, TtcS t) {
     final films = kTtcVideos.take(2).toList();
     if (films.isEmpty) return const SizedBox.shrink();
-    final reads = <PvRead>[];
-    for (final v in kTtcVideos) {
-      for (final id in v.readNext) {
-        final r = ttcReadById(id);
-        if (r == null || !ttcLearnShows(r) || reads.any((x) => x.id == id)) {
-          continue;
-        }
-        reads.add(r);
-      }
-    }
+    // Kept for revert (L1): the reads under the films, as their own list.
+    // final reads = <PvRead>[];
+    // for (final v in kTtcVideos) {
+    //   for (final id in v.readNext) {
+    //     final r = ttcReadById(id);
+    //     if (r == null || !ttcLearnShows(r) || reads.any((x) => x.id == id)) {
+    //       continue;
+    //     }
+    //     reads.add(r);
+    //   }
+    // }
+    // ⚠️ THE NOTES LIVE IN THE FILM'S OWN CARD (launch sanity L1,
+    // 2026-09-28). The reads these films point to used to follow under a
+    // bare "READ ABOUT IT NOW" eyebrow, and the same three PCOS rows came
+    // back a screen lower under the PCOS shelf: one list twice, and an
+    // eyebrow that only made sense joined to the films above. Each card now
+    // carries "Read the notes", which opens the film's first read; the
+    // separate list is kept below as a comment, for revert.
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       _head(t.learnFilmsEyebrow, t.learnFilmsTitle, lead: t.learnFilmsLead),
       const SizedBox(height: 12),
@@ -864,20 +896,34 @@ class _TtcLearnScreenState extends State<TtcLearnScreen> {
               film: films[i],
               meta: t.learnMinWatch((films[i].seconds / 60).round()),
               coming: t.learnFilmComing,
+              notes: _filmNotes(films[i]),
+              onNotes: _filmNotes(films[i]) == null
+                  ? null
+                  : () => _openRead(_filmNotes(films[i])!),
             ),
           ),
         ],
       ])),
-      if (reads.isNotEmpty) ...[
-        const SizedBox(height: 16),
-        _pad(_eyebrow(p, t.learnFilmReadNow)),
-        const SizedBox(height: 8),
-        _pad(PvRowGroup(p: p, children: [
-          for (final r in reads.take(3))
-            _readRow(p, r, hue: _hueOfRead(r), meta: t.learnMinRead(r.minutes)),
-        ])),
-      ],
+      // Kept for revert (L1): the separate "Read about it now" list.
+      // if (reads.isNotEmpty) ...[
+      //   const SizedBox(height: 16),
+      //   _pad(_eyebrow(p, t.learnFilmReadNow)),
+      //   const SizedBox(height: 8),
+      //   _pad(PvRowGroup(p: p, children: [
+      //     for (final r in reads.take(3))
+      //       _readRow(p, r, hue: _hueOfRead(r), meta: t.learnMinRead(r.minutes)),
+      //   ])),
+      // ],
     ]);
+  }
+
+  /// The first read a film points to that she can open (L1).
+  PvRead? _filmNotes(PvVideoSlot v) {
+    for (final id in v.readNext) {
+      final r = ttcReadById(id);
+      if (r != null && ttcLearnShows(r)) return r;
+    }
+    return null;
   }
 
   // Kept for revert (L5, 2026-09-26): the rail of every film, each tappable
@@ -1049,7 +1095,7 @@ class _TtcLearnScreenState extends State<TtcLearnScreen> {
         leading: PvMarkWell(
             p: p,
             hue: hue,
-            photo: r.imageUrl,
+            photo: readImageFor(r.id, own: r.imageUrl),
             bracket: _doorMarkOf(r),
             mark: _doorMarkOf(r) == null ? IntentMark.pageMark : null),
         title: r.title.en,
@@ -1085,7 +1131,9 @@ class _TtcLearnScreenState extends State<TtcLearnScreen> {
     const fold = 4;
     final shown = open ? reads : reads.take(fold).toList();
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      _head(s.label, s.title,
+      // L2: the title is the door's name, so the eyebrow says what the
+      // shelf is rather than the name twice. Kept for revert: s.label.
+      _head(s.bracket == null ? s.label : 'Reads from the door', s.title,
           action: s.bracket == null ? null : t.learnOpenDoor,
           onAction: s.bracket == null ? null : () => _openDoor(s.bracket!)),
       if (tabs.isNotEmpty) ...[
@@ -1649,7 +1697,7 @@ class _ContinueCard extends StatelessWidget {
                     PvMarkWell(
                         p: p,
                         hue: hue,
-                        photo: read.imageUrl,
+                        photo: readImageFor(read.id, own: read.imageUrl),
                         mark: IntentMark.pageMark),
                     const SizedBox(width: 12),
                     Expanded(
@@ -1704,10 +1752,20 @@ class _FilmCard extends StatelessWidget {
     required this.film,
     required this.meta,
     required this.coming,
+    this.notes,
+    this.onNotes,
   });
   final PvVideoSlot film;
+
+  /// The film's length. ⚠️ NOT SHOWN since 2026-09-28 (launch sanity L3):
+  /// a duration on a film that does not exist is a promise. Kept so the
+  /// pill comes back in one line when a film is live.
   final String meta;
   final String coming;
+
+  /// The read behind the film, and how to open it (L1).
+  final PvRead? notes;
+  final VoidCallback? onNotes;
 
   @override
   Widget build(BuildContext context) {
@@ -1723,16 +1781,23 @@ class _FilmCard extends StatelessWidget {
               aspectRatio: 16 / 9,
               child: Container(
                 color: tint,
+                // ⚠️ NO PLAY GLYPH ON SOMETHING THAT CANNOT PLAY (launch
+                // sanity L3, D3, 2026-09-28): a clock and "Coming soon",
+                // nothing that looks like a player, and no duration. Kept
+                // for revert: the play mark centred, and
+                //   Positioned(right: 8, bottom: 8, child: _Pill(label: meta)),
                 child: Stack(children: [
                   Center(
-                    child: SizedBox(
-                      width: 40,
-                      height: 40,
-                      child: HubIntentArt(mark: IntentMark.playMark, tint: tint),
-                    ),
+                    child: Icon(Icons.schedule_rounded,
+                        size: 30,
+                        color: HSLColor.fromColor(tint)
+                            .withSaturation(0.42)
+                            .withLightness(0.36)
+                            .toColor()),
                   ),
                   Positioned(left: 8, top: 8, child: _Pill(label: coming)),
-                  Positioned(right: 8, bottom: 8, child: _Pill(label: meta)),
+                  if (film.isLive)
+                    Positioned(right: 8, bottom: 8, child: _Pill(label: meta)),
                 ]),
               ),
             ),
@@ -1751,6 +1816,31 @@ class _FilmCard extends StatelessWidget {
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
               style: pvManrope(fontSize: 12, height: 1.4, color: p.ink2)),
+          if (onNotes != null)
+            // The one tappable part of a film that is not made yet: its
+            // notes, which exist today. A 44pt target.
+            InkWell(
+              key: ValueKey('ttc_learn_notes_${film.id}'),
+              onTap: () {
+                pvCommitFeedback();
+                onNotes!();
+              },
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minHeight: 44),
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  Flexible(
+                    child: Text('Read the notes',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: pvManrope(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w800,
+                            color: p.ink1)),
+                  ),
+                  Icon(Icons.chevron_right_rounded, size: 17, color: p.ink1),
+                ]),
+              ),
+            ),
         ]);
   }
 }

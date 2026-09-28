@@ -171,11 +171,22 @@ class TtcShouldTestChat extends TtcChatScript {
   @override
   String get title => 'Should I test?';
 
+  /// The chat's first line.
+  static const String kOpening =
+      "Let's work out if a test will tell you anything yet.";
+
+  /// ⚠️ IT STARTS BY ITSELF (launch sanity D7, 2026-09-28). The chat opened
+  /// on one bubble and a blank screen above a lone "Start" chip, and looked
+  /// empty until she guessed to press it. There was nothing to decide at
+  /// that step, so the opening line now runs straight into the first real
+  /// step (her dates, read from the stores, or the question about them).
+  /// "Start again" still replays it from here. Kept for revert:
+  ///   TtcChatStep([kOpening], [TtcChatChoice('Start', next: begin)])
   @override
-  TtcChatStep start() => TtcChatStep(
-        const ["Let's work out if a test will tell you anything yet."],
-        [TtcChatChoice('Start', next: begin)],
-      );
+  TtcChatStep start() {
+    final first = begin();
+    return TtcChatStep([kOpening, ...first.say], first.choices);
+  }
 
   /// The advice for what the chat knows right now.
   TtcTestAdvice get advice => ttcTestAdvice(

@@ -145,11 +145,17 @@ void main() {
           ),
         );
 
-    test('it opens with the gap analysis line and a Start chip', () {
-      final s = chat().start();
-      expect(s.say.single,
+    // D7 (2026-09-28): no Start chip; the opening runs into the first step.
+    // Kept for revert: expect(s.say.single, <opening>);
+    //                  expect(s.choices.single.label, 'Start');
+    test('it opens with the gap analysis line and goes straight on', () {
+      final s = chat(last: _d(2026, 8, 20), len: 28).start();
+      expect(s.say.first,
           "Let's work out if a test will tell you anything yet.");
-      expect(s.choices.single.label, 'Start');
+      expect(s.say.length, greaterThan(1),
+          reason: 'the first real step follows the opening line');
+      expect(s.choices.map((c) => c.label), isNot(contains('Start')));
+      expect(s.choices, isNotEmpty);
     });
 
     test('early', () {
@@ -414,10 +420,9 @@ void main() {
       expect(find.text('Should I test?'), findsOneWidget);
       expect(find.text("Let's work out if a test will tell you anything yet."),
           findsOneWidget);
-      await tester.tap(find.text('Start'));
-      await tester.pumpAndSettle();
-      // Her chip is now her bubble, and the answer follows.
-      expect(find.text('Start'), findsOneWidget);
+      // D7 (2026-09-28): the answer follows by itself, no Start tap. Kept
+      // for revert: tap 'Start', then expect the Start bubble.
+      expect(find.text('Start'), findsNothing);
       expect(find.textContaining('Your period is due on Thu 17 Sep'),
           findsOneWidget);
     });

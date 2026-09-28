@@ -465,9 +465,17 @@ void main() {
     });
 
     test('a period logged while the check-in is due asks first', () {
+      // 2026-09-28: `logTtcPeriod` delegates to the period sheet, which opens
+      // the check-in after a new period. Kept for revert:
+      //   calls('lib/screens/ttc/ttc_today_screen.dart',
+      //       'await showTtcCheckInSheet(context);')
       expect(
           calls('lib/screens/ttc/ttc_today_screen.dart',
-              'await showTtcCheckInSheet(context);'),
+              'showTtcHomePeriodSheet(context)'),
+          isTrue);
+      expect(
+          calls('lib/screens/ttc/ttc_cycle_companion.dart',
+              'await showTtcCheckInSheet(navigator.context);'),
           isTrue);
     });
 

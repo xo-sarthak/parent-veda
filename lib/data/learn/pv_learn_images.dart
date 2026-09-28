@@ -102,6 +102,9 @@ const Map<String, IntentMark> _byTopic = {
   'nutrition': IntentMark.plate,
   'food': IntentMark.plate,
   'diet': IntentMark.plate,
+  // Before 'mind' and 'mental', so it wins for the TTC psychologist and
+  // support group (launch sanity MB21, 2026-09-28; see `_fromTtc`).
+  'mental support': IntentMark.cuppedHands,
   'mind': IntentMark.moodArc,
   'mental': IntentMark.moodArc,
   'emotion': IntentMark.moodArc,

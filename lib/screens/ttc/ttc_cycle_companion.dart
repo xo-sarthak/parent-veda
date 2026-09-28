@@ -54,6 +54,8 @@ import 'ttc_common.dart';
 import 'ttc_cycle_report_screen.dart';
 import 'ttc_cycle_report_v3.dart';
 import 'ttc_home_gap.dart' show showTtcPeriodCameNudge;
+import '../../ttc/ttc_treatment_store.dart';
+import 'ttc_treatment_round_screens.dart' show showTtcCheckInSheet;
 import '../products/pv_store_chrome.dart' show pvSnack;
 import 'ttc_cycle_palette.dart';
 // Kept for revert (2026-09-27): import 'ttc_phase_colours.dart';
@@ -602,6 +604,25 @@ class _CompanionSheet extends StatelessWidget {
       //   'Swipe a row left to fix or remove it.'
       Text('Tap a date to change or remove it.',
           style: ttcBody(13, h: 1.45)),
+      // H6 (2026-09-28): the reason for "Not in your average", said once.
+      if (ttcCompanionNotCountedNote() case final note?) ...[
+        const SizedBox(height: 10),
+        Container(
+          key: const ValueKey('ttc_companion_not_counted_note'),
+          width: double.infinity,
+          padding: const EdgeInsets.fromLTRB(14, 11, 14, 11),
+          decoration: BoxDecoration(
+              color: ttcPanel, borderRadius: BorderRadius.circular(14)),
+          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            const Padding(
+              padding: EdgeInsets.only(top: 1),
+              child: Icon(Icons.info_outline_rounded, size: 16, color: ttcSoft),
+            ),
+            const SizedBox(width: 9),
+            Expanded(child: Text(note, style: ttcBody(12.5, h: 1.45))),
+          ]),
+        ),
+      ],
       const SizedBox(height: 12),
       for (var i = starts.length - 1; i >= 0; i--) ...[
         _DateRow(
@@ -620,6 +641,35 @@ class _CompanionSheet extends StatelessWidget {
 
 bool _sameDay(DateTime a, DateTime b) =>
     a.year == b.year && a.month == b.month && a.day == b.day;
+
+/// The one line that explains "Not in your average" (launch sanity H6,
+/// 2026-09-28), or null when every logged cycle counts. Names only the kinds
+/// of gap she actually has.
+String? ttcCompanionNotCountedNote() {
+  final starts = CycleStore.instance.periodStarts;
+  var short = false;
+  var long = false;
+  for (var i = 0; i + 1 < starts.length; i++) {
+    final c = CycleStore.instance.cycleFrom(starts[i]);
+    if (c == null || c.counted) continue;
+    if (c.days < CycleStore.minPlausibleCycleDays) {
+      short = true;
+    } else {
+      long = true;
+    }
+  }
+  if (!short && !long) return null;
+  final parts = [
+    if (short)
+      'under ${CycleStore.minPlausibleCycleDays} days is too short to be a '
+          'whole cycle (it may be spotting, or a date logged twice)',
+    if (long)
+      'over ${CycleStore.maxPlausibleCycleDays} days is usually a month that '
+          "wasn't logged",
+  ];
+  return 'Dates marked Not in your average stay on your list, but they are '
+      'left out of your usual length: a gap ${parts.join(', and one ')}.';
+}
 
 void _openReport(BuildContext context) =>
     Navigator.of(context).push(MaterialPageRoute<void>(
@@ -1172,6 +1222,29 @@ class _DateRowState extends State<_DateRow> {
                                   overflow: TextOverflow.ellipsis,
                                   style: ttcBody(12.5, color: ttcMuted)),
                             ],
+                            // H6 (2026-09-28): a small tag in the row; the
+                            // reason is said once above the list
+                            // (`ttcCompanionNotCountedNote`).
+                            if (!counted) ...[
+                              const SizedBox(height: 6),
+                              Container(
+                                key: const ValueKey('ttc_period_row_not_counted'),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 9, vertical: 3),
+                                decoration: BoxDecoration(
+                                    color: ttcPanel,
+                                    borderRadius: BorderRadius.circular(999)),
+                                child: Text(
+                                    tooShort
+                                        ? 'NOT IN YOUR AVERAGE · TOO SHORT'
+                                        : 'NOT IN YOUR AVERAGE · TOO LONG',
+                                    style: pvManrope(
+                                        fontSize: 9,
+                                        fontWeight: FontWeight.w800,
+                                        letterSpacing: 0.9,
+                                        color: ttcSoft)),
+                              ),
+                            ],
                           ]),
                     ),
                     // A pencil you can see, in place of the swipe hint
@@ -1197,46 +1270,51 @@ class _DateRowState extends State<_DateRow> {
                       ),
                     ),
                   ]),
-                  if (!counted) ...[
-                    const SizedBox(height: 12),
-                    ttcDivider(),
-                    const SizedBox(height: 12),
-                    Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 4),
-                            decoration: BoxDecoration(
-                                color: ttcPanel,
-                                borderRadius: BorderRadius.circular(999)),
-                            // Says what it means (2026-09-27). Kept for
-                            // revert: 'NOT COUNTED'.
-                            child: Text('NOT IN YOUR AVERAGE',
-                                style: pvManrope(
-                                    fontSize: 9.5,
-                                    fontWeight: FontWeight.w800,
-                                    letterSpacing: 1.1,
-                                    color: ttcSoft)),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            // One reason per kind of gap (2026-09-27): a
-                            // ten-day gap used to read "a gap this long".
-                            // Kept for revert: the long-gap sentence only.
-                            child: Text(
-                                tooShort
-                                    ? 'Too short to be a whole cycle. It may be '
-                                        'spotting, or a date logged twice. We keep '
-                                        "it, but we don't use it for your usual "
-                                        'length.'
-                                    : "A gap this long is usually a month that "
-                                        "wasn't logged. We keep it, but we don't "
-                                        'use it for your usual length.',
-                                style: ttcBody(13, h: 1.45)),
-                          ),
-                        ]),
-                  ],
+                  // ⚠️ THE SAME FOUR LINES ON EVERY SUCH ROW (launch sanity H6,
+                  // 2026-09-28): eight rejected dates were eight tall cards of
+                  // one paragraph, and the dates got lost. The tag is in the
+                  // row now and the reason is said once, above the list. Kept
+                  // for revert: the block below.
+                  // if (!counted) ...[
+                  //   const SizedBox(height: 12),
+                  //   ttcDivider(),
+                  //   const SizedBox(height: 12),
+                  //   Row(
+                  //       crossAxisAlignment: CrossAxisAlignment.start,
+                  //       children: [
+                  //         Container(
+                  //           padding: const EdgeInsets.symmetric(
+                  //               horizontal: 10, vertical: 4),
+                  //           decoration: BoxDecoration(
+                  //               color: ttcPanel,
+                  //               borderRadius: BorderRadius.circular(999)),
+                  //           // Says what it means (2026-09-27). Kept for
+                  //           // revert: 'NOT COUNTED'.
+                  //           child: Text('NOT IN YOUR AVERAGE',
+                  //               style: pvManrope(
+                  //                   fontSize: 9.5,
+                  //                   fontWeight: FontWeight.w800,
+                  //                   letterSpacing: 1.1,
+                  //                   color: ttcSoft)),
+                  //         ),
+                  //         const SizedBox(width: 10),
+                  //         Expanded(
+                  //           // One reason per kind of gap (2026-09-27): a
+                  //           // ten-day gap used to read "a gap this long".
+                  //           // Kept for revert: the long-gap sentence only.
+                  //           child: Text(
+                  //               tooShort
+                  //                   ? 'Too short to be a whole cycle. It may be '
+                  //                       'spotting, or a date logged twice. We keep '
+                  //                       "it, but we don't use it for your usual "
+                  //                       'length.'
+                  //                   : "A gap this long is usually a month that "
+                  //                       "wasn't logged. We keep it, but we don't "
+                  //                       'use it for your usual length.',
+                  //               style: ttcBody(13, h: 1.45)),
+                  //         ),
+                  //       ]),
+                  // ],
                 ]),
           ),
         ),
@@ -1551,10 +1629,127 @@ Future<void> showTtcPeriodLogSheet(
           notify: Scaffold.maybeOf(context) != null),
     );
 
+// =============================================================================
+//  The home's Period button (launch sanity H1, 2026-09-28)
+// -----------------------------------------------------------------------------
+//  ⚠️ ONE REFLEX TAP USED TO RESTART HER CYCLE. The home's quick action opened
+//  a stock date picker pre-set to TODAY, so tapping OK out of habit logged a
+//  new period today and put her back on day 1, while her real period had
+//  started nine days earlier. The fix is three rules, in the shape Flo uses
+//  for "Edit period dates" (the logged period already marked when the
+//  calendar opens, https://mobbin.com/screens/c6a25c29-3cdd-4a0d-8e24-ea9d1be0c6fa)
+//  and Clue's one-question calendar
+//  (https://mobbin.com/screens/5aaae3cd-d256-4f85-ad8b-a2558ef79850):
+//   1. The sheet opens on the start she LOGGED, never on today.
+//   2. A line under the calendar says, in words, what the button will do with
+//      the day she has picked ("Your period started on 19 Sep" / "Log a new
+//      period starting 28 Sep"), and the button's own label says it again.
+//   3. Starting a new cycle asks once, then offers Undo (the house rule:
+//      tell her before anything changes, and make it reversible).
+//  A day close to the logged start (under 15 days either way) is almost
+//  always a correction, so the first offer there is to MOVE the start, which
+//  keeps what hangs off it (`CycleStore.movePeriodStart`).
+// =============================================================================
+
+/// What the home's period sheet will do with the day she picked.
+enum TtcHomePeriodIntent {
+  /// Nothing logged before: this is her first period with us.
+  first,
+
+  /// The day she already logged as this cycle's start. Nothing changes.
+  keep,
+
+  /// Another period she already logged. Nothing changes.
+  already,
+
+  /// Too close to the logged start to be a new cycle: offer to move it.
+  move,
+
+  /// After the logged start by a whole cycle or more: a NEW cycle.
+  newCycle,
+
+  /// Well before the logged start: an earlier period she forgot. Her current
+  /// cycle is untouched.
+  earlier,
+}
+
+/// Pure, so the rule is tested without a sheet (test/ttc_home_period_test.dart).
+TtcHomePeriodIntent ttcHomePeriodIntent({
+  required DateTime? anchor,
+  required DateTime picked,
+  List<DateTime> starts = const [],
+}) {
+  DateTime d(DateTime x) => DateTime(x.year, x.month, x.day);
+  final p = d(picked);
+  if (anchor == null) return TtcHomePeriodIntent.first;
+  final a = d(anchor);
+  if (p == a) return TtcHomePeriodIntent.keep;
+  if (starts.any((s) => d(s) == p)) return TtcHomePeriodIntent.already;
+  final gap = p.difference(a).inDays;
+  if (gap.abs() < CycleStore.minPlausibleCycleDays) {
+    return TtcHomePeriodIntent.move;
+  }
+  return gap > 0 ? TtcHomePeriodIntent.newCycle : TtcHomePeriodIntent.earlier;
+}
+
+/// The words under the calendar for [intent]: what Save will do, said plainly.
+String ttcHomePeriodLine(
+    TtcHomePeriodIntent intent, DateTime? anchor, DateTime picked) {
+  final day = ttcShortDate(picked);
+  final from = anchor == null ? '' : ttcShortDate(anchor);
+  switch (intent) {
+    case TtcHomePeriodIntent.first:
+      return 'Your period started on $day.';
+    case TtcHomePeriodIntent.keep:
+      return 'Your period started on $day. Nothing changes unless you pick '
+          'another day.';
+    case TtcHomePeriodIntent.already:
+      return 'A period starting $day is already logged. Nothing changes.';
+    case TtcHomePeriodIntent.move:
+      final gap = picked.difference(anchor!).inDays.abs();
+      return '$day is $gap ${gap == 1 ? 'day' : 'days'} from the start you '
+          'logged ($from), too close to be a new cycle. Did this period '
+          'really start on $day?';
+    case TtcHomePeriodIntent.newCycle:
+      return 'Log a new period starting $day. Your cycle starts again at '
+          'day 1.';
+    case TtcHomePeriodIntent.earlier:
+      return 'Add an earlier period starting $day. Your current cycle, from '
+          '$from, stays as it is.';
+  }
+}
+
+/// The home's Period button. Opens the stage's own log sheet on her logged
+/// start (or empty, before her first), never on today.
+Future<void> showTtcHomePeriodSheet(BuildContext context) =>
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      routeSettings: const RouteSettings(name: 'ttc/home_period'),
+      builder: (_) => _LogSheet(
+          home: true,
+          anchor: CycleStore.instance.lastPeriodStart,
+          notify: Scaffold.maybeOf(context) != null),
+    );
+
 class _LogSheet extends StatefulWidget {
-  const _LogSheet({this.correcting, this.initial, this.notify = true});
+  const _LogSheet({
+    this.correcting,
+    this.initial,
+    this.anchor,
+    this.home = false,
+    this.notify = true,
+  });
   final DateTime? correcting;
   final DateTime? initial;
+
+  /// The home's Period button (H1): the logged start the sheet opens on.
+  final DateTime? anchor;
+
+  /// Opened from the home's Period button: says what Save will do and asks
+  /// before a new cycle (H1).
+  final bool home;
 
   /// Whether the screen underneath can show the saved notice.
   final bool notify;
@@ -1580,12 +1775,144 @@ class _LogSheetState extends State<_LogSheet> {
         : DateTime(widget.initial!.year, widget.initial!.month,
             widget.initial!.day);
     final usable = init != null && !init.isAfter(todayD) ? init : null;
-    final seed = widget.correcting ?? usable ?? now;
+    // H1: the home's sheet opens on her LOGGED start, never on today.
+    final anchor = widget.home ? widget.anchor : null;
+    final seed = widget.correcting ?? usable ?? anchor ?? now;
     _month = DateTime(seed.year, seed.month);
-    _picked = widget.correcting ?? usable;
-    _bleed = widget.correcting == null
-        ? null
-        : CycleStore.instance.bleedDaysFor(widget.correcting!);
+    _picked = widget.correcting ?? usable ?? anchor;
+    final owner = widget.correcting ?? anchor;
+    _bleed = owner == null ? null : CycleStore.instance.bleedDaysFor(owner);
+  }
+
+  TtcHomePeriodIntent? get _homeIntent => !widget.home || _picked == null
+      ? null
+      : ttcHomePeriodIntent(
+          anchor: widget.anchor,
+          picked: _picked!,
+          starts: CycleStore.instance.periodStarts);
+
+  /// The primary button's label on the home's sheet: the action, not "OK".
+  String _homeLabel(TtcHomePeriodIntent intent) {
+    final day = ttcShortDate(_picked!);
+    switch (intent) {
+      case TtcHomePeriodIntent.first:
+        return 'Save this period';
+      case TtcHomePeriodIntent.keep:
+      case TtcHomePeriodIntent.already:
+        return 'Done';
+      case TtcHomePeriodIntent.move:
+        return 'Move it to $day';
+      case TtcHomePeriodIntent.newCycle:
+        return 'Log a new period';
+      case TtcHomePeriodIntent.earlier:
+        return 'Add this earlier period';
+    }
+  }
+
+  /// Asks once before a new cycle starts (H1). Undo follows the save.
+  Future<bool> _confirmNewCycle(DateTime picked) async {
+    final anchor = widget.anchor;
+    final ran = anchor == null ? null : picked.difference(anchor).inDays;
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        key: const ValueKey('ttc_home_period_confirm'),
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+        title: Text('Start a new cycle on ${ttcShortDate(picked)}?',
+            style: ttcFraunces(19, w: FontWeight.w600, color: ttcTitleInk)),
+        content: Text(
+            anchor != null && ran != null && ran > 0
+                ? 'Day 1 becomes ${ttcShortDate(picked)}, and the cycle that '
+                    'began on ${ttcShortDate(anchor)} ends at $ran days. You '
+                    'can undo this straight after.'
+                : 'Day 1 becomes ${ttcShortDate(picked)}. You can undo this '
+                    'straight after.',
+            style: ttcBody(13.5, h: 1.5)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text('Not now',
+                style: ttcBody(13, color: ttcSoft, w: FontWeight.w700)),
+          ),
+          TextButton(
+            key: const ValueKey('ttc_home_period_confirm_yes'),
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text('Start new cycle',
+                style: ttcBody(13, color: ttcTitleInk, w: FontWeight.w800)),
+          ),
+        ],
+      ),
+    );
+    return ok == true;
+  }
+
+  /// Save from the home's sheet: does exactly what the line above it said.
+  Future<void> _saveHome({bool separate = false}) async {
+    final picked = _picked;
+    if (picked == null) return;
+    final store = CycleStore.instance;
+    final anchor = widget.anchor;
+    var intent = _homeIntent!;
+    // "Log a separate period" under a Move: a new start after all, asked.
+    if (separate) {
+      intent = anchor != null && picked.isAfter(anchor)
+          ? TtcHomePeriodIntent.newCycle
+          : TtcHomePeriodIntent.earlier;
+    }
+    if (intent == TtcHomePeriodIntent.newCycle) {
+      if (!await _confirmNewCycle(picked)) return;
+      if (!mounted) return;
+    }
+    final navigator = Navigator.of(context);
+    final messenger = ScaffoldMessenger.maybeOf(context);
+    String? note;
+    VoidCallback? undo;
+    switch (intent) {
+      case TtcHomePeriodIntent.keep:
+      case TtcHomePeriodIntent.already:
+        final before = store.bleedDaysFor(picked);
+        if (before != _bleed) {
+          store.logBleedDays(picked, _bleed);
+          note = 'Saved';
+        }
+      case TtcHomePeriodIntent.move:
+        store.movePeriodStart(anchor!, picked);
+        store.logBleedDays(picked, _bleed);
+        note = 'Moved to ${ttcShortDate(picked)}';
+        undo = () => store.movePeriodStart(picked, anchor);
+      case TtcHomePeriodIntent.first:
+      case TtcHomePeriodIntent.newCycle:
+      case TtcHomePeriodIntent.earlier:
+        store.logPeriodStart(picked);
+        store.logBleedDays(picked, _bleed);
+        note = intent == TtcHomePeriodIntent.earlier
+            ? 'Earlier period added: ${ttcShortDate(picked)}'
+            : 'Period saved: started ${ttcShortDate(picked)}';
+        undo = () => store.removePeriodStart(picked);
+    }
+    HapticFeedback.selectionClick();
+    navigator.maybePop();
+    if (note != null && messenger != null && widget.notify) {
+      pvSnack(navigator.context, note,
+          icon: Icons.check_rounded,
+          lift: 24,
+          action: undo == null ? null : 'Undo',
+          onAction: undo);
+    }
+    // A period logged while a treatment round waits on a check-in opens the
+    // check-in, as `logTtcPeriod` always did (docs/TTC-TREATMENT-FLOW.md
+    // decision 3). The period itself is saved either way.
+    if ((intent == TtcHomePeriodIntent.newCycle ||
+            intent == TtcHomePeriodIntent.first) &&
+        TtcTreatmentStore.instance.checkInDue() &&
+        navigator.mounted) {
+      await showTtcCheckInSheet(navigator.context);
+    }
+    // ⚠️ NO "TALK IT THROUGH" NOTICE HERE, ON PURPOSE: it would replace the
+    // Undo, and on this sheet the Undo is the promise. The home still says
+    // the kind line on day one (`TtcPeriodCameLine`), which links the read.
   }
 
   void _save() {
@@ -1668,7 +1995,12 @@ class _LogSheetState extends State<_LogSheet> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  Text(_isEdit ? 'CORRECT A DATE' : 'LOG A PERIOD',
+                  Text(
+                      _isEdit
+                          ? 'CORRECT A DATE'
+                          : widget.home && widget.anchor != null
+                              ? 'YOUR PERIOD'
+                              : 'LOG A PERIOD',
                       style: pvManrope(
                           fontSize: 9.5,
                           fontWeight: FontWeight.w800,
@@ -1684,13 +2016,19 @@ class _LogSheetState extends State<_LogSheet> {
                   // this stage hangs off her getting that right. Saying it in a
                   // help article instead would be saying it to the people who
                   // already knew.
-                  Text('The first day of real bleeding, not spotting.',
+                  Text(
+                      widget.home && widget.anchor != null
+                          ? 'The first day of real bleeding, not spotting. '
+                              'The start you logged is picked; choose '
+                              'another day only if a new period has begun.'
+                          : 'The first day of real bleeding, not spotting.',
                       style: ttcBody(13, h: 1.45)),
                   const SizedBox(height: 18),
 
                   _MonthPicker(
                     month: _month,
                     picked: _picked,
+                    logged: widget.home ? widget.anchor : null,
                     today: today,
                     onMonth: (m) => setState(() => _month = m),
                     onPick: (d) => setState(() => _picked = d),
@@ -1726,10 +2064,42 @@ class _LogSheetState extends State<_LogSheet> {
                       style: ttcBody(13, h: 1.45)),
 
                   const SizedBox(height: 22),
-                  _QuietAction(
-                    label: _isEdit ? 'Save the correction' : 'Save this period',
-                    onTap: _picked == null ? null : _save,
-                  ),
+                  if (_homeIntent case final intent?) ...[
+                    // H1: what the button will do, in words, before she taps.
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+                      decoration: BoxDecoration(
+                        color: ttcPanel,
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Text(
+                          ttcHomePeriodLine(intent, widget.anchor, _picked!),
+                          key: const ValueKey('ttc_home_period_line'),
+                          style: ttcBody(13.5,
+                              color: ttcTitleInk, w: FontWeight.w600, h: 1.45)),
+                    ),
+                    const SizedBox(height: 12),
+                    _QuietAction(
+                      key: const ValueKey('ttc_home_period_save'),
+                      label: _homeLabel(intent),
+                      onTap: () => _saveHome(),
+                    ),
+                    if (intent == TtcHomePeriodIntent.move) ...[
+                      const SizedBox(height: 10),
+                      _QuietAction(
+                        key: const ValueKey('ttc_home_period_separate'),
+                        label: 'No, log a separate period',
+                        muted: true,
+                        onTap: () => _saveHome(separate: true),
+                      ),
+                    ],
+                  ] else
+                    // Kept as it was for every other caller.
+                    _QuietAction(
+                      label: _isEdit ? 'Save the correction' : 'Save this period',
+                      onTap: _picked == null ? null : _save,
+                    ),
                   const SizedBox(height: 10),
                   _QuietAction(
                     label: 'Not now',
@@ -1748,6 +2118,7 @@ class _MonthPicker extends StatelessWidget {
   const _MonthPicker({
     required this.month,
     required this.picked,
+    this.logged,
     required this.today,
     required this.onMonth,
     required this.onPick,
@@ -1755,6 +2126,10 @@ class _MonthPicker extends StatelessWidget {
 
   final DateTime month;
   final DateTime? picked;
+
+  /// The start she logged (the home's sheet, H1): a small dot under its
+  /// number, so it stays findable when she picks another day.
+  final DateTime? logged;
   final DateTime today;
   final ValueChanged<DateTime> onMonth;
   final ValueChanged<DateTime> onPick;
@@ -1816,6 +2191,7 @@ class _MonthPicker extends StatelessWidget {
               day: d,
               date: DateTime(month.year, month.month, d),
               picked: picked,
+              logged: logged,
               today: today,
               onPick: onPick,
             ),
@@ -1830,6 +2206,7 @@ class _PickCell extends StatelessWidget {
     required this.day,
     required this.date,
     required this.picked,
+    this.logged,
     required this.today,
     required this.onPick,
   });
@@ -1837,6 +2214,7 @@ class _PickCell extends StatelessWidget {
   final int day;
   final DateTime date;
   final DateTime? picked;
+  final DateTime? logged;
   final DateTime today;
   final ValueChanged<DateTime> onPick;
 
@@ -1858,14 +2236,26 @@ class _PickCell extends StatelessWidget {
               ? Border.all(color: ttcBorder, width: 1.5)
               : null,
         ),
-        child: Text('$day',
-            style: ttcBody(13,
-                color: future
-                    ? ttcBorder
-                    : on
-                        ? Colors.white
-                        : ttcTitleInk,
-                w: on ? FontWeight.w800 : FontWeight.w600)),
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Text('$day',
+              style: ttcBody(13,
+                  color: future
+                      ? ttcBorder
+                      : on
+                          ? Colors.white
+                          : ttcTitleInk,
+                  w: on ? FontWeight.w800 : FontWeight.w600)),
+          // H1: the start she logged keeps a dot when another day is picked.
+          if (!on && logged != null && _sameDay(logged!, date))
+            Container(
+              key: const ValueKey('ttc_period_logged_dot'),
+              width: 5,
+              height: 5,
+              margin: const EdgeInsets.only(top: 2),
+              decoration: const BoxDecoration(
+                  color: TtcCycleColours.period, shape: BoxShape.circle),
+            ),
+        ]),
       ),
     );
   }
@@ -1982,6 +2372,7 @@ class _Fact extends StatelessWidget {
 /// every screen that has invented a second one has been corrected back to it.
 class _QuietAction extends StatelessWidget {
   const _QuietAction({
+    super.key,
     required this.label,
     required this.onTap,
     this.muted = false,

@@ -838,9 +838,22 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
                 ],
               ]),
               const SizedBox(height: 1),
+              // \u26A0\uFE0F NO READING TIME ON A PIECE READ IN SECONDS (the user,
+              // 2026-09-28: a daily tip is "way less" than the minutes it
+              // claimed). `minutes` rounds up and never goes below one, so a
+              // sixty-word tip wore a read time beside articles ten times its
+              // length. Under 200 words (a minute at the rate `minutes` uses)
+              // the role line stands alone. Kept for revert: the role and the
+              // minutes always.
               Text(
-                  '${a.authorRole.of(_lang)} \u00B7 '
-                  '${a.minutes} ${_t('min', 'min')}',
+                  a.wordCount +
+                              (a.shortAnswer?.en ?? '')
+                                  .split(RegExp(r'\s+'))
+                                  .length <
+                          200
+                      ? a.authorRole.of(_lang)
+                      : '${a.authorRole.of(_lang)} \u00B7 '
+                          '${a.minutes} ${_t('min', 'min')}',
                   maxLines: 2,
                   style: pvManrope(fontSize: 11, height: 1.35, color: s.soft)),
             ]),

@@ -155,7 +155,9 @@ void main() {
       await _pump(tester, const TtcJournalScreen());
       final prompt =
           ttcPromptForToday(TtcStore.instance.today.chapter).text(false);
-      await tester.tap(find.text('Write about this'));
+      // T11 (2026-09-28): one write button; the prompt is a tappable line
+      // under it. Kept for revert: find.text('Write about this')
+      await tester.tap(find.byKey(const ValueKey('ttc_journal_prompt')));
       await tester.pumpAndSettle();
       expect(find.byType(TtcJournalWriteScreen), findsOneWidget);
       expect(find.text(prompt), findsOneWidget,
@@ -324,7 +326,10 @@ void main() {
       // Twice since 2026-09-27: the list's counter, and the ring, which says
       // the step while the steps follow the timer. Kept for revert:
       //   expect(find.text('Step 1 of ${practice.steps.length}'), findsOneWidget);
-      expect(find.text('Step 1 of ${practice.steps.length}'), findsNWidgets(2));
+      // Once since 2026-09-28 (launch sanity MB14): one step counter, in the
+      // ring while the steps follow the timer. Kept for revert:
+      //   expect(find.text('Step 1 of ${practice.steps.length}'), findsNWidgets(2));
+      expect(find.text('Step 1 of ${practice.steps.length}'), findsOneWidget);
       await tester.tap(find.text('Next step'));
       await tester.pump();
       expect(find.text('Step 2 of ${practice.steps.length}'), findsOneWidget);
@@ -344,7 +349,11 @@ void main() {
     testWidgets('says what Start does, and the bedtime can be set here',
         (tester) async {
       await _pump(tester, const TtcMindTodayScreen(), height: 4000);
-      expect(find.textContaining('Opens the steps and a timer'), findsWidgets);
+      // Since 2026-09-28 Start is a real button and the help line is gone
+      // (the player explains itself). Kept for revert:
+      //   expect(find.textContaining('Opens the steps and a timer'), findsWidgets);
+      expect(find.text('Start'), findsWidgets);
+      expect(find.textContaining('Opens the steps and a timer'), findsNothing);
       expect(find.text('Pick your own time'), findsOneWidget);
       await tester.tap(find.text('Pick your own time'));
       await tester.pumpAndSettle();

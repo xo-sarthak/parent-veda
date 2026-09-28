@@ -83,6 +83,60 @@ class TtcPracticeSkin {
   }
 }
 
+/// Whether a breathing session vibrates on each change of breath. Off by
+/// default and remembered on this phone.
+///
+/// ⚠️ A NOTIFIER OUTSIDE THE SESSION (launch sanity MB14, 2026-09-28). The
+/// setting used to be a line of text inside the session that was secretly a
+/// toggle. The practice page now shows it as a labelled switch with the other
+/// setting (the steps following the timer), away from the ring, so the
+/// session and the switch have to read one value.
+final ValueNotifier<bool> ttcPracticeVibrate = ValueNotifier<bool>(false);
+const String _kVibrateKey = 'ttc_practice_vibrate';
+bool _vibrateLoaded = false;
+
+/// Reads the remembered setting once per run of the app.
+void _loadPracticeVibrate() {
+  if (_vibrateLoaded) return;
+  _vibrateLoaded = true;
+  SharedPreferences.getInstance().then((p) {
+    ttcPracticeVibrate.value = p.getBool(_kVibrateKey) ?? false;
+  }).catchError((Object _) {});
+}
+
+/// Turns the vibration on or off, and remembers it.
+void ttcSetPracticeVibrate(bool on) {
+  _vibrateLoaded = true;
+  ttcPracticeVibrate.value = on;
+  if (on) HapticFeedback.mediumImpact();
+  SharedPreferences.getInstance()
+      .then((p) => p.setBool(_kVibrateKey, on))
+      .catchError((Object _) => false);
+}
+
+/// The vibration as a labelled switch, the same shape as the steps switch.
+class TtcVibrateSwitch extends StatelessWidget {
+  const TtcVibrateSwitch({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    _loadPracticeVibrate();
+    final p = V2PaletteStore.instance.current;
+    return ValueListenableBuilder<bool>(
+      valueListenable: ttcPracticeVibrate,
+      builder: (context, on, _) => MergeSemantics(
+        child: Row(children: [
+          Expanded(
+            child: Text('Vibrate on each breath',
+                style: pvManrope(fontSize: 13.5, height: 1.4, color: p.ink1)),
+          ),
+          Switch(value: on, onChanged: ttcSetPracticeVibrate),
+        ]),
+      ),
+    );
+  }
+}
+
 /// The wall clock the player reads. A seam for tests only (2026-09-27): a
 /// widget test's pump moves timers, not `DateTime.now`, so a test that wants
 /// to see a practice finish sets this and moves it. Never set it in the app.
@@ -138,6 +192,8 @@ class TtcPracticeSession extends StatefulWidget {
     this.onFinished,
     this.onProgress,
     this.caption,
+    this.stepClock = false,
+    this.showVibrate = true,
   })  : anim = practice.anim,
         steps = practice.steps,
         skinFor = (() => TtcPracticeSkin.of(practice));
@@ -151,6 +207,8 @@ class TtcPracticeSession extends StatefulWidget {
         steps = const [],
         onProgress = null,
         caption = null,
+        stepClock = false,
+        showVibrate = false,
         skinFor = (() => TtcPracticeSkin.breathe());
 
   /// Called once, when the timer reaches the end on its own (never on a
@@ -167,6 +225,17 @@ class TtcPracticeSession extends StatefulWidget {
   /// What the middle of a drawn-figure ring says. Null keeps "Follow the
   /// steps as you go".
   final String? caption;
+
+  /// Whether a drawn-figure ring counts down each step rather than the whole
+  /// practice (launch sanity MB11, 2026-09-28). True while the lit step
+  /// follows the timer: the steps split the time evenly, the same split the
+  /// practice page lights the list by.
+  final bool stepClock;
+
+  /// Whether a breathing session draws its own vibration switch. The practice
+  /// page passes false and draws `TtcVibrateSwitch` with its other setting;
+  /// the course sessions keep it here.
+  final bool showVibrate;
 
   final TtcPracticeAnim anim;
 
@@ -201,9 +270,11 @@ class TtcPracticeSessionState extends State<TtcPracticeSession> {
   // time left, https://mobbin.com/screens/8cad3cd9-ead8-429c-8d48-a9fd14c76bc9),
   // Opal's "Breathe In" with its Mute control
   // (https://mobbin.com/screens/b7a85dff-8e86-4211-9dec-73f5bf2ac492).
-  static const _vibrateKey = 'ttc_practice_vibrate';
-  static bool? _vibrateCache;
-  bool _vibrate = _vibrateCache ?? false;
+  // Kept for revert (2026-09-28), the state before `ttcPracticeVibrate`:
+  //   static const _vibrateKey = 'ttc_practice_vibrate';
+  //   static bool? _vibrateCache;
+  //   bool _vibrate = _vibrateCache ?? false;
+  bool get _vibrate => ttcPracticeVibrate.value;
   String? _lastPhase;
 
   int get _total => widget.anim.seconds;
@@ -217,29 +288,25 @@ class TtcPracticeSessionState extends State<TtcPracticeSession> {
   @override
   void initState() {
     super.initState();
-    if (_vibrateCache == null) {
-      SharedPreferences.getInstance().then((p) {
-        _vibrateCache = p.getBool(_vibrateKey) ?? false;
-        if (mounted) setState(() => _vibrate = _vibrateCache!);
-      }).catchError((Object _) {});
-    }
+    _loadPracticeVibrate();
+    ttcPracticeVibrate.addListener(_onVibrateChanged);
+  }
+
+  void _onVibrateChanged() {
+    if (mounted) setState(() {});
   }
 
   @override
   void dispose() {
+    ttcPracticeVibrate.removeListener(_onVibrateChanged);
     _ticker?.cancel();
     if (_clock.running) WakelockPlus.disable().catchError((Object _) {});
     super.dispose();
   }
 
-  void _setVibrate(bool on) {
-    setState(() => _vibrate = on);
-    _vibrateCache = on;
-    if (on) HapticFeedback.mediumImpact();
-    SharedPreferences.getInstance()
-        .then((p) => p.setBool(_vibrateKey, on))
-        .catchError((Object _) => false);
-  }
+  // Kept for revert (2026-09-28): the session's own setter, now
+  // `ttcSetPracticeVibrate`.
+  //   void _setVibrate(bool on) => ttcSetPracticeVibrate(on);
 
   double get _fraction => _total == 0
       ? 0
@@ -323,8 +390,7 @@ class TtcPracticeSessionState extends State<TtcPracticeSession> {
               _BodyScan(steps: widget.steps, progress: progress, skin: skin),
             TtcListenAnim() =>
               _Listen(seconds: t, progress: progress, skin: skin),
-            TtcFigureAnim() =>
-              _Figure(progress: progress, skin: skin, caption: widget.caption),
+            TtcFigureAnim() => _figure(t, progress, skin),
             TtcTimerAnim() =>
               _PlainTimer(left: _left, progress: progress, skin: skin),
           },
@@ -376,7 +442,11 @@ class TtcPracticeSessionState extends State<TtcPracticeSession> {
       // ---- time left, once started (2026-09-27) ---------------------------
       // The ring shows it; the words say it. The plain timer already prints
       // its clock inside the ring, so it does not need a second one.
-      if (anim is! TtcTimerAnim && _clock.elapsed > Duration.zero && !done) ...[
+      // The drawn-figure ring prints its own clock since 2026-09-28 (MB11).
+      if (anim is! TtcTimerAnim &&
+          anim is! TtcFigureAnim &&
+          _clock.elapsed > Duration.zero &&
+          !done) ...[
         const SizedBox(height: 10),
         Text(_leftLabel(_left),
             style: pvManrope(
@@ -384,41 +454,45 @@ class TtcPracticeSessionState extends State<TtcPracticeSession> {
       ],
 
       // ---- the optional vibration, breathing only --------------------------
-      if (_isBreath) ...[
+      if (_isBreath && widget.showVibrate) ...[
         const SizedBox(height: 6),
-        Semantics(
-          button: true,
-          toggled: _vibrate,
-          label: 'Vibrate on each breath',
-          excludeSemantics: true,
-          child: InkWell(
-            onTap: () => _setVibrate(!_vibrate),
-            borderRadius: BorderRadius.circular(999),
-            child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              child: Row(mainAxisSize: MainAxisSize.min, children: [
-                Icon(
-                    _vibrate
-                        ? Icons.vibration_rounded
-                        : Icons.mobile_off_rounded,
-                    size: 16,
-                    color: _vibrate ? p.ink1 : p.ink3),
-                const SizedBox(width: 7),
-                Flexible(
-                  child: Text(
-                      _vibrate
-                          ? 'Vibrate on each breath: on'
-                          : 'Vibrate on each breath: off',
-                      style: pvManrope(
-                          fontSize: 12.5,
-                          fontWeight: FontWeight.w700,
-                          color: _vibrate ? p.ink1 : p.ink2)),
-                ),
-              ]),
-            ),
-          ),
-        ),
+        // A labelled switch, the same as the practice page's (launch sanity
+        // MB14, 2026-09-28). It was a line of text that was secretly a toggle.
+        // Kept for revert, the text toggle:
+        // Semantics(
+        // button: true,
+        // toggled: _vibrate,
+        // label: 'Vibrate on each breath',
+        // excludeSemantics: true,
+        // child: InkWell(
+        // onTap: () => _setVibrate(!_vibrate),
+        // borderRadius: BorderRadius.circular(999),
+        // child: Padding(
+        // padding:
+        // const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        // child: Row(mainAxisSize: MainAxisSize.min, children: [
+        // Icon(
+        // _vibrate
+        // ? Icons.vibration_rounded
+        // : Icons.mobile_off_rounded,
+        // size: 16,
+        // color: _vibrate ? p.ink1 : p.ink3),
+        // const SizedBox(width: 7),
+        // Flexible(
+        // child: Text(
+        // _vibrate
+        // ? 'Vibrate on each breath: on'
+        // : 'Vibrate on each breath: off',
+        // style: pvManrope(
+        // fontSize: 12.5,
+        // fontWeight: FontWeight.w700,
+        // color: _vibrate ? p.ink1 : p.ink2)),
+        // ),
+        // ]),
+        // ),
+        // ),
+        // ),
+        const TtcVibrateSwitch(),
       ],
 
       if (done) ...[
@@ -433,6 +507,38 @@ class TtcPracticeSessionState extends State<TtcPracticeSession> {
       ],
     ]);
   }
+
+  /// The drawn-figure ring: the time, large, and one small line under it.
+  ///
+  /// ⚠️ THE RING'S ONE JOB IS HOW LONG IS LEFT (launch sanity MB11,
+  /// 2026-09-28). It said "Step 1 of 6" and no time before Start. Now, while
+  /// the steps follow the timer, it counts down the step she is on ("0:30")
+  /// with "Step 1 of 6" small under it, as Future's exercise player puts the
+  /// move's own countdown in the middle
+  /// (https://mobbin.com/screens/72efd39a-7519-4765-8b86-eb7494d029ef,
+  /// https://mobbin.com/screens/e554df4e-de96-4fc3-81f2-652f44d009ca). Once
+  /// she moves the steps herself the ring counts the whole practice.
+  Widget _figure(double t, double progress, TtcPracticeSkin skin) {
+    final n = widget.steps.length;
+    if (widget.stepClock && n > 0 && _total > 0) {
+      final per = _total / n;
+      final i = (t / per).floor().clamp(0, n - 1);
+      final stepLeft = ((i + 1) * per - t).ceil().clamp(0, per.ceil());
+      return _Figure(
+          progress: progress,
+          skin: skin,
+          time: _clockLabel(stepLeft),
+          caption: widget.caption ?? 'Step ${i + 1} of $n');
+    }
+    return _Figure(
+        progress: progress,
+        skin: skin,
+        time: _clockLabel(_left),
+        caption: widget.caption ?? 'for the whole practice');
+  }
+
+  static String _clockLabel(int seconds) =>
+      '${seconds ~/ 60}:${(seconds % 60).toString().padLeft(2, '0')}';
 
   static String _leftLabel(int left) {
     final m = left ~/ 60;
@@ -496,6 +602,14 @@ class _Breath extends StatelessWidget {
         // a circle" — four equal phases around four equal sides.
         square: spec.square,
         size: 150,
+        // ⚠️ "READY" IS DRAWN BELOW, CENTRED (launch sanity MB12,
+        // 2026-09-28). The shared circle stacks the word over an empty
+        // 34pt count line while it rests, so the word sat in the top third
+        // of the disc. The real fix belongs in `PvBreathingCircle`, which
+        // other stages share, so this player blanks the word there and
+        // centres its own over the disc, as Opal centres "Breathe In"
+        // (https://mobbin.com/screens/b7a85dff-8e86-4211-9dec-73f5bf2ac492).
+        readyLabel: '',
         below: !running
             ? null
             : Column(mainAxisSize: MainAxisSize.min, children: [
@@ -525,6 +639,16 @@ class _Breath extends StatelessWidget {
                           color: skin.p.ink1)),
               ]),
       ),
+      if (!running)
+        IgnorePointer(
+          child: Text('Ready',
+              textAlign: TextAlign.center,
+              style: pvManrope(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.3,
+                  color: skin.p.ink1)),
+        ),
     ]);
   }
 }
@@ -615,9 +739,16 @@ class _Listen extends StatelessWidget {
 
 /// A drawn figure when one exists, and an honest placeholder until then.
 class _Figure extends StatelessWidget {
-  const _Figure({required this.progress, required this.skin, this.caption});
+  const _Figure(
+      {required this.progress,
+      required this.skin,
+      required this.time,
+      this.caption});
   final double progress;
   final TtcPracticeSkin skin;
+
+  /// The clock in the middle of the ring (2026-09-28, MB11).
+  final String time;
 
   /// "Step 3 of 6" when the steps follow the timer (2026-09-27): the biggest
   /// thing on screen then says where she is, readable from the mat.
@@ -648,23 +779,29 @@ class _Figure extends StatelessWidget {
                 accent: skin.accent,
                 track: skin.track)),
       ),
-      Icon(Icons.self_improvement_rounded,
-          size: 104, color: skin.accent.withValues(alpha: 0.10)),
-      if (caption case final c?)
-        Text(c,
-            style: pvFraunces(
-                fontSize: 24, fontWeight: FontWeight.w600, color: skin.p.ink1))
-      else
+      // ⚠️ NO FIGURE BEHIND THE WORDS (2026-09-28, the card family's first
+      // rule). A 104pt faded figure sat under "Step 3 of 6", the one thing
+      // on screen meant to be read from the mat. The ring is the picture.
+      // Headspace's player keeps its words on a clean ground
+      // (https://mobbin.com/screens/d5b9ff12-33e0-4ec4-ae64-82c70e68ba0d).
+      // Kept for revert:
+      //   Icon(Icons.self_improvement_rounded,
+      //       size: 104, color: skin.accent.withValues(alpha: 0.10)),
+      // The time large and the step small under it, centred as one block
+      // (MB11, 2026-09-28). Kept for revert: the caption alone in Fraunces 24,
+      // or "Follow the steps / as you go" when there was none.
       Column(mainAxisSize: MainAxisSize.min, children: [
-        Text('Follow the steps',
-            style: pvManrope(
-                fontSize: 12.5,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 0.3,
-                color: skin.p.ink2)),
-        const SizedBox(height: 4),
-        Text('as you go',
-            style: pvManrope(fontSize: 12.5, color: skin.p.ink3)),
+        Text(time,
+            style: pvFraunces(
+                fontSize: 40, fontWeight: FontWeight.w600, color: skin.p.ink1)),
+        if (caption case final c?) ...[
+          const SizedBox(height: 2),
+          Text(c,
+              style: pvManrope(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: skin.p.ink2)),
+        ],
       ]),
     ]);
   }

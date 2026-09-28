@@ -99,6 +99,35 @@ class TtcLogStore extends ChangeNotifier with TtcSyncedStore {
   final Map<String, TtcLogValue> _values = {};
   bool _loaded = false;
 
+  // ---- tombstones (launch sanity H12, 2026-09-28) ---------------------------
+  //
+  // ⚠️ A CLEARED VALUE CAME BACK AFTER A RESTART. The walk saw "Log sex" and
+  // mood "Energetic" on the running home, then "Sex logged" and "Calm" after
+  // a cold start. The home was not stale (it listens to this store, and every
+  // write notifies). The save was: `clear` deleted locally and fired ONE
+  // delete at the cloud, and the pull on the next start is a union
+  // (`putIfAbsent`). So any clear whose delete did not land came straight
+  // back: offline, a network hiccup (the delete is fire-and-forget), or the
+  // commonest case, Undo a second after logging, when the debounced push
+  // that carried the value was already in flight and its upsert landed after
+  // the delete.
+  //
+  // The general fix in a local-first store with a union merge is a
+  // TOMBSTONE: remember "this key was deleted here" until the cloud agrees.
+  // A cleared key is kept here (persisted), the pull skips it and deletes it
+  // again, and it is forgotten only once a pull no longer sees the row, at
+  // least a minute after the clear, so an upsert still in flight cannot
+  // outlive it. Logging the key again removes its tombstone. The cost: a few
+  // bytes per cleared value until the next sync, and a second delete call
+  // when the first did not stick.
+  static const _clearedKey = 'ttc_logs_cleared';
+
+  /// Cleared keys → when they were cleared (ms since epoch).
+  final Map<String, int> _cleared = {};
+
+  @visibleForTesting
+  Set<String> get clearedKeysForTest => Set.unmodifiable(_cleared.keys);
+
   bool get isLoaded => _loaded;
 
   static String dayKey(DateTime d) =>
@@ -164,6 +193,8 @@ class TtcLogStore extends ChangeNotifier with TtcSyncedStore {
   void log(String tracker, String field, double value,
       {DateTime? on, String? note}) {
     final k = dayKey(on ?? DateTime.now());
+    // Logged again: no longer deleted (H12).
+    _cleared.remove('$tracker/$field/$k');
     _values['$tracker/$field/$k'] = TtcLogValue(
       tracker: tracker,
       field: field,
@@ -179,6 +210,8 @@ class TtcLogStore extends ChangeNotifier with TtcSyncedStore {
     final day = dayKey(on ?? DateTime.now());
     final k = '$tracker/$field/$day';
     if (_values.remove(k) == null) return;
+    // H12: remember the delete until a pull shows the cloud has it too.
+    _cleared[k] = DateTime.now().millisecondsSinceEpoch;
     _persist();
     // Clearing must reach the cloud explicitly - a union pull would bring the
     // cleared value straight back.
@@ -196,6 +229,7 @@ class TtcLogStore extends ChangeNotifier with TtcSyncedStore {
   @visibleForTesting
   void resetForTest() {
     _values.clear();
+    _cleared.clear();
     _loaded = true;
     notifyListeners();
   }
@@ -227,6 +261,15 @@ class TtcLogStore extends ChangeNotifier with TtcSyncedStore {
           _values.putIfAbsent(v.key, () => v);
         } catch (_) {/* a corrupt row is dropped, not fatal */}
       }
+      final raw = p.getString(_clearedKey);
+      if (raw != null) {
+        final m = jsonDecode(raw);
+        if (m is Map) {
+          for (final e in m.entries) {
+            if (e.value is num) _cleared[e.key.toString()] = (e.value as num).toInt();
+          }
+        }
+      }
     } catch (_) {/* keep defaults */}
     _loaded = true;
     notifyListeners();
@@ -245,6 +288,8 @@ class TtcLogStore extends ChangeNotifier with TtcSyncedStore {
   Future<void> pullFromCloud() async {
     final rows = await SupabaseRepo.fetch(TtcTables.logs,
         orderBy: 'logged_on', ascending: true);
+    // H12: which tombstoned keys the cloud still holds.
+    final stillThere = <String>{};
     for (final row in rows) {
       final tracker = row['tracker'];
       final field = row['field'];
@@ -257,6 +302,21 @@ class TtcLogStore extends ChangeNotifier with TtcSyncedStore {
       // without this every sync would re-introduce the pre-merge ids.
       final merged = ttcMergedTracker(tracker);
       final key = '$merged/$field/$day';
+      // ⚠️ DELETED HERE, SO NOT BROUGHT BACK (H12): skip it and ask the cloud
+      // to delete it again, under the tracker id the row actually carries.
+      if (_cleared.containsKey(key)) {
+        stillThere.add(key);
+        final uid = SupabaseRepo.userId;
+        if (uid != null) {
+          SupabaseRepo.deleteMatch(TtcTables.logs, {
+            'user_id': uid,
+            'tracker': tracker,
+            'field': field,
+            'logged_on': day,
+          }).catchError((_) {});
+        }
+        continue;
+      }
       // Union: a value logged offline is kept rather than overwritten by an
       // older cloud row for the same day.
       _values.putIfAbsent(
@@ -270,6 +330,10 @@ class TtcLogStore extends ChangeNotifier with TtcSyncedStore {
         ),
       );
     }
+    // A tombstone the cloud no longer holds is done, once no upsert from
+    // before the clear can still be in flight (a minute is ample).
+    final settled = DateTime.now().millisecondsSinceEpoch - 60000;
+    _cleared.removeWhere((k, at) => !stillThere.contains(k) && at < settled);
   }
 
   @override
@@ -312,6 +376,7 @@ class TtcLogStore extends ChangeNotifier with TtcSyncedStore {
                 }))
             .toList(),
       );
+      await p.setString(_clearedKey, jsonEncode(_cleared));
     } catch (_) {/* best-effort */}
   }
 }

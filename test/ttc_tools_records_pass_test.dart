@@ -373,7 +373,10 @@ void main() {
 
     testWidgets('Save with no title says so', (tester) async {
       await pumpTall(tester, const TtcAppointmentsScreen());
-      await tester.tap(find.text(const TtcS(false).appointmentsAdd).first);
+      // Launch sanity T13 (2026-09-28): an empty list has one Add, the empty
+      // card's, under the same key. Was:
+      //   await tester.tap(find.text(const TtcS(false).appointmentsAdd).first);
+      await tester.tap(find.byKey(const ValueKey('ttc_appt_add')));
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const ValueKey('ttc_appt_save')));
       await tester.pumpAndSettle();

@@ -149,7 +149,11 @@ void main() {
     await pumpV3(tester);
     final t = TtcS.current();
 
-    final pills = find.text(t.sanskarDone, skipOffstage: false);
+    // Since 2026-09-28 the Sanskar cards are the practice card family and
+    // their ink pill reads the ritual page's own words for the act
+    // (t.ritualMarkDone). Kept for revert:
+    //   final pills = find.text(t.sanskarDone, skipOffstage: false);
+    final pills = find.text(t.ritualMarkDone, skipOffstage: false);
     await _scrollTo(tester, pills);
     expect(pills, findsNWidgets(TtcRitualStore.instance.total),
         reason: 'every part of the ritual should be completable from the home');
@@ -164,8 +168,13 @@ void main() {
     expect(find.text(t.sanskarDoneToday, skipOffstage: false), findsOneWidget,
         reason: 'the card does not listen to TtcRitualStore, so a completed '
             'part repaints nothing');
-    expect(find.text(t.sanskarDone, skipOffstage: false),
+    // Kept for revert (2026-09-28):
+    //   expect(find.text(t.sanskarDone, skipOffstage: false),
+    //       findsNWidgets(TtcRitualStore.instance.total - 1));
+    expect(find.text(t.ritualMarkDone, skipOffstage: false),
         findsNWidgets(TtcRitualStore.instance.total - 1));
+    // The done card takes it back in words, not by a tap on its chip.
+    expect(find.text('Mark not done', skipOffstage: false), findsOneWidget);
     // And no fraction anywhere: the count was removed on purpose.
     expect(find.textContaining('/${TtcRitualStore.instance.total}', skipOffstage: false),
         findsNothing,

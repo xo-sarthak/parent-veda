@@ -23,7 +23,7 @@
 
 import 'package:flutter/material.dart';
 
-import '../../ttc/cycle_store.dart';
+// Kept for revert (2026-09-28), old `logTtcPeriod` body only: import '../../ttc/cycle_store.dart';
 import '../../ttc/ttc_chapter.dart';
 import '../../ttc/ttc_daily_data.dart';
 import '../../ttc/ttc_insight_read.dart';
@@ -42,11 +42,14 @@ import 'ttc_partner_screen.dart';
 import 'ttc_products_screen.dart';
 import 'ttc_transition_screen.dart';
 import 'ttc_treatment_screen.dart';
-import 'ttc_treatment_round_screens.dart' show showTtcCheckInSheet;
-import '../../ttc/ttc_treatment_store.dart' show TtcTreatmentStore;
+// Kept for revert (2026-09-28), old `logTtcPeriod` body only: import 'ttc_treatment_round_screens.dart' show showTtcCheckInSheet;
+// Kept for revert (2026-09-28), old `logTtcPeriod` body only: import '../../ttc/ttc_treatment_store.dart' show TtcTreatmentStore;
 import 'ttc_ritual_screen.dart';
 import 'ttc_strings.dart';
-import 'ttc_home_gap.dart' show showTtcPeriodCameNudge;
+// Kept for revert (2026-09-28): used only by the old stock-picker body of
+// `logTtcPeriod`, now a comment.
+// import 'ttc_home_gap.dart' show showTtcPeriodCameNudge;
+import 'ttc_cycle_companion.dart' show showTtcHomePeriodSheet;
 
 class TtcTodayScreen extends StatelessWidget {
   const TtcTodayScreen({super.key});
@@ -550,158 +553,183 @@ String _noEstimateBody(TtcS t, TtcNoEstimate why) {
   }
 }
 
-/// Shared by Today and the Cycle Companion, so a period is logged the same way
-/// wherever it is logged from.
-Future<void> logTtcPeriod(BuildContext context) async {
-  final now = DateTime.now();
-  final picked = await showDatePicker(
-    context: context,
-    initialDate: now,
-    // A period start is always in the past; offering the future would invite
-    // the one input the engine has to reject.
-    firstDate: now.subtract(const Duration(days: 400)),
-    lastDate: now,
-    helpText: TtcS.current().logPeriodTitle,
-    // Spelled out, so the typed field says which order it wants rather than
-    // making her find out by being rejected.
-    fieldHintText: 'dd/mm/yyyy',
-    // ⚠️ A WHITE PICKER, NOT A PURPLE ONE. The app's `colorScheme.primary` is
-    // ttcPurple, and Material fills the date picker's whole header with it —
-    // so a control that is otherwise plain system furniture arrived as a
-    // saturated purple slab that matched nothing on the V3 screens.
-    //
-    // Overridden here rather than in the app theme deliberately: this is the
-    // only picker in the stage, and changing `primary` globally to fix one
-    // dialog would recolour every button in three stages.
-    builder: (context, child) => Theme(
-      data: Theme.of(context).copyWith(
-        datePickerTheme: DatePickerThemeData(
-          backgroundColor: Colors.white,
-          surfaceTintColor: Colors.transparent,
-          headerBackgroundColor: Colors.white,
-          headerForegroundColor: ttcTitleInk,
-          // ⚠️ THE DISABLED CASE WAS MISSING, AND THAT IS WHY THE CALENDAR
-          // FELT DEAD — FIXED 2026-09-05. Reported as *"I cannot select dates
-          // in calendar"*.
-          //
-          // `lastDate` is today, because a period start is always in the past.
-          // So roughly half of the visible month is disabled — and this
-          // resolver returned `ttcInk` for every state that was not `selected`,
-          // which includes `disabled`. Future days therefore rendered in the
-          // SAME ink as selectable ones, and tapping them did nothing.
-          //
-          // Nothing was broken. The picker was working exactly as told and
-          // giving the reader no way to know which half of it was alive, which
-          // from the outside is indistinguishable from a frozen screen.
-          //
-          // ⚠️ WORTH GENERALISING: overriding a `WidgetStateProperty` with a
-          // single-condition ternary silently flattens every state you did not
-          // name. `selected` was named; `disabled` was not; the default the
-          // override replaced had handled both.
-          dayForegroundColor: WidgetStateProperty.resolveWith((s) {
-            if (s.contains(WidgetState.disabled)) {
-              return ttcMuted.withValues(alpha: 0.55);
-            }
-            return s.contains(WidgetState.selected) ? Colors.white : ttcInk;
-          }),
-          dayBackgroundColor: WidgetStateProperty.resolveWith((s) =>
-              s.contains(WidgetState.selected) ? ttcPurple : Colors.transparent),
-          // ⚠️ PURPLE ON PURPLE — FIXED 2026-09-05. Reported: *"the whole
-          // purple thing covers the date, I don't know which date it is… on the
-          // current date seems very poor."*
-          //
-          // `WidgetStateProperty.all` returns the same colour for EVERY state,
-          // so today's digits stayed purple even when today was the selected
-          // day — and the selected day's background is purple. The number went
-          // invisible on exactly one cell: the one people look at first.
-          //
-          // Same shape as the disabled-days bug two lines up, and the same
-          // lesson: `.all()` and single-condition ternaries flatten the states
-          // you did not name. The default they replace handled them.
-          todayForegroundColor: WidgetStateProperty.resolveWith((s) {
-            if (s.contains(WidgetState.selected)) return Colors.white;
-            if (s.contains(WidgetState.disabled)) {
-              return ttcMuted.withValues(alpha: 0.55);
-            }
-            return ttcPurple;
-          }),
-          // And no ring around a filled cell — a border in the fill's own
-          // colour is invisible, and in any other colour it is a second mark on
-          // the one day that already has one.
-          todayBorder: const BorderSide(color: ttcPurple),
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(24)),
-        ),
-      ),
-      child: child!,
-    ),
-  );
-  if (picked == null) return;
+/// Shared by every Trying to Conceive screen that logs a period, so a period
+/// is logged the same way wherever it is logged from.
+///
+/// ⚠️ ONE SHEET, NOT A STOCK PICKER (2026-09-28, launch sanity H1 and its
+/// follow-up). This used to open Material's date picker set to TODAY, where
+/// one reflex tap on OK logged a period today and started a new cycle: day 1
+/// moved, the fertile window moved, and nothing said so or offered a way back.
+/// The home's Period button was fixed first (`showTtcHomePeriodSheet`); this
+/// now delegates to the same sheet, so every caller (the Cycle Companion, the
+/// Ovulation and Fertile window tools, the journey map, the timeline and the
+/// old Today) is fixed in one place. The sheet opens on her LOGGED start (or
+/// empty before her first), says in words what Save will do, asks before a
+/// new cycle begins, offers Undo, and still opens the treatment check-in when
+/// a round is waiting on one (docs/TTC-TREATMENT-FLOW.md decision 3).
+/// `test/ttc_period_logging_safe_test.dart` holds it.
+///
+/// The trade-off, named: the old picker also offered "Talk it through" after
+/// a new period. The sheet does not, on purpose, because that notice would
+/// replace the Undo. The home says the kind line on day one instead.
+Future<void> logTtcPeriod(BuildContext context) =>
+    showTtcHomePeriodSheet(context);
 
-  // Ask before accepting a start that cannot be a new cycle.
-  //
-  // The store already refuses to AVERAGE gaps under fifteen days, silently. So
-  // an entry three days after the last one was kept, shown in the list, and
-  // counted for nothing - with no way for her to know. Eleven entries once
-  // produced exactly one usable cycle, and the app's only response was to feel
-  // like it needed more logging.
-  //
-  // She can still add it. Some people bleed twice in a month and want both on
-  // record. What she cannot do any more is add it without being told.
-  final gap = CycleStore.instance.daysSincePreviousStart(picked);
-  if (gap != null && gap < CycleStore.minPlausibleCycleDays) {
-    if (!context.mounted) return;
-    final ok = await _confirmCloseStart(context, gap);
-    if (ok != true) return;
-  }
-  CycleStore.instance.logPeriodStart(picked);
-  // ⚠️ AN OPEN ROUND ASKS FIRST (2026-09-26, docs/TTC-TREATMENT-FLOW.md
-  // decision 3). A period logged while her round is waiting on a check-in (7
-  // quiet days, or back after 30 days away) never closes it or reads as
-  // either answer: the check-in opens, and the round changes only when she
-  // chooses. The period itself is saved either way.
-  if (!context.mounted) return;
-  if (TtcTreatmentStore.instance.checkInDue()) {
-    await showTtcCheckInSheet(context);
-    return;
-  }
-  // "Talk it through", once, for a new period (2026-09-26). The home's
-  // "Edit period dates" comes through here; the rule is in
-  // `ttcShouldOfferPeriodTalk`.
-  if (!context.mounted) return;
-  final messenger = ScaffoldMessenger.maybeOf(context);
-  if (messenger == null) return;
-  showTtcPeriodCameNudge(
-    navigator: Navigator.of(context),
-    messenger: messenger,
-    start: picked,
-    starts: CycleStore.instance.periodStarts,
-  );
-}
-
-Future<bool?> _confirmCloseStart(BuildContext context, int gap) {
-  final t = TtcS.current();
-  return showDialog<bool>(
-    context: context,
-    builder: (ctx) => AlertDialog(
-      backgroundColor: Colors.white,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
-      content: Text(t.tooCloseWarning(gap), style: ttcBody(13.5, h: 1.5)),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(ctx).pop(false),
-          child: Text(t.tooCloseCancel,
-              style: ttcBody(13, color: ttcSoft, w: FontWeight.w700)),
-        ),
-        TextButton(
-          onPressed: () => Navigator.of(ctx).pop(true),
-          child: Text(t.tooCloseKeep,
-              style: ttcBody(13, color: ttcPurple, w: FontWeight.w800)),
-        ),
-      ],
-    ),
-  );
-}
+// Kept for revert (2026-09-28): the stock-picker body of `logTtcPeriod` and
+// its too-close confirm. The sheet above asks the same too-close question as
+// its "Move it" line.
+// /// Shared by Today and the Cycle Companion, so a period is logged the same way
+// /// wherever it is logged from.
+// Future<void> logTtcPeriod(BuildContext context) async {
+//   final now = DateTime.now();
+//   final picked = await showDatePicker(
+//     context: context,
+//     initialDate: now,
+//     // A period start is always in the past; offering the future would invite
+//     // the one input the engine has to reject.
+//     firstDate: now.subtract(const Duration(days: 400)),
+//     lastDate: now,
+//     helpText: TtcS.current().logPeriodTitle,
+//     // Spelled out, so the typed field says which order it wants rather than
+//     // making her find out by being rejected.
+//     fieldHintText: 'dd/mm/yyyy',
+//     // ⚠️ A WHITE PICKER, NOT A PURPLE ONE. The app's `colorScheme.primary` is
+//     // ttcPurple, and Material fills the date picker's whole header with it —
+//     // so a control that is otherwise plain system furniture arrived as a
+//     // saturated purple slab that matched nothing on the V3 screens.
+//     //
+//     // Overridden here rather than in the app theme deliberately: this is the
+//     // only picker in the stage, and changing `primary` globally to fix one
+//     // dialog would recolour every button in three stages.
+//     builder: (context, child) => Theme(
+//       data: Theme.of(context).copyWith(
+//         datePickerTheme: DatePickerThemeData(
+//           backgroundColor: Colors.white,
+//           surfaceTintColor: Colors.transparent,
+//           headerBackgroundColor: Colors.white,
+//           headerForegroundColor: ttcTitleInk,
+//           // ⚠️ THE DISABLED CASE WAS MISSING, AND THAT IS WHY THE CALENDAR
+//           // FELT DEAD — FIXED 2026-09-05. Reported as *"I cannot select dates
+//           // in calendar"*.
+//           //
+//           // `lastDate` is today, because a period start is always in the past.
+//           // So roughly half of the visible month is disabled — and this
+//           // resolver returned `ttcInk` for every state that was not `selected`,
+//           // which includes `disabled`. Future days therefore rendered in the
+//           // SAME ink as selectable ones, and tapping them did nothing.
+//           //
+//           // Nothing was broken. The picker was working exactly as told and
+//           // giving the reader no way to know which half of it was alive, which
+//           // from the outside is indistinguishable from a frozen screen.
+//           //
+//           // ⚠️ WORTH GENERALISING: overriding a `WidgetStateProperty` with a
+//           // single-condition ternary silently flattens every state you did not
+//           // name. `selected` was named; `disabled` was not; the default the
+//           // override replaced had handled both.
+//           dayForegroundColor: WidgetStateProperty.resolveWith((s) {
+//             if (s.contains(WidgetState.disabled)) {
+//               return ttcMuted.withValues(alpha: 0.55);
+//             }
+//             return s.contains(WidgetState.selected) ? Colors.white : ttcInk;
+//           }),
+//           dayBackgroundColor: WidgetStateProperty.resolveWith((s) =>
+//               s.contains(WidgetState.selected) ? ttcPurple : Colors.transparent),
+//           // ⚠️ PURPLE ON PURPLE — FIXED 2026-09-05. Reported: *"the whole
+//           // purple thing covers the date, I don't know which date it is… on the
+//           // current date seems very poor."*
+//           //
+//           // `WidgetStateProperty.all` returns the same colour for EVERY state,
+//           // so today's digits stayed purple even when today was the selected
+//           // day — and the selected day's background is purple. The number went
+//           // invisible on exactly one cell: the one people look at first.
+//           //
+//           // Same shape as the disabled-days bug two lines up, and the same
+//           // lesson: `.all()` and single-condition ternaries flatten the states
+//           // you did not name. The default they replace handled them.
+//           todayForegroundColor: WidgetStateProperty.resolveWith((s) {
+//             if (s.contains(WidgetState.selected)) return Colors.white;
+//             if (s.contains(WidgetState.disabled)) {
+//               return ttcMuted.withValues(alpha: 0.55);
+//             }
+//             return ttcPurple;
+//           }),
+//           // And no ring around a filled cell — a border in the fill's own
+//           // colour is invisible, and in any other colour it is a second mark on
+//           // the one day that already has one.
+//           todayBorder: const BorderSide(color: ttcPurple),
+//           shape: RoundedRectangleBorder(
+//               borderRadius: BorderRadius.circular(24)),
+//         ),
+//       ),
+//       child: child!,
+//     ),
+//   );
+//   if (picked == null) return;
+//
+//   // Ask before accepting a start that cannot be a new cycle.
+//   //
+//   // The store already refuses to AVERAGE gaps under fifteen days, silently. So
+//   // an entry three days after the last one was kept, shown in the list, and
+//   // counted for nothing - with no way for her to know. Eleven entries once
+//   // produced exactly one usable cycle, and the app's only response was to feel
+//   // like it needed more logging.
+//   //
+//   // She can still add it. Some people bleed twice in a month and want both on
+//   // record. What she cannot do any more is add it without being told.
+//   final gap = CycleStore.instance.daysSincePreviousStart(picked);
+//   if (gap != null && gap < CycleStore.minPlausibleCycleDays) {
+//     if (!context.mounted) return;
+//     final ok = await _confirmCloseStart(context, gap);
+//     if (ok != true) return;
+//   }
+//   CycleStore.instance.logPeriodStart(picked);
+//   // ⚠️ AN OPEN ROUND ASKS FIRST (2026-09-26, docs/TTC-TREATMENT-FLOW.md
+//   // decision 3). A period logged while her round is waiting on a check-in (7
+//   // quiet days, or back after 30 days away) never closes it or reads as
+//   // either answer: the check-in opens, and the round changes only when she
+//   // chooses. The period itself is saved either way.
+//   if (!context.mounted) return;
+//   if (TtcTreatmentStore.instance.checkInDue()) {
+//     await showTtcCheckInSheet(context);
+//     return;
+//   }
+//   // "Talk it through", once, for a new period (2026-09-26). The home's
+//   // "Edit period dates" comes through here; the rule is in
+//   // `ttcShouldOfferPeriodTalk`.
+//   if (!context.mounted) return;
+//   final messenger = ScaffoldMessenger.maybeOf(context);
+//   if (messenger == null) return;
+//   showTtcPeriodCameNudge(
+//     navigator: Navigator.of(context),
+//     messenger: messenger,
+//     start: picked,
+//     starts: CycleStore.instance.periodStarts,
+//   );
+// }
+//
+// Future<bool?> _confirmCloseStart(BuildContext context, int gap) {
+//   final t = TtcS.current();
+//   return showDialog<bool>(
+//     context: context,
+//     builder: (ctx) => AlertDialog(
+//       backgroundColor: Colors.white,
+//       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+//       content: Text(t.tooCloseWarning(gap), style: ttcBody(13.5, h: 1.5)),
+//       actions: [
+//         TextButton(
+//           onPressed: () => Navigator.of(ctx).pop(false),
+//           child: Text(t.tooCloseCancel,
+//               style: ttcBody(13, color: ttcSoft, w: FontWeight.w700)),
+//         ),
+//         TextButton(
+//           onPressed: () => Navigator.of(ctx).pop(true),
+//           child: Text(t.tooCloseKeep,
+//               style: ttcBody(13, color: ttcPurple, w: FontWeight.w800)),
+//         ),
+//       ],
+//     ),
+//   );
+// }
 
 // ---- Today's Insight --------------------------------------------------------
 

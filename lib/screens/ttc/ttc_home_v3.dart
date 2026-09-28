@@ -43,6 +43,8 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+
+import '../../data/reads/read_images.dart' show readImageFor;
 import '../brackets/hub/journey_screen.dart';
 import '../../data/journeys/journey_registry.dart';
 import 'ttc_journal_screen.dart' show writeTtcEntry;
@@ -66,6 +68,8 @@ import '../../ttc/ttc_chapter.dart';
 import '../../ttc/ttc_daily_data.dart';
 import '../../ttc/ttc_insight_read.dart';
 import '../../ttc/ttc_log_store.dart';
+// Today's myth as a story, nutrition and movement as reads (2026-09-28).
+import 'ttc_daily_tip_open.dart';
 // Kept for revert: the hero's dates came from `ttcFertileWindowNow`; they
 // come from `ttcDayContext` now (2026-09-26, consistency pass).
 // import '../../ttc/ttc_fertile_window.dart';
@@ -117,16 +121,24 @@ import 'ttc_cycle_palette.dart' show TtcCycleColours;
 import '../brackets/hub/hub_intent_art.dart' show IntentMark;
 import '../doors/pv_list_row.dart' show PvMarkWell, pvWellInk;
 import '../../data/brackets/ttc_brackets.dart' show kTtcBrackets;
+import '../../models/bracket.dart' show Bracket;
 import '../../models/pv_read.dart' show PvRead;
 import 'ttc_shop_v3.dart' show openTtcProductPage;
 import 'ttc_products_screen.dart';
 import 'ttc_profile_screen.dart';
 import 'ttc_ritual_screen.dart';
+import 'ttc_practice_card_parts.dart';
 import 'ttc_strings.dart';
 import 'ttc_symptom_log_screen.dart';
 import 'ttc_surface_router.dart';
-import 'ttc_today_parts.dart';
-import 'ttc_today_screen.dart' show logTtcPeriod;
+// Kept for revert (2026-09-28): its `showTtcRowSheet` carried the myth,
+// nutrition and movement sheets, which are now a story and two reads
+// (ttc_daily_tip_open.dart). Restore with the three sheet cases.
+// import 'ttc_today_parts.dart';
+// Kept for revert (2026-09-28, H1): import 'ttc_today_screen.dart' show logTtcPeriod;
+import 'ttc_cycle_companion.dart' show showTtcHomePeriodSheet;
+import '../learn/pv_offering_content.dart'
+    show kTtcRegistrationChecksRecorded;
 import 'ttc_transition_screen.dart';
 
 /// The four chapters' hues, on the same controlled-pastel wheel every other
@@ -874,7 +886,11 @@ class _TtcHomeV3State extends State<TtcHomeV3>
                   //     ],
                   //   )),
                   _pad(_Head(
-                      eyebrow: hinglish ? 'Aapki journal' : 'Your journal',
+                      // One name with the page it opens (launch sanity H18,
+                      // 2026-09-28): the journal is shared with him and its
+                      // page and the Tools tile say "Our journal". Kept for
+                      // revert: hinglish ? 'Aapki journal' : 'Your journal'.
+                      eyebrow: TtcS.current().journalTitle,
                       title: hinglish
                           ? 'Aaj ka kuch rakh lein'
                           : 'Keep something from today',
@@ -1559,10 +1575,17 @@ class _CycleHeader extends StatelessWidget {
               _HeroQuickAction(
                 key: const ValueKey('ttc_home_quick_period'),
                 label: 'Period',
-                semantic: t.headerEditPeriod,
+                // H1 (launch sanity, 2026-09-28): the label says what the
+                // sheet now does. Kept for revert: t.headerEditPeriod.
+                semantic: 'Log or change your period',
                 icon: Icons.water_drop_outlined,
                 p: p,
-                onTap: () => logTtcPeriod(context),
+                // ⚠️ NEVER A NEW CYCLE BY REFLEX (H1). The stock picker
+                // opened on TODAY, so one OK restarted her cycle. The sheet
+                // opens on her logged start, says what Save will do, and
+                // asks before a new cycle, with Undo after. Kept for revert:
+                // onTap: () => logTtcPeriod(context),
+                onTap: () => showTtcHomePeriodSheet(context),
               ),
               _HeroQuickAction(
                 key: const ValueKey('ttc_home_quick_symptoms'),
@@ -3625,7 +3648,10 @@ class _InsightRail extends StatelessWidget {
     final insight = ttcHomeInsightFor(selected, phase: phase);
     final myth = ttcPickForToday(ttcMyths, now: selected, offset: 3);
     final n = ttcPickForToday(ttcNutrition, now: selected, offset: 1);
-    final m = ttcPickForToday(ttcMovements, now: selected, offset: 2);
+    // One picker (launch sanity MB18, 2026-09-28): the movement Mind & body ›
+    // Today names. Kept for revert:
+    //   final m = ttcPickForToday(ttcMovements, now: selected, offset: 2);
+    final m = ttcTodaysMoveTip(on: selected);
     final product = ttcPickForToday(ttcProducts, now: selected, offset: 4);
 
     // ⚠️ A RUNNING ROUND LEADS THE RAIL (2026-09-26, §3e): its step, and
@@ -3764,8 +3790,15 @@ class _InsightRail extends StatelessWidget {
           child: _InsightTile(
             card: cards[i],
             p: p,
-            onTap: () => _openInsight(context, cards[i], hi, selected,
-                insight: insight, myth: myth, n: n, m: m),
+            // ⚠️ TODAY'S PICK OPENS THE PRODUCT IT NAMES (launch sanity H2,
+            // 2026-09-28). It opened the top of the store (Folic acid in the
+            // hero) under a card that said CoQ10, so she had to hunt for the
+            // thing she tapped. Kept for revert: every card through
+            // `_openInsight`, where `products` opens the whole store.
+            onTap: cards[i].id == 'pick'
+                ? () => openTtcProductPage(context, product.id)
+                : () => _openInsight(context, cards[i], hi, selected,
+                    insight: insight, myth: myth, n: n, m: m),
           ),
         ),
       ),
@@ -3801,6 +3834,9 @@ void _openInsight(
       _openSurface(context, 'ttc_cycle');
     case TtcInsightGo.products:
       openTtcProducts(context);
+    case TtcInsightGo.read:
+      final id = card.readId;
+      if (id != null) _openSurface(context, 'ttc_read/$id');
     case TtcInsightGo.report:
       Navigator.of(context).push(MaterialPageRoute<void>(
         settings: const RouteSettings(name: 'ttc/cycle_report'),
@@ -3823,51 +3859,62 @@ void _openInsight(
       //   builder: (_) => TtcInsightScreen(insight: insight),
       // ));
       openTtcInsight(context, insight);
+    // ⚠️ NO SHEETS FOR THE DAILY THREE (the user, 2026-09-28: "pop-ups that
+    // come from below, not good UI, not a good way to give information").
+    // The myth opens the story deck every door myth opens; nutrition and
+    // movement open as reads in the one reader. See ttc_daily_tip_open.dart.
+    // Kept for revert, the three sheets:
+    //   case TtcInsightGo.myth:
+    //     showTtcRowSheet(
+    //       context,
+    //       eyebrow: TtcS.current().todaysMyth,
+    //       title: myth.myth(hi),
+    //       body: [
+    //         Container(
+    //           width: double.infinity,
+    //           padding: const EdgeInsets.all(15),
+    //           decoration: BoxDecoration(
+    //             color: ttcPanel,
+    //             borderRadius: BorderRadius.circular(ttcCardRadius),
+    //           ),
+    //           child: Text(myth.truth(hi),
+    //               style: ttcBody(14, color: ttcTitleInk, h: 1.65)),
+    //         ),
+    //       ],
+    //     );
+    //   case TtcInsightGo.nutrition:
+    //     showTtcRowSheet(
+    //       context,
+    //       eyebrow: n.nutrient(hi),
+    //       title: n.meal(hi),
+    //       body: [
+    //         Text(n.why(hi), style: ttcBody(14, color: ttcInk, h: 1.7)),
+    //         const SizedBox(height: 16),
+    //         Container(
+    //           width: double.infinity,
+    //           padding: const EdgeInsets.all(15),
+    //           decoration: BoxDecoration(
+    //             color: ttcCautionCard,
+    //             borderRadius: BorderRadius.circular(ttcCardRadius),
+    //           ),
+    //           child: Text(n.indian(hi),
+    //               style: ttcBody(13.5, color: ttcBrown, h: 1.6)),
+    //         ),
+    //       ],
+    //     );
+    //   case TtcInsightGo.movement:
+    //     showTtcRowSheet(
+    //       context,
+    //       eyebrow: TtcS.current().todaysMovement,
+    //       title: m.title(hi),
+    //       body: [Text(m.body(hi), style: ttcBody(14, color: ttcInk, h: 1.7))],
+    //     );
     case TtcInsightGo.myth:
-      showTtcRowSheet(
-        context,
-        eyebrow: TtcS.current().todaysMyth,
-        title: myth.myth(hi),
-        body: [
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(15),
-            decoration: BoxDecoration(
-              color: ttcPanel,
-              borderRadius: BorderRadius.circular(ttcCardRadius),
-            ),
-            child: Text(myth.truth(hi),
-                style: ttcBody(14, color: ttcTitleInk, h: 1.65)),
-          ),
-        ],
-      );
+      openTtcMythStory(context, myth, hi);
     case TtcInsightGo.nutrition:
-      showTtcRowSheet(
-        context,
-        eyebrow: n.nutrient(hi),
-        title: n.meal(hi),
-        body: [
-          Text(n.why(hi), style: ttcBody(14, color: ttcInk, h: 1.7)),
-          const SizedBox(height: 16),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(15),
-            decoration: BoxDecoration(
-              color: ttcCautionCard,
-              borderRadius: BorderRadius.circular(ttcCardRadius),
-            ),
-            child: Text(n.indian(hi),
-                style: ttcBody(13.5, color: ttcBrown, h: 1.6)),
-          ),
-        ],
-      );
+      openTtcTipRead(context, ttcNutritionAsRead(n));
     case TtcInsightGo.movement:
-      showTtcRowSheet(
-        context,
-        eyebrow: TtcS.current().todaysMovement,
-        title: m.title(hi),
-        body: [Text(m.body(hi), style: ttcBody(14, color: ttcInk, h: 1.7))],
-      );
+      openTtcTipRead(context, ttcMovementAsRead(m));
   }
 }
 
@@ -4616,12 +4663,17 @@ class _ReadRail extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 18),
       child: Column(children: [
-        for (final read in picks.take(3))
+        // H10 (launch sanity, 2026-09-28): never the same drawing twice in
+        // this list. Two Fertile window reads both wore the moon and read as
+        // one row repeated; the second now wears a mark of its own subject
+        // (`ttcHomeReadMarks`). Kept for revert: no `mark:` argument.
+        for (final (read, mark) in ttcHomeReadMarks(picks.take(3).toList()))
           _ReadRow(
             key: ValueKey('ttc_home_read_${read.id}'),
             read: read,
             p: p,
             hinglish: hinglish,
+            mark: mark,
             onTap: () => openTtcSurface(context, '$kTtcReadPrefix${read.id}'),
           ),
       ]),
@@ -5599,35 +5651,38 @@ class _SanskarBlock extends StatelessWidget {
                           color: Colors.white.withValues(alpha: 0.86))),
                 ]),
           ),
-          // The explainer, as on pregnancy's band: a section named in
-          // Sanskrit on an English screen needs a door to "what is this".
-          // The ritual screen carries the why of every part.
-          Positioned(
-            right: 16,
-            top: 14,
-            child: InkWell(
-              onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
-                builder: (_) => TtcRitualScreen(chapter: chapter),
-                settings: const RouteSettings(name: 'ttc/ritual'),
-              )),
-              customBorder: const CircleBorder(),
-              child: Container(
-                width: 26,
-                height: 26,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.55)),
-                ),
-                child: Text('i',
-                    style: pvFraunces(
-                        fontSize: 13,
-                        fontStyle: FontStyle.italic,
-                        color: Colors.white)),
-              ),
-            ),
-          ),
+          // ⚠️ NO "i" (launch sanity H15, 2026-09-28). It promised an
+          // explanation and opened the same ritual page every card opens:
+          // two ways to one place, one of them mislabelled. The name is
+          // already glossed in the line on the photograph ("Ayurveda calls
+          // this Garbhadhana Sanskar"), so the button did not earn its
+          // place. Kept for revert:
+          // Positioned(
+          //   right: 16,
+          //   top: 14,
+          //   child: InkWell(
+          //     onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+          //       builder: (_) => TtcRitualScreen(chapter: chapter),
+          //       settings: const RouteSettings(name: 'ttc/ritual'),
+          //     )),
+          //     customBorder: const CircleBorder(),
+          //     child: Container(
+          //       width: 26,
+          //       height: 26,
+          //       alignment: Alignment.center,
+          //       decoration: BoxDecoration(
+          //         shape: BoxShape.circle,
+          //         border: Border.all(
+          //             color: Colors.white.withValues(alpha: 0.55)),
+          //       ),
+          //       child: Text('i',
+          //           style: pvFraunces(
+          //               fontSize: 13,
+          //               fontStyle: FontStyle.italic,
+          //               color: Colors.white)),
+          //     ),
+          //   ),
+          // ),
         ]),
       ),
       // The rows, the first lifting onto the band.
@@ -5662,19 +5717,21 @@ class _SanskarCards extends StatelessWidget {
         TtcRitualPart.action => Icons.handyman_outlined,
       };
 
-  // The design's hues, part by part.
-  static double _hue(TtcRitualPart part) => switch (part) {
-        TtcRitualPart.reflection => 42,
-        TtcRitualPart.breath => 104,
-        TtcRitualPart.conversation => 268,
-        TtcRitualPart.gratitude => 344,
-        TtcRitualPart.action => 26,
-      };
+  // The design's hues, part by part. Since 2026-09-28 they live in
+  // `ttcRitualPartHue` (ttc_practice_card_parts.dart), so the ritual page
+  // paints each part the colour of the card she tapped here. Same numbers.
+  // Kept for revert:
+  //   TtcRitualPart.reflection => 42, breath => 104, conversation => 268,
+  //   gratitude => 344, action => 26
+  static double _hue(TtcRitualPart part) => ttcRitualPartHue(part);
 
   @override
   Widget build(BuildContext context) {
     final t = TtcS.current();
-    final items = ttcRituals[chapter] ?? const <TtcRitualItem>[];
+    // One picker (launch sanity MB18, 2026-09-28): the breath part is Mind &
+    // body › Today's breath. Kept for revert:
+    //   final items = ttcRituals[chapter] ?? const <TtcRitualItem>[];
+    final items = ttcSanskarItems(chapter);
     return ListenableBuilder(
       listenable: TtcRitualStore.instance,
       builder: (context, _) {
@@ -5740,8 +5797,105 @@ class _SanskarCard extends StatelessWidget {
   final VoidCallback onToggle;
   final VoidCallback onOpen;
 
+  // ⚠️ REDRAWN AS THE PRACTICE CARD FAMILY (2026-09-28). The user, after the
+  // Mind & body Today cards were fixed: "do this Headspace thing for ALL cards
+  // like this ... especially Preconception Sanskar". The row this replaces
+  // had an icon well, a 16pt title, a 12.5 body and an outlined "Done" pill on
+  // the right squeezing the words into a narrow column; three widths of text
+  // and two edges. Now it is the same object as `_PracticeBlock`: the part's
+  // own tint (the icon well's colour, now the card's), the title with "Done
+  // today" as a chip beside it, today's words as the body, and one ink pill
+  // under them. Headspace's Today list and its practice card
+  // (https://mobbin.com/screens/efc82d96-660f-4e91-bff9-1f3d083c34eb,
+  // https://mobbin.com/screens/d05b1798-9389-4073-999b-693b84cca19e).
+  //
+  // ⚠️ STILL TWO TAP TARGETS, the rule above: the card opens the ritual at
+  // this part, the pill completes. Done is taken back with "Mark not done"
+  // where the pill was, so the tick still goes both ways without a hidden tap
+  // on a chip.
+  // The old row is `_buildRow` below, kept for revert.
   @override
   Widget build(BuildContext context) {
+    final t = TtcS.current();
+    final tint = v2BlockTint(hue, p);
+    return Container(
+      decoration: BoxDecoration(
+        color: tint,
+        borderRadius: BorderRadius.circular(kTtcCardRadius),
+        // The first card lifts onto the photograph; the shadow is what makes
+        // that read as depth. All five carry it so the column is one thing.
+        boxShadow: [
+          BoxShadow(
+              color: Colors.black.withValues(alpha: 0.06),
+              blurRadius: 14,
+              offset: const Offset(0, 4)),
+        ],
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Material(
+        type: MaterialType.transparency,
+        child: InkWell(
+          onTap: onOpen,
+          child: Padding(
+            padding: kTtcCardPad,
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // The chip sits beside the title rather than on a row of its
+                  // own, so ticking a part does not push the card taller.
+                  Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Expanded(
+                      child: AnimatedOpacity(
+                        duration: const Duration(milliseconds: 200),
+                        opacity: done ? 0.62 : 1,
+                        child: Text(item.part.title(hinglish),
+                            style: ttcCardTitle(p)),
+                      ),
+                    ),
+                    if (done) ...[
+                      const SizedBox(width: 10),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 1),
+                        child: TtcCardChip.done(t.sanskarDoneToday, tint),
+                      ),
+                    ],
+                  ]),
+                  const SizedBox(height: 6),
+                  // The thing itself, not what it is for (2026-09-27): today's
+                  // thought, question or step, so she can do it here.
+                  AnimatedOpacity(
+                    duration: const Duration(milliseconds: 200),
+                    opacity: done ? 0.62 : 1,
+                    child: Text(item.text(hinglish),
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                        style: ttcCardBody(p)),
+                  ),
+                  const SizedBox(height: 16),
+                  // Kept for revert (2026-09-28): the label was
+                  // `t.sanskarDone` ("Done"), which on a filled button reads as
+                  // a state. The ritual page's own words for the same act.
+                  if (done)
+                    TtcQuietPill(
+                        label: 'Mark not done',
+                        icon: Icons.undo_rounded,
+                        onTap: onToggle)
+                  else
+                    TtcInkPill(
+                        label: t.ritualMarkDone,
+                        icon: Icons.check_rounded,
+                        onTap: onToggle),
+                ]),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Kept for revert (2026-09-28): the row card with the icon well and the
+  // Done pill on the right. Nothing calls it.
+  // ignore: unused_element
+  Widget _buildRow(BuildContext context) {
     final t = TtcS.current();
     // ⚠️ THE DIM IS ON THE CONTENTS, NOT THE CARD. Dimming the whole card
     // made its white surface translucent, and the first card sits on the
@@ -6160,7 +6314,9 @@ class _ExpertRail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SizedBox(
-        height: 160,
+        // H9 (2026-09-28): room for a two-line name and a video line. Kept
+        // for revert: height: 160.
+        height: 204,
         child: ListView.separated(
           scrollDirection: Axis.horizontal,
           padding: const EdgeInsets.symmetric(horizontal: 18),
@@ -6213,32 +6369,60 @@ class _ExpertRail extends StatelessWidget {
                                   color: p.ink1)),
                         ),
                         const SizedBox(height: 10),
-                        Row(children: [
-                          Flexible(
-                            child: Text(name,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: pvFraunces(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600,
-                                    height: 1.25,
-                                    letterSpacing: -0.3,
-                                    color: p.ink1)),
-                          ),
-                          const SizedBox(width: 4),
-                          Icon(Icons.verified_rounded,
-                              size: 14, color: p.action),
-                        ]),
+                        // ⚠️ A NAME IS NEVER CUT (launch sanity H9,
+                        // 2026-09-28). "Akanksha Srivasta…" and "nutritionist
+                        // · ₹499 · on vi…" on a trust surface looked careless.
+                        // The name wraps to two lines with the tick after its
+                        // last word, the role gets its own two lines, and
+                        // price and video share a line with a video icon.
+                        // Kept for revert: the name in a one-line Row with
+                        // the tick, then '$role · $price · on video' in two.
+                        Text.rich(
+                          TextSpan(children: [
+                            TextSpan(text: '$name '),
+                            // ⚠️ NO TICK UNTIL A REGISTRATION CHECK IS
+                            // RECORDED (the user, 2026-09-28): the expert's
+                            // own page says "A named clinician" until then,
+                            // and a tick here would claim what that page
+                            // declines to. Kept for revert: the tick always.
+                            if (kTtcRegistrationChecksRecorded)
+                              WidgetSpan(
+                                alignment: PlaceholderAlignment.middle,
+                                child: Icon(Icons.verified_rounded,
+                                    size: 14, color: p.action),
+                              ),
+                          ]),
+                          key: ValueKey('ttc_expert_rail_name_$id'),
+                          maxLines: 2,
+                          style: pvFraunces(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              height: 1.25,
+                              letterSpacing: -0.3,
+                              color: p.ink1),
+                        ),
                         const SizedBox(height: 4),
-                        // Kept for revert: 'On video, at a time you choose'.
-                        Text(
-                            price == null
-                                ? '$role · on video'
-                                : '$role · $price · on video',
+                        Text(role,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: pvManrope(
-                                fontSize: 12.5, height: 1.4, color: p.ink2)),
+                                fontSize: 12.5, height: 1.35, color: p.ink2)),
+                        const Spacer(),
+                        Row(children: [
+                          Icon(Icons.videocam_outlined,
+                              size: 15, color: p.ink2),
+                          const SizedBox(width: 5),
+                          Expanded(
+                            child: Text(
+                                price == null ? 'On video' : '$price · on video',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: pvManrope(
+                                    fontSize: 12.5,
+                                    fontWeight: FontWeight.w700,
+                                    color: p.ink1)),
+                          ),
+                        ]),
                       ]),
                 ),
               ),
@@ -6383,6 +6567,77 @@ class _TtcJournalTiles extends StatelessWidget {
 /// One read on the home, as a row (2026-09-27): 74dp photo or the door's
 /// drawn page mark, the title in the serif, "TOPIC · N MIN READ" under it.
 /// The pregnancy home's row shape (`V3ReadRow`), fed by a `PvRead`.
+/// The door a TTC read belongs to, by its topic line (the same match the
+/// home's read rows always used).
+Bracket? _ttcReadDoor(PvRead read) => [
+      for (final b in kTtcBrackets)
+        if (b.label.en == read.kicker.en) b
+    ].firstOrNull;
+
+/// A drawn mark for a read by what it is about, for when its door's mark is
+/// already on the list (H10). Keyword-led, so it says something true about
+/// the read rather than being a random picture.
+IntentMark _ttcReadSubjectMark(PvRead read) {
+  final t = '${read.title.en} ${read.kicker.en}'.toLowerCase();
+  bool has(List<String> ws) => ws.any(t.contains);
+  if (has(['sperm', 'semen', 'his ', 'male', 'men '])) return IntentMark.spermMark;
+  if (has(['temperature', 'bbt', 'thermometer'])) return IntentMark.thermoMark;
+  if (has(['mucus', 'discharge', 'lubric'])) return IntentMark.dropMark;
+  if (has(['test', 'strip', 'kit'])) return IntentMark.checkMark;
+  if (has(['ovulat', 'cycle', 'period', 'window', 'fertile'])) {
+    return IntentMark.cycleRing;
+  }
+  if (has(['food', 'eat', 'diet', 'meal'])) return IntentMark.plate;
+  if (has(['folic', 'supplement', 'vitamin', 'tablet', 'pill'])) {
+    return IntentMark.pillMark;
+  }
+  if (has(['stress', 'mood', 'feel', 'worry', 'calm', 'mind'])) {
+    return IntentMark.moodArc;
+  }
+  if (has(['sleep'])) return IntentMark.sleepMark;
+  if (has(['doctor', 'clinic', 'scan'])) return IntentMark.askDoctor;
+  return read.title.en.trim().endsWith('?')
+      ? IntentMark.questionMark
+      : IntentMark.bookMark;
+}
+
+/// Each read with the mark to draw, or null to draw its door's own mark. A
+/// read with a photograph needs neither. A door mark already drawn higher up
+/// the list is replaced by the read's subject mark, and a subject mark never
+/// repeats either; the last resort walks a short list of reading marks.
+/// Pure, so `test/ttc_home_read_marks_test.dart` holds the rule.
+List<(PvRead, IntentMark?)> ttcHomeReadMarks(List<PvRead> reads) {
+  final usedDoors = <String>{};
+  final usedMarks = <IntentMark>{};
+  final out = <(PvRead, IntentMark?)>[];
+  for (final r in reads) {
+    if (readImageFor(r.id, own: r.imageUrl) != null) {
+      out.add((r, null));
+      continue;
+    }
+    final door = _ttcReadDoor(r);
+    final doorMark = door == null ? null : bracketMarkFor(door.id);
+    if (doorMark != null && usedDoors.add(door!.id)) {
+      out.add((r, null));
+      continue;
+    }
+    var m = doorMark == null ? IntentMark.pageMark : _ttcReadSubjectMark(r);
+    if (usedMarks.contains(m)) {
+      m = const [
+        IntentMark.bookMark,
+        IntentMark.questionMark,
+        IntentMark.lampMark,
+        IntentMark.compassMark,
+        IntentMark.pageMark,
+      ].firstWhere((x) => !usedMarks.contains(x),
+          orElse: () => IntentMark.pageMark);
+    }
+    usedMarks.add(m);
+    out.add((r, m));
+  }
+  return out;
+}
+
 class _ReadRow extends StatelessWidget {
   const _ReadRow({
     super.key,
@@ -6390,12 +6645,17 @@ class _ReadRow extends StatelessWidget {
     required this.p,
     required this.hinglish,
     required this.onTap,
+    this.mark,
   });
 
   final PvRead read;
   final V2Palette p;
   final bool hinglish;
   final VoidCallback onTap;
+
+  /// A drawn mark in place of the door's own (H10), when the door's mark is
+  /// already higher up the list.
+  final IntentMark? mark;
 
   @override
   Widget build(BuildContext context) {
@@ -6428,9 +6688,9 @@ class _ReadRow extends StatelessWidget {
                 p: p,
                 hue: door?.hue ?? read.hue,
                 size: 74,
-                photo: read.imageUrl,
-                bracket: doorMark,
-                mark: doorMark == null ? IntentMark.pageMark : null),
+                photo: readImageFor(read.id, own: read.imageUrl),
+                bracket: mark != null ? null : doorMark,
+                mark: mark ?? (doorMark == null ? IntentMark.pageMark : null)),
             const SizedBox(width: 13),
             Expanded(
               child: Column(

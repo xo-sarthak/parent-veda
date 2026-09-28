@@ -30,8 +30,19 @@ for f in sorted(glob.glob('lib/ttc/focus/*.dart')) + ['lib/screens/ttc/ttc_focus
     for m in re.finditer(r"reviewedBy:\s*'([^']+)'", s):
         who = m.group(1).replace('Reviewed by ', '').split(',')[0]
         pre = s[:m.start()]
-        tm = list(re.finditer(r"(?:coverTitle|title):\s*'((?:[^'\\]|\\.)*)'", pre))
-        title = tm[-1].group(1) if tm else '?'
+        # The TILE's title, which is the id in kTtcSignedOffStories
+        # (2026-09-28). The last `title:` before the byline was a slide's
+        # title on most carousels ("A blood test gives the answer."). Kept
+        # for revert:
+        # tm = list(re.finditer(r"(?:coverTitle|title):\s*'((?:[^'\\]|\\.)*)'", pre))
+        # title = tm[-1].group(1) if tm else '?'
+        in_door = '/focus/' in f.replace('\\', '/')
+        tiles = list(re.finditer(r"Ttc(?:Carousel|Infographic)Tile\(", pre)) if in_door else []
+        tm = re.search(r"title:\s*((?:\s*" + LIT + r")+)", pre[tiles[-1].end():]) if tiles else None
+        title = join(tm.group(1)) if tm else None
+        if title is None:  # a story built in code, not a door tile
+            tm = list(re.finditer(r"(?:coverTitle|title):\s*'((?:[^'\\]|\\.)*)'", pre))
+            title = tm[-1].group(1) if tm else 'Every door myth (the story built in code)'
         door = os.path.basename(f).replace('ttc_focus_', '').replace('.dart', '').replace('_', ' ')
         by[who].append(('Door carousel', door, title.replace("\\'", "'"), ''))
 # videos
@@ -44,10 +55,15 @@ out = ["# TTC expert sign-off list",
        "",
        "Written 2026-09-26 in the TTC warmth pass. The made-up reviewer names in TTC were replaced with real people",
        "from the expert roster (`Downloads/MASTER-CONTENT-PLAN-v3.xlsx`, sheet \"Expert roster\"), or with",
-       "\"ParentVeda team\" where no roster expert fits. **The app now shows \"REVIEWED BY\" and a tick next to these",
-       "real names.** That is only true once each person has read her pieces, so this is the list to send each expert",
-       "before launch. Where an expert asks for changes, the text changes; where she cannot sign off, switch that",
-       "read to `reviewed: false` with \"ParentVeda team\" (the pattern the His side reads already use).",
+       "\"ParentVeda team\" where no roster expert fits. This is the list to send each expert before launch. Where an",
+       "expert asks for changes, the text changes.",
+       "",
+       "**Until a piece is signed off, the app does not name its expert (launch sanity H14, 2026-09-28).** A read, a",
+       "door carousel or an infographic shows \"By ParentVeda team\" with no tick. When an expert signs a piece off,",
+       "fill in its Signed off date here and, in the same commit, add it to that expert's set in",
+       "`lib/ttc/ttc_expert_signoff.dart`: a read by its id in `kTtcSignedOffReads`, a door carousel or infographic",
+       "by its Title as listed here in `kTtcSignedOffStories` (tiles have no id; the title is the id). That one line",
+       "brings back \"Reviewed by\" and the tick. `test/ttc_expert_signoff_test.dart` holds the rule.",
        "",
        "Films are placeholders (nothing filmed yet); the name on a film is the plan for who presents it.",
        "",

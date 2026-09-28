@@ -51,15 +51,20 @@ const _brief = <(String, String, TtcTileFormat)>[
   ('diet', 'Folic acid and preconception supplements', TtcTileFormat.product),
   ('diet', 'When to start what, and how early', TtcTileFormat.article),
 
+  // ⚠️ CHANGED ON PURPOSE 2026-09-28 (launch sanity D11): six tabs became
+  // four. Meal plan folded into Food and supplements (the 'diet' tab), and
+  // Before you start into Habits and first steps (the 'habits' tab). Every
+  // row stays; only its tab moved. The old tab ids are in each row's
+  // comment, kept for revert.
   // 1b) Meal plan — ADDED ON PURPOSE 2026-09-26, from the TTC gap analysis
   // (docs/TTC-GAP-PLAN.md §3 A, "Getting ready › Meal plan"). A decision, not
   // a drift: the gap analysis is now the brief for this door.
-  ('meals', 'A week of Indian meals for trying', TtcTileFormat.article),
-  ('meals', 'Ten everyday recipes', TtcTileFormat.article),
-  ('meals', 'Plan your own week', TtcTileFormat.tool),
-  ('meals', 'Iron before pregnancy', TtcTileFormat.article),
-  ('meals', 'Omega-3 without fish', TtcTileFormat.article),
-  ('meals', 'Ask a dietitian: ten questions', TtcTileFormat.article),
+  ('diet', 'A week of Indian meals for trying', TtcTileFormat.article), // was 'meals'
+  ('diet', 'Ten everyday recipes', TtcTileFormat.article), // was 'meals'
+  ('diet', 'Plan your own week', TtcTileFormat.tool), // was 'meals'
+  ('diet', 'Iron before pregnancy', TtcTileFormat.article), // was 'meals'
+  ('diet', 'Omega-3 without fish', TtcTileFormat.article), // was 'meals'
+  ('diet', 'Ask a dietitian: ten questions', TtcTileFormat.article), // was 'meals'
 
   // 2) Tests and vaccines
   ('tests', 'Tests and vaccines worth doing first', TtcTileFormat.article),
@@ -77,15 +82,15 @@ const _brief = <(String, String, TtcTileFormat)>[
 
   // 4) Before you start
   // Moved here from diet, 2026-09-27 (relevance audit).
-  ('before', 'The three months before', TtcTileFormat.article),
-  ('before', 'Coming off birth control', TtcTileFormat.article),
-  ('before', 'Medicines and conditions to check with a doctor',
-      TtcTileFormat.article),
-  ('before', 'His part', TtcTileFormat.article),
+  ('habits', 'The three months before', TtcTileFormat.article), // was 'before'
+  ('habits', 'Coming off birth control', TtcTileFormat.article), // was 'before'
+  ('habits', 'Medicines and conditions to check with a doctor',
+      TtcTileFormat.article), // was 'before'
+  ('habits', 'His part', TtcTileFormat.article), // was 'before'
   // ADDED ON PURPOSE 2026-09-26, same source as the meal plan rows above.
-  ('before', 'Your first gynaecologist visit', TtcTileFormat.article),
-  ('before', 'Can a past abortion affect trying now?', TtcTileFormat.article),
-  ('before', 'Money before a baby', TtcTileFormat.article),
+  ('habits', 'Your first gynaecologist visit', TtcTileFormat.article), // was 'before'
+  ('habits', 'Can a past abortion affect trying now?', TtcTileFormat.article), // was 'before'
+  ('habits', 'Money before a baby', TtcTileFormat.article), // was 'before'
 
   // 5) Your checklist
   ('checklist', 'Your pre-pregnancy checklist', TtcTileFormat.checklist),

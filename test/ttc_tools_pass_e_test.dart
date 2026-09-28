@@ -76,7 +76,14 @@ void main() {
           find.byWidgetPredicate((w) =>
               w is Text && w.data == 'Fertile window' && w.style?.fontSize == 27),
           findsOneWidget);
-      expect(find.textContaining('The six days each cycle'), findsOneWidget);
+      // M3 (2026-09-28): the intro defines both names in one place. Kept for
+      // revert: expect(find.textContaining('The six days each cycle'), ...);
+      final intro = tester
+          .widget<Text>(find.byKey(const ValueKey('ttc_window_intro')))
+          .data!;
+      expect(intro, contains('Your fertile window is the six days ending on '
+          'the day you ovulate'));
+      expect(intro, contains('These are your fertile days'));
       expect(find.textContaining('Your best days are'), findsOneWidget);
       expect(find.textContaining('Why six days'), findsOneWidget);
       // The old header that read like a percentage is gone.
@@ -390,7 +397,10 @@ void main() {
   // ===========================================================================
   group('the tools hub', () {
     test('the product guide says it is products', () {
-      expect(ttcToolById('guide')!.nameEn, 'Products');
+      // 2026-09-28 (launch sanity T1): off the hub; the bar's Products tab is
+      // the one way to the store. Kept for revert:
+      // expect(ttcToolById('guide')!.nameEn, 'Products');
+      expect(ttcToolById('guide'), isNull);
     });
 
     test('supplements and medication say how they differ', () {

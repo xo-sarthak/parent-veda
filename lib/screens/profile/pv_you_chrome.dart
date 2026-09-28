@@ -248,7 +248,7 @@ class PvYouSwitchRow extends StatelessWidget {
     trailing: Switch.adaptive(
       value: value,
       onChanged: onChanged,
-      activeTrackColor: pvStorePalette.action,
+      // Kept for revert (2026-09-28, one black switch app-wide): activeTrackColor: pvStorePalette.action,
     ),
   );
 }

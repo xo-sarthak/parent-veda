@@ -232,6 +232,16 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
           blurb: 'When to start, how often to test, and what the strips mean.',
           readId: 'ttc_read_ovulation_tests_irregular',
         ),
+        // Added 2026-09-28 (launch sanity, from the tools helper): the other
+        // body sign people track, beside the kits, so the temperature chart's
+        // own read has a door to live in and is not only reachable from the
+        // tool.
+        TtcArticleTile(
+          title: 'Morning temperature: how it works',
+          blurb: 'What the small rise after ovulation shows, and why you '
+              "don't need it.",
+          readId: 'ttc_read_morning_temperature',
+        ),
         TtcProductTile(
           title: 'Buy an ovulation kit',
           blurb: 'LH strips, and what to look for on the pack.',

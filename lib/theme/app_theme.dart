@@ -634,17 +634,25 @@ final ColorScheme _lightScheme = ColorScheme(
       ),
 
       // ---- Switch / toggles ------------------------------------------------
+      // ⚠️ ONE SWITCH, BLACK WHEN ON (the user, 2026-09-28: "sometimes it's
+      // purple, sometimes it's black; keep it one, make it black"). The ink
+      // (`onSurface`) track with a white knob when on, a soft grey when off,
+      // and no outline. Screens stopped setting their own switch colours the
+      // same day. Kept for revert: thumb onPrimary/outline, track
+      // primary/surfaceContainerHigh.
       switchTheme: SwitchThemeData(
         thumbColor: WidgetStateProperty.resolveWith(
           (states) => states.contains(WidgetState.selected)
-              ? scheme.onPrimary
-              : scheme.outline,
+              ? scheme.surface
+              : scheme.surface,
         ),
         trackColor: WidgetStateProperty.resolveWith(
           (states) => states.contains(WidgetState.selected)
-              ? scheme.primary
-              : scheme.surfaceContainerHigh,
+              ? scheme.onSurface
+              : scheme.outlineVariant,
         ),
+        trackOutlineColor:
+            const WidgetStatePropertyAll<Color>(Colors.transparent),
       ),
 
       // ---- Dividers, icons, dialogs, sheets --------------------------------

@@ -60,12 +60,24 @@ class TtcBmiStore extends ChangeNotifier {
   static const _kHeightUnit = 'ttc_bmi_height_unit';
   static const _kWeightUnit = 'ttc_bmi_weight_unit';
   static const _kOnChecklist = 'ttc_bmi_on_checklist';
+  static const _kHeight = 'ttc_bmi_height_m';
 
   final List<BmiHistoryEntry> _history = [];
   BmiHeightUnit _heightUnit = BmiHeightUnit.cm;
   BmiWeightUnit _weightUnit = BmiWeightUnit.kg;
   bool _onChecklist = false;
   bool _loaded = false;
+
+  /// ⚠️ HER HEIGHT, REMEMBERED ONCE (launch sanity T2, 2026-09-28). Height
+  /// was only ever recovered from a SAVED result, so a woman who worked out
+  /// her BMI and did not tap Save typed her height again next time. It is
+  /// kept on its own the moment she works a number out, in metres (the unit
+  /// is a display choice, as for the history).
+  double? _heightM;
+
+  /// Her height in metres: the one she last worked a BMI out with, else the
+  /// latest saved measurement's. Null when she has never given it.
+  double? get heightMetres => _heightM ?? latest?.metres;
 
   /// Oldest first.
   List<BmiHistoryEntry> get history => List.unmodifiable(_history);
@@ -100,7 +112,29 @@ class TtcBmiStore extends ChangeNotifier {
         .firstWhere((u) => u.name == w, orElse: () => BmiWeightUnit.kg);
 
     _onChecklist = p.getBool(_kOnChecklist) ?? false;
+    _heightM = p.getDouble(_kHeight);
     notifyListeners();
+  }
+
+  /// Remember her height for next time (T2, 2026-09-28). Fire and forget.
+  Future<void> rememberHeight(double metres) async {
+    if (_heightM == metres) return;
+    _heightM = metres;
+    notifyListeners();
+    try {
+      final p = await SharedPreferences.getInstance();
+      await p.setDouble(_kHeight, metres);
+    } catch (_) {/* local-first: next time she types it again */}
+  }
+
+  @visibleForTesting
+  void resetForTest() {
+    _history.clear();
+    _heightUnit = BmiHeightUnit.cm;
+    _weightUnit = BmiWeightUnit.kg;
+    _onChecklist = false;
+    _heightM = null;
+    _loaded = false;
   }
 
   Future<void> setUnits(

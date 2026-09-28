@@ -87,12 +87,17 @@ void main() {
         'movement', 'nutrition', 'journey', 'can i',
         // 2026-09-27: the product guide is named "Products" now. Kept for
         // revert: 'worth knowing',
-        'products',
+        // 2026-09-28 (launch sanity T1): the Products row left the hub; it
+        // opened the store the bar's Products tab already opens. Kept for
+        // revert: 'products',
         // The five checks the level-map checklist added. Each was reachable
         // only from inside one journey step before this, which is the
         // contextual entrance, not an index. A woman told "you might have
         // PCOS" opens Tools and looks for the word.
-        'pcos', 'weight and fertility', 'specialist', 'vaccination',
+        // 2026-09-28 (T1/T2/D18): BMI is found on the Weight row, and the
+        // specialist check goes by its one name. Kept for revert:
+        // 'pcos', 'weight and fertility', 'specialist', 'vaccination',
+        'pcos', 'bmi', 'fertility help', 'specialist', 'vaccination',
         'checklist',
       ]) {
         expect(names, contains(capability),
@@ -127,7 +132,10 @@ void main() {
       // became a Tools tile (Care and medicines), opening the same consults.
       // ⚠️ 25 -> 24 ON 2026-09-27: Mood folded into "Symptoms and mood"
       // (both opened the one logger). Kept for revert: 25.
-      expect(TtcToolsScreen.toolCount, 24);
+      // ⚠️ 24 -> 22 ON 2026-09-28 (launch sanity T1): "Weight and fertility"
+      // folded into Weight (the BMI page opens from the Weight page) and
+      // "Products" left the hub (it opened a tab). Kept for revert: 24.
+      expect(TtcToolsScreen.toolCount, 22);
     });
 
     test('supplements and medication are not the same destination', () {
@@ -333,7 +341,26 @@ void main() {
         (tester) async {
       final tracker = ttcTrackerById('mood')!;
       await pumpTall(tester, TtcTrackerScreen(tracker: tracker));
+      // T4 (launch sanity, 2026-09-28): one sentence above the controls, the
+      // whole "why" one tap away. Kept for revert (2026-09-28):
+      // expect(find.text(tracker.why(false)), findsOneWidget);
+      expect(find.text(ttcTrackerWhyLead(tracker, false)), findsOneWidget);
+      expect(find.text(tracker.why(false)), findsNothing);
+      await tester.tap(find.byKey(const ValueKey('ttc_tracker_why_more')));
+      await tester.pumpAndSettle();
       expect(find.text(tracker.why(false)), findsOneWidget);
+    });
+
+    testWidgets('Weight: controls first, and BMI is on the page (T2, T4)',
+        (tester) async {
+      final tracker = ttcTrackerById('weight')!;
+      await pumpTall(tester, TtcTrackerScreen(tracker: tracker));
+      expect(find.text(ttcTrackerWhyLead(tracker, false)), findsOneWidget);
+      expect(find.text(tracker.why(false)), findsNothing,
+          reason: 'two paragraphs no longer sit above the first control');
+      expect(find.byKey(const ValueKey('ttc_weight_bmi_row')), findsOneWidget,
+          reason: 'the BMI screen is reached from the Weight page');
+      expect(find.text('Work out your BMI'), findsOneWidget);
     });
 
     testWidgets('choosing an option records it', (tester) async {

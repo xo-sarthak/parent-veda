@@ -26,7 +26,9 @@ import '../../ttc/ttc_log_store.dart';
 import '../../ttc/ttc_mind_today.dart';
 import '../../ttc/ttc_practice_data.dart';
 import '../v2/v2_palette.dart';
-import 'ttc_mind_today_screen.dart' show kTtcMoveHue, kTtcBreatheHue;
+import 'ttc_mind_today_screen.dart'
+    show kTtcMoveHue, kTtcBreatheHue, kTtcBreatheFieldHue;
+import 'ttc_practice_card_parts.dart';
 import 'ttc_practice_player.dart';
 import 'ttc_tool_chrome.dart';
 
@@ -139,11 +141,21 @@ class _TtcPracticeScreenState extends State<TtcPracticeScreen> {
             .withSaturation(0.44)
             .withLightness(0.36)
             .toColor();
+        // Whether the ring carries the step counter: a drawn-figure card
+        // whose steps follow the timer (MB11 and MB14, 2026-09-28).
+        final ringCounts = pr.anim is TtcFigureAnim && _follow;
 
         return TtcToolScaffold(
-          hue: hue,
-          eyebrow:
-              pr.kind == TtcPracticeKind.move ? 'MOVE' : 'BREATHE AND CALM',
+          // ⚠️ THE HEADER IS THE CARD'S COLOUR (launch sanity MB13,
+          // 2026-09-28). A breath field painted from 206 travels to 240, a
+          // lilac, under a slate-blue card; see `kTtcBreatheFieldHue`. Kept
+          // for revert: hue: hue,
+          hue: pr.kind == TtcPracticeKind.move ? hue : kTtcBreatheFieldHue,
+          // ⚠️ ONE WORD FOR THE KIND (launch sanity MB6, 2026-09-28): the
+          // Today headings say "Today's movement" and "Today's breath", so
+          // the page they open says MOVEMENT or BREATH. Kept for revert:
+          //   pr.kind == TtcPracticeKind.move ? 'MOVE' : 'BREATHE AND CALM',
+          eyebrow: pr.kind == TtcPracticeKind.move ? 'MOVEMENT' : 'BREATH',
           title: pr.title,
           intro: pr.blurb,
           children: [
@@ -156,7 +168,23 @@ class _TtcPracticeScreenState extends State<TtcPracticeScreen> {
             ttcToolPad(Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-            Row(children: [
+            // ⚠️ CLEAR OF THE SHEET'S ROUNDED TOP (launch sanity MB10,
+            // 2026-09-28). The line began on the sheet's first pixel, so its
+            // corner curve cut in beside "About" and the line looked half on
+            // the header. Headspace starts a session page's first line well
+            // inside the sheet
+            // (https://mobbin.com/screens/d5b9ff12-33e0-4ec4-ae64-82c70e68ba0d).
+            const SizedBox(height: 22),
+            // ⚠️ ONE QUIET LINE FOR TIME AND PLACE (2026-09-28), the card's own
+            // words, as on the Today card she tapped to get here: two bold
+            // lines with a clock and a pin were icons for plain facts, and a
+            // fourth text style under the title and intro. Headspace's
+            // session page says "Podcast" and "4 min" in one quiet line
+            // (https://mobbin.com/screens/f2297328-ef5d-42b9-96ba-e851f428f5e4).
+            Text('${pr.duration} · ${pr.setting}', style: ttcCardMeta(pal)),
+            // Kept for revert (2026-09-28): the icon row below.
+            // ignore: dead_code
+            if (false) Row(children: [
               Icon(Icons.schedule_rounded, size: 15, color: pal.ink3),
               const SizedBox(width: 7),
               Text(pr.duration,
@@ -177,44 +205,98 @@ class _TtcPracticeScreenState extends State<TtcPracticeScreen> {
             ]),
 
             const SizedBox(height: 20),
+            // ⚠️ RING, THEN THE STEP SHE IS ON AND ITS CONTROLS, THEN THE LIST
+            // (launch sanity MB14, 2026-09-28). The ring and Start took the
+            // first screen and Previous and Next sat under the whole list, so
+            // while the timer ran the step and the controls were a scroll
+            // apart; "Step 1 of 6" was printed twice; and the two settings
+            // were a bare switch and a line of text that was secretly one.
+            // Now: the ring (which counts each step), the step she is on in
+            // words with Previous and Next right under it, the full list as
+            // "All steps", the two settings as labelled switches together,
+            // then Skip it if and Mark done. One step counter: in the ring
+            // while the steps follow the timer, on the step card otherwise.
+            // Future's player keeps the move and its time under the clock
+            // (https://mobbin.com/screens/e554df4e-de96-4fc3-81f2-652f44d009ca),
+            // pushr puts its controls straight under the count
+            // (https://mobbin.com/screens/1e4dd6e2-2e83-4fda-8069-51c74faf0cd9),
+            // Opal keeps the one setting under the breath
+            // (https://mobbin.com/screens/b7a85dff-8e86-4211-9dec-73f5bf2ac492).
+            // The old order is kept for revert at the foot of this build.
             TtcPracticeSession(
               practice: pr,
               onFinished: _onFinished,
               onProgress: _onProgress,
-              caption: pr.anim is TtcFigureAnim && _follow
+              stepClock: ringCounts,
+              showVibrate: false,
+              caption: ringCounts
                   ? 'Step ${_step + 1} of ${pr.steps.length}'
                   : null,
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
 
-            // ---- the steps -------------------------------------------
-            // Kept for revert (2026-09-27): 'WHAT TO DO' in tracked capitals,
-            // with two small unlabelled up and down arrows beside it. The
-            // arrows are now the labelled buttons under the list.
-            //   Row(children: [Text('WHAT TO DO'), Spacer(),
-            //     _StepNudge(up), _StepNudge(down)]),
-            Row(children: [
-              Expanded(
-                child: Text('What to do',
-                    style: pvManrope(
-                        fontSize: 14.5,
-                        fontWeight: FontWeight.w800,
-                        color: pal.ink1)),
+            // ---- the step she is on, and the two controls -----------
+            if (pr.steps.isNotEmpty) ...[
+              Semantics(
+                liveRegion: true,
+                child: Container(
+                  width: double.infinity,
+                  padding: kTtcCardPad,
+                  decoration: BoxDecoration(
+                    color: tint,
+                    borderRadius: BorderRadius.circular(kTtcCardRadius),
+                  ),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (!ringCounts) ...[
+                          Text('Step ${_step + 1} of ${pr.steps.length}',
+                              style: ttcCardMeta(pal)),
+                          const SizedBox(height: 6),
+                        ],
+                        Text(pr.steps[_step],
+                            style: pvManrope(
+                                fontSize: 16,
+                                height: 1.5,
+                                fontWeight: FontWeight.w600,
+                                color: pal.ink1)),
+                      ]),
+                ),
               ),
-              Text('Step ${_step + 1} of ${pr.steps.length}',
-                  style: pvManrope(
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.w700,
-                      color: pal.ink3)),
-            ]),
-            if (_followable) ...[
-              const SizedBox(height: 4),
-              _FollowSwitch(
-                on: _follow,
-                onChanged: (v) => setState(() => _follow = v),
-              ),
+              const SizedBox(height: 10),
+              Row(children: [
+                Expanded(
+                  child: _StepButton(
+                    label: 'Previous step',
+                    icon: Icons.arrow_back_rounded,
+                    enabled: _step > 0,
+                    filled: false,
+                    deep: deep,
+                    onTap: () => _setStepByHand(_step - 1),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _StepButton(
+                    label: 'Next step',
+                    icon: Icons.arrow_forward_rounded,
+                    enabled: _step < pr.steps.length - 1,
+                    filled: true,
+                    deep: deep,
+                    onTap: () => _setStepByHand(_step + 1),
+                  ),
+                ),
+              ]),
+              const SizedBox(height: 28),
             ],
-            const SizedBox(height: 12),
+
+            // ---- every step --------------------------------------------
+            Text('All steps',
+                style: pvManrope(
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w800,
+                    color: pal.ink1)),
+            const SizedBox(height: 10),
 
             //  ⚠️ THE LIVE STEP IS A FILLED ROW, NOT A BOLDER FONT. Weight
             //  alone is what this had, and on a floor practice the phone is
@@ -273,37 +355,6 @@ class _TtcPracticeScreenState extends State<TtcPracticeScreen> {
               ),
             ],
 
-            // ⚠️ PREVIOUS AND NEXT, LABELLED AND BIG ENOUGH FOR THE MAT
-            // (tools pass, 2026-09-27). Two 30pt arrows with no words were the
-            // only way to move, and on a floor practice the phone is at arm's
-            // length. Now two full-width halves, 52 tall, that say what they
-            // do. Still moved by her, never by a clock (see `_step`). Mobbin:
-            // Future's workout player (a large next control at the foot).
-            const SizedBox(height: 8),
-            Row(children: [
-              Expanded(
-                child: _StepButton(
-                  label: 'Previous step',
-                  icon: Icons.arrow_back_rounded,
-                  enabled: _step > 0,
-                  filled: false,
-                  deep: deep,
-                  onTap: () => _setStepByHand(_step - 1),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _StepButton(
-                  label: 'Next step',
-                  icon: Icons.arrow_forward_rounded,
-                  enabled: _step < pr.steps.length - 1,
-                  filled: true,
-                  deep: deep,
-                  onTap: () => _setStepByHand(_step + 1),
-                ),
-              ),
-            ]),
-
             // ---- which side, where sides matter ----------------------
             if (pr.anim case TtcFigureAnim(sides: true)) ...[
               const SizedBox(height: 6),
@@ -318,6 +369,27 @@ class _TtcPracticeScreenState extends State<TtcPracticeScreen> {
                           fontSize: 12.5, height: 1.5, color: pal.ink2)),
                 ),
               ]),
+            ],
+
+            // ---- the two settings, labelled, together -------------------
+            if (_followable || pr.anim is TtcBreathAnim) ...[
+              const SizedBox(height: 18),
+              Container(
+                padding: const EdgeInsets.fromLTRB(18, 6, 8, 6),
+                decoration: BoxDecoration(
+                  color: pal.surface,
+                  borderRadius: BorderRadius.circular(kTtcCardRadius),
+                  border: Border.all(color: pal.line),
+                ),
+                child: Column(children: [
+                  if (_followable)
+                    _FollowSwitch(
+                      on: _follow,
+                      onChanged: (v) => setState(() => _follow = v),
+                    ),
+                  if (pr.anim is TtcBreathAnim) const TtcVibrateSwitch(),
+                ]),
+              ),
             ],
 
             const SizedBox(height: 18),
@@ -335,11 +407,14 @@ class _TtcPracticeScreenState extends State<TtcPracticeScreen> {
             //  Sand (42) is the stage's caution tint and is used here for the
             //  same reason the door uses it for paid blocks: distinct without
             //  being loud.
+            // The card family's inset and corner (2026-09-28; was all(14),
+            // radius 16), so the one note on this page is the same shape as
+            // the card that opened it.
             Container(
-              padding: const EdgeInsets.all(14),
+              padding: kTtcCardPad,
               decoration: BoxDecoration(
                 color: v2BlockTint(42, pal),
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(kTtcCardRadius),
               ),
               child: Row(crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -420,6 +495,152 @@ class _TtcPracticeScreenState extends State<TtcPracticeScreen> {
                       fontSize: 12.5, height: 1.45, color: pal.ink3)),
             ),
             const SizedBox(height: 10),
+            // Kept for revert (2026-09-28, launch sanity MB14): the order
+            // before, ring, then "What to do" with its own counter and the
+            // follow switch, the list, then Previous and Next under the list.
+            // const SizedBox(height: 20),
+            // TtcPracticeSession(
+            // practice: pr,
+            // onFinished: _onFinished,
+            // onProgress: _onProgress,
+            // caption: pr.anim is TtcFigureAnim && _follow
+            // ? 'Step ${_step + 1} of ${pr.steps.length}'
+            // : null,
+            // ),
+            // const SizedBox(height: 24),
+            //
+            // // ---- the steps -------------------------------------------
+            // // Kept for revert (2026-09-27): 'WHAT TO DO' in tracked capitals,
+            // // with two small unlabelled up and down arrows beside it. The
+            // // arrows are now the labelled buttons under the list.
+            // //   Row(children: [Text('WHAT TO DO'), Spacer(),
+            // //     _StepNudge(up), _StepNudge(down)]),
+            // Row(children: [
+            // Expanded(
+            // child: Text('What to do',
+            // style: pvManrope(
+            // fontSize: 14.5,
+            // fontWeight: FontWeight.w800,
+            // color: pal.ink1)),
+            // ),
+            // Text('Step ${_step + 1} of ${pr.steps.length}',
+            // style: pvManrope(
+            // fontSize: 12.5,
+            // fontWeight: FontWeight.w700,
+            // color: pal.ink3)),
+            // ]),
+            // if (_followable) ...[
+            // const SizedBox(height: 4),
+            // _FollowSwitch(
+            // on: _follow,
+            // onChanged: (v) => setState(() => _follow = v),
+            // ),
+            // ],
+            // const SizedBox(height: 12),
+            //
+            // //  ⚠️ THE LIVE STEP IS A FILLED ROW, NOT A BOLDER FONT. Weight
+            // //  alone is what this had, and on a floor practice the phone is
+            // //  arm's length away on the mat: at that distance w700 against w400
+            // //  in the same colour is not a difference you can find without
+            // //  reading. A tinted row with a filled number is findable in a
+            // //  glance, which is the only interaction this list ever gets.
+            // for (var i = 0; i < pr.steps.length; i++) ...[
+            // GestureDetector(
+            // onTap: () => _setStepByHand(i),
+            // behavior: HitTestBehavior.opaque,
+            // child: AnimatedContainer(
+            // duration: const Duration(milliseconds: 140),
+            // padding: const EdgeInsets.symmetric(
+            // vertical: 11, horizontal: 11),
+            // margin: const EdgeInsets.only(bottom: 4),
+            // decoration: BoxDecoration(
+            // color: i == _step ? tint : Colors.transparent,
+            // borderRadius: BorderRadius.circular(14),
+            // ),
+            // child: Row(
+            // crossAxisAlignment: CrossAxisAlignment.start,
+            // children: [
+            // Container(
+            // width: 24,
+            // height: 24,
+            // alignment: Alignment.center,
+            // decoration: BoxDecoration(
+            // color: i == _step ? deep : pal.surfaceAlt,
+            // borderRadius: BorderRadius.circular(999),
+            // ),
+            // child: Text('${i + 1}',
+            // style: pvManrope(
+            // fontSize: 11,
+            // fontWeight: FontWeight.w800,
+            // color:
+            // i == _step ? Colors.white : pal.ink2)),
+            // ),
+            // const SizedBox(width: 11),
+            // Expanded(
+            // child: Text(pr.steps[i],
+            // // ⚠️ NO `maxLines`, ANYWHERE IN THIS LIST. The
+            // // brief: the step text "must survive the largest
+            // // accessibility text size". A clipped instruction
+            // // is worse than a long screen.
+            // style: pvManrope(
+            // fontSize: 13.5,
+            // height: 1.55,
+            // color: i == _step ? pal.ink1 : pal.ink2,
+            // fontWeight: i == _step
+            // ? FontWeight.w700
+            // : FontWeight.w400)),
+            // ),
+            // ]),
+            // ),
+            // ),
+            // ],
+            //
+            // // ⚠️ PREVIOUS AND NEXT, LABELLED AND BIG ENOUGH FOR THE MAT
+            // // (tools pass, 2026-09-27). Two 30pt arrows with no words were the
+            // // only way to move, and on a floor practice the phone is at arm's
+            // // length. Now two full-width halves, 52 tall, that say what they
+            // // do. Still moved by her, never by a clock (see `_step`). Mobbin:
+            // // Future's workout player (a large next control at the foot).
+            // const SizedBox(height: 8),
+            // Row(children: [
+            // Expanded(
+            // child: _StepButton(
+            // label: 'Previous step',
+            // icon: Icons.arrow_back_rounded,
+            // enabled: _step > 0,
+            // filled: false,
+            // deep: deep,
+            // onTap: () => _setStepByHand(_step - 1),
+            // ),
+            // ),
+            // const SizedBox(width: 10),
+            // Expanded(
+            // child: _StepButton(
+            // label: 'Next step',
+            // icon: Icons.arrow_forward_rounded,
+            // enabled: _step < pr.steps.length - 1,
+            // filled: true,
+            // deep: deep,
+            // onTap: () => _setStepByHand(_step + 1),
+            // ),
+            // ),
+            // ]),
+            //
+            // // ---- which side, where sides matter ----------------------
+            // if (pr.anim case TtcFigureAnim(sides: true)) ...[
+            // const SizedBox(height: 6),
+            // Row(children: [
+            // Icon(Icons.swap_horiz_rounded, size: 15, color: pal.ink3),
+            // const SizedBox(width: 8),
+            // Expanded(
+            // child: Text(
+            // 'This one uses both sides. Do the whole thing on one '
+            // 'side, then on the other.',
+            // style: pvManrope(
+            // fontSize: 12.5, height: 1.5, color: pal.ink2)),
+            // ),
+            // ]),
+            // ],
                 ])),
           ],
         );
@@ -452,7 +673,7 @@ class _FollowSwitch extends StatelessWidget {
         Switch(
           value: on,
           onChanged: onChanged,
-          activeTrackColor: p.ink1,
+          // Kept for revert (2026-09-28, one black switch app-wide): activeTrackColor: p.ink1,
         ),
       ]),
     );

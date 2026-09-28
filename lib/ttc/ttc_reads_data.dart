@@ -68,6 +68,7 @@ import 'reads/ttc_reads_extra.dart';
 import 'reads/ttc_reads_age.dart';
 import 'reads/ttc_reads_safety.dart';
 import 'reads/ttc_reads_treatment.dart';
+import 'ttc_expert_signoff.dart' show ttcApplySignoff;
 
 /// Every TTC read, in bracket order.
 ///
@@ -80,7 +81,20 @@ import 'reads/ttc_reads_treatment.dart';
 /// expression — so the per-bracket lists are `final` too. Worth knowing before
 /// someone "tightens" one of them and gets 27 errors in a file they did not
 /// open.
+///
+/// ⚠️ WHAT SHE SEES GOES THROUGH THE SIGN-OFF (launch sanity H14,
+/// 2026-09-28). A read shows its expert's name and the verified tick only
+/// once that expert has signed it off (`ttc_expert_signoff.dart`); until then
+/// its byline is the ParentVeda team's, no tick. The reads exactly as written,
+/// with the planned reviewer on each, are [kTtcReadsAsWritten].
+/// Kept for revert: `final List<PvRead> kTtcReads = [...the spreads...]`.
 final List<PvRead> kTtcReads = [
+  for (final r in kTtcReadsAsWritten) ttcApplySignoff(r),
+];
+
+/// Every TTC read as written, with the expert each one is planned to be
+/// reviewed by. For the sign-off list and its tool, never for display.
+final List<PvRead> kTtcReadsAsWritten = [
   ...kTtcReadsConceiving,
   ...kTtcReadsPcos,
   ...kTtcReadsIvf,

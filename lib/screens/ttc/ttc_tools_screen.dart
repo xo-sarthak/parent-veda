@@ -70,13 +70,16 @@ import '../../ttc/ttc_supplements_store.dart';
 import '../../ttc/ttc_trackers_data.dart';
 import 'ttc_appointments_screen.dart';
 import 'ttc_can_i_screen.dart';
+import 'ttc_ivf_readiness_screen.dart' show kTtcFertilityHelpName;
+import 'ttc_tool_hues.dart';
 import 'ttc_common.dart';
 import 'ttc_cycle_screens.dart';
 import 'ttc_journal_screen.dart';
 import 'ttc_journey_map_screen.dart';
 import 'ttc_nutrition_screen.dart';
 import 'ttc_prepare_screen.dart';
-import 'ttc_products_screen.dart';
+// Only the Products row used it, and that row is commented out (T1,
+// 2026-09-28). Kept for revert: import 'ttc_products_screen.dart';
 import 'ttc_records_screen.dart';
 import 'ttc_strings.dart';
 import 'ttc_medication_screen.dart';
@@ -153,8 +156,9 @@ final List<TtcToolGroup> ttcToolGroups = [
   TtcToolGroup(
     titleEn: 'Your body',
     titleHi: 'Aapka body',
-    // Body and cycle's hue.
-    hue: 172,
+    // Body and cycle's hue. The same constant every tool in this group wears
+    // in its header (launch sanity T6, ttc_tool_hues.dart). Was: 172.
+    hue: kTtcToolHueBody,
     tools: [
       // ⚠️ Y2 (2026-09-26): one name, one icon, one line and one destination
       // for this tool on both tabs. You reads all four from here. Kept for
@@ -225,7 +229,12 @@ final List<TtcToolGroup> ttcToolGroups = [
         icon: Icons.monitor_weight_outlined,
         nameEn: 'Weight',
         nameHi: 'Wazan',
-        descEn: 'Just a number, not a judgement',
+        // ⚠️ ONE WEIGHT TOOL (launch sanity T1/T2, 2026-09-28). "Weight" and
+        // "Weight and fertility" were two rows for one subject; the BMI read
+        // now opens from the Weight page, so this line names it and a search
+        // for "BMI" still lands here. Kept for revert:
+        // descEn: 'Just a number, not a judgement',
+        descEn: 'Log your weight and see your BMI',
         descHi: 'Ek number, faisla nahi',
         open: (c) => openTtcTracker(c, 'weight'),
       ),
@@ -282,37 +291,45 @@ final List<TtcToolGroup> ttcToolGroups = [
         descHi: 'Doctor ko dikhane layak sawaal',
         open: (c) => openTtcSurface(c, 'ttc_pcos_check'),
       ),
-      TtcTool(
-        id: 'bmi',
-        // Deliberately NOT the same destination as the Weight tracker beside
-        // it: that one logs a series over months, this one reads a single
-        // number against South Asian cut-offs and says what it does and does
-        // not mean for fertility. Two tiles, two pages, two questions.
-        icon: Icons.straighten_rounded,
-        nameEn: 'Weight and fertility',
-        nameHi: 'Wazan aur fertility',
-        descEn: "What BMI does and doesn't tell you",
-        descHi: 'BMI kya kehta hai, kya nahi',
-        open: (c) => openTtcSurface(c, 'ttc_bmi'),
-      ),
-      TtcTool(
-        id: 'fertility_help',
-        // T7: a compass. The headset is "Talk to an expert"'s.
-        icon: Icons.explore_outlined,
-        nameEn: 'See a specialist?',
-        nameHi: 'Specialist se milein?',
-        // Plain line, 2026-09-27 (simplicity pass). Kept for revert: 'Is it time yet?'.
-        descEn: "Check if it's time to see a fertility doctor",
-        descHi: 'Kya ab waqt hai',
-        open: (c) => openTtcSurface(c, 'ttc_fertility_help'),
-      ),
+      // ⚠️ FOLDED INTO WEIGHT (launch sanity T1/T2, 2026-09-28): the BMI
+      // page opens from the Weight page, so a second row for the same
+      // subject is gone from the hub. Kept for revert (2026-09-28):
+      // TtcTool(
+      //   id: 'bmi',
+      //   // Deliberately NOT the same destination as the Weight tracker beside
+      //   // it: that one logs a series over months, this one reads a single
+      //   // number against South Asian cut-offs and says what it does and does
+      //   // not mean for fertility. Two tiles, two pages, two questions.
+      //   icon: Icons.straighten_rounded,
+      //   nameEn: 'Weight and fertility',
+      //   nameHi: 'Wazan aur fertility',
+      //   descEn: "What BMI does and doesn't tell you",
+      //   descHi: 'BMI kya kehta hai, kya nahi',
+      //   open: (c) => openTtcSurface(c, 'ttc_bmi'),
+      // ),
+      // ⚠️ MOVED TO "CARE AND MEDICINES" (launch sanity T1/T6/D18,
+      // 2026-09-28), beside Talk to an expert: it is about when to see a
+      // doctor, and its screen already wore the clinic colour, so the row
+      // and the header now agree. One name with its door card and screen.
+      // Kept for revert (2026-09-28):
+      // TtcTool(
+      //   id: 'fertility_help',
+      //   // T7: a compass. The headset is "Talk to an expert"'s.
+      //   icon: Icons.explore_outlined,
+      //   nameEn: 'See a specialist?',
+      //   nameHi: 'Specialist se milein?',
+      //   // Plain line, 2026-09-27 (simplicity pass). Kept for revert: 'Is it time yet?'.
+      //   descEn: "Check if it's time to see a fertility doctor",
+      //   descHi: 'Kya ab waqt hai',
+      //   open: (c) => openTtcSurface(c, 'ttc_fertility_help'),
+      // ),
     ],
   ),
   TtcToolGroup(
     titleEn: 'Both of you',
     titleHi: 'Aap dono',
-    // His side's hue.
-    hue: 186,
+    // His side's hue (T6: ttc_tool_hues.dart). Was: 186.
+    hue: kTtcToolHueBoth,
     tools: [
       TtcTool(
         id: 'partner_health',
@@ -372,8 +389,8 @@ final List<TtcToolGroup> ttcToolGroups = [
   TtcToolGroup(
     titleEn: 'Care and medicines',
     titleHi: 'Dekhbhaal aur dawaiyan',
-    // IVF and IUI's hue, the clinic door.
-    hue: 206,
+    // IVF and IUI's hue, the clinic door (T6: ttc_tool_hues.dart). Was: 206.
+    hue: kTtcToolHueCare,
     tools: [
       // ⚠️ TALK TO AN EXPERT LEFT THE BAR — 2026-09-26. The V3 bar became
       // Today · Learn · Products · Tools · You, and the consults it opened
@@ -385,11 +402,26 @@ final List<TtcToolGroup> ttcToolGroups = [
         icon: Icons.support_agent_outlined,
         nameEn: 'Talk to an expert',
         nameHi: 'Talk to an expert',
-        descEn: 'A private video call with a specialist',
+        // ⚠️ NOT A DUPLICATE OF A TAB (launch sanity T1, 2026-09-28): the V3
+        // bar has no consults tab, so this row IS where booking lives on
+        // Tools. Its line says it is a booking. Kept for revert:
+        // descEn: 'A private video call with a specialist',
+        descEn: 'Book a private video call with a specialist',
         descHi: 'A private video call with a specialist',
         open: (c) => Navigator.of(c).push(MaterialPageRoute<void>(
             builder: (_) => const TtcPrepareScreen(onlyCategory: 'consults'),
             settings: const RouteSettings(name: 'ttc/consults'))),
+      ),
+      // The specialist check, here since 2026-09-28 (see the note where it
+      // was). Same id, same surface, so recents and tests still find it.
+      TtcTool(
+        id: 'fertility_help',
+        icon: Icons.explore_outlined,
+        nameEn: kTtcFertilityHelpName,
+        nameHi: kTtcFertilityHelpName,
+        descEn: "Check if it's time to see a fertility doctor",
+        descHi: 'Kya ab waqt hai',
+        open: (c) => openTtcSurface(c, 'ttc_fertility_help'),
       ),
       // Two tiles, because they are two different things and the single
       // "Supplements & medication" tile could only ever do one of them.
@@ -468,8 +500,8 @@ final List<TtcToolGroup> ttcToolGroups = [
   TtcToolGroup(
     titleEn: 'Plan and learn',
     titleHi: 'Plan aur seekhein',
-    // Getting ready's hue.
-    hue: 104,
+    // Getting ready's hue (T6: ttc_tool_hues.dart). Was: 104.
+    hue: kTtcToolHuePlan,
     tools: [
       // ⚠️ COURSES LEFT THE BAR — 2026-09-17. Slot 2 of the V3 bar became the
       // unified store (docs/PRODUCTS-AUDIT.md); the courses hub is the first
@@ -480,7 +512,11 @@ final List<TtcToolGroup> ttcToolGroups = [
         nameEn: 'Courses',
         nameHi: 'Courses',
         // Plain line, 2026-09-27 (simplicity pass). Kept for revert: 'Guided, by people who know'.
-        descEn: 'Classes from experts, and one free course',
+        // ⚠️ SAYS WHAT IS THERE (launch sanity T9, 2026-09-28): the page
+        // holds one free course and no expert classes, and with one course
+        // "Courses" now opens it directly. Kept for revert:
+        // descEn: 'Classes from experts, and one free course',
+        descEn: 'One free course: Preconception garbh sanskar',
         descHi: 'Guided, jaankaar logon se',
         open: (c) => Navigator.of(c).push(MaterialPageRoute<void>(
             builder: (_) => const TtcPrepareScreen(onlyCategory: 'courses'),
@@ -540,19 +576,23 @@ final List<TtcToolGroup> ttcToolGroups = [
         descHi: 'Pehle ke teen mahine',
         open: (c) => openTtcSurface(c, 'ttc_precheck'),
       ),
-      TtcTool(
-        id: 'guide',
-        icon: Icons.verified_outlined,
-        // ⚠️ SAYS WHAT IT IS (2026-09-27). "Worth knowing about" never said
-        // it was the products page, and it opens the same store as the bar's
-        // Products tab, so it takes that one name. Kept for revert:
-        // nameEn: 'Worth knowing about', descEn: 'Read first, buy later'.
-        nameEn: 'Products',
-        nameHi: 'Jaanne layak',
-        descEn: "What's worth buying, and what to skip",
-        descHi: 'Pehle research, phir kharid',
-        open: openTtcProducts,
-      ),
+      // ⚠️ OFF THE HUB (launch sanity T1, 2026-09-28): it opened the same
+      // store as the bar's Products tab (V3) and the Prepare tab (V1), so
+      // it was a link to a tab she can already see, not a tool. Kept for
+      // revert (2026-09-28):
+      // TtcTool(
+      //   id: 'guide',
+      //   icon: Icons.verified_outlined,
+      //   // ⚠️ SAYS WHAT IT IS (2026-09-27). "Worth knowing about" never said
+      //   // it was the products page, and it opens the same store as the bar's
+      //   // Products tab, so it takes that one name. Kept for revert:
+      //   // nameEn: 'Worth knowing about', descEn: 'Read first, buy later'.
+      //   nameEn: 'Products',
+      //   nameHi: 'Jaanne layak',
+      //   descEn: "What's worth buying, and what to skip",
+      //   descHi: 'Pehle research, phir kharid',
+      //   open: openTtcProducts,
+      // ),
     ],
   ),
 ];

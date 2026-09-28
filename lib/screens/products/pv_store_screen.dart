@@ -52,6 +52,11 @@ class PvStoreScreen extends StatefulWidget {
 class _PvStoreScreenState extends State<PvStoreScreen> {
   late LifeStage _stage;
 
+  /// Whether the stage switch is drawn in full (H11, 2026-09-28). On the
+  /// Trying to conceive storefront it starts folded to a quiet "Other
+  /// stages" link, so another stage's shop is not on her screen by default.
+  bool _showStages = false;
+
   @override
   void initState() {
     super.initState();
@@ -113,15 +118,40 @@ class _PvStoreScreenState extends State<PvStoreScreen> {
       ]),
       builder: (context, _) {
         final cats = store.categoriesFor(_stage);
-        final forYou = store.forYou(_stage);
+        final ttc = _stage == LifeStage.tryingToConceive;
+        // ⚠️ ON THE TTC STOREFRONT, ONE PRODUCT ONCE ABOVE THE FOLD (launch
+        // sanity PR3, 2026-09-28). Folic acid was the hero, the first card of
+        // "Where most couples start" and the first card of Supplements: the
+        // store looked like one product. The hero's products leave the
+        // for-you rail, and shelves of one item fold into one "Also useful"
+        // rail until they grow. Other storefronts are unchanged. Kept for
+        // revert: `final forYou = store.forYou(_stage);`.
+        final heroIds = ttc ? pvHeroProductIds(_stage) : const <String>{};
+        final forYou = store
+            .forYou(_stage)
+            .where((p) => !heroIds.contains(p.id))
+            .toList();
         // Never the same product twice on one screen (Amazon's rule): what
         // the for-you rail already shows is dropped from the recommends rail.
-        final shown = forYou.map((p) => p.id).toSet();
+        final shown = {...forYou.map((p) => p.id), ...heroIds};
         final reco = store
             .recommended(_stage, limit: 12)
             .where((p) => !shown.contains(p.id))
             .take(8)
             .toList();
+        final singles = ttc
+            ? [
+                for (final c in cats)
+                  if (store.inCategory(c.id).length == 1) c,
+              ]
+            : const <PvCategory>[];
+        final shelves = [
+          for (final c in cats)
+            if (!singles.contains(c)) c,
+        ];
+        final alsoUseful = [
+          for (final c in singles) ...store.inCategory(c.id),
+        ];
         final clock = store.clockLabel(_stage);
         final hasBar = widget.chrome != PvStoreChrome.none;
         return Scaffold(
@@ -196,9 +226,23 @@ class _PvStoreScreenState extends State<PvStoreScreen> {
                           scope: 'reco',
                         ),
                       ),
-                    for (final c in cats)
+                    // Kept for revert (PR3): `for (final c in cats)`.
+                    for (final c in shelves)
                       SliverToBoxAdapter(
                         child: _shelf(p, c, store.inCategory(c.id)),
+                      ),
+                    if (alsoUseful.isNotEmpty)
+                      SliverToBoxAdapter(
+                        child: KeyedSubtree(
+                          key: const ValueKey('pv_store_also_useful'),
+                          child: _rail(
+                            eyebrow: [for (final c in singles) c.name]
+                                .join(' · '),
+                            title: 'Also useful',
+                            products: alsoUseful,
+                            scope: 'also',
+                          ),
+                        ),
                       ),
                     SliverToBoxAdapter(child: _honestyStrip(p)),
                     SliverToBoxAdapter(
@@ -288,13 +332,45 @@ class _PvStoreScreenState extends State<PvStoreScreen> {
     );
   }
 
-  Widget _stageRow(V2Palette p) => Padding(
-    padding: const EdgeInsets.fromLTRB(14, 10, 20, 4),
-    child: PvStageSwitch(
-      stage: _stage,
-      onChanged: (s) => setState(() => _stage = s),
-    ),
-  );
+  // ⚠️ THE TRYING STORE DOES NOT OPEN ON OTHER STAGES' SHOPS (launch sanity
+  // H11, 2026-09-28). The walk found Pregnancy and Parenting tabs beside
+  // Trying on her screen. On the TTC storefront the switch folds to a quiet
+  // "Other stages" link that opens it; every other storefront keeps the
+  // switch as it was. Kept for revert: the PvStageSwitch alone.
+  Widget _stageRow(V2Palette p) {
+    if (_stage == LifeStage.tryingToConceive && !_showStages) {
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(20, 6, 20, 0),
+        child: Align(
+          alignment: Alignment.centerRight,
+          child: TextButton(
+            key: const ValueKey('pv_store_other_stages'),
+            onPressed: () => setState(() => _showStages = true),
+            style: TextButton.styleFrom(
+              foregroundColor: p.ink2,
+              padding: const EdgeInsets.symmetric(horizontal: 6),
+              minimumSize: const Size(44, 36),
+            ),
+            child: Text(
+              'Other stages',
+              style: pvManrope(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w700,
+                color: p.ink2,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(14, 10, 20, 4),
+      child: PvStageSwitch(
+        stage: _stage,
+        onChanged: (s) => setState(() => _stage = s),
+      ),
+    );
+  }
 
   // ---- category shortcuts ------------------------------------------------------
 

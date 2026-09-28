@@ -275,7 +275,13 @@ class _PvOfferingScreenState extends State<PvOfferingScreen> {
         children: [
           AspectRatio(
             aspectRatio: 4 / 3,
-            child: PvLearnCover(view: v, radius: 0),
+            // H17 (TTC launch sanity, 2026-09-28): a 1:1 consult with a
+            // named person and no photo opens on her monogram on the page's
+            // own colour, not a speech-bubble drawing that reads as a
+            // template. Kept for revert: PvLearnCover(view: v, radius: 0).
+            child: pvShowsConsultMonogram(v)
+                ? PvConsultMonogramCover(view: v)
+                : PvLearnCover(view: v, radius: 0),
           ),
           Positioned(
             left: 16,
@@ -683,4 +689,56 @@ class _PvOfferingScreenState extends State<PvOfferingScreen> {
       ),
     ),
   );
+}
+
+/// Whether the consult page opens on the person's monogram (H17): a Trying to
+/// conceive consult, with a named person, and no photograph of anyone.
+bool pvShowsConsultMonogram(PvOfferingView v) =>
+    v.kind == PvLearnKind.consult &&
+    v.stage == LifeStage.tryingToConceive &&
+    v.cover == null &&
+    !pvLearnHasNoNamedPerson(v);
+
+/// The person's initials, large, in a disc on the page's own two-tone field:
+/// the place a photograph goes, honestly empty of one. Swapped for her photo
+/// the day the roster carries one (set `cover`).
+class PvConsultMonogramCover extends StatelessWidget {
+  const PvConsultMonogramCover({super.key, required this.view});
+  final PvOfferingView view;
+
+  @override
+  Widget build(BuildContext context) {
+    final a = HSLColor.fromAHSL(1, view.hue, 0.34, 0.945).toColor();
+    final b = HSLColor.fromAHSL(1, view.hue, 0.30, 0.875).toColor();
+    final ink = HSLColor.fromAHSL(1, view.hue, 0.40, 0.28).toColor();
+    return Container(
+      key: const ValueKey('pv_consult_monogram'),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [a, b],
+        ),
+      ),
+      alignment: const Alignment(0, 0.1),
+      child: Container(
+        width: 128,
+        height: 128,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.72),
+          shape: BoxShape.circle,
+        ),
+        child: Text(
+          pvLearnInitials(view.expert.name),
+          style: pvFraunces(
+            fontSize: 44,
+            fontWeight: FontWeight.w600,
+            letterSpacing: -1,
+            color: ink,
+          ),
+        ),
+      ),
+    );
+  }
 }

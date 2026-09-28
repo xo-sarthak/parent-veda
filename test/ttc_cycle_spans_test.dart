@@ -201,9 +201,14 @@ void main() {
           reason: 'the fixture no longer reproduces the case that was broken');
 
       await pump(tester);
-      expect(find.text('Circle') /* was 'Dial' until 2026-09-27 */, findsOneWidget,
+      // H4 (2026-09-28): the report draws the days, the ring is the
+      // Companion's, so the picture is the grid and there is no toggle. Was:
+      //   expect(find.text('Circle'), findsOneWidget, ...)
+      expect(find.byType(TtcCycleGrid), findsOneWidget,
           reason: 'the old report rendered — the picture was withheld because '
               'there were no FINDINGS, which is a different question');
+      expect(find.byType(TtcCycleRing), findsNothing,
+          reason: 'the report and the Companion drew the same ring (H4)');
       // Was 'The four stretches, in order' until 2026-09-27 (tools pass).
       expect(find.text('The four parts of your cycle'), findsOneWidget);
     });
@@ -258,7 +263,8 @@ void main() {
       addTearDown(TtcTreatmentStore.instance.resetForTest);
       await pump(tester);
 
-      expect(find.text('Circle') /* was 'Dial' until 2026-09-27 */, findsNothing,
+      // Was find.text('Circle'); the report has no toggle since H4.
+      expect(find.byType(TtcCycleGrid), findsNothing,
           reason: 'phases were drawn over a cycle a clinician is directing');
       expect(find.text('Your doctor is timing this one'), findsOneWidget);
       // ⚠️ HER DAYS AND HER HISTORY BOTH SURVIVE THE REFUSAL. Refusing to

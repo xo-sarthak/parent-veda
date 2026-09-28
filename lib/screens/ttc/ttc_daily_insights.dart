@@ -99,7 +99,17 @@ enum TtcInsightGo {
   /// The treatment screen: her round's step and its blood test. Added
   /// 2026-09-26 (docs/TTC-TREATMENT-FLOW.md §3e).
   treatment,
+
+  /// One read, by [TtcInsightCard.readId]. Added 2026-09-28 so that no two
+  /// cards on one rail open the same screen (see `ttcRailDestination`).
+  read,
 }
+
+/// Where a card lands, as one comparable string: the destination, plus the
+/// read for a read card. No two cards on one day's rail may share one (the
+/// user, 2026-09-28); `test/ttc_daily_insights_test.dart` holds it.
+String ttcRailDestination(TtcInsightCard c) =>
+    c.go == TtcInsightGo.read ? 'read:${c.readId}' : c.go.name;
 
 /// One card on the rail.
 class TtcInsightCard {
@@ -111,7 +121,11 @@ class TtcInsightCard {
     required this.art,
     required this.go,
     this.caption,
+    this.readId,
   });
+
+  /// The read a [TtcInsightGo.read] card opens.
+  final String? readId;
 
   /// Stable, so a test can assert which cards a given day produces.
   final String id;
@@ -255,7 +269,13 @@ List<TtcInsightCard> ttcInsightsFor(DateTime day) {
           : null,
       hue: 206,
       art: TtcInsightArt.droplet,
-      go: TtcInsightGo.window,
+      // ⚠️ ONE CARD, ONE PLACE (the user on build 16, 2026-09-28: the same
+      // screen behind two cards "causes ambiguity"). The chance card already
+      // opens the Fertile window; discharge opens the read about discharge,
+      // which is what a card naming her discharge promises. Kept for revert:
+      //   go: TtcInsightGo.window,
+      go: TtcInsightGo.read,
+      readId: 'ttc_read_discharge_guide',
     ));
   }
 
@@ -269,16 +289,49 @@ List<TtcInsightCard> ttcInsightsFor(DateTime day) {
       orElse: () => '');
   if (bodySymptom.isNotEmpty) {
     final sym = ttcSymptomById(bodySymptom);
+    final isToday = d ==
+        DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+    // ⚠️ THE EYEBROW SAYS WHAT THE CARD IS, THE VALUE SAYS WHAT SHE LOGGED
+    // (the user on build 16, 2026-09-28: "why have you called the third tab
+    // calm?"). A card headed CALM in capitals read as a label we had given the
+    // day, not as her own mood played back to her. Now "YOU LOGGED TODAY" over
+    // "Calm", the way Flo's daily log card names its section above the
+    // logged items. Kept for revert:
+    //   eyebrow: (sym?.label ?? 'Logged').toUpperCase(),
+    //   value: isToday ? 'You logged this today' : 'You logged this',
+    final others = logged
+        .where((id) =>
+            id != bodySymptom &&
+            !id.startsWith('sex_') &&
+            !id.startsWith('ov_') &&
+            !id.startsWith('pt_') &&
+            id != 'all_fine' &&
+            id != 'disch_none')
+        .length;
     out.add(TtcInsightCard(
       id: 'symptom',
-      eyebrow: (sym?.label ?? 'Logged').toUpperCase(),
+      eyebrow: isToday ? 'YOU LOGGED TODAY' : 'YOU LOGGED',
       // ⚠️ NOT "WHAT COULD BE CAUSING IT?". We have no per-symptom article, and
       // a card asking that question would open something that does not answer
       // it. This asks a question her own data can answer.
-      value: 'Where it falls in your cycle',
+      //
+      // ⚠️ IT OPENS HER DAY, NOT THE REPORT (launch sanity H3, 2026-09-28).
+      // "CALM · Where it falls in your cycle" opened the Cycle report, the
+      // same screen as the report card two tiles along: a mood card that
+      // said nothing about her mood and a duplicate door in a five-card
+      // rail. Now it opens the logger on this day, where she sees what she
+      // logged and can change it, and the report card stays the one way to
+      // the report. Kept for revert:
+      //   value: 'Where it falls in your cycle', go: TtcInsightGo.report,
+      value: sym?.label ?? 'Something',
+      caption: others == 0
+          ? 'Tap to see or change it'
+          : others == 1
+              ? 'And 1 more. Tap to see or change'
+              : 'And $others more. Tap to see or change',
       hue: sym?.hue ?? 344,
       art: TtcInsightArt.symptom,
-      go: TtcInsightGo.report,
+      go: TtcInsightGo.logger,
     ));
   }
 
@@ -322,7 +375,12 @@ List<TtcInsightCard> ttcInsightsFor(DateTime day) {
       caption: 'What that means for trying',
       hue: 104,
       art: TtcInsightArt.ring,
-      go: TtcInsightGo.cycle,
+      // ⚠️ ONE CARD, ONE PLACE (2026-09-28). "Day of your cycle" already
+      // opens the Cycle companion; "What that means for trying" is a
+      // question, and the read on a normal cycle answers it. Kept for
+      // revert: go: TtcInsightGo.cycle,
+      go: TtcInsightGo.read,
+      readId: 'ttc_read_normal_cycle',
     ));
   }
 

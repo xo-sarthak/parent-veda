@@ -66,6 +66,37 @@ void main() {
       expect(find.byType(TtcDayStrip), findsNothing);
       // Every suggestion shows while nothing is added.
       expect(find.text('Zinc'), findsOneWidget);
+      // Launch sanity T5 (2026-09-28): CoQ10 is one row, with an add each
+      // for her and for him. Was: two CoQ10 rows.
+      expect(find.text('CoQ10'), findsOneWidget);
+      expect(find.byKey(const ValueKey('ttc_supp_idea_CoQ10_you')),
+          findsOneWidget);
+      expect(find.byKey(const ValueKey('ttc_supp_idea_CoQ10_him')),
+          findsOneWidget);
+    });
+
+    testWidgets('T5: the Add column sits at the right edge on every row',
+        (tester) async {
+      await pumpTall(tester, const TtcSupplementsScreen());
+      final adds = find.text('Add');
+      expect(adds, findsWidgets);
+      final rights = [
+        for (final e in adds.evaluate())
+          tester.getTopRight(find.byWidget(e.widget)).dx.round()
+      ];
+      expect(rights.toSet(), hasLength(1),
+          reason: 'one trailing column, not "Add" after each name');
+    });
+
+    testWidgets('T5: For him on the one CoQ10 row adds it to his list',
+        (tester) async {
+      await pumpTall(tester, const TtcSupplementsScreen());
+      await tester.tap(find.byKey(const ValueKey('ttc_supp_idea_CoQ10_him')));
+      await tester.pump();
+      final store = TtcSupplementsStore.instance;
+      expect(store.forAuthor(TtcAuthor.partner).map((e) => e.name), ['CoQ10']);
+      expect(store.forAuthor(TtcAuthor.me), isEmpty);
+      await settleSnacks(tester);
     });
 
     testWidgets('the hero Add opens the sheet, and the new row lands',
@@ -255,6 +286,17 @@ void main() {
 
   // ===========================================================================
   group('medication', () {
+    // Launch sanity T12 (2026-09-28): "DHA · 3 · twice".
+    test('a bare number reads as a dose, and a unit reads as itself', () {
+      expect(ttcDoseIsBare('3'), isTrue);
+      expect(ttcDoseIsBare(' 2.5 '), isTrue);
+      expect(ttcDoseIsBare('3 tablets'), isFalse);
+      expect(ttcDoseShown('3'), 'Dose 3');
+      expect(ttcDoseShown('500 mg'), '500 mg');
+      expect(ttcDoseWithUnit('1', 'tablets'), '1 tablet');
+      expect(ttcDoseWithUnit('2', 'tablets'), '2 tablets');
+    });
+
     // ⚠️ NOT AWAITED, ON PURPOSE (as in ttc_tools_records_pass_test.dart):
     // MedicineStore arms real OS alarms after it updates its list, and under
     // flutter_test that platform call never answers.
@@ -284,6 +326,44 @@ void main() {
       expect(m.alarms.single.times, [480]);
       expect(find.text('Reminds you at 8:00 am'), findsOneWidget);
       await settleSnacks(tester);
+    });
+
+    testWidgets('T12: a bare-number dose asks for its unit once',
+        (tester) async {
+      await pumpTall(tester, const TtcMedicationScreen());
+      await tester.tap(find.byKey(const ValueKey('ttc_dose_hero_add')));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField).first, 'DHA');
+      await tester.enterText(find.byType(TextField).at(1), '3');
+      await tester.pump();
+      expect(find.text('3 what?'), findsOneWidget);
+      await tester.tap(find.byKey(const ValueKey('ttc_med_save')));
+      await tester.pumpAndSettle();
+      expect(MedicineStore.instance.all, isEmpty,
+          reason: 'the first Save asks what 3 counts');
+      expect(find.textContaining('Pick tablets, mg or ml'), findsOneWidget);
+      await tester.tap(find.byKey(const ValueKey('ttc_med_unit_tablets')));
+      await tester.pump();
+      expect(find.text('3 what?'), findsNothing);
+      await tester.tap(find.byKey(const ValueKey('ttc_med_save')));
+      await tester.pumpAndSettle();
+      expect(MedicineStore.instance.all.single.dose, '3 tablets');
+      expect(find.textContaining('3 tablets'), findsWidgets);
+      await settleSnacks(tester);
+    });
+
+    testWidgets('T12: a bare number saved before reads "Dose 3"',
+        (tester) async {
+      MedicineStore.instance.addMed(const Medication(
+          id: 'mb',
+          name: 'DHA',
+          type: MedType.medication,
+          dose: '3',
+          frequency: 'twice',
+          startDateIso: '2026-09-01T00:00:00.000'));
+      await pumpTall(tester, const TtcMedicationScreen());
+      expect(find.text('Dose 3 · twice'), findsOneWidget);
+      expect(find.text('3 · twice'), findsNothing);
     });
 
     testWidgets('a closed clock adds no time', (tester) async {

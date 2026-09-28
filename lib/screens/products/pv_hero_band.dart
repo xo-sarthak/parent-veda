@@ -59,6 +59,17 @@ class PvHeroSlide {
   final String? heroTag;
 }
 
+/// The products the hero band shows as their own slides (the first two
+/// photographed recommendations), so a storefront can keep them out of the
+/// rails right under it (PR3, 2026-09-28). Same rule as [pvHeroSlidesFor].
+Set<String> pvHeroProductIds(LifeStage stage) => {
+      for (final p in PvCatalogStore.instance
+          .recommended(stage.shopStage, limit: 4)
+          .where((p) => p.hasImage)
+          .take(2))
+        p.id,
+    };
+
 /// The stage's slides, from the catalogue. Three, at most.
 List<PvHeroSlide> pvHeroSlidesFor(LifeStage stage) {
   final store = PvCatalogStore.instance;

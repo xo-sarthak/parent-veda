@@ -364,6 +364,7 @@ PvProduct _enrich(PvProduct p) {
   final x = kPvProductExtras[p.id];
   final photos = kPvProductPhotos[p.id] ?? const <String>[];
   if (x == null && photos.isEmpty) return p;
+  final seedOk = pvShowsSeedVoices(p);
   return PvProduct(
     id: p.id,
     stage: p.stage,
@@ -380,8 +381,16 @@ PvProduct _enrich(PvProduct p) {
     buyUrl: x?.buyUrl ?? p.buyUrl,
     soldHere: x?.soldHere ?? p.soldHere,
     reviewOnly: p.reviewOnly,
-    rating: x?.rating ?? p.rating,
-    reviewCount: x?.reviewCount ?? p.reviewCount,
+    // ⚠️ THE OVERLAY'S SEED VOICES OBEY THE SAME TTC GATE (launch sanity H13,
+    // 2026-09-28). `kTtcShowSeedReviews` hid the source file's seed ratings,
+    // quotes and badges, but the overlay in pv_product_extras.dart added its
+    // own: "What experts say" on Folic acid quoted "Dr. Meera Iyer,
+    // Obstetrician", a seed persona, with a verified tick. On a TTC product
+    // the overlay's experts, reviews, rating, count and experts' share now
+    // show only with the flag on, exactly like the source's. Other stages
+    // are unchanged. Kept for revert: the five lines without `seedOk`.
+    rating: seedOk ? (x?.rating ?? p.rating) : p.rating,
+    reviewCount: seedOk ? (x?.reviewCount ?? p.reviewCount) : p.reviewCount,
     reco: x?.reco ?? p.reco,
     evidence: p.evidence,
     goods: p.goods,
@@ -389,10 +398,10 @@ PvProduct _enrich(PvProduct p) {
     bestFor: p.bestFor,
     specs: p.specs,
     variants: x?.variants ?? p.variants,
-    reviews: [...p.reviews, ...?x?.reviews],
-    experts: [...p.experts, ...?x?.experts],
+    reviews: [...p.reviews, if (seedOk) ...?x?.reviews],
+    experts: [...p.experts, if (seedOk) ...?x?.experts],
     parentsPct: p.parentsPct,
-    expertsPct: x?.expertsPct ?? p.expertsPct,
+    expertsPct: seedOk ? (x?.expertsPct ?? p.expertsPct) : p.expertsPct,
     ingredients: p.ingredients,
     studies: p.studies,
     weekFrom: p.weekFrom,
@@ -433,3 +442,11 @@ String pvProductIdForGuide(String guideId) {
 /// Off until real reviews exist (TTC launch walk, 2026-09-27); a demo build
 /// can turn it on with `--dart-define=PV_TTC_SEED_REVIEWS=true`.
 const bool kTtcShowSeedReviews = bool.fromEnvironment('PV_TTC_SEED_REVIEWS');
+
+/// Whether [p] may show SEED voices (ratings, counts, parent quotes, expert
+/// quotes): always outside Trying to conceive, and on it only with
+/// [kTtcShowSeedReviews] (H13, 2026-09-28). The day a real, signed expert
+/// quote exists for a TTC product, it goes in the source record
+/// (`p.experts`), which this gate never hides.
+bool pvShowsSeedVoices(PvProduct p) =>
+    p.stage != LifeStage.tryingToConceive || kTtcShowSeedReviews;

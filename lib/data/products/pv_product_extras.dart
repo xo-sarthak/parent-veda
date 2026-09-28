@@ -126,7 +126,11 @@ final Map<String, List<String>> kPvProductPhotos = {
   'ttc_coq10': [_u('1664956618021-73c47736845e'), _u('1732900293895-233f769299b3')],
   'ttc_myo_inositol': [_u('1732900293895-233f769299b3'), _u('1707129785947-ddc627a8bab9')],
   'ttc_zinc': [_u('1624362772755-4d5843e67047'), _u('1664956618021-73c47736845e')],
-  'ttc_fertility_blend': [_u('1707129785947-ddc627a8bab9'), _u('1624362772755-4d5843e67047')],
+  // PR1's rule, one photo one product (2026-09-28): the blend led with
+  // Folic acid's own first photo, so the two cards looked like one product.
+  // It draws its mark until a photo of a blend exists. Kept for revert:
+  //   'ttc_fertility_blend': [_u('1707129785947-ddc627a8bab9'), _u('1624362772755-4d5843e67047')],
+  'ttc_fertility_blend': <String>[],
   // ⚠️ NO OTHER BRAND'S PRODUCT, AND NO BUMP (TTC launch walk, 2026-09-27):
   // 1647549228195 is a Clearblue test, shown on a Prega News listing, and
   // 1643659733565 is a pregnant belly on a shelf for people still trying.
@@ -134,9 +138,19 @@ final Map<String, List<String>> kPvProductPhotos = {
   // Kept for revert:
   //   'ttc_lh_strips': [_u('1619183921628-9e6050dcd2e1'), _u('1647549228195-301269c33265')],
   //   'ttc_preg_test': [_u('1647549228195-301269c33265'), _u('1619183921628-9e6050dcd2e1'), _u('1643659733565-94e097cdb7e9')],
-  'ttc_lh_strips': [_u('1619183921628-9e6050dcd2e1')],
+  // ⚠️ ONE PHOTO, ONE PRODUCT (launch sanity PR1, PR2, 2026-09-28). The pink
+  // test cassette (1619183921628) stood for BOTH the I-CAN LH strips and the
+  // Prega News test, so she could not tell the two apart; it is a test card,
+  // so it stays on the pregnancy test and the strips draw their mark until a
+  // real strip photo exists. The Pre-Seed listing showed The Ordinary's
+  // skincare bottles (1580870069867), another brand's products; it draws its
+  // mark until a real Pre-Seed photo exists. Photos owed: I-CAN ovulation
+  // (LH) strips, Pre-Seed fertility-friendly lubricant. Kept for revert:
+  //   'ttc_lh_strips': [_u('1619183921628-9e6050dcd2e1')],
+  //   'ttc_lubricant': [_u('1580870069867-74c57ee1bb07')],
+  'ttc_lh_strips': <String>[],
   'ttc_preg_test': [_u('1619183921628-9e6050dcd2e1')],
-  'ttc_lubricant': [_u('1580870069867-74c57ee1bb07')],
+  'ttc_lubricant': <String>[],
   'ttc_thermometer': [_u('1594790628624-9e563bea851d'), _u('1609725236589-d987ffc8133a')],
   'ttc_book_impatient': [_u('1497633762265-9d179a990aa6'), _u('1495446815901-a7297e633e8d')],
 };

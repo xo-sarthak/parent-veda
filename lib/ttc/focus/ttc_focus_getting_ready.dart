@@ -99,19 +99,28 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
   // ⚠️ AND "Your checklist" IS LAST BECAUSE IT IS THE CLOSING SPINE, not
   // because it matters least. The brief is explicit: it is not a browse rail,
   // it is where the section ends.
+  //
+  // ⚠️ FOUR TABS, NOT SIX (launch sanity D11, 2026-09-28): 27 pieces over six
+  // tabs (3, 6, 4, 4, 7, 3) was six tabs to learn for a small door, and
+  // "Meal plan" held reads, not a plan. Diet and Meal plan are one tab, Food
+  // and supplements; Weight and habits and Before you start are one tab,
+  // Habits and first steps. Every piece stays, in the same order; only the
+  // tab it sits under moved. The two retired tabs are kept for revert.
   groups: [
+    // Kept for revert (2026-09-28): label: 'Diet and supplements',
     TtcFocusGroup(
         id: 'diet', mark: IntentMark.plate, tabMark: TtcTabMark.jarLeaf,
-        label: 'Diet and supplements',
+        label: 'Food and supplements',
         icon: Icons.restaurant_outlined,
         hue: 104),
     // Added 2026-09-26 (gap plan, P1): the Indian meal plan, beside Diet
     // because it is Diet made practical. Six tabs; Your checklist stays last.
-    TtcFocusGroup(
-        id: 'meals', mark: IntentMark.cookMark, tabMark: TtcTabMark.bowl,
-        label: 'Meal plan',
-        icon: Icons.soup_kitchen_outlined,
-        hue: 26),
+    // Folded into Food and supplements (D11, 2026-09-28). Kept for revert:
+    // TtcFocusGroup(
+    //     id: 'meals', mark: IntentMark.cookMark, tabMark: TtcTabMark.bowl,
+    //     label: 'Meal plan',
+    //     icon: Icons.soup_kitchen_outlined,
+    //     hue: 26),
     TtcFocusGroup(
         id: 'tests', mark: IntentMark.reportPage, tabMark: TtcTabMark.vialReport,
         label: 'Tests and vaccines',
@@ -119,14 +128,16 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
         hue: 206),
     TtcFocusGroup(
         id: 'habits', mark: IntentMark.stepsMark, tabMark: TtcTabMark.scale,
-        label: 'Weight and habits',
+        // Kept for revert (2026-09-28): label: 'Weight and habits',
+        label: 'Habits and first steps',
         icon: Icons.self_improvement_outlined,
         hue: 42),
-    TtcFocusGroup(
-        id: 'before', mark: IntentMark.nextStep, tabMark: TtcTabMark.flagPath,
-        label: 'Before you start',
-        icon: Icons.event_note_outlined,
-        hue: 344),
+    // Folded into Habits and first steps (D11, 2026-09-28). Kept for revert:
+    // TtcFocusGroup(
+    //     id: 'before', mark: IntentMark.nextStep, tabMark: TtcTabMark.flagPath,
+    //     label: 'Before you start',
+    //     icon: Icons.event_note_outlined,
+    //     hue: 344),
     TtcFocusGroup(
         id: 'checklist', mark: IntentMark.checkMark, tabMark: TtcTabMark.checklist,
         label: 'Your checklist',
@@ -295,7 +306,7 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
   //  is now the one way in from this door.
     TtcFocusSection(
       heading: 'What can we cook this week?',
-      group: 'meals',
+      group: 'diet', // D11 (2026-09-28). Kept for revert: 'meals'
       tiles: [
         TtcArticleTile(
           title: 'A week of Indian meals for trying',
@@ -317,7 +328,7 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
 
     TtcFocusSection(
       heading: 'What else is worth knowing about food?',
-      group: 'meals',
+      group: 'diet', // D11 (2026-09-28). Kept for revert: 'meals'
       tiles: [
         TtcArticleTile(
           title: 'Iron before pregnancy',
@@ -480,7 +491,7 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
     // =========================================================================
     TtcFocusSection(
       heading: 'Before you start',
-      group: 'before',
+      group: 'habits', // D11 (2026-09-28). Kept for revert: 'before'
       tiles: [
         // Moved here from "Eating before you try" (2026-09-27, relevance
         // audit). The whole read is the answer to "before you start", and it
@@ -522,7 +533,7 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
     // keep and ask, and this one is the visit and the practical side.
     TtcFocusSection(
       heading: 'What is worth asking early?',
-      group: 'before',
+      group: 'habits', // D11 (2026-09-28). Kept for revert: 'before'
       tiles: [
         TtcArticleTile(
           title: 'Your first gynaecologist visit',

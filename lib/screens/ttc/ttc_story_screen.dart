@@ -45,6 +45,7 @@ import 'package:flutter/material.dart';
 
 import '../../theme/pv_fonts.dart';
 import '../../ttc/ttc_focus_data.dart';
+import '../../ttc/ttc_expert_signoff.dart' show ttcStoryReviewer;
 import 'ttc_illustrations.dart';
 import 'ttc_story_skin.dart';
 
@@ -59,6 +60,8 @@ class TtcStoryScreen extends StatefulWidget {
     this.coverBlurb,
     this.coverArt,
     this.coverHue,
+    this.myth,
+    this.fact,
   });
 
   final String title;
@@ -74,6 +77,19 @@ class TtcStoryScreen extends StatefulWidget {
   final String? coverBlurb;
   final TtcArt? coverArt;
   final double? coverHue;
+
+  /// ⚠️ A MYTH'S COVER SAYS BOTH HALVES (launch sanity D4, D14, 2026-09-28).
+  /// A myth deck used to open on its title with the one-line blurb at the
+  /// very foot of an empty slide, and the card's own title could be a true
+  /// statement under a "Myth vs fact" chip. With [myth] and [fact] set, the
+  /// cover draws a labelled MYTH block and a labelled FACT block under the
+  /// title, in the reading zone, so the answer is on the first screen and
+  /// the two can never be confused. Any authored slides follow as the why.
+  /// MacroFactor's labelled definition cards are the shape: a small label,
+  /// then the words in a card of their own
+  /// (https://mobbin.com/screens/9e560e12-1d1d-4347-bd48-80595ad2dccc).
+  final String? myth;
+  final String? fact;
 
   @override
   State<TtcStoryScreen> createState() => _TtcStoryScreenState();
@@ -189,7 +205,21 @@ class _TtcStoryScreenState extends State<TtcStoryScreen> {
                     card: _slides[i],
                     skin: ttcSkinFor(i),
                     index: i,
-                    reviewedBy: widget.reviewedBy),
+                    // ⚠️ NO "REVIEWED BY" UNTIL SIGNED OFF (launch sanity,
+                    // H14's follow-up, 2026-09-28). Door carousels named
+                    // Dr Ruchika Sood and Dr Surbhi Sharma, who have not
+                    // read them. Until the title is in their set in
+                    // `kTtcSignedOffStories` it reads "BY · ParentVeda
+                    // team". Kept for revert: reviewedBy: widget.reviewedBy,
+                    reviewedBy:
+                        ttcStoryReviewer(widget.reviewedBy, widget.title),
+                    // Only the cover carries the myth and the fact.
+                    myth: i == 0 && widget.coverTitle != null
+                        ? widget.myth
+                        : null,
+                    fact: i == 0 && widget.coverTitle != null
+                        ? widget.fact
+                        : null),
               ),
 
               // ⚠️ TAP TARGETS OVER THE WHOLE HEIGHT, not just the chevrons.
@@ -238,12 +268,18 @@ class _Slide extends StatelessWidget {
     required this.skin,
     required this.index,
     this.reviewedBy,
+    this.myth,
+    this.fact,
   });
 
   final TtcCarouselCard card;
   final TtcSlideSkin skin;
   final int index;
   final String? reviewedBy;
+
+  /// The cover of a myth deck: both halves, labelled (see the screen).
+  final String? myth;
+  final String? fact;
 
   @override
   Widget build(BuildContext context) {
@@ -262,6 +298,23 @@ class _Slide extends StatelessWidget {
         color: skin.onBottom);
     final bodyStrong = bodyStyle.copyWith(
         fontWeight: FontWeight.w800, fontStyle: FontStyle.italic);
+
+    // ⚠️ A SLIDE WITH NO PICTURE READS FROM THE TOP (launch sanity D4,
+    // 2026-09-28). The bands put the heading in the top field, the picture in
+    // the middle and the payoff in the bottom one; with no picture the middle
+    // was 70% empty colour and the answer sat at the very foot of the screen
+    // ("The short answer is no." alone at the bottom of a maroon slide). So a
+    // text slide is ONE field of the slide's top colour, the heading, and the
+    // words straight under it, where the eye already is. Lloyds' recommended
+    // reads are the shape: one colour field, a heading, the paragraph under it
+    // (https://mobbin.com/screens/3e0474a3-661d-40be-9f44-48557f873633).
+    // A slide WITH a drawing keeps the bands, which exist for it (Stardust's
+    // Daily Decode: the picture, then the words,
+    // https://mobbin.com/screens/66ebdc01-ab26-4960-894e-2d98c0357307).
+    // Kept for revert: every slide took the banded layout below.
+    if (card.art == null) {
+      return _textSlide(heading, headingStrong);
+    }
 
     return Stack(fit: StackFit.expand, children: [
       // ---- the bands -----------------------------------------------------
@@ -350,6 +403,101 @@ class _Slide extends StatelessWidget {
     ]);
   }
 }
+
+extension on _Slide {
+  /// The byline pill, on the first slide only.
+  Widget? _byline(Color on) {
+    if (reviewedBy == null || index != 0) return null;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: on.withValues(alpha: 0.16),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(ttcStoryByline(reviewedBy!),
+          style: pvManrope(
+              fontSize: 9.5,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.8,
+              color: on)),
+    );
+  }
+
+  /// A slide with no drawing: one field, the heading, the words under it,
+  /// and on a myth's cover the labelled Myth and Fact blocks. Scrolls when a
+  /// long fact runs past the screen; the story's tap zones stay on top.
+  Widget _textSlide(TextStyle heading, TextStyle headingStrong) {
+    final on = skin.onTop;
+    final bodyStyle = pvManrope(
+        fontSize: 18, fontWeight: FontWeight.w500, height: 1.5, color: on);
+    final bodyStrong = bodyStyle.copyWith(
+        fontWeight: FontWeight.w800, fontStyle: FontStyle.italic);
+    final byline = _byline(on);
+    return ColoredBox(
+      key: const ValueKey('ttc_story_text_slide'),
+      color: skin.top,
+      child: SingleChildScrollView(
+        // Room on the right for the chevron.
+        padding: const EdgeInsets.fromLTRB(24, 12, 56, 32),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          if (byline != null) ...[byline, const SizedBox(height: 18)],
+          const SizedBox(height: 18),
+          RichText(
+            text: TextSpan(
+                children: ttcEmphasise(card.title, heading, headingStrong)),
+          ),
+          if (card.body.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            RichText(
+              text: TextSpan(
+                  children: ttcEmphasise(card.body, bodyStyle, bodyStrong)),
+            ),
+          ],
+          if (myth case final m? when m.isNotEmpty)
+            _mythBlock(kTtcStoryMythLabel, m, on),
+          if (fact case final f? when f.isNotEmpty)
+            _mythBlock(kTtcStoryFactLabel, f, on),
+        ]),
+      ),
+    );
+  }
+
+  /// One labelled half of a myth: the label small and spaced, the words in a
+  /// soft card of the slide's own ink.
+  Widget _mythBlock(String label, String words, Color on) => Padding(
+        key: ValueKey('ttc_story_${label.toLowerCase()}'),
+        padding: const EdgeInsets.only(top: 22),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(label.toUpperCase(),
+              style: pvManrope(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.4,
+                  color: on.withValues(alpha: 0.78))),
+          const SizedBox(height: 8),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+            decoration: BoxDecoration(
+              color: on.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Text(words,
+                style: pvManrope(
+                    fontSize: 16.5,
+                    fontWeight: label == kTtcStoryFactLabel
+                        ? FontWeight.w700
+                        : FontWeight.w500,
+                    height: 1.5,
+                    color: on)),
+          ),
+        ]),
+      );
+}
+
+/// The two labels on a myth's cover. English only (new copy).
+const String kTtcStoryMythLabel = 'Myth';
+const String kTtcStoryFactLabel = 'Fact';
 
 class _Chevron extends StatelessWidget {
   const _Chevron({required this.icon, required this.onTap});

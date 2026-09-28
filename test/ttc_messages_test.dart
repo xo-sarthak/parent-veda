@@ -104,14 +104,19 @@ void main() {
         TtcMessageFacts(
           periodStarts: [_d(2026, 9, 1)],
           windowOpens: _d(2026, 9, 10),
-          windowCloses: _d(2026, 9, 16),
+          // Six days ending on ovulation since 2026-09-27; the resolver can
+          // no longer produce a seven-day window. Was _d(2026, 9, 16).
+          windowCloses: _d(2026, 9, 15),
         ),
         now,
       );
       final w = find(list, TtcMessageKind.windowOpens);
       expect(w, isNotNull);
       expect(w!.at, _d(2026, 9, 10, 8));
-      expect(w.body, contains('Wed 16 Sep'));
+      // The end date follows the six-day rule, the same one the Fertile
+      // window tool resolves (launch sanity M1, 2026-09-28). Was:
+      //   expect(w.body, contains('Wed 16 Sep'));
+      expect(w.body, contains('Tue 15 Sep'));
     });
 
     test('a window that opened on an earlier day is not announced late', () {

@@ -2791,8 +2791,8 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
               child: SwitchListTile.adaptive(
                 value: _wantVerify,
                 onChanged: (v) => setState(() => _wantVerify = v),
-                activeTrackColor: _proPurple,
-            activeThumbColor: Colors.white,
+                // Kept for revert (2026-09-28, one black switch app-wide): activeTrackColor: _proPurple,
+            // Kept for revert (2026-09-28, one black switch app-wide): activeThumbColor: Colors.white,
                 contentPadding:
                     const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
                 secondary:

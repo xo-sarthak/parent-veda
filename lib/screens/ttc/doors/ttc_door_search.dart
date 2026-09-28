@@ -29,6 +29,7 @@ import 'package:flutter/material.dart';
 
 import '../../../localization/app_language.dart';
 import '../../../models/bracket.dart';
+import '../../../models/pv_read.dart';
 import '../../../theme/pv_fonts.dart';
 import '../../../ttc/ttc_focus_data.dart';
 import '../../../ttc/ttc_reads_data.dart';
@@ -56,6 +57,7 @@ class TtcDoorHit {
     this.tile,
     this.readId,
     List<String> extra = const [],
+    this.bodyWords = const {},
   }) : _words = '$title $blurb $meta ${extra.join(' ')}'.toLowerCase().split(
          _kSplit,
        );
@@ -74,7 +76,121 @@ class TtcDoorHit {
   final String? readId;
 
   final List<String> _words;
+
+  /// Every word of the read behind the hit (D6, 2026-09-28): its sections,
+  /// lists, tips, questions and answers. Searched after the title words and
+  /// ranked last, so a title match always leads.
+  final Set<String> bodyWords;
 }
+
+// =============================================================================
+//  The words inside a read, and the names people search by (launch sanity D6,
+//  L4, 2026-09-28)
+// -----------------------------------------------------------------------------
+//  "clomid" typed in Fertile window found nothing, although a read on that
+//  door explains clomiphene; "duphaston" found nothing anywhere. Two causes:
+//  the index held titles, blurbs and keywords only, never what a read SAYS,
+//  and people in India search by the name on the strip (Clomid, Siphene,
+//  Letroz, Duphaston, Susten), which a read written in plain words names by
+//  its medicine (clomiphene, letrozole, progesterone).
+//
+//  So the index carries every word of the read behind a hit, and the query
+//  carries its synonyms: a query word that starts one of [kTtcSearchSynonyms]'
+//  keys also matches that key's words. The list is a lookup of names, not a
+//  rule about medicine; it says nothing about which to take.
+// =============================================================================
+
+/// Brand and everyday names, each to the words our reads use. Lower case.
+/// A query word of four letters or more that STARTS a key brings that key's
+/// words with it ("clom" is enough for Clomid).
+const Map<String, List<String>> kTtcSearchSynonyms = {
+  // Ovulation tablets.
+  'clomid': ['clomiphene', 'ovulation'],
+  'clomiphene': ['clomid', 'ovulation'],
+  'siphene': ['clomiphene', 'ovulation'],
+  'fertyl': ['clomiphene', 'ovulation'],
+  'ovamit': ['clomiphene', 'ovulation'],
+  'letroz': ['letrozole', 'ovulation'],
+  'femara': ['letrozole', 'ovulation'],
+  'letrozole': ['ovulation'],
+  // Progesterone support.
+  'duphaston': ['dydrogesterone', 'progesterone'],
+  'dydroboon': ['dydrogesterone', 'progesterone'],
+  'dydrogesterone': ['progesterone'],
+  'susten': ['progesterone'],
+  'cyclogest': ['progesterone'],
+  'utrogestan': ['progesterone'],
+  'gestone': ['progesterone'],
+  // Trigger injection and stimulation.
+  'ovitrelle': ['trigger', 'hcg'],
+  'pregnyl': ['trigger', 'hcg'],
+  'gonal': ['stimulation', 'injections'],
+  'menopur': ['stimulation', 'injections'],
+  'foligraf': ['stimulation', 'injections'],
+  // PCOS medicines and supplements.
+  'glyciphage': ['metformin'],
+  'glycomet': ['metformin'],
+  'inofolic': ['inositol'],
+  'myoinositol': ['inositol'],
+  // Everyday words for clinic words.
+  'insemination': ['iui'],
+  'testtube': ['ivf'],
+  'sperm': ['semen'],
+  'semen': ['sperm'],
+  'pregnancy': ['test', 'pregnant'],
+  'miscarriage': ['loss'],
+};
+
+/// A query word and the words it also stands for.
+Set<String> ttcSearchAlternatives(String w) {
+  final out = {w};
+  if (w.length < 4) return out;
+  for (final e in kTtcSearchSynonyms.entries) {
+    if (e.key.startsWith(w) || w.startsWith(e.key)) out.addAll(e.value);
+  }
+  return out;
+}
+
+/// Every word a read says, in both languages, lower case, split the way the
+/// index splits. Cached by id: the library is static for the app's life.
+Set<String> ttcReadWords(PvRead r) =>
+    _kReadWords.putIfAbsent(r.id, () {
+      final b = StringBuffer();
+      void add(LocalizedText? t) {
+        if (t == null) return;
+        b
+          ..write(t.en)
+          ..write(' ')
+          ..write(t.hi)
+          ..write(' ');
+      }
+
+      add(r.shortAnswer);
+      add(r.scaleSetter);
+      add(r.teaser);
+      for (final sec in r.sections) {
+        add(sec.heading);
+        add(sec.summary);
+        sec.paragraphs.forEach(add);
+        sec.bullets.forEach(add);
+        add(sec.tip?.title);
+        add(sec.tip?.body);
+        add(sec.mythFact?.myth);
+        add(sec.mythFact?.fact);
+        add(sec.callout?.title);
+        add(sec.callout?.body);
+      }
+      for (final f in r.faqs) {
+        add(f.question);
+        add(f.answer);
+      }
+      return {
+        for (final w in b.toString().toLowerCase().split(_kSplit))
+          if (w.length > 1) w,
+      };
+    });
+
+final Map<String, Set<String>> _kReadWords = {};
 
 final RegExp _kSplit = RegExp(r'[^a-z0-9]+');
 
@@ -127,6 +243,10 @@ List<TtcDoorHit> ttcDoorSearchIndex(
     final g = groups.where((g) => g.id == s.group).firstOrNull;
     for (final t in s.tiles) {
       if (_readIdOf(t) case final id?) onDoor.add(id);
+      final read = switch (_readIdOf(t)) {
+        final id? => ttcReadById(id),
+        _ => null,
+      };
       hits.add(
         TtcDoorHit._(
           title: t.title,
@@ -134,7 +254,15 @@ List<TtcDoorHit> ttcDoorSearchIndex(
           meta: g == null ? door : '$door · ${g.label}',
           icon: iconForFormat(t.format),
           tile: t,
-          extra: t.keywords,
+          // A myth's own two halves are its body (D6).
+          extra: [
+            ...t.keywords,
+            if (t case TtcMythTile(:final myth, :final fact)) ...[myth, fact],
+          ],
+          // ⚠️ NOT WHILE THE SHARED-PHONE SWITCH IS ON: another read's text
+          // can mention "lubricant" in passing, and a word she has chosen not
+          // to see must not bring back a row. Titles only, as before D6.
+          bodyWords: read == null || hide ? const {} : ttcReadWords(read),
         ),
       );
     }
@@ -152,6 +280,7 @@ List<TtcDoorHit> ttcDoorSearchIndex(
         // The English words too, so a Hinglish reader typing "folic" still
         // finds the piece.
         extra: [r.title.en, r.kicker.of(lang)],
+        bodyWords: hide ? const {} : ttcReadWords(r),
       ),
     );
   }
@@ -161,16 +290,44 @@ List<TtcDoorHit> ttcDoorSearchIndex(
 /// Rank: every query word must start a word; a title that starts with the
 /// query outranks one that contains it, which outranks a blurb match.
 /// Ties keep index order, so this door's tiles come before the library.
+///
+/// D6 (2026-09-28): each query word also matches its synonyms
+/// ([ttcSearchAlternatives]), and a word may be found in the read's own
+/// text; a hit found only that way ranks 4, after every title and blurb
+/// match. Kept for revert, the title-and-blurb-only rule:
+///   if (!words.every((w) => _matches(h._words, w))) continue;
 List<TtcDoorHit> ttcDoorSearch(String query, List<TtcDoorHit> index) {
   final q = query.trim().toLowerCase();
   if (q.isEmpty) return const [];
-  final words = q.split(RegExp(r'\s+'));
+  // Split the way the index splits (D6, 2026-09-28), so "two-week" is two
+  // words on both sides. Kept for revert: q.split(RegExp(r'\s+')).
+  final words = [
+    for (final w in q.split(_kSplit))
+      if (w.isNotEmpty) w,
+  ];
+  if (words.isEmpty) return const [];
+  final alts = [for (final w in words) ttcSearchAlternatives(w)];
   final scored = <(int, int, TtcDoorHit)>[];
   for (var i = 0; i < index.length; i++) {
     final h = index[i];
-    if (!words.every((w) => _matches(h._words, w))) continue;
+    var inBody = false;
+    var all = true;
+    for (final a in alts) {
+      if (a.any((w) => _matches(h._words, w))) continue;
+      // The read's text, for words of three letters or more, so "a" or
+      // "is" does not bring back the whole library.
+      if (a.any((w) => w.length >= 3 && h.bodyWords.any((b) => b.startsWith(w)))) {
+        inBody = true;
+        continue;
+      }
+      all = false;
+      break;
+    }
+    if (!all) continue;
     final t = h.title.toLowerCase();
-    final rank = t.startsWith(q)
+    final rank = inBody
+        ? 4
+        : t.startsWith(q)
         ? 0
         : t.contains(q)
         ? 1

@@ -67,9 +67,15 @@ import '../v2/v2_palette.dart';
 import 'ttc_strings.dart';
 import 'ttc_surface_router.dart';
 import 'ttc_tool_chrome.dart';
+import 'ttc_tool_hues.dart';
+import '../../ttc/ttc_cycle_report.dart' show kTtcWeightTracker, kTtcWeightField;
+import '../../ttc/ttc_log_store.dart';
 
-/// Getting ready is 104 — the tool keeps its door's colour.
-const double kBmiHue = 104;
+/// ⚠️ T6 (launch sanity, 2026-09-28): the tool wears its Tools group's
+/// colour, "Your body" (see ttc_tool_hues.dart). Kept for revert (2026-09-28):
+/// "Getting ready is 104 — the tool keeps its door's colour."
+/// const double kBmiHue = 104;
+const double kBmiHue = kTtcToolHueBody;
 
 class TtcBmiScreen extends StatefulWidget {
   const TtcBmiScreen({super.key});
@@ -108,6 +114,13 @@ class _TtcBmiScreenState extends State<TtcBmiScreen> {
 
   TtcBmiStore get _store => TtcBmiStore.instance;
 
+  /// Where each prefilled field came from, said under its label
+  /// (launch sanity T2, 2026-09-28). Null once she types over it.
+  String? _heightFrom;
+  String? _weightFrom;
+  String _heightFilled = '';
+  String _weightFilled = '';
+
   @override
   void initState() {
     super.initState();
@@ -125,12 +138,83 @@ class _TtcBmiScreenState extends State<TtcBmiScreen> {
             ? last.kilograms.toStringAsFixed(1)
             : (last.kilograms / 0.45359237).toStringAsFixed(1);
       }
+      _prefillFromWhatWeHold();
       setState(() {});
     });
+    // The Weight log loads on its own; if it lands after this screen, fill
+    // from it then (once).
+    if (!TtcLogStore.instance.isLoaded) {
+      TtcLogStore.instance.addListener(_onLogLoaded);
+    }
+    _height.addListener(_typedOver);
+    _feet.addListener(_typedOver);
+    _inches.addListener(_typedOver);
+    _weight.addListener(_typedOver);
+  }
+
+  void _onLogLoaded() {
+    if (!TtcLogStore.instance.isLoaded) return;
+    TtcLogStore.instance.removeListener(_onLogLoaded);
+    if (!mounted || _weightFrom != null) return;
+    setState(_prefillFromWhatWeHold);
+  }
+
+  /// ⚠️ DERIVE, NEVER ASK (launch sanity T2, 2026-09-28). The walk found both
+  /// boxes empty although she had logged a weight in the Weight tool. Height
+  /// is the one she gave last time (kept even when she did not save the
+  /// result, see `TtcBmiStore.heightMetres`); weight is her latest Weight log
+  /// when it is as new as her last saved measurement or newer. Each says
+  /// where it came from and stays a plain editable field.
+  void _prefillFromWhatWeHold() {
+    final m = _store.heightMetres;
+    if (m != null) {
+      _height.text = (m * 100).toStringAsFixed(0);
+      final totalIn = m / 0.0254;
+      _feet.text = (totalIn ~/ 12).toString();
+      _inches.text = (totalIn % 12).toStringAsFixed(0);
+      _heightFrom = 'Saved from last time. Change it if it is wrong.';
+      _heightFilled = _heightKey;
+    }
+    final logged =
+        TtcLogStore.instance.latest(kTtcWeightTracker, kTtcWeightField);
+    final last = _store.latest;
+    if (logged != null &&
+        (last == null || !logged.day.isBefore(_dayOnly(last.at)))) {
+      final kg = logged.value;
+      _weight.text = _store.weightUnit == BmiWeightUnit.kg
+          ? kg.toStringAsFixed(1)
+          : (kg / 0.45359237).toStringAsFixed(1);
+      _weightFrom = 'From your Weight log, ${ttcToolDate(logged.day)}. '
+          'Change it if it is different now.';
+      _weightFilled = _weight.text;
+    } else if (last != null) {
+      _weightFrom = 'From your last saved measurement. Change it if it is '
+          'different now.';
+      _weightFilled = _weight.text;
+    }
+  }
+
+  static DateTime _dayOnly(DateTime d) => DateTime(d.year, d.month, d.day);
+
+  String get _heightKey => '${_height.text}|${_feet.text}|${_inches.text}';
+
+  /// The "from your log" line goes once she types a different number.
+  void _typedOver() {
+    var changed = false;
+    if (_heightFrom != null && _heightKey != _heightFilled) {
+      _heightFrom = null;
+      changed = true;
+    }
+    if (_weightFrom != null && _weight.text != _weightFilled) {
+      _weightFrom = null;
+      changed = true;
+    }
+    if (changed && mounted) setState(() {});
   }
 
   @override
   void dispose() {
+    TtcLogStore.instance.removeListener(_onLogLoaded);
     _height.dispose();
     _feet.dispose();
     _inches.dispose();
@@ -254,7 +338,12 @@ class _TtcBmiScreenState extends State<TtcBmiScreen> {
           key: ValueKey((_stage, identityHashCode(_calc))),
           hue: kBmiHue,
           // ⚠️ ONE TOOL, ONE NAME: the Tools tile's name, word for word.
-          eyebrow: t('Weight and fertility', 'Wazan aur fertility'),
+          // T1/T2 (2026-09-28): BMI is folded into the Weight tool (its page
+          // carries the BMI row that opens this), and the separate "Weight
+          // and fertility" tile is gone, so the eyebrow is Weight's.
+          // Kept for revert (2026-09-28):
+          // eyebrow: t('Weight and fertility', 'Wazan aur fertility'),
+          eyebrow: t('Weight', 'Wazan'),
           title: _stage == _Stage.result
               ? 'Where your number sits.'
               : 'Work out your BMI.',
@@ -449,6 +538,11 @@ class _TtcBmiScreenState extends State<TtcBmiScreen> {
                 fontWeight: FontWeight.w800,
                 letterSpacing: 1.1,
                 color: p.ink3)),
+        if (_heightFrom case final from?) ...[
+          const SizedBox(height: 4),
+          _FromLine(
+              key: const ValueKey('ttc_bmi_height_from'), p: p, text: from),
+        ],
         const SizedBox(height: 10),
         Row(children: [
           if (metric)
@@ -476,6 +570,11 @@ class _TtcBmiScreenState extends State<TtcBmiScreen> {
                 fontWeight: FontWeight.w800,
                 letterSpacing: 1.1,
                 color: p.ink3)),
+        if (_weightFrom case final from?) ...[
+          const SizedBox(height: 4),
+          _FromLine(
+              key: const ValueKey('ttc_bmi_weight_from'), p: p, text: from),
+        ],
         const SizedBox(height: 10),
         Row(children: [
           Expanded(
@@ -565,9 +664,13 @@ class _TtcBmiScreenState extends State<TtcBmiScreen> {
       setState(() => _error = err);
       return;
     }
+    // T2 (2026-09-28): her height, kept for next time whether or not she
+    // saves this result.
+    final worked = calculateBmi(input);
+    if (worked != null) _store.rememberHeight(worked.metres);
     setState(() {
       _error = BmiInputError.none;
-      _calc = calculateBmi(input);
+      _calc = worked;
       // A new number is not a saved one until she saves it.
       _shownEntry = null;
       _stage = _Stage.result;
@@ -1522,5 +1625,30 @@ class _Button extends StatelessWidget {
                   fontWeight: FontWeight.w700,
                   color: filled ? Colors.white : p.ink1)),
         ),
+      );
+}
+
+
+/// "From your Weight log, change it": where a prefilled number came from
+/// (launch sanity T2, 2026-09-28).
+class _FromLine extends StatelessWidget {
+  const _FromLine({super.key, required this.p, required this.text});
+  final V2Palette p;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) => Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Icon(Icons.history_rounded, size: 13, color: p.ink3),
+          ),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Text(text,
+                style: pvManrope(fontSize: 12, height: 1.45, color: p.ink3)),
+          ),
+        ],
       );
 }

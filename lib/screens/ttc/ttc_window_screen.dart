@@ -82,6 +82,21 @@ import 'ttc_treatment_screen.dart' show TtcTreatmentEntryCard;
 /// noted where they were. Kept for revert: const double kWindowHue = 273;
 const double kWindowHue = TtcCycleColours.fertileHue;
 
+/// The Fertile window tool's opening line (launch sanity M3, 2026-09-28):
+/// what "fertile window" and "fertile days" mean, said once, in one
+/// sentence. The length comes from the two constants every date surface
+/// reads (`ttc_fertile_window.dart`), so the words cannot drift from the
+/// dates again.
+String ttcWindowIntroLine() {
+  const n =
+      ttcWindowOpensBeforeOvulation + ttcWindowClosesAfterOvulation + 1;
+  const words = {5: 'five', 6: 'six', 7: 'seven'};
+  final days = words[n] ?? '$n';
+  return 'Your fertile window is the $days days ending on the day you '
+      'ovulate. These are your fertile days, the days you\'re most likely to '
+      'get pregnant, and they\'re coloured below.';
+}
+
 /// Which picture the "Across this cycle" card is showing.
 enum _Across { list, curve }
 
@@ -260,9 +275,15 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
           const SizedBox(height: 8),
           // ⚠️ WHAT THIS IS, FIRST. A first-time reader has to know what the
           // coloured days are before she meets them, not after a walkthrough.
-          Text(
-              "The six days each cycle when you're most likely to get "
-              'pregnant. The coloured days below are yours.',
+          // ⚠️ BOTH NAMES, DEFINED ONCE (launch sanity M3, 2026-09-28). The
+          // stage says "fertile window" and "fertile days" for one thing, and
+          // nothing said so; the intro now says what the window is (six days
+          // ending on ovulation, the same constants every screen reads) and
+          // that those six are her fertile days. Kept for revert:
+          //   "The six days each cycle when you're most likely to get "
+          //   'pregnant. The coloured days below are yours.',
+          Text(ttcWindowIntroLine(),
+              key: const ValueKey('ttc_window_intro'),
               style: pvManrope(fontSize: 14, height: 1.45, color: p.ink1)),
           const SizedBox(height: 8),
           // Kept for revert: 'Cycle day ${today.cycleDay} · $month'.

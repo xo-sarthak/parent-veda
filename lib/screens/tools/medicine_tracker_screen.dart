@@ -386,7 +386,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
               height: 28,
               child: Switch(
                 value: a.enabled,
-                activeThumbColor: _accent,
+                // Kept for revert (2026-09-28, one black switch app-wide): activeThumbColor: _accent,
                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 onChanged: (v) {
                   final updated = m.alarms
@@ -872,7 +872,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                     ),
                     Switch(
                       value: enabled,
-                      activeThumbColor: _accent,
+                      // Kept for revert (2026-09-28, one black switch app-wide): activeThumbColor: _accent,
                       onChanged: (v) => setSheet(() => enabled = v),
                     ),
                   ]),

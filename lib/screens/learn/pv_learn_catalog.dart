@@ -592,7 +592,15 @@ class PvLearnCatalog {
       cover: pvLearnCoverFor(o.id, [o.category, 'trying'], kind),
       offering: engine,
       priceMinor: engine?.priceMinor ?? o.priceMinor,
-      topics: [o.category],
+      // ⚠️ NOT A GLUM FACE ON HELP (launch sanity MB21, 2026-09-28). The
+      // category "mental" drew `IntentMark.moodArc`, a flat-mouthed face, as
+      // the hero of the psychologist consult: the wrong tone for someone
+      // reaching out, and it reads as the emoji the app avoids. For TTC only,
+      // the topic says what the offerings are ("Mental support"), which draws
+      // the cupped hands (support offered, not instructions given) through
+      // `pvLearnMarkFor`. Other stages keep "mental". Kept for revert:
+      //   topics: [o.category],
+      topics: [o.category == 'mental' ? 'mental support' : o.category],
       facts: facts,
       takeaways: const [],
       sessions: kind == PvLearnKind.cohort
@@ -757,3 +765,12 @@ class PvLearnCatalog {
       .replaceAll(RegExp(r'[^a-z0-9]+'), '_')
       .replaceAll(RegExp(r'^_|_$'), '');
 }
+
+/// A Trying to conceive consult whose expert is a ROLE, not a person ("An
+/// andrologist", "A ParentVeda expert"): the roster has nobody named for it
+/// yet (TTC launch sanity H16, 2026-09-28). The consult list titles such a row
+/// by what the consult is instead of drawing initials for a nameless person.
+/// It stops matching the day `_ttcRosterFor` names someone.
+bool pvLearnHasNoNamedPerson(PvOfferingView v) =>
+    v.stage == LifeStage.tryingToConceive &&
+    RegExp(r'^An? ').hasMatch(v.expert.name);

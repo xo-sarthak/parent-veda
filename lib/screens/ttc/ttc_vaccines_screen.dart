@@ -85,10 +85,14 @@ import '../v2/v2_palette.dart';
 import 'ttc_common.dart' show ttcTitleInk, ttcLine;
 import 'ttc_strings.dart';
 import 'ttc_tool_chrome.dart';
+import 'ttc_tool_hues.dart';
 
 /// The bracket's own hue — Getting ready is 104, and a surface opened from that
 /// door keeps its colour.
-const double _kHue = 104;
+// ⚠️ LAUNCH SANITY T6 (2026-09-28): a tool's header wears its Tools group's
+// colour (`ttc_tool_hues.dart`). Vaccinations sits in Care and medicines.
+// Kept for revert (2026-09-28): const double _kHue = 104;
+const double _kHue = kTtcToolHueCare;
 
 class TtcVaccinesScreen extends StatefulWidget {
   const TtcVaccinesScreen({super.key});
@@ -162,7 +166,8 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
         //                     fontSize: 16.5, height: 1.55, color: p.ink2)),
         //             const SizedBox(height: 22),
         return TtcToolScaffold(
-          // Getting ready's hue, which this screen always wore.
+          // Care and medicines' hue in Tools (T6, 2026-09-28). Kept for
+          // revert: "Getting ready's hue, which this screen always wore."
           hue: _kHue,
           // ⚠️ ONE TOOL, ONE NAME (2026-09-27): the eyebrow IS the Tools
           // tile's name, word for word; the title is the tile's own line.
@@ -202,8 +207,20 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
                     const SizedBox(height: 22),
 
                     // ---- THE ANSWER, BEFORE THE LIST ---------------------
-                    _verdict(p, store, t),
-                    const SizedBox(height: 26),
+                    //
+                    // ⚠️ NOT ON A FIRST OPEN (launch sanity T8, 2026-09-28).
+                    // With nothing recorded the answer was "One blood test
+                    // settles most of this", and the box right under it said
+                    // "Ask for these tests by name. One blood sample covers all
+                    // of them": the page opened by saying one thing twice. On a
+                    // first open the tests box is the one box, and it carries
+                    // the rubella line the answer box used to. Once anything is
+                    // recorded the answer has something of hers to say, so it
+                    // comes back. Kept for revert (2026-09-28): drawn always.
+                    if (!_firstOpen(store)) ...[
+                      _verdict(p, store, t),
+                      const SizedBox(height: 26),
+                    ],
 
                     // ---- INDIA -------------------------------------------
                     //
@@ -485,12 +502,19 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
                   fontWeight: FontWeight.w600,
                   color: p.ink1)),
           const SizedBox(height: 6),
+          // T8 (2026-09-28): the rubella line from the answer box joins
+          // here, so a first open says it once. Kept for revert: the first
+          // two sentences alone.
           Text(
               t(
                   'One blood sample covers all of them. Everything else on '
-                      'this page depends on the result.',
+                      'this page depends on the result. Rubella is the one '
+                      "worth doing first: if it shows you're immune, as it "
+                      "usually does, there's nothing more to do for it.",
                   'Ek hi blood test mein teenon ho jaate hain, aur is page ki '
-                      'baaki har cheez uske result par tiki hai.'),
+                      'baaki har cheez uske result par tiki hai. Rubella sabse '
+                      'pehle karwane layak hai. Agar immune aaya — jo aksar '
+                      'aata hai — toh uske liye aur kuch karna nahi hai.'),
               style: pvManrope(fontSize: 13.5, height: 1.6, color: p.ink2)),
           const SizedBox(height: 15),
           for (final ask in kTtcVaccineAsks)
@@ -532,6 +556,11 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
               style: pvManrope(fontSize: 13, height: 1.55, color: p.ink2)),
         ]),
       );
+
+  /// Nothing recorded on any vaccine: the tests box is the page's one box
+  /// (T8).
+  bool _firstOpen(TtcVaccineStore store) =>
+      store.unrecorded == kTtcVaccines.length;
 
   /// Whether she has answered any of the three "before trying" cards.
   bool _started(TtcVaccineStore store) =>
@@ -1291,12 +1320,21 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
     await store.set(v.id, TtcVaccineStatus.done, on: picked);
   }
 
+  // ⚠️ FOUR ANSWERS SHE CAN TELL APART (launch sanity T8, 2026-09-28).
+  // "Already immune" and "Had it" read as the same thing. The walk asked for
+  // three answers with "Immune (test or vaccine)", but that would fold "had
+  // the jab" into "immune", and for a live vaccine the jab's DATE is what
+  // starts the month's wait before trying. So the four stay (the persisted
+  // enum names do not move) and each now says HOW she knows: a test, or the
+  // jab itself. Kept for revert (2026-09-28): 'Already immune', 'I need
+  // this', 'Had it', 'Not for me'.
   String _statusLabel(TtcVaccineStatus s, String Function(String, String) t) =>
       switch (s) {
         TtcVaccineStatus.unknown => t('Not recorded', 'Darj nahi'),
-        TtcVaccineStatus.immune => t('Already immune', 'Pehle se immune'),
-        TtcVaccineStatus.needed => t('I need this', 'Mujhe chahiye'),
-        TtcVaccineStatus.done => t('Had it', 'Lagwa liya'),
+        TtcVaccineStatus.immune =>
+          t('Immune (a test says so)', 'Pehle se immune'),
+        TtcVaccineStatus.needed => t('Need it', 'Mujhe chahiye'),
+        TtcVaccineStatus.done => t('Had the jab', 'Lagwa liya'),
         TtcVaccineStatus.notApplicable => t('Not for me', 'Mere liye nahi'),
       };
 

@@ -180,7 +180,14 @@ class TtcCycleRing extends StatelessWidget {
             // setting being ignored is not a small thing.
             if (here != null && today != null)
               Column(mainAxisSize: MainAxisSize.min, children: [
-                Text('TODAY',
+                // ⚠️ THE DATE MOVED UP TO THE EYEBROW (launch sanity H5,
+                // 2026-09-28). "Day 10 / of 28 · 28 Sep" read as "day 10 of
+                // 28 September". Now "TODAY, 28 SEP" above, "Day 10" and
+                // "of about 28 days" below: the length is an estimate, and a
+                // number and a date never share a line. Kept for revert:
+                //   Text('TODAY', ...) and Text('of $_length · ${_d(today!)}')
+                Text('TODAY, ${_d(today!).toUpperCase()}',
+                    key: const ValueKey('ttc_ring_today'),
                     style: pvManrope(
                         fontSize: 9.5,
                         fontWeight: FontWeight.w800,
@@ -193,7 +200,8 @@ class TtcCycleRing extends StatelessWidget {
                     style: ttcFraunces(26,
                         w: FontWeight.w600, color: ttcTitleInk)),
                 const SizedBox(height: 1),
-                Text('of $_length · ${_d(today!)}',
+                Text('of about $_length days',
+                    key: const ValueKey('ttc_ring_length'),
                     style: ttcBody(11.5, color: ttcSoft)),
               ])
             else

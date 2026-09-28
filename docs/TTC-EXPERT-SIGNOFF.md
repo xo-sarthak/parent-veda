@@ -2,10 +2,15 @@
 
 Written 2026-09-26 in the TTC warmth pass. The made-up reviewer names in TTC were replaced with real people
 from the expert roster (`Downloads/MASTER-CONTENT-PLAN-v3.xlsx`, sheet "Expert roster"), or with
-"ParentVeda team" where no roster expert fits. **The app now shows "REVIEWED BY" and a tick next to these
-real names.** That is only true once each person has read her pieces, so this is the list to send each expert
-before launch. Where an expert asks for changes, the text changes; where she cannot sign off, switch that
-read to `reviewed: false` with "ParentVeda team" (the pattern the His side reads already use).
+"ParentVeda team" where no roster expert fits. This is the list to send each expert before launch. Where an
+expert asks for changes, the text changes.
+
+**Until a piece is signed off, the app does not name its expert (launch sanity H14, 2026-09-28).** A read, a
+door carousel or an infographic shows "By ParentVeda team" with no tick. When an expert signs a piece off,
+fill in its Signed off date here and, in the same commit, add it to that expert's set in
+`lib/ttc/ttc_expert_signoff.dart`: a read by its id in `kTtcSignedOffReads`, a door carousel or infographic
+by its Title as listed here in `kTtcSignedOffStories` (tiles have no id; the title is the id). That one line
+brings back "Reviewed by" and the tick. `test/ttc_expert_signoff_test.dart` holds the rule.
 
 Films are placeholders (nothing filmed yet); the name on a film is the plan for who presents it.
 
@@ -78,8 +83,8 @@ changes its named expert, run `py -3.11 tools/ttc_expert_signoff.py` (it reads t
 | Read | waiting | Feeling pregnant, but the test says no | `ttc_read_feeling_pregnant` | | |
 | Door carousel | pcos | PCOS or ovarian cysts |  | | |
 | Door carousel | pcos | PCOS or thyroid |  | | |
-| Door carousel | pcos | Fast change is worth raising soon. |  | | |
-| Door carousel | pcos | A blood test gives the answer. |  | | |
+| Door carousel | pcos | Hair changes, explained |  | | |
+| Door carousel | pcos | Cycles without ovulation |  | | |
 | Door carousel | pcos | When to see a doctor |  | | |
 | Film (not yet made) |  | PCOS, explained in five minutes | `ttc_vid_pcos_explained` | | |
 | Film (not yet made) |  | The PCOS treatments your doctor may offer | `ttc_vid_pcos_treatment` | | |
@@ -118,7 +123,7 @@ changes its named expert, run `py -3.11 tools/ttc_expert_signoff.py` (it reads t
 | Read | ivf | What a package leaves out | `ttc_read_ivf_package` | | |
 | Read | ivf | Is egg retrieval painful? | `ttc_read_ivf_retrieval` | | |
 | Read | ivf | Can I work through a cycle? | `ttc_read_ivf_working` | | |
-| Read | treatment | The trigger shot: why the time is exact | `ttc_read_tx_trigger_shot` | | |
+| Read | treatment | The trigger injection: why the time is exact | `ttc_read_tx_trigger_shot` | | |
 | Read | treatment | Transfer day, and the progesterone after it | `ttc_read_tx_transfer_day` | | |
 | Read | treatment | The two-week wait after IVF or IUI | `ttc_read_tx_wait_after_treatment` | | |
 | Read | treatment | The beta test: what it is, and why it's sometimes repeated | `ttc_read_tx_beta_test` | | |
@@ -130,12 +135,13 @@ changes its named expert, run `py -3.11 tools/ttc_expert_signoff.py` (it reads t
 | Read | treatment | Day 1, day 3, day 5: the words the lab uses | `ttc_read_tx_embryo_days` | | |
 | Read | treatment | Fresh or frozen transfer: how clinics decide | `ttc_read_tx_fresh_or_frozen` | | |
 | Read | treatment | Your review appointment: questions to take | `ttc_read_tx_review_appointment` | | |
-| Door carousel | ivf | Agree on that number at the start. |  | | |
+| Door carousel | ivf | IUI or IVF, and when to move from one to the other |  | | |
 
-## ParentVeda team (18)
+## ParentVeda team (19)
 
 | Kind | Door | Title | id | Sent | Signed off |
 |---|---|---|---|---|---|
+| Read | conceiving | Morning temperature: how it works | `ttc_read_morning_temperature` | | |
 | Read | extra | When sex is hard for him under pressure | `ttc_read_his_side_pressure` | | |
 | Read | extra | Does his age affect getting pregnant? | `ttc_read_his_age` | | |
 | Read | extra | Money before a baby: what to sort out now | `ttc_read_money_before_baby` | | |
@@ -150,7 +156,7 @@ changes its named expert, run `py -3.11 tools/ttc_expert_signoff.py` (it reads t
 | Read | his side | What three months looks like | `ttc_read_three_months` | | |
 | Read | his side | Zinc and CoQ10, honestly | `ttc_read_zinc_coq10` | | |
 | Door carousel | conceiving | How sperm are made |  | | |
-| Door carousel | screen | What people say |  | | |
+| Door carousel | screen | Every door myth (the story built in code) |  | | |
 | Film (not yet made) |  | Why his side gets tested last | `ttc_vid_whose_side` | | |
 | Film (not yet made) |  | Reading a semen report without panicking | `ttc_vid_semen_analysis` | | |
 | Film (not yet made) |  | Three things that really change his numbers | `ttc_vid_heat_habits` | | |

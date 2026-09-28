@@ -22,8 +22,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:parentveda/screens/ttc/ttc_cycle_report_screen.dart'
+    show TtcCycleReportScreen;
 import 'package:parentveda/screens/ttc/ttc_edit_categories_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_symptom_log_screen.dart';
+import 'package:parentveda/screens/ttc/ttc_tool_chrome.dart' show TtcToolClose;
 import 'package:parentveda/ttc/cycle_store.dart';
 import 'package:parentveda/ttc/ttc_cycle_report.dart';
 import 'package:parentveda/ttc/ttc_log_store.dart';
@@ -74,11 +77,19 @@ void main() {
       expect(find.text(kTtcLogEyebrow.toUpperCase()), findsOneWidget);
       expect(find.text('How is today going?'), findsOneWidget);
       expect(find.text(kTtcLogHowItWorks), findsOneWidget);
-      expect(find.text(ttcLogSavedLine(0)), findsOneWidget);
+      // 2026-09-28: nothing saved says nothing at the top: no card, no
+      // pill. Was: expect(find.text(ttcLogSavedLine(0)), findsOneWidget);
+      expect(find.text(ttcLogSavedLine(0)), findsNothing);
+      expect(find.byKey(const ValueKey('ttc_log_saved_card')), findsNothing);
+      expect(find.byKey(const ValueKey('ttc_log_saved_pill')), findsNothing);
       // Both number cards say what a tap does.
       expect(find.byKey(const ValueKey('ttc_measure_action_kg')),
           findsOneWidget);
-      expect(find.text(kTtcMeasureAdd), findsNWidgets(2));
+      // U2 (2026-09-28): Flo's card, the grey "Log your ..." line and a
+      // pencil. Was: expect(find.text(kTtcMeasureAdd), findsNWidgets(2));
+      expect(find.text(kTtcMeasureWeightHint), findsOneWidget);
+      expect(find.text(kTtcMeasureTempHint), findsOneWidget);
+      expect(find.text(kTtcMeasureViewChart), findsNWidgets(2));
       // One way out, and the report as a link.
       expect(find.byKey(const ValueKey('ttc_log_done')), findsOneWidget);
       expect(find.byKey(const ValueKey('ttc_log_open_report')), findsOneWidget);
@@ -106,28 +117,97 @@ void main() {
 
   // ===========================================================================
   group('add and remove', () {
-    testWidgets('a tap is listed as saved', (tester) async {
+    // 2026-09-28: the saved list moved from a card above the search into a
+    // sheet behind the hero's "3 saved" pill. Was: a tap showed
+    // ttcLogSavedLine(1) and a 'ttc_log_saved_calm' chip on the page.
+    testWidgets('a tap is counted in the hero, and listed behind the pill',
+        (tester) async {
       await pump(tester, const TtcSymptomLogScreen());
       await tester.tap(find.text('Calm'));
       await tester.pump();
-      expect(find.text(ttcLogSavedLine(1)), findsOneWidget);
-      expect(find.byKey(const ValueKey('ttc_log_saved_calm')), findsOneWidget);
+      expect(find.text(ttcLogSavedPill(1)), findsOneWidget);
       expect(fieldsOn(today), contains('calm'));
+      await tester.tap(find.byKey(const ValueKey('ttc_log_saved_pill')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('ttc_log_saved_sheet')), findsOneWidget);
+      expect(find.text(ttcLogSavedSheetTitle('Today')), findsOneWidget);
+      expect(find.byKey(const ValueKey('ttc_log_saved_calm')), findsOneWidget);
     });
 
-    testWidgets('the × takes it off, and Undo puts it back', (tester) async {
+    // Was: the × on the page's saved card, then an Undo in a snack. A snack
+    // cannot be tapped under a sheet, so the Undo is in the row now.
+    testWidgets('the × in the sheet takes it off, and Undo puts it back',
+        (tester) async {
       TtcLogStore.instance.log(kTtcSymptomTracker, 'cramping', 1, on: today);
       await pump(tester, const TtcSymptomLogScreen());
+      await tester.tap(find.byKey(const ValueKey('ttc_log_saved_pill')));
+      await tester.pumpAndSettle();
       await tester.tap(find.byKey(const ValueKey('ttc_log_saved_cramping')));
       await tester.pump();
       expect(fieldsOn(today), isNot(contains('cramping')));
-      expect(find.text(ttcLogRemovedLine('Cramping')), findsOneWidget);
-      // Let the snack finish sliding in before its button is tapped.
-      await tester.pump(const Duration(milliseconds: 600));
-      await tester.tap(find.text('Undo'));
+      expect(find.text(ttcLogSavedLine(0)), findsOneWidget,
+          reason: 'the sheet says what is left');
+      await tester.tap(
+          find.byKey(const ValueKey('ttc_log_saved_undo_cramping')));
       await tester.pump();
       expect(fieldsOn(today), contains('cramping'));
-      await drain(tester);
+      expect(find.text(ttcLogSavedLine(1)), findsOneWidget);
+    });
+
+    testWidgets('the search is a white field with an ink edge, not a tinted '
+        'pill', (tester) async {
+      await pump(tester, const TtcSymptomLogScreen());
+      final field = tester.widget<TextField>(
+          find.byKey(const ValueKey('ttc_log_search')));
+      final d = field.decoration!;
+      expect(d.filled, isTrue);
+      expect(d.fillColor, Colors.white);
+      for (final b in [d.border, d.enabledBorder, d.focusedBorder]) {
+        expect(b, isA<OutlineInputBorder>());
+        final side = (b! as OutlineInputBorder).borderSide;
+        expect(side.color, const Color(0xFF2F2C30), reason: 'ttcInk');
+      }
+      // No lavender (`ttcPanel`) box round it.
+      expect(
+          find.ancestor(
+              of: find.byKey(const ValueKey('ttc_log_search')),
+              matching: find.byWidgetPredicate((w) =>
+                  w is Container &&
+                  w.decoration is BoxDecoration &&
+                  (w.decoration! as BoxDecoration).color ==
+                      const Color(0xFFEDEAF0))),
+          findsNothing);
+    });
+
+    testWidgets('a past day with things saved fits the close row at 360',
+        (tester) async {
+      final d = today.subtract(const Duration(days: 9));
+      TtcLogStore.instance.log(kTtcSymptomTracker, 'calm', 1, on: d);
+      TtcLogStore.instance.log(kTtcSymptomTracker, 'cramping', 1, on: d);
+      TtcLogStore.instance.log(kTtcWeightTracker, kTtcWeightField, 61.5, on: d);
+      await pump(tester, TtcSymptomLogScreen(day: d), height: 780);
+      expect(find.text(ttcLogSavedPill(3)), findsOneWidget);
+      expect(find.byKey(const ValueKey('ttc_log_back_to_today')),
+          findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('the day sits in the close row: the name is above the title',
+        (tester) async {
+      await pump(tester, const TtcSymptomLogScreen());
+      final name =
+          tester.getRect(find.byKey(const ValueKey('ttc_log_day_name')));
+      final title = tester.getRect(find.text('How is today going?'));
+      final search =
+          tester.getRect(find.byKey(const ValueKey('ttc_log_search')));
+      expect(name.bottom, lessThan(title.top));
+      // The day's row IS the close button's row: their middles line up.
+      final close = tester.getRect(find.byType(TtcToolClose));
+      expect((close.center.dy - name.center.dy).abs(), lessThan(24));
+      // And the search is the first thing in the sheet. Measured in the test
+      // font (every glyph a full em, so lines wrap sooner than on a phone):
+      // 284 now, against roughly 440 with the picker band and the saved card.
+      expect(search.top, lessThan(300));
     });
   });
 
@@ -190,7 +270,12 @@ void main() {
               ?.value,
           60.1);
       expect(find.text(ttcLogMeasureSaved('Weight', 'Today')), findsOneWidget);
-      expect(find.text(kTtcMeasureChange), findsOneWidget);
+      // U2 (2026-09-28): the card shows the number, a pencil and a bin.
+      // Was: expect(find.text(kTtcMeasureChange), findsOneWidget);
+      expect(find.text('60.1'), findsOneWidget);
+      expect(find.byTooltip('Change Weight'), findsOneWidget);
+      expect(find.byKey(const ValueKey('ttc_measure_delete_kg')),
+          findsOneWidget);
       await drain(tester);
     });
 
@@ -214,6 +299,43 @@ void main() {
               ?.value,
           64.2);
       await drain(tester);
+    });
+
+    testWidgets('the bin on the card removes, and Undo brings it back',
+        (tester) async {
+      TtcLogStore.instance
+          .log(kTtcWeightTracker, kTtcWeightField, 64.2, on: today);
+      await pump(tester, const TtcSymptomLogScreen());
+      expect(find.byKey(const ValueKey('ttc_measure_delete_°C')),
+          findsNothing,
+          reason: 'no bin on a card with nothing to remove');
+      await tester.tap(find.byKey(const ValueKey('ttc_measure_delete_kg')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+      expect(
+          TtcLogStore.instance.valueFor(kTtcWeightTracker, kTtcWeightField),
+          isNull);
+      expect(find.text(kTtcMeasureWeightHint), findsOneWidget);
+      await tester.tap(find.text('Undo'));
+      await tester.pump();
+      expect(
+          TtcLogStore.instance
+              .valueFor(kTtcWeightTracker, kTtcWeightField)
+              ?.value,
+          64.2);
+      await drain(tester);
+    });
+
+    testWidgets('View chart opens the report on that number', (tester) async {
+      await pump(tester, const TtcSymptomLogScreen());
+      final chart = find.byKey(const ValueKey('ttc_measure_chart_°C'));
+      await tester.ensureVisible(chart);
+      await tester.tap(chart);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 600));
+      final report = tester
+          .widget<TtcCycleReportScreen>(find.byType(TtcCycleReportScreen));
+      expect(report.series, TtcMeasureKind.temperature);
     });
 
     testWidgets('the temperature sheet says how to take it', (tester) async {

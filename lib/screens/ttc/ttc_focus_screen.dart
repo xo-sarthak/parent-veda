@@ -54,6 +54,7 @@ import '../../theme/pv_fonts.dart';
 // import '../../services/bracket_resolver.dart'; // kept for revert: the old TtcDoorTile push (2026-09-26)
 import '../../ttc/ttc_focus_data.dart';
 import '../../data/nutrition_data.dart' show kRecipes;
+import '../../data/reads/read_images.dart' show readImageFor;
 import '../../ttc/ttc_prepare_data.dart';
 import '../nutrition/nutrition_recipes_screen.dart' show RecipeDetailScreen;
 import '../../widgets/pv_placeholders.dart';
@@ -2574,13 +2575,61 @@ TtcArt? artForTile(TtcTile tile) => switch (tile) {
     };
 
 /// The photograph a tile carries, if any.
-String? photoForTile(TtcTile tile) => switch (tile) {
-      // The tile's own picture, else the read's — the read owns it now
-      // (`PvRead.imageUrl`), and the tile only ever overrides.
-      TtcArticleTile(:final imageUrl, :final readId) =>
-        imageUrl ?? (readId == null ? null : ttcReadById(readId)?.imageUrl),
-      _ => null,
-    };
+// Kept for revert (2026-09-28, a photo on every card): only an article tile
+// could carry one, and only from the read's own `imageUrl`, so one card on
+// the Fertile window door had a picture and forty did not.
+// String? photoForTile(TtcTile tile) => switch (tile) {
+//       TtcArticleTile(:final imageUrl, :final readId) =>
+//         imageUrl ?? (readId == null ? null : ttcReadById(readId)?.imageUrl),
+//       _ => null,
+//     };
+//
+// ⚠️ A PHOTO ON EVERY CARD, FROM ONE TABLE (the user, 2026-09-28: "I like
+// that card… get FREE images and put them for each and every card"). The
+// order, strongest first:
+//   1. the tile's own `imageUrl` (an article tile that overrides);
+//   2. the tile's own line in `kReadImageUrls`, keyed `ttcTilePhotoId` —
+//      how a card that opens no read (a tool, a film, a myth, a carousel, a
+//      product, a consult) gets a picture, and how a second card on the same
+//      read avoids showing the same photo twice on one tab;
+//   3. the read's photo, through `readImageFor` — the SAME call the reader's
+//      header makes, so the card she taps is the picture she lands on;
+//   4. a door tile: the door's own hero, which is where the tap lands.
+// Every table line is served from our R2 bucket (`kReadImageBase`) and has
+// its licence in `kReadImageCredits`. No line = the typographic face, never
+// a broken frame.
+String? photoForTile(TtcTile tile) {
+  if (tile case TtcArticleTile(:final imageUrl?)) return imageUrl;
+  if (readImageFor(ttcTilePhotoId(tile)) case final url?) return url;
+  return switch (tile) {
+    TtcArticleTile(:final readId?) =>
+      readImageFor(readId, own: ttcReadById(readId)?.imageUrl),
+    TtcGuideTile(:final readId) =>
+      readImageFor(readId, own: ttcReadById(readId)?.imageUrl),
+    TtcDoorTile(:final bracketId) => ttcFocusPageFor(bracketId)?.heroImageUrl,
+    _ => null,
+  };
+}
+
+/// The key a tile's own photograph sits under in `kReadImageUrls`:
+/// `ttc_tile_` and the title in lower case, words joined by `_`
+/// ("Every day or not?" → `ttc_tile_every_day_or_not`).
+///
+/// ⚠️ BY TITLE, BECAUSE A MYTH OR A CAROUSEL HAS NOTHING ELSE. A film has a
+/// slot and a tool a surface, but one rule for every kind is easier to hold
+/// than six. The cost: renaming a tile drops its photo to the typographic
+/// face until the key is renamed too — a quiet card, never a broken one, and
+/// `test/ttc_door_photos_test.dart` fails on whichever of the nine doors
+/// holds it (all nine since 2026-09-28; the Fertile window door alone
+/// before). It happened the same day: seven cards were retitled and their
+/// photo lines had to follow.
+String ttcTilePhotoId(TtcTile tile) {
+  final slug = tile.title
+      .toLowerCase()
+      .replaceAll(RegExp(r'[^a-z0-9]+'), '_')
+      .replaceAll(RegExp(r'^_+|_+$'), '');
+  return 'ttc_tile_$slug';
+}
 
 IconData iconForFormat(TtcTileFormat format) => switch (format) {
     TtcTileFormat.masterclass => Icons.school_outlined,
@@ -2741,49 +2790,92 @@ void openTtcFocusTile(BuildContext context, TtcTile tile, double hue) {
     // authored slides is content that has not been written yet, and it reads
     // as slightly thin rather than as a different kind of thing. Authoring
     // slides upgrades it in place, with no code change at the call site.
+    // ⚠️ THE COVER SAYS MYTH AND FACT, LABELLED (launch sanity D4, D14,
+    // 2026-09-28). The first slide now carries both halves under the title,
+    // so the answer is on the first screen and a true title can never be
+    // read as the myth. With no authored slides the cover is the whole deck:
+    // the two synthesised slides said the same two things again. Kept for
+    // revert, the synthesised pair:
+    //   cards: slides.isNotEmpty ? slides : [
+    //     TtcCarouselCard(title: 'What people say', body: myth),
+    //     TtcCarouselCard(title: "What's true", body: fact),
+    //   ],
     case TtcMythTile(:final myth, :final fact, :final slides):
       Navigator.of(context).push(MaterialPageRoute<void>(
         settings: const RouteSettings(name: 'ttc/story'),
         builder: (_) => TtcStoryScreen(
           title: tile.title,
-          cards: slides.isNotEmpty
-              ? slides
-              : [
-                  TtcCarouselCard(
-                      title: 'What people say', body: myth),
-                  TtcCarouselCard(title: "What's true", body: fact),
-                ],
+          cards: slides,
           hue: hue,
           reviewedBy: 'ParentVeda team',
           coverTitle: tile.title,
           coverBlurb: tile.blurb,
+          myth: myth,
+          fact: fact,
         ),
       ));
 
-    case TtcVideoTile(:final slotId, :final duration):
+    case TtcVideoTile(:final slotId):
       // ⚠️ THE TILE IS TAPPABLE AND THE PLACEHOLDER INSIDE IT IS NOT. The
       // sheet is honest about there being no film yet; a play control that
       // plays nothing would teach her that taps do nothing.
+      //
+      // ⚠️ AND NO PLAY GLYPH AT ALL (launch sanity D3, 2026-09-28): the
+      // sheet drew `PvVideoPlaceholder`, whose play button sat over "COMING
+      // SOON", and the door tile promised "6 min film". Now the sheet says
+      // what the film will cover, when it is not made yet, and gives her the
+      // notes she can read today. Kept for revert, the placeholder:
+      //   PvVideoPlaceholder(title: tile.title, subtitle: tile.blurb,
+      //       duration: duration, hue: 268, slotId: slotId, flat: true),
+      final film = ttcVideoBySlot(slotId);
+      final notes = [
+        for (final id in film?.readNext ?? const <String>[]) ?ttcReadById(id),
+      ];
       showTtcRowSheet(
         context,
-        eyebrow: tile.format.label,
+        eyebrow: 'Film · Coming soon',
         title: tile.title,
         body: [
-          PvVideoPlaceholder(
-            title: tile.title,
-            subtitle: tile.blurb,
-            duration: duration,
-            hue: 268,
-            slotId: slotId,
-            // Same reasoning as the hero above: inside a sheet this is the
-            // only object on screen, so the gradient has nothing to separate
-            // itself from.
-            flat: true,
-          ),
+          Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            const Padding(
+              padding: EdgeInsets.only(top: 2),
+              child: Icon(Icons.schedule_rounded, size: 18, color: ttcSoft),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                  "We're still making this film. It isn't ready to watch yet.",
+                  key: const ValueKey('ttc_film_coming_soon'),
+                  style: ttcBody(14, color: ttcSoft, h: 1.5)),
+            ),
+          ]),
           const SizedBox(height: 14),
-          Text(
-              "We're still making this film. It will play here when it's ready.",
-              style: ttcBody(13.5, color: ttcSoft, h: 1.6)),
+          Text(film?.why.en ?? tile.blurb,
+              style: ttcBody(15, color: ttcTitleInk, h: 1.55)),
+          if (notes.isNotEmpty) ...[
+            const SizedBox(height: 18),
+            ttcEyebrow('Read the notes now'),
+            const SizedBox(height: 6),
+            for (final r in notes.take(3))
+              InkWell(
+                onTap: () {
+                  Navigator.of(context).pop();
+                  openTtcArticle(context, r.id, hue: hue);
+                },
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(minHeight: 48),
+                  child: Row(children: [
+                    Expanded(
+                      child: Text(r.title.en,
+                          style: ttcBody(15,
+                              color: ttcTitleInk, w: FontWeight.w700)),
+                    ),
+                    const Icon(Icons.chevron_right_rounded,
+                        size: 20, color: ttcSoft),
+                  ]),
+                ),
+              ),
+          ],
         ],
       );
 
@@ -3389,7 +3481,18 @@ void openTtcArticle(
       customBlock: ttcReadCustomBlock,
       // The read's own picture wins over the tile's drawn art; the drawn art
       // is the fallback while the picture loads or when there is none.
-      hero: (art == null && (imageUrl ?? read.imageUrl) == null)
+      // ⚠️ A TABLE PHOTO GOES TO THE READER'S OWN FRAME (2026-09-28). A read
+      // whose picture is a line in `kReadImageUrls` (a free-licence photo on
+      // R2) opens with no caller hero, so the reader draws it AND prints its
+      // licence line under it (`_photoCredit` is null whenever a hero is
+      // passed). A CC BY picture without its credit is not a free picture.
+      // Kept for revert:
+      // hero: (art == null && (imageUrl ?? read.imageUrl) == null)
+      //     ? null
+      //     : TtcHeroArt(
+      //         art: art, tint: tint, imageUrl: imageUrl ?? read.imageUrl),
+      hero: ((imageUrl ?? read.imageUrl) == null &&
+              (art == null || readImageFor(readId) != null))
           ? null
           : TtcHeroArt(
               art: art, tint: tint, imageUrl: imageUrl ?? read.imageUrl),

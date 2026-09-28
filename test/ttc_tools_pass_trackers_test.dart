@@ -174,11 +174,15 @@ void main() {
   group('symptom log', () {
     testWidgets('a tap is seen to save', (tester) async {
       await pumpTall(tester, const TtcSymptomLogScreen());
-      expect(find.text(ttcLogSavedLine(0)), findsOneWidget);
+      // 2026-09-28: no "Nothing saved" line at the top any more; the count
+      // is a pill in the hero once something is saved. Was:
+      //   expect(find.text(ttcLogSavedLine(0)), findsOneWidget);
+      expect(find.text(ttcLogSavedLine(0)), findsNothing);
       expect(find.text(kTtcLogHowItWorks), findsOneWidget);
       await tester.tap(find.text('Calm'));
       await tester.pump();
-      expect(find.text(ttcLogSavedLine(1)), findsOneWidget);
+      // Was: expect(find.text(ttcLogSavedLine(1)), findsOneWidget);
+      expect(find.text(ttcLogSavedPill(1)), findsOneWidget);
     });
 
     test('search finds the words she would type', () {

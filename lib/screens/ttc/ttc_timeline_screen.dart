@@ -48,6 +48,7 @@ import 'ttc_strings.dart';
 import 'ttc_surface_router.dart' show openTtcSurface;
 import 'ttc_today_screen.dart' show logTtcPeriod;
 import 'ttc_tool_chrome.dart';
+import 'ttc_tool_hues.dart';
 
 void openTtcTimeline(BuildContext context) {
   Navigator.of(context).push(MaterialPageRoute<void>(
@@ -114,7 +115,9 @@ class _TtcTimelineScreenState extends State<TtcTimelineScreen> {
         // Kept for revert (2026-09-27, night): a plain Scaffold with
         // `TtcBackBar(title: t.familyTimeline)` and a ListView of cards.
         return TtcToolScaffold(
-          hue: 104,
+          // T6 (2026-09-28): the Journey map's group colour, named. Kept for
+          // revert: hue: 104,
+          hue: kTtcToolHuePlan,
           eyebrow: hi ? t.familyTimeline : 'Family timeline',
           title: 'Your story, in date order.',
           // What this is, first (2026-09-27). Kept for revert:

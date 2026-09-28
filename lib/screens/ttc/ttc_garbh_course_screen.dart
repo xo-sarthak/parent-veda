@@ -35,6 +35,7 @@ import '../../ttc/ttc_garbh_course_store.dart';
 import '../../ttc/ttc_practice_data.dart';
 import '../v2/v2_palette.dart';
 import 'ttc_mind_today_screen.dart';
+import 'ttc_practice_card_parts.dart';
 import 'ttc_practice_player.dart';
 import 'ttc_surface_router.dart';
 import 'ttc_tool_chrome.dart';
@@ -385,7 +386,15 @@ class _TtcCourseSessionScreenState extends State<TtcCourseSessionScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 2),
-                  Row(children: [
+                  // ⚠️ ONE QUIET LINE FOR TIME AND WHO (2026-09-28), as on the
+                  // practice cards: two bold lines behind a clock and a people
+                  // icon were icons for plain facts. Headspace's session list
+                  // says the length in one quiet line
+                  // (https://mobbin.com/screens/f2297328-ef5d-42b9-96ba-e851f428f5e4).
+                  Text('${s.duration} · ${s.setting}', style: ttcCardMeta(p)),
+                  // Kept for revert (2026-09-28): the icon row below.
+                  // ignore: dead_code
+                  if (false) Row(children: [
                     Icon(Icons.schedule_rounded, size: 15, color: p.ink3),
                     const SizedBox(width: 7),
                     Text(s.duration,
@@ -478,11 +487,13 @@ class _TtcCourseSessionScreenState extends State<TtcCourseSessionScreen> {
         // Classic below for the reasoning; the words are unchanged.
         if (s.betterTogether) ...[
           const SizedBox(height: 16),
+          // The card family's inset and corner (2026-09-28; was all(13),
+          // radius 14), so every block on the page shares one left edge.
           Container(
-            padding: const EdgeInsets.all(13),
+            padding: kTtcCardPad,
             decoration: BoxDecoration(
               color: p.surfaceAlt,
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(kTtcCardRadius),
             ),
             child: Row(children: [
               Icon(Icons.people_outline_rounded, size: 15, color: p.ink3),
@@ -541,22 +552,20 @@ class _TtcCourseSessionScreenState extends State<TtcCourseSessionScreen> {
         // the sentence that lowers the stakes, and the first part is the one
         // every visit sees.
         const SizedBox(height: 16),
+        // The card family (2026-09-28): its inset, corner, title and body.
+        // Kept for revert: padding all(15), radius 16, the heading in bold
+        // Manrope 12.5 ink2 and the words in Manrope 13 ink1.
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(15),
+          padding: kTtcCardPad,
           decoration: BoxDecoration(
             color: p.surfaceAlt,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(kTtcCardRadius),
           ),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text('Said plainly',
-                style: pvManrope(
-                    fontSize: 12.5,
-                    fontWeight: FontWeight.w800,
-                    color: p.ink2)),
+            Text('Said plainly', style: ttcCardTitle(p)),
             const SizedBox(height: 6),
-            Text(s.saidPlainly,
-                style: pvManrope(fontSize: 13, height: 1.6, color: p.ink1)),
+            Text(s.saidPlainly, style: ttcCardBody(p)),
           ]),
         ),
       ];
@@ -866,8 +875,56 @@ class _TaughtPractice extends StatelessWidget {
   final TtcPractice practice;
   final V2Palette p;
 
+  // ⚠️ THE SAME CARD AS ON TODAY, WITH THE PLAYER INSIDE IT (2026-09-28). It
+  // was a loose title, a 12.5 blurb, the player and a line of bold coloured
+  // text as the way to the full card: no edge, a third text size and a text
+  // link. Now the practice's own tint (Move or Breathe, the colour of its
+  // Today card), the chip, title, body and one quiet line of time and place,
+  // the player, and a white pill to the full card. Headspace's course session
+  // holds its technique in a card with the length under the title
+  // (https://mobbin.com/screens/cda46030-4c2b-4b7c-b6f1-6e08db0ddf96).
+  // The white pill, not the ink one: the player's Start is this card's main
+  // action. The loose layout is `_buildLoose`, kept for revert.
   @override
-  Widget build(BuildContext context) => Column(
+  Widget build(BuildContext context) {
+    final move = practice.kind == TtcPracticeKind.move;
+    final tint = v2BlockTint(move ? kTtcMoveHue : kTtcBreatheHue, p);
+    return Container(
+      width: double.infinity,
+      padding: kTtcCardPad,
+      decoration: BoxDecoration(
+        color: tint,
+        borderRadius: BorderRadius.circular(kTtcCardRadius),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        TtcCardChip(
+            label: move ? 'Move' : 'Breathe',
+            icon: move ? Icons.self_improvement_rounded : Icons.air_rounded,
+            fg: ttcCardDeep(tint),
+            bg: Colors.white.withValues(alpha: 0.82)),
+        const SizedBox(height: 14),
+        Text(practice.title, style: ttcCardTitle(p)),
+        const SizedBox(height: 6),
+        Text(practice.blurb, style: ttcCardBody(p)),
+        const SizedBox(height: 10),
+        Text('${practice.duration} · ${practice.setting}',
+            style: ttcCardMeta(p)),
+        const SizedBox(height: 16),
+        TtcPracticeSession(practice: practice),
+        const SizedBox(height: 16),
+        // ⚠️ THE FULL CARD IS ONE TAP AWAY AND IS NOT COPIED HERE (below).
+        TtcQuietPill(
+          label: 'The full steps, and when to skip it',
+          icon: Icons.format_list_numbered_rounded,
+          onTap: () => openTtcSurface(context, 'ttc_practice/${practice.id}'),
+        ),
+      ]),
+    );
+  }
+
+  // Kept for revert (2026-09-28). Nothing calls it.
+  // ignore: unused_element
+  Widget _buildLoose(BuildContext context) => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(practice.title,
@@ -1354,23 +1411,22 @@ class _Panel extends StatelessWidget {
   final String heading;
   final String body;
 
+  // The card family (2026-09-28): its inset, corner, title and body, so the
+  // session's notes and its practices are one kind of object. Kept for
+  // revert: padding all(15), radius 18, heading bold Manrope 13 ink1, the
+  // body Manrope 13 ink1 at 1.65.
   @override
   Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.all(15),
+        width: double.infinity,
+        padding: kTtcCardPad,
         decoration: BoxDecoration(
           color: tint,
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(kTtcCardRadius),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          // Sentence case since 2026-09-27; was 9.5, tracked, for capitals.
-          Text(heading,
-              style: pvManrope(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w800,
-                  color: p.ink1)),
-          const SizedBox(height: 7),
-          Text(body,
-              style: pvManrope(fontSize: 13, height: 1.65, color: p.ink1)),
+          Text(heading, style: ttcCardTitle(p)),
+          const SizedBox(height: 6),
+          Text(body, style: ttcCardBody(p)),
         ]),
       );
 }
@@ -1388,24 +1444,23 @@ class _Keep extends StatelessWidget {
   final String blurb;
   final List<Widget> children;
 
+  // The card family's inset, corner, title and body (2026-09-28). White with
+  // a hairline still: these hold controls (times, picks), not a practice.
+  // Kept for revert: padding all(15), radius 18, heading bold Manrope 13,
+  // blurb Manrope 12.5.
   @override
   Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.all(15),
+        width: double.infinity,
+        padding: kTtcCardPad,
         decoration: BoxDecoration(
           color: p.surface,
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(kTtcCardRadius),
           border: Border.all(color: p.line),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          // Sentence case since 2026-09-27; was 9.5, tracked, for capitals.
-          Text(heading,
-              style: pvManrope(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w800,
-                  color: p.ink1)),
+          Text(heading, style: ttcCardTitle(p)),
           const SizedBox(height: 6),
-          Text(blurb,
-              style: pvManrope(fontSize: 12.5, height: 1.55, color: p.ink2)),
+          Text(blurb, style: ttcCardBody(p)),
           const SizedBox(height: 12),
           ...children,
         ]),

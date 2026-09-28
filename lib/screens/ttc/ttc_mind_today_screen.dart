@@ -59,7 +59,11 @@ import '../../ttc/ttc_garbh_course_store.dart';
 import '../../ttc/ttc_log_store.dart';
 import '../../ttc/ttc_mind_today.dart';
 import '../../ttc/ttc_practice_data.dart';
+import '../products/pv_store_chrome.dart' show pvSnack;
+import '../../ttc/ttc_daily_data.dart' show TtcRitualPart;
 import '../v2/v2_palette.dart';
+import 'doors/ttc_door_screen.dart' show openTtcDoor;
+import 'ttc_practice_card_parts.dart';
 import 'ttc_tool_chrome.dart';
 import 'ttc_surface_router.dart';
 
@@ -72,6 +76,22 @@ import 'ttc_surface_router.dart';
 /// door's palette to be kept in step later.
 const double kTtcMoveHue = 104;
 const double kTtcBreatheHue = 206;
+
+/// The hue a breathing page's hero FIELD is painted from, not its cards.
+///
+/// ⚠️ 186, NOT 206, AND THE REASON IS THE FIELD'S SECOND HUE (launch sanity
+/// MB13, 2026-09-28). `V3HeroField` paints two hues, the one it is given and
+/// one 34 degrees further round, so a gradient has somewhere to travel to.
+/// From 206 (the slate blue of the Breathe card) the second hue lands on 240,
+/// which at the field's lightness is lilac, so the player she opened from a
+/// blue card had a purple header. From 106 the movement field's second hue is
+/// 138, still green, which is why only breath showed it. Starting at 186 puts
+/// both stops (186 and 220) inside the blue family and centred on the card's
+/// 206. Cards, rings and buttons still use [kTtcBreatheHue].
+const double kTtcBreatheFieldHue = 186;
+
+/// The Getting ready door, where food is taught (the bracket id).
+const String kTtcGettingReadyDoorId = 'ttc_preconception_health';
 
 /// Today on a page of its own, for anything that opens `ttc_mind_today` as a
 /// destination rather than rendering it inside the door's first tab.
@@ -87,7 +107,9 @@ class TtcMindTodayScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => TtcToolScaffold(
-        hue: kTtcBreatheHue,
+        // The breath field's hue (MB13, 2026-09-28). Kept for revert:
+        //   hue: kTtcBreatheHue,
+        hue: kTtcBreatheFieldHue,
         eyebrow: 'MIND & BODY',
         title: 'Today',
         intro: 'One movement, one breath and two small things. Nothing here '
@@ -160,7 +182,10 @@ class TtcMindTodayBody extends StatelessWidget {
 
           // 24, the door's gap between blocks (2026-09-27; was 22).
           const SizedBox(height: 24),
-          _inset(_label("Today's breathing", p)),
+          // "Today's breath", the Sanskar's own name for the same card (MB18,
+          // 2026-09-28: one picker, so one name). Kept for revert:
+          //   _inset(_label("Today's breathing", p)),
+          _inset(_label("Today's breath", p)),
           const SizedBox(height: 12),
           _inset(
               _PracticeBlock(practice: breathe, hue: kTtcBreatheHue, p: p)),
@@ -253,6 +278,8 @@ class _PracticeBlock extends StatelessWidget {
 
   /// The mark behind the block. Read from the animation rather than the kind,
   /// so the walk gets a walk and the listen gets a wave.
+  // Unused since the art left the card (2026-09-28); kept for revert.
+  // ignore: unused_element
   IconData get _mark => switch (practice.anim) {
         TtcBreathAnim() => Icons.air_rounded,
         TtcBodyScanAnim() => Icons.accessibility_new_rounded,
@@ -282,42 +309,50 @@ class _PracticeBlock extends StatelessWidget {
         child: Stack(children: [
           // Large, quiet, and cropped by the block — the same treatment the
           // door's own tiles use where there is no illustration yet.
-          Positioned(
-            right: -18,
-            bottom: -14,
-            child: Icon(_mark,
-                size: 132, color: Colors.white.withValues(alpha: 0.42)),
-          ),
+          // ⚠️ NO ART BEHIND THE WORDS (the user, 2026-09-28: the basics of
+          // placement inside these cards). The 132pt faded figure sat under
+          // the time and place line. Headspace and Calm keep a practice card's
+          // text on a clean ground (https://mobbin.com/screens/d05b1798-9389-4073-999b-693b84cca19e);
+          // the card's colour already says Move or Breathe. Kept for revert:
+          //   Positioned(right: -18, bottom: -14, child: Icon(_mark, size: 132,
+          //       color: Colors.white.withValues(alpha: 0.42))),
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 15, 16, 15),
+            padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(children: [
+                  // ⚠️ NO KIND CHIP (launch sanity MB6 and MB2, 2026-09-28).
+                  // The heading above each card already says "Today's
+                  // movement" or "Today's breath"; a "Move" chip inside said it
+                  // a second time, and its seated-meditator icon showed
+                  // meditation on a card about neck rolls. Headspace's Today
+                  // cards carry a title, one line and the action, nothing
+                  // naming the section again
+                  // (https://mobbin.com/screens/efc82d96-660f-4e91-bff9-1f3d083c34eb).
+                  // Kept for revert, the chip that led the row:
+                  //   _Chip(
+                  //       label: practice.kind == TtcPracticeKind.move
+                  //           ? 'Move' : 'Breathe',
+                  //       icon: practice.kind == TtcPracticeKind.move
+                  //           ? Icons.self_improvement_rounded
+                  //           : Icons.air_rounded,
+                  //       fg: deep,
+                  //       bg: Colors.white.withValues(alpha: 0.82)),
+                  //   const Spacer(),
+                  //
+                  // ⚠️ DONE IS A CHIP THAT SAYS SO, NOT A TICK IN A CORNER. A
+                  // bare check mark on a coloured block reads as a selection
+                  // control — something you are being asked to set — which is
+                  // exactly backwards on a card recording what already
+                  // happened.
+                  if (done) ...[
                     _Chip(
-                        // Kept for revert (2026-09-27): 'MOVE' / 'BREATHE'.
-                        label: practice.kind == TtcPracticeKind.move
-                            ? 'Move'
-                            : 'Breathe',
-                        icon: practice.kind == TtcPracticeKind.move
-                            ? Icons.self_improvement_rounded
-                            : Icons.air_rounded,
-                        fg: deep,
-                        bg: Colors.white.withValues(alpha: 0.82)),
-                    const Spacer(),
-                    // ⚠️ DONE IS A CHIP THAT SAYS SO, NOT A TICK IN A CORNER. A
-                    // bare check mark on a coloured block reads as a selection
-                    // control — something you are being asked to set — which is
-                    // exactly backwards on a card recording what already
-                    // happened.
-                    if (done)
-                      _Chip(
-                          label: 'Done today',
-                          icon: Icons.check_rounded,
-                          fg: Colors.white,
-                          bg: deep.withValues(alpha: 0.92)),
-                  ]),
-                  const SizedBox(height: 14),
+                        label: 'Done today',
+                        icon: Icons.check_rounded,
+                        fg: Colors.white,
+                        bg: deep.withValues(alpha: 0.92)),
+                    const SizedBox(height: 14),
+                  ],
                   // 18, under the 21 of the heading above it now that the
                   // heading is serif too (2026-09-27): a card title the same
                   // size as its section heading flattens the hierarchy.
@@ -329,14 +364,27 @@ class _PracticeBlock extends StatelessWidget {
                           height: 1.18,
                           letterSpacing: -0.4,
                           color: p.ink1)),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 6),
                   // Room for the whole blurb: the block is full width and the
                   // blurb is two lines by construction in the library.
                   Text(practice.blurb,
                       style: pvManrope(
-                          fontSize: 13, height: 1.55, color: p.ink2)),
-                  const SizedBox(height: 14),
-                  Row(children: [
+                          fontSize: 13.5, height: 1.5, color: p.ink2)),
+                  const SizedBox(height: 10),
+                  // ⚠️ ONE QUIET LINE FOR TIME AND PLACE (2026-09-28): two bold
+                  // coloured lines with icons made four text styles in one
+                  // card. The card's own wording, unformatted, as before.
+                  Text('${practice.duration} · ${practice.setting}',
+                      maxLines: 2,
+                      style: pvManrope(
+                          fontSize: 12.5,
+                          height: 1.4,
+                          fontWeight: FontWeight.w600,
+                          color: p.ink3)),
+                  const SizedBox(height: 16),
+                  // Kept for revert (2026-09-28): the icon row below.
+                  // ignore: dead_code
+                  if (false) Row(children: [
                     Icon(Icons.schedule_rounded, size: 14, color: deep),
                     const SizedBox(width: 6),
                     // ⚠️ THE CARD'S OWN WORDING, NOT A NUMBER WE FORMAT. "About
@@ -367,23 +415,34 @@ class _PracticeBlock extends StatelessWidget {
                               color: deep)),
                     ),
                   ]),
-                  const SizedBox(height: 14),
-                  // The affordance, spelled out. On a block with no chevron and
-                  // no button, "is this a card or a picture" is a real question.
-                  Row(children: [
-                    Text(done ? 'Do it again' : 'Start',
-                        style: pvManrope(
-                            fontSize: 13.5,
-                            fontWeight: FontWeight.w800,
-                            color: p.ink1)),
-                    const SizedBox(width: 5),
-                    Icon(Icons.arrow_forward_rounded, size: 15, color: p.ink1),
-                  ]),
+                  // ⚠️ A BUTTON, NOT A LINE OF BOLD TEXT (2026-09-28): an ink
+                  // pill says "press me" the way every other action in the app
+                  // does. Kept for revert: Row(Text('Start', w800), arrow icon).
+                  Container(
+                    padding: const EdgeInsets.fromLTRB(16, 9, 12, 9),
+                    decoration: BoxDecoration(
+                      color: p.ink1,
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: Row(mainAxisSize: MainAxisSize.min, children: [
+                      Text(done ? 'Do it again' : 'Start',
+                          style: pvManrope(
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white)),
+                      const SizedBox(width: 4),
+                      const Icon(Icons.arrow_forward_rounded,
+                          size: 16, color: Colors.white),
+                    ]),
+                  ),
                   // ⚠️ WHAT "START" LEADS TO, SAID BEFORE THE TAP (tools pass,
                   // 2026-09-27). She had to go in to find out it is a guided
                   // page, and that the "Done today" chip comes from a button
                   // at its end.
-                  if (!done) ...[
+                  // The help line went with the button (2026-09-28): the
+                  // player says what to do on its own page. Kept for revert.
+                  // ignore: dead_code
+                  if (false && !done) ...[
                     const SizedBox(height: 4),
                     Text(
                         'Opens the steps and a timer. Tap "Mark done today" '
@@ -434,8 +493,53 @@ class _YourPracticeStrip extends StatelessWidget {
   const _YourPracticeStrip({required this.p});
   final V2Palette p;
 
+  /// Back to a different card each day, said out loud with a way back
+  /// (the user's rule: tell her before anything changes). Until 2026-09-28 a
+  /// tap on the bold line cleared her session 8 choice silently.
+  void _clear(BuildContext context) {
+    final store = TtcGarbhCourseStore.instance;
+    final move = store.moveId;
+    final breathe = store.breatheId;
+    final couple = store.couple;
+    store.clearDailyPractice();
+    pvSnack(context, 'Today now shows a different practice each day.',
+        icon: Icons.check_rounded,
+        action: 'Undo',
+        onAction: () => store.setDailyPractice(
+            moveId: move, breatheId: breathe, couple: couple),
+        lift: 24);
+  }
+
+  // ⚠️ THE CARD FAMILY'S SHAPE, AND A BUTTON FOR THE WAY BACK (2026-09-28).
+  // It was a 16pt strip with an icon and a line of bold coloured text as the
+  // action, a text link the user's pass rules out. Now the family's radius
+  // and padding, one sentence, and a white pill that says what it does, as
+  // Noom's "Today's plan" puts a small pill on a row
+  // (https://mobbin.com/screens/1368bd6c-14cf-4d22-abd9-c429c529443c).
+  // The strip as it was is `_buildStrip`, kept for revert.
   @override
   Widget build(BuildContext context) => Container(
+        width: double.infinity,
+        padding: kTtcCardPad,
+        decoration: BoxDecoration(
+          color: p.surfaceAlt,
+          borderRadius: BorderRadius.circular(kTtcCardRadius),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text('You picked this practice in the free preconception course.',
+              style: ttcCardBody(p)),
+          const SizedBox(height: 12),
+          TtcQuietPill(
+            label: 'Show a different practice each day',
+            icon: Icons.shuffle_rounded,
+            onTap: () => _clear(context),
+          ),
+        ]),
+      );
+
+  // Kept for revert (2026-09-28). Nothing calls it.
+  // ignore: unused_element
+  Widget _buildStrip(BuildContext context) => Container(
         padding: const EdgeInsets.fromLTRB(13, 11, 11, 11),
         decoration: BoxDecoration(
           color: p.surfaceAlt,
@@ -497,23 +601,37 @@ class _CouplePart extends StatelessWidget {
         ),
     };
 
+    // ⚠️ THE SAME CARD AS THE TWO PRACTICES ABOVE IT (2026-09-28). It was a
+    // white bordered box with a 16.5 title and a 12.5 body, the one card on
+    // Today in a different shape. Now the family's tint, padding and type,
+    // with a "Together" chip where the practices say Move or Breathe, in the
+    // colour the home's Sanskar gives the same part (`ttcRitualPartHue`), so
+    // gratitude is one colour wherever she meets it. No button: it is a line
+    // to say to each other, and there is nothing to open.
+    // Kept for revert: Container(padding: all(15), surface, radius 18,
+    //   border p.line; title pvFraunces 16.5; blurb pvManrope 12.5).
+    final tint = v2BlockTint(
+        ttcRitualPartHue(part == TtcCoupleDaily.gratitude
+            ? TtcRitualPart.gratitude
+            : TtcRitualPart.conversation),
+        p);
     return Container(
-      padding: const EdgeInsets.all(15),
+      width: double.infinity,
+      padding: kTtcCardPad,
       decoration: BoxDecoration(
-        color: p.surface,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: p.line),
+        color: tint,
+        borderRadius: BorderRadius.circular(kTtcCardRadius),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(title,
-            style: pvFraunces(
-                fontSize: 16.5,
-                fontWeight: FontWeight.w600,
-                height: 1.25,
-                color: p.ink1)),
+        TtcCardChip(
+            label: 'Together',
+            icon: Icons.people_outline_rounded,
+            fg: ttcCardDeep(tint),
+            bg: Colors.white.withValues(alpha: 0.82)),
+        const SizedBox(height: 14),
+        Text(title, style: ttcCardTitle(p)),
         const SizedBox(height: 6),
-        Text(blurb,
-            style: pvManrope(fontSize: 12.5, height: 1.55, color: p.ink2)),
+        Text(blurb, style: ttcCardBody(p)),
       ]),
     );
   }
@@ -535,12 +653,17 @@ class _TickPanel extends StatelessWidget {
     // hers is the app forgetting what it asked her.
     final bed = TtcGarbhCourseStore.instance.bedtime;
 
+    // The family's radius (2026-09-28; was 18) so the panel lines up with the
+    // cards above it. It stays white with a hairline: it is a checklist, not a
+    // practice, and Noom's "Today's plan" keeps its ticks on a plain ground
+    // (https://mobbin.com/screens/1368bd6c-14cf-4d22-abd9-c429c529443c).
     return Container(
       decoration: BoxDecoration(
         color: p.surface,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(kTtcCardRadius),
         border: Border.all(color: p.line),
       ),
+      clipBehavior: Clip.antiAlias,
       child: Column(children: [
         _Tick(
           p: p,
@@ -554,7 +677,8 @@ class _TickPanel extends StatelessWidget {
           action: bed == null ? 'Pick your own time' : 'Change time',
           onAction: () => _pickBedtime(context, bed),
         ),
-        Divider(height: 1, thickness: 1, color: p.line, indent: 15, endIndent: 15),
+        // Indented to the card's 18 with the rows (2026-09-28; was 15).
+        Divider(height: 1, thickness: 1, color: p.line, indent: 18, endIndent: 18),
         _Tick(
           p: p,
           field: kTtcHomeCookedField,
@@ -562,7 +686,18 @@ class _TickPanel extends StatelessWidget {
           // ⚠️ IT DOES NOT TEACH FOOD, AND THAT IS A BOUNDARY THE BRIEF SETS:
           // this area "references Getting ready, does not own or teach food".
           // So the tick records the fact and says nothing about what to eat.
-          blurb: 'Mostly home-cooked counts. What to eat is in Getting ready.',
+          // ⚠️ "GETTING READY" IS A PILL THAT GOES THERE (launch sanity MB8,
+          // 2026-09-28). The blurb named another door she could not tap. Now
+          // the words say what counts and the pill opens the Getting ready
+          // door on its Diet tab, the same quiet pill as the bedtime's. Kept
+          // for revert:
+          //   blurb: 'Mostly home-cooked counts. What to eat is in Getting '
+          //       'ready.',
+          blurb: 'Mostly home-cooked counts.',
+          action: 'What to eat, in Getting ready',
+          actionIcon: Icons.restaurant_outlined,
+          onAction: () => openTtcDoor(context, kTtcGettingReadyDoorId,
+              initialGroup: 'diet'),
         ),
       ]),
     );
@@ -593,6 +728,7 @@ class _Tick extends StatelessWidget {
       required this.label,
       required this.blurb,
       this.action,
+      this.actionIcon = Icons.schedule_rounded,
       this.onAction});
 
   final V2Palette p;
@@ -602,17 +738,23 @@ class _Tick extends StatelessWidget {
 
   /// An optional small link under the blurb (the bedtime's "Change time").
   final String? action;
+
+  /// The pill's icon. The bedtime's clock by default.
+  final IconData actionIcon;
   final VoidCallback? onAction;
 
   @override
   Widget build(BuildContext context) {
     final on = ttcHabitTicked(field);
 
+    // ⚠️ ONE EDGE, TWO TEXT STYLES, A BUTTON FOR THE TIME (2026-09-28). The
+    // row's inset is the card family's 18 (was 15), the hint is the family's
+    // body colour rather than a third grey, and "Change time" is a small white
+    // pill instead of a line of bold coloured text.
     return InkWell(
       onTap: () => ttcSetHabitTick(field, !on),
-      borderRadius: BorderRadius.circular(18),
       child: Padding(
-        padding: const EdgeInsets.all(15),
+        padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
           AnimatedContainer(
             duration: const Duration(milliseconds: 130),
@@ -641,8 +783,18 @@ class _Tick extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(blurb,
                       style: pvManrope(
-                          fontSize: 12.5, height: 1.5, color: p.ink3)),
-                  if (action != null && onAction != null)
+                          fontSize: 12.5, height: 1.5, color: p.ink2)),
+                  if (action != null && onAction != null) ...[
+                    const SizedBox(height: 10),
+                    TtcQuietPill(
+                        label: action!,
+                        icon: actionIcon,
+                        onTap: onAction!),
+                  ],
+                  // Kept for revert (2026-09-28): the action as bold text.
+                  // ignore: dead_code
+                  if (false && action != null && onAction != null)
+                    // ignore: dead_code
                     GestureDetector(
                       onTap: onAction,
                       behavior: HitTestBehavior.opaque,

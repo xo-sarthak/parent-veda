@@ -225,8 +225,8 @@ class _BrandShowcaseScreenState extends State<BrandShowcaseScreen> {
           ),
           Switch(
             value: on,
-            activeTrackColor: _purple,
-            activeThumbColor: Colors.white,
+            // Kept for revert (2026-09-28, one black switch app-wide): activeTrackColor: _purple,
+            // Kept for revert (2026-09-28, one black switch app-wide): activeThumbColor: Colors.white,
             onChanged: (v) => setState(() => BrandStudio.instance.demoMode = v),
           ),
         ]),

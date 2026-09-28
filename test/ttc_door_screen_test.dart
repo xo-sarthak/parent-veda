@@ -305,6 +305,27 @@ void main() {
                 findsNothing,
                 reason: '"${s.heading}" drew as rows again',
               );
+              // Launch sanity D13, MB20 (2026-09-28): a section of ONE piece
+              // is the one card at full width, and a way to another door is a
+              // link row. Both hold here instead of the rail.
+              for (final t in s.tiles.whereType<TtcDoorTile>()) {
+                expect(
+                  find.byKey(ttcDoorLinkKey(t.bracketId), skipOffstage: false),
+                  findsWidgets,
+                  reason: '"${t.title}" is not a link row',
+                );
+              }
+              final railTiles = ttcDoorRailTiles(s.tiles);
+              if (railTiles.isEmpty) continue;
+              if (railTiles.length == 1) {
+                expect(
+                  find.byKey(ttcDoorSectionWideKey(s.heading),
+                      skipOffstage: false),
+                  findsOneWidget,
+                  reason: '"${s.heading}" holds one piece and is not wide',
+                );
+                continue;
+              }
               final rail = find.byKey(
                 ttcDoorSectionRailKey(s.heading),
                 skipOffstage: false,
@@ -373,6 +394,15 @@ void main() {
         expect(find.byType(Image), findsNothing);
         expect(tester.getSize(find.byType(TtcDoorSectionCard)),
             const Size(kTtcDoorCardWidth, kTtcDoorCardHeight));
+        // The title sits at the foot, over the kind and minutes, not under
+        // the mark with the space below it empty (the user, 2026-09-28).
+        final card = tester.getRect(find.byType(TtcDoorSectionCard));
+        final title = tester.getRect(find.textContaining('A long title'));
+        final foot = tester.getRect(find.text('Article · 4 min read'));
+        expect(title.top, greaterThan(card.top + card.height / 3),
+            reason: 'the title leads again, with the space under it empty');
+        expect(foot.top - title.bottom, lessThanOrEqualTo(8),
+            reason: 'a gap opened between the title and its foot');
       });
     },
   );
@@ -461,7 +491,9 @@ void main() {
       final page =
           kTtcFocusPages.firstWhere((p) => p.bracketId == 'ttc_mind_body');
       await pumpDoor(tester, page, height: 6000);
-      for (final h in ["Today's movement", "Today's breathing",
+      // "Today's breath" since 2026-09-28 (launch sanity MB18, the Sanskar's
+      // name for the same card). Kept for revert: "Today's breathing".
+      for (final h in ["Today's movement", "Today's breath",
           'Two small things']) {
         final st = tester.widget<Text>(find.text(h)).style!;
         expect(st.fontFamily, want.fontFamily, reason: h);
@@ -504,21 +536,30 @@ void main() {
       },
     );
 
+    // ⚠️ SINCE 2026-09-28 (the user's option B) ONLY THE TABS IN
+    // `kTtcDoorFlagTabs` OPEN ON A SAFETY LINE, and there as one short line.
+    // This used to walk Mind & body, whose Hard days and Talk tabs both
+    // carried the folded row; they no longer do (test/ttc_get_help_test.dart
+    // holds that). Kept for revert, the old walk:
+    //   page = mind_body; for each tab with pinnedRedFlagReadIds: pick it,
+    //   expect the row findsOneWidget, height < 90, above every heading.
     testWidgets('the folded flag is compact and sits above the content',
         (tester) async {
       final page =
-          kTtcFocusPages.firstWhere((p) => p.bracketId == 'ttc_mind_body');
+          kTtcFocusPages.firstWhere((p) => p.bracketId == 'ttc_after_loss');
       await pumpDoor(tester, page, height: 6000);
       var seen = 0;
       for (var i = 0; i < page.groups!.length; i++) {
         final g = page.groups![i];
         if (g.pinnedRedFlagReadIds.isEmpty) continue;
+        if (!ttcDoorShowsFlag(page.bracketId, g.id)) continue;
         await pickTab(tester, i);
         for (final rid in g.pinnedRedFlagReadIds) {
           final row = find.byKey(ttcDoorFlagKey(rid), skipOffstage: false);
           expect(row, findsOneWidget, reason: rid);
-          expect(tester.getSize(row).height, lessThan(90),
-              reason: '$rid: the flag is a block again, not a row');
+          // One short line now (2026-09-28). Kept for revert: lessThan(90).
+          expect(tester.getSize(row).height, lessThan(60),
+              reason: '$rid: the flag is a block again, not a line');
           seen++;
         }
         // Above every section heading on the tab.
@@ -537,17 +578,24 @@ void main() {
       expect(seen, greaterThan(0));
     });
 
-    testWidgets('Mind and body Talk carries both flags', (tester) async {
+    // Reversed 2026-09-28 (the user's option B): Talk opens on its content,
+    // and both reads keep their lists in their own "When to see someone".
+    // Kept for revert: expect(find.byKey(ttcDoorFlagKey(rid), ...),
+    // findsOneWidget) for each of Talk's two pinned reads.
+    testWidgets('Mind and body Talk no longer opens on its two flags',
+        (tester) async {
       final page = kTtcFocusPages.firstWhere(
         (p) => p.bracketId == 'ttc_mind_body',
       );
       await pumpDoor(tester, page, height: 6000);
       final talk = page.groups!.indexWhere((g) => g.id == 'talk');
       await pickTab(tester, talk);
+      expect(page.groups![talk].pinnedRedFlagReadIds, isNotEmpty,
+          reason: 'the data keeps the pin, so turning it back on is one line');
       for (final rid in page.groups![talk].pinnedRedFlagReadIds) {
         expect(
           find.byKey(ttcDoorFlagKey(rid), skipOffstage: false),
-          findsOneWidget,
+          findsNothing,
           reason: rid,
         );
       }
@@ -757,6 +805,27 @@ void main() {
       expect(ttcDoorDisclaimerFor('ttc_conceiving'), contains('not medical advice'));
     });
 
+    // Launch sanity D5 (2026-09-28): the estimates line only under the tabs
+    // that estimate. Kept for revert: the door-wide expectation above only.
+    test('D5: the estimates line sits only under tabs that estimate', () {
+      expect(ttcDoorDisclaimerFor('ttc_conceiving', 'trying'),
+          contains('These are estimates'));
+      expect(ttcDoorDisclaimerFor('ttc_conceiving', 'waiting'),
+          contains('These are estimates'));
+      for (final tab in ['sex', 'his', 'hers', 'doctor']) {
+        expect(ttcDoorDisclaimerFor('ttc_conceiving', tab),
+            isNot(contains('These are estimates')),
+            reason: 'Fertile window › $tab estimates nothing');
+        expect(ttcDoorDisclaimerFor('ttc_conceiving', tab),
+            contains('not medical advice'));
+      }
+      // Every tab named in the rule is a real tab of its door.
+      for (final e in kTtcDoorEstimateTabs.entries) {
+        final ids = {for (final g in ttcFocusPageFor(e.key)!.groups!) g.id};
+        expect(ids.containsAll(e.value), isTrue, reason: e.key);
+      }
+    });
+
     test('D3: the Search key with no match no longer jumps into Ask Veda', () {
       final src = _src('lib/screens/ttc/doors/ttc_door_screen.dart');
       final start = src.indexOf('onSubmitted: (q) {');
@@ -923,6 +992,264 @@ void main() {
         await tester.pump();
         expect(tester.takeException(), isNull);
       }
+    });
+  });
+  // ===========================================================================
+  //  Launch sanity, 2026-09-28 (docs/TTC-LAUNCH-SANITY.md, the doors rows)
+  // ===========================================================================
+  group('launch sanity', () {
+    testWidgets('D2: a bar pins with back and the name once the hero goes',
+        (tester) async {
+      final page = kTtcFocusPages.firstWhere((p) => p.bracketId == 'ttc_pcos');
+      await pumpDoor(tester, page, height: 800);
+      final bar = find.byKey(kTtcDoorPinnedBarKey);
+      expect(bar, findsOneWidget);
+      double opacity() => tester
+          .widget<Opacity>(
+              find.descendant(of: bar, matching: find.byType(Opacity)).first)
+          .opacity;
+      expect(opacity(), 0, reason: 'at the top the hero is the header');
+      await tester.drag(find.byType(ListView).first, const Offset(0, -600));
+      await tester.pumpAndSettle();
+      expect(opacity(), 1, reason: 'scrolled, the bar is in');
+      expect(
+          find.descendant(of: bar, matching: find.byTooltip('Back')),
+          findsOneWidget);
+      expect(
+          find.descendant(
+              of: bar, matching: find.text(bracketById('ttc_pcos')!.label.en)),
+          findsOneWidget);
+    });
+
+    test('D3: an unmade film never promises minutes, and goes last', () {
+      var films = 0;
+      for (final page in kTtcFocusPages) {
+        for (final s in page.sections) {
+          for (final t in s.tiles.whereType<TtcVideoTile>()) {
+            if (!ttcTileIsUnmadeFilm(t)) continue;
+            films++;
+            expect(ttcDoorTileMeta(t), kTtcFilmComingSoon, reason: t.title);
+          }
+          final rail = ttcDoorRailTiles(s.tiles);
+          final firstUnmade = rail.indexWhere(ttcTileIsUnmadeFilm);
+          if (firstUnmade >= 0) {
+            expect(rail.skip(firstUnmade).every(ttcTileIsUnmadeFilm), isTrue,
+                reason: '${s.heading}: a finished piece sits after a film '
+                    'that is not made');
+          }
+        }
+      }
+      expect(films, greaterThan(0), reason: 'the rule is untested');
+    });
+
+    testWidgets('D3: an unmade film card wears a clock, not a play mark',
+        (tester) async {
+      final p = V2PaletteStore.instance.current;
+      await tester.pumpWidget(MaterialApp(
+        home: Scaffold(
+          body: Row(children: [
+            TtcDoorSectionCard(
+              p: p,
+              hue: 200,
+              mark: ttcDoorFormatMark(TtcTileFormat.video),
+              icon: Icons.schedule_rounded,
+              kind: 'Video',
+              title: 'A film',
+              meta: kTtcFilmComingSoon,
+            ),
+          ]),
+        ),
+      ));
+      expect(find.byIcon(Icons.schedule_rounded), findsOneWidget);
+      expect(find.text('Video · Coming soon'), findsOneWidget);
+    });
+
+    test('D6: search finds words inside a read, and brand names', () {
+      final page =
+          kTtcFocusPages.firstWhere((p) => p.bracketId == 'ttc_conceiving');
+      final b = bracketById(page.bracketId)!;
+      final index = ttcDoorSearchIndex(page, b, AppLanguage.english,
+          hideIntimate: false);
+      expect(ttcDoorSearch('clomid', index), isNotEmpty,
+          reason: 'Clomid is clomiphene');
+      expect(ttcDoorSearch('duphaston', index), isNotEmpty,
+          reason: 'Duphaston is a progesterone');
+      expect(ttcDoorSearch('letroz', index), isNotEmpty);
+      // A title match still leads a body match.
+      final hits = ttcDoorSearch('ovulation', index);
+      expect(hits.first.title.toLowerCase(), contains('ovulat'));
+      // Two-letter words never search the body.
+      expect(ttcDoorSearch('zq', index), isEmpty);
+    });
+
+    testWidgets('D6: no result offers words that find something',
+        (tester) async {
+      final page = kTtcFocusPages.firstWhere((p) => p.bracketId == 'ttc_pcos');
+      await pumpDoor(tester, page, height: 4000);
+      await tester.enterText(
+        find.descendant(
+          of: find.byKey(kTtcDoorSearchKey),
+          matching: find.byType(TextField),
+        ),
+        'zzqqxx',
+      );
+      await tester.pump(const Duration(milliseconds: 400));
+      expect(find.byKey(kTtcDoorSearchEmptyKey), findsOneWidget);
+      final b = bracketById(page.bracketId)!;
+      final index = ttcDoorSearchIndex(page, b, AppLanguage.english,
+          hideIntimate: false);
+      for (final w in kTtcDoorSearchSuggestions) {
+        // findsWidgets: "PCOS" is also the pinned bar's (hidden) title.
+        expect(find.text(w), findsWidgets);
+        expect(ttcDoorSearch(w, index), isNotEmpty,
+            reason: 'the suggestion "$w" finds nothing');
+      }
+    });
+
+    testWidgets('D10: the IVF round panel only on the tabs about a round',
+        (tester) async {
+      TtcTreatmentStore.instance.resetForTest();
+      final page = ttcFocusPageFor(kTtcIvfBracketId)!;
+      await pumpDoor(tester, page, height: 6000);
+      for (var i = 0; i < page.groups!.length; i++) {
+        await pickTab(tester, i);
+        final id = page.groups![i].id;
+        expect(find.byType(TtcIvfRoundPanel, skipOffstage: false),
+            kTtcIvfPanelTabs.contains(id) ? findsOneWidget : findsNothing,
+            reason: id);
+      }
+    });
+
+    testWidgets('D13: a section of one piece is one wide card',
+        (tester) async {
+      final page = kTtcFocusPages
+          .firstWhere((p) => p.bracketId == 'ttc_male_fertility');
+      await pumpDoor(tester, page, height: 6000);
+      final improve = page.groups!.indexWhere((g) => g.id == 'improve');
+      await pickTab(tester, improve);
+      final wide = find.byKey(
+          ttcDoorSectionWideKey('Keep track of what he changes'),
+          skipOffstage: false);
+      expect(wide, findsOneWidget);
+      expect(tester.getSize(wide).width, greaterThan(kTtcDoorCardWidth * 1.5));
+      expect(page.groups!.any((g) => g.id == 'track'), isFalse,
+          reason: 'the two-tool Track tab folded into its neighbours');
+    });
+
+    testWidgets('D15: the urgent sheet can call the emergency number',
+        (tester) async {
+      final page =
+          kTtcFocusPages.firstWhere((p) => p.bracketId == 'ttc_after_loss');
+      final dialled = <String>[];
+      tester.view.physicalSize = const Size(360, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+      await tester.pumpWidget(MaterialApp(
+        home: TtcDoorScreen(
+          page: page,
+          bracket: bracketById(page.bracketId)!,
+          initialGroup: 'body',
+          dial: (n) async => dialled.add(n),
+        ),
+      ));
+      await tester.pumpAndSettle();
+      final rid = page.groups!
+          .firstWhere((g) => g.id == 'body')
+          .pinnedRedFlagReadIds
+          .first;
+      await tester.tap(find.byKey(ttcDoorFlagKey(rid)));
+      await tester.pumpAndSettle();
+      final call = find.byKey(ttcDoorCallKey('112'));
+      expect(call, findsOneWidget);
+      await tester.ensureVisible(call);
+      await tester.tap(call);
+      await tester.pumpAndSettle();
+      expect(dialled, ['112']);
+      // And 108 for an ambulance, under it (2026-09-28).
+      final amb = find.byKey(ttcDoorCallKey('108'));
+      expect(amb, findsOneWidget);
+      expect(find.text('Call 108 for an ambulance'), findsOneWidget);
+      await tester.ensureVisible(amb);
+      await tester.tap(amb);
+      await tester.pumpAndSettle();
+      expect(dialled, ['112', '108']);
+    });
+
+    test('D14: every myth card is titled as a question', () {
+      for (final page in kTtcFocusPages) {
+        for (final s in page.sections) {
+          for (final t in s.tiles.whereType<TtcMythTile>()) {
+            expect(t.title.trim().endsWith('?'), isTrue,
+                reason: '${page.bracketId}: "${t.title}" under a Myth vs fact '
+                    'chip reads as a statement');
+          }
+        }
+      }
+    });
+
+    test('D16: a tool card on a door uses the tool\'s own name', () {
+      final page =
+          kTtcFocusPages.firstWhere((p) => p.bracketId == 'ttc_body_cycle');
+      final titles = {
+        for (final s in page.sections)
+          for (final t in s.tiles.whereType<TtcToolTile>()) t.surfaceId: t.title,
+      };
+      expect(titles['ttc_cycle'], 'Cycle companion');
+      expect(titles['ttc_symptom_log'], 'Symptoms and mood');
+    });
+
+    test('D17: See a doctor leads with the doctor', () {
+      final page =
+          kTtcFocusPages.firstWhere((p) => p.bracketId == 'ttc_body_cycle');
+      final first = page.sections.firstWhere((s) => s.group == 'doctor');
+      expect(first.tiles.single, isA<TtcTalkTile>());
+    });
+
+    test('MB16: an Article chip always wears the page mark', () {
+      expect(ttcDoorFormatMark(TtcTileFormat.guide),
+          ttcDoorFormatMark(TtcTileFormat.article));
+    });
+
+    test('MB20: no tab shares its name with a door', () {
+      final doors = {for (final p in kTtcFocusPages) bracketById(p.bracketId)!.label.en};
+      for (final page in kTtcFocusPages) {
+        for (final g in page.groups!) {
+          expect(doors.contains(g.label), isFalse,
+              reason: '${page.bracketId} › "${g.label}" is also a door');
+        }
+      }
+    });
+
+    testWidgets('MB9: the closing line leads in the hero, not at every foot',
+        (tester) async {
+      final page =
+          kTtcFocusPages.firstWhere((p) => p.bracketId == 'ttc_mind_body');
+      expect(page.heroBlurb, contains(page.closingLine!));
+      await pumpDoor(tester, page, height: 8000);
+      for (var i = 1; i < page.groups!.length; i++) {
+        await pickTab(tester, i);
+        // Once, in the hero; never again at the foot of a tab.
+        expect(find.text(page.closingLine!, skipOffstage: false), findsNothing,
+            reason: page.groups![i].id);
+      }
+    });
+
+    test('MB15: a practice says Practice, how long, and its own kind', () {
+      final page =
+          kTtcFocusPages.firstWhere((p) => p.bracketId == 'ttc_mind_body');
+      final practices = [
+        for (final s in page.sections)
+          for (final t in s.tiles)
+            if (ttcTilePractice(t) != null) t,
+      ];
+      expect(practices, isNotEmpty);
+      for (final t in practices) {
+        expect(ttcDoorChip(t), 'Practice');
+        expect(ttcDoorTileMeta(t), contains('min'), reason: t.title);
+      }
+      final marks = {for (final t in practices) ttcDoorTileMark(t)};
+      expect(marks, containsAll([IntentMark.stepsMark, IntentMark.windMark]),
+          reason: 'a movement and a breath wear different marks');
     });
   });
 }

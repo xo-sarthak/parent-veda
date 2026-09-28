@@ -23,7 +23,14 @@ import '../memories/memory_personalize_screen.dart';
 import 'ttc_common.dart';
 import 'ttc_strings.dart';
 import 'ttc_treatment_round_screens.dart'
-    show ttcRoundForPregnancy, openTtcRoundPregnancy;
+    show
+        ttcRoundForPregnancy,
+        openTtcRoundPregnancy,
+        ttcDueDateText,
+        TtcRoundOption;
+import '../../services/pregnancy_controller.dart' show DueDateSource;
+import '../../theme/pv_fonts.dart';
+import 'ttc_tool_chrome.dart';
 
 /// Asks first, then transitions. Returns true if the couple went through.
 ///
@@ -42,6 +49,25 @@ Future<bool> recordPositiveTest(BuildContext context) async {
     openTtcRoundPregnancy(context);
     return false;
   }
+  // ⚠️ A PAGE, NOT A GREY DIALOG (launch sanity H19, 2026-09-28). The
+  // biggest moment in the stage was a plain Material dialog, and with no
+  // round logged it could only date the pregnancy from her last period,
+  // with no way to say the test followed a clinic transfer. The page asks
+  // whether a clinic guided this cycle, dates it the way the clinic does
+  // when one did (the DueDateSource rule), says the date and its basis
+  // before anything moves, and keeps the undo on the screen after. The
+  // dialog below is kept for revert and no longer reached.
+  if (!context.mounted) return false;
+  final moved = await Navigator.of(context).push<bool>(MaterialPageRoute<bool>(
+    builder: (_) => const TtcPositiveTestScreen(),
+    settings: const RouteSettings(name: 'ttc/positive_test'),
+  ));
+  return moved == true;
+}
+
+/// The old confirm dialog, kept for revert (H19, 2026-09-28).
+// ignore: unused_element
+Future<bool> _recordPositiveTestDialog(BuildContext context) async {
   final t = TtcS.current();
   final confirmed = await showDialog<bool>(
     context: context,
@@ -361,4 +387,263 @@ class TtcRecordTestCard extends StatelessWidget {
 DateTime? ttcPreviewDueDate() {
   final lmp = CycleStore.instance.lastPeriodStart;
   return lmp == null ? null : TtcTransitionEngine.dueDateFrom(lmp);
+}
+
+// =============================================================================
+//  A positive test — the page (launch sanity H19, 2026-09-28)
+// -----------------------------------------------------------------------------
+//  One question before anything moves: did a clinic guide this cycle? The
+//  answer decides who dates the pregnancy. On her own (or after an IUI or
+//  ovulation tablets) it is her last period, which is ours to count. After a
+//  transfer it is the transfer and the embryo's day, the clinic's way
+//  (`DueDateSource.ivfTransfer`, clinic-owned, never recounted). A date her
+//  clinic told her is theirs (`DueDateSource.clinician`). Every option says
+//  its date and its basis in words, a confirm names it again, and the
+//  transition screen keeps its Undo. Shaped like the round's own "Moving to
+//  Pregnancy" page, so the two ways in read as one flow.
+//
+//  ⚠️ NO "CONGRATULATIONS", ON PURPOSE. The walk row suggested one; this
+//  file's own rule stands (quiet certainty, not confetti: plenty of couples
+//  arrive here carrying a previous loss).
+// =============================================================================
+
+/// What she said about this cycle.
+enum TtcPositivePath { own, transfer }
+
+/// The due date after a transfer, the clinic's way: transfer + (266 − embryo
+/// day). The same arithmetic as `ttcRoundDating`, for a transfer she tells us
+/// here without having logged a round.
+DateTime ttcDueFromTransfer(DateTime transfer, int embryoDay) =>
+    DateTime(transfer.year, transfer.month, transfer.day)
+        .add(Duration(days: 266 - embryoDay));
+
+class TtcPositiveTestScreen extends StatefulWidget {
+  const TtcPositiveTestScreen({super.key});
+
+  @override
+  State<TtcPositiveTestScreen> createState() => _TtcPositiveTestScreenState();
+}
+
+class _TtcPositiveTestScreenState extends State<TtcPositiveTestScreen> {
+  TtcPositivePath? _path;
+  DateTime? _transfer;
+  int? _embryo;
+  bool _busy = false;
+
+  static const double _hue = 152;
+
+  static DateTime _day(DateTime d) => DateTime(d.year, d.month, d.day);
+
+  Widget _picker(BuildContext context, Widget? child) => Theme(
+        data: Theme.of(context).copyWith(
+          datePickerTheme: DatePickerThemeData(
+            backgroundColor: Colors.white,
+            surfaceTintColor: Colors.transparent,
+            headerBackgroundColor: Colors.white,
+            headerForegroundColor: ttcTitleInk,
+            dayBackgroundColor: WidgetStateProperty.resolveWith((s) =>
+                s.contains(WidgetState.selected)
+                    ? ttcTitleInk
+                    : Colors.transparent),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24)),
+          ),
+        ),
+        child: child!,
+      );
+
+  Future<void> _move(
+      DateTime? due, DueDateSource? source, String basis) async {
+    final shown = due ??
+        TtcTransitionEngine.dueDateFrom(CycleStore.instance.lastPeriodStart ??
+            _day(DateTime.now()).subtract(const Duration(days: 28)));
+    final ok = await showDialog<bool>(
+      context: context,
+      routeSettings: const RouteSettings(name: 'ttc/positive_test/confirm'),
+      builder: (ctx) => AlertDialog(
+        key: const ValueKey('ttc_positive_confirm'),
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+        title: Text('Move to Pregnancy?',
+            style: ttcFraunces(19, w: FontWeight.w600, color: ttcTitleInk)),
+        content: Text(
+            'Your home becomes the pregnancy home, with a due date of '
+            '${ttcDueDateText(shown)} ($basis). Everything you wrote here '
+            'comes with you. You can undo this on the next screen.',
+            style: ttcBody(13.5, h: 1.5)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text('Not yet',
+                style: ttcBody(13, color: ttcSoft, w: FontWeight.w700)),
+          ),
+          TextButton(
+            key: const ValueKey('ttc_positive_confirm_yes'),
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text('Move to Pregnancy',
+                style: ttcBody(13, color: ttcTitleInk, w: FontWeight.w800)),
+          ),
+        ],
+      ),
+    );
+    if (ok != true || !mounted || _busy) return;
+    setState(() => _busy = true);
+    final result = await const TtcTransitionEngine()
+        .confirmPregnancy(dueDate: due, source: source);
+    if (!mounted) return;
+    // `result: true` so `recordPositiveTest` reports that she went through.
+    await Navigator.of(context).pushReplacement(
+        MaterialPageRoute<void>(
+          builder: (_) => TtcTransitionScreen(result: result),
+          settings: const RouteSettings(name: 'ttc/transition'),
+        ),
+        result: true);
+  }
+
+  Future<void> _pickTransfer() async {
+    final today = _day(DateTime.now());
+    final d = await showDatePicker(
+      context: context,
+      initialDate: _transfer ?? today.subtract(const Duration(days: 10)),
+      firstDate: today.subtract(const Duration(days: 120)),
+      lastDate: today,
+      helpText: 'Your transfer date',
+      fieldHintText: 'dd/mm/yyyy',
+      builder: _picker,
+    );
+    if (d != null && mounted) setState(() => _transfer = _day(d));
+  }
+
+  Future<void> _clinicDate() async {
+    final today = _day(DateTime.now());
+    final d = await showDatePicker(
+      context: context,
+      initialDate: today.add(const Duration(days: 245)),
+      firstDate: today,
+      lastDate: today.add(const Duration(days: 300)),
+      helpText: 'The due date your clinic gave you',
+      fieldHintText: 'dd/mm/yyyy',
+      builder: _picker,
+    );
+    if (d == null || !mounted) return;
+    await _move(
+        _day(d), DueDateSource.clinician, 'the date your clinic gave you');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final lmp = CycleStore.instance.lastPeriodStart;
+    final ownLine = lmp != null
+        ? 'Dated from your last period, ${ttcDueDateText(lmp)}: due '
+            '${ttcDueDateText(TtcTransitionEngine.dueDateFrom(lmp))}. The same '
+            'after an IUI or ovulation tablets. A dating scan may update it.'
+        : 'No period is logged, so we count about four weeks back from today. '
+            'Your first scan will correct it.';
+    final transferDue = _transfer != null && _embryo != null
+        ? ttcDueFromTransfer(_transfer!, _embryo!)
+        : null;
+
+    Widget label(String text) => ttcToolPad(Text(text,
+        style: pvManrope(
+            fontSize: 14, fontWeight: FontWeight.w700, color: ttcTitleInk)));
+
+    return TtcToolScaffold(
+      hue: _hue,
+      variant: 3,
+      eyebrow: 'A positive test',
+      title: 'Before anything changes',
+      intro: 'Your home will become the pregnancy home. Everything you wrote '
+          'here comes with you, and you can undo the move on the next screen. '
+          'First, one question, so the dates are right.',
+      children: [
+        const SizedBox(height: 22),
+        label('Was this cycle guided by a clinic?'),
+        const SizedBox(height: 12),
+        ttcToolPad(TtcRoundOption(
+          key: const ValueKey('ttc_positive_own'),
+          title: 'No, we were trying on our own',
+          line: ownLine,
+          icon: Icons.favorite_border_rounded,
+          selected: _path == TtcPositivePath.own,
+          onTap: () {
+            setState(() => _path = TtcPositivePath.own);
+            _move(null, null,
+                lmp != null ? 'from your last period' : 'about four weeks');
+          },
+        )),
+        const SizedBox(height: 10),
+        ttcToolPad(TtcRoundOption(
+          key: const ValueKey('ttc_positive_transfer'),
+          title: 'Yes, after a transfer (IVF or frozen)',
+          line: "Your clinic dates it from the transfer and the embryo's "
+              'day. We use their way.',
+          icon: Icons.local_hospital_outlined,
+          selected: _path == TtcPositivePath.transfer,
+          onTap: () => setState(() => _path = TtcPositivePath.transfer),
+        )),
+        if (_path == TtcPositivePath.transfer) ...[
+          const SizedBox(height: 16),
+          ttcToolPad(TtcRoundOption(
+            key: const ValueKey('ttc_positive_transfer_date'),
+            title: _transfer == null
+                ? 'Add your transfer date'
+                : 'Transfer on ${ttcDueDateText(_transfer!)}',
+            line: _transfer == null
+                ? 'The day the embryo was put back.'
+                : 'Tap to change it.',
+            icon: Icons.edit_calendar_outlined,
+            onTap: _pickTransfer,
+          )),
+          const SizedBox(height: 14),
+          label('Which day was the embryo when it was transferred?'),
+          const SizedBox(height: 10),
+          ttcToolPad(Wrap(spacing: 8, children: [
+            for (final d in const [3, 5])
+              TtcToolPill(
+                key: ValueKey('ttc_positive_embryo_$d'),
+                label: 'Day $d',
+                on: _embryo == d,
+                hue: _hue,
+                onTap: () => setState(() => _embryo = d),
+              ),
+          ])),
+          if (transferDue != null) ...[
+            const SizedBox(height: 14),
+            ttcToolPad(TtcRoundOption(
+              key: const ValueKey('ttc_positive_from_transfer'),
+              title: 'Date it from my transfer',
+              line: 'Due ${ttcDueDateText(transferDue)}. Your transfer on '
+                  '${ttcDueDateText(_transfer!)}, a day $_embryo embryo, the '
+                  'way clinics date it.',
+              icon: Icons.event_available_outlined,
+              onTap: () => _move(
+                  transferDue, DueDateSource.ivfTransfer, 'from your transfer'),
+            )),
+          ],
+        ],
+        const SizedBox(height: 10),
+        ttcToolPad(TtcRoundOption(
+          key: const ValueKey('ttc_positive_clinic_date'),
+          title: 'My clinic gave me a due date',
+          line: "Enter the date they told you. We'll use theirs.",
+          icon: Icons.event_note_outlined,
+          onTap: _clinicDate,
+        )),
+        const SizedBox(height: 16),
+        Center(
+          child: TextButton(
+            key: const ValueKey('ttc_positive_not_now'),
+            onPressed: () => Navigator.of(context).maybePop(false),
+            child: Text('Not yet',
+                style: pvManrope(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w800,
+                    color: ttcTitleInk)),
+          ),
+        ),
+        const SizedBox(height: 28),
+      ],
+    );
+  }
 }

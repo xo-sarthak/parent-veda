@@ -129,11 +129,15 @@ const TtcFocusPage kTtcHisSideFocus = TtcFocusPage(
         label: 'Improve his health',
         icon: Icons.eco_outlined,
         hue: 104),
-    TtcFocusGroup(
-        id: 'track', mark: IntentMark.chartLog, tabMark: TtcTabMark.chartLine,
-        label: 'Track',
-        icon: Icons.calendar_today_outlined,
-        hue: 160),
+    // ⚠️ FOLDED 2026-09-28 (launch sanity D13): a tab of two tools made her
+    // tap for very little. His log now sits under Improve his health (it
+    // logs the habits that tab is about) and the shared records folder under
+    // Test and results (it holds the report). Kept for revert:
+    // TtcFocusGroup(
+    //     id: 'track', mark: IntentMark.chartLog, tabMark: TtcTabMark.chartLine,
+    //     label: 'Track',
+    //     icon: Icons.calendar_today_outlined,
+    //     hue: 160),
     TtcFocusGroup(
       id: 'talk', mark: IntentMark.askDoctor, tabMark: TtcTabMark.twoBubbles,
       label: 'Talk',
@@ -270,6 +274,22 @@ const TtcFocusPage kTtcHisSideFocus = TtcFocusPage(
               'sheet of paper.',
           surfaceId: 'ttc_semen_report',
         ),
+        // D13 (2026-09-28): "Get it read" was a section of this one card;
+        // it joins the report it reads. Moved from its own section below.
+        TtcTalkTile(
+          title: 'Have the report read properly',
+          blurb: 'An andrologist reads the numbers together and in context, '
+              'which no list of lines can do.',
+          action: kTtcOfferingAndrologist,
+        ),
+        // D13 (2026-09-28): moved from the retired Track tab. His semen
+        // analysis belongs beside her reports; see the note at its old place.
+        TtcToolTile(
+          title: 'Keep his reports with yours',
+          blurb: 'One folder for both of you, so a second opinion starts with '
+              'the papers, not with trying to remember.',
+          surfaceId: 'ttc_records',
+        ),
       ],
     ),
 
@@ -307,23 +327,24 @@ const TtcFocusPage kTtcHisSideFocus = TtcFocusPage(
       ],
     ),
 
-    TtcFocusSection(
-      heading: 'Get it read',
-      group: 'test',
-      tiles: [
-        // ⚠️ THE ANDROLOGIST, NOT THE CONSULTS SHELF — 2026-09-06. The brief
-        // says "Talk / Consult (andrologist)". `kTtcActConsult` opens the whole
-        // consults category, where the male-fertility consultation is one card
-        // in three; this names the offering itself, so the tap lands on the
-        // person the card promised.
-        TtcTalkTile(
-          title: 'Have the report read properly',
-          blurb: 'An andrologist reads the numbers together and in context, '
-              'which no list of lines can do.',
-          action: kTtcOfferingAndrologist,
-        ),
-      ],
-    ),
+    // ⚠️ THE ANDROLOGIST, NOT THE CONSULTS SHELF — 2026-09-06. The brief
+    // says "Talk / Consult (andrologist)". `kTtcActConsult` opens the whole
+    // consults category, where the male-fertility consultation is one card
+    // in three; this names the offering itself, so the tap lands on the
+    // person the card promised.
+    // Moved into "Read your own report" (D13, 2026-09-28). Kept for revert:
+    // TtcFocusSection(
+    //   heading: 'Get it read',
+    //   group: 'test',
+    //   tiles: [
+    //     TtcTalkTile(
+    //       title: 'Have the report read properly',
+    //       blurb: 'An andrologist reads the numbers together and in context, '
+    //           'which no list of lines can do.',
+    //       action: kTtcOfferingAndrologist,
+    //     ),
+    //   ],
+    // ),
 
     // =========================================================================
     //  3 — Improve his health
@@ -425,9 +446,11 @@ const TtcFocusPage kTtcHisSideFocus = TtcFocusPage(
     // =========================================================================
     //  4 — Track
     // =========================================================================
+    // D13 (2026-09-28): under Improve his health, with the tab gone. Kept for
+    // revert: heading: 'Track', group: 'track'.
     TtcFocusSection(
-      heading: 'Track',
-      group: 'track',
+      heading: 'Keep track of what he changes',
+      group: 'improve',
       tiles: [
         // ⚠️ HIS TRACKER, DIRECTLY — 2026-09-06. The brief: "Tool (reuse,
         // private, his side)". This opened `ttc_tools`, the whole tools hub,
@@ -446,12 +469,13 @@ const TtcFocusPage kTtcHisSideFocus = TtcFocusPage(
         // belongs beside her AMH, in one folder, in one date order; two
         // records screens that have to agree with each other is how records
         // rot.
-        TtcToolTile(
-          title: 'Keep his reports with yours',
-          blurb: 'One folder for both of you, so a second opinion starts with '
-              'the papers, not with trying to remember.',
-          surfaceId: 'ttc_records',
-        ),
+        // Moved to "Read your own report" (D13, 2026-09-28). Kept for revert:
+        // TtcToolTile(
+        //   title: 'Keep his reports with yours',
+        //   blurb: 'One folder for both of you, so a second opinion starts with '
+        //       'the papers, not with trying to remember.',
+        //   surfaceId: 'ttc_records',
+        // ),
       ],
     ),
 

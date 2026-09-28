@@ -61,7 +61,9 @@ void main() {
     ('Can I...?', const TtcCanIScreen()),
     ("This week's food ideas", const TtcNutritionScreen()),
     ('Journey map', const TtcJourneyMapScreen()),
-    ('Weight and fertility', const TtcBmiScreen()),
+    // T1/T2 (2026-09-28): BMI folded into Weight, so its eyebrow is
+    // Weight's. Kept for revert: ('Weight and fertility', const TtcBmiScreen()),
+    ('Weight', const TtcBmiScreen()),
     ('Pre-pregnancy checklist', const TtcPrecheckScreen()),
     ('Pre-pregnancy checklist', const TtcPrecheckSummaryScreen()),
   ];
@@ -69,7 +71,8 @@ void main() {
   // Tools that already wore the shell, whose eyebrow named something else.
   final renamed = <(String, Widget)>[
     ('Medication', const TtcMedicationScreen()),
-    ('See a specialist?', const TtcIvfReadinessScreen()),
+    // D18 (2026-09-28): one name. Kept for revert: 'See a specialist?'
+    ('Should I seek fertility help?', const TtcIvfReadinessScreen()),
     ('PCOS symptom check', const TtcPcosStandScreen()),
   ];
 

@@ -78,9 +78,18 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
   heroImageUrl: 'https://pub-bfbc0773e60e4c5c851b535f08b384bc.r2.dev/ttc_door_mind_body.jpg',
   // The new door's headline, a sentence (TtcDoorScreen, 2026-09-26).
   heroTitle: 'A few calm minutes a day, for both of you.',
-  heroBlurb: 'Move a little, breathe a little, and sleep and eat like someone '
-      "looking after themselves. That's the whole practice. It's worth doing "
-      'for how the waiting feels, not for what it promises.',
+  // ⚠️ THE CLOSING LINE LEADS NOW (launch sanity MB9, 2026-09-28). The
+  // brief's own sentence stood at the foot of every tab as a large serif line
+  // that read like a heading with nothing under it, the second of three
+  // closing texts. It is the door's promise, so it moves up into the blurb,
+  // word for word, and the door stops drawing it at the foot (the door skips
+  // a closing line the hero already says). Kept for revert:
+  //   heroBlurb: 'Move a little, breathe a little, and sleep and eat like '
+  //       "someone looking after themselves. That's the whole practice. It's "
+  //       'worth doing for how the waiting feels, not for what it promises.',
+  heroBlurb: 'Move a little, breathe a little, sleep and eat well. This is '
+      'about spending the wait well and arriving at conception calmer and '
+      'healthier.',
 
   // ---------------------------------------------------------------------------
   //  The rail — Today first, and it is a do-it screen rather than a menu
@@ -128,7 +137,11 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
     ),
     TtcFocusGroup(
         id: 'ready', mark: IntentMark.checkMark, tabMark: TtcTabMark.checklist,
-        label: 'Getting ready',
+        // ⚠️ NAMED FOR WHAT IT HOLDS (launch sanity MB20, 2026-09-28): a tab
+        // called exactly like another door ("Getting ready"), holding two
+        // sleep reads, a bedtime breath and a way to that door. The id stays
+        // (an identity). Kept for revert: label: 'Getting ready',
+        label: 'Sleep and routine',
         icon: Icons.checklist_rtl_rounded,
         hue: 42),
     // ⚠️ BOTH FLAGS, ON ONE TAB, FROM TWO DIFFERENT ARTICLES. This is what
@@ -253,7 +266,10 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
         // ⚠️ WRITTEN OUT RATHER THAN PROMOTED — see the file header. Both
         // halves restate the article's opening argument.
         TtcMythTile(
-          title: 'Stop thinking about it and it will happen',
+          // D14 (2026-09-28): every myth card is titled as the question, so a
+          // true statement never sits under a Myth vs fact chip. Kept for
+          // revert: title: 'Stop thinking about it and it will happen',
+          title: 'Will it happen if you stop thinking about it?',
           blurb: 'The advice everyone gives, and what the evidence says.',
           myth: "If you stop thinking about it, you'll conceive.",
           fact: 'The largest studies find that emotional distress before '
@@ -273,7 +289,9 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
     ),
 
     TtcFocusSection(
-      heading: 'What garbh sanskar is',
+      // MB16 (2026-09-28): Garbh Sanskar, capitalised as on the home. Kept
+      // for revert: heading: 'What garbh sanskar is',
+      heading: 'What Garbh Sanskar is',
       group: 'understand',
       tiles: [
         TtcArticleTile(
@@ -507,8 +525,10 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
     // ),
 
     // The one section in this tab that Mind & body owns.
+    // MB20 (2026-09-28): the tab is called Sleep and routine now, so the
+    // section says what it answers. Kept for revert: heading: 'Sleep and routine',
     TtcFocusSection(
-      heading: 'Sleep and routine',
+      heading: 'How do you sleep better while trying?',
       group: 'ready',
       tiles: [
         TtcGuideTile(

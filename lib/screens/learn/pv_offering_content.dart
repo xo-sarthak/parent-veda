@@ -20,7 +20,9 @@
 import '../../booking/booking_models.dart';
 import '../../booking/booking_store.dart';
 import '../../data/learn/pv_learn_view.dart';
+import '../../services/life_stage_store.dart' show LifeStage;
 import 'pv_learn_art.dart';
+import 'pv_learn_catalog.dart' show pvLearnHasNoNamedPerson;
 import '../../services/pv_learn_progress_store.dart';
 
 /// Where she stands with this thing.
@@ -65,7 +67,16 @@ Booking? pvLearnBookingFor(PvOfferingView v) {
 }
 
 /// What the sticky bar says and does.
-enum PvCommitAction { buyThenPlay, play, pickSlot, buyPack, openSession }
+enum PvCommitAction {
+  buyThenPlay,
+  play,
+  pickSlot,
+  buyPack,
+  openSession,
+  /// A consult with nobody named to run it yet (the user, 2026-09-28): it
+  /// shows, never hidden, but it cannot be booked. Tapping says so.
+  comingSoon,
+}
 
 class PvLearnVerb {
   const PvLearnVerb(this.verb, this.action, {this.note});
@@ -156,6 +167,21 @@ PvLearnVerb pvCommitFor(
         note: v.seatsLeft != null ? '${v.seatsLeft} seats left' : 'Small group',
       );
     case PvLearnKind.consult:
+      // ⚠️ NO BOOKING WITHOUT A NAMED PERSON (launch sanity H16, the user,
+      // 2026-09-28). The andrologist consult has a role and no one on the
+      // roster to run it; taking money for a call nobody is set to take would
+      // be the worst kind of broken. It stays on the shelf as an honest
+      // "Coming soon" and lifts itself the day `_ttcRosterFor` names someone.
+      // A booking already made is still shown, whatever the roster says.
+      if (booking == null &&
+          state == PvLearnState.none &&
+          pvLearnHasNoNamedPerson(v)) {
+        return const PvLearnVerb(
+          'Coming soon',
+          PvCommitAction.comingSoon,
+          note: "We're adding a specialist",
+        );
+      }
       if (state == PvLearnState.booked && booking != null) {
         return PvLearnVerb(
           'Your session',
@@ -208,9 +234,61 @@ String _when(Booking b) {
   return '${w[d.weekday - 1]} ${d.day} · $h:$mm ${d.hour < 12 ? 'am' : 'pm'}';
 }
 
+/// Whether the Trying to conceive experts' registrations have been checked
+/// AND the check is recorded somewhere a reviewer could see (launch sanity
+/// H17, 2026-09-28). Flip to true when it is; the consult page then says
+/// "Verified clinician" again.
+const bool kTtcRegistrationChecksRecorded = false;
+
 /// The three trust rows. The middle one is always the money rule, said
 /// once, in one line — no "guarantee" band.
+///
+/// ⚠️ ON TRYING TO CONCEIVE, NO REVIEW CLAIMED (launch sanity, H14's
+/// follow-up, 2026-09-28). The TTC offerings carry no roster record, so the
+/// first row fell through to "Reviewed by our clinical panel", "Led by our
+/// clinical panel" or "Taught by our clinical panel" with the seal-and-tick
+/// mark: a panel that does not exist, and a review nobody did. The user's
+/// rule for reads applies here too: no "Reviewed by" and no tick until an
+/// expert signs the piece off. The consult row is H17's and stays as it is.
+/// Other stages are unchanged (a decision for the user).
 List<PvLearnTrust> pvTrustRowsFor(PvOfferingView v) {
+  final rows = _pvTrustRowsFor(v);
+  if (v.stage != LifeStage.tryingToConceive ||
+      v.kind == PvLearnKind.consult) {
+    return rows;
+  }
+  return [pvTtcLeadTrustRow(v), ...rows.skip(1)];
+}
+
+/// The first trust row on a Trying to conceive course, masterclass, group or
+/// class pack: who made it or who teaches it, said as a fact, never a review.
+PvLearnTrust pvTtcLeadTrustRow(PvOfferingView v) {
+  if (v.kind == PvLearnKind.course) {
+    return const PvLearnTrust(
+      PvLearnMark.note,
+      'Written by the ParentVeda team',
+      'Each lesson is written from current guidance.',
+    );
+  }
+  final named = !pvLearnHasNoNamedPerson(v) &&
+      !v.expert.name.toLowerCase().contains('parentveda');
+  // "An andrologist" reads as "Taught by an andrologist".
+  final who = named
+      ? v.expert.name
+      : v.expert.name.replaceFirstMapped(
+          RegExp(r'^An? '), (m) => m[0]!.toLowerCase());
+  final verb = v.kind == PvLearnKind.cohort ? 'Led' : 'Taught';
+  return PvLearnTrust(
+    PvLearnMark.learn,
+    '$verb by $who',
+    named
+        ? 'You see who ${v.kind == PvLearnKind.cohort ? 'leads' : 'teaches'} '
+            'it before you book.'
+        : 'Live, with time for your questions.',
+  );
+}
+
+List<PvLearnTrust> _pvTrustRowsFor(PvOfferingView v) {
   final reviewer = v.expert.expert != null
       ? 'by ${v.expert.name}'
       : 'by our clinical panel';
@@ -275,11 +353,25 @@ List<PvLearnTrust> pvTrustRowsFor(PvOfferingView v) {
       ];
     case PvLearnKind.consult:
       return [
-        const PvLearnTrust(
-          PvLearnMark.reviewed,
-          'Verified clinician',
-          'Registration checked before they are listed.',
-        ),
+        // ⚠️ ON TRYING TO CONCEIVE, NO CLAIM WITHOUT A RECORD (launch sanity
+        // H17, 2026-09-28). "Registration checked before they are listed"
+        // had nothing behind it on screen, and the stage has no recorded
+        // registration check yet. Until `kTtcRegistrationChecksRecorded` is
+        // true the row says only what is true: she sees who she is booking.
+        // Other stages are unchanged (a decision for the user).
+        if (v.stage == LifeStage.tryingToConceive &&
+            !kTtcRegistrationChecksRecorded)
+          const PvLearnTrust(
+            PvLearnMark.reviewed,
+            'A named clinician',
+            'You see who you are booking, and what they do, before you pay.',
+          )
+        else
+          const PvLearnTrust(
+            PvLearnMark.reviewed,
+            'Verified clinician',
+            'Registration checked before they are listed.',
+          ),
         const PvLearnTrust(
           PvLearnMark.refund,
           'Free cancellation up to 24 hours before',

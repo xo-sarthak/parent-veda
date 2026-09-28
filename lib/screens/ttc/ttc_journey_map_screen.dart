@@ -52,6 +52,7 @@ import 'ttc_surface_router.dart' show openTtcSurface;
 import 'ttc_timeline_screen.dart';
 import 'ttc_today_screen.dart' show logTtcPeriod;
 import 'ttc_tool_chrome.dart';
+import 'ttc_tool_hues.dart';
 
 /// Where each milestone lives, and the plain action that reaches it
 /// (2026-09-27, night). `surface` opens once it is done ("where is it?");
@@ -143,9 +144,16 @@ class TtcJourneyMapScreen extends StatelessWidget {
               t: t,
             );
 
+        // T10 (launch sanity, 2026-09-28): only what she can do, as the doing.
+        final tryable = [
+          for (final m in ahead)
+            if (kTtcMilestoneWays[m.id]?.action != null) m,
+        ];
+
         return TtcToolScaffold(
-          // Plan and learn's hue in Tools.
-          hue: 104,
+          // Plan and learn's hue in Tools. T6 (2026-09-28): the named group
+          // constant. Kept for revert: hue: 104,
+          hue: kTtcToolHuePlan,
           // ⚠️ ONE NAME (2026-09-27): the tile says "Journey map", so
           // the page does too, as the eyebrow, word for word; the title is
           // the tile's own line. Kept for revert: `t.journeyMap`.
@@ -175,14 +183,30 @@ class TtcJourneyMapScreen extends StatelessWidget {
                 const SizedBox(height: 14),
                 step(TtcChapter.aNewBeginning, last: true),
 
-                // ---- still ahead: each row says how, and goes there -------
-                // Before "done" now: it is the half she can act on.
-                if (ahead.isNotEmpty) ...[
-                  // "Still ahead", never "missing" and never a count of what
-                  // is undone. Warm language is a contract.
-                  TtcLookupHeading(t.milestonesAhead, top: 30),
+                // ---- things you can try (launch sanity T10, 2026-09-28) ----
+                // ⚠️ NOT A LIST OF GOALS TO TICK. "Still ahead" named each
+                // milestone as an achievement ("Completed a full cycle
+                // together", "Kept the daily ritual for a week") and ended on
+                // "A positive test - Whenever it comes": a scorecard, in the
+                // one stage that promises no streaks and no pressure. Now the
+                // section is "Things you can try", each row is the DOING
+                // ("Write in the journal", "Open your daily ritual"), and the
+                // milestones no tap can bring (a completed cycle, a positive
+                // test) are not listed here at all. What she has done still
+                // shows below, as effort. The engine is unchanged.
+                // Kept for revert (2026-09-28):
+                // if (ahead.isNotEmpty) ...[
+                //   TtcLookupHeading(t.milestonesAhead, top: 30),
+                //   PvRowGroup(p: p, children: [
+                //     for (final m in ahead) _MilestoneRow(milestone: m, done: false, t: t),
+                //   ]),
+                // ],
+                if (tryable.isNotEmpty) ...[
+                  TtcLookupHeading(
+                      hi ? t.milestonesAhead : kTtcMapTryHeading,
+                      top: 30),
                   PvRowGroup(p: p, children: [
-                    for (final m in ahead) _MilestoneRow(milestone: m, done: false, t: t),
+                    for (final m in tryable) _TryRow(milestone: m),
                   ]),
                 ],
 
@@ -323,6 +347,39 @@ class _ChapterStep extends StatelessWidget {
             ),
           ),
         ]),
+      ),
+    );
+  }
+}
+
+/// The heading over the things she can do (T10, 2026-09-28). English only.
+const String kTtcMapTryHeading = 'Things you can try';
+
+/// One thing she can do, named as the doing, never as a goal (T10,
+/// 2026-09-28). Opens the place that does it.
+class _TryRow extends StatelessWidget {
+  const _TryRow({required this.milestone});
+
+  final TtcMilestone milestone;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = V2PaletteStore.instance.current;
+    final action = kTtcMilestoneWays[milestone.id]!.action!;
+    return TtcLookupRow(
+      key: ValueKey('ttc_map_try_${milestone.id}'),
+      title: action,
+      onTap: () => openTtcMilestoneWay(context, milestone.id, ahead: true),
+      leading: Container(
+        width: 30,
+        height: 30,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: p.surface,
+          shape: BoxShape.circle,
+          border: Border.all(color: p.line, width: 1.5),
+        ),
+        child: Icon(Icons.arrow_forward_rounded, size: 15, color: p.ink2),
       ),
     );
   }

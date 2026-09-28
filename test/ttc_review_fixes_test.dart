@@ -337,14 +337,12 @@ void main() {
       tester.view.physicalSize = const Size(360, 780);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.reset);
+      final script = TtcShouldTestChat(
+        facts: TtcShouldTestFacts(
+            today: today, lastStart: ago(20), usualLength: 28),
+      );
       await tester.pumpWidget(MaterialApp(
-        home: TtcChatScreen(
-          pause: Duration.zero,
-          script: TtcShouldTestChat(
-            facts: TtcShouldTestFacts(
-                today: today, lastStart: ago(20), usualLength: 28),
-          ),
-        ),
+        home: TtcChatScreen(pause: Duration.zero, script: script),
       ));
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
@@ -352,7 +350,11 @@ void main() {
       expect(tray, findsOneWidget);
       // The tray is at the foot of the screen.
       expect(tester.getBottomLeft(tray).dy, closeTo(780, 1));
-      final start = find.descendant(of: tray, matching: find.text('Start'));
+      // Launch sanity D7 (2026-09-28): the chat starts by itself, so the
+      // first answer in the tray is its first real step's, not "Start".
+      // Kept for revert: find.text('Start').
+      final first = script.start().choices.first.label;
+      final start = find.descendant(of: tray, matching: find.text(first));
       expect(start, findsOneWidget, reason: 'the answer sits in the tray');
       expect(
           tester
@@ -439,6 +441,9 @@ void main() {
       await TtcContentPrefs.instance.setHideIntimate(false);
       await tester.pump();
       expect(find.byKey(const ValueKey('ttc_home_quick_sex')), findsOneWidget);
+      // The home's reads now carry photos from the photo table (2026-09-28);
+      // let a network image's retry timer run out before the test ends.
+      await tester.pump(const Duration(milliseconds: 50));
     });
 
     testWidgets('H4, H5, E7: the chip is 44pt, ink when on, and can be undone',

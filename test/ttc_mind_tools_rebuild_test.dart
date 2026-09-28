@@ -110,14 +110,25 @@ void main() {
     testWidgets('the vibration is off by default and turns on with one tap',
         (tester) async {
       await _pump(tester, TtcPracticeScreen(practice: breath), height: 4000);
-      expect(find.text('Vibrate on each breath: off'), findsOneWidget);
-      await tester.tap(find.text('Vibrate on each breath: off'));
+      // A labelled switch since 2026-09-28 (launch sanity MB14), not a line of
+      // text that was secretly a toggle. Kept for revert:
+      //   expect(find.text('Vibrate on each breath: off'), findsOneWidget);
+      //   await tester.tap(find.text('Vibrate on each breath: off'));
+      //   expect(find.text('Vibrate on each breath: on'), findsOneWidget);
+      final row = find.ancestor(
+          of: find.text('Vibrate on each breath'),
+          matching: find.byType(TtcVibrateSwitch));
+      expect(row, findsOneWidget);
+      final sw = find.descendant(of: row, matching: find.byType(Switch));
+      expect(tester.widget<Switch>(sw).value, isFalse);
+      await tester.tap(sw);
       await tester.pump();
-      expect(find.text('Vibrate on each breath: on'), findsOneWidget);
+      expect(tester.widget<Switch>(sw).value, isTrue);
+      expect(ttcPracticeVibrate.value, isTrue);
       final prefs = await SharedPreferences.getInstance();
       expect(prefs.getBool('ttc_practice_vibrate'), isTrue);
       // Put it back, for the next test's default.
-      await tester.tap(find.text('Vibrate on each breath: on'));
+      await tester.tap(sw);
       await tester.pump();
     });
 
@@ -138,8 +149,12 @@ void main() {
       // Half way through a six-step card is step four.
       _now = _now.add(Duration(seconds: move.anim.seconds ~/ 2));
       await tester.pump(const Duration(milliseconds: 150));
-      expect(find.text('Step 4 of $n'), findsNWidgets(2),
-          reason: 'the list counter and the ring both say it');
+      // One counter since 2026-09-28 (launch sanity MB14): the ring carries
+      // it while the steps follow the timer. Kept for revert:
+      //   expect(find.text('Step 4 of $n'), findsNWidgets(2),
+      //       reason: 'the list counter and the ring both say it');
+      expect(find.text('Step 4 of $n'), findsOneWidget,
+          reason: 'the ring says it, and nothing repeats it');
 
       await tester.tap(find.text('Previous step'));
       await tester.pump();
@@ -171,9 +186,11 @@ void main() {
           const TtcRitualScreen(chapter: TtcChapter.tryingTogether));
       expect(find.byType(TtcToolScaffold), findsOneWidget);
       expect(find.byType(TtcCard), findsNothing);
-      expect(find.text(const TtcS(false).ritualTitle.toUpperCase()),
+      // The home's name for it since 2026-09-28 (launch sanity H15). Kept
+      // for revert: const TtcS(false).ritualTitle.toUpperCase()
+      expect(find.text(const TtcS(false).sanskarTitle.toUpperCase()),
           findsOneWidget,
-          reason: "the tile's name is the eyebrow");
+          reason: "the home band's name is the eyebrow");
       expect(find.text('Tap a part to open it.'), findsOneWidget);
     });
 
@@ -187,7 +204,10 @@ void main() {
       expect(find.byType(TtcPracticeSession), findsOneWidget);
       await tester.tap(find.text('Start'));
       await tester.pump();
-      _now = _now.add(const Duration(seconds: 61));
+      // Today's breath practice since 2026-09-28 (MB18), one to two minutes.
+      // Kept for revert: const Duration(seconds: 61)
+      _now = _now.add(
+          Duration(seconds: ttcSanskarBreathPractice().anim.seconds + 1));
       await tester.pump(const Duration(milliseconds: 150));
       await tester.pump(const Duration(milliseconds: 300));
       expect(TtcRitualStore.instance.isDone(TtcRitualPart.breath), isTrue);

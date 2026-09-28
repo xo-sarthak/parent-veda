@@ -73,6 +73,10 @@ import 'ttc_round_strings.dart' show ttcRoundDate;
 import 'ttc_strings.dart';
 import 'ttc_tool_chrome.dart';
 import 'ttc_tools_screen.dart' show ttcToolById;
+import 'ttc_tool_hues.dart';
+import 'ttc_surface_router.dart' show openTtcSurface;
+import '../../ttc/ttc_bmi_rules.dart';
+import '../../ttc/ttc_bmi_store.dart';
 
 /// The hue a field's linked read opens in. 42 is the stage's warm read tone —
 /// the same one `ttc_read_stress_fertility` carries in its own definition, so
@@ -1454,7 +1458,11 @@ class _Presets extends StatelessWidget {
 // =============================================================================
 
 /// The hue each tracker's field takes: the group its Tools tile sits in.
-double _trackerHue(TtcTracker t) => t.id == 'partner_health' ? 186 : 172;
+/// T6 (launch sanity, 2026-09-28): the named group constants, so the rule
+/// is one file (ttc_tool_hues.dart). Kept for revert (2026-09-28):
+/// double _trackerHue(TtcTracker t) => t.id == 'partner_health' ? 186 : 172;
+double _trackerHue(TtcTracker t) =>
+    t.id == 'partner_health' ? kTtcToolHueBoth : kTtcToolHueBody;
 
 /// The eyebrow is the Tools tile's name, so tile, eyebrow and title agree.
 String _trackerEyebrow(TtcTracker t, bool hi) {
@@ -1630,10 +1638,28 @@ class _TtcTrackerScreenState extends State<TtcTrackerScreen> {
           ),
       ])),
       const SizedBox(height: 14),
-      // The tracker's own "why", kept visible: `ttc_tools_test.dart` holds
-      // that the reason comes before anything is asked for.
-      ttcToolPad(Text(tracker.why(hi),
+      // ⚠️ THE CONTROLS COME FIRST (launch sanity T4, 2026-09-28). The whole
+      // "why" (two paragraphs on Weight) sat between the day strip and the
+      // first control and pushed the controls below the fold. The reason
+      // still comes before anything is asked for, as `ttc_tools_test.dart`
+      // holds, but as ONE sentence; the rest is behind "Why this matters",
+      // which opens it in a sheet. Mobbin: Stardust's symptom log (an info
+      // mark beside the name opens the explanation; the control is what
+      // the page shows),
+      // https://mobbin.com/screens/8841ef76-e6a4-453f-bebc-cd838feb5804 ;
+      // Lifesum "Nutrition ratings" (the explanation lives in a sheet),
+      // https://mobbin.com/screens/376876df-203e-4fba-9afa-4c4c1b2fba10 ;
+      // Oura heart rate zones (an explainer sheet off the data screen),
+      // https://mobbin.com/screens/7f8a6ae0-de39-4e5f-8fee-3e0bd3aa5ce3 .
+      // Kept for revert (2026-09-28):
+      // ttcToolPad(Text(tracker.why(hi),
+      //     style: pvManrope(fontSize: 12.5, height: 1.55, color: p.ink2))),
+      ttcToolPad(Text(ttcTrackerWhyLead(tracker, hi),
+          key: const ValueKey('ttc_tracker_why_lead'),
           style: pvManrope(fontSize: 12.5, height: 1.55, color: p.ink2))),
+      if (ttcTrackerWhyLead(tracker, hi) != tracker.why(hi).trim())
+        ttcToolPad(_WhyRow(
+            onTap: () => showTtcTrackerWhy(context, tracker, hi))),
       if (tracker.forPartner) ...[
         const SizedBox(height: 10),
         ttcToolPad(Text(
@@ -1670,6 +1696,13 @@ class _TtcTrackerScreenState extends State<TtcTrackerScreen> {
         ],
       ],
       ttcToolPad(_SevereLine(tracker: tracker, day: _day, t: t)),
+      // ⚠️ BMI LIVES ON THE WEIGHT PAGE (launch sanity T1/T2, 2026-09-28).
+      // "Weight" and "Weight and fertility" were two tiles for one subject;
+      // the hub keeps one, and this row is the way to the BMI screen.
+      if (tracker.id == 'weight') ...[
+        const SizedBox(height: 24),
+        ttcToolPad(const TtcWeightBmiRow()),
+      ],
       if (tracker.disclaimer(hi) != null) ...[
         const SizedBox(height: 24),
         ttcToolPad(Text(tracker.disclaimer(hi)!,
@@ -2487,4 +2520,201 @@ class _TypeSheetState extends State<_TypeSheet> {
       ),
     );
   }
+}
+
+
+// =============================================================================
+//  T4 (launch sanity, 2026-09-28): one sentence of why, the rest in a sheet
+// =============================================================================
+
+/// The one sentence a tracker says above its controls, where its "why"
+/// does not open with its point. Weight's opens on oestrogen, which is the
+/// mechanism, not the reason. A shortening of its own text, never a new fact.
+const Map<String, String> kTtcTrackerWhyLeads = {
+  'weight': 'Very low or very high weight can make cycles irregular. '
+      "There's no target here.",
+};
+
+/// The first sentence of a tracker's "why" (or its lead above): what the
+/// page shows above its controls. The whole text opens behind "Why this
+/// matters".
+String ttcTrackerWhyLead(TtcTracker tracker, bool hi) {
+  final why = tracker.why(hi);
+  final lead = hi ? null : kTtcTrackerWhyLeads[tracker.id];
+  if (lead != null) return lead;
+  final text = why.trim();
+  final para = text.split('\n').first.trim();
+  final m = RegExp(r'^.*?[.!?](?=\s|$)').firstMatch(para);
+  return (m?.group(0) ?? para).trim();
+}
+
+const String kTtcTrackerWhyLabel = 'Why this matters';
+
+class _WhyRow extends StatelessWidget {
+  const _WhyRow({required this.onTap});
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = V2PaletteStore.instance.current;
+    return Semantics(
+      button: true,
+      label: kTtcTrackerWhyLabel,
+      excludeSemantics: true,
+      child: InkWell(
+        key: const ValueKey('ttc_tracker_why_more'),
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            Icon(Icons.info_outline_rounded, size: 15, color: p.ink1),
+            const SizedBox(width: 6),
+            Text(kTtcTrackerWhyLabel,
+                style: pvManrope(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w800,
+                    color: p.ink1,
+                    decoration: TextDecoration.underline)),
+          ]),
+        ),
+      ),
+    );
+  }
+}
+
+/// The tracker's whole "why", in a sheet.
+Future<void> showTtcTrackerWhy(
+        BuildContext context, TtcTracker tracker, bool hi) =>
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        final p = V2PaletteStore.instance.current;
+        return Container(
+          key: const ValueKey('ttc_tracker_why_sheet'),
+          constraints: BoxConstraints(
+              maxHeight: MediaQuery.sizeOf(ctx).height * 0.8),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+          ),
+          child: SafeArea(
+            top: false,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(22, 14, 22, 22),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 36,
+                      height: 4,
+                      decoration: BoxDecoration(
+                          color: p.line,
+                          borderRadius: BorderRadius.circular(2)),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(kTtcTrackerWhyLabel,
+                      style: pvFraunces(
+                          fontSize: 21,
+                          fontWeight: FontWeight.w600,
+                          color: p.ink1)),
+                  const SizedBox(height: 12),
+                  Text(tracker.why(hi),
+                      style: pvManrope(
+                          fontSize: 14, height: 1.6, color: p.ink2)),
+                  const SizedBox(height: 18),
+                  TtcToolPrimary(
+                    label: 'Got it',
+                    onTap: () => Navigator.of(ctx).maybePop(),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+
+// =============================================================================
+//  T1/T2 (launch sanity, 2026-09-28): BMI folded into the Weight page
+// =============================================================================
+
+/// Her BMI when she has worked one out, else an invitation to. Opens the BMI
+/// screen, which fills her height and her latest weight in for her.
+class TtcWeightBmiRow extends StatefulWidget {
+  const TtcWeightBmiRow({super.key});
+
+  @override
+  State<TtcWeightBmiRow> createState() => _TtcWeightBmiRowState();
+}
+
+class _TtcWeightBmiRowState extends State<TtcWeightBmiRow> {
+  @override
+  void initState() {
+    super.initState();
+    TtcBmiStore.instance.load();
+  }
+
+  @override
+  Widget build(BuildContext context) => ListenableBuilder(
+        listenable: TtcBmiStore.instance,
+        builder: (context, _) {
+          final p = V2PaletteStore.instance.current;
+          final last = TtcBmiStore.instance.latest;
+          final title = last == null
+              ? 'Work out your BMI'
+              : 'Your BMI: ${last.bmi.toStringAsFixed(1)}';
+          final line = last == null
+              ? "What BMI does and doesn't tell you, from your height and "
+                  'weight. We fill in what you have logged.'
+              : '${categoriseBmi(last.bmi, kBmiPrimaryStandard).label.en}, '
+                  'from ${ttcToolDate(last.at)}. Tap to work it out again '
+                  'or see what it means.';
+          return Semantics(
+            button: true,
+            label: title,
+            child: Material(
+              color: Colors.white,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  side: BorderSide(color: p.line)),
+              clipBehavior: Clip.antiAlias,
+              child: InkWell(
+                key: const ValueKey('ttc_weight_bmi_row'),
+                onTap: () => openTtcSurface(context, 'ttc_bmi'),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
+                  child: Row(children: [
+                    Icon(Icons.straighten_rounded, size: 20, color: p.ink1),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(title,
+                              style: pvManrope(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w800,
+                                  color: p.ink1)),
+                          const SizedBox(height: 3),
+                          Text(line,
+                              style: pvManrope(
+                                  fontSize: 12.5,
+                                  height: 1.45,
+                                  color: p.ink2)),
+                        ],
+                      ),
+                    ),
+                    Icon(Icons.chevron_right_rounded, color: p.ink3),
+                  ]),
+                ),
+              ),
+            ),
+          );
+        },
+      );
 }
