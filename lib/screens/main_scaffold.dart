@@ -26,8 +26,9 @@ import '../theme/app_theme.dart';
 // import '../widgets/launch_promo.dart';
 import '../widgets/global_ask_fab.dart';
 import '../widgets/pv_tab_bar.dart';
-import 'calendar_screen.dart';
-import 'community_screen.dart';
+// Calendar moved into More, Community held back (2026-09-29). Kept for revert:
+// import 'calendar_screen.dart';
+// import 'community_screen.dart';
 import 'father/father_daily_screen.dart';
 import 'father/father_journal_screen.dart';
 import 'father/father_read_aloud_screen.dart';
@@ -46,6 +47,8 @@ import '../services/usage_events.dart';
 import '../booking/prescription_watch.dart';
 import '../services/pregnancy_ended_store.dart';
 import 'pregnancy/preg_ended_screen.dart' show PregEndedHome;
+import 'pregnancy/preg_learn_screen.dart';
+import 'pregnancy/preg_more_screen.dart';
 
 /// The five pregnancy tabs, in nav order, as usage surfaces.
 ///
@@ -53,12 +56,19 @@ import 'pregnancy/preg_ended_screen.dart' show PregEndedHome;
 /// bilingual and father mode swaps three of them — a metric keyed on display
 /// text would silently split one surface into several the day someone switched
 /// language, and the numbers would look like a drop in usage.
+// ⚠️ TODAY · LEARN · PRODUCTS · TOOLS · MORE since 2026-09-29 (the
+// structure pass, the TTC bar's order). Learn logs as `learn`, the surface
+// parenting's Learn already uses, told apart by `stage`. More has no surface
+// of its own in the closed list, so it logs as `prepare`: experts, courses
+// and groups are most of what is on it, and adding a surface to the shared
+// list is a separate, deliberate change. Kept for revert:
+//   home, products, tools, calendar, community
 const _pregnancySurfaces = <String>[
   UsageSurface.home,
+  UsageSurface.learn,
   UsageSurface.products,
   UsageSurface.tools,
-  UsageSurface.calendar,
-  UsageSurface.community,
+  UsageSurface.prepare,
 ];
 
 class MainScaffold extends StatefulWidget {
@@ -207,10 +217,21 @@ class _MainScaffoldState extends State<MainScaffold> with WidgetsBindingObserver
                 // yoga, birthing classes) is the first tile of the Tools hub
                 // now. Kept for revert:
                 //   PrepareHubScreen(lang: widget.pregnancy.language),
+                //
+                // ⚠️ TODAY · LEARN · PRODUCTS · TOOLS · MORE — 2026-09-29, the
+                // structure pass: the trying-to-conceive bar, in its order (the
+                // user's screenshots; "everyone learns one ParentVeda").
+                // Calendar moved into More › Your journey. Community is held
+                // back until it is real (gap analysis P1), with every entry
+                // point commented out. Kept for revert, the old order:
+                //   PvStoreScreen(chrome: PvStoreChrome.embedded),
+                //   ToolsHubScreen(controller: widget.pregnancy),
+                //   CalendarScreen(controller: widget.pregnancy),
+                //   CommunityScreen(controller: widget.pregnancy),
+                PregLearnScreen(pregnancy: widget.pregnancy),
                 const PvStoreScreen(chrome: PvStoreChrome.embedded),
                 ToolsHubScreen(controller: widget.pregnancy),
-                CalendarScreen(controller: widget.pregnancy),
-                CommunityScreen(controller: widget.pregnancy),
+                PregMoreScreen(pregnancy: widget.pregnancy),
               ];
         final tabs = fatherMode
             ? const [
@@ -232,11 +253,15 @@ class _MainScaffoldState extends State<MainScaffold> with WidgetsBindingObserver
                 //   home_rounded · school_rounded · widgets_rounded ·
                 //   calendar_today_rounded · groups_rounded
                 PvTab(Icons.home_outlined, s.tabToday),
+                // Learn and More (2026-09-29): the TTC bar's glyphs, the
+                // four-square More of the user's screenshot. Kept for revert:
+                //   PvTab(Icons.calendar_today_outlined, s.tabCalendar),
+                //   PvTab(Icons.groups_outlined, s.tabCommunity),
+                const PvTab(Icons.menu_book_outlined, 'Learn'),
                 // Was: PvTab(Icons.school_outlined, s.tabPrepare) — kept for revert.
                 const PvTab(Icons.shopping_basket_outlined, 'Products'),
                 PvTab(Icons.handyman_outlined, s.toolsTab),
-                PvTab(Icons.calendar_today_outlined, s.tabCalendar),
-                PvTab(Icons.groups_outlined, s.tabCommunity),
+                const PvTab(Icons.grid_view_outlined, 'More'),
               ];
         return Scaffold(
           backgroundColor: AppTheme.scaffoldBackground,

@@ -50,6 +50,8 @@ import 'package:flutter/services.dart';
 // block below. Restore both if that block is uncommented.
 import '../data/product_data.dart' show productImageUrl;
 import '../services/app_nav.dart';
+import 'calendar_screen.dart';
+import 'pregnancy/preg_more_screen.dart' show kPregTabMore, kPregTabProducts, kPregTabTools;
 import '../services/app_structure.dart';
 import '../services/home_content_controller.dart';
 import '../services/landing_focus.dart';
@@ -1675,17 +1677,26 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
       case AppHome.today:
       case AppHome.profile:
         TodayVersionStore.instance.set(TodayVersion.classic);
+      // ⚠️ THE BAR IS TODAY · LEARN · PRODUCTS · TOOLS · MORE since
+      // 2026-09-29, so every index moved. Kept for revert: products 1,
+      // prepare 2, tools 2, calendar 3, community 4.
       case AppHome.products:
-        AppNav.instance.go(1);
+        AppNav.instance.go(kPregTabProducts);
       case AppHome.prepare:
-        // Prepare left the bar for the Tools hub's first tile (2026-09-17).
-        AppNav.instance.go(2);
+        // Prepare is More › All programmes and sessions now.
+        AppNav.instance.go(kPregTabMore);
       case AppHome.tools:
-        AppNav.instance.go(2);
+        AppNav.instance.go(kPregTabTools);
       case AppHome.calendar:
-        AppNav.instance.go(3);
+        // Calendar lost its tab to Learn; it opens itself rather than
+        // landing her on More one tap short of it.
+        Navigator.of(context).push(MaterialPageRoute<void>(
+            settings: const RouteSettings(name: 'calendar'),
+            builder: (_) => CalendarScreen(controller: pregnancy)));
       case AppHome.community:
-        AppNav.instance.go(4);
+        // Held back until it is real (gap analysis P1). Kept for revert:
+        //   AppNav.instance.go(4);
+        return;
     }
   }
 }

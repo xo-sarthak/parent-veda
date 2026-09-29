@@ -574,14 +574,24 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
 
   // The 7 sections, all from the backend feed. 1-3 from the LLM; 4/6/7 (+ videos,
   // community) always render — an empty one shows "Coming soon".
+  //
+  // ⚠️ AN EMPTY SECTION IS LEFT OUT, NOT PROMISED (2026-09-29, the pregnancy
+  // gap analysis, "Hide empty sections instead of saying 'coming soon'"): five
+  // "coming soon" lines under an answer made every answer look unfinished.
+  // The service already returns an empty list for a section it has nothing
+  // for, so this is display only and nothing is owed on the service side.
+  // Community insights is held back with the community itself. Kept for
+  // revert, the always-render list:
+  //   _feedMoreInfo(f), _feedCommunityComingSoon(), _feedProducts(f),
+  //   _feedServices(f),
   List<Widget> _feedSections(AskVedaResult f, S s) => [
         _feedAnswerCard(f.answer, s),
         if (f.meaning.isNotEmpty) _feedMeaning(f.meaning),
         if (f.actions.isNotEmpty) _feedActions(f.actions),
-        _feedMoreInfo(f),
-        _feedCommunityComingSoon(),
-        _feedProducts(f),
-        _feedServices(f),
+        if (f.content.isNotEmpty || f.videos.isNotEmpty) _feedMoreInfo(f),
+        // _feedCommunityComingSoon(), // held back with the community, kept for revert
+        if (f.products.isNotEmpty) _feedProducts(f),
+        if (f.services.isNotEmpty) _feedServices(f),
         _disclaimer(s),
       ];
 
@@ -692,11 +702,10 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
   // S4 - More information + Videos sub-section
   Widget _feedMoreInfo(AskVedaResult f) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         _sectionHead(Icons.library_books_rounded, 'More information'),
-        if (f.content.isEmpty)
-          _comingSoon('More articles on this are coming soon')
-        else
-          for (final it in f.content) _feedItemCard(it),
-        Padding(
+        // Kept for revert: the "coming soon" line when content is empty.
+        //   if (f.content.isEmpty) _comingSoon('More articles on this are coming soon') else
+        for (final it in f.content) _feedItemCard(it),
+        if (f.videos.isNotEmpty) Padding(
           padding: const EdgeInsets.fromLTRB(2, 20, 2, 12),
           child: Row(children: [
             const Icon(Icons.play_circle_outline_rounded, size: 19, color: _vPurple2),
@@ -704,10 +713,8 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
             Text(S.now.uiVideos, style: pvFraunces(fontSize: 17, fontWeight: FontWeight.w600, color: _vInk2)),
           ]),
         ),
-        if (f.videos.isEmpty)
-          _comingSoon('Videos for this are coming soon')
-        else
-          for (final it in f.videos) _feedItemCard(it),
+        // Kept for revert: _comingSoon('Videos for this are coming soon') when empty.
+        for (final it in f.videos) _feedItemCard(it),
       ]);
 
   Widget _feedItemCard(VedaFeedItem it) {
@@ -906,7 +913,9 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         _viewMeaning(v, s), // S2
         if (v.actions.isNotEmpty) _viewActions(v, s), // S3
         if (v.content.isNotEmpty) _viewContent(v, s), // S4
-        if (v.community != null) _viewCommunity(v.community!, s), // S5
+        // Held back with the community (2026-09-29, gap analysis "Hold the
+        // community back until it is real"). Kept for revert:
+        // if (v.community != null) _viewCommunity(v.community!, s), // S5
         if (v.products.isNotEmpty) _viewProducts(v, s, lang), // S6
         _disclaimer(s),
       ];

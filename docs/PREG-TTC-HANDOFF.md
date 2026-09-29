@@ -47,3 +47,37 @@ The user (2026-09-29): "doctors used in TTC are real, you can use them." TTC sho
 have signed a piece off (`lib/ttc/ttc_expert_signoff.dart`, `docs/TTC-EXPERT-SIGNOFF.md`). Pregnancy will follow the
 same rule with its own sign-off list. If the sign-off mechanism moves to a shared file, pregnancy should use it
 rather than copy it.
+
+## 5. An "opening soon" state on the shared course page
+
+**Pregnancy has (2026-09-29, the structure pass):** the gap analysis's P1 "Do not sell courses that do not exist yet".
+The three recorded pregnancy courses with no lesson made are listed in `kPrepOpeningSoon`
+(`lib/data/prepare_data.dart`). On the pregnancy Learn and More tabs they show "Opening soon" where the price was, and a
+tap opens a pregnancy sheet with "Tell me when it opens" instead of Buy. Their seed review, the made-up "1,240 mothers"
+counts and "reviewed by obstetricians" are commented out.
+
+**What is shared and was not touched:** `PvOfferingScreen` and `PvLearnScreen` (`lib/screens/learn/`) render every
+stage's courses, TTC's included, and `lib/booking/booking_catalog.dart` prices them. A course reached through Prepare ›
+Courses still shows its price and Buy.
+
+**What it would need:** an `openingSoon` (or "no lessons yet") state on `PvOfferingView` that the shared page reads:
+no price, no Buy, the "Tell me when it opens" button, and the booking catalogue refusing to sell it. TTC has the same
+question for any TTC course listed before its lessons exist.
+
+## 6. The TTC More screen in the user's screenshot is not in this repository
+
+**What pregnancy did:** built its own More tab (`lib/screens/pregnancy/preg_more_screen.dart`) to the screenshot's
+headings and order: Talk to an expert, Courses and masterclasses, Groups, Read and watch, Your journey, Benefits, All
+programmes and sessions. The bar is now Today · Learn · Products · Tools · More.
+
+**What was found:** the TTC code on this branch has Today · Learn · Products · Tools · **You** (`ttc_common.dart`,
+`_iconsV3`), and its More screen (`ttc_more_screen.dart`) is marked retired. The screenshot's More must be in the
+user's unpushed TTC work. When that lands: the two More screens should share one set of rows (they are built from the
+same `PvYouSection` / `PvYouRow` parts, so this is a merge of data, not of design), and the icon for More should
+match (pregnancy uses `Icons.grid_view_outlined`, the four squares in the screenshot).
+
+## 7. Two small shared-file follow-ups from the new pregnancy bar
+
+- `AppNav.journeyTab` (`lib/services/app_nav.dart`) is 1, which is Journey in the partner's bar and now Learn in hers.
+  Going to tab 1 snaps the selected week to this week; harmless on Learn, but the constant's name is now half true.
+- `UsageSurface` (`lib/services/usage_events.dart`) has no `more`; pregnancy logs More as `prepare` (STILL-OPEN §80.7).

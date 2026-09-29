@@ -266,12 +266,14 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
   bool _recording = false;
   bool _recorded = false;
   final _draft = TextEditingController();
-  final List<_Entry> _entries = [
-    _Entry(_t('Yesterday', 'कल').now,
-        _t('Felt the first kick against my palm tonight. I actually teared up.', 'आज रात पहली हलचल हथेली पर महसूस हुई। सच में आँख भर आई।').now),
-    _Entry(_t('Tuesday', 'मंगलवार').now,
-        _t('Told her the nursery can wait - we just need each other right now.', 'उनसे कह दिया कि नर्सरी रुक सकती है — अभी बस एक-दूसरे की ज़रूरत है।').now),
-  ];
+  // ⚠️ STARTS EMPTY (2026-09-29, pregnancy gap analysis, P1 "Remove the fake
+  // journal entries"): a new father opening his journal to words he never
+  // wrote is confusing and untrue. The two seed entries, kept for revert:
+  //   _Entry(_t('Yesterday', 'कल').now,
+  //       _t('Felt the first kick against my palm tonight. I actually teared up.', 'आज रात पहली हलचल हथेली पर महसूस हुई। सच में आँख भर आई।').now),
+  //   _Entry(_t('Tuesday', 'मंगलवार').now,
+  //       _t('Told her the nursery can wait - we just need each other right now.', 'उनसे कह दिया कि नर्सरी रुक सकती है — अभी बस एक-दूसरे की ज़रूरत है।').now),
+  final List<_Entry> _entries = [];
 
   String _toast = '';
   bool _toastShow = false;
@@ -1969,6 +1971,11 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
         const SizedBox(height: 24),
         Text(S.now.uiRecentEntries, style: _eyebrow(p.muted, 0.12)),
         const SizedBox(height: 12),
+        // The empty state the gap analysis asks for. Its "unless you share it"
+        // is left off: this journal has no share yet, so it would promise one.
+        if (_entries.isEmpty)
+          Text('Write the first line. It stays on your side, and she will not see it.',
+              style: _body(14, p.muted, h: 1.5)),
         for (final e in _entries)
           Container(
             margin: const EdgeInsets.only(bottom: 12),

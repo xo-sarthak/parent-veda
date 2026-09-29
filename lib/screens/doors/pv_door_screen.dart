@@ -109,6 +109,14 @@ const Set<String> kPvDoorRailDoors = {
   'pregnancy_work_money',
   'pregnancy_twins',
   'pregnancy_first_weeks',
+  // 2026-09-29, the structure pass: the three doors the user named as out of
+  // step with the benchmark ("labour prep, mind and mood, belly and skin are
+  // not having that same structural integrity"). Same data, same tabs; only
+  // the selector moves from the deck to the rail. Kept for revert: delete
+  // these three lines and they go back to the deck.
+  'pregnancy_labour',
+  'pregnancy_mental_health',
+  'pregnancy_belly_skin',
 };
 
 /// Inline tools that lay out their own gutter (their rails run edge to

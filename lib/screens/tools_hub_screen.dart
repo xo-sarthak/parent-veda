@@ -61,9 +61,318 @@ import 'learn/pv_learn_screen.dart';
 import '../services/life_stage_store.dart';
 import 'doors/pv_door_screen.dart' show pvDoorScreenForBracket;
 import '../data/doors/pv_door_symptoms.dart' show kSymptomsBracketId;
+import '../data/doors/pv_door_labour.dart' show kLabourSurfaceBirthPlan;
+import '../widgets/global_ask_fab.dart' show kAskVedaRoute;
+import '../widgets/pv_feedback.dart';
+import 'doors/pv_list_row.dart';
+import 'doors/pv_live_search.dart';
+import 'pregnancy/birth_plan_screen.dart';
+import 'products/pv_store_chrome.dart' show pvStorePalette;
+import 'v2/v2_palette.dart';
 
-class ToolsHubScreen extends StatelessWidget {
+// =============================================================================
+//  THE LIST — 2026-09-29, the structure pass
+// -----------------------------------------------------------------------------
+//  The pregnancy gap analysis, "Tools tab · Clean the list: her tools only,
+//  grouped" (P2): 24 tiles in the older plum grid mixed her tools with sponsor
+//  showcases ("Launches", "Brand Studio") and the father's journal, and the
+//  birth plan was missing. What to Expect's Tools tab is short and plain, one
+//  line per tool.
+//
+//  So this is the TTC Tools tab's shape (the user's screenshot, and
+//  `ttc_tools_screen.dart`): a large title and one line, "Find a tool", then
+//  unboxed rows (`PvRowGroup` + `PvListRow`) under eyebrows, each tool's glyph
+//  in its group's tint. The groups are the PDF's three, Track · Get ready ·
+//  Keep, plus the TTC tab's "Plan and check" as Check and ask, because Is it
+//  safe? and Ask Veda fit none of the three and a tool with no group is a
+//  tool with no home.
+//
+//  WHERE THE REST WENT, NOTHING DELETED:
+//    Learn, Read recommendations  the Learn tab (the bar's second slot)
+//    Prepare                      More › All programmes and sessions
+//    Product Guide                the Products tab (the guide lives in it)
+//    Journey map hero             More › Your journey
+//    Launches, Brand Studio       off her list (sponsor showcases); the debug
+//                                 workbenches stay in debug builds only
+//    Father's Journal             his side (the partner's Journal tab)
+//  The grid is `ToolsHubScreenClassic` below, byte for byte, for revert.
+//
+//  Mobbin: What to Expect's Tools list (the PDF's reference); Apple Health
+//  Search, a large title then the list (AH-SEARCH,
+//  https://mobbin.com/screens/cd8919aa-c470-48b8-8716-54343395eab2), the
+//  reference the TTC Tools tab was built to.
+// =============================================================================
+
+/// One group of tools: an eyebrow, a tint, and its rows.
+class _ToolGroup {
+  const _ToolGroup(this.title, this.hue, this.tools);
+  final String title;
+  final double hue;
+  final List<_Tool> tools;
+}
+
+class ToolsHubScreen extends StatefulWidget {
   const ToolsHubScreen({super.key, required this.controller});
+  final PregnancyController controller;
+
+  @override
+  State<ToolsHubScreen> createState() => _ToolsHubScreenState();
+}
+
+class _ToolsHubScreenState extends State<ToolsHubScreen> {
+  final PvLiveSearch _search = PvLiveSearch();
+
+  PregnancyController get controller => widget.controller;
+
+  static const double _g = 18;
+
+  @override
+  void dispose() {
+    _search.dispose();
+    super.dispose();
+  }
+
+  void _open(String route, Widget Function() b) {
+    pvCommitFeedback();
+    Navigator.of(context).push(MaterialPageRoute<void>(
+      settings: RouteSettings(name: route),
+      builder: (_) => b(),
+    ));
+  }
+
+  List<_ToolGroup> _groups(S s) => [
+        _ToolGroup('Track', 206, [
+          _Tool(s.babyMovementTracker, Icons.favorite_border_rounded,
+              AppTheme.secondary500,
+              () => _open('tools/movement', () => BabyMovementScreen(controller: controller)),
+              line: "Count kicks and get to know your baby's pattern",
+              priority: PregPriority.babyDevelopment),
+          _Tool(s.toolWeightTitle, Icons.monitor_weight_outlined,
+              AppTheme.tertiary500,
+              () => _open('tools/weight', () => WeightTrackerScreen(controller: controller)),
+              line: 'Log your weight and see a healthy range for you',
+              priority: PregPriority.nutrition),
+          _Tool(s.medTitle, Icons.medication_outlined, const Color(0xFF4F7A52),
+              () => _open('tools/medicines', () => MedicineTrackerScreen(controller: controller)),
+              line: 'What your doctor prescribed, with reminders',
+              priority: PregPriority.symptoms),
+          _Tool(s.symToolTitle, Icons.healing_outlined, const Color(0xFF4A7BC8),
+              // The Symptoms door (2026-09-23), as the grid opened it.
+              () => _open('bracket/symptoms', () =>
+                  pvDoorScreenForBracket(kSymptomsBracketId, controller) ??
+                  SymptomCompanionScreen(controller: controller)),
+              line: "What's normal, what helps, and when to call",
+              priority: PregPriority.symptoms),
+          _Tool(s.toolKegelTitle, Icons.self_improvement_rounded,
+              AppTheme.secondary400,
+              () => _open('tools/kegel', () => KegelCareScreen(controller: controller)),
+              line: 'A few minutes a day for your pelvic floor',
+              priority: PregPriority.fitness),
+          _Tool(s.tsrTitle, Icons.fact_check_outlined, AppTheme.primary500,
+              () => _open('tools/tests_scans', () => TestsScansReportsScreen(controller: controller)),
+              line: 'Your scans and reports, and what each one checks',
+              priority: PregPriority.symptoms),
+          _Tool(s.rmdTitle, Icons.notifications_none_rounded,
+              const Color(0xFFE0921C),
+              () => _open('tools/reminders', () => RemindersScreen(controller: controller)),
+              line: 'What we remind you about, and when'),
+        ]),
+        _ToolGroup('Get ready', 28, [
+          _Tool(s.hbName, Icons.luggage_outlined, AppTheme.tertiary400,
+              () => _open('tools/hospital_bag', () => ReadyForBirthScreen(controller: controller)),
+              line: 'What to pack for you, your baby and your partner',
+              priority: PregPriority.birthPrep),
+          // Added by the gap analysis: the birth plan was built for the Labour
+          // door and never listed here.
+          _Tool('Birth plan', Icons.edit_note_rounded, const Color(0xFFB0654A),
+              () => _open(kLabourSurfaceBirthPlan, () => BirthPlanScreen(pregnancy: controller)),
+              line: 'What you would like on the day, to share with your doctor',
+              priority: PregPriority.birthPrep),
+          _Tool(s.toolContractionTitle, Icons.timer_outlined, AppTheme.primary400,
+              () => _open('tools/contractions', () => ContractionTrackerScreen(controller: controller)),
+              line: 'Time your contractions and see when to go in',
+              priority: PregPriority.birthPrep),
+          _Tool(s.ddcToolTitle, Icons.calendar_month_outlined, AppTheme.primary500,
+              () => _open('tools/due_date', () => DueDateCalculatorScreen(controller: controller)),
+              line: 'Work out your due date, or update it after a scan',
+              staleDueDate: controller.dueDateMayBeStale),
+          _Tool(s.pclTitle, Icons.checklist_rounded, const Color(0xFF3E9A8C),
+              () => _open('tools/product_checklist', () => ProductChecklistScreen(controller: controller)),
+              line: 'What you really need before the baby comes',
+              priority: PregPriority.birthPrep),
+        ]),
+        _ToolGroup('Keep', 330, [
+          _Tool(s.jrTitle, Icons.menu_book_outlined, const Color(0xFF8A6BBF),
+              () => _open('journal', () => JournalScreen(controller: controller)),
+              line: 'Write to yourself, or to your baby'),
+          _Tool(s.bumpTitle, Icons.pregnant_woman_rounded, const Color(0xFFCB6F94),
+              () => _open('tools/bump', () => BumpRitualScreen(controller: controller)),
+              line: 'A photo of your bump, week by week'),
+          _Tool(s.garbhToolTitle, Icons.spa_outlined, const Color(0xFFBE9C4E),
+              () => _open('garbh_daily', () =>
+                  screenForSurface('garbh_daily', controller, controller.language) ??
+                  GarbhScreen(controller: controller)),
+              line: "Today's practice: a story, a sound, a quiet minute",
+              priority: PregPriority.anxiety),
+          _Tool(s.sprToolTitle, Icons.auto_stories_outlined, const Color(0xFF9A7BB5),
+              () => _open('tools/spiritual_reading', () => SpiritualReadingScreen(controller: controller)),
+              line: 'Short readings to hear, or to read aloud',
+              priority: PregPriority.anxiety),
+        ]),
+        _ToolGroup('Check and ask', 268, [
+          // "Is it safe?" is what the door and the home call it; the string
+          // table's "Can I?" is its older name. Kept for revert: s.toolCanI.
+          _Tool('Is it safe?', Icons.help_outline_rounded, AppTheme.secondary600,
+              () => _open('can_i', () => CanIScreen(controller: controller)),
+              line: 'Food, medicines and everyday things, answered'),
+          _Tool(s.vedaToolTitle, Icons.auto_awesome_outlined, AppTheme.primary600,
+              () => _open(kAskVedaRoute, () => AskVedaScreen(controller: controller)),
+              line: 'Ask anything, in your own words'),
+        ]),
+        // The two workbenches the grid carried, debug builds only, as before.
+        if (kDebugMode)
+          _ToolGroup('Developer', 0, [
+            _Tool('Brand Studio (debug)', Icons.science_outlined,
+                const Color(0xFFD92D20),
+                () => _open('debug/brand', () => BrandPreviewScreen(pregnancyWeek: controller.currentWeek)),
+                line: 'Debug builds only'),
+            _Tool('Care Partner (debug)', Icons.qr_code_2_rounded,
+                const Color(0xFFD92D20),
+                () => _open('debug/care', () => const CareDebugScreen()),
+                line: 'Debug builds only'),
+          ]),
+      ];
+
+  /// The doors' rule: every word she typed starts a word in the title or the
+  /// line.
+  bool _matches(_Tool t, String q) {
+    final hay = '${t.title} ${t.line ?? ''}'
+        .toLowerCase()
+        .split(RegExp(r'[^a-z0-9]+'))
+        .where((w) => w.isNotEmpty)
+        .toList();
+    final words = q.toLowerCase().split(RegExp(r'[^a-z0-9]+')).where((w) => w.isNotEmpty);
+    return words.every((w) => hay.any((h) => h.startsWith(w)));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Listens to the profile as well as the controller, so re-ordering takes
+    // effect the moment she changes what she wants help with.
+    return AnimatedBuilder(
+      animation: Listenable.merge([controller, FamilyProfileStore.instance, _search]),
+      builder: (context, _) {
+        final p = pvStorePalette;
+        final s = S(controller.language);
+        final groups = _groups(s);
+        return PvLiveSearchScope(
+          search: _search,
+          child: Container(
+            color: p.ground,
+            child: ListView(
+              // kAskFabReserve, as the grid had it: the Ask Veda button floats
+              // over every tab, and the last row must clear it.
+              padding: EdgeInsets.fromLTRB(
+                  0, MediaQuery.of(context).padding.top + 12, 0, kAskFabReserve + 40),
+              children: [
+                _pad(Text(s.toolsTitle,
+                    style: pvFraunces(
+                        fontSize: 30, fontWeight: FontWeight.w500, height: 1.1, color: p.ink1))),
+                const SizedBox(height: 6),
+                _pad(PvLiveSearchWords(
+                  search: _search,
+                  // Kept for revert: s.toolsIntro ("Helpful companions for your
+                  // journey - more arriving soon").
+                  child: Text(
+                      'Tools to track your pregnancy, get ready for the birth and '
+                      'keep what matters. Tap one to open it. None of them are required.',
+                      style: pvManrope(fontSize: 14, height: 1.45, color: p.ink2)),
+                )),
+                const SizedBox(height: 14),
+                _pad(PvLiveSearchField(search: _search, p: p, hint: 'Find a tool')),
+                if (_search.searching)
+                  ..._results(p, groups)
+                else ...[
+                  for (final g in groups) ..._group(p, g),
+                  // Progressive profiling, kept: whatever she picks re-sorts the
+                  // rows inside each group. Under the list now, so the list leads.
+                  const SizedBox(height: 22),
+                  _pad(pregPrioritiesStrip(controller.language, 'tools_hub')),
+                ],
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _pad(Widget child) =>
+      Padding(padding: const EdgeInsets.symmetric(horizontal: _g), child: child);
+
+  Widget _eyebrow(V2Palette p, String t) => Text(t.toUpperCase(),
+      style: pvManrope(
+          fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.4, color: p.action));
+
+  List<Widget> _group(V2Palette p, _ToolGroup g) => [
+        const SizedBox(height: 26),
+        _pad(_eyebrow(p, g.title)),
+        const SizedBox(height: 8),
+        _pad(PvRowGroup(p: p, children: [
+          // LEVEL 3 personalisation, inside the group: a stable sort, every
+          // tool returned, the ones serving a priority she chose first.
+          for (final t in FamilyProfileStore.instance
+              .orderByPregPriority(g.tools, (t) => t.priority))
+            _row(p, t, g.hue),
+        ])),
+      ];
+
+  Widget _row(V2Palette p, _Tool t, double hue) => PvListRow(
+        p: p,
+        leading: PvMarkWell(p: p, hue: hue, size: 40, icon: t.icon),
+        title: t.title,
+        line: t.line,
+        // The one conditional line (§9.1b): her date is ours and a scan has
+        // probably overtaken it. Said as an offer, on the tile she opens to
+        // change it.
+        meta: t.staleDueDate ? S(controller.language).ddcMayBeStale : null,
+        onTap: t.onTap,
+      );
+
+  List<Widget> _results(V2Palette p, List<_ToolGroup> groups) {
+    final q = _search.query;
+    final hits = [
+      for (final g in groups)
+        for (final t in g.tools)
+          if (_matches(t, q)) (t, g.hue),
+    ];
+    return [
+      const SizedBox(height: 18),
+      if (hits.isEmpty)
+        _pad(Text('No tool by that name. Try a shorter word, or ask Veda.',
+            style: pvManrope(fontSize: 14, height: 1.45, color: p.ink2)))
+      else
+        _pad(PvRowGroup(p: p, children: [
+          for (final (t, hue) in hits) _row(p, t, hue),
+        ])),
+      const SizedBox(height: 14),
+      _pad(PvLiveSearchWayOn(
+        p: p,
+        icon: Icons.auto_awesome_outlined,
+        title: 'Ask Veda about "$q"',
+        line: 'In your own words, with your week in mind.',
+        onTap: () {
+          _search.focus.unfocus();
+          _open(kAskVedaRoute, () => AskVedaScreen(controller: controller, initialQuery: q));
+        },
+      )),
+    ];
+  }
+}
+
+/// The pre-2026-09-29 grid. Kept for revert; nothing pushes it.
+class ToolsHubScreenClassic extends StatelessWidget {
+  const ToolsHubScreenClassic({super.key, required this.controller});
   final PregnancyController controller;
 
   static const List<BoxShadow> _soft = [
@@ -576,8 +885,13 @@ class _Tool {
     this.onTap, {
     this.priority,
     this.staleDueDate = false,
+    this.line,
   });
   final String title;
+
+  /// One line saying what the tool does (the list, 2026-09-29). The grid
+  /// never showed one.
+  final String? line;
   final IconData icon;
   final Color color;
   final VoidCallback onTap;

@@ -9696,3 +9696,36 @@ Owed:
     is set only by the developer switch; how a paired partner's own phone lands on his side is the father-mode pass the
     user scheduled as a whole. (c) **his messages at key moments** (Flo: "Her period is due soon, ways to support
     her"): not built; the five computed messages are hers.
+
+## 80.0 Pregnancy gap pass — warmth, new doors, and the structure pass — 2026-09-29
+
+Branch `claude/magical-ritchie-ynob3a`, from the pregnancy gap analysis (Flo and What to Expect vs ParentVeda, the PDF is
+the source of truth). Anything that needs trying to conceive or a shared file changed is in `docs/PREG-TTC-HANDOFF.md`,
+not here. Owed:
+
+  - **§80.1 "If your pregnancy has ended" is on this phone only.** `PregnancyEndedStore` is one local flag. A new phone
+    shows the pregnancy again (the safe failure: the You row is one tap away). Owed: a column or row the partner's
+    phone can read too, so his Today follows hers across devices.
+  - **§80.2 The week pages' sources need a clinician's check before launch.** `kPregWeekSources` in
+    `lib/data/preg_week_extras.dart` lists real, published guidance (MoHFW, ICMR-NIN, WHO, NICE, ACOG, RCOG, Moore);
+    which week cites which has not been reviewed by a doctor.
+  - **§80.3 "Tell me when it opens" is counted on this phone only.** The three recorded courses with no lesson made
+    (`kPrepOpeningSoon`) show "Opening soon" on the pregnancy Learn and More tabs, and the button saves the course id
+    locally (`preg_course_interest_v1`). The gap analysis wants "we learn which course to make first", which needs a
+    table (course id, user id, created at) behind RLS, written fire-and-forget like the other local-first stores.
+  - **§80.4 The shared course page still sells them.** `PvOfferingScreen` / `PvLearnScreen` have no "opening soon"
+    state; see `docs/PREG-TTC-HANDOFF.md` §5. Until then a course reached through Prepare › Courses still shows a price.
+  - **§80.5 Masterclasses and cohorts still carry made-up counts.** `_fromMasterclass` and `_fromCohort` in
+    `lib/data/prepare_data.dart` compute a "N mothers" label from the testimonial count and the seats, and
+    `PrepProgram.rating` defaults to 4.9. Only the three courses were cleaned in this pass (the PDF's item names
+    courses without lessons). Owed: the same for every programme that has not run.
+  - **§80.6 Mind & mood's film and audio tiles stay, by the user's call** ("don't hide them for now", 2026-09-29). The
+    PDF asks to comment out the meditation video tiles until they exist and to record the four calming tracks and
+    three guided breaths first. When the user wants it, the tiles are in `lib/data/doors/pv_door_mind.dart`
+    ("Breathe", "Calming audio", "Longer, when you have time").
+  - **§80.7 More logs as `prepare`.** `UsageSurface` is a closed list in a shared file; the pregnancy More tab logs its
+    tap as `prepare` (most of it is experts, courses and groups). A `more` surface is a one-line change there when
+    someone wants the two told apart.
+  - **§80.8 The Tools tab asks her priorities under the list now.** The strip (`pregPrioritiesStrip`) still re-sorts
+    the tools inside each group; it moved below the groups so the list leads. Whether it stays at all is the user's
+    call ("derive, never ask").

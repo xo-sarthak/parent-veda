@@ -593,8 +593,12 @@ void main() {
       // a green test turning red on a reflow, which teaches nothing and
       // costs a debugging session. The invariant is that the hub pushes the
       // screen; where the formatter puts the brackets is not our business.
+      //
+      // ⚠️ MORE, SINCE 2026-09-29 (the structure pass): the pregnancy bar is
+      // Today · Learn · Products · Tools · More, and Prepare is More › All
+      // programmes and sessions. Was: tools_hub_screen.dart.
       expect(
-        read('lib/screens/tools_hub_screen.dart'),
+        read('lib/screens/pregnancy/preg_more_screen.dart'),
         contains('PrepareHubScreen('),
       );
     });

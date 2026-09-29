@@ -20,7 +20,7 @@ import '../theme/app_theme.dart';
 import 'belly_skin/bump_ritual_screen.dart';
 import 'calendar_screen.dart';
 import 'can_i_screen.dart';
-import 'community_screen.dart';
+// import 'community_screen.dart'; // held back with the community, kept for revert
 import 'garbh_screen.dart';
 import 'journal_screen.dart';
 import 'journey_map_screen.dart';
@@ -130,8 +130,10 @@ class _GlobalSearchDelegate extends SearchDelegate<void> {
             Icons.description_rounded, (c) => TestsScansReportsScreen(controller: c)),
         _Dest(s.tabCalendar, const ['calendar', 'date', 'event', 'reminder'],
             Icons.calendar_today_rounded, (c) => CalendarScreen(controller: c)),
-        _Dest(s.tabCommunity, const ['community', 'mom', 'group', 'post'],
-            Icons.groups_rounded, (c) => CommunityScreen(controller: c)),
+        // Held back with the community (2026-09-29, pregnancy gap analysis:
+        // "comment out the tab and every entry point"). Kept for revert:
+        // _Dest(s.tabCommunity, const ['community', 'mom', 'group', 'post'],
+        //     Icons.groups_rounded, (c) => CommunityScreen(controller: c)),
       ];
 
   Widget _results(BuildContext context) {

@@ -135,7 +135,26 @@ void main() {
       (tester) async {
     // Complications is on the tile row (2026-09-18) and Nutrition joined the
     // rail doors (2026-09-20); the deck is judged on a door that still has it.
-    await _pump(tester, 'pregnancy_belly_skin');
+    //
+    // 2026-09-29, the structure pass: Belly & skin, Labour and Mind & mood
+    // moved to the rail, which left no pregnancy door on the deck. The deck
+    // stays built (kept for revert), so this judges it on whichever door is
+    // put back on it, and until then holds the other half of the promise:
+    // every door is on the benchmark rail. Was: _pump(tester, 'pregnancy_belly_skin').
+    final onDeck = [
+      for (final d in kPvDoorPages)
+        if (!kPvDoorRailDoors.contains(d.bracketId) &&
+            !kPvDoorTileDoors.contains(d.bracketId) &&
+            !kPvDoorChipDoors.contains(d.bracketId))
+          d.bracketId,
+    ];
+    if (onDeck.isEmpty) {
+      for (final d in kPvDoorPages) {
+        expect(kPvDoorRailDoors.contains(d.bracketId), isTrue, reason: d.bracketId);
+      }
+      return;
+    }
+    await _pump(tester, onDeck.first);
 
     // ⚠️ THE WIDGET, NOT THE DATA. A test can prove the door declares five
     // groups and prove nothing at all about which control draws them.

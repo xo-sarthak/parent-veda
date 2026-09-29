@@ -857,6 +857,23 @@ final List<LocalizedText> kPrepTopics = [
 ];
 
 // ---- new recorded courses (authored) ----------------------------------------
+
+/// The recorded courses with no lesson made yet (2026-09-29, pregnancy gap
+/// analysis, P1 "Do not sell courses that do not exist yet"). The pregnancy
+/// Learn and More tabs show these as "Opening soon" with no price and a
+/// "Tell me when it opens" instead of a Buy. Take an id out the day its
+/// lessons exist.
+///
+/// ⚠️ THE SHARED COURSE PAGE STILL SELLS THEM. `PvOfferingScreen` and
+/// `PvLearnScreen` are shared with trying to conceive and parenting, so
+/// teaching them an "opening soon" state is written down in
+/// docs/PREG-TTC-HANDOFF.md §5 rather than done in this pass.
+const Set<String> kPrepOpeningSoon = {
+  'course_pregnancy_guide',
+  'course_birthprep',
+  'course_trimester_fit',
+};
+
 final List<PrepProgram> _kPrepCourses = [
   PrepProgram(
     id: 'course_pregnancy_guide',
@@ -873,9 +890,19 @@ final List<PrepProgram> _kPrepCourses = [
     status: PrepStatus.available,
     durationLabel: _same('80+ lessons'),
     about:
-        _t('A documentary-style course that unlocks as your pregnancy grows and stays yours for life. You only ever see the lessons for your current stage; earlier and later ones are a tap away. Told through ParentVeda\'s own animated guides, scripted from research and reviewed by obstetricians.', 'एक documentary जैसा course, जो आपकी गर्भावस्था के साथ खुलता जाता है और हमेशा के लिए आपका रहता है। आपको हर बार सिर्फ़ अपने मौजूदा पड़ाव के lessons दिखते हैं; पहले और बाद वाले एक tap दूर हैं। ParentVeda के अपने animated guides के ज़रिए, शोध से लिखे और obstetricians द्वारा जाँचे गए।'),
-    rating: 4.9,
-    reviewsLabel: _t('1,240 mothers', '1,240 माँएँ'),
+        _t('A documentary-style course that unlocks as your pregnancy grows and stays yours for life. You only ever see the lessons for your current stage; earlier and later ones are a tap away. Told through ParentVeda\'s own animated guides.', 'एक documentary जैसा course, जो आपकी गर्भावस्था के साथ खुलता जाता है और हमेशा के लिए आपका रहता है। आपको हर बार सिर्फ़ अपने मौजूदा पड़ाव के lessons दिखते हैं; पहले और बाद वाले एक tap दूर हैं। ParentVeda के अपने animated guides के ज़रिए।'),
+    // ⚠️ "scripted from research and reviewed by obstetricians" CAME OFF
+    // (2026-09-29, pregnancy gap analysis, P1 "Do not sell courses that do
+    // not exist yet"): a medical claim on a course with no lesson made. It
+    // goes back when an obstetrician has actually reviewed it. Both sides
+    // lose the clause; nothing else in the pair changed.
+    // ⚠️ NO RATING, COUNT OR REVIEW UNTIL SOMEONE HAS TAKEN IT (2026-09-29,
+    // gap analysis "Behind · Trust"): no lesson of this course exists, so a
+    // 4.9 from 1,240 mothers and a quote from one of them cannot be true.
+    // `rating: 0` is how the catalogue says "no rating" (it shows one only
+    // above zero; the model's default is 4.9). Kept for revert:
+    //   rating: 4.9, reviewsLabel: _t('1,240 mothers', '1,240 माँएँ'),
+    rating: 0,
     lessons: [
       PrepLesson(_t('Your third trimester, week by week', 'आपकी तीसरी तिमाही, हफ़्ते-दर-हफ़्ते'), 16),
       PrepLesson(_t('Reading your body\'s labour signals', 'अपने शरीर के लेबर के संकेत पढ़ना'), 18),
@@ -888,9 +915,10 @@ final List<PrepProgram> _kPrepCourses = [
       _t('The warning signs that genuinely need a call.', 'वे चेतावनी संकेत जिन पर सच में डॉक्टर को फ़ोन करना चाहिए।'),
       _t('A gentle on-ramp into the newborn weeks.', 'नवजात के हफ़्तों में एक सौम्य प्रवेश।'),
     ],
-    reviews: [
-      Review(_same('Sneha K.'), _t('28 weeks', '28 हफ़्ते'), _t('"The one place that told me what to actually do, stage by stage."', '"बस यही एक जगह थी जिसने बताया कि असल में करना क्या है, पड़ाव दर पड़ाव।"')),
-    ],
+    // The seed review, kept for revert:
+    // reviews: [
+    //   Review(_same('Sneha K.'), _t('28 weeks', '28 हफ़्ते'), _t('"The one place that told me what to actually do, stage by stage."', '"बस यही एक जगह थी जिसने बताया कि असल में करना क्या है, पड़ाव दर पड़ाव।"')),
+    // ],
     featured: true,
     recency: 100,
   ),
@@ -899,7 +927,9 @@ final List<PrepProgram> _kPrepCourses = [
     kind: PrepKind.course,
     instructorName: _same('Meera Nair'),
     instructorRole: _same('Childbirth educator'),
-    instructorBio: _t('A certified, OB-reviewed childbirth educator who has prepared thousands of mothers for the big day.', 'एक प्रमाणित, OB द्वारा जाँची गई childbirth educator, जिन्होंने हज़ारों माँओं को उस बड़े दिन के लिए तैयार किया है।'),
+    instructorBio: _t('A certified childbirth educator who has prepared thousands of mothers for the big day.', 'एक प्रमाणित childbirth educator, जिन्होंने हज़ारों माँओं को उस बड़े दिन के लिए तैयार किया है।'),
+    // "OB-reviewed" came off with the guide's claim (2026-09-29); kept for revert:
+    // 'A certified, OB-reviewed childbirth educator ...'
     title: _same('Birth Prep Essentials'),
     subtitle: _t('A calm, self-paced walkthrough of everything the big day asks of you.', 'उस बड़े दिन आपसे जो कुछ चाहिए, उसकी शांत जानकारी — अपनी रफ़्तार से।'),
     topics: [_t('Birth & Labour', 'जन्म और लेबर'), _t('Breathing', 'साँस')],
@@ -909,8 +939,9 @@ final List<PrepProgram> _kPrepCourses = [
     durationLabel: _same('6 lessons · ~90 min'),
     about:
         _t('The self-paced companion to our live Birthing Classes - the stages of labour, breathing and positions, pain-relief options and the golden hour, all in short lessons you can watch and rewatch at your own pace.', 'हमारी live Birthing Classes का अपनी रफ़्तार वाला साथी — लेबर के चरण, साँस और मुद्राएँ, दर्द से राहत के विकल्प और golden hour, सब छोटे lessons में, जिन्हें आप अपनी रफ़्तार से बार-बार देख सकती हैं।'),
-    rating: 4.8,
-    reviewsLabel: _t('910 mothers', '910 माँएँ'),
+    // No rating or count until it exists (2026-09-29). Kept for revert:
+    //   rating: 4.8, reviewsLabel: _t('910 mothers', '910 माँएँ'),
+    rating: 0,
     lessons: [
       PrepLesson(_t('The stages of labour, demystified', 'लेबर के चरण, आसान भाषा में'), 22),
       PrepLesson(_t('Breathing & relaxation that works', 'साँस और आराम — जो काम आता है'), 18),
@@ -940,8 +971,9 @@ final List<PrepProgram> _kPrepCourses = [
     durationLabel: _same('5 lessons · ~60 min'),
     about:
         _t('A short, practical course on staying safely strong and mobile through pregnancy - what to do, what to skip, and how to scale everything to how you feel that day.', 'गर्भावस्था भर सुरक्षित ढंग से मज़बूत और चलती-फिरती रहने पर एक छोटा, काम का course — क्या करें, क्या छोड़ें, और उस दिन के मिज़ाज के हिसाब से सब कैसे ढालें।'),
-    rating: 4.8,
-    reviewsLabel: _t('540 mothers', '540 माँएँ'),
+    // No rating or count until it exists (2026-09-29). Kept for revert:
+    //   rating: 4.8, reviewsLabel: _t('540 mothers', '540 माँएँ'),
+    rating: 0,
     lessons: [
       PrepLesson(_t('Safe strength, trimester by trimester', 'सुरक्षित मज़बूती, तिमाही दर तिमाही'), 14),
       PrepLesson(_t('Mobility for a changing body', 'बदलते शरीर के लिए लचक'), 12),
