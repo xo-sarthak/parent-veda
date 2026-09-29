@@ -115,8 +115,11 @@ final PvDoorPage kBellySkinDoor = PvDoorPage(
   // simply" is what the landing said and it is the right sentence; only the
   // menu under it has gone.
   heroTitle: 'Your changing skin and bump.',
-  heroBlurb: 'What is happening, what actually helps, and what is safe to put '
-      'on your skin — cared for simply.',
+  // Rewritten 2026-09-29 to docs/PREG-VOICE.md. Was: 'What is happening,
+  // what actually helps, and what is safe to put on your skin — cared for
+  // simply.'
+  heroBlurb: "What's happening to your skin, what helps, and what's safe to "
+      'put on it.',
 
   // ⚠️ THE ONE DOOR WHOSE SUBJECT IS A BODY, SO THE PHOTOGRAPH IS ONE. An
   // Indian woman in late pregnancy, a hand on her bump, outdoors in warm
@@ -132,9 +135,8 @@ final PvDoorPage kBellySkinDoor = PvDoorPage(
   // ⚠️ THE FOOTER STAYS IN THE VOICE THE AREA ALREADY USES. The brief:
   // *"Every line spoken to her, warmly, never a legal notice."* This is the
   // reads' own closing note, not a disclaimer bolted on.
-  closingLine: 'Skin in pregnancy changes in ways nobody warns you about, and '
-      'almost all of it settles. Anything that worries you is worth showing '
-      'your doctor.',
+  closingLine: 'Your skin changes in lots of ways in pregnancy, and almost all '
+      'of it settles after birth. If anything worries you, show your doctor.',
 
   groups: [
     PvDoorGroup(
@@ -210,7 +212,7 @@ final PvDoorPage kBellySkinDoor = PvDoorPage(
       tiles: [
         PvDoorToolTile(
           title: 'Itchy skin in pregnancy, explained',
-          blurb: 'What is ordinary, what soothes it, and the one kind that '
+          blurb: "What's normal, what soothes it, and the one kind that "
               'means calling your doctor today.',
           surfaceId: kBsSurfaceItching,
         ),
@@ -220,13 +222,23 @@ final PvDoorPage kBellySkinDoor = PvDoorPage(
     // =========================================================================
     //  SUB-TAB 2 · What's safe to use
     // =========================================================================
+    // Added 2026-09-29 (pregnancy gap analysis, Belly & skin, P3): hair,
+    // nails, gums and teeth and her changing shape, so every "is this normal
+    // on my body?" question lands in this door. Read from `kBsPages` like
+    // the other rails.
+    PvDoorSection(
+      group: kBsTabSkin,
+      heading: 'Hair, nails and body changes',
+      tiles: _readsIn(BsArea.bodyChanges),
+    ),
+
     PvDoorSection(
       group: kBsTabSafe,
       heading: 'Check any product',
       tiles: [
         PvDoorToolTile(
           title: 'Ingredient Safety Checker',
-          blurb: 'Free. Search a product or an ingredient for a clear Safe, '
+          blurb: 'Free. Search a product or ingredient and get a clear Safe, '
               'Limit or Avoid answer.',
           surfaceId: kBsSurfaceChecker,
         ),

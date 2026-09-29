@@ -89,7 +89,7 @@ class BsItchingScreen extends StatelessWidget {
         children: [
           PvVideoPlaceholder(
             title: 'Itchy skin in pregnancy, explained',
-            subtitle: 'What is normal, and the one sign worth knowing',
+            subtitle: "What's normal, and the one sign to know about",
             duration: '4 MIN',
             hue: areaHue,
           ),
@@ -296,8 +296,8 @@ class _DoctorSheet extends StatelessWidget {
                   fontSize: 18, fontWeight: FontWeight.w600, color: p.ink1)),
           const SizedBox(height: 8),
           Text(
-              'Intense itching on your palms or soles is worth a same-day '
-              'call, not a wait-and-see. Your doctor can run a simple blood '
+              'Intense itching on your palms or soles needs a call today. '
+              'Please don\'t wait and see. Your doctor can do a simple blood '
               'test to check for cholestasis (ICP).',
               textAlign: TextAlign.center,
               style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2)),
@@ -326,8 +326,8 @@ class _FootDisclaimer extends StatelessWidget {
       const SizedBox(width: 8),
       Expanded(
         child: Text(
-            'General guidance, not a diagnosis. If in doubt, call your '
-            'doctor rather than wait for your next visit.',
+            'General guidance, not a diagnosis. If you are unsure, call your '
+            'doctor. You don\'t need to wait for your next visit.',
             style: pvManrope(fontSize: 11.5, height: 1.4, color: p.ink3)),
       ),
     ]);

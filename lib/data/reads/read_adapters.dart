@@ -151,6 +151,9 @@ PvRead pvReadFromBs(BsPage page) {
     kicker: kBsAreaInfo[page.area]!.title,
     title: page.title,
     teaser: page.videoTitle,
+    // The pregnancy warmth pass, 2026-09-29: every Belly & skin page carries
+    // a short answer (docs/PREG-VOICE.md §3). Null renders as before.
+    shortAnswer: page.shortAnswer,
     scaleSetter: lede,
     author: _desk,
     authorRole: const LocalizedText(en: 'Belly and skin', hi: 'Pet aur twacha'),

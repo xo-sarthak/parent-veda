@@ -93,8 +93,9 @@ class IngredientCheckerScreen extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(18, 4, 18, 32),
         children: [
           Text(
-              'Is this cream, serum or salon treatment fine in pregnancy? '
-              'Search an ingredient for a straight answer, free, every time.',
+              'Not sure if a cream, serum or salon treatment is okay in '
+              'pregnancy? Search an ingredient for a clear answer. It is '
+              'free, every time.',
               style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2)),
           const SizedBox(height: 16),
           GestureDetector(
@@ -319,8 +320,8 @@ class BsIngredientAnswerScreen extends StatelessWidget {
             const SizedBox(width: 8),
             Expanded(
               child: Text(
-                  'General guidance, not a diagnosis. Your own doctor knows '
-                  'your case, and always wins if this ever disagrees.',
+                  "General guidance, not a diagnosis. Your own doctor knows "
+                  "you best. If they say something different, go with them.",
                   style: pvManrope(fontSize: 11.5, height: 1.4, color: p.ink3)),
             ),
           ]),
