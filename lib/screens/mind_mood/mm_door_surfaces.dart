@@ -81,7 +81,7 @@ class _MmHardDayResetScreenState extends State<MmHardDayResetScreen>
       heading = kMmHardDaySteps[_at].title;
       body = kMmHardDaySteps[_at].body;
     } else {
-      heading = 'That is it';
+      heading = "That's it";
       body = kMmHardDayClose;
     }
     final last = _at >= kMmHardDaySteps.length;
@@ -227,7 +227,7 @@ class _MmAffirmationsScreenState extends State<MmAffirmationsScreen> {
       hue: 288,
       eyebrow: 'Feel',
       title: 'A gentle word',
-      intro: 'One at a time. For you, never about the baby.',
+      intro: 'Kind words for you, one at a time.',
       children: [
         pvDoorPad(AnimatedSwitcher(
           duration: const Duration(milliseconds: 300),
@@ -261,8 +261,8 @@ class _MmAffirmationsScreenState extends State<MmAffirmationsScreen> {
         const SizedBox(height: 22),
         pvDoorPad(PvDoorDisclaimer(
             p: p,
-            text: 'Nothing here is logged or counted. Read one, or read '
-                'all of them, whenever you like.')),
+            text: 'Nothing here is saved or counted. Read one, or all of '
+                'them, whenever you like.')),
       ],
     );
   }
@@ -307,15 +307,14 @@ class MmHelplinesScreen extends StatelessWidget {
           p: p,
           name: 'Emergency',
           number: kEmergencyNumber,
-          line: 'Police, ambulance, fire — the one number for all three.',
+          line: 'Police, ambulance and fire. One number for all three.',
           onCall: _call,
         )),
         const SizedBox(height: 22),
         pvDoorPad(PvDoorDisclaimer(
             p: p,
-            text: 'If you are in danger right now, call $kEmergencyNumber '
-                'first. Everything else on this door can wait until you are '
-                'safe.')),
+            text: "If you're in danger right now, call $kEmergencyNumber "
+                'first. Everything else here can wait until you are safe.')),
       ],
     );
   }
@@ -439,9 +438,9 @@ class MmOfferingScreen extends StatelessWidget {
         const SizedBox(height: 22),
         pvDoorPad(PvDoorDisclaimer(
             p: p,
-            text: 'A counsellor is not a replacement for your doctor. If '
-                'something feels urgent, the crisis path on this door is free '
-                'and open now.')),
+            text: "A counsellor doesn't replace your doctor. If something "
+                'feels urgent, the crisis path on this door is free and open '
+                'now.')),
       ],
     );
   }

@@ -148,7 +148,7 @@ class _MmBreathingScreenState extends State<MmBreathingScreen> {
                     Icon(Icons.check_circle_outline_rounded,
                         size: 48, color: ink),
                     const SizedBox(height: 16),
-                    Text('That is a full session.',
+                    Text("That's a full session.",
                         textAlign: TextAlign.center,
                         style: pvFraunces(
                             fontSize: 20,
@@ -156,8 +156,7 @@ class _MmBreathingScreenState extends State<MmBreathingScreen> {
                             color: p.ink1)),
                     const SizedBox(height: 8),
                     Text(
-                        'However you feel right now is exactly the right '
-                        'way to feel.',
+                        'However you feel right now is okay.',
                         textAlign: TextAlign.center,
                         style: pvManrope(
                             fontSize: 13.5, height: 1.5, color: p.ink2)),

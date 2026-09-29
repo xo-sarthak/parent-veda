@@ -93,6 +93,10 @@ const String kMindTabTrack = 'track';
 const String kMindTabMore = 'more';
 const String kMindTabTalk = 'talk';
 
+/// Sex and closeness (2026-09-29, pregnancy gap analysis P2). The one tab the
+/// shared-phone switch hides: see [mindDoorVisiblePage].
+const String kMindTabCloseness = 'closeness';
+
 // Surfaces. Constants because each becomes a route NAME.
 const String kMindSurfaceReset = 'mind/hard_day_reset';
 const String kMindSurfaceCalmNote = 'mind/calm_note';
@@ -143,6 +147,75 @@ List<PvDoorTile> _fears() {
   ];
 }
 
+/// Reads by id, in the order given. An id the library lacks is skipped (the
+/// door test's "every read is on the door" catches the other direction).
+List<PvDoorTile> _readsById(List<String> ids) => [
+      for (final id in ids)
+        if (mmArticleById(id) case final a?)
+          PvDoorEntryTile(
+            title: a.title.en,
+            blurb: a.teaser.en,
+            meta: a.readingTime.en,
+            library: PvDoorLibrary.mindRead,
+            entryId: a.id,
+          ),
+    ];
+
+/// Every read the shared-phone switch hides: the whole Sex and closeness tab.
+/// Derived from the library, so a seventh read there is hidden too.
+Set<String> get kMindIntimateReadIds => {
+      for (final a in mmArticlesIn(MmArticleGroup.closeness)) a.id,
+    };
+
+/// The Mind & mood door as she has chosen to see it.
+///
+/// ⚠️ THE SAME RULE AS TTC'S `ttcDoorVisiblePage`, FOR THE SAME REASON. Many
+/// phones in India are shared with family. When `hideIntimate` is on, the
+/// Sex and closeness tab and every tile that opens one of its reads are left
+/// out, wherever they sit, and the page is filtered ONCE so the tab row, the
+/// rails and the door's search all see the same smaller page. Content, never
+/// structure: every other tab stays exactly where it was.
+///
+/// ⚠️ NOT YET CALLED. The door shell (`pv_door_screen.dart`) is shared and
+/// this helper cannot wire itself; the lead calls it where the screen reads
+/// its page, with `TtcContentPrefs.instance.hideIntimate`.
+PvDoorPage mindDoorVisiblePage(PvDoorPage page, {required bool hideIntimate}) {
+  if (!hideIntimate) return page;
+  final hidden = kMindIntimateReadIds;
+  bool keep(PvDoorTile t) =>
+      !(t is PvDoorEntryTile &&
+          t.library == PvDoorLibrary.mindRead &&
+          hidden.contains(t.entryId));
+  return PvDoorPage(
+    bracketId: page.bracketId,
+    heroTitle: page.heroTitle,
+    heroBlurb: page.heroBlurb,
+    heroImageUrl: page.heroImageUrl,
+    closingLine: page.closingLine,
+    groups: [
+      for (final g in page.groups)
+        if (g.id != kMindTabCloseness) g,
+    ],
+    sections: [
+      for (final s in page.sections)
+        if (s.group != kMindTabCloseness)
+          if (s.inlineSurfaceId != null)
+            s
+          else
+            PvDoorSection(
+              heading: s.heading,
+              tiles: [for (final t in s.tiles) if (keep(t)) t],
+              group: s.group,
+              lead: s.lead,
+              folded: s.folded,
+              strip: s.strip,
+              moreSurfaceId: s.moreSurfaceId,
+              railMax: s.railMax,
+            ),
+    ],
+  );
+}
+
 final PvDoorPage kMindDoor = PvDoorPage(
   bracketId: 'pregnancy_mental_health',
 
@@ -151,7 +224,8 @@ final PvDoorPage kMindDoor = PvDoorPage(
   // was the bracket's `title` and is not used here; the user asked for the
   // tile's own words at the top.
   heroTitle: 'How you feel matters too.',
-  heroBlurb: 'Something to do right now, words for the days no one talks '
+  // Rewritten 2026-09-29 to docs/PREG-VOICE.md.
+  heroBlurb: 'Something to help right now, words for the days no one talks '
       'about, and a real person when you want one.',
 
   // ⚠️ LOOKED AT BEFORE IT WAS WIRED — see `pv_door_scans.dart` for the rule.
@@ -165,7 +239,7 @@ final PvDoorPage kMindDoor = PvDoorPage(
 
   // The area's own closing note, in the reads' voice.
   closingLine: 'Nothing here is a test, and nothing is scored. If a feeling '
-      'needs a person, the last tab shows you who.',
+      'needs a person, the Talk tab shows you who.',
 
   groups: [
     // -------------------------------------------------------------------------
@@ -189,6 +263,24 @@ final PvDoorPage kMindDoor = PvDoorPage(
     ),
 
     // -------------------------------------------------------------------------
+    //  2b. Sex and closeness — added 2026-09-29 (gap analysis, P2)
+    // -------------------------------------------------------------------------
+    //  ⚠️ PRIVATE, AND MEANT TO BE HIDDEN BY THE SHARED-PHONE SWITCH. Six
+    //  reads, data only, no new widget. The door shell has no per-tab privacy
+    //  flag, so the hiding is one pure function below (`mindDoorVisiblePage`)
+    //  that the screen must call; until it does, the tab shows for everyone.
+    //  Next to Understand because it is reading, and so "the Talk tab" and
+    //  "When it is more than this" keep their places at the end.
+    PvDoorGroup(
+      id: kMindTabCloseness,
+      label: 'Sex and closeness',
+      icon: Icons.favorite_outline_rounded,
+      hue: 26,
+      note: 'Just for the two of you. If your doctor has asked you to avoid '
+          'sex, follow what they said.',
+    ),
+
+    // -------------------------------------------------------------------------
     //  3. Track — "Check how I am feeling". The mood check-in, in place.
     // -------------------------------------------------------------------------
     //  ⚠️ "Do-it screens, not rails. Must NOT show Feel's content." The tab
@@ -199,10 +291,10 @@ final PvDoorPage kMindDoor = PvDoorPage(
       icon: Icons.timeline_rounded,
       hue: 160,
       inlineSurfaceId: kMindSurfaceTrack,
-      inlineLabel: 'How are you feeling today?',
+      inlineLabel: 'Check in today',
       layout: PvDoorLayout.stack,
-      note: 'A mood word, never a score. Nothing here is graded and nothing '
-          'is shared.',
+      note: "Pick a word for your mood. There's no score, and nothing is "
+          'shared.',
     ),
 
     // -------------------------------------------------------------------------
@@ -221,20 +313,23 @@ final PvDoorPage kMindDoor = PvDoorPage(
       // the closing two sentences are the footer, so nothing it wrote is lost
       // to the shape.
       pinnedRedFlag: PvDoorRedFlag(
-        title: 'When to reach out the same day — you are not a bad mother, '
-            'and you are not alone',
+        // Rewritten 2026-09-29 to docs/PREG-VOICE.md. The second line was
+        // written for after the birth ("even when the baby lets you"); the
+        // gap analysis (P3) gives the pregnancy line, used exactly.
+        title: "When to reach out the same day. You're not a bad mother, "
+            "and you're not alone.",
         lines: [
-          PvDoorFlagLine('A low feeling has not lifted for two weeks.'),
-          PvDoorFlagLine('You cannot sleep even when the baby lets you.'),
+          PvDoorFlagLine("A low feeling hasn't lifted for two weeks."),
+          PvDoorFlagLine('You cannot sleep even when you have the chance to.'),
           PvDoorFlagLine(
               'Nothing interests you anymore, not even things you loved.'),
-          PvDoorFlagLine('You feel detached, like you are watching your own '
+          PvDoorFlagLine("You feel detached, like you're watching your own "
               'life from outside.'),
           PvDoorFlagLine(
               'You have any thought of harming yourself or the baby.'),
         ],
-        footer: 'None of these mean you have failed. They mean it is time to '
-            'let a person help, and there are people right here who do this '
+        footer: "None of these mean you've failed. They mean it's time to "
+            "let a person help, and there are people right here who do this "
             'every day.',
         surfaceId: kMindSurfaceCrisis,
       ),
@@ -248,8 +343,8 @@ final PvDoorPage kMindDoor = PvDoorPage(
       label: 'Talk',
       icon: Icons.chat_bubble_outline_rounded,
       hue: 186,
-      note: 'The counselling here is the only paid part of Mind & mood. '
-          'Everything else is, and stays, free.',
+      note: 'Counselling is the only paid part of Mind & mood. Everything '
+          'else is free, and it stays free.',
     ),
   ],
 
@@ -272,7 +367,8 @@ final PvDoorPage kMindDoor = PvDoorPage(
         ),
         PvDoorToolTile(
           title: 'Calm note',
-          blurb: '60 seconds, three breaths, grounding.',
+          blurb: "One minute of slow breaths and noticing what's around "
+              'you, for when panic rises.',
           meta: '1 MIN',
           surfaceId: kMindSurfaceCalmNote,
         ),
@@ -295,8 +391,8 @@ final PvDoorPage kMindDoor = PvDoorPage(
         // One card, Kriya's surface id, Kriya's screen.
         const PvDoorToolTile(
           title: 'Guided relaxation, head to toe',
-          blurb: 'Eight narrated minutes from Garbh Sanskar. Lie on your '
-              'side and let a voice do the rest.',
+          blurb: 'Eight guided minutes from Garbh Sanskar. Lie on your side '
+              'and let the voice lead you.',
           meta: '8 MIN',
           surfaceId: kGarbhSurfaceRelax,
         ),
@@ -304,7 +400,7 @@ final PvDoorPage kMindDoor = PvDoorPage(
         for (final ex in kMmBreathingExercises)
           PvDoorVideoTile(
             title: '${ex.name.en}, guided',
-            blurb: 'A watch-along version of the same breath.',
+            blurb: 'The same breath, with a video to follow along.',
             meta: '3 MIN',
           ),
       ],
@@ -317,8 +413,8 @@ final PvDoorPage kMindDoor = PvDoorPage(
         // ⚠️ REBUILT: the whole rotating set is the brief's 3.2, verbatim.
         PvDoorToolTile(
           title: 'Affirmations',
-          blurb: 'One at a time, on "Show me one". For you, never about '
-              'the baby.',
+          blurb: 'Kind words for you, one at a time, whenever you want '
+              'one.',
           surfaceId: kMindSurfaceAffirmations,
         ),
       ],
@@ -339,7 +435,7 @@ final PvDoorPage kMindDoor = PvDoorPage(
 
     PvDoorSection(
       group: kMindTabFeel,
-      heading: 'Longer, when there is time',
+      heading: 'Longer, when you have time',
       tiles: [
         // ⚠️ `hard_day_reset` IS NOT IN THIS RAIL. It is the tool at the top
         // of the tab now; a film of it beside the tool would be two cards for
@@ -385,6 +481,30 @@ final PvDoorPage kMindDoor = PvDoorPage(
     ),
 
     // =========================================================================
+    //  SEX AND CLOSENESS (2026-09-29)
+    // =========================================================================
+    //  Two rails from `kMmArticles` by id, in reading order: the safety
+    //  questions first, then the relationship ones.
+    PvDoorSection(
+      group: kMindTabCloseness,
+      heading: 'Is it safe?',
+      tiles: _readsById(const [
+        'closeness_sex_safe',
+        'closeness_when_to_stop',
+        'closeness_baby_worries',
+      ]),
+    ),
+    PvDoorSection(
+      group: kMindTabCloseness,
+      heading: 'Staying close',
+      tiles: _readsById(const [
+        'closeness_desire_changes',
+        'closeness_comfortable',
+        'closeness_without_sex',
+      ]),
+    ),
+
+    // =========================================================================
     //  TRACK — no sections; the tab IS the tool.
     // =========================================================================
 
@@ -399,14 +519,14 @@ final PvDoorPage kMindDoor = PvDoorPage(
         // score" — the screener already works that way.
         PvDoorToolTile(
           title: 'A gentle check-in',
-          blurb: 'A few soft questions. No score, and nothing is stored.',
+          blurb: 'A few gentle questions. No score, and nothing is saved.',
           meta: '2 MIN',
           surfaceId: kMindSurfaceCheckIn,
         ),
         PvDoorEntryTile(
           title: 'Baby blues, or something more?',
-          blurb: 'Most mothers feel weepy, up and down and a bit raw in the '
-              'first days and weeks.',
+          blurb: 'How to tell the usual weepy first weeks from a low that '
+              'needs help.',
           meta: '2 MIN',
           library: PvDoorLibrary.mindRead,
           entryId: 'baby_blues_or_more',
@@ -420,13 +540,13 @@ final PvDoorPage kMindDoor = PvDoorPage(
       tiles: [
         PvDoorTalkTile(
           title: 'Talk to someone today',
-          blurb: 'A counsellor trained in pregnancy. Anonymous, at your '
+          blurb: 'A counsellor trained in pregnancy. Anonymous, and at your '
               'pace.',
           surfaceId: 'mind/offer/perinatal_counselling',
         ),
         PvDoorToolTile(
           title: 'Helpline numbers',
-          blurb: 'India\'s perinatal and mental-health lines, free, any '
+          blurb: 'Free mental health and emergency numbers for India, any '
               'hour.',
           surfaceId: kMindSurfaceHelplines,
         ),
@@ -434,8 +554,8 @@ final PvDoorPage kMindDoor = PvDoorPage(
         // it." Listed, not written. See the header.
         PvDoorReadTile.comingSoon(
           title: 'Tell your doctor',
-          blurb: 'How to raise it at your next visit, and the words if you '
-              'cannot find them.',
+          blurb: "How to bring it up at your next visit, and words to use if "
+              "you can't find your own.",
           meta: '3 MIN',
         ),
       ],
@@ -446,7 +566,7 @@ final PvDoorPage kMindDoor = PvDoorPage(
     // old Understand tab; this is where the brief moves them.
     PvDoorSection(
       group: kMindTabMore,
-      heading: 'Reading, when you are ready',
+      heading: "Reading, when you're ready",
       tiles: _readsIn(MmArticleGroup.moreThanMood,
           except: const {'baby_blues_or_more'}),
     ),
@@ -473,11 +593,11 @@ final PvDoorPage kMindDoor = PvDoorPage(
 
     PvDoorSection(
       group: kMindTabTalk,
-      heading: 'If it cannot wait',
+      heading: "If it can't wait",
       tiles: [
         PvDoorToolTile(
           title: 'Right now, free',
-          blurb: 'The crisis path: a person to call, tonight, at no cost.',
+          blurb: 'Someone to call tonight, free, whatever the hour.',
           surfaceId: kMindSurfaceCrisis,
         ),
       ],

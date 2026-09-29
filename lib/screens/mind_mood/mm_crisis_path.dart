@@ -85,7 +85,7 @@ class MmCrisisPathScreen extends StatelessWidget {
             ),
             const SizedBox(height: 22),
             Text(
-              'You are not alone in this',
+              "You're not alone in this",
               textAlign: TextAlign.center,
               style: pvFraunces(
                   fontSize: 25,
@@ -96,8 +96,8 @@ class MmCrisisPathScreen extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              'What you are feeling matters, and real help is available '
-              'right now. Please reach out.',
+              "What you're feeling matters, and real help is there right "
+              'now. Please reach out.',
               textAlign: TextAlign.center,
               style: pvManrope(fontSize: 14.5, height: 1.55, color: p.ink2),
             ),
@@ -154,9 +154,9 @@ class MmCrisisPathScreen extends StatelessWidget {
             const SizedBox(height: 20),
 
             Text(
-              'Or talk to someone you trust right now, a partner, a friend, '
-              'a parent, anyone close. You do not have to carry this alone, '
-              'and telling someone is not a burden on them.',
+              'Or talk to someone you trust right now: your partner, a friend, '
+              "a parent, anyone close. You don't have to carry "
+              "this alone, and telling someone isn't a burden on them.",
               textAlign: TextAlign.center,
               style: pvManrope(fontSize: 13.5, height: 1.55, color: p.ink2),
             ),
@@ -200,7 +200,7 @@ class MmCrisisPathScreen extends StatelessWidget {
             Center(
               child: TextButton(
                 onPressed: () => Navigator.of(context).maybePop(),
-                child: Text('I am okay for now',
+                child: Text("I'm okay for now",
                     style: pvManrope(
                         fontSize: 13.5,
                         fontWeight: FontWeight.w700,
@@ -209,7 +209,7 @@ class MmCrisisPathScreen extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Center(
-              child: Text('You can come back here any time from Mind & Mood.',
+              child: Text('You can come back here any time from Mind & mood.',
                   style: pvManrope(fontSize: 11.5, color: p.ink3)),
             ),
           ],

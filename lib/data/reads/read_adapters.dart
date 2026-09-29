@@ -87,6 +87,8 @@ PvRead pvReadFromMm(MmArticle a, {bool withTalk = false}) {
     kicker: a.group.heading,
     title: a.title,
     teaser: a.teaser,
+    // Pregnancy warmth pass, 2026-09-29 (docs/PREG-VOICE.md §3).
+    shortAnswer: a.shortAnswer,
     scaleSetter: lede,
     author: _desk,
     authorRole: const LocalizedText(en: 'Mind and mood', hi: 'Mann aur mood'),

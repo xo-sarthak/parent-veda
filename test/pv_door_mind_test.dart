@@ -30,10 +30,12 @@ void main() {
   setUp(() => door = pvDoorPageFor('pregnancy_mental_health')!);
 
   group('the door matches the brief', () {
-    test('five sub-tabs, Feel first', () {
+    test('six sub-tabs, Feel first', () {
+      // Sex and closeness added 2026-09-29 (pregnancy gap analysis, P2).
       expect(door.groups.map((g) => g.label), [
         'Feel',
         'Understand',
+        'Sex and closeness',
         'Track',
         'When it is more than this',
         'Talk',
@@ -53,13 +55,17 @@ void main() {
       final f = g.pinnedRedFlag!;
       expect(f.lines.length, 5);
       expect(f.lines.map((l) => l.text), [
-        'A low feeling has not lifted for two weeks.',
-        'You cannot sleep even when the baby lets you.',
+        "A low feeling hasn't lifted for two weeks.",
+        // The pregnancy line (gap analysis P3), not the postpartum one.
+        'You cannot sleep even when you have the chance to.',
         'Nothing interests you anymore, not even things you loved.',
-        'You feel detached, like you are watching your own life from outside.',
+        "You feel detached, like you're watching your own life from outside.",
         'You have any thought of harming yourself or the baby.',
       ]);
-      expect(f.footer, contains('None of these mean you have failed'));
+      expect(f.footer, contains("None of these mean you've failed"));
+      for (final l in f.lines) {
+        expect(l.text, isNot(contains('baby lets you')));
+      }
       expect(f.surfaceId, kMindSurfaceCrisis);
       for (final other in door.groups.where((g) => g.id != kMindTabMore)) {
         expect(other.pinnedRedFlag, isNull);
@@ -95,8 +101,7 @@ void main() {
     test('a rebuilt body is the brief\'s sentence, not a paraphrase', () {
       final a = mmArticleById('mood_swings')!;
       expect(a.body.en, startsWith('You were fine a moment ago.'));
-      expect(a.body.en,
-          endsWith('that is worth telling someone, and the last tab shows you who.'));
+      expect(a.body.en, endsWith('The Talk tab shows you who.'));
       final n = mmArticleById('numb_no_joy')!;
       expect(n.body.en, contains('So here it is said plainly: it happens'));
     });
@@ -113,6 +118,9 @@ void main() {
         "No corner of the house that's yours",
         'When the nuskhe and the superstitions start',
         "Bringing him in, when he doesn't get it",
+        // Added 2026-09-29 (pregnancy gap analysis, P3).
+        'After IVF, and finding it hard',
+        'When your husband works far away',
       ]);
     });
 
@@ -126,7 +134,7 @@ void main() {
     test('the fear is rebuilt under its new title', () {
       final a = mmArticleById('fear_not_good_mother')!;
       expect(a.title.en, 'Fear of being a bad mother');
-      expect(a.body.en, startsWith('You are not even a mother yet'));
+      expect(a.body.en, startsWith("You're not even a mother yet"));
     });
 
     test('fear of labour links to Labour prep; something-wrong to Scans', () {
@@ -165,13 +173,67 @@ void main() {
       expect(kMmHardDaySteps.length, 4);
       expect(kMmHardDaySteps.map((s) => s.title),
           ['Put it down', 'Breathe', 'One kind thing', 'Let the day go']);
-      expect(kMmHardDayIntro, startsWith('Some days just do not go well.'));
-      expect(kMmHardDayClose, 'That is it. Nothing to log. Come back whenever a day gets heavy.');
+      expect(kMmHardDayIntro, startsWith("Some days just don't go well."));
+      expect(kMmHardDayClose,
+          "That's it. Nothing to log. Come back whenever a day feels heavy.");
     });
 
-    test('every read carries the byline', () {
-      expect(kMmReadAuthor, 'Dr Sharanya Menon');
-      expect(kMmReadAuthorRole, contains('Perinatal psychologist'));
+    test('every read carries the honest byline, and no invented reviewer', () {
+      // Pregnancy gap analysis, P1 trust (2026-09-29): the named
+      // psychologist never reviewed these and is not on the real roster.
+      expect(kMmReadAuthor, 'ParentVeda editorial');
+      expect(kMmReadAuthorRole, isNot(contains('reviewed Aug')));
+      expect('$kMmReadAuthor $kMmReadAuthorRole', isNot(contains('Dr ')));
+    });
+  });
+
+  group('sex and closeness', () {
+    test('six reads, on their own tab, and nowhere else', () {
+      final reads = mmArticlesIn(MmArticleGroup.closeness);
+      expect(reads.length, 6);
+      final onTab = {
+        for (final s in door.sectionsOf(kMindTabCloseness))
+          for (final t in s.tiles)
+            if (t is PvDoorEntryTile) t.entryId,
+      };
+      expect(onTab, reads.map((a) => a.id).toSet());
+      for (final g in door.groups.where((g) => g.id != kMindTabCloseness)) {
+        for (final s in door.sectionsOf(g.id)) {
+          for (final t in s.tiles) {
+            if (t is PvDoorEntryTile) {
+              expect(kMindIntimateReadIds.contains(t.entryId), isFalse,
+                  reason: '${t.entryId} sits on ${g.id}');
+            }
+          }
+        }
+      }
+    });
+
+    test('the switch hides the tab and its reads, and nothing else', () {
+      final shown = mindDoorVisiblePage(door, hideIntimate: false);
+      expect(identical(shown, door), isTrue);
+      final hidden = mindDoorVisiblePage(door, hideIntimate: true);
+      expect(hidden.groups.map((g) => g.id),
+          door.groups.map((g) => g.id).where((id) => id != kMindTabCloseness));
+      for (final t in hidden.allTiles) {
+        if (t is PvDoorEntryTile) {
+          expect(kMindIntimateReadIds.contains(t.entryId), isFalse);
+        }
+      }
+      expect(hidden.allTiles.length,
+          door.allTiles.length - kMindIntimateReadIds.length);
+    });
+
+    test('the "When it is more than this" and Talk tabs stay last', () {
+      expect(door.groups.last.id, kMindTabTalk);
+      expect(door.groups[door.groups.length - 2].id, kMindTabMore);
+    });
+
+    test('every read in the tab has a short answer and names no reviewer', () {
+      for (final a in mmArticlesIn(MmArticleGroup.closeness)) {
+        expect(a.shortAnswer?.en.trim(), isNotEmpty, reason: a.id);
+        expect(a.body.en, isNot(contains('Dr ')), reason: a.id);
+      }
     });
   });
 
@@ -299,7 +361,7 @@ void main() {
       ));
       await tester.pump();
       // Track's tool is on screen; Feel's first section is not.
-      expect(find.text('How are you feeling, today?'), findsOneWidget);
+      expect(find.text('How are you feeling today?'), findsOneWidget);
       expect(find.text('In the moment'), findsNothing);
 
       await tester.pumpWidget(MaterialApp(
@@ -314,7 +376,7 @@ void main() {
       ));
       await tester.pump();
       expect(find.text('In the moment'), findsOneWidget);
-      expect(find.text('How are you feeling, today?'), findsNothing);
+      expect(find.text('How are you feeling today?'), findsNothing);
     });
   });
 }

@@ -82,21 +82,21 @@ class MmAffirmation {
 /// says use its copy exactly, and it does.
 final List<MmAffirmation> kMmAffirmations = [
   MmAffirmation(_en('You are allowed to find this hard.')),
-  MmAffirmation(_en('You do not have to feel grateful every minute.')),
+  MmAffirmation(_en("You don't have to feel grateful every minute.")),
   MmAffirmation(_en('Resting is doing something.')),
   MmAffirmation(_en('You are already a good mother.')),
   MmAffirmation(_en('One bad day is just one day.')),
-  MmAffirmation(_en('You do not owe anyone an explanation for how you feel.')),
-  MmAffirmation(_en('Your body knows what it is doing.')),
-  MmAffirmation(_en('It is okay to not be glowing.')),
+  MmAffirmation(_en("You don't owe anyone an explanation for how you feel.")),
+  MmAffirmation(_en("Your body knows what it's doing.")),
+  MmAffirmation(_en("It's okay not to be glowing.")),
   MmAffirmation(_en('You can say no to a visit.')),
-  MmAffirmation(_en('Asking for help is not failing.')),
+  MmAffirmation(_en("Asking for help isn't failing.")),
   MmAffirmation(_en('You are more than this pregnancy.')),
   MmAffirmation(_en('The people who matter are a short list.')),
   MmAffirmation(_en('You are allowed to take up space.')),
-  MmAffirmation(_en('Feeling scared does not mean something is wrong.')),
-  MmAffirmation(_en('You do not have to do this the way anyone else did.')),
-  MmAffirmation(_en('Tired is not weak.')),
+  MmAffirmation(_en("Feeling scared doesn't mean something is wrong.")),
+  MmAffirmation(_en("You don't have to do this the way anyone else did.")),
+  MmAffirmation(_en("Being tired isn't being weak.")),
   MmAffirmation(_en('You are doing enough.')),
   MmAffirmation(_en('Some days you just get through, and that counts.')),
 ];
@@ -151,59 +151,62 @@ final MmArticle kMmPartnerArticle = MmArticle(
   // reads it for this entry.
   group: MmArticleGroup.everydayCare,
   title: _en('How to support her emotionally during pregnancy'),
-  teaser: _en('For a partner who wants to help and is not sure how.'),
+  teaser: _en("For a partner who wants to help and isn't sure how."),
+  shortAnswer: _en(
+    'Listen without trying to fix things, take jobs off her plate without '
+    "being asked, and stay steady when she isn't. If she has seemed low or "
+    'anxious for more than two weeks, gently help her talk to someone.',
+  ),
   readingTime: _en('4 MIN'),
   hasExpertVideo: true,
   body: _en(
     'Pregnancy changes how she feels, not just how she looks, and a lot of '
-    'that change happens where you cannot see it. Hormones shift fast in the '
+    "that change happens where you can't see it. Hormones shift fast in the "
     'first few months and again near the end. Sleep gets worse. Her body '
-    'starts doing things she did not agree to. On top of all that she is '
-    'usually being asked, by everyone, how she is feeling, and expected to '
-    'say fine.\n\n'
+    "starts doing things she didn't agree to. On top of all that, everyone "
+    "keeps asking how she's feeling, and expects her to say fine.\n\n"
     'What she may be feeling\n\n'
-    'Some days she will be happy and excited. Other days she may cry at '
-    'nothing, snap at you, go quiet, or feel oddly flat about a pregnancy she '
-    'very much wanted. None of that means something is wrong with her, and '
-    'none of it means she is unhappy with you. It usually means she is tired '
-    'and carrying a lot at once.\n\n'
-    'She may also be frightened in ways she has not said out loud. Fear about '
-    'labour is common. So is a quiet worry that something might go wrong with '
-    'the baby. Many women do not say these things because saying them feels '
-    'like tempting fate.\n\n'
+    "Some days she'll be happy and excited. Other days she may cry at "
+    'nothing, snap at you, go quiet, or feel oddly flat about a pregnancy '
+    'she very much wanted. None of that means something is wrong with her, '
+    "and none of it means she's unhappy with you. Usually it means she's "
+    'tired and carrying a lot at once.\n\n'
+    "She may also be frightened in ways she hasn't said out loud. Fear "
+    'about labour is common. So is a worry that something might go wrong '
+    "with the baby. Many women don't say these things because saying them "
+    'feels like tempting fate.\n\n'
     'What helps\n\n'
-    'Listening without fixing. This is the big one. When she tells you she is '
-    'worried, she is usually not asking you to solve it. Try "that sounds '
+    "Listening without fixing. This matters most. When she tells you she's "
+    'worried, she usually isn\'t asking you to solve it. Try "that sounds '
     'really hard" before "have you tried".\n\n'
     'Taking something off her plate without being asked. Not offering to '
-    'help. Doing it. The offer is one more decision she has to make.\n\n'
-    'Coming to appointments where you can. It tells her she is not doing this '
+    'help, but doing it. An offer is one more decision she has to make.\n\n'
+    "Coming to appointments when you can. It tells her she isn't doing this "
     'alone, and it means two people heard what the doctor said.\n\n'
-    'Asking how she is and then waiting. The pause is the part that works.\n\n'
-    'Being steady when she is not. She does not need you to match her mood. '
-    'She needs one person in the room who is not spiralling.\n\n'
+    'Asking how she is, and then waiting. The pause is the part that works.\n\n'
+    "Being steady when she isn't. She doesn't need you to match her mood. "
+    'She needs one person in the room who stays calm.\n\n'
     'What to avoid saying\n\n'
-    '"At least the baby is healthy." It is true and it is not a reply to how '
+    '"At least the baby is healthy." It\'s true, and it isn\'t a reply to how '
     'she feels.\n\n'
-    '"Just relax." Nobody in the history of anxiety has relaxed on hearing '
-    'this.\n\n'
-    '"My mother did this with four children." Comparison is not comfort.\n\n'
-    '"You are being emotional." Even when it is meant kindly, it tells her '
-    'her feelings are the problem.\n\n'
+    '"Just relax." It almost never helps anyone relax.\n\n'
+    '"My mother did this with four children." Comparison isn\'t comfort.\n\n'
+    '"You\'re being emotional." Even when it\'s meant kindly, it tells her '
+    'that her feelings are the problem.\n\n'
     '"Should you be eating that?" She has heard it from six people already '
     'this week.\n\n'
     'When to gently push for more help\n\n'
-    'Low mood on some days is normal. If she has seemed persistently low, '
-    'anxious or not herself for more than two weeks, or if she says anything '
-    'that worries you about her safety, that is worth acting on rather than '
-    'waiting out. You do not have to diagnose anything. You can simply say '
-    'you have noticed, that you are not going anywhere, and ask whether she '
-    'would talk to someone. Offering to help book it, or to sit with her '
-    'while she does, removes the hardest step.\n\n'
+    'Low mood on some days is normal. If she has seemed low, anxious or not '
+    'herself most of the time for more than two weeks, or if she says '
+    "anything that worries you about her safety, act on it. Don't wait it "
+    "out. You don't have to name what it is. You can tell her you've "
+    "noticed, that you're not going anywhere, and ask whether she'd talk to "
+    'someone. Offering to help book it, or to sit with her while she does, '
+    'takes away the hardest step.\n\n'
     'You matter here too\n\n'
     'Partners get frightened and tired as well, and are rarely asked about '
-    'it. Having somewhere of your own to put that is not a distraction from '
-    'supporting her. It is usually what makes it possible.',
+    "it. Having somewhere of your own to put that isn't a distraction from "
+    "supporting her. It's usually what makes it possible.",
   ),
 );
 
@@ -220,19 +223,20 @@ class MmResetStep {
   final String body;
 }
 
+// Rewritten 2026-09-29 to docs/PREG-VOICE.md.
 const String kMmHardDayIntro =
-    'Some days just do not go well. This is a few minutes to set the day down before you sleep. You do not have to fix anything.';
+    "Some days just don't go well. Here are a few minutes to set the day down before you sleep. You don't have to fix anything.";
 
 const List<MmResetStep> kMmHardDaySteps = [
   MmResetStep('Put it down',
-      'Put the phone down for a minute once you start. Sit or lie however you are comfortable. Let your shoulders drop.'),
+      "Once you've started, put your phone down for a minute. Sit or lie however you're comfortable. Let your shoulders drop."),
   MmResetStep('Breathe',
-      'Breathe in slowly, and out, a little longer than the in. Do this a few times. Nothing to count, just a longer out than in.'),
+      'Breathe in slowly, then out a little longer than the in. Do this a few times. Nothing to count, just a longer out than in.'),
   MmResetStep('One kind thing',
-      'Now one small kind thing for yourself. A glass of water. Feet up. A message to the one person who makes you feel better. Pick one.'),
+      'Now do one small, kind thing for yourself. A glass of water. Your feet up. A message to the one person who makes you feel better. Pick one.'),
   MmResetStep('Let the day go',
-      'Today was hard, and it is over now. Tomorrow is allowed to be completely different. You did enough by getting through it.'),
+      "Today was hard, and it's over now. Tomorrow is allowed to be completely different. Getting through today was enough."),
 ];
 
 const String kMmHardDayClose =
-    'That is it. Nothing to log. Come back whenever a day gets heavy.';
+    "That's it. Nothing to log. Come back whenever a day feels heavy.";

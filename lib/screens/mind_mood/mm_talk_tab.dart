@@ -586,7 +586,7 @@ class _BookingSheetState extends State<_BookingSheet> {
                   fontSize: 18, fontWeight: FontWeight.w600, color: p.ink1)),
           const SizedBox(height: 8),
           Text(
-              'We will reach out to set a time that works for you. This '
+              "We'll get in touch to find a time that works for you. It "
               'stays anonymous throughout.',
               textAlign: TextAlign.center,
               style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2)),

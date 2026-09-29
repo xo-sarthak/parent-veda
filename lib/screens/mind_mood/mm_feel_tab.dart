@@ -353,17 +353,17 @@ class _SosClosing extends StatelessWidget {
       const SizedBox(height: 18),
       Text(
           offerCrisis
-              ? 'You have reached for calm a few times in a short while today.'
-              : 'That is the full flow.',
+              ? "You've reached for calm a few times in a short while today."
+              : "That's the whole exercise.",
           textAlign: TextAlign.center,
           style: pvFraunces(
               fontSize: 20, fontWeight: FontWeight.w600, color: p.ink1)),
       const SizedBox(height: 10),
       Text(
           offerCrisis
-              ? 'That matters, and it might help to talk it through with a '
-                  'real person too, not just breathe through it alone.'
-              : 'However you feel right now is exactly the right way to feel.',
+              ? 'That matters. It might help to talk it through with a real '
+                  'person too, not just breathe through it alone.'
+              : 'However you feel right now is okay.',
           textAlign: TextAlign.center,
           style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2)),
       const SizedBox(height: 26),

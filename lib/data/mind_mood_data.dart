@@ -22,6 +22,13 @@
 //  this ships. See the `REQUIRED_REVIEW` markers throughout this file.
 //
 //  ⚠️ ENGLISH ONLY FOR NOW - see `_en` below and CLAUDE.md's language rules.
+//
+//  Rewritten 2026-09-29 to docs/PREG-VOICE.md (the pregnancy warmth pass):
+//  every read, tile line and prompt below speaks to her in short sentences
+//  with contractions, and every read gains a `shortAnswer`. Facts, warning
+//  signs, helpline names and numbers are unchanged. Where a read is marked
+//  "REBUILT ... VERBATIM" below, that was the 2026-09-12 brief's copy; the
+//  wording is now this pass's, the substance is the brief's.
 // =============================================================================
 
 import 'dart:convert';
@@ -167,8 +174,8 @@ final List<MmBreathingExercise> kMmBreathingExercises = [
     name: _en('Box breathing'),
     description: _en('Four equal counts, in a steady square. Good when your '
         'thoughts are racing.'),
-    why: _en('Four equal sides give your mind something simple to hold onto, '
-        'which is most of what a racing mind needs.'),
+    why: _en('Four equal sides give your mind something simple to hold on '
+        "to. That's most of what a racing mind needs."),
     phases: [
       MmBreathPhase(_en('Breathe in'), 4, MmBreathAction.expand),
       MmBreathPhase(_en('Hold'), 4, MmBreathAction.hold),
@@ -181,7 +188,7 @@ final List<MmBreathingExercise> kMmBreathingExercises = [
     name: _en('4-7-8 breath'),
     description: _en('A short in, a long hold, a longer out. Good before '
         'sleep or when your heart is pounding.'),
-    why: _en('The long, slow exhale is doing the work here. It tells your '
+    why: _en('The long, slow breath out does the work here. It tells your '
         'body the moment has passed, even before your mind believes it.'),
     phases: [
       MmBreathPhase(_en('Breathe in'), 4, MmBreathAction.expand),
@@ -192,10 +199,11 @@ final List<MmBreathingExercise> kMmBreathingExercises = [
   MmBreathingExercise(
     id: 'slow_down',
     name: _en('Slow-down breath'),
-    description: _en('A gentle in, a longer out, nothing to count under '
-        'pressure. Good any time you just need to slow down.'),
-    why: _en('An exhale longer than the inhale is the single fastest way to '
-        'settle a body that has sped up. No holding, nothing to get wrong.'),
+    description: _en('A gentle in, a longer out, and nothing to count under '
+        'pressure. Good any time you need to slow down.'),
+    why: _en('Breathing out for longer than you breathe in is one of the '
+        'quickest ways to settle a body that has sped up. No holding, and '
+        'nothing to get wrong.'),
     phases: [
       MmBreathPhase(_en('Breathe in'), 4, MmBreathAction.expand),
       MmBreathPhase(_en('Breathe out'), 6, MmBreathAction.contract),
@@ -241,10 +249,10 @@ final List<MmSosStep> kMmSosFlow = [
   MmSosStep(
       MmSosStepKind.senses, _en('Name 2 things you can smell.'), seconds: 10),
   MmSosStep(MmSosStepKind.senses,
-      _en('Name 1 thing you are grateful for, right now.'), seconds: 10),
+      _en("Name 1 thing you're grateful for right now."), seconds: 10),
   MmSosStep(
       MmSosStepKind.steadying,
-      _en('This feeling will move through you. You are safe, and this '
+      _en("This feeling will move through you. You're safe, and this "
           'moment is passing.'),
       seconds: 10),
 ];
@@ -283,7 +291,7 @@ final List<MmMeditation> kMmMeditations = [
   MmMeditation(
     id: 'sleep',
     title: _en('Falling asleep'),
-    subtitle: _en('A slow wind-down for a body that will not settle.'),
+    subtitle: _en("A slow wind-down for a body that won't settle."),
     durationLabel: _en('15 MIN'),
   ),
   MmMeditation(
@@ -301,13 +309,13 @@ final List<MmMeditation> kMmMeditations = [
   MmMeditation(
     id: 'self_compassion',
     title: _en('Self-compassion'),
-    subtitle: _en('Speaking to yourself the way you would to a friend.'),
+    subtitle: _en("Talking to yourself the way you'd talk to a friend."),
     durationLabel: _en('9 MIN'),
   ),
   MmMeditation(
     id: 'hard_day_reset',
     title: _en('A hard-day reset'),
-    subtitle: _en('For the days that just did not go well.'),
+    subtitle: _en("For the days that just didn't go well."),
     durationLabel: _en('6 MIN'),
   ),
 ];
@@ -378,13 +386,29 @@ final List<MmCalmAudio> kMmCalmAudio = [
 //  Understand - article groups
 // =============================================================================
 
-/// ⚠️ THE READS' AUTHOR, ONE CONSTANT. The Mind & mood brief (2026-09-12) puts
-/// Dr Sharanya Menon's byline on every read in the area; the article screen
-/// renders it from here so a new read cannot forget it.
-const String kMmReadAuthor = 'Dr Sharanya Menon';
-const String kMmReadAuthorRole = 'Perinatal psychologist · reviewed Aug 2026';
+/// ⚠️ THE READS' AUTHOR, ONE CONSTANT. The Mind & mood brief (2026-09-12) put
+/// a named psychologist's byline on every read in the area. No such review
+/// happened and the person is not on the real roster (pregnancy gap analysis,
+/// P1 trust, 2026-09-29), so the byline is the honest state: the editorial
+/// desk, not reviewed. The reader already draws these reads that way
+/// (`pvReadFromMm`); this keeps the retired screen's copy in agreement.
+/// Kept for revert, and as the record of what was claimed:
+///   const String kMmReadAuthor = 'Dr Sharanya Menon';
+///   const String kMmReadAuthorRole = 'Perinatal psychologist · reviewed Aug 2026';
+const String kMmReadAuthor = 'ParentVeda editorial';
+const String kMmReadAuthorRole = 'Mind and mood · not yet reviewed';
 
-enum MmArticleGroup { isThisNormal, noOneTalksAbout, fears, moreThanMood, everydayCare }
+enum MmArticleGroup {
+  isThisNormal,
+  noOneTalksAbout,
+  fears,
+  moreThanMood,
+  everydayCare,
+
+  /// Sex and closeness (2026-09-29). Its own tab on the door, hidden by the
+  /// shared-phone switch once the lead wires it.
+  closeness,
+}
 
 extension MmArticleGroupMeta on MmArticleGroup {
   LocalizedText get heading => switch (this) {
@@ -394,21 +418,20 @@ extension MmArticleGroupMeta on MmArticleGroup {
         // nuskhe, log kya kahenge — that no clinical library ever names.
         MmArticleGroup.noOneTalksAbout => _en('What no one talks about'),
         MmArticleGroup.fears => _en('Fears, named and answered'),
-        MmArticleGroup.moreThanMood => _en('When it is more than a mood'),
+        MmArticleGroup.moreThanMood => _en("When it's more than a mood"),
         MmArticleGroup.everydayCare => _en('Everyday emotional care'),
+        MmArticleGroup.closeness => _en('Sex and closeness'),
       };
 
   LocalizedText get intro => switch (this) {
-        MmArticleGroup.isThisNormal => _en('The feelings that catch mothers '
-            'by surprise, and almost always are not a problem.'),
+        MmArticleGroup.isThisNormal => _en('The feelings that take you by '
+            "surprise, and almost always aren't a problem."),
         MmArticleGroup.noOneTalksAbout => _en('The parts of pregnancy here '
-            'that everyone lives and nobody writes down.'),
+            'that everyone lives through and nobody writes down.'),
         MmArticleGroup.fears => _en('The worries most women carry and rarely '
-            'say out loud. Named here, so you know you are not the only '
-            'one.'),
-        MmArticleGroup.moreThanMood => _en('Gently, and only where it is '
-            'useful to know: what it looks like when a feeling has become '
-            'more than a passing mood, and what to do about it.'),
+            "say out loud, named here so you know you're not the only one."),
+        MmArticleGroup.moreThanMood => _en('What it looks like when a feeling '
+            'has become more than a passing mood, and what to do about it.'),
         // ⚠️ FIVE PAGES, NOT THE BRIEF'S EIGHT, AND THAT IS SETTLED RATHER
         // THAN OUTSTANDING. Confirmed by the product owner 2026-08-20.
         //
@@ -425,6 +448,8 @@ extension MmArticleGroupMeta on MmArticleGroup {
         // Do not "finish" this to eight without reopening the decision.
         MmArticleGroup.everydayCare => _en('The ordinary things that shape '
             'how you feel, day to day.'),
+        MmArticleGroup.closeness => _en('Sex, desire and staying close as a '
+            'couple while you are expecting.'),
       };
 }
 
@@ -436,6 +461,7 @@ class MmArticle {
     required this.teaser,
     required this.readingTime,
     required this.body,
+    this.shortAnswer,
     this.hasExpertVideo = false,
     this.hasStoryVideo = false,
     this.whatItIs,
@@ -467,6 +493,11 @@ class MmArticle {
 
   /// Paragraphs, separated by a blank line.
   final LocalizedText body;
+
+  /// Two or three sentences that answer the title, shown in the reader's
+  /// short-answer box (docs/PREG-VOICE.md §3, added 2026-09-29). Null renders
+  /// as before. Reaches the reader through `pvReadFromMm`.
+  final LocalizedText? shortAnswer;
 
   /// §Understand - "an expert explainer at the top of each 'more than a
   /// mood' page and each major fear page".
@@ -509,19 +540,26 @@ final List<MmArticle> kMmArticles = [
     // teaser is the read's own first sentence. The earlier body is kept
     // below, commented, for revert.
     title: _en('One minute okay, next minute not'),
-    teaser: _en('You were fine a moment ago.'),
+    teaser: _en(
+      'Why your mood can change so fast right now, and when to mention it.',
+    ),
+    shortAnswer: _en(
+      'Fast mood changes are very common in pregnancy. Your hormones are '
+      'rising quickly, and your mood moves with them. It usually settles as '
+      'the weeks go on.',
+    ),
     readingTime: _en('3 MIN'),
     hasStoryVideo: true,
     body: _en(
-      'You were fine a moment ago. Now your eyes are wet over an advert, '
-      'or you have snapped at someone who did nothing. This is not you '
-      'losing control. Your body is running on more hormones than it ever '
-      'has, and they move fast, so your mood moves with them. It settles '
-      'as the weeks pass, and more once the baby is here. You do not have '
-      'to explain every mood to the people around you. "I am alright, it '
-      'is just one of those days" is enough. If the low moods start '
-      'lasting whole days and do not lift, that is worth telling someone, '
-      'and the last tab shows you who.',
+      'You were fine a moment ago. Now your eyes are wet over an advert, or '
+      "you've snapped at someone who did nothing wrong.\n\n"
+      "This isn't you losing control. Your body is running on more hormones "
+      'than it ever has, and they change fast, so your mood changes with '
+      'them. It settles as the weeks pass, and more once your baby is here.\n\n'
+      'You don\'t have to explain every mood to the people around you. "I\'m '
+      'alright, it\'s just one of those days" is enough.\n\n'
+      "If the low moods start lasting whole days and don't lift, tell "
+      'someone. The Talk tab shows you who.',
     ),
     // id: 'mood_swings',
     // group: MmArticleGroup.isThisNormal,
@@ -553,18 +591,25 @@ final List<MmArticle> kMmArticles = [
     // teaser is the read's own first sentence. The earlier body is kept
     // below, commented, for revert.
     title: _en('Crying at everything'),
-    teaser: _en('Adverts, a song, the way someone looked at you, nothing at all.'),
+    teaser: _en(
+      'Why tears come so easily now, and the kind of crying worth '
+      'mentioning.',
+    ),
+    shortAnswer: _en(
+      "Crying easily is normal in pregnancy, and it doesn't mean something "
+      'is wrong. It usually passes in a few minutes and leaves you lighter. '
+      "If it's there most days, or you can't stop, talk to someone.",
+    ),
     readingTime: _en('3 MIN'),
     body: _en(
-      'Adverts, a song, the way someone looked at you, nothing at all. '
-      'The tears come easy right now and you cannot always find a reason. '
-      'That is normal in pregnancy and it does not mean something is '
-      'wrong with you. Crying is not a problem to fix. Let it come, it '
-      'usually passes in a few minutes and you feel lighter after. What '
-      'is worth watching is if the crying stops feeling like release and '
-      'starts feeling like you cannot stop, or it is there most days. '
-      'Then it is not just hormones, and it is worth a proper '
-      'conversation.',
+      'Adverts, a song, the way someone looked at you, or nothing at all. '
+      "The tears come easily right now, and you can't always find a reason.\n\n"
+      "That's normal in pregnancy. It doesn't mean something is wrong with "
+      "you, and crying isn't a problem to fix. Let it come. It usually "
+      'passes in a few minutes, and you feel lighter after.\n\n'
+      "What's worth watching is crying that stops feeling like a release. "
+      "If it starts to feel like you can't stop, or it's there most days, "
+      "it's more than hormones, and it's worth a proper talk with someone.",
     ),
     // id: 'crying_easily',
     // group: MmArticleGroup.isThisNormal,
@@ -592,19 +637,27 @@ final List<MmArticle> kMmArticles = [
     // teaser is the read's own first sentence. The earlier body is kept
     // below, commented, for revert.
     title: _en('Short temper, and the guilt after'),
-    teaser: _en('Someone asks one more question, gives one more piece of advice, '
-        'and you snap.'),
+    teaser: _en(
+      'Why you snap more easily now, and how to ask for quiet without '
+      'guilt.',
+    ),
+    shortAnswer: _en(
+      'Snapping more easily is common in pregnancy. Tiredness and hormones '
+      'shorten your fuse, and the guilt afterwards shows you care. Neither '
+      'makes you a bad mother-to-be.',
+    ),
     readingTime: _en('3 MIN'),
     body: _en(
-      'Someone asks one more question, gives one more piece of advice, '
+      'Someone asks one more question or gives one more piece of advice, '
       'and you snap. Then you feel terrible about it for the rest of the '
-      'day. The snapping is the tiredness and the hormones talking. The '
-      'guilt after is you being a kind person. Neither makes you a bad '
-      'mother-to-be. You are allowed to say "I cannot take advice right '
-      'now, I just need a bit of quiet." You do not owe everyone patience '
-      'while you are growing a whole person. If the anger is scaring you, '
-      'or it is turning on you, that is a sign to talk to someone, and '
-      'there is no shame in it.',
+      'day.\n\n'
+      'The snapping is tiredness and hormones. The guilt after is you being '
+      'a kind person. Neither makes you a bad mother-to-be.\n\n'
+      'You\'re allowed to say, "I can\'t take advice right now. I just need a '
+      'bit of quiet." You don\'t owe everyone patience while you\'re growing '
+      'a whole person.\n\n'
+      "If the anger is scaring you, or it's turning on you, talk to "
+      "someone. There's no shame in it.",
     ),
     // id: 'irritability_anger',
     // group: MmArticleGroup.isThisNormal,
@@ -633,20 +686,27 @@ final List<MmArticle> kMmArticles = [
     // teaser is the read's own first sentence. The earlier body is kept
     // below, commented, for revert.
     title: _en('Not feeling the bond yet'),
-    teaser: _en('Everyone assumes you fell in love with the baby the second you saw '
-        'two lines.'),
+    teaser: _en(
+      "If you don't feel that rush of love yet, you're far from the only "
+      'one.',
+    ),
+    shortAnswer: _en(
+      "Many mothers don't feel a strong bond during pregnancy, and it "
+      "doesn't mean anything is missing in you. A bond grows over time, and "
+      'for many women it grows after the birth.',
+    ),
     readingTime: _en('4 MIN'),
     hasStoryVideo: true,
     body: _en(
-      'Everyone assumes you fell in love with the baby the second you saw '
-      'two lines. Some mothers do. Plenty do not, and they carry a quiet '
-      'worry that something is missing in them. Nothing is. A bond is not '
-      'a switch, it grows, and for many women it grows after the baby is '
-      'born, not before. Talking to your bump, feeling the kicks, none of '
-      'it has to feel magical to be real. You are already doing the '
-      'loving part by looking after yourself. If not feeling it is making '
-      'you feel low or broken, that feeling is worth sharing. It is more '
-      'common than anyone admits.',
+      'Everyone assumes you fell in love with your baby the second you saw '
+      "two lines. Some mothers do. Plenty don't, and they carry a worry "
+      'that something is missing in them. Nothing is.\n\n'
+      "A bond isn't a switch. It grows, and for many women it grows after "
+      'the baby is born, not before. Talking to your bump or feeling the '
+      "kicks doesn't have to feel special to be real. You're already doing "
+      'the loving part by looking after yourself.\n\n'
+      'If not feeling it is making you feel low or broken, share that '
+      "feeling with someone. It's more common than anyone admits.",
     ),
     // id: 'feeling_disconnected',
     // group: MmArticleGroup.isThisNormal,
@@ -677,17 +737,25 @@ final List<MmArticle> kMmArticles = [
     // teaser is the read's own first sentence. The earlier body is kept
     // below, commented, for revert.
     title: _en('The guilt that follows you around'),
-    teaser: _en('You ate the wrong thing.'),
+    teaser: _en(
+      'The wrong meal, the skipped walk: why the guilt is so loud, and why '
+      "it's rarely fair.",
+    ),
+    shortAnswer: _en(
+      "Guilt is loud in pregnancy, and it's rarely fair. One meal, one "
+      "skipped walk or one bad day doesn't harm your baby. If the guilt "
+      "won't stop, tell someone.",
+    ),
     readingTime: _en('3 MIN'),
     body: _en(
       'You ate the wrong thing. You skipped the walk. You felt annoyed at '
-      'the baby for making you sick. Guilt in pregnancy is loud and it is '
-      'rarely fair. One meal, one bad day, one moment of not feeling '
-      'grateful does not harm your baby. You are allowed to be a person '
-      'who gets things wrong and is still a good mother. If the guilt has '
-      'become a voice that will not stop, that lists everything you have '
-      'done wrong, that is worth telling someone. That is not conscience '
-      'anymore, and it is something we can help with.',
+      'the baby for making you sick.\n\n'
+      "Guilt in pregnancy is loud, and it's rarely fair. One meal, one bad "
+      "day, or one moment of not feeling grateful doesn't harm your baby. "
+      'You can get things wrong and still be a good mother.\n\n'
+      "If the guilt has become a voice that won't stop, listing everything "
+      "you've done wrong, please tell someone. That isn't your conscience "
+      "any more, and it's something we can help with.",
     ),
     // id: 'guilt',
     // group: MmArticleGroup.isThisNormal,
@@ -717,17 +785,25 @@ final List<MmArticle> kMmArticles = [
     // teaser is the read's own first sentence. The earlier body is kept
     // below, commented, for revert.
     title: _en('Forgetting everything'),
-    teaser: _en('You walked into a room and forgot why.'),
+    teaser: _en(
+      'Walking into a room and forgetting why: what pregnancy brain is, and '
+      'what helps.',
+    ),
+    shortAnswer: _en(
+      'Forgetfulness in pregnancy is real, and people call it pregnancy '
+      "brain. It isn't a sign of anything lasting, and it comes back after. "
+      "It's worth a second look only if it comes with feeling low.",
+    ),
     readingTime: _en('3 MIN'),
     body: _en(
-      'You walked into a room and forgot why. You have said the same '
-      'thing twice. You are sure you are getting slower. This is real, '
-      'people call it pregnancy brain, and it is your body putting its '
-      'energy elsewhere for a while. It is not a sign of anything lasting '
-      'and it comes back after. Write things down, keep one list, and be '
-      'kind to yourself about it. It is only worth a second look if the '
-      'fog comes with feeling low or not like yourself, in which case it '
-      'might not be the pregnancy alone.',
+      "You walked into a room and forgot why. You've said the same thing "
+      "twice. You're sure you're getting slower.\n\n"
+      "This is real. People call it pregnancy brain, and it's your body "
+      "putting its energy elsewhere for a while. It isn't a sign of "
+      'anything lasting, and it comes back after.\n\n'
+      'Write things down, keep one list, and be kind to yourself about it. '
+      "It's only worth a second look if the fog comes with feeling low or "
+      'not like yourself. Then it might not be the pregnancy alone.',
     ),
     // id: 'pregnancy_brain',
     // group: MmArticleGroup.isThisNormal,
@@ -755,20 +831,26 @@ final List<MmArticle> kMmArticles = [
     // teaser is the read's own first sentence. The earlier body is kept
     // below, commented, for revert.
     title: _en('When it all feels like too much'),
-    teaser: _en('The appointments, the advice, the changes in your body, the worry '
-        'about money or work or the delivery, and everyone with an opinion.'),
+    teaser: _en(
+      'The appointments, the advice, the worry: how to put some of it down.',
+    ),
+    shortAnswer: _en(
+      "Feeling overwhelmed in pregnancy isn't weakness. There's a lot on "
+      'you. Pick the one thing that matters today and let the rest wait, '
+      'and if the feeling is there every day, reach out.',
+    ),
     readingTime: _en('3 MIN'),
     hasStoryVideo: true,
     body: _en(
       'The appointments, the advice, the changes in your body, the worry '
       'about money or work or the delivery, and everyone with an opinion. '
-      'Some days it piles up and you just want it all to stop for a '
-      'minute. That feeling is not weakness, it is a lot, genuinely. You '
-      'are allowed to put some of it down. Pick the one thing that '
-      'matters today and let the rest wait. Say no to a visit. Hand '
-      'something to your partner. If the overwhelmed feeling is there '
-      'every day, or you are lying awake with it, do not sit with it '
-      'alone, the last tab shows you who to reach.',
+      'Some days it piles up and you just want it all to stop for a minute.\n\n'
+      "That feeling isn't weakness. It's a lot. You're allowed to put some "
+      'of it down.\n\n'
+      'Pick the one thing that matters today and let the rest wait. Say no '
+      'to a visit. Hand something to your partner.\n\n'
+      "If you feel overwhelmed every day, or you're lying awake with it, "
+      "please don't sit with it alone. The Talk tab shows you who to reach.",
     ),
     // id: 'overwhelm',
     // group: MmArticleGroup.isThisNormal,
@@ -797,19 +879,27 @@ final List<MmArticle> kMmArticles = [
     // teaser is the read's own first sentence. The earlier body is kept
     // below, commented, for revert.
     title: _en('Numb, when everyone says you should be glowing'),
-    teaser: _en('Everyone is excited.'),
+    teaser: _en(
+      'Feeling flat, even trapped, when everyone expects you to be happy.',
+    ),
+    shortAnswer: _en(
+      'Feeling flat when everyone around you is excited happens, and it '
+      "isn't your fault. It doesn't mean you won't love your baby. If the "
+      'numbness stays, talk to a counsellor.',
+    ),
     readingTime: _en('4 MIN'),
     hasStoryVideo: true,
     body: _en(
-      'Everyone is excited. The family is planning. And you feel flat. '
-      'Nothing. Maybe even a bit trapped, and then guilty for feeling '
-      'trapped. Feeling numb when you are supposed to be happy is one of '
-      'the loneliest things in pregnancy, because you cannot say it out '
-      'loud without someone gasping. So here it is said plainly: it '
-      'happens, it does not mean you will not love your baby, and it is '
-      'not your fault. Numbness that stays is one of the clearer signs '
-      'that this is more than a mood, and it is exactly what a counsellor '
-      'is there for. Reaching out is not giving up.',
+      'Everyone is excited. The family is planning. And you feel flat, like '
+      'nothing. Maybe even a bit trapped, and then guilty for feeling '
+      'trapped.\n\n'
+      "Feeling numb when you're supposed to be happy is one of the "
+      "loneliest things in pregnancy, because you can't say it out loud "
+      'without someone gasping. So here it is said plainly: it happens, it '
+      "doesn't mean you won't love your baby, and it isn't your fault.\n\n"
+      'Numbness that stays is one of the clearer signs that this is more '
+      "than a mood. It's exactly what a counsellor is there for. Reaching "
+      "out isn't giving up.",
     ),
     // id: 'numb_no_joy',
     // group: MmArticleGroup.isThisNormal,
@@ -839,18 +929,31 @@ final List<MmArticle> kMmArticles = [
     // teaser is the read's own first sentence. The earlier body is kept
     // below, commented, for revert.
     title: _en('Lonely, even in a full house'),
-    teaser: _en('The house is full of people and you have never felt more alone.'),
+    teaser: _en(
+      'When everyone is busy with the baby and nobody asks how you are '
+      'inside.',
+    ),
+    shortAnswer: _en(
+      'Feeling alone in a house full of people is common in pregnancy. '
+      "You're allowed to want to be seen, not just checked on. Tell one "
+      'person what you need, or talk to someone here.',
+    ),
     readingTime: _en('3 MIN'),
     body: _en(
-      'The house is full of people and you have never felt more alone. '
-      'Everyone is focused on the baby, the plans, the rituals, and '
-      'nobody has really asked how you are doing inside. That loneliness '
-      'is real and it is common, especially when you are surrounded by '
-      'people who love you but do not quite see you. You are allowed to '
-      'want to be seen, not just checked on. Tell one person, the one '
-      'most likely to just listen, "I do not need advice, I just need you '
-      'to hear me today." And if there is no such person right now, the '
-      'community and the counsellor here are for exactly this.',
+      "The house is full of people and you've never felt more alone. "
+      'Everyone is focused on the baby, the plans and the rituals, and '
+      "nobody has asked how you're doing inside.\n\n"
+      "That loneliness is real, and it's common, especially when you're "
+      "surrounded by people who love you but don't quite see you. You're "
+      'allowed to want to be seen, not just checked on.\n\n'
+      'Tell one person, the one most likely to just listen: "I don\'t need '
+      'advice. I just need you to hear me today."\n\n'
+      'It also helps to know someone going through the same months. A '
+      'friend or cousin who is expecting, a woman from your antenatal '
+      'class, or a mother you keep meeting in the hospital waiting room can '
+      'become the person you message at night.\n\n'
+      "If there's no one like that right now, the community and the "
+      'counsellor here are for exactly this.',
     ),
     // id: 'loneliness',
     // group: MmArticleGroup.isThisNormal,
@@ -884,135 +987,264 @@ final List<MmArticle> kMmArticles = [
     id: 'policed_eating',
     group: MmArticleGroup.noOneTalksAbout,
     title: _en('When everyone polices what you eat and do'),
-    teaser: _en('No papaya.'),
+    teaser: _en(
+      "No papaya, don't lift that: when the whole house has rules for your "
+      'body.',
+    ),
+    shortAnswer: _en(
+      'When everyone has advice on what you eat and do, much of it is love '
+      'and habit rather than fact. Check what matters, gently let the rest '
+      "go, and keep in mind it's still your body.",
+    ),
     readingTime: _en('3 MIN'),
     body: _en(
-      'No papaya. Do not lift that. Sit down. Eat this, it is good for '
-      'the baby. Do not eat that, it is too hot. Everyone in the house '
-      'has become an expert on your body. Some of it is love, some of it '
-      'is old habit, and a lot of it is not backed by anything. You are '
-      'allowed to check what actually matters (the Can I? section has the '
-      'real answers) and gently let the rest go. "Doctor said it is fine" '
-      'is a full sentence. You do not have to argue, and you do not have '
-      'to obey either. It is still your body, even now.',
+      "No papaya. Don't lift that. Sit down. Eat this, it's good for the "
+      "baby. Don't eat that, it's too hot. Everyone in the house has become "
+      'an expert on your body.\n\n'
+      "Some of it is love, some of it is old habit, and a lot of it isn't "
+      'backed by anything. Check what matters (the Can I? section has the '
+      'real answers) and gently let the rest go.\n\n'
+      '"Doctor said it\'s fine" is a full sentence. You don\'t have to argue, '
+      "and you don't have to obey either. It's still your body, even now.",
     ),
   ),
   MmArticle(
     id: 'log_kya_kahenge',
     group: MmArticleGroup.noOneTalksAbout,
     title: _en('Log kya kahenge'),
-    teaser: _en('So much of pregnancy here gets lived for other people.'),
+    teaser: _en(
+      'When what the neighbours and in-laws will say starts to weigh on '
+      'you.',
+    ),
+    shortAnswer: _en(
+      "So much of pregnancy here gets lived for other people's opinions. "
+      "Most of them won't remember any of it in a year. The people whose "
+      'opinion matters are you, your partner and your doctor.',
+    ),
     readingTime: _en('3 MIN'),
     body: _en(
-      'So much of pregnancy here gets lived for other people. What will '
-      'the neighbours say, what will the in-laws think, are we doing it '
-      'the right way, are we telling people at the right time. It is '
-      'exhausting to carry everyone\'s opinion on top of everything else. '
-      'Here is the quiet truth: most of those people will not remember '
-      'any of it in a year, and none of them are the ones growing this '
-      'baby or raising it. You are allowed to do this your way. The '
-      'people whose opinion actually matters are you, your partner, and '
-      'your doctor. That is a short list, and it is the right one.',
+      'So much of pregnancy here gets lived for other people. What will the '
+      'neighbours say, what will the in-laws think, are we doing it the '
+      'right way, are we telling people at the right time. Carrying '
+      "everyone's opinion on top of everything else is exhausting.\n\n"
+      "Most of those people won't remember any of it in a year, and none of "
+      "them are the ones growing this baby or raising it. You're allowed to "
+      'do this your way.\n\n'
+      'The people whose opinion matters are you, your partner and your '
+      "doctor. That's a short list, and it's the right one.",
     ),
   ),
   MmArticle(
     id: 'secret_months',
     group: MmArticleGroup.noOneTalksAbout,
     title: _en('The secret months, carried alone'),
-    teaser: _en('Many couples do not tell anyone for the first three months, just '
-        'in case.'),
+    teaser: _en(
+      'Not telling anyone for three months, and carrying the sickness and '
+      'worry alone.',
+    ),
+    shortAnswer: _en(
+      "Many couples wait three months before telling anyone. It's a "
+      'sensible custom, but it can leave you carrying the sickness and '
+      'worry alone. You can tell one or two people who make you feel safe.',
+    ),
     readingTime: _en('3 MIN'),
     body: _en(
-      'Many couples do not tell anyone for the first three months, just '
-      'in case. It is a sensible custom, but it has a cost: you are going '
-      'through the sickness, the fear, the tiredness and the worry, and '
-      'you cannot tell a soul. That is a heavy secret to carry, '
-      'especially at work or in a full house. You are allowed to tell the '
-      'one or two people who make you feel safe, even in these early '
-      'weeks. A secret does not have to mean completely alone. And if the '
-      'early worry is keeping you up, the community here is anonymous, so '
-      'you can say it out loud without saying it out loud.',
+      "Many couples don't tell anyone for the first three months, just in "
+      "case. It's a sensible custom, but it has a cost. You're going "
+      'through the sickness, the fear, the tiredness and the worry, and you '
+      "can't tell a soul.\n\n"
+      "That's a heavy secret to carry, especially at work or in a full "
+      "house. You're allowed to tell the one or two people who make you "
+      "feel safe, even in these early weeks. A secret doesn't have to mean "
+      'being completely alone.\n\n'
+      'If the early worry is keeping you up, the community here is '
+      "anonymous, so you can say it out loud without anyone knowing it's "
+      'you.',
     ),
   ),
   MmArticle(
     id: 'gender_everyones_business',
     group: MmArticleGroup.noOneTalksAbout,
     title: _en('When the baby\'s gender becomes everyone\'s business'),
-    teaser: _en('The law will not let anyone tell you, and that is a good thing, '
-        'but it does not stop people wondering out loud, dropping hints, or '
-        'making you feel like one answer would be better than the other.'),
+    teaser: _en(
+      'When people drop hints or make one answer sound better than the '
+      'other.',
+    ),
+    shortAnswer: _en(
+      "The law doesn't let anyone tell you, and that's a good thing. People "
+      'may still drop hints or show a preference. That says something about '
+      "them, not about your child, and you don't have to carry it.",
+    ),
     readingTime: _en('3 MIN'),
     body: _en(
-      'The law will not let anyone tell you, and that is a good thing, '
-      'but it does not stop people wondering out loud, dropping hints, or '
-      'making you feel like one answer would be better than the other. If '
-      'you have felt the weight of that, or felt a flicker of your own '
-      'hope and then guilt about it, you are not a bad person. You are a '
-      'person in a place where this still carries pressure. Your baby is '
-      'your baby. The people who make it about a gender are telling you '
-      'about themselves, not about your child. You do not have to carry '
-      'their preference as your worry.',
+      "The law won't let anyone tell you, and that's a good thing. But it "
+      "doesn't stop people wondering out loud, dropping hints, or making "
+      'you feel one answer would be better than the other.\n\n'
+      "If you've felt the weight of that, or felt a flicker of your own "
+      "hope and then guilt about it, you're not a bad person. You're living "
+      'in a place where this still carries pressure.\n\n'
+      'Your baby is your baby. People who make it about a gender are '
+      "telling you about themselves, not about your child. You don't have "
+      'to carry their preference as your worry.',
     ),
   ),
   MmArticle(
     id: 'no_corner_of_the_house',
     group: MmArticleGroup.noOneTalksAbout,
     title: _en('No corner of the house that\'s yours'),
-    teaser: _en('In a joint family, or even a small flat full of people, there may '
-        'be nowhere you can just close a door and be.'),
+    teaser: _en(
+      "When there's nowhere to close a door and just be, and how to find "
+      'ten minutes.',
+    ),
+    shortAnswer: _en(
+      'In a full house there may be nowhere to be alone, and that wears you '
+      "down. Taking a little space for yourself isn't rude. It's how you "
+      'stay okay.',
+    ),
     readingTime: _en('3 MIN'),
     body: _en(
-      'In a joint family, or even a small flat full of people, there may '
-      'be nowhere you can just close a door and be. Everyone means well, '
+      'In a joint family, or even a small flat full of people, there may be '
+      'nowhere you can close a door and just be. Everyone means well, '
       'everyone is around, and you never get five minutes that are only '
-      'yours. That wears you down more than people realise. You are '
-      'allowed to take that space, even in small ways: a walk by '
-      'yourself, ten minutes in a room with the door shut, headphones on '
-      'with something calming. It is not rude, it is not acting '
-      'difficult, it is how you stay okay. The Feel tab has a few short '
-      'things for exactly those stolen ten minutes.',
+      'yours. That wears you down more than people realise.\n\n'
+      "You're allowed to take that space, even in small ways: a walk by "
+      'yourself, ten minutes in a room with the door shut, or headphones on '
+      "with something calming. It isn't rude and it isn't being difficult. "
+      "It's how you stay okay.\n\n"
+      'The Feel tab has a few short things for those stolen ten minutes.',
     ),
   ),
   MmArticle(
     id: 'nuskhe_and_superstitions',
     group: MmArticleGroup.noOneTalksAbout,
     title: _en('When the nuskhe and the superstitions start'),
-    teaser: _en('Do not sit in the doorway.'),
+    teaser: _en(
+      'Family beliefs and home remedies: what to keep, what to check and '
+      'what to let go.',
+    ),
+    shortAnswer: _en(
+      "Every family has its nuskhe and its beliefs. You don't have to "
+      'follow the ones that worry you, or fight the ones that comfort '
+      'people. Check anything that makes you uneasy, then let it go.',
+    ),
     readingTime: _en('3 MIN'),
     body: _en(
-      'Do not sit in the doorway. Drink this so the baby is fair. Do this '
-      'so it is a boy, do that so the delivery is easy. Every family has '
-      'its nuskhe and its beliefs, and some are sweet, some are harmless, '
-      'and some quietly make you anxious or ashamed. You do not have to '
-      'follow the ones that worry you, and you do not have to fight the '
-      'ones that comfort people. When something makes you uneasy, you are '
-      'allowed to check it (Can I? and Ask Veda are there for that) and '
-      'then let it go. A belief that adds fear is not helping you, '
-      'whatever it promises.',
+      "Don't sit in the doorway. Drink this so the baby is fair. Do this so "
+      "it's a boy, do that so the delivery is easy. Every family has its "
+      'nuskhe and its beliefs. Some are sweet, some are harmless, and some '
+      'leave you anxious or ashamed.\n\n'
+      "You don't have to follow the ones that worry you, and you don't have "
+      'to fight the ones that comfort people. When something makes you '
+      'uneasy, check it (Can I? and Ask Veda are there for that) and then '
+      'let it go.\n\n'
+      "A belief that adds fear isn't helping you, whatever it promises.",
     ),
   ),
   MmArticle(
     id: 'bringing_him_in',
     group: MmArticleGroup.noOneTalksAbout,
     title: _en('Bringing him in, when he doesn\'t get it'),
-    teaser: _en('He is happy about the baby, but he does not feel the sickness, the '
-        'fear, the change in your body, so he does not always understand '
-        'why you are low or snappy or scared.'),
+    teaser: _en(
+      "When he's happy about the baby but doesn't understand why you're low "
+      'or scared.',
+    ),
+    shortAnswer: _en(
+      "He may be happy about the baby but not feel what you're feeling, so "
+      "he doesn't always understand. That doesn't mean he doesn't care. "
+      "Small, clear asks work better than hoping he'll notice.",
+    ),
     readingTime: _en('3 MIN'),
     // "There is a short piece for him too on what actually helps" —
     // `kMmPartnerArticle`, which already exists and is written to him.
     linkLabel: 'The short piece for him',
     linkArticleId: 'partner_support',
     body: _en(
-      'He is happy about the baby, but he does not feel the sickness, the '
-      'fear, the change in your body, so he does not always understand '
-      'why you are low or snappy or scared. That gap is normal and it '
-      'does not mean he does not care. He often just does not know what '
-      'to do. Tell him the specific thing, not the whole feeling: sit '
-      'with me for ten minutes, handle your mother today, just listen, do '
-      'not fix it. Men here are rarely taught how to do this, so small '
-      'clear asks work better than hoping he will notice. There is a '
-      'short piece for him too on what actually helps.',
+      "He's happy about the baby, but he doesn't feel the sickness, the "
+      "fear or the change in your body. So he doesn't always understand why "
+      "you're low or snappy or scared.\n\n"
+      "That gap is normal, and it doesn't mean he doesn't care. Often he "
+      "just doesn't know what to do.\n\n"
+      'Tell him the specific thing, not the whole feeling: sit with me for '
+      "ten minutes, handle your mother today, just listen and don't fix it. "
+      'Men here are rarely taught how to do this, so small, clear asks work '
+      "better than hoping he'll notice.\n\n"
+      "Asking for help can feel like admitting you can't manage. It isn't. "
+      "You're doing something big, and letting others carry part of it is "
+      'how it gets done. The same goes for family. Tell your mother, sister '
+      'or mother-in-law one thing she can take off you this week, like a '
+      'meal or an errand. Most people want to help and are waiting to be '
+      'told how.\n\n'
+      "There's a short piece for him too, on what helps.",
+    ),
+  ),
+  MmArticle(
+    id: 'after_ivf_allowed_hard',
+    group: MmArticleGroup.noOneTalksAbout,
+    // Added 2026-09-29 (pregnancy gap analysis). ParentVeda editorial,
+    // not yet reviewed by a clinician.
+    title: _en('After IVF, and finding it hard'),
+    teaser: _en(
+      'When you worked so hard for this pregnancy that finding it hard '
+      'feels wrong.',
+    ),
+    shortAnswer: _en(
+      "After IVF, many women feel they've no right to complain about "
+      'sickness, tiredness or fear. You do. Wanting this pregnancy very '
+      'much and finding it hard are both true at once.',
+    ),
+    readingTime: _en('3 MIN'),
+    body: _en(
+      "After months or years of treatment, injections and waiting, you're "
+      "finally pregnant. And now you're sick, tired or scared, and you feel "
+      "you've no right to say so, because everyone knows how much you "
+      'wanted this.\n\n'
+      "You're allowed to find it hard. Wanting a baby very much doesn't "
+      "make nausea any easier, and saying it's rough doesn't make you "
+      'ungrateful. Both are true at once.\n\n'
+      'An IVF pregnancy can bring its own kind of worry too. You may have '
+      "watched every number for so long that it's hard to stop checking. "
+      'The early weeks can feel fragile, and moving from your fertility '
+      'clinic to your pregnancy doctor can feel like losing a safety net. '
+      'Ask your clinic when that handover happens, and who to call if '
+      "you're worried before then.\n\n"
+      'Find one person who understands what it took to get here, and let '
+      "them hear the hard parts too. If you'd like to talk to someone "
+      'trained for this, a counsellor is on the Talk tab.',
+    ),
+  ),
+  MmArticle(
+    id: 'husband_far_away',
+    group: MmArticleGroup.noOneTalksAbout,
+    // Added 2026-09-29 (pregnancy gap analysis). ParentVeda editorial,
+    // not yet reviewed by a clinician.
+    title: _en('When your husband works far away'),
+    teaser: _en(
+      'Going through pregnancy while he works in another city or abroad.',
+    ),
+    shortAnswer: _en(
+      'Many women are pregnant while their husband works in another city or '
+      "abroad. It's hard, and it's okay to say so. Small daily habits help "
+      'you feel close, and an early plan for the birth helps you feel safe.',
+    ),
+    readingTime: _en('3 MIN'),
+    body: _en(
+      'Many women here are pregnant while their husband works in another '
+      'city, in the Gulf, or further away. You may be living with your '
+      "in-laws or back at your parents' home, with the scans, the sickness "
+      'and the worry happening without him.\n\n'
+      "It's hard, and it's okay to say so, to him and to the people around "
+      "you. Missing him doesn't make you ungrateful for the work that keeps "
+      'the family going.\n\n'
+      'A few things help you feel close. Share scan photos and what the '
+      'doctor said on the same day. Keep a regular time to talk, even ten '
+      'minutes. Ask if he can join a check-up on a video call. Let him read '
+      'about each week too, so you have the same things to talk about.\n\n'
+      "Plan for the birth early. Talk about when he'll try to come home, "
+      'who will take you to hospital if labour starts before he arrives, '
+      "and who you'll call first. Write it down and share it with the "
+      'family.\n\n'
+      'If the loneliness is heavy most days, the counsellor on the Talk tab '
+      'is there for that too.',
     ),
   ),
 
@@ -1029,26 +1261,44 @@ final List<MmArticle> kMmArticles = [
     linkGroup: 'birth',
     group: MmArticleGroup.fears,
     title: _en('Fear of labour'),
-    teaser: _en('A fear strong enough to have its own name: tokophobia. You '
-        'are not alone in it.'),
+    teaser: _en(
+      'A fear common enough to have its own name, and what makes it '
+      'smaller.',
+    ),
+    shortAnswer: _en(
+      "Fear of labour is very common, and when it's strong it has a name, "
+      'tokophobia. Knowing what will happen, and knowing pain relief is a '
+      "real choice, both make the fear smaller. If it's affecting your "
+      'sleep, tell your doctor.',
+    ),
     readingTime: _en('4 MIN'),
     hasExpertVideo: true,
     hasStoryVideo: true,
     body: _en(
-      'A real, sometimes intense fear of labour is common enough to have '
-      'a medical name, tokophobia, and it exists on a spectrum from '
-      'ordinary nervousness to fear strong enough to affect sleep and mood. '
-      'Wherever you sit on it, you are far from the only one there.\n\n'
+      'A real, sometimes intense fear of labour is common enough to have a '
+      'medical name, tokophobia. It runs from ordinary nervousness to fear '
+      'strong enough to affect your sleep and mood. Wherever you are on it, '
+      "you're far from the only one there.\n\n"
       'Much of the fear comes from not knowing what to expect, or from '
-      'stories other people have told you, which are rarely a fair sample '
-      'of what labour is actually like. Preparation genuinely helps here in '
-      'a way it does not for every fear: understanding what will actually '
-      'happen, stage by stage, and knowing pain relief is a real, available '
-      'choice, both reduce the fear itself.\n\n'
-      'If the fear is strong enough that you are avoiding thinking about '
-      'the birth altogether, or it is affecting your sleep most nights, '
-      'that is worth raising with your doctor directly, and worth talking '
-      'through with a counsellor. Both exist for exactly this.',
+      'stories other people have told you. Those stories are rarely a fair '
+      "picture of labour. Preparing helps here in a way it doesn't for "
+      'every fear. Understanding what will happen, stage by stage, and '
+      'knowing pain relief is a real, available choice both make the fear '
+      'itself smaller.\n\n'
+      "If it's the pain you fear most, ask your doctor at your next visit "
+      'what pain relief your hospital offers, and when you can ask for it. '
+      'Knowing your options ahead of time takes away a lot of the dread.\n\n'
+      "If it's tearing, ask about that too. Your doctor can tell you what "
+      'they do during the birth to help protect you, and how a tear is '
+      'cared for if it happens. Most women find the real answer calmer than '
+      "what they'd imagined.\n\n"
+      'Write your fears down and take the list with you. Saying them out '
+      'loud to your doctor, your partner or a counsellor makes them easier '
+      'to hold.\n\n'
+      "If the fear is strong enough that you're avoiding thinking about the "
+      "birth at all, or it's affecting your sleep most nights, raise it "
+      'with your doctor directly, and talk it through with a counsellor. '
+      'Both are there for exactly this.',
     ),
   ),
   MmArticle(
@@ -1059,51 +1309,107 @@ final List<MmArticle> kMmArticles = [
     linkGroup: 'understand',
     group: MmArticleGroup.fears,
     title: _en('Fear something is wrong with the baby'),
-    teaser: _en('A worry that sits underneath everything, even when every '
-        'scan has been fine.'),
+    teaser: _en(
+      'A worry under everything, even when every scan has been fine.',
+    ),
+    shortAnswer: _en(
+      'Almost every pregnant woman carries this worry, even after good '
+      'scans. A clear scan is real evidence, not a short break before the '
+      'next worry. If the worry fills hours of your day, talk to someone.',
+    ),
     readingTime: _en('4 MIN'),
     hasExpertVideo: true,
     hasStoryVideo: true,
     body: _en(
       'Almost every pregnant woman carries some version of this fear, even '
-      'after a string of reassuring scans and appointments. It is one of '
-      'the most universal pregnancy fears there is, precisely because so '
-      'much of what happens inside you cannot be seen or felt directly.\n\n'
-      'The scans and checks in your calendar exist to catch what genuinely '
-      'needs catching, and a clear scan is real evidence, not a temporary '
-      'reprieve before the next worry. It is normal for the reassurance to '
-      'fade after a few days and the worry to creep back. That cycle is the '
-      'fear itself, not a sign something has actually changed.\n\n'
+      "after a string of reassuring scans and appointments. It's one of the "
+      'most common pregnancy fears there is, because so much of what '
+      "happens inside you can't be seen or felt.\n\n"
+      'The scans and checks in your calendar are there to catch what needs '
+      'catching. A clear scan is real evidence, not a short break before '
+      "the next worry. It's normal for the reassurance to fade after a few "
+      'days and the worry to creep back. That cycle is the fear itself, not '
+      'a sign something has changed.\n\n'
       'If this worry is taking up hours of most days, or sending you back '
-      'to search engines repeatedly for reassurance that never quite lands, '
-      '"Health anxiety and over-Googling" and "Pregnancy anxiety" both go '
-      'further into this.',
+      'to search engines again and again for reassurance that never lands, '
+      '"Health anxiety and over-Googling" and "Pregnancy anxiety" go '
+      'further into it.',
     ),
   ),
   MmArticle(
     id: 'fear_miscarriage',
     group: MmArticleGroup.fears,
     title: _en('Fear of miscarriage'),
-    teaser: _en('Especially sharp in the early weeks, and especially if you '
-        'have been through loss before.'),
+    teaser: _en(
+      'Especially sharp in the early weeks, and especially after a loss '
+      'before.',
+    ),
+    shortAnswer: _en(
+      'Fear of miscarriage is sharpest in the early weeks, and sharper '
+      "still after a loss. How strong your symptoms feel doesn't tell you "
+      'how your pregnancy is doing. In most cases, nothing you do causes or '
+      'prevents a miscarriage.',
+    ),
     readingTime: _en('4 MIN'),
     hasExpertVideo: true,
     hasStoryVideo: true,
     body: _en(
-      'Fear of loss is at its sharpest in the first trimester, and sharper '
-      'still for anyone who has miscarried before or spent a long time '
-      'trying to conceive. Checking for symptoms constantly, or bracing '
-      'yourself against getting attached, are both common ways this fear '
-      'shows up.\n\n'
-      'It usually eases as the pregnancy progresses and the risk itself '
-      'genuinely falls, though for some women it lingers well past the '
-      'point where the numbers would suggest it should. That is a real '
-      'experience, not an overreaction.\n\n'
-      'There is nothing you did, or are doing, that causes or prevents a '
-      'miscarriage in the vast majority of cases, and that fact is worth '
-      'returning to when the fear speaks in the language of blame. If it '
-      'is affecting your ability to function day to day, please talk to '
-      'your doctor and consider a counsellor alongside them.',
+      "Fear of loss is at its sharpest in the first trimester. It's sharper "
+      "still if you've miscarried before or spent a long time trying to "
+      'conceive. Checking for symptoms all the time, or holding back from '
+      'getting attached, are both common ways this fear shows up.\n\n'
+      'Many women panic when their sickness eases or their breasts stop '
+      'feeling sore, or when the symptoms never came at all. Symptoms come '
+      "and go, and they vary hugely from one woman to the next. They don't "
+      'measure how well a pregnancy is going. Your doctor and your scans do '
+      'that.\n\n'
+      'The fear usually eases as the pregnancy goes on and the risk itself '
+      'falls. For some women it stays well past the point where the numbers '
+      "say it should. That's a real experience, not an overreaction.\n\n"
+      'In the vast majority of cases, nothing you did or are doing causes '
+      'or prevents a miscarriage. Come back to that fact when the fear '
+      'starts to sound like blame.\n\n'
+      "If it's affecting your ability to get through the day, please talk "
+      'to your doctor, and think about a counsellor alongside them.',
+    ),
+  ),
+  MmArticle(
+    id: 'pregnant_after_loss',
+    group: MmArticleGroup.fears,
+    // Added 2026-09-29 (pregnancy gap analysis). ParentVeda editorial,
+    // not yet reviewed by a clinician.
+    title: _en('Pregnant again after a loss'),
+    teaser: _en(
+      "When joy and fear arrive together, because you've lost a pregnancy "
+      'before.',
+    ),
+    shortAnswer: _en(
+      'Being pregnant after a miscarriage or loss often brings joy and fear '
+      "together. That mix is normal, and you don't have to choose one. Tell "
+      'your doctor about your loss and how anxious you feel, so your care '
+      'fits you.',
+    ),
+    readingTime: _en('4 MIN'),
+    body: _en(
+      "If you've lost a pregnancy before, this one can feel different from "
+      'the start. You may be happy and frightened at the same time, and '
+      'hold back from getting attached, just in case. Both feelings can be '
+      'there together, and neither is wrong.\n\n'
+      'Some people call a baby born after a loss a rainbow baby. You can '
+      'use the words that feel right to you, or none at all. Your grief for '
+      "the baby you lost doesn't have to be finished for you to love this "
+      'one.\n\n'
+      'The early weeks, and the weeks around the time of your earlier loss, '
+      'are often the hardest. Many women find themselves checking for '
+      "bleeding or counting symptoms. Your symptoms don't tell you how this "
+      'pregnancy is going. Your doctor and your scans do.\n\n'
+      "Tell your doctor about your loss, if they don't already know, and "
+      "say how anxious you feel. Ask what check-ups you'll have and when, "
+      'so you know when the next reassurance is coming. Some doctors offer '
+      "an extra early scan after a loss, and it's fine to ask.\n\n"
+      'Let one or two people know how hard this is, even if everyone else '
+      'only sees good news. If the fear is taking over your days or your '
+      'sleep, a counsellor on the Talk tab can help.',
     ),
   ),
   MmArticle(
@@ -1113,22 +1419,28 @@ final List<MmArticle> kMmArticles = [
     // teaser is the read's own first sentence. The earlier body is kept
     // below, commented, for revert.
     title: _en('Fear of being a bad mother'),
-    teaser: _en('You are not even a mother yet and you are already sure you will '
-        'get it wrong.'),
+    teaser: _en(
+      "Already sure you'll get it wrong, before your baby is even here.",
+    ),
+    shortAnswer: _en(
+      "Almost every thoughtful mother fears she'll get it wrong. The "
+      'mothers who worry about it are almost never the ones to worry about. '
+      "You'll learn your baby, and your baby will learn you.",
+    ),
     readingTime: _en('4 MIN'),
     hasExpertVideo: true,
     hasStoryVideo: true,
     body: _en(
-      'You are not even a mother yet and you are already sure you will '
-      'get it wrong. You will be too tired, too impatient, too much like '
-      'someone in your own family you did not want to become. Almost '
-      'every thoughtful mother has this fear, and here is the thing: the '
-      'mothers who worry about being bad at it are almost never the ones '
-      'you would actually worry about. The fear is your care showing up '
-      'early. You do not have to have it all figured out. You will learn '
-      'the baby, the baby will learn you, and you will both be fine at it '
-      'in your own way. If this fear is constant and heavy, that is worth '
-      'talking through with someone.',
+      "You're not even a mother yet, and you're already sure you'll get it "
+      "wrong. You'll be too tired, too impatient, too much like someone in "
+      "your own family you didn't want to become.\n\n"
+      'Almost every thoughtful mother has this fear. The mothers who worry '
+      "about being bad at it are almost never the ones you'd worry about. "
+      'The fear is your care showing up early.\n\n'
+      "You don't have to have it all figured out. You'll learn your baby, "
+      "your baby will learn you, and you'll both be fine at it in your own "
+      'way.\n\n'
+      'If this fear is constant and heavy, talk it through with someone.',
     ),
     // id: 'fear_not_good_mother',
     // group: MmArticleGroup.fears,
@@ -1155,48 +1467,59 @@ final List<MmArticle> kMmArticles = [
     id: 'fear_body_changes',
     group: MmArticleGroup.fears,
     title: _en('Fear of body changes'),
-    teaser: _en('Worry about how your body will look, feel, or work, both '
-        'now and after.'),
+    teaser: _en(
+      'Worry about how your body will look, feel or work, now and after.',
+    ),
+    shortAnswer: _en(
+      "Worrying about how your body is changing is common, and it isn't "
+      'shallow. Most changes soften a lot in the months after birth, though '
+      'every woman is different.',
+    ),
     readingTime: _en('4 MIN'),
     hasExpertVideo: true,
     hasStoryVideo: true,
     body: _en(
-      'Fear about how your body is changing, and whether it will feel like '
-      'yours again afterwards, is common and rarely acknowledged out loud, '
-      'partly because it can feel shallow to admit next to the "bigger" '
-      'worries of pregnancy. It is not shallow. Your body is genuinely '
-      'changing in ways that are visible, permanent in some respects, and '
-      'entirely outside your control.\n\n'
-      'Most physical changes soften considerably over the months after '
-      'birth, though the timeline and the outcome differ for every woman, '
-      'and comparing yourself to anyone else, including your own '
-      'pre-pregnancy body, rarely helps.\n\n'
-      '"Body image and self-esteem" in Everyday emotional care goes '
-      'further into living with this day to day.',
+      "Fear about how your body is changing, and whether it'll feel like "
+      "yours again, is common. It's rarely said out loud, partly because it "
+      'can feel shallow next to the "bigger" worries of pregnancy.\n\n'
+      "It isn't shallow. Your body is changing in ways that are visible, "
+      'permanent in some ways, and outside your control.\n\n'
+      'Most physical changes soften a lot over the months after birth, '
+      'though the timeline and the result are different for every woman. '
+      'Comparing yourself to anyone else, including your own body before '
+      'pregnancy, rarely helps.\n\n'
+      '"Body image and self-esteem" in Everyday emotional care goes further '
+      'into living with this day to day.',
     ),
   ),
   MmArticle(
     id: 'health_anxiety_googling',
     group: MmArticleGroup.fears,
     title: _en('Health anxiety and over-Googling'),
-    teaser: _en('Searching a symptom at midnight, and feeling worse an hour '
-        'later, not better.'),
+    teaser: _en(
+      'Searching a symptom at midnight, and feeling worse an hour later.',
+    ),
+    shortAnswer: _en(
+      'Searching a symptom is natural, but results often put the rarest, '
+      'scariest answer first. If you keep searching late into the night and '
+      "never feel reassured, that's the anxiety, not the symptom.",
+    ),
     readingTime: _en('4 MIN'),
     hasExpertVideo: true,
     hasStoryVideo: true,
     body: _en(
-      'Searching a symptom is a reasonable instinct, and pregnancy makes '
-      'it more tempting than ever because so much feels new and '
-      'unfamiliar. The trouble is what search results actually contain: '
-      'the rarest, most frightening explanation is often the loudest one '
-      'on the page, which is the opposite of how likely it actually is.\n\n'
-      'A pattern worth noticing in yourself is searching that does not '
-      'stop at one answer, but keeps going, page after page, late into the '
-      'night, chasing a reassurance that never quite arrives. That pattern '
-      'is the anxiety talking, not the symptom.\n\n'
-      'Ask Veda in the Talk tab exists partly for this: a calmer place to '
-      'ask a worry out loud, with a clear steer to a real person whenever '
-      'the question is serious enough to need one.',
+      'Searching a symptom is a natural thing to do, and pregnancy makes it '
+      'more tempting than ever because so much feels new. The trouble is '
+      'what the results contain. The rarest, most frightening explanation '
+      'is often the loudest one on the page, which is the opposite of how '
+      'likely it is.\n\n'
+      "One pattern worth noticing in yourself is searching that doesn't "
+      'stop at one answer. It keeps going, page after page, late into the '
+      'night, chasing a reassurance that never arrives. That pattern is the '
+      'anxiety talking, not the symptom.\n\n'
+      'Ask Veda, which you can open from any screen here, is there partly '
+      'for this: a calmer place to ask a worry out loud, with a clear '
+      'pointer to a real person whenever the question needs one.',
     ),
   ),
 
@@ -1211,181 +1534,269 @@ final List<MmArticle> kMmArticles = [
     // door's "When it is more than this" tab. The red flag beside it holds
     // the signs; this is the sentence before them.
     title: _en('Baby blues, or something more?'),
-    teaser: _en('Most mothers feel weepy, up and down and a bit raw in the first '
-        'days and weeks.'),
+    teaser: _en(
+      'How to tell the usual weepy first weeks from a low that needs help.',
+    ),
+    shortAnswer: _en(
+      'Feeling weepy and up and down in the first days after birth is the '
+      'baby blues, and it usually settles within about two weeks. A low '
+      "that doesn't lift is different. It's common, it isn't your fault, "
+      'and it gets better with the right help.',
+    ),
     readingTime: _en('2 MIN'),
     requiresReview: true,
     body: _en(
-      'Most mothers feel weepy, up and down and a bit raw in the first '
-      'days and weeks. That is the baby blues, and it usually settles on '
-      'its own within about two weeks. What is different, and worth '
-      'taking seriously, is a low that does not lift, that is there most '
-      'of every day, that steals your sleep or your appetite or your '
-      'interest in everything. That is not a mood you have to wait out or '
-      'push through. It is common, it is not your fault, and it gets '
-      'better with the right help. The signs below tell you when to reach '
-      'out today.',
+      'Most mothers feel weepy, up and down and a bit raw in the first days '
+      "and weeks. That's the baby blues, and it usually settles on its own "
+      'within about two weeks.\n\n'
+      "What's different, and worth taking seriously, is a low that doesn't "
+      "lift. It's there most of every day, and it takes your sleep, your "
+      "appetite or your interest in everything. That isn't a mood you have "
+      'to wait out or push through.\n\n'
+      "It's common, it isn't your fault, and it gets better with the right "
+      'help. The same-day signs on the "When it is more than this" tab tell '
+      'you when to reach out today.',
     ),
   ),
   MmArticle(
     id: 'antenatal_depression',
     group: MmArticleGroup.moreThanMood,
     title: _en('Antenatal depression'),
-    teaser: _en('When low mood in pregnancy lasts, rather than lifts.'),
+    teaser: _en('When a low mood in pregnancy stays, instead of lifting.'),
+    shortAnswer: _en(
+      'Depression in pregnancy is more common than most people expect, and '
+      "it's treatable. It's a low mood that stays most of the day, for two "
+      'weeks or more. Tell your doctor, and a counsellor can help.',
+    ),
     readingTime: _en('5 MIN'),
     hasExpertVideo: true,
     requiresReview: true,
     body: _en(
       'Depression during pregnancy is more common than most people expect, '
-      'and it is treatable. It is not a sign of weakness, and it is not '
-      'something you can simply decide your way out of.',
+      "and it's treatable. It isn't a sign of weakness, and it isn't "
+      'something you can decide your way out of.',
     ),
-    whatItIs: _en('A low mood that stays, most of most days, for two weeks '
-        'or more, rather than a difficult day or two that passes. It can '
-        'sit alongside excitement about the baby, not instead of it, which '
-        'is part of why it is easy to miss in pregnancy.'),
-    signsToNotice: _en('A flatness or heaviness that does not lift, losing '
-        'interest in things you normally enjoy, changes in appetite or '
-        'sleep beyond what pregnancy alone explains, feeling worthless or '
-        'excessively guilty, or finding it hard to concentrate or make '
-        'decisions.'),
-    howToGetHelp: _en('This is worth saying out loud to your doctor at your '
-        'next appointment, and it is exactly what perinatal counselling in '
-        'the Talk tab is built for. Neither conversation requires you to '
-        'have the words exactly right first.'),
+    whatItIs: _en(
+      'A low mood that stays, most of most days, for two weeks or more, '
+      'rather than a hard day or two that passes. It can sit alongside '
+      "excitement about the baby, not instead of it. That's part of why "
+      "it's easy to miss in pregnancy.",
+    ),
+    signsToNotice: _en(
+      "A flatness or heaviness that doesn't lift. Losing interest in things "
+      'you usually enjoy. Changes in appetite or sleep beyond what '
+      'pregnancy explains. Feeling worthless, or far more guilty than '
+      'usual. Finding it hard to concentrate or make decisions.',
+    ),
+    howToGetHelp: _en(
+      "Say it out loud to your doctor at your next appointment. It's "
+      "exactly what perinatal counselling on the Talk tab is for. You don't "
+      'need the right words first for either conversation.',
+    ),
   ),
   MmArticle(
     id: 'pregnancy_anxiety',
     group: MmArticleGroup.moreThanMood,
     title: _en('Pregnancy anxiety'),
-    teaser: _en('When worry becomes near constant, rather than something '
-        'that comes and goes.'),
+    teaser: _en(
+      'When worry is there almost all the time, instead of coming and '
+      'going.',
+    ),
+    shortAnswer: _en(
+      'Some worry in pregnancy is expected. It becomes anxiety when '
+      'reassurance stops helping and the worry starts running your day. A '
+      'counsellor can teach you ways to interrupt it.',
+    ),
     readingTime: _en('5 MIN'),
     hasExpertVideo: true,
     requiresReview: true,
     body: _en(
-      'Some worry in pregnancy is expected and even useful, it is what '
-      'gets you to appointments on time. Anxiety becomes its own thing '
-      'when the worry stops responding to reassurance and starts running '
-      'the day.',
+      "Some worry in pregnancy is expected, and it can even help: it's what "
+      'gets you to appointments on time. Anxiety becomes its own thing when '
+      'the worry stops responding to reassurance and starts running your '
+      'day.\n\n'
+      'A small practice for when it rises. Breathe out slowly, longer than '
+      'you breathe in, three times. Then name the worry in one sentence, '
+      "and ask yourself what you can do about it today. If there's "
+      "something, do that one thing. If there isn't, write the worry down "
+      'and keep it for your next appointment, where you can ask.',
     ),
-    whatItIs: _en('A pattern of worry that is hard to switch off, often '
-        'about the baby\'s health or the birth, that keeps returning even '
-        'after a scan or a doctor\'s reassurance should have settled it.'),
-    signsToNotice: _en('Restlessness, a racing heart or tight chest without '
-        'a physical cause, trouble sleeping because your mind will not '
-        'quiet, avoiding things that trigger the worry, or seeking '
-        'reassurance again and again without it ever feeling like enough.'),
-    howToGetHelp: _en('A perinatal counsellor can teach specific ways to '
-        'interrupt this pattern, which is different from simply being told '
-        'to stop worrying. Booking one is in the Talk tab, and it is '
-        'anonymous.'),
+    whatItIs: _en(
+      "A pattern of worry that's hard to switch off, often about the baby's "
+      'health or the birth. It keeps coming back even after a scan or your '
+      "doctor's reassurance should have settled it.",
+    ),
+    signsToNotice: _en(
+      'Restlessness. A racing heart or a tight chest without a physical '
+      "cause. Trouble sleeping because your mind won't quieten. Avoiding "
+      'things that set off the worry. Looking for reassurance again and '
+      'again without it ever feeling like enough.',
+    ),
+    howToGetHelp: _en(
+      'A perinatal counsellor can teach you specific ways to interrupt this '
+      'pattern, which is different from being told to stop worrying. You '
+      "can book one on the Talk tab, and it's anonymous.",
+    ),
   ),
   MmArticle(
     id: 'panic_attacks',
     group: MmArticleGroup.moreThanMood,
     title: _en('Panic attacks'),
-    teaser: _en('A sudden wave of fear with real physical symptoms. '
-        'Frightening, and not dangerous in itself.'),
+    teaser: _en(
+      'A sudden wave of fear with real physical symptoms. Frightening, and '
+      'not dangerous in itself.',
+    ),
+    shortAnswer: _en(
+      'A panic attack is a sudden wave of fear with strong physical '
+      "symptoms that peaks within minutes and then eases. It's frightening, "
+      "and on its own it isn't dangerous to you or your baby.",
+    ),
     readingTime: _en('4 MIN'),
     hasExpertVideo: true,
     requiresReview: true,
     body: _en(
-      'A panic attack can feel like something is seriously physically '
-      'wrong, a racing heart, tight chest, shaking, a feeling of unreality. '
-      'It is intensely unpleasant and, on its own, not dangerous to you or '
-      'your baby.',
+      'A panic attack can feel like something is seriously wrong with your '
+      'body: a racing heart, a tight chest, shaking, a feeling that nothing '
+      "is real. It's very unpleasant, and on its own it isn't dangerous to "
+      'you or your baby.',
     ),
-    whatItIs: _en('A sudden, sharp surge of fear that peaks within minutes, '
-        'usually with strong physical symptoms, and then eases. It can '
-        'happen with no obvious trigger.'),
-    signsToNotice: _en('A pounding heart, shortness of breath, dizziness, '
-        'trembling, a feeling of choking or unreality, or a sudden fear '
-        'that something terrible is about to happen, all arriving together '
-        'and quickly.'),
-    howToGetHelp: _en('The Calm-now flow in the Feel tab is built for the '
-        'moment itself. If panic attacks are happening more than once, '
-        'mention it to your doctor and consider talking it through with a '
-        'perinatal counsellor.'),
+    whatItIs: _en(
+      'A sudden, sharp wave of fear that peaks within minutes, usually with '
+      'strong physical symptoms, and then eases. It can happen with no '
+      'obvious trigger.',
+    ),
+    signsToNotice: _en(
+      'A pounding heart, shortness of breath, dizziness, trembling, a '
+      'feeling of choking or of things not being real, or a sudden fear '
+      'that something terrible is about to happen, all arriving together '
+      'and quickly.',
+    ),
+    howToGetHelp: _en(
+      'The Calm note on the Feel tab is made for the moment itself. If '
+      'panic attacks happen more than once, tell your doctor, and think '
+      'about talking it through with a perinatal counsellor. If you have '
+      "chest pain or breathlessness and you're not sure it's panic, call "
+      'your doctor or go to hospital today.',
+    ),
   ),
   MmArticle(
     id: 'intrusive_thoughts',
     group: MmArticleGroup.moreThanMood,
     title: _en('Intrusive thoughts'),
-    teaser: _en('Sudden, unwanted, frightening thoughts about the baby. '
-        'More common than almost anyone admits.'),
+    teaser: _en(
+      'Sudden, unwanted, frightening thoughts about the baby. More common '
+      'than almost anyone admits.',
+    ),
+    shortAnswer: _en(
+      'Many pregnant women and new mothers have sudden, unwanted thoughts '
+      "about something bad happening to the baby. Having them doesn't mean "
+      "you'd ever act on them. Please tell your doctor or a counsellor "
+      'instead of carrying them alone.',
+    ),
     readingTime: _en('5 MIN'),
     hasExpertVideo: true,
     requiresReview: true,
     body: _en(
-      'Many pregnant and new mothers experience sudden, unwanted thoughts '
-      'about something bad happening to the baby, thoughts they would '
-      'never act on and that frighten them precisely because they seem to '
-      'come from nowhere. These are far more common than they are talked '
-      'about, and having them does not mean you would ever act on them, or '
-      'that you are a danger to your baby.',
+      'Many pregnant women and new mothers have sudden, unwanted thoughts '
+      "about something bad happening to the baby. They'd never act on them, "
+      'and the thoughts frighten them because they seem to come from '
+      'nowhere.\n\n'
+      'These thoughts are far more common than people talk about. Having '
+      "them doesn't mean you'd ever act on them, or that you're a danger to "
+      'your baby.',
     ),
-    whatItIs: _en('An unwanted thought or image that arrives suddenly, '
-        'feels completely against your own values, and that you do not '
-        'want and would never choose to act on. The distress it causes is '
-        'itself a sign it is not a real intention.'),
-    signsToNotice: _en('The thoughts repeat, cause real distress or shame, '
-        'or lead to avoiding the baby or situations connected to the '
-        'thought altogether.'),
-    howToGetHelp: _en('Please say this out loud to your doctor or a '
-        'perinatal counsellor rather than carrying it alone. It is a known, '
-        'treatable experience, and naming it plainly is usually the '
-        'hardest and most relieving part.'),
+    whatItIs: _en(
+      'An unwanted thought or picture that arrives suddenly and feels '
+      "completely against who you are. You don't want it, and you'd never "
+      'choose to act on it. The distress it causes is itself a sign it '
+      "isn't a real intention.",
+    ),
+    signsToNotice: _en(
+      'The thoughts keep coming back, cause real distress or shame, or lead '
+      'you to avoid the baby, or anything connected to the thought, '
+      'altogether.',
+    ),
+    howToGetHelp: _en(
+      'Please say this out loud to your doctor or a perinatal counsellor, '
+      "instead of carrying it alone. It's a known experience that can be "
+      'treated, and naming it plainly is usually the hardest part and the '
+      'biggest relief.',
+    ),
   ),
   MmArticle(
     id: 'baby_blues',
     group: MmArticleGroup.moreThanMood,
     title: _en('Baby blues (looking ahead)'),
-    teaser: _en('The dip most mothers feel in the first two weeks after '
-        'birth. Common, and it passes.'),
+    teaser: _en(
+      'The dip most mothers feel in the first two weeks after birth. '
+      'Common, and it passes.',
+    ),
+    shortAnswer: _en(
+      'The baby blues is a short dip in mood that most mothers feel a few '
+      'days after birth. It usually settles within about two weeks. If it '
+      "doesn't ease, or gets worse, speak to your doctor.",
+    ),
     readingTime: _en('4 MIN'),
     requiresReview: true,
     body: _en(
-      'This is written for later, so it is here to recognise rather than '
-      'worry about now. In the days after birth, hormone levels fall '
-      'sharply and sleep is short, and most new mothers feel some version '
-      'of tearfulness, mood swings or overwhelm as a result.',
+      "This is written for after the birth, so it's here for you to "
+      'recognise, not to worry about now. In the days after birth, hormone '
+      'levels fall sharply and sleep is short. Most new mothers feel some '
+      'tearfulness, mood swings or overwhelm because of it.',
     ),
-    whatItIs: _en('A short dip in mood, usually starting two to four days '
-        'after birth and settling within about two weeks, driven largely '
-        'by the sudden hormonal drop after delivery.'),
-    signsToNotice: _en('Tearfulness, irritability, feeling overwhelmed or '
-        'anxious, that comes and goes and generally improves day by day.'),
-    howToGetHelp: _en('If it has not started easing by around two weeks, or '
-        'it is getting worse rather than better, that is the point to read '
-        '"Postpartum depression" and to speak to your doctor.'),
+    whatItIs: _en(
+      'A short dip in mood, usually starting two to four days after birth '
+      "and settling within about two weeks. It's driven mostly by the "
+      'sudden drop in hormones after delivery.',
+    ),
+    signsToNotice: _en(
+      'Tearfulness, irritability, or feeling overwhelmed or anxious, which '
+      'comes and goes and gets a little better day by day.',
+    ),
+    howToGetHelp: _en(
+      "If it hasn't started easing by around two weeks, or it's getting "
+      'worse instead of better, read "Postpartum depression" and speak to '
+      'your doctor.',
+    ),
   ),
   MmArticle(
     id: 'postpartum_depression',
     group: MmArticleGroup.moreThanMood,
     title: _en('Postpartum depression (looking ahead)'),
-    teaser: _en('When the low feeling after birth does not lift on its own. '
-        'Common, and treatable.'),
+    teaser: _en(
+      "When the low feeling after birth doesn't lift on its own. Common, "
+      'and treatable.',
+    ),
+    shortAnswer: _en(
+      'Postpartum depression is more than the baby blues. It lasts longer, '
+      "feels stronger and doesn't ease on its own. It's common, it's "
+      'treatable, and reaching out early helps.',
+    ),
     readingTime: _en('5 MIN'),
     hasExpertVideo: true,
     requiresReview: true,
     body: _en(
-      'Also written for later. Postpartum depression is more than the '
-      'baby blues, it lasts longer, tends to be more intense, and does not '
-      'ease on its own the way the blues usually do. It is one of the most '
-      'common complications of childbirth, and effective help exists.',
+      'Also written for later. Postpartum depression is more than the baby '
+      "blues. It lasts longer, it tends to be stronger, and it doesn't ease "
+      "on its own the way the blues usually do. It's one of the most common "
+      'complications of childbirth, and good help exists.',
     ),
-    whatItIs: _en('A depression that develops any time in the first year '
-        'after birth, most often within the first few months, that lasts '
-        'more than two weeks and affects daily functioning.'),
-    signsToNotice: _en('A low mood that does not lift, loss of interest in '
-        'the baby or in things you used to enjoy, exhaustion beyond what '
-        'new-parent tiredness explains, feeling unable to cope, or '
-        'withdrawing from people who want to help.'),
-    howToGetHelp: _en('Please tell your doctor or health visitor plainly, '
-        'and know that a perinatal counsellor is trained specifically for '
-        'this. Reaching out early tends to shorten how long it lasts, not '
-        'lengthen the disruption to your life.'),
+    whatItIs: _en(
+      'A depression that starts any time in the first year after birth, '
+      'most often in the first few months. It lasts more than two weeks and '
+      'affects how you get through the day.',
+    ),
+    signsToNotice: _en(
+      "A low mood that doesn't lift. Losing interest in the baby or in "
+      'things you used to enjoy. Exhaustion beyond ordinary new-parent '
+      'tiredness. Feeling unable to cope. Pulling away from people who want '
+      'to help.',
+    ),
+    howToGetHelp: _en(
+      'Please tell your doctor plainly, and know that a perinatal '
+      'counsellor is trained for exactly this. Reaching out early tends to '
+      'shorten how long it lasts.',
+    ),
   ),
 
   // ---------------------------------------------------------------------------
@@ -1395,108 +1806,389 @@ final List<MmArticle> kMmArticles = [
     id: 'sleep_and_mood',
     group: MmArticleGroup.everydayCare,
     title: _en('Sleep and mood'),
-    teaser: _en('Broken sleep does not just tire you out. It changes how '
-        'everything else feels.'),
+    teaser: _en(
+      "Broken sleep doesn't just tire you. It changes how everything else "
+      'feels.',
+    ),
+    shortAnswer: _en(
+      'Poor sleep and low mood feed each other. Protect the sleep you can '
+      'with a steady wind-down and a cool, dark room. If a racing mind '
+      'keeps you awake most nights, tell your doctor.',
+    ),
     readingTime: _en('3 MIN'),
     body: _en(
-      'Poor sleep and low mood feed each other in both directions: '
-      'tiredness makes everything feel harder to cope with, and a mind '
-      'full of worry makes it harder to fall asleep in the first place. '
-      'Pregnancy disrupts sleep for very physical reasons too, an '
-      'uncomfortable body, frequent trips to the bathroom, a baby who is '
-      'more active at night than in the day.\n\n'
-      'Protecting what sleep you can, a consistent wind-down, a cool dark '
-      'room, less screen time before bed, is worth more than it sounds '
-      'like it should. The Falling asleep meditation in the Feel tab is '
-      'built for exactly this.\n\n'
-      'If lying awake with a racing mind is a near-nightly pattern, that '
-      'crosses from ordinary discomfort into something worth mentioning to '
-      'your doctor.',
+      'Poor sleep and low mood feed each other. Tiredness makes everything '
+      'harder to cope with, and a mind full of worry makes it harder to '
+      'fall asleep. Pregnancy disrupts sleep for physical reasons too: an '
+      "uncomfortable body, trips to the bathroom, and a baby who's more "
+      'active at night than in the day.\n\n'
+      'Protect the sleep you can. A steady wind-down, a cool dark room and '
+      "less screen time before bed help more than you'd expect. The 4-7-8 "
+      'breath on the Feel tab is a good one at bedtime.\n\n'
+      "If lying awake with a racing mind happens most nights, that's more "
+      "than ordinary discomfort, and it's worth mentioning to your doctor.",
     ),
   ),
   MmArticle(
     id: 'unsolicited_advice_family_pressure',
     group: MmArticleGroup.everydayCare,
     title: _en('Unsolicited advice and family pressure'),
-    teaser: _en('Everyone has an opinion on your pregnancy, and not all of '
-        'it was asked for.'),
+    teaser: _en(
+      'Everyone has an opinion on your pregnancy, and not all of it was '
+      'asked for.',
+    ),
+    shortAnswer: _en(
+      'In many Indian families pregnancy is a family event, which brings '
+      "support and a lot of advice you didn't ask for. A short, warm line "
+      'closes the conversation without a fight. You can say thank you and '
+      'still do it your way.',
+    ),
     readingTime: _en('4 MIN'),
     body: _en(
-      'In many Indian families, pregnancy is treated as a family event as '
-      'much as a personal one, which brings real support and also a great '
-      'deal of advice you did not ask for, on everything from what to eat '
-      'to how to sleep to when to have another. It can wear you down even '
-      'when it comes from love.\n\n'
-      'A short, warm, repeatable line helps more than a long explanation: '
-      '"Thank you, I will talk to my doctor about that." It closes the '
-      'conversation without a confrontation.\n\n'
-      'It is fair to protect your own decisions, especially anything '
-      'medical, even from people who mean well. You are allowed to say '
-      'thank you and still do it your way.',
+      'In many Indian families, pregnancy is a family event as much as a '
+      'personal one. That brings real support, and also a lot of advice you '
+      "didn't ask for, on everything from what to eat to how to sleep to "
+      'when to have another. It can wear you down even when it comes from '
+      'love.\n\n'
+      'A short, warm line you can repeat works better than a long '
+      'explanation: "Thank you, I\'ll talk to my doctor about that." It '
+      'closes the conversation without a fight.\n\n'
+      'It helps to practise before the next visit. Pick one line and say it '
+      "out loud a few times when you're alone, so it comes easily when you "
+      'need it. Keep your voice kind and your answer the same each time. '
+      "You don't need to give reasons, and you don't need to win.\n\n"
+      "It's fair to protect your own decisions, especially anything "
+      "medical, even from people who mean well. You're allowed to say thank "
+      'you and still do it your way.',
     ),
   ),
   MmArticle(
     id: 'work_stress',
     group: MmArticleGroup.everydayCare,
     title: _en('Work stress'),
-    teaser: _en('Managing a job and a pregnancy at the same time, without '
-        'either one being told the truth about the other.'),
+    teaser: _en(
+      'Managing a job and a pregnancy at once, and deciding what to tell '
+      'work.',
+    ),
+    shortAnswer: _en(
+      'Juggling a job and a pregnancy adds its own stress. Knowing your '
+      'maternity leave rights early makes the conversation with work '
+      'easier. Even ten minutes of rest in the day helps.',
+    ),
     readingTime: _en('3 MIN'),
     body: _en(
       'Deciding when to tell your workplace, how much to say, and how to '
-      'manage energy that is genuinely lower than usual, all add a layer '
-      'of stress on top of the pregnancy itself. It is common to feel torn '
-      'between wanting to perform as normal and needing real '
-      'accommodation.\n\n'
+      "manage energy that's lower than usual all add stress on top of the "
+      "pregnancy itself. It's common to feel torn between wanting to work "
+      'as normal and needing some real support.\n\n'
       'Knowing your maternity leave and workplace rights ahead of time '
-      'tends to lower the anxiety around the conversation, even before you '
+      'tends to lower the worry about that conversation, even before you '
       'have it.\n\n'
-      'A short rest during the day, even ten minutes with your eyes '
-      'closed, genuinely changes how the rest of the day feels. It is not '
-      'a small thing, even when it looks like one.',
+      'A short rest in the day, even ten minutes with your eyes closed, '
+      "changes how the rest of the day feels. It's not a small thing, even "
+      'when it looks like one.',
     ),
   ),
   MmArticle(
     id: 'relationship_intimacy_changes',
     group: MmArticleGroup.everydayCare,
     title: _en('Relationship and intimacy changes'),
-    teaser: _en('Pregnancy changes a partnership too, not just a body.'),
+    teaser: _en('Pregnancy changes a relationship too, not just a body.'),
+    shortAnswer: _en(
+      'Pregnancy changes a relationship too. Some couples feel closer and '
+      'some feel more distant, and neither means trouble. Saying plainly '
+      'what you each need helps more than guessing.',
+    ),
     readingTime: _en('4 MIN'),
     body: _en(
-      'It is common for desire, energy and closeness with a partner to '
-      'shift during pregnancy, in both directions, some couples feel '
-      'closer than ever and some feel more distant. Neither is a sign the '
+      "It's common for desire, energy and closeness with your partner to "
+      'shift in pregnancy, in both directions. Some couples feel closer '
+      'than ever and some feel more distant. Neither is a sign the '
       'relationship is in trouble.\n\n'
-      'A change in physical intimacy is often about comfort, tiredness and '
-      'a body that feels unfamiliar, rather than about the relationship '
-      'itself, and saying that plainly to a partner usually helps more '
-      'than either of you guessing.\n\n'
-      'A partner can feel unsure how to help, or sidelined by how much '
-      'attention the pregnancy naturally takes. A short, direct '
-      'conversation about what you each need tends to close that gap '
-      'faster than either of you working it out alone.',
+      'A change in physical closeness is often about comfort, tiredness and '
+      'a body that feels unfamiliar, not about the relationship. Saying '
+      'that plainly to your partner usually helps more than either of you '
+      'guessing.\n\n'
+      'Your partner can feel unsure how to help, or left out by how much '
+      'attention the pregnancy takes. A short, direct talk about what you '
+      'each need closes that gap faster than working it out alone.\n\n'
+      'A few things make those talks easier. Pick a calm moment, not the '
+      'middle of an argument. Start with "I feel" instead of "you always". '
+      'Ask one question, and listen to the whole answer before you reply.\n\n'
+      "There's a hopeful side too. Many couples find that expecting a baby "
+      'brings them closer: planning together, feeling the first kicks '
+      'together, and learning to lean on each other before the baby '
+      'arrives.',
     ),
   ),
   MmArticle(
     id: 'body_image_self_esteem',
     group: MmArticleGroup.everydayCare,
     title: _en('Body image and self-esteem'),
-    teaser: _en('Learning to live in a body that is changing week by week, '
-        'whether you feel ready or not.'),
+    teaser: _en(
+      'Living in a body that changes week by week, whether you feel ready '
+      'or not.',
+    ),
+    shortAnswer: _en(
+      'Pride and discomfort about your changing body often come on the same '
+      'day, and both are allowed. Comparing yourself to others, especially '
+      "online, rarely helps. If it's affecting how you eat, talk to your "
+      'doctor or a counsellor.',
+    ),
     readingTime: _en('4 MIN'),
     body: _en(
       'A changing body can bring pride and discomfort at the same time, '
-      'often within the same day. Both are allowed to be true together, '
-      'and neither cancels the other out.\n\n'
-      'Comparison is usually the sharpest edge here, to other pregnant '
-      'women, to your own pre-pregnancy body, to images online that are '
-      'rarely the ordinary version of anything. Your body is doing '
-      'something enormous, and it is allowed to look and feel different '
-      'while it does.\n\n'
-      'If body image is affecting how you eat, or bringing up feelings '
-      'that feel bigger than the moment, that is worth a gentle '
-      'conversation with your doctor or a counsellor, not something to '
-      'push through alone.',
+      'often on the same day. Both can be true together, and neither '
+      'cancels the other out.\n\n'
+      'Comparison is usually the sharpest edge: with other pregnant women, '
+      'with your own body before pregnancy, and with pictures online that '
+      'are rarely the ordinary version of anything.\n\n'
+      'Pregnancy photos on social media are chosen, posed and often edited. '
+      "You're seeing someone's best angle on their best day, next to your "
+      "own ordinary Tuesday. If scrolling leaves you feeling worse, it's "
+      'fine to mute accounts or take a break for a while.\n\n'
+      "Your body is doing something enormous, and it's allowed to look and "
+      'feel different while it does.\n\n'
+      'If body image is affecting how you eat, or bringing up feelings that '
+      'seem bigger than the moment, have a gentle talk with your doctor or '
+      "a counsellor. You don't have to push through it alone.",
+    ),
+  ),
+
+  // ---------------------------------------------------------------------------
+  //  Sex and closeness - 6 (added 2026-09-29, pregnancy gap analysis P2)
+  // ---------------------------------------------------------------------------
+  //  Private in tone and never explicit. The door lists these on their own tab,
+  //  which the shared-phone switch is meant to hide: see
+  //  `kMindIntimateReadIds` and `mindDoorVisiblePage` in pv_door_mind.dart.
+  MmArticle(
+    id: 'closeness_sex_safe',
+    group: MmArticleGroup.closeness,
+    // Added 2026-09-29 (pregnancy gap analysis). ParentVeda editorial,
+    // not yet reviewed by a clinician.
+    title: _en('Is sex safe in pregnancy?'),
+    teaser: _en(
+      'The answer for most couples, and what keeps your baby protected.',
+    ),
+    shortAnswer: _en(
+      "For most couples with a healthy pregnancy, yes. Sex doesn't reach or "
+      'hurt your baby, who is protected by the waters, the womb and the '
+      'closed cervix. If your doctor has told you to avoid sex, follow '
+      'that.',
+    ),
+    readingTime: _en('3 MIN'),
+    body: _en(
+      "It's one of the questions couples wonder about most and ask least. "
+      'For most couples with a healthy pregnancy, sex is safe all the way '
+      'through, unless your doctor has told you otherwise.\n\n'
+      "Your baby is well protected. They're cushioned by the fluid in the "
+      'bag of waters, held inside the strong muscle of your womb, and '
+      'sealed off by a thick plug of mucus at the neck of the womb (the '
+      'cervix). Nothing during sex reaches the baby.\n\n'
+      "Your womb may tighten for a little while after an orgasm. That's "
+      'normal, and it settles on its own with rest.\n\n'
+      'Light spotting after sex can happen, because the cervix has more '
+      "blood flowing to it now and bleeds more easily when touched. It's "
+      'often harmless, but any bleeding in pregnancy is worth a call to '
+      'your doctor, so they can check.\n\n'
+      'Some doctors ask couples to avoid sex for a while, for reasons the '
+      'next read explains. If any of those apply to you, check with your '
+      'doctor first. ParentVeda explains and reminds. Your doctor decides.',
+    ),
+  ),
+  MmArticle(
+    id: 'closeness_when_to_stop',
+    group: MmArticleGroup.closeness,
+    // Added 2026-09-29 (pregnancy gap analysis). ParentVeda editorial,
+    // not yet reviewed by a clinician.
+    title: _en('When your doctor may say to stop'),
+    teaser: _en(
+      'The usual reasons a doctor asks you to avoid sex, and what to ask.',
+    ),
+    shortAnswer: _en(
+      'Sometimes a doctor advises no sex for a while, or until the birth. '
+      'The usual reasons are bleeding, a low-lying placenta, leaking '
+      'waters, a risk of early labour or a stitch in the cervix. Your own '
+      "doctor's advice always comes first.",
+    ),
+    readingTime: _en('3 MIN'),
+    body: _en(
+      'For most pregnancies sex is fine. Sometimes your doctor will ask you '
+      'to avoid it for a while, or until your baby is born. These are the '
+      'usual reasons.\n\n'
+      "Bleeding from the vagina, especially while the cause isn't known.\n\n"
+      'A low-lying placenta (placenta praevia), where the placenta lies '
+      'over or close to the neck of the womb.\n\n'
+      'Leaking waters. Once the bag of waters has opened, infection can '
+      'reach the baby more easily.\n\n'
+      "A risk of early labour (preterm labour), for example if you've had "
+      'early labour before, or your doctor sees signs of it now.\n\n'
+      'A stitch in the cervix (cervical cerclage), or a cervix your doctor '
+      'has found to be short or opening early.\n\n'
+      'Your doctor may also advise it for other reasons in your own '
+      'pregnancy, and that advice is the one to follow. Some doctors mean '
+      'no intercourse. Others mean no orgasm, or nothing inside the vagina, '
+      "as well. It's fine to ask exactly what they mean and for how long. "
+      "They've been asked many times before.\n\n"
+      'When should you call your doctor? Call straight away if you have '
+      'bleeding, a gush or trickle of fluid from the vagina, strong pain, '
+      "or tightenings that keep coming regularly after sex. Don't wait for "
+      'your next visit.\n\n'
+      'Being told to stop can bring worry, and sometimes a feeling of '
+      'distance between you. The read on feeling close without sex has '
+      'ideas for those weeks.',
+    ),
+  ),
+  MmArticle(
+    id: 'closeness_desire_changes',
+    group: MmArticleGroup.closeness,
+    // Added 2026-09-29 (pregnancy gap analysis). ParentVeda editorial,
+    // not yet reviewed by a clinician.
+    title: _en('Wanting sex more, or less'),
+    teaser: _en(
+      'Desire going up, down, or both: why it changes, and how to talk '
+      'about it.',
+    ),
+    shortAnswer: _en(
+      'Desire often changes in pregnancy. It can go up, go down, or do both '
+      'at different times, and all of it is normal. It says nothing about '
+      'your love for each other, and talking gently helps more than '
+      'guessing.',
+    ),
+    readingTime: _en('3 MIN'),
+    body: _en(
+      'Many women find their desire changes in pregnancy. For some it '
+      'drops, especially in the first months with sickness and tiredness, '
+      'and again near the end when the bump makes everything harder. For '
+      'others it rises, often in the middle months, when extra blood flow '
+      'makes the area more sensitive. Many feel both at different times.\n\n'
+      "All of this is normal. Not wanting sex doesn't mean you don't love "
+      "your partner, and wanting it more isn't strange either.\n\n"
+      'His desire can change too. Some men feel shy, or worry about hurting '
+      'the baby, and stop reaching out without saying why. Others feel more '
+      'drawn to you than ever. Often the silence is the hardest part for '
+      'you both.\n\n'
+      "A few gentle things help. Say what's going on for you in simple "
+      'words: "It\'s not you. I\'m just so tired." Ask what\'s going on for '
+      'him. Agree that closeness can look different for now.\n\n'
+      'Some women notice dryness, or feel tearful during or after sex. Both '
+      'can come with changing hormones. A water-based lubricant can help '
+      'with dryness. Tears are okay too. Stop, hold each other, and talk if '
+      'you want to.\n\n'
+      'Vivid dreams, sex dreams among them, are common in pregnancy as '
+      "well. They come with changing hormones and broken sleep, and they're "
+      'nothing to feel embarrassed about.\n\n'
+      'If sex hurts, or low desire comes with feeling low most days, '
+      'mention it to your doctor.',
+    ),
+  ),
+  MmArticle(
+    id: 'closeness_comfortable',
+    group: MmArticleGroup.closeness,
+    // Added 2026-09-29 (pregnancy gap analysis). ParentVeda editorial,
+    // not yet reviewed by a clinician.
+    title: _en('Staying comfortable as your bump grows'),
+    teaser: _en(
+      'What tends to feel easier later in pregnancy, in plain words.',
+    ),
+    shortAnswer: _en(
+      'As your bump grows, positions that keep weight off your belly '
+      'usually feel best. Lying on your sides, or you being on top, are '
+      'easy ones to try. Go slowly, use pillows, and stop if anything '
+      'hurts.',
+    ),
+    readingTime: _en('2 MIN'),
+    body: _en(
+      'In the early months, most couples find nothing needs to change. As '
+      'your bump grows, some positions start to feel awkward or '
+      "uncomfortable, and that's normal.\n\n"
+      'What helps most is keeping weight and pressure off your bump. Lying '
+      'on your sides, with your partner behind you, suits many couples, '
+      'especially later on. You being on top lets you set the pace. Sitting '
+      'positions, or you at the edge of the bed, keep your bump free too.\n\n'
+      'From the middle of pregnancy, lying flat on your back for a long '
+      'time can make you feel dizzy or sick, because the weight of your '
+      'womb presses on a large blood vessel. A pillow under one hip, or '
+      'turning onto your side, helps.\n\n'
+      'Use pillows freely, go slowly and talk as you go. If anything hurts, '
+      'stop. Bleeding, leaking fluid or pain after sex is a reason to call '
+      'your doctor.',
+    ),
+  ),
+  MmArticle(
+    id: 'closeness_baby_worries',
+    group: MmArticleGroup.closeness,
+    // Added 2026-09-29 (pregnancy gap analysis). ParentVeda editorial,
+    // not yet reviewed by a clinician.
+    title: _en('Can sex hurt the baby?'),
+    teaser: _en(
+      'The worries couples have and rarely say out loud, answered plainly.',
+    ),
+    shortAnswer: _en(
+      "In a healthy pregnancy, sex can't hurt your baby. Your baby is "
+      'protected by the waters, the womb and the closed cervix. Many '
+      'husbands worry about this too, so it helps to read it together.',
+    ),
+    readingTime: _en('3 MIN'),
+    body: _en(
+      "This is the worry that stops many couples, and it's often the man "
+      "who has it but doesn't say it. In a healthy pregnancy, sex can't "
+      'hurt your baby.\n\n'
+      'Can the baby feel it? Your baby is floating in fluid, inside the '
+      'womb, behind a closed cervix. They may feel a gentle rocking, like '
+      'when you walk, and nothing more.\n\n'
+      'Can it cause a miscarriage? In a healthy pregnancy, no. Most early '
+      'losses happen because of a problem in how the pregnancy began, not '
+      'because of anything either of you did.\n\n'
+      'Can it start labour? Not before your body is ready. Near the due '
+      "date families sometimes suggest it to bring labour on, but there's "
+      'no good evidence that it works.\n\n'
+      'Why does my bump go hard afterwards? The womb often tightens for a '
+      "while after an orgasm. It's normal, and it eases with rest. If the "
+      'tightenings keep coming regularly, or you have pain, bleeding or '
+      'leaking fluid, call your doctor.\n\n'
+      "If he's the one who's worried, show him this. Many men feel "
+      'protective and pull back without explaining, and a short read can '
+      'end weeks of silence.',
+    ),
+  ),
+  MmArticle(
+    id: 'closeness_without_sex',
+    group: MmArticleGroup.closeness,
+    // Added 2026-09-29 (pregnancy gap analysis). ParentVeda editorial,
+    // not yet reviewed by a clinician.
+    title: _en('Feeling close, with or without sex'),
+    teaser: _en(
+      'Ways to stay close as a couple when sex is off the table, or just '
+      'not wanted.',
+    ),
+    shortAnswer: _en(
+      "Pregnancy changes how you are as a couple, and closeness doesn't "
+      'have to mean sex. Touch, time together and talking keep you '
+      'connected. It matters most in the weeks your doctor has asked you to '
+      'avoid sex.',
+    ),
+    readingTime: _en('3 MIN'),
+    body: _en(
+      'Pregnancy changes how you are as a couple. There are new worries, '
+      'more family around, less sleep and less time alone. Some weeks sex '
+      "just isn't wanted, and some couples have been asked by their doctor "
+      'to avoid it.\n\n'
+      "Closeness doesn't depend on sex. A long hug, a hand on the bump, "
+      'rubbing sore feet or a tired back, sleeping close, or an evening '
+      'walk together all keep you connected.\n\n'
+      "Protect a little time that's only yours. In a busy house that might "
+      'be ten minutes on the terrace, a drive, or tea together before '
+      'everyone wakes. Put the phones away.\n\n'
+      'Talk about the baby, and also about things that have nothing to do '
+      "with the baby. You were a couple before, and you'll be a couple "
+      'after.\n\n'
+      'Be kind about what each of you can give right now. If one of you '
+      'wants more closeness than the other, say it gently, without blame, '
+      'and look for something you both feel good about.\n\n'
+      'If you find yourselves drifting apart, arguing a lot or not talking, '
+      "it can help to see a counsellor together. That isn't a sign of "
+      "failure. It's looking after the family you're making.",
     ),
   ),
 ];
@@ -1544,12 +2236,11 @@ final List<MmTalkOffering> kMmTalkOfferings = [
     id: 'perinatal_counselling',
     kind: MmTalkOfferingKind.counselling,
     title: _en('Perinatal mental-health counselling'),
-    whoFor: _en('For anyone who wants to talk to a trained professional '
-        'about how pregnancy is affecting their mind, not just their '
-        'body.'),
-    description: _en('One-on-one sessions with a counsellor trained '
-        'specifically in pregnancy and early motherhood. Always '
-        'anonymous, always at your pace.'),
+    whoFor: _en("If you'd like to talk to a trained professional about how "
+        'pregnancy is affecting your mind, not just your body.'),
+    description: _en('One-to-one sessions with a counsellor trained in '
+        'pregnancy and early motherhood. Always anonymous, and always at '
+        'your pace.'),
     priceUsd: 25,
     priceInr: 999,
     priceUnit: _en('per session'),
@@ -1559,9 +2250,9 @@ final List<MmTalkOffering> kMmTalkOfferings = [
     id: 'one_on_one_consultation',
     kind: MmTalkOfferingKind.consultation,
     title: _en('One-on-one consultation'),
-    whoFor: _en('For a specific worry you want to talk through once, '
-        'rather than an ongoing relationship with a counsellor.'),
-    description: _en('A single, focused session to talk through what is on '
+    whoFor: _en('For one worry you want to talk through once, without '
+        'seeing a counsellor regularly.'),
+    description: _en("A single, focused session to talk through what's on "
         'your mind right now, with clear next steps at the end.'),
     priceUsd: 18,
     priceInr: 749,
@@ -1571,9 +2262,9 @@ final List<MmTalkOffering> kMmTalkOfferings = [
     id: 'ongoing_checkin',
     kind: MmTalkOfferingKind.checkin,
     title: _en('Ongoing check-in package'),
-    whoFor: _en('For anyone who wants steady support across the rest of '
-        'the pregnancy, not just a one-off conversation.'),
-    description: _en('A short check-in call every two weeks with the same '
+    whoFor: _en("If you'd like steady support for the rest of your "
+        'pregnancy, not just one conversation.'),
+    description: _en('A short call every two weeks with the same '
         'counsellor, so you never have to start from the beginning again.'),
     priceUsd: 79,
     priceInr: 3299,
@@ -1672,22 +2363,21 @@ final List<MmScreenerQuestion> kMmScreenerQuestions = [
 /// ⚠️ REQUIRED_REVIEW.
 LocalizedText mmScreenerGuidance(int totalSeverity) {
   if (totalSeverity <= 4) {
-    return _en('What you have described sounds like an ordinary, hard '
+    return _en("What you've described sounds like an ordinary hard "
         'stretch of pregnancy, the kind most mothers go through. The Feel '
-        'tab has tools built for exactly this, and they are worth trying '
-        'when it flares up.');
+        "tab has short things made for this. They're worth trying when it "
+        'flares up.');
   }
   if (totalSeverity <= 9) {
-    return _en('What you have described has been sitting with you for a '
-        'while now. It might help to talk it through with someone who '
-        'knows pregnancy and mood well, rather than carrying it alone. '
-        'Perinatal counselling, in the Talk tab, is anonymous and built '
-        'for exactly this.');
+    return _en("What you've described has been with you for a while now. "
+        'It might help to talk it through with someone who knows pregnancy '
+        'and mood well, instead of carrying it alone. Perinatal counselling, '
+        "on the Talk tab, is anonymous and it's there for exactly this.");
   }
-  return _en('Thank you for answering honestly. What you have described is '
+  return _en("Thank you for answering honestly. What you've described is "
       'worth talking through with someone soon, both a counsellor and your '
-      'doctor. Reaching out now tends to make this shorter to move '
-      'through, not longer.');
+      'doctor. Reaching out now tends to make this easier to get through, '
+      'and sooner.');
 }
 
 // =============================================================================

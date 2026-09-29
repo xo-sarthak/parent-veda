@@ -97,7 +97,7 @@ class _MmTrackTabState extends State<MmTrackTab> {
         final entries = _store.journalEntries;
 
         final children = <Widget>[
-            Text('How are you feeling, today?',
+            Text('How are you feeling today?',
                 style: pvFraunces(
                     fontSize: 20,
                     fontWeight: FontWeight.w600,
@@ -193,7 +193,7 @@ class _MmTrackTabState extends State<MmTrackTab> {
                 style: pvManrope(fontSize: 14, height: 1.5, color: p.ink1),
                 decoration: InputDecoration(
                   border: InputBorder.none,
-                  hintText: 'Write whatever is on your mind.',
+                  hintText: "Write whatever's on your mind.",
                   hintStyle: pvManrope(fontSize: 14, color: p.ink3),
                 ),
               ),
@@ -428,8 +428,8 @@ class _TrendCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
         ),
         child: Text(
-            'Check in for a few days and this will gently show you the '
-            'shape of how you have been feeling.',
+            'Check in for a few days and this will show you how '
+            "you've been feeling.",
             style: pvManrope(fontSize: 12.5, height: 1.5, color: p.ink2)),
       );
     }
