@@ -10,6 +10,7 @@ import 'package:parentveda/data/doors/pv_door_after_loss.dart';
 import 'package:parentveda/data/doors/pv_door_complications.dart';
 import 'package:parentveda/data/doors/pv_door_data.dart';
 import 'package:parentveda/screens/doors/pv_door_router.dart';
+import 'package:parentveda/screens/doors/pv_door_screen.dart';
 import 'package:parentveda/screens/pregnancy/preg_ended_screen.dart';
 import 'package:parentveda/screens/profile/pv_you_content.dart';
 import 'package:parentveda/services/life_stage_store.dart';
@@ -84,5 +85,24 @@ void main() {
       expect(pvDoorSurfaceResolves(id), isTrue, reason: id);
       expect(pvDoorScreenFor(id, pregnancy), isNotNull, reason: id);
     }
+  });
+
+  testWidgets('the After a loss door draws every tab in the rail format', (tester) async {
+    tester.view.physicalSize = const Size(400, 2400);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+    for (final g in kAfterLossDoor.groups) {
+      await tester.pumpWidget(MaterialApp(
+          home: PvDoorScreen(
+              key: ValueKey(g.id),
+              page: kAfterLossDoor,
+              bracket: kPregAfterLossBracket,
+              pregnancy: pregnancy,
+              initialGroup: g.id)));
+      await tester.pump(const Duration(milliseconds: 600));
+      expect(tester.takeException(), isNull, reason: g.id);
+      expect(find.text(kAfterLossDoor.heroTitle, skipOffstage: false), findsWidgets, reason: g.id);
+    }
+    expect(kPvDoorRailDoors.contains(kPregAfterLossBracket.id), isTrue);
   });
 }

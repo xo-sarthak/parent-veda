@@ -140,6 +140,8 @@ import '../../data/reads/read_adapters.dart' show kMmReadPrefix, kBsReadPrefix, 
 import '../garbh/garbh_today_practice.dart' show GarbhTodayPractice;
 import '../../data/doors/pv_door_after_loss.dart';
 import '../pregnancy/preg_ended_screen.dart' show PregTryAgainScreen;
+import '../prepare/prenatal_yoga_screen.dart';
+import '../tools/kegel_care_screen.dart';
 
 /// A tile's OWN drawn mark, where the door has something better than its
 /// format's. Null means "the format mark", which is the rule everywhere else.
@@ -455,6 +457,9 @@ Widget? pvDoorScreenFor(String id, PregnancyController c) => switch (id) {
   kCondSurfaceAfterLoss => PvDoorScreen(
       page: kAfterLossDoor, bracket: kPregAfterLossBracket, pregnancy: c),
   kAfterLossSurfaceTryAgain => const PregTryAgainScreen(),
+  // Move & rest's two tools: the 22 prenatal yoga sessions and Kegel Care.
+  kMoveSurfaceYoga => PrenatalYogaScreen(lang: c.language),
+  kMoveSurfaceKegel => KegelCareScreen(controller: c),
 
   _ => null,
 };
@@ -896,6 +901,7 @@ bool pvDoorSurfaceResolves(String id) => switch (id) {
   kMindSurfaceCrisis ||
   kMindSurfaceHelplines => true,
   kCondSurfaceAfterLoss || kAfterLossSurfaceTryAgain => true,
+  kMoveSurfaceYoga || kMoveSurfaceKegel => true,
   _ when id.startsWith('mind/breathe/') => kMmBreathingExercises.any(
     (e) => mindSurfaceBreathe(e.id) == id,
   ),

@@ -75,6 +75,7 @@ import 'pv_door_belly_skin.dart';
 import 'pv_door_complications.dart';
 import 'pv_door_garbh.dart';
 import 'pv_door_symptoms.dart';
+import 'pv_door_move.dart';
 import 'pv_door_labour.dart';
 import 'pv_door_mind.dart';
 import 'pv_door_nutrition.dart';
@@ -85,6 +86,7 @@ export 'pv_door_complications.dart';
 export 'pv_door_labour.dart';
 export 'pv_door_nutrition.dart';
 export 'pv_door_scans.dart';
+export 'pv_door_move.dart';
 
 /// What kind of thing a tile is. Drives the chip, the icon and the tap.
 ///
@@ -1067,6 +1069,9 @@ final List<PvDoorPage> kPvDoorPages = [
   kMindDoor,
   kGarbhDoor,
   kSymptomsDoor, // 2026-09-22
+  // Move & rest (2026-09-29, pregnancy gap analysis P1): the Yoga & fitness
+  // tile had no door; registering this one makes the tile open it.
+  kMoveDoor,
 ];
 
 /// The door for a bracket, or null when that bracket still opens a hub.

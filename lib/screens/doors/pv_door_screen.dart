@@ -101,6 +101,10 @@ const Set<String> kPvDoorRailDoors = {
   // 2026-09-23 — the user: "make it consistent as the structural situation
   // as well, like the way we have our other doors like scans and tests."
   'pregnancy_garbh',
+  // 2026-09-29: the two new doors are built in the benchmark format from the
+  // start (Move & rest on the Yoga & fitness tile, and After a loss).
+  'pregnancy_fitness',
+  'pregnancy_after_loss',
 };
 
 /// Inline tools that lay out their own gutter (their rails run edge to
