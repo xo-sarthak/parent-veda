@@ -217,11 +217,11 @@
   "phase": "discovery",
   "babySnapshot": {
    "milestone": {
-    "en": "Ears in Place, Tiny Hiccups",
+    "en": "A Tiny Heart Begins",
     "hi": "कान अपनी जगह, नन्ही हिचकियाँ"
    },
    "weekHeadline": {
-    "en": "This week your baby's ears settle close to where they'll stay, and silent hiccups may begin.",
+    "en": "Your baby is about the size of a sesame seed. This week the heart, brain and spine are beginning to form.",
     "hi": "इस हफ़्ते आपके शिशु के कान अपनी आख़िरी जगह के क़रीब पहुँच रहे हैं, और चुपचाप हिचकियाँ भी शुरू हो सकती हैं।"
    },
    "size": {
@@ -239,102 +239,102 @@
     }
    },
    "reveal": {
-    "en": "Maa, my ears are settling into place, and I might even have silent hiccups now.",
+    "en": "Maa, I'm smaller than a sesame seed, but my heart is already starting to take shape.",
     "hi": "माँ, मेरे कान अपनी जगह ले रहे हैं, और अब शायद मुझे चुपचाप हिचकियाँ भी आने लगी हैं।"
    }
   },
   "babyDevelopment": {
    "whatImDoing": {
-    "en": "My ears are now close to where they'll stay, on the sides of my head. My skin is still thin and see-through, so you could spot my blood vessels and bones underneath. Tiny hairs keep growing, including my eyebrows, eyelashes and the soft hair on my head. My legs are longer than my arms now. I'm moving all my joints, wiggling my fingers and toes, and maybe practising silent hiccups too.",
+    "en": "I'm growing fast. The tube that will become my brain and spine is forming, and a tiny tube that will become my heart is starting to take shape. Soon it will begin to beat. The early buds of my face and body are just beginning.",
     "hi": "मेरे कान अब मेरे सिर के दोनों तरफ़ अपनी आख़िरी जगह के क़रीब हैं। मेरी त्वचा अभी पतली और पारदर्शी है, इसलिए उसके नीचे मेरी रक्त-नलिकाएँ और हड्डियाँ आसानी से दिख जाती हैं। छोटे-छोटे बाल बढ़ते जा रहे हैं — मेरी भौंहें, पलकों के बाल और सिर के महीन बाल भी। अब मेरे पैर मेरे हाथों से लंबे हो गए हैं, और मेरे सारे अंग और जोड़ हिलने लगे हैं, उँगलियाँ और पैर की उँगलियाँ चलती रहती हैं, और शायद चुपचाप हिचकियाँ लेने का अभ्यास भी चल रहा है।"
    }
   },
   "momJourney": {
    "physicalChanges": {
-    "en": "Your uterus keeps rising out of your pelvis, and your bump may be showing more each week. Your baby's movements are getting stronger, though you probably can't feel them yet unless you've been pregnant before. Steady, healthy weight gain shows more from now on, and it helps your baby grow.",
+    "en": "Your period is late, and pregnancy hormones are rising quickly. Nothing shows on the outside yet, but you may feel tired, have sore breasts or need to wee more often.",
     "hi": "आपकी बच्चेदानी पेल्विस से ऊपर उठती जा रही है, और आपका बंप धीरे-धीरे और साफ़ दिखने लगा है। आपके शिशु की हरकतें मज़बूत और बेहतर तालमेल वाली होती जा रही हैं, भले ही आपको अभी वे शायद महसूस न हों — जब तक कि यह आपकी दूसरी या उसके बाद की गर्भावस्था न हो। इस समय से वज़न का स्थिर और सेहतमंद बढ़ना ज़्यादा दिखने लगता है, जो आपके शिशु के तेज़ विकास में मदद करता है।"
    },
    "emotionalState": {
-    "en": "Many women feel well around now. Energy holds steady and the hardest early weeks are behind them. If this isn't your first pregnancy, you may soon notice the faintest flutters. First-time mothers usually feel them a little later.",
+    "en": "You may feel happy, shocked, worried, or all three in one afternoon. That's normal when news this big is still sinking in.",
     "hi": "बहुत सी महिलाएँ इस दौर में सचमुच अच्छा महसूस करती हैं — ऊर्जा टिकी रहती है और शुरुआती दिनों की सबसे मुश्किल घड़ी पीछे छूट चुकी होती है। अगर यह आपकी पहली गर्भावस्था नहीं है, तो हो सकता है जल्द ही आपको हलचल की पहली हल्की सी सरसराहट महसूस हो — पहली बार माँ बनने वाली महिलाओं को यह आमतौर पर थोड़ा बाद में महसूस होता है।"
    },
    "commonSymptoms": [
     {
-     "en": "Heartburn",
+     "en": "Missed period",
      "hi": "सीने में जलन"
     },
     {
-     "en": "Constipation",
+     "en": "Tiredness",
      "hi": "कब्ज़"
     },
     {
-     "en": "Tender breasts",
+     "en": "Sore breasts",
      "hi": "स्तनों में हल्का दर्द"
     },
     {
-     "en": "Varicose veins",
+     "en": "Needing to wee more",
      "hi": "नसों का उभरना"
     },
     {
-     "en": "Lingering nausea",
+     "en": "Mild nausea",
      "hi": "बची हुई मितली"
     },
     {
-     "en": "Dizziness",
+     "en": "Mild cramping",
      "hi": "चक्कर आना"
     }
    ],
    "selfCareTip": {
-    "en": "If your feet swell by evening, softer, slightly roomier shoes help. Keep eating well, move gently every day, and enjoy the steadier energy this stretch often brings.",
+    "en": "Take a folic acid tablet every day, rest when you're tired, and sip water through the day. Small, frequent meals help if you feel queasy.",
     "hi": "अगर शाम तक पैरों में सूजन आने लगे तो थोड़े ढीले, आरामदायक जूते मदद करते हैं। अच्छा खाते रहें, हल्की-फुल्की हलचल बनाए रखें, और इस दौर की टिकी हुई ऊर्जा का आनंद लें।"
    },
    "reassurance": {
-    "en": "If you haven't felt your baby move yet, that's completely normal. Most first-time mothers don't notice movement for several more weeks. Enjoy this steadier stretch. Your pregnancy is going at its own pace.",
+    "en": "Many women feel almost nothing at five weeks, and others feel a lot. Both are normal. How you feel isn't a measure of how your pregnancy is going.",
     "hi": "अगर आपने अभी तक अपने शिशु की हलचल महसूस नहीं की है, तो यह बिलकुल सामान्य है — पहली बार माँ बनने वाली ज़्यादातर महिलाओं को यह अभी कई हफ़्ते बाद महसूस होती है। इस शांत दौर का आनंद लें और भरोसा रखें कि यह आपकी अपनी गर्भावस्था का हिस्सा है।"
    }
   },
   "nutrition": {
    "nutritionTheme": {
-    "en": "Iron, Fibre and Calcium",
+    "en": "Folate For A Growing Brain",
     "hi": "आयरन, फ़ाइबर और कैल्शियम"
    },
    "focusNutrients": [
     {
-     "en": "Iron",
+     "en": "Folate",
      "hi": "आयरन"
     },
     {
-     "en": "Fibre",
+     "en": "Vitamin B12",
      "hi": "फ़ाइबर"
     },
     {
-     "en": "Calcium",
+     "en": "Iron",
      "hi": "कैल्शियम"
     }
    ],
    "whyNow": {
-    "en": "You need more fibre and more iron now, and your baby's bones keep hardening. So iron-rich, high-fibre food and steady calcium all matter this week.",
+    "en": "Your baby's brain and spine are forming right now, and folate (folic acid) helps them form well. Keep taking your folic acid tablet and add folate-rich food.",
     "hi": "इस समय आपकी फ़ाइबर और आयरन दोनों की ज़रूरत बढ़ रही है, और आपके शिशु की हड्डियाँ लगातार मज़बूत हो रही हैं — इसलिए इस हफ़्ते आयरन से भरपूर, फ़ाइबर वाला खाना और कैल्शियम, तीनों मायने रखते हैं।"
    },
    "foods": [
     {
-     "en": "Bajra (Pearl millet)",
+     "en": "Spinach & leafy greens",
      "hi": "बाजरा"
     },
     {
-     "en": "Til (Sesame seeds)",
+     "en": "Moong & other dals",
      "hi": "तिल"
     },
     {
-     "en": "Paneer & dairy",
+     "en": "Citrus & amla",
      "hi": "पनीर और दूध-दही"
     },
     {
-     "en": "Citrus & amla",
+     "en": "Whole grains & oats",
      "hi": "खट्टे फल और आँवला"
     },
     {
-     "en": "Whole grains & oats",
+     "en": "Paneer & dairy",
      "hi": "साबुत अनाज और ओट्स"
     },
     {
@@ -342,53 +342,53 @@
      "hi": "मेवे और बीज"
     },
     {
-     "en": "Spinach & leafy greens",
+     "en": "Chana & rajma",
      "hi": "पालक और हरी पत्तेदार सब्ज़ियाँ"
     }
    ],
    "indianSuperfoodOfTheWeek": {
     "food": {
-     "en": "Bajra (Pearl Millet)",
+     "en": "Palak (Spinach)",
      "hi": "बाजरा"
     },
     "benefit": {
-     "en": "Full of iron and fibre. It's filling, and gentle on your digestion.",
+     "en": "A good source of folate and iron, both needed in these early weeks.",
      "hi": "आयरन और फ़ाइबर से भरपूर, और इस हफ़्ते पाचन को सँभालने का एक हल्का, पेट भरने वाला तरीक़ा।"
     },
     "howToConsume": {
-     "en": "Try it as bajra roti, bhakri, or a warm bowl of khichdi.",
+     "en": "Try palak dal, palak paratha or a little palak in your khichdi. Wash it well and cook it through.",
      "hi": "बाजरे की रोटी, भाकरी, या एक कटोरी गरम खिचड़ी के रूप में लें।"
     }
    },
    "mealIdea": {
-    "en": "A bajra roti with palak and curd, then an orange or amla to help your body take in the iron.",
+    "en": "Moong dal khichdi with a spoon of ghee, a small bowl of curd and a few pieces of orange. Easy on a queasy stomach.",
     "hi": "बाजरे की रोटी के साथ पालक, साथ में दही, और बाद में एक संतरा या आँवला — ताकि शरीर आयरन बेहतर सोख सके।"
    },
    "tip": {
-    "en": "Have iron-rich food with something high in vitamin C, like amla, orange or nimbu paani. It helps your body take in far more of the iron.",
+    "en": "If you feel sick, eat something small every two to three hours. Dry snacks like roasted chana or a plain khakhra can help settle your stomach.",
     "hi": "आयरन वाले खाने के साथ विटामिन C लें — जैसे आँवला, संतरा या नींबू पानी। इससे शरीर आयरन कहीं बेहतर तरीक़े से सोखता है।"
    }
   },
   "actionPlan": {
    "doThisWeek": {
-    "en": "Start planning for your anomaly scan (Week 18 to 20), keep eating iron-rich meals, and stay gently active.",
+    "en": "Book your first visit with a doctor, keep taking folic acid every day, and tell your doctor about any medicines you take.",
     "hi": "अपने anomaly scan (हफ़्ता 18 से 20) की तैयारी शुरू करें, आयरन से भरपूर खाना खाते रहें, और हल्की-फुल्की हलचल बनाए रखें।"
    },
    "skipThisWeek": {
-    "en": "Brushing off stress, or trying to keep up your pre-pregnancy pace.",
+    "en": "Alcohol, smoking and any medicine your doctor hasn't said is safe, including herbal ones.",
     "hi": "तनाव को नज़रअंदाज़ करना, या ख़ुद पर गर्भावस्था से पहले जैसी रफ़्तार बनाए रखने का दबाव डालना।"
    },
    "redFlags": {
-    "en": "Call your doctor if you have heavy bleeding, severe pain in your tummy, fever, vomiting so much you can't keep fluids down, or anything that doesn't feel right.",
+    "en": "Call your doctor or go to hospital straight away if you have heavy bleeding, strong pain on one side of your tummy, pain in the tip of your shoulder, or you feel faint.",
     "hi": "अगर ज़्यादा ब्लीडिंग, पेट में तेज़ दर्द, बुख़ार, लगातार उल्टी जिससे पानी भी पेट में न टिके, या कुछ भी ठीक न लगे — तो अपने डॉक्टर से संपर्क करें।"
    },
    "mythBuster": {
     "myth": {
-     "en": "Your baby gets nothing from hearing your voice before birth.",
+     "en": "If you don't feel sick, something must be wrong.",
      "hi": "जन्म से पहले शिशु को आपकी आवाज़ सुनने का कोई फ़ायदा नहीं होता।"
     },
     "truth": {
-     "en": "Your baby is already growing the parts needed for hearing, and will soon start to know familiar sounds.",
+     "en": "Many healthy pregnancies come with little or no nausea. How sick you feel says nothing about how your baby is doing.",
      "hi": "आपके शिशु में सुनने के लिए ज़रूरी हिस्से अभी से बन रहे हैं, और वह जल्द ही जानी-पहचानी आवाज़ें पहचानने लगेगा।"
     }
    }
@@ -405,7 +405,7 @@
    },
    "spokenLine": {
     "hi": "माँ, मेरी दुनिया बड़ी हो रही है।",
-    "en": "Maa, my world is expanding."
+    "en": "Maa, I've only just begun, and I'm so glad it's with you."
    }
   },
   "reflectAndRemember": {
@@ -414,32 +414,32 @@
     "hi": "आप अपने शिशु के सबसे क़रीब कब महसूस करती हैं?"
    },
    "journalPrompt": {
-    "en": "Write about the moments when being pregnant feels most real.",
+    "en": "Write down how you found out, and how you felt in that first moment.",
     "hi": "वे पल लिखिए जब गर्भावस्था आपको सबसे ज़्यादा सच्ची महसूस होती है।"
    },
    "voiceJournalEnabled": true,
    "textJournalEnabled": true,
    "photoPrompt": {
-    "en": "Take a photo of your favourite moment from this week.",
+    "en": "Take a photo of something from this week you want to remember, like the test or a quiet moment.",
     "hi": "इस हफ़्ते का अपना सबसे पसंदीदा पल तस्वीर में क़ैद करें।"
    },
    "cameraEnabled": true
   },
   "partnerCorner": {
    "whatSheMayFeel": {
-    "en": "She's probably feeling well this week, with steady energy and a growing bump. If this isn't her first pregnancy, she may notice the first faint flutters soon.",
+    "en": "She may feel tired, a little sick or emotional, and she's still taking in the news. Nothing shows yet, but her body is working hard.",
     "hi": "इस हफ़्ते वह शायद सचमुच अच्छा महसूस कर रही है — ऊर्जा टिकी हुई और बंप बढ़ता हुआ। अगर यह उसकी पहली गर्भावस्था नहीं है, तो उसे जल्द ही हलचल की पहली हल्की सरसराहट महसूस हो सकती है।"
    },
    "whatYouCanDo": {
-    "en": "Ask if she's felt any flutters yet. Enjoy this easier stretch together, go on gentle walks, cook healthy meals, and be patient with any symptoms that linger.",
+    "en": "Help her book the first doctor's visit, remind her about folic acid, and take on more of the cooking and housework if she's tired or queasy.",
     "hi": "पूछिए कि उसे कोई हलचल महसूस हुई या नहीं, इस आरामदेह दौर को साथ मिलकर मनाइए, हल्की हलचल और अच्छे खाने के लिए प्रोत्साहित कीजिए, और बचे हुए लक्षणों के साथ धीरज रखिए।"
    },
    "oneMission": {
-    "en": "Start planning for the anomaly scan (Week 18 to 20) together, and enjoy this calmer stretch side by side.",
+    "en": "Go with her to the first doctor's visit, or help her plan it.",
     "hi": "anomaly scan (हफ़्ता 18 से 20) की तैयारी साथ मिलकर शुरू कीजिए, और इस शांत अध्याय का साथ-साथ आनंद लीजिए।"
    },
    "shareMessage": {
-    "en": "This week my ears are settling into place, and my legs have grown longer than my arms. I'm about the size of an apple now, and I might even have silent hiccups.",
+    "en": "This week I'm about the size of a sesame seed, and my heart is starting to form.",
     "hi": "इस हफ़्ते मेरे कान अपनी आख़िरी जगह ले रहे हैं, और मेरे पैर मेरे हाथों से लंबे हो गए हैं। अब मैं लगभग एक सेब जितना हूँ, और शायद मुझे चुपचाप हिचकियाँ भी आती हैं।"
    }
   },
