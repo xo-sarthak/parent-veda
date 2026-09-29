@@ -38,10 +38,12 @@ void main() {
       }
     });
 
-    test('ten brackets, seventy cells', () {
-      expect(kPregnancyBrackets.length, 10);
+    // Thirteen since 2026-09-29: Your first weeks, Getting ready and Work &
+    // money joined as home tiles (pregnancy gap analysis, new sections).
+    test('thirteen brackets, ninety-one cells', () {
+      expect(kPregnancyBrackets.length, 13);
       expect(
-          kPregnancyBrackets.fold<int>(0, (n, b) => n + b.layers.length), 70);
+          kPregnancyBrackets.fold<int>(0, (n, b) => n + b.layers.length), 91);
     });
 
     test('every bracket carries a label, a title, a blurb and a theme', () {
@@ -88,6 +90,10 @@ void main() {
     const englishByPolicy = <String>{
       'ttc_body_cycle', // TTC gap plan, 2026-09-26
       'ttc_not_yet', // TTC gap plan, 2026-09-26
+      // Pregnancy gap analysis new doors, 2026-09-29 (new work is English).
+      'pregnancy_first_weeks',
+      'pregnancy_getting_ready',
+      'pregnancy_work_money',
     };
 
     test('every user-visible string has Hindi', () {

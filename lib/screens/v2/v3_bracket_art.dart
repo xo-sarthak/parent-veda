@@ -62,6 +62,10 @@ enum BracketMark {
   swaddle,
   basket,
   lamp,
+  // ---- Pregnancy, added 2026-09-29 ------------------------------------------
+  // Work, money and rights: a work bag. Nothing in the set said work, and a
+  // rupee sign would make the tile about money alone.
+  work,
 }
 
 /// Maps a bracket id to its mark. Lives here rather than in the data table so
@@ -77,6 +81,13 @@ BracketMark? bracketMarkFor(String bracketId) => switch (bracketId) {
       'pregnancy_fitness' => BracketMark.fitness,
       'pregnancy_mental_health' => BracketMark.mind,
       'pregnancy_belly_skin' => BracketMark.skin,
+      // Added 2026-09-29 (pregnancy gap analysis, new doors). Two reuse a
+      // mark for the reason the TTC block below gives: the first weeks ARE
+      // first steps, and getting ready IS the basket (deciding what you need).
+      'pregnancy_first_weeks' => BracketMark.steps,
+      'pregnancy_getting_ready' => BracketMark.basket,
+      'pregnancy_work_money' => BracketMark.work,
+      'pregnancy_twins' => BracketMark.swaddle,
       // ---- Parenting ---------------------------------------------------
       'parenting_sleep' => BracketMark.moon,
       'parenting_feeding' => BracketMark.nutrition,
@@ -498,6 +509,22 @@ class _BracketPainter extends CustomPainter {
             ..quadraticBezierTo(64 * s, 34 * s, 50 * s, 52 * s)
             ..quadraticBezierTo(36 * s, 34 * s, 50 * s, 14 * s)
             ..close(),
+          soft,
+        );
+
+      // A work bag: body, handle and one soft clasp band. Carried, not
+      // opened, because the door is about keeping your work life going.
+      case BracketMark.work:
+        canvas.drawRRect(
+          RRect.fromRectAndRadius(
+              Rect.fromLTWH(16 * s, 38 * s, 68 * s, 44 * s), Radius.circular(8 * s)),
+          obj,
+        );
+        canvas.drawArc(Rect.fromLTWH(36 * s, 22 * s, 28 * s, 30 * s),
+            math.pi, math.pi, false, line(6, seed.withValues(alpha: 0.5)));
+        canvas.drawRRect(
+          RRect.fromRectAndRadius(
+              Rect.fromLTWH(16 * s, 54 * s, 68 * s, 8 * s), Radius.circular(3 * s)),
           soft,
         );
     }

@@ -71,6 +71,7 @@ import '../../screens/brackets/hub/hub_intent_art.dart' show IntentMark;
 import 'package:flutter/material.dart' show Icons;
 
 import 'pv_door_data.dart';
+import 'pv_door_twins.dart' show kTwinsSurfaceDoor;
 
 /// Surfaces this door opens. Resolved by `pv_door_router.dart`.
 ///
@@ -392,6 +393,19 @@ final PvDoorPage kScansDoor = PvDoorPage(
     // seeing it folded and as a strip: "keep it the way it was before —
     // it's fine below Last three months"). `folded` and `strip` stay on
     // the model for a door that needs them.
+    // Twins and more (2026-09-29, pregnancy gap analysis P3): the door is
+    // not a home tile, so the scans it is mostly about point to it.
+    PvDoorSection(
+      group: kScansTabScan,
+      heading: 'Carrying twins',
+      tiles: [
+        PvDoorToolTile(
+          title: 'Twins and more',
+          blurb: 'The extra scans, the placenta question, and your care.',
+          surfaceId: kTwinsSurfaceDoor,
+        ),
+      ],
+    ),
     PvDoorSection(
       group: kScansTabScan,
       heading: 'Before any scan',

@@ -105,6 +105,10 @@ const Set<String> kPvDoorRailDoors = {
   // start (Move & rest on the Yoga & fitness tile, and After a loss).
   'pregnancy_fitness',
   'pregnancy_after_loss',
+  'pregnancy_getting_ready',
+  'pregnancy_work_money',
+  'pregnancy_twins',
+  'pregnancy_first_weeks',
 };
 
 /// Inline tools that lay out their own gutter (their rails run edge to

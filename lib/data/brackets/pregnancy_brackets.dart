@@ -371,4 +371,100 @@ final List<Bracket> kPregnancyBrackets = [
           BracketLayerSpec(state: LayerState.notApplicable, reason: 'None proposed'),
     },
   ),
+
+  // ---------------------------------------------------------------------------
+  //  11. Your first weeks — added 2026-09-29 (pregnancy gap analysis, new sections).
+  //  English on both sides of the pair: new work is English (CLAUDE.md).
+  // ---------------------------------------------------------------------------
+  Bracket(
+    id: 'pregnancy_first_weeks',
+    stage: LifeStage.pregnancy,
+    theme: 'first_weeks',
+    hue: 200,
+    label: _t(en: 'Your first weeks', hi: 'Your first weeks'),
+    title: _t(en: 'Your first weeks', hi: 'Your first weeks'),
+    blurb: _t(
+        en: "Just found out? What to do first, your first visit, and early worries.",
+        hi: "Just found out? What to do first, your first visit, and early worries."),
+    layers: {
+      BracketLayer.content: BracketLayerSpec(
+          state: LayerState.notApplicable,
+          reason: 'The door holds the reads'),
+      BracketLayer.activities:
+          BracketLayerSpec(state: LayerState.notApplicable, reason: 'Not a fit'),
+      BracketLayer.tools: BracketLayerSpec(
+          state: LayerState.notReady,
+          reason: 'The due date calculator, reached from the door'),
+      BracketLayer.products: BracketLayerSpec(state: LayerState.notApplicable, reason: 'Not a fit'),
+      BracketLayer.course:
+          BracketLayerSpec(state: LayerState.notApplicable, reason: 'Not a fit'),
+      BracketLayer.consult: BracketLayerSpec(
+          state: LayerState.notReady, reason: 'Consults reached from the door'),
+      BracketLayer.extras:
+          BracketLayerSpec(state: LayerState.notApplicable, reason: 'None proposed'),
+    },
+  ),
+
+  // ---------------------------------------------------------------------------
+  //  12. Getting ready — added 2026-09-29 (pregnancy gap analysis, new sections).
+  //  English on both sides of the pair: new work is English (CLAUDE.md).
+  // ---------------------------------------------------------------------------
+  Bracket(
+    id: 'pregnancy_getting_ready',
+    stage: LifeStage.pregnancy,
+    theme: 'getting_ready',
+    hue: 36,
+    label: _t(en: 'Getting ready', hi: 'Getting ready'),
+    title: _t(en: 'Getting ready for baby', hi: 'Getting ready for baby'),
+    blurb: _t(
+        en: "Names, what you need and can skip, and help for the first 40 days.",
+        hi: "Names, what you need and can skip, and help for the first 40 days."),
+    layers: {
+      BracketLayer.content: BracketLayerSpec(
+          state: LayerState.notApplicable,
+          reason: 'The door holds the reads'),
+      BracketLayer.activities:
+          BracketLayerSpec(state: LayerState.notApplicable, reason: 'Not a fit'),
+      BracketLayer.tools:
+          BracketLayerSpec(state: LayerState.notApplicable, reason: 'Not a fit'),
+      BracketLayer.products: BracketLayerSpec(
+          state: LayerState.notReady, reason: 'Checklist reached from the door'),
+      BracketLayer.course:
+          BracketLayerSpec(state: LayerState.notApplicable, reason: 'Not a fit'),
+      BracketLayer.consult: BracketLayerSpec(state: LayerState.notApplicable, reason: 'Not a fit'),
+      BracketLayer.extras:
+          BracketLayerSpec(state: LayerState.notApplicable, reason: 'None proposed'),
+    },
+  ),
+
+  // ---------------------------------------------------------------------------
+  //  13. Work & money — added 2026-09-29 (pregnancy gap analysis, new sections).
+  //  English on both sides of the pair: new work is English (CLAUDE.md).
+  // ---------------------------------------------------------------------------
+  Bracket(
+    id: 'pregnancy_work_money',
+    stage: LifeStage.pregnancy,
+    theme: 'work_money',
+    hue: 226,
+    label: _t(en: 'Work & money', hi: 'Work & money'),
+    title: _t(en: 'Work, money and rights', hi: 'Work, money and rights'),
+    blurb: _t(
+        en: "Working while pregnant, your maternity leave, and what a birth costs.",
+        hi: "Working while pregnant, your maternity leave, and what a birth costs."),
+    layers: {
+      BracketLayer.content: BracketLayerSpec(
+          state: LayerState.notApplicable,
+          reason: 'The door holds the reads'),
+      BracketLayer.activities:
+          BracketLayerSpec(state: LayerState.notApplicable, reason: 'Not a fit'),
+      BracketLayer.tools:
+          BracketLayerSpec(state: LayerState.notApplicable, reason: 'Not a fit'),
+      BracketLayer.products: BracketLayerSpec(state: LayerState.notApplicable, reason: 'Not a fit'),
+      BracketLayer.course:
+          BracketLayerSpec(state: LayerState.notApplicable, reason: 'Not a fit'),
+      BracketLayer.consult: BracketLayerSpec(state: LayerState.notApplicable, reason: 'Not a fit'),
+      BracketLayer.extras:
+          BracketLayerSpec(state: LayerState.notApplicable, reason: 'None proposed'),
+    },
+  ),
 ];

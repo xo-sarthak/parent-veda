@@ -86,6 +86,7 @@
 import 'package:flutter/material.dart' show Icons;
 
 import 'pv_door_data.dart';
+import 'pv_door_twins.dart' show kTwinsSurfaceDoor;
 
 /// Surfaces this door opens. Constants because each becomes a route NAME.
 const String kLabourSurfaceTimer = 'contractions';
@@ -412,6 +413,12 @@ final PvDoorPage kLabourDoor = PvDoorPage(
       group: kLabourTabSigns,
       heading: 'If the plan changes',
       tiles: [
+        // Twins and more (2026-09-29): how twins are born lives there.
+        PvDoorToolTile(
+          title: 'Having twins',
+          blurb: 'How twins are born, when, and getting ready for two.',
+          surfaceId: kTwinsSurfaceDoor,
+        ),
         PvDoorGuideTile(
           title: 'Induction: why, how and what it feels like',
           blurb: 'Why your doctor might start labour, and what to ask first.',

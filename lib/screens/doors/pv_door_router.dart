@@ -142,6 +142,10 @@ import '../../data/doors/pv_door_after_loss.dart';
 import '../pregnancy/preg_ended_screen.dart' show PregTryAgainScreen;
 import '../prepare/prenatal_yoga_screen.dart';
 import '../tools/kegel_care_screen.dart';
+import '../tools/product_checklist_screen.dart';
+import '../tools/due_date_calculator_screen.dart';
+import '../post_pregnancy/baby_naming_home_screen.dart';
+import '../../data/doors/pv_door_twins.dart';
 
 /// A tile's OWN drawn mark, where the door has something better than its
 /// format's. Null means "the format mark", which is the rule everywhere else.
@@ -460,6 +464,18 @@ Widget? pvDoorScreenFor(String id, PregnancyController c) => switch (id) {
   // Move & rest's two tools: the 22 prenatal yoga sessions and Kegel Care.
   kMoveSurfaceYoga => PrenatalYogaScreen(lang: c.language),
   kMoveSurfaceKegel => KegelCareScreen(controller: c),
+  // Getting ready for baby (2026-09-29): the name finder the parenting stage
+  // ships (reused, not copied), the shopping checklist with its newborn
+  // starter list, and the hospital bag.
+  kReadySurfaceNames => const BabyNamingHomeScreen(),
+  kReadySurfaceStore => ProductChecklistScreen(controller: c),
+  kReadySurfaceBag => ReadyForBirthScreen(controller: c),
+  // Twins and more: not a home tile, opened from Scans & tests and Labour.
+  // Your first weeks: the due date calculator, the same screen as the
+  // surface router's 'due_date'.
+  kFirstSurfaceDueDate => DueDateCalculatorScreen(controller: c),
+  kTwinsSurfaceDoor => PvDoorScreen(
+      page: kTwinsDoor, bracket: kPregTwinsBracket, pregnancy: c),
 
   _ => null,
 };
@@ -902,6 +918,9 @@ bool pvDoorSurfaceResolves(String id) => switch (id) {
   kMindSurfaceHelplines => true,
   kCondSurfaceAfterLoss || kAfterLossSurfaceTryAgain => true,
   kMoveSurfaceYoga || kMoveSurfaceKegel => true,
+  kReadySurfaceNames || kReadySurfaceStore || kReadySurfaceBag => true,
+  kTwinsSurfaceDoor => true,
+  kFirstSurfaceDueDate => true,
   _ when id.startsWith('mind/breathe/') => kMmBreathingExercises.any(
     (e) => mindSurfaceBreathe(e.id) == id,
   ),

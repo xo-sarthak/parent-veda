@@ -170,6 +170,15 @@ drafted. The live figure moved from 30 to **34**:
   bracket's own red flag, so the layer resolves. The missing logs are a listed gap, not
   an absent layer.
 
+**2026-09-29: 13 brackets, 91 cells, still 34 live.** Three home tiles joined from the
+pregnancy gap analysis (Your first weeks, Getting ready for baby, Work, money and rights).
+Each is a door whose reads live on the door itself, so none of their 21 cells claims a
+live surface: content is `notApplicable` ("the door holds the reads") and the tools,
+products and consults the doors link to are `notReady` until they are audited as
+layers. The 34 above is unchanged, and `test/bracket_model_test.dart` holds both
+figures. The After a loss and Twins and more doors are deliberately not brackets in
+this grid (they are not home tiles); each carries its own bracket in its door file.
+
 | State | Count | Share of 70 cells |
 |---|---|---|
 | `live` | 34 | 49% |

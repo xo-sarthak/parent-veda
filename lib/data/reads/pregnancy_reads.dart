@@ -59,6 +59,10 @@ import 'pregnancy_reads_scans.dart';
 import 'pregnancy_reads_weekly_a.dart';
 import 'pregnancy_reads_loss.dart';
 import 'pregnancy_reads_move.dart';
+import 'pregnancy_reads_first.dart';
+import 'pregnancy_reads_ready.dart';
+import 'pregnancy_reads_twins.dart';
+import 'pregnancy_reads_work.dart';
 import 'pregnancy_reads_weekly_b.dart';
 import 'pregnancy_reads_weekly_c.dart';
 import 'pregnancy_reads_weekly_d.dart';
@@ -67,6 +71,10 @@ export 'pregnancy_reads_conditions.dart';
 export 'pregnancy_reads_labour.dart';
 export 'pregnancy_reads_loss.dart';
 export 'pregnancy_reads_move.dart';
+export 'pregnancy_reads_first.dart';
+export 'pregnancy_reads_ready.dart';
+export 'pregnancy_reads_twins.dart';
+export 'pregnancy_reads_work.dart';
 export 'pregnancy_reads_nutrition.dart';
 export 'pregnancy_reads_scans.dart';
 export 'pregnancy_reads_weekly_a.dart';
@@ -88,6 +96,11 @@ final List<PvRead> kPregnancyReads = [
   ...kPregnancyReadsLoss,
   // Move & rest (2026-09-29).
   ...kPregnancyReadsMove,
+  // Getting ready, Twins and more, Work, money and rights (2026-09-29).
+  ...kPregnancyReadsFirst,
+  ...kPregnancyReadsReady,
+  ...kPregnancyReadsTwins,
+  ...kPregnancyReadsWork,
   // The weekly reads, written out 2026-09-18 — see pregnancy_reads_weekly_a.
   ...kPregnancyReadsWeeklyA,
   ...kPregnancyReadsWeeklyB,
