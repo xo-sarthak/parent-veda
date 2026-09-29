@@ -61,8 +61,8 @@ class ScanUrgentScreen extends StatelessWidget {
           Text(
               const LocalizedText(
                       en: 'Any one of these is a reason to call your doctor '
-                          'today — not to wait for your next appointment, and '
-                          'not to read further here first.',
+                          "today. Please don't wait for your next appointment, "
+                          "and don't read further here first.",
                       hi: 'इनमें से कोई भी एक बात आज ही डॉक्टर को फ़ोन करने की '
                           'वजह है — अगली appointment का इंतज़ार मत कीजिए, और '
                           'पहले यहाँ आगे पढ़ने की भी ज़रूरत नहीं।')
@@ -120,7 +120,7 @@ class ScanUrgentScreen extends StatelessWidget {
                 children: [
                   Text(
                       const LocalizedText(
-                              en: 'Call, do not message',
+                              en: "Call, don't message",
                               hi: 'फ़ोन कीजिए, message नहीं')
                           .of(lang),
                       style: pvFraunces(
@@ -133,7 +133,7 @@ class ScanUrgentScreen extends StatelessWidget {
                       const LocalizedText(
                               en: 'Your obstetrician, the labour ward, or the '
                                   'nearest hospital with a maternity unit. If '
-                                  'you cannot reach anyone and the pain or '
+                                  "you can't reach anyone and the pain or "
                                   'bleeding is bad, go in. Nobody will mind '
                                   'you coming and being sent home.',
                               hi: 'अपनी gynae को, labour ward को, या नज़दीकी '
@@ -149,8 +149,8 @@ class ScanUrgentScreen extends StatelessWidget {
           const SizedBox(height: 18),
           Text(
               const LocalizedText(
-                      en: 'ParentVeda cannot tell you what is happening. This '
-                          'list exists only so you know which things are worth '
+                      en: "ParentVeda can't tell you what's happening. This "
+                          'list is here so you know which things are worth '
                           'a call.',
                       hi: 'ParentVeda यह नहीं बता सकता कि हो क्या रहा है। यह '
                           'सूची सिर्फ़ इसलिए है कि आपको पता रहे कि किन बातों पर '

@@ -308,7 +308,7 @@ class _ScanReportsScreenState extends State<ScanReportsBody> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: p.ground,
-        title: Text('What is this report?',
+        title: Text("What's this report?",
             style: pvFraunces(
                 fontSize: 17, fontWeight: FontWeight.w600, color: p.ink1)),
         content: TextField(
@@ -380,7 +380,7 @@ class _ScanReportsScreenState extends State<ScanReportsBody> {
                     fontWeight: FontWeight.w600,
                     color: p.ink1)),
             const SizedBox(height: 6),
-            Text(_en('Optional. Just makes it easier to find.').of(lang),
+            Text(_en('Optional. It makes it easier to find.').of(lang),
                 style: pvManrope(fontSize: 12.5, color: p.ink3)),
             const SizedBox(height: 16),
             for (final s in kTestsScans.take(12))
@@ -833,7 +833,7 @@ class _ScanReportsAllScreenState extends State<ScanReportsAllScreen> {
             eyebrow: 'Scans & tests',
             title: 'All reports',
             intro: '${all.length} ${all.length == 1 ? 'report' : 'reports'}. '
-                'Everything stays on your phone, and in your account when you are signed in.',
+                "Everything stays on your phone, and in your account when you're signed in.",
             children: [
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 18),

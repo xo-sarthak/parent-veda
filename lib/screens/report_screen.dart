@@ -279,7 +279,7 @@ class _ReportScreenState extends State<ReportScreen> {
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(
                     lang.isEnglish
-                        ? 'Nothing in the library is read off those reports together.'
+                        ? 'No topics here match those reports yet.'
                         : 'इन रिपोर्टों में साथ में पढ़ा जाने वाला कोई विषय नहीं है।',
                     style: text.bodyMedium?.copyWith(height: 1.5)),
                 const SizedBox(height: 12),

@@ -111,7 +111,7 @@ class _ScanNextScreenState extends State<ScanNextScreen> {
             children: [
               // ---- What is behind her --------------------------------------
               if (last != null) ...[
-                _Eyebrow('THE ONE YOU HAVE DONE', p, lang),
+                _Eyebrow("THE ONE YOU'VE HAD", p, lang),
                 const SizedBox(height: 10),
                 Text(last.name.of(lang),
                     style: pvFraunces(
@@ -147,7 +147,7 @@ class _ScanNextScreenState extends State<ScanNextScreen> {
                 Text(
                     _en('Mark a scan as done on your timeline and this page '
                             'will tell you what that result usually means, and '
-                            'what is due after it.')
+                            "what's due after it.")
                         .of(lang),
                     style: pvManrope(
                         fontSize: 14, height: 1.55, color: p.ink2)),
@@ -155,7 +155,7 @@ class _ScanNextScreenState extends State<ScanNextScreen> {
                 SolutionCard(
                   type: SolutionType.tool,
                   title: _en('Open your timeline'),
-                  value: _en('Mark what you have already had done.'),
+                  value: _en("Mark the ones you've already had."),
                   p: p,
                   lang: lang,
                   onTap: () => _push(
@@ -184,7 +184,7 @@ class _ScanNextScreenState extends State<ScanNextScreen> {
                 const SizedBox(height: 10),
               ] else ...[
                 Text(
-                    _en('Nothing else is scheduled on the usual run from here. '
+                    _en("Nothing else is due on the usual run from here. "
                             'Your doctor may still add one.')
                         .of(lang),
                     style: pvManrope(
@@ -194,7 +194,7 @@ class _ScanNextScreenState extends State<ScanNextScreen> {
               SolutionCard(
                 type: SolutionType.tool,
                 title: _en('Your appointments'),
-                value: _en('What is booked, and what to carry.'),
+                value: _en("What's booked, and what to carry."),
                 p: p,
                 lang: lang,
                 onTap: () => _push(
@@ -229,10 +229,10 @@ class _ScanNextScreenState extends State<ScanNextScreen> {
                 ),
                 child: Text(
                     _en('This is general information about what usually '
-                            'follows a scan. It is not a reading of your '
-                            'report. Your doctor has seen your scan and you '
-                            'have not been given a diagnosis here — if a '
-                            'result is worrying you, ask them.')
+                            "follows a scan. It isn't a reading of your "
+                            'report, and nothing here is a diagnosis. Your '
+                            'doctor has seen your scan. If a result is '
+                            'worrying you, ask them.')
                         .of(lang),
                     style: pvManrope(
                         fontSize: 12.5, height: 1.5, color: p.ink3)),

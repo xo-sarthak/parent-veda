@@ -137,7 +137,7 @@ class _ScanReportEditScreenState extends State<ScanReportEditScreen> {
             textCapitalization: TextCapitalization.sentences,
             style: pvManrope(fontSize: 15, color: p.ink1),
             decoration: InputDecoration(
-              hintText: 'e.g. Anomaly scan — Apollo',
+              hintText: 'For example, Anomaly scan, Apollo',
               hintStyle: pvManrope(fontSize: 14.5, color: p.ink3),
               filled: true,
               fillColor: p.surface,

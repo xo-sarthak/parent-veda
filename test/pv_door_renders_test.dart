@@ -195,17 +195,53 @@ void main() {
 
   testWidgets('a coming-soon card is drawn and is not tappable',
       (tester) async {
-    await _pump(tester);
-    final door = pvDoorPageFor('pregnancy_scans_tests')!;
-    final scan = door.groups.indexWhere((g) => g.id == kScansTabScan);
+    // ⚠️ 2026-09-29: the Scans door's own coming-soon card ("What the scan
+    // person can and cannot tell you") was written and is now a live read
+    // (see the next test). The rule this test holds is about the TILE KIND,
+    // not that one card, so it now draws the Scans door with a stand-in
+    // coming-soon card in the same section and checks the same things.
+    tester.view.physicalSize = _phone;
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+    final real = pvDoorPageFor('pregnancy_scans_tests')!;
+    const stand = 'A piece still being written';
+    final page = PvDoorPage(
+      bracketId: real.bracketId,
+      heroTitle: real.heroTitle,
+      heroBlurb: real.heroBlurb,
+      heroImageUrl: real.heroImageUrl,
+      closingLine: real.closingLine,
+      groups: real.groups,
+      sections: [
+        for (final s in real.sections)
+          if (s.heading == 'Before any scan')
+            PvDoorSection(
+              group: s.group,
+              heading: s.heading,
+              tiles: [
+                const PvDoorReadTile.comingSoon(
+                    title: stand, blurb: 'Held in place until it lands.'),
+                ...s.tiles,
+              ],
+            )
+          else
+            s,
+      ],
+    );
+    await tester.pumpWidget(MaterialApp(
+      home: PvDoorScreen(
+        page: page,
+        bracket: bracketById(real.bracketId)!,
+        pregnancy: PregnancyController(),
+      ),
+    ));
+    await tester.pump();
+    final scan = page.groups.indexWhere((g) => g.id == kScansTabScan);
 
     await _goTab(tester, 'pregnancy_scans_tests', scan);
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
 
-    // The section it lives in is on screen.
-    // "Before any scan" folds (2026-09-19): its heading carries the count
-    // and a tap opens it. The coming-soon card is inside.
     // The page's ListView is lazy: drag until the heading is built.
     Future<void> dragTo(Finder f) async {
       for (var i = 0; i < 12 && f.evaluate().isEmpty; i++) {
@@ -214,31 +250,50 @@ void main() {
       }
       expect(f, findsWidgets);
     }
-    // "Before any scan" is a plain section at the end (the fold and strip
-    // were tried and taken off, 2026-09-19); the card is a list row in it.
     await dragTo(find.text('Before any scan'));
-    await dragTo(find.text('What the scan person can and cannot tell you'));
+    await dragTo(find.text(stand));
 
     // ⚠️ IT HOLDS ITS PLACE AT FULL SIZE. The rule at the head of
     // `pv_placeholders.dart`: a placeholder occupies the real geometry, so
     // nothing on the rail moves the day the piece lands.
     final card = find.ancestor(
-      of: find.text('What the scan person can and cannot tell you'),
+      of: find.text(stand),
       matching: find.byType(InkWell),
     );
     expect(card, findsWidgets);
 
-    // Tapping it must not push anything. The hero title is scrolled out of
-    // the lazy list by now, so the check is that the door is still the top
-    // route: its card is still hit-testable and no reader appeared.
+    // Tapping it must not push anything. (A coming-soon row has no onTap, so
+    // it is not itself hit-testable — that is the point, not a failure.)
     await tester.tap(card.first, warnIfMissed: false);
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
-    // The row is still on the page and no reader was pushed. (A coming-soon
-    // row has no onTap, so it is not itself hit-testable — that is the
-    // point, not a failure.)
     expect(card, findsWidgets, reason: 'a coming-soon card navigated away.');
     expect(find.byType(PvReaderScreen), findsNothing);
+  });
+
+  testWidgets('the scan-person card, written 2026-09-29, opens its read',
+      (tester) async {
+    await _pump(tester);
+    final door = pvDoorPageFor('pregnancy_scans_tests')!;
+    final scan = door.groups.indexWhere((g) => g.id == kScansTabScan);
+    await _goTab(tester, 'pregnancy_scans_tests', scan);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+
+    const title = 'What the scan person can and cannot tell you';
+    final f = find.text(title);
+    for (var i = 0; i < 12 && f.evaluate().isEmpty; i++) {
+      await tester.drag(find.byType(Scrollable).first, const Offset(0, -300));
+      await tester.pump();
+    }
+    expect(f, findsWidgets);
+    await tester.ensureVisible(f.first);
+    await tester.pump();
+    await tester.tap(f.first, warnIfMissed: false);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 600));
+    expect(find.byType(PvReaderScreen), findsOneWidget,
+        reason: 'the finished card does not open its read.');
   });
 
   testWidgets('nothing overflows at 360dp on any tab', (tester) async {

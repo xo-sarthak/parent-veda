@@ -142,7 +142,7 @@ class ScanDetailScreen extends StatelessWidget {
             const PvReadNextStep(
               kind: PvNextKind.tool,
               title: LocalizedText(
-                  en: 'A word on the report you do not recognise?',
+                  en: "A word on the report you don't recognise?",
                   hi: 'Report का कोई शब्द समझ नहीं आया?'),
               value: LocalizedText(
                   en: 'Look it up, see what it may mean, and what to ask.',
@@ -155,7 +155,7 @@ class ScanDetailScreen extends StatelessWidget {
                   en: 'Have a gynaecologist go through it with you',
                   hi: 'किसी gynaecologist से समझिए'),
               value: LocalizedText(
-                  en: 'They tell you what the scan does and does not say.',
+                  en: "They'll explain what the scan does and doesn't say.",
                   hi: 'वे बताएँगे यह scan क्या कहता है और क्या नहीं।'),
               action: 'scan_consult',
             ),
@@ -427,7 +427,7 @@ class ScanDetailScreen extends StatelessWidget {
               SolutionCard(
                 type: SolutionType.read,
                 title: const LocalizedText(
-                    en: 'A word on the report you do not recognise?',
+                    en: "A word on the report you don't recognise?",
                     hi: 'रिपोर्ट का कोई शब्द समझ न आए?'),
                 value: const LocalizedText(
                     en: 'Look it up, see what it may mean, and what to ask.',
@@ -526,7 +526,7 @@ class ScanDetailScreen extends StatelessWidget {
                     en: 'Have a gynaecologist go through it with you',
                     hi: 'किसी gynaecologist से साथ में देखिए'),
                 value: const LocalizedText(
-                    en: 'They tell you what the scan does and does not say.',
+                    en: "They'll explain what the scan does and doesn't say.",
                     hi: 'वे बताती हैं कि scan क्या कहता है और क्या नहीं।'),
                 p: p,
                 lang: lang,

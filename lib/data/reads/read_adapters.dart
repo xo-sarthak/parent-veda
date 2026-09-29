@@ -322,6 +322,8 @@ PvRead pvReadFromScan(
       kicker: const LocalizedText(en: 'Scans and tests', hi: 'Scan aur test'),
       title: s.name,
       teaser: s.altName ?? s.when,
+      // Pregnancy warmth pass, 2026-09-29 (docs/PREG-VOICE.md §3).
+      shortAnswer: s.shortAnswer,
       scaleSetter: s.whatItIs,
       author: _desk,
       authorRole: const LocalizedText(en: 'Scans and tests', hi: 'Scan aur test'),

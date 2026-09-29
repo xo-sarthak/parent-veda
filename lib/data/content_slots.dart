@@ -158,8 +158,8 @@ const List<ContentSlot> kContentSlots = [
     topic: 'anomaly_scan',
     format: ContentFormat.video,
     title: LocalizedText(
-        en: 'What the anomaly scan actually looks at',
-        hi: 'What the anomaly scan actually looks at'),
+        en: 'What the anomaly scan looks at',
+        hi: 'What the anomaly scan looks at'),
     value: LocalizedText(
         en: 'The forty minutes, explained by someone who does them.',
         hi: 'The forty minutes, explained by someone who does them.'),
@@ -191,8 +191,8 @@ const List<ContentSlot> kContentSlots = [
         en: 'Your first scan, start to finish',
         hi: 'Your first scan, start to finish'),
     value: LocalizedText(
-        en: 'What you will see, and what it is too early to see.',
-        hi: 'What you will see, and what it is too early to see.'),
+        en: "What you'll see, and what it's too early to see.",
+        hi: "What you'll see, and what it's too early to see."),
     duration: '5 MIN',
   ),
 
@@ -206,10 +206,10 @@ const List<ContentSlot> kContentSlots = [
         en: 'The NT scan, and what a screening result is',
         hi: 'The NT scan, and what a screening result is'),
     value: LocalizedText(
-        en: 'Why a screening number is not a diagnosis — the distinction that '
-            'causes the most fear.',
-        hi: 'Why a screening number is not a diagnosis — the distinction that '
-            'causes the most fear.'),
+        en: "Why a screening number isn't a diagnosis, and why that "
+            "difference matters so much.",
+        hi: "Why a screening number isn't a diagnosis, and why that "
+            "difference matters so much."),
     duration: '7 MIN',
   ),
 
@@ -223,8 +223,8 @@ const List<ContentSlot> kContentSlots = [
         en: 'The glucose test, and getting through it',
         hi: 'The glucose test, and getting through it'),
     value: LocalizedText(
-        en: 'The fasting, the drink, the wait — and what the numbers mean.',
-        hi: 'The fasting, the drink, the wait — and what the numbers mean.'),
+        en: 'The fasting, the drink, the wait, and what the numbers mean.',
+        hi: 'The fasting, the drink, the wait, and what the numbers mean.'),
     duration: '5 MIN',
   ),
 
@@ -234,13 +234,13 @@ const List<ContentSlot> kContentSlots = [
     step: kStepUnderstandScan,
     format: ContentFormat.article,
     title: LocalizedText(
-        en: 'What a sonographer can and cannot tell you',
-        hi: 'What a sonographer can and cannot tell you'),
+        en: "What a sonographer can and can't tell you",
+        hi: "What a sonographer can and can't tell you"),
     value: LocalizedText(
-        en: 'Why they go quiet, why they will not discuss the sex, and who '
-            'gives you the result.',
-        hi: 'Why they go quiet, why they will not discuss the sex, and who '
-            'gives you the result.'),
+        en: "Why they go quiet, why they won't discuss the baby's sex, and "
+            "who gives you the result.",
+        hi: "Why they go quiet, why they won't discuss the baby's sex, and "
+            "who gives you the result."),
     duration: '4 MIN',
   ),
 

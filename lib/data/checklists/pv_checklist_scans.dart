@@ -75,40 +75,40 @@ final PvChecklist kScanQuestionsChecklist = PvChecklist(
   id: 'scan_questions',
   eyebrow: 'Before your appointment',
   title: 'What to ask at your next scan',
-  intro: 'Tick what matters to you, and take the list in with you. Nothing '
-      'here is a test — they are questions your doctor is used to answering.',
+  intro: 'Tick what matters to you, and take the list in with you. None of '
+      "these is a silly question. Your doctor answers them every day.",
   shareHeader: 'What to ask at my next scan',
   subject: _nextScanName,
   subjectTitle: (s) => 'What to ask at your $s',
   subjectIntro: (s) => 'Tick what matters to you and take the list in with '
-      'you. These are questions your doctor is used to answering about the $s.',
+      'you. Your doctor answers these about the $s every day.',
   groups: [
   PvChecklistGroup('Before the day', [
     PvChecklistItem('prep_fast',
-        'Do I need to fast, or drink water before I come?'),
+        'Do I need to fast, or drink water before I come in?'),
     PvChecklistItem('prep_how_long', 'How long will it take?'),
     PvChecklistItem('prep_bring',
-        'What should I bring — old reports, my card, anything else?'),
+        'What should I bring: old reports, my card, anything else?'),
     PvChecklistItem('prep_partner', 'Can someone come in with me?'),
     PvChecklistItem('prep_cost',
         'What will it cost, and is the report included in that?'),
   ]),
 
   PvChecklistGroup('About this scan', [
-    PvChecklistItem('scan_what_for', 'What are you looking for in this one?'),
-    PvChecklistItem('scan_why_now', 'Why is it done at this week and not another?'),
+    PvChecklistItem('scan_what_for', 'What are you checking in this one?'),
+    PvChecklistItem('scan_why_now', "Why is it done at this week and not another?"),
     PvChecklistItem('scan_needed',
-        'Is this one you are asking for, or one that is available?'),
+        "Is this one you're asking for, or one that's available?"),
     PvChecklistItem('scan_repeat',
-        'How likely is it that I will need to come back for a repeat?'),
+        "How often do people need to come back for a repeat?"),
   ]),
 
   PvChecklistGroup('When I get the report', [
     PvChecklistItem('rep_when', 'When will the report be ready, and who gives it '
         'to me?'),
-    PvChecklistItem('rep_explain', 'Who will explain it — you, or someone here?'),
+    PvChecklistItem('rep_explain', 'Who will explain it to me: you, or someone here?'),
     PvChecklistItem('rep_normal',
-        'What would count as an ordinary result for this scan?'),
+        'What would a normal result look like for this scan?'),
     PvChecklistItem('rep_copy',
         'Can I have a copy of the report and the films to keep?'),
   ]),
@@ -116,7 +116,7 @@ final PvChecklist kScanQuestionsChecklist = PvChecklist(
   PvChecklistGroup('What happens next', [
     PvChecklistItem('next_change',
         'Would anything in this result change my delivery plan?'),
-    PvChecklistItem('next_when', 'When do I see you again, and what is next after '
+    PvChecklistItem('next_when', "When do I see you again, and what's next after "
         'this?'),
     // ⚠️ THE ONE QUESTION EVERY DOCTOR HAS AN ANSWER TO AND FEW SAY OUT LOUD.
     // Every clinician carries a threshold for "call me before your next

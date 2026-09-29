@@ -105,7 +105,8 @@ final PvDoorPage kScansDoor = PvDoorPage(
   // to it. The eyebrow above it is `bracket.label`, so "Scans & tests" is
   // still on screen and the tile she tapped still names where she landed.
   heroTitle: 'Your scans, in one place.',
-  heroBlurb: 'What is coming, what you have already had, and what the report '
+  // Rewritten 2026-09-29 to docs/PREG-VOICE.md.
+  heroBlurb: "What's coming, what you've already had, and what the report "
       'says.',
 
   // ⚠️ THE PHOTOGRAPH IS BACK, AND THE PROCESS THAT PUT IT THERE IS THE POINT.
@@ -139,7 +140,7 @@ final PvDoorPage kScansDoor = PvDoorPage(
   // the door keeps it here, under every tab, and the embedded timeline no
   // longer draws its own — two copies a centimetre apart was the fault.
   closingLine: 'Not every pregnancy needs every test on this list, and your '
-      'doctor may add one that is not here. This is the usual run, not a '
+      "doctor may add one that isn't here. This is the usual run, not a "
       'rule.',
 
   groups: [
@@ -269,12 +270,31 @@ final PvDoorPage kScansDoor = PvDoorPage(
       group: kScansTabScan,
       heading: 'First three months',
       tiles: [
+        // Added 2026-09-29 (pregnancy gap analysis, Scans & tests, P1/P2):
+        // the first antenatal visit, early hCG and blood group reads, so
+        // every test she is sent for early has a page before she goes.
+        PvDoorGuideTile(
+          title: 'Your first antenatal visit',
+          blurb: "What's checked, what to carry, and how often you'll be "
+              'seen.',
+          readId: 'preg_scan_read_first_visit',
+        ),
         PvDoorEntryTile(
           title: 'Blood tests',
           blurb: 'The first set of blood tests, and what each one is for.',
           library: PvDoorLibrary.scan,
           entryId: 'blood_tests',
           meta: 'Weeks 6–10',
+        ),
+        PvDoorGuideTile(
+          title: 'hCG and early blood tests',
+          blurb: 'What the numbers mean, and why one gets repeated.',
+          readId: 'preg_scan_read_early_bloods',
+        ),
+        PvDoorGuideTile(
+          title: 'Blood group and Rh',
+          blurb: 'What Rh negative means, and what anti-D is for.',
+          readId: 'preg_scan_read_blood_group',
         ),
         PvDoorEntryTile(
           title: 'Dating scan',
@@ -318,6 +338,12 @@ final PvDoorPage kScansDoor = PvDoorPage(
           entryId: 'ogtt',
           meta: 'Weeks 24–28',
         ),
+        // Added 2026-09-29 (gap analysis, P1): Td, Tdap and flu.
+        PvDoorGuideTile(
+          title: 'Vaccines in pregnancy',
+          blurb: 'Tetanus, whooping cough and flu: which ones, and when.',
+          readId: 'preg_scan_read_vaccines',
+        ),
       ],
     ),
 
@@ -327,7 +353,8 @@ final PvDoorPage kScansDoor = PvDoorPage(
       tiles: [
         PvDoorEntryTile(
           title: 'Growth scan',
-          blurb: 'Checks how the baby is growing, and how much fluid there is.',
+          blurb: 'Checks how your baby is growing, and how much fluid there '
+              'is.',
           library: PvDoorLibrary.scan,
           entryId: 'growth_scan',
           meta: 'Weeks 28–36',
@@ -346,6 +373,18 @@ final PvDoorPage kScansDoor = PvDoorPage(
           entryId: 'gbs',
           meta: 'Weeks 35–37',
         ),
+        // Added 2026-09-29 (gap analysis, P2): the two late checks Indian
+        // doctors order most, often past the due date.
+        PvDoorGuideTile(
+          title: 'NST and fetal monitoring',
+          blurb: "The belts on your bump, and what \"reactive\" means.",
+          readId: 'preg_scan_read_nst',
+        ),
+        PvDoorGuideTile(
+          title: 'Biophysical profile (BPP)',
+          blurb: "Your baby's score out of 10, and what it tells your doctor.",
+          readId: 'preg_scan_read_bpp',
+        ),
       ],
     ),
 
@@ -362,13 +401,18 @@ final PvDoorPage kScansDoor = PvDoorPage(
         // The brief marks it COMING SOON rather than dropping it, which is
         // right: the card holds its place at full size, so nothing on the rail
         // moves the day the piece lands.
-        PvDoorReadTile.comingSoon(
+        //
+        // ⚠️ WRITTEN 2026-09-29 (gap analysis, P2): the coming-soon card is
+        // now a live read, `preg_scan_read_scan_person`. Was:
+        //   PvDoorReadTile.comingSoon(title: <same>, blurb: <same>)
+        PvDoorGuideTile(
           title: 'What the scan person can and cannot tell you',
           blurb: 'Why they go quiet, and who gives you the result.',
+          readId: 'preg_scan_read_scan_person',
         ),
         PvDoorGuideTile(
           title: 'Why nobody will tell you the sex',
-          blurb: 'It is the law, not the clinic being unkind.',
+          blurb: "It's the law, not the clinic being unkind.",
           readId: 'preg_scan_read_sex_law',
         ),
         PvDoorGuideTile(
@@ -389,7 +433,7 @@ final PvDoorPage kScansDoor = PvDoorPage(
     // =========================================================================
     PvDoorSection(
       group: kScansTabResult,
-      heading: 'When a word does not make sense',
+      heading: "When a word doesn't make sense",
       tiles: [
         // ⚠️ IT OPENS THE DECODER'S SEARCH, NOT THE DECODER. The decoder is
         // already on screen above this card — its chips and its topic lists
@@ -430,7 +474,7 @@ final PvDoorPage kScansDoor = PvDoorPage(
     // =========================================================================
     PvDoorSection(
       group: kScansTabReports,
-      heading: 'Make sense of what is in there',
+      heading: "Making sense of what's in there",
       tiles: [
         // ⚠️ RETIRED 2026-09-18 — the door walk. Every scan's own read now
         // carries "What the report will say" (its parameters, usual range,

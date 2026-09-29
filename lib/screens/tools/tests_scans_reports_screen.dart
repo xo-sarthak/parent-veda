@@ -132,9 +132,8 @@ class _TestsScansReportsScreenState extends State<TestsScansReportsScreen> {
           // pregHealthStrip(p.language, 'tests_scans_reports'),
           Text(
             widget.intro ??
-                'A calm library of the tests, scans and findings you may meet '
-                    'in pregnancy - what each one means, and how to read your '
-                    'report.',
+                'The tests, scans and findings you may meet in pregnancy: what '
+                    'each one means, and how to read your report.',
             style: pvManrope(
                 fontSize: 13.5, height: 1.5, color: AppTheme.neutral600),
           ),

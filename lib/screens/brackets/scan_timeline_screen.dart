@@ -230,7 +230,7 @@ class ScanTimelineBody extends StatelessWidget {
               // on. Inside the door it is the door's closing line instead.
               Text(
                   _en('Not every pregnancy needs every test on this list, and '
-                          'your doctor may add one that is not here. This is '
+                          "your doctor may add one that isn't here. This is "
                           'the usual run, not a rule.')
                       .of(lang),
                   style: pvManrope(fontSize: 12, height: 1.5, color: p.ink3)),
@@ -1283,7 +1283,7 @@ Future<void> showScanDateSheet(BuildContext context,
                 textCapitalization: TextCapitalization.words,
                 style: pvManrope(fontSize: 15, color: p.ink1),
                 decoration: InputDecoration(
-                  hintText: _en('Where — the clinic or hospital (optional)')
+                  hintText: _en('Where: the clinic or hospital (optional)')
                       .of(lang),
                   hintStyle: pvManrope(fontSize: 14, color: p.ink3),
                   prefixIcon:

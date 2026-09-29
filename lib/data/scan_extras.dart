@@ -70,8 +70,8 @@ const Map<String, ScanCost> kScanCost = {
       low: 800,
       high: 3000,
       note: LocalizedText(
-          en: 'The first-visit panel together. Free at most government '
-              'hospitals under the national programme.',
+          en: "The whole first-visit panel together. It's free at most "
+              "government hospitals under the national programme.",
           hi: 'पहली विज़िट का पूरा panel साथ में। ज़्यादातर सरकारी अस्पतालों में '
               'राष्ट्रीय कार्यक्रम के तहत मुफ़्त।')),
   'dating_scan': ScanCost(low: 800, high: 2500),
@@ -85,16 +85,16 @@ const Map<String, ScanCost> kScanCost = {
       low: 11000,
       high: 25000,
       note: LocalizedText(
-          en: 'The most expensive test in pregnancy, and optional. It is a '
-              'screening test, not a diagnosis.',
+          en: "The most expensive test in pregnancy, and it's optional. It's "
+              "a screening test, not a diagnosis.",
           hi: 'गर्भावस्था का सबसे महँगा test, और यह वैकल्पिक है। यह screening है, '
               'निदान नहीं।')),
   'anomaly_scan': ScanCost(
       low: 2000,
       high: 5000,
       note: LocalizedText(
-          en: 'Takes the longest of all the scans, so the price reflects the '
-              'time as much as the machine.',
+          en: "It's the longest of all the scans, so the price is for the "
+              "time as much as the machine.",
           hi: 'सभी scans में सबसे लंबा, तो क़ीमत मशीन जितनी ही समय की भी है।')),
   'ogtt': ScanCost(low: 400, high: 1200),
   'growth_scan': ScanCost(low: 1200, high: 3000),
@@ -102,7 +102,7 @@ const Map<String, ScanCost> kScanCost = {
       low: 1500,
       high: 3500,
       note: LocalizedText(
-          en: 'Usually done together with a growth scan and billed as one.',
+          en: 'Usually done with a growth scan and billed as one.',
           hi: 'आम तौर पर growth scan के साथ ही होता है और एक ही बिल बनता है।')),
   'gbs': ScanCost(low: 600, high: 1800),
 };
@@ -114,11 +114,11 @@ const Map<String, ScanCost> kScanCost = {
 /// refusal may be blunt so she is not hurt by it, and it says why the law
 /// exists so the refusal reads as protection rather than obstruction.
 const LocalizedText kPcpndtLine = LocalizedText(
-  en: "They will not tell you the baby's sex, and they are not allowed to — "
-      'the PCPNDT Act makes it illegal anywhere in India. Some sonographers '
-      'say so bluntly, and there is often a sign on the wall. It is not about '
-      'you. The law exists because sex-selective abortion cost this country '
-      'millions of daughters.',
+  en: "They won't tell you the baby's sex, and they aren't allowed to. The "
+      "PCPNDT Act makes it illegal anywhere in India. Some sonographers say "
+      "so bluntly, and there's often a sign on the wall. It isn't about you. "
+      "The law exists because sex-selective abortion cost this country "
+      "millions of daughters.",
   hi: 'वे आपको बच्चे का लिंग नहीं बताएँगे, और बता भी नहीं सकते — PCPNDT Act के '
       'तहत यह पूरे भारत में ग़ैरक़ानूनी है। कई sonographer सीधे मना कर देते हैं, '
       'और दीवार पर बोर्ड भी लगा होता है। यह आप पर शक नहीं है। यह क़ानून इसलिए है '
@@ -132,8 +132,8 @@ const LocalizedText kPcpndtLine = LocalizedText(
 const Map<String, List<LocalizedText>> kScanRedFlags = {
   'dating_scan': [
     _RF(
-        'Bleeding, or pain low down on one side — especially if the scan could '
-        'not yet see the pregnancy in the womb.',
+        "Bleeding, or pain low down on one side, especially if the scan "
+        "couldn't yet see the pregnancy in the womb.",
         'ख़ून आना, या नीचे एक तरफ़ दर्द — ख़ासकर अगर scan में गर्भ अभी गर्भाशय में '
             'दिखा ही न हो।'),
   ],
@@ -142,26 +142,27 @@ const Map<String, List<LocalizedText>> kScanRedFlags = {
         'scan के बाद के दिनों में किसी भी तरह का ख़ून आना।'),
   ],
   'anomaly_scan': [
-    _RF('Fluid leaking, steady bleeding, or a tight painful belly.',
+    _RF('Fluid leaking, steady bleeding, or a tight, painful belly.',
         'पानी जाना, लगातार ख़ून आना, या पेट का कसकर दर्द करना।'),
     _RF(
-        'If they mentioned the placenta is low, note it — it changes what to '
-        'watch for, and it usually moves up by the third trimester.',
+        'If they said the placenta is low, make a note of it. It changes '
+        'what to watch for, and it usually moves up by the third trimester.',
         'अगर उन्होंने placenta नीचे होने की बात कही हो तो याद रखिए — इससे ध्यान '
             'रखने वाली बातें बदल जाती हैं, और आम तौर पर तीसरी तिमाही तक वह ऊपर '
             'चला जाता है।'),
   ],
   'growth_scan': [
-    _RF('The baby moving noticeably less than usual, on any day.',
+    _RF('Your baby moving noticeably less than usual, on any day.',
         'किसी भी दिन बच्चे का रोज़ से काफ़ी कम हिलना-डुलना।'),
   ],
   'doppler': [
-    _RF('Reduced movements, or a headache with blurred vision or swelling.',
+    _RF('Fewer movements than usual, or a headache with blurred vision or '
+        'swelling.',
         'हलचल कम होना, या सिरदर्द के साथ धुँधला दिखना या सूजन।'),
   ],
   'ogtt': [
-    _RF('Feeling faint, shaky or very unwell during the test itself — tell the '
-        'lab staff at once rather than finishing it.',
+    _RF('Feeling faint, shaky or very unwell during the test itself. Tell '
+        'the lab staff straight away rather than finishing it.',
         'test के दौरान ही चक्कर, कँपकँपी या बहुत तबीयत ख़राब लगना — test पूरा '
             'करने की बजाय तुरंत lab के स्टाफ़ को बताइए।'),
   ],
@@ -174,19 +175,20 @@ const Map<String, List<LocalizedText>> kScanRedFlags = {
 /// is the one on this list a mother would otherwise ignore. ~74,000 people a
 /// month search "ectopic".
 const List<LocalizedText> kScanUrgentSigns = [
-  _RF('Bleeding — more than spotting, or with clots.',
+  _RF("Bleeding that's more than spotting, or has clots.",
       'ख़ून आना — हल्के दाग़ से ज़्यादा, या थक्कों के साथ।'),
-  _RF('Sharp pain low down on one side that does not ease.',
+  _RF("Sharp pain low down on one side that doesn't ease.",
       'नीचे एक तरफ़ तेज़ दर्द जो कम नहीं हो रहा।'),
   _RF('Pain at the tip of your shoulder, with belly pain or feeling faint.',
       'कंधे के सिरे पर दर्द, साथ में पेट दर्द या चक्कर।'),
   _RF('Fluid leaking, or a gush of water.',
       'पानी रिसना, या एकदम से पानी जाना।'),
-  _RF('The baby moving much less than usual.',
+  _RF('Your baby moving much less than usual.',
       'बच्चे का रोज़ से बहुत कम हिलना।'),
-  _RF('A bad headache with blurred vision, or sudden swelling of face and hands.',
+  _RF('A bad headache with blurred vision, or sudden swelling of your face '
+      'and hands.',
       'तेज़ सिरदर्द के साथ धुँधला दिखना, या चेहरे और हाथों में अचानक सूजन।'),
-  _RF('Fever above 38°C, or burning that makes you dread passing urine.',
+  _RF('A fever above 38°C, or burning so bad you dread passing urine.',
       '38°C से ऊपर बुख़ार, या पेशाब में इतनी जलन कि जाने से डर लगे।'),
 ];
 

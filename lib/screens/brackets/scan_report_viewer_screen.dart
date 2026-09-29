@@ -524,7 +524,7 @@ class _PdfScreenState extends State<_PdfScreen> {
             return Padding(
               padding: const EdgeInsets.all(24),
               child: Text(
-                  'This file could not be opened. It may have been moved or '
+                  "This file couldn't be opened. It may have been moved or "
                   'removed from your phone.',
                   style: pvManrope(
                       fontSize: 14, height: 1.55, color: p.ink2)),
