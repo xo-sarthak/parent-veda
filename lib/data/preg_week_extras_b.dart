@@ -446,7 +446,9 @@ const List<PregWeekExtra> kPregWeekExtrasB = [
             'a call to your doctor or the labour ward straight away.',
       ),
     ],
-    sources: ['mohfw_anc', 'mohfw_pmsma', 'nice_ng201', 'who_anc', 'moore_embryology'],
+    // mohfw_gdm backs the glucose-test answer (added 2026-09-29, the user:
+    // "if India's health ministry guideline says it, add it").
+    sources: ['mohfw_gdm', 'mohfw_anc', 'mohfw_pmsma', 'nice_ng201', 'who_anc'],
   ),
 
   // ---------------------------------------------------------------- week 25

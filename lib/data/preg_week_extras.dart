@@ -127,6 +127,10 @@ const Map<String, PregWeekSource> kPregWeekSources = {
       'Ministry of Health and Family Welfare, Government of India. Pradhan '
       'Mantri Surakshit Matritva Abhiyan (PMSMA) operational guidelines. '
       '2016.'),
+  'mohfw_gdm': PregWeekSource(
+      'Ministry of Health and Family Welfare, Government of India. Diagnosis '
+      'and Management of Gestational Diabetes Mellitus: Technical and '
+      'Operational Guidelines. 2018.'),
   'icmr_nin': PregWeekSource(
       'ICMR–National Institute of Nutrition. Dietary Guidelines for Indians. '
       '2024.'),
