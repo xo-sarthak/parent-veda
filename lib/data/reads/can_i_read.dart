@@ -81,6 +81,11 @@ String canIVerdictWord(CanIVerdict v) => switch (v) {
 
 LocalizedText _same(String s) => LocalizedText(en: s, hi: s);
 
+/// The heading over the Indian line. "Kitchen" fits food and drink; a
+/// flight or a medicine gets the plainer "In India" (2026-09-29).
+String canIIndianHeading(CanICategory c) =>
+    c == CanICategory.eat || c == CanICategory.drink ? 'In an Indian kitchen' : 'In India';
+
 PvRead pvReadFromCanI(CanIEntry e, {int? week}) {
   final swaps = canIInsteadOf(e);
   final swapIds = {for (final s in swaps) s.id};
@@ -96,6 +101,9 @@ PvRead pvReadFromCanI(CanIEntry e, {int? week}) {
     title: e.name,
     teaser: _same(canIQuestion(e.category)),
     scaleSetter: e.short,
+    // The short answer is the entry's own two-line answer (2026-09-29, the
+    // pregnancy warmth pass: every read opens with one).
+    shortAnswer: e.short,
     author: _desk,
     authorRole: _kicker,
     reviewed: false,
@@ -109,9 +117,9 @@ PvRead pvReadFromCanI(CanIEntry e, {int? week}) {
             heading: _same(week == null ? 'Through the trimesters' : 'Earlier and later in pregnancy'),
             bullets: others,
             collapsible: true,
-            summary: _same('How the answer shifts as the weeks go by.')),
+            summary: _same('How the answer changes as the weeks go by.')),
       if (e.indian case final ind?)
-        PvReadSection(heading: _same('In an Indian kitchen'), paragraphs: [ind]),
+        PvReadSection(heading: _same(canIIndianHeading(e.category)), paragraphs: [ind]),
       PvReadSection(custom: PvCanIDoctorBlock(e)),
     ],
     whenToSeeSomeone: PvCallout(
@@ -121,10 +129,10 @@ PvRead pvReadFromCanI(CanIEntry e, {int? week}) {
           : 'General guidance, not a prescription'),
       body: _same(e.verdict == CanIVerdict.askDoctor
           ? 'The right answer depends on your history and your dose. Take this '
-              'page to your doctor and let them decide for you.'
+              'page to your doctor and let them decide.'
           : 'If your doctor has told you something different for your '
-              'pregnancy, they are right and this page is not. Record what '
-              'they said under My doctor said, and this answer remembers it.'),
+              'pregnancy, go with your doctor. Record what they said under '
+              'My doctor said, and this answer will remember it.'),
     ),
     faqs: const [],
     readNext: [
@@ -135,13 +143,13 @@ PvRead pvReadFromCanI(CanIEntry e, {int? week}) {
       PvReadNextStep(
         kind: PvNextKind.tool,
         title: _same('Send this answer to someone'),
-        value: _same('The verdict and the why, as a message — for the partner who does the shopping.'),
+        value: _same('The verdict and the reason, as a message for whoever does the shopping.'),
         action: 'cani_share',
       ),
       PvReadNextStep(
         kind: PvNextKind.ask,
         title: _same('Something specific? Ask Veda about ${e.name.en}'),
-        value: _same('Your brand, your dose, your week — in your own words.'),
+        value: _same('Your brand, your dose, your week, in your own words.'),
         action: 'cani_askveda',
       ),
     ],

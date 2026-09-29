@@ -94,7 +94,7 @@ class CanIAnswerReader extends StatelessWidget {
 String canIShareText(CanIEntry e, {int? week}) {
   final note = week == null ? null : canINoteForWeek(e, week);
   final b = StringBuffer()
-    ..writeln('${e.name.en} in pregnancy — ${canIVerdictWord(e.verdict)}')
+    ..writeln('${e.name.en} in pregnancy: ${canIVerdictWord(e.verdict)}')
     ..writeln()
     ..writeln(e.short.en);
   if (note != null) {
@@ -104,7 +104,7 @@ String canIShareText(CanIEntry e, {int? week}) {
   }
   b
     ..writeln()
-    ..write('— ParentVeda · Is it safe? General guidance, not a prescription.');
+    ..write('ParentVeda · Is it safe? General guidance, not a prescription.');
   return b.toString();
 }
 
@@ -170,7 +170,7 @@ class _InsteadView extends StatelessWidget {
           child: canIHeading(p, 'Instead, try',
               sub: block.entry.verdict == CanIVerdict.avoid
                   ? 'What you can reach for in its place.'
-                  : 'If you would rather not think about the limit.'),
+                  : "If you'd rather not count the limit."),
         ),
         const SizedBox(height: 12),
         SizedBox(
@@ -212,8 +212,8 @@ class _DoctorView extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(0, 6, 0, 10),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             canIHeading(p, 'My doctor said',
-                sub: 'Your doctor knows your pregnancy; this page does not. '
-                    'Record their call and it sits above ours here.'),
+                sub: "Your doctor knows your pregnancy and this page doesn't. "
+                    'Record their call and it shows above ours here.'),
             const SizedBox(height: 12),
             if (said != null) ...[
               Row(children: [

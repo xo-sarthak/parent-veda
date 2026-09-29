@@ -190,7 +190,7 @@ class CanIVerdictScreen extends StatelessWidget {
                     'Instead, try',
                     sub: e.verdict == CanIVerdict.avoid
                         ? 'What you can reach for in its place.'
-                        : 'If you would rather not think about the limit.',
+                        : "If you'd rather not count the limit.",
                     flush: true,
                     child: _rail(context, swaps, p),
                   ),
@@ -218,7 +218,7 @@ class CanIVerdictScreen extends StatelessWidget {
                   _rule(p),
                   _section(
                     p,
-                    'In an Indian kitchen',
+                    canIIndianHeading(e.category),
                     child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Padding(
                         padding: const EdgeInsets.only(top: 2),
@@ -235,7 +235,7 @@ class CanIVerdictScreen extends StatelessWidget {
                 _section(
                   p,
                   'My doctor said',
-                  sub: 'Your doctor knows your pregnancy; this page does not. Record their call and it sits above ours.',
+                  sub: "Your doctor knows your pregnancy and this page doesn't. Record their call and it shows above ours.",
                   child: _doctor(p, e),
                 ),
 
@@ -287,8 +287,8 @@ class CanIVerdictScreen extends StatelessWidget {
                   child: PvDoorDisclaimer(
                       p: p,
                       text: e.verdict == CanIVerdict.askDoctor
-                          ? 'This one is your doctor\'s call: the right answer depends on your history and your dose.'
-                          : 'General guidance for a healthy pregnancy, not a prescription. If your doctor has said otherwise, they are right.'),
+                          ? "This one is your doctor's call. The right answer depends on your history and your dose."
+                          : 'General guidance for a healthy pregnancy, not a prescription. If your doctor has told you something different, go with your doctor.'),
                 ),
                 const SizedBox(height: 28),
               ]),

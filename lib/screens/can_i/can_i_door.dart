@@ -127,7 +127,7 @@ class _CanIDoorBodyState extends State<CanIDoorBody> {
                   padding: EdgeInsets.zero,
                   keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
                   children: [
-                    _hero(p, bracket?.blurb.now ?? 'Food, medicines, travel, beauty — what is fine and what is not.'),
+                    _hero(p, bracket?.blurb.now ?? "Food, medicines, travel and beauty: what's fine and what isn't."),
                     PvDoorSheet(
                       p: p,
                       minHeightFactor: 0.8,
@@ -397,7 +397,7 @@ class _CanIDoorBodyState extends State<CanIDoorBody> {
               p,
               Icons.photo_camera_outlined,
               'Take a photo',
-              'A fruit, a plate, a packet, a cream — anything.',
+              'A fruit, a plate, a packet or a cream. Anything.',
               'photo',
             ),
             _choice(
@@ -405,7 +405,7 @@ class _CanIDoorBodyState extends State<CanIDoorBody> {
               p,
               Icons.qr_code_scanner_rounded,
               'Scan a barcode',
-              'Packaged food and medicines; exact when the packet is known.',
+              'Packaged food and medicines. Exact when we know the packet.',
               'barcode',
               last: true,
             ),
@@ -480,7 +480,7 @@ class _CanIDoorBodyState extends State<CanIDoorBody> {
         canIHeading(
           p,
           hits.isEmpty ? 'Nothing by that name yet' : 'Results',
-          sub: hits.isEmpty ? 'Try the plain name — "noodles", not the brand — or ask Veda.' : null,
+          sub: hits.isEmpty ? 'Try the plain name, like "noodles" instead of the brand, or ask Veda.' : null,
         ),
       ),
       const SizedBox(height: 6),
@@ -554,7 +554,7 @@ class _CanIDoorBodyState extends State<CanIDoorBody> {
       // Nothing of hers yet: the twelve, so the keyboard never rises over
       // a blank sheet. (Not the recents' empty line — a hint is not a section.)
       if (recents.isEmpty && saved.isEmpty) ...[
-        pvDoorPad(canIHeading(p, 'Asked most', sub: 'Type a food, a medicine, a thing you want to do — or tap one.')),
+        pvDoorPad(canIHeading(p, 'Asked most', sub: 'Type a food, a medicine or something you want to do, or tap one below.')),
         const SizedBox(height: 14),
         pvDoorPad(_grid([for (final id in kCanIAskedMost) ?canIById(id)], p)),
         const SizedBox(height: 26),
@@ -615,7 +615,7 @@ class _CanIDoorBodyState extends State<CanIDoorBody> {
       // const SizedBox(height: 26),
 
       // ---- ASKED MOST ----------------------------------------------------
-      pvDoorPad(canIHeading(p, 'Asked most', sub: 'The dozen every pregnancy asks in its first month.')),
+      pvDoorPad(canIHeading(p, 'Asked most', sub: 'The twelve questions almost every pregnancy starts with.')),
       const SizedBox(height: 14),
       pvDoorPad(_grid([for (final id in kCanIAskedMost) ?canIById(id)], p)),
       const SizedBox(height: 26),
@@ -644,7 +644,7 @@ class _CanIDoorBodyState extends State<CanIDoorBody> {
           week == null ? 'For your trimester' : 'For your weeks · ${_trimesterWord(week)}',
           sub: week == null
               ? 'Set your due date and this shelf fills with what changes for your trimester.'
-              : 'Answers that shift with the trimester you are in.',
+              : "Answers that change with the trimester you're in.",
         ),
       ),
       const SizedBox(height: 14),
@@ -662,7 +662,7 @@ class _CanIDoorBodyState extends State<CanIDoorBody> {
           p: p,
           text:
               'General guidance for a healthy pregnancy, not a prescription. '
-              'Your doctor knows your history; if they have said otherwise, they are right.',
+              'ParentVeda explains and reminds. Your doctor decides.',
         ),
       ),
     ];
@@ -875,7 +875,7 @@ class _CanIGroupScreenState extends State<CanIGroupScreen> {
       intro: switch (widget.category) {
         CanICategory.eat => 'Every food we have an answer for, by shelf. The dot is the verdict; tap for the why.',
         CanICategory.drink => 'From chai to coconut water. The dot is the verdict; tap for the why.',
-        CanICategory.take => 'Medicines and supplements. Many are your doctor\'s call — the page says which.',
+        CanICategory.take => "Medicines and supplements. Many are your doctor's call, and each answer says which.",
         CanICategory.doActivity => 'Travel, exercise, beauty, the house. The dot is the verdict; tap for the why.',
       },
       children: [

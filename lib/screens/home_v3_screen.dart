@@ -58,6 +58,7 @@ import '../models/week_content.dart' show WeekContent;
 import '../services/pregnancy_controller.dart';
 import 'weekly_card_stack_screen.dart';
 import 'preg_daily_insights.dart';
+import '../data/preg_daily_tips.dart' show pregDailyTipFor;
 import 'symptoms/door/symptoms_widgets.dart' show symptomLineMark;
 import '../data/symptoms/symptom_library.dart' show symptomById;
 import 'v2/preg_size_sheet.dart';
@@ -334,9 +335,10 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
     // not yet in Hindi, a Hindi reader got the branch chosen for her by a
     // language she is not reading, and then got it in English. Checking one
     // language and rendering another is how a fallback stops falling back.
-    final remember = day?.grow.remember.now.trim() ?? '';
-    final insight =
-        remember.isNotEmpty ? remember : (day?.grow.insight.now ?? '');
+    // Kept for revert (the tip's old source, retired 2026-09-29 below):
+    // final remember = day?.grow.remember.now.trim() ?? '';
+    // final insight =
+    //     remember.isNotEmpty ? remember : (day?.grow.insight.now ?? '');
 
     final name = pregnancy.motherName.trim();
 
@@ -345,7 +347,14 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
     // greeting is not the interstitial §16.3 bans.
     // The day within the week, as the hero says it — the tip said WEEK 4 ·
     // DAY 14 over a hero saying Week 4 · Day 7 (the phone, 2026-09-22).
-    _maybeShowTip(insight, week, ((activeDay - 1) % 7) + 1, p);
+    // ⚠️ A PREGNANCY TIP FOR HER WEEK, 2026-09-29. The gap analysis (P1,
+    // "Make 'Today's tip' a practical pregnancy tip for that week") found the
+    // pop-up showing a parenting reflection ("Offer the warmth; let the
+    // flower choose its hour."). Seven practical tips per week now come from
+    // the week's own data (lib/data/preg_daily_tips.dart). Kept for revert:
+    //   _maybeShowTip(insight, week, ((activeDay - 1) % 7) + 1, p);
+    final dayInWeek = ((activeDay - 1) % 7) + 1;
+    _maybeShowTip(pregDailyTipFor(week, dayInWeek), week, dayInWeek, p);
 
     // The field's hue: the trimester's — the arrival green of the first, the
     // warm second, the deep third. One colour decision, shared with the sheet.

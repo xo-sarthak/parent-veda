@@ -274,7 +274,7 @@ class _CanIScanScreenState extends State<CanIScanScreen> {
               child: Column(children: [
                 AnimatedSwitcher(
                   duration: const Duration(milliseconds: 220),
-                  child: Text(_busy ? 'Got it — reading the packet…' : 'Point at the barcode on the packet',
+                  child: Text(_busy ? 'Got it. Reading the packet…' : 'Point at the barcode on the packet',
                       key: ValueKey(_busy),
                       textAlign: TextAlign.center,
                       style: pvFraunces(fontSize: 20, fontWeight: FontWeight.w600, color: Colors.white)),
@@ -408,7 +408,7 @@ class _IdentifyingOverlay extends StatelessWidget {
           Text('Looking closely…',
               style: pvFraunces(fontSize: 20, fontWeight: FontWeight.w600, color: Colors.white)),
           const SizedBox(height: 4),
-          Text(hint.isEmpty ? 'A second or two.' : 'You said "$hint" — checking.',
+          Text(hint.isEmpty ? 'A second or two.' : 'You said "$hint". Checking now.',
               style: pvManrope(fontSize: 13, color: Colors.white.withValues(alpha: 0.8))),
           const SizedBox(height: 14),
           SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: p.ground)),
@@ -521,7 +521,7 @@ Future<CanIIdentifyChoice> showCanIIdentifyResult(
                 Text('Switching on soon',
                     style: pvFraunces(fontSize: 22, fontWeight: FontWeight.w600, height: 1.2, color: p.ink1)),
                 const SizedBox(height: 8),
-                Text('Photo lookup is not live in this build yet. Type what it is and the answer is the same.',
+                Text("Photo lookup isn't switched on yet. Type what it is and you'll get the same answer.",
                     style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2)),
                 const SizedBox(height: 16),
                 FilledButton(
@@ -530,17 +530,17 @@ Future<CanIIdentifyChoice> showCanIIdentifyResult(
                   child: const Text('Type it instead'),
                 ),
               ] else ...[
-                Text(product ?? 'We could not read that',
+                Text(product ?? "We couldn't read that",
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: pvFraunces(fontSize: 22, fontWeight: FontWeight.w600, height: 1.2, color: p.ink1)),
                 const SizedBox(height: 8),
                 Text(
                     product == null
-                        ? 'The barcode is not in the food database — common for regional brands. '
-                            'Type the name and we will look it up that way.'
-                        : 'We have noted it, so the answer can be written. Until then, ask Veda '
-                            'or type the plain name — "noodles", not the brand.',
+                        ? "This barcode isn't in the food database yet. That's common for regional brands. "
+                            "Type the name and we'll look it up that way."
+                        : "We've noted it so an answer can be written. Until then, ask Veda, "
+                            'or type the plain name, like "noodles" instead of the brand.',
                     style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2)),
                 const SizedBox(height: 16),
                 FilledButton(
@@ -663,7 +663,7 @@ class _FoundSheet extends StatelessWidget {
             child: TextButton(
               onPressed: () =>
                   Navigator.pop(ctx, source == 'barcode' ? CanIIdentifyChoice.again : CanIIdentifyChoice.close),
-              child: Text(source == 'barcode' ? 'Not this one — scan again' : 'Not this one',
+              child: Text(source == 'barcode' ? 'Not this one. Scan again' : 'Not this one',
                   style: pvManrope(fontSize: 13, fontWeight: FontWeight.w700, color: p.ink2)),
             ),
           ),

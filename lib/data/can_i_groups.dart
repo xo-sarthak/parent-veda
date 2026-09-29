@@ -84,7 +84,7 @@ const List<CanIGroup> kCanIGroups = [
     'paracetamol', 'ibuprofen', 'combiflam', 'aspirin', 'diclofenac',
   ]),
   CanIGroup(id: 'cold_cough', label: 'Cold, cough and allergy', category: CanICategory.take, entryIds: [
-    'cetirizine', 'cough_syrup', 'lozenges', 'vicks_balm', 'antibiotics',
+    'common_cold', 'cetirizine', 'cough_syrup', 'lozenges', 'vicks_balm', 'antibiotics',
   ]),
   CanIGroup(id: 'stomach', label: 'Stomach and nausea', category: CanICategory.take, entryIds: [
     'antacids', 'pantoprazole', 'ondansetron', 'doxylamine', 'laxative',
@@ -107,26 +107,28 @@ const List<CanIGroup> kCanIGroups = [
   ]),
   CanIGroup(id: 'exercise', label: 'Exercise and effort', category: CanICategory.doActivity, entryIds: [
     'yoga', 'swimming', 'walking', 'cycling', 'running', 'dancing', 'gym', 'trekking',
-    'climbing_stairs', 'lifting', 'standing_long', 'household_chores',
+    'climbing_stairs', 'lifting', 'standing_long', 'household_chores', 'hot_yoga',
   ]),
   CanIGroup(id: 'beauty', label: 'Hair, skin and beauty', category: CanICategory.doActivity, entryIds: [
     'hair_color', 'waxing', 'nail_polish', 'keratin', 'facial', 'chemical_peel',
     'botox_fillers', 'laser_hair', 'pedicure', 'makeup', 'sunscreen', 'retinol',
     'perfume', 'hair_oil', 'tattoo', 'gel_nails', 'high_heels', 'tight_clothes',
+    'hair_removal_cream',
   ]),
   CanIGroup(id: 'home', label: 'Around the house', category: CanICategory.doActivity, entryIds: [
     'mosquito_repellent', 'ac_use', 'incense', 'cleaning_chemicals', 'paint_fumes',
     'pesticides', 'pet_cats', 'pet_dogs', 'gardening', 'mobile_phone',
-    'hot_water_bath', 'sauna', 'spa', 'massage',
+    'hot_water_bath', 'milk_bath', 'sauna', 'spa', 'massage',
   ]),
   CanIGroup(id: 'rest', label: 'Rest, intimacy and mind', category: CanICategory.doActivity, entryIds: [
-    'sleeping_back', 'sex', 'meditation', 'stress', 'fasting',
+    'sleeping_back', 'sex', 'masturbation', 'breastfeeding_pregnant', 'meditation',
+    'stress', 'fasting',
   ]),
-  CanIGroup(id: 'smoke', label: 'Smoke', category: CanICategory.doActivity, entryIds: [
-    'smoking', 'secondhand_smoke', 'vaping',
+  CanIGroup(id: 'smoke', label: 'Smoking, vaping and cannabis', category: CanICategory.doActivity, entryIds: [
+    'smoking', 'secondhand_smoke', 'vaping', 'cannabis',
   ]),
-  CanIGroup(id: 'clinic', label: 'Dentist and X-ray', category: CanICategory.doActivity, entryIds: [
-    'dental', 'xray',
+  CanIGroup(id: 'clinic', label: 'Dentist, X-rays and heartbeat monitors', category: CanICategory.doActivity, entryIds: [
+    'dental', 'xray', 'fetal_doppler',
   ]),
 ];
 
