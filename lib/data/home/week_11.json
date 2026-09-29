@@ -4,11 +4,11 @@
     "week": 11,
     "babyLearning": { "en": "Your baby's bones are starting to harden.", "hi": "नन्ही उँगलियाँ बन रही हैं, धीरे-धीरे खुलती हुई" },
     "grow": {
-      "title": { "en": "Courage Is Quiet", "hi": "हिम्मत शांत होती है" },
-      "insight": { "en": "Courage is not always loud. Most often it is the quiet choice to keep going, made softly, when no one is watching.", "hi": "हिम्मत हमेशा शोर नहीं मचाती। अक्सर तो यह आगे बढ़ते रहने का वह शांत फ़ैसला होता है, जो धीरे से लिया जाता है, जब कोई देख भी नहीं रहा होता।" },
-      "expanded": { "en": "We picture bravery as something dramatic — a bold leap, a roaring voice. But the courage that carries you through pregnancy is far gentler than that. It is getting up on a tired morning. It is letting yourself hope when you feel unsure. It is loving a little one you have not yet met. None of this looks heroic from the outside, yet all of it is quietly brave. You are learning a truth your child will need one day: that real courage rarely announces itself. It simply shows up, softly, and keeps going.", "hi": "हम बहादुरी को कुछ नाटकीय-सा सोचते हैं — एक निडर छलाँग, एक गरजती आवाज़। पर जो हिम्मत आपको गर्भावस्था से पार ले जाती है, वह उससे कहीं नरम है। यह थकी हुई सुबह में उठ जाना है। यह डगमगाते मन के बीच भी ख़ुद को उम्मीद करने देना है। यह उस नन्ही जान से प्यार करना है जिससे आप अभी मिली भी नहीं। बाहर से इसमें कुछ भी वीरता जैसा नहीं दिखता, फिर भी यह सब चुपचाप बहादुर है। आप एक ऐसा सच सीख रही हैं जो एक दिन आपके बच्चे के काम आएगा: कि असली हिम्मत अपना ऐलान कम ही करती है। वह बस धीरे से आती है, और चलती रहती है।" },
-      "deepDive": { "en": "Psychologists note that everyday courage — quietly facing the ordinary unknown — builds resilience more reliably than rare grand acts. It is practised in small, repeated moments.", "hi": "मनोविज्ञान के जानकार कहते हैं कि रोज़ की हिम्मत — आम अनजाने का चुपचाप सामना करना — कभी-कभार के बड़े कारनामों से कहीं ज़्यादा भरोसे के साथ भीतर की मज़बूती बनाती है। यह छोटे, बार-बार आने वाले पलों में पकती है।" },
-      "remember": { "en": "The bravest thing you do today may be the quietest.", "hi": "आज आप जो सबसे बहादुर काम करेंगी, शायद वही सबसे शांत होगा।" }
+      "title": { "en": "Courage is often quiet", "hi": "हिम्मत शांत होती है" },
+      "insight": { "en": "Courage isn't always loud. Most often it's the choice to keep going when no one is watching.", "hi": "हिम्मत हमेशा शोर नहीं मचाती। अक्सर तो यह आगे बढ़ते रहने का वह शांत फ़ैसला होता है, जो धीरे से लिया जाता है, जब कोई देख भी नहीं रहा होता।" },
+      "expanded": { "en": "We picture bravery as dramatic: a bold leap, a loud voice. The courage that gets you through pregnancy is gentler. It's getting up on a tired morning. It's letting yourself hope when you feel unsure. It's loving a little one you haven't met yet. None of this looks heroic from outside, yet all of it is brave. Your child will need to learn this one day too: courage rarely announces itself. It shows up and keeps going.", "hi": "हम बहादुरी को कुछ नाटकीय-सा सोचते हैं — एक निडर छलाँग, एक गरजती आवाज़। पर जो हिम्मत आपको गर्भावस्था से पार ले जाती है, वह उससे कहीं नरम है। यह थकी हुई सुबह में उठ जाना है। यह डगमगाते मन के बीच भी ख़ुद को उम्मीद करने देना है। यह उस नन्ही जान से प्यार करना है जिससे आप अभी मिली भी नहीं। बाहर से इसमें कुछ भी वीरता जैसा नहीं दिखता, फिर भी यह सब चुपचाप बहादुर है। आप एक ऐसा सच सीख रही हैं जो एक दिन आपके बच्चे के काम आएगा: कि असली हिम्मत अपना ऐलान कम ही करती है। वह बस धीरे से आती है, और चलती रहती है।" },
+      "deepDive": { "en": "Psychologists note that everyday courage, facing ordinary unknowns, builds resilience. It grows through small, repeated moments.", "hi": "मनोविज्ञान के जानकार कहते हैं कि रोज़ की हिम्मत — आम अनजाने का चुपचाप सामना करना — कभी-कभार के बड़े कारनामों से कहीं ज़्यादा भरोसे के साथ भीतर की मज़बूती बनाती है। यह छोटे, बार-बार आने वाले पलों में पकती है।" },
+      "remember": { "en": "The bravest thing you do today may be the one nobody notices.", "hi": "आज आप जो सबसे बहादुर काम करेंगी, शायद वही सबसे शांत होगा।" }
     },
     "readToBaby": {
       "title": { "en": "The Lion And The Gnat", "hi": "शेर और मच्छर" },
@@ -18,7 +18,7 @@
     },
     "talkToBaby": {
       "title": { "en": "Tell your baby about a festival or celebration you can't wait to share with them.", "hi": "अपने शिशु को एक ऐसे त्योहार या जश्न के बारे में बताइए जिसे इनके साथ मनाने का आपको बेसब्री से इंतज़ार है।" },
-      "motivation": { "en": "You're already inviting your child into the joys that mark your year.", "hi": "आप अभी से अपने बच्चे को उन ख़ुशियों में बुला रही हैं जो आपके साल को ख़ास बनाती हैं।" }
+      "motivation": { "en": "You're already inviting your child into the celebrations that mark your year.", "hi": "आप अभी से अपने बच्चे को उन ख़ुशियों में बुला रही हैं जो आपके साल को ख़ास बनाती हैं।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -33,8 +33,8 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Breathe Into The Brave", "hi": "बहादुरी में साँस लीजिए" },
-      "content": { "en": "Before a moment that feels daunting, breathe in slowly for four, then breathe out for six. Three rounds is enough to remind your body that you are safe.", "hi": "किसी ऐसे पल से पहले जो डराने वाला लगे, चार तक गिनते हुए धीरे से साँस लीजिए, फिर छह तक गिनते हुए छोड़िए। तीन बार काफ़ी है, शरीर को यह याद दिलाने के लिए कि आप सुरक्षित हैं।" },
+      "title": { "en": "A breath before something hard", "hi": "बहादुरी में साँस लीजिए" },
+      "content": { "en": "Before a moment that feels daunting, breathe in slowly for four, then breathe out for six. Three rounds is enough to remind your body that you're safe.", "hi": "किसी ऐसे पल से पहले जो डराने वाला लगे, चार तक गिनते हुए धीरे से साँस लीजिए, फिर छह तक गिनते हुए छोड़िए। तीन बार काफ़ी है, शरीर को यह याद दिलाने के लिए कि आप सुरक्षित हैं।" },
       "remember": { "en": "A slow breath is courage you can always reach for.", "hi": "एक धीमी साँस वह हिम्मत है जिसे आप हमेशा थाम सकती हैं।" },
       "durationMinutes": 1
     }
@@ -44,11 +44,11 @@
     "week": 11,
     "babyLearning": { "en": "Your baby can stretch and kick, though you can't feel it yet.", "hi": "दाँतों की नन्ही कलियाँ बन रही हैं, गहरे भीतर" },
     "grow": {
-      "title": { "en": "Brave Is Not Fearless", "hi": "बहादुर होना निडर होना नहीं है" },
-      "insight": { "en": "Being brave has never meant feeling no fear. It means feeling the fear and choosing love anyway.", "hi": "बहादुर होने का मतलब कभी यह नहीं रहा कि डर लगे ही नहीं। इसका मतलब है डर महसूस करना और फिर भी प्यार चुनना।" },
-      "expanded": { "en": "Somewhere we learned that fear is a flaw — that truly brave people simply do not feel it. But fear is part of caring deeply, and you will feel plenty of it on this journey. The brave thing is not to chase the fear away; it is to let it sit beside you and keep going anyway. Each time you act with love while afraid, you teach your heart that fear is not the boss of you. One day your child will watch you do exactly this, and learn that being scared and being brave can live in the very same breath.", "hi": "कहीं हमने सीख लिया कि डर एक कमी है — कि सच में बहादुर लोग इसे महसूस ही नहीं करते। पर डर गहरे प्यार का ही हिस्सा है, और इस सफ़र पर आप इसे ख़ूब महसूस करेंगी। बहादुरी डर को भगा देना नहीं है; बहादुरी उसे अपने बग़ल में बैठने देना और फिर भी आगे बढ़ते रहना है। हर बार जब आप डरते हुए भी प्यार से क़दम उठाती हैं, आप अपने दिल को सिखाती हैं कि डर आपका मालिक नहीं है। एक दिन आपका बच्चा आपको ठीक यही करते देखेगा, और सीखेगा कि डरना और बहादुर होना एक ही साँस में साथ रह सकते हैं।" },
-      "deepDive": { "en": "Courage researchers describe bravery as action in the presence of fear, not its absence. Acknowledging fear, rather than suppressing it, actually makes us steadier under pressure.", "hi": "हिम्मत पर काम करने वाले शोधकर्ता बहादुरी को डर के होते हुए उठाया गया क़दम बताते हैं, डर के न होने को नहीं। डर को दबाने के बजाय उसे मान लेना असल में हमें दबाव में ज़्यादा स्थिर बनाता है।" },
-      "remember": { "en": "You can be afraid and brave at the very same time.", "hi": "आप एक ही पल में डरी हुई भी हो सकती हैं और बहादुर भी।" }
+      "title": { "en": "Being brave doesn't mean feeling no fear", "hi": "बहादुर होना निडर होना नहीं है" },
+      "insight": { "en": "Being brave has never meant feeling no fear. It means feeling afraid and choosing love anyway.", "hi": "बहादुर होने का मतलब कभी यह नहीं रहा कि डर लगे ही नहीं। इसका मतलब है डर महसूस करना और फिर भी प्यार चुनना।" },
+      "expanded": { "en": "Somewhere we learned that fear is a flaw, and that brave people don't feel it. Fear is part of caring deeply, and you'll feel plenty of it in pregnancy and parenting. Being brave means letting the fear sit beside you and carrying on. Each time you act with love while you're afraid, fear gets a little less say. One day your child will watch you do this and learn that being scared and being brave can go together.", "hi": "कहीं हमने सीख लिया कि डर एक कमी है — कि सच में बहादुर लोग इसे महसूस ही नहीं करते। पर डर गहरे प्यार का ही हिस्सा है, और इस सफ़र पर आप इसे ख़ूब महसूस करेंगी। बहादुरी डर को भगा देना नहीं है; बहादुरी उसे अपने बग़ल में बैठने देना और फिर भी आगे बढ़ते रहना है। हर बार जब आप डरते हुए भी प्यार से क़दम उठाती हैं, आप अपने दिल को सिखाती हैं कि डर आपका मालिक नहीं है। एक दिन आपका बच्चा आपको ठीक यही करते देखेगा, और सीखेगा कि डरना और बहादुर होना एक ही साँस में साथ रह सकते हैं।" },
+      "deepDive": { "en": "Researchers who study courage describe it as acting while afraid, not as having no fear. Admitting fear, instead of pushing it down, tends to help people stay steady under pressure.", "hi": "हिम्मत पर काम करने वाले शोधकर्ता बहादुरी को डर के होते हुए उठाया गया क़दम बताते हैं, डर के न होने को नहीं। डर को दबाने के बजाय उसे मान लेना असल में हमें दबाव में ज़्यादा स्थिर बनाता है।" },
+      "remember": { "en": "You can be afraid and brave at the same time.", "hi": "आप एक ही पल में डरी हुई भी हो सकती हैं और बहादुर भी।" }
     },
     "readToBaby": {
       "title": { "en": "The Lion-Makers", "hi": "शेर बनाने वाले" },
@@ -57,7 +57,7 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about a food or meal that is special in your family.", "hi": "अपने शिशु को एक ऐसे पकवान या खाने के बारे में बताइए जो आपके परिवार में ख़ास है।" },
+      "title": { "en": "Tell your baby about a food or meal that's special in your family.", "hi": "अपने शिशु को एक ऐसे पकवान या खाने के बारे में बताइए जो आपके परिवार में ख़ास है।" },
       "motivation": { "en": "The tastes of home are some of the warmest memories you'll pass on.", "hi": "घर के स्वाद उन सबसे गरम यादों में से हैं जो आप आगे सौंपेंगी।" }
     },
     "garbhSanskar": {
@@ -73,9 +73,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "My Fear Does Not Make Me Weak", "hi": "मेरा डर मुझे कमज़ोर नहीं बनाता" },
-      "content": { "en": "Feeling afraid does not mean I am failing. It means I care, and caring is its own kind of strength.", "hi": "डर लगने का मतलब यह नहीं कि मैं हार रही हूँ। इसका मतलब है कि मुझे परवाह है, और परवाह करना अपने आप में एक ताक़त है।" },
-      "remember": { "en": "Fear is the shadow of how much you love.", "hi": "डर इस बात की परछाईं है कि आप कितना प्यार करती हैं।" },
+      "title": { "en": "Feeling afraid doesn't make me weak", "hi": "मेरा डर मुझे कमज़ोर नहीं बनाता" },
+      "content": { "en": "Feeling afraid doesn't mean I'm failing. It means I care, and caring takes strength.", "hi": "डर लगने का मतलब यह नहीं कि मैं हार रही हूँ। इसका मतलब है कि मुझे परवाह है, और परवाह करना अपने आप में एक ताक़त है।" },
+      "remember": { "en": "Your fear shows how much you love.", "hi": "डर इस बात की परछाईं है कि आप कितना प्यार करती हैं।" },
       "durationMinutes": 0
     }
   },
@@ -84,11 +84,11 @@
     "week": 11,
     "babyLearning": { "en": "Your baby may get hiccups now, far too small for you to feel.", "hi": "लात मारना और अंगड़ाई लेना, अभी इतना छोटा कि महसूस न हो" },
     "grow": {
-      "title": { "en": "You Are Stronger Than The Doubt", "hi": "आप शक़ से ज़्यादा मज़बूत हैं" },
-      "insight": { "en": "The voice that whispers 'you can't' is not the truth about you. It is only fear, and you are far bigger than it.", "hi": "जो आवाज़ फुसफुसाती है 'तुमसे नहीं होगा', वह आपके बारे में सच नहीं है। वह सिर्फ़ डर है, और आप उससे कहीं बड़ी हैं।" },
-      "expanded": { "en": "Almost every parent meets a quiet voice that says they are not ready, not capable, not enough. It can feel like the truth, but it is only doubt — loud, repetitive, and usually wrong. Notice that the very same you who hears the doubt is also the one who keeps showing up despite it. That is your real strength talking. You do not have to silence the doubt to move past it; you only have to keep walking while it mutters. Day by day, you are proving it wrong simply by continuing.", "hi": "लगभग हर माँ-बाप को एक शांत-सी आवाज़ मिलती है जो कहती है कि वे तैयार नहीं, क़ाबिल नहीं, काफ़ी नहीं। यह सच लग सकती है, पर यह सिर्फ़ शक़ है — ऊँचा, बार-बार लौटने वाला, और अक्सर ग़लत। ग़ौर कीजिए कि जो आप यह शक़ सुनती हैं, वही आप हैं जो उसके बावजूद हर दिन डटी रहती हैं। यही आपकी असली ताक़त बोल रही है। शक़ से आगे निकलने के लिए उसे चुप कराना ज़रूरी नहीं; आपको बस चलते रहना है जबकि वह बुदबुदाता रहे। दिन-ब-दिन, आप बस आगे बढ़ते रहकर उसे ग़लत साबित कर रही हैं।" },
-      "deepDive": { "en": "Psychologists find that 'self-doubt' is nearly universal among new parents and rarely reflects actual ability. Treating that inner critic as just one passing voice, not a verdict, builds genuine confidence.", "hi": "मनोविज्ञान के जानकार पाते हैं कि नए माता-पिता में ख़ुद पर शक़ लगभग सबको होता है और यह असली क़ाबिलियत का पैमाना कम ही होता है। भीतर बैठे उस आलोचक को बस एक गुज़रती आवाज़ मानना, कोई फ़ैसला नहीं, असली आत्मविश्वास बनाता है।" },
-      "remember": { "en": "Doubt talks loudly, but you are the one still standing.", "hi": "शक़ ज़ोर से बोलता है, पर खड़ी अब भी आप ही हैं।" }
+      "title": { "en": "Doubt isn't the truth about you", "hi": "आप शक़ से ज़्यादा मज़बूत हैं" },
+      "insight": { "en": "The voice that whispers 'you can't' isn't the truth about you. It's fear talking, and you're bigger than it.", "hi": "जो आवाज़ फुसफुसाती है 'तुमसे नहीं होगा', वह आपके बारे में सच नहीं है। वह सिर्फ़ डर है, और आप उससे कहीं बड़ी हैं।" },
+      "expanded": { "en": "Almost every parent meets a voice that says they're not ready, not capable, not enough. It can feel true, but it's doubt: loud, repetitive and usually wrong. Notice that the same you who hears the doubt keeps showing up anyway. That's your strength. You don't have to silence the doubt to move past it. You only have to keep going while it mutters. Day by day, you're proving it wrong by carrying on.", "hi": "लगभग हर माँ-बाप को एक शांत-सी आवाज़ मिलती है जो कहती है कि वे तैयार नहीं, क़ाबिल नहीं, काफ़ी नहीं। यह सच लग सकती है, पर यह सिर्फ़ शक़ है — ऊँचा, बार-बार लौटने वाला, और अक्सर ग़लत। ग़ौर कीजिए कि जो आप यह शक़ सुनती हैं, वही आप हैं जो उसके बावजूद हर दिन डटी रहती हैं। यही आपकी असली ताक़त बोल रही है। शक़ से आगे निकलने के लिए उसे चुप कराना ज़रूरी नहीं; आपको बस चलते रहना है जबकि वह बुदबुदाता रहे। दिन-ब-दिन, आप बस आगे बढ़ते रहकर उसे ग़लत साबित कर रही हैं।" },
+      "deepDive": { "en": "Research suggests self-doubt is very common among new parents and rarely reflects how capable they are. Treating that inner critic as one passing voice, not a verdict, helps build confidence.", "hi": "मनोविज्ञान के जानकार पाते हैं कि नए माता-पिता में ख़ुद पर शक़ लगभग सबको होता है और यह असली क़ाबिलियत का पैमाना कम ही होता है। भीतर बैठे उस आलोचक को बस एक गुज़रती आवाज़ मानना, कोई फ़ैसला नहीं, असली आत्मविश्वास बनाता है।" },
+      "remember": { "en": "Doubt talks loudly, but you're still here, still going.", "hi": "शक़ ज़ोर से बोलता है, पर खड़ी अब भी आप ही हैं।" }
     },
     "readToBaby": {
       "title": { "en": "Abhimanyu's Courage", "hi": "अभिमन्यु की हिम्मत" },
@@ -97,8 +97,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about a song or music tradition that means a lot to you.", "hi": "अपने शिशु को एक ऐसे गीत या संगीत की परंपरा के बारे में बताइए जो आपके लिए बहुत मायने रखती है।" },
-      "motivation": { "en": "Music is one of the first languages your baby will come to love.", "hi": "संगीत उन पहली भाषाओं में से है जिन्हें आपका शिशु प्यार करने लगेगा।" }
+      "title": { "en": "Tell your baby about a song or music that means a lot to you.", "hi": "अपने शिशु को एक ऐसे गीत या संगीत की परंपरा के बारे में बताइए जो आपके लिए बहुत मायने रखती है।" },
+      "motivation": { "en": "Music is one of the first things your baby will come to love.", "hi": "संगीत उन पहली भाषाओं में से है जिन्हें आपका शिशु प्यार करने लगेगा।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -113,9 +113,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "I Trust My Own Becoming", "hi": "मुझे अपने बनते जाने पर भरोसा है" },
-      "content": { "en": "I do not need to have it all figured out today. I trust that I am growing into exactly who my baby needs.", "hi": "मुझे आज सब कुछ समझ लेने की ज़रूरत नहीं। मुझे भरोसा है कि मैं ठीक वही बनती जा रही हूँ जिसकी मेरे शिशु को ज़रूरत है।" },
-      "remember": { "en": "You are already becoming the parent you hope to be.", "hi": "आप अभी से वही माँ बनती जा रही हैं जो आप बनना चाहती हैं।" },
+      "title": { "en": "I trust that I'm growing into this", "hi": "मुझे अपने बनते जाने पर भरोसा है" },
+      "content": { "en": "I don't need to have it all figured out today. I trust that I'm growing into who my baby needs.", "hi": "मुझे आज सब कुछ समझ लेने की ज़रूरत नहीं। मुझे भरोसा है कि मैं ठीक वही बनती जा रही हूँ जिसकी मेरे शिशु को ज़रूरत है।" },
+      "remember": { "en": "You're already becoming the parent you hope to be.", "hi": "आप अभी से वही माँ बनती जा रही हैं जो आप बनना चाहती हैं।" },
       "durationMinutes": 0
     }
   },
@@ -124,11 +124,11 @@
     "week": 11,
     "babyLearning": { "en": "Your baby's skin is still thin enough to see through.", "hi": "नन्ही हिचकियाँ शुरू हो रही हैं, नरम और अनदेखी" },
     "grow": {
-      "title": { "en": "Small Acts Of Bravery", "hi": "बहादुरी के छोटे काम" },
-      "insight": { "en": "You do not need one great act of courage. A life is changed by a hundred small, brave choices.", "hi": "आपको हिम्मत के एक बड़े कारनामे की ज़रूरत नहीं। ज़िंदगी सौ छोटे, बहादुर फ़ैसलों से बदलती है।" },
-      "expanded": { "en": "We tend to wait for big moments to prove our courage, but bravery is mostly made of small, unseen choices. Asking a question you were nervous to ask. Speaking up gently for what you and your baby need. Resting when everything inside says push harder. Letting yourself be honest about a hard feeling. None of these feel grand, yet each one is a small act of bravery. Strung together, they shape a person who knows how to face life. And your child, watching closely, will learn courage the way they learn everything — by seeing you live it.", "hi": "हम अक्सर अपनी हिम्मत साबित करने के लिए बड़े पलों का इंतज़ार करते हैं, पर बहादुरी ज़्यादातर छोटे, अनदेखे फ़ैसलों से बनती है। वह सवाल पूछ लेना जिसे पूछने में घबराहट हो रही थी। जो आपको और आपके शिशु को चाहिए, उसके लिए धीरे से आवाज़ उठाना। आराम कर लेना, जब भीतर सब कुछ कह रहा हो कि और ज़ोर लगाओ। किसी मुश्किल भावना के बारे में ख़ुद से ईमानदार हो जाना। इनमें से कुछ भी बड़ा नहीं लगता, फिर भी हर एक बहादुरी का एक छोटा काम है। ये सब जुड़कर एक ऐसा इंसान गढ़ते हैं जो ज़िंदगी का सामना करना जानता है। और आपका बच्चा, ध्यान से देखते हुए, हिम्मत उसी तरह सीखेगा जैसे बाक़ी सब कुछ सीखता है — आपको उसे जीते हुए देखकर।" },
-      "deepDive": { "en": "Behavioural science shows that small, repeated brave actions gradually expand what feels possible — a process called graded exposure. Courage grows by being practised, not by being waited for.", "hi": "व्यवहार पर हुए शोध बताते हैं कि छोटे, बार-बार किए गए बहादुर क़दम धीरे-धीरे यह बड़ा कर देते हैं कि क्या मुमकिन लगता है — इस तरीक़े को 'graded exposure' कहते हैं। हिम्मत अभ्यास से बढ़ती है, इंतज़ार से नहीं।" },
-      "remember": { "en": "Every small brave choice quietly makes you braver.", "hi": "हर छोटा बहादुर फ़ैसला चुपचाप आपको और बहादुर बना देता है।" }
+      "title": { "en": "Small brave choices add up", "hi": "बहादुरी के छोटे काम" },
+      "insight": { "en": "You don't need one great act of courage. A hundred small brave choices change a life.", "hi": "आपको हिम्मत के एक बड़े कारनामे की ज़रूरत नहीं। ज़िंदगी सौ छोटे, बहादुर फ़ैसलों से बदलती है।" },
+      "expanded": { "en": "We tend to wait for big moments to prove our courage, but bravery is mostly made of small choices no one sees. Asking a question you were nervous to ask. Speaking up gently for what you and your baby need. Resting when everything inside says push harder. Being honest about a hard feeling. None of these feels grand, but each is brave. Together, they shape a person who knows how to face life, and your child will learn courage by watching you live it.", "hi": "हम अक्सर अपनी हिम्मत साबित करने के लिए बड़े पलों का इंतज़ार करते हैं, पर बहादुरी ज़्यादातर छोटे, अनदेखे फ़ैसलों से बनती है। वह सवाल पूछ लेना जिसे पूछने में घबराहट हो रही थी। जो आपको और आपके शिशु को चाहिए, उसके लिए धीरे से आवाज़ उठाना। आराम कर लेना, जब भीतर सब कुछ कह रहा हो कि और ज़ोर लगाओ। किसी मुश्किल भावना के बारे में ख़ुद से ईमानदार हो जाना। इनमें से कुछ भी बड़ा नहीं लगता, फिर भी हर एक बहादुरी का एक छोटा काम है। ये सब जुड़कर एक ऐसा इंसान गढ़ते हैं जो ज़िंदगी का सामना करना जानता है। और आपका बच्चा, ध्यान से देखते हुए, हिम्मत उसी तरह सीखेगा जैसे बाक़ी सब कुछ सीखता है — आपको उसे जीते हुए देखकर।" },
+      "deepDive": { "en": "Research on behaviour shows that small, repeated brave actions slowly widen what feels possible. Therapists use this idea on purpose and call it graded exposure. Courage grows with practice.", "hi": "व्यवहार पर हुए शोध बताते हैं कि छोटे, बार-बार किए गए बहादुर क़दम धीरे-धीरे यह बड़ा कर देते हैं कि क्या मुमकिन लगता है — इस तरीक़े को 'graded exposure' कहते हैं। हिम्मत अभ्यास से बढ़ती है, इंतज़ार से नहीं।" },
+      "remember": { "en": "Every small brave choice makes you a little braver.", "hi": "हर छोटा बहादुर फ़ैसला चुपचाप आपको और बहादुर बना देता है।" }
     },
     "readToBaby": {
       "title": { "en": "The Quail And The Falcon", "hi": "बटेर और बाज़" },
@@ -153,9 +153,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "One Brave Breath", "hi": "एक बहादुर साँस" },
-      "content": { "en": "Choose one small thing you have been putting off. Before it, take one long, steadying breath in and out — then begin. Just one breath can carry you over the edge of hesitation.", "hi": "एक छोटी-सी चीज़ चुनिए जिसे आप टालती आ रही थीं। उससे पहले एक लंबी, स्थिर करती साँस अंदर लीजिए और छोड़िए — फिर शुरू कर दीजिए। सिर्फ़ एक साँस आपको झिझक की दहलीज़ के पार ले जा सकती है।" },
-      "remember": { "en": "Courage often begins with a single breath.", "hi": "हिम्मत अक्सर एक ही साँस से शुरू होती है।" },
+      "title": { "en": "One brave breath", "hi": "एक बहादुर साँस" },
+      "content": { "en": "Choose one small thing you've been putting off. Before you start, take one long, steadying breath in and out, then begin. One breath can carry you past the hesitation.", "hi": "एक छोटी-सी चीज़ चुनिए जिसे आप टालती आ रही थीं। उससे पहले एक लंबी, स्थिर करती साँस अंदर लीजिए और छोड़िए — फिर शुरू कर दीजिए। सिर्फ़ एक साँस आपको झिझक की दहलीज़ के पार ले जा सकती है।" },
+      "remember": { "en": "Courage often starts with a single breath.", "hi": "हिम्मत अक्सर एक ही साँस से शुरू होती है।" },
       "durationMinutes": 1
     }
   },
@@ -164,11 +164,11 @@
     "week": 11,
     "babyLearning": { "en": "Your baby's intestines, which grew partly in the cord, are moving inside.", "hi": "त्वचा अभी भी आर-पार दिखती है, पर दिन-ब-दिन मोटी होती जा रही" },
     "grow": {
-      "title": { "en": "Fear And Love Can Coexist", "hi": "डर और प्यार साथ रह सकते हैं" },
-      "insight": { "en": "You can love this baby with your whole heart and still feel afraid. The two were always meant to live together.", "hi": "आप इस शिशु को अपने पूरे दिल से प्यार कर सकती हैं और फिर भी डर महसूस कर सकती हैं। ये दोनों हमेशा से साथ ही रहने वाले थे।" },
-      "expanded": { "en": "Many parents feel a quiet guilt: how can I be so afraid when I love this child so much? But fear and love are not opposites. In fact, the fear comes precisely because the love is so large. You worry because something now matters more than anything. Rather than fighting the fear or hiding it, let it sit alongside the love, both pointing to the same tender truth: this little one already means the world to you. You do not have to choose between feeling afraid and feeling full of love. You are allowed to feel both at once.", "hi": "कई माता-पिता मन ही मन थोड़ा दोषी महसूस करते हैं: मैं इतनी डरी हुई कैसे हो सकती हूँ, जब मैं इस बच्चे से इतना प्यार करती हूँ? पर डर और प्यार एक-दूसरे के उलट नहीं हैं। असल में डर आता ही इसलिए है क्योंकि प्यार इतना बड़ा है। आप फ़िक्र करती हैं क्योंकि अब कुछ है जो बाक़ी सब से ज़्यादा मायने रखता है। डर से लड़ने या उसे छुपाने के बजाय, उसे प्यार के साथ-साथ बैठने दीजिए — दोनों एक ही कोमल सच की ओर इशारा करते हैं: यह नन्ही जान अभी से आपके लिए पूरी दुनिया है। आपको डरने और प्यार से भरे होने में से एक चुनना नहीं है। आपको दोनों एक साथ महसूस करने की पूरी इजाज़त है।" },
-      "deepDive": { "en": "Emotion researchers note that complex feelings often arrive together — fear and love, joy and worry. Allowing mixed emotions, rather than judging them, is a sign of emotional maturity, not confusion.", "hi": "भावनाओं पर काम करने वाले शोधकर्ता कहते हैं कि उलझी भावनाएँ अक्सर साथ-साथ आती हैं — डर और प्यार, ख़ुशी और चिंता। मिली-जुली भावनाओं को जज करने के बजाय उन्हें आने देना उलझन नहीं, मन के पकने की निशानी है।" },
-      "remember": { "en": "Your fear and your love both come from the same caring heart.", "hi": "आपका डर और आपका प्यार, दोनों उसी एक परवाह करने वाले दिल से आते हैं।" }
+      "title": { "en": "Fear and love can live together", "hi": "डर और प्यार साथ रह सकते हैं" },
+      "insight": { "en": "You can love this baby with your whole heart and still feel afraid. The two often come together.", "hi": "आप इस शिशु को अपने पूरे दिल से प्यार कर सकती हैं और फिर भी डर महसूस कर सकती हैं। ये दोनों हमेशा से साथ ही रहने वाले थे।" },
+      "expanded": { "en": "Many parents feel guilty: how can I be so afraid when I love this child so much? Fear and love aren't opposites. The fear often comes because the love is so big. You worry because something now matters more than anything. Instead of fighting the fear or hiding it, let it sit alongside the love. Both point to the same thing: this little one already means the world to you. You're allowed to feel both at once.", "hi": "कई माता-पिता मन ही मन थोड़ा दोषी महसूस करते हैं: मैं इतनी डरी हुई कैसे हो सकती हूँ, जब मैं इस बच्चे से इतना प्यार करती हूँ? पर डर और प्यार एक-दूसरे के उलट नहीं हैं। असल में डर आता ही इसलिए है क्योंकि प्यार इतना बड़ा है। आप फ़िक्र करती हैं क्योंकि अब कुछ है जो बाक़ी सब से ज़्यादा मायने रखता है। डर से लड़ने या उसे छुपाने के बजाय, उसे प्यार के साथ-साथ बैठने दीजिए — दोनों एक ही कोमल सच की ओर इशारा करते हैं: यह नन्ही जान अभी से आपके लिए पूरी दुनिया है। आपको डरने और प्यार से भरे होने में से एक चुनना नहीं है। आपको दोनों एक साथ महसूस करने की पूरी इजाज़त है।" },
+      "deepDive": { "en": "Emotion researchers note that mixed feelings often arrive together, like fear and love, or joy and worry. Allowing them, instead of judging them, is a healthy way to cope.", "hi": "भावनाओं पर काम करने वाले शोधकर्ता कहते हैं कि उलझी भावनाएँ अक्सर साथ-साथ आती हैं — डर और प्यार, ख़ुशी और चिंता। मिली-जुली भावनाओं को जज करने के बजाय उन्हें आने देना उलझन नहीं, मन के पकने की निशानी है।" },
+      "remember": { "en": "Your fear and your love come from the same caring heart.", "hi": "आपका डर और आपका प्यार, दोनों उसी एक परवाह करने वाले दिल से आते हैं।" }
     },
     "readToBaby": {
       "title": { "en": "Birbal And The Crow Count", "hi": "बीरबल और कौवों की गिनती" },
@@ -178,7 +178,7 @@
     },
     "talkToBaby": {
       "title": { "en": "Tell your baby about a place you visit every year.", "hi": "अपने शिशु को एक ऐसी जगह के बारे में बताइए जहाँ आप हर साल जाती हैं।" },
-      "motivation": { "en": "The places you return to become part of the map of who your child is.", "hi": "जिन जगहों पर आप बार-बार लौटती हैं, वे आपके बच्चे की पहचान के नक़्शे का हिस्सा बन जाती हैं।" }
+      "motivation": { "en": "The places you return to become part of your child's sense of who they are.", "hi": "जिन जगहों पर आप बार-बार लौटती हैं, वे आपके बच्चे की पहचान के नक़्शे का हिस्सा बन जाती हैं।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -193,8 +193,8 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "I Welcome All Of My Feelings", "hi": "मैं अपनी सारी भावनाओं का स्वागत करती हूँ" },
-      "content": { "en": "I do not have to tidy my feelings into neat boxes. Joy and worry, love and fear — all of them are welcome here.", "hi": "मुझे अपनी भावनाओं को सलीक़े के डिब्बों में समेटने की ज़रूरत नहीं। ख़ुशी और चिंता, प्यार और डर — इन सबका यहाँ स्वागत है।" },
+      "title": { "en": "All my feelings are welcome", "hi": "मैं अपनी सारी भावनाओं का स्वागत करती हूँ" },
+      "content": { "en": "I don't have to tidy my feelings into neat boxes. Joy and worry, love and fear, all of them are welcome here.", "hi": "मुझे अपनी भावनाओं को सलीक़े के डिब्बों में समेटने की ज़रूरत नहीं। ख़ुशी और चिंता, प्यार और डर — इन सबका यहाँ स्वागत है।" },
       "remember": { "en": "Two feelings can be true at once.", "hi": "दो भावनाएँ एक ही समय पर सच हो सकती हैं।" },
       "durationMinutes": 0
     }
@@ -204,11 +204,11 @@
     "week": 11,
     "babyLearning": { "en": "Your baby's head is about half the length of the whole body.", "hi": "नन्हे नाख़ूनों की जड़ें बनने लगी हैं" },
     "grow": {
-      "title": { "en": "Showing Up Is Courage", "hi": "मौजूद रहना ही हिम्मत है" },
-      "insight": { "en": "On the days you do nothing more than simply show up, you have already done the bravest thing.", "hi": "जिन दिनों आप सिर्फ़ मौजूद रह पाती हैं और कुछ नहीं, उन्हीं दिनों आप सबसे बहादुर काम कर चुकी होती हैं।" },
-      "expanded": { "en": "There will be days when you feel you have nothing to give — tired, low, unsure. On those days it is tempting to think you are failing. But simply showing up, staying present for your baby and yourself when it would be easier to retreat, is its own quiet act of courage. You do not have to feel strong to be strong. You only have to keep turning up, gently, again and again. This steady showing-up is the very heart of love, and it is the thing your child will feel long before they could ever name it.", "hi": "ऐसे दिन आएँगे जब लगेगा कि आपके पास देने को कुछ बचा ही नहीं — थकी हुई, उदास, डगमगाती। उन दिनों यह सोचना आसान होता है कि आप कहीं चूक रही हैं। पर बस मौजूद रहना, अपने शिशु के लिए और ख़ुद के लिए वहीं टिके रहना जब पीछे हट जाना कहीं आसान होता — यह अपने आप में हिम्मत का एक शांत काम है। मज़बूत होने के लिए मज़बूत महसूस करना ज़रूरी नहीं। आपको बस नरमी से, बार-बार लौट आना है। यही टिकी हुई मौजूदगी प्यार का असली दिल है, और यही वह चीज़ है जिसे आपका बच्चा उसे नाम देने से बहुत पहले महसूस कर लेगा।" },
-      "deepDive": { "en": "Attachment research highlights consistency over intensity: a caregiver who keeps showing up, even imperfectly, builds a child's deep sense of security. Presence, repeated, is what counts most.", "hi": "लगाव पर हुए शोध कहते हैं कि कितना ज़ोरदार, इससे ज़्यादा मायने यह रखता है कि कितना लगातार: जो बड़ा बार-बार मौजूद रहता है, चाहे हर बार सब ठीक न कर पाए, वही बच्चे के भीतर सुरक्षा की गहरी भावना बनाता है। मौजूदगी, बार-बार दोहराई गई, सबसे ज़्यादा मायने रखती है।" },
-      "remember": { "en": "Just showing up, again and again, is its own brave love.", "hi": "बस मौजूद रहना, बार-बार, अपने आप में एक बहादुर मोहब्बत है।" }
+      "title": { "en": "Showing up takes courage", "hi": "मौजूद रहना ही हिम्मत है" },
+      "insight": { "en": "On days when all you do is show up, you've already done something brave.", "hi": "जिन दिनों आप सिर्फ़ मौजूद रह पाती हैं और कुछ नहीं, उन्हीं दिनों आप सबसे बहादुर काम कर चुकी होती हैं।" },
+      "expanded": { "en": "Some days you'll feel you have nothing to give: tired, low, unsure. On those days it's tempting to think you're failing. Showing up, staying present for your baby and yourself when it would be easier to pull back, takes courage. You don't have to feel strong to be strong. You only have to keep turning up, again and again. This steady showing up is the heart of love, and your child will feel it long before they can name it.", "hi": "ऐसे दिन आएँगे जब लगेगा कि आपके पास देने को कुछ बचा ही नहीं — थकी हुई, उदास, डगमगाती। उन दिनों यह सोचना आसान होता है कि आप कहीं चूक रही हैं। पर बस मौजूद रहना, अपने शिशु के लिए और ख़ुद के लिए वहीं टिके रहना जब पीछे हट जाना कहीं आसान होता — यह अपने आप में हिम्मत का एक शांत काम है। मज़बूत होने के लिए मज़बूत महसूस करना ज़रूरी नहीं। आपको बस नरमी से, बार-बार लौट आना है। यही टिकी हुई मौजूदगी प्यार का असली दिल है, और यही वह चीज़ है जिसे आपका बच्चा उसे नाम देने से बहुत पहले महसूस कर लेगा।" },
+      "deepDive": { "en": "Attachment research puts consistency ahead of intensity. A caregiver who keeps showing up, even imperfectly, builds a child's sense of security.", "hi": "लगाव पर हुए शोध कहते हैं कि कितना ज़ोरदार, इससे ज़्यादा मायने यह रखता है कि कितना लगातार: जो बड़ा बार-बार मौजूद रहता है, चाहे हर बार सब ठीक न कर पाए, वही बच्चे के भीतर सुरक्षा की गहरी भावना बनाता है। मौजूदगी, बार-बार दोहराई गई, सबसे ज़्यादा मायने रखती है।" },
+      "remember": { "en": "Showing up, again and again, is a brave kind of love.", "hi": "बस मौजूद रहना, बार-बार, अपने आप में एक बहादुर मोहब्बत है।" }
     },
     "readToBaby": {
       "title": { "en": "Punyakoti, The Honest Cow", "hi": "पुण्यकोटि, सच्ची गाय" },
@@ -218,7 +218,7 @@
     },
     "talkToBaby": {
       "title": { "en": "Tell your baby about a game or pastime you can't wait to teach them.", "hi": "अपने शिशु को एक ऐसे खेल या शौक़ के बारे में बताइए जिसे सिखाने का आपको बेसब्री से इंतज़ार है।" },
-      "motivation": { "en": "The play you share will be some of the happiest time you spend together.", "hi": "जो खेल आप साथ बाँटेंगी, वही आपके साथ बिताए सबसे ख़ुशहाल पलों में होंगे।" }
+      "motivation": { "en": "The play you share will be some of your happiest time together.", "hi": "जो खेल आप साथ बाँटेंगी, वही आपके साथ बिताए सबसे ख़ुशहाल पलों में होंगे।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -233,8 +233,8 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Arrive Where You Are", "hi": "जहाँ हैं, वहीं पहुँचिए" },
-      "content": { "en": "Pause and take three slow breaths, feeling your feet on the floor. Let each breath bring you fully into this moment — you do not have to be anywhere but here.", "hi": "ज़रा रुकिए और तीन धीमी साँसें लीजिए, अपने पैरों को फ़र्श पर महसूस करते हुए। हर साँस को आपको पूरी तरह इसी पल में ले आने दीजिए — आपको यहाँ के अलावा कहीं और होने की ज़रूरत नहीं।" },
+      "title": { "en": "Be here for three breaths", "hi": "जहाँ हैं, वहीं पहुँचिए" },
+      "content": { "en": "Pause and take three slow breaths, feeling your feet on the floor. Let each breath bring you fully into this moment. You don't have to be anywhere but here.", "hi": "ज़रा रुकिए और तीन धीमी साँसें लीजिए, अपने पैरों को फ़र्श पर महसूस करते हुए। हर साँस को आपको पूरी तरह इसी पल में ले आने दीजिए — आपको यहाँ के अलावा कहीं और होने की ज़रूरत नहीं।" },
       "remember": { "en": "Showing up to this moment is enough.", "hi": "इस पल में मौजूद हो जाना ही काफ़ी है।" },
       "durationMinutes": 1
     }
@@ -244,11 +244,11 @@
     "week": 11,
     "babyLearning": { "en": "Tiny nail beds are forming on your baby's fingers.", "hi": "हफ़्ता पूरा होते-होते, लगातार मज़बूत होते हुए" },
     "grow": {
-      "title": { "en": "You Can Do Hard Things", "hi": "आप मुश्किल चीज़ें कर सकती हैं" },
-      "insight": { "en": "Look back at all you have already carried. You are someone who does hard things — quietly, and well.", "hi": "पीछे मुड़कर देखिए, आप अब तक कितना कुछ सँभाल चुकी हैं। आप वह हैं जो मुश्किल चीज़ें करती हैं — चुपचाप, और अच्छे से।" },
-      "expanded": { "en": "It is easy to forget how much you have already done. You have faced uncertainty, carried tiredness, held hope through worry — and you are still here, still going. That is the truest proof of your strength: not a feeling of confidence, but a track record of continuing. Hard things do not require you to feel ready or unafraid; they only ask that you keep taking the next small step. You have done that again and again. Trust that the same steady self who brought you this far will carry you through whatever comes next.", "hi": "यह भूल जाना आसान है कि आप पहले ही कितना कुछ कर चुकी हैं। आपने आगे क्या होगा यह न जानते हुए भी सामना किया, थकान सँभाली, चिंता के बीच उम्मीद थामी — और आप अब भी यहीं हैं, अब भी आगे बढ़ रही हैं। यही आपकी ताक़त का सबसे सच्चा सबूत है: आत्मविश्वास का कोई एहसास नहीं, बल्कि चलते रहने का एक पूरा रिकॉर्ड। मुश्किल चीज़ें आपसे यह नहीं माँगतीं कि आप तैयार या निडर महसूस करें; वे बस इतना माँगती हैं कि आप अगला छोटा क़दम उठाती रहें। आपने यह बार-बार किया है। भरोसा रखिए कि वही स्थिर आप, जो आपको यहाँ तक लाई हैं, जो भी आगे आए उसके पार भी ले जाएँगी।" },
-      "deepDive": { "en": "Psychologists call it 'self-efficacy' — the belief, built from past experience, that you can cope with what comes. Each hard thing you survive quietly strengthens it for the next.", "hi": "मनोविज्ञान के जानकार इसे 'self-efficacy' कहते हैं — पिछले तजुर्बे से बना वह भरोसा कि जो भी आए, आप उससे निपट लेंगी। हर मुश्किल चीज़ जिसे आप पार कर जाती हैं, वह चुपचाप अगली के लिए इसे और मज़बूत कर देती है।" },
-      "remember": { "en": "You have done hard things before, and you can again.", "hi": "आप पहले भी मुश्किल चीज़ें कर चुकी हैं, और दोबारा भी कर सकती हैं।" }
+      "title": { "en": "You can do hard things", "hi": "आप मुश्किल चीज़ें कर सकती हैं" },
+      "insight": { "en": "Look back at all you've already carried. You're someone who does hard things, and does them well.", "hi": "पीछे मुड़कर देखिए, आप अब तक कितना कुछ सँभाल चुकी हैं। आप वह हैं जो मुश्किल चीज़ें करती हैं — चुपचाप, और अच्छे से।" },
+      "expanded": { "en": "It's easy to forget how much you've already done. You've faced uncertainty, pushed through tiredness and held on to hope through worry, and you're still going. That's real proof of your strength: a record of carrying on, more than a feeling of confidence. Hard things don't need you to feel ready or unafraid. They ask you to keep taking the next small step. You've done that again and again, and you can keep doing it.", "hi": "यह भूल जाना आसान है कि आप पहले ही कितना कुछ कर चुकी हैं। आपने आगे क्या होगा यह न जानते हुए भी सामना किया, थकान सँभाली, चिंता के बीच उम्मीद थामी — और आप अब भी यहीं हैं, अब भी आगे बढ़ रही हैं। यही आपकी ताक़त का सबसे सच्चा सबूत है: आत्मविश्वास का कोई एहसास नहीं, बल्कि चलते रहने का एक पूरा रिकॉर्ड। मुश्किल चीज़ें आपसे यह नहीं माँगतीं कि आप तैयार या निडर महसूस करें; वे बस इतना माँगती हैं कि आप अगला छोटा क़दम उठाती रहें। आपने यह बार-बार किया है। भरोसा रखिए कि वही स्थिर आप, जो आपको यहाँ तक लाई हैं, जो भी आगे आए उसके पार भी ले जाएँगी।" },
+      "deepDive": { "en": "Psychologists call it 'self-efficacy': the belief, built from past experience, that you can cope with what comes. Each hard thing you get through makes it a bit stronger for the next.", "hi": "मनोविज्ञान के जानकार इसे 'self-efficacy' कहते हैं — पिछले तजुर्बे से बना वह भरोसा कि जो भी आए, आप उससे निपट लेंगी। हर मुश्किल चीज़ जिसे आप पार कर जाती हैं, वह चुपचाप अगली के लिए इसे और मज़बूत कर देती है।" },
+      "remember": { "en": "You've done hard things before, and you can again.", "hi": "आप पहले भी मुश्किल चीज़ें कर चुकी हैं, और दोबारा भी कर सकती हैं।" }
     },
     "readToBaby": {
       "title": { "en": "The Sapling In The Storm", "hi": "तूफ़ान में नन्हा पौधा" },
@@ -257,7 +257,7 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about a small joy that always lifts you, no matter the day.", "hi": "अपने शिशु को एक ऐसी छोटी ख़ुशी के बारे में बताइए जो दिन चाहे कैसा भी हो, आपका मन हमेशा हल्का कर देती है।" },
+      "title": { "en": "Tell your baby about a small joy that always lifts you, whatever the day.", "hi": "अपने शिशु को एक ऐसी छोटी ख़ुशी के बारे में बताइए जो दिन चाहे कैसा भी हो, आपका मन हमेशा हल्का कर देती है।" },
       "motivation": { "en": "Naming your small joys teaches your child where to look for light.", "hi": "अपनी छोटी ख़ुशियों को नाम देना आपके बच्चे को सिखाता है कि रोशनी कहाँ ढूँढ़नी है।" }
     },
     "garbhSanskar": {
@@ -273,9 +273,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "I Honour How Far I've Come", "hi": "मैं अपने यहाँ तक पहुँचने का सम्मान करती हूँ" },
-      "content": { "en": "I will pause and quietly acknowledge every hard thing I have already carried this week. That deserves a gentle, proud nod.", "hi": "मैं ज़रा रुककर चुपचाप हर उस मुश्किल चीज़ को मानूँगी जो मैं इस हफ़्ते सँभाल चुकी हूँ। यह एक नरम, गर्व भरी थपकी की हक़दार है।" },
-      "remember": { "en": "Look how much you have already carried.", "hi": "देखिए, आप अब तक कितना कुछ सँभाल चुकी हैं।" },
+      "title": { "en": "I'm proud of how far I've come", "hi": "मैं अपने यहाँ तक पहुँचने का सम्मान करती हूँ" },
+      "content": { "en": "I'll pause and notice every hard thing I've already carried this week. That deserves a proud, gentle nod.", "hi": "मैं ज़रा रुककर चुपचाप हर उस मुश्किल चीज़ को मानूँगी जो मैं इस हफ़्ते सँभाल चुकी हूँ। यह एक नरम, गर्व भरी थपकी की हक़दार है।" },
+      "remember": { "en": "Look how much you've already carried.", "hi": "देखिए, आप अब तक कितना कुछ सँभाल चुकी हैं।" },
       "durationMinutes": 0
     }
   }

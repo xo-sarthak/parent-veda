@@ -4,10 +4,10 @@
     "week": 8,
     "babyLearning": { "en": "Grooves are appearing on your baby's hands where fingers will be.", "hi": "नन्ही उँगलियाँ बन रही हैं, नरम और नई" },
     "grow": {
-      "title": { "en": "Your Way Is A Good Way", "hi": "आपका तरीक़ा भी एक अच्छा तरीक़ा है" },
-      "insight": { "en": "There is no single right way to do this. The way you love your baby, in your own rhythm, is already a good way.", "hi": "इसे करने का कोई एक ही सही तरीक़ा नहीं है। जिस तरह आप अपने बच्चे को प्यार करती हैं, अपनी ही चाल में — वह पहले से एक अच्छा तरीक़ा है।" },
-      "expanded": { "en": "You will hear a hundred opinions about how pregnancy and parenting 'should' look — what to eat, how to rest, what to feel. It is easy to start doubting your own quiet sense of things. But there is no one perfect path that every mother must walk. Your home, your body, your instincts are unlike anyone else's, and the way you care, in your own rhythm, fits your baby better than any borrowed plan ever could. Trust that your way, gentle and imperfect, is a good way — because it is yours, and it is full of love.", "hi": "आप सौ राय सुनेंगी कि गर्भावस्था और परवरिश 'कैसी होनी चाहिए' — क्या खाएँ, कैसे आराम करें, क्या महसूस करें। अपनी ही शांत समझ पर शक होने लगना आसान है। पर कोई एक परफ़ेक्ट रास्ता नहीं है जिस पर हर माँ को चलना ही हो। आपका घर, आपका शरीर, आपकी सहज समझ किसी और जैसी नहीं है, और जिस तरह आप ख़याल रखती हैं, अपनी ही चाल में — वह आपके बच्चे पर किसी उधार लिए तरीक़े से कहीं बेहतर बैठता है। भरोसा रखिए कि आपका तरीक़ा, नरम और अधूरा, एक अच्छा तरीक़ा है — क्योंकि वह आपका है, और प्यार से भरा है।" },
-      "deepDive": { "en": "Researchers note there is no single 'optimal' parenting style across cultures; warmth and responsiveness, not a fixed method, are what consistently support a child. Your instinct is a valid guide.", "hi": "शोध बताते हैं कि अलग-अलग समाजों में परवरिश का कोई एक 'सबसे बढ़िया' तरीक़ा नहीं होता; गर्मजोशी और बच्चे की बात पर ध्यान देना — कोई तय तरीक़ा नहीं — यही लगातार बच्चों का साथ देते हैं। आपकी सहज समझ एक सही राह दिखाती है।" },
+      "title": { "en": "Your way can be a good way", "hi": "आपका तरीक़ा भी एक अच्छा तरीक़ा है" },
+      "insight": { "en": "There's no single right way to do this. The way you love your baby, at your own pace, is a good way.", "hi": "इसे करने का कोई एक ही सही तरीक़ा नहीं है। जिस तरह आप अपने बच्चे को प्यार करती हैं, अपनी ही चाल में — वह पहले से एक अच्छा तरीक़ा है।" },
+      "expanded": { "en": "You'll hear a hundred opinions about how pregnancy and parenting should look: what to eat, how to rest, what to feel. It's easy to start doubting your own sense of things. There's no one path every parent must follow. Your home and your instincts are your own, and the way you care fits your baby better than a borrowed plan. Your way, loving and imperfect, is a good way.", "hi": "आप सौ राय सुनेंगी कि गर्भावस्था और परवरिश 'कैसी होनी चाहिए' — क्या खाएँ, कैसे आराम करें, क्या महसूस करें। अपनी ही शांत समझ पर शक होने लगना आसान है। पर कोई एक परफ़ेक्ट रास्ता नहीं है जिस पर हर माँ को चलना ही हो। आपका घर, आपका शरीर, आपकी सहज समझ किसी और जैसी नहीं है, और जिस तरह आप ख़याल रखती हैं, अपनी ही चाल में — वह आपके बच्चे पर किसी उधार लिए तरीक़े से कहीं बेहतर बैठता है। भरोसा रखिए कि आपका तरीक़ा, नरम और अधूरा, एक अच्छा तरीक़ा है — क्योंकि वह आपका है, और प्यार से भरा है।" },
+      "deepDive": { "en": "Researchers note there's no single best parenting style across cultures. Warmth and responsiveness, more than any fixed method, are what consistently help children. Your instincts are a fair guide.", "hi": "शोध बताते हैं कि अलग-अलग समाजों में परवरिश का कोई एक 'सबसे बढ़िया' तरीक़ा नहीं होता; गर्मजोशी और बच्चे की बात पर ध्यान देना — कोई तय तरीक़ा नहीं — यही लगातार बच्चों का साथ देते हैं। आपकी सहज समझ एक सही राह दिखाती है।" },
       "remember": { "en": "Your own way, full of love, is a good way.", "hi": "आपका अपना तरीक़ा, प्यार से भरा, एक अच्छा तरीक़ा है।" }
     },
     "readToBaby": {
@@ -17,8 +17,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby one big dream you quietly hold for them.", "hi": "अपने बच्चे को एक बड़ा सपना बताइए जो आप चुपचाप उनके लिए संजोए रखती हैं।" },
-      "motivation": { "en": "Speaking a dream aloud is the first gentle way of believing in it.", "hi": "किसी सपने को बोलकर कह देना उस पर यक़ीन करने का पहला नरम तरीक़ा है।" }
+      "title": { "en": "Tell your baby about one big dream you hold for them.", "hi": "अपने बच्चे को एक बड़ा सपना बताइए जो आप चुपचाप उनके लिए संजोए रखती हैं।" },
+      "motivation": { "en": "Saying a dream out loud is the first way of believing in it.", "hi": "किसी सपने को बोलकर कह देना उस पर यक़ीन करने का पहला नरम तरीक़ा है।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -33,9 +33,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "I Don't Need To Compare", "hi": "मुझे तुलना करने की ज़रूरत नहीं" },
-      "content": { "en": "Other mothers' journeys are not a measure of mine. I will keep my eyes gently on my own path.", "hi": "दूसरी माओं का सफ़र मेरे सफ़र का पैमाना नहीं है। मैं अपनी नज़र नरमी से अपने ही रास्ते पर रखूँगी।" },
-      "remember": { "en": "Your only fair comparison is to yourself yesterday.", "hi": "आपकी इकलौती ठीक तुलना कल की अपने आप से है।" },
+      "title": { "en": "I don't need to compare", "hi": "मुझे तुलना करने की ज़रूरत नहीं" },
+      "content": { "en": "Other mothers' pregnancies aren't a measure of mine. I'll keep my eyes on my own path.", "hi": "दूसरी माओं का सफ़र मेरे सफ़र का पैमाना नहीं है। मैं अपनी नज़र नरमी से अपने ही रास्ते पर रखूँगी।" },
+      "remember": { "en": "The only fair comparison is with yourself yesterday.", "hi": "आपकी इकलौती ठीक तुलना कल की अपने आप से है।" },
       "durationMinutes": 0
     }
   },
@@ -44,11 +44,11 @@
     "week": 8,
     "babyLearning": { "en": "Your baby may make tiny first movements, far too small to feel.", "hi": "नन्हे हाथ और पैर हिलने लगे हैं" },
     "grow": {
-      "title": { "en": "Advice Is Not Instruction", "hi": "सलाह हुक्म नहीं होती" },
-      "insight": { "en": "Advice is something offered, not something you must obey. You are always free to keep what fits and let the rest go.", "hi": "सलाह दी जाने वाली चीज़ है, ऐसी नहीं जिसे मानना ही पड़े। जो बात आप पर बैठे उसे रखना और बाक़ी को जाने देना — यह हमेशा आपके हाथ में है।" },
-      "expanded": { "en": "Pregnancy seems to invite advice from everyone — family, friends, strangers in a queue. Most of it is kind, but it can pile up until you feel you must follow it all, even when pieces contradict each other. Remember that advice is a gift laid at your feet, not a command. You can thank someone warmly and still quietly decide it is not for you. Listening does not mean obeying. You get to be the one who weighs each suggestion against your own heart and chooses what truly belongs in your home.", "hi": "गर्भावस्था हर किसी की सलाह को न्योता देती सी लगती है — परिवार, दोस्त, लाइन में खड़े अजनबी। ज़्यादातर सलाह प्यार से ही आती है, पर वह इतनी जमा हो जाती है कि लगने लगता है सब मानना ही है — तब भी जब दो बातें एक-दूसरे के उलट हों। याद रखिए कि सलाह आपके सामने रखा एक तोहफ़ा है, कोई हुक्म नहीं। आप किसी का गर्मजोशी से शुक्रिया कर सकती हैं और फिर भी चुपचाप तय कर सकती हैं कि यह आपके लिए नहीं है। सुन लेना मान लेना नहीं होता। हर सुझाव को अपने दिल के तराज़ू पर तौलकर यह चुनने वाली आप ही हैं कि आपके घर में सच में क्या रहेगा।" },
-      "deepDive": { "en": "Experts note that unsolicited advice can raise a new parent's anxiety more than it helps. Filtering it through your own judgement is itself a healthy parenting skill.", "hi": "जानकार कहते हैं कि बिना माँगी सलाह नए माता-पिता की घबराहट को मदद से ज़्यादा बढ़ा देती है। उसे अपनी समझ से छानना अपने आप में परवरिश का एक अच्छा हुनर है।" },
-      "remember": { "en": "Keep what fits you; let the rest gently pass.", "hi": "जो आप पर बैठे उसे रख लीजिए; बाक़ी को नरमी से गुज़र जाने दीजिए।" }
+      "title": { "en": "You don't have to follow every piece of advice", "hi": "सलाह हुक्म नहीं होती" },
+      "insight": { "en": "Advice is offered, not ordered. You can keep what fits and let the rest go.", "hi": "सलाह दी जाने वाली चीज़ है, ऐसी नहीं जिसे मानना ही पड़े। जो बात आप पर बैठे उसे रखना और बाक़ी को जाने देना — यह हमेशा आपके हाथ में है।" },
+      "expanded": { "en": "Pregnancy seems to invite advice from everyone: family, friends, even strangers in a queue. Most of it is kind, but it can pile up until you feel you must follow it all, even when it contradicts itself. You can thank someone warmly and still decide it isn't for you. Listening isn't the same as obeying. You get to weigh each suggestion and choose what belongs in your home.", "hi": "गर्भावस्था हर किसी की सलाह को न्योता देती सी लगती है — परिवार, दोस्त, लाइन में खड़े अजनबी। ज़्यादातर सलाह प्यार से ही आती है, पर वह इतनी जमा हो जाती है कि लगने लगता है सब मानना ही है — तब भी जब दो बातें एक-दूसरे के उलट हों। याद रखिए कि सलाह आपके सामने रखा एक तोहफ़ा है, कोई हुक्म नहीं। आप किसी का गर्मजोशी से शुक्रिया कर सकती हैं और फिर भी चुपचाप तय कर सकती हैं कि यह आपके लिए नहीं है। सुन लेना मान लेना नहीं होता। हर सुझाव को अपने दिल के तराज़ू पर तौलकर यह चुनने वाली आप ही हैं कि आपके घर में सच में क्या रहेगा।" },
+      "deepDive": { "en": "Experts note that advice nobody asked for can make new parents more anxious. Filtering it through your own judgement is a healthy parenting skill.", "hi": "जानकार कहते हैं कि बिना माँगी सलाह नए माता-पिता की घबराहट को मदद से ज़्यादा बढ़ा देती है। उसे अपनी समझ से छानना अपने आप में परवरिश का एक अच्छा हुनर है।" },
+      "remember": { "en": "Keep what fits you and let the rest pass.", "hi": "जो आप पर बैठे उसे रख लीजिए; बाक़ी को नरमी से गुज़र जाने दीजिए।" }
     },
     "readToBaby": {
       "title": { "en": "The Blue Jackal", "hi": "नीला सियार" },
@@ -57,8 +57,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby the kind of person you quietly hope they grow into.", "hi": "अपने बच्चे को बताइए कि आप चुपचाप उम्मीद करती हैं कि वे कैसे इंसान बनें।" },
-      "motivation": { "en": "Naming the heart you wish for them is part of growing it together.", "hi": "जिस दिल की आप उनके लिए कामना करती हैं, उसे नाम देना उसे साथ मिलकर बड़ा करने का हिस्सा है।" }
+      "title": { "en": "Tell your baby about the kind of person you hope they'll grow into.", "hi": "अपने बच्चे को बताइए कि आप चुपचाप उम्मीद करती हैं कि वे कैसे इंसान बनें।" },
+      "motivation": { "en": "Naming the heart you wish for them is part of helping it grow.", "hi": "जिस दिल की आप उनके लिए कामना करती हैं, उसे नाम देना उसे साथ मिलकर बड़ा करने का हिस्सा है।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -73,9 +73,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Breathe Out The Noise", "hi": "शोर को साँस के साथ बाहर कीजिए" },
-      "content": { "en": "Breathe in slowly for a count of four. As you breathe out for six, imagine letting go of one piece of advice or worry you do not need to carry today.", "hi": "चार तक गिनते हुए धीरे से साँस लीजिए। छह तक गिनते हुए साँस छोड़िए, और सोचिए कि आप एक ऐसी सलाह या चिंता को जाने दे रही हैं जिसे आज उठाने की ज़रूरत नहीं।" },
-      "remember": { "en": "Not every voice deserves a place inside you.", "hi": "हर आवाज़ आपके भीतर जगह की हक़दार नहीं होती।" },
+      "title": { "en": "Breathe out the noise", "hi": "शोर को साँस के साथ बाहर कीजिए" },
+      "content": { "en": "Breathe in slowly for a count of four. As you breathe out for six, picture letting go of one piece of advice or worry you don't need to carry today.", "hi": "चार तक गिनते हुए धीरे से साँस लीजिए। छह तक गिनते हुए साँस छोड़िए, और सोचिए कि आप एक ऐसी सलाह या चिंता को जाने दे रही हैं जिसे आज उठाने की ज़रूरत नहीं।" },
+      "remember": { "en": "You don't have to carry every opinion you hear.", "hi": "हर आवाज़ आपके भीतर जगह की हक़दार नहीं होती।" },
       "durationMinutes": 1
     }
   },
@@ -84,11 +84,11 @@
     "week": 8,
     "babyLearning": { "en": "Your baby's eyelids are just starting to form.", "hi": "नन्ही आँखों पर धीरे-धीरे पलकें बन रही हैं" },
     "grow": {
-      "title": { "en": "No Two Journeys Match", "hi": "कोई दो सफ़र एक जैसे नहीं होते" },
-      "insight": { "en": "Your pregnancy will not look like anyone else's, and it is not meant to. Each journey has its own shape.", "hi": "आपकी गर्भावस्था किसी और जैसी नहीं दिखेगी, और उसे दिखनी भी नहीं चाहिए। हर सफ़र का अपना आकार होता है।" },
-      "expanded": { "en": "It is natural to glance sideways — at the friend who glowed, the cousin who never felt sick, the stranger online who seems to have it all figured out. But a pregnancy is not a race with a single finish line that everyone crosses the same way. Your body, your feelings, your days will follow a path that belongs only to you and your baby. Some parts will be harder than others' and some far easier, and none of it makes your journey lesser. Let yours unfold at its own pace, in its own shape, without measuring it against a map that was never yours.", "hi": "आस-पास देख लेना स्वाभाविक है — उस दोस्त को जो चमकती रही, उस चचेरी बहन को जिसकी तबीयत कभी ख़राब नहीं हुई, उस ऑनलाइन अजनबी को जिसे सब कुछ समझ आ चुका लगता है। पर गर्भावस्था कोई दौड़ नहीं जिसकी एक ही मंज़िल हो और सब उसे एक ही तरह पार करें। आपका शरीर, आपकी भावनाएँ, आपके दिन एक ऐसी राह पर चलेंगे जो सिर्फ़ आपकी और आपके बच्चे की है। कुछ हिस्से दूसरों से मुश्किल होंगे और कुछ कहीं आसान, और इनमें से कुछ भी आपके सफ़र को छोटा नहीं बनाता। अपने सफ़र को अपनी ही रफ़्तार से, अपने ही आकार में खुलने दीजिए — उसे किसी ऐसे नक़्शे से नापे बिना जो कभी आपका था ही नहीं।" },
-      "deepDive": { "en": "Doctors stress that healthy pregnancies vary enormously from person to person and even between a woman's own pregnancies. Difference is the norm, not a sign that something is wrong.", "hi": "डॉक्टर ज़ोर देकर कहते हैं कि स्वस्थ गर्भावस्थाएँ एक औरत से दूसरी में, और एक ही औरत की अलग-अलग गर्भावस्थाओं में भी, बहुत अलग होती हैं। अलग होना आम बात है, यह कोई निशानी नहीं कि कुछ ग़लत है।" },
-      "remember": { "en": "Your journey has a shape all its own.", "hi": "आपके सफ़र का अपना ही एक आकार है।" }
+      "title": { "en": "Every pregnancy is different", "hi": "कोई दो सफ़र एक जैसे नहीं होते" },
+      "insight": { "en": "Your pregnancy won't look like anyone else's, and it isn't meant to.", "hi": "आपकी गर्भावस्था किसी और जैसी नहीं दिखेगी, और उसे दिखनी भी नहीं चाहिए। हर सफ़र का अपना आकार होता है।" },
+      "expanded": { "en": "It's natural to glance sideways at the friend who glowed, the cousin who never felt sick, the stranger online who seems to have it all sorted. A pregnancy isn't a race. Your feelings and your days will follow a path that belongs to you and your baby. Some parts will be harder than for others and some much easier. None of that makes yours less. Let it go at its own pace, without measuring it against someone else's.", "hi": "आस-पास देख लेना स्वाभाविक है — उस दोस्त को जो चमकती रही, उस चचेरी बहन को जिसकी तबीयत कभी ख़राब नहीं हुई, उस ऑनलाइन अजनबी को जिसे सब कुछ समझ आ चुका लगता है। पर गर्भावस्था कोई दौड़ नहीं जिसकी एक ही मंज़िल हो और सब उसे एक ही तरह पार करें। आपका शरीर, आपकी भावनाएँ, आपके दिन एक ऐसी राह पर चलेंगे जो सिर्फ़ आपकी और आपके बच्चे की है। कुछ हिस्से दूसरों से मुश्किल होंगे और कुछ कहीं आसान, और इनमें से कुछ भी आपके सफ़र को छोटा नहीं बनाता। अपने सफ़र को अपनी ही रफ़्तार से, अपने ही आकार में खुलने दीजिए — उसे किसी ऐसे नक़्शे से नापे बिना जो कभी आपका था ही नहीं।" },
+      "deepDive": { "en": "Doctors stress that healthy pregnancies vary a great deal from person to person, and even between one woman's pregnancies. Being different is normal, and it doesn't mean something is wrong.", "hi": "डॉक्टर ज़ोर देकर कहते हैं कि स्वस्थ गर्भावस्थाएँ एक औरत से दूसरी में, और एक ही औरत की अलग-अलग गर्भावस्थाओं में भी, बहुत अलग होती हैं। अलग होना आम बात है, यह कोई निशानी नहीं कि कुछ ग़लत है।" },
+      "remember": { "en": "Every pregnancy has a shape of its own.", "hi": "आपके सफ़र का अपना ही एक आकार है।" }
     },
     "readToBaby": {
       "title": { "en": "Shravan Kumar's Devotion", "hi": "श्रवण कुमार की भक्ति" },
@@ -97,8 +97,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about an experience you cannot wait to share with them one day.", "hi": "अपने बच्चे को एक ऐसे अनुभव के बारे में बताइए जिसे उनके साथ बाँटने का आपको बेसब्री से इंतज़ार है।" },
-      "motivation": { "en": "The things you long to share are the love you are already saving up.", "hi": "जो चीज़ें आप बाँटने को तरसती हैं, वही वह प्यार है जो आप अभी से जोड़ रही हैं।" }
+      "title": { "en": "Tell your baby about something you can't wait to share with them one day.", "hi": "अपने बच्चे को एक ऐसे अनुभव के बारे में बताइए जिसे उनके साथ बाँटने का आपको बेसब्री से इंतज़ार है।" },
+      "motivation": { "en": "The things you long to share are love you're already saving up.", "hi": "जो चीज़ें आप बाँटने को तरसती हैं, वही वह प्यार है जो आप अभी से जोड़ रही हैं।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -113,8 +113,8 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "Slower Is Still Forward", "hi": "धीमा भी आगे ही है" },
-      "content": { "en": "If my journey feels slower than someone else's, that is fine. Slower is still moving forward, in my own time.", "hi": "अगर मेरा सफ़र किसी और से धीमा लगे, तो ठीक है। धीमा भी आगे बढ़ना ही है, अपने ही समय में।" },
+      "title": { "en": "Going slower still counts", "hi": "धीमा भी आगे ही है" },
+      "content": { "en": "If my pregnancy feels slower than someone else's, that's fine. Slower is still moving forward, in my own time.", "hi": "अगर मेरा सफ़र किसी और से धीमा लगे, तो ठीक है। धीमा भी आगे बढ़ना ही है, अपने ही समय में।" },
       "remember": { "en": "Forward is forward, at any pace.", "hi": "आगे बढ़ना आगे बढ़ना ही है, किसी भी रफ़्तार पर।" },
       "durationMinutes": 0
     }
@@ -124,11 +124,11 @@
     "week": 8,
     "babyLearning": { "en": "Your baby's face is becoming easier to make out.", "hi": "एक नन्ही नाक नरम आकार ले रही है" },
     "grow": {
-      "title": { "en": "Trust Your Quiet Instinct", "hi": "अपनी शांत सहज समझ पर भरोसा कीजिए" },
-      "insight": { "en": "Beneath all the noise, you carry a quiet knowing about your baby. It is worth listening to.", "hi": "सारे शोर के नीचे, आपके भीतर अपने बच्चे के बारे में एक शांत सी समझ रहती है। उसे सुनना ज़रूरी है।" },
-      "expanded": { "en": "Long before you can explain why, you will often simply sense what your baby needs — a feeling that arrives soft and sure beneath your busy thoughts. It is easy to override this quiet instinct with books, apps and other people's certainty. But that inner sense is real, shaped by the deep bond already forming between you. You do not have to follow it blindly, and you can still ask for help. Yet learning to pause and listen to your own quiet knowing is one of the truest skills of parenthood, and it grows stronger every time you trust it.", "hi": "जिस बात को आप समझा पाएँ, उससे बहुत पहले ही आप अक्सर बस भाँप लेंगी कि आपके बच्चे को क्या चाहिए — एक एहसास जो आपकी व्यस्त सोच के नीचे नरम और पक्का उतरता है। किताबों, ऐप और दूसरों के भरोसे से इस शांत समझ को दबा देना आसान है। पर वह भीतरी एहसास असली है, उस गहरे जुड़ाव से गढ़ा जो अभी से आपके बीच बन रहा है। आपको उसे आँख मूँदकर मानना नहीं है, और मदद माँगना हमेशा खुला है। फिर भी रुककर अपनी शांत समझ को सुनना सीखना माँ-बाप बनने के सबसे सच्चे हुनरों में से एक है, और हर बार जब आप उस पर भरोसा करती हैं, वह और मज़बूत होता जाता है।" },
-      "deepDive": { "en": "Studies of maternal intuition suggest mothers often pick up on subtle cues about their baby before they can consciously name them. Your instincts are informed, not imaginary.", "hi": "माँ की सहज समझ पर हुए शोध बताते हैं कि माएँ अपने बच्चे के बारे में बारीक इशारे अक्सर तब पकड़ लेती हैं जब वे उन्हें नाम भी नहीं दे पातीं। आपकी सहज समझ जानकारी से बनी है, कल्पना नहीं।" },
-      "remember": { "en": "Your quiet inner knowing is worth trusting.", "hi": "आपकी शांत भीतरी समझ पर भरोसा करने लायक़ है।" }
+      "title": { "en": "Your instinct is worth listening to", "hi": "अपनी शांत सहज समझ पर भरोसा कीजिए" },
+      "insight": { "en": "Under all the noise, you'll often sense what your baby needs. It's worth listening to.", "hi": "सारे शोर के नीचे, आपके भीतर अपने बच्चे के बारे में एक शांत सी समझ रहती है। उसे सुनना ज़रूरी है।" },
+      "expanded": { "en": "Often you'll sense what your baby needs before you can explain why, a feeling that arrives under your busy thoughts. It's easy to override it with books, apps and other people's certainty. That sense is real, shaped by the bond forming between you. You don't have to follow it blindly, and you can always ask for help. Learning to pause and listen to it is a real parenting skill, and it gets stronger each time you trust it.", "hi": "जिस बात को आप समझा पाएँ, उससे बहुत पहले ही आप अक्सर बस भाँप लेंगी कि आपके बच्चे को क्या चाहिए — एक एहसास जो आपकी व्यस्त सोच के नीचे नरम और पक्का उतरता है। किताबों, ऐप और दूसरों के भरोसे से इस शांत समझ को दबा देना आसान है। पर वह भीतरी एहसास असली है, उस गहरे जुड़ाव से गढ़ा जो अभी से आपके बीच बन रहा है। आपको उसे आँख मूँदकर मानना नहीं है, और मदद माँगना हमेशा खुला है। फिर भी रुककर अपनी शांत समझ को सुनना सीखना माँ-बाप बनने के सबसे सच्चे हुनरों में से एक है, और हर बार जब आप उस पर भरोसा करती हैं, वह और मज़बूत होता जाता है।" },
+      "deepDive": { "en": "Research suggests parents often pick up small cues from their baby before they can put them into words. Instinct grows from close, daily attention, and it's worth taking seriously.", "hi": "माँ की सहज समझ पर हुए शोध बताते हैं कि माएँ अपने बच्चे के बारे में बारीक इशारे अक्सर तब पकड़ लेती हैं जब वे उन्हें नाम भी नहीं दे पातीं। आपकी सहज समझ जानकारी से बनी है, कल्पना नहीं।" },
+      "remember": { "en": "Your inner sense of things is worth trusting.", "hi": "आपकी शांत भीतरी समझ पर भरोसा करने लायक़ है।" }
     },
     "readToBaby": {
       "title": { "en": "The Wise Quail", "hi": "समझदार बटेर" },
@@ -138,7 +138,7 @@
     },
     "talkToBaby": {
       "title": { "en": "Tell your baby about a place you dream of taking them one day.", "hi": "अपने बच्चे को एक ऐसी जगह के बारे में बताइए जहाँ एक दिन ले जाने का आप सपना देखती हैं।" },
-      "motivation": { "en": "Picturing a place together is a small promise of all the world you'll share.", "hi": "किसी जगह की साथ मिलकर कल्पना करना उस पूरी दुनिया का एक छोटा वादा है जो आप बाँटेंगी।" }
+      "motivation": { "en": "Picturing a place together is a small promise of all you'll share.", "hi": "किसी जगह की साथ मिलकर कल्पना करना उस पूरी दुनिया का एक छोटा वादा है जो आप बाँटेंगी।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -153,9 +153,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Settle Into Stillness", "hi": "ठहराव में बैठ जाइए" },
-      "content": { "en": "Sit still and breathe in for a slow count of four. Hold gently for four, then release for four. As you settle, let your busy thoughts grow quiet enough to hear yourself.", "hi": "स्थिर बैठिए और चार तक धीरे गिनते हुए साँस लीजिए। चार तक नरमी से रोकिए, फिर चार तक छोड़िए। जैसे-जैसे आप ठहरती हैं, अपनी व्यस्त सोच को इतना शांत होने दीजिए कि आप ख़ुद को सुन सकें।" },
-      "remember": { "en": "Stillness is where your own voice becomes clear.", "hi": "ठहराव वही है जहाँ आपकी अपनी आवाज़ साफ़ होती है।" },
+      "title": { "en": "Settle into stillness", "hi": "ठहराव में बैठ जाइए" },
+      "content": { "en": "Sit still and breathe in for a slow count of four. Hold gently for four, then breathe out for four. As you settle, let your thoughts grow quiet enough to hear yourself.", "hi": "स्थिर बैठिए और चार तक धीरे गिनते हुए साँस लीजिए। चार तक नरमी से रोकिए, फिर चार तक छोड़िए। जैसे-जैसे आप ठहरती हैं, अपनी व्यस्त सोच को इतना शांत होने दीजिए कि आप ख़ुद को सुन सकें।" },
+      "remember": { "en": "In stillness, it's easier to hear yourself.", "hi": "ठहराव वही है जहाँ आपकी अपनी आवाज़ साफ़ होती है।" },
       "durationMinutes": 2
     }
   },
@@ -164,11 +164,11 @@
     "week": 8,
     "babyLearning": { "en": "The outer ears are beginning to form on your baby's head.", "hi": "लगातार बढ़ते हुए, हर दिन थोड़ा और" },
     "grow": {
-      "title": { "en": "Comparison Steals Joy", "hi": "तुलना ख़ुशी चुरा लेती है" },
-      "insight": { "en": "The moment you start comparing, the joy of your own moment quietly slips away. Your story is not theirs.", "hi": "जिस पल आप तुलना करने लगती हैं, आपके अपने पल की ख़ुशी चुपचाप खिसक जाती है। आपकी कहानी उनकी नहीं है।" },
-      "expanded": { "en": "Comparison rarely makes us happier; more often it dims a joy that was glowing just fine on its own. You can be content with your own pregnancy until you scroll past someone else's, and suddenly your own beautiful moment feels lacking. But the truth is your experience was never meant to match theirs. When you notice comparison creeping in, gently turn your attention back to what is real and present for you — the small flutter of hope, the quiet of this very day. Joy lives in your own story, not in the gap between yours and someone else's.", "hi": "तुलना शायद ही हमें ज़्यादा ख़ुश करती है; अक्सर वह उस ख़ुशी को मद्धम कर देती है जो अपने आप में ठीक चमक रही थी। आप अपनी गर्भावस्था से सुकून में रहती हैं — जब तक किसी और की तस्वीरें स्क्रोल न कर लें, और अचानक आपका अपना सुंदर पल कुछ कम लगने लगता है। पर सच यह है कि आपका अनुभव उनके जैसा होने के लिए बना ही नहीं था। जब तुलना भीतर सरकती लगे, अपना ध्यान नरमी से वापस उस पर मोड़िए जो आपके लिए असली और अभी का है — उम्मीद की एक छोटी सी धड़कन, इसी दिन का सुकून। ख़ुशी आपकी अपनी कहानी में बसती है, आपकी और किसी और की कहानी के फ़ासले में नहीं।" },
-      "deepDive": { "en": "Psychologists find that frequent social comparison, especially online, is linked to lower mood and higher anxiety. Turning attention back to your own present moment reliably protects wellbeing.", "hi": "मनोविज्ञान के शोध बताते हैं कि बार-बार दूसरों से तुलना करना, ख़ासकर ऑनलाइन, मन को उतारता है और घबराहट बढ़ाता है। ध्यान वापस अपने इसी पल पर लाना भरोसे के साथ मन को संभालता है।" },
-      "remember": { "en": "Your joy is safest kept in your own story.", "hi": "आपकी ख़ुशी आपकी अपनी कहानी में ही सबसे सुरक्षित रहती है।" }
+      "title": { "en": "Comparing takes away your joy", "hi": "तुलना ख़ुशी चुरा लेती है" },
+      "insight": { "en": "When you start comparing, the joy of your own moment slips away. Your story is yours.", "hi": "जिस पल आप तुलना करने लगती हैं, आपके अपने पल की ख़ुशी चुपचाप खिसक जाती है। आपकी कहानी उनकी नहीं है।" },
+      "expanded": { "en": "Comparing rarely makes us happier. More often it dims a joy that was fine on its own. You can feel content with your pregnancy until you scroll past someone else's, and suddenly your moment feels lacking. Your experience was never meant to match theirs. When you notice comparison creeping in, bring your attention back to what's real for you today: a flicker of hope, a calm moment. Joy lives in your own story.", "hi": "तुलना शायद ही हमें ज़्यादा ख़ुश करती है; अक्सर वह उस ख़ुशी को मद्धम कर देती है जो अपने आप में ठीक चमक रही थी। आप अपनी गर्भावस्था से सुकून में रहती हैं — जब तक किसी और की तस्वीरें स्क्रोल न कर लें, और अचानक आपका अपना सुंदर पल कुछ कम लगने लगता है। पर सच यह है कि आपका अनुभव उनके जैसा होने के लिए बना ही नहीं था। जब तुलना भीतर सरकती लगे, अपना ध्यान नरमी से वापस उस पर मोड़िए जो आपके लिए असली और अभी का है — उम्मीद की एक छोटी सी धड़कन, इसी दिन का सुकून। ख़ुशी आपकी अपनी कहानी में बसती है, आपकी और किसी और की कहानी के फ़ासले में नहीं।" },
+      "deepDive": { "en": "Research links frequent comparison with others, especially online, to lower mood and more anxiety. Turning your attention back to your own day helps protect how you feel.", "hi": "मनोविज्ञान के शोध बताते हैं कि बार-बार दूसरों से तुलना करना, ख़ासकर ऑनलाइन, मन को उतारता है और घबराहट बढ़ाता है। ध्यान वापस अपने इसी पल पर लाना भरोसे के साथ मन को संभालता है।" },
+      "remember": { "en": "Your joy is safest in your own story.", "hi": "आपकी ख़ुशी आपकी अपनी कहानी में ही सबसे सुरक्षित रहती है।" }
     },
     "readToBaby": {
       "title": { "en": "Tenali Rama And The Well Dispute", "hi": "तेनाली राम और कुएँ का झगड़ा" },
@@ -177,8 +177,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby what you hope they will never doubt about themselves.", "hi": "अपने बच्चे को बताइए कि आप चाहती हैं वे अपने बारे में किस बात पर कभी शक न करें।" },
-      "motivation": { "en": "The certainty you wish for them begins as your steady belief in them.", "hi": "जिस भरोसे की आप उनके लिए कामना करती हैं, वह आपके उन पर पक्के यक़ीन से शुरू होता है।" }
+      "title": { "en": "Tell your baby what you hope they'll never doubt about themselves.", "hi": "अपने बच्चे को बताइए कि आप चाहती हैं वे अपने बारे में किस बात पर कभी शक न करें।" },
+      "motivation": { "en": "The certainty you wish for them starts with your belief in them.", "hi": "जिस भरोसे की आप उनके लिए कामना करती हैं, वह आपके उन पर पक्के यक़ीन से शुरू होता है।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -193,9 +193,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "Enough For Me Is Enough", "hi": "मेरे लिए जो काफ़ी है, वही काफ़ी है" },
-      "content": { "en": "What I have today is enough for me. I do not need someone else's version of this season to feel full.", "hi": "जो आज मेरे पास है, वह मेरे लिए काफ़ी है। भरा हुआ महसूस करने के लिए मुझे इस दौर का किसी और वाला रूप नहीं चाहिए।" },
-      "remember": { "en": "Enough is found by looking inward, not sideways.", "hi": "'काफ़ी' भीतर देखने से मिलता है, आस-पास देखने से नहीं।" },
+      "title": { "en": "What I have is enough", "hi": "मेरे लिए जो काफ़ी है, वही काफ़ी है" },
+      "content": { "en": "What I have today is enough for me. I don't need someone else's version of this time to feel full.", "hi": "जो आज मेरे पास है, वह मेरे लिए काफ़ी है। भरा हुआ महसूस करने के लिए मुझे इस दौर का किसी और वाला रूप नहीं चाहिए।" },
+      "remember": { "en": "You find enough by looking at your own life.", "hi": "'काफ़ी' भीतर देखने से मिलता है, आस-पास देखने से नहीं।" },
       "durationMinutes": 0
     }
   },
@@ -204,11 +204,11 @@
     "week": 8,
     "babyLearning": { "en": "Your baby's feet have small ridges where the toes will grow.", "hi": "नन्हे नक़्श हर दिन साफ़ होते जा रहे हैं" },
     "grow": {
-      "title": { "en": "You Know Your Baby Best", "hi": "अपने बच्चे को सबसे बेहतर आप जानती हैं" },
-      "insight": { "en": "No book or expert spends every moment with your baby the way you do. In time, you will be the true expert on this little one.", "hi": "कोई किताब या जानकार आपके बच्चे के साथ हर पल नहीं बिताता, जैसे आप बिताती हैं। समय के साथ इस बच्चे की सबसे सच्ची जानकार आप ही होंगी।" },
-      "expanded": { "en": "There is so much knowledge out there, and it can make you feel that everyone understands your baby better than you do. But no expert lives inside this closeness you share. You are the one who feels every shift, every quiet rhythm, every flicker of this little life. Knowledge from others is useful, and you should welcome it — yet it works best when it sits alongside your own deepening understanding, not above it. Slowly, day by day, you are becoming the person who knows this child most tenderly and most truly in all the world.", "hi": "बाहर इतनी जानकारी है कि लगने लगता है हर कोई आपके बच्चे को आपसे बेहतर समझता है। पर इस नज़दीकी के भीतर कोई जानकार नहीं रहता — वह सिर्फ़ आपकी है। हर हलचल, हर शांत लय, इस नन्ही ज़िंदगी की हर झलक महसूस करने वाली आप हैं। दूसरों का ज्ञान काम का है, और उसका स्वागत भी कीजिए — पर वह तब सबसे अच्छा काम करता है जब वह आपकी अपनी गहराती समझ के साथ बैठे, उसके ऊपर नहीं। धीरे-धीरे, दिन-ब-दिन, आप वही बन रही हैं जो इस बच्चे को पूरी दुनिया में सबसे नरमी से और सबसे सच्चाई से जानती है।" },
-      "deepDive": { "en": "Paediatricians often remind parents that they are the foremost observers of their own child. Professional guidance works best when paired with a parent's close, daily knowledge.", "hi": "बच्चों के डॉक्टर अक्सर याद दिलाते हैं कि अपने बच्चे को सबसे क़रीब से देखने वाले माता-पिता ही होते हैं। डॉक्टर की सलाह तब सबसे अच्छा काम करती है जब उसके साथ माता-पिता की रोज़ की, नज़दीकी जानकारी जुड़ी हो।" },
-      "remember": { "en": "You are becoming the true expert on your baby.", "hi": "आप अपने बच्चे की सबसे सच्ची जानकार बनती जा रही हैं।" }
+      "title": { "en": "You'll come to know your baby best", "hi": "अपने बच्चे को सबसे बेहतर आप जानती हैं" },
+      "insight": { "en": "No book or expert will spend every day with your baby the way you will. In time, you'll know this little one best.", "hi": "कोई किताब या जानकार आपके बच्चे के साथ हर पल नहीं बिताता, जैसे आप बिताती हैं। समय के साथ इस बच्चे की सबसे सच्ची जानकार आप ही होंगी।" },
+      "expanded": { "en": "There's so much information out there that it can feel as if everyone understands your baby better than you do. No expert has the closeness you share. You'll notice every change and rhythm in this little life. Advice from others is useful, and it's good to welcome it. It works best alongside your own growing understanding. Day by day, you're becoming the person who knows this child most closely.", "hi": "बाहर इतनी जानकारी है कि लगने लगता है हर कोई आपके बच्चे को आपसे बेहतर समझता है। पर इस नज़दीकी के भीतर कोई जानकार नहीं रहता — वह सिर्फ़ आपकी है। हर हलचल, हर शांत लय, इस नन्ही ज़िंदगी की हर झलक महसूस करने वाली आप हैं। दूसरों का ज्ञान काम का है, और उसका स्वागत भी कीजिए — पर वह तब सबसे अच्छा काम करता है जब वह आपकी अपनी गहराती समझ के साथ बैठे, उसके ऊपर नहीं। धीरे-धीरे, दिन-ब-दिन, आप वही बन रही हैं जो इस बच्चे को पूरी दुनिया में सबसे नरमी से और सबसे सच्चाई से जानती है।" },
+      "deepDive": { "en": "Paediatricians often remind parents that they're the ones who see their child every day. Professional advice works best when it's paired with that close, daily knowledge.", "hi": "बच्चों के डॉक्टर अक्सर याद दिलाते हैं कि अपने बच्चे को सबसे क़रीब से देखने वाले माता-पिता ही होते हैं। डॉक्टर की सलाह तब सबसे अच्छा काम करती है जब उसके साथ माता-पिता की रोज़ की, नज़दीकी जानकारी जुड़ी हो।" },
+      "remember": { "en": "You're becoming the expert on your baby.", "hi": "आप अपने बच्चे की सबसे सच्ची जानकार बनती जा रही हैं।" }
     },
     "readToBaby": {
       "title": { "en": "The Potter's Promise", "hi": "कुम्हार का वादा" },
@@ -217,7 +217,7 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about the kind of world you hope they help build.", "hi": "अपने बच्चे को उस तरह की दुनिया के बारे में बताइए जिसे बनाने में आप चाहती हैं कि वे मदद करें।" },
+      "title": { "en": "Tell your baby about the kind of world you hope they'll help build.", "hi": "अपने बच्चे को उस तरह की दुनिया के बारे में बताइए जिसे बनाने में आप चाहती हैं कि वे मदद करें।" },
       "motivation": { "en": "Sharing your hopes for the world plants the first seeds of their kindness.", "hi": "दुनिया के लिए अपनी उम्मीदें बाँटना उनकी दयालुता के पहले बीज बोता है।" }
     },
     "garbhSanskar": {
@@ -233,9 +233,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "My Knowing Counts", "hi": "मेरी समझ भी मायने रखती है" },
-      "content": { "en": "What I sense about my baby matters. I will let my own knowing have a seat at the table.", "hi": "अपने बच्चे के बारे में जो मैं महसूस करती हूँ, वह मायने रखता है। मैं अपनी समझ को भी बराबर की जगह दूँगी।" },
-      "remember": { "en": "Your knowing belongs in every decision.", "hi": "आपकी समझ हर फ़ैसले में शामिल होनी चाहिए।" },
+      "title": { "en": "What I sense matters", "hi": "मेरी समझ भी मायने रखती है" },
+      "content": { "en": "What I sense about my baby matters. I'll give my own knowing a seat at the table.", "hi": "अपने बच्चे के बारे में जो मैं महसूस करती हूँ, वह मायने रखता है। मैं अपनी समझ को भी बराबर की जगह दूँगी।" },
+      "remember": { "en": "What you sense about your baby deserves to be heard.", "hi": "आपकी समझ हर फ़ैसले में शामिल होनी चाहिए।" },
       "durationMinutes": 0
     }
   },
@@ -244,11 +244,11 @@
     "week": 8,
     "babyLearning": { "en": "All your baby's main organs have started to grow.", "hi": "हफ़्ता पूरा करते हुए, पहले से ज़्यादा मज़बूत और पूरे" },
     "grow": {
-      "title": { "en": "Write Your Own Story", "hi": "अपनी कहानी ख़ुद लिखिए" },
-      "insight": { "en": "This pregnancy, and the parent you become, is a story only you can write. No one else holds the pen.", "hi": "यह गर्भावस्था, और आप जो माता-पिता बनती हैं — यह एक ऐसी कहानी है जिसे सिर्फ़ आप लिख सकती हैं। क़लम किसी और के हाथ में नहीं।" },
-      "expanded": { "en": "All week we have touched the same gentle truth: your path is your own. As this week closes, let it settle in deeply. You will gather wisdom from many places — elders, books, friends, this very app — but you are the author of how your family will live and love. The story you are writing does not have to look like your mother's, your friend's, or anyone else's. It only has to be honest, and warm, and truly yours. Pick up the pen with confidence. The most beautiful family stories are the ones written from the heart, one ordinary, loving day at a time.", "hi": "पूरे हफ़्ते हम उसी नरम सच को छूते रहे: आपका रास्ता आपका अपना है। यह हफ़्ता बंद होते-होते इसे गहरे बैठ जाने दीजिए। आप कई जगहों से समझ बटोरेंगी — बड़े-बुज़ुर्ग, किताबें, दोस्त, यही ऐप — पर आपका परिवार कैसे जिएगा और कैसे प्यार करेगा, इसकी लेखक आप हैं। जो कहानी आप लिख रही हैं, उसे आपकी माँ की, आपकी दोस्त की, या किसी और की जैसी दिखने की ज़रूरत नहीं। बस इतना कि वह सच्ची हो, गर्म हो, और सच में आपकी हो। भरोसे के साथ क़लम उठाइए। सबसे सुंदर पारिवारिक कहानियाँ वही होती हैं जो दिल से लिखी जाती हैं — एक आम, प्यार भरे दिन के बाद दूसरा।" },
-      "deepDive": { "en": "Family researchers find that parents who feel confident authoring their own approach, rather than copying others, tend to be calmer and more consistent. Ownership steadies you.", "hi": "परिवार पर हुए शोध बताते हैं कि जो माता-पिता दूसरों की नक़ल करने के बजाय अपना तरीक़ा ख़ुद गढ़ने का भरोसा रखते हैं, वे ज़्यादा शांत और ज़्यादा टिके हुए रहते हैं। अपनापन आपको थाम देता है।" },
-      "remember": { "en": "You hold the pen to your own family story.", "hi": "अपने परिवार की कहानी की क़लम आपके हाथ में है।" }
+      "title": { "en": "You get to write your own family story", "hi": "अपनी कहानी ख़ुद लिखिए" },
+      "insight": { "en": "This pregnancy, and the parent you become, is a story only you can write.", "hi": "यह गर्भावस्था, और आप जो माता-पिता बनती हैं — यह एक ऐसी कहानी है जिसे सिर्फ़ आप लिख सकती हैं। क़लम किसी और के हाथ में नहीं।" },
+      "expanded": { "en": "All week the idea has been the same: your path is your own. You'll gather wisdom from many places, like elders, books, friends and this app. You decide how your family will live and love. Your story doesn't have to look like your mother's, your friend's or anyone else's. It only has to be honest, warm and yours. Write it with confidence, one ordinary, loving day at a time.", "hi": "पूरे हफ़्ते हम उसी नरम सच को छूते रहे: आपका रास्ता आपका अपना है। यह हफ़्ता बंद होते-होते इसे गहरे बैठ जाने दीजिए। आप कई जगहों से समझ बटोरेंगी — बड़े-बुज़ुर्ग, किताबें, दोस्त, यही ऐप — पर आपका परिवार कैसे जिएगा और कैसे प्यार करेगा, इसकी लेखक आप हैं। जो कहानी आप लिख रही हैं, उसे आपकी माँ की, आपकी दोस्त की, या किसी और की जैसी दिखने की ज़रूरत नहीं। बस इतना कि वह सच्ची हो, गर्म हो, और सच में आपकी हो। भरोसे के साथ क़लम उठाइए। सबसे सुंदर पारिवारिक कहानियाँ वही होती हैं जो दिल से लिखी जाती हैं — एक आम, प्यार भरे दिन के बाद दूसरा।" },
+      "deepDive": { "en": "Family researchers find that parents who feel confident shaping their own approach, instead of copying others, tend to be calmer and more consistent.", "hi": "परिवार पर हुए शोध बताते हैं कि जो माता-पिता दूसरों की नक़ल करने के बजाय अपना तरीक़ा ख़ुद गढ़ने का भरोसा रखते हैं, वे ज़्यादा शांत और ज़्यादा टिके हुए रहते हैं। अपनापन आपको थाम देता है।" },
+      "remember": { "en": "You hold the pen for your family's story.", "hi": "अपने परिवार की कहानी की क़लम आपके हाथ में है।" }
     },
     "readToBaby": {
       "title": { "en": "The Mountain Stream", "hi": "पहाड़ी झरना" },
@@ -257,8 +257,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about a small, everyday hope you hold for them.", "hi": "अपने बच्चे को एक छोटी, रोज़मर्रा की उम्मीद के बारे में बताइए जो आप उनके लिए रखती हैं।" },
-      "motivation": { "en": "The little hopes you whisper are as precious as the grand ones.", "hi": "जो छोटी उम्मीदें आप धीरे से कहती हैं, वे बड़ी उम्मीदों जितनी ही क़ीमती हैं।" }
+      "title": { "en": "Tell your baby about a small, everyday hope you have for them.", "hi": "अपने बच्चे को एक छोटी, रोज़मर्रा की उम्मीद के बारे में बताइए जो आप उनके लिए रखती हैं।" },
+      "motivation": { "en": "The little hopes you whisper matter as much as the big ones.", "hi": "जो छोटी उम्मीदें आप धीरे से कहती हैं, वे बड़ी उम्मीदों जितनी ही क़ीमती हैं।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -273,9 +273,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "A Breath To Begin", "hi": "शुरू करने के लिए एक साँस" },
-      "content": { "en": "Breathe in slowly and imagine a fresh, blank page before you. As you breathe out, gently let go of how things 'should' be, and feel free to begin your own way.", "hi": "धीरे से साँस लीजिए और अपने सामने एक ताज़ा, कोरा पन्ना सोचिए। साँस छोड़ते हुए, नरमी से यह जाने दीजिए कि चीज़ें कैसी 'होनी चाहिए', और अपने ही तरीक़े से शुरू करने के लिए आज़ाद महसूस कीजिए।" },
-      "remember": { "en": "Every breath is a clean page to begin again.", "hi": "हर साँस फिर से शुरू करने का एक कोरा पन्ना है।" },
+      "title": { "en": "A breath to begin", "hi": "शुरू करने के लिए एक साँस" },
+      "content": { "en": "Breathe in slowly and picture a fresh, blank page. As you breathe out, let go of how things 'should' be, and feel free to start your own way.", "hi": "धीरे से साँस लीजिए और अपने सामने एक ताज़ा, कोरा पन्ना सोचिए। साँस छोड़ते हुए, नरमी से यह जाने दीजिए कि चीज़ें कैसी 'होनी चाहिए', और अपने ही तरीक़े से शुरू करने के लिए आज़ाद महसूस कीजिए।" },
+      "remember": { "en": "Each breath is a chance to start again.", "hi": "हर साँस फिर से शुरू करने का एक कोरा पन्ना है।" },
       "durationMinutes": 2
     }
   }

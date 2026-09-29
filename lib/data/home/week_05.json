@@ -4,10 +4,10 @@
     "week": 5,
     "babyLearning": { "en": "A tiny tube that will become your baby's heart is forming.", "hi": "तेज़ी से बढ़ रहा है, एक नन्हा दिल धड़कना शुरू कर रहा है" },
     "grow": {
-      "title": { "en": "Calm Is A Language", "hi": "शांति भी एक भाषा है" },
-      "insight": { "en": "Long before your baby understands words, they understand your calm. It is the first language you will ever share.", "hi": "आपके शिशु के शब्द समझने से बहुत पहले, वह आपकी शांति समझ लेता है। यही पहली भाषा है जो आप दोनों बाँटेंगे।" },
-      "expanded": { "en": "Babies are tuned to the feeling behind our words, not the words themselves. The steadiness in your breath, the softness in your body, the quiet in your heart — these reach your baby as a kind of language, one that says 'you are safe.' You do not have to be calm every moment; no one is. But each time you return to calm, you teach your baby the most reassuring lesson of all: that peace is always something we can come back to.", "hi": "शिशु हमारे शब्दों के पीछे के भाव से जुड़े होते हैं, शब्दों से नहीं। आपकी साँस की स्थिरता, आपके शरीर की नरमी, आपके दिल का सुकून — ये आपके शिशु तक एक तरह की भाषा बनकर पहुँचते हैं, जो कहती है 'तुम सुरक्षित हो।' आपको हर पल शांत रहने की ज़रूरत नहीं; कोई नहीं रहता। पर हर बार जब आप शांति में लौटती हैं, आप अपने शिशु को सबसे भरोसा देने वाला सबक सिखाती हैं — कि शांति वह जगह है जहाँ हम हमेशा लौट सकते हैं।" },
-      "deepDive": { "en": "Infants only a few days old can sense and mirror a caregiver's emotional state — a process researchers call co-regulation. Your nervous system literally helps shape your baby's.", "hi": "कुछ ही दिन के नवजात देखभाल करने वाले के मन की हालत भाँप लेते हैं और उसे दोहराने लगते हैं — शोध में इसे 'co-regulation' कहा जाता है। आपके शरीर की अपनी लय सचमुच आपके शिशु की लय गढ़ने में मदद करती है।" },
+      "title": { "en": "Babies understand calm before words", "hi": "शांति भी एक भाषा है" },
+      "insight": { "en": "Long before your baby understands words, they'll understand your calm. It's the first language you'll share.", "hi": "आपके शिशु के शब्द समझने से बहुत पहले, वह आपकी शांति समझ लेता है। यही पहली भाषा है जो आप दोनों बाँटेंगे।" },
+      "expanded": { "en": "Babies pick up the feeling behind our words more than the words themselves. A steady breath, a soft voice and a relaxed face all tell a baby 'you're safe'. You don't have to be calm every moment. No one is. Each time you come back to calm, your baby learns that calm is something you can always return to.", "hi": "शिशु हमारे शब्दों के पीछे के भाव से जुड़े होते हैं, शब्दों से नहीं। आपकी साँस की स्थिरता, आपके शरीर की नरमी, आपके दिल का सुकून — ये आपके शिशु तक एक तरह की भाषा बनकर पहुँचते हैं, जो कहती है 'तुम सुरक्षित हो।' आपको हर पल शांत रहने की ज़रूरत नहीं; कोई नहीं रहता। पर हर बार जब आप शांति में लौटती हैं, आप अपने शिशु को सबसे भरोसा देने वाला सबक सिखाती हैं — कि शांति वह जगह है जहाँ हम हमेशा लौट सकते हैं।" },
+      "deepDive": { "en": "Research on babies and young children suggests they settle more easily when the adult with them is calm. Researchers call this co-regulation. Your calm helps your baby find theirs.", "hi": "कुछ ही दिन के नवजात देखभाल करने वाले के मन की हालत भाँप लेते हैं और उसे दोहराने लगते हैं — शोध में इसे 'co-regulation' कहा जाता है। आपके शरीर की अपनी लय सचमुच आपके शिशु की लय गढ़ने में मदद करती है।" },
       "remember": { "en": "Your calm is the first language your baby learns.", "hi": "आपकी शांति वह पहली भाषा है जो आपका शिशु सीखता है।" }
     },
     "readToBaby": {
@@ -17,8 +17,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby what makes you, you — the little things that feel most like yourself.", "hi": "अपने शिशु को बताइए कि क्या आपको 'आप' बनाता है — वे छोटी-छोटी चीज़ें जो सबसे ज़्यादा आपकी अपनी लगती हैं।" },
-      "motivation": { "en": "Your child's first sense of the world will be shaped by who you are.", "hi": "आपका बच्चा दुनिया को पहली बार जैसा महसूस करेगा, वह इसी से बनेगा कि आप कौन हैं।" }
+      "title": { "en": "Tell your baby what makes you who you are, the little things that feel most like you.", "hi": "अपने शिशु को बताइए कि क्या आपको 'आप' बनाता है — वे छोटी-छोटी चीज़ें जो सबसे ज़्यादा आपकी अपनी लगती हैं।" },
+      "motivation": { "en": "Who you are will shape your child's first sense of the world.", "hi": "आपका बच्चा दुनिया को पहली बार जैसा महसूस करेगा, वह इसी से बनेगा कि आप कौन हैं।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -33,9 +33,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "I Am Doing Better Than I Think", "hi": "मैं अपनी सोच से बेहतर कर रही हूँ" },
-      "content": { "en": "On the hard days, I will remember that simply showing up with love is already enough.", "hi": "मुश्किल दिनों में मैं याद रखूँगी कि प्यार के साथ बस साथ खड़े रहना ही काफ़ी है।" },
-      "remember": { "en": "Enough is not a high bar — it is a loving one.", "hi": "'काफ़ी' कोई ऊँचा पैमाना नहीं — यह एक प्यार भरा पैमाना है।" },
+      "title": { "en": "I'm doing better than I think", "hi": "मैं अपनी सोच से बेहतर कर रही हूँ" },
+      "content": { "en": "On the hard days, I'll keep in mind that showing up with love is enough.", "hi": "मुश्किल दिनों में मैं याद रखूँगी कि प्यार के साथ बस साथ खड़े रहना ही काफ़ी है।" },
+      "remember": { "en": "You're doing better than you think.", "hi": "'काफ़ी' कोई ऊँचा पैमाना नहीं — यह एक प्यार भरा पैमाना है।" },
       "durationMinutes": 0
     }
   },
@@ -44,10 +44,10 @@
     "week": 5,
     "babyLearning": { "en": "The neural tube, which will become the brain and spine, is forming.", "hi": "नन्हे हाथ-पैर की कलियाँ बनना शुरू" },
     "grow": {
-      "title": { "en": "You Cannot Pour From Empty", "hi": "ख़ाली से नहीं उँडेला जाता" },
-      "insight": { "en": "Caring for your baby begins with caring for yourself. You cannot pour from a cup that is empty.", "hi": "अपने शिशु का ख़्याल रखना ख़ुद का ख़्याल रखने से शुरू होता है। ख़ाली प्याले से कुछ उँडेला नहीं जाता।" },
-      "expanded": { "en": "It can feel selfish to rest, to eat well, to ask for a quiet hour — as if every ounce of care should go to the baby. But your wellbeing is not separate from your baby's; it is the very source of it. A rested, nourished, gently cared-for mother gives from fullness, not from strain. Filling your own cup is not taking away from your baby. It is exactly how you make sure there is always something warm to give.", "hi": "आराम करना, अच्छा खाना, एक शांत घंटा माँग लेना — यह सब कभी-कभी स्वार्थी लगने लगता है, जैसे देखभाल का हर कण बस शिशु के लिए ही होना चाहिए। पर आपकी भलाई आपके शिशु की भलाई से अलग नहीं है; वही तो उसकी जड़ है। एक आराम पाई हुई, पोसी हुई, नरमी से सँभाली गई माँ भरेपन से देती है, खिंचाव से नहीं। अपना प्याला भरना अपने शिशु से कुछ छीनना नहीं है। यही तो वह तरीक़ा है जिससे आप पक्का करती हैं कि देने के लिए हमेशा कुछ गर्म बचा रहे।" },
-      "deepDive": { "en": "Maternal stress hormones can cross the placenta, while a calm, supported mother creates a steadier environment. Caring for yourself is, quite literally, prenatal care.", "hi": "माँ के तनाव वाले हॉर्मोन प्लेसेंटा पार कर सकते हैं, जबकि एक शांत, सहारा पाई हुई माँ ज़्यादा ठहरा हुआ माहौल बनाती है। अपना ख़्याल रखना, सच में, गर्भ की देखभाल का ही हिस्सा है।" },
+      "title": { "en": "Looking after yourself helps your baby", "hi": "ख़ाली से नहीं उँडेला जाता" },
+      "insight": { "en": "Caring for your baby starts with caring for yourself. It's hard to give when you're running on empty.", "hi": "अपने शिशु का ख़्याल रखना ख़ुद का ख़्याल रखने से शुरू होता है। ख़ाली प्याले से कुछ उँडेला नहीं जाता।" },
+      "expanded": { "en": "It can feel selfish to rest, eat well or ask for a quiet hour, as if all your care should go to the baby. Your wellbeing and your baby's are closely linked. When you're rested, fed and looked after, you give from a full place instead of from strain. Looking after yourself doesn't take anything from your baby. It makes sure you have warmth left to give.", "hi": "आराम करना, अच्छा खाना, एक शांत घंटा माँग लेना — यह सब कभी-कभी स्वार्थी लगने लगता है, जैसे देखभाल का हर कण बस शिशु के लिए ही होना चाहिए। पर आपकी भलाई आपके शिशु की भलाई से अलग नहीं है; वही तो उसकी जड़ है। एक आराम पाई हुई, पोसी हुई, नरमी से सँभाली गई माँ भरेपन से देती है, खिंचाव से नहीं। अपना प्याला भरना अपने शिशु से कुछ छीनना नहीं है। यही तो वह तरीक़ा है जिससे आप पक्का करती हैं कि देने के लिए हमेशा कुछ गर्म बचा रहे।" },
+      "deepDive": { "en": "Research suggests that feeling supported and less stressed in pregnancy is good for both mother and baby. So rest, good food and help from others are all part of prenatal care.", "hi": "माँ के तनाव वाले हॉर्मोन प्लेसेंटा पार कर सकते हैं, जबकि एक शांत, सहारा पाई हुई माँ ज़्यादा ठहरा हुआ माहौल बनाती है। अपना ख़्याल रखना, सच में, गर्भ की देखभाल का ही हिस्सा है।" },
       "remember": { "en": "Filling your own cup is part of filling your baby's.", "hi": "अपना प्याला भरना ही अपने शिशु का प्याला भरने का हिस्सा है।" }
     },
     "readToBaby": {
@@ -57,8 +57,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about your favourite things — the small joys that light you up.", "hi": "अपने शिशु को अपनी पसंदीदा चीज़ों के बारे में बताइए — वे छोटी ख़ुशियाँ जो आपको जगमगा देती हैं।" },
-      "motivation": { "en": "One day you'll watch your child discover joys of their own — share yours first.", "hi": "एक दिन आप अपने बच्चे को अपनी ख़ुशियाँ खोजते देखेंगी — पहले अपनी बाँट दीजिए।" }
+      "title": { "en": "Tell your baby about your favourite things, the small joys that light you up.", "hi": "अपने शिशु को अपनी पसंदीदा चीज़ों के बारे में बताइए — वे छोटी ख़ुशियाँ जो आपको जगमगा देती हैं।" },
+      "motivation": { "en": "One day you'll watch your child find joys of their own. Share yours first.", "hi": "एक दिन आप अपने बच्चे को अपनी ख़ुशियाँ खोजते देखेंगी — पहले अपनी बाँट दीजिए।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -73,9 +73,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Two Long Breaths", "hi": "दो लंबी साँसें" },
+      "title": { "en": "Two long breaths", "hi": "दो लंबी साँसें" },
       "content": { "en": "Breathe in slowly through your nose for a count of five, then sigh it all out through your mouth. Just two of these can soften a whole afternoon.", "hi": "पाँच तक गिनते हुए नाक से धीरे-धीरे साँस अंदर लीजिए, फिर पूरी साँस मुँह से छोड़ दीजिए। ऐसी सिर्फ़ दो साँसें पूरी दोपहर को नरम कर सकती हैं।" },
-      "remember": { "en": "A single deep breath is a doorway back to calm.", "hi": "एक गहरी साँस शांति में लौटने का दरवाज़ा है।" },
+      "remember": { "en": "One deep breath can bring you back to calm.", "hi": "एक गहरी साँस शांति में लौटने का दरवाज़ा है।" },
       "durationMinutes": 1
     }
   },
@@ -84,11 +84,11 @@
     "week": 5,
     "babyLearning": { "en": "Your baby's heart is getting ready to start beating very soon.", "hi": "एक नन्हा दिल अब लगातार धड़क रहा है" },
     "grow": {
-      "title": { "en": "Feelings Are Not Emergencies", "hi": "भावनाएँ कोई आफ़त नहीं होतीं" },
-      "insight": { "en": "A big feeling is not a problem to fix. It is a wave to ride — and it always passes.", "hi": "कोई बड़ी भावना ठीक करने वाली समस्या नहीं है। यह एक लहर है, जिस पर बस बहना होता है — और यह हमेशा गुज़र जाती है।" },
-      "expanded": { "en": "Pregnancy can bring waves of feeling that arrive without warning — tears, irritation, sudden tenderness. It is tempting to treat each one as an emergency, something wrong that must be solved at once. But most feelings ask only to be felt and allowed to move through. When you can sit with a feeling without panic — naming it, breathing through it — you model the very skill you most want for your child: that emotions can be big and still be safe.", "hi": "गर्भावस्था बिना चेतावनी आने वाली भावनाओं की लहरें ला सकती है — आँसू, चिड़चिड़ाहट, अचानक उमड़ती नरमी। हर एक को आफ़त की तरह लेना आसान है, जैसे कुछ ग़लत हो गया हो जिसे तुरंत ठीक करना है। पर ज़्यादातर भावनाएँ बस इतना माँगती हैं कि उन्हें महसूस किया जाए और गुज़र जाने दिया जाए। जब आप बिना घबराए किसी भावना के साथ बैठ पाती हैं — उसे नाम देकर, उसके बीच साँस लेकर — तो आप वही हुनर सिखा देती हैं जो आप अपने बच्चे के लिए सबसे ज़्यादा चाहती हैं: कि भावनाएँ बड़ी हो सकती हैं और फिर भी सुरक्षित रह सकती हैं।" },
-      "deepDive": { "en": "Naming an emotion — 'this is anxiety,' 'this is sadness' — measurably calms the brain's alarm centre. Psychologists call it 'name it to tame it.'", "hi": "किसी भावना को नाम दे देना — 'यह घबराहट है', 'यह उदासी है' — दिमाग़ के ख़तरे वाले हिस्से को नापी जा सकने लायक़ हद तक शांत कर देता है। मनोवैज्ञानिक इसे 'name it to tame it' कहते हैं।" },
-      "remember": { "en": "Name the feeling, and it loosens its grip.", "hi": "भावना को नाम दीजिए, और उसकी पकड़ ढीली पड़ जाती है।" }
+      "title": { "en": "Big feelings aren't emergencies", "hi": "भावनाएँ कोई आफ़त नहीं होतीं" },
+      "insight": { "en": "A big feeling doesn't need fixing straight away. You can let it rise and pass.", "hi": "कोई बड़ी भावना ठीक करने वाली समस्या नहीं है। यह एक लहर है, जिस पर बस बहना होता है — और यह हमेशा गुज़र जाती है।" },
+      "expanded": { "en": "Pregnancy can bring waves of feeling with no warning: tears, irritation, sudden tenderness. It's tempting to treat each one as a problem to solve at once. Most feelings only need to be felt and allowed to pass. When you can sit with a feeling without panic, naming it and breathing through it, you're practising something you'll want your child to learn: big feelings can be safe.", "hi": "गर्भावस्था बिना चेतावनी आने वाली भावनाओं की लहरें ला सकती है — आँसू, चिड़चिड़ाहट, अचानक उमड़ती नरमी। हर एक को आफ़त की तरह लेना आसान है, जैसे कुछ ग़लत हो गया हो जिसे तुरंत ठीक करना है। पर ज़्यादातर भावनाएँ बस इतना माँगती हैं कि उन्हें महसूस किया जाए और गुज़र जाने दिया जाए। जब आप बिना घबराए किसी भावना के साथ बैठ पाती हैं — उसे नाम देकर, उसके बीच साँस लेकर — तो आप वही हुनर सिखा देती हैं जो आप अपने बच्चे के लिए सबसे ज़्यादा चाहती हैं: कि भावनाएँ बड़ी हो सकती हैं और फिर भी सुरक्षित रह सकती हैं।" },
+      "deepDive": { "en": "Studies suggest that putting a feeling into words, like 'this is worry' or 'this is sadness', can make it less intense. Some psychologists call this 'name it to tame it'.", "hi": "किसी भावना को नाम दे देना — 'यह घबराहट है', 'यह उदासी है' — दिमाग़ के ख़तरे वाले हिस्से को नापी जा सकने लायक़ हद तक शांत कर देता है। मनोवैज्ञानिक इसे 'name it to tame it' कहते हैं।" },
+      "remember": { "en": "Naming a feeling helps it loosen its grip.", "hi": "भावना को नाम दीजिए, और उसकी पकड़ ढीली पड़ जाती है।" }
     },
     "readToBaby": {
       "title": { "en": "Birbal And The Shorter Line", "hi": "बीरबल और छोटी लकीर" },
@@ -97,8 +97,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about what you do each day — your work and the things you care about.", "hi": "अपने शिशु को बताइए कि आप हर दिन क्या करती हैं — अपना काम और वे चीज़ें जिनकी आप परवाह करती हैं।" },
-      "motivation": { "en": "Your child will be proud to know the world you move through.", "hi": "आपका बच्चा उस दुनिया को जानकर गर्व करेगा जिसमें आप चलती-फिरती हैं।" }
+      "title": { "en": "Tell your baby about what you do each day, your work and the things you care about.", "hi": "अपने शिशु को बताइए कि आप हर दिन क्या करती हैं — अपना काम और वे चीज़ें जिनकी आप परवाह करती हैं।" },
+      "motivation": { "en": "Your child will love knowing about the world you spend your days in.", "hi": "आपका बच्चा उस दुनिया को जानकर गर्व करेगा जिसमें आप चलती-फिरती हैं।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -113,9 +113,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "I Don't Have To Earn Rest", "hi": "आराम कमाना नहीं पड़ता" },
-      "content": { "en": "Rest is not a reward for finishing everything. It is something my body and my baby simply deserve.", "hi": "आराम सब कुछ निपटा लेने का इनाम नहीं है। यह वह चीज़ है जिसके मेरा शरीर और मेरा शिशु यूँ ही हक़दार हैं।" },
-      "remember": { "en": "You are allowed to rest before you are 'done.'", "hi": "आपको 'सब निपट जाने' से पहले भी आराम करने की इजाज़त है।" },
+      "title": { "en": "I don't have to earn rest", "hi": "आराम कमाना नहीं पड़ता" },
+      "content": { "en": "Rest isn't a reward for finishing everything. My body and my baby need it.", "hi": "आराम सब कुछ निपटा लेने का इनाम नहीं है। यह वह चीज़ है जिसके मेरा शरीर और मेरा शिशु यूँ ही हक़दार हैं।" },
+      "remember": { "en": "You're allowed to rest before everything's done.", "hi": "आपको 'सब निपट जाने' से पहले भी आराम करने की इजाज़त है।" },
       "durationMinutes": 0
     }
   },
@@ -124,11 +124,11 @@
     "week": 5,
     "babyLearning": { "en": "Tiny blocks along your baby's back will later become bones and muscles.", "hi": "दिमाग़ नरम लहरों में बढ़ रहा है" },
     "grow": {
-      "title": { "en": "The Pause Is The Power", "hi": "ठहरने में ही ताक़त है" },
-      "insight": { "en": "The most powerful thing you can do in a hard moment is simply to pause before you react.", "hi": "किसी मुश्किल पल में सबसे ताक़तवर काम यही है कि प्रतिक्रिया देने से पहले बस एक पल ठहर जाइए।" },
-      "expanded": { "en": "Between something happening and how we respond, there is a small space — and in that space lies all our freedom. When feelings run high, the instinct is to react at once. But a single breath, a single pause, lets you choose your response instead of being chosen by it. This is perhaps the deepest parenting skill of all, and you can begin practising it now. Each time you pause before reacting, you grow calmer — and you build the patience your child will one day lean on.", "hi": "कुछ घटने और हमारे जवाब देने के बीच एक छोटी सी जगह होती है — और उसी जगह में हमारी सारी आज़ादी है। जब भावनाएँ तेज़ होती हैं, मन करता है कि फ़ौरन प्रतिक्रिया दे दें। पर एक ही साँस, एक ही ठहराव, आपको अपना जवाब चुनने देता है — बजाय इसके कि जवाब आपको चुन ले। शायद यही माँ-पापा बनने का सबसे गहरा हुनर है, और आप इसका अभ्यास अभी से शुरू कर सकती हैं। हर बार जब आप प्रतिक्रिया देने से पहले ठहरती हैं, आप और शांत होती जाती हैं — और वह सब्र बनता जाता है जिस पर आपका बच्चा एक दिन टिकेगा।" },
-      "deepDive": { "en": "Neuroscience shows a pause of even a few seconds lets the thinking brain catch up with the reacting brain. The pause is not doing nothing — it is doing the most important thing.", "hi": "दिमाग़ पर हुए शोध बताते हैं कि कुछ सेकंड का ठहराव भी सोचने वाले दिमाग़ को प्रतिक्रिया करने वाले दिमाग़ के बराबर आ जाने देता है। ठहरना कुछ न करना नहीं है — यह सबसे ज़रूरी काम करना है।" },
-      "remember": { "en": "In the pause, you get to choose who you want to be.", "hi": "उसी ठहराव में आप चुन पाती हैं कि आप कौन बनना चाहती हैं।" }
+      "title": { "en": "Pausing before you react helps", "hi": "ठहरने में ही ताक़त है" },
+      "insight": { "en": "In a hard moment, one of the most useful things you can do is pause before you react.", "hi": "किसी मुश्किल पल में सबसे ताक़तवर काम यही है कि प्रतिक्रिया देने से पहले बस एक पल ठहर जाइए।" },
+      "expanded": { "en": "Between something happening and how you respond, there's a small gap. When feelings run high, the urge is to react at once. One breath, one pause, lets you choose your response. This is one of the most useful parenting skills there is, and you can start practising it now. Each pause makes the next one easier, and builds the patience your child will one day lean on.", "hi": "कुछ घटने और हमारे जवाब देने के बीच एक छोटी सी जगह होती है — और उसी जगह में हमारी सारी आज़ादी है। जब भावनाएँ तेज़ होती हैं, मन करता है कि फ़ौरन प्रतिक्रिया दे दें। पर एक ही साँस, एक ही ठहराव, आपको अपना जवाब चुनने देता है — बजाय इसके कि जवाब आपको चुन ले। शायद यही माँ-पापा बनने का सबसे गहरा हुनर है, और आप इसका अभ्यास अभी से शुरू कर सकती हैं। हर बार जब आप प्रतिक्रिया देने से पहले ठहरती हैं, आप और शांत होती जाती हैं — और वह सब्र बनता जाता है जिस पर आपका बच्चा एक दिन टिकेगा।" },
+      "deepDive": { "en": "Taking a breath before you respond gives you a moment to think about what you want to say. Parenting experts often suggest it for heated moments with children.", "hi": "दिमाग़ पर हुए शोध बताते हैं कि कुछ सेकंड का ठहराव भी सोचने वाले दिमाग़ को प्रतिक्रिया करने वाले दिमाग़ के बराबर आ जाने देता है। ठहरना कुछ न करना नहीं है — यह सबसे ज़रूरी काम करना है।" },
+      "remember": { "en": "A pause gives you time to choose how you respond.", "hi": "उसी ठहराव में आप चुन पाती हैं कि आप कौन बनना चाहती हैं।" }
     },
     "readToBaby": {
       "title": { "en": "The Banyan And The Reed", "hi": "बरगद और सरकंडा" },
@@ -137,8 +137,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about your dearest friends — the people who feel like home.", "hi": "अपने शिशु को अपने सबसे प्यारे दोस्तों के बारे में बताइए — वे लोग जो घर जैसे लगते हैं।" },
-      "motivation": { "en": "You're introducing your baby to the circle of love they're being born into.", "hi": "आप अपने शिशु का उस प्यार के घेरे से परिचय करा रही हैं जिसमें वह जन्म ले रहा है।" }
+      "title": { "en": "Tell your baby about your closest friends, the people who feel like home.", "hi": "अपने शिशु को अपने सबसे प्यारे दोस्तों के बारे में बताइए — वे लोग जो घर जैसे लगते हैं।" },
+      "motivation": { "en": "You're introducing your baby to the people who'll love them too.", "hi": "आप अपने शिशु का उस प्यार के घेरे से परिचय करा रही हैं जिसमें वह जन्म ले रहा है।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -153,9 +153,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Soften The Jaw", "hi": "जबड़े को ढीला छोड़िए" },
-      "content": { "en": "Take a slow breath in. As you breathe out, gently unclench your jaw, let your tongue rest, and feel your whole face soften. Repeat five times.", "hi": "एक धीमी साँस अंदर लीजिए। साँस छोड़ते हुए अपना जबड़ा प्यार से ढीला कीजिए, जीभ को आराम दीजिए, और अपना पूरा चेहरा नरम होते महसूस कीजिए। पाँच बार दोहराइए।" },
-      "remember": { "en": "We hold tension in places we forget to notice.", "hi": "हम तनाव उन जगहों पर पकड़े रहते हैं जिन पर ध्यान देना ही भूल जाते हैं।" },
+      "title": { "en": "Soften your jaw", "hi": "जबड़े को ढीला छोड़िए" },
+      "content": { "en": "Take a slow breath in. As you breathe out, unclench your jaw, let your tongue rest and feel your whole face soften. Repeat five times.", "hi": "एक धीमी साँस अंदर लीजिए। साँस छोड़ते हुए अपना जबड़ा प्यार से ढीला कीजिए, जीभ को आराम दीजिए, और अपना पूरा चेहरा नरम होते महसूस कीजिए। पाँच बार दोहराइए।" },
+      "remember": { "en": "Tension often hides in the jaw.", "hi": "हम तनाव उन जगहों पर पकड़े रहते हैं जिन पर ध्यान देना ही भूल जाते हैं।" },
       "durationMinutes": 2
     }
   },
@@ -164,11 +164,11 @@
     "week": 5,
     "babyLearning": { "en": "Your baby's first blood cells and blood vessels are forming.", "hi": "नरमी से सिमट रहा है, भीतर आराम से" },
     "grow": {
-      "title": { "en": "Your Peace Travels Inward", "hi": "आपकी शांति भीतर तक जाती है" },
-      "insight": { "en": "The calm you create for yourself does not stay with you. It travels inward, to your baby.", "hi": "जो शांति आप अपने लिए बनाती हैं वह सिर्फ़ आप तक नहीं रुकती। वह भीतर, आपके शिशु तक जाती है।" },
-      "expanded": { "en": "When you take a slow breath, sip your tea in quiet, or let your shoulders drop, it can feel like a small, private moment — just for you. But nothing you feel stays only with you right now. Your steadiness becomes your baby's steadiness; your ease becomes the gentle ocean they float in. This is a beautiful thing: the kindest gift you can give your baby today is also the kindest gift you can give yourself. Your peace is never wasted — it always reaches two.", "hi": "जब आप एक धीमी साँस लेती हैं, चुपचाप चाय की चुस्की लेती हैं, या अपने कंधे ढीले छोड़ देती हैं, तो यह एक छोटा, अपना सा पल लग सकता है — बस आपके लिए। पर अभी आप जो भी महसूस करती हैं वह सिर्फ़ आप तक नहीं रहता। आपका ठहराव आपके शिशु का ठहराव बन जाता है; आपका सुकून वह नरम समंदर बन जाता है जिसमें वह तैरता है। यह बहुत सुंदर बात है — आज आप अपने शिशु को जो सबसे प्यारा तोहफ़ा दे सकती हैं, वही सबसे प्यारा तोहफ़ा आप ख़ुद को भी दे रही होती हैं। आपकी शांति कभी बेकार नहीं जाती — वह हमेशा दो तक पहुँचती है।" },
-      "deepDive": { "en": "When a mother relaxes, her heart rate steadies and blood flows more easily to the womb. Your calm reaches your baby through the body, not just the heart.", "hi": "जब माँ आराम में होती है, उसकी दिल की धड़कन ठहर जाती है और गर्भ तक ख़ून ज़्यादा आसानी से पहुँचता है। आपकी शांति आपके शिशु तक शरीर के रास्ते पहुँचती है, सिर्फ़ दिल के रास्ते नहीं।" },
-      "remember": { "en": "Peace given to yourself is peace given to your baby.", "hi": "ख़ुद को दी गई शांति आपके शिशु को दी गई शांति है।" }
+      "title": { "en": "Your calm reaches your baby too", "hi": "आपकी शांति भीतर तक जाती है" },
+      "insight": { "en": "The calm you make for yourself doesn't stay with you. It reaches your baby too.", "hi": "जो शांति आप अपने लिए बनाती हैं वह सिर्फ़ आप तक नहीं रुकती। वह भीतर, आपके शिशु तक जाती है।" },
+      "expanded": { "en": "A slow breath, a cup of tea in peace, letting your shoulders drop: these can feel like small moments just for you. Right now, what helps you helps your baby too. When you feel steadier, that steadiness is part of the world your baby is growing in. The kindest thing you can do for your baby today is also kind to you.", "hi": "जब आप एक धीमी साँस लेती हैं, चुपचाप चाय की चुस्की लेती हैं, या अपने कंधे ढीले छोड़ देती हैं, तो यह एक छोटा, अपना सा पल लग सकता है — बस आपके लिए। पर अभी आप जो भी महसूस करती हैं वह सिर्फ़ आप तक नहीं रहता। आपका ठहराव आपके शिशु का ठहराव बन जाता है; आपका सुकून वह नरम समंदर बन जाता है जिसमें वह तैरता है। यह बहुत सुंदर बात है — आज आप अपने शिशु को जो सबसे प्यारा तोहफ़ा दे सकती हैं, वही सबसे प्यारा तोहफ़ा आप ख़ुद को भी दे रही होती हैं। आपकी शांति कभी बेकार नहीं जाती — वह हमेशा दो तक पहुँचती है।" },
+      "deepDive": { "en": "When you relax, your heart rate and breathing slow down. Feeling calmer is good for you, and what's good for you is good for your baby.", "hi": "जब माँ आराम में होती है, उसकी दिल की धड़कन ठहर जाती है और गर्भ तक ख़ून ज़्यादा आसानी से पहुँचता है। आपकी शांति आपके शिशु तक शरीर के रास्ते पहुँचती है, सिर्फ़ दिल के रास्ते नहीं।" },
+      "remember": { "en": "Peace you give yourself reaches your baby too.", "hi": "ख़ुद को दी गई शांति आपके शिशु को दी गई शांति है।" }
     },
     "readToBaby": {
       "title": { "en": "The Boy Who Cried Wolf", "hi": "झूठा चरवाहा" },
@@ -177,8 +177,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about your faith, or whatever quietly calms and steadies you.", "hi": "अपने शिशु को अपनी आस्था के बारे में बताइए, या जो भी चीज़ आपको चुपचाप शांत और स्थिर करती है।" },
-      "motivation": { "en": "You're passing on the inner anchors that have carried you.", "hi": "आप वे भीतरी सहारे आगे दे रही हैं जिन्होंने आपको सँभाले रखा है।" }
+      "title": { "en": "Tell your baby about your faith, or whatever calms and steadies you.", "hi": "अपने शिशु को अपनी आस्था के बारे में बताइए, या जो भी चीज़ आपको चुपचाप शांत और स्थिर करती है।" },
+      "motivation": { "en": "You're passing on the things that have kept you steady.", "hi": "आप वे भीतरी सहारे आगे दे रही हैं जिन्होंने आपको सँभाले रखा है।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -193,9 +193,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "My Best Looks Different Each Day", "hi": "मेरा सबसे अच्छा हर दिन अलग दिखता है" },
-      "content": { "en": "Some days my best is a lot, and some days it is just getting through. Both are completely enough.", "hi": "कुछ दिन मेरा सबसे अच्छा बहुत कुछ होता है, और कुछ दिन बस दिन काट लेना। दोनों पूरी तरह काफ़ी हैं।" },
-      "remember": { "en": "Your best is allowed to change with the day.", "hi": "आपके 'सबसे अच्छे' को दिन के साथ बदलने की इजाज़त है।" },
+      "title": { "en": "My best looks different each day", "hi": "मेरा सबसे अच्छा हर दिन अलग दिखता है" },
+      "content": { "en": "Some days my best is a lot, and some days it's just getting through. Both are enough.", "hi": "कुछ दिन मेरा सबसे अच्छा बहुत कुछ होता है, और कुछ दिन बस दिन काट लेना। दोनों पूरी तरह काफ़ी हैं।" },
+      "remember": { "en": "Your best can change from day to day, and that's fine.", "hi": "आपके 'सबसे अच्छे' को दिन के साथ बदलने की इजाज़त है।" },
       "durationMinutes": 0
     }
   },
@@ -204,11 +204,11 @@
     "week": 5,
     "babyLearning": { "en": "The folds that will shape your baby's face are just beginning.", "hi": "नन्हे नक़्श आकार लेने लगे हैं" },
     "grow": {
-      "title": { "en": "Soft Is Also Strong", "hi": "नरम होना भी मज़बूत होना है" },
-      "insight": { "en": "Gentleness is not weakness. It takes real strength to stay soft in a hard world.", "hi": "नरमी कमज़ोरी नहीं है। एक सख़्त दुनिया में नरम बने रहने के लिए सच्ची ताक़त चाहिए।" },
-      "expanded": { "en": "We often imagine strength as something hard — firm, unbending, in control. But the strength a child most needs is a softer kind: the patience to stay gentle when tired, the warmth to comfort instead of scold, the courage to be tender. This softness is not the absence of strength; it is strength with love added. As you grow into your baby's parent, know that every gentle choice you make is powerful. Soft hands and a soft voice shape a child more deeply than any hardness ever could.", "hi": "हम अक्सर ताक़त को कुछ सख़्त सा मानते हैं — कड़ी, न झुकने वाली, सब क़ाबू में रखने वाली। पर बच्चे को जिस ताक़त की सबसे ज़्यादा ज़रूरत होती है वह नरम क़िस्म की है: थके होने पर भी नरम बने रहने का सब्र, डाँटने के बजाय दिलासा देने की गरमाहट, कोमल होने की हिम्मत। यह नरमी ताक़त का न होना नहीं है; यह ताक़त है, जिसमें प्यार जुड़ गया हो। जैसे-जैसे आप अपने शिशु की माँ बनती जा रही हैं, जान लीजिए कि आपका हर नरम फ़ैसला बहुत ताक़तवर है। नरम हाथ और नरम आवाज़ बच्चे को किसी भी सख़्ती से कहीं गहरे गढ़ते हैं।" },
-      "deepDive": { "en": "Children raised with warm, gentle responsiveness tend to grow more resilient, not less — kindness builds the secure base from which they bravely explore the world.", "hi": "जिन बच्चों को गरमजोशी और नरमी से जवाब मिलता है, वे कम नहीं बल्कि ज़्यादा मज़बूत बनते हैं — नरमी वह पक्की ज़मीन बनाती है जहाँ से वे हिम्मत के साथ दुनिया को खोजने निकलते हैं।" },
-      "remember": { "en": "Staying soft in a hard world is its own quiet strength.", "hi": "सख़्त दुनिया में नरम बने रहना अपने आप में एक चुपचाप की ताक़त है।" }
+      "title": { "en": "Gentleness takes strength", "hi": "नरम होना भी मज़बूत होना है" },
+      "insight": { "en": "Being gentle isn't weak. It takes real strength to stay soft when things are hard.", "hi": "नरमी कमज़ोरी नहीं है। एक सख़्त दुनिया में नरम बने रहने के लिए सच्ची ताक़त चाहिए।" },
+      "expanded": { "en": "We often picture strength as hard: firm, unbending, in control. The strength a child needs most is softer. It's the patience to stay gentle when you're tired, the warmth to comfort instead of scold, the courage to be tender. As you grow into your baby's parent, every gentle choice you make counts. A soft voice and kind hands shape a child more than harshness can.", "hi": "हम अक्सर ताक़त को कुछ सख़्त सा मानते हैं — कड़ी, न झुकने वाली, सब क़ाबू में रखने वाली। पर बच्चे को जिस ताक़त की सबसे ज़्यादा ज़रूरत होती है वह नरम क़िस्म की है: थके होने पर भी नरम बने रहने का सब्र, डाँटने के बजाय दिलासा देने की गरमाहट, कोमल होने की हिम्मत। यह नरमी ताक़त का न होना नहीं है; यह ताक़त है, जिसमें प्यार जुड़ गया हो। जैसे-जैसे आप अपने शिशु की माँ बनती जा रही हैं, जान लीजिए कि आपका हर नरम फ़ैसला बहुत ताक़तवर है। नरम हाथ और नरम आवाज़ बच्चे को किसी भी सख़्ती से कहीं गहरे गढ़ते हैं।" },
+      "deepDive": { "en": "Research suggests children raised with warm, gentle care tend to become more resilient. Kindness gives them a safe base to explore the world from.", "hi": "जिन बच्चों को गरमजोशी और नरमी से जवाब मिलता है, वे कम नहीं बल्कि ज़्यादा मज़बूत बनते हैं — नरमी वह पक्की ज़मीन बनाती है जहाँ से वे हिम्मत के साथ दुनिया को खोजने निकलते हैं।" },
+      "remember": { "en": "Staying gentle when things are hard is a kind of strength.", "hi": "सख़्त दुनिया में नरम बने रहना अपने आप में एक चुपचाप की ताक़त है।" }
     },
     "readToBaby": {
       "title": { "en": "The Tortoise And The Hare", "hi": "कछुआ और ख़रगोश" },
@@ -217,8 +217,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about a fear you're gently working through — and how you keep going.", "hi": "अपने शिशु को किसी ऐसे डर के बारे में बताइए जिससे आप नरमी से जूझ रही हैं — और यह भी कि आप कैसे आगे बढ़ती रहती हैं।" },
-      "motivation": { "en": "Letting your child see courage means letting them see the fear behind it.", "hi": "बच्चे को हिम्मत दिखाने का मतलब है उसे उसके पीछे का डर भी दिखा देना।" }
+      "title": { "en": "Tell your baby about a fear you're working through, and how you keep going.", "hi": "अपने शिशु को किसी ऐसे डर के बारे में बताइए जिससे आप नरमी से जूझ रही हैं — और यह भी कि आप कैसे आगे बढ़ती रहती हैं।" },
+      "motivation": { "en": "Courage makes more sense to a child who also sees the fear behind it.", "hi": "बच्चे को हिम्मत दिखाने का मतलब है उसे उसके पीछे का डर भी दिखा देना।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -233,9 +233,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Hand On Heart", "hi": "दिल पर हाथ" },
-      "content": { "en": "Rest one hand on your heart and one on your belly. Breathe slowly and feel the gentle warmth under both hands for one quiet minute.", "hi": "एक हाथ अपने दिल पर और एक अपने पेट पर रखिए। धीरे-धीरे साँस लीजिए और एक शांत मिनट तक दोनों हाथों के नीचे की नरम गरमाहट महसूस कीजिए।" },
-      "remember": { "en": "A kind touch calms the body as much as the mind.", "hi": "एक प्यार भरा स्पर्श शरीर को उतना ही शांत करता है जितना मन को।" },
+      "title": { "en": "Hand on heart", "hi": "दिल पर हाथ" },
+      "content": { "en": "Rest one hand on your heart and one on your belly. Breathe slowly and feel the warmth under both hands for one minute.", "hi": "एक हाथ अपने दिल पर और एक अपने पेट पर रखिए। धीरे-धीरे साँस लीजिए और एक शांत मिनट तक दोनों हाथों के नीचे की नरम गरमाहट महसूस कीजिए।" },
+      "remember": { "en": "A kind touch calms the body as well as the mind.", "hi": "एक प्यार भरा स्पर्श शरीर को उतना ही शांत करता है जितना मन को।" },
       "durationMinutes": 2
     }
   },
@@ -244,11 +244,11 @@
     "week": 5,
     "babyLearning": { "en": "The placenta is growing so it can bring your baby food and oxygen.", "hi": "हफ़्ता पूरा करते हुए, और मज़बूत होते हुए" },
     "grow": {
-      "title": { "en": "Begin Again, Gently", "hi": "फिर से शुरू कीजिए, नरमी से" },
-      "insight": { "en": "You will have hard days and lose your calm. What matters is not never falling, but gently beginning again.", "hi": "मुश्किल दिन आएँगे और आपकी शांति भी छूटेगी। मायने यह नहीं रखता कि कभी गिरें ही नहीं, बल्कि यह कि नरमी से फिर शुरू कर दें।" },
-      "expanded": { "en": "No parent stays patient and peaceful every hour — and you will not either. There will be days the calm slips, the words come out sharp, the worry wins. None of this undoes the love beneath it. What shapes a child is not a parent who never stumbles, but one who returns: who softens again, repairs gently, and begins anew without harsh self-blame. Learning to begin again — kindly, as many times as it takes — is not failing at calm. It is exactly what calm is made of.", "hi": "कोई माँ या पापा हर घंटे सब्र और शांति नहीं बनाए रख पाते — और आप भी नहीं रख पाएँगी। ऐसे दिन आएँगे जब शांति फिसल जाएगी, शब्द तीखे निकल आएँगे, फ़िक्र जीत जाएगी। इनमें से कुछ भी उसके नीचे बहते प्यार को मिटा नहीं देता। बच्चे को वे माँ-पापा नहीं गढ़ते जो कभी नहीं लड़खड़ाते, बल्कि वे जो लौट आते हैं — जो फिर से नरम हो जाते हैं, प्यार से बात सँभाल लेते हैं, और ख़ुद को कोसे बिना नए सिरे से शुरू करते हैं। फिर से शुरू करना सीखना — नरमी से, जितनी बार भी ज़रूरत पड़े — शांति में हार जाना नहीं है। शांति बनती ही इसी से है।" },
-      "deepDive": { "en": "Researchers find what matters most is not avoiding every rupture with a child, but the 'repair' that follows. Coming back gently teaches a child that love survives hard moments.", "hi": "शोध बताते हैं कि सबसे ज़्यादा मायने यह नहीं रखता कि बच्चे के साथ हर दरार से बचा जाए, बल्कि यह कि उसके बाद 'repair' हो — बात फिर से जुड़ जाए। नरमी से लौट आना बच्चे को सिखाता है कि प्यार मुश्किल पलों में भी बचा रहता है।" },
-      "remember": { "en": "You can always begin again, as gently as you like.", "hi": "आप हमेशा फिर से शुरू कर सकती हैं — जितनी नरमी से चाहें।" }
+      "title": { "en": "You can always start again", "hi": "फिर से शुरू कीजिए, नरमी से" },
+      "insight": { "en": "You'll have hard days and lose your calm sometimes. What matters is coming back gently.", "hi": "मुश्किल दिन आएँगे और आपकी शांति भी छूटेगी। मायने यह नहीं रखता कि कभी गिरें ही नहीं, बल्कि यह कि नरमी से फिर शुरू कर दें।" },
+      "expanded": { "en": "No parent stays patient every hour, and you won't either. Some days the calm will slip, words will come out sharp and worry will win. None of that undoes the love underneath. What helps a child most is a parent who comes back: who softens, repairs and starts again without harsh self-blame. Starting again, as many times as it takes, is how calm is learned.", "hi": "कोई माँ या पापा हर घंटे सब्र और शांति नहीं बनाए रख पाते — और आप भी नहीं रख पाएँगी। ऐसे दिन आएँगे जब शांति फिसल जाएगी, शब्द तीखे निकल आएँगे, फ़िक्र जीत जाएगी। इनमें से कुछ भी उसके नीचे बहते प्यार को मिटा नहीं देता। बच्चे को वे माँ-पापा नहीं गढ़ते जो कभी नहीं लड़खड़ाते, बल्कि वे जो लौट आते हैं — जो फिर से नरम हो जाते हैं, प्यार से बात सँभाल लेते हैं, और ख़ुद को कोसे बिना नए सिरे से शुरू करते हैं। फिर से शुरू करना सीखना — नरमी से, जितनी बार भी ज़रूरत पड़े — शांति में हार जाना नहीं है। शांति बनती ही इसी से है।" },
+      "deepDive": { "en": "No parent avoids every hard moment with a child. Researchers have found that the 'repair' afterwards matters a lot. Coming back gently shows a child that love survives difficult moments.", "hi": "शोध बताते हैं कि सबसे ज़्यादा मायने यह नहीं रखता कि बच्चे के साथ हर दरार से बचा जाए, बल्कि यह कि उसके बाद 'repair' हो — बात फिर से जुड़ जाए। नरमी से लौट आना बच्चे को सिखाता है कि प्यार मुश्किल पलों में भी बचा रहता है।" },
+      "remember": { "en": "You can always start again, as gently as you like.", "hi": "आप हमेशा फिर से शुरू कर सकती हैं — जितनी नरमी से चाहें।" }
     },
     "readToBaby": {
       "title": { "en": "The Lamp In The Wind", "hi": "हवा में दीया" },
@@ -257,8 +257,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about the kind of parent you hope to become for them.", "hi": "अपने शिशु को बताइए कि आप उसके लिए कैसी माँ बनने की उम्मीद रखती हैं।" },
-      "motivation": { "en": "Naming your hopes aloud is the first step to living them.", "hi": "अपनी उम्मीदों को बोलकर कह देना उन्हें जीने का पहला क़दम है।" }
+      "title": { "en": "Tell your baby about the kind of parent you hope to be for them.", "hi": "अपने शिशु को बताइए कि आप उसके लिए कैसी माँ बनने की उम्मीद रखती हैं।" },
+      "motivation": { "en": "Saying your hopes out loud is the first step to living them.", "hi": "अपनी उम्मीदों को बोलकर कह देना उन्हें जीने का पहला क़दम है।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -273,8 +273,8 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "I Have Come So Far Already", "hi": "मैं पहले ही कितनी दूर आ चुकी हूँ" },
-      "content": { "en": "I will pause to notice how much I have already carried and grown this week. That deserves a quiet, kind nod.", "hi": "मैं ठहरकर देखूँगी कि इस हफ़्ते मैंने पहले ही कितना कुछ सँभाला और कितना बढ़ी हूँ। यह एक शांत, प्यार भरी शाबाशी का हक़ रखता है।" },
+      "title": { "en": "I've already come a long way", "hi": "मैं पहले ही कितनी दूर आ चुकी हूँ" },
+      "content": { "en": "I'll stop and notice how much I've carried and grown this week. That deserves a kind nod.", "hi": "मैं ठहरकर देखूँगी कि इस हफ़्ते मैंने पहले ही कितना कुछ सँभाला और कितना बढ़ी हूँ। यह एक शांत, प्यार भरी शाबाशी का हक़ रखता है।" },
       "remember": { "en": "Look how far you've already come.", "hi": "देखिए, आप पहले ही कितनी दूर आ चुकी हैं।" },
       "durationMinutes": 0
     }

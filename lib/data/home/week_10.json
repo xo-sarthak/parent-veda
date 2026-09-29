@@ -4,11 +4,11 @@
     "week": 10,
     "babyLearning": { "en": "The webbing between your baby's fingers and toes is disappearing.", "hi": "नन्ही उँगलियाँ और पैर की उँगलियाँ बढ़ती हुईं, बिल्कुल अपनी" },
     "grow": {
-      "title": { "en": "Patience Is Love, Slowed Down", "hi": "सब्र यानी धीमा हुआ प्यार" },
-      "insight": { "en": "Patience is not waiting with gritted teeth. It is love that has learned to move at the right speed.", "hi": "सब्र दाँत भींचकर इंतज़ार करना नहीं है। यह वह प्यार है जिसने सही रफ़्तार से चलना सीख लिया है।" },
-      "expanded": { "en": "We often think of patience as something hard — teeth clenched, time dragging by. But real patience is gentler than that. It is simply love that trusts the slow unfolding of things, that does not rush a flower to bloom or a child to grow. Right now, your body is teaching you this every day, asking you to wait through weeks that cannot be hurried. Let this be practice. The patience you grow now is the same patience your child will one day feel as safety: a parent who is not in a hurry, who has time, who can wait with love.", "hi": "हम अक्सर सब्र को कोई मुश्किल चीज़ मान लेते हैं — दाँत भींचे हुए, वक़्त घिसटता हुआ। पर सच्चा सब्र इससे कहीं नरम है। यह बस वह प्यार है जो चीज़ों के धीरे-धीरे खुलने पर भरोसा करता है, जो न फूल को खिलने की जल्दी करवाता है, न बच्चे को बड़े होने की। अभी, आपका शरीर आपको यही हर दिन सिखा रहा है, आपसे उन हफ़्तों में से गुज़रने को कह रहा है जिन्हें जल्दी नहीं किया जा सकता। इसे अभ्यास बन जाने दीजिए। जो सब्र आप अभी उगा रही हैं, वही सब्र आपका बच्चा एक दिन सुरक्षा की तरह महसूस करेगा: एक माँ जो जल्दी में नहीं है, जिसके पास वक़्त है, जो प्यार से इंतज़ार कर सकती है।" },
-      "deepDive": { "en": "Child development researchers find that an unhurried, patient caregiver helps a child build calm self-regulation. Slowness, it turns out, is not lost time — it is how a sense of safety is grown.", "hi": "बाल-विकास पर हुए शोध बताते हैं कि बिना जल्दबाज़ी वाला, सब्र रखने वाला पालने वाला बच्चे को शांति से ख़ुद को सँभालना सीखने में मदद करता है। पता चलता है कि धीमापन खोया हुआ वक़्त नहीं — यही वह तरीक़ा है जिससे सुरक्षा का एहसास उगता है।" },
-      "remember": { "en": "Patience is just love that refuses to rush.", "hi": "सब्र बस वह प्यार है जो जल्दबाज़ी से इनकार कर देता है।" }
+      "title": { "en": "Patience is love that doesn't rush", "hi": "सब्र यानी धीमा हुआ प्यार" },
+      "insight": { "en": "Patience can be gentle. It's love that lets things take the time they need.", "hi": "सब्र दाँत भींचकर इंतज़ार करना नहीं है। यह वह प्यार है जिसने सही रफ़्तार से चलना सीख लिया है।" },
+      "expanded": { "en": "We often think of patience as hard: jaw clenched, time dragging. Real patience is gentler. It's love that trusts things to unfold, that doesn't rush a flower to bloom or a child to grow. Right now, pregnancy is teaching you this every day, asking you to wait through weeks that can't be hurried. Let it be practice. The patience you build now is what your child will one day feel as safety: a parent who isn't in a hurry and can wait with love.", "hi": "हम अक्सर सब्र को कोई मुश्किल चीज़ मान लेते हैं — दाँत भींचे हुए, वक़्त घिसटता हुआ। पर सच्चा सब्र इससे कहीं नरम है। यह बस वह प्यार है जो चीज़ों के धीरे-धीरे खुलने पर भरोसा करता है, जो न फूल को खिलने की जल्दी करवाता है, न बच्चे को बड़े होने की। अभी, आपका शरीर आपको यही हर दिन सिखा रहा है, आपसे उन हफ़्तों में से गुज़रने को कह रहा है जिन्हें जल्दी नहीं किया जा सकता। इसे अभ्यास बन जाने दीजिए। जो सब्र आप अभी उगा रही हैं, वही सब्र आपका बच्चा एक दिन सुरक्षा की तरह महसूस करेगा: एक माँ जो जल्दी में नहीं है, जिसके पास वक़्त है, जो प्यार से इंतज़ार कर सकती है।" },
+      "deepDive": { "en": "Child development researchers find that a patient, unhurried caregiver helps a child learn to calm themselves. Slow time is how a sense of safety grows.", "hi": "बाल-विकास पर हुए शोध बताते हैं कि बिना जल्दबाज़ी वाला, सब्र रखने वाला पालने वाला बच्चे को शांति से ख़ुद को सँभालना सीखने में मदद करता है। पता चलता है कि धीमापन खोया हुआ वक़्त नहीं — यही वह तरीक़ा है जिससे सुरक्षा का एहसास उगता है।" },
+      "remember": { "en": "Patience is love that doesn't rush.", "hi": "सब्र बस वह प्यार है जो जल्दबाज़ी से इनकार कर देता है।" }
     },
     "readToBaby": {
       "title": { "en": "The Fox And The Grapes", "hi": "लोमड़ी और अंगूर" },
@@ -17,8 +17,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about the season they'll be born into — and the world it brings.", "hi": "अपने शिशु को उस मौसम के बारे में बताइए जिसमें उसका जन्म होगा — और वह दुनिया जो यह मौसम अपने साथ लाता है।" },
-      "motivation": { "en": "The first air your baby breathes will carry a season — share what it feels like.", "hi": "आपका शिशु जो पहली हवा लेगा, वह अपने साथ एक मौसम लाएगी — बताइए कि वह कैसी लगती है।" }
+      "title": { "en": "Tell your baby about the season they'll be born into and what it's like.", "hi": "अपने शिशु को उस मौसम के बारे में बताइए जिसमें उसका जन्म होगा — और वह दुनिया जो यह मौसम अपने साथ लाता है।" },
+      "motivation": { "en": "The first air your baby breathes will carry a season. Tell them what it feels like.", "hi": "आपका शिशु जो पहली हवा लेगा, वह अपने साथ एक मौसम लाएगी — बताइए कि वह कैसी लगती है।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -33,9 +33,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "I Do Not Have To Hurry", "hi": "मुझे जल्दी करने की ज़रूरत नहीं" },
+      "title": { "en": "I don't have to hurry", "hi": "मुझे जल्दी करने की ज़रूरत नहीं" },
       "content": { "en": "Today I give myself permission to slow down. Nothing important is lost when I take my time.", "hi": "आज मैं ख़ुद को धीमे होने की इजाज़त देती हूँ। जब मैं अपना वक़्त लेती हूँ, तो कुछ भी ज़रूरी नहीं खोता।" },
-      "remember": { "en": "Slowing down is not falling behind.", "hi": "धीमे होना पीछे रह जाना नहीं है।" },
+      "remember": { "en": "Slowing down isn't falling behind.", "hi": "धीमे होना पीछे रह जाना नहीं है।" },
       "durationMinutes": 0
     }
   },
@@ -44,11 +44,11 @@
     "week": 10,
     "babyLearning": { "en": "Your baby's jaw and mouth are taking shape.", "hi": "हर उँगली पर नन्हे नाख़ून बनना शुरू" },
     "grow": {
-      "title": { "en": "The Long Game Of Love", "hi": "प्यार का लंबा खेल" },
-      "insight": { "en": "Love is not built in a day or a single grand gesture. It is the long, quiet game of showing up again and again.", "hi": "प्यार एक दिन में या किसी एक बड़े काम से नहीं बनता। यह बार-बार मौजूद रहने का लंबा, शांत खेल है।" },
-      "expanded": { "en": "We are tempted to want quick results — to feel like a 'good parent' all at once. But love between a parent and child is a long game, played out over thousands of small days. It is the bedtime story read for the hundredth time, the same question answered with the same patience, the steady presence through ordinary years. None of it looks dramatic. Yet it is exactly this slow, repeated devotion that a child grows up to trust completely. You are already playing this long game now, simply by carrying and caring, day after unhurried day.", "hi": "हमारा मन जल्दी नतीजे चाहता है — एक ही बार में 'अच्छी माँ' जैसा महसूस करना। पर माँ और बच्चे के बीच का प्यार एक लंबा खेल है, जो हज़ारों छोटे-छोटे दिनों में खेला जाता है। यह सौवीं बार पढ़ी गई वही सोते वक़्त की कहानी है, वही सवाल जिसका जवाब उसी सब्र से दिया जाए, आम सालों में बनी रहने वाली मौजूदगी। इनमें से कुछ भी बड़ा या नाटकीय नहीं लगता। फिर भी यही धीमा, बार-बार दोहराया गया समर्पण है जिस पर बच्चा बड़ा होकर पूरी तरह भरोसा करता है। आप यह लंबा खेल अभी से खेल रही हैं, बस अपने भीतर सँभालकर और ख़याल रखकर, एक बिना जल्दी वाले दिन के बाद दूसरा।" },
-      "deepDive": { "en": "Researchers find that a child's sense of security comes less from big moments and more from reliable, repeated responsiveness over time. Consistency, not intensity, is what love is measured by.", "hi": "शोधकर्ता बताते हैं कि बच्चे को सुरक्षित होने का एहसास बड़े पलों से कम, और समय के साथ मिलने वाले भरोसेमंद, बार-बार के जवाब से ज़्यादा मिलता है। प्यार इससे नहीं नापा जाता कि वह कितना तेज़ है, बल्कि इससे कि वह कितना लगातार है।" },
-      "remember": { "en": "Love is won slowly, by showing up again and again.", "hi": "प्यार धीरे-धीरे जीता जाता है, बार-बार मौजूद रहकर।" }
+      "title": { "en": "Love is built over years", "hi": "प्यार का लंबा खेल" },
+      "insight": { "en": "Love is built slowly, by showing up again and again, more than by one big gesture.", "hi": "प्यार एक दिन में या किसी एक बड़े काम से नहीं बनता। यह बार-बार मौजूद रहने का लंबा, शांत खेल है।" },
+      "expanded": { "en": "It's tempting to want quick results, to feel like a good parent all at once. Love between a parent and child is built over thousands of small days. It's the bedtime story read for the hundredth time, the same question answered with the same patience, being steady through ordinary years. None of it looks dramatic. This slow, repeated care is what a child grows up trusting. You're already doing it now, day after day.", "hi": "हमारा मन जल्दी नतीजे चाहता है — एक ही बार में 'अच्छी माँ' जैसा महसूस करना। पर माँ और बच्चे के बीच का प्यार एक लंबा खेल है, जो हज़ारों छोटे-छोटे दिनों में खेला जाता है। यह सौवीं बार पढ़ी गई वही सोते वक़्त की कहानी है, वही सवाल जिसका जवाब उसी सब्र से दिया जाए, आम सालों में बनी रहने वाली मौजूदगी। इनमें से कुछ भी बड़ा या नाटकीय नहीं लगता। फिर भी यही धीमा, बार-बार दोहराया गया समर्पण है जिस पर बच्चा बड़ा होकर पूरी तरह भरोसा करता है। आप यह लंबा खेल अभी से खेल रही हैं, बस अपने भीतर सँभालकर और ख़याल रखकर, एक बिना जल्दी वाले दिन के बाद दूसरा।" },
+      "deepDive": { "en": "Researchers find that a child's sense of security comes less from big moments and more from being responded to reliably over time. Being consistent matters more than being intense.", "hi": "शोधकर्ता बताते हैं कि बच्चे को सुरक्षित होने का एहसास बड़े पलों से कम, और समय के साथ मिलने वाले भरोसेमंद, बार-बार के जवाब से ज़्यादा मिलता है। प्यार इससे नहीं नापा जाता कि वह कितना तेज़ है, बल्कि इससे कि वह कितना लगातार है।" },
+      "remember": { "en": "Love grows slowly, by showing up again and again.", "hi": "प्यार धीरे-धीरे जीता जाता है, बार-बार मौजूद रहकर।" }
     },
     "readToBaby": {
       "title": { "en": "The Brahmin And The Three Crooks", "hi": "ब्राह्मण और तीन ठग" },
@@ -57,8 +57,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about the home and the place they'll come to.", "hi": "अपने शिशु को उस घर और उस जगह के बारे में बताइए जहाँ वह आने वाला है।" },
-      "motivation": { "en": "Long before they see it, your baby can begin to feel where they belong.", "hi": "उसे देखने से बहुत पहले, आपका शिशु महसूस करने लगता है कि वह कहाँ का है।" }
+      "title": { "en": "Tell your baby about the home and the place they're coming to.", "hi": "अपने शिशु को उस घर और उस जगह के बारे में बताइए जहाँ वह आने वाला है।" },
+      "motivation": { "en": "Long before they see it, your baby can start to feel where they belong.", "hi": "उसे देखने से बहुत पहले, आपका शिशु महसूस करने लगता है कि वह कहाँ का है।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -73,9 +73,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "The Long Way Out", "hi": "धीरे-धीरे बाहर जाती साँस" },
+      "title": { "en": "A long, slow breath out", "hi": "धीरे-धीरे बाहर जाती साँस" },
       "content": { "en": "Breathe in gently through your nose, then let the breath out twice as slowly through your mouth, as if you have all the time in the world. Repeat five times.", "hi": "नाक से नरमी से साँस लीजिए, फिर मुँह से साँस को दुगुना धीरे बाहर जाने दीजिए, जैसे आपके पास दुनिया भर का वक़्त हो। पाँच बार दोहराइए।" },
-      "remember": { "en": "A slow breath out tells the body it is safe to rest.", "hi": "बाहर जाती एक धीमी साँस शरीर को बता देती है कि अब आराम करना सुरक्षित है।" },
+      "remember": { "en": "A slow breath out tells the body it's safe to rest.", "hi": "बाहर जाती एक धीमी साँस शरीर को बता देती है कि अब आराम करना सुरक्षित है।" },
       "durationMinutes": 2
     }
   },
@@ -84,11 +84,11 @@
     "week": 10,
     "babyLearning": { "en": "Your baby's brain is building new connections every day.", "hi": "नन्हे जोड़ मुड़ते हुए, हिलना सीखते हुए" },
     "grow": {
-      "title": { "en": "Nothing Good Is Rushed", "hi": "अच्छी चीज़ें जल्दबाज़ी में नहीं बनतीं" },
-      "insight": { "en": "The best things in a life — trust, comfort, deep love — cannot be hurried into being. They grow only in their own good time.", "hi": "ज़िंदगी की सबसे अच्छी चीज़ें — भरोसा, सुकून, गहरा प्यार — जल्दबाज़ी में नहीं बनाई जा सकतीं। वे सिर्फ़ अपने सही समय पर उगती हैं।" },
-      "expanded": { "en": "Think of the things you treasure most: a friendship that took years, a calm you found slowly, a love that deepened over time. None of them arrived quickly. The same will be true with your child. The bond you long for will not appear fully formed at birth; it will be built gently, over feeds and walks and ordinary mornings. There is no shortcut, and that is a mercy — it means you cannot fall behind. You only have to keep showing up with love, and let the good things ripen in their own season.", "hi": "उन चीज़ों के बारे में सोचिए जो आपको सबसे अनमोल लगती हैं: एक दोस्ती जिसमें सालों लगे, एक शांति जो आपको धीरे-धीरे मिली, एक प्यार जो वक़्त के साथ गहरा हुआ। इनमें से कोई भी जल्दी नहीं आया। आपके बच्चे के साथ भी यही सच होगा। जिस जुड़ाव की आप तड़प रखती हैं, वह जन्म के दिन पूरा बना हुआ नहीं मिलेगा; वह नरमी से बनेगा — दूध पिलाने, टहलने और आम सुबहों के बीच। कोई शॉर्टकट नहीं है, और यही एक राहत है — इसका मतलब है कि आप पीछे रह ही नहीं सकतीं। आपको बस प्यार के साथ मौजूद रहना है, और अच्छी चीज़ों को उनके अपने मौसम में पकने देना है।" },
-      "deepDive": { "en": "Bonding experts note that attachment forms gradually through countless ordinary interactions, not in a single 'magic' moment. Parents who feel love grow slowly are entirely normal — and right on time.", "hi": "जुड़ाव के जानकार बताते हैं कि लगाव धीरे-धीरे अनगिनत आम पलों से बनता है, किसी एक 'जादुई' पल में नहीं। जिन माँ-बाप का प्यार धीरे-धीरे बढ़ता है, वे बिल्कुल सामान्य हैं — और ठीक समय पर हैं।" },
-      "remember": { "en": "Good things ripen slowly; let them.", "hi": "अच्छी चीज़ें धीरे-धीरे पकती हैं; उन्हें पकने दीजिए।" }
+      "title": { "en": "Good things take time", "hi": "अच्छी चीज़ें जल्दबाज़ी में नहीं बनतीं" },
+      "insight": { "en": "The best things in life, like trust, comfort and deep love, can't be hurried. They grow in their own time.", "hi": "ज़िंदगी की सबसे अच्छी चीज़ें — भरोसा, सुकून, गहरा प्यार — जल्दबाज़ी में नहीं बनाई जा सकतीं। वे सिर्फ़ अपने सही समय पर उगती हैं।" },
+      "expanded": { "en": "Think of the things you treasure most: a friendship that took years, a calm you found slowly, a love that deepened over time. None arrived quickly. It'll be the same with your child. The bond won't appear fully formed at birth. It'll be built over feeds, walks and ordinary mornings. There's no shortcut, and that's a relief, because it means you can't fall behind. Keep showing up with love and let the good things grow at their own pace.", "hi": "उन चीज़ों के बारे में सोचिए जो आपको सबसे अनमोल लगती हैं: एक दोस्ती जिसमें सालों लगे, एक शांति जो आपको धीरे-धीरे मिली, एक प्यार जो वक़्त के साथ गहरा हुआ। इनमें से कोई भी जल्दी नहीं आया। आपके बच्चे के साथ भी यही सच होगा। जिस जुड़ाव की आप तड़प रखती हैं, वह जन्म के दिन पूरा बना हुआ नहीं मिलेगा; वह नरमी से बनेगा — दूध पिलाने, टहलने और आम सुबहों के बीच। कोई शॉर्टकट नहीं है, और यही एक राहत है — इसका मतलब है कि आप पीछे रह ही नहीं सकतीं। आपको बस प्यार के साथ मौजूद रहना है, और अच्छी चीज़ों को उनके अपने मौसम में पकने देना है।" },
+      "deepDive": { "en": "Experts on bonding note that attachment forms gradually, through many ordinary moments, not in one instant. Parents who feel their love grow slowly are completely normal.", "hi": "जुड़ाव के जानकार बताते हैं कि लगाव धीरे-धीरे अनगिनत आम पलों से बनता है, किसी एक 'जादुई' पल में नहीं। जिन माँ-बाप का प्यार धीरे-धीरे बढ़ता है, वे बिल्कुल सामान्य हैं — और ठीक समय पर हैं।" },
+      "remember": { "en": "Good things grow slowly. Let them.", "hi": "अच्छी चीज़ें धीरे-धीरे पकती हैं; उन्हें पकने दीजिए।" }
     },
     "readToBaby": {
       "title": { "en": "Krishna And The Serpent Kaliya", "hi": "कृष्ण और कालिया नाग" },
@@ -97,8 +97,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby what the world is like right now, in this moment of waiting.", "hi": "अपने शिशु को बताइए कि दुनिया अभी कैसी है, इंतज़ार के इस पल में।" },
-      "motivation": { "en": "You are the first narrator of the world your baby is about to join.", "hi": "जिस दुनिया में आपका शिशु आने वाला है, उसकी पहली कहानीकार आप ही हैं।" }
+      "title": { "en": "Tell your baby what the world is like right now, while you wait for them.", "hi": "अपने शिशु को बताइए कि दुनिया अभी कैसी है, इंतज़ार के इस पल में।" },
+      "motivation": { "en": "You're the first person to describe the world your baby is about to join.", "hi": "जिस दुनिया में आपका शिशु आने वाला है, उसकी पहली कहानीकार आप ही हैं।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -113,9 +113,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "I Am Right On Time", "hi": "मैं बिल्कुल समय पर हूँ" },
-      "content": { "en": "I am not behind and I am not failing. My journey is unfolding at exactly the pace it needs.", "hi": "मैं न पीछे हूँ, न नाकाम हो रही हूँ। मेरा सफ़र ठीक उसी रफ़्तार से खुल रहा है जिसकी उसे ज़रूरत है।" },
-      "remember": { "en": "There is no schedule you are falling behind on.", "hi": "ऐसा कोई तय समय नहीं जिस पर आप पीछे पड़ रही हों।" },
+      "title": { "en": "I'm right on time", "hi": "मैं बिल्कुल समय पर हूँ" },
+      "content": { "en": "I'm not behind and I'm not failing. My pregnancy is going at the pace it needs.", "hi": "मैं न पीछे हूँ, न नाकाम हो रही हूँ। मेरा सफ़र ठीक उसी रफ़्तार से खुल रहा है जिसकी उसे ज़रूरत है।" },
+      "remember": { "en": "There's no schedule you're falling behind on.", "hi": "ऐसा कोई तय समय नहीं जिस पर आप पीछे पड़ रही हों।" },
       "durationMinutes": 0
     }
   },
@@ -124,11 +124,11 @@
     "week": 10,
     "babyLearning": { "en": "Your baby's eyelids are closing, and will open again around week 26.", "hi": "नन्ही स्वाद-कलियाँ बनना शुरू" },
     "grow": {
-      "title": { "en": "Slow Is Its Own Gift", "hi": "धीमापन ख़ुद एक तोहफ़ा है" },
-      "insight": { "en": "Going slowly is not a delay on the way to something better. The slowness itself is part of the gift.", "hi": "धीरे चलना किसी बेहतर चीज़ के रास्ते की देरी नहीं है। धीमापन ख़ुद ही उस तोहफ़े का हिस्सा है।" },
-      "expanded": { "en": "We tend to treat slowness as something to be tolerated until the 'real' thing arrives. But so often, the slow part is the sweetest. The unhurried morning, the long walk with nowhere to be, the quiet hour with your hand resting on your belly — these are not the waiting room before life; they are life itself. When your child arrives, the slowest moments will be the ones you treasure: the lingering cuddle, the half-asleep feed at dawn. Practise loving slowness now, and you are practising one of parenthood's deepest joys.", "hi": "हम धीमेपन को अक्सर ऐसी चीज़ मान लेते हैं जिसे तब तक सहना है जब तक 'असली' चीज़ न आ जाए। पर अक्सर, धीमा हिस्सा ही सबसे मीठा होता है। बिना जल्दी वाली सुबह, वह लंबी सैर जिसमें कहीं पहुँचना नहीं है, पेट पर हाथ रखे बिताया गया एक शांत घंटा — ये ज़िंदगी से पहले का इंतज़ार-कमरा नहीं हैं; ये ख़ुद ज़िंदगी हैं। जब आपका बच्चा आएगा, सबसे धीमे पल ही वे होंगे जिन्हें आप सबसे अनमोल मानेंगी: वह ठहरी हुई झप्पी, भोर में आधी नींद में दूध पिलाना। धीमेपन से प्यार करना अभी से सीखिए, और आप माँ बनने की सबसे गहरी ख़ुशियों में से एक का अभ्यास कर रही होंगी।" },
-      "deepDive": { "en": "Studies of parent-child connection show that unhurried, fully present moments — not busy, productive ones — are what most strengthen the bond. Slowness is where closeness is built.", "hi": "माँ-बाप और बच्चे के जुड़ाव पर हुए शोध बताते हैं कि बिना जल्दी वाले, पूरी तरह मौजूद पल — न कि व्यस्त, काम से भरे पल — जुड़ाव को सबसे ज़्यादा मज़बूत करते हैं। नज़दीकी धीमेपन में ही बनती है।" },
-      "remember": { "en": "The slow moments are often the sweetest ones.", "hi": "धीमे पल ही अक्सर सबसे मीठे होते हैं।" }
+      "title": { "en": "Slow time is worth enjoying", "hi": "धीमापन ख़ुद एक तोहफ़ा है" },
+      "insight": { "en": "Slow moments are worth enjoying for their own sake. They're part of the gift.", "hi": "धीरे चलना किसी बेहतर चीज़ के रास्ते की देरी नहीं है। धीमापन ख़ुद ही उस तोहफ़े का हिस्सा है।" },
+      "expanded": { "en": "We tend to put up with slowness until the 'real' thing arrives. Often the slow part is the sweetest. An unhurried morning, a long walk with nowhere to be, a quiet hour thinking about your baby: these moments are life too. When your child arrives, the slow moments will be the ones you treasure, like a long cuddle or a sleepy feed at dawn. Learning to enjoy slowness now is practice for one of parenting's deepest joys.", "hi": "हम धीमेपन को अक्सर ऐसी चीज़ मान लेते हैं जिसे तब तक सहना है जब तक 'असली' चीज़ न आ जाए। पर अक्सर, धीमा हिस्सा ही सबसे मीठा होता है। बिना जल्दी वाली सुबह, वह लंबी सैर जिसमें कहीं पहुँचना नहीं है, पेट पर हाथ रखे बिताया गया एक शांत घंटा — ये ज़िंदगी से पहले का इंतज़ार-कमरा नहीं हैं; ये ख़ुद ज़िंदगी हैं। जब आपका बच्चा आएगा, सबसे धीमे पल ही वे होंगे जिन्हें आप सबसे अनमोल मानेंगी: वह ठहरी हुई झप्पी, भोर में आधी नींद में दूध पिलाना। धीमेपन से प्यार करना अभी से सीखिए, और आप माँ बनने की सबसे गहरी ख़ुशियों में से एक का अभ्यास कर रही होंगी।" },
+      "deepDive": { "en": "Research on parent and child connection suggests that unhurried, fully present time is what strengthens the bond most. Closeness is built in slow moments.", "hi": "माँ-बाप और बच्चे के जुड़ाव पर हुए शोध बताते हैं कि बिना जल्दी वाले, पूरी तरह मौजूद पल — न कि व्यस्त, काम से भरे पल — जुड़ाव को सबसे ज़्यादा मज़बूत करते हैं। नज़दीकी धीमेपन में ही बनती है।" },
+      "remember": { "en": "The slow moments are often the sweetest.", "hi": "धीमे पल ही अक्सर सबसे मीठे होते हैं।" }
     },
     "readToBaby": {
       "title": { "en": "The Patient Buffalo", "hi": "सब्र वाला भैंसा" },
@@ -137,7 +137,7 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about something beautiful in the world you can't wait to show them.", "hi": "अपने शिशु को दुनिया की कोई ऐसी सुंदर चीज़ बताइए जिसे दिखाने का आपको बेसब्री से इंतज़ार है।" },
+      "title": { "en": "Tell your baby about something beautiful you can't wait to show them.", "hi": "अपने शिशु को दुनिया की कोई ऐसी सुंदर चीज़ बताइए जिसे दिखाने का आपको बेसब्री से इंतज़ार है।" },
       "motivation": { "en": "Sharing your wonder is how your child first learns the world is full of it.", "hi": "अपना अचरज बाँटना ही वह पहला तरीक़ा है जिससे बच्चा सीखता है कि दुनिया अचरज से भरी है।" }
     },
     "garbhSanskar": {
@@ -153,9 +153,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Breathe Like The Tide", "hi": "लहरों की तरह साँस लीजिए" },
-      "content": { "en": "Imagine the slow rhythm of the sea. Breathe in as a wave gathers, breathe out as it rolls gently to shore. Let five slow breaths match that tide.", "hi": "समुद्र की धीमी लय की कल्पना कीजिए। साँस लीजिए जैसे कोई लहर उठ रही हो, साँस छोड़िए जैसे वह नरमी से किनारे तक लौट रही हो। पाँच धीमी साँसों को उसी लहर से मिलने दीजिए।" },
-      "remember": { "en": "Your breath has its own unhurried tide.", "hi": "आपकी साँस की अपनी एक बिना जल्दी वाली लहर है।" },
+      "title": { "en": "Breathe like the tide", "hi": "लहरों की तरह साँस लीजिए" },
+      "content": { "en": "Imagine the slow rhythm of the sea. Breathe in as a wave gathers, and breathe out as it rolls to shore. Let five slow breaths follow the tide.", "hi": "समुद्र की धीमी लय की कल्पना कीजिए। साँस लीजिए जैसे कोई लहर उठ रही हो, साँस छोड़िए जैसे वह नरमी से किनारे तक लौट रही हो। पाँच धीमी साँसों को उसी लहर से मिलने दीजिए।" },
+      "remember": { "en": "Let your breath move slowly, like the tide.", "hi": "आपकी साँस की अपनी एक बिना जल्दी वाली लहर है।" },
       "durationMinutes": 2
     }
   },
@@ -164,11 +164,11 @@
     "week": 10,
     "babyLearning": { "en": "Most of your baby's main parts are in place, and now they grow.", "hi": "नन्हे हाथ-पैर लंबे होते हुए, अंगड़ाई के लिए तैयार" },
     "grow": {
-      "title": { "en": "Let Things Unfold", "hi": "चीज़ों को अपने आप खुलने दीजिए" },
-      "insight": { "en": "Not everything needs to be solved or controlled. Some things simply need room to unfold in their own way.", "hi": "हर चीज़ को सुलझाने या क़ाबू में रखने की ज़रूरत नहीं। कुछ चीज़ों को बस अपने तरीक़े से खुलने की जगह चाहिए।" },
-      "expanded": { "en": "There is deep relief in learning that you do not have to manage every outcome. So much of pregnancy, and later of parenting, asks you to loosen your grip — to trust a process you cannot fully steer. Your baby is growing without your instructions; their little body knows what to do. Practise this trust now, in the small things: letting a worry pass without fixing it, letting a day be imperfect, letting tomorrow stay unknown. The more gracefully you let life unfold, the more peace you will carry into the years of raising a child who will surprise you in a thousand ways.", "hi": "यह जान लेने में गहरी राहत है कि आपको हर नतीजा सँभालना नहीं है। गर्भावस्था का, और आगे चलकर परवरिश का, बहुत सारा हिस्सा आपसे अपनी पकड़ ढीली करने को कहता है — एक ऐसी प्रक्रिया पर भरोसा करने को जिसे आप पूरी तरह चला नहीं सकतीं। आपका शिशु आपके किसी निर्देश के बिना बढ़ रहा है; उसका नन्हा शरीर जानता है कि उसे क्या करना है। यह भरोसा अभी से छोटी-छोटी बातों में सीखिए: एक चिंता को बिना ठीक किए गुज़र जाने देना, एक दिन को अधूरा रहने देना, कल को अनजाना रहने देना। आप ज़िंदगी को जितनी सहजता से खुलने देंगी, उतनी ही ज़्यादा शांति आप उस बच्चे को पालने के सालों में साथ ले जाएँगी जो आपको हज़ार तरीक़ों से चौंकाएगा।" },
-      "deepDive": { "en": "Psychologists find that parents who can tolerate uncertainty — rather than trying to control every outcome — tend to be calmer and more responsive. Letting go is a skill that protects your peace.", "hi": "मनोवैज्ञानिक बताते हैं कि जो माँ-बाप अनिश्चितता को सह लेते हैं — हर नतीजे को क़ाबू करने की कोशिश करने के बजाय — वे ज़्यादा शांत रहते हैं और ज़्यादा नरमी से जवाब देते हैं। छोड़ देना भी एक हुनर है, जो आपकी शांति की रक्षा करता है।" },
-      "remember": { "en": "Some things heal and grow best when you let them be.", "hi": "कुछ चीज़ें तब सबसे अच्छे से भरती और बढ़ती हैं जब आप उन्हें उनके हाल पर छोड़ देती हैं।" }
+      "title": { "en": "Let things unfold", "hi": "चीज़ों को अपने आप खुलने दीजिए" },
+      "insight": { "en": "Not everything needs to be solved or controlled. Some things need room to unfold.", "hi": "हर चीज़ को सुलझाने या क़ाबू में रखने की ज़रूरत नहीं। कुछ चीज़ों को बस अपने तरीक़े से खुलने की जगह चाहिए।" },
+      "expanded": { "en": "It's a relief to learn you don't have to manage every outcome. Much of pregnancy, and later parenting, asks you to loosen your grip and trust a process you can't fully steer. Your baby is growing without instructions. Their body knows what to do. Practise this trust in small things: letting a worry pass without fixing it, letting a day be imperfect, letting tomorrow stay unknown. The more you can let things unfold, the more calm you'll carry into raising a child who'll surprise you.", "hi": "यह जान लेने में गहरी राहत है कि आपको हर नतीजा सँभालना नहीं है। गर्भावस्था का, और आगे चलकर परवरिश का, बहुत सारा हिस्सा आपसे अपनी पकड़ ढीली करने को कहता है — एक ऐसी प्रक्रिया पर भरोसा करने को जिसे आप पूरी तरह चला नहीं सकतीं। आपका शिशु आपके किसी निर्देश के बिना बढ़ रहा है; उसका नन्हा शरीर जानता है कि उसे क्या करना है। यह भरोसा अभी से छोटी-छोटी बातों में सीखिए: एक चिंता को बिना ठीक किए गुज़र जाने देना, एक दिन को अधूरा रहने देना, कल को अनजाना रहने देना। आप ज़िंदगी को जितनी सहजता से खुलने देंगी, उतनी ही ज़्यादा शांति आप उस बच्चे को पालने के सालों में साथ ले जाएँगी जो आपको हज़ार तरीक़ों से चौंकाएगा।" },
+      "deepDive": { "en": "Psychologists find that parents who can live with uncertainty, instead of trying to control every outcome, tend to be calmer and more responsive. Letting go is a skill, and it protects your peace.", "hi": "मनोवैज्ञानिक बताते हैं कि जो माँ-बाप अनिश्चितता को सह लेते हैं — हर नतीजे को क़ाबू करने की कोशिश करने के बजाय — वे ज़्यादा शांत रहते हैं और ज़्यादा नरमी से जवाब देते हैं। छोड़ देना भी एक हुनर है, जो आपकी शांति की रक्षा करता है।" },
+      "remember": { "en": "Some things grow best when you let them be.", "hi": "कुछ चीज़ें तब सबसे अच्छे से भरती और बढ़ती हैं जब आप उन्हें उनके हाल पर छोड़ देती हैं।" }
     },
     "readToBaby": {
       "title": { "en": "Tenali Rama And The King's Dream", "hi": "तेनाली रामा और राजा का सपना" },
@@ -177,7 +177,7 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about a challenge in the world you hope they'll help to mend.", "hi": "अपने शिशु को दुनिया की कोई ऐसी मुश्किल बताइए जिसे सुधारने में आप चाहती हैं कि वह एक दिन मदद करे।" },
+      "title": { "en": "Tell your baby about a problem in the world you hope they'll help fix.", "hi": "अपने शिशु को दुनिया की कोई ऐसी मुश्किल बताइए जिसे सुधारने में आप चाहती हैं कि वह एक दिन मदद करे।" },
       "motivation": { "en": "Sharing your hopes for the world plants the first seed of their purpose.", "hi": "दुनिया के लिए अपनी उम्मीदें बाँटना उसके मक़सद का पहला बीज बो देता है।" }
     },
     "garbhSanskar": {
@@ -193,8 +193,8 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "I Can Let Go Of Control", "hi": "मैं क़ाबू छोड़ सकती हूँ" },
-      "content": { "en": "I do not have to hold everything together today. Some things will work out without my managing them.", "hi": "आज मुझे सब कुछ थामकर रखने की ज़रूरत नहीं। कुछ चीज़ें मेरे सँभाले बिना भी ठीक हो जाएँगी।" },
+      "title": { "en": "I can let go of control", "hi": "मैं क़ाबू छोड़ सकती हूँ" },
+      "content": { "en": "I don't have to hold everything together today. Some things will work out without me managing them.", "hi": "आज मुझे सब कुछ थामकर रखने की ज़रूरत नहीं। कुछ चीज़ें मेरे सँभाले बिना भी ठीक हो जाएँगी।" },
       "remember": { "en": "Not everything is yours to carry.", "hi": "हर चीज़ आपके उठाने के लिए नहीं है।" },
       "durationMinutes": 0
     }
@@ -204,11 +204,11 @@
     "week": 10,
     "babyLearning": { "en": "The buds of your baby's milk teeth are forming under the gums.", "hi": "नन्ही आँखों पर नरम पलकें बनती हुईं" },
     "grow": {
-      "title": { "en": "Waiting Can Be Tender", "hi": "इंतज़ार कोमल भी हो सकता है" },
-      "insight": { "en": "Waiting does not have to be restless or anxious. It can be a tender, hopeful kind of love all its own.", "hi": "इंतज़ार का बेचैन या परेशान होना ज़रूरी नहीं। यह अपने आप में एक कोमल, उम्मीद भरा प्यार भी हो सकता है।" },
-      "expanded": { "en": "There is a kind of waiting that is full of worry — checking, counting, wishing the time away. But there is another kind, softer and warmer: the tender waiting of someone preparing to love. This is the waiting of a mother who rests a hand on her belly and simply wonders, who readies a small space in her heart and her home. You are not merely passing time until your baby comes; you are loving them already, through the waiting itself. Let it be tender. Let it be sweet. This longing is one of the truest forms your love will ever take.", "hi": "एक तरह का इंतज़ार होता है जो चिंता से भरा होता है — बार-बार जाँचना, दिन गिनना, वक़्त के गुज़र जाने की दुआ करना। पर एक दूसरी तरह का भी है, कहीं ज़्यादा नरम और गर्म: उस इंसान का कोमल इंतज़ार जो प्यार करने की तैयारी कर रहा है। यह उस माँ का इंतज़ार है जो पेट पर एक हाथ रखकर बस सोचती रहती है, जो अपने दिल में और अपने घर में एक छोटी सी जगह तैयार करती है। आप अपने शिशु के आने तक बस वक़्त नहीं काट रहीं; आप उसे अभी से प्यार कर रही हैं, इसी इंतज़ार के ज़रिए। इसे कोमल रहने दीजिए। इसे मीठा रहने दीजिए। यह तड़प आपके प्यार के सबसे सच्चे रूपों में से एक है।" },
-      "deepDive": { "en": "Researchers note that prenatal bonding — the loving attention a parent gives during pregnancy — is linked to a smoother connection after birth. The tenderness of waiting is not idle; it is preparation.", "hi": "शोधकर्ता बताते हैं कि गर्भावस्था में बना जुड़ाव — यानी इन महीनों में दिया गया प्यार भरा ध्यान — जन्म के बाद के आसान रिश्ते से जुड़ा है। इंतज़ार की कोमलता बेकार नहीं है; यह तैयारी है।" },
-      "remember": { "en": "Tender waiting is a love of its own.", "hi": "कोमल इंतज़ार ख़ुद अपनी तरह का एक प्यार है।" }
+      "title": { "en": "Waiting can be tender", "hi": "इंतज़ार कोमल भी हो सकता है" },
+      "insight": { "en": "Waiting doesn't have to be restless or anxious. It can be a hopeful kind of love.", "hi": "इंतज़ार का बेचैन या परेशान होना ज़रूरी नहीं। यह अपने आप में एक कोमल, उम्मीद भरा प्यार भी हो सकता है।" },
+      "expanded": { "en": "There's a kind of waiting full of worry: checking, counting, wishing the time away. There's another kind, softer and warmer: the waiting of someone getting ready to love. It's resting a hand on the bump and wondering, making a small space ready in your heart and your home. You're not only passing time until your baby comes. You're loving them already, through the waiting. Let it be tender. This longing is one of the first forms your love will take.", "hi": "एक तरह का इंतज़ार होता है जो चिंता से भरा होता है — बार-बार जाँचना, दिन गिनना, वक़्त के गुज़र जाने की दुआ करना। पर एक दूसरी तरह का भी है, कहीं ज़्यादा नरम और गर्म: उस इंसान का कोमल इंतज़ार जो प्यार करने की तैयारी कर रहा है। यह उस माँ का इंतज़ार है जो पेट पर एक हाथ रखकर बस सोचती रहती है, जो अपने दिल में और अपने घर में एक छोटी सी जगह तैयार करती है। आप अपने शिशु के आने तक बस वक़्त नहीं काट रहीं; आप उसे अभी से प्यार कर रही हैं, इसी इंतज़ार के ज़रिए। इसे कोमल रहने दीजिए। इसे मीठा रहने दीजिए। यह तड़प आपके प्यार के सबसे सच्चे रूपों में से एक है।" },
+      "deepDive": { "en": "Research suggests that prenatal bonding, the loving attention parents give during pregnancy, is linked to a smoother connection after birth. Tender waiting is a way of getting ready.", "hi": "शोधकर्ता बताते हैं कि गर्भावस्था में बना जुड़ाव — यानी इन महीनों में दिया गया प्यार भरा ध्यान — जन्म के बाद के आसान रिश्ते से जुड़ा है। इंतज़ार की कोमलता बेकार नहीं है; यह तैयारी है।" },
+      "remember": { "en": "Tender waiting is a kind of love too.", "hi": "कोमल इंतज़ार ख़ुद अपनी तरह का एक प्यार है।" }
     },
     "readToBaby": {
       "title": { "en": "The Magic Pot", "hi": "जादुई मटका" },
@@ -217,8 +217,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about the neighbours and community already awaiting them.", "hi": "अपने शिशु को उन पड़ोसियों और उस समाज के बारे में बताइए जो अभी से उसका इंतज़ार कर रहे हैं।" },
-      "motivation": { "en": "Your baby is being born into a whole web of people ready to care.", "hi": "आपका शिशु ऐसे लोगों के एक पूरे जाल में जन्म ले रहा है जो ख़याल रखने के लिए तैयार हैं।" }
+      "title": { "en": "Tell your baby about the neighbours and community already waiting for them.", "hi": "अपने शिशु को उन पड़ोसियों और उस समाज के बारे में बताइए जो अभी से उसका इंतज़ार कर रहे हैं।" },
+      "motivation": { "en": "Your baby is being born into a whole web of people ready to care for them.", "hi": "आपका शिशु ऐसे लोगों के एक पूरे जाल में जन्म ले रहा है जो ख़याल रखने के लिए तैयार हैं।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -233,9 +233,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Soft Belly Breaths", "hi": "पेट की नरम साँसें" },
-      "content": { "en": "Rest both hands on your belly. Breathe in slowly and feel it rise gently into your palms, then breathe out and feel it soften. Stay with five tender breaths.", "hi": "दोनों हाथ अपने पेट पर रखिए। धीरे से साँस लीजिए और महसूस कीजिए कि पेट नरमी से आपकी हथेलियों में उठ रहा है, फिर साँस छोड़िए और उसे नरम होते महसूस कीजिए। पाँच कोमल साँसों तक इसी में रहिए।" },
-      "remember": { "en": "Each soft breath is a quiet hello to your baby.", "hi": "हर नरम साँस आपके शिशु को एक शांत नमस्ते है।" },
+      "title": { "en": "Soft belly breaths", "hi": "पेट की नरम साँसें" },
+      "content": { "en": "Rest both hands on your belly. Breathe in slowly and feel it rise into your palms, then breathe out and feel it soften. Stay with five slow breaths.", "hi": "दोनों हाथ अपने पेट पर रखिए। धीरे से साँस लीजिए और महसूस कीजिए कि पेट नरमी से आपकी हथेलियों में उठ रहा है, फिर साँस छोड़िए और उसे नरम होते महसूस कीजिए। पाँच कोमल साँसों तक इसी में रहिए।" },
+      "remember": { "en": "Five slow breaths, and a hello to your baby.", "hi": "हर नरम साँस आपके शिशु को एक शांत नमस्ते है।" },
       "durationMinutes": 2
     }
   },
@@ -244,10 +244,10 @@
     "week": 10,
     "babyLearning": { "en": "Tiny taste buds are starting to form on your baby's tongue.", "hi": "हफ़्ता पूरा करते हुए, लगातार और मज़बूत होते हुए" },
     "grow": {
-      "title": { "en": "One Day Holds Enough", "hi": "एक दिन में उतना ही काफ़ी है" },
-      "insight": { "en": "You do not have to carry the whole future today. One day, lived gently, already holds enough.", "hi": "आपको आज पूरा भविष्य नहीं उठाना है। नरमी से जिया गया एक दिन, अपने आप में काफ़ी है।" },
-      "expanded": { "en": "The road ahead can feel vast — the months of waiting, the birth, the years of raising a whole person. Held all at once, it is too much for anyone. But you are never asked to live it all at once. You are only ever asked to live today: this breath, this meal, this small act of care. A child is not raised in one overwhelming leap, but in a long string of single days, each one holding just enough. Let the future stay where it is. Today is the only day you ever have to carry, and today, you are doing beautifully.", "hi": "आगे का रास्ता बहुत लंबा लग सकता है — इंतज़ार के महीने, जन्म, एक पूरे इंसान को पालने के साल। सब एक साथ थाम लें, तो यह किसी के लिए भी बहुत ज़्यादा है। पर आपसे कभी यह सब एक साथ जीने को नहीं कहा जाता। आपसे सिर्फ़ आज जीने को कहा जाता है: यह साँस, यह खाना, ख़याल रखने का यह छोटा सा काम। बच्चा किसी एक भारी छलाँग में नहीं पाला जाता, बल्कि एक-एक दिन की एक लंबी माला में, जिसका हर मनका बस उतना ही थामे है जितना चाहिए। भविष्य को जहाँ है वहीं रहने दीजिए। आज ही वह अकेला दिन है जो आपको कभी उठाना है, और आज, आप बहुत सुंदर तरीक़े से कर रही हैं।" },
-      "deepDive": { "en": "Therapists often guide anxious parents to 'come back to today,' because the mind calms when it stops carrying the whole future at once. Living one day at a time is not avoidance — it is wisdom.", "hi": "थेरेपिस्ट अक्सर परेशान माँ-बाप से 'आज में लौट आइए' कहते हैं, क्योंकि मन तब शांत होता है जब वह पूरा भविष्य एक साथ उठाना छोड़ देता है। एक-एक दिन करके जीना भागना नहीं है — यह समझदारी है।" },
+      "title": { "en": "One day at a time is enough", "hi": "एक दिन में उतना ही काफ़ी है" },
+      "insight": { "en": "You don't have to carry the whole future today. One day, lived gently, is enough.", "hi": "आपको आज पूरा भविष्य नहीं उठाना है। नरमी से जिया गया एक दिन, अपने आप में काफ़ी है।" },
+      "expanded": { "en": "The road ahead can feel huge: months of waiting, the birth, years of raising a whole person. Held all at once, it's too much for anyone. You're never asked to live it all at once. You're only asked to live today: this breath, this meal, this small act of care. A child is raised in a long string of single days, each holding just enough. Let the future stay where it is. Today is the only day you have to carry, and you're doing well.", "hi": "आगे का रास्ता बहुत लंबा लग सकता है — इंतज़ार के महीने, जन्म, एक पूरे इंसान को पालने के साल। सब एक साथ थाम लें, तो यह किसी के लिए भी बहुत ज़्यादा है। पर आपसे कभी यह सब एक साथ जीने को नहीं कहा जाता। आपसे सिर्फ़ आज जीने को कहा जाता है: यह साँस, यह खाना, ख़याल रखने का यह छोटा सा काम। बच्चा किसी एक भारी छलाँग में नहीं पाला जाता, बल्कि एक-एक दिन की एक लंबी माला में, जिसका हर मनका बस उतना ही थामे है जितना चाहिए। भविष्य को जहाँ है वहीं रहने दीजिए। आज ही वह अकेला दिन है जो आपको कभी उठाना है, और आज, आप बहुत सुंदर तरीक़े से कर रही हैं।" },
+      "deepDive": { "en": "Therapists often help anxious parents come back to today, because the mind calms when it stops trying to hold the whole future. Living one day at a time is a sound way to cope.", "hi": "थेरेपिस्ट अक्सर परेशान माँ-बाप से 'आज में लौट आइए' कहते हैं, क्योंकि मन तब शांत होता है जब वह पूरा भविष्य एक साथ उठाना छोड़ देता है। एक-एक दिन करके जीना भागना नहीं है — यह समझदारी है।" },
       "remember": { "en": "You only ever have to carry today.", "hi": "आपको हमेशा सिर्फ़ आज ही उठाना है।" }
     },
     "readToBaby": {
@@ -257,8 +257,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about a piece of the world's wonder — the stars, the ocean, the mountains.", "hi": "अपने शिशु को दुनिया के किसी अचरज के बारे में बताइए — तारे, समुद्र, पहाड़।" },
-      "motivation": { "en": "Wonder is the first language of the world — begin teaching it now.", "hi": "अचरज ही दुनिया की पहली भाषा है — इसे अभी से सिखाना शुरू कीजिए।" }
+      "title": { "en": "Tell your baby about a piece of the world's wonder, like the stars, the ocean or the mountains.", "hi": "अपने शिशु को दुनिया के किसी अचरज के बारे में बताइए — तारे, समुद्र, पहाड़।" },
+      "motivation": { "en": "Wonder is how a child first meets the world. You can start sharing it now.", "hi": "अचरज ही दुनिया की पहली भाषा है — इसे अभी से सिखाना शुरू कीजिए।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -273,9 +273,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "Just For Today", "hi": "बस आज के लिए" },
-      "content": { "en": "I will not borrow tomorrow's worries. Just for today, I will care for this one day and let it be enough.", "hi": "मैं कल की चिंताएँ उधार नहीं लूँगी। बस आज के लिए, मैं इसी एक दिन का ख़याल रखूँगी और इसे काफ़ी होने दूँगी।" },
-      "remember": { "en": "Tomorrow can wait; today is where you live.", "hi": "कल इंतज़ार कर सकता है; आप आज में जीती हैं।" },
+      "title": { "en": "Just for today", "hi": "बस आज के लिए" },
+      "content": { "en": "I won't borrow tomorrow's worries. Just for today, I'll care for this one day and let it be enough.", "hi": "मैं कल की चिंताएँ उधार नहीं लूँगी। बस आज के लिए, मैं इसी एक दिन का ख़याल रखूँगी और इसे काफ़ी होने दूँगी।" },
+      "remember": { "en": "Tomorrow can wait. Today is where you live.", "hi": "कल इंतज़ार कर सकता है; आप आज में जीती हैं।" },
       "durationMinutes": 0
     }
   }

@@ -4,11 +4,11 @@
     "week": 6,
     "babyLearning": { "en": "Your baby's heart is beating in a steady rhythm now.", "hi": "एक नन्हा दिल तेज़ी से फड़कता हुआ, आकार लेता हुआ" },
     "grow": {
-      "title": { "en": "Your Body Already Knows The Way", "hi": "आपका शरीर राह पहले से जानता है" },
-      "insight": { "en": "You do not have to instruct your body how to grow your baby. Deep within, it already knows the way.", "hi": "आपको अपने शरीर को यह सिखाना नहीं पड़ता कि शिशु को कैसे बढ़ाना है। भीतर कहीं गहरे, वो राह पहले से जानता है।" },
-      "expanded": { "en": "There is an ancient wisdom moving through you right now — a knowing far older than any book or worry. Without a single instruction from you, your body is forming a heart, weaving tiny cells into a whole new person. You do not have to manage it or understand it for it to work beautifully. This is your first lesson in trust: some of the most important things happen not because we control them, but because we step back and let a deeper wisdom do its quiet work. Your only task today is to rest in that trust.", "hi": "अभी इसी वक़्त आपके भीतर एक बहुत पुरानी समझ बह रही है — किसी भी किताब या चिंता से कहीं पुरानी। आपकी एक भी हिदायत के बिना आपका शरीर एक दिल बना रहा है, नन्ही कोशिकाओं को बुनकर एक पूरा नया इंसान गढ़ रहा है। इसके ख़ूबसूरती से चलने के लिए आपको इसे सँभालना या समझना नहीं पड़ता। यह भरोसे का आपका पहला सबक़ है: सबसे ज़रूरी चीज़ों में से कुछ इसलिए नहीं होतीं कि हम उन्हें क़ाबू में रखते हैं, बल्कि इसलिए कि हम पीछे हट जाते हैं और एक गहरी समझ को उसका चुपचाप काम करने देते हैं। आज आपका बस इतना काम है — उसी भरोसे में टिक जाना।" },
-      "deepDive": { "en": "From a single cell, your body orchestrates billions of precise developmental steps without any conscious effort from you. Scientists who study it call early development one of nature's most reliable processes.", "hi": "एक ही कोशिका से शुरू होकर, आपका शरीर आपकी किसी सजग कोशिश के बिना अरबों बारीक क़दम तय करता है। इसे पढ़ने वाले वैज्ञानिक शुरुआती विकास को क़ुदरत की सबसे भरोसेमंद प्रक्रियाओं में गिनते हैं।" },
-      "remember": { "en": "Trust your body — it has been doing this longer than time itself.", "hi": "अपने शरीर पर भरोसा कीजिए — यह काम वो समय से भी पहले से करता आया है।" }
+      "title": { "en": "Your baby grows without instructions", "hi": "आपका शरीर राह पहले से जानता है" },
+      "insight": { "en": "Nobody has to tell your baby how to grow. It's already happening, all on its own.", "hi": "आपको अपने शरीर को यह सिखाना नहीं पड़ता कि शिशु को कैसे बढ़ाना है। भीतर कहीं गहरे, वो राह पहले से जानता है।" },
+      "expanded": { "en": "Right now, without a single instruction from anyone, a heart is forming and tiny cells are becoming a whole new person. You don't have to manage it or understand it for it to work. This can be a first lesson in trust. Some of the most important things happen without our control. For today, you can rest in that.", "hi": "अभी इसी वक़्त आपके भीतर एक बहुत पुरानी समझ बह रही है — किसी भी किताब या चिंता से कहीं पुरानी। आपकी एक भी हिदायत के बिना आपका शरीर एक दिल बना रहा है, नन्ही कोशिकाओं को बुनकर एक पूरा नया इंसान गढ़ रहा है। इसके ख़ूबसूरती से चलने के लिए आपको इसे सँभालना या समझना नहीं पड़ता। यह भरोसे का आपका पहला सबक़ है: सबसे ज़रूरी चीज़ों में से कुछ इसलिए नहीं होतीं कि हम उन्हें क़ाबू में रखते हैं, बल्कि इसलिए कि हम पीछे हट जाते हैं और एक गहरी समझ को उसका चुपचाप काम करने देते हैं। आज आपका बस इतना काम है — उसी भरोसे में टिक जाना।" },
+      "deepDive": { "en": "From a single cell, a baby's organs begin forming in these early weeks, one step after another, on their own. None of it needs any conscious effort from you.", "hi": "एक ही कोशिका से शुरू होकर, आपका शरीर आपकी किसी सजग कोशिश के बिना अरबों बारीक क़दम तय करता है। इसे पढ़ने वाले वैज्ञानिक शुरुआती विकास को क़ुदरत की सबसे भरोसेमंद प्रक्रियाओं में गिनते हैं।" },
+      "remember": { "en": "You can let this happen without managing it.", "hi": "अपने शरीर पर भरोसा कीजिए — यह काम वो समय से भी पहले से करता आया है।" }
     },
     "readToBaby": {
       "title": { "en": "The Elephant And The Rope", "hi": "हाथी और रस्सी" },
@@ -17,8 +17,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about your own mother and the things she taught you.", "hi": "अपने शिशु को अपनी माँ के बारे में बताइए, और उन बातों के बारे में जो उन्होंने आपको सिखाईं।" },
-      "motivation": { "en": "The love you were given is the first love you will pass on.", "hi": "जो प्यार आपको मिला, वही पहला प्यार है जो आप आगे देंगी।" }
+      "title": { "en": "Tell your baby about your own mother and what she taught you.", "hi": "अपने शिशु को अपनी माँ के बारे में बताइए, और उन बातों के बारे में जो उन्होंने आपको सिखाईं।" },
+      "motivation": { "en": "The love you were given is the first love you'll pass on.", "hi": "जो प्यार आपको मिला, वही पहला प्यार है जो आप आगे देंगी।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -33,9 +33,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "I Can Let Go Of Controlling Everything", "hi": "मैं हर चीज़ पर क़ाबू रखना छोड़ सकती हूँ" },
+      "title": { "en": "I can let go of controlling everything", "hi": "मैं हर चीज़ पर क़ाबू रखना छोड़ सकती हूँ" },
       "content": { "en": "Not everything is mine to manage today. I can loosen my grip and let the day carry some of it.", "hi": "आज हर चीज़ सँभालना मेरा ही काम नहीं है। मैं अपनी पकड़ ढीली कर सकती हूँ और दिन को थोड़ा बोझ उठाने दे सकती हूँ।" },
-      "remember": { "en": "Letting go is its own kind of strength.", "hi": "छोड़ देना भी अपने आप में एक तरह की ताक़त है।" },
+      "remember": { "en": "Letting go takes strength too.", "hi": "छोड़ देना भी अपने आप में एक तरह की ताक़त है।" },
       "durationMinutes": 0
     }
   },
@@ -44,11 +44,11 @@
     "week": 6,
     "babyLearning": { "en": "Small buds that will become arms and legs are appearing.", "hi": "हाथ और पैर की नन्ही कलियाँ दिखने लगी हैं" },
     "grow": {
-      "title": { "en": "You Can Trust What You Cannot See", "hi": "जो दिखता नहीं, उस पर भी भरोसा हो सकता है" },
-      "insight": { "en": "Just because you cannot see your baby growing does not mean it is not happening. The unseen can still be trusted.", "hi": "सिर्फ़ इसलिए कि आप शिशु को बढ़ते नहीं देख पातीं, इसका मतलब यह नहीं कि यह हो नहीं रहा। जो दिखता नहीं, उस पर भी भरोसा किया जा सकता है।" },
-      "expanded": { "en": "In these early weeks there is so little to show — no rounded belly, no fluttering kicks, sometimes nothing but tiredness and faith. It can be hard to trust in something you cannot yet feel. But the deepest things in life are often invisible: love, growth, the slow turning of a seed into a sprout underground. Your baby is busily becoming, even in this quiet. Learning to trust what you cannot see is a gift you give yourself now — and, one day, the very steadiness your child will sense in you.", "hi": "इन शुरुआती हफ़्तों में दिखाने को इतना कम होता है — न गोल पेट, न फड़कती लातें, कभी सिर्फ़ थकान और यक़ीन। ऐसी चीज़ पर भरोसा करना मुश्किल हो सकता है जिसे आप अभी महसूस भी नहीं कर पातीं। पर ज़िंदगी की सबसे गहरी चीज़ें अक्सर आँखों से ओझल ही होती हैं: प्यार, बढ़ना, ज़मीन के नीचे एक बीज का धीरे-धीरे अंकुर बन जाना। इस चुप्पी में भी भीतर बनना लगातार जारी है। जो दिखता नहीं उस पर भरोसा करना सीखना एक तोहफ़ा है जो आप अभी ख़ुद को देती हैं — और एक दिन वही ठहराव है जो आपके बच्चे तक भी पहुँचेगा।" },
-      "deepDive": { "en": "Even before a bump appears, the placenta is fully nourishing your baby and hormone levels rise steadily to support the pregnancy. Much of the most vital work is simply invisible from the outside.", "hi": "पेट उभरने से पहले ही प्लेसेंटा आपके शिशु को पूरा पोषण दे रहा होता है और गर्भावस्था को सँभालने के लिए हॉर्मोन का स्तर लगातार बढ़ता जाता है। सबसे ज़रूरी काम का ज़्यादातर हिस्सा बाहर से दिखता ही नहीं।" },
-      "remember": { "en": "What you cannot see is often working hardest of all.", "hi": "जो आपको दिखता नहीं, अक्सर वही सबसे ज़्यादा मेहनत कर रहा होता है।" }
+      "title": { "en": "You can trust what you can't see yet", "hi": "जो दिखता नहीं, उस पर भी भरोसा हो सकता है" },
+      "insight": { "en": "You can't see your baby growing, but it's happening. You can trust it.", "hi": "सिर्फ़ इसलिए कि आप शिशु को बढ़ते नहीं देख पातीं, इसका मतलब यह नहीं कि यह हो नहीं रहा। जो दिखता नहीं, उस पर भी भरोसा किया जा सकता है।" },
+      "expanded": { "en": "In these early weeks there's so little to show: no kicks, often no bump, sometimes only tiredness and faith. It's hard to trust something you can't feel yet. Many important things can't be seen, like love, or a seed sprouting underground. Your baby is busy growing, even now. Learning to trust what you can't see is a gift to yourself, and one day your child will feel that steadiness in you.", "hi": "इन शुरुआती हफ़्तों में दिखाने को इतना कम होता है — न गोल पेट, न फड़कती लातें, कभी सिर्फ़ थकान और यक़ीन। ऐसी चीज़ पर भरोसा करना मुश्किल हो सकता है जिसे आप अभी महसूस भी नहीं कर पातीं। पर ज़िंदगी की सबसे गहरी चीज़ें अक्सर आँखों से ओझल ही होती हैं: प्यार, बढ़ना, ज़मीन के नीचे एक बीज का धीरे-धीरे अंकुर बन जाना। इस चुप्पी में भी भीतर बनना लगातार जारी है। जो दिखता नहीं उस पर भरोसा करना सीखना एक तोहफ़ा है जो आप अभी ख़ुद को देती हैं — और एक दिन वही ठहराव है जो आपके बच्चे तक भी पहुँचेगा।" },
+      "deepDive": { "en": "Even before there's a bump, the placenta is forming to feed your baby, and pregnancy hormones are rising to support the pregnancy. Much of the most important work can't be seen from outside.", "hi": "पेट उभरने से पहले ही प्लेसेंटा आपके शिशु को पूरा पोषण दे रहा होता है और गर्भावस्था को सँभालने के लिए हॉर्मोन का स्तर लगातार बढ़ता जाता है। सबसे ज़रूरी काम का ज़्यादातर हिस्सा बाहर से दिखता ही नहीं।" },
+      "remember": { "en": "What you can't see is often working hardest.", "hi": "जो आपको दिखता नहीं, अक्सर वही सबसे ज़्यादा मेहनत कर रहा होता है।" }
     },
     "readToBaby": {
       "title": { "en": "The Clever Rabbit And The Lion", "hi": "चतुर ख़रगोश और शेर" },
@@ -58,7 +58,7 @@
     },
     "talkToBaby": {
       "title": { "en": "Tell your baby about their grandparents and where the family comes from.", "hi": "अपने शिशु को उनके दादा-दादी, नाना-नानी के बारे में बताइए, और यह कि परिवार कहाँ से आया है।" },
-      "motivation": { "en": "Knowing where they come from gives your child a place to stand.", "hi": "यह जानना कि वो कहाँ से आए हैं, बच्चों को खड़े होने की एक ज़मीन देता है।" }
+      "motivation": { "en": "Knowing where they come from gives a child a place to stand.", "hi": "यह जानना कि वो कहाँ से आए हैं, बच्चों को खड़े होने की एक ज़मीन देता है।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -73,9 +73,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Breathe Into The Belly", "hi": "पेट तक साँस लीजिए" },
-      "content": { "en": "Rest a hand low on your belly. Breathe in slowly and feel it rise gently under your palm, then breathe out and feel it soften. Stay with five quiet breaths.", "hi": "एक हाथ अपने पेट पर नीचे रखिए। धीरे-धीरे साँस भीतर लीजिए और उसे हथेली के नीचे हल्के से उठते महसूस कीजिए, फिर साँस छोड़िए और उसे नरम पड़ते महसूस कीजिए। पाँच शांत साँसों तक यही करती रहिए।" },
-      "remember": { "en": "Your breath is a quiet hello to the life within.", "hi": "आपकी साँस भीतर पल रही ज़िंदगी को एक चुपचाप नमस्ते है।" },
+      "title": { "en": "Belly breathing", "hi": "पेट तक साँस लीजिए" },
+      "content": { "en": "Rest a hand low on your belly. Breathe in slowly and feel it rise under your palm, then breathe out and feel it soften. Stay with five slow breaths.", "hi": "एक हाथ अपने पेट पर नीचे रखिए। धीरे-धीरे साँस भीतर लीजिए और उसे हथेली के नीचे हल्के से उठते महसूस कीजिए, फिर साँस छोड़िए और उसे नरम पड़ते महसूस कीजिए। पाँच शांत साँसों तक यही करती रहिए।" },
+      "remember": { "en": "Each slow breath is a hello to your baby.", "hi": "आपकी साँस भीतर पल रही ज़िंदगी को एक चुपचाप नमस्ते है।" },
       "durationMinutes": 1
     }
   },
@@ -84,11 +84,11 @@
     "week": 6,
     "babyLearning": { "en": "The first shape of your baby's face is starting to form.", "hi": "चेहरे की शुरुआती बनावट बनने लगी है" },
     "grow": {
-      "title": { "en": "Worry Is Not Preparation", "hi": "चिंता तैयारी नहीं है" },
-      "insight": { "en": "Worrying about your baby can feel like caring for them, but the two are not the same.", "hi": "शिशु की चिंता करना उनका ख़याल रखने जैसा लग सकता है, पर दोनों एक नहीं हैं।" },
-      "expanded": { "en": "When we love someone deeply, our minds often try to protect them by rehearsing every possible fear. It feels responsible, even loving. But worry rarely changes what will happen — it only borrows tomorrow's troubles to spend on today's peace. Real preparation is gentle and practical: rest, nourishment, kindness to yourself. The rest you can hand over to trust. Each time you notice worry and softly set it down, you are not being careless. You are choosing the calm that truly serves both you and your baby.", "hi": "जब हम किसी से गहरा प्यार करते हैं, हमारा मन अक्सर हर मुमकिन डर को दोहराकर उन्हें बचाने की कोशिश करता है। यह ज़िम्मेदारी जैसा, बल्कि प्यार जैसा लगता है। पर चिंता शायद ही बदलती है कि क्या होगा — वो बस कल की मुश्किलें उधार लेकर आज के सुकून पर ख़र्च कर देती है। असली तैयारी नरम और सीधी-सादी होती है: आराम, पोषण, ख़ुद पर थोड़ी नरमी। बाक़ी आप भरोसे को सौंप सकती हैं। हर बार जब आप चिंता को पहचानकर उसे धीरे से नीचे रख देती हैं, आप लापरवाह नहीं हो रहीं। आप वो शांति चुन रही हैं जो सचमुच आपका और शिशु, दोनों का भला करती है।" },
-      "deepDive": { "en": "Psychologists distinguish 'productive worry,' which leads to a clear action, from 'unproductive worry,' which only loops. Naming which kind you are in helps the mind let the looping kind go.", "hi": "मनोवैज्ञानिक 'productive worry' को, जो किसी साफ़ काम तक ले जाती है, 'unproductive worry' से अलग रखते हैं, जो बस गोल-गोल घूमती रहती है। यह पहचान लेना कि आप किस वाली में हैं, मन को घूमने वाली को छोड़ने में मदद करता है।" },
-      "remember": { "en": "Worry borrows trouble; trust returns peace.", "hi": "चिंता मुश्किल उधार लेती है; भरोसा सुकून लौटा देता है।" }
+      "title": { "en": "Worrying isn't the same as preparing", "hi": "चिंता तैयारी नहीं है" },
+      "insight": { "en": "Worrying about your baby can feel like caring for them, but the two aren't the same.", "hi": "शिशु की चिंता करना उनका ख़याल रखने जैसा लग सकता है, पर दोनों एक नहीं हैं।" },
+      "expanded": { "en": "When we love someone deeply, the mind tries to protect them by running through every fear. It feels responsible, even loving. But worry rarely changes what happens. It mostly takes away today's peace. Real preparing is practical and gentle: rest, food, kindness to yourself. The rest you can hand over to trust. Each time you notice a worry and set it down, you're choosing calm, and that helps you and your baby.", "hi": "जब हम किसी से गहरा प्यार करते हैं, हमारा मन अक्सर हर मुमकिन डर को दोहराकर उन्हें बचाने की कोशिश करता है। यह ज़िम्मेदारी जैसा, बल्कि प्यार जैसा लगता है। पर चिंता शायद ही बदलती है कि क्या होगा — वो बस कल की मुश्किलें उधार लेकर आज के सुकून पर ख़र्च कर देती है। असली तैयारी नरम और सीधी-सादी होती है: आराम, पोषण, ख़ुद पर थोड़ी नरमी। बाक़ी आप भरोसे को सौंप सकती हैं। हर बार जब आप चिंता को पहचानकर उसे धीरे से नीचे रख देती हैं, आप लापरवाह नहीं हो रहीं। आप वो शांति चुन रही हैं जो सचमुच आपका और शिशु, दोनों का भला करती है।" },
+      "deepDive": { "en": "Psychologists separate worry that leads to a clear action from worry that only goes round in circles. Noticing which kind you're in can help you let the looping kind go.", "hi": "मनोवैज्ञानिक 'productive worry' को, जो किसी साफ़ काम तक ले जाती है, 'unproductive worry' से अलग रखते हैं, जो बस गोल-गोल घूमती रहती है। यह पहचान लेना कि आप किस वाली में हैं, मन को घूमने वाली को छोड़ने में मदद करता है।" },
+      "remember": { "en": "Worry takes away today's peace and rarely changes tomorrow.", "hi": "चिंता मुश्किल उधार लेती है; भरोसा सुकून लौटा देता है।" }
     },
     "readToBaby": {
       "title": { "en": "Krishna And The Govardhan Hill", "hi": "कृष्ण और गोवर्धन पर्वत" },
@@ -98,7 +98,7 @@
     },
     "talkToBaby": {
       "title": { "en": "Tell your baby about a family tradition you love and hope to pass on.", "hi": "अपने शिशु को परिवार की उस रीत के बारे में बताइए जो आपको प्यारी है और जिसे आप आगे बढ़ाना चाहती हैं।" },
-      "motivation": { "en": "Traditions are the threads that quietly tie one generation to the next.", "hi": "रीतें वो धागे हैं जो एक पीढ़ी को अगली से चुपचाप बाँध देती हैं।" }
+      "motivation": { "en": "Traditions tie one generation to the next.", "hi": "रीतें वो धागे हैं जो एक पीढ़ी को अगली से चुपचाप बाँध देती हैं।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -113,9 +113,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "I Will Meet Today, Not Tomorrow", "hi": "मैं आज से मिलूँगी, कल से नहीं" },
-      "content": { "en": "I do not have to solve every future moment right now. Today asks only for today.", "hi": "मुझे अभी हर आने वाले पल को सुलझाने की ज़रूरत नहीं। आज सिर्फ़ आज माँगता है।" },
-      "remember": { "en": "Today is the only day you are asked to live.", "hi": "आज ही इकलौता दिन है जिसे जीने को आपसे कहा गया है।" },
+      "title": { "en": "I'll take today as it comes", "hi": "मैं आज से मिलूँगी, कल से नहीं" },
+      "content": { "en": "I don't have to solve every future moment right now. Today only asks for today.", "hi": "मुझे अभी हर आने वाले पल को सुलझाने की ज़रूरत नहीं। आज सिर्फ़ आज माँगता है।" },
+      "remember": { "en": "Today is the only day you need to get through.", "hi": "आज ही इकलौता दिन है जिसे जीने को आपसे कहा गया है।" },
       "durationMinutes": 0
     }
   },
@@ -124,11 +124,11 @@
     "week": 6,
     "babyLearning": { "en": "Your baby's brain is growing very fast this week.", "hi": "और गोल होते हुए, अपने आरामदेह घर में और गहरे बसते हुए" },
     "grow": {
-      "title": { "en": "Let Go Of The Perfect Plan", "hi": "एकदम सही प्लान को जाने दीजिए" },
-      "insight": { "en": "You can prepare with love, but you cannot script everything. The most beautiful parts of this journey will surprise you.", "hi": "आप प्यार से तैयारी कर सकती हैं, पर हर चीज़ पहले से लिखी नहीं जा सकती। इस सफ़र के सबसे ख़ूबसूरत हिस्से आपको चौंका देंगे।" },
-      "expanded": { "en": "Many of us cope with the unknown by planning — the perfect birth, the perfect nursery, the perfect first year. There is comfort in a plan, and some planning is wise. But life with a child is gloriously unpredictable, and the tightest plan often cracks at the first surprise. The gift is to hold your plans loosely, like an open hand rather than a clenched fist. When you make room for things to unfold their own way, you trade the brittle pressure of perfect for something far steadier: the freedom to meet whatever comes with grace.", "hi": "हममें से कई अनजाने से यूँ निपटते हैं कि सब कुछ पहले से तय कर लें — एकदम सही जन्म, एकदम सही कमरा, एकदम सही पहला साल। एक प्लान में सुकून होता है, और थोड़ी तैयारी समझदारी भी है। पर बच्चे के साथ ज़िंदगी बड़े ही शानदार ढंग से अनजान होती है, और सबसे कसा हुआ प्लान अक्सर पहले ही चौंकाने पर चटक जाता है। तोहफ़ा यह है कि अपने प्लान ढीले थामिए — बंद मुट्ठी की तरह नहीं, खुली हथेली की तरह। जब आप चीज़ों को अपने तरीक़े से खुलने की जगह देती हैं, तो 'सब कुछ एकदम सही' के नाज़ुक दबाव की जगह आपको कहीं ज़्यादा ठहरी हुई चीज़ मिलती है: जो भी आए, उससे शांति से मिल पाने की आज़ादी।" },
-      "deepDive": { "en": "Studies of new parents find that flexibility predicts wellbeing far better than rigid expectations. Those who hold plans loosely adapt more easily when reality, as it always does, arrives differently.", "hi": "नए माँ-बाप पर हुए शोध बताते हैं कि सख़्त उम्मीदों के मुक़ाबले लचीलापन कहीं बेहतर बताता है कि कौन ख़ुश रहेगा। जो अपने प्लान ढीले थामते हैं, वो तब ज़्यादा आसानी से ढल जाते हैं जब हक़ीक़त, जैसा वो हमेशा करती है, कुछ और ही निकलती है।" },
-      "remember": { "en": "Hold your plans like an open hand, not a clenched fist.", "hi": "अपने प्लान बंद मुट्ठी की तरह नहीं, खुली हथेली की तरह थामिए।" }
+      "title": { "en": "Hold your plans loosely", "hi": "एकदम सही प्लान को जाने दीजिए" },
+      "insight": { "en": "You can prepare with love, but you can't plan everything. Some of the best parts will surprise you.", "hi": "आप प्यार से तैयारी कर सकती हैं, पर हर चीज़ पहले से लिखी नहीं जा सकती। इस सफ़र के सबसे ख़ूबसूरत हिस्से आपको चौंका देंगे।" },
+      "expanded": { "en": "Many of us cope with the unknown by planning the perfect birth, the perfect nursery, the perfect first year. A plan is comforting, and some planning is wise. But life with a child is unpredictable, and a tight plan often breaks at the first surprise. Try holding your plans loosely, like an open hand. Leaving room for things to go their own way takes off the pressure and helps you meet whatever comes calmly.", "hi": "हममें से कई अनजाने से यूँ निपटते हैं कि सब कुछ पहले से तय कर लें — एकदम सही जन्म, एकदम सही कमरा, एकदम सही पहला साल। एक प्लान में सुकून होता है, और थोड़ी तैयारी समझदारी भी है। पर बच्चे के साथ ज़िंदगी बड़े ही शानदार ढंग से अनजान होती है, और सबसे कसा हुआ प्लान अक्सर पहले ही चौंकाने पर चटक जाता है। तोहफ़ा यह है कि अपने प्लान ढीले थामिए — बंद मुट्ठी की तरह नहीं, खुली हथेली की तरह। जब आप चीज़ों को अपने तरीक़े से खुलने की जगह देती हैं, तो 'सब कुछ एकदम सही' के नाज़ुक दबाव की जगह आपको कहीं ज़्यादा ठहरी हुई चीज़ मिलती है: जो भी आए, उससे शांति से मिल पाने की आज़ादी।" },
+      "deepDive": { "en": "Research with new parents suggests that being flexible helps wellbeing more than holding rigid expectations. Parents who hold plans loosely tend to adjust more easily when things turn out differently.", "hi": "नए माँ-बाप पर हुए शोध बताते हैं कि सख़्त उम्मीदों के मुक़ाबले लचीलापन कहीं बेहतर बताता है कि कौन ख़ुश रहेगा। जो अपने प्लान ढीले थामते हैं, वो तब ज़्यादा आसानी से ढल जाते हैं जब हक़ीक़त, जैसा वो हमेशा करती है, कुछ और ही निकलती है।" },
+      "remember": { "en": "Hold your plans like an open hand.", "hi": "अपने प्लान बंद मुट्ठी की तरह नहीं, खुली हथेली की तरह थामिए।" }
     },
     "readToBaby": {
       "title": { "en": "The Golden Swan", "hi": "सुनहरा हंस" },
@@ -138,7 +138,7 @@
     },
     "talkToBaby": {
       "title": { "en": "Tell your baby about the town or place where you grew up.", "hi": "अपने शिशु को उस शहर या जगह के बारे में बताइए जहाँ आप बड़ी हुईं।" },
-      "motivation": { "en": "The places that shaped you are part of the story they will carry too.", "hi": "जिन जगहों ने आपको गढ़ा, वो उस कहानी का हिस्सा हैं जो वो भी आगे लिए चलेंगे।" }
+      "motivation": { "en": "The places that shaped you are part of their story too.", "hi": "जिन जगहों ने आपको गढ़ा, वो उस कहानी का हिस्सा हैं जो वो भी आगे लिए चलेंगे।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -153,9 +153,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "The Unclenching Breath", "hi": "मुट्ठी खोलती साँस" },
-      "content": { "en": "Make a soft fist as you breathe in. As you breathe out slowly, let your fingers open and your hand fall loose and relaxed. Repeat five times, releasing a little more each time.", "hi": "साँस भीतर लेते हुए एक नरम मुट्ठी बना लीजिए। धीरे-धीरे साँस छोड़ते हुए उँगलियों को खुलने दीजिए और हाथ को ढीला छोड़ दीजिए। पाँच बार दोहराइए, हर बार थोड़ा और छोड़ते हुए।" },
-      "remember": { "en": "An open hand holds peace more easily than a closed one.", "hi": "खुली हथेली सुकून को बंद हथेली से कहीं आसानी से थाम लेती है।" },
+      "title": { "en": "Open-hand breathing", "hi": "मुट्ठी खोलती साँस" },
+      "content": { "en": "Make a soft fist as you breathe in. As you breathe out slowly, open your fingers and let your hand go loose. Repeat five times, letting go a little more each time.", "hi": "साँस भीतर लेते हुए एक नरम मुट्ठी बना लीजिए। धीरे-धीरे साँस छोड़ते हुए उँगलियों को खुलने दीजिए और हाथ को ढीला छोड़ दीजिए। पाँच बार दोहराइए, हर बार थोड़ा और छोड़ते हुए।" },
+      "remember": { "en": "Open hands help a busy mind settle.", "hi": "खुली हथेली सुकून को बंद हथेली से कहीं आसानी से थाम लेती है।" },
       "durationMinutes": 2
     }
   },
@@ -164,11 +164,11 @@
     "week": 6,
     "babyLearning": { "en": "The first parts of your baby's eyes are starting to form.", "hi": "नन्ही आँखें अपनी जगह लेने लगी हैं" },
     "grow": {
-      "title": { "en": "Uncertainty Can Be Gentle", "hi": "अनिश्चितता नरम भी हो सकती है" },
-      "insight": { "en": "Not knowing what comes next does not have to feel frightening. Uncertainty can be a soft, open space too.", "hi": "अगला क्या है, यह न जानना डरावना लगना ज़रूरी नहीं। अनिश्चितता एक नरम, खुली जगह भी हो सकती है।" },
-      "expanded": { "en": "We are often taught to fear the unknown, to fill every blank with a plan or a worry. But uncertainty is simply the space where new things are still becoming — and not all of it is heavy. The same not-knowing that can feel anxious is also full of wonder: who your baby will be, what their laugh will sound like, the surprises waiting in ordinary days. When you can let uncertainty be gentle rather than threatening, it softens into something almost like hope. The future is unwritten, and that means it is still open to all that is good.", "hi": "हमें अक्सर अनजाने से डरना सिखाया जाता है, हर ख़ाली जगह को किसी प्लान या चिंता से भर देना सिखाया जाता है। पर अनिश्चितता बस वो जगह है जहाँ नई चीज़ें अभी बन रही होती हैं — और वो सब भारी नहीं होता। वही न-जानना जो बेचैन कर सकता है, अचरज से भी भरा है: आपका शिशु कैसा होगा, उनकी हँसी कैसी सुनाई देगी, आम दिनों में छिपे हुए वो पल जो चौंका देंगे। जब आप अनिश्चितता को ख़तरे की जगह नरम होने देती हैं, तो वो कुछ-कुछ उम्मीद जैसी लगने लगती है। आने वाला कल लिखा नहीं गया है — और इसका मतलब है कि वो हर अच्छी चीज़ के लिए अब भी खुला है।" },
-      "deepDive": { "en": "Researchers note that the very same uncertainty the brain reads as anxiety can be reappraised as excitement, since both share the same bodily signals. The story we tell ourselves shapes how the not-knowing feels.", "hi": "शोधकर्ता बताते हैं कि जिस अनिश्चितता को दिमाग़ घबराहट समझ लेता है, उसे उत्साह की तरह भी पढ़ा जा सकता है, क्योंकि शरीर के संकेत दोनों में एक जैसे होते हैं। जो कहानी हम ख़ुद को सुनाते हैं, वही तय करती है कि न-जानना कैसा लगेगा।" },
-      "remember": { "en": "An open future is also an open door to wonder.", "hi": "खुला आने वाला कल अचरज का भी एक खुला दरवाज़ा है।" }
+      "title": { "en": "Not knowing can feel gentle too", "hi": "अनिश्चितता नरम भी हो सकती है" },
+      "insight": { "en": "Not knowing what comes next doesn't have to be frightening. It can also leave room for hope.", "hi": "अगला क्या है, यह न जानना डरावना लगना ज़रूरी नहीं। अनिश्चितता एक नरम, खुली जगह भी हो सकती है।" },
+      "expanded": { "en": "We're often taught to fear the unknown and fill every gap with a plan or a worry. Uncertainty is also where good things are still taking shape. The same not-knowing that feels anxious is full of wonder too: who your baby will be, what their laugh will sound like, the surprises in ordinary days. When you let uncertainty be gentle, it can start to feel a lot like hope.", "hi": "हमें अक्सर अनजाने से डरना सिखाया जाता है, हर ख़ाली जगह को किसी प्लान या चिंता से भर देना सिखाया जाता है। पर अनिश्चितता बस वो जगह है जहाँ नई चीज़ें अभी बन रही होती हैं — और वो सब भारी नहीं होता। वही न-जानना जो बेचैन कर सकता है, अचरज से भी भरा है: आपका शिशु कैसा होगा, उनकी हँसी कैसी सुनाई देगी, आम दिनों में छिपे हुए वो पल जो चौंका देंगे। जब आप अनिश्चितता को ख़तरे की जगह नरम होने देती हैं, तो वो कुछ-कुछ उम्मीद जैसी लगने लगती है। आने वाला कल लिखा नहीं गया है — और इसका मतलब है कि वो हर अच्छी चीज़ के लिए अब भी खुला है।" },
+      "deepDive": { "en": "Nervousness and excitement feel similar in the body, with a faster heartbeat and a busy mind. Some studies suggest that calling the feeling excitement can change how the not-knowing feels.", "hi": "शोधकर्ता बताते हैं कि जिस अनिश्चितता को दिमाग़ घबराहट समझ लेता है, उसे उत्साह की तरह भी पढ़ा जा सकता है, क्योंकि शरीर के संकेत दोनों में एक जैसे होते हैं। जो कहानी हम ख़ुद को सुनाते हैं, वही तय करती है कि न-जानना कैसा लगेगा।" },
+      "remember": { "en": "Not knowing also leaves room for wonder.", "hi": "खुला आने वाला कल अचरज का भी एक खुला दरवाज़ा है।" }
     },
     "readToBaby": {
       "title": { "en": "Tenali Rama And The Thieves", "hi": "तेनाली राम और चोर" },
@@ -177,8 +177,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about a relative who simply cannot wait to meet them.", "hi": "अपने शिशु को किसी ऐसे रिश्तेदार के बारे में बताइए जिनसे उनके मिलने का इंतज़ार ही नहीं हो रहा।" },
-      "motivation": { "en": "Your baby is already awaited by hearts they have never seen.", "hi": "आपके शिशु का इंतज़ार अभी से उन दिलों में हो रहा है जिन्हें उन्होंने कभी देखा नहीं।" }
+      "title": { "en": "Tell your baby about a relative who can't wait to meet them.", "hi": "अपने शिशु को किसी ऐसे रिश्तेदार के बारे में बताइए जिनसे उनके मिलने का इंतज़ार ही नहीं हो रहा।" },
+      "motivation": { "en": "People your baby has never seen are already waiting for them.", "hi": "आपके शिशु का इंतज़ार अभी से उन दिलों में हो रहा है जिन्हें उन्होंने कभी देखा नहीं।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -193,9 +193,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "I Can Be Curious, Not Afraid", "hi": "मैं जिज्ञासा रख सकती हूँ, डर नहीं" },
-      "content": { "en": "When I do not know what is ahead, I can meet it with wonder instead of worry.", "hi": "जब मुझे नहीं पता कि आगे क्या है, मैं उससे चिंता की जगह अचरज के साथ मिल सकती हूँ।" },
-      "remember": { "en": "Wonder and worry look at the same unknown — choose wonder.", "hi": "अचरज और चिंता, दोनों उसी अनजाने को देखते हैं — अचरज चुनिए।" },
+      "title": { "en": "I can meet the unknown with curiosity", "hi": "मैं जिज्ञासा रख सकती हूँ, डर नहीं" },
+      "content": { "en": "When I don't know what's ahead, I can meet it with wonder instead of worry.", "hi": "जब मुझे नहीं पता कि आगे क्या है, मैं उससे चिंता की जगह अचरज के साथ मिल सकती हूँ।" },
+      "remember": { "en": "You can meet the unknown with wonder instead of worry.", "hi": "अचरज और चिंता, दोनों उसी अनजाने को देखते हैं — अचरज चुनिए।" },
       "durationMinutes": 0
     }
   },
@@ -204,11 +204,11 @@
     "week": 6,
     "babyLearning": { "en": "Tiny pits that will become your baby's inner ears are forming.", "hi": "बाँहों के सिरों पर नन्हे हाथ कलियों की तरह बनने लगे हैं" },
     "grow": {
-      "title": { "en": "Faith In Small Steps", "hi": "छोटे क़दमों पर यक़ीन" },
-      "insight": { "en": "You do not have to see the whole staircase. You only have to trust the next single step.", "hi": "आपको पूरी सीढ़ी नहीं देखनी है। आपको बस अगले एक क़दम पर भरोसा करना है।" },
-      "expanded": { "en": "The road to becoming a parent can look impossibly long from the bottom — so many weeks, so much to learn, so much unknown. But no one crosses that distance all at once. It is walked one ordinary day at a time: one good meal, one calm breath, one small kindness to yourself. You do not need faith in the entire journey today. You only need a little faith in the very next step. Take that, and then the next, and you will find that the long road has a way of quietly carrying you forward.", "hi": "माँ बनने का रास्ता नीचे से देखने पर नामुमकिन-सा लंबा दिख सकता है — इतने हफ़्ते, इतना कुछ सीखना, इतना कुछ अनजाना। पर वो दूरी कोई एक साथ पार नहीं करता। उसे एक-एक आम दिन करके चला जाता है: एक अच्छा खाना, एक शांत साँस, ख़ुद पर एक छोटी नरमी। आपको आज पूरे सफ़र पर यक़ीन नहीं चाहिए। बस अगले एक क़दम पर थोड़ा-सा यक़ीन चाहिए। वो क़दम लीजिए, फिर अगला, और आप पाएँगी कि लंबा रास्ता ख़ुद ही आपको चुपचाप आगे लिए चलता है।" },
-      "deepDive": { "en": "Behavioural science shows that breaking a daunting goal into the smallest possible next step sharply lowers anxiety and makes follow-through far more likely. Small is not weak — small is how big things actually get done.", "hi": "व्यवहार-विज्ञान बताता है कि किसी डरा देने वाले लक्ष्य को सबसे छोटे मुमकिन अगले क़दम में तोड़ देना घबराहट को तेज़ी से घटाता है और काम पूरा होने की गुंजाइश कहीं बढ़ा देता है। छोटा होना कमज़ोरी नहीं है — बड़ी चीज़ें असल में छोटे से ही होती हैं।" },
-      "remember": { "en": "Faith in the next small step is enough to keep you moving.", "hi": "अगले छोटे क़दम पर यक़ीन आपको चलते रहने के लिए काफ़ी है।" }
+      "title": { "en": "Trust the next small step", "hi": "छोटे क़दमों पर यक़ीन" },
+      "insight": { "en": "You don't have to see the whole staircase. You only need the next step.", "hi": "आपको पूरी सीढ़ी नहीं देखनी है। आपको बस अगले एक क़दम पर भरोसा करना है।" },
+      "expanded": { "en": "The road to becoming a parent can look very long from here: so many weeks, so much to learn, so much unknown. Nobody covers that distance all at once. It happens one ordinary day at a time: one good meal, one calm breath, one small kindness to yourself. You don't need faith in the whole thing today, only in the next step. Take that one, then the next, and you'll find you're moving forward.", "hi": "माँ बनने का रास्ता नीचे से देखने पर नामुमकिन-सा लंबा दिख सकता है — इतने हफ़्ते, इतना कुछ सीखना, इतना कुछ अनजाना। पर वो दूरी कोई एक साथ पार नहीं करता। उसे एक-एक आम दिन करके चला जाता है: एक अच्छा खाना, एक शांत साँस, ख़ुद पर एक छोटी नरमी। आपको आज पूरे सफ़र पर यक़ीन नहीं चाहिए। बस अगले एक क़दम पर थोड़ा-सा यक़ीन चाहिए। वो क़दम लीजिए, फिर अगला, और आप पाएँगी कि लंबा रास्ता ख़ुद ही आपको चुपचाप आगे लिए चलता है।" },
+      "deepDive": { "en": "Research on behaviour suggests that breaking a big goal into the smallest next step lowers anxiety and makes it more likely you'll follow through. Small steps are how big things get done.", "hi": "व्यवहार-विज्ञान बताता है कि किसी डरा देने वाले लक्ष्य को सबसे छोटे मुमकिन अगले क़दम में तोड़ देना घबराहट को तेज़ी से घटाता है और काम पूरा होने की गुंजाइश कहीं बढ़ा देता है। छोटा होना कमज़ोरी नहीं है — बड़ी चीज़ें असल में छोटे से ही होती हैं।" },
+      "remember": { "en": "Trusting the next small step is enough to keep you going.", "hi": "अगले छोटे क़दम पर यक़ीन आपको चलते रहने के लिए काफ़ी है।" }
     },
     "readToBaby": {
       "title": { "en": "The Farmer And The Well", "hi": "किसान और कुआँ" },
@@ -217,8 +217,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about your family's food, language and the roots you carry.", "hi": "अपने शिशु को अपने परिवार के खाने, भाषा और उन जड़ों के बारे में बताइए जो आप साथ लिए चलती हैं।" },
-      "motivation": { "en": "Flavours and words are how a family's love is handed down.", "hi": "स्वाद और शब्द ही वो तरीक़ा हैं जिससे परिवार का प्यार आगे सौंपा जाता है।" }
+      "title": { "en": "Tell your baby about your family's food, language and roots.", "hi": "अपने शिशु को अपने परिवार के खाने, भाषा और उन जड़ों के बारे में बताइए जो आप साथ लिए चलती हैं।" },
+      "motivation": { "en": "Food and words are how a family's love gets handed down.", "hi": "स्वाद और शब्द ही वो तरीक़ा हैं जिससे परिवार का प्यार आगे सौंपा जाता है।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -233,9 +233,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Counting Down To Calm", "hi": "शांति तक उल्टी गिनती" },
-      "content": { "en": "Breathe in gently and silently count three. Breathe out and count down — three, two, one — letting your body settle a little more with each number. Repeat a few times.", "hi": "हल्के से साँस भीतर लीजिए और मन ही मन तीन तक गिनिए। साँस छोड़िए और उल्टी गिनती कीजिए — तीन, दो, एक — हर नंबर के साथ शरीर को थोड़ा और ठहरने दीजिए। कुछ बार दोहराइए।" },
-      "remember": { "en": "Calm often arrives one slow number at a time.", "hi": "शांति अक्सर एक-एक धीमे नंबर करके आती है।" },
+      "title": { "en": "Counting down to calm", "hi": "शांति तक उल्टी गिनती" },
+      "content": { "en": "Breathe in gently and count to three in your head. Breathe out and count down, three, two, one, letting your body settle a little more with each number. Repeat a few times.", "hi": "हल्के से साँस भीतर लीजिए और मन ही मन तीन तक गिनिए। साँस छोड़िए और उल्टी गिनती कीजिए — तीन, दो, एक — हर नंबर के साथ शरीर को थोड़ा और ठहरने दीजिए। कुछ बार दोहराइए।" },
+      "remember": { "en": "Calm often comes one slow count at a time.", "hi": "शांति अक्सर एक-एक धीमे नंबर करके आती है।" },
       "durationMinutes": 1
     }
   },
@@ -244,11 +244,11 @@
     "week": 6,
     "babyLearning": { "en": "The neural tube, the start of your baby's spine, is closing around now.", "hi": "हफ़्ता पूरा करते हुए, दिन-ब-दिन लगातार बढ़ते हुए" },
     "grow": {
-      "title": { "en": "Tomorrow Will Teach You Tomorrow", "hi": "कल आपको कल ही सिखा देगा" },
-      "insight": { "en": "You do not need today the wisdom that only tomorrow can give. Each day arrives with its own lessons in hand.", "hi": "जो समझ सिर्फ़ कल दे सकता है, वो आपको आज नहीं चाहिए। हर दिन अपने सबक़ हाथ में लिए आता है।" },
-      "expanded": { "en": "We often try to feel ready for things that are still far away — birth, sleepless nights, the first day of school. But wisdom does not arrive all at once, in advance. It comes exactly when it is needed, grown from the very moment you are living. The patience you will need as a parent will meet you on the day you need it; the strength will come with the struggle that asks for it. You do not have to be ready for everything now. Trust that tomorrow, with all you will have lived by then, will quietly teach you what tomorrow requires.", "hi": "हम अक्सर उन चीज़ों के लिए तैयार महसूस करने की कोशिश करते हैं जो अभी दूर हैं — जन्म, नींद भरी रातें, स्कूल का पहला दिन। पर समझ एक साथ, पहले से नहीं आती। वो ठीक तब आती है जब उसकी ज़रूरत होती है, उसी पल से उगी हुई जिसे आप जी रही होती हैं। जो सब्र आपको माँ के तौर पर चाहिए होगा, वो आपसे उसी दिन मिलेगा जिस दिन ज़रूरत होगी; ताक़त उसी जूझ के साथ आएगी जो उसे माँगती है। आपको अभी हर चीज़ के लिए तैयार होने की ज़रूरत नहीं। भरोसा रखिए कि कल, उस सब के साथ जो आप तब तक जी चुकी होंगी, आपको चुपचाप वही सिखा देगा जो कल माँगता है।" },
-      "deepDive": { "en": "Psychologists find that 'anticipatory coping' — rehearsing distant problems in advance — tends to drain energy without improving outcomes. We adapt best when challenges and our capacity to meet them arrive together.", "hi": "मनोवैज्ञानिक पाते हैं कि 'anticipatory coping' — दूर की मुश्किलों को पहले से मन में दोहराते रहना — नतीजे सुधारे बिना ताक़त निचोड़ लेता है। हम तब सबसे अच्छा ढलते हैं जब चुनौती और उससे निपटने की हमारी क्षमता, दोनों साथ आती हैं।" },
-      "remember": { "en": "The wisdom you need will arrive exactly when you need it.", "hi": "जो समझ आपको चाहिए, वो ठीक तभी आएगी जब आपको उसकी ज़रूरत होगी।" }
+      "title": { "en": "You'll learn what you need when you need it", "hi": "कल आपको कल ही सिखा देगा" },
+      "insight": { "en": "You don't need today what only tomorrow can teach you. Each day brings its own lessons.", "hi": "जो समझ सिर्फ़ कल दे सकता है, वो आपको आज नहीं चाहिए। हर दिन अपने सबक़ हाथ में लिए आता है।" },
+      "expanded": { "en": "We often try to feel ready for things far away: birth, sleepless nights, the first day of school. Wisdom doesn't arrive all at once, in advance. It comes when it's needed, out of what you're living through. The patience you'll need as a parent will be there on the day you need it. The strength will come with the hard moment that asks for it. You don't have to be ready for everything now.", "hi": "हम अक्सर उन चीज़ों के लिए तैयार महसूस करने की कोशिश करते हैं जो अभी दूर हैं — जन्म, नींद भरी रातें, स्कूल का पहला दिन। पर समझ एक साथ, पहले से नहीं आती। वो ठीक तब आती है जब उसकी ज़रूरत होती है, उसी पल से उगी हुई जिसे आप जी रही होती हैं। जो सब्र आपको माँ के तौर पर चाहिए होगा, वो आपसे उसी दिन मिलेगा जिस दिन ज़रूरत होगी; ताक़त उसी जूझ के साथ आएगी जो उसे माँगती है। आपको अभी हर चीज़ के लिए तैयार होने की ज़रूरत नहीं। भरोसा रखिए कि कल, उस सब के साथ जो आप तब तक जी चुकी होंगी, आपको चुपचाप वही सिखा देगा जो कल माँगता है।" },
+      "deepDive": { "en": "Research on worry suggests that going over problems that are still far away, again and again, tends to tire people out without helping much. Most of us cope best with a challenge when it's in front of us.", "hi": "मनोवैज्ञानिक पाते हैं कि 'anticipatory coping' — दूर की मुश्किलों को पहले से मन में दोहराते रहना — नतीजे सुधारे बिना ताक़त निचोड़ लेता है। हम तब सबसे अच्छा ढलते हैं जब चुनौती और उससे निपटने की हमारी क्षमता, दोनों साथ आती हैं।" },
+      "remember": { "en": "What you need to know will come when you need it.", "hi": "जो समझ आपको चाहिए, वो ठीक तभी आएगी जब आपको उसकी ज़रूरत होगी।" }
     },
     "readToBaby": {
       "title": { "en": "The Seed That Waited", "hi": "वो बीज जो इंतज़ार करता रहा" },
@@ -257,8 +257,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about the day the whole family first heard about them.", "hi": "अपने शिशु को उस दिन के बारे में बताइए जब पूरे परिवार ने पहली बार उनके बारे में सुना।" },
-      "motivation": { "en": "Their arrival was joyful news long before they could know it.", "hi": "उनका आना एक ख़ुशी भरी ख़बर थी — उनके जानने से बहुत पहले।" }
+      "title": { "en": "Tell your baby about the day the family first heard about them.", "hi": "अपने शिशु को उस दिन के बारे में बताइए जब पूरे परिवार ने पहली बार उनके बारे में सुना।" },
+      "motivation": { "en": "Their arrival was happy news long before they could know it.", "hi": "उनका आना एक ख़ुशी भरी ख़बर थी — उनके जानने से बहुत पहले।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -273,9 +273,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "I Have Grown In Trust This Week", "hi": "इस हफ़्ते मैं भरोसे में बढ़ी हूँ" },
-      "content": { "en": "I will pause to notice how I have practised letting go and trusting this week. That quiet growth counts.", "hi": "मैं रुककर देखूँगी कि इस हफ़्ते मैंने छोड़ना और भरोसा करना कैसे सीखा। वो चुपचाप बढ़ना भी मायने रखता है।" },
-      "remember": { "en": "Trust is a muscle, and you have been gently building it.", "hi": "भरोसा एक माँसपेशी है, और आप उसे धीरे-धीरे मज़बूत कर रही हैं।" },
+      "title": { "en": "I've grown in trust this week", "hi": "इस हफ़्ते मैं भरोसे में बढ़ी हूँ" },
+      "content": { "en": "I'll stop and notice how I've practised letting go and trusting this week. That growth counts.", "hi": "मैं रुककर देखूँगी कि इस हफ़्ते मैंने छोड़ना और भरोसा करना कैसे सीखा। वो चुपचाप बढ़ना भी मायने रखता है।" },
+      "remember": { "en": "Trust gets stronger with practice, and you've been practising.", "hi": "भरोसा एक माँसपेशी है, और आप उसे धीरे-धीरे मज़बूत कर रही हैं।" },
       "durationMinutes": 0
     }
   }

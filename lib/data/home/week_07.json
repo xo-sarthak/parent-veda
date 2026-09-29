@@ -4,10 +4,10 @@
     "week": 7,
     "babyLearning": { "en": "Your baby's arm buds are growing longer, with flat paddles for hands.", "hi": "नरमी से बढ़ते हुए, नन्ही बाँहें कलियों की तरह उभरती हुईं" },
     "grow": {
-      "title": { "en": "Love Speaks Before Words", "hi": "प्यार शब्दों से पहले बोलता है" },
-      "insight": { "en": "Long before your baby learns a single word, they are already learning love — through your warmth, your voice, the way you hold the day.", "hi": "आपके शिशु के एक भी शब्द सीखने से बहुत पहले, प्यार सीखा जाने लगता है — आपकी गर्माहट से, आपकी आवाज़ से, और इससे कि आप अपने दिन को कैसे थामती हैं।" },
-      "expanded": { "en": "Words come late in a child's story. What comes first is the language of being loved — the softness of a touch, the music of a familiar voice, the calm that settles a room. Your baby is learning this language now, inside you, long before they will ever speak it back. Every gentle thought you have, every moment you turn toward them with tenderness, is a quiet sentence in a conversation that has already begun. You do not need the right words yet. The love beneath them is what your baby is listening for.", "hi": "किसी भी बच्चे की कहानी में शब्द देर से आते हैं। पहले आती है प्यार पाए जाने की भाषा — एक छुअन की नरमी, एक जानी-पहचानी आवाज़ का संगीत, वह शांति जो पूरे कमरे को थाम लेती है। यह भाषा आपके शिशु तक अभी पहुँच रही है, आपके भीतर, उससे बहुत पहले कि वह इसे बोलकर लौटा सके। आपका हर नरम विचार, हर वह पल जब आप कोमलता से उसकी ओर मुड़ती हैं, उस बातचीत का एक शांत वाक्य है जो शुरू हो चुकी है। आपको अभी सही शब्दों की ज़रूरत नहीं। शब्दों के नीचे बहता प्यार ही वह है जिसे आपका शिशु सुन रहा है।" },
-      "deepDive": { "en": "Researchers find that the earliest bonding happens through tone, rhythm and warmth long before language. Babies absorb the feeling of being loved well before they understand a word of it.", "hi": "शोध बताते हैं कि सबसे पहला जुड़ाव भाषा से बहुत पहले लहजे, लय और गर्माहट के ज़रिए बनता है। प्यार पाए जाने का एहसास शिशुओं तक उससे बहुत पहले पहुँच जाता है जब वे उसका एक शब्द भी समझते हों।" },
+      "title": { "en": "Babies learn love before words", "hi": "प्यार शब्दों से पहले बोलता है" },
+      "insight": { "en": "Long before your baby learns a word, they'll be learning love from your warmth, your voice and how you are with them.", "hi": "आपके शिशु के एक भी शब्द सीखने से बहुत पहले, प्यार सीखा जाने लगता है — आपकी गर्माहट से, आपकी आवाज़ से, और इससे कि आप अपने दिन को कैसे थामती हैं।" },
+      "expanded": { "en": "Words come late for a child. What comes first is the feeling of being loved: a gentle touch, a familiar voice, a calm room. Your baby will be learning this long before they can say anything back. Every tender thought and every moment you turn towards them is part of a conversation that has already started. You don't need the right words yet. It's the love behind them your baby will notice.", "hi": "किसी भी बच्चे की कहानी में शब्द देर से आते हैं। पहले आती है प्यार पाए जाने की भाषा — एक छुअन की नरमी, एक जानी-पहचानी आवाज़ का संगीत, वह शांति जो पूरे कमरे को थाम लेती है। यह भाषा आपके शिशु तक अभी पहुँच रही है, आपके भीतर, उससे बहुत पहले कि वह इसे बोलकर लौटा सके। आपका हर नरम विचार, हर वह पल जब आप कोमलता से उसकी ओर मुड़ती हैं, उस बातचीत का एक शांत वाक्य है जो शुरू हो चुकी है। आपको अभी सही शब्दों की ज़रूरत नहीं। शब्दों के नीचे बहता प्यार ही वह है जिसे आपका शिशु सुन रहा है।" },
+      "deepDive": { "en": "Researchers find that early bonding happens through tone of voice, rhythm and warmth, long before language. Babies feel loved well before they understand any words.", "hi": "शोध बताते हैं कि सबसे पहला जुड़ाव भाषा से बहुत पहले लहजे, लय और गर्माहट के ज़रिए बनता है। प्यार पाए जाने का एहसास शिशुओं तक उससे बहुत पहले पहुँच जाता है जब वे उसका एक शब्द भी समझते हों।" },
       "remember": { "en": "Your baby learns love long before they learn words.", "hi": "शब्द सीखने से बहुत पहले, आपका शिशु प्यार सीख लेता है।" }
     },
     "readToBaby": {
@@ -18,7 +18,7 @@
     },
     "talkToBaby": {
       "title": { "en": "Tell your baby how you and their other parent first met.", "hi": "अपने शिशु को बताएँ कि आप और आपके साथी पहली बार कैसे मिले थे।" },
-      "motivation": { "en": "Your love story is the very first chapter of theirs.", "hi": "आपकी प्यार की कहानी ही उनकी कहानी का सबसे पहला अध्याय है।" }
+      "motivation": { "en": "Your love story is the first chapter of theirs.", "hi": "आपकी प्यार की कहानी ही उनकी कहानी का सबसे पहला अध्याय है।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -33,9 +33,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Breathe Into The Heart", "hi": "दिल की ओर साँस लें" },
-      "content": { "en": "Rest a hand on your chest and breathe in slowly, imagining the breath filling the space around your heart. Let it out with a soft sigh. Repeat five gentle times.", "hi": "एक हाथ अपने सीने पर रखें और धीरे-धीरे साँस लें, यह सोचते हुए कि साँस आपके दिल के चारों ओर की जगह भर रही है। फिर एक नरम आह के साथ उसे छोड़ दें। ऐसे पाँच बार, नरमी से।" },
-      "remember": { "en": "The heart softens when we breathe toward it.", "hi": "जब हम दिल की ओर साँस लेते हैं, तो वह नरम पड़ जाता है।" },
+      "title": { "en": "Breathe into the heart", "hi": "दिल की ओर साँस लें" },
+      "content": { "en": "Rest a hand on your chest and breathe in slowly, imagining the breath filling the space around your heart. Let it out with a soft sigh. Repeat five times.", "hi": "एक हाथ अपने सीने पर रखें और धीरे-धीरे साँस लें, यह सोचते हुए कि साँस आपके दिल के चारों ओर की जगह भर रही है। फिर एक नरम आह के साथ उसे छोड़ दें। ऐसे पाँच बार, नरमी से।" },
+      "remember": { "en": "A few slow breaths can soften a heavy heart.", "hi": "जब हम दिल की ओर साँस लेते हैं, तो वह नरम पड़ जाता है।" },
       "durationMinutes": 2
     }
   },
@@ -44,11 +44,11 @@
     "week": 7,
     "babyLearning": { "en": "Small dips that will become your baby's nostrils are forming.", "hi": "नन्हे कान आकार लेना शुरू कर रहे हैं" },
     "grow": {
-      "title": { "en": "Your Voice Is Already Home", "hi": "आपकी आवाज़ पहले से ही घर है" },
-      "insight": { "en": "Of all the sounds your baby will ever hear, your voice will feel the most like home — and that bond is forming already.", "hi": "आपका शिशु आगे जितनी भी आवाज़ें सुनेगा, उन सबमें आपकी आवाज़ सबसे ज़्यादा घर जैसी लगेगी — और वह जुड़ाव अभी से बन रहा है।" },
-      "expanded": { "en": "There is a reason a baby calms at the sound of their parent's voice, even from the very first days. That voice has been their constant companion, the steady hum beneath everything, the sound that means safety. Though your baby's hearing is only just beginning to form, the closeness you build now lays the ground for that recognition. When you speak softly, hum a tune, or simply talk through your day, you are not waiting for them to understand. You are becoming the sound they will always reach for — the one that says, you are not alone, you are home.", "hi": "एक वजह है कि नवजात अपने माँ-बाप की आवाज़ सुनते ही शांत हो जाते हैं, पहले ही दिन से। वह आवाज़ उनकी लगातार साथी रही है — हर चीज़ के नीचे बहती एक धीमी गूँज, वह आवाज़ जिसका मतलब है सुरक्षित होना। आपके शिशु की सुनने की शक्ति अभी बननी शुरू ही हुई है, फिर भी आप अभी जो नज़दीकी बना रही हैं, वही उस पहचान की नींव रखती है। जब आप धीरे से बोलती हैं, कोई धुन गुनगुनाती हैं, या बस अपने दिन के बारे में बात करती हैं, तो आप समझे जाने का इंतज़ार नहीं कर रहीं। आप वह आवाज़ बन रही हैं जिसकी तरफ़ हमेशा हाथ बढ़ेगा — वह आवाज़ जो कहती है: तुम अकेले नहीं हो, तुम घर पर हो।" },
-      "deepDive": { "en": "By the third trimester, babies can recognise and prefer their mother's voice, having heard its rhythm and warmth from within. The familiarity you build now becomes lifelong comfort.", "hi": "तीसरी तिमाही तक शिशु अपनी माँ की आवाज़ पहचानने लगते हैं और उसे सबसे ज़्यादा पसंद करते हैं, क्योंकि उसकी लय और गर्माहट वे भीतर से सुनते आए हैं। आप अभी जो अपनापन बना रही हैं, वही उम्र भर का सुकून बन जाता है।" },
-      "remember": { "en": "Your voice will always feel like home to your baby.", "hi": "आपकी आवाज़ आपके शिशु को हमेशा घर जैसी लगेगी।" }
+      "title": { "en": "Your voice will feel like home", "hi": "आपकी आवाज़ पहले से ही घर है" },
+      "insight": { "en": "Of all the sounds your baby hears, your voice will be one that feels most like home. That bond is starting now.", "hi": "आपका शिशु आगे जितनी भी आवाज़ें सुनेगा, उन सबमें आपकी आवाज़ सबसे ज़्यादा घर जैसी लगेगी — और वह जुड़ाव अभी से बन रहा है।" },
+      "expanded": { "en": "Babies often calm at the sound of a parent's voice from their very first days. That voice comes to mean safety. Your baby's hearing is only starting to develop, but the closeness you build now lays the ground for that recognition. When you talk softly, hum a tune or chat about your day, you're not waiting for them to understand. You're becoming a sound they'll reach for.", "hi": "एक वजह है कि नवजात अपने माँ-बाप की आवाज़ सुनते ही शांत हो जाते हैं, पहले ही दिन से। वह आवाज़ उनकी लगातार साथी रही है — हर चीज़ के नीचे बहती एक धीमी गूँज, वह आवाज़ जिसका मतलब है सुरक्षित होना। आपके शिशु की सुनने की शक्ति अभी बननी शुरू ही हुई है, फिर भी आप अभी जो नज़दीकी बना रही हैं, वही उस पहचान की नींव रखती है। जब आप धीरे से बोलती हैं, कोई धुन गुनगुनाती हैं, या बस अपने दिन के बारे में बात करती हैं, तो आप समझे जाने का इंतज़ार नहीं कर रहीं। आप वह आवाज़ बन रही हैं जिसकी तरफ़ हमेशा हाथ बढ़ेगा — वह आवाज़ जो कहती है: तुम अकेले नहीं हो, तुम घर पर हो।" },
+      "deepDive": { "en": "By the third trimester, babies can hear voices from outside the womb, and newborns show a preference for their mother's voice, the one they heard most. Voices a baby hears often before birth can feel familiar and comforting afterwards.", "hi": "तीसरी तिमाही तक शिशु अपनी माँ की आवाज़ पहचानने लगते हैं और उसे सबसे ज़्यादा पसंद करते हैं, क्योंकि उसकी लय और गर्माहट वे भीतर से सुनते आए हैं। आप अभी जो अपनापन बना रही हैं, वही उम्र भर का सुकून बन जाता है।" },
+      "remember": { "en": "Your voice will feel like home to your baby.", "hi": "आपकी आवाज़ आपके शिशु को हमेशा घर जैसी लगेगी।" }
     },
     "readToBaby": {
       "title": { "en": "The Talkative Tortoise", "hi": "बातूनी कछुआ" },
@@ -58,7 +58,7 @@
     },
     "talkToBaby": {
       "title": { "en": "Tell your baby about a favourite memory you share with their other parent.", "hi": "अपने शिशु को कोई पसंदीदा याद सुनाएँ जो आप और आपके साथी साथ में सँजोए हुए हैं।" },
-      "motivation": { "en": "Sharing your happy memories warms the world your baby is arriving into.", "hi": "अपनी ख़ुशी भरी यादें बाँटना उस दुनिया को गर्म कर देता है जिसमें आपका शिशु आ रहा है।" }
+      "motivation": { "en": "Sharing happy memories warms the world your baby is coming into.", "hi": "अपनी ख़ुशी भरी यादें बाँटना उस दुनिया को गर्म कर देता है जिसमें आपका शिशु आ रहा है।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -73,9 +73,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "I Am Not Doing This Alone", "hi": "मैं यह अकेले नहीं कर रही" },
-      "content": { "en": "I am held by the people who love me. I can let their care carry some of the weight today.", "hi": "जो लोग मुझसे प्यार करते हैं, उन्होंने मुझे थाम रखा है। आज मैं उनकी देखभाल को थोड़ा बोझ उठाने दे सकती हूँ।" },
-      "remember": { "en": "Leaning on love is not weakness — it is wisdom.", "hi": "प्यार का सहारा लेना कमज़ोरी नहीं — यह समझदारी है।" },
+      "title": { "en": "I'm not doing this alone", "hi": "मैं यह अकेले नहीं कर रही" },
+      "content": { "en": "I'm held by the people who love me. I can let their care carry some of the weight today.", "hi": "जो लोग मुझसे प्यार करते हैं, उन्होंने मुझे थाम रखा है। आज मैं उनकी देखभाल को थोड़ा बोझ उठाने दे सकती हूँ।" },
+      "remember": { "en": "Leaning on the people who love you is a wise thing to do.", "hi": "प्यार का सहारा लेना कमज़ोरी नहीं — यह समझदारी है।" },
       "durationMinutes": 0
     }
   },
@@ -84,11 +84,11 @@
     "week": 7,
     "babyLearning": { "en": "Your baby's eyes are taking a clearer shape this week.", "hi": "दिल अब एक ठहरी हुई लय में धड़क रहा है" },
     "grow": {
-      "title": { "en": "They Feel What You Feel", "hi": "जो आप महसूस करती हैं, वही उन तक पहुँचता है" },
-      "insight": { "en": "Your baby does not yet know your words, but they are already tuned to your feelings — your joy and your calm reach them quietly.", "hi": "आपका शिशु अभी आपके शब्द नहीं जानता, पर आपकी भावनाओं से जुड़ चुका है — आपकी ख़ुशी और आपकी शांति चुपचाप उस तक पहुँच जाती है।" },
-      "expanded": { "en": "The bond between you and your baby is not built on understanding yet — it is built on feeling. When you are content, a soft ease moves through you that your baby shares. When you laugh, when you feel loved, when peace settles over you, that warmth becomes the world they are growing in. This is not pressure to feel happy all the time; no one can. It is simply a tender reminder that your inner weather is shared weather. The kindest thing you can offer your baby is to let yourself feel cared for and content, as often as you gently can.", "hi": "आपके और आपके शिशु के बीच का जुड़ाव अभी समझ पर नहीं बना — वह एहसास पर बना है। जब आप संतुष्ट होती हैं, तो एक नरम सहजता आपके भीतर बहती है, और वही उस तक भी पहुँचती है। जब आप हँसती हैं, जब आप ख़ुद को प्यार में पाती हैं, जब शांति आप पर उतर आती है, तो वही गर्माहट वह दुनिया बन जाती है जिसमें यह नन्ही ज़िंदगी पल रही है। यह हर वक़्त ख़ुश रहने का दबाव नहीं है; ऐसा कोई नहीं कर सकता। यह बस एक कोमल याद है कि आपका भीतरी मौसम बँटा हुआ मौसम है। सबसे प्यारी चीज़ जो आप अपने शिशु को दे सकती हैं, वह है ख़ुद को देखभाल पाया हुआ और संतुष्ट महसूस करने देना — जितनी बार नरमी से हो सके।" },
-      "deepDive": { "en": "A mother's emotional state shapes the chemical environment her baby grows in. Moments of contentment and connection are felt by your baby as a gentle, steady calm.", "hi": "एक माँ की भावनात्मक हालत उस रासायनिक माहौल को गढ़ती है जिसमें उसका शिशु बढ़ता है। संतोष और जुड़ाव के पल शिशु तक एक नरम, ठहरी हुई शांति की तरह पहुँचते हैं।" },
-      "remember": { "en": "Your contentment becomes your baby's calm.", "hi": "आपका संतोष आपके शिशु की शांति बन जाता है।" }
+      "title": { "en": "How you feel is part of your baby's world", "hi": "जो आप महसूस करती हैं, वही उन तक पहुँचता है" },
+      "insight": { "en": "Your baby doesn't know your words yet, but how you feel shapes the world they're growing into.", "hi": "आपका शिशु अभी आपके शब्द नहीं जानता, पर आपकी भावनाओं से जुड़ चुका है — आपकी ख़ुशी और आपकी शांति चुपचाप उस तक पहुँच जाती है।" },
+      "expanded": { "en": "For now, the bond with your baby is built on feeling more than understanding. When you feel content, loved and at peace, that warmth becomes part of the world your baby is growing into. This isn't pressure to be happy all the time. No one can be. It's a gentle reminder that how you feel is shared. One of the kindest things you can do for your baby is let yourself feel cared for, as often as you can.", "hi": "आपके और आपके शिशु के बीच का जुड़ाव अभी समझ पर नहीं बना — वह एहसास पर बना है। जब आप संतुष्ट होती हैं, तो एक नरम सहजता आपके भीतर बहती है, और वही उस तक भी पहुँचती है। जब आप हँसती हैं, जब आप ख़ुद को प्यार में पाती हैं, जब शांति आप पर उतर आती है, तो वही गर्माहट वह दुनिया बन जाती है जिसमें यह नन्ही ज़िंदगी पल रही है। यह हर वक़्त ख़ुश रहने का दबाव नहीं है; ऐसा कोई नहीं कर सकता। यह बस एक कोमल याद है कि आपका भीतरी मौसम बँटा हुआ मौसम है। सबसे प्यारी चीज़ जो आप अपने शिशु को दे सकती हैं, वह है ख़ुद को देखभाल पाया हुआ और संतुष्ट महसूस करने देना — जितनी बार नरमी से हो सके।" },
+      "deepDive": { "en": "A pregnant mother's moods change her body's chemistry, and some of that reaches the baby. Everyday moments of contentment and connection help both of them. Nobody needs to feel happy all the time for this to work.", "hi": "एक माँ की भावनात्मक हालत उस रासायनिक माहौल को गढ़ती है जिसमें उसका शिशु बढ़ता है। संतोष और जुड़ाव के पल शिशु तक एक नरम, ठहरी हुई शांति की तरह पहुँचते हैं।" },
+      "remember": { "en": "Your contentment becomes part of your baby's calm.", "hi": "आपका संतोष आपके शिशु की शांति बन जाता है।" }
     },
     "readToBaby": {
       "title": { "en": "Hanuman And The Mountain", "hi": "हनुमान और पर्वत" },
@@ -98,7 +98,7 @@
     },
     "talkToBaby": {
       "title": { "en": "Tell your baby what made you choose each other.", "hi": "अपने शिशु को बताएँ कि किस बात ने आप दोनों को एक-दूसरे को चुनने पर राज़ी किया।" },
-      "motivation": { "en": "The choice that made your family is a story worth telling first.", "hi": "जिस चुनाव से आपका परिवार बना, वह कहानी सबसे पहले सुनाने लायक़ है।" }
+      "motivation": { "en": "How your family began is a story worth telling first.", "hi": "जिस चुनाव से आपका परिवार बना, वह कहानी सबसे पहले सुनाने लायक़ है।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -113,8 +113,8 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "My Joy Matters Too", "hi": "मेरी ख़ुशी भी मायने रखती है" },
-      "content": { "en": "Letting myself feel happy is not a distraction from this journey. It is a gift I share with my baby.", "hi": "ख़ुद को ख़ुश महसूस करने देना इस सफ़र से ध्यान भटकाना नहीं है। यह एक तोहफ़ा है जो मैं अपने शिशु के साथ बाँटती हूँ।" },
+      "title": { "en": "My joy matters too", "hi": "मेरी ख़ुशी भी मायने रखती है" },
+      "content": { "en": "Letting myself feel happy isn't a distraction from this pregnancy. It's something I share with my baby.", "hi": "ख़ुद को ख़ुश महसूस करने देना इस सफ़र से ध्यान भटकाना नहीं है। यह एक तोहफ़ा है जो मैं अपने शिशु के साथ बाँटती हूँ।" },
       "remember": { "en": "Your happiness is part of your baby's world.", "hi": "आपकी ख़ुशी आपके शिशु की दुनिया का हिस्सा है।" },
       "durationMinutes": 0
     }
@@ -124,11 +124,11 @@
     "week": 7,
     "babyLearning": { "en": "Your baby's heart is starting to divide into its chambers.", "hi": "नन्ही आँखें गहरे, नरम धब्बों की तरह बन रही हैं" },
     "grow": {
-      "title": { "en": "Connection Is The First Lesson", "hi": "जुड़ाव ही पहला सबक़ है" },
-      "insight": { "en": "Before your child learns anything else, they will learn whether the world is a place where they belong. Connection is that first lesson.", "hi": "कुछ और सीखने से पहले बच्चे यह सीखते हैं कि दुनिया ऐसी जगह है या नहीं जहाँ वे अपने हैं। जुड़ाव ही वह पहला सबक़ है।" },
-      "expanded": { "en": "Long before letters and numbers, a child's deepest early learning is about belonging — am I wanted, am I safe, will someone come when I reach out? The answer to these quiet questions shapes everything that follows. And you are already answering them now, simply by holding your baby in your thoughts with warmth and care. Connection is not something you must teach later; it is the ground all teaching stands on. Every loving moment you offer is laying that ground, gently, before your baby even arrives.", "hi": "अक्षरों और अंकों से बहुत पहले, बच्चों की सबसे गहरी शुरुआती सीख अपनेपन के बारे में होती है — क्या मुझे चाहा गया है, क्या मैं सुरक्षित हूँ, क्या हाथ बढ़ाने पर कोई आएगा? इन शांत सवालों का जवाब आगे की हर चीज़ को गढ़ता है। और आप इनका जवाब अभी से दे रही हैं, बस अपने शिशु को गर्माहट और देखभाल के साथ अपने ख़यालों में थामे रखकर। जुड़ाव कोई ऐसी चीज़ नहीं जो बाद में सिखानी हो; यह वह ज़मीन है जिस पर हर सीख खड़ी होती है। आपका दिया हर प्यार भरा पल वही ज़मीन रख रहा है, नरमी से, आपके शिशु के आने से भी पहले।" },
-      "deepDive": { "en": "Developmental research shows secure connection in the earliest years builds the foundation for learning, confidence and relationships. Belonging comes first; everything else grows from it.", "hi": "बाल-विकास पर हुए शोध बताते हैं कि शुरुआती सालों का सुरक्षित जुड़ाव सीखने, आत्मविश्वास और रिश्तों की नींव बनाता है। अपनापन पहले आता है; बाकी सब उसी से उगता है।" },
-      "remember": { "en": "Belonging is the first lesson every child learns.", "hi": "अपनापन ही हर बच्चे का पहला सबक़ है।" }
+      "title": { "en": "Connection comes first", "hi": "जुड़ाव ही पहला सबक़ है" },
+      "insight": { "en": "Before your child learns anything else, they'll learn whether they belong. Connection is that first lesson.", "hi": "कुछ और सीखने से पहले बच्चे यह सीखते हैं कि दुनिया ऐसी जगह है या नहीं जहाँ वे अपने हैं। जुड़ाव ही वह पहला सबक़ है।" },
+      "expanded": { "en": "Long before letters and numbers, a young child is learning about belonging. Am I wanted? Am I safe? Will someone come when I reach out? The answers shape everything that follows. You're already starting to answer them, by holding your baby in your thoughts with warmth and care. Connection doesn't have to be taught later. Everything else a child learns rests on it.", "hi": "अक्षरों और अंकों से बहुत पहले, बच्चों की सबसे गहरी शुरुआती सीख अपनेपन के बारे में होती है — क्या मुझे चाहा गया है, क्या मैं सुरक्षित हूँ, क्या हाथ बढ़ाने पर कोई आएगा? इन शांत सवालों का जवाब आगे की हर चीज़ को गढ़ता है। और आप इनका जवाब अभी से दे रही हैं, बस अपने शिशु को गर्माहट और देखभाल के साथ अपने ख़यालों में थामे रखकर। जुड़ाव कोई ऐसी चीज़ नहीं जो बाद में सिखानी हो; यह वह ज़मीन है जिस पर हर सीख खड़ी होती है। आपका दिया हर प्यार भरा पल वही ज़मीन रख रहा है, नरमी से, आपके शिशु के आने से भी पहले।" },
+      "deepDive": { "en": "Research on child development shows that secure connection in the early years is the base for learning, confidence and relationships. Belonging comes first, and other things grow from it.", "hi": "बाल-विकास पर हुए शोध बताते हैं कि शुरुआती सालों का सुरक्षित जुड़ाव सीखने, आत्मविश्वास और रिश्तों की नींव बनाता है। अपनापन पहले आता है; बाकी सब उसी से उगता है।" },
+      "remember": { "en": "Belonging is the first thing every child learns.", "hi": "अपनापन ही हर बच्चे का पहला सबक़ है।" }
     },
     "readToBaby": {
       "title": { "en": "The Monkey King's Bridge", "hi": "बंदर राजा का पुल" },
@@ -138,7 +138,7 @@
     },
     "talkToBaby": {
       "title": { "en": "Tell your baby about a hard time you and their other parent got through together.", "hi": "अपने शिशु को किसी ऐसे मुश्किल दौर के बारे में बताएँ जिसे आपने और आपके साथी ने साथ मिलकर पार किया।" },
-      "motivation": { "en": "Showing how love holds through hard times is a quiet gift of strength.", "hi": "यह दिखाना कि मुश्किल दिनों में भी प्यार थामे रहता है, ताक़त का एक शांत तोहफ़ा है।" }
+      "motivation": { "en": "Showing how love holds through hard times gives your child strength.", "hi": "यह दिखाना कि मुश्किल दिनों में भी प्यार थामे रहता है, ताक़त का एक शांत तोहफ़ा है।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -153,9 +153,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "The Falling Breath", "hi": "गिरती हुई साँस" },
-      "content": { "en": "Breathe in for a count of four, then let the breath fall out slowly for a count of six, like rain easing off. Repeat for one calm minute.", "hi": "चार तक गिनते हुए साँस अंदर लें, फिर छह तक गिनते हुए उसे धीरे-धीरे बाहर गिरने दें, जैसे बारिश धीमी पड़ रही हो। एक शांत मिनट तक यही दोहराएँ।" },
-      "remember": { "en": "A longer breath out tells the body it is safe.", "hi": "लंबी साँस छोड़ना शरीर को बता देता है कि वह सुरक्षित है।" },
+      "title": { "en": "A long breath out", "hi": "गिरती हुई साँस" },
+      "content": { "en": "Breathe in for a count of four, then let the breath out slowly for a count of six, like rain easing off. Repeat for one calm minute.", "hi": "चार तक गिनते हुए साँस अंदर लें, फिर छह तक गिनते हुए उसे धीरे-धीरे बाहर गिरने दें, जैसे बारिश धीमी पड़ रही हो। एक शांत मिनट तक यही दोहराएँ।" },
+      "remember": { "en": "A longer breath out tells the body it's safe.", "hi": "लंबी साँस छोड़ना शरीर को बता देता है कि वह सुरक्षित है।" },
       "durationMinutes": 2
     }
   },
@@ -164,11 +164,11 @@
     "week": 7,
     "babyLearning": { "en": "The kidneys your baby will keep for life are starting to form.", "hi": "नन्ही उँगलियाँ अलग होना शुरू कर रही हैं" },
     "grow": {
-      "title": { "en": "A Heartbeat They Already Know", "hi": "एक धड़कन जो पहले से जानी-पहचानी है" },
-      "insight": { "en": "Your steady heartbeat is the very first rhythm your baby ever knows — the original sound of safety and home.", "hi": "आपके दिल की ठहरी हुई धड़कन ही वह पहली लय है जिसे आपका शिशु जानता है — सुरक्षित होने की और घर की सबसे पहली आवाज़।" },
-      "expanded": { "en": "Inside you, your baby is held in a world of gentle sound — and at its centre is the soft, constant drum of your heartbeat. It is the first rhythm they ever live to, steady and reassuring, day and night. This is why a newborn so often calms when held close to a chest: they are returning to a sound they have always known. The bond you share is written in this rhythm. You do not have to do anything special to give it; just by being, your heart is already singing your baby the oldest lullaby there is.", "hi": "आपके भीतर आपका शिशु नरम आवाज़ों की एक दुनिया में थमा हुआ है — और उस दुनिया के बीचोंबीच है आपके दिल का नरम, लगातार बजता ढोल। यह वह पहली लय है जिसके साथ यह ज़िंदगी जीती है, ठहरी हुई और भरोसा देती, दिन और रात। यही वजह है कि नवजात अक्सर सीने से लगते ही शांत हो जाते हैं: वे उसी आवाज़ में लौट रहे होते हैं जिसे वे हमेशा से जानते आए हैं। आप दोनों का रिश्ता इसी लय में लिखा है। इसे देने के लिए आपको कुछ ख़ास नहीं करना; बस होने भर से, आपका दिल पहले से दुनिया की सबसे पुरानी लोरी सुना रहा है।" },
-      "deepDive": { "en": "Newborns calm and settle to the sound of a heartbeat, which they have heard since the womb. That rhythm is wired into their earliest sense of comfort and safety.", "hi": "नवजात दिल की धड़कन की आवाज़ पर शांत और ठहर जाते हैं, क्योंकि वह आवाज़ उन्होंने गर्भ से ही सुनी है। वह लय उनके सुकून और सुरक्षा के सबसे पहले एहसास में बसी होती है।" },
-      "remember": { "en": "Your heartbeat is the first song your baby ever hears.", "hi": "आपकी धड़कन ही वह पहला गीत है जो आपका शिशु सुनता है।" }
+      "title": { "en": "A heartbeat is a sound of safety", "hi": "एक धड़कन जो पहले से जानी-पहचानी है" },
+      "insight": { "en": "Your baby is growing to the steady sound of a heartbeat, one of the first sounds of safety they'll know.", "hi": "आपके दिल की ठहरी हुई धड़कन ही वह पहली लय है जिसे आपका शिशु जानता है — सुरक्षित होने की और घर की सबसे पहली आवाज़।" },
+      "expanded": { "en": "As your baby's hearing develops, they'll be surrounded by gentle sound, and at the centre of it is the steady beat of a heart. It goes on day and night. This is part of why newborns often settle when held against a chest: it's a sound they know. You don't have to do anything special for this. Anyone who holds your baby close can offer that comfort.", "hi": "आपके भीतर आपका शिशु नरम आवाज़ों की एक दुनिया में थमा हुआ है — और उस दुनिया के बीचोंबीच है आपके दिल का नरम, लगातार बजता ढोल। यह वह पहली लय है जिसके साथ यह ज़िंदगी जीती है, ठहरी हुई और भरोसा देती, दिन और रात। यही वजह है कि नवजात अक्सर सीने से लगते ही शांत हो जाते हैं: वे उसी आवाज़ में लौट रहे होते हैं जिसे वे हमेशा से जानते आए हैं। आप दोनों का रिश्ता इसी लय में लिखा है। इसे देने के लिए आपको कुछ ख़ास नहीं करना; बस होने भर से, आपका दिल पहले से दुनिया की सबसे पुरानी लोरी सुना रहा है।" },
+      "deepDive": { "en": "Later in pregnancy, a heartbeat is one of the steady sounds a baby hears. After birth, many newborns settle when held against a chest, where they can hear one again.", "hi": "नवजात दिल की धड़कन की आवाज़ पर शांत और ठहर जाते हैं, क्योंकि वह आवाज़ उन्होंने गर्भ से ही सुनी है। वह लय उनके सुकून और सुरक्षा के सबसे पहले एहसास में बसी होती है।" },
+      "remember": { "en": "A heartbeat is one of the first sounds of safety your baby knows.", "hi": "आपकी धड़कन ही वह पहला गीत है जो आपका शिशु सुनता है।" }
     },
     "readToBaby": {
       "title": { "en": "Birbal And The Three Questions", "hi": "बीरबल और तीन सवाल" },
@@ -177,8 +177,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about the moment you knew you would be a family.", "hi": "अपने शिशु को उस पल के बारे में बताएँ जब आपको पता चला कि अब आप एक परिवार बनने वाले हैं।" },
-      "motivation": { "en": "The moment your family began is a memory your baby will love to carry.", "hi": "जिस पल आपका परिवार शुरू हुआ, वह एक ऐसी याद है जो आगे उम्र भर साथ चलती है।" }
+      "title": { "en": "Tell your baby about the moment you knew you'd be a family.", "hi": "अपने शिशु को उस पल के बारे में बताएँ जब आपको पता चला कि अब आप एक परिवार बनने वाले हैं।" },
+      "motivation": { "en": "The moment your family began is a memory your baby will love to hear.", "hi": "जिस पल आपका परिवार शुरू हुआ, वह एक ऐसी याद है जो आगे उम्र भर साथ चलती है।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -193,9 +193,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "I Carry Steadiness Within", "hi": "ठहराव मेरे भीतर ही है" },
-      "content": { "en": "Even on uncertain days, there is a steady centre in me — calm, dependable, and entirely my own.", "hi": "अनिश्चित दिनों में भी मेरे भीतर एक ठहरा हुआ केंद्र है — शांत, भरोसेमंद, और पूरी तरह मेरा अपना।" },
-      "remember": { "en": "Your calm centre is always there to return to.", "hi": "आपका शांत केंद्र हमेशा वहीं है, जब भी लौटना हो।" },
+      "title": { "en": "There's a steady place in me", "hi": "ठहराव मेरे भीतर ही है" },
+      "content": { "en": "Even on uncertain days, there's a steady centre in me. It's calm, dependable and mine.", "hi": "अनिश्चित दिनों में भी मेरे भीतर एक ठहरा हुआ केंद्र है — शांत, भरोसेमंद, और पूरी तरह मेरा अपना।" },
+      "remember": { "en": "Your calm centre is always there to come back to.", "hi": "आपका शांत केंद्र हमेशा वहीं है, जब भी लौटना हो।" },
       "durationMinutes": 0
     }
   },
@@ -204,10 +204,10 @@
     "week": 7,
     "babyLearning": { "en": "The leg buds are growing too, a little behind the arms.", "hi": "नन्ही पलकें बनना शुरू कर रही हैं" },
     "grow": {
-      "title": { "en": "Presence Over Perfection", "hi": "सब कुछ सही होने से बड़ा है साथ होना" },
-      "insight": { "en": "Your baby will not need a perfect parent. They will need a present one — someone simply, warmly there.", "hi": "आपके शिशु को ऐसे माँ-बाप नहीं चाहिए जो सब कुछ सही करते हों। चाहिए बस ऐसे जो साथ हों — जो बस, गर्माहट के साथ, वहाँ मौजूद हों।" },
-      "expanded": { "en": "It is easy to feel you must get everything right — the perfect routine, the perfect calm, the perfect words. But children do not remember perfection; they remember presence. They remember who showed up, who listened, who was warm even when tired. The bond you are building is not made of flawless days but of real ones, lived together. Let go of the pressure to be the perfect parent, and lean into the simpler, deeper gift: being truly there. That is the one thing your baby will feel most, and remember longest.", "hi": "ऐसा लगना आसान है कि सब कुछ सही करना ही है — सही दिनचर्या, सही शांति, सही शब्द। पर बच्चों को यह याद नहीं रहता कि सब कुछ सही था; उन्हें यह याद रहता है कि कौन साथ था। उन्हें याद रहता है कि कौन आया, किसने सुना, कौन थका होकर भी नरम रहा। आप जो रिश्ता बना रही हैं वह बेदाग़ दिनों से नहीं, असली दिनों से बनता है — साथ जिए हुए दिनों से। सब कुछ सही करने के दबाव को जाने दीजिए, और उस सादे, गहरे तोहफ़े की ओर झुक जाइए: सच में साथ होना। यही वह एक चीज़ है जो सबसे ज़्यादा महसूस होती है, और सबसे लंबे समय तक याद रहती है।" },
-      "deepDive": { "en": "Psychologists describe the 'good enough' parent who is present and responsive most of the time — not perfect. Children thrive on consistent warmth far more than flawless caregiving.", "hi": "मनोवैज्ञानिक 'good enough' माँ-बाप की बात करते हैं — ऐसे जो ज़्यादातर समय साथ हों और जवाब देते हों, सब कुछ सही करने वाले नहीं। बच्चे बेदाग़ देखभाल से कहीं ज़्यादा लगातार मिलने वाली गर्माहट पर फलते-फूलते हैं।" },
+      "title": { "en": "Being there matters more than being perfect", "hi": "सब कुछ सही होने से बड़ा है साथ होना" },
+      "insight": { "en": "Your baby won't need a perfect parent. They'll need one who's there, warmly.", "hi": "आपके शिशु को ऐसे माँ-बाप नहीं चाहिए जो सब कुछ सही करते हों। चाहिए बस ऐसे जो साथ हों — जो बस, गर्माहट के साथ, वहाँ मौजूद हों।" },
+      "expanded": { "en": "It's easy to feel you have to get everything right: the perfect routine, the perfect calm, the perfect words. Children aren't looking for perfection. What stays with them is who showed up, who listened and who stayed warm even when tired. The bond you're building is made of real days lived together, flaws and all. Let go of the pressure to be perfect and lean into being there. That's what your baby will feel most, and for longest.", "hi": "ऐसा लगना आसान है कि सब कुछ सही करना ही है — सही दिनचर्या, सही शांति, सही शब्द। पर बच्चों को यह याद नहीं रहता कि सब कुछ सही था; उन्हें यह याद रहता है कि कौन साथ था। उन्हें याद रहता है कि कौन आया, किसने सुना, कौन थका होकर भी नरम रहा। आप जो रिश्ता बना रही हैं वह बेदाग़ दिनों से नहीं, असली दिनों से बनता है — साथ जिए हुए दिनों से। सब कुछ सही करने के दबाव को जाने दीजिए, और उस सादे, गहरे तोहफ़े की ओर झुक जाइए: सच में साथ होना। यही वह एक चीज़ है जो सबसे ज़्यादा महसूस होती है, और सबसे लंबे समय तक याद रहती है।" },
+      "deepDive": { "en": "Psychologists talk about the 'good enough' parent, one who is present and responsive most of the time. Children do well with steady warmth. They don't need flawless care.", "hi": "मनोवैज्ञानिक 'good enough' माँ-बाप की बात करते हैं — ऐसे जो ज़्यादातर समय साथ हों और जवाब देते हों, सब कुछ सही करने वाले नहीं। बच्चे बेदाग़ देखभाल से कहीं ज़्यादा लगातार मिलने वाली गर्माहट पर फलते-फूलते हैं।" },
       "remember": { "en": "Being there matters more than getting it perfect.", "hi": "साथ होना, सब कुछ सही कर देने से ज़्यादा मायने रखता है।" }
     },
     "readToBaby": {
@@ -217,8 +217,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about the home you and their other parent are building for them.", "hi": "अपने शिशु को उस घर के बारे में बताएँ जो आप और आपके साथी उसके लिए बना रहे हैं।" },
-      "motivation": { "en": "Describing their home aloud makes the welcome feel real and near.", "hi": "उस घर को बोलकर बताना उस स्वागत को असली और क़रीब कर देता है।" }
+      "title": { "en": "Tell your baby about the home you and their other parent are making for them.", "hi": "अपने शिशु को उस घर के बारे में बताएँ जो आप और आपके साथी उसके लिए बना रहे हैं।" },
+      "motivation": { "en": "Describing their home out loud makes the welcome feel real and close.", "hi": "उस घर को बोलकर बताना उस स्वागत को असली और क़रीब कर देता है।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -233,9 +233,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Soften The Hands", "hi": "हाथों को नरम होने दें" },
-      "content": { "en": "Notice if your hands are clenched. Breathe in, then as you breathe out let your fingers uncurl and your palms open softly. Repeat five slow times.", "hi": "देखिए कहीं आपके हाथ भिंचे तो नहीं हैं। साँस अंदर लें, और छोड़ते हुए उँगलियों को खुलने दें और हथेलियों को नरमी से खोल दें। ऐसे पाँच बार, धीरे-धीरे।" },
-      "remember": { "en": "Open hands invite a calmer mind.", "hi": "खुले हाथ मन को भी शांत होने का न्योता देते हैं।" },
+      "title": { "en": "Soften your hands", "hi": "हाथों को नरम होने दें" },
+      "content": { "en": "Notice if your hands are clenched. Breathe in, and as you breathe out let your fingers uncurl and your palms open. Repeat five slow times.", "hi": "देखिए कहीं आपके हाथ भिंचे तो नहीं हैं। साँस अंदर लें, और छोड़ते हुए उँगलियों को खुलने दें और हथेलियों को नरमी से खोल दें। ऐसे पाँच बार, धीरे-धीरे।" },
+      "remember": { "en": "Open hands help the mind calm down.", "hi": "खुले हाथ मन को भी शांत होने का न्योता देते हैं।" },
       "durationMinutes": 2
     }
   },
@@ -244,11 +244,11 @@
     "week": 7,
     "babyLearning": { "en": "Your baby's brain is forming its main sections this week.", "hi": "हफ़्ता पूरा होते हुए, और गोल और मज़बूत होते हुए" },
     "grow": {
-      "title": { "en": "The Bond Grows Both Ways", "hi": "यह रिश्ता दोनों तरफ़ बढ़ता है" },
-      "insight": { "en": "This bond is not only something you give to your baby. As you love them, they are quietly making you into a parent, too.", "hi": "यह जुड़ाव सिर्फ़ वह नहीं जो आप अपने शिशु को देती हैं। जैसे-जैसे आप प्यार करती हैं, वैसे-वैसे यह नन्ही ज़िंदगी चुपचाप आपको भी एक माँ बना रही है।" },
-      "expanded": { "en": "We often think of bonding as flowing in one direction — from parent to child. But love between you and your baby moves both ways. Even now, this little life is changing you: softening you, opening your heart wider, teaching you a patience and tenderness you did not know you had. As you grow your baby, your baby is growing you. The bond you share is a quiet exchange, each of you shaping the other. By the time you finally meet, you will already be deeply, beautifully bound — made for one another by all these unseen days of love.", "hi": "हम अक्सर सोचते हैं कि जुड़ाव एक ही तरफ़ बहता है — माँ-बाप से बच्चे की ओर। पर आपके और आपके शिशु के बीच प्यार दोनों तरफ़ चलता है। अभी भी, यह नन्ही ज़िंदगी आपको बदल रही है: आपको नरम कर रही है, आपके दिल को और चौड़ा खोल रही है, आपको ऐसा सब्र और ऐसी कोमलता सिखा रही है जो आप जानती भी नहीं थीं कि आपमें है। जैसे आप इस ज़िंदगी को बढ़ा रही हैं, वैसे ही यह ज़िंदगी आपको बढ़ा रही है। आप दोनों का रिश्ता एक शांत आदान-प्रदान है, जिसमें हर कोई दूसरे को गढ़ रहा है। जब तक आप आख़िर में आमने-सामने मिलेंगे, आप पहले से ही गहराई से, ख़ूबसूरती से बँधे होंगे — प्यार के इन सारे अनदेखे दिनों ने आपको एक-दूसरे के लिए बना दिया होगा।" },
-      "deepDive": { "en": "Studies show pregnancy reshapes a parent's brain toward empathy and bonding. The relationship is mutual from the start — you and your baby are forming each other.", "hi": "शोध बताते हैं कि गर्भावस्था माँ-बाप के दिमाग़ को सहानुभूति और जुड़ाव की तरफ़ नए सिरे से गढ़ती है। यह रिश्ता शुरू से ही दोतरफ़ा है — आप और आपका शिशु एक-दूसरे को बना रहे हैं।" },
-      "remember": { "en": "As you grow your baby, your baby grows you.", "hi": "जैसे आप अपने शिशु को बढ़ा रही हैं, वैसे ही आपका शिशु आपको बढ़ा रहा है।" }
+      "title": { "en": "Your baby is changing you too", "hi": "यह रिश्ता दोनों तरफ़ बढ़ता है" },
+      "insight": { "en": "This bond isn't only something you give. As you love your baby, they're turning you into a parent.", "hi": "यह जुड़ाव सिर्फ़ वह नहीं जो आप अपने शिशु को देती हैं। जैसे-जैसे आप प्यार करती हैं, वैसे-वैसे यह नन्ही ज़िंदगी चुपचाप आपको भी एक माँ बना रही है।" },
+      "expanded": { "en": "We often think of bonding as flowing one way, from parent to child. It goes both ways. Even now, this baby is changing you: softening you, opening your heart and teaching you a patience and tenderness you didn't know you had. As you care for your baby, your baby is shaping you. By the time you meet, you'll already be close, after all these weeks of love.", "hi": "हम अक्सर सोचते हैं कि जुड़ाव एक ही तरफ़ बहता है — माँ-बाप से बच्चे की ओर। पर आपके और आपके शिशु के बीच प्यार दोनों तरफ़ चलता है। अभी भी, यह नन्ही ज़िंदगी आपको बदल रही है: आपको नरम कर रही है, आपके दिल को और चौड़ा खोल रही है, आपको ऐसा सब्र और ऐसी कोमलता सिखा रही है जो आप जानती भी नहीं थीं कि आपमें है। जैसे आप इस ज़िंदगी को बढ़ा रही हैं, वैसे ही यह ज़िंदगी आपको बढ़ा रही है। आप दोनों का रिश्ता एक शांत आदान-प्रदान है, जिसमें हर कोई दूसरे को गढ़ रहा है। जब तक आप आख़िर में आमने-सामने मिलेंगे, आप पहले से ही गहराई से, ख़ूबसूरती से बँधे होंगे — प्यार के इन सारे अनदेखे दिनों ने आपको एक-दूसरे के लिए बना दिया होगा।" },
+      "deepDive": { "en": "Studies suggest that pregnancy and caring for a baby change parents' brains in ways linked to bonding. The relationship shapes both of you from the start.", "hi": "शोध बताते हैं कि गर्भावस्था माँ-बाप के दिमाग़ को सहानुभूति और जुड़ाव की तरफ़ नए सिरे से गढ़ती है। यह रिश्ता शुरू से ही दोतरफ़ा है — आप और आपका शिशु एक-दूसरे को बना रहे हैं।" },
+      "remember": { "en": "As you care for your baby, your baby changes you.", "hi": "जैसे आप अपने शिशु को बढ़ा रही हैं, वैसे ही आपका शिशु आपको बढ़ा रहा है।" }
     },
     "readToBaby": {
       "title": { "en": "The River And The Mountain", "hi": "नदी और पहाड़" },
@@ -258,7 +258,7 @@
     },
     "talkToBaby": {
       "title": { "en": "Tell your baby about a promise you and their other parent have made.", "hi": "अपने शिशु को उस वादे के बारे में बताएँ जो आपने और आपके साथी ने किया है।" },
-      "motivation": { "en": "A promise spoken aloud becomes a foundation your baby can stand on.", "hi": "बोलकर कहा गया वादा एक ऐसी नींव बन जाता है जिस पर आपके शिशु की पूरी दुनिया खड़ी हो सकती है।" }
+      "motivation": { "en": "A promise said out loud becomes something your baby can rely on.", "hi": "बोलकर कहा गया वादा एक ऐसी नींव बन जाता है जिस पर आपके शिशु की पूरी दुनिया खड़ी हो सकती है।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -273,9 +273,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "I Am Becoming Who They Need", "hi": "मैं वही बन रही हूँ जिसकी उन्हें ज़रूरत है" },
-      "content": { "en": "With each passing day, I am gently growing into the parent my baby will need — and I trust that becoming.", "hi": "हर गुज़रते दिन के साथ मैं नरमी से वही माँ बनती जा रही हूँ जिसकी मेरे शिशु को ज़रूरत होगी — और मुझे इस बनने पर भरोसा है।" },
-      "remember": { "en": "You are becoming exactly who your baby needs.", "hi": "आप ठीक वही बनती जा रही हैं जिसकी आपके शिशु को ज़रूरत है।" },
+      "title": { "en": "I'm becoming who my baby needs", "hi": "मैं वही बन रही हूँ जिसकी उन्हें ज़रूरत है" },
+      "content": { "en": "Each day, I'm growing into the parent my baby will need, and I trust that.", "hi": "हर गुज़रते दिन के साथ मैं नरमी से वही माँ बनती जा रही हूँ जिसकी मेरे शिशु को ज़रूरत होगी — और मुझे इस बनने पर भरोसा है।" },
+      "remember": { "en": "You're becoming the parent your baby needs.", "hi": "आप ठीक वही बनती जा रही हैं जिसकी आपके शिशु को ज़रूरत है।" },
       "durationMinutes": 0
     }
   }
