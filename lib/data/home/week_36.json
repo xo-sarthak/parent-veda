@@ -4,11 +4,11 @@
     "week": 36,
     "babyLearning": { "en": "Your baby is practising sucking and swallowing, ready for feeds.", "hi": "और गोल और भरा-भरा होता जा रहा है, आपसे मिलने की तैयारी में" },
     "grow": {
-      "title": { "en": "Your Journey Is Not A Competition", "hi": "आपका सफ़र कोई मुक़ाबला नहीं है" },
-      "insight": { "en": "No two pregnancies, and no two babies, unfold the same way. Yours is not a race against anyone.", "hi": "कोई दो गर्भावस्थाएँ, और कोई दो शिशु, एक जैसे नहीं खुलते। आपका सफ़र किसी के ख़िलाफ़ कोई दौड़ नहीं है।" },
-      "expanded": { "en": "Somewhere there is always a mother who looks calmer, a bump that looks neater, a baby said to be 'ahead.' Held up beside them, your own beautiful, ordinary journey can suddenly feel like it is falling short. But pregnancy was never meant to be judged on a leaderboard. Your body, your baby and your story are unfolding on their own quiet timeline, exactly as they should. The moment you stop measuring yourself against others, you free up all that energy to simply be here, with the little one who is yours alone.", "hi": "कहीं न कहीं हमेशा कोई ऐसी माँ होती है जो ज़्यादा शांत लगती है, कोई ऐसा पेट जो ज़्यादा सुथरा दिखता है, कोई शिशु जिसे 'आगे' बताया जाता है। उनके बग़ल में रखकर देखने पर आपका अपना सुंदर, आम-सा सफ़र अचानक अधूरा लग सकता है। पर गर्भावस्था को कभी किसी अंक-तालिका पर आँकने के लिए बनाया ही नहीं गया। आपका शरीर, आपका शिशु और आपकी कहानी अपनी ही शांत रफ़्तार से खुल रहे हैं, ठीक जैसे उन्हें खुलना चाहिए। जिस पल आप ख़ुद को दूसरों से नापना बंद करती हैं, वह सारी ताक़त बस यहाँ रहने के लिए ख़ाली हो जाती है — उस नन्हे के साथ जो सिर्फ़ आपका है।" },
-      "deepDive": { "en": "Psychologists find that social comparison reliably lowers wellbeing, especially in late pregnancy. Focusing on your own experience, rather than others', is linked to lower stress and a calmer transition to parenthood.", "hi": "मनोवैज्ञानिक पाते हैं कि ख़ुद को दूसरों से नापना मन की सेहत को बार-बार गिराता है, ख़ासकर गर्भावस्था के आख़िरी दौर में। दूसरों के बजाय अपने ही अनुभव पर ध्यान देना कम तनाव और परवरिश की ओर एक शांत बदलाव से जुड़ा है।" },
-      "remember": { "en": "Your journey is yours alone — it needs no comparison.", "hi": "आपका सफ़र सिर्फ़ आपका है — इसे किसी तुलना की ज़रूरत नहीं।" }
+      "title": { "en": "Your pregnancy isn't a competition", "hi": "आपका सफ़र कोई मुक़ाबला नहीं है" },
+      "insight": { "en": "No two pregnancies and no two babies are the same. Yours isn't a race against anyone.", "hi": "कोई दो गर्भावस्थाएँ, और कोई दो शिशु, एक जैसे नहीं खुलते। आपका सफ़र किसी के ख़िलाफ़ कोई दौड़ नहीं है।" },
+      "expanded": { "en": "There's always someone who seems calmer or better prepared, and a baby said to be 'ahead'. Held up next to them, your own ordinary, lovely experience can start to feel like it's falling short. But pregnancy was never meant to be judged like a contest. Your baby and your story are unfolding on their own timeline, as they should. When you stop measuring yourself against others, you free up all that effort to be here, with the little one who is yours.", "hi": "कहीं न कहीं हमेशा कोई ऐसी माँ होती है जो ज़्यादा शांत लगती है, कोई ऐसा पेट जो ज़्यादा सुथरा दिखता है, कोई शिशु जिसे 'आगे' बताया जाता है। उनके बग़ल में रखकर देखने पर आपका अपना सुंदर, आम-सा सफ़र अचानक अधूरा लग सकता है। पर गर्भावस्था को कभी किसी अंक-तालिका पर आँकने के लिए बनाया ही नहीं गया। आपका शरीर, आपका शिशु और आपकी कहानी अपनी ही शांत रफ़्तार से खुल रहे हैं, ठीक जैसे उन्हें खुलना चाहिए। जिस पल आप ख़ुद को दूसरों से नापना बंद करती हैं, वह सारी ताक़त बस यहाँ रहने के लिए ख़ाली हो जाती है — उस नन्हे के साथ जो सिर्फ़ आपका है।" },
+      "deepDive": { "en": "Psychologists find that frequent comparison with others tends to lower wellbeing. Focusing on your own experience is linked to less stress as you become a parent.", "hi": "मनोवैज्ञानिक पाते हैं कि ख़ुद को दूसरों से नापना मन की सेहत को बार-बार गिराता है, ख़ासकर गर्भावस्था के आख़िरी दौर में। दूसरों के बजाय अपने ही अनुभव पर ध्यान देना कम तनाव और परवरिश की ओर एक शांत बदलाव से जुड़ा है।" },
+      "remember": { "en": "Your pregnancy is yours. It doesn't need comparing.", "hi": "आपका सफ़र सिर्फ़ आपका है — इसे किसी तुलना की ज़रूरत नहीं।" }
     },
     "readToBaby": {
       "title": { "en": "The Jackdaw And The Borrowed Feathers", "hi": "कौआ और उधार के पंख" },
@@ -17,8 +17,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby how you will never compare them to anyone else.", "hi": "अपने शिशु को बताइए कि आप उन्हें कभी किसी और से नहीं तोलेंगी।" },
-      "motivation": { "en": "A child who is never measured against others learns to feel enough exactly as they are.", "hi": "जिस बच्चे को कभी दूसरों से नहीं नापा जाता, वह जैसा है वैसे ही ख़ुद को काफ़ी महसूस करना सीखता है।" }
+      "title": { "en": "Tell your baby you'll never compare them to anyone else.", "hi": "अपने शिशु को बताइए कि आप उन्हें कभी किसी और से नहीं तोलेंगी।" },
+      "motivation": { "en": "A child who isn't measured against others learns they're enough as they are.", "hi": "जिस बच्चे को कभी दूसरों से नहीं नापा जाता, वह जैसा है वैसे ही ख़ुद को काफ़ी महसूस करना सीखता है।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -33,9 +33,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Breathing Back To Yourself", "hi": "साँस के सहारे ख़ुद तक लौटना" },
-      "content": { "en": "Breathe in slowly for four counts, and as you breathe out for six, silently say 'this is my own pace.' Repeat five times and feel the comparison loosen its hold.", "hi": "चार की गिनती तक धीरे-धीरे साँस भीतर लीजिए, और छह तक छोड़ते हुए मन ही मन कहिए 'यह मेरी अपनी रफ़्तार है।' पाँच बार दोहराइए और महसूस कीजिए कि तुलना की पकड़ ढीली पड़ रही है।" },
-      "remember": { "en": "Your breath always brings you back to your own pace.", "hi": "आपकी साँस हमेशा आपको आपकी अपनी रफ़्तार पर लौटा लाती है।" },
+      "title": { "en": "Breathing back to your own pace", "hi": "साँस के सहारे ख़ुद तक लौटना" },
+      "content": { "en": "Breathe in slowly for four counts. As you breathe out for six, say 'this is my own pace' in your head. Repeat five times and feel the urge to compare ease off.", "hi": "चार की गिनती तक धीरे-धीरे साँस भीतर लीजिए, और छह तक छोड़ते हुए मन ही मन कहिए 'यह मेरी अपनी रफ़्तार है।' पाँच बार दोहराइए और महसूस कीजिए कि तुलना की पकड़ ढीली पड़ रही है।" },
+      "remember": { "en": "Your breath can always bring you back to your own pace.", "hi": "आपकी साँस हमेशा आपको आपकी अपनी रफ़्तार पर लौटा लाती है।" },
       "durationMinutes": 1
     }
   },
@@ -44,11 +44,11 @@
     "week": 36,
     "babyLearning": { "en": "Your baby may know voices and songs they've heard often.", "hi": "और नीचे बस रहा है, आराम से और सिमटा हुआ" },
     "grow": {
-      "title": { "en": "Comparison Is A Thief", "hi": "तुलना एक चोर है" },
-      "insight": { "en": "Comparison quietly steals the joy from moments that were perfectly lovely until you measured them against someone else's.", "hi": "तुलना चुपचाप उन पलों से ख़ुशी चुरा लेती है जो बिल्कुल प्यारे थे — जब तक आपने उन्हें किसी और के पलों से नाप नहीं लिया।" },
-      "expanded": { "en": "There is an old saying that comparison is the thief of joy, and pregnancy makes it especially true. A scan you were thrilled about can suddenly feel disappointing beside someone else's. A peaceful afternoon can sour the moment you scroll past a 'perfect' one. The thief never takes the moment itself — only your contentment with it. The good news is that you hold the door. Each time you gently turn back to your own experience, asking only 'is this good for us?', you lock the thief out and let the joy stay.", "hi": "एक पुरानी कहावत है कि तुलना ख़ुशी की चोर है, और गर्भावस्था इसे और भी सच कर देती है। एक स्कैन जिससे आप बहुत ख़ुश थीं, किसी और के स्कैन के बग़ल में अचानक अधूरा लग सकता है। एक शांत दोपहर उसी पल कड़वी हो सकती है जब आप किसी 'परफ़ेक्ट' दोपहर को स्क्रॉल करके निकल जाएँ। चोर कभी वह पल नहीं ले जाता — सिर्फ़ उससे मिला आपका संतोष ले जाता है। अच्छी बात यह है कि दरवाज़ा आपके ही हाथ में है। हर बार जब आप कोमलता से अपने ही अनुभव की ओर लौटती हैं, और सिर्फ़ यह पूछती हैं कि 'क्या यह हमारे लिए अच्छा है?', आप चोर को बाहर ही रोक देती हैं और ख़ुशी को रह जाने देती हैं।" },
-      "deepDive": { "en": "Researchers studying gratitude find that turning attention to what is already good in your own life reliably crowds out comparison and lifts mood — a small habit with an outsized effect on contentment.", "hi": "शुक्रगुज़ारी पर शोध करने वाले पाते हैं कि ध्यान को अपनी ही ज़िंदगी की अच्छी चीज़ों की ओर मोड़ना तुलना को बार-बार पीछे धकेल देता है और मन हल्का करता है — एक छोटी आदत, जिसका संतोष पर बहुत बड़ा असर है।" },
-      "remember": { "en": "Guard your joy; comparison only comes to steal it.", "hi": "अपनी ख़ुशी की रखवाली कीजिए; तुलना उसे चुराने ही आती है।" }
+      "title": { "en": "Comparing takes away joy", "hi": "तुलना एक चोर है" },
+      "insight": { "en": "Comparing can spoil moments that felt lovely until you measured them against someone else's.", "hi": "तुलना चुपचाप उन पलों से ख़ुशी चुरा लेती है जो बिल्कुल प्यारे थे — जब तक आपने उन्हें किसी और के पलों से नाप नहीं लिया।" },
+      "expanded": { "en": "People say comparison is the thief of joy, and pregnancy can make that feel very true. A scan you were thrilled about can feel disappointing next to someone else's. A peaceful afternoon can turn sour the moment you scroll past a 'perfect' one. The moment itself doesn't change. What goes is your contentment with it. The good news is that you have a say. Each time you turn back to your own experience and ask only 'is this good for us?', you keep the joy.", "hi": "एक पुरानी कहावत है कि तुलना ख़ुशी की चोर है, और गर्भावस्था इसे और भी सच कर देती है। एक स्कैन जिससे आप बहुत ख़ुश थीं, किसी और के स्कैन के बग़ल में अचानक अधूरा लग सकता है। एक शांत दोपहर उसी पल कड़वी हो सकती है जब आप किसी 'परफ़ेक्ट' दोपहर को स्क्रॉल करके निकल जाएँ। चोर कभी वह पल नहीं ले जाता — सिर्फ़ उससे मिला आपका संतोष ले जाता है। अच्छी बात यह है कि दरवाज़ा आपके ही हाथ में है। हर बार जब आप कोमलता से अपने ही अनुभव की ओर लौटती हैं, और सिर्फ़ यह पूछती हैं कि 'क्या यह हमारे लिए अच्छा है?', आप चोर को बाहर ही रोक देती हैं और ख़ुशी को रह जाने देती हैं।" },
+      "deepDive": { "en": "Research on gratitude suggests that turning your attention to what's already good in your life can lift your mood and ease the pull to compare.", "hi": "शुक्रगुज़ारी पर शोध करने वाले पाते हैं कि ध्यान को अपनी ही ज़िंदगी की अच्छी चीज़ों की ओर मोड़ना तुलना को बार-बार पीछे धकेल देता है और मन हल्का करता है — एक छोटी आदत, जिसका संतोष पर बहुत बड़ा असर है।" },
+      "remember": { "en": "Protect your joy from comparison.", "hi": "अपनी ख़ुशी की रखवाली कीजिए; तुलना उसे चुराने ही आती है।" }
     },
     "readToBaby": {
       "title": { "en": "The Two Sparrows And Their Nests", "hi": "दो गौरैया और उनके घोंसले" },
@@ -57,8 +57,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about the unique little person they already are to you.", "hi": "अपने शिशु को उस अनोखे नन्हे इंसान के बारे में बताइए जो वे अभी से आपके लिए हैं।" },
-      "motivation": { "en": "Naming what makes them one of a kind plants the first seeds of their self-worth.", "hi": "जो उन्हें सबसे अलग बनाता है, उसे नाम देना उनके आत्म-सम्मान के पहले बीज बोता है।" }
+      "title": { "en": "Tell your baby about the one-of-a-kind little person they already are to you.", "hi": "अपने शिशु को उस अनोखे नन्हे इंसान के बारे में बताइए जो वे अभी से आपके लिए हैं।" },
+      "motivation": { "en": "Naming what makes them special is an early start to their sense of self-worth.", "hi": "जो उन्हें सबसे अलग बनाता है, उसे नाम देना उनके आत्म-सम्मान के पहले बीज बोता है।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -73,9 +73,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "My Enough Is Truly Enough", "hi": "मेरा काफ़ी सच में काफ़ी है" },
-      "content": { "en": "I will not let another person's highlight make my own good day feel small. What I have is genuinely enough.", "hi": "मैं किसी और के अच्छे पल को अपने अच्छे दिन को छोटा महसूस नहीं कराने दूँगी। जो मेरे पास है, वह सच में काफ़ी है।" },
-      "remember": { "en": "Someone else having more does not make yours less.", "hi": "किसी और के पास ज़्यादा होने से आपका कम नहीं हो जाता।" },
+      "title": { "en": "What I have is enough", "hi": "मेरा काफ़ी सच में काफ़ी है" },
+      "content": { "en": "I won't let someone else's best moments make my own good day feel small. What I have is enough.", "hi": "मैं किसी और के अच्छे पल को अपने अच्छे दिन को छोटा महसूस नहीं कराने दूँगी। जो मेरे पास है, वह सच में काफ़ी है।" },
+      "remember": { "en": "Someone else having more doesn't make yours any less.", "hi": "किसी और के पास ज़्यादा होने से आपका कम नहीं हो जाता।" },
       "durationMinutes": 0
     }
   },
@@ -84,11 +84,11 @@
     "week": 36,
     "babyLearning": { "en": "Most of the fine hair (lanugo) has shed by now.", "hi": "नन्ही साँसों का अभ्यास चल रहा है, लगभग पूरा बढ़ चुका है" },
     "grow": {
-      "title": { "en": "No Two Babies Are The Same", "hi": "कोई दो शिशु एक जैसे नहीं होते" },
-      "insight": { "en": "Every baby arrives with their own pace, temperament and gifts. Yours was never meant to match anyone else's.", "hi": "हर शिशु अपनी ही रफ़्तार, अपने स्वभाव और अपनी ख़ूबियों के साथ आता है। आपका शिशु किसी और से मेल खाने के लिए बना ही नहीं था।" },
-      "expanded": { "en": "Soon you may hear of babies who sleep through the night early, sit up sooner, or hit every milestone like clockwork. It is tempting to hold your own little one up against these stories. But babies are not products rolling off the same line; each is a whole new person, unfolding in their own order and their own time. The baby you are carrying has a rhythm that is theirs alone. The kindest thing you can do, now and forever, is to meet them as they are — not as a copy of anyone else's child.", "hi": "जल्द ही आप ऐसे शिशुओं के बारे में सुन सकती हैं जो जल्दी रात भर सो जाते हैं, पहले बैठने लगते हैं, या हर पड़ाव घड़ी की तरह ठीक समय पर छू लेते हैं। इन कहानियों के सामने अपने नन्हे को रखकर देखने का मन करता है। पर शिशु एक ही लाइन से निकलते सामान नहीं हैं; हर एक एक पूरा नया इंसान है, अपने ही क्रम में और अपने ही समय पर खुलता हुआ। जिस शिशु को आप अपने भीतर पाल रही हैं, उसकी अपनी एक लय है, जो सिर्फ़ उसकी है। सबसे मेहरबान काम जो आप कर सकती हैं, अब और हमेशा, वह है उनसे वैसे ही मिलना जैसे वे हैं — किसी और के बच्चे की नक़ल की तरह नहीं।" },
-      "deepDive": { "en": "Child development experts stress that milestone charts show wide normal ranges, not fixed deadlines. Healthy babies vary enormously in when they reach each step, and earlier is not better.", "hi": "बाल-विकास के जानकार ज़ोर देते हैं कि पड़ावों की सूची चौड़े सामान्य दायरे दिखाती है, कोई तय आख़िरी तारीख़ नहीं। सेहतमंद शिशु हर क़दम तक कब पहुँचते हैं, इसमें बहुत फ़र्क़ होता है, और जल्दी पहुँचना बेहतर नहीं होता।" },
-      "remember": { "en": "Your baby has their own perfect timing.", "hi": "आपके शिशु का अपना सही समय है।" }
+      "title": { "en": "No two babies are the same", "hi": "कोई दो शिशु एक जैसे नहीं होते" },
+      "insight": { "en": "Every baby comes with their own pace, nature and gifts. Yours was never meant to match anyone else's.", "hi": "हर शिशु अपनी ही रफ़्तार, अपने स्वभाव और अपनी ख़ूबियों के साथ आता है। आपका शिशु किसी और से मेल खाने के लिए बना ही नहीं था।" },
+      "expanded": { "en": "Soon you may hear about babies who sleep through the night early, sit up sooner or hit every milestone on time. It's tempting to hold your own little one up against these stories. But every baby is a whole new person, growing in their own order and their own time. The baby on the way has a rhythm that's theirs alone. The kindest thing you can do, now and always, is meet them as they are, and not as a copy of anyone else's child.", "hi": "जल्द ही आप ऐसे शिशुओं के बारे में सुन सकती हैं जो जल्दी रात भर सो जाते हैं, पहले बैठने लगते हैं, या हर पड़ाव घड़ी की तरह ठीक समय पर छू लेते हैं। इन कहानियों के सामने अपने नन्हे को रखकर देखने का मन करता है। पर शिशु एक ही लाइन से निकलते सामान नहीं हैं; हर एक एक पूरा नया इंसान है, अपने ही क्रम में और अपने ही समय पर खुलता हुआ। जिस शिशु को आप अपने भीतर पाल रही हैं, उसकी अपनी एक लय है, जो सिर्फ़ उसकी है। सबसे मेहरबान काम जो आप कर सकती हैं, अब और हमेशा, वह है उनसे वैसे ही मिलना जैसे वे हैं — किसी और के बच्चे की नक़ल की तरह नहीं।" },
+      "deepDive": { "en": "Child development experts stress that milestone charts show wide normal ranges, not fixed deadlines. Healthy babies vary a lot in when they reach each step, and earlier isn't better.", "hi": "बाल-विकास के जानकार ज़ोर देते हैं कि पड़ावों की सूची चौड़े सामान्य दायरे दिखाती है, कोई तय आख़िरी तारीख़ नहीं। सेहतमंद शिशु हर क़दम तक कब पहुँचते हैं, इसमें बहुत फ़र्क़ होता है, और जल्दी पहुँचना बेहतर नहीं होता।" },
+      "remember": { "en": "Your baby has their own timing, and it's right for them.", "hi": "आपके शिशु का अपना सही समय है।" }
     },
     "readToBaby": {
       "title": { "en": "How Each Found Krishna", "hi": "हर एक ने कृष्ण को कैसे पाया" },
@@ -97,8 +97,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby how they never need to be like anyone else to be loved.", "hi": "अपने शिशु को बताइए कि प्यार पाने के लिए उन्हें कभी किसी और जैसा बनने की ज़रूरत नहीं।" },
-      "motivation": { "en": "A child told they are loved as themselves never has to perform to feel worthy.", "hi": "जिस बच्चे को बताया जाए कि उसे वैसे ही प्यार किया जाता है जैसा वह है, उसे क़ाबिल महसूस करने के लिए कभी दिखावा नहीं करना पड़ता।" }
+      "title": { "en": "Tell your baby they never need to be like anyone else to be loved.", "hi": "अपने शिशु को बताइए कि प्यार पाने के लिए उन्हें कभी किसी और जैसा बनने की ज़रूरत नहीं।" },
+      "motivation": { "en": "A child who's loved for themselves doesn't have to perform to feel worthy.", "hi": "जिस बच्चे को बताया जाए कि उसे वैसे ही प्यार किया जाता है जैसा वह है, उसे क़ाबिल महसूस करने के लिए कभी दिखावा नहीं करना पड़ता।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -113,9 +113,9 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "When Heartburn Won't Settle", "hi": "जब सीने की जलन शांत न हो" },
-      "content": { "en": "If a full plate brings on that burning ache low in your chest, try smaller meals more often, and sit upright for a little while after eating rather than lying straight down. A few sips of cool milk or a little plain curd can soothe it gently.", "hi": "अगर भरी थाली आपके सीने में नीचे की ओर वह जलन ले आती है, तो थोड़ा-थोड़ा और ज़्यादा बार खाकर देखिए, और खाने के बाद सीधे लेटने के बजाय थोड़ी देर सीधे बैठिए। ठंडे दूध के कुछ घूँट या थोड़ा सादा दही उसे कोमलता से शांत कर सकता है।" },
-      "remember": { "en": "Small, frequent meals are kinder to a crowded belly.", "hi": "थोड़ा-थोड़ा और बार-बार खाना एक भरे हुए पेट के लिए ज़्यादा मेहरबान होता है।" },
+      "title": { "en": "When heartburn won't settle", "hi": "जब सीने की जलन शांत न हो" },
+      "content": { "en": "If a full plate brings on that burning ache low in your chest, try smaller meals more often. Sit upright for a little while after eating instead of lying straight down. A few sips of cool milk or a little plain curd can ease it.", "hi": "अगर भरी थाली आपके सीने में नीचे की ओर वह जलन ले आती है, तो थोड़ा-थोड़ा और ज़्यादा बार खाकर देखिए, और खाने के बाद सीधे लेटने के बजाय थोड़ी देर सीधे बैठिए। ठंडे दूध के कुछ घूँट या थोड़ा सादा दही उसे कोमलता से शांत कर सकता है।" },
+      "remember": { "en": "Small, frequent meals help when heartburn won't settle.", "hi": "थोड़ा-थोड़ा और बार-बार खाना एक भरे हुए पेट के लिए ज़्यादा मेहरबान होता है।" },
       "durationMinutes": 0
     }
   },
@@ -124,10 +124,10 @@
     "week": 36,
     "babyLearning": { "en": "You may feel your baby drop lower, which can ease your breathing.", "hi": "नरम और मज़बूत, आपसे लगकर आराम करते हुए" },
     "grow": {
-      "title": { "en": "Run Your Own Race", "hi": "अपनी दौड़ ख़ुद दौड़िए" },
+      "title": { "en": "Go at your own pace", "hi": "अपनी दौड़ ख़ुद दौड़िए" },
       "insight": { "en": "When you keep your eyes on your own lane, you stop tripping over everyone else's pace.", "hi": "जब आप अपनी ही राह पर नज़र रखती हैं, तो आप बाक़ी सबकी रफ़्तार पर ठोकर खाना बंद कर देती हैं।" },
-      "expanded": { "en": "A runner who keeps glancing sideways at the others loses her stride. The same is true in this season. When your attention is fixed on who is further along, who has it easier, who seems to be 'winning,' you lose your own rhythm and your own joy. Running your own race does not mean ignoring everyone — it means trusting that your lane is the right one for you. Your baby does not need you to come first; they need you steady, present and at peace with the pace that is yours.", "hi": "जो दौड़ने वाली बार-बार बग़ल में दूसरों को देखती रहती है, वह अपनी चाल खो देती है। यही इस दौर में भी सच है। जब आपका ध्यान इस पर टिका हो कि कौन आगे है, किसके लिए आसान है, कौन 'जीत' रहा लगता है, तो आप अपनी ही लय और अपनी ही ख़ुशी खो देती हैं। अपनी दौड़ दौड़ने का मतलब सबको अनदेखा करना नहीं — इसका मतलब यह भरोसा करना है कि आपकी राह आपके लिए सही है। आपके शिशु को यह नहीं चाहिए कि आप सबसे पहले आएँ; उन्हें आप स्थिर चाहिए, मौजूद चाहिए, और उस रफ़्तार से शांत चाहिए जो आपकी अपनी है।" },
-      "deepDive": { "en": "Sports psychologists note that athletes perform best when focused on their own process rather than rivals. The same inward focus lowers anxiety and builds steadiness in any demanding season, parenthood included.", "hi": "खेल के मनोवैज्ञानिक बताते हैं कि खिलाड़ी तब सबसे अच्छा करते हैं जब उनका ध्यान अपने ही अभ्यास पर होता है, प्रतिद्वंद्वियों पर नहीं। वही भीतर की ओर टिका ध्यान किसी भी मुश्किल दौर में — परवरिश समेत — घबराहट घटाता है और स्थिरता बनाता है।" },
+      "expanded": { "en": "A runner who keeps glancing sideways at the others loses their stride. It's the same in this season. When you keep checking who's further along, who has it easier or who seems to be 'winning', you lose your own rhythm and your own joy. Running your own race doesn't mean ignoring everyone. It means trusting that your lane is the right one for you. Your baby doesn't need you to come first. They need you steady, present and at peace with your own pace.", "hi": "जो दौड़ने वाली बार-बार बग़ल में दूसरों को देखती रहती है, वह अपनी चाल खो देती है। यही इस दौर में भी सच है। जब आपका ध्यान इस पर टिका हो कि कौन आगे है, किसके लिए आसान है, कौन 'जीत' रहा लगता है, तो आप अपनी ही लय और अपनी ही ख़ुशी खो देती हैं। अपनी दौड़ दौड़ने का मतलब सबको अनदेखा करना नहीं — इसका मतलब यह भरोसा करना है कि आपकी राह आपके लिए सही है। आपके शिशु को यह नहीं चाहिए कि आप सबसे पहले आएँ; उन्हें आप स्थिर चाहिए, मौजूद चाहिए, और उस रफ़्तार से शांत चाहिए जो आपकी अपनी है।" },
+      "deepDive": { "en": "Sports psychologists note that athletes often do better when they focus on their own performance instead of their rivals. The same inward focus can help ease anxiety in any demanding time, parenthood included.", "hi": "खेल के मनोवैज्ञानिक बताते हैं कि खिलाड़ी तब सबसे अच्छा करते हैं जब उनका ध्यान अपने ही अभ्यास पर होता है, प्रतिद्वंद्वियों पर नहीं। वही भीतर की ओर टिका ध्यान किसी भी मुश्किल दौर में — परवरिश समेत — घबराहट घटाता है और स्थिरता बनाता है।" },
       "remember": { "en": "Keep your eyes on your own lane.", "hi": "अपनी नज़र अपनी ही राह पर रखिए।" }
     },
     "readToBaby": {
@@ -137,8 +137,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby how you will help them believe in their own gifts.", "hi": "अपने शिशु को बताइए कि आप उन्हें उनकी अपनी ख़ूबियों पर यक़ीन करने में कैसे मदद करेंगी।" },
-      "motivation": { "en": "A child who trusts their own gifts does not need to borrow anyone else's.", "hi": "जो बच्चा अपनी ख़ूबियों पर भरोसा करता है, उसे किसी और की ख़ूबियाँ उधार लेने की ज़रूरत नहीं पड़ती।" }
+      "title": { "en": "Tell your baby you'll help them believe in their own gifts.", "hi": "अपने शिशु को बताइए कि आप उन्हें उनकी अपनी ख़ूबियों पर यक़ीन करने में कैसे मदद करेंगी।" },
+      "motivation": { "en": "A child who trusts their own gifts doesn't need to borrow anyone else's.", "hi": "जो बच्चा अपनी ख़ूबियों पर भरोसा करता है, उसे किसी और की ख़ूबियाँ उधार लेने की ज़रूरत नहीं पड़ती।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -153,9 +153,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Stay In This Breath", "hi": "इसी साँस में रहिए" },
-      "content": { "en": "Breathe in slowly and notice only this one breath — not the next, not anyone else's. Breathe out gently. For one minute, let each breath be the only thing that matters.", "hi": "धीरे से साँस लीजिए और सिर्फ़ इसी एक साँस को महसूस कीजिए — अगली नहीं, किसी और की नहीं। कोमलता से साँस छोड़िए। एक मिनट के लिए, हर साँस को ही एकमात्र मायने रखने वाली चीज़ रहने दीजिए।" },
-      "remember": { "en": "This single breath is the only one you need right now.", "hi": "यही एक साँस है जिसकी आपको अभी ज़रूरत है।" },
+      "title": { "en": "Stay with this breath", "hi": "इसी साँस में रहिए" },
+      "content": { "en": "Breathe in slowly and notice only this one breath, not the next one and not anyone else's. Breathe out gently. For one minute, let each breath be the only thing that matters.", "hi": "धीरे से साँस लीजिए और सिर्फ़ इसी एक साँस को महसूस कीजिए — अगली नहीं, किसी और की नहीं। कोमलता से साँस छोड़िए। एक मिनट के लिए, हर साँस को ही एकमात्र मायने रखने वाली चीज़ रहने दीजिए।" },
+      "remember": { "en": "This one breath is all you need to think about right now.", "hi": "यही एक साँस है जिसकी आपको अभी ज़रूरत है।" },
       "durationMinutes": 1
     }
   },
@@ -164,11 +164,11 @@
     "week": 36,
     "babyLearning": { "en": "Your baby's lungs are almost ready for that first breath.", "hi": "और शांत और सिमटा हुआ बढ़ रहा है, अब बहुत क़रीब" },
     "grow": {
-      "title": { "en": "Trust Beats Comparison", "hi": "भरोसा तुलना को हरा देता है" },
-      "insight": { "en": "Comparison asks 'am I keeping up?' Trust asks 'is this right for us?' — and only one of those brings peace.", "hi": "तुलना पूछती है 'क्या मैं साथ चल पा रही हूँ?' भरोसा पूछता है 'क्या यह हमारे लिए सही है?' — और इन दोनों में शांति सिर्फ़ एक लाता है।" },
-      "expanded": { "en": "Comparison and trust are two different lenses for the very same life. Through comparison, everything becomes a measurement: better or worse, ahead or behind. Through trust, the question softens to simply 'is this good for my baby and me?' That single shift changes everything. You stop needing the world to confirm you are doing well, and start listening to your own quiet knowing instead. Trust will not make the comparisons disappear, but it will make them matter less. And a mother who trusts herself gives her baby the steadiest possible start.", "hi": "तुलना और भरोसा एक ही ज़िंदगी को देखने के दो अलग चश्मे हैं। तुलना से देखें तो हर चीज़ एक माप बन जाती है: बेहतर या बदतर, आगे या पीछे। भरोसे से देखें तो सवाल नरम होकर बस इतना रह जाता है — 'क्या यह मेरे शिशु और मेरे लिए अच्छा है?' यह एक बदलाव सब कुछ बदल देता है। आपको दुनिया से यह पुष्टि चाहिए होना बंद हो जाता है कि आप अच्छा कर रही हैं, और उसकी जगह आप अपनी ही शांत समझ सुनना शुरू करती हैं। भरोसा तुलनाओं को ग़ायब नहीं करेगा, पर उन्हें कम मायने वाला बना देगा। और जो माँ ख़ुद पर भरोसा करती है, वह अपने शिशु को सबसे स्थिर शुरुआत देती है।" },
-      "deepDive": { "en": "Studies of maternal confidence show that mothers who trust their own judgment, rather than constantly seeking external comparison, report less anxiety and respond more sensitively to their babies after birth.", "hi": "माँ के आत्मविश्वास पर हुए शोध दिखाते हैं कि जो माएँ लगातार बाहर तुलना ढूँढ़ने के बजाय अपने ही फ़ैसले पर भरोसा करती हैं, वे कम घबराहट बताती हैं और जन्म के बाद अपने शिशु की ज़रूरतों को ज़्यादा नरमी से समझती हैं।" },
-      "remember": { "en": "Trust your own knowing more than the comparison.", "hi": "तुलना से ज़्यादा अपनी ही समझ पर भरोसा कीजिए।" }
+      "title": { "en": "Trust yourself more than comparisons", "hi": "भरोसा तुलना को हरा देता है" },
+      "insight": { "en": "Comparison asks 'am I keeping up?' Trust asks 'is this right for us?' The second question brings more peace.", "hi": "तुलना पूछती है 'क्या मैं साथ चल पा रही हूँ?' भरोसा पूछता है 'क्या यह हमारे लिए सही है?' — और इन दोनों में शांति सिर्फ़ एक लाता है।" },
+      "expanded": { "en": "Comparison and trust are two ways of looking at the same life. Through comparison, everything becomes a measurement: better or worse, ahead or behind. Through trust, the question becomes 'is this good for our baby and us?' That one change makes a big difference. You stop needing the world to confirm you're doing well, and you start listening to your own sense of what's right. Trust won't make comparisons disappear, but it makes them matter less. A parent who trusts themselves gives their baby a steady start.", "hi": "तुलना और भरोसा एक ही ज़िंदगी को देखने के दो अलग चश्मे हैं। तुलना से देखें तो हर चीज़ एक माप बन जाती है: बेहतर या बदतर, आगे या पीछे। भरोसे से देखें तो सवाल नरम होकर बस इतना रह जाता है — 'क्या यह मेरे शिशु और मेरे लिए अच्छा है?' यह एक बदलाव सब कुछ बदल देता है। आपको दुनिया से यह पुष्टि चाहिए होना बंद हो जाता है कि आप अच्छा कर रही हैं, और उसकी जगह आप अपनी ही शांत समझ सुनना शुरू करती हैं। भरोसा तुलनाओं को ग़ायब नहीं करेगा, पर उन्हें कम मायने वाला बना देगा। और जो माँ ख़ुद पर भरोसा करती है, वह अपने शिशु को सबसे स्थिर शुरुआत देती है।" },
+      "deepDive": { "en": "Studies of new parents suggest that confidence in their own judgement is linked to less anxiety. Parents who feel confident often find it easier to tune in to their baby.", "hi": "माँ के आत्मविश्वास पर हुए शोध दिखाते हैं कि जो माएँ लगातार बाहर तुलना ढूँढ़ने के बजाय अपने ही फ़ैसले पर भरोसा करती हैं, वे कम घबराहट बताती हैं और जन्म के बाद अपने शिशु की ज़रूरतों को ज़्यादा नरमी से समझती हैं।" },
+      "remember": { "en": "Trust your own sense of what's right more than the comparisons.", "hi": "तुलना से ज़्यादा अपनी ही समझ पर भरोसा कीजिए।" }
     },
     "readToBaby": {
       "title": { "en": "Birbal And Every Garden's Flower", "hi": "बीरबल और हर बग़ीचे का फूल" },
@@ -177,8 +177,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about the very things that will make them, them.", "hi": "अपने शिशु को उन्हीं बातों के बारे में बताइए जो उन्हें 'वे' बनाएँगी।" },
-      "motivation": { "en": "Celebrating a child's uniqueness early teaches them it is something to treasure, not hide.", "hi": "बच्चे के अनोखेपन का जल्दी जश्न मनाना उसे सिखाता है कि यह सँभालकर रखने की चीज़ है, छिपाने की नहीं।" }
+      "title": { "en": "Tell your baby about the things that will make them who they are.", "hi": "अपने शिशु को उन्हीं बातों के बारे में बताइए जो उन्हें 'वे' बनाएँगी।" },
+      "motivation": { "en": "Celebrating what makes a child different teaches them it's something to treasure.", "hi": "बच्चे के अनोखेपन का जल्दी जश्न मनाना उसे सिखाता है कि यह सँभालकर रखने की चीज़ है, छिपाने की नहीं।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -193,8 +193,8 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "I Trust My Own Way", "hi": "मैं अपने ही तरीक़े पर भरोसा करती हूँ" },
-      "content": { "en": "I do not need to do this the way anyone else does. I can trust the quiet way that feels right for my baby and me.", "hi": "मुझे यह किसी और की तरह करने की ज़रूरत नहीं। मैं उस शांत तरीक़े पर भरोसा कर सकती हूँ जो मेरे शिशु और मेरे लिए सही लगता है।" },
+      "title": { "en": "I trust my own way", "hi": "मैं अपने ही तरीक़े पर भरोसा करती हूँ" },
+      "content": { "en": "I don't need to do this the way anyone else does. I can trust the way that feels right for my baby and me.", "hi": "मुझे यह किसी और की तरह करने की ज़रूरत नहीं। मैं उस शांत तरीक़े पर भरोसा कर सकती हूँ जो मेरे शिशु और मेरे लिए सही लगता है।" },
       "remember": { "en": "Your own way is allowed to be enough.", "hi": "आपके अपने तरीक़े का काफ़ी होना बिल्कुल ठीक है।" },
       "durationMinutes": 0
     }
@@ -204,11 +204,11 @@
     "week": 36,
     "babyLearning": { "en": "Your baby's digestive system is ready, but waits until after birth.", "hi": "गोल-मटोल और तैयार, आपकी आवाज़ सुनने को कान लगाए" },
     "grow": {
-      "title": { "en": "Other People's Highlights Aren't Your Reality", "hi": "दूसरों के चुने हुए पल आपकी असलियत नहीं" },
-      "insight": { "en": "What you see of others is a highlight reel; what you live is the whole, unedited day. They are never a fair comparison.", "hi": "दूसरों का जो आप देखती हैं, वह चुने हुए पलों की झलक है; जो आप जीती हैं, वह पूरा, बिना काटा-छाँटा दिन है। इन दोनों की तुलना कभी इंसाफ़ नहीं है।" },
-      "expanded": { "en": "The glowing pregnancy photos, the cheerful posts, the friend who seems to have it all together — these are carefully chosen moments, the best slivers of someone's day. Behind them are the same tired mornings, worries and messes that fill yours. When you measure your full, honest reality against someone else's edited highlights, you will always come up short, because you are comparing two completely different things. Let others keep their highlight reels. Your real, unfiltered days — tiredness and tenderness and all — are where your true and lasting bond with your baby is actually being made.", "hi": "वे चमकती गर्भावस्था की तस्वीरें, ख़ुशनुमा पोस्ट, वह सहेली जिसके पास सब कुछ सँभला हुआ लगता है — ये ध्यान से चुने गए पल हैं, किसी के दिन के सबसे अच्छे टुकड़े। उनके पीछे वही थकी सुबहें, चिंताएँ और गड़बड़ हैं जो आपके दिन में भी भरी होती हैं। जब आप अपनी पूरी, सच्ची असलियत को किसी और के छाँटे हुए अच्छे पलों से नापती हैं, आप हमेशा कम पड़ेंगी, क्योंकि आप दो बिल्कुल अलग चीज़ों को तोल रही हैं। दूसरों को उनकी झलकियाँ रखने दीजिए। आपके असली, बिना फ़िल्टर वाले दिन — थकान और नरमी और सब कुछ — वहीं हैं जहाँ आपके शिशु के साथ आपका सच्चा और टिकाऊ जुड़ाव सच में बन रहा है।" },
-      "deepDive": { "en": "Research on social media links frequent comparison with curated online images to higher rates of low mood in expectant and new mothers. Knowing posts are edited highlights measurably softens their sting.", "hi": "सोशल मीडिया पर हुए शोध बताते हैं कि ऑनलाइन दिखने वाली छँटी-छँटाई तस्वीरों से बार-बार तुलना करना गर्भवती और नई माँओं में उदासी बढ़ा देता है। यह जान लेना कि पोस्ट छाँटे हुए अच्छे पल हैं, उनकी चुभन को साफ़ तौर पर नरम कर देता है।" },
-      "remember": { "en": "Don't compare your whole day to someone's best moment.", "hi": "अपने पूरे दिन को किसी के सबसे अच्छे पल से मत तोलिए।" }
+      "title": { "en": "Other people's highlights aren't the whole story", "hi": "दूसरों के चुने हुए पल आपकी असलियत नहीं" },
+      "insight": { "en": "What you see of others is their best moments. What you live is the whole day. That's never a fair comparison.", "hi": "दूसरों का जो आप देखती हैं, वह चुने हुए पलों की झलक है; जो आप जीती हैं, वह पूरा, बिना काटा-छाँटा दिन है। इन दोनों की तुलना कभी इंसाफ़ नहीं है।" },
+      "expanded": { "en": "The glowing pregnancy photos, the cheerful posts, the friend who seems to have it all together: these are chosen moments, the best bits of someone's day. Behind them are the same tired mornings, worries and mess that fill yours. When you measure your full, honest life against someone else's edited highlights, you'll always come up short. You're comparing two different things. Let others keep their highlights. Your real days, tired and tender, are where your bond with your baby is being built.", "hi": "वे चमकती गर्भावस्था की तस्वीरें, ख़ुशनुमा पोस्ट, वह सहेली जिसके पास सब कुछ सँभला हुआ लगता है — ये ध्यान से चुने गए पल हैं, किसी के दिन के सबसे अच्छे टुकड़े। उनके पीछे वही थकी सुबहें, चिंताएँ और गड़बड़ हैं जो आपके दिन में भी भरी होती हैं। जब आप अपनी पूरी, सच्ची असलियत को किसी और के छाँटे हुए अच्छे पलों से नापती हैं, आप हमेशा कम पड़ेंगी, क्योंकि आप दो बिल्कुल अलग चीज़ों को तोल रही हैं। दूसरों को उनकी झलकियाँ रखने दीजिए। आपके असली, बिना फ़िल्टर वाले दिन — थकान और नरमी और सब कुछ — वहीं हैं जहाँ आपके शिशु के साथ आपका सच्चा और टिकाऊ जुड़ाव सच में बन रहा है।" },
+      "deepDive": { "en": "Research links frequent comparison with polished online images to low mood, including during pregnancy and after birth. Remembering that posts are edited highlights can soften their sting.", "hi": "सोशल मीडिया पर हुए शोध बताते हैं कि ऑनलाइन दिखने वाली छँटी-छँटाई तस्वीरों से बार-बार तुलना करना गर्भवती और नई माँओं में उदासी बढ़ा देता है। यह जान लेना कि पोस्ट छाँटे हुए अच्छे पल हैं, उनकी चुभन को साफ़ तौर पर नरम कर देता है।" },
+      "remember": { "en": "Don't compare your whole day to someone else's best moment.", "hi": "अपने पूरे दिन को किसी के सबसे अच्छे पल से मत तोलिए।" }
     },
     "readToBaby": {
       "title": { "en": "The Fish Who Envied The Birds", "hi": "वह मछली जो पंछियों से जलती थी" },
@@ -217,8 +217,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby how they are exactly the little one you always wanted.", "hi": "अपने शिशु को बताइए कि वे ठीक वही नन्हे हैं जो आप हमेशा से चाहती थीं।" },
-      "motivation": { "en": "Knowing they were wanted exactly as they are gives a child an unshakeable sense of belonging.", "hi": "यह जानना कि उन्हें ठीक वैसे ही चाहा गया जैसे वे हैं, बच्चे को अपनेपन का एक न हिलने वाला एहसास देता है।" }
+      "title": { "en": "Tell your baby they're exactly the little one you always wanted.", "hi": "अपने शिशु को बताइए कि वे ठीक वही नन्हे हैं जो आप हमेशा से चाहती थीं।" },
+      "motivation": { "en": "Knowing they were wanted as they are gives a child a strong sense of belonging.", "hi": "यह जानना कि उन्हें ठीक वैसे ही चाहा गया जैसे वे हैं, बच्चे को अपनेपन का एक न हिलने वाला एहसास देता है।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -233,9 +233,9 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "When Nothing Feels Appetising", "hi": "जब कुछ भी खाने का मन न करे" },
-      "content": { "en": "With your belly so full and crowded now, big meals can feel off-putting. Don't force a full plate — a handful of nuts, a piece of fruit, a few spoons of dal or curd through the day keep you nourished without the heaviness. Eat what feels gentle, little and often.", "hi": "अब पेट इतना भरा और तंग होने से बड़ी थाली देखकर ही मन हट सकता है। पूरी थाली ज़बरदस्ती मत खाइए — मुट्ठी भर मेवे, एक फल, दिन भर में दाल या दही के कुछ चम्मच आपको बिना भारीपन के पोषण देते रहते हैं। जो नरम लगे वही खाइए, थोड़ा-थोड़ा और बार-बार।" },
-      "remember": { "en": "Little and often is plenty when a full meal feels too much.", "hi": "जब पूरा खाना ज़्यादा लगे, तो थोड़ा-थोड़ा और बार-बार ही काफ़ी है।" },
+      "title": { "en": "When nothing feels appetising", "hi": "जब कुछ भी खाने का मन न करे" },
+      "content": { "en": "With your belly so full and crowded now, big meals can feel off-putting. Don't force a full plate. A handful of nuts, a piece of fruit, or a few spoons of dal or curd through the day keep you nourished without the heaviness. Eat what feels gentle, little and often.", "hi": "अब पेट इतना भरा और तंग होने से बड़ी थाली देखकर ही मन हट सकता है। पूरी थाली ज़बरदस्ती मत खाइए — मुट्ठी भर मेवे, एक फल, दिन भर में दाल या दही के कुछ चम्मच आपको बिना भारीपन के पोषण देते रहते हैं। जो नरम लगे वही खाइए, थोड़ा-थोड़ा और बार-बार।" },
+      "remember": { "en": "Little and often is plenty when a full meal feels like too much.", "hi": "जब पूरा खाना ज़्यादा लगे, तो थोड़ा-थोड़ा और बार-बार ही काफ़ी है।" },
       "durationMinutes": 0
     }
   },
@@ -244,11 +244,11 @@
     "week": 36,
     "babyLearning": { "en": "Your baby has soft creases and dimples at the elbows and knees.", "hi": "हफ़्ता पूरा हो रहा है, आने के लिए लगभग तैयार" },
     "grow": {
-      "title": { "en": "Your Baby Needs You, Not A Copy", "hi": "आपके शिशु को आप चाहिए, कोई नक़ल नहीं" },
-      "insight": { "en": "Your baby is not waiting for a perfect, copied version of some other parent. They are waiting for you.", "hi": "आपका शिशु किसी और माँ की नक़ल की हुई परफ़ेक्ट कॉपी का इंतज़ार नहीं कर रहा। वे आपका इंतज़ार कर रहे हैं।" },
-      "expanded": { "en": "It is easy, in these last weeks, to wish you were a little more like the mothers you admire — calmer, more organised, more sure. But your baby was not made for those mothers. They were made for you: your particular voice, your particular warmth, the exact way you will hold and soothe and love them. No copied version of someone else could ever give your child what your true, imperfect self can. The most precious gift you bring to your baby is not a better imitation of anyone — it is simply, fully, you.", "hi": "इन आख़िरी हफ़्तों में यह चाहना आसान है कि काश आप उन माँओं जैसी थोड़ी और होतीं जिनकी आप क़दर करती हैं — ज़्यादा शांत, ज़्यादा सँभली हुई, ज़्यादा यक़ीन वाली। पर आपका शिशु उन माँओं के लिए बना ही नहीं था। वे आपके लिए बने थे: आपकी ख़ास आवाज़ के लिए, आपकी ख़ास गर्माहट के लिए, उस ठीक तरीक़े के लिए जिससे आप उन्हें थामेंगी, दिलासा देंगी और प्यार करेंगी। किसी और की नक़ल की हुई कोई कॉपी आपके बच्चे को वह कभी नहीं दे सकती जो आपका सच्चा, अधूरा-सा 'आप' दे सकता है। आप अपने शिशु के लिए जो सबसे क़ीमती तोहफ़ा लाती हैं, वह किसी की बेहतर नक़ल नहीं — वह बस, पूरी तरह, आप हैं।" },
-      "deepDive": { "en": "Attachment research is clear that babies bond to their own caregiver's specific voice, scent and rhythm — recognised from the womb. There is no substitute, and no 'better' parent your baby would prefer over the real you.", "hi": "जुड़ाव पर हुए शोध साफ़ कहते हैं कि शिशु अपनी ही देखभाल करने वाली की ख़ास आवाज़, ख़ुशबू और लय से जुड़ते हैं — जिन्हें वे गर्भ से ही पहचानते हैं। इसका कोई बदल नहीं है, और कोई 'बेहतर' माँ नहीं जिसे आपका शिशु असली आप से ज़्यादा चाहेगा।" },
-      "remember": { "en": "Your baby was made for you, not for a copy of anyone.", "hi": "आपका शिशु आपके लिए बना था, किसी की नक़ल के लिए नहीं।" }
+      "title": { "en": "Your baby needs you as you are", "hi": "आपके शिशु को आप चाहिए, कोई नक़ल नहीं" },
+      "insight": { "en": "Your baby isn't waiting for a perfect copy of some other parent. They're waiting for you.", "hi": "आपका शिशु किसी और माँ की नक़ल की हुई परफ़ेक्ट कॉपी का इंतज़ार नहीं कर रहा। वे आपका इंतज़ार कर रहे हैं।" },
+      "expanded": { "en": "It's easy, in these last weeks, to wish you were a bit more like the parents you admire: calmer, more organised, more sure. But your baby wasn't made for those parents. They were made for you: your voice, your warmth, the way you'll hold, soothe and love them. No copy of someone else could give your child what your real, imperfect self can. The best thing you bring to your baby is you.", "hi": "इन आख़िरी हफ़्तों में यह चाहना आसान है कि काश आप उन माँओं जैसी थोड़ी और होतीं जिनकी आप क़दर करती हैं — ज़्यादा शांत, ज़्यादा सँभली हुई, ज़्यादा यक़ीन वाली। पर आपका शिशु उन माँओं के लिए बना ही नहीं था। वे आपके लिए बने थे: आपकी ख़ास आवाज़ के लिए, आपकी ख़ास गर्माहट के लिए, उस ठीक तरीक़े के लिए जिससे आप उन्हें थामेंगी, दिलासा देंगी और प्यार करेंगी। किसी और की नक़ल की हुई कोई कॉपी आपके बच्चे को वह कभी नहीं दे सकती जो आपका सच्चा, अधूरा-सा 'आप' दे सकता है। आप अपने शिशु के लिए जो सबसे क़ीमती तोहफ़ा लाती हैं, वह किसी की बेहतर नक़ल नहीं — वह बस, पूरी तरह, आप हैं।" },
+      "deepDive": { "en": "Research shows newborns already recognise their mother's voice from the womb, and babies soon bond with the particular people who care for them. Your baby doesn't want a better parent. They want you.", "hi": "जुड़ाव पर हुए शोध साफ़ कहते हैं कि शिशु अपनी ही देखभाल करने वाली की ख़ास आवाज़, ख़ुशबू और लय से जुड़ते हैं — जिन्हें वे गर्भ से ही पहचानते हैं। इसका कोई बदल नहीं है, और कोई 'बेहतर' माँ नहीं जिसे आपका शिशु असली आप से ज़्यादा चाहेगा।" },
+      "remember": { "en": "Your baby needs you, just as you are.", "hi": "आपका शिशु आपके लिए बना था, किसी की नक़ल के लिए नहीं।" }
     },
     "readToBaby": {
       "title": { "en": "The Rose And The Lotus", "hi": "गुलाब और कमल" },
@@ -257,8 +257,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby how you'll cheer them on to run their own race.", "hi": "अपने शिशु को बताइए कि आप उन्हें अपनी ही दौड़ दौड़ने के लिए कैसे हौसला देंगी।" },
-      "motivation": { "en": "A child cheered on for their own path learns to chase it without looking over their shoulder.", "hi": "जिस बच्चे को उसकी अपनी राह के लिए हौसला मिलता है, वह उस पर बिना मुड़कर देखे चलना सीखता है।" }
+      "title": { "en": "Tell your baby you'll cheer them on as they find their own path.", "hi": "अपने शिशु को बताइए कि आप उन्हें अपनी ही दौड़ दौड़ने के लिए कैसे हौसला देंगी।" },
+      "motivation": { "en": "A child cheered on along their own path learns to follow it without looking over their shoulder.", "hi": "जिस बच्चे को उसकी अपनी राह के लिए हौसला मिलता है, वह उस पर बिना मुड़कर देखे चलना सीखता है।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -273,8 +273,8 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "A Breath Just For Us", "hi": "एक साँस सिर्फ़ हमारे लिए" },
-      "content": { "en": "Rest a hand on your belly. Breathe in slowly, and as you breathe out, imagine the breath wrapping just around you and your baby — no one else in it. Repeat for one quiet minute.", "hi": "एक हाथ अपने पेट पर रखिए। धीरे से साँस लीजिए, और छोड़ते हुए कल्पना कीजिए कि वह साँस बस आपके और आपके शिशु के चारों ओर लिपट रही है — उसमें कोई और नहीं। एक शांत मिनट तक दोहराइए।" },
+      "title": { "en": "A breath just for us", "hi": "एक साँस सिर्फ़ हमारे लिए" },
+      "content": { "en": "Rest a hand on your belly. Breathe in slowly. As you breathe out, picture the breath wrapping around just you and your baby, with no one else in it. Repeat for one quiet minute.", "hi": "एक हाथ अपने पेट पर रखिए। धीरे से साँस लीजिए, और छोड़ते हुए कल्पना कीजिए कि वह साँस बस आपके और आपके शिशु के चारों ओर लिपट रही है — उसमें कोई और नहीं। एक शांत मिनट तक दोहराइए।" },
       "remember": { "en": "This breath belongs only to you and your baby.", "hi": "यह साँस सिर्फ़ आपकी और आपके शिशु की है।" },
       "durationMinutes": 1
     }

@@ -4,11 +4,11 @@
     "week": 37,
     "babyLearning": { "en": "From around now, your baby counts as full term.", "hi": "गोल और तैयार होते हुए, आगे के सफ़र के लिए नीचे बसते हुए" },
     "grow": {
-      "title": { "en": "You Are Already Enough", "hi": "आप पहले से ही काफ़ी हैं" },
-      "insight": { "en": "You do not need to become someone better before your baby arrives. The parent you already are is exactly enough.", "hi": "शिशु के आने से पहले आपको कोई बेहतर इंसान बनने की ज़रूरत नहीं। आप जैसी माँ पहले से हैं, वही बिल्कुल काफ़ी है।" },
-      "expanded": { "en": "As these last weeks draw close, it is natural to feel you should be more ready, more patient, more sure. But your baby is not waiting for a finished version of you. They are coming to the warm, willing, imperfect heart you carry right now. Enough does not mean perfect; it means present, loving and trying. Every quiet hope you hold, every gentle thought you have already given this little one — these are not the rehearsal for being a good parent. They are the proof you already are one.", "hi": "जैसे-जैसे ये आख़िरी हफ़्ते पास आते हैं, यह महसूस होना सहज है कि आपको और तैयार, और सब्र वाली, और पक्की होना चाहिए। पर आपका शिशु आपके किसी पूरे हो चुके रूप का इंतज़ार नहीं कर रहा। वह उसी गर्म, तैयार, अधूरे दिल के पास आ रहा है जो आप अभी थामे हैं। काफ़ी होने का मतलब परफ़ेक्ट होना नहीं; इसका मतलब है मौजूद रहना, प्यार करना और कोशिश करना। हर चुपचाप उम्मीद जो आप रखती हैं, हर नरम ख़याल जो आप इस नन्हे को पहले ही दे चुकी हैं — ये अच्छी माँ बनने की रिहर्सल नहीं हैं। ये सबूत हैं कि आप पहले से ही एक हैं।" },
-      "deepDive": { "en": "Psychologist Donald Winnicott described the 'good enough' parent — one who responds with love most of the time, not perfectly. Children thrive on this realistic, warm care, not on flawlessness.", "hi": "मनोवैज्ञानिक Donald Winnicott ने 'good enough' यानी काफ़ी-अच्छे माता-पिता की बात कही — जो ज़्यादातर समय प्यार से जवाब देते हैं, परफ़ेक्ट तरीक़े से नहीं। बच्चे इसी असली, गर्मजोशी भरी देखभाल पर फलते-फूलते हैं, बेऐबी पर नहीं।" },
-      "remember": { "en": "You are already enough for the baby who is choosing you.", "hi": "जो शिशु आपको चुन रहा है, उसके लिए आप पहले से ही काफ़ी हैं।" }
+      "title": { "en": "You're already enough", "hi": "आप पहले से ही काफ़ी हैं" },
+      "insight": { "en": "You don't need to become someone better before your baby arrives. The parent you already are is enough.", "hi": "शिशु के आने से पहले आपको कोई बेहतर इंसान बनने की ज़रूरत नहीं। आप जैसी माँ पहले से हैं, वही बिल्कुल काफ़ी है।" },
+      "expanded": { "en": "As these last weeks go by, it's natural to feel you should be more ready, more patient, more sure. But your baby isn't waiting for a finished version of you. They're coming to the warm, willing, imperfect person you are right now. Enough doesn't mean perfect. It means present, loving and trying. Every hope you hold and every loving thought you've already given this little one shows the kind of parent you are.", "hi": "जैसे-जैसे ये आख़िरी हफ़्ते पास आते हैं, यह महसूस होना सहज है कि आपको और तैयार, और सब्र वाली, और पक्की होना चाहिए। पर आपका शिशु आपके किसी पूरे हो चुके रूप का इंतज़ार नहीं कर रहा। वह उसी गर्म, तैयार, अधूरे दिल के पास आ रहा है जो आप अभी थामे हैं। काफ़ी होने का मतलब परफ़ेक्ट होना नहीं; इसका मतलब है मौजूद रहना, प्यार करना और कोशिश करना। हर चुपचाप उम्मीद जो आप रखती हैं, हर नरम ख़याल जो आप इस नन्हे को पहले ही दे चुकी हैं — ये अच्छी माँ बनने की रिहर्सल नहीं हैं। ये सबूत हैं कि आप पहले से ही एक हैं।" },
+      "deepDive": { "en": "The paediatrician and psychoanalyst Donald Winnicott described the 'good enough' parent: one who responds with love most of the time, not perfectly. Children do well with this kind of real, warm care.", "hi": "मनोवैज्ञानिक Donald Winnicott ने 'good enough' यानी काफ़ी-अच्छे माता-पिता की बात कही — जो ज़्यादातर समय प्यार से जवाब देते हैं, परफ़ेक्ट तरीक़े से नहीं। बच्चे इसी असली, गर्मजोशी भरी देखभाल पर फलते-फूलते हैं, बेऐबी पर नहीं।" },
+      "remember": { "en": "You're already enough for the baby on the way.", "hi": "जो शिशु आपको चुन रहा है, उसके लिए आप पहले से ही काफ़ी हैं।" }
     },
     "readToBaby": {
       "title": { "en": "The Lark And Her Little Ones", "hi": "चिड़िया और उसके बच्चे" },
@@ -17,8 +17,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby how they are already enough for you, just by being on their way.", "hi": "अपने शिशु को बताइए कि बस रास्ते में होने से ही वह आपके लिए पहले से काफ़ी है।" },
-      "motivation": { "en": "Your baby learns their first sense of worth from how wholly they are wanted.", "hi": "शिशु अपनी क़ीमत का पहला एहसास इसी से सीखता है कि उसे कितनी पूरी तरह चाहा गया।" }
+      "title": { "en": "Tell your baby they're already enough for you, just by being on their way.", "hi": "अपने शिशु को बताइए कि बस रास्ते में होने से ही वह आपके लिए पहले से काफ़ी है।" },
+      "motivation": { "en": "Your baby's first sense of worth comes from how fully they're wanted.", "hi": "शिशु अपनी क़ीमत का पहला एहसास इसी से सीखता है कि उसे कितनी पूरी तरह चाहा गया।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -33,9 +33,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Breathe Down To The Belly", "hi": "साँस पेट तक लीजिए" },
-      "content": { "en": "Place both hands low on your belly. Breathe in slowly until you feel them rise, then let the breath sink all the way out. Five soft, low breaths settle the whole body.", "hi": "दोनों हाथ पेट पर नीचे रखिए। धीरे-धीरे साँस लीजिए जब तक आप उन्हें उठते महसूस न करें, फिर साँस को पूरी तरह नीचे तक निकल जाने दीजिए। पाँच नरम, गहरी साँसें पूरे शरीर को थाम देती हैं।" },
-      "remember": { "en": "A low, slow breath tells your body it is safe.", "hi": "एक गहरी, धीमी साँस आपके शरीर को बताती है कि वह सुरक्षित है।" },
+      "title": { "en": "Breathe down to the belly", "hi": "साँस पेट तक लीजिए" },
+      "content": { "en": "Place both hands low on your belly. Breathe in slowly until you feel them rise, then let the breath sink all the way out. Five soft, low breaths can settle your whole body.", "hi": "दोनों हाथ पेट पर नीचे रखिए। धीरे-धीरे साँस लीजिए जब तक आप उन्हें उठते महसूस न करें, फिर साँस को पूरी तरह नीचे तक निकल जाने दीजिए। पाँच नरम, गहरी साँसें पूरे शरीर को थाम देती हैं।" },
+      "remember": { "en": "A low, slow breath helps you feel safe and settled.", "hi": "एक गहरी, धीमी साँस आपके शरीर को बताती है कि वह सुरक्षित है।" },
       "durationMinutes": 2
     }
   },
@@ -44,10 +44,10 @@
     "week": 37,
     "babyLearning": { "en": "Your baby's lungs are ready, or nearly ready, for air.", "hi": "नन्ही साँसों का अभ्यास करते हुए, फेफड़े मज़बूत और तैयार होते हुए" },
     "grow": {
-      "title": { "en": "There Is No Perfect Parent", "hi": "कोई परफ़ेक्ट माता-पिता नहीं होता" },
-      "insight": { "en": "The perfect parent does not exist, and never has. Your baby does not need one — they need you.", "hi": "परफ़ेक्ट माता-पिता का कोई वजूद नहीं है, और कभी था भी नहीं। आपके शिशु को कोई परफ़ेक्ट माँ नहीं चाहिए — उसे आप चाहिए।" },
-      "expanded": { "en": "Somewhere we picked up the idea that other parents have it figured out, and that we alone are fumbling. The truth is gentler: every parent, in every home, is improvising with love. The calm ones have hard days; the patient ones lose their patience. What looks like perfection from outside is simply people doing their honest best and beginning again. You can let go of the impossible standard now. It was never the measure. Showing up, soft and willing, over and over — that has always been the whole of it.", "hi": "कहीं से हमने यह सोच उठा ली कि दूसरे माता-पिता को सब समझ आ गया है, और सिर्फ़ हम ही लड़खड़ा रहे हैं। सच इससे कहीं नरम है: हर माता-पिता, हर घर में, प्यार के सहारे रास्ता बनाते जा रहे हैं। शांत लोगों के भी मुश्किल दिन होते हैं; सब्र वालों का भी सब्र टूटता है। जो बाहर से परफ़ेक्शन लगता है, वह बस लोग हैं जो अपना ईमानदार सबसे अच्छा करते हैं और फिर से शुरू कर लेते हैं। आप अब उस नामुमकिन पैमाने को छोड़ सकती हैं। वह कभी नापने की चीज़ था ही नहीं। नरम और तैयार होकर, बार-बार मौजूद रहना — यही हमेशा से पूरी बात थी।" },
-      "deepDive": { "en": "Research on 'parental self-compassion' finds that parents who forgive their own mistakes respond to their children more warmly and consistently than those chasing perfection. Kindness to yourself becomes kindness to your child.", "hi": "ख़ुद पर नरमी — 'parental self-compassion' — पर हुए शोध पाते हैं कि जो माता-पिता अपनी ग़लतियाँ माफ़ कर देते हैं, वे अपने बच्चों को परफ़ेक्शन का पीछा करने वालों से ज़्यादा गर्मजोशी और ठहराव से जवाब देते हैं। ख़ुद पर की गई दया आपके बच्चे पर दया बन जाती है।" },
+      "title": { "en": "There's no perfect parent", "hi": "कोई परफ़ेक्ट माता-पिता नहीं होता" },
+      "insight": { "en": "The perfect parent doesn't exist and never has. Your baby doesn't need one. They need you.", "hi": "परफ़ेक्ट माता-पिता का कोई वजूद नहीं है, और कभी था भी नहीं। आपके शिशु को कोई परफ़ेक्ट माँ नहीं चाहिए — उसे आप चाहिए।" },
+      "expanded": { "en": "Somewhere we picked up the idea that other parents have it all figured out and we're the only ones fumbling. The truth is kinder. Every parent, in every home, is working it out as they go, with love. The calm ones have hard days. The patient ones lose their patience. What looks perfect from outside is people doing their honest best and starting again. You can let go of that impossible standard now. Showing up, gentle and willing, again and again, is what parenting is.", "hi": "कहीं से हमने यह सोच उठा ली कि दूसरे माता-पिता को सब समझ आ गया है, और सिर्फ़ हम ही लड़खड़ा रहे हैं। सच इससे कहीं नरम है: हर माता-पिता, हर घर में, प्यार के सहारे रास्ता बनाते जा रहे हैं। शांत लोगों के भी मुश्किल दिन होते हैं; सब्र वालों का भी सब्र टूटता है। जो बाहर से परफ़ेक्शन लगता है, वह बस लोग हैं जो अपना ईमानदार सबसे अच्छा करते हैं और फिर से शुरू कर लेते हैं। आप अब उस नामुमकिन पैमाने को छोड़ सकती हैं। वह कभी नापने की चीज़ था ही नहीं। नरम और तैयार होकर, बार-बार मौजूद रहना — यही हमेशा से पूरी बात थी।" },
+      "deepDive": { "en": "Research on self-compassion in parents suggests that those who are kinder to themselves about mistakes tend to respond to their children more warmly. Being kind to yourself helps you be kind to your child.", "hi": "ख़ुद पर नरमी — 'parental self-compassion' — पर हुए शोध पाते हैं कि जो माता-पिता अपनी ग़लतियाँ माफ़ कर देते हैं, वे अपने बच्चों को परफ़ेक्शन का पीछा करने वालों से ज़्यादा गर्मजोशी और ठहराव से जवाब देते हैं। ख़ुद पर की गई दया आपके बच्चे पर दया बन जाती है।" },
       "remember": { "en": "Your baby needs a real parent, not a perfect one.", "hi": "आपके शिशु को एक असली माँ चाहिए, परफ़ेक्ट नहीं।" }
     },
     "readToBaby": {
@@ -57,8 +57,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby that they will never have to earn your love — it is already, fully theirs.", "hi": "अपने शिशु को बताइए कि उसे कभी आपका प्यार कमाना नहीं पड़ेगा — यह पहले से ही, पूरा उसका है।" },
-      "motivation": { "en": "A love that asks for nothing in return is the safest ground a child can stand on.", "hi": "जो प्यार बदले में कुछ नहीं माँगता, वही सबसे सुरक्षित ज़मीन है जिस पर एक बच्चा खड़ा हो सकता है।" }
+      "title": { "en": "Tell your baby they'll never have to earn your love. It's already theirs.", "hi": "अपने शिशु को बताइए कि उसे कभी आपका प्यार कमाना नहीं पड़ेगा — यह पहले से ही, पूरा उसका है।" },
+      "motivation": { "en": "Love that asks for nothing back gives a child the safest ground to stand on.", "hi": "जो प्यार बदले में कुछ नहीं माँगता, वही सबसे सुरक्षित ज़मीन है जिस पर एक बच्चा खड़ा हो सकता है।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -73,9 +73,9 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "When Heartburn Visits", "hi": "जब सीने में जलन हो" },
-      "content": { "en": "Late-pregnancy heartburn is common as your baby presses upward. Try smaller, more frequent meals, sip cool milk, and avoid lying down right after eating. Gentle, soothing food is kinder to a crowded belly now.", "hi": "गर्भावस्था के आख़िरी महीनों में सीने की जलन आम है, क्योंकि शिशु ऊपर की तरफ़ दबाता है। छोटे, बार-बार खाने लीजिए, ठंडा दूध चुस्कियों में पीजिए, और खाने के तुरंत बाद लेटने से बचिए। नरम, आराम देने वाला खाना अब भरे हुए पेट के लिए ज़्यादा अच्छा है।" },
-      "remember": { "en": "Small meals are gentler on a body making room for two.", "hi": "छोटे खाने उस शरीर पर ज़्यादा नरम होते हैं जो दो के लिए जगह बना रहा है।" },
+      "title": { "en": "When heartburn comes", "hi": "जब सीने में जलन हो" },
+      "content": { "en": "Heartburn is common late in pregnancy as your baby pushes upward. Try smaller, more frequent meals, sip cool milk, and don't lie down right after eating. Gentle, soothing food is easier on a crowded belly now.", "hi": "गर्भावस्था के आख़िरी महीनों में सीने की जलन आम है, क्योंकि शिशु ऊपर की तरफ़ दबाता है। छोटे, बार-बार खाने लीजिए, ठंडा दूध चुस्कियों में पीजिए, और खाने के तुरंत बाद लेटने से बचिए। नरम, आराम देने वाला खाना अब भरे हुए पेट के लिए ज़्यादा अच्छा है।" },
+      "remember": { "en": "Small meals are gentler while the baby is taking up so much room.", "hi": "छोटे खाने उस शरीर पर ज़्यादा नरम होते हैं जो दो के लिए जगह बना रहा है।" },
       "durationMinutes": 0
     }
   },
@@ -84,10 +84,10 @@
     "week": 37,
     "babyLearning": { "en": "Your baby is practising blinking, sucking and turning the head.", "hi": "नाख़ून उँगलियों के सिरों तक पहुँचते हुए, नरम और पूरे" },
     "grow": {
-      "title": { "en": "Your Love Is Qualification Enough", "hi": "आपका प्यार ही काफ़ी योग्यता है" },
-      "insight": { "en": "No one hands out a licence to be a parent. The love already in your heart is the only qualification that matters.", "hi": "माँ बनने का कोई लाइसेंस नहीं बँटता। आपके दिल में पहले से मौजूद प्यार ही इकलौती योग्यता है जो मायने रखती है।" },
-      "expanded": { "en": "You may worry you lack the right knowledge, the right calm, the right kind of patience. But parenting was never a test you must pass to qualify. The deepest qualification is the one you already hold: a heart that cares this much. Skills will come with time, and you will learn them in the doing, as every parent does. What cannot be taught — the willingness to love this child through everything — is the very thing you brought with you from the start. That is enough to begin, and more than enough to continue.", "hi": "आपको लग सकता है कि आपके पास सही ज्ञान नहीं, सही शांति नहीं, सही तरह का सब्र नहीं। पर परवरिश कभी कोई इम्तिहान थी ही नहीं जिसे पास करके आपको योग्य बनना हो। सबसे गहरी योग्यता वही है जो आप पहले से रखती हैं: एक दिल जो इतना ख़याल करता है। हुनर वक़्त के साथ आएँगे, और आप उन्हें करते-करते सीखेंगी, जैसे हर माँ सीखती है। जो सिखाया नहीं जा सकता — इस बच्चे को हर हाल में प्यार करने की तैयारी — वही चीज़ आप शुरू से अपने साथ लाई हैं। शुरू करने के लिए यह काफ़ी है, और चलते रहने के लिए काफ़ी से भी ज़्यादा।" },
-      "deepDive": { "en": "Attachment researchers find that a caregiver's emotional availability — not their expertise — best predicts a securely bonded child. Love, reliably offered, is the foundation everything else rests on.", "hi": "जुड़ाव पर शोध करने वाले पाते हैं कि देखभाल करने वाले की भावनात्मक मौजूदगी — उसकी विशेषज्ञता नहीं — सबसे अच्छी तरह बताती है कि बच्चा सुरक्षित जुड़ाव में बढ़ेगा। भरोसे से दिया गया प्यार वह नींव है जिस पर बाक़ी सब टिका होता है।" },
+      "title": { "en": "Your love is what qualifies you", "hi": "आपका प्यार ही काफ़ी योग्यता है" },
+      "insight": { "en": "Nobody hands out a licence to be a parent. The love you already feel is the qualification that matters most.", "hi": "माँ बनने का कोई लाइसेंस नहीं बँटता। आपके दिल में पहले से मौजूद प्यार ही इकलौती योग्यता है जो मायने रखती है।" },
+      "expanded": { "en": "You may worry you don't have the right knowledge, the right calm or enough patience. But parenting isn't a test you have to pass first. The most important qualification is one you already have: you care this much. Skills come with time, and you'll learn them by doing, like every parent does. What can't be taught is the willingness to love this child through everything. You brought that with you from the start. It's enough to begin with, and enough to keep going.", "hi": "आपको लग सकता है कि आपके पास सही ज्ञान नहीं, सही शांति नहीं, सही तरह का सब्र नहीं। पर परवरिश कभी कोई इम्तिहान थी ही नहीं जिसे पास करके आपको योग्य बनना हो। सबसे गहरी योग्यता वही है जो आप पहले से रखती हैं: एक दिल जो इतना ख़याल करता है। हुनर वक़्त के साथ आएँगे, और आप उन्हें करते-करते सीखेंगी, जैसे हर माँ सीखती है। जो सिखाया नहीं जा सकता — इस बच्चे को हर हाल में प्यार करने की तैयारी — वही चीज़ आप शुरू से अपने साथ लाई हैं। शुरू करने के लिए यह काफ़ी है, और चलते रहने के लिए काफ़ी से भी ज़्यादा।" },
+      "deepDive": { "en": "Attachment research suggests that a caregiver's warmth and availability matter more to a secure bond than expert knowledge. Love, given reliably, is what everything else rests on.", "hi": "जुड़ाव पर शोध करने वाले पाते हैं कि देखभाल करने वाले की भावनात्मक मौजूदगी — उसकी विशेषज्ञता नहीं — सबसे अच्छी तरह बताती है कि बच्चा सुरक्षित जुड़ाव में बढ़ेगा। भरोसे से दिया गया प्यार वह नींव है जिस पर बाक़ी सब टिका होता है।" },
       "remember": { "en": "Loving this much already qualifies you.", "hi": "इतना प्यार करना ही आपको पहले से योग्य बना देता है।" }
     },
     "readToBaby": {
@@ -97,8 +97,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby that your love for them comes with no conditions, today and always.", "hi": "अपने शिशु को बताइए कि उसके लिए आपका प्यार बिना किसी शर्त के है, आज भी और हमेशा।" },
-      "motivation": { "en": "Love without conditions is the gift that lets a child grow up unafraid to be themselves.", "hi": "बिना शर्त का प्यार वह तोहफ़ा है जो एक बच्चे को ख़ुद होने से डरे बिना बड़ा होने देता है।" }
+      "title": { "en": "Tell your baby your love for them comes with no conditions, today and always.", "hi": "अपने शिशु को बताइए कि उसके लिए आपका प्यार बिना किसी शर्त के है, आज भी और हमेशा।" },
+      "motivation": { "en": "Love without conditions lets a child grow up unafraid to be themselves.", "hi": "बिना शर्त का प्यार वह तोहफ़ा है जो एक बच्चे को ख़ुद होने से डरे बिना बड़ा होने देता है।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -113,9 +113,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "My Love Is Already Enough", "hi": "मेरा प्यार पहले से ही काफ़ी है" },
-      "content": { "en": "I do not need to prove myself ready. The love I already carry is qualification enough for this child.", "hi": "मुझे ख़ुद को तैयार साबित करने की ज़रूरत नहीं। जो प्यार मैं पहले से रखती हूँ, वही इस बच्चे के लिए काफ़ी योग्यता है।" },
-      "remember": { "en": "Your love was always the only qualification that counted.", "hi": "आपका प्यार हमेशा से इकलौती योग्यता था, जो सच में गिनी जाती थी।" },
+      "title": { "en": "My love is already enough", "hi": "मेरा प्यार पहले से ही काफ़ी है" },
+      "content": { "en": "I don't need to prove I'm ready. The love I already feel is enough for this child.", "hi": "मुझे ख़ुद को तैयार साबित करने की ज़रूरत नहीं। जो प्यार मैं पहले से रखती हूँ, वही इस बच्चे के लिए काफ़ी योग्यता है।" },
+      "remember": { "en": "Your love is the qualification that counts.", "hi": "आपका प्यार हमेशा से इकलौती योग्यता था, जो सच में गिनी जाती थी।" },
       "durationMinutes": 0
     }
   },
@@ -124,11 +124,11 @@
     "week": 37,
     "babyLearning": { "en": "Your baby is gaining weight to store energy for after birth.", "hi": "आपकी आवाज़ की तरफ़ मुड़ते हुए, घर की आवाज़ सीखते हुए" },
     "grow": {
-      "title": { "en": "Doubt Does Not Mean Failure", "hi": "शक़ का मतलब नाकामी नहीं" },
-      "insight": { "en": "Feeling unsure is not a sign you will be a bad parent. It is often a sign of how deeply you already care.", "hi": "अनिश्चित महसूस करना इस बात की निशानी नहीं कि आप बुरी माँ बनेंगी। यह अक्सर इस बात की निशानी है कि आप पहले से कितनी गहराई से ख़याल करती हैं।" },
-      "expanded": { "en": "As your due date nears, doubt may visit more often — am I ready, will I know what to do, what if I get it wrong. It is easy to read these questions as proof of unfitness. But the parents who never doubt are rarely the most attentive ones. Your doubt is your love asking to do well. It is the careful part of you, keeping watch. You can welcome the question without believing the worst answer. Caring enough to wonder if you are enough is, quietly, one more sign that you are.", "hi": "जैसे-जैसे डिलीवरी की तारीख़ पास आती है, शक़ ज़्यादा बार आ सकता है — क्या मैं तैयार हूँ, क्या मुझे पता होगा कि क्या करना है, अगर मुझसे ग़लती हो गई तो। इन सवालों को अपनी नाकाबिलियत का सबूत मान लेना आसान है। पर जो माता-पिता कभी शक़ नहीं करते, वे शायद ही सबसे ज़्यादा ध्यान देने वाले होते हैं। आपका शक़ आपका प्यार ही है, जो अच्छा करना चाहता है। यह आपका सावधान हिस्सा है, पहरा देता हुआ। आप सवाल का स्वागत कर सकती हैं, बिना सबसे बुरे जवाब को मान लिए। इतना ख़याल करना कि आप सोचें, कहीं आप काफ़ी हैं या नहीं — यह, चुपचाप, एक और निशानी है कि आप हैं।" },
-      "deepDive": { "en": "Studies on new parents show that mild self-doubt often pairs with greater sensitivity to a baby's needs. The reflective parent who asks 'am I doing right?' tends to attune more closely, not less.", "hi": "नए माता-पिता पर हुए अध्ययन दिखाते हैं कि हल्का आत्म-शक़ अक्सर शिशु की ज़रूरतों के प्रति ज़्यादा संवेदनशीलता के साथ चलता है। जो माता-पिता सोचकर पूछते हैं 'क्या मैं ठीक कर रही हूँ?', वे ज़्यादा क़रीब से जुड़ते हैं, कम नहीं।" },
-      "remember": { "en": "Your doubt is your care, wearing a worried face.", "hi": "आपका शक़ आपका ख़याल ही है, एक चिंतित चेहरा पहने।" }
+      "title": { "en": "Doubt doesn't mean you'll fail", "hi": "शक़ का मतलब नाकामी नहीं" },
+      "insight": { "en": "Feeling unsure isn't a sign you'll be a bad parent. It often shows how much you already care.", "hi": "अनिश्चित महसूस करना इस बात की निशानी नहीं कि आप बुरी माँ बनेंगी। यह अक्सर इस बात की निशानी है कि आप पहले से कितनी गहराई से ख़याल करती हैं।" },
+      "expanded": { "en": "As your due date gets closer, doubt may show up more often. Am I ready? Will I know what to do? What if I get it wrong? It's easy to read these questions as proof you're not up to it. But parents who never doubt aren't usually the most attentive ones. Your doubt is your love wanting to do well. It's the careful part of you, keeping watch. You can listen to the question without believing the worst answer. Caring enough to wonder if you're enough is one more sign that you are.", "hi": "जैसे-जैसे डिलीवरी की तारीख़ पास आती है, शक़ ज़्यादा बार आ सकता है — क्या मैं तैयार हूँ, क्या मुझे पता होगा कि क्या करना है, अगर मुझसे ग़लती हो गई तो। इन सवालों को अपनी नाकाबिलियत का सबूत मान लेना आसान है। पर जो माता-पिता कभी शक़ नहीं करते, वे शायद ही सबसे ज़्यादा ध्यान देने वाले होते हैं। आपका शक़ आपका प्यार ही है, जो अच्छा करना चाहता है। यह आपका सावधान हिस्सा है, पहरा देता हुआ। आप सवाल का स्वागत कर सकती हैं, बिना सबसे बुरे जवाब को मान लिए। इतना ख़याल करना कि आप सोचें, कहीं आप काफ़ी हैं या नहीं — यह, चुपचाप, एक और निशानी है कि आप हैं।" },
+      "deepDive": { "en": "Worry about being a good parent is very common before a baby arrives. Parents who stop to ask 'am I doing this right?' are often the ones paying close attention to their baby.", "hi": "नए माता-पिता पर हुए अध्ययन दिखाते हैं कि हल्का आत्म-शक़ अक्सर शिशु की ज़रूरतों के प्रति ज़्यादा संवेदनशीलता के साथ चलता है। जो माता-पिता सोचकर पूछते हैं 'क्या मैं ठीक कर रही हूँ?', वे ज़्यादा क़रीब से जुड़ते हैं, कम नहीं।" },
+      "remember": { "en": "Your doubt is a sign of how much you care.", "hi": "आपका शक़ आपका ख़याल ही है, एक चिंतित चेहरा पहने।" }
     },
     "readToBaby": {
       "title": { "en": "The Little Quail's Truth", "hi": "नन्ही बटेर का सच" },
@@ -137,8 +137,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby how, again and again, you'll remind them that they matter.", "hi": "अपने शिशु को बताइए कि कैसे, बार-बार, आप उसे याद दिलाएँगी कि वह मायने रखता है।" },
-      "motivation": { "en": "A child who is told they matter, often and warmly, carries that knowing for a lifetime.", "hi": "जिस बच्चे को अक्सर और गर्मजोशी से बताया जाता है कि वह मायने रखता है, वह उस समझ को ज़िंदगी भर साथ रखता है।" }
+      "title": { "en": "Tell your baby you'll keep reminding them, again and again, that they matter.", "hi": "अपने शिशु को बताइए कि कैसे, बार-बार, आप उसे याद दिलाएँगी कि वह मायने रखता है।" },
+      "motivation": { "en": "A child who's told they matter, often and warmly, carries that for life.", "hi": "जिस बच्चे को अक्सर और गर्मजोशी से बताया जाता है कि वह मायने रखता है, वह उस समझ को ज़िंदगी भर साथ रखता है।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -153,9 +153,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Breathe Out The Worry", "hi": "चिंता को साँस के साथ बाहर छोड़िए" },
-      "content": { "en": "Breathe in for a count of four. As you breathe out for a count of six, silently let a single worry leave with the breath. Repeat for one quiet minute.", "hi": "चार तक गिनते हुए साँस लीजिए। छह तक गिनते हुए साँस छोड़ते वक़्त, मन ही मन एक चिंता को साँस के साथ जाने दीजिए। एक शांत मिनट तक दोहराइए।" },
-      "remember": { "en": "A longer breath out gently tells the worry it can go.", "hi": "एक लंबी बाहर की साँस चिंता को नरमी से बताती है कि वह जा सकती है।" },
+      "title": { "en": "Breathe out the worry", "hi": "चिंता को साँस के साथ बाहर छोड़िए" },
+      "content": { "en": "Breathe in for a count of four. As you breathe out for a count of six, let one worry leave with the breath. Repeat for one quiet minute.", "hi": "चार तक गिनते हुए साँस लीजिए। छह तक गिनते हुए साँस छोड़ते वक़्त, मन ही मन एक चिंता को साँस के साथ जाने दीजिए। एक शांत मिनट तक दोहराइए।" },
+      "remember": { "en": "A longer breath out can help a worry loosen its grip.", "hi": "एक लंबी बाहर की साँस चिंता को नरमी से बताती है कि वह जा सकती है।" },
       "durationMinutes": 1
     }
   },
@@ -164,11 +164,11 @@
     "week": 37,
     "babyLearning": { "en": "Your baby's cheeks have fat pads that help with sucking.", "hi": "अब नरम और भरे गालों वाला, दुनिया के लिए गर्माहट संजोता हुआ" },
     "grow": {
-      "title": { "en": "This Is What You're Here For", "hi": "आप इसी के लिए यहाँ हैं" },
-      "insight": { "en": "All the love you have been carrying was leading here. This — caring for one small person — is what you are here for.", "hi": "जो सारा प्यार आप थामे चल रही थीं, वह यहीं ला रहा था। यह — एक छोटे इंसान का ख़याल रखना — इसी के लिए आप यहाँ हैं।" },
-      "expanded": { "en": "There are seasons in life when we wonder what it is all for. As your baby's arrival nears, a quiet answer may begin to settle in. The patience you built, the tenderness you saved, the love that had nowhere to fully go — it was all preparing for this. You will not be perfect at it, and you do not need to be. But you are made for this kind of love in a way no qualification could grant. When you hold your baby, something deep in you will recognise: this is the work my heart was shaped to do.", "hi": "ज़िंदगी में ऐसे दौर आते हैं जब हम सोचते हैं कि यह सब आख़िर किसलिए है। जैसे-जैसे शिशु का आना पास आता है, एक शांत जवाब भीतर बैठने लगता है। जो सब्र आपने बनाया, जो कोमलता आपने संभालकर रखी, जिस प्यार के पास पूरी तरह जाने की जगह नहीं थी — वह सब इसी की तैयारी कर रहा था। आप इसमें परफ़ेक्ट नहीं होंगी, और आपको होने की ज़रूरत भी नहीं। पर आप इस तरह के प्यार के लिए बनी हैं, जिस तरह कोई योग्यता दे ही नहीं सकती। जब आप अपने शिशु को थामेंगी, आपके अंदर कुछ गहरा पहचान लेगा: यही वह काम है जिसके लिए मेरा दिल गढ़ा गया था।" },
-      "deepDive": { "en": "Researchers studying meaning in life find that caring for a child reliably ranks among the most profound sources of purpose people report. The sense that 'this is what I'm for' is real, and deeply human.", "hi": "ज़िंदगी के अर्थ पर शोध करने वाले पाते हैं कि एक बच्चे का ख़याल रखना उन सबसे गहरे मक़सदों में गिना जाता है जो लोग ख़ुद बताते हैं। यह एहसास कि 'मैं इसी के लिए हूँ' असली है, और गहराई से इंसानी है।" },
-      "remember": { "en": "Your heart was shaped for exactly this love.", "hi": "आपका दिल ठीक इसी प्यार के लिए गढ़ा गया था।" }
+      "title": { "en": "This is what your love was for", "hi": "आप इसी के लिए यहाँ हैं" },
+      "insight": { "en": "All the love you've been carrying was leading here, to caring for one small person.", "hi": "जो सारा प्यार आप थामे चल रही थीं, वह यहीं ला रहा था। यह — एक छोटे इंसान का ख़याल रखना — इसी के लिए आप यहाँ हैं।" },
+      "expanded": { "en": "There are times in life when we wonder what it's all for. As your baby's arrival gets closer, an answer may start to settle in. The patience you built, the tenderness you saved and the love that had nowhere to fully go were all getting you ready for this. You won't be perfect at it, and you don't need to be. But you're made for this kind of love in a way no qualification could give you. When you hold your baby, part of you will know this is the work your heart was shaped for.", "hi": "ज़िंदगी में ऐसे दौर आते हैं जब हम सोचते हैं कि यह सब आख़िर किसलिए है। जैसे-जैसे शिशु का आना पास आता है, एक शांत जवाब भीतर बैठने लगता है। जो सब्र आपने बनाया, जो कोमलता आपने संभालकर रखी, जिस प्यार के पास पूरी तरह जाने की जगह नहीं थी — वह सब इसी की तैयारी कर रहा था। आप इसमें परफ़ेक्ट नहीं होंगी, और आपको होने की ज़रूरत भी नहीं। पर आप इस तरह के प्यार के लिए बनी हैं, जिस तरह कोई योग्यता दे ही नहीं सकती। जब आप अपने शिशु को थामेंगी, आपके अंदर कुछ गहरा पहचान लेगा: यही वह काम है जिसके लिए मेरा दिल गढ़ा गया था।" },
+      "deepDive": { "en": "When researchers ask people what gives their life meaning, family and caring for children come up again and again. The feeling that 'this is what I'm for' is common and very human.", "hi": "ज़िंदगी के अर्थ पर शोध करने वाले पाते हैं कि एक बच्चे का ख़याल रखना उन सबसे गहरे मक़सदों में गिना जाता है जो लोग ख़ुद बताते हैं। यह एहसास कि 'मैं इसी के लिए हूँ' असली है, और गहराई से इंसानी है।" },
+      "remember": { "en": "Your heart was shaped for this love.", "hi": "आपका दिल ठीक इसी प्यार के लिए गढ़ा गया था।" }
     },
     "readToBaby": {
       "title": { "en": "Birbal And The Priceless Servant", "hi": "बीरबल और अनमोल सेवक" },
@@ -177,8 +177,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby that their worth has nothing to do with what they achieve.", "hi": "अपने शिशु को बताइए कि उसकी क़ीमत का उसकी उपलब्धियों से कोई लेना-देना नहीं।" },
-      "motivation": { "en": "A child whose worth feels safe and unearned grows free to try, to fail, and to be themselves.", "hi": "जिस बच्चे को अपनी क़ीमत सुरक्षित और बिना कमाए मिलती है, वह कोशिश करने, नाकाम होने और ख़ुद होने के लिए आज़ाद बढ़ता है।" }
+      "title": { "en": "Tell your baby their worth has nothing to do with what they achieve.", "hi": "अपने शिशु को बताइए कि उसकी क़ीमत का उसकी उपलब्धियों से कोई लेना-देना नहीं।" },
+      "motivation": { "en": "A child who knows they don't have to earn their worth feels free to try, to fail and to be themselves.", "hi": "जिस बच्चे को अपनी क़ीमत सुरक्षित और बिना कमाए मिलती है, वह कोशिश करने, नाकाम होने और ख़ुद होने के लिए आज़ाद बढ़ता है।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -193,8 +193,8 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "When Appetite Feels Smaller", "hi": "जब भूख कम लगे" },
-      "content": { "en": "As your baby fills more space, large meals can feel too heavy. Choose smaller, nourishing plates — a little dal, soft khichdi, fruit, a handful of nuts. Eating often and lightly keeps your energy steady without crowding a full belly.", "hi": "जैसे-जैसे शिशु ज़्यादा जगह भरता है, बड़े खाने भारी लग सकते हैं। छोटी, पोषण भरी थालियाँ चुनिए — थोड़ी दाल, नरम खिचड़ी, फल, मुट्ठी भर मेवे। बार-बार और हल्का खाना आपकी ताक़त थमी रखता है, भरे पेट को और भरे बिना।" },
+      "title": { "en": "When your appetite feels smaller", "hi": "जब भूख कम लगे" },
+      "content": { "en": "As your baby fills more space, big meals can feel too heavy. Choose smaller, nourishing plates like a little dal, soft khichdi, fruit or a handful of nuts. Eating lightly and often keeps your energy steady without crowding a full belly.", "hi": "जैसे-जैसे शिशु ज़्यादा जगह भरता है, बड़े खाने भारी लग सकते हैं। छोटी, पोषण भरी थालियाँ चुनिए — थोड़ी दाल, नरम खिचड़ी, फल, मुट्ठी भर मेवे। बार-बार और हल्का खाना आपकी ताक़त थमी रखता है, भरे पेट को और भरे बिना।" },
       "remember": { "en": "Little and often is plenty when space is short.", "hi": "थोड़ा और बार-बार काफ़ी है, जब जगह कम हो।" },
       "durationMinutes": 0
     }
@@ -204,11 +204,11 @@
     "week": 37,
     "babyLearning": { "en": "Your baby's hair and nails keep growing.", "hi": "गहराई से आराम करते हुए, आने वाले दिन के लिए सब्र सीखते हुए" },
     "grow": {
-      "title": { "en": "Trust What You Already Know", "hi": "जो आप पहले से जानती हैं, उस पर भरोसा कीजिए" },
-      "insight": { "en": "Beneath all the books and advice, you already carry a quiet wisdom about your own baby. Learn to trust it.", "hi": "सारी किताबों और सलाह के नीचे, आप पहले से ही अपने शिशु के बारे में एक शांत समझ रखती हैं। उस पर भरोसा करना सीखिए।" },
-      "expanded": { "en": "So much advice will come your way, some helpful and some not, and it is easy to feel that everyone knows your baby better than you do. But no one has been this close to this child but you. The instinct that makes you pause, soothe, or simply hold — that is real knowledge, growing in you already. Information from outside has its place, but it works best resting on the quiet trust within. You are allowed to listen to your own knowing. More often than you expect, it will be exactly right.", "hi": "बहुत सारी सलाह आपके पास आएगी, कुछ मददगार और कुछ नहीं, और यह महसूस होना आसान है कि हर कोई आपके शिशु को आपसे बेहतर जानता है। पर इस बच्चे के इतने क़रीब आपके सिवा कोई नहीं रहा। वह सहज समझ जो आपको रुकने, दिलासा देने, या बस थाम लेने पर ले आती है — वही असली ज्ञान है, जो आपमें पहले से बढ़ रहा है। बाहर की जानकारी की अपनी जगह है, पर वह तब सबसे अच्छा काम करती है जब वह अंदर के शांत भरोसे पर टिकी हो। आपको अपनी ख़ुद की समझ सुनने की पूरी इजाज़त है। आपकी उम्मीद से ज़्यादा बार, वह बिल्कुल सही होगी।" },
-      "deepDive": { "en": "Studies show mothers can recognise their own baby's cry within days of birth, and respond to subtle cues others miss. Your body and mind are already learning your child in ways no manual can teach.", "hi": "अध्ययन दिखाते हैं कि माएँ जन्म के कुछ ही दिनों में अपने शिशु का रोना पहचान लेती हैं, और उन बारीक इशारों पर जवाब देती हैं जो दूसरे चूक जाते हैं। आपका शरीर और मन पहले से ही आपके बच्चे को उन तरीक़ों से सीख रहे हैं जो कोई किताब नहीं सिखा सकती।" },
-      "remember": { "en": "Your own quiet knowing is wiser than you think.", "hi": "आपकी अपनी शांत समझ आपकी सोच से ज़्यादा समझदार है।" }
+      "title": { "en": "Trust what you already know", "hi": "जो आप पहले से जानती हैं, उस पर भरोसा कीजिए" },
+      "insight": { "en": "Under all the books and advice, you already have a sense for your own baby. Learn to trust it.", "hi": "सारी किताबों और सलाह के नीचे, आप पहले से ही अपने शिशु के बारे में एक शांत समझ रखती हैं। उस पर भरोसा करना सीखिए।" },
+      "expanded": { "en": "Lots of advice will come your way, some helpful and some not, and it's easy to feel everyone knows your baby better than you do. But you're the one who'll be closest to this child. The instinct that makes you pause, soothe or just hold them is real knowledge, and it's already growing in you. Advice from outside has its place. It works best when it rests on trust in yourself. You're allowed to listen to your own sense of things. More often than you expect, it'll be right.", "hi": "बहुत सारी सलाह आपके पास आएगी, कुछ मददगार और कुछ नहीं, और यह महसूस होना आसान है कि हर कोई आपके शिशु को आपसे बेहतर जानता है। पर इस बच्चे के इतने क़रीब आपके सिवा कोई नहीं रहा। वह सहज समझ जो आपको रुकने, दिलासा देने, या बस थाम लेने पर ले आती है — वही असली ज्ञान है, जो आपमें पहले से बढ़ रहा है। बाहर की जानकारी की अपनी जगह है, पर वह तब सबसे अच्छा काम करती है जब वह अंदर के शांत भरोसे पर टिकी हो। आपको अपनी ख़ुद की समझ सुनने की पूरी इजाज़त है। आपकी उम्मीद से ज़्यादा बार, वह बिल्कुल सही होगी।" },
+      "deepDive": { "en": "Studies suggest parents can often pick out their own baby's cry within days of birth. You'll learn your child's signals by being with them, in ways no manual can teach.", "hi": "अध्ययन दिखाते हैं कि माएँ जन्म के कुछ ही दिनों में अपने शिशु का रोना पहचान लेती हैं, और उन बारीक इशारों पर जवाब देती हैं जो दूसरे चूक जाते हैं। आपका शरीर और मन पहले से ही आपके बच्चे को उन तरीक़ों से सीख रहे हैं जो कोई किताब नहीं सिखा सकती।" },
+      "remember": { "en": "Your own sense of your baby is wiser than you think.", "hi": "आपकी अपनी शांत समझ आपकी सोच से ज़्यादा समझदार है।" }
     },
     "readToBaby": {
       "title": { "en": "The Woman Who Had Enough", "hi": "वह औरत जिसके पास काफ़ी था" },
@@ -217,8 +217,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby that simply being themselves will always be plenty.", "hi": "अपने शिशु को बताइए कि बस ख़ुद होना हमेशा बहुत होगा।" },
-      "motivation": { "en": "When a child knows that being themselves is enough, they never have to perform to feel loved.", "hi": "जब एक बच्चा जानता है कि ख़ुद होना ही काफ़ी है, तो उसे प्यार पाने के लिए कभी दिखावा नहीं करना पड़ता।" }
+      "title": { "en": "Tell your baby that being themselves will always be plenty.", "hi": "अपने शिशु को बताइए कि बस ख़ुद होना हमेशा बहुत होगा।" },
+      "motivation": { "en": "When a child knows being themselves is enough, they don't have to perform to feel loved.", "hi": "जब एक बच्चा जानता है कि ख़ुद होना ही काफ़ी है, तो उसे प्यार पाने के लिए कभी दिखावा नहीं करना पड़ता।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -233,9 +233,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "I Trust My Own Knowing", "hi": "मैं अपनी ख़ुद की समझ पर भरोसा करती हूँ" },
-      "content": { "en": "I will listen to the quiet wisdom inside me. I know my baby in a way no one else can.", "hi": "मैं अपने अंदर की शांत समझ को सुनूँगी। मैं अपने शिशु को उस तरह जानती हूँ, जैसे कोई और नहीं जान सकता।" },
-      "remember": { "en": "Your own knowing deserves a place at the table.", "hi": "आपकी अपनी समझ भी सुने जाने की पूरी हक़दार है।" },
+      "title": { "en": "I trust my own sense of my baby", "hi": "मैं अपनी ख़ुद की समझ पर भरोसा करती हूँ" },
+      "content": { "en": "I'll listen to the wisdom inside me. I know my baby in a way no one else can.", "hi": "मैं अपने अंदर की शांत समझ को सुनूँगी। मैं अपने शिशु को उस तरह जानती हूँ, जैसे कोई और नहीं जान सकता।" },
+      "remember": { "en": "What you know about your baby deserves to be heard.", "hi": "आपकी अपनी समझ भी सुने जाने की पूरी हक़दार है।" },
       "durationMinutes": 0
     }
   },
@@ -244,11 +244,11 @@
     "week": 37,
     "babyLearning": { "en": "Your baby's skin has lost most of its wrinkles.", "hi": "पूरी तरह बना और इंतज़ार करता हुआ, बिल्कुल जैसा है वैसे ही काफ़ी" },
     "grow": {
-      "title": { "en": "Enough Is A Beautiful Word", "hi": "'काफ़ी' एक सुंदर शब्द है" },
-      "insight": { "en": "We are taught to chase 'more,' but 'enough' may be the kindest word of all — for your baby, and for you.", "hi": "हमें 'ज़्यादा' का पीछा करना सिखाया जाता है, पर 'काफ़ी' शायद सबसे नरम शब्द है — आपके शिशु के लिए, और आपके लिए भी।" },
-      "expanded": { "en": "The world keeps whispering that we should be more — do more, achieve more, become more. But somewhere in these final weeks, a softer truth waits to be heard: enough is not a settling, it is a homecoming. Your love is enough. Your effort is enough. The ordinary, imperfect care you will give, day after day, is enough. And one day you will pass this same gift to your child — letting them know that they, too, are enough exactly as they are. There is deep rest in that small, beautiful word.", "hi": "दुनिया बार-बार फुसफुसाती है कि हमें और होना चाहिए — और करना, और हासिल करना, और बनना। पर इन आख़िरी हफ़्तों में कहीं, एक नरम सच सुने जाने का इंतज़ार करता है: काफ़ी होना कोई समझौता नहीं, यह घर लौटना है। आपका प्यार काफ़ी है। आपकी मेहनत काफ़ी है। वह आम, अधूरी देखभाल जो आप दिन-ब-दिन देंगी, काफ़ी है। और एक दिन आप यही तोहफ़ा अपने बच्चे को देंगी — उसे यह बताते हुए कि वह भी, बिल्कुल जैसा है वैसे ही, काफ़ी है। उस छोटे, सुंदर शब्द में एक गहरा आराम है।" },
-      "deepDive": { "en": "Psychologists note that 'enough-ness' — the felt sense of being adequate without constant striving — is strongly linked to lower anxiety and warmer relationships. Naming it can quietly loosen the grip of perfectionism.", "hi": "मनोवैज्ञानिक कहते हैं कि 'काफ़ी होने' का एहसास — लगातार दौड़े बिना पर्याप्त लगना — कम घबराहट और ज़्यादा गर्मजोशी भरे रिश्तों से गहराई से जुड़ा है। इसे नाम दे देना ही परफ़ेक्शन की पकड़ को चुपचाप ढीला कर सकता है।" },
-      "remember": { "en": "Enough is not less — it is a quiet kind of fullness.", "hi": "काफ़ी होना कम होना नहीं है — यह एक शांत तरह का भरापन है।" }
+      "title": { "en": "Enough is a kind word", "hi": "'काफ़ी' एक सुंदर शब्द है" },
+      "insight": { "en": "We're taught to chase more. But enough may be the kindest word of all, for your baby and for you.", "hi": "हमें 'ज़्यादा' का पीछा करना सिखाया जाता है, पर 'काफ़ी' शायद सबसे नरम शब्द है — आपके शिशु के लिए, और आपके लिए भी।" },
+      "expanded": { "en": "The world keeps telling us to be more: do more, achieve more, become more. In these last weeks, there's a softer truth worth hearing. Enough can be a place to rest. Your love is enough. Your effort is enough. The ordinary, imperfect care you'll give, day after day, is enough. One day you'll pass this on to your child, letting them know that they're enough as they are too. There's deep rest in that small word.", "hi": "दुनिया बार-बार फुसफुसाती है कि हमें और होना चाहिए — और करना, और हासिल करना, और बनना। पर इन आख़िरी हफ़्तों में कहीं, एक नरम सच सुने जाने का इंतज़ार करता है: काफ़ी होना कोई समझौता नहीं, यह घर लौटना है। आपका प्यार काफ़ी है। आपकी मेहनत काफ़ी है। वह आम, अधूरी देखभाल जो आप दिन-ब-दिन देंगी, काफ़ी है। और एक दिन आप यही तोहफ़ा अपने बच्चे को देंगी — उसे यह बताते हुए कि वह भी, बिल्कुल जैसा है वैसे ही, काफ़ी है। उस छोटे, सुंदर शब्द में एक गहरा आराम है।" },
+      "deepDive": { "en": "Psychologists who study perfectionism link constant striving with more anxiety. Feeling that you're good enough, without always pushing for more, can ease that pressure.", "hi": "मनोवैज्ञानिक कहते हैं कि 'काफ़ी होने' का एहसास — लगातार दौड़े बिना पर्याप्त लगना — कम घबराहट और ज़्यादा गर्मजोशी भरे रिश्तों से गहराई से जुड़ा है। इसे नाम दे देना ही परफ़ेक्शन की पकड़ को चुपचाप ढीला कर सकता है।" },
+      "remember": { "en": "Having enough can feel full and restful.", "hi": "काफ़ी होना कम होना नहीं है — यह एक शांत तरह का भरापन है।" }
     },
     "readToBaby": {
       "title": { "en": "The Little Stream That Reached The Sea", "hi": "वह नन्ही धारा जो समंदर तक पहुँची" },
@@ -257,8 +257,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby, softly, that they are enough — just exactly as they are.", "hi": "अपने शिशु को, नरमी से, बताइए कि वह काफ़ी है — बिल्कुल जैसा है वैसे ही।" },
-      "motivation": { "en": "These may be the truest words a child can carry: you are enough, just as you are.", "hi": "ये शायद सबसे सच्चे शब्द हैं जो एक बच्चा साथ रख सकता है: तुम काफ़ी हो, बिल्कुल जैसे तुम हो।" }
+      "title": { "en": "Tell your baby, softly, that they're enough just as they are.", "hi": "अपने शिशु को, नरमी से, बताइए कि वह काफ़ी है — बिल्कुल जैसा है वैसे ही।" },
+      "motivation": { "en": "Being told they're enough as they are is something a child can carry all their life.", "hi": "ये शायद सबसे सच्चे शब्द हैं जो एक बच्चा साथ रख सकता है: तुम काफ़ी हो, बिल्कुल जैसे तुम हो।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -273,9 +273,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "One Full, Settling Breath", "hi": "एक पूरी, थमा देने वाली साँस" },
-      "content": { "en": "Breathe in slowly and deeply until your lungs feel full, pause for a gentle moment, then release it all in one long, soft sigh. Just three of these can bring you home to now.", "hi": "धीरे और गहरी साँस लीजिए, जब तक फेफड़े भरे न लगें, एक नरम पल के लिए रुकिए, फिर उसे एक लंबी, नरम आह में पूरा छोड़ दीजिए। ऐसी सिर्फ़ तीन साँसें आपको वापस अभी में ले आती हैं।" },
-      "remember": { "en": "One full breath is always enough to begin again.", "hi": "एक पूरी साँस फिर से शुरू करने के लिए हमेशा काफ़ी है।" },
+      "title": { "en": "One full, settling breath", "hi": "एक पूरी, थमा देने वाली साँस" },
+      "content": { "en": "Breathe in slowly and deeply until your lungs feel full. Pause for a gentle moment, then let it all go in one long, soft sigh. Three of these can bring you back to the present.", "hi": "धीरे और गहरी साँस लीजिए, जब तक फेफड़े भरे न लगें, एक नरम पल के लिए रुकिए, फिर उसे एक लंबी, नरम आह में पूरा छोड़ दीजिए। ऐसी सिर्फ़ तीन साँसें आपको वापस अभी में ले आती हैं।" },
+      "remember": { "en": "One full breath is always enough to start again.", "hi": "एक पूरी साँस फिर से शुरू करने के लिए हमेशा काफ़ी है।" },
       "durationMinutes": 1
     }
   }

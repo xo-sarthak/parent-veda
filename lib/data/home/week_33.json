@@ -4,10 +4,10 @@
     "week": 33,
     "babyLearning": { "en": "Your baby is getting antibodies from you to help protect them after birth.", "hi": "और गोल, और नरम होना — पेट में थोड़ा नीचे बसना" },
     "grow": {
-      "title": { "en": "Patience Is A Daily Practice", "hi": "सब्र रोज़ का अभ्यास है" },
-      "insight": { "en": "Patience is not a trait you are born with or without. It is a small practice you return to, day after day.", "hi": "सब्र कोई ऐसी चीज़ नहीं जो लेकर पैदा हुआ जाता हो। यह एक छोटा सा अभ्यास है, जिस पर आप दिन-ब-दिन लौटती हैं।" },
-      "expanded": { "en": "We often imagine patient people simply have it easy — calm by nature, never tested. But patience is built, not given. It is the slow choice to wait one more breath before reacting, to soften when you would rather rush. In these final weeks, life keeps asking you to wait: for appointments, for sleep, for your baby's arrival. Each small wait is quiet training. You are not behind for finding it hard; you are practising the very steadiness your child will one day lean against. Patience grows the way muscles do — through gentle, repeated use.", "hi": "हम अक्सर सोचते हैं कि सब्र वाले लोगों को यह आसानी से मिल जाता है — स्वभाव से शांत, कभी परखे ही नहीं गए। पर सब्र बनाया जाता है, दिया नहीं जाता। यह एक धीमा चुनाव है — पलटकर जवाब देने से पहले एक साँस और रुक जाना, जहाँ जल्दी करने का मन हो वहाँ नरम पड़ जाना। इन आख़िरी हफ़्तों में ज़िंदगी बार-बार आपसे इंतज़ार माँगती है: अपॉइंटमेंट का, नींद का, शिशु के आने का। हर छोटा इंतज़ार एक चुपचाप की तैयारी है। यह मुश्किल लगे तो आप पीछे नहीं हैं; आप वही ठहराव सीख रही हैं जिसका सहारा आपका शिशु एक दिन लेगा। सब्र वैसे ही बढ़ता है जैसे मांसपेशियाँ — नरम, बार-बार के इस्तेमाल से।" },
-      "deepDive": { "en": "Psychologists find patience is less a fixed personality and more a skill that strengthens with practice, especially when we pause and name what we feel. Each small wait you handle calmly rewires you toward calm.", "hi": "मनोवैज्ञानिक पाते हैं कि सब्र कोई तय स्वभाव कम और अभ्यास से मज़बूत होने वाला हुनर ज़्यादा है — ख़ासकर तब, जब हम रुककर अपने मन की बात को नाम देते हैं। हर छोटा इंतज़ार जो आप शांति से सँभालती हैं, आपको शांति की ओर थोड़ा और ढाल देता है।" },
+      "title": { "en": "Patience grows with practice", "hi": "सब्र रोज़ का अभ्यास है" },
+      "insight": { "en": "Nobody is born patient. Patience is a small practice you come back to, day after day.", "hi": "सब्र कोई ऐसी चीज़ नहीं जो लेकर पैदा हुआ जाता हो। यह एक छोटा सा अभ्यास है, जिस पर आप दिन-ब-दिन लौटती हैं।" },
+      "expanded": { "en": "We often think patient people have it easy, calm by nature and never tested. But patience is built. It's the choice to wait one more breath before reacting, and to soften when you'd rather rush. In these last weeks, life keeps asking you to wait: for appointments, for sleep, for your baby to arrive. Each small wait is practice. You're not behind for finding it hard. You're practising the steadiness your child will lean on one day. Patience grows the way muscles do, through gentle, repeated use.", "hi": "हम अक्सर सोचते हैं कि सब्र वाले लोगों को यह आसानी से मिल जाता है — स्वभाव से शांत, कभी परखे ही नहीं गए। पर सब्र बनाया जाता है, दिया नहीं जाता। यह एक धीमा चुनाव है — पलटकर जवाब देने से पहले एक साँस और रुक जाना, जहाँ जल्दी करने का मन हो वहाँ नरम पड़ जाना। इन आख़िरी हफ़्तों में ज़िंदगी बार-बार आपसे इंतज़ार माँगती है: अपॉइंटमेंट का, नींद का, शिशु के आने का। हर छोटा इंतज़ार एक चुपचाप की तैयारी है। यह मुश्किल लगे तो आप पीछे नहीं हैं; आप वही ठहराव सीख रही हैं जिसका सहारा आपका शिशु एक दिन लेगा। सब्र वैसे ही बढ़ता है जैसे मांसपेशियाँ — नरम, बार-बार के इस्तेमाल से।" },
+      "deepDive": { "en": "Psychologists see patience as something that can grow with practice, not only a fixed trait. Pausing to name what you're feeling is one way people learn to respond more calmly.", "hi": "मनोवैज्ञानिक पाते हैं कि सब्र कोई तय स्वभाव कम और अभ्यास से मज़बूत होने वाला हुनर ज़्यादा है — ख़ासकर तब, जब हम रुककर अपने मन की बात को नाम देते हैं। हर छोटा इंतज़ार जो आप शांति से सँभालती हैं, आपको शांति की ओर थोड़ा और ढाल देता है।" },
       "remember": { "en": "Patience is built one small wait at a time.", "hi": "सब्र एक-एक छोटे इंतज़ार से बनता है।" }
     },
     "readToBaby": {
@@ -17,8 +17,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about the patience you are learning right now, so that you can carry it gently to them.", "hi": "अपने शिशु को उस सब्र के बारे में बताइए जो आप अभी सीख रही हैं, ताकि आप उसे नरमी से उन तक पहुँचा सकें।" },
-      "motivation": { "en": "The calm you practise today becomes the calm your child will feel in your arms.", "hi": "आज आप जो शांति अभ्यास करती हैं, वही शांति आपकी बाँहों में महसूस की जाएगी।" }
+      "title": { "en": "Tell your baby about the patience you're learning right now, so you can bring it to them.", "hi": "अपने शिशु को उस सब्र के बारे में बताइए जो आप अभी सीख रही हैं, ताकि आप उसे नरमी से उन तक पहुँचा सकें।" },
+      "motivation": { "en": "The calm you practise today is the calm your child will feel in your arms.", "hi": "आज आप जो शांति अभ्यास करती हैं, वही शांति आपकी बाँहों में महसूस की जाएगी।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -33,9 +33,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "The Slow Count", "hi": "धीमी गिनती" },
-      "content": { "en": "Breathe in for a count of four, then breathe out for a count of six, letting the out-breath be longer and softer. Repeat for one slow minute and feel your body settle.", "hi": "चार तक गिनते हुए साँस अंदर लीजिए, फिर छह तक गिनते हुए साँस बाहर छोड़िए — बाहर वाली साँस को लंबा और नरम रखते हुए। एक धीमे मिनट तक दोहराइए और अपने शरीर को ठहरता हुआ महसूस कीजिए।" },
-      "remember": { "en": "A longer out-breath is a quiet signal of safety to your body.", "hi": "लंबी साँस बाहर छोड़ना आपके शरीर के लिए सुरक्षित होने का एक चुपचाप इशारा है।" },
+      "title": { "en": "The slow count", "hi": "धीमी गिनती" },
+      "content": { "en": "Breathe in for a count of four, then breathe out for a count of six. Let the out-breath be longer and softer. Repeat for one slow minute and feel your body settle.", "hi": "चार तक गिनते हुए साँस अंदर लीजिए, फिर छह तक गिनते हुए साँस बाहर छोड़िए — बाहर वाली साँस को लंबा और नरम रखते हुए। एक धीमे मिनट तक दोहराइए और अपने शरीर को ठहरता हुआ महसूस कीजिए।" },
+      "remember": { "en": "A longer out-breath tells you it's safe to settle.", "hi": "लंबी साँस बाहर छोड़ना आपके शरीर के लिए सुरक्षित होने का एक चुपचाप इशारा है।" },
       "durationMinutes": 1
     }
   },
@@ -44,11 +44,11 @@
     "week": 33,
     "babyLearning": { "en": "Your baby's arm and leg bones are hardening.", "hi": "नन्ही साँसों का अभ्यास, दुनिया के लिए तैयारी" },
     "grow": {
-      "title": { "en": "The Slow Yes", "hi": "धीमी हाँ" },
-      "insight": { "en": "A quick yes can come from pressure. A slow yes comes from your own heart — and it is far kinder.", "hi": "जल्दी वाली हाँ दबाव से आ सकती है। धीमी हाँ आपके अपने दिल से आती है — और वह कहीं ज़्यादा नरम होती है।" },
-      "expanded": { "en": "When others want answers from us — visitors, advice-givers, even our own racing thoughts — we often rush to say yes just to ease the moment. But a hurried yes can quietly cost us our peace. Learning to take a breath before answering is a gentle act of patience with yourself. 'Let me think about that' is a complete sentence. In these tender weeks, you are allowed to slow your yeses, to feel into what truly fits. The slow yes protects your calm — and a calm mother is exactly what your baby is waiting for.", "hi": "जब दूसरे हमसे जवाब चाहते हैं — मिलने आने वाले, सलाह देने वाले, यहाँ तक कि हमारे अपने भागते विचार — तो हम अक्सर बस पल को आसान करने के लिए जल्दी से हाँ कह देते हैं। पर जल्दबाज़ी की हाँ चुपचाप हमारी शांति की क़ीमत ले लेती है। जवाब देने से पहले एक साँस लेना सीखना ख़ुद के साथ सब्र रखने का एक नरम तरीक़ा है। 'मुझे इस पर सोचने दीजिए' अपने आप में पूरा जवाब है। इन नाज़ुक हफ़्तों में आपको अपनी हाँ धीमी करने की इजाज़त है, यह महसूस करने की कि सच में क्या ठीक बैठता है। धीमी हाँ आपकी शांति बचाती है — और एक शांत माँ ही तो है जिसका आपका शिशु इंतज़ार कर रहा है।" },
-      "deepDive": { "en": "Researchers note that pausing before committing reduces later resentment and decision-fatigue. A few seconds of reflection helps you answer from your values rather than from pressure.", "hi": "शोध बताते हैं कि हामी भरने से पहले रुक जाना बाद की नाराज़गी और बार-बार फ़ैसले लेने की थकान, दोनों कम करता है। कुछ सेकंड का सोचना आपको दबाव से नहीं, अपने मन की बात से जवाब देने में मदद करता है।" },
-      "remember": { "en": "You are allowed to take a breath before you answer.", "hi": "जवाब देने से पहले एक साँस लेने की इजाज़त आपको है।" }
+      "title": { "en": "Take your time before you say yes", "hi": "धीमी हाँ" },
+      "insight": { "en": "A quick yes can come from pressure. A slow yes comes from what you want, and it's kinder to you.", "hi": "जल्दी वाली हाँ दबाव से आ सकती है। धीमी हाँ आपके अपने दिल से आती है — और वह कहीं ज़्यादा नरम होती है।" },
+      "expanded": { "en": "When people want answers from us, whether visitors, relatives with advice or our own racing thoughts, we often say yes just to end the moment. But a hurried yes can cost us our peace. Taking a breath before you answer is a way of being patient with yourself. 'Let me think about that' is a full answer. In these weeks, you're allowed to slow down your yeses and feel out what fits. A slower yes protects your calm, and a calm parent is what your baby needs.", "hi": "जब दूसरे हमसे जवाब चाहते हैं — मिलने आने वाले, सलाह देने वाले, यहाँ तक कि हमारे अपने भागते विचार — तो हम अक्सर बस पल को आसान करने के लिए जल्दी से हाँ कह देते हैं। पर जल्दबाज़ी की हाँ चुपचाप हमारी शांति की क़ीमत ले लेती है। जवाब देने से पहले एक साँस लेना सीखना ख़ुद के साथ सब्र रखने का एक नरम तरीक़ा है। 'मुझे इस पर सोचने दीजिए' अपने आप में पूरा जवाब है। इन नाज़ुक हफ़्तों में आपको अपनी हाँ धीमी करने की इजाज़त है, यह महसूस करने की कि सच में क्या ठीक बैठता है। धीमी हाँ आपकी शांति बचाती है — और एक शांत माँ ही तो है जिसका आपका शिशु इंतज़ार कर रहा है।" },
+      "deepDive": { "en": "Pausing before you agree to something gives you time to check it against what matters to you. It can save you from saying yes to things you later regret.", "hi": "शोध बताते हैं कि हामी भरने से पहले रुक जाना बाद की नाराज़गी और बार-बार फ़ैसले लेने की थकान, दोनों कम करता है। कुछ सेकंड का सोचना आपको दबाव से नहीं, अपने मन की बात से जवाब देने में मदद करता है।" },
+      "remember": { "en": "You're allowed to take a breath before you answer.", "hi": "जवाब देने से पहले एक साँस लेने की इजाज़त आपको है।" }
     },
     "readToBaby": {
       "title": { "en": "The Heron Who Could Not Wait", "hi": "वह बगुला जो इंतज़ार न कर सका" },
@@ -57,8 +57,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby that you will never rush them, that they can take all the time they need to come and to grow.", "hi": "अपने शिशु से कहिए कि आप उन्हें कभी जल्दी नहीं मचाएँगी — आने में भी, बढ़ने में भी, जितना समय चाहिए उतना वे ले सकते हैं।" },
-      "motivation": { "en": "Telling them now teaches your own heart to wait without worry.", "hi": "अभी यह कह देना आपके अपने दिल को बिना चिंता के इंतज़ार करना सिखाता है।" }
+      "title": { "en": "Tell your baby you'll never rush them, and that they can take all the time they need to grow and to arrive.", "hi": "अपने शिशु से कहिए कि आप उन्हें कभी जल्दी नहीं मचाएँगी — आने में भी, बढ़ने में भी, जितना समय चाहिए उतना वे ले सकते हैं।" },
+      "motivation": { "en": "Saying it out loud now helps your own heart wait without worry.", "hi": "अभी यह कह देना आपके अपने दिल को बिना चिंता के इंतज़ार करना सिखाता है।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -73,9 +73,9 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "When Heartburn Keeps You Up", "hi": "जब सीने की जलन सोने न दे" },
-      "content": { "en": "If a burning feeling rises after meals these days, try eating smaller portions more often, and avoid lying down for an hour after you eat. A glass of cool milk or a few soaked almonds can soothe the burn gently.", "hi": "अगर इन दिनों खाने के बाद सीने में जलन उठती है, तो थोड़ा-थोड़ा और ज़्यादा बार खाने की कोशिश कीजिए, और खाने के बाद एक घंटे तक लेटने से बचिए। एक गिलास ठंडा दूध या कुछ भीगे बादाम इस जलन को नरमी से शांत कर सकते हैं।" },
-      "remember": { "en": "Smaller, slower meals are kinder to your body now.", "hi": "छोटे, धीरे खाए गए भोजन अभी आपके शरीर के लिए ज़्यादा नरम हैं।" },
+      "title": { "en": "When heartburn keeps you up", "hi": "जब सीने की जलन सोने न दे" },
+      "content": { "en": "If a burning feeling rises after meals, try smaller portions more often. Stay upright for an hour after you eat instead of lying down. A glass of cool milk or a few soaked almonds can ease the burn.", "hi": "अगर इन दिनों खाने के बाद सीने में जलन उठती है, तो थोड़ा-थोड़ा और ज़्यादा बार खाने की कोशिश कीजिए, और खाने के बाद एक घंटे तक लेटने से बचिए। एक गिलास ठंडा दूध या कुछ भीगे बादाम इस जलन को नरमी से शांत कर सकते हैं।" },
+      "remember": { "en": "Smaller, slower meals are gentler on heartburn.", "hi": "छोटे, धीरे खाए गए भोजन अभी आपके शरीर के लिए ज़्यादा नरम हैं।" },
       "durationMinutes": 0
     }
   },
@@ -84,10 +84,10 @@
     "week": 33,
     "babyLearning": { "en": "Your baby's nervous system is maturing quickly.", "hi": "हड्डियों का मज़बूत होना, लातों का और तेज़ लगना" },
     "grow": {
-      "title": { "en": "Rushing Teaches Rushing", "hi": "जल्दबाज़ी जल्दबाज़ी सिखाती है" },
-      "insight": { "en": "Children learn pace from us. A rushed home raises a rushed child; a calm one offers a different gift.", "hi": "बच्चे रफ़्तार हमसे सीखते हैं। जल्दबाज़ी वाला घर जल्दबाज़ी वाले बच्चे पालता है; शांत घर एक अलग ही तोहफ़ा देता है।" },
-      "expanded": { "en": "Long before a child understands hurry, they absorb its feeling — the clipped voice, the tight shoulders, the sense that there is never quite enough time. Just as easily, they absorb calm: a parent who moves slowly, speaks gently, and treats moments as roomy rather than rushed. You are setting the pace your child will one day call normal. In these last weeks, practising an unhurried rhythm is not only kinder to you; it is the first tempo your baby will learn to live by. Slow is something you can teach simply by being it.", "hi": "बच्चे जल्दबाज़ी को समझें, उससे बहुत पहले उसका एहसास सोख लेते हैं — कटी हुई आवाज़, कसे हुए कंधे, यह भाव कि समय कभी पूरा पड़ता ही नहीं। उतनी ही आसानी से वे शांति भी सोख लेते हैं: ऐसे माँ-बाप जो धीरे चलते हैं, नरमी से बोलते हैं, और पलों को भरा हुआ नहीं, खुला हुआ मानते हैं। आप वही रफ़्तार तय कर रही हैं जिसे आपका शिशु एक दिन आम कहेगा। इन आख़िरी हफ़्तों में बिना जल्दबाज़ी की लय का अभ्यास सिर्फ़ आपके लिए नरम नहीं है; यह वह पहली ताल है जिस पर जीना आपके शिशु को सीखना है। धीरे होना आप बस धीरे होकर ही सिखा सकती हैं।" },
-      "deepDive": { "en": "Child development research shows children mirror a caregiver's tempo and stress level long before they understand words. A calm, unhurried pace literally helps shape their developing nervous system.", "hi": "बाल-विकास पर हुए शोध बताते हैं कि बच्चे शब्द समझने से बहुत पहले अपने पालने वाले की रफ़्तार और तनाव की नक़ल कर लेते हैं। एक शांत, बिना जल्दबाज़ी की रफ़्तार सच में उनके बनते नर्वस सिस्टम को गढ़ने में मदद करती है।" },
+      "title": { "en": "Children pick up your pace", "hi": "जल्दबाज़ी जल्दबाज़ी सिखाती है" },
+      "insight": { "en": "Children learn their pace from us. A rushed home tends to raise a rushed child, and a calm home teaches calm.", "hi": "बच्चे रफ़्तार हमसे सीखते हैं। जल्दबाज़ी वाला घर जल्दबाज़ी वाले बच्चे पालता है; शांत घर एक अलग ही तोहफ़ा देता है।" },
+      "expanded": { "en": "Long before a child understands hurry, they pick up how it feels: the sharp voice, the tight shoulders, the sense that there's never enough time. They pick up calm just as easily. A parent who moves slowly, speaks gently and lets moments feel roomy teaches that too. You're setting the pace your child will one day think of as normal. Keeping an unhurried rhythm in these last weeks is kinder to you, and it's also the first pace your baby will learn. You can teach a slower pace by living it.", "hi": "बच्चे जल्दबाज़ी को समझें, उससे बहुत पहले उसका एहसास सोख लेते हैं — कटी हुई आवाज़, कसे हुए कंधे, यह भाव कि समय कभी पूरा पड़ता ही नहीं। उतनी ही आसानी से वे शांति भी सोख लेते हैं: ऐसे माँ-बाप जो धीरे चलते हैं, नरमी से बोलते हैं, और पलों को भरा हुआ नहीं, खुला हुआ मानते हैं। आप वही रफ़्तार तय कर रही हैं जिसे आपका शिशु एक दिन आम कहेगा। इन आख़िरी हफ़्तों में बिना जल्दबाज़ी की लय का अभ्यास सिर्फ़ आपके लिए नरम नहीं है; यह वह पहली ताल है जिस पर जीना आपके शिशु को सीखना है। धीरे होना आप बस धीरे होकर ही सिखा सकती हैं।" },
+      "deepDive": { "en": "Research suggests babies and young children pick up on a caregiver's stress and pace long before they understand words. A calm, unhurried home helps them feel settled.", "hi": "बाल-विकास पर हुए शोध बताते हैं कि बच्चे शब्द समझने से बहुत पहले अपने पालने वाले की रफ़्तार और तनाव की नक़ल कर लेते हैं। एक शांत, बिना जल्दबाज़ी की रफ़्तार सच में उनके बनते नर्वस सिस्टम को गढ़ने में मदद करती है।" },
       "remember": { "en": "The pace you keep becomes the pace your child knows.", "hi": "जो रफ़्तार आप रखती हैं, वही रफ़्तार आपके बच्चे की जानी-पहचानी बन जाती है।" }
     },
     "readToBaby": {
@@ -97,8 +97,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby how you have been waiting for them through all these long months, and how the wait has been worth it.", "hi": "अपने शिशु को बताइए कि इन सारे लंबे महीनों में आप उनका कैसे इंतज़ार करती आई हैं, और यह इंतज़ार कितना सही रहा है।" },
-      "motivation": { "en": "Naming the wait aloud turns it from something endured into something treasured.", "hi": "इंतज़ार को बोलकर नाम दे देना उसे सही जाने वाली चीज़ से सँभालकर रखने वाली चीज़ बना देता है।" }
+      "title": { "en": "Tell your baby how you've been waiting for them through all these long months, and how the wait has been worth it.", "hi": "अपने शिशु को बताइए कि इन सारे लंबे महीनों में आप उनका कैसे इंतज़ार करती आई हैं, और यह इंतज़ार कितना सही रहा है।" },
+      "motivation": { "en": "Talking about the wait out loud helps you treasure it.", "hi": "इंतज़ार को बोलकर नाम दे देना उसे सही जाने वाली चीज़ से सँभालकर रखने वाली चीज़ बना देता है।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -113,8 +113,8 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "I Do Not Have To Hurry", "hi": "मुझे जल्दबाज़ी नहीं करनी" },
-      "content": { "en": "There is time enough for what truly matters today. I can move slowly and still do everything I need to.", "hi": "आज जो सच में मायने रखता है, उसके लिए समय काफ़ी है। मैं धीरे चल सकती हूँ और फिर भी वह सब कर सकती हूँ जो ज़रूरी है।" },
+      "title": { "en": "I don't have to hurry", "hi": "मुझे जल्दबाज़ी नहीं करनी" },
+      "content": { "en": "There's enough time today for what matters. I can move slowly and still do everything I need to.", "hi": "आज जो सच में मायने रखता है, उसके लिए समय काफ़ी है। मैं धीरे चल सकती हूँ और फिर भी वह सब कर सकती हूँ जो ज़रूरी है।" },
       "remember": { "en": "Slowing down rarely costs as much as we fear.", "hi": "धीरे होना उतना महँगा शायद ही पड़ता है जितना हम डरते हैं।" },
       "durationMinutes": 0
     }
@@ -124,10 +124,10 @@
     "week": 33,
     "babyLearning": { "en": "Your baby's kicks may feel strong, with less room to stretch.", "hi": "नरमी से भरना, कम जगह में आराम से सिमटना" },
     "grow": {
-      "title": { "en": "Let The Pace Be Gentle", "hi": "रफ़्तार को नरम रहने दीजिए" },
-      "insight": { "en": "Not everything has to be fast to be good. Some of the best things in life unfold at a gentle, unhurried pace.", "hi": "अच्छा होने के लिए हर चीज़ का तेज़ होना ज़रूरी नहीं। ज़िंदगी की कुछ सबसे अच्छी चीज़ें एक नरम, बिना जल्दबाज़ी की रफ़्तार पर ही खुलती हैं।" },
-      "expanded": { "en": "The world rewards speed — quick replies, fast results, doing more in less time. But babies live by a different clock. They feed slowly, settle slowly, grow at their own pace, and ask us to slow down to meet them. This is not a delay to push through; it is an invitation. Practising a gentle pace now, in these final weeks, prepares you for the unhurried rhythm of life with a newborn. Let some things take as long as they take. A gentle pace is not falling behind — it is choosing to be fully present.", "hi": "दुनिया तेज़ी को इनाम देती है — झट से जवाब, तेज़ नतीजे, कम समय में ज़्यादा। पर शिशु एक अलग ही घड़ी से जीते हैं। वे धीरे दूध पीते हैं, धीरे ठहरते हैं, अपनी ही रफ़्तार से बढ़ते हैं, और हमसे कहते हैं कि उनसे मिलने के लिए ज़रा धीरे हो जाइए। यह कोई देर नहीं जिसे धकेलकर पार करना है; यह एक न्योता है। अभी, इन आख़िरी हफ़्तों में, नरम रफ़्तार का अभ्यास आपको नवजात के साथ की बिना जल्दबाज़ी वाली ज़िंदगी के लिए तैयार करता है। कुछ चीज़ों को उतना समय लेने दीजिए जितना वे लेती हैं। नरम रफ़्तार पीछे रह जाना नहीं है — यह पूरी तरह मौजूद रहना चुनना है।" },
-      "deepDive": { "en": "Infant specialists note that newborns set their own pace for feeding, sleeping and soothing, and rushing them often backfires. Parents who attune to a baby's slower rhythm tend to find feeding and bonding easier.", "hi": "नवजात शिशुओं के जानकार बताते हैं कि दूध पीने, सोने और शांत होने की रफ़्तार नवजात ख़ुद तय करते हैं, और उन्हें जल्दी मचाना अक्सर उल्टा पड़ता है। जो माँ-बाप शिशु की धीमी लय के साथ ढल जाते हैं, उन्हें दूध पिलाना और जुड़ाव दोनों आसान लगते हैं।" },
+      "title": { "en": "A gentle pace suits a newborn", "hi": "रफ़्तार को नरम रहने दीजिए" },
+      "insight": { "en": "Not everything has to be fast to be good. Some of the best things in life happen slowly.", "hi": "अच्छा होने के लिए हर चीज़ का तेज़ होना ज़रूरी नहीं। ज़िंदगी की कुछ सबसे अच्छी चीज़ें एक नरम, बिना जल्दबाज़ी की रफ़्तार पर ही खुलती हैं।" },
+      "expanded": { "en": "The world rewards speed: quick replies, fast results, more done in less time. Babies live by a different clock. They feed slowly, settle slowly and grow at their own pace. They ask us to slow down and meet them there. Practising a gentle pace now, in these last weeks, gets you ready for the slower rhythm of life with a newborn. Let some things take as long as they take. Going slowly doesn't mean falling behind. A gentle pace lets you be fully there for what's happening.", "hi": "दुनिया तेज़ी को इनाम देती है — झट से जवाब, तेज़ नतीजे, कम समय में ज़्यादा। पर शिशु एक अलग ही घड़ी से जीते हैं। वे धीरे दूध पीते हैं, धीरे ठहरते हैं, अपनी ही रफ़्तार से बढ़ते हैं, और हमसे कहते हैं कि उनसे मिलने के लिए ज़रा धीरे हो जाइए। यह कोई देर नहीं जिसे धकेलकर पार करना है; यह एक न्योता है। अभी, इन आख़िरी हफ़्तों में, नरम रफ़्तार का अभ्यास आपको नवजात के साथ की बिना जल्दबाज़ी वाली ज़िंदगी के लिए तैयार करता है। कुछ चीज़ों को उतना समय लेने दीजिए जितना वे लेती हैं। नरम रफ़्तार पीछे रह जाना नहीं है — यह पूरी तरह मौजूद रहना चुनना है।" },
+      "deepDive": { "en": "Newborns set their own pace for feeding, sleeping and settling, and hurrying them rarely helps. Following a baby's slower rhythm often makes feeding and bonding feel easier.", "hi": "नवजात शिशुओं के जानकार बताते हैं कि दूध पीने, सोने और शांत होने की रफ़्तार नवजात ख़ुद तय करते हैं, और उन्हें जल्दी मचाना अक्सर उल्टा पड़ता है। जो माँ-बाप शिशु की धीमी लय के साथ ढल जाते हैं, उन्हें दूध पिलाना और जुड़ाव दोनों आसान लगते हैं।" },
       "remember": { "en": "A gentle pace lets you be fully present.", "hi": "नरम रफ़्तार आपको पूरी तरह मौजूद रहने देती है।" }
     },
     "readToBaby": {
@@ -137,8 +137,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby that they may take their own time with everything, and that you will be patient with them always.", "hi": "अपने शिशु से कहिए कि वे हर चीज़ में अपना समय ले सकते हैं, और आप उनके साथ हमेशा सब्र रखेंगी।" },
-      "motivation": { "en": "The freedom to go slowly is one of the safest gifts a parent can give.", "hi": "धीरे चलने की आज़ादी उन सबसे सुरक्षित तोहफ़ों में से एक है जो माँ-बाप दे सकते हैं।" }
+      "title": { "en": "Tell your baby they can take their own time with everything, and that you'll always be patient with them.", "hi": "अपने शिशु से कहिए कि वे हर चीज़ में अपना समय ले सकते हैं, और आप उनके साथ हमेशा सब्र रखेंगी।" },
+      "motivation": { "en": "Being allowed to go slowly helps a child feel safe.", "hi": "धीरे चलने की आज़ादी उन सबसे सुरक्षित तोहफ़ों में से एक है जो माँ-बाप दे सकते हैं।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -153,9 +153,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Breathe Into The Belly", "hi": "पेट तक साँस लीजिए" },
-      "content": { "en": "Rest a hand low on your belly. Breathe in slowly and feel it rise gently under your hand, then breathe out and feel it fall. Stay with this soft rise and fall for one quiet minute.", "hi": "एक हाथ पेट के नीचे वाले हिस्से पर रखिए। धीरे साँस अंदर लीजिए और उसे अपने हाथ के नीचे नरमी से उठता महसूस कीजिए, फिर साँस बाहर छोड़िए और उसे बैठता महसूस कीजिए। एक शांत मिनट तक इसी नरम उठने-बैठने के साथ रहिए।" },
-      "remember": { "en": "Belly breathing tells your whole body it is safe to slow down.", "hi": "पेट से साँस लेना आपके पूरे शरीर को बताता है कि धीरे होना सुरक्षित है।" },
+      "title": { "en": "Breathe into the belly", "hi": "पेट तक साँस लीजिए" },
+      "content": { "en": "Rest a hand low on your belly. Breathe in slowly and feel it rise under your hand. Breathe out and feel it fall. Stay with this soft rise and fall for one quiet minute.", "hi": "एक हाथ पेट के नीचे वाले हिस्से पर रखिए। धीरे साँस अंदर लीजिए और उसे अपने हाथ के नीचे नरमी से उठता महसूस कीजिए, फिर साँस बाहर छोड़िए और उसे बैठता महसूस कीजिए। एक शांत मिनट तक इसी नरम उठने-बैठने के साथ रहिए।" },
+      "remember": { "en": "Slow belly breathing is an easy way to calm down.", "hi": "पेट से साँस लेना आपके पूरे शरीर को बताता है कि धीरे होना सुरक्षित है।" },
       "durationMinutes": 1
     }
   },
@@ -164,11 +164,11 @@
     "week": 33,
     "babyLearning": { "en": "Amniotic fluid is at about its highest level around now.", "hi": "त्वचा का चिकना होना, आँखों का खुलना और बंद होना" },
     "grow": {
-      "title": { "en": "Repeat, Without Resentment", "hi": "दोहराइए, बिना नाराज़गी के" },
-      "insight": { "en": "Much of loving care is repetition. The grace lies in doing the same gentle thing again, without bitterness.", "hi": "प्यार भरी देखभाल का बहुत बड़ा हिस्सा दोहराना ही है। ख़ूबसूरती उसी नरम काम को फिर से करने में है, बिना कड़वाहट के।" },
-      "expanded": { "en": "Caring for a baby means doing the same things over and over: the same soothing, the same feeding, the same answer to the same small need. It can wear on us — the part of the mind that whispers, 'I just did this.' But resentment is not in the repeating; it is in resisting the repeating. When you can meet a familiar task as if for the first time, patience returns. These weeks of waiting are practice for that grace: doing what must be done again, gently, without keeping score. Repetition, met with softness, becomes a kind of love.", "hi": "शिशु की देखभाल का मतलब है वही चीज़ें बार-बार करना: वही दिलासा, वही दूध पिलाना, उसी छोटी ज़रूरत का वही जवाब। यह थका सकता है — मन का वह हिस्सा जो फुसफुसाता है, 'यह तो मैंने अभी किया था।' पर नाराज़गी दोहराने में नहीं है; वह दोहराने के विरोध में है। जब आप जाने-पहचाने काम से ऐसे मिल पाती हैं जैसे पहली बार, सब्र लौट आता है। इंतज़ार के ये हफ़्ते उसी ख़ूबसूरती का अभ्यास हैं: जो फिर से करना है उसे नरमी से करना, बिना हिसाब रखे। दोहराना, जब नरमी से मिले, तो एक तरह का प्यार बन जाता है।" },
-      "deepDive": { "en": "Psychologists find that resentment grows not from a task itself but from the resistance we add to it. Meeting repetitive care with acceptance lowers stress and protects the warmth in the relationship.", "hi": "मनोवैज्ञानिक पाते हैं कि नाराज़गी काम से नहीं, बल्कि उस विरोध से बढ़ती है जो हम उसमें जोड़ देते हैं। बार-बार वाली देखभाल को स्वीकार के साथ अपनाना तनाव कम करता है और रिश्ते की गरमाहट बचा लेता है।" },
-      "remember": { "en": "It is the resisting, not the repeating, that tires us.", "hi": "हमें दोहराना नहीं, उसका विरोध करना थकाता है।" }
+      "title": { "en": "Doing the same thing again, with patience", "hi": "दोहराइए, बिना नाराज़गी के" },
+      "insight": { "en": "Much of caring for a baby is repetition. Doing the same gentle thing again, without bitterness, is a skill worth learning.", "hi": "प्यार भरी देखभाल का बहुत बड़ा हिस्सा दोहराना ही है। ख़ूबसूरती उसी नरम काम को फिर से करने में है, बिना कड़वाहट के।" },
+      "expanded": { "en": "Caring for a baby means doing the same things over and over: the same soothing, the same feeding, the same answer to the same small need. It can wear you down, with a voice in your head saying 'I just did this.' Often what tires us most is fighting the repeat, more than the task itself. When you can meet a familiar task as if it's new, patience comes back. These weeks of waiting are practice for that: doing what needs doing again, gently, without keeping score. Repetition met with gentleness becomes a kind of love.", "hi": "शिशु की देखभाल का मतलब है वही चीज़ें बार-बार करना: वही दिलासा, वही दूध पिलाना, उसी छोटी ज़रूरत का वही जवाब। यह थका सकता है — मन का वह हिस्सा जो फुसफुसाता है, 'यह तो मैंने अभी किया था।' पर नाराज़गी दोहराने में नहीं है; वह दोहराने के विरोध में है। जब आप जाने-पहचाने काम से ऐसे मिल पाती हैं जैसे पहली बार, सब्र लौट आता है। इंतज़ार के ये हफ़्ते उसी ख़ूबसूरती का अभ्यास हैं: जो फिर से करना है उसे नरमी से करना, बिना हिसाब रखे। दोहराना, जब नरमी से मिले, तो एक तरह का प्यार बन जाता है।" },
+      "deepDive": { "en": "Research on acceptance suggests that a hard, repetitive task often feels less draining when we stop resisting it. That can help keep a relationship warm through tiring stretches.", "hi": "मनोवैज्ञानिक पाते हैं कि नाराज़गी काम से नहीं, बल्कि उस विरोध से बढ़ती है जो हम उसमें जोड़ देते हैं। बार-बार वाली देखभाल को स्वीकार के साथ अपनाना तनाव कम करता है और रिश्ते की गरमाहट बचा लेता है।" },
+      "remember": { "en": "Fighting the repeat often tires us more than the task does.", "hi": "हमें दोहराना नहीं, उसका विरोध करना थकाता है।" }
     },
     "readToBaby": {
       "title": { "en": "Birbal And The King Who Wanted It Now", "hi": "बीरबल और वह राजा जो सब अभी चाहता था" },
@@ -177,8 +177,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about the calm you most want to bring them, the quiet steadiness you hope they always feel near you.", "hi": "अपने शिशु को उस शांति के बारे में बताइए जो आप सबसे ज़्यादा उन तक पहुँचाना चाहती हैं — वह चुपचाप ठहराव, जो आप चाहती हैं वे आपके पास हमेशा महसूस करें।" },
-      "motivation": { "en": "Speaking the calm you wish for them is the first way you begin offering it.", "hi": "जो शांति आप उनके लिए चाहती हैं, उसे बोलकर कह देना ही उसे देने की पहली शुरुआत है।" }
+      "title": { "en": "Tell your baby about the calm you most want to give them, the steady feeling you hope they always have near you.", "hi": "अपने शिशु को उस शांति के बारे में बताइए जो आप सबसे ज़्यादा उन तक पहुँचाना चाहती हैं — वह चुपचाप ठहराव, जो आप चाहती हैं वे आपके पास हमेशा महसूस करें।" },
+      "motivation": { "en": "Saying out loud the calm you wish for them is the first step to giving it.", "hi": "जो शांति आप उनके लिए चाहती हैं, उसे बोलकर कह देना ही उसे देने की पहली शुरुआत है।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -193,9 +193,9 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "When Your Appetite Feels Small", "hi": "जब भूख कम लगे" },
-      "content": { "en": "As your baby takes up more room now, big meals can feel too heavy. Try eating little and often — a handful of fruit, some curd, a few nuts spread through the day keep your energy steady without crowding your stomach.", "hi": "अब जब आपका शिशु ज़्यादा जगह ले रहा है, बड़े भोजन बहुत भारी लग सकते हैं। थोड़ा-थोड़ा और बार-बार खाने की कोशिश कीजिए — मुट्ठी भर फल, थोड़ा दही, कुछ मेवे दिन भर में फैलाकर लीजिए; इससे आपकी ताक़त बनी रहती है और पेट भी नहीं भरता।" },
-      "remember": { "en": "Little and often is easier on a crowded belly.", "hi": "भरे हुए पेट के लिए थोड़ा-थोड़ा और बार-बार खाना ज़्यादा आसान है।" },
+      "title": { "en": "When your appetite feels small", "hi": "जब भूख कम लगे" },
+      "content": { "en": "As your baby takes up more room, big meals can feel too heavy. Try eating little and often. A handful of fruit, some curd and a few nuts spread through the day keep your energy steady without crowding your stomach.", "hi": "अब जब आपका शिशु ज़्यादा जगह ले रहा है, बड़े भोजन बहुत भारी लग सकते हैं। थोड़ा-थोड़ा और बार-बार खाने की कोशिश कीजिए — मुट्ठी भर फल, थोड़ा दही, कुछ मेवे दिन भर में फैलाकर लीजिए; इससे आपकी ताक़त बनी रहती है और पेट भी नहीं भरता।" },
+      "remember": { "en": "Little and often is easier when there's less room for food.", "hi": "भरे हुए पेट के लिए थोड़ा-थोड़ा और बार-बार खाना ज़्यादा आसान है।" },
       "durationMinutes": 0
     }
   },
@@ -204,11 +204,11 @@
     "week": 33,
     "babyLearning": { "en": "Your baby's lungs are still maturing, week by week.", "hi": "धीरे-धीरे वज़न बढ़ना, थोड़ा और गोल होना" },
     "grow": {
-      "title": { "en": "Patience Outlasts Frustration", "hi": "सब्र झुंझलाहट से ज़्यादा टिकता है" },
-      "insight": { "en": "Frustration burns hot and fades fast. Patience burns low and steady — and it is what remains.", "hi": "झुंझलाहट तेज़ जलती है और जल्दी बुझ जाती है। सब्र धीमा और ठहरा हुआ जलता है — और आख़िर में वही बचता है।" },
-      "expanded": { "en": "Frustration feels powerful in the moment — loud, urgent, sure it will solve things. But it rarely lasts, and it rarely helps; it flares up and burns out, often leaving regret behind. Patience is quieter and far stronger. It does not roar; it simply stays, holding on a little longer than the difficulty does. In the long stretch of parenting, the calm that endures matters more than the heat that erupts. When frustration rises in you, you do not have to fight it. Just outlast it. Wait one breath longer, and patience will still be standing when the frustration has burned itself out.", "hi": "झुंझलाहट उस पल में बड़ी ताक़तवर लगती है — ज़ोरदार, फ़ौरन, इस यक़ीन से भरी कि यही सब ठीक कर देगी। पर वह शायद ही टिकती है, और शायद ही काम आती है; वह भड़कती है और बुझ जाती है, अक्सर पीछे पछतावा छोड़ते हुए। सब्र ज़्यादा शांत है और कहीं ज़्यादा मज़बूत। वह गरजता नहीं; वह बस ठहरा रहता है — मुश्किल से बस ज़रा देर ज़्यादा। पालने-पोसने के लंबे सफ़र में, जो शांति टिक जाती है वह उस गरमी से ज़्यादा मायने रखती है जो फूट पड़ती है। जब आपके भीतर झुंझलाहट उठे, आपको उससे लड़ने की ज़रूरत नहीं। बस उससे ज़्यादा देर टिक जाइए। एक साँस और रुकिए — और जब झुंझलाहट ख़ुद बुझ चुकी होगी, सब्र तब भी वहीं खड़ा मिलेगा।" },
-      "deepDive": { "en": "Emotion research shows that intense feelings like anger and frustration peak quickly and naturally subside within minutes if we do not feed them. Patience often means simply giving the storm time to pass.", "hi": "भावनाओं पर हुए शोध बताते हैं कि ग़ुस्सा और झुंझलाहट जैसी तेज़ भावनाएँ जल्दी अपने चरम पर पहुँचती हैं और, अगर हम उन्हें और न बढ़ाएँ, तो कुछ मिनटों में ख़ुद ही शांत हो जाती हैं। सब्र का मतलब अक्सर बस इतना है कि तूफ़ान को गुज़र जाने का समय दे दिया जाए।" },
-      "remember": { "en": "Outlast the frustration; the patience will still be there.", "hi": "झुंझलाहट से ज़्यादा देर टिक जाइए; सब्र तब भी वहीं होगा।" }
+      "title": { "en": "Patience lasts longer than frustration", "hi": "सब्र झुंझलाहट से ज़्यादा टिकता है" },
+      "insight": { "en": "Frustration flares up fast and fades fast. Patience is slower and steadier, and it's what stays.", "hi": "झुंझलाहट तेज़ जलती है और जल्दी बुझ जाती है। सब्र धीमा और ठहरा हुआ जलता है — और आख़िर में वही बचता है।" },
+      "expanded": { "en": "Frustration feels strong in the moment: loud, urgent and sure it will fix things. But it rarely lasts and it rarely helps. It flares up and burns out, often leaving regret behind. Patience is quieter and much stronger. It stays, holding on a little longer than the hard moment does. Over years of parenting, the calm that lasts matters more than the heat that flares. When frustration rises, you don't have to fight it. Wait one breath longer. Your patience will still be there when the frustration has passed.", "hi": "झुंझलाहट उस पल में बड़ी ताक़तवर लगती है — ज़ोरदार, फ़ौरन, इस यक़ीन से भरी कि यही सब ठीक कर देगी। पर वह शायद ही टिकती है, और शायद ही काम आती है; वह भड़कती है और बुझ जाती है, अक्सर पीछे पछतावा छोड़ते हुए। सब्र ज़्यादा शांत है और कहीं ज़्यादा मज़बूत। वह गरजता नहीं; वह बस ठहरा रहता है — मुश्किल से बस ज़रा देर ज़्यादा। पालने-पोसने के लंबे सफ़र में, जो शांति टिक जाती है वह उस गरमी से ज़्यादा मायने रखती है जो फूट पड़ती है। जब आपके भीतर झुंझलाहट उठे, आपको उससे लड़ने की ज़रूरत नहीं। बस उससे ज़्यादा देर टिक जाइए। एक साँस और रुकिए — और जब झुंझलाहट ख़ुद बुझ चुकी होगी, सब्र तब भी वहीं खड़ा मिलेगा।" },
+      "deepDive": { "en": "Strong feelings like anger and frustration tend to rise fast and ease on their own if we don't keep feeding them. Patience often means giving the feeling time to pass.", "hi": "भावनाओं पर हुए शोध बताते हैं कि ग़ुस्सा और झुंझलाहट जैसी तेज़ भावनाएँ जल्दी अपने चरम पर पहुँचती हैं और, अगर हम उन्हें और न बढ़ाएँ, तो कुछ मिनटों में ख़ुद ही शांत हो जाती हैं। सब्र का मतलब अक्सर बस इतना है कि तूफ़ान को गुज़र जाने का समय दे दिया जाए।" },
+      "remember": { "en": "Wait out the frustration. Your patience will still be there.", "hi": "झुंझलाहट से ज़्यादा देर टिक जाइए; सब्र तब भी वहीं होगा।" }
     },
     "readToBaby": {
       "title": { "en": "The Farmer Who Rushed His Crops", "hi": "वह किसान जिसने अपनी फ़सल में जल्दबाज़ी की" },
@@ -217,8 +217,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby how the very best things in life take time, just as they have taken these long, patient months.", "hi": "अपने शिशु को बताइए कि ज़िंदगी की सबसे अच्छी चीज़ें समय लेती हैं — ठीक जैसे उन्होंने ये लंबे, सब्र भरे महीने लिए हैं।" },
-      "motivation": { "en": "Teaching them that good things grow slowly begins with how you wait for them.", "hi": "उन्हें यह सिखाना कि अच्छी चीज़ें धीरे बढ़ती हैं, इसी से शुरू होता है कि आप उनका इंतज़ार कैसे करती हैं।" }
+      "title": { "en": "Tell your baby that the best things in life take time, just like these long, patient months.", "hi": "अपने शिशु को बताइए कि ज़िंदगी की सबसे अच्छी चीज़ें समय लेती हैं — ठीक जैसे उन्होंने ये लंबे, सब्र भरे महीने लिए हैं।" },
+      "motivation": { "en": "The way you wait for them now teaches your child that good things grow slowly.", "hi": "उन्हें यह सिखाना कि अच्छी चीज़ें धीरे बढ़ती हैं, इसी से शुरू होता है कि आप उनका इंतज़ार कैसे करती हैं।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -233,9 +233,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "Good Things Are Worth The Wait", "hi": "अच्छी चीज़ें इंतज़ार के लायक़ हैं" },
-      "content": { "en": "I will not measure these days by how slowly they pass. The wait is part of the gift, and the gift is on its way.", "hi": "मैं इन दिनों को इससे नहीं नापूँगी कि वे कितने धीरे गुज़रते हैं। इंतज़ार भी तोहफ़े का ही हिस्सा है, और तोहफ़ा अपने रास्ते पर है।" },
-      "remember": { "en": "The wait is part of the gift.", "hi": "इंतज़ार भी तोहफ़े का ही हिस्सा है।" },
+      "title": { "en": "Good things are worth the wait", "hi": "अच्छी चीज़ें इंतज़ार के लायक़ हैं" },
+      "content": { "en": "I won't judge these days by how slowly they pass. Waiting is part of this, and my baby is on the way.", "hi": "मैं इन दिनों को इससे नहीं नापूँगी कि वे कितने धीरे गुज़रते हैं। इंतज़ार भी तोहफ़े का ही हिस्सा है, और तोहफ़ा अपने रास्ते पर है।" },
+      "remember": { "en": "Waiting is part of getting ready for your baby.", "hi": "इंतज़ार भी तोहफ़े का ही हिस्सा है।" },
       "durationMinutes": 0
     }
   },
@@ -244,10 +244,10 @@
     "week": 33,
     "babyLearning": { "en": "Your baby's heart beats about twice as fast as yours.", "hi": "हफ़्ता पूरा करना, ठहरकर लगातार बढ़ना" },
     "grow": {
-      "title": { "en": "Breathe Through The Wait", "hi": "इंतज़ार में साँस लेते रहिए" },
-      "insight": { "en": "When the waiting feels long, your breath is always there — a steady place to return to, one moment at a time.", "hi": "जब इंतज़ार लंबा लगे, आपकी साँस हमेशा वहीं है — लौटने की एक ठहरी हुई जगह, एक-एक पल करके।" },
-      "expanded": { "en": "These final weeks can stretch out long — the body heavy, the heart eager, the question of 'when' always near. Waiting is its own quiet work, and it asks for patience you cannot force. But you do not have to carry the whole wait at once. You only have to breathe through this one moment, and then the next. Your breath is a steady companion through the longest stretch, gently returning you to now, where your baby already is. The wait will end exactly when it should. Until then, you breathe, and you are already where you need to be.", "hi": "ये आख़िरी हफ़्ते लंबे खिंच सकते हैं — शरीर भारी, दिल बेताब, 'कब' का सवाल हमेशा पास। इंतज़ार अपने आप में एक चुपचाप काम है, और वह ऐसा सब्र माँगता है जिसे ज़बरदस्ती नहीं लाया जा सकता। पर आपको पूरा इंतज़ार एक साथ नहीं उठाना है। आपको बस इस एक पल में साँस लेनी है, और फिर अगले में। सबसे लंबे रास्ते पर आपकी साँस एक ठहरा हुआ साथी है, जो नरमी से आपको अभी में लौटा लाती है — वहीं, जहाँ आपका शिशु पहले से है। इंतज़ार ठीक तभी ख़त्म होगा जब उसे होना चाहिए। तब तक, आप साँस लेती रहिए — और आप पहले से ही वहीं हैं जहाँ आपको होना चाहिए।" },
-      "deepDive": { "en": "Researchers find that slow, mindful breathing during periods of waiting lowers stress hormones and helps time feel less heavy. The breath anchors us in the present, where anxiety about the future cannot reach.", "hi": "शोध बताते हैं कि इंतज़ार के दौर में धीमी, ध्यान से ली गई साँस तनाव वाले हॉर्मोन कम करती है और समय को कम भारी महसूस कराती है। साँस हमें वर्तमान में थाम लेती है — वहाँ, जहाँ आने वाले कल की चिंता पहुँच ही नहीं सकती।" },
+      "title": { "en": "Breathe through the wait", "hi": "इंतज़ार में साँस लेते रहिए" },
+      "insight": { "en": "When the waiting feels long, your breath is always there. It's a steady place to come back to, one moment at a time.", "hi": "जब इंतज़ार लंबा लगे, आपकी साँस हमेशा वहीं है — लौटने की एक ठहरी हुई जगह, एक-एक पल करके।" },
+      "expanded": { "en": "These last weeks can feel long, with heavy days, an eager heart and the question of 'when' always close. Waiting is work of its own, and it asks for a patience you can't force. But you don't have to carry the whole wait at once. You only have to breathe through this one moment, and then the next. Your breath is steady company through the longest stretch. It brings you back to now, where your baby already is. The wait will end when it's meant to. Until then, you breathe, and that's enough.", "hi": "ये आख़िरी हफ़्ते लंबे खिंच सकते हैं — शरीर भारी, दिल बेताब, 'कब' का सवाल हमेशा पास। इंतज़ार अपने आप में एक चुपचाप काम है, और वह ऐसा सब्र माँगता है जिसे ज़बरदस्ती नहीं लाया जा सकता। पर आपको पूरा इंतज़ार एक साथ नहीं उठाना है। आपको बस इस एक पल में साँस लेनी है, और फिर अगले में। सबसे लंबे रास्ते पर आपकी साँस एक ठहरा हुआ साथी है, जो नरमी से आपको अभी में लौटा लाती है — वहीं, जहाँ आपका शिशु पहले से है। इंतज़ार ठीक तभी ख़त्म होगा जब उसे होना चाहिए। तब तक, आप साँस लेती रहिए — और आप पहले से ही वहीं हैं जहाँ आपको होना चाहिए।" },
+      "deepDive": { "en": "Slow breathing is a well-known way to ease stress. It keeps your attention on the present moment, which can make worry about the future easier to hold.", "hi": "शोध बताते हैं कि इंतज़ार के दौर में धीमी, ध्यान से ली गई साँस तनाव वाले हॉर्मोन कम करती है और समय को कम भारी महसूस कराती है। साँस हमें वर्तमान में थाम लेती है — वहाँ, जहाँ आने वाले कल की चिंता पहुँच ही नहीं सकती।" },
       "remember": { "en": "You only have to breathe through this one moment.", "hi": "आपको बस इस एक पल में साँस लेनी है।" }
     },
     "readToBaby": {
@@ -257,8 +257,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby how your patience has been growing right alongside them, deepening quietly as you wait to meet.", "hi": "अपने शिशु को बताइए कि आपका सब्र उनके साथ-साथ ही बढ़ता आया है — मिलने के इंतज़ार में चुपचाप और गहरा होते हुए।" },
-      "motivation": { "en": "The patience you grow now is the calm your baby will be born into.", "hi": "जो सब्र आप अभी उगाती हैं, वही वह शांति है जिसमें आपका शिशु जन्म लेगा।" }
+      "title": { "en": "Tell your baby how your patience has been growing alongside them while you wait to meet.", "hi": "अपने शिशु को बताइए कि आपका सब्र उनके साथ-साथ ही बढ़ता आया है — मिलने के इंतज़ार में चुपचाप और गहरा होते हुए।" },
+      "motivation": { "en": "The patience you grow now is part of the calm your baby will be born into.", "hi": "जो सब्र आप अभी उगाती हैं, वही वह शांति है जिसमें आपका शिशु जन्म लेगा।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -273,9 +273,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Three Slow Sighs", "hi": "तीन धीमी आहें" },
-      "content": { "en": "Take a deep breath in through your nose, then let it out through your mouth with a soft, audible sigh. Do this three times, letting your shoulders drop a little lower with each one.", "hi": "अपनी नाक से एक गहरी साँस अंदर लीजिए, फिर उसे मुँह से एक नरम, सुनाई देती आह के साथ बाहर छोड़िए। ऐसा तीन बार कीजिए, हर बार अपने कंधों को थोड़ा और नीचे गिरने देते हुए।" },
-      "remember": { "en": "A sigh is the body's own way of letting go.", "hi": "आह भरना शरीर का अपना तरीक़ा है — छोड़ देने का।" },
+      "title": { "en": "Three slow sighs", "hi": "तीन धीमी आहें" },
+      "content": { "en": "Take a deep breath in through your nose. Let it out through your mouth with a soft sigh you can hear. Do this three times, letting your shoulders drop a little lower each time.", "hi": "अपनी नाक से एक गहरी साँस अंदर लीजिए, फिर उसे मुँह से एक नरम, सुनाई देती आह के साथ बाहर छोड़िए। ऐसा तीन बार कीजिए, हर बार अपने कंधों को थोड़ा और नीचे गिरने देते हुए।" },
+      "remember": { "en": "A long sigh is a natural way to let go of tension.", "hi": "आह भरना शरीर का अपना तरीक़ा है — छोड़ देने का।" },
       "durationMinutes": 1
     }
   }

@@ -4,11 +4,11 @@
     "week": 31,
     "babyLearning": { "en": "Your baby's five senses are all working now.", "hi": "और गोल, और नरम — और अब थोड़ा नीचे बसते हुए" },
     "grow": {
-      "title": { "en": "Raise Them With Meaning", "hi": "उन्हें मायने के साथ पालें" },
-      "insight": { "en": "A child raised with meaning learns that life is not only about doing — it is about why we do it.", "hi": "जिन बच्चों को मायने के साथ पाला जाता है, वे सीखते हैं कि ज़िंदगी सिर्फ़ करने की नहीं — यह इसकी है कि हम करते क्यों हैं।" },
-      "expanded": { "en": "Soon your days will be full of ordinary tasks — feeding, washing, soothing, settling. It is easy to move through them as a list to finish. But a child does not absorb your tasks; they absorb the spirit behind them. The same act done with love and meaning becomes something a child can feel. You do not need grand lessons to raise a child with purpose. You only need to let your own 'why' — love, care, devotion — quietly shine through the smallest things you do each day.", "hi": "जल्द ही आपके दिन आम कामों से भरे होंगे — खिलाना, धोना, चुप कराना, सुलाना। इन्हें बस एक लिस्ट की तरह निपटा देना आसान है। पर बच्चे आपके काम नहीं सोखते; वे उन कामों के पीछे का भाव सोखते हैं। वही काम प्यार और मायने के साथ किया जाए, तो वह कुछ ऐसा बन जाता है जिसे बच्चे महसूस कर पाते हैं। किसी को मक़सद के साथ पालने के लिए बड़े-बड़े सबक़ों की ज़रूरत नहीं होती। बस अपने 'क्यों' को — प्यार, देखभाल, समर्पण — हर दिन की सबसे छोटी चीज़ों में चुपचाप चमकने देना है।" },
-      "deepDive": { "en": "Researchers find that children raised in homes with a clear sense of purpose and shared values show greater resilience and life satisfaction. Meaning, it turns out, is something we model long before we explain it.", "hi": "शोध बताते हैं कि जिन घरों में एक साफ़ मक़सद और साझे मूल्य होते हैं, वहाँ पले बच्चों में ज़्यादा लचीलापन और जीवन-संतोष दिखता है। मायने, असल में, वह चीज़ हैं जिन्हें हम समझाने से बहुत पहले जी कर दिखा देते हैं।" },
-      "remember": { "en": "How you do a thing teaches more than the thing itself.", "hi": "आप कोई काम कैसे करती हैं, यह उस काम से ज़्यादा सिखाता है।" }
+      "title": { "en": "Children feel the reason behind what you do", "hi": "उन्हें मायने के साथ पालें" },
+      "insight": { "en": "Children learn more than what you do. They pick up why you do it, and that gives their days meaning.", "hi": "जिन बच्चों को मायने के साथ पाला जाता है, वे सीखते हैं कि ज़िंदगी सिर्फ़ करने की नहीं — यह इसकी है कि हम करते क्यों हैं।" },
+      "expanded": { "en": "Soon your days will be full of small jobs: feeding, bathing, soothing, settling. It's easy to rush through them like a list. But a child picks up the feeling behind each task, not only the task. The same nappy change, done with love, feels different to a baby. You don't need big lessons to raise a child with purpose. Let your reasons show in the small things you do each day: love, care and patience.", "hi": "जल्द ही आपके दिन आम कामों से भरे होंगे — खिलाना, धोना, चुप कराना, सुलाना। इन्हें बस एक लिस्ट की तरह निपटा देना आसान है। पर बच्चे आपके काम नहीं सोखते; वे उन कामों के पीछे का भाव सोखते हैं। वही काम प्यार और मायने के साथ किया जाए, तो वह कुछ ऐसा बन जाता है जिसे बच्चे महसूस कर पाते हैं। किसी को मक़सद के साथ पालने के लिए बड़े-बड़े सबक़ों की ज़रूरत नहीं होती। बस अपने 'क्यों' को — प्यार, देखभाल, समर्पण — हर दिन की सबसे छोटी चीज़ों में चुपचाप चमकने देना है।" },
+      "deepDive": { "en": "Research on families suggests that shared values and warm routines help children cope with hard times. Children tend to pick up values from what they see at home long before anyone explains them.", "hi": "शोध बताते हैं कि जिन घरों में एक साफ़ मक़सद और साझे मूल्य होते हैं, वहाँ पले बच्चों में ज़्यादा लचीलापन और जीवन-संतोष दिखता है। मायने, असल में, वह चीज़ हैं जिन्हें हम समझाने से बहुत पहले जी कर दिखा देते हैं।" },
+      "remember": { "en": "How you do something teaches your child more than the task itself.", "hi": "आप कोई काम कैसे करती हैं, यह उस काम से ज़्यादा सिखाता है।" }
     },
     "readToBaby": {
       "title": { "en": "The Three Stonecutters", "hi": "तीन पत्थर तराशने वाले" },
@@ -17,8 +17,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby what truly matters to you in life — the few things you would never trade away.", "hi": "अपने शिशु को बताएँ कि ज़िंदगी में आपके लिए सच में क्या मायने रखता है — वे कुछ चीज़ें जिन्हें आप कभी नहीं छोड़ेंगी।" },
-      "motivation": { "en": "What you treasure most will quietly become the compass your child grows by.", "hi": "जिसे आप सबसे ज़्यादा सँजोती हैं, चुपचाप वही आपके बच्चे की दिशा बन जाता है।" }
+      "title": { "en": "Tell your baby the few things that matter most to you in life, the ones you'd never trade away.", "hi": "अपने शिशु को बताएँ कि ज़िंदगी में आपके लिए सच में क्या मायने रखता है — वे कुछ चीज़ें जिन्हें आप कभी नहीं छोड़ेंगी।" },
+      "motivation": { "en": "The things you care about most will help guide your child as they grow.", "hi": "जिसे आप सबसे ज़्यादा सँजोती हैं, चुपचाप वही आपके बच्चे की दिशा बन जाता है।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -33,9 +33,9 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "Heaviness After Meals", "hi": "खाने के बाद भारीपन" },
-      "content": { "en": "As your baby grows, big meals can leave you uncomfortably full and heavy. Try smaller plates more often through the day, and eat slowly and warm — your body digests gently when it is not rushed or overloaded.", "hi": "जैसे-जैसे अंदर जगह भरती जाती है, एक बार में बड़ा खाना आपको असहज तरीक़े से भरा और भारी कर सकता है। दिन भर में थोड़ा-थोड़ा, ज़्यादा बार खाकर देखें, और धीरे-धीरे और गर्म खाएँ — शरीर आराम से पचाता है, जब उस पर जल्दी या बहुत ज़्यादा बोझ न हो।" },
-      "remember": { "en": "Little and often sits gentler than large and rushed.", "hi": "थोड़ा-थोड़ा और बार-बार, बहुत सारा और जल्दी-जल्दी से हल्का बैठता है।" },
+      "title": { "en": "Feeling heavy after meals", "hi": "खाने के बाद भारीपन" },
+      "content": { "en": "As your baby grows, big meals can leave you uncomfortably full. Try smaller plates more often through the day. Eat slowly and choose warm food. Your body digests more easily when it isn't rushed or overloaded.", "hi": "जैसे-जैसे अंदर जगह भरती जाती है, एक बार में बड़ा खाना आपको असहज तरीक़े से भरा और भारी कर सकता है। दिन भर में थोड़ा-थोड़ा, ज़्यादा बार खाकर देखें, और धीरे-धीरे और गर्म खाएँ — शरीर आराम से पचाता है, जब उस पर जल्दी या बहुत ज़्यादा बोझ न हो।" },
+      "remember": { "en": "Small meals, eaten slowly, sit more easily than big rushed ones.", "hi": "थोड़ा-थोड़ा और बार-बार, बहुत सारा और जल्दी-जल्दी से हल्का बैठता है।" },
       "durationMinutes": 0
     }
   },
@@ -44,11 +44,11 @@
     "week": 31,
     "babyLearning": { "en": "Your baby can turn their head from side to side.", "hi": "आँखें खुलती और बंद होती हुईं, नरम रोशनी को पहचानती हुईं" },
     "grow": {
-      "title": { "en": "Wonder Is A Doorway To Faith", "hi": "विस्मय आस्था का दरवाज़ा है" },
-      "insight": { "en": "A child who learns to wonder at the world is already learning to trust something larger than themselves.", "hi": "जो बच्चे दुनिया पर अचंभा करना सीखते हैं, वे पहले से ही ख़ुद से बड़ी किसी चीज़ पर भरोसा करना सीख रहे होते हैं।" },
-      "expanded": { "en": "Long before a child can hold a belief, they can hold wonder — at a raindrop, a beetle, the moon following the car. This quiet awe is the seedbed of faith: the felt sense that the world is vast, generous and worth trusting. You do not have to teach wonder; you only have to protect it. When you pause to marvel beside your child instead of rushing past, you tell them the world is full of things worth slowing down for — and that life itself is something to be held with open, grateful hands.", "hi": "किसी विश्वास को थामने से बहुत पहले, बच्चे विस्मय थाम लेते हैं — बारिश की एक बूँद पर, एक भँवरे पर, गाड़ी के पीछे-पीछे चलते चाँद पर। यही शांत अचंभा आस्था की क्यारी है: यह महसूस होता भाव कि दुनिया विशाल है, उदार है और भरोसे के लायक़ है। विस्मय सिखाना नहीं पड़ता; बस उसे बचाना पड़ता है। जब आप आगे भागने के बजाय अपने बच्चे के साथ रुककर अचंभा करती हैं, तो आप कह देती हैं कि दुनिया ऐसी चीज़ों से भरी है जिनके लिए धीमा पड़ना अच्छा है — और यह कि ज़िंदगी ख़ुद एक ऐसी चीज़ है जिसे खुले, कृतज्ञ हाथों से थामना चाहिए।" },
-      "deepDive": { "en": "Psychologists who study awe find it shifts us out of self-focus and toward connection, humility and meaning. In children, frequent wonder is linked to greater curiosity and emotional openness.", "hi": "अचंभे पर शोध करने वाले मनोवैज्ञानिक पाते हैं कि यह हमें ख़ुद पर टिके रहने से हटाकर जुड़ाव, विनम्रता और मायनों की ओर ले जाता है। बच्चों में, बार-बार का विस्मय ज़्यादा जिज्ञासा और भावनात्मक खुलेपन से जुड़ा मिला है।" },
-      "remember": { "en": "Guard their wonder; it is where faith first takes root.", "hi": "बच्चों के विस्मय को बचाकर रखें; आस्था सबसे पहले वहीं जड़ पकड़ती है।" }
+      "title": { "en": "Wonder helps a child trust the world", "hi": "विस्मय आस्था का दरवाज़ा है" },
+      "insight": { "en": "A child who learns to wonder at the world is also learning to trust something bigger than themselves.", "hi": "जो बच्चे दुनिया पर अचंभा करना सीखते हैं, वे पहले से ही ख़ुद से बड़ी किसी चीज़ पर भरोसा करना सीख रहे होते हैं।" },
+      "expanded": { "en": "Long before a child can hold a belief, they can feel wonder: at a raindrop, a beetle, the moon that seems to follow the car. That sense of awe is often where faith begins. It's a feeling that the world is big, kind and worth trusting. You don't have to teach wonder. You only have to protect it. When you stop and look with your child instead of hurrying past, you show them the world is full of things worth slowing down for.", "hi": "किसी विश्वास को थामने से बहुत पहले, बच्चे विस्मय थाम लेते हैं — बारिश की एक बूँद पर, एक भँवरे पर, गाड़ी के पीछे-पीछे चलते चाँद पर। यही शांत अचंभा आस्था की क्यारी है: यह महसूस होता भाव कि दुनिया विशाल है, उदार है और भरोसे के लायक़ है। विस्मय सिखाना नहीं पड़ता; बस उसे बचाना पड़ता है। जब आप आगे भागने के बजाय अपने बच्चे के साथ रुककर अचंभा करती हैं, तो आप कह देती हैं कि दुनिया ऐसी चीज़ों से भरी है जिनके लिए धीमा पड़ना अच्छा है — और यह कि ज़िंदगी ख़ुद एक ऐसी चीज़ है जिसे खुले, कृतज्ञ हाथों से थामना चाहिए।" },
+      "deepDive": { "en": "Studies of awe in adults suggest it can turn attention away from ourselves and toward other people. In children, awe often goes hand in hand with curiosity.", "hi": "अचंभे पर शोध करने वाले मनोवैज्ञानिक पाते हैं कि यह हमें ख़ुद पर टिके रहने से हटाकर जुड़ाव, विनम्रता और मायनों की ओर ले जाता है। बच्चों में, बार-बार का विस्मय ज़्यादा जिज्ञासा और भावनात्मक खुलेपन से जुड़ा मिला है।" },
+      "remember": { "en": "Protect your child's sense of wonder. It's often where faith begins.", "hi": "बच्चों के विस्मय को बचाकर रखें; आस्था सबसे पहले वहीं जड़ पकड़ती है।" }
     },
     "readToBaby": {
       "title": { "en": "The Bird Who Chose Freedom", "hi": "वह पंछी जिसने आज़ादी चुनी" },
@@ -57,8 +57,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about the kind of wonder you hope they never lose — the small things that still amaze you.", "hi": "अपने शिशु को उस विस्मय के बारे में बताएँ जो आप चाहती हैं कि कभी न खोए — वे छोटी चीज़ें जो आज भी आपको अचंभित करती हैं।" },
-      "motivation": { "en": "Wonder is fragile in a busy world — naming yours helps you keep it alive for them.", "hi": "इतनी भागती दुनिया में विस्मय नाज़ुक है — अपने विस्मय को नाम देना आपको उसे बच्चे के लिए ज़िंदा रखने में मदद करता है।" }
+      "title": { "en": "Tell your baby about the small things that still amaze you, the kind of wonder you hope they never lose.", "hi": "अपने शिशु को उस विस्मय के बारे में बताएँ जो आप चाहती हैं कि कभी न खोए — वे छोटी चीज़ें जो आज भी आपको अचंभित करती हैं।" },
+      "motivation": { "en": "Busy days can crowd out wonder. Talking about yours helps you keep it alive for them.", "hi": "इतनी भागती दुनिया में विस्मय नाज़ुक है — अपने विस्मय को नाम देना आपको उसे बच्चे के लिए ज़िंदा रखने में मदद करता है।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -73,9 +73,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Breathe With The Sky", "hi": "आसमान के साथ साँस लें" },
-      "content": { "en": "Look out at the sky, or simply picture it. Breathe in slowly as if drawing in all that openness, then let it out long and soft. Repeat for five gentle breaths and feel yourself widen.", "hi": "आसमान की तरफ़ देखें, या बस उसे मन में ले आएँ। धीरे से साँस भीतर लें, जैसे वह सारा खुलापन अंदर खींच रही हों, फिर उसे लंबा और नरम छोड़ें। ऐसी पाँच नरम साँसें लें और ख़ुद को फैलता हुआ महसूस करें।" },
-      "remember": { "en": "A wide breath makes room for a quieter mind.", "hi": "एक खुली साँस शांत मन के लिए जगह बना देती है।" },
+      "title": { "en": "Breathe with the sky", "hi": "आसमान के साथ साँस लें" },
+      "content": { "en": "Look out at the sky, or picture it. Breathe in slowly, as if you're taking in all that open space. Then breathe out, long and soft. Repeat for five slow breaths and let yourself feel a little lighter.", "hi": "आसमान की तरफ़ देखें, या बस उसे मन में ले आएँ। धीरे से साँस भीतर लें, जैसे वह सारा खुलापन अंदर खींच रही हों, फिर उसे लंबा और नरम छोड़ें। ऐसी पाँच नरम साँसें लें और ख़ुद को फैलता हुआ महसूस करें।" },
+      "remember": { "en": "A slow, wide breath makes room for a calmer mind.", "hi": "एक खुली साँस शांत मन के लिए जगह बना देती है।" },
       "durationMinutes": 1
     }
   },
@@ -84,11 +84,11 @@
     "week": 31,
     "babyLearning": { "en": "Your baby is gaining weight faster now.", "hi": "नरम परतें चढ़ती हुईं, अंदर गर्माहट बढ़ती हुई" },
     "grow": {
-      "title": { "en": "Gratitude Is A Family Habit", "hi": "कृतज्ञता एक पारिवारिक आदत है" },
-      "insight": { "en": "Children do not learn gratitude from being told to say thank you. They learn it from living among people who notice their blessings.", "hi": "बच्चे कृतज्ञता 'धन्यवाद बोलो' कहने से नहीं सीखते। वे इसे उन लोगों के बीच रहकर सीखते हैं जो अपने पास जो है, उसे देखते और सराहते हैं।" },
-      "expanded": { "en": "Gratitude is less a lesson and more an atmosphere. A child raised in a home where small things are noticed and appreciated — a warm meal, a sunny morning, a kind word — grows up believing the world is full of gifts. You can begin weaving this thread now, by quietly naming the good things of your own days aloud. One day your child will hear you do this and learn, without a single lecture, that a grateful heart is simply a heart that pays attention. That habit, more than any possession, will keep them rich for life.", "hi": "कृतज्ञता एक सबक़ से ज़्यादा एक माहौल है। जिस घर में छोटी चीज़ें देखी और सराही जाती हैं — एक गर्म खाना, एक धूप भरी सुबह, एक अच्छा शब्द — वहाँ पले बच्चे यह मानकर बड़े होते हैं कि दुनिया तोहफ़ों से भरी है। आप यह धागा अभी से बुनना शुरू कर सकती हैं, बस अपने दिनों की अच्छी चीज़ों को चुपचाप बोलकर गिनते हुए। एक दिन बच्चे आपको ऐसा करते सुनेंगे और बिना एक भी भाषण के सीख जाएँगे कि कृतज्ञ दिल बस वह दिल है जो ध्यान देता है। यह आदत, किसी भी चीज़ से ज़्यादा, उन्हें ज़िंदगी भर अमीर रखेगी।" },
-      "deepDive": { "en": "Studies show that practising gratitude — even just naming a few good things daily — measurably raises wellbeing and lowers stress. In families, the habit is largely caught from parents rather than taught.", "hi": "शोध दिखाते हैं कि कृतज्ञता का अभ्यास — चाहे बस रोज़ कुछ अच्छी चीज़ें गिन लेना — भलाई को नापने लायक़ हद तक बढ़ाता है और तनाव घटाता है। परिवारों में यह आदत ज़्यादातर माता-पिता से पकड़ी जाती है, सिखाई नहीं जाती।" },
-      "remember": { "en": "A grateful heart is one that simply pays attention.", "hi": "कृतज्ञ दिल बस वह दिल है जो ध्यान देता है।" }
+      "title": { "en": "Children learn gratitude by watching you", "hi": "कृतज्ञता एक पारिवारिक आदत है" },
+      "insight": { "en": "Children don't learn gratitude from being told to say thank you. They learn it by living with people who notice the good things.", "hi": "बच्चे कृतज्ञता 'धन्यवाद बोलो' कहने से नहीं सीखते। वे इसे उन लोगों के बीच रहकर सीखते हैं जो अपने पास जो है, उसे देखते और सराहते हैं।" },
+      "expanded": { "en": "Gratitude is less a lesson and more the feel of a home. A child raised where small things get noticed, like a warm meal, a sunny morning or a kind word, grows up believing the world has plenty of good in it. You can start now by saying the good parts of your day out loud. One day your child will hear you do it. They'll learn, without any lecture, that gratitude starts with paying attention. That habit will serve them better than anything you could buy.", "hi": "कृतज्ञता एक सबक़ से ज़्यादा एक माहौल है। जिस घर में छोटी चीज़ें देखी और सराही जाती हैं — एक गर्म खाना, एक धूप भरी सुबह, एक अच्छा शब्द — वहाँ पले बच्चे यह मानकर बड़े होते हैं कि दुनिया तोहफ़ों से भरी है। आप यह धागा अभी से बुनना शुरू कर सकती हैं, बस अपने दिनों की अच्छी चीज़ों को चुपचाप बोलकर गिनते हुए। एक दिन बच्चे आपको ऐसा करते सुनेंगे और बिना एक भी भाषण के सीख जाएँगे कि कृतज्ञ दिल बस वह दिल है जो ध्यान देता है। यह आदत, किसी भी चीज़ से ज़्यादा, उन्हें ज़िंदगी भर अमीर रखेगी।" },
+      "deepDive": { "en": "Studies suggest that regularly noting a few good things can lift mood and ease stress in adults. Children tend to pick up the habit from the adults around them more than from being taught it.", "hi": "शोध दिखाते हैं कि कृतज्ञता का अभ्यास — चाहे बस रोज़ कुछ अच्छी चीज़ें गिन लेना — भलाई को नापने लायक़ हद तक बढ़ाता है और तनाव घटाता है। परिवारों में यह आदत ज़्यादातर माता-पिता से पकड़ी जाती है, सिखाई नहीं जाती।" },
+      "remember": { "en": "Being grateful starts with noticing what's good.", "hi": "कृतज्ञ दिल बस वह दिल है जो ध्यान देता है।" }
     },
     "readToBaby": {
       "title": { "en": "Krishna's Counsel On Duty", "hi": "कर्तव्य पर कृष्ण का उपदेश" },
@@ -97,8 +97,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby why gratitude matters to you — a time you felt truly thankful and what it taught you.", "hi": "अपने शिशु को बताएँ कि कृतज्ञता आपके लिए क्यों मायने रखती है — कोई एक समय जब आपने सच में शुक्रगुज़ार महसूस किया और उसने आपको क्या सिखाया।" },
-      "motivation": { "en": "When you name your own gratitude, you hand your child a lens that makes life feel fuller.", "hi": "जब आप अपनी कृतज्ञता को नाम देती हैं, तो आप अपने बच्चे को एक ऐसा चश्मा थमा देती हैं जिससे ज़िंदगी ज़्यादा भरी लगती है।" }
+      "title": { "en": "Tell your baby about a time you felt deeply thankful, and what it taught you.", "hi": "अपने शिशु को बताएँ कि कृतज्ञता आपके लिए क्यों मायने रखती है — कोई एक समय जब आपने सच में शुक्रगुज़ार महसूस किया और उसने आपको क्या सिखाया।" },
+      "motivation": { "en": "When you talk about what you're grateful for, you help your child learn to notice the good in their own life.", "hi": "जब आप अपनी कृतज्ञता को नाम देती हैं, तो आप अपने बच्चे को एक ऐसा चश्मा थमा देती हैं जिससे ज़िंदगी ज़्यादा भरी लगती है।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -113,9 +113,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "I Will Notice One Good Thing", "hi": "मैं एक अच्छी चीज़ ज़रूर देखूँगी" },
-      "content": { "en": "Even on a tiring day, I will pause to notice one small good thing — and let it be enough to soften me.", "hi": "थका देने वाले दिन में भी मैं रुककर एक छोटी अच्छी चीज़ पर नज़र डालूँगी — और उसे इतना काफ़ी होने दूँगी कि वह मुझे नरम कर दे।" },
-      "remember": { "en": "One noticed blessing can lighten a whole day.", "hi": "एक देखी हुई नेमत पूरे दिन को हल्का कर सकती है।" },
+      "title": { "en": "I'll notice one good thing today", "hi": "मैं एक अच्छी चीज़ ज़रूर देखूँगी" },
+      "content": { "en": "Even on a tiring day, I'll stop to notice one small good thing. I'll let it be enough to soften the day.", "hi": "थका देने वाले दिन में भी मैं रुककर एक छोटी अच्छी चीज़ पर नज़र डालूँगी — और उसे इतना काफ़ी होने दूँगी कि वह मुझे नरम कर दे।" },
+      "remember": { "en": "Noticing one good thing can make a whole day feel lighter.", "hi": "एक देखी हुई नेमत पूरे दिन को हल्का कर सकती है।" },
       "durationMinutes": 0
     }
   },
@@ -124,11 +124,11 @@
     "week": 31,
     "babyLearning": { "en": "Your baby's arms and legs are filling out.", "hi": "आपकी गर्माहट में अंगड़ाई लेते और करवट बदलते हुए" },
     "grow": {
-      "title": { "en": "Teach Them To Look Up", "hi": "उन्हें ऊपर देखना सिखाएँ" },
-      "insight": { "en": "A child who learns to look up — at the stars, the trees, the wide sky — grows up with a heart that is harder to make small.", "hi": "जो बच्चे ऊपर देखना सीखते हैं — तारों की तरफ़, पेड़ों की तरफ़, खुले आसमान की तरफ़ — वे ऐसे दिल के साथ बड़े होते हैं जिसे छोटा कर पाना मुश्किल है।" },
-      "expanded": { "en": "It is easy for life to pull our eyes down — to screens, to floors, to the next small task. But a child who is taught to look up, to lift their gaze to something vast, learns early that they are part of a world far bigger than their worries. The moon, a flock of birds, a tall old tree — these gently remind a small person that life is wide and full of marvels. You can give this gift simply by lifting your own eyes more often, and inviting your child to look up with you.", "hi": "ज़िंदगी हमारी नज़रें नीचे खींच ले, यह आसान है — screen की तरफ़, फ़र्श की तरफ़, अगले छोटे काम की तरफ़। पर जिन बच्चों को ऊपर देखना सिखाया जाता है, अपनी नज़र किसी विशाल चीज़ की तरफ़ उठाना, वे जल्दी सीख जाते हैं कि वे अपनी चिंताओं से कहीं बड़ी दुनिया का हिस्सा हैं। चाँद, पंछियों का एक झुंड, एक लंबा पुराना पेड़ — ये धीरे से एक छोटे इंसान को याद दिला देते हैं कि ज़िंदगी खुली है और अचंभों से भरी। यह तोहफ़ा आप बस अपनी नज़रें ज़्यादा बार उठाकर, और अपने बच्चे को अपने साथ ऊपर देखने का न्योता देकर दे सकती हैं।" },
-      "deepDive": { "en": "Time in nature and moments of awe are repeatedly linked to lower stress and a stronger sense of connection. Children given regular contact with sky, trees and open space show calmer, more curious minds.", "hi": "प्रकृति में बिताया समय और विस्मय के पल बार-बार कम तनाव और गहरे जुड़ाव के भाव से जुड़े मिले हैं। जिन बच्चों को आसमान, पेड़ों और खुली जगह के साथ नियमित संपर्क मिलता है, उनके मन ज़्यादा शांत और ज़्यादा जिज्ञासु दिखते हैं।" },
-      "remember": { "en": "Lift your eyes, and your child learns to lift theirs.", "hi": "आप अपनी नज़रें उठाएँ, और बच्चे अपनी उठाना सीख जाते हैं।" }
+      "title": { "en": "Teach your child to look up", "hi": "उन्हें ऊपर देखना सिखाएँ" },
+      "insight": { "en": "A child who learns to look up at the stars, the trees and the wide sky grows up with a bigger view of the world.", "hi": "जो बच्चे ऊपर देखना सीखते हैं — तारों की तरफ़, पेड़ों की तरफ़, खुले आसमान की तरफ़ — वे ऐसे दिल के साथ बड़े होते हैं जिसे छोटा कर पाना मुश्किल है।" },
+      "expanded": { "en": "It's easy for life to pull our eyes down, to screens, to the floor, to the next small job. A child who learns to look up at something big learns early that the world is larger than their worries. The moon, a flock of birds or a tall old tree can remind a small person that life is wide and full of good things to see. You can give this by looking up more often yourself, and asking your child to look with you.", "hi": "ज़िंदगी हमारी नज़रें नीचे खींच ले, यह आसान है — screen की तरफ़, फ़र्श की तरफ़, अगले छोटे काम की तरफ़। पर जिन बच्चों को ऊपर देखना सिखाया जाता है, अपनी नज़र किसी विशाल चीज़ की तरफ़ उठाना, वे जल्दी सीख जाते हैं कि वे अपनी चिंताओं से कहीं बड़ी दुनिया का हिस्सा हैं। चाँद, पंछियों का एक झुंड, एक लंबा पुराना पेड़ — ये धीरे से एक छोटे इंसान को याद दिला देते हैं कि ज़िंदगी खुली है और अचंभों से भरी। यह तोहफ़ा आप बस अपनी नज़रें ज़्यादा बार उठाकर, और अपने बच्चे को अपने साथ ऊपर देखने का न्योता देकर दे सकती हैं।" },
+      "deepDive": { "en": "Many studies link time in green, open spaces with lower stress, for children as well as adults. Sky, trees and room to move are good for a small, curious mind.", "hi": "प्रकृति में बिताया समय और विस्मय के पल बार-बार कम तनाव और गहरे जुड़ाव के भाव से जुड़े मिले हैं। जिन बच्चों को आसमान, पेड़ों और खुली जगह के साथ नियमित संपर्क मिलता है, उनके मन ज़्यादा शांत और ज़्यादा जिज्ञासु दिखते हैं।" },
+      "remember": { "en": "When you look up more often, your child learns to look up too.", "hi": "आप अपनी नज़रें उठाएँ, और बच्चे अपनी उठाना सीख जाते हैं।" }
     },
     "readToBaby": {
       "title": { "en": "The Monkeys Who Chased The Moon", "hi": "वे बंदर जिन्होंने चाँद का पीछा किया" },
@@ -137,8 +137,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about a simple joy you hope they treasure — something free, like the moon or rain or a quiet morning.", "hi": "अपने शिशु को किसी ऐसी सीधी-सादी ख़ुशी के बारे में बताएँ जो आप चाहती हैं कि वे सँजोकर रखें — कुछ जो मुफ़्त है, जैसे चाँद, बारिश, या एक शांत सुबह।" },
-      "motivation": { "en": "The simplest joys are the ones a child can carry their whole life, anywhere.", "hi": "सबसे सीधी-सादी ख़ुशियाँ वही होती हैं जिन्हें बच्चे पूरी ज़िंदगी, कहीं भी, साथ ले जा सकते हैं।" }
+      "title": { "en": "Tell your baby about a simple, free joy you hope they'll love, like the moon, the rain or a quiet morning.", "hi": "अपने शिशु को किसी ऐसी सीधी-सादी ख़ुशी के बारे में बताएँ जो आप चाहती हैं कि वे सँजोकर रखें — कुछ जो मुफ़्त है, जैसे चाँद, बारिश, या एक शांत सुबह।" },
+      "motivation": { "en": "Simple joys are ones a child can carry anywhere, all their life.", "hi": "सबसे सीधी-सादी ख़ुशियाँ वही होती हैं जिन्हें बच्चे पूरी ज़िंदगी, कहीं भी, साथ ले जा सकते हैं।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -153,9 +153,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Look Up And Breathe", "hi": "ऊपर देखें और साँस लें" },
-      "content": { "en": "Lift your gaze to the sky or ceiling and let your chin soften upward. Breathe in slowly as you look up, then lower your eyes as you breathe out. Repeat five times and feel your neck and chest open.", "hi": "अपनी नज़रें आसमान या छत की तरफ़ उठाएँ और ठोड़ी को नरमी से ऊपर होने दें। ऊपर देखते हुए धीरे से साँस भीतर लें, फिर साँस छोड़ते हुए नज़रें नीचे लाएँ। पाँच बार दोहराएँ और अपनी गर्दन और सीने को खुलता हुआ महसूस करें।" },
-      "remember": { "en": "Looking up opens both the body and the heart.", "hi": "ऊपर देखना शरीर और दिल, दोनों को खोल देता है।" },
+      "title": { "en": "Look up and breathe", "hi": "ऊपर देखें और साँस लें" },
+      "content": { "en": "Lift your gaze to the sky or the ceiling and let your chin tip gently up. Breathe in slowly as you look up. Lower your eyes as you breathe out. Repeat five times and feel your neck and chest open.", "hi": "अपनी नज़रें आसमान या छत की तरफ़ उठाएँ और ठोड़ी को नरमी से ऊपर होने दें। ऊपर देखते हुए धीरे से साँस भीतर लें, फिर साँस छोड़ते हुए नज़रें नीचे लाएँ। पाँच बार दोहराएँ और अपनी गर्दन और सीने को खुलता हुआ महसूस करें।" },
+      "remember": { "en": "A few breaths looking up can ease a tight neck and a busy mind.", "hi": "ऊपर देखना शरीर और दिल, दोनों को खोल देता है।" },
       "durationMinutes": 1
     }
   },
@@ -164,11 +164,11 @@
     "week": 31,
     "babyLearning": { "en": "It's getting snug in there, but your baby still moves plenty.", "hi": "भरते हुए — अंदर गर्म और आराम से" },
     "grow": {
-      "title": { "en": "Purpose Over Possessions", "hi": "चीज़ों से बड़ा मक़सद" },
-      "insight": { "en": "A child can have very little and still feel rich, if they grow up knowing their life has meaning.", "hi": "बच्चों के पास बहुत कम हो सकता है और फिर भी वे अमीर महसूस कर सकते हैं — अगर वे यह जानते हुए बड़े हों कि उनकी ज़िंदगी के मायने हैं।" },
-      "expanded": { "en": "It is natural to want to give your child plenty — the right things, the best of everything. But the deepest sense of richness a child can carry does not come from what they own; it comes from feeling that their life matters and has a purpose. A child who knows they are needed, that their kindness counts, that they belong to something good, walks through life steady and full. You give this not with gifts but with attention, with values lived aloud, and with the quiet message: you are here for a reason, and that reason is good.", "hi": "अपने बच्चे को बहुत कुछ देना चाहना सहज है — सही चीज़ें, हर चीज़ में सबसे अच्छी। पर अमीरी का सबसे गहरा एहसास इससे नहीं आता कि बच्चों के पास क्या है; वह यह महसूस करने से आता है कि उनकी ज़िंदगी के मायने हैं, उसका एक मक़सद है। जो बच्चे जानते हैं कि उनकी ज़रूरत है, कि उनकी नेकी गिनी जाती है, कि वे किसी अच्छी चीज़ का हिस्सा हैं — वे ज़िंदगी में स्थिर और भरे हुए चलते हैं। यह आप तोहफ़ों से नहीं, बल्कि ध्यान से देती हैं — बोलकर जिए गए मूल्यों से, और इस शांत संदेश से: तुम यहाँ एक वजह से हो, और वह वजह अच्छी है।" },
-      "deepDive": { "en": "Research consistently finds that beyond meeting basic needs, more possessions add little to a child's lasting happiness — while a sense of purpose and belonging predicts wellbeing well into adulthood.", "hi": "शोध लगातार यही पाते हैं कि बुनियादी ज़रूरतें पूरी हो जाने के बाद, ज़्यादा चीज़ें बच्चों की टिकाऊ ख़ुशी में बहुत कम जोड़ती हैं — जबकि मक़सद और अपनेपन का एहसास बड़े होने के बाद तक भलाई का पता देता है।" },
-      "remember": { "en": "Purpose makes a child feel rich in a way no possession can.", "hi": "मक़सद बच्चों को उस तरह अमीर महसूस कराता है, जैसे कोई चीज़ नहीं करा सकती।" }
+      "title": { "en": "A sense of purpose matters more than things", "hi": "चीज़ों से बड़ा मक़सद" },
+      "insight": { "en": "A child can have very little and still feel rich if they grow up knowing their life matters.", "hi": "बच्चों के पास बहुत कम हो सकता है और फिर भी वे अमीर महसूस कर सकते हैं — अगर वे यह जानते हुए बड़े हों कि उनकी ज़िंदगी के मायने हैं।" },
+      "expanded": { "en": "It's natural to want to give your child plenty, the right things and the best of everything. But the deepest sense of being rich doesn't come from what a child owns. It comes from feeling that their life matters. A child who knows they're needed, that their kindness counts and that they belong, walks through life steady. You give this through your attention and the values you live out loud. And through a clear message: you're here for a reason, and it's a good one.", "hi": "अपने बच्चे को बहुत कुछ देना चाहना सहज है — सही चीज़ें, हर चीज़ में सबसे अच्छी। पर अमीरी का सबसे गहरा एहसास इससे नहीं आता कि बच्चों के पास क्या है; वह यह महसूस करने से आता है कि उनकी ज़िंदगी के मायने हैं, उसका एक मक़सद है। जो बच्चे जानते हैं कि उनकी ज़रूरत है, कि उनकी नेकी गिनी जाती है, कि वे किसी अच्छी चीज़ का हिस्सा हैं — वे ज़िंदगी में स्थिर और भरे हुए चलते हैं। यह आप तोहफ़ों से नहीं, बल्कि ध्यान से देती हैं — बोलकर जिए गए मूल्यों से, और इस शांत संदेश से: तुम यहाँ एक वजह से हो, और वह वजह अच्छी है।" },
+      "deepDive": { "en": "Research suggests that once basic needs are met, more possessions add little to a child's happiness. Feeling loved, belonging and having a sense of purpose seem to matter much more.", "hi": "शोध लगातार यही पाते हैं कि बुनियादी ज़रूरतें पूरी हो जाने के बाद, ज़्यादा चीज़ें बच्चों की टिकाऊ ख़ुशी में बहुत कम जोड़ती हैं — जबकि मक़सद और अपनेपन का एहसास बड़े होने के बाद तक भलाई का पता देता है।" },
+      "remember": { "en": "Knowing their life matters makes a child richer than any toy can.", "hi": "मक़सद बच्चों को उस तरह अमीर महसूस कराता है, जैसे कोई चीज़ नहीं करा सकती।" }
     },
     "readToBaby": {
       "title": { "en": "Birbal On True Riches", "hi": "बीरबल और सच्ची अमीरी" },
@@ -177,8 +177,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby what you hope they find meaningful — the kind of work or life that you believe is worth living.", "hi": "अपने शिशु को बताएँ कि आप चाहती हैं कि उन्हें किसमें मायने मिलें — वह काम या वह ज़िंदगी जिसे आप जीने लायक़ मानती हैं।" },
-      "motivation": { "en": "When meaning guides a life, even ordinary days feel like they count.", "hi": "जब मायने ज़िंदगी को राह दिखाते हैं, तो आम दिन भी बेकार नहीं लगते।" }
+      "title": { "en": "Tell your baby the kind of work or life you think is worth living, and what you hope they'll find meaningful.", "hi": "अपने शिशु को बताएँ कि आप चाहती हैं कि उन्हें किसमें मायने मिलें — वह काम या वह ज़िंदगी जिसे आप जीने लायक़ मानती हैं।" },
+      "motivation": { "en": "When a life has meaning, even ordinary days feel like they count.", "hi": "जब मायने ज़िंदगी को राह दिखाते हैं, तो आम दिन भी बेकार नहीं लगते।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -193,9 +193,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "I Have More Than I Often Notice", "hi": "मेरे पास उससे ज़्यादा है, जितना मैं देख पाती हूँ" },
-      "content": { "en": "When I feel I lack something, I will gently turn to all I already have — and let that fullness quiet the wanting.", "hi": "जब मुझे लगे कि किसी चीज़ की कमी है, मैं धीरे से उस सब की तरफ़ मुड़ूँगी जो मेरे पास पहले से है — और उस भरेपन को चाहत शांत कर देने दूँगी।" },
-      "remember": { "en": "Enough is a feeling, not an amount.", "hi": "'काफ़ी' एक एहसास है, कोई गिनती नहीं।" },
+      "title": { "en": "I have more than I often notice", "hi": "मेरे पास उससे ज़्यादा है, जितना मैं देख पाती हूँ" },
+      "content": { "en": "When I feel I'm missing something, I'll turn my mind to all I already have. I'll let that feeling of having enough ease the wanting.", "hi": "जब मुझे लगे कि किसी चीज़ की कमी है, मैं धीरे से उस सब की तरफ़ मुड़ूँगी जो मेरे पास पहले से है — और उस भरेपन को चाहत शांत कर देने दूँगी।" },
+      "remember": { "en": "Feeling you have enough starts with noticing what's already here.", "hi": "'काफ़ी' एक एहसास है, कोई गिनती नहीं।" },
       "durationMinutes": 0
     }
   },
@@ -204,11 +204,11 @@
     "week": 31,
     "babyLearning": { "en": "Your baby's lungs and brain keep maturing each day.", "hi": "आपकी आवाज़ सुनते हुए, शांत होते हुए" },
     "grow": {
-      "title": { "en": "The Sacred In The Ordinary", "hi": "आम में छिपा पवित्र" },
-      "insight": { "en": "You do not need temples or grand moments to teach a child reverence. The ordinary day is full of the sacred.", "hi": "बच्चों को श्रद्धा सिखाने के लिए आपको मंदिर या बड़े पलों की ज़रूरत नहीं। आम दिन ही पवित्र से भरा है।" },
-      "expanded": { "en": "We often imagine the sacred as something set apart — a special place, a holy hour. But a child raised to see wonder in the everyday learns a deeper reverence: that a shared meal, a hand held, a morning light through the window can each be holy. When you treat small daily things with care and attention, you teach your child that life itself is sacred, not only its rare and shining moments. This is perhaps the gentlest faith of all — the quiet sense that grace is hidden in the ordinary, waiting to be noticed.", "hi": "हम अक्सर पवित्र को कोई अलग रखी हुई चीज़ मान लेते हैं — एक ख़ास जगह, एक ख़ास घड़ी। पर जिन बच्चों को रोज़मर्रा में विस्मय देखना सिखाया जाता है, वे एक गहरी श्रद्धा सीखते हैं: कि साथ बैठकर खाया गया खाना, एक थामा हुआ हाथ, खिड़की से आती सुबह की रोशनी — हर एक पवित्र हो सकती है। जब आप रोज़ की छोटी चीज़ों को देखभाल और ध्यान से करती हैं, तो आप सिखा देती हैं कि ज़िंदगी ख़ुद पवित्र है, सिर्फ़ उसके गिने-चुने चमकते पल नहीं। शायद यही सबसे नरम आस्था है — यह शांत एहसास कि कृपा आम में ही छिपी है, देखे जाने का इंतज़ार करती हुई।" },
-      "deepDive": { "en": "Studies of everyday rituals — shared meals, bedtime routines, small acts of care — show they build a child's sense of security and meaning more than occasional grand events. The sacred, it seems, lives in repetition.", "hi": "रोज़मर्रा की रस्मों पर हुए अध्ययन — साथ खाया खाना, सोने से पहले की आदतें, देखभाल के छोटे काम — दिखाते हैं कि ये बच्चों में सुरक्षा और मायनों का भाव कभी-कभार के बड़े आयोजनों से कहीं ज़्यादा बनाते हैं। पवित्र, लगता है, दोहराव में ही बसता है।" },
-      "remember": { "en": "Grace hides in the ordinary, waiting to be noticed.", "hi": "कृपा आम में छिपी रहती है, देखे जाने का इंतज़ार करती हुई।" }
+      "title": { "en": "Everyday moments can feel sacred", "hi": "आम में छिपा पवित्र" },
+      "insight": { "en": "You don't need temples or big occasions to teach a child reverence. Ordinary days are full of moments worth treating with care.", "hi": "बच्चों को श्रद्धा सिखाने के लिए आपको मंदिर या बड़े पलों की ज़रूरत नहीं। आम दिन ही पवित्र से भरा है।" },
+      "expanded": { "en": "We often think of the sacred as something set apart, a special place or a holy hour. A child raised to see wonder in everyday life learns a gentler kind of reverence. A shared meal, a held hand or morning light through the window can each feel special. When you treat small daily things with care, you teach your child that all of life deserves respect, not only its big moments. It's a gentle kind of faith: a sense that grace is there in ordinary days, waiting to be noticed.", "hi": "हम अक्सर पवित्र को कोई अलग रखी हुई चीज़ मान लेते हैं — एक ख़ास जगह, एक ख़ास घड़ी। पर जिन बच्चों को रोज़मर्रा में विस्मय देखना सिखाया जाता है, वे एक गहरी श्रद्धा सीखते हैं: कि साथ बैठकर खाया गया खाना, एक थामा हुआ हाथ, खिड़की से आती सुबह की रोशनी — हर एक पवित्र हो सकती है। जब आप रोज़ की छोटी चीज़ों को देखभाल और ध्यान से करती हैं, तो आप सिखा देती हैं कि ज़िंदगी ख़ुद पवित्र है, सिर्फ़ उसके गिने-चुने चमकते पल नहीं। शायद यही सबसे नरम आस्था है — यह शांत एहसास कि कृपा आम में ही छिपी है, देखे जाने का इंतज़ार करती हुई।" },
+      "deepDive": { "en": "Research on family routines, like shared meals and bedtime rituals, suggests they help children feel secure. Small things done again and again seem to matter more than rare big events.", "hi": "रोज़मर्रा की रस्मों पर हुए अध्ययन — साथ खाया खाना, सोने से पहले की आदतें, देखभाल के छोटे काम — दिखाते हैं कि ये बच्चों में सुरक्षा और मायनों का भाव कभी-कभार के बड़े आयोजनों से कहीं ज़्यादा बनाते हैं। पवित्र, लगता है, दोहराव में ही बसता है।" },
+      "remember": { "en": "Ordinary days have grace in them, if you stop to notice.", "hi": "कृपा आम में छिपी रहती है, देखे जाने का इंतज़ार करती हुई।" }
     },
     "readToBaby": {
       "title": { "en": "The Fisherman And The Rich Merchant", "hi": "मछुआरा और अमीर व्यापारी" },
@@ -217,8 +217,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby the kind of rich you hope they become — rich in love, in time, in peace, not only in things.", "hi": "अपने शिशु को उस तरह की अमीरी के बारे में बताएँ जो आप उनके लिए चाहती हैं — प्यार में अमीर, समय में, शांति में, सिर्फ़ चीज़ों में नहीं।" },
-      "motivation": { "en": "How you define 'rich' will quietly shape what your child spends their life chasing.", "hi": "आप 'अमीर' का मतलब क्या मानती हैं, चुपचाप वही तय कर देता है कि बच्चे ज़िंदगी भर किसके पीछे भागेंगे।" }
+      "title": { "en": "Tell your baby the kind of rich you hope they'll be: rich in love, time and peace, not only in things.", "hi": "अपने शिशु को उस तरह की अमीरी के बारे में बताएँ जो आप उनके लिए चाहती हैं — प्यार में अमीर, समय में, शांति में, सिर्फ़ चीज़ों में नहीं।" },
+      "motivation": { "en": "How you describe being rich will shape what your child spends their life chasing.", "hi": "आप 'अमीर' का मतलब क्या मानती हैं, चुपचाप वही तय कर देता है कि बच्चे ज़िंदगी भर किसके पीछे भागेंगे।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -233,9 +233,9 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "Last-Trimester Heartburn", "hi": "आख़िरी तिमाही की जलन" },
-      "content": { "en": "As your baby presses higher, that burning rise after meals can flare. Sip warm water, avoid lying down right after eating, and lean toward cooler, soothing foods like cool milk, soft rice or banana rather than heavy fried or spicy plates.", "hi": "अब जब अंदर से दबाव और ऊपर तक आने लगा है, खाने के बाद वह जलन और भड़क सकती है। गर्म पानी की चुस्कियाँ लें, खाने के तुरंत बाद लेटने से बचें, और भारी तले या तीखे खाने के बजाय ठंडी, राहत देने वाली चीज़ों की तरफ़ झुकें — जैसे ठंडा दूध, नरम चावल या केला।" },
-      "remember": { "en": "Cool and simple soothes what heavy and spicy stirs up.", "hi": "ठंडा और सादा वही शांत करता है जिसे भारी और तीखा भड़काता है।" },
+      "title": { "en": "Heartburn in the last trimester", "hi": "आख़िरी तिमाही की जलन" },
+      "content": { "en": "As your baby pushes higher, that burning feeling after meals can flare up. Sip warm water. Try not to lie down straight after eating. Choose cooler, soothing foods like cool milk, soft rice or banana over heavy, fried or spicy plates.", "hi": "अब जब अंदर से दबाव और ऊपर तक आने लगा है, खाने के बाद वह जलन और भड़क सकती है। गर्म पानी की चुस्कियाँ लें, खाने के तुरंत बाद लेटने से बचें, और भारी तले या तीखे खाने के बजाय ठंडी, राहत देने वाली चीज़ों की तरफ़ झुकें — जैसे ठंडा दूध, नरम चावल या केला।" },
+      "remember": { "en": "Cool, simple food settles heartburn better than heavy, spicy food.", "hi": "ठंडा और सादा वही शांत करता है जिसे भारी और तीखा भड़काता है।" },
       "durationMinutes": 0
     }
   },
@@ -244,11 +244,11 @@
     "week": 31,
     "babyLearning": { "en": "Your baby's fingernails are growing towards the fingertips.", "hi": "हफ़्ता पूरा होते हुए, और मज़बूत और पक्के होते हुए" },
     "grow": {
-      "title": { "en": "What Truly Lasts", "hi": "जो सच में टिकता है" },
-      "insight": { "en": "Almost everything we chase will fade. What lasts in a child is the love they were given and the goodness it grew in them.", "hi": "जिनके पीछे हम भागते हैं, वह लगभग सब कुछ मिट जाता है। बच्चों में जो टिकता है, वह है उन्हें मिला प्यार और उससे उनमें उगी नेकी।" },
-      "expanded": { "en": "As you prepare to meet your baby, it is worth asking quietly: of all you might give them, what will truly last? Not the toys, not the milestones, not the perfect plans — those come and go. What remains is the felt experience of being loved, the values lived in front of them, the steadiness they learned to carry inside. A child grown in genuine love and meaning carries it forward into every room they enter, long after the small things are forgotten. You are planting, even now, what will outlast you both — and the seed is simply love.", "hi": "जैसे-जैसे आप अपने शिशु से मिलने की तैयारी करती हैं, चुपचाप यह पूछना अच्छा है: जो सब आप उन्हें दे सकती हैं, उसमें से सच में टिकेगा क्या? खिलौने नहीं, बड़े पड़ाव नहीं, एकदम सही योजनाएँ नहीं — ये आते-जाते रहते हैं। जो रह जाता है वह है प्यार पाए जाने का महसूस किया हुआ अनुभव, उनके सामने जिए गए मूल्य, और भीतर थामने लायक़ वह स्थिरता जो उन्होंने सीखी। सच्चे प्यार और मायनों में बड़े हुए बच्चे उसे हर उस कमरे में साथ ले जाते हैं जहाँ वे दाख़िल होते हैं — छोटी चीज़ें भूल जाने के बहुत बाद तक। आप अभी से वह बो रही हैं जो आप दोनों से आगे टिकेगा — और बीज बस प्यार है।" },
-      "deepDive": { "en": "Long-term studies find that what adults most remember from childhood is not what they owned, but how loved and safe they felt. Warmth and values, not things, are what truly endure.", "hi": "लंबे समय तक चले अध्ययन पाते हैं कि बड़े होकर लोग बचपन से सबसे ज़्यादा यह याद रखते हैं कि उन्हें कितना प्यार और कितनी सुरक्षा महसूस हुई — यह नहीं कि उनके पास क्या था। गर्मजोशी और मूल्य टिकते हैं, चीज़ें नहीं।" },
-      "remember": { "en": "Love is the one gift that outlasts everything else.", "hi": "प्यार वह एक तोहफ़ा है जो बाक़ी सब से ज़्यादा टिकता है।" }
+      "title": { "en": "What your child keeps is your love", "hi": "जो सच में टिकता है" },
+      "insight": { "en": "Most of what we chase will fade. What stays with a child is the love they were given and the goodness it grew in them.", "hi": "जिनके पीछे हम भागते हैं, वह लगभग सब कुछ मिट जाता है। बच्चों में जो टिकता है, वह है उन्हें मिला प्यार और उससे उनमें उगी नेकी।" },
+      "expanded": { "en": "As you get ready to meet your baby, it's worth asking which of the things you give them will last. Not the toys, the milestones or the perfect plans. Those come and go. What stays is the feeling of being loved, the values they saw you live, and the steadiness they learned to carry inside. A child raised with real love takes it into every room they enter, long after the small things are forgotten. You're planting that now, and the seed is love.", "hi": "जैसे-जैसे आप अपने शिशु से मिलने की तैयारी करती हैं, चुपचाप यह पूछना अच्छा है: जो सब आप उन्हें दे सकती हैं, उसमें से सच में टिकेगा क्या? खिलौने नहीं, बड़े पड़ाव नहीं, एकदम सही योजनाएँ नहीं — ये आते-जाते रहते हैं। जो रह जाता है वह है प्यार पाए जाने का महसूस किया हुआ अनुभव, उनके सामने जिए गए मूल्य, और भीतर थामने लायक़ वह स्थिरता जो उन्होंने सीखी। सच्चे प्यार और मायनों में बड़े हुए बच्चे उसे हर उस कमरे में साथ ले जाते हैं जहाँ वे दाख़िल होते हैं — छोटी चीज़ें भूल जाने के बहुत बाद तक। आप अभी से वह बो रही हैं जो आप दोनों से आगे टिकेगा — और बीज बस प्यार है।" },
+      "deepDive": { "en": "When adults look back on childhood, they tend to talk about how loved and safe they felt far more than about what they owned. Warmth and values are what children carry forward.", "hi": "लंबे समय तक चले अध्ययन पाते हैं कि बड़े होकर लोग बचपन से सबसे ज़्यादा यह याद रखते हैं कि उन्हें कितना प्यार और कितनी सुरक्षा महसूस हुई — यह नहीं कि उनके पास क्या था। गर्मजोशी और मूल्य टिकते हैं, चीज़ें नहीं।" },
+      "remember": { "en": "Love is the gift that lasts longest.", "hi": "प्यार वह एक तोहफ़ा है जो बाक़ी सब से ज़्यादा टिकता है।" }
     },
     "readToBaby": {
       "title": { "en": "The Tree That Bowed With Fruit", "hi": "वह पेड़ जो फलों से झुक गया" },
@@ -257,8 +257,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby how you find peace within yourself — the place you return to when the world feels heavy.", "hi": "अपने शिशु को बताएँ कि आप अपने भीतर शांति कैसे पाती हैं — वह जगह जहाँ आप लौटती हैं जब दुनिया भारी लगने लगती है।" },
-      "motivation": { "en": "Showing a child how to find inner peace is showing them a home they can always return to.", "hi": "बच्चों को भीतर की शांति पाना दिखाना, उन्हें एक ऐसा घर दिखाना है जहाँ वे हमेशा लौट सकते हैं।" }
+      "title": { "en": "Tell your baby how you find peace inside yourself, the place you go back to when the world feels heavy.", "hi": "अपने शिशु को बताएँ कि आप अपने भीतर शांति कैसे पाती हैं — वह जगह जहाँ आप लौटती हैं जब दुनिया भारी लगने लगती है।" },
+      "motivation": { "en": "When you show a child how to find calm inside, you give them a home they can always go back to.", "hi": "बच्चों को भीतर की शांति पाना दिखाना, उन्हें एक ऐसा घर दिखाना है जहाँ वे हमेशा लौट सकते हैं।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -273,9 +273,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Return To The Still Place", "hi": "उस स्थिर जगह पर लौटें" },
-      "content": { "en": "Close your eyes and breathe in slowly, imagining your breath sinking down to a calm, still place in your centre. Breathe out and rest there for a moment. Repeat for five slow breaths whenever the world feels loud.", "hi": "आँखें बंद करें और धीरे से साँस भीतर लें, यह सोचते हुए कि साँस आपके भीतर एक शांत, स्थिर जगह तक उतर रही है। साँस छोड़ें और एक पल वहीं ठहरें। जब भी दुनिया शोर भरी लगे, ऐसी पाँच धीमी साँसें लें।" },
-      "remember": { "en": "The still place within you is always only one breath away.", "hi": "आपके भीतर की स्थिर जगह हमेशा बस एक साँस दूर है।" },
+      "title": { "en": "Go back to your calm place", "hi": "उस स्थिर जगह पर लौटें" },
+      "content": { "en": "Close your eyes and breathe in slowly. Picture your breath sinking down to a calm, still place in your centre. Breathe out and rest there for a moment. Repeat for five slow breaths whenever the world feels loud.", "hi": "आँखें बंद करें और धीरे से साँस भीतर लें, यह सोचते हुए कि साँस आपके भीतर एक शांत, स्थिर जगह तक उतर रही है। साँस छोड़ें और एक पल वहीं ठहरें। जब भी दुनिया शोर भरी लगे, ऐसी पाँच धीमी साँसें लें।" },
+      "remember": { "en": "Your calm place is always one slow breath away.", "hi": "आपके भीतर की स्थिर जगह हमेशा बस एक साँस दूर है।" },
       "durationMinutes": 1
     }
   }

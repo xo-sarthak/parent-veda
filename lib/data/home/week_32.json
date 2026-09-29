@@ -4,11 +4,11 @@
     "week": 32,
     "babyLearning": { "en": "Your baby sleeps in regular cycles for much of the day.", "hi": "गोल और मज़बूत होता जा रहा है, नीचे आराम से बस रहा है" },
     "grow": {
-      "title": { "en": "Your Attention Is Love", "hi": "आपका ध्यान ही प्यार है" },
-      "insight": { "en": "To a child, attention and love are the same thing. The fullest way to say 'I love you' is simply to be fully there.", "hi": "बच्चों के लिए ध्यान और प्यार एक ही चीज़ है। 'मुझे तुमसे प्यार है' कहने का सबसे पूरा तरीक़ा है — बस पूरी तरह वहाँ होना।" },
-      "expanded": { "en": "Children do not measure love by what we buy or say. They measure it by how it feels to have our eyes, our ears, our whole self turned towards them. When you stop, look, and truly listen, a child feels a quiet certainty: 'I matter.' As you near the end of this journey, this is worth holding close. The undivided attention you are learning to give now — to your breath, to your belly, to your baby's small movements — is the very same gift your child will need most. Attention is love made visible.", "hi": "बच्चे प्यार को इससे नहीं नापते कि हम क्या ख़रीदते या कहते हैं। वे इससे नापते हैं कि हमारी आँखें, हमारे कान, हमारा पूरा वजूद उनकी तरफ़ मुड़ना कैसा लगता है। जब आप रुकती हैं, देखती हैं, और सच में सुनती हैं, तो बच्चे के भीतर एक शांत यक़ीन बैठ जाता है — 'मेरी अहमियत है।' इस सफ़र के आख़िर के क़रीब आते हुए यह बात पास रखने लायक़ है। पूरा-का-पूरा ध्यान देना आप अभी सीख रही हैं — अपनी साँस को, अपने पेट को, अपने शिशु की छोटी-छोटी हरकतों को — और वही तोहफ़ा आगे आपके बच्चे को सबसे ज़्यादा चाहिए होगा। ध्यान वही प्यार है, जो दिखाई देने लगता है।" },
-      "deepDive": { "en": "Researchers find that responsive, focused attention in the early years builds the neural pathways for trust and emotional security. Children read undivided attention as a message of worth.", "hi": "शोध बताते हैं कि शुरुआती सालों में जवाब देने वाला, टिका हुआ ध्यान भरोसे और भावनात्मक सुरक्षा के रास्ते दिमाग़ में बना देता है। पूरा ध्यान बच्चों तक अपनी अहमियत के संदेश की तरह पहुँचता है।" },
-      "remember": { "en": "When you give your full attention, you are saying 'I love you.'", "hi": "जब आप अपना पूरा ध्यान देती हैं, आप कह रही होती हैं — 'मुझे तुमसे प्यार है।'" }
+      "title": { "en": "Your attention tells your child they're loved", "hi": "आपका ध्यान ही प्यार है" },
+      "insight": { "en": "To a child, attention and love feel like the same thing. Being fully there is one of the clearest ways to say I love you.", "hi": "बच्चों के लिए ध्यान और प्यार एक ही चीज़ है। 'मुझे तुमसे प्यार है' कहने का सबसे पूरा तरीक़ा है — बस पूरी तरह वहाँ होना।" },
+      "expanded": { "en": "Children don't measure love by what we buy or say. They feel it when our eyes, our ears and our whole self are turned towards them. When you stop, look and listen, a child feels sure of one thing: I matter. As the due date gets closer, this is worth holding on to. The attention you're learning to give now, to your breath and to your baby's small movements, is the same gift your child will need most. Attention is how love shows.", "hi": "बच्चे प्यार को इससे नहीं नापते कि हम क्या ख़रीदते या कहते हैं। वे इससे नापते हैं कि हमारी आँखें, हमारे कान, हमारा पूरा वजूद उनकी तरफ़ मुड़ना कैसा लगता है। जब आप रुकती हैं, देखती हैं, और सच में सुनती हैं, तो बच्चे के भीतर एक शांत यक़ीन बैठ जाता है — 'मेरी अहमियत है।' इस सफ़र के आख़िर के क़रीब आते हुए यह बात पास रखने लायक़ है। पूरा-का-पूरा ध्यान देना आप अभी सीख रही हैं — अपनी साँस को, अपने पेट को, अपने शिशु की छोटी-छोटी हरकतों को — और वही तोहफ़ा आगे आपके बच्चे को सबसे ज़्यादा चाहिए होगा। ध्यान वही प्यार है, जो दिखाई देने लगता है।" },
+      "deepDive": { "en": "Research on early childhood shows that warm, responsive attention helps babies build trust and feel secure. Children take focused attention as a sign that they matter.", "hi": "शोध बताते हैं कि शुरुआती सालों में जवाब देने वाला, टिका हुआ ध्यान भरोसे और भावनात्मक सुरक्षा के रास्ते दिमाग़ में बना देता है। पूरा ध्यान बच्चों तक अपनी अहमियत के संदेश की तरह पहुँचता है।" },
+      "remember": { "en": "Giving your full attention is one way of saying I love you.", "hi": "जब आप अपना पूरा ध्यान देती हैं, आप कह रही होती हैं — 'मुझे तुमसे प्यार है।'" }
     },
     "readToBaby": {
       "title": { "en": "The Hare With Many Friends", "hi": "बहुत दोस्तों वाला ख़रगोश" },
@@ -17,8 +17,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby how you will give them your full attention — eyes, ears and whole heart turned just to them.", "hi": "अपने शिशु को बताइए कि आप उसे अपना पूरा ध्यान कैसे देंगी — आँखें, कान और पूरा दिल, बस उसी की तरफ़ मुड़े हुए।" },
-      "motivation": { "en": "The promise of your full attention is the first thing your child will feel as love.", "hi": "आपके पूरे ध्यान का वादा वह पहली चीज़ है जिसे आपका बच्चा प्यार की तरह महसूस करेगा।" }
+      "title": { "en": "Tell your baby how you'll give them your full attention, with your eyes, your ears and your whole heart.", "hi": "अपने शिशु को बताइए कि आप उसे अपना पूरा ध्यान कैसे देंगी — आँखें, कान और पूरा दिल, बस उसी की तरफ़ मुड़े हुए।" },
+      "motivation": { "en": "Your full attention will be one of the first ways your child feels loved.", "hi": "आपके पूरे ध्यान का वादा वह पहली चीज़ है जिसे आपका बच्चा प्यार की तरह महसूस करेगा।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -33,9 +33,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "One Breath, Fully Here", "hi": "एक साँस, पूरी तरह यहीं" },
-      "content": { "en": "Take one slow breath and, just for it, let everything else go. Feel only the air coming in and going out. One fully present breath can bring you back to now.", "hi": "एक धीमी साँस लीजिए और बस उतनी देर के लिए बाक़ी सब जाने दीजिए। सिर्फ़ अंदर आती और बाहर जाती हवा को महसूस कीजिए। पूरी तरह मौजूद एक साँस आपको वापस इसी पल में ले आ सकती है।" },
-      "remember": { "en": "Presence begins with a single breath.", "hi": "मौजूद होना एक ही साँस से शुरू होता है।" },
+      "title": { "en": "One breath, fully here", "hi": "एक साँस, पूरी तरह यहीं" },
+      "content": { "en": "Take one slow breath and, just for that breath, let everything else go. Notice only the air coming in and going out. One breath like this can bring you back to the present.", "hi": "एक धीमी साँस लीजिए और बस उतनी देर के लिए बाक़ी सब जाने दीजिए। सिर्फ़ अंदर आती और बाहर जाती हवा को महसूस कीजिए। पूरी तरह मौजूद एक साँस आपको वापस इसी पल में ले आ सकती है।" },
+      "remember": { "en": "Being present can start with a single breath.", "hi": "मौजूद होना एक ही साँस से शुरू होता है।" },
       "durationMinutes": 1
     }
   },
@@ -44,11 +44,11 @@
     "week": 32,
     "babyLearning": { "en": "Your baby is storing iron and nutrients for after birth.", "hi": "नन्ही साँसों का अभ्यास कर रहा है, दुनिया के लिए तैयार होते हुए" },
     "grow": {
-      "title": { "en": "Put The Phone Down", "hi": "फ़ोन नीचे रख दीजिए" },
-      "insight": { "en": "A child can feel the difference between you looking at them and you looking past them at a screen.", "hi": "बच्चे इस फ़र्क़ को महसूस कर लेते हैं कि आप उन्हें देख रही हैं, या उनके पार किसी स्क्रीन को।" },
-      "expanded": { "en": "The most ordinary distraction of our time is the small glowing rectangle in our hands. It is not bad — but it quietly competes for the very attention a child longs for. When you put the phone down and turn fully towards your little one, even for a few minutes, you give them something rare: the feeling of being more interesting than anything else in the room. You do not need to be perfect about this. But practising now, in these last weeks, the simple act of setting the screen aside, prepares you to offer your child the undistracted presence that tells them they come first.", "hi": "हमारे समय का सबसे आम ध्यान भटकाने वाला हमारे हाथ में पकड़ा वह छोटा सा चमकता आयत है। वह बुरा नहीं है — पर वह चुपचाप उसी ध्यान से होड़ करता है जिसके लिए एक बच्चा तरसता है। जब आप फ़ोन नीचे रखकर पूरी तरह अपने नन्हे की तरफ़ मुड़ती हैं, चंद मिनटों के लिए भी, तो आप उसे कुछ दुर्लभ देती हैं — कमरे की हर दूसरी चीज़ से ज़्यादा दिलचस्प होने का एहसास। इसमें आपको परफ़ेक्ट होने की ज़रूरत नहीं। पर इन आख़िरी हफ़्तों में स्क्रीन को एक तरफ़ रख देने की यह सीधी सी आदत अभी से डालना आपको तैयार करता है — ताकि आगे आप अपने बच्चे को वह बिना भटकी मौजूदगी दे सकें, जो उसे बताती है कि वह सबसे पहले आता है।" },
-      "deepDive": { "en": "Studies of 'technoference' show that frequent device interruptions during caregiving are linked to more behaviour difficulties in young children. Children notice, and respond to, divided attention.", "hi": "'Technoference' पर हुए शोध बताते हैं कि देखभाल के बीच बार-बार फ़ोन की दख़ल छोटे बच्चों में व्यवहार की ज़्यादा मुश्किलों से जुड़ी है। बँटा हुआ ध्यान बच्चे ताड़ लेते हैं, और उस पर प्रतिक्रिया भी देते हैं।" },
-      "remember": { "en": "Setting the screen aside is one of the kindest things you can do.", "hi": "स्क्रीन को एक तरफ़ रख देना सबसे प्यार भरे कामों में से एक है जो आप कर सकती हैं।" }
+      "title": { "en": "Put the phone down", "hi": "फ़ोन नीचे रख दीजिए" },
+      "insight": { "en": "A child can tell the difference between you looking at them and you looking past them at a screen.", "hi": "बच्चे इस फ़र्क़ को महसूस कर लेते हैं कि आप उन्हें देख रही हैं, या उनके पार किसी स्क्रीन को।" },
+      "expanded": { "en": "The most common distraction today is the phone in our hands. It isn't bad, but it competes for the attention a child wants most. When you put the phone down and turn towards your little one, even for a few minutes, you give them something rare. They feel more interesting than anything else in the room. You don't need to be perfect about this. Practising it now, in these last weeks, gets you ready to give your child the kind of attention that tells them they come first.", "hi": "हमारे समय का सबसे आम ध्यान भटकाने वाला हमारे हाथ में पकड़ा वह छोटा सा चमकता आयत है। वह बुरा नहीं है — पर वह चुपचाप उसी ध्यान से होड़ करता है जिसके लिए एक बच्चा तरसता है। जब आप फ़ोन नीचे रखकर पूरी तरह अपने नन्हे की तरफ़ मुड़ती हैं, चंद मिनटों के लिए भी, तो आप उसे कुछ दुर्लभ देती हैं — कमरे की हर दूसरी चीज़ से ज़्यादा दिलचस्प होने का एहसास। इसमें आपको परफ़ेक्ट होने की ज़रूरत नहीं। पर इन आख़िरी हफ़्तों में स्क्रीन को एक तरफ़ रख देने की यह सीधी सी आदत अभी से डालना आपको तैयार करता है — ताकि आगे आप अपने बच्चे को वह बिना भटकी मौजूदगी दे सकें, जो उसे बताती है कि वह सबसे पहले आता है।" },
+      "deepDive": { "en": "Studies of what researchers call technoference suggest that frequent phone interruptions during care are linked with more behaviour difficulties in young children. Children notice when attention is split.", "hi": "'Technoference' पर हुए शोध बताते हैं कि देखभाल के बीच बार-बार फ़ोन की दख़ल छोटे बच्चों में व्यवहार की ज़्यादा मुश्किलों से जुड़ी है। बँटा हुआ ध्यान बच्चे ताड़ लेते हैं, और उस पर प्रतिक्रिया भी देते हैं।" },
+      "remember": { "en": "Putting the phone away is one of the kindest things you can do for your child.", "hi": "स्क्रीन को एक तरफ़ रख देना सबसे प्यार भरे कामों में से एक है जो आप कर सकती हैं।" }
     },
     "readToBaby": {
       "title": { "en": "The Washerman's Dog", "hi": "धोबी का कुत्ता" },
@@ -57,8 +57,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby how you will put away your distractions, so the time you share is truly theirs.", "hi": "अपने शिशु को बताइए कि आप अपना ध्यान भटकाने वाली चीज़ें कैसे दूर रखेंगी, ताकि जो समय आप साथ बिताएँ वह सच में उसी का हो।" },
-      "motivation": { "en": "Choosing to be undistracted is how you tell your child they are worth your whole self.", "hi": "ध्यान न भटकने देना चुनना ही वह तरीक़ा है जिससे आप अपने बच्चे को बताती हैं कि वह आपके पूरे वजूद के लायक़ है।" }
+      "title": { "en": "Tell your baby how you'll put your distractions away, so the time you share is all theirs.", "hi": "अपने शिशु को बताइए कि आप अपना ध्यान भटकाने वाली चीज़ें कैसे दूर रखेंगी, ताकि जो समय आप साथ बिताएँ वह सच में उसी का हो।" },
+      "motivation": { "en": "Putting distractions away tells your child they're worth all of your attention.", "hi": "ध्यान न भटकने देना चुनना ही वह तरीक़ा है जिससे आप अपने बच्चे को बताती हैं कि वह आपके पूरे वजूद के लायक़ है।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -73,9 +73,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "I Can Be Where My Feet Are", "hi": "मैं वहीं हो सकती हूँ जहाँ मेरे पैर हैं" },
-      "content": { "en": "I do not have to be everywhere at once. Right now, I can simply be here, in this one quiet moment.", "hi": "मुझे एक साथ हर जगह होने की ज़रूरत नहीं। अभी, मैं बस यहीं हो सकती हूँ, इस एक शांत पल में।" },
-      "remember": { "en": "Being fully in one place is its own kind of rest.", "hi": "एक ही जगह पूरी तरह होना अपने आप में एक तरह का आराम है।" },
+      "title": { "en": "I can be right where I am", "hi": "मैं वहीं हो सकती हूँ जहाँ मेरे पैर हैं" },
+      "content": { "en": "I don't have to be everywhere at once. Right now, I can be here, in this one quiet moment.", "hi": "मुझे एक साथ हर जगह होने की ज़रूरत नहीं। अभी, मैं बस यहीं हो सकती हूँ, इस एक शांत पल में।" },
+      "remember": { "en": "Being fully in one place is a kind of rest.", "hi": "एक ही जगह पूरी तरह होना अपने आप में एक तरह का आराम है।" },
       "durationMinutes": 0
     }
   },
@@ -84,11 +84,11 @@
     "week": 32,
     "babyLearning": { "en": "Many babies turn head-down between now and week 36.", "hi": "नरम और आराम से सिमटा हुआ, अब तक आपकी आवाज़ अच्छे से पहचानता हुआ" },
     "grow": {
-      "title": { "en": "Presence Over Presents", "hi": "तोहफ़ों से बढ़कर मौजूदगी" },
-      "insight": { "en": "Years from now, your child will not remember most of the gifts. They will remember the moments you were truly there.", "hi": "सालों बाद आपके बच्चे को ज़्यादातर तोहफ़े याद नहीं रहेंगे। उसे वे पल याद रहेंगे जब आप सच में वहाँ थीं।" },
-      "expanded": { "en": "There is a quiet pressure to give children more and more things, as if love could be measured in toys. But ask any grown person about their happiest childhood memories, and they rarely name objects. They name a parent who sat on the floor and played, who listened to a long rambling story, who simply stayed. Presents are easily forgotten; presence is woven into who a child becomes. As you wait to meet your baby, let this lift a weight from you. The most treasured thing you will ever give costs nothing but your time and your full, warm attention.", "hi": "बच्चों को और-और चीज़ें देने का एक चुपचाप दबाव रहता है, जैसे प्यार को खिलौनों में नापा जा सकता हो। पर किसी भी बड़े इंसान से उसके बचपन की सबसे ख़ुश यादें पूछिए — वह शायद ही कोई चीज़ गिनाएगा। वह उस माँ या पापा को याद करेगा जो फ़र्श पर बैठकर खेले, जिसने एक लंबी बहकती-सी कहानी सुनी, जो बस साथ रुका रहा। तोहफ़े आसानी से भूल जाते हैं; मौजूदगी उसी में बुन जाती है जो बच्चा आगे चलकर बनता है। अपने शिशु से मिलने का इंतज़ार करते हुए, इस बात को अपने ऊपर से एक बोझ उतारने दीजिए। सबसे क़ीमती चीज़ जो आप कभी देंगी, उसकी क़ीमत कुछ नहीं — बस आपका समय और आपका पूरा, गर्म ध्यान।" },
-      "deepDive": { "en": "Longitudinal research finds that warm parental engagement predicts adult wellbeing far more strongly than family income or material provision. Time and attention outlast things.", "hi": "सालों तक चले शोध बताते हैं कि माँ-पापा का गरमजोशी भरा जुड़ाव बड़े होकर मिलने वाली ख़ुशहाली का, घर की आमदनी या सामान से कहीं ज़्यादा पक्का इशारा है। समय और ध्यान चीज़ों से ज़्यादा टिकते हैं।" },
-      "remember": { "en": "What a child treasures most is you, not what you give.", "hi": "बच्चा सबसे ज़्यादा जिसे सँजोता है वह आप हैं, वह नहीं जो आप देती हैं।" }
+      "title": { "en": "Your time means more than gifts", "hi": "तोहफ़ों से बढ़कर मौजूदगी" },
+      "insight": { "en": "Years from now, your child won't remember most of the gifts. They'll remember the times you were really there.", "hi": "सालों बाद आपके बच्चे को ज़्यादातर तोहफ़े याद नहीं रहेंगे। उसे वे पल याद रहेंगे जब आप सच में वहाँ थीं।" },
+      "expanded": { "en": "There's a steady pressure to give children more and more things, as if love could be counted in toys. But ask any adult about their happiest childhood memories and they rarely name objects. They name a parent who sat on the floor and played, who listened to a long, rambling story, who stayed. Gifts are easily forgotten. Time together becomes part of who a child is. As you wait to meet your baby, let this take some weight off you. The thing your child will treasure most costs nothing but your time and your warm attention.", "hi": "बच्चों को और-और चीज़ें देने का एक चुपचाप दबाव रहता है, जैसे प्यार को खिलौनों में नापा जा सकता हो। पर किसी भी बड़े इंसान से उसके बचपन की सबसे ख़ुश यादें पूछिए — वह शायद ही कोई चीज़ गिनाएगा। वह उस माँ या पापा को याद करेगा जो फ़र्श पर बैठकर खेले, जिसने एक लंबी बहकती-सी कहानी सुनी, जो बस साथ रुका रहा। तोहफ़े आसानी से भूल जाते हैं; मौजूदगी उसी में बुन जाती है जो बच्चा आगे चलकर बनता है। अपने शिशु से मिलने का इंतज़ार करते हुए, इस बात को अपने ऊपर से एक बोझ उतारने दीजिए। सबसे क़ीमती चीज़ जो आप कभी देंगी, उसकी क़ीमत कुछ नहीं — बस आपका समय और आपका पूरा, गर्म ध्यान।" },
+      "deepDive": { "en": "Long-term studies link warm, involved parenting with better wellbeing later in life. Time and attention stay with a child longer than things do.", "hi": "सालों तक चले शोध बताते हैं कि माँ-पापा का गरमजोशी भरा जुड़ाव बड़े होकर मिलने वाली ख़ुशहाली का, घर की आमदनी या सामान से कहीं ज़्यादा पक्का इशारा है। समय और ध्यान चीज़ों से ज़्यादा टिकते हैं।" },
+      "remember": { "en": "What your child will treasure most is you, not what you give them.", "hi": "बच्चा सबसे ज़्यादा जिसे सँजोता है वह आप हैं, वह नहीं जो आप देती हैं।" }
     },
     "readToBaby": {
       "title": { "en": "Krishna Plays With The Cowherds", "hi": "कृष्ण ग्वालों के साथ खेलते हैं" },
@@ -97,8 +97,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about the small daily moments you already long to share — a song, a walk, a quiet morning.", "hi": "अपने शिशु को उन छोटे रोज़ के पलों के बारे में बताइए जिन्हें बाँटने को आप अभी से तरसती हैं — एक गीत, एक सैर, एक शांत सुबह।" },
-      "motivation": { "en": "It is the smallest ordinary moments, not the big ones, that your child will hold forever.", "hi": "सबसे छोटे, आम पल — बड़े नहीं — वही हैं जिन्हें आपका बच्चा हमेशा थामे रखेगा।" }
+      "title": { "en": "Tell your baby about the small daily moments you're already looking forward to sharing, like a song, a walk or a quiet morning.", "hi": "अपने शिशु को उन छोटे रोज़ के पलों के बारे में बताइए जिन्हें बाँटने को आप अभी से तरसती हैं — एक गीत, एक सैर, एक शांत सुबह।" },
+      "motivation": { "en": "Small, ordinary moments are often the ones a child keeps for life.", "hi": "सबसे छोटे, आम पल — बड़े नहीं — वही हैं जिन्हें आपका बच्चा हमेशा थामे रखेगा।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -113,9 +113,9 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "When Eating Feels Like A Chore", "hi": "जब खाना एक बोझ लगने लगे" },
-      "content": { "en": "If meals feel heavy or rushed near the end, set the screen aside and eat just one small thing slowly — a few warm bites, fully tasted. Eating with a little attention can make even a simple plate feel more nourishing and calm.", "hi": "अगर आख़िरी हफ़्तों में खाना भारी या जल्दबाज़ी भरा लगे, तो स्क्रीन एक तरफ़ रखिए और बस एक छोटी चीज़ धीरे-धीरे खाइए — कुछ गर्म कौर, पूरी तरह चखते हुए। थोड़े ध्यान से खाया गया साधारण खाना भी ज़्यादा पौष्टिक और शांत लगने लगता है।" },
-      "remember": { "en": "How you eat matters as gently as what you eat.", "hi": "आप कैसे खाती हैं, यह उतनी ही नरमी से मायने रखता है जितना यह कि आप क्या खाती हैं।" },
+      "title": { "en": "When eating feels like a chore", "hi": "जब खाना एक बोझ लगने लगे" },
+      "content": { "en": "If meals feel heavy or rushed near the end, put the screen away and eat one small thing slowly. Take a few warm bites and really taste them. Eating with a little attention can make even a simple plate feel calmer and more satisfying.", "hi": "अगर आख़िरी हफ़्तों में खाना भारी या जल्दबाज़ी भरा लगे, तो स्क्रीन एक तरफ़ रखिए और बस एक छोटी चीज़ धीरे-धीरे खाइए — कुछ गर्म कौर, पूरी तरह चखते हुए। थोड़े ध्यान से खाया गया साधारण खाना भी ज़्यादा पौष्टिक और शांत लगने लगता है।" },
+      "remember": { "en": "How you eat matters, as well as what you eat.", "hi": "आप कैसे खाती हैं, यह उतनी ही नरमी से मायने रखता है जितना यह कि आप क्या खाती हैं।" },
       "durationMinutes": 0
     }
   },
@@ -124,11 +124,11 @@
     "week": 32,
     "babyLearning": { "en": "Your baby's skin is no longer see-through.", "hi": "नन्ही आँखें खुलती और बंद होती हैं, रोशनी और अँधेरा महसूस करते हुए" },
     "grow": {
-      "title": { "en": "Five Minutes Of Just You", "hi": "सिर्फ़ आपके पाँच मिनट" },
-      "insight": { "en": "A child does not need hours of your time. They need small windows where they have all of you.", "hi": "बच्चे को आपके घंटों की ज़रूरत नहीं। उसे छोटी-छोटी खिड़कियाँ चाहिए, जहाँ आप पूरी-की-पूरी उसकी हों।" },
-      "expanded": { "en": "Many parents carry quiet guilt about not having enough time. But children rarely measure love by the clock. What fills their cup is concentrated attention — a few minutes where nothing else is competing, where your eyes truly meet theirs. Five unhurried minutes of complete presence can mean more to a child than an entire distracted afternoon. As you prepare to meet your baby, let this free you. You do not need endless time to be a wonderful parent. You need small, regular moments where, for those minutes, your child is the only thing in the world.", "hi": "बहुत से माँ-पापा यह चुपचाप का अपराधबोध लिए चलते हैं कि उनके पास काफ़ी समय नहीं। पर बच्चे प्यार को घड़ी से शायद ही नापते हैं। उनका मन जिससे भरता है वह है टिका हुआ ध्यान — कुछ मिनट, जब और कुछ होड़ में न हो, जब आपकी आँखें सच में उनकी आँखों से मिलें। पूरी मौजूदगी के पाँच बिना जल्दबाज़ी वाले मिनट एक बच्चे के लिए पूरी भटकी हुई दोपहर से ज़्यादा मायने रख सकते हैं। अपने शिशु से मिलने की तैयारी करते हुए, इस बात को आपको हल्का कर देने दीजिए। एक शानदार माँ बनने के लिए आपको अनगिनत समय की ज़रूरत नहीं। आपको चाहिए छोटे, नियमित पल — जिनमें उतनी देर के लिए आपका बच्चा ही दुनिया की इकलौती चीज़ हो।" },
-      "deepDive": { "en": "Child development experts emphasise 'special time' — short, regular bursts of one-on-one attention — as more powerful for bonding than long stretches of divided presence. Quality concentrates what quantity dilutes.", "hi": "बाल-विकास के जानकार 'special time' पर ज़ोर देते हैं — आमने-सामने के ध्यान के छोटे, नियमित झोंके — जो जुड़ाव के लिए बँटी हुई मौजूदगी के लंबे दौर से कहीं ज़्यादा असरदार हैं। समय की लंबाई जिसे पतला कर देती है, ध्यान की गहराई उसे गाढ़ा कर देती है।" },
-      "remember": { "en": "A few minutes of all of you beats hours of half of you.", "hi": "आपकी पूरी मौजूदगी के कुछ मिनट, आपके आधे मन के घंटों से बेहतर हैं।" }
+      "title": { "en": "Five minutes of your full attention", "hi": "सिर्फ़ आपके पाँच मिनट" },
+      "insight": { "en": "A child doesn't need hours of your time. They need small windows where they have all of you.", "hi": "बच्चे को आपके घंटों की ज़रूरत नहीं। उसे छोटी-छोटी खिड़कियाँ चाहिए, जहाँ आप पूरी-की-पूरी उसकी हों।" },
+      "expanded": { "en": "Many parents feel guilty about not having enough time. But children rarely measure love by the clock. What fills them up is focused attention: a few minutes where nothing else is competing and your eyes meet theirs. Five unhurried minutes can mean more to a child than a whole distracted afternoon. As you get ready to meet your baby, let this take some pressure off. You don't need endless time to be a wonderful parent. You need small, regular moments where your child is the only thing that matters.", "hi": "बहुत से माँ-पापा यह चुपचाप का अपराधबोध लिए चलते हैं कि उनके पास काफ़ी समय नहीं। पर बच्चे प्यार को घड़ी से शायद ही नापते हैं। उनका मन जिससे भरता है वह है टिका हुआ ध्यान — कुछ मिनट, जब और कुछ होड़ में न हो, जब आपकी आँखें सच में उनकी आँखों से मिलें। पूरी मौजूदगी के पाँच बिना जल्दबाज़ी वाले मिनट एक बच्चे के लिए पूरी भटकी हुई दोपहर से ज़्यादा मायने रख सकते हैं। अपने शिशु से मिलने की तैयारी करते हुए, इस बात को आपको हल्का कर देने दीजिए। एक शानदार माँ बनने के लिए आपको अनगिनत समय की ज़रूरत नहीं। आपको चाहिए छोटे, नियमित पल — जिनमें उतनी देर के लिए आपका बच्चा ही दुनिया की इकलौती चीज़ हो।" },
+      "deepDive": { "en": "Many child development experts recommend special time: short, regular spells of one-on-one play that the child leads. It's often suggested as a way to strengthen the bond, even when time is short.", "hi": "बाल-विकास के जानकार 'special time' पर ज़ोर देते हैं — आमने-सामने के ध्यान के छोटे, नियमित झोंके — जो जुड़ाव के लिए बँटी हुई मौजूदगी के लंबे दौर से कहीं ज़्यादा असरदार हैं। समय की लंबाई जिसे पतला कर देती है, ध्यान की गहराई उसे गाढ़ा कर देती है।" },
+      "remember": { "en": "A few minutes of all of you means more than hours of half of you.", "hi": "आपकी पूरी मौजूदगी के कुछ मिनट, आपके आधे मन के घंटों से बेहतर हैं।" }
     },
     "readToBaby": {
       "title": { "en": "The Deer Who Watched And Listened", "hi": "वह हिरन जो देखता और सुनता था" },
@@ -137,8 +137,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby how you will be there for the small things — a scraped knee, a first word, a quiet worry.", "hi": "अपने शिशु को बताइए कि आप छोटी-छोटी चीज़ों के लिए कैसे साथ रहेंगी — एक छिला हुआ घुटना, पहला शब्द, एक चुपचाप की फ़िक्र।" },
-      "motivation": { "en": "Showing up for the small things is how a child learns they will never be alone with the big ones.", "hi": "छोटी चीज़ों में साथ खड़े रहने से ही बच्चा सीखता है कि बड़ी चीज़ों में वह कभी अकेला नहीं होगा।" }
+      "title": { "en": "Tell your baby how you'll be there for the small things, like a scraped knee, a first word or a quiet worry.", "hi": "अपने शिशु को बताइए कि आप छोटी-छोटी चीज़ों के लिए कैसे साथ रहेंगी — एक छिला हुआ घुटना, पहला शब्द, एक चुपचाप की फ़िक्र।" },
+      "motivation": { "en": "When you show up for the small things, a child learns they won't face the big ones alone.", "hi": "छोटी चीज़ों में साथ खड़े रहने से ही बच्चा सीखता है कि बड़ी चीज़ों में वह कभी अकेला नहीं होगा।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -153,9 +153,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Five Slow Breaths", "hi": "पाँच धीमी साँसें" },
-      "content": { "en": "Set everything down and take five slow, easy breaths — in through the nose, gently out through the mouth. Just five, given your full attention, can reset a whole afternoon.", "hi": "सब कुछ नीचे रख दीजिए और पाँच धीमी, आसान साँसें लीजिए — नाक से अंदर, हल्के से मुँह से बाहर। बस पाँच, पूरा ध्यान देकर, पूरी दोपहर को नए सिरे से बसा सकती हैं।" },
-      "remember": { "en": "Five attentive breaths are a small gift to yourself.", "hi": "ध्यान से ली गई पाँच साँसें ख़ुद को दिया एक छोटा तोहफ़ा हैं।" },
+      "title": { "en": "Five slow breaths", "hi": "पाँच धीमी साँसें" },
+      "content": { "en": "Put everything down and take five slow, easy breaths. Breathe in through your nose and gently out through your mouth. Five breaths with your full attention can reset a whole afternoon.", "hi": "सब कुछ नीचे रख दीजिए और पाँच धीमी, आसान साँसें लीजिए — नाक से अंदर, हल्के से मुँह से बाहर। बस पाँच, पूरा ध्यान देकर, पूरी दोपहर को नए सिरे से बसा सकती हैं।" },
+      "remember": { "en": "Five slow breaths are a small gift you can give yourself.", "hi": "ध्यान से ली गई पाँच साँसें ख़ुद को दिया एक छोटा तोहफ़ा हैं।" },
       "durationMinutes": 1
     }
   },
@@ -164,11 +164,11 @@
     "week": 32,
     "babyLearning": { "en": "The bones of your baby's skull stay soft, to help at birth.", "hi": "धीरे-धीरे भर रहा है, पास सिमटा हुआ और गर्म" },
     "grow": {
-      "title": { "en": "The Magic Of Being Seen", "hi": "देखे जाने का जादू" },
-      "insight": { "en": "There is a quiet magic in being truly seen by someone. It is one of the deepest gifts you will give your child.", "hi": "किसी के द्वारा सच में देखे जाने में एक शांत जादू है। यह उन सबसे गहरे तोहफ़ों में से एक है जो आप अपने बच्चे को देंगी।" },
-      "expanded": { "en": "To be 'seen' is more than being looked at. It is to be noticed, understood, taken seriously exactly as we are. When a child feels truly seen by a parent, something settles deep inside them: a sense that they are real, that they matter, that they belong. You give this not through grand gestures but through small acts of attention — noticing their mood, remembering what delights them, meeting their eyes when they speak. As you wait to hold your baby, know that this quiet seeing is a kind of magic. It tells a child, again and again, 'You are worth paying attention to.'", "hi": "'देखा जाना' सिर्फ़ नज़र पड़ जाने से कहीं ज़्यादा है। इसका मतलब है ताड़ लिया जाना, समझ लिया जाना, ठीक जैसे हम हैं वैसे ही गंभीरता से लिया जाना। जब कोई बच्चा माँ या पापा की नज़र में सच में देखा हुआ महसूस करता है, तो उसके भीतर गहरे कुछ थम जाता है — यह एहसास कि वह असली है, कि उसकी अहमियत है, कि वह अपनों में है। यह आप बड़े-बड़े इशारों से नहीं, ध्यान की छोटी-छोटी बातों से देती हैं — उसका मिज़ाज ताड़ लेना, याद रखना कि उसे क्या ख़ुश करता है, जब वह बोले तो उसकी आँखों में देखना। अपने शिशु को गोद में लेने का इंतज़ार करते हुए जान लीजिए कि यह चुपचाप देखना एक तरह का जादू है। यह बच्चे को बार-बार कहता है — 'तुम ध्यान दिए जाने के लायक़ हो।'" },
-      "deepDive": { "en": "Attachment researchers describe 'attunement' — a caregiver accurately sensing and responding to a child's inner state — as the foundation of secure bonds. Feeling seen literally shapes a child's developing self.", "hi": "लगाव पर शोध करने वाले 'attunement' की बात करते हैं — यानी देखभाल करने वाले का बच्चे की भीतरी हालत को ठीक-ठीक भाँपना और उसका जवाब देना — और इसे ही पक्के जुड़ाव की नींव मानते हैं। देखा हुआ महसूस करना सचमुच बच्चे के बनते हुए अपनेपन को गढ़ता है।" },
-      "remember": { "en": "To truly see your child is to tell them they matter.", "hi": "अपने बच्चे को सच में देखना ही उसे यह बताना है कि उसकी अहमियत है।" }
+      "title": { "en": "Children need to feel seen", "hi": "देखे जाने का जादू" },
+      "insight": { "en": "Being really seen by someone is a deep comfort. It's one of the most important things you'll give your child.", "hi": "किसी के द्वारा सच में देखे जाने में एक शांत जादू है। यह उन सबसे गहरे तोहफ़ों में से एक है जो आप अपने बच्चे को देंगी।" },
+      "expanded": { "en": "Being seen is more than being looked at. It means being noticed, understood and taken seriously as we are. When a child feels seen by a parent, something settles inside them. They feel they matter and they belong. You give this through small acts of attention, not big gestures. Notice their mood, remember what delights them, and meet their eyes when they speak. As you wait to hold your baby, know that this kind of seeing tells a child, again and again, that they're worth paying attention to.", "hi": "'देखा जाना' सिर्फ़ नज़र पड़ जाने से कहीं ज़्यादा है। इसका मतलब है ताड़ लिया जाना, समझ लिया जाना, ठीक जैसे हम हैं वैसे ही गंभीरता से लिया जाना। जब कोई बच्चा माँ या पापा की नज़र में सच में देखा हुआ महसूस करता है, तो उसके भीतर गहरे कुछ थम जाता है — यह एहसास कि वह असली है, कि उसकी अहमियत है, कि वह अपनों में है। यह आप बड़े-बड़े इशारों से नहीं, ध्यान की छोटी-छोटी बातों से देती हैं — उसका मिज़ाज ताड़ लेना, याद रखना कि उसे क्या ख़ुश करता है, जब वह बोले तो उसकी आँखों में देखना। अपने शिशु को गोद में लेने का इंतज़ार करते हुए जान लीजिए कि यह चुपचाप देखना एक तरह का जादू है। यह बच्चे को बार-बार कहता है — 'तुम ध्यान दिए जाने के लायक़ हो।'" },
+      "deepDive": { "en": "Attachment researchers use the word attunement for a caregiver noticing and responding to how a child feels. It's seen as a key part of a secure bond.", "hi": "लगाव पर शोध करने वाले 'attunement' की बात करते हैं — यानी देखभाल करने वाले का बच्चे की भीतरी हालत को ठीक-ठीक भाँपना और उसका जवाब देना — और इसे ही पक्के जुड़ाव की नींव मानते हैं। देखा हुआ महसूस करना सचमुच बच्चे के बनते हुए अपनेपन को गढ़ता है।" },
+      "remember": { "en": "When you really see your child, you tell them they matter.", "hi": "अपने बच्चे को सच में देखना ही उसे यह बताना है कि उसकी अहमियत है।" }
     },
     "readToBaby": {
       "title": { "en": "Tenali Rama And The King's Distraction", "hi": "तेनाली राम और राजा का भटकता ध्यान" },
@@ -177,8 +177,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby how you will truly see them — not who you wish they were, but exactly who they are.", "hi": "अपने शिशु को बताइए कि आप उसे सच में कैसे देखेंगी — वह नहीं जो आप चाहती हैं कि वह हो, बल्कि ठीक वैसा जैसा वह है।" },
-      "motivation": { "en": "Being seen exactly as they are is how a child learns they are loved without conditions.", "hi": "ठीक जैसा है वैसा ही देखा जाना — इसी से बच्चा सीखता है कि उसे बिना किसी शर्त के प्यार किया जाता है।" }
+      "title": { "en": "Tell your baby you'll see them for who they are, not who you wish they were.", "hi": "अपने शिशु को बताइए कि आप उसे सच में कैसे देखेंगी — वह नहीं जो आप चाहती हैं कि वह हो, बल्कि ठीक वैसा जैसा वह है।" },
+      "motivation": { "en": "Being seen as they are is how a child learns they're loved without conditions.", "hi": "ठीक जैसा है वैसा ही देखा जाना — इसी से बच्चा सीखता है कि उसे बिना किसी शर्त के प्यार किया जाता है।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -193,9 +193,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "I Am Worth Noticing Too", "hi": "मैं भी ध्यान दिए जाने के लायक़ हूँ" },
-      "content": { "en": "As I learn to truly see my baby, I will remember to gently notice myself too — my needs, my tiredness, my quiet wins.", "hi": "जैसे-जैसे मैं अपने शिशु को सच में देखना सीखती हूँ, मैं ख़ुद को भी प्यार से देखना याद रखूँगी — अपनी ज़रूरतें, अपनी थकान, अपनी चुपचाप की जीतें।" },
-      "remember": { "en": "You deserve the same gentle attention you give others.", "hi": "आप उसी नरम ध्यान की हक़दार हैं जो आप दूसरों को देती हैं।" },
+      "title": { "en": "I'm worth noticing too", "hi": "मैं भी ध्यान दिए जाने के लायक़ हूँ" },
+      "content": { "en": "As I learn to see my baby, I'll notice myself too: my needs, my tiredness and my small wins.", "hi": "जैसे-जैसे मैं अपने शिशु को सच में देखना सीखती हूँ, मैं ख़ुद को भी प्यार से देखना याद रखूँगी — अपनी ज़रूरतें, अपनी थकान, अपनी चुपचाप की जीतें।" },
+      "remember": { "en": "You deserve the same gentle attention you give everyone else.", "hi": "आप उसी नरम ध्यान की हक़दार हैं जो आप दूसरों को देती हैं।" },
       "durationMinutes": 0
     }
   },
@@ -204,11 +204,11 @@
     "week": 32,
     "babyLearning": { "en": "Your baby practises breathing movements, without any air yet.", "hi": "लगातार बढ़ रहा है, गोल-मटोल और गले लगने को तैयार" },
     "grow": {
-      "title": { "en": "Undivided Is Unforgettable", "hi": "पूरा ध्यान, जो कभी नहीं भूलता" },
-      "insight": { "en": "The moments your child will carry forever are the ones where you were undivided — all there, nowhere else.", "hi": "जिन पलों को आपका बच्चा हमेशा साथ लिए चलेगा, वे वही हैं जहाँ आप पूरी-की-पूरी वहीं थीं — कहीं और नहीं।" },
-      "expanded": { "en": "We live in a hurried world, often half-present even when our bodies are in the room. But a child can always tell the difference between a parent who is partly listening and one who is wholly there. Undivided attention is rare, and that is exactly what makes it unforgettable. A child who is met this way — looked at fully, listened to completely — carries the warmth of it for life. As you prepare to slow down for your little one, remember that you do not need to be undivided every hour. You only need to mean it when you are. Those whole, unhurried moments become the memories your child will keep forever.", "hi": "हम एक जल्दबाज़ी भरी दुनिया में रहते हैं, अक्सर आधे-अधूरे मौजूद — तब भी जब शरीर कमरे में ही हो। पर बच्चा हमेशा उस माँ या पापा में फ़र्क़ ताड़ लेता है जो थोड़ा-सा सुन रहे हैं, और उनमें जो पूरी तरह वहीं हैं। बिना बँटा ध्यान दुर्लभ है, और यही उसे अनभूला बना देता है। जिस बच्चे से इस तरह मिला जाए — पूरी तरह देखा जाए, पूरी तरह सुना जाए — वह उसकी गरमाहट जीवन भर साथ रखता है। अपने नन्हे के लिए धीमे होने की तैयारी करते हुए यह याद रखिए कि आपको हर घंटे पूरी-की-पूरी वहाँ होने की ज़रूरत नहीं। बस जब हों, तब सच में हों। वही पूरे, बिना जल्दबाज़ी वाले पल आगे चलकर वे यादें बनते हैं जिन्हें आपका बच्चा हमेशा सँभाले रखेगा।" },
-      "deepDive": { "en": "Memory researchers note that emotionally rich, focused interactions are encoded far more deeply than fragmented, multitasked ones. Undivided moments quite literally last longer in the mind.", "hi": "याददाश्त पर शोध करने वाले बताते हैं कि भावनाओं से भरी, टिकी हुई बातचीत मन में उससे कहीं गहरे दर्ज होती है जो टुकड़ों में बँटी और कई काम साथ करते हुए हुई हो। बिना बँटे पल सचमुच मन में ज़्यादा देर टिकते हैं।" },
-      "remember": { "en": "Undivided attention is the thing your child will never forget.", "hi": "बिना बँटा ध्यान वही चीज़ है जिसे आपका बच्चा कभी नहीं भूलेगा।" }
+      "title": { "en": "Moments of full attention stay with a child", "hi": "पूरा ध्यान, जो कभी नहीं भूलता" },
+      "insight": { "en": "The moments your child carries for life are often the ones where you were all there, and nowhere else.", "hi": "जिन पलों को आपका बच्चा हमेशा साथ लिए चलेगा, वे वही हैं जहाँ आप पूरी-की-पूरी वहीं थीं — कहीं और नहीं।" },
+      "expanded": { "en": "We live in a hurried world, and we're often half there even when we're in the room. A child can tell the difference between a parent who's partly listening and one who's fully there. Full attention is rare, which is why it stays with a child. A child who's looked at and listened to in this way carries that warmth for life. As you get ready to slow down for your little one, know that you don't need to be fully focused every hour. You only need to mean it when you are. Those unhurried moments become the memories your child keeps.", "hi": "हम एक जल्दबाज़ी भरी दुनिया में रहते हैं, अक्सर आधे-अधूरे मौजूद — तब भी जब शरीर कमरे में ही हो। पर बच्चा हमेशा उस माँ या पापा में फ़र्क़ ताड़ लेता है जो थोड़ा-सा सुन रहे हैं, और उनमें जो पूरी तरह वहीं हैं। बिना बँटा ध्यान दुर्लभ है, और यही उसे अनभूला बना देता है। जिस बच्चे से इस तरह मिला जाए — पूरी तरह देखा जाए, पूरी तरह सुना जाए — वह उसकी गरमाहट जीवन भर साथ रखता है। अपने नन्हे के लिए धीमे होने की तैयारी करते हुए यह याद रखिए कि आपको हर घंटे पूरी-की-पूरी वहाँ होने की ज़रूरत नहीं। बस जब हों, तब सच में हों। वही पूरे, बिना जल्दबाज़ी वाले पल आगे चलकर वे यादें बनते हैं जिन्हें आपका बच्चा हमेशा सँभाले रखेगा।" },
+      "deepDive": { "en": "Memory research suggests we remember emotional, focused moments better than scattered, rushed ones. That may be part of why moments of full attention stay with us.", "hi": "याददाश्त पर शोध करने वाले बताते हैं कि भावनाओं से भरी, टिकी हुई बातचीत मन में उससे कहीं गहरे दर्ज होती है जो टुकड़ों में बँटी और कई काम साथ करते हुए हुई हो। बिना बँटे पल सचमुच मन में ज़्यादा देर टिकते हैं।" },
+      "remember": { "en": "Your full attention is something your child won't forget.", "hi": "बिना बँटा ध्यान वही चीज़ है जिसे आपका बच्चा कभी नहीं भूलेगा।" }
     },
     "readToBaby": {
       "title": { "en": "The Busy Merchant And His Son", "hi": "व्यस्त व्यापारी और उसका बेटा" },
@@ -217,8 +217,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Make your baby a gentle promise to slow down for them, even when the world is rushing.", "hi": "अपने शिशु से एक नरम वादा कीजिए कि आप उसके लिए धीमी हो जाएँगी — तब भी, जब दुनिया भाग रही हो।" },
-      "motivation": { "en": "Slowing down is the quiet way you tell your child they are worth your time.", "hi": "धीमे होना वह चुपचाप का तरीक़ा है जिससे आप अपने बच्चे को बताती हैं कि वह आपके समय के लायक़ है।" }
+      "title": { "en": "Promise your baby that you'll slow down for them, even when the world is rushing.", "hi": "अपने शिशु से एक नरम वादा कीजिए कि आप उसके लिए धीमी हो जाएँगी — तब भी, जब दुनिया भाग रही हो।" },
+      "motivation": { "en": "Slowing down tells your child they're worth your time.", "hi": "धीमे होना वह चुपचाप का तरीक़ा है जिससे आप अपने बच्चे को बताती हैं कि वह आपके समय के लायक़ है।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -233,9 +233,9 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "When You Forget To Slow Down And Eat", "hi": "जब आप धीमे होकर खाना भूल जाएँ" },
-      "content": { "en": "On busy, distracted days it is easy to eat standing up or skip a meal. Try to sit, even for five minutes, with something warm and simple. A calm, unhurried bite nourishes you more deeply than a rushed one ever can.", "hi": "व्यस्त, भटके हुए दिनों में खड़े-खड़े खा लेना या एक वक़्त का खाना छोड़ देना आसान है। कोशिश कीजिए कि बैठें, पाँच मिनट के लिए ही सही, कुछ गर्म और सादा लेकर। एक शांत, बिना जल्दबाज़ी वाला कौर आपको उससे कहीं गहरे पोसता है जो जल्दी में निगला जाए।" },
-      "remember": { "en": "Slowing down to eat is a small act of self-care.", "hi": "खाने के लिए धीमे हो जाना अपना ख़्याल रखने की एक छोटी सी बात है।" },
+      "title": { "en": "When you forget to stop and eat", "hi": "जब आप धीमे होकर खाना भूल जाएँ" },
+      "content": { "en": "On busy days it's easy to eat standing up or skip a meal. Try to sit down, even for five minutes, with something warm and simple. A calm meal does you more good than a rushed one.", "hi": "व्यस्त, भटके हुए दिनों में खड़े-खड़े खा लेना या एक वक़्त का खाना छोड़ देना आसान है। कोशिश कीजिए कि बैठें, पाँच मिनट के लिए ही सही, कुछ गर्म और सादा लेकर। एक शांत, बिना जल्दबाज़ी वाला कौर आपको उससे कहीं गहरे पोसता है जो जल्दी में निगला जाए।" },
+      "remember": { "en": "Sitting down to eat is a small way of looking after yourself.", "hi": "खाने के लिए धीमे हो जाना अपना ख़्याल रखने की एक छोटी सी बात है।" },
       "durationMinutes": 0
     }
   },
@@ -244,11 +244,11 @@
     "week": 32,
     "babyLearning": { "en": "Your baby's gut is getting ready for milk.", "hi": "हफ़्ता पूरा करते हुए, शांत और दिन-ब-दिन बढ़ता हुआ" },
     "grow": {
-      "title": { "en": "A Moment Of True Attention", "hi": "सच्चे ध्यान का एक पल" },
-      "insight": { "en": "A single moment of true attention can fill a child more than a whole day of half-noticed care.", "hi": "सच्चे ध्यान का एक पल बच्चे को आधे-अधूरे ध्यान वाली पूरे दिन की देखभाल से ज़्यादा भर देता है।" },
-      "expanded": { "en": "As this week of presence draws to a close, hold on to its simplest truth: attention is not about quantity but about quality of heart. One moment where you stop, soften, and turn your whole self towards your child can carry more love than hours spent merely nearby. These are the moments a child reaches for in memory — when someone truly attended to them. You are practising this now, every time you pause to feel your baby move, to send a quiet thought their way. Soon you will offer it in countless small ways. A single moment of true attention is a gift that quietly lasts a lifetime.", "hi": "जैसे-जैसे मौजूदगी का यह हफ़्ता अपने आख़िर की तरफ़ आता है, इसकी सबसे सीधी सच्चाई थामे रखिए — ध्यान इस बात का नहीं कि कितना, बल्कि इस बात का है कि दिल कितना उसमें है। एक पल, जिसमें आप रुकती हैं, नरम होती हैं, और अपना पूरा वजूद अपने बच्चे की तरफ़ मोड़ देती हैं, बस पास बिताए घंटों से ज़्यादा प्यार ले जा सकता है। यही वे पल हैं जिन्हें बच्चा आगे चलकर यादों में टटोलता है — जब किसी ने सच में उस पर ध्यान दिया था। आप अभी से इसका अभ्यास कर रही हैं, हर बार जब आप अपने शिशु की हलचल महसूस करने को ठहरती हैं, उसकी तरफ़ एक शांत ख़याल भेजती हैं। जल्द ही आप इसे अनगिनत छोटे तरीक़ों से देंगी। सच्चे ध्यान का एक पल ऐसा तोहफ़ा है जो चुपचाप उम्र भर टिका रहता है।" },
-      "deepDive": { "en": "Researchers studying parent-child bonds find that brief moments of full, attuned attention have a lasting effect on a child's sense of being valued — far beyond the few minutes they take.", "hi": "माँ-पापा और बच्चे के जुड़ाव पर हुए शोध बताते हैं कि पूरे, भाँप लेने वाले ध्यान के छोटे-छोटे पल बच्चे के इस एहसास पर टिकने वाला असर छोड़ते हैं कि उसकी क़ीमत है — उन चंद मिनटों से कहीं आगे तक।" },
-      "remember": { "en": "One moment of true attention can last a lifetime.", "hi": "सच्चे ध्यान का एक पल उम्र भर टिक सकता है।" }
+      "title": { "en": "One moment of full attention matters", "hi": "सच्चे ध्यान का एक पल" },
+      "insight": { "en": "One moment of real attention can fill a child up more than a whole day of half-noticed care.", "hi": "सच्चे ध्यान का एक पल बच्चे को आधे-अधूरे ध्यान वाली पूरे दिन की देखभाल से ज़्यादा भर देता है।" },
+      "expanded": { "en": "As this week about attention ends, hold on to its simplest idea. What counts is how fully you're there, more than how long. One moment where you stop, soften and turn towards your child can carry more love than hours spent nearby. These are the moments a child reaches for in memory. You're practising this now, each time you stop to feel your baby move or send them a loving thought. Soon you'll give it in many small ways. A moment of real attention stays with a child for a long time.", "hi": "जैसे-जैसे मौजूदगी का यह हफ़्ता अपने आख़िर की तरफ़ आता है, इसकी सबसे सीधी सच्चाई थामे रखिए — ध्यान इस बात का नहीं कि कितना, बल्कि इस बात का है कि दिल कितना उसमें है। एक पल, जिसमें आप रुकती हैं, नरम होती हैं, और अपना पूरा वजूद अपने बच्चे की तरफ़ मोड़ देती हैं, बस पास बिताए घंटों से ज़्यादा प्यार ले जा सकता है। यही वे पल हैं जिन्हें बच्चा आगे चलकर यादों में टटोलता है — जब किसी ने सच में उस पर ध्यान दिया था। आप अभी से इसका अभ्यास कर रही हैं, हर बार जब आप अपने शिशु की हलचल महसूस करने को ठहरती हैं, उसकी तरफ़ एक शांत ख़याल भेजती हैं। जल्द ही आप इसे अनगिनत छोटे तरीक़ों से देंगी। सच्चे ध्यान का एक पल ऐसा तोहफ़ा है जो चुपचाप उम्र भर टिका रहता है।" },
+      "deepDive": { "en": "Researchers who study parent and child bonds find that brief moments of warm, focused attention add up. They help a child feel valued, well beyond the few minutes they take.", "hi": "माँ-पापा और बच्चे के जुड़ाव पर हुए शोध बताते हैं कि पूरे, भाँप लेने वाले ध्यान के छोटे-छोटे पल बच्चे के इस एहसास पर टिकने वाला असर छोड़ते हैं कि उसकी क़ीमत है — उन चंद मिनटों से कहीं आगे तक।" },
+      "remember": { "en": "One moment of real attention can stay with your child for years.", "hi": "सच्चे ध्यान का एक पल उम्र भर टिक सकता है।" }
     },
     "readToBaby": {
       "title": { "en": "The Gardener Who Truly Watched", "hi": "वह माली जो सच में देखता था" },
@@ -257,8 +257,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about the time that will be just yours together — unhurried, undistracted, simply present.", "hi": "अपने शिशु को उस समय के बारे में बताइए जो बस आप दोनों का होगा — बिना जल्दबाज़ी, बिना भटकाव, बस मौजूद।" },
-      "motivation": { "en": "Time that belongs only to the two of you is where your deepest bond will quietly grow.", "hi": "जो समय सिर्फ़ आप दोनों का हो, वहीं आपका सबसे गहरा जुड़ाव चुपचाप बढ़ेगा।" }
+      "title": { "en": "Tell your baby about the time that will be just for the two of you, unhurried and without distractions.", "hi": "अपने शिशु को उस समय के बारे में बताइए जो बस आप दोनों का होगा — बिना जल्दबाज़ी, बिना भटकाव, बस मौजूद।" },
+      "motivation": { "en": "Time that belongs only to the two of you is where your bond will grow deepest.", "hi": "जो समय सिर्फ़ आप दोनों का हो, वहीं आपका सबसे गहरा जुड़ाव चुपचाप बढ़ेगा।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -273,9 +273,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "A Breath Held With Care", "hi": "ध्यान से थामी एक साँस" },
-      "content": { "en": "Breathe in slowly and, at the top, pause for a soft moment of complete stillness. Then let it go gently. Repeat three times, giving each breath your full, kind attention.", "hi": "धीरे-धीरे साँस अंदर लीजिए और सबसे ऊपर पहुँचकर, पूरे ठहराव के एक नरम पल के लिए रुकिए। फिर उसे प्यार से जाने दीजिए। तीन बार दोहराइए, हर साँस को अपना पूरा, कोमल ध्यान देते हुए।" },
-      "remember": { "en": "Even one breath, given full attention, is a moment of peace.", "hi": "एक साँस भी, पूरा ध्यान देकर ली जाए, तो शांति का एक पल है।" },
+      "title": { "en": "A slow breath with a pause", "hi": "ध्यान से थामी एक साँस" },
+      "content": { "en": "Breathe in slowly. At the top, pause for a soft moment of stillness. Then let the breath go gently. Repeat three times, giving each breath your full, kind attention.", "hi": "धीरे-धीरे साँस अंदर लीजिए और सबसे ऊपर पहुँचकर, पूरे ठहराव के एक नरम पल के लिए रुकिए। फिर उसे प्यार से जाने दीजिए। तीन बार दोहराइए, हर साँस को अपना पूरा, कोमल ध्यान देते हुए।" },
+      "remember": { "en": "One breath with your full attention can bring a moment of peace.", "hi": "एक साँस भी, पूरा ध्यान देकर ली जाए, तो शांति का एक पल है।" },
       "durationMinutes": 1
     }
   }

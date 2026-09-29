@@ -4,11 +4,11 @@
     "week": 39,
     "babyLearning": { "en": "Your baby is fully developed and ready to be born.", "hi": "पूरी तरह बढ़े हुए और आराम से सिमटे, आपसे मिलने की तैयारी में" },
     "grow": {
-      "title": { "en": "Almost Time To Meet You", "hi": "मिलने का समय लगभग आ गया" },
-      "insight": { "en": "After all these months of waiting, the meeting you have dreamed of is finally close. Soon the little one you have carried will be in your arms.", "hi": "इतने महीनों के इंतज़ार के बाद, जिस मुलाक़ात के सपने आप देखती रही हैं वह आख़िर पास है। जल्द ही आपकी बाहें उस बच्चे को थाम लेंगी जिसे आपने इतने महीने भीतर संभाला है।" },
-      "expanded": { "en": "There is a tenderness in these final days that is hard to put into words. You have known your baby only through flutters and kicks, through the gentle weight you carry everywhere. Soon you will know their face, the warmth of their skin, the sound of their cry. It is natural to feel both impatient and a little afraid; both are simply love getting ready. Let yourself feel how close you are. The long becoming is nearly done, and the meeting you have waited for is almost here.", "hi": "इन आख़िरी दिनों में एक नरमी होती है जिसे शब्दों में कहना मुश्किल है। अब तक आपने अपने बच्चे को सिर्फ़ हल्की हरकतों और लातों से जाना है, उस नरम बोझ से जिसे आप हर जगह साथ लिए फिरती हैं। जल्द ही आप उनका चेहरा जानेंगी, उनकी त्वचा की गर्माहट, उनके रोने की आवाज़। बेसब्री भी लगे और थोड़ा डर भी — दोनों होना स्वाभाविक है; दोनों बस प्यार की तैयारी हैं। ख़ुद को महसूस करने दीजिए कि आप कितनी क़रीब हैं। इतने लंबे समय का बनना लगभग पूरा हो चुका है, और जिस मुलाक़ात का आपने इंतज़ार किया, वह बस आने ही वाली है।" },
-      "deepDive": { "en": "In the last weeks of pregnancy, a baby's senses are already alert — they can hear your voice clearly and will recognise it within hours of being born. The meeting is new for you both, yet your baby already knows you.", "hi": "गर्भावस्था के आख़िरी हफ़्तों में बच्चों की इंद्रियाँ पहले से ही जाग चुकी होती हैं — आपकी आवाज़ उन तक साफ़ पहुँचती है, और जन्म के कुछ ही घंटों में वे उसे पहचान लेते हैं। यह मुलाक़ात आप दोनों के लिए नई है, फिर भी आपकी आवाज़ उनके लिए पहले से जानी-पहचानी है।" },
-      "remember": { "en": "The meeting you have waited for is almost here.", "hi": "जिस मुलाक़ात का आपने इंतज़ार किया, वह बस आने ही वाली है।" }
+      "title": { "en": "Almost time to meet you", "hi": "मिलने का समय लगभग आ गया" },
+      "insight": { "en": "After all these months of waiting, the meeting you've dreamed of is close. Soon your little one will be in your arms.", "hi": "इतने महीनों के इंतज़ार के बाद, जिस मुलाक़ात के सपने आप देखती रही हैं वह आख़िर पास है। जल्द ही आपकी बाहें उस बच्चे को थाम लेंगी जिसे आपने इतने महीने भीतर संभाला है।" },
+      "expanded": { "en": "There's a tenderness in these last days that's hard to put into words. You've known your baby only through flutters and kicks, and a weight carried everywhere. Soon you'll know their face, the warmth of their skin and the sound of their cry. It's natural to feel both impatient and a little afraid. Both are love getting ready. Let yourself feel how close you are. The long wait is nearly done, and the meeting you've hoped for is almost here.", "hi": "इन आख़िरी दिनों में एक नरमी होती है जिसे शब्दों में कहना मुश्किल है। अब तक आपने अपने बच्चे को सिर्फ़ हल्की हरकतों और लातों से जाना है, उस नरम बोझ से जिसे आप हर जगह साथ लिए फिरती हैं। जल्द ही आप उनका चेहरा जानेंगी, उनकी त्वचा की गर्माहट, उनके रोने की आवाज़। बेसब्री भी लगे और थोड़ा डर भी — दोनों होना स्वाभाविक है; दोनों बस प्यार की तैयारी हैं। ख़ुद को महसूस करने दीजिए कि आप कितनी क़रीब हैं। इतने लंबे समय का बनना लगभग पूरा हो चुका है, और जिस मुलाक़ात का आपने इंतज़ार किया, वह बस आने ही वाली है।" },
+      "deepDive": { "en": "In the last weeks of pregnancy, your baby can already hear voices from outside the womb. Newborns show signs of knowing their mother's voice soon after birth. The meeting is new, but your baby has already been listening.", "hi": "गर्भावस्था के आख़िरी हफ़्तों में बच्चों की इंद्रियाँ पहले से ही जाग चुकी होती हैं — आपकी आवाज़ उन तक साफ़ पहुँचती है, और जन्म के कुछ ही घंटों में वे उसे पहचान लेते हैं। यह मुलाक़ात आप दोनों के लिए नई है, फिर भी आपकी आवाज़ उनके लिए पहले से जानी-पहचानी है।" },
+      "remember": { "en": "The meeting you've waited for is almost here.", "hi": "जिस मुलाक़ात का आपने इंतज़ार किया, वह बस आने ही वाली है।" }
     },
     "readToBaby": {
       "title": { "en": "The Birds Who Made Ready", "hi": "वे पंछी जो तैयार हुए" },
@@ -17,8 +17,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about the little space you have made just for them.", "hi": "अपने बच्चे को उस छोटी सी जगह के बारे में बताइए जो आपने सिर्फ़ उनके लिए बनाई है।" },
-      "motivation": { "en": "Describing the corner that waits for them is your first way of saying 'you belong here.'", "hi": "उस कोने के बारे में बताना जो उनका इंतज़ार कर रहा है, यह कहने का आपका पहला तरीक़ा है — 'यह घर तुम्हारा है'।" }
+      "title": { "en": "Tell your baby about the little space you've made just for them.", "hi": "अपने बच्चे को उस छोटी सी जगह के बारे में बताइए जो आपने सिर्फ़ उनके लिए बनाई है।" },
+      "motivation": { "en": "Describing the corner that's waiting for them is your first way of saying 'you belong here'.", "hi": "उस कोने के बारे में बताना जो उनका इंतज़ार कर रहा है, यह कहने का आपका पहला तरीक़ा है — 'यह घर तुम्हारा है'।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -33,9 +33,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Breathing Towards The Day", "hi": "उस दिन की ओर एक साँस" },
-      "content": { "en": "Breathe in slowly and think 'almost here.' Breathe out and let your body soften. Just a few of these can settle the flutter of these last, waiting days.", "hi": "धीरे से साँस लीजिए और सोचिए 'बस आने ही वाला है।' साँस छोड़िए और शरीर को नरम पड़ने दीजिए। ऐसी कुछ ही साँसें इन आख़िरी, इंतज़ार वाले दिनों की घबराहट को शांत कर देती हैं।" },
-      "remember": { "en": "You do not have to hurry the day; you only have to breathe towards it.", "hi": "उस दिन को जल्दी लाना आपके हाथ में नहीं; बस उसकी ओर साँस लेते रहना है।" },
+      "title": { "en": "Breathing towards the day", "hi": "उस दिन की ओर एक साँस" },
+      "content": { "en": "Breathe in slowly and think 'almost here'. Breathe out and let your body soften. A few of these can settle the flutter of these last days of waiting.", "hi": "धीरे से साँस लीजिए और सोचिए 'बस आने ही वाला है।' साँस छोड़िए और शरीर को नरम पड़ने दीजिए। ऐसी कुछ ही साँसें इन आख़िरी, इंतज़ार वाले दिनों की घबराहट को शांत कर देती हैं।" },
+      "remember": { "en": "You don't have to hurry the day. You only have to breathe towards it.", "hi": "उस दिन को जल्दी लाना आपके हाथ में नहीं; बस उसकी ओर साँस लेते रहना है।" },
       "durationMinutes": 2
     }
   },
@@ -44,11 +44,11 @@
     "week": 39,
     "babyLearning": { "en": "Your baby's lungs are ready to fill with air at birth.", "hi": "नरम और गर्म, लगभग आने को तैयार" },
     "grow": {
-      "title": { "en": "Ready Is A Feeling That Grows", "hi": "तैयारी एक एहसास है, जो धीरे-धीरे बढ़ता है" },
-      "insight": { "en": "You will not wake up one morning feeling perfectly ready. Readiness is not a switch — it is something that grows in you a little at a time.", "hi": "किसी सुबह आप यह महसूस करते हुए नहीं उठेंगी कि आप पूरी तरह तैयार हैं। तैयारी कोई ऐसा बटन नहीं जो एक झटके में चालू हो जाए — यह भीतर थोड़ा-थोड़ा करके बढ़ती है।" },
-      "expanded": { "en": "Many mothers wait for a moment when they will finally feel 'ready,' as if a calm certainty will arrive and settle everything. But readiness rarely comes like that. It grows quietly, in the gathering of small things, in the imagining of a face, in the love that has been deepening all these months. Even if part of you still feels unsure, look closer — you are far more ready than you think. The readiness you have been waiting for has been forming inside you all along, gently, day by day.", "hi": "कई माएँ उस पल का इंतज़ार करती हैं जब उन्हें आख़िर 'तैयार' लगेगा, मानो एक शांत सा भरोसा आकर सब कुछ तय कर देगा। पर तैयारी शायद ही कभी ऐसे आती है। वह चुपचाप बढ़ती है — छोटी-छोटी चीज़ों के जमा होने में, एक चेहरे की कल्पना में, उस प्यार में जो इन सारे महीनों गहरा होता रहा है। अगर आपका कोई हिस्सा अब भी डगमगाता है, तो ज़रा ग़ौर से देखिए — आप अपनी सोच से कहीं ज़्यादा तैयार हैं। जिस तैयारी का आप इंतज़ार करती रहीं, वह हमेशा से आपके भीतर बनती रही है, नरमी से, दिन-ब-दिन।" },
-      "deepDive": { "en": "Researchers note that the sense of preparedness for parenthood comes less from knowledge and more from emotional connection — the bond you have already built is itself a form of readiness.", "hi": "शोध बताते हैं कि माता-पिता बनने की तैयारी का एहसास जानकारी से कम और भावनात्मक जुड़ाव से ज़्यादा आता है — जो जुड़ाव आप पहले ही बना चुकी हैं, वही अपने आप में एक तरह की तैयारी है।" },
-      "remember": { "en": "You are far more ready than you feel.", "hi": "आप अपने एहसास से कहीं ज़्यादा तैयार हैं।" }
+      "title": { "en": "Feeling ready grows slowly", "hi": "तैयारी एक एहसास है, जो धीरे-धीरे बढ़ता है" },
+      "insight": { "en": "You won't wake up one morning feeling perfectly ready. Readiness grows in you a little at a time.", "hi": "किसी सुबह आप यह महसूस करते हुए नहीं उठेंगी कि आप पूरी तरह तैयार हैं। तैयारी कोई ऐसा बटन नहीं जो एक झटके में चालू हो जाए — यह भीतर थोड़ा-थोड़ा करके बढ़ती है।" },
+      "expanded": { "en": "Many parents wait for a moment when they'll finally feel ready, as if a calm certainty will arrive and settle everything. Readiness rarely comes like that. It grows slowly, as you gather small things, picture a face and feel the love that's been deepening all these months. Even if part of you still feels unsure, look closer. You're more ready than you think. The readiness you've been waiting for has been forming inside you all along, day by day.", "hi": "कई माएँ उस पल का इंतज़ार करती हैं जब उन्हें आख़िर 'तैयार' लगेगा, मानो एक शांत सा भरोसा आकर सब कुछ तय कर देगा। पर तैयारी शायद ही कभी ऐसे आती है। वह चुपचाप बढ़ती है — छोटी-छोटी चीज़ों के जमा होने में, एक चेहरे की कल्पना में, उस प्यार में जो इन सारे महीनों गहरा होता रहा है। अगर आपका कोई हिस्सा अब भी डगमगाता है, तो ज़रा ग़ौर से देखिए — आप अपनी सोच से कहीं ज़्यादा तैयार हैं। जिस तैयारी का आप इंतज़ार करती रहीं, वह हमेशा से आपके भीतर बनती रही है, नरमी से, दिन-ब-दिन।" },
+      "deepDive": { "en": "Feeling ready to be a parent often has more to do with the bond you've built than with how much you know. The connection you already feel is part of being ready.", "hi": "शोध बताते हैं कि माता-पिता बनने की तैयारी का एहसास जानकारी से कम और भावनात्मक जुड़ाव से ज़्यादा आता है — जो जुड़ाव आप पहले ही बना चुकी हैं, वही अपने आप में एक तरह की तैयारी है।" },
+      "remember": { "en": "You're more ready than you feel.", "hi": "आप अपने एहसास से कहीं ज़्यादा तैयार हैं।" }
     },
     "readToBaby": {
       "title": { "en": "The Ants Who Made Ready For The Rains", "hi": "वे चींटियाँ जो बारिश के लिए तैयार हुईं" },
@@ -57,8 +57,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about the little things you have gathered and saved for them.", "hi": "अपने बच्चे को उन छोटी-छोटी चीज़ों के बारे में बताइए जो आपने उनके लिए जमा करके रखी हैं।" },
-      "motivation": { "en": "Each thing you have set aside is a small promise that they are wanted and waited for.", "hi": "आपने जो भी चीज़ अलग रखी है, वह एक छोटा सा वादा है — कि उन्हें चाहा गया है और उनका इंतज़ार हो रहा है।" }
+      "title": { "en": "Tell your baby about the little things you've gathered and saved for them.", "hi": "अपने बच्चे को उन छोटी-छोटी चीज़ों के बारे में बताइए जो आपने उनके लिए जमा करके रखी हैं।" },
+      "motivation": { "en": "Each thing you've set aside is a small promise that they're wanted and waited for.", "hi": "आपने जो भी चीज़ अलग रखी है, वह एक छोटा सा वादा है — कि उन्हें चाहा गया है और उनका इंतज़ार हो रहा है।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -73,9 +73,9 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "Gentle Energy For Tired Days", "hi": "थके दिनों के लिए नरम ताक़त" },
-      "content": { "en": "If these last days leave you drained and your appetite small, reach for easy, warm and nourishing bites — a bowl of khichdi, a handful of dates and nuts, or warm milk with a little turmeric. Small, frequent meals are kinder to a crowded belly than large ones, and they keep your energy steady for the day ahead.", "hi": "अगर ये आख़िरी दिन आपको थका देते हैं और भूख कम लगती है, तो आसान, गर्म और पोषण देने वाले निवाले लीजिए — एक कटोरी खिचड़ी, मुट्ठी भर खजूर और मेवा, या थोड़ी हल्दी वाला गर्म दूध। छोटे-छोटे और बार-बार खाना भरे हुए पेट के लिए बड़े खाने से कहीं आसान रहता है, और दिन भर आपकी ताक़त बनी रहती है।" },
-      "remember": { "en": "Small warm meals are easier to carry than big ones now.", "hi": "अभी बड़े खाने से छोटे, गर्म खाने संभालना आसान है।" },
+      "title": { "en": "Gentle energy for tired days", "hi": "थके दिनों के लिए नरम ताक़त" },
+      "content": { "en": "If these last days leave you drained and your appetite small, reach for easy, warm, nourishing bites: a bowl of khichdi, a handful of dates and nuts, or warm milk with a little turmeric. Small, frequent meals are easier on a crowded belly than big ones, and they keep your energy steady for the day ahead.", "hi": "अगर ये आख़िरी दिन आपको थका देते हैं और भूख कम लगती है, तो आसान, गर्म और पोषण देने वाले निवाले लीजिए — एक कटोरी खिचड़ी, मुट्ठी भर खजूर और मेवा, या थोड़ी हल्दी वाला गर्म दूध। छोटे-छोटे और बार-बार खाना भरे हुए पेट के लिए बड़े खाने से कहीं आसान रहता है, और दिन भर आपकी ताक़त बनी रहती है।" },
+      "remember": { "en": "Small, warm meals are easier to manage than big ones now.", "hi": "अभी बड़े खाने से छोटे, गर्म खाने संभालना आसान है।" },
       "durationMinutes": 0
     }
   },
@@ -84,11 +84,11 @@
     "week": 39,
     "babyLearning": { "en": "Only a few babies arrive on the exact due date.", "hi": "पास सिमटे हुए, सही पल का इंतज़ार करते" },
     "grow": {
-      "title": { "en": "The Nest Is Almost Ready", "hi": "घोंसला लगभग तैयार है" },
-      "insight": { "en": "The urge to tidy, to arrange, to make things just so is not restlessness — it is love preparing a soft place to land.", "hi": "साफ़ करने, सजाने, चीज़ों को ठीक वैसा ही कर देने की जो इच्छा उठती है — वह बेचैनी नहीं है। वह प्यार है, जो उतरने के लिए एक नरम जगह तैयार कर रहा है।" },
-      "expanded": { "en": "In these last days you may feel a quiet pull to ready your home — to wash tiny clothes, fold a blanket, smooth a corner that will soon hold your baby. This 'nesting' is gentle and instinctive, an old and tender wisdom in the body. It is not about a perfect room or a finished checklist. It is your heart, through your hands, making a place that says 'you are welcome here.' Let yourself enjoy it, but do not let it tire you. A nest does not need to be perfect — it only needs to be made with love.", "hi": "इन आख़िरी दिनों में आपको अपने घर को तैयार करने का एक शांत सा खिंचाव महसूस हो सकता है — नन्हे कपड़े धोना, एक कंबल तह करना, वह कोना ठीक करना जो जल्द आपके बच्चे को संभालेगा। जिसे 'nesting' कहते हैं, वह नरम और सहज है — शरीर में बसी एक पुरानी, कोमल समझ। यह किसी परफ़ेक्ट कमरे या पूरी हुई सूची की बात नहीं है। यह आपका दिल है, जो आपके हाथों के ज़रिए एक ऐसी जगह बना रहा है जो कहती है 'यहाँ तुम्हारा स्वागत है'। इसका मज़ा लीजिए, पर इसे ख़ुद को थकाने मत दीजिए। घोंसले को परफ़ेक्ट होने की ज़रूरत नहीं — बस प्यार से बने होने की।" },
-      "deepDive": { "en": "The 'nesting instinct' many mothers feel near term is widely observed and likely rooted in a deep drive to prepare a safe space. Experts gently suggest channelling it without overdoing — your rest matters more than a spotless room.", "hi": "'nesting' — घोंसला बनाने की वह सहज इच्छा जो कई माएँ पूरे दिनों के क़रीब महसूस करती हैं — बहुत आम है, और शायद एक सुरक्षित जगह तैयार करने की गहरी चाह से आती है। जानकार नरमी से कहते हैं कि इसे कीजिए, पर हद में — आपका आराम एक चमकते-साफ़ कमरे से ज़्यादा मायने रखता है।" },
-      "remember": { "en": "A nest only needs to be made with love, not made perfect.", "hi": "घोंसले को बस प्यार से बना होना चाहिए, परफ़ेक्ट नहीं।" }
+      "title": { "en": "Getting the nest ready", "hi": "घोंसला लगभग तैयार है" },
+      "insight": { "en": "The urge to tidy, arrange and get things just so is love making a soft place for your baby to land.", "hi": "साफ़ करने, सजाने, चीज़ों को ठीक वैसा ही कर देने की जो इच्छा उठती है — वह बेचैनी नहीं है। वह प्यार है, जो उतरने के लिए एक नरम जगह तैयार कर रहा है।" },
+      "expanded": { "en": "In these last days you may feel a pull to get your home ready: washing tiny clothes, folding a blanket, clearing a corner that will soon hold your baby. This is often called nesting, and it's a natural, tender instinct. You don't need a perfect room or a finished checklist. What matters is making a place, with your own hands, that says 'you're welcome here'. Enjoy it, but don't let it wear you out. A nest doesn't need to be perfect. It only needs to be made with love.", "hi": "इन आख़िरी दिनों में आपको अपने घर को तैयार करने का एक शांत सा खिंचाव महसूस हो सकता है — नन्हे कपड़े धोना, एक कंबल तह करना, वह कोना ठीक करना जो जल्द आपके बच्चे को संभालेगा। जिसे 'nesting' कहते हैं, वह नरम और सहज है — शरीर में बसी एक पुरानी, कोमल समझ। यह किसी परफ़ेक्ट कमरे या पूरी हुई सूची की बात नहीं है। यह आपका दिल है, जो आपके हाथों के ज़रिए एक ऐसी जगह बना रहा है जो कहती है 'यहाँ तुम्हारा स्वागत है'। इसका मज़ा लीजिए, पर इसे ख़ुद को थकाने मत दीजिए। घोंसले को परफ़ेक्ट होने की ज़रूरत नहीं — बस प्यार से बने होने की।" },
+      "deepDive": { "en": "Many parents notice a strong urge to prepare the home near the due date, often called the nesting instinct. It's fine to follow it, but rest matters more than a spotless room.", "hi": "'nesting' — घोंसला बनाने की वह सहज इच्छा जो कई माएँ पूरे दिनों के क़रीब महसूस करती हैं — बहुत आम है, और शायद एक सुरक्षित जगह तैयार करने की गहरी चाह से आती है। जानकार नरमी से कहते हैं कि इसे कीजिए, पर हद में — आपका आराम एक चमकते-साफ़ कमरे से ज़्यादा मायने रखता है।" },
+      "remember": { "en": "A nest needs to be made with love. It doesn't need to be perfect.", "hi": "घोंसले को बस प्यार से बना होना चाहिए, परफ़ेक्ट नहीं।" }
     },
     "readToBaby": {
       "title": { "en": "The Night Krishna Came", "hi": "वह रात जब कृष्ण आए" },
@@ -97,8 +97,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby who is getting ready and waiting to meet them.", "hi": "अपने बच्चे को बताइए कि कौन-कौन उनसे मिलने के लिए तैयार हो रहा है और इंतज़ार कर रहा है।" },
-      "motivation": { "en": "Naming the people who long to hold them tells your baby they are arriving into open, waiting arms.", "hi": "जो लोग उन्हें गोद में लेने को तरस रहे हैं, उनके नाम लेना आपके बच्चे को बताता है कि वे खुली, इंतज़ार करती बाहों में आ रहे हैं।" }
+      "title": { "en": "Tell your baby about everyone who's getting ready and waiting to meet them.", "hi": "अपने बच्चे को बताइए कि कौन-कौन उनसे मिलने के लिए तैयार हो रहा है और इंतज़ार कर रहा है।" },
+      "motivation": { "en": "Naming the people who can't wait to hold them tells your baby they're arriving into open arms.", "hi": "जो लोग उन्हें गोद में लेने को तरस रहे हैं, उनके नाम लेना आपके बच्चे को बताता है कि वे खुली, इंतज़ार करती बाहों में आ रहे हैं।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -113,9 +113,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "My Home Is Ready Enough", "hi": "मेरा घर काफ़ी तैयार है" },
-      "content": { "en": "My baby does not need a perfect room or a finished list. They need my arms and my love, and those are already here.", "hi": "मेरे बच्चे को कोई परफ़ेक्ट कमरा या पूरी हुई सूची नहीं चाहिए। चाहिए तो बस मेरी बाहें और मेरा प्यार — और वे पहले से यहीं हैं।" },
-      "remember": { "en": "Your love is the only nursery your baby truly needs.", "hi": "आपका प्यार ही वह इकलौती नर्सरी है जिसकी आपके बच्चे को सच में ज़रूरत है।" },
+      "title": { "en": "My home is ready enough", "hi": "मेरा घर काफ़ी तैयार है" },
+      "content": { "en": "My baby doesn't need a perfect room or a finished list. They need my arms and my love, and those are already here.", "hi": "मेरे बच्चे को कोई परफ़ेक्ट कमरा या पूरी हुई सूची नहीं चाहिए। चाहिए तो बस मेरी बाहें और मेरा प्यार — और वे पहले से यहीं हैं।" },
+      "remember": { "en": "Your love is the nursery your baby needs most.", "hi": "आपका प्यार ही वह इकलौती नर्सरी है जिसकी आपके बच्चे को सच में ज़रूरत है।" },
       "durationMinutes": 0
     }
   },
@@ -124,11 +124,11 @@
     "week": 39,
     "babyLearning": { "en": "Your baby is still storing a little fat and energy.", "hi": "बसे हुए और आराम से, इन आख़िरी शांत दिनों को सँजोते" },
     "grow": {
-      "title": { "en": "The First Days Will Be A Blur Of Love", "hi": "शुरू के दिन प्यार की एक धुंध होंगे" },
-      "insight": { "en": "The first days with your newborn will pass in a soft, tired haze. Do not try to do them perfectly — just let yourself be soaked in love.", "hi": "अपने नवजात के साथ शुरू के दिन एक नरम, थकी हुई धुंध में गुज़रेंगे। उन्हें परफ़ेक्ट तरीक़े से करने की कोशिश मत कीजिए — बस ख़ुद को प्यार में भीग जाने दीजिए।" },
-      "expanded": { "en": "When your baby finally arrives, the days will lose their usual shape. There will be little sleep, much feeding, and long, quiet hours of simply gazing at a face you cannot stop looking at. It can feel overwhelming and tender all at once. Do not measure those first days by tidiness or productivity. They are not meant to be managed — they are meant to be felt. Let the world wait. Let the dishes pile. The only thing those early days ask of you is to be present, and to let yourself fall completely in love.", "hi": "बच्चे के आ जाने के बाद दिनों का अपना जाना-पहचाना आकार खो जाएगा। नींद कम होगी, दूध पिलाना बहुत, और लंबे, शांत घंटे बस एक चेहरे को निहारते हुए, जिससे नज़र हटती ही नहीं। यह एक साथ भारी भी लग सकता है और बहुत नरम भी। उन शुरुआती दिनों को साफ़-सफ़ाई या कितना काम निपटा, इससे मत नापिए। उन्हें संभालना नहीं है — उन्हें महसूस करना है। दुनिया को इंतज़ार करने दीजिए। बर्तन जमा होने दीजिए। वे शुरुआती दिन आपसे बस इतना माँगते हैं कि आप वहाँ मौजूद रहें, और ख़ुद को पूरी तरह प्यार में गिर जाने दें।" },
-      "deepDive": { "en": "The early postpartum weeks are sometimes called the 'fourth trimester' — a time when both baby and parent are still adjusting. Experts say rest and skin-to-skin closeness matter far more than chores in these days.", "hi": "जन्म के बाद के शुरुआती हफ़्तों को कभी-कभी 'चौथी तिमाही' कहा जाता है — वह समय जब बच्चा और माता-पिता, दोनों अभी ढल ही रहे होते हैं। जानकार कहते हैं कि इन दिनों आराम और स्किन-टू-स्किन नज़दीकी घर के कामों से कहीं ज़्यादा मायने रखती है।" },
-      "remember": { "en": "Those first days are to be felt, not managed.", "hi": "शुरू के वे दिन महसूस करने के लिए हैं, संभालने के लिए नहीं।" }
+      "title": { "en": "The first days will be a blur of love", "hi": "शुरू के दिन प्यार की एक धुंध होंगे" },
+      "insight": { "en": "The first days with your newborn will pass in a soft, tired haze. Don't try to do them perfectly. Let yourself be wrapped up in love.", "hi": "अपने नवजात के साथ शुरू के दिन एक नरम, थकी हुई धुंध में गुज़रेंगे। उन्हें परफ़ेक्ट तरीक़े से करने की कोशिश मत कीजिए — बस ख़ुद को प्यार में भीग जाने दीजिए।" },
+      "expanded": { "en": "When your baby arrives, the days will lose their usual shape. There'll be little sleep, lots of feeding, and long, quiet hours gazing at a face you can't stop looking at. It can feel overwhelming and tender at the same time. Don't judge those first days by how tidy the house is or how much gets done. Let yourself feel them. Let the world wait. Let the dishes pile up. All those early days ask of you is to be present and to fall in love.", "hi": "बच्चे के आ जाने के बाद दिनों का अपना जाना-पहचाना आकार खो जाएगा। नींद कम होगी, दूध पिलाना बहुत, और लंबे, शांत घंटे बस एक चेहरे को निहारते हुए, जिससे नज़र हटती ही नहीं। यह एक साथ भारी भी लग सकता है और बहुत नरम भी। उन शुरुआती दिनों को साफ़-सफ़ाई या कितना काम निपटा, इससे मत नापिए। उन्हें संभालना नहीं है — उन्हें महसूस करना है। दुनिया को इंतज़ार करने दीजिए। बर्तन जमा होने दीजिए। वे शुरुआती दिन आपसे बस इतना माँगते हैं कि आप वहाँ मौजूद रहें, और ख़ुद को पूरी तरह प्यार में गिर जाने दें।" },
+      "deepDive": { "en": "The first weeks after birth are sometimes called the fourth trimester, a time when baby and parents are still adjusting. Experts say rest and skin-to-skin closeness matter far more than chores now.", "hi": "जन्म के बाद के शुरुआती हफ़्तों को कभी-कभी 'चौथी तिमाही' कहा जाता है — वह समय जब बच्चा और माता-पिता, दोनों अभी ढल ही रहे होते हैं। जानकार कहते हैं कि इन दिनों आराम और स्किन-टू-स्किन नज़दीकी घर के कामों से कहीं ज़्यादा मायने रखती है।" },
+      "remember": { "en": "Let those first days be for rest and love, and let the chores wait.", "hi": "शुरू के वे दिन महसूस करने के लिए हैं, संभालने के लिए नहीं।" }
     },
     "readToBaby": {
       "title": { "en": "The Nest Made Ready", "hi": "तैयार किया गया घोंसला" },
@@ -137,8 +137,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about the very first cuddle you are dreaming of giving them.", "hi": "अपने बच्चे को उस सबसे पहली गोद के बारे में बताइए, जिसका सपना आप देखती हैं।" },
-      "motivation": { "en": "Picturing that first hold aloud lets your baby feel the warmth that is waiting for them.", "hi": "उस पहली गोद की कल्पना बोलकर करना आपके बच्चे को वह गर्माहट महसूस करा देता है जो उनका इंतज़ार कर रही है।" }
+      "title": { "en": "Tell your baby about the very first cuddle you're dreaming of.", "hi": "अपने बच्चे को उस सबसे पहली गोद के बारे में बताइए, जिसका सपना आप देखती हैं।" },
+      "motivation": { "en": "Picturing that first hold out loud lets your baby hear the warmth that's waiting.", "hi": "उस पहली गोद की कल्पना बोलकर करना आपके बच्चे को वह गर्माहट महसूस करा देता है जो उनका इंतज़ार कर रही है।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -153,9 +153,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Soft Belly Breath", "hi": "पेट की नरम साँस" },
-      "content": { "en": "Rest both hands low on your belly. Breathe in slowly and feel them rise; breathe out and feel them fall. Let five gentle breaths slow everything down around you.", "hi": "दोनों हाथ अपने पेट के निचले हिस्से पर रखिए। धीरे से साँस लीजिए और उन्हें उठते महसूस कीजिए; साँस छोड़िए और उन्हें नीचे आते महसूस कीजिए। पाँच नरम साँसें आपके आस-पास सब कुछ धीमा कर देंगी।" },
-      "remember": { "en": "Slowing your breath is the simplest way to slow a racing mind.", "hi": "साँस धीमी करना दौड़ते मन को धीमा करने का सबसे आसान तरीक़ा है।" },
+      "title": { "en": "Soft belly breath", "hi": "पेट की नरम साँस" },
+      "content": { "en": "Rest both hands low on your belly. Breathe in slowly and feel them rise. Breathe out and feel them fall. Let five gentle breaths slow everything down around you.", "hi": "दोनों हाथ अपने पेट के निचले हिस्से पर रखिए। धीरे से साँस लीजिए और उन्हें उठते महसूस कीजिए; साँस छोड़िए और उन्हें नीचे आते महसूस कीजिए। पाँच नरम साँसें आपके आस-पास सब कुछ धीमा कर देंगी।" },
+      "remember": { "en": "Slowing your breath is an easy way to slow a racing mind.", "hi": "साँस धीमी करना दौड़ते मन को धीमा करने का सबसे आसान तरीक़ा है।" },
       "durationMinutes": 2
     }
   },
@@ -164,10 +164,10 @@
     "week": 39,
     "babyLearning": { "en": "Your baby's reflexes, like rooting and sucking, are in place.", "hi": "पास दुबके हुए, हर दिन थोड़ा और तैयार" },
     "grow": {
-      "title": { "en": "Pack Light, Love Heavy", "hi": "सामान हल्का, प्यार भारी" },
-      "insight": { "en": "Your baby will not remember which things you had ready. They will only ever feel how much they were loved.", "hi": "बच्चों को यह याद नहीं रहता कि कौन सी चीज़ें तैयार रखी थीं। याद बस यह रहता है कि उन्हें कितना प्यार मिला।" },
-      "expanded": { "en": "In these last days it is easy to worry about getting everything right — the perfect bag, the right list, the missing item. But babies arrive needing remarkably little: warmth, milk, closeness, and a steady heartbeat to rest against. The truest preparation was never about objects at all. It was the love you have been growing all these months, ready to pour out the moment you meet. Pack what you need without fuss, and carry the heavier, more precious thing lightly in your heart — you already have more than enough to give.", "hi": "इन आख़िरी दिनों में सब कुछ ठीक-ठीक कर लेने की चिंता होना आसान है — परफ़ेक्ट बैग, सही सूची, वह एक छूटी हुई चीज़। पर बच्चे बहुत कम ज़रूरतों के साथ आते हैं: गर्माहट, दूध, नज़दीकी, और एक ठहरी हुई धड़कन जिससे लगकर सुस्ता सकें। सबसे सच्ची तैयारी कभी चीज़ों की थी ही नहीं। वह तो वह प्यार था जो आप इन सारे महीनों बढ़ाती रही हैं, मिलते ही उँडेल देने के लिए तैयार। जो ज़रूरी है वह बिना हाय-तौबा के रख लीजिए, और उस भारी, ज़्यादा क़ीमती चीज़ को दिल में हल्के से लिए चलिए — देने के लिए आपके पास पहले से काफ़ी से ज़्यादा है।" },
-      "deepDive": { "en": "Newborns are soothed most by the simplest things — a parent's smell, warmth, voice and heartbeat. Studies show skin-to-skin contact alone steadies a baby's breathing and temperature better than most equipment.", "hi": "नवजात को सबसे आसान चीज़ों से ही सबसे ज़्यादा चैन मिलता है — माता-पिता की गंध, गर्माहट, आवाज़ और धड़कन। शोध दिखाते हैं कि अकेली स्किन-टू-स्किन नज़दीकी बच्चे की साँस और शरीर का तापमान ज़्यादातर मशीनों से बेहतर संभालती है।" },
+      "title": { "en": "Your baby needs love more than things", "hi": "सामान हल्का, प्यार भारी" },
+      "insight": { "en": "Your baby won't remember which things you had ready. They'll feel how much they were loved.", "hi": "बच्चों को यह याद नहीं रहता कि कौन सी चीज़ें तैयार रखी थीं। याद बस यह रहता है कि उन्हें कितना प्यार मिला।" },
+      "expanded": { "en": "In these last days it's easy to worry about getting everything right: the perfect bag, the right list, the missing item. But babies arrive needing very little: warmth, milk, closeness and a steady heartbeat to rest against. The real preparation was never about objects. It was the love you've been growing all these months, ready to pour out the moment you meet. Pack what you need without fuss. You already have more than enough to give.", "hi": "इन आख़िरी दिनों में सब कुछ ठीक-ठीक कर लेने की चिंता होना आसान है — परफ़ेक्ट बैग, सही सूची, वह एक छूटी हुई चीज़। पर बच्चे बहुत कम ज़रूरतों के साथ आते हैं: गर्माहट, दूध, नज़दीकी, और एक ठहरी हुई धड़कन जिससे लगकर सुस्ता सकें। सबसे सच्ची तैयारी कभी चीज़ों की थी ही नहीं। वह तो वह प्यार था जो आप इन सारे महीनों बढ़ाती रही हैं, मिलते ही उँडेल देने के लिए तैयार। जो ज़रूरी है वह बिना हाय-तौबा के रख लीजिए, और उस भारी, ज़्यादा क़ीमती चीज़ को दिल में हल्के से लिए चलिए — देने के लिए आपके पास पहले से काफ़ी से ज़्यादा है।" },
+      "deepDive": { "en": "Newborns are comforted most by simple things: a parent's smell, warmth, voice and heartbeat. Skin-to-skin contact is known to help newborns stay warm and settle.", "hi": "नवजात को सबसे आसान चीज़ों से ही सबसे ज़्यादा चैन मिलता है — माता-पिता की गंध, गर्माहट, आवाज़ और धड़कन। शोध दिखाते हैं कि अकेली स्किन-टू-स्किन नज़दीकी बच्चे की साँस और शरीर का तापमान ज़्यादातर मशीनों से बेहतर संभालती है।" },
       "remember": { "en": "Your baby needs your love far more than any list of things.", "hi": "आपके बच्चे को चीज़ों की किसी भी सूची से कहीं ज़्यादा आपके प्यार की ज़रूरत है।" }
     },
     "readToBaby": {
@@ -177,8 +177,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby how you are resting and saving your strength for them.", "hi": "अपने बच्चे को बताइए कि आप उनके लिए कैसे आराम कर रही हैं और अपनी ताक़त बचा रही हैं।" },
-      "motivation": { "en": "Letting your baby hear that you are caring for yourself shows them that love includes rest, too.", "hi": "अपने बच्चे को यह सुनाना कि आप अपना ख़याल रख रही हैं, उन्हें दिखाता है कि प्यार में आराम भी शामिल है।" }
+      "title": { "en": "Tell your baby how you're resting and saving your strength for them.", "hi": "अपने बच्चे को बताइए कि आप उनके लिए कैसे आराम कर रही हैं और अपनी ताक़त बचा रही हैं।" },
+      "motivation": { "en": "Telling your baby you're looking after yourself shows them that love includes rest too.", "hi": "अपने बच्चे को यह सुनाना कि आप अपना ख़याल रख रही हैं, उन्हें दिखाता है कि प्यार में आराम भी शामिल है।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -193,9 +193,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "I Am Allowed To Slow Down", "hi": "मुझे धीमे होने की इजाज़त है" },
-      "content": { "en": "These last days are not for finishing everything. They are for gathering myself, gently, before the great change ahead.", "hi": "ये आख़िरी दिन सब कुछ निपटाने के लिए नहीं हैं। ये ख़ुद को समेटने के लिए हैं, नरमी से, आगे आने वाले बड़े बदलाव से पहले।" },
-      "remember": { "en": "Slowing down now is preparation, not laziness.", "hi": "अभी धीमे होना तैयारी है, आलस नहीं।" },
+      "title": { "en": "I'm allowed to slow down", "hi": "मुझे धीमे होने की इजाज़त है" },
+      "content": { "en": "These last days aren't for finishing everything. They're for gathering myself, gently, before the big change ahead.", "hi": "ये आख़िरी दिन सब कुछ निपटाने के लिए नहीं हैं। ये ख़ुद को समेटने के लिए हैं, नरमी से, आगे आने वाले बड़े बदलाव से पहले।" },
+      "remember": { "en": "Slowing down now is a way of getting ready.", "hi": "अभी धीमे होना तैयारी है, आलस नहीं।" },
       "durationMinutes": 0
     }
   },
@@ -204,11 +204,11 @@
     "week": 39,
     "babyLearning": { "en": "Your baby should keep moving as usual right up to labour.", "hi": "गहरा आराम करते हुए, बड़े दिन के लिए ताक़त बचाते" },
     "grow": {
-      "title": { "en": "Rest Now For What's Ahead", "hi": "जो आगे है, उसके लिए अभी आराम" },
-      "insight": { "en": "The rest you take in these last days is not idle time. It is you quietly storing strength for the journey just ahead.", "hi": "इन आख़िरी दिनों में आप जो आराम लेती हैं, वह बेकार का समय नहीं है। वह आपका चुपचाप आगे के सफ़र के लिए ताक़त जमा करना है।" },
-      "expanded": { "en": "When the finish line feels so close, there can be a pull to stay busy, to use every hour. But the days ahead will ask a great deal of you — long nights, deep effort, a body and heart stretched in new ways. The kindest, wisest thing you can do now is rest. Nap when you can. Let others carry what they can carry. Sit and simply be. This is not falling behind; it is filling the well you will soon draw from. Rest now, gently and without guilt — your future self, and your baby, will thank you.", "hi": "जब मंज़िल इतनी क़रीब लगती है, तो व्यस्त रहने का, हर घंटे को काम में लगाने का मन करता है। पर आने वाले दिन आपसे बहुत कुछ माँगेंगे — लंबी रातें, गहरी मेहनत, एक शरीर और एक दिल जो नए तरीक़ों से खिंचेंगे। अभी आप जो सबसे नरम और सबसे समझदारी वाली चीज़ कर सकती हैं, वह है आराम। जब मौक़ा मिले, झपकी ले लीजिए। जो काम दूसरे उठा सकते हैं, उन्हें उठाने दीजिए। बैठिए और बस रहिए। यह पीछे रह जाना नहीं है; यह उस कुएँ को भरना है जिससे आप जल्द ही पानी खींचेंगी। अभी आराम कीजिए, नरमी से और ख़ुद को दोषी माने बिना — आने वाले दिनों की आप, और आपका बच्चा, दोनों इसके लिए शुक्रगुज़ार होंगे।" },
-      "deepDive": { "en": "Studies suggest that mothers who enter labour well-rested tend to cope with it more steadily. Rest in late pregnancy is not indulgence — it is genuine preparation for the work ahead.", "hi": "शोध बताते हैं कि जो माएँ अच्छी तरह आराम करके प्रसव में जाती हैं, वे उसे ज़्यादा ठहराव के साथ संभाल पाती हैं। गर्भावस्था के आख़िरी दिनों में आराम ऐशो-आराम नहीं — यह आगे के काम की सच्ची तैयारी है।" },
-      "remember": { "en": "Resting now is filling the well you will soon draw from.", "hi": "अभी आराम करना उस कुएँ को भरना है जिससे आप जल्द पानी खींचेंगी।" }
+      "title": { "en": "Rest now for what's ahead", "hi": "जो आगे है, उसके लिए अभी आराम" },
+      "insight": { "en": "The rest you take in these last days isn't wasted time. It's how you store up strength for what's coming.", "hi": "इन आख़िरी दिनों में आप जो आराम लेती हैं, वह बेकार का समय नहीं है। वह आपका चुपचाप आगे के सफ़र के लिए ताक़त जमा करना है।" },
+      "expanded": { "en": "When the due date feels so close, there can be a pull to stay busy and use every hour. But the days ahead will ask a lot of you: long nights, hard work, and a heart stretched in new ways. The kindest thing you can do now is rest. Nap when you can. Let others carry what they can. Sit and just be. Resting now fills up the reserves you'll soon draw on. Rest without guilt. Your future self, and your baby, will thank you.", "hi": "जब मंज़िल इतनी क़रीब लगती है, तो व्यस्त रहने का, हर घंटे को काम में लगाने का मन करता है। पर आने वाले दिन आपसे बहुत कुछ माँगेंगे — लंबी रातें, गहरी मेहनत, एक शरीर और एक दिल जो नए तरीक़ों से खिंचेंगे। अभी आप जो सबसे नरम और सबसे समझदारी वाली चीज़ कर सकती हैं, वह है आराम। जब मौक़ा मिले, झपकी ले लीजिए। जो काम दूसरे उठा सकते हैं, उन्हें उठाने दीजिए। बैठिए और बस रहिए। यह पीछे रह जाना नहीं है; यह उस कुएँ को भरना है जिससे आप जल्द ही पानी खींचेंगी। अभी आराम कीजिए, नरमी से और ख़ुद को दोषी माने बिना — आने वाले दिनों की आप, और आपका बच्चा, दोनों इसके लिए शुक्रगुज़ार होंगे।" },
+      "deepDive": { "en": "Sleep is often broken in late pregnancy, and being tired makes everything feel harder. Resting in these weeks is a sensible way to prepare for the work ahead.", "hi": "शोध बताते हैं कि जो माएँ अच्छी तरह आराम करके प्रसव में जाती हैं, वे उसे ज़्यादा ठहराव के साथ संभाल पाती हैं। गर्भावस्था के आख़िरी दिनों में आराम ऐशो-आराम नहीं — यह आगे के काम की सच्ची तैयारी है।" },
+      "remember": { "en": "Resting now builds up the strength you'll soon need.", "hi": "अभी आराम करना उस कुएँ को भरना है जिससे आप जल्द पानी खींचेंगी।" }
     },
     "readToBaby": {
       "title": { "en": "The Cradle Made With Love", "hi": "प्यार से बना झूला" },
@@ -217,8 +217,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about the warm welcome that is waiting for them.", "hi": "अपने बच्चे को उस गर्मजोशी भरे स्वागत के बारे में बताइए जो उनका इंतज़ार कर रहा है।" },
-      "motivation": { "en": "Describing the welcome ahead lets your baby arrive already knowing they are deeply wanted.", "hi": "आगे के स्वागत के बारे में बताना आपके बच्चे को पहले से यह जानते हुए आने देता है कि उन्हें गहराई से चाहा गया है।" }
+      "title": { "en": "Tell your baby about the warm welcome that's waiting for them.", "hi": "अपने बच्चे को उस गर्मजोशी भरे स्वागत के बारे में बताइए जो उनका इंतज़ार कर रहा है।" },
+      "motivation": { "en": "Describing the welcome ahead lets your baby arrive already wanted and waited for.", "hi": "आगे के स्वागत के बारे में बताना आपके बच्चे को पहले से यह जानते हुए आने देता है कि उन्हें गहराई से चाहा गया है।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -233,9 +233,9 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "Easing The Last-Week Heaviness", "hi": "आख़िरी हफ़्ते का भारीपन हल्का करना" },
-      "content": { "en": "If a full belly feels heavy and uncomfortable now, lean on light, hydrating foods — soft fruits, curd, soups and plenty of water. Sip warm drinks slowly and eat a little at a time. Keeping gently hydrated also eases the swelling and tiredness that often come in these final days.", "hi": "अगर अब भरा हुआ पेट भारी और बेचैन करता है, तो हल्के, पानी वाले खाने का सहारा लीजिए — नरम फल, दही, सूप और ख़ूब पानी। गर्म पेय धीरे-धीरे चुस्कियों में लीजिए और थोड़ा-थोड़ा करके खाइए। शरीर में पानी बना रहना उस सूजन और थकान को भी हल्का करता है जो इन आख़िरी दिनों में अक्सर आ जाती है।" },
-      "remember": { "en": "Light, hydrating foods sit easiest in these final, heavy days.", "hi": "इन आख़िरी, भारी दिनों में हल्के, पानी वाले खाने सबसे आसानी से पचते हैं।" },
+      "title": { "en": "Easing the last-week heaviness", "hi": "आख़िरी हफ़्ते का भारीपन हल्का करना" },
+      "content": { "en": "If a full belly feels heavy and uncomfortable now, lean on light, hydrating foods like soft fruit, curd, soups and plenty of water. Sip warm drinks slowly and eat a little at a time. Staying hydrated can also ease the swelling and tiredness that often come in these last days. If swelling comes on suddenly, or shows up in your face or hands, call your doctor straight away.", "hi": "अगर अब भरा हुआ पेट भारी और बेचैन करता है, तो हल्के, पानी वाले खाने का सहारा लीजिए — नरम फल, दही, सूप और ख़ूब पानी। गर्म पेय धीरे-धीरे चुस्कियों में लीजिए और थोड़ा-थोड़ा करके खाइए। शरीर में पानी बना रहना उस सूजन और थकान को भी हल्का करता है जो इन आख़िरी दिनों में अक्सर आ जाती है।" },
+      "remember": { "en": "Light, hydrating food sits easiest in these last, heavy days.", "hi": "इन आख़िरी, भारी दिनों में हल्के, पानी वाले खाने सबसे आसानी से पचते हैं।" },
       "durationMinutes": 0
     }
   },
@@ -244,11 +244,11 @@
     "week": 39,
     "babyLearning": { "en": "Newborns cry with few tears for the first few weeks.", "hi": "पूरी तरह तैयार, बस सही पल का इंतज़ार" },
     "grow": {
-      "title": { "en": "Your Arms Are Almost Full", "hi": "आपकी बाहें लगभग भर चुकी हैं" },
-      "insight": { "en": "Soon the arms that have rested on your belly all these months will hold your baby for real. The waiting is nearly over.", "hi": "जल्द ही वे बाहें, जो इन सारे महीनों आपके पेट पर टिकी रहीं, आपके बच्चे को सच में थाम लेंगी। इंतज़ार लगभग पूरा हुआ।" },
-      "expanded": { "en": "For nine long months your arms have wrapped around a belly, holding your baby in the only way you could. Soon those same arms will cradle a real, breathing little one — soft and warm and finally here. It is almost impossible to imagine, and yet it is so close now. Whatever these final days hold, let yourself feel the wonder of how near you are. The long wait, the wondering, the hoping — all of it has been leading to this. Very soon, the arms that have held you in waiting will simply hold your child.", "hi": "नौ लंबे महीनों से आपकी बाहें एक पेट के इर्द-गिर्द लिपटी रही हैं, अपने बच्चे को उसी एक तरीक़े से थामे हुए जो आपके पास था। जल्द ही वही बाहें एक सचमुच के, साँस लेते बच्चे को झुलाएँगी — नरम, गर्म, और आख़िरकार यहाँ। इसे सोच पाना लगभग नामुमकिन लगता है, फिर भी यह अब इतना क़रीब है। ये आख़िरी दिन जो भी लाएँ, ख़ुद को यह हैरानी महसूस करने दीजिए कि आप कितनी पास हैं। इतना लंबा इंतज़ार, वह सोचना, वह उम्मीद — सब इसी ओर ले जा रहा था। बहुत जल्द, जिन बाहों ने आपको इंतज़ार में संभाला, वे बस आपके बच्चे को संभालेंगी।" },
-      "deepDive": { "en": "From the very first minutes after birth, holding your baby close releases hormones in you both that calm the heart and deepen the bond. Those waiting arms are part of how your baby first learns the world is safe.", "hi": "जन्म के पहले कुछ मिनटों से ही, बच्चे को पास थामने पर आप दोनों में ऐसे हॉर्मोन निकलते हैं जो दिल को शांत करते हैं और जुड़ाव गहरा करते हैं। वे इंतज़ार करती बाहें उस तरीक़े का हिस्सा हैं जिससे बच्चे सबसे पहले सीखते हैं कि दुनिया सुरक्षित है।" },
-      "remember": { "en": "Very soon, your waiting arms will simply hold your child.", "hi": "बहुत जल्द, आपकी इंतज़ार करती बाहें बस आपके बच्चे को थाम लेंगी।" }
+      "title": { "en": "Your arms are almost full", "hi": "आपकी बाहें लगभग भर चुकी हैं" },
+      "insight": { "en": "Soon the arms that have waited all these months will hold your baby for real. The waiting is nearly over.", "hi": "जल्द ही वे बाहें, जो इन सारे महीनों आपके पेट पर टिकी रहीं, आपके बच्चे को सच में थाम लेंगी। इंतज़ार लगभग पूरा हुआ।" },
+      "expanded": { "en": "For nine long months your arms have wrapped around a belly, holding your baby in the only way they could. Soon those same arms will cradle a real, breathing little one, soft and warm and finally here. It's hard to imagine, and yet it's so close now. Whatever these last days bring, let yourself feel how near you are. The long wait, the wondering and the hoping have all been leading to this. Very soon, your waiting arms will hold your child.", "hi": "नौ लंबे महीनों से आपकी बाहें एक पेट के इर्द-गिर्द लिपटी रही हैं, अपने बच्चे को उसी एक तरीक़े से थामे हुए जो आपके पास था। जल्द ही वही बाहें एक सचमुच के, साँस लेते बच्चे को झुलाएँगी — नरम, गर्म, और आख़िरकार यहाँ। इसे सोच पाना लगभग नामुमकिन लगता है, फिर भी यह अब इतना क़रीब है। ये आख़िरी दिन जो भी लाएँ, ख़ुद को यह हैरानी महसूस करने दीजिए कि आप कितनी पास हैं। इतना लंबा इंतज़ार, वह सोचना, वह उम्मीद — सब इसी ओर ले जा रहा था। बहुत जल्द, जिन बाहों ने आपको इंतज़ार में संभाला, वे बस आपके बच्चे को संभालेंगी।" },
+      "deepDive": { "en": "Holding your baby close, skin to skin, in the first minutes and days after birth is linked with the release of oxytocin in both of you. It's a hormone tied to calm and bonding, and your arms help your baby learn the world is safe.", "hi": "जन्म के पहले कुछ मिनटों से ही, बच्चे को पास थामने पर आप दोनों में ऐसे हॉर्मोन निकलते हैं जो दिल को शांत करते हैं और जुड़ाव गहरा करते हैं। वे इंतज़ार करती बाहें उस तरीक़े का हिस्सा हैं जिससे बच्चे सबसे पहले सीखते हैं कि दुनिया सुरक्षित है।" },
+      "remember": { "en": "Very soon, your waiting arms will hold your child.", "hi": "बहुत जल्द, आपकी इंतज़ार करती बाहें बस आपके बच्चे को थाम लेंगी।" }
     },
     "readToBaby": {
       "title": { "en": "Just Before The Dawn", "hi": "भोर से ठीक पहले" },
@@ -257,8 +257,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby that you are counting the days now, gently and full of love.", "hi": "अपने बच्चे को बताइए कि अब आप दिन गिन रही हैं, नरमी से और प्यार से भरी हुई।" },
-      "motivation": { "en": "Letting your baby hear your tender impatience tells them how longed-for their arrival truly is.", "hi": "अपने बच्चे को अपनी नरम बेसब्री सुनाना उन्हें बताता है कि उनके आने का कितना इंतज़ार है।" }
+      "title": { "en": "Tell your baby you're counting the days now, full of love.", "hi": "अपने बच्चे को बताइए कि अब आप दिन गिन रही हैं, नरमी से और प्यार से भरी हुई।" },
+      "motivation": { "en": "Hearing how much you're longing to meet them tells your baby how wanted they are.", "hi": "अपने बच्चे को अपनी नरम बेसब्री सुनाना उन्हें बताता है कि उनके आने का कितना इंतज़ार है।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -273,9 +273,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "A Breath For The Days To Come", "hi": "आने वाले दिनों के लिए एक साँस" },
+      "title": { "en": "A breath for the days to come", "hi": "आने वाले दिनों के लिए एक साँस" },
       "content": { "en": "Breathe in slowly and gather a little calm. Breathe out and let go of any worry about when and how. Repeat softly five times, trusting that your body and your baby know the way.", "hi": "धीरे से साँस लीजिए और थोड़ी शांति भीतर भर लीजिए। साँस छोड़िए और कब और कैसे — इसकी हर चिंता को जाने दीजिए। पाँच बार धीरे-धीरे दोहराइए, इस भरोसे के साथ कि आपका शरीर और आपका बच्चा रास्ता जानते हैं।" },
-      "remember": { "en": "Your body and your baby already know the way.", "hi": "आपका शरीर और आपका बच्चा रास्ता पहले से जानते हैं।" },
+      "remember": { "en": "You can let go of the when and how. The day will come.", "hi": "आपका शरीर और आपका बच्चा रास्ता पहले से जानते हैं।" },
       "durationMinutes": 2
     }
   }

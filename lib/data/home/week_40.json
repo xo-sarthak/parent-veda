@@ -4,10 +4,10 @@
     "week": 40,
     "babyLearning": { "en": "This is your due week, and your baby is ready.", "hi": "पूरी तरह बढ़ चुके, और अब आपसे मिलने को तैयार" },
     "grow": {
-      "title": { "en": "The Wait Is Nearly Over", "hi": "इंतज़ार बस ख़त्म ही होने वाला है" },
-      "insight": { "en": "After all these months of waiting, the day you have dreamed of is almost here. Soon, you will finally hold your little one.", "hi": "इन सारे महीनों के इंतज़ार के बाद, वह दिन बस आने ही वाला है जिसका आपने सपना देखा था। जल्द ही आप आख़िरकार अपने बच्चे को बाँहों में थाम लेंगी।" },
-      "expanded": { "en": "You have carried this little one through every season of these forty weeks — the wonder, the worry, the quiet nights and the small kicks. And now you stand at the very edge of the wait, with the welcome so close you can almost feel it. There is nothing left to prove and nothing left to perfect. Your baby is ready, and so, in all the ways that truly matter, are you. Let yourself feel the gentle thrill of these last days. The longest, most loving wait of your life is nearly over, and a whole new beginning is just about to start.", "hi": "आपने इस नन्ही सी जान को इन चालीस हफ़्तों के हर मौसम में साथ लिए चली हैं — अचरज, चिंता, चुपचाप बीती रातें और वे छोटी-छोटी लातें। और अब आप इंतज़ार के बिल्कुल किनारे पर खड़ी हैं, स्वागत इतना क़रीब कि आप उसे लगभग छू सकती हैं। अब न कुछ साबित करना बाक़ी है, न कुछ परफ़ेक्ट करना। आपका बच्चा तैयार है, और जिन तरीक़ों से सचमुच फ़र्क़ पड़ता है, उन सबमें आप भी तैयार हैं। इन आख़िरी दिनों की नरम सिहरन को ख़ुद पर उतरने दीजिए। आपकी ज़िंदगी का सबसे लंबा, सबसे प्यार भरा इंतज़ार बस ख़त्म होने को है, और एक बिल्कुल नई शुरुआत शुरू होने ही वाली है।" },
-      "deepDive": { "en": "In the final weeks, babies are considered fully developed and simply gaining strength for the world outside. Doctors call this 'term' — your little one is ready whenever the moment comes.", "hi": "आख़िरी हफ़्तों में बच्चों को पूरी तरह विकसित माना जाता है — अब वे बस बाहर की दुनिया के लिए ताक़त जुटा रहे होते हैं। डॉक्टर इसे 'term' कहते हैं — जब भी वह पल आए, आपका बच्चा तैयार है।" },
+      "title": { "en": "The wait is nearly over", "hi": "इंतज़ार बस ख़त्म ही होने वाला है" },
+      "insight": { "en": "After all these months of waiting, the day you've dreamed of is almost here. Soon you'll hold your little one.", "hi": "इन सारे महीनों के इंतज़ार के बाद, वह दिन बस आने ही वाला है जिसका आपने सपना देखा था। जल्द ही आप आख़िरकार अपने बच्चे को बाँहों में थाम लेंगी।" },
+      "expanded": { "en": "You've carried this little one through every part of these forty weeks: the wonder, the worry, the quiet nights and the small kicks. Now you're at the very end of the wait, and the welcome is so close you can almost feel it. There's nothing left to prove and nothing left to perfect. Your baby is ready, and in all the ways that matter, so are you. Let yourself enjoy these last days. The longest, most loving wait of your life is nearly over, and something new is about to begin.", "hi": "आपने इस नन्ही सी जान को इन चालीस हफ़्तों के हर मौसम में साथ लिए चली हैं — अचरज, चिंता, चुपचाप बीती रातें और वे छोटी-छोटी लातें। और अब आप इंतज़ार के बिल्कुल किनारे पर खड़ी हैं, स्वागत इतना क़रीब कि आप उसे लगभग छू सकती हैं। अब न कुछ साबित करना बाक़ी है, न कुछ परफ़ेक्ट करना। आपका बच्चा तैयार है, और जिन तरीक़ों से सचमुच फ़र्क़ पड़ता है, उन सबमें आप भी तैयार हैं। इन आख़िरी दिनों की नरम सिहरन को ख़ुद पर उतरने दीजिए। आपकी ज़िंदगी का सबसे लंबा, सबसे प्यार भरा इंतज़ार बस ख़त्म होने को है, और एक बिल्कुल नई शुरुआत शुरू होने ही वाली है।" },
+      "deepDive": { "en": "By now your baby is fully formed and mostly gaining strength for life outside. Doctors call this stage term, so your baby could come any day. Your doctor will guide you on timing.", "hi": "आख़िरी हफ़्तों में बच्चों को पूरी तरह विकसित माना जाता है — अब वे बस बाहर की दुनिया के लिए ताक़त जुटा रहे होते हैं। डॉक्टर इसे 'term' कहते हैं — जब भी वह पल आए, आपका बच्चा तैयार है।" },
       "remember": { "en": "The longest wait of your life is almost over.", "hi": "आपकी ज़िंदगी का सबसे लंबा इंतज़ार बस ख़त्म ही होने वाला है।" }
     },
     "readToBaby": {
@@ -17,8 +17,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby the very first thing you will whisper to them when you finally hold them.", "hi": "अपने बच्चे को वह सबसे पहली बात बताइए जो आप उन्हें पहली बार गोद में लेते ही कान में कहेंगी।" },
-      "motivation": { "en": "The first words your baby hears in your arms will carry all your love at once.", "hi": "आपकी बाँहों में आपके बच्चे को जो पहले शब्द सुनाई देंगे, वे आपका सारा प्यार एक साथ लेकर आएँगे।" }
+      "title": { "en": "Tell your baby the first thing you'll whisper to them when you finally hold them.", "hi": "अपने बच्चे को वह सबसे पहली बात बताइए जो आप उन्हें पहली बार गोद में लेते ही कान में कहेंगी।" },
+      "motivation": { "en": "The first words your baby hears in your arms will carry all your love.", "hi": "आपकी बाँहों में आपके बच्चे को जो पहले शब्द सुनाई देंगे, वे आपका सारा प्यार एक साथ लेकर आएँगे।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -33,9 +33,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Breathing Toward The Meeting", "hi": "मुलाक़ात की ओर एक साँस" },
-      "content": { "en": "Breathe in slowly and think 'almost here.' Breathe out softly and think 'I am ready.' Repeat gently for one quiet minute.", "hi": "धीरे से साँस लीजिए और सोचिए — 'बस आने ही वाला है।' नरमी से साँस छोड़िए और सोचिए — 'मैं तैयार हूँ।' एक शांत मिनट तक इसे नरमी से दोहराइए।" },
-      "remember": { "en": "Each calm breath brings the meeting a little closer.", "hi": "हर शांत साँस उस मुलाक़ात को थोड़ा और क़रीब ले आती है।" },
+      "title": { "en": "Breathing towards the meeting", "hi": "मुलाक़ात की ओर एक साँस" },
+      "content": { "en": "Breathe in slowly and think 'almost here'. Breathe out softly and think 'I'm ready'. Repeat gently for one quiet minute.", "hi": "धीरे से साँस लीजिए और सोचिए — 'बस आने ही वाला है।' नरमी से साँस छोड़िए और सोचिए — 'मैं तैयार हूँ।' एक शांत मिनट तक इसे नरमी से दोहराइए।" },
+      "remember": { "en": "Each calm breath carries you a little closer to the meeting.", "hi": "हर शांत साँस उस मुलाक़ात को थोड़ा और क़रीब ले आती है।" },
       "durationMinutes": 1
     }
   },
@@ -44,10 +44,10 @@
     "week": 40,
     "babyLearning": { "en": "Most babies arrive within about two weeks of the due date.", "hi": "आराम से सिमटे और पूरे, बस अब इंतज़ार में" },
     "grow": {
-      "title": { "en": "You Were Worth Every Moment", "hi": "तुम हर एक पल के लायक़ हो" },
-      "insight": { "en": "Every long day, every ache, every hope of these months was leading to one little face. And it was all worth it.", "hi": "इन महीनों का हर लंबा दिन, हर दर्द, हर उम्मीद एक नन्हे से चेहरे की ओर ले जा रही थी। और यह सब उसी के लायक़ था।" },
-      "expanded": { "en": "There were days that felt endless, nights of broken sleep, and moments you wondered how you would carry on. Looking back now, you can see that all of it — the tiredness, the patience, the waiting — was quietly building toward this. Soon you will look into your baby's eyes and feel something settle in your heart: that you would do every single day of it again, gladly. Some things in life are worth any amount of waiting, and your little one is the truest of them all. You have not just endured these months; you have loved your way through them.", "hi": "कुछ दिन ऐसे थे जो ख़त्म ही नहीं होते थे, कुछ रातें टूटी-फूटी नींद की, और कुछ पल जब आपने सोचा कि आगे कैसे चलेंगी। अब पीछे मुड़कर देखिए, तो साफ़ दिखता है कि यह सब — थकान, सब्र, इंतज़ार — चुपचाप इसी की ओर बुना जा रहा था। जल्द ही आप अपने बच्चे की आँखों में देखेंगी और दिल में कुछ ठहरता सा महसूस करेंगी: कि आप इसका एक-एक दिन ख़ुशी से फिर से जी लेंगी। ज़िंदगी में कुछ चीज़ें किसी भी इंतज़ार के लायक़ होती हैं, और आपका बच्चा उन सबमें सबसे सच्ची बात है। आपने इन महीनों को सिर्फ़ काटा नहीं है; आप इनके बीच से प्यार करती हुई गुज़री हैं।" },
-      "deepDive": { "en": "Many parents describe a wave of deep relief and joy the moment they first meet their baby, as months of effort give way to connection. Researchers call this powerful surge of bonding feeling entirely natural.", "hi": "बहुत से माता-पिता बताते हैं कि अपने बच्चे से पहली बार मिलते ही उन्हें गहरी राहत और ख़ुशी की एक लहर महसूस होती है, जब महीनों की मेहनत एक जुड़ाव में बदल जाती है। शोध करने वालों का कहना है कि जुड़ाव का यह ज़बरदस्त एहसास बिल्कुल स्वाभाविक है।" },
+      "title": { "en": "Every moment was worth it", "hi": "तुम हर एक पल के लायक़ हो" },
+      "insight": { "en": "Every long day, every ache and every hope of these months was leading to one little face. It was all worth it.", "hi": "इन महीनों का हर लंबा दिन, हर दर्द, हर उम्मीद एक नन्हे से चेहरे की ओर ले जा रही थी। और यह सब उसी के लायक़ था।" },
+      "expanded": { "en": "There were days that felt endless, nights of broken sleep and moments you wondered how you'd keep going. Looking back now, you can see that all of it, the tiredness, the patience and the waiting, was building towards this. Soon you'll look into your baby's eyes and feel something settle in your heart. You'd do every day of it again, gladly. Some things are worth any amount of waiting, and your little one is one of them. You didn't just get through these months. You loved your way through them.", "hi": "कुछ दिन ऐसे थे जो ख़त्म ही नहीं होते थे, कुछ रातें टूटी-फूटी नींद की, और कुछ पल जब आपने सोचा कि आगे कैसे चलेंगी। अब पीछे मुड़कर देखिए, तो साफ़ दिखता है कि यह सब — थकान, सब्र, इंतज़ार — चुपचाप इसी की ओर बुना जा रहा था। जल्द ही आप अपने बच्चे की आँखों में देखेंगी और दिल में कुछ ठहरता सा महसूस करेंगी: कि आप इसका एक-एक दिन ख़ुशी से फिर से जी लेंगी। ज़िंदगी में कुछ चीज़ें किसी भी इंतज़ार के लायक़ होती हैं, और आपका बच्चा उन सबमें सबसे सच्ची बात है। आपने इन महीनों को सिर्फ़ काटा नहीं है; आप इनके बीच से प्यार करती हुई गुज़री हैं।" },
+      "deepDive": { "en": "Many parents describe a wave of relief and joy when they first meet their baby. For others the feeling builds more slowly over the first days. Both are natural.", "hi": "बहुत से माता-पिता बताते हैं कि अपने बच्चे से पहली बार मिलते ही उन्हें गहरी राहत और ख़ुशी की एक लहर महसूस होती है, जब महीनों की मेहनत एक जुड़ाव में बदल जाती है। शोध करने वालों का कहना है कि जुड़ाव का यह ज़बरदस्त एहसास बिल्कुल स्वाभाविक है।" },
       "remember": { "en": "Every moment of the wait was worth this little one.", "hi": "इंतज़ार का हर पल इस नन्ही जान के लायक़ था।" }
     },
     "readToBaby": {
@@ -57,8 +57,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby how long, and how patiently, you have waited just for them.", "hi": "अपने बच्चे को बताइए कि आपने सिर्फ़ उनके लिए कितना लंबा, और कितने सब्र से इंतज़ार किया है।" },
-      "motivation": { "en": "Your baby will love knowing they were wished for, long before they arrived.", "hi": "आपके बच्चे को यह जानना बहुत भला लगेगा कि उनके आने से बहुत पहले से ही उन्हें चाहा गया था।" }
+      "title": { "en": "Tell your baby how long, and how patiently, you've waited for them.", "hi": "अपने बच्चे को बताइए कि आपने सिर्फ़ उनके लिए कितना लंबा, और कितने सब्र से इंतज़ार किया है।" },
+      "motivation": { "en": "Your baby will love knowing they were wished for long before they arrived.", "hi": "आपके बच्चे को यह जानना बहुत भला लगेगा कि उनके आने से बहुत पहले से ही उन्हें चाहा गया था।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -73,9 +73,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "It Was All Worth It", "hi": "यह सब इसी के लायक़ था" },
-      "content": { "en": "Every hard day and every long night of these months has carried me to this. I would do it all again for you.", "hi": "इन महीनों का हर मुश्किल दिन और हर लंबी रात मुझे यहाँ तक लाई है। मैं तुम्हारे लिए यह सब फिर से कर लूँगी।" },
-      "remember": { "en": "What you waited for is finally almost here.", "hi": "जिसका आपने इंतज़ार किया, वह आख़िरकार बस आने ही वाला है।" },
+      "title": { "en": "It was all worth it", "hi": "यह सब इसी के लायक़ था" },
+      "content": { "en": "Every hard day and every long night of these months has brought me here. I'd do it all again for you.", "hi": "इन महीनों का हर मुश्किल दिन और हर लंबी रात मुझे यहाँ तक लाई है। मैं तुम्हारे लिए यह सब फिर से कर लूँगी।" },
+      "remember": { "en": "What you've waited for is almost here.", "hi": "जिसका आपने इंतज़ार किया, वह आख़िरकार बस आने ही वाला है।" },
       "durationMinutes": 0
     }
   },
@@ -84,11 +84,11 @@
     "week": 40,
     "babyLearning": { "en": "Your baby's first cry helps clear fluid and open the lungs.", "hi": "दुनिया को हैलो कहने के लिए तैयार" },
     "grow": {
-      "title": { "en": "Hello Is Coming", "hi": "हैलो बस आने ही वाला है" },
-      "insight": { "en": "Very soon, the first hello of your whole lives together will finally happen. The moment is almost here.", "hi": "बहुत जल्द, आपकी साथ की पूरी ज़िंदगी का पहला हैलो आख़िरकार होगा। वह पल बस आने ही वाला है।" },
-      "expanded": { "en": "For all these months you have spoken to your baby, hoped for them, imagined their face — but always through the soft wall between you. Soon that wall will melt away, and there will be a real hello: skin to skin, eyes to eyes, your voice no longer muffled but warm and clear in their ear. It is the moment every parent dreams of. You do not need to rehearse it or get it right. When it comes, your heart will know exactly what to do. The most beautiful hello of your life is on its way, and nothing can hold it back now.", "hi": "इन सारे महीनों में आप अपने बच्चे से बात करती रहीं, उनके लिए उम्मीदें बुनीं, उनका चेहरा सोचा — पर हमेशा आप दोनों के बीच की उस नरम दीवार के पार से। जल्द ही वह दीवार पिघल जाएगी, और एक सच्चा हैलो होगा: त्वचा से त्वचा, आँखों में आँखें, और आपकी आवाज़ अब दबी हुई नहीं, बल्कि उनके कान में गर्म और साफ़। यही वह पल है जिसका सपना हर माँ-बाप देखते हैं। आपको इसकी रिहर्सल करने या इसे 'ठीक' करने की ज़रूरत नहीं। जब वह पल आएगा, आपका दिल ख़ुद जान लेगा कि क्या करना है। आपकी ज़िंदगी का सबसे सुंदर हैलो अपने रास्ते पर है, और अब उसे कुछ रोक नहीं सकता।" },
-      "deepDive": { "en": "Newborns recognise their mother's voice from birth, having heard it for months in the womb. That first real hello is, to your baby, the sound of someone already deeply familiar and loved.", "hi": "नवजात शिशु जन्म से ही अपनी माँ की आवाज़ पहचान लेते हैं, क्योंकि वे उसे महीनों तक गर्भ में सुनते आए हैं। वह पहला सच्चा हैलो आपके बच्चे के लिए किसी ऐसे की आवाज़ है जो पहले से गहराई तक जाना-पहचाना और अपना है।" },
-      "remember": { "en": "The most beautiful hello of your life is coming.", "hi": "आपकी ज़िंदगी का सबसे सुंदर हैलो आने वाला है।" }
+      "title": { "en": "Hello is coming", "hi": "हैलो बस आने ही वाला है" },
+      "insight": { "en": "Very soon, the first hello of your life together will happen. The moment is almost here.", "hi": "बहुत जल्द, आपकी साथ की पूरी ज़िंदगी का पहला हैलो आख़िरकार होगा। वह पल बस आने ही वाला है।" },
+      "expanded": { "en": "All these months you've talked to your baby, hoped for them and imagined their face, always through the soft wall between you. Soon that wall will be gone and there'll be a real hello: skin to skin, eye to eye, your voice warm and clear in their ear instead of muffled. It's the moment every parent dreams of. You don't need to rehearse it or get it right. When it comes, your heart will know what to do. The best hello of your life is on its way, and nothing can hold it back now.", "hi": "इन सारे महीनों में आप अपने बच्चे से बात करती रहीं, उनके लिए उम्मीदें बुनीं, उनका चेहरा सोचा — पर हमेशा आप दोनों के बीच की उस नरम दीवार के पार से। जल्द ही वह दीवार पिघल जाएगी, और एक सच्चा हैलो होगा: त्वचा से त्वचा, आँखों में आँखें, और आपकी आवाज़ अब दबी हुई नहीं, बल्कि उनके कान में गर्म और साफ़। यही वह पल है जिसका सपना हर माँ-बाप देखते हैं। आपको इसकी रिहर्सल करने या इसे 'ठीक' करने की ज़रूरत नहीं। जब वह पल आएगा, आपका दिल ख़ुद जान लेगा कि क्या करना है। आपकी ज़िंदगी का सबसे सुंदर हैलो अपने रास्ते पर है, और अब उसे कुछ रोक नहीं सकता।" },
+      "deepDive": { "en": "Newborns show signs of knowing their mother's voice from birth, after hearing it for months in the womb. That first hello is, for your baby, a meeting with someone they've already heard.", "hi": "नवजात शिशु जन्म से ही अपनी माँ की आवाज़ पहचान लेते हैं, क्योंकि वे उसे महीनों तक गर्भ में सुनते आए हैं। वह पहला सच्चा हैलो आपके बच्चे के लिए किसी ऐसे की आवाज़ है जो पहले से गहराई तक जाना-पहचाना और अपना है।" },
+      "remember": { "en": "The best hello of your life is coming.", "hi": "आपकी ज़िंदगी का सबसे सुंदर हैलो आने वाला है।" }
     },
     "readToBaby": {
       "title": { "en": "Gokul Rejoices", "hi": "गोकुल में ख़ुशी छा गई" },
@@ -97,8 +97,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about the moment you have dreamed of — finally holding them close.", "hi": "अपने बच्चे को उस पल के बारे में बताइए जिसका आपने सपना देखा है — आख़िरकार उन्हें अपने पास थाम लेना।" },
-      "motivation": { "en": "Sharing the moment you long for makes the welcome already feel real.", "hi": "जिस पल की आप चाह रखती हैं, उसे बाँट देना स्वागत को अभी से सच्चा बना देता है।" }
+      "title": { "en": "Tell your baby about the moment you've dreamed of: finally holding them close.", "hi": "अपने बच्चे को उस पल के बारे में बताइए जिसका आपने सपना देखा है — आख़िरकार उन्हें अपने पास थाम लेना।" },
+      "motivation": { "en": "Talking about the moment you're longing for makes the welcome feel real already.", "hi": "जिस पल की आप चाह रखती हैं, उसे बाँट देना स्वागत को अभी से सच्चा बना देता है।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -113,8 +113,8 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "Easy, Nourishing Bites For Now", "hi": "अभी के लिए आसान, पौष्टिक निवाले" },
-      "content": { "en": "If the wait leaves your appetite uneven, keep small, gentle foods close — a banana, a handful of nuts, warm khichdi. Little nourishing bites are kinder than forcing a full meal right now.", "hi": "अगर इंतज़ार में भूख एक जैसी न रहे, तो छोटे और हल्के खाने पास रखिए — एक केला, मुट्ठी भर मेवे, गरम खिचड़ी। अभी पूरा खाना ज़बरदस्ती करने से बेहतर हैं छोटे-छोटे पौष्टिक निवाले।" },
+      "title": { "en": "Easy, nourishing bites for now", "hi": "अभी के लिए आसान, पौष्टिक निवाले" },
+      "content": { "en": "If the wait leaves your appetite up and down, keep small, gentle foods close, like a banana, a handful of nuts or warm khichdi. Little nourishing bites are better than forcing a full meal right now.", "hi": "अगर इंतज़ार में भूख एक जैसी न रहे, तो छोटे और हल्के खाने पास रखिए — एक केला, मुट्ठी भर मेवे, गरम खिचड़ी। अभी पूरा खाना ज़बरदस्ती करने से बेहतर हैं छोटे-छोटे पौष्टिक निवाले।" },
       "remember": { "en": "Small, steady bites keep your strength up for the days ahead.", "hi": "छोटे और लगातार निवाले आने वाले दिनों के लिए आपकी ताक़त बनाए रखते हैं।" },
       "durationMinutes": 0
     }
@@ -124,10 +124,10 @@
     "week": 40,
     "babyLearning": { "en": "Your baby will know your voice from the very first day.", "hi": "गर्माहट में, इंतज़ार में, और बेहिसाब प्यार में" },
     "grow": {
-      "title": { "en": "A Love Like No Other", "hi": "ऐसा प्यार, जैसा कोई और नहीं" },
-      "insight": { "en": "The love you are about to feel for your baby is unlike anything you have known before. It will surprise you with its depth.", "hi": "अपने बच्चे के लिए आप जो प्यार महसूस करने वाली हैं, वैसा आपने पहले कुछ नहीं जाना। उसकी गहराई आपको चौंका देगी।" },
-      "expanded": { "en": "There is a kind of love that arrives only with a child — fierce and tender at once, vast and yet centred on one tiny person. You may have wondered if you could love this deeply, and soon you will have your answer. It is a love that asks for nothing and gives everything, that makes the whole world seem to rearrange itself around one small face. Do not worry about whether you will feel it 'enough.' It will come, the way the tide comes, sure and full. This love has been growing quietly in you for months, and it is about to find its home.", "hi": "एक ऐसा प्यार होता है जो सिर्फ़ बच्चे के साथ आता है — एक ही साथ प्रचंड और कोमल, विशाल और फिर भी एक नन्हे से इंसान पर सिमटा हुआ। आपने शायद सोचा हो कि क्या आप इतनी गहराई से प्यार कर पाएँगी — जल्द ही आपको जवाब मिल जाएगा। यह वह प्यार है जो कुछ माँगता नहीं और सब कुछ दे देता है, जिसमें पूरी दुनिया एक नन्हे से चेहरे के आसपास फिर से सज जाती है। इस बात की चिंता मत कीजिए कि आप इसे 'काफ़ी' महसूस कर पाएँगी या नहीं। यह आएगा, जैसे समंदर का ज्वार आता है — पक्का और पूरा। यह प्यार महीनों से आपके भीतर चुपचाप बढ़ रहा है, और अब बस अपना घर पाने वाला है।" },
-      "deepDive": { "en": "When a parent holds their newborn, the brain releases a surge of oxytocin — often called the bonding hormone — deepening feelings of love and protection. This profound new attachment is one of nature's most powerful designs.", "hi": "जब माँ या पिता अपने नवजात को गोद में लेते हैं, तो दिमाग़ में ऑक्सीटोसिन की एक लहर दौड़ जाती है — जिसे अक्सर जुड़ाव का हॉर्मोन कहा जाता है — और प्यार तथा हिफ़ाज़त का एहसास और गहरा हो जाता है। यह गहरा नया लगाव क़ुदरत की सबसे ताक़तवर रचनाओं में से एक है।" },
+      "title": { "en": "A love like no other", "hi": "ऐसा प्यार, जैसा कोई और नहीं" },
+      "insight": { "en": "The love you're about to feel for your baby is unlike anything you've known. Its depth may surprise you.", "hi": "अपने बच्चे के लिए आप जो प्यार महसूस करने वाली हैं, वैसा आपने पहले कुछ नहीं जाना। उसकी गहराई आपको चौंका देगी।" },
+      "expanded": { "en": "There's a kind of love that comes only with a child. It's fierce and tender at once, huge and yet centred on one tiny person. You may have wondered if you could love this deeply. Soon you'll find out. It's a love that asks for nothing and gives everything, and it makes the world seem to rearrange itself around one small face. There's no need to fret about whether you'll feel it 'enough'. For some parents it arrives in a rush. For others it grows over days or weeks. Both are normal. This love has been growing in you for months, and it's about to find its home.", "hi": "एक ऐसा प्यार होता है जो सिर्फ़ बच्चे के साथ आता है — एक ही साथ प्रचंड और कोमल, विशाल और फिर भी एक नन्हे से इंसान पर सिमटा हुआ। आपने शायद सोचा हो कि क्या आप इतनी गहराई से प्यार कर पाएँगी — जल्द ही आपको जवाब मिल जाएगा। यह वह प्यार है जो कुछ माँगता नहीं और सब कुछ दे देता है, जिसमें पूरी दुनिया एक नन्हे से चेहरे के आसपास फिर से सज जाती है। इस बात की चिंता मत कीजिए कि आप इसे 'काफ़ी' महसूस कर पाएँगी या नहीं। यह आएगा, जैसे समंदर का ज्वार आता है — पक्का और पूरा। यह प्यार महीनों से आपके भीतर चुपचाप बढ़ रहा है, और अब बस अपना घर पाने वाला है।" },
+      "deepDive": { "en": "Holding and caring for a newborn is linked with rising levels of oxytocin, a hormone tied to bonding, in parents. It's part of how a new attachment grows.", "hi": "जब माँ या पिता अपने नवजात को गोद में लेते हैं, तो दिमाग़ में ऑक्सीटोसिन की एक लहर दौड़ जाती है — जिसे अक्सर जुड़ाव का हॉर्मोन कहा जाता है — और प्यार तथा हिफ़ाज़त का एहसास और गहरा हो जाता है। यह गहरा नया लगाव क़ुदरत की सबसे ताक़तवर रचनाओं में से एक है।" },
       "remember": { "en": "A love deeper than you've known is on its way.", "hi": "आपने अब तक जितना जाना है, उससे गहरा प्यार अपने रास्ते पर है।" }
     },
     "readToBaby": {
@@ -137,7 +137,7 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby who is here, waiting with open arms, to welcome them.", "hi": "अपने बच्चे को बताइए कि कौन-कौन यहाँ खुली बाँहें लिए उनके स्वागत के लिए खड़ा है।" },
+      "title": { "en": "Tell your baby about everyone who's waiting with open arms to welcome them.", "hi": "अपने बच्चे को बताइए कि कौन-कौन यहाँ खुली बाँहें लिए उनके स्वागत के लिए खड़ा है।" },
       "motivation": { "en": "Your baby is being born into a whole circle of waiting love.", "hi": "आपके बच्चे का जन्म इंतज़ार करते प्यार के एक पूरे घेरे में हो रहा है।" }
     },
     "garbhSanskar": {
@@ -153,9 +153,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Breathing In The Love", "hi": "प्यार को साँस में भरना" },
-      "content": { "en": "Breathe in slowly and let your heart feel soft and open. Breathe out and imagine that warmth flowing down to your baby. Repeat gently for a minute or two.", "hi": "धीरे से साँस लीजिए और अपने दिल को नरम और खुला होने दीजिए। साँस छोड़िए और सोचिए कि वही गर्माहट बहकर आपके बच्चे तक पहुँच रही है। एक-दो मिनट तक नरमी से दोहराइए।" },
-      "remember": { "en": "Your open heart is the softest place your baby will land.", "hi": "आपका खुला दिल ही वह सबसे नरम जगह है जो आपके बच्चे का पहला ठिकाना बनेगी।" },
+      "title": { "en": "Breathing in the love", "hi": "प्यार को साँस में भरना" },
+      "content": { "en": "Breathe in slowly and let your heart feel soft and open. Breathe out and picture that warmth flowing down to your baby. Repeat gently for a minute or two.", "hi": "धीरे से साँस लीजिए और अपने दिल को नरम और खुला होने दीजिए। साँस छोड़िए और सोचिए कि वही गर्माहट बहकर आपके बच्चे तक पहुँच रही है। एक-दो मिनट तक नरमी से दोहराइए।" },
+      "remember": { "en": "An open heart is a soft place for your baby to land.", "hi": "आपका खुला दिल ही वह सबसे नरम जगह है जो आपके बच्चे का पहला ठिकाना बनेगी।" },
       "durationMinutes": 2
     }
   },
@@ -164,11 +164,11 @@
     "week": 40,
     "babyLearning": { "en": "Newborns see best about 20 to 30 cm away, near your face.", "hi": "आपके परिवार का सबसे नया हिस्सा" },
     "grow": {
-      "title": { "en": "You Made Us A Family", "hi": "तुमने हमें एक परिवार बना दिया" },
-      "insight": { "en": "With your baby's arrival, something new is born too — a family, shaped forever around this little one.", "hi": "आपके बच्चे के आने के साथ कुछ नया भी जन्म लेता है — एक परिवार, जो हमेशा के लिए इस नन्ही जान के इर्द-गिर्द बुन जाता है।" },
-      "expanded": { "en": "A baby does not just join a family; a baby creates one. The moment your little one arrives, the shape of your whole world quietly changes. Two people become parents, a home becomes a place of beginnings, and ordinary days take on a brand-new meaning. Whatever your family looked like before, it is about to grow a tender new centre. This little one will tie hearts together in ways no one could have planned. You are not only welcoming a baby — you are watching a family be born, with your child at the very heart of it.", "hi": "बच्चा सिर्फ़ किसी परिवार में शामिल नहीं होता; बच्चा एक परिवार बना देता है। जिस पल आपकी नन्ही जान आती है, आपकी पूरी दुनिया का आकार चुपचाप बदल जाता है। दो लोग माँ-बाप बन जाते हैं, एक घर शुरुआतों की जगह बन जाता है, और आम से दिन बिल्कुल नए मायने ले लेते हैं। आपका परिवार पहले जैसा भी रहा हो, उसे अब एक नरम नया केंद्र मिलने वाला है। यह नन्ही जान दिलों को ऐसे जोड़ेगी जैसा कोई पहले से तय नहीं कर सकता था। आप सिर्फ़ एक बच्चे का स्वागत नहीं कर रहीं — आप एक परिवार को जन्म लेते देख रही हैं, जिसके ठीक बीचोंबीच आपका बच्चा है।" },
-      "deepDive": { "en": "Family researchers note that the arrival of a child reorganises relationships and roles across a whole household. A new baby becomes a shared centre of meaning, drawing the people around it closer together.", "hi": "परिवारों पर हुए शोध बताते हैं कि एक बच्चे का आना पूरे घर के रिश्तों और भूमिकाओं को नए सिरे से जमा देता है। नया बच्चा मायनों का एक साझा केंद्र बन जाता है, जो आसपास के लोगों को और क़रीब खींच लाता है।" },
-      "remember": { "en": "Your baby doesn't just join a family — they make one.", "hi": "बच्चे सिर्फ़ परिवार में शामिल नहीं होते — वे परिवार बना देते हैं।" }
+      "title": { "en": "A baby makes a family", "hi": "तुमने हमें एक परिवार बना दिया" },
+      "insight": { "en": "When your baby arrives, something new begins too: a family, shaped around this little one.", "hi": "आपके बच्चे के आने के साथ कुछ नया भी जन्म लेता है — एक परिवार, जो हमेशा के लिए इस नन्ही जान के इर्द-गिर्द बुन जाता है।" },
+      "expanded": { "en": "A baby doesn't only join a family. In many ways, a baby creates one. The moment your little one arrives, the shape of your world changes. Two people become parents, a home becomes a place of new beginnings, and ordinary days take on new meaning. Whatever your family looked like before, it's about to gain a tender new centre. This little one will bring hearts together in ways no one could plan. You're welcoming a baby, and you're also watching a family begin, with your child at the heart of it.", "hi": "बच्चा सिर्फ़ किसी परिवार में शामिल नहीं होता; बच्चा एक परिवार बना देता है। जिस पल आपकी नन्ही जान आती है, आपकी पूरी दुनिया का आकार चुपचाप बदल जाता है। दो लोग माँ-बाप बन जाते हैं, एक घर शुरुआतों की जगह बन जाता है, और आम से दिन बिल्कुल नए मायने ले लेते हैं। आपका परिवार पहले जैसा भी रहा हो, उसे अब एक नरम नया केंद्र मिलने वाला है। यह नन्ही जान दिलों को ऐसे जोड़ेगी जैसा कोई पहले से तय नहीं कर सकता था। आप सिर्फ़ एक बच्चे का स्वागत नहीं कर रहीं — आप एक परिवार को जन्म लेते देख रही हैं, जिसके ठीक बीचोंबीच आपका बच्चा है।" },
+      "deepDive": { "en": "Family researchers note that a new child changes relationships and roles across a whole household. A baby often becomes a shared focus that draws the people around them closer.", "hi": "परिवारों पर हुए शोध बताते हैं कि एक बच्चे का आना पूरे घर के रिश्तों और भूमिकाओं को नए सिरे से जमा देता है। नया बच्चा मायनों का एक साझा केंद्र बन जाता है, जो आसपास के लोगों को और क़रीब खींच लाता है।" },
+      "remember": { "en": "Your baby doesn't only join a family. They help make one.", "hi": "बच्चे सिर्फ़ परिवार में शामिल नहीं होते — वे परिवार बना देते हैं।" }
     },
     "readToBaby": {
       "title": { "en": "Birbal And The Greatest Treasure", "hi": "बीरबल और सबसे बड़ा ख़ज़ाना" },
@@ -177,8 +177,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby the promise you make to them, as they come into your family.", "hi": "अपने बच्चे को वह वादा बताइए जो आप उनसे कर रही हैं, जब वे आपके परिवार में आ रहे हैं।" },
-      "motivation": { "en": "A promise spoken now becomes a quiet vow your child will grow up inside of.", "hi": "अभी कहा गया वादा एक शांत सा प्रण बन जाता है, जिसके भीतर आपके बच्चे का बचपन बीतेगा।" }
+      "title": { "en": "Tell your baby the promise you're making to them as they join your family.", "hi": "अपने बच्चे को वह वादा बताइए जो आप उनसे कर रही हैं, जब वे आपके परिवार में आ रहे हैं।" },
+      "motivation": { "en": "A promise made now is one your child will grow up inside.", "hi": "अभी कहा गया वादा एक शांत सा प्रण बन जाता है, जिसके भीतर आपके बच्चे का बचपन बीतेगा।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -193,8 +193,8 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "I Am Becoming A Family", "hi": "मैं एक परिवार बन रही हूँ" },
-      "content": { "en": "I am not only welcoming a baby; I am stepping into a whole new family, and I step into it with love.", "hi": "मैं सिर्फ़ एक बच्चे का स्वागत नहीं कर रही; मैं एक बिल्कुल नए परिवार में क़दम रख रही हूँ, और यह क़दम मैं प्यार के साथ रखती हूँ।" },
+      "title": { "en": "I'm becoming a family", "hi": "मैं एक परिवार बन रही हूँ" },
+      "content": { "en": "I'm not only welcoming a baby. I'm stepping into a whole new family, and I'm doing it with love.", "hi": "मैं सिर्फ़ एक बच्चे का स्वागत नहीं कर रही; मैं एक बिल्कुल नए परिवार में क़दम रख रही हूँ, और यह क़दम मैं प्यार के साथ रखती हूँ।" },
       "remember": { "en": "A family is being born along with your baby.", "hi": "आपके बच्चे के साथ-साथ एक परिवार भी जन्म ले रहा है।" },
       "durationMinutes": 0
     }
@@ -204,10 +204,10 @@
     "week": 40,
     "babyLearning": { "en": "Soon after birth, your baby will know your smell as well.", "hi": "पहली ही साँस से भरपूर प्यार में" },
     "grow": {
-      "title": { "en": "Welcome To The World, Little One", "hi": "दुनिया में स्वागत है, मेरी जान" },
-      "insight": { "en": "Your baby is about to open their eyes on a world that has been waiting just for them, and is already full of love.", "hi": "आपके बच्चे की आँखें जल्द ही ऐसी दुनिया में खुलेंगी जो सिर्फ़ उनका इंतज़ार करती रही है, और जो पहले से प्यार से भरी है।" },
-      "expanded": { "en": "Soon your little one will take their first breath of the open air and meet the world for the very first time. It can feel tender to imagine — so small, so new, stepping into something so vast. But your baby will not arrive alone or unwanted. They come into warm arms, a soft voice they already know, and a love that was ready long before they were. Whatever the world is, your baby's first experience of it will be you: your warmth, your heartbeat, your welcome. That is the world they will know first, and it is a good and loving one.", "hi": "जल्द ही आपकी नन्ही जान खुली हवा की अपनी पहली साँस लेगी और दुनिया से बिल्कुल पहली बार मिलेगी। इसे सोचना नाज़ुक सा लगता है — इतना छोटा, इतना नया, और इतनी बड़ी चीज़ में क़दम रखते हुए। पर आपका बच्चा न अकेला आएगा, न अनचाहा। उनके लिए गर्म बाँहें तैयार हैं, एक नरम आवाज़ जिसे वे पहले से जानते हैं, और एक ऐसा प्यार जो उनके आने से बहुत पहले से तैयार बैठा है। दुनिया जैसी भी हो, इस दुनिया का आपके बच्चे का पहला अनुभव आप होंगी: आपकी गर्माहट, आपकी धड़कन, आपका स्वागत। यही वह दुनिया है जिसे वे सबसे पहले जानेंगे — और वह अच्छी है, प्यार से भरी है।" },
-      "deepDive": { "en": "A newborn placed skin to skin on a parent's chest calms more quickly, breathes more steadily, and settles into warmth and safety. Your body is, quite literally, your baby's first welcome to the world.", "hi": "जिन नवजात शिशुओं को माँ या पिता के सीने से स्किन-टू-स्किन लगाकर रखा जाता है, वे जल्दी शांत होते हैं, ज़्यादा ठहरी हुई साँस लेते हैं, और गर्माहट तथा हिफ़ाज़त में बस जाते हैं। आपका शरीर, सचमुच, दुनिया में आपके बच्चे का पहला स्वागत है।" },
+      "title": { "en": "Welcome to the world, little one", "hi": "दुनिया में स्वागत है, मेरी जान" },
+      "insight": { "en": "Your baby is about to open their eyes on a world that's been waiting for them, and it's already full of love.", "hi": "आपके बच्चे की आँखें जल्द ही ऐसी दुनिया में खुलेंगी जो सिर्फ़ उनका इंतज़ार करती रही है, और जो पहले से प्यार से भरी है।" },
+      "expanded": { "en": "Soon your little one will take their first breath of open air and meet the world for the first time. It can feel tender to imagine: so small and so new, arriving somewhere so big. But your baby won't arrive alone or unwanted. They're coming into warm arms, a voice they already know, and a love that was ready long before they were. Whatever the world is like, your baby's first taste of it will be you: your warmth, your heartbeat, your welcome. That's the world they'll know first, and it's a loving one.", "hi": "जल्द ही आपकी नन्ही जान खुली हवा की अपनी पहली साँस लेगी और दुनिया से बिल्कुल पहली बार मिलेगी। इसे सोचना नाज़ुक सा लगता है — इतना छोटा, इतना नया, और इतनी बड़ी चीज़ में क़दम रखते हुए। पर आपका बच्चा न अकेला आएगा, न अनचाहा। उनके लिए गर्म बाँहें तैयार हैं, एक नरम आवाज़ जिसे वे पहले से जानते हैं, और एक ऐसा प्यार जो उनके आने से बहुत पहले से तैयार बैठा है। दुनिया जैसी भी हो, इस दुनिया का आपके बच्चे का पहला अनुभव आप होंगी: आपकी गर्माहट, आपकी धड़कन, आपका स्वागत। यही वह दुनिया है जिसे वे सबसे पहले जानेंगे — और वह अच्छी है, प्यार से भरी है।" },
+      "deepDive": { "en": "A newborn held skin to skin on a parent's chest tends to settle faster and stay warmer, and their breathing and heart rate are often steadier. Being held close is your baby's first welcome to the world.", "hi": "जिन नवजात शिशुओं को माँ या पिता के सीने से स्किन-टू-स्किन लगाकर रखा जाता है, वे जल्दी शांत होते हैं, ज़्यादा ठहरी हुई साँस लेते हैं, और गर्माहट तथा हिफ़ाज़त में बस जाते हैं। आपका शरीर, सचमुच, दुनिया में आपके बच्चे का पहला स्वागत है।" },
       "remember": { "en": "Your baby's first world is your loving arms.", "hi": "आपके बच्चे की पहली दुनिया आपकी प्यार भरी बाँहें हैं।" }
     },
     "readToBaby": {
@@ -217,8 +217,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby how deeply loved they are, from their very first breath.", "hi": "अपने बच्चे को बताइए कि उनकी सबसे पहली साँस से ही उन्हें कितनी गहराई से प्यार किया जाता है।" },
-      "motivation": { "en": "To know you are loved from the first breath is the safest start a child can have.", "hi": "पहली साँस से ही यह जान लेना कि उन्हें प्यार किया जाता है — बच्चों के लिए इससे सुरक्षित शुरुआत कोई नहीं।" }
+      "title": { "en": "Tell your baby how deeply they're loved, from their very first breath.", "hi": "अपने बच्चे को बताइए कि उनकी सबसे पहली साँस से ही उन्हें कितनी गहराई से प्यार किया जाता है।" },
+      "motivation": { "en": "Knowing they're loved from the first breath is the safest start a child can have.", "hi": "पहली साँस से ही यह जान लेना कि उन्हें प्यार किया जाता है — बच्चों के लिए इससे सुरक्षित शुरुआत कोई नहीं।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -233,9 +233,9 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "Foods That Comfort And Sustain", "hi": "जो खाना दिलासा भी दे और ताक़त भी" },
-      "content": { "en": "If these waiting days leave you restless or low on energy, lean on warm, comforting foods — soft dal, a bowl of porridge, milk with a little turmeric. Gentle, sustaining meals help your body stay steady and strong.", "hi": "अगर इंतज़ार के ये दिन आपको बेचैन या कम ऊर्जा वाला महसूस कराएँ, तो गरम और दिलासा देने वाले खाने का सहारा लीजिए — नरम दाल, एक कटोरी दलिया, थोड़ी हल्दी वाला दूध। हल्का पर ताक़त देने वाला खाना शरीर को ठहरा और मज़बूत बनाए रखता है।" },
-      "remember": { "en": "Comforting food is its own quiet kind of care.", "hi": "दिलासा देने वाला खाना अपने आप में एक शांत सी देखभाल है।" },
+      "title": { "en": "Foods that comfort and keep you going", "hi": "जो खाना दिलासा भी दे और ताक़त भी" },
+      "content": { "en": "If these waiting days leave you restless or low on energy, lean on warm, comforting foods like soft dal, a bowl of porridge, or milk with a little turmeric. Gentle, filling meals help your body stay steady and strong.", "hi": "अगर इंतज़ार के ये दिन आपको बेचैन या कम ऊर्जा वाला महसूस कराएँ, तो गरम और दिलासा देने वाले खाने का सहारा लीजिए — नरम दाल, एक कटोरी दलिया, थोड़ी हल्दी वाला दूध। हल्का पर ताक़त देने वाला खाना शरीर को ठहरा और मज़बूत बनाए रखता है।" },
+      "remember": { "en": "Comforting food is a way of caring for yourself.", "hi": "दिलासा देने वाला खाना अपने आप में एक शांत सी देखभाल है।" },
       "durationMinutes": 0
     }
   },
@@ -244,11 +244,11 @@
     "week": 40,
     "babyLearning": { "en": "Your baby's brain will grow faster this first year than ever again.", "hi": "आख़िरकार यहाँ — हर चीज़ की शुरुआत" },
     "grow": {
-      "title": { "en": "The Beginning Of Everything", "hi": "हर चीज़ की शुरुआत" },
-      "insight": { "en": "This is not the end of your journey together. It is the very beginning of everything — the first day of a whole shared life.", "hi": "यह आपके साथ के सफ़र का अंत नहीं है। यह तो हर चीज़ की बिल्कुल शुरुआत है — एक पूरी साझा ज़िंदगी का पहला दिन।" },
-      "expanded": { "en": "Two hundred and eighty days ago, this little one was barely a whisper of a hope. Today, the wait is over and the welcome has come. But this is not where your story closes — it is where it truly opens. Every lullaby, every first step, every birthday, every ordinary morning still lies ahead of you both. The months of waiting were only the doorway; now you walk through it together. Hold your little one close and feel it: this is the beginning of everything. The longest, most loving wait of your life has given way to a love with no end. Welcome, little one. Your whole life together starts now.", "hi": "दो सौ अस्सी दिन पहले यह नन्ही जान बस एक उम्मीद की हल्की सी सरगोशी थी। आज इंतज़ार पूरा हुआ और स्वागत का दिन आ गया। पर यह वह जगह नहीं जहाँ आपकी कहानी बंद होती है — यह वह जगह है जहाँ वह सचमुच खुलती है। हर लोरी, हर पहला क़दम, हर जन्मदिन, हर आम सी सुबह अभी आप दोनों के आगे बाक़ी है। इंतज़ार के महीने तो बस दरवाज़ा थे; अब आप साथ मिलकर उसमें से गुज़र रही हैं। अपनी नन्ही जान को पास थामिए और महसूस कीजिए: यह हर चीज़ की शुरुआत है। आपकी ज़िंदगी का सबसे लंबा, सबसे प्यार भरा इंतज़ार अब एक ऐसे प्यार में बदल गया है जिसका कोई अंत नहीं। स्वागत है, मेरी जान। आपकी साथ की पूरी ज़िंदगी अब शुरू होती है।" },
-      "deepDive": { "en": "The first hours after birth are often called the 'golden hour' — a tender window where skin-to-skin closeness, a familiar voice and gentle warmth begin a lifelong bond. The journey does not end here; the truest part has only just begun.", "hi": "जन्म के बाद के पहले घंटे को अक्सर 'golden hour' कहा जाता है — एक नाज़ुक सा समय, जब स्किन-टू-स्किन की नज़दीकी, एक जानी-पहचानी आवाज़ और नरम गर्माहट ज़िंदगी भर का जुड़ाव शुरू कर देती हैं। सफ़र यहाँ ख़त्म नहीं होता; सबसे सच्चा हिस्सा तो अभी शुरू हुआ है।" },
-      "remember": { "en": "This is not the end — it is the beginning of everything.", "hi": "यह अंत नहीं है — यह हर चीज़ की शुरुआत है।" }
+      "title": { "en": "The beginning of everything", "hi": "हर चीज़ की शुरुआत" },
+      "insight": { "en": "This is the very beginning for you and your baby: the first day of a whole life together.", "hi": "यह आपके साथ के सफ़र का अंत नहीं है। यह तो हर चीज़ की बिल्कुल शुरुआत है — एक पूरी साझा ज़िंदगी का पहला दिन।" },
+      "expanded": { "en": "Two hundred and eighty days ago, this little one was barely a hope. Today the wait is over and the welcome has come. Your story together is only opening. Every lullaby, every first step, every birthday and every ordinary morning is still ahead of you both. The months of waiting were the doorway, and now you walk through it together. Hold your little one close and feel it: this is the beginning of everything. The longest, most loving wait of your life has turned into a love with no end. Welcome, little one. Your life together starts now.", "hi": "दो सौ अस्सी दिन पहले यह नन्ही जान बस एक उम्मीद की हल्की सी सरगोशी थी। आज इंतज़ार पूरा हुआ और स्वागत का दिन आ गया। पर यह वह जगह नहीं जहाँ आपकी कहानी बंद होती है — यह वह जगह है जहाँ वह सचमुच खुलती है। हर लोरी, हर पहला क़दम, हर जन्मदिन, हर आम सी सुबह अभी आप दोनों के आगे बाक़ी है। इंतज़ार के महीने तो बस दरवाज़ा थे; अब आप साथ मिलकर उसमें से गुज़र रही हैं। अपनी नन्ही जान को पास थामिए और महसूस कीजिए: यह हर चीज़ की शुरुआत है। आपकी ज़िंदगी का सबसे लंबा, सबसे प्यार भरा इंतज़ार अब एक ऐसे प्यार में बदल गया है जिसका कोई अंत नहीं। स्वागत है, मेरी जान। आपकी साथ की पूरी ज़िंदगी अब शुरू होती है।" },
+      "deepDive": { "en": "The first hour after birth is often called the golden hour. Skin-to-skin closeness, a familiar voice and gentle warmth in that time help begin a bond that lasts for life.", "hi": "जन्म के बाद के पहले घंटे को अक्सर 'golden hour' कहा जाता है — एक नाज़ुक सा समय, जब स्किन-टू-स्किन की नज़दीकी, एक जानी-पहचानी आवाज़ और नरम गर्माहट ज़िंदगी भर का जुड़ाव शुरू कर देती हैं। सफ़र यहाँ ख़त्म नहीं होता; सबसे सच्चा हिस्सा तो अभी शुरू हुआ है।" },
+      "remember": { "en": "This is the beginning of everything.", "hi": "यह अंत नहीं है — यह हर चीज़ की शुरुआत है।" }
     },
     "readToBaby": {
       "title": { "en": "The Flower That Finally Bloomed", "hi": "वह फूल जो आख़िरकार खिला" },
@@ -257,8 +257,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby the words your heart has waited all these months to say: welcome to the world, my little one.", "hi": "अपने बच्चे को वे शब्द कहिए जिन्हें कहने के लिए आपका दिल इन सारे महीनों से इंतज़ार कर रहा था: दुनिया में स्वागत है, मेरी जान।" },
-      "motivation": { "en": "These are the first true words of your forever together — let them carry every bit of your love.", "hi": "ये आपके हमेशा साथ रहने के पहले सच्चे शब्द हैं — इन्हें अपने प्यार का एक-एक कण साथ ले जाने दीजिए।" }
+      "title": { "en": "Tell your baby the words you've waited all these months to say: welcome to the world, my little one.", "hi": "अपने बच्चे को वे शब्द कहिए जिन्हें कहने के लिए आपका दिल इन सारे महीनों से इंतज़ार कर रहा था: दुनिया में स्वागत है, मेरी जान।" },
+      "motivation": { "en": "These are the first words of your life together. Let them carry all your love.", "hi": "ये आपके हमेशा साथ रहने के पहले सच्चे शब्द हैं — इन्हें अपने प्यार का एक-एक कण साथ ले जाने दीजिए।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -273,9 +273,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "One Last Grateful Breath", "hi": "एक आख़िरी शुक्रगुज़ार साँस" },
-      "content": { "en": "Breathe in slowly and feel gratitude for the whole journey behind you. Breathe out and welcome everything still to come. Rest in this one quiet, grateful breath.", "hi": "धीरे से साँस लीजिए और अपने पीछे के पूरे सफ़र के लिए शुक्रगुज़ारी महसूस कीजिए। साँस छोड़िए और आगे आने वाली हर चीज़ का स्वागत कीजिए। बस इसी एक शांत, शुक्रगुज़ार साँस में ठहर जाइए।" },
-      "remember": { "en": "Breathe in gratitude, breathe out into a whole new beginning.", "hi": "शुक्रगुज़ारी भीतर लीजिए, और एक बिल्कुल नई शुरुआत में साँस छोड़िए।" },
+      "title": { "en": "One last grateful breath", "hi": "एक आख़िरी शुक्रगुज़ार साँस" },
+      "content": { "en": "Breathe in slowly and feel grateful for all the months behind you. Breathe out and welcome everything still to come. Rest in this one quiet, grateful breath.", "hi": "धीरे से साँस लीजिए और अपने पीछे के पूरे सफ़र के लिए शुक्रगुज़ारी महसूस कीजिए। साँस छोड़िए और आगे आने वाली हर चीज़ का स्वागत कीजिए। बस इसी एक शांत, शुक्रगुज़ार साँस में ठहर जाइए।" },
+      "remember": { "en": "Breathe in gratitude. Breathe out into a whole new beginning.", "hi": "शुक्रगुज़ारी भीतर लीजिए, और एक बिल्कुल नई शुरुआत में साँस छोड़िए।" },
       "durationMinutes": 1
     }
   }
