@@ -4,11 +4,11 @@
     "week": 30,
     "babyLearning": { "en": "Your baby's brain is starting to look much like a newborn's.", "hi": "नरम और गोल होता हुआ, आपकी आवाज़ की आहट पहचानता हुआ" },
     "grow": {
-      "title": { "en": "Every Family Has A Story", "hi": "हर परिवार की एक कहानी होती है" },
-      "insight": { "en": "Your baby is not arriving into an empty world. They are joining a long, living story that began far before them.", "hi": "आपका शिशु किसी ख़ाली दुनिया में नहीं आ रहा। वह एक लंबी, ज़िंदा कहानी में शामिल हो रहा है, जो उससे बहुत पहले शुरू हुई थी।" },
-      "expanded": { "en": "Long before your baby takes their first breath, they belong to a story — of grandparents and great-grandparents, of journeys made, homes built, hardships carried and joys shared. None of us begin from nothing; we each step into a tale already in motion. As your due date draws near, it is worth pausing to feel this. You are not handing your child a blank page but a chapter that follows many others. Knowing where they come from will one day give them a quiet strength, a sense that they are held by more than they can see.", "hi": "आपका शिशु पहली साँस ले, उससे बहुत पहले ही वह एक कहानी का हिस्सा होता है — दादा-दादी और उनसे भी पहले वालों की, तय किए गए सफ़रों की, बसाए गए घरों की, झेली गई मुश्किलों और बाँटी गई ख़ुशियों की। हममें से कोई शून्य से शुरू नहीं होता; हम सब एक ऐसी कहानी में क़दम रखते हैं जो पहले से चल रही है। जैसे-जैसे आपकी तारीख़ पास आती है, रुककर इसे महसूस करना अच्छा लगता है। आप अपने बच्चे को कोरा पन्ना नहीं दे रहीं, बल्कि एक ऐसा अध्याय जो कई और अध्यायों के बाद आता है। वह कहाँ से आया है, यह जानना एक दिन उसे एक शांत ताक़त देगा — यह एहसास कि उसे उससे कहीं ज़्यादा ने थाम रखा है, जितना वह देख पाता है।" },
-      "deepDive": { "en": "Researchers studying family narratives found that children who know their family's stories tend to have stronger self-esteem and resilience. A sense of belonging to something larger steadies us through life's storms.", "hi": "परिवार की कहानियों पर हुए शोध में पाया गया कि जो बच्चे अपने परिवार के क़िस्से जानते हैं, उनमें आत्म-सम्मान और लचीलापन ज़्यादा होता है। ख़ुद से बड़ी किसी चीज़ से जुड़े होने का एहसास हमें ज़िंदगी के तूफ़ानों में टिकाए रखता है।" },
-      "remember": { "en": "Your child is born into a story already rich with love.", "hi": "आपका बच्चा एक ऐसी कहानी में जन्म लेता है जो पहले से प्यार से भरी है।" }
+      "title": { "en": "Every family has a story", "hi": "हर परिवार की एक कहानी होती है" },
+      "insight": { "en": "Your baby isn't arriving into an empty world. They're joining a long family story that started well before them.", "hi": "आपका शिशु किसी ख़ाली दुनिया में नहीं आ रहा। वह एक लंबी, ज़िंदा कहानी में शामिल हो रहा है, जो उससे बहुत पहले शुरू हुई थी।" },
+      "expanded": { "en": "Before your baby takes their first breath, they already belong to a story: grandparents and great-grandparents, moves made, homes built, hard times and happy ones. None of us start from nothing. As your due date gets closer, it's worth stopping to feel this. You're not handing your child a blank page. You're giving them the next chapter after many others. Knowing where they come from will one day give them strength, and a sense that they're held by more than they can see.", "hi": "आपका शिशु पहली साँस ले, उससे बहुत पहले ही वह एक कहानी का हिस्सा होता है — दादा-दादी और उनसे भी पहले वालों की, तय किए गए सफ़रों की, बसाए गए घरों की, झेली गई मुश्किलों और बाँटी गई ख़ुशियों की। हममें से कोई शून्य से शुरू नहीं होता; हम सब एक ऐसी कहानी में क़दम रखते हैं जो पहले से चल रही है। जैसे-जैसे आपकी तारीख़ पास आती है, रुककर इसे महसूस करना अच्छा लगता है। आप अपने बच्चे को कोरा पन्ना नहीं दे रहीं, बल्कि एक ऐसा अध्याय जो कई और अध्यायों के बाद आता है। वह कहाँ से आया है, यह जानना एक दिन उसे एक शांत ताक़त देगा — यह एहसास कि उसे उससे कहीं ज़्यादा ने थाम रखा है, जितना वह देख पाता है।" },
+      "deepDive": { "en": "Researchers studying family stories found that children who know their family's stories tend to have stronger self-esteem and resilience. Feeling part of something bigger helps steady us through hard times.", "hi": "परिवार की कहानियों पर हुए शोध में पाया गया कि जो बच्चे अपने परिवार के क़िस्से जानते हैं, उनमें आत्म-सम्मान और लचीलापन ज़्यादा होता है। ख़ुद से बड़ी किसी चीज़ से जुड़े होने का एहसास हमें ज़िंदगी के तूफ़ानों में टिकाए रखता है।" },
+      "remember": { "en": "Your child is born into a story already full of love.", "hi": "आपका बच्चा एक ऐसी कहानी में जन्म लेता है जो पहले से प्यार से भरी है।" }
     },
     "readToBaby": {
       "title": { "en": "The Storyteller Of The Village", "hi": "गाँव का किस्सागो" },
@@ -17,8 +17,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby a story about their grandparents — who they were and the world they lived in.", "hi": "अपने शिशु को उसके दादा-दादी या नाना-नानी की कहानी सुनाइए — वे कौन थे और कैसी दुनिया में रहते थे।" },
-      "motivation": { "en": "You are giving your child their first roots, long before they can ask where they come from.", "hi": "आप अपने बच्चे को उसकी पहली जड़ें दे रही हैं — उसके यह पूछने से बहुत पहले कि वह आया कहाँ से है।" }
+      "title": { "en": "Tell your baby a story about their grandparents: who they were and the world they lived in.", "hi": "अपने शिशु को उसके दादा-दादी या नाना-नानी की कहानी सुनाइए — वे कौन थे और कैसी दुनिया में रहते थे।" },
+      "motivation": { "en": "You're giving your child their first roots, long before they can ask where they come from.", "hi": "आप अपने बच्चे को उसकी पहली जड़ें दे रही हैं — उसके यह पूछने से बहुत पहले कि वह आया कहाँ से है।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -33,9 +33,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Breathe Down To The Belly", "hi": "साँस को पेट तक ले जाइए" },
-      "content": { "en": "Rest both hands low on your belly. Breathe in slowly and feel it rise gently under your palms, then let it fall as you breathe out. Stay with five soft breaths.", "hi": "दोनों हाथ अपने पेट पर नीचे की ओर रखिए। धीरे से साँस लीजिए और उसे हथेलियों के नीचे नरमी से उठते हुए महसूस कीजिए, फिर साँस छोड़ते हुए उसे बैठने दीजिए। पाँच नरम साँसों तक यहीं रहिए।" },
-      "remember": { "en": "Your breath is a place you and your baby share.", "hi": "आपकी साँस वह जगह है जो आप और आपका शिशु साथ बाँटते हैं।" },
+      "title": { "en": "Breathe down low", "hi": "साँस को पेट तक ले जाइए" },
+      "content": { "en": "Rest both hands low on your belly. Breathe in slowly and feel it rise under your palms, then let it fall as you breathe out. Stay with five soft breaths.", "hi": "दोनों हाथ अपने पेट पर नीचे की ओर रखिए। धीरे से साँस लीजिए और उसे हथेलियों के नीचे नरमी से उठते हुए महसूस कीजिए, फिर साँस छोड़ते हुए उसे बैठने दीजिए। पाँच नरम साँसों तक यहीं रहिए।" },
+      "remember": { "en": "Your breath is something you and your baby share.", "hi": "आपकी साँस वह जगह है जो आप और आपका शिशु साथ बाँटते हैं।" },
       "durationMinutes": 2
     }
   },
@@ -44,10 +44,10 @@
     "week": 30,
     "babyLearning": { "en": "Your baby is adding fat that will keep them warm after birth.", "hi": "भरता हुआ, गर्म अँधेरे में नन्ही साँसों का अभ्यास करता हुआ" },
     "grow": {
-      "title": { "en": "Tell Them Where They Began", "hi": "उसे बताइए कि वह शुरू कहाँ से हुआ" },
-      "insight": { "en": "One day your child will want to know how their story began — and that story starts with you and the people who came before.", "hi": "एक दिन आपका बच्चा जानना चाहेगा कि उसकी कहानी कैसे शुरू हुई — और वह कहानी आपसे और उन लोगों से शुरू होती है जो पहले आए।" },
-      "expanded": { "en": "Every child eventually asks the same quiet questions: How did you and the family come to be? Where did we all begin? These are not just curiosities; they are how a child finds their place in the world. The story of how your parents met, how families joined, how a name or a home came to be — these become a map your child can hold. You do not need a grand tale, only an honest one. The simple facts of where you began, told with warmth, give your child something solid to stand on.", "hi": "हर बच्चा देर-सवेर वही शांत सवाल पूछता है: आप और यह परिवार बने कैसे? हम सब शुरू कहाँ से हुए? ये सिर्फ़ जिज्ञासा नहीं हैं; इन्हीं से एक बच्चा दुनिया में अपनी जगह ढूँढता है। आपके माँ-बाप कैसे मिले, दो परिवार कैसे जुड़े, एक नाम या एक घर कैसे बना — ये सब मिलकर एक ऐसा नक्शा बन जाते हैं जिसे आपका बच्चा थाम सके। कोई बड़ी दास्तान की ज़रूरत नहीं, बस एक सच्ची कहानी की। आप शुरू कहाँ से हुईं, इसकी सीधी-सादी बातें, गर्मजोशी से कही जाएँ तो बच्चे को खड़े होने के लिए कुछ ठोस दे जाती हैं।" },
-      "deepDive": { "en": "Family psychologists note that children who hear how their parents and grandparents overcame difficulties develop a stronger 'intergenerational self' — a sense that they belong to a family that endures.", "hi": "परिवारों पर काम करने वाले मनोवैज्ञानिक कहते हैं कि जो बच्चे यह सुनते हैं कि उनके माँ-बाप और दादा-दादी ने मुश्किलें कैसे पार कीं, उनमें एक मज़बूत 'intergenerational self' बनता है — यह एहसास कि वे एक ऐसे परिवार के हैं जो टिकता है।" },
+      "title": { "en": "Tell them where they began", "hi": "उसे बताइए कि वह शुरू कहाँ से हुआ" },
+      "insight": { "en": "One day your child will want to know how their story began. It starts with you and the people who came before.", "hi": "एक दिन आपका बच्चा जानना चाहेगा कि उसकी कहानी कैसे शुरू हुई — और वह कहानी आपसे और उन लोगों से शुरू होती है जो पहले आए।" },
+      "expanded": { "en": "Every child asks the same questions in the end. How did you meet? How did our family come to be? Where did we all begin? These questions help a child find their place in the world. The story of how you met, how families joined, how a name or a home came about: this becomes something your child can hold on to. You don't need a grand tale, only an honest one. The simple facts of where you began, told warmly, give your child something solid to stand on.", "hi": "हर बच्चा देर-सवेर वही शांत सवाल पूछता है: आप और यह परिवार बने कैसे? हम सब शुरू कहाँ से हुए? ये सिर्फ़ जिज्ञासा नहीं हैं; इन्हीं से एक बच्चा दुनिया में अपनी जगह ढूँढता है। आपके माँ-बाप कैसे मिले, दो परिवार कैसे जुड़े, एक नाम या एक घर कैसे बना — ये सब मिलकर एक ऐसा नक्शा बन जाते हैं जिसे आपका बच्चा थाम सके। कोई बड़ी दास्तान की ज़रूरत नहीं, बस एक सच्ची कहानी की। आप शुरू कहाँ से हुईं, इसकी सीधी-सादी बातें, गर्मजोशी से कही जाएँ तो बच्चे को खड़े होने के लिए कुछ ठोस दे जाती हैं।" },
+      "deepDive": { "en": "Family psychologists note that children who hear how their parents and grandparents got through hard times tend to develop a stronger 'intergenerational self': a sense that they belong to a family that lasts.", "hi": "परिवारों पर काम करने वाले मनोवैज्ञानिक कहते हैं कि जो बच्चे यह सुनते हैं कि उनके माँ-बाप और दादा-दादी ने मुश्किलें कैसे पार कीं, उनमें एक मज़बूत 'intergenerational self' बनता है — यह एहसास कि वे एक ऐसे परिवार के हैं जो टिकता है।" },
       "remember": { "en": "Knowing where they began helps a child know who they are.", "hi": "शुरुआत कहाँ से हुई, यह जानना बच्चे को यह जानने में मदद करता है कि वह है कौन।" }
     },
     "readToBaby": {
@@ -57,8 +57,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby how your parents' families first met — the small story behind your own beginning.", "hi": "अपने शिशु को बताइए कि आपके माँ-बाप के परिवार पहली बार कैसे मिले — आपकी अपनी शुरुआत के पीछे की छोटी-सी कहानी।" },
-      "motivation": { "en": "Every story of how a family began is a story of how love found its way.", "hi": "परिवार कैसे बना, इसकी हर कहानी असल में यही कहानी है कि प्यार ने अपना रास्ता कैसे ढूँढा।" }
+      "title": { "en": "Tell your baby how your parents' families first met, the small story behind your own beginning.", "hi": "अपने शिशु को बताइए कि आपके माँ-बाप के परिवार पहली बार कैसे मिले — आपकी अपनी शुरुआत के पीछे की छोटी-सी कहानी।" },
+      "motivation": { "en": "Every story of how a family began is a love story.", "hi": "परिवार कैसे बना, इसकी हर कहानी असल में यही कहानी है कि प्यार ने अपना रास्ता कैसे ढूँढा।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -73,9 +73,9 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "When Heartburn Creeps Up", "hi": "जब सीने में जलन उठने लगे" },
-      "content": { "en": "If a burning feeling rises after meals now, try eating smaller portions more often, and stay sitting upright for a while after you eat. Cool milk or a little curd can soothe it gently.", "hi": "अगर अब खाने के बाद जलन-सी उठती है, तो थोड़ा-थोड़ा और बार-बार खाकर देखिए, और खाने के बाद कुछ देर सीधी बैठी रहिए। ठंडा दूध या थोड़ा-सा दही इसे नरमी से शांत कर देता है।" },
-      "remember": { "en": "Small, frequent meals are kinder to a crowded belly.", "hi": "भरे हुए पेट पर छोटे और बार-बार के खाने ज़्यादा मेहरबान होते हैं।" },
+      "title": { "en": "When heartburn creeps up", "hi": "जब सीने में जलन उठने लगे" },
+      "content": { "en": "If a burning feeling rises after meals now, try smaller portions more often, and stay sitting upright for a while after you eat. Cool milk or a little curd can gently soothe it.", "hi": "अगर अब खाने के बाद जलन-सी उठती है, तो थोड़ा-थोड़ा और बार-बार खाकर देखिए, और खाने के बाद कुछ देर सीधी बैठी रहिए। ठंडा दूध या थोड़ा-सा दही इसे नरमी से शांत कर देता है।" },
+      "remember": { "en": "Small, frequent meals are easier on a crowded belly.", "hi": "भरे हुए पेट पर छोटे और बार-बार के खाने ज़्यादा मेहरबान होते हैं।" },
       "durationMinutes": 0
     }
   },
@@ -84,11 +84,11 @@
     "week": 30,
     "babyLearning": { "en": "The fine hair (lanugo) on your baby's body is starting to shed.", "hi": "धीरे-धीरे वज़न बढ़ाता हुआ, आपकी लय में बसता हुआ" },
     "grow": {
-      "title": { "en": "Stories Are How We Remember", "hi": "याद हम कहानियों से रखते हैं" },
-      "insight": { "en": "Facts fade, but a story stays. A family remembers itself not in dates, but in the tales it tells again and again.", "hi": "तथ्य धुँधले पड़ जाते हैं, पर कहानी ठहर जाती है। परिवार ख़ुद को तारीख़ों में नहीं, उन क़िस्सों में याद रखता है जो वह बार-बार सुनाता है।" },
-      "expanded": { "en": "We rarely remember our families through facts and figures. We remember them through stories — the time grandfather got lost on the way to a wedding, the dish a grandmother made that no one could quite copy, the night a storm brought everyone together. These tales are how a family keeps its heart alive across generations. When you tell your child these stories, you are not just passing time; you are handing them the memory of people they may never meet, keeping the family whole. A story told is a person remembered.", "hi": "हम अपने परिवारों को शायद ही आँकड़ों और तारीख़ों से याद रखते हैं। हम उन्हें कहानियों से याद रखते हैं — वह वक़्त जब दादाजी शादी के रास्ते में खो गए थे, वह पकवान जो दादी बनाती थीं और जिसे कोई ठीक वैसा बना ही नहीं पाया, वह रात जब तूफ़ान ने सबको एक कमरे में इकट्ठा कर दिया। इन्हीं कहानियों से परिवार अपना दिल पीढ़ियों तक ज़िंदा रखता है। जब आप अपने बच्चे को ये कहानियाँ सुनाती हैं, तो आप सिर्फ़ वक़्त नहीं बिता रहीं; आप उसे उन लोगों की याद सौंप रही हैं जिनसे शायद वह कभी मिले भी नहीं — और परिवार को पूरा रख रही हैं। एक कहानी सुनाई जाना, एक इंसान का याद रह जाना है।" },
-      "deepDive": { "en": "Memory researchers find that stories are remembered far better than isolated facts, because the brain naturally stores experience in narrative form. We are, quite literally, built to remember through tales.", "hi": "याददाश्त पर हुए शोध बताते हैं कि अलग-अलग तथ्यों के मुक़ाबले कहानियाँ कहीं बेहतर याद रहती हैं, क्योंकि दिमाग़ अनुभव को क़ुदरती तौर पर कहानी की शक्ल में सँभालता है। हम सचमुच कहानियों से याद रखने के लिए ही बने हैं।" },
-      "remember": { "en": "To tell a story is to keep someone alive in memory.", "hi": "कहानी सुनाना, किसी को याद में ज़िंदा रखना है।" }
+      "title": { "en": "Stories are how families remember", "hi": "याद हम कहानियों से रखते हैं" },
+      "insight": { "en": "Facts fade, but a story stays. A family remembers itself through the stories it tells again and again.", "hi": "तथ्य धुँधले पड़ जाते हैं, पर कहानी ठहर जाती है। परिवार ख़ुद को तारीख़ों में नहीं, उन क़िस्सों में याद रखता है जो वह बार-बार सुनाता है।" },
+      "expanded": { "en": "We rarely remember our families through facts and dates. We remember them through stories: the time grandfather got lost on the way to a wedding, the dish grandmother made that no one could copy, the night a storm brought everyone together. These stories keep a family's heart alive across generations. When you tell your child these stories, you're giving them the memory of people they may never meet, and keeping the family whole. A story told is a person remembered.", "hi": "हम अपने परिवारों को शायद ही आँकड़ों और तारीख़ों से याद रखते हैं। हम उन्हें कहानियों से याद रखते हैं — वह वक़्त जब दादाजी शादी के रास्ते में खो गए थे, वह पकवान जो दादी बनाती थीं और जिसे कोई ठीक वैसा बना ही नहीं पाया, वह रात जब तूफ़ान ने सबको एक कमरे में इकट्ठा कर दिया। इन्हीं कहानियों से परिवार अपना दिल पीढ़ियों तक ज़िंदा रखता है। जब आप अपने बच्चे को ये कहानियाँ सुनाती हैं, तो आप सिर्फ़ वक़्त नहीं बिता रहीं; आप उसे उन लोगों की याद सौंप रही हैं जिनसे शायद वह कभी मिले भी नहीं — और परिवार को पूरा रख रही हैं। एक कहानी सुनाई जाना, एक इंसान का याद रह जाना है।" },
+      "deepDive": { "en": "Memory research suggests we tend to remember information better when it comes as a story than as separate facts. Stories give us a shape to hang things on.", "hi": "याददाश्त पर हुए शोध बताते हैं कि अलग-अलग तथ्यों के मुक़ाबले कहानियाँ कहीं बेहतर याद रहती हैं, क्योंकि दिमाग़ अनुभव को क़ुदरती तौर पर कहानी की शक्ल में सँभालता है। हम सचमुच कहानियों से याद रखने के लिए ही बने हैं।" },
+      "remember": { "en": "Telling a story keeps someone alive in memory.", "hi": "कहानी सुनाना, किसी को याद में ज़िंदा रखना है।" }
     },
     "readToBaby": {
       "title": { "en": "Ganesha Writes The Great Story", "hi": "गणेशजी महाकथा लिखते हैं" },
@@ -97,8 +97,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby a family legend or a favourite tale that has been passed down to you.", "hi": "अपने शिशु को कोई पारिवारिक क़िस्सा या कोई पसंदीदा कहानी सुनाइए, जो आप तक चलकर आई है।" },
-      "motivation": { "en": "The tales you pass on today will be the ones your child tells their own children one day.", "hi": "जो कहानियाँ आप आज आगे बढ़ाती हैं, वही आपका बच्चा एक दिन अपने बच्चों को सुनाएगा।" }
+      "title": { "en": "Tell your baby a family legend or a favourite story that was passed down to you.", "hi": "अपने शिशु को कोई पारिवारिक क़िस्सा या कोई पसंदीदा कहानी सुनाइए, जो आप तक चलकर आई है।" },
+      "motivation": { "en": "The stories you pass on today may be the ones your child tells their own children.", "hi": "जो कहानियाँ आप आज आगे बढ़ाती हैं, वही आपका बच्चा एक दिन अपने बच्चों को सुनाएगा।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -113,8 +113,8 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "My Memories Are A Gift To Give", "hi": "मेरी यादें देने लायक़ एक तोहफ़ा हैं" },
-      "content": { "en": "The stories I carry are not only mine. They are a quiet inheritance I get to hand to my child.", "hi": "जो कहानियाँ मैं अपने साथ लिए चलती हूँ, वे सिर्फ़ मेरी नहीं। वे एक शांत विरासत हैं, जिन्हें अपने बच्चे को सौंपने का मौक़ा मुझे मिला है।" },
+      "title": { "en": "My memories are a gift to give", "hi": "मेरी यादें देने लायक़ एक तोहफ़ा हैं" },
+      "content": { "en": "The stories I carry aren't only mine. They're something I get to hand on to my child.", "hi": "जो कहानियाँ मैं अपने साथ लिए चलती हूँ, वे सिर्फ़ मेरी नहीं। वे एक शांत विरासत हैं, जिन्हें अपने बच्चे को सौंपने का मौक़ा मुझे मिला है।" },
       "remember": { "en": "What you remember, your child gets to keep.", "hi": "जो आप याद रखती हैं, वही आपका बच्चा सँभालकर रख पाता है।" },
       "durationMinutes": 0
     }
@@ -124,11 +124,11 @@
     "week": 30,
     "babyLearning": { "en": "Your baby's pupils are starting to widen and narrow with light.", "hi": "नन्ही आँखें खोलता-बंद करता, नरम रोशनी को महसूस करता हुआ" },
     "grow": {
-      "title": { "en": "The Past Lives In Us", "hi": "बीता कल हम में जीता है" },
-      "insight": { "en": "The people who shaped you are not gone. They live on in the way you love, laugh, and care for your baby.", "hi": "जिन लोगों ने आपको गढ़ा, वे गए नहीं। वे उसी में जीते हैं — जिस तरह आप प्यार करती हैं, हँसती हैं, और अपने शिशु का ख़याल रखती हैं।" },
-      "expanded": { "en": "Look closely and you will see the past living inside you. The way you hum a tune may be your mother's; your patience may be your father's; the recipe in your hands once belonged to a grandmother you barely remember. None of these were taught on purpose — they were absorbed, lovingly, over years. Now, without trying, you will pass them on to your child. This is the quiet miracle of family: those who loved us are not lost, but folded into who we are, and gently carried forward into who our children become.", "hi": "ग़ौर से देखिए तो बीता कल आपके भीतर जीता हुआ मिलेगा। जिस तरह आप कोई धुन गुनगुनाती हैं, वह शायद आपकी माँ की हो; आपका सब्र शायद आपके पिता का; आपके हाथों का वह पकवान कभी किसी ऐसी दादी का रहा होगा जो आपको ठीक से याद भी नहीं। इनमें से कुछ भी जान-बूझकर सिखाया नहीं गया — यह सब सालों में, प्यार के साथ, अपने आप उतरता गया। अब, बिना कोशिश किए, आप इसे अपने बच्चे तक पहुँचा देंगी। यही परिवार का शांत चमत्कार है: जिन्होंने हमसे प्यार किया वे खोते नहीं, बल्कि हम जो हैं उसी में बुने रह जाते हैं, और नरमी से आगे उसमें चले जाते हैं जो हमारे बच्चे बनते हैं।" },
-      "deepDive": { "en": "Studies of habit and language show we inherit far more than genes — gestures, phrases, ways of comforting, even recipes pass invisibly from one generation to the next. We carry our ancestors in our everyday acts.", "hi": "आदत और भाषा पर हुए अध्ययन दिखाते हैं कि हमें विरासत में जीन से कहीं ज़्यादा मिलता है — हाव-भाव, बोलने के तकिया-कलाम, दिलासा देने के तरीक़े, यहाँ तक कि पकवान भी एक पीढ़ी से दूसरी तक चुपचाप चले जाते हैं। हम अपने पुरखों को अपने रोज़ के कामों में लिए फिरते हैं।" },
-      "remember": { "en": "Those who loved you live on in how you love your child.", "hi": "जिन्होंने आपसे प्यार किया, वे इसी में जीते हैं कि आप अपने बच्चे से कैसे प्यार करती हैं।" }
+      "title": { "en": "The people who shaped you live on in you", "hi": "बीता कल हम में जीता है" },
+      "insight": { "en": "The people who shaped you aren't gone. They live on in the way you love, laugh and care for your baby.", "hi": "जिन लोगों ने आपको गढ़ा, वे गए नहीं। वे उसी में जीते हैं — जिस तरह आप प्यार करती हैं, हँसती हैं, और अपने शिशु का ख़याल रखती हैं।" },
+      "expanded": { "en": "Look closely and you'll see the past in you. The way you hum a tune may be your mother's. Your patience may be your father's. The recipe you cook once belonged to a grandmother you barely remember. None of this was taught on purpose. You picked it up over years. Now, without trying, you'll pass it on to your child. That's the wonder of family: the people who loved us become part of who we are, and part of who our children become.", "hi": "ग़ौर से देखिए तो बीता कल आपके भीतर जीता हुआ मिलेगा। जिस तरह आप कोई धुन गुनगुनाती हैं, वह शायद आपकी माँ की हो; आपका सब्र शायद आपके पिता का; आपके हाथों का वह पकवान कभी किसी ऐसी दादी का रहा होगा जो आपको ठीक से याद भी नहीं। इनमें से कुछ भी जान-बूझकर सिखाया नहीं गया — यह सब सालों में, प्यार के साथ, अपने आप उतरता गया। अब, बिना कोशिश किए, आप इसे अपने बच्चे तक पहुँचा देंगी। यही परिवार का शांत चमत्कार है: जिन्होंने हमसे प्यार किया वे खोते नहीं, बल्कि हम जो हैं उसी में बुने रह जाते हैं, और नरमी से आगे उसमें चले जाते हैं जो हमारे बच्चे बनते हैं।" },
+      "deepDive": { "en": "Families pass on far more than genes. Gestures, phrases, ways of comforting and recipes are handed from one generation to the next without anyone planning it.", "hi": "आदत और भाषा पर हुए अध्ययन दिखाते हैं कि हमें विरासत में जीन से कहीं ज़्यादा मिलता है — हाव-भाव, बोलने के तकिया-कलाम, दिलासा देने के तरीक़े, यहाँ तक कि पकवान भी एक पीढ़ी से दूसरी तक चुपचाप चले जाते हैं। हम अपने पुरखों को अपने रोज़ के कामों में लिए फिरते हैं।" },
+      "remember": { "en": "The people who loved you live on in how you love your child.", "hi": "जिन्होंने आपसे प्यार किया, वे इसी में जीते हैं कि आप अपने बच्चे से कैसे प्यार करती हैं।" }
     },
     "readToBaby": {
       "title": { "en": "The Old Deer's Lessons", "hi": "बूढ़े हिरन के सबक़" },
@@ -137,8 +137,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby where their name comes from, or how you are still searching for the right one.", "hi": "अपने शिशु को बताइए कि उसका नाम कहाँ से आया है, या यह कि आप अब भी सही नाम ढूँढ रही हैं।" },
-      "motivation": { "en": "A name carries a history; sharing it gives your child their first sense of belonging.", "hi": "हर नाम अपने साथ एक इतिहास लिए चलता है; उसे बाँटना आपके बच्चे को अपनेपन का पहला एहसास देता है।" }
+      "title": { "en": "Tell your baby where their name comes from, or how you're still looking for the right one.", "hi": "अपने शिशु को बताइए कि उसका नाम कहाँ से आया है, या यह कि आप अब भी सही नाम ढूँढ रही हैं।" },
+      "motivation": { "en": "A name carries a history. Sharing it gives your child an early sense of belonging.", "hi": "हर नाम अपने साथ एक इतिहास लिए चलता है; उसे बाँटना आपके बच्चे को अपनेपन का पहला एहसास देता है।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -153,9 +153,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Slow Down The Out-Breath", "hi": "साँस छोड़ना धीमा कीजिए" },
-      "content": { "en": "Breathe in gently for a count of four, then let your breath out slowly for a count of six. The longer out-breath tells your body it is safe to rest. Repeat for a quiet minute.", "hi": "चार तक गिनते हुए नरमी से साँस लीजिए, फिर छह तक गिनते हुए धीरे-धीरे साँस छोड़िए। लंबी साँस छोड़ना आपके शरीर को बता देता है कि अब आराम करना सुरक्षित है। एक शांत मिनट तक दोहराइए।" },
-      "remember": { "en": "A long, slow out-breath is a quiet signal of safety.", "hi": "लंबी, धीमी साँस छोड़ना सुरक्षित होने का एक शांत इशारा है।" },
+      "title": { "en": "Slow down the breath out", "hi": "साँस छोड़ना धीमा कीजिए" },
+      "content": { "en": "Breathe in gently for a count of four, then let your breath out slowly for a count of six. A longer breath out helps your body relax. Repeat for one calm minute.", "hi": "चार तक गिनते हुए नरमी से साँस लीजिए, फिर छह तक गिनते हुए धीरे-धीरे साँस छोड़िए। लंबी साँस छोड़ना आपके शरीर को बता देता है कि अब आराम करना सुरक्षित है। एक शांत मिनट तक दोहराइए।" },
+      "remember": { "en": "A long, slow breath out helps you feel safe and calm.", "hi": "लंबी, धीमी साँस छोड़ना सुरक्षित होने का एक शांत इशारा है।" },
       "durationMinutes": 1
     }
   },
@@ -164,11 +164,11 @@
     "week": 30,
     "babyLearning": { "en": "Your baby's lungs keep maturing for that first breath.", "hi": "और मज़बूत होता हुआ, इरादे से लात मारता और अंगड़ाई लेता हुआ" },
     "grow": {
-      "title": { "en": "Pass Down The Good", "hi": "अच्छाई आगे बढ़ाइए" },
-      "insight": { "en": "Not everything in a family must be carried forward. You get to choose which threads to pass on — and which to gently set down.", "hi": "परिवार की हर चीज़ आगे ले जाना ज़रूरी नहीं। यह आपका चुनाव है कि कौन-से धागे आगे बढ़ाने हैं — और कौन-से नरमी से रख देने हैं।" },
-      "expanded": { "en": "Every family carries both gifts and burdens — the warm traditions and the old hurts, the kind habits and the harsh words. As you become a parent, you hold something powerful: the chance to choose. You can keep the laughter, the recipes, the gentleness, and lovingly let go of what caused pain. This is not a betrayal of where you come from; it is the truest honouring of it. To pass down the good and quietly stop the rest is one of the bravest, most loving things a parent can do.", "hi": "हर परिवार अपने साथ तोहफ़े भी लिए चलता है और बोझ भी — गर्मजोशी भरी परंपराएँ और पुराने ज़ख़्म, नरम आदतें और कड़वे बोल। माँ बनते हुए आपके हाथ में कुछ बहुत ताक़तवर आ जाता है: चुनने का मौक़ा। आप हँसी रख सकती हैं, पकवान रख सकती हैं, नरमी रख सकती हैं — और जिसने दर्द दिया, उसे प्यार से जाने दे सकती हैं। यह इस बात से मुँह मोड़ना नहीं कि आप कहाँ से आई हैं; यही उसका सबसे सच्चा सम्मान है। अच्छाई को आगे पहुँचाना और बाक़ी को चुपचाप वहीं रोक देना, माँ-बाप के किए सबसे बहादुर और सबसे प्यार भरे कामों में से एक है।" },
-      "deepDive": { "en": "Psychologists describe 'breaking the cycle' — the way one mindful parent can end patterns of harshness and pass on warmth instead. A single generation's choice can change a family's story for good.", "hi": "मनोवैज्ञानिक 'सिलसिला तोड़ने' की बात करते हैं — यानी एक समझदार माँ या पिता कैसे सख़्ती के पुराने ढर्रे को वहीं ख़त्म कर सकते हैं और उसकी जगह गर्मजोशी आगे दे सकते हैं। सिर्फ़ एक पीढ़ी का चुनाव पूरे परिवार की कहानी हमेशा के लिए बदल सकता है।" },
-      "remember": { "en": "You can keep the warmth and gently leave the rest behind.", "hi": "आप गर्मजोशी रख सकती हैं और बाक़ी को नरमी से पीछे छोड़ सकती हैं।" }
+      "title": { "en": "Pass on the good", "hi": "अच्छाई आगे बढ़ाइए" },
+      "insight": { "en": "You don't have to carry everything in a family forward. You get to choose what to pass on and what to let go.", "hi": "परिवार की हर चीज़ आगे ले जाना ज़रूरी नहीं। यह आपका चुनाव है कि कौन-से धागे आगे बढ़ाने हैं — और कौन-से नरमी से रख देने हैं।" },
+      "expanded": { "en": "Every family carries good things and hard things: warm traditions and old hurts, kind habits and harsh words. As you become a parent, you get to choose. You can keep the laughter, the recipes and the gentleness, and let go of what caused pain. That isn't turning your back on where you come from. It's honouring the best of it. Passing on the good and stopping the rest is one of the bravest, most loving things a parent can do.", "hi": "हर परिवार अपने साथ तोहफ़े भी लिए चलता है और बोझ भी — गर्मजोशी भरी परंपराएँ और पुराने ज़ख़्म, नरम आदतें और कड़वे बोल। माँ बनते हुए आपके हाथ में कुछ बहुत ताक़तवर आ जाता है: चुनने का मौक़ा। आप हँसी रख सकती हैं, पकवान रख सकती हैं, नरमी रख सकती हैं — और जिसने दर्द दिया, उसे प्यार से जाने दे सकती हैं। यह इस बात से मुँह मोड़ना नहीं कि आप कहाँ से आई हैं; यही उसका सबसे सच्चा सम्मान है। अच्छाई को आगे पहुँचाना और बाक़ी को चुपचाप वहीं रोक देना, माँ-बाप के किए सबसे बहादुर और सबसे प्यार भरे कामों में से एक है।" },
+      "deepDive": { "en": "Psychologists talk about 'breaking the cycle': a parent who is aware of harsh patterns from their own childhood can choose to pass on warmth instead. One generation's choices can change a family's story.", "hi": "मनोवैज्ञानिक 'सिलसिला तोड़ने' की बात करते हैं — यानी एक समझदार माँ या पिता कैसे सख़्ती के पुराने ढर्रे को वहीं ख़त्म कर सकते हैं और उसकी जगह गर्मजोशी आगे दे सकते हैं। सिर्फ़ एक पीढ़ी का चुनाव पूरे परिवार की कहानी हमेशा के लिए बदल सकता है।" },
+      "remember": { "en": "You can keep the warmth and leave the rest behind.", "hi": "आप गर्मजोशी रख सकती हैं और बाक़ी को नरमी से पीछे छोड़ सकती हैं।" }
     },
     "readToBaby": {
       "title": { "en": "Birbal And The Never-Ending Story", "hi": "बीरबल और कभी ख़त्म न होने वाली कहानी" },
@@ -177,8 +177,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about a tradition you cannot wait to share with them one day.", "hi": "अपने शिशु को किसी ऐसी परंपरा के बारे में बताइए, जिसे एक दिन उसके साथ बाँटने के लिए आप बेक़रार हैं।" },
-      "motivation": { "en": "A tradition becomes precious the moment you pass it lovingly to the next pair of hands.", "hi": "कोई परंपरा उसी पल क़ीमती बनती है जब आप उसे प्यार से अगले हाथों में सौंप देती हैं।" }
+      "title": { "en": "Tell your baby about a tradition you can't wait to share with them one day.", "hi": "अपने शिशु को किसी ऐसी परंपरा के बारे में बताइए, जिसे एक दिन उसके साथ बाँटने के लिए आप बेक़रार हैं।" },
+      "motivation": { "en": "A tradition becomes special when you pass it lovingly to the next generation.", "hi": "कोई परंपरा उसी पल क़ीमती बनती है जब आप उसे प्यार से अगले हाथों में सौंप देती हैं।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -193,9 +193,9 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "When Iron Feels Low", "hi": "जब आयरन कम लगने लगे" },
-      "content": { "en": "If you feel more tired or breathless than usual now, your iron may be running low. Pair iron-rich foods like spinach, dates and lentils with a little lemon or amla — the vitamin C helps your body absorb the iron.", "hi": "अगर अब आप आम दिनों से ज़्यादा थकी या साँस फूलती महसूस करती हैं, तो हो सकता है आपका आयरन कम चल रहा हो। आयरन से भरपूर चीज़ें — पालक, खजूर और दाल — थोड़े नींबू या आँवले के साथ लीजिए; Vitamin C शरीर को आयरन सोखने में मदद करता है।" },
-      "remember": { "en": "A squeeze of lemon helps your body take in more iron.", "hi": "थोड़ा-सा नींबू निचोड़ लेना शरीर को ज़्यादा आयरन लेने में मदद करता है।" },
+      "title": { "en": "Getting enough iron", "hi": "जब आयरन कम लगने लगे" },
+      "content": { "en": "Your baby needs a lot of iron in these weeks. If you feel more tired or breathless than usual, tell your doctor. Pair iron-rich foods like spinach, dates and lentils with a little lemon or amla. The vitamin C helps your body take in the iron.", "hi": "अगर अब आप आम दिनों से ज़्यादा थकी या साँस फूलती महसूस करती हैं, तो हो सकता है आपका आयरन कम चल रहा हो। आयरन से भरपूर चीज़ें — पालक, खजूर और दाल — थोड़े नींबू या आँवले के साथ लीजिए; Vitamin C शरीर को आयरन सोखने में मदद करता है।" },
+      "remember": { "en": "A squeeze of lemon helps iron from food go further.", "hi": "थोड़ा-सा नींबू निचोड़ लेना शरीर को ज़्यादा आयरन लेने में मदद करता है।" },
       "durationMinutes": 0
     }
   },
@@ -204,11 +204,11 @@
     "week": 30,
     "babyLearning": { "en": "Your baby's toenails are growing in.", "hi": "आपकी लोरियों में नरम पड़ता हुआ, आपके स्पर्श को पहचानता हुआ" },
     "grow": {
-      "title": { "en": "Names Carry Meaning", "hi": "नाम अपने साथ अर्थ लाते हैं" },
-      "insight": { "en": "A name is the first story you tell about your child — a small word holding a wish, a memory, or a love.", "hi": "नाम वह पहली कहानी है जो आप अपने बच्चे के बारे में कहती हैं — एक छोटा-सा शब्द, जिसमें एक दुआ, एक याद या एक प्यार बंद है।" },
-      "expanded": { "en": "The name you choose for your child is more than a label; it is the first gift of identity, carried for a lifetime. Some names honour a beloved grandparent, some hold the meaning of a virtue you hope your child will grow into, some simply sounded like love the moment you heard them. Whatever you choose, your child will one day ask, 'Why this name?' — and your answer will become part of their story. A name is a tiny inheritance, a wish folded into a single word, spoken every day with affection.", "hi": "जो नाम आप अपने बच्चे के लिए चुनती हैं वह किसी लेबल से कहीं ज़्यादा है; यह पहचान का पहला तोहफ़ा है, जो ज़िंदगी भर साथ चलता है। कुछ नाम किसी प्यारे दादा-दादी का सम्मान करते हैं, कुछ में वह गुण छिपा होता है जो आप चाहती हैं कि आपके बच्चे में उतरे, और कुछ बस सुनते ही प्यार जैसे लगते हैं। आप जो भी चुनें, आपका बच्चा एक दिन पूछेगा, 'यही नाम क्यों?' — और आपका जवाब उसकी कहानी का हिस्सा बन जाएगा। नाम एक नन्ही विरासत है, एक दुआ जो एक ही शब्द में मुड़ी है, और हर दिन प्यार से पुकारी जाती है।" },
-      "deepDive": { "en": "Across cultures, naming has always been a sacred act — in many Indian traditions the naamkaran ceremony welcomes a child by speaking their name aloud, marking their place in the family for the first time.", "hi": "हर संस्कृति में नाम रखना हमेशा एक पवित्र काम रहा है — कई भारतीय परंपराओं में नामकरण संस्कार बच्चे का स्वागत उसका नाम ऊँची आवाज़ में बोलकर करता है, और पहली बार परिवार में उसकी जगह तय कर देता है।" },
-      "remember": { "en": "A name is a love and a wish, spoken every day.", "hi": "नाम एक प्यार है और एक दुआ, जो हर दिन बोली जाती है।" }
+      "title": { "en": "A name carries meaning", "hi": "नाम अपने साथ अर्थ लाते हैं" },
+      "insight": { "en": "A name is the first story you tell about your child: a small word holding a wish, a memory or your love.", "hi": "नाम वह पहली कहानी है जो आप अपने बच्चे के बारे में कहती हैं — एक छोटा-सा शब्द, जिसमें एक दुआ, एक याद या एक प्यार बंद है।" },
+      "expanded": { "en": "The name you choose is your child's first gift of identity, and they'll carry it for life. Some names honour a much-loved grandparent. Some carry the meaning of a quality you hope your child will grow into. Some just sounded like love the moment you heard them. Whatever you choose, your child will one day ask 'Why this name?', and your answer will become part of their story. A name is a small inheritance, a wish in a single word, said every day with love.", "hi": "जो नाम आप अपने बच्चे के लिए चुनती हैं वह किसी लेबल से कहीं ज़्यादा है; यह पहचान का पहला तोहफ़ा है, जो ज़िंदगी भर साथ चलता है। कुछ नाम किसी प्यारे दादा-दादी का सम्मान करते हैं, कुछ में वह गुण छिपा होता है जो आप चाहती हैं कि आपके बच्चे में उतरे, और कुछ बस सुनते ही प्यार जैसे लगते हैं। आप जो भी चुनें, आपका बच्चा एक दिन पूछेगा, 'यही नाम क्यों?' — और आपका जवाब उसकी कहानी का हिस्सा बन जाएगा। नाम एक नन्ही विरासत है, एक दुआ जो एक ही शब्द में मुड़ी है, और हर दिन प्यार से पुकारी जाती है।" },
+      "deepDive": { "en": "In many cultures, naming a child is a special moment. In many Indian families, the naamkaran ceremony welcomes a child by saying their name aloud, marking their place in the family for the first time.", "hi": "हर संस्कृति में नाम रखना हमेशा एक पवित्र काम रहा है — कई भारतीय परंपराओं में नामकरण संस्कार बच्चे का स्वागत उसका नाम ऊँची आवाज़ में बोलकर करता है, और पहली बार परिवार में उसकी जगह तय कर देता है।" },
+      "remember": { "en": "A name is a wish and a love, said every day.", "hi": "नाम एक प्यार है और एक दुआ, जो हर दिन बोली जाती है।" }
     },
     "readToBaby": {
       "title": { "en": "The Quilt Of Memories", "hi": "यादों की रज़ाई" },
@@ -218,7 +218,7 @@
     },
     "talkToBaby": {
       "title": { "en": "Tell your baby about a memory you treasure from your own childhood.", "hi": "अपने शिशु को अपने बचपन की कोई ऐसी याद सुनाइए जिसे आपने सँभालकर रखा है।" },
-      "motivation": { "en": "Sharing your childhood lets your baby know the child you once were, too.", "hi": "अपना बचपन बाँटना आपके शिशु को उस बच्ची से भी मिलवा देता है जो कभी आप थीं।" }
+      "motivation": { "en": "Sharing your childhood lets your baby know the child you once were.", "hi": "अपना बचपन बाँटना आपके शिशु को उस बच्ची से भी मिलवा देता है जो कभी आप थीं।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -233,8 +233,8 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "My Childhood Has Gifts To Give", "hi": "मेरे बचपन के पास देने लायक़ तोहफ़े हैं" },
-      "content": { "en": "The joys I knew as a child are not behind me. They are waiting to be shared again with my own little one.", "hi": "बचपन में मैंने जो ख़ुशियाँ जानी थीं, वे मेरे पीछे छूटी नहीं हैं। वे तो इंतज़ार में हैं कि मेरे अपने नन्हे के साथ फिर से बाँटी जाएँ।" },
+      "title": { "en": "My childhood has gifts to give", "hi": "मेरे बचपन के पास देने लायक़ तोहफ़े हैं" },
+      "content": { "en": "The joys I knew as a child aren't behind me. I get to share them again with my own little one.", "hi": "बचपन में मैंने जो ख़ुशियाँ जानी थीं, वे मेरे पीछे छूटी नहीं हैं। वे तो इंतज़ार में हैं कि मेरे अपने नन्हे के साथ फिर से बाँटी जाएँ।" },
       "remember": { "en": "Your happiest childhood memories can become your child's too.", "hi": "आपके बचपन की सबसे ख़ुश यादें आपके बच्चे की भी बन सकती हैं।" },
       "durationMinutes": 0
     }
@@ -244,11 +244,11 @@
     "week": 30,
     "babyLearning": { "en": "Your baby spends much of the day asleep, in regular cycles.", "hi": "हफ़्ता पूरा करते हुए, पास सिमटा हुआ, आपकी धड़कन सुनता हुआ" },
     "grow": {
-      "title": { "en": "Memory Is A Kind Of Love", "hi": "याद भी एक तरह का प्यार है" },
-      "insight": { "en": "To remember someone is to keep loving them. The stories we hold are love that refuses to fade.", "hi": "किसी को याद रखना, उससे प्यार करते रहना है। जो कहानियाँ हम थामे रहते हैं, वे ऐसा प्यार हैं जो धुँधला होने से इनकार कर देता है।" },
-      "expanded": { "en": "When you tell your child about a grandparent they will never meet, a home long left behind, or a tradition handed down through time, you are doing something tender and powerful: you are keeping love alive. Memory is not just the past held in the mind; it is a way of continuing to love those we cannot hold. As you prepare to meet your baby, know that every story you choose to carry forward is a gift of love — one that lets your child belong to people and places far beyond their own short life. To remember, and to tell, is itself an act of love.", "hi": "जब आप अपने बच्चे को उन दादा-दादी के बारे में बताती हैं जिनसे वह कभी मिल नहीं पाएगा, उस घर के बारे में जो बहुत पीछे छूट गया, या उस परंपरा के बारे में जो वक़्त के साथ चलकर आई — तब आप कुछ बहुत नाज़ुक और बहुत ताक़तवर कर रही होती हैं: आप प्यार को ज़िंदा रख रही होती हैं। याद सिर्फ़ मन में थमा हुआ बीता कल नहीं है; यह उन लोगों से प्यार करते रहने का तरीक़ा है जिन्हें अब हम थाम नहीं सकते। जैसे-जैसे आप अपने शिशु से मिलने की तैयारी करती हैं, यह जान लीजिए कि हर वह कहानी जिसे आप आगे ले जाना चुनती हैं, प्यार का एक तोहफ़ा है — ऐसा तोहफ़ा जो आपके बच्चे को उन लोगों और जगहों से जोड़ देता है जो उसकी अपनी छोटी-सी ज़िंदगी से कहीं आगे तक फैले हैं। याद रखना, और सुनाना — यह अपने आप में प्यार का एक काम है।" },
-      "deepDive": { "en": "Grief researchers describe 'continuing bonds' — the way remembering and retelling keeps a loved one present in our lives. Far from being unhealthy, this is one of the most natural ways love endures.", "hi": "किसी अपने के बिछड़ने के दुख पर हुए शोध 'continuing bonds' की बात करते हैं — यानी याद करना और दोहराकर सुनाना किसी प्यारे को हमारी ज़िंदगी में मौजूद रखता है। यह किसी तरह बीमार सोच नहीं, बल्कि प्यार के टिके रहने के सबसे क़ुदरती तरीक़ों में से एक है।" },
-      "remember": { "en": "Every story you keep is love that refuses to fade.", "hi": "हर कहानी जो आप सँभालकर रखती हैं, वह प्यार है जो धुँधला होने से इनकार कर देता है।" }
+      "title": { "en": "Remembering is a way of loving", "hi": "याद भी एक तरह का प्यार है" },
+      "insight": { "en": "To remember someone is to keep loving them. The stories we keep hold that love.", "hi": "किसी को याद रखना, उससे प्यार करते रहना है। जो कहानियाँ हम थामे रहते हैं, वे ऐसा प्यार हैं जो धुँधला होने से इनकार कर देता है।" },
+      "expanded": { "en": "When you tell your child about a grandparent they'll never meet, a home left long ago, or a tradition handed down, you're keeping love alive. Remembering is a way of still loving people we can't hold any more. As you get ready to meet your baby, every story you choose to carry forward is a gift. It lets your child belong to people and places far beyond their own life. Remembering and telling are acts of love.", "hi": "जब आप अपने बच्चे को उन दादा-दादी के बारे में बताती हैं जिनसे वह कभी मिल नहीं पाएगा, उस घर के बारे में जो बहुत पीछे छूट गया, या उस परंपरा के बारे में जो वक़्त के साथ चलकर आई — तब आप कुछ बहुत नाज़ुक और बहुत ताक़तवर कर रही होती हैं: आप प्यार को ज़िंदा रख रही होती हैं। याद सिर्फ़ मन में थमा हुआ बीता कल नहीं है; यह उन लोगों से प्यार करते रहने का तरीक़ा है जिन्हें अब हम थाम नहीं सकते। जैसे-जैसे आप अपने शिशु से मिलने की तैयारी करती हैं, यह जान लीजिए कि हर वह कहानी जिसे आप आगे ले जाना चुनती हैं, प्यार का एक तोहफ़ा है — ऐसा तोहफ़ा जो आपके बच्चे को उन लोगों और जगहों से जोड़ देता है जो उसकी अपनी छोटी-सी ज़िंदगी से कहीं आगे तक फैले हैं। याद रखना, और सुनाना — यह अपने आप में प्यार का एक काम है।" },
+      "deepDive": { "en": "Grief researchers describe 'continuing bonds': the way remembering and retelling keeps a loved one present in our lives. It's a normal and healthy way that love lasts.", "hi": "किसी अपने के बिछड़ने के दुख पर हुए शोध 'continuing bonds' की बात करते हैं — यानी याद करना और दोहराकर सुनाना किसी प्यारे को हमारी ज़िंदगी में मौजूद रखता है। यह किसी तरह बीमार सोच नहीं, बल्कि प्यार के टिके रहने के सबसे क़ुदरती तरीक़ों में से एक है।" },
+      "remember": { "en": "Every story you keep holds love.", "hi": "हर कहानी जो आप सँभालकर रखती हैं, वह प्यार है जो धुँधला होने से इनकार कर देता है।" }
     },
     "readToBaby": {
       "title": { "en": "The Rings Of The Old Tree", "hi": "बूढ़े पेड़ के छल्ले" },
@@ -257,8 +257,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby the story of how they came to be — your own beginning of their life.", "hi": "अपने शिशु को वह कहानी सुनाइए कि वह कैसे आया — उसकी ज़िंदगी की आपकी अपनी शुरुआत।" },
-      "motivation": { "en": "Of all the stories you will ever tell, the story of them is the one they will treasure most.", "hi": "आप ज़िंदगी भर जितनी कहानियाँ सुनाएँगी, उनमें उसकी अपनी कहानी वही होगी जिसे वह सबसे ज़्यादा सँभालकर रखेगा।" }
+      "title": { "en": "Tell your baby the story of how they came to be, the start of their life.", "hi": "अपने शिशु को वह कहानी सुनाइए कि वह कैसे आया — उसकी ज़िंदगी की आपकी अपनी शुरुआत।" },
+      "motivation": { "en": "Of all the stories you'll tell, the story of them may be the one they treasure most.", "hi": "आप ज़िंदगी भर जितनी कहानियाँ सुनाएँगी, उनमें उसकी अपनी कहानी वही होगी जिसे वह सबसे ज़्यादा सँभालकर रखेगा।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -273,9 +273,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Breathe In Gratitude", "hi": "शुक्रगुज़ारी की साँस लीजिए" },
-      "content": { "en": "Breathe in slowly and silently name one person you are grateful for. Breathe out and let that warmth settle in your chest. Repeat with a new name for five gentle breaths.", "hi": "धीरे से साँस लीजिए और मन ही मन किसी एक इंसान का नाम लीजिए जिसके लिए आप शुक्रगुज़ार हैं। साँस छोड़िए और उस गर्माहट को अपने सीने में बैठने दीजिए। हर बार नया नाम लेते हुए, पाँच नरम साँसों तक दोहराइए।" },
-      "remember": { "en": "Gratitude is a quiet way of holding our people close.", "hi": "शुक्रगुज़ारी अपने लोगों को पास थामे रखने का एक शांत तरीक़ा है।" },
+      "title": { "en": "Breathe in gratitude", "hi": "शुक्रगुज़ारी की साँस लीजिए" },
+      "content": { "en": "Breathe in slowly and silently name one person you're grateful for. Breathe out and let that warmth settle in your chest. Repeat with a new name for five gentle breaths.", "hi": "धीरे से साँस लीजिए और मन ही मन किसी एक इंसान का नाम लीजिए जिसके लिए आप शुक्रगुज़ार हैं। साँस छोड़िए और उस गर्माहट को अपने सीने में बैठने दीजिए। हर बार नया नाम लेते हुए, पाँच नरम साँसों तक दोहराइए।" },
+      "remember": { "en": "Gratitude is a way of holding your people close.", "hi": "शुक्रगुज़ारी अपने लोगों को पास थामे रखने का एक शांत तरीक़ा है।" },
       "durationMinutes": 2
     }
   }

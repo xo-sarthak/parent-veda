@@ -4,11 +4,11 @@
     "week": 25,
     "babyLearning": { "en": "Your baby moves in response to sounds around you.", "hi": "और मज़बूत होते हुए, नन्हे हाथ पकड़ना सीखते हुए" },
     "grow": {
-      "title": { "en": "Let Them Do It Themselves", "hi": "उन्हें ख़ुद करने दीजिए" },
-      "insight": { "en": "One of the hardest, kindest gifts you will give your child is the space to do things on their own.", "hi": "सबसे मुश्किल और सबसे प्यारे तोहफ़ों में से एक जो आप अपने बच्चे को देंगी, वो है ख़ुद करने की जगह।" },
-      "expanded": { "en": "When you love someone, your first instinct is to help — to tie the shoe, finish the sentence, smooth the path. But a child grows by trying, fumbling, and trying again. Each time you step back and let those small hands work it out, you are saying something powerful: 'I believe you can.' It will feel slower, messier, and sometimes harder than doing it yourself. Yet those clumsy first attempts are exactly how confidence takes root. You are not withholding help; you are handing over the quiet joy of 'I did it myself.'", "hi": "जब आप किसी से प्यार करती हैं, तो पहला मन मदद करने का ही होता है — जूते का फ़ीता बाँध देना, बात पूरी कर देना, रास्ता आसान कर देना। पर बच्चे कोशिश करके, लड़खड़ाकर, और फिर कोशिश करके ही बड़े होते हैं। हर बार जब आप एक क़दम पीछे हटकर उन नन्हे हाथों को ख़ुद उलझन सुलझाने देती हैं, आप कुछ बहुत बड़ा कह रही होती हैं: 'मुझे भरोसा है, तुमसे हो जाएगा।' यह धीमा लगेगा, थोड़ा गड़बड़ लगेगा, और कभी-कभी ख़ुद कर देने से ज़्यादा मुश्किल भी। फिर भी वही अनाड़ी-सी पहली कोशिशें हैं जहाँ से आत्मविश्वास जड़ पकड़ता है। आप मदद रोक नहीं रहीं; आप 'मैंने ख़ुद किया' की वो चुपचाप ख़ुशी सौंप रही हैं।" },
-      "deepDive": { "en": "Child development researchers find that letting children attempt age-appropriate tasks themselves builds 'self-efficacy' — a child's belief in their own ability. Stepping back, when it is safe, is a form of active support.", "hi": "बाल-विकास पर हुए शोध बताते हैं कि बच्चों को उम्र के हिसाब के काम ख़ुद करने देना 'self-efficacy' बनाता है — यानी अपनी काबिलियत पर बच्चे का अपना भरोसा। जहाँ सुरक्षित हो, वहाँ पीछे हट जाना भी मदद का ही एक तरीक़ा है।" },
-      "remember": { "en": "Doing it for them is help; letting them try is growth.", "hi": "उनके लिए कर देना मदद है; उन्हें कोशिश करने देना बढ़ना है।" }
+      "title": { "en": "Let them do it themselves", "hi": "उन्हें ख़ुद करने दीजिए" },
+      "insight": { "en": "Giving your child room to do things on their own is one of the hardest, kindest things you'll do.", "hi": "सबसे मुश्किल और सबसे प्यारे तोहफ़ों में से एक जो आप अपने बच्चे को देंगी, वो है ख़ुद करने की जगह।" },
+      "expanded": { "en": "When you love someone, your first instinct is to help: tie the shoe, finish the sentence, smooth the way. But a child grows by trying, fumbling and trying again. Each time you step back and let those small hands work it out, you're saying 'I believe you can.' It will feel slower and messier than doing it yourself. But those clumsy first tries are how confidence starts. You're still helping. You're giving them the joy of 'I did it myself.'", "hi": "जब आप किसी से प्यार करती हैं, तो पहला मन मदद करने का ही होता है — जूते का फ़ीता बाँध देना, बात पूरी कर देना, रास्ता आसान कर देना। पर बच्चे कोशिश करके, लड़खड़ाकर, और फिर कोशिश करके ही बड़े होते हैं। हर बार जब आप एक क़दम पीछे हटकर उन नन्हे हाथों को ख़ुद उलझन सुलझाने देती हैं, आप कुछ बहुत बड़ा कह रही होती हैं: 'मुझे भरोसा है, तुमसे हो जाएगा।' यह धीमा लगेगा, थोड़ा गड़बड़ लगेगा, और कभी-कभी ख़ुद कर देने से ज़्यादा मुश्किल भी। फिर भी वही अनाड़ी-सी पहली कोशिशें हैं जहाँ से आत्मविश्वास जड़ पकड़ता है। आप मदद रोक नहीं रहीं; आप 'मैंने ख़ुद किया' की वो चुपचाप ख़ुशी सौंप रही हैं।" },
+      "deepDive": { "en": "Child development researchers find that letting children try tasks suited to their age helps build 'self-efficacy', a child's belief in their own ability. Stepping back, when it's safe, is a way of supporting them.", "hi": "बाल-विकास पर हुए शोध बताते हैं कि बच्चों को उम्र के हिसाब के काम ख़ुद करने देना 'self-efficacy' बनाता है — यानी अपनी काबिलियत पर बच्चे का अपना भरोसा। जहाँ सुरक्षित हो, वहाँ पीछे हट जाना भी मदद का ही एक तरीक़ा है।" },
+      "remember": { "en": "Letting them try is how they grow.", "hi": "उनके लिए कर देना मदद है; उन्हें कोशिश करने देना बढ़ना है।" }
     },
     "readToBaby": {
       "title": { "en": "The Eaglet's First Flight", "hi": "नन्हे बाज़ की पहली उड़ान" },
@@ -17,8 +17,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about a moment you'll cheer the loudest for them, when they finally do it on their own.", "hi": "अपने शिशु को उस पल के बारे में बताइए जब वो आख़िरकार ख़ुद कर लेंगे और आप सबसे ज़ोर से ताली बजाएँगी।" },
-      "motivation": { "en": "Your cheer will be the first sound of pride they ever know.", "hi": "आपकी ताली वो पहली आवाज़ होगी जिससे गर्व का मतलब समझ आएगा।" }
+      "title": { "en": "Tell your baby about a moment you'll cheer the loudest, when they finally do something on their own.", "hi": "अपने शिशु को उस पल के बारे में बताइए जब वो आख़िरकार ख़ुद कर लेंगे और आप सबसे ज़ोर से ताली बजाएँगी।" },
+      "motivation": { "en": "Your cheering will be one of the first sounds of pride they know.", "hi": "आपकी ताली वो पहली आवाज़ होगी जिससे गर्व का मतलब समझ आएगा।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -33,9 +33,9 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "When Heartburn Creeps In", "hi": "जब सीने में जलन उठने लगे" },
-      "content": { "en": "If meals are leaving a warm, burning feeling rising in your chest, try eating a little less at a time and a little more often. Sip water between bites rather than gulping it all at once, and give yourself a calm, upright half hour before lying down.", "hi": "अगर खाने के बाद सीने में गर्म-सी जलन उठती है, तो एक बार में थोड़ा कम और थोड़ी-थोड़ी देर में खाकर देखिए। सारा पानी एक साथ गटकने के बजाय कौर के बीच-बीच में घूँट लीजिए, और लेटने से पहले ख़ुद को आधा घंटा शांति से सीधे बैठने का समय दीजिए।" },
-      "remember": { "en": "Smaller, slower meals are often kinder to a growing belly.", "hi": "छोटा और धीमे खाया गया खाना अक्सर बढ़ते पेट पर ज़्यादा नरम पड़ता है।" },
+      "title": { "en": "Easing heartburn with smaller meals", "hi": "जब सीने में जलन उठने लगे" },
+      "content": { "en": "If meals leave a warm, burning feeling in your chest, try eating a little less at a time and a little more often. Sip water between bites instead of drinking a lot at once, and stay upright for half an hour before lying down.", "hi": "अगर खाने के बाद सीने में गर्म-सी जलन उठती है, तो एक बार में थोड़ा कम और थोड़ी-थोड़ी देर में खाकर देखिए। सारा पानी एक साथ गटकने के बजाय कौर के बीच-बीच में घूँट लीजिए, और लेटने से पहले ख़ुद को आधा घंटा शांति से सीधे बैठने का समय दीजिए।" },
+      "remember": { "en": "Smaller, slower meals are often easier on a growing belly.", "hi": "छोटा और धीमे खाया गया खाना अक्सर बढ़ते पेट पर ज़्यादा नरम पड़ता है।" },
       "durationMinutes": 0
     }
   },
@@ -44,11 +44,11 @@
     "week": 25,
     "babyLearning": { "en": "Your baby's nostrils, closed until now, are starting to open.", "hi": "आवाज़ों पर जवाब देते हुए, तेज़ शोर पर चौंकते हुए" },
     "grow": {
-      "title": { "en": "Confidence Is Built, Not Given", "hi": "आत्मविश्वास बनता है, दिया नहीं जाता" },
-      "insight": { "en": "You cannot hand your child confidence like a gift. It is built, brick by brick, every time they try and discover they can.", "hi": "आत्मविश्वास आप अपने बच्चे को तोहफ़े की तरह नहीं थमा सकतीं। ये ईंट-दर-ईंट बनता है, हर उस बार जब वो कोशिश करते हैं और पाते हैं कि उनसे हो जाता है।" },
-      "expanded": { "en": "We sometimes imagine confidence is something we pour into a child with enough praise. But real confidence is quieter and sturdier than that. It grows from lived proof — from a child trying something hard, struggling, and finding their own way through. Each small success they earn themselves becomes a brick they can stand on next time. Your praise matters, but it works best when it points to their effort, not just to you being impressed. The most confident children are not the most praised; they are the ones who have been allowed to discover, again and again, 'I can do hard things.'", "hi": "हमें कभी लगता है कि आत्मविश्वास कोई ऐसी चीज़ है जो ख़ूब तारीफ़ करके बच्चे में उँडेली जा सकती है। पर असली आत्मविश्वास इससे कहीं ज़्यादा चुप और मज़बूत होता है। वो जिए हुए सबूत से बनता है — किसी मुश्किल काम में हाथ डालने से, उलझने से, और अपना रास्ता ख़ुद निकालने से। हर छोटी कामयाबी जो बच्चे ख़ुद कमाते हैं, वो एक ईंट बन जाती है जिस पर वो अगली बार खड़े हो सकते हैं। आपकी तारीफ़ मायने रखती है, पर वो तब सबसे अच्छा काम करती है जब वो उनकी मेहनत की ओर इशारा करे, सिर्फ़ आपके ख़ुश हो जाने की ओर नहीं। सबसे ज़्यादा आत्मविश्वासी बच्चे वो नहीं होते जिनकी सबसे ज़्यादा तारीफ़ हुई; वो होते हैं जिन्हें बार-बार यह पाने दिया गया कि 'मुश्किल काम मुझसे हो जाते हैं।'" },
-      "deepDive": { "en": "Psychologist Carol Dweck's research shows that praising effort and strategy, rather than fixed traits like being 'smart,' helps children build resilience and a willingness to keep trying.", "hi": "मनोवैज्ञानिक Carol Dweck के शोध बताते हैं कि 'smart' होने जैसे तय गुणों की जगह मेहनत और तरीक़े की तारीफ़ करना बच्चों में हार न मानने की आदत और कोशिश करते रहने का मन बनाता है।" },
-      "remember": { "en": "Confidence is earned in the trying, not handed in the praising.", "hi": "आत्मविश्वास कोशिश में कमाया जाता है, तारीफ़ में थमाया नहीं जाता।" }
+      "title": { "en": "Confidence is built by trying", "hi": "आत्मविश्वास बनता है, दिया नहीं जाता" },
+      "insight": { "en": "You can't hand your child confidence. It's built, bit by bit, each time they try and find out they can.", "hi": "आत्मविश्वास आप अपने बच्चे को तोहफ़े की तरह नहीं थमा सकतीं। ये ईंट-दर-ईंट बनता है, हर उस बार जब वो कोशिश करते हैं और पाते हैं कि उनसे हो जाता है।" },
+      "expanded": { "en": "It's tempting to think confidence comes from enough praise. But real confidence is sturdier than that. It grows from proof: a child tries something hard, struggles, and finds their own way through. Each small success they earn becomes something to stand on next time. Your praise matters, and it works best when it points to their effort. The most confident children are often the ones who've been allowed to find out, again and again, 'I can do hard things.'", "hi": "हमें कभी लगता है कि आत्मविश्वास कोई ऐसी चीज़ है जो ख़ूब तारीफ़ करके बच्चे में उँडेली जा सकती है। पर असली आत्मविश्वास इससे कहीं ज़्यादा चुप और मज़बूत होता है। वो जिए हुए सबूत से बनता है — किसी मुश्किल काम में हाथ डालने से, उलझने से, और अपना रास्ता ख़ुद निकालने से। हर छोटी कामयाबी जो बच्चे ख़ुद कमाते हैं, वो एक ईंट बन जाती है जिस पर वो अगली बार खड़े हो सकते हैं। आपकी तारीफ़ मायने रखती है, पर वो तब सबसे अच्छा काम करती है जब वो उनकी मेहनत की ओर इशारा करे, सिर्फ़ आपके ख़ुश हो जाने की ओर नहीं। सबसे ज़्यादा आत्मविश्वासी बच्चे वो नहीं होते जिनकी सबसे ज़्यादा तारीफ़ हुई; वो होते हैं जिन्हें बार-बार यह पाने दिया गया कि 'मुश्किल काम मुझसे हो जाते हैं।'" },
+      "deepDive": { "en": "The psychologist Carol Dweck's research suggests that praising effort and approach, rather than fixed traits like being 'smart', helps children cope with setbacks and keep trying.", "hi": "मनोवैज्ञानिक Carol Dweck के शोध बताते हैं कि 'smart' होने जैसे तय गुणों की जगह मेहनत और तरीक़े की तारीफ़ करना बच्चों में हार न मानने की आदत और कोशिश करते रहने का मन बनाता है।" },
+      "remember": { "en": "Confidence comes from trying, more than from praise.", "hi": "आत्मविश्वास कोशिश में कमाया जाता है, तारीफ़ में थमाया नहीं जाता।" }
     },
     "readToBaby": {
       "title": { "en": "The Two-Headed Bird", "hi": "दो सिर वाला पक्षी" },
@@ -57,7 +57,7 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby that you will celebrate their tries, not just their wins.", "hi": "अपने शिशु से कहिए कि आप सिर्फ़ उनकी जीत का नहीं, उनकी कोशिशों का भी जश्न मनाएँगी।" },
+      "title": { "en": "Tell your baby you'll celebrate their tries, not just their wins.", "hi": "अपने शिशु से कहिए कि आप सिर्फ़ उनकी जीत का नहीं, उनकी कोशिशों का भी जश्न मनाएँगी।" },
       "motivation": { "en": "A child who is cheered for trying learns to keep trying.", "hi": "जिन बच्चों की कोशिश पर ताली बजती है, वो कोशिश करते रहना सीखते हैं।" }
     },
     "garbhSanskar": {
@@ -73,9 +73,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "My Effort Is Already Enough", "hi": "मेरी मेहनत पहले से काफ़ी है" },
-      "content": { "en": "I do not have to do everything perfectly. The love and effort I bring each day are already more than enough.", "hi": "मुझे हर चीज़ बिलकुल सही करने की ज़रूरत नहीं। जो प्यार और मेहनत मैं हर दिन लाती हूँ, वो पहले से ही काफ़ी से ज़्यादा है।" },
-      "remember": { "en": "Showing up with effort is its own quiet success.", "hi": "मेहनत के साथ हाज़िर रहना अपने आप में एक चुपचाप कामयाबी है।" },
+      "title": { "en": "My effort is already enough", "hi": "मेरी मेहनत पहले से काफ़ी है" },
+      "content": { "en": "I don't have to do everything perfectly. The love and effort I bring each day are already enough.", "hi": "मुझे हर चीज़ बिलकुल सही करने की ज़रूरत नहीं। जो प्यार और मेहनत मैं हर दिन लाती हूँ, वो पहले से ही काफ़ी से ज़्यादा है।" },
+      "remember": { "en": "Showing up and trying is a success in itself.", "hi": "मेहनत के साथ हाज़िर रहना अपने आप में एक चुपचाप कामयाबी है।" },
       "durationMinutes": 0
     }
   },
@@ -84,11 +84,11 @@
     "week": 25,
     "babyLearning": { "en": "Your baby's hands are fully developed and can make a fist.", "hi": "खिंचते और करवट लेते हुए, हिलने की जगह ढूँढ़ते हुए" },
     "grow": {
-      "title": { "en": "The Space To Try", "hi": "कोशिश करने की जगह" },
-      "insight": { "en": "Children do not grow in the space where everything is done for them. They grow in the space where they are allowed to try.", "hi": "बच्चे उस जगह नहीं बढ़ते जहाँ सब कुछ उनके लिए कर दिया जाता है। वो उस जगह बढ़ते हैं जहाँ उन्हें कोशिश करने दी जाती है।" },
-      "expanded": { "en": "It takes patience to watch a small person struggle with a task you could finish in seconds. Every instinct says to swoop in. But there is a quiet magic in the space just beyond what a child can already do — the place where they reach, stretch, and surprise themselves. By making room for that effort, by waiting a few extra moments before helping, you give your child something far richer than a finished task. You give them the experience of growing. The space to try is not empty space; it is the very ground that capability grows in.", "hi": "किसी छोटे इंसान को उस काम से उलझते देखना, जिसे आप सेकंडों में निपटा सकती हैं, सब्र माँगता है। भीतर सब कुछ कहता है कि झपटकर मदद कर दो। पर उस जगह में एक चुपचाप जादू है जो बच्चे के अभी के दायरे से बस थोड़ी आगे है — वही जगह जहाँ वो हाथ बढ़ाते हैं, खिंचते हैं, और ख़ुद को हैरान कर देते हैं। उस मेहनत के लिए जगह बनाकर, मदद करने से पहले कुछ पल और रुककर, आप अपने बच्चे को पूरे हो चुके काम से कहीं ज़्यादा क़ीमती चीज़ देती हैं। आप उन्हें बढ़ने का अनुभव देती हैं। कोशिश करने की जगह ख़ाली जगह नहीं होती; वही वो ज़मीन है जिसमें काबिलियत उगती है।" },
-      "deepDive": { "en": "Educators call the gap between what a child can do alone and what they can do with a little support the 'zone of proximal development.' Growth happens right at that stretching edge.", "hi": "शिक्षक उस फ़ासले को, जो बच्चे के अकेले कर पाने और थोड़े सहारे से कर पाने के बीच होता है, 'zone of proximal development' कहते हैं। बढ़ना ठीक उसी खिंचते हुए किनारे पर होता है।" },
-      "remember": { "en": "Leave a little room, and watch them rise to fill it.", "hi": "थोड़ी जगह छोड़ दीजिए, और देखिए कि वो उसे भरने के लिए कैसे उठ खड़े होते हैं।" }
+      "title": { "en": "Give them room to try", "hi": "कोशिश करने की जगह" },
+      "insight": { "en": "Children grow when they're allowed to try, more than when everything is done for them.", "hi": "बच्चे उस जगह नहीं बढ़ते जहाँ सब कुछ उनके लिए कर दिया जाता है। वो उस जगह बढ़ते हैं जहाँ उन्हें कोशिश करने दी जाती है।" },
+      "expanded": { "en": "It takes patience to watch a small child struggle with something you could finish in seconds. Every instinct says to jump in. But there's a lot happening just beyond what a child can already do. That's where they reach, stretch and surprise themselves. When you wait a few extra moments before helping, you give your child more than a finished task. You give them the feeling of growing. Room to try is where ability grows.", "hi": "किसी छोटे इंसान को उस काम से उलझते देखना, जिसे आप सेकंडों में निपटा सकती हैं, सब्र माँगता है। भीतर सब कुछ कहता है कि झपटकर मदद कर दो। पर उस जगह में एक चुपचाप जादू है जो बच्चे के अभी के दायरे से बस थोड़ी आगे है — वही जगह जहाँ वो हाथ बढ़ाते हैं, खिंचते हैं, और ख़ुद को हैरान कर देते हैं। उस मेहनत के लिए जगह बनाकर, मदद करने से पहले कुछ पल और रुककर, आप अपने बच्चे को पूरे हो चुके काम से कहीं ज़्यादा क़ीमती चीज़ देती हैं। आप उन्हें बढ़ने का अनुभव देती हैं। कोशिश करने की जगह ख़ाली जगह नहीं होती; वही वो ज़मीन है जिसमें काबिलियत उगती है।" },
+      "deepDive": { "en": "Educators call the gap between what a child can do alone and what they can do with a little help the 'zone of proximal development'. Learning tends to happen right at that edge.", "hi": "शिक्षक उस फ़ासले को, जो बच्चे के अकेले कर पाने और थोड़े सहारे से कर पाने के बीच होता है, 'zone of proximal development' कहते हैं। बढ़ना ठीक उसी खिंचते हुए किनारे पर होता है।" },
+      "remember": { "en": "Leave a little room, and watch them grow into it.", "hi": "थोड़ी जगह छोड़ दीजिए, और देखिए कि वो उसे भरने के लिए कैसे उठ खड़े होते हैं।" }
     },
     "readToBaby": {
       "title": { "en": "Lava And Kusha", "hi": "लव और कुश" },
@@ -97,8 +97,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about a skill you cannot wait to watch them master one day.", "hi": "अपने शिशु को उस हुनर के बारे में बताइए जिसे एक दिन उन्हें आसानी से करते देखने का आपको बेसब्री से इंतज़ार है।" },
-      "motivation": { "en": "Picturing their future skills is one way your love reaches forward in time.", "hi": "उनके आने वाले हुनर की कल्पना करना आपके प्यार का समय में आगे पहुँच जाने का एक तरीक़ा है।" }
+      "title": { "en": "Tell your baby about a skill you can't wait to watch them learn one day.", "hi": "अपने शिशु को उस हुनर के बारे में बताइए जिसे एक दिन उन्हें आसानी से करते देखने का आपको बेसब्री से इंतज़ार है।" },
+      "motivation": { "en": "Picturing what they'll learn is one way your love reaches ahead.", "hi": "उनके आने वाले हुनर की कल्पना करना आपके प्यार का समय में आगे पहुँच जाने का एक तरीक़ा है।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -113,9 +113,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Breathing Into The Belly", "hi": "पेट तक साँस ले जाना" },
-      "content": { "en": "Rest both hands low on your belly. Breathe in slowly and feel it gently rise under your hands, then let it soften as you breathe out. Repeat for one calm minute, picturing the room you are making inside.", "hi": "दोनों हाथ अपने पेट के नीचे रखिए। धीरे-धीरे साँस भीतर लीजिए और उसे अपने हाथों के नीचे हल्के से उठते महसूस कीजिए, फिर साँस छोड़ते हुए उसे नरम पड़ने दीजिए। एक शांत मिनट तक दोहराइए, और सोचिए कि आप भीतर कितनी जगह बना रही हैं।" },
-      "remember": { "en": "A slow belly breath gently makes room for two.", "hi": "पेट तक ली गई एक धीमी साँस चुपचाप दो के लिए जगह बना देती है।" },
+      "title": { "en": "Breathing into the belly", "hi": "पेट तक साँस ले जाना" },
+      "content": { "en": "Rest both hands low on your belly. Breathe in slowly and feel it rise under your hands, then let it soften as you breathe out. Repeat for one calm minute, picturing the room you're making inside.", "hi": "दोनों हाथ अपने पेट के नीचे रखिए। धीरे-धीरे साँस भीतर लीजिए और उसे अपने हाथों के नीचे हल्के से उठते महसूस कीजिए, फिर साँस छोड़ते हुए उसे नरम पड़ने दीजिए। एक शांत मिनट तक दोहराइए, और सोचिए कि आप भीतर कितनी जगह बना रही हैं।" },
+      "remember": { "en": "A slow belly breath makes room for two.", "hi": "पेट तक ली गई एक धीमी साँस चुपचाप दो के लिए जगह बना देती है।" },
       "durationMinutes": 1
     }
   },
@@ -124,11 +124,11 @@
     "week": 25,
     "babyLearning": { "en": "Your baby's hair is growing, with its colour and texture forming.", "hi": "आराम और हल्की हलचल की एक लय में बसते हुए" },
     "grow": {
-      "title": { "en": "Help Less, Trust More", "hi": "मदद थोड़ी कम, भरोसा थोड़ा ज़्यादा" },
-      "insight": { "en": "Sometimes the most loving thing you can do is help a little less, and trust your child a little more.", "hi": "कभी सबसे प्यारी बात यही होती है कि मदद थोड़ी कम की जाए, और अपने बच्चे पर भरोसा थोड़ा ज़्यादा।" },
-      "expanded": { "en": "Helping feels like love, and often it is. But too much help, too quickly, can quietly tell a child, 'I do not think you can manage this.' When you pause and offer trust instead of rescue, you send the opposite message: 'I believe in you.' Trust does not mean abandoning your child to struggle alone — it means staying near, ready, but holding back just enough for them to feel their own capability. This is one of the gentlest balances of parenting: close enough to catch them, far enough to let them rise.", "hi": "मदद करना प्यार जैसा लगता है, और अक्सर होता भी है। पर बहुत ज़्यादा मदद, बहुत जल्दी, बच्चे से चुपचाप यह कह देती है, 'मुझे नहीं लगता कि यह तुमसे सँभलेगा।' जब आप एक पल रुककर बचाने की जगह भरोसा देती हैं, तो उल्टा संदेश जाता है: 'मुझे तुम पर यक़ीन है।' भरोसा करने का मतलब बच्चे को अकेला उलझने के लिए छोड़ देना नहीं है — इसका मतलब है पास ही रहना, तैयार रहना, पर बस इतना पीछे रहना कि उन्हें अपनी काबिलियत महसूस हो। यह परवरिश के सबसे नरम संतुलनों में से एक है: इतना पास कि थाम सकें, इतना दूर कि उठ सकें।" },
-      "deepDive": { "en": "Studies of 'autonomy-supportive' parenting find that children whose parents trust them with manageable challenges tend to be more motivated and self-reliant than those whose parents over-help.", "hi": "'Autonomy-supportive' परवरिश पर हुए शोध बताते हैं कि जिन बच्चों के माँ-बाप उन्हें सँभल जाने लायक़ चुनौतियाँ भरोसे से सौंपते हैं, वो उन बच्चों से ज़्यादा उत्साही और अपने पैरों पर खड़े होते हैं जिनके माँ-बाप ज़रूरत से ज़्यादा मदद करते हैं।" },
-      "remember": { "en": "Trust says 'I believe in you' louder than any rescue can.", "hi": "भरोसा 'मुझे तुम पर यक़ीन है' किसी भी बचाव से ज़्यादा ज़ोर से कहता है।" }
+      "title": { "en": "Help a little less, trust a little more", "hi": "मदद थोड़ी कम, भरोसा थोड़ा ज़्यादा" },
+      "insight": { "en": "Sometimes the loving thing is to help a little less and trust your child a little more.", "hi": "कभी सबसे प्यारी बात यही होती है कि मदद थोड़ी कम की जाए, और अपने बच्चे पर भरोसा थोड़ा ज़्यादा।" },
+      "expanded": { "en": "Helping feels like love, and often it is. But too much help, too quickly, can tell a child 'I don't think you can manage this.' When you pause and trust them instead of rescuing them, you tell them 'I believe in you.' Trusting them doesn't mean leaving them to struggle alone. You stay near and ready, but hold back just enough for them to feel what they can do. It's one of the gentlest balances in parenting: close enough to catch them, far enough to let them try.", "hi": "मदद करना प्यार जैसा लगता है, और अक्सर होता भी है। पर बहुत ज़्यादा मदद, बहुत जल्दी, बच्चे से चुपचाप यह कह देती है, 'मुझे नहीं लगता कि यह तुमसे सँभलेगा।' जब आप एक पल रुककर बचाने की जगह भरोसा देती हैं, तो उल्टा संदेश जाता है: 'मुझे तुम पर यक़ीन है।' भरोसा करने का मतलब बच्चे को अकेला उलझने के लिए छोड़ देना नहीं है — इसका मतलब है पास ही रहना, तैयार रहना, पर बस इतना पीछे रहना कि उन्हें अपनी काबिलियत महसूस हो। यह परवरिश के सबसे नरम संतुलनों में से एक है: इतना पास कि थाम सकें, इतना दूर कि उठ सकें।" },
+      "deepDive": { "en": "Studies of 'autonomy-supportive' parenting suggest children whose parents trust them with manageable challenges tend to be more motivated and self-reliant than children whose parents over-help.", "hi": "'Autonomy-supportive' परवरिश पर हुए शोध बताते हैं कि जिन बच्चों के माँ-बाप उन्हें सँभल जाने लायक़ चुनौतियाँ भरोसे से सौंपते हैं, वो उन बच्चों से ज़्यादा उत्साही और अपने पैरों पर खड़े होते हैं जिनके माँ-बाप ज़रूरत से ज़्यादा मदद करते हैं।" },
+      "remember": { "en": "Trusting them says 'I believe in you' more clearly than rescuing does.", "hi": "भरोसा 'मुझे तुम पर यक़ीन है' किसी भी बचाव से ज़्यादा ज़ोर से कहता है।" }
     },
     "readToBaby": {
       "title": { "en": "The Deer Who Learned The Forest Ways", "hi": "वो हिरन जिसने वन के तौर-तरीक़े सीखे" },
@@ -137,8 +137,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby that you will always be their safe place to fall.", "hi": "अपने शिशु से कहिए कि गिरने पर आप हमेशा उनकी सुरक्षित जगह रहेंगी।" },
-      "motivation": { "en": "A child who knows they can fall safely is a child brave enough to climb.", "hi": "जिन बच्चों को पता होता है कि वो सुरक्षित गिर सकते हैं, वही चढ़ने की हिम्मत रखते हैं।" }
+      "title": { "en": "Tell your baby you'll always be their safe place to land.", "hi": "अपने शिशु से कहिए कि गिरने पर आप हमेशा उनकी सुरक्षित जगह रहेंगी।" },
+      "motivation": { "en": "A child who knows they can fall safely feels brave enough to climb.", "hi": "जिन बच्चों को पता होता है कि वो सुरक्षित गिर सकते हैं, वही चढ़ने की हिम्मत रखते हैं।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -153,9 +153,9 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "When Energy Dips In The Afternoon", "hi": "जब दोपहर में ताक़त ढलने लगे" },
-      "content": { "en": "If the middle of the day leaves you tired and heavy, reach for something that gives slow, steady energy rather than a quick sugary lift. A small handful of nuts, a piece of fruit, or a few soaked dates can carry you more gently through the afternoon than sweets that fade fast.", "hi": "अगर दिन का बीच आपको थका और भारी छोड़ देता है, तो कुछ ऐसा लीजिए जो जल्दी चढ़ने वाली मिठास के बजाय धीमी, टिकाऊ ताक़त दे। मुट्ठी भर मेवे, फल का एक टुकड़ा, या कुछ भीगे हुए खजूर आपको दोपहर से उन मिठाइयों के मुक़ाबले ज़्यादा नरमी से पार ले जा सकते हैं जो जल्दी उतर जाती हैं।" },
-      "remember": { "en": "Slow, steady foods carry you further than a quick sweet rush.", "hi": "धीमा, टिकाऊ खाना आपको जल्दी चढ़ने वाली मिठास से कहीं आगे तक ले जाता है।" },
+      "title": { "en": "Foods for a steady afternoon", "hi": "जब दोपहर में ताक़त ढलने लगे" },
+      "content": { "en": "If the middle of the day leaves you tired and heavy, reach for something that keeps you going steadily, not a quick sugary lift. A small handful of nuts, a piece of fruit or a few soaked dates will carry you through the afternoon better than sweets that wear off fast.", "hi": "अगर दिन का बीच आपको थका और भारी छोड़ देता है, तो कुछ ऐसा लीजिए जो जल्दी चढ़ने वाली मिठास के बजाय धीमी, टिकाऊ ताक़त दे। मुट्ठी भर मेवे, फल का एक टुकड़ा, या कुछ भीगे हुए खजूर आपको दोपहर से उन मिठाइयों के मुक़ाबले ज़्यादा नरमी से पार ले जा सकते हैं जो जल्दी उतर जाती हैं।" },
+      "remember": { "en": "Slow, steady foods last longer than a quick sweet.", "hi": "धीमा, टिकाऊ खाना आपको जल्दी चढ़ने वाली मिठास से कहीं आगे तक ले जाता है।" },
       "durationMinutes": 0
     }
   },
@@ -164,11 +164,11 @@
     "week": 25,
     "babyLearning": { "en": "Your baby's spine is growing stronger to support the body.", "hi": "और सजग होते हुए, आपकी आवाज़ से शांत होते हुए" },
     "grow": {
-      "title": { "en": "Struggle Is Not Suffering", "hi": "जूझना और दुख एक नहीं" },
-      "insight": { "en": "A child's struggle is not always something to rescue them from. Often it is the very thing growing them.", "hi": "बच्चे का जूझना हमेशा ऐसी चीज़ नहीं जिससे उन्हें बचाया जाए। अक्सर वही उन्हें बड़ा कर रहा होता है।" },
-      "expanded": { "en": "When we see a child struggle, our hearts ache and we long to make it easy. But there is a difference between suffering, which we should ease, and healthy struggle, which we can gently allow. The frustration of a puzzle that won't fit, the wobble of a first step, the effort of a hard word — these are not signs that something is wrong. They are the feeling of learning happening. When you can stay calm and warm while your child struggles, without rushing to fix it, you teach them that effort is safe, that difficulty is survivable, and that they are capable of more than they knew.", "hi": "जब हम किसी बच्चे को जूझते देखते हैं, दिल दुखता है और मन करता है कि सब आसान कर दें। पर दुख, जिसे कम करना चाहिए, और सेहतमंद जूझना, जिसे प्यार से होने देना चाहिए — इन दोनों में फ़र्क़ है। जो पहेली बैठ नहीं रही उसकी झुँझलाहट, पहले क़दम का डगमगाना, एक मुश्किल शब्द की मेहनत — ये निशानियाँ नहीं हैं कि कुछ ग़लत है। ये सीखने के होते रहने का एहसास हैं। जब आप बच्चे के जूझते वक़्त शांत और गर्मजोश रह पाती हैं, बिना उसे ठीक करने के लिए झपटे, तो आप उन्हें सिखाती हैं कि मेहनत सुरक्षित है, कि मुश्किल से गुज़रा जा सकता है, और कि उनमें उससे कहीं ज़्यादा है जितना वो जानते थे।" },
-      "deepDive": { "en": "Psychologists describe 'productive struggle' — the effortful, sometimes frustrating work of figuring something out — as central to deep learning. The struggle itself is where understanding is built.", "hi": "मनोवैज्ञानिक 'productive struggle' की बात करते हैं — किसी बात को सुलझाने की मेहनती, कभी झुँझलाहट भरी कोशिश — और इसे गहरे सीखने का केंद्र मानते हैं। समझ जूझने में ही बनती है।" },
-      "remember": { "en": "Not every struggle needs rescuing; some need only your calm company.", "hi": "हर जूझ को बचाव नहीं चाहिए; कुछ को बस आपका शांत साथ चाहिए।" }
+      "title": { "en": "Some struggle helps a child grow", "hi": "जूझना और दुख एक नहीं" },
+      "insight": { "en": "You don't always need to rescue your child from a struggle. Often it's the thing helping them grow.", "hi": "बच्चे का जूझना हमेशा ऐसी चीज़ नहीं जिससे उन्हें बचाया जाए। अक्सर वही उन्हें बड़ा कर रहा होता है।" },
+      "expanded": { "en": "When you see a child struggle, it's natural to want to make it easy. But there's a difference between suffering, which we should ease, and healthy struggle, which we can let happen. The frustration of a puzzle piece that won't fit, the wobble of a first step, the effort of a hard word: these don't mean something's wrong. They're what learning feels like. When you stay calm and warm while your child struggles, without rushing to fix it, they learn that effort is safe, that hard things can be got through, and that they can do more than they thought.", "hi": "जब हम किसी बच्चे को जूझते देखते हैं, दिल दुखता है और मन करता है कि सब आसान कर दें। पर दुख, जिसे कम करना चाहिए, और सेहतमंद जूझना, जिसे प्यार से होने देना चाहिए — इन दोनों में फ़र्क़ है। जो पहेली बैठ नहीं रही उसकी झुँझलाहट, पहले क़दम का डगमगाना, एक मुश्किल शब्द की मेहनत — ये निशानियाँ नहीं हैं कि कुछ ग़लत है। ये सीखने के होते रहने का एहसास हैं। जब आप बच्चे के जूझते वक़्त शांत और गर्मजोश रह पाती हैं, बिना उसे ठीक करने के लिए झपटे, तो आप उन्हें सिखाती हैं कि मेहनत सुरक्षित है, कि मुश्किल से गुज़रा जा सकता है, और कि उनमें उससे कहीं ज़्यादा है जितना वो जानते थे।" },
+      "deepDive": { "en": "Educators describe 'productive struggle', the effortful and sometimes frustrating work of figuring something out, as an important part of deep learning.", "hi": "मनोवैज्ञानिक 'productive struggle' की बात करते हैं — किसी बात को सुलझाने की मेहनती, कभी झुँझलाहट भरी कोशिश — और इसे गहरे सीखने का केंद्र मानते हैं। समझ जूझने में ही बनती है।" },
+      "remember": { "en": "Some struggles don't need rescuing. They need your calm company.", "hi": "हर जूझ को बचाव नहीं चाहिए; कुछ को बस आपका शांत साथ चाहिए।" }
     },
     "readToBaby": {
       "title": { "en": "Tenali Rama And The Wise Dolls", "hi": "तेनाली राम और समझदार गुड़ियाँ" },
@@ -177,8 +177,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about the kind of independence you hope they grow into.", "hi": "अपने शिशु को उस आज़ादी के बारे में बताइए जिसमें आप उन्हें बड़ा होते देखना चाहती हैं।" },
-      "motivation": { "en": "Naming the freedom you wish for them is the first way you make room for it.", "hi": "जो आज़ादी आप उनके लिए चाहती हैं उसे नाम दे देना ही उसके लिए जगह बनाने का पहला तरीक़ा है।" }
+      "title": { "en": "Tell your baby about the kind of independence you hope they'll grow into.", "hi": "अपने शिशु को उस आज़ादी के बारे में बताइए जिसमें आप उन्हें बड़ा होते देखना चाहती हैं।" },
+      "motivation": { "en": "Saying the freedom you wish for them out loud is a first step to making room for it.", "hi": "जो आज़ादी आप उनके लिए चाहती हैं उसे नाम दे देना ही उसके लिए जगह बनाने का पहला तरीक़ा है।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -193,9 +193,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "I Can Let Things Be Unfinished", "hi": "मैं चीज़ों को अधूरा रहने दे सकती हूँ" },
-      "content": { "en": "Not everything needs to be solved or tidied today. I can let some things rest unfinished and still feel at peace.", "hi": "आज हर चीज़ का सुलझना या सिमटना ज़रूरी नहीं। मैं कुछ चीज़ों को अधूरा रहने दे सकती हूँ और फिर भी सुकून में रह सकती हूँ।" },
-      "remember": { "en": "Peace does not wait for everything to be finished.", "hi": "सुकून हर चीज़ के पूरा होने का इंतज़ार नहीं करता।" },
+      "title": { "en": "I can let things stay unfinished", "hi": "मैं चीज़ों को अधूरा रहने दे सकती हूँ" },
+      "content": { "en": "Not everything needs to be solved or tidied today. I can leave some things unfinished and still feel at peace.", "hi": "आज हर चीज़ का सुलझना या सिमटना ज़रूरी नहीं। मैं कुछ चीज़ों को अधूरा रहने दे सकती हूँ और फिर भी सुकून में रह सकती हूँ।" },
+      "remember": { "en": "You can feel at peace before everything is done.", "hi": "सुकून हर चीज़ के पूरा होने का इंतज़ार नहीं करता।" },
       "durationMinutes": 0
     }
   },
@@ -204,11 +204,11 @@
     "week": 25,
     "babyLearning": { "en": "Your baby is filling out as fat builds under the skin.", "hi": "धीरे-धीरे भरते हुए, और गोल और मज़बूत होते हुए" },
     "grow": {
-      "title": { "en": "Small Freedoms, Big Growth", "hi": "छोटी आज़ादियाँ, बड़ा बढ़ना" },
-      "insight": { "en": "Big confidence grows from small freedoms — the little choices and tasks a child is trusted to own.", "hi": "बड़ा आत्मविश्वास छोटी आज़ादियों से बढ़ता है — उन छोटे चुनावों और कामों से जो बच्चे के अपने माने जाते हैं।" },
-      "expanded": { "en": "Independence is not one big moment when a child suddenly steps into the world alone. It is built from countless tiny freedoms offered early: choosing which shirt to wear, pouring their own water, deciding which story to read. These small choices feel minor to us, but to a child they are real power, real practice in being a capable person. Each little freedom you trust them with says, 'Your choices matter, and you can handle them.' Offer these small freedoms generously now, in your imagination and your hopes, and you are already shaping a child who will one day step out boldly.", "hi": "आत्मनिर्भरता कोई एक बड़ा पल नहीं होती जब बच्चा अचानक अकेले दुनिया में क़दम रख देता है। वो जल्दी दी गई अनगिनत नन्ही आज़ादियों से बनती है: कौन-सी कमीज़ पहननी है यह चुनना, अपना पानी ख़ुद डालना, कौन-सी कहानी पढ़नी है यह तय करना। ये छोटे चुनाव हमें मामूली लगते हैं, पर बच्चों के लिए ये असली ताक़त हैं, काबिल इंसान होने का असली अभ्यास। हर छोटी आज़ादी जो आप भरोसे से सौंपती हैं, यह कहती है, 'तुम्हारे चुनाव मायने रखते हैं, और तुमसे ये सँभल जाएँगे।' इन छोटी आज़ादियों को अभी से दिल खोलकर दीजिए, अपनी कल्पना और उम्मीदों में — और आप अभी से उस हिम्मत की नींव रख रही हैं जिससे एक दिन दुनिया में बेधड़क क़दम रखा जाएगा।" },
-      "deepDive": { "en": "Researchers find that offering young children small, bounded choices — like picking between two outfits — supports their sense of autonomy and reduces power struggles, while keeping decisions manageable.", "hi": "शोध बताते हैं कि छोटे बच्चों को छोटे और सीमित चुनाव देना — जैसे दो कपड़ों में से एक चुनना — उनकी अपनी मर्ज़ी के एहसास को सहारा देता है और ज़िद की खींचतान कम करता है, जबकि फ़ैसले सँभालने लायक़ बने रहते हैं।" },
-      "remember": { "en": "Big independence is grown one small freedom at a time.", "hi": "बड़ी आत्मनिर्भरता एक-एक छोटी आज़ादी से उगती है।" }
+      "title": { "en": "Small freedoms build big confidence", "hi": "छोटी आज़ादियाँ, बड़ा बढ़ना" },
+      "insight": { "en": "Big confidence grows from small freedoms: the little choices and jobs a child is trusted with.", "hi": "बड़ा आत्मविश्वास छोटी आज़ादियों से बढ़ता है — उन छोटे चुनावों और कामों से जो बच्चे के अपने माने जाते हैं।" },
+      "expanded": { "en": "Independence doesn't arrive in one big moment. It's built from lots of small freedoms offered early: choosing which shirt to wear, pouring their own water, picking which story to read. These choices seem minor to us. To a child they're real practice at being capable. Each small freedom you trust them with says 'Your choices matter, and you can handle them.' Picturing these small freedoms now is already a start on raising a child who will one day step out with confidence.", "hi": "आत्मनिर्भरता कोई एक बड़ा पल नहीं होती जब बच्चा अचानक अकेले दुनिया में क़दम रख देता है। वो जल्दी दी गई अनगिनत नन्ही आज़ादियों से बनती है: कौन-सी कमीज़ पहननी है यह चुनना, अपना पानी ख़ुद डालना, कौन-सी कहानी पढ़नी है यह तय करना। ये छोटे चुनाव हमें मामूली लगते हैं, पर बच्चों के लिए ये असली ताक़त हैं, काबिल इंसान होने का असली अभ्यास। हर छोटी आज़ादी जो आप भरोसे से सौंपती हैं, यह कहती है, 'तुम्हारे चुनाव मायने रखते हैं, और तुमसे ये सँभल जाएँगे।' इन छोटी आज़ादियों को अभी से दिल खोलकर दीजिए, अपनी कल्पना और उम्मीदों में — और आप अभी से उस हिम्मत की नींव रख रही हैं जिससे एक दिन दुनिया में बेधड़क क़दम रखा जाएगा।" },
+      "deepDive": { "en": "Research suggests that giving young children small, limited choices, like picking between two outfits, supports their sense of independence and can mean fewer power struggles.", "hi": "शोध बताते हैं कि छोटे बच्चों को छोटे और सीमित चुनाव देना — जैसे दो कपड़ों में से एक चुनना — उनकी अपनी मर्ज़ी के एहसास को सहारा देता है और ज़िद की खींचतान कम करता है, जबकि फ़ैसले सँभालने लायक़ बने रहते हैं।" },
+      "remember": { "en": "Independence grows one small freedom at a time.", "hi": "बड़ी आत्मनिर्भरता एक-एक छोटी आज़ादी से उगती है।" }
     },
     "readToBaby": {
       "title": { "en": "The Young Weaver's Own Design", "hi": "नन्ही बुनकर का अपना नमूना" },
@@ -218,7 +218,7 @@
     },
     "talkToBaby": {
       "title": { "en": "Tell your baby about a moment you'll be proud of them just by watching, without doing a thing.", "hi": "अपने शिशु को उस पल के बारे में बताइए जब आप कुछ किए बिना, बस देखकर ही उन पर गर्व करेंगी।" },
-      "motivation": { "en": "Some of the proudest moments of parenting are the ones you only get to watch.", "hi": "परवरिश के कुछ सबसे गर्व भरे पल वही होते हैं जिन्हें आप सिर्फ़ देख पाती हैं।" }
+      "motivation": { "en": "Some of the proudest moments in parenting are the ones you only get to watch.", "hi": "परवरिश के कुछ सबसे गर्व भरे पल वही होते हैं जिन्हें आप सिर्फ़ देख पाती हैं।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -233,9 +233,9 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "When Mornings Feel Queasy Still", "hi": "जब सुबह अब भी मितली भरी लगे" },
-      "content": { "en": "If a little queasiness still visits some mornings, try keeping something plain and dry near your bed — a few crackers or a biscuit — to nibble before you even rise. Eating a small bite before your feet touch the floor can settle a tender stomach more kindly than waiting.", "hi": "अगर कुछ सुबहें अब भी थोड़ी मितली लेकर आती हैं, तो बिस्तर के पास कुछ सादा और सूखा रखकर देखिए — कुछ बिस्किट या टोस्ट — उठने से पहले ही थोड़ा कुतरने के लिए। पैर ज़मीन पर रखने से पहले एक छोटा कौर खा लेना, इंतज़ार करने से कहीं ज़्यादा नरमी से नाज़ुक पेट को थाम लेता है।" },
-      "remember": { "en": "A small bite before rising can soothe a tender morning stomach.", "hi": "उठने से पहले एक छोटा कौर नाज़ुक सुबह वाले पेट को शांत कर सकता है।" },
+      "title": { "en": "If mornings still feel queasy", "hi": "जब सुबह अब भी मितली भरी लगे" },
+      "content": { "en": "If some mornings still bring a little nausea, keep something plain and dry by your bed, like a few crackers or a biscuit. Eating a small bite before you get up can settle your stomach. If you can't keep food or water down, call your doctor.", "hi": "अगर कुछ सुबहें अब भी थोड़ी मितली लेकर आती हैं, तो बिस्तर के पास कुछ सादा और सूखा रखकर देखिए — कुछ बिस्किट या टोस्ट — उठने से पहले ही थोड़ा कुतरने के लिए। पैर ज़मीन पर रखने से पहले एक छोटा कौर खा लेना, इंतज़ार करने से कहीं ज़्यादा नरमी से नाज़ुक पेट को थाम लेता है।" },
+      "remember": { "en": "A small bite before getting up can settle a queasy morning.", "hi": "उठने से पहले एक छोटा कौर नाज़ुक सुबह वाले पेट को शांत कर सकता है।" },
       "durationMinutes": 0
     }
   },
@@ -244,11 +244,11 @@
     "week": 25,
     "babyLearning": { "en": "You may feel your baby's hiccups as small rhythmic jumps.", "hi": "हफ़्ता पूरा करते हुए, दिन-ब-दिन और पक्के होते हुए" },
     "grow": {
-      "title": { "en": "Step Back To Let Them Rise", "hi": "पीछे हटिए, ताकि वो उठ सकें" },
-      "insight": { "en": "Sometimes the bravest, most loving thing a parent does is step back — and trust their child to rise.", "hi": "कभी सबसे बहादुर और सबसे प्यार भरा काम यही होता है कि माँ-बाप एक क़दम पीछे हटें — और भरोसा करें कि बच्चे ख़ुद उठ खड़े होंगे।" },
-      "expanded": { "en": "Stepping back can feel like the opposite of love. Everything in you wants to stay close, to hold, to guide every step. But there comes a moment in every small task when the kindest help is to gently let go — to stop hovering, stop correcting, and simply trust. This is not abandonment; it is faith made visible. When you step back with warmth still in your eyes, your child feels both freedom and safety at once. And in that space, they often rise higher than you, or even they, imagined. Learning when to hold on and when to let go is the long, tender art of parenting.", "hi": "पीछे हटना प्यार का उल्टा लग सकता है। आपके भीतर सब कुछ पास रहना चाहता है, थामे रखना चाहता है, हर क़दम पर राह दिखाना चाहता है। पर हर छोटे काम में एक पल ऐसा आता है जब सबसे प्यारी मदद यही होती है कि प्यार से हाथ ढीला कर दिया जाए — सिर पर मँडराना बंद, टोकना बंद, और बस भरोसा। यह छोड़ देना नहीं है; यह दिखाई देता हुआ यक़ीन है। जब आप आँखों में वही गर्मजोशी लिए पीछे हटती हैं, तो बच्चों को एक साथ आज़ादी और सुरक्षा दोनों महसूस होती हैं। और उसी जगह में वो अक्सर आपकी, या अपनी भी, सोच से ऊँचा उठ जाते हैं। कब थामे रखना है और कब छोड़ देना है, यह सीखना ही परवरिश की लंबी, नाज़ुक कला है।" },
-      "deepDive": { "en": "Attachment research suggests children explore most confidently when they have a 'secure base' — a parent who is warm and available, yet does not hover. Trusting them to wander a little is what makes returning feel safe.", "hi": "अटैचमेंट पर हुए शोध कहते हैं कि बच्चे तब सबसे आत्मविश्वास से दुनिया टटोलते हैं जब उनके पास एक 'secure base' हो — यानी ऐसे माँ-बाप जो गर्मजोश और मौजूद हों, पर सिर पर मँडराएँ नहीं। उन्हें थोड़ा भटकने का भरोसा देना ही लौटने को सुरक्षित बनाता है।" },
-      "remember": { "en": "Stepping back, with love in your eyes, lets your child rise.", "hi": "आँखों में प्यार लिए पीछे हटना ही बच्चों को उठने देता है।" }
+      "title": { "en": "Step back so they can rise", "hi": "पीछे हटिए, ताकि वो उठ सकें" },
+      "insight": { "en": "Sometimes the most loving thing a parent can do is step back and trust their child.", "hi": "कभी सबसे बहादुर और सबसे प्यार भरा काम यही होता है कि माँ-बाप एक क़दम पीछे हटें — और भरोसा करें कि बच्चे ख़ुद उठ खड़े होंगे।" },
+      "expanded": { "en": "Stepping back can feel like loving less. Everything in you wants to stay close and guide every step. But in every small task there comes a moment when the kindest help is to let go: stop hovering, stop correcting, and trust. You're still there. You're showing faith in them. When you step back with warmth in your eyes, your child feels free and safe at once. In that space, they often go further than either of you expected. Learning when to hold on and when to let go is a big part of parenting.", "hi": "पीछे हटना प्यार का उल्टा लग सकता है। आपके भीतर सब कुछ पास रहना चाहता है, थामे रखना चाहता है, हर क़दम पर राह दिखाना चाहता है। पर हर छोटे काम में एक पल ऐसा आता है जब सबसे प्यारी मदद यही होती है कि प्यार से हाथ ढीला कर दिया जाए — सिर पर मँडराना बंद, टोकना बंद, और बस भरोसा। यह छोड़ देना नहीं है; यह दिखाई देता हुआ यक़ीन है। जब आप आँखों में वही गर्मजोशी लिए पीछे हटती हैं, तो बच्चों को एक साथ आज़ादी और सुरक्षा दोनों महसूस होती हैं। और उसी जगह में वो अक्सर आपकी, या अपनी भी, सोच से ऊँचा उठ जाते हैं। कब थामे रखना है और कब छोड़ देना है, यह सीखना ही परवरिश की लंबी, नाज़ुक कला है।" },
+      "deepDive": { "en": "Attachment research suggests children explore most confidently when they have a 'secure base': a parent who is warm and available but doesn't hover. Being trusted to wander a little is what makes coming back feel safe.", "hi": "अटैचमेंट पर हुए शोध कहते हैं कि बच्चे तब सबसे आत्मविश्वास से दुनिया टटोलते हैं जब उनके पास एक 'secure base' हो — यानी ऐसे माँ-बाप जो गर्मजोश और मौजूद हों, पर सिर पर मँडराएँ नहीं। उन्हें थोड़ा भटकने का भरोसा देना ही लौटने को सुरक्षित बनाता है।" },
+      "remember": { "en": "Stepping back with love lets your child rise.", "hi": "आँखों में प्यार लिए पीछे हटना ही बच्चों को उठने देता है।" }
     },
     "readToBaby": {
       "title": { "en": "The Stream That Found Its Way", "hi": "वो धारा जिसने अपनी राह ढूँढ़ी" },
@@ -257,8 +257,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby that you will trust them to find their own way through the world.", "hi": "अपने शिशु से कहिए कि दुनिया में अपनी राह ख़ुद ढूँढ़ने का भरोसा आप उन पर करेंगी।" },
-      "motivation": { "en": "Trusting your child to find their way is the deepest faith love can offer.", "hi": "अपने बच्चे पर अपनी राह ख़ुद ढूँढ़ने का भरोसा करना, प्यार का दिया सबसे गहरा यक़ीन है।" }
+      "title": { "en": "Tell your baby you'll trust them to find their own way in the world.", "hi": "अपने शिशु से कहिए कि दुनिया में अपनी राह ख़ुद ढूँढ़ने का भरोसा आप उन पर करेंगी।" },
+      "motivation": { "en": "Trusting your child to find their way is a deep kind of faith.", "hi": "अपने बच्चे पर अपनी राह ख़ुद ढूँढ़ने का भरोसा करना, प्यार का दिया सबसे गहरा यक़ीन है।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -273,9 +273,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Open Hands, Open Breath", "hi": "खुले हाथ, खुली साँस" },
-      "content": { "en": "Rest your hands in your lap with palms turned gently upward and open. Breathe in slowly, and as you breathe out, let your hands and shoulders soften even more. Repeat for one quiet minute, feeling what it is to hold lightly.", "hi": "अपने हाथ गोद में रखिए, हथेलियाँ हल्के से ऊपर की ओर खुली हुई। धीरे-धीरे साँस भीतर लीजिए, और साँस छोड़ते हुए अपने हाथों और कंधों को और नरम पड़ने दीजिए। एक शांत मिनट तक दोहराइए, और महसूस कीजिए कि हल्के से थामना कैसा लगता है।" },
-      "remember": { "en": "Open hands can hold love just as fully as a tight grip.", "hi": "खुले हाथ प्यार को उतनी ही पूरी तरह थाम सकते हैं जितनी कोई कसी पकड़।" },
+      "title": { "en": "Open hands, open breath", "hi": "खुले हाथ, खुली साँस" },
+      "content": { "en": "Rest your hands in your lap with your palms turned up and open. Breathe in slowly, and as you breathe out, let your hands and shoulders soften more. Repeat for one calm minute, noticing what it feels like to hold things lightly.", "hi": "अपने हाथ गोद में रखिए, हथेलियाँ हल्के से ऊपर की ओर खुली हुई। धीरे-धीरे साँस भीतर लीजिए, और साँस छोड़ते हुए अपने हाथों और कंधों को और नरम पड़ने दीजिए। एक शांत मिनट तक दोहराइए, और महसूस कीजिए कि हल्के से थामना कैसा लगता है।" },
+      "remember": { "en": "Open hands can hold as much love as a tight grip.", "hi": "खुले हाथ प्यार को उतनी ही पूरी तरह थाम सकते हैं जितनी कोई कसी पकड़।" },
       "durationMinutes": 1
     }
   }

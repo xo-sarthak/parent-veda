@@ -4,10 +4,10 @@
     "week": 28,
     "babyLearning": { "en": "Your baby can blink and may turn towards a bright light.", "hi": "अंगड़ाई लेता और लात मारता हुआ, एक लय में बसता हुआ" },
     "grow": {
-      "title": { "en": "Where You Come From Matters", "hi": "जड़ें मायने रखती हैं" },
-      "insight": { "en": "Your baby is not arriving into an empty world. They are joining a family with a history, a warmth and a story already waiting.", "hi": "आपका शिशु किसी ख़ाली दुनिया में नहीं आ रहा। वह एक ऐसे परिवार में शामिल हो रहा है जिसका इतिहास, जिसकी गर्मजोशी और जिसकी कहानी पहले से उसका इंतज़ार कर रहे हैं।" },
-      "expanded": { "en": "In these last weeks, it helps to remember that you are not raising your child alone or from scratch. Behind you stands a long line of people who loved, struggled and carried on — and your baby inherits all of it. Knowing where they come from gives a child something quiet and strong to stand on. You do not have to make their world perfect; you only have to let them feel held by something larger than themselves. The family they are born into is their first and softest ground.", "hi": "इन आख़िरी हफ़्तों में यह याद रखना अच्छा लगता है कि आप अपने बच्चे को न अकेले पाल रही हैं, न शून्य से। आपके पीछे लोगों की एक लंबी क़तार खड़ी है — जिन्होंने प्यार किया, संघर्ष किया और चलते रहे — और यह सब आपके शिशु को विरासत में मिलता है। अपनी जड़ों का पता होना एक बच्चे को खड़े होने के लिए कुछ शांत और मज़बूत दे देता है। आपको उसकी दुनिया परफ़ेक्ट नहीं बनानी; बस उसे यह महसूस होने देना है कि उसे ख़ुद से कहीं बड़ी किसी चीज़ ने थाम रखा है। जिस परिवार में वह जन्म लेता है, वही उसकी पहली और सबसे नरम ज़मीन है।" },
-      "deepDive": { "en": "Studies of family storytelling find that children who know their family's history — its ups and downs — tend to feel more resilient and rooted. A sense of belonging acts like an emotional anchor.", "hi": "परिवार की कहानियों पर हुए शोध बताते हैं कि जो बच्चे अपने परिवार का इतिहास जानते हैं — उसके उतार-चढ़ाव भी — वे ख़ुद को ज़्यादा लचीला और जुड़ा हुआ महसूस करते हैं। अपनेपन का एहसास मन के लिए एक लंगर जैसा काम करता है।" },
+      "title": { "en": "Where your baby comes from matters", "hi": "जड़ें मायने रखती हैं" },
+      "insight": { "en": "Your baby isn't arriving into an empty world. They're joining a family with its own history, warmth and story.", "hi": "आपका शिशु किसी ख़ाली दुनिया में नहीं आ रहा। वह एक ऐसे परिवार में शामिल हो रहा है जिसका इतिहास, जिसकी गर्मजोशी और जिसकी कहानी पहले से उसका इंतज़ार कर रहे हैं।" },
+      "expanded": { "en": "In these weeks before your baby arrives, it helps to know you're not raising your child alone or from scratch. Behind you is a long line of people who loved, struggled and carried on, and your baby gets all of that. Knowing where they come from gives a child something strong to stand on. You don't have to make their world perfect. You only have to let them feel held by something bigger than themselves. The family they're born into is the first ground they stand on.", "hi": "इन आख़िरी हफ़्तों में यह याद रखना अच्छा लगता है कि आप अपने बच्चे को न अकेले पाल रही हैं, न शून्य से। आपके पीछे लोगों की एक लंबी क़तार खड़ी है — जिन्होंने प्यार किया, संघर्ष किया और चलते रहे — और यह सब आपके शिशु को विरासत में मिलता है। अपनी जड़ों का पता होना एक बच्चे को खड़े होने के लिए कुछ शांत और मज़बूत दे देता है। आपको उसकी दुनिया परफ़ेक्ट नहीं बनानी; बस उसे यह महसूस होने देना है कि उसे ख़ुद से कहीं बड़ी किसी चीज़ ने थाम रखा है। जिस परिवार में वह जन्म लेता है, वही उसकी पहली और सबसे नरम ज़मीन है।" },
+      "deepDive": { "en": "Studies of family storytelling suggest children who know their family's history, the hard times and the good, tend to feel more resilient and more rooted. Feeling that they belong helps steady them.", "hi": "परिवार की कहानियों पर हुए शोध बताते हैं कि जो बच्चे अपने परिवार का इतिहास जानते हैं — उसके उतार-चढ़ाव भी — वे ख़ुद को ज़्यादा लचीला और जुड़ा हुआ महसूस करते हैं। अपनेपन का एहसास मन के लिए एक लंगर जैसा काम करता है।" },
       "remember": { "en": "Your baby is born already belonging to someone.", "hi": "आपका शिशु जन्म से ही किसी का होकर आता है।" }
     },
     "readToBaby": {
@@ -17,8 +17,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about the family they are being born into — the people who already love them.", "hi": "अपने शिशु को उस परिवार के बारे में बताइए जिसमें वह जन्म ले रहा है — उन लोगों के बारे में जो अभी से उससे प्यार करते हैं।" },
-      "motivation": { "en": "Your baby's first sense of belonging begins with hearing who they belong to.", "hi": "अपनेपन का पहला एहसास आपके शिशु में यह सुनकर ही शुरू होता है कि वह है किसका।" }
+      "title": { "en": "Tell your baby about the family they're being born into, and the people who already love them.", "hi": "अपने शिशु को उस परिवार के बारे में बताइए जिसमें वह जन्म ले रहा है — उन लोगों के बारे में जो अभी से उससे प्यार करते हैं।" },
+      "motivation": { "en": "Your baby's first sense of belonging starts with hearing who they belong to.", "hi": "अपनेपन का पहला एहसास आपके शिशु में यह सुनकर ही शुरू होता है कि वह है किसका।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -33,9 +33,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Rooting Breath", "hi": "जड़ जमाती साँस" },
-      "content": { "en": "Sit with both feet flat on the floor. Breathe in slowly and imagine drawing steadiness up from the ground; breathe out and feel yourself settle. Repeat for one quiet minute.", "hi": "दोनों पैर ज़मीन पर सीधे टिकाकर बैठिए। धीरे से साँस लीजिए और सोचिए कि आप ज़मीन से एक ठहराव ऊपर की ओर खींच रही हैं; साँस छोड़िए और ख़ुद को जमता हुआ महसूस कीजिए। एक शांत मिनट तक दोहराइए।" },
-      "remember": { "en": "When you feel grounded, your baby does too.", "hi": "जब आप ख़ुद को जमी हुई महसूस करती हैं, आपका शिशु भी वही महसूस करता है।" },
+      "title": { "en": "A grounding breath", "hi": "जड़ जमाती साँस" },
+      "content": { "en": "Sit with both feet flat on the floor. Breathe in slowly and imagine drawing steadiness up from the ground. Breathe out and feel yourself settle. Repeat for one calm minute.", "hi": "दोनों पैर ज़मीन पर सीधे टिकाकर बैठिए। धीरे से साँस लीजिए और सोचिए कि आप ज़मीन से एक ठहराव ऊपर की ओर खींच रही हैं; साँस छोड़िए और ख़ुद को जमता हुआ महसूस कीजिए। एक शांत मिनट तक दोहराइए।" },
+      "remember": { "en": "When you feel grounded, your baby feels it too.", "hi": "जब आप ख़ुद को जमी हुई महसूस करती हैं, आपका शिशु भी वही महसूस करता है।" },
       "durationMinutes": 2
     }
   },
@@ -44,11 +44,11 @@
     "week": 28,
     "babyLearning": { "en": "Your baby's eyelashes are fully grown now.", "hi": "आवाज़ों का जवाब नन्ही लातों से देता हुआ" },
     "grow": {
-      "title": { "en": "Belonging Is A Gift", "hi": "अपनापन एक तोहफ़ा है" },
-      "insight": { "en": "To belong somewhere — to be claimed and held by people — is one of the first and greatest gifts you can give your child.", "hi": "कहीं का होना — लोगों का अपना कहकर थाम लेना — उन पहले और सबसे बड़े तोहफ़ों में से एक है जो आप अपने बच्चे को दे सकती हैं।" },
-      "expanded": { "en": "Long before your child can name it, they will feel whether they are wanted. Belonging is not something a child earns; it is something we give freely, simply because they are ours. The grandparents who already speak of them, the aunts and uncles who wait, the home being readied — all of this tells your baby, without a single word, that they have a place. That quiet certainty becomes the floor beneath everything they will ever try, risk and become. You are not just expecting a baby; a whole circle is widening to make room.", "hi": "आपका बच्चा इसे नाम दे सके, उससे बहुत पहले ही वह महसूस कर लेता है कि उसे चाहा गया है या नहीं। अपनापन कोई ऐसी चीज़ नहीं जो बच्चा कमाता है; यह वह है जो हम खुले दिल से देते हैं, सिर्फ़ इसलिए कि वह हमारा है। वे दादा-दादी और नाना-नानी जो अभी से उसकी बातें करते हैं, वे चाचा-मौसी जो इंतज़ार कर रहे हैं, वह घर जो तैयार हो रहा है — यह सब आपके शिशु को बिना एक शब्द कहे बता देता है कि उसकी एक जगह है। वही शांत भरोसा आगे चलकर उस हर चीज़ के नीचे की ज़मीन बन जाता है जो वह कभी आज़माएगा, जिसका जोखिम उठाएगा और जो वह बनेगा। आप सिर्फ़ एक शिशु का इंतज़ार नहीं कर रहीं; एक पूरा घेरा जगह बनाने के लिए फैलता जा रहा है।" },
-      "deepDive": { "en": "Child development experts note that a secure sense of belonging in the early years is strongly linked to confidence and emotional health later. Feeling 'part of us' is foundational, not optional.", "hi": "बाल-विकास के जानकार बताते हैं कि शुरुआती सालों में अपनेपन का एक सुरक्षित एहसास आगे चलकर आत्मविश्वास और मन की सेहत से गहराई से जुड़ा होता है। 'हम में से एक' होने का एहसास बुनियादी है, कोई ऊपरी चीज़ नहीं।" },
-      "remember": { "en": "Belonging is given freely, never earned.", "hi": "अपनापन खुले दिल से दिया जाता है, कमाया कभी नहीं जाता।" }
+      "title": { "en": "Belonging is a gift you give", "hi": "अपनापन एक तोहफ़ा है" },
+      "insight": { "en": "Being claimed and held by people is one of the first and biggest gifts you can give your child.", "hi": "कहीं का होना — लोगों का अपना कहकर थाम लेना — उन पहले और सबसे बड़े तोहफ़ों में से एक है जो आप अपने बच्चे को दे सकती हैं।" },
+      "expanded": { "en": "Long before your child can name it, they'll feel whether they're wanted. A child doesn't have to earn belonging. We give it freely, because they're ours. The grandparents who already talk about them, the aunts and uncles who are waiting, the home being got ready: all of this tells your baby they have a place. That sure feeling sits under everything they'll ever try and become. You're not only expecting a baby. A whole circle of people is making room.", "hi": "आपका बच्चा इसे नाम दे सके, उससे बहुत पहले ही वह महसूस कर लेता है कि उसे चाहा गया है या नहीं। अपनापन कोई ऐसी चीज़ नहीं जो बच्चा कमाता है; यह वह है जो हम खुले दिल से देते हैं, सिर्फ़ इसलिए कि वह हमारा है। वे दादा-दादी और नाना-नानी जो अभी से उसकी बातें करते हैं, वे चाचा-मौसी जो इंतज़ार कर रहे हैं, वह घर जो तैयार हो रहा है — यह सब आपके शिशु को बिना एक शब्द कहे बता देता है कि उसकी एक जगह है। वही शांत भरोसा आगे चलकर उस हर चीज़ के नीचे की ज़मीन बन जाता है जो वह कभी आज़माएगा, जिसका जोखिम उठाएगा और जो वह बनेगा। आप सिर्फ़ एक शिशु का इंतज़ार नहीं कर रहीं; एक पूरा घेरा जगह बनाने के लिए फैलता जा रहा है।" },
+      "deepDive": { "en": "Child development experts note that a secure sense of belonging in the early years is linked with confidence and emotional health later on. Feeling part of a family is a strong foundation.", "hi": "बाल-विकास के जानकार बताते हैं कि शुरुआती सालों में अपनेपन का एक सुरक्षित एहसास आगे चलकर आत्मविश्वास और मन की सेहत से गहराई से जुड़ा होता है। 'हम में से एक' होने का एहसास बुनियादी है, कोई ऊपरी चीज़ नहीं।" },
+      "remember": { "en": "Belonging is given freely. A child never has to earn it.", "hi": "अपनापन खुले दिल से दिया जाता है, कमाया कभी नहीं जाता।" }
     },
     "readToBaby": {
       "title": { "en": "The Wise Bird And The Foolish Monkeys", "hi": "समझदार चिड़िया और नासमझ बंदर" },
@@ -57,8 +57,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about their grandparents and the way they already love them.", "hi": "अपने शिशु को उसके दादा-दादी और नाना-नानी के बारे में बताइए, और यह कि वे अभी से उससे कैसे प्यार करते हैं।" },
-      "motivation": { "en": "Speaking of the elders' love stitches your baby into a long line of belonging.", "hi": "बड़ों के प्यार की बात करना आपके शिशु को अपनेपन की एक लंबी कड़ी में सी देता है।" }
+      "title": { "en": "Tell your baby about their grandparents and how they already love them.", "hi": "अपने शिशु को उसके दादा-दादी और नाना-नानी के बारे में बताइए, और यह कि वे अभी से उससे कैसे प्यार करते हैं।" },
+      "motivation": { "en": "Talking about the elders' love connects your baby to a long line of family.", "hi": "बड़ों के प्यार की बात करना आपके शिशु को अपनेपन की एक लंबी कड़ी में सी देता है।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -73,9 +73,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "I Come From Strength", "hi": "मैं ताक़त से आई हूँ" },
-      "content": { "en": "I carry the courage of everyone who came before me. I am not doing this alone, and I never was.", "hi": "जो मुझसे पहले आए, उन सबकी हिम्मत मैं अपने साथ लिए चलती हूँ। मैं यह अकेले नहीं कर रही, और कभी अकेले थी भी नहीं।" },
-      "remember": { "en": "You are the latest in a long line of strong hearts.", "hi": "मज़बूत दिलों की एक लंबी कड़ी में सबसे नई आप हैं।" },
+      "title": { "en": "I come from strong people", "hi": "मैं ताक़त से आई हूँ" },
+      "content": { "en": "I carry the courage of everyone who came before me. I'm not doing this alone, and I never was.", "hi": "जो मुझसे पहले आए, उन सबकी हिम्मत मैं अपने साथ लिए चलती हूँ। मैं यह अकेले नहीं कर रही, और कभी अकेले थी भी नहीं।" },
+      "remember": { "en": "You come from a long line of strong people.", "hi": "मज़बूत दिलों की एक लंबी कड़ी में सबसे नई आप हैं।" },
       "durationMinutes": 0
     }
   },
@@ -84,11 +84,11 @@
     "week": 28,
     "babyLearning": { "en": "Your baby has spells of dream sleep (REM sleep) now.", "hi": "आपकी आवाज़ की तरफ़ मुड़ता हुआ, आपकी गर्मजोशी पहचानता हुआ" },
     "grow": {
-      "title": { "en": "Roots Give Wings", "hi": "जड़ें ही पंख देती हैं" },
-      "insight": { "en": "A child who feels deeply rooted is the one most free to explore. Belonging does not hold them back — it sets them free.", "hi": "जिस बच्चे की जड़ें गहरी होती हैं, वही खोजने के लिए सबसे आज़ाद होता है। अपनापन उसे रोकता नहीं — वही उसे आज़ाद करता है।" },
-      "expanded": { "en": "It can seem as if roots and freedom pull against each other — as if to hold a child close is to keep them small. But the opposite is true. A child who knows there is always a place to return to is the one brave enough to wander far. The security of home becomes the launchpad, not the cage. As you prepare your baby's place in the world, know that every bit of warmth and belonging you build is also building their future courage. Deep roots are what make tall branches possible.", "hi": "ऐसा लग सकता है जैसे जड़ें और आज़ादी एक-दूसरे को उल्टी दिशा में खींचती हों — जैसे बच्चे को पास रखना उसे छोटा बनाए रखना हो। पर सच इसका उल्टा है। जो बच्चा जानता है कि लौटने के लिए हमेशा एक जगह है, वही इतनी हिम्मत रखता है कि दूर तक निकल जाए। घर की सुरक्षा उड़ान भरने की ज़मीन बन जाती है, पिंजरा नहीं। जैसे-जैसे आप दुनिया में अपने शिशु की जगह तैयार करती हैं, यह जान लीजिए कि आप जितनी गर्मजोशी और अपनापन बना रही हैं, वह आगे चलकर उसकी हिम्मत भी बना रहा है। गहरी जड़ें ही ऊँची डालियों को मुमकिन बनाती हैं।" },
-      "deepDive": { "en": "Attachment research is clear: children with a secure base — a sense that home is safe and steady — explore more boldly and recover from setbacks faster. Closeness builds courage, it does not weaken it.", "hi": "जुड़ाव पर हुए शोध साफ़ कहते हैं: जिन बच्चों के पास एक सुरक्षित ठिकाना होता है — यह एहसास कि घर सुरक्षित और टिका हुआ है — वे ज़्यादा हिम्मत से दुनिया खोजते हैं और ठोकरों से जल्दी सँभल जाते हैं। नज़दीकी हिम्मत बनाती है, उसे कमज़ोर नहीं करती।" },
-      "remember": { "en": "Deep roots are what let the branches reach high.", "hi": "गहरी जड़ें ही डालियों को ऊँचाई तक पहुँचने देती हैं।" }
+      "title": { "en": "Feeling rooted helps a child explore", "hi": "जड़ें ही पंख देती हैं" },
+      "insight": { "en": "A child who feels rooted is the one most free to explore. Belonging gives them the courage to go further.", "hi": "जिस बच्चे की जड़ें गहरी होती हैं, वही खोजने के लिए सबसे आज़ाद होता है। अपनापन उसे रोकता नहीं — वही उसे आज़ाद करता है।" },
+      "expanded": { "en": "It can seem that holding a child close keeps them small. But a child who knows there's always a place to come back to is the one brave enough to wander far. The safety of home is what lets them set out. As you get your baby's place in the world ready, every bit of warmth and belonging you build is also building their courage for later. Deep roots let a tree grow tall.", "hi": "ऐसा लग सकता है जैसे जड़ें और आज़ादी एक-दूसरे को उल्टी दिशा में खींचती हों — जैसे बच्चे को पास रखना उसे छोटा बनाए रखना हो। पर सच इसका उल्टा है। जो बच्चा जानता है कि लौटने के लिए हमेशा एक जगह है, वही इतनी हिम्मत रखता है कि दूर तक निकल जाए। घर की सुरक्षा उड़ान भरने की ज़मीन बन जाती है, पिंजरा नहीं। जैसे-जैसे आप दुनिया में अपने शिशु की जगह तैयार करती हैं, यह जान लीजिए कि आप जितनी गर्मजोशी और अपनापन बना रही हैं, वह आगे चलकर उसकी हिम्मत भी बना रहा है। गहरी जड़ें ही ऊँची डालियों को मुमकिन बनाती हैं।" },
+      "deepDive": { "en": "Attachment research suggests children with a secure base, a sense that home is safe and steady, explore more boldly and recover from setbacks faster. Closeness helps build courage.", "hi": "जुड़ाव पर हुए शोध साफ़ कहते हैं: जिन बच्चों के पास एक सुरक्षित ठिकाना होता है — यह एहसास कि घर सुरक्षित और टिका हुआ है — वे ज़्यादा हिम्मत से दुनिया खोजते हैं और ठोकरों से जल्दी सँभल जाते हैं। नज़दीकी हिम्मत बनाती है, उसे कमज़ोर नहीं करती।" },
+      "remember": { "en": "Deep roots let a child reach high.", "hi": "गहरी जड़ें ही डालियों को ऊँचाई तक पहुँचने देती हैं।" }
     },
     "readToBaby": {
       "title": { "en": "Krishna's Two Mothers", "hi": "कृष्ण की दो माँएँ" },
@@ -97,8 +97,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about the home that is waiting to welcome them.", "hi": "अपने शिशु को उस घर के बारे में बताइए जो उसका स्वागत करने के लिए तैयार बैठा है।" },
-      "motivation": { "en": "Describing their home aloud begins building their first sense of safe ground.", "hi": "उसका घर बोलकर बताना उसके भीतर सुरक्षित ज़मीन का पहला एहसास बनाना शुरू कर देता है।" }
+      "title": { "en": "Tell your baby about the home that's waiting to welcome them.", "hi": "अपने शिशु को उस घर के बारे में बताइए जो उसका स्वागत करने के लिए तैयार बैठा है।" },
+      "motivation": { "en": "Describing their home out loud starts building their first feeling of safety.", "hi": "उसका घर बोलकर बताना उसके भीतर सुरक्षित ज़मीन का पहला एहसास बनाना शुरू कर देता है।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -113,9 +113,9 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "When Nothing Feels Like Enough", "hi": "जब कुछ भी काफ़ी न लगे" },
-      "content": { "en": "In these weeks your belly leaves little room, and big meals can feel too heavy. Try small, warm plates spread through the day — a bowl of khichdi, some dal and rice, soft fruit. Gentle and often is kinder to you both right now than large and rare.", "hi": "इन हफ़्तों में पेट में जगह कम बचती है, और भारी खाना बहुत ज़्यादा लग सकता है। दिन भर में छोटी-छोटी, गर्म थालियाँ बाँटकर देखिए — एक कटोरी खिचड़ी, थोड़ा दाल-चावल, नरम फल। अभी थोड़ा-थोड़ा और बार-बार, भारी और कभी-कभार से आप दोनों पर ज़्यादा मेहरबान है।" },
-      "remember": { "en": "Small and often beats large and rare these days.", "hi": "इन दिनों थोड़ा-थोड़ा और बार-बार, भारी और कभी-कभार से बेहतर है।" },
+      "title": { "en": "When big meals feel too much", "hi": "जब कुछ भी काफ़ी न लगे" },
+      "content": { "en": "In these weeks your belly leaves little room, and big meals can feel too heavy. Try small, warm plates through the day, like a bowl of khichdi, some dal and rice, or soft fruit. Little and often is easier on you both right now.", "hi": "इन हफ़्तों में पेट में जगह कम बचती है, और भारी खाना बहुत ज़्यादा लग सकता है। दिन भर में छोटी-छोटी, गर्म थालियाँ बाँटकर देखिए — एक कटोरी खिचड़ी, थोड़ा दाल-चावल, नरम फल। अभी थोड़ा-थोड़ा और बार-बार, भारी और कभी-कभार से आप दोनों पर ज़्यादा मेहरबान है।" },
+      "remember": { "en": "Little and often works better than large meals these days.", "hi": "इन दिनों थोड़ा-थोड़ा और बार-बार, भारी और कभी-कभार से बेहतर है।" },
       "durationMinutes": 0
     }
   },
@@ -124,11 +124,11 @@
     "week": 28,
     "babyLearning": { "en": "Your baby's kicks may be strong enough to see from outside.", "hi": "लात मारता और करवट लेता हुआ, अब मज़बूत और चुस्त" },
     "grow": {
-      "title": { "en": "You Carry Generations", "hi": "आप पीढ़ियाँ अपने साथ लिए चलती हैं" },
-      "insight": { "en": "Inside you grows a child who carries the faces, gifts and stories of everyone who came before. They are a living thread of generations.", "hi": "आपके भीतर एक ऐसा बच्चा बढ़ रहा है जो अपने साथ उन सबके चेहरे, हुनर और कहानियाँ लिए है जो पहले आए। वह पीढ़ियों का एक ज़िंदा धागा है।" },
-      "expanded": { "en": "Your baby is not beginning the story; they are its newest chapter. Somewhere in them may live a grandparent's laugh, a great-aunt's stubborn courage, a way of humming passed down without anyone teaching it. There is something deeply steadying in this — your child is not alone in the world, but woven into a long, living cloth of people. When you sense how much they carry forward, parenting feels less like building from nothing and more like passing on a flame that has been burning for a very long time.", "hi": "आपका शिशु कहानी शुरू नहीं कर रहा; वह उसका सबसे नया अध्याय है। उसके भीतर कहीं दादी की हँसी बसी हो सकती है, किसी बुज़ुर्ग की ज़िद्दी हिम्मत, या गुनगुनाने का वह अंदाज़ जो बिना किसी के सिखाए आगे चला आया। इसमें कुछ बहुत ठहराव देने वाला है — आपका बच्चा दुनिया में अकेला नहीं, बल्कि लोगों के एक लंबे, ज़िंदा कपड़े में बुना हुआ है। जब आप महसूस करती हैं कि वह कितना कुछ आगे लिए जा रहा है, तो परवरिश शून्य से कुछ बनाने जैसी कम और एक ऐसी लौ आगे बढ़ाने जैसी ज़्यादा लगती है जो बहुत लंबे समय से जल रही है।" },
-      "deepDive": { "en": "Researchers find that children who hear stories of their ancestors and family roots develop a stronger 'intergenerational self' — a felt sense of being part of something enduring, which supports wellbeing.", "hi": "शोधकर्ता पाते हैं कि जो बच्चे अपने पुरखों और परिवार की जड़ों की कहानियाँ सुनते हैं, उनमें एक मज़बूत 'intergenerational self' बनता है — किसी टिकाऊ चीज़ का हिस्सा होने का महसूस किया हुआ एहसास, जो मन की भलाई में मदद करता है।" },
-      "remember": { "en": "Your child is a living thread between past and future.", "hi": "आपका बच्चा बीते कल और आने वाले कल के बीच एक ज़िंदा धागा है।" }
+      "title": { "en": "Your baby carries generations", "hi": "आप पीढ़ियाँ अपने साथ लिए चलती हैं" },
+      "insight": { "en": "Your baby carries the faces, gifts and stories of everyone who came before. They connect the generations.", "hi": "आपके भीतर एक ऐसा बच्चा बढ़ रहा है जो अपने साथ उन सबके चेहरे, हुनर और कहानियाँ लिए है जो पहले आए। वह पीढ़ियों का एक ज़िंदा धागा है।" },
+      "expanded": { "en": "Your baby isn't starting a new story. They're the newest chapter of an old one. Somewhere in them there may be a grandparent's laugh, a great-aunt's stubborn courage, or a way of humming that no one had to teach. There's something steadying in this. Your child isn't alone in the world. They're part of a long line of people. When you see how much they carry forward, parenting feels less like building from nothing and more like passing on something that's been handed down for a long time.", "hi": "आपका शिशु कहानी शुरू नहीं कर रहा; वह उसका सबसे नया अध्याय है। उसके भीतर कहीं दादी की हँसी बसी हो सकती है, किसी बुज़ुर्ग की ज़िद्दी हिम्मत, या गुनगुनाने का वह अंदाज़ जो बिना किसी के सिखाए आगे चला आया। इसमें कुछ बहुत ठहराव देने वाला है — आपका बच्चा दुनिया में अकेला नहीं, बल्कि लोगों के एक लंबे, ज़िंदा कपड़े में बुना हुआ है। जब आप महसूस करती हैं कि वह कितना कुछ आगे लिए जा रहा है, तो परवरिश शून्य से कुछ बनाने जैसी कम और एक ऐसी लौ आगे बढ़ाने जैसी ज़्यादा लगती है जो बहुत लंबे समय से जल रही है।" },
+      "deepDive": { "en": "Researchers find that children who hear stories about their family's past tend to develop what's called an 'intergenerational self': a sense of being part of something lasting, which supports wellbeing.", "hi": "शोधकर्ता पाते हैं कि जो बच्चे अपने पुरखों और परिवार की जड़ों की कहानियाँ सुनते हैं, उनमें एक मज़बूत 'intergenerational self' बनता है — किसी टिकाऊ चीज़ का हिस्सा होने का महसूस किया हुआ एहसास, जो मन की भलाई में मदद करता है।" },
+      "remember": { "en": "Your child links the past and the future.", "hi": "आपका बच्चा बीते कल और आने वाले कल के बीच एक ज़िंदा धागा है।" }
     },
     "readToBaby": {
       "title": { "en": "The Elephant Who Remembered", "hi": "वह हथिनी जिसे सब याद था" },
@@ -137,8 +137,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby where your family comes from — the places and roots that made you.", "hi": "अपने शिशु को बताइए कि आपका परिवार कहाँ से आता है — वे जगहें और जड़ें जिन्होंने आपको बनाया।" },
-      "motivation": { "en": "Naming your roots aloud hands your baby a map of where they belong.", "hi": "अपनी जड़ों को बोलकर बताना आपके शिशु के हाथ में उसके अपनेपन का नक्शा थमा देता है।" }
+      "title": { "en": "Tell your baby where your family comes from, the places and roots that made you.", "hi": "अपने शिशु को बताइए कि आपका परिवार कहाँ से आता है — वे जगहें और जड़ें जिन्होंने आपको बनाया।" },
+      "motivation": { "en": "Sharing your roots out loud shows your baby where they belong.", "hi": "अपनी जड़ों को बोलकर बताना आपके शिशु के हाथ में उसके अपनेपन का नक्शा थमा देता है।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -153,9 +153,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Breathing Down The Spine", "hi": "रीढ़ के साथ बहती साँस" },
-      "content": { "en": "Sit tall and breathe in slowly. As you breathe out, imagine warmth flowing gently down your spine, easing each tired muscle. Repeat for one slow minute.", "hi": "सीधी बैठिए और धीरे से साँस लीजिए। साँस छोड़ते हुए सोचिए कि एक गर्माहट नरमी से आपकी रीढ़ के साथ नीचे बह रही है और हर थकी हुई मांसपेशी को आराम देती जा रही है। एक धीमे मिनट तक दोहराइए।" },
-      "remember": { "en": "Your body carries a lot; let the breath unburden it.", "hi": "आपका शरीर बहुत कुछ ढोता है; साँस को उसका बोझ हल्का करने दीजिए।" },
+      "title": { "en": "Breathing down the spine", "hi": "रीढ़ के साथ बहती साँस" },
+      "content": { "en": "Sit tall and breathe in slowly. As you breathe out, imagine warmth flowing gently down your spine and easing each tired muscle. Repeat for one slow minute.", "hi": "सीधी बैठिए और धीरे से साँस लीजिए। साँस छोड़ते हुए सोचिए कि एक गर्माहट नरमी से आपकी रीढ़ के साथ नीचे बह रही है और हर थकी हुई मांसपेशी को आराम देती जा रही है। एक धीमे मिनट तक दोहराइए।" },
+      "remember": { "en": "You're carrying a lot. Let a slow breath lighten it.", "hi": "आपका शरीर बहुत कुछ ढोता है; साँस को उसका बोझ हल्का करने दीजिए।" },
       "durationMinutes": 2
     }
   },
@@ -164,10 +164,10 @@
     "week": 28,
     "babyLearning": { "en": "Your baby has a pattern of movements that you'll come to know.", "hi": "थमता हुआ, फिर अंगड़ाई लेता हुआ, आराम ढूँढता हुआ" },
     "grow": {
-      "title": { "en": "Home Is A Feeling", "hi": "घर एक एहसास है" },
-      "insight": { "en": "Home is not a building or a place on a map. For your baby, home will be a feeling — the feeling of you.", "hi": "घर कोई इमारत या नक्शे पर बनी कोई जगह नहीं है। आपके शिशु के लिए घर एक एहसास होगा — आपका एहसास।" },
-      "expanded": { "en": "We often picture home as a house — rooms, walls, a familiar door. But long before your baby knows any of that, home will mean something far simpler: your heartbeat, your voice, the warmth of being held. Home is wherever they feel safe, and right now that home is entirely you. This is a comforting thing to remember in the busy work of preparing a nursery. The most important home you are making cannot be furnished or bought. It is made of your presence, and your baby already lives inside it.", "hi": "हम अक्सर घर को एक मकान की तरह सोचते हैं — कमरे, दीवारें, एक जाना-पहचाना दरवाज़ा। पर आपका शिशु इनमें से कुछ भी जाने, उससे बहुत पहले घर का मतलब कुछ बहुत सीधा-सा होगा: आपकी धड़कन, आपकी आवाज़, थामे जाने की गर्माहट। घर वहीं है जहाँ उसे सुरक्षित लगे, और अभी वह घर पूरी तरह आप हैं। बच्चे का कमरा तैयार करने की भागदौड़ में यह याद रखना सुकून देता है। जो सबसे ज़रूरी घर आप बना रही हैं, उसे न सजाया जा सकता है न ख़रीदा। वह आपकी मौजूदगी से बना है, और आपका शिशु पहले से ही उसके भीतर रहता है।" },
-      "deepDive": { "en": "Newborns recognise their mother's voice and scent within days, having learned them in the womb. The earliest sense of 'home' is sensory and relational, long before it is a physical place.", "hi": "नवजात शिशु कुछ ही दिनों में अपनी माँ की आवाज़ और ख़ुशबू पहचान लेते हैं — यह सब वे गर्भ में ही सीख चुके होते हैं। 'घर' का सबसे पहला एहसास इंद्रियों और रिश्तों का होता है, किसी असली जगह का होने से बहुत पहले।" },
+      "title": { "en": "To your baby, home is a feeling", "hi": "घर एक एहसास है" },
+      "insight": { "en": "Home isn't a building or a place on a map. For your baby, home will be a feeling: the feeling of you.", "hi": "घर कोई इमारत या नक्शे पर बनी कोई जगह नहीं है। आपके शिशु के लिए घर एक एहसास होगा — आपका एहसास।" },
+      "expanded": { "en": "We often picture home as a house, with rooms, walls and a familiar door. But long before your baby knows any of that, home will mean something simpler: a heartbeat, a voice, the warmth of being held. Home is wherever they feel safe, and right now that's you. It's a comforting thought while you're busy getting the baby's corner ready. The most important home you're making can't be furnished or bought. It's made of you being there.", "hi": "हम अक्सर घर को एक मकान की तरह सोचते हैं — कमरे, दीवारें, एक जाना-पहचाना दरवाज़ा। पर आपका शिशु इनमें से कुछ भी जाने, उससे बहुत पहले घर का मतलब कुछ बहुत सीधा-सा होगा: आपकी धड़कन, आपकी आवाज़, थामे जाने की गर्माहट। घर वहीं है जहाँ उसे सुरक्षित लगे, और अभी वह घर पूरी तरह आप हैं। बच्चे का कमरा तैयार करने की भागदौड़ में यह याद रखना सुकून देता है। जो सबसे ज़रूरी घर आप बना रही हैं, उसे न सजाया जा सकता है न ख़रीदा। वह आपकी मौजूदगी से बना है, और आपका शिशु पहले से ही उसके भीतर रहता है।" },
+      "deepDive": { "en": "Newborns can recognise their mother's voice from birth, having heard it in the womb, and they learn familiar smells within days. A baby's first sense of home comes from people and senses, long before it's a place.", "hi": "नवजात शिशु कुछ ही दिनों में अपनी माँ की आवाज़ और ख़ुशबू पहचान लेते हैं — यह सब वे गर्भ में ही सीख चुके होते हैं। 'घर' का सबसे पहला एहसास इंद्रियों और रिश्तों का होता है, किसी असली जगह का होने से बहुत पहले।" },
       "remember": { "en": "To your baby, you are home.", "hi": "आपके शिशु के लिए घर आप ही हैं।" }
     },
     "readToBaby": {
@@ -178,7 +178,7 @@
     },
     "talkToBaby": {
       "title": { "en": "Tell your baby about a place that has always felt like home to you.", "hi": "अपने शिशु को किसी ऐसी जगह के बारे में बताइए जो आपको हमेशा घर जैसी लगी है।" },
-      "motivation": { "en": "Sharing what home feels like to you teaches your baby the shape of belonging.", "hi": "आपको घर कैसा लगता है, यह बाँटना आपके शिशु को अपनेपन की शक्ल सिखा देता है।" }
+      "motivation": { "en": "Sharing what home feels like to you shows your baby what belonging feels like.", "hi": "आपको घर कैसा लगता है, यह बाँटना आपके शिशु को अपनेपन की शक्ल सिखा देता है।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -193,9 +193,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "I Carry Home Within Me", "hi": "घर मैं अपने भीतर लिए चलती हूँ" },
-      "content": { "en": "I do not need everything to be perfect to feel at home. I carry calm and belonging within me, wherever I am.", "hi": "घर जैसा महसूस करने के लिए मुझे हर चीज़ का परफ़ेक्ट होना ज़रूरी नहीं। शांति और अपनापन मैं अपने भीतर लिए चलती हूँ, मैं जहाँ भी रहूँ।" },
-      "remember": { "en": "Home is something you carry, not only somewhere you go.", "hi": "घर वह है जो आप अपने साथ लिए चलती हैं, सिर्फ़ कोई जगह नहीं जहाँ आप जाती हैं।" },
+      "title": { "en": "I carry home with me", "hi": "घर मैं अपने भीतर लिए चलती हूँ" },
+      "content": { "en": "I don't need everything to be perfect to feel at home. I carry calm and belonging with me, wherever I am.", "hi": "घर जैसा महसूस करने के लिए मुझे हर चीज़ का परफ़ेक्ट होना ज़रूरी नहीं। शांति और अपनापन मैं अपने भीतर लिए चलती हूँ, मैं जहाँ भी रहूँ।" },
+      "remember": { "en": "Home is something you carry with you, as well as somewhere you go.", "hi": "घर वह है जो आप अपने साथ लिए चलती हैं, सिर्फ़ कोई जगह नहीं जहाँ आप जाती हैं।" },
       "durationMinutes": 0
     }
   },
@@ -204,10 +204,10 @@
     "week": 28,
     "babyLearning": { "en": "Your baby's hair may be growing longer.", "hi": "ध्यान से सुनता हुआ, आसपास की आवाज़ें पहचानता हुआ" },
     "grow": {
-      "title": { "en": "Know Your Story", "hi": "अपनी कहानी जानिए" },
-      "insight": { "en": "One of the kindest things you can give your child is their story — where they began, and the people who waited for them.", "hi": "सबसे मेहरबान तोहफ़ों में से एक जो आप अपने बच्चे को दे सकती हैं, वह है उसकी अपनी कहानी — वह शुरू कहाँ से हुआ, और वे लोग जिन्होंने उसका इंतज़ार किया।" },
-      "expanded": { "en": "Every child wonders, sooner or later, 'Where did I come from? Whose am I?' Long before they can ask, you can begin gathering the answers — the small stories of how they were waited for, who held the news with joy, what the family hoped for them. These are not grand tales; they are the simple threads of belonging. A child who grows up knowing their story carries a quiet confidence: they know they did not appear by accident, but arrived into open and waiting arms.", "hi": "हर बच्चा देर-सवेर सोचता है, 'मैं आया कहाँ से? मैं हूँ किसका?' उसके पूछ पाने से बहुत पहले, आप जवाब इकट्ठे करना शुरू कर सकती हैं — वे छोटी-छोटी बातें कि उसका इंतज़ार कैसे हुआ, किसने यह ख़बर ख़ुशी से थामी, परिवार ने उसके लिए क्या-क्या सोचा। ये कोई बड़ी दास्तानें नहीं; ये अपनेपन के सीधे-सादे धागे हैं। जो बच्चा अपनी कहानी जानते हुए बड़ा होता है, उसमें एक शांत भरोसा रहता है: वह जानता है कि वह इत्तेफ़ाक़ से नहीं आ गया, बल्कि खुली और इंतज़ार करती बाँहों में आया है।" },
-      "deepDive": { "en": "Family researchers found that children who could answer questions about their family history scored higher on measures of resilience and self-esteem. Knowing one's story is quietly protective.", "hi": "परिवारों पर काम करने वाले शोधकर्ताओं ने पाया कि जो बच्चे अपने परिवार के इतिहास के सवालों का जवाब दे पाते थे, वे लचीलेपन और आत्म-सम्मान के पैमानों पर ज़्यादा ऊपर निकले। अपनी कहानी जानना चुपचाप बचाव का काम करता है।" },
+      "title": { "en": "Give your child their story", "hi": "अपनी कहानी जानिए" },
+      "insight": { "en": "One of the kindest things you can give your child is their story: where they began, and the people who waited for them.", "hi": "सबसे मेहरबान तोहफ़ों में से एक जो आप अपने बच्चे को दे सकती हैं, वह है उसकी अपनी कहानी — वह शुरू कहाँ से हुआ, और वे लोग जिन्होंने उसका इंतज़ार किया।" },
+      "expanded": { "en": "Sooner or later, every child wonders 'Where did I come from? Who do I belong to?' Long before they can ask, you can start gathering the answers: how they were waited for, who was overjoyed at the news, what the family hoped for them. These don't need to be grand stories. They're the small things that make a child feel they belong. A child who grows up knowing their story feels sure of themselves. They know they arrived into open, waiting arms.", "hi": "हर बच्चा देर-सवेर सोचता है, 'मैं आया कहाँ से? मैं हूँ किसका?' उसके पूछ पाने से बहुत पहले, आप जवाब इकट्ठे करना शुरू कर सकती हैं — वे छोटी-छोटी बातें कि उसका इंतज़ार कैसे हुआ, किसने यह ख़बर ख़ुशी से थामी, परिवार ने उसके लिए क्या-क्या सोचा। ये कोई बड़ी दास्तानें नहीं; ये अपनेपन के सीधे-सादे धागे हैं। जो बच्चा अपनी कहानी जानते हुए बड़ा होता है, उसमें एक शांत भरोसा रहता है: वह जानता है कि वह इत्तेफ़ाक़ से नहीं आ गया, बल्कि खुली और इंतज़ार करती बाँहों में आया है।" },
+      "deepDive": { "en": "In one well-known line of research, children who could answer more questions about their family's history tended to score higher on measures of resilience and self-esteem. Knowing their story seems to help protect them.", "hi": "परिवारों पर काम करने वाले शोधकर्ताओं ने पाया कि जो बच्चे अपने परिवार के इतिहास के सवालों का जवाब दे पाते थे, वे लचीलेपन और आत्म-सम्मान के पैमानों पर ज़्यादा ऊपर निकले। अपनी कहानी जानना चुपचाप बचाव का काम करता है।" },
       "remember": { "en": "A child who knows their story stands a little taller.", "hi": "जो बच्चा अपनी कहानी जानता है, वह थोड़ा और तनकर खड़ा होता है।" }
     },
     "readToBaby": {
@@ -218,7 +218,7 @@
     },
     "talkToBaby": {
       "title": { "en": "Tell your baby about the wider community that will come to know and love them.", "hi": "अपने शिशु को उस बड़े समाज के बारे में बताइए जो आगे चलकर उसे जानेगा और उससे प्यार करेगा।" },
-      "motivation": { "en": "Your baby belongs not only to a family but to a whole circle of people.", "hi": "आपका शिशु सिर्फ़ एक परिवार का नहीं, लोगों के एक पूरे घेरे का है।" }
+      "motivation": { "en": "Your baby belongs to a family and to a whole circle of people.", "hi": "आपका शिशु सिर्फ़ एक परिवार का नहीं, लोगों के एक पूरे घेरे का है।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -233,9 +233,9 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "When The Heartburn Rises", "hi": "जब सीने में जलन उठने लगे" },
-      "content": { "en": "As the weeks go on, that rising burn after meals can be tiring. It often helps to eat a little less at a time, stay upright for a while after eating, and lean on soothing foods like cool milk, soft bananas or a little curd. Be gentle with your evenings.", "hi": "जैसे-जैसे हफ़्ते आगे बढ़ते हैं, खाने के बाद उठती वह जलन थका देती है। अक्सर मदद मिलती है अगर एक बार में थोड़ा कम खाया जाए, खाने के बाद कुछ देर सीधी बैठी रहा जाए, और ठंडा दूध, नरम केला या थोड़ा-सा दही जैसी ठंडक देने वाली चीज़ों का सहारा लिया जाए। अपनी शामों के साथ नरमी बरतिए।" },
-      "remember": { "en": "Smaller meals and a little patience ease the evenings.", "hi": "छोटे खाने और थोड़ा-सा सब्र शामों को आसान कर देते हैं।" },
+      "title": { "en": "When heartburn keeps coming back", "hi": "जब सीने में जलन उठने लगे" },
+      "content": { "en": "As the weeks go on, that burning after meals can wear you out. It often helps to eat a little less at a time, stay upright for a while after eating, and have soothing foods like cool milk, soft bananas or a little curd. Go easy on yourself in the evenings.", "hi": "जैसे-जैसे हफ़्ते आगे बढ़ते हैं, खाने के बाद उठती वह जलन थका देती है। अक्सर मदद मिलती है अगर एक बार में थोड़ा कम खाया जाए, खाने के बाद कुछ देर सीधी बैठी रहा जाए, और ठंडा दूध, नरम केला या थोड़ा-सा दही जैसी ठंडक देने वाली चीज़ों का सहारा लिया जाए। अपनी शामों के साथ नरमी बरतिए।" },
+      "remember": { "en": "Smaller meals and a little patience make evenings easier.", "hi": "छोटे खाने और थोड़ा-सा सब्र शामों को आसान कर देते हैं।" },
       "durationMinutes": 0
     }
   },
@@ -244,10 +244,10 @@
     "week": 28,
     "babyLearning": { "en": "Your baby's lungs keep getting ready for life outside the womb.", "hi": "हफ़्ता पूरा करते हुए, मज़बूत और लात मारता हुआ" },
     "grow": {
-      "title": { "en": "A Place To Always Return", "hi": "हमेशा लौटने की एक जगह" },
-      "insight": { "en": "More than anything, your child will need to know there is one place, one heart, they can always return to. That place is you.", "hi": "सबसे ज़्यादा, आपके बच्चे को यह जानने की ज़रूरत होगी कि एक जगह है, एक दिल है, जहाँ वह हमेशा लौट सकता है। वह जगह आप हैं।" },
-      "expanded": { "en": "As this week of roots and belonging draws to a close, hold on to one simple truth: your child does not need a perfect home, a perfect parent or a perfect start. They need a place to always return to — arms that open the same way every time, a love that does not depend on how the day went. You are building that place now, in your steadiness and your warmth. Whatever they grow into, however far they go, they will carry the quiet knowing that somewhere, someone is always glad they came home.", "hi": "जड़ों और अपनेपन का यह हफ़्ता जैसे-जैसे पूरा होता है, एक सीधी-सी सच्चाई थामे रखिए: आपके बच्चे को न परफ़ेक्ट घर चाहिए, न परफ़ेक्ट माँ, न परफ़ेक्ट शुरुआत। उसे बस हमेशा लौटने की एक जगह चाहिए — वे बाँहें जो हर बार उसी तरह खुलें, वह प्यार जो इस पर टिका न हो कि दिन कैसा बीता। आप वह जगह अभी बना रही हैं, अपने ठहराव और अपनी गर्मजोशी से। वह जो भी बने, जितनी भी दूर जाए, वह यह शांत भरोसा अपने साथ लिए चलेगा कि कहीं कोई है जो उसके घर लौटने पर हमेशा ख़ुश होता है।" },
-      "deepDive": { "en": "Decades of research on the 'secure base' show that a child who trusts there is always someone to return to grows more confident and emotionally steady. Reliable return matters more than constant presence.", "hi": "'secure base' पर दशकों के शोध दिखाते हैं कि जो बच्चा भरोसा करता है कि लौटने के लिए हमेशा कोई है, वह ज़्यादा आत्मविश्वासी और भीतर से टिका हुआ बड़ा होता है। हर वक़्त पास होने से ज़्यादा मायने यह रखता है कि लौटने पर आप हमेशा मिलें।" },
+      "title": { "en": "Be a place they can always come back to", "hi": "हमेशा लौटने की एक जगह" },
+      "insight": { "en": "More than anything, your child will need to know there's one person they can always come back to. That person is you.", "hi": "सबसे ज़्यादा, आपके बच्चे को यह जानने की ज़रूरत होगी कि एक जगह है, एक दिल है, जहाँ वह हमेशा लौट सकता है। वह जगह आप हैं।" },
+      "expanded": { "en": "As this week about roots and belonging ends, hold on to one thing. Your child doesn't need a perfect home, a perfect parent or a perfect start. They need a place to come back to: arms that open the same way every time, and love that doesn't depend on how the day went. You're building that place now, with your steadiness and warmth. Whoever they grow into, however far they go, they'll know someone is always glad when they come home.", "hi": "जड़ों और अपनेपन का यह हफ़्ता जैसे-जैसे पूरा होता है, एक सीधी-सी सच्चाई थामे रखिए: आपके बच्चे को न परफ़ेक्ट घर चाहिए, न परफ़ेक्ट माँ, न परफ़ेक्ट शुरुआत। उसे बस हमेशा लौटने की एक जगह चाहिए — वे बाँहें जो हर बार उसी तरह खुलें, वह प्यार जो इस पर टिका न हो कि दिन कैसा बीता। आप वह जगह अभी बना रही हैं, अपने ठहराव और अपनी गर्मजोशी से। वह जो भी बने, जितनी भी दूर जाए, वह यह शांत भरोसा अपने साथ लिए चलेगा कि कहीं कोई है जो उसके घर लौटने पर हमेशा ख़ुश होता है।" },
+      "deepDive": { "en": "Decades of research on the 'secure base' suggest a child who trusts there's always someone to come back to grows more confident and emotionally steady. Being reliably there matters more than being there every minute.", "hi": "'secure base' पर दशकों के शोध दिखाते हैं कि जो बच्चा भरोसा करता है कि लौटने के लिए हमेशा कोई है, वह ज़्यादा आत्मविश्वासी और भीतर से टिका हुआ बड़ा होता है। हर वक़्त पास होने से ज़्यादा मायने यह रखता है कि लौटने पर आप हमेशा मिलें।" },
       "remember": { "en": "Be the place your child can always come home to.", "hi": "वह जगह बनिए जहाँ आपका बच्चा हमेशा घर लौट सके।" }
     },
     "readToBaby": {
@@ -257,8 +257,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby how, even now, they already belong — completely and without condition.", "hi": "अपने शिशु को बताइए कि अभी भी वह पूरी तरह अपना है — बिना किसी शर्त के।" },
-      "motivation": { "en": "The truest gift you can offer is the certainty that they belong.", "hi": "सबसे सच्चा तोहफ़ा जो आप दे सकती हैं, वह यही भरोसा है कि वह अपना है।" }
+      "title": { "en": "Tell your baby that, even now, they already belong, completely and without conditions.", "hi": "अपने शिशु को बताइए कि अभी भी वह पूरी तरह अपना है — बिना किसी शर्त के।" },
+      "motivation": { "en": "The best gift you can give is knowing for sure that they belong.", "hi": "सबसे सच्चा तोहफ़ा जो आप दे सकती हैं, वह यही भरोसा है कि वह अपना है।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -273,9 +273,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "A Breath Of Belonging", "hi": "अपनेपन की एक साँस" },
-      "content": { "en": "Breathe in slowly and silently say 'I am held.' Breathe out and say 'You are held.' Let the two of you rest in that exchange for one quiet minute.", "hi": "धीरे से साँस लीजिए और मन ही मन कहिए 'मुझे थामा हुआ है।' साँस छोड़िए और कहिए 'तुम्हें थामा हुआ है।' एक शांत मिनट तक आप दोनों को इसी आदान-प्रदान में ठहरने दीजिए।" },
-      "remember": { "en": "When you feel held, you hold your baby more gently.", "hi": "जब आप ख़ुद को थामा हुआ महसूस करती हैं, तो आप अपने शिशु को और नरमी से थामती हैं।" },
+      "title": { "en": "A breath of belonging", "hi": "अपनेपन की एक साँस" },
+      "content": { "en": "Breathe in slowly and silently say 'I am held.' Breathe out and say 'You are held.' Let the two of you rest in those words for one calm minute.", "hi": "धीरे से साँस लीजिए और मन ही मन कहिए 'मुझे थामा हुआ है।' साँस छोड़िए और कहिए 'तुम्हें थामा हुआ है।' एक शांत मिनट तक आप दोनों को इसी आदान-प्रदान में ठहरने दीजिए।" },
+      "remember": { "en": "When you feel held, it's easier to hold your baby gently.", "hi": "जब आप ख़ुद को थामा हुआ महसूस करती हैं, तो आप अपने शिशु को और नरमी से थामती हैं।" },
       "durationMinutes": 2
     }
   }

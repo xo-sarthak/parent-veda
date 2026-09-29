@@ -4,11 +4,11 @@
     "week": 26,
     "babyLearning": { "en": "Your baby's eyes are starting to open.", "hi": "और ज़्यादा सजग होते हुए, आपके गर्म अँधेरे में अंगड़ाई लेते हुए" },
     "grow": {
-      "title": { "en": "Imagination Is Intelligence At Play", "hi": "कल्पना बुद्धि का खेल है" },
-      "insight": { "en": "When a child pretends, they are not wasting time. They are doing the serious, joyful work of thinking.", "hi": "जब बच्चे बहाना करते हैं, तो वे समय बरबाद नहीं कर रहे होते। वे सोचने का गंभीर और ख़ुशनुमा काम कर रहे होते हैं।" },
-      "expanded": { "en": "We sometimes treat imagination as the opposite of intelligence — something cute but unserious. In truth, it is intelligence stretching its wings. When a child turns a spoon into a rocket or a blanket into a kingdom, their mind is building, testing and inventing. Pretend play teaches a little one to hold ideas in their head, to plan, to see things that are not yet there. The more your child plays, the more they learn how to think. So one day, when you see them lost in some made-up world, know that nothing more important is happening anywhere in the room.", "hi": "हम कभी-कभी कल्पना को बुद्धि का उल्टा मान लेते हैं — कुछ प्यारा सा, पर बिना मतलब का। सच तो यह है कि यही बुद्धि अपने पंख फैला रही होती है। जब बच्चे एक चम्मच को रॉकेट और एक कंबल को राज्य बना देते हैं, तो उनका मन बनाता है, परखता है, कुछ नया गढ़ता है। बहाने का खेल नन्हों को सिखाता है कि विचारों को मन में थामे रखना है, आगे की सोचनी है, और वह देखना है जो अभी वहाँ है ही नहीं। बच्चे जितना ज़्यादा खेलते हैं, उतना ही सीखते हैं कि सोचना कैसे है। तो किसी दिन जब आप उन्हें अपनी बनाई किसी दुनिया में खोए हुए देखें, जान लीजिए कि उस कमरे में इससे ज़्यादा ज़रूरी कुछ नहीं हो रहा।" },
-      "deepDive": { "en": "Developmental psychologists find that rich pretend play in early childhood links to stronger language, self-control and problem-solving. Play is not a break from learning — it is one of its deepest forms.", "hi": "बाल-विकास पर काम करने वाले मनोवैज्ञानिक पाते हैं कि शुरुआती बचपन में भरपूर बहाने का खेल बेहतर भाषा, आत्म-नियंत्रण और मुश्किलें सुलझाने की समझ से जुड़ा है। खेल सीखने से छुट्टी नहीं है — यह सीखने का सबसे गहरा रूप है।" },
-      "remember": { "en": "A child at play is a child hard at thinking.", "hi": "खेल में डूबे बच्चे असल में सोचने में डूबे होते हैं।" }
+      "title": { "en": "Pretend play is how children think", "hi": "कल्पना बुद्धि का खेल है" },
+      "insight": { "en": "When a child pretends, they aren't wasting time. They're doing the serious, happy work of thinking.", "hi": "जब बच्चे बहाना करते हैं, तो वे समय बरबाद नहीं कर रहे होते। वे सोचने का गंभीर और ख़ुशनुमा काम कर रहे होते हैं।" },
+      "expanded": { "en": "It's easy to see imagination as cute but not serious. In fact it's a child's thinking at full stretch. When a child turns a spoon into a rocket or a blanket into a kingdom, their mind is building, testing and inventing. Pretend play helps a little one hold ideas in their head, plan ahead and picture things that aren't there yet. The more your child plays, the more they learn how to think. So when you one day see them lost in a made-up world, you'll know something important is going on.", "hi": "हम कभी-कभी कल्पना को बुद्धि का उल्टा मान लेते हैं — कुछ प्यारा सा, पर बिना मतलब का। सच तो यह है कि यही बुद्धि अपने पंख फैला रही होती है। जब बच्चे एक चम्मच को रॉकेट और एक कंबल को राज्य बना देते हैं, तो उनका मन बनाता है, परखता है, कुछ नया गढ़ता है। बहाने का खेल नन्हों को सिखाता है कि विचारों को मन में थामे रखना है, आगे की सोचनी है, और वह देखना है जो अभी वहाँ है ही नहीं। बच्चे जितना ज़्यादा खेलते हैं, उतना ही सीखते हैं कि सोचना कैसे है। तो किसी दिन जब आप उन्हें अपनी बनाई किसी दुनिया में खोए हुए देखें, जान लीजिए कि उस कमरे में इससे ज़्यादा ज़रूरी कुछ नहीं हो रहा।" },
+      "deepDive": { "en": "Developmental psychologists find that plenty of pretend play in early childhood is linked with stronger language, self-control and problem-solving. Play is one of the main ways young children learn.", "hi": "बाल-विकास पर काम करने वाले मनोवैज्ञानिक पाते हैं कि शुरुआती बचपन में भरपूर बहाने का खेल बेहतर भाषा, आत्म-नियंत्रण और मुश्किलें सुलझाने की समझ से जुड़ा है। खेल सीखने से छुट्टी नहीं है — यह सीखने का सबसे गहरा रूप है।" },
+      "remember": { "en": "A child at play is a child thinking hard.", "hi": "खेल में डूबे बच्चे असल में सोचने में डूबे होते हैं।" }
     },
     "readToBaby": {
       "title": { "en": "The Boy Who Painted The Wind", "hi": "वह लड़का जिसने हवा का चित्र बनाया" },
@@ -18,7 +18,7 @@
     },
     "talkToBaby": {
       "title": { "en": "Tell your baby what you imagine their laugh will sound like.", "hi": "अपने बच्चे को बताइए कि आप सोचती हैं उनकी हँसी कैसी होगी।" },
-      "motivation": { "en": "Imagining their joy is one of the sweetest ways to begin loving it.", "hi": "उनकी ख़ुशी की कल्पना करना उस ख़ुशी से प्यार करने की सबसे प्यारी शुरुआत है।" }
+      "motivation": { "en": "Picturing their happiness is a sweet way to start loving it.", "hi": "उनकी ख़ुशी की कल्पना करना उस ख़ुशी से प्यार करने की सबसे प्यारी शुरुआत है।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -33,8 +33,8 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "My Mind Is Allowed To Wander", "hi": "मेरे मन को भटकने की इजाज़त है" },
-      "content": { "en": "I will let myself daydream a little today, with no goal at all. A wandering mind is a resting mind.", "hi": "आज मैं ख़ुद को थोड़ा दिन में सपने देखने दूँगी, बिना किसी मक़सद के। भटकता हुआ मन असल में आराम करता मन है।" },
+      "title": { "en": "My mind is allowed to wander", "hi": "मेरे मन को भटकने की इजाज़त है" },
+      "content": { "en": "I'll let myself daydream a little today, with no goal at all. A wandering mind is a resting mind.", "hi": "आज मैं ख़ुद को थोड़ा दिन में सपने देखने दूँगी, बिना किसी मक़सद के। भटकता हुआ मन असल में आराम करता मन है।" },
       "remember": { "en": "Not every quiet moment needs a purpose.", "hi": "हर शांत पल का कोई मक़सद होना ज़रूरी नहीं।" },
       "durationMinutes": 0
     }
@@ -44,11 +44,11 @@
     "week": 26,
     "babyLearning": { "en": "Your baby can sense some changes between light and dark.", "hi": "नन्ही उँगलियाँ मुड़ती हुईं, खोज शुरू करती हुईं" },
     "grow": {
-      "title": { "en": "A Cardboard Box Is A Universe", "hi": "एक गत्ते का डिब्बा एक पूरा ब्रह्मांड है" },
-      "insight": { "en": "The simplest things become the biggest worlds in a child's hands. A plain box can be a ship, a cave, a home.", "hi": "बच्चों के हाथ में सबसे सादी चीज़ें ही सबसे बड़ी दुनिया बन जाती हैं। एक साधारण डिब्बा जहाज़ भी है, गुफा भी, और घर भी।" },
-      "expanded": { "en": "Give a child the most expensive toy and a cardboard box, and watch which one holds them longer. It is often the box. A finished toy can only be what it was made to be, but an empty box can be anything a child decides. That open space is where imagination breathes. You do not need to fill your child's world with clever things; you mostly need to leave room for them to fill it themselves. Some of the richest childhoods are built from the plainest stuff — and a little freedom to dream.", "hi": "एक बच्चे को सबसे महँगा खिलौना और एक गत्ते का डिब्बा दीजिए, और देखिए कौन सा उन्हें ज़्यादा देर बाँधे रखता है। अक्सर डिब्बा ही जीतता है। बना-बनाया खिलौना बस वही रह सकता है जिसके लिए उसे बनाया गया, पर एक ख़ाली डिब्बा वह कुछ भी बन सकता है जो बच्चे तय कर दें। वही खुली जगह है जहाँ कल्पना साँस लेती है। आपको अपने बच्चे की दुनिया को चालाक चीज़ों से भरना नहीं है; आपको ज़्यादातर बस इतनी जगह छोड़नी है कि वे उसे ख़ुद भर सकें। सबसे अमीर बचपन अक्सर सबसे सादी चीज़ों से बनते हैं — और सपने देखने की थोड़ी सी आज़ादी से।" },
-      "deepDive": { "en": "Researchers note that open-ended, simple play materials tend to spark more creativity than highly detailed toys, which often dictate a single use. Less can quietly be more.", "hi": "शोध करने वालों का कहना है कि खुले-अधूरे, सादे खेल के सामान अक्सर बहुत बारीकी से बने खिलौनों से ज़्यादा कल्पना जगाते हैं, क्योंकि ऐसे खिलौने अपना एक ही इस्तेमाल पहले से तय कर देते हैं। कम, चुपचाप, ज़्यादा हो सकता है।" },
-      "remember": { "en": "Leave room, and a child will fill it with worlds.", "hi": "थोड़ी जगह छोड़ दीजिए — बच्चे उसे पूरी दुनियाओं से भर देते हैं।" }
+      "title": { "en": "Simple things spark the most play", "hi": "एक गत्ते का डिब्बा एक पूरा ब्रह्मांड है" },
+      "insight": { "en": "The simplest things become the biggest worlds in a child's hands. A plain box can be a ship, a cave or a home.", "hi": "बच्चों के हाथ में सबसे सादी चीज़ें ही सबसे बड़ी दुनिया बन जाती हैं। एक साधारण डिब्बा जहाज़ भी है, गुफा भी, और घर भी।" },
+      "expanded": { "en": "Give a child an expensive toy and a cardboard box, and see which one holds them longer. It's often the box. A finished toy can only be what it was made to be. An empty box can be anything a child decides. That open space is where imagination grows. You don't need to fill your child's world with clever things. You mostly need to leave room for them to fill it themselves. Some of the happiest childhoods are built from the plainest things and a little freedom to dream.", "hi": "एक बच्चे को सबसे महँगा खिलौना और एक गत्ते का डिब्बा दीजिए, और देखिए कौन सा उन्हें ज़्यादा देर बाँधे रखता है। अक्सर डिब्बा ही जीतता है। बना-बनाया खिलौना बस वही रह सकता है जिसके लिए उसे बनाया गया, पर एक ख़ाली डिब्बा वह कुछ भी बन सकता है जो बच्चे तय कर दें। वही खुली जगह है जहाँ कल्पना साँस लेती है। आपको अपने बच्चे की दुनिया को चालाक चीज़ों से भरना नहीं है; आपको ज़्यादातर बस इतनी जगह छोड़नी है कि वे उसे ख़ुद भर सकें। सबसे अमीर बचपन अक्सर सबसे सादी चीज़ों से बनते हैं — और सपने देखने की थोड़ी सी आज़ादी से।" },
+      "deepDive": { "en": "Researchers note that simple, open-ended play materials tend to spark more creativity than very detailed toys, which often suggest just one way to play.", "hi": "शोध करने वालों का कहना है कि खुले-अधूरे, सादे खेल के सामान अक्सर बहुत बारीकी से बने खिलौनों से ज़्यादा कल्पना जगाते हैं, क्योंकि ऐसे खिलौने अपना एक ही इस्तेमाल पहले से तय कर देते हैं। कम, चुपचाप, ज़्यादा हो सकता है।" },
+      "remember": { "en": "Leave room, and a child will fill it with ideas.", "hi": "थोड़ी जगह छोड़ दीजिए — बच्चे उसे पूरी दुनियाओं से भर देते हैं।" }
     },
     "readToBaby": {
       "title": { "en": "Castles In The Air", "hi": "हवा में महल" },
@@ -57,8 +57,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about the games you dream of playing with them one day.", "hi": "अपने बच्चे को उन खेलों के बारे में बताइए जो आप एक दिन उनके साथ खेलने के सपने देखती हैं।" },
-      "motivation": { "en": "The games you imagine now are little promises of joy to come.", "hi": "जो खेल आप अभी सोचती हैं, वे आने वाली ख़ुशी के नन्हे वादे हैं।" }
+      "title": { "en": "Tell your baby about the games you hope to play with them one day.", "hi": "अपने बच्चे को उन खेलों के बारे में बताइए जो आप एक दिन उनके साथ खेलने के सपने देखती हैं।" },
+      "motivation": { "en": "The games you imagine now are small promises of happy times to come.", "hi": "जो खेल आप अभी सोचती हैं, वे आने वाली ख़ुशी के नन्हे वादे हैं।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -73,9 +73,9 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "When Heartburn Creeps In", "hi": "जब सीने में जलन उठे" },
-      "content": { "en": "If a burning feeling rises after meals now that there is less room inside, try eating smaller amounts more often, and stay sitting upright for a little while after you eat rather than lying straight down.", "hi": "अब जब भीतर जगह कम रह गई है, अगर खाने के बाद सीने में जलन सी उठती है, तो एक बार में कम और थोड़ी-थोड़ी देर में खाने की कोशिश कीजिए, और खाने के तुरंत बाद लेट जाने के बजाय थोड़ी देर सीधा बैठी रहिए।" },
-      "remember": { "en": "Smaller, slower meals are kinder to a crowded belly.", "hi": "छोटा और धीरे-धीरे खाया गया खाना भरे हुए पेट पर ज़्यादा मेहरबान होता है।" },
+      "title": { "en": "Heartburn now there's less room", "hi": "जब सीने में जलन उठे" },
+      "content": { "en": "If a burning feeling rises after meals now that there's less room inside, try eating smaller amounts more often. Stay sitting upright for a while after you eat, instead of lying straight down.", "hi": "अब जब भीतर जगह कम रह गई है, अगर खाने के बाद सीने में जलन सी उठती है, तो एक बार में कम और थोड़ी-थोड़ी देर में खाने की कोशिश कीजिए, और खाने के तुरंत बाद लेट जाने के बजाय थोड़ी देर सीधा बैठी रहिए।" },
+      "remember": { "en": "Smaller, slower meals are easier on a crowded belly.", "hi": "छोटा और धीरे-धीरे खाया गया खाना भरे हुए पेट पर ज़्यादा मेहरबान होता है।" },
       "durationMinutes": 0
     }
   },
@@ -84,11 +84,11 @@
     "week": 26,
     "babyLearning": { "en": "Your baby's lungs are forming tiny air sacs.", "hi": "आवाज़ों का जवाब देते हुए, आपकी दुनिया को सुनते हुए" },
     "grow": {
-      "title": { "en": "Pretend Is Practice For Life", "hi": "बहाने का खेल ज़िंदगी का अभ्यास है" },
-      "insight": { "en": "When a child plays house or doctor or hero, they are quietly rehearsing how to be a person in the world.", "hi": "जब बच्चे घर-घर, डॉक्टर-डॉक्टर या हीरो का खेल खेलते हैं, तो वे चुपचाप यही अभ्यास कर रहे होते हैं कि दुनिया में इंसान कैसे बनना है।" },
-      "expanded": { "en": "Pretend play looks like pure fun, and it is — but it is also a child's safe rehearsal space. When your little one feeds a doll, scolds a teddy, or plays at being you, they are trying on feelings, roles and rules where nothing can go truly wrong. They practise kindness, fairness, fear and bravery in miniature. Through make-believe, a child works out big things their words cannot yet hold. So when you watch your child play out a little drama, you are watching them rehearse, gently, for the real and wonderful life ahead.", "hi": "बहाने का खेल देखने में सिर्फ़ मज़ा लगता है, और है भी — पर यह बच्चों की सुरक्षित रिहर्सल की जगह भी है। जब आपके नन्हे किसी गुड़िया को खिलाते हैं, टेडी को डाँटते हैं, या आप बनने का खेल खेलते हैं, तो वे भावनाओं, किरदारों और नियमों को ऐसी जगह पहनकर देख रहे होते हैं जहाँ सच में कुछ ग़लत नहीं हो सकता। वे छोटे रूप में दया, इंसाफ़, डर और हिम्मत का अभ्यास करते हैं। बहाने के ज़रिए बच्चे वे बड़ी बातें सुलझा लेते हैं जिन्हें उनके शब्द अभी थाम नहीं पाते। तो जब आप अपने बच्चे को कोई छोटा सा नाटक खेलते देखें, समझिए आप उन्हें आगे की असली और सुंदर ज़िंदगी के लिए धीरे-धीरे तैयार होते देख रही हैं।" },
-      "deepDive": { "en": "Child development experts describe pretend play as a 'rehearsal' for real life — a low-stakes space where children practise emotions, social roles and problem-solving before they need them.", "hi": "बाल-विकास के जानकार बहाने के खेल को असली ज़िंदगी की एक 'रिहर्सल' कहते हैं — एक ऐसी जगह जहाँ कुछ दाँव पर नहीं होता, और बच्चे भावनाओं, सामाजिक किरदारों और मुश्किलें सुलझाने का अभ्यास ज़रूरत पड़ने से पहले ही कर लेते हैं।" },
-      "remember": { "en": "Through pretend, a child practises being themselves.", "hi": "बहाने के खेल में बच्चे ख़ुद होने का अभ्यास करते हैं।" }
+      "title": { "en": "Pretend play is practice for life", "hi": "बहाने का खेल ज़िंदगी का अभ्यास है" },
+      "insight": { "en": "When a child plays house, doctor or hero, they're practising how to be a person in the world.", "hi": "जब बच्चे घर-घर, डॉक्टर-डॉक्टर या हीरो का खेल खेलते हैं, तो वे चुपचाप यही अभ्यास कर रहे होते हैं कि दुनिया में इंसान कैसे बनना है।" },
+      "expanded": { "en": "Pretend play looks like pure fun, and it is. It's also a safe place for a child to practise. When your little one feeds a doll, scolds a teddy or plays at being you, they're trying on feelings, roles and rules where nothing can go badly wrong. They practise kindness, fairness, fear and courage on a small scale. Through make-believe, a child works through big things they don't have words for yet. So when you watch your child act out a little drama, you're watching them get ready for real life.", "hi": "बहाने का खेल देखने में सिर्फ़ मज़ा लगता है, और है भी — पर यह बच्चों की सुरक्षित रिहर्सल की जगह भी है। जब आपके नन्हे किसी गुड़िया को खिलाते हैं, टेडी को डाँटते हैं, या आप बनने का खेल खेलते हैं, तो वे भावनाओं, किरदारों और नियमों को ऐसी जगह पहनकर देख रहे होते हैं जहाँ सच में कुछ ग़लत नहीं हो सकता। वे छोटे रूप में दया, इंसाफ़, डर और हिम्मत का अभ्यास करते हैं। बहाने के ज़रिए बच्चे वे बड़ी बातें सुलझा लेते हैं जिन्हें उनके शब्द अभी थाम नहीं पाते। तो जब आप अपने बच्चे को कोई छोटा सा नाटक खेलते देखें, समझिए आप उन्हें आगे की असली और सुंदर ज़िंदगी के लिए धीरे-धीरे तैयार होते देख रही हैं।" },
+      "deepDive": { "en": "Child development experts describe pretend play as practice for real life: a low-pressure space where children try out feelings, social roles and problem-solving before they need them.", "hi": "बाल-विकास के जानकार बहाने के खेल को असली ज़िंदगी की एक 'रिहर्सल' कहते हैं — एक ऐसी जगह जहाँ कुछ दाँव पर नहीं होता, और बच्चे भावनाओं, सामाजिक किरदारों और मुश्किलें सुलझाने का अभ्यास ज़रूरत पड़ने से पहले ही कर लेते हैं।" },
+      "remember": { "en": "Through pretend play, a child practises being themselves.", "hi": "बहाने के खेल में बच्चे ख़ुद होने का अभ्यास करते हैं।" }
     },
     "readToBaby": {
       "title": { "en": "The Universe In Krishna's Mouth", "hi": "कृष्ण के मुख में ब्रह्मांड" },
@@ -98,7 +98,7 @@
     },
     "talkToBaby": {
       "title": { "en": "Tell your baby about the stories you'll make up just for them.", "hi": "अपने बच्चे को उन कहानियों के बारे में बताइए जो आप सिर्फ़ उनके लिए गढ़ेंगी।" },
-      "motivation": { "en": "A story made just for your child is a gift only you can give.", "hi": "सिर्फ़ अपने बच्चे के लिए बनाई गई कहानी वह तोहफ़ा है जो सिर्फ़ आप दे सकती हैं।" }
+      "motivation": { "en": "A story made up just for your child is a gift only you can give.", "hi": "सिर्फ़ अपने बच्चे के लिए बनाई गई कहानी वह तोहफ़ा है जो सिर्फ़ आप दे सकती हैं।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -113,8 +113,8 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Breathing Into The Belly", "hi": "पेट तक साँस भरना" },
-      "content": { "en": "Rest a hand low on your belly. Breathe in slowly and feel it rise gently under your hand, then breathe out and feel it fall. Do this softly for five slow breaths.", "hi": "एक हाथ पेट के नीचे की तरफ़ रखिए। धीरे से साँस लीजिए और महसूस कीजिए कि पेट आपके हाथ के नीचे नरमी से उठ रहा है, फिर साँस छोड़िए और उसे नीचे बैठते महसूस कीजिए। ऐसा पाँच धीमी साँसों तक नरमी से कीजिए।" },
+      "title": { "en": "Breathing into the belly", "hi": "पेट तक साँस भरना" },
+      "content": { "en": "Rest a hand low on your belly. Breathe in slowly and feel it rise under your hand, then breathe out and feel it fall. Do this gently for five slow breaths.", "hi": "एक हाथ पेट के नीचे की तरफ़ रखिए। धीरे से साँस लीजिए और महसूस कीजिए कि पेट आपके हाथ के नीचे नरमी से उठ रहा है, फिर साँस छोड़िए और उसे नीचे बैठते महसूस कीजिए। ऐसा पाँच धीमी साँसों तक नरमी से कीजिए।" },
       "remember": { "en": "A slow breath into the belly is a hello to your baby.", "hi": "पेट तक ली गई एक धीमी साँस आपके बच्चे के लिए एक हैलो है।" },
       "durationMinutes": 2
     }
@@ -124,11 +124,11 @@
     "week": 26,
     "babyLearning": { "en": "Your baby's sense of smell is developing around now.", "hi": "पलकें फड़फड़ाती हुईं, नरम रोशनी और अँधेरे को महसूस करती हुईं" },
     "grow": {
-      "title": { "en": "Wonder Needs No Screen", "hi": "अचरज को screen की ज़रूरत नहीं" },
-      "insight": { "en": "A child's sense of wonder is sparked not by bright screens, but by puddles, clouds, ants and the moon.", "hi": "बच्चों के भीतर अचरज उजली screen से नहीं जगता, बल्कि पानी के गड्ढों, बादलों, चींटियों और चाँद से जगता है।" },
-      "expanded": { "en": "It is easy to think children need to be entertained — bright lights, fast sounds, endless screens. But real wonder is quieter and older than any of that. A child can be spellbound by a beetle crossing a path, by rain on a window, by the simple magic of a shadow on the wall. These slow, ordinary wonders teach a child to look closely and to be amazed by the world they actually live in. You do not have to provide the wonder; the world is already full of it. You only have to slow down enough to notice it together.", "hi": "यह सोचना आसान है कि बच्चों का मनोरंजन करते रहना ज़रूरी है — तेज़ रोशनी, तेज़ आवाज़ें, कभी न ख़त्म होने वाली screen। पर असली अचरज इन सबसे कहीं शांत और कहीं पुराना है। बच्चे रास्ता पार करते एक भँवरे पर, खिड़की पर गिरती बारिश पर, दीवार पर पड़ती परछाईं के सादे जादू पर मंत्रमुग्ध हो सकते हैं। ये धीमे, आम अचरज बच्चों को सिखाते हैं कि गौर से देखो, और उस दुनिया पर हैरान हो जिसमें वे सचमुच रहते हैं। अचरज आपको जुटाना नहीं है; दुनिया पहले से ही उससे भरी है। आपको बस इतना धीमा होना है कि उसे साथ मिलकर देख सकें।" },
-      "deepDive": { "en": "Early-childhood researchers find that unhurried time in nature and everyday exploration nurtures attention and curiosity, while heavy fast-paced screen time in the early years can crowd them out.", "hi": "शुरुआती बचपन पर हुए शोध बताते हैं कि प्रकृति में बिना जल्दबाज़ी बिताया समय और रोज़ की छोटी-छोटी खोज ध्यान और जिज्ञासा को पोसती है, जबकि शुरुआती सालों में बहुत ज़्यादा और तेज़ रफ़्तार screen time इन दोनों के लिए जगह ही नहीं छोड़ता।" },
-      "remember": { "en": "The world is already full of wonder — just slow down to see it.", "hi": "दुनिया पहले से अचरज से भरी है — बस उसे देखने के लिए थोड़ा धीमा हो जाइए।" }
+      "title": { "en": "Wonder doesn't need a screen", "hi": "अचरज को screen की ज़रूरत नहीं" },
+      "insight": { "en": "Puddles, clouds, ants and the moon spark a child's wonder more than bright screens do.", "hi": "बच्चों के भीतर अचरज उजली screen से नहीं जगता, बल्कि पानी के गड्ढों, बादलों, चींटियों और चाँद से जगता है।" },
+      "expanded": { "en": "It's easy to think children need to be entertained with bright lights, fast sounds and screens. But a child can be spellbound by a beetle crossing a path, rain on a window or a shadow on the wall. These slow, everyday wonders teach a child to look closely and be amazed by the world around them. You don't have to provide the wonder. The world is already full of it. You just have to slow down enough to notice it together.", "hi": "यह सोचना आसान है कि बच्चों का मनोरंजन करते रहना ज़रूरी है — तेज़ रोशनी, तेज़ आवाज़ें, कभी न ख़त्म होने वाली screen। पर असली अचरज इन सबसे कहीं शांत और कहीं पुराना है। बच्चे रास्ता पार करते एक भँवरे पर, खिड़की पर गिरती बारिश पर, दीवार पर पड़ती परछाईं के सादे जादू पर मंत्रमुग्ध हो सकते हैं। ये धीमे, आम अचरज बच्चों को सिखाते हैं कि गौर से देखो, और उस दुनिया पर हैरान हो जिसमें वे सचमुच रहते हैं। अचरज आपको जुटाना नहीं है; दुनिया पहले से ही उससे भरी है। आपको बस इतना धीमा होना है कि उसे साथ मिलकर देख सकें।" },
+      "deepDive": { "en": "Early childhood research suggests unhurried time outdoors and everyday exploring help attention and curiosity grow. A lot of fast-paced screen time in the early years can take the place of that.", "hi": "शुरुआती बचपन पर हुए शोध बताते हैं कि प्रकृति में बिना जल्दबाज़ी बिताया समय और रोज़ की छोटी-छोटी खोज ध्यान और जिज्ञासा को पोसती है, जबकि शुरुआती सालों में बहुत ज़्यादा और तेज़ रफ़्तार screen time इन दोनों के लिए जगह ही नहीं छोड़ता।" },
+      "remember": { "en": "The world is full of wonder. Slow down to see it together.", "hi": "दुनिया पहले से अचरज से भरी है — बस उसे देखने के लिए थोड़ा धीमा हो जाइए।" }
     },
     "readToBaby": {
       "title": { "en": "The Painter And The Painted Door", "hi": "चित्रकार और बना हुआ दरवाज़ा" },
@@ -138,7 +138,7 @@
     },
     "talkToBaby": {
       "title": { "en": "Tell your baby about an adventure you'll imagine together one day.", "hi": "अपने बच्चे को किसी ऐसे सफ़र के बारे में बताइए जिसकी कल्पना आप एक दिन साथ मिलकर करेंगी।" },
-      "motivation": { "en": "The adventures you dream of now are doors you'll open together later.", "hi": "जिन रोमांचों के सपने आप अभी देखती हैं, वे दरवाज़े हैं जिन्हें आप आगे साथ मिलकर खोलेंगी।" }
+      "motivation": { "en": "The adventures you dream of now are ones you'll share later.", "hi": "जिन रोमांचों के सपने आप अभी देखती हैं, वे दरवाज़े हैं जिन्हें आप आगे साथ मिलकर खोलेंगी।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -153,9 +153,9 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "When Sweet Cravings Hit", "hi": "जब मीठा खाने का मन करे" },
-      "content": { "en": "If you find yourself reaching for sweets often now, there is no need to scold yourself. Try pairing something sweet with a little protein or fruit — a date with nuts, fruit with yogurt — so the craving is met more gently and steadily.", "hi": "अगर इन दिनों बार-बार मीठे की तरफ़ हाथ बढ़ जाता है, तो ख़ुद को डाँटने की ज़रूरत नहीं। कोशिश कीजिए कि मीठे के साथ थोड़ा protein या फल भी हो — खजूर के साथ मेवे, फल के साथ दही — ताकि मन ज़्यादा नरमी और ठहराव से शांत हो।" },
-      "remember": { "en": "A craving met gently is kinder than one fought hard.", "hi": "नरमी से शांत किया गया मन, ज़ोर से लड़े गए मन से बेहतर है।" },
+      "title": { "en": "When sweet cravings hit", "hi": "जब मीठा खाने का मन करे" },
+      "content": { "en": "If you're reaching for sweets often now, there's no need to scold yourself. Try pairing something sweet with a little protein or fruit, like a date with nuts or fruit with yoghurt, so the craving is met more gently and lasts you longer.", "hi": "अगर इन दिनों बार-बार मीठे की तरफ़ हाथ बढ़ जाता है, तो ख़ुद को डाँटने की ज़रूरत नहीं। कोशिश कीजिए कि मीठे के साथ थोड़ा protein या फल भी हो — खजूर के साथ मेवे, फल के साथ दही — ताकि मन ज़्यादा नरमी और ठहराव से शांत हो।" },
+      "remember": { "en": "Meet a craving gently. There's no need to fight it.", "hi": "नरमी से शांत किया गया मन, ज़ोर से लड़े गए मन से बेहतर है।" },
       "durationMinutes": 0
     }
   },
@@ -164,11 +164,11 @@
     "week": 26,
     "babyLearning": { "en": "Your baby's brain is growing fast, with more activity each week.", "hi": "जागने और आराम की लय में बसते हुए" },
     "grow": {
-      "title": { "en": "Daydreams Are Not Wasted Time", "hi": "ख़्वाब देखना बरबाद किया हुआ समय नहीं है" },
-      "insight": { "en": "A child staring out of the window, lost in thought, is not being idle. They are building an inner world.", "hi": "खिड़की से बाहर ताकते, ख़यालों में खोए बच्चे कामचोर नहीं होते। वे अपने भीतर एक पूरी दुनिया बना रहे होते हैं।" },
-      "expanded": { "en": "In a busy world we can grow uneasy when a child seems to be doing 'nothing' — drifting, staring, daydreaming. But the mind at rest is rarely empty. In those soft, unhurried moments, a child sorts feelings, dreams up ideas and quietly knits together what they have seen. Boredom is often the doorway to imagination; the wandering mind is where invention is born. So resist the urge to fill every gap. Let your child be a little bored sometimes, and watch what blooms in the empty space.", "hi": "इस भागती दुनिया में हम बेचैन हो जाते हैं जब बच्चे 'कुछ नहीं' करते दिखते हैं — यूँ ही बहते, ताकते, ख़्वाब बुनते। पर आराम करता मन शायद ही कभी ख़ाली होता है। उन नरम, बिना जल्दी वाले पलों में बच्चे भावनाओं को छाँटते हैं, नए ख़याल गढ़ते हैं और जो देखा है उसे चुपचाप आपस में बुनते हैं। ऊबना अक्सर कल्पना का दरवाज़ा होता है; भटकता हुआ मन ही वह जगह है जहाँ नई चीज़ें जन्म लेती हैं। तो हर ख़ाली पल को भर देने की इच्छा से बचिए। बच्चों को कभी-कभी थोड़ा ऊबने दीजिए, और देखिए उस ख़ाली जगह में क्या खिलता है।" },
-      "deepDive": { "en": "Neuroscientists find that the brain's 'default mode' — active during daydreaming and rest — supports memory, creativity and a sense of self. Idle moments are quietly busy ones.", "hi": "दिमाग़ पर काम करने वाले शोधकर्ता पाते हैं कि दिमाग़ का 'default mode' — जो ख़्वाब देखते और आराम करते वक़्त सक्रिय रहता है — याददाश्त, कल्पना और अपनी पहचान की समझ को सँभालता है। ख़ाली दिखते पल असल में चुपचाप व्यस्त होते हैं।" },
-      "remember": { "en": "An idle moment is where imagination quietly grows.", "hi": "ख़ाली पल ही वह जगह है जहाँ कल्पना चुपचाप बढ़ती है।" }
+      "title": { "en": "Daydreaming is time well spent", "hi": "ख़्वाब देखना बरबाद किया हुआ समय नहीं है" },
+      "insight": { "en": "A child staring out of the window, lost in thought, isn't being idle. They're building an inner world.", "hi": "खिड़की से बाहर ताकते, ख़यालों में खोए बच्चे कामचोर नहीं होते। वे अपने भीतर एक पूरी दुनिया बना रहे होते हैं।" },
+      "expanded": { "en": "In a busy world it can feel uneasy when a child seems to be doing nothing: drifting, staring, daydreaming. But a resting mind is rarely empty. In those slow moments, a child sorts out feelings, dreams up ideas and connects what they've seen. Boredom often leads to imagination. So try not to fill every gap. Let your child be a little bored sometimes, and see what they come up with.", "hi": "इस भागती दुनिया में हम बेचैन हो जाते हैं जब बच्चे 'कुछ नहीं' करते दिखते हैं — यूँ ही बहते, ताकते, ख़्वाब बुनते। पर आराम करता मन शायद ही कभी ख़ाली होता है। उन नरम, बिना जल्दी वाले पलों में बच्चे भावनाओं को छाँटते हैं, नए ख़याल गढ़ते हैं और जो देखा है उसे चुपचाप आपस में बुनते हैं। ऊबना अक्सर कल्पना का दरवाज़ा होता है; भटकता हुआ मन ही वह जगह है जहाँ नई चीज़ें जन्म लेती हैं। तो हर ख़ाली पल को भर देने की इच्छा से बचिए। बच्चों को कभी-कभी थोड़ा ऊबने दीजिए, और देखिए उस ख़ाली जगह में क्या खिलता है।" },
+      "deepDive": { "en": "Brain research suggests a network that's active when we daydream and rest, called the 'default mode network', is involved in memory, imagination and thinking about ourselves. Idle moments are busier than they look.", "hi": "दिमाग़ पर काम करने वाले शोधकर्ता पाते हैं कि दिमाग़ का 'default mode' — जो ख़्वाब देखते और आराम करते वक़्त सक्रिय रहता है — याददाश्त, कल्पना और अपनी पहचान की समझ को सँभालता है। ख़ाली दिखते पल असल में चुपचाप व्यस्त होते हैं।" },
+      "remember": { "en": "Idle moments give imagination room to grow.", "hi": "ख़ाली पल ही वह जगह है जहाँ कल्पना चुपचाप बढ़ती है।" }
     },
     "readToBaby": {
       "title": { "en": "Birbal And The Picture Of A Story", "hi": "बीरबल और एक कहानी की तस्वीर" },
@@ -178,7 +178,7 @@
     },
     "talkToBaby": {
       "title": { "en": "Tell your baby who you wonder they'll grow up to be.", "hi": "अपने बच्चे को बताइए कि आप सोचती हैं वे बड़े होकर कौन बनेंगे।" },
-      "motivation": { "en": "Wondering about who they'll become is its own quiet kind of love.", "hi": "वे कौन बनेंगे, यह सोचते रहना अपने आप में एक शांत सा प्यार है।" }
+      "motivation": { "en": "Wondering who they'll become is a kind of love too.", "hi": "वे कौन बनेंगे, यह सोचते रहना अपने आप में एक शांत सा प्यार है।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -193,9 +193,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "I Can Picture Good Things Coming", "hi": "मैं अच्छी चीज़ों को आते हुए देख सकती हूँ" },
-      "content": { "en": "I will let myself imagine warm, happy moments ahead with my baby. Picturing joy is a way of inviting it.", "hi": "मैं ख़ुद को अपने बच्चे के साथ आने वाले गर्म, ख़ुश पलों की कल्पना करने दूँगी। ख़ुशी की तस्वीर बनाना उसे बुलाने का ही एक तरीक़ा है।" },
-      "remember": { "en": "What you imagine with love, you draw a little closer.", "hi": "जिसकी कल्पना आप प्यार से करती हैं, उसे थोड़ा और पास खींच लाती हैं।" },
+      "title": { "en": "I can picture good things coming", "hi": "मैं अच्छी चीज़ों को आते हुए देख सकती हूँ" },
+      "content": { "en": "I'll let myself imagine warm, happy moments ahead with my baby. Picturing joy is a way of welcoming it.", "hi": "मैं ख़ुद को अपने बच्चे के साथ आने वाले गर्म, ख़ुश पलों की कल्पना करने दूँगी। ख़ुशी की तस्वीर बनाना उसे बुलाने का ही एक तरीक़ा है।" },
+      "remember": { "en": "Let yourself picture the happy times ahead.", "hi": "जिसकी कल्पना आप प्यार से करती हैं, उसे थोड़ा और पास खींच लाती हैं।" },
       "durationMinutes": 0
     }
   },
@@ -204,10 +204,10 @@
     "week": 26,
     "babyLearning": { "en": "Your baby often sleeps and wakes at different times from you.", "hi": "नरम और सिमटे हुए, हर दिन थोड़ा और गोल होते हुए" },
     "grow": {
-      "title": { "en": "Stories Build Inner Worlds", "hi": "कहानियाँ भीतर की दुनिया बनाती हैं" },
-      "insight": { "en": "Every story you tell your child gives them a new room to walk through inside their own mind.", "hi": "हर कहानी जो आप अपने बच्चे को सुनाती हैं, उनके अपने मन के भीतर एक नया कमरा खोल देती है।" },
-      "expanded": { "en": "Stories are not just entertainment; they are how a child first travels beyond their own small world. Through a tale, a little one becomes brave, kind, frightened and triumphant — all from the safe warmth of your lap. Each story stretches their sense of what is possible and quietly teaches them how people feel and why. The more stories a child hears, the richer the inner world they carry, and the more language and empathy they grow. When you tell your child a story, you are handing them a whole world to keep, one they can return to whenever they wish.", "hi": "कहानियाँ सिर्फ़ मनोरंजन नहीं हैं; यही वह पहला रास्ता है जिससे बच्चे अपनी छोटी सी दुनिया से बाहर निकलते हैं। एक कहानी के भीतर नन्हे बहादुर बनते हैं, दयालु बनते हैं, डरते हैं और जीतते हैं — और यह सब आपकी गोद की सुरक्षित गर्माहट में। हर कहानी उनके इस एहसास को फैलाती है कि क्या-क्या मुमकिन है, और चुपचाप सिखाती है कि लोग क्या महसूस करते हैं और क्यों। बच्चे जितनी कहानियाँ सुनते हैं, भीतर उतनी ही अमीर दुनिया साथ लेकर चलते हैं, और उतनी ही भाषा और समझ उनमें बढ़ती है। जब आप अपने बच्चे को कहानी सुनाती हैं, तो आप उन्हें रखने के लिए एक पूरी दुनिया थमा रही होती हैं — ऐसी दुनिया जिसमें वे जब चाहें लौट सकते हैं।" },
-      "deepDive": { "en": "Studies on shared storytelling show it builds vocabulary, narrative thinking and empathy — children who hear many stories better understand that others have feelings and minds of their own.", "hi": "साथ बैठकर कहानी सुनाने पर हुए अध्ययन बताते हैं कि इससे शब्द-भंडार, कहानी के ढंग से सोचने की समझ और दूसरों का मन पढ़ने की क्षमता बढ़ती है — जो बच्चे बहुत कहानियाँ सुनते हैं, वे बेहतर समझ पाते हैं कि दूसरों की अपनी भावनाएँ और अपनी सोच होती है।" },
+      "title": { "en": "Stories build a child's inner world", "hi": "कहानियाँ भीतर की दुनिया बनाती हैं" },
+      "insight": { "en": "Every story you tell your child gives them a new place to explore in their own mind.", "hi": "हर कहानी जो आप अपने बच्चे को सुनाती हैं, उनके अपने मन के भीतर एक नया कमरा खोल देती है।" },
+      "expanded": { "en": "Stories are how a child first travels beyond their own small world. Through a tale, a little one gets to be brave, kind, scared and proud, all from the safety of your lap. Each story stretches their sense of what's possible and shows them how people feel and why. The more stories a child hears, the richer their inner world, and the more words and empathy they build. When you tell your child a story, you're giving them a world they can come back to whenever they like.", "hi": "कहानियाँ सिर्फ़ मनोरंजन नहीं हैं; यही वह पहला रास्ता है जिससे बच्चे अपनी छोटी सी दुनिया से बाहर निकलते हैं। एक कहानी के भीतर नन्हे बहादुर बनते हैं, दयालु बनते हैं, डरते हैं और जीतते हैं — और यह सब आपकी गोद की सुरक्षित गर्माहट में। हर कहानी उनके इस एहसास को फैलाती है कि क्या-क्या मुमकिन है, और चुपचाप सिखाती है कि लोग क्या महसूस करते हैं और क्यों। बच्चे जितनी कहानियाँ सुनते हैं, भीतर उतनी ही अमीर दुनिया साथ लेकर चलते हैं, और उतनी ही भाषा और समझ उनमें बढ़ती है। जब आप अपने बच्चे को कहानी सुनाती हैं, तो आप उन्हें रखने के लिए एक पूरी दुनिया थमा रही होती हैं — ऐसी दुनिया जिसमें वे जब चाहें लौट सकते हैं।" },
+      "deepDive": { "en": "Studies on reading and telling stories with children suggest it builds vocabulary, storytelling skills and empathy. Children who hear many stories get better at understanding that other people have their own feelings and thoughts.", "hi": "साथ बैठकर कहानी सुनाने पर हुए अध्ययन बताते हैं कि इससे शब्द-भंडार, कहानी के ढंग से सोचने की समझ और दूसरों का मन पढ़ने की क्षमता बढ़ती है — जो बच्चे बहुत कहानियाँ सुनते हैं, वे बेहतर समझ पाते हैं कि दूसरों की अपनी भावनाएँ और अपनी सोच होती है।" },
       "remember": { "en": "A story is a world you can give a child to keep.", "hi": "कहानी एक ऐसी दुनिया है जो आप बच्चों को हमेशा के लिए दे सकती हैं।" }
     },
     "readToBaby": {
@@ -218,7 +218,7 @@
     },
     "talkToBaby": {
       "title": { "en": "Tell your baby about the little world you'll build together in play.", "hi": "अपने बच्चे को उस नन्ही दुनिया के बारे में बताइए जो आप खेल में साथ मिलकर बनाएँगी।" },
-      "motivation": { "en": "The make-believe worlds you'll share are some of childhood's truest treasures.", "hi": "बहाने की जो दुनियाएँ आप साथ बाँटेंगी, वे बचपन के सबसे सच्चे ख़ज़ानों में से हैं।" }
+      "motivation": { "en": "The make-believe worlds you share will be some of their happiest childhood memories.", "hi": "बहाने की जो दुनियाएँ आप साथ बाँटेंगी, वे बचपन के सबसे सच्चे ख़ज़ानों में से हैं।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -233,9 +233,9 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "When Iron Feels Low", "hi": "जब आयरन कम पड़ने लगे" },
-      "content": { "en": "If you feel more tired or pale than usual, your iron may be running low as your baby grows. Try adding iron-rich foods like leafy greens, lentils and jaggery, and pair them with a little vitamin C, like lemon or amla, to help your body absorb more.", "hi": "अगर आप आम से ज़्यादा थकी या पीली महसूस करती हैं, तो हो सकता है बच्चे के बढ़ने के साथ आपका आयरन कम पड़ रहा हो। खाने में आयरन से भरपूर चीज़ें जोड़िए — हरी पत्तेदार सब्ज़ियाँ, दाल और गुड़ — और उनके साथ थोड़ा Vitamin C भी लीजिए, जैसे नींबू या आँवला, ताकि शरीर उसे ज़्यादा सोख सके।" },
-      "remember": { "en": "A little vitamin C helps iron do its quiet work.", "hi": "थोड़ा सा Vitamin C, आयरन को उसका चुपचाप वाला काम करने में मदद करता है।" },
+      "title": { "en": "Getting enough iron", "hi": "जब आयरन कम पड़ने लगे" },
+      "content": { "en": "Your need for iron rises as your baby grows. If you feel more tired or look paler than usual, tell your doctor. Add iron-rich foods like leafy greens, lentils and jaggery, and pair them with a little vitamin C, like lemon or amla, to help your body take in more.", "hi": "अगर आप आम से ज़्यादा थकी या पीली महसूस करती हैं, तो हो सकता है बच्चे के बढ़ने के साथ आपका आयरन कम पड़ रहा हो। खाने में आयरन से भरपूर चीज़ें जोड़िए — हरी पत्तेदार सब्ज़ियाँ, दाल और गुड़ — और उनके साथ थोड़ा Vitamin C भी लीजिए, जैसे नींबू या आँवला, ताकि शरीर उसे ज़्यादा सोख सके।" },
+      "remember": { "en": "A little vitamin C helps iron do its work.", "hi": "थोड़ा सा Vitamin C, आयरन को उसका चुपचाप वाला काम करने में मदद करता है।" },
       "durationMinutes": 0
     }
   },
@@ -244,10 +244,10 @@
     "week": 26,
     "babyLearning": { "en": "Your baby may respond when you press or stroke your bump.", "hi": "हफ़्ता पूरा करते हुए, आपकी गर्माहट में सपने बुनते हुए" },
     "grow": {
-      "title": { "en": "Let Them Make-Believe", "hi": "उन्हें बहाना करने दीजिए" },
-      "insight": { "en": "When a child says the floor is lava or the chair is a horse, the kindest thing you can do is to play along.", "hi": "जब बच्चे कहें कि फ़र्श लावा है या कुर्सी घोड़ा है, तो सबसे प्यारी बात यही है कि आप भी उनके खेल में शामिल हो जाएँ।" },
-      "expanded": { "en": "It is tempting to correct a child — to say 'that is only a chair' or 'there is no dragon.' But when you step into their make-believe instead, something lovely happens. You tell your child that their inner world matters, that their imagination is welcome, that you take their wonder seriously. You do not have to be a brilliant actor; you only have to say 'yes, and' instead of 'no, but.' Playing along costs you a few minutes and gives your child something lasting: the deep, quiet sense that the worlds they dream up are worth sharing with the people they love.", "hi": "बच्चे को सुधार देने का मन करता है — यह कहने का कि 'वह तो बस एक कुर्सी है' या 'कोई ड्रैगन नहीं है।' पर जब आप इसके बजाय उनके बहाने वाली दुनिया में एक क़दम रख देती हैं, तो कुछ बहुत प्यारा होता है। आप अपने बच्चे से कह रही होती हैं कि उनकी भीतर की दुनिया मायने रखती है, कि उनकी कल्पना का यहाँ स्वागत है, कि आप उनके अचरज को गंभीरता से लेती हैं। आपको कोई शानदार कलाकार होने की ज़रूरत नहीं; बस 'नहीं, पर' की जगह 'हाँ, और' कहना है। साथ खेलने में आपके कुछ मिनट लगते हैं और बच्चों को कुछ ऐसा मिलता है जो टिका रहता है: वह गहरा, शांत भरोसा कि जो दुनिया वे मन में गढ़ते हैं, वह उन लोगों के साथ बाँटने लायक़ है जिन्हें वे प्यार करते हैं।" },
-      "deepDive": { "en": "When a caregiver joins a child's pretend play and follows their lead, it deepens both the bond and the play itself — children whose imaginative worlds are welcomed tend to play more richly and feel more secure.", "hi": "जब कोई बड़ा बच्चे के बहाने वाले खेल में शामिल होता है और उनके पीछे-पीछे चलता है, तो जुड़ाव और खेल दोनों गहरे होते हैं — जिन बच्चों की कल्पना की दुनिया का स्वागत होता है, वे और भरपूर खेलते हैं और ख़ुद को ज़्यादा सुरक्षित महसूस करते हैं।" },
+      "title": { "en": "Play along with their make-believe", "hi": "उन्हें बहाना करने दीजिए" },
+      "insight": { "en": "When a child says the floor is lava or the chair is a horse, the kindest thing you can do is play along.", "hi": "जब बच्चे कहें कि फ़र्श लावा है या कुर्सी घोड़ा है, तो सबसे प्यारी बात यही है कि आप भी उनके खेल में शामिल हो जाएँ।" },
+      "expanded": { "en": "It's tempting to correct a child and say 'that's only a chair' or 'there's no dragon'. But when you step into their make-believe instead, you show your child that their inner world matters and their imagination is welcome. You don't have to be a great actor. You only have to say 'yes, and' instead of 'no, but'. Playing along takes a few minutes and gives your child something lasting: the feeling that the worlds they dream up are worth sharing with the people they love.", "hi": "बच्चे को सुधार देने का मन करता है — यह कहने का कि 'वह तो बस एक कुर्सी है' या 'कोई ड्रैगन नहीं है।' पर जब आप इसके बजाय उनके बहाने वाली दुनिया में एक क़दम रख देती हैं, तो कुछ बहुत प्यारा होता है। आप अपने बच्चे से कह रही होती हैं कि उनकी भीतर की दुनिया मायने रखती है, कि उनकी कल्पना का यहाँ स्वागत है, कि आप उनके अचरज को गंभीरता से लेती हैं। आपको कोई शानदार कलाकार होने की ज़रूरत नहीं; बस 'नहीं, पर' की जगह 'हाँ, और' कहना है। साथ खेलने में आपके कुछ मिनट लगते हैं और बच्चों को कुछ ऐसा मिलता है जो टिका रहता है: वह गहरा, शांत भरोसा कि जो दुनिया वे मन में गढ़ते हैं, वह उन लोगों के साथ बाँटने लायक़ है जिन्हें वे प्यार करते हैं।" },
+      "deepDive": { "en": "When a parent joins a child's pretend play and follows their lead, it tends to strengthen their bond and make the play richer. Children whose imaginative play is welcomed tend to play in more detail and with more confidence.", "hi": "जब कोई बड़ा बच्चे के बहाने वाले खेल में शामिल होता है और उनके पीछे-पीछे चलता है, तो जुड़ाव और खेल दोनों गहरे होते हैं — जिन बच्चों की कल्पना की दुनिया का स्वागत होता है, वे और भरपूर खेलते हैं और ख़ुद को ज़्यादा सुरक्षित महसूस करते हैं।" },
       "remember": { "en": "Say 'yes, and' to the worlds your child dreams up.", "hi": "जो दुनिया आपका बच्चा गढ़े, उसे 'हाँ, और' कहिए।" }
     },
     "readToBaby": {
@@ -258,7 +258,7 @@
     },
     "talkToBaby": {
       "title": { "en": "Tell your baby about a daydream you have about them.", "hi": "अपने बच्चे को कोई ऐसा ख़्वाब सुनाइए जो आप उनके बारे में देखती हैं।" },
-      "motivation": { "en": "Sharing a daydream aloud is a way of letting your baby into your heart.", "hi": "किसी ख़्वाब को बोलकर बाँटना अपने बच्चे को अपने दिल के भीतर आने देने का एक तरीक़ा है।" }
+      "motivation": { "en": "Sharing a daydream out loud lets your baby into your heart.", "hi": "किसी ख़्वाब को बोलकर बाँटना अपने बच्चे को अपने दिल के भीतर आने देने का एक तरीक़ा है।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -273,9 +273,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Watching The Breath Float", "hi": "साँस को बहते देखना" },
-      "content": { "en": "Close your eyes and simply watch your breath as if it were a cloud — in, and out, with no effort to change it. Follow five slow breaths drifting by.", "hi": "आँखें बंद कीजिए और बस अपनी साँस को ऐसे देखिए जैसे वह कोई बादल हो — भीतर, और बाहर, उसे बदलने की कोई कोशिश किए बिना। पाँच धीमी साँसों को यूँ ही बहते देखिए।" },
-      "remember": { "en": "Watching the breath float is rest enough for the mind.", "hi": "साँस को बहते देखना ही मन के लिए काफ़ी आराम है।" },
+      "title": { "en": "Watching the breath drift", "hi": "साँस को बहते देखना" },
+      "content": { "en": "Close your eyes and watch your breath as if it were a cloud, in and out, without trying to change it. Follow five slow breaths as they drift by.", "hi": "आँखें बंद कीजिए और बस अपनी साँस को ऐसे देखिए जैसे वह कोई बादल हो — भीतर, और बाहर, उसे बदलने की कोई कोशिश किए बिना। पाँच धीमी साँसों को यूँ ही बहते देखिए।" },
+      "remember": { "en": "Watching your breath is enough rest for your mind.", "hi": "साँस को बहते देखना ही मन के लिए काफ़ी आराम है।" },
       "durationMinutes": 2
     }
   }

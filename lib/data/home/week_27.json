@@ -4,11 +4,11 @@
     "week": 27,
     "babyLearning": { "en": "You're starting the third trimester this week.", "hi": "गोल और मज़बूत होते हुए, ख़ामोशी में सपने बुनते हुए" },
     "grow": {
-      "title": { "en": "These Days Are The Good Old Days", "hi": "यही दिन वो पुराने अच्छे दिन हैं" },
-      "insight": { "en": "One day you will look back on this very season and miss it. These ordinary days are already the good old days.", "hi": "एक दिन आप इसी दौर को मुड़कर देखेंगी और इसके लिए तरसेंगी। ये आम से दिन अभी से वो पुराने अच्छे दिन हैं।" },
-      "expanded": { "en": "It is easy to spend pregnancy waiting — for the next scan, the next milestone, the day the baby finally arrives. But the slow, in-between days you are living right now are precious in a way you may only see later. The quiet evenings, the small kicks, the wondering — one day these will be memories you reach for with a soft ache of love. You do not have to wait for some better moment to begin treasuring this one. The good old days are not behind you or ahead of you. They are happening now, gently, all around you.", "hi": "गर्भावस्था को इंतज़ार में बिता देना आसान है — अगले स्कैन का, अगले पड़ाव का, उस दिन का जब आख़िरकार शिशु आ जाएगा। पर जो धीमे, बीच के दिन आप अभी जी रही हैं, वे एक ऐसी तरह से क़ीमती हैं जो शायद आपको बाद में ही दिखे। वो शांत शामें, वो नन्ही लातें, वो सोचते रहना — एक दिन यही वो यादें होंगी जिन तक आप प्यार की एक नरम टीस के साथ पहुँचेंगी। इस पल को सँभालना शुरू करने के लिए आपको किसी बेहतर पल का इंतज़ार नहीं करना है। पुराने अच्छे दिन न आपके पीछे हैं, न आगे। वे अभी हो रहे हैं, नरमी से, आपके चारों ओर।" },
-      "deepDive": { "en": "Psychologists call savouring the active practice of noticing and lingering on good moments. Studies link it to greater wellbeing — not because life is better, but because we let ourselves feel it fully.", "hi": "मनोवैज्ञानिक इसे 'savouring' कहते हैं — अच्छे पलों को ग़ौर से देखने और उनमें ठहर जाने का एक सचेत अभ्यास। शोध इसे बेहतर सेहत से जोड़ते हैं — इसलिए नहीं कि ज़िंदगी बेहतर हो जाती है, बल्कि इसलिए कि हम ख़ुद को उसे पूरी तरह महसूस करने देते हैं।" },
-      "remember": { "en": "The days you are in now will one day feel golden.", "hi": "जिन दिनों में आप अभी हैं, वे एक दिन सुनहरे लगेंगे।" }
+      "title": { "en": "These ordinary days are ones you'll miss", "hi": "यही दिन वो पुराने अच्छे दिन हैं" },
+      "insight": { "en": "One day you'll look back on this time and miss it. These ordinary days are already the good old days.", "hi": "एक दिन आप इसी दौर को मुड़कर देखेंगी और इसके लिए तरसेंगी। ये आम से दिन अभी से वो पुराने अच्छे दिन हैं।" },
+      "expanded": { "en": "It's easy to spend pregnancy waiting: for the next scan, the next milestone, the day your baby arrives. But the slow days in between are precious in a way you may only see later. The calm evenings, the small kicks, the wondering. One day you'll look back on these with a lot of love. You don't have to wait for a better moment to start enjoying this one. The good days are happening now, all around you.", "hi": "गर्भावस्था को इंतज़ार में बिता देना आसान है — अगले स्कैन का, अगले पड़ाव का, उस दिन का जब आख़िरकार शिशु आ जाएगा। पर जो धीमे, बीच के दिन आप अभी जी रही हैं, वे एक ऐसी तरह से क़ीमती हैं जो शायद आपको बाद में ही दिखे। वो शांत शामें, वो नन्ही लातें, वो सोचते रहना — एक दिन यही वो यादें होंगी जिन तक आप प्यार की एक नरम टीस के साथ पहुँचेंगी। इस पल को सँभालना शुरू करने के लिए आपको किसी बेहतर पल का इंतज़ार नहीं करना है। पुराने अच्छे दिन न आपके पीछे हैं, न आगे। वे अभी हो रहे हैं, नरमी से, आपके चारों ओर।" },
+      "deepDive": { "en": "Psychologists use the word 'savouring' for noticing good moments and letting yourself stay with them. Studies link it with greater wellbeing, because we let ourselves feel the good times fully.", "hi": "मनोवैज्ञानिक इसे 'savouring' कहते हैं — अच्छे पलों को ग़ौर से देखने और उनमें ठहर जाने का एक सचेत अभ्यास। शोध इसे बेहतर सेहत से जोड़ते हैं — इसलिए नहीं कि ज़िंदगी बेहतर हो जाती है, बल्कि इसलिए कि हम ख़ुद को उसे पूरी तरह महसूस करने देते हैं।" },
+      "remember": { "en": "One day you'll look back on these days fondly.", "hi": "जिन दिनों में आप अभी हैं, वे एक दिन सुनहरे लगेंगे।" }
     },
     "readToBaby": {
       "title": { "en": "The Town Mouse And The Country Mouse", "hi": "शहर की चुहिया और गाँव की चुहिया" },
@@ -18,7 +18,7 @@
     },
     "talkToBaby": {
       "title": { "en": "Tell your baby how grateful you are that they chose your family to come to.", "hi": "अपने शिशु को बताइए कि आप कितनी आभारी हैं कि उसने आने के लिए आपका परिवार चुना।" },
-      "motivation": { "en": "Gratitude spoken aloud lets your baby feel how deeply they are wanted.", "hi": "बोलकर कहा गया आभार आपके शिशु को महसूस करा देता है कि उसे कितनी गहराई से चाहा गया है।" }
+      "motivation": { "en": "Saying your thanks out loud lets your baby feel how wanted they are.", "hi": "बोलकर कहा गया आभार आपके शिशु को महसूस करा देता है कि उसे कितनी गहराई से चाहा गया है।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -33,9 +33,9 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "When Heartburn Visits In The Evening", "hi": "जब शाम को सीने की जलन आ जाए" },
-      "content": { "en": "As your baby grows, a warm burn after meals is common now. Try eating smaller portions more often, and sip cool milk or coconut water to soothe it. Avoid lying down right after eating — let your meal settle first.", "hi": "जैसे-जैसे आपका शिशु बढ़ता है, खाने के बाद सीने में हल्की जलन अब आम है। थोड़ा-थोड़ा, पर बार-बार खाने की कोशिश कीजिए, और उसे शांत करने के लिए ठंडा दूध या नारियल पानी घूँट-घूँट पीजिए। खाने के तुरंत बाद लेटने से बचिए — पहले खाने को बैठ जाने दीजिए।" },
-      "remember": { "en": "Small, gentle meals are kinder to your changing body.", "hi": "थोड़ा-थोड़ा और हल्का खाना आपके बदलते शरीर पर ज़्यादा मेहरबान होता है।" },
+      "title": { "en": "When heartburn comes in the evening", "hi": "जब शाम को सीने की जलन आ जाए" },
+      "content": { "en": "As your baby grows, a burning feeling after meals is common. Try smaller portions more often, and sip cool milk or coconut water to soothe it. Don't lie down straight after eating. Let your meal settle first.", "hi": "जैसे-जैसे आपका शिशु बढ़ता है, खाने के बाद सीने में हल्की जलन अब आम है। थोड़ा-थोड़ा, पर बार-बार खाने की कोशिश कीजिए, और उसे शांत करने के लिए ठंडा दूध या नारियल पानी घूँट-घूँट पीजिए। खाने के तुरंत बाद लेटने से बचिए — पहले खाने को बैठ जाने दीजिए।" },
+      "remember": { "en": "Small, gentle meals are easier on a changing body.", "hi": "थोड़ा-थोड़ा और हल्का खाना आपके बदलते शरीर पर ज़्यादा मेहरबान होता है।" },
       "durationMinutes": 0
     }
   },
@@ -44,11 +44,11 @@
     "week": 27,
     "babyLearning": { "en": "Your baby can open and close their eyes now.", "hi": "नन्ही आँखें खुलने और बंद होने लगी हैं" },
     "grow": {
-      "title": { "en": "Savour, Don't Just Survive", "hi": "दिन काटिए नहीं, जीइए" },
-      "insight": { "en": "There is a difference between getting through your days and truly living them. This season asks you to savour, not just survive.", "hi": "दिनों को बस काट देने और उन्हें सचमुच जीने में फ़र्क़ है। यह दौर आपसे कहता है कि जीइए, सिर्फ़ गुज़ारिए मत।" },
-      "expanded": { "en": "Some weeks pass in a blur of tasks and tiredness, and it can feel like enough simply to make it to bedtime. That is human, and there is no shame in it. But this gentle stretch of pregnancy is also asking something sweeter of you: to pause now and then and actually taste your life. The warmth of morning tea, the flutter of a kick, a laugh shared with someone you love — these moments are not in the way of your day. They are the point of it. Surviving keeps you going; savouring is what makes the going worth it.", "hi": "कुछ हफ़्ते कामों और थकान के धुँधलके में गुज़र जाते हैं, और रात सोने तक पहुँच जाना ही काफ़ी लगने लगता है। यह इंसानी बात है, और इसमें कोई शर्म नहीं। पर गर्भावस्था का यह नरम दौर आपसे कुछ और मीठा भी माँग रहा है: बीच-बीच में ठहरकर अपनी ज़िंदगी का स्वाद लेना। सुबह की चाय की गर्माहट, एक लात की फड़फड़ाहट, किसी अपने के साथ बाँटी हुई हँसी — ये पल आपके दिन के रास्ते में नहीं हैं। यही तो उस दिन का मतलब हैं। गुज़ारा आपको चलाता रहता है; स्वाद लेना ही उस चलने को सार्थक बनाता है।" },
-      "deepDive": { "en": "Researchers find that people who deliberately savour everyday pleasures report more joy and less stress than those who rush past them. Attention, not abundance, is what makes a moment rich.", "hi": "शोधकर्ता पाते हैं कि जो लोग जान-बूझकर रोज़ की छोटी ख़ुशियों का स्वाद लेते हैं, वे उनसे ज़्यादा ख़ुशी और कम तनाव बताते हैं जो उन्हें दौड़ते हुए पार कर जाते हैं। किसी पल को अमीर ध्यान बनाता है, ढेर सारी चीज़ें नहीं।" },
-      "remember": { "en": "Don't just pass through your days — taste them.", "hi": "दिनों से बस गुज़र मत जाइए — उन्हें चखिए।" }
+      "title": { "en": "Take time to enjoy these days", "hi": "दिन काटिए नहीं, जीइए" },
+      "insight": { "en": "Getting through your days and enjoying them feel different. This time is worth enjoying, not only getting through.", "hi": "दिनों को बस काट देने और उन्हें सचमुच जीने में फ़र्क़ है। यह दौर आपसे कहता है कि जीइए, सिर्फ़ गुज़ारिए मत।" },
+      "expanded": { "en": "Some weeks pass in a blur of jobs and tiredness, and making it to bedtime feels like enough. That's human, and there's no shame in it. But this stretch of pregnancy is also a time to pause now and then and enjoy your life. Morning chai, a little kick, a laugh with someone you love. These moments aren't getting in the way of your day. They're what make it good. Getting through keeps you going. Enjoying the small things makes it worth it.", "hi": "कुछ हफ़्ते कामों और थकान के धुँधलके में गुज़र जाते हैं, और रात सोने तक पहुँच जाना ही काफ़ी लगने लगता है। यह इंसानी बात है, और इसमें कोई शर्म नहीं। पर गर्भावस्था का यह नरम दौर आपसे कुछ और मीठा भी माँग रहा है: बीच-बीच में ठहरकर अपनी ज़िंदगी का स्वाद लेना। सुबह की चाय की गर्माहट, एक लात की फड़फड़ाहट, किसी अपने के साथ बाँटी हुई हँसी — ये पल आपके दिन के रास्ते में नहीं हैं। यही तो उस दिन का मतलब हैं। गुज़ारा आपको चलाता रहता है; स्वाद लेना ही उस चलने को सार्थक बनाता है।" },
+      "deepDive": { "en": "Research suggests people who make a point of enjoying everyday pleasures report more happiness and less stress than those who rush past them. Paying attention is what makes a moment feel rich.", "hi": "शोधकर्ता पाते हैं कि जो लोग जान-बूझकर रोज़ की छोटी ख़ुशियों का स्वाद लेते हैं, वे उनसे ज़्यादा ख़ुशी और कम तनाव बताते हैं जो उन्हें दौड़ते हुए पार कर जाते हैं। किसी पल को अमीर ध्यान बनाता है, ढेर सारी चीज़ें नहीं।" },
+      "remember": { "en": "Take a moment to enjoy your day, not only get through it.", "hi": "दिनों से बस गुज़र मत जाइए — उन्हें चखिए।" }
     },
     "readToBaby": {
       "title": { "en": "The Four Friends", "hi": "चार दोस्त" },
@@ -57,8 +57,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about the joy they have already brought you, long before arriving.", "hi": "अपने शिशु को उस ख़ुशी के बारे में बताइए जो उसने आने से बहुत पहले ही आपको दे दी है।" },
-      "motivation": { "en": "Your baby is already a giver of joy, and saying so makes it real.", "hi": "आपका शिशु अभी से ख़ुशी देता है, और यह कह देने से वह बात सच बन जाती है।" }
+      "title": { "en": "Tell your baby about the joy they've already brought you, before they've even arrived.", "hi": "अपने शिशु को उस ख़ुशी के बारे में बताइए जो उसने आने से बहुत पहले ही आपको दे दी है।" },
+      "motivation": { "en": "Your baby already brings you joy, and saying so makes it real.", "hi": "आपका शिशु अभी से ख़ुशी देता है, और यह कह देने से वह बात सच बन जाती है।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -73,9 +73,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "I Am Allowed To Enjoy This", "hi": "मुझे इसका आनंद लेने की इजाज़त है" },
-      "content": { "en": "I do not have to earn my joy or wait for the 'right' time. I can let myself enjoy this season exactly as it is.", "hi": "मुझे अपनी ख़ुशी कमानी नहीं है, न ही 'सही' समय का इंतज़ार करना है। मैं ख़ुद को इस दौर का आनंद लेने दे सकती हूँ — जैसा यह है, ठीक वैसा ही।" },
-      "remember": { "en": "Joy does not have to be earned to be deserved.", "hi": "ख़ुशी का हक़दार होने के लिए उसे कमाना ज़रूरी नहीं।" },
+      "title": { "en": "I'm allowed to enjoy this", "hi": "मुझे इसका आनंद लेने की इजाज़त है" },
+      "content": { "en": "I don't have to earn my joy or wait for the right time. I can let myself enjoy this time just as it is.", "hi": "मुझे अपनी ख़ुशी कमानी नहीं है, न ही 'सही' समय का इंतज़ार करना है। मैं ख़ुद को इस दौर का आनंद लेने दे सकती हूँ — जैसा यह है, ठीक वैसा ही।" },
+      "remember": { "en": "You don't have to earn joy to deserve it.", "hi": "ख़ुशी का हक़दार होने के लिए उसे कमाना ज़रूरी नहीं।" },
       "durationMinutes": 0
     }
   },
@@ -84,11 +84,11 @@
     "week": 27,
     "babyLearning": { "en": "Your baby is practising breathing movements more often.", "hi": "उँगलियाँ फुर्तीली हो रही हैं, अक्सर चेहरे के पास" },
     "grow": {
-      "title": { "en": "Gratitude Changes The Day", "hi": "आभार पूरा दिन बदल देता है" },
-      "insight": { "en": "Nothing about your day has to change for gratitude to change it. One grateful thought can soften an entire afternoon.", "hi": "आभार को आपका दिन बदलने के लिए दिन में कुछ भी बदलने की ज़रूरत नहीं। शुक्र से भरा एक ख़याल पूरी दोपहर को नरम कर सकता है।" },
-      "expanded": { "en": "On a tiring or worried day, gratitude can feel like the last thing you have energy for. Yet it asks for so little — just a single moment of noticing what is already good. The roof above you, the kick beneath your hand, the cup of warmth in your fingers. None of these fix what is hard, but they quietly widen the picture, reminding you that even a difficult day holds gifts. Gratitude is not pretending everything is perfect. It is choosing to see the good that is already, quietly, there.", "hi": "थके हुए या चिंता भरे दिन में, आभार वह आख़िरी चीज़ लग सकती है जिसके लिए आपमें ताक़त बची हो। फिर भी वह माँगता कितना कम है — बस एक पल, जो पहले से अच्छा है उसे देख लेने का। सिर के ऊपर की छत, हाथ के नीचे लगी वह लात, उँगलियों में थमा गर्म कप। इनमें से कोई भी उस मुश्किल को ठीक नहीं करता, पर ये चुपचाप तस्वीर को चौड़ा कर देते हैं, और याद दिला देते हैं कि सबसे मुश्किल दिन में भी तोहफ़े छिपे होते हैं। आभार यह दिखावा नहीं है कि सब कुछ परफ़ेक्ट है। यह उस अच्छे को देख लेने का चुनाव है जो पहले से, चुपचाप, वहीं है।" },
-      "deepDive": { "en": "Research on gratitude shows that naming even three small good things a day can measurably lift mood and lower stress over time. The brain leans towards whatever we practise noticing.", "hi": "आभार पर हुए शोध दिखाते हैं कि दिन में सिर्फ़ तीन छोटी अच्छी बातें गिन लेना भी समय के साथ मन को हल्का और तनाव को कम कर देता है — और यह फ़र्क़ नापा जा सकता है। दिमाग़ उसी तरफ़ झुक जाता है जिसे देखने की हम आदत डालते हैं।" },
-      "remember": { "en": "Gratitude does not change the day; it changes how the day feels.", "hi": "आभार दिन को नहीं बदलता; वह बदलता है कि दिन कैसा महसूस होता है।" }
+      "title": { "en": "Gratitude can change how a day feels", "hi": "आभार पूरा दिन बदल देता है" },
+      "insight": { "en": "Your day doesn't have to change for gratitude to change it. One grateful thought can soften a whole afternoon.", "hi": "आभार को आपका दिन बदलने के लिए दिन में कुछ भी बदलने की ज़रूरत नहीं। शुक्र से भरा एक ख़याल पूरी दोपहर को नरम कर सकता है।" },
+      "expanded": { "en": "On a tiring or worried day, gratitude can feel like too much effort. But it asks for very little: one moment of noticing what's already good. The roof over you, a small kick from your baby, a warm cup in your hands. None of these fix what's hard. They widen the picture and show you that a hard day still has good things in it. Gratitude doesn't mean pretending everything is perfect. It means seeing the good that's already there.", "hi": "थके हुए या चिंता भरे दिन में, आभार वह आख़िरी चीज़ लग सकती है जिसके लिए आपमें ताक़त बची हो। फिर भी वह माँगता कितना कम है — बस एक पल, जो पहले से अच्छा है उसे देख लेने का। सिर के ऊपर की छत, हाथ के नीचे लगी वह लात, उँगलियों में थमा गर्म कप। इनमें से कोई भी उस मुश्किल को ठीक नहीं करता, पर ये चुपचाप तस्वीर को चौड़ा कर देते हैं, और याद दिला देते हैं कि सबसे मुश्किल दिन में भी तोहफ़े छिपे होते हैं। आभार यह दिखावा नहीं है कि सब कुछ परफ़ेक्ट है। यह उस अच्छे को देख लेने का चुनाव है जो पहले से, चुपचाप, वहीं है।" },
+      "deepDive": { "en": "Research on gratitude suggests that writing down a few good things each day can lift mood and lower stress over time. The more we practise noticing good things, the easier it gets.", "hi": "आभार पर हुए शोध दिखाते हैं कि दिन में सिर्फ़ तीन छोटी अच्छी बातें गिन लेना भी समय के साथ मन को हल्का और तनाव को कम कर देता है — और यह फ़र्क़ नापा जा सकता है। दिमाग़ उसी तरफ़ झुक जाता है जिसे देखने की हम आदत डालते हैं।" },
+      "remember": { "en": "Gratitude changes how the day feels.", "hi": "आभार दिन को नहीं बदलता; वह बदलता है कि दिन कैसा महसूस होता है।" }
     },
     "readToBaby": {
       "title": { "en": "Shabari's Berries", "hi": "शबरी के बेर" },
@@ -97,8 +97,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about one small, ordinary moment you are savouring right now.", "hi": "अपने शिशु को उस एक छोटे, आम से पल के बारे में बताइए जिसका स्वाद आप अभी ले रही हैं।" },
-      "motivation": { "en": "Sharing a small joy teaches your baby that wonder lives in ordinary things.", "hi": "एक छोटी ख़ुशी बाँटना आपके शिशु को सिखाता है कि अचरज आम-सी चीज़ों में ही बसता है।" }
+      "title": { "en": "Tell your baby about one small, ordinary moment you're enjoying right now.", "hi": "अपने शिशु को उस एक छोटे, आम से पल के बारे में बताइए जिसका स्वाद आप अभी ले रही हैं।" },
+      "motivation": { "en": "Sharing a small joy shows your baby that wonder is found in ordinary things.", "hi": "एक छोटी ख़ुशी बाँटना आपके शिशु को सिखाता है कि अचरज आम-सी चीज़ों में ही बसता है।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -113,9 +113,9 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "When You Feel Hungrier Than Before", "hi": "जब पहले से ज़्यादा भूख लगने लगे" },
-      "content": { "en": "Your appetite may grow now as your baby does, and that is perfectly natural. Reach for filling, steady foods — dal, whole grains, fruit, a handful of nuts — that nourish you both and keep your energy even through the day.", "hi": "जैसे-जैसे आपका शिशु बढ़ता है, आपकी भूख भी बढ़ सकती है, और यह बिलकुल स्वाभाविक है। पेट भरने वाली, धीरे-धीरे ताक़त देने वाली चीज़ों की ओर जाइए — दाल, साबुत अनाज, फल, एक मुट्ठी मेवे — जो आप दोनों को पोषण दें और दिन भर आपकी ऊर्जा बराबर बनाए रखें।" },
-      "remember": { "en": "A growing appetite is your body asking for what it needs.", "hi": "बढ़ती भूख आपके शरीर का वही माँगना है जो उसे चाहिए।" },
+      "title": { "en": "When you feel hungrier than before", "hi": "जब पहले से ज़्यादा भूख लगने लगे" },
+      "content": { "en": "Your appetite may grow now as your baby does, and that's normal. Reach for filling, steady foods like dal, whole grains, fruit and a handful of nuts. They nourish you both and keep you going evenly through the day.", "hi": "जैसे-जैसे आपका शिशु बढ़ता है, आपकी भूख भी बढ़ सकती है, और यह बिलकुल स्वाभाविक है। पेट भरने वाली, धीरे-धीरे ताक़त देने वाली चीज़ों की ओर जाइए — दाल, साबुत अनाज, फल, एक मुट्ठी मेवे — जो आप दोनों को पोषण दें और दिन भर आपकी ऊर्जा बराबर बनाए रखें।" },
+      "remember": { "en": "A bigger appetite now is a sign to eat well and often.", "hi": "बढ़ती भूख आपके शरीर का वही माँगना है जो उसे चाहिए।" },
       "durationMinutes": 0
     }
   },
@@ -124,11 +124,11 @@
     "week": 27,
     "babyLearning": { "en": "Your baby's nerves and brain are maturing quickly.", "hi": "नींद और जागने की नरम लय में ढलते हुए" },
     "grow": {
-      "title": { "en": "The Ordinary Is The Extraordinary", "hi": "आम ही असाधारण है" },
-      "insight": { "en": "The most extraordinary thing in your life right now is happening quietly inside an ordinary day. A whole person is being made.", "hi": "आपकी ज़िंदगी की सबसे असाधारण बात अभी एक बिलकुल आम से दिन के भीतर चुपचाप हो रही है। एक पूरा इंसान बन रहा है।" },
-      "expanded": { "en": "It is strange how the most miraculous things become ordinary to us. Right now, inside the most regular of days, a heart is beating that did not exist a year ago, fingers are learning to curl, a brain is folding itself into being. You carry a small miracle while you wash dishes and answer messages. The ordinary days are not separate from the extraordinary one — they are the very place where wonder is happening. When you remember this, even a dull afternoon becomes quietly sacred.", "hi": "अजीब है कि सबसे चमत्कारी चीज़ें भी हमारे लिए कितनी जल्दी आम हो जाती हैं। अभी, सबसे मामूली से दिन के भीतर, एक दिल धड़क रहा है जो एक साल पहले था ही नहीं, उँगलियाँ मुड़ना सीख रही हैं, एक दिमाग़ अपनी तहें बनाता जा रहा है। आप एक छोटा-सा चमत्कार अपने भीतर लिए बर्तन धोती हैं और मैसेज का जवाब देती हैं। आम दिन उस असाधारण दिन से अलग नहीं हैं — यही वह जगह हैं जहाँ अचरज घट रहा है। जब आपको यह याद रहता है, एक फीकी-सी दोपहर भी चुपचाप पवित्र हो जाती है।" },
-      "deepDive": { "en": "Mindfulness researchers note that awe and wonder can be found in everyday moments, not just grand events — and these small doses of awe are linked to greater calm and connection.", "hi": "माइंडफ़ुलनेस पर काम करने वाले शोधकर्ता कहते हैं कि विस्मय और अचरज रोज़ के पलों में भी मिल जाते हैं, सिर्फ़ बड़े मौक़ों पर नहीं — और विस्मय की ये छोटी-छोटी ख़ुराकें ज़्यादा शांति और ज़्यादा जुड़ाव से जुड़ी हैं।" },
-      "remember": { "en": "The miracle is hiding inside your most ordinary day.", "hi": "चमत्कार आपके सबसे आम दिन के भीतर ही छिपा है।" }
+      "title": { "en": "Something amazing is happening on an ordinary day", "hi": "आम ही असाधारण है" },
+      "insight": { "en": "The most amazing thing in your life right now is happening inside an ordinary day. A whole person is being made.", "hi": "आपकी ज़िंदगी की सबसे असाधारण बात अभी एक बिलकुल आम से दिन के भीतर चुपचाप हो रही है। एक पूरा इंसान बन रहा है।" },
+      "expanded": { "en": "It's strange how the most amazing things start to feel ordinary. Right now, on a regular day, a heart is beating that didn't exist a year ago. Fingers are learning to curl. A brain is growing and folding. Your baby is growing while you wash dishes and answer messages. The ordinary days are where this wonder is happening. Knowing that can make even a dull afternoon feel special.", "hi": "अजीब है कि सबसे चमत्कारी चीज़ें भी हमारे लिए कितनी जल्दी आम हो जाती हैं। अभी, सबसे मामूली से दिन के भीतर, एक दिल धड़क रहा है जो एक साल पहले था ही नहीं, उँगलियाँ मुड़ना सीख रही हैं, एक दिमाग़ अपनी तहें बनाता जा रहा है। आप एक छोटा-सा चमत्कार अपने भीतर लिए बर्तन धोती हैं और मैसेज का जवाब देती हैं। आम दिन उस असाधारण दिन से अलग नहीं हैं — यही वह जगह हैं जहाँ अचरज घट रहा है। जब आपको यह याद रहता है, एक फीकी-सी दोपहर भी चुपचाप पवित्र हो जाती है।" },
+      "deepDive": { "en": "Researchers who study awe note that it can come from everyday moments as well as big events. Small moments of awe are linked with feeling calmer and more connected.", "hi": "माइंडफ़ुलनेस पर काम करने वाले शोधकर्ता कहते हैं कि विस्मय और अचरज रोज़ के पलों में भी मिल जाते हैं, सिर्फ़ बड़े मौक़ों पर नहीं — और विस्मय की ये छोटी-छोटी ख़ुराकें ज़्यादा शांति और ज़्यादा जुड़ाव से जुड़ी हैं।" },
+      "remember": { "en": "Something amazing is happening on your most ordinary day.", "hi": "चमत्कार आपके सबसे आम दिन के भीतर ही छिपा है।" }
     },
     "readToBaby": {
       "title": { "en": "The Monkey King's Sacrifice", "hi": "वानर राज का त्याग" },
@@ -137,8 +137,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby what you are most thankful for today, however small.", "hi": "अपने शिशु को बताइए कि आज आप किस बात के लिए सबसे ज़्यादा शुक्रगुज़ार हैं, चाहे वह कितनी ही छोटी क्यों न हो।" },
-      "motivation": { "en": "Naming today's gift aloud helps your baby grow inside a grateful world.", "hi": "आज के तोहफ़े को बोलकर नाम दे देना आपके शिशु को एक आभार भरी दुनिया के भीतर बढ़ने देता है।" }
+      "title": { "en": "Tell your baby what you're most thankful for today, however small.", "hi": "अपने शिशु को बताइए कि आज आप किस बात के लिए सबसे ज़्यादा शुक्रगुज़ार हैं, चाहे वह कितनी ही छोटी क्यों न हो।" },
+      "motivation": { "en": "Saying today's good thing out loud helps your baby grow up in a grateful home.", "hi": "आज के तोहफ़े को बोलकर नाम दे देना आपके शिशु को एक आभार भरी दुनिया के भीतर बढ़ने देता है।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -153,9 +153,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Breathing In The Good", "hi": "अच्छे को साँस में भर लेना" },
-      "content": { "en": "Breathe in slowly and silently name one good thing in this moment. Breathe out and let it settle in your chest. Repeat for five gentle breaths, gathering small gratitudes.", "hi": "धीरे से साँस भीतर लीजिए और मन ही मन इस पल की एक अच्छी बात का नाम लीजिए। साँस छोड़िए और उसे अपने सीने में बैठ जाने दीजिए। पाँच नरम साँसों तक दोहराइए, छोटी-छोटी शुक्रगुज़ारियाँ समेटते हुए।" },
-      "remember": { "en": "Gratitude breathed in slowly settles deep.", "hi": "धीरे से साँस में भरा गया आभार गहरे तक बैठ जाता है।" },
+      "title": { "en": "Breathing in the good", "hi": "अच्छे को साँस में भर लेना" },
+      "content": { "en": "Breathe in slowly and silently name one good thing about this moment. Breathe out and let it settle in your chest. Repeat for five gentle breaths, collecting small things to be grateful for.", "hi": "धीरे से साँस भीतर लीजिए और मन ही मन इस पल की एक अच्छी बात का नाम लीजिए। साँस छोड़िए और उसे अपने सीने में बैठ जाने दीजिए। पाँच नरम साँसों तक दोहराइए, छोटी-छोटी शुक्रगुज़ारियाँ समेटते हुए।" },
+      "remember": { "en": "Breathe slowly and let the good things settle in.", "hi": "धीरे से साँस में भरा गया आभार गहरे तक बैठ जाता है।" },
       "durationMinutes": 2
     }
   },
@@ -164,11 +164,11 @@
     "week": 27,
     "babyLearning": { "en": "Your baby may suck a thumb or fingers, practising for feeding.", "hi": "अब आपकी आवाज़ और साफ़ सुनाई देने लगी है" },
     "grow": {
-      "title": { "en": "Be Where Your Feet Are", "hi": "वहीं रहिए जहाँ आपके पैर हैं" },
-      "insight": { "en": "So much of life is missed by being half-here, our minds racing ahead. Peace begins by being where your feet are.", "hi": "ज़िंदगी का कितना कुछ आधा-अधूरा यहाँ रहने में छूट जाता है, जब मन आगे दौड़ता रहता है। शांति वहीं से शुरू होती है जहाँ आपके पैर हैं।" },
-      "expanded": { "en": "The mind loves to leap ahead — to the birth, the sleepless nights, the years to come. But while it races forward, you can miss the only moment you ever truly have, which is this one. To be where your feet are means to gently bring yourself back: to feel the chair beneath you, the breath in your body, the baby you are carrying right now. The future will arrive in its own time, and you will meet it then. For now, this quiet present is enough, and it is yours to fully inhabit.", "hi": "मन आगे छलाँग लगाना पसंद करता है — जन्म तक, बिना नींद वाली रातों तक, आने वाले बरसों तक। पर जब वह आगे दौड़ता है, आप वही एक पल खो सकती हैं जो सचमुच आपका है, और वह यही है। जहाँ आपके पैर हैं वहीं रहने का मतलब है ख़ुद को नरमी से वापस ले आना: नीचे रखी कुर्सी को महसूस करना, शरीर में चलती साँस को, और उस शिशु को जिसे आप अभी अपने भीतर लिए हैं। भविष्य अपने समय पर आ ही जाएगा, और तब आप उससे मिल लेंगी। अभी के लिए यह शांत वर्तमान काफ़ी है, और यह आपका है — पूरी तरह इसमें बस जाने के लिए।" },
-      "deepDive": { "en": "Studies of mind-wandering suggest people are happiest when their attention rests on what they are actually doing. Presence itself, regardless of the activity, tends to lift our wellbeing.", "hi": "मन के भटकने पर हुए अध्ययन बताते हैं कि लोग तब सबसे ख़ुश होते हैं जब उनका ध्यान उसी पर टिका हो जो वे सचमुच कर रहे होते हैं। काम चाहे जो भी हो, बस वहाँ पूरी तरह मौजूद होना ही मन को हल्का कर देता है।" },
-      "remember": { "en": "Your life is happening here, not somewhere ahead.", "hi": "आपकी ज़िंदगी यहीं घट रही है, कहीं आगे नहीं।" }
+      "title": { "en": "Stay with the moment you're in", "hi": "वहीं रहिए जहाँ आपके पैर हैं" },
+      "insight": { "en": "A lot of life is missed when our minds race ahead. Peace starts with being here, in this moment.", "hi": "ज़िंदगी का कितना कुछ आधा-अधूरा यहाँ रहने में छूट जाता है, जब मन आगे दौड़ता रहता है। शांति वहीं से शुरू होती है जहाँ आपके पैर हैं।" },
+      "expanded": { "en": "The mind loves to jump ahead: to the birth, the sleepless nights, the years to come. But while it races forward, you can miss this moment, the one you're living. Being present means gently bringing yourself back. Feel the chair under you, your breath going in and out, and your baby, here right now. The future will come in its own time, and you'll meet it then. For now, this moment is enough, and it's yours.", "hi": "मन आगे छलाँग लगाना पसंद करता है — जन्म तक, बिना नींद वाली रातों तक, आने वाले बरसों तक। पर जब वह आगे दौड़ता है, आप वही एक पल खो सकती हैं जो सचमुच आपका है, और वह यही है। जहाँ आपके पैर हैं वहीं रहने का मतलब है ख़ुद को नरमी से वापस ले आना: नीचे रखी कुर्सी को महसूस करना, शरीर में चलती साँस को, और उस शिशु को जिसे आप अभी अपने भीतर लिए हैं। भविष्य अपने समय पर आ ही जाएगा, और तब आप उससे मिल लेंगी। अभी के लिए यह शांत वर्तमान काफ़ी है, और यह आपका है — पूरी तरह इसमें बस जाने के लिए।" },
+      "deepDive": { "en": "Studies of mind-wandering suggest people tend to be happier when their attention is on what they're doing right now, whatever that is.", "hi": "मन के भटकने पर हुए अध्ययन बताते हैं कि लोग तब सबसे ख़ुश होते हैं जब उनका ध्यान उसी पर टिका हो जो वे सचमुच कर रहे होते हैं। काम चाहे जो भी हो, बस वहाँ पूरी तरह मौजूद होना ही मन को हल्का कर देता है।" },
+      "remember": { "en": "Your life is happening here, right now.", "hi": "आपकी ज़िंदगी यहीं घट रही है, कहीं आगे नहीं।" }
     },
     "readToBaby": {
       "title": { "en": "Birbal And The Most Precious Thing", "hi": "बीरबल और सबसे क़ीमती चीज़" },
@@ -177,8 +177,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby how they have already changed your heart, even before you meet.", "hi": "अपने शिशु को बताइए कि मिलने से पहले ही उसने आपका दिल कैसे बदल दिया है।" },
-      "motivation": { "en": "Your baby is shaping who you are becoming, and they deserve to hear it.", "hi": "आपका शिशु गढ़ रहा है कि आप कौन बनती जा रही हैं, और उसे यह सुनने का हक़ है।" }
+      "title": { "en": "Tell your baby how they've already changed your heart, before you've even met.", "hi": "अपने शिशु को बताइए कि मिलने से पहले ही उसने आपका दिल कैसे बदल दिया है।" },
+      "motivation": { "en": "Your baby is already changing who you are, and they deserve to hear it.", "hi": "आपका शिशु गढ़ रहा है कि आप कौन बनती जा रही हैं, और उसे यह सुनने का हक़ है।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -193,8 +193,8 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "This Moment Is Enough", "hi": "यह पल काफ़ी है" },
-      "content": { "en": "I do not need to be anywhere but here. This quiet moment, just as it is, is already enough.", "hi": "मुझे यहाँ के अलावा कहीं और होने की ज़रूरत नहीं। यह शांत पल, जैसा है ठीक वैसा ही, पहले से काफ़ी है।" },
+      "title": { "en": "This moment is enough", "hi": "यह पल काफ़ी है" },
+      "content": { "en": "I don't need to be anywhere but here. This calm moment, just as it is, is enough.", "hi": "मुझे यहाँ के अलावा कहीं और होने की ज़रूरत नहीं। यह शांत पल, जैसा है ठीक वैसा ही, पहले से काफ़ी है।" },
       "remember": { "en": "Right here, right now, is enough.", "hi": "यहीं, इसी वक़्त — यही काफ़ी है।" },
       "durationMinutes": 0
     }
@@ -204,11 +204,11 @@
     "week": 27,
     "babyLearning": { "en": "Your baby's sleep and wake times are more regular now.", "hi": "रोशनी और आवाज़ पर नरमी से जवाब देते हुए" },
     "grow": {
-      "title": { "en": "Notice The Small Wonders", "hi": "छोटे-छोटे अचरजों को देखिए" },
-      "insight": { "en": "Wonder does not always arrive in grand moments. It hides in small ones, waiting only to be noticed.", "hi": "अचरज हमेशा बड़े पलों में नहीं आता। वह छोटे पलों में छिपा रहता है, बस इस इंतज़ार में कि कोई उसे देख ले।" },
-      "expanded": { "en": "It is tempting to wait for the big milestones to feel amazed — the first scan, the first kick, the birth. But wonder is far more generous than that. It is in the way your body softens to hold this life, the small flutter you feel while resting, the way you already love someone you have not yet seen. When you slow down enough to notice these small wonders, life feels fuller, and your gratitude grows. The extraordinary is not somewhere far away. It is scattered, quietly, through your most ordinary hours.", "hi": "अचरज महसूस करने के लिए बड़े पड़ावों का इंतज़ार करना आसान है — पहला स्कैन, पहली लात, जन्म। पर अचरज इससे कहीं ज़्यादा उदार है। वह उस तरीक़े में है जिससे आपका शरीर इस ज़िंदगी को थामने के लिए नरम पड़ता जा रहा है, उस नन्ही फड़फड़ाहट में जो आराम करते हुए महसूस होती है, उस बात में कि आप अभी से किसी ऐसे को प्यार करती हैं जिसे आपने देखा तक नहीं। जब आप इतना धीमा हो जाती हैं कि ये छोटे अचरज दिख जाएँ, ज़िंदगी ज़्यादा भरी हुई लगने लगती है, और आपका आभार बढ़ता जाता है। असाधारण कहीं दूर नहीं है। वह चुपचाप, आपके सबसे आम घंटों में बिखरा हुआ है।" },
-      "deepDive": { "en": "Researchers studying 'micro-moments' of positivity find that noticing small good things, repeated daily, builds lasting emotional resources over time — a slow, gentle kind of resilience.", "hi": "सकारात्मकता के 'micro-moments' पर काम करने वाले शोधकर्ता पाते हैं कि छोटी अच्छी बातों को देख लेना, अगर रोज़ दोहराया जाए, तो समय के साथ मन की एक टिकाऊ पूँजी बना देता है — एक धीमी, नरम किस्म की मज़बूती।" },
-      "remember": { "en": "Small wonders, noticed daily, become a grateful life.", "hi": "छोटे-छोटे अचरज, रोज़ देख लिए जाएँ, तो पूरी ज़िंदगी आभार से भर जाती है।" }
+      "title": { "en": "Notice the small wonders", "hi": "छोटे-छोटे अचरजों को देखिए" },
+      "insight": { "en": "Wonder doesn't only come in big moments. It's in small ones too, waiting to be noticed.", "hi": "अचरज हमेशा बड़े पलों में नहीं आता। वह छोटे पलों में छिपा रहता है, बस इस इंतज़ार में कि कोई उसे देख ले।" },
+      "expanded": { "en": "It's tempting to wait for the big milestones to feel amazed: the scan, the first kick, the birth. But wonder shows up far more often than that. It's in the small flutter felt during a quiet rest, and in the way you already love someone you haven't seen yet. When you slow down enough to notice these small wonders, life feels fuller and you feel more grateful. The special moments are scattered through your ordinary hours.", "hi": "अचरज महसूस करने के लिए बड़े पड़ावों का इंतज़ार करना आसान है — पहला स्कैन, पहली लात, जन्म। पर अचरज इससे कहीं ज़्यादा उदार है। वह उस तरीक़े में है जिससे आपका शरीर इस ज़िंदगी को थामने के लिए नरम पड़ता जा रहा है, उस नन्ही फड़फड़ाहट में जो आराम करते हुए महसूस होती है, उस बात में कि आप अभी से किसी ऐसे को प्यार करती हैं जिसे आपने देखा तक नहीं। जब आप इतना धीमा हो जाती हैं कि ये छोटे अचरज दिख जाएँ, ज़िंदगी ज़्यादा भरी हुई लगने लगती है, और आपका आभार बढ़ता जाता है। असाधारण कहीं दूर नहीं है। वह चुपचाप, आपके सबसे आम घंटों में बिखरा हुआ है।" },
+      "deepDive": { "en": "Research on small, everyday moments of good feeling suggests that noticing them, day after day, helps build emotional strength over time.", "hi": "सकारात्मकता के 'micro-moments' पर काम करने वाले शोधकर्ता पाते हैं कि छोटी अच्छी बातों को देख लेना, अगर रोज़ दोहराया जाए, तो समय के साथ मन की एक टिकाऊ पूँजी बना देता है — एक धीमी, नरम किस्म की मज़बूती।" },
+      "remember": { "en": "Notice small wonders every day, and gratitude grows.", "hi": "छोटे-छोटे अचरज, रोज़ देख लिए जाएँ, तो पूरी ज़िंदगी आभार से भर जाती है।" }
     },
     "readToBaby": {
       "title": { "en": "The Stonecutter's Wishes", "hi": "पत्थर तोड़ने वाले की ख़्वाहिशें" },
@@ -217,8 +217,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby what a gift these months of carrying them have been to you.", "hi": "अपने शिशु को बताइए कि उसे भीतर लिए हुए ये महीने आपके लिए कितना बड़ा तोहफ़ा रहे हैं।" },
-      "motivation": { "en": "Letting your baby hear your gratitude wraps them in a sense of welcome.", "hi": "अपना आभार शिशु को सुनने देना उसे स्वागत के एहसास में लपेट देता है।" }
+      "title": { "en": "Tell your baby what a gift these months of waiting for them have been.", "hi": "अपने शिशु को बताइए कि उसे भीतर लिए हुए ये महीने आपके लिए कितना बड़ा तोहफ़ा रहे हैं।" },
+      "motivation": { "en": "Letting your baby hear your gratitude helps them feel welcome.", "hi": "अपना आभार शिशु को सुनने देना उसे स्वागत के एहसास में लपेट देता है।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -233,8 +233,8 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "When You Crave Something Sweet", "hi": "जब कुछ मीठा खाने का मन करे" },
-      "content": { "en": "A sweet craving is normal and fine to enjoy. Reach gently for naturally sweet foods — a ripe mango, a date, a little jaggery with milk — which satisfy you and bring goodness too, instead of leaving you tired soon after.", "hi": "मीठे की तलब आम बात है, और उसे पूरा कर लेना भी ठीक है। नरमी से उन चीज़ों की ओर जाइए जो अपने आप में मीठी हैं — एक पका आम, एक खजूर, दूध के साथ थोड़ा गुड़ — जो मन भी भर दें और साथ में अच्छाई भी दें, न कि थोड़ी देर बाद आपको थका छोड़ जाएँ।" },
+      "title": { "en": "When you crave something sweet", "hi": "जब कुछ मीठा खाने का मन करे" },
+      "content": { "en": "A sweet craving is normal and fine to enjoy. Reach for naturally sweet foods, like a ripe mango, a date or a little jaggery with milk. They satisfy you and bring some goodness too, instead of leaving you tired soon after.", "hi": "मीठे की तलब आम बात है, और उसे पूरा कर लेना भी ठीक है। नरमी से उन चीज़ों की ओर जाइए जो अपने आप में मीठी हैं — एक पका आम, एक खजूर, दूध के साथ थोड़ा गुड़ — जो मन भी भर दें और साथ में अच्छाई भी दें, न कि थोड़ी देर बाद आपको थका छोड़ जाएँ।" },
       "remember": { "en": "Naturally sweet foods satisfy the craving and nourish too.", "hi": "अपने आप में मीठी चीज़ें तलब भी पूरी करती हैं और पोषण भी देती हैं।" },
       "durationMinutes": 0
     }
@@ -244,11 +244,11 @@
     "week": 27,
     "babyLearning": { "en": "Your baby's liver and immune system keep maturing.", "hi": "हफ़्ता पूरा होते हुए, आधे रास्ते से कहीं आगे निकलकर" },
     "grow": {
-      "title": { "en": "Halfway, And Wholly In Love", "hi": "आधा रास्ता, और पूरा प्यार" },
-      "insight": { "en": "You have come more than halfway, and somewhere along this road, love quietly became the whole of it.", "hi": "आप आधे से ज़्यादा रास्ता तय कर चुकी हैं, और इस राह में कहीं, चुपचाप प्यार ही पूरा सफ़र बन गया।" },
-      "expanded": { "en": "Look how far you have travelled. The early weeks of wonder and worry, the slow unfolding of these months — all of it has carried you well past the halfway mark. And somewhere along the way, without a single grand moment to mark it, something shifted. This is no longer just a pregnancy you are managing; it is a person you wholly love. The road ahead still holds the unknown, but you do not face it as the same person who began. You are more, now — softer, stronger, and full of a love that has quietly become the centre of everything.", "hi": "देखिए तो, आप कितनी दूर आ चुकी हैं। अचरज और चिंता वाले शुरुआती हफ़्ते, इन महीनों का धीरे-धीरे खुलना — यह सब आपको आधे निशान से कहीं आगे ले आया है। और इसी राह में कहीं, बिना किसी बड़े पल के जो इसे दर्ज करता, कुछ बदल गया। यह अब सिर्फ़ एक गर्भावस्था नहीं जिसे आप सँभाल रही हैं; यह एक इंसान है जिसे आप पूरे दिल से प्यार करती हैं। आगे की राह में अब भी बहुत कुछ अनजाना है, पर आप उसका सामना उसी इंसान की तरह नहीं कर रहीं जिसने शुरुआत की थी। आप अब कुछ और हैं — ज़्यादा नरम, ज़्यादा मज़बूत, और एक ऐसे प्यार से भरी हुईं जो चुपचाप हर चीज़ का केंद्र बन गया है।" },
-      "deepDive": { "en": "By the late second trimester, many parents describe a deepening sense of attachment as the baby's movements and rhythms grow familiar. This felt bond is part of how nature gently prepares you to love and protect.", "hi": "दूसरी तिमाही के आख़िरी हिस्से तक आते-आते, कई माँ-बाप बताते हैं कि जुड़ाव और गहरा होता जाता है, क्योंकि शिशु की हरकतें और उसकी लय जानी-पहचानी लगने लगती हैं। महसूस होता यह जुड़ाव उसी तरीक़े का हिस्सा है जिससे क़ुदरत आपको प्यार और हिफ़ाज़त के लिए नरमी से तैयार करती है।" },
-      "remember": { "en": "More than halfway, and already wholly in love.", "hi": "आधे से ज़्यादा रास्ता, और अभी से पूरा प्यार।" }
+      "title": { "en": "More than halfway, and already in love", "hi": "आधा रास्ता, और पूरा प्यार" },
+      "insight": { "en": "You're more than halfway there, and somewhere along the way, love became the centre of it all.", "hi": "आप आधे से ज़्यादा रास्ता तय कर चुकी हैं, और इस राह में कहीं, चुपचाप प्यार ही पूरा सफ़र बन गया।" },
+      "expanded": { "en": "Look how far you've come. The early weeks of wonder and worry, the slow months since: they've carried you well past halfway. And somewhere along the way, without one big moment to mark it, something changed. This is no longer just a pregnancy to manage. It's a person you love. What's ahead still holds unknowns, but you're not the same person who started. You're softer, stronger, and full of a love that's now at the centre of everything.", "hi": "देखिए तो, आप कितनी दूर आ चुकी हैं। अचरज और चिंता वाले शुरुआती हफ़्ते, इन महीनों का धीरे-धीरे खुलना — यह सब आपको आधे निशान से कहीं आगे ले आया है। और इसी राह में कहीं, बिना किसी बड़े पल के जो इसे दर्ज करता, कुछ बदल गया। यह अब सिर्फ़ एक गर्भावस्था नहीं जिसे आप सँभाल रही हैं; यह एक इंसान है जिसे आप पूरे दिल से प्यार करती हैं। आगे की राह में अब भी बहुत कुछ अनजाना है, पर आप उसका सामना उसी इंसान की तरह नहीं कर रहीं जिसने शुरुआत की थी। आप अब कुछ और हैं — ज़्यादा नरम, ज़्यादा मज़बूत, और एक ऐसे प्यार से भरी हुईं जो चुपचाप हर चीज़ का केंद्र बन गया है।" },
+      "deepDive": { "en": "Many parents say they feel more attached in the late second trimester, as the baby's movements and patterns become familiar. That growing bond is a normal part of getting ready to care for a baby.", "hi": "दूसरी तिमाही के आख़िरी हिस्से तक आते-आते, कई माँ-बाप बताते हैं कि जुड़ाव और गहरा होता जाता है, क्योंकि शिशु की हरकतें और उसकी लय जानी-पहचानी लगने लगती हैं। महसूस होता यह जुड़ाव उसी तरीक़े का हिस्सा है जिससे क़ुदरत आपको प्यार और हिफ़ाज़त के लिए नरमी से तैयार करती है।" },
+      "remember": { "en": "More than halfway, and already in love.", "hi": "आधे से ज़्यादा रास्ता, और अभी से पूरा प्यार।" }
     },
     "readToBaby": {
       "title": { "en": "The Blossom And Its Season", "hi": "फूल और उसका मौसम" },
@@ -257,8 +257,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby how deeply loved they are, now that you are well past halfway together.", "hi": "अपने शिशु को बताइए कि उसे कितनी गहराई से प्यार किया जाता है, अब जब आप दोनों साथ में आधे रास्ते से कहीं आगे आ चुके हैं।" },
-      "motivation": { "en": "Reaching this milestone together is a moment of love worth naming aloud.", "hi": "इस पड़ाव तक साथ पहुँचना प्यार का ऐसा पल है जिसे बोलकर कह देना चाहिए।" }
+      "title": { "en": "Tell your baby how loved they are, now that you're well past halfway together.", "hi": "अपने शिशु को बताइए कि उसे कितनी गहराई से प्यार किया जाता है, अब जब आप दोनों साथ में आधे रास्ते से कहीं आगे आ चुके हैं।" },
+      "motivation": { "en": "Reaching this point together is worth saying out loud.", "hi": "इस पड़ाव तक साथ पहुँचना प्यार का ऐसा पल है जिसे बोलकर कह देना चाहिए।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -273,9 +273,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "A Breath Of Thanks", "hi": "शुक्र की एक साँस" },
-      "content": { "en": "Rest a hand on your belly. Breathe in slowly and silently say 'thank you' for how far you have come. Breathe out and let warmth spread through you. Repeat for five gentle breaths.", "hi": "एक हाथ पेट पर रखिए। धीरे से साँस भीतर लीजिए और मन ही मन 'शुक्रिया' कहिए — इस बात के लिए कि आप कितनी दूर आ गई हैं। साँस छोड़िए और गर्माहट को अपने भीतर फैल जाने दीजिए। पाँच नरम साँसों तक दोहराइए।" },
-      "remember": { "en": "A breath of thanks turns this moment into a gift.", "hi": "शुक्र की एक साँस इस पल को एक तोहफ़ा बना देती है।" },
+      "title": { "en": "A breath of thanks", "hi": "शुक्र की एक साँस" },
+      "content": { "en": "Rest a hand on your belly. Breathe in slowly and silently say 'thank you' for how far you've come. Breathe out and let warmth spread through you. Repeat for five gentle breaths.", "hi": "एक हाथ पेट पर रखिए। धीरे से साँस भीतर लीजिए और मन ही मन 'शुक्रिया' कहिए — इस बात के लिए कि आप कितनी दूर आ गई हैं। साँस छोड़िए और गर्माहट को अपने भीतर फैल जाने दीजिए। पाँच नरम साँसों तक दोहराइए।" },
+      "remember": { "en": "A breath of thanks makes this moment feel like a gift.", "hi": "शुक्र की एक साँस इस पल को एक तोहफ़ा बना देती है।" },
       "durationMinutes": 1
     }
   }

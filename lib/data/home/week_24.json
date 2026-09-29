@@ -4,11 +4,11 @@
     "week": 24,
     "babyLearning": { "en": "Your baby's lungs are starting to make a substance that helps them open.", "hi": "और मज़बूत होते हुए, आपकी आवाज़ की लय सीखते हुए" },
     "grow": {
-      "title": { "en": "Mistakes Are How We Grow", "hi": "ग़लतियों से ही हम बढ़ते हैं" },
-      "insight": { "en": "A mistake is not the opposite of learning. It is one of the truest ways learning ever happens.", "hi": "ग़लती सीखने का उलटा नहीं है। यह तो सीखने के सबसे सच्चे रास्तों में से एक है।" },
-      "expanded": { "en": "We often hope our children will avoid mistakes, as if a smooth path were the safest one. But a child who never stumbles never learns how to rise. Every wobble, every spill, every wrong turn carries a small lesson that no perfect day could teach. As you become a parent, it helps to make peace with this early: mistakes are not failures of your child, they are the workshop where their growing happens. The kindest thing you can do is greet each one with calm, not alarm, so your child learns that getting it wrong is simply part of getting it right.", "hi": "हम अक्सर चाहते हैं कि हमारे बच्चे ग़लतियों से बचे रहें, जैसे सीधा-सपाट रास्ता ही सबसे सुरक्षित हो। पर जो कभी लड़खड़ाता ही नहीं, वह उठना भी नहीं सीखता। हर डगमगाहट, हर गिरा हुआ गिलास, हर ग़लत मोड़ अपने साथ एक छोटी-सी सीख लाता है, जो कोई परफ़ेक्ट दिन नहीं सिखा सकता। माँ बनते हुए इस बात से जल्दी ही सुलह कर लेना अच्छा है: ग़लतियाँ आपके बच्चे की नाकामी नहीं, वे तो वह कारख़ाना हैं जहाँ बढ़ना होता है। सबसे प्यारी बात जो आप कर सकती हैं, वह है हर ग़लती को घबराहट से नहीं, शांति से मिलना — ताकि बच्चों में यह समझ बने कि ग़लत करना, सही करने का ही एक हिस्सा है।" },
-      "deepDive": { "en": "Learning scientists find that the brain forms its strongest new connections right after an error is noticed and corrected — a moment researchers call 'productive struggle.' Mistakes literally help the brain grow.", "hi": "सीखने पर काम करने वाले वैज्ञानिक पाते हैं कि दिमाग़ अपने सबसे मज़बूत नए जोड़ ठीक तब बनाता है, जब कोई ग़लती पकड़ी और सुधारी जाती है — इस पल को शोधकर्ता 'productive struggle' कहते हैं। ग़लतियाँ सचमुच दिमाग़ को बढ़ने में मदद करती हैं।" },
-      "remember": { "en": "Every mistake is a small, quiet teacher.", "hi": "हर ग़लती एक छोटी, ख़ामोश गुरु है।" }
+      "title": { "en": "Mistakes are how children learn", "hi": "ग़लतियों से ही हम बढ़ते हैं" },
+      "insight": { "en": "Mistakes are part of learning. They're one of the main ways learning happens.", "hi": "ग़लती सीखने का उलटा नहीं है। यह तो सीखने के सबसे सच्चे रास्तों में से एक है।" },
+      "expanded": { "en": "It's natural to hope your child will avoid mistakes. But a child who never stumbles never learns how to get back up. Every wobble, spill and wrong turn carries a small lesson a perfect day couldn't teach. It helps to make peace with this early. Your child's mistakes aren't failures. They're how growing happens. The kindest thing you can do is meet each one calmly, so your child learns that getting it wrong is part of getting it right.", "hi": "हम अक्सर चाहते हैं कि हमारे बच्चे ग़लतियों से बचे रहें, जैसे सीधा-सपाट रास्ता ही सबसे सुरक्षित हो। पर जो कभी लड़खड़ाता ही नहीं, वह उठना भी नहीं सीखता। हर डगमगाहट, हर गिरा हुआ गिलास, हर ग़लत मोड़ अपने साथ एक छोटी-सी सीख लाता है, जो कोई परफ़ेक्ट दिन नहीं सिखा सकता। माँ बनते हुए इस बात से जल्दी ही सुलह कर लेना अच्छा है: ग़लतियाँ आपके बच्चे की नाकामी नहीं, वे तो वह कारख़ाना हैं जहाँ बढ़ना होता है। सबसे प्यारी बात जो आप कर सकती हैं, वह है हर ग़लती को घबराहट से नहीं, शांति से मिलना — ताकि बच्चों में यह समझ बने कि ग़लत करना, सही करने का ही एक हिस्सा है।" },
+      "deepDive": { "en": "Research on learning suggests that noticing a mistake and then correcting it helps a lesson stick. Teachers sometimes call this effortful, trial-and-error work 'productive struggle'.", "hi": "सीखने पर काम करने वाले वैज्ञानिक पाते हैं कि दिमाग़ अपने सबसे मज़बूत नए जोड़ ठीक तब बनाता है, जब कोई ग़लती पकड़ी और सुधारी जाती है — इस पल को शोधकर्ता 'productive struggle' कहते हैं। ग़लतियाँ सचमुच दिमाग़ को बढ़ने में मदद करती हैं।" },
+      "remember": { "en": "Every mistake is a small teacher.", "hi": "हर ग़लती एक छोटी, ख़ामोश गुरु है।" }
     },
     "readToBaby": {
       "title": { "en": "The Bear And The Beehive", "hi": "भालू और मधुमक्खी का छत्ता" },
@@ -18,7 +18,7 @@
     },
     "talkToBaby": {
       "title": { "en": "Tell your baby about a mistake that ended up teaching you the most.", "hi": "अपने शिशु को उस ग़लती के बारे में बताइए, जिसने आख़िर में आपको सबसे ज़्यादा सिखाया।" },
-      "motivation": { "en": "Your child will learn that mistakes are not to be feared, but learned from.", "hi": "बच्चे यह सीखते हैं कि ग़लतियों से डरना नहीं, उनसे सीखना होता है।" }
+      "motivation": { "en": "Your child will learn that mistakes are something to learn from, and nothing to fear.", "hi": "बच्चे यह सीखते हैं कि ग़लतियों से डरना नहीं, उनसे सीखना होता है।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -33,9 +33,9 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "When Heartburn Creeps In", "hi": "जब सीने में जलन उठने लगे" },
-      "content": { "en": "If meals are leaving a burning feeling behind your chest, try eating smaller portions more often and staying upright for a while after. Cool milk, a ripe banana or a little plain yoghurt can soothe the burn gently.", "hi": "अगर खाने के बाद सीने के पीछे जलन-सी रह जाती है, तो थोड़ा-थोड़ा और ज़्यादा बार खाकर देखिए, और खाने के बाद कुछ देर सीधी बैठी रहिए। ठंडा दूध, एक पका केला या थोड़ा-सा सादा दही इस जलन को नरमी से शांत कर सकता है।" },
-      "remember": { "en": "Small, slow meals are kinder to a busy belly.", "hi": "छोटा और आराम से खाया गया खाना, व्यस्त पेट पर ज़्यादा मेहरबान होता है।" },
+      "title": { "en": "Soothing heartburn after meals", "hi": "जब सीने में जलन उठने लगे" },
+      "content": { "en": "If meals leave a burning feeling behind your chest, try smaller portions more often and stay upright for a while after eating. Cool milk, a ripe banana or a little plain yoghurt can gently soothe the burn.", "hi": "अगर खाने के बाद सीने के पीछे जलन-सी रह जाती है, तो थोड़ा-थोड़ा और ज़्यादा बार खाकर देखिए, और खाने के बाद कुछ देर सीधी बैठी रहिए। ठंडा दूध, एक पका केला या थोड़ा-सा सादा दही इस जलन को नरमी से शांत कर सकता है।" },
+      "remember": { "en": "Small, slow meals are easier on a busy belly.", "hi": "छोटा और आराम से खाया गया खाना, व्यस्त पेट पर ज़्यादा मेहरबान होता है।" },
       "durationMinutes": 0
     }
   },
@@ -44,11 +44,11 @@
     "week": 24,
     "babyLearning": { "en": "Your baby is settling into times of sleep and activity.", "hi": "नन्हे कान लोरियों और हँसी की ओर लगते हुए" },
     "grow": {
-      "title": { "en": "Failing Is Part Of Learning", "hi": "नाकाम होना सीखने का ही हिस्सा है" },
-      "insight": { "en": "Failing at something is not the end of learning it. Very often, it is the real beginning.", "hi": "किसी चीज़ में नाकाम होना, उसे सीखने का अंत नहीं है। अक्सर तो यही असली शुरुआत होती है।" },
-      "expanded": { "en": "There is a quiet myth that learning should feel smooth, that if our child struggles, something has gone wrong. But almost nothing worth knowing is learned without a stretch of not-yet-getting-it. A child learning to walk falls dozens of times a day, and we cheer each fall, because we know it is the path. The same is true of every harder skill that comes later. When you can see failing as a natural chapter rather than a verdict, you free your child to keep trying. Your calm patience tells them the most freeing truth: not-yet is not never.", "hi": "एक चुपचाप-सी ग़लतफ़हमी है कि सीखना आसान लगना चाहिए — कि अगर बच्चा जूझ रहा है, तो कुछ गड़बड़ है। पर जानने लायक़ शायद ही कोई चीज़ ‘अभी नहीं आ रहा’ वाले दौर से गुज़रे बिना सीखी जाती है। चलना सीखते बच्चे दिन में दर्जनों बार गिरते हैं, और हम हर गिरने पर ताली बजाते हैं, क्योंकि हम जानते हैं कि यही रास्ता है। आगे आने वाले हर मुश्किल हुनर के साथ भी यही सच है। जब आप नाकामी को कोई फ़ैसला नहीं, बल्कि एक क़ुदरती अध्याय मानकर देख पाती हैं, तो बच्चों को कोशिश करते रहने की आज़ादी मिल जाती है। आपका शांत सब्र उन्हें सबसे आज़ाद करने वाला सच बताता है: ‘अभी नहीं’ का मतलब ‘कभी नहीं’ नहीं होता।" },
-      "deepDive": { "en": "Studies of skill-building show that people who view setbacks as information, not as proof of inability, persist far longer and ultimately learn more. The story we tell about failing shapes whether we keep going.", "hi": "हुनर सीखने पर हुए अध्ययन बताते हैं कि जो लोग नाकामी को अपनी कमी का सबूत नहीं, बल्कि एक जानकारी मानते हैं, वे कहीं ज़्यादा देर तक लगे रहते हैं और आख़िर में ज़्यादा सीखते हैं। नाकामी के बारे में हम जो कहानी ख़ुद से कहते हैं, वही तय करती है कि हम आगे बढ़ते रहेंगे या नहीं।" },
-      "remember": { "en": "Not-yet is not never.", "hi": "‘अभी नहीं’ का मतलब ‘कभी नहीं’ नहीं होता।" }
+      "title": { "en": "Failing is part of learning", "hi": "नाकाम होना सीखने का ही हिस्सा है" },
+      "insight": { "en": "Failing at something doesn't end the learning. Very often, it's where the learning starts.", "hi": "किसी चीज़ में नाकाम होना, उसे सीखने का अंत नहीं है। अक्सर तो यही असली शुरुआत होती है।" },
+      "expanded": { "en": "It's easy to believe learning should feel smooth, and that if a child struggles, something's gone wrong. But almost nothing worth knowing is learned without a stretch of not getting it yet. A child learning to walk falls many times a day, and we cheer each fall, because we know that's how walking comes. The same is true of every harder skill later on. When you see failing as a normal step and not a final judgement, your child feels free to keep trying. Your calm patience tells them 'not yet' doesn't mean 'never'.", "hi": "एक चुपचाप-सी ग़लतफ़हमी है कि सीखना आसान लगना चाहिए — कि अगर बच्चा जूझ रहा है, तो कुछ गड़बड़ है। पर जानने लायक़ शायद ही कोई चीज़ ‘अभी नहीं आ रहा’ वाले दौर से गुज़रे बिना सीखी जाती है। चलना सीखते बच्चे दिन में दर्जनों बार गिरते हैं, और हम हर गिरने पर ताली बजाते हैं, क्योंकि हम जानते हैं कि यही रास्ता है। आगे आने वाले हर मुश्किल हुनर के साथ भी यही सच है। जब आप नाकामी को कोई फ़ैसला नहीं, बल्कि एक क़ुदरती अध्याय मानकर देख पाती हैं, तो बच्चों को कोशिश करते रहने की आज़ादी मिल जाती है। आपका शांत सब्र उन्हें सबसे आज़ाद करने वाला सच बताता है: ‘अभी नहीं’ का मतलब ‘कभी नहीं’ नहीं होता।" },
+      "deepDive": { "en": "Studies of how people build skills suggest those who see setbacks as useful information, and not as proof they can't do it, keep going longer and end up learning more. How we explain failing to ourselves affects whether we try again.", "hi": "हुनर सीखने पर हुए अध्ययन बताते हैं कि जो लोग नाकामी को अपनी कमी का सबूत नहीं, बल्कि एक जानकारी मानते हैं, वे कहीं ज़्यादा देर तक लगे रहते हैं और आख़िर में ज़्यादा सीखते हैं। नाकामी के बारे में हम जो कहानी ख़ुद से कहते हैं, वही तय करती है कि हम आगे बढ़ते रहेंगे या नहीं।" },
+      "remember": { "en": "Not yet doesn't mean never.", "hi": "‘अभी नहीं’ का मतलब ‘कभी नहीं’ नहीं होता।" }
     },
     "readToBaby": {
       "title": { "en": "The Monkey Who Rang The Bell", "hi": "वह बंदर जिसने घंटी बजाई" },
@@ -58,7 +58,7 @@
     },
     "talkToBaby": {
       "title": { "en": "Tell your baby how you slowly learned to forgive yourself for a mistake.", "hi": "अपने शिशु को बताइए कि आपने धीरे-धीरे एक ग़लती के लिए ख़ुद को माफ़ करना कैसे सीखा।" },
-      "motivation": { "en": "Self-kindness is a gift your child learns first by watching you give it to yourself.", "hi": "ख़ुद पर नरमी एक ऐसा तोहफ़ा है, जो बच्चे सबसे पहले आपको ख़ुद पर नरम होते देखकर सीखते हैं।" }
+      "motivation": { "en": "Your child learns to be kind to themselves first by watching you do it.", "hi": "ख़ुद पर नरमी एक ऐसा तोहफ़ा है, जो बच्चे सबसे पहले आपको ख़ुद पर नरम होते देखकर सीखते हैं।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -73,8 +73,8 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "I Am Learning As I Go", "hi": "मैं चलते-चलते सीख रही हूँ" },
-      "content": { "en": "I do not have to have it all figured out. I am allowed to learn this slowly, one day at a time.", "hi": "मुझे सब कुछ पहले से समझा हुआ होना ज़रूरी नहीं। मुझे इसे धीरे-धीरे सीखने की छूट है — एक-एक दिन करके।" },
+      "title": { "en": "I'm learning as I go", "hi": "मैं चलते-चलते सीख रही हूँ" },
+      "content": { "en": "I don't have to have it all figured out. I'm allowed to learn this slowly, one day at a time.", "hi": "मुझे सब कुछ पहले से समझा हुआ होना ज़रूरी नहीं। मुझे इसे धीरे-धीरे सीखने की छूट है — एक-एक दिन करके।" },
       "remember": { "en": "Learning slowly is still learning.", "hi": "धीरे सीखना भी सीखना ही है।" },
       "durationMinutes": 0
     }
@@ -84,10 +84,10 @@
     "week": 24,
     "babyLearning": { "en": "Your baby's inner ear now senses balance and which way is up.", "hi": "नन्ही उँगलियाँ अभ्यास के साथ मुड़ती और खिंचती हुईं" },
     "grow": {
-      "title": { "en": "Let Them Try And Stumble", "hi": "उन्हें कोशिश करने और लड़खड़ाने दीजिए" },
-      "insight": { "en": "The greatest gift is not catching your child every time. It is letting them learn to catch themselves.", "hi": "सबसे बड़ा तोहफ़ा हर बार बच्चे को थाम लेना नहीं है। सबसे बड़ा तोहफ़ा है उन्हें ख़ुद को थामना सीखने देना।" },
-      "expanded": { "en": "Love makes us want to smooth every path, to reach out before our child can fall. But a hand that always catches can quietly teach a child that they cannot stand on their own. The deeper kind of protection is to stay close while letting them try — to allow the small stumble that builds real confidence. You do not have to choose between caring and stepping back; the loving thing is to do both at once. Be the steady presence at the edge of the room, ready but not rushing, so your child learns that trying is safe and that you trust them to grow.", "hi": "प्यार हमें हर रास्ता चिकना कर देने को कहता है — बच्चे के गिरने से पहले ही हाथ बढ़ा देने को। पर जो हाथ हमेशा थाम लेता है, वह चुपचाप यह भी सिखा देता है कि अपने पैरों पर खड़ा नहीं हुआ जा सकता। असली हिफ़ाज़त यह है कि आप पास रहें, पर कोशिश करने दें — वह छोटी-सी लड़खड़ाहट होने दें, जिससे सच्चा आत्मविश्वास बनता है। आपको परवाह और पीछे हटने में से एक चुनना नहीं है; प्यार तो दोनों एक साथ करने में है। कमरे के कोने पर एक ठहरी हुई मौजूदगी बनकर रहिए — तैयार, पर जल्दबाज़ी में नहीं — ताकि बच्चों में यह भरोसा बने कि कोशिश करना सुरक्षित है, और कि आप उनके बढ़ने पर यक़ीन करती हैं।" },
-      "deepDive": { "en": "Child development experts call the support that gives just enough help and no more 'scaffolding.' Stepping back at the right moment lets a child discover their own capability — the root of lasting confidence.", "hi": "बाल-विकास के जानकार उस सहारे को 'scaffolding' कहते हैं, जो बस उतनी ही मदद दे — उससे ज़्यादा नहीं। सही पल पर पीछे हट जाना बच्चों को अपनी क़ाबिलियत ख़ुद खोजने देता है, और यही टिकाऊ आत्मविश्वास की जड़ है।" },
+      "title": { "en": "Let them try, even if they stumble", "hi": "उन्हें कोशिश करने और लड़खड़ाने दीजिए" },
+      "insight": { "en": "You don't have to catch your child every time. Letting them learn to catch themselves is a gift too.", "hi": "सबसे बड़ा तोहफ़ा हर बार बच्चे को थाम लेना नहीं है। सबसे बड़ा तोहफ़ा है उन्हें ख़ुद को थामना सीखने देना।" },
+      "expanded": { "en": "Love makes us want to smooth every path and reach out before our child falls. But a hand that always catches can teach a child they can't stand on their own. Another kind of protection is to stay close while letting them try, and to allow the small stumble that builds confidence. You can care and step back at the same time. Be the steady person at the edge of the room, ready but not rushing, so your child learns that trying is safe and that you trust them.", "hi": "प्यार हमें हर रास्ता चिकना कर देने को कहता है — बच्चे के गिरने से पहले ही हाथ बढ़ा देने को। पर जो हाथ हमेशा थाम लेता है, वह चुपचाप यह भी सिखा देता है कि अपने पैरों पर खड़ा नहीं हुआ जा सकता। असली हिफ़ाज़त यह है कि आप पास रहें, पर कोशिश करने दें — वह छोटी-सी लड़खड़ाहट होने दें, जिससे सच्चा आत्मविश्वास बनता है। आपको परवाह और पीछे हटने में से एक चुनना नहीं है; प्यार तो दोनों एक साथ करने में है। कमरे के कोने पर एक ठहरी हुई मौजूदगी बनकर रहिए — तैयार, पर जल्दबाज़ी में नहीं — ताकि बच्चों में यह भरोसा बने कि कोशिश करना सुरक्षित है, और कि आप उनके बढ़ने पर यक़ीन करती हैं।" },
+      "deepDive": { "en": "Child development experts call it 'scaffolding' when an adult gives just enough help and no more. Stepping back at the right moment lets a child find out what they can do, and that's where lasting confidence comes from.", "hi": "बाल-विकास के जानकार उस सहारे को 'scaffolding' कहते हैं, जो बस उतनी ही मदद दे — उससे ज़्यादा नहीं। सही पल पर पीछे हट जाना बच्चों को अपनी क़ाबिलियत ख़ुद खोजने देता है, और यही टिकाऊ आत्मविश्वास की जड़ है।" },
       "remember": { "en": "Stay close, but let them try.", "hi": "पास रहिए, पर कोशिश उन्हें करने दीजिए।" }
     },
     "readToBaby": {
@@ -97,8 +97,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about a failure that quietly led to something good.", "hi": "अपने शिशु को उस नाकामी के बारे में बताइए, जो चुपचाप किसी अच्छी चीज़ तक ले गई।" },
-      "motivation": { "en": "Your child will learn that even disappointments can open unexpected doors.", "hi": "बच्चे यह सीखते हैं कि निराशाएँ भी अनजाने दरवाज़े खोल सकती हैं।" }
+      "title": { "en": "Tell your baby about a failure that later led to something good.", "hi": "अपने शिशु को उस नाकामी के बारे में बताइए, जो चुपचाप किसी अच्छी चीज़ तक ले गई।" },
+      "motivation": { "en": "Your child will learn that even disappointments can lead somewhere good.", "hi": "बच्चे यह सीखते हैं कि निराशाएँ भी अनजाने दरवाज़े खोल सकती हैं।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -113,9 +113,9 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "When Energy Dips In The Afternoon", "hi": "जब दोपहर में ताक़त ढल जाए" },
-      "content": { "en": "If your energy fades by mid-afternoon, reach for a steady snack rather than something sugary — a handful of roasted chana, a few nuts with dates, or whole-grain toast with peanut butter keep you fuelled without the sudden crash.", "hi": "अगर दोपहर ढलते-ढलते आपकी ताक़त कम पड़ जाती है, तो कुछ मीठे की जगह ऐसा हल्का खाना लीजिए जो देर तक साथ दे — मुट्ठी भर भुना चना, कुछ मेवे खजूर के साथ, या साबुत अनाज का टोस्ट पीनट बटर के साथ। इनसे ताक़त बनी रहती है और अचानक गिरती भी नहीं।" },
-      "remember": { "en": "Steady fuel beats a quick sugar rush.", "hi": "देर तक साथ देने वाला खाना, झटपट मिलने वाली मिठास से बेहतर है।" },
+      "title": { "en": "A mid-afternoon snack that lasts", "hi": "जब दोपहर में ताक़त ढल जाए" },
+      "content": { "en": "If you feel drained by mid-afternoon, reach for a steady snack instead of something sugary. A handful of roasted chana, a few nuts with dates, or whole-grain toast with peanut butter keeps you going without a sudden crash.", "hi": "अगर दोपहर ढलते-ढलते आपकी ताक़त कम पड़ जाती है, तो कुछ मीठे की जगह ऐसा हल्का खाना लीजिए जो देर तक साथ दे — मुट्ठी भर भुना चना, कुछ मेवे खजूर के साथ, या साबुत अनाज का टोस्ट पीनट बटर के साथ। इनसे ताक़त बनी रहती है और अचानक गिरती भी नहीं।" },
+      "remember": { "en": "A steady snack lasts longer than a sugar rush.", "hi": "देर तक साथ देने वाला खाना, झटपट मिलने वाली मिठास से बेहतर है।" },
       "durationMinutes": 0
     }
   },
@@ -124,11 +124,11 @@
     "week": 24,
     "babyLearning": { "en": "Your baby's face is fully formed, with eyelashes and eyebrows.", "hi": "नन्ही हरकतों का अभ्यास करते हुए, हर दिन थोड़ा और पक्का होते हुए" },
     "grow": {
-      "title": { "en": "The Gift Of A Second Try", "hi": "दूसरी कोशिश का तोहफ़ा" },
-      "insight": { "en": "Some of the most important learning happens not on the first try, but on the second, the third, the tenth.", "hi": "सबसे ज़रूरी सीख अक्सर पहली कोशिश में नहीं मिलती — वह दूसरी, तीसरी, दसवीं कोशिश में मिलती है।" },
-      "expanded": { "en": "There is a kind of quiet magic in the words 'try again.' They tell a child that one stumble does not close the door, that the path stays open. When we let our children come back to a thing they could not do yesterday, we teach them that ability is not fixed but grown — built try by try, like a muscle. The child who feels safe to attempt again learns that effort is more powerful than any single result. Offering a gentle second try, free of frustration, is one of the most encouraging things a parent ever does.", "hi": "‘फिर से कोशिश करो’ — इन शब्दों में एक चुपचाप-सा जादू है। ये बच्चों को बताते हैं कि एक लड़खड़ाहट दरवाज़ा बंद नहीं करती, रास्ता खुला रहता है। जब हम उन्हें उस चीज़ पर लौटने देते हैं जो वे कल नहीं कर पाए थे, तो हम सिखाते हैं कि क़ाबिलियत तय नहीं होती, बनाई जाती है — कोशिश-दर-कोशिश, किसी मांसपेशी की तरह। जिस बच्चे को फिर से कोशिश करने में सुरक्षित महसूस होता है, वह सीखता है कि मेहनत किसी एक नतीजे से ज़्यादा ताक़तवर है। बिना झुंझलाहट के एक नरम दूसरी कोशिश दे देना, माँ-बाप के किए सबसे हौसला बढ़ाने वाले कामों में से एक है।" },
-      "deepDive": { "en": "Research on practice shows that repeated, spaced attempts — not one long push — build the most durable skills. Each fresh try strengthens the memory and deepens the learning.", "hi": "अभ्यास पर हुए शोध बताते हैं कि बार-बार, थोड़े-थोड़े अंतराल पर की गई कोशिशें — न कि एक लंबा ज़ोर — सबसे टिकाऊ हुनर बनाती हैं। हर नई कोशिश याददाश्त को मज़बूत करती है और सीख को गहरा।" },
-      "remember": { "en": "There is always room for one more try.", "hi": "एक और कोशिश के लिए जगह हमेशा बची रहती है।" }
+      "title": { "en": "The value of a second try", "hi": "दूसरी कोशिश का तोहफ़ा" },
+      "insight": { "en": "A lot of learning happens after the first try: on the second, the third, the tenth.", "hi": "सबसे ज़रूरी सीख अक्सर पहली कोशिश में नहीं मिलती — वह दूसरी, तीसरी, दसवीं कोशिश में मिलती है।" },
+      "expanded": { "en": "The words 'try again' tell a child that one stumble doesn't close the door. When you let your child come back to something they couldn't do yesterday, they learn that ability grows. It's built try by try, like a muscle. A child who feels safe to try again learns that effort matters more than any one result. Offering a gentle second try, without frustration, is one of the most encouraging things a parent can do.", "hi": "‘फिर से कोशिश करो’ — इन शब्दों में एक चुपचाप-सा जादू है। ये बच्चों को बताते हैं कि एक लड़खड़ाहट दरवाज़ा बंद नहीं करती, रास्ता खुला रहता है। जब हम उन्हें उस चीज़ पर लौटने देते हैं जो वे कल नहीं कर पाए थे, तो हम सिखाते हैं कि क़ाबिलियत तय नहीं होती, बनाई जाती है — कोशिश-दर-कोशिश, किसी मांसपेशी की तरह। जिस बच्चे को फिर से कोशिश करने में सुरक्षित महसूस होता है, वह सीखता है कि मेहनत किसी एक नतीजे से ज़्यादा ताक़तवर है। बिना झुंझलाहट के एक नरम दूसरी कोशिश दे देना, माँ-बाप के किए सबसे हौसला बढ़ाने वाले कामों में से एक है।" },
+      "deepDive": { "en": "Research on practice suggests that repeated attempts spread out over time build longer-lasting skills than one long push. Each fresh try helps the learning stick.", "hi": "अभ्यास पर हुए शोध बताते हैं कि बार-बार, थोड़े-थोड़े अंतराल पर की गई कोशिशें — न कि एक लंबा ज़ोर — सबसे टिकाऊ हुनर बनाती हैं। हर नई कोशिश याददाश्त को मज़बूत करती है और सीख को गहरा।" },
+      "remember": { "en": "There's always room for one more try.", "hi": "एक और कोशिश के लिए जगह हमेशा बची रहती है।" }
     },
     "readToBaby": {
       "title": { "en": "The Young Elephant's First Steps", "hi": "नन्हे हाथी के पहले क़दम" },
@@ -138,7 +138,7 @@
     },
     "talkToBaby": {
       "title": { "en": "Tell your baby what trying again taught you, after something didn't work the first time.", "hi": "अपने शिशु को बताइए कि जब कोई चीज़ पहली बार नहीं चली, तब फिर से कोशिश करने ने आपको क्या सिखाया।" },
-      "motivation": { "en": "Your child will learn that persistence, not perfection, carries us forward.", "hi": "बच्चे सीखते हैं कि हमें आगे लगन ले जाती है, परफ़ेक्शन नहीं।" }
+      "motivation": { "en": "Your child will learn that it's keeping at it that moves us forward, even when things aren't perfect.", "hi": "बच्चे सीखते हैं कि हमें आगे लगन ले जाती है, परफ़ेक्शन नहीं।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -153,9 +153,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Breathe Into The Belly", "hi": "साँस को पेट तक ले जाइए" },
-      "content": { "en": "Rest a hand low on your belly. Breathe in slowly and feel your hand rise, then breathe out and feel it fall. Let each breath reach a little deeper. Repeat gently for one quiet minute.", "hi": "एक हाथ अपने पेट पर नीचे की ओर रखिए। धीरे से साँस भीतर लीजिए और अपने हाथ को ऊपर उठते महसूस कीजिए, फिर साँस छोड़िए और उसे नीचे आते महसूस कीजिए। हर साँस को थोड़ा और गहरे तक जाने दीजिए। एक शांत मिनट तक नरमी से दोहराइए।" },
-      "remember": { "en": "Deep, low breaths reach your baby too.", "hi": "गहरी, नीचे तक जाती साँसें आपके शिशु तक भी पहुँचती हैं।" },
+      "title": { "en": "Breathe low into the belly", "hi": "साँस को पेट तक ले जाइए" },
+      "content": { "en": "Rest a hand low on your belly. Breathe in slowly and feel your hand rise, then breathe out and feel it fall. Let each breath go a little deeper. Keep going gently for one calm minute.", "hi": "एक हाथ अपने पेट पर नीचे की ओर रखिए। धीरे से साँस भीतर लीजिए और अपने हाथ को ऊपर उठते महसूस कीजिए, फिर साँस छोड़िए और उसे नीचे आते महसूस कीजिए। हर साँस को थोड़ा और गहरे तक जाने दीजिए। एक शांत मिनट तक नरमी से दोहराइए।" },
+      "remember": { "en": "Slow, deep breaths are good for you and your baby.", "hi": "गहरी, नीचे तक जाती साँसें आपके शिशु तक भी पहुँचती हैं।" },
       "durationMinutes": 1
     }
   },
@@ -164,11 +164,11 @@
     "week": 24,
     "babyLearning": { "en": "Your baby may have favourite times of day to be active.", "hi": "और गोल, और नरम होते हुए — आपकी गर्माहट में आराम से सिमटे हुए" },
     "grow": {
-      "title": { "en": "Praise The Effort, Not Just The Win", "hi": "मेहनत की तारीफ़ कीजिए, सिर्फ़ जीत की नहीं" },
-      "insight": { "en": "When we praise the trying rather than only the winning, we teach a child to love the very thing that helps them grow.", "hi": "जब हम सिर्फ़ जीत की नहीं, कोशिश की तारीफ़ करते हैं, तो बच्चों को उसी चीज़ से प्यार करना सिखाते हैं जो उन्हें बढ़ाती है।" },
-      "expanded": { "en": "It feels natural to cheer the win — the finished puzzle, the high mark, the race come first. But a child who hears praise only for results learns to fear anything they might not win. When we instead notice the effort — 'you worked so hard on that,' 'you kept trying' — we point to the part the child can always control. Effort can be repeated; outcomes cannot. A child praised for trying grows braver about hard things, because they have learned that the trying itself is what we treasure, win or lose.", "hi": "जीत पर ताली बजाना सबसे आसान लगता है — पूरी हो गई पहेली, अच्छे नंबर, दौड़ में पहला आना। पर जो बच्चे सिर्फ़ नतीजों की तारीफ़ सुनते हैं, वे हर उस चीज़ से डरने लगते हैं जिसमें शायद जीत न मिले। इसके बजाय जब हम मेहनत पर नज़र डालते हैं — ‘तुमने इस पर कितनी मेहनत की,’ ‘तुम कोशिश करते रहे’ — तो हम उस हिस्से की ओर इशारा करते हैं जो हमेशा उनके अपने हाथ में है। मेहनत दोहराई जा सकती है; नतीजे नहीं। जिनकी कोशिश की क़दर होती है, वे मुश्किल चीज़ों के आगे ज़्यादा हिम्मती हो जाते हैं — क्योंकि उन्होंने सीख लिया होता है कि कोशिश ही वह चीज़ है जिसे हम सँभालकर रखते हैं, जीत हो या हार।" },
-      "deepDive": { "en": "Studies on praise show that children commended for effort take on harder challenges and recover better from setbacks than those praised for being 'smart' or 'talented.' How we praise shapes how they dare.", "hi": "तारीफ़ पर हुए अध्ययन बताते हैं कि जिन बच्चों की मेहनत की तारीफ़ होती है, वे मुश्किल चुनौतियाँ लेते हैं और नाकामी से बेहतर उबरते हैं — उन बच्चों के मुक़ाबले जिनकी तारीफ़ ‘होशियार’ या ‘प्रतिभाशाली’ होने के लिए होती है। हम जिस तरह तारीफ़ करते हैं, वही तय करता है कि वे कितनी हिम्मत करेंगे।" },
-      "remember": { "en": "Praise the trying, and they will keep trying.", "hi": "कोशिश की तारीफ़ कीजिए, और कोशिश चलती रहेगी।" }
+      "title": { "en": "Praise the effort, not only the win", "hi": "मेहनत की तारीफ़ कीजिए, सिर्फ़ जीत की नहीं" },
+      "insight": { "en": "When you praise the trying and not only the winning, your child learns to value the thing that helps them grow.", "hi": "जब हम सिर्फ़ जीत की नहीं, कोशिश की तारीफ़ करते हैं, तो बच्चों को उसी चीज़ से प्यार करना सिखाते हैं जो उन्हें बढ़ाती है।" },
+      "expanded": { "en": "It feels natural to cheer the win: the finished puzzle, the high mark, the race won. But a child who's praised only for results can start to fear anything they might not win. When you notice the effort instead, 'you worked so hard on that' or 'you kept trying', you point to the part they can always control. Effort can be repeated. Results can't be promised. A child praised for trying gets braver about hard things, because they know the trying is what you value, win or lose.", "hi": "जीत पर ताली बजाना सबसे आसान लगता है — पूरी हो गई पहेली, अच्छे नंबर, दौड़ में पहला आना। पर जो बच्चे सिर्फ़ नतीजों की तारीफ़ सुनते हैं, वे हर उस चीज़ से डरने लगते हैं जिसमें शायद जीत न मिले। इसके बजाय जब हम मेहनत पर नज़र डालते हैं — ‘तुमने इस पर कितनी मेहनत की,’ ‘तुम कोशिश करते रहे’ — तो हम उस हिस्से की ओर इशारा करते हैं जो हमेशा उनके अपने हाथ में है। मेहनत दोहराई जा सकती है; नतीजे नहीं। जिनकी कोशिश की क़दर होती है, वे मुश्किल चीज़ों के आगे ज़्यादा हिम्मती हो जाते हैं — क्योंकि उन्होंने सीख लिया होता है कि कोशिश ही वह चीज़ है जिसे हम सँभालकर रखते हैं, जीत हो या हार।" },
+      "deepDive": { "en": "Studies on praise suggest children praised for effort are more willing to take on harder tasks, and bounce back better from setbacks, than children praised for being 'smart' or 'talented'.", "hi": "तारीफ़ पर हुए अध्ययन बताते हैं कि जिन बच्चों की मेहनत की तारीफ़ होती है, वे मुश्किल चुनौतियाँ लेते हैं और नाकामी से बेहतर उबरते हैं — उन बच्चों के मुक़ाबले जिनकी तारीफ़ ‘होशियार’ या ‘प्रतिभाशाली’ होने के लिए होती है। हम जिस तरह तारीफ़ करते हैं, वही तय करता है कि वे कितनी हिम्मत करेंगे।" },
+      "remember": { "en": "Praise the trying, and they'll keep trying.", "hi": "कोशिश की तारीफ़ कीजिए, और कोशिश चलती रहेगी।" }
     },
     "readToBaby": {
       "title": { "en": "Birbal And The Spilt Milk", "hi": "बीरबल और गिरा हुआ दूध" },
@@ -178,7 +178,7 @@
     },
     "talkToBaby": {
       "title": { "en": "Tell your baby about a time you were wrong, and how you grew from admitting it.", "hi": "अपने शिशु को उस वक़्त के बारे में बताइए जब आप ग़लत थीं, और उसे मानकर आप कैसे आगे बढ़ीं।" },
-      "motivation": { "en": "Your child will learn that admitting a mistake is a sign of strength, not shame.", "hi": "बच्चे सीखते हैं कि ग़लती मान लेना ताक़त की निशानी है, शर्म की नहीं।" }
+      "motivation": { "en": "Your child will learn that admitting a mistake takes strength, and there's no shame in it.", "hi": "बच्चे सीखते हैं कि ग़लती मान लेना ताक़त की निशानी है, शर्म की नहीं।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -193,9 +193,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "I Honour My Own Effort", "hi": "मैं अपनी मेहनत का मान रखती हूँ" },
-      "content": { "en": "I will notice how much I am quietly doing, and let that be worth celebrating, even when no one else sees it.", "hi": "मैं देखूँगी कि मैं चुपचाप कितना कुछ कर रही हूँ, और उसे मनाने लायक़ मानूँगी — तब भी, जब उसे कोई और न देखे।" },
-      "remember": { "en": "Your quiet effort counts, even unseen.", "hi": "आपकी चुपचाप की गई मेहनत मायने रखती है, भले किसी ने न देखी हो।" },
+      "title": { "en": "I value my own effort", "hi": "मैं अपनी मेहनत का मान रखती हूँ" },
+      "content": { "en": "I'll notice how much I'm doing each day, and let it be worth celebrating, even when no one else sees it.", "hi": "मैं देखूँगी कि मैं चुपचाप कितना कुछ कर रही हूँ, और उसे मनाने लायक़ मानूँगी — तब भी, जब उसे कोई और न देखे।" },
+      "remember": { "en": "Your effort counts, even when no one sees it.", "hi": "आपकी चुपचाप की गई मेहनत मायने रखती है, भले किसी ने न देखी हो।" },
       "durationMinutes": 0
     }
   },
@@ -204,10 +204,10 @@
     "week": 24,
     "babyLearning": { "en": "Your baby's skin is still thin but starting to fill out.", "hi": "नींद और हलचल की नरम लय में बसते हुए" },
     "grow": {
-      "title": { "en": "Safe To Fail, Safe To Grow", "hi": "जहाँ गिरना सुरक्षित है, वहीं बढ़ना सुरक्षित है" },
-      "insight": { "en": "A child grows bravest not where failing is forbidden, but where failing is safe.", "hi": "बच्चे वहाँ सबसे हिम्मती नहीं होते जहाँ नाकाम होना मना है, बल्कि वहाँ जहाँ नाकाम होना सुरक्षित है।" },
-      "expanded": { "en": "Children are wonderfully bold when they trust that a mistake will be met with warmth instead of blame. That sense of safety is what lets them reach, experiment and dare. When a spill is greeted with a calm 'let's clean it up' rather than a sharp word, a child learns that errors are ordinary and survivable. Slowly they build an inner voice that is patient with itself. The home where it is safe to fail becomes the home where a child is willing to try big, hard, wonderful things — and where they grow without fear holding them back.", "hi": "बच्चे तब कमाल के बहादुर होते हैं, जब उन्हें भरोसा होता है कि ग़लती पर इल्ज़ाम नहीं, गर्मजोशी मिलेगी। यही सुरक्षा का एहसास उन्हें हाथ बढ़ाने, आज़माने और हिम्मत करने देता है। जब गिरे हुए गिलास पर तीखे शब्द नहीं, बल्कि एक शांत ‘चलो, इसे साफ़ कर देते हैं’ मिलता है, तो समझ बनती है कि ग़लतियाँ आम हैं और उनसे उबरा जा सकता है। धीरे-धीरे भीतर एक ऐसी आवाज़ बनती है जो ख़ुद के साथ सब्र रखती है। जिस घर में नाकाम होना सुरक्षित है, वही घर ऐसा बनता है जहाँ बड़ी, मुश्किल, कमाल की चीज़ें करने का मन होता है — और जहाँ डर पैर नहीं पकड़ता।" },
-      "deepDive": { "en": "Psychologists call a setting where it is safe to make and admit mistakes 'psychological safety,' and it is the strongest predictor of learning and growth, in classrooms and homes alike.", "hi": "मनोवैज्ञानिक ऐसे माहौल को, जहाँ ग़लती करना और मानना सुरक्षित हो, 'psychological safety' कहते हैं — और यही सीखने और बढ़ने का सबसे मज़बूत संकेत है, क्लासरूम में भी और घर में भी।" },
+      "title": { "en": "When it's safe to fail, children grow braver", "hi": "जहाँ गिरना सुरक्षित है, वहीं बढ़ना सुरक्षित है" },
+      "insight": { "en": "A child grows bravest where failing is safe.", "hi": "बच्चे वहाँ सबसे हिम्मती नहीं होते जहाँ नाकाम होना मना है, बल्कि वहाँ जहाँ नाकाम होना सुरक्षित है।" },
+      "expanded": { "en": "Children are bold when they trust that a mistake will be met with warmth instead of blame. That feeling of safety lets them reach, experiment and try new things. When a spill is met with a calm 'let's clean it up' instead of a sharp word, a child learns that mistakes are ordinary and can be fixed. Over time they build an inner voice that's patient with itself. A home where it's safe to fail becomes a home where a child is willing to try big, hard things without fear holding them back.", "hi": "बच्चे तब कमाल के बहादुर होते हैं, जब उन्हें भरोसा होता है कि ग़लती पर इल्ज़ाम नहीं, गर्मजोशी मिलेगी। यही सुरक्षा का एहसास उन्हें हाथ बढ़ाने, आज़माने और हिम्मत करने देता है। जब गिरे हुए गिलास पर तीखे शब्द नहीं, बल्कि एक शांत ‘चलो, इसे साफ़ कर देते हैं’ मिलता है, तो समझ बनती है कि ग़लतियाँ आम हैं और उनसे उबरा जा सकता है। धीरे-धीरे भीतर एक ऐसी आवाज़ बनती है जो ख़ुद के साथ सब्र रखती है। जिस घर में नाकाम होना सुरक्षित है, वही घर ऐसा बनता है जहाँ बड़ी, मुश्किल, कमाल की चीज़ें करने का मन होता है — और जहाँ डर पैर नहीं पकड़ता।" },
+      "deepDive": { "en": "Psychologists use the term 'psychological safety' for a setting where it's safe to make and admit mistakes. Research, mostly in schools and workplaces, links it with more learning and more willingness to try.", "hi": "मनोवैज्ञानिक ऐसे माहौल को, जहाँ ग़लती करना और मानना सुरक्षित हो, 'psychological safety' कहते हैं — और यही सीखने और बढ़ने का सबसे मज़बूत संकेत है, क्लासरूम में भी और घर में भी।" },
       "remember": { "en": "Where failing is safe, courage grows.", "hi": "जहाँ नाकाम होना सुरक्षित है, वहीं हिम्मत बढ़ती है।" }
     },
     "readToBaby": {
@@ -218,7 +218,7 @@
     },
     "talkToBaby": {
       "title": { "en": "Tell your baby how you slowly learned to be patient with yourself.", "hi": "अपने शिशु को बताइए कि आपने धीरे-धीरे ख़ुद के साथ सब्र रखना कैसे सीखा।" },
-      "motivation": { "en": "Your child will learn that patience with oneself is a skill worth growing.", "hi": "बच्चे सीखते हैं कि ख़ुद के साथ सब्र रखना एक ऐसा हुनर है जिसे बढ़ाना ज़रूरी है।" }
+      "motivation": { "en": "Your child will learn that being patient with yourself is a skill worth building.", "hi": "बच्चे सीखते हैं कि ख़ुद के साथ सब्र रखना एक ऐसा हुनर है जिसे बढ़ाना ज़रूरी है।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -233,8 +233,8 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "When Your Hands And Feet Swell", "hi": "जब हाथ और पैर सूजने लगें" },
-      "content": { "en": "If your hands or ankles feel puffy, it can help to drink plenty of water — yes, water actually eases swelling — and ease back on very salty snacks. Add cooling foods like cucumber, melon and coconut water, and put your feet up when you can.", "hi": "अगर आपके हाथ या टख़ने फूले हुए लगते हैं, तो ख़ूब पानी पीने से मदद मिल सकती है — जी हाँ, पानी सचमुच सूजन कम करता है — और बहुत नमकीन चीज़ें थोड़ी कम कर दीजिए। खीरा, ख़रबूज़ा और नारियल पानी जैसी ठंडी चीज़ें जोड़िए, और जब हो सके, पैर ऊपर रखकर बैठिए।" },
+      "title": { "en": "When your hands and feet swell", "hi": "जब हाथ और पैर सूजने लगें" },
+      "content": { "en": "If your hands or ankles feel puffy, drinking plenty of water can help ease the swelling. Cut back on very salty snacks. Add cooling foods like cucumber, melon and coconut water, and put your feet up when you can. If swelling comes on suddenly, or your face swells, call your doctor today.", "hi": "अगर आपके हाथ या टख़ने फूले हुए लगते हैं, तो ख़ूब पानी पीने से मदद मिल सकती है — जी हाँ, पानी सचमुच सूजन कम करता है — और बहुत नमकीन चीज़ें थोड़ी कम कर दीजिए। खीरा, ख़रबूज़ा और नारियल पानी जैसी ठंडी चीज़ें जोड़िए, और जब हो सके, पैर ऊपर रखकर बैठिए।" },
       "remember": { "en": "Water and rest are kind to swollen feet.", "hi": "पानी और आराम, सूजे हुए पैरों पर सबसे मेहरबान हैं।" },
       "durationMinutes": 0
     }
@@ -244,11 +244,11 @@
     "week": 24,
     "babyLearning": { "en": "Your baby's hearing is getting sharper every week.", "hi": "हफ़्ता पूरा करते हुए, छोटे और ठहरे हुए तरीक़ों से थोड़ा और समझदार होते हुए" },
     "grow": {
-      "title": { "en": "Every Expert Was Once A Beginner", "hi": "हर माहिर कभी नौसिखिया था" },
-      "insight": { "en": "Everyone who is wonderful at something was once clumsy at it. Beginning badly is simply how mastery starts.", "hi": "जो भी किसी चीज़ में कमाल है, वह कभी उसी में बेढंगा था। कच्ची शुरुआत ही महारत की शुरुआत होती है।" },
-      "expanded": { "en": "It is easy to look at someone skilled and assume they were always that way. But every master musician once played wrong notes, every fluent speaker once fumbled words, every steady walker once crawled and fell. There is no shortcut around the beginner stage; it is the gateway everyone passes through. Knowing this changes how we meet our child's early clumsy attempts: not as signs of trouble, but as the honourable first steps of someone on their way. When you treat your child's beginnings with respect, you give them permission to be a beginner — and that is exactly where every expert is born.", "hi": "किसी हुनरमंद को देखकर यह मान लेना आसान है कि वे हमेशा ऐसे ही थे। पर हर बड़े संगीतकार ने कभी बेसुरे सुर बजाए थे, हर धाराप्रवाह बोलने वाले की कभी ज़बान लड़खड़ाई थी, हर मज़बूती से चलने वाला कभी रेंगा और गिरा था। नौसिखिए वाले दौर का कोई शॉर्टकट नहीं है; वह वही दरवाज़ा है जिससे हर कोई गुज़रता है। यह जानना बदल देता है कि हम बच्चों की शुरुआती बेढंगी कोशिशों से कैसे मिलते हैं — किसी गड़बड़ी की निशानी की तरह नहीं, बल्कि अपने रास्ते पर चले किसी के पहले, सम्मान लायक़ क़दमों की तरह। जब आप इन शुरुआतों का मान रखती हैं, तो आप नौसिखिया होने की इजाज़त देती हैं — और ठीक वहीं से हर माहिर जन्म लेता है।" },
-      "deepDive": { "en": "Researchers who study expertise find it grows from years of patient, error-filled practice, not from inborn gifts. The willingness to be a beginner, again and again, is what separates those who master a thing from those who never start.", "hi": "महारत पर काम करने वाले शोधकर्ता पाते हैं कि यह सालों के सब्र भरे, ग़लतियों से भरे अभ्यास से बनती है, किसी जन्मजात वरदान से नहीं। बार-बार नौसिखिया बनने को तैयार रहना ही उन्हें अलग करता है जो किसी चीज़ में माहिर हो जाते हैं — उनसे, जो कभी शुरू ही नहीं करते।" },
-      "remember": { "en": "Being a beginner is where every expert starts.", "hi": "नौसिखिया होना ही वह जगह है जहाँ से हर माहिर शुरू होता है।" }
+      "title": { "en": "Every expert started as a beginner", "hi": "हर माहिर कभी नौसिखिया था" },
+      "insight": { "en": "Everyone who's good at something was once clumsy at it. Starting badly is how skill begins.", "hi": "जो भी किसी चीज़ में कमाल है, वह कभी उसी में बेढंगा था। कच्ची शुरुआत ही महारत की शुरुआत होती है।" },
+      "expanded": { "en": "It's easy to look at someone skilled and assume they were always that way. But every musician once played wrong notes, every fluent speaker once fumbled words, and every walker once crawled and fell. Nobody skips the beginner stage. Knowing this changes how you'll meet your child's first clumsy attempts. They're the first steps of someone who's learning, not signs of trouble. When you treat your child's beginnings with respect, you let them be a beginner, and that's where every expert starts.", "hi": "किसी हुनरमंद को देखकर यह मान लेना आसान है कि वे हमेशा ऐसे ही थे। पर हर बड़े संगीतकार ने कभी बेसुरे सुर बजाए थे, हर धाराप्रवाह बोलने वाले की कभी ज़बान लड़खड़ाई थी, हर मज़बूती से चलने वाला कभी रेंगा और गिरा था। नौसिखिए वाले दौर का कोई शॉर्टकट नहीं है; वह वही दरवाज़ा है जिससे हर कोई गुज़रता है। यह जानना बदल देता है कि हम बच्चों की शुरुआती बेढंगी कोशिशों से कैसे मिलते हैं — किसी गड़बड़ी की निशानी की तरह नहीं, बल्कि अपने रास्ते पर चले किसी के पहले, सम्मान लायक़ क़दमों की तरह। जब आप इन शुरुआतों का मान रखती हैं, तो आप नौसिखिया होने की इजाज़त देती हैं — और ठीक वहीं से हर माहिर जन्म लेता है।" },
+      "deepDive": { "en": "Research on expertise suggests skill is built mostly through years of patient practice, full of mistakes along the way. Being willing to be a beginner again and again is a big part of getting good at something.", "hi": "महारत पर काम करने वाले शोधकर्ता पाते हैं कि यह सालों के सब्र भरे, ग़लतियों से भरे अभ्यास से बनती है, किसी जन्मजात वरदान से नहीं। बार-बार नौसिखिया बनने को तैयार रहना ही उन्हें अलग करता है जो किसी चीज़ में माहिर हो जाते हैं — उनसे, जो कभी शुरू ही नहीं करते।" },
+      "remember": { "en": "Every expert starts as a beginner.", "hi": "नौसिखिया होना ही वह जगह है जहाँ से हर माहिर शुरू होता है।" }
     },
     "readToBaby": {
       "title": { "en": "The Sapling That Grew Through Rock", "hi": "वह पौधा जो चट्टान चीरकर उगा" },
@@ -257,8 +257,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about a lesson you are still learning, even now.", "hi": "अपने शिशु को उस सीख के बारे में बताइए, जो आप आज भी सीख रही हैं।" },
-      "motivation": { "en": "Your child will learn that growing never truly ends, and that is a beautiful thing.", "hi": "बच्चे सीखते हैं कि बढ़ना कभी सचमुच ख़त्म नहीं होता — और यह एक ख़ूबसूरत बात है।" }
+      "title": { "en": "Tell your baby about a lesson you're still learning, even now.", "hi": "अपने शिशु को उस सीख के बारे में बताइए, जो आप आज भी सीख रही हैं।" },
+      "motivation": { "en": "Your child will learn that we keep growing all our lives, and that's a good thing.", "hi": "बच्चे सीखते हैं कि बढ़ना कभी सचमुच ख़त्म नहीं होता — और यह एक ख़ूबसूरत बात है।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -273,9 +273,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Breathe And Lengthen", "hi": "साँस लीजिए और तनकर बैठिए" },
-      "content": { "en": "Sit tall and breathe in slowly, gently lengthening your spine as if a soft thread lifts the top of your head. Breathe out and relax, keeping that easy height. Repeat for one calm minute.", "hi": "सीधे बैठिए और धीरे से साँस भीतर लीजिए, अपनी रीढ़ को नरमी से लंबा करते हुए — जैसे कोई कोमल धागा आपके सिर की चोटी को ऊपर उठा रहा हो। साँस छोड़िए और ढीली पड़ जाइए, पर वही आसान ऊँचाई बनाए रखिए। एक शांत मिनट तक दोहराइए।" },
-      "remember": { "en": "A little length in the spine eases a heavy day.", "hi": "रीढ़ में थोड़ी-सी लंबाई एक भारी दिन को हल्का कर देती है।" },
+      "title": { "en": "Breathe and sit tall", "hi": "साँस लीजिए और तनकर बैठिए" },
+      "content": { "en": "Sit tall and breathe in slowly, lengthening your spine as if a soft thread lifts the top of your head. Breathe out and relax, keeping that easy height. Repeat for one calm minute.", "hi": "सीधे बैठिए और धीरे से साँस भीतर लीजिए, अपनी रीढ़ को नरमी से लंबा करते हुए — जैसे कोई कोमल धागा आपके सिर की चोटी को ऊपर उठा रहा हो। साँस छोड़िए और ढीली पड़ जाइए, पर वही आसान ऊँचाई बनाए रखिए। एक शांत मिनट तक दोहराइए।" },
+      "remember": { "en": "Sitting a little taller can ease a heavy day.", "hi": "रीढ़ में थोड़ी-सी लंबाई एक भारी दिन को हल्का कर देती है।" },
       "durationMinutes": 1
     }
   }
