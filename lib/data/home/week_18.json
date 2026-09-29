@@ -4,11 +4,11 @@
     "week": 18,
     "babyLearning": { "en": "Your baby's ears are in place, and hearing is developing.", "hi": "नन्हे कान बनना — जल्द ही आपकी आवाज़ सुनने को तैयार" },
     "grow": {
-      "title": { "en": "They Can Hear You Now", "hi": "अब वे आपको सुन सकते हैं" },
-      "insight": { "en": "Around this week, your baby's hearing awakens. The sounds of your life are becoming their very first world.", "hi": "लगभग इसी हफ़्ते आपके शिशु के सुनने की शक्ति जागती है। आपकी ज़िंदगी की आवाज़ें उनकी सबसे पहली दुनिया बन रही हैं।" },
-      "expanded": { "en": "Something tender happens around week eighteen: your baby begins to hear. Not words yet, but the steady drum of your heartbeat, the rhythm of your breath, the warm hum of your voice carrying through your body. You do not have to do anything special — simply by living your day, you are filling your baby's world with sound. The gentle truth is that your baby is no longer only feeling you; they are starting to listen. Every ordinary moment you speak is quietly becoming the soundtrack of their beginning.", "hi": "अठारहवें हफ़्ते के आस-पास कुछ बहुत नाज़ुक होता है: आपका शिशु सुनने लगता है। अभी शब्द नहीं, पर आपके दिल की ठहरी हुई धड़कन, आपकी साँस की लय, आपके शरीर से गुज़रती आपकी आवाज़ की गरम गुनगुनाहट। आपको कुछ ख़ास करने की ज़रूरत नहीं — बस अपना दिन जीकर ही आप अपने शिशु की दुनिया आवाज़ से भर रही हैं। नरम सच यह है कि अब आपका शिशु सिर्फ़ आपको महसूस नहीं कर रहा; वह सुनने भी लगा है। आप जो भी आम पल बोलती हैं, वह चुपचाप उनकी शुरुआत का संगीत बनता जा रहा है।" },
-      "deepDive": { "en": "Researchers find that by the second trimester a baby's auditory system is forming, and the sound they hear most is their mother's voice, carried through her body. Newborns recognise that voice at birth.", "hi": "शोध बताते हैं कि दूसरी तिमाही तक शिशु में सुनने वाला तंत्र बन रहा होता है, और जो आवाज़ सबसे ज़्यादा सुनाई देती है वह माँ की अपनी आवाज़ है, उसी के शरीर से होकर आती हुई। नवजात जन्म के समय उस आवाज़ को पहचान लेते हैं।" },
-      "remember": { "en": "Your voice is the first sound your baby learns to love.", "hi": "आपकी आवाज़ वह पहली आवाज़ है जिससे प्यार करना आपका शिशु सीखता है।" }
+      "title": { "en": "Your baby is starting to hear", "hi": "अब वे आपको सुन सकते हैं" },
+      "insight": { "en": "Around this week, your baby is starting to pick up sound. The sounds of your life are becoming part of their world.", "hi": "लगभग इसी हफ़्ते आपके शिशु के सुनने की शक्ति जागती है। आपकी ज़िंदगी की आवाज़ें उनकी सबसे पहली दुनिया बन रही हैं।" },
+      "expanded": { "en": "Something tender happens around week eighteen: your baby starts to pick up sound. Not words yet, but the sounds of the body they're growing in: a steady heartbeat, breathing, and voices, most clearly the voice of the parent carrying them. Other voices close by reach them too, more softly. You don't have to do anything special. Just by living your day, you're filling your baby's world with sound. Your baby is starting to listen. Every ordinary moment you talk is becoming part of the background of their first months.", "hi": "अठारहवें हफ़्ते के आस-पास कुछ बहुत नाज़ुक होता है: आपका शिशु सुनने लगता है। अभी शब्द नहीं, पर आपके दिल की ठहरी हुई धड़कन, आपकी साँस की लय, आपके शरीर से गुज़रती आपकी आवाज़ की गरम गुनगुनाहट। आपको कुछ ख़ास करने की ज़रूरत नहीं — बस अपना दिन जीकर ही आप अपने शिशु की दुनिया आवाज़ से भर रही हैं। नरम सच यह है कि अब आपका शिशु सिर्फ़ आपको महसूस नहीं कर रहा; वह सुनने भी लगा है। आप जो भी आम पल बोलती हैं, वह चुपचाप उनकी शुरुआत का संगीत बनता जा रहा है।" },
+      "deepDive": { "en": "Researchers find that a baby's hearing develops through the second trimester. The voice they hear most clearly is their mother's, carried from inside, and newborns recognise it at birth.", "hi": "शोध बताते हैं कि दूसरी तिमाही तक शिशु में सुनने वाला तंत्र बन रहा होता है, और जो आवाज़ सबसे ज़्यादा सुनाई देती है वह माँ की अपनी आवाज़ है, उसी के शरीर से होकर आती हुई। नवजात जन्म के समय उस आवाज़ को पहचान लेते हैं।" },
+      "remember": { "en": "The voices around your baby are the first sounds they learn.", "hi": "आपकी आवाज़ वह पहली आवाज़ है जिससे प्यार करना आपका शिशु सीखता है।" }
     },
     "readToBaby": {
       "title": { "en": "The Ant And The Dove", "hi": "चींटी और कबूतर" },
@@ -17,8 +17,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby a hope you hold for their health and their joy.", "hi": "अपने शिशु को एक उम्मीद बताइए जो आप उनकी सेहत और उनकी ख़ुशी के लिए रखती हैं।" },
-      "motivation": { "en": "Now that they can hear you, your hopes reach them in your own warm voice.", "hi": "अब जब वे आपको सुन सकते हैं, आपकी उम्मीदें उन तक आपकी अपनी गरम आवाज़ में पहुँचती हैं।" }
+      "title": { "en": "Tell your baby one hope you have for their health and their happiness.", "hi": "अपने शिशु को एक उम्मीद बताइए जो आप उनकी सेहत और उनकी ख़ुशी के लिए रखती हैं।" },
+      "motivation": { "en": "Now that they're starting to hear, your hopes reach them in your own voice.", "hi": "अब जब वे आपको सुन सकते हैं, आपकी उम्मीदें उन तक आपकी अपनी गरम आवाज़ में पहुँचती हैं।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -33,9 +33,9 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "When Heartburn Creeps In", "hi": "जब सीने में जलन आ जाए" },
+      "title": { "en": "When heartburn creeps in", "hi": "जब सीने में जलन आ जाए" },
       "content": { "en": "If a warm, burning feeling rises after meals, try eating a little less at a time and a little more often. A cool glass of milk or a few soaked almonds can soothe it gently.", "hi": "अगर खाने के बाद सीने में गरम, जलन भरा एहसास उठता है, तो एक बार में थोड़ा कम और थोड़ी-थोड़ी देर में खाने की कोशिश कीजिए। एक गिलास ठंडा दूध या कुछ भीगे बादाम इसे नरमी से शांत कर सकते हैं।" },
-      "remember": { "en": "Smaller, gentler meals are kinder to a growing belly.", "hi": "छोटे, नरम भोजन बढ़ते हुए पेट के लिए ज़्यादा आसान होते हैं।" },
+      "remember": { "en": "Smaller meals, more often, are easier when heartburn comes.", "hi": "छोटे, नरम भोजन बढ़ते हुए पेट के लिए ज़्यादा आसान होते हैं।" },
       "durationMinutes": 0
     }
   },
@@ -44,11 +44,11 @@
     "week": 18,
     "babyLearning": { "en": "Your baby may start to hear some sounds around now.", "hi": "आपकी दुनिया का धीमा-सा संगीत पकड़ना शुरू" },
     "grow": {
-      "title": { "en": "Your Voice Is Their Favourite Sound", "hi": "आपकी आवाज़ उनकी सबसे पसंदीदा आवाज़ है" },
-      "insight": { "en": "Of every sound in the world, none will be as dear to your baby as the gentle sound of you.", "hi": "दुनिया की सारी आवाज़ों में से कोई भी आपके शिशु को उतनी प्यारी नहीं होगी जितनी आपकी अपनी नरम आवाज़।" },
-      "expanded": { "en": "Your baby is surrounded by sound — the world outside, the rhythms of your body — but one sound rises above the rest, and it is yours. Carried through you, your voice reaches your baby clearer and closer than anything else. You need not perform or read aloud all day; even your everyday chatter, your laugh, your sighs are teaching your baby the music of you. After birth, it is this familiar voice that will calm them fastest. So speak freely, dear one. Your baby is already falling in love with the sound of their mother.", "hi": "आपका शिशु आवाज़ों से घिरा है — बाहर की दुनिया, आपके शरीर की लय — पर एक आवाज़ बाक़ी सबसे ऊपर उठती है, और वह आपकी है। आपके ही भीतर से होकर, आपकी आवाज़ आपके शिशु तक किसी भी और चीज़ से ज़्यादा साफ़ और ज़्यादा क़रीब पहुँचती है। आपको दिन भर पढ़ते रहने या कुछ दिखावा करने की ज़रूरत नहीं; आपकी रोज़ की बातें, आपकी हँसी, आपकी आहें भी आपके शिशु को आपका संगीत सिखा रही हैं। जन्म के बाद यही जानी-पहचानी आवाज़ उन्हें सबसे जल्दी शांत करेगी। तो खुलकर बोलिए। आपका शिशु पहले से ही अपनी माँ की आवाज़ से प्यार करने लगा है।" },
-      "deepDive": { "en": "Studies show newborns prefer their mother's voice over any other from the very first day, and may even quiet down when they hear it — a recognition built entirely in the womb.", "hi": "शोध बताते हैं कि नवजात पहले ही दिन से माँ की आवाज़ को हर दूसरी आवाज़ पर चुनते हैं, और उसे सुनकर शांत भी हो जाते हैं — यह पहचान पूरी की पूरी गर्भ में ही बनती है।" },
-      "remember": { "en": "Your everyday voice is your baby's lifelong comfort.", "hi": "आपकी रोज़ की आवाज़ आपके शिशु की उम्र भर की तसल्ली है।" }
+      "title": { "en": "Familiar voices are your baby's favourite sounds", "hi": "आपकी आवाज़ उनकी सबसे पसंदीदा आवाज़ है" },
+      "insight": { "en": "Of all the sounds in the world, the voices your baby hears every day will be the ones they love most.", "hi": "दुनिया की सारी आवाज़ों में से कोई भी आपके शिशु को उतनी प्यारी नहीं होगी जितनी आपकी अपनी नरम आवाज़।" },
+      "expanded": { "en": "Your baby is surrounded by sound: the world outside and the rhythms inside. One voice comes through clearest of all, the voice of the parent carrying them, and the other voices close by reach them too. You don't need to perform or read aloud all day. Everyday chatter, laughter and even sighs are teaching your baby what home sounds like. After birth, the voice they know best is often the one that calms them fastest. So talk freely. Your baby is getting to know you by sound.", "hi": "आपका शिशु आवाज़ों से घिरा है — बाहर की दुनिया, आपके शरीर की लय — पर एक आवाज़ बाक़ी सबसे ऊपर उठती है, और वह आपकी है। आपके ही भीतर से होकर, आपकी आवाज़ आपके शिशु तक किसी भी और चीज़ से ज़्यादा साफ़ और ज़्यादा क़रीब पहुँचती है। आपको दिन भर पढ़ते रहने या कुछ दिखावा करने की ज़रूरत नहीं; आपकी रोज़ की बातें, आपकी हँसी, आपकी आहें भी आपके शिशु को आपका संगीत सिखा रही हैं। जन्म के बाद यही जानी-पहचानी आवाज़ उन्हें सबसे जल्दी शांत करेगी। तो खुलकर बोलिए। आपका शिशु पहले से ही अपनी माँ की आवाज़ से प्यार करने लगा है।" },
+      "deepDive": { "en": "Studies show that newborns prefer their mother's voice to a stranger's from the first days after birth, a familiarity built up during pregnancy. They may even settle when they hear it.", "hi": "शोध बताते हैं कि नवजात पहले ही दिन से माँ की आवाज़ को हर दूसरी आवाज़ पर चुनते हैं, और उसे सुनकर शांत भी हो जाते हैं — यह पहचान पूरी की पूरी गर्भ में ही बनती है।" },
+      "remember": { "en": "Your everyday voice can become a lasting comfort to your baby.", "hi": "आपकी रोज़ की आवाज़ आपके शिशु की उम्र भर की तसल्ली है।" }
     },
     "readToBaby": {
       "title": { "en": "The Crows And The Serpent", "hi": "कौए और साँप" },
@@ -57,8 +57,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about a skill you hope to nurture in them one day.", "hi": "अपने शिशु को किसी ऐसे हुनर के बारे में बताइए जिसे आप एक दिन उनमें पालना चाहती हैं।" },
-      "motivation": { "en": "Speaking your hopes aloud plants the first quiet seeds of who they'll become.", "hi": "अपनी उम्मीदें बोलकर कह देना उन पहले चुपचाप बीजों को बो देता है कि वे आगे कौन बनेंगे।" }
+      "title": { "en": "Tell your baby about a skill you hope to help them learn one day.", "hi": "अपने शिशु को किसी ऐसे हुनर के बारे में बताइए जिसे आप एक दिन उनमें पालना चाहती हैं।" },
+      "motivation": { "en": "Saying your hopes out loud is a first small step towards helping them grow.", "hi": "अपनी उम्मीदें बोलकर कह देना उन पहले चुपचाप बीजों को बो देता है कि वे आगे कौन बनेंगे।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -73,9 +73,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "My Voice Is Enough", "hi": "मेरी आवाज़ काफ़ी है" },
-      "content": { "en": "I do not need perfect words or a sweet singing voice. Simply speaking to my baby is already a gift.", "hi": "मुझे न सही-सही शब्द चाहिए, न मीठी गाने वाली आवाज़। अपने शिशु से बस बात कर लेना ही एक तोहफ़ा है।" },
-      "remember": { "en": "Your baby loves your voice exactly as it is.", "hi": "आपका शिशु आपकी आवाज़ को बिल्कुल वैसी ही चाहता है, जैसी वह है।" },
+      "title": { "en": "My voice is enough", "hi": "मेरी आवाज़ काफ़ी है" },
+      "content": { "en": "I don't need perfect words or a sweet singing voice. Talking to my baby is already a gift.", "hi": "मुझे न सही-सही शब्द चाहिए, न मीठी गाने वाली आवाज़। अपने शिशु से बस बात कर लेना ही एक तोहफ़ा है।" },
+      "remember": { "en": "Your baby loves your voice as it is.", "hi": "आपका शिशु आपकी आवाज़ को बिल्कुल वैसी ही चाहता है, जैसी वह है।" },
       "durationMinutes": 0
     }
   },
@@ -84,10 +84,10 @@
     "week": 18,
     "babyLearning": { "en": "Your baby's nerves are starting to grow a protective coating (myelin).", "hi": "आस-पास की आवाज़ की नरम गुनगुनाहट से सुकून पाना" },
     "grow": {
-      "title": { "en": "Speak, Sing, Be Heard", "hi": "बोलिए, गाइए, सुनी जाइए" },
-      "insight": { "en": "You do not need to be a singer or a storyteller. Your baby simply loves to hear you be you.", "hi": "आपको गायिका या क़िस्सागो होने की ज़रूरत नहीं। आपके शिशु को तो बस आपको आप ही की तरह सुनना अच्छा लगता है।" },
-      "expanded": { "en": "Now that your baby can hear, it is tempting to think you must do it 'right' — the perfect song, the perfect words. But your baby does not judge the tune. A lullaby hummed off-key, a story read sleepily, a few words spoken while you cook — all of it reaches them as warmth. Speaking and singing also slows your own breath and softens your mood, and your baby feels that calm too. So let your voice be ordinary and free. The simplest sounds you make are already the sweetest music your baby will ever know.", "hi": "अब जब आपका शिशु सुन सकता है, यह सोचना बहुत आसान है कि इसे 'सही' तरीक़े से करना है — बिल्कुल सही गाना, बिल्कुल सही शब्द। पर आपका शिशु धुन को नहीं परखता। बेसुरी गुनगुनाई एक लोरी, नींद में पढ़ी एक कहानी, खाना बनाते हुए कहे कुछ शब्द — यह सब उन तक गरमाहट बनकर पहुँचता है। बोलने और गाने से आपकी अपनी साँस भी धीमी होती है और मन नरम, और वह शांति आपका शिशु भी महसूस करता है। तो अपनी आवाज़ को आम और खुला रहने दीजिए। आप जो सबसे सादी आवाज़ें निकालती हैं, वही सबसे मीठा संगीत है जो आपका शिशु कभी जानेगा।" },
-      "deepDive": { "en": "Experts say it is not the quality of the sound but its warmth and repetition that matter most. A familiar melody or phrase, sung often, can even soothe the same baby after birth.", "hi": "जानकार कहते हैं कि सबसे ज़्यादा मायने आवाज़ की ख़ूबी नहीं, उसकी गरमाहट और बार-बार दोहराया जाना रखता है। कोई जानी-पहचानी धुन या पंक्ति, अगर अक्सर गाई जाए, तो वही शिशु को जन्म के बाद भी शांत कर सकती है।" },
+      "title": { "en": "Talk and sing to your baby, just as you are", "hi": "बोलिए, गाइए, सुनी जाइए" },
+      "insight": { "en": "You don't need to be a singer or a storyteller. Your baby likes hearing you be yourself.", "hi": "आपको गायिका या क़िस्सागो होने की ज़रूरत नहीं। आपके शिशु को तो बस आपको आप ही की तरह सुनना अच्छा लगता है।" },
+      "expanded": { "en": "Now that your baby is starting to hear, it's tempting to think you must do it 'right', with the perfect song or the perfect words. But your baby doesn't judge the tune. A lullaby hummed off-key, a story read sleepily, a few words while you cook: all of it reaches them as warmth. Talking and singing can also slow your breathing and lift your mood, and a calmer home is good for all of you. So let your voice be ordinary and free. The everyday sounds you make are already the sweetest music your baby knows.", "hi": "अब जब आपका शिशु सुन सकता है, यह सोचना बहुत आसान है कि इसे 'सही' तरीक़े से करना है — बिल्कुल सही गाना, बिल्कुल सही शब्द। पर आपका शिशु धुन को नहीं परखता। बेसुरी गुनगुनाई एक लोरी, नींद में पढ़ी एक कहानी, खाना बनाते हुए कहे कुछ शब्द — यह सब उन तक गरमाहट बनकर पहुँचता है। बोलने और गाने से आपकी अपनी साँस भी धीमी होती है और मन नरम, और वह शांति आपका शिशु भी महसूस करता है। तो अपनी आवाज़ को आम और खुला रहने दीजिए। आप जो सबसे सादी आवाज़ें निकालती हैं, वही सबसे मीठा संगीत है जो आपका शिशु कभी जानेगा।" },
+      "deepDive": { "en": "Experts say warmth and repetition matter more than the quality of the sound. A familiar tune, sung often, may help soothe the same baby after birth.", "hi": "जानकार कहते हैं कि सबसे ज़्यादा मायने आवाज़ की ख़ूबी नहीं, उसकी गरमाहट और बार-बार दोहराया जाना रखता है। कोई जानी-पहचानी धुन या पंक्ति, अगर अक्सर गाई जाए, तो वही शिशु को जन्म के बाद भी शांत कर सकती है।" },
       "remember": { "en": "Your baby hears the love, not the notes.", "hi": "आपका शिशु प्यार सुनता है, सुर नहीं।" }
     },
     "readToBaby": {
@@ -97,8 +97,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby who you hope they grow up kind to.", "hi": "अपने शिशु को बताइए कि आप उन्हें बड़े होकर किन-किन के साथ नरम-दिल देखना चाहती हैं।" },
-      "motivation": { "en": "The kindness you wish for them begins as a voice they trust today.", "hi": "जो दयालुता आप उनके लिए चाहती हैं, वह आज एक ऐसी आवाज़ से शुरू होती है जिस पर वे भरोसा करते हैं।" }
+      "title": { "en": "Tell your baby about the people you hope they'll be kind to.", "hi": "अपने शिशु को बताइए कि आप उन्हें बड़े होकर किन-किन के साथ नरम-दिल देखना चाहती हैं।" },
+      "motivation": { "en": "The kindness you hope for them starts with a voice they learn to trust.", "hi": "जो दयालुता आप उनके लिए चाहती हैं, वह आज एक ऐसी आवाज़ से शुरू होती है जिस पर वे भरोसा करते हैं।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -113,9 +113,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Breathe Before You Speak", "hi": "बोलने से पहले एक साँस" },
-      "content": { "en": "Before you speak or sing to your baby, take one slow breath in and a long breath out. Feel your chest soften, then let your voice come from that calm place.", "hi": "अपने शिशु से बोलने या गाने से पहले एक धीमी साँस अंदर लीजिए और एक लंबी साँस बाहर छोड़िए। अपने सीने को नरम पड़ता महसूस कीजिए, फिर अपनी आवाज़ को उसी शांत जगह से आने दीजिए।" },
-      "remember": { "en": "A calm breath gives your voice a calm warmth.", "hi": "एक शांत साँस आपकी आवाज़ को एक शांत गरमाहट देती है।" },
+      "title": { "en": "Breathe before you speak", "hi": "बोलने से पहले एक साँस" },
+      "content": { "en": "Before you talk or sing to your baby, take one slow breath in and a long breath out. Feel your chest soften, then let your voice come from that calm place.", "hi": "अपने शिशु से बोलने या गाने से पहले एक धीमी साँस अंदर लीजिए और एक लंबी साँस बाहर छोड़िए। अपने सीने को नरम पड़ता महसूस कीजिए, फिर अपनी आवाज़ को उसी शांत जगह से आने दीजिए।" },
+      "remember": { "en": "A calm breath makes your voice warm and calm too.", "hi": "एक शांत साँस आपकी आवाज़ को एक शांत गरमाहट देती है।" },
       "durationMinutes": 1
     }
   },
@@ -124,11 +124,11 @@
     "week": 18,
     "babyLearning": { "en": "Your baby moves arms and legs with more control now.", "hi": "आपके शब्दों में भाव का उतार-चढ़ाव महसूस करना" },
     "grow": {
-      "title": { "en": "Words Carry Feeling", "hi": "शब्द भाव लिए चलते हैं" },
-      "insight": { "en": "Long before your baby knows what words mean, they feel the emotion riding inside them.", "hi": "शब्दों का मतलब जानने से बहुत पहले आपका शिशु उनके भीतर बैठे भाव को महसूस कर लेता है।" },
-      "expanded": { "en": "Your baby cannot yet understand a single word, but they can feel its colour. A soft, loving tone reaches them as comfort; a tense, hurried one reaches them as a ripple of unease. This is not a reason for worry — no one speaks gently every moment. It is simply a quiet invitation to notice how you sound, especially when you speak to your baby. When you slow down and let warmth into your voice, you are not just sharing words. You are giving your baby their very first lesson in what it feels like to be spoken to with love.", "hi": "आपका शिशु अभी एक भी शब्द नहीं समझ सकता, पर उसका रंग ज़रूर महसूस कर सकता है। नरम, प्यार भरा लहजा उस तक तसल्ली बनकर पहुँचता है; तना हुआ, जल्दबाज़ लहजा बेचैनी की एक लहर बनकर। यह चिंता की बात नहीं — कोई हर पल नरमी से नहीं बोलता। यह बस एक चुपचाप न्योता है कि आप ध्यान दें कि आप कैसी सुनाई देती हैं, ख़ासकर जब आप अपने शिशु से बोलती हैं। जब आप धीमी होती हैं और अपनी आवाज़ में गरमाहट आने देती हैं, तब आप सिर्फ़ शब्द नहीं बाँट रहीं। तब आप अपने शिशु को उनका पहला सबक़ दे रही हैं — कि प्यार से बोले जाने पर कैसा लगता है।" },
-      "deepDive": { "en": "Babies in the womb respond to the emotional tone of speech far earlier than its meaning. The rhythm and warmth of your voice are their first language of feeling.", "hi": "गर्भ में शिशु बोली के अर्थ से बहुत पहले उसके भाव भरे लहजे पर प्रतिक्रिया देने लगते हैं। आपकी आवाज़ की लय और गरमाहट ही उनकी भावनाओं की पहली भाषा है।" },
-      "remember": { "en": "Your baby hears how you feel before they hear what you say.", "hi": "आप क्या कहती हैं, यह सुनने से पहले आपका शिशु यह सुन लेता है कि आप कैसा महसूस कर रही हैं।" }
+      "title": { "en": "Your tone reaches your baby first", "hi": "शब्द भाव लिए चलते हैं" },
+      "insight": { "en": "Long before your baby knows what words mean, they pick up the feeling in how they're said.", "hi": "शब्दों का मतलब जानने से बहुत पहले आपका शिशु उनके भीतर बैठे भाव को महसूस कर लेता है।" },
+      "expanded": { "en": "Your baby can't understand a single word yet, but they can pick up its tone. A soft, loving voice sounds soothing, even before any words make sense. This isn't a reason to worry. No one speaks gently every moment. It's a gentle invitation to notice how you sound, especially when you talk to your baby. When you slow down and let warmth into your voice, you're sharing more than words. You're giving your baby their first taste of what it feels like to be spoken to with love.", "hi": "आपका शिशु अभी एक भी शब्द नहीं समझ सकता, पर उसका रंग ज़रूर महसूस कर सकता है। नरम, प्यार भरा लहजा उस तक तसल्ली बनकर पहुँचता है; तना हुआ, जल्दबाज़ लहजा बेचैनी की एक लहर बनकर। यह चिंता की बात नहीं — कोई हर पल नरमी से नहीं बोलता। यह बस एक चुपचाप न्योता है कि आप ध्यान दें कि आप कैसी सुनाई देती हैं, ख़ासकर जब आप अपने शिशु से बोलती हैं। जब आप धीमी होती हैं और अपनी आवाज़ में गरमाहट आने देती हैं, तब आप सिर्फ़ शब्द नहीं बाँट रहीं। तब आप अपने शिशु को उनका पहला सबक़ दे रही हैं — कि प्यार से बोले जाने पर कैसा लगता है।" },
+      "deepDive": { "en": "Researchers find that babies respond to the rhythm and melody of speech long before they understand any words. Tone is their first way into language.", "hi": "गर्भ में शिशु बोली के अर्थ से बहुत पहले उसके भाव भरे लहजे पर प्रतिक्रिया देने लगते हैं। आपकी आवाज़ की लय और गरमाहट ही उनकी भावनाओं की पहली भाषा है।" },
+      "remember": { "en": "Your baby hears how you feel before they understand what you say.", "hi": "आप क्या कहती हैं, यह सुनने से पहले आपका शिशु यह सुन लेता है कि आप कैसा महसूस कर रही हैं।" }
     },
     "readToBaby": {
       "title": { "en": "The Crow Who Would Sing", "hi": "वह कौआ जो गाना चाहता था" },
@@ -137,8 +137,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby a dream you hold for their curiosity and their learning.", "hi": "अपने शिशु को एक सपना बताइए जो आप उनकी जिज्ञासा और उनकी सीख के लिए रखती हैं।" },
-      "motivation": { "en": "A child's love of learning often begins with a parent who wondered aloud.", "hi": "बच्चे का सीखने से प्यार अक्सर ऐसे माँ-बाप से शुरू होता है जो बोल-बोलकर सोचते रहे।" }
+      "title": { "en": "Tell your baby about a dream you have for their curiosity and learning.", "hi": "अपने शिशु को एक सपना बताइए जो आप उनकी जिज्ञासा और उनकी सीख के लिए रखती हैं।" },
+      "motivation": { "en": "A child's love of learning often starts with a parent who wondered out loud.", "hi": "बच्चे का सीखने से प्यार अक्सर ऐसे माँ-बाप से शुरू होता है जो बोल-बोलकर सोचते रहे।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -153,9 +153,9 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "When Sweet Cravings Call", "hi": "जब मीठे की तलब उठे" },
-      "content": { "en": "If you long for something sweet, reach first for fruit, a date or two, or a little jaggery. They satisfy the craving gently while giving your body something kind.", "hi": "अगर कुछ मीठा खाने का मन हो, तो पहले फल, एक-दो खजूर, या थोड़ा-सा गुड़ लीजिए। ये तलब को नरमी से शांत करते हैं और साथ ही आपके शरीर को कुछ अच्छा भी देते हैं।" },
-      "remember": { "en": "A craving met gently is a craving cared for.", "hi": "नरमी से पूरी की गई तलब सँभाली हुई तलब है।" },
+      "title": { "en": "When sweet cravings come", "hi": "जब मीठे की तलब उठे" },
+      "content": { "en": "If you want something sweet, reach first for fruit, a date or two, or a little jaggery. They satisfy the craving and give your body something good.", "hi": "अगर कुछ मीठा खाने का मन हो, तो पहले फल, एक-दो खजूर, या थोड़ा-सा गुड़ लीजिए। ये तलब को नरमी से शांत करते हैं और साथ ही आपके शरीर को कुछ अच्छा भी देते हैं।" },
+      "remember": { "en": "A craving met with fruit or jaggery is a craving well handled.", "hi": "नरमी से पूरी की गई तलब सँभाली हुई तलब है।" },
       "durationMinutes": 0
     }
   },
@@ -164,10 +164,10 @@
     "week": 18,
     "babyLearning": { "en": "Many women have the anomaly scan between 18 and 22 weeks.", "hi": "आवाज़ और हरकत की साझी ताल पर झूलना" },
     "grow": {
-      "title": { "en": "The Music You Share", "hi": "वह संगीत जो आप बाँटती हैं" },
-      "insight": { "en": "The songs you love can become a gift you share with your baby, long before they are born.", "hi": "जो गीत आपको प्यारे हैं, वे एक ऐसा तोहफ़ा बन सकते हैं जिसे आप अपने शिशु के साथ जन्म से बहुत पहले ही बाँट लेती हैं।" },
-      "expanded": { "en": "Music has a special way of reaching your baby. A song you play often — a lullaby, a favourite tune, something that calms you — becomes part of the world your baby is learning. They feel the rhythm, the rise and fall, and the ease it brings to your body. Choosing one or two gentle songs to return to is like building a small, familiar room of sound for your baby to grow in. And there is a quiet wonder waiting: a melody heard often now can soothe the very same baby once they are in your arms.", "hi": "संगीत का आपके शिशु तक पहुँचने का अपना ही एक तरीक़ा है। जो गीत आप अक्सर चलाती हैं — कोई लोरी, कोई पसंदीदा धुन, कुछ जो आपको शांत करता है — वह उस दुनिया का हिस्सा बन जाता है जिसे आपका शिशु सीख रहा है। वे ताल महसूस करते हैं, उतार-चढ़ाव महसूस करते हैं, और वह सहजता भी जो वह धुन आपके शरीर में ले आती है। एक-दो नरम गीत चुन लेना, जिन पर आप बार-बार लौट सकें, अपने शिशु के बढ़ने के लिए आवाज़ का एक छोटा-सा, जाना-पहचाना कमरा बना देने जैसा है। और एक चुपचाप करिश्मा इंतज़ार में है: जो धुन अभी अक्सर सुनी जाती है, वही उन्हें तब शांत कर सकती है जब वे आपकी बाँहों में होंगे।" },
-      "deepDive": { "en": "Researchers have found that babies remember melodies heard in the womb for weeks after birth, often calming or alerting to a familiar tune. Music becomes one of their earliest memories.", "hi": "शोध में पाया गया है कि गर्भ में सुनी धुनें शिशु जन्म के कई हफ़्तों बाद तक याद रखते हैं, और जानी-पहचानी धुन पर अक्सर शांत या चौकन्ने हो जाते हैं। संगीत उनकी सबसे पहली यादों में से एक बन जाता है।" },
+      "title": { "en": "Share your favourite music with your baby", "hi": "वह संगीत जो आप बाँटती हैं" },
+      "insight": { "en": "The songs you love can be something you share with your baby, long before they're born.", "hi": "जो गीत आपको प्यारे हैं, वे एक ऐसा तोहफ़ा बन सकते हैं जिसे आप अपने शिशु के साथ जन्म से बहुत पहले ही बाँट लेती हैं।" },
+      "expanded": { "en": "Music has a special way of reaching your baby. A song you play often, a lullaby, a favourite tune, something that calms you, becomes part of the world your baby is getting to know. They pick up the rhythm and the rise and fall. Choosing one or two gentle songs to come back to builds a small, familiar world of sound for your baby. And there's something lovely waiting: a tune heard often now may help soothe the same baby once they're in your arms.", "hi": "संगीत का आपके शिशु तक पहुँचने का अपना ही एक तरीक़ा है। जो गीत आप अक्सर चलाती हैं — कोई लोरी, कोई पसंदीदा धुन, कुछ जो आपको शांत करता है — वह उस दुनिया का हिस्सा बन जाता है जिसे आपका शिशु सीख रहा है। वे ताल महसूस करते हैं, उतार-चढ़ाव महसूस करते हैं, और वह सहजता भी जो वह धुन आपके शरीर में ले आती है। एक-दो नरम गीत चुन लेना, जिन पर आप बार-बार लौट सकें, अपने शिशु के बढ़ने के लिए आवाज़ का एक छोटा-सा, जाना-पहचाना कमरा बना देने जैसा है। और एक चुपचाप करिश्मा इंतज़ार में है: जो धुन अभी अक्सर सुनी जाती है, वही उन्हें तब शांत कर सकती है जब वे आपकी बाँहों में होंगे।" },
+      "deepDive": { "en": "Researchers have found signs that newborns recognise a tune they heard often before birth. A familiar song can become one of their earliest memories.", "hi": "शोध में पाया गया है कि गर्भ में सुनी धुनें शिशु जन्म के कई हफ़्तों बाद तक याद रखते हैं, और जानी-पहचानी धुन पर अक्सर शांत या चौकन्ने हो जाते हैं। संगीत उनकी सबसे पहली यादों में से एक बन जाता है।" },
       "remember": { "en": "A song shared now can comfort your baby for years.", "hi": "अभी बाँटा गया एक गीत आपके शिशु को सालों तक तसल्ली दे सकता है।" }
     },
     "readToBaby": {
@@ -177,8 +177,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about an adventure you dream of giving them one day.", "hi": "अपने शिशु को किसी ऐसे सफ़र के बारे में बताइए जो आप एक दिन उन्हें देने का सपना देखती हैं।" },
-      "motivation": { "en": "Dreaming aloud weaves your baby into the journeys still ahead of you both.", "hi": "बोलकर सपने देखना आपके शिशु को उन सफ़रों में पिरो देता है जो अभी आप दोनों के आगे हैं।" }
+      "title": { "en": "Tell your baby about an adventure you'd love to take them on one day.", "hi": "अपने शिशु को किसी ऐसे सफ़र के बारे में बताइए जो आप एक दिन उन्हें देने का सपना देखती हैं।" },
+      "motivation": { "en": "Dreaming out loud includes your baby in all the plans still ahead of you.", "hi": "बोलकर सपने देखना आपके शिशु को उन सफ़रों में पिरो देता है जो अभी आप दोनों के आगे हैं।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -193,9 +193,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "I Am Allowed To Enjoy This", "hi": "मुझे इसका आनंद लेने की इजाज़त है" },
-      "content": { "en": "Amid all the planning and worry, I am allowed to simply delight in this season and the little life I carry.", "hi": "सारी योजना और चिंता के बीच, मुझे इजाज़त है कि मैं इस दौर का और इस नन्ही ज़िंदगी का, जो मैं थामे हूँ, बस आनंद लूँ।" },
-      "remember": { "en": "Joy is a part of this journey too.", "hi": "ख़ुशी भी इस सफ़र का हिस्सा है।" },
+      "title": { "en": "I'm allowed to enjoy this", "hi": "मुझे इसका आनंद लेने की इजाज़त है" },
+      "content": { "en": "Among all the planning and worry, I'm allowed to enjoy this time and the little life I'm carrying.", "hi": "सारी योजना और चिंता के बीच, मुझे इजाज़त है कि मैं इस दौर का और इस नन्ही ज़िंदगी का, जो मैं थामे हूँ, बस आनंद लूँ।" },
+      "remember": { "en": "Joy is part of pregnancy too.", "hi": "ख़ुशी भी इस सफ़र का हिस्सा है।" },
       "durationMinutes": 0
     }
   },
@@ -204,11 +204,11 @@
     "week": 18,
     "babyLearning": { "en": "Your baby's brain is building the links for learning and memory.", "hi": "आपकी धीमी, ठहरी हुई आवाज़ से सुकून पाना" },
     "grow": {
-      "title": { "en": "A Lullaby Before Birth", "hi": "जन्म से पहले एक लोरी" },
-      "insight": { "en": "A lullaby you sing now is not too early. It is the first song of a bond that will last a lifetime.", "hi": "जो लोरी आप अभी गाती हैं, वह जल्दी नहीं है। वह एक ऐसे रिश्ते का पहला गीत है जो उम्र भर चलेगा।" },
-      "expanded": { "en": "There is something timeless about singing a lullaby to a baby still within you. Pick one gentle song and let it become 'yours' — sung at night, sung when you rest, sung simply because you love them. Your baby learns its rhythm and links it to your calm and your warmth. Then, on the long nights after birth, that same lullaby will work like quiet magic, telling your baby in a language older than words: I know this sound, I am safe, I am home. You are not just singing. You are building a small, sure comfort to carry you both for years.", "hi": "अभी अपने भीतर पल रहे शिशु के लिए लोरी गाने में कुछ ऐसा है जो समय से परे है। कोई एक नरम गीत चुन लीजिए और उसे 'अपना' बन जाने दीजिए — रात को गाया, आराम करते हुए गाया, बस इसलिए गाया कि आप उनसे प्यार करती हैं। आपका शिशु उसकी ताल सीखता है और उसे आपकी शांति और आपकी गरमाहट से जोड़ लेता है। फिर, जन्म के बाद की लंबी रातों में, वही लोरी एक चुपचाप जादू की तरह काम करेगी, आपके शिशु से शब्दों से भी पुरानी भाषा में कहती हुई: यह आवाज़ मेरी जानी हुई है, मैं सुरक्षित हूँ, मैं घर पर हूँ। आप सिर्फ़ गा नहीं रहीं। आप एक छोटी, पक्की तसल्ली बना रही हैं जो आप दोनों को सालों तक थामे रखेगी।" },
-      "deepDive": { "en": "Music therapists find that lullabies sung repeatedly in pregnancy can settle a newborn's heartbeat and breathing after birth — the familiar song works as a bridge from the womb to the world.", "hi": "संगीत से इलाज करने वाले जानकार पाते हैं कि गर्भावस्था में बार-बार गाई गई लोरी जन्म के बाद नवजात की धड़कन और साँस को ठहरा सकती है — जाना-पहचाना गीत गर्भ से दुनिया तक एक पुल की तरह काम करता है।" },
-      "remember": { "en": "One song, sung often, becomes a lifelong comfort.", "hi": "एक गीत, अक्सर गाया जाए, तो उम्र भर की तसल्ली बन जाता है।" }
+      "title": { "en": "Sing a lullaby before birth", "hi": "जन्म से पहले एक लोरी" },
+      "insight": { "en": "It isn't too early to sing a lullaby. It can be the first song of a bond that lasts.", "hi": "जो लोरी आप अभी गाती हैं, वह जल्दी नहीं है। वह एक ऐसे रिश्ते का पहला गीत है जो उम्र भर चलेगा।" },
+      "expanded": { "en": "There's something lovely about singing a lullaby to a baby who isn't born yet. Pick one gentle song and let it become 'yours': sung at night, sung while you rest, sung because you love them. Your baby gets used to it and links it with calm. Then, on long nights after birth, that same lullaby can help settle them, a sound they already know that tells them they're safe. You're doing more than singing. You're building a small comfort that can help you both for years.", "hi": "अभी अपने भीतर पल रहे शिशु के लिए लोरी गाने में कुछ ऐसा है जो समय से परे है। कोई एक नरम गीत चुन लीजिए और उसे 'अपना' बन जाने दीजिए — रात को गाया, आराम करते हुए गाया, बस इसलिए गाया कि आप उनसे प्यार करती हैं। आपका शिशु उसकी ताल सीखता है और उसे आपकी शांति और आपकी गरमाहट से जोड़ लेता है। फिर, जन्म के बाद की लंबी रातों में, वही लोरी एक चुपचाप जादू की तरह काम करेगी, आपके शिशु से शब्दों से भी पुरानी भाषा में कहती हुई: यह आवाज़ मेरी जानी हुई है, मैं सुरक्षित हूँ, मैं घर पर हूँ। आप सिर्फ़ गा नहीं रहीं। आप एक छोटी, पक्की तसल्ली बना रही हैं जो आप दोनों को सालों तक थामे रखेगी।" },
+      "deepDive": { "en": "Studies in newborn units have found that gentle, live lullabies can help settle babies' heart rate and breathing. Singing the same song often, before and after birth, makes it familiar.", "hi": "संगीत से इलाज करने वाले जानकार पाते हैं कि गर्भावस्था में बार-बार गाई गई लोरी जन्म के बाद नवजात की धड़कन और साँस को ठहरा सकती है — जाना-पहचाना गीत गर्भ से दुनिया तक एक पुल की तरह काम करता है।" },
+      "remember": { "en": "One song, sung often, becomes a lasting comfort.", "hi": "एक गीत, अक्सर गाया जाए, तो उम्र भर की तसल्ली बन जाता है।" }
     },
     "readToBaby": {
       "title": { "en": "The Magic Drum", "hi": "जादुई ढोल" },
@@ -217,8 +217,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby how you hope they will handle the hard times in life.", "hi": "अपने शिशु को बताइए कि आप चाहती हैं कि वे ज़िंदगी के मुश्किल वक़्त को कैसे सँभालें।" },
-      "motivation": { "en": "The courage you wish for them is first felt in the steadiness of your voice.", "hi": "जो हिम्मत आप उनके लिए चाहती हैं, वह सबसे पहले आपकी आवाज़ के ठहराव में महसूस होती है।" }
+      "title": { "en": "Tell your baby how you hope they'll get through the hard times in life.", "hi": "अपने शिशु को बताइए कि आप चाहती हैं कि वे ज़िंदगी के मुश्किल वक़्त को कैसे सँभालें।" },
+      "motivation": { "en": "The courage you wish for them starts with hearing a steady voice.", "hi": "जो हिम्मत आप उनके लिए चाहती हैं, वह सबसे पहले आपकी आवाज़ के ठहराव में महसूस होती है।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -233,9 +233,9 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "When Sleep Comes Uneasy", "hi": "जब नींद मुश्किल से आए" },
-      "content": { "en": "If nights feel restless, a small warm cup of milk with a pinch of turmeric before bed can settle you. Keep evening meals light so your body can rest, not work.", "hi": "अगर रातें बेचैन लगें, तो सोने से पहले एक छोटा कप गरम दूध, ज़रा-सी हल्दी के साथ, आपको ठहरा सकता है। शाम का खाना हल्का रखिए ताकि आपका शरीर आराम कर सके, काम नहीं।" },
-      "remember": { "en": "A light, warm evening prepares the body for rest.", "hi": "एक हल्की, गरम शाम शरीर को आराम के लिए तैयार कर देती है।" },
+      "title": { "en": "When sleep won't come easily", "hi": "जब नींद मुश्किल से आए" },
+      "content": { "en": "If nights feel restless, a small cup of warm milk with a pinch of turmeric before bed can help you settle. Keep evening meals light so your body can rest instead of working.", "hi": "अगर रातें बेचैन लगें, तो सोने से पहले एक छोटा कप गरम दूध, ज़रा-सी हल्दी के साथ, आपको ठहरा सकता है। शाम का खाना हल्का रखिए ताकि आपका शरीर आराम कर सके, काम नहीं।" },
+      "remember": { "en": "A light, warm evening helps you get ready for sleep.", "hi": "एक हल्की, गरम शाम शरीर को आराम के लिए तैयार कर देती है।" },
       "durationMinutes": 0
     }
   },
@@ -244,11 +244,11 @@
     "week": 18,
     "babyLearning": { "en": "First movements often feel like bubbles or light tapping.", "hi": "घर की जानी-पहचानी आवाज़ें चुपचाप सँभालना" },
     "grow": {
-      "title": { "en": "Sound Becomes Memory", "hi": "आवाज़ याद बन जाती है" },
-      "insight": { "en": "The sounds your baby hears today do not simply pass by. They are quietly becoming their very first memories.", "hi": "जो आवाज़ें आपका शिशु आज सुनता है, वे बस गुज़र नहीं जातीं। वे चुपचाप उनकी सबसे पहली यादें बनती जा रही हैं।" },
-      "expanded": { "en": "Something quietly remarkable is happening: the sounds filling your baby's world are not just heard, they are being remembered. Your voice, a favourite song, the warm bustle of home — your baby is gathering these into the first soft memories of belonging. This is why a newborn turns towards a mother's voice, settles to a familiar tune, calms in the home they have somehow always known. The world you are surrounding your baby with now becomes the first 'home' they recognise. Let it be gentle, let it be loving — and trust that your baby is already learning, in sound, that they are safe.", "hi": "कुछ चुपचाप कमाल का हो रहा है: जो आवाज़ें आपके शिशु की दुनिया भर रही हैं, वे सिर्फ़ सुनी नहीं जा रहीं, वे याद भी रखी जा रही हैं। आपकी आवाज़, कोई पसंदीदा गीत, घर की गरम चहल-पहल — आपका शिशु इन सबको अपनेपन की पहली नरम यादों में समेट रहा है। इसीलिए नवजात माँ की आवाज़ की ओर मुड़ जाते हैं, जानी-पहचानी धुन पर ठहर जाते हैं, उस घर में शांत हो जाते हैं जिसे वे किसी तरह हमेशा से जानते थे। जिस दुनिया से आप अभी अपने शिशु को घेर रही हैं, वही पहला 'घर' बन जाती है जिसे वे पहचानते हैं। उसे नरम रहने दीजिए, उसे प्यार भरा रहने दीजिए — और भरोसा रखिए कि आपका शिशु आवाज़ में ही यह सीख रहा है कि वह सुरक्षित है।" },
-      "deepDive": { "en": "Newborns have been shown to recognise a story, a song, even a particular phrase heard repeatedly before birth — proof that memory begins forming in the womb, woven from sound.", "hi": "नवजात को कोई कहानी, कोई गीत, यहाँ तक कि कोई ख़ास पंक्ति भी पहचानते देखा गया है, जो जन्म से पहले बार-बार सुनाई गई हो — इस बात का सबूत कि याददाश्त गर्भ में ही बननी शुरू हो जाती है, आवाज़ से बुनी हुई।" },
-      "remember": { "en": "The sounds of home today are your baby's first memories.", "hi": "आज घर की जो आवाज़ें हैं, वही आपके शिशु की पहली यादें हैं।" }
+      "title": { "en": "Sounds become your baby's first memories", "hi": "आवाज़ याद बन जाती है" },
+      "insight": { "en": "The sounds your baby hears now don't just pass by. Some of them are becoming their very first memories.", "hi": "जो आवाज़ें आपका शिशु आज सुनता है, वे बस गुज़र नहीं जातीं। वे चुपचाप उनकी सबसे पहली यादें बनती जा रही हैं।" },
+      "expanded": { "en": "Something remarkable is happening: some of the sounds in your baby's world aren't only being heard, they're being remembered. Familiar voices, a favourite song, the everyday sounds of home: your baby is starting to learn these. This is part of why a newborn often settles to a voice or a tune they already know. The world of sound around your baby now becomes one of the first things they recognise. Let it be gentle and loving, and trust that your baby is already learning, through sound, that they're safe.", "hi": "कुछ चुपचाप कमाल का हो रहा है: जो आवाज़ें आपके शिशु की दुनिया भर रही हैं, वे सिर्फ़ सुनी नहीं जा रहीं, वे याद भी रखी जा रही हैं। आपकी आवाज़, कोई पसंदीदा गीत, घर की गरम चहल-पहल — आपका शिशु इन सबको अपनेपन की पहली नरम यादों में समेट रहा है। इसीलिए नवजात माँ की आवाज़ की ओर मुड़ जाते हैं, जानी-पहचानी धुन पर ठहर जाते हैं, उस घर में शांत हो जाते हैं जिसे वे किसी तरह हमेशा से जानते थे। जिस दुनिया से आप अभी अपने शिशु को घेर रही हैं, वही पहला 'घर' बन जाती है जिसे वे पहचानते हैं। उसे नरम रहने दीजिए, उसे प्यार भरा रहने दीजिए — और भरोसा रखिए कि आपका शिशु आवाज़ में ही यह सीख रहा है कि वह सुरक्षित है।" },
+      "deepDive": { "en": "Newborns have been shown to recognise a story or a song heard many times before birth. It's a sign that some memory for sound begins before a baby is born.", "hi": "नवजात को कोई कहानी, कोई गीत, यहाँ तक कि कोई ख़ास पंक्ति भी पहचानते देखा गया है, जो जन्म से पहले बार-बार सुनाई गई हो — इस बात का सबूत कि याददाश्त गर्भ में ही बननी शुरू हो जाती है, आवाज़ से बुनी हुई।" },
+      "remember": { "en": "The sounds of home today are among your baby's first memories.", "hi": "आज घर की जो आवाज़ें हैं, वही आपके शिशु की पहली यादें हैं।" }
     },
     "readToBaby": {
       "title": { "en": "The Song Of The Koel", "hi": "कोयल का गीत" },
@@ -257,8 +257,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby a hope you hold for the person they will love one day.", "hi": "अपने शिशु को एक उम्मीद बताइए जो आप उस इंसान के लिए रखती हैं जिससे वे एक दिन प्यार करेंगे।" },
-      "motivation": { "en": "The love they will give one day grows from the love they hear from you now.", "hi": "जो प्यार वे एक दिन देंगे, वह उसी प्यार से बढ़ता है जो वे अभी आपसे सुनते हैं।" }
+      "title": { "en": "Tell your baby one hope you have for the people they'll love one day.", "hi": "अपने शिशु को एक उम्मीद बताइए जो आप उस इंसान के लिए रखती हैं जिससे वे एक दिन प्यार करेंगे।" },
+      "motivation": { "en": "The love they give one day grows from the love they hear from you now.", "hi": "जो प्यार वे एक दिन देंगे, वह उसी प्यार से बढ़ता है जो वे अभी आपसे सुनते हैं।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -273,9 +273,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Listen To One Sound", "hi": "एक आवाज़ को सुनिए" },
-      "content": { "en": "Breathe slowly and choose one gentle sound around you — a fan, a bird, your own breath. Rest your attention softly on it for a quiet minute, and let everything else fade.", "hi": "धीरे साँस लीजिए और अपने आस-पास कोई एक नरम आवाज़ चुनिए — पंखा, कोई पंछी, अपनी ही साँस। एक शांत मिनट तक अपना ध्यान नरमी से उसी पर टिकाइए, और बाक़ी सब को धीरे-धीरे धुँधला हो जाने दीजिए।" },
-      "remember": { "en": "Listening to one sound gently quiets the busy mind.", "hi": "एक ही आवाज़ को सुनना व्यस्त मन को नरमी से शांत कर देता है।" },
+      "title": { "en": "Listen to one sound", "hi": "एक आवाज़ को सुनिए" },
+      "content": { "en": "Breathe slowly and pick one gentle sound around you: a fan, a bird, your own breath. Rest your attention on it for a minute, and let everything else fade.", "hi": "धीरे साँस लीजिए और अपने आस-पास कोई एक नरम आवाज़ चुनिए — पंखा, कोई पंछी, अपनी ही साँस। एक शांत मिनट तक अपना ध्यान नरमी से उसी पर टिकाइए, और बाक़ी सब को धीरे-धीरे धुँधला हो जाने दीजिए।" },
+      "remember": { "en": "Listening to one sound helps calm a busy mind.", "hi": "एक ही आवाज़ को सुनना व्यस्त मन को नरमी से शांत कर देता है।" },
       "durationMinutes": 2
     }
   }

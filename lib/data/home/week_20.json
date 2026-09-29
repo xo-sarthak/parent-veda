@@ -4,11 +4,11 @@
     "week": 20,
     "babyLearning": { "en": "You're halfway through your pregnancy this week.", "hi": "आधा सफ़र पूरा, कान आपकी आवाज़ पर ध्यान देने लगे" },
     "grow": {
-      "title": { "en": "You Cannot Force A Flower", "hi": "फूल को ज़बरदस्ती नहीं खिलाया जाता" },
-      "insight": { "en": "A flower opens in its own time. You can offer warmth and water, but you cannot pull the petals apart.", "hi": "फूल अपने समय पर ही खिलता है। आप गरमाहट और पानी दे सकती हैं, पर पंखुड़ियों को ज़बरदस्ती खोल नहीं सकतीं।" },
-      "expanded": { "en": "There is a quiet joy in realising you do not have to make your child grow — you only have to nurture the conditions and let growth happen. Forcing a flower open damages it; the same is true of a little one's spirit. Your job is not to push, drag or rush, but to offer warmth, patience and a safe place to unfold. When you trade control for gentle influence, parenting becomes lighter. You are the sunlight and the rain, not the hand that yanks the bud. Growth, given room, always finds its own beautiful pace.", "hi": "यह समझ लेने में एक शांत सी ख़ुशी है कि आपको अपने बच्चे को बड़ा नहीं करना है — आपको बस हालात सँवारने हैं और बढ़ना अपने आप होने देना है। फूल को ज़बरदस्ती खोलना उसे नुक़सान पहुँचाता है; नन्हे मन के साथ भी यही बात सच है। आपका काम धकेलना, खींचना या जल्दबाज़ी करना नहीं, बल्कि गरमाहट, सब्र और खिलने के लिए एक सुरक्षित जगह देना है। जब आप क़ाबू की जगह कोमल असर चुनती हैं, परवरिश हल्की हो जाती है। आप धूप और बारिश हैं, वह हाथ नहीं जो कली को झटक दे। बढ़ना, जगह मिलने पर, हमेशा अपनी सुंदर रफ़्तार ख़ुद ढूँढ़ लेता है।" },
-      "deepDive": { "en": "Developmental psychologists distinguish 'control' from 'influence' — children resist being forced but absorb a calm example deeply. Guiding by warmth, not pressure, supports lasting self-motivation.", "hi": "बाल-विकास पर काम करने वाले जानकार 'क़ाबू' और 'असर' में फ़र्क़ करते हैं — बच्चे ज़बरदस्ती का विरोध करते हैं, पर एक शांत मिसाल को गहराई से अपना लेते हैं। दबाव से नहीं, गरमाहट से राह दिखाना बच्चे के भीतर से आने वाली लगन को लंबे समय तक बनाए रखता है।" },
-      "remember": { "en": "Offer the warmth; let the flower choose its hour.", "hi": "गरमाहट दीजिए; खिलने का पल फूल को चुनने दीजिए।" }
+      "title": { "en": "Children grow at their own pace", "hi": "फूल को ज़बरदस्ती नहीं खिलाया जाता" },
+      "insight": { "en": "A flower opens in its own time. You can give it warmth and water, but you can't pull the petals open.", "hi": "फूल अपने समय पर ही खिलता है। आप गरमाहट और पानी दे सकती हैं, पर पंखुड़ियों को ज़बरदस्ती खोल नहीं सकतीं।" },
+      "expanded": { "en": "It's a relief to realise you don't have to make your child grow. You only have to give them the right conditions and let growth happen. Forcing a flower open damages it, and pushing a little one too hard can hurt their spirit in the same way. Your job is to offer warmth, patience and a safe place to grow, without pushing or rushing. When you swap control for gentle influence, parenting gets lighter. You provide the sun and the rain. Given room, a child grows at their own pace.", "hi": "यह समझ लेने में एक शांत सी ख़ुशी है कि आपको अपने बच्चे को बड़ा नहीं करना है — आपको बस हालात सँवारने हैं और बढ़ना अपने आप होने देना है। फूल को ज़बरदस्ती खोलना उसे नुक़सान पहुँचाता है; नन्हे मन के साथ भी यही बात सच है। आपका काम धकेलना, खींचना या जल्दबाज़ी करना नहीं, बल्कि गरमाहट, सब्र और खिलने के लिए एक सुरक्षित जगह देना है। जब आप क़ाबू की जगह कोमल असर चुनती हैं, परवरिश हल्की हो जाती है। आप धूप और बारिश हैं, वह हाथ नहीं जो कली को झटक दे। बढ़ना, जगह मिलने पर, हमेशा अपनी सुंदर रफ़्तार ख़ुद ढूँढ़ लेता है।" },
+      "deepDive": { "en": "Research on motivation suggests children tend to resist being forced, and that guiding with warmth instead of pressure helps them build motivation that comes from within.", "hi": "बाल-विकास पर काम करने वाले जानकार 'क़ाबू' और 'असर' में फ़र्क़ करते हैं — बच्चे ज़बरदस्ती का विरोध करते हैं, पर एक शांत मिसाल को गहराई से अपना लेते हैं। दबाव से नहीं, गरमाहट से राह दिखाना बच्चे के भीतर से आने वाली लगन को लंबे समय तक बनाए रखता है।" },
+      "remember": { "en": "Offer warmth, and let your child grow in their own time.", "hi": "गरमाहट दीजिए; खिलने का पल फूल को चुनने दीजिए।" }
     },
     "readToBaby": {
       "title": { "en": "The Stargazer", "hi": "तारों का दीवाना" },
@@ -17,8 +17,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about the languages of your world — the words and sounds they will grow up hearing.", "hi": "अपने शिशु को अपनी दुनिया की भाषाओं के बारे में बताइए — वे शब्द और आवाज़ें जिन्हें सुनते हुए इनका बचपन बीतेगा।" },
-      "motivation": { "en": "Every language you share is another doorway into the world they're joining.", "hi": "आप जो भी भाषा बाँटती हैं, वह उस दुनिया का एक और दरवाज़ा है जिसमें आपका शिशु आ रहा है।" }
+      "title": { "en": "Tell your baby about the languages spoken around you, the words and sounds they'll grow up hearing.", "hi": "अपने शिशु को अपनी दुनिया की भाषाओं के बारे में बताइए — वे शब्द और आवाज़ें जिन्हें सुनते हुए इनका बचपन बीतेगा।" },
+      "motivation": { "en": "Every language you share opens another door into the world they're joining.", "hi": "आप जो भी भाषा बाँटती हैं, वह उस दुनिया का एक और दरवाज़ा है जिसमें आपका शिशु आ रहा है।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -33,9 +33,9 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "When The Afternoon Slump Hits", "hi": "जब दोपहर की सुस्ती घेर ले" },
-      "content": { "en": "If your energy dips mid-afternoon, reach for a small handful of nuts and a few dates instead of something sugary. The slow-release energy steadies you without the crash.", "hi": "अगर दोपहर में आपकी ताक़त गिरने लगे, तो कुछ मीठा खाने के बजाय मुट्ठी भर मेवे और दो-चार खजूर ले लीजिए। धीरे-धीरे मिलने वाली ताक़त आपको बिना गिरावट के थामे रखती है।" },
-      "remember": { "en": "Steady fuel beats a quick sugar rush.", "hi": "टिकाऊ ताक़त, तेज़ मीठे उछाल से बेहतर है।" },
+      "title": { "en": "When the afternoon slump hits", "hi": "जब दोपहर की सुस्ती घेर ले" },
+      "content": { "en": "If your energy dips mid-afternoon, reach for a small handful of nuts and a few dates instead of something sugary. Food that releases energy slowly keeps you steady without the crash.", "hi": "अगर दोपहर में आपकी ताक़त गिरने लगे, तो कुछ मीठा खाने के बजाय मुट्ठी भर मेवे और दो-चार खजूर ले लीजिए। धीरे-धीरे मिलने वाली ताक़त आपको बिना गिरावट के थामे रखती है।" },
+      "remember": { "en": "Nuts and dates keep you going better than a quick sugar rush.", "hi": "टिकाऊ ताक़त, तेज़ मीठे उछाल से बेहतर है।" },
       "durationMinutes": 0
     }
   },
@@ -44,11 +44,11 @@
     "week": 20,
     "babyLearning": { "en": "Your baby can hear sounds now, including your voice.", "hi": "नन्ही उँगलियों के निशान बन रहे हैं, दुनिया में सिर्फ़ इन्हीं के" },
     "grow": {
-      "title": { "en": "Lead, Don't Drag", "hi": "आगे चलिए, खींचिए नहीं" },
-      "insight": { "en": "A child follows where they feel gently led — not where they are pushed from behind.", "hi": "बच्चे वहीं चलते हैं जहाँ उन्हें प्यार से ले जाया जाए — वहाँ नहीं जहाँ पीछे से धकेला जाए।" },
-      "expanded": { "en": "There is a world of difference between leading and dragging. To drag is to pull a reluctant child along by force, leaving them resentful and tense. To lead is to go first, with warmth, so they want to come along. Children are wonderfully drawn to follow someone calm and sure, the way travellers follow a steady light. You will guide your little one most powerfully not through commands but through example — by walking the path yourself, gently, and letting them choose to walk beside you. Leading invites; dragging only resists.", "hi": "आगे चलने और खींचने में ज़मीन-आसमान का फ़र्क़ है। खींचना यानी अनमने बच्चे को ज़बरदस्ती साथ घसीटना, और उसे नाराज़ और तना हुआ छोड़ देना। आगे चलना यानी गरमाहट के साथ पहले जाना, ताकि वे ख़ुद साथ आना चाहें। बच्चे शांत और भरोसे वाले इंसान के पीछे बड़ी ख़ुशी से चलते हैं, जैसे मुसाफ़िर एक स्थिर रोशनी के पीछे। आप अपने नन्हे को सबसे गहरी राह हुक्म से नहीं, मिसाल से दिखाएँगी — ख़ुद उस रास्ते पर नरमी से चलकर, और उन्हें अपने साथ चलने का फ़ैसला ख़ुद करने देकर। आगे चलना न्योता देता है; खींचना सिर्फ़ विरोध जगाता है।" },
-      "deepDive": { "en": "Research on motivation shows that autonomy-supportive guidance — offering choices and reasons — builds far deeper cooperation than coercion, which tends to spark resistance.", "hi": "लगन पर हुए शोध बताते हैं कि बच्चे को चुनाव और कारण देकर राह दिखाना ज़बरदस्ती के मुक़ाबले कहीं गहरा सहयोग बनाता है — ज़बरदस्ती तो अक्सर विरोध ही जगा देती है।" },
-      "remember": { "en": "Go first, gently, and they will want to follow.", "hi": "नरमी से पहले चलिए, वे ख़ुद साथ आना चाहेंगे।" }
+      "title": { "en": "Lead your child gently instead of pulling", "hi": "आगे चलिए, खींचिए नहीं" },
+      "insight": { "en": "A child follows where they feel gently led, not where they're pushed from behind.", "hi": "बच्चे वहीं चलते हैं जहाँ उन्हें प्यार से ले जाया जाए — वहाँ नहीं जहाँ पीछे से धकेला जाए।" },
+      "expanded": { "en": "Leading and dragging are very different. Dragging means pulling an unwilling child along by force, which leaves them upset and tense. Leading means going first, warmly, so they want to come along. Children are drawn to follow someone calm and sure. You'll guide your little one best through example, not commands: walking the path yourself, gently, and letting them choose to walk beside you. When you lead, a child wants to come. When you drag, they push back.", "hi": "आगे चलने और खींचने में ज़मीन-आसमान का फ़र्क़ है। खींचना यानी अनमने बच्चे को ज़बरदस्ती साथ घसीटना, और उसे नाराज़ और तना हुआ छोड़ देना। आगे चलना यानी गरमाहट के साथ पहले जाना, ताकि वे ख़ुद साथ आना चाहें। बच्चे शांत और भरोसे वाले इंसान के पीछे बड़ी ख़ुशी से चलते हैं, जैसे मुसाफ़िर एक स्थिर रोशनी के पीछे। आप अपने नन्हे को सबसे गहरी राह हुक्म से नहीं, मिसाल से दिखाएँगी — ख़ुद उस रास्ते पर नरमी से चलकर, और उन्हें अपने साथ चलने का फ़ैसला ख़ुद करने देकर। आगे चलना न्योता देता है; खींचना सिर्फ़ विरोध जगाता है।" },
+      "deepDive": { "en": "Research on motivation suggests that offering choices and explaining reasons tends to win more cooperation than force, which often leads to pushback.", "hi": "लगन पर हुए शोध बताते हैं कि बच्चे को चुनाव और कारण देकर राह दिखाना ज़बरदस्ती के मुक़ाबले कहीं गहरा सहयोग बनाता है — ज़बरदस्ती तो अक्सर विरोध ही जगा देती है।" },
+      "remember": { "en": "Go first, gently, and your child will want to follow.", "hi": "नरमी से पहले चलिए, वे ख़ुद साथ आना चाहेंगे।" }
     },
     "readToBaby": {
       "title": { "en": "The Cunning Cat's Justice", "hi": "चालाक बिल्ली का इंसाफ़" },
@@ -57,8 +57,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about a tradition from your culture they'll grow up inside.", "hi": "अपने शिशु को अपनी संस्कृति की एक ऐसी परंपरा के बारे में बताइए जिसके भीतर इनका बचपन बीतेगा।" },
-      "motivation": { "en": "Traditions are the threads that tie your child to a story bigger than themselves.", "hi": "परंपराएँ वे धागे हैं जो आपके बच्चे को अपने से कहीं बड़ी एक कहानी से बाँध देती हैं।" }
+      "title": { "en": "Tell your baby about a tradition from your culture that they'll grow up with.", "hi": "अपने शिशु को अपनी संस्कृति की एक ऐसी परंपरा के बारे में बताइए जिसके भीतर इनका बचपन बीतेगा।" },
+      "motivation": { "en": "Traditions connect your child to a story bigger than themselves.", "hi": "परंपराएँ वे धागे हैं जो आपके बच्चे को अपने से कहीं बड़ी एक कहानी से बाँध देती हैं।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -73,9 +73,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "I Set The Tone, Gently", "hi": "माहौल मैं बनाती हूँ, नरमी से" },
-      "content": { "en": "I do not have to control everything around me. I only have to lead my own calm, and let it spread.", "hi": "मुझे अपने आस-पास सब कुछ क़ाबू में नहीं रखना। मुझे बस अपनी शांति आगे रखनी है, और उसे फैलने देना है।" },
-      "remember": { "en": "Your calm is the tone everyone else follows.", "hi": "आपकी शांति ही वह माहौल है जिसके पीछे बाक़ी सब चलते हैं।" },
+      "title": { "en": "I set the tone, gently", "hi": "माहौल मैं बनाती हूँ, नरमी से" },
+      "content": { "en": "I don't have to control everything around me. I only have to look after my own calm, and let it spread.", "hi": "मुझे अपने आस-पास सब कुछ क़ाबू में नहीं रखना। मुझे बस अपनी शांति आगे रखनी है, और उसे फैलने देना है।" },
+      "remember": { "en": "Your calm can help everyone around you settle.", "hi": "आपकी शांति ही वह माहौल है जिसके पीछे बाक़ी सब चलते हैं।" },
       "durationMinutes": 0
     }
   },
@@ -84,11 +84,11 @@
     "week": 20,
     "babyLearning": { "en": "Your baby swallows amniotic fluid, practice for feeding later.", "hi": "धीरे-धीरे निगलना, बाहर की ज़िंदगी की तैयारी" },
     "grow": {
-      "title": { "en": "The Calm Adult Wins", "hi": "शांत बड़ा ही जीतता है" },
-      "insight": { "en": "In any tense moment between a grown-up and a child, the calmer one quietly leads the way.", "hi": "बड़े और बच्चे के बीच किसी भी तने हुए पल में, जो ज़्यादा शांत है वही चुपचाप राह दिखा देता है।" },
-      "expanded": { "en": "When a small storm brews — a tantrum, a refusal, a meltdown — it can feel like a contest of wills. But it is never really a fight to win. The grown-up who stays calm is not losing; they are holding the steady centre the child cannot yet hold for themselves. A raised voice meets a raised voice and the storm grows. A soft, sure presence meets the storm and slowly calms it. You will never need to overpower your child — only to out-calm the moment. That steadiness is the most quietly powerful thing a parent can offer.", "hi": "जब एक छोटा तूफ़ान उठता है — ज़िद, इनकार, रोना-चीख़ना — तो लगता है जैसे इरादों की लड़ाई हो। पर यह कभी जीतने की लड़ाई होती ही नहीं। जो बड़ा शांत रहता है वह हार नहीं रहा; वह वह स्थिर केंद्र थामे है जिसे बच्चा अभी ख़ुद नहीं थाम सकता। ऊँची आवाज़ ऊँची आवाज़ से मिलती है और तूफ़ान बढ़ जाता है। एक नरम, भरोसे वाली मौजूदगी तूफ़ान से मिलती है और उसे धीरे-धीरे शांत कर देती है। आपको कभी अपने बच्चे पर हावी होने की ज़रूरत नहीं — बस उस पल से ज़्यादा शांत रहने की। यही स्थिरता वह सबसे चुपचाप ताक़तवर चीज़ है जो माता-पिता दे सकते हैं।" },
-      "deepDive": { "en": "Neuroscience shows a calm adult can literally down-regulate a distressed child's stress response — a soothing presence lowers the child's heart rate and cortisol. Your calm is contagious.", "hi": "दिमाग़ पर हुए शोध बताते हैं कि एक शांत बड़ा सचमुच परेशान बच्चे के तनाव को कम कर सकता है — एक सुकून देने वाली मौजूदगी बच्चे की धड़कन और कॉर्टिसोल दोनों घटा देती है। आपकी शांति छूत की तरह फैलती है।" },
-      "remember": { "en": "You don't have to win the moment — only out-calm it.", "hi": "आपको वह पल जीतना नहीं है — बस उससे ज़्यादा शांत रहना है।" }
+      "title": { "en": "The calmer adult can lead the way", "hi": "शांत बड़ा ही जीतता है" },
+      "insight": { "en": "In a tense moment between an adult and a child, the calmer person can lead the way.", "hi": "बड़े और बच्चे के बीच किसी भी तने हुए पल में, जो ज़्यादा शांत है वही चुपचाप राह दिखा देता है।" },
+      "expanded": { "en": "When a small storm starts, a tantrum, a refusal, a meltdown, it can feel like a battle of wills. But it's never really a fight to win. The adult who stays calm isn't losing. They're staying steady for a child who can't yet do that for themselves. A raised voice meets a raised voice and things get worse. A soft, steady presence helps the storm settle. You'll never need to overpower your child. You only need to stay calmer than the moment. That steadiness is one of the most powerful things a parent can give.", "hi": "जब एक छोटा तूफ़ान उठता है — ज़िद, इनकार, रोना-चीख़ना — तो लगता है जैसे इरादों की लड़ाई हो। पर यह कभी जीतने की लड़ाई होती ही नहीं। जो बड़ा शांत रहता है वह हार नहीं रहा; वह वह स्थिर केंद्र थामे है जिसे बच्चा अभी ख़ुद नहीं थाम सकता। ऊँची आवाज़ ऊँची आवाज़ से मिलती है और तूफ़ान बढ़ जाता है। एक नरम, भरोसे वाली मौजूदगी तूफ़ान से मिलती है और उसे धीरे-धीरे शांत कर देती है। आपको कभी अपने बच्चे पर हावी होने की ज़रूरत नहीं — बस उस पल से ज़्यादा शांत रहने की। यही स्थिरता वह सबसे चुपचाप ताक़तवर चीज़ है जो माता-पिता दे सकते हैं।" },
+      "deepDive": { "en": "Research on young children suggests that a calm, soothing adult helps a distressed child settle. It's part of what researchers call co-regulation.", "hi": "दिमाग़ पर हुए शोध बताते हैं कि एक शांत बड़ा सचमुच परेशान बच्चे के तनाव को कम कर सकता है — एक सुकून देने वाली मौजूदगी बच्चे की धड़कन और कॉर्टिसोल दोनों घटा देती है। आपकी शांति छूत की तरह फैलती है।" },
+      "remember": { "en": "You don't have to win the moment. You only have to stay calm through it.", "hi": "आपको वह पल जीतना नहीं है — बस उससे ज़्यादा शांत रहना है।" }
     },
     "readToBaby": {
       "title": { "en": "The Elephant And The Robbers' Talk", "hi": "हाथी और लुटेरों की बातें" },
@@ -97,8 +97,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about a problem in the world you're hopeful will be better by their time.", "hi": "अपने शिशु को दुनिया की एक ऐसी दिक़्क़त के बारे में बताइए जिसके इनके समय तक बेहतर हो जाने की आपको उम्मीद है।" },
-      "motivation": { "en": "Sharing your hope plants the belief that the world can be changed for the kinder.", "hi": "अपनी उम्मीद बाँटना यह भरोसा बो देता है कि दुनिया को और भला बनाया जा सकता है।" }
+      "title": { "en": "Tell your baby about a problem in the world that you hope will be better by the time they grow up.", "hi": "अपने शिशु को दुनिया की एक ऐसी दिक़्क़त के बारे में बताइए जिसके इनके समय तक बेहतर हो जाने की आपको उम्मीद है।" },
+      "motivation": { "en": "Sharing your hope helps your child believe the world can become kinder.", "hi": "अपनी उम्मीद बाँटना यह भरोसा बो देता है कि दुनिया को और भला बनाया जा सकता है।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -113,9 +113,9 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "If Heartburn Is Creeping In", "hi": "अगर सीने में जलन होने लगे" },
-      "content": { "en": "As baby grows, heartburn often creeps in. Try eating smaller meals more often, and sip cool milk or chew on a little fennel after eating to settle things gently.", "hi": "जैसे-जैसे शिशु बढ़ता है, सीने में जलन अक्सर होने लगती है। थोड़ी-थोड़ी देर में छोटे-छोटे खाने की कोशिश कीजिए, और खाने के बाद ठंडा दूध घूँट-घूँट पीजिए या थोड़ी सौंफ़ चबा लीजिए — चीज़ें नरमी से बैठ जाएँगी।" },
-      "remember": { "en": "Smaller, slower meals are kinder to a crowded belly.", "hi": "छोटे और धीरे खाए गए खाने भरे हुए पेट पर ज़्यादा मेहरबान होते हैं।" },
+      "title": { "en": "If heartburn is creeping in", "hi": "अगर सीने में जलन होने लगे" },
+      "content": { "en": "As your baby grows, heartburn often creeps in. Try eating smaller meals more often, and sip cool milk or chew a little fennel after eating to settle things gently.", "hi": "जैसे-जैसे शिशु बढ़ता है, सीने में जलन अक्सर होने लगती है। थोड़ी-थोड़ी देर में छोटे-छोटे खाने की कोशिश कीजिए, और खाने के बाद ठंडा दूध घूँट-घूँट पीजिए या थोड़ी सौंफ़ चबा लीजिए — चीज़ें नरमी से बैठ जाएँगी।" },
+      "remember": { "en": "Smaller, slower meals help with heartburn.", "hi": "छोटे और धीरे खाए गए खाने भरे हुए पेट पर ज़्यादा मेहरबान होते हैं।" },
       "durationMinutes": 0
     }
   },
@@ -124,11 +124,11 @@
     "week": 20,
     "babyLearning": { "en": "Your baby is moving arms and legs on purpose now.", "hi": "आपकी आवाज़ सुनना और अंगड़ाई लेना सीखते हुए" },
     "grow": {
-      "title": { "en": "Children Borrow Calm From Adults", "hi": "बच्चे शांति बड़ों से उधार लेते हैं" },
-      "insight": { "en": "Your baby is learning from you long before they understand words. Your calm is their first lullaby.", "hi": "शब्द समझने से बहुत पहले ही आपका शिशु आपसे सीखने लगता है। आपकी शांति ही इनकी पहली लोरी है।" },
-      "expanded": { "en": "Babies cannot regulate their own emotions yet — they borrow that ability from the adults around them. When you are calm, your breathing slows, your voice softens, and your body sends a quiet signal: the world is safe. Your baby feels that signal even now, through the steady rhythm of your heartbeat. You do not have to be calm all the time. You only have to return to calm, again and again. That returning is what your child will one day learn to do too.", "hi": "नन्हे बच्चे अभी अपनी भावनाओं को ख़ुद नहीं सँभाल सकते — वे यह क़ाबिलियत अपने आस-पास के बड़ों से उधार लेते हैं। जब आप शांत होती हैं, आपकी साँसें धीमी होती हैं, आवाज़ नरम होती है, और आपका शरीर एक चुपचाप संदेश भेजता है: दुनिया सुरक्षित है। आपका शिशु यह संदेश अभी भी महसूस करता है, आपके दिल की स्थिर धड़कन के ज़रिए। आपको हर वक़्त शांत रहने की ज़रूरत नहीं। आपको बस बार-बार शांति में लौटना है। यही लौटना एक दिन आपका बच्चा भी सीख लेगा।" },
-      "deepDive": { "en": "Researchers call this 'co-regulation' — a child's nervous system tunes itself to a caregiver's. Studies on prenatal stress show that a mother's sustained calm is associated with steadier infant temperament after birth. The takeaway is gentle, not pressured: caring for your own peace is already caring for your baby.", "hi": "शोध करने वाले इसे 'co-regulation' कहते हैं — बच्चे का नर्वस सिस्टम अपने पालने वाले के हिसाब से ख़ुद को ढाल लेता है। गर्भावस्था के तनाव पर हुए अध्ययन बताते हैं कि माँ की लगातार बनी शांति जन्म के बाद शिशु के ज़्यादा स्थिर स्वभाव से जुड़ी होती है। इसका मतलब दबाव नहीं, प्यार है: अपनी शांति का ख़याल रखना ही अपने शिशु का ख़याल रखना है।" },
-      "remember": { "en": "Every parent begins exactly where you are today.", "hi": "हर माँ-बाप ठीक वहीं से शुरू करते हैं जहाँ आज आप हैं।" }
+      "title": { "en": "Children borrow calm from the adults around them", "hi": "बच्चे शांति बड़ों से उधार लेते हैं" },
+      "insight": { "en": "Your baby will learn from you long before they understand words. Your calm helps them feel calm.", "hi": "शब्द समझने से बहुत पहले ही आपका शिशु आपसे सीखने लगता है। आपकी शांति ही इनकी पहली लोरी है।" },
+      "expanded": { "en": "Babies can't manage their own feelings yet. They borrow that ability from the adults around them. When you're calm, your breathing slows and your voice softens, and that tells a child the world is safe. You don't have to be calm all the time. You only have to come back to calm, again and again. Coming back is what your child will one day learn to do too.", "hi": "नन्हे बच्चे अभी अपनी भावनाओं को ख़ुद नहीं सँभाल सकते — वे यह क़ाबिलियत अपने आस-पास के बड़ों से उधार लेते हैं। जब आप शांत होती हैं, आपकी साँसें धीमी होती हैं, आवाज़ नरम होती है, और आपका शरीर एक चुपचाप संदेश भेजता है: दुनिया सुरक्षित है। आपका शिशु यह संदेश अभी भी महसूस करता है, आपके दिल की स्थिर धड़कन के ज़रिए। आपको हर वक़्त शांत रहने की ज़रूरत नहीं। आपको बस बार-बार शांति में लौटना है। यही लौटना एक दिन आपका बच्चा भी सीख लेगा।" },
+      "deepDive": { "en": "Researchers call this co-regulation: a young child's stress response tunes itself to a caregiver's. Some studies in pregnancy link lower ongoing stress with a more settled baby after birth. The point is gentle, not a pressure: looking after your own peace is part of looking after your baby.", "hi": "शोध करने वाले इसे 'co-regulation' कहते हैं — बच्चे का नर्वस सिस्टम अपने पालने वाले के हिसाब से ख़ुद को ढाल लेता है। गर्भावस्था के तनाव पर हुए अध्ययन बताते हैं कि माँ की लगातार बनी शांति जन्म के बाद शिशु के ज़्यादा स्थिर स्वभाव से जुड़ी होती है। इसका मतलब दबाव नहीं, प्यार है: अपनी शांति का ख़याल रखना ही अपने शिशु का ख़याल रखना है।" },
+      "remember": { "en": "Every parent starts where you are today.", "hi": "हर माँ-बाप ठीक वहीं से शुरू करते हैं जहाँ आज आप हैं।" }
     },
     "readToBaby": {
       "title": { "en": "Krishna & Sudama", "hi": "कृष्ण और सुदामा" },
@@ -153,9 +153,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "I Can Take This One Day At A Time", "hi": "मैं इसे एक-एक दिन करके सँभाल सकती हूँ" },
-      "content": { "en": "I do not need all the answers today. I only need the next step.", "hi": "मुझे आज सारे जवाब नहीं चाहिए। मुझे बस अगला क़दम चाहिए।" },
-      "remember": { "en": "Parenthood is learned one day at a time.", "hi": "परवरिश एक-एक दिन करके सीखी जाती है।" },
+      "title": { "en": "I can take this one day at a time", "hi": "मैं इसे एक-एक दिन करके सँभाल सकती हूँ" },
+      "content": { "en": "I don't need all the answers today. I only need the next step.", "hi": "मुझे आज सारे जवाब नहीं चाहिए। मुझे बस अगला क़दम चाहिए।" },
+      "remember": { "en": "Everyone learns to be a parent one day at a time.", "hi": "परवरिश एक-एक दिन करके सीखी जाती है।" },
       "durationMinutes": 0
     }
   },
@@ -164,11 +164,11 @@
     "week": 20,
     "babyLearning": { "en": "Your baby's first stool (meconium) is collecting in the gut.", "hi": "भौंहें और नरम नन्ही पलकें बन रही हैं" },
     "grow": {
-      "title": { "en": "Guidance Over Orders", "hi": "हुक्म से बेहतर है राह दिखाना" },
-      "insight": { "en": "An order tells a child what to do. Guidance helps a child understand why — and that lasts far longer.", "hi": "हुक्म बच्चे को बताता है कि क्या करना है। राह दिखाना बच्चे को समझाता है कि क्यों — और यही कहीं ज़्यादा देर तक साथ रहता है।" },
-      "expanded": { "en": "Orders are quick, but they only work while someone is watching. Guidance is slower, yet it grows something inside the child that stays even when you are not there: understanding. When you explain gently — 'we are quiet here so others can rest' — you hand your child a reason they can carry for life, rather than a rule they will drop the moment they can. Children guided rather than commanded learn to think, to weigh, to choose well on their own. The goal of all our guidance is, in the end, a child who no longer needs to be told.", "hi": "हुक्म तेज़ होते हैं, पर वे तभी तक चलते हैं जब तक कोई देख रहा हो। राह दिखाना धीमा है, फिर भी यह बच्चे के भीतर कुछ ऐसा बनाता है जो तब भी रहता है जब आप वहाँ नहीं होतीं: समझ। जब आप नरमी से समझाती हैं — 'यहाँ हम शांत रहते हैं ताकि दूसरे आराम कर सकें' — तो आप अपने बच्चे को एक ऐसा कारण थमा देती हैं जिसे वे ज़िंदगी भर साथ ले जा सकते हैं, न कि एक नियम जिसे मौक़ा मिलते ही छोड़ देंगे। जिन बच्चों को हुक्म के बजाय राह दिखाई जाती है, वे सोचना, तौलना और ख़ुद अच्छा चुनना सीखते हैं। हमारे हर राह दिखाने का मक़सद, आख़िर में, एक ऐसा बच्चा है जिसे अब बताने की ज़रूरत ही न पड़े।" },
-      "deepDive": { "en": "Studies on discipline find that reasoning with children — 'inductive discipline' — builds stronger internalised values and empathy than commands or punishment alone.", "hi": "अनुशासन पर हुए अध्ययन बताते हैं कि बच्चों को समझा-बुझाकर बताना — जिसे 'inductive discipline' कहते हैं — अकेले हुक्म या सज़ा के मुक़ाबले भीतर तक उतरने वाले मूल्य और दूसरों का दर्द समझने की क्षमता कहीं ज़्यादा मज़बूती से बनाता है।" },
-      "remember": { "en": "Give the reason, not just the rule.", "hi": "सिर्फ़ नियम नहीं, कारण भी बताइए।" }
+      "title": { "en": "Explaining works better than ordering", "hi": "हुक्म से बेहतर है राह दिखाना" },
+      "insight": { "en": "An order tells a child what to do. Explaining helps them understand why, and that lasts much longer.", "hi": "हुक्म बच्चे को बताता है कि क्या करना है। राह दिखाना बच्चे को समझाता है कि क्यों — और यही कहीं ज़्यादा देर तक साथ रहता है।" },
+      "expanded": { "en": "Orders are quick, but they only work while someone's watching. Explaining is slower, but it builds something in a child that stays even when you're not there: understanding. When you explain gently, 'we're quiet here so others can rest', you give your child a reason they can keep, not a rule they'll drop as soon as they can. Children who are guided, not commanded, learn to think things through and choose well on their own. In the end, the goal is a child who doesn't need to be told.", "hi": "हुक्म तेज़ होते हैं, पर वे तभी तक चलते हैं जब तक कोई देख रहा हो। राह दिखाना धीमा है, फिर भी यह बच्चे के भीतर कुछ ऐसा बनाता है जो तब भी रहता है जब आप वहाँ नहीं होतीं: समझ। जब आप नरमी से समझाती हैं — 'यहाँ हम शांत रहते हैं ताकि दूसरे आराम कर सकें' — तो आप अपने बच्चे को एक ऐसा कारण थमा देती हैं जिसे वे ज़िंदगी भर साथ ले जा सकते हैं, न कि एक नियम जिसे मौक़ा मिलते ही छोड़ देंगे। जिन बच्चों को हुक्म के बजाय राह दिखाई जाती है, वे सोचना, तौलना और ख़ुद अच्छा चुनना सीखते हैं। हमारे हर राह दिखाने का मक़सद, आख़िर में, एक ऐसा बच्चा है जिसे अब बताने की ज़रूरत ही न पड़े।" },
+      "deepDive": { "en": "Studies on discipline find that explaining reasons to children, which researchers call inductive discipline, is linked with stronger values and more empathy than commands or punishment alone.", "hi": "अनुशासन पर हुए अध्ययन बताते हैं कि बच्चों को समझा-बुझाकर बताना — जिसे 'inductive discipline' कहते हैं — अकेले हुक्म या सज़ा के मुक़ाबले भीतर तक उतरने वाले मूल्य और दूसरों का दर्द समझने की क्षमता कहीं ज़्यादा मज़बूती से बनाता है।" },
+      "remember": { "en": "Give the reason, not only the rule.", "hi": "सिर्फ़ नियम नहीं, कारण भी बताइए।" }
     },
     "readToBaby": {
       "title": { "en": "Tenali Rama Calms The King", "hi": "तेनाली रामा राजा को शांत करते हैं" },
@@ -178,7 +178,7 @@
     },
     "talkToBaby": {
       "title": { "en": "Tell your baby about the nature and animals you can't wait to show them.", "hi": "अपने शिशु को उस क़ुदरत और उन जानवरों के बारे में बताइए जिन्हें दिखाने का आपको बेसब्री से इंतज़ार है।" },
-      "motivation": { "en": "Your wonder at the natural world becomes the first wonder they inherit.", "hi": "क़ुदरत पर आपका अचरज ही वह पहला अचरज बनता है जो इन्हें विरासत में मिलता है।" }
+      "motivation": { "en": "Your love of the natural world can become theirs too.", "hi": "क़ुदरत पर आपका अचरज ही वह पहला अचरज बनता है जो इन्हें विरासत में मिलता है।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -193,9 +193,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "The Cooling Breath", "hi": "ठंडी करने वाली साँस" },
-      "content": { "en": "When you feel heat rising — in the body or the temper — breathe in slowly through your nose, then breathe out long and cool through gently pursed lips, as if cooling tea. Do this five times.", "hi": "जब गरमी बढ़ती महसूस हो — शरीर में या मिज़ाज में — नाक से धीरे-धीरे साँस लीजिए, फिर हल्के से सिकुड़े होंठों से लंबी और ठंडी साँस बाहर छोड़िए, जैसे चाय ठंडी कर रही हों। ऐसा पाँच बार कीजिए।" },
-      "remember": { "en": "A long, cool exhale settles both body and mood.", "hi": "एक लंबी, ठंडी साँस शरीर और मन दोनों को बिठा देती है।" },
+      "title": { "en": "A cooling breath", "hi": "ठंडी करने वाली साँस" },
+      "content": { "en": "When you feel heat rising, in your body or your temper, breathe in slowly through your nose, then breathe out long and cool through gently pursed lips, as if cooling chai. Do this five times.", "hi": "जब गरमी बढ़ती महसूस हो — शरीर में या मिज़ाज में — नाक से धीरे-धीरे साँस लीजिए, फिर हल्के से सिकुड़े होंठों से लंबी और ठंडी साँस बाहर छोड़िए, जैसे चाय ठंडी कर रही हों। ऐसा पाँच बार कीजिए।" },
+      "remember": { "en": "A long, cool breath out helps you cool down and settle.", "hi": "एक लंबी, ठंडी साँस शरीर और मन दोनों को बिठा देती है।" },
       "durationMinutes": 1
     }
   },
@@ -204,11 +204,11 @@
     "week": 20,
     "babyLearning": { "en": "Your baby's eyebrows and eyelashes are growing.", "hi": "सोने और जागने की लय में बसना शुरू" },
     "grow": {
-      "title": { "en": "Respect Grows Respect", "hi": "सम्मान से सम्मान बढ़ता है" },
-      "insight": { "en": "Children do not learn respect from being commanded. They learn it from being shown it.", "hi": "बच्चे हुक्म पाकर सम्मान नहीं सीखते। वे इसे तब सीखते हैं जब उन्हें ख़ुद सम्मान मिलता है।" },
-      "expanded": { "en": "It is easy to demand respect from a child, but respect is not really something we can demand — it is something we grow by giving. When you speak to your little one with kindness, listen to their small voice, and treat their feelings as real, you are not 'spoiling' them. You are teaching them, in the most lasting way, exactly how people deserve to be treated. A child who is respected learns that respect is how love behaves. They will hand it back to you, and one day, out into the world. What you plant in gentleness, you harvest in kind.", "hi": "बच्चे से सम्मान माँगना आसान है, पर सम्मान सच में कोई माँगने की चीज़ है ही नहीं — यह देकर उगाई जाने वाली चीज़ है। जब आप अपने नन्हे से भलाई से बात करती हैं, इनकी छोटी-सी आवाज़ सुनती हैं, और इनकी भावनाओं को असली मानती हैं, तो आप इन्हें 'बिगाड़' नहीं रहीं। आप इन्हें, सबसे टिकाऊ तरीक़े से, ठीक यह सिखा रही हैं कि लोगों के साथ कैसा बरताव होना चाहिए। जिस बच्चे को सम्मान मिलता है वह सीखता है कि सम्मान ही प्यार का तरीक़ा है। वे इसे आपको लौटाएँगे, और एक दिन, पूरी दुनिया को। जो आप नरमी में बोती हैं, वही आप काटती हैं।" },
-      "deepDive": { "en": "Research on modelling shows children copy how they are treated far more than what they are told. Being treated with respect predicts a child's own respectful, cooperative behaviour.", "hi": "नक़ल पर हुए शोध बताते हैं कि बच्चे इससे कहीं ज़्यादा यह दोहराते हैं कि उनके साथ कैसा बरताव हुआ, बजाय इसके कि उन्हें क्या कहा गया। जिन बच्चों को सम्मान मिलता है, वे आगे चलकर ख़ुद भी सम्मान से और साथ देकर पेश आते हैं।" },
-      "remember": { "en": "Respect is taught by being given.", "hi": "सम्मान देकर ही सिखाया जाता है।" }
+      "title": { "en": "Respect teaches respect", "hi": "सम्मान से सम्मान बढ़ता है" },
+      "insight": { "en": "Children don't learn respect by being ordered to show it. They learn it by being shown it.", "hi": "बच्चे हुक्म पाकर सम्मान नहीं सीखते। वे इसे तब सीखते हैं जब उन्हें ख़ुद सम्मान मिलता है।" },
+      "expanded": { "en": "It's easy to demand respect from a child, but respect can't really be demanded. It grows when we give it. When you speak to your little one kindly, listen to their small voice and treat their feelings as real, you're not spoiling them. You're teaching them how people deserve to be treated. A child who's respected learns that respect is part of love. They'll give it back to you, and one day to the world. The way you treat them is the way they'll learn to treat others.", "hi": "बच्चे से सम्मान माँगना आसान है, पर सम्मान सच में कोई माँगने की चीज़ है ही नहीं — यह देकर उगाई जाने वाली चीज़ है। जब आप अपने नन्हे से भलाई से बात करती हैं, इनकी छोटी-सी आवाज़ सुनती हैं, और इनकी भावनाओं को असली मानती हैं, तो आप इन्हें 'बिगाड़' नहीं रहीं। आप इन्हें, सबसे टिकाऊ तरीक़े से, ठीक यह सिखा रही हैं कि लोगों के साथ कैसा बरताव होना चाहिए। जिस बच्चे को सम्मान मिलता है वह सीखता है कि सम्मान ही प्यार का तरीक़ा है। वे इसे आपको लौटाएँगे, और एक दिन, पूरी दुनिया को। जो आप नरमी में बोती हैं, वही आप काटती हैं।" },
+      "deepDive": { "en": "Research suggests children tend to treat others the way they're treated. Children who are spoken to with warmth and respect tend to be more cooperative.", "hi": "नक़ल पर हुए शोध बताते हैं कि बच्चे इससे कहीं ज़्यादा यह दोहराते हैं कि उनके साथ कैसा बरताव हुआ, बजाय इसके कि उन्हें क्या कहा गया। जिन बच्चों को सम्मान मिलता है, वे आगे चलकर ख़ुद भी सम्मान से और साथ देकर पेश आते हैं।" },
+      "remember": { "en": "Children learn respect by being respected.", "hi": "सम्मान देकर ही सिखाया जाता है।" }
     },
     "readToBaby": {
       "title": { "en": "The Two Gardeners", "hi": "दो माली" },
@@ -217,7 +217,7 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about the music of your world — the songs and sounds that move you.", "hi": "अपने शिशु को अपनी दुनिया के संगीत के बारे में बताइए — वे गीत और आवाज़ें जो आपके मन को छू जाती हैं।" },
+      "title": { "en": "Tell your baby about the music around you, the songs and sounds that move you.", "hi": "अपने शिशु को अपनी दुनिया के संगीत के बारे में बताइए — वे गीत और आवाज़ें जो आपके मन को छू जाती हैं।" },
       "motivation": { "en": "The music you love now may become the lullaby they know best.", "hi": "जो संगीत आप आज प्यार करती हैं, वही एक दिन वह लोरी बन सकता है जिसे यह सबसे अच्छे से पहचानेंगे।" }
     },
     "garbhSanskar": {
@@ -233,9 +233,9 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "If You're Feeling Drained", "hi": "अगर थकान घेर रही हो" },
-      "content": { "en": "Growing iron needs are common now and can leave you tired. Pair iron-rich foods like spinach, lentils or jaggery with a little vitamin C — a squeeze of lemon or a slice of orange — to help your body absorb it.", "hi": "अब आयरन की ज़रूरत बढ़ना आम है और इससे थकान लग सकती है। पालक, दाल या गुड़ जैसी आयरन वाली चीज़ों के साथ थोड़ा विटामिन C लीजिए — नींबू का रस या संतरे की एक फाँक — ताकि शरीर आयरन को अच्छे से सोख सके।" },
-      "remember": { "en": "A little vitamin C helps iron do its work.", "hi": "थोड़ा-सा विटामिन C आयरन को अपना काम करने में मदद करता है।" },
+      "title": { "en": "If you're feeling drained", "hi": "अगर थकान घेर रही हो" },
+      "content": { "en": "Your need for iron grows now, and low iron can leave you tired. Pair iron-rich foods like spinach, lentils or jaggery with a little vitamin C, such as a squeeze of lemon or a slice of orange, to help your body absorb it.", "hi": "अब आयरन की ज़रूरत बढ़ना आम है और इससे थकान लग सकती है। पालक, दाल या गुड़ जैसी आयरन वाली चीज़ों के साथ थोड़ा विटामिन C लीजिए — नींबू का रस या संतरे की एक फाँक — ताकि शरीर आयरन को अच्छे से सोख सके।" },
+      "remember": { "en": "A little vitamin C helps iron get absorbed.", "hi": "थोड़ा-सा विटामिन C आयरन को अपना काम करने में मदद करता है।" },
       "durationMinutes": 0
     }
   },
@@ -244,11 +244,11 @@
     "week": 20,
     "babyLearning": { "en": "Your baby's skin is growing thicker, with more layers.", "hi": "हफ़्ता पूरा होते-होते, आराम से लात मारना और सिमटना" },
     "grow": {
-      "title": { "en": "Your Calm Is The Anchor", "hi": "आपकी शांति ही लंगर है" },
-      "insight": { "en": "When everything around a child feels rough, your steadiness is the anchor that holds them safe.", "hi": "जब बच्चे के आस-पास सब कुछ मुश्किल लगे, आपकी स्थिरता ही वह लंगर है जो उन्हें सुरक्षित थामे रखती है।" },
-      "expanded": { "en": "A boat in choppy water does not calm the whole sea — it simply drops an anchor and stays steady while the waves pass. This is what you are for your child. You cannot smooth every hard day or remove every upset, and you do not need to. You only need to be the still point they can hold onto: your steady voice, your unhurried presence, your calm returning again and again. From that anchor, a child learns the deepest lesson of safety — that no matter how rough things feel, there is always something steady to come back to. That steady thing is you.", "hi": "हिलते पानी में एक नाव पूरे समंदर को शांत नहीं करती — वह बस लंगर डाल देती है और लहरें गुज़रने तक स्थिर खड़ी रहती है। यही आप अपने बच्चे के लिए हैं। आप हर मुश्किल दिन को आसान नहीं कर सकतीं, न हर परेशानी हटा सकती हैं, और ज़रूरत भी नहीं। आपको बस वह ठहरा हुआ बिंदु बनना है जिसे वे थाम सकें: आपकी स्थिर आवाज़, आपकी बिना जल्दबाज़ी वाली मौजूदगी, आपकी बार-बार लौटती शांति। उसी लंगर से बच्चे सुरक्षा का सबसे गहरा सबक़ सीखते हैं — कि चीज़ें चाहे कितनी भी मुश्किल लगें, लौटने के लिए हमेशा कुछ स्थिर मौजूद है। वह स्थिर चीज़ आप हैं।" },
-      "deepDive": { "en": "Attachment research describes the calm caregiver as a child's 'secure base' — the steady point from which they bravely explore and to which they safely return.", "hi": "लगाव पर हुए शोध शांत रहने वाले बड़े को बच्चे का 'secure base' बताते हैं — वह स्थिर ठिकाना जहाँ से वे हिम्मत करके दुनिया खोजने निकलते हैं और जहाँ सुरक्षित लौट आते हैं।" },
-      "remember": { "en": "You do not calm the sea — you are the anchor in it.", "hi": "आप समंदर को शांत नहीं करतीं — आप उसमें लंगर हैं।" }
+      "title": { "en": "Your steadiness helps your child feel safe", "hi": "आपकी शांति ही लंगर है" },
+      "insight": { "en": "When everything around a child feels rough, your steadiness helps them feel safe.", "hi": "जब बच्चे के आस-पास सब कुछ मुश्किल लगे, आपकी स्थिरता ही वह लंगर है जो उन्हें सुरक्षित थामे रखती है।" },
+      "expanded": { "en": "A boat in rough water can't calm the sea. It drops an anchor and stays steady while the waves pass. That's what you can be for your child. You can't smooth every hard day or stop every upset, and you don't need to. You only need to be something steady they can hold on to: your calm voice, your unhurried presence, your calm coming back again and again. From that, a child learns that however rough things feel, there's always something steady to come back to. That steady thing is you.", "hi": "हिलते पानी में एक नाव पूरे समंदर को शांत नहीं करती — वह बस लंगर डाल देती है और लहरें गुज़रने तक स्थिर खड़ी रहती है। यही आप अपने बच्चे के लिए हैं। आप हर मुश्किल दिन को आसान नहीं कर सकतीं, न हर परेशानी हटा सकती हैं, और ज़रूरत भी नहीं। आपको बस वह ठहरा हुआ बिंदु बनना है जिसे वे थाम सकें: आपकी स्थिर आवाज़, आपकी बिना जल्दबाज़ी वाली मौजूदगी, आपकी बार-बार लौटती शांति। उसी लंगर से बच्चे सुरक्षा का सबसे गहरा सबक़ सीखते हैं — कि चीज़ें चाहे कितनी भी मुश्किल लगें, लौटने के लिए हमेशा कुछ स्थिर मौजूद है। वह स्थिर चीज़ आप हैं।" },
+      "deepDive": { "en": "Attachment research describes a calm caregiver as a child's secure base: the steady place they explore from and come back to for comfort.", "hi": "लगाव पर हुए शोध शांत रहने वाले बड़े को बच्चे का 'secure base' बताते हैं — वह स्थिर ठिकाना जहाँ से वे हिम्मत करके दुनिया खोजने निकलते हैं और जहाँ सुरक्षित लौट आते हैं।" },
+      "remember": { "en": "You don't have to fix every hard day. You only need to stay steady.", "hi": "आप समंदर को शांत नहीं करतीं — आप उसमें लंगर हैं।" }
     },
     "readToBaby": {
       "title": { "en": "How The Gentle River Shaped The Stone", "hi": "नरम नदी ने पत्थर को कैसे गढ़ा" },
@@ -257,8 +257,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about how people in your world help each other.", "hi": "अपने शिशु को बताइए कि आपकी दुनिया में लोग एक-दूसरे की मदद कैसे करते हैं।" },
-      "motivation": { "en": "The kindness you describe becomes the kindness they expect to give.", "hi": "जिस भलाई का ज़िक्र आप करती हैं, वही भलाई आगे चलकर इनके देने का तरीक़ा बन जाती है।" }
+      "title": { "en": "Tell your baby how people around you help each other.", "hi": "अपने शिशु को बताइए कि आपकी दुनिया में लोग एक-दूसरे की मदद कैसे करते हैं।" },
+      "motivation": { "en": "The kindness you describe becomes the kindness they'll expect to give.", "hi": "जिस भलाई का ज़िक्र आप करती हैं, वही भलाई आगे चलकर इनके देने का तरीक़ा बन जाती है।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -273,9 +273,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Anchor Breath", "hi": "लंगर वाली साँस" },
-      "content": { "en": "Plant both feet on the floor. Breathe in slowly and feel your weight settle down through them; breathe out and feel yourself grow steady and rooted. Repeat for one calm minute.", "hi": "दोनों पैर फ़र्श पर जमाइए। धीरे-धीरे साँस लीजिए और अपना भार उनके ज़रिए नीचे बैठता महसूस कीजिए; साँस छोड़िए और ख़ुद को स्थिर और जड़ों से जुड़ा होता महसूस कीजिए। एक शांत मिनट तक दोहराइए।" },
-      "remember": { "en": "Feeling your feet on the ground brings you home to now.", "hi": "पैरों को ज़मीन पर महसूस करना आपको इसी पल में वापस ले आता है।" },
+      "title": { "en": "Anchor breath", "hi": "लंगर वाली साँस" },
+      "content": { "en": "Put both feet flat on the floor. Breathe in slowly and feel your weight settle down through them. Breathe out and feel yourself grow steady. Repeat for one calm minute.", "hi": "दोनों पैर फ़र्श पर जमाइए। धीरे-धीरे साँस लीजिए और अपना भार उनके ज़रिए नीचे बैठता महसूस कीजिए; साँस छोड़िए और ख़ुद को स्थिर और जड़ों से जुड़ा होता महसूस कीजिए। एक शांत मिनट तक दोहराइए।" },
+      "remember": { "en": "Feeling your feet on the ground brings you back to now.", "hi": "पैरों को ज़मीन पर महसूस करना आपको इसी पल में वापस ले आता है।" },
       "durationMinutes": 2
     }
   }

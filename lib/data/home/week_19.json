@@ -4,11 +4,11 @@
     "week": 19,
     "babyLearning": { "en": "A creamy coating (vernix) is starting to protect your baby's skin.", "hi": "तेज़ी से बढ़ते हुए, नन्हे कान आपकी आवाज़ पर लगे हुए" },
     "grow": {
-      "title": { "en": "All Feelings Are Allowed", "hi": "सारी भावनाएँ मंज़ूर हैं" },
-      "insight": { "en": "There is no such thing as a bad feeling. Every emotion your child will ever have deserves a welcome, not a wall.", "hi": "बुरी भावना जैसी कोई चीज़ नहीं होती। आपके बच्चे के मन में जो भी भाव उठे, वह स्वागत का हक़दार है — दीवार का नहीं।" },
-      "expanded": { "en": "We often divide feelings into 'good' and 'bad,' praising joy and quietly frowning at anger or fear. But a child who learns some feelings are not allowed simply learns to hide them, not to handle them. Every emotion carries useful information — anger about a boundary, sadness about a loss, fear about safety. When you let all feelings be welcome in your home, you are not raising a child without limits. You are raising one who trusts that whatever they feel, they can bring it to you.", "hi": "हम अक्सर भावनाओं को 'अच्छी' और 'बुरी' में बाँट देते हैं — ख़ुशी की तारीफ़ करते हैं और ग़ुस्से या डर पर चुपचाप नाक-भौं सिकोड़ते हैं। पर जो बच्चे यह सीख लेते हैं कि कुछ भावनाएँ मंज़ूर नहीं, वे उन्हें सिर्फ़ छिपाना सीखते हैं, सँभालना नहीं। हर भावना कोई काम की बात कहती है — ग़ुस्सा किसी हद के बारे में, उदासी किसी नुक़सान के बारे में, डर सुरक्षा के बारे में। जब आप अपने घर में सारी भावनाओं का स्वागत करती हैं, तो आप बिना हद के बच्चे नहीं पाल रहीं। आप ऐसे बच्चे पाल रही हैं जिन्हें भरोसा है कि वे जो भी महसूस करें, आपके पास ले आ सकते हैं।" },
-      "deepDive": { "en": "Researchers call parents who accept all emotions 'emotion coaches' — and their children grow up better at calming themselves and bouncing back. Acceptance comes first; guidance follows.", "hi": "जो माता-पिता सारी भावनाओं को अपना लेते हैं, शोधकर्ता उन्हें 'emotion coaches' कहते हैं — और उनके बच्चे ख़ुद को शांत करने और सँभलने में बेहतर होते हैं। पहले अपनाना आता है; राह दिखाना उसके बाद।" },
-      "remember": { "en": "Welcome the feeling first; the lesson can wait.", "hi": "पहले भावना का स्वागत कीजिए; सीख इंतज़ार कर सकती है।" }
+      "title": { "en": "Every feeling is allowed", "hi": "सारी भावनाएँ मंज़ूर हैं" },
+      "insight": { "en": "There's no such thing as a bad feeling. Every emotion your child has deserves to be welcomed, not shut out.", "hi": "बुरी भावना जैसी कोई चीज़ नहीं होती। आपके बच्चे के मन में जो भी भाव उठे, वह स्वागत का हक़दार है — दीवार का नहीं।" },
+      "expanded": { "en": "We often sort feelings into 'good' and 'bad', praising joy and frowning at anger or fear. But a child who learns some feelings aren't allowed learns to hide them, not to handle them. Every emotion carries useful information: anger about a limit being crossed, sadness about a loss, fear about safety. Welcoming all feelings at home doesn't mean raising a child without limits. It means raising one who trusts that whatever they feel, they can bring it to you.", "hi": "हम अक्सर भावनाओं को 'अच्छी' और 'बुरी' में बाँट देते हैं — ख़ुशी की तारीफ़ करते हैं और ग़ुस्से या डर पर चुपचाप नाक-भौं सिकोड़ते हैं। पर जो बच्चे यह सीख लेते हैं कि कुछ भावनाएँ मंज़ूर नहीं, वे उन्हें सिर्फ़ छिपाना सीखते हैं, सँभालना नहीं। हर भावना कोई काम की बात कहती है — ग़ुस्सा किसी हद के बारे में, उदासी किसी नुक़सान के बारे में, डर सुरक्षा के बारे में। जब आप अपने घर में सारी भावनाओं का स्वागत करती हैं, तो आप बिना हद के बच्चे नहीं पाल रहीं। आप ऐसे बच्चे पाल रही हैं जिन्हें भरोसा है कि वे जो भी महसूस करें, आपके पास ले आ सकते हैं।" },
+      "deepDive": { "en": "Researchers call parents who accept all their child's emotions and then help with them 'emotion coaches'. Their children tend to grow up better at calming themselves and recovering from upsets.", "hi": "जो माता-पिता सारी भावनाओं को अपना लेते हैं, शोधकर्ता उन्हें 'emotion coaches' कहते हैं — और उनके बच्चे ख़ुद को शांत करने और सँभलने में बेहतर होते हैं। पहले अपनाना आता है; राह दिखाना उसके बाद।" },
+      "remember": { "en": "Welcome the feeling first. The lesson can wait.", "hi": "पहले भावना का स्वागत कीजिए; सीख इंतज़ार कर सकती है।" }
     },
     "readToBaby": {
       "title": { "en": "The Boy And The Nettle", "hi": "लड़का और बिच्छू-बूटी" },
@@ -17,8 +17,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about a lesson you've learned about handling anger — how you found a calmer way.", "hi": "अपने शिशु को बताइए कि ग़ुस्सा सँभालने के बारे में आपने क्या सीखा — आपने कैसे एक ज़्यादा शांत रास्ता ढूँढ़ा।" },
-      "motivation": { "en": "When you share how you tamed a hard feeling, your child learns it can be tamed.", "hi": "जब आप बताती हैं कि आपने एक मुश्किल भावना को कैसे क़ाबू किया, तो बच्चे सीखते हैं कि उसे क़ाबू किया जा सकता है।" }
+      "title": { "en": "Tell your baby something you've learned about handling anger, and how you found a calmer way.", "hi": "अपने शिशु को बताइए कि ग़ुस्सा सँभालने के बारे में आपने क्या सीखा — आपने कैसे एक ज़्यादा शांत रास्ता ढूँढ़ा।" },
+      "motivation": { "en": "When you share how you handled a hard feeling, your child learns that they can handle theirs.", "hi": "जब आप बताती हैं कि आपने एक मुश्किल भावना को कैसे क़ाबू किया, तो बच्चे सीखते हैं कि उसे क़ाबू किया जा सकता है।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -33,9 +33,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "My Feelings Are Allowed Too", "hi": "मेरी भावनाएँ भी मंज़ूर हैं" },
-      "content": { "en": "I do not have to be only joyful to be a good mother. Whatever I feel today, I am allowed to feel it.", "hi": "अच्छी माँ होने के लिए मेरा हर वक़्त ख़ुश रहना ज़रूरी नहीं। आज मैं जो भी महसूस करूँ, उसे महसूस करने का मुझे हक़ है।" },
-      "remember": { "en": "You can welcome your own feelings, just as you'll welcome your child's.", "hi": "अपनी भावनाओं का भी वैसे ही स्वागत कीजिए, जैसे आप अपने बच्चे की भावनाओं का करेंगी।" },
+      "title": { "en": "My feelings are allowed too", "hi": "मेरी भावनाएँ भी मंज़ूर हैं" },
+      "content": { "en": "I don't have to feel only happy to be a good mother. Whatever I feel today, I'm allowed to feel it.", "hi": "अच्छी माँ होने के लिए मेरा हर वक़्त ख़ुश रहना ज़रूरी नहीं। आज मैं जो भी महसूस करूँ, उसे महसूस करने का मुझे हक़ है।" },
+      "remember": { "en": "You can welcome your own feelings, the way you'll welcome your child's.", "hi": "अपनी भावनाओं का भी वैसे ही स्वागत कीजिए, जैसे आप अपने बच्चे की भावनाओं का करेंगी।" },
       "durationMinutes": 0
     }
   },
@@ -44,11 +44,11 @@
     "week": 19,
     "babyLearning": { "en": "The parts of your baby's brain that handle the senses are growing.", "hi": "खिंचते और करवट लेते हुए, और ज़्यादा सजग होते हुए" },
     "grow": {
-      "title": { "en": "Feelings Need A Witness", "hi": "भावनाओं को एक गवाह चाहिए" },
-      "insight": { "en": "A feeling does not need to be fixed. Most of the time, it simply needs to be seen.", "hi": "भावना को ठीक करने की ज़रूरत नहीं होती। ज़्यादातर तो उसे बस देखे जाने की ज़रूरत होती है।" },
-      "expanded": { "en": "When someone is upset, our instinct is to rush in with solutions — 'don't cry,' 'here's what to do,' 'it's not so bad.' But often what a heart truly needs is not a fix at all; it is a witness. Someone who says 'I see this is hard, and I am here.' Your child, in time, will feel things you cannot solve. The gift you can give is simply to stay near and let them be seen. You can practise it now, with yourself: noticing your own feelings kindly, without rushing to make them disappear.", "hi": "जब कोई परेशान होता है, हमारा मन तुरंत हल लेकर पहुँचने का होता है — 'मत रो,' 'ये कर लो,' 'इतना बुरा भी नहीं है।' पर अक्सर दिल को हल की नहीं, एक गवाह की ज़रूरत होती है। कोई जो कहे, 'मैं देख रही हूँ कि यह मुश्किल है, और मैं यहीं हूँ।' आगे चलकर आपके बच्चे के मन में ऐसी बातें उठेंगी जिन्हें आप हल नहीं कर पाएँगी। तब सबसे बड़ा तोहफ़ा यही है कि आप पास बनी रहें और उन्हें देखा जाना महसूस होने दें। इसका अभ्यास आप अभी से ख़ुद पर कर सकती हैं: अपनी भावनाओं को प्यार से नोटिस कीजिए, उन्हें जल्दी से मिटाने की कोशिश किए बिना।" },
-      "deepDive": { "en": "Studies of comfort show that feeling understood lowers distress more than advice does. Being witnessed, not corrected, is what soothes the nervous system.", "hi": "दिलासे पर हुए शोध बताते हैं कि समझे जाने का एहसास, सलाह से कहीं ज़्यादा परेशानी घटाता है। देखा जाना — सुधारा जाना नहीं — वही नर्वस सिस्टम को शांत करता है।" },
-      "remember": { "en": "Sometimes 'I'm here' helps more than 'here's what to do.'", "hi": "कभी-कभी 'मैं यहीं हूँ' 'ये कर लो' से ज़्यादा काम आता है।" }
+      "title": { "en": "Sometimes a feeling only needs to be seen", "hi": "भावनाओं को एक गवाह चाहिए" },
+      "insight": { "en": "A feeling doesn't always need fixing. Most of the time, it needs someone to notice it.", "hi": "भावना को ठीक करने की ज़रूरत नहीं होती। ज़्यादातर तो उसे बस देखे जाने की ज़रूरत होती है।" },
+      "expanded": { "en": "When someone's upset, we want to rush in with solutions: 'don't cry', 'here's what to do', 'it's not that bad'. But often what a person needs isn't a fix. It's someone who says 'I can see this is hard, and I'm here.' In time, your child will feel things you can't solve. What you can do is stay close and let them feel seen. You can practise this now with yourself, noticing your own feelings kindly instead of rushing to make them go away.", "hi": "जब कोई परेशान होता है, हमारा मन तुरंत हल लेकर पहुँचने का होता है — 'मत रो,' 'ये कर लो,' 'इतना बुरा भी नहीं है।' पर अक्सर दिल को हल की नहीं, एक गवाह की ज़रूरत होती है। कोई जो कहे, 'मैं देख रही हूँ कि यह मुश्किल है, और मैं यहीं हूँ।' आगे चलकर आपके बच्चे के मन में ऐसी बातें उठेंगी जिन्हें आप हल नहीं कर पाएँगी। तब सबसे बड़ा तोहफ़ा यही है कि आप पास बनी रहें और उन्हें देखा जाना महसूस होने दें। इसका अभ्यास आप अभी से ख़ुद पर कर सकती हैं: अपनी भावनाओं को प्यार से नोटिस कीजिए, उन्हें जल्दी से मिटाने की कोशिश किए बिना।" },
+      "deepDive": { "en": "Research on comfort and support suggests that feeling understood often eases distress more than advice does. Being listened to helps people settle.", "hi": "दिलासे पर हुए शोध बताते हैं कि समझे जाने का एहसास, सलाह से कहीं ज़्यादा परेशानी घटाता है। देखा जाना — सुधारा जाना नहीं — वही नर्वस सिस्टम को शांत करता है।" },
+      "remember": { "en": "Sometimes 'I'm here' helps more than 'here's what to do'.", "hi": "कभी-कभी 'मैं यहीं हूँ' 'ये कर लो' से ज़्यादा काम आता है।" }
     },
     "readToBaby": {
       "title": { "en": "The Hermit And The Mouse", "hi": "साधु और चुहिया" },
@@ -57,8 +57,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby what sadness has taught you — how it softened or shaped you over time.", "hi": "अपने शिशु को बताइए कि उदासी ने आपको क्या सिखाया — उसने समय के साथ आपको कैसे नरम किया या गढ़ा।" },
-      "motivation": { "en": "Sharing what sadness taught you shows your child that even hard feelings have gifts.", "hi": "उदासी से मिली सीख बाँटना बच्चों को दिखाता है कि मुश्किल भावनाओं में भी कोई तोहफ़ा छिपा होता है।" }
+      "title": { "en": "Tell your baby what sadness has taught you, and how it changed you over time.", "hi": "अपने शिशु को बताइए कि उदासी ने आपको क्या सिखाया — उसने समय के साथ आपको कैसे नरम किया या गढ़ा।" },
+      "motivation": { "en": "Sharing what sadness taught you shows your child that hard feelings can teach us something.", "hi": "उदासी से मिली सीख बाँटना बच्चों को दिखाता है कि मुश्किल भावनाओं में भी कोई तोहफ़ा छिपा होता है।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -73,9 +73,9 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "When Tiredness Hits Mid-Afternoon", "hi": "जब दोपहर में थकान घेर ले" },
-      "content": { "en": "If your energy dips and you reach for sugar, try a small handful of soaked almonds or a banana with a few walnuts instead. The slow, steady fuel keeps your mood and energy gentler through the afternoon.", "hi": "अगर आपकी ताक़त गिरने लगे और हाथ मीठे की तरफ़ जाए, तो उसकी जगह भीगे बादाम की एक छोटी मुट्ठी या कुछ अख़रोट के साथ एक केला आज़माइए। यह धीमा, थमा हुआ ईंधन दोपहर भर आपके मन और ताक़त को नरम बनाए रखता है।" },
-      "remember": { "en": "Steady fuel makes for a steadier mood.", "hi": "ठहरा हुआ ईंधन, ठहरा हुआ मन।" },
+      "title": { "en": "When you're flagging mid-afternoon", "hi": "जब दोपहर में थकान घेर ले" },
+      "content": { "en": "If your energy dips and you reach for something sugary, try a small handful of soaked almonds, or a banana with a few walnuts, instead. That slower, steadier food keeps your mood and energy more even through the afternoon.", "hi": "अगर आपकी ताक़त गिरने लगे और हाथ मीठे की तरफ़ जाए, तो उसकी जगह भीगे बादाम की एक छोटी मुट्ठी या कुछ अख़रोट के साथ एक केला आज़माइए। यह धीमा, थमा हुआ ईंधन दोपहर भर आपके मन और ताक़त को नरम बनाए रखता है।" },
+      "remember": { "en": "Steady food makes for a steadier mood.", "hi": "ठहरा हुआ ईंधन, ठहरा हुआ मन।" },
       "durationMinutes": 0
     }
   },
@@ -84,11 +84,11 @@
     "week": 19,
     "babyLearning": { "en": "Your baby is more active and spends a lot of the day moving.", "hi": "नन्ही इंद्रियाँ तेज़ होती हुईं, दुनिया को सोखती हुईं" },
     "grow": {
-      "title": { "en": "Big Emotions, Small People", "hi": "बड़ी भावनाएँ, छोटे लोग" },
-      "insight": { "en": "A small child with a huge feeling is not misbehaving. They are simply overwhelmed by a storm they cannot yet name.", "hi": "बड़ी भावना में डूबे छोटे बच्चे बदतमीज़ी नहीं कर रहे होते। वे बस एक ऐसे तूफ़ान से भर जाते हैं जिसे वे अभी नाम नहीं दे सकते।" },
-      "expanded": { "en": "A toddler's tears over a broken biscuit can look like drama to a grown-up. But to a little one, that feeling is real and enormous, arriving in a brain that has no tools yet to calm itself. They are not giving you a hard time; they are having a hard time. When you remember this, your response changes — from frustration to compassion. You become the calm they cannot find on their own. That borrowed calm is exactly how a child slowly grows their own.", "hi": "टूटे हुए बिस्कुट पर बहते आँसू किसी बड़े को नाटक लग सकते हैं। पर उस नन्हे के लिए वह भावना सच्ची है और बहुत बड़ी — और वह ऐसे दिमाग़ में आती है जिसके पास ख़ुद को शांत करने के औज़ार अभी हैं ही नहीं। वे आपको तंग नहीं कर रहे; वे ख़ुद तंग हैं। यह याद रहे तो आपका जवाब बदल जाता है — झुँझलाहट से करुणा में। जो शांति वे ख़ुद नहीं पा सकते, वह आप बन जाती हैं। उसी उधार ली हुई शांति से बच्चे धीरे-धीरे अपनी शांति बनाना सीखते हैं।" },
-      "deepDive": { "en": "A young child's calming centre is still wiring up for years. They literally cannot 'just calm down' alone — they borrow yours first, which scientists call co-regulation.", "hi": "छोटे बच्चों के दिमाग़ का शांत करने वाला हिस्सा सालों तक बनता रहता है। वे सचमुच अकेले 'बस शांत' नहीं हो सकते — पहले वे आपकी शांति उधार लेते हैं, जिसे वैज्ञानिक 'co-regulation' कहते हैं।" },
-      "remember": { "en": "They're not giving you a hard time; they're having one.", "hi": "वे आपको तंग नहीं कर रहे; वे ख़ुद तंग हैं।" }
+      "title": { "en": "Small children have big feelings", "hi": "बड़ी भावनाएँ, छोटे लोग" },
+      "insight": { "en": "A small child with a huge feeling isn't misbehaving. They're overwhelmed by something they can't yet name.", "hi": "बड़ी भावना में डूबे छोटे बच्चे बदतमीज़ी नहीं कर रहे होते। वे बस एक ऐसे तूफ़ान से भर जाते हैं जिसे वे अभी नाम नहीं दे सकते।" },
+      "expanded": { "en": "A toddler's tears over a broken biscuit can look like drama to an adult. But to a little one, that feeling is real and huge, and their brain doesn't yet have the tools to calm itself. A child in a meltdown is struggling, not being naughty. When you see it that way, your response changes from frustration to kindness. You become the calm they can't find on their own. Borrowing your calm, again and again, is how a child slowly learns to find their own.", "hi": "टूटे हुए बिस्कुट पर बहते आँसू किसी बड़े को नाटक लग सकते हैं। पर उस नन्हे के लिए वह भावना सच्ची है और बहुत बड़ी — और वह ऐसे दिमाग़ में आती है जिसके पास ख़ुद को शांत करने के औज़ार अभी हैं ही नहीं। वे आपको तंग नहीं कर रहे; वे ख़ुद तंग हैं। यह याद रहे तो आपका जवाब बदल जाता है — झुँझलाहट से करुणा में। जो शांति वे ख़ुद नहीं पा सकते, वह आप बन जाती हैं। उसी उधार ली हुई शांति से बच्चे धीरे-धीरे अपनी शांति बनाना सीखते हैं।" },
+      "deepDive": { "en": "The parts of the brain that help manage strong feelings keep developing through childhood and beyond. Young children first learn to calm down with an adult's help, which researchers call co-regulation.", "hi": "छोटे बच्चों के दिमाग़ का शांत करने वाला हिस्सा सालों तक बनता रहता है। वे सचमुच अकेले 'बस शांत' नहीं हो सकते — पहले वे आपकी शांति उधार लेते हैं, जिसे वैज्ञानिक 'co-regulation' कहते हैं।" },
+      "remember": { "en": "A child in a meltdown is struggling, not being difficult.", "hi": "वे आपको तंग नहीं कर रहे; वे ख़ुद तंग हैं।" }
     },
     "readToBaby": {
       "title": { "en": "Arjuna's Doubt", "hi": "अर्जुन का संदेह" },
@@ -97,8 +97,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby a lesson you've learned about forgiveness — how letting go lightened your heart.", "hi": "अपने शिशु को माफ़ी के बारे में सीखी एक बात बताइए — छोड़ देने ने आपके दिल को कैसे हल्का किया।" },
-      "motivation": { "en": "Teaching forgiveness early gives your child a way to set down what hurts.", "hi": "माफ़ी जल्दी सिखाना बच्चों को एक रास्ता देता है, जिससे वे दुख देने वाली बात नीचे रख सकें।" }
+      "title": { "en": "Tell your baby something you've learned about forgiveness, and how letting go made you feel lighter.", "hi": "अपने शिशु को माफ़ी के बारे में सीखी एक बात बताइए — छोड़ देने ने आपके दिल को कैसे हल्का किया।" },
+      "motivation": { "en": "Learning about forgiveness early gives your child a way to let go of what hurts.", "hi": "माफ़ी जल्दी सिखाना बच्चों को एक रास्ता देता है, जिससे वे दुख देने वाली बात नीचे रख सकें।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -113,9 +113,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Breathe Out The Storm", "hi": "तूफ़ान को साँस के साथ छोड़िए" },
-      "content": { "en": "When a big feeling rises, breathe in for a count of four, then breathe out slowly for a count of six. The long out-breath tells your body the storm is passing. Repeat for five rounds.", "hi": "जब कोई बड़ी भावना उठे, चार तक गिनते हुए साँस भीतर लीजिए, फिर छह तक गिनते हुए धीरे-धीरे साँस बाहर छोड़िए। लंबी बाहर की साँस आपके शरीर को बता देती है कि तूफ़ान गुज़र रहा है। पाँच बार दोहराइए।" },
-      "remember": { "en": "A long out-breath is your fastest way back to calm.", "hi": "लंबी साँस छोड़ना, शांति में लौटने का सबसे तेज़ रास्ता है।" },
+      "title": { "en": "Breathe out a big feeling", "hi": "तूफ़ान को साँस के साथ छोड़िए" },
+      "content": { "en": "When a big feeling rises, breathe in for a count of four, then breathe out slowly for a count of six. The long breath out tells your body the feeling is passing. Repeat for five rounds.", "hi": "जब कोई बड़ी भावना उठे, चार तक गिनते हुए साँस भीतर लीजिए, फिर छह तक गिनते हुए धीरे-धीरे साँस बाहर छोड़िए। लंबी बाहर की साँस आपके शरीर को बता देती है कि तूफ़ान गुज़र रहा है। पाँच बार दोहराइए।" },
+      "remember": { "en": "A long breath out helps you get back to calm.", "hi": "लंबी साँस छोड़ना, शांति में लौटने का सबसे तेज़ रास्ता है।" },
       "durationMinutes": 2
     }
   },
@@ -124,11 +124,11 @@
     "week": 19,
     "babyLearning": { "en": "Your baby's arms and legs are now in proportion.", "hi": "और मज़बूत होते हुए, एक नरम लय में बसते हुए" },
     "grow": {
-      "title": { "en": "You Can Hold The Hard Ones", "hi": "मुश्किल भावनाएँ भी आप थाम सकती हैं" },
-      "insight": { "en": "Your child's biggest feelings will need a steady container. You are stronger than those storms, and you can hold them.", "hi": "आपके बच्चे की सबसे बड़ी भावनाओं को एक ठहरा हुआ बर्तन चाहिए होगा। आप उन तूफ़ानों से मज़बूत हैं, और आप उन्हें थाम सकती हैं।" },
-      "expanded": { "en": "There is a quiet fear many parents carry: what if my child's feelings are too big for me? A screaming tantrum, an inconsolable sob, a rage that fills the room. But a child does not need you to stop the storm. They need you to be the calm shore it crashes against — present, unshaken, not swept away with them. You do not have to match their intensity or fix it instantly. Your steadiness says: this feeling is big, but it is not bigger than my love, and you are safe inside it.", "hi": "बहुत से माँ-बाप एक चुपचाप डर साथ लिए चलते हैं: कहीं मेरे बच्चे की भावनाएँ मेरे लिए बहुत बड़ी न पड़ जाएँ? चीख़ता हुआ ग़ुस्सा, न रुकने वाला रोना, एक ऐसा क्रोध जो पूरा कमरा भर दे। पर बच्चों को आपसे तूफ़ान रोकने की ज़रूरत नहीं होती। उन्हें वह शांत किनारा चाहिए जिससे तूफ़ान टकराए — मौजूद, अडिग, उनके साथ बहता हुआ नहीं। आपको उनकी तेज़ी की बराबरी करने या उसे तुरंत ठीक करने की ज़रूरत नहीं। आपका ठहराव कहता है: यह भावना बड़ी है, पर मेरे प्यार से बड़ी नहीं — और तुम इसके भीतर सुरक्षित हो।" },
-      "deepDive": { "en": "Child psychologists describe the parent as a 'container' for emotions a child cannot yet hold alone. Your calm presence literally helps shape their developing ability to self-soothe.", "hi": "बाल-मनोवैज्ञानिक माँ-बाप को उन भावनाओं का 'container' बताते हैं जिन्हें बच्चे अभी अकेले नहीं थाम सकते। आपकी शांत मौजूदगी सचमुच उनकी ख़ुद को शांत करने की बनती हुई क्षमता को गढ़ने में मदद करती है।" },
-      "remember": { "en": "Be the calm shore, not another wave.", "hi": "शांत किनारा बनिए, एक और लहर नहीं।" }
+      "title": { "en": "You can stay steady through your child's hard feelings", "hi": "मुश्किल भावनाएँ भी आप थाम सकती हैं" },
+      "insight": { "en": "Your child's biggest feelings will need someone steady. You can be that person.", "hi": "आपके बच्चे की सबसे बड़ी भावनाओं को एक ठहरा हुआ बर्तन चाहिए होगा। आप उन तूफ़ानों से मज़बूत हैं, और आप उन्हें थाम सकती हैं।" },
+      "expanded": { "en": "Many parents carry a fear: what if my child's feelings are too big for me? A screaming tantrum, crying that won't stop, anger that fills the room. But a child doesn't need you to stop the feeling. They need you to stay calm and close, without getting swept up in it. You don't have to match how upset they are, or fix it straight away. Staying steady tells them: this feeling is big, but my love is bigger, and you're safe.", "hi": "बहुत से माँ-बाप एक चुपचाप डर साथ लिए चलते हैं: कहीं मेरे बच्चे की भावनाएँ मेरे लिए बहुत बड़ी न पड़ जाएँ? चीख़ता हुआ ग़ुस्सा, न रुकने वाला रोना, एक ऐसा क्रोध जो पूरा कमरा भर दे। पर बच्चों को आपसे तूफ़ान रोकने की ज़रूरत नहीं होती। उन्हें वह शांत किनारा चाहिए जिससे तूफ़ान टकराए — मौजूद, अडिग, उनके साथ बहता हुआ नहीं। आपको उनकी तेज़ी की बराबरी करने या उसे तुरंत ठीक करने की ज़रूरत नहीं। आपका ठहराव कहता है: यह भावना बड़ी है, पर मेरे प्यार से बड़ी नहीं — और तुम इसके भीतर सुरक्षित हो।" },
+      "deepDive": { "en": "Some child psychologists describe the parent as a 'container' for feelings a child can't yet manage alone. A calm adult nearby helps a child slowly learn to settle themselves.", "hi": "बाल-मनोवैज्ञानिक माँ-बाप को उन भावनाओं का 'container' बताते हैं जिन्हें बच्चे अभी अकेले नहीं थाम सकते। आपकी शांत मौजूदगी सचमुच उनकी ख़ुद को शांत करने की बनती हुई क्षमता को गढ़ने में मदद करती है।" },
+      "remember": { "en": "Stay calm and close. That's what your child needs most.", "hi": "शांत किनारा बनिए, एक और लहर नहीं।" }
     },
     "readToBaby": {
       "title": { "en": "The Quarrel Of The Quails", "hi": "बटेरों का झगड़ा" },
@@ -137,8 +137,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby what patience has taught you — a time waiting quietly led to something good.", "hi": "अपने शिशु को बताइए कि सब्र ने आपको क्या सिखाया — कोई एक बार जब चुपचाप इंतज़ार करना किसी अच्छी चीज़ तक ले गया।" },
-      "motivation": { "en": "Stories of your patience show your child that good things are worth the wait.", "hi": "आपके सब्र की कहानियाँ बच्चों को दिखाती हैं कि अच्छी चीज़ें इंतज़ार के लायक़ होती हैं।" }
+      "title": { "en": "Tell your baby about a time when being patient led to something good.", "hi": "अपने शिशु को बताइए कि सब्र ने आपको क्या सिखाया — कोई एक बार जब चुपचाप इंतज़ार करना किसी अच्छी चीज़ तक ले गया।" },
+      "motivation": { "en": "Stories about your patience show your child that good things can be worth waiting for.", "hi": "आपके सब्र की कहानियाँ बच्चों को दिखाती हैं कि अच्छी चीज़ें इंतज़ार के लायक़ होती हैं।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -153,9 +153,9 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "When Meals Feel Like A Chore", "hi": "जब खाना बनाना बोझ लगे" },
-      "content": { "en": "On days when cooking feels too much, keep it simple and kind: a bowl of warm khichdi, curd with rice, or dal over soft rice. A gentle, easy meal still nourishes you both — it does not have to be elaborate to be enough.", "hi": "जिन दिनों खाना बनाना बहुत ज़्यादा लगे, इसे सीधा और नरम रखिए: एक कटोरी गरम खिचड़ी, दही-चावल, या नरम चावल पर दाल। एक आसान, हल्का खाना भी आप दोनों को पूरा पोषण देता है — काफ़ी होने के लिए उसका बड़ा-चौड़ा होना ज़रूरी नहीं।" },
-      "remember": { "en": "A simple warm meal is still a loving one.", "hi": "सादा गरम खाना भी उतना ही प्यार भरा होता है।" },
+      "title": { "en": "When cooking feels like a chore", "hi": "जब खाना बनाना बोझ लगे" },
+      "content": { "en": "On days when cooking feels like too much, keep it easy: a bowl of warm khichdi, curd rice, or dal over soft rice. An easy meal still nourishes you both. It doesn't have to be fancy to be enough.", "hi": "जिन दिनों खाना बनाना बहुत ज़्यादा लगे, इसे सीधा और नरम रखिए: एक कटोरी गरम खिचड़ी, दही-चावल, या नरम चावल पर दाल। एक आसान, हल्का खाना भी आप दोनों को पूरा पोषण देता है — काफ़ी होने के लिए उसका बड़ा-चौड़ा होना ज़रूरी नहीं।" },
+      "remember": { "en": "A plain, warm meal is still a loving one.", "hi": "सादा गरम खाना भी उतना ही प्यार भरा होता है।" },
       "durationMinutes": 0
     }
   },
@@ -164,11 +164,11 @@
     "week": 19,
     "babyLearning": { "en": "Your baby's kidneys make urine, which adds to the amniotic fluid.", "hi": "नरमी से बढ़ते हुए, आपकी थमी हुई धड़कन से शांत" },
     "grow": {
-      "title": { "en": "Tears Are Not Trouble", "hi": "आँसू कोई मुसीबत नहीं" },
-      "insight": { "en": "Crying is not a problem to be stopped. It is the body's own gentle way of letting a feeling move through and out.", "hi": "रोना कोई समस्या नहीं जिसे रोका जाए। यह शरीर का अपना नरम तरीक़ा है — किसी भावना को बहकर निकल जाने देने का।" },
-      "expanded": { "en": "'Don't cry' may be the most common phrase said to children, yet tears are not the enemy. They are how the body releases sorrow, frustration, even relief. When we rush to stop a child's tears, we teach them that this natural release is something shameful to hide. But a child allowed to cry safely in loving arms learns that feelings can be expressed and survived. You do not have to make the tears stop. You only have to stay close while they flow — that closeness, not the silence, is what truly comforts.", "hi": "'मत रो' शायद बच्चों से कहा जाने वाला सबसे आम वाक्य है, फिर भी आँसू दुश्मन नहीं हैं। दुख, झुँझलाहट, यहाँ तक कि राहत भी — शरीर इन्हीं के ज़रिए बाहर निकालता है। जब हम बच्चे के आँसू रोकने के लिए दौड़ पड़ते हैं, तो वे यही सीखते हैं कि यह सहज बहाव छिपाने लायक़ शर्म की बात है। पर जिन बच्चों को प्यार भरी बाँहों में सुरक्षित रोने दिया जाता है, वे सीखते हैं कि भावनाएँ कही भी जा सकती हैं और उनसे गुज़रा भी जा सकता है। आपको आँसू रोकने की ज़रूरत नहीं। बस पास बनी रहिए जब तक वे बहें — दिलासा उसी पास होने से मिलता है, चुप्पी से नहीं।" },
-      "deepDive": { "en": "Emotional tears carry stress chemicals out of the body, and crying can genuinely calm the nervous system. Letting a child cry safely is helping them heal, not fall apart.", "hi": "भावना के आँसू शरीर से तनाव के रसायन बाहर ले जाते हैं, और रोना सचमुच नर्वस सिस्टम को शांत कर सकता है। बच्चों को सुरक्षित रोने देना उन्हें भरने में मदद करना है, बिखरने में नहीं।" },
-      "remember": { "en": "Stay close to the tears instead of stopping them.", "hi": "आँसू रोकिए मत — बस उनके पास बनी रहिए।" }
+      "title": { "en": "Crying isn't a problem to stop", "hi": "आँसू कोई मुसीबत नहीं" },
+      "insight": { "en": "Crying is a natural way of letting a feeling out. It doesn't need to be stopped.", "hi": "रोना कोई समस्या नहीं जिसे रोका जाए। यह शरीर का अपना नरम तरीक़ा है — किसी भावना को बहकर निकल जाने देने का।" },
+      "expanded": { "en": "'Don't cry' may be the thing children hear most often, yet tears aren't the enemy. They're how we let out sadness, frustration and even relief. When we rush to stop a child's tears, we can teach them that crying is something to hide. A child who's allowed to cry safely in loving arms learns that feelings can be shown and got through. You don't have to make the tears stop. You only have to stay close while they come. Your being there is what comforts them.", "hi": "'मत रो' शायद बच्चों से कहा जाने वाला सबसे आम वाक्य है, फिर भी आँसू दुश्मन नहीं हैं। दुख, झुँझलाहट, यहाँ तक कि राहत भी — शरीर इन्हीं के ज़रिए बाहर निकालता है। जब हम बच्चे के आँसू रोकने के लिए दौड़ पड़ते हैं, तो वे यही सीखते हैं कि यह सहज बहाव छिपाने लायक़ शर्म की बात है। पर जिन बच्चों को प्यार भरी बाँहों में सुरक्षित रोने दिया जाता है, वे सीखते हैं कि भावनाएँ कही भी जा सकती हैं और उनसे गुज़रा भी जा सकता है। आपको आँसू रोकने की ज़रूरत नहीं। बस पास बनी रहिए जब तक वे बहें — दिलासा उसी पास होने से मिलता है, चुप्पी से नहीं।" },
+      "deepDive": { "en": "Some studies suggest crying can help people feel calmer afterwards, especially when someone comforts them. Letting a child cry safely helps them learn that big feelings pass.", "hi": "भावना के आँसू शरीर से तनाव के रसायन बाहर ले जाते हैं, और रोना सचमुच नर्वस सिस्टम को शांत कर सकता है। बच्चों को सुरक्षित रोने देना उन्हें भरने में मदद करना है, बिखरने में नहीं।" },
+      "remember": { "en": "Stay close to the tears instead of trying to stop them.", "hi": "आँसू रोकिए मत — बस उनके पास बनी रहिए।" }
     },
     "readToBaby": {
       "title": { "en": "Birbal And The Beggar's Bowl", "hi": "बीरबल और भिखारी का कटोरा" },
@@ -177,8 +177,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby a lesson you've learned about honesty — a time telling the truth set you free.", "hi": "अपने शिशु को ईमानदारी के बारे में सीखी एक बात बताइए — कोई एक बार जब सच बोलना आपको आज़ाद कर गया।" },
-      "motivation": { "en": "Speaking of honesty teaches your child that truth, though hard, brings peace.", "hi": "ईमानदारी की बात बच्चों को सिखाती है कि सच, मुश्किल होकर भी, सुकून लाता है।" }
+      "title": { "en": "Tell your baby something you've learned about honesty, and a time when telling the truth was a relief.", "hi": "अपने शिशु को ईमानदारी के बारे में सीखी एक बात बताइए — कोई एक बार जब सच बोलना आपको आज़ाद कर गया।" },
+      "motivation": { "en": "Talking about honesty shows your child that the truth, even when it's hard, brings peace.", "hi": "ईमानदारी की बात बच्चों को सिखाती है कि सच, मुश्किल होकर भी, सुकून लाता है।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -193,9 +193,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "I Can Cry And Still Be Strong", "hi": "मैं रो भी सकती हूँ और मज़बूत भी रह सकती हूँ" },
-      "content": { "en": "If tears come today, I will let them. Crying does not make me weak; it makes room for me to feel lighter again.", "hi": "आज अगर आँसू आएँ, तो मैं उन्हें आने दूँगी। रोना मुझे कमज़ोर नहीं बनाता; यह मेरे भीतर फिर से हल्का महसूस करने की जगह बना देता है।" },
-      "remember": { "en": "Letting tears flow is its own kind of strength.", "hi": "आँसू बहने देना भी अपनी एक तरह की ताक़त है।" },
+      "title": { "en": "I can cry and still be strong", "hi": "मैं रो भी सकती हूँ और मज़बूत भी रह सकती हूँ" },
+      "content": { "en": "If tears come today, I'll let them. Crying doesn't make me weak. It helps me feel lighter again.", "hi": "आज अगर आँसू आएँ, तो मैं उन्हें आने दूँगी। रोना मुझे कमज़ोर नहीं बनाता; यह मेरे भीतर फिर से हल्का महसूस करने की जगह बना देता है।" },
+      "remember": { "en": "Letting yourself cry is a kind of strength.", "hi": "आँसू बहने देना भी अपनी एक तरह की ताक़त है।" },
       "durationMinutes": 0
     }
   },
@@ -204,11 +204,11 @@
     "week": 19,
     "babyLearning": { "en": "A little hair is growing on your baby's head.", "hi": "दिन-ब-दिन बढ़ते हुए, जब आप शांत तब शांत" },
     "grow": {
-      "title": { "en": "Anger Has A Message", "hi": "ग़ुस्से का एक संदेश होता है" },
-      "insight": { "en": "Anger is rarely the real story. It is usually a messenger, pointing to a hurt or a need underneath.", "hi": "ग़ुस्सा शायद ही असली कहानी होता है। वह तो अक्सर एक संदेश लाने वाला होता है — नीचे छिपी किसी चोट या किसी ज़रूरत की ओर इशारा करता हुआ।" },
-      "expanded": { "en": "When a child stamps and shouts, it is easy to see only the anger and want it gone. But anger almost always sits on top of something softer — feeling unheard, tired, frightened, or left out. If we punish the anger alone, we miss the message it carries. The gentler path is to look beneath: 'You're so upset — what happened?' This does not mean every angry act is allowed. It means the feeling is understood even as the behaviour is guided. Curiosity about anger teaches a child their inner world makes sense.", "hi": "जब कोई बच्चा पैर पटकता और चिल्लाता है, तो सिर्फ़ ग़ुस्सा दिखता है और मन करता है कि वह हट जाए। पर ग़ुस्सा लगभग हमेशा किसी नरम चीज़ के ऊपर बैठा होता है — अनसुना महसूस करना, थकान, डर, या छूट जाना। अगर हम सिर्फ़ ग़ुस्से को सज़ा दें, तो वह संदेश चूक जाते हैं जो वह लेकर आया है। नरम रास्ता है नीचे झाँकना: 'तुम इतना परेशान हो — हुआ क्या?' इसका मतलब यह नहीं कि ग़ुस्से में किया हर काम मंज़ूर है। मतलब बस यह है कि भावना को समझा जाता है, और साथ ही व्यवहार को राह दिखाई जाती है। ग़ुस्से के बारे में यह जिज्ञासा बच्चों को सिखाती है कि उनके भीतर की दुनिया समझ में आने लायक़ है।" },
-      "deepDive": { "en": "Therapists often call anger a 'secondary emotion,' a guard standing in front of a softer feeling. Looking past it to the hurt beneath is what truly calms a child.", "hi": "थेरेपिस्ट अक्सर ग़ुस्से को 'secondary emotion' कहते हैं — एक पहरेदार, जो किसी नरम भावना के आगे खड़ा है। उसके पार जाकर नीचे की चोट को देखना ही बच्चों को सचमुच शांत करता है।" },
-      "remember": { "en": "Look for the hurt hiding behind the anger.", "hi": "ग़ुस्से के पीछे छिपी चोट को ढूँढ़िए।" }
+      "title": { "en": "Anger usually points to something underneath", "hi": "ग़ुस्से का एक संदेश होता है" },
+      "insight": { "en": "Anger is rarely the whole story. It usually points to a hurt or a need underneath.", "hi": "ग़ुस्सा शायद ही असली कहानी होता है। वह तो अक्सर एक संदेश लाने वाला होता है — नीचे छिपी किसी चोट या किसी ज़रूरत की ओर इशारा करता हुआ।" },
+      "expanded": { "en": "When a child stamps and shouts, it's easy to see only the anger and want it gone. But anger almost always sits on top of something softer: feeling unheard, tired, scared or left out. If we only punish the anger, we miss what it's telling us. The gentler way is to look underneath: 'You're so upset. What happened?' This doesn't mean every angry action is allowed. It means you understand the feeling while you guide the behaviour. Being curious about anger teaches a child that their feelings make sense.", "hi": "जब कोई बच्चा पैर पटकता और चिल्लाता है, तो सिर्फ़ ग़ुस्सा दिखता है और मन करता है कि वह हट जाए। पर ग़ुस्सा लगभग हमेशा किसी नरम चीज़ के ऊपर बैठा होता है — अनसुना महसूस करना, थकान, डर, या छूट जाना। अगर हम सिर्फ़ ग़ुस्से को सज़ा दें, तो वह संदेश चूक जाते हैं जो वह लेकर आया है। नरम रास्ता है नीचे झाँकना: 'तुम इतना परेशान हो — हुआ क्या?' इसका मतलब यह नहीं कि ग़ुस्से में किया हर काम मंज़ूर है। मतलब बस यह है कि भावना को समझा जाता है, और साथ ही व्यवहार को राह दिखाई जाती है। ग़ुस्से के बारे में यह जिज्ञासा बच्चों को सिखाती है कि उनके भीतर की दुनिया समझ में आने लायक़ है।" },
+      "deepDive": { "en": "Therapists often describe anger as sitting on top of a softer feeling, such as hurt or fear. Noticing that softer feeling helps a child feel understood and settle.", "hi": "थेरेपिस्ट अक्सर ग़ुस्से को 'secondary emotion' कहते हैं — एक पहरेदार, जो किसी नरम भावना के आगे खड़ा है। उसके पार जाकर नीचे की चोट को देखना ही बच्चों को सचमुच शांत करता है।" },
+      "remember": { "en": "Look for the hurt behind the anger.", "hi": "ग़ुस्से के पीछे छिपी चोट को ढूँढ़िए।" }
     },
     "readToBaby": {
       "title": { "en": "The Princess Who Could Not Cry", "hi": "वह राजकुमारी जो रो नहीं सकती थी" },
@@ -217,8 +217,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby what disappointment has taught you — how a setback later opened a better door.", "hi": "अपने शिशु को बताइए कि निराशा ने आपको क्या सिखाया — किसी ठोकर ने बाद में कैसे एक बेहतर दरवाज़ा खोल दिया।" },
-      "motivation": { "en": "Sharing disappointment shows your child that not getting what we want can still lead somewhere good.", "hi": "निराशा की बात बाँटना बच्चों को दिखाता है कि जो चाहा वह न मिलने पर भी रास्ता कहीं अच्छी जगह ले जा सकता है।" }
+      "title": { "en": "Tell your baby what disappointment has taught you, and how a setback later led somewhere better.", "hi": "अपने शिशु को बताइए कि निराशा ने आपको क्या सिखाया — किसी ठोकर ने बाद में कैसे एक बेहतर दरवाज़ा खोल दिया।" },
+      "motivation": { "en": "Sharing a disappointment shows your child that not getting what we want can still lead somewhere good.", "hi": "निराशा की बात बाँटना बच्चों को दिखाता है कि जो चाहा वह न मिलने पर भी रास्ता कहीं अच्छी जगह ले जा सकता है।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -233,9 +233,9 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "When You Feel Bloated And Heavy", "hi": "जब पेट भारी और फूला हुआ लगे" },
-      "content": { "en": "If your stomach feels uncomfortably full, try smaller meals spaced through the day, and sip warm water with a little ajwain or fennel after eating. Eating slowly and unhurried also helps your body settle gently.", "hi": "अगर पेट असहज तरीक़े से भरा लगे, तो दिन भर में थोड़ा-थोड़ा करके खाइए, और खाने के बाद थोड़ी अजवाइन या सौंफ़ डालकर गरम पानी की चुस्कियाँ लीजिए। धीरे-धीरे, बिना जल्दबाज़ी के खाना भी शरीर को नरमी से थमने में मदद करता है।" },
-      "remember": { "en": "Small, slow meals are kinder to a full belly.", "hi": "थोड़ा-थोड़ा और धीरे खाना भरे पेट पर ज़्यादा मेहरबान होता है।" },
+      "title": { "en": "Feeling bloated and heavy?", "hi": "जब पेट भारी और फूला हुआ लगे" },
+      "content": { "en": "If your stomach feels uncomfortably full, try smaller meals spread through the day, and sip warm water with a little ajwain or fennel after eating. Eating slowly, without rushing, also helps your body settle.", "hi": "अगर पेट असहज तरीक़े से भरा लगे, तो दिन भर में थोड़ा-थोड़ा करके खाइए, और खाने के बाद थोड़ी अजवाइन या सौंफ़ डालकर गरम पानी की चुस्कियाँ लीजिए। धीरे-धीरे, बिना जल्दबाज़ी के खाना भी शरीर को नरमी से थमने में मदद करता है।" },
+      "remember": { "en": "Small, slow meals help when you feel full.", "hi": "थोड़ा-थोड़ा और धीरे खाना भरे पेट पर ज़्यादा मेहरबान होता है।" },
       "durationMinutes": 0
     }
   },
@@ -244,11 +244,11 @@
     "week": 19,
     "babyLearning": { "en": "Buds for your baby's adult teeth are forming behind the milk teeth.", "hi": "हफ़्ता पूरा करते हुए, आपके भीतर शांत और मज़बूत होते हुए" },
     "grow": {
-      "title": { "en": "Comfort Comes Before Calm", "hi": "दिलासा पहले, शांति बाद में" },
-      "insight": { "en": "We cannot reason a child into calm while they are still upset. Comfort comes first, and calm follows on its own.", "hi": "परेशान बच्चे को समझा-बुझाकर शांत नहीं किया जा सकता। पहले दिलासा आता है, शांति अपने आप पीछे-पीछे आ जाती है।" },
-      "expanded": { "en": "When a child is in the grip of a big feeling, the part of their brain that listens to reason has gone quiet. Explaining, correcting, or asking them to 'calm down' simply cannot land yet. What reaches them is comfort — a soft voice, open arms, your steady presence. Only once they feel safe and soothed does the thinking part come back online, ready to hear and learn. So the order matters: connect before you correct. Comfort the heart first, and the calm you are hoping for will arrive on its own.", "hi": "जब बच्चे किसी बड़ी भावना की पकड़ में होते हैं, तो उनके दिमाग़ का वह हिस्सा जो तर्क सुनता है चुप पड़ जाता है। समझाना, सुधारना, या 'शांत हो जाओ' कहना उस वक़्त पहुँचता ही नहीं। जो पहुँचता है वह है दिलासा — एक नरम आवाज़, खुली बाँहें, आपकी ठहरी हुई मौजूदगी। जब वे सुरक्षित और शांत महसूस करते हैं, तभी सोचने वाला हिस्सा वापस आता है — सुनने और सीखने के लिए तैयार। इसलिए क्रम मायने रखता है: सुधारने से पहले जुड़िए। पहले दिल को दिलासा दीजिए, और जिस शांति की आप उम्मीद कर रही हैं वह ख़ुद चली आएगी।" },
-      "deepDive": { "en": "Brain science shows that during big emotions, the calming, thinking part goes 'offline.' Soothing connection brings it back — which is why comfort must come before any lesson.", "hi": "दिमाग़ पर हुए शोध बताते हैं कि बड़ी भावनाओं के दौरान, शांत करने वाला और सोचने वाला हिस्सा 'offline' हो जाता है। दिलासा भरा जुड़ाव उसे वापस लाता है — इसीलिए किसी भी सीख से पहले दिलासा आना चाहिए।" },
-      "remember": { "en": "Connect before you correct.", "hi": "सुधारने से पहले जुड़िए।" }
+      "title": { "en": "Comfort first, then calm", "hi": "दिलासा पहले, शांति बाद में" },
+      "insight": { "en": "We can't reason a child into calm while they're still upset. Comfort comes first, and calm follows.", "hi": "परेशान बच्चे को समझा-बुझाकर शांत नहीं किया जा सकता। पहले दिलासा आता है, शांति अपने आप पीछे-पीछे आ जाती है।" },
+      "expanded": { "en": "When a child is caught up in a big feeling, it's very hard for them to listen to reason. Explaining, correcting or asking them to 'calm down' can't get through yet. What reaches them is comfort: a soft voice, open arms, you staying close. Once they feel safe and soothed, they can think again and are ready to listen and learn. So the order matters. Comfort first, then talk about what happened. Settle the feeling, and the calm you're hoping for will follow.", "hi": "जब बच्चे किसी बड़ी भावना की पकड़ में होते हैं, तो उनके दिमाग़ का वह हिस्सा जो तर्क सुनता है चुप पड़ जाता है। समझाना, सुधारना, या 'शांत हो जाओ' कहना उस वक़्त पहुँचता ही नहीं। जो पहुँचता है वह है दिलासा — एक नरम आवाज़, खुली बाँहें, आपकी ठहरी हुई मौजूदगी। जब वे सुरक्षित और शांत महसूस करते हैं, तभी सोचने वाला हिस्सा वापस आता है — सुनने और सीखने के लिए तैयार। इसलिए क्रम मायने रखता है: सुधारने से पहले जुड़िए। पहले दिल को दिलासा दीजिए, और जिस शांति की आप उम्मीद कर रही हैं वह ख़ुद चली आएगी।" },
+      "deepDive": { "en": "Researchers describe how strong emotions make it harder for anyone, and especially a young child, to think clearly and take in reasoning. Comfort helps them settle enough to listen.", "hi": "दिमाग़ पर हुए शोध बताते हैं कि बड़ी भावनाओं के दौरान, शांत करने वाला और सोचने वाला हिस्सा 'offline' हो जाता है। दिलासा भरा जुड़ाव उसे वापस लाता है — इसीलिए किसी भी सीख से पहले दिलासा आना चाहिए।" },
+      "remember": { "en": "Comfort first, then talk about what happened.", "hi": "सुधारने से पहले जुड़िए।" }
     },
     "readToBaby": {
       "title": { "en": "Why The Clouds Must Rain", "hi": "बादल को बरसना क्यों पड़ता है" },
@@ -257,8 +257,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby a lesson you've learned about starting over — how beginning again gave you a fresh chance.", "hi": "अपने शिशु को फिर से शुरू करने के बारे में सीखी एक बात बताइए — नए सिरे से शुरू करना आपको कैसे एक नया मौक़ा दे गया।" },
-      "motivation": { "en": "Sharing a fresh start teaches your child that it is never too late to begin again.", "hi": "नई शुरुआत की बात बाँटना बच्चों को सिखाता है कि फिर से शुरू करने में कभी देर नहीं होती।" }
+      "title": { "en": "Tell your baby something you've learned about starting over, and how beginning again gave you a fresh chance.", "hi": "अपने शिशु को फिर से शुरू करने के बारे में सीखी एक बात बताइए — नए सिरे से शुरू करना आपको कैसे एक नया मौक़ा दे गया।" },
+      "motivation": { "en": "Sharing a fresh start teaches your child that it's never too late to begin again.", "hi": "नई शुरुआत की बात बाँटना बच्चों को सिखाता है कि फिर से शुरू करने में कभी देर नहीं होती।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -273,9 +273,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Sigh It All Out", "hi": "सब कुछ एक आह में छोड़ दीजिए" },
-      "content": { "en": "Take a deep breath in through your nose, then let it go through your mouth with a soft, audible sigh — the way you do when something finally eases. Let your shoulders drop with it. Repeat slowly five times.", "hi": "नाक से एक गहरी साँस भीतर लीजिए, फिर उसे मुँह से एक नरम, सुनाई देती आह के साथ जाने दीजिए — वैसे ही जैसे तब निकलती है जब कोई बात आख़िर आसान हो जाती है। कंधों को भी उसके साथ गिर जाने दीजिए। धीरे-धीरे पाँच बार दोहराइए।" },
-      "remember": { "en": "A long sigh tells the whole body it can let go.", "hi": "एक लंबी आह पूरे शरीर को बता देती है कि अब छोड़ा जा सकता है।" },
+      "title": { "en": "Sigh it all out", "hi": "सब कुछ एक आह में छोड़ दीजिए" },
+      "content": { "en": "Take a deep breath in through your nose, then let it out through your mouth with a soft sigh you can hear, the kind you give when something finally eases. Let your shoulders drop with it. Repeat slowly five times.", "hi": "नाक से एक गहरी साँस भीतर लीजिए, फिर उसे मुँह से एक नरम, सुनाई देती आह के साथ जाने दीजिए — वैसे ही जैसे तब निकलती है जब कोई बात आख़िर आसान हो जाती है। कंधों को भी उसके साथ गिर जाने दीजिए। धीरे-धीरे पाँच बार दोहराइए।" },
+      "remember": { "en": "A long sigh helps you let go.", "hi": "एक लंबी आह पूरे शरीर को बता देती है कि अब छोड़ा जा सकता है।" },
       "durationMinutes": 2
     }
   }

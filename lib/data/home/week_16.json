@@ -4,10 +4,10 @@
     "week": 16,
     "babyLearning": { "en": "Your baby can hold their head up more steadily now.", "hi": "नन्हे भाव बनते हुए, छोटी भौंहें और होंठ आकार लेते हुए" },
     "grow": {
-      "title": { "en": "You Are The First Teacher", "hi": "पहली शिक्षक आप ही हैं" },
-      "insight": { "en": "Long before any school, you are your child's first teacher. Not through lessons, but simply through who you are.", "hi": "किसी भी स्कूल से बहुत पहले, आप अपने बच्चे की पहली शिक्षक हैं। सबक़ों से नहीं, बस इससे कि आप कैसी हैं।" },
-      "expanded": { "en": "We imagine teaching as something formal — lessons, rules, instructions. But your child's deepest learning begins long before any of that, by watching you. The way you speak when you are tired, how you treat a stranger, what you do when something goes wrong — these are the first lessons, taught without a single word. This is not a pressure to be perfect; it is an invitation to be honest. Your child will learn far more from how you live than from anything you tell them. You are already teaching, simply by being yourself with care.", "hi": "हम सिखाने को कुछ औपचारिक-सा समझते हैं — सबक़, नियम, हिदायतें। पर बच्चों की सबसे गहरी सीख इन सबसे बहुत पहले शुरू हो जाती है, आपको देखकर। थकी हुई होने पर आप कैसे बोलती हैं, किसी अजनबी से कैसे पेश आती हैं, कुछ ग़लत हो जाए तो क्या करती हैं — ये पहले सबक़ हैं, बिना एक भी शब्द कहे सिखाए गए। यह सब कुछ सही करने का दबाव नहीं है; यह ईमानदार होने का न्योता है। आप जो कहती हैं उससे कहीं ज़्यादा बच्चे इससे सीखते हैं कि आप कैसे जीती हैं। आप पहले से ही सिखा रही हैं — बस थोड़े से ध्यान के साथ ख़ुद होकर।" },
-      "deepDive": { "en": "Developmental psychologists call this 'observational learning' — children absorb behaviour by watching trusted adults far more readily than by being told. The example you set is the strongest lesson you give.", "hi": "बाल-विकास के मनोवैज्ञानिक इसे 'observational learning' कहते हैं — बच्चे किसी भरोसे वाले बड़े को देखकर जितनी जल्दी व्यवहार सीख लेते हैं, कहने से उतना नहीं। आप जो मिसाल रखती हैं, वही सबसे मज़बूत सबक़ है।" },
+      "title": { "en": "You'll be your child's first teacher", "hi": "पहली शिक्षक आप ही हैं" },
+      "insight": { "en": "Long before school, you'll be your child's first teacher. Not through lessons, but through who you are.", "hi": "किसी भी स्कूल से बहुत पहले, आप अपने बच्चे की पहली शिक्षक हैं। सबक़ों से नहीं, बस इससे कि आप कैसी हैं।" },
+      "expanded": { "en": "We picture teaching as something formal: lessons, rules, instructions. But your child's deepest learning starts long before that, by watching you. The way you speak when you're tired, how you treat a stranger, what you do when something goes wrong: these are the first lessons, taught without a word. You don't have to be perfect for this. You only need to be honest. Your child will learn much more from how you live than from anything you tell them. You're already teaching, just by being yourself with care.", "hi": "हम सिखाने को कुछ औपचारिक-सा समझते हैं — सबक़, नियम, हिदायतें। पर बच्चों की सबसे गहरी सीख इन सबसे बहुत पहले शुरू हो जाती है, आपको देखकर। थकी हुई होने पर आप कैसे बोलती हैं, किसी अजनबी से कैसे पेश आती हैं, कुछ ग़लत हो जाए तो क्या करती हैं — ये पहले सबक़ हैं, बिना एक भी शब्द कहे सिखाए गए। यह सब कुछ सही करने का दबाव नहीं है; यह ईमानदार होने का न्योता है। आप जो कहती हैं उससे कहीं ज़्यादा बच्चे इससे सीखते हैं कि आप कैसे जीती हैं। आप पहले से ही सिखा रही हैं — बस थोड़े से ध्यान के साथ ख़ुद होकर।" },
+      "deepDive": { "en": "Developmental psychologists call this observational learning. Children pick up behaviour by watching the adults they trust, often more readily than by being told.", "hi": "बाल-विकास के मनोवैज्ञानिक इसे 'observational learning' कहते हैं — बच्चे किसी भरोसे वाले बड़े को देखकर जितनी जल्दी व्यवहार सीख लेते हैं, कहने से उतना नहीं। आप जो मिसाल रखती हैं, वही सबसे मज़बूत सबक़ है।" },
       "remember": { "en": "Your child learns who to be by watching who you are.", "hi": "बच्चे यह आपको देखकर सीखते हैं कि बनना कैसा है।" }
     },
     "readToBaby": {
@@ -17,8 +17,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby a story from your grandparents' lives — a tale of where you all come from.", "hi": "अपने शिशु को अपने दादा-दादी या नाना-नानी की ज़िंदगी से एक कहानी सुनाएँ — एक क़िस्सा कि आप सब कहाँ से आए हैं।" },
-      "motivation": { "en": "Your child belongs to a story that began long before them — let them hear its beginning.", "hi": "आपका बच्चा एक ऐसी कहानी का हिस्सा है जो उससे बहुत पहले शुरू हुई थी — उसकी शुरुआत उसे भी सुनने दें।" }
+      "title": { "en": "Tell your baby a story from your grandparents' lives, about where your family comes from.", "hi": "अपने शिशु को अपने दादा-दादी या नाना-नानी की ज़िंदगी से एक कहानी सुनाएँ — एक क़िस्सा कि आप सब कहाँ से आए हैं।" },
+      "motivation": { "en": "Your baby belongs to a story that began long before them. Let them hear how it started.", "hi": "आपका बच्चा एक ऐसी कहानी का हिस्सा है जो उससे बहुत पहले शुरू हुई थी — उसकी शुरुआत उसे भी सुनने दें।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -33,9 +33,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Breathe With The Belly", "hi": "पेट से साँस लें" },
-      "content": { "en": "Rest a hand low on your belly. Breathe in slowly and feel it rise under your hand, then let it fall as you breathe out. Five soft rounds, just you and your bump.", "hi": "एक हाथ पेट पर नीचे की ओर रखें। धीरे-धीरे साँस अंदर लें और उसे अपने हाथ के नीचे उठते महसूस करें, फिर साँस छोड़ते हुए उसे बैठने दें। ऐसे पाँच नरम दौर — बस आप और आपका पेट।" },
-      "remember": { "en": "Slow belly breaths calm you and your baby together.", "hi": "पेट से ली गई धीमी साँसें आपको और आपके शिशु को साथ-साथ शांत करती हैं।" },
+      "title": { "en": "Slow belly breaths", "hi": "पेट से साँस लें" },
+      "content": { "en": "Rest a hand low on your belly. Breathe in slowly and feel it rise under your hand, then let it fall as you breathe out. Five gentle rounds, just you and your bump.", "hi": "एक हाथ पेट पर नीचे की ओर रखें। धीरे-धीरे साँस अंदर लें और उसे अपने हाथ के नीचे उठते महसूस करें, फिर साँस छोड़ते हुए उसे बैठने दें। ऐसे पाँच नरम दौर — बस आप और आपका पेट।" },
+      "remember": { "en": "Slow belly breaths help you and your baby settle together.", "hi": "पेट से ली गई धीमी साँसें आपको और आपके शिशु को साथ-साथ शांत करती हैं।" },
       "durationMinutes": 2
     }
   },
@@ -44,11 +44,11 @@
     "week": 16,
     "babyLearning": { "en": "The tiny bones inside your baby's ears are forming.", "hi": "नन्हे कान अपनी जगह बैठते हुए, जल्द ही सुनने को तैयार" },
     "grow": {
-      "title": { "en": "They Copy, They Don't Obey", "hi": "बच्चे नक़ल करते हैं, हुक्म नहीं मानते" },
-      "insight": { "en": "Children rarely do what we tell them. They do what they see us do.", "hi": "बच्चे शायद ही वह करते हैं जो हम कहते हैं। वे वही करते हैं जो हमें करते देखते हैं।" },
-      "expanded": { "en": "Every parent learns this sooner or later: you can say 'be patient' a hundred times, but if you sigh and snap when you are rushed, that is the lesson that lands. Children are watching long before they are listening. They copy the tone of our voice, the way we handle a hard moment, how we speak about others when we think it does not matter. This is not a reason to feel watched and judged. It is a gentle freedom — you do not have to lecture. You simply have to live, as well as you can, the things you hope your child will one day carry.", "hi": "हर माँ-बाप यह देर-सवेर सीख ही जाते हैं: आप सौ बार कह सकती हैं 'सब्र रखो', पर अगर जल्दी में आप आह भरकर झुँझला जाती हैं, तो सबक़ वही बैठता है। बच्चे सुनने से बहुत पहले देख रहे होते हैं। हमारी आवाज़ का लहजा, मुश्किल पल को सँभालने का हमारा तरीक़ा, और जब हमें लगता है कोई फ़र्क़ नहीं पड़ता तब हम दूसरों के बारे में कैसे बोलते हैं — बच्चे यह सब उतार लेते हैं। यह देखे और परखे जाने का डर महसूस करने की वजह नहीं है। यह एक नरम आज़ादी है — आपको भाषण नहीं देना है। आपको बस, जितना अच्छे से हो सके, वे बातें जीनी हैं जो आप चाहती हैं कि आपका बच्चा एक दिन अपने साथ ले जाए।" },
-      "deepDive": { "en": "Studies of young children show imitation is one of their earliest and strongest learning tools — they mirror actions even before they grasp the words behind them. Modelling teaches faster than instruction.", "hi": "छोटे बच्चों पर हुए शोध बताते हैं कि नक़ल उनके सबसे पहले और सबसे मज़बूत औज़ारों में से एक है — शब्दों का मतलब समझने से पहले ही वे हरकतों को दोहराने लगते हैं। मिसाल रखना हिदायत देने से जल्दी सिखाता है।" },
-      "remember": { "en": "What you do speaks louder than what you say.", "hi": "आप जो करती हैं, वह आपके कहे से ऊँचा बोलता है।" }
+      "title": { "en": "Children copy what they see", "hi": "बच्चे नक़ल करते हैं, हुक्म नहीं मानते" },
+      "insight": { "en": "Children don't often do what we tell them. They do what they see us do.", "hi": "बच्चे शायद ही वह करते हैं जो हम कहते हैं। वे वही करते हैं जो हमें करते देखते हैं।" },
+      "expanded": { "en": "Most parents learn this sooner or later. You can say 'be patient' a hundred times, but if you sigh and snap when you're rushed, that's the lesson that sticks. Children watch long before they listen. They copy our tone of voice, how we handle a hard moment, how we talk about others when we think it doesn't matter. This isn't a reason to feel watched and judged. It's a kind of freedom: you don't have to lecture. You only have to live, as well as you can, the things you hope your child will carry.", "hi": "हर माँ-बाप यह देर-सवेर सीख ही जाते हैं: आप सौ बार कह सकती हैं 'सब्र रखो', पर अगर जल्दी में आप आह भरकर झुँझला जाती हैं, तो सबक़ वही बैठता है। बच्चे सुनने से बहुत पहले देख रहे होते हैं। हमारी आवाज़ का लहजा, मुश्किल पल को सँभालने का हमारा तरीक़ा, और जब हमें लगता है कोई फ़र्क़ नहीं पड़ता तब हम दूसरों के बारे में कैसे बोलते हैं — बच्चे यह सब उतार लेते हैं। यह देखे और परखे जाने का डर महसूस करने की वजह नहीं है। यह एक नरम आज़ादी है — आपको भाषण नहीं देना है। आपको बस, जितना अच्छे से हो सके, वे बातें जीनी हैं जो आप चाहती हैं कि आपका बच्चा एक दिन अपने साथ ले जाए।" },
+      "deepDive": { "en": "Studies of young children show that copying is one of their earliest and strongest ways to learn. Toddlers copy actions even before they understand the words that go with them.", "hi": "छोटे बच्चों पर हुए शोध बताते हैं कि नक़ल उनके सबसे पहले और सबसे मज़बूत औज़ारों में से एक है — शब्दों का मतलब समझने से पहले ही वे हरकतों को दोहराने लगते हैं। मिसाल रखना हिदायत देने से जल्दी सिखाता है।" },
+      "remember": { "en": "What you do teaches more than what you say.", "hi": "आप जो करती हैं, वह आपके कहे से ऊँचा बोलता है।" }
     },
     "readToBaby": {
       "title": { "en": "The Jackal And The Bowstring", "hi": "गीदड़ और कमान की डोरी" },
@@ -57,8 +57,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby where your family name comes from, and the people who carried it before you.", "hi": "अपने शिशु को बताएँ कि आपके परिवार का नाम कहाँ से आया, और वे लोग कौन थे जिन्होंने आपसे पहले उसे थामा।" },
-      "motivation": { "en": "A name carries a history — let your baby feel the roots they are growing from.", "hi": "एक नाम अपने साथ पूरा इतिहास लेकर चलता है — अपने शिशु को उन जड़ों का एहसास होने दें जिनसे यह ज़िंदगी उग रही है।" }
+      "title": { "en": "Tell your baby where your family name comes from, and about the people who had it before you.", "hi": "अपने शिशु को बताएँ कि आपके परिवार का नाम कहाँ से आया, और वे लोग कौन थे जिन्होंने आपसे पहले उसे थामा।" },
+      "motivation": { "en": "A name carries a history. Let your baby hear about the family they're joining.", "hi": "एक नाम अपने साथ पूरा इतिहास लेकर चलता है — अपने शिशु को उन जड़ों का एहसास होने दें जिनसे यह ज़िंदगी उग रही है।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -73,9 +73,9 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "When Hunger Sneaks Up Fast", "hi": "जब भूख अचानक तेज़ लगे" },
-      "content": { "en": "In this trimester, hunger can arrive suddenly and sharply. A small handful of nuts, a banana or a few soaked dates kept close by can steady that wave before it tips into a headache or a low mood.", "hi": "इस तिमाही में भूख अचानक और तेज़ लग सकती है। पास रखे मुट्ठी भर मेवे, एक केला या कुछ भीगे खजूर उस लहर को सँभाल लेते हैं, इससे पहले कि वह सिरदर्द या उतरे हुए मन में बदल जाए।" },
-      "remember": { "en": "Keeping a little snack near you is a small act of self-care.", "hi": "पास कुछ हल्का-फुल्का रखना ख़ुद की देखभाल का ही एक छोटा तरीक़ा है।" },
+      "title": { "en": "When hunger comes on fast", "hi": "जब भूख अचानक तेज़ लगे" },
+      "content": { "en": "In this trimester, hunger can come on suddenly and strongly. A small handful of nuts, a banana or a few soaked dates kept nearby can take the edge off before it turns into a headache or a low mood.", "hi": "इस तिमाही में भूख अचानक और तेज़ लग सकती है। पास रखे मुट्ठी भर मेवे, एक केला या कुछ भीगे खजूर उस लहर को सँभाल लेते हैं, इससे पहले कि वह सिरदर्द या उतरे हुए मन में बदल जाए।" },
+      "remember": { "en": "Keeping a snack nearby is an easy way to look after yourself.", "hi": "पास कुछ हल्का-फुल्का रखना ख़ुद की देखभाल का ही एक छोटा तरीक़ा है।" },
       "durationMinutes": 0
     }
   },
@@ -84,10 +84,10 @@
     "week": 16,
     "babyLearning": { "en": "Your baby's eyes can make slow movements behind closed lids.", "hi": "नन्ही उँगलियाँ मुड़ना और पकड़ना सीखती हुईं" },
     "grow": {
-      "title": { "en": "Your Habits Become Theirs", "hi": "आपकी आदतें उनकी आदतें बन जाती हैं" },
-      "insight": { "en": "The small habits you repeat each day quietly become the ones your child grows up to keep.", "hi": "जो छोटी आदतें आप हर दिन दोहराती हैं, वही चुपचाप बच्चों की उम्र भर की आदतें बन जाती हैं।" },
-      "expanded": { "en": "Children do not inherit our grand intentions; they inherit our daily routines. How we greet the morning, whether we say thank you, how we speak about our own bodies, the way we rest or rush — these repeat in front of small eyes until they feel simply like 'how things are done.' This can sound like pressure, but it is really a quiet kind of hope. The gentle habits you tend to now — a kind word, a calm pause, a moment of gratitude — are seeds you are planting. You do not need new ones. You only need to keep the good ones warm.", "hi": "बच्चों को हमारे बड़े इरादे विरासत में नहीं मिलते; उन्हें हमारी रोज़ की दिनचर्या मिलती है। हम सुबह का स्वागत कैसे करते हैं, शुक्रिया कहते हैं या नहीं, अपने ही शरीर के बारे में कैसे बात करते हैं, आराम करते हैं या भागते रहते हैं — यह सब नन्ही आँखों के सामने तब तक दोहराया जाता है जब तक 'ऐसा ही होता है' न लगने लगे। यह दबाव जैसा सुनाई दे सकता है, पर असल में यह एक शांत-सी उम्मीद है। जो नरम आदतें आप अभी सँभाल रही हैं — एक मीठा शब्द, एक शांत ठहराव, शुक्रगुज़ारी का एक पल — वही बीज हैं जो आप बो रही हैं। आपको नई आदतें बनाने की ज़रूरत नहीं। बस अच्छी वालों को गर्म रखना है।" },
-      "deepDive": { "en": "Researchers find that family routines and everyday rituals shape a child's habits and sense of stability more than occasional big efforts. Consistency, not intensity, is what children absorb.", "hi": "शोध बताते हैं कि परिवार की दिनचर्या और रोज़ के छोटे रिवाज़ बच्चों की आदतों और उनके ठहराव के एहसास को कभी-कभार की बड़ी कोशिशों से कहीं ज़्यादा गढ़ते हैं। बच्चे ज़ोर से नहीं, लगातार दोहराई गई बातों से सीखते हैं।" },
+      "title": { "en": "Your daily habits become your child's", "hi": "आपकी आदतें उनकी आदतें बन जाती हैं" },
+      "insight": { "en": "The small things you do every day tend to become the things your child grows up doing.", "hi": "जो छोटी आदतें आप हर दिन दोहराती हैं, वही चुपचाप बच्चों की उम्र भर की आदतें बन जाती हैं।" },
+      "expanded": { "en": "Children don't pick up our big intentions. They pick up our daily routines. How we start the morning, whether we say thank you, how we talk about our own bodies, whether we rest or rush: all of this happens in front of them until it feels like 'how things are done'. That can sound like pressure, but it's also hopeful. The gentle habits you keep now, a kind word, a calm pause, a moment of thanks, are the ones your child will grow up with. You don't need new habits. You only need to keep the good ones going.", "hi": "बच्चों को हमारे बड़े इरादे विरासत में नहीं मिलते; उन्हें हमारी रोज़ की दिनचर्या मिलती है। हम सुबह का स्वागत कैसे करते हैं, शुक्रिया कहते हैं या नहीं, अपने ही शरीर के बारे में कैसे बात करते हैं, आराम करते हैं या भागते रहते हैं — यह सब नन्ही आँखों के सामने तब तक दोहराया जाता है जब तक 'ऐसा ही होता है' न लगने लगे। यह दबाव जैसा सुनाई दे सकता है, पर असल में यह एक शांत-सी उम्मीद है। जो नरम आदतें आप अभी सँभाल रही हैं — एक मीठा शब्द, एक शांत ठहराव, शुक्रगुज़ारी का एक पल — वही बीज हैं जो आप बो रही हैं। आपको नई आदतें बनाने की ज़रूरत नहीं। बस अच्छी वालों को गर्म रखना है।" },
+      "deepDive": { "en": "Researchers find that everyday family routines help children feel secure and shape their habits. Small things done steadily seem to matter more to children than occasional big efforts.", "hi": "शोध बताते हैं कि परिवार की दिनचर्या और रोज़ के छोटे रिवाज़ बच्चों की आदतों और उनके ठहराव के एहसास को कभी-कभार की बड़ी कोशिशों से कहीं ज़्यादा गढ़ते हैं। बच्चे ज़ोर से नहीं, लगातार दोहराई गई बातों से सीखते हैं।" },
       "remember": { "en": "Your daily routines become your child's normal.", "hi": "आपकी रोज़ की दिनचर्या ही बच्चों के लिए 'आम' बन जाती है।" }
     },
     "readToBaby": {
@@ -97,8 +97,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about a recipe passed down in your family — the dish that tastes like home.", "hi": "अपने शिशु को अपने परिवार में पीढ़ियों से चली आ रही किसी एक रेसिपी के बारे में बताएँ — वह पकवान जिसका स्वाद घर जैसा लगता है।" },
-      "motivation": { "en": "Some of our deepest memories live in a familiar taste — share one your child will inherit.", "hi": "हमारी कुछ सबसे गहरी यादें एक जाने-पहचाने स्वाद में बसती हैं — एक ऐसी याद बाँट दें जो विरासत में आगे चली जाए।" }
+      "title": { "en": "Tell your baby about a recipe passed down in your family, the dish that tastes like home.", "hi": "अपने शिशु को अपने परिवार में पीढ़ियों से चली आ रही किसी एक रेसिपी के बारे में बताएँ — वह पकवान जिसका स्वाद घर जैसा लगता है।" },
+      "motivation": { "en": "Some of our warmest memories are tastes. Share one your child will grow up with.", "hi": "हमारी कुछ सबसे गहरी यादें एक जाने-पहचाने स्वाद में बसती हैं — एक ऐसी याद बाँट दें जो विरासत में आगे चली जाए।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -113,9 +113,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "I Lead By Living, Not Lecturing", "hi": "मैं जीकर राह दिखाती हूँ, भाषण देकर नहीं" },
-      "content": { "en": "I do not have to have all the right words. The way I live, gently and honestly, is the truest thing I can pass on.", "hi": "मेरे पास सारे सही शब्द होना ज़रूरी नहीं। जिस तरह मैं जीती हूँ — नरमी और ईमानदारी से — वही सबसे सच्ची चीज़ है जो मैं आगे दे सकती हूँ।" },
-      "remember": { "en": "You teach most by simply being your gentle self.", "hi": "आप सबसे ज़्यादा तब सिखाती हैं जब बस अपने नरम रूप में होती हैं।" },
+      "title": { "en": "I teach by how I live", "hi": "मैं जीकर राह दिखाती हूँ, भाषण देकर नहीं" },
+      "content": { "en": "I don't have to have all the right words. The way I live, gently and honestly, is the best thing I can pass on.", "hi": "मेरे पास सारे सही शब्द होना ज़रूरी नहीं। जिस तरह मैं जीती हूँ — नरमी और ईमानदारी से — वही सबसे सच्ची चीज़ है जो मैं आगे दे सकती हूँ।" },
+      "remember": { "en": "You teach most by being your kind, everyday self.", "hi": "आप सबसे ज़्यादा तब सिखाती हैं जब बस अपने नरम रूप में होती हैं।" },
       "durationMinutes": 0
     }
   },
@@ -124,11 +124,11 @@
     "week": 16,
     "babyLearning": { "en": "Your baby's fingernails are starting to grow.", "hi": "नन्ही मांसपेशियाँ मज़बूत होती हुईं, छोटी-छोटी अंगड़ाइयाँ शुरू" },
     "grow": {
-      "title": { "en": "Show, Don't Just Tell", "hi": "बताएँ नहीं, दिखाएँ" },
-      "insight": { "en": "A child believes what they see far more than what they are told. Showing is the truest kind of teaching.", "hi": "बच्चे जो देखते हैं उस पर उससे कहीं ज़्यादा भरोसा करते हैं जो उन्हें बताया जाता है। दिखाना ही सिखाने का सबसे सच्चा तरीक़ा है।" },
-      "expanded": { "en": "We can tell a child to be kind, to share, to stay calm — but words alone rarely take root. What truly teaches is letting them see kindness happen: watching you help a neighbour, share the last sweet, apologise when you are wrong. Children are quietly checking whether our actions match our words, and they trust the actions every time. This is wonderful news, because it means you do not need clever explanations. You only need to let your child witness, again and again, the small good things you already do. Showing turns a value from an idea into something real.", "hi": "हम बच्चों से कह सकते हैं कि दयालु बनो, बाँटो, शांत रहो — पर अकेले शब्द शायद ही जड़ पकड़ते हैं। सच में सिखाता है उन्हें दया होते हुए देखने देना: आपको पड़ोसी की मदद करते देखना, आख़िरी मिठाई बाँटते देखना, ग़लती पर माफ़ी माँगते देखना। बच्चे चुपचाप परखते रहते हैं कि हमारी करनी और कहनी मिलती है या नहीं, और भरोसा वे हर बार करनी पर करते हैं। यह बहुत अच्छी ख़बर है, क्योंकि इसका मतलब है कि आपको कोई चतुर समझाइश नहीं चाहिए। बस अपने बच्चे को बार-बार वही छोटी अच्छी बातें देखने देनी हैं जो आप पहले से करती हैं। दिखाना एक संस्कार को विचार से उठाकर कुछ असली बना देता है।" },
-      "deepDive": { "en": "Research on moral development shows children align their behaviour with what adults do, not just what they say — and notice the gap between the two keenly. Lived example is the most convincing lesson.", "hi": "नैतिक विकास पर हुए शोध बताते हैं कि बच्चे अपना व्यवहार इससे मिलाते हैं कि बड़े क्या करते हैं, सिर्फ़ इससे नहीं कि क्या कहते हैं — और दोनों के बीच का फ़र्क़ वे बहुत बारीकी से पकड़ लेते हैं। जी कर दिखाई गई मिसाल ही सबसे भरोसेमंद सबक़ है।" },
-      "remember": { "en": "Let your child see the values you hope they keep.", "hi": "जो संस्कार आप चाहती हैं कि आगे चलें, उन्हें बच्चों को होते हुए देखने दें।" }
+      "title": { "en": "Showing teaches more than telling", "hi": "बताएँ नहीं, दिखाएँ" },
+      "insight": { "en": "A child believes what they see much more than what they're told. Showing is the most convincing way to teach.", "hi": "बच्चे जो देखते हैं उस पर उससे कहीं ज़्यादा भरोसा करते हैं जो उन्हें बताया जाता है। दिखाना ही सिखाने का सबसे सच्चा तरीक़ा है।" },
+      "expanded": { "en": "We can tell a child to be kind, to share, to stay calm, but words alone rarely stick. What teaches is letting them see kindness happen: watching you help a neighbour, share the last laddoo, say sorry when you're wrong. Children check whether our actions match our words, and they trust the actions. That's good news, because it means you don't need clever explanations. You only need to let your child see, again and again, the small good things you already do. Seeing it happen turns a value from an idea into something real.", "hi": "हम बच्चों से कह सकते हैं कि दयालु बनो, बाँटो, शांत रहो — पर अकेले शब्द शायद ही जड़ पकड़ते हैं। सच में सिखाता है उन्हें दया होते हुए देखने देना: आपको पड़ोसी की मदद करते देखना, आख़िरी मिठाई बाँटते देखना, ग़लती पर माफ़ी माँगते देखना। बच्चे चुपचाप परखते रहते हैं कि हमारी करनी और कहनी मिलती है या नहीं, और भरोसा वे हर बार करनी पर करते हैं। यह बहुत अच्छी ख़बर है, क्योंकि इसका मतलब है कि आपको कोई चतुर समझाइश नहीं चाहिए। बस अपने बच्चे को बार-बार वही छोटी अच्छी बातें देखने देनी हैं जो आप पहले से करती हैं। दिखाना एक संस्कार को विचार से उठाकर कुछ असली बना देता है।" },
+      "deepDive": { "en": "Classic studies of generosity found that children tended to copy what an adult did, even when the adult said something different. Children notice when words and actions don't match.", "hi": "नैतिक विकास पर हुए शोध बताते हैं कि बच्चे अपना व्यवहार इससे मिलाते हैं कि बड़े क्या करते हैं, सिर्फ़ इससे नहीं कि क्या कहते हैं — और दोनों के बीच का फ़र्क़ वे बहुत बारीकी से पकड़ लेते हैं। जी कर दिखाई गई मिसाल ही सबसे भरोसेमंद सबक़ है।" },
+      "remember": { "en": "Let your child see the values you hope they'll keep.", "hi": "जो संस्कार आप चाहती हैं कि आगे चलें, उन्हें बच्चों को होते हुए देखने दें।" }
     },
     "readToBaby": {
       "title": { "en": "The Selfless Hare", "hi": "निस्वार्थ खरगोश" },
@@ -137,8 +137,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about a place that matters to your family's history — a village, a home, a corner of the world.", "hi": "अपने शिशु को एक ऐसी जगह के बारे में बताएँ जो आपके परिवार के इतिहास में मायने रखती है — एक गाँव, एक घर, दुनिया का एक कोना।" },
-      "motivation": { "en": "Knowing where they come from helps a child feel rooted in the world.", "hi": "यह जानना कि वे कहाँ से आए हैं, बच्चों को दुनिया में अपनी जड़ों से जुड़ा हुआ महसूस कराता है।" }
+      "title": { "en": "Tell your baby about a place that matters in your family's history: a village, a house, a town.", "hi": "अपने शिशु को एक ऐसी जगह के बारे में बताएँ जो आपके परिवार के इतिहास में मायने रखती है — एक गाँव, एक घर, दुनिया का एक कोना।" },
+      "motivation": { "en": "Knowing where they come from helps a child feel they belong.", "hi": "यह जानना कि वे कहाँ से आए हैं, बच्चों को दुनिया में अपनी जड़ों से जुड़ा हुआ महसूस कराता है।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -153,9 +153,9 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "When Food Feels Boring", "hi": "जब खाना बेस्वाद-सा लगने लगे" },
-      "content": { "en": "If the same meals start to feel dull, you do not need a big change — a squeeze of lemon, a handful of fresh herbs, or eating somewhere pleasant can make familiar food feel inviting again. Eating well is easier when it feels nice.", "hi": "अगर वही रोज़ का खाना फीका लगने लगे, तो किसी बड़े बदलाव की ज़रूरत नहीं — थोड़ा नींबू निचोड़ लें, मुट्ठी भर ताज़ा धनिया-पुदीना डाल लें, या किसी अच्छी-सी जगह बैठकर खाएँ; वही जाना-पहचाना खाना फिर से मन को भाने लगेगा। अच्छा खाना तब आसान होता है जब खाना अच्छा लगे।" },
-      "remember": { "en": "Making a meal pleasant is part of nourishing yourself.", "hi": "खाने को सुहाना बनाना भी ख़ुद को पोषण देने का ही हिस्सा है।" },
+      "title": { "en": "When food feels boring", "hi": "जब खाना बेस्वाद-सा लगने लगे" },
+      "content": { "en": "If the same meals start to feel dull, you don't need a big change. A squeeze of lemon, some fresh coriander or mint, or eating somewhere pleasant can make familiar food feel inviting again. Eating well is easier when it feels nice.", "hi": "अगर वही रोज़ का खाना फीका लगने लगे, तो किसी बड़े बदलाव की ज़रूरत नहीं — थोड़ा नींबू निचोड़ लें, मुट्ठी भर ताज़ा धनिया-पुदीना डाल लें, या किसी अच्छी-सी जगह बैठकर खाएँ; वही जाना-पहचाना खाना फिर से मन को भाने लगेगा। अच्छा खाना तब आसान होता है जब खाना अच्छा लगे।" },
+      "remember": { "en": "Making a meal pleasant is part of eating well.", "hi": "खाने को सुहाना बनाना भी ख़ुद को पोषण देने का ही हिस्सा है।" },
       "durationMinutes": 0
     }
   },
@@ -164,11 +164,11 @@
     "week": 16,
     "babyLearning": { "en": "You might feel first flutters from around now, or a few weeks later.", "hi": "और ज़्यादा जवाब देते हुए, आपकी नरम हलचल को महसूस करते हुए" },
     "grow": {
-      "title": { "en": "Little Eyes Are Watching", "hi": "नन्ही आँखें देख रही हैं" },
-      "insight": { "en": "Even when you think no lesson is happening, little eyes are quietly learning from you.", "hi": "तब भी जब आपको लगे कि कोई सबक़ नहीं चल रहा, नन्ही आँखें चुपचाप आपसे सीख रही होती हैं।" },
-      "expanded": { "en": "The truest teaching often happens in the unguarded moments — not when we are trying to set an example, but when we forget we are being watched. How we react to spilt tea, the patience we show in a slow queue, the way we speak to ourselves when we make a mistake. Children gather all of it. This is not meant to make you anxious; no one is graceful every minute. It is simply a tender reminder that your ordinary, in-between moments are full of quiet lessons. Being a little gentler with yourself, even when no one seems to be looking, is teaching too.", "hi": "सबसे सच्चा सिखाना अक्सर उन पलों में होता है जब हम सँभले हुए नहीं होते — तब नहीं जब हम मिसाल रखने की कोशिश कर रहे हों, बल्कि तब जब हम भूल ही जाएँ कि कोई देख रहा है। गिरी हुई चाय पर हम कैसे बरतते हैं, धीमी क़तार में कितना सब्र दिखाते हैं, ग़लती हो जाने पर ख़ुद से कैसे बात करते हैं। बच्चे यह सब समेट लेते हैं। यह आपको चिंता में डालने के लिए नहीं है; कोई भी हर मिनट सँभला हुआ नहीं रहता। यह बस एक कोमल याद है कि आपके आम, बीच-बीच के पल भी शांत सबक़ों से भरे हैं। ख़ुद के साथ थोड़ा और नरम होना — तब भी जब लगे कोई देख नहीं रहा — यह भी सिखाना ही है।" },
-      "deepDive": { "en": "Studies show children pick up on incidental, unplanned behaviour — including how adults treat themselves — as strongly as on deliberate teaching. The off-stage moments shape them too.", "hi": "शोध बताते हैं कि बच्चे बिना सोचे-समझे हुए, अनजाने व्यवहार को — इसमें यह भी कि बड़े ख़ुद से कैसे पेश आते हैं — उतनी ही मज़बूती से पकड़ते हैं जितना जान-बूझकर सिखाई गई बात को। परदे के पीछे के पल भी उन्हें गढ़ते हैं।" },
-      "remember": { "en": "Be gentle with yourself — small eyes learn that too.", "hi": "ख़ुद के साथ नरम रहें — नन्ही आँखें वह भी सीखती हैं।" }
+      "title": { "en": "Children learn from ordinary moments too", "hi": "नन्ही आँखें देख रही हैं" },
+      "insight": { "en": "Even when you don't think any lesson is happening, your child is learning from you.", "hi": "तब भी जब आपको लगे कि कोई सबक़ नहीं चल रहा, नन्ही आँखें चुपचाप आपसे सीख रही होती हैं।" },
+      "expanded": { "en": "A lot of teaching happens in unplanned moments, when we're not trying to set an example and forget anyone's watching. How we react to spilt chai, how patient we are in a slow queue, how we talk to ourselves after a mistake. Children take in all of it. This isn't meant to worry you. No one is calm every minute. It's a gentle reminder that your ordinary, in-between moments teach too. Being a little kinder to yourself, even when no one seems to be looking, is teaching as well.", "hi": "सबसे सच्चा सिखाना अक्सर उन पलों में होता है जब हम सँभले हुए नहीं होते — तब नहीं जब हम मिसाल रखने की कोशिश कर रहे हों, बल्कि तब जब हम भूल ही जाएँ कि कोई देख रहा है। गिरी हुई चाय पर हम कैसे बरतते हैं, धीमी क़तार में कितना सब्र दिखाते हैं, ग़लती हो जाने पर ख़ुद से कैसे बात करते हैं। बच्चे यह सब समेट लेते हैं। यह आपको चिंता में डालने के लिए नहीं है; कोई भी हर मिनट सँभला हुआ नहीं रहता। यह बस एक कोमल याद है कि आपके आम, बीच-बीच के पल भी शांत सबक़ों से भरे हैं। ख़ुद के साथ थोड़ा और नरम होना — तब भी जब लगे कोई देख नहीं रहा — यह भी सिखाना ही है।" },
+      "deepDive": { "en": "Researchers who study how children learn note that they pick up a lot from everyday, unplanned moments, not only from things adults set out to teach.", "hi": "शोध बताते हैं कि बच्चे बिना सोचे-समझे हुए, अनजाने व्यवहार को — इसमें यह भी कि बड़े ख़ुद से कैसे पेश आते हैं — उतनी ही मज़बूती से पकड़ते हैं जितना जान-बूझकर सिखाई गई बात को। परदे के पीछे के पल भी उन्हें गढ़ते हैं।" },
+      "remember": { "en": "Be gentle with yourself. Your child will learn that too.", "hi": "ख़ुद के साथ नरम रहें — नन्ही आँखें वह भी सीखती हैं।" }
     },
     "readToBaby": {
       "title": { "en": "Tenali Rama And The Brinjal Curry", "hi": "तेनाली रामा और बैंगन की सब्ज़ी" },
@@ -177,8 +177,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about a family value you are proud of — something you hope they will carry too.", "hi": "अपने शिशु को अपने परिवार के एक ऐसे संस्कार के बारे में बताएँ जिस पर आपको गर्व है — कुछ ऐसा जो आप चाहती हैं आगे भी चलता रहे।" },
-      "motivation": { "en": "The values you name today become the compass your child will steer by.", "hi": "जिन संस्कारों को आप आज नाम देती हैं, वही आगे चलकर बच्चों की दिशा तय करते हैं।" }
+      "title": { "en": "Tell your baby about a family value you're proud of, one you hope they'll carry too.", "hi": "अपने शिशु को अपने परिवार के एक ऐसे संस्कार के बारे में बताएँ जिस पर आपको गर्व है — कुछ ऐसा जो आप चाहती हैं आगे भी चलता रहे।" },
+      "motivation": { "en": "The values you talk about today can help guide your child later.", "hi": "जिन संस्कारों को आप आज नाम देती हैं, वही आगे चलकर बच्चों की दिशा तय करते हैं।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -193,9 +193,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "I Speak Kindly To Myself", "hi": "मैं ख़ुद से प्यार से बात करती हूँ" },
-      "content": { "en": "The voice I use with myself is the voice my child will one day learn. I will make it a gentle one.", "hi": "जिस आवाज़ में मैं ख़ुद से बात करती हूँ, वही आवाज़ एक दिन मेरे बच्चे को विरासत में मिलेगी। मैं उसे नरम बनाऊँगी।" },
-      "remember": { "en": "Self-kindness is a lesson your child overhears.", "hi": "ख़ुद पर दया एक ऐसा सबक़ है जो बच्चों के कानों तक अपने आप पहुँच जाता है।" },
+      "title": { "en": "I speak kindly to myself", "hi": "मैं ख़ुद से प्यार से बात करती हूँ" },
+      "content": { "en": "The way I talk to myself is the way my child will one day learn to talk to themselves. I'll make it a gentle voice.", "hi": "जिस आवाज़ में मैं ख़ुद से बात करती हूँ, वही आवाज़ एक दिन मेरे बच्चे को विरासत में मिलेगी। मैं उसे नरम बनाऊँगी।" },
+      "remember": { "en": "Your child will pick up how you speak to yourself.", "hi": "ख़ुद पर दया एक ऐसा सबक़ है जो बच्चों के कानों तक अपने आप पहुँच जाता है।" },
       "durationMinutes": 0
     }
   },
@@ -204,11 +204,11 @@
     "week": 16,
     "babyLearning": { "en": "Your baby's umbilical cord is growing thicker and stronger.", "hi": "नरमी से बढ़ते हुए, एक महीन रोएँदार परत बनती हुई" },
     "grow": {
-      "title": { "en": "Values Are Caught, Not Taught", "hi": "संस्कार सिखाए नहीं जाते, पकड़े जाते हैं" },
-      "insight": { "en": "A child does not memorise honesty or kindness. They catch it, like warmth, from the people around them.", "hi": "बच्चे ईमानदारी या दया रट कर नहीं सीखते। वे उसे गर्माहट की तरह अपने आसपास के लोगों से पकड़ लेते हैं।" },
-      "expanded": { "en": "We cannot hand a child our values the way we hand them a book. Honesty, generosity, courage — these are not facts to be learned but qualities that seep in slowly, caught from the air of a loving home. A child raised among gentleness grows gentle; one surrounded by gratitude grows grateful. This means the most powerful thing you can do is not to explain your values, but to live among them yourself, letting your child breathe them in daily. You are creating the very atmosphere your child's character will form in — and that atmosphere is made of who you choose to be.", "hi": "हम बच्चों को अपने संस्कार वैसे नहीं थमा सकते जैसे कोई किताब थमा देते हैं। ईमानदारी, उदारता, हिम्मत — ये याद करने की बातें नहीं, ये वे गुण हैं जो धीरे-धीरे भीतर उतरते हैं, एक प्यार भरे घर की हवा से पकड़े जाते हैं। नरमी के बीच पले बच्चे नरम होते हैं; शुक्रगुज़ारी से घिरे बच्चे शुक्रगुज़ार। इसका मतलब यह है कि सबसे ताक़तवर काम अपने संस्कार समझाना नहीं, बल्कि ख़ुद उन्हीं के बीच जीना है — और बच्चों को उन्हें रोज़ साँस में लेने देना। आप वही माहौल बना रही हैं जिसमें आपके बच्चे का स्वभाव बनेगा — और वह माहौल इससे बनता है कि आप कौन होना चुनती हैं।" },
-      "deepDive": { "en": "Researchers describe values as 'transmitted through modelling and atmosphere' rather than direct instruction — children adopt the moral climate they grow up in. The home's everyday tone shapes character most.", "hi": "शोध संस्कारों को सीधी हिदायत के बजाय 'मिसाल और माहौल के ज़रिए आगे पहुँचने वाली' चीज़ बताते हैं — बच्चे वही नैतिक हवा अपना लेते हैं जिसमें वे बड़े होते हैं। घर का रोज़ का लहजा ही स्वभाव को सबसे ज़्यादा गढ़ता है।" },
-      "remember": { "en": "Children breathe in the values they grow up among.", "hi": "बच्चे उन्हीं संस्कारों को साँस में लेते हैं जिनके बीच वे बड़े होते हैं।" }
+      "title": { "en": "Children pick up values from home", "hi": "संस्कार सिखाए नहीं जाते, पकड़े जाते हैं" },
+      "insight": { "en": "A child doesn't memorise honesty or kindness. They pick it up from the people around them.", "hi": "बच्चे ईमानदारी या दया रट कर नहीं सीखते। वे उसे गर्माहट की तरह अपने आसपास के लोगों से पकड़ लेते हैं।" },
+      "expanded": { "en": "We can't hand a child our values the way we hand them a book. Honesty, generosity and courage aren't facts to learn. They soak in slowly from the feel of a loving home. A child raised around gentleness tends to grow gentle. One raised around gratitude tends to grow grateful. So the most powerful thing you can do isn't to explain your values. It's to live by them, so your child grows up among them every day. The feel of your home is made of who you choose to be, and that's where your child's character will grow.", "hi": "हम बच्चों को अपने संस्कार वैसे नहीं थमा सकते जैसे कोई किताब थमा देते हैं। ईमानदारी, उदारता, हिम्मत — ये याद करने की बातें नहीं, ये वे गुण हैं जो धीरे-धीरे भीतर उतरते हैं, एक प्यार भरे घर की हवा से पकड़े जाते हैं। नरमी के बीच पले बच्चे नरम होते हैं; शुक्रगुज़ारी से घिरे बच्चे शुक्रगुज़ार। इसका मतलब यह है कि सबसे ताक़तवर काम अपने संस्कार समझाना नहीं, बल्कि ख़ुद उन्हीं के बीच जीना है — और बच्चों को उन्हें रोज़ साँस में लेने देना। आप वही माहौल बना रही हैं जिसमें आपके बच्चे का स्वभाव बनेगा — और वह माहौल इससे बनता है कि आप कौन होना चुनती हैं।" },
+      "deepDive": { "en": "Many researchers describe values as passed on mostly through example and the everyday feel of a home, more than through direct instruction. Children tend to take on the way of life they grow up in.", "hi": "शोध संस्कारों को सीधी हिदायत के बजाय 'मिसाल और माहौल के ज़रिए आगे पहुँचने वाली' चीज़ बताते हैं — बच्चे वही नैतिक हवा अपना लेते हैं जिसमें वे बड़े होते हैं। घर का रोज़ का लहजा ही स्वभाव को सबसे ज़्यादा गढ़ता है।" },
+      "remember": { "en": "Children take on the values they grow up around.", "hi": "बच्चे उन्हीं संस्कारों को साँस में लेते हैं जिनके बीच वे बड़े होते हैं।" }
     },
     "readToBaby": {
       "title": { "en": "The Grateful Elephant", "hi": "एहसानमंद हाथी" },
@@ -217,8 +217,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about an elder or ancestor you admire — someone whose spirit you hope lives on in them.", "hi": "अपने शिशु को किसी ऐसे बुज़ुर्ग या पुरखे के बारे में बताएँ जिनकी आप क़दर करती हैं — कोई जिनकी रूह आप चाहती हैं आगे भी ज़िंदा रहे।" },
-      "motivation": { "en": "The ones we admire live on in the stories we keep telling about them.", "hi": "जिनकी हम क़दर करते हैं, वे उन्हीं कहानियों में ज़िंदा रहते हैं जो हम उनके बारे में सुनाते रहते हैं।" }
+      "title": { "en": "Tell your baby about an elder or ancestor you admire, someone whose spirit you hope lives on in them.", "hi": "अपने शिशु को किसी ऐसे बुज़ुर्ग या पुरखे के बारे में बताएँ जिनकी आप क़दर करती हैं — कोई जिनकी रूह आप चाहती हैं आगे भी ज़िंदा रहे।" },
+      "motivation": { "en": "The people we admire live on in the stories we keep telling about them.", "hi": "जिनकी हम क़दर करते हैं, वे उन्हीं कहानियों में ज़िंदा रहते हैं जो हम उनके बारे में सुनाते रहते हैं।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -233,9 +233,9 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "When Evenings Feel Heavy", "hi": "जब शामें भारी लगें" },
-      "content": { "en": "If meals sit heavily by evening, a lighter supper eaten a little earlier can help you rest more comfortably. Warm, simple foods — a bowl of khichdi, soup, or daliya — are kind to a tired stomach at the end of the day.", "hi": "अगर शाम तक खाना भारी लगने लगे, तो थोड़ा पहले खाया गया हल्का रात का खाना आपको ज़्यादा आराम से सोने में मदद करता है। गर्म, सादी चीज़ें — एक कटोरी खिचड़ी, सूप, या दलिया — दिन के आख़िर में थके हुए पेट पर बहुत नरम पड़ती हैं।" },
-      "remember": { "en": "A light, warm evening meal helps your body settle into rest.", "hi": "हल्का, गर्म रात का खाना शरीर को आराम में उतरने में मदद करता है।" },
+      "title": { "en": "When evenings feel heavy", "hi": "जब शामें भारी लगें" },
+      "content": { "en": "If meals sit heavily by evening, a lighter supper eaten a little earlier can help you rest more comfortably. Warm, easy food like khichdi, soup or daliya is gentle on a tired stomach at the end of the day.", "hi": "अगर शाम तक खाना भारी लगने लगे, तो थोड़ा पहले खाया गया हल्का रात का खाना आपको ज़्यादा आराम से सोने में मदद करता है। गर्म, सादी चीज़ें — एक कटोरी खिचड़ी, सूप, या दलिया — दिन के आख़िर में थके हुए पेट पर बहुत नरम पड़ती हैं।" },
+      "remember": { "en": "A light, early supper makes it easier to rest.", "hi": "हल्का, गर्म रात का खाना शरीर को आराम में उतरने में मदद करता है।" },
       "durationMinutes": 0
     }
   },
@@ -244,10 +244,10 @@
     "week": 16,
     "babyLearning": { "en": "Your baby's muscles are getting stronger with every stretch.", "hi": "हफ़्ता पूरा होते हुए, और गोल और मज़बूत होते हुए" },
     "grow": {
-      "title": { "en": "Be What You Hope To See", "hi": "जो देखना चाहती हैं, वही बन जाइए" },
-      "insight": { "en": "The simplest way to raise the child you dream of is to become, gently, the person you hope they grow into.", "hi": "जिस बच्चे का आप सपना देखती हैं, उसे पालने का सबसे सादा तरीक़ा है — नरमी से ख़ुद वही इंसान बन जाना जैसा आप उसे बनते देखना चाहती हैं।" },
-      "expanded": { "en": "All week we have seen the same quiet truth from different angles: children learn most from who we are. So the kindest goal is not to perfect your child, but to keep becoming the kind of person you hope they will be. If you wish them to be patient, practise patience; if you hope they will be kind, let kindness be your habit. You will never do this flawlessly, and you do not need to. You only need to keep facing in the right direction. Be what you hope to see — and your child, watching closely, will slowly grow towards it too.", "hi": "पूरे हफ़्ते हमने वही एक शांत सच अलग-अलग पहलुओं से देखा: बच्चे सबसे ज़्यादा इससे सीखते हैं कि हम कौन हैं। तो सबसे प्यारा लक्ष्य अपने बच्चे को सुधारना नहीं, बल्कि ख़ुद वैसा इंसान बनते रहना है जैसा आप उसे बनते देखना चाहती हैं। अगर चाहती हैं कि सब्र आए, तो सब्र का अभ्यास कीजिए; अगर चाहती हैं कि दया आए, तो दया को अपनी आदत बना लीजिए। यह आपसे कभी बिना ग़लती के नहीं होगा, और होना ज़रूरी भी नहीं। बस मुँह सही दिशा में किए रहना है। जो देखना चाहती हैं वही बन जाइए — और आपका बच्चा, ग़ौर से देखते हुए, धीरे-धीरे उसी तरफ़ बढ़ता चला जाएगा।" },
-      "deepDive": { "en": "Long-term studies find that parents' own consistent behaviour predicts children's values better than rewards or rules. Becoming the example is the most lasting form of guidance.", "hi": "लंबे समय तक चले शोध बताते हैं कि माँ-बाप का अपना टिका हुआ व्यवहार बच्चों के संस्कारों के बारे में इनाम या नियमों से बेहतर बताता है। ख़ुद मिसाल बन जाना ही रास्ता दिखाने का सबसे टिकाऊ तरीक़ा है।" },
+      "title": { "en": "Be the person you hope your child becomes", "hi": "जो देखना चाहती हैं, वही बन जाइए" },
+      "insight": { "en": "The surest way to raise the child you hope for is to become, gently, the person you hope they'll be.", "hi": "जिस बच्चे का आप सपना देखती हैं, उसे पालने का सबसे सादा तरीक़ा है — नरमी से ख़ुद वही इंसान बन जाना जैसा आप उसे बनते देखना चाहती हैं।" },
+      "expanded": { "en": "All week we've looked at the same idea from different sides: children learn most from who we are. So the kindest goal isn't to make your child perfect. It's to keep growing into the kind of person you hope they'll be. If you want them to be patient, practise patience. If you hope they'll be kind, make kindness a habit. You'll never do this without mistakes, and you don't need to. You only need to keep heading in the right direction. Your child will be watching, and they'll slowly grow the same way.", "hi": "पूरे हफ़्ते हमने वही एक शांत सच अलग-अलग पहलुओं से देखा: बच्चे सबसे ज़्यादा इससे सीखते हैं कि हम कौन हैं। तो सबसे प्यारा लक्ष्य अपने बच्चे को सुधारना नहीं, बल्कि ख़ुद वैसा इंसान बनते रहना है जैसा आप उसे बनते देखना चाहती हैं। अगर चाहती हैं कि सब्र आए, तो सब्र का अभ्यास कीजिए; अगर चाहती हैं कि दया आए, तो दया को अपनी आदत बना लीजिए। यह आपसे कभी बिना ग़लती के नहीं होगा, और होना ज़रूरी भी नहीं। बस मुँह सही दिशा में किए रहना है। जो देखना चाहती हैं वही बन जाइए — और आपका बच्चा, ग़ौर से देखते हुए, धीरे-धीरे उसी तरफ़ बढ़ता चला जाएगा।" },
+      "deepDive": { "en": "Research on parenting suggests that what parents do day after day has a strong influence on the values children take on, often more than rewards or rules.", "hi": "लंबे समय तक चले शोध बताते हैं कि माँ-बाप का अपना टिका हुआ व्यवहार बच्चों के संस्कारों के बारे में इनाम या नियमों से बेहतर बताता है। ख़ुद मिसाल बन जाना ही रास्ता दिखाने का सबसे टिकाऊ तरीक़ा है।" },
       "remember": { "en": "Become the person you hope your child becomes.", "hi": "वही इंसान बनिए जैसा आप अपने बच्चे को बनते देखना चाहती हैं।" }
     },
     "readToBaby": {
@@ -257,8 +257,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby how your family marks its milestones — the birthdays, festivals and moments you gather for.", "hi": "अपने शिशु को बताएँ कि आपका परिवार अपने ख़ास पड़ावों को कैसे मनाता है — वे जन्मदिन, त्योहार और लम्हे जिनके लिए आप सब जमा होते हैं।" },
-      "motivation": { "en": "The way a family celebrates becomes the warm memory a child carries for life.", "hi": "एक परिवार जिस तरह ख़ुशियाँ मनाता है, वही गर्म याद बन जाती है जो बच्चे ज़िंदगी भर साथ रखते हैं।" }
+      "title": { "en": "Tell your baby how your family celebrates its big days: the birthdays, festivals and moments you gather for.", "hi": "अपने शिशु को बताएँ कि आपका परिवार अपने ख़ास पड़ावों को कैसे मनाता है — वे जन्मदिन, त्योहार और लम्हे जिनके लिए आप सब जमा होते हैं।" },
+      "motivation": { "en": "The way a family celebrates becomes a warm memory a child keeps for life.", "hi": "एक परिवार जिस तरह ख़ुशियाँ मनाता है, वही गर्म याद बन जाती है जो बच्चे ज़िंदगी भर साथ रखते हैं।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -273,9 +273,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Three Settling Breaths", "hi": "तीन ठहरा देने वाली साँसें" },
-      "content": { "en": "Breathe in slowly through your nose, pause for a gentle moment, then breathe out a little longer than you breathed in. Just three of these, and notice how your whole body settles.", "hi": "नाक से धीरे-धीरे साँस अंदर लें, एक नरम पल के लिए रुकें, फिर साँस को अंदर लेने से थोड़ा लंबा करके बाहर छोड़ें। बस ऐसी तीन, और देखिए पूरा शरीर कैसे थम जाता है।" },
-      "remember": { "en": "A longer breath out is the body's own way back to calm.", "hi": "लंबी साँस छोड़ना शरीर का ख़ुद का शांति तक लौटने का रास्ता है।" },
+      "title": { "en": "Three settling breaths", "hi": "तीन ठहरा देने वाली साँसें" },
+      "content": { "en": "Breathe in slowly through your nose, pause for a moment, then breathe out a little longer than you breathed in. Do just three of these and notice how you settle.", "hi": "नाक से धीरे-धीरे साँस अंदर लें, एक नरम पल के लिए रुकें, फिर साँस को अंदर लेने से थोड़ा लंबा करके बाहर छोड़ें। बस ऐसी तीन, और देखिए पूरा शरीर कैसे थम जाता है।" },
+      "remember": { "en": "A longer breath out helps bring you back to calm.", "hi": "लंबी साँस छोड़ना शरीर का ख़ुद का शांति तक लौटने का रास्ता है।" },
       "durationMinutes": 2
     }
   }

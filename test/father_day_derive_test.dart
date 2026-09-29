@@ -204,12 +204,18 @@ void main() {
 
     test('the source data really does contain the problem — otherwise the '
         'test above proves nothing', () {
+      // ⚠️ BOTH HALVES SINCE 2026-09-29. The pregnancy warmth pass rewrote the
+      // English of grow/talk/nurture and, on purpose, took the body phrases
+      // out of the fields a father reads (English-only hits fell from 22 days
+      // to 10). The app's filter reads English OR Hindi (`_speaksToHer`), and
+      // the Hindi side is unchanged, so the material this premise needs is
+      // still there; counting one half would fail for the right reason.
       var flagged = 0;
       for (var w = _first; w <= _last; w++) {
         for (final d in weeks[w]!) {
-          if (_hits(d.grow.title) ||
-              _hits(d.grow.insight) ||
-              _hits(d.grow.expanded)) {
+          if (_hitsEither(d.grow.title) ||
+              _hitsEither(d.grow.insight) ||
+              _hitsEither(d.grow.expanded)) {
             flagged++;
           }
         }

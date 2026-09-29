@@ -4,11 +4,11 @@
     "week": 14,
     "babyLearning": { "en": "Your baby can make tiny faces, like a squint or a frown.", "hi": "गोल होते हुए, नन्हे-नन्हे भाव बनाना शुरू" },
     "grow": {
-      "title": { "en": "The Quiet Conversation", "hi": "वो ख़ामोश बातचीत" },
-      "insight": { "en": "Long before words, you and your baby are already in conversation — one made of warmth, rhythm and attention.", "hi": "शब्दों से बहुत पहले, आप और आपका शिशु पहले से ही बातचीत में हैं — एक बातचीत जो गर्माहट, लय और ध्यान से बनी है।" },
-      "expanded": { "en": "A conversation is not only talking; it is two people turning toward each other. When you pause to feel your bump, hum without thinking, or rest a hand low and breathe, you are speaking in the first language you both share. Your baby answers in their own way — a flutter, a settling, a quiet calm that moves through you. As your energy returns this trimester, let yourself enjoy this back-and-forth. It asks for nothing perfect, only your presence. The conversation has already begun, and it will go on for the rest of your lives.", "hi": "बातचीत सिर्फ़ बोलना नहीं है; यह दो लोगों का एक-दूसरे की तरफ़ मुड़ना है। जब आप रुककर अपने पेट को महसूस करती हैं, बिना सोचे गुनगुनाती हैं, या एक हाथ नीचे रखकर साँस लेती हैं, तब आप उसी पहली भाषा में बोल रही होती हैं जो आप दोनों की साझी है। आपका शिशु अपने तरीक़े से जवाब देता है — एक हल्की सी हरकत, एक ठहराव, एक शांत सुकून जो आपके भीतर से गुज़रता है। इस तिमाही में जैसे-जैसे आपकी ऊर्जा लौटती है, ख़ुद को इस आने-जाने का आनंद लेने दीजिए। इसे कुछ भी परफ़ेक्ट नहीं चाहिए, बस आपका होना चाहिए। बातचीत शुरू हो चुकी है, और यह आप दोनों की बाक़ी ज़िंदगी चलती रहेगी।" },
-      "deepDive": { "en": "Researchers describe early bonding as a 'duet' — a rhythm of giving and receiving attention. This responsive turn-taking, begun in pregnancy, lays the groundwork for a child's future communication and trust.", "hi": "शोधकर्ता शुरुआती जुड़ाव को एक 'जुगलबंदी' कहते हैं — ध्यान देने और लेने की एक लय। जवाब देने की यह बारी-बारी, जो गर्भावस्था में ही शुरू हो जाती है, बच्चे की आगे की बातचीत और भरोसे की नींव रखती है।" },
-      "remember": { "en": "You are already in conversation, long before the first word.", "hi": "आप पहले से बातचीत में हैं, पहले शब्द से बहुत पहले।" }
+      "title": { "en": "You and your baby are already in conversation", "hi": "वो ख़ामोश बातचीत" },
+      "insight": { "en": "Long before words, you and your baby are already talking in a way: through warmth, rhythm and attention.", "hi": "शब्दों से बहुत पहले, आप और आपका शिशु पहले से ही बातचीत में हैं — एक बातचीत जो गर्माहट, लय और ध्यान से बनी है।" },
+      "expanded": { "en": "A conversation can be more than talking. It can be two people turning towards each other. When you stop to rest a hand on the bump, hum without thinking or sit and breathe, you're using the first language you both share. Your baby answers in their own way: a flutter, a settling, a stillness. As this calmer stretch of pregnancy begins, let yourself enjoy this back and forth. Nothing about it has to be perfect. It only needs you to be there. The conversation has already started, and it will go on for the rest of your lives.", "hi": "बातचीत सिर्फ़ बोलना नहीं है; यह दो लोगों का एक-दूसरे की तरफ़ मुड़ना है। जब आप रुककर अपने पेट को महसूस करती हैं, बिना सोचे गुनगुनाती हैं, या एक हाथ नीचे रखकर साँस लेती हैं, तब आप उसी पहली भाषा में बोल रही होती हैं जो आप दोनों की साझी है। आपका शिशु अपने तरीक़े से जवाब देता है — एक हल्की सी हरकत, एक ठहराव, एक शांत सुकून जो आपके भीतर से गुज़रता है। इस तिमाही में जैसे-जैसे आपकी ऊर्जा लौटती है, ख़ुद को इस आने-जाने का आनंद लेने दीजिए। इसे कुछ भी परफ़ेक्ट नहीं चाहिए, बस आपका होना चाहिए। बातचीत शुरू हो चुकी है, और यह आप दोनों की बाक़ी ज़िंदगी चलती रहेगी।" },
+      "deepDive": { "en": "Researchers describe early bonding as a back and forth of giving and receiving attention. This kind of responsive turn-taking helps lay the ground for a child's later communication and trust.", "hi": "शोधकर्ता शुरुआती जुड़ाव को एक 'जुगलबंदी' कहते हैं — ध्यान देने और लेने की एक लय। जवाब देने की यह बारी-बारी, जो गर्भावस्था में ही शुरू हो जाती है, बच्चे की आगे की बातचीत और भरोसे की नींव रखती है।" },
+      "remember": { "en": "You're already talking with your baby, long before the first word.", "hi": "आप पहले से बातचीत में हैं, पहले शब्द से बहुत पहले।" }
     },
     "readToBaby": {
       "title": { "en": "The Goose That Laid Golden Eggs", "hi": "सोने के अंडे देने वाली हंसिनी" },
@@ -17,8 +17,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby how your bump is growing and showing now, and how it makes you feel.", "hi": "अपने शिशु को बताइए कि आपका पेट अब कैसे बढ़ रहा है और दिखने लगा है, और इससे आपको कैसा लगता है।" },
-      "motivation": { "en": "The little space between you is becoming visible — share the wonder of it.", "hi": "आप दोनों के बीच की वह नन्ही सी जगह अब दिखने लगी है — उसका अचरज बाँट दीजिए।" }
+      "title": { "en": "Tell your baby how the bump is growing and showing now, and how that feels.", "hi": "अपने शिशु को बताइए कि आपका पेट अब कैसे बढ़ रहा है और दिखने लगा है, और इससे आपको कैसा लगता है।" },
+      "motivation": { "en": "Your baby is starting to show. Share how that feels.", "hi": "आप दोनों के बीच की वह नन्ही सी जगह अब दिखने लगी है — उसका अचरज बाँट दीजिए।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -33,9 +33,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "I Can Trust What I Feel", "hi": "जो मैं महसूस करती हूँ, उस पर भरोसा कर सकती हूँ" },
-      "content": { "en": "I do not need every answer to know my baby. Quiet attention teaches me more than any book.", "hi": "अपने शिशु को जानने के लिए मुझे हर जवाब की ज़रूरत नहीं। शांत ध्यान मुझे किसी भी किताब से ज़्यादा सिखाता है।" },
-      "remember": { "en": "Your attention is its own kind of knowing.", "hi": "आपका ध्यान ख़ुद अपनी तरह की एक समझ है।" },
+      "title": { "en": "I can trust what I notice", "hi": "जो मैं महसूस करती हूँ, उस पर भरोसा कर सकती हूँ" },
+      "content": { "en": "I don't need every answer to know my baby. Paying gentle attention teaches me more than any book.", "hi": "अपने शिशु को जानने के लिए मुझे हर जवाब की ज़रूरत नहीं। शांत ध्यान मुझे किसी भी किताब से ज़्यादा सिखाता है।" },
+      "remember": { "en": "Paying attention is its own way of knowing your baby.", "hi": "आपका ध्यान ख़ुद अपनी तरह की एक समझ है।" },
       "durationMinutes": 0
     }
   },
@@ -44,11 +44,11 @@
     "week": 14,
     "babyLearning": { "en": "Soft, fine hair (lanugo) is starting to grow on your baby's skin.", "hi": "महीन नरम बाल त्वचा पर आना शुरू" },
     "grow": {
-      "title": { "en": "Babies Speak In Signals", "hi": "शिशु इशारों में बोलते हैं" },
-      "insight": { "en": "Your baby will not arrive speaking words, but speaking signals — and learning to read them is half of parenting.", "hi": "आपका शिशु शब्द बोलता हुआ नहीं आएगा, बल्कि इशारे बोलता हुआ — और उन्हें पढ़ना सीखना आधी परवरिश है।" },
-      "expanded": { "en": "A newborn cannot say 'I am tired' or 'I feel safe,' yet they say it all the time — in a turned head, a softening face, a small cry that means one thing in the morning and another at night. Long before words, babies are fluent in signals, and the loving work of a parent is simply to keep watching and guessing, kindly, until the meanings come clear. You can begin tuning your eyes now. The closer you feel to meeting them, the more you are already learning their language — one small cue at a time.", "hi": "एक नवजात 'मैं थक गया हूँ' या 'मैं सुरक्षित महसूस करता हूँ' नहीं कह सकता, फिर भी वह यह हर समय कहता रहता है — एक मुड़े हुए सिर में, एक नरम होते चेहरे में, एक छोटी सी रोने की आवाज़ में जिसका मतलब सुबह कुछ और होता है और रात में कुछ और। शब्दों से बहुत पहले, शिशु इशारों की भाषा में माहिर होते हैं, और माँ-बाप का प्यार भरा काम बस देखते रहना और नरमी से अंदाज़ा लगाते रहना है, जब तक मतलब साफ़ न हो जाएँ। आप अभी से अपनी नज़र को सुर में लाना शुरू कर सकती हैं। आप उससे मिलने के जितना क़रीब महसूस करती हैं, उतना ही आप उसकी भाषा पहले से सीख रही हैं — एक-एक नन्हे इशारे से।" },
-      "deepDive": { "en": "Infant researchers find that babies signal their needs through cues long before crying — gaze, movement, stillness. Parents who learn to read these early cues tend to feel more confident and connected.", "hi": "शिशुओं पर हुए शोध बताते हैं कि बच्चे रोने से बहुत पहले इशारों से अपनी ज़रूरतें बता देते हैं — नज़र, हरकत, ठहराव। जो माता-पिता इन शुरुआती इशारों को पढ़ना सीख लेते हैं, वे ख़ुद को ज़्यादा आत्मविश्वासी और जुड़ा हुआ महसूस करते हैं।" },
-      "remember": { "en": "Before words, there are signals — and you can learn to read them.", "hi": "शब्दों से पहले इशारे होते हैं — और आप उन्हें पढ़ना सीख सकती हैं।" }
+      "title": { "en": "Babies talk in signals", "hi": "शिशु इशारों में बोलते हैं" },
+      "insight": { "en": "Your baby won't arrive with words, but they'll arrive with signals. Learning to read them is a big part of parenting.", "hi": "आपका शिशु शब्द बोलता हुआ नहीं आएगा, बल्कि इशारे बोलता हुआ — और उन्हें पढ़ना सीखना आधी परवरिश है।" },
+      "expanded": { "en": "A newborn can't say 'I'm tired' or 'I feel safe', yet they tell you all the time: a turned head, a softer face, a small cry that means one thing in the morning and another at night. Babies are fluent in signals long before words. A parent's job is to keep watching and making kind guesses until the meanings become clear. You can start getting ready for that now. The closer you feel to meeting them, the more you're already learning their language, one small cue at a time.", "hi": "एक नवजात 'मैं थक गया हूँ' या 'मैं सुरक्षित महसूस करता हूँ' नहीं कह सकता, फिर भी वह यह हर समय कहता रहता है — एक मुड़े हुए सिर में, एक नरम होते चेहरे में, एक छोटी सी रोने की आवाज़ में जिसका मतलब सुबह कुछ और होता है और रात में कुछ और। शब्दों से बहुत पहले, शिशु इशारों की भाषा में माहिर होते हैं, और माँ-बाप का प्यार भरा काम बस देखते रहना और नरमी से अंदाज़ा लगाते रहना है, जब तक मतलब साफ़ न हो जाएँ। आप अभी से अपनी नज़र को सुर में लाना शुरू कर सकती हैं। आप उससे मिलने के जितना क़रीब महसूस करती हैं, उतना ही आप उसकी भाषा पहले से सीख रही हैं — एक-एक नन्हे इशारे से।" },
+      "deepDive": { "en": "Infant researchers find that babies show their needs through cues such as where they look, how they move and when they go still, often before they cry. Parents who learn to read these early cues tend to feel more confident and connected.", "hi": "शिशुओं पर हुए शोध बताते हैं कि बच्चे रोने से बहुत पहले इशारों से अपनी ज़रूरतें बता देते हैं — नज़र, हरकत, ठहराव। जो माता-पिता इन शुरुआती इशारों को पढ़ना सीख लेते हैं, वे ख़ुद को ज़्यादा आत्मविश्वासी और जुड़ा हुआ महसूस करते हैं।" },
+      "remember": { "en": "Before words there are signals, and you can learn to read them.", "hi": "शब्दों से पहले इशारे होते हैं — और आप उन्हें पढ़ना सीख सकती हैं।" }
     },
     "readToBaby": {
       "title": { "en": "The Crane And The Crab", "hi": "बगुला और केकड़ा" },
@@ -58,7 +58,7 @@
     },
     "talkToBaby": {
       "title": { "en": "Tell your baby how close you feel to meeting them now, and how you picture that first moment.", "hi": "अपने शिशु को बताइए कि अब आप उससे मिलने के कितने क़रीब महसूस करती हैं, और उस पहले पल को आप कैसा सोचती हैं।" },
-      "motivation": { "en": "Naming the longing to meet them makes the bond between you feel even closer.", "hi": "मिलने की उस तड़प को नाम देना आप दोनों के जुड़ाव को और भी क़रीब कर देता है।" }
+      "motivation": { "en": "Saying how much you want to meet them makes the bond between you feel even closer.", "hi": "मिलने की उस तड़प को नाम देना आप दोनों के जुड़ाव को और भी क़रीब कर देता है।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -73,9 +73,9 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "Hungrier Than Before?", "hi": "पहले से ज़्यादा भूख?" },
-      "content": { "en": "Feeling hungrier lately? That is your returning energy asking to be fed. Keep something warm and simple close by — a handful of nuts, fruit, a little khichdi — so you can answer that hunger gently instead of waiting until you feel faint.", "hi": "आजकल ज़्यादा भूख लग रही है? यह आपकी लौटती ऊर्जा है जो खाना माँग रही है। कुछ गरम और सादा पास रखिए — मुट्ठी भर मेवे, फल, थोड़ी सी खिचड़ी — ताकि आप उस भूख का जवाब नरमी से दे सकें, कमज़ोरी महसूस होने तक इंतज़ार करने के बजाय।" },
-      "remember": { "en": "Hunger this season is a sign your body is busy and growing.", "hi": "इस दौर की भूख इस बात की निशानी है कि आपका शरीर व्यस्त है और बढ़ रहा है।" },
+      "title": { "en": "Hungrier than before?", "hi": "पहले से ज़्यादा भूख?" },
+      "content": { "en": "Feeling hungrier lately? That's your appetite coming back as your energy returns. Keep something warm and easy close by, like a handful of nuts, some fruit or a little khichdi, so you can eat when hunger comes instead of waiting until you feel faint.", "hi": "आजकल ज़्यादा भूख लग रही है? यह आपकी लौटती ऊर्जा है जो खाना माँग रही है। कुछ गरम और सादा पास रखिए — मुट्ठी भर मेवे, फल, थोड़ी सी खिचड़ी — ताकि आप उस भूख का जवाब नरमी से दे सकें, कमज़ोरी महसूस होने तक इंतज़ार करने के बजाय।" },
+      "remember": { "en": "Feeling hungrier now is normal, and snacks kept close make it easy.", "hi": "इस दौर की भूख इस बात की निशानी है कि आपका शरीर व्यस्त है और बढ़ रहा है।" },
       "durationMinutes": 0
     }
   },
@@ -84,11 +84,11 @@
     "week": 14,
     "babyLearning": { "en": "Your baby's body is now growing faster than the head.", "hi": "हाथ और पैर की उँगलियाँ अब पूरी बन चुकीं" },
     "grow": {
-      "title": { "en": "Responding Builds Trust", "hi": "जवाब देना भरोसा बनाता है" },
-      "insight": { "en": "Every time a need is met with warmth, a baby learns the world is a place that answers. That is how trust is born.", "hi": "हर बार जब किसी ज़रूरत का जवाब गर्मजोशी से मिलता है, शिशु सीखता है कि दुनिया एक ऐसी जगह है जो जवाब देती है। भरोसा ऐसे ही जन्म लेता है।" },
-      "expanded": { "en": "A baby does not learn trust from being told they are safe; they learn it from being answered. A cry that brings comfort, a reach that is met, a fear that is soothed — repeated again and again — quietly teaches a child that they matter and that help comes. You cannot spoil a baby with responsiveness; you build them with it. As your bond deepens this season, know that the simple habit of turning toward your child, again and again, is laying the foundation of a lifetime's security.", "hi": "शिशु भरोसा यह सुनकर नहीं सीखता कि वह सुरक्षित है; वह इसे जवाब पाकर सीखता है। एक रोना जिस पर दिलासा मिलता है, एक बढ़ा हुआ हाथ जिसे थाम लिया जाता है, एक डर जिसे शांत किया जाता है — बार-बार दोहराया गया — चुपचाप बच्चे को सिखाता है कि वह मायने रखता है और मदद आती है। जवाब देकर आप शिशु को बिगाड़ नहीं सकतीं; आप उसी से उसे गढ़ती हैं। इस दौर में जैसे-जैसे आपका जुड़ाव गहरा होता है, जान लीजिए कि बार-बार अपने बच्चे की तरफ़ मुड़ने की यह सादी आदत पूरी ज़िंदगी की सुरक्षा की नींव रख रही है।" },
-      "deepDive": { "en": "Decades of attachment research show that consistent, warm responsiveness in the early years builds 'secure attachment' — a child's deep confidence that their needs will be met. It cannot be over-given.", "hi": "जुड़ाव पर हुए दशकों के शोध बताते हैं कि शुरुआती सालों में लगातार, गर्मजोशी भरा जवाब 'सुरक्षित जुड़ाव' बनाता है — बच्चे का यह गहरा भरोसा कि उसकी ज़रूरतें पूरी होंगी। यह कभी ज़्यादा नहीं हो सकता।" },
-      "remember": { "en": "A baby answered is a baby who learns to trust.", "hi": "जिस शिशु को जवाब मिलता है, वही भरोसा करना सीखता है।" }
+      "title": { "en": "Answering your baby builds trust", "hi": "जवाब देना भरोसा बनाता है" },
+      "insight": { "en": "Each time a need is met with warmth, a baby learns that the world answers. That's how trust begins.", "hi": "हर बार जब किसी ज़रूरत का जवाब गर्मजोशी से मिलता है, शिशु सीखता है कि दुनिया एक ऐसी जगह है जो जवाब देती है। भरोसा ऐसे ही जन्म लेता है।" },
+      "expanded": { "en": "A baby doesn't learn trust from being told they're safe. They learn it from being answered. A cry that brings comfort, a reach that's met, a fear that's soothed, again and again, teaches a child that they matter and that help comes. You can't spoil a young baby by responding to them. Responding is how you help them grow. As your bond deepens, know that the everyday habit of turning towards your child is building the security they'll carry through life.", "hi": "शिशु भरोसा यह सुनकर नहीं सीखता कि वह सुरक्षित है; वह इसे जवाब पाकर सीखता है। एक रोना जिस पर दिलासा मिलता है, एक बढ़ा हुआ हाथ जिसे थाम लिया जाता है, एक डर जिसे शांत किया जाता है — बार-बार दोहराया गया — चुपचाप बच्चे को सिखाता है कि वह मायने रखता है और मदद आती है। जवाब देकर आप शिशु को बिगाड़ नहीं सकतीं; आप उसी से उसे गढ़ती हैं। इस दौर में जैसे-जैसे आपका जुड़ाव गहरा होता है, जान लीजिए कि बार-बार अपने बच्चे की तरफ़ मुड़ने की यह सादी आदत पूरी ज़िंदगी की सुरक्षा की नींव रख रही है।" },
+      "deepDive": { "en": "Many years of attachment research show that warm, steady responses in the early years help build what's called secure attachment: a child's confidence that their needs will be met.", "hi": "जुड़ाव पर हुए दशकों के शोध बताते हैं कि शुरुआती सालों में लगातार, गर्मजोशी भरा जवाब 'सुरक्षित जुड़ाव' बनाता है — बच्चे का यह गहरा भरोसा कि उसकी ज़रूरतें पूरी होंगी। यह कभी ज़्यादा नहीं हो सकता।" },
+      "remember": { "en": "A baby who is answered learns to trust.", "hi": "जिस शिशु को जवाब मिलता है, वही भरोसा करना सीखता है।" }
     },
     "readToBaby": {
       "title": { "en": "Dhruva, The Steadfast Star", "hi": "ध्रुव, अटल तारा" },
@@ -97,8 +97,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby the nicknames you already call them by, and how each one came to you.", "hi": "अपने शिशु को वे प्यारे नाम बताइए जिनसे आप उसे अभी से बुलाती हैं, और हर नाम आप तक कैसे पहुँचा।" },
-      "motivation": { "en": "A tender name, spoken often, is one of the first ways your baby learns they are loved.", "hi": "एक कोमल नाम, बार-बार बोला गया, उन पहले तरीक़ों में से एक है जिनसे आपका शिशु सीखता है कि उससे प्यार किया जाता है।" }
+      "title": { "en": "Tell your baby the nicknames you already call them, and where each one came from.", "hi": "अपने शिशु को वे प्यारे नाम बताइए जिनसे आप उसे अभी से बुलाती हैं, और हर नाम आप तक कैसे पहुँचा।" },
+      "motivation": { "en": "A loving name, said often, is one of the first ways your baby learns they're loved.", "hi": "एक कोमल नाम, बार-बार बोला गया, उन पहले तरीक़ों में से एक है जिनसे आपका शिशु सीखता है कि उससे प्यार किया जाता है।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -113,9 +113,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Breathe Toward The Bump", "hi": "पेट की तरफ़ साँस लीजिए" },
-      "content": { "en": "Rest both hands low on your belly. Breathe in slowly and imagine the breath softening downward, toward your baby. As you breathe out, let your shoulders fall. Repeat gently for one minute.", "hi": "दोनों हाथ अपने पेट पर नीचे रखिए। धीरे से साँस लीजिए और सोचिए कि साँस नीचे, आपके शिशु की तरफ़ नरम होती जा रही है। साँस छोड़ते हुए अपने कंधे गिरने दीजिए। एक मिनट तक नरमी से दोहराइए।" },
-      "remember": { "en": "A slow breath toward your baby calms you both at once.", "hi": "अपने शिशु की तरफ़ ली गई एक धीमी साँस आप दोनों को एक साथ शांत कर देती है।" },
+      "title": { "en": "A breath towards your baby", "hi": "पेट की तरफ़ साँस लीजिए" },
+      "content": { "en": "Rest both hands low on your belly. Breathe in slowly and imagine the breath softening down towards your baby. As you breathe out, let your shoulders drop. Repeat gently for one minute.", "hi": "दोनों हाथ अपने पेट पर नीचे रखिए। धीरे से साँस लीजिए और सोचिए कि साँस नीचे, आपके शिशु की तरफ़ नरम होती जा रही है। साँस छोड़ते हुए अपने कंधे गिरने दीजिए। एक मिनट तक नरमी से दोहराइए।" },
+      "remember": { "en": "A slow breath towards your baby can calm you both.", "hi": "अपने शिशु की तरफ़ ली गई एक धीमी साँस आप दोनों को एक साथ शांत कर देती है।" },
       "durationMinutes": 1
     }
   },
@@ -124,11 +124,11 @@
     "week": 14,
     "babyLearning": { "en": "Your baby's neck is getting longer and stronger.", "hi": "छोटी-छोटी हरकतें कर पाना, धीरे से अंगड़ाई लेना" },
     "grow": {
-      "title": { "en": "Tune In Before You Fix", "hi": "ठीक करने से पहले सुर मिलाइए" },
-      "insight": { "en": "When your child struggles, the first gift is not a solution. It is being understood.", "hi": "जब आपका बच्चा जूझ रहा हो, तो पहला तोहफ़ा कोई हल नहीं होता। पहला तोहफ़ा है समझा जाना।" },
-      "expanded": { "en": "When someone we love is upset, our instinct is to fix it fast — to offer advice, to make it better at once. But often what a child needs first is simply to feel met: 'I see you, I hear you, this is hard.' Tuning in before fixing tells a child their feelings are real and welcome, not problems to be hurried away. The fixing can come after, and it lands far more gently once they feel understood. You can practise this tenderness now, in how you treat your own changing feelings, too.", "hi": "जब हमारा कोई अपना परेशान होता है, हमारा मन उसे फटाफट ठीक कर देने का होता है — सलाह देने का, तुरंत सब बेहतर बना देने का। पर अक्सर बच्चे को पहले बस यह महसूस करना होता है कि उसे समझा गया: 'मैं तुम्हें देख रही हूँ, मैं तुम्हें सुन रही हूँ, यह मुश्किल है।' ठीक करने से पहले सुर मिलाना बच्चे को बताता है कि उसकी भावनाएँ असली हैं और उनका स्वागत है, वे जल्दी से हटा देने वाली समस्याएँ नहीं हैं। ठीक करना बाद में आ सकता है, और समझे जाने के बाद वह कहीं ज़्यादा नरमी से उतरता है। इस कोमलता का अभ्यास आप अभी कर सकती हैं — इसमें भी, कि आप अपनी बदलती भावनाओं के साथ कैसे पेश आती हैं।" },
-      "deepDive": { "en": "Psychologists call this 'attunement' — sensing and reflecting another's emotional state before acting. Studies link attuned parenting to stronger emotional regulation in children later on.", "hi": "मनोवैज्ञानिक इसे 'attunement' कहते हैं — कुछ करने से पहले सामने वाले के मन को महसूस करना और उसे लौटाकर दिखाना। शोध बताते हैं कि इस तरह सुर मिलाकर की गई परवरिश से बच्चे आगे चलकर अपनी भावनाओं को बेहतर सँभाल पाते हैं।" },
-      "remember": { "en": "Understand first; the fixing can wait.", "hi": "पहले समझिए; ठीक करना इंतज़ार कर सकता है।" }
+      "title": { "en": "Understand first, then help", "hi": "ठीक करने से पहले सुर मिलाइए" },
+      "insight": { "en": "When your child is struggling, the first thing they need is to feel understood. Solutions can come after.", "hi": "जब आपका बच्चा जूझ रहा हो, तो पहला तोहफ़ा कोई हल नहीं होता। पहला तोहफ़ा है समझा जाना।" },
+      "expanded": { "en": "When someone we love is upset, we want to fix it fast: give advice, make it better straight away. But often a child first needs to feel met: 'I see you, I hear you, this is hard.' Understanding first tells a child their feelings are real and welcome, not problems to hurry away. The fixing can come after, and it goes much better once they feel understood. You can start practising this now, in how gently you treat your own changing feelings.", "hi": "जब हमारा कोई अपना परेशान होता है, हमारा मन उसे फटाफट ठीक कर देने का होता है — सलाह देने का, तुरंत सब बेहतर बना देने का। पर अक्सर बच्चे को पहले बस यह महसूस करना होता है कि उसे समझा गया: 'मैं तुम्हें देख रही हूँ, मैं तुम्हें सुन रही हूँ, यह मुश्किल है।' ठीक करने से पहले सुर मिलाना बच्चे को बताता है कि उसकी भावनाएँ असली हैं और उनका स्वागत है, वे जल्दी से हटा देने वाली समस्याएँ नहीं हैं। ठीक करना बाद में आ सकता है, और समझे जाने के बाद वह कहीं ज़्यादा नरमी से उतरता है। इस कोमलता का अभ्यास आप अभी कर सकती हैं — इसमें भी, कि आप अपनी बदलती भावनाओं के साथ कैसे पेश आती हैं।" },
+      "deepDive": { "en": "Psychologists call this attunement: sensing what someone else is feeling and reflecting it back before acting. Studies link attuned parenting with children managing their emotions better later on.", "hi": "मनोवैज्ञानिक इसे 'attunement' कहते हैं — कुछ करने से पहले सामने वाले के मन को महसूस करना और उसे लौटाकर दिखाना। शोध बताते हैं कि इस तरह सुर मिलाकर की गई परवरिश से बच्चे आगे चलकर अपनी भावनाओं को बेहतर सँभाल पाते हैं।" },
+      "remember": { "en": "Understand first. The fixing can wait.", "hi": "पहले समझिए; ठीक करना इंतज़ार कर सकता है।" }
     },
     "readToBaby": {
       "title": { "en": "The Elephant And The Dog", "hi": "हाथी और कुत्ता" },
@@ -138,7 +138,7 @@
     },
     "talkToBaby": {
       "title": { "en": "Tell your baby how your days have changed since they came into your life.", "hi": "अपने शिशु को बताइए कि जब से वह आपकी ज़िंदगी में आया है, आपके दिन कैसे बदल गए हैं।" },
-      "motivation": { "en": "Your child is already reshaping your ordinary days — let them hear how.", "hi": "आपका बच्चा अभी से आपके आम दिनों को नए सिरे से गढ़ रहा है — उसे सुनने दीजिए कि कैसे।" }
+      "motivation": { "en": "Your baby is already changing your ordinary days. Let them hear how.", "hi": "आपका बच्चा अभी से आपके आम दिनों को नए सिरे से गढ़ रहा है — उसे सुनने दीजिए कि कैसे।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -153,9 +153,9 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "Craving Something Particular?", "hi": "किसी ख़ास चीज़ का मन कर रहा है?" },
-      "content": { "en": "Are little cravings showing up now? They are nothing to feel guilty about. Enjoy what you fancy in gentle amounts, and try to pair it with something warm and wholesome alongside — a craving met with a little kindness is a craving well honoured.", "hi": "क्या अब छोटी-छोटी चीज़ों का मन करने लगा है? इसके लिए अपराध-बोध की कोई बात नहीं। जो मन भाए उसे थोड़ी-सी मात्रा में मज़े से खाइए, और साथ में कुछ गरम और पौष्टिक जोड़ने की कोशिश कीजिए — थोड़ी नरमी के साथ पूरा किया गया मन, अच्छे से निभाया गया मन है।" },
-      "remember": { "en": "A craving met kindly is part of caring for yourself.", "hi": "नरमी से पूरा किया गया मन ख़ुद का ख़याल रखने का ही हिस्सा है।" },
+      "title": { "en": "Craving something?", "hi": "किसी ख़ास चीज़ का मन कर रहा है?" },
+      "content": { "en": "Are small cravings showing up now? There's nothing to feel guilty about. Enjoy what you fancy in sensible amounts, and try to have something warm and wholesome alongside it.", "hi": "क्या अब छोटी-छोटी चीज़ों का मन करने लगा है? इसके लिए अपराध-बोध की कोई बात नहीं। जो मन भाए उसे थोड़ी-सी मात्रा में मज़े से खाइए, और साथ में कुछ गरम और पौष्टिक जोड़ने की कोशिश कीजिए — थोड़ी नरमी के साथ पूरा किया गया मन, अच्छे से निभाया गया मन है।" },
+      "remember": { "en": "Enjoying a craving is part of looking after yourself.", "hi": "नरमी से पूरा किया गया मन ख़ुद का ख़याल रखने का ही हिस्सा है।" },
       "durationMinutes": 0
     }
   },
@@ -164,11 +164,11 @@
     "week": 14,
     "babyLearning": { "en": "Your baby may start to suck a thumb around now.", "hi": "नन्हे-नन्हे चूसने और निगलने का अभ्यास" },
     "grow": {
-      "title": { "en": "Every Cue Is A Word", "hi": "हर इशारा एक शब्द है" },
-      "insight": { "en": "A yawn, a turned face, a settling sigh — each of these is your baby speaking. Every cue is a kind of word.", "hi": "एक जम्हाई, एक मुड़ा हुआ चेहरा, एक ठहरती हुई आह — इनमें से हर एक आपके शिशु का बोलना है। हर इशारा एक तरह का शब्द है।" },
-      "expanded": { "en": "Long before language, babies have a rich vocabulary of cues — and they are constantly speaking it. A small frown might mean 'too much,' a soft gaze might mean 'I am with you,' a wriggle might mean 'I need to move.' To a watchful parent, these are not random; they are words in a language you slowly come to know. You do not need to read every cue perfectly. Simply believing that each one means something — that your baby is always telling you who they are — changes how you listen for a lifetime.", "hi": "भाषा से बहुत पहले, शिशुओं के पास इशारों की एक भरी-पूरी शब्दावली होती है — और वे लगातार उसी में बोलते रहते हैं। एक छोटी सी त्योरी का मतलब हो सकता है 'बहुत ज़्यादा हो गया', एक नरम नज़र का मतलब 'मैं तुम्हारे साथ हूँ', एक मचलने का मतलब 'मुझे हिलना है'। एक चौकन्नी माँ के लिए ये बेमतलब नहीं होते; ये एक ऐसी भाषा के शब्द हैं जिसे आप धीरे-धीरे जानने लगती हैं। आपको हर इशारा एकदम सही पढ़ना ज़रूरी नहीं। बस यह मानना कि हर इशारे का कोई मतलब है — कि आपका शिशु आपको हमेशा बता रहा है कि वह कौन है — यह बदल देता है कि आप पूरी ज़िंदगी कैसे सुनती हैं।" },
-      "deepDive": { "en": "Infant-development experts describe a baby's cues as a 'language of behaviour' that begins before birth. Parents who treat cues as meaningful communication respond more sensitively and bond more deeply.", "hi": "शिशु-विकास के जानकार बच्चे के इशारों को 'व्यवहार की भाषा' कहते हैं, जो जन्म से पहले ही शुरू हो जाती है। जो माता-पिता इशारों को सचमुच की बात मानते हैं, वे ज़्यादा संवेदनशीलता से जवाब देते हैं और जुड़ाव भी गहरा बनता है।" },
-      "remember": { "en": "Believe every cue means something — and you will always be listening.", "hi": "मानिए कि हर इशारे का कोई मतलब है — और आप हमेशा सुनती रहेंगी।" }
+      "title": { "en": "Every cue from your baby means something", "hi": "हर इशारा एक शब्द है" },
+      "insight": { "en": "A yawn, a turned face, a settling sigh: each one is your baby telling you something.", "hi": "एक जम्हाई, एक मुड़ा हुआ चेहरा, एक ठहरती हुई आह — इनमें से हर एक आपके शिशु का बोलना है। हर इशारा एक तरह का शब्द है।" },
+      "expanded": { "en": "Long before language, babies have lots of cues, and they use them all the time. A small frown might mean 'too much'. A soft gaze might mean 'I'm with you'. A wriggle might mean 'I need to move'. To a parent who's watching, these aren't random. They're words in a language you'll slowly come to know. You don't need to read every cue perfectly. Believing that each one means something, that your baby is always telling you who they are, changes how you listen for good.", "hi": "भाषा से बहुत पहले, शिशुओं के पास इशारों की एक भरी-पूरी शब्दावली होती है — और वे लगातार उसी में बोलते रहते हैं। एक छोटी सी त्योरी का मतलब हो सकता है 'बहुत ज़्यादा हो गया', एक नरम नज़र का मतलब 'मैं तुम्हारे साथ हूँ', एक मचलने का मतलब 'मुझे हिलना है'। एक चौकन्नी माँ के लिए ये बेमतलब नहीं होते; ये एक ऐसी भाषा के शब्द हैं जिसे आप धीरे-धीरे जानने लगती हैं। आपको हर इशारा एकदम सही पढ़ना ज़रूरी नहीं। बस यह मानना कि हर इशारे का कोई मतलब है — कि आपका शिशु आपको हमेशा बता रहा है कि वह कौन है — यह बदल देता है कि आप पूरी ज़िंदगी कैसे सुनती हैं।" },
+      "deepDive": { "en": "Infant development experts describe a baby's cues as a kind of language made of behaviour. Parents who treat cues as real communication tend to respond more sensitively.", "hi": "शिशु-विकास के जानकार बच्चे के इशारों को 'व्यवहार की भाषा' कहते हैं, जो जन्म से पहले ही शुरू हो जाती है। जो माता-पिता इशारों को सचमुच की बात मानते हैं, वे ज़्यादा संवेदनशीलता से जवाब देते हैं और जुड़ाव भी गहरा बनता है।" },
+      "remember": { "en": "If you believe every cue means something, you'll keep listening.", "hi": "मानिए कि हर इशारे का कोई मतलब है — और आप हमेशा सुनती रहेंगी।" }
     },
     "readToBaby": {
       "title": { "en": "Tenali Rama And The Cat", "hi": "तेनाली रामा और बिल्ली" },
@@ -177,8 +177,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby how you imagine feeling their very first movements.", "hi": "अपने शिशु को बताइए कि उसकी सबसे पहली हरकतें महसूस करना आप कैसा सोचती हैं।" },
-      "motivation": { "en": "Sharing what you long to feel makes the waiting itself a part of your bond.", "hi": "जो महसूस करने को आप तरस रही हैं, उसे बाँटना इंतज़ार को ही आपके जुड़ाव का हिस्सा बना देता है।" }
+      "title": { "en": "Tell your baby how you imagine feeling their first movements.", "hi": "अपने शिशु को बताइए कि उसकी सबसे पहली हरकतें महसूस करना आप कैसा सोचती हैं।" },
+      "motivation": { "en": "Sharing what you're looking forward to feeling makes the waiting part of your bond.", "hi": "जो महसूस करने को आप तरस रही हैं, उसे बाँटना इंतज़ार को ही आपके जुड़ाव का हिस्सा बना देता है।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -193,8 +193,8 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "I Notice The Good Days Too", "hi": "मैं अच्छे दिनों पर भी ध्यान देती हूँ" },
-      "content": { "en": "As my energy returns, I will pause to notice the lighter, brighter moments and let myself simply enjoy them.", "hi": "जैसे-जैसे मेरी ऊर्जा लौटती है, मैं रुककर हल्के, उजले पलों को देखूँगी और ख़ुद को बस उनका मज़ा लेने दूँगी।" },
+      "title": { "en": "I notice the good days too", "hi": "मैं अच्छे दिनों पर भी ध्यान देती हूँ" },
+      "content": { "en": "As my energy returns, I'll stop to notice the lighter, brighter moments and let myself enjoy them.", "hi": "जैसे-जैसे मेरी ऊर्जा लौटती है, मैं रुककर हल्के, उजले पलों को देखूँगी और ख़ुद को बस उनका मज़ा लेने दूँगी।" },
       "remember": { "en": "Good moments deserve to be noticed as much as hard ones.", "hi": "अच्छे पलों का ध्यान में आना उतना ही ज़रूरी है जितना मुश्किल पलों का।" },
       "durationMinutes": 0
     }
@@ -204,11 +204,11 @@
     "week": 14,
     "babyLearning": { "en": "Your baby's liver is starting to make bile.", "hi": "लगातार बढ़ते हुए, एक नरम लय में बसते हुए" },
     "grow": {
-      "title": { "en": "The Dance Of Back And Forth", "hi": "आने-जाने का नृत्य" },
-      "insight": { "en": "Connection is not one person giving and the other receiving. It is a gentle dance of back and forth between you.", "hi": "जुड़ाव एक का देना और दूसरे का लेना नहीं है। यह आप दोनों के बीच आने-जाने का एक कोमल नृत्य है।" },
-      "expanded": { "en": "The deepest bond between a parent and child is not built on doing things for them, but on a rhythm shared with them — a smile that is returned, a sound that is echoed, a pause that lets the other respond. This 'serve and return' is how babies learn that they have an effect on the world and that someone is delighted by them. You can begin the dance now: feel a movement, answer it with a touch; notice a stillness, meet it with your own calm. Connection grows in these tiny exchanges, far more than in anything grand.", "hi": "माँ-बाप और बच्चे के बीच का सबसे गहरा जुड़ाव उसके लिए चीज़ें करने से नहीं बनता, बल्कि उसके साथ बाँटी गई एक लय से बनता है — एक मुस्कान जो लौटाई जाए, एक आवाज़ जो दोहराई जाए, एक ठहराव जो दूसरे को जवाब देने दे। यही 'serve and return' वह तरीक़ा है जिससे शिशु सीखते हैं कि दुनिया पर उनका असर है और कोई उनसे ख़ुश होता है। यह नृत्य आप अभी शुरू कर सकती हैं: एक हरकत महसूस कीजिए, उसका जवाब एक स्पर्श से दीजिए; एक ठहराव देखिए, उससे अपनी शांति के साथ मिलिए। जुड़ाव इन्हीं नन्हे आदान-प्रदान में बढ़ता है, किसी भी बड़ी बात से कहीं ज़्यादा।" },
-      "deepDive": { "en": "Harvard researchers call this rhythm 'serve and return' and consider it foundational to brain development. These small, responsive exchanges literally wire a child's growing brain for connection.", "hi": "हार्वर्ड के शोधकर्ता इस लय को 'serve and return' कहते हैं और इसे दिमाग़ के विकास की बुनियाद मानते हैं। ये छोटे, जवाब देने वाले आदान-प्रदान सचमुच बच्चे के बढ़ते दिमाग़ को जुड़ाव के लिए तैयार करते हैं।" },
-      "remember": { "en": "Connection lives in the small back-and-forth, not the grand gesture.", "hi": "जुड़ाव छोटे आने-जाने में बसता है, किसी बड़े दिखावे में नहीं।" }
+      "title": { "en": "Connection is a back and forth", "hi": "आने-जाने का नृत्य" },
+      "insight": { "en": "Connection grows through a gentle back and forth, with both of you giving and receiving.", "hi": "जुड़ाव एक का देना और दूसरे का लेना नहीं है। यह आप दोनों के बीच आने-जाने का एक कोमल नृत्य है।" },
+      "expanded": { "en": "The closest bond between a parent and child isn't built only on doing things for them. It's built on a rhythm you share: a smile that's returned, a sound that's copied, a pause that lets the other answer. This back and forth is how babies learn that they have an effect on the world and that someone enjoys them. You can start now. Feel a movement and answer it with a touch. Notice a still moment and meet it with your own calm. Connection grows in these tiny exchanges much more than in big gestures.", "hi": "माँ-बाप और बच्चे के बीच का सबसे गहरा जुड़ाव उसके लिए चीज़ें करने से नहीं बनता, बल्कि उसके साथ बाँटी गई एक लय से बनता है — एक मुस्कान जो लौटाई जाए, एक आवाज़ जो दोहराई जाए, एक ठहराव जो दूसरे को जवाब देने दे। यही 'serve and return' वह तरीक़ा है जिससे शिशु सीखते हैं कि दुनिया पर उनका असर है और कोई उनसे ख़ुश होता है। यह नृत्य आप अभी शुरू कर सकती हैं: एक हरकत महसूस कीजिए, उसका जवाब एक स्पर्श से दीजिए; एक ठहराव देखिए, उससे अपनी शांति के साथ मिलिए। जुड़ाव इन्हीं नन्हे आदान-प्रदान में बढ़ता है, किसी भी बड़ी बात से कहीं ज़्यादा।" },
+      "deepDive": { "en": "Researchers at Harvard's Center on the Developing Child call this rhythm 'serve and return' and describe it as one of the building blocks of a child's brain development.", "hi": "हार्वर्ड के शोधकर्ता इस लय को 'serve and return' कहते हैं और इसे दिमाग़ के विकास की बुनियाद मानते हैं। ये छोटे, जवाब देने वाले आदान-प्रदान सचमुच बच्चे के बढ़ते दिमाग़ को जुड़ाव के लिए तैयार करते हैं।" },
+      "remember": { "en": "Connection grows in small back and forth moments.", "hi": "जुड़ाव छोटे आने-जाने में बसता है, किसी बड़े दिखावे में नहीं।" }
     },
     "readToBaby": {
       "title": { "en": "The King's Seed", "hi": "राजा का बीज" },
@@ -217,8 +217,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby what you cannot wait to feel or share with them next.", "hi": "अपने शिशु को बताइए कि आगे उसके साथ क्या महसूस करने या बाँटने का आपको बेसब्री से इंतज़ार है।" },
-      "motivation": { "en": "Looking forward together is its own sweet way of being close right now.", "hi": "साथ मिलकर आगे की सोचना अभी क़रीब होने का अपना ही एक प्यारा तरीक़ा है।" }
+      "title": { "en": "Tell your baby what you're most looking forward to feeling or sharing with them next.", "hi": "अपने शिशु को बताइए कि आगे उसके साथ क्या महसूस करने या बाँटने का आपको बेसब्री से इंतज़ार है।" },
+      "motivation": { "en": "Looking forward to things together is a sweet way to feel close right now.", "hi": "साथ मिलकर आगे की सोचना अभी क़रीब होने का अपना ही एक प्यारा तरीक़ा है।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -233,9 +233,9 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "Forgetting To Drink Water?", "hi": "पानी पीना भूल रही हैं?" },
-      "content": { "en": "Busy days slipping by without enough water? As your energy and appetite return, your body needs more fluid than before. Keep a filled bottle or glass within reach and sip through the day — a little water often beats a lot all at once, and it eases tiredness more than you might expect.", "hi": "व्यस्त दिन बिना पूरे पानी के निकल रहे हैं? जैसे-जैसे आपकी ऊर्जा और भूख लौटती है, आपके शरीर को पहले से ज़्यादा पानी चाहिए। भरी हुई बोतल या गिलास हाथ के पास रखिए और दिन भर घूँट-घूँट पीती रहिए — थोड़ा-थोड़ा पानी बार-बार, एक ही बार में बहुत सारा पीने से बेहतर है, और यह थकान को उससे कहीं ज़्यादा कम करता है जितना आप सोचती हैं।" },
-      "remember": { "en": "Small sips through the day carry you further than one big gulp.", "hi": "दिन भर की छोटी-छोटी घूँटें आपको एक बड़े घूँट से कहीं आगे ले जाती हैं।" },
+      "title": { "en": "Forgetting to drink water?", "hi": "पानी पीना भूल रही हैं?" },
+      "content": { "en": "Are busy days slipping by without enough water? As your energy and appetite return, your body needs more fluid than before. Keep a filled bottle or glass within reach and sip through the day. A little water often is better than a lot at once, and it can ease tiredness too.", "hi": "व्यस्त दिन बिना पूरे पानी के निकल रहे हैं? जैसे-जैसे आपकी ऊर्जा और भूख लौटती है, आपके शरीर को पहले से ज़्यादा पानी चाहिए। भरी हुई बोतल या गिलास हाथ के पास रखिए और दिन भर घूँट-घूँट पीती रहिए — थोड़ा-थोड़ा पानी बार-बार, एक ही बार में बहुत सारा पीने से बेहतर है, और यह थकान को उससे कहीं ज़्यादा कम करता है जितना आप सोचती हैं।" },
+      "remember": { "en": "Small sips through the day work better than one big glass.", "hi": "दिन भर की छोटी-छोटी घूँटें आपको एक बड़े घूँट से कहीं आगे ले जाती हैं।" },
       "durationMinutes": 0
     }
   },
@@ -244,11 +244,11 @@
     "week": 14,
     "babyLearning": { "en": "Your baby can grip, curling the fingers into a fist.", "hi": "हफ़्ता पूरा करते हुए, हर दिन और ज़्यादा जवाब देते हुए" },
     "grow": {
-      "title": { "en": "To Be Heard Is To Be Loved", "hi": "सुना जाना ही प्यार पाना है" },
-      "insight": { "en": "For a child, being truly listened to is one of the deepest forms of love they will ever feel.", "hi": "बच्चे के लिए, सचमुच सुना जाना प्यार के उन सबसे गहरे रूपों में से एक है जो वह कभी महसूस करेगा।" },
-      "expanded": { "en": "We often think love is shown by what we do — what we provide, fix or arrange. But ask anyone what made them feel most loved as a child, and they rarely name a gift. They remember being heard: a parent who knelt down, listened fully, and made them feel that what they felt mattered. To listen is to say, without words, 'You are worth my whole attention.' You are already practising this each time you grow still and tune in to your baby. The habit of listening, begun now, becomes one of the greatest gifts you will ever give.", "hi": "हम अक्सर सोचते हैं कि प्यार इससे दिखता है कि हम क्या करते हैं — क्या देते हैं, क्या ठीक करते हैं, क्या इंतज़ाम करते हैं। पर किसी से भी पूछिए कि बचपन में उसे सबसे ज़्यादा प्यार किस बात से महसूस हुआ, वह शायद ही किसी तोहफ़े का नाम लेगा। उसे सुना जाना याद रहता है: कोई बड़ा जो नीचे झुका, पूरा सुना, और उसे महसूस कराया कि जो वह महसूस करता है वह मायने रखता है। सुनना, बिना शब्दों के यह कहना है, 'तुम मेरे पूरे ध्यान के लायक़ हो।' आप इसका अभ्यास पहले से कर रही हैं, हर बार जब आप ठहरकर अपने शिशु से सुर मिलाती हैं। सुनने की आदत, जो अभी शुरू हो रही है, उन सबसे बड़े तोहफ़ों में से एक बन जाती है जो आप कभी देंगी।" },
-      "deepDive": { "en": "Researchers find that feeling 'heard and understood' by a caregiver strongly predicts a child's emotional resilience and self-worth — often more than material support does.", "hi": "शोध बताते हैं कि अपने पालने वालों से 'सुना और समझा गया' महसूस करना बच्चे के भावनात्मक लचीलेपन और आत्म-सम्मान की सबसे मज़बूत निशानी है — अक्सर चीज़ों के सहारे से भी ज़्यादा।" },
-      "remember": { "en": "Listening is one of the loudest ways to say 'I love you.'", "hi": "सुनना 'मैं तुमसे प्यार करती हूँ' कहने के सबसे ऊँचे तरीक़ों में से एक है।" }
+      "title": { "en": "Being listened to helps a child feel loved", "hi": "सुना जाना ही प्यार पाना है" },
+      "insight": { "en": "For a child, being really listened to is one of the deepest kinds of love.", "hi": "बच्चे के लिए, सचमुच सुना जाना प्यार के उन सबसे गहरे रूपों में से एक है जो वह कभी महसूस करेगा।" },
+      "expanded": { "en": "We often think love is shown by what we do: what we provide, fix or arrange. But ask people what made them feel most loved as children, and they rarely name a gift. They remember being heard. A parent who knelt down, listened properly and made them feel their feelings mattered. Listening says, without words, 'You're worth my full attention.' You're already practising this each time you go still and tune in to your baby. The habit of listening, started now, will be one of the best things you give them.", "hi": "हम अक्सर सोचते हैं कि प्यार इससे दिखता है कि हम क्या करते हैं — क्या देते हैं, क्या ठीक करते हैं, क्या इंतज़ाम करते हैं। पर किसी से भी पूछिए कि बचपन में उसे सबसे ज़्यादा प्यार किस बात से महसूस हुआ, वह शायद ही किसी तोहफ़े का नाम लेगा। उसे सुना जाना याद रहता है: कोई बड़ा जो नीचे झुका, पूरा सुना, और उसे महसूस कराया कि जो वह महसूस करता है वह मायने रखता है। सुनना, बिना शब्दों के यह कहना है, 'तुम मेरे पूरे ध्यान के लायक़ हो।' आप इसका अभ्यास पहले से कर रही हैं, हर बार जब आप ठहरकर अपने शिशु से सुर मिलाती हैं। सुनने की आदत, जो अभी शुरू हो रही है, उन सबसे बड़े तोहफ़ों में से एक बन जाती है जो आप कभी देंगी।" },
+      "deepDive": { "en": "Research on children's wellbeing suggests that feeling listened to and understood by a parent is linked with stronger self-worth and resilience.", "hi": "शोध बताते हैं कि अपने पालने वालों से 'सुना और समझा गया' महसूस करना बच्चे के भावनात्मक लचीलेपन और आत्म-सम्मान की सबसे मज़बूत निशानी है — अक्सर चीज़ों के सहारे से भी ज़्यादा।" },
+      "remember": { "en": "Listening is one of the clearest ways to say 'I love you'.", "hi": "सुनना 'मैं तुमसे प्यार करती हूँ' कहने के सबसे ऊँचे तरीक़ों में से एक है।" }
     },
     "readToBaby": {
       "title": { "en": "The Squirrel And The Mountain", "hi": "गिलहरी और पहाड़" },
@@ -257,8 +257,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Welcome your baby into the second trimester — tell them you are feeling stronger and ready.", "hi": "अपने शिशु का दूसरी तिमाही में स्वागत कीजिए — उसे बताइए कि आप ख़ुद को ज़्यादा मज़बूत और तैयार महसूस कर रही हैं।" },
-      "motivation": { "en": "Crossing into this calmer season together is a small milestone worth marking aloud.", "hi": "इस शांत दौर में साथ क़दम रखना एक छोटा पड़ाव है, जिसे बोलकर मनाना बनता है।" }
+      "title": { "en": "Welcome your baby into the second trimester. Tell them how you're feeling as this calmer stretch begins.", "hi": "अपने शिशु का दूसरी तिमाही में स्वागत कीजिए — उसे बताइए कि आप ख़ुद को ज़्यादा मज़बूत और तैयार महसूस कर रही हैं।" },
+      "motivation": { "en": "Starting this calmer stretch together is a small milestone worth saying out loud.", "hi": "इस शांत दौर में साथ क़दम रखना एक छोटा पड़ाव है, जिसे बोलकर मनाना बनता है।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -273,9 +273,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "A Breath To Welcome The Calm", "hi": "शांति का स्वागत करने वाली एक साँस" },
-      "content": { "en": "Sit softly and breathe in for a count of four, feeling your chest open. Breathe out slowly for a count of six, welcoming this calmer season in. Repeat for one quiet minute and let the steadiness settle.", "hi": "आराम से बैठिए और चार तक गिनते हुए साँस लीजिए, अपने सीने को खुलता महसूस करते हुए। छह तक गिनते हुए धीरे-धीरे साँस छोड़िए, इस शांत दौर का स्वागत करते हुए। एक शांत मिनट तक दोहराइए और ठहराव को बसने दीजिए।" },
-      "remember": { "en": "A slow breath is a gentle welcome to whatever comes next.", "hi": "एक धीमी साँस आगे जो भी आए, उसका एक कोमल स्वागत है।" },
+      "title": { "en": "A breath to welcome a calmer stretch", "hi": "शांति का स्वागत करने वाली एक साँस" },
+      "content": { "en": "Sit comfortably and breathe in for a count of four, feeling your chest open. Breathe out slowly for a count of six. Repeat for one minute and let yourself feel steady.", "hi": "आराम से बैठिए और चार तक गिनते हुए साँस लीजिए, अपने सीने को खुलता महसूस करते हुए। छह तक गिनते हुए धीरे-धीरे साँस छोड़िए, इस शांत दौर का स्वागत करते हुए। एक शांत मिनट तक दोहराइए और ठहराव को बसने दीजिए।" },
+      "remember": { "en": "A slow breath is a gentle way to welcome what comes next.", "hi": "एक धीमी साँस आगे जो भी आए, उसका एक कोमल स्वागत है।" },
       "durationMinutes": 1
     }
   }

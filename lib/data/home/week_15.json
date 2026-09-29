@@ -4,11 +4,11 @@
     "week": 15,
     "babyLearning": { "en": "Your baby's bones are getting harder and stronger.", "hi": "अपने ही नन्हे उँगलियों के निशान बनते हुए" },
     "grow": {
-      "title": { "en": "Curiosity Lights The Way", "hi": "जिज्ञासा राह रोशन करती है" },
-      "insight": { "en": "Children are born explorers. Long before lessons begin, curiosity is already lighting the path your little one will learn by.", "hi": "बच्चे खोजी पैदा होते हैं। सबक़ शुरू होने से बहुत पहले, जिज्ञासा पहले से ही वह राह रोशन कर रही होती है जिस पर आपका नन्हा सीखेगा।" },
-      "expanded": { "en": "A baby does not need to be taught to wonder — wonder is their natural state. Every reaching hand, every tilted head, every long gaze at a moving leaf is learning in motion. As a parent, your gift is not to fill them with facts but to protect that spark: to slow down with their questions, to follow their pointing finger, to say 'let's find out' more than 'because I said so.' Curiosity that is welcomed grows into a lifelong love of learning. The world is endlessly interesting to a child who feels safe being amazed by it.", "hi": "एक शिशु को हैरान होना सिखाना नहीं पड़ता — हैरानी उसकी सहज हालत है। हर बढ़ता हाथ, हर झुका सिर, हर हिलते पत्ते पर टिकी लंबी नज़र — यह सीखना ही है, चलते-फिरते। एक माँ के तौर पर, आपका तोहफ़ा उसे तथ्यों से भर देना नहीं, बल्कि उस चिंगारी को बचाना है: उसके सवालों के साथ धीमे हो जाना, उसकी इशारा करती उँगली के पीछे चलना, 'मैंने कहा इसलिए' से ज़्यादा 'चलो पता करते हैं' कहना। जिस जिज्ञासा का स्वागत होता है, वह ज़िंदगी भर के सीखने के प्यार में बदल जाती है। दुनिया उस बच्चे के लिए बेहद दिलचस्प रहती है जो उससे हैरान होने में सुरक्षित महसूस करता है।" },
-      "deepDive": { "en": "Researchers find that infants as young as a few months old will gaze longer at surprising events — early evidence that curiosity, not instruction, drives the very first learning.", "hi": "शोध करने वाले पाते हैं कि कुछ ही महीनों के शिशु भी चौंकाने वाली चीज़ों को ज़्यादा देर तक देखते हैं — इस बात का शुरुआती सबूत कि सबसे पहला सीखना जिज्ञासा से चलता है, सिखाने से नहीं।" },
-      "remember": { "en": "A curious child is already a learning child.", "hi": "जो बच्चा जिज्ञासु है, वह पहले से ही सीखता हुआ बच्चा है।" }
+      "title": { "en": "Children learn by being curious", "hi": "जिज्ञासा राह रोशन करती है" },
+      "insight": { "en": "Children are born explorers. Long before any lessons, curiosity is how your child will learn.", "hi": "बच्चे खोजी पैदा होते हैं। सबक़ शुरू होने से बहुत पहले, जिज्ञासा पहले से ही वह राह रोशन कर रही होती है जिस पर आपका नन्हा सीखेगा।" },
+      "expanded": { "en": "A baby doesn't need to be taught to wonder. Wondering comes naturally. Every reaching hand, every tilted head, every long look at a moving leaf is learning as it happens. As a parent, you don't need to fill them with facts. Your part is to protect that spark: slow down for their questions, follow their pointing finger, and say 'let's find out' more often than 'because I said so'. Curiosity that's welcomed grows into a love of learning. The world stays interesting to a child who feels safe being amazed by it.", "hi": "एक शिशु को हैरान होना सिखाना नहीं पड़ता — हैरानी उसकी सहज हालत है। हर बढ़ता हाथ, हर झुका सिर, हर हिलते पत्ते पर टिकी लंबी नज़र — यह सीखना ही है, चलते-फिरते। एक माँ के तौर पर, आपका तोहफ़ा उसे तथ्यों से भर देना नहीं, बल्कि उस चिंगारी को बचाना है: उसके सवालों के साथ धीमे हो जाना, उसकी इशारा करती उँगली के पीछे चलना, 'मैंने कहा इसलिए' से ज़्यादा 'चलो पता करते हैं' कहना। जिस जिज्ञासा का स्वागत होता है, वह ज़िंदगी भर के सीखने के प्यार में बदल जाती है। दुनिया उस बच्चे के लिए बेहद दिलचस्प रहती है जो उससे हैरान होने में सुरक्षित महसूस करता है।" },
+      "deepDive": { "en": "Researchers find that babies only a few months old look longer at surprising events. It's an early sign that curiosity drives their very first learning.", "hi": "शोध करने वाले पाते हैं कि कुछ ही महीनों के शिशु भी चौंकाने वाली चीज़ों को ज़्यादा देर तक देखते हैं — इस बात का शुरुआती सबूत कि सबसे पहला सीखना जिज्ञासा से चलता है, सिखाने से नहीं।" },
+      "remember": { "en": "A curious child is already learning.", "hi": "जो बच्चा जिज्ञासु है, वह पहले से ही सीखता हुआ बच्चा है।" }
     },
     "readToBaby": {
       "title": { "en": "The Milkmaid And Her Pail", "hi": "दूधवाली और उसकी बाल्टी" },
@@ -17,8 +17,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about a talent or skill you have — something your hands or heart just know how to do.", "hi": "अपने शिशु को अपनी किसी प्रतिभा या हुनर के बारे में बताइए — कुछ जो आपके हाथ या दिल बस करना जानते हैं।" },
-      "motivation": { "en": "One day your child may carry a little of your gift in their own hands.", "hi": "एक दिन आपका बच्चा आपके हुनर का थोड़ा हिस्सा अपने हाथों में लिए चल सकता है।" }
+      "title": { "en": "Tell your baby about a skill you have, something you know how to do without thinking.", "hi": "अपने शिशु को अपनी किसी प्रतिभा या हुनर के बारे में बताइए — कुछ जो आपके हाथ या दिल बस करना जानते हैं।" },
+      "motivation": { "en": "One day your child may pick up a little of that skill from you.", "hi": "एक दिन आपका बच्चा आपके हुनर का थोड़ा हिस्सा अपने हाथों में लिए चल सकता है।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -33,9 +33,9 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "When Everything Tastes A Little Boring", "hi": "जब सब कुछ थोड़ा फीका लगे" },
-      "content": { "en": "If your usual meals feel dull lately, try a small change rather than a big one — a squeeze of lemon, a few fresh herbs, a warm dish instead of cold. Eating well does not have to mean eating the same.", "hi": "अगर आपका रोज़ का खाना आजकल फीका लग रहा है, तो बड़े बदलाव के बजाय एक छोटा बदलाव आज़माइए — थोड़ा नींबू, कुछ ताज़ा धनिया-पुदीना, ठंडे के बजाय एक गर्म पकवान। अच्छा खाने का मतलब हर बार एक ही चीज़ खाना नहीं है।" },
-      "remember": { "en": "A little variety can make nourishing feel joyful again.", "hi": "थोड़ा सा बदलाव पोषण को फिर से ख़ुशनुमा बना सकता है।" },
+      "title": { "en": "When food starts to taste boring", "hi": "जब सब कुछ थोड़ा फीका लगे" },
+      "content": { "en": "If your usual meals feel dull lately, try a small change instead of a big one: a squeeze of lemon, some fresh coriander or mint, a warm dish instead of a cold one. Eating well doesn't have to mean eating the same thing every day.", "hi": "अगर आपका रोज़ का खाना आजकल फीका लग रहा है, तो बड़े बदलाव के बजाय एक छोटा बदलाव आज़माइए — थोड़ा नींबू, कुछ ताज़ा धनिया-पुदीना, ठंडे के बजाय एक गर्म पकवान। अच्छा खाने का मतलब हर बार एक ही चीज़ खाना नहीं है।" },
+      "remember": { "en": "A little variety can make eating well enjoyable again.", "hi": "थोड़ा सा बदलाव पोषण को फिर से ख़ुशनुमा बना सकता है।" },
       "durationMinutes": 0
     }
   },
@@ -44,11 +44,11 @@
     "week": 15,
     "babyLearning": { "en": "Your baby's movements are getting smoother and better controlled.", "hi": "नन्ही स्वाद कलियाँ बनना शुरू" },
     "grow": {
-      "title": { "en": "Learning Looks Like Play", "hi": "सीखना खेल जैसा दिखता है" },
-      "insight": { "en": "To a child, play is not a break from learning. Play is learning, in its happiest and most natural form.", "hi": "एक बच्चे के लिए खेल सीखने से छुट्टी नहीं है। खेल ही सीखना है, अपने सबसे ख़ुश और सहज रूप में।" },
-      "expanded": { "en": "We sometimes imagine learning as something serious — sitting still, repeating, being corrected. But a young child learns most deeply through play: stacking, spilling, banging, pretending. When your little one one day pours water from cup to cup again and again, they are not wasting time — they are studying how the world works. Your job will not be to interrupt play with 'real' lessons, but to join it, to add a word here, a wonder there. The most powerful classroom your child will ever have is the floor, with you beside them.", "hi": "हम कभी-कभी सीखने को कुछ गंभीर सा मान लेते हैं — चुप बैठना, दोहराना, टोका जाना। पर एक छोटा बच्चा सबसे गहराई से खेल के ज़रिए सीखता है: चीज़ें जमाना, गिराना, ठोकना, नाटक करना। जब आपका नन्हा एक दिन बार-बार एक गिलास से दूसरे गिलास में पानी उड़ेलेगा, तो वह वक़्त बर्बाद नहीं कर रहा होगा — वह पढ़ रहा होगा कि दुनिया कैसे काम करती है। आपका काम खेल को 'असली' सबक़ से रोकना नहीं होगा, बल्कि उसमें शामिल हो जाना — यहाँ एक शब्द, वहाँ एक हैरानी जोड़ देना। सबसे ताक़तवर क्लासरूम जो आपके बच्चे के पास कभी होगा, वह है फ़र्श, और उसके बग़ल में बैठी आप।" },
-      "deepDive": { "en": "Child development experts agree that unstructured, playful exploration builds problem-solving, language and creativity more powerfully than early drilling. Play is the brain's preferred way to grow.", "hi": "बाल-विकास के जानकार मानते हैं कि बिना ढाँचे वाला, खेल भरा टटोलना समस्या सुलझाने, भाषा और रचनात्मकता को जल्दी रटवाने से कहीं ज़्यादा मज़बूती से बनाता है। खेल दिमाग़ का बढ़ने का पसंदीदा तरीक़ा है।" },
-      "remember": { "en": "When a child plays, a child learns.", "hi": "जब बच्चे खेलते हैं, तब बच्चे सीखते हैं।" }
+      "title": { "en": "Play is how young children learn", "hi": "सीखना खेल जैसा दिखता है" },
+      "insight": { "en": "To a young child, play isn't a break from learning. Play is how they learn, in the happiest way.", "hi": "एक बच्चे के लिए खेल सीखने से छुट्टी नहीं है। खेल ही सीखना है, अपने सबसे ख़ुश और सहज रूप में।" },
+      "expanded": { "en": "We sometimes picture learning as something serious: sitting still, repeating, being corrected. But young children learn most through play: stacking, spilling, banging, pretending. One day, when your child pours water from cup to cup again and again, they won't be wasting time. They'll be finding out how the world works. Your job won't be to interrupt play with 'real' lessons. It'll be to join in, adding a word here and a question there. Some of your child's best learning will happen on the floor, with you beside them.", "hi": "हम कभी-कभी सीखने को कुछ गंभीर सा मान लेते हैं — चुप बैठना, दोहराना, टोका जाना। पर एक छोटा बच्चा सबसे गहराई से खेल के ज़रिए सीखता है: चीज़ें जमाना, गिराना, ठोकना, नाटक करना। जब आपका नन्हा एक दिन बार-बार एक गिलास से दूसरे गिलास में पानी उड़ेलेगा, तो वह वक़्त बर्बाद नहीं कर रहा होगा — वह पढ़ रहा होगा कि दुनिया कैसे काम करती है। आपका काम खेल को 'असली' सबक़ से रोकना नहीं होगा, बल्कि उसमें शामिल हो जाना — यहाँ एक शब्द, वहाँ एक हैरानी जोड़ देना। सबसे ताक़तवर क्लासरूम जो आपके बच्चे के पास कभी होगा, वह है फ़र्श, और उसके बग़ल में बैठी आप।" },
+      "deepDive": { "en": "Paediatric and child development experts describe play as central to how young children build problem-solving, language and creativity. Playful exploration suits a young child's growing brain.", "hi": "बाल-विकास के जानकार मानते हैं कि बिना ढाँचे वाला, खेल भरा टटोलना समस्या सुलझाने, भाषा और रचनात्मकता को जल्दी रटवाने से कहीं ज़्यादा मज़बूती से बनाता है। खेल दिमाग़ का बढ़ने का पसंदीदा तरीक़ा है।" },
+      "remember": { "en": "When a child plays, they're learning.", "hi": "जब बच्चे खेलते हैं, तब बच्चे सीखते हैं।" }
     },
     "readToBaby": {
       "title": { "en": "The Jackal And The Drum", "hi": "गीदड़ और ढोल" },
@@ -57,8 +57,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby how you handle a bad day — the small things that help you find your feet again.", "hi": "अपने शिशु को बताइए कि आप एक बुरे दिन को कैसे संभालती हैं — वे छोटी चीज़ें जो आपको फिर से संभलने में मदद करती हैं।" },
-      "motivation": { "en": "How you meet hard days will quietly teach your child how to meet their own.", "hi": "आप मुश्किल दिनों का सामना कैसे करती हैं, यह चुपचाप आपके बच्चे को अपने दिन संभालना सिखाएगा।" }
+      "title": { "en": "Tell your baby what you do on a bad day, the small things that help you feel steady again.", "hi": "अपने शिशु को बताइए कि आप एक बुरे दिन को कैसे संभालती हैं — वे छोटी चीज़ें जो आपको फिर से संभलने में मदद करती हैं।" },
+      "motivation": { "en": "How you handle hard days will help your child learn how to handle theirs.", "hi": "आप मुश्किल दिनों का सामना कैसे करती हैं, यह चुपचाप आपके बच्चे को अपने दिन संभालना सिखाएगा।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -73,9 +73,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "Joy Is Allowed In My Day", "hi": "मेरे दिन में ख़ुशी की इजाज़त है" },
-      "content": { "en": "I do not have to wait until the baby arrives to feel light. A little laughter and play belong to me right now.", "hi": "हल्का महसूस करने के लिए मुझे शिशु के आने का इंतज़ार नहीं करना है। थोड़ी हँसी और थोड़ा खेल अभी भी मेरे हैं।" },
-      "remember": { "en": "Lightness is good for both of you.", "hi": "हल्कापन आप दोनों के लिए अच्छा है।" },
+      "title": { "en": "There's room for joy in my day", "hi": "मेरे दिन में ख़ुशी की इजाज़त है" },
+      "content": { "en": "I don't have to wait until the baby arrives to feel light. A little laughter and play belong to me right now.", "hi": "हल्का महसूस करने के लिए मुझे शिशु के आने का इंतज़ार नहीं करना है। थोड़ी हँसी और थोड़ा खेल अभी भी मेरे हैं।" },
+      "remember": { "en": "Feeling light and happy is good for both of you.", "hi": "हल्कापन आप दोनों के लिए अच्छा है।" },
       "durationMinutes": 0
     }
   },
@@ -84,11 +84,11 @@
     "week": 15,
     "babyLearning": { "en": "Your baby may sense light through closed eyelids.", "hi": "कान अपनी जगह बसते हुए, सुनने को तैयार" },
     "grow": {
-      "title": { "en": "Every Question Is A Gift", "hi": "हर सवाल एक तोहफ़ा है" },
-      "insight": { "en": "A child's endless questions are not interruptions to learning. Each 'why?' is the very engine of it.", "hi": "एक बच्चे के अनगिनत सवाल सीखने में रुकावट नहीं हैं। हर 'क्यों?' उसी सीखने का इंजन है।" },
-      "expanded": { "en": "There will come a season of relentless questions — why is the sky blue, why do dogs bark, why, why, why. It can feel exhausting, but each question is your child's mind reaching out to understand the world. The gift is not to have every answer, but to honour the asking: to say 'what a good question,' to wonder aloud together, to admit 'I don't know — shall we find out?' A child whose questions are welcomed learns that thinking is safe and valued. You are not raising someone who knows everything; you are raising someone unafraid to ask.", "hi": "एक ऐसा दौर आएगा लगातार सवालों का — आसमान नीला क्यों है, कुत्ते क्यों भौंकते हैं, क्यों, क्यों, क्यों। यह थका देने वाला लग सकता है, पर हर सवाल आपके बच्चे का मन है, जो दुनिया को समझने के लिए हाथ बढ़ा रहा है। तोहफ़ा हर जवाब रखना नहीं है, बल्कि पूछे जाने का सम्मान करना है: 'कितना अच्छा सवाल है' कहना, साथ मिलकर ज़ोर से हैरान होना, यह मान लेना कि 'मुझे नहीं पता — चलो पता करें?' जिस बच्चे के सवालों का स्वागत होता है, वह सीखता है कि सोचना सुरक्षित भी है और क़ीमती भी। आप किसी ऐसे को नहीं पाल रहीं जो सब कुछ जानता हो; आप किसी ऐसे को पाल रही हैं जो पूछने से नहीं डरता।" },
-      "deepDive": { "en": "Studies of early childhood show that children whose questions are answered warmly ask more and learn faster. Curiosity, when met with patience, compounds over a lifetime.", "hi": "शुरुआती बचपन पर हुए अध्ययन दिखाते हैं कि जिन बच्चों के सवालों का गर्मजोशी से जवाब मिलता है, वे ज़्यादा पूछते हैं और तेज़ी से सीखते हैं। जिज्ञासा को जब सब्र मिलता है, तो वह ज़िंदगी भर बढ़ती जाती है।" },
-      "remember": { "en": "Welcome the questions, and you grow a thinker.", "hi": "सवालों का स्वागत कीजिए, और आप एक सोचने वाला मन गढ़ती हैं।" }
+      "title": { "en": "Welcome your child's questions", "hi": "हर सवाल एक तोहफ़ा है" },
+      "insight": { "en": "A child's endless questions aren't interruptions to learning. Each 'why?' is how they learn.", "hi": "एक बच्चे के अनगिनत सवाल सीखने में रुकावट नहीं हैं। हर 'क्यों?' उसी सीखने का इंजन है।" },
+      "expanded": { "en": "There'll come a time of nonstop questions. Why is the sky blue? Why do dogs bark? Why, why, why? It can be tiring, but each question is your child's mind reaching out to understand the world. You don't need every answer. What matters is welcoming the question: saying 'that's a good question', wondering out loud together, admitting 'I don't know, shall we find out?' A child whose questions are welcomed learns that thinking is safe and valued. You won't be raising someone who knows everything. You'll be raising someone who isn't afraid to ask.", "hi": "एक ऐसा दौर आएगा लगातार सवालों का — आसमान नीला क्यों है, कुत्ते क्यों भौंकते हैं, क्यों, क्यों, क्यों। यह थका देने वाला लग सकता है, पर हर सवाल आपके बच्चे का मन है, जो दुनिया को समझने के लिए हाथ बढ़ा रहा है। तोहफ़ा हर जवाब रखना नहीं है, बल्कि पूछे जाने का सम्मान करना है: 'कितना अच्छा सवाल है' कहना, साथ मिलकर ज़ोर से हैरान होना, यह मान लेना कि 'मुझे नहीं पता — चलो पता करें?' जिस बच्चे के सवालों का स्वागत होता है, वह सीखता है कि सोचना सुरक्षित भी है और क़ीमती भी। आप किसी ऐसे को नहीं पाल रहीं जो सब कुछ जानता हो; आप किसी ऐसे को पाल रही हैं जो पूछने से नहीं डरता।" },
+      "deepDive": { "en": "Researchers who study children's questions find that young children ask a great many, and use the answers to build their understanding. Patient answers help keep that curiosity going.", "hi": "शुरुआती बचपन पर हुए अध्ययन दिखाते हैं कि जिन बच्चों के सवालों का गर्मजोशी से जवाब मिलता है, वे ज़्यादा पूछते हैं और तेज़ी से सीखते हैं। जिज्ञासा को जब सब्र मिलता है, तो वह ज़िंदगी भर बढ़ती जाती है।" },
+      "remember": { "en": "Welcome the questions and you help your child become a thinker.", "hi": "सवालों का स्वागत कीजिए, और आप एक सोचने वाला मन गढ़ती हैं।" }
     },
     "readToBaby": {
       "title": { "en": "Nachiketa's Questions", "hi": "नचिकेता के सवाल" },
@@ -97,8 +97,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby what you were like as a child — the games you loved and the trouble you got into.", "hi": "अपने शिशु को बताइए कि आप बचपन में कैसी थीं — वे खेल जो आपको पसंद थे और वे शरारतें जो आप करती थीं।" },
-      "motivation": { "en": "Your child will love knowing the little one you once were.", "hi": "आपके बच्चे को उस नन्ही को जानकर बहुत अच्छा लगेगा जो कभी आप थीं।" }
+      "title": { "en": "Tell your baby what you were like as a child: the games you loved and the trouble you got into.", "hi": "अपने शिशु को बताइए कि आप बचपन में कैसी थीं — वे खेल जो आपको पसंद थे और वे शरारतें जो आप करती थीं।" },
+      "motivation": { "en": "Your child will love hearing about the little one you once were.", "hi": "आपके बच्चे को उस नन्ही को जानकर बहुत अच्छा लगेगा जो कभी आप थीं।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -113,8 +113,8 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "Breathe Out The Day", "hi": "दिन को साँस के साथ बाहर छोड़िए" },
-      "content": { "en": "Sit quietly and take a slow breath in. As you breathe out, imagine releasing everything the day asked of you. Do this five times and let your body grow lighter with each one.", "hi": "शांति से बैठिए और एक धीमी साँस अंदर लीजिए। जब साँस छोड़ें, तो सोचिए कि आप वह सब छोड़ रही हैं जो दिन ने आपसे माँगा। ऐसा पाँच बार कीजिए और हर बार अपने शरीर को थोड़ा और हल्का होने दीजिए।" },
+      "title": { "en": "Breathe out the day", "hi": "दिन को साँस के साथ बाहर छोड़िए" },
+      "content": { "en": "Sit comfortably and take a slow breath in. As you breathe out, imagine letting go of everything the day asked of you. Do this five times and let yourself feel a little lighter each time.", "hi": "शांति से बैठिए और एक धीमी साँस अंदर लीजिए। जब साँस छोड़ें, तो सोचिए कि आप वह सब छोड़ रही हैं जो दिन ने आपसे माँगा। ऐसा पाँच बार कीजिए और हर बार अपने शरीर को थोड़ा और हल्का होने दीजिए।" },
       "remember": { "en": "Each breath out is a small letting go.", "hi": "हर बाहर जाती साँस एक छोटा सा छोड़ देना है।" },
       "durationMinutes": 2
     }
@@ -124,11 +124,11 @@
     "week": 15,
     "babyLearning": { "en": "Your baby is practising breathing movements with amniotic fluid.", "hi": "हिलते और अंगड़ाई लेते हुए, हिलना-डुलना सीखते हुए" },
     "grow": {
-      "title": { "en": "They Learn By Watching You", "hi": "वे आपको देखकर सीखते हैं" },
-      "insight": { "en": "Long before children listen to what we say, they learn from what we do. You are your child's first and most-watched teacher.", "hi": "बच्चे हमारी कही बात सुनने से बहुत पहले, हमारे किए हुए से सीखते हैं। आप अपने बच्चे की पहली और सबसे ज़्यादा देखी जाने वाली गुरु हैं।" },
-      "expanded": { "en": "Children are quiet, constant observers. They notice how you speak to a tired waiter, how you handle spilled tea, whether your words match your actions. We cannot teach patience while shouting it, or kindness while withholding it. This sounds like pressure, but it is really freedom: you do not need clever lessons. You only need to keep becoming, gently, the person you hope your child will be. Your everyday self — flawed, trying, repairing — is the most honest classroom they will ever have. Children learn integrity by watching it lived.", "hi": "बच्चे चुपचाप, लगातार देखने वाले होते हैं। वे ध्यान देते हैं कि आप एक थके हुए वेटर से कैसे बात करती हैं, छलकी चाय को कैसे संभालती हैं, आपके शब्द आपके काम से मेल खाते हैं या नहीं। हम चिल्लाकर सब्र नहीं सिखा सकते, न ही दया को रोककर दया। यह दबाव जैसा लगता है, पर असल में यह आज़ादी है: आपको चालाक सबक़ नहीं चाहिए। आपको बस नरमी से वही इंसान बनते रहना है जो आप चाहती हैं कि आपका बच्चा बने। आपका रोज़ का ख़ुद — कमियों भरा, कोशिश करता, सुधारता — सबसे ईमानदार क्लासरूम है जो उसे कभी मिलेगा। बच्चे ईमानदारी उसे जीते हुए देखकर सीखते हैं।" },
-      "deepDive": { "en": "Psychologists have long shown that children imitate the behaviour they observe far more than the instructions they are given. Modelling, not lecturing, is how values truly pass on.", "hi": "मनोवैज्ञानिक बहुत पहले से दिखाते आए हैं कि बच्चे जो व्यवहार देखते हैं, उसकी नक़ल दिए गए निर्देशों से कहीं ज़्यादा करते हैं। ख़ुद करके दिखाना, न कि भाषण देना, वही तरीक़ा है जिससे संस्कार सच में आगे जाते हैं।" },
-      "remember": { "en": "Your child watches who you are, not just what you say.", "hi": "आपका बच्चा देखता है कि आप कौन हैं, सिर्फ़ यह नहीं कि आप क्या कहती हैं।" }
+      "title": { "en": "Children learn by watching you", "hi": "वे आपको देखकर सीखते हैं" },
+      "insight": { "en": "Long before children listen to what we say, they learn from what we do. You'll be your child's first and most-watched teacher.", "hi": "बच्चे हमारी कही बात सुनने से बहुत पहले, हमारे किए हुए से सीखते हैं। आप अपने बच्चे की पहली और सबसे ज़्यादा देखी जाने वाली गुरु हैं।" },
+      "expanded": { "en": "Children are always watching. They notice how you speak to a tired shopkeeper, how you handle spilled chai, whether your words match what you do. You can't teach patience while shouting, or kindness while holding it back. That can sound like pressure, but it's also a relief: you don't need clever lessons. You only need to keep growing, gently, into the person you hope your child will be. Your everyday self, with its mistakes and its making up, is the most honest example they'll have. Children learn honesty by watching it lived.", "hi": "बच्चे चुपचाप, लगातार देखने वाले होते हैं। वे ध्यान देते हैं कि आप एक थके हुए वेटर से कैसे बात करती हैं, छलकी चाय को कैसे संभालती हैं, आपके शब्द आपके काम से मेल खाते हैं या नहीं। हम चिल्लाकर सब्र नहीं सिखा सकते, न ही दया को रोककर दया। यह दबाव जैसा लगता है, पर असल में यह आज़ादी है: आपको चालाक सबक़ नहीं चाहिए। आपको बस नरमी से वही इंसान बनते रहना है जो आप चाहती हैं कि आपका बच्चा बने। आपका रोज़ का ख़ुद — कमियों भरा, कोशिश करता, सुधारता — सबसे ईमानदार क्लासरूम है जो उसे कभी मिलेगा। बच्चे ईमानदारी उसे जीते हुए देखकर सीखते हैं।" },
+      "deepDive": { "en": "Psychologists have long found that children copy what they see adults do, often more than what they're told to do. Showing, more than telling, is how values get passed on.", "hi": "मनोवैज्ञानिक बहुत पहले से दिखाते आए हैं कि बच्चे जो व्यवहार देखते हैं, उसकी नक़ल दिए गए निर्देशों से कहीं ज़्यादा करते हैं। ख़ुद करके दिखाना, न कि भाषण देना, वही तरीक़ा है जिससे संस्कार सच में आगे जाते हैं।" },
+      "remember": { "en": "Your child learns from what you do as much as from what you say.", "hi": "आपका बच्चा देखता है कि आप कौन हैं, सिर्फ़ यह नहीं कि आप क्या कहती हैं।" }
     },
     "readToBaby": {
       "title": { "en": "The Monkey And The Handful Of Peas", "hi": "बंदर और मुट्ठी भर मटर" },
@@ -137,8 +137,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about a lifelong dream of yours — something you've quietly hoped for over the years.", "hi": "अपने शिशु को अपने किसी ज़िंदगी भर के सपने के बारे में बताइए — कुछ जिसकी आप सालों से चुपचाप उम्मीद रखती आई हैं।" },
-      "motivation": { "en": "Sharing your dreams teaches your child that it is brave and beautiful to have them.", "hi": "अपने सपने बाँटना आपके बच्चे को सिखाता है कि सपने रखना हिम्मत की बात है, और सुंदर भी।" }
+      "title": { "en": "Tell your baby about a dream you've had for years, something you've always hoped for.", "hi": "अपने शिशु को अपने किसी ज़िंदगी भर के सपने के बारे में बताइए — कुछ जिसकी आप सालों से चुपचाप उम्मीद रखती आई हैं।" },
+      "motivation": { "en": "Sharing your dreams teaches your child that it's good and brave to have them.", "hi": "अपने सपने बाँटना आपके बच्चे को सिखाता है कि सपने रखना हिम्मत की बात है, और सुंदर भी।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -153,9 +153,9 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "When You Forget To Eat Enough", "hi": "जब आप ठीक से खाना भूल जाएँ" },
-      "content": { "en": "Busy days can slip by with too little eaten. Keep something simple within reach — a handful of nuts, a fruit, a few dates — so that nourishing yourself never depends on having time to cook.", "hi": "व्यस्त दिन बहुत कम खाए हुए यूँ ही निकल सकते हैं। कुछ आसान सी चीज़ पास रखिए — मुट्ठी भर मेवे, एक फल, कुछ खजूर — ताकि ख़ुद को पोषण देना कभी खाना बनाने के वक़्त पर निर्भर न रहे।" },
-      "remember": { "en": "Small, easy bites count just as much.", "hi": "छोटे, आसान निवाले भी उतने ही मायने रखते हैं।" },
+      "title": { "en": "When you forget to eat enough", "hi": "जब आप ठीक से खाना भूल जाएँ" },
+      "content": { "en": "Busy days can slip by with too little eaten. Keep something easy within reach, like a handful of nuts, a piece of fruit or a few dates, so eating well never depends on having time to cook.", "hi": "व्यस्त दिन बहुत कम खाए हुए यूँ ही निकल सकते हैं। कुछ आसान सी चीज़ पास रखिए — मुट्ठी भर मेवे, एक फल, कुछ खजूर — ताकि ख़ुद को पोषण देना कभी खाना बनाने के वक़्त पर निर्भर न रहे।" },
+      "remember": { "en": "Small, easy bites count too.", "hi": "छोटे, आसान निवाले भी उतने ही मायने रखते हैं।" },
       "durationMinutes": 0
     }
   },
@@ -164,11 +164,11 @@
     "week": 15,
     "babyLearning": { "en": "Your baby's legs are growing longer than the arms.", "hi": "गर्भ के पानी की नन्ही साँसों का अभ्यास करते हुए" },
     "grow": {
-      "title": { "en": "Boredom Sparks Imagination", "hi": "बोरियत कल्पना जगाती है" },
-      "insight": { "en": "An empty, unhurried moment is not wasted on a child. Boredom is often where imagination is born.", "hi": "एक ख़ाली, बिना जल्दी वाला पल बच्चे पर बर्बाद नहीं होता। बोरियत अक्सर वही जगह है जहाँ कल्पना जन्म लेती है।" },
-      "expanded": { "en": "We feel a pull to fill every quiet moment for our children — a screen, a toy, an activity. But a child who is sometimes left gently bored learns something precious: how to make their own fun, invent their own worlds, sit with their own mind. The cardboard box becomes a ship; the stick becomes a sword. These leaps happen in the unscheduled spaces. You will not need to entertain your child every minute. Sometimes the kindest, most creative gift you can offer is simply a little unhurried time, and the trust that they will fill it.", "hi": "हमें अपने बच्चों के लिए हर शांत पल भर देने की खिंचाव सी महसूस होती है — एक स्क्रीन, एक खिलौना, कोई गतिविधि। पर जिस बच्चे को कभी-कभी नरमी से बोर होने दिया जाता है, वह कुछ क़ीमती सीखता है: अपना मज़ा ख़ुद बनाना, अपनी दुनिया ख़ुद गढ़ना, अपने ही मन के साथ बैठना। गत्ते का डिब्बा एक जहाज़ बन जाता है; एक छड़ी एक तलवार। ये छलाँगें उसी बिना तय किए हुए वक़्त में लगती हैं। आपको हर मिनट अपने बच्चे का मनोरंजन नहीं करना होगा। कभी-कभी सबसे नरम, सबसे रचनात्मक तोहफ़ा जो आप दे सकती हैं, वह बस थोड़ा बिना जल्दी वाला वक़्त है, और यह भरोसा कि वह उसे भर लेगा।" },
-      "deepDive": { "en": "Researchers find that unstructured 'boredom' often precedes bursts of creativity in children, giving the mind space to wander, invent and play. Empty time is fertile time.", "hi": "शोध करने वाले पाते हैं कि बिना ढाँचे वाली 'बोरियत' अक्सर बच्चों में रचनात्मकता के फूटने से ठीक पहले आती है — वह मन को भटकने, गढ़ने और खेलने की जगह देती है। ख़ाली वक़्त उपजाऊ वक़्त है।" },
-      "remember": { "en": "A little boredom leaves room for big imagination.", "hi": "थोड़ी बोरियत बड़ी कल्पना के लिए जगह छोड़ देती है।" }
+      "title": { "en": "A little boredom helps a child imagine", "hi": "बोरियत कल्पना जगाती है" },
+      "insight": { "en": "An empty, unhurried moment isn't wasted on a child. Boredom is often where imagination starts.", "hi": "एक ख़ाली, बिना जल्दी वाला पल बच्चे पर बर्बाद नहीं होता। बोरियत अक्सर वही जगह है जहाँ कल्पना जन्म लेती है।" },
+      "expanded": { "en": "It's tempting to fill every free moment for a child with a screen, a toy or an activity. But a child who's sometimes left a little bored learns something valuable: how to make their own fun, invent their own worlds and be comfortable with their own thoughts. A cardboard box becomes a ship. A stick becomes a sword. These leaps happen in unplanned time. You won't need to entertain your child every minute. Sometimes the most helpful thing you can give is a little unhurried time, and the trust that they'll fill it.", "hi": "हमें अपने बच्चों के लिए हर शांत पल भर देने की खिंचाव सी महसूस होती है — एक स्क्रीन, एक खिलौना, कोई गतिविधि। पर जिस बच्चे को कभी-कभी नरमी से बोर होने दिया जाता है, वह कुछ क़ीमती सीखता है: अपना मज़ा ख़ुद बनाना, अपनी दुनिया ख़ुद गढ़ना, अपने ही मन के साथ बैठना। गत्ते का डिब्बा एक जहाज़ बन जाता है; एक छड़ी एक तलवार। ये छलाँगें उसी बिना तय किए हुए वक़्त में लगती हैं। आपको हर मिनट अपने बच्चे का मनोरंजन नहीं करना होगा। कभी-कभी सबसे नरम, सबसे रचनात्मक तोहफ़ा जो आप दे सकती हैं, वह बस थोड़ा बिना जल्दी वाला वक़्त है, और यह भरोसा कि वह उसे भर लेगा।" },
+      "deepDive": { "en": "Some researchers suggest that unstructured, unhurried time gives children's minds room to wander and invent, which can feed creativity.", "hi": "शोध करने वाले पाते हैं कि बिना ढाँचे वाली 'बोरियत' अक्सर बच्चों में रचनात्मकता के फूटने से ठीक पहले आती है — वह मन को भटकने, गढ़ने और खेलने की जगह देती है। ख़ाली वक़्त उपजाऊ वक़्त है।" },
+      "remember": { "en": "A little boredom leaves room for imagination.", "hi": "थोड़ी बोरियत बड़ी कल्पना के लिए जगह छोड़ देती है।" }
     },
     "readToBaby": {
       "title": { "en": "Birbal And The Centre Of The Earth", "hi": "बीरबल और धरती का केंद्र" },
@@ -177,8 +177,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about your favourite way to spend a weekend — the slow, simple pleasures you love.", "hi": "अपने शिशु को बताइए कि छुट्टी का दिन बिताने का आपका पसंदीदा तरीक़ा क्या है — वे धीमे, सादे सुख जो आपको प्यारे हैं।" },
-      "motivation": { "en": "Your child will one day share these quiet pleasures right alongside you.", "hi": "आपका बच्चा एक दिन ये शांत सुख ठीक आपके साथ बैठकर बाँटेगा।" }
+      "title": { "en": "Tell your baby about your favourite way to spend a weekend, the slow, easy things you love.", "hi": "अपने शिशु को बताइए कि छुट्टी का दिन बिताने का आपका पसंदीदा तरीक़ा क्या है — वे धीमे, सादे सुख जो आपको प्यारे हैं।" },
+      "motivation": { "en": "One day your child may enjoy these same things right beside you.", "hi": "आपका बच्चा एक दिन ये शांत सुख ठीक आपके साथ बैठकर बाँटेगा।" }
     },
     "garbhSanskar": {
       "type": "affirmation",
@@ -193,9 +193,9 @@
     },
     "nurture": {
       "type": "affirm",
-      "title": { "en": "I Don't Have To Fill Every Hour", "hi": "मुझे हर घंटा भरना नहीं है" },
-      "content": { "en": "An open, unplanned afternoon is not a failure. Rest and stillness are doing quiet, important work in me.", "hi": "एक खुली, बिना योजना वाली दोपहर कोई नाकामी नहीं है। आराम और ठहराव मुझमें चुपचाप, ज़रूरी काम कर रहे हैं।" },
-      "remember": { "en": "Stillness is allowed to be enough.", "hi": "ठहराव को काफ़ी होने की पूरी इजाज़त है।" },
+      "title": { "en": "I don't have to fill every hour", "hi": "मुझे हर घंटा भरना नहीं है" },
+      "content": { "en": "An open, unplanned afternoon isn't a failure. Rest and stillness are doing important work for me and my baby.", "hi": "एक खुली, बिना योजना वाली दोपहर कोई नाकामी नहीं है। आराम और ठहराव मुझमें चुपचाप, ज़रूरी काम कर रहे हैं।" },
+      "remember": { "en": "Rest counts as doing something.", "hi": "ठहराव को काफ़ी होने की पूरी इजाज़त है।" },
       "durationMinutes": 0
     }
   },
@@ -204,11 +204,11 @@
     "week": 15,
     "babyLearning": { "en": "The pattern of your baby's hair on the scalp is forming.", "hi": "नरम बाल उगना शुरू हो रहे हैं" },
     "grow": {
-      "title": { "en": "The World Is Their Classroom", "hi": "दुनिया ही उनका क्लासरूम है" },
-      "insight": { "en": "Your child will not learn most from books and screens, but from the ordinary world — markets, kitchens, gardens and walks.", "hi": "आपका बच्चा सबसे ज़्यादा किताबों और स्क्रीन से नहीं सीखेगा, बल्कि आम दुनिया से — बाज़ार, रसोई, बग़ीचे और सैर से।" },
-      "expanded": { "en": "It is easy to think learning needs special toys and clever apps. But a child's richest classroom is the everyday world you already move through. Counting steps on the stairs, naming vegetables at the market, feeling rain, watching dough rise, helping stir a pot — these are deep lessons in language, numbers, cause and effect, and wonder. You do not need to create learning; you only need to invite your child into the life you are already living. Talk through what you do, let them touch and try, and the whole world becomes a place to grow.", "hi": "यह सोचना आसान है कि सीखने के लिए ख़ास खिलौने और चालाक ऐप चाहिए। पर एक बच्चे का सबसे भरा-पूरा क्लासरूम वही रोज़मर्रा की दुनिया है जिसमें आप पहले से चलती-फिरती हैं। सीढ़ियों पर क़दम गिनना, बाज़ार में सब्ज़ियों के नाम बताना, बारिश को महसूस करना, आटा फूलते देखना, बर्तन में कुछ चलाने में मदद करना — ये भाषा, गिनती, कारण और असर, और हैरानी के गहरे सबक़ हैं। आपको सीखना गढ़ना नहीं है; आपको बस अपने बच्चे को उसी ज़िंदगी में बुलाना है जो आप पहले से जी रही हैं। जो आप कर रही हैं उसे बोलकर बताइए, उसे छूने और आज़माने दीजिए, और पूरी दुनिया बढ़ने की जगह बन जाती है।" },
-      "deepDive": { "en": "Early learning experts emphasise that everyday narration — talking through daily tasks with a child — builds vocabulary and understanding more than any educational toy. Real life is the best teacher.", "hi": "शुरुआती सीखने के जानकार ज़ोर देते हैं कि रोज़ का बोलकर बताना — बच्चे के साथ रोज़मर्रा के कामों को कहते चलना — किसी भी पढ़ाई वाले खिलौने से ज़्यादा शब्द और समझ बनाता है। असली ज़िंदगी ही सबसे अच्छी गुरु है।" },
-      "remember": { "en": "Ordinary days are full of extraordinary lessons.", "hi": "आम दिन असाधारण सबक़ों से भरे होते हैं।" }
+      "title": { "en": "Everyday life is full of learning", "hi": "दुनिया ही उनका क्लासरूम है" },
+      "insight": { "en": "Your child will learn most from the ordinary world around them: markets, kitchens, gardens and walks.", "hi": "आपका बच्चा सबसे ज़्यादा किताबों और स्क्रीन से नहीं सीखेगा, बल्कि आम दुनिया से — बाज़ार, रसोई, बग़ीचे और सैर से।" },
+      "expanded": { "en": "It's easy to think learning needs special toys and clever apps. But a child's richest classroom is the everyday world you already live in. Counting steps on the stairs, naming vegetables at the sabzi market, feeling rain, watching dough rise, helping stir a pot: these teach language, numbers, cause and effect, and wonder. You don't need to create learning. You only need to bring your child into the life you're already living. Talk about what you're doing, let them touch and try, and the whole world becomes a place to grow.", "hi": "यह सोचना आसान है कि सीखने के लिए ख़ास खिलौने और चालाक ऐप चाहिए। पर एक बच्चे का सबसे भरा-पूरा क्लासरूम वही रोज़मर्रा की दुनिया है जिसमें आप पहले से चलती-फिरती हैं। सीढ़ियों पर क़दम गिनना, बाज़ार में सब्ज़ियों के नाम बताना, बारिश को महसूस करना, आटा फूलते देखना, बर्तन में कुछ चलाने में मदद करना — ये भाषा, गिनती, कारण और असर, और हैरानी के गहरे सबक़ हैं। आपको सीखना गढ़ना नहीं है; आपको बस अपने बच्चे को उसी ज़िंदगी में बुलाना है जो आप पहले से जी रही हैं। जो आप कर रही हैं उसे बोलकर बताइए, उसे छूने और आज़माने दीजिए, और पूरी दुनिया बढ़ने की जगह बन जाती है।" },
+      "deepDive": { "en": "Early learning research shows that talking with young children through everyday tasks helps build their vocabulary and understanding. Ordinary chatter during the day does a lot of the teaching.", "hi": "शुरुआती सीखने के जानकार ज़ोर देते हैं कि रोज़ का बोलकर बताना — बच्चे के साथ रोज़मर्रा के कामों को कहते चलना — किसी भी पढ़ाई वाले खिलौने से ज़्यादा शब्द और समझ बनाता है। असली ज़िंदगी ही सबसे अच्छी गुरु है।" },
+      "remember": { "en": "Ordinary days are full of lessons.", "hi": "आम दिन असाधारण सबक़ों से भरे होते हैं।" }
     },
     "readToBaby": {
       "title": { "en": "The Tailor And The Elephant", "hi": "दर्ज़ी और हाथी" },
@@ -217,8 +217,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby about something that always makes you laugh — a joke, a memory, a person who tickles your heart.", "hi": "अपने शिशु को किसी ऐसी चीज़ के बारे में बताइए जो आपको हमेशा हँसा देती है — कोई मज़ाक़, कोई याद, या कोई इंसान जो आपके दिल को गुदगुदा देता है।" },
-      "motivation": { "en": "Laughter is one of the warmest things you'll ever share with your child.", "hi": "हँसी उन सबसे गर्म चीज़ों में से एक है जो आप कभी अपने बच्चे के साथ बाँटेंगी।" }
+      "title": { "en": "Tell your baby about something that always makes you laugh: a joke, a memory or a person you love.", "hi": "अपने शिशु को किसी ऐसी चीज़ के बारे में बताइए जो आपको हमेशा हँसा देती है — कोई मज़ाक़, कोई याद, या कोई इंसान जो आपके दिल को गुदगुदा देता है।" },
+      "motivation": { "en": "Laughter is one of the warmest things you'll share with your child.", "hi": "हँसी उन सबसे गर्म चीज़ों में से एक है जो आप कभी अपने बच्चे के साथ बाँटेंगी।" }
     },
     "garbhSanskar": {
       "type": "raga",
@@ -233,9 +233,9 @@
     },
     "nurture": {
       "type": "food",
-      "title": { "en": "When Heaviness Sits After Meals", "hi": "जब खाने के बाद भारीपन बना रहे" },
-      "content": { "en": "If you feel heavy and full after eating, try smaller plates more often rather than two large meals. Slow, smaller helpings sit easier and keep your energy steadier through the day.", "hi": "अगर खाने के बाद आपको भारी और भरा हुआ लगे, तो दो बड़े खानों के बजाय छोटे-छोटे खाने ज़्यादा बार आज़माइए। धीरे-धीरे लिए गए छोटे हिस्से आसानी से बैठ जाते हैं और दिन भर आपकी ताक़त थमी रखते हैं।" },
-      "remember": { "en": "Smaller and slower is often kinder to your body.", "hi": "छोटा और धीमा अक्सर आपके शरीर के लिए ज़्यादा नरम होता है।" },
+      "title": { "en": "Feeling heavy after meals?", "hi": "जब खाने के बाद भारीपन बना रहे" },
+      "content": { "en": "If you feel heavy and full after eating, try smaller meals more often instead of two big ones. Eating slowly and in smaller amounts sits easier and keeps your energy steadier through the day.", "hi": "अगर खाने के बाद आपको भारी और भरा हुआ लगे, तो दो बड़े खानों के बजाय छोटे-छोटे खाने ज़्यादा बार आज़माइए। धीरे-धीरे लिए गए छोटे हिस्से आसानी से बैठ जाते हैं और दिन भर आपकी ताक़त थमी रखते हैं।" },
+      "remember": { "en": "Smaller, slower meals are often easier to manage.", "hi": "छोटा और धीमा अक्सर आपके शरीर के लिए ज़्यादा नरम होता है।" },
       "durationMinutes": 0
     }
   },
@@ -244,11 +244,11 @@
     "week": 15,
     "babyLearning": { "en": "Your baby's taste buds are maturing.", "hi": "हफ़्ता पूरा करते हुए, लगातार मज़बूत होते हुए" },
     "grow": {
-      "title": { "en": "Slow Learning Lasts Longest", "hi": "धीमे सीखा हुआ सबसे लंबा टिकता है" },
-      "insight": { "en": "There is no rush to make a child learn faster. What is learned slowly, with joy, is what lasts a lifetime.", "hi": "बच्चे को तेज़ी से सिखाने की कोई जल्दी नहीं है। जो धीरे, ख़ुशी से सीखा जाता है, वही ज़िंदगी भर टिकता है।" },
-      "expanded": { "en": "In a world that prizes speed, it is easy to worry whether your child is learning early enough, fast enough. But children are not in a race. A skill grasped slowly, in its own time, settles deep and stays. Pushing too hard can teach a child to dread learning; patience teaches them to love it. Some children walk early, some talk late, and almost all of it evens out. Your calm, your trust that learning will come, is itself a lesson — that they are enough as they are, and that growth is a gentle, unhurried thing.", "hi": "एक ऐसी दुनिया में जो रफ़्तार को सराहती है, यह चिंता करना आसान है कि आपका बच्चा काफ़ी जल्दी, काफ़ी तेज़ी से सीख रहा है या नहीं। पर बच्चे किसी दौड़ में नहीं हैं। जो हुनर धीरे, अपने वक़्त पर पकड़ में आता है, वह गहरा बैठ जाता है और टिका रहता है। ज़्यादा ज़ोर देना बच्चे को सीखने से डरना सिखा सकता है; सब्र उसे सीखने से प्यार करना सिखाता है। कुछ बच्चे जल्दी चलते हैं, कुछ देर से बोलते हैं, और लगभग सब कुछ आगे चलकर बराबर हो जाता है। आपकी शांति, आपका यह भरोसा कि सीखना आ ही जाएगा, ख़ुद एक सबक़ है — कि वह जैसा है वैसे ही काफ़ी है, और बढ़ना एक नरम, बिना जल्दी वाली चीज़ है।" },
-      "deepDive": { "en": "Long-term studies show that early academic pushing offers no lasting advantage, while playful, unhurried learning supports stronger curiosity and wellbeing years later. Slow truly does last.", "hi": "लंबे समय तक चले अध्ययन दिखाते हैं कि जल्दी पढ़ाई का दबाव कोई टिकाऊ फ़ायदा नहीं देता, जबकि खेल भरा, बिना जल्दी वाला सीखना सालों बाद भी मज़बूत जिज्ञासा और भलाई को सहारा देता है। धीमा सच में टिकता है।" },
-      "remember": { "en": "Learned slowly and with joy is learned for life.", "hi": "धीरे और ख़ुशी से सीखा गया, ज़िंदगी भर के लिए सीखा गया।" }
+      "title": { "en": "There's no rush for a child to learn", "hi": "धीमे सीखा हुआ सबसे लंबा टिकता है" },
+      "insight": { "en": "There's no need to make a child learn faster. What's learned slowly and happily tends to last.", "hi": "बच्चे को तेज़ी से सिखाने की कोई जल्दी नहीं है। जो धीरे, ख़ुशी से सीखा जाता है, वही ज़िंदगी भर टिकता है।" },
+      "expanded": { "en": "In a world that loves speed, it's easy to worry about whether your child is learning early enough or fast enough. But children aren't in a race. A skill learned in its own time settles in and stays. Pushing too hard can teach a child to dread learning. Patience helps them enjoy it. Some children walk early, some talk late, and most of these differences even out. Your calm trust that learning will come teaches something too: that they're enough as they are, and that growing takes time.", "hi": "एक ऐसी दुनिया में जो रफ़्तार को सराहती है, यह चिंता करना आसान है कि आपका बच्चा काफ़ी जल्दी, काफ़ी तेज़ी से सीख रहा है या नहीं। पर बच्चे किसी दौड़ में नहीं हैं। जो हुनर धीरे, अपने वक़्त पर पकड़ में आता है, वह गहरा बैठ जाता है और टिका रहता है। ज़्यादा ज़ोर देना बच्चे को सीखने से डरना सिखा सकता है; सब्र उसे सीखने से प्यार करना सिखाता है। कुछ बच्चे जल्दी चलते हैं, कुछ देर से बोलते हैं, और लगभग सब कुछ आगे चलकर बराबर हो जाता है। आपकी शांति, आपका यह भरोसा कि सीखना आ ही जाएगा, ख़ुद एक सबक़ है — कि वह जैसा है वैसे ही काफ़ी है, और बढ़ना एक नरम, बिना जल्दी वाली चीज़ है।" },
+      "deepDive": { "en": "Child development research suggests young children learn well through play and at their own pace. Children vary a lot in when they reach milestones, and most of those differences even out.", "hi": "लंबे समय तक चले अध्ययन दिखाते हैं कि जल्दी पढ़ाई का दबाव कोई टिकाऊ फ़ायदा नहीं देता, जबकि खेल भरा, बिना जल्दी वाला सीखना सालों बाद भी मज़बूत जिज्ञासा और भलाई को सहारा देता है। धीमा सच में टिकता है।" },
+      "remember": { "en": "What's learned slowly and happily is learned for life.", "hi": "धीरे और ख़ुशी से सीखा गया, ज़िंदगी भर के लिए सीखा गया।" }
     },
     "readToBaby": {
       "title": { "en": "The Little Cloud's Journey", "hi": "नन्हे बादल का सफ़र" },
@@ -257,8 +257,8 @@
       "audioAvailable": true
     },
     "talkToBaby": {
-      "title": { "en": "Tell your baby how you've changed as a person over the years — who you used to be, and who you've grown into.", "hi": "अपने शिशु को बताइए कि सालों में आप एक इंसान के तौर पर कैसे बदली हैं — आप कैसी थीं, और कैसी बन गई हैं।" },
-      "motivation": { "en": "Your child will learn that growing and changing is a beautiful, lifelong thing.", "hi": "आपका बच्चा सीखेगा कि बढ़ना और बदलना एक सुंदर, ज़िंदगी भर चलने वाली बात है।" }
+      "title": { "en": "Tell your baby how you've changed over the years: who you used to be, and who you've become.", "hi": "अपने शिशु को बताइए कि सालों में आप एक इंसान के तौर पर कैसे बदली हैं — आप कैसी थीं, और कैसी बन गई हैं।" },
+      "motivation": { "en": "Your child will learn that growing and changing carries on all through life.", "hi": "आपका बच्चा सीखेगा कि बढ़ना और बदलना एक सुंदर, ज़िंदगी भर चलने वाली बात है।" }
     },
     "garbhSanskar": {
       "type": "meditation",
@@ -273,9 +273,9 @@
     },
     "nurture": {
       "type": "breathe",
-      "title": { "en": "A Slow Count Of Six", "hi": "छह की धीमी गिनती" },
-      "content": { "en": "Breathe in gently for a count of four, then breathe out slowly for a count of six. Let the out-breath be longer than the in-breath, and repeat for a calm minute.", "hi": "चार तक गिनते हुए नरमी से साँस अंदर लीजिए, फिर छह तक गिनते हुए धीरे-धीरे बाहर छोड़िए। बाहर की साँस को अंदर की साँस से लंबी रखिए, और एक शांत मिनट तक दोहराइए।" },
-      "remember": { "en": "A longer breath out tells the body it is safe to rest.", "hi": "एक लंबी बाहर की साँस शरीर को बताती है कि आराम करना सुरक्षित है।" },
+      "title": { "en": "A slow count of six", "hi": "छह की धीमी गिनती" },
+      "content": { "en": "Breathe in gently for a count of four, then breathe out slowly for a count of six. Let the breath out be longer than the breath in, and repeat for a calm minute.", "hi": "चार तक गिनते हुए नरमी से साँस अंदर लीजिए, फिर छह तक गिनते हुए धीरे-धीरे बाहर छोड़िए। बाहर की साँस को अंदर की साँस से लंबी रखिए, और एक शांत मिनट तक दोहराइए।" },
+      "remember": { "en": "A longer breath out helps you settle and rest.", "hi": "एक लंबी बाहर की साँस शरीर को बताती है कि आराम करना सुरक्षित है।" },
       "durationMinutes": 2
     }
   }
