@@ -660,7 +660,8 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
             // minutes, this week" is commented out below, kept for revert.
             if (video != null) ...[
               const SizedBox(height: 36),
-              Text('This Week Explained',
+              // Rewritten 2026-09-29 (docs/PREG-VOICE.md). Was 'This Week Explained'.
+              Text('Your week, explained',
                   style: pvFraunces(
                       fontSize: 24,
                       letterSpacing: -0.6,
@@ -891,8 +892,10 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
             // Grouping them means the page has one "your turn" region rather
             // than actions scattered between articles.
             V3SectionHead(
-                eyebrow: 'Medicine Reminder',
-                title: "Don't miss today's dose",
+                // Rewritten 2026-09-29 (docs/PREG-VOICE.md). Was 'Medicine
+                // Reminder' over "Don't miss today's dose".
+                eyebrow: 'Medicine reminder',
+                title: "Today's medicines",
                 p: p),
             const SizedBox(height: 12),
             ListenableBuilder(
@@ -951,7 +954,9 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
             // grows up'.
             V3SectionHead(
                 eyebrow: 'My journal',
-                title: 'Create a memory for your baby to show when it grows up',
+                // Rewritten 2026-09-29. Was 'Create a memory for your baby to
+                // show when it grows up'.
+                title: 'Keep a memory for your baby to see one day',
                 p: p),
             const SizedBox(height: 12),
             V3JournalSection(
@@ -1059,7 +1064,8 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
             if (shelf.isNotEmpty) ...[
               V3SectionHead(
                   eyebrow: 'Recommended videos',
-                  title: 'Watch These Videos This Week',
+                  // Was 'Watch These Videos This Week' (2026-09-29).
+                  title: 'Videos for this week',
                   p: p),
               const SizedBox(height: 2),
               for (final v in shelf) ...[
@@ -1083,8 +1089,12 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
             // that actually makes someone open a pregnancy article.
             if (reads.isNotEmpty) ...[
               V3SectionHead(
-                  eyebrow: 'Recommended Reads',
-                  title: 'Research-backed articles',
+                  // ⚠️ THE GAP ANALYSIS, P1 ("Say 'Research-backed' only when it
+                  // is true"): no pregnancy read has had a real review yet, so
+                  // the heading names the week instead. Was 'Recommended
+                  // Reads' over 'Research-backed articles'.
+                  eyebrow: 'Recommended reads',
+                  title: 'Reads for week $week',
                   p: p),
               const SizedBox(height: 8),
               for (final r in reads.take(3))
@@ -1114,8 +1124,10 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
               // a price on the home screen turns a companion into a shop front
               // before she has asked to shop.
               V3SectionHead(
-                  eyebrow: 'Recommended Products',
-                  title: 'Crafted for Week $week of Pregnancy',
+                  // Was 'Recommended Products' over 'Crafted for Week $week of
+                  // Pregnancy' (2026-09-29, docs/PREG-VOICE.md).
+                  eyebrow: 'Recommended products',
+                  title: 'Picked for week $week',
                   p: p),
               const SizedBox(height: 12),
               // A RAIL, NOT A LIST — and the difference is the point.
@@ -1705,7 +1717,8 @@ class _AlsoRow extends StatelessWidget {
     if (ids.isEmpty) return const SizedBox.shrink();
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       V3SectionHead(
-          eyebrow: 'Also today', title: 'Still here, just not first', p: p),
+          // Was 'Still here, just not first' (2026-09-29: a clever line).
+          eyebrow: 'Also today', title: 'More for you today', p: p),
       const SizedBox(height: 12),
       Wrap(spacing: 8, runSpacing: 8, children: [
         for (final id in ids)
@@ -1954,7 +1967,8 @@ class _ToolsRow extends StatelessWidget {
           //       : 'Worth having at week $week',
           V3SectionHead(
               eyebrow: 'Use these tools',
-              title: 'Count, track, time',
+              // Was 'Count, track, time' (2026-09-29, docs/PREG-VOICE.md).
+              title: 'Tools for this week',
               p: p),
           const SizedBox(height: 12),
           Row(

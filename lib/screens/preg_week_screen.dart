@@ -289,7 +289,7 @@ class _WeekBody extends StatelessWidget {
         for (final line in forYou) ...[body(line), const SizedBox(height: 8)],
       ],
       const SizedBox(height: 10),
-      Text('Averages for week $week. Every baby grows at their own pace — your scan is the measure, not this page.',
+      Text('Averages for week $week. Every baby grows at their own pace, and your scan is what counts, not this page.',
           style: pvManrope(fontSize: 12, height: 1.45, color: p.ink3)),
     ]);
   }

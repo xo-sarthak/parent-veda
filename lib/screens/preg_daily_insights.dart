@@ -164,7 +164,7 @@ List<PregInsight> pregInsightsFor({
   } else if (isToday) {
     cards.add(const PregInsight(
       id: 'log',
-      eyebrow: 'How are you',
+      eyebrow: 'How are you today?',
       value: 'Log how today feels',
       hue: 344,
       art: PvInsightArt.log,
