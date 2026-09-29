@@ -138,6 +138,8 @@ import '../report_screen.dart';
 import '../tools/tests_scans_reports_screen.dart';
 import '../../data/reads/read_adapters.dart' show kMmReadPrefix, kBsReadPrefix, kConditionReadPrefix, kScanReadPrefix, kFindingReadPrefix;
 import '../garbh/garbh_today_practice.dart' show GarbhTodayPractice;
+import '../../data/doors/pv_door_after_loss.dart';
+import '../pregnancy/preg_ended_screen.dart' show PregTryAgainScreen;
 
 /// A tile's OWN drawn mark, where the door has something better than its
 /// format's. Null means "the format mark", which is the rule everywhere else.
@@ -447,6 +449,12 @@ Widget? pvDoorScreenFor(String id, PregnancyController c) => switch (id) {
   _ when id.startsWith('garbh/read/piece/') => _garbhPiece(id, c),
   _ when id.startsWith('garbh/read/shelf/') => _garbhShelf(id, c),
   _ when id.startsWith('garbh/play/') => _garbhGame(id, c),
+  // After a loss (2026-09-29): the door from Complications, and the Trying
+  // again tab's "When you're ready" step. The door is not a home tile, so it
+  // carries its own bracket (see pv_door_after_loss.dart).
+  kCondSurfaceAfterLoss => PvDoorScreen(
+      page: kAfterLossDoor, bracket: kPregAfterLossBracket, pregnancy: c),
+  kAfterLossSurfaceTryAgain => const PregTryAgainScreen(),
 
   _ => null,
 };
@@ -887,6 +895,7 @@ bool pvDoorSurfaceResolves(String id) => switch (id) {
   kMindSurfaceCheckIn ||
   kMindSurfaceCrisis ||
   kMindSurfaceHelplines => true,
+  kCondSurfaceAfterLoss || kAfterLossSurfaceTryAgain => true,
   _ when id.startsWith('mind/breathe/') => kMmBreathingExercises.any(
     (e) => mindSurfaceBreathe(e.id) == id,
   ),

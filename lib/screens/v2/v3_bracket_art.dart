@@ -113,6 +113,8 @@ BracketMark? bracketMarkFor(String bracketId) => switch (bracketId) {
       'ttc_preconception_health' => BracketMark.nutrition,
       'ttc_male_fertility' => BracketMark.fitness,
       'ttc_after_loss' => BracketMark.mind,
+      // The pregnancy After a loss door (2026-09-29): the same calm mark.
+      'pregnancy_after_loss' => BracketMark.mind,
       'ttc_mind_body' => BracketMark.garbh,
       // Added 2026-09-26 (TTC gap plan), both reusing a mark for the reason
       // above: the body and its signs IS the symptoms mark, one stage

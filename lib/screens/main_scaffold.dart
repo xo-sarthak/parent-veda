@@ -44,6 +44,8 @@ import 'tools_hub_screen.dart';
 import 'weekly_card_stack_screen.dart';
 import '../services/usage_events.dart';
 import '../booking/prescription_watch.dart';
+import '../services/pregnancy_ended_store.dart';
+import 'pregnancy/preg_ended_screen.dart' show PregEndedHome;
 
 /// The five pregnancy tabs, in nav order, as usage surfaces.
 ///
@@ -162,7 +164,8 @@ class _MainScaffoldState extends State<MainScaffold> with WidgetsBindingObserver
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: widget.pregnancy,
+      // PregnancyEndedStore too: his Today swaps when she reports a loss.
+      animation: Listenable.merge([widget.pregnancy, PregnancyEndedStore.instance]),
       builder: (context, _) {
         final s = S(widget.pregnancy.language);
         // Father mode is driven by FatherPreview - set true in initState for a
@@ -174,7 +177,12 @@ class _MainScaffoldState extends State<MainScaffold> with WidgetsBindingObserver
         // become the father's own sections (Reads · Read · Journal).
         final pages = fatherMode
             ? [
-                FatherDailyScreen(controller: widget.pregnancy, embedded: true),
+                // After a loss his Today stops showing the week too (gap
+                // analysis: "stops the week content, the messages and the
+                // partner's week"). Kept for revert: the line below alone.
+                PregnancyEndedStore.instance.ended
+                    ? PregEndedHome(pregnancy: widget.pregnancy, forPartner: true)
+                    : FatherDailyScreen(controller: widget.pregnancy, embedded: true),
                 WeeklyCardStackScreen(controller: widget.pregnancy),
                 const FatherReadsScreen(),
                 FatherReadAloudScreen(controller: widget.pregnancy),

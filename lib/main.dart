@@ -24,6 +24,7 @@ import 'screens/post_pregnancy/pp_sleep_data.dart';
 import 'screens/post_pregnancy/pp_vaccine_data.dart';
 import 'screens/post_pregnancy/pp_journeys_data.dart';
 import 'booking/server_slots.dart';
+import 'services/pregnancy_ended_store.dart';
 import 'services/auth/session_watch.dart';
 import 'services/family_profile.dart';
 import 'services/profile_analytics.dart';
@@ -210,6 +211,9 @@ class _ParentVedaAppState extends State<ParentVedaApp>
     // first so the per-kind facades below find their rows ready; each of
     // them also calls load(), which is idempotent.
     SavedStore.instance.load();
+    // "If your pregnancy has ended" (2026-09-29): read before the first
+    // frame decides which Today to draw.
+    PregnancyEndedStore.instance.load();
     // Load Can I? saved-questions persistence.
     CanIStore.instance.init();
     // Load Garbh Sanskar Journey persistence (favorites, reflective tally).

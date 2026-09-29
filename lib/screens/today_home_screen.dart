@@ -23,6 +23,8 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import '../services/pregnancy_ended_store.dart';
+import 'pregnancy/preg_ended_screen.dart' show PregEndedHome;
 import 'v2/v2_palette.dart';
 // Kept for revert with the GroundPicker below.
 // ignore: unused_import
@@ -108,9 +110,19 @@ class _TodayHomeScreenState extends State<TodayHomeScreen> {
     // notification, not on a value differing from last frame. A dynamic token is
     // only half a migration until something listens to it.
     return ListenableBuilder(
-      listenable: Listenable.merge(
-          [TodayVersionStore.instance, V2PaletteStore.instance]),
+      listenable: Listenable.merge([
+        TodayVersionStore.instance,
+        V2PaletteStore.instance,
+        PregnancyEndedStore.instance,
+      ]),
       builder: (context, _) {
+        // ⚠️ AFTER A LOSS, NO BABY HOME (2026-09-29, the pregnancy gap
+        // analysis's second most urgent finding). Once she has told us her
+        // pregnancy ended, Today is the calm After a loss page: no week, no
+        // size, no daily tip. Nothing is deleted; You undoes it.
+        if (PregnancyEndedStore.instance.ended) {
+          return PregEndedHome(pregnancy: widget.pregnancy);
+        }
         final v = TodayVersionStore.instance.version;
         final body = switch (v) {
           // The screen that ships today, constructed exactly as MainScaffold

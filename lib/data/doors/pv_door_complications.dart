@@ -84,6 +84,10 @@ const String kCondTabFind = 'find';
 const String kCondTabWhen = 'when';
 const String kCondTabHelp = 'help';
 const String kCondTabLiving = 'living';
+
+/// The After a loss door, from Living with it (2026-09-29, pregnancy gap
+/// analysis, "Give miscarriage and stillbirth a proper home").
+const String kCondSurfaceAfterLoss = 'conditions/after_loss';
 const String kCondTabTalk = 'talk';
 
 final PvDoorPage kComplicationsDoor = PvDoorPage(
@@ -393,6 +397,21 @@ final PvDoorPage kComplicationsDoor = PvDoorPage(
           title: 'With a disability or long-term illness',
           blurb: 'Care that fits you, from appointments to the birth.',
           readId: 'preg_cond_read_disability',
+        ),
+      ],
+    ),
+
+    // The facts stay on the condition pages; everything after a loss lives
+    // in its own door (gap analysis, P1). Last on the tab, and quiet.
+    PvDoorSection(
+      group: kCondTabLiving,
+      heading: 'If your pregnancy has ended',
+      tiles: [
+        PvDoorToolTile(
+          title: 'After a loss',
+          blurb: 'Your body, what happened, support for you both, and '
+              'trying again when you are ready.',
+          surfaceId: kCondSurfaceAfterLoss,
         ),
       ],
     ),

@@ -43,6 +43,9 @@ import '../memories/memories_home_screen.dart';
 import '../post_pregnancy/my_bookings_screen.dart';
 import '../post_pregnancy/provider_results_screen.dart';
 import '../pregnancy_profile_screen.dart';
+import '../pregnancy/preg_ended_screen.dart' show openPregEnded;
+import '../../data/doors/pv_door_after_loss.dart' show kPregEndedRowTitle, kPregEndedRowSub;
+import '../../services/pregnancy_ended_store.dart';
 import '../products/pv_orders_screen.dart';
 import '../saved_screen.dart';
 import '../skilling/sk_child_store.dart';
@@ -647,6 +650,23 @@ final PvYouStageContent _pregnancy = PvYouStageContent(
     _addresses(),
     _doctorNotes(LifeStage.pregnancy),
     _findHelp(),
+    // ⚠️ LAST, AND QUIET ON PURPOSE (2026-09-29, pregnancy gap analysis,
+    // "Behind · After a loss", P1). Oura keeps "My pregnancy ended" as one
+    // plain row in its pregnancy details; a loss is not a feature to
+    // advertise, it is a door that has to be findable on the worst day.
+    PvYouThing(
+      icon: Icons.spa_outlined,
+      title: kPregEndedRowTitle,
+      subtitle: kPregEndedRowSub,
+      subtitleNow: () => PregnancyEndedStore.instance.ended
+          ? 'Your Today shows support pages. Tap to change this.'
+          : kPregEndedRowSub,
+      listen: PregnancyEndedStore.instance,
+      open: (c) {
+        final ctl = PregnancyController.current;
+        if (ctl != null) openPregEnded(c, ctl);
+      },
+    ),
   ],
   childrenInvitation:
       'Your baby\'s page appears here after the birth. An older child can be added now.',
