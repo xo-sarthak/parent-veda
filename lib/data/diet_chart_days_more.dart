@@ -311,7 +311,7 @@ final Map<String, List<ChartDay>> kChartDaysMore = {
   // ---------------------------------------------------------------------------
   'regional_bengali': [
     _d('Day 4', [
-      _m('Breakfast', 'Luchi is a treat, not a daily — muri with milk and a banana'),
+      _m('Breakfast', 'Luchi is a treat, not a daily. Muri with milk and a banana'),
       _m('Mid-morning', 'A guava, roasted chana'),
       _m('Lunch', 'Rice with moong dal, shukto, a small piece of fish'),
       _m('Evening', 'Sprouts chaat, buttermilk'),

@@ -159,46 +159,46 @@ final List<CravingItem> kCravingItems = [
     name: _en('Golgappa / pani puri'),
     verdict: NutritionVerdict.limit,
     aliases: ['pani puri', 'puchka', 'gol gappa', 'street food', 'chaat'],
-    why: _en('Sour, cold, sharp and salty all at once — it hits almost every '
-        'craving pregnancy tends to produce, which is why it is the most-'
-        'wanted thing in an Indian pregnancy.'),
+    why: _en("Sour, cold, sharp and salty all at once. It hits almost every "
+        "craving pregnancy brings, which is why it's the most wanted thing in "
+        "an Indian pregnancy."),
     stageNotes: {
-      1: _en('The craving is usually strongest now, and so is the reason to be '
-          'careful: a stomach infection on top of first-trimester nausea is '
-          'genuinely miserable and can dehydrate you fast.'),
-      2: _en('Appetite is back and this is often the thing you want most. '
-          'Home-made is a real yes; roadside is still a gamble on the water.'),
-      3: _en('Same rule, one addition — the salt in the pani is worth watching '
-          'now if anyone has mentioned swelling or blood pressure.'),
+      1: _en("The craving is usually strongest now, and so is the reason to be "
+          "careful. A stomach infection on top of early nausea is miserable "
+          "and can dehydrate you fast."),
+      2: _en("Your appetite is back and this is often what you want most. "
+          "Home-made is a real yes. Roadside is still a gamble on the water."),
+      3: _en("Same rule, plus one thing: watch the salt in the pani now if "
+          "anyone has mentioned swelling or blood pressure."),
     },
-    modification: _en('Made at home with filtered water, and pudina washed in '
-        'filtered water, this is a straightforward yes. The risk was never the '
-        'golgappa — it is the water it was dipped in.'),
-    whenToAvoid: _en('Roadside pani, especially in summer or anywhere you '
-        'cannot see how the water is stored. Typhoid and hepatitis A both '
-        'travel this way, and both are worse in pregnancy.'),
+    modification: _en("Made at home with filtered water, and pudina washed in "
+        "filtered water, it's a clear yes. The risk was never the golgappa. "
+        "It's the water it was dipped in."),
+    whenToAvoid: _en("Roadside pani, especially in summer or anywhere you "
+        "can't see how the water is stored. Typhoid and hepatitis A both "
+        "spread this way, and both are worse in pregnancy."),
     alternatives: [
-      _en('The same flavours as a chaat you assemble yourself — sev puri or '
-          'bhel, which need no standing water at all.'),
-      _en('Jaljeera or nimbu-pani with black salt, if it is the sour-and-sharp '
-          'hit you are after rather than the crunch.'),
+      _en('The same flavours in a chaat you put together yourself, like sev '
+          'puri or bhel, which need no standing water at all.'),
+      _en("Jaljeera or nimbu pani with black salt, if it's the sour, sharp "
+          "taste you want more than the crunch."),
     ],
     recipe: CravingRecipe(
       name: _en('Home pani puri, safely'),
       minutes: 20,
-      note: _en('Everything risky about golgappa is in the pani. Make that '
-          'part yourself and the rest is just a snack.'),
+      note: _en("Everything risky about golgappa is in the pani. Make that "
+          "part yourself and the rest is just a snack."),
       ingredients: [
-        _en('Ready puris — 12 to 15, from a sealed packet'),
-        _en('Fresh pudina — 1 cup, washed in filtered water'),
-        _en('Fresh coriander — 1/2 cup'),
-        _en('Green chilli — 1 small, or skip it'),
-        _en('Ginger — a small piece'),
-        _en('Roasted jeera powder — 1 tsp'),
-        _en('Black salt and regular salt — to taste, go light'),
-        _en('Imli pulp — 2 tbsp'),
-        _en('Filtered or boiled-and-cooled water — 3 cups'),
-        _en('Boiled potato and white chana — for the filling'),
+        _en('Ready puris: 12 to 15, from a sealed packet'),
+        _en('Fresh pudina: 1 cup, washed in filtered water'),
+        _en('Fresh coriander: 1/2 cup'),
+        _en('Green chilli: 1 small, or skip it'),
+        _en('Ginger: a small piece'),
+        _en('Roasted jeera powder: 1 tsp'),
+        _en('Black salt and regular salt: to taste, go light'),
+        _en('Imli pulp: 2 tbsp'),
+        _en('Filtered or boiled-and-cooled water: 3 cups'),
+        _en('Boiled potato and white chana: for the filling'),
       ],
       steps: [
         _en('Wash the pudina and coriander in filtered water, not tap. This is '
@@ -207,7 +207,7 @@ final List<CravingItem> kCravingItems = [
             'paste.'),
         _en('Mix into the filtered water with the imli pulp, jeera powder and '
             'both salts.'),
-        _en('Chill for 30 minutes. Do not add ice made from tap water.'),
+        _en("Chill for 30 minutes. Don't add ice made from tap water."),
         _en('Fill the puris with mashed potato and chana, and eat straight '
             'away.'),
       ],
@@ -219,29 +219,30 @@ final List<CravingItem> kCravingItems = [
     name: _en('Imli / tamarind'),
     verdict: NutritionVerdict.safe,
     aliases: ['tamarind', 'khatta', 'sour'],
-    why: _en('A pull towards sour is one of the most common and most harmless '
-        'cravings there is, and imli is usually the first thing it lands on.'),
+    why: _en('Wanting something sour is one of the most common and harmless '
+        'cravings there is, and imli is usually the first thing you reach '
+        'for.'),
     stageNotes: {
-      1: _en('Very common right now, and often genuinely helpful — the '
-          'sourness settles nausea for a lot of women.'),
-      2: _en('Fine to enjoy. Nothing to watch beyond your own teeth, which '
+      1: _en('Very common right now, and often helpful. The sourness settles '
+          'nausea for a lot of women.'),
+      2: _en('Fine to enjoy. The only thing to watch is your teeth, which '
           'soften a little in pregnancy.'),
-      3: _en('Still fine. If you are taking iron tablets, leave a gap around '
-          'them rather than eating imli alongside.'),
+      3: _en("Still fine. If you're taking iron tablets, leave a gap around "
+          "them instead of having imli at the same time."),
     },
-    modification: _en('Plain imli is fine. Imli candy is mostly salt and sugar '
-        'with a little imli in it, which is a different thing.'),
+    modification: _en("Plain imli is fine. Imli candy is mostly salt and sugar "
+        "with a little imli in it, which isn't the same thing."),
     recipe: CravingRecipe(
       name: _en('Imli-gud chutney'),
       minutes: 15,
-      note: _en('Keeps a week in the fridge, and turns a sour craving into '
-          'something with a little iron in it from the gud.'),
+      note: _en('It keeps for a week in the fridge, and the gud adds a little '
+          'iron to a sour craving.'),
       ingredients: [
-        _en('Imli — a lemon-sized ball, soaked'),
-        _en('Gud (jaggery) — 3 tbsp'),
-        _en('Roasted jeera powder — 1 tsp'),
-        _en('Saunf powder — 1/2 tsp'),
-        _en('Black salt — a pinch'),
+        _en('Imli: a lemon-sized ball, soaked'),
+        _en('Gud (jaggery): 3 tbsp'),
+        _en('Roasted jeera powder: 1 tsp'),
+        _en('Saunf powder: 1/2 tsp'),
+        _en('Black salt: a pinch'),
       ],
       steps: [
         _en('Soak the imli in warm water for 20 minutes and squeeze out the '
@@ -258,22 +259,21 @@ final List<CravingItem> kCravingItems = [
     verdict: NutritionVerdict.limit,
     talkToDoctor: true,
     aliases: ['ice', 'pagophagia', 'barf'],
-    why: _en('A strong, repeated urge to chew ice is one of the better-known '
-        'signals of low iron. It is not always that — plenty of women simply '
-        'find it cooling — but it is common enough to be worth saying out loud '
-        'rather than managing quietly.'),
+    why: _en("A strong, repeated urge to chew ice is one of the better-known "
+        "signs of low iron. It isn't always that. Plenty of women just find it "
+        "cooling. But it's common enough that it's worth mentioning to your "
+        "doctor instead of keeping it to yourself."),
     stageNotes: {
-      1: _en('Worth mentioning at your next visit. Iron stores are usually '
-          'checked in early bloodwork anyway, so it costs nothing to ask.'),
-      2: _en('This is the stage anaemia is most often picked up in India. If '
-          'you are chewing ice daily, ask for your haemoglobin to be looked '
-          'at.'),
-      3: _en('Say it to your doctor now rather than waiting. Iron matters more '
-          'in the last trimester, both for you and for delivery.'),
+      1: _en("Mention it at your next visit. Your iron is usually checked in "
+          "your early blood tests anyway, so it costs nothing to ask."),
+      2: _en("This is when anaemia is most often found in India. If you're "
+          "chewing ice every day, ask for your haemoglobin to be checked."),
+      3: _en("Tell your doctor now, don't wait. Iron matters more in the last "
+          "trimester, both for you and for the birth."),
     },
-    whenToAvoid: _en('The habit itself is hard on tooth enamel, which is '
-        'already softer in pregnancy. Crushed ice is kinder than cubes if you '
-        'are going to.'),
+    whenToAvoid: _en("The habit is hard on your tooth enamel, which is "
+        "already softer in pregnancy. If you're going to, crushed ice is "
+        "kinder than cubes."),
     // ⚠️ NO ALTERNATIVES ON PURPOSE. "Try cold cucumber instead" answers a
     // craving question when the useful answer is a blood test. See
     // `talkToDoctor` on the model.
@@ -284,26 +284,24 @@ final List<CravingItem> kCravingItems = [
     name: _en('Achaar / pickle'),
     verdict: NutritionVerdict.limit,
     aliases: ['achar', 'pickle', 'namkeen', 'salty'],
-    why: _en('Sharp, salty and sour — the same craving that lands on imli, '
-        'wearing a different jar. Very common and mostly harmless in small '
-        'amounts.'),
+    why: _en('Sharp, salty and sour: the same craving as imli, in a different '
+        'jar. Very common, and mostly harmless in small amounts.'),
     stageNotes: {
       1: _en('A spoonful with a meal is fine, and the sourness often helps '
           'with nausea.'),
-      2: _en('Fine in small amounts. Keep an eye on how much oil comes with it '
-          'if heartburn has started.'),
-      3: _en('This is the stage to go lighter. Pickle is very high in salt, '
-          'and salt is what matters if swelling or blood pressure is being '
-          'watched.'),
+      2: _en('Fine in small amounts. If heartburn has started, watch how much '
+          'oil comes with it.'),
+      3: _en('Now is the time to go lighter. Pickle is very high in salt, and '
+          'salt matters if your swelling or blood pressure is being watched.'),
     },
-    modification: _en('A spoonful, not a bowl — and drain the oil off against '
-        'the side of the jar.'),
+    modification: _en('A spoonful, not a bowl. Drain the oil off against the '
+        'side of the jar.'),
     whenToAvoid: _en('If your doctor has mentioned raised blood pressure, '
-        'preeclampsia or swelling, treat pickle as occasional rather than '
-        'daily.'),
+        'preeclampsia or swelling, keep pickle for now and then, not every '
+        'day.'),
     alternatives: [
-      _en('Fresh lemon squeezed over the meal — the same sour lift, none of '
-          'the salt.'),
+      _en('Fresh lemon squeezed over your meal. The same sour lift, with none '
+          'of the salt.'),
       _en('Kachumber with amchoor and black salt, made fresh.'),
     ],
   ),
@@ -313,45 +311,45 @@ final List<CravingItem> kCravingItems = [
     name: _en('Mithai and sweets'),
     verdict: NutritionVerdict.limit,
     aliases: ['sweet', 'mithai', 'sugar', 'dessert', 'chocolate'],
-    why: _en('A sweet craving in pregnancy is usually ordinary — more '
-        'appetite, more energy needed, and a body used to a sugar hit at a '
-        'particular time of day.'),
+    why: _en('A sweet craving in pregnancy is usually ordinary. You have more '
+        'appetite, you need more energy, and your body is used to something '
+        'sweet at a certain time of day.'),
     stageNotes: {
-      1: _en('Whatever stays down is a good day. Do not overthink sweets right '
-          'now.'),
+      1: _en("Whatever stays down is a good day. Don't overthink sweets right "
+          "now."),
       2: _en('Fine in normal amounts. This is the trimester the sugar test is '
           'usually done, around 24 to 28 weeks.'),
-      3: _en('If your OGTT flagged anything, sweets are the first thing your '
-          'doctor will talk about. If it did not, ordinary amounts are '
-          'ordinary.'),
+      3: _en("If your sugar test (OGTT) flagged anything, sweets are the first "
+          "thing your doctor will talk about. If it didn't, normal amounts are "
+          "fine."),
     },
-    whenToAvoid: _en('If you have been told you have gestational diabetes, '
-        'this stops being a general-advice question and becomes your own '
-        'doctor\'s plan. Follow theirs, not this page.'),
+    whenToAvoid: _en("If you've been told you have gestational diabetes, this "
+        "is no longer a general question. It's part of your doctor's plan, so "
+        "follow theirs, not this page."),
     alternatives: [
-      _en('Dates or a piece of gud — sweet, and they bring some iron along.'),
+      _en('Dates or a piece of gud. Sweet, and they bring some iron with them.'),
       _en('Fruit with thick curd, which slows the sugar down.'),
-      _en('A small piece of dark chocolate rather than a full mithai.'),
+      _en('A small piece of dark chocolate instead of a full mithai.'),
     ],
     recipe: CravingRecipe(
       name: _en('Date and nut ladoo'),
       minutes: 20,
-      note: _en('No added sugar at all, and enough iron and calcium to be '
-          'worth eating rather than merely allowed.'),
+      note: _en('No added sugar at all, and enough iron and calcium to do you '
+          'some good.'),
       ingredients: [
-        _en('Seedless dates — 1 cup, packed'),
-        _en('Almonds — 1/2 cup'),
-        _en('Walnuts — 1/4 cup'),
-        _en('Til (sesame) — 2 tbsp'),
-        _en('Ghee — 1 tsp'),
-        _en('Elaichi powder — a pinch'),
+        _en('Seedless dates: 1 cup, packed'),
+        _en('Almonds: 1/2 cup'),
+        _en('Walnuts: 1/4 cup'),
+        _en('Til (sesame): 2 tbsp'),
+        _en('Ghee: 1 tsp'),
+        _en('Elaichi powder: a pinch'),
       ],
       steps: [
         _en('Dry-roast the nuts and til lightly, then chop them coarse.'),
         _en('Warm the ghee, add the chopped dates, and mash until they come '
             'together as a paste.'),
         _en('Mix in the nuts, til and elaichi. Cool slightly.'),
-        _en('Roll into small ladoos. Keeps a week in the fridge.'),
+        _en('Roll into small ladoos. They keep for a week in the fridge.'),
       ],
     ),
   ),
@@ -361,21 +359,20 @@ final List<CravingItem> kCravingItems = [
     name: _en('Ice cream and kulfi'),
     verdict: NutritionVerdict.limit,
     aliases: ['icecream', 'kulfi', 'cold', 'dessert'],
-    why: _en('Cold, sweet and soothing — and if you have heartburn, genuinely '
-        'the thing your body is asking for.'),
+    why: _en("Cold, sweet and soothing. If you have heartburn, it's often just "
+        "what your body is asking for."),
     stageNotes: {
       1: _en('Often one of the few things that stays down. Packet ice cream '
           'from a shop with a working freezer is fine.'),
       2: _en('Fine in normal amounts.'),
-      3: _en('Fine, and often the best thing going for heartburn. Watch the '
-          'sugar if your OGTT flagged anything.'),
+      3: _en('Fine, and often one of the best things for heartburn. Watch the '
+          'sugar if your sugar test (OGTT) flagged anything.'),
     },
-    modification: _en('Sealed, branded, and from a freezer that has clearly '
-        'stayed cold. What to skip is soft-serve from a machine you cannot see '
-        'the cleaning of, and thela kulfi made with unpasteurised milk.'),
-    whenToAvoid: _en('Anything that has half-melted and been refrozen — that '
-        'is where listeria risk actually lives, not in ice cream as a '
-        'category.'),
+    modification: _en("Sealed, branded, and from a freezer that has clearly "
+        "stayed cold. Skip soft-serve from a machine you can't see being "
+        "cleaned, and thela kulfi made with unpasteurised milk."),
+    whenToAvoid: _en("Anything that has half-melted and been refrozen. That's "
+        "where the listeria risk is, not in ice cream itself."),
     alternatives: [
       _en('Frozen curd with fruit blended through it.'),
       _en('A home kulfi made from boiled, cooled milk.'),
@@ -384,17 +381,17 @@ final List<CravingItem> kCravingItems = [
       name: _en('Mango-curd kulfi'),
       minutes: 15,
       note: _en('Made from boiled milk and set at home, so the two things that '
-          'make shop kulfi a question — the milk and the freezer — are both '
-          'yours.'),
+          'make shop kulfi a worry, the milk and the freezer, are both in your '
+          'hands.'),
       ingredients: [
-        _en('Full-fat milk — 2 cups, boiled and cooled'),
-        _en('Thick curd — 1/2 cup'),
-        _en('Ripe mango pulp — 1 cup'),
-        _en('Sugar or gud — 2 tbsp, or skip if the mango is sweet'),
-        _en('Elaichi powder — a pinch'),
+        _en('Full-fat milk: 2 cups, boiled and cooled'),
+        _en('Thick curd: 1/2 cup'),
+        _en('Ripe mango pulp: 1 cup'),
+        _en('Sugar or gud: 2 tbsp, or skip if the mango is sweet'),
+        _en('Elaichi powder: a pinch'),
       ],
       steps: [
-        _en('Boil the milk, then cool it fully. Do not skip the boil.'),
+        _en("Boil the milk, then cool it fully. Don't skip the boil."),
         _en('Blend with the curd, mango pulp, sweetener and elaichi.'),
         _en('Pour into moulds and freeze for 6 hours.'),
       ],
@@ -407,23 +404,23 @@ final List<CravingItem> kCravingItems = [
     verdict: NutritionVerdict.limit,
     foodId: 'coffee',
     aliases: ['tea', 'chai', 'coffee', 'caffeine', 'filter coffee'],
-    why: _en('Habit as much as craving — and in the first trimester often the '
-        'opposite: a cup you have had every morning for years can suddenly '
-        'smell wrong.'),
+    why: _en('As much habit as craving. In the first trimester it can even go '
+        'the other way: a cup you have had every morning for years can '
+        'suddenly smell wrong.'),
     stageNotes: {
-      1: _en('Around two cups a day is the usual guidance. Many women go off '
-          'it entirely right now, which is its own answer.'),
-      2: _en('Same limit — roughly 200mg of caffeine a day, which is about two '
+      1: _en("Around two cups a day is the usual guidance. Many women go off "
+          "it completely right now, and that's fine too."),
+      2: _en('Same limit: roughly 200mg of caffeine a day, which is about two '
           'cups of instant coffee or three of home chai.'),
       3: _en('Same limit. Keep tea and coffee an hour away from iron tablets '
-          'and iron-rich meals — they block the absorption.'),
+          'and iron-rich meals, because they block the iron.'),
     },
-    modification: _en('Weaker, and fewer. A light home chai carries much less '
+    modification: _en('Weaker, and fewer. A light home chai has much less '
         'caffeine than a filter coffee or a café cup.'),
     alternatives: [
-      _en('Saunf or ajwain water — warm, and it helps digestion.'),
+      _en('Saunf or ajwain water. Warm, and it helps digestion.'),
       _en('Milk with a little haldi in the evening.'),
-      _en('Decaf, which keeps the ritual and drops the problem.'),
+      _en('Decaf, which keeps the habit without the caffeine.'),
     ],
   ),
   CravingItem(
@@ -433,24 +430,23 @@ final List<CravingItem> kCravingItems = [
     verdict: NutritionVerdict.safe,
     verdictByTrimester: {3: NutritionVerdict.limit},
     aliases: ['spice', 'chilli', 'teekha', 'masala'],
-    why: _en('Extremely common, and the old belief that it harms the baby is '
-        'not true. Chilli does not reach your baby; it stops at your own '
-        'stomach.'),
+    why: _en("Very common, and the old belief that it harms the baby isn't "
+        "true. Chilli doesn't reach your baby. It stops at your own stomach."),
     stageNotes: {
-      1: _en('Eat what appeals. If it comes back up, that is the nausea '
-          'talking, not the chilli doing harm.'),
+      1: _en("Eat what appeals. If it comes back up, that's the nausea, not the "
+          "chilli doing harm."),
       2: _en('Fine. This is usually the easiest trimester for spice.'),
-      3: _en('Still safe for the baby — but the acidity is a real problem now '
-          'that there is less room and heartburn is common. Most women cut '
-          'back on their own by this stage.'),
+      3: _en("Still safe for your baby, but the acidity can bother you now that "
+          "there's less room and heartburn is common. Most women cut back on "
+          "their own by now."),
     },
-    whenToAvoid: _en('When heartburn has started. That is a comfort limit, not '
-        'a safety one — worth being clear about, because the two get confused '
-        'and women give up food they never needed to.'),
+    whenToAvoid: _en("When heartburn has started. That's a comfort limit, not a "
+        "safety one. It helps to know the difference, so you don't give up "
+        "food you never needed to."),
     alternatives: [
-      _en('Flavour without heat — more jeera, dhania and kali mirch, less red '
-          'chilli.'),
-      _en('Curd or a glass of milk alongside the meal rather than after it.'),
+      _en('Flavour without the heat: more jeera, dhania and kali mirch, less '
+          'red chilli.'),
+      _en('Curd or a glass of milk with the meal, not after it.'),
     ],
   ),
   CravingItem(
@@ -460,18 +456,18 @@ final List<CravingItem> kCravingItems = [
     verdict: NutritionVerdict.safe,
     foodId: 'mango',
     aliases: ['kacha aam', 'green mango', 'amchoor', 'sour'],
-    why: _en('The sour craving again, in season. It also carries real vitamin '
+    why: _en('The sour craving again, in season. It also has plenty of vitamin '
         'C, which helps you absorb the iron in the same meal.'),
     stageNotes: {
-      1: _en('Fine, and often welcome — sour flavours settle nausea for many '
+      1: _en('Fine, and often welcome. Sour flavours settle nausea for many '
           'women.'),
-      2: _en('Fine. Eat it with a meal and the vitamin C helps that meal\'s '
-          'iron do more.'),
-      3: _en('Fine. Go easy on the salt-and-chilli that usually comes with it '
-          'if swelling is being watched.'),
+      2: _en("Fine. Have it with a meal and the vitamin C helps you absorb that "
+          "meal's iron."),
+      3: _en('Fine. If your swelling is being watched, go easy on the salt and '
+          'chilli that usually come with it.'),
     },
-    modification: _en('Wash it properly and peel it. The caution is the skin '
-        'and what was on it, not the fruit.'),
+    modification: _en("Wash it well and peel it. The care is about the skin and "
+        "what was on it, not the fruit."),
   ),
   CravingItem(
     id: 'papaya',
@@ -481,28 +477,27 @@ final List<CravingItem> kCravingItems = [
     verdictByTrimester: {1: NutritionVerdict.avoid},
     foodId: 'papaya',
     aliases: ['papita', 'raw papaya', 'kaccha papita'],
-    why: _en('Craved like any sweet fruit — and also the single most-asked '
-        'food question in an Indian pregnancy, so the craving usually arrives '
-        'with worry attached.'),
+    why: _en("You might crave it like any sweet fruit. It's also the most "
+        "asked food question in an Indian pregnancy, so the craving often "
+        "comes with a worry."),
     stageNotes: {
-      1: _en('Leave it for now. Unripe papaya contains latex that can cause '
+      1: _en('Leave it for now. Unripe papaya has latex that can cause '
           'contractions, and early pregnancy is when that caution is taken '
           'most seriously.'),
-      2: _en('Fully ripe papaya — soft, deep orange, no white sap — is '
-          'generally considered fine in normal amounts. Unripe or half-ripe '
-          'stays off.'),
-      3: _en('Same as the second trimester: ripe is fine, unripe is not. If '
-          'your own doctor has told you to avoid it entirely, follow them.'),
+      2: _en('Fully ripe papaya (soft, deep orange, no white sap) is generally '
+          'considered fine in normal amounts. Unripe or half-ripe is still '
+          'off.'),
+      3: _en("Same as the second trimester: ripe is fine, unripe isn't. If your "
+          "own doctor has told you to avoid it completely, follow them."),
     },
-    modification: _en('Ripe only, and obviously ripe — soft to the touch, deep '
+    modification: _en('Ripe only, and clearly ripe: soft to the touch, deep '
         'orange inside, no milky sap at the stem.'),
-    whenToAvoid: _en('Any papaya that is green, firm, or leaks white sap when '
-        'cut. That is the one the warning has always been about.'),
+    whenToAvoid: _en("Any papaya that is green, firm, or leaks white sap when "
+        "cut. That's the one the warning has always been about."),
     alternatives: [
-      _en('Ripe mango, chikoo or banana — sweet, soft, and no argument '
-          'attached.'),
-      _en('Papita is often craved for digestion; soaked figs or a bowl of curd '
-          'do the same job.'),
+      _en('Ripe mango, chikoo or banana. Sweet, soft, and no argument at home.'),
+      _en('If you want papita for digestion, soaked figs or a bowl of curd do '
+          'the same job.'),
     ],
   ),
   CravingItem(
@@ -511,42 +506,41 @@ final List<CravingItem> kCravingItems = [
     name: _en('Chowmein and Indo-Chinese'),
     verdict: NutritionVerdict.limit,
     aliases: ['noodles', 'chowmein', 'hakka', 'manchurian', 'msg', 'ajinomoto'],
-    why: _en('Salt, oil and a strong savoury hit — which is exactly what a '
-        'pregnancy craving wants when it is not asking for sour or sweet.'),
+    why: _en("Salt, oil and a strong savoury taste. That's what a pregnancy "
+        "craving often wants when it isn't asking for sour or sweet."),
     stageNotes: {
-      1: _en('Fine occasionally. Freshly cooked and hot is the thing to insist '
-          'on.'),
-      2: _en('Fine occasionally. Ask for less ajinomoto if the place will do '
+      1: _en('Fine now and then. Make sure it is freshly cooked and hot.'),
+      2: _en('Fine now and then. Ask for less ajinomoto if the place will do '
           'it.'),
-      3: _en('Go lighter now — this food is very high in salt, and salt is '
-          'what matters if swelling or blood pressure is being watched.'),
+      3: _en('Go lighter now. This food is very high in salt, and salt matters '
+          'if your swelling or blood pressure is being watched.'),
     },
-    modification: _en('Freshly cooked, eaten hot, from somewhere with '
-        'turnover. Reheated noodles that have sat out are the actual risk.'),
+    modification: _en('Freshly cooked, eaten hot, from a busy place. Reheated '
+        'noodles that have been sitting out are the real risk.'),
     whenToAvoid: _en('Cold or lukewarm noodles, and anything in a sauce that '
         'has been standing.'),
     alternatives: [
       _en('Home hakka noodles with plenty of vegetables and half the salt.'),
-      _en('Vegetable soup with noodles in it, if it is the warm-savoury thing '
-          'you want.'),
+      _en("Vegetable soup with noodles in it, if it's something warm and "
+          "savoury you want."),
     ],
     recipe: CravingRecipe(
       name: _en('Home veg hakka noodles'),
       minutes: 25,
-      note: _en('No ajinomoto, half the salt, twice the vegetables — and hot '
-          'off your own stove, which was the real issue.'),
+      note: _en('No ajinomoto, half the salt, twice the vegetables, and hot off '
+          'your own stove, which was the real issue.'),
       ingredients: [
-        _en('Hakka noodles — 1 packet'),
-        _en('Cabbage, carrot, capsicum, spring onion — 2 cups, shredded'),
-        _en('Garlic — 4 cloves, chopped'),
-        _en('Soy sauce — 1 tbsp'),
-        _en('Vinegar — 1 tsp'),
-        _en('Kali mirch — to taste'),
-        _en('Oil — 1 tbsp'),
+        _en('Hakka noodles: 1 packet'),
+        _en('Cabbage, carrot, capsicum, spring onion: 2 cups, shredded'),
+        _en('Garlic: 4 cloves, chopped'),
+        _en('Soy sauce: 1 tbsp'),
+        _en('Vinegar: 1 tsp'),
+        _en('Kali mirch: to taste'),
+        _en('Oil: 1 tbsp'),
       ],
       steps: [
         _en('Boil the noodles, drain, and toss with a few drops of oil.'),
-        _en('Fry the garlic on high heat, then the vegetables — 2 minutes '
+        _en('Fry the garlic on high heat, then the vegetables for 2 minutes '
             'only, so they stay crisp.'),
         _en('Add the noodles, soy, vinegar and pepper. Toss and serve hot.'),
       ],
@@ -560,33 +554,32 @@ final List<CravingItem> kCravingItems = [
     foodId: 'curd_yogurt',
     aliases: ['dahi', 'yogurt', 'lassi', 'chaas', 'buttermilk'],
     why: _en('Cooling, easy on a sour stomach, and one of the few things that '
-        'reliably helps heartburn. A craving worth simply following.'),
+        'reliably helps heartburn. A craving worth following.'),
     stageNotes: {
-      1: _en('Genuinely helpful for nausea, and it stays down when little else '
-          'does.'),
-      2: _en('Fine and good — calcium and protein, both of which you need more '
-          'of now.'),
-      3: _en('Fine, and one of the better answers to third-trimester '
-          'heartburn.'),
+      1: _en('Helpful for nausea, and it stays down when little else does.'),
+      2: _en('Fine and good: calcium and protein, and you need more of both '
+          'now.'),
+      3: _en('Fine, and one of the better answers to heartburn in the last '
+          'months.'),
     },
-    modification: _en('Set at home or from a sealed packet. The one to skip is '
-        'loose curd sold open in a market.'),
+    modification: _en('Set at home or from a sealed packet. Skip loose curd '
+        'sold open in a market.'),
     recipe: CravingRecipe(
       name: _en('Salted jeera chaas'),
       minutes: 5,
-      note: _en('Five minutes, and it does more for heartburn than most things '
+      note: _en('Five minutes, and it helps heartburn more than most things '
           'sold for it.'),
       ingredients: [
-        _en('Thick curd — 1/2 cup'),
-        _en('Cold water — 1 cup'),
-        _en('Roasted jeera powder — 1/2 tsp'),
-        _en('Black salt — a pinch'),
-        _en('Pudina leaves — a few, washed'),
+        _en('Thick curd: 1/2 cup'),
+        _en('Cold water: 1 cup'),
+        _en('Roasted jeera powder: 1/2 tsp'),
+        _en('Black salt: a pinch'),
+        _en('Pudina leaves: a few, washed'),
       ],
       steps: [
         _en('Whisk the curd smooth, then whisk in the water.'),
         _en('Add the jeera, black salt and crushed pudina.'),
-        _en('Serve cold. Do not add ice made from tap water.'),
+        _en("Serve cold. Don't add ice made from tap water."),
       ],
     ),
   ),
@@ -597,21 +590,20 @@ final List<CravingItem> kCravingItems = [
     verdict: NutritionVerdict.avoid,
     talkToDoctor: true,
     aliases: ['pica', 'mitti', 'chalk', 'clay', 'ash', 'raakh', 'khadiya'],
-    why: _en('A craving for things that are not food is called pica. It is '
-        'real, it is not something to be embarrassed about, and it is often '
-        'linked to low iron or zinc — which is a treatable thing, not a '
-        'character flaw.'),
+    why: _en("A craving for things that aren't food is called pica. It's real, "
+        "there's nothing to be embarrassed about, and it's often linked to low "
+        "iron or zinc. That can be treated, and it says nothing about you."),
     stageNotes: {
-      1: _en('Tell your doctor at your next visit. Bloodwork this early will '
+      1: _en('Tell your doctor at your next visit. Early blood tests will '
           'usually show whether iron is behind it.'),
-      2: _en('Please mention it. It is common enough in India that your doctor '
-          'will not be surprised, and the fix is often just iron.'),
-      3: _en('Say it now rather than at delivery. Low iron in the last '
-          'trimester matters for how the birth goes.'),
+      2: _en("Please mention it. It's common enough in India that your doctor "
+          "won't be surprised, and the fix is often just iron."),
+      3: _en("Tell your doctor now, not at delivery. Low iron in the last "
+          "trimester matters for how the birth goes."),
     },
-    whenToAvoid: _en('Always. Mud and ash can carry lead, parasites and '
-        'bacteria, and chalk blocks the very iron you are short of — so it '
-        'deepens the thing causing the craving.'),
+    whenToAvoid: _en("Always. Mud and ash can carry lead, parasites and "
+        "bacteria, and chalk blocks the very iron you're short of. So it makes "
+        "the cause of the craving worse."),
     // No alternatives and no recipe: the answer to this one is a blood test.
   ),
 ];

@@ -281,7 +281,7 @@ class _MealSheet extends StatelessWidget {
                       ),
                     ]),
                     const SizedBox(height: 6),
-                    Text('Skipping a meal is allowed. If it is most meals for a few days, mention it to your doctor.',
+                    Text('Skipping a meal is fine. If it\'s most meals for a few days, mention it to your doctor.',
                         style: pvManrope(fontSize: 11.5, height: 1.45, color: p.ink3)),
                     ],
                   ]),

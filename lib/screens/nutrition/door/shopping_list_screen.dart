@@ -22,7 +22,7 @@ class ShoppingListScreen extends StatelessWidget {
   const ShoppingListScreen({super.key});
 
   String _text(List<ShoppingItem> items) {
-    final b = StringBuffer('Shopping list — ParentVeda\n');
+    final b = StringBuffer('Shopping list, from ParentVeda\n');
     for (final rid in items.map((s) => s.recipeId).toSet()) {
       final r = kRecipes.where((x) => x.id == rid).firstOrNull;
       b.writeln('\n${r?.name.en ?? rid}');

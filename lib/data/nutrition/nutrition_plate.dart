@@ -204,11 +204,11 @@ class PlateNeed {
 /// Five, in the order the day meets them. Fluids is not a nutrient guide;
 /// it is the water row, and it ticks itself at six glasses.
 const List<PlateNeed> kPlateNeeds = [
-  PlateNeed(id: 'iron', label: 'Iron', line: 'Dal, greens, jaggery, dates — with something sour to absorb it.', recipeTag: 'iron'),
+  PlateNeed(id: 'iron', label: 'Iron', line: 'Dal, greens, jaggery, dates, with something sour to help you absorb it.', recipeTag: 'iron'),
   PlateNeed(id: 'calcium', label: 'Calcium', line: 'Milk, curd, paneer, ragi, sesame.', recipeTag: 'calcium'),
-  PlateNeed(id: 'protein', label: 'Protein', line: 'Dal, paneer, egg, chana, curd — a little at every meal.', recipeTag: 'protein'),
+  PlateNeed(id: 'protein', label: 'Protein', line: 'Dal, paneer, egg, chana, curd. A little at every meal.', recipeTag: 'protein'),
   PlateNeed(id: 'folic_acid', label: 'Folate', line: 'Greens, oranges, beans, and your daily tablet.', recipeTag: 'folate'),
-  PlateNeed(id: 'fibre', label: 'Fibre', line: 'Whole grains, fruit with skin, vegetables — and water to go with it.', recipeTag: 'fibre'),
+  PlateNeed(id: 'fibre', label: 'Fibre', line: 'Whole grains, fruit with the skin on, vegetables, and water to go with it.', recipeTag: 'fibre'),
 ];
 
 PlateNeed? plateNeedById(String id) => kPlateNeeds.where((n) => n.id == id).firstOrNull;

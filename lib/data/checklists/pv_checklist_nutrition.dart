@@ -44,27 +44,30 @@ final PvChecklist kDietQuestionsChecklist = PvChecklist(
   id: 'diet_questions',
   eyebrow: 'Before your appointment',
   title: 'What to ask about your diet',
-  intro: 'Tick what matters to you and take the list in with you. These are '
-      'questions a doctor or a dietician answers every day — none of them is '
-      'a silly one.',
+  intro: 'Tick what matters to you and take the list in with you. A doctor '
+      'or dietician answers these every day. None of them is a silly '
+      'question.',
   shareHeader: 'What to ask about my diet',
   subject: _stageName,
   subjectTitle: (s) => 'What to ask about your diet',
-  subjectIntro: (s) => 'You are in $s. Tick what matters to you and take the '
-      'list in with you — these are questions a doctor or a dietician answers '
-      'every day.',
+  subjectIntro: (s) => "You're in $s. Tick what matters to you and take the "
+      'list in with you. A doctor or dietician answers these every day.',
   groups: [
     PvChecklistGroup('Is my plate alright?', [
       PvChecklistItem('plate_enough',
-          'Looking at what I actually eat in a day, is anything missing?'),
+          'Looking at what I eat in a day, is anything missing?'),
       PvChecklistItem('plate_veg',
-          'I am vegetarian — is there anything I need to add or take?'),
+          "I'm vegetarian. Is there anything I need to add or take?"),
       PvChecklistItem('plate_weight',
           'Am I gaining weight the way you would expect at this stage?'),
+      // Added 2026-09-29 with the weight read (gap analysis P1).
+      PvChecklistItem('plate_range',
+          'Which BMI group am I in, and what weight gain range do you want '
+          'for me?'),
       PvChecklistItem('plate_portion',
           'How much more should I be eating than before, if any?'),
       PvChecklistItem('plate_home',
-          'My family cooks one meal for everyone — can I eat that?'),
+          'My family cooks one meal for everyone. Can I eat that?'),
     ]),
 
     PvChecklistGroup('Tablets and supplements', [
@@ -73,22 +76,22 @@ final PvChecklist kDietQuestionsChecklist = PvChecklist(
       PvChecklistItem('sup_when',
           'When should I take each one, and what should I avoid with it?'),
       PvChecklistItem('sup_sick',
-          'They upset my stomach — is there another version I could try?'),
+          'They upset my stomach. Is there another kind I could try?'),
       PvChecklistItem('sup_extra',
           'Do I need anything you have not already given me?'),
       PvChecklistItem('sup_bought',
-          'I bought this on my own — should I be taking it?'),
+          'I bought this on my own. Should I be taking it?'),
     ]),
 
     PvChecklistGroup('Food I am unsure about', [
       PvChecklistItem('food_papaya',
-          'Are the foods my family says to avoid actually a problem?'),
+          'Are the foods my family says to avoid really a problem?'),
       PvChecklistItem('food_outside',
           'How careful do I need to be about eating outside?'),
       PvChecklistItem('food_tea',
           'How much tea or coffee is alright in a day?'),
       PvChecklistItem('food_craving',
-          'I am craving something odd — is that worth mentioning?'),
+          "I'm craving something odd. Is that worth mentioning?"),
     ]),
 
     PvChecklistGroup('If something has been flagged', [
@@ -104,7 +107,7 @@ final PvChecklist kDietQuestionsChecklist = PvChecklist(
 
     PvChecklistGroup('Fasting and festivals', [
       PvChecklistItem('fast_safe',
-          'A fast is coming up — is it alright for me to keep it this year?'),
+          'A fast is coming up. Is it alright for me to keep it this year?'),
       PvChecklistItem('fast_modify',
           'If I do keep it, what should I change to make it safer?'),
       // ⚠️ LAST, AND IT IS THE SAME LINE EVERY CHECKLIST ENDS ON. Every

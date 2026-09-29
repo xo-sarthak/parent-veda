@@ -273,7 +273,7 @@ class _NutritionTodayBodyState extends State<NutritionTodayBody> {
                 ),
             ])),
             const SizedBox(height: 10),
-            pvDoorPad(Text('Roughly what a day in pregnancy asks for (ICMR-NIN). Food covers most of it; the tablet covers the rest.',
+            pvDoorPad(Text('Roughly what a day in pregnancy asks for (ICMR-NIN). Food covers most of it, and your tablets cover the rest.',
                 style: pvManrope(fontSize: 11.5, height: 1.45, color: p.ink3))),
             const SizedBox(height: 26),
 
@@ -313,8 +313,8 @@ class _NutritionTodayBodyState extends State<NutritionTodayBody> {
   String _needsLine(NutritionDayStore store) {
     final ticked = kPlateNeeds.where((n) => store.ticked(_date, n.id)).length;
     if (ticked == 0) return 'Tap what you had today. Hold one to see what counts.';
-    if (ticked == kPlateNeeds.length) return 'All five today. That is a good day for the baby.';
-    return '$ticked of ${kPlateNeeds.length} today — every one helps.';
+    if (ticked == kPlateNeeds.length) return 'All five today. That\'s a good day for your baby.';
+    return '$ticked of ${kPlateNeeds.length} today. Every one helps.';
   }
 
   // `nutritionNeedIcon` (nutrition_widgets.dart) — shared with the dish
@@ -326,8 +326,8 @@ class _NutritionTodayBodyState extends State<NutritionTodayBody> {
     return [
       pvDoorPad(nutritionHeading(p, 'Craving something?',
           sub: chipFor == null
-              ? 'Tap it. Cravings are normal; most have a kind answer.'
-              : '${chipFor.$2} has come up ${pattern!.times} times this week — here is what helps.')),
+              ? 'Tap it. Cravings are normal, and most have a kind answer.'
+              : '${chipFor.$2} has come up ${pattern!.times} times this week. Here\'s what helps.')),
       const SizedBox(height: 12),
       SizedBox(
         height: 40,

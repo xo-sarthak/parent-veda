@@ -387,7 +387,7 @@ class _ConsultCard extends StatelessWidget {
                           Text(
                               'A diet plan built around your trimester, any '
                               'condition you are managing, and what you '
-                              'actually eat at home.',
+                              'really eat at home.',
                               style: pvManrope(
                                   fontSize: 13,
                                   height: 1.45,

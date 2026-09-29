@@ -252,7 +252,7 @@ class _CanIEatBodyState extends State<CanIEatBody> {
                   title: 'Not in the food library yet',
                   body: '${kFoodEntries.length} foods are answered here. If '
                       'yours is missing, the cravings below may still cover '
-                      'it — and anything specific is worth one question to '
+                      'it, and anything specific is worth one question to '
                       'your doctor.',
                   p: p,
                 ),
@@ -300,7 +300,7 @@ class _CanIEatBodyState extends State<CanIEatBody> {
                   title: 'No craving by that name',
                   body: '${kCravingItems.length} cravings are answered for '
                       'the week you are in. Try the feeling rather than the '
-                      'dish — sour, salty, cold, very spicy.',
+                      'dish: sour, salty, cold, very spicy.',
                   p: p,
                 ),
             ],
@@ -920,7 +920,7 @@ class _CravingDetail extends StatelessWidget {
       ],
       if (item.talkToDoctor) ...[
         const SizedBox(height: 10),
-        Text('Worth a word with your doctor — this one can point at low iron.',
+        Text('Worth a word with your doctor. This one can point to low iron.',
             style: pvManrope(
                 fontSize: 12.5,
                 fontWeight: FontWeight.w700,

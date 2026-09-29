@@ -111,9 +111,10 @@ class _SetupFlowState extends State<_SetupFlow> {
 
   ({double min, double max}) _gainFor(double w, double h) {
     final bmi = w / ((h / 100) * (h / 100));
+    // Asian BMI cut-offs, matching ToolsStore.recommendedGain (2026-09-29).
     if (bmi < 18.5) return (min: 12.5, max: 18.0);
-    if (bmi < 25) return (min: 11.5, max: 16.0);
-    if (bmi < 30) return (min: 7.0, max: 11.5);
+    if (bmi < 23) return (min: 11.5, max: 16.0);
+    if (bmi < 25) return (min: 7.0, max: 11.5);
     return (min: 5.0, max: 9.0);
   }
 

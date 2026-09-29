@@ -97,7 +97,7 @@ class _DietChartBrowseScreenState extends State<DietChartBrowseScreen> {
               const SizedBox(height: 10),
               if (charts.isEmpty)
                 pvDoorPad(Text(
-                    'Loosen one of the chips — a regional chart is rarely also a condition chart. '
+                    'Loosen one of the chips. A regional chart is rarely also a condition chart. '
                     'The Full month Indian chart fits everyone.',
                     style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2)))
               else

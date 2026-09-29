@@ -61,7 +61,7 @@ class _DietChartPlanScreenState extends State<DietChartPlanScreen> {
       if (!mounted) return;
       if (bytes == null) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Could not prepare the file. Please try again on a connection.'),
+          content: Text('Couldn\'t prepare the file. Please try again when you\'re online.'),
         ));
         return;
       }

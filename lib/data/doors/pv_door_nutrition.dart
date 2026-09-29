@@ -141,7 +141,7 @@ final PvDoorPage kNutritionDoor = PvDoorPage(
   // words, and it is the reason the food checker leads with a verdict rather
   // than a lecture.
   heroTitle: 'Eating well, without the panic.',
-  heroBlurb: 'Any food, any craving, any stage — answered plainly, for an '
+  heroBlurb: 'Any food, any craving, any stage, answered plainly for an '
       'Indian kitchen.',
 
   // ⚠️ THE PHOTOGRAPH HAS TO BE INDIAN FOOD OR IT CONTRADICTS THE BLURB. The
@@ -272,8 +272,10 @@ final PvDoorPage kNutritionDoor = PvDoorPage(
       hue: 344,
       inlineSurfaceId: kDietSurfaceExperts, // NutritionTalkBody since 2026-09-20
       inlineLabel: 'The dietician',
-      note: 'This is general guidance, not your doctor\'s advice. Anything '
-          'specific to your health goes to your doctor or our dietician.',
+      // Rewritten 2026-09-29 to docs/PREG-VOICE.md (its one medical line).
+      note: 'This is general guidance. ParentVeda explains and reminds; your '
+          'doctor decides. For your own plan, talk to your doctor or our '
+          'dietician.',
     ),
   ],
 
@@ -287,12 +289,14 @@ final PvDoorPage kNutritionDoor = PvDoorPage(
       tiles: [
         PvDoorToolTile(
           title: 'Is this food safe?',
-          blurb: 'Papaya, paneer, street food, a packet — the Is it safe? door, one tap away.',
+          // One food answer, not two (gap analysis P1): this opens the same
+          // 193 answers as the Is it safe? door; the 64-food list is retired.
+          blurb: 'Papaya, paneer, street food, a packet. The Is it safe? door answers it.',
           surfaceId: 'can_i',
         ),
         PvDoorToolTile(
           title: 'Your shopping list',
-          blurb: 'Ingredients from the recipes you picked, ticked off at the shop.',
+          blurb: 'Ingredients from the recipes you picked, to tick off at the shop.',
           surfaceId: kDietSurfaceList,
         ),
       ],
@@ -322,8 +326,16 @@ final PvDoorPage kNutritionDoor = PvDoorPage(
         // this stays where it is.
         PvDoorGuideTile(
           title: 'Add this to your plate now',
-          blurb: 'One short list per stage. Not a diet — just what to add.',
+          blurb: 'One short list for each stage. Not a diet, just what to add.',
           readId: 'preg_diet_read_add_now',
+        ),
+        // The weight read (gap analysis P1, 2026-09-29): Asian BMI groups,
+        // and ranges her doctor may use. A guide tile, so the entry-tile
+        // lead above still hoists her trimester and this stays second.
+        PvDoorGuideTile(
+          title: 'How much weight is right for me?',
+          blurb: 'The BMI groups used for Indian women, and where the weight goes.',
+          readId: 'preg_diet_read_weight',
         ),
         // ⚠️ TRIMESTERS FIRST, PRE-PREGNANCY LAST. `kTrimesterGuides` is in
         // life order — before, first, second, third — which is right for the
@@ -394,9 +406,9 @@ final PvDoorPage kNutritionDoor = PvDoorPage(
         // screen. The brief marks it [Video, COMING SOON] reuse; the card holds
         // its place at full size and does not tap.
         PvDoorVideoTile(
-          title: 'Do I actually need supplements?',
-          blurb: 'A dietician on what food covers, and what it usually does '
-              'not.',
+          title: 'Do I need supplements?',
+          blurb: "A dietician on what food covers, and what it usually "
+              "doesn't.",
         ),
       ],
     ),
@@ -411,10 +423,18 @@ final PvDoorPage kNutritionDoor = PvDoorPage(
     PvDoorSection(
       group: kDietTabNow,
       heading: 'The bigger questions',
-      tiles: _tilesFor(PvDoorLibrary.dietQuestion, [
-        for (final q in kNutritionPracticalCards)
-          (id: q.id, title: q.title.en, blurb: _firstSentence(q.body.en)),
-      ]),
+      tiles: [
+        // Food beliefs at home (gap analysis Appendix A, P2, 2026-09-29).
+        PvDoorGuideTile(
+          title: "What they say at home, and what's true",
+          blurb: 'Ghee, kesar, papaya and more, answered kindly.',
+          readId: 'preg_diet_read_food_myths',
+        ),
+        ..._tilesFor(PvDoorLibrary.dietQuestion, [
+          for (final q in kNutritionPracticalCards)
+            (id: q.id, title: q.title.en, blurb: _firstSentence(q.body.en)),
+        ]),
+      ],
     ),
 
     // =========================================================================

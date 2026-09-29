@@ -66,7 +66,7 @@ class NutrientsScreen extends StatelessWidget {
                 ],
                 const SizedBox(height: 20),
                 const PvVideoPlaceholder(
-                  title: 'Do I actually need supplements?',
+                  title: 'Do I need supplements?',
                   subtitle: 'A dietician walks through what food covers, and what it usually does not.',
                   hue: 104,
                 ),

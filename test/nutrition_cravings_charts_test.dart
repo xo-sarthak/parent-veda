@@ -151,7 +151,7 @@ void main() {
       expect(find.textContaining('week 8'), findsWidgets);
       expect(
         pvReadFromCraving(_c('papaya'), 8).teaser.en,
-        'At week 8 — Not now',
+        'At week 8: Not now', // re-pinned 2026-09-29, the voice pass (no dashes)
       );
 
       final late = _at(30);
@@ -161,7 +161,7 @@ void main() {
       expect(find.textContaining('week 30'), findsWidgets);
       expect(
         pvReadFromCraving(_c('papaya'), 30).teaser.en,
-        'At week 30 — In small amounts',
+        'At week 30: In small amounts',
       );
     });
 

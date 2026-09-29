@@ -379,8 +379,8 @@ class _ComplicationsLink extends StatelessWidget {
             const SizedBox(width: 10),
             Expanded(
               child: Text(
-                  'This page is about what to eat. For the condition itself — '
-                  'what it is, what happens next and when to call — read '
+                  'This page is about what to eat. For the condition itself '
+                  '(what it is, what happens next and when to call), read '
                   '${guide.label.now}.',
                   style: pvManrope(fontSize: 12, height: 1.4, color: p.ink3)),
             ),

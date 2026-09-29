@@ -967,6 +967,21 @@ final List<FoodEntry> kFoodEntries = [
 //  2. Food for my stage
 // =============================================================================
 
+/// An extra section on a nutrition read: a question heading, then a few
+/// paragraphs or bullets. Added 2026-09-29 for the gap analysis's "add to a
+/// piece we already have" items, so a page can grow without a new model.
+class NutritionMore {
+  const NutritionMore({
+    required this.heading,
+    this.paragraphs = const [],
+    this.bullets = const [],
+  });
+
+  final LocalizedText heading;
+  final List<LocalizedText> paragraphs;
+  final List<LocalizedText> bullets;
+}
+
 class TrimesterGuide {
   const TrimesterGuide({
     required this.id,
@@ -976,11 +991,16 @@ class TrimesterGuide {
     required this.helps,
     required this.leanOn,
     required this.sampleDay,
+    this.shortAnswer,
   });
 
   final String id;
   final LocalizedText label;
   final String videoTitle;
+
+  /// Two or three sentences that answer the page's title, boxed at the top
+  /// of the read (docs/PREG-VOICE.md §3). Added 2026-09-29.
+  final LocalizedText? shortAnswer;
 
   /// What to focus on this stage.
   final LocalizedText focus;
@@ -1000,18 +1020,21 @@ final List<TrimesterGuide> kTrimesterGuides = [
     id: 'pre_pregnancy',
     label: _en('Pre-pregnancy'),
     videoTitle: 'Eating well before you conceive',
-    focus: _en('Building up folate, iron and a steady weight before you '
-        'conceive makes the first weeks, when the baby\'s neural tube is '
-        'forming, easier on both of you.'),
+    shortAnswer: _en("Start folic acid a few months before you try, and build "
+        "up your iron with everyday food. A steady, varied diet is better "
+        "than a sudden new one."),
+    focus: _en("Building up folate, iron and a steady weight before you "
+        "conceive makes the first weeks easier on you both. That's when your "
+        "baby's brain and spine (the neural tube) are forming."),
     helps: [
       _en('Starting folic acid, ideally a few months before you try'),
-      _en('A steady, varied diet rather than a sudden new one'),
-      _en('Cutting down alcohol and smoking, not just once pregnant'),
+      _en('A steady, varied diet, not a sudden new one'),
+      _en('Cutting down alcohol and smoking now, not only once pregnant'),
     ],
     leanOn: [
       _en('Leafy greens, dal and citrus for folate'),
       _en('Iron-rich foods: dal, dark greens, jaggery'),
-      _en('Dairy or a calcium source daily'),
+      _en('Dairy or another calcium source every day'),
     ],
     sampleDay: [
       (meal: _en('Breakfast'), items: _en('Vegetable poha or besan chilla, a glass of milk')),
@@ -1024,16 +1047,20 @@ final List<TrimesterGuide> kTrimesterGuides = [
     id: 't1',
     label: _en('First trimester'),
     videoTitle: 'Eating through the first trimester',
-    focus: _en('Nausea often makes eating hard right when folic acid matters '
-        'most. Small, frequent, bland meals usually work better than three '
-        'big ones.'),
+    shortAnswer: _en("Eat whatever stays down, little and often, and keep "
+        "taking your folic acid. You don't need any extra food yet. Your "
+        "appetite usually comes back in the second trimester."),
+    focus: _en("Nausea often makes eating hard just when folic acid matters "
+        "most. Small, frequent, plain meals usually work better than three "
+        "big ones."),
     helps: [
-      _en('Small meals every two to three hours rather than three large ones'),
+      _en('Small meals every two to three hours, not three big ones'),
       _en('Ginger, in tea or food, for nausea'),
-      _en('Not worrying if appetite dips, it usually returns by T2'),
+      _en("Not worrying if your appetite dips. It usually comes back by the "
+          "second trimester"),
     ],
     leanOn: [
-      _en('Dry, bland foods when nausea is high: khichdi, toast, banana'),
+      _en('Dry, plain foods when nausea is bad: khichdi, toast, banana'),
       _en('Folate-rich food: dal, leafy greens, citrus'),
       _en('Whatever stays down, over what is "ideal" that day'),
     ],
@@ -1048,13 +1075,16 @@ final List<TrimesterGuide> kTrimesterGuides = [
     id: 't2',
     label: _en('Second trimester'),
     videoTitle: 'Eating through the second trimester',
-    focus: _en('Appetite usually returns and the baby is growing fast. This '
-        'is the stage to build a steady rhythm of protein, iron and calcium '
-        'rather than restrict anything.'),
+    shortAnswer: _en("Your appetite usually comes back, and your baby is "
+        "growing fast. Build each day around protein, iron and calcium. "
+        "About one small extra meal a day covers the extra you need."),
+    focus: _en("Your appetite usually returns and your baby is growing fast. "
+        "This is the time to build a steady rhythm of protein, iron and "
+        "calcium. There's nothing you need to cut out."),
     helps: [
-      _en('A protein source at every meal: dal, paneer, egg, chicken or fish'),
-      _en('Iron with a vitamin C food alongside it, to help absorption'),
-      _en('Calcium daily, dairy or ragi, alongside iron at a different meal'),
+      _en('Protein at every meal: dal, paneer, egg, chicken or fish'),
+      _en('Iron with a vitamin C food alongside, to help you absorb it'),
+      _en('Calcium every day from dairy or ragi, at a different meal from iron'),
     ],
     leanOn: [
       _en('Dal, paneer, eggs, chicken or fish through the week'),
@@ -1072,16 +1102,19 @@ final List<TrimesterGuide> kTrimesterGuides = [
     id: 't3',
     label: _en('Third trimester'),
     videoTitle: 'Eating through the third trimester',
-    focus: _en('The baby\'s growth speeds up and there is less room for big '
-        'meals. Smaller, more frequent meals with steady protein and iron '
-        'usually feel more comfortable than three large plates.'),
+    shortAnswer: _en("Eat smaller meals more often, because your stomach has "
+        "less room. Keep your protein, iron and calcium going right up to "
+        "the birth. A light dinner helps with heartburn."),
+    focus: _en("Your baby grows faster now and there's less room for big "
+        "meals. Smaller, more frequent meals with steady protein and iron "
+        "usually feel better than three large plates."),
     helps: [
-      _en('Smaller, more frequent meals as the stomach has less room'),
-      _en('Iron and protein stay a daily priority, right through to labour'),
-      _en('Easy-to-digest food in the evening if heartburn is a problem'),
+      _en('Smaller, more frequent meals, as your stomach has less room'),
+      _en('Iron and protein every day, right up to labour'),
+      _en('Easy food in the evening if heartburn bothers you'),
     ],
     leanOn: [
-      _en('Dates, valued traditionally in the final weeks'),
+      _en('Dates, a traditional favourite in the last weeks'),
       _en('Dal, paneer, eggs for steady protein'),
       _en('Lighter dinners: khichdi, curd rice, a simple soup'),
     ],
@@ -1113,12 +1146,24 @@ class ConditionGuide {
     required this.guidance,
     this.linkId,
     this.linkLibrary = ConditionLink.complication,
+    this.shortAnswer,
+    this.more = const [],
+    this.readNext = const [],
   });
 
   final String id;
   final LocalizedText label;
   final String videoTitle;
   final LocalizedText summary;
+
+  /// The short answer boxed at the top of the read. Added 2026-09-29.
+  final LocalizedText? shortAnswer;
+
+  /// Extra sections under the guidance (gap analysis Appendix A additions).
+  final List<NutritionMore> more;
+
+  /// Pregnancy read ids offered after this page (`preg_diet_read_*`).
+  final List<String> readNext;
 
   /// Plain guidance, as short paragraphs.
   final List<LocalizedText> guidance;
@@ -1154,19 +1199,21 @@ final List<ConditionGuide> kConditionGuides = [
     id: 'gestational_diabetes',
     label: _en('Gestational diabetes'),
     videoTitle: 'Eating with gestational diabetes',
-    summary: _en('The goal is steadier blood sugar through the day, not a '
-        'restrictive diet. Small changes to how and when you eat carbs '
-        'usually matter more than cutting any one food out.'),
+    shortAnswer: _en("You don't need a strict diet. The aim is steadier blood "
+        "sugar through the day: pair carbs with protein or fibre, and eat "
+        "smaller meals more often. Your care team sets your numbers."),
+    summary: _en("The aim is steadier blood sugar through the day, not a strict "
+        "diet. Small changes to how and when you eat carbs usually matter "
+        "more than cutting out any one food."),
     guidance: [
-      _en('Pair carbs with protein or fibre, rice with dal rather than rice '
-          'alone, to slow how fast sugar rises.'),
-      _en('Smaller, more frequent meals tend to keep readings steadier than '
-          'three large ones.'),
-      _en('Fruit is not off-limits, but portion and pairing matter, ask your '
-          'dietician what a serving looks like for you.'),
-      _en('Your care team will usually give you specific numbers to aim for. '
-          'This page explains the general approach; the numbers are theirs '
-          'to set.'),
+      _en('Pair carbs with protein or fibre: rice with dal, not rice on its '
+          'own. It slows how fast your sugar rises.'),
+      _en('Smaller meals more often usually keep readings steadier than three '
+          'big ones.'),
+      _en("Fruit isn't off-limits, but portion and pairing matter. Ask your "
+          "dietician what a serving looks like for you."),
+      _en("Your care team will usually give you numbers to aim for. This page "
+          "explains the general approach; the numbers are theirs to set."),
     ],
     linkId: 'gdm',
   ),
@@ -1174,18 +1221,22 @@ final List<ConditionGuide> kConditionGuides = [
     id: 'anemia_iron',
     label: _en('Anaemia / low iron'),
     videoTitle: 'Eating for anaemia in pregnancy',
-    summary: _en('Iron needs go up sharply in pregnancy, and food alone often '
-        'is not quite enough, which is why a supplement is common alongside '
-        'diet, not instead of it.'),
+    shortAnswer: _en("Eat iron-rich foods with something sour at the same meal, "
+        "and keep tea and coffee away from mealtimes. Food alone often isn't "
+        "enough in pregnancy, so the tablet your doctor gives you works "
+        "alongside your food."),
+    summary: _en("Your iron needs go up sharply in pregnancy, and food alone "
+        "often isn't quite enough. That's why a tablet is common alongside "
+        "your food, not instead of it."),
     guidance: [
       _en('Iron-rich foods: dal, dark leafy greens, jaggery, ragi, and meat '
           'if you eat it.'),
-      _en('Have a vitamin C food, citrus, tomato, amla, at the same meal as '
-          'an iron-rich food, it noticeably helps absorption.'),
-      _en('Tea and coffee right around an iron-rich meal can reduce '
-          'absorption, so it helps to have them a little apart from meals.'),
-      _en('If a supplement has been prescribed, food and supplement work '
-          'together, one is not a substitute for the other.'),
+      _en('Have a vitamin C food (citrus, tomato, amla) at the same meal as '
+          'your iron-rich food. It helps you absorb noticeably more.'),
+      _en('Tea and coffee around an iron-rich meal can cut how much you '
+          'absorb, so have them a little apart from meals.'),
+      _en("If you've been prescribed a tablet, food and tablet work together. "
+          "One doesn't replace the other."),
     ],
     linkId: 'anemia',
   ),
@@ -1193,18 +1244,21 @@ final List<ConditionGuide> kConditionGuides = [
     id: 'thyroid',
     label: _en('Thyroid conditions'),
     videoTitle: 'Eating with a thyroid condition in pregnancy',
-    summary: _en('Thyroid needs in pregnancy are usually managed through '
-        'medication your doctor prescribes and monitors, with diet playing a '
-        'supporting role rather than the main one.'),
+    shortAnswer: _en("Your thyroid is managed with the medicine your doctor "
+        "prescribes and checks. Food plays a supporting part: use iodised "
+        "salt, and ask your doctor how to time your tablet around calcium "
+        "and iron."),
+    summary: _en('In pregnancy, your thyroid is usually managed with medicine '
+        'your doctor prescribes and checks. Food plays a supporting part, not '
+        'the main one.'),
     guidance: [
-      _en('Iodine matters for thyroid function, iodised salt in normal '
-          'cooking amounts usually covers this.'),
-      _en('If you take thyroid medication, it is generally taken on an '
-          'empty stomach, calcium and iron supplements can interfere with '
-          'absorption if taken too close together, ask your doctor about '
-          'timing.'),
-      _en('Diet supports thyroid health, it does not replace or adjust your '
-          'prescribed dose, that stays with your doctor.'),
+      _en('Iodine matters for your thyroid. Iodised salt in normal cooking '
+          'amounts usually covers it.'),
+      _en('Thyroid medicine is usually taken on an empty stomach. Calcium and '
+          'iron tablets can stop it working well if taken too close together, '
+          'so ask your doctor about timing.'),
+      _en("Food supports your thyroid. It doesn't replace or change your "
+          "dose; that stays with your doctor."),
     ],
     linkId: 'thyroid',
   ),
@@ -1212,17 +1266,21 @@ final List<ConditionGuide> kConditionGuides = [
     id: 'pcos',
     label: _en('PCOS'),
     videoTitle: 'Eating with PCOS in pregnancy',
-    summary: _en('If PCOS was part of your journey to this pregnancy, steady '
-        'blood sugar and a varied diet remain useful, much like the general '
-        'gestational diabetes approach, whether or not you have been '
-        'diagnosed with it in this pregnancy.'),
+    shortAnswer: _en("If you have PCOS, regular meals with protein and fibre "
+        "help keep your blood sugar steady. You don't need a strict diet. "
+        "Your doctor may check your sugar a little more often, and that's "
+        "routine."),
+    summary: _en("If you had PCOS before this pregnancy, steady blood sugar "
+        "and a varied diet are still useful, much like the general approach "
+        "for gestational diabetes, whether or not you've been diagnosed with "
+        "it in this pregnancy."),
     guidance: [
-      _en('Regular meals with protein and fibre help keep blood sugar '
-          'steadier through the day.'),
-      _en('There is no need for an unusually restrictive diet, a varied, '
-          'balanced plate remains the goal.'),
-      _en('Your doctor may watch your blood sugar a little more closely '
-          'given a PCOS history, that is routine, not a sign of a problem.'),
+      _en('Regular meals with protein and fibre help keep blood sugar steadier '
+          'through the day.'),
+      _en("There's no need for a strict diet. A varied, balanced plate is "
+          "still the aim."),
+      _en("Your doctor may check your blood sugar a little more closely with "
+          "PCOS. That's routine, not a sign of a problem."),
     ],
     linkId: 'pcos',
   ),
@@ -1230,17 +1288,21 @@ final List<ConditionGuide> kConditionGuides = [
     id: 'high_bp_preeclampsia',
     label: _en('High BP / preeclampsia'),
     videoTitle: 'Eating with high blood pressure in pregnancy',
-    summary: _en('Where salt has been flagged as a concern, the useful lever '
-        'is usually cutting back on added and packaged salt, not eliminating '
-        'salt from cooking altogether.'),
+    shortAnswer: _en("If salt has been flagged, cut back on packaged, pickled "
+        "and salty snacks rather than taking all the salt out of your "
+        "cooking. Potassium-rich foods help too. Your doctor tailors the "
+        "rest to your readings."),
+    summary: _en("If salt has been flagged, the useful change is usually "
+        "cutting back on added and packaged salt, not taking salt out of your "
+        "cooking altogether."),
     guidance: [
-      _en('Go easy on packaged, pickled and processed foods, where most '
-          'hidden salt lives, more than the pinch you add while cooking.'),
-      _en('Potassium-rich foods, banana, coconut water, leafy greens, are '
-          'often encouraged alongside a lower-salt approach.'),
-      _en('This is guidance your doctor will tailor with actual numbers if '
-          'you have been diagnosed with preeclampsia, this page is the '
-          'general picture, not your specific plan.'),
+      _en('Go easy on packaged, pickled and processed foods. That is where '
+          'most hidden salt is, more than the pinch you add while cooking.'),
+      _en('Potassium-rich foods (banana, coconut water, leafy greens) are '
+          'often encouraged along with less salt.'),
+      _en("If you've been diagnosed with preeclampsia, your doctor will "
+          "tailor this to your own numbers. This page is the general picture, "
+          "not your plan."),
     ],
     linkId: 'high_bp',
   ),
@@ -1248,52 +1310,80 @@ final List<ConditionGuide> kConditionGuides = [
     id: 'healthy_weight_gain',
     label: _en('Healthy weight gain'),
     videoTitle: 'How much weight gain is normal, and what helps',
-    summary: _en('Weight gain in pregnancy is expected and healthy. The '
-        'useful question is usually less "how much" and more "is it '
-        'steady", which your doctor tracks at each visit.'),
+    shortAnswer: _en("Gaining weight in pregnancy is expected and healthy. A "
+        "steady gain matters more than the total, and your doctor checks it "
+        "at each visit. Most of it is your baby, the placenta, and extra "
+        "blood and fluid."),
+    summary: _en("Gaining weight in pregnancy is expected and healthy. The "
+        "useful question is usually less \"how much\" and more \"is it "
+        "steady\", which your doctor checks at each visit."),
     guidance: [
       _en('A varied plate with protein, whole grains and vegetables usually '
-          'supports steady gain better than any single food.'),
-      _en('Sudden, sharp weight change in either direction is worth '
-          'mentioning to your doctor, more than the total number on its '
-          'own.'),
-      _en('Your doctor tracks your weight against your own starting point, '
-          'not a single target every mother is measured against.'),
+          'supports a steady gain better than any single food.'),
+      _en('A sudden, sharp change in either direction is worth telling your '
+          'doctor about, more than the total on its own.'),
+      _en("Your doctor tracks your weight against your own starting point, "
+          "not one target every woman is measured against."),
     ],
+    // Appendix A (What to Expect, "How Much Weight You Should Gain?"): the
+    // simple picture of where the weight goes. The full read is
+    // `preg_diet_read_weight`.
+    more: [
+      NutritionMore(
+        heading: _en('Where does the weight go?'),
+        paragraphs: [
+          _en("For a gain of about 12 kg, only around 3 kg is fat, and your "
+              "body stores it on purpose, for breastfeeding. The rest is "
+              "roughly:"),
+        ],
+        bullets: [
+          _en('Your baby: about 3 to 3.5 kg'),
+          _en('The placenta and the water around your baby: about 1.5 kg'),
+          _en('Your growing womb and breasts: about 1.5 kg'),
+          _en('Extra blood and fluid: about 3 kg'),
+        ],
+      ),
+    ],
+    readNext: const ['preg_diet_read_weight'],
   ),
   ConditionGuide(
     id: 'brain_development',
     label: _en('Brain-development foods'),
     videoTitle: 'Foods that support your baby\'s brain development',
-    summary: _en('A few nutrients are particularly tied to the baby\'s '
-        'developing brain and nervous system, and they are easy to build '
-        'into an ordinary Indian diet.'),
+    shortAnswer: _en("Omega-3, folate, iron and choline all help your baby's "
+        "brain grow. You'll find them in fish or walnuts, dal and greens, and "
+        "eggs. An ordinary Indian diet can cover them with small additions."),
+    summary: _en("A few nutrients are closely tied to your baby's growing "
+        "brain and nerves, and they're easy to build into an ordinary Indian "
+        "diet."),
     guidance: [
-      _en('Omega-3, from fish twice a week or walnuts and flaxseed if you '
-          'eat vegetarian, supports the developing brain.'),
-      _en('Folate and iron, dal, leafy greens, remain foundational through '
-          'every trimester, not just the first.'),
-      _en('Choline, found in eggs, is another nutrient increasingly linked '
-          'to brain development, an egg a day is an easy way to include it.'),
+      _en("Omega-3, from fish twice a week, or walnuts and flaxseed if you're "
+          "vegetarian, helps the growing brain."),
+      _en('Folate and iron (dal, leafy greens) matter in every trimester, not '
+          'only the first.'),
+      _en('Choline, found in eggs, is another nutrient linked to brain '
+          'development. An egg a day is an easy way to get it.'),
     ],
   ),
   ConditionGuide(
     id: 'constipation_piles',
     label: _en('Constipation / piles'),
     videoTitle: 'Easing constipation through food',
-    summary: _en('Constipation is extremely common in pregnancy, from '
-        'hormones, iron supplements and a growing uterus, and food is often '
-        'the first and gentlest thing to try.'),
+    shortAnswer: _en("Constipation is very common in pregnancy. More fibre, "
+        "water through the day and a short walk after meals usually help. If "
+        "it becomes painful, or piles develop, tell your doctor."),
+    summary: _en('Constipation is very common in pregnancy, because of '
+        'hormones, iron tablets and your growing womb. Food is often the '
+        'first and gentlest thing to try.'),
     guidance: [
-      _en('Fibre from whole grains, oats, fruits with the skin on, and '
+      _en('Fibre from whole grains, oats, fruit with the skin on, and '
           'vegetables makes a real difference.'),
-      _en('Water matters as much as fibre, aim to drink through the day '
-          'rather than in a few large glasses.'),
-      _en('A short walk after meals genuinely helps digestion move, worth '
-          'pairing with the dietary changes.'),
-      _en('If it becomes painful or persistent, or piles develop, that is '
-          'worth mentioning to your doctor rather than managing through diet '
-          'alone.'),
+      _en('Water matters as much as fibre. Drink through the day rather than '
+          'a few big glasses.'),
+      _en('A short walk after meals helps digestion move. Try it along with '
+          'the food changes.'),
+      _en("If it becomes painful or doesn't go away, or piles develop, tell "
+          "your doctor. Don't try to manage it with food alone."),
     ],
     linkId: 'piles',
   ),
@@ -1301,53 +1391,98 @@ final List<ConditionGuide> kConditionGuides = [
     id: 'twins',
     label: _en('Carrying twins'),
     videoTitle: 'Eating well for a twin pregnancy',
-    summary: _en('A twin pregnancy generally needs more calories and '
-        'nutrients than a single pregnancy, which your doctor will usually '
-        'account for at your visits.'),
+    shortAnswer: _en("With twins you need more food, protein and iron than "
+        "with one baby, and you're likely to gain more weight. Smaller meals "
+        "more often help as space runs out. Your doctor sets your weight "
+        "range and any higher doses."),
+    summary: _en("A twin pregnancy usually needs more calories and nutrients "
+        "than a single one. Your doctor will usually plan for this at your "
+        "visits."),
     guidance: [
-      _en('Extra protein and iron needs are common with twins, your doctor '
-          'may suggest higher supplement doses than a single pregnancy.'),
-      _en('Smaller, more frequent meals often feel more comfortable as room '
-          'in the stomach becomes limited earlier than in a single '
-          'pregnancy.'),
-      _en('Weight gain targets for twins are usually different from single '
-          'pregnancy charts, ask your doctor what range applies to you.'),
+      _en('You often need extra protein and iron with twins. Your doctor may '
+          'suggest higher tablet doses than for one baby.'),
+      _en('Smaller meals more often usually feel better, as your stomach runs '
+          'out of room earlier than with one baby.'),
+      _en("Weight-gain ranges for twins are different from single-pregnancy "
+          "charts. Ask your doctor which range applies to you."),
+    ],
+    // Appendix A (What to Expect, "Pregnancy Weight Gain With Multiples"):
+    // how gain differs with twins, the target left to her doctor.
+    more: [
+      NutritionMore(
+        heading: _en('How is weight gain different with twins?'),
+        paragraphs: [
+          _en("You'll usually gain more than with one baby, and more of it "
+              "earlier. That's expected: there are two babies, two sets of "
+              "fluid and often two placentas, and a larger blood supply."),
+          _en("A good gain in the first half helps twins grow, since twins "
+              "are often born a little early. Your doctor will give you your "
+              "own range and check it at every visit."),
+        ],
+      ),
     ],
     linkId: 'twin_pregnancy',
     linkLibrary: ConditionLink.finding,
+    readNext: const ['preg_diet_read_weight'],
   ),
   ConditionGuide(
     id: 'underweight',
     label: _en('Underweight in pregnancy'),
     videoTitle: 'Eating to gain steadily when starting underweight',
-    summary: _en('If you started pregnancy underweight, the goal is usually '
-        'steady, adequate weight gain, without feeling pressured to eat past '
-        'comfort.'),
+    shortAnswer: _en("If you started pregnancy underweight, the aim is a "
+        "steady, good gain without forcing big meals. Small, rich snacks "
+        "through the day help. Your doctor sets your range, which is usually "
+        "higher."),
+    summary: _en("If you started pregnancy underweight, the aim is usually a "
+        "steady, good weight gain, without feeling pushed to eat past "
+        "comfort."),
     guidance: [
-      _en('Calorie-dense, nutritious foods, nuts, ghee, dairy, help without '
-          'needing huge meal sizes.'),
-      _en('Frequent smaller meals, five or six through the day, are often '
-          'easier than three large ones if appetite is limited.'),
-      _en('Your doctor will track your specific weight-gain range, which is '
-          'usually higher than the general chart when starting underweight.'),
+      _en('Filling, nourishing foods (nuts, ghee, dairy) help without needing '
+          'huge meals.'),
+      _en('Five or six smaller meals through the day are often easier than '
+          'three big ones if your appetite is low.'),
+      _en("Your doctor will track your own weight-gain range, which is "
+          "usually higher than the general chart when you start "
+          "underweight."),
     ],
+    readNext: const ['preg_diet_read_weight'],
   ),
   ConditionGuide(
     id: 'overweight',
     label: _en('Overweight in pregnancy'),
     videoTitle: 'Eating well when starting pregnancy overweight',
-    summary: _en('This is about steady, healthy nutrition for you and the '
-        'baby, never about restriction or a smaller body during pregnancy '
-        'itself.'),
+    shortAnswer: _en("This is about steady, healthy food for you and your baby, "
+        "never about dieting. Your range is usually smaller, and your doctor "
+        "sets it. Pregnancy isn't the time for keto or low-carb diets."),
+    summary: _en("This is about steady, healthy food for you and your baby. "
+        "It's never about restriction or trying to be smaller while you're "
+        "pregnant."),
     guidance: [
-      _en('A varied, balanced plate, protein, vegetables, whole grains, '
-          'supports a healthy pregnancy regardless of starting weight.'),
-      _en('Weight-gain targets are usually a smaller range than the general '
-          'chart when starting overweight, your doctor will set the actual '
-          'number.'),
-      _en('This is never about dieting during pregnancy, that is a '
-          'conversation for after, with your own doctor.'),
+      _en('A varied, balanced plate (protein, vegetables, whole grains) '
+          'supports a healthy pregnancy whatever your starting weight.'),
+      _en("Weight-gain ranges are usually smaller when you start overweight. "
+          "Your doctor will set your number."),
+      _en("This is never about dieting in pregnancy. That's a conversation "
+          "for after the birth, with your own doctor."),
     ],
+    // Appendix A (What to Expect, "Keto Diet" and "Low-Carb Diet"): one plain
+    // answer covers both.
+    more: [
+      NutritionMore(
+        heading: _en('Can I try keto or low-carb to gain less?'),
+        paragraphs: [
+          _en("Please don't. Pregnancy isn't the time for keto, low-carb or "
+              "any diet that cuts out a whole food group. Your baby needs a "
+              "steady supply of carbohydrate, and cutting it hard can leave "
+              "you short of fibre, folate and energy."),
+          _en("What helps instead: whole grains over maida, dal with every "
+              "meal, fewer fried and packaged snacks, and a daily walk if your "
+              "doctor says it's fine. If you want a plan, our dietician can "
+              "build one with your doctor's range."),
+        ],
+      ),
+    ],
+    readNext: const ['preg_diet_read_weight'],
   ),
 ];
 
@@ -1362,11 +1497,19 @@ class NutrientGuide {
     required this.whatItDoes,
     required this.foods,
     required this.supplementNote,
+    this.shortAnswer,
+    this.more = const [],
   });
 
   final String id;
   final LocalizedText name;
   final LocalizedText whatItDoes;
+
+  /// The short answer boxed at the top of the read. Added 2026-09-29.
+  final LocalizedText? shortAnswer;
+
+  /// Extra sections (gap analysis Appendix A additions).
+  final List<NutritionMore> more;
 
   /// Everyday Indian foods that give this nutrient.
   final List<LocalizedText> foods;
@@ -1377,117 +1520,167 @@ final List<NutrientGuide> kNutrientGuides = [
   NutrientGuide(
     id: 'folic_acid',
     name: _en('Folic acid'),
-    whatItDoes: _en('Supports the early formation of the baby\'s brain and '
-        'spinal cord, which is why it matters most before conception and in '
-        'the first weeks.'),
+    shortAnswer: _en("Folic acid helps form your baby's brain and spine in "
+        "the first weeks. Food alone rarely gives enough in time, so doctors "
+        "usually prescribe a tablet before and during early pregnancy."),
+    whatItDoes: _en("Helps form your baby's brain and spinal cord early on. "
+        "That's why it matters most before you conceive and in the first "
+        "weeks."),
     foods: [_en('Leafy greens'), _en('Dal and lentils'), _en('Citrus fruit'), _en('Beetroot')],
-    supplementNote: _en('Usually prescribed as a supplement before and '
-        'during early pregnancy, since food alone rarely covers the full '
-        'need in time.'),
+    supplementNote: _en('Usually prescribed as a tablet before and during '
+        'early pregnancy, because food alone rarely covers the full need in '
+        'time.'),
   ),
   NutrientGuide(
     id: 'iron',
     name: _en('Iron'),
-    whatItDoes: _en('Builds the extra blood you and the baby both need, and '
-        'low iron is one of the most common pregnancy deficiencies in '
-        'India.'),
+    shortAnswer: _en("Iron builds the extra blood you and your baby need, and "
+        "low iron is very common in Indian pregnancies. Eat dal, greens, "
+        "jaggery and ragi with something sour, and take the tablet your "
+        "doctor prescribes."),
+    whatItDoes: _en('Builds the extra blood you and your baby both need. Low '
+        'iron is one of the most common shortfalls in pregnancy in India.'),
     foods: [_en('Dal'), _en('Dark leafy greens'), _en('Jaggery'), _en('Ragi'), _en('Meat, if eaten')],
-    supplementNote: _en('Very commonly prescribed alongside diet, since '
-        'pregnancy needs are usually higher than food alone provides.'),
+    supplementNote: _en('Very often prescribed along with food, because '
+        'pregnancy usually needs more than food alone gives.'),
   ),
   NutrientGuide(
     id: 'calcium',
     name: _en('Calcium'),
-    whatItDoes: _en('Builds the baby\'s bones and teeth, and protects your '
-        'own bone density, since the baby will draw on your stores if diet '
-        'falls short.'),
+    shortAnswer: _en("Calcium builds your baby's bones and protects your own. "
+        "Milk, curd, paneer, ragi and sesame are good sources. If you don't "
+        "have much dairy, ask your doctor about a tablet."),
+    whatItDoes: _en("Builds your baby's bones and teeth, and protects your own "
+        "bones. If your food falls short, your baby draws on your stores."),
     foods: [_en('Milk and curd'), _en('Paneer'), _en('Ragi'), _en('Sesame seeds')],
-    supplementNote: _en('Often suggested if dairy intake is low, ask your '
-        'doctor rather than starting one on your own.'),
+    supplementNote: _en("Often suggested if you don't have much dairy. Ask "
+        "your doctor before starting one on your own."),
   ),
   NutrientGuide(
     id: 'protein',
     name: _en('Protein'),
-    whatItDoes: _en('Builds the baby\'s tissue and supports your own '
-        'changing body, with needs rising steadily through pregnancy.'),
+    shortAnswer: _en("Protein builds your baby's body and supports your own, "
+        "and you need more as pregnancy goes on. Dal, paneer, curd, eggs, "
+        "chicken or fish at each meal usually covers it. Most women don't "
+        "need a protein powder."),
+    whatItDoes: _en("Builds your baby's tissues and supports your changing "
+        "body. You need a little more of it as each month goes by."),
     foods: [_en('Dal'), _en('Paneer'), _en('Eggs'), _en('Chicken and fish'), _en('Soy and tofu')],
-    supplementNote: _en('Rarely needed as a supplement if meals include a '
-        'protein source regularly, whole food is usually enough.'),
+    supplementNote: _en('Rarely needed as a supplement if your meals include '
+        'protein regularly. Whole food is usually enough.'),
+    // Appendix A (What to Expect, "Protein During Pregnancy"): one plain
+    // answer on protein powders, which many Indian women are sold.
+    more: [
+      NutritionMore(
+        heading: _en('Do I need a protein powder?'),
+        paragraphs: [
+          _en("Usually not. Powders are sold hard to pregnant women in India, "
+              "but most women get enough from food: a bowl of dal, a bowl of "
+              "curd, a piece of paneer or an egg at each meal adds up."),
+          _en("Some powders have added herbs, sweeteners or high doses of "
+              "vitamins that aren't meant for pregnancy. If you're finding it "
+              "hard to eat enough, or your doctor thinks you're short, ask "
+              "them before you buy one. They can suggest one that suits you."),
+        ],
+      ),
+    ],
   ),
   NutrientGuide(
     id: 'vitamin_d',
     name: _en('Vitamin D'),
-    whatItDoes: _en('Helps your body use calcium properly, and supports the '
-        'baby\'s bone development.'),
+    shortAnswer: _en("Vitamin D helps your body use calcium, for your bones "
+        "and your baby's. It's often low in India even with all the sun, so "
+        "many doctors prescribe it as routine."),
+    whatItDoes: _en("Helps your body use calcium properly, and helps your "
+        "baby's bones grow."),
     foods: [_en('Sunlight exposure'), _en('Egg yolk'), _en('Fortified milk')],
-    supplementNote: _en('Commonly low in India despite the sun, many doctors '
+    supplementNote: _en('Often low in India despite the sun. Many doctors '
         'prescribe a supplement as routine.'),
   ),
   NutrientGuide(
     id: 'b12',
     name: _en('Vitamin B12'),
-    whatItDoes: _en('Supports the baby\'s nervous system, and is one of the '
-        'few nutrients genuinely hard to get enough of on a vegetarian or '
-        'vegan diet, since it mainly comes from animal foods.'),
+    shortAnswer: _en("B12 supports your baby's nerves. It comes mainly from "
+        "animal foods, so it's hard to get enough on a vegetarian or vegan "
+        "diet. Ask your doctor about a supplement if that's you."),
+    whatItDoes: _en("Supports your baby's nervous system. It's one of the few "
+        "nutrients that's hard to get enough of as a vegetarian or vegan, "
+        "because it mostly comes from animal foods."),
     foods: [_en('Milk and curd'), _en('Eggs'), _en('Meat and fish, if eaten')],
-    supplementNote: _en('Often prescribed for vegetarians and almost always '
-        'for vegans, since plant foods do not reliably provide it.'),
+    supplementNote: _en("Often prescribed for vegetarians and almost always for "
+        "vegans, because plant foods don't reliably provide it."),
   ),
   NutrientGuide(
     id: 'omega3_dha',
     name: _en('Omega-3 (DHA)'),
-    whatItDoes: _en('A key building block for the baby\'s brain and eyes, '
-        'especially in the second half of pregnancy.'),
+    shortAnswer: _en("Omega-3 helps build your baby's brain and eyes, most of "
+        "all in the second half of pregnancy. Fish twice a week covers it. "
+        "If you're vegetarian, ask your doctor about a supplement."),
+    whatItDoes: _en("A key building block for your baby's brain and eyes, "
+        "especially in the second half of pregnancy."),
     foods: [_en('Fish, twice a week'), _en('Walnuts'), _en('Flaxseed')],
-    supplementNote: _en('Often suggested for vegetarians, since plant '
-        'sources give a weaker form of omega-3 than fish does.'),
+    supplementNote: _en('Often suggested for vegetarians, because plant '
+        'sources give a weaker form of omega-3 than fish.'),
   ),
   NutrientGuide(
     id: 'iodine',
     name: _en('Iodine'),
-    whatItDoes: _en('Needed for the baby\'s thyroid and brain development, '
-        'and for your own thyroid, which is working harder in pregnancy.'),
+    shortAnswer: _en("Iodine helps your baby's brain and thyroid, and your own "
+        "thyroid. Iodised salt in normal cooking usually covers it, so you "
+        "don't need a separate tablet unless your doctor says so."),
+    whatItDoes: _en("Needed for your baby's thyroid and brain, and for your own "
+        "thyroid, which works harder in pregnancy."),
     foods: [_en('Iodised salt'), _en('Milk'), _en('Eggs')],
-    supplementNote: _en('Iodised salt in normal cooking usually covers this, '
-        'a separate supplement is not routine unless your doctor suggests '
-        'one.'),
+    supplementNote: _en("Iodised salt in normal cooking usually covers this. A "
+        "separate supplement isn't routine unless your doctor suggests one."),
   ),
   NutrientGuide(
     id: 'fibre',
     name: _en('Fibre'),
-    whatItDoes: _en('Keeps digestion moving, genuinely useful against the '
+    shortAnswer: _en("Fibre keeps digestion moving and helps with the "
+        "constipation many women get in pregnancy. Whole grains, fruit with "
+        "the skin on, vegetables and dal cover it. Drink water with it."),
+    whatItDoes: _en('Keeps digestion moving, which helps with the '
         'constipation that is common in pregnancy.'),
     foods: [_en('Whole grains'), _en('Fruit with the skin on'), _en('Vegetables'), _en('Dal')],
-    supplementNote: _en('Rarely needed as a supplement, food easily covers '
-        'this one.'),
+    supplementNote: _en('Rarely needed as a supplement. Food covers this one '
+        'easily.'),
   ),
   NutrientGuide(
     id: 'zinc',
     name: _en('Zinc'),
-    whatItDoes: _en('Supports the baby\'s growth and your own immune '
-        'function through pregnancy.'),
+    shortAnswer: _en("Zinc supports your baby's growth and your immunity. Dal, "
+        "nuts, seeds and dairy usually give you enough, so it's rarely taken "
+        "as a separate tablet."),
+    whatItDoes: _en("Supports your baby's growth and your own immunity through "
+        "pregnancy."),
     foods: [_en('Dal and legumes'), _en('Nuts and seeds'), _en('Dairy')],
-    supplementNote: _en('Usually covered by a varied diet, not routinely '
-        'supplemented on its own.'),
+    supplementNote: _en('Usually covered by a varied diet. Not usually taken '
+        'as a tablet on its own.'),
   ),
   NutrientGuide(
     id: 'magnesium',
     name: _en('Magnesium'),
-    whatItDoes: _en('Supports muscle and nerve function, and may help with '
-        'the leg cramps common later in pregnancy.'),
+    shortAnswer: _en("Magnesium helps your muscles and nerves, and may help "
+        "with leg cramps later in pregnancy. Nuts, seeds, whole grains and "
+        "greens usually give you enough."),
+    whatItDoes: _en('Helps your muscles and nerves work, and may help with the '
+        'leg cramps that are common later in pregnancy.'),
     foods: [_en('Nuts and seeds'), _en('Whole grains'), _en('Dark leafy greens')],
-    supplementNote: _en('Usually covered by diet, sometimes suggested '
-        'specifically if leg cramps are frequent.'),
+    supplementNote: _en('Usually covered by food. Sometimes suggested if leg '
+        'cramps are frequent.'),
   ),
   NutrientGuide(
     id: 'vitamin_c',
     name: _en('Vitamin C'),
-    whatItDoes: _en('Supports your immune system and, importantly, helps '
-        'your body absorb iron from plant foods when eaten at the same '
-        'meal.'),
+    shortAnswer: _en("Vitamin C supports your immunity and helps you absorb "
+        "iron from plant foods. Have citrus, amla, tomato or guava at the "
+        "same meal as your dal or greens."),
+    whatItDoes: _en('Supports your immunity and helps your body absorb iron '
+        'from plant foods, when you eat them at the same meal.'),
     foods: [_en('Citrus fruit'), _en('Amla'), _en('Tomato'), _en('Guava')],
-    supplementNote: _en('Rarely needed as a supplement, easiest to just pair '
-        'with an iron-rich food at meals.'),
+    supplementNote: _en('Rarely needed as a supplement. The easiest way is to '
+        'pair it with an iron-rich food at meals.'),
   ),
 ];
 
@@ -1498,59 +1691,209 @@ class NutritionPracticalCard {
     required this.id,
     required this.title,
     required this.body,
+    this.shortAnswer,
+    this.more = const [],
   });
 
   final String id;
   final LocalizedText title;
   final LocalizedText body;
+
+  /// The short answer boxed at the top of the read. Added 2026-09-29.
+  final LocalizedText? shortAnswer;
+
+  /// Extra sections (gap analysis Appendix A additions).
+  final List<NutritionMore> more;
 }
 
 final List<NutritionPracticalCard> kNutritionPracticalCards = [
   NutritionPracticalCard(
     id: 'which_prenatal_vitamins',
     title: _en('Which prenatal vitamins?'),
-    body: _en('Most doctors prescribe a standard combination covering folic '
-        'acid, iron, calcium and vitamin D, sometimes as separate tablets '
-        'rather than one pill, since some of these interfere with each other '
-        'if taken together. Take whatever your own doctor has prescribed, '
-        'this page is about understanding it, not choosing it yourself.'),
+    shortAnswer: _en("Take the ones your doctor prescribes. Most doctors give "
+        "folic acid, iron, calcium and vitamin D, often as separate tablets "
+        "because some of them get in each other's way."),
+    body: _en("Most doctors prescribe a standard set: folic acid, iron, "
+        "calcium and vitamin D. They're often separate tablets rather than "
+        "one pill, because some of these get in each other's way if taken "
+        "together. Take whatever your own doctor has prescribed. This page "
+        "helps you understand it, not choose it yourself."),
   ),
   NutritionPracticalCard(
     id: 'iron_calcium_timing',
     title: _en('Iron and calcium: why not together'),
-    body: _en('Calcium can reduce how much iron your body absorbs if taken '
-        'at the same time. That is why they are often prescribed at '
-        'different times of day, iron with a vitamin C food, calcium with '
-        'milk or a meal later on. If your prescription already spaces them '
-        'out, that spacing is doing real work.'),
+    shortAnswer: _en("Calcium can stop your body absorbing iron if you take "
+        "them at the same time. So take them at different times of day: iron "
+        "with a vitamin C food, calcium later with milk or a meal."),
+    body: _en("Calcium can reduce how much iron your body absorbs if you take "
+        "them at the same time. That's why they're often prescribed at "
+        "different times of day: iron with a vitamin C food, calcium later "
+        "with milk or a meal. If your prescription already spaces them out, "
+        "that spacing is doing real work."),
   ),
   NutritionPracticalCard(
     id: 'veg_vegan_protein_b12',
     title: _en('Vegetarian or vegan? Protein and B12'),
-    body: _en('A vegetarian diet can easily meet protein needs through dal, '
-        'paneer, dairy and soy. B12 is the harder gap, since it mainly comes '
-        'from animal foods, dairy covers it for most vegetarians, but a '
-        'vegan diet almost always needs a B12 supplement, worth raising with '
-        'your doctor early.'),
+    shortAnswer: _en("A vegetarian diet easily covers protein with dal, "
+        "paneer, dairy and soy. B12 is the harder one. Dairy covers it for "
+        "most vegetarians, but vegans almost always need a supplement."),
+    body: _en("A vegetarian diet can easily give you enough protein through "
+        "dal, paneer, dairy and soy. B12 is the harder gap, because it mostly "
+        "comes from animal foods. Dairy covers it for most vegetarians, but a "
+        "vegan diet almost always needs a B12 supplement. Raise it with your "
+        "doctor early."),
   ),
   NutritionPracticalCard(
     id: 'is_my_thali_enough',
     title: _en('Is my normal thali enough?'),
-    body: _en('An ordinary Indian thali, dal, sabzi, roti or rice, curd, '
-        'covers most of what you need most days. The gaps that usually still '
-        'need a supplement are iron, folic acid, calcium and vitamin D, '
-        'which is why your doctor prescribes those specifically rather than '
-        'asking you to overhaul your diet.'),
+    shortAnswer: _en("Mostly, yes. Dal, sabzi, roti or rice and curd cover "
+        "most of what you need most days. The gaps are usually iron, folic "
+        "acid, calcium and vitamin D, which is why your doctor prescribes "
+        "those."),
+    body: _en("An ordinary Indian thali (dal, sabzi, roti or rice, curd) "
+        "covers most of what you need most days. The gaps that usually still "
+        "need a tablet are iron, folic acid, calcium and vitamin D. That's "
+        "why your doctor prescribes those, rather than asking you to change "
+        "your whole diet."),
+    // Appendix A (What to Expect, "Fit in healthy fare" and "Gluten-Free
+    // Diet"): a work day, and the few who can't eat wheat.
+    more: [
+      NutritionMore(
+        heading: _en('What about on a work day?'),
+        paragraphs: [
+          _en("Pack the thali, and two snacks to keep in your bag. Long gaps "
+              "make nausea and tiredness worse, so eat a little every two to "
+              "three hours."),
+        ],
+        bullets: [
+          _en('Lunch box: roti with dal or rajma, a dry sabzi, and curd in a '
+              'small sealed box'),
+          _en('Snack one: roasted chana or makhana, or a handful of nuts'),
+          _en('Snack two: a fruit you can eat whole, like a banana, apple or '
+              'guava'),
+          _en('A bottle of water on your desk, refilled twice'),
+        ],
+      ),
+      NutritionMore(
+        heading: _en("What if I can't eat wheat?"),
+        paragraphs: [
+          _en("If you have coeliac disease or your doctor has told you to "
+              "avoid gluten, an Indian kitchen makes it easier than most. Swap "
+              "wheat roti for rice, jowar, bajra, ragi or makki roti, and use "
+              "besan for chillas. Dal, rice, curd and sabzi stay just as they "
+              "are."),
+          _en("Watch for wheat in hidden places: some hing is mixed with "
+              "wheat flour, and packaged snacks and biscuits often contain it. "
+              "Don't cut out gluten without a reason; for most women, wheat "
+              "is a good food."),
+        ],
+      ),
+    ],
   ),
   NutritionPracticalCard(
     id: 'do_i_need_supplements',
-    title: _en('Do I actually need supplements?'),
-    body: _en('For most mothers, yes, at least for iron, folic acid and '
-        'often vitamin D and calcium, because pregnancy needs typically '
-        'outpace what a normal diet provides, even a good one. Food and '
-        'supplements do different jobs here, one does not replace the '
-        'other. Your prescription is the actual answer for you; a dietician '
-        'can walk through why, if you want the reasoning.'),
+    title: _en('Do I need supplements?'),
+    shortAnswer: _en("For most women, yes: iron and folic acid, and often "
+        "vitamin D and calcium. Pregnancy needs more than even a good diet "
+        "gives. Your prescription is the answer for you."),
+    body: _en("For most women, yes: at least iron and folic acid, and often "
+        "vitamin D and calcium. Pregnancy usually needs more than a normal "
+        "diet gives, even a good one. Food and tablets do different jobs "
+        "here, and one doesn't replace the other. Your prescription is the "
+        "answer for you, and a dietician can explain why if you'd like to "
+        "know."),
+  ),
+  // Appendix A (What to Expect, "What to Snack On"), 2026-09-29: we had
+  // snack recipes but no snack list.
+  NutritionPracticalCard(
+    id: 'what_to_snack_on',
+    title: _en('What can I snack on?'),
+    shortAnswer: _en("Pick a snack for what it gives you. Roasted chana, "
+        "sprouts, curd or an egg for protein; ragi, sesame or a glass of milk "
+        "for calcium; dates, peanut chikki or poha with lemon for iron."),
+    body: _en("Snacks do real work in pregnancy. They keep nausea down in the "
+        "early months and fit in when your stomach has less room later. The "
+        "trick is to choose ones that give you something, not just fill a "
+        "gap."),
+    more: [
+      NutritionMore(
+        heading: _en('For protein'),
+        bullets: [
+          _en('Roasted chana, a handful'),
+          _en('Sprouts chaat with lemon'),
+          _en('A bowl of curd, or a glass of buttermilk'),
+          _en('A boiled egg, cooked until the yolk is firm'),
+          _en('A few cubes of paneer, lightly cooked'),
+        ],
+      ),
+      NutritionMore(
+        heading: _en('For calcium'),
+        bullets: [
+          _en('A glass of milk, plain or with a pinch of haldi'),
+          _en('Ragi laddoo or ragi malt'),
+          _en('Til (sesame) chikki'),
+          _en('Curd with fruit'),
+        ],
+      ),
+      NutritionMore(
+        heading: _en('For iron'),
+        bullets: [
+          _en('Two or three dates'),
+          _en('Peanut and jaggery chikki'),
+          _en('Poha with peanuts and a squeeze of lemon'),
+          _en('A guava or an orange after an iron-rich snack, to help absorb '
+              'it'),
+        ],
+      ),
+      NutritionMore(
+        heading: _en('Easy on a queasy day'),
+        paragraphs: [
+          _en('Ghee-roasted makhana, a plain khakhra, a banana, or a few '
+              'dry crackers. Small and plain, every two to three hours.'),
+        ],
+      ),
+    ],
+  ),
+  // Appendix A (What to Expect, "What to Eat for Breakfast"), 2026-09-29: the
+  // charts lay out breakfasts; this is the quick list.
+  NutritionPracticalCard(
+    id: 'quick_breakfasts',
+    title: _en('Quick breakfasts that keep you going'),
+    shortAnswer: _en("A good breakfast has some protein and some slow carbs, "
+        "so you stay full till lunch. Besan or moong chilla, vegetable poha "
+        "with peanuts, idli with sambar, or an egg with roti all work in "
+        "under 20 minutes."),
+    body: _en("Breakfast matters more in pregnancy than it used to. A long "
+        "night's gap can make nausea worse in the morning, and a breakfast "
+        "with protein keeps your energy steady until lunch."),
+    more: [
+      NutritionMore(
+        heading: _en('Ready in about 15 minutes'),
+        bullets: [
+          _en('Besan or moong dal chilla with curd'),
+          _en('Vegetable poha with peanuts and a squeeze of lemon'),
+          _en('Egg bhurji with a roti'),
+          _en('Oats porridge with milk, dates and almonds'),
+          _en('Vegetable upma with a glass of milk'),
+        ],
+      ),
+      NutritionMore(
+        heading: _en('Made the night before'),
+        bullets: [
+          _en('Idli or dosa batter, with sambar'),
+          _en('Soaked almonds and a banana, for the first minutes of the day'),
+          _en('Ragi malt, mixed and ready to warm'),
+        ],
+      ),
+      NutritionMore(
+        heading: _en('On a sick morning'),
+        paragraphs: [
+          _en("Eat something small before you get up, like a dry toast or a "
+              "biscuit, then a proper breakfast an hour later if you can. "
+              "Sipping ginger tea in between often helps."),
+        ],
+      ),
+    ],
   ),
 ];
 
@@ -1718,7 +2061,7 @@ final List<Recipe> kRecipes = [
   Recipe(
     id: 'pcos_moong_chilla',
     minutes: 20,
-    fact: "Moong is the dal that keeps its protein through soaking and grinding — a chilla has more of it than the same weight of roti.",
+    fact: "Moong is the dal that keeps its protein through soaking and grinding, so a chilla has more of it than the same weight of roti.",
     meals: const [RecipeMeal.breakfast, RecipeMeal.snack],
     kind: RecipeKind.light,
     name: _en('Moong dal chilla with curd'),
@@ -1818,12 +2161,12 @@ final List<Recipe> kRecipes = [
   Recipe(
     id: 'tamil_ragi_kanji',
     minutes: 15,
-    fact: "Ragi has about ten times the calcium of rice — a bowl of kanji is a glass of milk in grain form.",
+    fact: "Ragi has about ten times the calcium of rice. A bowl of kanji gives you about as much as a glass of milk.",
     meals: const [RecipeMeal.breakfast],
     kind: RecipeKind.light,
     name: _en('Tamil ragi kanji'),
     whyNow: _en('A finger-millet porridge that is easy on a queasy stomach '
-        'and quietly strong on iron and calcium.'),
+        'and good for iron and calcium.'),
     region: RecipeRegion.tamil,
     tags: const ['iron', 'calcium', 't1'],
     defaultServings: 1,
@@ -1962,7 +2305,7 @@ final List<Recipe> kRecipes = [
   Recipe(
     id: 'gujarati_khichdi',
     minutes: 25,
-    fact: "Rice and moong together make a complete protein — the reason khichdi has fed sick days for a thousand years.",
+    fact: "Rice and moong together make a complete protein. That's why khichdi has fed people on sick days for so long.",
     meals: const [RecipeMeal.lunch, RecipeMeal.dinner],
     kind: RecipeKind.main,
     name: _en('Gujarati moong dal khichdi'),
@@ -2020,7 +2363,7 @@ final List<Recipe> kRecipes = [
   Recipe(
     id: 'south_indian_curd_rice',
     minutes: 15,
-    fact: "Curd rice is probiotic and cooling — the meal for a hot afternoon or a stomach that wants nothing spicy.",
+    fact: "Curd rice is probiotic and cooling: the meal for a hot afternoon or a stomach that wants nothing spicy.",
     meals: const [RecipeMeal.lunch, RecipeMeal.dinner],
     kind: RecipeKind.main,
     name: _en('South Indian curd rice'),
@@ -2106,7 +2449,7 @@ final List<Recipe> kRecipes = [
   Recipe(
     id: 'jain_kadhi_khichdi',
     minutes: 35,
-    fact: "Kadhi's curd is calcium and the besan is protein — a no-onion, no-garlic dish that still adds up.",
+    fact: "Kadhi's curd is calcium and the besan is protein. A no-onion, no-garlic dish that still gives you plenty.",
     meals: const [RecipeMeal.lunch, RecipeMeal.dinner],
     kind: RecipeKind.main,
     name: _en('Jain kadhi khichdi'),
@@ -2135,7 +2478,7 @@ final List<Recipe> kRecipes = [
   Recipe(
     id: 'besan_chilla',
     minutes: 15,
-    fact: "Besan has three times the protein of wheat flour and a fifth of the glycaemic load — a chilla steadies the morning.",
+    fact: "Besan has three times the protein of wheat flour and a fifth of the glycaemic load, so a chilla keeps your morning steady.",
     meals: const [RecipeMeal.breakfast, RecipeMeal.snack],
     kind: RecipeKind.light,
     name: _en('Besan chilla'),
@@ -2157,6 +2500,10 @@ final List<Recipe> kRecipes = [
       _en('Pour a ladle onto a hot, lightly oiled pan and spread thin.'),
       _en('Cook until the base is golden, then flip and cook the other side.'),
       _en('Serve hot with chutney or curd.'),
+      // Appendix A (What to Expect, "Ginger Blueberry Pancakes"): ginger for
+      // nausea, the Indian pancake way.
+      _en('On a queasy day, add a teaspoon of grated ginger to the batter. '
+          'Many women find ginger settles the stomach.'),
     ],
     nutritionGlance: const ['Protein 9g', 'Calories 170'],
     videoTitle: 'Cook along: Besan chilla',
@@ -2164,7 +2511,7 @@ final List<Recipe> kRecipes = [
   Recipe(
     id: 'vegetable_daliya',
     minutes: 25,
-    fact: "Daliya is whole wheat cracked, not milled — the bran stays, and so does the fibre.",
+    fact: "Daliya is whole wheat cracked, not milled. The bran stays, and so does the fibre.",
     meals: const [RecipeMeal.breakfast, RecipeMeal.dinner],
     kind: RecipeKind.light,
     name: _en('Vegetable daliya'),
@@ -2215,53 +2562,54 @@ final List<CravingCard> kCravingCards = [
   CravingCard(
     id: 'why_cravings_happen',
     title: _en('Why cravings happen'),
-    body: _en('Shifting hormones, a heightened sense of smell and taste, and '
-        'your body genuinely asking for certain nutrients all play a part. '
-        'Cravings are common and, for the most part, harmless to follow in '
-        'reasonable amounts.'),
+    body: _en("Changing hormones, a sharper sense of smell and taste, and your "
+        "body asking for certain nutrients all play a part. Cravings are "
+        "common, and most are fine to follow in sensible amounts."),
   ),
   CravingCard(
     id: 'common_cravings',
     title: _en('Sour, spicy, sweet, ice'),
-    body: _en('Sour and spicy cravings are extremely common and usually '
-        'harmless. A pull toward sweet food is worth watching a little if '
-        'your doctor is monitoring blood sugar. A strong urge to chew ice is '
-        'sometimes, though not always, linked to low iron, worth mentioning '
-        'at your next visit if it is frequent.'),
+    body: _en("Sour and spicy cravings are very common and usually harmless. "
+        "Keep a little watch on sweet cravings if your doctor is checking "
+        "your blood sugar. A strong urge to chew ice is sometimes linked to "
+        "low iron, so mention it at your next visit if it happens often."),
   ),
   CravingCard(
     id: 'sudden_aversions',
     title: _en('Sudden aversions'),
-    body: _en('Going off a food you used to love, coffee, garlic, a '
-        'particular vegetable, is as common as craving something new. It '
-        'usually passes on its own; there is no need to force yourself to '
-        'eat something that suddenly turns your stomach.'),
+    body: _en("Going off a food you used to love (coffee, garlic, a certain "
+        "vegetable) is as common as craving something new. It usually passes "
+        "on its own. There's no need to force down something that suddenly "
+        "turns your stomach."),
   ),
   CravingCard(
     id: 'pica',
     title: _en('Pica, and when to tell a doctor'),
-    body: _en('A rare but real craving for non-food things, chalk, clay, ice '
-        'in large amounts, mud, is called pica and is sometimes linked to a '
-        'deficiency like low iron. It is genuinely worth mentioning to your '
-        'doctor rather than managing quietly on your own.'),
+    body: _en("A rare but real craving for things that aren't food (chalk, "
+        "clay, mud, or ice in large amounts) is called pica. It's sometimes "
+        "linked to a shortfall like low iron. Tell your doctor about it; "
+        "don't try to manage it on your own."),
   ),
   CravingCard(
     id: 'loss_of_appetite',
     title: _en('Loss of appetite'),
-    body: _en('Especially in the first trimester, not wanting to eat much at '
-        'all is common. Small, frequent, plain meals usually work better '
-        'than pushing through a full plate. If it continues well into the '
-        'second trimester or you are losing weight, mention it to your '
-        'doctor.'),
+    body: _en("Not wanting to eat much is common, especially in the first "
+        "trimester. Small, frequent, plain meals usually work better than "
+        "pushing through a full plate. If it carries on well into the second "
+        "trimester, or you're losing weight, tell your doctor."),
   ),
   CravingCard(
     id: 'eating_for_two_myth',
     title: _en('The "eating for two" myth'),
-    body: _en('Pregnancy does need more calories, but nowhere near double. '
-        'Most of the extra need is modest and comes later in pregnancy, not '
-        'from the first trimester. "Eating for two" as a licence for two '
-        'full plates at every meal is the part that is a myth, not the idea '
-        'that you need a little more.'),
+    // Appendix A (What to Expect, "Increased Appetite During Pregnancy"):
+    // real hunger in the second trimester, and filling Indian snacks.
+    body: _en("You do need more food in pregnancy, but nowhere near double. "
+        "Most of the extra comes later, not in the first trimester. Two full "
+        "plates at every meal is the myth; needing a little more is true. "
+        "If you're hungry all the time in the middle months, that's real: "
+        "your baby is growing fast. Add a filling snack like roasted chana, "
+        "sprouts, curd with fruit or a boiled egg, rather than a bigger "
+        "dinner."),
   ),
 ];
 
@@ -2289,22 +2637,22 @@ final List<DietChart> kDietCharts = [
   DietChart(
     id: 'full_month_indian',
     title: _en('Full month-by-month Indian chart'),
-    description: _en('A complete pregnancy-to-postpartum reference, month by '
+    description: _en('A complete guide from pregnancy to after the birth, month by '
         'month, built around an everyday Indian kitchen.'),
     category: DietChartCategory.stage,
   ),
   DietChart(
     id: 't1_chart',
     title: _en('First trimester chart'),
-    description: _en('Small, bland, frequent meals built for a queasy '
-        'stomach and early folate needs.'),
+    description: _en('Small, plain, frequent meals for a queasy stomach and '
+        'early folate needs.'),
     category: DietChartCategory.stage,
   ),
   DietChart(
     id: 't2_chart',
     title: _en('Second trimester chart'),
-    description: _en('A fuller, protein-and-iron-forward chart for the '
-        'stage appetite usually returns.'),
+    description: _en('A fuller chart, heavy on protein and iron, for when '
+        'your appetite usually comes back.'),
     category: DietChartCategory.stage,
   ),
   DietChart(
@@ -2317,36 +2665,36 @@ final List<DietChart> kDietCharts = [
   DietChart(
     id: 'hindi_chart',
     title: _en('Hindi chart'),
-    description: _en('The same everyday guidance, written out in Hindi for '
-        'the household to read together.'),
+    description: _en('The same everyday guidance, written in Hindi so the '
+        'whole family can read it together.'),
     category: DietChartCategory.language,
   ),
   DietChart(
     id: 'vegetarian_chart',
     title: _en('Vegetarian chart'),
-    description: _en('A full vegetarian week built to hit protein, iron and '
+    description: _en('A full vegetarian week that covers protein, iron and '
         'B12 without meat, egg or fish.'),
     category: DietChartCategory.diet,
   ),
   DietChart(
     id: 'non_vegetarian_chart',
     title: _en('Non-vegetarian chart'),
-    description: _en('A full week that folds in chicken, fish and egg '
-        'alongside the everyday thali.'),
+    description: _en('A full week that adds chicken, fish and egg to the '
+        'everyday thali.'),
     category: DietChartCategory.diet,
   ),
   DietChart(
     id: 'gestational_diabetes_chart',
     title: _en('Gestational diabetes chart'),
-    description: _en('A steadier-blood-sugar week: smaller meals, carbs '
-        'paired with protein and fibre.'),
+    description: _en('A week for steadier blood sugar: smaller meals, and '
+        'carbs paired with protein and fibre.'),
     category: DietChartCategory.condition,
   ),
   DietChart(
     id: 'weight_gain_chart',
     title: _en('Healthy weight-gain chart'),
-    description: _en('Calorie-dense, nutritious meals for steady gain '
-        'without needing huge portions.'),
+    description: _en('Rich, nourishing meals for a steady gain, without '
+        'huge portions.'),
     category: DietChartCategory.condition,
   ),
   DietChart(
@@ -2415,29 +2763,29 @@ final List<DietChart> kDietCharts = [
   DietChart(
     id: 'anaemia_chart',
     title: _en('Anaemia chart'),
-    description: _en('For low haemoglobin — the most common thing picked up '
-        'in an Indian pregnancy. Built around iron you can actually absorb.'),
+    description: _en('For low haemoglobin, the most common thing found in an '
+        'Indian pregnancy. Built around iron your body can absorb.'),
     category: DietChartCategory.condition,
   ),
   DietChart(
     id: 'postpartum_chart',
     title: _en('After delivery chart'),
     description: _en('The first three months after birth: recovery, milk '
-        'supply, and eating at all when there is no time to.'),
+        "supply, and eating at all when there's no time."),
     category: DietChartCategory.stage,
   ),
   DietChart(
     id: 'eggetarian_chart',
     title: _en('Eggetarian chart'),
-    description: _en('Vegetarian plus egg — which solves most of what a '
-        'vegetarian pregnancy plate struggles with.'),
+    description: _en('Vegetarian plus egg, which fills most of the gaps a '
+        'vegetarian pregnancy plate has.'),
     category: DietChartCategory.diet,
   ),
   DietChart(
     id: 'regional_north_indian',
     title: _en('North Indian chart'),
-    description: _en('Roti, dal, sabzi and curd across UP, Bihar, Rajasthan '
-        'and Delhi — distinct from the Punjabi chart.'),
+    description: _en('Roti, dal, sabzi and curd as they are cooked in UP, Bihar, '
+        'Rajasthan and Delhi. Different from the Punjabi chart.'),
     category: DietChartCategory.regional,
   ),
 ];
@@ -2462,10 +2810,18 @@ final List<DietChart> kDietCharts = [
 // =============================================================================
 
 class FastingTopic {
-  const FastingTopic({required this.id, required this.title, required this.body});
+  const FastingTopic({
+    required this.id,
+    required this.title,
+    required this.body,
+    this.shortAnswer,
+  });
   final String id;
   final LocalizedText title;
   final LocalizedText body;
+
+  /// The short answer boxed at the top of the read. Added 2026-09-29.
+  final LocalizedText? shortAnswer;
 }
 
 /// The five named fasts, shown first.
@@ -2473,46 +2829,59 @@ final List<FastingTopic> kFastingByOccasion = [
   FastingTopic(
     id: 'navratri',
     title: _en('Navratri'),
-    body: _en('A Navratri fast usually allows fruit, milk, sabudana, '
-        'kuttu and singhara flour, and rock salt, which makes it easier to '
-        'keep nutritious than many other fasts. Spread these across the day '
-        'rather than one heavy meal, and keep drinking water and fluids '
-        'through the fast.'),
+    shortAnswer: _en("A Navratri fast is one of the easier ones to keep well "
+        "in pregnancy, because fruit, milk, sabudana and kuttu are allowed. "
+        "Eat little and often through the day, and keep drinking fluids."),
+    body: _en('A Navratri fast usually allows fruit, milk, sabudana, kuttu '
+        'and singhara flour, and rock salt. That makes it easier to keep '
+        'nourishing than many other fasts. Spread these through the day '
+        'instead of one heavy meal, and keep drinking water and fluids.'),
   ),
   FastingTopic(
     id: 'ramzan',
     title: _en('Ramzan'),
-    body: _en('A dawn-to-dusk fast with no food or water is a much bigger '
-        'ask in pregnancy than a partial fast, and Islamic guidance itself '
-        'generally excuses pregnant women from fasting, with the fast made '
-        'up later or through charity instead. This is worth discussing with '
-        'both your doctor and your religious guidance before deciding.'),
+    shortAnswer: _en("A dawn-to-dusk fast without food or water is hard in "
+        "pregnancy, and Islamic guidance generally excuses pregnant women. "
+        "Talk to your doctor, and your imam if you wish, before you decide."),
+    body: _en("A dawn-to-dusk fast with no food or water asks a lot more of "
+        "you in pregnancy than a partial fast. Islamic guidance itself "
+        "generally excuses pregnant women, with the fast made up later or "
+        "through charity instead. Talk it over with your doctor and your "
+        "religious guide before you decide."),
   ),
   FastingTopic(
     id: 'karva_chauth',
     title: _en('Karva Chauth'),
-    body: _en('A full day without food or water is hard on anyone, and more '
-        'so in pregnancy, where dehydration and low blood sugar come on '
-        'faster. Many mothers choose a modified version, sipping water or '
-        'eating lightly, and that is a reasonable adjustment, not a lesser '
-        'observance.'),
+    shortAnswer: _en("A full day without food or water is hard in pregnancy, "
+        "because you dehydrate and your sugar drops faster. Many women sip "
+        "water or eat lightly, and that's still a full observance."),
+    body: _en("A full day without food or water is hard on anyone, and more "
+        "so in pregnancy, when dehydration and low blood sugar come on "
+        "faster. Many women keep a gentler version, sipping water or eating "
+        "lightly. That's a sensible change, and no less of an observance."),
   ),
   FastingTopic(
     id: 'ekadashi',
     title: _en('Ekadashi'),
-    body: _en('Ekadashi fasting styles vary widely, from grain-free to a '
-        'single meal to complete abstinence. Whatever your usual practice, '
-        'a grain-free but otherwise normal-eating version is usually the '
-        'easiest to keep safe in pregnancy.'),
+    shortAnswer: _en("Ekadashi fasts vary a lot. In pregnancy, a grain-free "
+        "day where you still eat normally otherwise is usually the easiest "
+        "to keep safe."),
+    body: _en("Ekadashi fasts vary widely, from grain-free to one meal to "
+        "nothing at all. Whatever you usually do, a grain-free day where you "
+        "otherwise eat normally is usually the easiest to keep safe in "
+        "pregnancy."),
   ),
   FastingTopic(
     id: 'jain_fasts',
     title: _en('Jain fasts'),
-    body: _en('Jain fasting can range from avoiding root vegetables to a '
-        'full day of water only. Pregnancy is widely considered a valid '
-        'reason to observe a lighter form of the fast, worth discussing '
-        'with your family and, where relevant, a religious guide alongside '
-        'your doctor.'),
+    shortAnswer: _en("Jain fasts range from avoiding root vegetables to a "
+        "day of only water. Pregnancy is widely seen as a good reason to keep "
+        "a lighter form. Talk to your family, your doctor and, if you wish, "
+        "a religious guide."),
+    body: _en('Jain fasts can range from avoiding root vegetables to a full '
+        'day of only water. Pregnancy is widely seen as a good reason to '
+        'keep a lighter form of the fast. Talk it over with your family and, '
+        'if you wish, a religious guide, as well as your doctor.'),
   ),
 ];
 
@@ -2521,26 +2890,34 @@ final List<FastingTopic> kFastingGeneral = [
   FastingTopic(
     id: 'should_i_fast',
     title: _en('Should I fast at all?'),
-    body: _en('This is genuinely your call to make, alongside your doctor, '
-        'weighing your own health, how the pregnancy is going, and what the '
-        'fast means to you. Nobody here is going to tell you not to fast, '
-        'only to make sure it is a safe version if you choose to.'),
+    shortAnswer: _en("That's your choice, made with your doctor. It depends on "
+        "your health, how your pregnancy is going, and what the fast means to "
+        "you. If you do fast, choose a safe version."),
+    body: _en("This is your choice to make with your doctor. It depends on "
+        "your own health, how the pregnancy is going, and what the fast means "
+        "to you. Nobody here will tell you not to fast. We only want it to "
+        "be a safe version if you do."),
   ),
   FastingTopic(
     id: 'how_to_fast_safely',
     title: _en('How to fast safely'),
-    body: _en('Where the fast allows it, keep sipping water and fluids '
-        'through the day. Break a fast gently, a fruit or a light bite '
-        'rather than a heavy meal all at once. Keep a piece of fruit or a '
-        'snack on hand in case you need to stop.'),
+    shortAnswer: _en("Keep sipping fluids if the fast allows it, break it "
+        "gently with fruit or something light, and keep a snack with you in "
+        "case you need to stop."),
+    body: _en("If the fast allows it, keep sipping water and fluids through "
+        "the day. Break the fast gently, with a fruit or a light bite, not a "
+        "heavy meal all at once. Keep a piece of fruit or a snack with you in "
+        "case you need to stop."),
   ),
   FastingTopic(
     id: 'when_to_skip',
     title: _en('When to skip it this year'),
-    body: _en('Dizziness, a headache that will not lift, reduced baby '
-        'movement, or simply feeling unwell are all good reasons to break a '
-        'fast, this year, without guilt. A high-risk pregnancy is also worth '
-        'a direct conversation with your doctor before you decide to fast at '
-        'all.'),
+    shortAnswer: _en("Break your fast if you feel dizzy, have a headache that "
+        "won't go, feel your baby moving less, or just feel unwell. With a "
+        "high-risk pregnancy, talk to your doctor before you fast at all."),
+    body: _en("Dizziness, a headache that won't go, your baby moving less, or "
+        "just feeling unwell are all good reasons to break a fast this "
+        "year, without guilt. If your pregnancy is high-risk, talk to your "
+        "doctor before you decide to fast at all."),
   ),
 ];

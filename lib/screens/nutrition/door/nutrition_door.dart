@@ -223,7 +223,7 @@ class _NutritionDoorScreenState extends State<NutritionDoorScreen> {
 
   List<Widget> _plateSection(V2Palette p, NutritionPlate plate, NutritionDay day) => [
         pvDoorPad(nutritionHeading(p, 'Your plate',
-            sub: 'Swap anything. Skip anything — "not today" is a real answer.',
+            sub: 'Swap anything. Skip anything. "Not today" is a real answer.',
             trailing: TextButton(
               onPressed: () {
                 pvCommitFeedback();
@@ -262,8 +262,8 @@ class _NutritionDoorScreenState extends State<NutritionDoorScreen> {
     final line = ticked == 0
         ? 'Tap what you had today. Hold one to see what counts.'
         : ticked == kPlateNeeds.length
-            ? 'All five today. That is a good day for the baby.'
-            : '$ticked of ${kPlateNeeds.length} today — every one helps.';
+            ? 'All five today. That\'s a good day for your baby.'
+            : '$ticked of ${kPlateNeeds.length} today. Every one helps.';
     return [
       pvDoorPad(nutritionHeading(p, 'Did you get…', sub: line)),
       const SizedBox(height: 16),
@@ -326,8 +326,8 @@ class _NutritionDoorScreenState extends State<NutritionDoorScreen> {
     return [
       pvDoorPad(nutritionHeading(p, 'Craving something?',
           sub: chipFor == null
-              ? 'Tap it. Cravings are normal; most have a kind answer.'
-              : '${chipFor.$2} has come up ${pattern!.times} times this week — here is what helps.')),
+              ? 'Tap it. Cravings are normal, and most have a kind answer.'
+              : '${chipFor.$2} has come up ${pattern!.times} times this week. Here\'s what helps.')),
       const SizedBox(height: 12),
       SizedBox(
         height: 40,
@@ -509,7 +509,7 @@ class _NutritionDoorScreenState extends State<NutritionDoorScreen> {
             () => const FastingScreen(), 'nutrition/fasting'),
         row(Icons.science_outlined, 'What your body needs', '${kNutrientGuides.length} nutrients, in everyday foods',
             () => const NutrientsScreen(), 'nutrition/nutrients'),
-        row(Icons.help_outline_rounded, 'Is this food safe?', 'Papaya, paneer, street food — the Is it safe? door',
+        row(Icons.help_outline_rounded, 'Is this food safe?', 'Papaya, paneer, street food. The Is it safe? door',
             () => CanIScreen(controller: widget.pregnancy), 'can_i'),
         // THE DOOR AS IT WAS — the user's ask on the phone, 2026-09-20: "a
         // version toggle, just in case, for us to see what was before". The

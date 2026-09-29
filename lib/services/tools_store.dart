@@ -356,9 +356,14 @@ class ToolsStore extends ChangeNotifier {
     final h = _heightCm;
     if (w == null || h == null || h <= 0) return null;
     final bmi = w / ((h / 100) * (h / 100));
+    // ⚠️ ASIAN BMI CUT-OFFS, 2026-09-29 (pregnancy gap analysis, Nutrition
+    // P1: "change the tracker's range to match" the read "How much weight is
+    // right for me?"). ICMR and the WHO Asia-Pacific guidance put overweight
+    // at 23 and obesity at 25 for Indian women; the ranges themselves are
+    // unchanged. Was: < 25 normal, < 30 overweight.
     if (bmi < 18.5) return (min: 12.5, max: 18.0);
-    if (bmi < 25) return (min: 11.5, max: 16.0);
-    if (bmi < 30) return (min: 7.0, max: 11.5);
+    if (bmi < 23) return (min: 11.5, max: 16.0);
+    if (bmi < 25) return (min: 7.0, max: 11.5);
     return (min: 5.0, max: 9.0);
   }
 
@@ -367,9 +372,10 @@ class ToolsStore extends ChangeNotifier {
     final h = _heightCm;
     if (w == null || h == null || h <= 0) return null;
     final bmi = w / ((h / 100) * (h / 100));
+    // Asian cut-offs, as in `recommendedGain` above (2026-09-29).
     if (bmi < 18.5) return 'underweight';
-    if (bmi < 25) return 'normal';
-    if (bmi < 30) return 'overweight';
+    if (bmi < 23) return 'normal';
+    if (bmi < 25) return 'overweight';
     return 'high';
   }
 

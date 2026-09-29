@@ -183,8 +183,8 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
       ChartDay(label: _en('Day 1'), meals: [
         ChartMeal(_en('Breakfast'),
             _en('Vegetable poha with peanuts, a glass of milk')),
-        ChartMeal(_en('Mid-morning'), _en('A seasonal fruit — banana, papaya '
-            'is best avoided, so orange, apple or chikoo')),
+        ChartMeal(_en('Mid-morning'), _en('A seasonal fruit: banana, or orange, apple or '
+            'chikoo (papaya is best avoided)')),
         ChartMeal(_en('Lunch'),
             _en('Dal, one sabzi, two rotis, curd, a small salad')),
         ChartMeal(_en('Evening'), _en('Roasted chana or a handful of nuts, tea '
@@ -214,7 +214,7 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
       ]),
     ],
     swaps: [
-      _en('Roti, rice, poha, upma and idli are interchangeable — pick what is '
+      _en('Roti, rice, poha, upma and idli are interchangeable. Pick what is '
           'already cooking at home.'),
       _en('Any dal works in place of any other. Variety across the week '
           'matters more than which one on a given day.'),
@@ -228,7 +228,7 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
           'cheeses made from it.'),
       _en('Papaya, especially raw or semi-ripe, and large amounts of '
           'pineapple.'),
-      _en('Very high-caffeine days — around two cups of tea or coffee is the '
+      _en('Very high-caffeine days. Around two cups of tea or coffee is the '
           'usual guidance, not zero.'),
       _en('Outside cut fruit and salads, where the water and handling are the '
           'risk rather than the food.'),
@@ -253,7 +253,7 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
       ]),
       ChartDay(label: _en('Day 2'), meals: [
         ChartMeal(_en('On waking'), _en('A handful of roasted chana or makhana')),
-        ChartMeal(_en('Breakfast'), _en('Idli with a little chutney — steamed '
+        ChartMeal(_en('Breakfast'), _en('Idli with a little chutney. Steamed '
             'food usually sits better than fried')),
         ChartMeal(_en('Mid-morning'), _en('Buttermilk with jeera')),
         ChartMeal(_en('Lunch'), _en('Curd rice, a small piece of pickle if it '
@@ -277,8 +277,8 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
           'hour later. Skipping and waiting usually makes the nausea worse.'),
       _en('Cold food often smells less than hot food, and smell is what '
           'triggers most first-trimester nausea. Room temperature is fine.'),
-      _en('Sour helps many women — lemon, imli, amchur, curd. Sweet often does '
-          'not.'),
+      _en('Sour helps many women: lemon, imli, amchur, curd. Sweet often '
+          "doesn't."),
       _en('Folate is the one thing worth chasing: leafy greens, dal, citrus, '
           'and the Folate tablet your doctor has prescribed.'),
     ],
@@ -301,7 +301,7 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
     days: [
       ChartDay(label: _en('Day 1'), meals: [
         ChartMeal(_en('Breakfast'), _en('Two besan chilla with paneer, milk')),
-        ChartMeal(_en('Mid-morning'), _en('Orange or amla — vitamin C with '
+        ChartMeal(_en('Mid-morning'), _en('Orange or amla. Vitamin C with '
             'the day\'s iron helps you absorb it')),
         ChartMeal(_en('Lunch'),
             _en('Rajma with rice, palak sabzi, curd, salad')),
@@ -329,8 +329,8 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
       ]),
     ],
     swaps: [
-      _en('Iron sits in dal, dark greens, jaggery, dates, ragi and — if you '
-          'eat them — eggs, chicken liver and fish.'),
+      _en('Iron is in dal, dark greens, jaggery, dates, ragi and, if you '
+          'eat them, eggs, chicken liver and fish.'),
       _en('Pair iron with something sour or citrus in the same meal, and keep '
           'tea and coffee an hour away from it. Tea with a meal blocks a real '
           'share of the iron in it.'),
@@ -341,8 +341,8 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
     ],
     limits: [
       _en('Tea and coffee alongside meals rather than between them.'),
-      _en('Skipping the mid-morning and evening — this is the stage where '
-          'three large meals start becoming uncomfortable.'),
+      _en('Skipping the mid-morning and evening snacks. This is when three '
+          'large meals start to feel uncomfortable.'),
       _en('Raw or runny egg, and undercooked meat and fish.'),
       _en('Very salty pickles and packaged snacks if your blood pressure has '
           'been mentioned at all.'),
@@ -353,23 +353,23 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
   't3_chart': ChartContent(
     focus: _en('Smaller, more frequent meals, because there is less room for '
         'your stomach and heartburn is common. Calcium, iron and fibre matter '
-        'most here, and constipation is the complaint this chart is quietly '
-        'designed around.'),
+        'most here, and the chart is built with constipation in '
+        'mind.'),
     days: [
       ChartDay(label: _en('Day 1'), meals: [
         ChartMeal(_en('Breakfast'), _en('Ragi porridge with milk and jaggery')),
         ChartMeal(_en('Mid-morning'), _en('A pear or two figs soaked '
             'overnight')),
-        ChartMeal(_en('Lunch'), _en('One roti, dal, palak sabzi, curd — a '
+        ChartMeal(_en('Lunch'), _en('One roti, dal, palak sabzi, curd: a '
             'smaller plate than you would have eaten last month')),
         ChartMeal(_en('Evening'), _en('Milk with a date, or a small bowl of '
             'poha')),
-        ChartMeal(_en('Dinner'), _en('Soft khichdi with lauki, eaten early — '
+        ChartMeal(_en('Dinner'), _en('Soft khichdi with lauki, eaten early, '
             'two hours before you lie down')),
       ]),
       ChartDay(label: _en('Day 2'), meals: [
         ChartMeal(_en('Breakfast'), _en('Vegetable upma, a glass of milk')),
-        ChartMeal(_en('Mid-morning'), _en('Papaya-free fruit bowl — apple, '
+        ChartMeal(_en('Mid-morning'), _en('Papaya-free fruit bowl: apple, '
             'pear, pomegranate')),
         ChartMeal(_en('Lunch'), _en('Curd rice with a vegetable, or roti with '
             'moong dal')),
@@ -377,7 +377,7 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
         ChartMeal(_en('Dinner'), _en('Dal with one roti, a light sabzi')),
       ]),
       ChartDay(label: _en('Day 3'), meals: [
-        ChartMeal(_en('Breakfast'), _en('Idli with sambar — easy on a full '
+        ChartMeal(_en('Breakfast'), _en('Idli with sambar, easy on a full '
             'chest')),
         ChartMeal(_en('Mid-morning'), _en('A glass of milk, or a fruit')),
         ChartMeal(_en('Lunch'), _en('Rice with dal, bhindi or tori, curd')),
@@ -386,13 +386,13 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
       ]),
     ],
     swaps: [
-      _en('Five or six small meals instead of three. This is the single change '
-          'that helps most with third-trimester heartburn.'),
+      _en('Five or six small meals instead of three. This change helps most '
+          'with heartburn in the last months.'),
       _en('For constipation: soaked figs or raisins, ragi, oats, plenty of '
           'water, and a fruit with skin where you can.'),
       _en('Eat dinner two to three hours before lying down, and prop your '
           'upper body if reflux wakes you.'),
-      _en('Keep the calcium going daily — this is the stage your baby lays '
+      _en('Keep up your calcium every day. This is when your baby lays '
           'down most of their bone.'),
     ],
     limits: [
@@ -401,8 +401,8 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
       _en('Very spicy and fried food if heartburn has started.'),
       _en('Long gaps without water, even though it means more trips to the '
           'bathroom.'),
-      _en('Papaya, and cutting salt drastically on your own — if salt has been '
-          'raised with you, that is a conversation for your doctor.'),
+      _en('Papaya, and cutting salt sharply on your own. If salt has been '
+          'raised with you, talk it over with your doctor.'),
     ],
   ),
 
@@ -483,9 +483,9 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
 
   // ---------------------------------------------------------------------------
   'vegetarian_chart': ChartContent(
-    focus: _en('A fully vegetarian chart that does not quietly fall short on '
-        'protein, iron or B12 — the three a vegetarian pregnancy plan most '
-        'often misses.'),
+    focus: _en('A fully vegetarian chart that doesn\'t fall short on protein, '
+        'iron or B12, the three a vegetarian pregnancy plan most often '
+        'misses.'),
     days: [
       ChartDay(label: _en('Day 1'), meals: [
         ChartMeal(_en('Breakfast'), _en('Paneer paratha with curd')),
@@ -512,9 +512,9 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
     swaps: [
       _en('Protein without meat: paneer, dal, chana, rajma, soya, curd, milk, '
           'peanuts, sesame. Two good sources a day is the target.'),
-      _en('Iron: palak, methi, jaggery, dates, ragi, sesame — and something '
+      _en('Iron: palak, methi, jaggery, dates, ragi, sesame, and something '
           'sour in the same meal.'),
-      _en('B12 is the genuinely hard one on a vegetarian plate. Milk and curd '
+      _en('B12 is the hard one on a vegetarian plate. Milk and curd '
           'help, and most doctors add a supplement. Ask at your next visit '
           'rather than deciding alone.'),
       _en('Soya chunks stand in for chicken in almost any curry, at similar '
@@ -523,7 +523,7 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
     limits: [
       _en('Filling up on rice and roti and treating dal as a side. Reverse the '
           'proportions.'),
-      _en('Relying on paneer alone for protein — it is high in fat as well.'),
+      _en('Relying on paneer alone for protein. It is high in fat as well.'),
       _en('Tea with meals, which costs a vegetarian plate more iron than it '
           'costs a mixed one.'),
       _en('Unpasteurised milk and the soft cheeses made from it.'),
@@ -533,7 +533,7 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
   // ---------------------------------------------------------------------------
   'non_vegetarian_chart': ChartContent(
     focus: _en('A mixed plate, built so the non-vegetarian portion does the '
-        'work it is good at — protein, iron and B12 — without the plan '
+        'work it is good at (protein, iron and B12) without the plan '
         'becoming meat at every meal.'),
     days: [
       ChartDay(label: _en('Day 1'), meals: [
@@ -547,7 +547,7 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
       ChartDay(label: _en('Day 2'), meals: [
         ChartMeal(_en('Breakfast'), _en('Egg bhurji with roti')),
         ChartMeal(_en('Mid-morning'), _en('Milk with two dates')),
-        ChartMeal(_en('Lunch'), _en('Fish curry with rice — well cooked, and a '
+        ChartMeal(_en('Lunch'), _en('Fish curry with rice, well cooked, and a '
             'low-mercury fish like rohu, surmai or pomfret')),
         ChartMeal(_en('Evening'), _en('Fruit and a handful of nuts')),
         ChartMeal(_en('Dinner'), _en('Rajma with roti, curd')),
@@ -564,8 +564,8 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
     swaps: [
       _en('Egg is the cheapest complete protein on this list and the easiest '
           'to keep down early on.'),
-      _en('Chicken, fish and egg are interchangeable across the week — the '
-          'point is two to four non-vegetarian meals, not one every day.'),
+      _en('Chicken, fish and egg are interchangeable across the week. The '
+          'aim is two to four non-vegetarian meals, not one every day.'),
       _en('Stick to low-mercury fish: rohu, katla, surmai, pomfret, small '
           'prawns. King mackerel, shark and swordfish are the ones to skip.'),
       _en('A vegetarian day or two a week is not a gap. Dal and rajma cover '
@@ -588,7 +588,7 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
         'what they have told you.'),
     days: [
       ChartDay(label: _en('Day 1'), meals: [
-        ChartMeal(_en('Breakfast'), _en('Besan chilla with paneer — protein '
+        ChartMeal(_en('Breakfast'), _en('Besan chilla with paneer. Protein '
             'first thing steadies the whole morning')),
         ChartMeal(_en('Mid-morning'), _en('A handful of nuts, buttermilk')),
         ChartMeal(_en('Lunch'), _en('One roti, dal, a large green sabzi, '
@@ -618,7 +618,7 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
     ],
     swaps: [
       _en('Eat salad or a protein before the carbohydrate in the same meal. '
-          'The order genuinely changes the reading.'),
+          'The order changes the reading.'),
       _en('Ragi, jowar, bajra and multigrain roti in place of maida and white '
           'rice. Brown rice in a small portion is usually fine.'),
       _en('Fruit whole rather than as juice, with the skin where you can, and '
@@ -627,7 +627,7 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
           'followed by a spike, not by a good reading.'),
     ],
     limits: [
-      _en('Sugar, jaggery, honey and sweets — including the "healthy" ones. '
+      _en('Sugar, jaggery, honey and sweets, including the "healthy" ones. '
           'Jaggery is sugar.'),
       _en('Fruit juice, packaged or fresh.'),
       _en('Large portions of rice, potato and maida at one sitting.'),
@@ -642,7 +642,7 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
 
   // ---------------------------------------------------------------------------
   'weight_gain_chart': ChartContent(
-    focus: _en('For when weight gain has been raised with you — in either '
+    focus: _en('For when your doctor has raised your weight gain, in either '
         'direction. The food is ordinary; what changes is portion size and how '
         'often you eat, and both are things your doctor should be setting.'),
     days: [
@@ -682,7 +682,7 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
           'trend.'),
     ],
     limits: [
-      _en('Fried food and sweets as the way to gain — they add weight without '
+      _en('Fried food and sweets as the way to gain. They add weight without '
           'adding much your baby can use.'),
       _en('Cutting meals or skipping dinner to lose. In pregnancy this is not '
           'a safe way to manage weight.'),
@@ -703,11 +703,11 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
   //  produces, and the swaps are the ones a family there would already make.
   // ---------------------------------------------------------------------------
   'regional_bengali': ChartContent(
-    focus: _en('Built around a Bengali kitchen — rice at the centre, fish for '
+    focus: _en('Built around a Bengali kitchen: rice at the centre, fish for '
         'protein, and the greens and dal that come with them.'),
     days: [
       ChartDay(label: _en('Day 1'), meals: [
-        ChartMeal(_en('Breakfast'), _en('Luchi is a treat, not a daily — start '
+        ChartMeal(_en('Breakfast'), _en('Luchi is a treat, not a daily. Start '
             'with muri with milk and a banana, or chirer polao')),
         ChartMeal(_en('Mid-morning'), _en('Green coconut water')),
         ChartMeal(_en('Lunch'), _en('Bhat with musur dal, aloo posto, and rui '
@@ -736,8 +736,8 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
     swaps: [
       _en('Rui, katla and small freshwater fish are the safe everyday choices. '
           'Keep large sea fish occasional.'),
-      _en('Shaak — palong, lal, methi — is where most of the iron in this '
-          'chart sits. Aim for it most days.'),
+      _en('Shaak (palong, lal, methi) is where most of the iron in this '
+          'chart is. Aim for it most days.'),
       _en('Doi after a meal helps with the heaviness that rice can bring.'),
       _en('Vegetarian days: cholar dal, chhana and paneer stand in for the '
           'fish.'),
@@ -746,15 +746,15 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
       _en('Deep-fried bhaja and luchi as daily items rather than occasional '
           'ones.'),
       _en('Shutki and any fermented or dried fish through pregnancy.'),
-      _en('Very large rice portions at a single meal — split across the day '
+      _en('Very large rice portions at one meal. Split them across the day '
           'instead.'),
     ],
   ),
 
   // ---------------------------------------------------------------------------
   'regional_tamil': ChartContent(
-    focus: _en('A Tamil kitchen — idli, dosa, sambar, rasam and curd rice — '
-        'arranged so the fermented breakfasts and the dal do the nutritional '
+    focus: _en('A Tamil kitchen (idli, dosa, sambar, rasam and curd rice), '
+        'arranged so the fermented breakfasts and the dal do most of the '
         'work.'),
     days: [
       ChartDay(label: _en('Day 1'), meals: [
@@ -762,7 +762,7 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
             'chutney')),
         ChartMeal(_en('Mid-morning'), _en('Tender coconut water')),
         ChartMeal(_en('Lunch'), _en('Rice with sambar, a poriyal, and curd')),
-        ChartMeal(_en('Evening'), _en('Sundal — chana or peanut')),
+        ChartMeal(_en('Evening'), _en('Sundal, chana or peanut')),
         ChartMeal(_en('Dinner'), _en('Ragi kali or two dosa with sambar')),
       ]),
       ChartDay(label: _en('Day 2'), meals: [
@@ -774,7 +774,7 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
         ChartMeal(_en('Dinner'), _en('Curd rice with a vegetable')),
       ]),
       ChartDay(label: _en('Day 3'), meals: [
-        ChartMeal(_en('Breakfast'), _en('Adai with avial — the highest-protein '
+        ChartMeal(_en('Breakfast'), _en('Adai with avial, the highest-protein '
             'breakfast in this kitchen')),
         ChartMeal(_en('Mid-morning'), _en('Guava or banana')),
         ChartMeal(_en('Lunch'), _en('Rice with kootu, a poriyal, and curd')),
@@ -783,30 +783,30 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
       ]),
     ],
     swaps: [
-      _en('Keerai — any of the greens — most days. This is the iron in a '
-          'largely rice-based plate.'),
+      _en('Keerai, any of the greens, most days. This is the iron in a '
+          'mostly rice-based plate.'),
       _en('Ragi in place of rice at one meal adds calcium without changing '
           'how the meal is eaten.'),
       _en('Sundal in the evening is the easiest protein to add to this chart.'),
-      _en('Adai and pongal carry more protein than idli and dosa — rotate them '
-          'in.'),
+      _en('Adai and pongal have more protein than idli and dosa, so rotate '
+          'them in.'),
     ],
     limits: [
       _en('Rice at every one of three meals. Swap at least one for ragi, '
           'millet or idiyappam.'),
       _en('Very tangy tamarind rasam daily if you have heartburn.'),
-      _en('Coffee with meals — it costs you iron from the greens.'),
+      _en('Coffee with meals. It costs you iron from the greens.'),
     ],
   ),
 
   // ---------------------------------------------------------------------------
   'regional_punjabi': ChartContent(
-    focus: _en('A Punjabi kitchen has no protein problem — dal, rajma, chana, '
+    focus: _en('A Punjabi kitchen has no protein problem: dal, rajma, chana, '
         'paneer and curd are already there. This chart is mostly about the '
         'ghee, the portion size and getting greens in daily.'),
     days: [
       ChartDay(label: _en('Day 1'), meals: [
-        ChartMeal(_en('Breakfast'), _en('Stuffed paratha with curd — one, and '
+        ChartMeal(_en('Breakfast'), _en('Stuffed paratha with curd: one, and '
             'less ghee than usual')),
         ChartMeal(_en('Mid-morning'), _en('Lassi, unsweetened')),
         ChartMeal(_en('Lunch'), _en('Rajma with rice, salad, curd')),
@@ -830,7 +830,7 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
       ]),
     ],
     swaps: [
-      _en('Saag — sarson, palak, methi, bathua — most days through winter. '
+      _en('Saag (sarson, palak, methi, bathua) most days through winter. '
           'This is the strongest iron source in the kitchen.'),
       _en('Curd or lassi with the heavier meals, which helps more than it '
           'sounds.'),
@@ -841,7 +841,7 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
     limits: [
       _en('Butter chicken, malai dishes and cream-based gravies as everyday '
           'food.'),
-      _en('Paratha at breakfast every day — rotate with daliya and poha.'),
+      _en('Paratha at breakfast every day. Rotate with daliya and poha.'),
       _en('Achar in quantity if blood pressure has been mentioned.'),
     ],
   ),
@@ -880,7 +880,7 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
       ]),
     ],
     swaps: [
-      _en('Steamed over fried is already the Gujarati habit — dhokla, handvo, '
+      _en('Steamed over fried is already the Gujarati habit: dhokla, handvo, '
           'muthiya, idada. Lean on it.'),
       _en('Methi, palak and bathua shaak carry the iron. Aim for a green '
           'shaak most days.'),
@@ -890,8 +890,8 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
     ],
     limits: [
       _en('Gathiya, fafda and farsan as daily snacks.'),
-      _en('The everyday sugar in dal, kadhi and shaak — worth reducing '
-          'especially if sugars have been raised with you.'),
+      _en('The everyday sugar in dal, kadhi and shaak. Cut it down, '
+          'especially if your sugar has been raised with you.'),
       _en('Very large rotli-and-bhaat lunches; split some into the evening.'),
     ],
   ),
@@ -899,8 +899,8 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
   // ---------------------------------------------------------------------------
   'regional_south_indian': ChartContent(
     focus: _en('A broader South Indian chart across Kerala, Karnataka and '
-        'Andhra — rice, coconut, sambar and plenty of vegetables — arranged so '
-        'the protein does not fall behind.'),
+        'Andhra (rice, coconut, sambar and plenty of vegetables), arranged so '
+        'the protein doesn\'t fall behind.'),
     days: [
       ChartDay(label: _en('Day 1'), meals: [
         ChartMeal(_en('Breakfast'), _en('Appam with vegetable stew')),
@@ -919,9 +919,9 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
         ChartMeal(_en('Dinner'), _en('Idiyappam with kadala curry')),
       ]),
       ChartDay(label: _en('Day 3'), meals: [
-        ChartMeal(_en('Breakfast'), _en('Puttu with kadala curry — one of the '
+        ChartMeal(_en('Breakfast'), _en('Puttu with kadala curry, one of the '
             'better protein breakfasts here')),
-        ChartMeal(_en('Mid-morning'), _en('Papaya-free fruit — banana, guava')),
+        ChartMeal(_en('Mid-morning'), _en('Papaya-free fruit: banana, guava')),
         ChartMeal(_en('Lunch'), _en('Rice with rasam, a poriyal, curd')),
         ChartMeal(_en('Evening'), _en('Ragi porridge with jaggery')),
         ChartMeal(_en('Dinner'), _en('Vegetable stew with appam')),
@@ -930,7 +930,7 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
     swaps: [
       _en('Kadala, sundal and dal are where the protein sits in a rice-heavy '
           'plate. One of them daily.'),
-      _en('Ragi at one meal for calcium — mudde, porridge or dosa.'),
+      _en('Ragi at one meal for calcium: mudde, porridge or dosa.'),
       _en('Coconut is fine in ordinary cooking amounts; it is the fried '
           'accompaniments that add up.'),
       _en('Low-mercury fish two or three times a week if you eat fish.'),
@@ -938,7 +938,7 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
     limits: [
       _en('Very spicy Andhra-style pickles and curries if heartburn has '
           'started.'),
-      _en('Rice at all three meals — swap one for ragi, puttu or idiyappam.'),
+      _en('Rice at all three meals. Swap one for ragi, puttu or idiyappam.'),
       _en('Coffee with meals rather than between them.'),
     ],
   ),
@@ -946,8 +946,8 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
   // ---------------------------------------------------------------------------
   'regional_jain': ChartContent(
     focus: _en('A Jain kitchen without onion, garlic or root vegetables. The '
-        'real work here is iron and B12, because the usual sources — palak, '
-        'beetroot, meat — are either restricted or absent, and this is the '
+        'real work here is iron and B12, because the usual sources (palak, '
+        'beetroot, meat) are either restricted or absent, and this is the '
         'chart most likely to need a supplement alongside it.'),
     days: [
       ChartDay(label: _en('Day 1'), meals: [
@@ -984,14 +984,14 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
       _en('Pair every iron meal with lemon, amla or a citrus fruit.'),
     ],
     limits: [
-      _en('Long gaps and light meals during Paryushan or other fasts — please '
+      _en('Long gaps and light meals during Paryushan or other fasts. Please '
           'read the Fasting section and speak to your doctor first.'),
       _en('Relying on rotli and bhaat for volume while the dal portion stays '
           'small.'),
       _en('Assuming iron will come from food alone here. It often does not, '
           'and a supplement is a normal answer rather than a failure.'),
     ],
-    doctorNote: _en('Iron and B12 are genuinely harder on a Jain plate, and '
+    doctorNote: _en('Iron and B12 are harder to get on a Jain plate, and '
         'this is one of the few charts where a supplement is commonly needed '
         'rather than optional. Ask your doctor to check your levels rather '
         'than assuming the food has covered it.'),
@@ -1003,8 +1003,8 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
   // ---------------------------------------------------------------------------
   'anaemia_chart': ChartContent(
     focus: _en('For low haemoglobin. The trap with an anaemia chart is that '
-        'eating iron and absorbing iron are different things — so this is '
-        'built as much around what you eat WITH the iron, and what you keep '
+        'eating iron and absorbing iron are different things. So this is '
+        'built as much around what you eat with the iron, and what you keep '
         'away from it, as around the iron itself.'),
     days: [
       ChartDay(label: _en('Day 1'), meals: [
@@ -1014,11 +1014,11 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
         ChartMeal(_en('Lunch'),
             _en('Palak dal with rice, beetroot salad with lemon, curd')),
         ChartMeal(_en('Evening'),
-            _en('Roasted chana with jaggery — no tea with it')),
+            _en('Roasted chana with jaggery, no tea with it')),
         ChartMeal(_en('Dinner'), _en('Methi roti with dal, a green sabzi')),
       ]),
       ChartDay(label: _en('Day 2'), meals: [
-        ChartMeal(_en('Breakfast'), _en('Poha with peanuts and lemon — poha '
+        ChartMeal(_en('Breakfast'), _en('Poha with peanuts and lemon. Poha '
             'is iron-fortified more often than people realise')),
         ChartMeal(_en('Mid-morning'), _en('Two soaked dates and a few raisins')),
         ChartMeal(_en('Lunch'), _en('Rajma with rice, tomato salad, and a '
@@ -1045,7 +1045,7 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
       _en('Keep tea and coffee an hour away from meals. Tea with a meal blocks '
           'a large share of the iron in it, and this is the most common reason '
           'a good diet still shows a low reading.'),
-      _en('Cook in an iron kadhai where you can — especially anything sour.'),
+      _en('Cook in an iron kadhai where you can, especially anything sour.'),
       _en('Sprouting and soaking dals and grains raises what your body can '
           'take from them.'),
       _en('Milk and calcium tablets compete with iron. Take them at a '
@@ -1058,8 +1058,8 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
           'cannot, and a tablet is the normal answer rather than a failure.'),
     ],
     doctorNote: _en('Anaemia is diagnosed and treated by your doctor, and the '
-        'iron tablet they prescribe does most of the work — this chart '
-        'supports it, it does not replace it. If your haemoglobin has been low '
+        'iron tablet they prescribe does most of the work. This chart '
+        'supports it; it doesn\'t replace it. If your haemoglobin has been low '
         'at two visits, that is a conversation to have rather than a diet to '
         'try harder at.'),
   ),
@@ -1078,7 +1078,7 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
         ChartMeal(_en('Lunch'), _en('Dal, rice, lauki sabzi, ghee, curd')),
         ChartMeal(_en('Evening'), _en('Milk with haldi, roasted makhana')),
         ChartMeal(_en('Dinner'),
-            _en('Khichdi with ghee — soft, warm and early')),
+            _en('Khichdi with ghee, soft, warm and early')),
       ]),
       ChartDay(label: _en('Day 2'), meals: [
         ChartMeal(_en('Early'), _en('Methi water or jeera water')),
@@ -1100,7 +1100,7 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
       ]),
     ],
     swaps: [
-      _en('If you are feeding, you need more water than food — keep a bottle '
+      _en('If you are breastfeeding, you need more water than food. Keep a bottle '
           'wherever you sit to feed, and drink at every feed.'),
       _en('Methi, ajwain, jeera, gond, sonth and garden cress are the '
           'traditional supply foods, and there is reasonable sense behind most '
@@ -1114,16 +1114,16 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
     limits: [
       _en('Cutting food to lose the weight. The first three months is the '
           'wrong time, and it shows up in your supply and your recovery.'),
-      _en('Very long gaps — feeding on an empty stomach is where the '
-          'lightheadedness comes from.'),
+      _en('Very long gaps. Feeding on an empty stomach is what makes you '
+          'lightheaded.'),
       _en('Being talked into or out of foods by whoever visits. Almost '
           'everything ordinary is fine.'),
     ],
   ),
 
   'eggetarian_chart': ChartContent(
-    focus: _en('Vegetarian plus egg — which quietly solves most of what a '
-        'vegetarian pregnancy plate struggles with. Egg carries complete '
+    focus: _en('Vegetarian plus egg, which fills most of the gaps a '
+        'vegetarian pregnancy plate has. Egg carries complete '
         'protein, B12, choline and iron in one cheap, everyday item.'),
     days: [
       ChartDay(label: _en('Day 1'), meals: [
@@ -1151,7 +1151,7 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
       ]),
     ],
     swaps: [
-      _en('One or two eggs a day covers a great deal — protein, B12 and '
+      _en('One or two eggs a day cover a great deal: protein, B12 and '
           'choline, which a vegetarian plate is usually short of.'),
       _en('Boiled travels, keeps and can be eaten one-handed. Bhurji and '
           'omelette are the same egg with more oil.'),
@@ -1161,8 +1161,8 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
           'from meals.'),
     ],
     limits: [
-      _en('Runny yolks, half-set omelettes and anything with raw egg — '
-          'mayonnaise, mousse, uncooked batter. Cooked through is the rule.'),
+      _en('Runny yolks, half-set omelettes and anything with raw egg, like '
+          'mayonnaise, mousse or uncooked batter. Cooked through is the rule.'),
       _en('Cracked or long-unrefrigerated eggs.'),
       _en('Relying on egg alone and letting the dal portion shrink.'),
     ],
@@ -1171,7 +1171,7 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
   'regional_north_indian': ChartContent(
     focus: _en('Roti, dal, sabzi and curd as they are eaten across UP, Bihar, '
         'Rajasthan and Delhi. Kept separate from the Punjabi chart because the '
-        'ghee, the dairy and the saag habit are genuinely different.'),
+        'ghee, the dairy and the saag habit are different.'),
     days: [
       ChartDay(label: _en('Day 1'), meals: [
         ChartMeal(_en('Breakfast'), _en('Vegetable poha or daliya, milk')),
@@ -1187,7 +1187,7 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
         ChartMeal(_en('Mid-morning'), _en('Milk with two dates')),
         ChartMeal(_en('Lunch'),
             _en('Chana dal with rice, lauki sabzi, kachumber')),
-        ChartMeal(_en('Evening'), _en('Sattu drink with lemon and salt — one '
+        ChartMeal(_en('Evening'), _en('Sattu drink with lemon and salt, one '
             'of the best protein drinks in this kitchen')),
         ChartMeal(_en('Dinner'), _en('Roti with palak or sarson saag')),
       ]),
@@ -1201,9 +1201,9 @@ final Map<String, ChartContent> _kChartContentAsWritten = {
       ]),
     ],
     swaps: [
-      _en('Sattu is the most underrated thing on this list — as a drink or in '
+      _en('Sattu is the most underrated thing on this list. As a drink or in '
           'a paratha, it carries real protein and costs very little.'),
-      _en('Saag through winter — palak, sarson, bathua, chaulai. This is where '
+      _en('Saag through winter: palak, sarson, bathua, chaulai. This is where '
           'the iron is.'),
       _en('Curd or chaas with the heavier meals.'),
       _en('Bajra and makki roti in winter add iron that wheat does not.'),

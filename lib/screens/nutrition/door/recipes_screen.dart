@@ -36,7 +36,7 @@ class RecipesScreen extends StatelessWidget {
     return PvDoorToolScaffold(
       hue: 104,
       eyebrow: 'Nutrition · Recipes',
-      title: 'Recipes to actually cook',
+      title: 'Recipes you\'ll want to cook',
       intro: diet == null
           ? 'Everyday Indian dishes, each with a reason it helps now. Tap one to cook it.'
           : '${diet.label.en} dishes from an everyday Indian kitchen, each with a reason it helps now.',
@@ -110,7 +110,7 @@ class _RecipesGridBodyState extends State<RecipesGridBody> {
             // ---- cook today ---------------------------------------------
             if (lead != null && !filtering) ...[
               pvDoorPad(nutritionHeading(p, 'Cook today',
-                  sub: unticked.isEmpty ? 'Something for the evening.' : 'Picked for what you have not had yet today.')),
+                  sub: unticked.isEmpty ? 'Something for the evening.' : 'Picked for what you haven\'t had yet today.')),
               const SizedBox(height: 12),
               pvDoorPad(PvPress(
                 child: InkWell(
@@ -204,7 +204,7 @@ class _RecipesGridBodyState extends State<RecipesGridBody> {
             ],
             // ---- what she wants: a meal, or a kind ----------------------
             pvDoorPad(nutritionHeading(p, 'What are you after?',
-                sub: 'A meal, a sweet, a soup — then by what you need.')),
+                sub: 'A meal, a sweet, a soup, then by what you need.')),
             const SizedBox(height: 10),
             // The same two chips as under the plate's heading on Today: her
             // diet and region steer this grid too, and "Non-vegetarian only"
@@ -288,8 +288,8 @@ class _RecipesGridBodyState extends State<RecipesGridBody> {
             if (mine.isEmpty)
               pvDoorPad(Text(
                   _bucket != null && _tag != null
-                      ? 'Nothing that is both yet. Try one without the other.'
-                      : 'Nothing tagged for that yet. The plate has swaps that cover it.',
+                      ? 'Nothing is both yet. Try one without the other.'
+                      : 'Nothing tagged for that yet. Your plate has swaps that cover it.',
                   style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2)))
             else
               pvDoorPad(GridView.builder(

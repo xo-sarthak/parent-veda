@@ -125,7 +125,7 @@ class _CravingsScreenState extends State<CravingsScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 18),
                     child: Text(
                         'Nothing here matches that. Try "Can I eat this?" on '
-                        'the Nutrition home — it covers far more foods than '
+                        'the Nutrition home. It covers far more foods than '
                         'this list of common cravings.',
                         style: pvManrope(
                             fontSize: 13.5, height: 1.5, color: p.ink3)),
@@ -243,7 +243,7 @@ class _StageBanner extends StatelessWidget {
         Icon(Icons.my_location_rounded, size: 16, color: p.action),
         const SizedBox(width: 10),
         Expanded(
-          child: Text('You are in week $week — your ${names[tri]} trimester.',
+          child: Text('You are in week $week, your ${names[tri]} trimester.',
               style: pvManrope(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,

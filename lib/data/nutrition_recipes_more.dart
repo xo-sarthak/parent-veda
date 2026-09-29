@@ -56,7 +56,7 @@ final List<Recipe> kMoreRecipes = [
       _en('Heat the oil; pop the mustard seeds, then fry the peanuts until they colour.'),
       _en('Add the onion, curry leaves and turmeric; cook until the onion is soft.'),
       _en('Stir in the peas or carrot, then the poha and salt; cover for two minutes on low.'),
-      _en('Finish with a squeeze of lemon — that is what unlocks the iron.'),
+      _en('Finish with a squeeze of lemon. It helps your body take in the iron.'),
     ],
     nutritionGlance: const ['Iron 2mg', 'Fibre 3g', 'Light and quick'],
     videoTitle: 'Cook along: vegetable poha',
@@ -95,7 +95,7 @@ final List<Recipe> kMoreRecipes = [
   Recipe(
     id: 'oats_porridge_dates',
     minutes: 12,
-    fact: "Two dates sweeten a bowl and add about a milligram of iron — sugar would add none.",
+    fact: "Two dates sweeten a bowl and add about a milligram of iron. Sugar would add none.",
     meals: const [RecipeMeal.breakfast],
     kind: RecipeKind.light,
     name: _en('Oats porridge with dates and almonds'),
@@ -116,6 +116,9 @@ final List<Recipe> kMoreRecipes = [
       _en('Simmer five to six minutes, stirring, until it thickens to how you like it.'),
       _en('Stir in the dates and cardamom; the dates do the sweetening.'),
       _en('Top with the almonds and eat warm.'),
+      // Appendix A (What to Expect, "Good Morning Granola"): an Indian crunch.
+      _en('For a change, skip the dates and top it with a spoon of roasted '
+          'makhana and a little grated jaggery instead.'),
     ],
     nutritionGlance: const ['Fibre 6g', 'Calcium 300mg', 'Iron 2mg'],
     videoTitle: 'Cook along: oats porridge',
@@ -144,8 +147,11 @@ final List<Recipe> kMoreRecipes = [
     steps: [
       _en('Heat the ghee and soften the onion, then the tomato and chilli with turmeric and salt.'),
       _en('Beat the eggs and pour them in; stir gently as they set.'),
-      _en('Cook until there is no wet egg left — fully set is the pregnancy rule.'),
+      _en("Cook until there's no wet egg left. In pregnancy, eggs should be fully set."),
       _en('Scatter coriander and roll into warm rotis.'),
+      // Appendix A (What to Expect, "Broccoli-Cheddar Omelet"): greens folded in.
+      _en('For greens, stir a handful of chopped spinach or methi in with the '
+          'tomato. It wilts in a minute and adds folate and iron.'),
     ],
     nutritionGlance: const ['Protein 16g', 'Choline', 'Eggs cooked through'],
     videoTitle: 'Cook along: egg bhurji',
@@ -153,7 +159,7 @@ final List<Recipe> kMoreRecipes = [
   Recipe(
     id: 'paneer_paratha',
     minutes: 30,
-    fact: "Fifty grams of paneer is a quarter of a day's calcium — more than a glass of milk.",
+    fact: "Fifty grams of paneer is a quarter of a day's calcium, more than a glass of milk.",
     meals: const [RecipeMeal.breakfast, RecipeMeal.lunch],
     kind: RecipeKind.main,
     name: _en('Paneer paratha with curd'),
@@ -187,8 +193,8 @@ final List<Recipe> kMoreRecipes = [
     meals: const [RecipeMeal.breakfast, RecipeMeal.dinner],
     kind: RecipeKind.main,
     name: _en('Idli with sambar'),
-    whyNow: _en('Steamed, fermented and easy to keep down — the breakfast '
-        'most mothers can face in the first weeks, with sambar for the dal.'),
+    whyNow: _en('Steamed, fermented and easy to keep down. The breakfast '
+        'most women can face in the first weeks, with sambar for the dal.'),
     region: RecipeRegion.southIndian,
     tags: const ['t1', 'nausea', 'protein', 'fibre'],
     defaultServings: 2,
@@ -247,8 +253,8 @@ final List<Recipe> kMoreRecipes = [
     meals: const [RecipeMeal.snack, RecipeMeal.breakfast],
     kind: RecipeKind.light,
     name: _en('Steamed sprouts chaat'),
-    whyNow: _en('Sprouted moong is protein, folate and fibre in one bowl — '
-        'steamed, because raw sprouts are the one thing to skip right now.'),
+    whyNow: _en('Sprouted moong is protein, folate and fibre in one bowl. '
+        "It's steamed, because raw sprouts are the one thing to skip right now."),
     region: RecipeRegion.panIndian,
     tags: const ['protein', 'folic_acid', 'fibre', 't1', 't2', 'constipation', 'onion_garlic'],
     defaultServings: 2,
@@ -261,7 +267,7 @@ final List<Recipe> kMoreRecipes = [
       _i('Coriander leaves', 1, 'tbsp'),
     ],
     steps: [
-      _en('Steam the sprouts for five to six minutes — cooked through, no longer raw.'),
+      _en('Steam the sprouts for five to six minutes, until cooked through and no longer raw.'),
       _en('Cool, then toss with the vegetables and potato.'),
       _en('Season with chaat masala, cumin, salt and lemon; finish with coriander.'),
     ],
@@ -281,7 +287,7 @@ final List<Recipe> kMoreRecipes = [
     tags: const ['vitamin_c', 'fibre', 't1', 't2', 't3', 'constipation', 'jain'],
     defaultServings: 2,
     ingredients: [
-      _i('Apple, guava, banana, pomegranate — whatever is in season', 200, 'g'),
+      _i('Apple, guava, banana, pomegranate, whatever is in season', 200, 'g'),
       _i('Roasted cumin powder', 0.25, 'tsp'),
       _i('Black salt', 0.25, 'tsp'),
       _i('Lemon', 0.25, 'pcs'),
@@ -297,7 +303,7 @@ final List<Recipe> kMoreRecipes = [
   Recipe(
     id: 'peanut_jaggery_chikki',
     minutes: 25,
-    fact: "Jaggery keeps the iron that refined sugar loses — a square of chikki has about a milligram.",
+    fact: "Jaggery keeps the iron that refined sugar loses. A square of chikki has about a milligram.",
     meals: const [RecipeMeal.snack],
     kind: RecipeKind.sweet,
     name: _en('Peanut and jaggery chikki'),
@@ -330,7 +336,7 @@ final List<Recipe> kMoreRecipes = [
     meals: const [RecipeMeal.snack],
     kind: RecipeKind.sweet,
     name: _en('Dates and nuts laddoo'),
-    whyNow: _en('No sugar at all — dates hold it together, and every laddoo '
+    whyNow: _en('No sugar at all. Dates hold it together, and every laddoo '
         'is iron, fibre and the good fat from the nuts.'),
     region: RecipeRegion.panIndian,
     tags: const ['iron', 'fibre', 'protein', 't2', 't3', 'constipation', 'jain', 'gestational_diabetes'],
@@ -380,7 +386,7 @@ final List<Recipe> kMoreRecipes = [
   Recipe(
     id: 'ragi_halwa',
     minutes: 25,
-    fact: "Ragi has more calcium than any other grain — a halwa of it is a sweet that does some work.",
+    fact: "Ragi has more calcium than any other grain, so a halwa of it is a sweet that does you some good.",
     meals: const [RecipeMeal.snack],
     kind: RecipeKind.sweet,
     name: _en('Ragi halwa'),
@@ -412,7 +418,7 @@ final List<Recipe> kMoreRecipes = [
   Recipe(
     id: 'ginger_lemon_tea',
     minutes: 10,
-    fact: "A gram of ginger a day is the amount studies used for morning sickness — about three thin slices.",
+    fact: "A gram of ginger a day is the amount studies used for morning sickness: about three thin slices.",
     meals: const [RecipeMeal.breakfast, RecipeMeal.snack],
     kind: RecipeKind.drink,
     name: _en('Ginger and lemon warm water'),
@@ -543,7 +549,7 @@ final List<Recipe> kMoreRecipes = [
   Recipe(
     id: 'moong_dal_soup',
     minutes: 25,
-    fact: "Moong is the easiest dal to digest — the one dieticians reach for on a queasy day.",
+    fact: "Moong is the easiest dal to digest, the one dieticians reach for on a queasy day.",
     meals: const [RecipeMeal.dinner, RecipeMeal.lunch],
     kind: RecipeKind.soup,
     name: _en('Moong dal soup'),
@@ -631,7 +637,7 @@ final List<Recipe> kMoreRecipes = [
   Recipe(
     id: 'home_chicken_curry',
     minutes: 45,
-    fact: "Chicken's iron is the haem kind — the body absorbs two to three times more of it than from dal.",
+    fact: "Chicken's iron is the haem kind. Your body absorbs two to three times more of it than from dal.",
     meals: const [RecipeMeal.lunch, RecipeMeal.dinner],
     kind: RecipeKind.main,
     name: _en('Home-style chicken curry'),
@@ -653,7 +659,7 @@ final List<Recipe> kMoreRecipes = [
       _en('Brown the onion in the oil, then cook the ginger-garlic paste and spices for a minute.'),
       _en('Add the tomato and cook until the oil separates; stir in the curd.'),
       _en('Add the chicken and salt; cover and simmer twenty-five minutes until the meat leaves the bone.'),
-      _en('Check the thickest piece is white through — no pink. Serve with roti or rice.'),
+      _en('Check the thickest piece is white all through, with no pink. Serve with roti or rice.'),
     ],
     nutritionGlance: const ['Protein 24g', 'Iron 1.5mg', 'Cooked through'],
     videoTitle: 'Cook along: chicken curry',
@@ -693,8 +699,8 @@ final List<Recipe> kMoreRecipes = [
     meals: const [RecipeMeal.lunch, RecipeMeal.dinner],
     kind: RecipeKind.main,
     name: _en('Pan-fried pomfret'),
-    whyNow: _en('Pomfret is a low-mercury fish, so it is the omega-3 the '
-        'baby\'s brain wants without the worry — shallow-fried, not deep.'),
+    whyNow: _en('Pomfret is a low-mercury fish, so it gives your baby\'s brain '
+        'omega-3 without the mercury. Shallow-fried, not deep.'),
     region: RecipeRegion.maharashtrian,
     tags: const ['non_veg', 'fish', 'protein', 'omega3', 't2', 't3', 'onion_garlic'],
     defaultServings: 2,
@@ -717,7 +723,7 @@ final List<Recipe> kMoreRecipes = [
   Recipe(
     id: 'dal_palak',
     minutes: 30,
-    fact: "The tomato in dal palak is not just taste — its vitamin C helps the spinach's iron go in.",
+    fact: "The tomato in dal palak isn't only for taste. Its vitamin C helps the spinach's iron go in.",
     meals: const [RecipeMeal.lunch, RecipeMeal.dinner],
     kind: RecipeKind.main,
     name: _en('Dal palak'),
@@ -741,5 +747,129 @@ final List<Recipe> kMoreRecipes = [
     ],
     nutritionGlance: const ['Protein 10g', 'Folate', 'Iron 3mg'],
     videoTitle: 'Cook along: dal palak',
+  ),
+
+  // ===========================================================================
+  //  2026-09-29, the pregnancy warmth pass: four the gap analysis asked for
+  //  (Appendix A, Nutrition > Recipes). Our own Indian versions: a raita
+  //  (Tzatziki), a kaddu soup (the two squash soups), a banana, curd and
+  //  dates smoothie (Banana-Berry Smoothie, Just Peachy Shake), and a
+  //  kachumber with pomegranate that shows how to eat raw salad safely.
+  // ===========================================================================
+  Recipe(
+    id: 'cucumber_raita',
+    minutes: 10,
+    fact: "A bowl of curd has about as much calcium as half a glass of milk, and the cucumber makes it cooling.",
+    meals: const [RecipeMeal.lunch, RecipeMeal.dinner, RecipeMeal.snack],
+    kind: RecipeKind.light,
+    name: _en('Cucumber raita'),
+    whyNow: _en('Cool curd with cucumber adds calcium to any meal, and it '
+        'soothes a stomach that has had enough spice.'),
+    region: RecipeRegion.panIndian,
+    tags: const ['calcium', 't1', 't2', 't3'],
+    defaultServings: 2,
+    ingredients: [
+      _i('Curd', 0.5, 'cup'),
+      _i('Cucumber, peeled and grated', 60, 'g'),
+      _i('Roasted cumin powder', 0.25, 'tsp'),
+      _i('Mint leaves, chopped', 1, 'tsp'),
+      _i('Black salt', 0.25, 'tsp'),
+    ],
+    steps: [
+      _en('Wash the cucumber well in clean water, peel it and grate it.'),
+      _en('Squeeze out a little of the water so the raita stays thick.'),
+      _en('Whisk the curd smooth, then stir in the cucumber, cumin, mint and black salt.'),
+      _en('Eat it fresh, the same day. Keep any left over in the fridge.'),
+    ],
+    nutritionGlance: const ['Calcium good', 'Cooling', 'Calories 70'],
+    videoTitle: 'Cook along: cucumber raita',
+  ),
+  Recipe(
+    id: 'kaddu_soup',
+    minutes: 25,
+    fact: "Orange pumpkin is rich in beta-carotene, which your body turns into vitamin A.",
+    meals: const [RecipeMeal.dinner, RecipeMeal.snack],
+    kind: RecipeKind.soup,
+    name: _en('Kaddu (pumpkin) soup'),
+    whyNow: _en('Smooth, mild and gentle on the stomach, with fibre and '
+        'vitamin A. Easy on an evening when heavy food feels like too much.'),
+    region: RecipeRegion.panIndian,
+    tags: const ['fibre', 't1', 't2', 't3', 'onion_garlic'],
+    defaultServings: 2,
+    ingredients: [
+      _i('Pumpkin (kaddu), peeled and cubed', 150, 'g'),
+      _i('Onion, chopped', 0.5, 'pcs'),
+      _i('Ginger, grated', 0.5, 'tsp'),
+      _i('Cumin seeds', 0.25, 'tsp'),
+      _i('Ghee', 1, 'tsp'),
+      _i('Water', 1, 'cup'),
+      _i('Milk', 0.25, 'cup'),
+    ],
+    steps: [
+      _en('Heat the ghee, add the cumin, then soften the onion and ginger.'),
+      _en('Add the pumpkin, water and a little salt, and simmer until the pumpkin is soft, about fifteen minutes.'),
+      _en('Blend until smooth, return to the pan and stir in the milk.'),
+      _en('Warm through without boiling, and add black pepper if you like.'),
+    ],
+    nutritionGlance: const ['Vitamin A', 'Fibre 3g', 'Calories 110'],
+    videoTitle: 'Cook along: kaddu soup',
+  ),
+  Recipe(
+    id: 'banana_dates_smoothie',
+    minutes: 10,
+    fact: "Banana and dates sweeten a smoothie on their own, and the dates add a little iron.",
+    meals: const [RecipeMeal.breakfast, RecipeMeal.snack],
+    kind: RecipeKind.drink,
+    name: _en('Banana, curd and dates smoothie'),
+    whyNow: _en('Easy to sip on a morning when chewing feels like too much. '
+        'Calcium from the curd and milk, and a little iron from the dates.'),
+    region: RecipeRegion.panIndian,
+    tags: const ['calcium', 'iron', 't1', 't2', 'nausea'],
+    defaultServings: 1,
+    ingredients: [
+      _i('Banana', 1, 'pcs'),
+      _i('Curd', 0.5, 'cup'),
+      _i('Milk', 0.5, 'cup'),
+      _i('Dates, pitted', 2, 'pcs'),
+      _i('Cardamom, ground', 0.25, 'tsp'),
+    ],
+    steps: [
+      _en('Soak the dates in the milk for ten minutes so they soften.'),
+      _en('Blend the banana, curd, milk, dates and cardamom until smooth.'),
+      _en('Drink it fresh and cool. Sip slowly if you feel sick.'),
+      // Appendix A (What to Expect, "Just Peachy Breakfast Shake").
+      _en('For a change, use a ripe chikoo or mango instead of the banana.'),
+    ],
+    nutritionGlance: const ['Calcium good', 'Iron present', 'Calories 280'],
+    videoTitle: 'Cook along: banana dates smoothie',
+  ),
+  Recipe(
+    id: 'kachumber_pomegranate',
+    minutes: 15,
+    fact: "The lemon on a kachumber adds vitamin C, which helps you absorb iron from the dal on the same plate.",
+    meals: const [RecipeMeal.lunch, RecipeMeal.dinner, RecipeMeal.snack],
+    kind: RecipeKind.light,
+    name: _en('Kachumber with pomegranate'),
+    whyNow: _en('A fresh, crunchy salad with vitamin C to help the iron in '
+        'your meal go in. Washed well and eaten fresh, raw salad is fine.'),
+    region: RecipeRegion.panIndian,
+    tags: const ['vitamin_c', 'fibre', 'iron', 't2', 't3', 'onion_garlic'],
+    defaultServings: 2,
+    ingredients: [
+      _i('Cucumber, peeled and chopped', 60, 'g'),
+      _i('Tomato, chopped', 0.5, 'pcs'),
+      _i('Onion, chopped', 0.5, 'pcs'),
+      _i('Pomegranate seeds', 30, 'g'),
+      _i('Lemon', 0.25, 'pcs'),
+      _i('Roasted cumin powder', 0.25, 'tsp'),
+    ],
+    steps: [
+      _en('Wash the cucumber, tomato and onion well under clean running water, and wash your hands and knife too.'),
+      _en('Peel the cucumber, then chop everything small on a clean board.'),
+      _en('Toss with the pomegranate seeds, cumin, a pinch of salt and the lemon juice.'),
+      _en("Eat it within the hour. Don't keep cut salad standing, and skip salads from outside."),
+    ],
+    nutritionGlance: const ['Vitamin C', 'Fibre 3g', 'Calories 60'],
+    videoTitle: 'Cook along: kachumber',
   ),
 ];

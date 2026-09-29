@@ -301,8 +301,8 @@ class _YouAreHere extends StatelessWidget {
             Expanded(
               child: Text(
                   active
-                      ? 'You are in week $week — showing ${stage.label.now.toLowerCase()} charts first.'
-                      : 'You are in week $week — your ${stage.label.now.toLowerCase()}.',
+                      ? 'You are in week $week. Showing ${stage.label.now.toLowerCase()} charts first.'
+                      : 'You are in week $week, your ${stage.label.now.toLowerCase()}.',
                   style: pvManrope(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,

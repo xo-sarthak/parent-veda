@@ -30,6 +30,13 @@ import 'package:parentveda/data/reads/pregnancy_reads.dart';
 import 'package:parentveda/screens/doors/pv_door_router.dart';
 import 'package:parentveda/services/pregnancy_controller.dart';
 
+/// The door's own reads, exactly (see the re-pin note on the test).
+const _kDietReads = [
+  'preg_diet_read_add_now',
+  'preg_diet_read_weight',
+  'preg_diet_read_food_myths',
+];
+
 /// Every entry tile on the door from one library.
 List<PvDoorEntryTile> _from(PvDoorPage door, PvDoorLibrary library) => [
       for (final t in door.allTiles)
@@ -225,7 +232,7 @@ void main() {
           if (t is PvDoorVideoTile) t,
       ];
       expect(videos.length, 1);
-      expect(videos.single.title, 'Do I actually need supplements?');
+      expect(videos.single.title, 'Do I need supplements?');
       expect(videos.single.comingSoon, isTrue);
       expect(videos.single.format, PvDoorFormat.video);
     });
@@ -243,12 +250,16 @@ void main() {
   });
 
   group('only two things on this door are new', () {
-    test('one read, and it is the trimester guide', () {
+    // ⚠️ RE-PINNED 2026-09-29. The rebuild brief allowed one new read; the
+    // pregnancy gap analysis (the source of truth since) asks for two more:
+    // "How much weight is right for me?" (P1) and the food-myths read (P2).
+    // The list is still exact, so a fourth needs a decision here too.
+    test('three reads: the trimester guide, weight, and food beliefs', () {
       final reads = [
         for (final r in kPregnancyReads)
           if (r.id.startsWith('preg_diet_')) r.id,
       ];
-      expect(reads, ['preg_diet_read_add_now']);
+      expect(reads, _kDietReads);
     });
 
     test('one checklist, and it names her stage', () {
@@ -264,7 +275,7 @@ void main() {
       // door whose brief says, twice, that nothing here is new copy.
       for (final t in door.allTiles) {
         if (t is! PvDoorGuideTile) continue;
-        expect(t.readId, 'preg_diet_read_add_now',
+        expect(_kDietReads, contains(t.readId),
             reason: '"${t.title}" is a new guide on a reuse-only door.');
       }
     });
