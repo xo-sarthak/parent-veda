@@ -230,8 +230,10 @@ String ttcMovementTime(int minutes) => minutes > 0
     : 'Nothing to set time aside for today.';
 
 /// The heading over a practice's steps, and its way into the player.
-const String kTtcTipHowHeading = 'How to do it';
-const String kTtcTipStartTitle = 'Start it with the timer';
+// Kept for revert (2026-09-28): 'How to do it', 'Start it with the timer'.
+// A heading and a card title name the thing, never "it".
+const String kTtcTipHowHeading = 'The steps, one by one';
+const String kTtcTipStartTitle = 'Start the steps with a timer';
 const String kTtcTipStartValue =
     'The steps one at a time, with a timer, and a tick when you finish.';
 

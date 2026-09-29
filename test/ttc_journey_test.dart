@@ -19,7 +19,8 @@ import 'package:parentveda/services/life_stage_store.dart';
 import 'package:parentveda/ttc/cycle_store.dart';
 import 'package:parentveda/ttc/ttc_chapter.dart';
 import 'package:parentveda/ttc/ttc_daily_data.dart' show TtcRitualPart;
-import 'package:parentveda/ttc/ttc_journal_store.dart';
+// Kept for revert (2026-09-28, the user: no journal in trying to conceive).
+// import 'package:parentveda/ttc/ttc_journal_store.dart';
 import 'package:parentveda/ttc/ttc_log_store.dart';
 import 'package:parentveda/ttc/ttc_milestones.dart';
 import 'package:parentveda/ttc/ttc_ritual_store.dart';
@@ -43,7 +44,7 @@ void main() {
     CycleStore.instance.resetForTest();
     TtcStore.instance.resetForTest();
     TtcLogStore.instance.resetForTest();
-    TtcJournalStore.instance.resetForTest();
+    // Kept for revert (2026-09-28): TtcJournalStore.instance.resetForTest();
     TtcRitualStore.instance.resetForTest();
     TtcSupplementsStore.instance.resetForTest();
     FamilyTimeline.instance.resetForTest();
@@ -111,10 +112,16 @@ void main() {
       expect(engine.isAchieved('ovulation_learned'), isTrue);
     });
 
-    test('writing something', () {
+    // Kept for revert (2026-09-28, the user: no journal in trying to
+    // conceive): the milestone and its check are commented out with the
+    // journal store.
+    // test('writing something', () {
+    //   expect(engine.isAchieved('wrote_something'), isFalse);
+    //   TtcJournalStore.instance.add(kind: TtcEntryKind.memory, text: 'x');
+    //   expect(engine.isAchieved('wrote_something'), isTrue);
+    // });
+    test('writing something is no longer a milestone', () {
       expect(engine.isAchieved('wrote_something'), isFalse);
-      TtcJournalStore.instance.add(kind: TtcEntryKind.memory, text: 'x');
-      expect(engine.isAchieved('wrote_something'), isTrue);
     });
 
     test('a week of the ritual', () {
@@ -135,7 +142,8 @@ void main() {
     test('nothing still ahead is described as missing', () {
       // Structural: `ahead` is simply the complement of `achieved`, and there
       // is no "overdue" or "missed" concept anywhere in the engine.
-      TtcJournalStore.instance.add(kind: TtcEntryKind.memory, text: 'x');
+      // Kept for revert (2026-09-28, journal out of TTC):
+      //   TtcJournalStore.instance.add(kind: TtcEntryKind.memory, text: 'x');
       expect(engine.achieved.length + engine.ahead.length,
           ttcMilestones.length);
     });
@@ -217,10 +225,14 @@ void main() {
 
     test('reaching milestones writes them into the story', () {
       TtcSupplementsStore.instance.add('Folic acid');
-      TtcJournalStore.instance.add(kind: TtcEntryKind.memory, text: 'x');
+      // Kept for revert (2026-09-28, journal out of TTC):
+      //   TtcJournalStore.instance.add(kind: TtcEntryKind.memory, text: 'x');
       const TtcMilestoneEngine().syncToTimeline();
       expect(FamilyTimeline.instance.has('ttc_ms_supplements_started'), isTrue);
-      expect(FamilyTimeline.instance.has('ttc_ms_wrote_something'), isTrue);
+      // Kept for revert (2026-09-28, journal out of TTC): the milestone left
+      // the list with the journal, so a journal entry no longer writes it.
+      //   expect(FamilyTimeline.instance.has('ttc_ms_wrote_something'), isTrue);
+      expect(FamilyTimeline.instance.has('ttc_ms_wrote_something'), isFalse);
     });
 
     test('syncing repeatedly does not duplicate the story', () {
@@ -361,14 +373,24 @@ void main() {
       expect(ttcFactsFor(last).isExpectedPeriod, isFalse);
     });
 
-    test('a logged tracker and a journal entry both surface on their day', () {
+    // Kept for revert (2026-09-28, journal out of TTC): the name was "a
+    // logged tracker and a journal entry both surface on their day", and it
+    // expected `facts.journalEntries.length` to be 1. The journal left the
+    // stage, so its words stay in the store and off the calendar.
+    test('a logged tracker surfaces on its day, and a journal entry does not',
+        () {
       final d = DateTime(2026, 7, 10);
       TtcLogStore.instance.log('mood', 'mood', 3, on: d);
-      TtcJournalStore.instance
-          .add(kind: TtcEntryKind.memory, text: 'a good day', on: d);
+      // Kept for revert (2026-09-28, the journal store is commented out
+      // and the day's facts no longer carry journal entries at all):
+      //   TtcJournalStore.instance
+      //       .add(kind: TtcEntryKind.memory, text: 'a good day', on: d);
       final facts = ttcFactsFor(d);
       expect(facts.loggedTrackers, contains('mood'));
-      expect(facts.journalEntries.length, 1);
+      //   expect(facts.journalEntries.length, 1);
+      //   expect(facts.journalEntries, isEmpty);
+      //   expect(TtcJournalStore.instance.count, 1,
+      //       reason: 'the entry is kept, only not shown');
       expect(facts.hasAnything, isTrue);
     });
 

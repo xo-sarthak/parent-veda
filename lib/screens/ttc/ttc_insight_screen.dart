@@ -302,11 +302,15 @@ class _TtcInsightScreenState extends State<TtcInsightScreen> {
                   Text('A', style: ttcBody(12, color: p.soft)),
                   Expanded(
                     child: SliderTheme(
+                      // A control is the ink, like every switch (2026-09-29,
+                      // the user: "keep it black everywhere"). Kept for
+                      // revert: activeTrackColor, thumbColor and the overlay
+                      // were p.accent (violet).
                       data: SliderThemeData(
-                        activeTrackColor: p.accent,
-                        thumbColor: p.accent,
+                        activeTrackColor: p.ink,
+                        thumbColor: p.ink,
                         inactiveTrackColor: p.rule,
-                        overlayColor: p.accent.withValues(alpha: 0.12),
+                        overlayColor: p.ink.withValues(alpha: 0.12),
                       ),
                       child: Slider(
                         value: _scale,

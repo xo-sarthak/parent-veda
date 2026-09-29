@@ -58,6 +58,7 @@
 // =============================================================================
 
 import '../../screens/brackets/hub/hub_intent_art.dart';
+import '../reads/read_images.dart' show readImageFor;
 import 'pv_learn_view.dart';
 
 /// Topic word → drawn mark. First match in the programme's topic list wins;
@@ -176,7 +177,42 @@ IntentMark pvLearnMarkFor(List<String> topics, PvLearnKind kind) {
 /// an afternoon, and every card and hero picks the photo up with no other
 /// change. Until then the drawn cover is the cover — a real one, not a gap.
 ///   'course_pregnancy_guide': 'https://…',
-const Map<String, String> kPvLearnCovers = {};
+///
+/// ⚠️ FILLED FOR TRYING TO CONCEIVE — 2026-09-29. The user: "stop leaving
+/// the placeholders and put random but relevant images for them, from free
+/// resources on the web." The library that did not exist on 2026-09-22 does
+/// now: the read-photo pipeline (`read_images.dart`: StockSnap through
+/// Openverse, and Wikimedia Commons, mirrored to our R2 bucket with a
+/// licence line each). So every TTC programme has ONE photo, chosen by eye
+/// for THAT programme and keyed `learn_<id>` in the read table, which is
+/// the rule this file was written to protect: a photo per programme, never
+/// a photo per topic word. Objects and rooms only, never a face: a consult
+/// is with a named person, and a stock face on her page would be presented
+/// as her (a stethoscope beside a laptop for a video consult, spices in
+/// steel katoris for the nutritionist, an armchair in soft light for the
+/// psychologist). Other stages keep their drawn covers.
+/// Kept for revert: `const Map<String, String> kPvLearnCovers = {};`
+final Map<String, String> kPvLearnCovers = {
+  for (final id in kPvTtcLearnCoverIds) id: ?readImageFor('learn_$id'),
+};
+
+/// The TTC programmes that carry a photograph, by catalogue id.
+const List<String> kPvTtcLearnCoverIds = [
+  'ttc_consult_fertility',
+  'ttc_consult_gynae',
+  'ttc_consult_androl',
+  'ttc_course_basics',
+  'ttc_course_pcos',
+  'ttc_yoga_pack',
+  'ttc_nutrition_consult',
+  'ttc_psych_consult',
+  'ttc_loss_support',
+  'ttc_assessment_couple',
+  'ttc_partner_workshop',
+  'ttc_ivf_prep',
+  'ttc_lifestyle_90',
+  'ttc_course_garbh',
+];
 
 /// The photograph for a programme, or null for the drawn cover.
 String? pvLearnCoverFor(String id, List<String> topics, PvLearnKind kind) =>

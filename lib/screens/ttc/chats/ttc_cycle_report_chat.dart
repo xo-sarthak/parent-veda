@@ -159,7 +159,8 @@ class TtcCycleReportChat extends TtcChatScript {
           '${finding.headline}: ${finding.detail}',
       ],
       [
-        TtcChatChoice('What should I do with this?', next: nextStep),
+        // Kept for revert (2026-09-28, explicit labels): 'What should I do with this?'
+        TtcChatChoice('What should I do with this report?', next: nextStep),
         const TtcChatChoice('See the full report', open: ['ttc_cycle_report']),
       ],
     );

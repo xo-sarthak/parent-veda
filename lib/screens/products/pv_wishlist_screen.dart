@@ -69,7 +69,7 @@ class PvWishlistScreen extends StatelessWidget {
                                 fontSize: 10.5,
                                 fontWeight: FontWeight.w800,
                                 letterSpacing: 1.1,
-                                color: p.action,
+                                color: kPvInk,
                               ),
                             ),
                             Text(

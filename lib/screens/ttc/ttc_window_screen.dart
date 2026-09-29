@@ -65,6 +65,7 @@ import 'ttc_common.dart';
 import 'ttc_cycle_palette.dart';
 import 'ttc_cycle_companion.dart' show TtcCycleCompanionScreen;
 import 'ttc_strings.dart';
+import 'ttc_tool_marks.dart' show ttcToolHeaderMark;
 import 'ttc_today_screen.dart' show logTtcPeriod;
 import 'ttc_treatment_screen.dart' show TtcTreatmentEntryCard;
 
@@ -263,7 +264,14 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
             //         letterSpacing: 0.2,
             //         color: p.ink1)),
           ]),
-          const SizedBox(height: 20),
+          // The tool's mark over the title (2026-09-29, ttc_tool_marks.dart):
+          // the object she tapped on the Tools row. 14 + 40 + 10 where the gap
+          // was 20, so the hero grows by 44 and no more. Tinted by this
+          // page's own field, the cycle palette's window colour. Kept for
+          // revert: const SizedBox(height: 20),
+          const SizedBox(height: 14),
+          ttcToolHeaderMark('window', v2BlockTint(kWindowHue, p))!,
+          const SizedBox(height: 10),
           // Kept for revert: `Text(t.windowYourDays, ...)`.
           Text(t.fertilityWindow,
               style: pvFraunces(
@@ -316,7 +324,13 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
             // that a black shadow on a tinted ground clashes, and notes that
             // the Dart side is the half still getting this wrong. This screen
             // is the right direction for that fix to travel from.
-            color: const Color(0xFFD0C8DC).withValues(alpha: 0.45),
+            //
+            // ⚠️ AND THEN NOT LILAC EITHER (2026-09-29): the ground is white
+            // now, and the one shadow in the palette is the ink's at 8%
+            // (ttcCardShadow), which is neither black nor a second hue.
+            // Kept for revert (2026-09-29):
+            //   color: const Color(0xFFD0C8DC).withValues(alpha: 0.45),
+            color: ttcShadowInk,
             blurRadius: 24,
             offset: const Offset(0, -6),
           ),
@@ -714,7 +728,8 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
         alignment: Alignment.centerLeft,
         child: _Pill(
           p: p,
-          label: 'How to read this',
+          // Kept for revert (2026-09-28, explicit labels): 'How to read this'
+          label: 'How to read the fertile window',
           leading: '?',
           onTap: () => setState(() => _tour = 0),
         ),
@@ -745,7 +760,8 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
         const SizedBox(width: 10),
         _Pill(
           p: p,
-          label: _tour < steps.length - 1 ? 'Next' : 'Got it',
+          // Kept for revert (2026-09-28, explicit labels): 'Next'
+          label: _tour < steps.length - 1 ? 'Next tip' : 'Got it',
           onTap: () => setState(
               () => _tour = _tour < steps.length - 1 ? _tour + 1 : -1),
         ),
@@ -782,7 +798,8 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
   Widget _glossary(V2Palette p) => _Card(
         p: p,
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('New to this? Tap a word.',
+          // Kept for revert (2026-09-28, explicit labels): 'New to this? Tap a word.'
+          Text('Tap a word to see what it means.',
               style: pvFraunces(
                   fontSize: 16.5,
                   fontWeight: FontWeight.w600,
@@ -1242,7 +1259,7 @@ class _DayChip extends StatelessWidget {
               color: selected ? p.surface : Colors.transparent,
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
-                  color: selected ? p.action : p.line,
+                  color: selected ? ttcTitleInk : p.line,
                   width: selected ? 1.4 : 1),
             ),
             child: Column(
@@ -1295,7 +1312,8 @@ class _FactBlock extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         decoration: BoxDecoration(
-          color: p.surfaceAlt,
+          // Kept for revert (2026-09-29, no tinted slab behind text): color: p.surfaceAlt,
+          color: p.surface, border: Border.fromBorderSide(BorderSide(color: p.line)),
           borderRadius: BorderRadius.circular(18),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -1525,7 +1543,10 @@ class _Card extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFD0C8DC).withValues(alpha: 0.5),
+              // Neutral ink, the ttcCardShadow value (2026-09-29): a lilac lift is a
+              // second hue under a white surface. Kept for revert (2026-09-29):
+              //   color: const Color(0xFFD0C8DC).withValues(alpha: 0.5),
+              color: ttcShadowInk,
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
@@ -1575,13 +1596,13 @@ class _Pill extends StatelessWidget {
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(color: p.action, width: 1.4),
+                  border: Border.all(color: ttcTitleInk, width: 1.4),
                 ),
                 child: Text(leading!,
                     style: pvManrope(
                         fontSize: 9,
                         fontWeight: FontWeight.w800,
-                        color: p.action)),
+                        color: ttcTitleInk)),
               ),
               const SizedBox(width: 7),
             ],
@@ -1589,7 +1610,7 @@ class _Pill extends StatelessWidget {
                 style: pvManrope(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
-                    color: leading != null ? p.action : p.ink1)),
+                    color: leading != null ? ttcTitleInk : p.ink1)),
           ]),
         ),
       );
@@ -1720,7 +1741,10 @@ class _ViewToggle extends StatelessWidget {
               boxShadow: on
                   ? [
                       BoxShadow(
-                        color: const Color(0xFFD0C8DC).withValues(alpha: 0.55),
+                        // Neutral ink, the ttcCardShadow value (2026-09-29): a lilac lift is a
+                        // second hue under a white surface. Kept for revert (2026-09-29):
+                        //   color: const Color(0xFFD0C8DC).withValues(alpha: 0.55),
+                        color: ttcShadowInk,
                         blurRadius: 6,
                         offset: const Offset(0, 1),
                       ),
@@ -1731,7 +1755,7 @@ class _ViewToggle extends StatelessWidget {
                 style: pvManrope(
                     fontSize: 11.5,
                     fontWeight: FontWeight.w700,
-                    color: on ? p.action : p.ink3)),
+                    color: on ? ttcTitleInk : p.ink3)),
           ),
         ),
       );

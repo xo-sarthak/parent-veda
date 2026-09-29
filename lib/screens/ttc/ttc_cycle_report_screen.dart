@@ -196,7 +196,7 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
       title: title,
       action: IconButton(
         icon: const Icon(Icons.info_outline_rounded, size: 21),
-        color: ttcMuted,
+        color: ttcInk, // ink on the field (2026-09-29, 2.8:1 in ttcSoft); was ttcMuted
         onPressed: () => setState(() => _about = !_about),
       ),
       heroLead: _CyclePicker(
@@ -239,7 +239,9 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
                 report: r,
                 facts: facts,
                 eyebrow: 'Who is guiding this cycle',
-                title: 'Your doctor is timing this one',
+                // Change 5 (2026-09-28). Kept for revert: 'Your doctor is
+                // timing this one'.
+                title: 'Your doctor is timing this cycle',
                 body: "You've marked this as a treatment cycle. Your clinic "
                     'is scanning you and choosing the dates, and they can see '
                     'things this page never will.',
@@ -528,8 +530,9 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
       //   onPressed: () => _showDisclaimer(context, t),
       action: IconButton(
         icon: const Icon(Icons.info_outline_rounded, size: 21),
-        color: ttcMuted,
-        tooltip: 'About this page',
+        color: ttcInk, // ink on the field (2026-09-29, 2.8:1 in ttcSoft); was ttcMuted
+        // Kept for revert (2026-09-28, explicit labels): 'About this page'
+        tooltip: 'About the cycle report',
         onPressed: () => setState(() => _about = !_about),
       ),
       heroLead: _CyclePicker(
@@ -797,7 +800,8 @@ class _WalkMeThrough extends StatelessWidget {
 
   final VoidCallback onTap;
 
-  static const String label = 'Walk me through it';
+  // Kept for revert (2026-09-28, explicit labels): 'Walk me through it'
+  static const String label = 'Walk me through my report';
 
   @override
   Widget build(BuildContext context) => InkWell(
@@ -808,7 +812,8 @@ class _WalkMeThrough extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.fromLTRB(16, 13, 12, 13),
           decoration: BoxDecoration(
-            color: ttcPanel,
+            // Kept for revert (2026-09-29, no tinted slab behind text): color: ttcPanel,
+            color: Colors.white, border: const Border.fromBorderSide(BorderSide(color: ttcLine)),
             borderRadius: BorderRadius.circular(ttcCardRadius),
           ),
           child: Row(children: [
@@ -868,7 +873,7 @@ class _CyclePicker extends StatelessWidget {
           child: Column(children: [
             Text(caption ?? TtcS.current().reportChosenCycle,
                 key: const ValueKey('ttc_report_which_cycle'),
-                style: ttcBody(11, color: ttcMuted, w: FontWeight.w700)),
+                style: ttcBody(11, color: ttcInk, w: FontWeight.w700)), // ink on the field; was ttcMuted (2026-09-29)
             const SizedBox(height: 2),
             Text(label, style: ttcJakarta(16)),
             if (onLatest != null)
@@ -1326,7 +1331,8 @@ class _Note extends StatelessWidget {
         decoration: BoxDecoration(
           // ⚠️ THE NEUTRAL PANEL. This was a pink-red wash, which made an
           // ordinary "not much yet" read like a warning.
-          color: ttcPanel,
+          // Kept for revert (2026-09-29, no tinted slab behind text): color: ttcPanel,
+          color: Colors.white, border: const Border.fromBorderSide(BorderSide(color: ttcLine)),
           borderRadius: BorderRadius.circular(ttcCardRadius),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

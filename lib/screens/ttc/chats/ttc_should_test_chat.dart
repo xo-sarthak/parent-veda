@@ -280,7 +280,8 @@ class TtcShouldTestChat extends TtcChatScript {
           "If that's today or earlier, you can test now.",
         ],
         [
-          TtcChatChoice('How do I take it?', next: () => howTo(null)),
+          // Kept for revert (2026-09-28, explicit labels): 'How do I take it?'
+          TtcChatChoice('How do I take a test?', next: () => howTo(null)),
           const TtcChatChoice('Done', done: true),
         ],
       );
@@ -362,8 +363,9 @@ class TtcShouldTestChat extends TtcChatScript {
         'A home test is reliable from today.',
       ],
       [
-        TtcChatChoice('How do I take it?', next: () => howTo(a)),
-        TtcChatChoice('I took one already', next: () => result(a)),
+        // Kept for revert (2026-09-28, explicit labels): 'How do I take it?', 'I took one already'
+        TtcChatChoice('How do I take a test?', next: () => howTo(a)),
+        TtcChatChoice('I took a test already', next: () => result(a)),
         if (a.looksStale)
           const TtcChatChoice('Log a period', open: ['ttc_cycle']),
         TtcChatChoice("I'll test later", next: later),
@@ -382,14 +384,16 @@ class TtcShouldTestChat extends TtcChatScript {
               "doesn't count.",
         ],
         [
-          TtcChatChoice("I've taken it", next: () => result(a)),
+          // Kept for revert (2026-09-28, explicit labels): "I've taken it"
+          TtcChatChoice("I've taken the test", next: () => result(a)),
           const TtcChatChoice('Read: how to test', open: kTtcReadHowToTest),
           TtcChatChoice("I'll test later", next: later),
         ],
       );
 
   TtcChatStep result(TtcTestAdvice? a) => TtcChatStep(
-        const ['What did it show?'],
+        // Kept for revert (2026-09-28, explicit labels): 'What did it show?'
+        const ['What did the test show?'],
         [
           TtcChatChoice('Positive', next: positive),
           TtcChatChoice('Negative', next: () => negative(a)),
@@ -408,7 +412,8 @@ class TtcShouldTestChat extends TtcChatScript {
         ],
         [
           TtcChatChoice('Record my positive test', action: _recordPositive),
-          const TtcChatChoice('Log it for today', open: kTtcLogResult),
+          // Kept for revert (2026-09-28, explicit labels): 'Log it for today'
+          const TtcChatChoice('Log the test for today', open: kTtcLogResult),
           const TtcChatChoice('Done', done: true),
         ],
       );

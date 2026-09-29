@@ -46,7 +46,8 @@ import '../../ttc/cycle_store.dart';
 import '../../ttc/ttc_chapter.dart';
 import '../../ttc/ttc_home_situation.dart' show ttcDueDateIfConceivedOn;
 import '../../ttc/ttc_day_context.dart';
-import '../../ttc/ttc_journal_store.dart';
+// Kept for revert (2026-09-28, the user: no journal in trying to conceive).
+// import '../../ttc/ttc_journal_store.dart';
 import '../../ttc/ttc_log_store.dart';
 import '../../ttc/ttc_records_store.dart';
 import '../../ttc/ttc_store.dart';
@@ -97,7 +98,7 @@ class _TtcCalendarScreenState extends State<TtcCalendarScreen> {
       animation: Listenable.merge([
         TtcStore.instance,
         TtcLogStore.instance,
-        TtcJournalStore.instance,
+        // Kept for revert (2026-09-28): TtcJournalStore.instance,
         TtcAppointmentsStore.instance,
         TtcTreatmentStore.instance,
         FamilyTimeline.instance,
@@ -227,7 +228,7 @@ class TtcDayFacts {
     required this.isOvulation,
     required this.isExpectedPeriod,
     required this.loggedTrackers,
-    required this.journalEntries,
+    // Kept for revert (2026-09-28): required this.journalEntries,
     required this.timelineEvents,
     required this.appointments,
     this.treatment = const [],
@@ -256,7 +257,9 @@ class TtcDayFacts {
   final bool isExpectedPeriod;
 
   final List<String> loggedTrackers;
-  final List<TtcJournalEntry> journalEntries;
+  // Kept for revert (2026-09-28, the user: no journal in trying to conceive):
+  // the day's journal entries. The store is commented out.
+  // final List<TtcJournalEntry> journalEntries;
   final List<TimelineEvent> timelineEvents;
   final List<TtcAppointment> appointments;
 
@@ -278,7 +281,7 @@ class TtcDayFacts {
       isOvulation ||
       (fertility != null && fertility != FertilityLevel.low) ||
       loggedTrackers.isNotEmpty ||
-      journalEntries.isNotEmpty ||
+      // Kept for revert (2026-09-28): journalEntries.isNotEmpty ||
       timelineEvents.isNotEmpty ||
       appointments.isNotEmpty ||
       treatment.isNotEmpty ||
@@ -438,12 +441,16 @@ TtcDayFacts ttcFactsFor(DateTime day) {
         tracker.id
   ];
 
-  final journal = TtcJournalStore.instance.entries
-      .where((e) =>
-          e.date.year == d.year &&
-          e.date.month == d.month &&
-          e.date.day == d.day)
-      .toList();
+  // Kept for revert (2026-09-28, journal out of TTC): the day card listed the
+  // journal's entries for the day. The journal left the stage, so its words
+  // no longer surface here; they stay in the store.
+  //   final journal = TtcJournalStore.instance.entries
+  //       .where((e) =>
+  //           e.date.year == d.year &&
+  //           e.date.month == d.month &&
+  //           e.date.day == d.day)
+  //       .toList();
+  // Kept for revert (2026-09-28): final journal = <TtcJournalEntry>[];
 
   final timeline = FamilyTimeline.instance.events
       .where((e) =>
@@ -459,7 +466,7 @@ TtcDayFacts ttcFactsFor(DateTime day) {
     isOvulation: isOvulation,
     isExpectedPeriod: isExpected,
     loggedTrackers: logged,
-    journalEntries: journal,
+    // Kept for revert (2026-09-28): journalEntries: journal,
     timelineEvents: timeline,
     appointments: TtcAppointmentsStore.instance.on(d),
     treatment: treatment,
@@ -896,8 +903,9 @@ class _DayCell extends StatelessWidget {
                   // a clinic date is a hollow ink dot so the two never look
                   // alike. Kept for revert: _dot(ttcPurple) for trackers,
                   // _dot(ttcMuted) for journal, _dot(ttcTitleInk) for clinic.
-                  if (facts.loggedTrackers.isNotEmpty ||
-                      facts.journalEntries.isNotEmpty)
+                  // Kept for revert (2026-09-28, journal out of TTC):
+                  //   || facts.journalEntries.isNotEmpty
+                  if (facts.loggedTrackers.isNotEmpty)
                     _dot(TtcCycleColours.logged,
                         key: const ValueKey('ttc_cal_logged_dot')),
                   // A date her clinic gave her (2026-09-26, B5).
@@ -1139,9 +1147,10 @@ class _DayPanel extends StatelessWidget {
           for (final id in facts.loggedTrackers)
             _line(Icons.check_circle_outline_rounded, TtcCycleColours.logged,
                 ttcCalendarLoggedLine(id, hi)),
-          for (final e in facts.journalEntries)
-            _line(Icons.edit_outlined, ttcMuted,
-                '${e.kind.label(hi)} · ${e.text}'),
+          // Kept for revert (2026-09-28, journal out of TTC):
+          // for (final e in facts.journalEntries)
+          //   _line(Icons.edit_outlined, ttcMuted,
+          //       '${e.kind.label(hi)} · ${e.text}'),
           for (final step in facts.treatment)
             _line(Icons.local_hospital_outlined, TtcCycleColours.clinic, step),
           if (facts.roundBand case final b?)
@@ -1532,7 +1541,7 @@ class _Upcoming extends StatelessWidget {
       // A test already behind her has nothing to come up (2026-09-26).
       if (days < 0) return const SizedBox();
       return TtcCycleCard(
-        color: ttcPanel,
+        // Kept for revert (2026-09-29, no tinted slab behind text): color: ttcPanel,
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           ttcEyebrow(t.calendarUpcoming, color: ttcSoft),
           const SizedBox(height: 10),
@@ -1567,7 +1576,7 @@ class _Upcoming extends StatelessWidget {
     final daysAway = nextPeriod.difference(ctx.today).inDays;
 
     return TtcCycleCard(
-      color: ttcPanel,
+      // Kept for revert (2026-09-29, no tinted slab behind text): color: ttcPanel,
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         ttcEyebrow(t.calendarUpcoming, color: ttcSoft),
         const SizedBox(height: 10),
@@ -1640,7 +1649,7 @@ class _RoundUpcoming extends StatelessWidget {
 
     return TtcCycleCard(
       key: const ValueKey('ttc_calendar_round_upcoming'),
-      color: ttcPanel,
+      // Kept for revert (2026-09-29, no tinted slab behind text): color: ttcPanel,
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         ttcEyebrow(t.calendarUpcoming, color: ttcSoft),
         const SizedBox(height: 10),

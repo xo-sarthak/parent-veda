@@ -66,6 +66,7 @@ import 'doors/ttc_door_screen.dart' show openTtcDoor;
 import 'ttc_practice_card_parts.dart';
 import 'ttc_tool_chrome.dart';
 import 'ttc_surface_router.dart';
+import 'ttc_common.dart' show ttcTitleInk;
 
 /// The two hues Today's blocks take.
 ///
@@ -195,7 +196,8 @@ class TtcMindTodayBody extends StatelessWidget {
           // she chose to be reminded of, and the brief offers "or neither".
           if (TtcGarbhCourseStore.instance.couple case final part?) ...[
             const SizedBox(height: 24),
-            _inset(_label('One thing together', p)),
+            // Kept for revert (2026-09-28): 'One thing together'.
+            _inset(_label('One thing to do together', p)),
             const SizedBox(height: 12),
             _inset(_CouplePart(part: part, p: p)),
           ],
@@ -421,15 +423,25 @@ class _PracticeBlock extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.fromLTRB(16, 9, 12, 9),
                     decoration: BoxDecoration(
-                      color: p.ink1,
+                      color: ttcTitleInk,
                       borderRadius: BorderRadius.circular(999),
                     ),
                     child: Row(mainAxisSize: MainAxisSize.min, children: [
-                      Text(done ? 'Do it again' : 'Start',
-                          style: pvManrope(
-                              fontSize: 13.5,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.white)),
+                      // Kept for revert (2026-09-28): done ? 'Do it again'
+                      // : 'Start'. The pill names the practice it opens.
+                      // 2026-09-29: Flexible with one ellipsised line, so the
+                      // pill gives way at text scale 1.5 on a 360pt door
+                      // instead of overflowing by 47. Kept for revert: the
+                      // Text bare.
+                      Flexible(
+                        child: Text(done ? 'Practise again' : 'Start practice',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: pvManrope(
+                                fontSize: 13.5,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.white)),
+                      ),
                       const SizedBox(width: 4),
                       const Icon(Icons.arrow_forward_rounded,
                           size: 16, color: Colors.white),
@@ -522,7 +534,8 @@ class _YourPracticeStrip extends StatelessWidget {
         width: double.infinity,
         padding: kTtcCardPad,
         decoration: BoxDecoration(
-          color: p.surfaceAlt,
+          // Kept for revert (2026-09-29, no tinted slab behind text): color: p.surfaceAlt,
+          color: p.surface, border: Border.fromBorderSide(BorderSide(color: p.line)),
           borderRadius: BorderRadius.circular(kTtcCardRadius),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -762,7 +775,7 @@ class _Tick extends StatelessWidget {
             height: 23,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: on ? p.action : Colors.transparent,
+              color: on ? ttcTitleInk : Colors.transparent,
               borderRadius: BorderRadius.circular(8),
               border: on ? null : Border.all(color: p.line, width: 1.6),
             ),
@@ -804,7 +817,7 @@ class _Tick extends StatelessWidget {
                             style: pvManrope(
                                 fontSize: 12.5,
                                 fontWeight: FontWeight.w800,
-                                color: p.action)),
+                                color: ttcTitleInk)),
                       ),
                     ),
                 ]),

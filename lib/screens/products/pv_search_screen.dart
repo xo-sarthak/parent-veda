@@ -459,7 +459,8 @@ class _PvSearchScreenState extends State<PvSearchScreen> {
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-              child: PvWell(
+              // A white card, not a slab (2026-09-29). Kept for revert: PvWell.
+              child: PvCard(
                 child: Text(
                   res.all.isEmpty
                       ? 'Nothing for “$q” yet. Try a need — "sleep", "rash", "folic" — or a brand.'

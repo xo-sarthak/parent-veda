@@ -476,6 +476,23 @@ Title          Fraunces 22 / w600 / −0.5 / p.ink1
 The eyebrow is `action`. **This is load-bearing** — it shipped grey on two
 screens and drained the colour out of everything below it.
 
+### 4.2 · addendum — one section heading, and it is the serif — SETTLED 2026-09-29
+
+The user on build 20 (Records and reports): *"The headings are of a different
+font than usual."* `ttcSectionTitle` had drawn ~60 TTC section headings in
+Manrope 17.5 while doors, Today, Learn, the store and More used the serif at
+21-22 (w500 in two places, w600 in the rest). **The rule: a page's section
+heading is Newsreader (`pvFraunces`) 21 / w600 / −0.45 / ink1** —
+`TtcSectionHeading` / `ttcSectionHeadingStyle` in `ttc_common.dart`, which
+`ttcSectionTitle`, `ttcDoorHeadingStyle`, Today's `_Head`, the More tab and
+`PvSectionHead` now all share. **A small grey caps label (Manrope ~11 / w800 /
++1.1) is only a group label inside a list or card, or a stat's label — never a
+page section.** Card titles, hero titles, sheet and dialog titles are not
+section headings and keep their own sizes. Held by
+`test/ttc_one_heading_style_test.dart` (a source scan with a reasoned
+allow-list). Evidence: Headspace Explore (one heading face on every screen),
+Apple Health (title-face section over rows; grey label only inside a list).
+
 ### 4.0 · addendum — no text on a tinted box — SETTLED 2026-09-18
 
 The door walk added one line to the rule above, and it has teeth: **a
@@ -641,6 +658,126 @@ a visual answer (a pill that becomes a "thanks"). Wired so far: the scans
 timeline's ticks and Up-next card, the reader's foot tiles and helpful
 pills, the checklist rows, all of onboarding (`ObPress` is now an alias).
 New surfaces use these rather than a bare `InkWell`.
+
+## 4.0f One card family on every door — BUILT 2026-09-29, all nine TTC doors
+
+The user, with a reference picture (a PCOS page of soft tinted cards, each
+with a kind pill, a fact pill, a picture, a serif title, a grey line and a
+chevron): *"a video looks like a video, a product looks like a product with
+the product image … every door seems a bit different in the way of
+representation."* The 2026-09-28 language below told kinds apart by
+**shape** (nine widths, some cards a photo, some a verb pill, some bubbles),
+on one door. This one tells them apart by **colour and words on one shape**,
+on all nine. Built as `TtcKindCard` in
+`lib/screens/ttc/doors/ttc_kind_cards.dart`; held by
+`test/ttc_door_kind_cards_test.dart`.
+
+**The card.** A soft tinted ground (HSL lightness 0.955, radius 22), a
+picture well inset 6 with 16 corners, then a Newsreader title (15, two lines
+at most) and a grey Manrope caption (12.5, two lines at most), a chevron at
+the right. Both text boxes are reserved at two lines, so every card on a door
+is **one size**; the height grows with the text size
+(`ttcKindCardHeight`), and the pills on the picture clamp at 1.25× so a fixed
+picture never overflows.
+
+| Kind (the pill's words) | Tint | Pill icon | Fact pill, top right | Picture |
+|---|---|---|---|---|
+| **Video** | rose 345 | camera (never a play glyph) | "Coming soon" with a clock when the film is not made | the photo; a play button and the length ("5:02") only on a film that exists |
+| **Article** (article, guide) | blue 212 | page | "5 min read", only at 200 words or more (the reader's rule) | the photo (the read's own, or the card's) |
+| **Carousel** | lilac 268 | carousel | "7 slides" | the first slide in front (the photo and "1. its words"), the next two peeking behind |
+| **Product** | green 140 | bag | none: we do not sell it, so never "Paid" | the product photo |
+| **Tool** (tool, checklist) | amber 40 | wrench | none | the tool's own drawn mark from the Tools tab (`ttcToolMarkForSurface`) on soft shapes; never a stock photo |
+| **Talk to an expert** (consult) | teal 176 | two bubbles | "Paid" with a lock, when the offering has a price | an object photo (a stethoscope, a bench, a cup held in two hands); never a face, because the roster has no photographs and a stranger's face would pose as our expert |
+| **Myth vs fact** | peach 18 | scales | "N slides" when it is a deck | the photo |
+| **Chat** (the scripted chats) | orchid 305 | bubble | none | two drawn bubbles |
+| **Practice** | sage 96 | lotus figure | "About 3 min" | the photo, or its drawn mark where no honest photo exists |
+| **Masterclass** | periwinkle 240 | cap | "Paid" with a lock | the photo |
+| **Recipe** · **Community** · **Infographic** | butter 58 · sky 196 · sea green 160 | plate · people · chart | none | the photo |
+
+An offline or missing photo falls back to the kind's drawing on its well,
+never a grey box. A way to another door keeps its link row; the one urgent
+row keeps its place.
+
+**Layout: a rail, not the reference's grid.** Decided on the numbers at
+360dp, the phone the app is judged on. A two-up grid card is 158 wide: two
+lines of the serif title hold about 36 characters, and about a quarter of the
+door titles (up to 52 characters, written for the old card's three lines)
+would be cut to an ellipsis, which the explicit-names rule forbids; and
+"Talk to an expert" beside "Paid" does not fit across a 146 picture. A 240
+card on a rail holds every title whole, keeps the reference's anatomy
+exactly, shows a card and a half so the rail says "more this way", and
+matches every other door rail in the app. The grid is built and one constant
+away (`kTtcDoorCardsAsGrid`) if the user prefers the reference's layout over
+whole titles. A section of **one** piece draws the same card at the content
+width and the rail's height, so a door has one card height and no lone card
+beside empty space.
+
+Mobbin: Hers, Nutrition (a rail of one card size, the kind on the photo,
+a play button on films) https://mobbin.com/screens/9dc1cc3a-3cd2-4e04-b724-e1ca2fe2e5f5 ·
+Flo, Insights ("▶ Video Course" pill on the picture, one size per rail)
+https://mobbin.com/screens/10d53da4-0522-4468-99d6-f98598845e80 · Clue,
+Content (a play button only on films) https://mobbin.com/screens/17a36856-fefd-44fb-a897-c9786b56fcc5 ·
+Headspace, Your Mind Matters (the two-up grid alternative)
+https://mobbin.com/screens/6a279b52-7e71-489c-ae0f-c0a5963af13d · Tiimo,
+library (grid with a kind glyph on the picture)
+https://mobbin.com/screens/667fb312-0fc2-4e46-a548-884ee4a78d88.
+
+**Stable ids.** Every tile on all nine doors carries `id`, the key its photo
+was filed under on 2026-09-29 (`ttc_tile_<the title then>`,
+`ttcTileTitleKey`). A retitle never drops a photo; the generated practice
+tiles pin theirs by practice id. `test/ttc_door_photos_test.dart` fails on a
+tile without one.
+
+What stays from 2026-09-28, below: sections are questions, never kinds; an
+unmade film goes last; the kind is said in words, also to screen readers.
+The 2026-09-28 card is kept in code as `TtcKindCardV1`, reachable from
+nowhere.
+
+### Superseded: one look per kind, the Fertile window door only (2026-09-28)
+
+The user: *"we need to see how to differentiate articles and videos and
+carousels and all that stuff inside doors … so that users find it intuitive
+to click."* Every piece on a TTC door was one 150×176 photo card with a small
+chip, so a tool, a read and a story looked alike. The §4.0b table decides
+what a kind **opens**; this one decides how it **looks on the door**, so she
+knows what she will get before the tap. Built in
+`lib/screens/ttc/doors/ttc_kind_cards.dart`, drawn only on the doors in
+`kTtcDoorsWithKindCards` (today `ttc_conceiving`); the other eight draw as
+before until the user approves. Held by `test/ttc_door_kind_cards_test.dart`.
+
+| Kind (the word on the card) | Shape, 236 tall | Picture | What it says |
+|---|---|---|---|
+| **Video** | 248 wide, a 16:9 thumbnail on top | the photo | a dark pill on the image: play and "5:12", or a clock and "Coming soon" when unmade (never a play glyph); "Video · 5 min" under the title |
+| **Story** (carousel) | 136 wide, tall, full-bleed | the photo, dark scrim | story ticks along the top, one per slide; white title; "Story · 6 slides" |
+| **Article** | 184 wide, white | photo on top, 112 | the title; "Article · 7 min read", minutes only at 200 words or more (the reader's rule) |
+| **Myth vs fact** | 184 wide, the door's tint, flat | none | "Myth vs fact", the question, *People say: "…"*, "See the fact" |
+| **Tool** | 156 wide, white | none: a line icon in a tinted 44 tile | "Tool", the name, an ink pill with the verb ("See your best days") |
+| **Chat** | 196 wide, white | none: two bubbles | her question in an ink bubble, the promise in a tinted one, an outlined "Start the chat" |
+| **Consult** | 176 wide, white | none: a video-call object in a circle, never a stock face | "Consult", the name, the kind of doctor, "Video call · ₹599", "See times and book" |
+| **Practice** | 176 wide, white | the practice's drawn mark in a tinted tile | "Practice", the name, "3 steps · About 3 min" |
+| **Product** | 160 wide, white | the photo inset in a grey well (the store's look) | the name, "Product · what to buy" |
+
+The rules that go with it:
+
+- **One height per rail, widths by kind.** A mixed rail still reads as one
+  row (Netflix keeps one shape per row; Flo's daily insights put an action
+  tile beside story cards at one height). Every card is white with the page
+  hairline and the 20 corner, except the story (its photo) and the myth (the
+  door's tint), which are flat on purpose.
+- **Sections stay questions.** A section is never "Videos"; the shape says the
+  kind and the heading keeps saying what she wants to know. Order is the
+  author's, with an unmade film last (§ launch sanity D3).
+- **The kind in words on every card,** and in its screen-reader label, not
+  only as a shape.
+- **A photo only where the kind uses one.** A tool, a chat, a myth and a
+  consult draw none, even when the table has one for them.
+- **A photo keys on the tile's stable `id`** where it has one (the key it was
+  filed under, which is its file name on R2), and on the title otherwise.
+  The Fertile window door's tiles carry ids; retitling them no longer drops
+  a photo.
+- A kind with no look yet (a course, a recipe, a community room, an
+  infographic) keeps the old card; a single piece keeps the wide card; a
+  way to another door keeps its link row.
 
 ## 4.0b The tag table — one format per chip — SETTLED 2026-09-18
 

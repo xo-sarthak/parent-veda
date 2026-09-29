@@ -30,7 +30,8 @@ import 'ttc_care_circle_screen.dart';
 import 'ttc_chapter_screen.dart';
 import 'ttc_community_screen.dart';
 import 'ttc_cycle_screens.dart';
-import 'ttc_journal_screen.dart';
+// Kept for revert (2026-09-28, journal out of TTC):
+// import 'ttc_journal_screen.dart';
 import 'ttc_medication_screen.dart';
 import 'ttc_nutrition_screen.dart';
 import 'ttc_partner_screen.dart';
@@ -375,7 +376,9 @@ Widget? _ttcStaticSurface(String id) => switch (id) {
       // door's entrance is gone and the screen is not — see
       // `docs/STILL-OPEN.md` §28 for the decision that is actually owed here.
       'ttc_ritual' => TtcRitualScreen(chapter: TtcStore.instance.today.chapter),
-      'ttc_journal' => const TtcJournalScreen(),
+      // Kept for revert (2026-09-28, journal out of TTC): the journal left the
+      // stage, so no read, bracket or map can name it. The screen stays.
+      //   'ttc_journal' => const TtcJournalScreen(),
 
       // ---- Partner -----------------------------------------------------------
       // ⚠️ HER view of the partner material, not his door into the app. The

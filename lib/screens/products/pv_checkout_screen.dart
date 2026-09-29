@@ -117,7 +117,8 @@ class _PvCheckoutScreenState extends State<PvCheckoutScreen> {
         cart.clear(kProductsCartId);
         _done(o);
       case PaymentOutcome.cancelled:
-        pvSnack(context, 'Payment cancelled — your bag is still here.');
+        // Kept for revert: '... your bag is still here.' (one name: cart).
+        pvSnack(context, 'Payment cancelled — your cart is still here.');
       case PaymentOutcome.failed:
         pvSnack(
           context,
@@ -189,7 +190,7 @@ class _PvCheckoutScreenState extends State<PvCheckoutScreen> {
                       style: pvManrope(
                         fontSize: 13.5,
                         fontWeight: FontWeight.w700,
-                        color: p.action,
+                        color: kPvInk,
                       ),
                     ),
                   ),
@@ -349,7 +350,11 @@ class _PvCheckoutScreenState extends State<PvCheckoutScreen> {
                         _block(
                           p,
                           'Deliver to',
-                          action: address == null ? 'Add' : 'Change',
+                          // Kept for revert (2026-09-28): 'Add' / 'Change'.
+                          // The link names the address it acts on.
+                          action: address == null
+                              ? 'Add address'
+                              : 'Change address',
                           onAction: _pickAddress,
                           child: address == null
                               ? Text(
@@ -555,7 +560,7 @@ class _PvCheckoutScreenState extends State<PvCheckoutScreen> {
                   style: pvManrope(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
-                    color: p.action,
+                    color: kPvInk,
                   ),
                 ),
               ),

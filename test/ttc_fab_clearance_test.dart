@@ -75,7 +75,10 @@ void main() {
     // whose sheet reserves `ttcBottomInset` for every tool at once (checked
     // just below), so there are fewer hand-rolled lists for this pattern to
     // find. Kept for revert: greaterThan(20).
-    expect(checked, greaterThan(15),
+    // ⚠️ 15 -> 14 ON 2026-09-28: the TTC journal page was commented out
+    // completely (the user: no journal in trying to conceive), and its two
+    // lists went with it. Kept for revert: greaterThan(15).
+    expect(checked, greaterThan(14),
         reason: 'the pattern stopped matching - this test went blind');
     final shell =
         File('lib/screens/ttc/ttc_tool_chrome.dart').readAsStringSync();

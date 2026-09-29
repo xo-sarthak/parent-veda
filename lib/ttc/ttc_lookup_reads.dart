@@ -56,6 +56,7 @@ import '../screens/ttc/ttc_tool_chrome.dart';
 import '../theme/pv_fonts.dart';
 import '../screens/v2/v2_palette.dart';
 import 'ttc_can_i_data.dart';
+import 'ttc_can_i_recent_store.dart';
 import 'ttc_tests_data.dart';
 
 const String kTtcTestReadPrefix = 'ttc_test_';
@@ -271,8 +272,14 @@ void openTtcTestRead(BuildContext context, TtcTest test) =>
     _openLookupRead(context, ttcTestAsRead(test), 'ttc/test/${test.id}');
 
 /// Open one "Can I...?" answer in the reader.
-void openTtcCanIRead(BuildContext context, TtcCanI item) =>
-    _openLookupRead(context, ttcCanIAsRead(item), 'ttc/can_i/${item.id}');
+///
+/// Every way in (the list, recently checked, an Ask Veda pointer, a read-next
+/// link) counts as checked, so "Recently checked" on the tool is true to what
+/// she opened (2026-09-29). Kept for revert: the arrow body alone.
+void openTtcCanIRead(BuildContext context, TtcCanI item) {
+  TtcCanIRecentStore.instance.touch(item.id);
+  _openLookupRead(context, ttcCanIAsRead(item), 'ttc/can_i/${item.id}');
+}
 
 /// Draws this file's blocks, and hands every other block to the stage's
 /// shared renderer, so a read opened here draws the same as anywhere else.

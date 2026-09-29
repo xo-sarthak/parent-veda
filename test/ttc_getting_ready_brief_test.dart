@@ -49,7 +49,10 @@ const _brief = <(String, String, TtcTileFormat)>[
   // ('diet', 'What to cut before trying', TtcTileFormat.article),
   ('diet', 'What to eat and avoid', TtcTileFormat.article),
   ('diet', 'Folic acid and preconception supplements', TtcTileFormat.product),
-  ('diet', 'When to start what, and how early', TtcTileFormat.article),
+  // ⚠️ CHANGED ON PURPOSE 2026-09-28 (explicit names: every title names
+  // what it opens, the user's instruction). Kept for revert: 'When to start
+  // what, and how early'.
+  ('diet', 'When to start each supplement', TtcTileFormat.article),
 
   // ⚠️ CHANGED ON PURPOSE 2026-09-28 (launch sanity D11): six tabs became
   // four. Meal plan folded into Food and supplements (the 'diet' tab), and
@@ -61,7 +64,9 @@ const _brief = <(String, String, TtcTileFormat)>[
   // a drift: the gap analysis is now the brief for this door.
   ('diet', 'A week of Indian meals for trying', TtcTileFormat.article), // was 'meals'
   ('diet', 'Ten everyday recipes', TtcTileFormat.article), // was 'meals'
-  ('diet', 'Plan your own week', TtcTileFormat.tool), // was 'meals'
+  // ⚠️ CHANGED ON PURPOSE 2026-09-28 (explicit names: every title names
+  // what it opens, the user's instruction). Kept for revert: 'Plan your own week'.
+  ('diet', 'Plan your own week of meals', TtcTileFormat.tool), // was 'meals'
   ('diet', 'Iron before pregnancy', TtcTileFormat.article), // was 'meals'
   ('diet', 'Omega-3 without fish', TtcTileFormat.article), // was 'meals'
   ('diet', 'Ask a dietitian: ten questions', TtcTileFormat.article), // was 'meals'
@@ -76,7 +81,10 @@ const _brief = <(String, String, TtcTileFormat)>[
   // 3) Weight and habits
   ('habits', 'Weight before pregnancy, said kindly', TtcTileFormat.article),
   ('habits', 'Habits worth building now', TtcTileFormat.practice),
-  ('habits', "Track what you're working on", TtcTileFormat.tool),
+  // ⚠️ CHANGED ON PURPOSE 2026-09-28 (explicit names: every title names
+  // what it opens, the user's instruction). Kept for revert: "Track what
+  // you're working on".
+  ('habits', 'Your habit trackers', TtcTileFormat.tool),
   // Moved here from diet, 2026-09-27 (relevance audit).
   ('habits', 'What to cut before trying', TtcTileFormat.article),
 
@@ -86,7 +94,9 @@ const _brief = <(String, String, TtcTileFormat)>[
   ('habits', 'Coming off birth control', TtcTileFormat.article), // was 'before'
   ('habits', 'Medicines and conditions to check with a doctor',
       TtcTileFormat.article), // was 'before'
-  ('habits', 'His part', TtcTileFormat.article), // was 'before'
+  // ⚠️ CHANGED ON PURPOSE 2026-09-28 (explicit names: every title names
+  // what it opens, the user's instruction). Kept for revert: 'His part'.
+  ('habits', 'His half of getting ready', TtcTileFormat.article), // was 'before'
   // ADDED ON PURPOSE 2026-09-26, same source as the meal plan rows above.
   ('habits', 'Your first gynaecologist visit', TtcTileFormat.article), // was 'before'
   ('habits', 'Can a past abortion affect trying now?', TtcTileFormat.article), // was 'before'
@@ -94,7 +104,10 @@ const _brief = <(String, String, TtcTileFormat)>[
 
   // 5) Your checklist
   ('checklist', 'Your pre-pregnancy checklist', TtcTileFormat.checklist),
-  ('checklist', 'Talk to someone before you start', TtcTileFormat.talk),
+  // ⚠️ CHANGED ON PURPOSE 2026-09-28 (explicit names: every title names
+  // what it opens, the user's instruction). Kept for revert: 'Talk to someone
+  // before you start'.
+  ('checklist', 'See a gynaecologist before you start', TtcTileFormat.talk),
   // ADDED ON PURPOSE 2026-09-27 (relevance audit): the consults shelf has no
   // nutritionist, so the one Talk tile promised a person it could not open.
   ('checklist', 'Talk to a nutritionist', TtcTileFormat.talk),
@@ -193,7 +206,8 @@ void main() {
       //
       // Third time a third card appeared in this section. Hence a test.
       final section = page.sections
-          .firstWhere((s) => s.heading == 'Supplements');
+          // Kept for revert (2026-09-28, explicit names): 'Supplements'.
+          .firstWhere((s) => s.heading == 'Which supplements, and when?');
       expect(section.tiles, hasLength(2),
           reason: 'the brief lists exactly two rows under Supplements');
       expect(
@@ -213,7 +227,8 @@ void main() {
           .firstWhere((t) => t.title == 'Habits worth building now');
       final tracker = tiles()
           .map((e) => e.$2)
-          .firstWhere((t) => t.title == "Track what you're working on");
+          // Kept for revert (2026-09-28): "Track what you're working on".
+          .firstWhere((t) => t.title == 'Your habit trackers');
       expect(practice.format, TtcTileFormat.practice);
       expect(tracker.format, TtcTileFormat.tool);
     });

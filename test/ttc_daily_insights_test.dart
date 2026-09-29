@@ -13,6 +13,8 @@
 //  any check that looks for a date cell. So these tests tap.
 // =============================================================================
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -88,11 +90,64 @@ void main() {
     });
   });
 
+  // ⚠️ THE CARD FOLLOWS HER LATEST LOG (the user on build 18, 2026-09-28:
+  // "once you log calm it stays on calm"). The day's values came back sorted
+  // by id, so an early-alphabet mood kept the card.
+  group('"You logged today" plays back her latest entry', () {
+    TtcInsightCard card() =>
+        ttcInsightsFor(day(0)).firstWhere((c) => c.id == 'symptom');
+
+    test('a newer log takes the card, and the rest are named', () {
+      history();
+      log('calm', 0);
+      expect(card().value, 'Calm');
+      expect(card().caption, 'Tap to see or change your log');
+      log('cramping', 0);
+      expect(card().value, isNot('Calm'),
+          reason: 'the newest entry leads, not the first in the alphabet');
+      expect(card().caption, contains('Calm'));
+    });
+
+    test('clearing the newest hands the card back', () {
+      history();
+      log('calm', 0);
+      log('cramping', 0);
+      TtcLogStore.instance.clear(kTtcSymptomTracker, 'cramping', on: day(0));
+      expect(card().value, 'Calm');
+    });
+
+    test('logging an old entry again makes it the newest', () {
+      history();
+      log('calm', 0);
+      log('cramping', 0);
+      TtcLogStore.instance.clear(kTtcSymptomTracker, 'calm', on: day(0));
+      log('calm', 0);
+      expect(card().value, 'Calm');
+    });
+
+    test('the also-line names two, then counts', () {
+      expect(ttcLoggedAlsoLine(const []), 'Tap to see or change your log');
+      expect(ttcLoggedAlsoLine(const ['Calm']), 'Also Calm. Tap to see your log');
+      expect(ttcLoggedAlsoLine(const ['A', 'B']),
+          'Also A and B. Tap to see your log');
+      expect(ttcLoggedAlsoLine(const ['A', 'B', 'C', 'D']),
+          'Also A, B and 2 more. Tap to see your log');
+    });
+  });
+
   group('which cards a day earns', () {
-    test('a day with nothing logged is invited to log, not left blank', () {
+    // ⚠️ THE INVITATION IS THE HERO'S SYMPTOMS BUTTON SINCE 2026-09-28 (no
+    // random repetition): it opens the same logger on the same day, one row
+    // above the rail, so the "Nothing yet" card was a second button for one
+    // thing (test/ttc_no_repetition_test.dart). Kept for revert:
+    //   expect(ids, contains('log_prompt'));
+    test('a day with nothing logged is invited by the Symptoms button, not a '
+        'second card', () {
       history();
       final ids = ttcInsightsFor(day(0)).map((c) => c.id);
-      expect(ids, contains('log_prompt'));
+      expect(ids, isNot(contains('log_prompt')));
+      final src = File('lib/screens/ttc/ttc_home_v3.dart').readAsStringSync();
+      expect(src, contains("key: const ValueKey('ttc_home_quick_symptoms')"));
     });
 
     test('and a day with something logged is not', () {
@@ -115,15 +170,37 @@ void main() {
       expect(ids, isNot(contains('log_prompt')));
     });
 
+    // Kept for revert (2026-09-28): the "Nothing yet" card is off the rail,
+    // so its tense has nothing to follow. The symptom card's own tense is
+    // held below ("YOU LOGGED TODAY" against "YOU LOGGED").
+    // test('the tense follows the date', () {
+    //   history();
+    //   final todayCard =
+    //       ttcInsightsFor(day(0)).firstWhere((c) => c.id == 'log_prompt');
+    //   final pastCard =
+    //       ttcInsightsFor(day(4)).firstWhere((c) => c.id == 'log_prompt');
+    //   expect(todayCard.value, contains('today'));
+    //   expect(pastCard.value, isNot(contains('today')),
+    //       reason: '"How did today feel?" printed under last Tuesday');
+    // });
     test('the tense follows the date', () {
       history();
-      final todayCard =
-          ttcInsightsFor(day(0)).firstWhere((c) => c.id == 'log_prompt');
-      final pastCard =
-          ttcInsightsFor(day(4)).firstWhere((c) => c.id == 'log_prompt');
-      expect(todayCard.value, contains('today'));
-      expect(pastCard.value, isNot(contains('today')),
-          reason: '"How did today feel?" printed under last Tuesday');
+      log('cramping', 0);
+      log('cramping', 4);
+      expect(ttcInsightsFor(day(0)).firstWhere((c) => c.id == 'symptom').eyebrow,
+          'YOU LOGGED TODAY');
+      expect(ttcInsightsFor(day(4)).firstWhere((c) => c.id == 'symptom').eyebrow,
+          'YOU LOGGED',
+          reason: '"today" printed under last Tuesday');
+    });
+
+    test('the day of her cycle opens a read, not the screen the hero opens',
+        () {
+      history();
+      final c = ttcInsightsFor(day(0)).firstWhere((c) => c.id == 'cycle_day');
+      expect(c.go, TtcInsightGo.read);
+      expect(ttcReadById(c.readId!), isNotNull);
+      expect(ttcRailReadIds(day(0)), contains(c.readId));
     });
 
     test('discharge is reported separately from how she feels', () {
@@ -363,17 +440,22 @@ void main() {
     testWidgets('the cards are computed for the selected day, not for today',
         (tester) async {
       history();
-      log('cramping', 0); // today has something; three days ago does not
+      // Three days ago has something; today does not. Since 2026-09-28 the
+      // "Nothing yet" card is off the rail (the hero's Symptoms button is the
+      // invitation), so the symptom card is what moves with the strip. Kept
+      // for revert: log today, and assert "How did today feel?" / "How did
+      // that day feel?".
+      log('cramping', 3);
       await pump(tester);
 
-      // Today: no invitation, because she logged.
-      expect(find.text('How did today feel?'), findsNothing);
+      // Today: nothing logged, so no "You logged" card.
+      expect(find.text('YOU LOGGED'), findsNothing);
 
       await tester.tap(find.byKey(ValueKey(keyFor(day(3)))));
       await tester.pump(const Duration(milliseconds: 300));
 
-      // A day with nothing on it: the invitation appears, in the past tense.
-      expect(find.text('How did that day feel?'), findsWidgets,
+      // The day she logged: its card appears, in the past tense.
+      expect(find.text('YOU LOGGED'), findsWidgets,
           reason: 'the cards ignored the selection — the strip moved and the '
               'content below it did not');
     });

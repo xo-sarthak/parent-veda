@@ -186,7 +186,7 @@ class _OfferingCard extends StatelessWidget {
         Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Expanded(child: Text(offering.title(hi), style: ttcJakarta(16))),
           const SizedBox(width: 10),
-          Text(offering.priceLabel, style: ttcJakarta(15, color: ttcPurple)),
+          Text(offering.priceLabel, style: ttcJakarta(15, color: ttcTitleInk)),
         ]),
         const SizedBox(height: 8),
         Text(offering.body(hi), style: ttcBody(13, h: 1.55)),
@@ -208,7 +208,7 @@ class _OfferingCard extends StatelessWidget {
           const Spacer(),
           if (entitlement != null)
             Text(t.prepareOwned,
-                style: ttcBody(12, color: ttcPurple, w: FontWeight.w800))
+                style: ttcBody(12, color: ttcTitleInk, w: FontWeight.w800))
           else
             const Icon(Icons.arrow_forward_rounded, size: 17, color: ttcMuted),
         ]),
@@ -288,7 +288,8 @@ class TtcOfferingScreenClassic extends StatelessWidget {
                 const SizedBox(height: 20),
 
                 TtcCard(
-                  color: ttcPanel,
+                  // Kept for revert (2026-09-29, no tinted slab behind text): color: ttcPanel,
+                  border: ttcLine,
                   child: Row(children: [
                     Expanded(
                       child: Column(
@@ -299,7 +300,7 @@ class TtcOfferingScreenClassic extends StatelessWidget {
                                     color: ttcSoft, w: FontWeight.w700)),
                             const SizedBox(height: 4),
                             Text(offering.priceLabel,
-                                style: ttcJakarta(22, color: ttcPurple)),
+                                style: ttcJakarta(22, color: ttcTitleInk)),
                           ]),
                     ),
                     if (entitlement == null)
@@ -310,7 +311,7 @@ class TtcOfferingScreenClassic extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 20, vertical: 13),
                           decoration: BoxDecoration(
-                              color: ttcPurple,
+                              color: ttcTitleInk,
                               borderRadius: BorderRadius.circular(15)),
                           child: Text(t.prepareBuy,
                               style: ttcBody(13.5,
@@ -323,7 +324,7 @@ class TtcOfferingScreenClassic extends StatelessWidget {
                           children: [
                             Text(t.prepareOwned,
                                 style: ttcBody(12.5,
-                                    color: ttcPurple, w: FontWeight.w800)),
+                                    color: ttcTitleInk, w: FontWeight.w800)),
                             const SizedBox(height: 3),
                             Text(
                                 t.prepareCreditsLeft(
@@ -339,7 +340,8 @@ class TtcOfferingScreenClassic extends StatelessWidget {
                 ttcSectionTitle(t.prepareSlots),
                 if (entitlement == null)
                   TtcCard(
-                    color: ttcPanel,
+                    // Kept for revert (2026-09-29, no tinted slab behind text): color: ttcPanel,
+                    border: ttcLine,
                     child: Text(t.prepareBuyFirst, style: ttcBody(13.5, h: 1.5)),
                   )
                 else if (slots.isEmpty)
@@ -402,7 +404,7 @@ class _SlotRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       onTap: booked ? null : () => _book(context),
       child: Row(children: [
-        const Icon(Icons.schedule_rounded, size: 17, color: ttcPurple),
+        const Icon(Icons.schedule_rounded, size: 17, color: ttcTitleInk),
         const SizedBox(width: 12),
         Expanded(
           child: Text(_fmt(local),
@@ -410,7 +412,7 @@ class _SlotRow extends StatelessWidget {
         ),
         Text(booked ? t.prepareBooked : t.prepareBook,
             style: ttcBody(12.5,
-                color: booked ? ttcMuted : ttcPurple, w: FontWeight.w800)),
+                color: booked ? ttcMuted : ttcTitleInk, w: FontWeight.w800)),
       ]),
     );
   }

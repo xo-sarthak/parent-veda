@@ -123,6 +123,219 @@ void main() {
   });
 
   // ===========================================================================
+  //  2026-09-29, the user on build 19: "Once I click on Start my round … I
+  //  cannot unselect them if I have selected them; I have to go back to
+  //  unselect them." Every answer toggles in place, a greyed Next says why,
+  //  and a step back keeps what she chose.
+  group('every answer can be taken back in place', () {
+    Finder kind(String name) => find.byKey(ValueKey('ttc_start_kind_$name'));
+    bool nextOn(WidgetTester tester) =>
+        tester.widget<TtcRoundButton>(find.byKey(const ValueKey('ttc_start_next'))).onTap !=
+        null;
+    bool chosen(WidgetTester tester, String name) =>
+        tester.widget<TtcRoundOption>(kind(name)).selected;
+
+    Future<void> addDate(WidgetTester tester, String step) async {
+      await tester.tap(find.byKey(ValueKey('ttc_start_date_$step')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('OK'));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('the kind: choose, clear by a second tap, choose again',
+        (tester) async {
+      await pumpAt360(tester, const TtcTreatmentStartScreen());
+      // Nothing chosen: Next waits and says why; every option wears a ring.
+      expect(nextOn(tester), isFalse);
+      expect(find.text(kTtcStartKindNeeded), findsOneWidget);
+      expect(find.byIcon(Icons.radio_button_unchecked_rounded), findsNWidgets(7));
+      expect(find.byIcon(Icons.chevron_right_rounded), findsNothing,
+          reason: 'an answer is not a link');
+
+      await tester.tap(kind('iui'));
+      await tester.pump();
+      expect(chosen(tester, 'iui'), isTrue);
+      expect(nextOn(tester), isTrue);
+      expect(find.text(kTtcStartKindNeeded), findsNothing);
+      expect(find.text(kTtcStartKindClearHint), findsOneWidget);
+      expect(find.byIcon(Icons.radio_button_checked_rounded), findsOneWidget);
+
+      // The same tap again clears it, on this screen.
+      await tester.tap(kind('iui'));
+      await tester.pump();
+      expect(chosen(tester, 'iui'), isFalse);
+      expect(find.byIcon(Icons.radio_button_checked_rounded), findsNothing);
+      expect(nextOn(tester), isFalse);
+      expect(find.text(kTtcStartKindNeeded), findsOneWidget);
+
+      // And again chooses it.
+      await tester.tap(kind('iui'));
+      await tester.pump();
+      expect(chosen(tester, 'iui'), isTrue);
+      expect(nextOn(tester), isTrue);
+
+      // Another kind moves the choice: one at a time.
+      await tester.tap(kind('notSure'));
+      await tester.pump();
+      expect(chosen(tester, 'iui'), isFalse);
+      expect(chosen(tester, 'notSure'), isTrue);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('a step back keeps the kind and the dates, even across a '
+        'change of mind', (tester) async {
+      await pumpAt360(tester, const TtcTreatmentStartScreen());
+      await tester.tap(kind('ivfFresh'));
+      await tester.pump();
+      await tester.tap(find.byKey(const ValueKey('ttc_start_next')));
+      await tester.pump(const Duration(milliseconds: 300));
+
+      // No date yet: Next waits and says why, and "later" is the way on.
+      expect(nextOn(tester), isFalse);
+      expect(find.text(kTtcStartDateNeeded), findsOneWidget);
+      expect(find.byKey(const ValueKey('ttc_start_later')), findsOneWidget);
+
+      await addDate(tester, 'baselineScan');
+      expect(nextOn(tester), isTrue);
+      expect(find.text(kTtcStartDateNeeded), findsNothing);
+      expect(find.byKey(const ValueKey('ttc_start_later')), findsNothing,
+          reason: '"later" can no longer wipe a date she added');
+
+      // Back by the system gesture: the kind is still chosen.
+      await tester.binding.handlePopRoute();
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(find.text(kTtcStartKindTitle), findsOneWidget);
+      expect(chosen(tester, 'ivfFresh'), isTrue);
+
+      // She changes her mind to IUI and back: the IVF date survives.
+      await tester.tap(kind('iui'));
+      await tester.pump();
+      await tester.tap(find.byKey(const ValueKey('ttc_start_next')));
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(find.text('Add date'), findsOneWidget,
+          reason: 'the IUI rows show only IUI dates');
+      // The shell's back arrow does the same as the gesture (2026-09-29: the
+      // worded link it replaced is commented out). Kept for revert:
+      //   // The worded back link does the same as the gesture.
+      //   await tester.tap(find.byKey(const ValueKey('ttc_start_back')));
+      await tester.tap(find.byKey(const ValueKey('ttc_tool_back')));
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(chosen(tester, 'iui'), isTrue);
+      await tester.tap(kind('ivfFresh'));
+      await tester.pump();
+      await tester.tap(find.byKey(const ValueKey('ttc_start_next')));
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(find.text(ttcRoundDate(_today())), findsOneWidget,
+          reason: 'the baseline scan she added is still there');
+      expect(nextOn(tester), isTrue);
+
+      // The date clears in place too, and Next waits again.
+      await tester.tap(find.byTooltip('Remove this date'));
+      await tester.pump();
+      expect(nextOn(tester), isFalse);
+      expect(find.byKey(const ValueKey('ttc_start_later')), findsOneWidget);
+      expect(tester.takeException(), isNull);
+      await tester.pump(const Duration(seconds: 5)); // the Undo snack
+    });
+
+    testWidgets('only the chosen kind\'s dates are saved', (tester) async {
+      await pumpAt360(tester, const TtcTreatmentStartScreen());
+      await tester.tap(kind('ivfFresh'));
+      await tester.pump();
+      await tester.tap(find.byKey(const ValueKey('ttc_start_next')));
+      await tester.pump(const Duration(milliseconds: 300));
+      await addDate(tester, 'baselineScan');
+      // Kept for revert (2026-09-29):
+      //   await tester.tap(find.byKey(const ValueKey('ttc_start_back')));
+      await tester.tap(find.byKey(const ValueKey('ttc_tool_back')));
+      await tester.pump(const Duration(milliseconds: 300));
+      await tester.tap(kind('iui'));
+      await tester.pump();
+      await tester.tap(find.byKey(const ValueKey('ttc_start_next')));
+      await tester.pump(const Duration(milliseconds: 300));
+      await tester.tap(find.byKey(const ValueKey('ttc_start_later')));
+      await tester.pump(const Duration(milliseconds: 300));
+      await tester.tap(find.byKey(const ValueKey('ttc_start_save')));
+      await tester.pumpAndSettle();
+      final c = TtcTreatmentStore.instance.cycle;
+      expect(c.kind, TtcRoundKind.iui);
+      expect(c[TtcTreatmentStep.baselineScan], isNull,
+          reason: 'an IVF date is never saved into an IUI round');
+    });
+
+    testWidgets('the clinic name, filled from the last round, clears in one '
+        'tap', (tester) async {
+      await pumpAt360(tester, const TtcTreatmentStartScreen());
+      await tester.tap(kind('iui'));
+      await tester.pump();
+      await tester.tap(find.byKey(const ValueKey('ttc_start_next')));
+      await tester.pump(const Duration(milliseconds: 300));
+      await tester.tap(find.byKey(const ValueKey('ttc_start_later')));
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(find.byKey(const ValueKey('ttc_start_clinic_clear')), findsNothing);
+      await tester.enterText(
+          find.byKey(const ValueKey('ttc_start_clinic')), 'Nova IVF');
+      await tester.pump();
+      await tester.tap(find.byKey(const ValueKey('ttc_start_clinic_clear')));
+      await tester.pump();
+      expect(find.text('Nova IVF'), findsNothing);
+      expect(find.byKey(const ValueKey('ttc_start_clinic_clear')), findsNothing);
+    });
+
+    testWidgets('the embryo day, before moving to Pregnancy, toggles and '
+        'stays on screen', (tester) async {
+      TtcTreatmentStore.instance.startRound(kind: TtcRoundKind.ivfFresh, dates: {
+        TtcTreatmentStep.stimStart: _plus(-30),
+        TtcTreatmentStep.transfer: _plus(-12),
+        TtcTreatmentStep.betaTest: _plus(-1),
+      });
+      await pumpAt360(tester, const TtcRoundPregnancyScreen());
+      const d3 = ValueKey('ttc_to_preg_embryo_3');
+      const d5 = ValueKey('ttc_to_preg_embryo_5');
+      await tester.tap(find.byKey(d3));
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(TtcTreatmentStore.instance.cycle.embryoDay, 3);
+      expect(find.byKey(d3), findsOneWidget,
+          reason: 'the question stays, so a mis-tap can be changed here');
+      await tester.tap(find.byKey(d3));
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(TtcTreatmentStore.instance.cycle.embryoDay, isNull);
+      await tester.tap(find.byKey(d5));
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(TtcTreatmentStore.instance.cycle.embryoDay, 5);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('no overflow on any start screen at 360dp and 1.5x text',
+        (tester) async {
+      tester.view.physicalSize = const Size(360, 3200);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+      await tester.pumpWidget(MaterialApp(
+        builder: (c, w) => MediaQuery(
+          data: MediaQuery.of(c).copyWith(textScaler: const TextScaler.linear(1.5)),
+          child: w!,
+        ),
+        home: const TtcTreatmentStartScreen(),
+      ));
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(tester.takeException(), isNull, reason: 'kind page, empty');
+      await tester.tap(kind('fetNatural'));
+      await tester.pump();
+      expect(tester.takeException(), isNull, reason: 'kind page, chosen');
+      await tester.tap(find.byKey(const ValueKey('ttc_start_next')));
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(tester.takeException(), isNull, reason: 'date page');
+      await tester.tap(find.byKey(const ValueKey('ttc_start_later')));
+      await tester.pump(const Duration(milliseconds: 300));
+      await tester.enterText(
+          find.byKey(const ValueKey('ttc_start_clinic')), 'A long clinic name, Bengaluru');
+      await tester.pump();
+      expect(tester.takeException(), isNull, reason: 'review page');
+    });
+  });
+
+  // ===========================================================================
   group('the plan: "Here\'s how your round usually goes"', () {
     testWidgets('dated rows show their date, the rest "Your clinic will tell '
         'you", at 360dp', (tester) async {

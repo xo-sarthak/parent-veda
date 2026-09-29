@@ -27,7 +27,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:parentveda/screens/ttc/ttc_care_circle_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_common.dart' show TtcCard;
 import 'package:parentveda/screens/ttc/ttc_garbh_course_screen.dart';
-import 'package:parentveda/screens/ttc/ttc_journal_screen.dart';
+// Kept for revert (2026-09-28, the user: no journal in trying to conceive).
+// import 'package:parentveda/screens/ttc/ttc_journal_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_practice_player.dart';
 import 'package:parentveda/screens/ttc/ttc_practice_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_ritual_screen.dart';
@@ -37,7 +38,7 @@ import 'package:parentveda/ttc/ttc_chapter.dart';
 import 'package:parentveda/ttc/ttc_daily_data.dart';
 import 'package:parentveda/ttc/ttc_garbh_course.dart';
 import 'package:parentveda/ttc/ttc_garbh_course_store.dart';
-import 'package:parentveda/ttc/ttc_journal_store.dart';
+// import 'package:parentveda/ttc/ttc_journal_store.dart';
 import 'package:parentveda/ttc/ttc_log_store.dart';
 import 'package:parentveda/ttc/ttc_mind_today.dart';
 import 'package:parentveda/ttc/ttc_practice_data.dart';
@@ -62,7 +63,7 @@ void main() {
 
   setUp(() {
     TtcStore.instance.resetForTest();
-    TtcJournalStore.instance.resetForTest();
+    // Kept for revert (2026-09-28): TtcJournalStore.instance.resetForTest();
     TtcRitualStore.instance.resetForTest();
     TtcGarbhCourseStore.instance.resetForTest();
     TtcLogStore.instance.resetForTest();
@@ -84,7 +85,8 @@ void main() {
       expect(find.textContaining('Finishing the timer marks it done'),
           findsOneWidget);
 
-      await tester.tap(find.text('Start'));
+      // Named since 2026-09-28. Kept for revert: find.text('Start').
+      await tester.tap(find.text('Start timer'));
       await tester.pump();
       expect(find.text('Pause'), findsOneWidget);
       _now = _now.add(const Duration(seconds: 20));
@@ -97,7 +99,8 @@ void main() {
       await tester.pump(const Duration(milliseconds: 300));
       expect(find.text('Pause'), findsNothing,
           reason: 'the button used to stay on "Pause" past zero');
-      expect(find.text('Start again'), findsOneWidget);
+      // Kept for revert (2026-09-28): find.text('Start again').
+      expect(find.text('Restart timer'), findsOneWidget);
       expect(ttcPracticeDoneToday(breath.kind), isTrue);
       expect(find.text('Marked done on your Mind and body Today tab.'),
           findsOneWidget);
@@ -144,7 +147,8 @@ void main() {
       expect(find.text('The steps move along with the timer.'),
           findsOneWidget);
 
-      await tester.tap(find.text('Start'));
+      // Kept for revert (2026-09-28): find.text('Start').
+      await tester.tap(find.text('Start timer'));
       await tester.pump();
       // Half way through a six-step card is step four.
       _now = _now.add(Duration(seconds: move.anim.seconds ~/ 2));
@@ -191,7 +195,11 @@ void main() {
       expect(find.text(const TtcS(false).sanskarTitle.toUpperCase()),
           findsOneWidget,
           reason: "the home band's name is the eyebrow");
-      expect(find.text('Tap a part to open it.'), findsOneWidget);
+      // Kept for revert (2026-09-28): 'Tap a part to open it.', then
+      // 'Tap a part to open its practice.' The hint is gone: each part is a
+      // card with a chevron (2026-09-28, the intro made one block).
+      //   expect(find.text('Tap a part to open its practice.'), findsOneWidget);
+      expect(find.textContaining('Tap a part'), findsNothing);
     });
 
     testWidgets('the breath part carries a one-minute timer that ticks it',
@@ -202,7 +210,8 @@ void main() {
               chapter: TtcChapter.tryingTogether,
               focus: TtcRitualPart.breath));
       expect(find.byType(TtcPracticeSession), findsOneWidget);
-      await tester.tap(find.text('Start'));
+      // Kept for revert (2026-09-28): find.text('Start').
+      await tester.tap(find.text('Start timer'));
       await tester.pump();
       // Today's breath practice since 2026-09-28 (MB18), one to two minutes.
       // Kept for revert: const Duration(seconds: 61)
@@ -217,26 +226,26 @@ void main() {
       expect(TtcRitualStore.instance.isDone(TtcRitualPart.breath), isFalse);
     });
 
-    testWidgets('a prompt can be written into the journal, carried in',
+    // Kept for revert (2026-09-28, journal out of TTC): 'a prompt can be
+    // written into the journal, carried in' tapped "Write about it in our
+    // journal", saved the words and expected one feeling entry carrying the
+    // prompt. The journal left the stage, so the ritual offers no link to it.
+    //   await tester.tap(find.text('Write about it in our journal'));
+    //   ... expect(find.byType(TtcJournalWriteScreen), findsOneWidget);
+    //   ... expect(e.prompt, item.text(false));
+    //   ... expect(e.kind, TtcEntryKind.feeling);
+    testWidgets('a prompt no longer offers the journal (journal out of TTC)',
         (tester) async {
       await _pump(
           tester,
           const TtcRitualScreen(
               chapter: TtcChapter.tryingTogether,
               focus: TtcRitualPart.gratitude));
-      final item = ttcRituals[TtcChapter.tryingTogether]!
-          .firstWhere((i) => i.part == TtcRitualPart.gratitude);
-      await tester.tap(find.text('Write about it in our journal'));
-      await tester.pumpAndSettle();
-      expect(find.byType(TtcJournalWriteScreen), findsOneWidget);
-      expect(find.text(item.text(false)), findsOneWidget);
-      await tester.enterText(find.byType(TextField), 'The tea this morning');
-      await tester.pump();
-      await tester.tap(find.text('Save'));
-      await tester.pumpAndSettle();
-      final e = TtcJournalStore.instance.entries.single;
-      expect(e.prompt, item.text(false));
-      expect(e.kind, TtcEntryKind.feeling);
+      expect(find.text('Write about it in our journal'), findsNothing);
+      // Kept for revert (2026-09-28): the journal's writer and store are
+      // commented out, so there is no type or store left to look for.
+      //   expect(find.byType(TtcJournalWriteScreen), findsNothing);
+      //   expect(TtcJournalStore.instance.entries, isEmpty);
     });
 
     testWidgets('the action part has no journal link', (tester) async {
@@ -250,94 +259,96 @@ void main() {
   });
 
   // ===========================================================================
-  group('the journal', () {
-    testWidgets('first open is an invitation, and a save says so',
-        (tester) async {
-      await _pump(tester, const TtcJournalScreen());
-      expect(find.text(const TtcS(false).journalEmptyTitle), findsOneWidget);
-      await tester.tap(find.text('Write something'));
-      await tester.pumpAndSettle();
-      await tester.enterText(find.byType(TextField), 'Day one');
-      await tester.pump();
-      await tester.tap(find.text('Save'));
-      await tester.pump();
-      // findsWidgets: during the pop both routes' scaffolds hold the notice.
-      expect(find.text('Saved to Our journal.'), findsWidgets);
-      await tester.pumpAndSettle();
-      expect(find.text('Day one'), findsOneWidget);
-    });
-
-    testWidgets('entries are headed by month', (tester) async {
-      TtcJournalStore.instance.add(
-          kind: TtcEntryKind.memory, text: 'In August', on: DateTime(2026, 8, 3));
-      TtcJournalStore.instance.add(
-          kind: TtcEntryKind.memory, text: 'In Sept A', on: DateTime(2026, 9, 3));
-      TtcJournalStore.instance.add(
-          kind: TtcEntryKind.memory, text: 'In Sept B', on: DateTime(2026, 9, 9));
-      await _pump(tester, const TtcJournalScreen());
-      expect(find.byType(TtcJournalMonthHead), findsNWidgets(2));
-      expect(find.text('September 2026'), findsOneWidget);
-      expect(find.text('August 2026'), findsOneWidget);
-    });
-
-    testWidgets('an edit can move an entry to another kind', (tester) async {
-      TtcJournalStore.instance.add(kind: TtcEntryKind.memory, text: 'Ask AMH');
-      await _pump(tester, const TtcJournalScreen());
-      await tester.tap(find.text('Ask AMH'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Edit'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text(TtcEntryKind.question.label(false)));
-      await tester.pump();
-      await tester.tap(find.text('Save'));
-      await tester.pump();
-      expect(find.text('Changes saved.'), findsWidgets);
-      await tester.pumpAndSettle();
-      final e = TtcJournalStore.instance.entries.single;
-      expect(e.kind, TtcEntryKind.question);
-      expect(e.text, 'Ask AMH');
-    });
-
-    testWidgets('a delete asks first, and can be undone', (tester) async {
-      final e = TtcJournalStore.instance
-          .add(kind: TtcEntryKind.letter, text: 'Dear little one');
-      await _pump(tester, const TtcJournalScreen());
-      await tester.tap(find.text('Dear little one'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.byTooltip('More'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Delete entry'));
-      await tester.pumpAndSettle();
-      expect(find.textContaining('You can undo it'), findsOneWidget);
-      await tester.tap(find.text('Delete'));
-      await tester.pump();
-      expect(TtcJournalStore.instance.count, 0);
-      expect(find.text('Entry deleted.'), findsWidgets);
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Undo'));
-      await tester.pumpAndSettle();
-      final back = TtcJournalStore.instance.entries.single;
-      expect(back.id, e.id, reason: 'same id, so the cloud sees one row');
-      expect(back.dateIso, e.dateIso);
-    });
-
-    test('the store: restore is idempotent, a kind-only edit counts', () {
-      final e =
-          TtcJournalStore.instance.add(kind: TtcEntryKind.memory, text: 'x');
-      TtcJournalStore.instance.restore(e);
-      expect(TtcJournalStore.instance.count, 1);
-      expect(
-          TtcJournalStore.instance
-              .update(e.id, text: 'x', kind: TtcEntryKind.feeling),
-          isTrue);
-      expect(TtcJournalStore.instance.entries.single.kind,
-          TtcEntryKind.feeling);
-      expect(TtcJournalStore.instance.update(e.id, text: 'x'), isFalse,
-          reason: 'nothing changed');
-    });
-  });
-
-  // ===========================================================================
+  // Kept for revert (2026-09-28, the user: no journal in trying to conceive).
+  // The journal page and store are commented out.
+  // group('the journal', () {
+  //   testWidgets('first open is an invitation, and a save says so',
+  //       (tester) async {
+  //     await _pump(tester, const TtcJournalScreen());
+  //     expect(find.text(const TtcS(false).journalEmptyTitle), findsOneWidget);
+  //     await tester.tap(find.text('Write something'));
+  //     await tester.pumpAndSettle();
+  //     await tester.enterText(find.byType(TextField), 'Day one');
+  //     await tester.pump();
+  //     await tester.tap(find.text('Save'));
+  //     await tester.pump();
+  //     // findsWidgets: during the pop both routes' scaffolds hold the notice.
+  //     expect(find.text('Saved to Our journal.'), findsWidgets);
+  //     await tester.pumpAndSettle();
+  //     expect(find.text('Day one'), findsOneWidget);
+  //   });
+  //
+  //   testWidgets('entries are headed by month', (tester) async {
+  //     TtcJournalStore.instance.add(
+  //         kind: TtcEntryKind.memory, text: 'In August', on: DateTime(2026, 8, 3));
+  //     TtcJournalStore.instance.add(
+  //         kind: TtcEntryKind.memory, text: 'In Sept A', on: DateTime(2026, 9, 3));
+  //     TtcJournalStore.instance.add(
+  //         kind: TtcEntryKind.memory, text: 'In Sept B', on: DateTime(2026, 9, 9));
+  //     await _pump(tester, const TtcJournalScreen());
+  //     expect(find.byType(TtcJournalMonthHead), findsNWidgets(2));
+  //     expect(find.text('September 2026'), findsOneWidget);
+  //     expect(find.text('August 2026'), findsOneWidget);
+  //   });
+  //
+  //   testWidgets('an edit can move an entry to another kind', (tester) async {
+  //     TtcJournalStore.instance.add(kind: TtcEntryKind.memory, text: 'Ask AMH');
+  //     await _pump(tester, const TtcJournalScreen());
+  //     await tester.tap(find.text('Ask AMH'));
+  //     await tester.pumpAndSettle();
+  //     await tester.tap(find.text('Edit'));
+  //     await tester.pumpAndSettle();
+  //     await tester.tap(find.text(TtcEntryKind.question.label(false)));
+  //     await tester.pump();
+  //     await tester.tap(find.text('Save'));
+  //     await tester.pump();
+  //     expect(find.text('Changes saved.'), findsWidgets);
+  //     await tester.pumpAndSettle();
+  //     final e = TtcJournalStore.instance.entries.single;
+  //     expect(e.kind, TtcEntryKind.question);
+  //     expect(e.text, 'Ask AMH');
+  //   });
+  //
+  //   testWidgets('a delete asks first, and can be undone', (tester) async {
+  //     final e = TtcJournalStore.instance
+  //         .add(kind: TtcEntryKind.letter, text: 'Dear little one');
+  //     await _pump(tester, const TtcJournalScreen());
+  //     await tester.tap(find.text('Dear little one'));
+  //     await tester.pumpAndSettle();
+  //     await tester.tap(find.byTooltip('More'));
+  //     await tester.pumpAndSettle();
+  //     await tester.tap(find.text('Delete entry'));
+  //     await tester.pumpAndSettle();
+  //     expect(find.textContaining('You can undo it'), findsOneWidget);
+  //     await tester.tap(find.text('Delete'));
+  //     await tester.pump();
+  //     expect(TtcJournalStore.instance.count, 0);
+  //     expect(find.text('Entry deleted.'), findsWidgets);
+  //     await tester.pumpAndSettle();
+  //     await tester.tap(find.text('Undo'));
+  //     await tester.pumpAndSettle();
+  //     final back = TtcJournalStore.instance.entries.single;
+  //     expect(back.id, e.id, reason: 'same id, so the cloud sees one row');
+  //     expect(back.dateIso, e.dateIso);
+  //   });
+  //
+  //   test('the store: restore is idempotent, a kind-only edit counts', () {
+  //     final e =
+  //         TtcJournalStore.instance.add(kind: TtcEntryKind.memory, text: 'x');
+  //     TtcJournalStore.instance.restore(e);
+  //     expect(TtcJournalStore.instance.count, 1);
+  //     expect(
+  //         TtcJournalStore.instance
+  //             .update(e.id, text: 'x', kind: TtcEntryKind.feeling),
+  //         isTrue);
+  //     expect(TtcJournalStore.instance.entries.single.kind,
+  //         TtcEntryKind.feeling);
+  //     expect(TtcJournalStore.instance.update(e.id, text: 'x'), isFalse,
+  //         reason: 'nothing changed');
+  //   });
+  // });
+  //
+  // // ===========================================================================
   group('a course session, in parts', () {
     test('every session has Read, and only the parts it needs', () {
       for (final s in kTtcCourseSessions) {
@@ -360,7 +371,8 @@ void main() {
       expect(find.byType(TtcPracticeSession), findsNothing,
           reason: 'the timer waits on its own part now');
 
-      await tester.tap(find.text('Next: Do it'));
+      // Named since 2026-09-28. Kept for revert: 'Next: Do it'.
+      await tester.tap(find.text('Next: The practice'));
       await tester.pump();
       expect(find.byType(TtcPracticeSession), findsOneWidget);
       expect(find.text(s1.saidPlainly), findsNothing);
@@ -377,7 +389,8 @@ void main() {
       final s8 = kTtcCourseSessions.last;
       await _pump(tester, TtcCourseSessionScreen(session: s8), height: 4000);
       expect(find.text('Set as my daily practice'), findsNothing);
-      await tester.tap(find.text('2  Keep it'));
+      // Named since 2026-09-28. Kept for revert: '2  Keep it'.
+      await tester.tap(find.text('2  Your plan'));
       await tester.pump();
       expect(find.text('Set as my daily practice'), findsOneWidget);
       expect(find.text('Back to the course'), findsOneWidget);
@@ -407,7 +420,11 @@ void main() {
       TtcStore.instance.setPartnerJoined(true);
       await tester.pump();
       expect(tester.takeException(), isNull);
-      expect(find.text('Joined. You share the journal.'), findsOneWidget);
+      // Kept for revert (2026-09-28, journal out of TTC):
+      //   expect(find.text('Joined. You share the journal.'), findsOneWidget);
+      expect(
+          find.text('Joined. You share your fertile window and appointments.'),
+          findsOneWidget);
     });
 
     testWidgets('every member says what a tap does, and it goes somewhere',

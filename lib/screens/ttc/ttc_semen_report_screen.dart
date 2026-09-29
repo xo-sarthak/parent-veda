@@ -203,8 +203,23 @@ class _TtcSemenReportScreenState extends State<TtcSemenReportScreen> {
     openTtcSurface(context, 'ttc_records');
   }
 
+  // ⚠️ THE READING IS STEP TWO, SO BACK GOES TO THE NUMBERS (2026-09-29).
+  // The reading draws in place of the questions, and its X used to close the
+  // whole tool, the Android back gesture too, so "go back and fix one
+  // number" meant starting again from the Tools row. Now the reading draws a
+  // back arrow and a pop while it shows is turned into "back to the
+  // numbers", with every answer still filled in. One PopScope for the
+  // button and the gesture, so they cannot disagree.
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => PopScope(
+        canPop: !_read,
+        onPopInvokedWithResult: (didPop, _) {
+          if (!didPop && _read) setState(() => _read = false);
+        },
+        child: _page(context),
+      );
+
+  Widget _page(BuildContext context) {
     if (_read) {
       Widget result(BuildContext context) => _Result(
             reading: ttcReadSemenReport(_e),
@@ -386,7 +401,8 @@ class _TtcSemenReportScreenState extends State<TtcSemenReportScreen> {
             TtcToolQuestion(
               n: base + 5,
               hue: kHisSideHue,
-              title: 'Any of these?',
+              // Kept for revert (2026-09-28): 'Any of these?'
+              title: 'Do any warning signs apply?',
               note: 'Tap anything that applies. None of these is common, and '
                   'each one is a reason to see someone before arranging '
                   'another sample.',
@@ -417,7 +433,8 @@ class _TtcSemenReportScreenState extends State<TtcSemenReportScreen> {
 
             const SizedBox(height: 8),
             TtcToolPrimary(
-              label: 'Read it back to me',
+              // Kept for revert (2026-09-28): 'Read it back to me'
+              label: 'Read my report back to me',
               onTap: () => setState(() => _read = true),
             ),
             const SizedBox(height: 14),
@@ -673,6 +690,8 @@ class _Result extends StatelessWidget {
     return TtcToolScaffold(
       hue: kHisSideHue,
       variant: 3,
+      // Step two: back to the numbers (2026-09-29, see the PopScope).
+      leading: TtcToolLeading.back,
       eyebrow: 'Your report',
       title: reading.headline,
       intro: reading.body,
@@ -716,7 +735,8 @@ class _Result extends StatelessWidget {
             // or a warning sign). Kept for revert: this section came after
             // the numbers and the gateway, with the consult always primary
             // and the save labelled 'Keep his reports with yours'.
-            ttcSectionTitle('What to do with this'),
+            // Kept for revert (2026-09-28): 'What to do with this'
+            ttcSectionTitle('What to do with the report'),
             if (reading.route == TtcSemenRoute.urgent ||
                 reading.route == TtcSemenRoute.azoospermia) ...[
               TtcToolPrimary(
@@ -727,14 +747,18 @@ class _Result extends StatelessWidget {
               TtcToolSecondary(
                 label: kept
                     ? 'Kept with your reports. Open the folder'
-                    : 'Keep this with your reports',
+                    // Kept for revert (2026-09-28): 'Keep this with your
+                    // reports'
+                    : 'Keep the report in your records',
                 onTap: onKeep,
               ),
             ] else ...[
               TtcToolPrimary(
                 label: kept
                     ? 'Kept with your reports. Open the folder'
-                    : 'Keep this with your reports',
+                    // Kept for revert (2026-09-28): 'Keep this with your
+                    // reports'
+                    : 'Keep the report in your records',
                 onTap: onKeep,
               ),
               const SizedBox(height: 10),
@@ -853,7 +877,8 @@ class _LineCard extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-                color: ttcPanel, borderRadius: BorderRadius.circular(14)),
+                // Kept for revert (2026-09-29, no tinted slab behind text): color: ttcPanel, borderRadius: BorderRadius.circular(14)),
+                color: Colors.white, border: const Border.fromBorderSide(BorderSide(color: ttcLine)), borderRadius: BorderRadius.circular(14)),
             child: Text(kTtcSemenBelowLineNote,
                 style: ttcBody(12.5, color: ttcTitleInk, h: 1.5)),
           ),

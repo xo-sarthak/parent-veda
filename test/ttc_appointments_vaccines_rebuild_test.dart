@@ -22,11 +22,15 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:parentveda/screens/ttc/ttc_appointments_screen.dart';
-import 'package:parentveda/screens/ttc/ttc_journal_screen.dart';
+// Kept for revert (2026-09-28, the user: no journal in trying to conceive).
+// import 'package:parentveda/screens/ttc/ttc_journal_screen.dart';
+import 'package:parentveda/screens/ttc/ttc_doctor_question_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_strings.dart';
 import 'package:parentveda/screens/ttc/ttc_tool_chrome.dart';
 import 'package:parentveda/screens/ttc/ttc_vaccines_screen.dart';
-import 'package:parentveda/ttc/ttc_journal_store.dart';
+// Kept for revert (2026-09-28, the user: no journal in trying to conceive).
+// import 'package:parentveda/ttc/ttc_journal_store.dart';
+import 'package:parentveda/ttc/ttc_doctor_questions_store.dart';
 import 'package:parentveda/ttc/ttc_records_store.dart';
 import 'package:parentveda/ttc/ttc_vaccine_store.dart';
 import 'package:parentveda/ttc/ttc_vaccines_data.dart';
@@ -58,7 +62,8 @@ void main() {
 
   setUp(() {
     TtcAppointmentsStore.instance.resetForTest();
-    TtcJournalStore.instance.resetForTest();
+    // Kept for revert (2026-09-28): TtcJournalStore.instance.resetForTest();
+    TtcDoctorQuestionsStore.instance.resetForTest();
     TtcVaccineStore.instance.resetForTest();
     TtcLang.instance.hinglish = false;
     TtcAppointmentsStore.schedulePhone = ({
@@ -104,7 +109,8 @@ void main() {
       TtcAppointmentsStore.instance
           .add(title: 'Blood test', startsLocal: _inDays(5));
       await _pump(tester, const TtcAppointmentsScreen());
-      expect(find.text('NEXT'), findsOneWidget);
+      // Renamed 2026-09-28 (change 5). Kept for revert: find.text('NEXT').
+      expect(find.text('NEXT VISIT'), findsOneWidget);
       expect(find.text('Tomorrow'), findsOneWidget);
       expect(find.text('Follicle scan'), findsOneWidget);
       expect(find.text('Blood test'), findsOneWidget);
@@ -127,12 +133,17 @@ void main() {
     });
 
     testWidgets('a saved question opens to be changed', (tester) async {
-      TtcJournalStore.instance
-          .add(kind: TtcEntryKind.question, text: 'Should we test AMH?');
+      // Kept for revert (2026-09-28, journal out of TTC): the question was a
+      // journal entry and opened the journal's entry page.
+      //   TtcJournalStore.instance
+      //       .add(kind: TtcEntryKind.question, text: 'Should we test AMH?');
+      //   ... expect(find.byType(TtcJournalEntryScreen), findsOneWidget);
+      TtcDoctorQuestionsStore.instance.add('Should we test AMH?');
       await _pump(tester, const TtcAppointmentsScreen());
       await tester.tap(find.text('Should we test AMH?'));
       await tester.pumpAndSettle();
-      expect(find.byType(TtcJournalEntryScreen), findsOneWidget);
+      expect(find.byType(TtcDoctorQuestionScreen), findsOneWidget);
+      expect(find.text('Edit your question'), findsOneWidget);
     });
   });
 
@@ -201,7 +212,8 @@ void main() {
       await tester.pump();
       await tester.tap(find.byType(TtcToolClose));
       await tester.pumpAndSettle();
-      expect(find.text('Discard this?'), findsOneWidget);
+      // Renamed 2026-09-28 (change 5). Kept for revert: 'Discard this?'.
+      expect(find.text('Discard this visit?'), findsOneWidget);
       await tester.tap(find.byKey(const ValueKey('ttc_appt_keep_editing')));
       await tester.pumpAndSettle();
       expect(find.byType(TtcAppointmentEditScreen), findsOneWidget);
@@ -221,19 +233,25 @@ void main() {
         (tester) async {
       TtcAppointmentsStore.instance
           .add(title: 'Consultation', startsLocal: _inDays(2));
-      TtcJournalStore.instance
-          .add(kind: TtcEntryKind.question, text: 'Is my AMH low?');
+      // Kept for revert (2026-09-28, journal out of TTC):
+      //   TtcJournalStore.instance
+      //       .add(kind: TtcEntryKind.question, text: 'Is my AMH low?');
+      TtcDoctorQuestionsStore.instance.add('Is my AMH low?');
       await _pump(tester, const TtcAppointmentsScreen());
-      expect(find.text('1 question to take'), findsOneWidget);
+      // Kept for revert (2026-09-28): '1 question to take'. The visit's
+      // count now uses the reminder's and the home card's words.
+      expect(find.text('1 question to ask'), findsOneWidget);
       await tester.tap(find.byKey(const ValueKey('ttc_appt_next')));
       await tester.pumpAndSettle();
 
       expect(find.text('APPOINTMENT'), findsOneWidget);
-      expect(find.text('Questions to take'), findsOneWidget);
+      // Kept for revert (2026-09-28): 'Questions to take'.
+      expect(find.text('Questions to ask'), findsOneWidget);
       expect(find.text('Is my AMH low?'), findsOneWidget);
-      expect(find.text("Add who it's with"), findsOneWidget);
+      // Renamed 2026-09-28 (change 5). Kept for revert: "Add who it's with".
+      expect(find.text('Add who the visit is with'), findsOneWidget);
 
-      await tester.tap(find.text("Add who it's with"));
+      await tester.tap(find.text('Add who the visit is with'));
       await tester.pumpAndSettle();
       expect(find.text('Change this appointment'), findsOneWidget,
           reason: 'an empty line opens the form, not a dead end');
@@ -343,7 +361,9 @@ void main() {
     testWidgets('first open: the tests box leads, the India note said once',
         (tester) async {
       await _pump(tester, const TtcVaccinesScreen());
-      final ask = tester.getTopLeft(find.text('Ask for these tests by name'));
+      // Change 5 (2026-09-28). Was: find.text('Ask for these tests by name')
+      final ask =
+          tester.getTopLeft(find.text('Ask for the immunity tests by name'));
       final group = tester.getTopLeft(find.text('BEFORE YOU START TRYING'));
       expect(ask.dy, lessThan(group.dy));
       expect(find.textContaining("India's public programme"), findsOneWidget);
@@ -353,7 +373,8 @@ void main() {
       // Launch sanity T8 (2026-09-28): one box on a first open, not the
       // answer box saying "one blood test" above the tests box saying it
       // again; the rubella line lives in the tests box now.
-      expect(find.text('One blood test settles most of this'), findsNothing);
+      // Change 5 (2026-09-28). Was: 'One blood test settles most of this'
+      expect(find.text('One blood test settles most of your jabs'), findsNothing);
       expect(find.textContaining('Rubella is the one worth doing first'),
           findsOneWidget);
       // Four answers she can tell apart: how she knows is in the words.
@@ -375,7 +396,9 @@ void main() {
       expect(find.byKey(const ValueKey('ttc_vax_mmr_immune')), findsNothing,
           reason: 'done reads as done, not as four buttons');
       // Once started, the tests box is reference and moves under the cards.
-      final ask = tester.getTopLeft(find.text('Ask for these tests by name'));
+      // Change 5 (2026-09-28). Was: find.text('Ask for these tests by name')
+      final ask =
+          tester.getTopLeft(find.text('Ask for the immunity tests by name'));
       final group = tester.getTopLeft(find.text('BEFORE YOU START TRYING'));
       expect(ask.dy, greaterThan(group.dy));
 
@@ -396,7 +419,8 @@ void main() {
           findsOneWidget);
       await tester.tap(find.byKey(const ValueKey('ttc_vax_varicella_had_now')));
       await tester.pumpAndSettle();
-      expect(find.text('When did you have it?'), findsOneWidget);
+      // Change 5 (2026-09-28). Was: 'When did you have it?'
+      expect(find.text('When did you have the Varicella jab?'), findsOneWidget);
       await tester.tap(find.text('OK'));
       await tester.pumpAndSettle();
       expect(TtcVaccineStore.instance.statusOf('varicella'),
@@ -431,12 +455,16 @@ void main() {
       await _pump(tester, const TtcVaccinesScreen());
       expect(find.textContaining('-DAY WAIT'), findsNothing);
       final live = ttcLiveVaccines.length;
-      expect(find.textContaining('Live vaccine: wait'), findsNWidgets(live));
-      expect(find.text('WHY IT MATTERS'), findsNothing);
+      // Change 5 (2026-09-28): each line names its vaccine. Was:
+      //   find.textContaining('Live vaccine: wait')
+      expect(find.textContaining('is a live vaccine: wait'), findsNWidgets(live));
+      // Change 5 (2026-09-28). Was: find.text('WHY IT MATTERS')
+      expect(find.text('WHY THIS JAB MATTERS'), findsNothing);
       await tester.tap(find.byKey(const ValueKey('ttc_vax_mmr_more')));
       await tester.pumpAndSettle();
-      expect(find.text('WHY IT MATTERS'), findsOneWidget);
-      expect(find.text('Show less'), findsOneWidget);
+      // Change 5 (2026-09-28). Was: 'WHY IT MATTERS', 'Show less'.
+      expect(find.text('WHY THIS JAB MATTERS'), findsOneWidget);
+      expect(find.text('Less about MMR'), findsOneWidget);
     });
 
     testWidgets('answered cards lay out at 360dp', (tester) async {

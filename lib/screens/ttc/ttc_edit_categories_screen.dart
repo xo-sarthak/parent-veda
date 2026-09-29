@@ -125,6 +125,8 @@ class _TtcEditCategoriesScreenState extends State<TtcEditCategoriesScreen> {
         return TtcToolScaffold(
           hue: 172,
           variant: 4,
+          // Opened from the logger: back to it, not an X (2026-09-29).
+          leading: TtcToolLeading.back,
           // The logger's own name, so she knows where she is.
           eyebrow: 'Symptoms and mood',
           // The same words as the link that opens it.
@@ -247,7 +249,8 @@ class _TtcEditCategoriesScreenState extends State<TtcEditCategoriesScreen> {
 }
 
 /// "Show all", under the list, when anything is hidden.
-const String kTtcCategoriesShowAll = 'Show all';
+// Kept for revert (2026-09-28): 'Show all'
+const String kTtcCategoriesShowAll = 'Show all cards';
 
 /// Under a row whose switch will not turn off.
 const String kTtcCategoriesKeepOne = 'Keep at least one on';

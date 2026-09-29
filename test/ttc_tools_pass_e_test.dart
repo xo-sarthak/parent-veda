@@ -114,7 +114,9 @@ void main() {
       expect(find.textContaining('The shaded band is your six fertile days'),
           findsOneWidget);
       // The walkthrough is retired: the picture is labelled instead.
+      // Was 'How to read this' until 2026-09-28 (explicit labels).
       expect(find.text('How to read this'), findsNothing);
+      expect(find.text('How to read the fertile window'), findsNothing);
     });
 
     testWidgets('paging says where it goes, and back appears only when useful',
@@ -200,7 +202,8 @@ void main() {
         (tester) async {
       await _pump(tester, const TtcJourneyMapScreen());
       expect(find.byKey(const ValueKey('ttc_map_cycle_loop')), findsOneWidget);
-      expect(find.text('These three repeat every cycle'), findsOneWidget);
+      // Kept for revert (2026-09-28): 'These three repeat every cycle'.
+      expect(find.text('Three chapters that repeat every cycle'), findsOneWidget);
       // How each chapter moves on is on every card, not only the current one.
       expect(find.textContaining('Next:'),
           findsNWidgets(TtcChapter.values.length));
@@ -214,10 +217,14 @@ void main() {
 
   // ===========================================================================
   group('the family timeline', () {
-    testWidgets('empty: names both ways to make the first entry',
+    // Kept for revert (2026-09-28, journal out of TTC): the name was 'empty:
+    // names both ways to make the first entry', and it expected "Write in the
+    // journal" beside "Log a period". The journal left the stage.
+    testWidgets('empty: names the way to make the first entry',
         (tester) async {
       await _pump(tester, const TtcTimelineScreen());
-      expect(find.text('Write in the journal'), findsOneWidget);
+      //   expect(find.text('Write in the journal'), findsOneWidget);
+      expect(find.text('Write in the journal'), findsNothing);
       expect(find.text('Log a period'), findsOneWidget);
     });
 

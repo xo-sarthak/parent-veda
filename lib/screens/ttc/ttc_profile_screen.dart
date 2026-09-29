@@ -54,12 +54,24 @@ import 'ttc_strings.dart';
 // bar now, so the avatar on the home and on every `TtcHeader` lands on that
 // tab, lit, rather than pushing a second copy of the same screen with a back
 // arrow over it. V1 has no You tab and keeps the push.
+//
+// ⚠️ AND SINCE 2026-09-29 THE AVATAR OPENS THE PROFILE AGAIN, ON EVERY
+// VERSION. The user: "what was the purpose of this 5th tab when you have
+// replicated the same thing inside the top left profile". The fifth tab is
+// More now, what the app offers (ttc_more_tab.dart); the avatar opens her
+// profile, pushed with its back arrow, and his side opens his (father),
+// which never draws her answers or her notes for the doctor. Kept for revert:
+//   if (TtcHomeVersionStore.instance.version == TtcHomeVersion.v3) {
+//     openTtcTabV3(context, 4);
+//     return;
+//   }
+//   openPvYou(context, stage: LifeStage.tryingToConceive);
 void openTtcProfile(BuildContext context) {
-  if (TtcHomeVersionStore.instance.version == TtcHomeVersion.v3) {
-    openTtcTabV3(context, 4);
-    return;
-  }
-  openPvYou(context, stage: LifeStage.tryingToConceive);
+  openPvYou(
+    context,
+    stage: LifeStage.tryingToConceive,
+    father: TtcPartnerMode.instance.on,
+  );
 }
 // Kept for revert:
 // void openTtcProfile(BuildContext context) =>
@@ -106,7 +118,7 @@ class TtcProfileScreenClassic extends StatelessWidget {
                   decoration: const BoxDecoration(
                       color: ttcPanel, shape: BoxShape.circle),
                   child: const Icon(Icons.person_outline_rounded,
-                      size: 26, color: ttcPurple),
+                      size: 26, color: ttcTitleInk),
                 ),
                 const SizedBox(width: 14),
                 Expanded(
@@ -134,7 +146,7 @@ class TtcProfileScreenClassic extends StatelessWidget {
                       borderRadius: BorderRadius.circular(13),
                     ),
                     child: const Icon(Icons.translate_rounded,
-                        size: 19, color: ttcPurple),
+                        size: 19, color: ttcTitleInk),
                   ),
                   const SizedBox(width: 13),
                   Expanded(child: Text(t.profileLanguage, style: ttcJakarta(15))),
@@ -152,7 +164,7 @@ class TtcProfileScreenClassic extends StatelessWidget {
                     children: [
                       Row(children: [
                         const Icon(Icons.favorite_border_rounded,
-                            size: 17, color: ttcPurple),
+                            size: 17, color: ttcTitleInk),
                         const SizedBox(width: 9),
                         Text(t.profilePartner, style: ttcJakarta(15)),
                       ]),
@@ -189,7 +201,7 @@ class TtcProfileScreenClassic extends StatelessWidget {
                       borderRadius: BorderRadius.circular(13),
                     ),
                     child: const Icon(Icons.map_outlined,
-                        size: 19, color: ttcPurple),
+                        size: 19, color: ttcTitleInk),
                   ),
                   const SizedBox(width: 13),
                   Expanded(
@@ -279,11 +291,11 @@ class TtcProfileScreenClassic extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(999),
-                            border: Border.all(color: ttcPurple, width: 1.2),
+                            border: Border.all(color: ttcTitleInk, width: 1.2),
                           ),
                           child: Text(t.profileGoPregnancy,
                               style: ttcBody(13.5,
-                                  color: ttcPurple, w: FontWeight.w800)),
+                                  color: ttcTitleInk, w: FontWeight.w800)),
                         ),
                       ),
                     ]),
@@ -396,7 +408,7 @@ class _LangSegment extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(
-              color: active ? ttcPurple : Colors.transparent,
+              color: active ? ttcTitleInk : Colors.transparent,
               borderRadius: BorderRadius.circular(999),
             ),
             child: Text(label,
@@ -446,7 +458,7 @@ class _VersionSegment extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 13, vertical: 6),
                 decoration: BoxDecoration(
-                  color: on ? ttcPurple : Colors.transparent,
+                  color: on ? ttcTitleInk : Colors.transparent,
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(label,
@@ -493,7 +505,11 @@ class _ModeSegment extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 13, vertical: 6),
                   decoration: BoxDecoration(
-                    color: on ? (him ? ttcSlate : ttcPurple) : Colors.transparent,
+                    // ⚠️ ONE BLACK ON HIS SIDE TOO (2026-09-29): slate stays
+                    // on his headers and tints, never on a control.
+                    // Kept for revert (2026-09-29):
+                    //   color: on ? (him ? ttcSlate : ttcTitleInk) : Colors.transparent,
+                    color: on ? ttcTitleInk : Colors.transparent,
                     borderRadius: BorderRadius.circular(999),
                   ),
                   child: Text(label,

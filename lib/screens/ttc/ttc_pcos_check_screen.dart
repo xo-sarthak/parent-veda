@@ -32,6 +32,7 @@ import '../../ttc/ttc_pcos_check_store.dart';
 import '../v2/v2_palette.dart';
 import 'ttc_pcos_check_result.dart';
 import 'ttc_strings.dart';
+import 'ttc_common.dart' show ttcTitleInk;
 
 /// PCOS is 288 on the controlled wheel — a tool opened from that door keeps
 /// the door's colour.
@@ -447,7 +448,7 @@ class _DerivedNote extends StatelessWidget {
           border: Border.all(color: p.line),
         ),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Icon(Icons.auto_awesome_outlined, size: 15, color: p.action),
+          Icon(Icons.auto_awesome_outlined, size: 15, color: ttcTitleInk),
           const SizedBox(width: 9),
           Expanded(
             child: Text(
@@ -491,10 +492,13 @@ class _OptionTile extends StatelessWidget {
           alignment: Alignment.centerLeft,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           decoration: BoxDecoration(
-            color: selected ? p.action.withValues(alpha: 0.08) : null,
+            // A chosen row is an ink edge and an ink tick; the row does not
+            // fill (DESIGN-SYSTEM §4.0, 2026-09-29). Kept for revert:
+            //   color: selected ? p.action.withValues(alpha: 0.08) : null,
+            color: null,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-                color: selected ? p.action : p.line, width: selected ? 1.5 : 1),
+                color: selected ? ttcTitleInk : p.line, width: selected ? 1.5 : 1),
           ),
           child: Row(children: [
             Expanded(
@@ -504,10 +508,10 @@ class _OptionTile extends StatelessWidget {
                       height: 1.4,
                       fontWeight:
                           selected ? FontWeight.w700 : FontWeight.w500,
-                      color: selected ? p.action : p.ink1)),
+                      color: selected ? ttcTitleInk : p.ink1)),
             ),
             if (selected)
-              Icon(Icons.check_rounded, size: 19, color: p.action),
+              Icon(Icons.check_rounded, size: 19, color: ttcTitleInk),
           ]),
         ),
       );
@@ -539,10 +543,10 @@ class _WhyWeAsk extends StatelessWidget {
                   style: pvManrope(
                       fontSize: 12.5,
                       fontWeight: FontWeight.w700,
-                      color: p.action)),
+                      color: ttcTitleInk)),
               const SizedBox(width: 4),
               Icon(open ? Icons.expand_less_rounded : Icons.expand_more_rounded,
-                  size: 17, color: p.action),
+                  size: 17, color: ttcTitleInk),
             ]),
           ),
           if (open) ...[
@@ -600,7 +604,7 @@ class _PrimaryButton extends StatelessWidget {
           height: 54,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: p.action,
+            color: ttcTitleInk,
             borderRadius: BorderRadius.circular(999),
           ),
           child: Text(label,
@@ -635,7 +639,7 @@ class PcosPrimaryButton extends StatelessWidget {
           height: 54,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: filled ? p.action : null,
+            color: filled ? ttcTitleInk : null,
             borderRadius: BorderRadius.circular(999),
             border: filled ? null : Border.all(color: p.line),
           ),

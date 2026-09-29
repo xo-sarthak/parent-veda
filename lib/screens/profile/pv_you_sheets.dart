@@ -148,7 +148,9 @@ Future<bool> showPvAddChildSheet(
                   ),
                   const SizedBox(height: 18),
                   PvCommit(
-                    label: arrival ? 'Open the parenting home' : 'Add',
+                    // Change 5 (2026-09-28), right for every stage. Kept for
+                    // revert: 'Add'.
+                    label: arrival ? 'Open the parenting home' : 'Add child',
                     onTap: ok
                         ? () async {
                             await ChildProfileStore.instance.addChild(
@@ -251,15 +253,15 @@ Future<void> showPvAddressesSheet(BuildContext context) async {
                   ],
                 ),
                 const SizedBox(height: 12),
+                // An empty list is one quiet line, not a lavender slab
+                // (2026-09-29), as the store's empty shelf is. Kept for
+                // revert: PvWell(child: Text(..., pvManrope(fontSize: 13.5,
+                //     height: 1.45, color: p.ink2))).
                 if (store.addresses.isEmpty)
-                  PvWell(
-                    child: Text(
+                  const Padding(
+                    padding: EdgeInsets.only(bottom: 8),
+                    child: PvQuietLine(
                       'No address yet. Add one here or at checkout — it is the same list.',
-                      style: pvManrope(
-                        fontSize: 13.5,
-                        height: 1.45,
-                        color: p.ink2,
-                      ),
                     ),
                   ),
                 for (final a in store.addresses)

@@ -37,6 +37,14 @@ import '../../services/saved_store.dart';
 import 'pv_shelf_screen.dart';
 import '../v2/v2_palette.dart';
 import 'pv_store_chrome.dart';
+import 'pv_store_marks.dart';
+// The TTC tab root's shared header (2026-09-29); only the TTC chrome uses it.
+import '../ttc/ttc_tab_root_header.dart'
+    show
+        TtcTabRootHeader,
+        kTtcTabRootGutter,
+        kTtcTabRootRowHeight,
+        ttcTabRootIntroStyle;
 
 class PvStoreScreen extends StatefulWidget {
   const PvStoreScreen({super.key, required this.chrome, this.initialStage});
@@ -99,6 +107,9 @@ class _PvStoreScreenState extends State<PvStoreScreen> {
     ),
   );
 
+  // Nothing on the store top opens this since 2026-09-29 (orders are on her
+  // profile). Kept for revert with the two commented circles.
+  // ignore: unused_element
   void _openOrders() => Navigator.of(context).push(
     MaterialPageRoute<void>(
       builder: (_) => const PvOrdersScreen(),
@@ -186,7 +197,7 @@ class _PvStoreScreenState extends State<PvStoreScreen> {
                     SliverToBoxAdapter(child: _stageRow(p)),
                     SliverToBoxAdapter(
                       child: Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 12, 20, 4),
+                        padding: EdgeInsets.fromLTRB(_g, 12, _g, 4),
                         child: PvHeroBand(
                           key: ValueKey('hero_$_stage'),
                           slides: pvHeroSlidesFor(_stage),
@@ -261,11 +272,31 @@ class _PvStoreScreenState extends State<PvStoreScreen> {
     );
   }
 
+  // ---- the side gutter -----------------------------------------------------------
+
+  /// The storefront's side gutter.
+  ///
+  /// ⚠️ 18 ON THE TTC TAB ROOT, 20 EVERYWHERE ELSE (2026-09-29). Learn and
+  /// Tools sit on the stage's 18 (`kTtcTabRootGutter`), and the Products tab
+  /// sat on the storefront's 20, so the titles jumped 2dp sideways between
+  /// tabs. Keyed on the CHROME, not on the stage shown: it is the TTC tab
+  /// root's edge, and "Other stages" on that tab keeps it. Pregnancy's and
+  /// parenting's storefronts are unchanged. Kept for revert (2026-09-29):
+  /// every `_g` in this file was a literal 20 (`const EdgeInsets.fromLTRB(20,
+  /// …, 20, …)`, `const EdgeInsets.symmetric(horizontal: 20)`, `gutter: 20`)
+  /// and the rails took PvCardRail's default 20.
+  double get _g =>
+      widget.chrome == PvStoreChrome.ttc ? kTtcTabRootGutter : 20;
+
   // ---- header: search + cart + orders -----------------------------------------
 
   Widget _header(V2Palette p) {
+    // TTC's tab root wears the stage's one tab-root header; the pregnancy
+    // and parenting storefronts keep theirs below, unchanged.
+    if (widget.chrome == PvStoreChrome.ttc) return _ttcHeader(p);
     final cartCount = CartStore.instance.count(kProductsCartId);
-    final hasOrders = PvOrderStore.instance.orders.isNotEmpty;
+    // Kept for revert (2026-09-29, the Orders circle is off the store top):
+    //   final hasOrders = PvOrderStore.instance.orders.isNotEmpty;
     return Padding(
       padding: EdgeInsets.fromLTRB(
         20,
@@ -313,14 +344,16 @@ class _PvStoreScreenState extends State<PvStoreScreen> {
             ),
           ),
           const SizedBox(width: 8),
-          if (hasOrders) ...[
-            PvRoundIcon(
-              icon: Icons.receipt_long_outlined,
-              onTap: _openOrders,
-              size: 46,
-            ),
-            const SizedBox(width: 8),
-          ],
+          // ⚠️ THE STORE TOP IS CART AND WISHLIST ONLY (2026-09-29). Orders
+          // and bookings live on her profile (the avatar), where Ro,
+          // Deliveroo, Instacart and Etsy keep "your orders": pregnancy and
+          // parenting You already carry an Orders tile, and the confirmation
+          // after checkout offers "See your orders". Kept for revert:
+          //   if (hasOrders) ...[
+          //     PvRoundIcon(icon: Icons.receipt_long_outlined,
+          //         onTap: _openOrders, size: 46),
+          //     const SizedBox(width: 8),
+          //   ],
           PvRoundIcon(
             icon: Icons.shopping_bag_outlined,
             onTap: _openCart,
@@ -328,6 +361,80 @@ class _PvStoreScreenState extends State<PvStoreScreen> {
             size: 46,
           ),
         ],
+      ),
+    );
+  }
+
+  /// ⚠️ THE TTC TAB ROOT'S HEADER (2026-09-29, build 19). The user found the
+  /// four tabs' headers at four heights. Products had no title at all: its
+  /// first line was the search pill at the safe area + 14, beside 46dp
+  /// circles, so leaving Learn for Products swapped a serif "Learn" for a
+  /// grey pill in the same place. On the TTC storefront it now wears the
+  /// stage's one header (`TtcTabRootHeader`, ttc_tab_root_header.dart): the
+  /// title "Products" at the same y and size as Learn, Tools and More, the
+  /// wishlist, orders and cart beside it at the row's 42dp, and the same
+  /// Hero-linked search pill as its first content. The gutter stays 20, the
+  /// storefront's edge, so the pill lines up with the hero band under it.
+  /// Nothing she could tap is gone; the pill moved under the title.
+  Widget _ttcHeader(V2Palette p) {
+    final cartCount = CartStore.instance.count(kProductsCartId);
+    // Kept for revert (2026-09-29, the Orders circle is off the store top):
+    //   final hasOrders = PvOrderStore.instance.orders.isNotEmpty;
+    return Padding(
+      // The old header's 6 above the stage row, kept.
+      padding: const EdgeInsets.only(bottom: 6),
+      child: TtcTabRootHeader(
+        title: 'Products',
+        // Kept for revert (2026-09-29): gutter: 20. See `_g`.
+        gutter: _g,
+        // One plain line, like the other tabs' intros (2026-09-29).
+        intro: Text(
+          "What to buy while you're trying, and why each one helps.",
+          style: ttcTabRootIntroStyle(),
+        ),
+        trailing: [
+          ListenableBuilder(
+            listenable: SavedStore.instance,
+            builder: (context, _) => PvRoundIcon(
+              icon: Icons.favorite_border_rounded,
+              onTap: _openWishlist,
+              badge: SavedStore.instance.items(kind: SavedKind.product).length,
+              size: kTtcTabRootRowHeight,
+              semanticLabel: 'Wishlist',
+            ),
+          ),
+          // Cart and wishlist only (2026-09-29): orders and bookings are on
+          // her profile. Kept for revert:
+          //   if (hasOrders)
+          //     PvRoundIcon(icon: Icons.receipt_long_outlined,
+          //         onTap: _openOrders, size: kTtcTabRootRowHeight,
+          //         semanticLabel: 'Orders'),
+          PvRoundIcon(
+            icon: Icons.shopping_bag_outlined,
+            onTap: _openCart,
+            badge: cartCount,
+            size: kTtcTabRootRowHeight,
+            semanticLabel: 'Cart',
+          ),
+        ],
+        below: PvSearchPill(
+          hero: true,
+          onTap: _openSearch,
+          child: Row(
+            children: [
+              Icon(Icons.search_rounded, size: 20, color: p.ink2),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  pvSearchHintFor(_stage),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: pvManrope(fontSize: 14, color: p.ink3),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -340,7 +447,7 @@ class _PvStoreScreenState extends State<PvStoreScreen> {
   Widget _stageRow(V2Palette p) {
     if (_stage == LifeStage.tryingToConceive && !_showStages) {
       return Padding(
-        padding: const EdgeInsets.fromLTRB(20, 6, 20, 0),
+        padding: EdgeInsets.fromLTRB(_g, 6, _g, 0),
         child: Align(
           alignment: Alignment.centerRight,
           child: TextButton(
@@ -378,10 +485,15 @@ class _PvStoreScreenState extends State<PvStoreScreen> {
     padding: const EdgeInsets.only(top: 10),
     child: SizedBox(
       // 72-px photo tiles (were 64-px icon wells) plus a two-line label.
-      height: 112,
+      // The label's two lines grow with her text size (2026-09-29): a fixed
+      // 112 clipped the tiles by 9px at 1.5x on a 360dp phone. At 1.0x this
+      // is the old 112. Kept for revert: height: 112.
+      height: 79 + MediaQuery.textScalerOf(context).scale(11.5) * 1.2 * 2 + 5,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        // 4 inside the gutter, as it was (16 in 20). Kept for revert
+        // (2026-09-29): const EdgeInsets.symmetric(horizontal: 16).
+        padding: EdgeInsets.symmetric(horizontal: _g - 4),
         itemCount: cats.length,
         separatorBuilder: (context, _) => const SizedBox(width: 8),
         itemBuilder: (_, i) =>
@@ -406,19 +518,19 @@ class _PvStoreScreenState extends State<PvStoreScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
+            padding: EdgeInsets.symmetric(horizontal: _g),
             child: PvSectionHead(eyebrow: eyebrow, title: title),
           ),
           if (lead != null)
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 6, 20, 0),
+              padding: EdgeInsets.fromLTRB(_g, 6, _g, 0),
               child: Text(
                 lead,
                 style: pvManrope(fontSize: 13, height: 1.45, color: p.ink2),
               ),
             ),
           const SizedBox(height: 12),
-          PvCardRail(products: products, scope: scope),
+          PvCardRail(products: products, scope: scope, gutter: _g),
         ],
       ),
     );
@@ -428,17 +540,16 @@ class _PvStoreScreenState extends State<PvStoreScreen> {
     if (items.isEmpty) {
       // A feature is never hidden: an empty category is an invitation.
       return Padding(
-        padding: const EdgeInsets.fromLTRB(20, 18, 20, 0),
+        padding: EdgeInsets.fromLTRB(_g, 18, _g, 0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             PvSectionHead(title: c.name),
             const SizedBox(height: 8),
-            PvWell(
-              child: Text(
-                'Nothing on this shelf yet. When it fills, it lands here first.',
-                style: pvManrope(fontSize: 13, color: p.ink2),
-              ),
+            // One quiet line, no slab (2026-09-29). Kept for revert: the
+            // same Text inside a PvWell.
+            const PvQuietLine(
+              'Nothing on this shelf yet. When it fills, it lands here first.',
             ),
           ],
         ),
@@ -457,16 +568,20 @@ class _PvStoreScreenState extends State<PvStoreScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
+            padding: EdgeInsets.symmetric(horizontal: _g),
             child: PvSectionHead(
               title: c.name,
-              action: 'See all ${items.length}',
+              // Just "See all" (the user, 2026-09-29): a count beside it grows
+              // meaningless as a shelf grows ("See all 1000"). The heading
+              // beside it already names the shelf. Kept for revert:
+              //   action: 'See all ${items.length}',
+              action: 'See all',
               onAction: () => _openShelf(c),
             ),
           ),
           if (c.subs.isNotEmpty)
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+              padding: EdgeInsets.fromLTRB(_g, 8, _g, 0),
               child: Wrap(
                 spacing: 6,
                 runSpacing: 6,
@@ -481,7 +596,11 @@ class _PvStoreScreenState extends State<PvStoreScreen> {
               ),
             ),
           const SizedBox(height: 12),
-          PvCardRail(products: sorted.take(6).toList(), scope: 'shelf_${c.id}'),
+          PvCardRail(
+            products: sorted.take(6).toList(),
+            scope: 'shelf_${c.id}',
+            gutter: _g,
+          ),
         ],
       ),
     );
@@ -533,6 +652,16 @@ class _PvStoreScreenState extends State<PvStoreScreen> {
     ),
   ];
 
+  /// Each need's drawn mark, by its target (2026-09-29). The icons in
+  /// [_kTtcNeeds] stay as data, kept for revert; nothing draws them.
+  static const Map<String, PvStoreMark> _kTtcNeedMarks = {
+    'product:ttc_folic': PvStoreMark.folicTablet,
+    'shelf:ttc_kits': PvStoreMark.fertileCalendar,
+    'shelf:ttc_tests': PvStoreMark.pregnancyTest,
+    'shelf:ttc_supplements': PvStoreMark.capsules,
+    'shelf:ttc_books': PvStoreMark.books,
+  };
+
   /// Whether a need's row leads anywhere (review S3, 2026-09-26). A row
   /// whose product AND fallback shelf are both gone would be a dead row, so
   /// it is not drawn; the check runs at build, against the live catalogue.
@@ -582,7 +711,7 @@ class _PvStoreScreenState extends State<PvStoreScreen> {
         if (ttcNeedResolves(n.$4)) n,
     ];
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 22, 20, 0),
+      padding: EdgeInsets.fromLTRB(_g, 22, _g, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -596,15 +725,20 @@ class _PvStoreScreenState extends State<PvStoreScreen> {
               PvListRow(
                 key: ValueKey('pv_store_need_${n.$4}'),
                 p: p,
-                leading: Container(
-                  width: 40,
-                  height: 40,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: p.surfaceAlt,
-                    borderRadius: BorderRadius.circular(11),
+                // ⚠️ A DRAWN MARK, NOT A LINE ICON (2026-09-29, the icon
+                // rule: rows that take her somewhere wear drawn marks, line
+                // icons are for controls). Each need has its own object in
+                // the door family's hand, all in the store's one tint
+                // (pv_store_marks.dart). Kept for revert: a 40pt surfaceAlt
+                // square holding `Icon(n.$1, size: 19, color: p.ink1)`.
+                leading: SizedBox(
+                  key: ValueKey('pv_store_need_mark_${n.$4}'),
+                  width: 44,
+                  height: 44,
+                  child: PvStoreArt(
+                    mark: _kTtcNeedMarks[n.$4] ?? PvStoreMark.capsules,
+                    tint: v2BlockTint(kPvStoreMarkHue, p),
                   ),
-                  child: Icon(n.$1, size: 19, color: p.ink1),
                 ),
                 title: n.$2,
                 line: n.$3,
@@ -619,15 +753,23 @@ class _PvStoreScreenState extends State<PvStoreScreen> {
 
   // ---- the honesty strip ---------------------------------------------------------
 
+  // ⚠️ ON WHITE UNDER A HAIRLINE, NOT IN A SLAB (2026-09-29). It sat in a
+  // lavender-grey PvWell with a violet tick; the store's closing words now
+  // read like the footnote they are, and the tick is ink. Kept for revert:
+  // `child: PvWell(child: Column(...))` and `color: p.action` on the tick.
   Widget _honestyStrip(V2Palette p) => Padding(
-    padding: const EdgeInsets.fromLTRB(20, 26, 20, 0),
-    child: PvWell(
+    padding: EdgeInsets.fromLTRB(_g, 26, _g, 0),
+    child: Container(
+      padding: const EdgeInsets.only(top: 18),
+      decoration: const BoxDecoration(
+        border: Border(top: BorderSide(color: kPvLine)),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.verified_rounded, size: 16, color: p.action),
+              const Icon(Icons.verified_rounded, size: 16, color: kPvInk),
               const SizedBox(width: 7),
               Text(
                 'How ParentVeda sells',

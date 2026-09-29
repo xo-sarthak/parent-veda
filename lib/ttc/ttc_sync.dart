@@ -45,7 +45,15 @@ class TtcTables {
   static const cycles = 'ttc_cycles';
   static const signals = 'ttc_cycle_signals';
   static const logs = 'ttc_logs';
+  // The journal left Trying to Conceive on 2026-09-28 and nothing syncs this
+  // table any more. The name stays because the table and its rows stay (the
+  // user: no need to preserve them, and no reason to drop them either), and
+  // the schema contract and 0092's backfill still name it.
   static const journal = 'ttc_journal';
+
+  /// The questions she saves for her doctor (0092). Their own table since
+  /// 2026-09-28; before that they were journal rows of kind `question`.
+  static const doctorQuestions = 'ttc_doctor_questions';
   static const supplements = 'ttc_supplements';
   static const supplementTaken = 'ttc_supplement_taken';
   static const ritual = 'ttc_ritual';

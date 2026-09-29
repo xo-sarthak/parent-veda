@@ -22,6 +22,7 @@ import '../../ttc/ttc_fertility_help_store.dart';
 import '../../ttc/ttc_read_blocks.dart';
 import '../../widgets/pv_feedback.dart';
 import '../v2/v2_palette.dart';
+import 'ttc_common.dart' show ttcTitleInk;
 
 /// The renderer both TTC reader openers hand to `PvReaderScreen.customBlock`.
 Widget ttcReadCustomBlock(BuildContext context, Object block) =>
@@ -141,9 +142,9 @@ class _TtcAgeBandAskState extends State<TtcAgeBandAsk> {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: on ? p.ink1 : p.surface,
+                color: on ? ttcTitleInk : p.surface,
                 borderRadius: BorderRadius.circular(999),
-                border: Border.all(color: on ? p.ink1 : p.line, width: 1.2),
+                border: Border.all(color: on ? ttcTitleInk : p.line, width: 1.2),
               ),
               child: Text(b.label.en,
                   style: pvManrope(
@@ -174,7 +175,9 @@ class _TtcAgeBandAskState extends State<TtcAgeBandAsk> {
             borderRadius: BorderRadius.circular(8),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-              child: Text('Change',
+              // Kept for revert (2026-09-28): 'Change'. The link names what
+              // it changes.
+              child: Text('Change age',
                   style: pvManrope(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,

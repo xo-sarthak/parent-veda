@@ -33,18 +33,49 @@
 //      line, Ask Veda, then the rest of its group.
 //    · "Not here?" at the foot of every list, not only an empty search, so the
 //      way to ask is always one tap away.
+//
+//  ---------------------------------------------------------------------------
+//  ⚠️ A TOOL, NOT A PAGE OF BLACK TEXT (tools rebuilt, 2026-09-29)
+//  ---------------------------------------------------------------------------
+//  The user, on build 20: "the vaguest of all tools... everything is black
+//  text, nothing else. It all looks the same unless you read it carefully."
+//  What changed, and where each part came from (ttc_can_i_parts.dart has the
+//  full Mobbin notes):
+//
+//    · The verdict is a TINTED TAG with its drawn mark and its word (CVS
+//      Health's status tags, Yuka's dot-and-word), in four calm tints, so a
+//      column of answers is seen before it is read. The words are unchanged.
+//    · The limit is a chip of its own beside the tag ("Limit: about 200mg of
+//      caffeine a day"), and an answer about him says "About him".
+//    · Topic chips (All, and the three headings) under the search field, the
+//      way Klarna's help and Nextdoor filter a list.
+//    · RECENTLY CHECKED on top, with Clear (Monzo, HYPE): the last three
+//      answers she opened, from any way in, kept across a restart
+//      (lib/ttc/ttc_can_i_recent_store.dart).
+//    · The shared-phone switch hides the intimacy answer here too.
+//    · Headings are the stage's one section heading; the way to ask Veda is
+//      one outlined ink button, not a row in a tinted well.
+//  Nothing in the answers moved: every question, verdict, limit, short
+//  answer, why and India line is the data file's, and a tap still opens the
+//  whole answer in the one reader.
 // =============================================================================
 
 import 'package:flutter/material.dart';
 
+import '../../theme/pv_fonts.dart';
 import '../../ttc/ttc_can_i_data.dart';
+import '../../ttc/ttc_can_i_recent_store.dart';
+import '../../ttc/ttc_content_prefs.dart';
 import '../../ttc/ttc_lookup_reads.dart' show openTtcCanIRead;
 import '../doors/pv_list_row.dart' show PvRowGroup;
 import '../v2/v2_palette.dart';
 import 'ttc_askveda_screen.dart' show openTtcAskVeda;
+import 'ttc_can_i_parts.dart';
+import 'ttc_common.dart' show TtcSectionHeading, ttcInk;
 import 'ttc_lookup_parts.dart';
 import 'ttc_strings.dart';
 import 'ttc_tool_chrome.dart';
+import 'ttc_tool_hues.dart';
 
 void openTtcCanI(BuildContext context) {
   Navigator.of(context).push(MaterialPageRoute<void>(
@@ -110,12 +141,27 @@ class TtcCanIScreen extends StatefulWidget {
   State<TtcCanIScreen> createState() => _TtcCanIScreenState();
 }
 
+/// Answers the shared-phone switch leaves out ("Hide sex and intimacy
+/// content", `TtcContentPrefs.hideIntimate`), the way doors and Learn do
+/// (2026-09-29). Only the piece goes; the topic it sits under stays. Search
+/// cannot find it either, because search runs over the same smaller list.
+/// An Ask Veda pointer to one still opens it: she asked for it by name.
+const Set<String> kTtcCanIIntimateIds = {'sex_frequency'};
+
+/// How many recently checked answers sit on top of the list.
+const int kTtcCanIRecentShown = 3;
+
 class _TtcCanIScreenState extends State<TtcCanIScreen> {
   final _search = TextEditingController();
+
+  /// The topic chip she chose; null is "All".
+  String? _topic;
 
   @override
   void initState() {
     super.initState();
+    TtcCanIRecentStore.instance.init();
+    TtcContentPrefs.instance.init();
     final focus = widget.focusId;
     if (focus == null) return;
     final item = ttcCanIById(focus);
@@ -134,57 +180,137 @@ class _TtcCanIScreenState extends State<TtcCanIScreen> {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: TtcLang.instance,
+      animation: Listenable.merge([
+        TtcLang.instance,
+        TtcCanIRecentStore.instance,
+        TtcContentPrefs.instance,
+      ]),
       builder: (context, _) {
         final t = TtcS.current();
         final hi = t.hinglish;
         final p = V2PaletteStore.instance.current;
         final typed = _search.text.trim();
-        // Kept for revert: the filter matched `question(hi)` and `short(hi)`.
-        final results = typed.isEmpty
-            ? ttcCanI
-            : ttcCanI.where((e) => ttcCanIMatches(e, typed)).toList();
+        final hide = TtcContentPrefs.instance.hideIntimate;
 
-        Widget row(TtcCanI item) => TtcLookupRow(
+        // Everything she can see, before the search and the chip.
+        final pool = [
+          for (final e in ttcCanI)
+            if (!(hide && kTtcCanIIntimateIds.contains(e.id))) e,
+        ];
+        final topics = [
+          for (final (name, _) in kTtcCanIGroups)
+            if (pool.any((e) => ttcCanIGroupOf(e.id) == name)) name,
+        ];
+        final topic = topics.contains(_topic) ? _topic : null;
+        final results = [
+          for (final e in pool)
+            if ((topic == null || ttcCanIGroupOf(e.id) == topic) &&
+                ttcCanIMatches(e, typed))
+              e,
+        ];
+        final recent = [
+          for (final e in TtcCanIRecentStore.instance.recent)
+            if (pool.contains(e)) e,
+        ].take(kTtcCanIRecentShown).toList();
+        final showRecent = typed.isEmpty && topic == null && recent.isNotEmpty;
+
+        Widget row(TtcCanI item) => TtcCanIRow(
               key: ValueKey('ttc_can_i_row_${item.id}'),
-              title: item.question(hi),
+              item: item,
+              hi: hi,
               onTap: () => openTtcCanIRead(context, item),
-              lines: [
-                ttcVerdictLine(item, hi),
-                ttcLookupLine(item.short(hi)),
-              ],
             );
 
         return TtcToolScaffold(
-          // Plan and learn's hue in Tools.
-          hue: 104,
+          // Plan and check's hue in Tools. Kept for revert: hue: 104 (the
+          // same number, now read from the one table).
+          hue: kTtcToolHuePlan,
+          // The tool's mark over the eyebrow (2026-09-29, ttc_tool_marks.dart).
+          toolId: 'canI',
           // ⚠️ ONE TOOL, ONE NAME (2026-09-27): the eyebrow IS the Tools
           // tile's name, word for word; the title is the tile's own line.
           eyebrow: t.canITitle,
           title: 'Quick answers to everyday worries.',
-          // Kept for revert: "While you're trying, the honest answer to most
-          // of these is yes." alone.
+          // Kept for revert (2026-09-29): "... Search, or tap a question to
+          // see why." The tags now answer before a tap; the tap is for why.
           intro: hi
               ? t.canIIntro
               : "While you're trying, the honest answer to most of these "
-                  'is yes. Search, or tap a question to see why.',
+                  'is yes. Tap one to see why.',
           children: [
+            const SizedBox(height: 22),
+            ttcToolPad(TtcLookupSearchField(
+              controller: _search,
+              hint: t.canISearch,
+              onChanged: (_) => setState(() {}),
+            )),
+            const SizedBox(height: 12),
+
+            // Topic chips (Klarna's help,
+            // https://mobbin.com/screens/83c7a512-33c5-4479-b490-92ef117654ea;
+            // Nextdoor, https://mobbin.com/screens/667ddb24-d7ae-4fee-a0bc-888bfaa1377c):
+            // All, then the three headings, running edge to edge.
+            // A scrolling Row, not a lazy list: four chips, all built, so
+            // a chip past the edge at large text is still there to reach.
+            SingleChildScrollView(
+              key: const ValueKey('ttc_can_i_topics'),
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 18),
+              child: Row(children: [
+                for (final name in [null, ...topics]) ...[
+                  if (name != null) const SizedBox(width: 8),
+                  TtcCanITopicChip(
+                    key: ValueKey('ttc_can_i_topic_${name ?? 'all'}'),
+                    label: name ?? 'All',
+                    selected: topic == name,
+                    onTap: () => setState(() => _topic = name),
+                  ),
+                ],
+              ]),
+            ),
+
             ttcToolPad(Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 22),
-                TtcLookupSearchField(
-                  controller: _search,
-                  hint: t.canISearch,
-                  onChanged: (_) => setState(() {}),
-                ),
+                // ⚠️ RECENTLY CHECKED, ON TOP (2026-09-29): the reason to
+                // come back. Only on the untouched list: once she types or
+                // picks a topic, she is looking for something else.
+                if (showRecent) ...[
+                  const SizedBox(height: 26),
+                  Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+                    const Expanded(child: TtcSectionHeading('Recently checked')),
+                    TextButton(
+                      key: const ValueKey('ttc_can_i_recent_clear'),
+                      onPressed: TtcCanIRecentStore.instance.clear,
+                      style: TextButton.styleFrom(foregroundColor: ttcInk),
+                      child: Text('Clear',
+                          // Said in full to a screen reader, where "Clear"
+                          // alone could mean the search field.
+                          semanticsLabel: 'Clear recently checked',
+                          style: pvManrope(
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.w800,
+                              color: ttcInk)),
+                    ),
+                  ]),
+                  const SizedBox(height: 8),
+                  PvRowGroup(p: p, children: [
+                    for (final item in recent)
+                      TtcCanIRow(
+                        key: ValueKey('ttc_can_i_recent_${item.id}'),
+                        item: item,
+                        hi: hi,
+                        compact: true,
+                        onTap: () => openTtcCanIRead(context, item),
+                      ),
+                  ]),
+                ],
 
                 // ⚠️ THE EMPTY STATE HAS A WAY ON (tools pass, 2026-09-27).
-                // It promised "tell us, so we can add it" with nothing to tap.
                 // It hands her words to Ask Veda, which answers from the
                 // reviewed reads.
                 if (results.isEmpty) ...[
-                  const SizedBox(height: 22),
+                  const SizedBox(height: 26),
                   Text(t.canINoneTitle, style: ttcLookupTitle(p)),
                   const SizedBox(height: 6),
                   Text(
@@ -193,22 +319,29 @@ class _TtcCanIScreenState extends State<TtcCanIScreen> {
                           : 'Ask Veda can answer it from our reviewed reads. '
                               "If it's worrying you, ask your doctor too.",
                       style: ttcLookupBody(p)),
-                  const SizedBox(height: 10),
-                  PvRowGroup(p: p, children: [
-                    TtcLookupActionRow(
-                      key: const ValueKey('ttc_can_i_ask_veda'),
-                      icon: Icons.auto_awesome_outlined,
-                      label: 'Ask Veda: "$typed"',
-                      onTap: () =>
-                          openTtcAskVeda(context, initialQuery: typed),
+                  const SizedBox(height: 14),
+                  KeyedSubtree(
+                    key: const ValueKey('ttc_can_i_ask_veda'),
+                    child: TtcToolSecondary(
+                      label: typed.isEmpty
+                          ? 'Ask Veda your own question'
+                          : 'Ask Veda: "$typed"',
+                      onTap: () => openTtcAskVeda(context,
+                          initialQuery: typed.isEmpty ? null : typed),
                     ),
-                  ]),
+                  ),
                 ] else ...[
-                  // Under three headings, in the data's own order within
-                  // each. Kept for revert: one flat list of `results`.
+                  // Under the three headings on "All"; under none when a
+                  // topic chip already names the one she is in.
                   for (final (group, _) in kTtcCanIGroups)
                     if (results.any((e) => ttcCanIGroupOf(e.id) == group)) ...[
-                      TtcLookupHeading(group),
+                      if (topic == null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 30, bottom: 6),
+                          child: TtcSectionHeading(group),
+                        )
+                      else
+                        const SizedBox(height: 18),
                       PvRowGroup(p: p, children: [
                         for (final item in results
                             .where((e) => ttcCanIGroupOf(e.id) == group))
@@ -216,21 +349,27 @@ class _TtcCanIScreenState extends State<TtcCanIScreen> {
                       ]),
                     ],
                   // The way to ask is always here, not only when a search
-                  // comes back empty.
-                  const TtcLookupHeading('Not here?'),
-                  PvRowGroup(p: p, children: [
-                    TtcLookupActionRow(
-                      key: const ValueKey('ttc_can_i_ask_veda_foot'),
-                      icon: Icons.auto_awesome_outlined,
+                  // comes back empty. Kept for revert (2026-09-29): a
+                  // TtcLookupHeading and a TtcLookupActionRow in a tinted
+                  // well (a retired icon style); now one line and the one
+                  // outlined ink button.
+                  const SizedBox(height: 30),
+                  Text('Question not listed?', style: ttcLookupTitle(p)),
+                  const SizedBox(height: 4),
+                  Text('Ask Veda answers from our reviewed reads.',
+                      style: ttcLookupBody(p)),
+                  const SizedBox(height: 12),
+                  KeyedSubtree(
+                    key: const ValueKey('ttc_can_i_ask_veda_foot'),
+                    child: TtcToolSecondary(
                       label: 'Ask Veda your own question',
-                      line: 'It answers from our reviewed reads.',
                       onTap: () => openTtcAskVeda(context,
                           initialQuery: typed.isEmpty ? null : typed),
                     ),
-                  ]),
+                  ),
                 ],
 
-                const SizedBox(height: 22),
+                const SizedBox(height: 24),
                 TtcLookupNote(t.canIDisclaimer),
                 const SizedBox(height: 26),
               ],
@@ -241,6 +380,146 @@ class _TtcCanIScreenState extends State<TtcCanIScreen> {
     );
   }
 }
+
+// =============================================================================
+//  Kept for revert (2026-09-29): the state as it was before the tools
+//  rebuild, when each row was the question, an ink mark and word, and a
+//  grey line, under small-caps headings.
+// =============================================================================
+// class _TtcCanIScreenState extends State<TtcCanIScreen> {
+//   final _search = TextEditingController();
+//
+//   @override
+//   void initState() {
+//     super.initState();
+//     final focus = widget.focusId;
+//     if (focus == null) return;
+//     final item = ttcCanIById(focus);
+//     if (item == null) return;
+//     WidgetsBinding.instance.addPostFrameCallback((_) {
+//       if (mounted) openTtcCanIRead(context, item);
+//     });
+//   }
+//
+//   @override
+//   void dispose() {
+//     _search.dispose();
+//     super.dispose();
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return AnimatedBuilder(
+//       animation: TtcLang.instance,
+//       builder: (context, _) {
+//         final t = TtcS.current();
+//         final hi = t.hinglish;
+//         final p = V2PaletteStore.instance.current;
+//         final typed = _search.text.trim();
+//         // Kept for revert: the filter matched `question(hi)` and `short(hi)`.
+//         final results = typed.isEmpty
+//             ? ttcCanI
+//             : ttcCanI.where((e) => ttcCanIMatches(e, typed)).toList();
+//
+//         Widget row(TtcCanI item) => TtcLookupRow(
+//               key: ValueKey('ttc_can_i_row_${item.id}'),
+//               title: item.question(hi),
+//               onTap: () => openTtcCanIRead(context, item),
+//               lines: [
+//                 ttcVerdictLine(item, hi),
+//                 ttcLookupLine(item.short(hi)),
+//               ],
+//             );
+//
+//         return TtcToolScaffold(
+//           // Plan and learn's hue in Tools.
+//           hue: 104,
+//           // The tool's mark over the eyebrow (2026-09-29, ttc_tool_marks.dart).
+//           toolId: 'canI',
+//           // ⚠️ ONE TOOL, ONE NAME (2026-09-27): the eyebrow IS the Tools
+//           // tile's name, word for word; the title is the tile's own line.
+//           eyebrow: t.canITitle,
+//           title: 'Quick answers to everyday worries.',
+//           // Kept for revert: "While you're trying, the honest answer to most
+//           // of these is yes." alone.
+//           intro: hi
+//               ? t.canIIntro
+//               : "While you're trying, the honest answer to most of these "
+//                   'is yes. Search, or tap a question to see why.',
+//           children: [
+//             ttcToolPad(Column(
+//               crossAxisAlignment: CrossAxisAlignment.stretch,
+//               children: [
+//                 const SizedBox(height: 22),
+//                 TtcLookupSearchField(
+//                   controller: _search,
+//                   hint: t.canISearch,
+//                   onChanged: (_) => setState(() {}),
+//                 ),
+//
+//                 // ⚠️ THE EMPTY STATE HAS A WAY ON (tools pass, 2026-09-27).
+//                 // It promised "tell us, so we can add it" with nothing to tap.
+//                 // It hands her words to Ask Veda, which answers from the
+//                 // reviewed reads.
+//                 if (results.isEmpty) ...[
+//                   const SizedBox(height: 22),
+//                   Text(t.canINoneTitle, style: ttcLookupTitle(p)),
+//                   const SizedBox(height: 6),
+//                   Text(
+//                       hi
+//                           ? t.canINoneBody
+//                           : 'Ask Veda can answer it from our reviewed reads. '
+//                               "If it's worrying you, ask your doctor too.",
+//                       style: ttcLookupBody(p)),
+//                   const SizedBox(height: 10),
+//                   PvRowGroup(p: p, children: [
+//                     TtcLookupActionRow(
+//                       key: const ValueKey('ttc_can_i_ask_veda'),
+//                       icon: Icons.auto_awesome_outlined,
+//                       label: 'Ask Veda: "$typed"',
+//                       onTap: () =>
+//                           openTtcAskVeda(context, initialQuery: typed),
+//                     ),
+//                   ]),
+//                 ] else ...[
+//                   // Under three headings, in the data's own order within
+//                   // each. Kept for revert: one flat list of `results`.
+//                   for (final (group, _) in kTtcCanIGroups)
+//                     if (results.any((e) => ttcCanIGroupOf(e.id) == group)) ...[
+//                       TtcLookupHeading(group),
+//                       PvRowGroup(p: p, children: [
+//                         for (final item in results
+//                             .where((e) => ttcCanIGroupOf(e.id) == group))
+//                           row(item),
+//                       ]),
+//                     ],
+//                   // The way to ask is always here, not only when a search
+//                   // comes back empty.
+//                   // Kept for revert (2026-09-28): 'Not here?'
+//                   const TtcLookupHeading('Question not listed?'),
+//                   PvRowGroup(p: p, children: [
+//                     TtcLookupActionRow(
+//                       key: const ValueKey('ttc_can_i_ask_veda_foot'),
+//                       icon: Icons.auto_awesome_outlined,
+//                       label: 'Ask Veda your own question',
+//                       line: 'It answers from our reviewed reads.',
+//                       onTap: () => openTtcAskVeda(context,
+//                           initialQuery: typed.isEmpty ? null : typed),
+//                     ),
+//                   ]),
+//                 ],
+//
+//                 const SizedBox(height: 22),
+//                 TtcLookupNote(t.canIDisclaimer),
+//                 const SizedBox(height: 26),
+//               ],
+//             )),
+//           ],
+//         );
+//       },
+//     );
+//   }
+// }
 
 // =============================================================================
 //  Kept for revert (2026-09-27, night): the build and the in-place card as

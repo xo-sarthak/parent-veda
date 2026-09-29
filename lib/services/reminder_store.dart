@@ -39,6 +39,7 @@ class ReminderStore extends ChangeNotifier {
               (e) => Reminder.fromJson(Map<String, dynamic>.from(e as Map))));
       }
     } catch (_) {/* start empty */}
+    _rewordOldReminders();
     _loaded = true;
     notifyListeners();
 
@@ -57,6 +58,37 @@ class ReminderStore extends ChangeNotifier {
     }
   }
 
+  /// Rewords reminders whose stored words were retired (2026-09-28).
+  ///
+  /// A reminder is stored with its title and body, so changing the words in
+  /// code only reaches reminders switched on after the change. The evening
+  /// symptoms reminder said "Two taps on the Symptoms door and your week
+  /// keeps itself", which is wrong outside pregnancy; any stored copy of that
+  /// exact line is rewritten here, once, locally and (after a pull) in the
+  /// cloud. A line she edited herself never matches and is left alone.
+  /// The words mirror `kSymptomReminderBody` / `kSymptomReminderOldBody` in
+  /// lib/screens/symptoms/door/symptoms_today_body.dart (a service does not
+  /// import a screen); `test/symptom_reminder_words_test.dart` keeps the two
+  /// in step.
+  static const String retiredSymptomBody =
+      'Two taps on the Symptoms door and your week keeps itself.';
+  static const String currentSymptomBody =
+      'Log how you felt today. It takes two taps.';
+
+  bool _rewordOldReminders({bool push = false}) {
+    var changed = false;
+    for (var i = 0; i < _items.length; i++) {
+      final r = _items[i];
+      if (r.id == 'symptoms_evening' && r.body == retiredSymptomBody) {
+        _items[i] = r.copyWith(body: currentSymptomBody);
+        if (push) _cloudPush(_items[i]);
+        changed = true;
+      }
+    }
+    if (changed && !push) _persist();
+    return changed;
+  }
+
   Future<void> _syncFromCloud() async {
     SyncRegistry.register(_syncFromCloud);
     if (!SupabaseRepo.isLoggedIn) return;
@@ -72,6 +104,8 @@ class ReminderStore extends ChangeNotifier {
       _items
         ..clear()
         ..addAll(byId.values);
+      // The cloud may still hold the old wording; reword before scheduling.
+      _rewordOldReminders(push: true);
       await _persist();
       notifyListeners();
     } catch (_) {/* offline - keep local */}

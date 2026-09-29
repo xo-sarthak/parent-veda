@@ -36,7 +36,8 @@ import 'package:parentveda/services/family_timeline.dart';
 import 'package:parentveda/services/life_stage_store.dart';
 import 'package:parentveda/ttc/cycle_store.dart';
 import 'package:parentveda/ttc/ttc_can_i_data.dart';
-import 'package:parentveda/ttc/ttc_journal_store.dart';
+// Kept for revert (2026-09-28, the user: no journal in trying to conceive).
+// import 'package:parentveda/ttc/ttc_journal_store.dart';
 import 'package:parentveda/ttc/ttc_log_store.dart';
 import 'package:parentveda/ttc/ttc_lookup_reads.dart';
 import 'package:parentveda/ttc/ttc_milestones.dart';
@@ -62,7 +63,7 @@ void main() {
     CycleStore.instance.resetForTest();
     TtcStore.instance.resetForTest();
     TtcLogStore.instance.resetForTest();
-    TtcJournalStore.instance.resetForTest();
+    // Kept for revert (2026-09-28): TtcJournalStore.instance.resetForTest();
     TtcRitualStore.instance.resetForTest();
     TtcSupplementsStore.instance.resetForTest();
     FamilyTimeline.instance.resetForTest();
@@ -170,9 +171,20 @@ void main() {
     testWidgets('each row shows the verdict word and its limit',
         (tester) async {
       await _pump(tester, const TtcCanIScreen());
+      // 2026-09-29 (tools rebuilt): the word is a tinted tag and the limit
+      // a chip beside it (test/ttc_can_i_rebuild_test.dart). Kept for revert:
+      // expect(
+      //     find.textContaining('Yes, with a limit · about 200mg',
+      //         findRichText: true),
+      //     findsOneWidget);
+      final chai = find.byKey(const ValueKey('ttc_can_i_row_chai'));
       expect(
-          find.textContaining('Yes, with a limit · about 200mg',
-              findRichText: true),
+          find.descendant(of: chai, matching: find.text('Yes, with a limit')),
+          findsOneWidget);
+      expect(
+          find.descendant(
+              of: chai,
+              matching: find.text('Limit: about 200mg of caffeine a day')),
           findsOneWidget);
       expect(find.byType(TtcCard), findsNothing);
       // The way to ask is always there, not only on an empty search.
@@ -218,7 +230,8 @@ void main() {
         (tester) async {
       await _pump(tester, const TtcNutritionScreen());
       final first = TtcNutritionScreen.weekFrom(DateTime.now()).first.$2;
-      await tester.tap(find.text('Swap this day'));
+      // Change 5 (2026-09-28). Was: find.text('Swap this day')
+      await tester.tap(find.text('Swap this food idea'));
       await tester.pumpAndSettle();
       expect(find.text(first.meal(false)), findsNothing);
       final prefs = await SharedPreferences.getInstance();
@@ -255,7 +268,11 @@ void main() {
         (tester) async {
       TtcSupplementsStore.instance.add('Folic acid');
       await _pump(tester, const TtcJourneyMapScreen());
-      expect(find.text('Write in the journal'), findsOneWidget);
+      // Kept for revert (2026-09-28, journal out of TTC): the journal's row
+      // left the map with the journal. The ritual's row names its action.
+      //   expect(find.text('Write in the journal'), findsOneWidget);
+      expect(find.text('Write in the journal'), findsNothing);
+      expect(find.text('Open your daily ritual'), findsOneWidget);
       expect(find.text('Started your supplements'), findsOneWidget);
       expect(find.text('1'), findsNothing,
           reason: 'a number beside effort reads as a score');

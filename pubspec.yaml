@@ -222,6 +222,10 @@ flutter:
     - lib/data/father/
     - assets/audio/raga_drone.wav
     - assets/audio/shravan_manifest.json
+    # Trying to Conceive practice cues (2026-09-28): five soft tones under
+    # 60 KB each, made by tools/gen_ttc_cue_sounds.py. Played by
+    # lib/ttc/ttc_cue_sounds.dart.
+    - assets/audio/cues/
     # Narration now streams from R2 (see NarrationService._sourceFor). Only the
     # MANIFEST ships in the app.
     #
@@ -251,6 +255,11 @@ flutter:
     # ParentVeda+ Home hero: three CC0 photographs (morning / afternoon /
     # evening), credits in lib/doctor/doctor_hero_images.dart.
     - assets/doctor/
+    # TTC door heroes (2026-09-29): hero_<slug>.jpg, 1536x1024 (3:2), flat
+    # illustrated art, one per door; the slugs are in
+    # lib/screens/ttc/doors/ttc_door_hero.dart. A door with no file yet shows
+    # its photograph, whole, in the same frame.
+    - assets/doors/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

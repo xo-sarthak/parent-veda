@@ -30,7 +30,8 @@ import 'package:parentveda/screens/profile/pv_you_screen.dart';
 import 'package:parentveda/screens/ttc/doors/ttc_door_card.dart';
 import 'package:parentveda/screens/ttc/doors/ttc_door_rail.dart';
 import 'package:parentveda/screens/ttc/doors/ttc_door_screen.dart';
-import 'package:parentveda/screens/ttc/ttc_common.dart';
+// Kept for revert (2026-09-29): the TTC bar was pumped with the You screen.
+// import 'package:parentveda/screens/ttc/ttc_common.dart';
 import 'package:parentveda/screens/ttc/ttc_get_help_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_strings.dart' show TtcLang;
 import 'package:parentveda/services/bracket_resolver.dart';
@@ -414,22 +415,30 @@ void main() {
       }
     });
 
-    testWidgets('You › Your health › Get help now', (tester) async {
+    // 2026-09-29: the profile's one Settings row, then Support (Co-Star
+    // keeps its crisis lines in Settings' Support the same way). Kept for
+    // revert: 'You › Your health › Get help now', through the bento tile.
+    testWidgets('Profile › Settings › Get help now', (tester) async {
       tester.view.physicalSize = const Size(1200, 9000);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.reset);
       final names = <String?>[];
       await tester.pumpWidget(MaterialApp(
         navigatorObservers: [_Names(names.add)],
-        home: const PvYouScreen(
-          stage: LifeStage.tryingToConceive,
-          bottomNav: TtcBottomNav(active: 4, v3: true),
-        ),
+        // Kept for revert: PvYouScreen with the TTC bar (the More tab).
+        home: const PvYouScreen(stage: LifeStage.tryingToConceive),
       ));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 300));
+      // ⚠️ SINCE 2026-09-28 THE TAB IS MORE, A BENTO: the row is behind the
+      // Your health tile. Kept for revert: the row was on the tab itself.
+      //   await tester.tap(
+      //       find.byKey(const ValueKey('pv_more_tile_your_health')));
+      await tester.tap(find.byKey(kPvProfileSettingsRowKey));
+      await tester.pumpAndSettle();
       final row = find.text(kTtcGetHelpTitle);
       expect(row, findsOneWidget);
+      await tester.ensureVisible(row);
       await tester.tap(row);
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 600));

@@ -17,13 +17,16 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:parentveda/screens/ttc/ttc_partner_screen.dart';
+import 'package:parentveda/screens/profile/pv_you_screen.dart'
+    show kPvProfileSettingsRowKey;
 import 'package:parentveda/screens/ttc/ttc_profile_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_strings.dart';
 import 'package:parentveda/screens/ttc/ttc_today_screen.dart';
 import 'package:parentveda/ttc/cycle_store.dart';
 import 'package:parentveda/ttc/ttc_chapter.dart';
 import 'package:parentveda/ttc/ttc_daily_data.dart';
-import 'package:parentveda/ttc/ttc_journal_store.dart';
+// Kept for revert (2026-09-28, the user: no journal in trying to conceive).
+// import 'package:parentveda/ttc/ttc_journal_store.dart';
 import 'package:parentveda/ttc/ttc_partner_data.dart';
 import 'package:parentveda/ttc/ttc_ritual_store.dart';
 import 'package:parentveda/ttc/ttc_store.dart';
@@ -47,7 +50,7 @@ void main() {
   setUp(() {
     CycleStore.instance.resetForTest();
     TtcStore.instance.resetForTest();
-    TtcJournalStore.instance.resetForTest();
+    // Kept for revert (2026-09-28): TtcJournalStore.instance.resetForTest();
     TtcRitualStore.instance.resetForTest();
     TtcPartnerMode.instance.on = false;
     TtcLang.instance.hinglish = false;
@@ -129,7 +132,10 @@ void main() {
       expect(find.text(t.partnerMission.toUpperCase()), findsOneWidget);
       expect(find.text(t.partnerSupport), findsOneWidget);
       expect(find.text(t.partnerYourBody), findsOneWidget);
-      expect(find.text(t.partnerJournal), findsOneWidget);
+      // Kept for revert (2026-09-28, journal out of TTC): his shared journal
+      // card left his home with the journal.
+      //   expect(find.text(t.partnerJournal), findsOneWidget);
+      expect(find.text(t.partnerJournal), findsNothing);
     });
 
     testWidgets('builds in every chapter', (tester) async {
@@ -158,7 +164,12 @@ void main() {
     testWidgets('her Today renders when partner mode is off', (tester) async {
       await pumpTall(tester, const TtcTodayScreen());
       expect(find.byType(TtcPartnerTodayScreen), findsNothing);
-      expect(find.text(const TtcS(false).myJournal), findsWidgets);
+      // Kept for revert (2026-09-28, journal out of TTC): her Today was
+      // recognised by its journal card, which left the stage. Her ritual
+      // card is hers alone and says the same thing.
+      //   expect(find.text(const TtcS(false).myJournal), findsWidgets);
+      expect(find.text(const TtcS(false).dailyRitual.toUpperCase()),
+          findsWidgets);
     });
 
     testWidgets('turning partner mode on swaps the whole stage',
@@ -177,6 +188,12 @@ void main() {
       // Today, the switch was unreachable from his half of the product except
       // by going back.
       await pumpTall(tester, const TtcProfileScreen());
+      // ⚠️ SINCE 2026-09-29 IT IS IN SETTINGS' DEVELOPER SECTION, one row
+      // below the profile, still on both sides. Kept for revert: read off
+      // the profile.
+      await tester.ensureVisible(find.byKey(kPvProfileSettingsRowKey));
+      await tester.tap(find.byKey(kPvProfileSettingsRowKey));
+      await tester.pumpAndSettle();
       expect(find.text(const TtcS(false).partnerHim), findsOneWidget);
       TtcPartnerMode.instance.on = true;
       await tester.pump();
@@ -185,33 +202,36 @@ void main() {
   });
 
   // ===========================================================================
-  group('the shared journal is genuinely shared', () {
-    test('his entries are attributed to him', () {
-      final e = TtcJournalStore.instance.add(
-          kind: TtcEntryKind.feeling,
-          text: 'Hard week',
-          author: TtcAuthor.partner);
-      expect(e.author, TtcAuthor.partner);
-    });
-
-    test('both authors land in one list, in one order', () {
-      final s = TtcJournalStore.instance;
-      s.add(
-          kind: TtcEntryKind.memory,
-          text: 'hers',
-          on: DateTime(2026, 7, 1));
-      s.add(
-          kind: TtcEntryKind.memory,
-          text: 'his',
-          author: TtcAuthor.partner,
-          on: DateTime(2026, 7, 2));
-      expect(s.count, 2);
-      // Newest first, regardless of who wrote it - not grouped by author.
-      expect(s.entries.first.text, 'his');
-    });
-  });
-
-  // ===========================================================================
+  // Kept for revert (2026-09-28, the user: no journal in trying to conceive).
+  // The journal store is commented out. His questions for the doctor, the
+  // one shared kind left, are held by test/ttc_doctor_questions_test.dart.
+  // group('the shared journal is genuinely shared', () {
+  //   test('his entries are attributed to him', () {
+  //     final e = TtcJournalStore.instance.add(
+  //         kind: TtcEntryKind.feeling,
+  //         text: 'Hard week',
+  //         author: TtcAuthor.partner);
+  //     expect(e.author, TtcAuthor.partner);
+  //   });
+  //
+  //   test('both authors land in one list, in one order', () {
+  //     final s = TtcJournalStore.instance;
+  //     s.add(
+  //         kind: TtcEntryKind.memory,
+  //         text: 'hers',
+  //         on: DateTime(2026, 7, 1));
+  //     s.add(
+  //         kind: TtcEntryKind.memory,
+  //         text: 'his',
+  //         author: TtcAuthor.partner,
+  //         on: DateTime(2026, 7, 2));
+  //     expect(s.count, 2);
+  //     // Newest first, regardless of who wrote it - not grouped by author.
+  //     expect(s.entries.first.text, 'his');
+  //   });
+  // });
+  //
+  // // ===========================================================================
   //  His round line (2026-09-26, docs/TTC-TREATMENT-FLOW.md §3g, B10): the
   //  round is couple-scoped, so he sees its step and date, and what it asks
   //  of him. Never her cycle, and never the result.

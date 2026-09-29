@@ -738,11 +738,16 @@ final List<PvRead> kTtcReadsLossMore = [
         surfaceId: 'ttc_appointments',
       ),
     ],
-    readNext: [
-      'ttc_read_loss_recovery',
-      'ttc_read_recurrent_miscarriage',
-      'ttc_read_loss_feelings',
-    ],
+    // ⚠️ ONE READ, ONCE, AT THE FOOT (2026-09-28, no repetition):
+    // 'ttc_read_recurrent_miscarriage' is the next step "Recurrent miscarriage: when to ask for tests",
+    // so the Read next rail no longer lists it a second time.
+    // Kept for revert:
+    // readNext: [
+    // 'ttc_read_loss_recovery',
+    // 'ttc_read_recurrent_miscarriage',
+    // 'ttc_read_loss_feelings',
+    // ],
+    readNext: ['ttc_read_loss_recovery', 'ttc_read_loss_feelings'],
   ),
 
   // ===========================================================================
@@ -963,7 +968,10 @@ final List<PvRead> kTtcReadsLossMore = [
             "choice, and there's no wrong answer."),
       ),
       PvReadFaq(
-        question: _en('Should my husband be tested too?'),
+        // Kept for revert (2026-09-28, no repetition; the same question is in
+        // the genital TB read):
+        // question: _en('Should my husband be tested too?'),
+        question: _en('After repeated losses, should my husband be tested too?'),
         answer: _en('Sometimes. Chromosome blood tests are for both of you '
             'when they are needed. Some clinics also suggest a sperm DNA '
             'test. The evidence for it is still limited, so ask what the '
@@ -1203,13 +1211,14 @@ final List<PvRead> kTtcReadsLossMore = [
         'national tele mental health service of the Ministry of Health and '
         'Family Welfare. Sources checked September 2026.'),
     nextSteps: [
-      PvReadNextStep(
-        kind: PvNextKind.tool,
-        title: _en('Write it down'),
-        value: _en("A private place for what you're feeling, only if writing "
-            'helps.'),
-        surfaceId: 'ttc_journal',
-      ),
+      // Kept for revert (2026-09-28, journal out of TTC): this next step opened the journal, which left the stage.
+      // PvReadNextStep(
+      //   kind: PvNextKind.tool,
+      //   title: _en('Write it down'),
+      //   value: _en("A private place for what you're feeling, only if writing "
+      //       'helps.'),
+      //   surfaceId: 'ttc_journal',
+      // ),
       PvReadNextStep(
         kind: PvNextKind.tool,
         title: _en('Bring your partner in'),

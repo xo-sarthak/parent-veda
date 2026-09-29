@@ -109,7 +109,8 @@ class _PvOrdersScreenState extends State<PvOrdersScreen> {
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
-                    child: PvWell(
+                    // A white card, not a slab (2026-09-29). Kept for revert: PvWell.
+                    child: PvCard(
                       child: Text(
                         'No orders yet. Anything you buy from ParentVeda shows here with its status.',
                         style: pvManrope(
@@ -469,8 +470,10 @@ class PvOrderDetailScreen extends StatelessWidget {
   Widget _status(V2Palette p, PvOrder o) {
     final preview = o.status == PvOrderStatus.preview;
     final paid = o.status == PvOrderStatus.paid;
-    return PvWell(
-      tint: preview ? p.surfaceAlt : const Color(0xFFE3F3EA),
+    // A white card; the status colour lives in the icon alone (2026-09-29,
+    // no tinted slab behind text). Kept for revert:
+    //   return PvWell(tint: preview ? p.surfaceAlt : const Color(0xFFE3F3EA),
+    return PvCard(
       child: Row(
         children: [
           Icon(

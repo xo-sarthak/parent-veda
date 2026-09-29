@@ -20,6 +20,8 @@
 //  paste the thumb URL. Never an id from memory.
 // =============================================================================
 
+import '../reads/read_images.dart' show readImageFor;
+
 String _c(String path) =>
     'https://upload.wikimedia.org/wikipedia/commons/$path';
 
@@ -82,4 +84,14 @@ final Map<String, String> _byCategory = {
 
 /// The photo for a category, or null for one the map does not know (a
 /// Directus category added later) — the tile then draws its icon.
-String? pvCategoryImageFor(String categoryId) => _byCategory[categoryId];
+///
+/// ⚠️ TRYING TO CONCEIVE IS SERVED FROM OUR OWN BUCKET (2026-09-29). The TTC
+/// "Pregnancy tests" tile showed its fallback icon on the phone: every URL
+/// above answers from this machine, but Wikimedia throttles a phone behind a
+/// carrier's shared address (the same failure `kReadImageBase` in
+/// read_images.dart was built for), and a refused photo falls through to the
+/// icon. The five TTC photos are mirrored to R2 as `cat_<category id>`, same
+/// pictures, credited in the read table; other stages keep the Commons URL.
+/// Kept for revert: `=> _byCategory[categoryId];`
+String? pvCategoryImageFor(String categoryId) =>
+    readImageFor('cat_$categoryId') ?? _byCategory[categoryId];

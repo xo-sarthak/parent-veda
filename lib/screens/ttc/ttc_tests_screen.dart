@@ -186,7 +186,8 @@ class _TtcTestsScreenState extends State<TtcTestsScreen> {
           if (hits.isEmpty) {
             children.addAll([
               const SizedBox(height: 18),
-              Text('No test called "$q" here yet.',
+              // Kept for revert (2026-09-28): 'No test called "$q" here yet.'
+              Text('No test called "$q" in this list yet.',
                   style: ttcLookupTitle(p)),
               const SizedBox(height: 6),
               Text(
@@ -249,6 +250,8 @@ class _TtcTestsScreenState extends State<TtcTestsScreen> {
         return TtcToolScaffold(
           // Care and medicines' hue in Tools, the same as Medication.
           hue: kIvfHue,
+          // The tool's mark over the eyebrow (2026-09-29, ttc_tool_marks.dart).
+          toolId: 'tests',
           // ⚠️ ONE TOOL, ONE NAME (2026-09-27): the eyebrow IS the Tools
           // tile's name, word for word ("Medical Tests" is the Hindi
           // build's tile); the title is the tile's own line.

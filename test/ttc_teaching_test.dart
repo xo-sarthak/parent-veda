@@ -23,7 +23,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:parentveda/screens/ttc/ttc_cycle_screens.dart';
 import 'package:parentveda/screens/ttc/ttc_ovulation_screen.dart';
-import 'package:parentveda/screens/ttc/ttc_journal_screen.dart';
+// Kept for revert (2026-09-28, the user: no journal in trying to conceive).
+// import 'package:parentveda/screens/ttc/ttc_journal_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_strings.dart';
 import 'package:parentveda/screens/ttc/ttc_tests_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_tracker_screen.dart';
@@ -32,7 +33,7 @@ import 'package:parentveda/ttc/cycle_store.dart';
 import 'package:parentveda/ttc/ttc_log_store.dart';
 import 'package:parentveda/ttc/ttc_store.dart';
 import 'package:parentveda/ttc/ttc_tests_data.dart';
-import 'package:parentveda/ttc/ttc_daily_data.dart';
+// import 'package:parentveda/ttc/ttc_daily_data.dart'; // only the journal tests used it (2026-09-28)
 import 'package:parentveda/ttc/ttc_trackers_data.dart';
 
 void main() {
@@ -145,21 +146,23 @@ void main() {
     });
   });
 
-  // ===========================================================================
-  group('an empty journal offers somewhere to start', () {
-    testWidgets('a prompt is shown, and it is the one for today',
-        (tester) async {
-      await pumpTall(tester, const TtcJournalScreen());
-      final expected = ttcPromptForToday(TtcStore.instance.today.chapter);
-      expect(find.text(expected.text(false)), findsOneWidget,
-          reason: 'sixteen prompts existed and none reached the screen');
-    });
-
-    testWidgets('phrased as an offer, never a task', (tester) async {
-      await pumpTall(tester, const TtcJournalScreen());
-      // No streaks, nothing that counts against her for skipping. Eyebrows in
-      // this stage are uppercased.
-      expect(find.textContaining('IF YOU WANT'), findsOneWidget);
-    });
-  });
+  // Kept for revert (2026-09-28, the user: no journal in trying to conceive).
+  // The journal page is commented out, so its prompt test is too.
+  // // ===========================================================================
+  // group('an empty journal offers somewhere to start', () {
+  //   testWidgets('a prompt is shown, and it is the one for today',
+  //       (tester) async {
+  //     await pumpTall(tester, const TtcJournalScreen());
+  //     final expected = ttcPromptForToday(TtcStore.instance.today.chapter);
+  //     expect(find.text(expected.text(false)), findsOneWidget,
+  //         reason: 'sixteen prompts existed and none reached the screen');
+  //   });
+  //
+  //   testWidgets('phrased as an offer, never a task', (tester) async {
+  //     await pumpTall(tester, const TtcJournalScreen());
+  //     // No streaks, nothing that counts against her for skipping. Eyebrows in
+  //     // this stage are uppercased.
+  //     expect(find.textContaining('IF YOU WANT'), findsOneWidget);
+  //   });
+  // });
 }

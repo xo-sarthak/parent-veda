@@ -519,7 +519,8 @@ void main() {
     });
 
     test('the words, and never a chance or a diagnosis', () {
-      expect(ttcCheckTitle(12), "It's been about a year");
+      // Kept for revert (2026-09-28): "It's been about a year".
+      expect(ttcCheckTitle(12), 'About a year of trying');
       expect(
           ttcCheckBody(12),
           "That's the point where guidelines suggest a simple check for both "
@@ -541,7 +542,8 @@ void main() {
       await pumpHome(tester);
       final card = find.byKey(const ValueKey('ttc_home_check_card'));
       expect(card, findsOneWidget);
-      expect(find.text("It's been about a year"), findsOneWidget);
+      // Kept for revert (2026-09-28): "It's been about a year".
+      expect(find.text('About a year of trying'), findsOneWidget);
       final notNow = find.byKey(const ValueKey('ttc_home_check_not_now'));
       await tester.ensureVisible(notNow);
       await tester.tap(notNow);
@@ -752,7 +754,8 @@ void main() {
     test('the cycle report walks her through it', () {
       final src = _src('lib/screens/ttc/ttc_cycle_report_screen.dart');
       expect(src, contains("'ttc_chat/cycle_report'"));
-      expect(src, contains('Walk me through it'));
+      // Kept for revert (2026-09-28): contains('Walk me through it')
+      expect(src, contains('Walk me through my report'));
       expect(src, contains('_WalkMeThrough('));
     });
 

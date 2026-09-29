@@ -29,8 +29,10 @@ import '../../services/medicine_store.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../services/tools_store.dart';
 import '../../theme/pv_fonts.dart';
+import '../../ttc/ttc_doctor_questions_store.dart';
 import '../../ttc/ttc_records_store.dart';
 import '../../ttc/ttc_treatment_store.dart';
+import '../ttc/ttc_appointments_screen.dart' show ttcVisitName;
 import 'pv_you_chrome.dart';
 import 'pv_you_content.dart';
 
@@ -168,6 +170,27 @@ class PvDoctorNotesScreen extends StatelessWidget {
       ],
       'None recorded. Medicines live under Tools.',
     ));
+
+    // ⚠️ LAST, AND TRYING TO CONCEIVE ONLY (2026-09-28): the questions she
+    // saved for the next visit, so the note she hands over ends on what she
+    // came to ask. Only the unticked ones kept for that visit (or, with no
+    // visit booked, the ones waiting for one); her own first, then her
+    // partner's, said as his. Read-only here, like everything on this page.
+    if (s == LifeStage.tryingToConceive) {
+      final qs = TtcDoctorQuestionsStore.instance;
+      final next = qs.nextVisit();
+      final list = next == null ? qs.waitingForAVisit() : qs.openFor(next.id);
+      out.add((
+        next == null
+            ? 'Questions to ask'
+            : 'Questions to ask at the ${ttcVisitName(next)}',
+        [
+          for (final q in list)
+            q.isMine ? q.text : '${q.text} (from your partner)',
+        ],
+        'No questions saved. Write them on Appointments, under Tools.',
+      ));
+    }
 
     return out;
   }

@@ -227,7 +227,10 @@ final List<PvRead> kTtcReadsExtra = [
             "say you're trying, so they can check his other medicines too."),
       ),
       PvReadFaq(
-        question: _en('Should we take a break from trying?'),
+        // Kept for revert (2026-09-28, no repetition; the same question is in
+        // the keeping-close read):
+        // question: _en('Should we take a break from trying?'),
+        question: _en('Should we take a break from trying while the pressure is high?'),
         answer: _en('Some couples find a month off the calendar helps a lot. '
             "You can still have sex, just without tracking. If you're 35 or "
             'over, or have been trying a while, talk to your doctor before a '
@@ -1224,11 +1227,16 @@ final List<PvRead> kTtcReadsExtra = [
         surfaceId: 'ttc_records',
       ),
     ],
-    readNext: [
-      'ttc_read_three_months_before',
-      'ttc_read_first_gyn_visit',
-      'ttc_read_ivf_costs',
-    ],
+    // ⚠️ ONE READ, ONCE, AT THE FOOT (2026-09-28, no repetition):
+    // 'ttc_read_ivf_costs' is the next step "What IVF really costs in India",
+    // so the Read next rail no longer lists it a second time.
+    // Kept for revert:
+    // readNext: [
+    // 'ttc_read_three_months_before',
+    // 'ttc_read_first_gyn_visit',
+    // 'ttc_read_ivf_costs',
+    // ],
+    readNext: ['ttc_read_three_months_before', 'ttc_read_first_gyn_visit'],
   ),
 
   // ===========================================================================

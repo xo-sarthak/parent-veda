@@ -2623,12 +2623,18 @@ String? photoForTile(TtcTile tile) {
 /// holds it (all nine since 2026-09-28; the Fertile window door alone
 /// before). It happened the same day: seven cards were retitled and their
 /// photo lines had to follow.
+///
+/// ⚠️ A STABLE ID WINS (2026-09-28): a tile with `id` set keys its photo on
+/// that, and the title rule is the fallback for every tile without one.
+/// Kept for revert: the slug of the title alone.
+///
+/// ⚠️ EVERY DOOR TILE HAS AN ID SINCE 2026-09-29, the key its photo was filed
+/// under that day, so the title rule below now only serves a tile built
+/// without one. The slug lives in `ttcTileTitleKey` so the practice tiles,
+/// generated in data, key the same way. Kept for revert: the slug inline.
 String ttcTilePhotoId(TtcTile tile) {
-  final slug = tile.title
-      .toLowerCase()
-      .replaceAll(RegExp(r'[^a-z0-9]+'), '_')
-      .replaceAll(RegExp(r'^_+|_+$'), '');
-  return 'ttc_tile_$slug';
+  if (tile.id case final id? when id.isNotEmpty) return id;
+  return ttcTileTitleKey(tile.title);
 }
 
 IconData iconForFormat(TtcTileFormat format) => switch (format) {
@@ -3190,7 +3196,7 @@ class _TileCard extends StatelessWidget {
                         horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: paid
-                          ? p.ink1
+                          ? ttcTitleInk
                           : Colors.white.withValues(alpha: 0.82),
                       borderRadius: BorderRadius.circular(999),
                     ),
@@ -3354,7 +3360,8 @@ class _CarouselState extends State<_Carousel> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
-                  color: ttcPanel,
+                  // Kept for revert (2026-09-29, no tinted slab behind text): color: ttcPanel,
+                  color: Colors.white, border: const Border.fromBorderSide(BorderSide(color: ttcLine)),
                   borderRadius: BorderRadius.circular(ttcCardRadius),
                 ),
                 child: Column(
@@ -3391,7 +3398,7 @@ class _CarouselState extends State<_Carousel> {
             width: i == _index ? 18 : 6,
             height: 6,
             decoration: BoxDecoration(
-              color: i == _index ? ttcPurple : ttcBorder,
+              color: i == _index ? ttcTitleInk : ttcBorder,
               borderRadius: BorderRadius.circular(999),
             ),
           ),

@@ -202,7 +202,14 @@ class _PvHeroBandState extends State<PvHeroBand> {
     return Column(
       children: [
         SizedBox(
-          height: 196,
+          // Grows with her text size (2026-09-29): the words clipped by 4px
+          // at 1.5x on a 360dp phone. 196 at 1.0x, as before. Kept for
+          // revert: height: 196.
+          height:
+              196 +
+              ((MediaQuery.textScalerOf(context).scale(10) / 10) - 1)
+                      .clamp(0.0, 2.0) *
+                  30,
           child: Listener(
             onPointerDown: (_) => _touched = true,
             child: PageView.builder(
@@ -307,13 +314,19 @@ class _HeroCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 5),
                       ],
-                      Text(
-                        slide.eyebrow.toUpperCase(),
-                        style: pvManrope(
-                          fontSize: 10.5,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 1.1,
-                          color: Colors.white.withValues(alpha: 0.9),
+                      // Flexible (2026-09-28): a long eyebrow overflowed the
+                      // band at 360dp. Kept for revert: the bare Text.
+                      Flexible(
+                        child: Text(
+                          slide.eyebrow.toUpperCase(),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: pvManrope(
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 1.1,
+                            color: Colors.white.withValues(alpha: 0.9),
+                          ),
                         ),
                       ),
                     ],
@@ -353,12 +366,18 @@ class _HeroCard extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
-                          slide.cta,
-                          style: pvManrope(
-                            fontSize: 12.5,
-                            fontWeight: FontWeight.w800,
-                            color: p.ink1,
+                        // Flexible (2026-09-28): a long action overflowed the
+                        // pill at 360dp. Kept for revert: the bare Text.
+                        Flexible(
+                          child: Text(
+                            slide.cta,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: pvManrope(
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w800,
+                              color: p.ink1,
+                            ),
                           ),
                         ),
                         const SizedBox(width: 4),

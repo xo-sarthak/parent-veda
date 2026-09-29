@@ -48,6 +48,19 @@ import 'symptoms_widgets.dart';
 /// The evening reminder's id in `ReminderStore` — one, toggled.
 const String kSymptomReminderId = 'symptoms_evening';
 
+/// The evening reminder's words.
+///
+/// ⚠️ WORDS THAT FIT EVERY STAGE (2026-09-28). The reminder is set from the
+/// pregnancy Symptoms door but fires whatever stage she is in, and the user
+/// got "Two taps on the Symptoms door and your week keeps itself" while on
+/// trying to conceive, where there is no Symptoms door and no week. The
+/// reminder is stored with its words, so `ReminderStore` rewrites a stored
+/// copy of the old line on load (see `kSymptomReminderOldBody`). Kept for
+/// revert: the old line below.
+const String kSymptomReminderBody = 'Log how you felt today. It takes two taps.';
+const String kSymptomReminderOldBody =
+    'Two taps on the Symptoms door and your week keeps itself.';
+
 /// Open a symptom's page in the one reader.
 void openSymptomRead(BuildContext context, Symptom s, PregnancyController c) {
   Navigator.of(context).push(
@@ -242,7 +255,7 @@ class _SymptomsTodayBodyState extends State<SymptomsTodayBody>
         const Reminder(
           id: kSymptomReminderId,
           title: 'How was today?',
-          body: 'Two taps on the Symptoms door and your week keeps itself.',
+          body: kSymptomReminderBody,
           hour: 20,
           minute: 30,
           category: 'symptoms',

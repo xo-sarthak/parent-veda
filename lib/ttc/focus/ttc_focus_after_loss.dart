@@ -109,7 +109,8 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
     ),
     TtcFocusGroup(
         id: 'understand', mark: IntentMark.bookMark, tabMark: TtcTabMark.openBook,
-        label: 'Understand',
+        // Kept for revert (2026-09-28, explicit names): label: 'Understand',
+        label: 'Why losses happen',
         icon: Icons.menu_book_outlined,
         hue: 206),
     TtcFocusGroup(
@@ -119,7 +120,8 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
         hue: 160),
     TtcFocusGroup(
       id: 'support', mark: IntentMark.cuppedHands, tabMark: TtcTabMark.heartHand,
-      label: 'Support',
+      // Kept for revert (2026-09-28, explicit names): label: 'Support',
+      label: 'Support for you',
       icon: Icons.diversity_1_outlined,
       hue: 344,
       // ⚠️ THIS ONE CARRIES THE SELF-HARM ROUTING and the brief says in as many
@@ -143,17 +145,21 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
     //  1 — Your body (default)
     // =========================================================================
     TtcFocusSection(
-      heading: "What's happening now",
+      // Kept for revert (2026-09-28, explicit names): heading: "What's happening now",
+      heading: 'What is happening in your body now?',
       group: 'body',
       tiles: [
         TtcArticleTile(
-          title: 'Physical recovery, in plain terms',
+          // Kept for revert (2026-09-28, explicit names): title: 'Physical recovery, in plain terms',
+          title: 'Physical recovery after a loss',
+          id: 'ttc_tile_physical_recovery_after_a_loss',
           blurb: 'Bleeding, hormones, when your cycle comes back, and what to '
               'expect if you had a procedure.',
           readId: _kRecovery,
         ),
         TtcVideoTile(
           title: 'What the next few weeks look like',
+          id: 'ttc_tile_what_the_next_few_weeks_look_like',
           blurb: 'Talked through gently, by a doctor who does this work.',
           slotId: 'ttc_vid_loss_recovery',
           duration: '5 MIN',
@@ -174,6 +180,7 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
         // Recorded in `docs/STILL-OPEN.md` §26.
         TtcGuideTile(
           title: 'What normal bleeding and spotting looks like',
+          id: 'ttc_tile_what_normal_bleeding_and_spotting_looks_like',
           blurb: 'How long it lasts, how heavy it is, and how it changes with '
               'how the loss was managed.',
           readId: _kRecovery,
@@ -185,6 +192,7 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
         // own urgent callout says go to a hospital today.
         TtcGuideTile(
           title: 'Ectopic signs that need a hospital today',
+          id: 'ttc_tile_ectopic_signs_that_need_a_hospital_today',
           blurb: 'Pain on one side, shoulder-tip pain, bleeding with pain, or '
               'feeling faint.',
           readId: 'ttc_read_ectopic_pregnancy',
@@ -194,7 +202,8 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
     ),
 
     TtcFocusSection(
-      heading: 'The parts that get missed',
+      // Kept for revert (2026-09-28, explicit names): heading: 'The parts that get missed',
+      heading: 'Which follow-ups get missed?',
       group: 'body',
       tiles: [
         // PROMOTED. The article folds this section on purpose — reading it on
@@ -203,6 +212,7 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
         // has a door of its own for the woman who needs it now.
         TtcGuideTile(
           title: 'Rh status and retained tissue',
+          id: 'ttc_tile_rh_status_and_retained_tissue',
           blurb: 'The two follow-ups that get missed. One of them has a '
               'seventy-two hour window.',
           readId: _kRecovery,
@@ -213,7 +223,10 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
           // true statement never sits under a Myth vs fact chip. Kept for
           // revert: title: 'You can ovulate before your first period',
           title: 'Can you ovulate before your first period?',
-          blurb: "This matters a lot if you're not ready.",
+          id: 'ttc_tile_can_you_ovulate_before_your_first_period',
+          // Kept for revert (2026-09-28, explicit names):
+          // blurb: "This matters a lot if you're not ready.",
+          blurb: "Ovulation can come before the first period, which matters if you're not ready.",
           myth: "You can't get pregnant again until your period comes back.",
           fact: 'Ovulation usually comes back before the first period, often '
               'two to four weeks after a loss. So you can get pregnant again '
@@ -229,11 +242,14 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
     //  2 — Understand
     // =========================================================================
     TtcFocusSection(
-      heading: 'Could this have been prevented?',
+      // Kept for revert (2026-09-28, explicit names): heading: 'Could this have been prevented?',
+      heading: 'Could the loss have been prevented?',
       group: 'understand',
       tiles: [
         TtcGuideTile(
-          title: "It almost certainly couldn't have been prevented",
+          // Kept for revert (2026-09-28, explicit names): title: "It almost certainly couldn't have been prevented",
+          title: 'Most early losses could not have been prevented',
+          id: 'ttc_tile_most_early_losses_could_not_have_been_prevented',
           blurb: 'Most early losses are a chromosome error that was there from '
               "the beginning. It isn't inherited, and nobody caused it.",
           readId: _kTryingAgain,
@@ -243,6 +259,7 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
         // long list of everyday things that don't cause a loss.
         TtcArticleTile(
           title: 'What causes a miscarriage, and what doesn\'t',
+          id: 'ttc_tile_what_causes_a_miscarriage_and_what_doesn_t',
           blurb: 'The real reasons, and the everyday things you can let go of.',
           readId: 'ttc_read_miscarriage_causes',
         ),
@@ -262,11 +279,14 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
     ),
 
     TtcFocusSection(
-      heading: "When it's worth looking further",
+      // Kept for revert (2026-09-28, explicit names): heading: "When it's worth looking further",
+      heading: 'When is it worth looking for a cause?',
       group: 'understand',
       tiles: [
         TtcGuideTile(
-          title: 'When to ask for tests',
+          // Kept for revert (2026-09-28, explicit names): title: 'When to ask for tests',
+          title: 'When to ask for tests after a loss',
+          id: 'ttc_tile_when_to_ask_for_tests',
           blurb: 'After two losses, not three. ESHRE changed that line, and '
               "many places haven't caught up.",
           readId: _kTryingAgain,
@@ -289,6 +309,7 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
         // the one question is answered in one tab.
         TtcArticleTile(
           title: 'Recurrent miscarriage',
+          id: 'ttc_tile_recurrent_miscarriage',
           blurb: 'Which tests help after more than one loss, and when.',
           readId: 'ttc_read_recurrent_miscarriage',
         ),
@@ -299,6 +320,7 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
           // true statement never sits under a Myth vs fact chip. Kept for
           // revert: title: "One miscarriage isn't a pattern",
           title: 'Does one miscarriage mean another?',
+          id: 'ttc_tile_does_one_miscarriage_mean_another',
           blurb: "One loss doesn't change what comes next.",
           myth: "One miscarriage means it's likely to happen again.",
           fact: 'After a single loss, the chance for a next pregnancy is close '
@@ -314,17 +336,22 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
     // read carries "go to a hospital today" in its own callout; the Your body
     // tab's pinned flag still covers heavy bleeding, fever and fainting.
     TtcFocusSection(
-      heading: 'What kind of loss was it?',
+      // Kept for revert (2026-09-28, explicit names): heading: 'What kind of loss was it?',
+      heading: 'What kind of loss did you have?',
       group: 'understand',
       tiles: [
         TtcArticleTile(
           title: 'Chemical pregnancy',
+          id: 'ttc_tile_chemical_pregnancy',
           blurb: 'When a positive test turns into a period, and what it means.',
           readId: 'ttc_read_chemical_pregnancy',
         ),
         TtcArticleTile(
           title: 'Ectopic pregnancy',
-          blurb: 'The signs that need a hospital today, and what comes after.',
+          id: 'ttc_tile_ectopic_pregnancy',
+          // Kept for revert (2026-09-28, explicit names):
+          // blurb: 'The signs that need a hospital today, and what comes after.',
+          blurb: 'What an ectopic pregnancy is, how it is treated, and trying again after one.',
           readId: 'ttc_read_ectopic_pregnancy',
         ),
       ],
@@ -334,11 +361,14 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
     //  3 — Trying again
     // =========================================================================
     TtcFocusSection(
-      heading: 'When, and who decides',
+      // Kept for revert (2026-09-28, explicit names): heading: 'When, and who decides',
+      heading: 'When can you try again?',
       group: 'again',
       tiles: [
         TtcArticleTile(
-          title: 'On trying again',
+          // Kept for revert (2026-09-28, explicit names): title: 'On trying again',
+          title: 'When to try again, and who decides',
+          id: 'ttc_tile_when_to_try_again_and_who_decides',
           blurb: "When it's safe, what the evidence says about waiting, and "
               'who decides.',
           readId: _kTryingAgain,
@@ -348,6 +378,7 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
           // true statement never sits under a Myth vs fact chip. Kept for
           // revert: title: 'The six-month wait, and where it came from',
           title: 'Do you have to wait six months?',
+          id: 'ttc_tile_do_you_have_to_wait_six_months',
           blurb: 'One 2007 recommendation, one study, and what the evidence '
               'has shown since.',
           myth: 'You have to wait three to six months before trying again.',
@@ -365,12 +396,16 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
     ),
 
     TtcFocusSection(
-      heading: 'If and when you do',
+      // Kept for revert (2026-09-28, explicit names): heading: 'If and when you do',
+      heading: 'If and when you try again',
       group: 'again',
       tiles: [
         TtcGuideTile(
           title: 'What to do differently next time',
-          blurb: "It's a short list, shorter than the internet suggests.",
+          id: 'ttc_tile_what_to_do_differently_next_time',
+          // Kept for revert (2026-09-28, explicit names):
+          // blurb: "It's a short list, shorter than the internet suggests.",
+          blurb: 'The list of changes is short, shorter than the internet suggests.',
           readId: _kTryingAgain,
           atHeading: 'If and when you do try again',
         ),
@@ -381,6 +416,7 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
         // Recorded in §26; it is one entry in `ttc_videos_data.dart` away.
         TtcArticleTile(
           title: 'Trying again: the feelings',
+          id: 'ttc_tile_trying_again_the_feelings',
           blurb: 'Fear, guilt and hope, often in the same day.',
           readId: 'ttc_read_loss_feelings',
         ),
@@ -426,6 +462,7 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
         // ),
         TtcCommunityTile(
           title: 'Your Care Circle',
+          id: 'ttc_tile_your_care_circle',
           // She has not chosen anyone yet: the circle is filled by the app
           // and her partner (2026-09-27). Kept for revert: 'The people you
           // chose. As much or as little as you want.'
@@ -451,7 +488,9 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
         //   action: kTtcActConsult,
         // ),
         TtcTalkTile(
-          title: 'Someone who knows this kind of loss',
+          // Kept for revert (2026-09-28, explicit names): title: 'Someone who knows this kind of loss',
+          title: 'A psychologist who knows pregnancy loss',
+          id: 'ttc_tile_someone_who_knows_this_kind_of_loss',
           blurb: 'A private talk with a psychologist, at your own pace.',
           action: 'ttc_psych_consult',
         ),
@@ -460,6 +499,7 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
         // signs and where to call.
         TtcGuideTile(
           title: 'When grief needs more help',
+          id: 'ttc_tile_when_grief_needs_more_help',
           blurb: 'The signs it is getting heavier, not easier, and who to '
               'call.',
           readId: 'ttc_read_loss_feelings',
@@ -472,6 +512,7 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
         // every other door uses. Its blurb carries no price.
         TtcMasterclassTile(
           title: 'After a loss, four sessions',
+          id: 'ttc_tile_after_a_loss_four_sessions',
           blurb: 'A small group, led by a counsellor, over four weeks. With '
               "people who've been through what you have.",
           offeringId: 'ttc_loss_support',

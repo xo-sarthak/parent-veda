@@ -238,7 +238,8 @@ final List<PvRead> kTtcReadsSex = [
     nextSteps: [
       PvReadNextStep(
         kind: PvNextKind.tool,
-        title: _en("See this cycle's window"),
+        // Kept for revert (2026-09-28, explicit names): title: _en("See this cycle's window"),
+        title: _en("See this cycle's fertile window"),
         value: _en('Know roughly when it is, so the rest of the month can be '
             'just yours.'),
         surfaceId: 'ttc_window',
@@ -694,7 +695,8 @@ final List<PvRead> kTtcReadsSex = [
       ),
       PvReadNextStep(
         kind: PvNextKind.tool,
-        title: _en('Note it for your next visit'),
+        // Kept for revert (2026-09-28, explicit names): title: _en('Note it for your next visit'),
+        title: _en('Note the pain for your next visit'),
         value: _en('Where it hurts and when, written down, so you don\'t have '
             'to find the words on the day.'),
         surfaceId: 'ttc_appointments',
@@ -923,7 +925,8 @@ final List<PvRead> kTtcReadsSex = [
       ),
       PvReadNextStep(
         kind: PvNextKind.tool,
-        title: _en("See this cycle's window"),
+        // Kept for revert (2026-09-28, explicit names): title: _en("See this cycle's window"),
+        title: _en("See this cycle's fertile window"),
         value: _en('The days you may want one to hand.'),
         surfaceId: 'ttc_window',
       ),
@@ -1135,7 +1138,8 @@ final List<PvRead> kTtcReadsSex = [
       ),
       PvReadNextStep(
         kind: PvNextKind.tool,
-        title: _en("See this cycle's window"),
+        // Kept for revert (2026-09-28, explicit names): title: _en("See this cycle's window"),
+        title: _en("See this cycle's fertile window"),
         value: _en('Where you are in the month, and when to test.'),
         surfaceId: 'ttc_window',
       ),
@@ -1359,12 +1363,13 @@ final List<PvRead> kTtcReadsSex = [
         value: _en('Share the plan so neither of you carries it alone.'),
         surfaceId: 'ttc_partner',
       ),
-      PvReadNextStep(
-        kind: PvNextKind.tool,
-        title: _en('Write it down'),
-        value: _en('A private place for what is hard to say out loud.'),
-        surfaceId: 'ttc_journal',
-      ),
+      // Kept for revert (2026-09-28, journal out of TTC): this next step opened the journal, which left the stage.
+      // PvReadNextStep(
+      //   kind: PvNextKind.tool,
+      //   title: _en('Write it down'),
+      //   value: _en('A private place for what is hard to say out loud.'),
+      //   surfaceId: 'ttc_journal',
+      // ),
     ],
     readNext: [
       'ttc_read_sex_homework',

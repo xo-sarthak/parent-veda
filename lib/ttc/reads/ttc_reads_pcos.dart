@@ -1368,12 +1368,17 @@ final List<PvRead> kTtcReadsPcos = [
             'are needed. If a scan was the only thing done, it is very fair to '
             'go back and ask what else was looked at.'),
       ),
-      PvReadFaq(
-        question: _en('Will I need IVF?'),
-        answer: _en("Most people with PCOS don't. Tablets to help you ovulate "
-            'are the usual first step, and they work for many. IVF is further '
-            'along the same road, not the starting point.'),
-      ),
+      // ⚠️ COMMENTED OUT, NOT DELETED (2026-09-28, no repetition). The same
+      // question, with nearly the same answer, is in "Getting pregnant with
+      // PCOS: what to expect" (ttc_read_pcos_timelines), on the same door's
+      // Trying with PCOS tab, which is where the treatment path lives.
+      // Kept for revert:
+      // PvReadFaq(
+      //   question: _en('Will I need IVF?'),
+      //   answer: _en("Most people with PCOS don't. Tablets to help you ovulate "
+      //       'are the usual first step, and they work for many. IVF is further '
+      //       'along the same road, not the starting point.'),
+      // ),
     ],
     evidence: _en('2023 International Evidence-Based Guideline for the '
         'Assessment and Management of Polycystic Ovary Syndrome (Monash '
@@ -1691,7 +1696,9 @@ final List<PvRead> kTtcReadsPcos = [
     ),
     faqs: [
       PvReadFaq(
-        question: _en('Will I need IVF?'),
+        // Kept for revert (2026-09-28, explicit names):
+        // question: _en('Will I need IVF?'),
+        question: _en('Will I need IVF to get pregnant with PCOS?'),
         answer: _en("Most people with PCOS don't. Tablets to bring on "
             'ovulation are the usual first step, and they help a large share '
             'of people. IVF is further along the same road for those they '

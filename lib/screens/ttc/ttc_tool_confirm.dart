@@ -52,7 +52,8 @@ Future<bool> ttcConfirmRemove(
           onPressed: () => Navigator.of(ctx).pop(true),
           child: Text(yes,
               style: ttcBody(13,
-                  color: const Color(0xFFD92D20), w: FontWeight.w800)),
+                  // One danger red, DESIGN-SYSTEM §4.0 (2026-09-29). Kept for revert: Color(0xFFD92D20)
+                  color: const Color(0xFFB3261E), w: FontWeight.w800)),
         ),
       ],
     ),

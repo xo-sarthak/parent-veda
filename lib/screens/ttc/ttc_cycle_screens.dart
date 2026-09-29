@@ -20,6 +20,9 @@ import '../../ttc/ttc_fertile_window.dart';
 import '../../ttc/ttc_store.dart';
 import 'ttc_common.dart';
 import 'ttc_cycle_companion.dart';
+import 'ttc_cycle_palette.dart' show TtcCycleColours;
+import 'ttc_tool_chrome.dart'
+    show TtcHeroFieldCard, TtcHeroFieldTag;
 import 'ttc_ovulation_screen.dart';
 import 'ttc_strings.dart';
 import 'ttc_today_screen.dart' show logTtcPeriod;
@@ -100,7 +103,8 @@ class TtcCycleScreen extends StatelessWidget {
                   // the two can never drift into disagreeing again.
                   ttcSectionTitle(t.yourRhythm),
                   TtcCard(
-                    color: ttcPanel,
+                    // Kept for revert (2026-09-29, no tinted slab behind text): color: ttcPanel,
+                    border: ttcLine,
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -161,7 +165,8 @@ class TtcCycleScreen extends StatelessWidget {
                   const SizedBox(height: 20),
                 ] else if (today.cycleDay != null) ...[
                   TtcCard(
-                    color: ttcPanel,
+                    // Kept for revert (2026-09-29, no tinted slab behind text): color: ttcPanel,
+                    border: ttcLine,
                     child: Text(t.cycleNeedMore, style: ttcBody(13.5, h: 1.55)),
                   ),
                   const SizedBox(height: 20),
@@ -174,7 +179,7 @@ class TtcCycleScreen extends StatelessWidget {
                       behavior: HitTestBehavior.opaque,
                       child: Text(t.logPeriodCta,
                           style: ttcBody(12,
-                              color: ttcPurple, w: FontWeight.w800)),
+                              color: ttcTitleInk, w: FontWeight.w800)),
                     )),
                 if (cycle.periodStarts.isEmpty)
                   TtcEmpty(
@@ -572,7 +577,7 @@ class _SignalRow extends StatelessWidget {
           if (on) ...[
             const SizedBox(height: 5),
             Text(t.whichCycleDay(day!),
-                style: ttcBody(12, color: ttcPurple, w: FontWeight.w700)),
+                style: ttcBody(12, color: ttcTitleInk, w: FontWeight.w700)),
           ],
         ]),
       ),
@@ -602,7 +607,7 @@ class _SignalRow extends StatelessWidget {
             color: !enabled
                 ? ttcPanel
                 : on
-                    ? ttcPurple
+                    ? ttcTitleInk
                     : ttcPanel,
             borderRadius: BorderRadius.circular(999),
           ),
@@ -613,7 +618,7 @@ class _SignalRow extends StatelessWidget {
                     ? ttcMuted
                     : on
                         ? Colors.white
-                        : ttcPurple,
+                        : ttcTitleInk,
                 w: FontWeight.w800),
           ),
         ),
@@ -685,7 +690,8 @@ class _TtcFertilityWindowScreenState extends State<TtcFertilityWindowScreen> {
                   TtcTreatmentEntryCard(t: t),
                 ] else ...[
                   TtcCard(
-                    color: ttcPanel,
+                    // Kept for revert (2026-09-29, no tinted slab behind text): color: ttcPanel,
+                    border: ttcLine,
                     child:
                         Text(t.fertilityWindowNote, style: ttcBody(13.5, h: 1.6)),
                   ),
@@ -794,40 +800,30 @@ class _WindowSummary extends StatelessWidget {
             ? t.windowOpenNow
             : t.windowOpensIn(window.daysUntilOpen);
 
-    return Container(
+    // ⚠️ THE TOOLS' LIGHT FIELD, INK TYPE (2026-09-29): see `TtcHeroFieldCard`.
+    // The fertile hue, the one the window screen's own field wears.
+    // Kept for revert (2026-09-29): a Container, padding 18, decorated with
+    //   LinearGradient(begin: topLeft, end: bottomRight,
+    //       colors: [ttcPurple, ttcPurpleDeep]);
+    // every line white (the label at 85%, the peak at 92%, the projected
+    // note at 82%) and the status a white 20% pill with white words.
+    return TtcHeroFieldCard(
+      hue: TtcCycleColours.fertileHue,
       padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(ttcCardRadius),
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [ttcPurple, ttcPurpleDeep],
-        ),
-      ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
           Expanded(
             child: Text(t.windowYourDays,
-                style: ttcBody(11.5,
-                    color: Colors.white.withValues(alpha: 0.85),
-                    w: FontWeight.w800)),
+                style: ttcBody(11.5, color: ttcInk, w: FontWeight.w800)),
           ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(999),
-            ),
-            child: Text(status,
-                style: ttcBody(10.5, color: Colors.white, w: FontWeight.w800)),
-          ),
+          TtcHeroFieldTag(status),
         ]),
         const SizedBox(height: 9),
         Row(children: [
           Expanded(
             child: Text(
                 t.windowRange(_fmt(window.opensOn), _fmt(window.closesOn)),
-                style: ttcFraunces(24, w: FontWeight.w600, color: Colors.white)),
+                style: ttcFraunces(24, w: FontWeight.w600, color: ttcInk)),
           ),
           // ---- the arrows ------------------------------------------------
           //
@@ -852,17 +848,14 @@ class _WindowSummary extends StatelessWidget {
         ]),
         const SizedBox(height: 8),
         Text('${t.windowPeakDay} · ${_fmt(window.peakOn)}',
-            style: ttcBody(12.5,
-                color: Colors.white.withValues(alpha: 0.92),
-                w: FontWeight.w700)),
+            style: ttcBody(12.5, color: ttcInk, w: FontWeight.w700)),
         // ⚠️ A PROJECTION SAYS SO, IN WORDS, ON THE CARD. Not only in the chip
         // — a chip is read once and then stops being read, and these dates look
         // exactly as confident as the current cycle's.
         if (window.cyclesAhead > 0) ...[
           const SizedBox(height: 10),
           Text(t.windowProjectedNote,
-              style: ttcBody(11.5,
-                  color: Colors.white.withValues(alpha: 0.82), h: 1.45)),
+              style: ttcBody(11.5, color: ttcInk, h: 1.45)),
         ],
       ]),
     );
@@ -895,13 +888,16 @@ class _StepArrow extends StatelessWidget {
             width: 32,
             height: 32,
             alignment: Alignment.center,
+            // On the light field (2026-09-29): a white round with an ink
+            // chevron, a control in the switch black. Kept for revert: fill
+            // white at 20% (7% off), the chevron white (35% off).
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.white.withValues(alpha: enabled ? 0.2 : 0.07),
+              color: Colors.white.withValues(alpha: enabled ? 0.78 : 0.35),
             ),
             child: Icon(icon,
                 size: 20,
-                color: Colors.white.withValues(alpha: enabled ? 1 : 0.35)),
+                color: ttcInk.withValues(alpha: enabled ? 1 : 0.3)),
           ),
         ),
       );
@@ -997,11 +993,11 @@ class _DayBar extends StatelessWidget {
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text('${date.day} ${_m[date.month - 1]}',
                 style: ttcBody(12,
-                    color: isToday ? ttcPurple : ttcInk,
+                    color: isToday ? ttcTitleInk : ttcInk,
                     w: isToday ? FontWeight.w900 : FontWeight.w700)),
             Text(_wd[(date.weekday - 1) % 7],
                 style: ttcBody(10.5,
-                    color: isToday ? ttcPurple : ttcMuted,
+                    color: isToday ? ttcTitleInk : ttcMuted,
                     w: FontWeight.w600)),
           ]),
         ),

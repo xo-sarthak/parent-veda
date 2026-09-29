@@ -1289,7 +1289,10 @@ final List<PvRead> kTtcReadsBodyIntimate = [
     ],
     faqs: [
       PvReadFaq(
-        question: _en('How do I bring this up with my husband?'),
+        // Kept for revert (2026-09-28, no repetition; the same question was in
+        // the PID read on this door):
+        // question: _en('How do I bring this up with my husband?'),
+        question: _en('How do I bring up an infection test with my husband?'),
         answer: _en("You could say it's on the list of tests the doctor suggests "
             "before trying, which is true. Doing it together, as a couple's "
             "check, makes it feel routine rather than personal."),
@@ -1350,6 +1353,11 @@ final List<PvRead> kTtcReadsBodyIntimate = [
         surfaceId: 'ttc_read/ttc_read_preconception_tests',
       ),
     ],
-    readNext: ['ttc_read_preconception_tests', 'ttc_read_discharge_guide'],
+    // ⚠️ ONE READ, ONCE, AT THE FOOT (2026-09-28, no repetition):
+    // 'ttc_read_preconception_tests' is the next step "The tests and vaccinations worth doing first",
+    // so the Read next rail no longer lists it a second time.
+    // Kept for revert:
+    // readNext: ['ttc_read_preconception_tests', 'ttc_read_discharge_guide'],
+    readNext: ['ttc_read_discharge_guide'],
   ),
 ];

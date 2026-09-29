@@ -114,7 +114,10 @@ void main() {
     test('the ritual and journal cards are still built', () {
       final src = codeOf('lib/screens/ttc/ttc_today_screen.dart');
       expect(src, contains('_RitualCard(t: t, chapter: chapter)'));
-      expect(src, contains('_JournalCard(t: t, chapter: chapter)'));
+      // Kept for revert (2026-09-28, journal out of TTC): the journal left
+      // the stage, so its card is commented out on Today.
+      //   expect(src, contains('_JournalCard(t: t, chapter: chapter)'));
+      expect(src, isNot(contains('_JournalCard(t: t, chapter: chapter)')));
     });
 
     testWidgets('and the ritual can still be ticked from Today',

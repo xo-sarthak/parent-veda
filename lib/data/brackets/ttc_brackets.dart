@@ -332,7 +332,9 @@ final List<Bracket> kTtcBrackets = [
       // The one bracket in the stage whose Activities layer the workbook
       // actively wants — "rides light preconception spine" — and `ttc_ritual`
       // is exactly that spine.
-      BracketLayer.activities: BracketLayerSpec.live(['ttc_ritual', 'ttc_journal']),
+      // Kept for revert (2026-09-28, journal out of TTC):
+      //   BracketLayerSpec.live(['ttc_ritual', 'ttc_journal']),
+      BracketLayer.activities: BracketLayerSpec.live(['ttc_ritual']),
       BracketLayer.tools:
           BracketLayerSpec(state: LayerState.notCore, reason: 'Not core'),
       BracketLayer.products:

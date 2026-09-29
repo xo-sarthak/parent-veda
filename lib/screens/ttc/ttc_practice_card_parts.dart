@@ -31,6 +31,7 @@ import 'package:flutter/material.dart';
 import '../../theme/pv_fonts.dart';
 import '../../ttc/ttc_daily_data.dart' show TtcRitualPart;
 import '../v2/v2_palette.dart';
+import 'ttc_common.dart' show ttcTitleInk;
 
 // ⚠️ THE ONE PICKER FOR "TODAY'S MOVEMENT" AND "TODAY'S BREATH", RE-EXPORTED
 // (launch sanity MB18, 2026-09-28). The home already imports this file for
@@ -149,11 +150,13 @@ class TtcInkPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final p = V2PaletteStore.instance.current;
+    // Kept for revert (2026-09-29): the pill read p.ink1; it is the switch
+    // black now (ttcTitleInk), so the palette is not read here.
+    //   final p = V2PaletteStore.instance.current;
     final pill = Container(
       padding: const EdgeInsets.fromLTRB(16, 9, 12, 9),
       decoration: BoxDecoration(
-        color: p.ink1,
+        color: ttcTitleInk,
         borderRadius: BorderRadius.circular(999),
       ),
       child: Row(

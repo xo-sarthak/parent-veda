@@ -543,6 +543,8 @@ class _TtcSymptomLogScreenState extends State<TtcSymptomLogScreen> {
         //           ...the search pill and everything below...
         return TtcToolScaffold(
           hue: kTtcLogHue,
+          // The tool's mark over the eyebrow (2026-09-29, ttc_tool_marks.dart).
+          toolId: 'symptoms',
           variant: 3,
           // ⚠️ ONE NAME: the Tools tile's, word for word.
           eyebrow: kTtcLogEyebrow,
@@ -727,7 +729,9 @@ class _TtcSymptomLogScreenState extends State<TtcSymptomLogScreen> {
                     // Says what is below, not what kind of thing it is
                     // (2026-09-27). Kept for revert: Text(t.logCategories, ...).
                     Expanded(
-                        child: Text(kTtcLogMoreHeading, style: ttcJakarta(18))),
+                        // Kept for revert (2026-09-29, one heading style):
+                        // child: Text(kTtcLogMoreHeading, style: ttcJakarta(18))),
+                        child: TtcSectionHeading(kTtcLogMoreHeading)),
                     // ⚠️ PURPLE, AND IT DOES SOMETHING. It shipped coral —
                     // borrowed straight off the reference — and did nothing at
                     // all. Both halves of that were wrong: coral in this stage
@@ -748,7 +752,7 @@ class _TtcSymptomLogScreenState extends State<TtcSymptomLogScreen> {
                       child: Text(kTtcLogShowHide,
                           key: const ValueKey('ttc_log_show_hide'),
                           style: ttcBody(13.5,
-                              color: ttcPurple, w: FontWeight.w800)),
+                              color: ttcTitleInk, w: FontWeight.w800)),
                     ),
                   ]),
                   // ⚠️ A HIDDEN CARD IS SAID, NOT SILENT (tool rebuild). A
@@ -878,6 +882,7 @@ class _TtcSymptomLogScreenState extends State<TtcSymptomLogScreen> {
                       dayName: _dayName,
                       hint: kTtcMeasureWeightHint,
                       onViewChart: () => _openChart(TtcMeasureKind.weight),
+                      chartLabel: kTtcMeasureViewWeightChart,
                     ),
                   const SizedBox(height: 12),
                   _MeasureCard(
@@ -900,6 +905,7 @@ class _TtcSymptomLogScreenState extends State<TtcSymptomLogScreen> {
                       hint: kTtcMeasureTempHint,
                       onViewChart: () =>
                           _openChart(TtcMeasureKind.temperature),
+                      chartLabel: kTtcMeasureViewTempChart,
                       // The fourteen-dot line gave way to the whole-cycle
                       // chart below.
                       //
@@ -924,7 +930,7 @@ class _TtcSymptomLogScreenState extends State<TtcSymptomLogScreen> {
                                     '$kTtcReadPrefix$kTtcTempReadId'),
                                 child: Text(kTtcTempReadLink,
                                     style: ttcBody(11.5,
-                                        color: ttcPurple,
+                                        color: ttcTitleInk,
                                         w: FontWeight.w800,
                                         h: 1.35)),
                               ),
@@ -1181,7 +1187,7 @@ class _Bubble extends StatelessWidget {
               decoration: BoxDecoration(
                 color: tint,
                 shape: BoxShape.circle,
-                border: on ? Border.all(color: deep, width: 2) : null,
+                border: on ? Border.all(color: ttcTitleInk, width: 2) : null,
               ),
               // ⚠️ DRAWN, NOT TYPED. See `ttc_mood_face.dart` for why an
               // emoji was the wrong object here — briefly: it is rendered by
@@ -1198,7 +1204,7 @@ class _Bubble extends StatelessWidget {
                   height: 20,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                      color: deep,
+                      color: ttcTitleInk,
                       shape: BoxShape.circle,
                       border: Border.all(color: Colors.white, width: 2)),
                   child: const Icon(Icons.check_rounded,
@@ -1309,13 +1315,13 @@ class _LinkRow extends StatelessWidget {
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Row(children: [
-          Icon(icon, size: 16, color: ttcPurple),
+          Icon(icon, size: 16, color: ttcTitleInk),
           const SizedBox(width: 8),
           Flexible(
             child: Text(label,
-                style: ttcBody(13, color: ttcPurple, w: FontWeight.w800)),
+                style: ttcBody(13, color: ttcTitleInk, w: FontWeight.w800)),
           ),
-          const Icon(Icons.chevron_right_rounded, size: 18, color: ttcPurple),
+          const Icon(Icons.chevron_right_rounded, size: 18, color: ttcTitleInk),
         ]),
       );
 }
@@ -1399,7 +1405,7 @@ class _Chip extends StatelessWidget {
         decoration: BoxDecoration(
           color: tint.withValues(alpha: on ? 1 : 0.45),
           borderRadius: BorderRadius.circular(999),
-          border: on ? Border.all(color: deep, width: 1.6) : null,
+          border: on ? Border.all(color: ttcTitleInk, width: 1.6) : null,
         ),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
           Container(
@@ -1632,7 +1638,8 @@ Future<void> _ttcMeasureSheet(
                     _Nudge(
                         key: const ValueKey('ttc_measure_minus'),
                         icon: Icons.remove_rounded,
-                        label: 'Less',
+                        // Kept for revert (2026-09-28): 'Less'
+                        label: 'Lower the reading',
                         onTap: () => nudge(-1)),
                     const SizedBox(width: 14),
                     if (typing)
@@ -1686,7 +1693,8 @@ Future<void> _ttcMeasureSheet(
                     _Nudge(
                         key: const ValueKey('ttc_measure_plus'),
                         icon: Icons.add_rounded,
-                        label: 'More',
+                        // Kept for revert (2026-09-28): 'More'
+                        label: 'Raise the reading',
                         onTap: () => nudge(1)),
                   ]),
                   const SizedBox(height: 4),
@@ -1821,7 +1829,11 @@ class _MeasureCard extends StatelessWidget {
     this.dayName = 'Today',
     this.hint = '',
     this.onViewChart,
+    this.chartLabel = kTtcMeasureViewChart,
   });
+
+  /// The chart link's words, naming its chart (2026-09-28).
+  final String chartLabel;
 
   /// What sits under the number. Null draws the fourteen-reading sparkline.
   final Widget? under;
@@ -2010,7 +2022,8 @@ class _MeasureCard extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(14, 13, 12, 13),
               child: Row(children: [
                 Expanded(
-                  child: Text(kTtcMeasureViewChart,
+                  // Kept for revert (2026-09-28): Text(kTtcMeasureViewChart,
+                  child: Text(chartLabel,
                       style: ttcBody(13.5,
                           color: ttcTitleInk, w: FontWeight.w700)),
                 ),
@@ -3059,7 +3072,8 @@ const String kTtcLogMoreHeading = 'More to log';
 const String kTtcLogShowHide = kTtcEditCategoriesTitle;
 
 /// On the two test cards, where a new answer replaces the old one.
-const String kTtcLogPickOne = 'Pick one';
+// Kept for revert (2026-09-28): 'Pick one'
+const String kTtcLogPickOne = 'Pick one answer';
 
 /// A search that finds no chip.
 const String kTtcLogSearchNothing =
@@ -3296,7 +3310,11 @@ const String kTtcLogPregnancyQuestion = "Can these tell me if I'm pregnant?";
 const String kTtcMeasureAdd = 'Add';
 
 /// The foot of each number card, to the report's chart (U2, 2026-09-28).
+// Kept for revert (2026-09-28): the one label both cards wore. Each card
+// now names its own chart (no two tappables with one label on a screen).
 const String kTtcMeasureViewChart = 'View chart';
+const String kTtcMeasureViewWeightChart = 'View weight chart';
+const String kTtcMeasureViewTempChart = 'View temperature chart';
 
 /// The grey line on an empty number card, Flo's wording (U2, 2026-09-28).
 const String kTtcMeasureWeightHint = 'Log your weight';
@@ -3418,9 +3436,14 @@ class _DayPicker extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: ttcJakarta(16)),
             ),
-            const SizedBox(width: 5),
-            const Icon(Icons.calendar_today_rounded,
-                size: 13, color: ttcPurple),
+            // Kept for revert (2026-09-29, the user on build 19: "why do we
+            // need a calendar icon altogether… it's just taking space"). It
+            // was also violet on the blue field, the one accent on the
+            // header. The arrows either side are the way to change day; the
+            // name still opens the calendar for a jump, as before.
+            //   const SizedBox(width: 5),
+            //   const Icon(Icons.calendar_today_rounded,
+            //       size: 13, color: ttcPurple),
           ]),
         ),
       ),
@@ -3430,11 +3453,15 @@ class _DayPicker extends StatelessWidget {
           alignment: WrapAlignment.center,
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
+            // ⚠️ ONE TIER DARKER ON THE FIELD (DESIGN-SYSTEM §4.0 rule b,
+            // 2026-09-29): the header sits on the tinted hero field, where
+            // the metadata grey (ttcMuted) lost its contrast. Kept for
+            // revert: color: ttcMuted, on both lines.
             if (caption != null)
               Text(caption!,
-                  style: ttcBody(11.5, color: ttcMuted, w: FontWeight.w700)),
+                  style: ttcBody(11.5, color: ttcSoft, w: FontWeight.w700)),
             if (caption != null && onToday != null)
-              Text('  ·  ', style: ttcBody(11.5, color: ttcMuted)),
+              Text('  ·  ', style: ttcBody(11.5, color: ttcSoft)),
             if (onToday != null)
               GestureDetector(
                 key: const ValueKey('ttc_log_back_to_today'),
@@ -3442,7 +3469,7 @@ class _DayPicker extends StatelessWidget {
                 onTap: onToday,
                 child: Text(kTtcLogBackToToday,
                     style:
-                        ttcBody(11.5, color: ttcPurple, w: FontWeight.w800)),
+                        ttcBody(11.5, color: ttcTitleInk, w: FontWeight.w800)),
               ),
           ],
         ),
@@ -3804,7 +3831,7 @@ class _SavedRow extends StatelessWidget {
               key: ValueKey('ttc_log_saved_undo_${item.field}'),
               onPressed: onUndo,
               child: Text('Undo',
-                  style: ttcBody(13.5, color: ttcPurple, w: FontWeight.w800)),
+                  style: ttcBody(13.5, color: ttcTitleInk, w: FontWeight.w800)),
             )
           else
             IconButton(

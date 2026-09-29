@@ -41,7 +41,8 @@ import '../../theme/pv_fonts.dart';
 import '../../ttc/ttc_milestones.dart';
 import '../doors/pv_list_row.dart' show PvRowGroup;
 import '../v2/v2_palette.dart';
-import 'ttc_journal_screen.dart' show openTtcJournal;
+// Kept for revert (2026-09-28, journal out of TTC):
+// import 'ttc_journal_screen.dart' show openTtcJournal;
 import 'ttc_journey_map_screen.dart' show ttcTimelineSurface;
 import 'ttc_lookup_parts.dart';
 import 'ttc_strings.dart';
@@ -49,6 +50,7 @@ import 'ttc_surface_router.dart' show openTtcSurface;
 import 'ttc_today_screen.dart' show logTtcPeriod;
 import 'ttc_tool_chrome.dart';
 import 'ttc_tool_hues.dart';
+import 'ttc_common.dart' show ttcTitleInk;
 
 void openTtcTimeline(BuildContext context) {
   Navigator.of(context).push(MaterialPageRoute<void>(
@@ -98,12 +100,14 @@ class _TtcTimelineScreenState extends State<TtcTimelineScreen> {
         final oneStage = events.map((e) => e.stage).toSet().length <= 1;
 
         final ways = PvRowGroup(p: p, children: [
-          TtcLookupActionRow(
-            key: const ValueKey('ttc_timeline_write'),
-            icon: Icons.edit_outlined,
-            label: 'Write in the journal',
-            onTap: () => openTtcJournal(context),
-          ),
+          // Kept for revert (2026-09-28, journal out of TTC): the user took
+          // the journal out of the stage.
+          //   TtcLookupActionRow(
+          //     key: const ValueKey('ttc_timeline_write'),
+          //     icon: Icons.edit_outlined,
+          //     label: 'Write in the journal',
+          //     onTap: () => openTtcJournal(context),
+          //   ),
           TtcLookupActionRow(
             key: const ValueKey('ttc_timeline_log_period'),
             icon: Icons.water_drop_outlined,
@@ -122,9 +126,11 @@ class _TtcTimelineScreenState extends State<TtcTimelineScreen> {
           title: 'Your story, in date order.',
           // What this is, first (2026-09-27). Kept for revert:
           //   Text(t.familyTimelineIntro, ...)
+          // Kept for revert (2026-09-28, journal out of TTC):
+          //   'Everything you log, write and reach, in date order. '
           intro: hi
               ? t.familyTimelineIntro
-              : 'Everything you log, write and reach, in date order. '
+              : 'Everything you log and reach, in date order. '
                   'It keeps going into pregnancy and parenting, so '
                   'nothing starts over.',
           variant: 3,
@@ -142,9 +148,12 @@ class _TtcTimelineScreenState extends State<TtcTimelineScreen> {
                   Text(
                       hi
                           ? t.timelineEmptyBody
-                          : 'This fills by itself. A journal entry, a period '
-                              'you log and each milestone you reach show up '
-                              'here in order, and stay through pregnancy and '
+                          // Kept for revert (2026-09-28, journal out of
+                          // TTC): 'This fills by itself. A journal entry, a
+                          // period you log and each milestone you reach ...'
+                          : 'This fills by itself. Each period you log and '
+                              'each milestone you reach show up here in '
+                              'order, and stay through pregnancy and '
                               'parenting.',
                       style: ttcLookupBody(p)),
                   const SizedBox(height: 12),
@@ -217,7 +226,7 @@ class _EventStep extends StatelessWidget {
               height: 11,
               decoration: BoxDecoration(
                 color: event.kind == TimelineKind.milestone
-                    ? p.ink1
+                    ? ttcTitleInk
                     : p.surface,
                 shape: BoxShape.circle,
                 border: Border.all(color: p.ink1, width: 1.5),

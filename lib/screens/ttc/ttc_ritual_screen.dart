@@ -21,12 +21,15 @@ import 'package:flutter/material.dart';
 import '../../theme/pv_fonts.dart';
 import '../../ttc/ttc_chapter.dart';
 import '../../ttc/ttc_daily_data.dart';
-import '../../ttc/ttc_journal_store.dart' show TtcEntryKind;
+// Kept for revert (2026-09-28, journal out of TTC):
+// import '../../ttc/ttc_journal_store.dart' show TtcEntryKind;
 import '../../ttc/ttc_ritual_store.dart';
+import '../../ttc/ttc_store.dart';
 import '../products/pv_store_chrome.dart' show pvSnack;
 import '../v2/v2_palette.dart';
 import 'ttc_common.dart';
-import 'ttc_journal_screen.dart' show writeTtcEntry;
+// Kept for revert (2026-09-28, journal out of TTC):
+// import 'ttc_journal_screen.dart' show writeTtcEntry;
 import 'ttc_practice_card_parts.dart';
 import '../../ttc/ttc_mind_today.dart'
     show ttcSanskarItems, ttcSanskarBreathPractice;
@@ -63,12 +66,18 @@ const double kTtcRitualHue = 42;
 //  `TtcRitualScreenClassic`; nothing pushes it.
 // =============================================================================
 class TtcRitualScreen extends StatefulWidget {
-  const TtcRitualScreen({super.key, required this.chapter, this.focus});
+  const TtcRitualScreen(
+      {super.key, required this.chapter, this.focus, this.clinicOwned});
 
   final TtcChapter chapter;
 
   /// Which part was tapped to get here - opened on arrival.
   final TtcRitualPart? focus;
+
+  /// Whether a clinic owns her timing this cycle (a treatment round). Null
+  /// reads it from `TtcStore` (2026-09-28), so no call site has to pass it;
+  /// a test passes it.
+  final bool? clinicOwned;
 
   @override
   State<TtcRitualScreen> createState() => _TtcRitualScreenState();
@@ -121,12 +130,28 @@ class _TtcRitualScreenState extends State<TtcRitualScreen> {
           //   eyebrow: t.ritualTitle,
           eyebrow: t.sanskarTitle,
           title: 'Five small things for today',
-          intro: "Each one takes about a minute. Do any one and that's "
-              'enough for today.',
+          // ⚠️ ONE INTRO, UNDER THE TITLE, AS ONE SENTENCE BLOCK (the user on
+          // build 17, 2026-09-28: "the positioning and the font, it's not
+          // placed well"). The page had two intros: this hero line, and a
+          // second 13pt grey line ("Picked for your fertile days.") on the
+          // sheet's very first pixel, with "Tap a part to open its practice."
+          // in a third, paler style under it. Now why these five and how
+          // long they take are one Manrope paragraph in the hero's intro
+          // slot, set by the tool chrome at the stage's body size, left on
+          // the title's gutter. Headspace's page is a title, one paragraph,
+          // then the list (https://mobbin.com/screens/f2297328-ef5d-42b9-96ba-e851f428f5e4).
+          // Kept for revert:
+          //   intro: "Each one takes about a minute. Do any one and that's "
+          //       'enough for today.',
+          intro: ttcRitualIntro(chapter,
+              clinicOwned: widget.clinicOwned ?? _clinicOwnedNow()),
           children: [
             ttcToolPad(Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Clear of the sheet's rounded top: the 22 every rebuilt tool
+                // starts its sheet with (the practice page's MB10 fix).
+                const SizedBox(height: 22),
                 // ⚠️ NO CHAPTER NAME ON ITS OWN (the user, 2026-09-27:
                 // "Trying Together... that word is not making any sense").
                 // One sentence, not two fragments (H15, 2026-09-28): "Picked
@@ -134,11 +159,13 @@ class _TtcRitualScreenState extends State<TtcRitualScreen> {
                 // time to try this month." Kept for revert:
                 //   'Picked for this part of your month. '
                 //   '${ttcChapterPlainPart(chapter)}',
-                Text(_pickedFor(chapter),
-                    style: pvManrope(
-                        fontSize: 13, height: 1.5, color: pal.ink2)),
-                const SizedBox(height: 12),
-                if (doneParts.isNotEmpty)
+                // Kept for revert (2026-09-28): the chapter line on the sheet,
+                // now the first sentence of the hero's intro.
+                //   Text(_pickedFor(chapter),
+                //       style: pvManrope(
+                //           fontSize: 13, height: 1.5, color: pal.ink2)),
+                //   const SizedBox(height: 12),
+                if (doneParts.isNotEmpty) ...[
                   Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Padding(
                       padding: const EdgeInsets.only(top: 1),
@@ -154,11 +181,18 @@ class _TtcRitualScreenState extends State<TtcRitualScreen> {
                               fontWeight: FontWeight.w700,
                               color: pal.ink1)),
                     ),
-                  ])
-                else
-                  Text('Tap a part to open it.',
-                      style: pvManrope(fontSize: 13, color: pal.ink3)),
-                const SizedBox(height: 16),
+                  ]),
+                  const SizedBox(height: 16),
+                ],
+                // ⚠️ NO "TAP" HINT (2026-09-28). Each part is a tinted card
+                // with a chevron, which already says it opens; a line telling
+                // her to tap was a fragment on its own line in a third style.
+                // Kept for revert:
+                //   else
+                //     // Kept for revert (2026-09-28): 'Tap a part to open it.'
+                //     Text('Tap a part to open its practice.',
+                //         style: pvManrope(fontSize: 13, color: pal.ink3)),
+                //   const SizedBox(height: 16),
                 for (final item in items) ...[
                   _RitualRow(
                     item: item,
@@ -180,6 +214,37 @@ class _TtcRitualScreenState extends State<TtcRitualScreen> {
     );
   }
 }
+
+/// Whether a clinic owns her timing today. Never throws: a store that cannot
+/// answer is treated as her own cycle.
+bool _clinicOwnedNow() {
+  try {
+    return TtcStore.instance.today.clinicInvolved;
+  } catch (_) {
+    return false;
+  }
+}
+
+/// The ritual page's intro: why these five, then how long they take, as one
+/// paragraph under the title (2026-09-28).
+///
+/// ⚠️ NO FERTILE DAYS ON A CLINIC'S CYCLE. On a treatment round the clinic
+/// owns the timing (`TimingOwnership`), and "picked for your fertile days"
+/// is our prediction on a screen that should be deferring to them. The chapter
+/// still turns underneath, so the words name the round instead.
+String ttcRitualIntro(TtcChapter c, {bool clinicOwned = false}) =>
+    '${clinicOwned ? _pickedForRound(c) : _pickedFor(c)} Each part takes '
+    'about a minute, and doing any one part is enough for today.';
+
+String _pickedForRound(TtcChapter c) => switch (c) {
+      TtcChapter.preparingTogether => 'Picked for the months of getting ready.',
+      TtcChapter.knowingYourRhythm ||
+      TtcChapter.tryingTogether =>
+        'Picked for this stage of your treatment round.',
+      TtcChapter.theWaitingDays => "Picked for the wait before your clinic's "
+          'test.',
+      TtcChapter.aNewBeginning => 'Picked for after a positive test.',
+    };
 
 /// Why these five, in one sentence, by where she is in her month (H15).
 String _pickedFor(TtcChapter c) => switch (c) {
@@ -210,15 +275,18 @@ class _RitualRow extends StatelessWidget {
   final bool expanded;
   final VoidCallback onHeaderTap;
 
-  /// Which journal kind an answer to this part is saved as, or null where
-  /// there is nothing to write (the breath and the action).
-  TtcEntryKind? get _journalKind => switch (item.part) {
-        TtcRitualPart.reflection => TtcEntryKind.feeling,
-        TtcRitualPart.gratitude => TtcEntryKind.feeling,
-        TtcRitualPart.conversation => TtcEntryKind.memory,
-        TtcRitualPart.breath => null,
-        TtcRitualPart.action => null,
-      };
+  // Kept for revert (2026-09-28, journal out of TTC): which journal kind an
+  // answer to this part was saved as. The journal left the stage, so the
+  // ritual no longer offers to write into it.
+  // /// Which journal kind an answer to this part is saved as, or null where
+  // /// there is nothing to write (the breath and the action).
+  // TtcEntryKind? get _journalKind => switch (item.part) {
+  //       TtcRitualPart.reflection => TtcEntryKind.feeling,
+  //       TtcRitualPart.gratitude => TtcEntryKind.feeling,
+  //       TtcRitualPart.conversation => TtcEntryKind.memory,
+  //       TtcRitualPart.breath => null,
+  //       TtcRitualPart.action => null,
+  //     };
 
   void _finishBreath(BuildContext context) {
     final store = TtcRitualStore.instance;
@@ -252,7 +320,8 @@ class _RitualRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final hi = t.hinglish;
     final tint = v2BlockTint(ttcRitualPartHue(item.part), pal);
-    final kind = _journalKind;
+    // Kept for revert (2026-09-28, journal out of TTC):
+    //   final kind = _journalKind;
     return Container(
       decoration: BoxDecoration(
         color: tint,
@@ -357,18 +426,20 @@ class _RitualRow extends StatelessWidget {
                       // The breath's steps, on the practice's own page.
                       if (item.part == TtcRitualPart.breath)
                         TtcQuietPill(
-                          label: 'See the steps',
+                          // Kept for revert (2026-09-28): 'See the steps'.
+                          label: 'See the breathing steps',
                           icon: Icons.format_list_numbered_rounded,
                           onTap: () => openTtcSurface(context,
                               'ttc_practice/${ttcSanskarBreathPractice().id}'),
                         ),
-                      if (kind != null)
-                        TtcQuietPill(
-                          label: 'Write about it in our journal',
-                          icon: Icons.edit_outlined,
-                          onTap: () => writeTtcEntry(context,
-                              kind: kind, prompt: item.text(hi)),
-                        ),
+                      // Kept for revert (2026-09-28, journal out of TTC):
+                      //   if (kind != null)
+                      //     TtcQuietPill(
+                      //       label: 'Write about it in our journal',
+                      //       icon: Icons.edit_outlined,
+                      //       onTap: () => writeTtcEntry(context,
+                      //           kind: kind, prompt: item.text(hi)),
+                      //     ),
                     ]),
                   ]),
             ),
@@ -383,7 +454,8 @@ class _RitualRow extends StatelessWidget {
   Widget _buildClassic(BuildContext context) {
     final hi = t.hinglish;
     final tint = v2BlockTint(kTtcRitualHue, pal);
-    final kind = _journalKind;
+    // Kept for revert (2026-09-28, journal out of TTC):
+    //   final kind = _journalKind;
     return Container(
       decoration: BoxDecoration(
         color: pal.surface,
@@ -452,7 +524,9 @@ class _RitualRow extends StatelessWidget {
                   // ---- the breath: a minute she can follow on the ring ----
                   if (item.part == TtcRitualPart.breath) ...[
                     const SizedBox(height: 16),
-                    Text('Use this one-minute timer if it helps.',
+                    // Kept for revert (2026-09-28): 'Use this one-minute
+                    // timer if it helps.'
+                    Text('Use the one-minute timer below if you like.',
                         textAlign: TextAlign.center,
                         style: pvManrope(fontSize: 12.5, color: pal.ink3)),
                     const SizedBox(height: 8),
@@ -462,26 +536,20 @@ class _RitualRow extends StatelessWidget {
                     ),
                   ],
                   // ---- somewhere to put the answer ----------------------
-                  if (kind != null) ...[
-                    const SizedBox(height: 12),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: TextButton.icon(
-                        onPressed: () => writeTtcEntry(context,
-                            kind: kind, prompt: item.text(hi)),
-                        icon: Icon(Icons.edit_outlined,
-                            size: 17, color: pal.ink1),
-                        label: Text('Write about it in our journal',
-                            style: pvManrope(
-                                fontSize: 13.5,
-                                fontWeight: FontWeight.w700,
-                                color: pal.ink1)),
-                        style: TextButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 4, vertical: 8)),
-                      ),
-                    ),
-                  ],
+                  // Kept for revert (2026-09-28, journal out of TTC):
+                  //   if (kind != null) ...[
+                  //     const SizedBox(height: 12),
+                  //     Align(
+                  //       alignment: Alignment.centerLeft,
+                  //       child: TextButton.icon(
+                  //         onPressed: () => writeTtcEntry(context,
+                  //             kind: kind, prompt: item.text(hi)),
+                  //         icon: Icon(Icons.edit_outlined,
+                  //             size: 17, color: pal.ink1),
+                  //         label: Text('Write about it in our journal', ...),
+                  //       ),
+                  //     ),
+                  //   ],
                   const SizedBox(height: 12),
                   // ---- the tick: ink when it is still to do --------------
                   InkWell(
@@ -603,16 +671,17 @@ class _TtcRitualScreenClassicState extends State<TtcRitualScreenClassic> {
                 // What this is, first. The chapter this ritual belongs to is
                 // named under it, so it never reads as generic wellness
                 // content bolted on.
-                Container(
+                // ⚠️ THE TOOLS' LIGHT FIELD, INK TYPE (2026-09-29): see
+                // `TtcHeroFieldCard`. Kept for revert (2026-09-29): a
+                // Container, padding 18, decorated with
+                //   LinearGradient(begin: topLeft, end: bottomRight,
+                //       colors: [ttcPurple, ttcPurpleDeep]);
+                // every line and the tick in white (the body at 93%, the
+                // "Picked for" line at 80%).
+                TtcHeroFieldCard(
+                  hue: ttcChapterFieldHue(chapter),
+                  variant: TtcChapter.values.indexOf(chapter) + 1,
                   padding: const EdgeInsets.all(18),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(ttcCardRadius),
-                    gradient: const LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [ttcPurple, ttcPurpleDeep],
-                    ),
-                  ),
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -623,7 +692,7 @@ class _TtcRitualScreenClassicState extends State<TtcRitualScreenClassic> {
                         //       w: FontWeight.w600, color: Colors.white)),
                         Text('Five small things for today',
                             style: ttcFraunces(21,
-                                w: FontWeight.w600, color: Colors.white)),
+                                w: FontWeight.w600, color: ttcInk)),
                         const SizedBox(height: 7),
                         // Kept for revert (2026-09-27): an "it isn't X" line
                         // (TTC-VOICE rule 10) that said what this is not.
@@ -631,9 +700,7 @@ class _TtcRitualScreenClassicState extends State<TtcRitualScreenClassic> {
                         Text(
                             "Each one takes about a minute. Do any one and "
                             "that's enough for today. Tap a part to open it.",
-                            style: ttcBody(13,
-                                color: Colors.white.withValues(alpha: 0.93),
-                                h: 1.5)),
+                            style: ttcBody(13, color: ttcInk, h: 1.5)),
                         const SizedBox(height: 10),
                         // ⚠️ NO CHAPTER NAME ON ITS OWN (the user,
                         // 2026-09-27: "Trying Together... that word is not
@@ -641,12 +708,12 @@ class _TtcRitualScreenClassicState extends State<TtcRitualScreenClassic> {
                         // in plain words instead. Kept for revert:
                         //   'Picked for where you are now: ${chapter.title(hi)}'
                         Text(
-                            'Picked for this part of your month. '
+                            // Kept for revert (2026-09-28): 'Picked for this
+                            // part of your month. '
+                            'Picked for where you are in your month. '
                             '${ttcChapterPlainPart(chapter)}',
                             style: ttcBody(12,
-                                color: Colors.white.withValues(alpha: 0.8),
-                                w: FontWeight.w700,
-                                h: 1.4)),
+                                color: ttcInk, w: FontWeight.w700, h: 1.4)),
                         // Kept for revert (2026-09-27): the "0/5" count and
                         // the progress bar, a score on a page that promises
                         // no way to fail.
@@ -659,13 +726,13 @@ class _TtcRitualScreenClassicState extends State<TtcRitualScreenClassic> {
                           const SizedBox(height: 12),
                           Row(children: [
                             const Icon(Icons.check_circle_rounded,
-                                size: 15, color: Colors.white),
+                                size: 15, color: ttcInk),
                             const SizedBox(width: 7),
                             Expanded(
                               child: Text(
                                   'Done today: ${doneParts.join(', ')}',
                                   style: ttcBody(12.5,
-                                      color: Colors.white,
+                                      color: ttcInk,
                                       w: FontWeight.w700,
                                       h: 1.4)),
                             ),
@@ -735,7 +802,7 @@ class _RitualPartCard extends StatelessWidget {
                   alignment: Alignment.center,
                   decoration: const BoxDecoration(
                       color: ttcPanel, shape: BoxShape.circle),
-                  child: Icon(_icon(item.part), size: 19, color: ttcPurple),
+                  child: Icon(_icon(item.part), size: 19, color: ttcTitleInk),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -750,7 +817,7 @@ class _RitualPartCard extends StatelessWidget {
                 const SizedBox(width: 8),
                 if (done)
                   const Icon(Icons.check_circle_rounded,
-                      size: 22, color: ttcPurple)
+                      size: 22, color: ttcTitleInk)
                 else
                   Icon(
                       expanded
@@ -778,7 +845,7 @@ class _RitualPartCard extends StatelessWidget {
                       alignment: Alignment.center,
                       padding: const EdgeInsets.symmetric(vertical: 13),
                       decoration: BoxDecoration(
-                        color: done ? ttcPanel : ttcPurple,
+                        color: done ? ttcPanel : ttcTitleInk,
                         borderRadius: BorderRadius.circular(15),
                       ),
                       child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -787,11 +854,11 @@ class _RitualPartCard extends StatelessWidget {
                                 ? Icons.check_circle_rounded
                                 : Icons.circle_outlined,
                             size: 17,
-                            color: done ? ttcPurple : Colors.white),
+                            color: done ? ttcTitleInk : Colors.white),
                         const SizedBox(width: 8),
                         Text(done ? t.ritualDone : t.ritualMarkDone,
                             style: ttcBody(13.5,
-                                color: done ? ttcPurple : Colors.white,
+                                color: done ? ttcTitleInk : Colors.white,
                                 w: FontWeight.w800)),
                       ]),
                     ),

@@ -96,7 +96,10 @@ const List<TtcSurface> kTtcSurfaces = [
   // language, and the rest of the label is the course's own name.
   TtcSurface('ttc_garbh_course', 'Preconception garbh sanskar',
       'Preconception garbh sanskar'),
-  TtcSurface('ttc_journal', 'Our journal', 'Journal'),
+  // Kept for revert (2026-09-28, journal out of TTC): the user took the
+  // journal out of the stage. The screen and its store stay, unreached; this
+  // line and the router's case come back together.
+  //   TtcSurface('ttc_journal', 'Our journal', 'Journal'),
 
   // ---- Partner --------------------------------------------------------------
   TtcSurface('ttc_partner', 'For your partner', 'Aapke partner ke liye'),

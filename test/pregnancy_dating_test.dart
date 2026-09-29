@@ -364,17 +364,19 @@ void main() {
       store.closeRound(TtcRoundOutcome.positive);
     }
 
+    // 2026-09-28: the option names the pregnancy (was 'Date it from my
+    // transfer', four times below).
     testWidgets('the date and its basis are said, and "Not yet" changes nothing',
         (tester) async {
       positiveRound(embryo: 5);
       await pump(tester);
       final due = day(-12).add(const Duration(days: 261));
-      expect(find.text('Date it from my transfer'), findsOneWidget);
+      expect(find.text('Date my pregnancy from my transfer'), findsOneWidget);
       expect(find.textContaining('Due ${ttcDueDateText(due)}.'), findsOneWidget);
       expect(find.text('My clinic gave me a due date'), findsOneWidget);
       expect(find.text('Not now'), findsOneWidget);
 
-      await tester.tap(find.text('Date it from my transfer'));
+      await tester.tap(find.text('Date my pregnancy from my transfer'));
       await tester.pump(const Duration(milliseconds: 300));
       expect(find.text('Move to Pregnancy?'), findsOneWidget);
       expect(find.textContaining(ttcDueDateText(due)), findsWidgets);
@@ -387,7 +389,7 @@ void main() {
       expect(prefs.getString(PregnancyController.kDueDateKey), isNull);
 
       // Yes: she moves, dated by the clinic, onto the screen with Undo.
-      await tester.tap(find.text('Date it from my transfer'));
+      await tester.tap(find.text('Date my pregnancy from my transfer'));
       await tester.pump(const Duration(milliseconds: 300));
       await tester.tap(find.text('Move to Pregnancy'));
       await tester.pump(const Duration(milliseconds: 300));
@@ -407,7 +409,7 @@ void main() {
         (tester) async {
       positiveRound();
       await pump(tester);
-      expect(find.text('Date it from my transfer'), findsNothing);
+      expect(find.text('Date my pregnancy from my transfer'), findsNothing);
       expect(find.byKey(const ValueKey('ttc_to_preg_embryo_5')), findsOneWidget);
       await tester.tap(find.byKey(const ValueKey('ttc_to_preg_embryo_3')));
       await tester.pump(const Duration(milliseconds: 300));

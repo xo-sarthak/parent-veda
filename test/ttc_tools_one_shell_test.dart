@@ -113,7 +113,10 @@ void main() {
       expect(find.text('GETTING READY'), findsNothing);
       expect(find.byKey(const ValueKey('ttc_precheck_next_steps')),
           findsOneWidget,
-          reason: '"My next 3 steps" keeps its top-right place');
+          // Kept for revert (2026-09-29):
+          // reason: '"My next 3 steps" keeps its top-right place');
+          reason: 'the one route to the summary: "Notes for my doctor" '
+              'under the next three steps');
     });
   });
 

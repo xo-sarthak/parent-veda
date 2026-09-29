@@ -23,7 +23,8 @@ import 'package:parentveda/screens/ttc/ttc_medication_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_strings.dart';
 import 'package:parentveda/screens/ttc/ttc_supplements_screen.dart';
 import 'package:parentveda/services/medicine_store.dart';
-import 'package:parentveda/ttc/ttc_journal_store.dart' show TtcAuthor;
+// Moved (2026-09-28, journal out of TTC): was ttc_journal_store.dart.
+import 'package:parentveda/ttc/ttc_author.dart';
 import 'package:parentveda/ttc/ttc_supplements_store.dart';
 
 Future<void> pumpTall(WidgetTester tester, Widget child,
@@ -102,7 +103,10 @@ void main() {
     testWidgets('the hero Add opens the sheet, and the new row lands',
         (tester) async {
       await pumpTall(tester, const TtcSupplementsScreen());
-      await tester.tap(find.byKey(const ValueKey('ttc_dose_hero_add')));
+      // T13 (2026-09-28): an empty list has one add, the empty card's.
+      // Was: tester.tap(find.byKey(const ValueKey('ttc_dose_hero_add')))
+      expect(find.byKey(const ValueKey('ttc_dose_hero_add')), findsNothing);
+      await tester.tap(find.text('Add your own'));
       await tester.pumpAndSettle();
       expect(find.text('Add a supplement'), findsOneWidget);
       await tester.enterText(find.byType(TextField).first, 'Vitamin B12');
@@ -280,7 +284,8 @@ void main() {
           .where((l) => !l.trimLeft().startsWith('//'))
           .join('\n');
       expect('instance.merge('.allMatches(src).length, 1);
-      expect(src, contains("label: 'Merge them'"));
+      // Change 5 (2026-09-28). Was: "label: 'Merge them'"
+      expect(src, contains("label: 'Merge the two rows'"));
     });
   });
 
@@ -331,7 +336,8 @@ void main() {
     testWidgets('T12: a bare-number dose asks for its unit once',
         (tester) async {
       await pumpTall(tester, const TtcMedicationScreen());
-      await tester.tap(find.byKey(const ValueKey('ttc_dose_hero_add')));
+      // T13 (2026-09-28): the empty card's add. Was: the hero add's key.
+      await tester.tap(find.text(const TtcS(false).medAdd));
       await tester.pumpAndSettle();
       await tester.enterText(find.byType(TextField).first, 'DHA');
       await tester.enterText(find.byType(TextField).at(1), '3');
@@ -368,7 +374,8 @@ void main() {
 
     testWidgets('a closed clock adds no time', (tester) async {
       await pumpTall(tester, const TtcMedicationScreen());
-      await tester.tap(find.byKey(const ValueKey('ttc_dose_hero_add')));
+      // T13 (2026-09-28): the empty card's add. Was: the hero add's key.
+      await tester.tap(find.text(const TtcS(false).medAdd));
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const ValueKey('ttc_med_add_time')));
       await tester.pumpAndSettle();

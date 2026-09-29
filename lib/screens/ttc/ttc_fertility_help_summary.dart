@@ -31,6 +31,7 @@ import '../v2/v2_palette.dart';
 import 'ttc_fertility_help_screen.dart' show FertilityHelpButton;
 import 'ttc_strings.dart';
 import 'ttc_surface_router.dart';
+import 'ttc_common.dart' show ttcTitleInk, TtcSectionHeading;
 
 class TtcFertilityHelpSummaryScreen extends StatelessWidget {
   const TtcFertilityHelpSummaryScreen({super.key});
@@ -154,12 +155,11 @@ class TtcFertilityHelpSummaryScreen extends StatelessWidget {
                     const SizedBox(height: 12),
                     Divider(color: p.line, height: 1),
                     const SizedBox(height: 22),
-                    Text(t('Questions to take with you',
-                        'Saath le jaane layak sawaal'),
-                        style: pvFraunces(
-                            fontSize: 19,
-                            fontWeight: FontWeight.w600,
-                            color: p.ink1)),
+                    // Kept for revert (2026-09-29, one heading style): the
+                    // same Text with style: pvFraunces(fontSize: 19,
+                    //     fontWeight: FontWeight.w600, color: p.ink1)
+                    TtcSectionHeading(t('Questions to take with you',
+                        'Saath le jaane layak sawaal')),
                     const SizedBox(height: 12),
                     for (final q in questions)
                       Padding(
@@ -172,7 +172,7 @@ class TtcFertilityHelpSummaryScreen extends StatelessWidget {
                                 width: 5,
                                 height: 5,
                                 decoration: BoxDecoration(
-                                    color: p.action, shape: BoxShape.circle),
+                                    color: ttcTitleInk, shape: BoxShape.circle),
                               ),
                               const SizedBox(width: 11),
                               Expanded(
@@ -188,7 +188,8 @@ class TtcFertilityHelpSummaryScreen extends StatelessWidget {
                     const SizedBox(height: 24),
                     FertilityHelpButton(
                         p: p,
-                        label: t('Copy this', 'Ise copy karein'),
+                        // Kept for revert (2026-09-28): 'Copy this'
+                        label: t('Copy the summary', 'Ise copy karein'),
                         onTap: () => _copy(context, c, lang, t)),
                     const SizedBox(height: 10),
                     FertilityHelpButton(

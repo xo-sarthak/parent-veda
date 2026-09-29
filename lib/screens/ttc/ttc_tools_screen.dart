@@ -27,6 +27,9 @@
 //        the matching door's, so a colour means one subject across the stage.
 //        Mobbin: AH-SEARCH (category colour on each glyph) and Fresha search
 //        (https://mobbin.com/screens/86a0b800-40fe-4cbe-a1b6-1355f84bd38d).
+//        ⚠️ 2026-09-29: the glyph in a square well became each tool's DRAWN
+//        MARK on a disc of the same tint, the family the door rails draw
+//        (`ttc_tool_marks.dart`). Same hue rule, same place in the row.
 //    T4  the field is `PvLiveSearchField` on a `PvLiveSearch`, the flow every
 //        door and Learn use (focus rides the field up, Back twice), not a
 //        third copy of the pill. Matching is the doors' word-prefix rule.
@@ -43,6 +46,35 @@
 //        surfaces You and the doors open (`ttc_cycle`, `ttc_window`); the
 //        window tile used to open the pre-design screen the surface router
 //        calls unreached.
+//
+//  ⚠️ TOOLS HOLDS ONLY TOOLS (2026-09-28, the user: "under Tools I should
+//  only be seeing tools, that's all ... the More button should have
+//  everything else that was extra inside Tools").
+//
+//  WHAT A TOOL IS, IN ONE SENTENCE: a tool is something she uses to record,
+//  track, calculate, check or plan her own data (her cycle, her logs, her
+//  medicines, her results, her visits, her treatment dates, her questions).
+//
+//  NOT a tool, and so not on this page: booking a consult or an expert,
+//  courses and classes, the store, reads and Learn, community, messages,
+//  Saved, help and support pages, the care circle and pairing, the journey
+//  map and its timeline (views of her journey, not her data), and settings.
+//  Those live under the bar's More tab (the bento, pv_more_bento.dart) or on
+//  the bar itself. `kTtcToolKinds` below is the classification, and
+//  `test/ttc_tools_only_tools_test.dart` fails the build if a row here is not
+//  a tool, or if a tool sits under More.
+//
+//  What moved (2026-09-28): "Talk to an expert" and "Courses" went to More's
+//  "Experts and courses" tile; "Journey map" went to More's "Your journey"
+//  tile. "Treatment cycle" came IN from More (it records her clinic's dates),
+//  and "Records and reports" left More, where it had been a second door to
+//  the row already here. The moved entries are kept, whole, in
+//  `ttcMovedToMore`, so More prints the same name, line and destination.
+//  Shape: MacroFactor's tabs are the working tools and its More holds the
+//  roadmap and the knowledge base
+//  (https://mobbin.com/screens/6f2fa44b-9e5a-4df3-9c6d-4ec214c9f0d9);
+//  American Airlines' More holds booking and help, never a tool
+//  (https://mobbin.com/screens/71e3fc57-af3c-446a-863e-a76f4088e03a).
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -68,13 +100,16 @@ import '../../ttc/ttc_records_store.dart';
 import '../../services/medicine_store.dart';
 import '../../ttc/ttc_supplements_store.dart';
 import '../../ttc/ttc_trackers_data.dart';
+import '../../ttc/ttc_treatment_store.dart';
 import 'ttc_appointments_screen.dart';
 import 'ttc_can_i_screen.dart';
 import 'ttc_ivf_readiness_screen.dart' show kTtcFertilityHelpName;
 import 'ttc_tool_hues.dart';
+import 'ttc_tool_marks.dart';
 import 'ttc_common.dart';
 import 'ttc_cycle_screens.dart';
-import 'ttc_journal_screen.dart';
+// Kept for revert (2026-09-28, journal out of TTC):
+// import 'ttc_journal_screen.dart';
 import 'ttc_journey_map_screen.dart';
 import 'ttc_nutrition_screen.dart';
 import 'ttc_prepare_screen.dart';
@@ -85,6 +120,7 @@ import 'ttc_strings.dart';
 import 'ttc_medication_screen.dart';
 import 'ttc_supplements_screen.dart';
 import 'ttc_surface_router.dart';
+import 'ttc_tab_root_header.dart';
 import 'ttc_tests_screen.dart';
 import 'ttc_tracker_screen.dart';
 
@@ -102,6 +138,10 @@ class TtcTool {
   });
 
   final String id;
+
+  /// The Material glyph this tool wore on the hub until 2026-09-29. The hub
+  /// now draws the tool's mark (`kTtcToolMarks`, `ttc_tool_marks.dart`); the
+  /// glyph stays because the You tab's rows still read it (Y2).
   final IconData icon;
   final String nameEn;
   final String nameHi;
@@ -374,16 +414,19 @@ final List<TtcToolGroup> ttcToolGroups = [
         open: (c) => openTtcTracker(c, 'lifestyle'),
       ),
       */
-      TtcTool(
-        id: 'journal',
-        icon: Icons.edit_note_rounded,
-        // The page's own name (2026-09-27). Kept for revert: 'Journal'.
-        nameEn: 'Our journal',
-        nameHi: 'Journal',
-        descEn: 'Both of you can write here',
-        descHi: 'Aap dono yahan likh sakte hain',
-        open: openTtcJournal,
-      ),
+      // Kept for revert (2026-09-28, journal out of TTC): the user took the
+      // journal out of the stage, for her and for him. A saved "recent" of
+      // 'journal' resolves to nothing in `ttcToolById` and is skipped.
+      // TtcTool(
+      //   id: 'journal',
+      //   icon: Icons.edit_note_rounded,
+      //   // The page's own name (2026-09-27). Kept for revert: 'Journal'.
+      //   nameEn: 'Our journal',
+      //   nameHi: 'Journal',
+      //   descEn: 'Both of you can write here',
+      //   descHi: 'Aap dono yahan likh sakte hain',
+      //   open: openTtcJournal,
+      // ),
     ],
   ),
   TtcToolGroup(
@@ -397,21 +440,25 @@ final List<TtcToolGroup> ttcToolGroups = [
       // are this tile now (the home keeps its Talk to experts rail). Same
       // screen, same route name, so `ttcV3ActiveFor` lights Tools for it.
       // 24 -> 25.
-      TtcTool(
-        id: 'expert',
-        icon: Icons.support_agent_outlined,
-        nameEn: 'Talk to an expert',
-        nameHi: 'Talk to an expert',
-        // ⚠️ NOT A DUPLICATE OF A TAB (launch sanity T1, 2026-09-28): the V3
-        // bar has no consults tab, so this row IS where booking lives on
-        // Tools. Its line says it is a booking. Kept for revert:
-        // descEn: 'A private video call with a specialist',
-        descEn: 'Book a private video call with a specialist',
-        descHi: 'A private video call with a specialist',
-        open: (c) => Navigator.of(c).push(MaterialPageRoute<void>(
-            builder: (_) => const TtcPrepareScreen(onlyCategory: 'consults'),
-            settings: const RouteSettings(name: 'ttc/consults'))),
-      ),
+      // ⚠️ MOVED TO MORE (2026-09-28, the user: Tools holds only tools).
+      // Booking a consult is not a tool; the row lives, word for word, in
+      // `ttcMovedToMore` below and More's "Experts and courses" tile reads
+      // it from there. Kept for revert (2026-09-28):
+      // TtcTool(
+      //   id: 'expert',
+      //   icon: Icons.support_agent_outlined,
+      //   nameEn: 'Talk to an expert',
+      //   nameHi: 'Talk to an expert',
+      //   // ⚠️ NOT A DUPLICATE OF A TAB (launch sanity T1, 2026-09-28): the V3
+      //   // bar has no consults tab, so this row IS where booking lives on
+      //   // Tools. Its line says it is a booking. Kept for revert:
+      //   // descEn: 'A private video call with a specialist',
+      //   descEn: 'Book a private video call with a specialist',
+      //   descHi: 'A private video call with a specialist',
+      //   open: (c) => Navigator.of(c).push(MaterialPageRoute<void>(
+      //       builder: (_) => const TtcPrepareScreen(onlyCategory: 'consults'),
+      //       settings: const RouteSettings(name: 'ttc/consults'))),
+      // ),
       // The specialist check, here since 2026-09-28 (see the note where it
       // was). Same id, same surface, so recents and tests still find it.
       TtcTool(
@@ -460,7 +507,8 @@ final List<TtcToolGroup> ttcToolGroups = [
         icon: Icons.biotech_outlined,
         nameEn: 'Medical tests',
         nameHi: 'Medical Tests',
-        descEn: 'What each one tells you',
+        // Change 5 (2026-09-28). Kept for revert: 'What each one tells you'.
+        descEn: 'What each fertility test tells you',
         descHi: 'Har test kya batata hai',
         open: (c) => Navigator.of(c).push(MaterialPageRoute<void>(
             builder: (_) => const TtcTestsScreen(),
@@ -495,33 +543,54 @@ final List<TtcToolGroup> ttcToolGroups = [
         descHi: 'Visits, aur kya poochhna hai',
         open: openTtcAppointments,
       ),
+      // ⚠️ IN FROM MORE (2026-09-28, Tools holds only tools): the round
+      // records her clinic's dates and reminds her before each step, so it
+      // is a tool. It sat under More's "Your health" as "Treatment"; this is
+      // now its one row on Tools and More. Named with the page's own eyebrow
+      // ("Your treatment cycle"), and it wears this group's colour because
+      // its header already does (`kIvfHue` is 206, `kTtcToolHueCare`).
+      TtcTool(
+        id: 'treatment',
+        icon: Icons.event_repeat_outlined,
+        nameEn: 'Treatment cycle',
+        nameHi: 'Treatment cycle',
+        descEn: "Your clinic's dates for IUI or IVF, step by step",
+        descHi: "Your clinic's dates for IUI or IVF, step by step",
+        open: (c) => openTtcSurface(c, 'ttc_treatment'),
+      ),
     ],
   ),
   TtcToolGroup(
-    titleEn: 'Plan and learn',
-    titleHi: 'Plan aur seekhein',
+    // ⚠️ "LEARN" LEFT WITH THE COURSES (2026-09-28): what is left here plans
+    // (food ideas, the checklist) and checks (Can I...?). Kept for revert:
+    //   titleEn: 'Plan and learn', titleHi: 'Plan aur seekhein',
+    titleEn: 'Plan and check',
+    titleHi: 'Plan and check',
     // Getting ready's hue (T6: ttc_tool_hues.dart). Was: 104.
     hue: kTtcToolHuePlan,
     tools: [
       // ⚠️ COURSES LEFT THE BAR — 2026-09-17. Slot 2 of the V3 bar became the
       // unified store (docs/PRODUCTS-AUDIT.md); the courses hub is the first
       // tile of this group so it is one tap further, never hidden. 23 → 24.
-      TtcTool(
-        id: 'courses',
-        icon: Icons.school_outlined,
-        nameEn: 'Courses',
-        nameHi: 'Courses',
-        // Plain line, 2026-09-27 (simplicity pass). Kept for revert: 'Guided, by people who know'.
-        // ⚠️ SAYS WHAT IS THERE (launch sanity T9, 2026-09-28): the page
-        // holds one free course and no expert classes, and with one course
-        // "Courses" now opens it directly. Kept for revert:
-        // descEn: 'Classes from experts, and one free course',
-        descEn: 'One free course: Preconception garbh sanskar',
-        descHi: 'Guided, jaankaar logon se',
-        open: (c) => Navigator.of(c).push(MaterialPageRoute<void>(
-            builder: (_) => const TtcPrepareScreen(onlyCategory: 'courses'),
-            settings: const RouteSettings(name: 'ttc/courses'))),
-      ),
+      // ⚠️ AND LEFT TOOLS FOR MORE (2026-09-28): a course is not a tool. It
+      // is More's "Experts and courses" tile now, read from `ttcMovedToMore`.
+      // Kept for revert (2026-09-28):
+      // TtcTool(
+      //   id: 'courses',
+      //   icon: Icons.school_outlined,
+      //   nameEn: 'Courses',
+      //   nameHi: 'Courses',
+      //   // Plain line, 2026-09-27 (simplicity pass). Kept for revert: 'Guided, by people who know'.
+      //   // ⚠️ SAYS WHAT IS THERE (launch sanity T9, 2026-09-28): the page
+      //   // holds one free course and no expert classes, and with one course
+      //   // "Courses" now opens it directly. Kept for revert:
+      //   // descEn: 'Classes from experts, and one free course',
+      //   descEn: 'One free course: Preconception garbh sanskar',
+      //   descHi: 'Guided, jaankaar logon se',
+      //   open: (c) => Navigator.of(c).push(MaterialPageRoute<void>(
+      //       builder: (_) => const TtcPrepareScreen(onlyCategory: 'courses'),
+      //       settings: const RouteSettings(name: 'ttc/courses'))),
+      // ),
       /*
       TtcTool(
         id: 'exercise',
@@ -545,18 +614,21 @@ final List<TtcToolGroup> ttcToolGroups = [
         descHi: 'Hafte bhar ke ideas, plan nahi',
         open: openTtcNutrition,
       ),
-      TtcTool(
-        id: 'map',
-        icon: Icons.map_outlined,
-        nameEn: 'Journey map',
-        nameHi: 'Journey Map',
-        // Plain line, 2026-09-27 (simplicity pass). Kept for revert: 'Everything so far, at a glance'.
-        descEn: 'Where you are this month, and what comes next',
-        descHi: 'Poora safar, ek nazar mein',
-        open: (c) => Navigator.of(c).push(MaterialPageRoute<void>(
-            builder: (_) => const TtcJourneyMapScreen(),
-            settings: const RouteSettings(name: 'ttc/map'))),
-      ),
+      // ⚠️ MOVED TO MORE (2026-09-28): the map and its family timeline are a
+      // view of her journey, not a tool. More's "Your journey" tile holds the
+      // row now, read from `ttcMovedToMore`. Kept for revert (2026-09-28):
+      // TtcTool(
+      //   id: 'map',
+      //   icon: Icons.map_outlined,
+      //   nameEn: 'Journey map',
+      //   nameHi: 'Journey Map',
+      //   // Plain line, 2026-09-27 (simplicity pass). Kept for revert: 'Everything so far, at a glance'.
+      //   descEn: 'Where you are this month, and what comes next',
+      //   descHi: 'Poora safar, ek nazar mein',
+      //   open: (c) => Navigator.of(c).push(MaterialPageRoute<void>(
+      //       builder: (_) => const TtcJourneyMapScreen(),
+      //       settings: const RouteSettings(name: 'ttc/map'))),
+      // ),
       TtcTool(
         id: 'canI',
         icon: Icons.help_outline_rounded,
@@ -572,7 +644,8 @@ final List<TtcToolGroup> ttcToolGroups = [
         nameEn: 'Pre-pregnancy checklist',
         nameHi: 'Pre-pregnancy checklist',
         // Plain line, 2026-09-27 (simplicity pass). Kept for revert: 'The three months before'.
-        descEn: 'What to sort in the three months before',
+        // Change 5 (2026-09-28). Kept for revert: '…three months before'.
+        descEn: 'What to sort in the three months before trying',
         descHi: 'Pehle ke teen mahine',
         open: (c) => openTtcSurface(c, 'ttc_precheck'),
       ),
@@ -596,6 +669,142 @@ final List<TtcToolGroup> ttcToolGroups = [
     ],
   ),
 ];
+
+// ---- what is a tool, and what moved to More (2026-09-28) ---------------------
+
+/// More's tile for booking an expert and the courses (pv_you_content.dart
+/// titles its group with this, so the Tools search note and the tile agree).
+const String kTtcMoreExpertsTitle = 'Experts and courses';
+
+/// More's journey tile (pv_you_screen.dart draws it under this title).
+const String kTtcMoreJourneyTitle = 'Your journey';
+
+/// The rows that left Tools because they are not tools, whole, so More prints
+/// them with the same name, line, icon and destination they had here (the Y2
+/// rule: one thing, one name, on every tab).
+final List<TtcTool> ttcMovedToMore = [
+  TtcTool(
+    id: 'expert',
+    icon: Icons.support_agent_outlined,
+    nameEn: 'Talk to an expert',
+    nameHi: 'Talk to an expert',
+    descEn: 'Book a private video call with a specialist',
+    descHi: 'A private video call with a specialist',
+    open: (c) => Navigator.of(c).push(MaterialPageRoute<void>(
+        builder: (_) => const TtcPrepareScreen(onlyCategory: 'consults'),
+        settings: const RouteSettings(name: 'ttc/consults'))),
+  ),
+  TtcTool(
+    id: 'courses',
+    icon: Icons.school_outlined,
+    nameEn: 'Courses',
+    nameHi: 'Courses',
+    descEn: 'One free course: Preconception garbh sanskar',
+    descHi: 'Guided, jaankaar logon se',
+    open: (c) => Navigator.of(c).push(MaterialPageRoute<void>(
+        builder: (_) => const TtcPrepareScreen(onlyCategory: 'courses'),
+        settings: const RouteSettings(name: 'ttc/courses'))),
+  ),
+  TtcTool(
+    id: 'map',
+    icon: Icons.map_outlined,
+    nameEn: 'Journey map',
+    nameHi: 'Journey Map',
+    // Names the timeline too: it opens from the map, and the map is where
+    // she now finds it.
+    descEn: 'Where you are this month, what comes next, and your family timeline',
+    descHi: 'Poora safar, ek nazar mein',
+    open: (c) => Navigator.of(c).push(MaterialPageRoute<void>(
+        builder: (_) => const TtcJourneyMapScreen(),
+        settings: const RouteSettings(name: 'ttc/map'))),
+  ),
+];
+
+/// Which More tile each moved row sits under, for the note a Tools search
+/// shows when she looks for one by its old place.
+///
+/// 2026-09-29 (the More tab is headed sections, ttc_more_tab.dart): the
+/// names are More's section headings now. Kept for revert:
+///   'expert': kTtcMoreExpertsTitle, 'courses': kTtcMoreExpertsTitle,
+///   'map': kTtcMoreJourneyTitle,
+const Map<String, String> kTtcMovedToMoreTile = {
+  'expert': 'Talk to an expert', // kTtcMoreExpertsHeading
+  'courses': 'Courses and masterclasses', // kTtcMoreCoursesHeading
+  'map': kTtcMoreJourneyTitle, // 'Your journey', kTtcMoreJourneyHeading
+};
+
+TtcTool? ttcMovedToMoreById(String id) {
+  for (final t in ttcMovedToMore) {
+    if (t.id == id) return t;
+  }
+  return null;
+}
+
+/// What each row that is, or was, on this hub IS: `true` for a tool (she
+/// records, tracks, calculates, checks or plans her own data with it),
+/// `false` for something that is not. `test/ttc_tools_only_tools_test.dart`
+/// fails if a Tools row is missing here or marked `false`. Adding a row to
+/// the hub means deciding, here, in one word, which it is.
+const Map<String, bool> kTtcToolKinds = {
+  // Your body: her cycle, her logs, her checks.
+  'cycle': true, // records her period dates, tracks her cycle
+  'ovulation': true, // logs ovulation tests and signs
+  'window': true, // calculates her fertile days from her dates
+  'symptoms': true, // logs symptoms and mood
+  'weight': true, // tracks weight, calculates BMI
+  'habits': true, // tracks sleep, movement, stress, lifestyle
+  'pcos_check': true, // a check she answers
+  // Both of you.
+  'partner_health': true, // his own tracker
+  // Care and medicines.
+  'fertility_help': true, // a check: is it time to see a specialist
+  'supplements': true, // records what she takes
+  'medication': true, // records prescriptions, reminds
+  'tests': true, // looks up a result and adds it to her records
+  'vaccinations': true, // records when each was given
+  'records': true, // keeps her results
+  'appointments': true, // plans visits and the questions for them
+  'treatment': true, // records her clinic's dates, reminds
+  // Plan and check.
+  'nutrition': true, // plans the week's food, keeps her swaps
+  'canI': true, // checks an everyday worry
+  'precheck': true, // plans the three months before, ticked off
+  // NOT tools: moved to More on 2026-09-28.
+  'expert': false, // booking a consult
+  'courses': false, // a course
+  'map': false, // a view of her journey, with the family timeline
+  // NOT tools: left the hub earlier (kept so the list is the whole history).
+  'guide': false, // the store; the bar's Products tab
+  // The journal left the stage on 2026-09-28 and is named nowhere live in
+  // TTC (test/ttc_journal_out_test.dart), so it has no entry here either.
+};
+
+/// Moved rows whose name or line matches [query], by the hub's own
+/// word-prefix rule, so a search for "expert" says where it went instead of
+/// finding nothing.
+List<TtcTool> ttcMovedMatching(String query) {
+  final words = query
+      .toLowerCase()
+      .split(RegExp(r'[^a-z0-9]+'))
+      .where((w) => w.isNotEmpty)
+      .toList();
+  if (words.isEmpty) return const [];
+  return [
+    for (final t in ttcMovedToMore)
+      if (words.every((q) => '${t.nameEn} ${t.descEn}'
+          .toLowerCase()
+          .split(RegExp(r'[^a-z0-9]+'))
+          .any((w) => w.startsWith(q))))
+        t,
+  ];
+}
+
+/// The note a search shows for a moved row. Names the row and the tile.
+/// A row whose section bears its own name says so, rather than "Talk to an
+/// expert is under More, in Talk to an expert" (2026-09-29).
+String ttcMovedNote(TtcTool t) => kTtcMovedToMoreTile[t.id] == t.nameEn
+    ? '${t.nameEn} is a section of More now.'
+    : '${t.nameEn} is under More, in ${kTtcMovedToMoreTile[t.id]}.';
 
 /// Which tools she opened last, newest first. Local only: a tapping
 /// shortcut, not history anyone else needs.
@@ -662,22 +871,34 @@ const List<String> kTtcToolsStartIds = ['cycle', 'window', 'precheck'];
 const Set<String> kTtcHisToolIds = {
   'window',
   'partner_health',
-  'journal',
-  'expert',
+  // Kept for revert (2026-09-28, journal out of TTC): 'journal',
+  // Kept for revert (2026-09-28, Tools holds only tools): 'expert',
+  // 'courses' and 'map' left for More, which he opens from the same bar.
   'tests',
   'records',
   'appointments',
-  'courses',
-  'map',
+  // In from More (2026-09-28): the round is the couple's (B10), and More's
+  // "Treatment" row, which he could open, is now this Tools row.
+  'treatment',
 };
 
 /// Where he starts when he has opened nothing yet.
-const List<String> kTtcHisToolsStartIds = ['partner_health', 'window', 'journal'];
+// Kept for revert (2026-09-28, journal out of TTC): the journal was his third
+// start. Appointments takes its place: the other thing the two of them keep
+// together.
+//   const List<String> kTtcHisToolsStartIds = ['partner_health', 'window', 'journal'];
+const List<String> kTtcHisToolsStartIds = [
+  'partner_health',
+  'window',
+  'appointments',
+];
 
 /// A tool's name and line said to him, where hers would be wrong from his
 /// side ("Partner health · His half of this" names him in the third person).
 const Map<String, (String, String)> kTtcHisToolWords = {
-  'partner_health': ('Your health', 'Your tests, habits and half of this'),
+  // Change 5 (2026-09-28): "half of this" named nothing. Kept for revert:
+  //   ('Your health', 'Your tests, habits and half of this'),
+  'partner_health': ('Your health', 'Your health, tests and habits'),
   // Kept for revert: 'The days that count most this cycle'.
   'window': ('Her fertile window', "The six days she's most likely to get pregnant"),
 };
@@ -822,6 +1043,8 @@ class _TtcToolsScreenState extends State<TtcToolsScreen> {
         MedicineStore.instance,
         TtcRecordsStore.instance,
         TtcAppointmentsStore.instance,
+        // The treatment row's state line (2026-09-28).
+        TtcTreatmentStore.instance,
         TtcToolRecents.instance,
         TtcHomeVersionStore.instance,
         TtcPartnerMode.instance,
@@ -837,19 +1060,20 @@ class _TtcToolsScreenState extends State<TtcToolsScreen> {
             body: Stack(children: [
               Positioned.fill(
                 child: ListView(
-                  padding: EdgeInsets.fromLTRB(
-                      0,
-                      MediaQuery.of(context).padding.top + 12,
-                      0,
-                      pvNavClearance(context)),
+                  // ⚠️ THE HEADER CARRIES THE SAFE-AREA INSET (2026-09-29,
+                  // TtcTabRootHeader), so every tab root's title sits at one
+                  // y. Kept for revert:
+                  //   padding: EdgeInsets.fromLTRB(0,
+                  //       MediaQuery.of(context).padding.top + 12, 0,
+                  //       pvNavClearance(context)),
+                  padding:
+                      EdgeInsets.fromLTRB(0, 0, 0, pvNavClearance(context)),
                   children: [
                     _header(p, t),
-                    const SizedBox(height: 14),
-                    _pad(PvLiveSearchField(
-                      search: _search,
-                      p: p,
-                      hint: t.toolsSearchHint,
-                    )),
+                    // The search is the header's `below` now. Kept for revert:
+                    //   const SizedBox(height: 14),
+                    //   _pad(PvLiveSearchField(search: _search, p: p,
+                    //       hint: t.toolsSearchHint)),
                     ConstrainedBox(
                       constraints: BoxConstraints(
                           minHeight: pvLiveSearchSheetMin(context, _search)),
@@ -887,41 +1111,72 @@ class _TtcToolsScreenState extends State<TtcToolsScreen> {
   ///   TtcPage(tab: 2, header: const TtcHeader(), children: [
   ///     ttcSectionTitle(t.toolsTitle, eyebrow: t.tabTools),
   ///     Text(t.toolsBody, style: ttcBody(14, h: 1.6)), ...])
+  ///
+  /// ⚠️ ONE TAB-ROOT HEADER (2026-09-29, build 19). The user: "Tools at the
+  /// very top, Learn a little lower". On V3 this row had no button, so it
+  /// was only as tall as the title and the title sat 4.5dp above Learn's.
+  /// `TtcTabRootHeader` holds the row at 42dp with or without a button
+  /// (ttc_tab_root_header.dart has the measurements).
   Widget _header(V2Palette p, TtcS t) {
     final v1 = TtcHomeVersionStore.instance.version == TtcHomeVersion.v1;
-    return _pad(Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(children: [
-          Expanded(
-            child: Text(t.tabTools,
-                style: pvFraunces(
-                    fontSize: 30,
-                    fontWeight: FontWeight.w500,
-                    height: 1.1,
-                    color: p.ink1)),
+    return TtcTabRootHeader(
+      title: t.tabTools,
+      trailing: [
+        // V1's bar has no You tab, so on V1 the profile stays one tap away
+        // here. On V3 the bar's You is that tap, and a second door to the
+        // same place would be the duplicate the review found.
+        if (v1)
+          PvRoundIcon(
+            icon: Icons.person_outline_rounded,
+            onTap: () => openTtcProfile(context),
+            size: kTtcTabRootRowHeight,
           ),
-          // V1's bar has no You tab, so on V1 the profile stays one tap away
-          // here. On V3 the bar's You is that tap, and a second door to the
-          // same place would be the duplicate the review found.
-          if (v1)
-            PvRoundIcon(
-              icon: Icons.person_outline_rounded,
-              onTap: () => openTtcProfile(context),
-              size: 42,
-            ),
-        ]),
-        const SizedBox(height: 6),
-        PvLiveSearchWords(
-          search: _search,
-          // Kept for revert: `t.toolsBody` (a list of seven things that did
-          // not say what the page is for).
-          child: Text(_him ? kTtcHisToolsBody : kTtcToolsBody,
-              style: pvManrope(fontSize: 14, height: 1.45, color: p.ink2)),
-        ),
       ],
-    ));
+      intro: PvLiveSearchWords(
+        search: _search,
+        // Kept for revert: `t.toolsBody` (a list of seven things that did
+        // not say what the page is for).
+        child: Text(_him ? kTtcHisToolsBody : kTtcToolsBody,
+            style: ttcTabRootIntroStyle()),
+      ),
+      below: PvLiveSearchField(
+        search: _search,
+        p: p,
+        hint: t.toolsSearchHint,
+      ),
+    );
   }
+  // Kept for revert (2026-09-29), Tools' own header:
+  // Widget _header(V2Palette p, TtcS t) {
+  //   final v1 = TtcHomeVersionStore.instance.version == TtcHomeVersion.v1;
+  //   return _pad(Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       Row(children: [
+  //         Expanded(
+  //           child: Text(t.tabTools,
+  //               style: pvFraunces(
+  //                   fontSize: 30,
+  //                   fontWeight: FontWeight.w500,
+  //                   height: 1.1,
+  //                   color: p.ink1)),
+  //         ),
+  //         if (v1)
+  //           PvRoundIcon(
+  //             icon: Icons.person_outline_rounded,
+  //             onTap: () => openTtcProfile(context),
+  //             size: 42,
+  //           ),
+  //       ]),
+  //       const SizedBox(height: 6),
+  //       PvLiveSearchWords(
+  //         search: _search,
+  //         child: Text(_him ? kTtcHisToolsBody : kTtcToolsBody,
+  //             style: pvManrope(fontSize: 14, height: 1.45, color: p.ink2)),
+  //       ),
+  //     ],
+  //   ));
+  // }
 
   Widget _eyebrow(V2Palette p, String s) => Text(s.toUpperCase(),
       style: pvManrope(
@@ -939,34 +1194,41 @@ class _TtcToolsScreenState extends State<TtcToolsScreen> {
       (_him ? kTtcHisToolWords[tool.id]?.$2 : null) ?? tool.desc(hi);
 
   List<Widget> _page(BuildContext context, V2Palette p, TtcS t, bool hi) {
-    final recent = [
-      for (final id in TtcToolRecents.instance.ids)
-        if (!_him || kTtcHisToolIds.contains(id)) ?ttcToolById(id)
-    ];
-    final strip = recent.isNotEmpty
-        ? recent
-        : [
-            for (final id in _him ? kTtcHisToolsStartIds : kTtcToolsStartIds)
-              ?ttcToolById(id)
-          ];
+    // ⚠️ NO STRIP ABOVE THE LIST (2026-09-28, the user: "no random
+    // repetition", and the brief named "a tool listed twice in the hub").
+    // The three tiles on top ("Recently used", or "Good places to start" when
+    // she had opened none) were three tools the list below also carries, so
+    // every one of them was on the page twice. The list is the one place for
+    // a tool; the search field above finds any tool by name or purpose, and
+    // `TtcToolRecents` still records what she opens. Kept for revert:
+    //   final recent = [
+    //     for (final id in TtcToolRecents.instance.ids)
+    //       if (!_him || kTtcHisToolIds.contains(id)) ?ttcToolById(id)
+    //   ];
+    //   final strip = recent.isNotEmpty
+    //       ? recent
+    //       : [
+    //           for (final id in _him ? kTtcHisToolsStartIds : kTtcToolsStartIds)
+    //             ?ttcToolById(id)
+    //         ];
     return [
-      const SizedBox(height: 22),
-      _pad(_eyebrow(p, recent.isNotEmpty ? t.toolsRecent : t.toolsStartWith)),
-      const SizedBox(height: 11),
-      // IntrinsicHeight so three names of different lengths still line up; a
-      // bare stretch inside a ListView cannot lay out.
-      _pad(IntrinsicHeight(
-        child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          for (var i = 0; i < 3; i++) ...[
-            if (i > 0) const SizedBox(width: 10),
-            Expanded(
-              child: i < strip.length
-                  ? _quick(context, p, strip[i], hi)
-                  : const SizedBox(),
-            ),
-          ],
-        ]),
-      )),
+      // const SizedBox(height: 22),
+      // _pad(_eyebrow(p, recent.isNotEmpty ? t.toolsRecent : t.toolsStartWith)),
+      // const SizedBox(height: 11),
+      // // IntrinsicHeight so three names of different lengths still line up; a
+      // // bare stretch inside a ListView cannot lay out.
+      // _pad(IntrinsicHeight(
+      //   child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      //     for (var i = 0; i < 3; i++) ...[
+      //       if (i > 0) const SizedBox(width: 10),
+      //       Expanded(
+      //         child: i < strip.length
+      //             ? _quick(context, p, strip[i], hi)
+      //             : const SizedBox(),
+      //       ),
+      //     ],
+      //   ]),
+      // )),
       for (final group in ttcToolGroupsFor(him: _him)) ...[
         const SizedBox(height: 28),
         _pad(_eyebrow(p, group.title(hi))),
@@ -993,9 +1255,20 @@ class _TtcToolsScreenState extends State<TtcToolsScreen> {
       _indexFor = key;
     }
     final library = ttcLibrarySearch(q, _index!).take(6).toList();
+    // A row that moved to More is named with where it went (2026-09-28): a
+    // feature is never hidden, only moved. Words, not a second door: the
+    // bar's More is the one way in.
+    final moved = ttcMovedMatching(q);
     return [
       const SizedBox(height: 14),
-      if (tools.isEmpty && library.isEmpty)
+      for (final m in moved)
+        _pad(Padding(
+          key: ValueKey('ttc_tool_moved_${m.id}'),
+          padding: const EdgeInsets.only(bottom: 8),
+          child: Text(ttcMovedNote(m),
+              style: pvManrope(fontSize: 14, height: 1.45, color: p.ink2)),
+        )),
+      if (tools.isEmpty && library.isEmpty && moved.isEmpty)
         _pad(Padding(
           padding: const EdgeInsets.symmetric(vertical: 8),
           child: Text(t.toolsNoMatch,
@@ -1029,6 +1302,9 @@ class _TtcToolsScreenState extends State<TtcToolsScreen> {
 
   /// The quick strip: the group's well and the name. Three across. A white
   /// card with one hairline (§4.0's card), pressing like every tile.
+  // Kept for revert (2026-09-28): the strip's tile, unreached since the strip
+  // left the hub (see `_page`).
+  // ignore: unused_element
   Widget _quick(BuildContext context, V2Palette p, TtcTool tool, bool hi) =>
       PvPress(
         child: Material(
@@ -1070,7 +1346,17 @@ class _TtcToolsScreenState extends State<TtcToolsScreen> {
         p: p,
         // A quiet marker of what has been logged, so an opened tool feels
         // different from an untouched one, without ever becoming a score.
-        leading: PvMarkWell(p: p, hue: hue, size: 40, icon: tool.icon),
+        // ⚠️ THE DOORS' HAND, NOT A MATERIAL GLYPH (2026-09-29, the user:
+        // "in Tools you have used icons ... it looks like a different side of
+        // the application"). Each tool's own drawn object on a disc of its
+        // group's tint, the family the door rails draw (`ttc_tool_marks.dart`,
+        // Noom's All tools:
+        // https://mobbin.com/screens/a4710a2a-449c-4014-aca2-ce8501600a11).
+        // 44, the disc being the well, where the square well was 40.
+        // Kept for revert (2026-09-29):
+        //   leading: PvMarkWell(p: p, hue: hue, size: 40, icon: tool.icon),
+        leading: TtcToolMarkLeading(
+            toolId: tool.id, tint: v2BlockTint(hue % 360, p)),
         title: _name(tool, hi),
         line: _desc(tool, hi),
         lineMaxLines: 2,
@@ -1168,6 +1454,11 @@ class _TtcToolsScreenState extends State<TtcToolsScreen> {
         final n = TtcAppointmentsStore.instance.upcoming.length;
         if (n == 0) return null;
         return hi ? '$n aage' : '$n upcoming';
+      // The state More's "Your health" tile used to carry (2026-09-28).
+      case 'treatment':
+        return TtcTreatmentStore.instance.hasDates
+            ? 'A round is in progress'
+            : null;
       default:
         // The tracker tiles share one store, so one lookup covers all of them.
         if (ttcTrackerById(tool.id) == null) return null;

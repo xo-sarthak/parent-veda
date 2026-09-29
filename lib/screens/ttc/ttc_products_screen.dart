@@ -139,7 +139,7 @@ class _ProductCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final hi = t.hinglish;
     return TtcCard(
-      border: highlight ? ttcPurple : null,
+      border: highlight ? ttcTitleInk : null,
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Expanded(child: Text(product.name(hi), style: ttcJakarta(16))),
@@ -160,7 +160,7 @@ class _ProductCard extends StatelessWidget {
 
         _block(
           icon: Icons.check_rounded,
-          color: ttcPurple,
+          color: ttcTitleInk,
           label: t.productsLookFor,
           body: product.lookFor(hi),
           tint: ttcPanel,

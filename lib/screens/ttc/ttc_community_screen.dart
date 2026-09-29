@@ -116,7 +116,7 @@ class _TtcCommunityScreenState extends State<TtcCommunityScreen> {
                   decoration: const BoxDecoration(
                       color: ttcPanel, shape: BoxShape.circle),
                   child: const Icon(Icons.diversity_3_rounded,
-                      size: 20, color: ttcPurple),
+                      size: 20, color: ttcTitleInk),
                 ),
                 const SizedBox(width: 13),
                 Expanded(
@@ -161,11 +161,11 @@ class _TtcCommunityScreenState extends State<TtcCommunityScreen> {
                   onTap: () => writeTtcPost(context, room: _room),
                   behavior: HitTestBehavior.opaque,
                   child: Row(mainAxisSize: MainAxisSize.min, children: [
-                    const Icon(Icons.edit_outlined, size: 15, color: ttcPurple),
+                    const Icon(Icons.edit_outlined, size: 15, color: ttcTitleInk),
                     const SizedBox(width: 6),
                     Text(t.communityWrite,
                         style:
-                            ttcBody(12, color: ttcPurple, w: FontWeight.w800)),
+                            ttcBody(12, color: ttcTitleInk, w: FontWeight.w800)),
                   ]),
                 )),
             _RoomFilter(
@@ -257,7 +257,7 @@ Future<void> writeTtcPost(BuildContext context, {String? room}) async {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 13, vertical: 9),
                             decoration: BoxDecoration(
-                              color: target == c.id ? ttcPurple : ttcPanel,
+                              color: target == c.id ? ttcTitleInk : ttcPanel,
                               borderRadius: BorderRadius.circular(999),
                             ),
                             child: Text(c.name.now,
@@ -296,7 +296,7 @@ Future<void> writeTtcPost(BuildContext context, {String? room}) async {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: ttcPurple, width: 1.4),
+                    borderSide: const BorderSide(color: ttcTitleInk, width: 1.4),
                   ),
                 ),
               ),
@@ -311,10 +311,10 @@ Future<void> writeTtcPost(BuildContext context, {String? room}) async {
                     height: 22,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: anonymous ? ttcPurple : Colors.transparent,
+                      color: anonymous ? ttcTitleInk : Colors.transparent,
                       borderRadius: BorderRadius.circular(7),
                       border: Border.all(
-                          color: anonymous ? ttcPurple : ttcBorder, width: 1.6),
+                          color: anonymous ? ttcTitleInk : ttcBorder, width: 1.6),
                     ),
                     child: anonymous
                         ? const Icon(Icons.check_rounded,
@@ -347,7 +347,8 @@ Future<void> writeTtcPost(BuildContext context, {String? room}) async {
                       alignment: Alignment.center,
                       padding: const EdgeInsets.symmetric(vertical: 15),
                       decoration: BoxDecoration(
-                          color: ttcPanel,
+                          // Kept for revert (2026-09-29, no tinted slab behind text): color: ttcPanel,
+                          color: Colors.white, border: const Border.fromBorderSide(BorderSide(color: ttcLine)),
                           borderRadius: BorderRadius.circular(16)),
                       child: Text(t.journalCancel,
                           style:
@@ -365,7 +366,7 @@ Future<void> writeTtcPost(BuildContext context, {String? room}) async {
                       alignment: Alignment.center,
                       padding: const EdgeInsets.symmetric(vertical: 15),
                       decoration: BoxDecoration(
-                          color: ttcPurple,
+                          color: ttcTitleInk,
                           borderRadius: BorderRadius.circular(16)),
                       child: Text(t.communityPost,
                           style: ttcBody(14,
@@ -434,7 +435,7 @@ class _RoomCard extends StatelessWidget {
           alignment: Alignment.center,
           decoration: const BoxDecoration(color: ttcPanel, shape: BoxShape.circle),
           child: Text(community.name.now.characters.first.toUpperCase(),
-              style: ttcJakarta(16, color: ttcPurple)),
+              style: ttcJakarta(16, color: ttcTitleInk)),
         ),
         const SizedBox(width: 13),
         Expanded(
@@ -457,12 +458,12 @@ class _RoomCard extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(
-              color: joined ? ttcPanel : ttcPurple,
+              color: joined ? ttcPanel : ttcTitleInk,
               borderRadius: BorderRadius.circular(999),
             ),
             child: Text(joined ? t.communityJoined : t.communityJoin,
                 style: ttcBody(12,
-                    color: joined ? ttcPurple : Colors.white,
+                    color: joined ? ttcTitleInk : Colors.white,
                     w: FontWeight.w800)),
           ),
         ),
@@ -496,7 +497,7 @@ class _RoomFilter extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 9),
             decoration: BoxDecoration(
-              color: on ? ttcPurple : ttcPanel,
+              color: on ? ttcTitleInk : ttcPanel,
               borderRadius: BorderRadius.circular(999),
             ),
             child: Text(label,
@@ -542,7 +543,7 @@ class _PostCard extends StatelessWidget {
             decoration:
                 const BoxDecoration(color: ttcPanel, shape: BoxShape.circle),
             child: Text(post.author.characters.first.toUpperCase(),
-                style: ttcJakarta(14, color: ttcPurple)),
+                style: ttcJakarta(14, color: ttcTitleInk)),
           ),
           const SizedBox(width: 11),
           Expanded(
@@ -559,7 +560,7 @@ class _PostCard extends StatelessWidget {
                     if (post.type == PostType.expert) ...[
                       const SizedBox(width: 6),
                       const Icon(Icons.verified_rounded,
-                          size: 14, color: ttcPurple),
+                          size: 14, color: ttcTitleInk),
                     ],
                   ]),
                   if (post.cred.isNotEmpty)
@@ -582,7 +583,8 @@ class _PostCard extends StatelessWidget {
               margin: const EdgeInsets.only(bottom: 8),
               padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 11),
               decoration: BoxDecoration(
-                color: ttcPanel,
+                // Kept for revert (2026-09-29, no tinted slab behind text): color: ttcPanel,
+                color: Colors.white, border: const Border.fromBorderSide(BorderSide(color: ttcLine)),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(option,

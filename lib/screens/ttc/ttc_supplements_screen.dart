@@ -48,7 +48,8 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/pv_fonts.dart';
-import '../../ttc/ttc_journal_store.dart' show TtcAuthor;
+// Moved (2026-09-28, journal out of TTC): was ttc_journal_store.dart.
+import '../../ttc/ttc_author.dart';
 import '../../ttc/ttc_supplements_store.dart';
 import '../products/pv_store_chrome.dart' show pvSnack;
 import '../v2/v2_palette.dart';
@@ -127,6 +128,8 @@ class _TtcSupplementsScreenState extends State<TtcSupplementsScreen> {
         return TtcToolScaffold(
           // Care and medicines' hue in Tools, the same as Medication.
           hue: kIvfHue,
+          // The tool's mark over the eyebrow (2026-09-29, ttc_tool_marks.dart).
+          toolId: 'supplements',
           // ⚠️ ONE TOOL, ONE NAME (2026-09-27): the eyebrow IS the Tools
           // tile's name, word for word; the title is the tile's own line.
           eyebrow: t.supplements,
@@ -141,7 +144,19 @@ class _TtcSupplementsScreenState extends State<TtcSupplementsScreen> {
               : 'Tap the circle when you take one. Tap the name to see its '
                     'days, change it or remove it.',
           // The same "Add" Records and Appointments wear, top right.
-          action: TtcDoseHeroAdd(onTap: () => editTtcSupplement(context, null)),
+          // ⚠️ ONE ADD ON AN EMPTY SCREEN (the launch sanity T13 rule,
+          // applied here 2026-09-28): while the list is empty the empty
+          // card's "Add your own" is the only add; the header pill appears
+          // once there are items, and says "New supplement" so it never
+          // reads the same as the sheet it opens ("Add another supplement"
+          // overflowed the header at 360dp). Kept for revert (2026-09-28):
+          //   action: TtcDoseHeroAdd(
+          //       onTap: () => editTtcSupplement(context, null)),
+          action: store.items.isEmpty
+              ? null
+              : TtcDoseHeroAdd(
+                  label: 'New supplement',
+                  onTap: () => editTtcSupplement(context, null)),
           children: [
             ttcToolPad(
               Column(
@@ -639,7 +654,8 @@ class _MergeNotice extends StatelessWidget {
           const SizedBox(height: 12),
           TtcDoseInkButton(
             key: ValueKey('ttc_supp_merge_${first.id}'),
-            label: 'Merge them',
+            // Kept for revert (2026-09-28): 'Merge them'
+            label: 'Merge the two rows',
             icon: Icons.call_merge_rounded,
             onTap: () {
               final kept = TtcSupplementsStore.instance.merge(group);
@@ -702,17 +718,24 @@ class _TtcSupplementDetailScreenState extends State<TtcSupplementDetailScreen> {
           // Removed or merged while this page was open. Say so, never blank.
           return TtcToolScaffold(
             hue: kIvfHue,
+            // Opened from the list: back, not an X (2026-09-29).
+            leading: TtcToolLeading.back,
             eyebrow: t.supplements,
             title: 'Not on the list any more.',
+            // The button is an arrow now (2026-09-29). Kept for revert:
+            //   'It was removed, or merged into another row with the same '
+            //   'name. Close this to go back to the list.',
             intro:
-                'It was removed, or merged into another row with the same '
-                'name. Close this to go back to the list.',
+                'This supplement was removed, or merged into another row with '
+                'the same name. Go back to see your list.',
             children: const [SizedBox(height: 40)],
           );
         }
         final partner = s.author == TtcAuthor.partner;
         return TtcToolScaffold(
           hue: kIvfHue,
+          // One supplement, opened from the list: back, not an X (2026-09-29).
+          leading: TtcToolLeading.back,
           eyebrow: t.supplements,
           title: s.name,
           intro: [
@@ -866,7 +889,8 @@ class _SupplementSheetState extends State<_SupplementSheet> {
         // Whose it is is fixed once it has days behind it, so the choice
         // only shows when adding.
         if (!editing) ...[
-          ttcDoseLabel('Whose is it'),
+          // Kept for revert (2026-09-28): 'Whose is it'
+          ttcDoseLabel('Whose supplement is it'),
           TtcDoseWhose(
             partner: _whose == TtcAuthor.partner,
             onPick: (partner) => setState(

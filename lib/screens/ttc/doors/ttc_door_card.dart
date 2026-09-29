@@ -51,6 +51,7 @@ import '../../doors/pv_door_chrome.dart'
     show kPvRailCardHeight, kPvUrgentInk, kPvUrgentTint;
 import '../../doors/pv_live_search.dart' show PvLiveSearch;
 import '../../v2/v2_palette.dart';
+import '../ttc_common.dart' show ttcTitleInk;
 
 /// The card's width: the tab rail's own (`TtcDoorRail.cardWidth`), so the
 /// tab cards and the section cards under them line up in one column rhythm.
@@ -884,7 +885,7 @@ class TtcDoorCallButton extends StatelessWidget {
         excludeSemantics: true,
         child: Material(
           key: ttcDoorCallKey(number),
-          color: p.ink1,
+          color: ttcTitleInk,
           borderRadius: BorderRadius.circular(999),
           clipBehavior: Clip.antiAlias,
           child: InkWell(
@@ -924,7 +925,7 @@ class TtcDoorCallButton extends StatelessWidget {
           child: Material(
             key: ttcDoorCallKey(amb),
             color: Colors.transparent,
-            shape: StadiumBorder(side: BorderSide(color: p.ink1, width: 1.2)),
+            shape: StadiumBorder(side: BorderSide(color: ttcTitleInk, width: 1.2)),
             clipBehavior: Clip.antiAlias,
             child: InkWell(
               onTap: () {

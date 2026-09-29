@@ -153,8 +153,12 @@ class FabRouteObserver extends NavigatorObserver {
             // the button sat on the results (2026-09-18).
             name == 'search' ||
             // The TTC journal's writer: a keyboard is up and the button sat
-            // over the words (2026-09-27, the tools pass).
-            name == 'ttc/journal/write' ||
+            // over the words (2026-09-27, the tools pass). Kept for revert
+            // (2026-09-28, the user: no journal in trying to conceive):
+            //   name == 'ttc/journal/write' ||
+            // Its one surviving job, a question for the doctor, has its own
+            // writer with the same keyboard (ttc_doctor_question_screen.dart).
+            name == 'ttc/appointments/question' ||
             // The skilling stage: every route there is either a CHILD screen,
             // where an adult surface (and a network call) must not be one tap
             // away, or a parent screen behind a gate the FAB would bypass.

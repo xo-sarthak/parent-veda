@@ -92,7 +92,9 @@ class _PvPartnerScreenState extends State<PvPartnerScreen> {
       'Where you are in the month: the window, not the dates you logged',
       'Appointments and tests you have booked',
       'What you save and share on purpose',
-      'The shared journal, only what either of you writes there',
+      // Kept for revert (2026-09-28, journal out of TTC): the journal left the
+      // stage, so the pairing no longer promises one.
+      //   'The shared journal, only what either of you writes there',
     ],
     LifeStage.pregnancy => [
       'Your week, and what is happening this week',
@@ -109,7 +111,8 @@ class _PvPartnerScreenState extends State<PvPartnerScreen> {
   List<String> get _neverSees => switch (widget.stage.shopStage) {
     LifeStage.tryingToConceive => [
       'Your symptoms and cycle logs',
-      'Your private journal',
+      // Kept for revert (2026-09-28, journal out of TTC):
+      //   'Your private journal',
       'Your test readings',
     ],
     LifeStage.pregnancy => [
@@ -216,12 +219,15 @@ class _PvPartnerScreenState extends State<PvPartnerScreen> {
                       p,
                       '1',
                       'Share your code',
-                      'It opens a link to download ParentVeda.',
+                      // Kept for revert (2026-09-28): 'It opens a link to
+                      // download ParentVeda.'
+                      'The code opens a link to download ParentVeda.',
                     ),
                     _step(
                       p,
                       '2',
-                      '$_who enters it',
+                      // Kept for revert (2026-09-28): '$_who enters it'.
+                      '$_who enters the code',
                       'At sign-in, on their own phone.',
                     ),
                     _step(
@@ -231,8 +237,13 @@ class _PvPartnerScreenState extends State<PvPartnerScreen> {
                       'Their home follows your stage from that moment.',
                     ),
                     const SizedBox(height: 16),
+                    // ⚠️ WHITE AND A HAIRLINE, NOT A LAVENDER SLAB
+                    // (2026-09-29, "no tinted slabs behind text"): the code
+                    // sits in a bordered field like the Invite page's code.
+                    // Kept for revert: PvWell( on this and the next box.
                     if (_code != null)
-                      PvWell(
+                      PvCard(
+                        key: const ValueKey('pv_partner_code_card'),
                         child: Column(
                           children: [
                             Text(
@@ -258,7 +269,7 @@ class _PvPartnerScreenState extends State<PvPartnerScreen> {
                         ),
                       )
                     else
-                      PvWell(
+                      PvCard(
                         child: Text(
                           'Sign in to get your pairing code.',
                           style: pvManrope(fontSize: 13.5, color: p.ink2),
@@ -271,15 +282,11 @@ class _PvPartnerScreenState extends State<PvPartnerScreen> {
                       onTap: _code == null ? null : _shareCode,
                     ),
                   ] else
-                    PvWell(
-                      child: Text(
-                        'To unpair, $_who signs out on their phone; your data never left yours. If you need it undone from here, write to us from Help.',
-                        style: pvManrope(
-                          fontSize: 13,
-                          height: 1.45,
-                          color: p.ink2,
-                        ),
-                      ),
+                    // A note is one quiet line, not a slab (2026-09-29).
+                    // Kept for revert: PvWell(child: Text(..., pvManrope(
+                    //     fontSize: 13, height: 1.45, color: p.ink2))).
+                    PvQuietLine(
+                      'To unpair, $_who signs out on their phone; your data never left yours. If you need it undone from here, write to us from Help.',
                     ),
                 ],
               ],

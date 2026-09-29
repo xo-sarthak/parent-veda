@@ -111,6 +111,8 @@ class _TtcRecordsScreenState extends State<TtcRecordsScreen> {
 
         return TtcToolScaffold(
           hue: kTtcRecordsHue,
+          // The tool's mark over the eyebrow (2026-09-29, ttc_tool_marks.dart).
+          toolId: 'records',
           // ⚠️ ONE NAME (tools pass, 2026-09-27): the Tools tile says
           // "Records and reports" and this said "Health Records". Kept for
           // revert: eyebrow: widget.resultsOnly ? t.recordsReports : t.recordsTitle,
@@ -143,7 +145,9 @@ class _TtcRecordsScreenState extends State<TtcRecordsScreen> {
           action: TtcRecordsHeroPill(
             key: const ValueKey('ttc_rec_add'),
             icon: Icons.add_rounded,
-            label: t.recordsAdd,
+            // Change 5 (2026-09-28): the pill names what it adds; the Hindi
+            // side keeps its words. Kept for revert: label: t.recordsAdd,
+            label: t.hinglish ? t.recordsAdd : 'Add a result',
             onTap: () => openTtcRecordEdit(context),
           ),
           /*
@@ -174,37 +178,41 @@ class _TtcRecordsScreenState extends State<TtcRecordsScreen> {
               children: [
                 const SizedBox(height: 20),
 
-                // ⚠️ A COUNT LINE, NOT A CONTROL. It states what is here and
-                // whose it is in one sentence. The filter beside it is a quiet
-                // chip rather than three segments, because narrowing to one
-                // person is something she does occasionally and the default is
-                // right almost always.
-                if (total > 0) ...[
-                  Row(children: [
-                    Expanded(
-                      child: Text(_countLine(total, his),
-                          style: ttcBody(12.5, color: ttcSoft, h: 1.4)),
-                    ),
-                    const SizedBox(width: 10),
-                    // Kept for revert (2026-09-27): the one-word chip that
-                    // cycled Everyone, You, Partner on each tap. Nobody could
-                    // tell it was a filter until it changed under them.
-                    // _WhoseChip(
-                    //   whose: _partner,
-                    //   onPick: (v) => setState(() => _partner = v),
-                    // ),
-                  ]),
-                  const SizedBox(height: 10),
-                  // Three answers side by side, so she can see all of them
-                  // before she taps. Only drawn when both of you have results:
-                  // a filter with one side empty is a control for nothing.
-                  if (his > 0 && his < total)
-                    _WhoseSegments(
-                      whose: _partner,
-                      onPick: (v) => setState(() => _partner = v),
-                    ),
-                  const SizedBox(height: 18),
-                ],
+                // Kept for revert (2026-09-29): the count line and the filter
+                // drew ABOVE the "Your results" heading; they are the
+                // heading's own summary now, passed in as `summary`.
+                // // ⚠️ A COUNT LINE, NOT A CONTROL. It states what is here and
+                // // whose it is in one sentence. The filter beside it is a quiet
+                // // chip rather than three segments, because narrowing to one
+                // // person is something she does occasionally and the default is
+                // // right almost always.
+                // if (total > 0) ...[
+                //   Row(children: [
+                //     Expanded(
+                //       child: Text(_countLine(total, his),
+                //           style: ttcBody(12.5, color: ttcSoft, h: 1.4)),
+                //     ),
+                //     const SizedBox(width: 10),
+                //     // Kept for revert (2026-09-27): the one-word chip that
+                //     // cycled Everyone, You, Partner on each tap. Nobody could
+                //     // tell it was a filter until it changed under them.
+                //     // _WhoseChip(
+                //     //   whose: _partner,
+                //     //   onPick: (v) => setState(() => _partner = v),
+                //     // ),
+                //   ]),
+                //   const SizedBox(height: 10),
+                //   // Three answers side by side, so she can see all of them
+                //   // before she taps. Only drawn when both of you have results:
+                //   // a filter with one side empty is a control for nothing.
+                //   if (his > 0 && his < total)
+                //     _WhoseSegments(
+                //       whose: _partner,
+                //       onPick: (v) => setState(() => _partner = v),
+                //     ),
+                //   const SizedBox(height: 18),
+                // ],
+                const SizedBox(height: 6),
 
                 TtcRecordsBody(
                   // The filter only exists while both of you have results; if
@@ -212,6 +220,27 @@ class _TtcRecordsScreenState extends State<TtcRecordsScreen> {
                   // with no control left to undo it.
                   onlyPartner: his > 0 && his < total ? _partner : null,
                   resultsOnly: widget.resultsOnly,
+                  // ⚠️ A COUNT LINE, NOT A CONTROL. It states what is here
+                  // and whose it is in one sentence; the three-way filter
+                  // shows only while both of you have results (a filter with
+                  // one side empty is a control for nothing).
+                  summary: total == 0
+                      ? null
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(_countLine(total, his),
+                                key: const ValueKey('ttc_rec_count_line'),
+                                style: ttcBody(13, color: ttcSoft, h: 1.4)),
+                            if (his > 0 && his < total) ...[
+                              const SizedBox(height: 12),
+                              _WhoseSegments(
+                                whose: _partner,
+                                onPick: (v) => setState(() => _partner = v),
+                              ),
+                            ],
+                          ],
+                        ),
                 ),
 
                 // ⚠️ THE WAY OUT OF THE PHONE IS ALWAYS HERE NOW (2026-09-27).
@@ -289,12 +318,25 @@ class _TtcRecordsScreenState extends State<TtcRecordsScreen> {
   /// A split is only printed when there is a split. "You 11 · Partner 0" states
   /// an absence nobody asked about, on a screen where his absence from the
   /// folder is a sore point rather than a statistic.
-  String _countLine(int total, int his) {
-    final head = '$total ${total == 1 ? 'result' : 'results'}';
-    if (his == 0) return head;
-    if (his == total) return '$head · all Partner';
-    return '$head · You ${total - his} · Partner $his';
+  ///
+  /// ⚠️ SAID AS A SENTENCE (2026-09-29, the user on build 20: "1 result · all
+  /// Partner" reads oddly). The one-word tags "You" / "Partner" were never
+  /// words anyone says about a result; the owner is said the way the add page
+  /// says it, "yours" and "your partner's". Kept for revert:
+  ///   if (his == total) return '$head · all Partner';
+  ///   return '$head · You ${total - his} · Partner $his';
+  String _countLine(int total, int his) => ttcRecordsCountLine(total, his);
+}
+
+/// "3 results · 2 yours, 1 your partner's"; "1 result · your partner's";
+/// "4 results · all your partner's". Public for the test.
+String ttcRecordsCountLine(int total, int his) {
+  final head = '$total ${total == 1 ? 'result' : 'results'}';
+  if (his == 0) return head;
+  if (his == total) {
+    return total == 1 ? "$head · your partner's" : "$head · all your partner's";
   }
+  return "$head · ${total - his} yours, $his your partner's";
 }
 
 /// The one row that turns a folder into something you hand over.
@@ -431,10 +473,12 @@ class _WhoseSegments extends StatelessWidget {
         decoration: BoxDecoration(
             color: ttcPanel, borderRadius: BorderRadius.circular(999)),
         child: Row(children: [
+          // Said as the add page says whose (2026-09-29). Kept for revert:
+          // ('Everyone', null), ('You', false), ('Partner', true).
           for (final (label, value) in const [
-            ('Everyone', null),
-            ('You', false),
-            ('Partner', true),
+            ('Both of you', null),
+            ('Yours', false),
+            ("Your partner's", true),
           ])
             Expanded(
               child: GestureDetector(
@@ -449,6 +493,7 @@ class _WhoseSegments extends StatelessWidget {
                     boxShadow: whose == value ? ttcCardShadow : null,
                   ),
                   child: Text(label,
+                      textAlign: TextAlign.center,
                       style: ttcBody(12.5,
                           color: whose == value ? ttcTitleInk : ttcSoft,
                           w: FontWeight.w800)),
@@ -588,7 +633,8 @@ class _RecordCard extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: ttcPanel,
+              // Kept for revert (2026-09-29, no tinted slab behind text): color: ttcPanel,
+              color: Colors.white, border: const Border.fromBorderSide(BorderSide(color: ttcLine)),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Text(test.reading(hi),
@@ -653,7 +699,9 @@ Future<void> addTtcRecord(BuildContext context) async {
               const SizedBox(height: 18),
               Align(
                 alignment: Alignment.centerLeft,
-                child: Text(t.recordsAdd, style: ttcJakarta(17)),
+                // Kept for revert (2026-09-28): Text(t.recordsAdd, ...)
+                child: Text(t.hinglish ? t.recordsAdd : 'Add a result',
+                    style: ttcJakarta(17)),
               ),
               const SizedBox(height: 14),
 
@@ -678,7 +726,7 @@ Future<void> addTtcRecord(BuildContext context) async {
                                 horizontal: 13, vertical: 9),
                             decoration: BoxDecoration(
                               color:
-                                  testId == test.id ? ttcPurple : ttcPanel,
+                                  testId == test.id ? ttcTitleInk : ttcPanel,
                               borderRadius: BorderRadius.circular(999),
                             ),
                             child: Text(test.name,
@@ -716,7 +764,7 @@ Future<void> addTtcRecord(BuildContext context) async {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 14, vertical: 9),
                         decoration: BoxDecoration(
-                          color: forPartner == isHim ? ttcPurple : ttcPanel,
+                          color: forPartner == isHim ? ttcTitleInk : ttcPanel,
                           borderRadius: BorderRadius.circular(999),
                         ),
                         child: Text(isHim ? t.testForHim : t.testForHer,
@@ -752,7 +800,7 @@ Future<void> addTtcRecord(BuildContext context) async {
                       border: Border.all(color: ttcBorder)),
                   child: Row(children: [
                     const Icon(Icons.calendar_today_rounded,
-                        size: 16, color: ttcPurple),
+                        size: 16, color: ttcTitleInk),
                     const SizedBox(width: 11),
                     Text(_RecordCard._fmt(takenOn),
                         style: ttcBody(14, color: ttcInk, w: FontWeight.w600)),
@@ -770,11 +818,12 @@ Future<void> addTtcRecord(BuildContext context) async {
                       alignment: Alignment.center,
                       padding: const EdgeInsets.symmetric(vertical: 15),
                       decoration: BoxDecoration(
-                          color: ttcPanel,
+                          // Kept for revert (2026-09-29, no tinted slab behind text): color: ttcPanel,
+                          color: Colors.white, border: const Border.fromBorderSide(BorderSide(color: ttcLine)),
                           borderRadius: BorderRadius.circular(16)),
                       child: Text(t.journalCancel,
                           style:
-                              ttcBody(14, color: ttcSoft, w: FontWeight.w800)),
+                              ttcBody(14, color: ttcTitleInk, w: FontWeight.w800)),
                     ),
                   ),
                 ),
@@ -798,7 +847,7 @@ Future<void> addTtcRecord(BuildContext context) async {
                       alignment: Alignment.center,
                       padding: const EdgeInsets.symmetric(vertical: 15),
                       decoration: BoxDecoration(
-                          color: ttcPurple,
+                          color: ttcTitleInk,
                           borderRadius: BorderRadius.circular(16)),
                       child: Text(t.journalSave,
                           style: ttcBody(14,
@@ -841,7 +890,7 @@ Widget _field(TextEditingController c, String hint, {bool autofocus = false}) =>
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: ttcPurple, width: 1.4),
+          borderSide: const BorderSide(color: ttcTitleInk, width: 1.4),
         ),
       ),
     );

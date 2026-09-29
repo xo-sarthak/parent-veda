@@ -103,7 +103,8 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
   groups: [
     TtcFocusGroup(
         id: 'understand', mark: IntentMark.bookMark, tabMark: TtcTabMark.openBook,
-        label: 'Understand',
+        // Kept for revert (2026-09-28, explicit names): label: 'Understand',
+        label: 'Understand PCOS',
         icon: Icons.menu_book_outlined,
         hue: 206),
     // ⚠️ THE TOOL ITSELF, NOT A CARD THAT OPENS IT. See `TtcFocusGroup.
@@ -132,7 +133,8 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
         // "Keep track of it" — so the tab and the heading under it would say
         // the same words twice, which is the repetition the group heading was
         // deleted to stop.
-        label: 'Track',
+        // Kept for revert (2026-09-28, explicit names): label: 'Track',
+        label: 'Track your cycle',
         icon: Icons.calendar_today_outlined,
         hue: 160),
   ],
@@ -144,6 +146,7 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
   // a tile. `ttc_focus_page_test.dart` asserts against the data, not the paint.
   headline: TtcMasterclassTile(
     title: 'The PCOS programme',
+    id: 'ttc_tile_the_pcos_programme',
     blurb: 'A guided course with a specialist, at your own pace.',
     offeringId: 'ttc_course_pcos',
   ),
@@ -168,6 +171,7 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
         // ),
         TtcVideoTile(
           title: 'PCOS, explained in five minutes',
+          id: 'ttc_tile_pcos_explained_in_five_minutes',
           blurb: "What's going on in your ovaries, without the confusing "
               'diagrams.',
           slotId: 'ttc_vid_pcos_explained',
@@ -175,17 +179,20 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
         ),
         TtcArticleTile(
           title: 'PCOS and your cycle',
+          id: 'ttc_tile_pcos_and_your_cycle',
           blurb: 'What PCOS does to your month, day by day.',
           readId: 'ttc_read_pcos_cycle',
         ),
         TtcArticleTile(
           title: 'Irregular periods, explained',
+          id: 'ttc_tile_irregular_periods_explained',
           blurb: 'What "irregular" means, and the many things that can '
               'cause it.',
           readId: 'ttc_read_pcos_irregular',
         ),
         TtcMythTile(
           title: 'How common is PCOS?',
+          id: 'ttc_tile_how_common_is_pcos',
           blurb: "So common that you likely know a few people who have it.",
           myth: 'PCOS is rare, and having it means something has gone '
               'badly wrong.',
@@ -198,7 +205,8 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
     ),
 
     TtcFocusSection(
-      heading: 'Is it PCOS, or something else?',
+      // Kept for revert (2026-09-28, explicit names): heading: 'Is it PCOS, or something else?',
+      heading: 'PCOS, or something else?',
       group: 'understand',
       tiles: [
         // WARNING: AN INFOGRAPHIC, WHICH IS ONE FRAME. This was six carousel
@@ -210,6 +218,7 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
         // something to remember across a swipe.
         TtcInfographicTile(
           title: 'PCOS or ovarian cysts',
+          id: 'ttc_tile_pcos_or_ovarian_cysts',
           blurb: 'Two different things that sound alike.',
           headline: "The \"cysts\" in polycystic aren't cysts at all.",
           left: TtcInfographicColumn(
@@ -242,6 +251,7 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
         ),
         TtcInfographicTile(
           title: 'PCOS or thyroid',
+          id: 'ttc_tile_pcos_or_thyroid',
           blurb: 'One blood test tells them apart, and it often gets missed.',
           headline: 'They look alike from the outside. One blood test tells '
               'them apart.',
@@ -276,7 +286,9 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
           reviewedBy: 'Reviewed by Dr Ruchika Sood, IVF gynaecologist',
         ),
         TtcCarouselTile(
-          title: 'Hair changes, explained',
+          // Kept for revert (2026-09-28, explicit names): title: 'Hair changes, explained',
+          title: 'Hair changes with PCOS, explained',
+          id: 'ttc_tile_hair_changes_explained',
           blurb: "More hair where you don't want it, less where you do.",
           coverTitle: 'Hair changes, explained',
           coverBlurb: 'Why hair can grow and thin at the same time.',
@@ -326,6 +338,7 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
         ),
         TtcArticleTile(
           title: 'If a doctor says PCOS',
+          id: 'ttc_tile_if_a_doctor_says_pcos',
           blurb: 'What the diagnosis is based on, and what to ask before you '
               'leave the room.',
           readId: 'ttc_read_pcos_diagnosed',
@@ -374,6 +387,7 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
         // ),
         TtcVideoTile(
           title: 'What a PCOS-friendly Indian plate looks like',
+          id: 'ttc_tile_what_a_pcos_friendly_indian_plate_looks_like',
           blurb: "Roti, rice and dal aren't the problem. What you eat with "
               'them is what matters.',
           slotId: 'ttc_vid_pcos_plate',
@@ -381,6 +395,7 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
         ),
         TtcArticleTile(
           title: 'Eating for steadier blood sugar, with nothing banned',
+          id: 'ttc_tile_eating_for_steadier_blood_sugar_with_nothing_banned',
           blurb: "Insulin is the part worth understanding, and none of it "
               "means giving up rice.",
           readId: 'ttc_read_pcos_insulin',
@@ -390,6 +405,7 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
         // door linked it, while a film of the same name sat here unmade.
         TtcArticleTile(
           title: 'A day of eating, with PCOS',
+          id: 'ttc_tile_a_day_of_eating_with_pcos',
           blurb: 'What helps in an Indian kitchen, and what a whole day can '
               'look like.',
           readId: 'ttc_read_pcos_food',
@@ -401,12 +417,14 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
         // meals is the shape of a thing nobody cooks from.
         TtcRecipeTile(
           title: 'Moong dal chilla with curd',
+          id: 'ttc_tile_moong_dal_chilla_with_curd',
           blurb: 'Protein and fibre in place of refined flour (maida). Makes '
               "as many as you're cooking for.",
           recipeId: 'pcos_moong_chilla',
         ),
         TtcMythTile(
           title: 'Do you have to give up rice?',
+          id: 'ttc_tile_do_you_have_to_give_up_rice',
           blurb: 'The PCOS advice you will hear most often in India.',
           myth: 'People with PCOS have to give up rice, roti and all Indian '
               'carbohydrates.',
@@ -424,12 +442,15 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
       tiles: [
         TtcArticleTile(
           title: 'Inositol: what the studies show',
+          id: 'ttc_tile_inositol_what_the_studies_show',
           blurb: 'The one supplement with real trials behind it, and an '
               'honest look at how strong they are.',
           readId: 'ttc_read_pcos_inositol',
         ),
         TtcMythTile(
-          title: 'Worth it or hype?',
+          // Kept for revert (2026-09-28, explicit names): title: 'Worth it or hype?',
+          title: 'PCOS supplements: worth it or hype?',
+          id: 'ttc_tile_worth_it_or_hype',
           blurb: 'What the rest of the chemist shelf is doing.',
           myth: 'Fertility blends, detox teas and PCOS mixes are worth trying '
               "because they can't hurt.",
@@ -440,6 +461,7 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
         ),
         TtcProductTile(
           title: 'Myo-inositol',
+          id: 'ttc_tile_myo_inositol',
           blurb: 'If you decide to try it, this is the form used in the '
               'trials.',
           productId: 'myo_inositol',
@@ -453,6 +475,7 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
       tiles: [
         TtcArticleTile(
           title: 'Weight and PCOS, said kindly',
+          id: 'ttc_tile_weight_and_pcos_said_kindly',
           blurb: 'No number, no target, no plan. Just how weight and PCOS '
               'are linked.',
           readId: 'ttc_read_pcos_weight',
@@ -469,13 +492,16 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
         // ),
         TtcArticleTile(
           title: 'Sleep, movement and insulin',
+          id: 'ttc_tile_sleep_movement_and_insulin',
           blurb: 'Why a few short nights and a little strength work change '
               'how your body handles sugar.',
           readId: 'ttc_read_pcos_insulin',
           atHeading: 'Why do sleep and exercise matter?',
         ),
         TtcArticleTile(
-          title: 'Yoga, and your mood',
+          // Kept for revert (2026-09-28, explicit names): title: 'Yoga, and your mood',
+          title: 'Yoga for PCOS, and your mood',
+          id: 'ttc_tile_yoga_and_your_mood',
           blurb: 'What the small trials found, and why moving helps how you '
               'feel.',
           readId: 'ttc_read_pcos_insulin',
@@ -483,6 +509,7 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
         ),
         TtcVideoTile(
           title: 'Gentle movement for PCOS',
+          id: 'ttc_tile_gentle_movement_for_pcos',
           blurb: 'Ten minutes, and you won\'t need a gym.',
           slotId: 'ttc_pcos_movement',
           duration: '10 MIN',
@@ -499,12 +526,14 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
       tiles: [
         TtcArticleTile(
           title: 'PCOS and ovulation',
+          id: 'ttc_tile_pcos_and_ovulation',
           blurb: 'Why the egg is usually fine, and the problem is getting it '
               'released.',
           readId: 'ttc_read_pcos_ovulation',
         ),
         TtcCarouselTile(
           title: 'Cycles without ovulation',
+          id: 'ttc_tile_cycles_without_ovulation',
           blurb: "A month with a bleed but no egg released.",
           coverTitle: "A cycle with a bleed but no ovulation",
           coverBlurb: "How that happens, and how you'd know.",
@@ -544,6 +573,7 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
         ),
         TtcArticleTile(
           title: 'Getting pregnant with PCOS: what to expect',
+          id: 'ttc_tile_getting_pregnant_with_pcos_what_to_expect',
           blurb: 'What research says about how long it takes, honestly and '
               'without doom.',
           readId: 'ttc_read_pcos_timelines',
@@ -559,6 +589,7 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
         // audit): `ttc_vid_pcos_treatment` was on no door.
         TtcVideoTile(
           title: 'The PCOS treatments your doctor may offer',
+          id: 'ttc_tile_the_pcos_treatments_your_doctor_may_offer',
           blurb: 'The order treatments are tried in, and what to ask before '
               'you agree to any of them.',
           slotId: 'ttc_vid_pcos_treatment',
@@ -575,14 +606,19 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
         //   readId: 'ttc_read_pcos_treatment',
         // ),
         TtcArticleTile(
-          title: 'Before any tablet',
-          blurb: 'The first step a doctor usually suggests, and why it keeps '
-              'mattering.',
+          // Kept for revert (2026-09-28, explicit names): title: 'Before any tablet',
+          title: 'What comes before any PCOS tablet',
+          id: 'ttc_tile_what_comes_before_any_pcos_tablet',
+          // Kept for revert (2026-09-28, explicit names):
+          // blurb: 'The first step a doctor usually suggests, and why it keeps '
+          // 'mattering.',
+          blurb: 'The first step a doctor usually suggests, and why that step keeps mattering.',
           readId: 'ttc_read_pcos_treatment',
           atHeading: 'What comes before any tablet?',
         ),
         TtcArticleTile(
           title: 'Letrozole, metformin and the usual order',
+          id: 'ttc_tile_letrozole_metformin_and_the_usual_order',
           blurb: 'What gets tried first, and what each one does.',
           readId: 'ttc_read_pcos_meds',
         ),
@@ -607,7 +643,10 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
     //  so these stay rail tiles, but they are grouped under a heading that says
     //  plainly they are things you use rather than things you read.
     TtcFocusSection(
-      heading: 'Keep track of it',
+      // Kept for revert (2026-09-28, explicit names): heading: 'Keep track of it',
+      // Not 'Keep track of your cycle': the tab above is 'Track your cycle',
+      // and a heading that repeats its tab says nothing (2026-09-28).
+      heading: 'What is worth logging with PCOS?',
       group: 'track',
       // WARNING: THESE FIVE, IN THIS ORDER, ARE THE BRIEF'S OWN LIST. The tab
       // had drifted to four tools -- two from the brief and two invented -- and
@@ -622,13 +661,17 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
       // stop tracking and go and see someone.
       tiles: [
         TtcToolTile(
-          title: 'Cycle Companion',
+          // One name for one tool (2026-09-28): the Tools tab and Body and
+          // cycle say 'Cycle companion'. Kept for revert: 'Cycle Companion'.
+          title: 'Cycle companion',
+          id: 'ttc_tile_cycle_companion',
           blurb: 'Your pattern is read from this log. Three months of dates '
               'lets it tell you much more.',
           surfaceId: 'ttc_cycle',
         ),
         TtcToolTile(
           title: 'Log your symptoms',
+          id: 'ttc_tile_log_your_symptoms',
           // WARNING: WAS `ttc_tools`, WHICH OPENED THE TOOLS HUB. The tile said
           // "log your symptoms" and delivered a menu -- reachable, wrong, and
           // exactly the failure this stage tests for.
@@ -648,6 +691,7 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
         // ),
         TtcToolTile(
           title: 'What your cycle shows',
+          id: 'ttc_tile_what_your_cycle_shows',
           blurb: 'The months you logged, turned into a pattern in plain words.',
           surfaceId: 'ttc_cycle_report',
         ),
@@ -660,7 +704,9 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
         // notice, and a 700-word read on when to be worried is a read nobody
         // finishes and everybody skims for the frightening part.
         TtcCarouselTile(
-          title: 'When to see a doctor',
+          // Kept for revert (2026-09-28, explicit names): title: 'When to see a doctor',
+          title: 'When to see a doctor about PCOS',
+          id: 'ttc_tile_when_to_see_a_doctor',
           blurb: 'Four things worth a check. None of them is an emergency.',
           coverTitle: 'When to see a doctor',
           coverBlurb: 'Not urgent. Just worth booking.',
@@ -733,7 +779,9 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
         // Moved here from "What happens if we need treatment?" and pointed at
         // the PCOS answer (2026-09-27, relevance audit).
         TtcArticleTile(
-          title: 'When to see a specialist',
+          // Kept for revert (2026-09-28, explicit names): title: 'When to see a specialist',
+          title: 'When to see a PCOS specialist',
+          id: 'ttc_tile_when_to_see_a_specialist',
           blurb: 'With PCOS the clock starts sooner. The point where waiting '
               'is no longer the better plan.',
           readId: 'ttc_read_pcos_timelines',
@@ -751,12 +799,14 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
         // ),
         TtcTalkTile(
           title: 'Talk to a PCOS specialist',
+          id: 'ttc_tile_talk_to_a_pcos_specialist',
           blurb: 'A 1:1 with a gynaecologist about managing PCOS while you '
               'try.',
           action: 'ttc_consult_gynae',
         ),
         TtcMasterclassTile(
           title: 'The PCOS programme',
+          id: 'ttc_tile_the_pcos_programme',
           blurb: 'A guided course with a specialist, at your own pace.',
           offeringId: 'ttc_course_pcos',
         ),

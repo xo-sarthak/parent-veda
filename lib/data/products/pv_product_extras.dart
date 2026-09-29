@@ -28,6 +28,7 @@
 // =============================================================================
 
 import '../../models/pv_product.dart';
+import '../reads/read_images.dart' show readImageFor;
 
 String _u(String id) =>
     'https://images.unsplash.com/photo-$id?w=900&q=80&auto=format&fit=crop';
@@ -130,7 +131,13 @@ final Map<String, List<String>> kPvProductPhotos = {
   // Folic acid's own first photo, so the two cards looked like one product.
   // It draws its mark until a photo of a blend exists. Kept for revert:
   //   'ttc_fertility_blend': [_u('1707129785947-ddc627a8bab9'), _u('1624362772755-4d5843e67047')],
-  'ttc_fertility_blend': <String>[],
+  // Kept for revert (2026-09-29): 'ttc_fertility_blend': <String>[],
+  // ⚠️ ILLUSTRATIVE, NOT THE PRODUCT (2026-09-29, the user: "stop leaving
+  // the placeholders"). Plain yellow capsules with no pack and no name, from
+  // Wikimedia Commons (CC BY 2.0), mirrored to R2 as `prod_ttc_fertility_blend`
+  // and credited in read_images.dart. Listed in [kPvIllustrativePhotoIds], so
+  // the page says it is an illustration.
+  'ttc_fertility_blend': [?readImageFor('prod_ttc_fertility_blend')],
   // ⚠️ NO OTHER BRAND'S PRODUCT, AND NO BUMP (TTC launch walk, 2026-09-27):
   // 1647549228195 is a Clearblue test, shown on a Prega News listing, and
   // 1643659733565 is a pregnant belly on a shelf for people still trying.
@@ -148,11 +155,32 @@ final Map<String, List<String>> kPvProductPhotos = {
   // (LH) strips, Pre-Seed fertility-friendly lubricant. Kept for revert:
   //   'ttc_lh_strips': [_u('1619183921628-9e6050dcd2e1')],
   //   'ttc_lubricant': [_u('1580870069867-74c57ee1bb07')],
-  'ttc_lh_strips': <String>[],
+  // Kept for revert (2026-09-29):
+  //   'ttc_lh_strips': <String>[],
+  //   'ttc_lubricant': <String>[],
+  // ⚠️ GENERIC OBJECTS, NEVER ANOTHER BRAND'S PACK (2026-09-29). The strips:
+  // two unbranded LH strips on white (Wikimedia Commons, public domain), not
+  // the test-card photo the pregnancy test shows, so the two products still
+  // look different (PR1). The lubricant: a plain white pump bottle with no
+  // label (Commons, CC BY-SA 4.0), not a Pre-Seed pack, whose photo is not
+  // free. Both mirrored to R2 and credited in read_images.dart, and both in
+  // [kPvIllustrativePhotoIds].
+  'ttc_lh_strips': [?readImageFor('prod_ttc_lh_strips')],
   'ttc_preg_test': [_u('1619183921628-9e6050dcd2e1')],
-  'ttc_lubricant': <String>[],
+  'ttc_lubricant': [?readImageFor('prod_ttc_lubricant')],
   'ttc_thermometer': [_u('1594790628624-9e563bea851d'), _u('1609725236589-d987ffc8133a')],
   'ttc_book_impatient': [_u('1497633762265-9d179a990aa6'), _u('1495446815901-a7297e633e8d')],
+};
+
+/// Products whose photo is a generic object standing in for the product, not
+/// a representative shot of it (2026-09-29). The product page says so in
+/// words ("Illustrative photo, not this product"), rather than the usual
+/// "Representative photo", because a plain white bottle is not what a
+/// Pre-Seed pack looks like.
+const Set<String> kPvIllustrativePhotoIds = {
+  'ttc_lh_strips',
+  'ttc_lubricant',
+  'ttc_fertility_blend',
 };
 
 // ---- variants + recommends -------------------------------------------------

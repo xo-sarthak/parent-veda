@@ -17,6 +17,7 @@ import 'package:flutter/material.dart';
 
 import '../../memories/memory_models.dart';
 import '../../ttc/cycle_store.dart';
+import '../../ttc/ttc_chapter.dart' show TtcChapter;
 import '../../ttc/ttc_transition.dart';
 import '../../ttc/ttc_treatment_store.dart' show TtcTreatmentStep;
 import '../memories/memory_personalize_screen.dart';
@@ -123,27 +124,27 @@ class TtcTransitionScreen extends StatelessWidget {
               children: [
                 // Quiet certainty, not confetti. Plenty of couples arrive here
                 // carrying a previous loss.
-                Container(
+                //
+                // ⚠️ THE TOOLS' LIGHT FIELD, INK TYPE (2026-09-29): see
+                // `TtcHeroFieldCard`. Green, the hue a new beginning wears on
+                // the home. Kept for revert (2026-09-29): a Container,
+                // padding 24, decorated with
+                //   LinearGradient(begin: topLeft, end: bottomRight,
+                //       colors: [ttcPurple, ttcPurpleDeep]);
+                // the title white and the subtitle white at 95%.
+                TtcHeroFieldCard(
+                  hue: ttcChapterFieldHue(TtcChapter.aNewBeginning),
+                  variant: 5,
                   padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(ttcCardRadius),
-                    gradient: const LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [ttcPurple, ttcPurpleDeep],
-                                ),
-                  ),
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(t.transitionTitle,
                             style: ttcFraunces(30,
-                                w: FontWeight.w600, color: Colors.white)),
+                                w: FontWeight.w600, color: ttcInk)),
                         const SizedBox(height: 12),
                         Text(t.transitionSubtitle,
-                            style: ttcBody(14,
-                                color: Colors.white.withValues(alpha: 0.95),
-                                h: 1.6)),
+                            style: ttcBody(14, color: ttcInk, h: 1.6)),
                       ]),
                 ),
                 const SizedBox(height: 20),
@@ -183,9 +184,12 @@ class TtcTransitionScreen extends StatelessWidget {
                 ttcSectionTitle(t.transitionCarried),
                 TtcCard(
                   child: Column(children: [
-                    if (result.journalEntries > 0)
-                      _carried(Icons.edit_outlined,
-                          t.transitionJournal(result.journalEntries)),
+                    // Kept for revert (2026-09-28, journal out of TTC): the
+                    // journal left the stage, so this page no longer names it.
+                    // The entries stay in the store.
+                    //   if (result.journalEntries > 0)
+                    //     _carried(Icons.edit_outlined,
+                    //         t.transitionJournal(result.journalEntries)),
                     if (result.timelineEvents > 0)
                       _carried(Icons.timeline_rounded,
                           t.transitionStory(result.timelineEvents)),
@@ -214,7 +218,7 @@ class TtcTransitionScreen extends StatelessWidget {
                     alignment: Alignment.center,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     decoration: BoxDecoration(
-                        color: ttcPurple,
+                        color: ttcTitleInk,
                         borderRadius: BorderRadius.circular(16)),
                     child: Text(t.transitionNext,
                         style: ttcBody(14.5,
@@ -262,7 +266,7 @@ class TtcTransitionScreen extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       child: Row(mainAxisSize: MainAxisSize.min, children: [
                         const Icon(Icons.auto_awesome_outlined,
-                            size: 16, color: ttcPurple),
+                            size: 16, color: ttcTitleInk),
                         const SizedBox(width: 8),
                         // Flexible (2026-09-26): at 360dp the line ran 58pt
                         // past the edge. Found walking the B8 flow in a test.
@@ -270,7 +274,7 @@ class TtcTransitionScreen extends StatelessWidget {
                           child: Text(t.transitionMakeCard,
                               textAlign: TextAlign.center,
                               style: ttcBody(13,
-                                  color: ttcPurple, w: FontWeight.w700)),
+                                  color: ttcTitleInk, w: FontWeight.w700)),
                         ),
                       ]),
                     ),
@@ -304,12 +308,12 @@ class TtcTransitionScreen extends StatelessWidget {
   Widget _carried(IconData icon, String label) => Padding(
         padding: const EdgeInsets.only(bottom: 13),
         child: Row(children: [
-          Icon(icon, size: 17, color: ttcPurple),
+          Icon(icon, size: 17, color: ttcTitleInk),
           const SizedBox(width: 12),
           Expanded(
               child: Text(label,
                   style: ttcBody(13.5, color: ttcInk, w: FontWeight.w600))),
-          const Icon(Icons.check_rounded, size: 16, color: ttcPurple),
+          const Icon(Icons.check_rounded, size: 16, color: ttcTitleInk),
         ]),
       );
 
@@ -591,7 +595,8 @@ class _TtcPositiveTestScreenState extends State<TtcPositiveTestScreen> {
                 : 'Transfer on ${ttcDueDateText(_transfer!)}',
             line: _transfer == null
                 ? 'The day the embryo was put back.'
-                : 'Tap to change it.',
+                // Kept for revert (2026-09-28): 'Tap to change it.'
+                : 'Tap to change the transfer date.',
             icon: Icons.edit_calendar_outlined,
             onTap: _pickTransfer,
           )),
@@ -605,14 +610,20 @@ class _TtcPositiveTestScreenState extends State<TtcPositiveTestScreen> {
                 label: 'Day $d',
                 on: _embryo == d,
                 hue: _hue,
-                onTap: () => setState(() => _embryo = d),
+                // A second tap clears the day (2026-09-29, the user: an answer
+                // must come back off in place). `_embryo` is nullable and the
+                // "date it from my transfer" option already waits for it.
+                // Kept for revert: setState(() => _embryo = d).
+                onTap: () =>
+                    setState(() => _embryo = _embryo == d ? null : d),
               ),
           ])),
           if (transferDue != null) ...[
             const SizedBox(height: 14),
             ttcToolPad(TtcRoundOption(
               key: const ValueKey('ttc_positive_from_transfer'),
-              title: 'Date it from my transfer',
+              // Kept for revert (2026-09-28): 'Date it from my transfer'
+              title: 'Date my pregnancy from my transfer',
               line: 'Due ${ttcDueDateText(transferDue)}. Your transfer on '
                   '${ttcDueDateText(_transfer!)}, a day $_embryo embryo, the '
                   'way clinics date it.',

@@ -70,7 +70,17 @@ void main() {
     for (final entry in tabs.entries) {
       testWidgets('${entry.key} renders a profile door', (tester) async {
         await pumpTall(tester, entry.value);
-        expect(find.byIcon(Icons.person_outline_rounded), findsWidgets,
+        // ⚠️ SINCE 2026-09-28 THE BAR'S LAST TAB IS MORE (the grid glyph),
+        // which opens the same profile screen; on a tab whose header has no
+        // avatar, that tab is the door. Kept for revert:
+        //   expect(find.byIcon(Icons.person_outline_rounded), findsWidgets,
+        //       reason: '${entry.key} has no way into Profile');
+        expect(
+            find.byWidgetPredicate((w) =>
+                w is Icon &&
+                (w.icon == Icons.person_outline_rounded ||
+                    w.icon == Icons.grid_view_outlined)),
+            findsWidgets,
             reason: '${entry.key} has no way into Profile');
       });
     }

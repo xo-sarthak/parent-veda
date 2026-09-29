@@ -189,7 +189,8 @@ class TtcInfographicScreen extends StatelessWidget {
                       width: double.infinity,
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                          color: ttcPanel,
+                          // Kept for revert (2026-09-29, no tinted slab behind text): color: ttcPanel,
+                          color: Colors.white, border: const Border.fromBorderSide(BorderSide(color: ttcLine)),
                           borderRadius: BorderRadius.circular(ttcCardRadius)),
                       child: Text(tile.footnote!,
                           style: ttcBody(13.5, h: 1.6, color: ttcInk)),

@@ -295,8 +295,12 @@ final List<PvRead> kTtcReadsIvf = [
 
     faqs: [
       PvReadFaq(
+        // Kept for revert (2026-09-28, explicit names; shown on its own in
+        // Learn's Common questions):
+        // question: _en("We've only been trying for eight months, but I'm "
+        //     'anxious. Is it too early?'),
         question: _en("We've only been trying for eight months, but I'm "
-            'anxious. Is it too early?'),
+            'anxious. Is it too early to see a doctor?'),
         answer: _en('No. Being seen earlier does no harm, and the first '
             'appointment is a talk and some tests. If the waiting is costing '
             'you sleep, that on its own is a fair reason to see a doctor.'),
@@ -356,7 +360,8 @@ final List<PvRead> kTtcReadsIvf = [
     nextSteps: [
       PvReadNextStep(
         kind: PvNextKind.tool,
-        title: _en('The tests, one by one'),
+        // Kept for revert (2026-09-28, explicit names): title: _en('The tests, one by one'),
+        title: _en('The full test library'),
         value: _en("What each one measures, when in the cycle it's done, and "
             'what it costs in India.'),
         surfaceId: 'ttc_tests',
@@ -686,7 +691,8 @@ final List<PvRead> kTtcReadsIvf = [
     nextSteps: [
       PvReadNextStep(
         kind: PvNextKind.read,
-        title: _en('What it costs in India'),
+        // Kept for revert (2026-09-28, explicit names): title: _en('What it costs in India'),
+        title: _en('What IVF costs in India'),
         value: _en('Real price ranges, what a package leaves out, and the bills '
             'that come separately.'),
         surfaceId: 'ttc_read/ttc_read_ivf_costs',
@@ -707,11 +713,16 @@ final List<PvRead> kTtcReadsIvf = [
       ),
     ],
 
-    readNext: [
-      'ttc_read_ivf_costs',
-      'ttc_read_ovulation_tablets',
-      'ttc_read_clinic_glossary',
-    ],
+    // ⚠️ ONE READ, ONCE, AT THE FOOT (2026-09-28, no repetition):
+    // 'ttc_read_ivf_costs' is the next step "What it costs in India",
+    // so the Read next rail no longer lists it a second time.
+    // Kept for revert:
+    // readNext: [
+    // 'ttc_read_ivf_costs',
+    // 'ttc_read_ovulation_tablets',
+    // 'ttc_read_clinic_glossary',
+    // ],
+    readNext: ['ttc_read_ovulation_tablets', 'ttc_read_clinic_glossary'],
   ),
 
   // ===========================================================================

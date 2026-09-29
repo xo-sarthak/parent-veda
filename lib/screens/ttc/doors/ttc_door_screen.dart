@@ -63,6 +63,10 @@
 //    3  every section is a rail of ONE card (`TtcDoorSectionCard`), never
 //       rows: the rows-when-all-written rule is retired (kept for revert).
 //       A card with no photo is typographic, not a faded ghost shape.
+//       ⚠️ 2026-09-29: the one card is now `TtcKindCard` on every door, one
+//       shape with a tint, a kind pill and a fact pill per kind, after the
+//       user's reference picture (`ttc_kind_cards.dart`, DESIGN-SYSTEM
+//       §4.0f). `TtcDoorSectionCard` is the never-reached fallback.
 //    4  a pinned red flag is one compact row that opens the full list in a
 //       sheet (`TtcDoorFlagRow`); nothing clinical removed, only folded.
 //    5  one heading style for every section: pvFraunces 21 w600.
@@ -123,6 +127,7 @@ import '../../../data/mind_mood_data.dart'
 import '../ttc_get_help_screen.dart'
     show TtcGetHelpRow, openTtcGetHelp, ttcDialNumber, TtcDial;
 import '../ttc_intimate_offer.dart' show ttcMaybeOfferIntimateSwitch;
+import '../ttc_common.dart' show ttcSectionHeadingStyle;
 import '../ttc_strings.dart';
 import '../ttc_surface_router.dart' show ttcInlineToolFor, openTtcSurface;
 // Kept for revert: `show TtcStartTreatmentCard` (the panel draws it now).
@@ -130,8 +135,10 @@ import '../ttc_treatment_round_screens.dart'
     show TtcIvfRoundPanel, ttcIvfRoundLeads;
 import '../../../ttc/ttc_treatment_store.dart';
 import 'ttc_door_card.dart';
+import 'ttc_door_hero.dart';
 import 'ttc_door_rail.dart';
 import 'ttc_door_search.dart';
+import 'ttc_kind_cards.dart';
 
 // -----------------------------------------------------------------------------
 //  Keys a test can find
@@ -228,7 +235,17 @@ const double kTtcDoorHeroOverlap = 38;
 /// Sized to hold the back button, the eyebrow, a two-line headline, a
 /// three-line blurb and the field, so the clamps below are what keep it
 /// fixed. At a very large text size the hero grows rather than overflow.
+///
+/// ⚠️ SUPERSEDED 2026-09-29 by `ttcDoorHeroHeight(width, top)` in
+/// ttc_door_hero.dart: the art's 3:2 frame is as tall as the screen is wide
+/// allows, so the one height is per screen, still the same on every door.
+/// Kept for revert and for `_Hero`.
 const double kTtcDoorHeroHeight = 344;
+
+/// The gap from the sheet's edge to the tab rail (2026-09-29): the same as
+/// the search pill keeps above the edge (`kTtcDoorHeroFootGap`), so the pill
+/// and the cards each have their own clear space.
+const double kTtcDoorRailTopGap = kTtcDoorHeroFootGap;
 
 /// The one vertical rhythm on a door (2026-09-27): the gap between any two
 /// blocks (rail, panel, flag, note, tool, section, closing line), and the
@@ -238,13 +255,14 @@ const double _kTtcDoorHeadingGap = 12;
 
 /// The section heading, one style for every section on every door (and the
 /// inline Mind & body Today panel matches it).
-TextStyle ttcDoorHeadingStyle(V2Palette p) => pvFraunces(
-  fontSize: 21,
-  fontWeight: FontWeight.w600,
-  height: 1.2,
-  letterSpacing: -0.45,
-  color: p.ink1,
-);
+///
+/// 2026-09-29 (one heading style): it IS the stage's one section heading now,
+/// `ttcSectionHeadingStyle` in ttc_common.dart, so a door and a tool page can
+/// no longer drift apart. Kept for revert, the same numbers inline:
+///   pvFraunces(fontSize: 21, fontWeight: FontWeight.w600, height: 1.2,
+///       letterSpacing: -0.45, color: p.ink1)
+TextStyle ttcDoorHeadingStyle(V2Palette p) =>
+    ttcSectionHeadingStyle(color: p.ink1);
 
 // -----------------------------------------------------------------------------
 //  The one opener
@@ -797,7 +815,8 @@ class _TtcDoorScreenState extends State<TtcDoorScreen> {
     if (g.inlineLabel case final label?) return label;
     final n = _sectionsOf(g.id).fold(0, (t, s) => t + s.tiles.length);
     if (n == 0) {
-      return (g.inlineSurfaceId ?? g.toolSurfaceId) != null ? 'Try it' : '';
+      // Kept for revert (2026-09-28, explicit names): 'Try it'.
+      return (g.inlineSurfaceId ?? g.toolSurfaceId) != null ? 'A tool' : '';
     }
     return n == 1 ? '1 thing' : '$n things';
   }
@@ -866,6 +885,25 @@ class _TtcDoorScreenState extends State<TtcDoorScreen> {
                   // The sheet owns the bottom clearance, not the list.
                   padding: EdgeInsets.zero,
                   children: [
+                    // ⚠️ THE HERO FOR FLAT ART (2026-09-29, build 20): the
+                    // picture whole in a 3:2 frame, the words and the white
+                    // search pill below it in ink on the art's own ground,
+                    // no scrim, no parallax (ttc_door_hero.dart). Kept for
+                    // revert, the photograph hero:
+                    //   _Hero(key: kTtcDoorHeroKey, scroll: _offset,
+                    //     page: page, p: p, tint: tint,
+                    //     eyebrow: bracket.label.of(lang), bracket: bracket,
+                    //     search: _search, hasRail: groups.isNotEmpty,
+                    //     onSubmitted: <the same callback>),
+                    // ⚠️ BACK TO THE PHOTOGRAPH HERO (2026-09-29, the user on
+                    // build 21: the stacked art-then-words hero was "a very
+                    // bad change"; Flo's door, the words and search ON the
+                    // picture with the cards riding up over its foot, is the
+                    // shape to keep). Kept for revert, the flat-art hero:
+                    //   TtcDoorHero(key: kTtcDoorHeroKey,
+                    //     fieldKey: kTtcDoorSearchKey, page: page, p: p,
+                    //     tint: tint, eyebrow: ..., bracket: bracket,
+                    //     search: _search, onSubmitted: <the same callback>),
                     _Hero(
                       key: kTtcDoorHeroKey,
                       scroll: _offset,
@@ -907,14 +945,28 @@ class _TtcDoorScreenState extends State<TtcDoorScreen> {
                         else ...[
                           SizedBox(key: _selectorAnchor, height: 0),
 
-                          // ---- the rail, across the seam ------------------
-                          // A slot `overlap` shorter than the rail, with the
-                          // rail painted upward out of it, puts the cards'
-                          // top half over the photograph (Flo).
+                          // ---- the rail, on the sheet, in its own space ---
+                          // ⚠️ NO LONGER ACROSS THE SEAM (2026-09-29, build
+                          // 20: the search "feels like a fit-to-fill" against
+                          // the cards). The rail sits [kTtcDoorRailTopGap]
+                          // under the sheet's edge, the same gap the search
+                          // keeps above it. Kept for revert, the straddle:
+                          //   SizedBox(
+                          //     height: TtcDoorRail.cardHeight -
+                          //         TtcDoorRail.overlap,
+                          //     child: OverflowBox(
+                          //       alignment: Alignment.bottomCenter,
+                          //       minHeight: TtcDoorRail.cardHeight,
+                          //       maxHeight: TtcDoorRail.cardHeight,
+                          //       child: TtcDoorRail(...the same...)))
+                          // The straddle is back with the photograph hero
+                          // (2026-09-29): the rail rides up over the hero's
+                          // foot, as on Flo. Kept for revert, the gap:
+                          //   const SizedBox(height: kTtcDoorRailTopGap),
                           if (groups.isNotEmpty) ...[
                             SizedBox(
-                              height:
-                                  TtcDoorRail.cardHeight - TtcDoorRail.overlap,
+                              height: TtcDoorRail.cardHeight -
+                                  TtcDoorRail.overlap,
                               child: OverflowBox(
                                 alignment: Alignment.bottomCenter,
                                 minHeight: TtcDoorRail.cardHeight,
@@ -926,8 +978,6 @@ class _TtcDoorScreenState extends State<TtcDoorScreen> {
                                   ],
                                   selected: groupIndex,
                                   p: p,
-                                  // Kept for revert: onPick: (i) =>
-                                  //   setState(() => _groupId = groups[i].id),
                                   onPick: (i) {
                                     setState(() => _groupId = groups[i].id);
                                     // The one-time shared-phone offer
@@ -1105,30 +1155,104 @@ class _TtcDoorScreenState extends State<TtcDoorScreen> {
                             //     says "Elsewhere". A signpost is not content.
                             // Kept for revert: the rail over `section.tiles`,
                             // every tile a card, whatever it was.
-                            if (ttcDoorRailTiles(section.tiles)
-                                case final tiles when tiles.length == 1)
+                            // ⚠️ ONE CARD FAMILY ON EVERY DOOR (2026-09-29, the user's
+                            // reference picture): every piece is a `TtcKindCard`, one shape
+                            // and one tint per kind (`ttc_kind_cards.dart`). Same order
+                            // (`ttcDoorRailTiles`, an unmade film last), same taps. Three
+                            // placements of the ONE card:
+                            //   · two or more pieces: a rail of 240 cards (or the two-up
+                            //     grid, `kTtcDoorCardsAsGrid`; the choice is argued in
+                            //     DESIGN-SYSTEM §4.0f);
+                            //   · ONE piece: the same card at the content width and the rail's
+                            //     height, never a lone card beside empty space (D13);
+                            //   · a way to another door: its link row below, as before (MB20).
+                            // ⚠️ FLO'S SMALL BLOCKS (2026-09-29, the user on build
+                            // 21): every shelf, one piece or many, is a row of
+                            // [TtcFloCard]s at Flo's size. Kept for revert: the
+                            // three branches below, behind kTtcDoorCardsFlo.
+                            if (kTtcDoorCardsFlo &&
+                                ttcDoorRailTiles(section.tiles)
+                                    .any((t) => ttcCardKindOf(t) != null))
+                              Builder(builder: (context) {
+                                final tiles = [
+                                  for (final t in ttcDoorRailTiles(section.tiles))
+                                    if (ttcCardKindOf(t) != null) t,
+                                ];
+                                final h = ttcFloRailHeight(
+                                  MediaQuery.textScalerOf(context),
+                                );
+                                return SizedBox(
+                                  key: ttcDoorSectionRailKey(section.heading),
+                                  height: h,
+                                  child: ListView.separated(
+                                    scrollDirection: Axis.horizontal,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: kPvDoorGutter,
+                                    ),
+                                    itemCount: tiles.length,
+                                    separatorBuilder: (_, _) =>
+                                        const SizedBox(width: 10),
+                                    itemBuilder: (context, i) => TtcFloCard(
+                                      tile: tiles[i],
+                                      kind: ttcCardKindOf(tiles[i])!,
+                                      p: p,
+                                      height: h,
+                                      onTap: () => _openTile(tiles[i]),
+                                    ),
+                                  ),
+                                );
+                              })
+                            else if (ttcDoorRailTiles(section.tiles)
+                                case final tiles
+                                when tiles.length == 1 &&
+                                    ttcCardKindOf(tiles.single) != null)
                               pvDoorPad(
-                                TtcDoorWideCard(
+                                LayoutBuilder(
                                   key: ttcDoorSectionWideKey(section.heading),
-                                  p: p,
-                                  hue: hue,
-                                  mark: ttcDoorTileMark(tiles.single),
-                                  icon: ttcTileIsUnmadeFilm(tiles.single)
-                                      ? Icons.schedule_rounded
-                                      : null,
-                                  kind: ttcDoorChip(tiles.single),
-                                  title: tiles.single.title,
-                                  blurb: tiles.single.blurb,
-                                  meta: ttcDoorTileMeta(tiles.single),
-                                  imageUrl: photoForTile(tiles.single),
-                                  onTap: () => _openTile(tiles.single),
+                                  builder: (context, box) => TtcKindCard(
+                                    tile: tiles.single,
+                                    kind: ttcCardKindOf(tiles.single)!,
+                                    p: p,
+                                    width: box.maxWidth,
+                                    imageHeight: kTtcDoorCardsAsGrid
+                                        ? null
+                                        : ttcKindCardImageHeight(),
+                                    onTap: () => _openTile(tiles.single),
+                                  ),
+                                ),
+                              )
+                            else if (ttcDoorRailTiles(section.tiles)
+                                case final tiles
+                                when tiles.isNotEmpty && kTtcDoorCardsAsGrid)
+                              pvDoorPad(
+                                LayoutBuilder(
+                                  key: ttcDoorSectionRailKey(section.heading),
+                                  builder: (context, box) {
+                                    final w = (box.maxWidth - kPvRailGap) / 2;
+                                    return Wrap(
+                                      spacing: kPvRailGap,
+                                      runSpacing: kPvRailGap,
+                                      children: [
+                                        for (final t in tiles)
+                                          if (ttcCardKindOf(t) case final kind?)
+                                            TtcKindCard(
+                                              tile: t,
+                                              kind: kind,
+                                              p: p,
+                                              width: w,
+                                              onTap: () => _openTile(t),
+                                            ),
+                                      ],
+                                    );
+                                  },
                                 ),
                               )
                             else if (ttcDoorRailTiles(section.tiles)
                                 case final tiles when tiles.isNotEmpty)
                               SizedBox(
                                 key: ttcDoorSectionRailKey(section.heading),
-                                height: kTtcDoorCardHeight,
+                                // One height for every card, grown with the text size.
+                                height: ttcKindCardHeight(MediaQuery.textScalerOf(context)),
                                 child: ListView.separated(
                                   scrollDirection: Axis.horizontal,
                                   padding: const EdgeInsets.symmetric(
@@ -1139,24 +1263,138 @@ class _TtcDoorScreenState extends State<TtcDoorScreen> {
                                       const SizedBox(width: kPvRailGap),
                                   itemBuilder: (context, i) {
                                     final t = tiles[i];
-                                    return TtcDoorSectionCard(
-                                      p: p,
-                                      hue: hue,
-                                      mark: ttcDoorTileMark(t),
-                                      // D3: an unmade film wears a clock,
-                                      // never a play glyph.
-                                      icon: ttcTileIsUnmadeFilm(t)
-                                          ? Icons.schedule_rounded
-                                          : null,
-                                      kind: ttcDoorChip(t),
-                                      title: t.title,
-                                      meta: ttcDoorTileMeta(t),
-                                      imageUrl: photoForTile(t),
-                                      onTap: () => _openTile(t),
+                                    if (ttcCardKindOf(t) case final kind?) {
+                                      return TtcKindCard(
+                                        tile: t,
+                                        kind: kind,
+                                        p: p,
+                                        onTap: () => _openTile(t),
+                                      );
+                                    }
+                                    // Never reached: every rail piece has a kind (a door
+                                    // tile is a link row). The old card, not a hole.
+                                    return Align(
+                                      alignment: Alignment.topCenter,
+                                      child: TtcDoorSectionCard(
+                                        p: p,
+                                        hue: hue,
+                                        mark: ttcDoorTileMark(t),
+                                        kind: ttcDoorChip(t),
+                                        title: t.title,
+                                        meta: ttcDoorTileMeta(t),
+                                        imageUrl: photoForTile(t),
+                                        onTap: () => _openTile(t),
+                                      ),
                                     );
                                   },
                                 ),
                               ),
+                            // Kept for revert (2026-09-29), the three shapes before the one
+                            // card family (the wide card, the kind rail on the Fertile window
+                            // door alone, and the photo card rail on the other eight):
+                            // if (ttcDoorRailTiles(section.tiles)
+                            //     case final tiles when tiles.length == 1)
+                            //   pvDoorPad(
+                            //     TtcDoorWideCard(
+                            //       key: ttcDoorSectionWideKey(section.heading),
+                            //       p: p,
+                            //       hue: hue,
+                            //       mark: ttcDoorTileMark(tiles.single),
+                            //       icon: ttcTileIsUnmadeFilm(tiles.single)
+                            //           ? Icons.schedule_rounded
+                            //           : null,
+                            //       kind: ttcDoorChip(tiles.single),
+                            //       title: tiles.single.title,
+                            //       blurb: tiles.single.blurb,
+                            //       meta: ttcDoorTileMeta(tiles.single),
+                            //       imageUrl: photoForTile(tiles.single),
+                            //       onTap: () => _openTile(tiles.single),
+                            //     ),
+                            //   )
+                            // // ⚠️ ONE LOOK PER KIND (2026-09-28), on the doors
+                            // // in `kTtcDoorsWithKindCards` only (the Fertile
+                            // // window door first, for the user to judge): a
+                            // // film is a 16:9 thumbnail, a story is tall with
+                            // // ticks, a tool is an icon and a verb, and so on
+                            // // (`ttc_kind_cards.dart`). Same rail, same order,
+                            // // same taps; every other door draws as before.
+                            // else if (ttcDoorRailTiles(section.tiles)
+                            //     case final tiles
+                            //     when tiles.isNotEmpty &&
+                            //         ttcDoorDrawsKinds(page.bracketId))
+                            //   SizedBox(
+                            //     key: ttcDoorSectionRailKey(section.heading),
+                            //     height: kTtcKindRailHeight,
+                            //     child: ListView.separated(
+                            //       scrollDirection: Axis.horizontal,
+                            //       padding: const EdgeInsets.symmetric(
+                            //         horizontal: kPvDoorGutter,
+                            //       ),
+                            //       itemCount: tiles.length,
+                            //       separatorBuilder: (_, _) =>
+                            //           const SizedBox(width: kPvRailGap),
+                            //       itemBuilder: (context, i) {
+                            //         final t = tiles[i];
+                            //         if (ttcCardKindOf(t) case final kind?) {
+                            //           return TtcKindCard(
+                            //             tile: t,
+                            //             kind: kind,
+                            //             p: p,
+                            //             hue: hue,
+                            //             onTap: () => _openTile(t),
+                            //           );
+                            //         }
+                            //         // A kind with no look of its own yet
+                            //         // (a course, a recipe): the one card.
+                            //         return Align(
+                            //           alignment: Alignment.topCenter,
+                            //           child: TtcDoorSectionCard(
+                            //             p: p,
+                            //             hue: hue,
+                            //             mark: ttcDoorTileMark(t),
+                            //             kind: ttcDoorChip(t),
+                            //             title: t.title,
+                            //             meta: ttcDoorTileMeta(t),
+                            //             imageUrl: photoForTile(t),
+                            //             onTap: () => _openTile(t),
+                            //           ),
+                            //         );
+                            //       },
+                            //     ),
+                            //   )
+                            // else if (ttcDoorRailTiles(section.tiles)
+                            //     case final tiles when tiles.isNotEmpty)
+                            //   SizedBox(
+                            //     key: ttcDoorSectionRailKey(section.heading),
+                            //     height: kTtcDoorCardHeight,
+                            //     child: ListView.separated(
+                            //       scrollDirection: Axis.horizontal,
+                            //       padding: const EdgeInsets.symmetric(
+                            //         horizontal: kPvDoorGutter,
+                            //       ),
+                            //       itemCount: tiles.length,
+                            //       separatorBuilder: (_, _) =>
+                            //           const SizedBox(width: kPvRailGap),
+                            //       itemBuilder: (context, i) {
+                            //         final t = tiles[i];
+                            //         return TtcDoorSectionCard(
+                            //           p: p,
+                            //           hue: hue,
+                            //           mark: ttcDoorTileMark(t),
+                            //           // D3: an unmade film wears a clock,
+                            //           // never a play glyph.
+                            //           icon: ttcTileIsUnmadeFilm(t)
+                            //               ? Icons.schedule_rounded
+                            //               : null,
+                            //           kind: ttcDoorChip(t),
+                            //           title: t.title,
+                            //           meta: ttcDoorTileMeta(t),
+                            //           imageUrl: photoForTile(t),
+                            //           onTap: () => _openTile(t),
+                            //         );
+                            //       },
+                            //     ),
+                            //   ),
                             for (final t
                                 in section.tiles.whereType<TtcDoorTile>())
                               pvDoorPad(
@@ -1262,8 +1500,10 @@ class _TtcDoorScreenState extends State<TtcDoorScreen> {
       const SizedBox(height: 22),
       pvDoorPad(
         Text(
+          // Names what was searched and where (2026-09-28, explicit names).
+          // Kept for revert: 'Nothing here by that name yet'.
           hits.isEmpty
-              ? 'Nothing here by that name yet'
+              ? 'Nothing in $label matches "$q" yet'
               : 'In $label and the library',
           // The one heading style (2026-09-27). Kept for revert: pvFraunces
           // 22, w600, height 1.15.
@@ -1280,9 +1520,11 @@ class _TtcDoorScreenState extends State<TtcDoorScreen> {
         pvDoorPad(
           Text(
             key: kTtcDoorSearchEmptyKey,
+            // Kept for revert (2026-09-28, explicit names): '... or one of '
+            // 'these:',
             'We looked through $label and every read in Trying to conceive, '
-            'words and all. Try a shorter word, a medicine name, or one of '
-            'these:',
+            'words and all. Try a shorter word, a medicine name, or a topic '
+            'below:',
             style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2),
           ),
         ),
@@ -1395,8 +1637,14 @@ class _TtcDoorScreenState extends State<TtcDoorScreen> {
 /// fixed height once the headline is two lines and the blurb three, so every
 /// door is the same height; only an accessibility text size taller than that
 /// grows the hero, which is better than clipping her words.
+///
+/// ⚠️ SUPERSEDED 2026-09-29 by `TtcDoorHero` (ttc_door_hero.dart): the
+/// photograph under a scrim, cover-cropped and parallaxed, with white type
+/// and the glass field on it. Kept for revert.
+// ignore: unused_element
 class _Hero extends StatelessWidget {
   const _Hero({
+    // ignore: unused_element_parameter
     super.key,
     required this.scroll,
     required this.page,

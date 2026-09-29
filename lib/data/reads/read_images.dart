@@ -1633,6 +1633,369 @@ const Map<String, String> kReadImageUrls = {
   // Talk to a fertility doctor
   'ttc_tile_talk_to_a_fertility_doctor':
       'https://upload.wikimedia.org/wikipedia/commons/7/75/Stethoscope_1.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled',
+  // ---- Learn covers for Trying to conceive (2026-09-29): one photo per programme, objects and rooms, never a face (pv_learn_images.dart).
+  // Stethoscope Medical
+  'learn_ttc_consult_fertility':
+      'https://cdn.stocksnap.io/img-thumbs/960w/9M1HWW2JFV.jpg',
+  // Notepad Pen
+  'learn_ttc_consult_gynae':
+      'https://cdn.stocksnap.io/img-thumbs/960w/QDWAF9X1N0.jpg',
+  // File:Laboratory Optical Microscope.jpg
+  'learn_ttc_consult_androl':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/6/61/Laboratory_Optical_Microscope.jpg/960px-Laboratory_Optical_Microscope.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // File:Desk-laptop-notebook-table (23697249344).jpg
+  'learn_ttc_course_basics':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4e/Desk-laptop-notebook-table_%2823697249344%29.jpg/960px-Desk-laptop-notebook-table_%2823697249344%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // File:Healthy meal planning with fresh fruits and vegetables in a bright kitchen setting.jp
+  'learn_ttc_course_pcos':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bc/Healthy_meal_planning_with_fresh_fruits_and_vegetables_in_a_bright_kitchen_setting.jpg/960px-Healthy_meal_planning_with_fresh_fruits_and_vegetables_in_a_bright_kitchen_setting.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // File:Yoga mat and water bottle in a living room.jpg
+  'learn_ttc_yoga_pack':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/5/50/Yoga_mat_and_water_bottle_in_a_living_room.jpg/960px-Yoga_mat_and_water_bottle_in_a_living_room.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // File:Indian Spices (49696133942).jpg
+  'learn_ttc_nutrition_consult':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2a/Indian_Spices_%2849696133942%29.jpg/960px-Indian_Spices_%2849696133942%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // House Home
+  'learn_ttc_psych_consult':
+      'https://cdn.stocksnap.io/img-thumbs/960w/6M49G7YDLK.jpg',
+  // Home House
+  'learn_ttc_loss_support':
+      'https://cdn.stocksnap.io/img-thumbs/960w/UO87523H3M.jpg',
+  // File:Cozy living room setting with a yellow sofa and a coffee table adorned with cups and 
+  'learn_ttc_assessment_couple':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fa/Cozy_living_room_setting_with_a_yellow_sofa_and_a_coffee_table_adorned_with_cups_and_a_flower_pot.jpg/960px-Cozy_living_room_setting_with_a_yellow_sofa_and_a_coffee_table_adorned_with_cups_and_a_flower_pot.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // Track Race
+  'learn_ttc_partner_workshop':
+      'https://cdn.stocksnap.io/img-thumbs/960w/YYH82Y0CS7.jpg',
+  // File:Pipette de laboratoire sur fond blanc au Bénin 04.jpg
+  'learn_ttc_ivf_prep':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cc/Pipette_de_laboratoire_sur_fond_blanc_au_B%C3%A9nin_04.jpg/960px-Pipette_de_laboratoire_sur_fond_blanc_au_B%C3%A9nin_04.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // File:Personal organizer with metallic ring binder.jpg
+  'learn_ttc_lifestyle_90':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/5/56/Personal_organizer_with_metallic_ring_binder.jpg/960px-Personal_organizer_with_metallic_ring_binder.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // File:Singing Bowl from Nepal.jpg
+  'learn_ttc_course_garbh':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/9/92/Singing_Bowl_from_Nepal.jpg/960px-Singing_Bowl_from_Nepal.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // ---- TTC products whose own photo is not free (2026-09-29): a generic object, never another brand's pack; the page says "Illustrative photo" (kPvIllustrativePhotoIds).
+  // File:Ovulatietest-zijdelings.jpg
+  'prod_ttc_lh_strips':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/a/af/Ovulatietest-zijdelings.jpg/960px-Ovulatietest-zijdelings.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // File:250ml HDPE pump plastic bottle.jpg
+  'prod_ttc_lubricant':
+      'https://upload.wikimedia.org/wikipedia/commons/f/f5/250ml_HDPE_pump_plastic_bottle.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled',
+  // File:Quercetin Supplement Capsules - 53398952524.jpg
+  'prod_ttc_fertility_blend':
+      'https://upload.wikimedia.org/wikipedia/commons/5/52/Quercetin_Supplement_Capsules_-_53398952524.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled',
+  // ---- TTC store category tiles (2026-09-29): the same Commons photos pvCategoryImageFor used, mirrored to R2 because Wikimedia throttles phones.
+  // File:Prenatal_vitamin_tablets.jpg
+  'cat_ttc_supplements':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Prenatal_vitamin_tablets.jpg/500px-Prenatal_vitamin_tablets.jpg',
+  // File:Positieve_LH-test_-_detail_kleur.jpg
+  'cat_ttc_kits':
+      'https://upload.wikimedia.org/wikipedia/commons/9/97/Positieve_LH-test_-_detail_kleur.jpg',
+  // File:Test_de_grossesse_ouvert.jpg
+  'cat_ttc_tests':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Test_de_grossesse_ouvert.jpg/500px-Test_de_grossesse_ouvert.jpg',
+  // File:Stack_of_multicolored_books_on_a_table.jpg
+  'cat_ttc_books':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Stack_of_multicolored_books_on_a_table.jpg/500px-Stack_of_multicolored_books_on_a_table.jpg',
+  // File:Herbal_Tea_05.jpg
+  'cat_ttc_wellness':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Herbal_Tea_05.jpg/500px-Herbal_Tea_05.jpg',
+  // ---- Film stills for films not made yet (2026-09-29): see kPvFilmStills at the foot of this file.
+  // File:Seedling planting.jpg
+  'ttc_film_three_months_before':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/0/04/Seedling_planting.jpg/960px-Seedling_planting.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // File:Vial and syringe used for first COVID-19 vaccination.jpg
+  'ttc_film_preconception_tests':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/5/58/Vial_and_syringe_used_for_first_COVID-19_vaccination.jpg/960px-Vial_and_syringe_used_for_first_COVID-19_vaccination.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // File:Slide under a microscope.jpg
+  'ttc_film_semen_analysis':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/9/95/Slide_under_a_microscope.jpg/960px-Slide_under_a_microscope.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // File:Marigold Flowers as garland in India.jpg
+  'ttc_film_garbh_preconception':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/7/71/Marigold_Flowers_as_garland_in_India.jpg/960px-Marigold_Flowers_as_garland_in_India.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // File:Incense in India.jpg
+  'ttc_film_mind_longer_session':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b2/Incense_in_India.jpg/960px-Incense_in_India.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // Notebook Notes
+  'ttc_film_intro':
+      'https://cdn.stocksnap.io/img-thumbs/960w/GWHP8O7K1A.jpg',
+  // ---- Today's insight reads (2026-09-29, launch sanity H7): the reader drew a pale band with a book on every daily insight. One photo each, picked by eye.
+  // Summer Meadow
+  'ttc_insight_fertile_window_length':
+      'https://cdn.stocksnap.io/img-thumbs/960w/S1U6OAIZZK.jpg',
+  // File:Spinach leaves.jpg
+  'ttc_insight_folic_acid_timing':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fe/Spinach_leaves.jpg/960px-Spinach_leaves.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // Seedlings Growing
+  'ttc_insight_sperm_cycle_90_days':
+      'https://cdn.stocksnap.io/img-thumbs/960w/RI9D5RQ77B.jpg',
+  // Dew Drops
+  'ttc_insight_cervical_mucus':
+      'https://cdn.stocksnap.io/img-thumbs/960w/8DFX9IEU56.jpg',
+  // File:Classic alarm clock 20180513.jpg
+  'ttc_insight_how_long_is_normal':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8f/Classic_alarm_clock_20180513.jpg/960px-Classic_alarm_clock_20180513.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // File:Project 365 -202 210723 The Rainy City (53061937253).jpg
+  'ttc_insight_stress_and_fertility':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a5/Project_365_-202_210723_The_Rainy_City_%2853061937253%29.jpg/960px-Project_365_-202_210723_The_Rainy_City_%2853061937253%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // File:Masala Chai.JPG
+  'ttc_insight_caffeine':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/0/04/Masala_Chai.JPG/960px-Masala_Chai.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // File:Positieve LH-test - detail kleur.jpg
+  'ttc_insight_lh_strips':
+      'https://upload.wikimedia.org/wikipedia/commons/9/97/Positieve_LH-test_-_detail_kleur.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled',
+  // Sunrays Sunlight
+  'ttc_insight_vitamin_d_india':
+      'https://cdn.stocksnap.io/img-thumbs/960w/3NJJ3EY8MM.jpg',
+  // File:Sauna of the spa at Amantaka luxury Resort & Hotel in Luang Prabang Laos.jpg
+  'ttc_insight_heat_and_sperm':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ef/Sauna_of_the_spa_at_Amantaka_luxury_Resort_%26_Hotel_in_Luang_Prabang_Laos.jpg/960px-Sauna_of_the_spa_at_Amantaka_luxury_Resort_%26_Hotel_in_Luang_Prabang_Laos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // Greens Vegetables
+  'ttc_insight_pcos_basics':
+      'https://cdn.stocksnap.io/img-thumbs/960w/BXCRHFTR7A.jpg',
+  // File:Hourglasses.jpg
+  'ttc_insight_two_week_wait':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f5/Hourglasses.jpg/960px-Hourglasses.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // File:Bed in Seattle hotel.jpg
+  'ttc_insight_sleep_and_hormones':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8c/Bed_in_Seattle_hotel.jpg/960px-Bed_in_Seattle_hotel.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // Park Trees
+  'ttc_insight_weight_and_cycles':
+      'https://cdn.stocksnap.io/img-thumbs/960w/1POHVCH6RG.jpg',
+  // File:Laboratory microcentrifuge tubes and pipette tips 02.jpg
+  'ttc_insight_semen_analysis':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2a/Laboratory_microcentrifuge_tubes_and_pipette_tips_02.jpg/960px-Laboratory_microcentrifuge_tubes_and_pipette_tips_02.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // File:Darjeeling, India, Indian Thali meal.jpg
+  'ttc_insight_indian_plate':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/4/46/Darjeeling%2C_India%2C_Indian_Thali_meal.jpg/960px-Darjeeling%2C_India%2C_Indian_Thali_meal.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // File:Blood Collection Tube 06.JPG
+  'ttc_insight_amh_meaning':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d6/Blood_Collection_Tube_06.JPG/960px-Blood_Collection_Tube_06.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // Healthy Fruit
+  'ttc_insight_alcohol_smoking':
+      'https://cdn.stocksnap.io/img-thumbs/960w/SE6LA5BXBG.jpg',
+  // File:Digital Thermometer.jpg
+  'ttc_insight_bbt_truth':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d0/Digital_Thermometer.jpg/960px-Digital_Thermometer.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // Nature Green
+  'ttc_insight_lubricant':
+      'https://cdn.stocksnap.io/img-thumbs/960w/W7LOZSOTQH.jpg',
+  // File:Blood collection renal function test tube.jpg
+  'ttc_insight_thyroid':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9d/Blood_collection_renal_function_test_tube.jpg/960px-Blood_collection_renal_function_test_tube.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // File:Wrought iron bench in Copped Hall Kitchen Garden, Epping, Essex, England.jpg
+  'ttc_insight_talking_to_family':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/3/39/Wrought_iron_bench_in_Copped_Hall_Kitchen_Garden%2C_Epping%2C_Essex%2C_England.jpg/960px-Wrought_iron_bench_in_Copped_Hall_Kitchen_Garden%2C_Epping%2C_Essex%2C_England.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // Sneakers Weights
+  'ttc_insight_exercise_amount':
+      'https://cdn.stocksnap.io/img-thumbs/960w/DAVLOF8C3R.jpg',
+  // File:Forest path through a deciduous forest in spring, Finland.jpg
+  'ttc_insight_ivf_is_not_failure':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/7/72/Forest_path_through_a_deciduous_forest_in_spring%2C_Finland.jpg/960px-Forest_path_through_a_deciduous_forest_in_spring%2C_Finland.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // Nature Beach
+  'ttc_insight_period_new_start':
+      'https://cdn.stocksnap.io/img-thumbs/960w/DI64TAJTIS.jpg',
+  // Cup Flatlay
+  'ttc_insight_period_day_one':
+      'https://cdn.stocksnap.io/img-thumbs/960w/FCPVTTJJLS.jpg',
+  // File:Cozy corner with a chair and a blanket in a wooden cabin interior.jpg
+  'ttc_insight_period_be_gentle':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/7/72/Cozy_corner_with_a_chair_and_a_blanket_in_a_wooden_cabin_interior.jpg/960px-Cozy_corner_with_a_chair_and_a_blanket_in_a_wooden_cabin_interior.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // File:001 2010 04 26 Blattadern.jpg
+  'ttc_insight_period_what_it_means':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/d/de/001_2010_04_26_Blattadern.jpg/960px-001_2010_04_26_Blattadern.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // Hammocks Trees
+  'ttc_insight_period_nothing_to_time':
+      'https://cdn.stocksnap.io/img-thumbs/960w/AFB41CF89E.jpg',
+  // Seed Tree
+  'ttc_insight_wait_first_week':
+      'https://cdn.stocksnap.io/img-thumbs/960w/01MVFCVHOD.jpg',
+  // File:Germination of neem seed.jpg
+  'ttc_insight_wait_implantation':
+      'https://upload.wikimedia.org/wikipedia/commons/e/e1/Germination_of_neem_seed.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled',
+  // Misty Morning
+  'ttc_insight_wait_symptoms_same':
+      'https://cdn.stocksnap.io/img-thumbs/960w/KPUOS5LKI1.jpg',
+  // Alarm Clock
+  'ttc_insight_wait_test_timing':
+      'https://cdn.stocksnap.io/img-thumbs/960w/VI3GY3LRD4.jpg',
+  // Calendar Diary
+  'ttc_insight_wait_pick_test_day':
+      'https://cdn.stocksnap.io/img-thumbs/960w/3FOSIEZDTW.jpg',
+  // Bouquet Flowers
+  'ttc_insight_wait_something_kind':
+      'https://cdn.stocksnap.io/img-thumbs/960w/I5U0KA81R5.jpg',
+  // Cafe Coffee
+  'ttc_insight_wait_live_normally':
+      'https://cdn.stocksnap.io/img-thumbs/960w/TUIRU743JZ.jpg',
+  // File:Pregnancy test strip.jpg
+  'ttc_insight_late_how_to_test':
+      'https://upload.wikimedia.org/wikipedia/commons/f/fe/Pregnancy_test_strip.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled',
+  // Window Glass
+  'ttc_insight_late_negative':
+      'https://cdn.stocksnap.io/img-thumbs/960w/H4PPELB9TN.jpg',
+  // File:Japanese clinic with red lane for COVID-infected patients, green lane for the others 
+  'ttc_insight_late_see_doctor':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4e/Japanese_clinic_with_red_lane_for_COVID-infected_patients%2C_green_lane_for_the_others_2.jpg/960px-Japanese_clinic_with_red_lane_for_COVID-infected_patients%2C_green_lane_for_the_others_2.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // Bed Sheets
+  'ttc_insight_window_every_day_or_two':
+      'https://cdn.stocksnap.io/img-thumbs/960w/9DRJGBVAEP.jpg',
+  // Dandelion Flowers
+  'ttc_insight_window_no_single_day':
+      'https://cdn.stocksnap.io/img-thumbs/960w/QNEXO868Q7.jpg',
+  // File:Crew 2016-01-10 (Unsplash xCmvrpzctaQ).jpg
+  'ttc_insight_window_closeness':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/9/97/Crew_2016-01-10_%28Unsplash_xCmvrpzctaQ%29.jpg/960px-Crew_2016-01-10_%28Unsplash_xCmvrpzctaQ%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // Cutting Fruit
+  'ttc_insight_window_he_helps':
+      'https://cdn.stocksnap.io/img-thumbs/960w/ULIKLNPKK0.jpg',
+  // Footprints Sand
+  'ttc_insight_window_no_tracking':
+      'https://cdn.stocksnap.io/img-thumbs/960w/GBUFTJIRSS.jpg',
+  // ---- Today's nutrition tip reads (2026-09-29): the food the tip names.
+  // File:Dal Palak Spinach and lentil curry (15914333462).jpg
+  'ttc_nutrition_folate_greens':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/4/47/Dal_Palak_Spinach_and_lentil_curry_%2815914333462%29.jpg/960px-Dal_Palak_Spinach_and_lentil_curry_%2815914333462%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // File:Bajra Roti and Dal.JPG
+  'ttc_nutrition_iron_bajra':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ae/Bajra_Roti_and_Dal.JPG/960px-Bajra_Roti_and_Dal.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // File:Brown Flax Seeds.jpg
+  'ttc_nutrition_omega3':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/5/56/Brown_Flax_Seeds.jpg/960px-Brown_Flax_Seeds.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // File:Roasted Chickpea Chana with Salt and Turmeric.jpg
+  'ttc_nutrition_protein_dal':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/3/30/Roasted_Chickpea_Chana_with_Salt_and_Turmeric.jpg/960px-Roasted_Chickpea_Chana_with_Salt_and_Turmeric.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // File:Peanuts, Egg, and Milk (33000737773).jpg
+  'ttc_nutrition_vitamin_d_food':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/3/30/Peanuts%2C_Egg%2C_and_Milk_%2833000737773%29.jpg/960px-Peanuts%2C_Egg%2C_and_Milk_%2833000737773%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // File:Pumpkin Seeds macro 1.jpg
+  'ttc_nutrition_zinc_male':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4f/Pumpkin_Seeds_macro_1.jpg/960px-Pumpkin_Seeds_macro_1.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // File:Jowar Roti.jpg
+  'ttc_nutrition_whole_grains':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/0/08/Jowar_Roti.jpg/960px-Jowar_Roti.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // File:Nimbu pani.JPG
+  'ttc_nutrition_hydration':
+      'https://upload.wikimedia.org/wikipedia/commons/8/81/Nimbu_pani.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled',
+  // File:Phyllanthus emblica L. (49547015732).jpg
+  'ttc_nutrition_antioxidants':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c4/Phyllanthus_emblica_L._%2849547015732%29.jpg/960px-Phyllanthus_emblica_L._%2849547015732%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // File:Indian Kitchen.JPG
+  'ttc_nutrition_less_processed':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/3/30/Indian_Kitchen.JPG/960px-Indian_Kitchen.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // File:Panir Paneer Indian cheese fresh.jpg
+  'ttc_nutrition_b12':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/3/36/Panir_Paneer_Indian_cheese_fresh.jpg/960px-Panir_Paneer_Indian_cheese_fresh.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // File:Mixed nuts bowl.jpg
+  'ttc_nutrition_coq10':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1e/Mixed_nuts_bowl.jpg/960px-Mixed_nuts_bowl.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // ---- Today's movement tip reads (2026-09-29): the place or the kit, never a body in a pose, because a different pose would teach the wrong one.
+  // File:Kayes Walk on a September evening (geograph 4659675).jpg
+  'ttc_movement_walk_after_dinner':
+      'https://upload.wikimedia.org/wikipedia/commons/2/2b/Kayes_Walk_on_a_September_evening_%28geograph_4659675%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled',
+  // File:Japanese Zafu.jpg
+  'ttc_movement_supta_baddha':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5f/Japanese_Zafu.jpg/960px-Japanese_Zafu.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // File:Kettlebell truebalance romeike.jpg
+  'ttc_movement_strength_twice':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/8/87/Kettlebell_truebalance_romeike.jpg/960px-Kettlebell_truebalance_romeike.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // File:Cotton Yoga Mats.png
+  'ttc_movement_hip_stretch':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6e/Cotton_Yoga_Mats.png/960px-Cotton_Yoga_Mats.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // Bed Flowers
+  'ttc_movement_rest_day':
+      'https://cdn.stocksnap.io/img-thumbs/960w/NW6VQ3EZGT.jpg',
+  // File:Grey knitted blanket.jpg
+  'ttc_movement_legs_up_wall':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/9/96/Grey_knitted_blanket.jpg/960px-Grey_knitted_blanket.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // File:Path in Holyrood Park - geograph.org.uk - 1989637.jpg
+  'ttc_movement_walk_together':
+      'https://upload.wikimedia.org/wikipedia/commons/8/80/Path_in_Holyrood_Park_-_geograph.org.uk_-_1989637.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled',
+  // File:Exercise ball.jpg
+  'ttc_movement_pelvic_floor':
+      'https://upload.wikimedia.org/wikipedia/commons/2/29/Exercise_ball.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled',
+  // File:Wooden staircase steps in the forest of Hallasan Park Eorimok Trail at dusk on Jeju I
+  'ttc_movement_stairs':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/5/56/Wooden_staircase_steps_in_the_forest_of_Hallasan_Park_Eorimok_Trail_at_dusk_on_Jeju_Island_in_South_Korea.jpg/960px-Wooden_staircase_steps_in_the_forest_of_Hallasan_Park_Eorimok_Trail_at_dusk_on_Jeju_Island_in_South_Korea.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // File:Yoga mat.jpg
+  'ttc_movement_cat_cow':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6d/Yoga_mat.jpg/960px-Yoga_mat.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // Tree Field
+  'ttc_movement_morning_sun':
+      'https://cdn.stocksnap.io/img-thumbs/960w/ONV344KX9K.jpg',
+  // File:Cork yoga blocks.jpg
+  'ttc_movement_gentle_flow':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c9/Cork_yoga_blocks.jpg/960px-Cork_yoga_blocks.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // ---- Medical tests, opened as reads (2026-09-29): the reader drew a pale band with a book on each. The tube, the machine or the room the test happens in; never a body.
+  // File:Blood Collection Tube 02.JPG
+  'ttc_test_tsh':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/4/49/Blood_Collection_Tube_02.JPG/960px-Blood_Collection_Tube_02.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // File:Blood Collection Tube 05.JPG
+  'ttc_test_amh':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4d/Blood_Collection_Tube_05.JPG/960px-Blood_Collection_Tube_05.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // File:Blood Collection Tube 01.JPG
+  'ttc_test_fsh_lh':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9c/Blood_Collection_Tube_01.JPG/960px-Blood_Collection_Tube_01.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // File:Blood Collection Tube 03.JPG
+  'ttc_test_prolactin':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5a/Blood_Collection_Tube_03.JPG/960px-Blood_Collection_Tube_03.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // File:Blood Collection Tube 04.JPG
+  'ttc_test_b12':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/7/73/Blood_Collection_Tube_04.JPG/960px-Blood_Collection_Tube_04.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // Sunlight Couch
+  'ttc_test_vitd':
+      'https://cdn.stocksnap.io/img-thumbs/960w/NB6ISAF275.jpg',
+  // File:Microscope slides and coverslips in the Musée de l'Institut Louis Pasteur (Lille).jpg
+  'ttc_test_semen':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a6/Microscope_slides_and_coverslips_in_the_Mus%C3%A9e_de_l%27Institut_Louis_Pasteur_%28Lille%29.jpg/960px-Microscope_slides_and_coverslips_in_the_Mus%C3%A9e_de_l%27Institut_Louis_Pasteur_%28Lille%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // File:2026 - Blood test samples.jpg
+  'ttc_test_hba1c':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f3/2026_-_Blood_test_samples.jpg/960px-2026_-_Blood_test_samples.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // File:A modern medical ultrasound scanner.jpg
+  'ttc_test_ultrasound':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e4/A_modern_medical_ultrasound_scanner.jpg/960px-A_modern_medical_ultrasound_scanner.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // File:Dedicated chest x-ray room.jpg
+  'ttc_test_hsg':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/c/ca/Dedicated_chest_x-ray_room.jpg/960px-Dedicated_chest_x-ray_room.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // ---- Can I...? answers, opened as reads (2026-09-29). Seven reuse the photo of the same question on the pregnancy side (cani_*), already picked by eye; six are new.
+  // File:Malaysia Prohibition-signs-No-smoking-sign-01.jpg
+  'ttc_cani_smoking':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bd/Malaysia_Prohibition-signs-No-smoking-sign-01.jpg/960px-Malaysia_Prohibition-signs-No-smoking-sign-01.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // Pills Medicine
+  'ttc_cani_painkillers':
+      'https://cdn.stocksnap.io/img-thumbs/960w/I4P7JN8SCN.jpg',
+  // File:Silesian Stadium, Chorzow (DBR45829).jpg
+  'ttc_cani_hot_bath':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f6/Silesian_Stadium%2C_Chorzow_%28DBR45829%29.jpg/960px-Silesian_Stadium%2C_Chorzow_%28DBR45829%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // File:TwoDumbbells.JPG
+  'ttc_cani_exercise':
+      'https://upload.wikimedia.org/wikipedia/commons/e/e3/TwoDumbbells.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled',
+  // Pillows Sheets
+  'ttc_cani_sex_frequency':
+      'https://cdn.stocksnap.io/img-thumbs/960w/M0YZ9Q79DZ.jpg',
+  // same photo as cani_tea
+  'ttc_cani_chai':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Mix_Masala_Tea.jpg/960px-Mix_Masala_Tea.jpg',
+  // same photo as cani_alcohol
+  'ttc_cani_alcohol':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Schwappender_Wein.jpg/960px-Schwappender_Wein.jpg',
+  // same photo as cani_hair_color
+  'ttc_cani_hair_dye':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/d/dc/Dyeing_hair_purple.png/960px-Dyeing_hair_purple.png',
+  // Luggage Dufflebag
+  'ttc_cani_travel':
+      'https://cdn.stocksnap.io/img-thumbs/960w/B3KGCPF50Y.jpg',
+  // same photo as cani_papaya
+  'ttc_cani_papaya':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/03_Preparing_papaya_fruit_-_papaya_peeled_and_cut_in_half.jpg/960px-03_Preparing_papaya_fruit_-_papaya_peeled_and_cut_in_half.jpg',
+  // same photo as cani_xray
+  'ttc_cani_xray':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Tube_%C3%A0_Rayon_X_dans_un_h%C3%B4pital_au_B%C3%A9nin_05.jpg/960px-Tube_%C3%A0_Rayon_X_dans_un_h%C3%B4pital_au_B%C3%A9nin_05.jpg',
+  // same photo as cani_ayurvedic_medicine
+  'ttc_cani_ayurvedic':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Ayurvedic_herbs_02.jpg/960px-Ayurvedic_herbs_02.jpg',
 };
 
 /// Read id → licence · source · creator, for the credit line.
@@ -2281,6 +2644,133 @@ const Map<String, String> kReadImageCredits = {
   'ttc_tile_trying_for_many_months': 'CC0 · StockSnap · Aaron Burden',
   'ttc_tile_is_it_time_to_see_someone': 'CC0 · StockSnap · Ales Krivec',
   'ttc_tile_talk_to_a_fertility_doctor': 'CC BY-SA 2.0 · Wikimedia Commons · ernstl',
+  // learn_* (2026-09-29)
+  'learn_ttc_consult_fertility': 'CC0 · StockSnap · Negative Space',
+  'learn_ttc_consult_gynae': 'CC0 · StockSnap · Negative Space',
+  'learn_ttc_consult_androl': 'CC BY-SA 4.0 · Wikimedia Commons · Aliva Sahoo',
+  'learn_ttc_course_basics': 'CC0 · Wikimedia Commons · www.Pixel.la Free Stock Photos',
+  'learn_ttc_course_pcos': 'CC BY 2.0 · Wikimedia Commons · Shixart1985',
+  'learn_ttc_yoga_pack': 'CC BY 4.0 · Wikimedia Commons · Femivaco',
+  'learn_ttc_nutrition_consult': 'CC BY 2.0 · Wikimedia Commons · Ajay Suresh from New York, NY, USA',
+  'learn_ttc_psych_consult': 'CC0 · StockSnap · Kari Shea',
+  'learn_ttc_loss_support': 'CC0 · StockSnap · Mike Birdy',
+  'learn_ttc_assessment_couple': 'CC BY 2.0 · Wikimedia Commons · Shixart1985',
+  'learn_ttc_partner_workshop': 'CC0 · StockSnap · Austris Augusts',
+  'learn_ttc_ivf_prep': 'CC BY-SA 4.0 · Wikimedia Commons · Adoscam',
+  'learn_ttc_lifestyle_90': 'CC BY 2.0 · Wikimedia Commons · Old Photo Profile',
+  'learn_ttc_course_garbh': 'CC BY-SA 4.0 · Wikimedia Commons · Serg Childed',
+  // prod_* (2026-09-29)
+  'prod_ttc_lh_strips': 'Public domain · Wikimedia Commons · Sapp',
+  'prod_ttc_lubricant': 'CC BY-SA 4.0 · Wikimedia Commons · Plasticbottlesupplier',
+  'prod_ttc_fertility_blend': 'CC BY 2.0 · Wikimedia Commons · ben_hoffman2003',
+  // cat_* (2026-09-29)
+  'cat_ttc_supplements': 'CC BY-SA 3.0 · Wikimedia Commons · Ragesoss',
+  'cat_ttc_kits': 'Public domain · Wikimedia Commons · Sapp',
+  'cat_ttc_tests': 'CC BY-SA 2.0 fr · Wikimedia Commons · Ceridwen',
+  'cat_ttc_books': 'CC0 · Wikimedia Commons · Alexander Grey',
+  'cat_ttc_wellness': 'CC0 · Wikimedia Commons · PagesAndPathsPH',
+  // ttc_film_* (2026-09-29)
+  'ttc_film_three_months_before': 'Public domain · Wikimedia Commons · USFS Region 5',
+  'ttc_film_preconception_tests': 'CC BY-SA 4.0 · Wikimedia Commons · The wub',
+  'ttc_film_semen_analysis': 'CC BY-SA 4.0 · Wikimedia Commons · Waughd',
+  'ttc_film_garbh_preconception': 'CC BY 4.0 · Wikimedia Commons · SnapMeUp',
+  'ttc_film_mind_longer_session': 'CC0 · Wikimedia Commons · 4174332',
+  'ttc_film_intro': 'CC0 · StockSnap · Kelly Jean',
+  // ttc_insight_* (2026-09-29)
+  'ttc_insight_fertile_window_length': 'CC0 · StockSnap · Bonnie Moreland',
+  'ttc_insight_folic_acid_timing': 'CC BY 3.0 · Wikimedia Commons · Nillerdk',
+  'ttc_insight_sperm_cycle_90_days': 'CC0 · StockSnap · Solo Shutter',
+  'ttc_insight_cervical_mucus': 'CC0 · StockSnap · Matt Bango',
+  'ttc_insight_how_long_is_normal': 'CC BY-SA 4.0 · Wikimedia Commons · Santeri Viinamäki',
+  'ttc_insight_stress_and_fertility': 'CC0 · Wikimedia Commons · Pete from Liverpool, UK',
+  'ttc_insight_caffeine': 'Public domain · Wikimedia Commons · Miansari66',
+  'ttc_insight_lh_strips': 'Public domain · Wikimedia Commons · Sapp',
+  'ttc_insight_vitamin_d_india': 'CC0 · StockSnap · Blake Verdoorn',
+  'ttc_insight_heat_and_sperm': 'CC BY-SA 4.0 · Wikimedia Commons · Basile Morin',
+  'ttc_insight_pcos_basics': 'CC0 · StockSnap · Paul Morris',
+  'ttc_insight_two_week_wait': 'CC BY-SA 4.0 · Wikimedia Commons · Aaaatu',
+  'ttc_insight_sleep_and_hormones': 'CC BY-SA 2.0 · Wikimedia Commons · Liz Lawley',
+  'ttc_insight_weight_and_cycles': 'CC0 · StockSnap · Johannes Plenio',
+  'ttc_insight_semen_analysis': 'CC BY-SA 4.0 · Wikimedia Commons · Gannu03',
+  'ttc_insight_indian_plate': 'CC BY 4.0 · Wikimedia Commons · Vyacheslav Argenberg',
+  'ttc_insight_amh_meaning': 'CC BY-SA 3.0 · Wikimedia Commons · AfroBrazilian',
+  'ttc_insight_alcohol_smoking': 'CC0 · StockSnap · Healthy Living',
+  'ttc_insight_bbt_truth': 'CC BY-SA 4.0 · Wikimedia Commons · Srini297',
+  'ttc_insight_lubricant': 'CC0 · StockSnap · Aphiwat Chuangchoem',
+  'ttc_insight_thyroid': 'CC0 · Wikimedia Commons · Fumikas Sagisavas',
+  'ttc_insight_talking_to_family': 'CC BY-SA 4.0 · Wikimedia Commons · Acabashi',
+  'ttc_insight_exercise_amount': 'CC0 · StockSnap · Kristin Hardwick',
+  'ttc_insight_ivf_is_not_failure': 'CC BY-SA 4.0 · Wikimedia Commons · Sanzzu',
+  'ttc_insight_period_new_start': 'CC0 · StockSnap · frank mckenna',
+  'ttc_insight_period_day_one': 'CC0 · StockSnap · Chimene Gaspar',
+  'ttc_insight_period_be_gentle': 'CC BY 2.0 · Wikimedia Commons · Shixart1985',
+  'ttc_insight_period_what_it_means': 'CC BY-SA 4.0 · Wikimedia Commons · Friedrich Haag',
+  'ttc_insight_period_nothing_to_time': 'CC0 · StockSnap · Leeroy',
+  'ttc_insight_wait_first_week': 'CC0 · StockSnap · Christian Joudrey',
+  'ttc_insight_wait_implantation': 'CC BY 3.0 · Wikimedia Commons · Anandha abirami Govindan',
+  'ttc_insight_wait_symptoms_same': 'CC0 · StockSnap · Johannes Plenio',
+  'ttc_insight_wait_test_timing': 'CC0 · StockSnap · Jessica Monte',
+  'ttc_insight_wait_pick_test_day': 'CC0 · StockSnap · Jess Watters',
+  'ttc_insight_wait_something_kind': 'CC0 · StockSnap · Paulina Lohunko',
+  'ttc_insight_wait_live_normally': 'CC0 · StockSnap · Maciej Korsan',
+  'ttc_insight_late_how_to_test': 'Public domain · Wikimedia Commons · Klaus Hoffmeier',
+  'ttc_insight_late_negative': 'CC0 · StockSnap · Loren Gu',
+  'ttc_insight_late_see_doctor': 'CC0 · Wikimedia Commons · Syced',
+  'ttc_insight_window_every_day_or_two': 'CC0 · StockSnap · Daria Nepriakhina',
+  'ttc_insight_window_no_single_day': 'CC0 · StockSnap · Aaron Burden',
+  'ttc_insight_window_closeness': 'CC0 · Wikimedia Commons · Crew crew',
+  'ttc_insight_window_he_helps': 'CC0 · StockSnap · Direct Media',
+  'ttc_insight_window_no_tracking': 'CC0 · StockSnap · Sergei Gussev',
+  // ttc_nutrition_* (2026-09-29)
+  'ttc_nutrition_folate_greens': 'CC BY 2.0 · Wikimedia Commons · Yummy O Yummy',
+  'ttc_nutrition_iron_bajra': 'CC BY-SA 4.0 · Wikimedia Commons · Jay87.mehta',
+  'ttc_nutrition_omega3': 'CC BY-SA 3.0 · Wikimedia Commons · Sanjay Acharya',
+  'ttc_nutrition_protein_dal': 'CC BY-SA 4.0 · Wikimedia Commons · Nizil Shah',
+  'ttc_nutrition_vitamin_d_food': 'CC BY 2.0 · Wikimedia Commons · NIAID',
+  'ttc_nutrition_zinc_male': 'CC BY 3.0 · Wikimedia Commons · Daniel Schwen',
+  'ttc_nutrition_whole_grains': 'CC BY-SA 4.0 · Wikimedia Commons · Chaitaliijagtap',
+  'ttc_nutrition_hydration': 'CC BY-SA 4.0 · Wikimedia Commons · Archana Joshi',
+  'ttc_nutrition_antioxidants': 'CC BY-SA 2.0 · Wikimedia Commons · Dinesh Valke from Thane, India',
+  'ttc_nutrition_less_processed': 'CC BY-SA 3.0 · Wikimedia Commons · Drmarathe',
+  'ttc_nutrition_b12': 'CC BY 2.0 de · Wikimedia Commons · Sonja Pauen - Stanhopea',
+  'ttc_nutrition_coq10': 'CC BY-SA 3.0 · Wikimedia Commons · User:Melchoir',
+  // ttc_movement_* (2026-09-29)
+  'ttc_movement_walk_after_dinner': 'CC BY-SA 2.0 · Wikimedia Commons · John Sutton',
+  'ttc_movement_supta_baddha': 'CC BY-SA 3.0 · Wikimedia Commons · Dontpanic',
+  'ttc_movement_strength_twice': 'CC BY-SA 2.5 · Wikimedia Commons · Detlef Romeike',
+  'ttc_movement_hip_stretch': 'CC0 · Wikimedia Commons · Sha89sha',
+  'ttc_movement_rest_day': 'CC0 · StockSnap · Burst',
+  'ttc_movement_legs_up_wall': 'CC BY-SA 4.0 · Wikimedia Commons · Hannah Clover',
+  'ttc_movement_walk_together': 'CC BY-SA 2.0 · Wikimedia Commons · Chris Gunns',
+  'ttc_movement_pelvic_floor': 'CC BY 2.0 · Wikimedia Commons · Spiralz from England',
+  'ttc_movement_stairs': 'CC BY-SA 4.0 · Wikimedia Commons · Basile Morin',
+  'ttc_movement_cat_cow': 'CC BY-SA 4.0 · Wikimedia Commons · Gausanchennai',
+  'ttc_movement_morning_sun': 'CC0 · StockSnap · Negative Space',
+  'ttc_movement_gentle_flow': 'CC BY-SA 4.0 · Wikimedia Commons · Ian Alexander',
+  // ttc_test_* (2026-09-29)
+  'ttc_test_tsh': 'CC BY-SA 3.0 · Wikimedia Commons · AfroBrazilian',
+  'ttc_test_amh': 'CC BY-SA 3.0 · Wikimedia Commons · AfroBrazilian',
+  'ttc_test_fsh_lh': 'CC BY-SA 3.0 · Wikimedia Commons · AfroBrazilian',
+  'ttc_test_prolactin': 'CC BY-SA 3.0 · Wikimedia Commons · AfroBrazilian',
+  'ttc_test_b12': 'CC BY-SA 3.0 · Wikimedia Commons · AfroBrazilian',
+  'ttc_test_vitd': 'CC0 · StockSnap · Patrick McMahon',
+  'ttc_test_semen': 'CC BY-SA 4.0 · Wikimedia Commons · Pierre André Leclercq',
+  'ttc_test_hba1c': 'CC BY-SA 4.0 · Wikimedia Commons · Oleg Yunakov',
+  'ttc_test_ultrasound': 'CC BY 4.0 · Wikimedia Commons · Harrison Keely',
+  'ttc_test_hsg': 'CC BY-SA 4.0 · Wikimedia Commons · Ptrump16',
+  // ttc_cani_* (2026-09-29)
+  'ttc_cani_smoking': 'CC BY-SA 3.0 · Wikimedia Commons · CEphoto, Uwe Aranas',
+  'ttc_cani_painkillers': 'CC0 · StockSnap · Michal Jarmoluk',
+  'ttc_cani_hot_bath': 'CC BY-SA 4.0 · Wikimedia Commons · Matti Blume',
+  'ttc_cani_exercise': 'CC BY-SA 3.0 · Wikimedia Commons · Wikimedia Commons',
+  'ttc_cani_sex_frequency': 'CC0 · StockSnap · Jay Mantri',
+  'ttc_cani_chai': 'CC BY-SA 4.0 · Wikimedia Commons · Gaurav Dhwaj Khadka',
+  'ttc_cani_alcohol': 'CC BY 3.0 de · Wikimedia Commons · Stefan Krause, Germany',
+  'ttc_cani_hair_dye': 'CC BY-SA 4.0 · Wikimedia Commons · WhatamIdoing',
+  'ttc_cani_travel': 'CC0 · StockSnap · Erol Ahmed',
+  'ttc_cani_papaya': 'CC BY 3.0 · Wikimedia Commons · Marek Ślusarczyk (Tupungato) Photo portf',
+  'ttc_cani_xray': 'CC BY-SA 4.0 · Wikimedia Commons · Adoscam',
+  'ttc_cani_ayurvedic': 'CC BY-SA 4.0 · Wikimedia Commons · Vis M',
 };
 
 /// ⚠️ OUR OWN HOST, ONCE IT EXISTS — 2026-09-20. Every URL in the table
@@ -2680,4 +3170,88 @@ const Map<String, String> kOpenverseIds = {
   'ttc_read_slow_conception': '8fcff628-35df-4714-84eb-4af4d8f82572',
   'ttc_tile_trying_for_many_months': '269674b0-ea4b-4022-9c33-6b6f1a2ba4c6',
   'ttc_tile_is_it_time_to_see_someone': '1eb1f9b1-37ad-4cca-830a-328ca5de88b7',
+  'learn_ttc_consult_fertility': 'e7d58d39-6f6e-454a-a195-e82dfa5a6f79',
+  'learn_ttc_consult_gynae': '10330df5-f748-497c-a41a-4ac7fc376445',
+  'learn_ttc_psych_consult': '0a071352-446f-49b9-b26d-bb16800bcb58',
+  'learn_ttc_loss_support': '506b3afc-da89-4989-b4e1-faf38ba62e2f',
+  'learn_ttc_partner_workshop': '68e280bc-3b61-4474-937e-412d0e7a2e9a',
+  'ttc_film_intro': 'e2c96ad7-6304-472c-bcb7-bf80f6e1fd3b',
+  'ttc_insight_fertile_window_length': '764e0f56-5fca-4e6d-a383-c9f08fba678b',
+  'ttc_insight_sperm_cycle_90_days': 'f52544ae-4ed4-4783-9cac-77073c4a6056',
+  'ttc_insight_cervical_mucus': '1214148a-a824-465c-b464-1a25ce8549b1',
+  'ttc_insight_vitamin_d_india': 'a0c2b648-f015-4e72-995f-51d5e2d25e2c',
+  'ttc_insight_pcos_basics': 'a6fb1881-1c88-4575-b260-e4759e1155c9',
+  'ttc_insight_weight_and_cycles': '2b1f95dd-e2cf-4dab-89cb-4d47c3fc0074',
+  'ttc_insight_alcohol_smoking': '5ea21747-1d47-4054-8941-77599642b262',
+  'ttc_insight_lubricant': 'bcab3eca-b801-4953-8f1b-ee47bd91f777',
+  'ttc_insight_exercise_amount': '13f9e935-7f4c-44b7-9e16-a2513dbaea28',
+  'ttc_insight_period_new_start': 'fb17bd5e-217b-48d8-aa95-38b809bf3c30',
+  'ttc_insight_period_day_one': '8fadf7be-fbed-42a9-b70b-92720ad73c14',
+  'ttc_insight_period_nothing_to_time': '518e2562-69da-4d06-8c1e-03f7b099bab1',
+  'ttc_insight_wait_first_week': '97ec50ed-083d-4c6a-b83a-ea647d415bb4',
+  'ttc_insight_wait_symptoms_same': 'e69f318a-84cc-478e-a98b-052786d57c9c',
+  'ttc_insight_wait_test_timing': '3095c427-7201-4b73-9d06-fe0f0ea509ac',
+  'ttc_insight_wait_pick_test_day': '6316622c-43f1-47de-841f-2b4a52136d45',
+  'ttc_insight_wait_something_kind': '94a46fb0-545a-455e-9311-881a7ad685ad',
+  'ttc_insight_wait_live_normally': 'e9e1151b-90e1-4e97-a6cc-4d122a9ba319',
+  'ttc_insight_late_negative': '34b660bc-7548-4a78-8c18-0070f94892a0',
+  'ttc_insight_window_every_day_or_two': 'fa396520-961c-4036-90a4-9a2899629492',
+  'ttc_insight_window_no_single_day': '4b350fe4-3e89-45d9-91e3-09e2e0771c59',
+  'ttc_insight_window_he_helps': '4b1b28d8-d7c0-43d4-b3e2-9835d2a25aaf',
+  'ttc_insight_window_no_tracking': '101aad9d-aadc-4f38-aca3-1a20260e5bc6',
+  'ttc_movement_rest_day': '0e46446c-9dd2-4670-a442-ec634dace077',
+  'ttc_movement_morning_sun': '8b6323a9-48d5-4f27-933d-e653dc927099',
+  'ttc_test_vitd': 'fc067327-5075-4d56-baac-df450adff819',
+  'ttc_cani_painkillers': '827f21cc-303b-4256-b72a-10c967f34108',
+  'ttc_cani_sex_frequency': '1ce9f84d-a670-40cb-be37-ec0600f435ad',
+  'ttc_cani_travel': '502b1380-51b7-4dc6-bae7-108e8cfe1fd2',
 };
+
+// =============================================================================
+//  Film stills — a relevant photograph on a film that is not made yet
+// -----------------------------------------------------------------------------
+//  2026-09-29, the user: "stop leaving the placeholders and put random but
+//  relevant images for them, from free resources on the web." Every Trying to
+//  conceive film is still to be shot, so its card was a tint with a clock or a
+//  play mark, which read as a picture that failed to load. Each film now has
+//  a still, chosen by film id (never from a keyword), and "Coming soon" stays
+//  on the card: a still is a thumbnail, not a promise that the film exists.
+//
+//  ⚠️ A FILM THE DOORS ALREADY SHOW KEEPS THE DOOR'S PICTURE. Eleven films sit
+//  on a door as a card with a photo (`ttc_tile_<title>`); the same film in
+//  Learn or at the head of a read points at that same photo, so one film has
+//  one face everywhere. The other six have their own `ttc_film_*` line in
+//  the table above. Every read that carries one of these films in its body
+//  has a DIFFERENT hero photo, so a page never shows one picture twice
+//  (`test/ttc_no_placeholder_images_test.dart` holds both rules).
+// =============================================================================
+
+/// Film slot id → the table id of its still.
+const Map<String, String> kPvFilmStills = {
+  'ttc_vid_pcos_explained': 'ttc_tile_pcos_explained_in_five_minutes',
+  'ttc_vid_pcos_treatment': 'ttc_tile_the_pcos_treatments_your_doctor_may_offer',
+  'ttc_vid_pcos_plate': 'ttc_tile_what_a_pcos_friendly_indian_plate_looks_like',
+  'ttc_vid_cycle_basics': 'ttc_tile_your_cycle_drawn_out_step_by_step',
+  'ttc_vid_timing_myths': 'ttc_tile_six_myths_about_timing_one_by_one',
+  'ttc_vid_when_to_seek_help': 'ttc_tile_is_it_time_to_see_someone',
+  'ttc_vid_ivf_walkthrough': 'ttc_tile_an_ivf_cycle_start_to_finish',
+  'ttc_vid_whose_side': 'ttc_tile_why_his_side_gets_tested_last',
+  'ttc_vid_heat_habits': 'ttc_tile_three_things_that_really_change_his_numbers',
+  'ttc_vid_loss_recovery': 'ttc_tile_what_the_next_few_weeks_look_like',
+  'ttc_vid_stress_fertility': 'ttc_tile_why_just_relax_is_the_wrong_advice',
+  'ttc_vid_three_months_before': 'ttc_film_three_months_before',
+  'ttc_vid_preconception_tests': 'ttc_film_preconception_tests',
+  'ttc_vid_semen_analysis': 'ttc_film_semen_analysis',
+  'ttc_vid_garbh_preconception': 'ttc_film_garbh_preconception',
+  'ttc_vid_mind_longer_session': 'ttc_film_mind_longer_session',
+  // The first-run film, one still for both languages' slots.
+  'ttc_intro_en': 'ttc_film_intro',
+  'ttc_intro_hi': 'ttc_film_intro',
+};
+
+/// The still for a film slot, or null (the card keeps its tint). Served from
+/// R2 like every other picture in the table.
+String? pvFilmStillFor(String? slotId) {
+  final key = slotId == null ? null : kPvFilmStills[slotId];
+  return key == null ? null : readImageFor(key);
+}

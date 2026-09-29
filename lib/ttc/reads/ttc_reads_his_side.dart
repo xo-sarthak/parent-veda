@@ -291,7 +291,8 @@ final List<PvRead> kTtcReadsHisSide = [
       ),
       PvReadNextStep(
         kind: PvNextKind.read,
-        title: _en('Heat, habits and time'),
+        // Kept for revert (2026-09-28, explicit names): title: _en('Heat, habits and time'),
+        title: _en('Heat, habits and time: what changes sperm'),
         value: _en('The three changes with real evidence, and roughly how '
             'much each one helps.'),
         surfaceId: 'ttc_read/ttc_read_heat_habits',
@@ -304,11 +305,16 @@ final List<PvRead> kTtcReadsHisSide = [
       ),
     ],
 
-    readNext: [
-      'ttc_read_semen_analysis',
-      'ttc_read_heat_habits',
-      'ttc_read_his_age',
-    ],
+    // ⚠️ ONE READ, ONCE, AT THE FOOT (2026-09-28, no repetition):
+    // 'ttc_read_semen_analysis' is the next step "What a semen analysis involves"; 'ttc_read_heat_habits' is the next step "Heat, habits and time",
+    // so the Read next rail no longer lists it a second time.
+    // Kept for revert:
+    // readNext: [
+    // 'ttc_read_semen_analysis',
+    // 'ttc_read_heat_habits',
+    // 'ttc_read_his_age',
+    // ],
+    readNext: ['ttc_read_his_age'],
   ),
 
 
@@ -576,7 +582,8 @@ final List<PvRead> kTtcReadsHisSide = [
       ),
       PvReadNextStep(
         kind: PvNextKind.consult,
-        title: _en('Have the report read properly'),
+        // Kept for revert (2026-09-28, explicit names): title: _en('Have the report read properly'),
+        title: _en('Have an andrologist read the report'),
         value: _en('An andrologist, on video, with the numbers in front of '
             'them.'),
         surfaceId: 'ttc_prepare',

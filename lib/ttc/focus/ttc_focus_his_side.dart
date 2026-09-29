@@ -116,7 +116,8 @@ const TtcFocusPage kTtcHisSideFocus = TtcFocusPage(
   groups: [
     TtcFocusGroup(
         id: 'understand', mark: IntentMark.bookMark, tabMark: TtcTabMark.openBook,
-        label: 'Understand',
+        // Kept for revert (2026-09-28, explicit names): label: 'Understand',
+        label: 'Understand his side',
         icon: Icons.menu_book_outlined,
         hue: 186),
     TtcFocusGroup(
@@ -140,7 +141,8 @@ const TtcFocusPage kTtcHisSideFocus = TtcFocusPage(
     //     hue: 160),
     TtcFocusGroup(
       id: 'talk', mark: IntentMark.askDoctor, tabMark: TtcTabMark.twoBubbles,
-      label: 'Talk',
+      // Kept for revert (2026-09-28, explicit names): label: 'Talk',
+      label: 'Talk to someone',
       icon: Icons.chat_bubble_outline_rounded,
       hue: 42,
       // ⚠️ THE BRIEF'S "REASONS TO BE SEEN SOONER" CARD, AND IT IS A REUSED
@@ -162,6 +164,7 @@ const TtcFocusPage kTtcHisSideFocus = TtcFocusPage(
   // course shown in two places, not two copies of a course.
   headline: TtcMasterclassTile(
     title: 'The half nobody talks about',
+    id: 'ttc_tile_the_half_nobody_talks_about',
     blurb: 'A short course on the male side, with an andrologist.',
     offeringId: 'ttc_partner_workshop',
   ),
@@ -171,11 +174,13 @@ const TtcFocusPage kTtcHisSideFocus = TtcFocusPage(
     //  1 — Understand
     // =========================================================================
     TtcFocusSection(
-      heading: 'Is it about him?',
+      // Kept for revert (2026-09-28, explicit names): heading: 'Is it about him?',
+      heading: 'How much does his side matter?',
       group: 'understand',
       tiles: [
         TtcArticleTile(
           title: 'Whose "side" is it, really',
+          id: 'ttc_tile_whose_side_is_it_really',
           blurb: 'About half of couples having difficulty have a male factor '
               'somewhere in it. The word "fault" doesn\'t help anyone here.',
           readId: 'ttc_read_whose_side',
@@ -196,14 +201,18 @@ const TtcFocusPage kTtcHisSideFocus = TtcFocusPage(
         // audit): his age is a question about him, not about the test.
         TtcArticleTile(
           title: 'Does his age matter?',
-          blurb: "It changes more slowly than yours. Here's what changes.",
+          id: 'ttc_tile_does_his_age_matter',
+          // Kept for revert (2026-09-28, explicit names):
+          // blurb: "It changes more slowly than yours. Here's what changes.",
+          blurb: 'His fertility changes more slowly with age than yours, and what does change.',
           readId: 'ttc_read_his_age',
         ),
       ],
     ),
 
     TtcFocusSection(
-      heading: 'Is it worth testing?',
+      // Kept for revert (2026-09-28, explicit names): heading: 'Is it worth testing?',
+      heading: 'Is a sperm test worth doing?',
       group: 'understand',
       tiles: [
         // ⚠️ THE BRIEF'S "SHORT CARD THAT BRIDGES INTO TAB 2" — and since
@@ -213,7 +222,9 @@ const TtcFocusPage kTtcHisSideFocus = TtcFocusPage(
         // and its next step is the tool, which is tab 2 in the order tab 2
         // presents them.
         TtcArticleTile(
-          title: 'The case for testing early',
+          // Kept for revert (2026-09-28, explicit names): title: 'The case for testing early',
+          title: 'The case for an early sperm test',
+          id: 'ttc_tile_the_case_for_an_early_sperm_test',
           blurb: 'One test, easy to find and cheap, and it answers a question '
               "a year of waiting can't.",
           readId: 'ttc_read_case_for_testing',
@@ -230,6 +241,7 @@ const TtcFocusPage kTtcHisSideFocus = TtcFocusPage(
         // relevance audit): the film is about why testing him comes last.
         TtcVideoTile(
           title: 'Why his side gets tested last',
+          id: 'ttc_tile_why_his_side_gets_tested_last',
           blurb: 'A male factor plays a part for about half of couples, and '
               'his side is the quickest to check.',
           slotId: 'ttc_vid_whose_side',
@@ -242,18 +254,24 @@ const TtcFocusPage kTtcHisSideFocus = TtcFocusPage(
     //  2 — Test and results
     // =========================================================================
     TtcFocusSection(
-      heading: 'The test',
+      // Kept for revert (2026-09-28, explicit names): heading: 'The test',
+      heading: 'What is a semen analysis?',
       group: 'test',
       tiles: [
         TtcArticleTile(
           title: 'What a semen analysis involves',
+          id: 'ttc_tile_what_a_semen_analysis_involves',
           blurb: "What's measured, what the numbers mean, and what to do "
               'before the sample so the result is worth having.',
           readId: 'ttc_read_semen_analysis',
         ),
         TtcVideoTile(
-          title: 'Reading a semen report',
-          blurb: 'The page, explained line by line.',
+          // Kept for revert (2026-09-28, explicit names): title: 'Reading a semen report',
+          title: 'A semen report, line by line',
+          id: 'ttc_tile_reading_a_semen_report',
+          // Kept for revert (2026-09-28, explicit names):
+          // blurb: 'The page, explained line by line.',
+          blurb: 'What each number on the page measures.',
           slotId: 'ttc_vid_semen_analysis',
           duration: '6 MIN',
         ),
@@ -261,7 +279,8 @@ const TtcFocusPage kTtcHisSideFocus = TtcFocusPage(
     ),
 
     TtcFocusSection(
-      heading: 'Read your own report',
+      // Kept for revert (2026-09-28, explicit names): heading: 'Read your own report',
+      heading: 'How do you read his report?',
       group: 'test',
       tiles: [
         // ⚠️ THE ONE NET-NEW THING IN THIS DOOR, and the rules it holds are on
@@ -269,6 +288,7 @@ const TtcFocusPage kTtcHisSideFocus = TtcFocusPage(
         // is never a conclusion, and every path ends at a real andrologist.
         TtcToolTile(
           title: 'Read your semen report',
+          id: 'ttc_tile_read_your_semen_report',
           blurb: 'Type in what it says and get it explained in plain English. '
               "It won't tell you whether you're fertile. Nothing can, from one "
               'sheet of paper.',
@@ -277,7 +297,9 @@ const TtcFocusPage kTtcHisSideFocus = TtcFocusPage(
         // D13 (2026-09-28): "Get it read" was a section of this one card;
         // it joins the report it reads. Moved from its own section below.
         TtcTalkTile(
-          title: 'Have the report read properly',
+          // Kept for revert (2026-09-28, explicit names): title: 'Have the report read properly',
+          title: 'Have an andrologist read the report',
+          id: 'ttc_tile_have_the_report_read_properly',
           blurb: 'An andrologist reads the numbers together and in context, '
               'which no list of lines can do.',
           action: kTtcOfferingAndrologist,
@@ -286,6 +308,7 @@ const TtcFocusPage kTtcHisSideFocus = TtcFocusPage(
         // analysis belongs beside her reports; see the note at its old place.
         TtcToolTile(
           title: 'Keep his reports with yours',
+          id: 'ttc_tile_keep_his_reports_with_yours',
           blurb: 'One folder for both of you, so a second opinion starts with '
               'the papers, not with trying to remember.',
           surfaceId: 'ttc_records',
@@ -294,23 +317,31 @@ const TtcFocusPage kTtcHisSideFocus = TtcFocusPage(
     ),
 
     TtcFocusSection(
-      heading: 'What the words and results mean',
+      // Kept for revert (2026-09-28, explicit names): heading: 'What the words and results mean',
+      heading: 'What do the words and results on his report mean?',
       group: 'test',
       tiles: [
         TtcGuideTile(
           title: 'The words on the report, in plain English',
+          id: 'ttc_tile_the_words_on_the_report_in_plain_english',
           blurb: 'Every term on the page, said the way a person would say it.',
           readId: 'ttc_read_report_words',
         ),
         TtcArticleTile(
-          title: 'If the result is normal',
+          // Kept for revert (2026-09-28, explicit names): title: 'If the result is normal',
+          title: 'If his semen result is normal',
+          id: 'ttc_tile_if_his_semen_result_is_normal',
           blurb: "What it rules out, and the two things it doesn't.",
           readId: 'ttc_read_result_normal',
         ),
         TtcArticleTile(
-          title: 'If the first test is abnormal',
-          blurb: 'One low number is a reason to repeat, not a conclusion. '
-              "Here's why that matters.",
+          // Kept for revert (2026-09-28, explicit names): title: 'If the first test is abnormal',
+          title: 'If his first semen test is abnormal',
+          id: 'ttc_tile_if_his_first_semen_test_is_abnormal',
+          // Kept for revert (2026-09-28, explicit names):
+          // blurb: 'One low number is a reason to repeat, not a conclusion. '
+          // "Here's why that matters.",
+          blurb: 'One low number is a reason to repeat the test, not a conclusion.',
           readId: 'ttc_read_result_abnormal',
         ),
         // ⚠️ ITS OWN CARD, WHICH IS STEP 4a AND MATTERS. This was a paragraph
@@ -320,8 +351,11 @@ const TtcFocusPage kTtcHisSideFocus = TtcFocusPage(
         // than the word sounds. Buried, it helps nobody.
         TtcArticleTile(
           title: 'If no sperm is found',
-          blurb: "It's not the end of the road. It's the one result that goes "
-              'to a specialist rather than to a second sample.',
+          id: 'ttc_tile_if_no_sperm_is_found',
+          // Kept for revert (2026-09-28, explicit names):
+          // blurb: "It's not the end of the road. It's the one result that goes "
+          // 'to a specialist rather than to a second sample.',
+          blurb: "Finding no sperm is not the end of the road. It's the one result that goes to a specialist rather than to a second sample.",
           readId: 'ttc_read_azoospermia',
         ),
       ],
@@ -350,20 +384,27 @@ const TtcFocusPage kTtcHisSideFocus = TtcFocusPage(
     //  3 — Improve his health
     // =========================================================================
     TtcFocusSection(
-      heading: 'The three levers',
+      // Kept for revert (2026-09-28, explicit names): heading: 'The three levers',
+      heading: 'What changes his sperm health?',
       group: 'improve',
       tiles: [
         TtcArticleTile(
-          title: 'Heat, habits and time',
-          blurb: 'What really changes sperm health, including the smokeless '
-              'tobacco nobody counts.',
+          // Kept for revert (2026-09-28, explicit names): title: 'Heat, habits and time',
+          title: 'Heat, habits and time: what changes sperm',
+          id: 'ttc_tile_heat_habits_and_time_what_changes_sperm',
+          // Kept for revert (2026-09-28, explicit names):
+          // blurb: 'What really changes sperm health, including the smokeless '
+          // 'tobacco nobody counts.',
+          blurb: 'How much each change helps, including the smokeless tobacco nobody counts.',
           readId: 'ttc_read_heat_habits',
         ),
         // ⚠️ A GUIDE, AND ITS OWN PIECE — 2026-09-06. The brief: "Guide (the
         // 12-week plan)". It was an article tile opening the essay above it;
         // now it is the plan, week by week, with the repeat booked on day one.
         TtcGuideTile(
-          title: 'What three months looks like',
+          // Kept for revert (2026-09-28, explicit names): title: 'What three months looks like',
+          title: 'What his three months of changes look like',
+          id: 'ttc_tile_what_his_three_months_of_changes_look_like',
           blurb: 'The twelve-week plan: which change in which week, and why '
               'the repeat test is booked before anything else.',
           readId: 'ttc_read_three_months',
@@ -372,6 +413,7 @@ const TtcFocusPage kTtcHisSideFocus = TtcFocusPage(
         // audit). Written and chaptered, and was on no door.
         TtcVideoTile(
           title: 'Three things that really change his numbers',
+          id: 'ttc_tile_three_things_that_really_change_his_numbers',
           blurb: 'Tobacco, heat and time, and how long before any change '
               'shows.',
           slotId: 'ttc_vid_heat_habits',
@@ -381,7 +423,8 @@ const TtcFocusPage kTtcHisSideFocus = TtcFocusPage(
     ),
 
     TtcFocusSection(
-      heading: 'Supplements, honestly',
+      // Kept for revert (2026-09-28, explicit names): heading: 'Supplements, honestly',
+      heading: 'Do supplements help his sperm?',
       group: 'improve',
       tiles: [
         // ⚠️ ARTICLE FIRST, PRODUCT SECOND — the brief lists both, in that
@@ -390,6 +433,7 @@ const TtcFocusPage kTtcHisSideFocus = TtcFocusPage(
         // rupees, BEFORE he reaches anything he can buy.
         TtcArticleTile(
           title: 'Zinc and CoQ10, honestly',
+          id: 'ttc_tile_zinc_and_coq10_honestly',
           blurb: 'The two with any evidence at all: what the evidence shows, '
               "what they cost, and what they can't replace.",
           readId: 'ttc_read_zinc_coq10',
@@ -415,27 +459,35 @@ const TtcFocusPage kTtcHisSideFocus = TtcFocusPage(
         // ),
         TtcProductTile(
           title: 'Zinc',
-          blurb: 'Worth it only if a test showed his level is low. Read the '
-              'piece above before you spend anything.',
+          id: 'ttc_tile_zinc',
+          // Kept for revert (2026-09-28, explicit names):
+          // blurb: 'Worth it only if a test showed his level is low. Read the '
+          // 'piece above before you spend anything.',
+          blurb: 'Worth it only if a test showed his level is low. Read "Zinc and CoQ10, honestly" before you spend anything.',
           productId: 'zinc',
         ),
         TtcProductTile(
           title: 'CoQ10',
-          blurb: 'Worth it only if a clinic has named it. Read the piece above '
-              'before you spend anything.',
+          id: 'ttc_tile_coq10',
+          // Kept for revert (2026-09-28, explicit names):
+          // blurb: 'Worth it only if a clinic has named it. Read the piece above '
+          // 'before you spend anything.',
+          blurb: 'Worth it only if a clinic has named CoQ10. Read "Zinc and CoQ10, honestly" before you spend anything.',
           productId: 'coq10',
         ),
       ],
     ),
 
     TtcFocusSection(
-      heading: 'The course',
+      // Kept for revert (2026-09-28, explicit names): heading: 'The course',
+      heading: 'Is there a course on his side?',
       group: 'improve',
       tiles: [
         // ⚠️ THE SAME OFFERING ID AS THE HEADLINE ABOVE — Step 5c. One course,
         // two placements, one content id.
         TtcMasterclassTile(
           title: 'The half nobody talks about',
+          id: 'ttc_tile_the_half_nobody_talks_about',
           blurb: 'A short course on the male side, at your own pace, with an '
               'andrologist.',
           offeringId: 'ttc_partner_workshop',
@@ -460,6 +512,7 @@ const TtcFocusPage kTtcHisSideFocus = TtcFocusPage(
         // else.
         TtcToolTile(
           title: 'What he can track',
+          id: 'ttc_tile_what_he_can_track',
           blurb: 'Sleep, alcohol, tobacco, heat and movement: his own log, on '
               'his own account.',
           surfaceId: 'ttc_partner_health',
@@ -485,12 +538,14 @@ const TtcFocusPage kTtcHisSideFocus = TtcFocusPage(
     //  The "Reasons to be seen sooner" card is pinned above this section by
     //  the group — see `pinnedRedFlagReadIds` on the `talk` group.
     TtcFocusSection(
-      heading: 'Talk',
+      // Kept for revert (2026-09-28, explicit names): heading: 'Talk',
+      heading: 'Who can he talk to?',
       group: 'talk',
       tiles: [
         // The andrologist offering itself — see the note on "Get it read".
         TtcTalkTile(
           title: 'Talk to an andrologist',
+          id: 'ttc_tile_talk_to_an_andrologist',
           blurb: 'In private, about your own results. Bring the printed '
               'report rather than a number you remember.',
           action: kTtcOfferingAndrologist,
@@ -500,6 +555,7 @@ const TtcFocusPage kTtcHisSideFocus = TtcFocusPage(
         // door drops this one tile, not the Talk tab, when she turns it on.
         TtcArticleTile(
           title: 'When sex is hard for him under pressure',
+          id: 'ttc_tile_when_sex_is_hard_for_him_under_pressure',
           blurb: "Common in the fertile days, and it's usually the pressure.",
           readId: 'ttc_read_his_side_pressure',
         ),
@@ -526,6 +582,7 @@ const TtcFocusPage kTtcHisSideFocus = TtcFocusPage(
         // ),
         TtcGuideTile(
           title: 'When he goes quiet',
+          id: 'ttc_tile_when_he_goes_quiet',
           blurb: 'Why he may say little even when he cares. Men are offered '
               'support far less often, mostly because nobody asks.',
           readId: 'ttc_read_bringing_him_in',

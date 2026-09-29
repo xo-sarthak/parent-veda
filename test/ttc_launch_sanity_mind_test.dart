@@ -230,6 +230,10 @@ void main() {
         const TtcRitualScreen(chapter: TtcChapter.tryingTogether));
     expect(find.text(const TtcS(false).sanskarTitle.toUpperCase()),
         findsOneWidget);
-    expect(find.text('Picked for your fertile days.'), findsOneWidget);
+    // The chapter sentence opens the hero's intro since 2026-09-28 (one
+    // paragraph under the title). Kept for revert:
+    //   expect(find.text('Picked for your fertile days.'), findsOneWidget);
+    expect(find.textContaining('Picked for your fertile days.'),
+        findsOneWidget);
   });
 }

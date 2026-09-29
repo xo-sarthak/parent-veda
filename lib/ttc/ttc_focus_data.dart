@@ -223,7 +223,23 @@ sealed class TtcTile {
     required this.blurb,
     this.meta,
     this.keywords = const [],
+    this.id,
   });
+
+  /// ⚠️ A STABLE ID, SO A PHOTO SURVIVES A RETITLE (2026-09-28). The door
+  /// keys a card's own photograph by `ttcTilePhotoId`, which used to be the
+  /// title only, and photos broke seven times on the day cards were retitled.
+  /// Where this is set it IS the photo key, so its value is the key the photo
+  /// was filed under (`ttc_tile_<the title it had then>`), which is also the
+  /// photo's file name on R2: never rename an id, only a title. Null keeps the
+  /// title rule. Set on the Fertile window door first; the other doors keep
+  /// the title rule until they are moved one by one.
+  ///
+  /// ⚠️ EVERY DOOR TILE HAS ONE SINCE 2026-09-29, on all nine doors: the key
+  /// its photo was filed under that day (`ttcTileTitleKey` of the title it had
+  /// then). A new tile is born with `ttcTileTitleKey(title)` and keeps it.
+  /// `ttc_door_photos_test.dart` fails on a tile without one.
+  final String? id;
 
   /// Short and plain. The one line she reads.
   final String title;
@@ -256,7 +272,7 @@ sealed class TtcTile {
 /// Opens a screen that already exists elsewhere in the stage.
 final class TtcToolTile extends TtcTile {
   const TtcToolTile(
-      {required super.title, required super.blurb, super.meta, super.keywords, required this.surfaceId});
+      {required super.title, required super.blurb, super.meta, super.keywords, super.id, required this.surfaceId});
 
   /// ⚠️ A SURFACE ID, NOT A WIDGET. The tool is built, shipped and tested; this
   /// opens it through `openTtcSurface` so the route NAME stays the surface id —
@@ -272,7 +288,7 @@ final class TtcToolTile extends TtcTile {
 final class TtcArticleTile extends TtcTile {
   const TtcArticleTile({
     required super.title,
-    required super.blurb, super.meta, super.keywords,
+    required super.blurb, super.meta, super.keywords, super.id,
     this.body = const [],
     this.readId,
     this.moreReadId,
@@ -358,7 +374,7 @@ class TtcInfographicColumn {
 final class TtcInfographicTile extends TtcTile {
   const TtcInfographicTile({
     required super.title,
-    required super.blurb, super.meta, super.keywords,
+    required super.blurb, super.meta, super.keywords, super.id,
     required this.headline,
     required this.left,
     required this.right,
@@ -389,7 +405,7 @@ final class TtcInfographicTile extends TtcTile {
 final class TtcCarouselTile extends TtcTile {
   const TtcCarouselTile(
       {required super.title,
-      required super.blurb, super.meta, super.keywords,
+      required super.blurb, super.meta, super.keywords, super.id,
       required this.cards,
       this.art,
       this.reviewedBy,
@@ -421,7 +437,7 @@ final class TtcCarouselTile extends TtcTile {
 final class TtcVideoTile extends TtcTile {
   const TtcVideoTile({
     required super.title,
-    required super.blurb, super.meta, super.keywords,
+    required super.blurb, super.meta, super.keywords, super.id,
     required this.slotId,
     required this.duration,
   });
@@ -447,7 +463,7 @@ final class TtcVideoTile extends TtcTile {
 final class TtcMythTile extends TtcTile {
   const TtcMythTile({
     required super.title,
-    required super.blurb, super.meta, super.keywords,
+    required super.blurb, super.meta, super.keywords, super.id,
     required this.myth,
     required this.fact,
     this.slides = const [],
@@ -495,13 +511,13 @@ final class TtcMythTile extends TtcTile {
 final class TtcProductTile extends TtcTile {
   /// One product, straight to its page.
   const TtcProductTile(
-      {required super.title, required super.blurb, super.meta, super.keywords, required this.productId})
+      {required super.title, required super.blurb, super.meta, super.keywords, super.id, required this.productId})
       : category = null;
 
   /// A whole shelf — every product in one category, ranked, with the
   /// recommendation band on each card.
   const TtcProductTile.shelf(
-      {required super.title, required super.blurb, super.meta, super.keywords, required this.category})
+      {required super.title, required super.blurb, super.meta, super.keywords, super.id, required this.category})
       : productId = null;
 
   /// Exactly one of these is set, and which one decides where it opens.
@@ -534,7 +550,7 @@ final class TtcProductTile extends TtcTile {
 final class TtcGuideTile extends TtcTile {
   const TtcGuideTile({
     required super.title,
-    required super.blurb, super.meta, super.keywords,
+    required super.blurb, super.meta, super.keywords, super.id,
     required this.readId,
     this.atHeading,
   });
@@ -567,7 +583,7 @@ final class TtcGuideTile extends TtcTile {
 /// something you come back to and add to, not something you use once.
 final class TtcChecklistTile extends TtcTile {
   const TtcChecklistTile(
-      {required super.title, required super.blurb, super.meta, super.keywords, required this.surfaceId});
+      {required super.title, required super.blurb, super.meta, super.keywords, super.id, required this.surfaceId});
 
   final String surfaceId;
 
@@ -584,7 +600,7 @@ final class TtcChecklistTile extends TtcTile {
 /// before you start" is offering somebody who has not started trying yet.
 final class TtcTalkTile extends TtcTile {
   const TtcTalkTile(
-      {required super.title, required super.blurb, super.meta, super.keywords, required this.action});
+      {required super.title, required super.blurb, super.meta, super.keywords, super.id, required this.action});
 
   /// A hub action, resolved by the caller — the same booking engine underneath.
   /// Only the promise on the card differs.
@@ -609,7 +625,7 @@ final class TtcTalkTile extends TtcTile {
 /// recipe page format so do that."*
 final class TtcRecipeTile extends TtcTile {
   const TtcRecipeTile(
-      {required super.title, required super.blurb, super.meta, super.keywords, required this.recipeId});
+      {required super.title, required super.blurb, super.meta, super.keywords, super.id, required this.recipeId});
 
   /// Must exist in `kRecipes`. Held by `ttc_focus_page_test.dart` for the same
   /// reason every other id here is: a tile whose id is wrong renders perfectly
@@ -635,7 +651,7 @@ final class TtcRecipeTile extends TtcTile {
 /// clinical claim on this page may point at it.
 final class TtcCommunityTile extends TtcTile {
   const TtcCommunityTile(
-      {required super.title, required super.blurb, super.meta, super.keywords, required this.surfaceId});
+      {required super.title, required super.blurb, super.meta, super.keywords, super.id, required this.surfaceId});
 
   /// Resolved by `ttcScreenForSurface`, like a tool's.
   final String surfaceId;
@@ -661,7 +677,7 @@ final class TtcCommunityTile extends TtcTile {
 /// tiles open the checklist and the trackers, which record without ranking.
 final class TtcDoTile extends TtcTile {
   const TtcDoTile(
-      {required super.title, required super.blurb, super.meta, super.keywords, required this.surfaceId});
+      {required super.title, required super.blurb, super.meta, super.keywords, super.id, required this.surfaceId});
 
   /// Resolved by `ttcScreenForSurface`, exactly like a tool's — the difference
   /// is what the chip promises, not how it opens.
@@ -694,7 +710,7 @@ final class TtcDoorTile extends TtcTile {
       {required super.title,
       required super.blurb,
       super.meta,
-      super.keywords,
+      super.keywords, super.id,
       required this.bracketId,
       this.group});
 
@@ -714,7 +730,7 @@ final class TtcDoorTile extends TtcTile {
 /// A paid course.
 final class TtcMasterclassTile extends TtcTile {
   const TtcMasterclassTile(
-      {required super.title, required super.blurb, super.meta, super.keywords, required this.offeringId});
+      {required super.title, required super.blurb, super.meta, super.keywords, super.id, required this.offeringId});
 
   final String offeringId;
 
@@ -725,7 +741,7 @@ final class TtcMasterclassTile extends TtcTile {
 /// Time with a real person.
 final class TtcBookingTile extends TtcTile {
   const TtcBookingTile(
-      {required super.title, required super.blurb, super.meta, super.keywords, required this.action});
+      {required super.title, required super.blurb, super.meta, super.keywords, super.id, required this.action});
 
   /// A hub action, resolved by the caller — never a booking flow rebuilt here.
   final String action;
@@ -1118,6 +1134,20 @@ TtcFocusPage? ttcFocusPageFor(String bracketId) {
 /// added above it, so the exported doc names the tile by its title. Hyphens,
 /// not underscores: Ask Veda strips a trailing `_hi` from every doc id, and
 /// "Say hi" must not lose its last word to that.
+/// The photo key a title files under: `ttc_tile_` and the title in lower
+/// case, words joined by `_` ("Every day or not?" is
+/// `ttc_tile_every_day_or_not`). Every tile's `id` was set to this key of the
+/// title it had on 2026-09-29, so a retitle keeps the photo; this is the
+/// fallback for a tile with no id, and the key a new tile's id is born with.
+/// `ttcTilePhotoId` (ttc_focus_screen.dart) reads it.
+String ttcTileTitleKey(String title) {
+  final slug = title
+      .toLowerCase()
+      .replaceAll(RegExp(r'[^a-z0-9]+'), '_')
+      .replaceAll(RegExp(r'^_+|_+$'), '');
+  return 'ttc_tile_$slug';
+}
+
 String ttcTileSlug(TtcTile t) => t.title
     .toLowerCase()
     .replaceAll(RegExp(r'[^a-z0-9]+'), '-')
@@ -1125,11 +1155,35 @@ String ttcTileSlug(TtcTile t) => t.title
 
 /// The tile on [page] named [slug], and the group of the section it sits in,
 /// or null when the door no longer has it (the door itself then opens).
+///
+/// ⚠️ AND BY ITS OLD NAME, WHEN IT HAS AN `id` (2026-09-28). About seventy
+/// tiles were retitled to name what they open ("Every day or not?" became
+/// "Sex every day, or every other day?"), and Ask Veda's pool still holds the
+/// doc ids exported under the old titles until it is refreshed. A tile whose
+/// photo was filed under its old title carries `id: 'ttc_tile_<old title>'`,
+/// so its old slug is recoverable from the id and an answer card from the
+/// old pool still lands on the card. A retitled tile with no id (its photo
+/// is its read's) falls back to opening the door, as any unknown slug does,
+/// until the pool is re-exported. The title wins when both match.
 (TtcTile, String?)? ttcTileBySlug(TtcFocusPage page, String slug) {
   for (final s in page.sections) {
     for (final t in s.tiles) {
       if (ttcTileSlug(t) == slug) return (t, s.group);
     }
   }
+  for (final s in page.sections) {
+    for (final t in s.tiles) {
+      if (ttcTileIdSlug(t) == slug) return (t, s.group);
+    }
+  }
   return null;
+}
+
+/// The slug a tile had in Ask Veda's pool before it was retitled, from its
+/// stable `id` (`ttc_tile_can_stress_stop_it` → `can-stress-stop-it`), or
+/// null for a tile with no id.
+String? ttcTileIdSlug(TtcTile t) {
+  final id = t.id;
+  if (id == null || !id.startsWith('ttc_tile_')) return null;
+  return id.substring('ttc_tile_'.length).replaceAll('_', '-');
 }

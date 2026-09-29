@@ -169,6 +169,8 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
           // Care and medicines' hue in Tools (T6, 2026-09-28). Kept for
           // revert: "Getting ready's hue, which this screen always wore."
           hue: _kHue,
+          // The tool's mark over the eyebrow (2026-09-29, ttc_tool_marks.dart).
+          toolId: 'vaccinations',
           // ⚠️ ONE TOOL, ONE NAME (2026-09-27): the eyebrow IS the Tools
           // tile's name, word for word; the title is the tile's own line.
           eyebrow: 'Vaccinations',
@@ -385,7 +387,8 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
       // is failing at something. An empty state is not a deficit — she has
       // simply arrived. Say what happens next instead of what has not
       // happened yet.
-      head = t('One blood test settles most of this',
+      // Kept for revert (2026-09-28): 'One blood test settles most of this'
+      head = t('One blood test settles most of your jabs',
           'Ek blood test se zyadatar baat saaf ho jaati hai');
       body = t(
           'Rubella is the one worth doing first. If it shows you\'re immune, '
@@ -394,7 +397,9 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
               'aata hai — toh yahan aur kuch karna nahi hai.');
       icon = Icons.science_outlined;
     } else {
-      head = t('Nothing here is holding you back',
+      // Change 5 (2026-09-28): the heading names what is not holding her
+      // back. Kept for revert (2026-09-28): 'Nothing here is holding you back'
+      head = t('No vaccine is holding you back',
           'Yahan kuch bhi aapko rok nahi raha');
       body = t(
           'This is based on what you\'ve recorded. If a result changes, '
@@ -482,11 +487,13 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
   Widget _theAsk(V2Palette p, String Function(String, String) t) => Container(
         padding: const EdgeInsets.fromLTRB(16, 15, 16, 17),
         decoration: BoxDecoration(
-          color: p.surfaceAlt,
+          // Kept for revert (2026-09-29, no tinted slab behind text): color: p.surfaceAlt,
+          color: p.surface, border: Border.fromBorderSide(BorderSide(color: p.line)),
           borderRadius: BorderRadius.circular(18),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(t('START HERE', 'YAHAN SE SHURU'),
+          // Kept for revert (2026-09-28): 'START HERE'
+          Text(t('START WITH ONE BLOOD TEST', 'YAHAN SE SHURU'),
               style: pvManrope(
                   fontSize: 10.5,
                   fontWeight: FontWeight.w800,
@@ -494,7 +501,8 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
                   color: p.action)),
           const SizedBox(height: 9),
           Text(
-              t('Ask for these tests by name',
+              // Kept for revert (2026-09-28): 'Ask for these tests by name'
+              t('Ask for the immunity tests by name',
                   'Ye tests naam lekar maangein'),
               style: pvFraunces(
                   fontSize: 19,
@@ -526,7 +534,7 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
                   width: 5,
                   height: 5,
                   decoration:
-                      BoxDecoration(color: p.action, shape: BoxShape.circle),
+                      BoxDecoration(color: ttcTitleInk, shape: BoxShape.circle),
                 ),
                 const SizedBox(width: 11),
                 Expanded(
@@ -643,8 +651,10 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
         const SizedBox(height: 8),
         _groupHead(
             p,
-            t('YOU ALMOST CERTAINLY HAVE THIS', 'YE LAGBHAG PAKKA HAI'),
-            t('The public programme gives this at ten and sixteen.',
+            // Kept for revert (2026-09-28): 'YOU ALMOST CERTAINLY HAVE THIS',
+            // 'The public programme gives this at ten and sixteen.'
+            t('YOU ALMOST CERTAINLY HAVE Td', 'YE LAGBHAG PAKKA HAI'),
+            t('The public programme gives Td at ten and sixteen.',
                 'Sarkari programme mein, das aur solah saal par.')),
         const SizedBox(height: 14),
         for (final v in background) ...[
@@ -719,8 +729,13 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
                     const SizedBox(width: 6),
                     Expanded(
                       child: Text(
-                          t('Live vaccine: wait ${v.waitDays} days after it '
-                                  'before you try.',
+                          // Change 5 (2026-09-28): the line names its
+                          // vaccine, so two cards never say the same
+                          // sentence. Kept for revert: 'Live vaccine: wait
+                          // ${v.waitDays} days after it before you try.'
+                          t('${v.name.en} is a live vaccine: wait '
+                                  '${v.waitDays} days after the jab before '
+                                  'you try.',
                               'Live vaccine: wait ${v.waitDays} days after it '
                                   'before you try.'),
                           style: pvManrope(
@@ -764,8 +779,10 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
               Expanded(
                 child: Text(
                     open
-                        ? t('Show less', 'Show less')
-                        : t('More about this', 'More about this'),
+                        // Kept for revert (2026-09-28): 'Show less',
+                        // 'More about this'.
+                        ? t('Less about ${v.name.en}', 'Show less')
+                        : t('More about ${v.name.en}', 'More about this'),
                     style: pvManrope(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
@@ -803,7 +820,8 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
                             hi: 'A live vaccine uses a weakened form of the '
                                 'virus. So doctors advise waiting '
                                 '${v.waitDays} days after it before you try.')),
-                  _field(p, lang, t('WHY IT MATTERS', 'KYUN ZAROORI HAI'),
+                  // Kept for revert (2026-09-28): 'WHY IT MATTERS'
+                  _field(p, lang, t('WHY THIS JAB MATTERS', 'KYUN ZAROORI HAI'),
                       v.why),
                   _field(p, lang, t('HOW YOU FIND OUT', 'PATA KAISE CHALEGA'),
                       v.howChecked),
@@ -839,12 +857,19 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
         if (s != TtcVaccineStatus.unknown) s,
     ];
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(
-          status == TtcVaccineStatus.unknown
-              ? t('Once you know, tap what fits.', 'Once you know, tap what fits.')
-              : t('Change your answer.', 'Change your answer.'),
-          style: pvManrope(fontSize: 12, height: 1.4, color: p.ink3)),
-      const SizedBox(height: 9),
+      // ⚠️ SAID ONCE, ABOVE THE CARDS (no repetition, 2026-09-28): the
+      // group line already says "Once you know, tap what fits under each
+      // one", and this line said it again on every card. Only the changing
+      // card keeps its own line. Kept for revert:
+      //   Text(status == TtcVaccineStatus.unknown
+      //       ? t('Once you know, tap what fits.', ...)
+      //       : t('Change your answer.', ...), ...),
+      //   const SizedBox(height: 9),
+      if (status != TtcVaccineStatus.unknown) ...[
+        Text(t('Change your answer.', 'Change your answer.'),
+            style: pvManrope(fontSize: 12, height: 1.4, color: p.ink3)),
+        const SizedBox(height: 9),
+      ],
       for (var i = 0; i < all.length; i += 2) ...[
         if (i > 0) const SizedBox(height: 8),
         IntrinsicHeight(
@@ -897,10 +922,12 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
     switch (status) {
       case TtcVaccineStatus.immune:
         head = t('Already immune', 'Pehle se immune');
-        sub = t('Nothing to do here.', 'Nothing to do here.');
+        // Kept for revert (2026-09-28): 'Nothing to do here.'
+        sub = t('Nothing to do for ${v.name.en}.', 'Nothing to do here.');
         icon = Icons.verified_outlined;
       case TtcVaccineStatus.needed:
-        head = t('You need this', 'Mujhe chahiye');
+        // Kept for revert (2026-09-28): 'You need this'
+        head = t('You need the ${v.name.en} jab', 'Mujhe chahiye');
         sub = v.isLive
             ? t('The ${v.waitDays}-day wait starts on the day you have it, '
                     'so booking it soon ends it soonest.',
@@ -912,12 +939,14 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
         next = _smallAction(
             p,
             ValueKey('ttc_vax_${v.id}_had_now'),
-            t("I've had it now", "I've had it now"),
+            // Kept for revert (2026-09-28): "I've had it now"
+            t("I've had the jab now", "I've had it now"),
             () => _askWhen(store, v, t));
       case TtcVaccineStatus.done:
         head = had == null
-            ? t('Had it', 'Lagwa liya')
-            : t('Had it on ${_date(had)}', 'Had it on ${_date(had)}');
+            // Kept for revert (2026-09-28): 'Had it', 'Had it on …'
+            ? t('Had the jab', 'Lagwa liya')
+            : t('Had the jab on ${_date(had)}', 'Had it on ${_date(had)}');
         if (v.isLive && had != null) {
           final until = had.add(Duration(days: v.waitDays));
           sub = until.isAfter(DateTime.now())
@@ -933,7 +962,8 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
             t('Change the date', 'Change the date'), () => _askWhen(store, v, t));
       case TtcVaccineStatus.notApplicable:
         head = t('Not for me', 'Mere liye nahi');
-        sub = t('You marked this as not for you.',
+        // Kept for revert (2026-09-28): 'You marked this as not for you.'
+        sub = t('You marked ${v.name.en} as not for you.',
             'You marked this as not for you.');
         icon = Icons.remove_circle_outline_rounded;
       case TtcVaccineStatus.unknown:
@@ -975,7 +1005,8 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
         TextButton(
           key: ValueKey('ttc_vax_${v.id}_change'),
           onPressed: () => setState(() => _changing.add(v.id)),
-          child: Text(t('Change', 'Change'),
+          // Kept for revert (2026-09-28): 'Change'
+          child: Text(t('Change answer', 'Change'),
               style: pvManrope(
                   fontSize: 12.5,
                   fontWeight: FontWeight.w800,
@@ -1309,7 +1340,9 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
     final had = store.doneOn(v.id);
     final picked = await showDatePicker(
       context: context,
-      helpText: t('When did you have it?', 'When did you have it?'),
+      // Kept for revert (2026-09-28): 'When did you have it?'
+      helpText: t('When did you have the ${v.name.en} jab?',
+          'When did you have it?'),
       initialDate: had != null && !had.isAfter(today) ? had : today,
       firstDate: DateTime(today.year - 5),
       // Not in the future: a date to come is not a dose she has had.
@@ -1333,7 +1366,8 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
         TtcVaccineStatus.unknown => t('Not recorded', 'Darj nahi'),
         TtcVaccineStatus.immune =>
           t('Immune (a test says so)', 'Pehle se immune'),
-        TtcVaccineStatus.needed => t('Need it', 'Mujhe chahiye'),
+        // Kept for revert (2026-09-28): 'Need it'
+        TtcVaccineStatus.needed => t('Need the jab', 'Mujhe chahiye'),
         TtcVaccineStatus.done => t('Had the jab', 'Lagwa liya'),
         TtcVaccineStatus.notApplicable => t('Not for me', 'Mere liye nahi'),
       };

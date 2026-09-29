@@ -63,7 +63,7 @@ class PvCompareScreen extends StatelessWidget {
                             style: pvManrope(
                               fontSize: 13.5,
                               fontWeight: FontWeight.w700,
-                              color: p.action,
+                              color: kPvInk,
                             ),
                           ),
                         ),
@@ -75,7 +75,8 @@ class PvCompareScreen extends StatelessWidget {
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
-                    child: PvWell(
+                    // A white card, not a slab (2026-09-29). Kept for revert: PvWell.
+                    child: PvCard(
                       child: Text(
                         items.isEmpty
                             ? 'Tick "Compare" on two products from one shelf and they line up here.'
@@ -182,8 +183,9 @@ class PvCompareScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(999),
                   border: Border.all(color: p.ink1, width: 1.2),
                 ),
+                // Kept for revert (2026-09-28): 'Open'.
                 child: Text(
-                  'Open',
+                  'See product',
                   style: pvManrope(
                     fontSize: 13.5,
                     fontWeight: FontWeight.w700,
@@ -213,7 +215,7 @@ class PvCompareScreen extends StatelessWidget {
                 fontSize: 10.5,
                 fontWeight: FontWeight.w800,
                 letterSpacing: 1,
-                color: first ? p.action : p.ink3,
+                color: first ? kPvInk : p.ink3,
               ),
             ),
             const SizedBox(height: 6),

@@ -124,17 +124,19 @@ Future<void> settle(WidgetTester tester) async {
 /// for, using the door's REAL sections and tiles regrouped by heading, rather
 /// than asserting five-card geometry against six cards. The five labels are
 /// the ones the tabs had before the merge.
+// ⚠️ 2026-09-28 (explicit names): headings and card titles below were
+// renamed to name their subject. Kept for revert: 'How many times should we try?', 'What he should do', 'What you should do'.
 TtcFocusPage fiveCardConceiving() {
   final real = ttcFocusPageFor('ttc_conceiving')!;
   const tabOf = {
     'When should we have sex?': 'window',
-    'How many times should we try?': 'trying',
+    'How often should we have sex?': 'trying',
     // Retitled 2026-09-27 (relevance audit). Kept for revert:
     // 'Which sex position is best?': 'trying',
     'Positions, lying down and other myths': 'trying',
     'Does stress stop pregnancy?': 'trying',
-    'What he should do': 'his',
-    'What you should do': 'hers',
+    'What can he do for his fertility?': 'his',
+    'What can you do before you conceive?': 'hers',
     'When should we see a doctor?': 'doctor',
   };
   final byId = {for (final g in real.groups!) g.id: g};
@@ -300,7 +302,7 @@ void main() {
         (tester) async {
       await pump(tester);
       expect(find.text('When should we have sex?'), findsOneWidget);
-      expect(find.text('What he should do'), findsNothing,
+      expect(find.text('What can he do for his fertility?'), findsNothing,
           reason: 'a section from another group rendered — the group filter '
               'is not filtering');
     });
@@ -312,7 +314,7 @@ void main() {
       await settle(tester);
       expect(tester.takeException(), isNull);
 
-      expect(find.text('How many times should we try?'), findsOneWidget);
+      expect(find.text('How often should we have sex?'), findsOneWidget);
       expect(find.text('When should we have sex?'), findsNothing);
     });
 
@@ -379,8 +381,8 @@ void main() {
       await tester.tap(find.byKey(ttcCarouselZoneKey(1)));
       await settle(tester);
 
-      expect(find.text('How many times should we try?'), findsOneWidget);
-      expect(find.text('What he should do'), findsNothing,
+      expect(find.text('How often should we have sex?'), findsOneWidget);
+      expect(find.text('What can he do for his fertility?'), findsNothing,
           reason: 'one tap skipped a card — the right zone is resolving to '
               'something other than offset +1');
     });
@@ -391,7 +393,7 @@ void main() {
       await settle(tester);
       expect(tester.takeException(), isNull);
 
-      expect(find.text('What he should do'), findsOneWidget,
+      expect(find.text('What can he do for his fertility?'), findsOneWidget,
           reason: 'the dots are the only one-step route to the back pair; '
               'without them two groups need two swipes each');
     });
@@ -414,7 +416,7 @@ void main() {
         await settle(tester);
       }
       expect(tester.takeException(), isNull);
-      expect(find.text('What he should do'), findsOneWidget,
+      expect(find.text('What can he do for his fertility?'), findsOneWidget,
           reason: 'two swipes left did not advance two cards — check the '
               'drag divisor and the sign in the drag handler');
 
@@ -422,7 +424,7 @@ void main() {
       // test. Dragging right returns card by card.
       await tester.drag(track, const Offset(140, 0));
       await settle(tester);
-      expect(find.text('How many times should we try?'), findsOneWidget);
+      expect(find.text('How often should we have sex?'), findsOneWidget);
 
       // The ring, from the other end: one more step back from the opening card
       // is the LAST group, not a dead stop.

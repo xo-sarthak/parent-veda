@@ -65,10 +65,15 @@ class WhatsAppPrefs {
     String? language,
     required String source,
   }) async {
-    final client = Supabase.instance.client;
-    final uid = client.auth.currentUser?.id;
-    if (uid == null) return false;
+    // ⚠️ AN UNINITIALISED BACKEND IS "LOGGED OUT", NEVER A CRASH (CLAUDE.md;
+    // found 2026-09-28 by the More tab's tests: the WhatsApp switch threw when
+    // Supabase was not set up, because `Supabase.instance.client` asserts).
+    // The client is read inside the guard. Kept for revert: the client and
+    // the user read above the try.
     try {
+      final client = Supabase.instance.client;
+      final uid = client.auth.currentUser?.id;
+      if (uid == null) return false;
       await client
           .from('profiles')
           .update(fieldsFor(
@@ -83,10 +88,11 @@ class WhatsAppPrefs {
   /// Read the current opt-in + phone for the signed-in user (for the Profile
   /// card to reflect whatever was set at onboarding, and vice versa).
   static Future<WhatsAppPrefs> load() async {
-    final client = Supabase.instance.client;
-    final uid = client.auth.currentUser?.id;
-    if (uid == null) return const WhatsAppPrefs();
+    // Same guard as [save]: no backend reads as nothing set.
     try {
+      final client = Supabase.instance.client;
+      final uid = client.auth.currentUser?.id;
+      if (uid == null) return const WhatsAppPrefs();
       final row = await client
           .from('profiles')
           .select('phone, wa_opt_in')

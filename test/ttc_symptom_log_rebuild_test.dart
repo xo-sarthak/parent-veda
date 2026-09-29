@@ -89,7 +89,10 @@ void main() {
       // pencil. Was: expect(find.text(kTtcMeasureAdd), findsNWidgets(2));
       expect(find.text(kTtcMeasureWeightHint), findsOneWidget);
       expect(find.text(kTtcMeasureTempHint), findsOneWidget);
-      expect(find.text(kTtcMeasureViewChart), findsNWidgets(2));
+      // 2026-09-28: each card names its chart. Was:
+      //   expect(find.text(kTtcMeasureViewChart), findsNWidgets(2));
+      expect(find.text(kTtcMeasureViewWeightChart), findsOneWidget);
+      expect(find.text(kTtcMeasureViewTempChart), findsOneWidget);
       // One way out, and the report as a link.
       expect(find.byKey(const ValueKey('ttc_log_done')), findsOneWidget);
       expect(find.byKey(const ValueKey('ttc_log_open_report')), findsOneWidget);
@@ -207,7 +210,10 @@ void main() {
       // And the search is the first thing in the sheet. Measured in the test
       // font (every glyph a full em, so lines wrap sooner than on a phone):
       // 284 now, against roughly 440 with the picker band and the saved card.
-      expect(search.top, lessThan(300));
+      // 2026-09-29: the tool's drawn mark sits over the eyebrow (40 and a 10
+      // gap, ttc_tool_marks.dart), so 334; still well under the old 440.
+      // Kept for revert: expect(search.top, lessThan(300));
+      expect(search.top, lessThan(350));
     });
   });
 

@@ -23,6 +23,7 @@ import '../../theme/pv_fonts.dart';
 import '../../ttc/ttc_content_prefs.dart';
 import '../products/pv_store_chrome.dart' show pvSnack;
 import '../v2/v2_palette.dart';
+import 'ttc_common.dart' show ttcTitleInk;
 
 const String kTtcIntimateOfferTitle = 'Sharing this phone?';
 const String kTtcIntimateOfferBody =
@@ -30,8 +31,10 @@ const String kTtcIntimateOfferBody =
     'you can hide it, along with its reads in Learn. Your fertile days and '
     'timing always stay. You can change this any time in You, under What you '
     'see.';
-const String kTtcIntimateOfferHide = 'Hide it';
-const String kTtcIntimateOfferKeep = 'Keep showing it';
+// Kept for revert (2026-09-28): 'Hide it', 'Keep showing it'. The buttons
+// name the tab they act on.
+const String kTtcIntimateOfferHide = 'Hide Sex and closeness';
+const String kTtcIntimateOfferKeep = 'Keep the tab showing';
 const String kTtcIntimateHiddenSnack = 'Sex and closeness is hidden';
 
 /// Offers the switch if it has never been offered and is not already on.
@@ -98,7 +101,7 @@ class _OfferSheet extends StatelessWidget {
                 height: 48,
                 child: FilledButton(
                   style: FilledButton.styleFrom(
-                    backgroundColor: p.ink1,
+                    backgroundColor: ttcTitleInk,
                     foregroundColor: Colors.white,
                     shape: const StadiumBorder(),
                   ),

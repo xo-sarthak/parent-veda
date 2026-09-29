@@ -24,6 +24,11 @@ import '../ttc_focus_data.dart';
 
 // =============================================================================
 //  Conceiving and the fertile window
+// -----------------------------------------------------------------------------
+//  ⚠️ `id:` ON A TILE IS ITS PHOTO KEY (2026-09-28, `TtcTile.id`). The value
+//  is frozen at the title the tile had when its photo was filed, and it is
+//  the photo's file name on R2, so retitle freely and never touch the id.
+//  Tiles with no `id` either take their read's photo or key on the title.
 // =============================================================================
 
 const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
@@ -124,7 +129,8 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
     //     hue: 42),
     TtcFocusGroup(
         id: 'trying', mark: IntentMark.cycleRing, tabMark: TtcTabMark.windowRing,
-        label: 'When and how',
+        // Kept for revert (2026-09-28, explicit names): label: 'When and how',
+        label: 'When and how to try',
         icon: Icons.center_focus_weak_outlined,
         hue: 344),
     TtcFocusGroup(
@@ -156,6 +162,7 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
 
   headline: TtcMasterclassTile(
     title: 'What helps you get pregnant',
+    id: 'ttc_tile_what_helps_you_get_pregnant',
     blurb: 'A short course with a fertility doctor. Watch in your own time.',
     offeringId: 'ttc_course_basics',
   ),
@@ -171,6 +178,7 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
         // she came for, so it is the first thing she sees.
         TtcToolTile(
           title: 'Your best days this month',
+          id: 'ttc_tile_your_best_days_this_month',
           blurb: 'Your own dates, from the period you logged.',
           surfaceId: 'ttc_window',
         ),
@@ -179,7 +187,10 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
         // piece it opens.
         TtcArticleTile(
           title: 'Which days can you get pregnant?',
-          blurb: "About six days each cycle. Here's why.",
+          id: 'ttc_tile_which_days_can_you_get_pregnant',
+          // Kept for revert (2026-09-28, explicit names):
+          // blurb: "About six days each cycle. Here's why.",
+          blurb: 'About six days each cycle, and the reason the fertile window is six days long.',
           art: TtcArt.fertileWindow,
           // The picture lives on the read now (`PvRead.imageUrl`, 2026-09-17)
           // and the rail reads it from there — see `photoForTile`. The URL
@@ -194,6 +205,7 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
         ),
         TtcCarouselTile(
           title: 'How the body shows the right days',
+          id: 'ttc_tile_how_the_body_shows_the_right_days',
           blurb: 'Three signs you can check yourself, free.',
           cards: [
             TtcCarouselCard(
@@ -220,15 +232,21 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
           ],
         ),
         TtcArticleTile(
-          title: 'Ovulation kits: do they help?',
-          blurb: "Sometimes. Here's when they're worth the money.",
+          // Kept for revert (2026-09-28, explicit names): title: 'Ovulation kits: do they help?',
+          title: 'Do ovulation kits help?',
+          id: 'ttc_tile_do_ovulation_kits_help',
+          // Kept for revert (2026-09-28, explicit names):
+          // blurb: "Sometimes. Here's when they're worth the money.",
+          blurb: "Sometimes. When ovulation kits are worth the money, and when they aren't.",
           art: TtcArt.fertileWindow,
           readId: 'ttc_read_ovulation_kits',
         ),
         // Beside the kits piece, because it is the question the kits piece
         // leaves open: what to do when your cycle won't tell you when to start.
         TtcArticleTile(
-          title: 'Kits when your cycles are irregular',
+          // Kept for revert (2026-09-28, explicit names): title: 'Kits when your cycles are irregular',
+          title: 'Ovulation kits when your cycles are irregular',
+          id: 'ttc_tile_ovulation_kits_when_your_cycles_are_irregular',
           blurb: 'When to start, how often to test, and what the strips mean.',
           readId: 'ttc_read_ovulation_tests_irregular',
         ),
@@ -237,13 +255,16 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
         // own read has a door to live in and is not only reachable from the
         // tool.
         TtcArticleTile(
-          title: 'Morning temperature: how it works',
+          // Kept for revert (2026-09-28, explicit names): title: 'Morning temperature: how it works',
+          title: 'How morning temperature tracking works',
+          id: 'ttc_tile_how_morning_temperature_tracking_works',
           blurb: 'What the small rise after ovulation shows, and why you '
               "don't need it.",
           readId: 'ttc_read_morning_temperature',
         ),
         TtcProductTile(
           title: 'Buy an ovulation kit',
+          id: 'ttc_tile_buy_an_ovulation_kit',
           blurb: 'LH strips, and what to look for on the pack.',
           productId: 'lh_strips',
         ),
@@ -252,13 +273,16 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
 
     // -------------------------------------------------------------------------
     TtcFocusSection(
-      heading: 'How many times should we try?',
+      // Kept for revert (2026-09-28, explicit names): heading: 'How many times should we try?',
+      heading: 'How often should we have sex?',
       group: 'trying',
       tiles: [
         // The timing read already answers this exactly — every one to two
         // days across the window, and why saving it up does not help.
         TtcArticleTile(
-          title: 'How often is best',
+          // Kept for revert (2026-09-28, explicit names): title: 'How often is best',
+          title: 'How often to have sex',
+          id: 'ttc_tile_how_often_to_have_sex',
           blurb: 'Every two days is enough. Really.',
           readId: 'ttc_read_timing_myths',
         ),
@@ -274,7 +298,9 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
         //   readId: 'ttc_read_how_long_it_takes',
         // ),
         TtcMythTile(
-          title: 'Every day or not?',
+          // Kept for revert (2026-09-28, explicit names): title: 'Every day or not?',
+          title: 'Sex every day, or every other day?',
+          id: 'ttc_tile_every_day_or_not',
           blurb: 'Does more often mean more likely?',
           myth: 'The more you have sex, the better the chance.',
           fact: 'Only up to a point. Every two days in the fertile week gives '
@@ -296,7 +322,9 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
       group: 'trying',
       tiles: [
         TtcMythTile(
-          title: 'Do positions matter?',
+          // Kept for revert (2026-09-28, explicit names): title: 'Do positions matter?',
+          title: 'Do sex positions matter?',
+          id: 'ttc_tile_do_positions_matter',
           blurb: 'The short answer is no.',
           myth: 'Some positions make a baby more likely.',
           fact: 'No position has been shown to work better than another. '
@@ -304,16 +332,24 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
               "used. Pick what's comfortable.",
         ),
         TtcMythTile(
-          title: 'Should you lie down after?',
-          blurb: "You don't have to. Here's why.",
+          // Kept for revert (2026-09-28, explicit names): title: 'Should you lie down after?',
+          title: 'Should you lie down after sex?',
+          id: 'ttc_tile_should_you_lie_down_after',
+          // Kept for revert (2026-09-28, explicit names):
+          // blurb: "You don't have to. Here's why.",
+          blurb: "You don't have to. Getting up washes nothing away.",
           myth: 'You must lie down with your legs up afterwards.',
           fact: 'Sperm are already past the cervix within minutes. Lying down '
               'does no harm if you like it. But getting up straight away '
               "doesn't wash anything away or undo anything.",
         ),
         TtcMythTile(
-          title: 'Do you need to orgasm?',
-          blurb: "No. It isn't needed to get pregnant.",
+          // Kept for revert (2026-09-28, explicit names): title: 'Do you need to orgasm?',
+          title: 'Do you need an orgasm to conceive?',
+          id: 'ttc_tile_do_you_need_to_orgasm',
+          // Kept for revert (2026-09-28, explicit names):
+          // blurb: "No. It isn't needed to get pregnant.",
+          blurb: "No. Nothing has gone wrong if you don't have one.",
           myth: 'You have to orgasm for it to work.',
           fact: "Getting pregnant doesn't depend on your orgasm. There's a "
               'theory that it may help sperm move, but it has never been shown '
@@ -324,6 +360,7 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
         // audit). It was on no door, only at the head of the timing read.
         TtcVideoTile(
           title: 'Six myths about timing, one by one',
+          id: 'ttc_tile_six_myths_about_timing_one_by_one',
           blurb: 'Positions, saving it up, lying still afterwards. What the '
               'evidence says about each.',
           slotId: 'ttc_vid_timing_myths',
@@ -346,8 +383,12 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
       group: 'trying',
       tiles: [
         TtcArticleTile(
-          title: 'Can stress stop it?',
-          blurb: 'Not the way people tell you it does.',
+          // Kept for revert (2026-09-28, explicit names): title: 'Can stress stop it?',
+          title: 'Can stress stop you getting pregnant?',
+          id: 'ttc_tile_can_stress_stop_you_getting_pregnant',
+          // Kept for revert (2026-09-28, explicit names):
+          // blurb: 'Not the way people tell you it does.',
+          blurb: 'Not the way people tell you stress does.',
           readId: 'ttc_read_stress_fertility',
         ),
         // ⚠️ THE FILM THAT ANSWERS THIS SECTION (2026-09-27, relevance
@@ -363,6 +404,7 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
         // ),
         TtcVideoTile(
           title: 'Why "just relax" is the wrong advice',
+          id: 'ttc_tile_why_just_relax_is_the_wrong_advice',
           blurb: 'What the evidence shows about stress and getting pregnant.',
           slotId: 'ttc_vid_stress_fertility',
           duration: '5 MIN',
@@ -374,17 +416,20 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
     // one read with no tile on any door, and the checklist puts it here. The
     // film beside it is written and chaptered and was on no door either.
     TtcFocusSection(
-      heading: 'How does it happen?',
+      // Kept for revert (2026-09-28, explicit names): heading: 'How does it happen?',
+      heading: 'How does conception happen?',
       group: 'trying',
       tiles: [
         TtcArticleTile(
           title: 'How conception works',
+          id: 'ttc_tile_how_conception_works',
           blurb: "What your cycle is doing, and why it doesn't happen every "
               'month.',
           readId: 'ttc_read_how_conception_works',
         ),
         TtcVideoTile(
           title: 'Your cycle, drawn out step by step',
+          id: 'ttc_tile_your_cycle_drawn_out_step_by_step',
           blurb: 'The two halves of a cycle, and when you ovulate in yours.',
           slotId: 'ttc_vid_cycle_basics',
           duration: '6 MIN',
@@ -400,21 +445,26 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
     //  the reads beside it do, in a few taps instead of a page. Both routes
     //  to one answer, side by side, so she picks the one that suits the night.
     TtcFocusSection(
-      heading: 'What happens in the two weeks after?',
+      // Kept for revert (2026-09-28, explicit names): heading: 'What happens in the two weeks after?',
+      heading: 'What happens in the two weeks after ovulation?',
       group: 'waiting',
       tiles: [
         TtcArticleTile(
           title: 'The two-week wait, day by day',
+          id: 'ttc_tile_the_two_week_wait_day_by_day',
           blurb: "What's going on inside, and why you can't feel it yet.",
           readId: 'ttc_read_two_week_wait',
         ),
         TtcArticleTile(
-          title: 'Early signs, and why most are also PMS',
+          // Kept for revert (2026-09-28, explicit names): title: 'Early signs, and why most are also PMS',
+          title: 'Early pregnancy signs, and why most are also PMS',
+          id: 'ttc_tile_early_pregnancy_signs_and_why_most_are_also_pms',
           blurb: "Why your body can't answer before a test can.",
           readId: 'ttc_read_early_signs',
         ),
         TtcArticleTile(
           title: 'Implantation bleeding or your period?',
+          id: 'ttc_tile_implantation_bleeding_or_your_period',
           blurb: 'How to tell them apart, and when bleeding needs a doctor.',
           readId: 'ttc_read_implantation_bleeding',
         ),
@@ -422,26 +472,36 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
     ),
 
     TtcFocusSection(
-      heading: 'When should you test, and how?',
+      // Kept for revert (2026-09-28, explicit names): heading: 'When should you test, and how?',
+      heading: 'When and how should you take a pregnancy test?',
       group: 'waiting',
       tiles: [
         TtcToolTile(
           title: 'Should I test?',
+          id: 'ttc_tile_should_i_test',
           blurb: 'A few taps to work out if a test can tell you anything yet.',
           surfaceId: 'ttc_chat/should_test',
         ),
         TtcArticleTile(
-          title: 'When to take a test, and which one',
+          // Kept for revert (2026-09-28, explicit names): title: 'When to take a test, and which one',
+          title: 'When to take a pregnancy test, and which one',
+          id: 'ttc_tile_when_to_take_a_pregnancy_test_and_which_one',
           blurb: 'The first day a test can give you a real answer.',
           readId: 'ttc_read_when_to_test',
         ),
         TtcArticleTile(
-          title: 'How to take a test, step by step',
-          blurb: 'So you can trust what it says.',
+          // Kept for revert (2026-09-28, explicit names): title: 'How to take a test, step by step',
+          title: 'How to take a pregnancy test, step by step',
+          id: 'ttc_tile_how_to_take_a_pregnancy_test_step_by_step',
+          // Kept for revert (2026-09-28, explicit names):
+          // blurb: 'So you can trust what it says.',
+          blurb: 'So you can trust the result.',
           readId: 'ttc_read_how_to_test',
         ),
         TtcArticleTile(
-          title: 'A faint line, explained',
+          // Kept for revert (2026-09-28, explicit names): title: 'A faint line, explained',
+          title: 'A faint line on a pregnancy test, explained',
+          id: 'ttc_tile_a_faint_line_on_a_pregnancy_test_explained',
           blurb: 'What a pale line usually means, and when to test again.',
           readId: 'ttc_read_faint_line',
         ),
@@ -449,17 +509,22 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
     ),
 
     TtcFocusSection(
-      heading: 'What if the test says no?',
+      // Kept for revert (2026-09-28, explicit names): heading: 'What if the test says no?',
+      heading: 'What if the pregnancy test says no?',
       group: 'waiting',
       tiles: [
         TtcArticleTile(
           title: 'Late period, negative test',
+          id: 'ttc_tile_late_period_negative_test',
           blurb: 'The usual reasons, and when to see a doctor.',
           readId: 'ttc_read_late_negative',
         ),
         TtcArticleTile(
           title: 'Feeling pregnant, but the test says no',
-          blurb: 'Why it can feel so real, and what helps.',
+          id: 'ttc_tile_feeling_pregnant_but_the_test_says_no',
+          // Kept for revert (2026-09-28, explicit names):
+          // blurb: 'Why it can feel so real, and what helps.',
+          blurb: 'Why the signs can feel so real, and what helps.',
           readId: 'ttc_read_feeling_pregnant',
         ),
       ],
@@ -479,16 +544,20 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
       tiles: [
         TtcArticleTile(
           title: 'When sex starts to feel like homework',
+          id: 'ttc_tile_when_sex_starts_to_feel_like_homework',
           blurb: 'Small changes that take the pressure off.',
           readId: 'ttc_read_sex_homework',
         ),
         TtcArticleTile(
           title: 'Low desire, yours and his',
+          id: 'ttc_tile_low_desire_yours_and_his',
           blurb: "What's normal, and when it's worth a word with a doctor.",
           readId: 'ttc_read_low_desire',
         ),
         TtcArticleTile(
-          title: 'Staying close through the months',
+          // Kept for revert (2026-09-28, explicit names): title: 'Staying close through the months',
+          title: 'Staying close through months of trying',
+          id: 'ttc_tile_staying_close_through_months_of_trying',
           blurb: 'Everyday ways to stay a couple, not just a plan.',
           readId: 'ttc_read_keeping_close',
         ),
@@ -496,22 +565,31 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
     ),
 
     TtcFocusSection(
-      heading: 'The questions that are hard to ask',
+      // Kept for revert (2026-09-28, explicit names): heading: 'The questions that are hard to ask',
+      heading: 'The sex questions that are hard to ask',
       group: 'sex',
       tiles: [
         TtcArticleTile(
           title: 'Pain during sex',
-          blurb: 'Including vaginismus, and how treatable it is.',
+          id: 'ttc_tile_pain_during_sex',
+          // Kept for revert (2026-09-28, explicit names):
+          // blurb: 'Including vaginismus, and how treatable it is.',
+          blurb: 'Including vaginismus, which is very treatable.',
           readId: 'ttc_read_pain_vaginismus',
         ),
         TtcArticleTile(
           title: 'Which lubricants are sperm-friendly?',
+          id: 'ttc_tile_which_lubricants_are_sperm_friendly',
           blurb: 'Why dryness happens, and what to use instead.',
           readId: 'ttc_read_lubricants',
         ),
         TtcArticleTile(
-          title: 'Sex after the window',
-          blurb: 'Can it affect an early pregnancy? For most couples, no.',
+          // Kept for revert (2026-09-28, explicit names): title: 'Sex after the window',
+          title: 'Sex after the fertile window',
+          id: 'ttc_tile_sex_after_the_fertile_window',
+          // Kept for revert (2026-09-28, explicit names):
+          // blurb: 'Can it affect an early pregnancy? For most couples, no.',
+          blurb: 'Can sex affect an early pregnancy? For most couples, no.',
           readId: 'ttc_read_sex_after_window',
         ),
       ],
@@ -525,7 +603,8 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
     //  lands on her. What changed is that it used to depend on somebody
     //  scrolling far enough to notice the order.
     TtcFocusSection(
-      heading: 'What he should do',
+      // Kept for revert (2026-09-28, explicit names): heading: 'What he should do',
+      heading: 'What can he do for his fertility?',
       group: 'his',
       tiles: [
         // ⚠️ REWRITTEN FROM A TIP LIST INTO AN EXPLAINER, and that was the
@@ -545,7 +624,10 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
         // the count made the heading wrong the moment the mechanism was added.
         TtcCarouselTile(
           title: 'How sperm are made',
-          blurb: 'How it works, and the three things that change it.',
+          id: 'ttc_tile_how_sperm_are_made',
+          // Kept for revert (2026-09-28, explicit names):
+          // blurb: 'How it works, and the three things that change it.',
+          blurb: 'Six slides, from how sperm are made to why a change takes three months.',
           art: TtcArt.hisSideCover,
           reviewedBy: 'ParentVeda team',
           coverHue: 268,
@@ -614,6 +696,7 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
         // ),
         TtcVideoTile(
           title: 'Three things that really change his numbers',
+          id: 'ttc_tile_three_things_that_really_change_his_numbers',
           blurb: 'Tobacco, heat and time, and how long before any change '
               'shows.',
           slotId: 'ttc_vid_heat_habits',
@@ -638,21 +721,28 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
         //   readId: 'ttc_read_whose_side',
         // ),
         TtcArticleTile(
-          title: 'The case for testing early',
+          // Kept for revert (2026-09-28, explicit names): title: 'The case for testing early',
+          title: 'The case for an early sperm test',
+          id: 'ttc_tile_the_case_for_an_early_sperm_test',
           blurb: 'One simple, cheap test that answers what months of waiting '
               "can't.",
           readId: 'ttc_read_case_for_testing',
         ),
         TtcArticleTile(
-          title: 'Heat, habits and time',
-          blurb: 'The three things that really change sperm health, '
-              'including the smokeless tobacco nobody counts.',
+          // Kept for revert (2026-09-28, explicit names): title: 'Heat, habits and time',
+          title: 'Heat, habits and time: what changes sperm',
+          id: 'ttc_tile_heat_habits_and_time_what_changes_sperm',
+          // Kept for revert (2026-09-28, explicit names):
+          // blurb: 'The three things that really change sperm health, '
+          // 'including the smokeless tobacco nobody counts.',
+          blurb: 'Including the smokeless tobacco nobody counts, and how much each change helps.',
           readId: 'ttc_read_heat_habits',
         ),
         // A labelled way through to the door written about him
         // (2026-09-27, relevance audit).
         TtcDoorTile(
           title: 'More in His side',
+          id: 'ttc_tile_more_in_his_side',
           blurb: 'The test, his report, and what helps, in his own door.',
           bracketId: 'ttc_male_fertility',
         ),
@@ -661,12 +751,17 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
 
     // -------------------------------------------------------------------------
     TtcFocusSection(
-      heading: 'What you should do',
+      // Kept for revert (2026-09-28, explicit names): heading: 'What you should do',
+      heading: 'What can you do before you conceive?',
       group: 'hers',
       tiles: [
         TtcCarouselTile(
-          title: '3 things for you',
-          blurb: 'Start here. The rest can wait.',
+          // Kept for revert (2026-09-28, explicit names): title: '3 things for you',
+          title: '3 things to start before you conceive',
+          id: 'ttc_tile_3_things_for_you',
+          // Kept for revert (2026-09-28, explicit names):
+          // blurb: 'Start here. The rest can wait.',
+          blurb: 'Folic acid, smoking and weight. The rest can wait.',
           cards: [
             TtcCarouselCard(
               title: 'Folic acid, today',
@@ -692,13 +787,16 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
         ),
         TtcArticleTile(
           title: 'What to eat and avoid',
+          id: 'ttc_tile_what_to_eat_and_avoid',
           blurb: 'Ordinary food. No special fertility diet.',
           readId: 'ttc_read_three_months_before',
           // Lands on the section that answers the tile (launch walk, 2026-09-27).
           atHeading: 'What should I eat?',
         ),
         TtcArticleTile(
-          title: 'Folic acid: why you need it',
+          // Kept for revert (2026-09-28, explicit names): title: 'Folic acid: why you need it',
+          title: 'Why you need folic acid before you conceive',
+          id: 'ttc_tile_why_you_need_folic_acid_before_you_conceive',
           blurb: '400 mcg a day, starting before you conceive.',
           readId: 'ttc_read_folic_acid',
         ),
@@ -718,20 +816,26 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
         // paragraph.
         TtcArticleTile(
           title: 'What to cut before trying',
+          id: 'ttc_tile_what_to_cut_before_trying',
           blurb: 'Three things worth changing, and a longer list you can stop '
               'feeling guilty about.',
           readId: 'ttc_read_what_to_cut',
         ),
         TtcArticleTile(
-          title: 'Weight, said kindly',
-          blurb: 'What it really does, why the direction matters more than '
-              'any goal, and no numbers at all.',
+          // Kept for revert (2026-09-28, explicit names): title: 'Weight, said kindly',
+          title: 'Weight before pregnancy, said kindly',
+          id: 'ttc_tile_weight_before_pregnancy_said_kindly',
+          // Kept for revert (2026-09-28, explicit names):
+          // blurb: 'What it really does, why the direction matters more than '
+          // 'any goal, and no numbers at all.',
+          blurb: 'What weight really does, why the direction matters more than any goal, and no numbers at all.',
           readId: 'ttc_read_weight_kindly',
         ),
         // Three of the reads above belong to Getting ready, so the tab says
         // where the rest of them live (2026-09-27, relevance audit).
         TtcDoorTile(
           title: 'More in Getting ready',
+          id: 'ttc_tile_more_in_getting_ready',
           blurb: 'Food, tests, vaccines and habits for the months before, in '
               'their own door.',
           bracketId: 'ttc_preconception_health',
@@ -749,19 +853,27 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
       group: 'doctor',
       tiles: [
         TtcArticleTile(
-          title: 'Trying for many months?',
+          // Kept for revert (2026-09-28, explicit names): title: 'Trying for many months?',
+          title: 'When to see a doctor',
+          id: 'ttc_tile_trying_for_many_months',
           blurb: 'How long is normal before asking for help.',
           readId: 'ttc_read_when_to_seek_help',
         ),
         // Moved here from "How many times should we try?" (2026-09-27,
         // relevance audit): how LONG it takes is the doctor question.
         TtcArticleTile(
-          title: 'How many months it usually takes',
-          blurb: "Most couples need several cycles. Here's what's normal.",
+          // Kept for revert (2026-09-28, explicit names): title: 'How many months it usually takes',
+          title: 'How long getting pregnant usually takes',
+          id: 'ttc_tile_how_long_getting_pregnant_usually_takes',
+          // Kept for revert (2026-09-28, explicit names):
+          // blurb: "Most couples need several cycles. Here's what's normal.",
+          blurb: 'Most couples need several cycles, and what can make trying take longer.',
           readId: 'ttc_read_how_long_it_takes',
         ),
         TtcCarouselTile(
-          title: 'Signs not to wait',
+          // Kept for revert (2026-09-28, explicit names): title: 'Signs not to wait',
+          title: 'Signs to see a doctor sooner',
+          id: 'ttc_tile_signs_not_to_wait',
           blurb: 'Reasons to see someone sooner, whatever the calendar says.',
           cards: [
             TtcCarouselCard(
@@ -806,7 +918,9 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
         //   action: 'ttc_consult',
         // ),
         TtcTalkTile(
-          title: 'Talk to a doctor',
+          // Kept for revert (2026-09-28, explicit names): title: 'Talk to a doctor',
+          title: 'Talk to a gynaecologist',
+          id: 'ttc_tile_talk_to_a_doctor',
           blurb: 'A private video consultation with a gynaecologist about '
               'your own cycle.',
           action: 'ttc_consult_gynae',

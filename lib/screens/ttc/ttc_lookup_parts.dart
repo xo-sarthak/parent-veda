@@ -37,6 +37,7 @@ import '../../theme/pv_fonts.dart';
 import '../../ttc/ttc_can_i_data.dart';
 import '../../widgets/pv_feedback.dart';
 import '../v2/v2_palette.dart';
+import 'ttc_common.dart' show ttcTitleInk;
 
 /// A live search field for a look-up list. White, hairline, grey lens, a
 /// clear button once there is something to clear.
@@ -125,7 +126,7 @@ class TtcLookupTwoWay extends StatelessWidget {
                 alignment: Alignment.center,
                 padding: const EdgeInsets.symmetric(vertical: 11),
                 decoration: BoxDecoration(
-                  color: on ? p.ink1 : Colors.transparent,
+                  color: on ? ttcTitleInk : Colors.transparent,
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(label,
@@ -331,10 +332,15 @@ class TtcLookupNote extends StatelessWidget {
 /// is ask your doctor, a ring with a bar is better not. The WORD always sits
 /// beside it; the mark only makes a column of answers scannable.
 class TtcVerdictMark extends StatelessWidget {
-  const TtcVerdictMark(this.verdict, {super.key, this.size = 11});
+  const TtcVerdictMark(this.verdict, {super.key, this.size = 11, this.color});
 
   final TtcVerdict verdict;
   final double size;
+
+  /// The mark's colour; null is ink, as before. Added 2026-09-29 for the
+  /// Can I...? verdict tag, which draws the mark in its tint's deeper shade
+  /// (ttc_can_i_parts.dart).
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
@@ -342,7 +348,8 @@ class TtcVerdictMark extends StatelessWidget {
     return SizedBox(
       width: size,
       height: size,
-      child: CustomPaint(painter: _VerdictPainter(verdict, p.ink1)),
+      // Kept for revert (2026-09-29): _VerdictPainter(verdict, p.ink1)
+      child: CustomPaint(painter: _VerdictPainter(verdict, color ?? p.ink1)),
     );
   }
 }

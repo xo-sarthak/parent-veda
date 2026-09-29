@@ -21,6 +21,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:parentveda/screens/ttc/ttc_bmi_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_can_i_screen.dart';
+import 'package:parentveda/screens/ttc/ttc_common.dart' show TtcSectionHeading;
 import 'package:parentveda/screens/ttc/ttc_ivf_readiness_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_pcos_stand_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_precheck_screen.dart';
@@ -292,7 +293,10 @@ void main() {
     testWidgets('grouped under three headings', (tester) async {
       await _pump(tester, const TtcCanIScreen());
       for (final (name, _) in kTtcCanIGroups) {
-        expect(find.text(name.toUpperCase()), findsOneWidget);
+        // 2026-09-29 (tools rebuilt): the stage's one section heading, not
+        // small capitals; the same names are also the topic chips. Kept for
+        // revert: expect(find.text(name.toUpperCase()), findsOneWidget);
+        expect(find.widgetWithText(TtcSectionHeading, name), findsOneWidget);
       }
     });
 
@@ -324,9 +328,14 @@ void main() {
     // The trigger fix is on the path every date row takes.
     final screens = File('lib/screens/ttc/ttc_treatment_round_screens.dart')
         .readAsStringSync();
-    expect(screens.contains('ttcPickTriggerTime(context, day'), isTrue);
+    // Whitespace-blind since 2026-09-28: the two files were run through
+    // `dart format`, which wraps a call after its open bracket. Kept for
+    // revert: screens.contains('ttcPickTriggerTime(context, day') and
+    // legacy.contains('ttcPickRoundDate(context').
+    expect(RegExp(r'ttcPickTriggerTime\(\s*context,\s*day').hasMatch(screens),
+        isTrue);
     final legacy =
         File('lib/screens/ttc/ttc_treatment_screen.dart').readAsStringSync();
-    expect(legacy.contains('ttcPickRoundDate(context'), isTrue);
+    expect(RegExp(r'ttcPickRoundDate\(\s*context').hasMatch(legacy), isTrue);
   });
 }

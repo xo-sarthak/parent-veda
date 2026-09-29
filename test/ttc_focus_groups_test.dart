@@ -106,7 +106,8 @@ void main() {
     test('PCOS is grouped, and names five', () {
       expect(pcos.groups, isNotNull);
       expect(pcos.groups!.length, 5);
-      expect(pcos.groups!.first.label, 'Understand',
+      // Kept for revert (2026-09-28, explicit names): 'Understand'.
+      expect(pcos.groups!.first.label, 'Understand PCOS',
           reason: 'Understand must be first — it is the default landing group');
     });
 
@@ -114,13 +115,15 @@ void main() {
       expect(ivf.groups, isNotNull);
       // 'Age and second baby' added 2026-09-26 from the TTC gap analysis
       // (docs/TTC-GAP-PLAN.md §3 A), a decision, not a drift.
+      // 2026-09-28 (explicit names). Kept for revert: 'Understand',
+      // 'Going through it', 'Track'.
       expect([for (final g in ivf.groups!) g.label], [
-        'Understand',
+        'Understand treatment',
         'Should I get help?',
         'Age and second baby',
         'Money and clinics',
-        'Going through it',
-        'Track',
+        'During a round',
+        'Track your round',
       ]);
     });
 
@@ -379,7 +382,7 @@ void main() {
       // it under the rail was removed — tapping "Understand" and then reading
       // the word "Understand" tells her nothing she did not just do, and on the
       // tool group it pushed the second question off the bottom of the screen.
-      expect(find.text('Understand'), findsOneWidget);
+      expect(find.text('Understand PCOS'), findsOneWidget);
       expect(find.text('What is PCOS, really?'), findsOneWidget);
       // And nothing from another group is on screen.
       expect(find.text('What should I be eating?'), findsNothing,
@@ -424,7 +427,7 @@ void main() {
       Color? labelColour(String label) =>
           tester.widget<Text>(find.text(label)).style?.color;
 
-      expect(labelColour('Understand'), Colors.white,
+      expect(labelColour('Understand PCOS'), Colors.white,
           reason: 'the open tab did not take white type');
       expect(labelColour('What helps'), isNot(Colors.white));
 
@@ -432,7 +435,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 300));
 
       expect(labelColour('What helps'), Colors.white);
-      expect(labelColour('Understand'), isNot(Colors.white),
+      expect(labelColour('Understand PCOS'), isNot(Colors.white),
           reason: 'two tabs read as open at once');
     });
 

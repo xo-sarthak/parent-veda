@@ -51,15 +51,46 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../theme/pv_fonts.dart';
+import '../../ttc/ttc_chapter.dart' show TtcChapter;
 import '../products/pv_store_chrome.dart' show pvSnack;
 import '../v2/v2_palette.dart';
 import '../v2/v3_hero_field.dart';
 import 'ttc_common.dart';
+import 'ttc_tool_marks.dart';
 
 /// The gutter every tool screen uses. One constant so two tools cannot disagree
 /// by two points.
 Widget ttcToolPad(Widget child) =>
     Padding(padding: const EdgeInsets.symmetric(horizontal: 18), child: child);
+
+/// What the round button at the top left of a tool says it does.
+///
+/// ⚠️ AN X MEANS "LEAVE THE WHOLE THING", SO IT IS ONLY FOR STEP ONE
+/// (2026-09-29, the user: "multi-step flows should be getting a back arrow
+/// instead of an X"). The shell drew an X on every page, so on step two of a
+/// flow the X stepped back one page while reading as "close everything".
+///
+/// The rule, from Mobbin: the first screen of a flow, or a screen that stands
+/// alone, closes (Yazio's check "Question 1 of 4" opens under an X,
+/// https://mobbin.com/screens/7268ad32-6efa-4eee-a48d-18b0e3206a18; Revolut's
+/// "New payment" sheet,
+/// https://mobbin.com/flows/bd6a93e9-def6-4315-b58e-b24d337e5d41). Every
+/// later step goes back one step with an arrow: Noom
+/// https://mobbin.com/screens/0e59d4b2-1aed-4b51-a18e-d6073141570b, Liven
+/// https://mobbin.com/screens/529b0ea8-3610-4a28-93d6-13231f1aaad8, Alan
+/// https://mobbin.com/screens/28579194-a284-411b-ae06-079a5aae598f, Ro in a
+/// round button like ours
+/// https://mobbin.com/screens/07c64cc9-88c4-4ca1-ba72-254e1603748a, and
+/// Flo's own onboarding
+/// https://mobbin.com/flows/d64dd348-5de3-40d0-8e2a-1fa781dad065.
+///
+/// ⚠️ BOTH DO THE SAME THING UNDERNEATH: `maybePop`. The difference is only
+/// what the button SAYS. A flow that is one screen with a step index owns
+/// its own step back in a `PopScope`, so the button, the Android back gesture
+/// and the iOS swipe all take one path and cannot disagree. Trade-off: the
+/// button cannot do anything the system back would not; what it buys is that
+/// there is no second, hand-rolled way back to drift out of step.
+enum TtcToolLeading { close, back }
 
 /// Field, hero and sheet, in one call.
 ///
@@ -81,9 +112,27 @@ class TtcToolScaffold extends StatelessWidget {
     this.heroLead,
     this.scrollController,
     this.chroma,
+    this.toolId,
+    this.leading = TtcToolLeading.close,
   });
 
   final double hue;
+
+  /// Close (step one, or a page on its own) or Back (step two and on). See
+  /// [TtcToolLeading]. Defaults to close, so every page that does not say
+  /// otherwise draws exactly what it drew before.
+  final TtcToolLeading leading;
+
+  /// The Tools id of the tool this page is the front of (`kTtcToolMarks`,
+  /// ttc_tool_marks.dart). When set, the tool's drawn mark sits above the
+  /// eyebrow, the same object she tapped on the Tools row (2026-09-29, the
+  /// user: Tools "looks like a different side of the application").
+  ///
+  /// ⚠️ ONLY ON A TOOL'S FRONT PAGE. A detail page (one medicine, one visit,
+  /// one result) is about the item, and a second copy of the tool's mark on
+  /// every level of a flow is decoration, and 50 more points of header, for
+  /// nothing she did not already know.
+  final String? toolId;
 
   /// How saturated the tinted field behind the sheet is.
   ///
@@ -165,6 +214,7 @@ class TtcToolScaffold extends StatelessWidget {
     // and a hue arriving from a data file has already tripped it once in this
     // stage. A hue is an angle.
     final accent = v2BlockTint(hue % 360, p);
+    final mark = ttcToolHeaderMark(toolId, accent);
 
     return Scaffold(
       backgroundColor: p.ground,
@@ -194,7 +244,8 @@ class TtcToolScaffold extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(children: [
-                        const TtcToolClose(),
+                        // Kept for revert (2026-09-29): const TtcToolClose(),
+                        TtcToolClose(mode: leading),
                         if (action != null) ...[
                           const Spacer(),
                           action!,
@@ -205,12 +256,26 @@ class TtcToolScaffold extends StatelessWidget {
                         heroLead!,
                       ],
                       const SizedBox(height: 14),
+                      // The tool's mark (2026-09-29): 40 and a 10 gap, so a
+                      // header grows by 50 and no more. Without a toolId the
+                      // header is exactly what it was.
+                      if (mark != null) ...[
+                        mark,
+                        const SizedBox(height: 10),
+                      ],
+                      // ⚠️ INK ON THE FIELD, NOT ink2 (2026-09-29, the user: "putting
+                      // grey on white won't make the visibility good").
+                      // DESIGN-SYSTEM §4.0 rule (b): on a tinted ground every ink
+                      // tier moves one step darker. Measured on the field's
+                      // deep corner, ink2 fell to 2.9-4.3:1 for the eyebrow and
+                      // the intro (test/ttc_palette_consistency_test.dart);
+                      // ink1 clears 4.5. Kept for revert: color: p.ink2 on both.
                       Text(eyebrow.toUpperCase(),
                           style: pvManrope(
                               fontSize: 10,
                               fontWeight: FontWeight.w800,
                               letterSpacing: 1.3,
-                              color: p.ink2)),
+                              color: p.ink1)),
                       const SizedBox(height: 8),
                       Text(title,
                           style: pvFraunces(
@@ -223,7 +288,7 @@ class TtcToolScaffold extends StatelessWidget {
                         const SizedBox(height: 10),
                         Text(line,
                             style: pvManrope(
-                                fontSize: 13.5, height: 1.6, color: p.ink2)),
+                                fontSize: 13.5, height: 1.6, color: p.ink1)),
                       ],
                     ]),
               ),
@@ -234,6 +299,100 @@ class TtcToolScaffold extends StatelessWidget {
       ]),
     );
   }
+}
+
+/// The hue each chapter's field wears, one table for the stage.
+///
+/// ⚠️ THE SAME HUES THE V3 HOME PAINTS ITS FIELD IN (`ttc_home_v3.dart`, whose
+/// `_chapterHue` now reads this). A chapter hero card that picked its own hue
+/// would say "a different place" about the same part of her month.
+double ttcChapterFieldHue(TtcChapter c) => switch (c) {
+      TtcChapter.preparingTogether => 344,
+      TtcChapter.knowingYourRhythm => 160,
+      TtcChapter.tryingTogether => 42,
+      TtcChapter.theWaitingDays => 268,
+      TtcChapter.aNewBeginning => 104,
+    };
+
+/// A hero CARD on the tools' light field, with ink type (2026-09-29).
+///
+/// ⚠️ REPLACES THE SIX VIOLET CARDS. The chapter hero, the cycle hero, the
+/// fertile-window summary, the ritual, the classic Today hero and "You're
+/// pregnant" were a `ttcPurple` → `ttcPurpleDeep` slab with white type: a
+/// second, darker brand colour that no tool, door or home used any more, on
+/// cards that sat one tap from screens wearing the soft field. This is the
+/// same field `TtcToolScaffold` paints behind every tool's header, clipped to
+/// a card, so a card and the page it opens read as one surface.
+///
+/// The trade-off, named: a white-on-violet card shouted louder, which is
+/// what a hero is for. What it cost was a second visual language, and
+/// contrast that only worked because the ground was dark. On the field every
+/// word is ink (DESIGN-SYSTEM §4.0 rule (b): on a tinted ground every ink
+/// tier moves one step darker), which is what the header test measures.
+///
+/// The card keeps one hairline, because the field fades to the page's
+/// ground at its lower-left corner and a card whose edge dissolves into the
+/// page stops reading as a card.
+class TtcHeroFieldCard extends StatelessWidget {
+  const TtcHeroFieldCard({
+    super.key,
+    required this.hue,
+    required this.child,
+    this.variant = 2,
+    this.padding = const EdgeInsets.all(20),
+    this.radius = ttcCardRadius,
+  });
+
+  final double hue;
+  final Widget child;
+  final int variant;
+  final EdgeInsetsGeometry padding;
+  final double radius;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = V2PaletteStore.instance.current;
+    final h = hue % 360;
+    return Container(
+      foregroundDecoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(radius),
+        border: Border.all(color: ttcLine),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(radius),
+        child: Stack(children: [
+          Positioned.fill(
+            child: V3HeroField(
+                accent: v2BlockTint(h, p),
+                ground: p.ground,
+                variant: variant,
+                chroma: v3FieldChroma(h)),
+          ),
+          Padding(padding: padding, child: child),
+        ]),
+      ),
+    );
+  }
+}
+
+/// A tag on a hero field: a white pill with ink words. Tints are for tags,
+/// and on a tinted field the tag is the white one.
+class TtcHeroFieldTag extends StatelessWidget {
+  const TtcHeroFieldTag(this.label, {super.key});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.78),
+          borderRadius: BorderRadius.circular(999),
+        ),
+        child: Text(label,
+            style: pvManrope(
+                fontSize: 10.5, fontWeight: FontWeight.w800, color: ttcInk)),
+      );
 }
 
 class _Sheet extends StatelessWidget {
@@ -276,16 +435,31 @@ class _Sheet extends StatelessWidget {
 /// solid colour across the top, which cuts the hero field off at exactly the
 /// point the composition is doing its work. A floating button leaves the field
 /// whole and still gives the one control a tool needs.
+///
+/// Since 2026-09-29 it is also the round Back button: [mode] picks the glyph
+/// and the screen-reader word, and nothing else. The type keeps its name so
+/// the tests and screens that find "the tool's way out" still find it.
 class TtcToolClose extends StatelessWidget {
-  const TtcToolClose({super.key});
+  const TtcToolClose({super.key, this.mode = TtcToolLeading.close});
+
+  final TtcToolLeading mode;
 
   @override
   Widget build(BuildContext context) {
     final p = V2PaletteStore.instance.current;
+    final back = mode == TtcToolLeading.back;
     return Semantics(
+      // ⚠️ ITS OWN NODE (2026-09-29). Without `container` the label merged up
+      // into the hero's node (the whole 360-wide header read "Close") while
+      // the tap sat on a separate, unlabelled node: a screen reader heard a
+      // word it could not press and a button with no name. Now the word, the
+      // button role and the tap are one node.
+      container: true,
       button: true,
-      label: 'Close',
+      // Kept for revert (2026-09-29): label: 'Close',
+      label: back ? 'Back' : 'Close',
       child: InkWell(
+        key: ValueKey(back ? 'ttc_tool_back' : 'ttc_tool_close'),
         onTap: () => Navigator.of(context).maybePop(),
         borderRadius: BorderRadius.circular(999),
         child: Container(
@@ -294,7 +468,13 @@ class TtcToolClose extends StatelessWidget {
           alignment: Alignment.center,
           decoration: BoxDecoration(
               color: p.surface.withValues(alpha: 0.9), shape: BoxShape.circle),
-          child: Icon(Icons.close_rounded, size: 19, color: p.ink1),
+          // Line glyphs in the one black (ttcInk, 0xFF2F2C30), the icon rule
+          // for controls. Kept for revert (2026-09-29):
+          //   child: Icon(Icons.close_rounded, size: 19, color: p.ink1),
+          child: Icon(
+              back ? Icons.arrow_back_rounded : Icons.close_rounded,
+              size: 19,
+              color: ttcInk),
         ),
       ),
     );
@@ -875,19 +1055,31 @@ class TtcToolPrimary extends StatelessWidget {
             // hand, and leaving the shared one purple would have meant two TTC
             // tools with two different primary buttons and a rule that only
             // one of them followed.
-            color: Colors.white,
+            //
+            // ⚠️ SUPERSEDED 2026-09-29: ONE BLACK FOR EVERYTHING PRESSABLE.
+            // The user, on build 19: "we don't want 10 colors of buttons… I
+            // was in the idea that we were using black." The primary is the
+            // switch black (ttcTitleInk, 0xFF2F2C30) with white words, the
+            // fill every other pill in the stage already uses (`TtcInkPill`).
+            // The argument above still holds against the ACCENT; black is not
+            // an accent, it is the ink the titles are set in. Kept for revert:
+            //   color: Colors.white,
+            //   border: Border.all(color: ttcLine),
+            //   Text color: ttcTitleInk
+            color: ttcTitleInk,
             borderRadius: BorderRadius.circular(999),
-            border: Border.all(color: ttcLine),
           ),
           child: Text(label,
+              textAlign: TextAlign.center,
               style: pvManrope(
                   fontSize: 14,
                   fontWeight: FontWeight.w800,
-                  color: ttcTitleInk)),
+                  color: Colors.white)),
         ),
       );
 }
 
+/// The quieter action: outlined in the one black, ink words (2026-09-29).
 class TtcToolSecondary extends StatelessWidget {
   const TtcToolSecondary({super.key, required this.label, required this.onTap});
 
@@ -905,9 +1097,14 @@ class TtcToolSecondary extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(999),
-            border: Border.all(color: ttcLine),
+            // An ink outline, not a hairline (2026-09-29, one black for
+            // everything pressable): a grey hairline read as a disabled
+            // button beside the ink primary. Kept for revert:
+            // border: Border.all(color: ttcLine),
+            border: Border.all(color: ttcTitleInk, width: 1.5),
           ),
           child: Text(label,
+              textAlign: TextAlign.center,
               style: pvManrope(
                   fontSize: 14.5,
                   fontWeight: FontWeight.w800,

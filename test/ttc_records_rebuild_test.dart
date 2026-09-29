@@ -347,9 +347,9 @@ void main() {
       expect(find.byKey(const ValueKey('ttc_semen_date')), findsOneWidget);
       expect(find.text('Date on the report'), findsOneWidget);
 
-      await tester.tap(find.text('Read it back to me'));
+      await tester.tap(find.text('Read my report back to me'));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Keep this with your reports'));
+      await tester.tap(find.text('Keep the report in your records'));
       await _letTheSaveLand(tester);
       final saved = TtcRecordsStore.instance.records.single;
       final now = DateTime.now();
@@ -362,9 +362,9 @@ void main() {
       // The save awaits the store's first load; let it finish on real time.
       await tester.runAsync(TtcRecordsStore.instance.ensureLoaded);
       await _pump(tester, const TtcSemenReportScreen());
-      await tester.tap(find.text('Read it back to me'));
+      await tester.tap(find.text('Read my report back to me'));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Keep this with your reports'));
+      await tester.tap(find.text('Keep the report in your records'));
       await _letTheSaveLand(tester);
       // The folder opened on top; come back.
       Navigator.of(tester.element(find.byType(Scaffold).last)).pop();
@@ -375,7 +375,7 @@ void main() {
       TtcRecordsStore.instance
           .remove(TtcRecordsStore.instance.records.single.id);
       await tester.pumpAndSettle();
-      expect(find.text('Keep this with your reports'), findsOneWidget,
+      expect(find.text('Keep the report in your records'), findsOneWidget,
           reason: 'it no longer claims to be kept');
       await _drain(tester);
     });

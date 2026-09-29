@@ -759,3 +759,11 @@ Path _leaf(Offset a, Offset b, double w) {
     ..quadraticBezierTo(c2.dx, c2.dy, a.dx, a.dy)
     ..close();
 }
+
+// ---- shared with the Tools marks (2026-09-29, additive) ----------------------
+// `ttc_tool_marks.dart` draws the Tools tab's marks in this same hand, so it
+// borrows this family's heart rather than drawing a second one. A public
+// wrapper, so nothing above changes.
+
+/// [_heart], for sibling mark families.
+Path ttcTabHeart(double cx, double cy, double w) => _heart(cx, cy, w);

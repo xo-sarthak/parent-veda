@@ -214,7 +214,7 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
               controller: _ctrl,
               textInputAction: TextInputAction.search,
               onSubmitted: _send,
-              cursorColor: ttcPurple,
+              cursorColor: ttcTitleInk,
               style: ttcBody(14, color: ttcInk, w: FontWeight.w600),
               decoration: InputDecoration(
                 hintText: t.hinglish ? 'Kuch bhi poochho…' : 'Ask anything…',
@@ -235,7 +235,7 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
               height: 36,
               alignment: Alignment.center,
               decoration:
-                  const BoxDecoration(color: ttcPurple, shape: BoxShape.circle),
+                  const BoxDecoration(color: ttcTitleInk, shape: BoxShape.circle),
               child: const Icon(Icons.arrow_upward_rounded,
                   color: Colors.white, size: 18),
             ),
@@ -290,7 +290,7 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [
                 const Icon(Icons.auto_awesome_outlined,
-                    size: 17, color: ttcPurple),
+                    size: 17, color: ttcTitleInk),
                 const SizedBox(width: 9),
                 Expanded(
                     child: Text(_chapterTitle(chapter, t), style: ttcJakarta(16))),
@@ -304,7 +304,8 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(13),
                     decoration: BoxDecoration(
-                        color: ttcPanel, borderRadius: BorderRadius.circular(14)),
+                        // Kept for revert (2026-09-29, no tinted slab behind text): color: ttcPanel, borderRadius: BorderRadius.circular(14)),
+                        color: Colors.white, border: const Border.fromBorderSide(BorderSide(color: ttcLine)), borderRadius: BorderRadius.circular(14)),
                     child: Row(children: [
                       Expanded(
                         child: Text(q,
@@ -313,7 +314,7 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
                       ),
                       const SizedBox(width: 8),
                       const Icon(Icons.arrow_forward_rounded,
-                          size: 15, color: ttcPurple),
+                          size: 15, color: ttcTitleInk),
                     ]),
                   ),
                 ),
@@ -358,7 +359,7 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
                   const Padding(
                     padding: EdgeInsets.only(top: 3),
                     child: Icon(Icons.check_circle_outline_rounded,
-                        size: 17, color: ttcPurple),
+                        size: 17, color: ttcTitleInk),
                   ),
                   const SizedBox(width: 11),
                   Expanded(
@@ -393,7 +394,8 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
         if (f.videos.isEmpty)
           _comingSoon(t.hinglish
               ? 'Videos jaldi aayenge'
-              : 'Videos for this are coming soon')
+              // Kept for revert (2026-09-28): 'Videos for this are coming soon'
+              : 'Videos on this topic are coming soon')
         else
           for (final it in f.videos) _itemCard(it),
         // Community held back for launch (2026-09-26, TTC gap plan §7.1),
@@ -437,16 +439,18 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
   Widget _head(IconData icon, String title) => Padding(
         padding: const EdgeInsets.fromLTRB(2, 24, 2, 11),
         child: Row(children: [
-          Icon(icon, size: 18, color: ttcPurple),
+          Icon(icon, size: 18, color: ttcTitleInk),
           const SizedBox(width: 9),
-          Expanded(child: Text(title, style: ttcFraunces(17, w: FontWeight.w600))),
+          // Kept for revert (2026-09-29, one heading style):
+          // Expanded(child: Text(title, style: ttcFraunces(17, w: FontWeight.w600))),
+          Expanded(child: TtcSectionHeading(title)),
         ]),
       );
 
   Widget _answerCard(String answer, TtcS t) => TtcCard(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
-            const Icon(Icons.auto_awesome_rounded, size: 18, color: ttcPurple),
+            const Icon(Icons.auto_awesome_rounded, size: 18, color: ttcTitleInk),
             const SizedBox(width: 9),
             Text(t.hinglish ? 'Veda ka jawaab' : "Veda's answer",
                 style: ttcJakarta(15.5)),
@@ -492,7 +496,7 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               decoration: BoxDecoration(
-                  color: ttcPurple, borderRadius: BorderRadius.circular(99)),
+                  color: ttcTitleInk, borderRadius: BorderRadius.circular(99)),
               child: Text(t.hinglish ? 'Dobara try karo' : 'Retry',
                   style: ttcBody(13,
                       color: Colors.white, w: FontWeight.w800)),
@@ -526,7 +530,7 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
               decoration: const BoxDecoration(
                   color: ttcPanel,
                   borderRadius: BorderRadius.all(Radius.circular(13))),
-              child: Icon(icon, size: 20, color: ttcPurple),
+              child: Icon(icon, size: 20, color: ttcTitleInk),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -536,7 +540,7 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
                     if (kind != null) ...[
                       Text(kind,
                           style: ttcBody(10,
-                              color: ttcPurple, w: FontWeight.w800)),
+                              color: ttcTitleInk, w: FontWeight.w800)),
                       const SizedBox(height: 3),
                     ],
                     Text(title,
@@ -581,13 +585,13 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
             alignment: Alignment.center,
             decoration: const BoxDecoration(
                 color: ttcPanel, borderRadius: BorderRadius.all(Radius.circular(13))),
-            child: Icon(_kindIcon(it.kind), size: 20, color: ttcPurple),
+            child: Icon(_kindIcon(it.kind), size: 20, color: ttcTitleInk),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(_kindLabel(it.kind),
-                  style: ttcBody(10, color: ttcPurple, w: FontWeight.w800)),
+                  style: ttcBody(10, color: ttcTitleInk, w: FontWeight.w800)),
               const SizedBox(height: 3),
               Text(it.title,
                   maxLines: 2,
@@ -647,7 +651,7 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
               ),
               const SizedBox(height: 16),
               Text(_kindLabel(it.kind),
-                  style: ttcBody(10.5, color: ttcPurple, w: FontWeight.w800)),
+                  style: ttcBody(10.5, color: ttcTitleInk, w: FontWeight.w800)),
               const SizedBox(height: 8),
               Text(it.title, style: ttcFraunces(21, w: FontWeight.w600)),
               const SizedBox(height: 12),

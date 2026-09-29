@@ -16,6 +16,13 @@
 //  conditions) was a card that looked tappable and did nothing. It now takes
 //  her back to the checklist with that item open, and every step card carries
 //  an arrow, as the BMI tool's next-step cards do.
+//
+//  ⚠️ "NOTES FOR MY DOCTOR" SINCE 2026-09-29. The checklist now carries its
+//  next three steps at the top of the list itself, where a tap opens the
+//  item in place. What this page adds is what she takes to an appointment:
+//  what is covered, what she wants to talk about, and the questions, shown
+//  BEFORE she copies them (the copy used to be sight unseen). The three
+//  steps here are kept for revert, unreached.
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -31,7 +38,11 @@ import '../../ttc/ttc_precheck_data.dart';
 import '../../ttc/ttc_precheck_rules.dart';
 import '../../ttc/ttc_precheck_store.dart';
 import '../v2/v2_palette.dart';
-import 'ttc_precheck_screen.dart' show PrecheckButton, kPrecheckHue;
+import 'ttc_common.dart' show TtcSectionHeading, ttcLine;
+import 'ttc_practice_card_parts.dart' show TtcInkPill;
+// PrecheckButton unused since 2026-09-29 (the ink pill); kept for revert:
+// import 'ttc_precheck_screen.dart' show PrecheckButton, kPrecheckHue;
+import 'ttc_precheck_screen.dart' show kPrecheckHue;
 import 'ttc_strings.dart';
 import 'ttc_surface_router.dart';
 import 'ttc_tool_chrome.dart';
@@ -132,16 +143,23 @@ class TtcPrecheckSummaryScreen extends StatelessWidget {
         return TtcToolScaffold(
           hue: kPrecheckHue,
           variant: 3,
+          // Opened from the checklist, so back to it, not an X (2026-09-29).
+          leading: TtcToolLeading.back,
           // ⚠️ ONE TOOL, ONE NAME: the Tools tile's name, word for word.
           eyebrow: 'Pre-pregnancy checklist',
           // The name of the link that opens this page.
-          title: t('My next 3 steps', 'Aapke agle 3 kadam'),
-          intro: t(
-              "Where you are, and what to do next: what's done, what may be "
-                  'worth asking a doctor about, and a copy to take to your '
-                  'appointment.',
-              'Ab aapke paas saaf tasveer hai ki kya ho chuka hai '
-                  'aur kis par baat karna baaki hai.'),
+          // Kept for revert (2026-09-29): t('My next 3 steps', 'Aapke agle 3 kadam')
+          title: 'Notes for my doctor',
+          // Kept for revert (2026-09-29):
+          // intro: t(
+          //     "Where you are, and what to do next: what's done, what may be "
+          //         'worth asking a doctor about, and a copy to take to your '
+          //         'appointment.',
+          //     'Ab aapke paas saaf tasveer hai ki kya ho chuka hai '
+          //         'aur kis par baat karna baaki hai.'),
+          intro: "What's covered, what you'd like to talk about and your "
+              'questions, from your checklist. Copy it into a message or '
+              'your notes.',
           children: [
             ttcToolPad(Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -168,12 +186,15 @@ class TtcPrecheckSummaryScreen extends StatelessWidget {
                     const SizedBox(height: 28),
 
                     // ---- THE NEXT THREE -------------------------------------
-                    if (priorities.isNotEmpty) ...[
-                      Text(t('Your next 3 steps', 'Aapke agle 3 kadam'),
-                          style: pvFraunces(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w600,
-                              color: p.ink1)),
+                    // ⚠️ ON THE LIST NOW (2026-09-29): "Your next 3 steps"
+                    // heads the checklist, so they are not repeated here.
+                    // Kept for revert: `if (priorities.isNotEmpty) ...[`.
+                    if (_kShowStepsHere && priorities.isNotEmpty) ...[
+                      // Kept for revert (2026-09-29, one heading style): the
+                      // same Text with style: pvFraunces(fontSize: 20,
+                      //     fontWeight: FontWeight.w600, color: p.ink1)
+                      TtcSectionHeading(
+                          t('Your next 3 steps', 'Aapke agle 3 kadam')),
                       const SizedBox(height: 6),
                       Text(
                           t(
@@ -219,20 +240,62 @@ class TtcPrecheckSummaryScreen extends StatelessWidget {
                       const SizedBox(height: 16),
                     ],
 
+                    // ---- THE QUESTIONS, SEEN BEFORE THEY ARE COPIED --------
+                    // (2026-09-29.) The same list the copy carries, from the
+                    // same function, so the page and the paste agree.
+                    const SizedBox(height: 6),
+                    const TtcSectionHeading('Your questions'),
                     const SizedBox(height: 10),
-                    PrecheckButton(
-                      p: p,
-                      label: t('Copy for my appointment',
-                          'Appointment ke liye copy karein'),
-                      onTap: () => _copy(context, store, c, lang, t),
+                    for (final q in precheckDoctorQuestions(store, c, lang))
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.fromLTRB(14, 11, 14, 12),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: ttcLine),
+                          ),
+                          child: Text('"$q"',
+                              style: pvFraunces(
+                                  fontSize: 15,
+                                  height: 1.45,
+                                  fontWeight: FontWeight.w500,
+                                  color: p.ink1)),
+                        ),
+                      ),
+
+                    const SizedBox(height: 14),
+                    // The one black pill (2026-09-29). Kept for revert:
+                    // PrecheckButton(
+                    //   p: p,
+                    //   label: t('Copy for my appointment',
+                    //       'Appointment ke liye copy karein'),
+                    //   onTap: () => _copy(context, store, c, lang, t),
+                    // ),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: KeyedSubtree(
+                        key: const ValueKey('ttc_precheck_copy'),
+                        child: TtcInkPill(
+                          label: t('Copy for my appointment',
+                              'Appointment ke liye copy karein'),
+                          icon: Icons.copy_rounded,
+                          onTap: () => _copy(context, store, c, lang, t),
+                        ),
+                      ),
                     ),
-                    const SizedBox(height: 10),
-                    PrecheckButton(
-                      p: p,
-                      filled: false,
-                      label: t('Back to the checklist', 'Checklist par wapas'),
-                      onTap: () => Navigator.of(context).maybePop(),
-                    ),
+                    // ⚠️ COMMENTED OUT 2026-09-29: the round Back arrow at the
+                    // top already does this, and two ways back on one page is
+                    // the repetition the one-app rules refuse. Kept for revert:
+                    // const SizedBox(height: 10),
+                    // PrecheckButton(
+                    //   p: p,
+                    //   filled: false,
+                    //   label: t('Back to the checklist', 'Checklist par wapas'),
+                    //   onTap: () => Navigator.of(context).maybePop(),
+                    // ),
                     const SizedBox(height: 22),
                     Text(kPrecheckDisclaimer.of(lang),
                         style: pvManrope(
@@ -304,9 +367,16 @@ class TtcPrecheckSummaryScreen extends StatelessWidget {
       buf.writeln('Already covered:');
       for (final i in done) {
         final e = store.entryFor(i.id);
+        // Kept for revert (2026-09-29): only the doctor flag.
+        // ⚠️ A TICK THE APP MADE SAYS WHERE IT CAME FROM: "Folic acid (on my
+        // supplement list)" is what she told the app, not what she did with
+        // a clinician, and the doctor reading it should know which.
+        final source = e == null ? precheckDoneSource(i, c) : null;
         final flag = (e?.discussedWithDoctor ?? false)
             ? ' (talked about with a doctor)'
-            : '';
+            : source != null
+                ? ' (${source.en.replaceFirst('From your ', 'from my ')})'
+                : '';
         buf.writeln('- ${i.title.of(lang)}$flag');
       }
       buf.writeln();
@@ -322,16 +392,10 @@ class TtcPrecheckSummaryScreen extends StatelessWidget {
     }
 
     buf.writeln('My questions:');
-    // Her own open items supply the questions, so the list is hers rather than
-    // a generic set.
-    final asked = <String>{};
-    for (final i in open) {
-      final q = i.askDoctor;
-      if (q != null && asked.add(q.en)) buf.writeln('- ${q.of(lang)}');
-    }
-    for (final q in kPrecheckFallbackQuestions) {
-      if (asked.length >= 7) break;
-      if (asked.add(q.en)) buf.writeln('- ${q.of(lang)}');
+    // Kept for revert (2026-09-29): the loop lived here; it is
+    // `precheckDoctorQuestions` now, so the page shows what the copy says.
+    for (final q in precheckDoctorQuestions(store, c, lang)) {
+      buf.writeln('- $q');
     }
 
     Clipboard.setData(ClipboardData(text: buf.toString()));
@@ -341,6 +405,28 @@ class TtcPrecheckSummaryScreen extends StatelessWidget {
           'Summary copy ho gayi')),
     ));
   }
+}
+
+/// Kept for revert (2026-09-29): the next three were drawn here too.
+const bool _kShowStepsHere = false;
+
+/// Her questions for a doctor: her own open items' questions first, then the
+/// general ones, seven at most. One function for the page and the copy.
+List<String> precheckDoctorQuestions(
+    TtcPrecheckStore store, PrecheckContext c, AppLanguage lang) {
+  final out = <String>[];
+  final asked = <String>{};
+  // Her own open items supply the questions, so the list is hers rather than
+  // a generic set.
+  for (final i in store.openItems(c)) {
+    final q = i.askDoctor;
+    if (q != null && asked.add(q.en)) out.add(q.of(lang));
+  }
+  for (final q in kPrecheckFallbackQuestions) {
+    if (asked.length >= 7) break;
+    if (asked.add(q.en)) out.add(q.of(lang));
+  }
+  return out;
 }
 
 /// Used to fill out the question list where her own items supply too few.
@@ -379,7 +465,8 @@ class _Count extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
           decoration: BoxDecoration(
-            color: p.surfaceAlt,
+            // Kept for revert (2026-09-29, no tinted slab behind text): color: p.surfaceAlt,
+            color: p.surface, border: Border.fromBorderSide(BorderSide(color: p.line)),
             borderRadius: BorderRadius.circular(16),
           ),
           child: Column(children: [
@@ -391,8 +478,9 @@ class _Count extends StatelessWidget {
             const SizedBox(height: 4),
             Text(label,
                 textAlign: TextAlign.center,
+                // ink2, not ink3 (2026-09-29, contrast).
                 style: pvManrope(
-                    fontSize: 11.5, height: 1.35, color: p.ink3)),
+                    fontSize: 11.5, height: 1.35, color: p.ink2)),
           ]),
         ),
       );
@@ -488,18 +576,21 @@ class _Group extends StatelessWidget {
                   fontSize: 10.5,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 1.1,
-                  color: p.ink3)),
+                  // ink2, not ink3 (2026-09-29, contrast).
+                  color: p.ink2)),
           const SizedBox(height: 10),
           for (final i in items)
             Padding(
               padding: const EdgeInsets.only(bottom: 8),
               child: Row(children: [
-                Icon(icon, size: 16, color: p.ink3),
+                // Ink, not grey on white (2026-09-29, contrast). Kept for
+                // revert: p.ink3 on the icon, p.ink2 on the words.
+                Icon(icon, size: 16, color: p.ink1),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(i.title.of(lang),
                       style: pvManrope(
-                          fontSize: 14, height: 1.45, color: p.ink2)),
+                          fontSize: 14, height: 1.45, color: p.ink1)),
                 ),
               ]),
             ),

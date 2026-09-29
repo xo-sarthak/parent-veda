@@ -21,7 +21,10 @@ import 'package:parentveda/screens/ttc/ttc_supplements_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_tests_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_vaccines_screen.dart';
 import 'package:parentveda/services/medicine_store.dart';
-import 'package:parentveda/ttc/ttc_journal_store.dart';
+// Kept for revert (2026-09-28, the user: no journal in trying to conceive).
+// import 'package:parentveda/ttc/ttc_journal_store.dart';
+// TtcAuthor moved to its own file.
+import 'package:parentveda/ttc/ttc_author.dart';
 import 'package:parentveda/ttc/ttc_records_store.dart';
 import 'package:parentveda/ttc/ttc_supplements_store.dart';
 import 'package:parentveda/ttc/ttc_vaccine_store.dart';
@@ -47,7 +50,7 @@ void main() {
   setUp(() {
     TtcRecordsStore.instance.resetForTest();
     TtcAppointmentsStore.instance.resetForTest();
-    TtcJournalStore.instance.resetForTest();
+    // Kept for revert (2026-09-28): TtcJournalStore.instance.resetForTest();
     TtcSupplementsStore.instance.resetForTest();
     TtcLang.instance.hinglish = false;
     _scheduled.clear();
@@ -155,7 +158,8 @@ void main() {
       await pumpTall(tester, const TtcVaccinesScreen());
       await tester.tap(find.byKey(const ValueKey('ttc_vax_mmr_done')));
       await tester.pumpAndSettle();
-      expect(find.text('When did you have it?'), findsOneWidget);
+      // Change 5 (2026-09-28). Was: 'When did you have it?'
+      expect(find.text('When did you have the MMR jab?'), findsOneWidget);
       await tester.tap(find.text('Cancel'));
       await tester.pumpAndSettle();
       expect(TtcVaccineStore.instance.statusOf('mmr'),
@@ -360,7 +364,9 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Change this appointment'), findsOneWidget);
       // Was: find.text('WHAT IS IT') (the old sheet's capitalised label).
-      expect(find.text('What is it?'), findsOneWidget,
+      // Renamed 2026-09-28 (change 5). Kept for revert:
+      //   expect(find.text('What is it?'), findsOneWidget,
+      expect(find.text('What kind of visit?'), findsOneWidget,
           reason: 'each box keeps its label once she has typed');
       await tester.enterText(find.byType(TextField).first, 'Day 12 scan');
       await tester.tap(find.byKey(const ValueKey('ttc_appt_save')));

@@ -166,49 +166,68 @@ class _TtcDoorRailState extends State<TtcDoorRail> {
                 child: g.tabMark != null
                     ? TtcTabArt(mark: g.tabMark!, tint: tint)
                     : g.mark != null
-                        ? HubIntentArt(mark: g.mark!, tint: tint)
-                        : Icon(g.icon, size: 28, color: p.ink1),
+                    ? HubIntentArt(mark: g.mark!, tint: tint)
+                    : Icon(g.icon, size: 28, color: p.ink1),
               ),
-              const Spacer(),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          g.label,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: pvManrope(
-                            fontSize: 15,
-                            fontWeight: on ? FontWeight.w800 : FontWeight.w700,
-                            height: 1.2,
-                            letterSpacing: -0.2,
-                            color: p.ink1,
-                          ),
-                        ),
-                        if (count.isNotEmpty) ...[
-                          const SizedBox(height: 3),
-                          Text(
-                            count,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: pvManrope(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: p.ink3,
+              // ⚠️ AT A LARGE TEXT SIZE THE LABEL GIVES WAY, NOT THE CARD
+              // (2026-09-28). At text scale 1.5 the mark, a two-line label and
+              // the count were taller than the card and the rail overflowed on
+              // every door. The label now takes the room that is left and
+              // clips at its ellipsis; at the normal size the layout is the
+              // same as before (the label still sits at the foot). Kept for
+              // revert: `const Spacer(), Row(...)` with the label unwrapped.
+              Expanded(
+                child: Align(
+                  alignment: Alignment.bottomLeft,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Flexible(
+                              child: Text(
+                                g.label,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: pvManrope(
+                                  fontSize: 15,
+                                  fontWeight: on
+                                      ? FontWeight.w800
+                                      : FontWeight.w700,
+                                  height: 1.2,
+                                  letterSpacing: -0.2,
+                                  color: p.ink1,
+                                ),
+                              ),
                             ),
-                          ),
-                        ],
-                      ],
-                    ),
+                            if (count.isNotEmpty) ...[
+                              const SizedBox(height: 3),
+                              Text(
+                                count,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: pvManrope(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: p.ink3,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Icon(
+                        Icons.chevron_right_rounded,
+                        size: 22,
+                        color: p.ink2,
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 6),
-                  Icon(Icons.chevron_right_rounded, size: 22, color: p.ink2),
-                ],
+                ),
               ),
             ],
           ),

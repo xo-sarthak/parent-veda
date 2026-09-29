@@ -27,17 +27,32 @@ import 'ttc_tests_data.dart';
 
 /// One test, and every reading of it.
 class TtcRecordGroup {
-  const TtcRecordGroup({required this.key, required this.readings});
+  const TtcRecordGroup(
+      {required this.key, required this.readings, String? testKey})
+      : testKey = testKey ?? key;
+
+  /// The group's identity: [testKey] for hers, `partner:` + [testKey] for his.
+  ///
+  /// ⚠️ ONE GROUP PER TEST PER PERSON (2026-09-29). The key used to be the
+  /// test alone, so her TSH and his TSH (thyroid, vitamin D, B12 and HbA1c
+  /// are tests both of them may have) fell into ONE group: the row took the
+  /// newest reading's owner, the "You / Partner" filter hid the other
+  /// person's result under it, and the trend page did arithmetic across two
+  /// bodies ("0.9 lower over 17 months" from her 2.1 to his 1.2). A reading
+  /// only has a direction against the same person's earlier reading, so the
+  /// person is part of the identity. Hers keep the bare key, so a link or a
+  /// test that names `'amh'` still finds her group.
+  final String key;
 
   /// `testId` where the record has one, the trimmed lower-cased label
-  /// otherwise.
+  /// otherwise. The same for both people; coverage matches on this.
   ///
   /// ⚠️ TWO KEYS BECAUSE ONLY SOME RECORDS CAME FROM THE LIBRARY. A result
   /// added from the tests screen carries a `testId`; one typed in by hand
   /// carries only what she called it. Grouping on the id alone would file
   /// "AMH" typed by hand apart from "AMH" picked from the list, which is the
   /// exact split this screen exists to close.
-  final String key;
+  final String testKey;
 
   /// Newest first.
   final List<TtcRecord> readings;
@@ -51,9 +66,10 @@ class TtcRecordGroup {
   /// she used last.
   String get label => latest.label;
 
-  /// Whose it is. A test belongs to one person in practice, and where records
-  /// disagree the most recent one decides — she is likelier to have filed the
-  /// newest correctly.
+  /// Whose it is. Every reading in a group is one person's (see [key]).
+  /// Kept for revert (2026-09-29), the note from when a group could hold
+  /// both: "A test belongs to one person in practice, and where records
+  /// disagree the most recent one decides."
   bool get forPartner => latest.forPartner;
 
   /// True when nothing was ever typed, only photographed.
@@ -67,9 +83,13 @@ class TtcRecordGroup {
 /// records, applied before grouping, so a group is never half-hidden.
 List<TtcRecordGroup> ttcGroupedRecords({bool resultsOnly = false}) {
   final byKey = <String, List<TtcRecord>>{};
+  final testKeys = <String, String>{};
   for (final r in TtcRecordsStore.instance.records) {
     if (resultsOnly && r.testId == null) continue;
-    final key = (r.testId ?? r.label.trim().toLowerCase());
+    final testKey = (r.testId ?? r.label.trim().toLowerCase());
+    // Kept for revert (2026-09-29, one group per person): final key = testKey;
+    final key = r.forPartner ? 'partner:$testKey' : testKey;
+    testKeys[key] = testKey;
     byKey.putIfAbsent(key, () => []).add(r);
   }
 
@@ -77,6 +97,7 @@ List<TtcRecordGroup> ttcGroupedRecords({bool resultsOnly = false}) {
     for (final e in byKey.entries)
       TtcRecordGroup(
         key: e.key,
+        testKey: testKeys[e.key],
         readings: e.value..sort((a, b) => b.takenOn.compareTo(a.takenOn)),
       ),
   ];
@@ -109,22 +130,49 @@ class TtcCoverage {
 
 TtcCoverage ttcRecordCoverage() {
   final groups = ttcGroupedRecords();
-
-  bool have(TtcTest test) => groups.any((g) =>
-      g.key == test.id ||
-      // A hand-typed "AMH" should count against the library's AMH. Matching on
-      // the leading word rather than the whole name, because the library's
-      // names carry a parenthetical the reader does not type: "TSH (thyroid)",
-      // "HSG (tube test)".
-      g.key == test.name.toLowerCase().split(' ').first);
-
   final added = <TtcTest>[];
   final notAdded = <TtcTest>[];
   for (final t in ttcTests) {
-    (have(t) ? added : notAdded).add(t);
+    (ttcCoverageGroup(t, groups) != null ? added : notAdded).add(t);
   }
   return TtcCoverage(added: added, notAdded: notAdded);
 }
+
+/// The filed group that answers [test] on the first-check list, or null.
+///
+/// ⚠️ ONLY THE PERSON THE TEST IS FOR (2026-09-29). The list is a first
+/// check's tests, his semen analysis and her AMH; his thyroid result does not
+/// tick her thyroid line. A hand-typed "AMH" counts against the library's
+/// AMH: matched on the whole name or on the leading word, because the
+/// library's names carry a parenthetical the reader does not type ("TSH
+/// (thyroid)", "HSG (tube test)"). The whole-name match is new: a typed
+/// "semen analysis" did not count, because only "semen" did.
+TtcRecordGroup? ttcCoverageGroup(TtcTest test, List<TtcRecordGroup> groups) {
+  final name = test.name.toLowerCase();
+  for (final g in groups) {
+    if (g.forPartner != test.forHim) continue;
+    if (g.testKey == test.id ||
+        g.testKey == name ||
+        g.testKey == name.split(' ').first) {
+      return g;
+    }
+  }
+  return null;
+}
+
+// Kept for revert (2026-09-29, coverage per person, via ttcCoverageGroup):
+// TtcCoverage ttcRecordCoverage() {
+//   final groups = ttcGroupedRecords();
+//   bool have(TtcTest test) => groups.any((g) =>
+//       g.key == test.id ||
+//       g.key == test.name.toLowerCase().split(' ').first);
+//   final added = <TtcTest>[];
+//   final notAdded = <TtcTest>[];
+//   for (final t in ttcTests) {
+//     (have(t) ? added : notAdded).add(t);
+//   }
+//   return TtcCoverage(added: added, notAdded: notAdded);
+// }
 
 /// "1.2 ng/mL", or just the value where there is no unit.
 String ttcRecordValue(TtcRecord r) =>

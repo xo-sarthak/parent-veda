@@ -9696,3 +9696,71 @@ Owed:
     is set only by the developer switch; how a paired partner's own phone lands on his side is the father-mode pass the
     user scheduled as a whole. (c) **his messages at key moments** (Flo: "Her period is due soon, ways to support
     her"): not built; the five computed messages are hers.
+
+---
+
+## 80.0 TTC after build 17: journal out, More bento, typed door cards, no repetition, named labels. 2026-09-28
+
+The user asked for five changes after using build 17 (commit f4e7f0e), then a few more on the same pass. All are built
+in code and tested. **Build 18 is not made yet**: the user took the phone away and said to build only on their word.
+
+- **80.1 The journal is out of TTC completely.** The screen, `TtcJournalStore`, its loading and its sync are commented
+  out, not deleted. Old entries stay on the phone and in `ttc_journal`, unseen (the user: no need to preserve them).
+  *Open:* nothing, unless the journal is ever wanted back. It comes back by uncommenting.
+- **80.2 Questions for the doctor are their own feature** (`TtcDoctorQuestionsStore`, `ttc_doctor_question_screen.dart`,
+  `ttc_visit_today_card.dart`). What it does:
+  - A question belongs to a visit and is ticked when asked; unticked questions roll forward (derived, never stored).
+  - "Did you get your answers?" follows the visit day.
+  - His questions sit beside hers, and each person edits only their own.
+  - The evening-before reminder counts them, the home shows a visit-day card, and the doctor's note lists them.
+
+  **Open:**
+  1. **The user must run `supabase/migrations/0092_ttc_doctor_questions.sql`, but only when told.** Until then cloud writes fail silently and the phone works fully.
+  2. An "about him" flag was not built.
+  3. The pattern is written up in BACKEND-PATTERNS §16r.
+- **80.3 More is a CRED-style bento** (`pv_more_bento.dart`, gated by `kPvTtcMoreBento`), and **Tools holds only tools**
+  (`kTtcToolKinds`). Talk to an expert and Courses moved to More under "Experts and courses", the journey map to Your
+  journey, and Treatment cycle into Tools. *Open:* **his More still shows her "Notes for your doctor" and "Your answers"**.
+  The recommended fix is a partner-aware More, not built.
+- **80.4 Door cards show their kind, on the Fertile window door only** (`ttc_kind_cards.dart`, gated by
+  `kTtcDoorsWithKindCards`; the table is in DESIGN-SYSTEM §4.0f). Fertile window tiles carry stable `id`s, so a retitle
+  no longer loses the photo. **Open:**
+  1. Roll it out to the other eight doors after the user sees Fertile window on the phone. Mind & body's practice card has not been seen on a device.
+  2. Give every door's tiles an `id`.
+- **80.5 No repetition and named labels,** across Today, Tools, More, all nine doors, Learn and the reads. About 150 UI
+  labels and 170 door titles and headings were renamed; old words are kept as comments. Held by `ttc_no_repetition_test`,
+  `ttc_explicit_labels_test`, `ttc_doors_no_repetition_test` and `ttc_doors_explicit_names_test`.
+
+  **Open:**
+  1. **Ask Veda:** re-export the TTC corpus (`tool/export_ttc_corpus.dart`) and refresh the pool in `parentveda-askveda`. Door answer links key by card title; retitled cards without an `id` open the door until then.
+  2. The user was to see "decision 2" on the phone: the hero and the one pill under it open the same screen ("Time to test" / "Should I test?"). Kept, allow-listed.
+  3. Prepare's "Get this" / "You have this" labels were left, because no noun fits both consults and programmes.
+- **80.6 The bottom bar:** one host for the five tabs (`ttc_tab_host.dart`), one Material fade-through, one bar at one
+  fixed position, and tab state kept across switches. Hide-on-scroll was checked on Mobbin and not built. *Open:* judge
+  the motion on the release build.
+- **80.7 Sound cues** in every TTC timer (`ttc_cue_sounds.dart`, generated WAVs in `assets/audio/cues/`, and a "Sound cues"
+  switch that is on by default and follows the phone's System volume). *Open:* listen on the phone.
+- **80.8 Owed later, by the user's word:**
+  - pictures of how to do each movement practice;
+  - notifications as a whole: a tap on the evening "How was today?" reminder only opens the app. Its words were made stage-neutral.
+- **80.9 Found in passing and fixed:**
+  - `WhatsAppPrefs` crashed with no backend;
+  - clock-tick id collisions in the appointments and questions stores;
+  - a 61px overflow on his home;
+  - the edit-name sheet disposed its controller too early;
+  - the Products hero band overflowed at 360dp.
+- **80.10 Superseded on 2026-09-29, after the user saw build 18: the bento was "poor" and More duplicated the avatar.**
+  - **More** (`ttc_more_tab.dart`) now lists only offerings, in headed sections: Talk to an expert, Courses and
+    masterclasses, Groups, Your bookings and orders, Your journey, Benefits. It holds nothing about account, settings,
+    support or developer.
+  - **Profile** (the avatar, `kPvTtcProfileV2`): identity, Your stage, Your answers, For your doctor, Family, Your
+    things, and one Settings row.
+  - **Settings** (`pv_settings_screen.dart`): Account, Preferences, Notifications, Privacy and data, Support (Get help
+    now lives here), About, and Developer last, gated.
+  - His More and his Profile hide her private rows, which closes 80.3's open point. The bento is kept but
+    `kPvTtcMoreBento` is false.
+  - **Tools** and every tool page header use our drawn marks (`ttc_tool_marks.dart`).
+  - **Door cards on all nine doors** follow the user's reference (per-kind tints, type pill, meta pill, image, serif
+    title) as `TtcKindCard`, and all 290 tiles carry ids. *Open:* the user chooses rails (recommended, titles stay
+    whole) or the reference's two-column grid (`kTtcDoorCardsAsGrid`).
+  - **Placeholders** are being replaced with free credited images; see that helper's report.

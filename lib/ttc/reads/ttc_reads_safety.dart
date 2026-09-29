@@ -308,6 +308,11 @@ final List<PvRead> kTtcReadsSafety = [
       ),
     ],
 
-    readNext: ['ttc_read_family_asking', 'ttc_read_good_news_answers'],
+    // ⚠️ ONE READ, ONCE, AT THE FOOT (2026-09-28, no repetition):
+    // 'ttc_read_family_asking' is the next step "When family keeps asking",
+    // so the Read next rail no longer lists it a second time.
+    // Kept for revert:
+    // readNext: ['ttc_read_family_asking', 'ttc_read_good_news_answers'],
+    readNext: ['ttc_read_good_news_answers'],
   ),
 ];
