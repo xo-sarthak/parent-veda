@@ -16,7 +16,6 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:parentveda/data/doors/pv_door_data.dart';
-import 'package:parentveda/data/doors/pv_door_getting_ready.dart';
 import 'package:parentveda/data/reads/pregnancy_reads_ready.dart';
 import 'package:parentveda/localization/app_language.dart';
 import 'package:parentveda/models/pv_read.dart';

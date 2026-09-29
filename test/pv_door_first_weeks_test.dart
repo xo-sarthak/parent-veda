@@ -22,11 +22,9 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:parentveda/data/doors/pv_door_data.dart';
-import 'package:parentveda/data/doors/pv_door_first_weeks.dart';
 import 'package:parentveda/data/doors/pv_door_mind.dart'
     show kMindSurfaceHelplines, mindSurfaceOffer;
 import 'package:parentveda/data/reads/pregnancy_reads.dart';
-import 'package:parentveda/data/reads/pregnancy_reads_first.dart';
 import 'package:parentveda/localization/app_language.dart';
 import 'package:parentveda/models/pv_read.dart';
 import 'package:parentveda/screens/doors/pv_door_router.dart';
