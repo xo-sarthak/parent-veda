@@ -74,18 +74,18 @@ class SameDaySign {
 /// The five, in the brief's order.
 const List<SameDaySign> kSameDaySigns = [
   SameDaySign(
-    line: 'Any bleeding from the vagina — spotting, or heavier.',
+    line: 'Any bleeding from the vagina, from spotting to heavier.',
     conditionId: 'placenta_previa',
     because: 'placenta_previa',
   ),
   SameDaySign(
-    line: 'A bad headache that will not ease, with blurred eyes or sudden '
+    line: "A bad headache that won't ease, with blurred eyes or sudden "
         'swelling in your face or hands.',
     conditionId: 'preeclampsia',
     because: 'preeclampsia',
   ),
   SameDaySign(
-    line: 'The baby moving less than usual, on any day.',
+    line: 'Your baby moving less than usual, on any day.',
     conditionId: 'iugr',
     because: 'iugr',
   ),
@@ -95,7 +95,7 @@ const List<SameDaySign> kSameDaySigns = [
     because: 'uti',
   ),
   SameDaySign(
-    line: 'Water leaking or a gush of fluid before your due weeks.',
+    line: 'Water leaking, or a gush of fluid, before your due weeks.',
     conditionId: 'cervical_incompetence',
     because: 'cervical_incompetence',
   ),
@@ -109,7 +109,9 @@ const List<SameDaySign> kSameDaySigns = [
 /// It is here rather than in the widget because it is content, and because the
 /// widget is shared with every other door's pinned flag — a sentence typed into
 /// a renderer is a sentence that appears on somebody else's warning.
+// Rewritten 2026-09-29 to docs/PREG-VOICE.md (no dash, contractions); the
+// two clauses the test holds are unchanged.
 const String kSameDayFooter =
     'This tells you when to call. It never replaces calling your doctor or '
-    'going in — if something feels wrong and it is not on this list, call '
+    "going in. If something feels wrong and it isn't on this list, call "
     'anyway.';

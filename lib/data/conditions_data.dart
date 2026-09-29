@@ -64,10 +64,14 @@ extension ConditionGroupMeta on ConditionGroup {
   LocalizedText get title => switch (this) {
         ConditionGroup.common => _en('Most common'),
         ConditionGroup.highAnxiety => _en('If either of these brought you here'),
-        ConditionGroup.placentaBleeding => _en('Placenta & bleeding'),
-        ConditionGroup.positionCervix => _en('Position & cervix'),
+        // Rewritten 2026-09-29 to docs/PREG-VOICE.md. Preterm labour joined
+        // the cervix shelf and five infections joined the seasonal one, so
+        // those two titles now say so.
+        ConditionGroup.placentaBleeding => _en('Placenta and bleeding'),
+        ConditionGroup.positionCervix =>
+          _en("Baby's position, cervix and early labour"),
         ConditionGroup.discomforts => _en('Common discomforts'),
-        ConditionGroup.specialist => _en('Specialist & less common'),
+        ConditionGroup.specialist => _en('Less common conditions'),
         // ⚠️ THE SHELF AND THE PAGE ON IT MUST NOT SHARE A NAME. This group
         // title used to read "Pregnancy with a pre-existing condition" —
         // exactly the name of the single entry inside it — so the shelf
@@ -77,8 +81,8 @@ extension ConditionGroupMeta on ConditionGroup {
         // longer sentence, because a page is a thing you read and a shelf is a
         // thing you scan. Found by a test asserting each group title appears
         // once.
-        ConditionGroup.preExisting => _en('Pre-existing conditions'),
-        ConditionGroup.seasonal => _en('Seasonal & infections'),
+        ConditionGroup.preExisting => _en('Conditions you had before'),
+        ConditionGroup.seasonal => _en('Infections and fevers'),
       };
 }
 
@@ -116,6 +120,7 @@ class ConditionEntry {
     this.watchEpisodes = 1,
     this.highAnxiety = false,
     this.pregSignal,
+    this.shortAnswer,
   });
 
   final String id;
@@ -224,6 +229,13 @@ class ConditionEntry {
   /// something she does not.
   final PregCondition? pregSignal;
 
+  /// "The short answer": two or three plain sentences answering the page's
+  /// title, for the reader's `PvRead.shortAnswer` box. Added 2026-09-29 from
+  /// the pregnancy gap analysis ("Behind · How reads are written", P1).
+  /// Optional so a page without one renders exactly as before; the adapter in
+  /// `read_adapters.dart` passes it through.
+  final LocalizedText? shortAnswer;
+
   bool matches(String query) {
     final q = query.trim().toLowerCase();
     if (q.isEmpty) return true;
@@ -244,6 +256,10 @@ class ConditionEntry {
 //  medicine for this?" on either would be a question with no honest answer to
 //  give. Both still get a read and a watch card, because there is genuinely
 //  more to learn calmly once the scare has passed.
+// Rewritten 2026-09-29 to docs/PREG-VOICE.md: every page speaks to her as
+// "you", in short plain sentences, with a short answer on top. Facts, numbers,
+// warning signs and their urgency are unchanged. The previous English is in
+// git history.
 final List<ConditionEntry> kCommonConditions = [
   ConditionEntry(
     id: 'gdm',
@@ -251,59 +267,65 @@ final List<ConditionEntry> kCommonConditions = [
     plainLine: _en('Pregnancy sugar goes high.'),
     group: ConditionGroup.common,
     aliases: ['gdm', 'blood sugar', 'sugar in pregnancy', 'diabetes'],
-    whatItIs: _en('Gestational diabetes means your blood sugar has gone above '
-        'the usual range because of pregnancy hormones, not because you had '
-        'diabetes before.'),
-    reassurance: _en('It is one of the most common things flagged in Indian '
-        'pregnancies, and with food changes and monitoring most women manage '
-        'it well and deliver healthy babies.'),
-    howCommon: _en('Studies across Indian cities put it at around 1 in 6 to 1 '
-        'in 7 pregnancies, higher than in most Western countries — Indian '
-        'guidelines actually test for it earlier because of this.'),
+    shortAnswer: _en("Gestational diabetes means your blood sugar has gone "
+        "higher than usual because of pregnancy hormones. It's common in "
+        "India and usually has no symptoms, which is why everyone is tested. "
+        "Most women manage it with food changes and regular checks, and have "
+        "healthy babies."),
+    whatItIs: _en("Your blood sugar has gone above the usual range because of "
+        "pregnancy hormones. It isn't because you had diabetes before."),
+    reassurance: _en("It's one of the most common things flagged in an Indian "
+        "pregnancy. With food changes and regular checks, most women manage "
+        "it well and have healthy babies."),
+    howCommon: _en("Studies across Indian cities put it at around 1 in 6 to 1 "
+        "in 7 pregnancies. That's higher than in most Western countries, "
+        "which is why Indian guidelines test for it earlier."),
     symptoms: [
-      _en('Usually none at all — this is why every pregnant woman in India is '
-          'tested for it, not just those with symptoms.'),
-      _en('Occasionally more thirst, more frequent urination, or tiredness.'),
+      _en("Usually none at all. That's why every pregnant woman in India is "
+          "tested, not only those with symptoms."),
+      _en('Sometimes more thirst, needing to pass urine more often, or '
+          'tiredness.'),
     ],
     callNow: [
       _en('You feel shaky, sweaty, confused or faint after starting '
-          'medicine — this can mean your sugar has dropped too low.'),
-      _en('You have not felt your baby move as usual.'),
+          'medicine. This can mean your sugar has dropped too low.'),
+      _en("You haven't felt your baby move as usual."),
     ],
     justMonitor: [
-      _en('A single slightly high home reading — one number rarely changes '
-          'the plan; a pattern over days does.'),
+      _en('One slightly high reading at home. A single number rarely changes '
+          'the plan. A pattern over a few days does.'),
     ],
     testsToConfirm: [
-      _en('OGTT / glucose challenge test, usually between 24 and 28 weeks.'),
-      _en('Fasting and post-meal sugar checks once it is confirmed.'),
-      _en('HbA1c, in some cases, to see the recent average.'),
+      _en('OGTT (glucose tolerance test) or glucose challenge test, usually '
+          'between 24 and 28 weeks.'),
+      _en("Fasting and after-meal sugar checks once it's confirmed."),
+      _en('HbA1c in some cases, to see your recent average.'),
     ],
-    management: _en('Most women manage it with diet changes alone — smaller, '
-        'more frequent meals, less refined sugar and rice, more fibre. Some '
-        'need metformin tablets or insulin injections as well, decided by '
-        'your doctor from your readings, not by how you feel.'),
-    babyImpact: _en('Well-managed GDM has very little effect on your baby. '
-        'Left unchecked, it can mean a larger baby and a higher chance of a '
-        'caesarean, which is exactly why it is tracked so closely.'),
+    management: _en('Most women manage it with food changes alone: smaller '
+        'meals more often, less refined sugar and rice, and more fibre. Some '
+        'also need metformin tablets or insulin injections. Your doctor '
+        'decides that from your readings, not from how you feel.'),
+    babyImpact: _en("Well-managed gestational diabetes has very little effect "
+        "on your baby. Left unchecked, it can mean a larger baby and a higher "
+        "chance of a caesarean. That's why it's watched so closely."),
     faqs: [
       ConditionFaq(
-        question: _en('Does this mean I will have diabetes after pregnancy?'),
-        answer: _en('For most women, sugar returns to normal after delivery. '
-            'You will usually be asked to repeat the test around 6 weeks '
-            'after birth, and again every so often after that.'),
+        question: _en('Will I have diabetes after pregnancy?'),
+        answer: _en("For most women, sugar goes back to normal after "
+            "delivery. You'll usually be asked to repeat the test around 6 "
+            "weeks after birth, and every so often after that."),
       ),
       ConditionFaq(
         question: _en('Can I still have a normal delivery?'),
-        answer: _en('Yes, in most cases. The decision is based on your '
-            "baby's size and your readings closer to your due date, not on "
-            'having GDM by itself.'),
+        answer: _en("Yes, in most cases. The decision depends on your baby's "
+            "size and your readings closer to your due date, not on having "
+            "gestational diabetes by itself."),
       ),
       ConditionFaq(
-        question: _en('Will my next baby have this too?'),
-        answer: _en('The chance is higher than for someone who never had it, '
-            'which is why doctors test early in a next pregnancy — but it is '
-            'not certain, and many women do not get it again.'),
+        question: _en('Will I get it again in my next pregnancy?'),
+        answer: _en("The chance is higher than for someone who never had it, "
+            "so doctors test early next time. But it isn't certain, and many "
+            "women don't get it again."),
       ),
     ],
     showMedicine: true,
@@ -318,55 +340,59 @@ final List<ConditionEntry> kCommonConditions = [
     plainLine: _en('The neck gland is off, fixed with a daily tablet.'),
     group: ConditionGroup.common,
     aliases: ['thyroid', 'tsh', 'hypothyroid', 'hyperthyroid'],
-    whatItIs: _en('Your thyroid gland can run slightly under or over its '
-        'usual level in pregnancy — most often under (hypothyroid), which is '
-        'the one screened for routinely in India.'),
-    reassurance: _en('It is extremely common and, once your levels are '
-        'known, straightforward to correct with a daily tablet.'),
-    howCommon: _en('Thyroid problems are picked up in a meaningful share of '
-        'Indian pregnancies, partly because iodine levels vary a lot by '
-        'region — it is one of the most routinely tested things in the '
-        'country.'),
+    shortAnswer: _en("Your thyroid can run a little low or a little high in "
+        "pregnancy, most often low. It's very common in India and is "
+        "corrected with one tablet a day. Your doctor sets the dose from "
+        "blood tests."),
+    whatItIs: _en("Your thyroid gland can run slightly under or over its usual "
+        "level in pregnancy. Most often it's under (hypothyroid), which is "
+        "the one routinely checked in India."),
+    reassurance: _en("It's very common. Once your levels are known, a daily "
+        "tablet corrects it."),
+    howCommon: _en("Thyroid problems are picked up in a good share of Indian "
+        "pregnancies, partly because iodine levels vary a lot from region to "
+        "region. It's one of the most routinely tested things in the "
+        "country."),
     symptoms: [
-      _en('Often none — many women feel entirely normal.'),
-      _en('Unusual tiredness, feeling cold, or slower weight gain (under-'
-          'active).'),
-      _en('A racing heartbeat, feeling too warm, or trouble sleeping (over-'
-          'active).'),
+      _en('Often none. Many women feel completely normal.'),
+      _en('Unusual tiredness, feeling cold, or slower weight gain '
+          '(underactive).'),
+      _en('A racing heartbeat, feeling too warm, or trouble sleeping '
+          '(overactive).'),
     ],
     callNow: [
-      _en('A fast or irregular heartbeat that does not settle.'),
-      _en('Swelling in your neck that is growing quickly, or trouble '
-          'swallowing.'),
+      _en("A fast or uneven heartbeat that doesn't settle."),
+      _en("Swelling in your neck that's growing quickly, or trouble "
+          "swallowing."),
     ],
     justMonitor: [
-      _en('Mild tiredness alone — very common in pregnancy for reasons that '
-          'have nothing to do with the thyroid.'),
+      _en("Mild tiredness on its own. It's very common in pregnancy for "
+          "reasons that have nothing to do with your thyroid."),
     ],
     testsToConfirm: [
-      _en('TSH blood test, and free T3/T4 if TSH is out of range.'),
-      _en('Thyroid antibody test, in some cases, to see the likely cause.'),
+      _en("TSH blood test, and free T3 and T4 if your TSH is out of range."),
+      _en('Thyroid antibody test in some cases, to find the likely cause.'),
     ],
-    management: _en('Underactive thyroid is treated with a daily levothyroxine '
-        'tablet, taken on an empty stomach and adjusted every few weeks from '
-        'your blood test. Overactive thyroid is managed differently and more '
-        'closely by your doctor. Either way, it is one of the more easily '
-        'corrected things on this list.'),
-    babyImpact: _en('Untreated thyroid problems can affect a baby\'s growth '
-        'and, rarely, their own development — which is exactly why it is '
-        'checked and corrected early rather than left to see.'),
+    management: _en("An underactive thyroid is treated with a daily "
+        "levothyroxine tablet. You take it on an empty stomach, and the dose "
+        "is adjusted every few weeks from your blood test. An overactive "
+        "thyroid is managed differently, and more closely, by your doctor. "
+        "Either way, it's one of the easier things on this list to correct."),
+    babyImpact: _en("Untreated thyroid problems can affect your baby's growth "
+        "and, rarely, their development. That's why it's checked and "
+        "corrected early rather than left to see."),
     faqs: [
       ConditionFaq(
-        question: _en('Do I need to keep taking the tablet after delivery?'),
-        answer: _en('Sometimes yes, sometimes no — your doctor will retest '
+        question: _en('Will I need the tablet after delivery?'),
+        answer: _en('Sometimes yes, sometimes no. Your doctor will test again '
             'a few weeks after birth and decide from there.'),
       ),
       ConditionFaq(
-        question: _en('Can I take my thyroid tablet with my prenatal '
+        question: _en('Can I take my thyroid tablet with my pregnancy '
             'vitamins?'),
-        answer: _en('Iron and calcium can block how well the tablet '
-            'absorbs, so most doctors ask for a gap of a few hours between '
-            'them. Follow your own doctor\'s timing.'),
+        answer: _en("Iron and calcium can stop the tablet absorbing well, so "
+            "most doctors ask for a gap of a few hours between them. Follow "
+            "your own doctor's timing."),
       ),
     ],
     showMedicine: true,
@@ -381,53 +407,71 @@ final List<ConditionEntry> kCommonConditions = [
     plainLine: _en('Low blood, low iron.'),
     group: ConditionGroup.common,
     aliases: ['anemia', 'anaemia', 'low hemoglobin', 'iron deficiency', 'hb low'],
-    whatItIs: _en('Anemia means your haemoglobin, the part of your blood that '
-        'carries oxygen, is lower than it should be — almost always because '
-        'of low iron in pregnancy.'),
-    reassurance: _en('It is the single most common thing flagged in Indian '
-        'pregnancies, and it responds well to iron, whether in food or '
-        'tablets.'),
-    howCommon: _en('A large majority of pregnant women in India are anaemic '
-        'to some degree, which is why iron and folic acid tablets are given '
-        'as routine, not just to those already low.'),
+    shortAnswer: _en("Anaemia means your blood has less haemoglobin than it "
+        "should, usually because of low iron. It's the most common finding "
+        "in Indian pregnancies, and it responds well to iron from food and "
+        "tablets."),
+    whatItIs: _en("Anaemia means your haemoglobin, the part of your blood that "
+        "carries oxygen, is lower than it should be. In pregnancy it's almost "
+        "always because of low iron."),
+    reassurance: _en("It's the most common thing flagged in Indian "
+        "pregnancies, and it responds well to iron, from food and from "
+        "tablets."),
+    howCommon: _en("A large majority of pregnant women in India are anaemic to "
+        "some degree. That's why iron and folic acid tablets are given to "
+        "everyone, not only to those already low."),
     symptoms: [
-      _en('Tiredness that feels more than usual pregnancy fatigue.'),
+      _en('Tiredness that feels like more than usual pregnancy tiredness.'),
       _en('Pale skin, lips or nail beds.'),
-      _en('Breathlessness on mild exertion, dizziness, or a fast heartbeat.'),
+      _en('Feeling breathless with light effort, dizziness, or a fast '
+          'heartbeat.'),
     ],
     callNow: [
       _en('Breathlessness even at rest, or chest pain.'),
-      _en('Fainting, or a heartbeat that feels very fast or irregular.'),
+      _en('Fainting, or a heartbeat that feels very fast or uneven.'),
     ],
     justMonitor: [
-      _en('Mild tiredness with a haemoglobin only slightly under range — '
-          'usually just means continuing your iron and re-checking.'),
+      _en('Mild tiredness with a haemoglobin only slightly under range. This '
+          'usually means carrying on with your iron and checking again.'),
     ],
     testsToConfirm: [
-      _en('CBC (complete blood count) — the haemoglobin number itself.'),
-      _en('Ferritin, in some cases, to see your iron stores specifically.'),
+      _en('CBC (complete blood count), which gives the haemoglobin number '
+          'itself.'),
+      _en('Ferritin in some cases, to see your iron stores.'),
     ],
-    management: _en('Iron-rich food — leafy greens, jaggery, dates, meat and '
-        'eggs where eaten — alongside a daily iron and folic acid tablet is '
-        'the usual first step. Vitamin C alongside a meal helps iron absorb '
-        'better; tea and coffee close to a meal block it. If levels are very '
-        'low, an iron infusion may be suggested instead of tablets.'),
-    babyImpact: _en('Well-corrected anemia has little effect on your baby. '
-        'Severe, untreated anemia can affect your baby\'s growth and raise '
-        'risks around delivery, which is why it is treated rather than '
-        'lived with.'),
+    management: _en("The usual first step is iron-rich food (leafy greens, "
+        "jaggery, dates, and meat and eggs if you eat them) alongside a daily "
+        "iron and folic acid tablet. Vitamin C with a meal helps iron absorb. "
+        "Tea and coffee close to a meal block it. If your levels are very "
+        "low, you may be offered iron through a drip (an infusion) instead of "
+        "tablets."),
+    babyImpact: _en("Well-corrected anaemia has little effect on your baby. "
+        "Severe anaemia that isn't treated can affect your baby's growth and "
+        "raise risks around delivery. That's why it's treated, not lived "
+        "with."),
     faqs: [
       ConditionFaq(
         question: _en('Why do iron tablets upset my stomach?'),
         answer: _en('Constipation and nausea are common with iron. Taking it '
-            'with food, splitting the dose, or switching brands often '
-            'helps — ask your doctor rather than stopping it.'),
+            'with food, splitting the dose or switching brands often helps. '
+            'Ask your doctor before you stop it.'),
       ),
       ConditionFaq(
-        question: _en('Can I fix this with diet alone?'),
-        answer: _en('Food helps, but most Indian diets alone cannot close a '
-            'real deficiency fast enough during pregnancy, which is why a '
-            'tablet is usually added rather than relied on instead of food.'),
+        question: _en('Can I fix this with food alone?'),
+        answer: _en("Food helps, but in pregnancy most Indian diets can't "
+            "close a real shortfall fast enough. That's why a tablet is "
+            "usually added alongside food, not used instead of it."),
+      ),
+      // Added 2026-09-29 (pregnancy gap analysis, Appendix A, "Types of
+      // anemia"): low folate and low B12, which matter in India.
+      ConditionFaq(
+        question: _en('Is anaemia always about iron?'),
+        answer: _en("Mostly, but not always. Low folate (folic acid) or low "
+            "vitamin B12 can cause it too. B12 comes mainly from milk, curd, "
+            "paneer, eggs, meat and fish, so women who eat little of these, "
+            "including many vegetarians, can run low. If your haemoglobin "
+            "doesn't rise on iron, your doctor may check your B12 and folate. "
+            "Don't start extra supplements without asking."),
       ),
     ],
     showMedicine: true,
@@ -441,46 +485,49 @@ final List<ConditionEntry> kCommonConditions = [
     plainLine: _en('A hormone imbalance you had before, watched more closely now.'),
     group: ConditionGroup.common,
     aliases: ['pcos', 'pcod', 'polycystic ovaries'],
-    whatItIs: _en('If you had PCOS before conceiving, it does not go away in '
-        'pregnancy — but it also does not automatically cause problems. It '
-        'mainly means your doctor watches a little more closely for a few '
-        'related things.'),
-    reassurance: _en('Most women with PCOS carry perfectly ordinary '
-        'pregnancies once they have conceived; the extra watching is '
-        'precaution, not prediction.'),
-    howCommon: _en('PCOS is thought to affect roughly 1 in 5 women of '
-        'reproductive age in India, so this is a routine, well-understood '
-        'part of many antenatal files.'),
+    shortAnswer: _en("If you had PCOS before, your doctor will watch your "
+        "sugar and blood pressure a little more closely. Most women with PCOS "
+        "have ordinary pregnancies. The extra checks are a precaution, not a "
+        "prediction."),
+    whatItIs: _en("If you had PCOS before you conceived, it doesn't go away in "
+        "pregnancy. It also doesn't automatically cause problems. It mainly "
+        "means your doctor watches a little more closely for a few related "
+        "things."),
+    reassurance: _en("Most women with PCOS have perfectly ordinary "
+        "pregnancies once they've conceived. The extra watching is a "
+        "precaution, not a prediction."),
+    howCommon: _en("PCOS is thought to affect roughly 1 in 5 women of "
+        "childbearing age in India. So it's a routine, well-understood part "
+        "of many pregnancy files."),
     symptoms: [
-      _en('No pregnancy-specific symptoms of its own — the watching happens '
-          'through readings and scans, not how you feel.'),
+      _en('It has no pregnancy symptoms of its own. The watching happens '
+          'through your readings and scans, not through how you feel.'),
     ],
     callNow: [
-      _en('Any of the standard warning signs for gestational diabetes or '
-          'raised blood pressure — see those pages, since PCOS raises the '
-          'chance of both slightly.'),
+      _en('Any of the usual warning signs of pregnancy sugar or raised blood '
+          'pressure. PCOS raises the chance of both a little, so see those '
+          'pages too.'),
     ],
     justMonitor: [],
     testsToConfirm: [
-      _en('Earlier or repeated glucose testing, since GDM is somewhat more '
-          'common with PCOS.'),
-      _en('Routine blood pressure checks at every visit.'),
+      _en("Earlier or repeated sugar tests, since pregnancy sugar is a bit "
+          "more common with PCOS."),
+      _en('Blood pressure checks at every visit, as usual.'),
     ],
-    management: _en('Mostly the same antenatal care as any pregnancy, with '
-        'slightly closer attention to blood sugar and blood pressure. If you '
-        'were on metformin or other PCOS medicine before conceiving, do not '
-        'stop or continue it without your doctor confirming which is safe '
-        'now.'),
-    babyImpact: _en('PCOS by itself does not harm your baby. The related '
-        'conditions it makes slightly more likely, gestational diabetes and '
-        'raised BP, are the ones actually being watched for.'),
+    management: _en("Mostly the same pregnancy care as anyone else, with a "
+        "little closer attention to your blood sugar and blood pressure. If "
+        "you were on metformin or another PCOS medicine before conceiving, "
+        "don't stop or continue it until your doctor confirms what's safe "
+        "now."),
+    babyImpact: _en("PCOS by itself doesn't harm your baby. What's watched for "
+        "are the two things it makes a little more likely: pregnancy sugar "
+        "and raised blood pressure."),
     faqs: [
       ConditionFaq(
         question: _en('Does PCOS mean a higher chance of miscarriage?'),
-        answer: _en('Population studies show a somewhat higher rate in the '
-            'first trimester, but the large majority of PCOS pregnancies '
-            'continue normally — this is not a personal prediction about '
-            'yours.'),
+        answer: _en("Population studies show a somewhat higher rate in the "
+            "first trimester. But most PCOS pregnancies continue normally, "
+            "and this isn't a prediction about yours."),
       ),
     ],
     showMedicine: true,
@@ -494,56 +541,71 @@ final List<ConditionEntry> kCommonConditions = [
     plainLine: _en('Severe pregnancy vomiting.'),
     group: ConditionGroup.common,
     aliases: ['hyperemesis', 'hg', 'severe vomiting', 'severe nausea'],
-    whatItIs: _en('Hyperemesis gravidarum is morning sickness taken much '
-        'further — vomiting so frequent it stops you keeping down food or '
-        'fluids, rather than the queasiness most pregnancies have.'),
-    reassurance: _en('It is uncomfortable and frightening while it lasts, '
-        'but it is treatable, and it does not mean anything is wrong with '
-        'your baby.'),
-    howCommon: _en('Ordinary morning sickness affects most pregnancies; this '
-        'more severe form affects roughly 1 to 3 in 100, most often in the '
-        'first trimester.'),
+    shortAnswer: _en("Hyperemesis is very severe pregnancy sickness, where you "
+        "can't keep food or water down. It's treatable, and it doesn't mean "
+        "anything is wrong with your baby. If you can't keep any fluids down "
+        "for more than a day, call your doctor."),
+    whatItIs: _en("Hyperemesis gravidarum is morning sickness taken much "
+        "further. The vomiting is so frequent that you can't keep food or "
+        "fluids down, far beyond the queasiness most pregnancies bring."),
+    reassurance: _en("It's miserable and frightening while it lasts, but it's "
+        "treatable. It doesn't mean anything is wrong with your baby."),
+    howCommon: _en('Ordinary morning sickness affects most pregnancies. This '
+        'severe form affects roughly 1 to 3 in 100, most often in the first '
+        'trimester.'),
     symptoms: [
-      _en('Vomiting several times a day, unable to keep food or water down.'),
-      _en('Losing weight rather than gaining it.'),
-      _en('Dizziness, a racing heart, or very dark urine — signs of '
+      _en("Vomiting several times a day, and not being able to keep food or "
+          "water down."),
+      _en('Losing weight instead of gaining it.'),
+      _en('Dizziness, a racing heart, or very dark urine. These are signs of '
           'dehydration.'),
     ],
     callNow: [
-      _en('You cannot keep any fluids down for more than a day.'),
-      _en('Dizziness on standing, a racing heart, or very little urine.'),
-      _en('Blood in your vomit, or severe abdominal pain.'),
+      _en("You can't keep any fluids down for more than a day."),
+      _en('Dizziness when you stand, a racing heart, or passing very little '
+          'urine.'),
+      _en('Blood in your vomit, or severe pain in your tummy.'),
     ],
     justMonitor: [
-      _en('Nausea that comes and goes but still lets you eat and drink '
-          'something through the day — that is ordinary morning sickness, '
-          'not this.'),
+      _en("Nausea that comes and goes but still lets you eat and drink "
+          "something through the day. That's ordinary morning sickness, not "
+          "hyperemesis."),
     ],
     testsToConfirm: [
-      _en('Usually diagnosed from your symptoms and weight loss, not a '
-          'single test.'),
-      _en('Urine and blood tests to check hydration and rule out other '
-          'causes.'),
+      _en("It's usually diagnosed from your symptoms and weight loss, not "
+          "from one test."),
+      _en('Urine and blood tests, to check how dehydrated you are and rule '
+          'out other causes.'),
     ],
-    management: _en('Small, frequent, bland meals; ginger; anti-nausea '
-        'tablets from your doctor; and, if dehydration is significant, a '
-        'short hospital admission for IV fluids. Most women improve by the '
-        'second trimester.'),
-    babyImpact: _en('When properly managed, hyperemesis does not usually '
-        'affect your baby. The risk comes from dehydration and weight loss '
-        'going untreated, which is why admission is offered rather than '
-        'something to push through alone.'),
+    management: _en("Small, frequent, bland meals, ginger, and anti-sickness "
+        "tablets from your doctor. If you're quite dehydrated, a short "
+        "hospital stay for fluids through a drip (IV fluids). Most women feel "
+        "better by the second trimester."),
+    babyImpact: _en("When it's properly managed, hyperemesis doesn't usually "
+        "affect your baby. The risk comes from dehydration and weight loss "
+        "going untreated. That's why a hospital stay is offered, so you "
+        "don't have to push through alone."),
     faqs: [
       ConditionFaq(
         question: _en('Is this different from normal morning sickness?'),
-        answer: _en('Yes — the difference is severity and whether you can '
-            'keep anything down at all, not just how sick you feel.'),
+        answer: _en('Yes. The difference is how severe it is and whether you '
+            'can keep anything down at all, not only how sick you feel.'),
       ),
       ConditionFaq(
         question: _en('Will I need to be admitted?'),
-        answer: _en('Some women do, briefly, for fluids — many are managed '
-            'at home with medicine and small meals. Your doctor decides '
-            'based on hydration, not how bad it feels.'),
+        answer: _en("Some women are, for a short time, for fluids. Many are "
+            "looked after at home with medicine and small meals. Your doctor "
+            "decides from how dehydrated you are, not from how bad it "
+            "feels."),
+      ),
+      // Added 2026-09-29 (gap analysis, Appendix A, hyperemesis stories): the
+      // point those stories make, that asking for treatment is right. A real
+      // woman's story is still owed; see the report.
+      ConditionFaq(
+        question: _en('Should I try to put up with it?'),
+        answer: _en("No. Asking for treatment isn't making a fuss. Your "
+            "doctor can offer anti-sickness medicine used in pregnancy, and "
+            "being able to eat and drink again matters for you both."),
       ),
     ],
     showMedicine: true,
@@ -557,51 +619,57 @@ final List<ConditionEntry> kCommonConditions = [
     plainLine: _en('The placenta is sitting low.'),
     group: ConditionGroup.common,
     aliases: ['placenta previa', 'low lying placenta', 'previa'],
-    whatItIs: _en('Your placenta has attached low in the womb, partly or '
-        'fully covering the cervix, instead of higher up as usual.'),
-    reassurance: _en('Found early, most low-lying placentas move upward on '
-        'their own as the womb grows — it is watched, rarely acted on '
-        'straight away.'),
-    howCommon: _en('Picked up in around 1 in 20 pregnancies at a mid-'
-        'pregnancy scan; by the third trimester, the great majority of '
-        'those have already moved clear on their own.'),
+    shortAnswer: _en("Your placenta is lower in the womb than usual, near or "
+        "over the cervix. Found early, most move up on their own as the womb "
+        "grows. Any bleeding at all means calling your doctor the same day."),
+    whatItIs: _en('Your placenta has attached low in the womb, partly or fully '
+        'covering the cervix (the neck of the womb), instead of higher up as '
+        'usual.'),
+    reassurance: _en("Found early, most low-lying placentas move up on their "
+        "own as the womb grows. It's watched, and rarely acted on straight "
+        "away."),
+    howCommon: _en("It's picked up in around 1 in 20 pregnancies at a "
+        "mid-pregnancy scan. By the third trimester, most of those have "
+        "already moved clear on their own."),
     symptoms: [
-      _en('Usually none — most are found on a routine scan, not from how '
-          'you feel.'),
-      _en('Painless vaginal bleeding, sometimes the first sign.'),
+      _en("Usually none. Most are found on a routine scan, not from how you "
+          "feel."),
+      _en('Bleeding from the vagina without pain, which is sometimes the '
+          'first sign.'),
     ],
     callNow: [
-      _en('Any vaginal bleeding, however light — call the same day, do not '
-          'wait for your next visit.'),
-      _en('Heavy bleeding or pain — go to hospital directly.'),
+      _en("Any bleeding from the vagina, however light. Call the same day. "
+          "Don't wait for your next visit."),
+      _en('Heavy bleeding or pain. Go straight to hospital.'),
     ],
     justMonitor: [
-      _en('A "low-lying" placenta found before 20 weeks with no bleeding — '
-          'this is simply rechecked at a later scan.'),
+      _en('A low-lying placenta found before 20 weeks with no bleeding. This '
+          'is checked again at a later scan.'),
     ],
     testsToConfirm: [
       _en('Ultrasound, usually the routine anomaly scan around 20 weeks.'),
       _en('A repeat scan around 32 weeks if it was still low.'),
     ],
-    management: _en('Mostly watchful waiting with repeat scans, avoiding '
-        'strenuous activity and, sometimes, intercourse if advised. If the '
-        'placenta is still covering the cervix close to your due date, a '
-        'planned caesarean is the usual, safe route rather than labour.'),
-    babyImpact: _en('Baby is not directly affected by the placenta\'s '
-        'position. The concern is bleeding for you, which is why any '
-        'bleeding at all is treated as worth an immediate call.'),
+    management: _en("Mostly watchful waiting with repeat scans, and avoiding "
+        "hard exercise. Sometimes you'll be asked to avoid sex too. If the "
+        "placenta is still covering the cervix close to your due date, a "
+        "planned caesarean is the usual, safe way to deliver, rather than "
+        "labour."),
+    babyImpact: _en("Your baby isn't directly affected by where the placenta "
+        "sits. The concern is bleeding for you. That's why any bleeding at "
+        "all is worth a call straight away."),
     faqs: [
       ConditionFaq(
-        question: _en('Can it move back up on its own?'),
-        answer: _en('Yes — most low-lying placentas found in the second '
+        question: _en('Can it move up on its own?'),
+        answer: _en('Yes. Most low-lying placentas found in the second '
             'trimester are clear of the cervix by the third, as the lower '
             'part of the womb stretches upward.'),
       ),
       ConditionFaq(
-        question: _en('Does this mean I definitely need a caesarean?'),
-        answer: _en('Only if it is still covering the cervix close to your '
-            'due date. A low placenta that has moved clear can allow a '
-            'normal delivery.'),
+        question: _en("Does this mean I'll definitely need a caesarean?"),
+        answer: _en("Only if it's still covering the cervix close to your due "
+            "date. A placenta that has moved clear can allow a normal "
+            "delivery."),
       ),
     ],
     showReadMore: true,
@@ -619,56 +687,58 @@ final List<ConditionEntry> kCommonConditions = [
       'gestational hypertension',
       'blood pressure',
     ],
+    shortAnswer: _en("Your blood pressure has gone up after 20 weeks, without "
+        "the other signs of preeclampsia. It's common and checked at every "
+        "visit. Most women with it have healthy babies."),
     whatItIs: _en('Gestational hypertension means your blood pressure has '
-        'risen above the usual range after 20 weeks, without the protein-in-'
-        'urine that marks preeclampsia specifically.'),
-    reassurance: _en('It is common, closely monitored, and most women with '
-        'it deliver healthy babies with no lasting problem for either of '
-        'you.'),
-    howCommon: _en('Raised BP in pregnancy is seen in roughly 1 in 12 to 1 '
-        'in 15 Indian pregnancies, which is why BP is checked at every '
-        'single antenatal visit.'),
+        'risen above the usual range after 20 weeks, without the protein in '
+        'your urine that marks preeclampsia.'),
+    reassurance: _en("It's common and closely watched. Most women with it have "
+        "healthy babies, with no lasting problem for either of you."),
+    howCommon: _en("Raised blood pressure is seen in roughly 1 in 12 to 1 in "
+        "15 Indian pregnancies. That's why it's checked at every visit."),
     symptoms: [
-      _en('Often none — this is exactly why it is checked routinely rather '
-          'than only when something feels wrong.'),
-      _en('Occasionally headaches or mild swelling, which are common in '
-          'pregnancy anyway and not reliable signs on their own.'),
+      _en("Often none. That's why it's checked routinely, not only when "
+          "something feels wrong."),
+      _en("Sometimes headaches or mild swelling. These are common in "
+          "pregnancy anyway, so they aren't reliable signs on their own."),
     ],
     callNow: [
-      _en('A severe headache that will not ease with rest or paracetamol.'),
-      _en('Vision changes — blurring, flashing lights, spots.'),
+      _en("A severe headache that won't ease with rest or paracetamol."),
+      _en('Changes in your vision: blurring, flashing lights or spots.'),
       _en('Pain just under your ribs, on the right side.'),
       _en('Sudden swelling in your face or hands.'),
     ],
     justMonitor: [
-      _en('A single slightly raised reading at a routine check — one '
-          'reading is usually repeated, not acted on alone.'),
+      _en('One slightly raised reading at a routine check. A single reading '
+          'is usually repeated, not acted on alone.'),
     ],
     testsToConfirm: [
       _en('Blood pressure readings over more than one visit.'),
-      _en('Urine protein test, to rule out preeclampsia.'),
-      _en('Blood tests for liver and kidney function, if BP stays raised.'),
+      _en('A urine test for protein, to rule out preeclampsia.'),
+      _en('Blood tests for your liver and kidneys, if your blood pressure '
+          'stays raised.'),
     ],
-    management: _en('More frequent check-ups, home BP monitoring if asked, '
-        'and blood-pressure medicine that is safe in pregnancy if the '
-        'numbers stay high. Rest and reduced salt are commonly advised '
-        'alongside medicine, not instead of it.'),
-    babyImpact: _en('Well-controlled gestational hypertension usually has '
-        'little effect. If it worsens toward preeclampsia, it can affect '
-        'your baby\'s growth and the timing of delivery, which is the whole '
-        'reason it is tracked at every visit.'),
+    management: _en("More frequent check-ups, checking your blood pressure at "
+        "home if you're asked to, and a blood pressure medicine that's safe "
+        "in pregnancy if the numbers stay high. Rest and less salt are often "
+        "advised alongside medicine, not instead of it."),
+    babyImpact: _en("Well-controlled high blood pressure usually has little "
+        "effect on your baby. If it moves towards preeclampsia, it can affect "
+        "your baby's growth and when you deliver. That's why it's checked at "
+        "every visit."),
     faqs: [
       ConditionFaq(
         question: _en('Is this the same as preeclampsia?'),
-        answer: _en('No — preeclampsia specifically adds protein in your '
-            'urine and other signs. This page covers raised BP on its own; '
-            'see the Preeclampsia page for that specific condition.'),
+        answer: _en('No. Preeclampsia also brings protein in your urine or '
+            'other signs. This page is about raised blood pressure on its '
+            'own. The Preeclampsia page covers the rest.'),
       ),
       ConditionFaq(
-        question: _en('Will my BP stay high after delivery?'),
-        answer: _en('For most women it settles within a few weeks of birth. '
-            'You will usually be asked to have it checked again '
-            'postpartum.'),
+        question: _en('Will my blood pressure stay high after delivery?'),
+        answer: _en("For most women it settles within a few weeks of birth. "
+            "You'll usually be asked to have it checked again after "
+            "delivery."),
       ),
     ],
     showMedicine: true,
@@ -683,51 +753,54 @@ final List<ConditionEntry> kCommonConditions = [
     plainLine: _en('The pregnancy is growing in the wrong place.'),
     group: ConditionGroup.common,
     aliases: ['ectopic', 'tubal pregnancy'],
-    whatItIs: _en('An ectopic pregnancy means the fertilised egg has '
-        'implanted outside the womb, almost always in a fallopian tube, '
-        'where it cannot grow safely.'),
-    reassurance: _en('It is found early in most cases now, from an early '
-        'scan or blood test, well before it becomes an emergency.'),
-    howCommon: _en('Affects roughly 1 to 2 in 100 pregnancies. It cannot '
-        'continue as a normal pregnancy, and it needs medical or surgical '
-        'treatment rather than waiting.'),
+    shortAnswer: _en("An ectopic pregnancy is growing outside the womb, "
+        "usually in a tube, where it can't grow safely. Today most are found "
+        "early on a scan or blood test. Sharp pain on one side with bleeding "
+        "means going to the emergency room."),
+    whatItIs: _en("An ectopic pregnancy means the fertilised egg has settled "
+        "outside the womb, almost always in a fallopian tube, where it can't "
+        "grow safely."),
+    reassurance: _en('Most are found early now, on an early scan or blood '
+        'test, well before it becomes an emergency.'),
+    howCommon: _en("It affects roughly 1 to 2 in 100 pregnancies. It can't "
+        "continue as a normal pregnancy, so it needs medicine or surgery "
+        "rather than waiting."),
     symptoms: [
-      _en('One-sided lower abdominal pain, often sharp.'),
-      _en('Vaginal bleeding that is different from a normal period.'),
-      _en('Shoulder-tip pain, dizziness or fainting — signs it needs urgent '
-          'attention.'),
+      _en('Pain low in your tummy on one side, often sharp.'),
+      _en("Bleeding from the vagina that's different from a normal period."),
+      _en('Pain at the tip of your shoulder, dizziness or fainting. These are '
+          'signs it needs urgent care.'),
     ],
     callNow: [
-      _en('Sharp one-sided abdominal pain with bleeding, especially in very '
-          'early pregnancy — go to the emergency room, do not wait for an '
-          'appointment.'),
-      _en('Dizziness, fainting, or shoulder-tip pain — these can mean '
-          'internal bleeding and need immediate care.'),
+      _en("Sharp pain on one side of your tummy with bleeding, especially in "
+          "very early pregnancy. Go to the emergency room. Don't wait for an "
+          "appointment."),
+      _en('Dizziness, fainting, or pain at the tip of your shoulder. These can '
+          'mean bleeding inside, and need care immediately.'),
     ],
     justMonitor: [],
     testsToConfirm: [
-      _en('Transvaginal ultrasound, to see where the pregnancy has '
-          'implanted.'),
-      _en('Repeated beta-hCG blood tests, since the pattern of rise matters '
+      _en('An internal (transvaginal) ultrasound, to see where the pregnancy '
+          'has settled.'),
+      _en('Repeated beta-hCG blood tests, because how the level rises matters '
           'as much as one number.'),
     ],
-    management: _en('Depending on how early it is found, treatment is '
-        'either a medicine (methotrexate) that ends the pregnancy without '
-        'surgery, or a surgical procedure to remove it, usually '
-        'laparoscopically. This is always a clinical decision made quickly, '
-        'not something to research and decide alone.'),
-    babyImpact: _en('An ectopic pregnancy cannot continue and cannot become '
-        'a viable baby — the tube it has implanted in is not able to '
-        'support growth. Treating it protects your health and your future '
-        'fertility.'),
+    management: _en("It depends on how early it's found. Treatment is either a "
+        "medicine (methotrexate) that ends the pregnancy without surgery, or "
+        "an operation to remove it, usually by keyhole surgery "
+        "(laparoscopy). This is always a medical decision made quickly with "
+        "your doctor. It isn't something to research and decide alone."),
+    babyImpact: _en("An ectopic pregnancy can't continue and can't become a "
+        "baby, because the tube can't support it as it grows. Treating it "
+        "protects your health and your future fertility."),
     faqs: [
       ConditionFaq(
         question: _en('Will this affect my chances of getting pregnant '
             'again?'),
         answer: _en('Most women who have had one ectopic pregnancy go on to '
             'have normal pregnancies afterwards. Your doctor may suggest an '
-            'earlier scan next time to confirm where the pregnancy has '
-            'implanted.'),
+            'early scan next time to check where the pregnancy has '
+            'settled.'),
       ),
     ],
     showReadMore: true,
@@ -738,6 +811,10 @@ final List<ConditionEntry> kCommonConditions = [
 // -----------------------------------------------------------------------------
 //  High-anxiety must-haves — 2, kept quiet and gentle
 // -----------------------------------------------------------------------------
+//  ⚠️ 2026-09-29, gap analysis P1 "Give miscarriage and stillbirth a proper
+//  home": this page keeps the facts, in gentler words. Everything after a loss
+//  belongs to the "After a loss (pregnancy)" section, which is a new door and
+//  the lead's to build; this page should link to it once it exists.
 final List<ConditionEntry> kHighAnxietyConditions = [
   ConditionEntry(
     id: 'miscarriage',
@@ -745,65 +822,77 @@ final List<ConditionEntry> kHighAnxietyConditions = [
     plainLine: _en('A pregnancy that ends on its own, early.'),
     group: ConditionGroup.highAnxiety,
     aliases: ['miscarriage', 'pregnancy loss', 'bleeding early pregnancy'],
-    whatItIs: _en('A miscarriage is the loss of a pregnancy before 20 weeks. '
-        'It is one of the most common outcomes in early pregnancy, and in the '
-        'large majority of cases it happens because of a chromosomal issue in '
-        'that particular pregnancy, not because of anything you did.'),
-    reassurance: _en('If you are here because you are worried, or because it '
-        'has happened, none of this was caused by lifting something, '
-        'stress, an argument, or travelling. Most women who miscarry go on '
-        'to have healthy pregnancies afterwards.'),
-    howCommon: _en('Around 1 in 5 to 1 in 6 known pregnancies end this way, '
-        'most in the first 12 weeks. It is common enough that it happens to '
-        'people all around you, even though it is rarely spoken about.'),
+    shortAnswer: _en("A miscarriage is when a pregnancy ends on its own before "
+        "20 weeks. It's common, and it's almost never caused by anything you "
+        "did. If you're bleeding heavily, in a lot of pain or feel faint, "
+        "call your doctor now."),
+    whatItIs: _en("A miscarriage is the loss of a pregnancy before 20 weeks. "
+        "It's one of the most common things that happens in early pregnancy. "
+        "Most of the time it happens because of a chromosome problem in that "
+        "particular pregnancy, not because of anything you did."),
+    reassurance: _en("If you're here because you're worried, or because it "
+        "has happened, please hear this. It wasn't caused by lifting "
+        "something, by stress, by an argument or by travelling. Most women "
+        "who miscarry go on to have healthy pregnancies afterwards."),
+    howCommon: _en("Around 1 in 5 to 1 in 6 known pregnancies end this way, "
+        "most in the first 12 weeks. It happens to many people around you, "
+        "even though it's rarely talked about."),
     symptoms: [
-      _en('Vaginal bleeding, which can range from light spotting to heavier '
+      _en('Bleeding from the vagina, from light spotting to heavier '
           'bleeding.'),
-      _en('Cramping or lower abdominal pain.'),
-      _en('A sudden easing of pregnancy symptoms, in some cases.'),
+      _en('Cramping, or pain low in your tummy.'),
+      _en('In some cases, pregnancy symptoms easing suddenly.'),
     ],
     callNow: [
       _en('Heavy bleeding, soaking through a pad in an hour or less.'),
-      _en('Severe abdominal pain, with or without bleeding.'),
-      _en('Fever, or bleeding with a foul smell.'),
+      _en('Severe pain in your tummy, with or without bleeding.'),
+      _en('Fever, or bleeding that smells bad.'),
       _en('Dizziness or fainting.'),
     ],
     justMonitor: [
-      _en('Light spotting with no pain, in early pregnancy, can be common '
-          'and harmless — still worth telling your doctor at your next '
-          'contact, even if it is not an emergency.'),
+      _en("Light spotting with no pain in early pregnancy can be common and "
+          "harmless. Still tell your doctor at your next contact, even if it "
+          "isn't an emergency."),
     ],
     testsToConfirm: [
-      _en('Ultrasound scan, to see the pregnancy directly.'),
+      _en('An ultrasound scan, to see the pregnancy.'),
       _en('Beta-hCG blood tests, sometimes repeated over a few days.'),
     ],
-    management: _en('Care depends on what stage things are at, and is '
-        'decided with you, not for you: it can mean waiting for it to '
-        'complete naturally, medicine to help it along, or a short '
-        'procedure. All three are medically safe options, and your doctor '
-        'will talk through what fits your situation.'),
-    babyImpact: _en('There is nothing you could have watched for or '
-        'prevented. This page will not tell you what caused it — most of '
-        'the time, no single cause is ever found, and that is normal too.'),
+    management: _en("Care depends on what stage things are at, and it's "
+        "decided with you, not for you. It can mean waiting for it to "
+        "complete naturally, medicine to help it along, or a short "
+        "procedure. All three are medically safe, and your doctor will talk "
+        "through what fits your situation. You can ask to have someone with "
+        "you."),
+    babyImpact: _en("There was nothing you could have watched for or "
+        "prevented. This page won't tell you what caused it. Most of the "
+        "time no single cause is ever found, and that's normal too."),
     faqs: [
       ConditionFaq(
         question: _en('Did I cause this?'),
-        answer: _en('Almost certainly not. The overwhelming majority of '
-            'early losses happen because of a chromosomal issue in that '
-            'pregnancy, which no food, activity, or stress caused or could '
-            'have prevented.'),
+        answer: _en('Almost certainly not. Most early losses happen because '
+            'of a chromosome problem in that pregnancy. No food, activity or '
+            'stress caused it, and none of them could have prevented it.'),
       ),
       ConditionFaq(
         question: _en('How long should I wait before trying again?'),
-        answer: _en('Medically, many doctors say it is safe to try again '
-            'after one normal cycle. There is no rule for when you will '
-            'feel ready, and that timeline is yours.'),
+        answer: _en("Medically, many doctors say it's safe to try again after "
+            "one normal cycle. There's no rule for when you'll feel ready. "
+            "That part is yours."),
       ),
       ConditionFaq(
         question: _en('Will this happen again?'),
-        answer: _en('For most women, one miscarriage does not mean it will '
-            'happen again — the large majority go on to have a healthy '
-            'pregnancy next time.'),
+        answer: _en("For most women, one miscarriage doesn't mean it will "
+            "happen again. Most go on to have a healthy pregnancy next "
+            "time."),
+      ),
+      // Added 2026-09-29 (gap analysis P1): grief named once, then a next
+      // step. No cheerful language, per `highAnxiety`.
+      ConditionFaq(
+        question: _en('Is it normal to feel this sad?'),
+        answer: _en("Yes. Grief after a loss is real at any number of weeks, "
+            "and partners feel it too. If the sadness stays heavy for weeks, "
+            "or you can't sleep or eat, tell your doctor. Support helps."),
       ),
     ],
     highAnxiety: true,
@@ -817,69 +906,87 @@ final List<ConditionEntry> kHighAnxietyConditions = [
     name: _en('Preeclampsia'),
     plainLine: _en('High blood pressure that starts to affect the rest of you.'),
     group: ConditionGroup.highAnxiety,
-    aliases: ['preeclampsia', 'pre eclampsia', 'toxemia'],
-    whatItIs: _en('Preeclampsia is raised blood pressure after 20 weeks '
-        'together with protein in your urine or signs that it is affecting '
-        'your liver, kidneys or blood — more than raised BP on its own.'),
-    reassurance: _en('It is watched for at every single antenatal visit '
-        'precisely so it is caught early, when it is very manageable — most '
-        'cases are picked up on a routine check, not as a sudden crisis.'),
-    howCommon: _en('Affects roughly 3 to 5 in 100 pregnancies worldwide, '
-        'somewhat more in first pregnancies. This is exactly why BP and '
-        'urine are checked at every visit, whether or not you feel unwell.'),
+    aliases: ['preeclampsia', 'pre eclampsia', 'toxemia', 'aspirin'],
+    shortAnswer: _en("Preeclampsia is high blood pressure after 20 weeks that "
+        "starts to affect other parts of your body, like your kidneys or "
+        "liver. It's checked for at every visit so it's caught early. A "
+        "severe headache with changes in your vision means going to "
+        "hospital."),
+    whatItIs: _en("Preeclampsia is raised blood pressure after 20 weeks "
+        "together with protein in your urine, or signs that it's affecting "
+        "your liver, kidneys or blood. It's more than raised blood pressure "
+        "on its own."),
+    reassurance: _en("It's checked for at every visit so it's caught early, "
+        "when it's very manageable. Most cases are found on a routine check, "
+        "not as a sudden crisis."),
+    howCommon: _en("It affects roughly 3 to 5 in 100 pregnancies worldwide, a "
+        "little more in first pregnancies. That's why your blood pressure "
+        "and urine are checked at every visit, whether or not you feel "
+        "unwell."),
     symptoms: [
-      _en('Often none you would notice yourself — found through routine BP '
-          'and urine checks.'),
-      _en('A severe headache that does not ease with rest.'),
-      _en('Vision changes — blurring, flashing lights, spots.'),
-      _en('Swelling that comes on suddenly, especially in the face and '
+      _en("Often nothing you'd notice yourself. It's found through routine "
+          "blood pressure and urine checks."),
+      _en("A severe headache that doesn't ease with rest."),
+      _en('Changes in your vision: blurring, flashing lights or spots.'),
+      _en('Swelling that comes on suddenly, especially in your face and '
           'hands.'),
-      _en('Pain just under the ribs, usually on the right.'),
+      _en('Pain just under your ribs, usually on the right.'),
     ],
     callNow: [
-      _en('A severe headache with vision changes — go to hospital, do not '
-          'wait for your next appointment.'),
-      _en('Pain under your ribs, or vomiting you have not had before.'),
-      _en('Sudden, significant swelling in your face or hands.'),
-      _en('Reduced movement from your baby.'),
+      _en("A severe headache with changes in your vision. Go to hospital. "
+          "Don't wait for your next appointment."),
+      _en("Pain under your ribs, or vomiting you haven't had before."),
+      _en('Sudden, marked swelling in your face or hands.'),
+      _en('Your baby moving less than usual.'),
     ],
     justMonitor: [],
     testsToConfirm: [
       _en('Blood pressure readings over repeated checks.'),
-      _en('Urine protein test.'),
-      _en('Blood tests for liver, kidney and platelet levels.'),
+      _en('A urine test for protein.'),
+      _en('Blood tests for your liver, kidneys and platelets.'),
       _en('Growth scans and Doppler, to check on your baby.'),
     ],
-    management: _en('Care depends on how far along you are and how severe it '
-        'is: closer monitoring and blood-pressure medicine for milder cases, '
-        'hospital admission and, at some point, planned early delivery for '
-        'more severe ones — because delivery is the actual treatment for '
-        'preeclampsia. Your doctor balances how far along your baby is '
-        'against how unwell you are becoming.'),
-    babyImpact: _en('Preeclampsia can affect how well your baby grows, which '
-        'is why growth scans are added once it is diagnosed. Most babies of '
-        'mothers with preeclampsia are born healthy, often a little early, '
-        'under close hospital care.'),
+    management: _en("Care depends on how far along you are and how severe it "
+        "is. Milder cases mean closer checks and blood pressure medicine. "
+        "More severe cases mean a hospital stay and, at some point, a planned "
+        "early delivery, because delivery is what treats preeclampsia. Your "
+        "doctor weighs how ready your baby is against how unwell you're "
+        "becoming."),
+    babyImpact: _en("Preeclampsia can affect how well your baby grows, so "
+        "growth scans are added once it's diagnosed. Most babies whose "
+        "mothers have preeclampsia are born healthy, often a little early, "
+        "with close hospital care."),
     faqs: [
       ConditionFaq(
-        question: _en('Is this the same as normal high BP in pregnancy?'),
-        answer: _en('No — preeclampsia specifically involves protein in '
-            'your urine or signs it is affecting your organs, not just a '
-            'raised number. See the "High BP" page for raised BP without '
-            'those signs.'),
+        question: _en('Is this the same as ordinary high blood pressure in '
+            'pregnancy?'),
+        answer: _en("No. Preeclampsia also involves protein in your urine or "
+            "signs it's affecting your organs, not only a raised number. The "
+            "High BP page covers raised blood pressure without those signs."),
       ),
       ConditionFaq(
         question: _en('Will I need to deliver early?'),
-        answer: _en('Sometimes, yes — delivery is the treatment that '
-            'actually resolves preeclampsia. Your doctor times it to '
-            'balance your baby\'s development against your own safety.'),
+        answer: _en("Sometimes, yes. Delivery is the treatment that ends "
+            "preeclampsia. Your doctor times it to balance your baby's "
+            "development against your own safety."),
       ),
       ConditionFaq(
         question: _en('Will this happen in my next pregnancy?'),
-        answer: _en('The chance is higher than for someone who never had '
-            'it, which is why doctors watch more closely from earlier on '
-            'next time — but most women who had it once do not have it '
-            'again.'),
+        answer: _en("The chance is higher than for someone who never had it, "
+            "so doctors watch more closely from earlier on next time. But "
+            "most women who had it once don't have it again."),
+      ),
+      // Added 2026-09-29 (gap analysis, Appendix A, "Ask about aspirin").
+      ConditionFaq(
+        question: _en('My doctor has prescribed aspirin. Why?'),
+        answer: _en("Many doctors prescribe a low dose of aspirin to women at "
+            "higher risk of preeclampsia, for example after preeclampsia in "
+            "a past pregnancy, or with high blood pressure, diabetes or "
+            "kidney disease from before. It's usually started between 12 and "
+            "16 weeks and taken every day until late pregnancy, and it lowers "
+            "the chance of preeclampsia. Take it exactly as prescribed. Never "
+            "start aspirin on your own, and don't stop it without asking your "
+            "doctor."),
       ),
     ],
     highAnxiety: true,
@@ -904,40 +1011,44 @@ final List<ConditionEntry> kPlacentaBleedingConditions = [
     plainLine: _en('The placenta starts coming away too early.'),
     group: ConditionGroup.placentaBleeding,
     aliases: ['abruption', 'placenta separation'],
-    whatItIs: _en('The placenta has started to separate from the wall of '
-        'the womb before your baby is born. This is a medical emergency.'),
-    reassurance: _en('It is uncommon, and hospitals are set up to act on it '
-        'fast — the outcome depends heavily on getting there quickly, which '
-        'is the one thing this page wants you to do.'),
-    howCommon: _en('Affects roughly 1 in 100 pregnancies, most often in the '
+    shortAnswer: _en("Placental abruption is when the placenta starts coming "
+        "away from the womb before your baby is born. It's uncommon, but it's "
+        "an emergency. Sudden bleeding, or constant severe pain in your tummy "
+        "or back, means going straight to hospital."),
+    whatItIs: _en('The placenta has started to come away from the wall of the '
+        'womb before your baby is born. This is a medical emergency.'),
+    reassurance: _en("It's uncommon, and hospitals are set up to act on it "
+        "fast. Getting there quickly makes the biggest difference, and "
+        "that's what this page asks you to do."),
+    howCommon: _en('It affects roughly 1 in 100 pregnancies, most often in the '
         'third trimester.'),
     symptoms: [
-      _en('Sudden vaginal bleeding, often with pain.'),
-      _en('Constant, severe abdominal or back pain, unlike normal '
+      _en('Sudden bleeding from the vagina, often with pain.'),
+      _en('Constant, severe pain in your tummy or back, unlike normal '
           'contractions.'),
-      _en('The womb feeling unusually firm or tender.'),
+      _en('Your womb feeling unusually hard or tender.'),
     ],
     callNow: [
-      _en('Any of the above — go to the nearest hospital emergency '
-          'department immediately, do not wait to call first.'),
+      _en("Any of the above. Go to the nearest hospital emergency department "
+          "immediately. Don't wait to call first."),
     ],
     justMonitor: [],
     testsToConfirm: [
-      _en('This is diagnosed clinically and by ultrasound, in hospital, as '
-          'an emergency, not on a routine visit.'),
+      _en("It's diagnosed in hospital as an emergency, by examination and "
+          "ultrasound, not at a routine visit."),
     ],
-    management: _en('Immediate hospital care. Depending on severity and how '
-        'far along you are, this can mean close monitoring or urgent '
-        'delivery, usually by caesarean.'),
-    babyImpact: _en('This can seriously reduce your baby\'s oxygen supply, '
-        'which is why it is treated as an emergency and why speed matters '
-        'more than anything else on this page.'),
+    management: _en('Hospital care straight away. Depending on how severe it '
+        'is and how far along you are, this can mean close monitoring or '
+        'urgent delivery, usually by caesarean.'),
+    babyImpact: _en("It can seriously reduce your baby's oxygen supply. That's "
+        "why it's treated as an emergency, and why speed matters more than "
+        "anything else on this page."),
     faqs: [
       ConditionFaq(
-        question: _en('What increases the chance of this?'),
-        answer: _en('Raised blood pressure, previous abruption, smoking and '
-            'abdominal trauma raise the chance, but it can also happen with '
-            'none of these present.'),
+        question: _en('What makes this more likely?'),
+        answer: _en('High blood pressure, a previous abruption, smoking and a '
+            'blow to the tummy raise the chance. It can also happen with none '
+            'of these.'),
       ),
     ],
   ),
@@ -947,40 +1058,43 @@ final List<ConditionEntry> kPlacentaBleedingConditions = [
     plainLine: _en('The baby is measuring smaller than expected.'),
     group: ConditionGroup.placentaBleeding,
     aliases: ['iugr', 'fgr', 'small baby', 'growth restriction'],
-    whatItIs: _en('IUGR means your baby is measuring smaller than expected '
-        'for their stage, usually because the placenta is not passing '
-        'through nutrients as efficiently as usual.'),
-    reassurance: _en('Many babies flagged as measuring small are simply '
-        'small, healthy babies — IUGR is confirmed with growth pattern and '
-        'Doppler flow, not a single measurement.'),
-    howCommon: _en('Affects roughly 5 to 10 in 100 pregnancies to some '
+    shortAnswer: _en("IUGR means your baby is measuring smaller than expected "
+        "on scans. Many babies flagged as small are small and healthy. More "
+        "scans show the trend, and your doctor plans from that."),
+    whatItIs: _en("IUGR (fetal growth restriction) means your baby is "
+        "measuring smaller than expected for their stage. Usually it's "
+        "because the placenta isn't passing on nutrients as well as usual."),
+    reassurance: _en("Many babies flagged as small are small, healthy babies. "
+        "IUGR is confirmed from the growth pattern and a Doppler scan, not "
+        "from a single measurement."),
+    howCommon: _en('It affects roughly 5 to 10 in 100 pregnancies to some '
         'degree.'),
     symptoms: [
-      _en('No symptoms you would feel — found on a growth scan.'),
+      _en("Nothing you'd feel. It's found on a growth scan."),
     ],
     callNow: [
-      _en('You notice your baby moving noticeably less than usual.'),
+      _en('Your baby is moving noticeably less than usual.'),
     ],
     justMonitor: [
-      _en('A single scan measuring a little small — this is followed up '
-          'with a repeat scan a few weeks later to see the trend.'),
+      _en('One scan measuring a little small. This is followed with a repeat '
+          'scan a few weeks later to see the trend.'),
     ],
     testsToConfirm: [
-      _en('Growth ultrasound, tracked over more than one visit.'),
-      _en('Doppler scan, to check blood flow through the umbilical cord.'),
+      _en('Growth scans, tracked over more than one visit.'),
+      _en('A Doppler scan, to check blood flow through the cord.'),
     ],
-    management: _en('More frequent growth scans and Doppler checks, and '
-        'closer kick-count monitoring. Depending on how things trend, this '
-        'can lead to earlier delivery if your baby is genuinely better off '
-        'outside than in.'),
-    babyImpact: _en('The monitoring exists specifically to protect your '
-        'baby\'s wellbeing and to time delivery correctly if needed.'),
+    management: _en("More frequent growth scans and Doppler checks, and a "
+        "closer watch on your baby's movements. Depending on the trend, this "
+        "can lead to an earlier delivery if your baby would be better off "
+        "outside than in."),
+    babyImpact: _en("All this monitoring is there to protect your baby, and to "
+        "time the delivery well if it's needed."),
     faqs: [
       ConditionFaq(
         question: _en('Does this mean something is wrong with my baby?'),
-        answer: _en('Not necessarily — many causes are about the placenta '
-            'or your own health, not the baby, and some small babies are '
-            'simply small and entirely healthy.'),
+        answer: _en('Not necessarily. Many causes are about the placenta or '
+            'your own health, not the baby. And some small babies are small '
+            'and completely healthy.'),
       ),
     ],
     showReadMore: true,
@@ -992,39 +1106,43 @@ final List<ConditionEntry> kPlacentaBleedingConditions = [
     plainLine: _en('Less water around the baby.'),
     group: ConditionGroup.placentaBleeding,
     aliases: ['oligohydramnios', 'low fluid', 'low amniotic fluid'],
+    shortAnswer: _en("Low fluid means there's less water around your baby "
+        "than usual for your stage. Mild cases late in pregnancy are common "
+        "and are usually watched with more scans. Fluid leaking from the "
+        "vagina needs checking the same day."),
     whatItIs: _en('Oligohydramnios means the fluid cushioning your baby is '
         'lower than the usual range for your stage.'),
-    reassurance: _en('Mild cases found late in pregnancy are common and '
-        'often need nothing more than closer watching.'),
-    howCommon: _en('Affects roughly 4 in 100 pregnancies, more often near '
+    reassurance: _en('Mild cases found late in pregnancy are common and often '
+        'need nothing more than closer watching.'),
+    howCommon: _en('It affects roughly 4 in 100 pregnancies, more often near '
         'the due date.'),
     symptoms: [
-      _en('Usually none — found on a routine growth scan.'),
+      _en("Usually none. It's found on a routine growth scan."),
     ],
     callNow: [
-      _en('Fluid leaking or gushing from the vagina — this could be your '
-          'waters, and needs same-day assessment.'),
-      _en('Reduced movement from your baby.'),
+      _en('Fluid leaking or gushing from the vagina. This could be your '
+          'waters, and needs checking the same day.'),
+      _en('Your baby moving less than usual.'),
     ],
     justMonitor: [
-      _en('A mildly low reading close to your due date, with everything '
-          'else normal — often just rechecked.'),
+      _en('A slightly low reading close to your due date, with everything '
+          'else normal. This is often just checked again.'),
     ],
     testsToConfirm: [
-      _en('Ultrasound measurement of amniotic fluid.'),
+      _en('An ultrasound measurement of the fluid (amniotic fluid).'),
     ],
-    management: _en('More frequent scans and monitoring, staying well '
-        'hydrated, and, depending on how far along you are and how low the '
-        'fluid is, a discussion about earlier delivery.'),
-    babyImpact: _en('Fluid cushions your baby and supports lung development '
-        'earlier in pregnancy, which is why the timing of when this is '
-        'found matters for how it is handled.'),
+    management: _en("More frequent scans and checks, and drinking plenty of "
+        "water. Depending on how far along you are and how low the fluid is, "
+        "your doctor may talk with you about an earlier delivery."),
+    babyImpact: _en("The fluid cushions your baby, and earlier in pregnancy it "
+        "helps their lungs develop. That's why the timing of when it's found "
+        "matters for how it's handled."),
     faqs: [
       ConditionFaq(
         question: _en('Can drinking more water help?'),
-        answer: _en('Staying well hydrated is commonly advised and can help '
-            'a little, but it is not a guaranteed fix — the monitoring '
-            'still matters more than the water itself.'),
+        answer: _en("Drinking plenty is commonly advised and can help a "
+            "little, but it isn't a guaranteed fix. The monitoring still "
+            "matters more than the water."),
       ),
     ],
     showReadMore: true,
@@ -1035,40 +1153,44 @@ final List<ConditionEntry> kPlacentaBleedingConditions = [
     plainLine: _en('More water around the baby than usual.'),
     group: ConditionGroup.placentaBleeding,
     aliases: ['polyhydramnios', 'excess fluid', 'too much fluid'],
-    whatItIs: _en('Polyhydramnios means there is more amniotic fluid around '
-        'your baby than the usual range.'),
-    reassurance: _en('Most cases are mild and the cause is never fully '
-        'known — mild polyhydramnios often needs nothing beyond watching.'),
-    howCommon: _en('Affects roughly 1 to 2 in 100 pregnancies.'),
+    shortAnswer: _en("Polyhydramnios means there's more water around your baby "
+        "than usual. Most cases are mild and are watched with later scans. "
+        "Sudden, severe discomfort or breathlessness means calling your "
+        "doctor."),
+    whatItIs: _en("Polyhydramnios means there's more fluid (amniotic fluid) "
+        "around your baby than the usual range."),
+    reassurance: _en("Most cases are mild and the cause is often never fully "
+        "known. Mild cases usually need nothing more than watching."),
+    howCommon: _en('It affects roughly 1 to 2 in 100 pregnancies.'),
     symptoms: [
-      _en('A womb measuring larger than expected for your dates.'),
+      _en('Your womb measuring bigger than expected for your dates.'),
       _en('Discomfort or breathlessness from the extra size, in more '
           'noticeable cases.'),
     ],
     callNow: [
-      _en('Sudden, severe abdominal discomfort or breathlessness.'),
+      _en('Sudden, severe discomfort in your tummy, or breathlessness.'),
       _en('Contractions that start earlier than expected.'),
     ],
     justMonitor: [
-      _en('Mild extra fluid with no discomfort — usually just rechecked at '
-          'later scans.'),
+      _en('A little extra fluid with no discomfort. This is usually just '
+          'checked again at later scans.'),
     ],
     testsToConfirm: [
-      _en('Ultrasound measurement of amniotic fluid.'),
-      _en('A glucose test, since it is sometimes linked to blood sugar.'),
+      _en('An ultrasound measurement of the fluid.'),
+      _en("A sugar test, since it's sometimes linked to blood sugar."),
     ],
-    management: _en('Monitoring, and treating any underlying cause found, '
-        'such as gestational diabetes. Rarely, fluid may be drained if it is '
-        'causing significant discomfort.'),
-    babyImpact: _en('Mild cases usually have no effect on your baby. More '
-        'significant polyhydramnios is followed with growth scans, since it '
-        'can occasionally point to something else worth checking.'),
+    management: _en("Monitoring, and treating any cause that's found, such as "
+        "pregnancy sugar. Rarely, some fluid is drained if it's causing a lot "
+        "of discomfort."),
+    babyImpact: _en("Mild cases usually have no effect on your baby. More "
+        "marked cases are followed with growth scans, because now and then "
+        "they point to something else worth checking."),
     faqs: [
       ConditionFaq(
-        question: _en('Does this mean I will go into labour early?'),
-        answer: _en('It raises the chance slightly, which is why it is '
-            'watched, but most women with mild polyhydramnios carry to term '
-            'or close to it.'),
+        question: _en("Does this mean I'll go into labour early?"),
+        answer: _en("It raises the chance a little, which is why it's watched. "
+            "But most women with mild polyhydramnios carry to term or close "
+            "to it."),
       ),
     ],
     showReadMore: true,
@@ -1076,7 +1198,7 @@ final List<ConditionEntry> kPlacentaBleedingConditions = [
 ];
 
 // -----------------------------------------------------------------------------
-//  Position & cervix — 2, brief
+//  Position & cervix — 2, brief; preterm labour added 2026-09-29
 // -----------------------------------------------------------------------------
 final List<ConditionEntry> kPositionCervixConditions = [
   ConditionEntry(
@@ -1085,35 +1207,40 @@ final List<ConditionEntry> kPositionCervixConditions = [
     plainLine: _en('The baby is lying feet-down.'),
     group: ConditionGroup.positionCervix,
     aliases: ['breech', 'baby position', 'bottom first'],
-    whatItIs: _en('Breech means your baby is positioned bottom or feet-first '
-        'rather than head-down, close to your due date.'),
-    reassurance: _en('Very common before 36 weeks — most babies who are '
-        'breech earlier turn head-down on their own well before birth.'),
-    howCommon: _en('Around 1 in 25 babies are still breech at term, after '
-        'the majority turn on their own earlier in the third trimester.'),
+    shortAnswer: _en("Breech means your baby is lying bottom or feet first "
+        "instead of head down. Before 36 weeks it's common, and most babies "
+        "turn on their own. If your baby is still breech near term, your "
+        "doctor will talk you through the options."),
+    whatItIs: _en('Breech means your baby is lying bottom or feet first rather '
+        'than head down, close to your due date.'),
+    reassurance: _en("It's very common before 36 weeks. Most babies who are "
+        "breech earlier turn head down on their own well before birth."),
+    howCommon: _en('Around 1 in 25 babies are still breech at term. Most turn '
+        'on their own earlier in the third trimester.'),
     symptoms: [
-      _en('No symptoms you would feel — found on examination or scan.'),
+      _en("Nothing you'd feel. It's found on examination or a scan."),
     ],
     callNow: [],
     justMonitor: [
-      _en('Breech position before 36 weeks — this is simply rechecked '
-          'closer to term, since most babies still turn.'),
+      _en('Breech before 36 weeks. This is checked again closer to term, '
+          'since most babies still turn.'),
     ],
     testsToConfirm: [
-      _en('Abdominal examination by your doctor.'),
-      _en('Ultrasound, to confirm position.'),
+      _en('Your doctor feeling your tummy (abdominal examination).'),
+      _en('An ultrasound, to confirm the position.'),
     ],
-    management: _en('If still breech close to term, options include a '
-        'procedure to try to turn your baby (ECV) or a planned caesarean. '
-        'Your doctor will discuss which fits your situation.'),
-    babyImpact: _en('Breech position on its own does not harm your baby — '
-        'it mainly changes the discussion around how you will deliver.'),
+    management: _en("If your baby is still breech close to term, the options "
+        "are a procedure to try to turn your baby from the outside (ECV) or a "
+        "planned caesarean. Your doctor will talk through which fits your "
+        "situation."),
+    babyImpact: _en("Being breech doesn't harm your baby by itself. It mainly "
+        "changes the conversation about how you'll deliver."),
     faqs: [
       ConditionFaq(
         question: _en('Can I still have a normal delivery?'),
-        answer: _en('It is less common but possible in some hospitals with '
-            'the right experience for breech vaginal birth. Most breech '
-            'babies in India are delivered by planned caesarean.'),
+        answer: _en("It's less common, but possible in some hospitals with "
+            "experience of vaginal breech birth. Most breech babies in India "
+            "are born by planned caesarean."),
       ),
     ],
     showReadMore: true,
@@ -1124,44 +1251,140 @@ final List<ConditionEntry> kPositionCervixConditions = [
     plainLine: _en('The neck of the womb opens too early.'),
     group: ConditionGroup.positionCervix,
     aliases: ['cervical incompetence', 'weak cervix', 'cervical insufficiency'],
-    whatItIs: _en('This means your cervix begins to open earlier than it '
-        'should, without contractions, raising the chance of an early '
-        'delivery.'),
-    reassurance: _en('It is uncommon, and where it is known about in '
-        'advance, there are effective ways to support the pregnancy.'),
-    howCommon: _en('A less common cause of second-trimester loss, more '
-        'often picked up after a previous early loss or premature birth.'),
+    shortAnswer: _en("This means the cervix, the neck of the womb, starts to "
+        "open too early without contractions. It's uncommon, and when it's "
+        "known about in advance there are good ways to support the "
+        "pregnancy. Pelvic pressure, spotting or leaking fluid means calling "
+        "your doctor."),
+    whatItIs: _en('Your cervix (the neck of the womb) starts to open earlier '
+        'than it should, without contractions. This raises the chance of an '
+        'early delivery.'),
+    reassurance: _en("It's uncommon. When it's known about in advance, there "
+        "are good ways to support the pregnancy."),
+    howCommon: _en("It's a less common cause of loss in the middle months. "
+        "It's more often picked up after a previous early loss or early "
+        "birth."),
     symptoms: [
-      _en('Often none until it is advanced — this is why it is watched '
-          'closely if you have a relevant history.'),
-      _en('A feeling of pelvic pressure, or spotting, in some cases.'),
+      _en("Often none until it's advanced. That's why it's watched closely if "
+          "your history points to it."),
+      _en('A feeling of pressure in your pelvis, or spotting, in some '
+          'cases.'),
     ],
     callNow: [
-      _en('Pelvic pressure, spotting or fluid loss, especially before 24 '
-          'weeks.'),
+      _en('Pressure in your pelvis, spotting or leaking fluid, especially '
+          'before 24 weeks.'),
     ],
     justMonitor: [],
     testsToConfirm: [
-      _en('Cervical length measured by ultrasound.'),
-      _en('Your obstetric history — this often guides whether closer '
+      _en('Measuring the length of your cervix on ultrasound.'),
+      _en('Your pregnancy history, which often decides whether closer '
           'watching starts early.'),
     ],
-    management: _en('Depending on your history and scan findings, this can '
-        'mean a cervical stitch (cerclage), progesterone support, or closer '
-        'monitoring through the second trimester.'),
-    babyImpact: _en('The concern is early delivery before your baby is '
-        'ready, which is exactly what the monitoring and any treatment aim '
-        'to prevent.'),
+    management: _en('Depending on your history and scans, this can mean a '
+        'stitch in the cervix (cerclage), progesterone, or closer monitoring '
+        'through the middle months.'),
+    babyImpact: _en("The concern is your baby arriving before they're ready. "
+        "The monitoring and any treatment aim to prevent that."),
     faqs: [
       ConditionFaq(
         question: _en('Will I need a stitch in every pregnancy now?'),
-        answer: _en('Not necessarily — the decision is made fresh each '
-            'pregnancy from your cervical length and history, not applied '
-            'automatically.'),
+        answer: _en('Not necessarily. The decision is made fresh each '
+            'pregnancy, from the length of your cervix and your history.'),
       ),
     ],
     showMedicine: true,
     pregSignal: PregCondition.cervicalIncompetence,
+  ),
+  // Added 2026-09-29 (pregnancy gap analysis, Complications, "the conditions
+  // both apps cover and we do not"). No `pregSignal`: early labour is an
+  // event, not a standing condition, and it must never be inferred as
+  // "high risk".
+  ConditionEntry(
+    id: 'preterm_labour',
+    name: _en('Preterm labour'),
+    plainLine: _en('Labour that starts before 37 weeks.'),
+    group: ConditionGroup.positionCervix,
+    aliases: [
+      'preterm labour',
+      'preterm labor',
+      'premature labour',
+      'early labour',
+      'premature birth',
+      'preterm birth',
+    ],
+    shortAnswer: _en("Preterm labour means labour starting before 37 weeks. "
+        "Regular tightenings, period-like cramps or leaking fluid before 37 "
+        "weeks mean calling your doctor or going in the same day. If labour "
+        "does start early, there are treatments that help your baby."),
+    whatItIs: _en("Preterm labour is labour that starts before 37 weeks of "
+        "pregnancy. Your womb starts tightening regularly and the cervix "
+        "begins to open earlier than planned."),
+    reassurance: _en("Many women who have early tightenings don't go on to "
+        "deliver early. And when labour does start early, there are "
+        "treatments that help your baby, and care for early babies in India "
+        "has improved a great deal."),
+    howCommon: _en("More than 1 in 10 babies in India are born before 37 "
+        "weeks. Most of them are born after 32 weeks, and babies born close "
+        "to 37 weeks usually do very well."),
+    symptoms: [
+      _en('Tightenings that come regularly, every 10 minutes or more often.'),
+      _en('Period-like cramps, or a dull ache low in your back that comes and '
+          'goes.'),
+      _en('Pressure low in your pelvis, as if your baby is pushing down.'),
+      _en('A change in discharge: watery, like mucus, or blood-stained.'),
+      _en('Fluid leaking, or a gush.'),
+    ],
+    callNow: [
+      _en('Regular tightenings or period-like pain before 37 weeks. Call your '
+          'doctor or go to hospital the same day.'),
+      _en('Fluid leaking or gushing from the vagina before 37 weeks.'),
+      _en('Any bleeding from the vagina.'),
+    ],
+    justMonitor: [
+      _en("Occasional, irregular tightenings that ease when you rest or move. "
+          "These are practice contractions (Braxton Hicks) and are common "
+          "from the middle months. If you can't tell which you have, call."),
+    ],
+    testsToConfirm: [
+      _en('An internal examination, to see whether the cervix is opening.'),
+      _en("A monitor (CTG) to record your tightenings and your baby's "
+          "heartbeat."),
+      _en('In some hospitals, a swab test (fetal fibronectin) or a scan of '
+          'your cervix length, to help show whether birth is likely soon.'),
+    ],
+    management: _en("It depends on how many weeks you are. Before 34 weeks "
+        "you may be given steroid injections to help your baby's lungs "
+        "mature, and, if birth is very early, magnesium sulphate to help "
+        "protect your baby's brain. Medicine to slow contractions may be used "
+        "for a short time, so the steroids can work or so you can move to a "
+        "hospital with a newborn unit (NICU). If your waters have broken, "
+        "you'll usually be given antibiotics."),
+    babyImpact: _en("The earlier a baby is born, the more help they need with "
+        "breathing, feeding and keeping warm. Babies born close to 37 weeks "
+        "usually do very well. Being born in a hospital with a newborn unit "
+        "makes a real difference for an early baby."),
+    faqs: [
+      ConditionFaq(
+        question: _en('What causes it?'),
+        answer: _en("Often no cause is found. Infections (including urine "
+            "infections), a previous early birth, twins, a short cervix, "
+            "bleeding and high blood pressure all raise the chance. Your "
+            "ordinary daily activity doesn't cause it."),
+      ),
+      ConditionFaq(
+        question: _en('Can it be stopped?'),
+        answer: _en("Sometimes it settles on its own, and sometimes medicine "
+            "slows it for a short time. Often the aim isn't to stop it for "
+            "weeks. It's to give your baby the steroid injections and get you "
+            "to the right hospital."),
+      ),
+      ConditionFaq(
+        question: _en('Will it happen again next time?'),
+        answer: _en("The chance is higher after one early birth, so doctors "
+            "watch more closely next time, sometimes with cervix scans or "
+            "progesterone. Many women carry their next baby to term."),
+      ),
+    ],
   ),
 ];
 
@@ -1177,43 +1400,46 @@ final List<ConditionEntry> kDiscomfortConditions = [
   ConditionEntry(
     id: 'uti',
     name: _en('UTI (urine infection)'),
-    plainLine: _en('A water infection — burning, and going often.'),
+    plainLine: _en('A water infection: burning, and needing to go often.'),
     group: ConditionGroup.discomforts,
     aliases: ['uti', 'urine infection', 'urinary tract infection'],
-    whatItIs: _en('A urinary tract infection — a bacterial infection, most '
-        'often in the bladder, which is common in pregnancy because of '
-        'hormonal changes to the urinary tract.'),
-    reassurance: _en('Very treatable with a short course of antibiotics '
-        'that are safe in pregnancy — the main thing is not to ignore it.'),
-    howCommon: _en('Affects around 1 in 10 pregnant women at some point, '
-        'which is why a urine test is part of routine antenatal checks.'),
+    shortAnswer: _en("A urine infection is common in pregnancy and is treated "
+        "with antibiotics that are safe for you and your baby. Burning when "
+        "you pass urine is the usual sign. Fever, chills or pain in your back "
+        "mean it needs urgent treatment."),
+    whatItIs: _en("A urinary tract infection is an infection with bacteria, "
+        "most often in the bladder. It's common in pregnancy because hormones "
+        "change how your urinary tract works."),
+    reassurance: _en("It's easy to treat with a short course of antibiotics "
+        "that are safe in pregnancy. The main thing is not to ignore it."),
+    howCommon: _en("It affects around 1 in 10 pregnant women at some point. "
+        "That's why a urine test is part of your routine pregnancy checks."),
     symptoms: [
-      _en('Burning or pain when urinating.'),
-      _en('Needing to urinate more often, or urgently.'),
+      _en('Burning or pain when you pass urine.'),
+      _en('Needing to go more often, or urgently.'),
       _en('Cloudy or strong-smelling urine.'),
     ],
     callNow: [
-      _en('Fever, chills, or pain in your back or side — this can mean the '
-          'infection has reached your kidneys and needs urgent treatment.'),
+      _en('Fever, chills, or pain in your back or side. This can mean the '
+          'infection has reached your kidneys, and it needs urgent '
+          'treatment.'),
     ],
     justMonitor: [],
     testsToConfirm: [
-      _en('Urine routine/microscopy (R/M) test.'),
-      _en('Urine culture, to confirm the bacteria and the right '
-          'antibiotic.'),
+      _en('Urine routine and microscopy (R/M) test.'),
+      _en('Urine culture, to find the bacteria and the right antibiotic.'),
     ],
-    management: _en('A short course of pregnancy-safe antibiotics, finished '
-        'in full even once you feel better. Drinking more water and not '
-        'holding urine for long stretches helps prevent it recurring.'),
-    babyImpact: _en('Treated promptly, a UTI does not affect your baby. Left '
-        'untreated, it can spread and raise the chance of early labour, '
-        'which is why it is treated rather than waited out.'),
+    management: _en("A short course of pregnancy-safe antibiotics. Finish the "
+        "whole course, even once you feel better. Drinking more water and not "
+        "holding urine in for long helps stop it coming back."),
+    babyImpact: _en("Treated quickly, a urine infection doesn't affect your "
+        "baby. Left untreated, it can spread and raise the chance of early "
+        "labour. That's why it's treated rather than waited out."),
     faqs: [
       ConditionFaq(
-        question: _en('Why does pregnancy make this more likely?'),
-        answer: _en('Pregnancy hormones relax the tube from your kidneys to '
-            'your bladder, which lets bacteria linger more easily than '
-            'usual.'),
+        question: _en('Why is it more likely in pregnancy?'),
+        answer: _en('Pregnancy hormones relax the tubes from your kidneys to '
+            'your bladder, so bacteria can linger more easily than usual.'),
       ),
     ],
   ),
@@ -1223,36 +1449,40 @@ final List<ConditionEntry> kDiscomfortConditions = [
     plainLine: _en('Swollen veins around the back passage.'),
     group: ConditionGroup.discomforts,
     aliases: ['piles', 'hemorrhoids', 'haemorrhoids'],
-    whatItIs: _en('Piles are swollen veins around the anus, common in '
-        'pregnancy because of increased pressure and slower digestion.'),
-    reassurance: _en('Uncomfortable, but harmless, and usually settles on '
-        'its own or with simple measures — it does not need to be endured '
-        'quietly.'),
-    howCommon: _en('Very common in the third trimester, and after '
-        'delivery, because of the pushing involved in birth.'),
+    shortAnswer: _en("Piles are swollen veins around your back passage. "
+        "They're very common late in pregnancy and after birth. They're "
+        "uncomfortable but harmless, and fibre, water and a warm sitz bath "
+        "usually help."),
+    whatItIs: _en("Piles are swollen veins around the anus. They're common in "
+        "pregnancy because of extra pressure and slower digestion."),
+    reassurance: _en("They're uncomfortable, but harmless. They usually settle "
+        "on their own or with a few easy changes, and you don't have to put "
+        "up with them in silence."),
+    howCommon: _en('Very common in the third trimester, and after delivery '
+        'because of the pushing in birth.'),
     symptoms: [
-      _en('Itching, discomfort or swelling around the anus.'),
-      _en('Light bleeding, usually noticed on wiping.'),
+      _en('Itching, soreness or swelling around the anus.'),
+      _en('Light bleeding, usually noticed when you wipe.'),
     ],
     callNow: [
-      _en('Heavy bleeding, or a lump that becomes very painful and does not '
-          'settle.'),
+      _en("Heavy bleeding, or a lump that becomes very painful and doesn't "
+          "settle."),
     ],
     justMonitor: [],
     testsToConfirm: [
-      _en('Usually diagnosed by examination — no special test is normally '
-          'needed.'),
+      _en('Usually diagnosed by a quick examination. No special test is '
+          'normally needed.'),
     ],
-    management: _en('More fibre and water to avoid constipation, a warm '
-        'sitz bath, and a pregnancy-safe cream if your doctor suggests one. '
-        'Straining less on the toilet helps prevent it worsening.'),
-    babyImpact: _en('No effect on your baby at all — this is entirely about '
-        'your own comfort.'),
+    management: _en('More fibre and water to avoid constipation, a warm sitz '
+        'bath, and a pregnancy-safe cream if your doctor suggests one. '
+        'Straining less on the toilet helps stop them getting worse.'),
+    babyImpact: _en('No effect on your baby at all. This is only about your '
+        'comfort.'),
     faqs: [
       ConditionFaq(
-        question: _en('Will this go away after delivery?'),
-        answer: _en('For most women, yes, over the following weeks, though '
-            'the same fibre-and-water habits help it settle faster.'),
+        question: _en('Will they go away after delivery?'),
+        answer: _en('For most women, yes, over the following weeks. The same '
+            'fibre and water habits help them settle faster.'),
       ),
     ],
   ),
@@ -1262,35 +1492,40 @@ final List<ConditionEntry> kDiscomfortConditions = [
     plainLine: _en('Swollen, achy veins in the legs.'),
     group: ConditionGroup.discomforts,
     aliases: ['varicose veins', 'leg veins', 'swollen veins'],
-    whatItIs: _en('Enlarged, bulging veins, usually in the legs, caused by '
-        'increased blood volume and pressure from the growing womb.'),
-    reassurance: _en('Common, cosmetic more than medical in most cases, and '
-        'usually improves after delivery.'),
-    howCommon: _en('Affects a large share of pregnant women to some degree, '
-        'more often later in pregnancy and in later pregnancies.'),
+    shortAnswer: _en("Varicose veins are swollen, achy veins, usually in your "
+        "legs. They're common in pregnancy and usually get better after "
+        "birth. One leg that's suddenly swollen, red, hot or painful needs a "
+        "doctor the same day."),
+    whatItIs: _en('These are enlarged, bulging veins, usually in the legs. '
+        'They come from the extra blood in pregnancy and the pressure of '
+        'your growing womb.'),
+    reassurance: _en("They're common, more about looks than health in most "
+        "cases, and usually improve after delivery."),
+    howCommon: _en('Many pregnant women get them to some degree, more often '
+        'later in pregnancy and in later pregnancies.'),
     symptoms: [
-      _en('Visible bulging or twisted veins, usually in the legs.'),
+      _en('Bulging or twisted veins you can see, usually in your legs.'),
       _en('Aching, heaviness or mild swelling by the end of the day.'),
     ],
     callNow: [
-      _en('One leg becomes suddenly swollen, red, hot or painful — this '
-          'needs same-day attention to rule out a clot.'),
+      _en('One leg becomes suddenly swollen, red, hot or painful. This needs a '
+          'doctor the same day, to rule out a clot.'),
     ],
     justMonitor: [],
     testsToConfirm: [
       _en('Usually diagnosed by examination alone.'),
     ],
-    management: _en('Compression stockings, putting your feet up when '
-        'possible, and staying active with short walks rather than long '
-        'periods of standing or sitting still.'),
-    babyImpact: _en('No effect on your baby — this is about your own '
-        'comfort, and usually eases within a few months after delivery.'),
+    management: _en('Compression stockings, putting your feet up when you '
+        'can, and short walks rather than long spells of standing or sitting '
+        'still.'),
+    babyImpact: _en('No effect on your baby. This is about your comfort, and '
+        'it usually eases within a few months of delivery.'),
     faqs: [
       ConditionFaq(
-        question: _en('Are these dangerous?'),
-        answer: _en('Ordinary varicose veins are not dangerous. The one '
-            'thing to watch for is a leg that suddenly becomes hot, red and '
-            'painful, which is different and needs same-day care.'),
+        question: _en('Are they dangerous?'),
+        answer: _en("Ordinary varicose veins aren't dangerous. The one thing "
+            "to watch for is a leg that suddenly turns hot, red and painful. "
+            "That's different, and needs care the same day."),
       ),
     ],
   ),
@@ -1306,40 +1541,43 @@ final List<ConditionEntry> kSpecialistConditions = [
     plainLine: _en('Harmless lumps in the wall of the womb.'),
     group: ConditionGroup.specialist,
     aliases: ['fibroids', 'uterine fibroids'],
+    shortAnswer: _en("Fibroids are harmless lumps in the wall of the womb that "
+        "many women have without knowing. Most cause no problems in pregnancy "
+        "and are watched on your usual scans. Severe pain in one spot that "
+        "doesn't ease means calling your doctor."),
     whatItIs: _en('Fibroids are non-cancerous growths in the wall of the '
         'womb. Many women have them without knowing, and pregnancy can make '
-        'them grow slightly or cause discomfort.'),
-    reassurance: _en('Most fibroids in pregnancy cause no problems at all '
-        'and are simply monitored alongside your regular scans.'),
-    howCommon: _en('Found in roughly 1 in 10 pregnancies, more often as '
-        'maternal age rises.'),
+        'them grow a little or cause discomfort.'),
+    reassurance: _en("Most fibroids cause no problems in pregnancy. They're "
+        "checked alongside your regular scans."),
+    howCommon: _en('Found in roughly 1 in 10 pregnancies, more often as a '
+        "mother's age rises."),
     symptoms: [
-      _en('Often none — found incidentally on a scan.'),
-      _en('Localised abdominal pain, sometimes, as a fibroid grows or '
-          'outgrows its blood supply.'),
+      _en("Often none. They're found by chance on a scan."),
+      _en('Sometimes pain in one spot, as a fibroid grows or outgrows its '
+          'blood supply.'),
     ],
     callNow: [
-      _en('Severe, focused abdominal pain that does not ease.'),
+      _en("Severe pain in one spot of your tummy that doesn't ease."),
     ],
     justMonitor: [
-      _en('A fibroid found on scan with no pain — usually just tracked at '
-          'routine visits.'),
+      _en("A fibroid found on a scan with no pain. It's usually just tracked "
+          "at routine visits."),
     ],
     testsToConfirm: [
-      _en('Ultrasound, usually the one that found it in the first place.'),
+      _en('Ultrasound, usually the scan that found it.'),
     ],
-    management: _en('Mostly monitoring and pain relief if needed. Surgery is '
-        'not done during pregnancy except in rare emergencies — any '
-        'necessary treatment normally waits until afterwards.'),
-    babyImpact: _en('Most fibroids do not affect your baby. Depending on '
-        'size and position, some can affect the position your baby settles '
-        'into or the way you deliver, which your doctor will factor in '
-        'closer to term.'),
+    management: _en("Mostly monitoring, and pain relief if you need it. "
+        "Surgery isn't done in pregnancy except in rare emergencies. Any "
+        "treatment usually waits until after the birth."),
+    babyImpact: _en("Most fibroids don't affect your baby. Depending on size "
+        "and position, some can affect how your baby settles or how you "
+        "deliver. Your doctor will think about this closer to term."),
     faqs: [
       ConditionFaq(
         question: _en('Will I need surgery to remove it?'),
-        answer: _en('Not during pregnancy in almost all cases — this is '
-            'usually reviewed and decided afterwards, if at all.'),
+        answer: _en("Almost never during pregnancy. It's usually looked at "
+            "again after the birth, if at all."),
       ),
     ],
     pregSignal: PregCondition.fibroids,
@@ -1350,42 +1588,45 @@ final List<ConditionEntry> kSpecialistConditions = [
     plainLine: _en('Itching caused by the liver, usually worst on hands and feet.'),
     group: ConditionGroup.specialist,
     aliases: ['icp', 'cholestasis', 'itching pregnancy', 'liver itching'],
-    whatItIs: _en('Intrahepatic cholestasis of pregnancy is a liver '
+    shortAnswer: _en("ICP is a liver condition of pregnancy that causes "
+        "intense itching, usually on your palms and soles, with no rash. It's "
+        "managed with medicine and closer checks. Itching like this means "
+        "calling your doctor, not treating it at home."),
+    whatItIs: _en('Intrahepatic cholestasis of pregnancy (ICP) is a liver '
         'condition that causes intense itching, usually on the palms and '
         'soles, without a rash.'),
-    reassurance: _en('It is manageable with medicine and closer monitoring '
-        'through the rest of your pregnancy.'),
-    howCommon: _en('Affects roughly 1 in 100 to 1 in 200 pregnancies in '
-        'India, somewhat more than in Western countries.'),
+    reassurance: _en("It's managed with medicine and closer monitoring for the "
+        "rest of your pregnancy."),
+    howCommon: _en('It affects roughly 1 in 100 to 1 in 200 pregnancies in '
+        'India, a bit more than in Western countries.'),
     symptoms: [
-      _en('Intense itching, especially on palms and soles, often worse at '
-          'night, with no visible rash.'),
-      _en('Occasionally darker urine or pale stools.'),
+      _en('Intense itching, especially on your palms and soles, often worse '
+          'at night, with no rash you can see.'),
+      _en('Sometimes darker urine or pale stools.'),
     ],
     callNow: [
-      _en('Intense itching with no rash, especially worse at night — this '
-          'is the one skin symptom worth a call rather than home '
-          'treatment.'),
+      _en("Intense itching with no rash, especially if it's worse at night. "
+          "This is the one skin symptom to call about rather than treat at "
+          "home."),
     ],
     justMonitor: [],
     testsToConfirm: [
-      _en('Blood test for bile acid levels.'),
+      _en('A blood test for bile acids.'),
       _en('Liver function tests (LFTs).'),
     ],
-    management: _en('Medicine (ursodeoxycholic acid) to ease itching and '
-        'support your liver, more frequent monitoring, and often a planned '
-        'delivery a little earlier than your due date.'),
-    babyImpact: _en('ICP raises the chance of complications for your baby '
-        'later in pregnancy, which is why monitoring is closer and delivery '
-        'is often planned a little early rather than waiting to go into '
-        'labour naturally.'),
+    management: _en('Medicine (ursodeoxycholic acid) to ease the itching and '
+        'support your liver, more frequent checks, and often a planned '
+        'delivery a little before your due date.'),
+    babyImpact: _en("ICP raises the chance of problems for your baby later in "
+        "pregnancy. That's why checks are closer, and delivery is often "
+        "planned a little early rather than waiting for labour."),
     faqs: [
       ConditionFaq(
         question: _en('Is this just normal pregnancy itching?'),
-        answer: _en('Ordinary pregnancy itching is common and usually mild, '
-            'often with a rash. ICP itching is intense, worse at night, on '
-            'palms and soles, and without a rash — that combination is the '
-            'one to mention to your doctor.'),
+        answer: _en("Ordinary pregnancy itching is common and usually mild, "
+            "often with a rash. ICP itching is intense, worse at night, on "
+            "your palms and soles, and has no rash. That combination is the "
+            "one to tell your doctor about."),
       ),
     ],
     showMedicine: true,
@@ -1397,39 +1638,44 @@ final List<ConditionEntry> kSpecialistConditions = [
     plainLine: _en('A severe form of high blood pressure that affects blood and liver.'),
     group: ConditionGroup.specialist,
     aliases: ['hellp', 'hellp syndrome'],
-    whatItIs: _en('HELLP is a severe, fast-moving complication related to '
-        'preeclampsia, affecting your blood and liver. It is a medical '
-        'emergency.'),
-    reassurance: _en('It is rare, and hospitals recognise and act on it '
-        'quickly — the outcome depends on speed, which is why this page '
-        'points straight to urgent care.'),
-    howCommon: _en('Affects a small fraction of preeclampsia cases, most '
-        'often in the third trimester or shortly after delivery.'),
+    shortAnswer: _en("HELLP syndrome is a rare, severe condition linked to "
+        "preeclampsia that affects your blood and liver. It's an emergency. "
+        "Pain under your right ribs, new sickness or a severe headache, "
+        "especially with high blood pressure, means going to the emergency "
+        "department immediately."),
+    whatItIs: _en("HELLP is a severe, fast-moving complication linked to "
+        "preeclampsia. It affects your blood and liver, and it's a medical "
+        "emergency."),
+    reassurance: _en("It's rare, and hospitals recognise it and act quickly. "
+        "Speed matters most, which is why this page points you straight to "
+        "urgent care."),
+    howCommon: _en('It affects a small share of women with preeclampsia, most '
+        'often in the third trimester or soon after delivery.'),
     symptoms: [
-      _en('Pain under the ribs, usually on the right.'),
+      _en('Pain under your ribs, usually on the right.'),
       _en('Nausea or vomiting that feels different from earlier in '
           'pregnancy.'),
-      _en('Severe headache, or vision changes.'),
+      _en('A severe headache, or changes in your vision.'),
     ],
     callNow: [
-      _en('Any of the above, especially if you already have raised BP — go '
-          'to the emergency department immediately.'),
+      _en('Any of the above, especially if you already have high blood '
+          'pressure. Go to the emergency department immediately.'),
     ],
     justMonitor: [],
     testsToConfirm: [
-      _en('This is diagnosed in hospital, urgently, through blood tests for '
-          'liver enzymes, platelets and red blood cell breakdown.'),
+      _en("It's diagnosed urgently in hospital, with blood tests for liver "
+          "enzymes, platelets and the breakdown of red blood cells."),
     ],
-    management: _en('Hospital admission, close monitoring, and, in almost '
-        'all cases, prompt delivery, because delivery is what resolves it.'),
-    babyImpact: _en('This can affect your baby if not treated promptly, '
-        'which is why hospitals move quickly once it is suspected.'),
+    management: _en('A hospital stay, close monitoring and, in almost all '
+        'cases, prompt delivery, because delivery is what ends it.'),
+    babyImpact: _en("It can affect your baby if it isn't treated quickly. "
+        "That's why hospitals move fast once it's suspected."),
     faqs: [
       ConditionFaq(
         question: _en('Is this the same as preeclampsia?'),
-        answer: _en('It is closely related and can develop from it, but it '
-            'is more severe and specifically involves your blood and liver. '
-            'See the Preeclampsia page for the underlying condition.'),
+        answer: _en("It's closely linked and can develop from it, but it's "
+            "more severe and affects your blood and liver. The Preeclampsia "
+            "page explains the condition underneath."),
       ),
     ],
   ),
@@ -1439,39 +1685,42 @@ final List<ConditionEntry> kSpecialistConditions = [
     plainLine: _en('Blood vessels crossing the exit of the womb.'),
     group: ConditionGroup.specialist,
     aliases: ['vasa previa'],
-    whatItIs: _en('Vasa previa means unprotected fetal blood vessels are '
-        'lying near or across the birth canal, close to the cervix. It is '
-        'rare, and dangerous if it is not known about in advance.'),
-    reassurance: _en('Found ahead of time on a scan, it is very safely '
-        'managed with a planned early caesarean, well before labour '
-        'starts.'),
-    howCommon: _en('A rare finding, roughly 1 in 2,500 pregnancies, and '
-        'increasingly picked up on routine scans rather than in labour.'),
+    shortAnswer: _en("Vasa previa means some of your baby's blood vessels run "
+        "near or across the opening of the womb. It's rare. When it's found "
+        "on a scan, a planned caesarean before labour keeps your baby safe."),
+    whatItIs: _en("Vasa previa means some of your baby's blood vessels, "
+        "without their usual protection, lie near or across the birth canal, "
+        "close to the cervix. It's rare, and dangerous if it isn't known "
+        "about in advance."),
+    reassurance: _en("When it's found ahead of time on a scan, it's managed "
+        "very safely with a planned early caesarean, well before labour "
+        "starts."),
+    howCommon: _en("It's rare, roughly 1 in 2,500 pregnancies, and more and "
+        "more often found on routine scans rather than in labour."),
     symptoms: [
-      _en('Usually none — this is why it matters that it is looked for on '
-          'scan rather than waited for.'),
+      _en("Usually none. That's why it matters that it's looked for on a "
+          "scan."),
     ],
     callNow: [
-      _en('Painless vaginal bleeding, especially once your waters break — '
-          'go to hospital immediately.'),
+      _en('Bleeding from the vagina without pain, especially once your waters '
+          'break. Go to hospital immediately.'),
     ],
     justMonitor: [],
     testsToConfirm: [
       _en('Ultrasound with colour Doppler, usually at the mid-pregnancy '
           'scan.'),
     ],
-    management: _en('If found in advance: closer monitoring and a planned '
-        'caesarean before labour starts, timed to avoid labour altogether.'),
-    babyImpact: _en('If it is not known about and these vessels tear during '
-        'labour, it is extremely dangerous for your baby — which is exactly '
-        'why finding it on a scan beforehand changes the outcome so '
-        'completely.'),
+    management: _en("If it's found in advance: closer monitoring and a planned "
+        "caesarean before labour starts, timed to avoid labour altogether."),
+    babyImpact: _en("If it isn't known about and the vessels tear during "
+        "labour, it's extremely dangerous for your baby. That's why finding "
+        "it on a scan beforehand changes the outcome so completely."),
     faqs: [
       ConditionFaq(
-        question: _en('Can this be found on a normal scan?'),
-        answer: _en('Yes, with attention to the placenta and cord '
-            'insertion at your anomaly scan, which is why this is '
-            'increasingly caught in advance rather than during labour.'),
+        question: _en('Can a normal scan find it?'),
+        answer: _en("Yes, when the placenta and the place where the cord joins "
+            "it are looked at carefully at your anomaly scan. That's why it's "
+            "more and more often found in advance."),
       ),
     ],
   ),
@@ -1481,38 +1730,48 @@ final List<ConditionEntry> kSpecialistConditions = [
     plainLine: _en('Your blood type needs one injection to protect the baby.'),
     group: ConditionGroup.specialist,
     aliases: ['rh negative', 'rhesus negative', 'anti-d'],
-    whatItIs: _en('If your blood group is Rh negative and your baby\'s is Rh '
-        'positive, your body can develop antibodies against your baby\'s '
-        'blood — mainly a concern for a second or later pregnancy, not this '
-        'one, if managed.'),
-    reassurance: _en('This is well understood and very effectively '
-        'prevented with an injection — it is a routine part of care for Rh '
-        'negative mothers, not a rare complication.'),
-    howCommon: _en('Around 5 to 6 in 100 people in India are Rh negative, so '
-        'this is a routine, well-managed part of many antenatal files.'),
+    shortAnswer: _en("If your blood group is Rh negative, your body could make "
+        "antibodies against an Rh positive baby's blood. An anti-D injection "
+        "prevents this almost entirely. It's a routine part of your care."),
+    whatItIs: _en("If your blood group is Rh negative and your baby's is Rh "
+        "positive, your body can make antibodies against your baby's blood. "
+        "If it's managed, this is mainly a concern for a second or later "
+        "pregnancy, not this one."),
+    reassurance: _en("This is well understood and very well prevented with an "
+        "injection. It's a routine part of care for Rh negative mothers, not "
+        "a rare complication."),
+    howCommon: _en("Around 5 to 6 in 100 people in India are Rh negative, so "
+        "this is a routine, well-managed part of many pregnancy files."),
     symptoms: [
-      _en('No symptoms of your own — this is picked up from your blood '
-          'group test, not from how you feel.'),
+      _en("No symptoms. It's picked up from your blood group test, not from "
+          "how you feel."),
     ],
     callNow: [],
     justMonitor: [],
     testsToConfirm: [
       _en('Blood group and Rh typing, done early in pregnancy.'),
-      _en('Antibody screen, to check whether antibodies have already '
+      _en('An antibody screen, to check whether antibodies have already '
           'formed.'),
     ],
-    management: _en('An anti-D injection at around 28 weeks, and again '
-        'after delivery if your baby turns out to be Rh positive — this '
-        'prevents antibodies from forming in the first place.'),
-    babyImpact: _en('Untreated, this can affect a future pregnancy if '
-        'antibodies form. The anti-D injection, given on schedule, prevents '
-        'that almost entirely.'),
+    management: _en('An anti-D injection at around 28 weeks, and again after '
+        'delivery if your baby turns out to be Rh positive. This stops '
+        'antibodies forming in the first place.'),
+    babyImpact: _en("Without treatment, this can affect a future pregnancy if "
+        "antibodies form. The anti-D injection, given on time, prevents that "
+        "almost entirely."),
     faqs: [
       ConditionFaq(
         question: _en('Does this affect this pregnancy?'),
-        answer: _en('Usually not — the concern is mainly for a future '
-            'pregnancy, which is exactly what the anti-D injection is '
-            'given to prevent.'),
+        answer: _en("Usually not. The concern is mainly for a future "
+            "pregnancy, and that's what the anti-D injection prevents."),
+      ),
+      // Added 2026-09-29: the same fact the bleeding read gives, where an Rh
+      // negative mother will look for it.
+      ConditionFaq(
+        question: _en('What if I bleed or have a fall?'),
+        answer: _en("Tell your doctor the same day. After bleeding, a blow to "
+            "your tummy or some procedures, you may need an extra anti-D "
+            "injection, and its timing matters."),
       ),
     ],
     showMedicine: true,
@@ -1530,6 +1789,10 @@ final List<ConditionEntry> kSpecialistConditions = [
 //  monitoring on top of what she already does. Two near-empty pages each
 //  saying "talk to your specialist" would have been the padding the spec
 //  explicitly warns against.
+//
+//  2026-09-29 (gap analysis, Appendix A): diabetes from before pregnancy and
+//  skin conditions like psoriasis get their own questions here, still on the
+//  one page and still led by her doctor.
 final List<ConditionEntry> kPreExistingConditions = [
   ConditionEntry(
     id: 'pre_existing',
@@ -1541,55 +1804,86 @@ final List<ConditionEntry> kPreExistingConditions = [
       'epilepsy',
       'pre-existing condition',
       'chronic condition pregnancy',
+      'type 2 diabetes',
+      'diabetes before pregnancy',
+      'psoriasis',
+      'eczema',
+      'chronic illness',
     ],
-    whatItIs: _en('If you already live with a condition like type 1 '
-        'diabetes or epilepsy, pregnancy does not reset that care — it adds '
-        'to it. The specialist who already treats you stays in charge; '
-        'pregnancy mainly means more frequent monitoring and, sometimes, a '
-        'review of which medicines are safest now.'),
-    reassurance: _en('Millions of women with pre-existing conditions have '
-        'straightforward pregnancies. The extra visits are there to keep it '
-        'that way, not because something is expected to go wrong.'),
-    howCommon: _en('A meaningful share of pregnancies involve an existing '
-        'condition the mother already had before conceiving, which is why '
-        'joint care between your specialist and your obstetrician is a '
-        'routine pathway, not an unusual one.'),
+    shortAnswer: _en("If you already live with a condition like diabetes, "
+        "epilepsy or psoriasis, pregnancy adds to your care rather than "
+        "replacing it. The specialist who knows you stays in charge, "
+        "alongside your obstetrician. Never stop or change a medicine on "
+        "your own."),
+    whatItIs: _en("If you already live with a condition like type 1 diabetes "
+        "or epilepsy, pregnancy doesn't reset your care. It adds to it. The "
+        "specialist who already treats you stays in charge. Pregnancy mainly "
+        "means more frequent checks and, sometimes, a review of which "
+        "medicines are safest now."),
+    reassurance: _en("Many women with a condition from before have "
+        "straightforward pregnancies. The extra visits are there to keep it "
+        "that way, not because something is expected to go wrong."),
+    howCommon: _en("Many pregnancies involve a condition the mother already "
+        "had before conceiving. So joint care between your specialist and "
+        "your obstetrician is a routine path, not an unusual one."),
     symptoms: [
-      _en('This depends entirely on your specific condition — the '
-          'symptoms you already know to watch for still apply.'),
+      _en('This depends on your condition. The symptoms you already know to '
+          'watch for still apply.'),
     ],
     callNow: [
-      _en('Any symptom that would normally have sent you to your '
-          'specialist before pregnancy still should now — pregnancy does '
-          'not change that threshold.'),
+      _en("Any symptom that would have sent you to your specialist before "
+          "pregnancy should still do so now. Pregnancy doesn't change that."),
     ],
     justMonitor: [],
     testsToConfirm: [
       _en('Whatever tests already track your condition, done more often in '
-          'pregnancy — blood sugar for diabetes, medicine levels for '
-          'epilepsy, and so on.'),
+          'pregnancy: blood sugar for diabetes, medicine levels for epilepsy, '
+          'and so on.'),
     ],
-    management: _en('Joint care between the specialist who already treats '
-        'you and your obstetrician. Some medicines are reviewed and '
-        'sometimes changed for pregnancy-safer alternatives — never stop or '
-        'switch anything yourself first. Extra scans and check-ups are '
-        'usually added on top of your regular antenatal schedule.'),
-    babyImpact: _en('Well-controlled pre-existing conditions have '
-        'reasonable outcomes for most babies. The added monitoring exists '
-        'specifically to catch anything early, both for you and your '
-        'baby.'),
+    management: _en("Joint care between the specialist who already treats you "
+        "and your obstetrician. Some medicines are reviewed, and sometimes "
+        "changed for ones that are safer in pregnancy. Never stop or switch "
+        "anything yourself first. Extra scans and check-ups are usually added "
+        "to your regular pregnancy visits."),
+    babyImpact: _en("When a condition you had before is well controlled, most "
+        "babies do well. The extra checks are there to catch anything early, "
+        "for you and your baby."),
     faqs: [
       ConditionFaq(
         question: _en('Should I keep seeing my regular specialist?'),
-        answer: _en('Yes — pregnancy adds an obstetrician to your care, it '
-            'does not replace the specialist who already knows your '
-            'condition.'),
+        answer: _en("Yes. Pregnancy adds an obstetrician to your care. It "
+            "doesn't replace the specialist who already knows your "
+            "condition."),
       ),
       ConditionFaq(
         question: _en('Do I need to change my medicines?'),
-        answer: _en('Possibly — some medicines are reviewed for pregnancy, '
-            'but this is always a specialist decision. Do not stop or '
-            'change anything before that conversation.'),
+        answer: _en("Possibly. Some medicines are reviewed for pregnancy, but "
+            "that's always your specialist's decision. Don't stop or change "
+            "anything before that conversation."),
+      ),
+      // Added 2026-09-29 (gap analysis, Appendix A, "Diabetic Diet").
+      ConditionFaq(
+        question: _en('I had diabetes before I got pregnant. What changes?'),
+        answer: _en("Type 1 or type 2 diabetes from before pregnancy needs "
+            "close care, so your diabetes doctor and obstetrician will work "
+            "together. You'll usually check your sugar more often, and your "
+            "doctor may change your tablets to insulin or adjust your doses as "
+            "the weeks go on. You'll be offered extra scans, including a "
+            "detailed scan of your baby's heart, and an eye check for you. A "
+            "higher dose of folic acid is often advised early on. Keep every "
+            "appointment, and never change a dose on your own."),
+      ),
+      // Added 2026-09-29 (gap analysis, Appendix A, "Psoriasis During
+      // Pregnancy").
+      ConditionFaq(
+        question: _en('I have psoriasis or eczema. Are my creams safe?'),
+        answer: _en("Some are and some aren't, so show every cream, tablet and "
+            "injection you use to your doctor or skin specialist early on. "
+            "Some strong psoriasis treatments must be stopped before or during "
+            "pregnancy, and many simple creams are fine to keep using. "
+            "Psoriasis calms down in pregnancy for some women and flares for "
+            "others, and it can flare after birth. Don't stop a treatment "
+            "suddenly without asking."),
       ),
     ],
     showMedicine: true,
@@ -1597,8 +1891,12 @@ final List<ConditionEntry> kPreExistingConditions = [
 ];
 
 // -----------------------------------------------------------------------------
-//  Seasonal & infections — 2, brief
+//  Seasonal & infections — 2, brief; five infections added 2026-09-29
 // -----------------------------------------------------------------------------
+//  ⚠️ THE NEW FIVE (gap analysis, Complications, "infections that matter in
+//  India"): toxoplasmosis, hepatitis B, HIV testing at booking, malaria and
+//  typhoid. None carries a `pregSignal`: `PregCondition` has no counterpart,
+//  and a null signal is the honest answer (see the field's note above).
 final List<ConditionEntry> kSeasonalConditions = [
   ConditionEntry(
     id: 'covid_pregnancy',
@@ -1606,44 +1904,46 @@ final List<ConditionEntry> kSeasonalConditions = [
     plainLine: _en('Covid while pregnant, and what changes.'),
     group: ConditionGroup.seasonal,
     aliases: ['covid', 'coronavirus', 'covid-19'],
-    whatItIs: _en('Catching COVID-19 while pregnant. For most vaccinated, '
-        'otherwise healthy women it behaves much like it would outside '
-        'pregnancy.'),
-    reassurance: _en('The large majority of pregnant women who get COVID '
-        'recover at home with rest and fluids, exactly as anyone else '
-        'would.'),
-    howCommon: _en('Follows the same patterns as the wider population, with '
-        'most cases mild, especially in vaccinated women.'),
+    shortAnswer: _en("For most vaccinated, healthy women, COVID in pregnancy "
+        "is much like COVID at any other time: rest, fluids and paracetamol "
+        "at home. Breathlessness, chest pain or a low oxygen level means "
+        "calling your doctor now."),
+    whatItIs: _en("This is catching COVID-19 while you're pregnant. For most "
+        "vaccinated, otherwise healthy women, it behaves much as it would "
+        "outside pregnancy."),
+    reassurance: _en('Most pregnant women who get COVID recover at home with '
+        'rest and fluids, as anyone else would.'),
+    howCommon: _en("It follows the same patterns as for everyone else, with "
+        "most cases mild, especially in vaccinated women."),
     symptoms: [
-      _en('Fever, cough, sore throat, body aches — the same symptoms as '
-          'anyone else.'),
+      _en('Fever, cough, sore throat and body aches, the same as anyone '
+          'else.'),
       _en('Loss of taste or smell, in some cases.'),
     ],
     callNow: [
       _en('Breathlessness or chest pain.'),
-      _en('Oxygen saturation below 94% on a pulse oximeter, if you have '
-          'one.'),
-      _en('Reduced movement from your baby.'),
+      _en('An oxygen level below 94% on a pulse oximeter, if you have one.'),
+      _en('Your baby moving less than usual.'),
     ],
     justMonitor: [
-      _en('Mild fever, cough or sore throat with normal breathing — rest, '
-          'fluids and paracetamol as usual, and telling your doctor at '
-          'your next contact.'),
+      _en('Mild fever, cough or sore throat with normal breathing. Rest, '
+          'fluids and paracetamol as usual, and tell your doctor at your next '
+          'contact.'),
     ],
     testsToConfirm: [
       _en('RT-PCR or rapid antigen test.'),
     ],
-    management: _en('Rest, fluids, and paracetamol for fever, same as '
+    management: _en('Rest, fluids, and paracetamol for fever, the same as '
         'outside pregnancy. Vaccination is recommended in pregnancy and '
         'lowers the chance of severe illness.'),
-    babyImpact: _en('Most babies are unaffected when the mother has mild '
-        'COVID. Severe illness in the mother is what carries added risk, '
-        'which is why breathlessness on this page is a call-now sign.'),
+    babyImpact: _en("Most babies are unaffected when their mother has mild "
+        "COVID. Severe illness in the mother is what adds risk, which is why "
+        "breathlessness on this page means calling now."),
     faqs: [
       ConditionFaq(
         question: _en('Is the vaccine safe in pregnancy?'),
-        answer: _en('Yes — it is recommended in pregnancy and lowers the '
-            'chance of severe illness for you.'),
+        answer: _en("Yes. It's recommended in pregnancy and lowers the chance "
+            "of severe illness."),
       ),
     ],
     showReadMore: true,
@@ -1654,43 +1954,358 @@ final List<ConditionEntry> kSeasonalConditions = [
     plainLine: _en('Dengue while pregnant, and what changes.'),
     group: ConditionGroup.seasonal,
     aliases: ['dengue', 'dengue fever'],
-    whatItIs: _en('A mosquito-borne viral fever. In pregnancy it needs '
-        'closer monitoring than usual because of its effect on platelets '
-        'and fluid balance.'),
-    reassurance: _en('Most cases are managed successfully with monitoring '
-        'and supportive care — the key is not missing the warning signs.'),
-    howCommon: _en('Follows local seasonal outbreaks, same as the wider '
-        'population — more common in the monsoon and post-monsoon months in '
-        'most of India.'),
+    shortAnswer: _en("Dengue is a fever spread by mosquitoes. In pregnancy "
+        "it's watched more closely because it can lower your platelets. Use "
+        "paracetamol for the fever, never ibuprofen or aspirin, and call your "
+        "doctor about any bleeding, severe pain or vomiting."),
+    whatItIs: _en("Dengue is a viral fever spread by mosquitoes. In pregnancy "
+        "it needs closer monitoring than usual because of how it affects your "
+        "platelets and fluid balance."),
+    reassurance: _en('Most cases are managed well with monitoring and '
+        'supportive care. What matters is not missing the warning signs.'),
+    howCommon: _en("It follows local seasonal outbreaks, the same as for "
+        "everyone else. In most of India it's more common in and just after "
+        "the monsoon."),
     symptoms: [
-      _en('High fever, severe headache, pain behind the eyes.'),
+      _en('High fever, severe headache, and pain behind your eyes.'),
       _en('Joint and muscle pain, and a rash in some cases.'),
     ],
     callNow: [
-      _en('Bleeding from gums or nose, or bruising easily.'),
-      _en('Severe abdominal pain, persistent vomiting.'),
-      _en('Reduced urination, or feeling faint.'),
+      _en('Bleeding from your gums or nose, or bruising easily.'),
+      _en("Severe tummy pain, or vomiting that won't stop."),
+      _en('Passing less urine, or feeling faint.'),
     ],
     justMonitor: [],
     testsToConfirm: [
       _en('NS1 antigen test, in the first few days of fever.'),
-      _en('Dengue IgM/IgG antibody test, later in the illness.'),
-      _en('Platelet count, tracked over the illness.'),
+      _en('Dengue IgM and IgG antibody test, later in the illness.'),
+      _en('Platelet count, tracked through the illness.'),
     ],
-    management: _en('Rest, fluids, and paracetamol for fever — never '
-        'ibuprofen or aspirin, which raise bleeding risk. Platelet counts '
-        'are tracked closely, and hospital admission is common for closer '
-        'monitoring in pregnancy even for otherwise mild cases.'),
-    babyImpact: _en('Severe dengue can affect a pregnancy, which is why '
-        'admission for monitoring is offered more readily in pregnancy than '
-        'it might be outside it.'),
+    management: _en("Rest, fluids, and paracetamol for fever. Never ibuprofen "
+        "or aspirin, which raise the risk of bleeding. Platelet counts are "
+        "tracked closely, and in pregnancy a hospital stay for closer "
+        "monitoring is common, even for otherwise mild cases."),
+    babyImpact: _en("Severe dengue can affect a pregnancy. That's why a "
+        "hospital stay for monitoring is offered more readily in pregnancy "
+        "than outside it."),
     faqs: [
       ConditionFaq(
         question: _en('Can I take paracetamol for the fever?'),
-        answer: _en('Yes, paracetamol is the usual choice. Avoid ibuprofen '
-            'and aspirin, which can increase bleeding risk in dengue.'),
+        answer: _en('Yes, paracetamol is the usual choice. Avoid ibuprofen and '
+            'aspirin, which can raise the risk of bleeding in dengue.'),
+      ),
+      // Added 2026-09-29, beside the new aspirin answer on Preeclampsia: the
+      // two pages must not leave her holding opposite instructions.
+      ConditionFaq(
+        question: _en('I take low-dose aspirin for my pregnancy. What now?'),
+        answer: _en("Tell your doctor straight away that you have dengue or a "
+            "fever. Don't stop or carry on with the aspirin until they "
+            "tell you which."),
       ),
     ],
+  ),
+  ConditionEntry(
+    id: 'malaria_pregnancy',
+    name: _en('Malaria in pregnancy'),
+    plainLine: _en('A mosquito fever with chills, treated quickly in pregnancy.'),
+    group: ConditionGroup.seasonal,
+    aliases: ['malaria', 'mosquito fever', 'fever with chills'],
+    shortAnswer: _en("Malaria is a fever spread by mosquitoes, often with "
+        "shivering and chills. In pregnancy it can become serious faster, so "
+        "a fever with chills needs a blood test the same day. It's treated "
+        "with medicines that are safe in pregnancy."),
+    whatItIs: _en("Malaria is an infection passed on by mosquito bites. It "
+        "causes fever that often comes with shivering and chills. Pregnancy "
+        "lowers your natural protection a little, so it can become severe "
+        "more quickly than usual."),
+    reassurance: _en("It's treatable, and there are malaria medicines that are "
+        "safe in pregnancy. Testing quickly and starting treatment early "
+        "makes the biggest difference."),
+    howCommon: _en("Malaria is still found in many parts of India, most of all "
+        "in forest and tribal areas and in and after the monsoon. It's less "
+        "common in big cities, but still seen."),
+    symptoms: [
+      _en('Fever, often with shivering, chills and sweating.'),
+      _en('Headache, body ache, and feeling very tired.'),
+      _en('Nausea or vomiting.'),
+    ],
+    callNow: [
+      _en('A fever, especially with chills, if you live in or have visited an '
+          'area with malaria. Get a blood test the same day.'),
+      _en('Confusion, fits, extreme drowsiness, breathlessness, yellow eyes '
+          'or passing very little urine. Go to hospital immediately.'),
+      _en('Your baby moving less than usual.'),
+    ],
+    justMonitor: [],
+    testsToConfirm: [
+      _en('A rapid malaria test (RDT) or a blood smear, usually the same '
+          'day.'),
+      _en('A blood count, and sometimes sugar and liver tests, because '
+          'malaria can lower your haemoglobin and your blood sugar.'),
+    ],
+    management: _en("Malaria medicine chosen for your stage of pregnancy, "
+        "taken as a full course. Paracetamol for fever, and plenty of fluids. "
+        "Severe malaria is treated in hospital with injections. Sleeping "
+        "under a mosquito net, ideally one treated with insecticide, helps "
+        "stop it happening again."),
+    babyImpact: _en("If it isn't treated, malaria in pregnancy can lead to "
+        "anaemia, a smaller baby or early labour. Treated quickly, most "
+        "mothers and babies do well."),
+    faqs: [
+      ConditionFaq(
+        question: _en('Are malaria medicines safe in pregnancy?'),
+        answer: _en("Yes. There are malaria medicines that are safe at each "
+            "stage of pregnancy, and your doctor chooses the right one for "
+            "your weeks. Untreated malaria is far riskier for you and your "
+            "baby than the medicine."),
+      ),
+      ConditionFaq(
+        question: _en('How can I avoid mosquito bites?'),
+        answer: _en("Sleep under a mosquito net, keep screens on windows, wear "
+            "long sleeves in the evening, and don't let water stand around "
+            "the house. Ask your doctor which repellent to use on your "
+            "skin."),
+      ),
+    ],
+  ),
+  ConditionEntry(
+    id: 'typhoid_pregnancy',
+    name: _en('Typhoid in pregnancy'),
+    plainLine: _en('A fever from food or water that was not clean.'),
+    group: ConditionGroup.seasonal,
+    aliases: ['typhoid', 'enteric fever', 'widal'],
+    shortAnswer: _en("Typhoid is a fever caught from food or water that has "
+        "been contaminated. It builds up over several days and needs "
+        "antibiotics, which your doctor chooses to be safe in pregnancy. A "
+        "high fever in pregnancy is a reason to call your doctor the same "
+        "day."),
+    whatItIs: _en("Typhoid (enteric fever) is an infection with bacteria that "
+        "you catch from contaminated food or water. The fever usually rises "
+        "over several days, and can come with stomach pain, headache and "
+        "loss of appetite."),
+    reassurance: _en("It's treatable with antibiotics, and there are ones that "
+        "are safe in pregnancy. Treated early, most women recover fully."),
+    howCommon: _en("Typhoid is still common in India, especially where "
+        "drinking water may not be safe, and more so in the monsoon."),
+    symptoms: [
+      _en('A fever that climbs over several days.'),
+      _en('Headache, weakness and body ache.'),
+      _en('Stomach pain, constipation or loose motions, and loss of '
+          'appetite.'),
+    ],
+    callNow: [
+      _en('A high fever, especially if it lasts or keeps climbing. Call your '
+          'doctor the same day.'),
+      _en("Severe tummy pain, vomiting that won't stop, blood in your stools, "
+          "or feeling confused. Go to hospital immediately."),
+      _en('Your baby moving less than usual.'),
+    ],
+    justMonitor: [],
+    testsToConfirm: [
+      _en('A blood culture, which is the most reliable test in the first '
+          'week.'),
+      _en('The Widal test is still widely used in India, but on its own it '
+          'can mislead. Your doctor reads it alongside your symptoms and '
+          'other tests.'),
+    ],
+    management: _en("Antibiotics chosen to be safe in pregnancy, taken as a "
+        "full course even once you feel better. Plenty of fluids, paracetamol "
+        "for fever, and light food you can manage. Some women need a short "
+        "hospital stay for a drip."),
+    babyImpact: _en("A high fever and dehydration can raise the chance of "
+        "early labour, which is why typhoid is treated quickly. Treated in "
+        "time, most babies aren't affected."),
+    faqs: [
+      ConditionFaq(
+        question: _en('Can I have the typhoid vaccine while pregnant?'),
+        answer: _en('Ask your doctor. It depends on the type of vaccine and '
+            'how likely you are to be exposed.'),
+      ),
+      ConditionFaq(
+        question: _en('How can I avoid it?'),
+        answer: _en("Drink boiled or filtered water, eat food that's freshly "
+            "cooked and hot, and wash your hands before eating. Take care "
+            "with cut fruit, chutneys and street food that may have been "
+            "washed in unsafe water."),
+      ),
+    ],
+  ),
+  ConditionEntry(
+    id: 'toxoplasmosis',
+    name: _en('Toxoplasmosis'),
+    plainLine: _en('An infection from soil, cat litter or undercooked meat.'),
+    group: ConditionGroup.seasonal,
+    aliases: ['toxoplasmosis', 'toxo', 'cat litter', 'torch test'],
+    shortAnswer: _en("Toxoplasmosis is an infection caught from undercooked "
+        "meat, unwashed vegetables, soil or cat faeces. Most people have no "
+        "symptoms, but a first infection in pregnancy can reach the baby. "
+        "That's why the advice on meat, vegetables and cats exists."),
+    whatItIs: _en("Toxoplasmosis is caused by a tiny parasite found in soil, "
+        "in cat faeces and in undercooked meat. Most people who catch it feel "
+        "nothing, or have a mild illness like flu. It matters in pregnancy "
+        "because a first infection can pass to your baby."),
+    reassurance: _en("Many women had it before pregnancy without knowing, and "
+        "that usually protects this baby. A few food and hygiene habits "
+        "make catching it much less likely."),
+    howCommon: _en("A new infection during pregnancy is uncommon. Testing "
+        "everyone isn't routine in India; your doctor tests if there's a "
+        "reason to."),
+    symptoms: [
+      _en('Usually none.'),
+      _en('Sometimes a mild fever, tiredness, aches or swollen glands in your '
+          'neck, like a mild flu.'),
+    ],
+    callNow: [
+      _en('A fever or flu-like illness with swollen glands in your neck. Call '
+          'your doctor so they can decide whether to test.'),
+    ],
+    justMonitor: [],
+    testsToConfirm: [
+      _en("A blood test for toxoplasma antibodies (IgG and IgM), sometimes as "
+          "part of a TORCH panel."),
+      _en("If a new infection is suspected, more tests and detailed scans, "
+          "planned by your doctor. One positive result often doesn't mean a "
+          "new infection, so ask your doctor to explain it."),
+    ],
+    management: _en("If a new infection is confirmed in pregnancy, your doctor "
+        "may prescribe medicine to lower the chance of it reaching your baby, "
+        "and plan extra scans. Prevention is the main thing: cook meat until "
+        "no pink is left, wash fruit and vegetables well, wear gloves for "
+        "gardening, and let someone else clean the cat's litter."),
+    babyImpact: _en("A first infection in pregnancy doesn't always pass to "
+        "your baby. When it does, it can affect the eyes and brain, which is "
+        "why a confirmed new infection is treated and followed with scans."),
+    faqs: [
+      ConditionFaq(
+        question: _en('Do I have to give away my cat?'),
+        answer: _en("No. Let someone else clean the litter every day, or wear "
+            "gloves and wash your hands afterwards. Keep your cat indoors if "
+            "you can, and don't feed it raw meat."),
+      ),
+      ConditionFaq(
+        question: _en('My TORCH test is positive. Is my baby infected?'),
+        answer: _en("Usually not. A positive IgG often means an old infection "
+            "that protects you. Ask your doctor to explain your result before "
+            "you act on it."),
+      ),
+    ],
+  ),
+  ConditionEntry(
+    id: 'hepatitis_b',
+    name: _en('Hepatitis B in pregnancy'),
+    plainLine: _en('A liver virus your baby can be protected from at birth.'),
+    group: ConditionGroup.seasonal,
+    aliases: ['hepatitis b', 'hep b', 'hbsag', 'hbv'],
+    shortAnswer: _en("Hepatitis B is a liver virus that can pass to a baby "
+        "around birth. Every pregnant woman is tested for it at booking. If "
+        "you have it, your baby gets a vaccine and an antibody injection soon "
+        "after birth, which protects most babies."),
+    whatItIs: _en("Hepatitis B is a virus that affects the liver. Many people "
+        "carry it for years without symptoms. In pregnancy, the main concern "
+        "is that it can pass to your baby around the time of birth."),
+    reassurance: _en("Passing it on is largely preventable. Your baby is given "
+        "the hepatitis B vaccine and an antibody injection (HBIG) soon after "
+        "birth, and this protects most babies."),
+    howCommon: _en("Studies in India find it in roughly 1 to 3 in 100 "
+        "pregnant women. That's why the HBsAg test is part of your routine "
+        "booking blood tests."),
+    symptoms: [
+      _en('Usually none. Most women find out from the booking blood test.'),
+      _en('Sometimes tiredness, poor appetite, or yellow eyes and skin '
+          '(jaundice).'),
+    ],
+    callNow: [
+      _en('Yellow eyes or skin, dark urine, or pale stools.'),
+      _en('Severe tiredness with vomiting, or pain under your right ribs.'),
+    ],
+    justMonitor: [],
+    testsToConfirm: [
+      _en('HBsAg blood test at your first booking visit.'),
+      _en("If it's positive, more blood tests (such as viral load and liver "
+          "tests) to see how active the virus is."),
+    ],
+    management: _en("Your obstetrician works with a liver specialist or "
+        "physician. If the amount of virus is high, you may be offered an "
+        "antiviral tablet in the third trimester to lower the chance of "
+        "passing it on. Your baby gets the hepatitis B vaccine and HBIG, "
+        "ideally within 12 hours of birth, then the rest of the vaccine "
+        "course. Your partner and family can be tested and vaccinated too."),
+    babyImpact: _en("With the vaccine and HBIG at birth, most babies are "
+        "protected. Your baby will usually have a blood test after the "
+        "vaccine course to check."),
+    faqs: [
+      ConditionFaq(
+        question: _en('Can I breastfeed?'),
+        answer: _en("Yes. Breastfeeding is considered safe once your baby has "
+            "had the vaccine and HBIG. If your nipples crack and bleed, ask "
+            "your doctor."),
+      ),
+      ConditionFaq(
+        question: _en('Will I need a caesarean because of this?'),
+        answer: _en("No. Hepatitis B on its own isn't a reason for a "
+            "caesarean. How you deliver is decided as usual."),
+      ),
+    ],
+    showMedicine: true,
+  ),
+  ConditionEntry(
+    id: 'hiv_testing',
+    name: _en('HIV testing in pregnancy'),
+    plainLine: _en("The routine booking test, and what happens if it's positive."),
+    group: ConditionGroup.seasonal,
+    aliases: ['hiv', 'aids', 'hiv test', 'art'],
+    shortAnswer: _en("An HIV test is part of the routine booking blood tests "
+        "for every pregnant woman in India, done with your consent. If it's "
+        "positive, free daily treatment keeps you well and makes it very "
+        "unlikely your baby gets HIV. Your result is kept confidential."),
+    whatItIs: _en("HIV is a virus that affects the body's defences (the "
+        "immune system). It can pass from a mother to her baby in pregnancy, "
+        "at birth or through breastfeeding. Testing everyone at booking means "
+        "anyone who has it can start treatment early."),
+    reassurance: _en("Being tested is routine and doesn't mean anyone suspects "
+        "anything. If a result is positive, treatment works very well. With "
+        "it, most mothers stay healthy and most babies are born without "
+        "HIV."),
+    howCommon: _en("HIV is uncommon in pregnant women in India, well under 1 "
+        "in 100. The test is offered to everyone because treatment works best "
+        "when it starts early."),
+    symptoms: [
+      _en('Usually none. Most people with HIV feel well for years, which is '
+          'why testing matters.'),
+    ],
+    callNow: [
+      _en("You're on treatment and can't take your tablets for any reason. "
+          "Call your doctor or ART centre."),
+    ],
+    justMonitor: [],
+    testsToConfirm: [
+      _en('An HIV test at your booking visit, done with your consent and a '
+          'short talk (counselling) first.'),
+      _en("If it's positive, confirmation tests and a viral load test."),
+    ],
+    management: _en("Treatment is daily antiretroviral tablets (ART), started "
+        "as soon as possible and continued through pregnancy, birth and "
+        "afterwards. It's free at government ART centres under the national "
+        "programme. Your baby is given medicine after birth and tested over "
+        "the following months. Your doctor will talk with you about "
+        "feeding."),
+    babyImpact: _en("Without treatment, HIV can pass to a baby. With treatment "
+        "that keeps the virus low, the chance becomes very small."),
+    faqs: [
+      ConditionFaq(
+        question: _en('Who will know my result?'),
+        answer: _en("Your result is confidential and shared only with the "
+            "people caring for you. Telling your partner or family is your "
+            "choice, and counsellors can help if you want it."),
+      ),
+      ConditionFaq(
+        question: _en('Can I say no to the test?'),
+        answer: _en("Yes, it's your choice. Doctors recommend it because it "
+            "protects your baby if the result is positive, and it's free at "
+            "government centres."),
+      ),
+    ],
+    showMedicine: true,
   ),
 ];
 

@@ -221,6 +221,8 @@ PvRead pvReadFromCondition(
       kicker: c.group.title,
       title: c.name,
       teaser: c.plainLine,
+      // Pregnancy warmth pass, 2026-09-29 (docs/PREG-VOICE.md §3).
+      shortAnswer: c.shortAnswer,
       scaleSetter: c.reassurance,
       author: _desk,
       authorRole: const LocalizedText(en: 'Conditions', hi: 'Sthitiyaan'),

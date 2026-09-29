@@ -57,9 +57,11 @@ final PvChecklist kConditionQuestionsChecklist = PvChecklist(
   id: 'condition_questions',
   eyebrow: 'Before your appointment',
   title: 'What to ask about your condition',
-  intro: 'Tick what matters to you and take the list in with you. These are '
-      'questions your doctor is used to answering — none of them is a test, '
-      'and none of them will annoy anybody.',
+  // Rewritten 2026-09-29 to docs/PREG-VOICE.md. Item ids are persisted and
+  // unchanged.
+  intro: 'Tick what matters to you and take the list in with you. Your '
+      "doctor is used to answering all of these, and none of them is a silly "
+      'question.',
   shareHeader: 'What to ask my doctor',
   subject: _addedConditionName,
   subjectTitle: (s) => 'What to ask about your $s',
@@ -70,9 +72,9 @@ final PvChecklist kConditionQuestionsChecklist = PvChecklist(
       PvChecklistItem('und_what',
           'In plain words, what does this mean for me?'),
       PvChecklistItem('und_why',
-          'Do we know why it happened, or is that usually not knowable?'),
+          'Do we know why this happened, or is that usually impossible to know?'),
       PvChecklistItem('und_serious',
-          'How worried should I actually be, on a normal day?'),
+          'How worried should I be, day to day?'),
       PvChecklistItem('und_common',
           'How often do you see this?'),
       PvChecklistItem('und_temp',
@@ -85,7 +87,7 @@ final PvChecklist kConditionQuestionsChecklist = PvChecklist(
       PvChecklistItem('plan_tests',
           'Which tests will you repeat, and how often?'),
       PvChecklistItem('plan_working',
-          'How will we know whether it is working?'),
+          "How will we know if it's working?"),
       PvChecklistItem('plan_choices',
           'Is there more than one way to manage this?'),
       PvChecklistItem('plan_scans',
@@ -94,7 +96,7 @@ final PvChecklist kConditionQuestionsChecklist = PvChecklist(
 
     PvChecklistGroup('Medicines and daily life', [
       PvChecklistItem('med_what',
-          'What exactly am I taking, and what is it doing?'),
+          'What exactly am I taking, and what does it do?'),
       PvChecklistItem('med_when',
           'When should I take it, and with what?'),
       PvChecklistItem('med_side',
@@ -104,7 +106,7 @@ final PvChecklist kConditionQuestionsChecklist = PvChecklist(
       PvChecklistItem('life_change',
           'Does anything need to change in what I eat, or how I work?'),
       PvChecklistItem('life_travel',
-          'Is travel still alright?'),
+          'Is it still okay to travel?'),
     ]),
 
     PvChecklistGroup('The baby, and the birth', [
@@ -118,7 +120,7 @@ final PvChecklist kConditionQuestionsChecklist = PvChecklist(
 
     PvChecklistGroup('When to call', [
       PvChecklistItem('call_who',
-          'Who do I call if something changes — you, or the hospital?'),
+          'Who do I call if something changes: you, or the hospital?'),
       // ⚠️ THE ONE QUESTION EVERY CLINICIAN HAS AN ANSWER TO AND FEW SAY OUT
       // LOUD. It is last because the last thing read is the thing remembered
       // walking out, and because on a condition page it is the question the

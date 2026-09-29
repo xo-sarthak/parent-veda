@@ -63,8 +63,8 @@ class SameDaySignsScreen extends StatelessWidget {
             hue: _hue,
             eyebrow: 'Get help now',
             title: 'Signs to get help the same day',
-            intro: 'Five things that mean today rather than your next '
-                'appointment. Each one opens the page it comes from.',
+            intro: "Five signs that mean calling today, not waiting for your "
+                'next appointment. Tap one to read more about it.',
             children: [
               for (final s in kSameDaySigns) ...[
                 pvDoorPad(_SignRow(
@@ -155,7 +155,7 @@ class _SignRow extends StatelessWidget {
                           color: p.ink1)),
                   if (from != null) ...[
                     const SizedBox(height: 6),
-                    Text('Read about it — $from',
+                    Text('Read about it: $from',
                         style: pvManrope(
                             fontSize: 12, height: 1.45, color: p.ink3)),
                   ],

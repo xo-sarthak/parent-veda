@@ -649,8 +649,8 @@ class _MedicineAsk extends StatelessWidget {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(
             const LocalizedText(
-                    en: 'Have you been advised any medicine for this?',
-                    hi: 'Have you been advised any medicine for this?')
+                    en: 'Has your doctor given you any medicine for this?',
+                    hi: 'Has your doctor given you any medicine for this?')
                 .of(lang),
             style: pvManrope(
                 fontSize: 14.5, fontWeight: FontWeight.w700, color: p.ink1)),
@@ -707,10 +707,10 @@ class _ReadMoreSection extends StatelessWidget {
                     hi: 'A longer read on what to expect')
                 .of(lang),
             subtitle: const LocalizedText(
-                    en: 'Written with an Indian obstetrician, in plain '
-                        'language.',
-                    hi: 'Written with an Indian obstetrician, in plain '
-                        'language.')
+                    // 2026-09-29: no claim we can't back (gap analysis P1).
+                    // Was "Written with an Indian obstetrician".
+                    en: 'In plain words, for pregnancies in India.',
+                    hi: 'In plain words, for pregnancies in India.')
                 .of(lang),
             readingTime: '6 MIN',
             slotId: 'condition_read_${entry.id}_1',
@@ -718,12 +718,12 @@ class _ReadMoreSection extends StatelessWidget {
           const SizedBox(height: 10),
           PvReadPlaceholder(
             title: const LocalizedText(
-                    en: "Real questions other mothers asked",
-                    hi: "Real questions other mothers asked")
+                    en: 'Questions mothers often ask',
+                    hi: 'Questions mothers often ask')
                 .of(lang),
             subtitle: const LocalizedText(
-                    en: 'Answered plainly, without jargon.',
-                    hi: 'Answered plainly, without jargon.')
+                    en: 'Answered in plain words.',
+                    hi: 'Answered in plain words.')
                 .of(lang),
             readingTime: '4 MIN',
             slotId: 'condition_read_${entry.id}_2',
@@ -769,10 +769,10 @@ class _WatchSection extends StatelessWidget {
                       hi: 'Explained in five minutes'))
               .of(lang),
           subtitle: const LocalizedText(
-                  en: 'What this condition is doing, drawn simply, by a '
-                      'doctor.',
-                  hi: 'What this condition is doing, drawn simply, by a '
-                      'doctor.')
+                  en: "What's happening in your body, drawn in plain "
+                      'pictures.',
+                  hi: "What's happening in your body, drawn in plain "
+                      'pictures.')
               .of(lang),
           // ⚠️ THE DURATION IS THE FIRST EPISODE'S, NOT THE SERIES TOTAL —
           // the same thing a playlist thumbnail shows anywhere else. The

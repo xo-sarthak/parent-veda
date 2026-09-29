@@ -179,12 +179,10 @@ class _DoorGate extends StatelessWidget {
             const SizedBox(height: 10),
             Text(
                 const LocalizedText(
-                        en: 'This only changes whether we offer to add it to '
-                            'your journey. Nothing is saved either way '
-                            'unless you choose to.',
-                        hi: 'This only changes whether we offer to add it to '
-                            'your journey. Nothing is saved either way '
-                            'unless you choose to.')
+                        en: 'This only changes what we offer you. Nothing '
+                            'is saved unless you choose to save it.',
+                        hi: 'This only changes what we offer you. Nothing '
+                            'is saved unless you choose to save it.')
                     .of(lang),
                 textAlign: TextAlign.center,
                 style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2)),

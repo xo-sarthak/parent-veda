@@ -90,8 +90,9 @@ final PvDoorPage kComplicationsDoor = PvDoorPage(
   bracketId: 'pregnancy_complications',
 
   heroTitle: 'What your doctor is managing.',
-  heroBlurb: 'Every condition explained in plain words — what it is, what '
-      'happens next, and when to call.',
+  // Rewritten 2026-09-29 to docs/PREG-VOICE.md.
+  heroBlurb: 'Every condition in plain words: what it is, what happens next, '
+      'and when to call.',
 
   // ⚠️ THE QUIETEST PHOTOGRAPH OF THE FIVE, ON PURPOSE. This is the door about
   // things that can go wrong, and the picture at the top of it is doing tone
@@ -144,8 +145,8 @@ final PvDoorPage kComplicationsDoor = PvDoorPage(
       mark: IntentMark.calendarDay,
       icon: Icons.calendar_month_outlined,
       hue: 26,
-      note: 'Nobody gets all of these, and most pregnancies get none of them. '
-          'This is when each one tends to show up, not a list to expect.',
+      note: 'Nobody gets all of these, and most pregnancies get none. This is '
+          "when each one tends to show up. It isn't a list to expect.",
     ),
 
     // -------------------------------------------------------------------------
@@ -219,31 +220,31 @@ final PvDoorPage kComplicationsDoor = PvDoorPage(
       tiles: [
         PvDoorEntryTile(
           title: 'Pregnancy in the wrong place (ectopic)',
-          blurb: 'Rare, urgent, and treatable when it is caught early.',
+          blurb: "Rare and urgent, and treatable when it's caught early.",
           library: PvDoorLibrary.condition,
           entryId: 'ectopic',
-          meta: 'Weeks 5–10',
+          meta: 'Weeks 5 to 10',
         ),
         PvDoorEntryTile(
           title: 'Severe vomiting (hyperemesis)',
-          blurb: 'Far past ordinary morning sickness, and treatable.',
+          blurb: 'Much worse than ordinary morning sickness, and treatable.',
           library: PvDoorLibrary.condition,
           entryId: 'hyperemesis',
-          meta: 'Weeks 6–16',
+          meta: 'Weeks 6 to 16',
         ),
         PvDoorEntryTile(
           title: 'Thyroid gland off (thyroid in pregnancy)',
-          blurb: 'Common here, and fixed with a daily tablet.',
+          blurb: 'Common in India, and fixed with a daily tablet.',
           library: PvDoorLibrary.condition,
           entryId: 'thyroid',
           meta: 'First booking bloods',
         ),
         PvDoorEntryTile(
           title: 'Low blood, low iron (anemia)',
-          blurb: 'The commonest finding in an Indian pregnancy.',
+          blurb: 'The most common finding in an Indian pregnancy.',
           library: PvDoorLibrary.condition,
           entryId: 'anemia',
-          meta: 'Any time · checked at 8, 28',
+          meta: 'Any time · checked at 8 and 28 weeks',
         ),
       ],
     ),
@@ -257,7 +258,7 @@ final PvDoorPage kComplicationsDoor = PvDoorPage(
           blurb: 'Usually no symptoms at all, which is why everyone is tested.',
           library: PvDoorLibrary.condition,
           entryId: 'gdm',
-          meta: 'Weeks 24–28 (OGTT)',
+          meta: 'Weeks 24 to 28 (OGTT)',
         ),
         // ⚠️ THE FINDINGS LIBRARY, AND IT IS THE RULE WORKING. There is no
         // low-lying placenta in `kAllConditions` — the nearest entry is
@@ -269,7 +270,7 @@ final PvDoorPage kComplicationsDoor = PvDoorPage(
           blurb: 'Common at the mid-pregnancy scan, and it usually moves up.',
           library: PvDoorLibrary.finding,
           entryId: 'low_lying_placenta',
-          meta: 'Weeks 18–22 (anomaly scan)',
+          meta: 'Weeks 18 to 22 (anomaly scan)',
         ),
         PvDoorEntryTile(
           title: 'PCOS in pregnancy',
@@ -294,17 +295,17 @@ final PvDoorPage kComplicationsDoor = PvDoorPage(
         ),
         PvDoorEntryTile(
           title: 'Baby lying feet-down (breech)',
-          blurb: 'Common until late on, and there is time for it to turn.',
+          blurb: "Common until late on, and there's time for your baby to turn.",
           library: PvDoorLibrary.condition,
           entryId: 'breech',
-          meta: 'Weeks 32–36',
+          meta: 'Weeks 32 to 36',
         ),
         PvDoorEntryTile(
           title: 'Less water around the baby (low fluid)',
           blurb: 'Found on a scan, and watched with more scans.',
           library: PvDoorLibrary.condition,
           entryId: 'low_amniotic_fluid',
-          meta: 'Weeks 28–40',
+          meta: 'Weeks 28 to 40',
         ),
         // ⚠️ FINDINGS AGAIN, and the brief names this card by hand. Cord around
         // the neck exists only as something a report says — no condition page
@@ -334,13 +335,13 @@ final PvDoorPage kComplicationsDoor = PvDoorPage(
         ),
         PvDoorGuideTile(
           title: 'Bleeding in pregnancy',
-          blurb: 'What is usually fine, what is not, and why you call either '
+          blurb: "What's usually fine, what isn't, and why you call either "
               'way.',
           readId: 'preg_cond_read_bleeding',
         ),
         PvDoorGuideTile(
           title: 'When the baby moves less',
-          blurb: 'Do not wait, and do not count first.',
+          blurb: "Don't wait, and don't count first.",
           readId: 'preg_cond_read_less_movement',
         ),
       ],
@@ -355,7 +356,7 @@ final PvDoorPage kComplicationsDoor = PvDoorPage(
       tiles: [
         PvDoorGuideTile(
           title: 'Handling pregnancy sugar in India',
-          blurb: 'Rice, roti, festivals — what actually shifts the numbers.',
+          blurb: 'Rice, roti and festivals: what shifts the numbers.',
           readId: 'preg_cond_read_sugar_india',
         ),
         PvDoorGuideTile(
@@ -367,6 +368,31 @@ final PvDoorPage kComplicationsDoor = PvDoorPage(
           title: 'Iron, from food and tablets',
           blurb: 'Why they upset your stomach, and what helps them work.',
           readId: 'preg_cond_read_iron',
+        ),
+      ],
+    ),
+
+    // Added 2026-09-29 (pregnancy gap analysis, Complications › Living with
+    // it, P2 and P3): being told "high risk", being told to rest, and a first
+    // page for a disability or long-term illness. Three reads, one rail.
+    PvDoorSection(
+      group: kCondTabLiving,
+      heading: 'When you need extra care',
+      tiles: [
+        PvDoorGuideTile(
+          title: "Told you're high risk?",
+          blurb: 'What the label means, and what changes in your care.',
+          readId: 'preg_cond_read_high_risk',
+        ),
+        PvDoorGuideTile(
+          title: 'Told to rest',
+          blurb: 'What rest usually means, and how to keep moving safely.',
+          readId: 'preg_cond_read_bed_rest',
+        ),
+        PvDoorGuideTile(
+          title: 'With a disability or long-term illness',
+          blurb: 'Care that fits you, from appointments to the birth.',
+          readId: 'preg_cond_read_disability',
         ),
       ],
     ),
