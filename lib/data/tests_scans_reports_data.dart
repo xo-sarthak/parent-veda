@@ -527,7 +527,7 @@ final List<TestScanInfo> kTestsScans = [
                          "together.", 'यह उन कई soft markers में से एक है जिन्हें साथ मिलाकर देखा जाता है।'),
         note:
             _t("If the nasal bone isn't seen, the calculated chance can go "
-               "up a little. On its own it isn't a diagnosis.", 'nasal bone न दिखे तो निकाली गई संभावना थोड़ी बढ़ सकती है; अकेले इसका मतलब कोई निदान नहीं।'),
+               "up a little. On its own it is not a diagnosis.", 'nasal bone न दिखे तो निकाली गई संभावना थोड़ी बढ़ सकती है; अकेले इसका मतलब कोई निदान नहीं।'),
       ),
       ReportParameter(
         name: _same('Free β-hCG / PAPP-A'),
@@ -559,7 +559,7 @@ final List<TestScanInfo> kTestsScans = [
     interpretPointers: [
       _t('The result is a probability, written as a ratio. Both 1 in 900 and '
          '1 in 90 are ordinary results from a normal scan.', 'नतीजा एक संभावना है, अनुपात में लिखी हुई। 1 in 900 और 1 in 90, दोनों एक सामान्य scan के आम नतीजे हैं।'),
-      _t("A raised neck measurement on its own isn't a diagnosis of anything.", 'nuchal माप का बढ़ा होना अकेले में किसी बात का निदान नहीं।'),
+      _t("A raised neck measurement on its own is not a diagnosis of anything.", 'nuchal माप का बढ़ा होना अकेले में किसी बात का निदान नहीं।'),
       _t("Your baby's position, where you are in the 11-13 week window, and "
          "your own build can each affect the measurement.", 'शिशु की स्थिति, 11-13 हफ़्ते की खिड़की में आप कहाँ हैं, और आपका अपना शरीर — इनमें से हर एक माप पर असर डाल सकता है।'),
       _t('If the chance comes back raised, NIPT or a diagnostic test is '
@@ -631,7 +631,7 @@ final List<TestScanInfo> kTestsScans = [
       ),
     ],
     interpretation:
-        _t("NIPT screens very accurately, and that still isn't the same as a "
+        _t("NIPT screens very accurately, and that still is not a "
            "diagnosis. A low-chance result is strongly reassuring for the "
            "conditions it looks at. A high-chance result has to be confirmed "
            "by a diagnostic test before anything is decided, and some of "

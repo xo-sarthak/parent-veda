@@ -119,7 +119,7 @@ class BirthingClassesScreenClassic extends StatelessWidget {
                   title: s.uiCompleteBirthingCourse,
                   subtitle: lang.isEnglish
                       ? 'Two minutes on what the six classes cover, and how '
-                          'they are taught. Free to watch.'
+                          "they're taught. Free to watch."
                       : 'छह classes में क्या सिखाया जाता है, दो मिनट में। '
                           'देखना मुफ़्त।',
                   duration: lang.isEnglish ? '2 MIN · FREE' : '2 मिनट · मुफ़्त',

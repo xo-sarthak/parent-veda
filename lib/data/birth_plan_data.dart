@@ -112,8 +112,10 @@ final List<BpSection> kBirthPlanSections = [
   BpSection(
     id: 'who',
     title: 'Who is with me',
-    lead: 'The one thing the team will ask first, and the one thing that is '
-        'hard to sort out once it has started.',
+    lead: "The first thing the team will ask, and the hardest thing to sort "
+        "out once labour has started.",
+    // Added 2026-09-29: the partner read covers who Indian hospitals let in.
+    readId: 'preg_labour_read_partner',
     questions: const [
       BpQuestion(
         id: 'support_person',
@@ -140,8 +142,8 @@ final List<BpSection> kBirthPlanSections = [
   BpSection(
     id: 'pain',
     title: 'Pain relief',
-    lead: 'What you are thinking today. You can change your mind on the day, '
-        'and most people do.',
+    lead: "What you're thinking today. You can change your mind on the day, "
+        'and most women do.',
     readId: 'preg_labour_read_pain_relief',
     questions: const [
       BpQuestion(
@@ -163,6 +165,7 @@ final List<BpSection> kBirthPlanSections = [
     id: 'labour',
     title: 'During labour',
     lead: 'Small things that are easier to say now than between contractions.',
+    readId: 'preg_labour_read_options',
     questions: const [
       BpQuestion(
         id: 'mobility',
@@ -204,6 +207,7 @@ final List<BpSection> kBirthPlanSections = [
     title: 'If it becomes a C-section',
     lead: 'Planned or decided during labour, a few things are still yours to '
         'ask for.',
+    readId: 'preg_labour_read_c_section',
     questions: const [
       BpQuestion(
         id: 'cs_partner',
@@ -230,8 +234,8 @@ final List<BpSection> kBirthPlanSections = [
   BpSection(
     id: 'after',
     title: 'Right after birth',
-    lead: 'The first hour goes quickly. These are the things worth having '
-        'said beforehand.',
+    lead: "The first hour goes quickly. These are worth saying beforehand.",
+    readId: 'preg_labour_read_first_hour',
     questions: const [
       BpQuestion(
         id: 'skin',
@@ -269,7 +273,7 @@ final List<BpSection> kBirthPlanSections = [
         choices: [
           BpChoice('breast', 'Help me breastfeed in the first hour'),
           BpChoice('formula', "I'm planning formula"),
-          BpChoice('undecided', "Not decided — I'd like to talk to someone"),
+          BpChoice('undecided', "Not decided. I'd like to talk to someone"),
         ],
       ),
     ],
@@ -285,9 +289,9 @@ final List<BpSection> kBirthPlanSections = [
         id: 'team_notes',
         prompt: 'In your own words',
         kind: BpKind.text,
-        hint: 'Allergies, previous births, anything cultural or religious — '
-            'a prayer, an item, who may come in — and the language you are '
-            'most comfortable in.',
+        hint: 'Allergies, previous births, anything cultural or religious (a '
+            "prayer, an item, who may come in), and the language you're most "
+            'comfortable in.',
       ),
     ],
   ),

@@ -29,15 +29,21 @@ void main() {
   setUp(() => door = pvDoorPageFor('pregnancy_labour')!);
 
   group('tools first', () {
-    test('five sub-tabs, the timer first', () {
+    test('seven sub-tabs, the timer first', () {
       // ⚠️ THE ORDERING IS THE BRIEF'S ARGUMENT, NOT A PREFERENCE: "near the
       // due date people open a tool, not a read."
-      expect(door.groups.length, 5);
+      //
+      // Seven since 2026-09-29: the pregnancy gap analysis asked for "Signs
+      // and stages" (P1, beside the timer) and "Feeding and first days" (P2).
+      // The timer is still first.
+      expect(door.groups.length, 7);
       expect(door.groups.first.id, kLabourTabTimer);
       expect(door.groups.map((g) => g.label), [
         'Contraction timer',
+        'Signs and stages',
         'Hospital bag',
         'Understand the birth',
+        'Feeding and first days',
         'For your partner',
         'Talk and learn',
       ]);
@@ -51,8 +57,14 @@ void main() {
       }
     });
 
-    test('sub-tabs 3, 4 and 5 are rails', () {
-      for (final id in [kLabourTabBirth, kLabourTabPartner, kLabourTabTalk]) {
+    test('every other sub-tab is a rail', () {
+      for (final id in [
+        kLabourTabSigns,
+        kLabourTabBirth,
+        kLabourTabFeeding,
+        kLabourTabPartner,
+        kLabourTabTalk,
+      ]) {
         final g = door.groups.firstWhere((g) => g.id == id);
         expect(g.layout, PvDoorLayout.rails);
       }
@@ -180,16 +192,29 @@ void main() {
       }
     });
 
-    test('the videos and the owed reads are marked, not faked', () {
+    test('the videos are marked, not faked', () {
+      // The four owed reads were written on 2026-09-29 and now open real
+      // reads; the two films are still owed and still say so.
       final soon = [for (final t in door.allTiles) if (t.comingSoon) t.title];
       expect(soon, containsAll(<String>[
         'The contraction timer, in two minutes',
         'Labour, start to finish',
+      ]));
+    });
+
+    test('the four reads that were owed are written, and open', () {
+      for (final title in [
         'If it becomes a C-section',
         'The first hour after birth',
-        'What your partner should actually do',
-        'What labour is actually like, and your options',
-      ]));
+        'What your partner should do',
+        'What labour is like, and your options',
+      ]) {
+        final t = door.allTiles.firstWhere((t) => t.title == title);
+        expect(t, isA<PvDoorGuideTile>(), reason: title);
+        expect(t.comingSoon, isFalse, reason: title);
+        expect(pregnancyReadById((t as PvDoorGuideTile).readId), isNotNull,
+            reason: title);
+      }
     });
 
     test('the birth-plan card is present, and it is a tool', () {
@@ -205,17 +230,70 @@ void main() {
       expect(tile.comingSoon, isFalse);
     });
 
-    test('only one read is new, and it is the pain-relief primer', () {
-      final reads = [
+    test("the door's own reads, and every guide opens one that exists", () {
+      // Was "only one read is new": true until 2026-09-29, when the gap
+      // analysis asked for the birth itself to be written.
+      final reads = {
         for (final r in kPregnancyReads)
           if (r.id.startsWith('preg_labour_')) r.id,
-      ];
-      expect(reads, ['preg_labour_read_pain_relief']);
+      };
+      expect(reads, {
+        'preg_labour_read_pain_relief',
+        'preg_labour_read_c_section',
+        'preg_labour_read_first_hour',
+        'preg_labour_read_options',
+        'preg_labour_read_partner',
+        'preg_labour_read_signs_near',
+        'preg_labour_read_waters',
+        'preg_labour_read_when_to_go',
+        'preg_labour_read_preterm',
+        'preg_labour_read_stages',
+        'preg_labour_read_pushing_placenta',
+        'preg_labour_read_induction',
+        'preg_labour_read_past_due',
+        'preg_labour_read_vbac',
+        'preg_labour_read_tears',
+        'preg_labour_read_bf_start',
+        'preg_labour_read_colostrum',
+        'preg_labour_read_golden_hour_feed',
+        'preg_labour_read_feeding_help',
+        'preg_labour_read_first_40',
+      });
 
       for (final t in door.allTiles) {
         if (t is! PvDoorGuideTile) continue;
-        expect(t.readId, 'preg_labour_read_pain_relief');
+        expect(pregnancyReadById(t.readId), isNotNull, reason: t.title);
       }
+    });
+
+    test('every read written for this door is on it', () {
+      // The wiring gate: a read nobody can reach is the failure this repo
+      // has hit before.
+      final onDoor = {
+        for (final t in door.allTiles)
+          if (t is PvDoorGuideTile) t.readId,
+      };
+      for (final r in kPregnancyReads) {
+        if (!r.id.startsWith('preg_labour_')) continue;
+        expect(onDoor, contains(r.id), reason: '${r.id} is on no tile.');
+      }
+    });
+
+    test('the timings guide lands on a heading that exists', () {
+      final t = door.allTiles.firstWhere((t) => t.title == 'What the timings mean')
+          as PvDoorGuideTile;
+      final r = pregnancyReadById(t.readId)!;
+      expect(r.toc.map((h) => h.en), contains(t.atHeading));
+    });
+
+    test('the timer sits beside the signs', () {
+      // The brief: "with our contraction timer beside it".
+      final tools = [
+        for (final s in door.sectionsOf(kLabourTabSigns))
+          for (final t in s.tiles)
+            if (t is PvDoorToolTile) t.surfaceId,
+      ];
+      expect(tools, contains(kLabourSurfaceTimer));
     });
   });
 

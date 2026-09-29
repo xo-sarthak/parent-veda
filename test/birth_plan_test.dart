@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:parentveda/data/birth_plan_data.dart';
 import 'package:parentveda/data/doors/pv_door_data.dart';
+import 'package:parentveda/data/reads/pregnancy_reads.dart';
 import 'package:parentveda/screens/doors/pv_door_router.dart';
 import 'package:parentveda/screens/pregnancy/birth_plan_screen.dart';
 import 'package:parentveda/services/birth_plan_store.dart';
@@ -84,6 +85,15 @@ void main() {
     test('the pain section links the primer that exists', () {
       final pain = kBirthPlanSections.firstWhere((s) => s.id == 'pain');
       expect(pain.readId, 'preg_labour_read_pain_relief');
+    });
+
+    test('every linked read exists', () {
+      // Five sections link a read since 2026-09-29. A dead id would render a
+      // link that opens nothing.
+      for (final s in kBirthPlanSections) {
+        if (s.readId == null) continue;
+        expect(pregnancyReadById(s.readId!), isNotNull, reason: s.id);
+      }
     });
   });
 

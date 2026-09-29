@@ -44,7 +44,7 @@ final _recNursingBra = BagRecommendation(
   title: _t('Best Overall', 'सबसे बेहतर'),
   price: 799,
   why: [_t('Soft, breathable fabric', 'नरम, साँस लेने वाला कपड़ा'), _t('Easy one-hand nursing access', 'एक हाथ से खुलने वाली, दूध पिलाने में आसान'),
-        _t('Loved by ParentVeda parents', 'ParentVeda के माता-पिता की पसंद')],
+        _t('Comfortable for day and night wear', 'ParentVeda के माता-पिता की पसंद')],
   consider: [_t('Size up from your usual', 'अपने रोज़ के नाप से एक बड़ा'), _t('Two or three help for rotation', 'दो-तीन रखिए तो बदलती रहेंगी')],
 );
 final _recBreastPads = BagRecommendation(
@@ -57,11 +57,11 @@ final _recMaternityPads = BagRecommendation(
   price: 349,
   why: [_t('Extra-long, high absorbency', 'ज़्यादा लंबे, ज़्यादा सोखने वाले'), _t('Soft top layer for comfort', 'ऊपर की नरम परत, आराम के लिए'),
         _t('Made for post-delivery flow', 'डिलीवरी के बाद के दिनों के लिए बने')],
-  consider: [_t('You will likely need more than you think', 'सोच से ज़्यादा लगेंगे')],
+  consider: [_t("You'll likely need more than you think", 'सोच से ज़्यादा लगेंगे')],
 );
 final _recNippleCream = BagRecommendation(
   price: 449,
-  why: [_t('Soothes sore, sensitive skin', 'दुखती, नाज़ुक त्वचा को आराम'), _t('Safe for baby - no need to wipe off', 'शिशु के लिए सुरक्षित — पोंछने की ज़रूरत नहीं')],
+  why: [_t('Soothes sore, sensitive skin', 'दुखती, नाज़ुक त्वचा को आराम'), _t('Safe for baby, no need to wipe off', 'शिशु के लिए सुरक्षित — पोंछने की ज़रूरत नहीं')],
   consider: [_t('A little goes a long way', 'थोड़ा सा ही बहुत है')],
 );
 final _recSwaddle = BagRecommendation(
@@ -75,7 +75,7 @@ final _recBodysuits = BagRecommendation(
   price: 899,
   why: [_t('Gentle cotton on newborn skin', 'नवजात की त्वचा पर हल्का सूती'), _t('Easy snap changes', 'बटन से झट से बदलने वाला'),
         _t('A pack of everyday essentials', 'रोज़ की ज़रूरत का पूरा पैक')],
-  consider: [_t('Newborn size is outgrown quickly - do not over-buy', 'नवजात का नाप जल्दी छोटा पड़ जाता है — ज़्यादा मत लीजिए')],
+  consider: [_t("Newborns outgrow this size quickly, so don't over-buy", 'नवजात का नाप जल्दी छोटा पड़ जाता है — ज़्यादा मत लीजिए')],
 );
 final _recDiapers = BagRecommendation(
   price: 499,

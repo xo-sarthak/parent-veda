@@ -105,6 +105,14 @@ const String kLabourTabBirth = 'birth';
 const String kLabourTabPartner = 'partner';
 const String kLabourTabTalk = 'talk';
 
+// Added 2026-09-29 from the pregnancy gap analysis (Flo / What to Expect vs
+// ParentVeda), Labour prep, P1 and P2: "Signs and stages" (the birth itself,
+// written for Indian hospitals, with the timer beside it) and "Feeding and
+// first days" (getting ready to feed, before the baby comes). Both are data:
+// a `PvDoorGroup` and its sections. The carousel draws any number of groups.
+const String kLabourTabSigns = 'signs';
+const String kLabourTabFeeding = 'feeding';
+
 /// The human safety line the brief writes, used on two tabs.
 ///
 /// ⚠️ ONE STRING, TWO PLACES. The timer's tab and the Talk tab both carry a
@@ -120,8 +128,10 @@ const String kLabourTimerNote =
 // one screen. The note now says the thing only this tab needs to say; the
 // closing line says the thing every tab does.
 
+// Rewritten 2026-09-29 to docs/PREG-VOICE.md.
 const String kLabourAreaNote =
-    'If anything feels off, call your doctor, even if this screen looks calm.';
+    'If anything feels wrong, call your doctor, even if this screen looks '
+    'calm.';
 
 final PvDoorPage kLabourDoor = PvDoorPage(
   bracketId: 'pregnancy_labour',
@@ -129,7 +139,9 @@ final PvDoorPage kLabourDoor = PvDoorPage(
   // ⚠️ THE HUB'S OWN LINE, KEPT. The brief says keep the hero, and "Getting
   // ready for the birth" is what the landing said.
   heroTitle: 'Getting ready for the birth.',
-  heroBlurb: 'What happens, what to decide beforehand, and what to carry.',
+  // Rewritten 2026-09-29 to docs/PREG-VOICE.md.
+  heroBlurb: 'What happens on the day, what to decide now, and what to take '
+      'with you.',
 
   // ⚠️ A LATE BUMP AND A DOORWAY, NOT A PACKED SUITCASE. The literal reading
   // of "what to carry" is a bag, and every stock bag is a holiday suitcase on
@@ -182,6 +194,19 @@ final PvDoorPage kLabourDoor = PvDoorPage(
       note: kLabourTimerNote,
     ),
 
+    // -------------------------------------------------------------------------
+    //  2. Signs and stages (added 2026-09-29, gap analysis P1)
+    // -------------------------------------------------------------------------
+    //  Beside the timer, because the brief puts it there: "Written for Indian
+    //  hospitals, with our contraction timer beside it." A rail of reads, like
+    //  Understand the birth.
+    PvDoorGroup(
+      id: kLabourTabSigns,
+      label: 'Signs and stages',
+      icon: Icons.timeline_rounded,
+      hue: 320,
+    ),
+
     //  ⚠️ THE PACKER IS A CARD FOR A SECOND REASON, ON TOP OF THE FIRST. It
     //  carries a `bottomNavigationBar` — the pinned "Labour started?" alert the
     //  brief says to keep — and a bottom bar has no meaning inside somebody
@@ -200,6 +225,19 @@ final PvDoorPage kLabourDoor = PvDoorPage(
       label: 'Understand the birth',
       icon: Icons.menu_book_outlined,
       hue: 26,
+    ),
+
+    // -------------------------------------------------------------------------
+    //  Feeding and first days (added 2026-09-29, gap analysis P2)
+    // -------------------------------------------------------------------------
+    //  "She is not meeting breastfeeding for the first time at 3 am in a
+    //  ward." Five reads for the last weeks, and the expert note that was
+    //  the whole of this subject before.
+    PvDoorGroup(
+      id: kLabourTabFeeding,
+      label: 'Feeding and first days',
+      icon: Icons.child_care_outlined,
+      hue: 12,
     ),
 
     PvDoorGroup(
@@ -238,8 +276,8 @@ final PvDoorPage kLabourDoor = PvDoorPage(
         // where the button is the size it needs to be.
         PvDoorToolTile(
           title: 'Contraction Tracker',
-          blurb: 'Tap when one starts, tap when it stops. It keeps the '
-              'pattern so you do not have to.',
+          blurb: 'Tap when one starts, tap when it stops. It keeps track of '
+              'the pattern for you.',
           surfaceId: kLabourSurfaceTimer,
         ),
       ],
@@ -254,8 +292,8 @@ final PvDoorPage kLabourDoor = PvDoorPage(
         // you will want it to already be familiar."
         PvDoorVideoTile(
           title: 'The contraction timer, in two minutes',
-          blurb: 'When to start timing, what the numbers mean, and the one '
-              'pattern that means leave for the hospital.',
+          blurb: 'When to start timing, what the numbers mean, and the '
+              "pattern that means it's time to go.",
           meta: '2 MIN',
         ),
         // ⚠️ THE SINGLE-SOURCE LINK THE BRIEF ASKS FOR. The contractions
@@ -264,10 +302,136 @@ final PvDoorPage kLabourDoor = PvDoorPage(
         // rather than a condition — see §4a of the playbook.
         PvDoorEntryTile(
           title: 'Tightenings that are not labour',
-          blurb: 'The practice contractions almost everyone gets, and how they '
-              'differ from the real thing.',
+          blurb: 'The practice tightenings almost everyone gets, and how '
+              'they differ from labour.',
           library: PvDoorLibrary.finding,
           entryId: 'braxton_hicks',
+        ),
+        // Added 2026-09-29 (gap analysis Appendix A, "Final push: your
+        // contraction cheat sheet", P2): the timer counts but did not say
+        // what the timings mean. The guide opens the when-to-go read at the
+        // section that does, ending on "follow what your doctor told you".
+        PvDoorGuideTile(
+          title: 'What the timings mean',
+          blurb: 'Early labour, the 5-1-1 pattern, and when to leave sooner.',
+          readId: 'preg_labour_read_when_to_go',
+          atHeading: 'What do the timings on the timer mean?',
+        ),
+      ],
+    ),
+
+    // =========================================================================
+    //  Signs and stages (added 2026-09-29, gap analysis P1)
+    // -------------------------------------------------------------------------
+    //  Twelve reads written for this tab (`pregnancy_reads_labour_birth.dart`),
+    //  plus the weekly "Labour, step by step", which the gap analysis found
+    //  existed but was not on this door: "The one read we have is not where
+    //  she looks for it." The C-section and first-hour reads also sit on
+    //  Understand the birth, where their coming-soon cards were.
+    // =========================================================================
+    PvDoorSection(
+      group: kLabourTabSigns,
+      heading: 'Is it labour?',
+      tiles: [
+        PvDoorGuideTile(
+          title: 'Is labour near? The signs to look for',
+          blurb: 'The days before, practice tightenings or the real thing, '
+              'and when babies usually come.',
+          readId: 'preg_labour_read_signs_near',
+        ),
+        PvDoorGuideTile(
+          title: 'When your waters break',
+          blurb: 'What it feels like, what the colour means, and what to do '
+              'next.',
+          readId: 'preg_labour_read_waters',
+        ),
+        PvDoorGuideTile(
+          title: 'When to go to hospital, and what to carry',
+          blurb: 'When to call first, when to go now, and the folder to keep '
+              'by the door.',
+          readId: 'preg_labour_read_when_to_go',
+        ),
+        PvDoorGuideTile(
+          title: 'Signs of early labour, before 37 weeks',
+          blurb: 'The signs to know, and why going in straight away helps.',
+          readId: 'preg_labour_read_preterm',
+        ),
+      ],
+    ),
+
+    PvDoorSection(
+      group: kLabourTabSigns,
+      heading: 'Time them',
+      tiles: [
+        PvDoorToolTile(
+          title: 'Contraction Tracker',
+          blurb: 'Tap when one starts and when it stops. It shows the pattern '
+              'to tell your doctor.',
+          surfaceId: kLabourSurfaceTimer,
+        ),
+      ],
+    ),
+
+    PvDoorSection(
+      group: kLabourTabSigns,
+      heading: 'The day itself',
+      tiles: [
+        PvDoorGuideTile(
+          title: 'Labour, step by step',
+          blurb: 'The three stages, how long each usually takes, and when to '
+              'go in.',
+          readId: 'preg_week_read_labour_prep',
+        ),
+        PvDoorGuideTile(
+          title: 'The three stages of labour, in an Indian hospital',
+          blurb: "What 'dilated' means, and the checks and drips you may meet.",
+          readId: 'preg_labour_read_stages',
+        ),
+        PvDoorGuideTile(
+          title: 'Pushing, and the placenta',
+          blurb: 'How to push, positions that help, and the stage after the '
+              'baby.',
+          readId: 'preg_labour_read_pushing_placenta',
+        ),
+        PvDoorGuideTile(
+          title: 'Will I tear? Episiotomy, tears and stitches',
+          blurb: 'What helps before and during the birth, and how stitches '
+              'heal.',
+          readId: 'preg_labour_read_tears',
+        ),
+        PvDoorGuideTile(
+          title: 'The first hour after birth',
+          blurb: 'Skin to skin, the cord, the first checks and the first '
+              'feed.',
+          readId: 'preg_labour_read_first_hour',
+        ),
+      ],
+    ),
+
+    PvDoorSection(
+      group: kLabourTabSigns,
+      heading: 'If the plan changes',
+      tiles: [
+        PvDoorGuideTile(
+          title: 'Induction: why, how and what it feels like',
+          blurb: 'Why your doctor might start labour, and what to ask first.',
+          readId: 'preg_labour_read_induction',
+        ),
+        PvDoorGuideTile(
+          title: 'Past your due date',
+          blurb: "The checks after 40 weeks, and what's safe to try at home.",
+          readId: 'preg_labour_read_past_due',
+        ),
+        PvDoorGuideTile(
+          title: 'If it becomes a C-section',
+          blurb: 'Planned or during labour: why, what happens, and the days '
+              'after.',
+          readId: 'preg_labour_read_c_section',
+        ),
+        PvDoorGuideTile(
+          title: 'Birth after a C-section',
+          blurb: 'When a vaginal birth may still be possible, and what to ask.',
+          readId: 'preg_labour_read_vbac',
         ),
       ],
     ),
@@ -287,8 +451,8 @@ final PvDoorPage kLabourDoor = PvDoorPage(
       tiles: [
         PvDoorToolTile(
           title: 'Ready for Birth',
-          blurb: 'Documents, you, the baby and whoever comes with you — with '
-              'how ready you actually are.',
+          blurb: 'Documents, you, the baby and whoever comes with you, and '
+              "how ready you are.",
           surfaceId: kLabourSurfaceBag,
         ),
       ],
@@ -299,7 +463,7 @@ final PvDoorPage kLabourDoor = PvDoorPage(
     // =========================================================================
     PvDoorSection(
       group: kLabourTabBirth,
-      heading: 'What actually happens',
+      heading: 'What happens on the day',
       tiles: [
         PvDoorVideoTile(
           title: 'Labour, start to finish',
@@ -307,17 +471,22 @@ final PvDoorPage kLabourDoor = PvDoorPage(
               'like.',
           meta: '12 MIN',
         ),
-        PvDoorReadTile.comingSoon(
+        // Written 2026-09-29 (gap analysis P1: "Write 'If it becomes a
+        // C-section' first"). Was `PvDoorReadTile.comingSoon`, meta 6 MIN;
+        // kept for revert:
+        //   PvDoorReadTile.comingSoon(title: 'If it becomes a C-section',
+        //     blurb: ..., meta: '6 MIN'),
+        PvDoorGuideTile(
           title: 'If it becomes a C-section',
-          blurb: 'What the operation involves, what you will feel, and what '
-              'recovery is actually like.',
-          meta: '6 MIN',
+          blurb: "What happens, what you'll feel, and what recovery is like.",
+          readId: 'preg_labour_read_c_section',
         ),
-        PvDoorReadTile.comingSoon(
+        // Written 2026-09-29, with skin to skin folded in (Appendix A).
+        // Was `PvDoorReadTile.comingSoon`, meta 5 MIN.
+        PvDoorGuideTile(
           title: 'The first hour after birth',
-          blurb: 'What happens to you and the baby in the hour nobody '
-              'describes.',
-          meta: '5 MIN',
+          blurb: 'What happens to you and your baby in the golden hour.',
+          readId: 'preg_labour_read_first_hour',
         ),
       ],
     ),
@@ -331,8 +500,8 @@ final PvDoorPage kLabourDoor = PvDoorPage(
         // cards.
         PvDoorGuideTile(
           title: 'Pain relief: natural, epidural and C-section',
-          blurb: 'What each one involves, what it costs here, and what you can '
-              'leave until the day.',
+          blurb: 'What each one involves, what it costs here, and what can '
+              'wait until the day.',
           readId: 'preg_labour_read_pain_relief',
         ),
         // ⚠️ THE TOOL SITS BETWEEN THE PRIMER AND THE OWED READ. She reads
@@ -342,15 +511,18 @@ final PvDoorPage kLabourDoor = PvDoorPage(
         // this feature before it existed.
         PvDoorToolTile(
           title: 'Your birth plan',
-          blurb: 'One page your hospital can actually read at 3am. A '
-              'preference, not a promise.',
+          blurb: 'One page your hospital can read at 3am. A preference, not '
+              'a promise.',
           surfaceId: kLabourSurfaceBirthPlan,
         ),
-        PvDoorReadTile.comingSoon(
-          title: 'What labour is actually like, and your options',
-          blurb: 'Pain relief, positions, who is in the room — decided calmly '
-              'now rather than mid-contraction.',
-          meta: '5 MIN',
+        // Written 2026-09-29. Was `PvDoorReadTile.comingSoon`, titled "What
+        // labour is actually like, and your options" (meta 5 MIN); the title
+        // lost "actually" (PREG-VOICE §4).
+        PvDoorGuideTile(
+          title: 'What labour is like, and your options',
+          blurb: 'Where to give birth, who can be with you, and positions '
+              'that help.',
+          readId: 'preg_labour_read_options',
         ),
       ],
     ),
@@ -365,13 +537,17 @@ final PvDoorPage kLabourDoor = PvDoorPage(
       // person in the room is often a mother, a sister or a friend. A heading
       // that assumes a husband contradicts the door's own copy a centimetre
       // later, and it is the woman who does not have one who reads it hardest.
-      heading: 'What your partner can actually do',
+      heading: 'How your partner can help',
       tiles: [
-        PvDoorReadTile.comingSoon(
-          title: 'What your partner should actually do',
-          blurb: 'The practical jobs, in order, for somebody who has never '
-              'done this either.',
-          meta: '5 MIN',
+        // Written 2026-09-29, with who can be in the room in Indian hospitals
+        // and choosing a birth companion folded in (Appendix A). Was
+        // `PvDoorReadTile.comingSoon`, titled "What your partner should
+        // actually do" (meta 5 MIN).
+        PvDoorGuideTile(
+          title: 'What your partner should do',
+          blurb: 'The jobs, in order, for someone who has never done this '
+              'either.',
+          readId: 'preg_labour_read_partner',
         ),
         // ⚠️ CLASS 5 OF THE COURSE, NOT A SECOND VIDEO. It opens the course
         // rather than playing anything, which is honest: the class is real, it
@@ -379,15 +555,69 @@ final PvDoorPage kLabourDoor = PvDoorPage(
         // that is visible.
         PvDoorToolTile(
           title: 'Your partner as birth support',
-          blurb: 'Class 5 of the birthing course — sixteen minutes on what to '
+          blurb: 'Class 5 of the birthing course: sixteen minutes on what to '
               'do in the room.',
           surfaceId: kLabourSurfaceCourse,
         ),
         // ⚠️ THE PACKER'S OWN SECTION, NOT A SECOND LIST.
         PvDoorToolTile(
           title: 'What to pack for whoever comes with you',
-          blurb: 'The Partner & extras section of your hospital bag.',
+          blurb: 'The Partner & extras part of your hospital bag.',
           surfaceId: kLabourSurfaceBag,
+        ),
+      ],
+    ),
+
+    // =========================================================================
+    //  Feeding and first days (added 2026-09-29, gap analysis P2)
+    // =========================================================================
+    PvDoorSection(
+      group: kLabourTabFeeding,
+      heading: 'Before the first feed',
+      tiles: [
+        PvDoorGuideTile(
+          title: 'How breastfeeding starts',
+          blurb: 'A good latch, holds to learn now, and hand expression.',
+          readId: 'preg_labour_read_bf_start',
+        ),
+        PvDoorGuideTile(
+          title: 'Colostrum, and when your milk comes in',
+          blurb: 'Why a few drops are enough, and what happens on day two to '
+              'four.',
+          readId: 'preg_labour_read_colostrum',
+        ),
+        PvDoorGuideTile(
+          title: 'The first feed, in the golden hour',
+          blurb: 'What it looks like, and how to ask for it in hospital.',
+          readId: 'preg_labour_read_golden_hour_feed',
+        ),
+        PvDoorGuideTile(
+          title: 'Why early breastfeeding preparation helps',
+          blurb: 'Three things worth knowing before the first feed.',
+          readId: 'preg_week_read_exp_meera',
+        ),
+      ],
+    ),
+
+    PvDoorSection(
+      group: kLabourTabFeeding,
+      heading: 'Help, and the first weeks',
+      tiles: [
+        PvDoorGuideTile(
+          title: 'Asking for feeding help in hospital',
+          blurb: 'Who can help, what to ask on day one, and support at home.',
+          readId: 'preg_labour_read_feeding_help',
+        ),
+        PvDoorGuideTile(
+          title: 'Planning the first 40 days at home',
+          blurb: 'Rest, help, food and visitors, and the signs that need a '
+              'doctor.',
+          readId: 'preg_labour_read_first_40',
+        ),
+        PvDoorGuideTile(
+          title: 'The first 24 hours after birth',
+          blurb: "The baby's first checks and jabs, and what happens to you.",
+          readId: 'preg_week_read_first_24h',
         ),
       ],
     ),
@@ -397,7 +627,7 @@ final PvDoorPage kLabourDoor = PvDoorPage(
     // =========================================================================
     PvDoorSection(
       group: kLabourTabTalk,
-      heading: 'Get taught properly',
+      heading: 'Learn with a teacher',
       tiles: [
         // ⚠️ THE PAID COURSE, AND ITS PRICE IS ON THE CARD. This app's rule is
         // that a tile which costs money must be legible as such BEFORE she taps
@@ -425,7 +655,7 @@ final PvDoorPage kLabourDoor = PvDoorPage(
           title: 'Complete Birthing Course',
           meta: '₹1,499 · first class free',
           blurb: 'Six classes with a certified childbirth educator, in English '
-              'and Hindi. ₹1,499 one-time — the first class and the trailer '
+              'and Hindi. ₹1,499 one-time. The first class and the trailer '
               'are free.',
           surfaceId: kLabourSurfaceCourse,
         ),
@@ -438,7 +668,7 @@ final PvDoorPage kLabourDoor = PvDoorPage(
       tiles: [
         PvDoorTalkTile(
           title: 'Book a 1:1 about the birth',
-          blurb: 'Half an hour with an obstetrician to ask what you actually '
+          blurb: 'Half an hour with an obstetrician, to ask everything you '
               'want to ask.',
           surfaceId: kLabourSurfaceConsult,
         ),

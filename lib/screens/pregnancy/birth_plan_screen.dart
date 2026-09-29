@@ -94,7 +94,7 @@ class _BirthPlanScreenState extends State<BirthPlanScreen> {
             hue: widget.hue,
             eyebrow: 'Labour prep',
             title: 'Your birth plan',
-            intro: 'One page your hospital can actually read at 3am. '
+            intro: 'One page your hospital can read at 3am. '
                 '$kBirthPlanVoice',
             action: store.isEmpty ? null : _ShareBar(p: p, onTap: _share),
             children: [
@@ -117,8 +117,8 @@ class _BirthPlanScreenState extends State<BirthPlanScreen> {
               // reads as broken. One line says where it went.
               if (store.isEmpty)
                 pvDoorPad(Text(
-                    'Answer whatever you have thought about — two answers is '
-                    'a plan. A share button appears once there is something '
+                    "Answer whatever you've thought about. Even two answers is "
+                    "a plan. A share button appears once there's something "
                     'to send.',
                     style: pvManrope(
                         fontSize: 12.5, height: 1.55, color: p.ink3))),
@@ -135,9 +135,9 @@ class _BirthPlanScreenState extends State<BirthPlanScreen> {
               const SizedBox(height: 22),
               pvDoorPad(PvDoorDisclaimer(
                   p: p,
-                  text: 'This records what you would prefer. It is not medical '
+                  text: "This records what you'd prefer. It isn't medical "
                       'advice, and your hospital may do things differently '
-                      'on the day — your doctor knows your pregnancy.')),
+                      'on the day. Your doctor knows your pregnancy.')),
               if (!store.isEmpty) const SizedBox(height: 64),
             ],
           );
@@ -225,7 +225,7 @@ class _SectionCard extends StatelessWidget {
             child: Row(mainAxisSize: MainAxisSize.min, children: [
               Icon(Icons.menu_book_outlined, size: 14, color: deep),
               const SizedBox(width: 6),
-              Text('Read the short primer first',
+              Text('Read about this first',
                   style: pvManrope(
                       fontSize: 12.5,
                       fontWeight: FontWeight.w700,

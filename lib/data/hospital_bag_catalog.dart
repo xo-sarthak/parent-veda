@@ -84,7 +84,7 @@ final Map<String, _Cat> _catalog = {
   // For me after delivery ---------------------------------------------------
   'after_pads': _Cat('🩸', 349, _same('ParentVeda Maternity Pads'),
       why: [_t('Extra-long, high absorbency', 'ज़्यादा लंबे, ज़्यादा सोखने वाले'), _t('Soft top layer for comfort', 'ऊपर की नरम परत, आराम के लिए')],
-      consider: [_t('You will need more than you think', 'सोच से ज़्यादा लगेंगे')]),
+      consider: [_t("You'll need more than you think", 'सोच से ज़्यादा लगेंगे')]),
   'after_underwear': _Cat('🩲', 399, _same('ParentVeda Maternity Briefs'),
       why: [
         _t('High-waist, won’t press on stitches', 'ऊँची कमर, टाँकों पर दबाव नहीं'),
@@ -97,7 +97,7 @@ final Map<String, _Cat> _catalog = {
   'after_breastpads': _Cat('⚪', 299, _same('ParentVeda Breast Pads'),
       why: [_t('Super absorbent, stay-dry', 'ख़ूब सोखने वाले, सूखा रखने वाले'), _t('Gentle on sensitive skin', 'नाज़ुक त्वचा पर हल्के')]),
   'after_nipplecream': _Cat('🧴', 449, _same('ParentVeda Nipple Cream'),
-      why: [_t('Soothes sore skin', 'दुखती त्वचा को आराम'), _t('Safe for baby - no need to wipe off', 'शिशु के लिए सुरक्षित — पोंछने की ज़रूरत नहीं')]),
+      why: [_t('Soothes sore skin', 'दुखती त्वचा को आराम'), _t('Safe for baby, no need to wipe off', 'शिशु के लिए सुरक्षित — पोंछने की ज़रूरत नहीं')]),
   'after_outfit': _Cat('👗', 899, _t('ParentVeda Going-Home Set', 'ParentVeda घर जाने का सेट'),
       why: [_t('Loose & soft on a healing body', 'ठीक हो रहे शरीर पर ढीला और नरम'), _t('Easy nursing access', 'दूध पिलाने में आसान')]),
   'after_toiletries': _Cat('🪥', 299, _t('ParentVeda Travel Kit', 'ParentVeda सफ़र किट'),
@@ -127,7 +127,7 @@ final Map<String, _Cat> _catalog = {
   'baby_wipes': _Cat('🧻', 249, _same('ParentVeda Water Wipes'),
       why: [_t('99% water, fragrance-free', '99% पानी, बिना ख़ुशबू के'), _t('Gentle on newborn skin', 'नवजात की त्वचा पर हल्के')]),
   'baby_blanket': _Cat('🛏️', 499, _t('ParentVeda Baby Blanket', 'ParentVeda शिशु कंबल'),
-      why: [_t('Cozy & breathable', 'गर्म और साँस लेने वाला'), _t('Doubles as a cover', 'ओढ़नी के तौर पर भी काम आता है')]),
+      why: [_t('Cosy and breathable', 'गर्म और साँस लेने वाला'), _t('Doubles as a cover', 'ओढ़नी के तौर पर भी काम आता है')]),
   'baby_towel': _Cat('🧖', 399, _t('ParentVeda Hooded Towel', 'ParentVeda टोपी वाला तौलिया'),
       why: [_t('Hooded, soft on delicate skin', 'टोपी वाला, नाज़ुक त्वचा पर नरम'), _t('Quick-drying', 'जल्दी सूखने वाला')]),
   'baby_lotion': _Cat('🧴', 349, _same('ParentVeda Baby Lotion'),
@@ -216,7 +216,7 @@ List<BagProduct> bagProductsFor(String itemId, {bool isCustom = false}) {
       price: 399,
       emoji: '🛍️',
       topPick: true,
-      why: [_t('Chosen for quality & comfort', 'गुणवत्ता और आराम देखकर चुना गया'), _t('Trusted by ParentVeda parents', 'ParentVeda के माता-पिता का भरोसा')],
+      why: [_t('Chosen for quality & comfort', 'गुणवत्ता और आराम देखकर चुना गया'), _t('Chosen for everyday comfort', 'ParentVeda के माता-पिता का भरोसा')],
     ));
   } else {
     final valuePrice = ((c.price * 0.8) / 10).round() * 10;

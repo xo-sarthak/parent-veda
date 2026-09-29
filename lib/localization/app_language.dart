@@ -2371,7 +2371,7 @@ class S {
   String get ctAboutTitle =>
       _p('Understanding contractions', 'संकुचन को समझना');
   String get ctAboutBody => _p(
-      'A contraction is your womb tightening and then relaxing. Not every tightening is labour. "Braxton Hicks" (practice) contractions are common and usually harmless - they tend to be irregular, do not get stronger or closer together, and often ease when you rest, change position or drink water. True labour contractions tend to get longer, stronger and closer together over time, and do not fade. To time one: tap when it starts, and again when it ends.',
+      'A contraction is your womb tightening and then relaxing. Not every tightening is labour. "Braxton Hicks" (practice) contractions are common and usually harmless. They tend to be irregular, do not get stronger or closer together, and often ease when you rest, change position or drink water. True labour contractions tend to get longer, stronger and closer together over time, and do not fade. To time one: tap when it starts, and again when it ends.',
       'संकुचन यानी आपकी बच्चेदानी का कसना और फिर ढीला होना। हर कसाव प्रसव नहीं होता। "Braxton Hicks" (अभ्यास वाले) संकुचन आम और अक्सर हानिरहित होते हैं — ये अनियमित होते हैं, न तेज़ होते हैं न पास-पास आते हैं, और आराम करने, करवट बदलने या पानी पीने पर अक्सर कम हो जाते हैं। असली प्रसव के संकुचन समय के साथ लंबे, तेज़ और पास-पास होते जाते हैं, और कम नहीं होते। समय नापने के लिए: शुरू होने पर टैप कीजिए, और ख़त्म होने पर फिर टैप कीजिए।');
   // ⚠️ THE SAFETY IS UNCHANGED; ONLY THE CORPORATE FRAMING WENT — 2026-09-10.
   //
@@ -2398,7 +2398,7 @@ class S {
       'यह टूल सिर्फ़ आपके संकुचन दर्ज करके पैटर्न दिखाता है — यह न प्रसव की पुष्टि कर सकता है, न इनकार। सिर्फ़ आपकी डॉक्टर या midwife ही यह कह सकती हैं। अगर कुछ ठीक न लगे, तो उनसे संपर्क कीजिए — चाहे यहाँ पैटर्न शांत ही क्यों न दिखे।');
   // Universal "always consult" line shown under every (non-urgent) assessment.
   String get ctAlwaysConsult => _p(
-      'Timing cannot confirm or rule out labour. If you are unsure, or something does not feel right, contact your doctor or midwife - even now.',
+      'Timing can\'t confirm or rule out labour. If you\'re unsure, or something doesn\'t feel right, call your doctor or midwife now.',
       'समय नापने से प्रसव की न पुष्टि हो सकती है न इनकार। अगर पक्का न हो, या कुछ ठीक न लगे, तो अभी अपनी डॉक्टर या midwife से संपर्क कीजिए।');
 
   // ---- Reminders (customizable local notifications) ------------------------
@@ -4288,10 +4288,10 @@ class S {
   String get uiSBigStepDone => _p('That’s a big step done', 'एक बड़ा काम पूरा हुआ');
   String get uiVeMovedThroughEverything => _p('You’ve moved through everything for now. Come back any time to add the last few things — you’re close.', 'अभी के लिए आप सब देख चुकी हैं। आख़िरी कुछ चीज़ें जोड़ने कभी भी लौट आइए — बस थोड़ा ही बाक़ी है।');
   String get uiBackMyReadiness => _p('Back to my readiness', 'अपनी तैयारी पर वापस');
-  String get uiFirstTakeBreath => _p('First — take a breath.', 'पहले — एक गहरी साँस लीजिए।');
+  String get uiFirstTakeBreath => _p('First, take a breath.', 'पहले — एक गहरी साँस लीजिए।');
   String get uiHaveTimeCallDoctor => _p('You have time. Call your doctor or hospital, then take these with you. Everything else can follow later.', 'आपके पास वक़्त है। अपने डॉक्टर या अस्पताल को फ़ोन कीजिए, फिर ये चीज़ें साथ ले लीजिए। बाक़ी सब बाद में आ सकता है।');
   String get uiTakeTheseFirst => _p('Take these first', 'ये पहले ले लीजिए');
-  String get uiThenLeaveHospitalVe => _p('Then leave for the hospital. You’ve got this.', 'फिर अस्पताल के लिए निकलिए। आप कर लेंगी।');
+  String get uiThenLeaveHospitalVe => _p('Then leave for the hospital. You’re ready.', 'फिर अस्पताल के लिए निकलिए। आप कर लेंगी।');
   String get uiPersonaliseBag => _p('Personalise your bag', 'अपना बैग अपने हिसाब से बनाइए');
   String get uiFewDetailsMakeSuggestions => _p('A few details make the suggestions smarter.', 'कुछ जानकारी से सुझाव और बेहतर हो जाते हैं।');
   String get uiExpectingTwins => _p('Expecting twins', 'जुड़वाँ की उम्मीद');
