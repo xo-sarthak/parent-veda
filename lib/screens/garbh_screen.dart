@@ -612,7 +612,7 @@ class _PracticeFoot extends StatelessWidget {
           children: [
             Flexible(
               child: Text(
-                  'This finishes on its own when you are done.',
+                  "This finishes on its own when you're done.",
                   style: pvJakarta(fontSize: 12, color: _muted)),
             ),
             TextButton(
@@ -924,7 +924,7 @@ class _ShravanLibraryState extends State<_ShravanLibrary> {
           Text(
               widget.controller.language.isHinglish
                   ? 'हर महीने के लिए चुने गए, सुनने के शांत पल।'
-                  : 'Listening sessions gathered for each month.',
+                  : 'Sounds to listen to, picked for each month.',
               style: text.bodyMedium?.copyWith(color: _muted)),
           const SizedBox(height: 14),
           // Month selector (1-9).
@@ -973,7 +973,7 @@ class _ShravanLibraryState extends State<_ShravanLibrary> {
               child: Text(
                   widget.controller.language.isHinglish
                       ? 'आप अभी यहाँ हैं'
-                      : 'You are here now',
+                      : "You're here now",
                   style: text.labelSmall?.copyWith(
                       color: _accShravan, fontWeight: FontWeight.w800)),
             ),
@@ -982,7 +982,7 @@ class _ShravanLibraryState extends State<_ShravanLibrary> {
             Text(
                 widget.controller.language.isHinglish
                     ? 'इस महीने के लिए अभी कुछ जोड़ा नहीं गया।'
-                    : 'No sessions for this month yet.',
+                    : 'Nothing for this month yet.',
                 style: text.bodyMedium?.copyWith(color: _muted))
           else
             for (final a in sessions)
@@ -1437,7 +1437,7 @@ class _SamvadScreenState extends State<SamvadScreen>
           (
             title: m.title,
             body: '${m.original}\n\n${m.transliteration}\n\n'
-                '${m.meaning}\n— ${m.source}',
+                '${m.meaning}\n${m.source}',
             saveKey: 'mantra_${m.id}',
             group: 'Mantras & Lullabies',
             id: 'mantra_${m.id}',

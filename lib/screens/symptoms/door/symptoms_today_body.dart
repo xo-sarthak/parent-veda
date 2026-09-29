@@ -242,7 +242,7 @@ class _SymptomsTodayBodyState extends State<SymptomsTodayBody>
         const Reminder(
           id: kSymptomReminderId,
           title: 'How was today?',
-          body: 'Two taps on the Symptoms door and your week keeps itself.',
+          body: 'Tap what you felt today. It takes a few seconds, and your week keeps itself.',
           hour: 20,
           minute: 30,
           category: 'symptoms',
@@ -288,7 +288,7 @@ class _SymptomsTodayBodyState extends State<SymptomsTodayBody>
               p,
               'How are you?',
               sub:
-                  '${_dayWord(_selected)}. Tap what you feel, tap again to clear. Hold one to say how strong.',
+                  '${_dayWord(_selected)}. Tap what you feel, and tap again to clear it. Hold one to say how strong.',
             ),
           ),
           const SizedBox(height: 10),
@@ -427,7 +427,7 @@ class _SymptomsTodayBodyState extends State<SymptomsTodayBody>
               sub: loggedToday.isEmpty
                   ? (future
                         ? 'Come back on the day.'
-                        : 'Tap a symptom above and its help appears here.')
+                        : 'Tap a symptom above to see what helps.')
                   : 'For what you logged ${_dayWord(_selected).toLowerCase()}.',
             ),
           ),
@@ -446,7 +446,7 @@ class _SymptomsTodayBodyState extends State<SymptomsTodayBody>
             const SizedBox(height: 4),
             pvDoorPad(
               Text(
-                'General guidance, never a diagnosis. Anything that worries you is a call to your doctor — the Talk tab has the five to call about at any hour.',
+                'General guidance, never a diagnosis. If anything worries you, call your doctor. The Talk tab lists the five signs to call about at any hour.',
                 style: pvManrope(fontSize: 11.5, height: 1.45, color: p.ink3),
               ),
             ),
@@ -478,7 +478,7 @@ class _SymptomsTodayBodyState extends State<SymptomsTodayBody>
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          '"How was today?" at 8:30 pm. Off unless you want it.',
+                          '"How was today?" at 8:30 pm. It stays off unless you turn it on.',
                           style: pvManrope(
                             fontSize: 12.5,
                             height: 1.4,

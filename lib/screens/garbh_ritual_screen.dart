@@ -80,7 +80,7 @@ class GarbhRitualScreen extends StatelessWidget {
                       color: _ink)),
               const SizedBox(height: 8),
               Text(
-                  'Pick as many as you like. Whatever you choose appears on '
+                  'Pick as many as you like. Whatever you choose shows up on '
                   'your daily card, alongside everything else.',
                   style: pvManrope(fontSize: 13.5, height: 1.55, color: _muted)),
               const SizedBox(height: 24),
@@ -106,8 +106,8 @@ class GarbhRitualScreen extends StatelessWidget {
               // declare a practice she does not have would be worse than not
               // asking at all.
               Text(
-                  'None of these is required. You can change this any time, '
-                  'and skipping it changes nothing else in the app.',
+                  'None of these is required. You can change them any time, '
+                  "and skipping this doesn't change anything else in the app.",
                   style: pvManrope(fontSize: 12, height: 1.55, color: _muted)),
             ],
           ),

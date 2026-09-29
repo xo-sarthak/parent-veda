@@ -53,19 +53,19 @@ const String kSymTabTalk = 'talk';
 final PvDoorRedFlag kSymptomsUrgentFlag = PvDoorRedFlag(
   title: 'Call now, at any hour, if',
   lines: const [
-    PvDoorFlagLine('You are bleeding, even lightly'),
-    PvDoorFlagLine('The baby is moving less than usual'),
-    PvDoorFlagLine('You are leaking fluid, or had a gush'),
+    PvDoorFlagLine("You're bleeding, even lightly"),
+    PvDoorFlagLine('Your baby is moving less than usual'),
+    PvDoorFlagLine("You're leaking fluid, or had a gush"),
     PvDoorFlagLine('Regular or painful tightenings before 37 weeks'),
     PvDoorFlagLine(
-      'A severe headache with vision changes, or sudden swelling of the face and hands',
+      'A severe headache with vision changes, or sudden swelling of your face and hands',
     ),
   ],
   surfaceId: kSymSurfaceUrgent,
   footer:
       'Your obstetrician, the labour ward, or the nearest hospital with a '
-      'maternity unit. Call, do not message. If you cannot reach anyone and it '
-      'is bad, go in.',
+      "maternity unit. Call, don't message. If you can't reach anyone and it's "
+      'bad, go in.',
   seeAll: false,
 );
 
@@ -77,9 +77,10 @@ String _first(String s) {
 final PvDoorPage kSymptomsDoor = PvDoorPage(
   bracketId: kSymptomsBracketId,
   heroTitle: 'How are you feeling today?',
+  // Rewritten 2026-09-29 to docs/PREG-VOICE.md.
   heroBlurb:
-      'Tap what you feel, see what helps, and know exactly when to '
-      'call — for every ache of pregnancy.',
+      'Tap what you feel, see what helps, and know when to call your '
+      'doctor. A page for every ache of pregnancy.',
   // Owed: a photograph of its own. The back-pain read's (a woman in a
   // doorway, a hand on her belly, warm light) carries the door until then.
   heroImageUrl: readImageFor('preg_week_read_back_pain'),
@@ -103,7 +104,7 @@ final PvDoorPage kSymptomsDoor = PvDoorPage(
       mark: IntentMark.questionMark,
       hue: 344,
       inlineSurfaceId: kSymSurfaceNormal,
-      inlineLabel: '10 questions',
+      inlineLabel: '11 questions',
     ),
     PvDoorGroup(
       id: kSymTabLibrary,
@@ -130,7 +131,7 @@ final PvDoorPage kSymptomsDoor = PvDoorPage(
       pinnedRedFlag: kSymptomsUrgentFlag,
       note:
           'General guidance for an ordinary pregnancy, never a diagnosis. '
-          'Your own doctor\'s word wins over anything here.',
+          'ParentVeda explains and reminds. Your doctor decides.',
     ),
   ],
   sections: [
@@ -164,7 +165,7 @@ final PvDoorPage kSymptomsDoor = PvDoorPage(
         PvDoorToolTile(
           title: 'What to say when you call',
           blurb:
-              'The six things they will ask, in order, so you are not composing them at 2 am.',
+              "The six things they'll ask, in order, so you're not searching for words at 2 am.",
           surfaceId: kSymSurfaceCalling,
         ),
       ],
@@ -196,7 +197,7 @@ final PvDoorPage kSymptomsDoor = PvDoorPage(
         PvDoorToolTile(
           title: 'Send my week',
           blurb:
-              'A short note of the seven days — what, how often, how strong — to share before a visit.',
+              'A short note of your last seven days (what, how often, how strong) to share before a visit.',
           surfaceId: kSymSurfaceSend,
         ),
       ],
@@ -210,7 +211,7 @@ final PvDoorPage kSymptomsDoor = PvDoorPage(
         PvDoorTalkTile(
           title: 'Have a doctor go through it with you',
           blurb:
-              'Book a 1:1 with a gynaecologist. Send your week from the Your week tab and bring it with you.',
+              'Book a one-to-one with a gynaecologist. Send your week from the Your week tab and bring it along.',
           surfaceId:
               kScansSurfaceConsult, // 'consults' — the one consult sheet every door books through
         ),

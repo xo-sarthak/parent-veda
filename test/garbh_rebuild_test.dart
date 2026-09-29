@@ -220,7 +220,7 @@ void main() {
       // ⚠️ THE MOST IMPORTANT EMPTY STATE IN THE SECTION: it is what a mother
       // sees on day one, before she has any reason to believe this is for
       // anything.
-      expect(find.textContaining('that is only today'), findsOneWidget);
+      expect(find.textContaining('starts filling up from today'), findsOneWidget);
       expect(find.textContaining('months of your voice'), findsOneWidget);
     });
 

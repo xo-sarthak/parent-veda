@@ -159,8 +159,9 @@ final PvDoorPage kGarbhDoor = PvDoorPage(
   bracketId: 'pregnancy_garbh',
 
   heroTitle: 'A few minutes a day, for both of you.',
-  heroBlurb: 'Something to listen to, something to say aloud, a few quiet '
-      'minutes for you, and a keepsake that grows.',
+  // Rewritten 2026-09-29 to docs/PREG-VOICE.md.
+  heroBlurb: 'Something to listen to, something to say aloud to your baby, a '
+      'few quiet minutes for you, and a keepsake that grows.',
 
   // ⚠️ LOOKED AT BEFORE IT WAS WIRED — see `pv_door_scans.dart` for the rule.
   // Her two hands around a late bump, warm light, the face soft and out of
@@ -173,11 +174,12 @@ final PvDoorPage kGarbhDoor = PvDoorPage(
 
   // ⚠️ THE ONE NEW ITEM IN THE AREA. See the header for why it is here and
   // not on the last tab only.
+  // Rewritten 2026-09-29 to docs/PREG-VOICE.md; the claim is unchanged.
   closingLine: 'Where this comes from: the one part with real evidence is '
       'your voice. By the third trimester your baby can hear it and learn it, '
-      'and newborns know the voice they heard most. The rest is a calming '
-      'ritual for you, and it promises nothing about how clever or what kind '
-      'of person your child will be.',
+      'and newborns know the voice they heard most. Everything else here is a '
+      "calming ritual for you. It promises nothing about how clever your "
+      "child will be, or what kind of person they'll grow into.",
 
   groups: [
     // -------------------------------------------------------------------------
@@ -215,8 +217,9 @@ final PvDoorPage kGarbhDoor = PvDoorPage(
       mark: IntentMark.audioMark,
       hue: 42,
       // Spoken TO her — "your calm", not "her calm". Read back on the phone.
-      note: 'Shravan, listening. Your calm, and a moment you share — nothing '
-          'here claims to be good for the baby, and nothing says it is.',
+      note: 'Shravan means listening. This is for your calm, and for a '
+          "moment you share with your baby. Nothing here claims it's good for "
+          'the baby.',
     ),
 
     // -------------------------------------------------------------------------
@@ -228,8 +231,8 @@ final PvDoorPage kGarbhDoor = PvDoorPage(
       icon: Icons.record_voice_over_outlined,
       mark: IntentMark.pageMark,
       hue: 14,
-      note: 'Samvad, talking to your baby. Everything you read or record here '
-          'lands in My Journal.',
+      note: 'Samvad means talking to your baby. Anything you record here is '
+          'kept in My Journal.',
     ),
 
     // -------------------------------------------------------------------------
@@ -272,9 +275,9 @@ final PvDoorPage kGarbhDoor = PvDoorPage(
       inlineSurfaceId: kGarbhSurfaceJournal,
       inlineLabel: 'Everything your baby has heard',
       layout: PvDoorLayout.stack,
-      note: 'This stays yours. It does not disappear after the birth: these '
-          'are the voices your newborn will already know, and you can play '
-          'the whole thing back whenever you want.',
+      note: 'This stays yours, and it does not disappear after the birth. '
+          "These are the voices your newborn will already know, and you can "
+          'play them all back whenever you like.',
     ),
   ],
 
@@ -334,11 +337,11 @@ final PvDoorPage kGarbhDoor = PvDoorPage(
 
     PvDoorSection(
       group: kGarbhTabToday,
-      heading: 'What you are making',
+      heading: "What you're making",
       tiles: [
         PvDoorToolTile(
           title: 'My Journal',
-          blurb: 'Every voice your baby has heard, kept by the week.',
+          blurb: 'Every recording and every raga, kept week by week.',
           surfaceId: pvDoorTabSurface(kGarbhTabJournal),
         ),
       ],
@@ -353,8 +356,8 @@ final PvDoorPage kGarbhDoor = PvDoorPage(
       tiles: [
         PvDoorAudioTile(
           title: "Today's raga",
-          blurb: 'One chosen for today, with why. Skip it if it is not the '
-              'one.',
+          blurb: "One picked for today, and why. Skip it if it doesn't suit "
+              'you today.',
           surfaceId: kGarbhSurfaceListenToday,
         ),
       ],
@@ -386,7 +389,7 @@ final PvDoorPage kGarbhDoor = PvDoorPage(
       tiles: [
         PvDoorToolTile(
           title: 'The people who recorded them',
-          blurb: 'Every track, its recordist, and where the original lives.',
+          blurb: 'Who recorded each track, and where to find the original.',
           surfaceId: kGarbhSurfaceCredits,
         ),
       ],
@@ -401,7 +404,7 @@ final PvDoorPage kGarbhDoor = PvDoorPage(
       tiles: [
         PvDoorReadTile(
           title: "Today's passage to read aloud",
-          blurb: 'Record it in your voice, or hear the narrator.',
+          blurb: 'Record it in your own voice, or listen to the narrator.',
           surfaceId: kGarbhSurfaceReadToday,
         ),
       ],
@@ -417,7 +420,8 @@ final PvDoorPage kGarbhDoor = PvDoorPage(
         for (final title in kGarbhDoorAffirmations)
           PvDoorReadTile(
             title: title,
-            blurb: 'Spoken to your baby. Read it aloud, or record it.',
+            blurb: 'A few words for your baby. Say them aloud, or record '
+                'them.',
             surfaceId: garbhSurfacePiece(garbhSlug(title)),
           ),
       ],
@@ -429,17 +433,17 @@ final PvDoorPage kGarbhDoor = PvDoorPage(
       tiles: [
         PvDoorReadTile(
           title: 'Stories and fables',
-          blurb: 'Short, gentle, a few minutes each.',
+          blurb: 'Short, gentle stories, a few minutes each.',
           surfaceId: garbhSurfaceShelf(1),
         ),
         PvDoorReadTile(
           title: 'Mantras and lullabies',
-          blurb: 'With the words, and what they mean.',
+          blurb: 'The words, and what they mean.',
           surfaceId: garbhSurfaceShelf(2),
         ),
         PvDoorReadTile(
           title: 'Spiritual reading',
-          blurb: 'Short passages, by tradition. You choose.',
+          blurb: 'Short passages from the tradition you choose.',
           surfaceId: garbhSurfaceShelf(3),
         ),
       ],
@@ -467,7 +471,7 @@ final PvDoorPage kGarbhDoor = PvDoorPage(
       tiles: [
         PvDoorToolTile(
           title: 'Guided Relaxation',
-          blurb: 'A voice walks you down your body, head to toe, with a raga '
+          blurb: 'A calm voice takes you from head to toe, with a raga '
               'underneath if you like.',
           meta: '8 MIN',
           surfaceId: kGarbhSurfaceRelax,
@@ -476,7 +480,8 @@ final PvDoorPage kGarbhDoor = PvDoorPage(
         // links to it later, it is not rebuilt there."
         PvDoorToolTile(
           title: 'See all guided relaxations',
-          blurb: 'Every breath and grounding practice, by trimester.',
+          blurb: "Every breathing and grounding practice that's right for "
+              'your week.',
           surfaceId: kGarbhSurfaceKriya,
         ),
       ],

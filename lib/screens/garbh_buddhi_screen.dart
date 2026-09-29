@@ -128,11 +128,11 @@ class GarbhBuddhiScreen extends StatelessWidget {
                     const SizedBox(height: 7),
                     Text(
                         'Ten minutes of focused attention is one of the few '
-                        'reliable ways to stop a worrying mind circling. It '
-                        'will not make your baby cleverer, and nobody can '
-                        'honestly tell you it will. It is here because '
-                        'pregnancy is long and your head deserves a break '
-                        'from it.',
+                        'reliable ways to stop a worried mind going round in '
+                        'circles. It will not make your baby cleverer, and '
+                        "nobody can honestly tell you it will. It's here "
+                        'because pregnancy is long, and your head deserves a '
+                        'break from it.',
                         style: pvManrope(
                             fontSize: 13.5, height: 1.6, color: _ink)),
                   ]),
@@ -158,7 +158,7 @@ class GarbhBuddhiScreen extends StatelessWidget {
               // pillar in this section.
               Text(
                   'This finishes on its own when the puzzle is done. Skipping '
-                  'it does not break your day.',
+                  "it doesn't spoil your day.",
                   style: pvManrope(fontSize: 12, height: 1.5, color: _muted)),
               const SizedBox(height: 30),
               Text('MORE',
@@ -182,8 +182,9 @@ class GarbhBuddhiScreen extends StatelessWidget {
             // She will have watched three other practices land there, so its
             // absence needs an explanation or it reads as a bug.
             Text(
-                'Nothing here goes into My Journal. That is for what you are '
-                'making for your baby, and week $week of it is already there.',
+                'Nothing here goes into My Journal. The journal is for what '
+                "you're making for your baby, and week $week of it is already "
+                'there.',
                 style: pvManrope(fontSize: 12, height: 1.55, color: _muted)),
           ],
         ),

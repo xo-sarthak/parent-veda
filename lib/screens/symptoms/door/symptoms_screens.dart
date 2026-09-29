@@ -34,7 +34,7 @@ class SymptomsWeekScreen extends StatelessWidget {
     eyebrow: 'Symptoms · Your week',
     title: 'Your week',
     intro:
-        'Seven days of what you logged. Tap a row for what helps; send the week before a visit.',
+        'Seven days of what you logged. Tap a row to see what helps, and send the week to your doctor before a visit.',
     children: [
       SymptomsWeekBody(
         pregnancy: pregnancy,
@@ -120,7 +120,7 @@ class SymptomsSendScreen extends StatelessWidget {
         const SizedBox(height: 10),
         pvDoorPad(
           Text(
-            'Your observation, in your words. It goes only where you send it — nothing here is shared unless you share it.',
+            'Your observations, in your words. Nothing here is shared unless you send it.',
             style: pvManrope(fontSize: 11.5, height: 1.45, color: p.ink3),
           ),
         ),
@@ -158,7 +158,7 @@ class SymptomsNormalBody extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'The ten questions, in your words, with the one answer that matters: rest, call today, or call now.',
+                  'The questions women ask most, each with a clear answer: usually fine, call your doctor today, or call now.',
                   style: pvManrope(fontSize: 13, height: 1.45, color: p.ink2),
                 ),
               ],
@@ -181,7 +181,7 @@ class SymptomsNormalBody extends StatelessWidget {
             ),
           pvDoorPad(
             Text(
-              'The answers every antenatal service prints on its when-to-call card. Not a diagnosis; your own doctor\'s word wins.',
+              "These are the answers antenatal services give on their when-to-call cards. They're not a diagnosis, and your own doctor's word comes first.",
               style: pvManrope(fontSize: 11.5, height: 1.45, color: p.ink3),
             ),
           ),
@@ -206,7 +206,7 @@ class SymptomsNormalScreen extends StatelessWidget {
       eyebrow: 'Symptoms · Is this normal?',
       title: 'Is this normal?',
       intro:
-          'The ten questions, in your words, with the one answer that matters: rest, call today, or call now.',
+          'The questions women ask most, each with a clear answer: usually fine, call your doctor today, or call now.',
       children: [
         for (final q in kNormalQuestions)
           pvDoorPad(
@@ -224,7 +224,7 @@ class SymptomsNormalScreen extends StatelessWidget {
         const SizedBox(height: 8),
         pvDoorPad(
           Text(
-            'These are the answers every antenatal service prints on its when-to-call card. They are not a diagnosis, and your own doctor\'s word wins.',
+            "These are the answers antenatal services give on their when-to-call cards. They're not a diagnosis, and your own doctor's word comes first.",
             style: pvManrope(fontSize: 11.5, height: 1.45, color: p.ink3),
           ),
         ),
@@ -247,26 +247,26 @@ class SymptomsCallingScreen extends StatelessWidget {
   static const _lines = <(String, String)>[
     (
       'How many weeks you are',
-      'Or your due date. It is the first thing they ask, and it changes what they do next.',
+      "Or your due date. It's the first thing they ask, and it changes what they do next.",
     ),
     (
-      'What you are feeling, in your words',
-      'Bleeding, pain, tightening, fever — plainly. You do not need the medical word.',
+      "What you're feeling, in your words",
+      "Bleeding, pain, tightening, fever. Plain words are fine; you don't need the medical term.",
     ),
     (
       'Since when',
-      'An hour, since morning, three days. Steady, coming and going, or getting worse.',
+      'An hour, since this morning, three days. Steady, coming and going, or getting worse.',
     ),
     (
       'Whether the baby has moved today',
-      'After about 24 weeks. Say when you last felt movement, not whether it "seems normal".',
+      'After about 24 weeks. Say when you last felt your baby move, not whether it "seems normal".',
     ),
     (
       'Anything measured, if you have it',
       'Temperature, blood pressure, sugar readings. Numbers, not impressions.',
     ),
     (
-      'What you have already taken',
+      "What you've already taken",
       'Any medicine today, and anything you take every day.',
     ),
   ];
@@ -279,7 +279,7 @@ class SymptomsCallingScreen extends StatelessWidget {
       eyebrow: 'Symptoms · When you call',
       title: 'What to say when you call',
       intro:
-          'Ringing a hospital at two in the morning is easier with the words ready. These are the six they ask, in the order they ask them.',
+          "Calling a hospital at two in the morning is easier with the words ready. These are the six things they'll ask, in the order they usually ask them.",
       children: [
         for (var i = 0; i < _lines.length; i++)
           pvDoorPad(
@@ -332,7 +332,7 @@ class SymptomsCallingScreen extends StatelessWidget {
         const SizedBox(height: 2),
         pvDoorPad(
           Text(
-            'Say it plainly and let them ask the rest — working out what it means is their job, not yours. You never need to be sure before you call. If you cannot reach anyone and it is bad, go in.',
+            "Say it plainly and let them ask the rest. Working out what it means is their job, not yours. You never need to be sure before you call. If you can't reach anyone and it's bad, go in.",
             style: pvManrope(fontSize: 13, height: 1.55, color: p.ink1),
           ),
         ),

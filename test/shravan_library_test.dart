@@ -163,7 +163,7 @@ void main() {
           Scaffold(
               body: ShravanTrackPlayer(
                   audio: shravanById('bodyscan')!, controller: c)));
-      expect(find.text('Body Awareness Journey'), findsOneWidget);
+      expect(find.text('Body Awareness'), findsOneWidget);
       expect(find.byIcon(Icons.play_arrow_rounded), findsOneWidget);
       expect(tester.takeException(), isNull);
     });

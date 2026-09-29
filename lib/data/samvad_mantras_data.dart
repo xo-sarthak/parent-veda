@@ -116,7 +116,7 @@ const List<SamvadMantra> kSamvadMantras = [
     tradition: 'Vedic',
     original: 'ॐ शान्तिः शान्तिः शान्तिः॥',
     transliteration: 'Om shantih, shantih, shantih.',
-    meaning: 'Peace — in the body, in the mind, and in the world around us.',
+    meaning: 'Peace in the body, in the mind, and in the world around us.',
     source: 'The closing of the Upanishadic shanti mantras',
   ),
   SamvadMantra(
@@ -143,8 +143,8 @@ const List<SamvadMantra> kSamvadMantras = [
     tradition: 'Buddhist',
     original: 'ॐ मणिपद्मे हूँ',
     transliteration: 'Om mani padme hum.',
-    meaning: 'The jewel in the lotus — compassion, said over and over until '
-        'it settles.',
+    meaning: 'The jewel in the lotus. A line of compassion, said over and '
+        'over until it settles.',
     source: 'Traditional Buddhist mantra',
   ),
   SamvadMantra(
@@ -165,8 +165,8 @@ const List<SamvadMantra> kSamvadMantras = [
     tradition: 'Islamic',
     original: 'بِسْمِ اللَّٰهِ الرَّحْمَٰنِ الرَّحِيمِ',
     transliteration: 'Bismillah ir-Rahman ir-Rahim.',
-    meaning: 'In the name of God, the most gracious, the most merciful — '
-        'said before anything begins.',
+    meaning: 'In the name of God, the most gracious, the most merciful. '
+        'Said before anything begins.',
     source: 'The Basmala, the opening of the Quran',
   ),
   SamvadMantra(
@@ -190,7 +190,7 @@ const List<SamvadMantra> kSamvadMantras = [
         'मेरा बाबा सो गया।',
     transliteration: 'Nini baba nini, makkhan roti chini. Makkhan roti ho '
         'gayi, mera baba so gaya.',
-    meaning: 'Sleep, little one, sleep — butter, bread and sugar; the bread '
+    meaning: 'Sleep, little one, sleep: butter, bread and sugar. The bread '
         'is done, and my little one has fallen asleep.',
     source: 'Hindustani folk lullaby, traditional',
   ),

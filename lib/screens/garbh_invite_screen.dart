@@ -87,9 +87,9 @@ class _GarbhInviteScreenState extends State<GarbhInviteScreen> {
     // `Share.share` is the API this repo already uses (memory_export.dart,
     // bump_book_screen.dart). Same version, one way to share.
     await Share.share(
-      'I am recording things for our baby to hear before they arrive. '
-      'Would you record something as $who? ParentVeda will send you a link '
-      'as soon as this is ready.',
+      "I'm recording things for our baby to hear before they arrive. "
+      'Would you record something too, as $who? I will send you a link as '
+      'soon as the recording page is ready.',
       subject: 'Record something for the baby',
     );
   }
@@ -122,8 +122,8 @@ class _GarbhInviteScreenState extends State<GarbhInviteScreen> {
                     color: _ink)),
             const SizedBox(height: 8),
             Text(
-                'They record from their own phone. No app to install, no '
-                'account to make.',
+                "When it's ready, they'll record from their own phone. No app "
+                'to install, no account to make.',
                 style: pvManrope(fontSize: 13.5, height: 1.55, color: _muted)),
             const SizedBox(height: 24),
 
@@ -206,8 +206,8 @@ class _GarbhInviteScreenState extends State<GarbhInviteScreen> {
               ),
               child: Text(
                   'The recording page is still being built. For now this '
-                  'sends them a message so they know it is coming, and we '
-                  'will send you the link to pass on the moment it is ready.',
+                  "sends them a message so they know it's coming. Nothing is "
+                  'recorded yet, and no link is sent until the page is ready.',
                   style: pvManrope(fontSize: 12.5, height: 1.55, color: _ink)),
             ),
           ],

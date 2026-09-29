@@ -26,6 +26,7 @@ import 'package:parentveda/data/doors/pv_door_data.dart';
 import 'package:parentveda/data/doors/pv_door_symptoms.dart';
 import 'package:parentveda/data/reads/read_images.dart';
 import 'package:parentveda/data/reads/symptom_reads.dart';
+import 'package:parentveda/models/pv_read.dart';
 import 'package:parentveda/data/symptom_data.dart';
 import 'package:parentveda/data/symptoms/symptom_library.dart';
 import 'package:parentveda/data/symptoms/symptom_normal.dart';
@@ -46,10 +47,12 @@ void main() {
   SharedPreferences.setMockInitialValues({});
 
   group('the library', () {
-    test('thirty-three ordinary symptoms, none urgent, ids unique', () {
-      expect(kSymptomLibrary.length, 33);
+    // 2026-09-29: thirty-three became forty-six with the gap analysis's
+    // symptoms (cramps, spotting, discharge, breasts and nine more).
+    test('forty-six ordinary symptoms, none urgent, ids unique', () {
+      expect(kSymptomLibrary.length, 46);
       expect(kSymptomLibrary.any((s) => s.urgent), isFalse);
-      expect(kSymptomLibrary.map((s) => s.id).toSet().length, 33);
+      expect(kSymptomLibrary.map((s) => s.id).toSet().length, 46);
       expect(kSymptomUrgent.length, 5);
     });
 
@@ -90,8 +93,9 @@ void main() {
   });
 
   group('is this normal?', () {
-    test('ten questions, four now, their flag', () {
-      expect(kNormalQuestions.length, 10);
+    // 2026-09-29: eleven, with "I have hardly any symptoms" (a "usually").
+    test('eleven questions, four now, their flag', () {
+      expect(kNormalQuestions.length, 11);
       final now = kNormalQuestions.where((q) => q.verdict == NormalVerdict.now).map((q) => q.id).toList();
       expect(now, containsAll(['bleeding', 'movement', 'fluid', 'contractions']));
       expect(now.length, 4);
@@ -122,6 +126,51 @@ void main() {
         for (final n in r.readNext) {
           expect(symptomReadById(n), isNotNull, reason: '${s.id} → $n');
         }
+      }
+    });
+  });
+
+  group('the pages (2026-09-29, the pregnancy warmth pass)', () {
+    test('every symptom page opens with a short answer, and keeps its why', () {
+      for (final s in kSymptomLibrary) {
+        final r = pvReadFromSymptom(s);
+        expect(r.shortAnswer?.en.trim(), isNotEmpty, reason: s.id);
+        // The reader hides the scale-setter under a short answer, so the
+        // why must be a section of its own.
+        expect(r.sections.any((x) => x.paragraphs.any((p) => p.en == s.why.en)), isTrue, reason: s.id);
+      }
+      for (final q in kNormalQuestions) {
+        expect(pvReadFromNormal(q).shortAnswer?.en, q.short, reason: q.id);
+      }
+    });
+
+    test('cramps say which pains mean hospital; spotting and discharge link to the urgent answers', () {
+      final cramps = symptomById('cramps')!;
+      final body = [
+        cramps.doctorGuidance.en,
+        for (final x in pvReadFromSymptom(cramps).sections) ...[
+          for (final p in x.paragraphs) p.en,
+          for (final b in x.bullets) b.en,
+        ],
+      ].join(' ');
+      for (final sign in ['bleeding', 'one side', "doesn't ease", '37 weeks', 'hospital']) {
+        expect(body, contains(sign), reason: 'cramps page must name: $sign');
+      }
+      expect(pvReadFromSymptom(cramps).whenToSeeSomeone.tone, PvCalloutTone.urgent);
+
+      final spotting = pvReadFromSymptom(symptomById('spotting')!);
+      expect(spotting.whenToSeeSomeone.tone, PvCalloutTone.urgent);
+      expect(spotting.whenToSeeSomeone.body.en, contains('call now'));
+      expect(spotting.readNext.first, 'normal_bleeding');
+      expect(pvReadFromSymptom(symptomById('discharge')!).readNext, contains('normal_fluid'));
+      expect(pvReadFromSymptom(symptomById('blurryVision')!).whenToSeeSomeone.tone, PvCalloutTone.urgent);
+    });
+
+    test('the new symptoms are on the check-in grid', () {
+      final grid = symptomsCommonAt(20).map((s) => s.id).toSet();
+      for (final id in ['cramps', 'spotting', 'discharge', 'breasts', 'leakyBreasts', 'lightningCrotch', 'sciatica',
+          'blurryVision', 'excessSaliva', 'redPalms', 'clumsiness', 'libido', 'diarrhoea']) {
+        expect(grid, contains(id));
       }
     });
   });
@@ -228,7 +277,7 @@ void main() {
       expect(find.text('Heartburn'), findsOneWidget);
       expect(find.textContaining('Heartburn on 2 of the last 7 days'), findsOneWidget);
       final note = symptomWeekNote(c);
-      expect(note, contains('Heartburn — 2 days (strong ×1, moderate ×1)'));
+      expect(note, contains('Heartburn: 2 days (strong ×1, moderate ×1)'));
       expect(note, contains('My observation, not a diagnosis'));
     });
 
@@ -355,7 +404,12 @@ void main() {
       }
       // Two had nothing fit to use on Commons; a longer list means a photo
       // went missing, a shorter one means someone found better — update this.
-      expect(missing..sort(), ['nosebleeds', 'roundLigament']);
+      // The thirteen of 2026-09-29 have no photo yet either (owed).
+      expect(missing..sort(), [
+        'blurryVision', 'breasts', 'clumsiness', 'cramps', 'diarrhoea', 'discharge', 'excessSaliva',
+        'leakyBreasts', 'libido', 'lightningCrotch', 'nosebleeds', 'redPalms', 'roundLigament', 'sciatica',
+        'spotting',
+      ]);
       // The row asks for the same picture the reader draws.
       final tile = kSymptomsDoor.sections
           .expand((x) => x.tiles)

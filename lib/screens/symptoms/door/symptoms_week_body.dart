@@ -86,8 +86,8 @@ class SymptomsWeekBody extends StatelessWidget {
                 p,
                 'Your week',
                 sub: rows.isEmpty
-                    ? 'Nothing logged in the last seven days. Tap what you feel on Today and it shows up here, day by day.'
-                    : '$daysLogged of 7 days logged. A dot is a day; a bigger dot, a stronger day.',
+                    ? 'Nothing logged in the last seven days. Tap what you feel on Today, and it shows up here day by day.'
+                    : '$daysLogged of 7 days logged. Each dot is a day, and a bigger dot means a stronger day.',
               ),
             ),
             const SizedBox(height: 16),
@@ -96,7 +96,7 @@ class SymptomsWeekBody extends StatelessWidget {
               Text(
                 rows.isEmpty
                     ? 'Nothing logged in the last seven days yet.'
-                    : '$daysLogged of 7 days logged. A dot is a day; a bigger dot, a stronger day.',
+                    : '$daysLogged of 7 days logged. Each dot is a day, and a bigger dot means a stronger day.',
                 style: pvManrope(fontSize: 13, height: 1.45, color: p.ink2),
               ),
             ),
@@ -148,7 +148,7 @@ class SymptomsWeekBody extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'Counted, not interpreted — how many days you said so, and nothing more.',
+                    'Just a count of the days you logged it. It doesn\'t read anything into them.',
                     style: pvManrope(
                       fontSize: 11.5,
                       height: 1.45,
@@ -232,7 +232,7 @@ String symptomWeekNote(PregnancyController c) {
         if (sev[k] != null) '${severityLabel(k).toLowerCase()} ×${sev[k]}',
     ].join(', ');
     b.writeln(
-      '• $name — ${r.days} day${r.days == 1 ? '' : 's'}${detail.isEmpty ? '' : ' ($detail)'}',
+      '• $name: ${r.days} day${r.days == 1 ? '' : 's'}${detail.isEmpty ? '' : ' ($detail)'}',
     );
   }
   b.writeln();

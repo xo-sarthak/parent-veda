@@ -107,7 +107,7 @@ class GarbhJournalScreen extends StatelessWidget {
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Nothing here yet, and that is only today.',
+                          Text('Nothing here yet. It starts filling up from today.',
                               style: pvFraunces(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w600,
@@ -115,11 +115,10 @@ class GarbhJournalScreen extends StatelessWidget {
                                   color: _ink)),
                           const SizedBox(height: 10),
                           Text(
-                              'Every time you read something aloud, every raga '
-                              'you play, and every message your family records '
-                              'lands here, filed under the week it happened. '
-                              'By the time your baby arrives this is months of '
-                              'your voice, kept.',
+                              'Every time you record your voice or play a raga, '
+                              'it lands here, filed under the week it happened. '
+                              "By the time your baby arrives, you'll have months "
+                              'of your voice, kept safe.',
                               style: pvManrope(
                                   fontSize: 13.5, height: 1.6, color: _ink)),
                         ]),
@@ -171,8 +170,8 @@ class GarbhJournalScreen extends StatelessWidget {
                                         color: _ink)),
                                 const SizedBox(height: 3),
                                 Text(
-                                    'Something to read to them one day. It is '
-                                    'kept under this week.',
+                                    'Something for them to read one day. '
+                                    "It's kept under this week.",
                                     style: pvManrope(
                                         fontSize: 12,
                                         height: 1.4,
@@ -244,9 +243,9 @@ class GarbhJournalScreen extends StatelessWidget {
                 // "becomes the newborn playlist" additive rather than a
                 // rebuild.
                 Text(
-                    'This stays yours. It does not disappear after the birth: '
-                    'these are the voices your newborn will already know, and '
-                    'you can play the whole thing back whenever you want.',
+                    'This stays yours, and it does not disappear after the '
+                    'birth. These are the voices your newborn will already '
+                    'know, and you can play them all back whenever you like.',
                     style: pvManrope(fontSize: 12, height: 1.55, color: _muted)),
               ],
             ),
@@ -331,7 +330,7 @@ class _EmptyAlbum extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('Nothing here yet, and that is only today.',
+          Text('Nothing here yet. It starts filling up from today.',
               style: pvFraunces(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
@@ -339,10 +338,9 @@ class _EmptyAlbum extends StatelessWidget {
                   color: _ink)),
           const SizedBox(height: 10),
           Text(
-              'Every time you read something aloud, every raga you play, and '
-              'every message your family records lands here, filed under the '
-              'week it happened. By the time your baby arrives this is months '
-              'of your voice, kept.',
+              'Every time you record your voice or play a raga, it lands '
+              'here, filed under the week it happened. By the time your baby '
+              "arrives, you'll have months of your voice, kept safe.",
               style: pvManrope(fontSize: 13.5, height: 1.6, color: _ink)),
         ]),
       );
@@ -473,7 +471,7 @@ class _Header extends StatelessWidget {
         // "48 minutes of your voice" is the artifact itself, measured.
         Text(
             store.myVoiceSeconds == 0
-                ? 'Not yet recorded'
+                ? 'Nothing recorded yet'
                 : (mins > 0 ? '$mins min ${secs}s' : '${secs}s'),
             style: pvFraunces(
                 fontSize: 30,

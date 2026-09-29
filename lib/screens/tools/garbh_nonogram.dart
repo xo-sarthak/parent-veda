@@ -120,8 +120,8 @@ class _LogicGameState extends State<LogicGame> {
         padding: const EdgeInsets.only(bottom: 28),
         children: [
           garbhHowCard('The numbers say how many cells in a row are filled, '
-              'in order, with at least one gap between runs. Fill what must '
-              'be, cross what cannot.'),
+              'in order, with at least one gap between runs. Fill the cells '
+              "you're sure of, and cross out the ones that must be empty."),
           Padding(
             padding: const EdgeInsets.fromLTRB(18, 14, 18, 0),
             child: LayoutBuilder(builder: (context, box) {
@@ -199,7 +199,7 @@ class _LogicGameState extends State<LogicGame> {
             padding: const EdgeInsets.symmetric(horizontal: 18),
             child: Text(
                 _cross
-                    ? 'Tap to cross out a cell you are sure is empty.'
+                    ? "Tap to cross out a cell you're sure is empty."
                     : 'Tap to fill a cell. Switch to Cross to mark the '
                         'empties.',
                 style: pvManrope(fontSize: 12, color: kGameMuted)),

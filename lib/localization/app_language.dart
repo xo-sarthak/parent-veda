@@ -3155,7 +3155,7 @@ class S {
       'Ask Veda जल्द आ रहा है — आपका अपना AI गाइड।');
 
   // ---- Garbh Sanskar Journey (Tools) ---------------------------------------
-  String get gsTitle => _p('Garbh Sanskar Journey', 'गर्भ संस्कार सफ़र');
+  String get gsTitle => _p('Garbh Sanskar', 'गर्भ संस्कार सफ़र');
   String get gsSubtitle => _p(
       'A space for calm, connection and reflection during pregnancy.',
       'गर्भावस्था में शांति, जुड़ाव और सोच के लिए एक जगह।');
@@ -3170,7 +3170,7 @@ class S {
   String get gsSamvadTag => _p('Womb Connection', 'गर्भ से जुड़ाव');
   // Short "what/why/daily" intro shown above the Today's Rituals list on Home.
   String get gsHomeIntro => _p(
-      'Garbh Sanskar is the age-old practice of nurturing your baby in the womb — through sound, thought, connection and gentle movement. A few mindful minutes each day calm you and help your baby feel loved from the very start.',
+      'Garbh Sanskar is an old Indian tradition of spending calm time with your baby in pregnancy, through sound, words and gentle breath. A few minutes a day can calm you and give you a moment with your baby.',
       'गर्भ संस्कार आपके गर्भ में पल रहे शिशु को ध्वनि, विचार, जुड़ाव और हल्की हलचल से पोषित करने की प्राचीन परंपरा है। रोज़ाना कुछ शांत मिनट आपको सुकून देते हैं और शिशु को शुरुआत से ही प्यार महसूस कराते हैं।');
   String get gsVichara => _p('Vichara', 'विचार');
   String get gsVicharaTag => _p('Positive Contemplation', 'सकारात्मक विचार');
@@ -3178,10 +3178,10 @@ class S {
   String get gsKriyaTag => _p('Breath & Grounding', 'साँस और स्थिरता');
   // Tools Garbh Sanskar = a calm LIBRARY (no "today" framing). Intro + tiles.
   String get gsAboutBody => _p(
-      'Garbh Sanskar is the gentle, age-old practice of nurturing your bond and your baby\'s growth through sound, positive thoughts, loving connection and mindful movement during pregnancy.',
+      'Garbh Sanskar is an old Indian tradition of spending calm time with your baby in pregnancy: listening, talking to them, and a few quiet minutes for you.',
       'गर्भ संस्कार गर्भावस्था के दौरान ध्वनि, सकारात्मक विचारों, प्यार भरे जुड़ाव और सजग हलचल से आपके रिश्ते और शिशु के विकास को पोषित करने की सौम्य, प्राचीन परंपरा है।');
   String get gsAboutMeaning => _p(
-      'A calm space to explore - pick whatever feels right for you today.',
+      'A calm space to explore. Pick whatever feels right for you today.',
       'एक शांत जगह — आज जो आपको ठीक लगे वह चुनिए।');
   String get gsShravanDesc => _p(
       'Calming ragas, tones and sounds for you and your baby.',
@@ -3229,7 +3229,7 @@ class S {
   String get gsWellDoneBody =>
       _p('Carry this calm with you.', 'इस शांति को अपने साथ ले जाइए।');
   String get gsSampleAudio =>
-      _p('A calming sample plays here - full audio coming soon.',
+      _p('A calming sample plays here. The full audio is coming soon.',
           'यहाँ एक शांत नमूना बजता है — पूरा ऑडियो जल्द आएगा।');
 
   // ---- Garbh Sanskar v2.0 (daily ritual) ----------------------------------
@@ -3250,7 +3250,7 @@ class S {
   String gsDailyGoalLine(int goal) =>
       _p('Goal: $goal / $goal each day', 'लक्ष्य: रोज़ $goal / $goal');
   String get gsAllDone =>
-      _p('All 5 rituals complete - beautiful 💛', 'सारी 5 आदतें पूरी — बहुत सुंदर 💛');
+      _p('All 5 rituals done for today. Well done.', 'सारी 5 आदतें पूरी — बहुत सुंदर 💛');
   String get gsWhatToDo => _p('What to do', 'क्या करना है');
   String get gsWhyMatters => _p('Why it matters', 'यह क्यों ज़रूरी है');
   String get gsStart => _p('Start', 'शुरू करें');
@@ -3279,16 +3279,16 @@ class S {
   String get gsLifestyleHabit => _p('Lifestyle habit', 'जीवनशैली की आदत');
   String get gsLearnMore => _p('Learn more', 'और जानें');
   String get gsLearnMoreSoon =>
-      _p('Ask Veda is coming soon - your personal AI guide.',
+      _p('Ask Veda is coming soon, to answer your questions.',
           'Ask Veda जल्द आ रहा है — आपका अपना AI गाइड।');
   String get gsRelatedDiscussions =>
       _p('Mothers are also discussing', 'माँएँ इस पर बात भी कर रही हैं');
   String get gsPuzzleSoon =>
-      _p('This puzzle opens soon - counts as done for today ❤️',
+      _p('This puzzle opens soon. It counts as done for today.',
           'यह पहेली जल्द — आज के लिए पूरा माना जाएगा ❤️');
   // Vichara brain games - shared chrome.
   String get gsGameDone =>
-      _p('Well done - a calm few minutes 🌿', 'शाबाश — कुछ शांत पल 🌿');
+      _p('Well done. A few calm minutes for you.', 'शाबाश — कुछ शांत पल 🌿');
   String get gsPlayAgain => _p('Play again', 'फिर से खेलें');
   String get gsGameClose => _p('Done', 'हो गया');
   String get gsWordSearchHow => _p(

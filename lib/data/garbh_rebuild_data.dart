@@ -81,7 +81,7 @@ const List<GarbhWeekReason> kGarbhWeekReasons = [
       hi: 'आपका शिशु हिलना-डुलना शुरू कर चुका है, आपको महसूस होने से बहुत पहले। '
           'छूने की नसें अभी बन रही हैं।')),
   GarbhWeekReason(14, 17, LocalizedText(
-      en: 'The inner ear is forming. Sound is not heard yet, but the structure '
+      en: "The inner ear is forming. Your baby can't hear yet, but the part "
           'that will hear you is being built this month.',
       hi: 'भीतरी कान बन रहा है। आवाज़ अभी सुनाई नहीं देती, लेकिन जो हिस्सा आपको '
           'सुनेगा वह इसी महीने बन रहा है।')),
@@ -167,12 +167,12 @@ final List<GarbhRitual> kGarbhRituals = [
   GarbhRitual(
     id: 'silence',
     name: _t('Five minutes of silence', 'पाँच मिनट का मौन'),
-    blurb: _en('No words, no screen. Just five minutes.'),
+    blurb: _en('No words and no screen, for five minutes.'),
   ),
   GarbhRitual(
     id: 'japa',
     name: _t('Japa', 'जप'),
-    blurb: _en('With a counter, so you do not have to keep the number.'),
+    blurb: _en("With a counter, so you don't have to keep count."),
     hasCounter: true,
   ),
   GarbhRitual(

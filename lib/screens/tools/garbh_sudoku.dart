@@ -150,9 +150,9 @@ class _SudokuGameState extends State<SudokuGame> {
         children: [
           garbhHowCard(_size == 9
               ? 'Fill 1–9 so every row, column and 3×3 box has no repeats. '
-                  'Pencil in the maybes; nothing is timed.'
+                  'Pencil in the maybes. Nothing is timed.'
               : 'Fill 1–6 so every row, column and 2×3 box has no repeats. '
-                  'Pencil in the maybes; nothing is timed.'),
+                  'Pencil in the maybes. Nothing is timed.'),
           Padding(
             padding: const EdgeInsets.fromLTRB(18, 10, 18, 0),
             child: Row(children: [

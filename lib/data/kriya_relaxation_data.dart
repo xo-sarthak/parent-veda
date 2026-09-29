@@ -105,10 +105,10 @@ const KriyaRelaxation kKriyaRelaxation = KriyaRelaxation(
   id: 'relax',
   title: 'Guided Relaxation',
   intro: 'Eight minutes, head to toe. A voice walks you down your body, one '
-      'part at a time, and asks each one to let go. You do not have to do it '
+      "part at a time, and asks each one to let go. You don't have to do it "
       'well. You only have to lie there.',
-  close: 'That is the whole thing. Stay as long as you like; there is nowhere '
-      'to be.',
+  close: "That is the whole thing. Stay as long as you like. There's nowhere "
+      'you need to be.',
   steps: [
     KriyaRelaxationStep(
       id: 'settle',
@@ -118,7 +118,7 @@ const KriyaRelaxation kKriyaRelaxation = KriyaRelaxation(
       script: 'Lie on your side with a pillow between your knees, or sit back '
           'with something behind you. Not flat on your back. Let the surface '
           'take your weight. Close your eyes if you want to, or let them rest '
-          'on one point. Breathe in slowly, and let it out even more slowly.',
+          'on one spot. Breathe in slowly, and let it out even more slowly.',
     ),
     KriyaRelaxationStep(
       id: 'face',
@@ -191,7 +191,7 @@ const KriyaRelaxation kKriyaRelaxation = KriyaRelaxation(
       part: 0.68,
       seconds: 35,
       script: 'Down into your thighs. Let the big muscles at the front and '
-          'the back go slack. They do not have to hold you up. Nothing does, '
+          "the back go slack. They don't have to hold you up. Nothing does, "
           'for now.',
     ),
     KriyaRelaxationStep(
@@ -244,11 +244,11 @@ const KriyaRelaxation kKriyaRelaxation = KriyaRelaxation(
 //  Same rules: side or propped, head to toe, no claim about the baby.
 const KriyaRelaxation kKriyaBodyAwareness = KriyaRelaxation(
   id: 'body_awareness',
-  title: 'Body Awareness Journey',
+  title: 'Body Awareness',
   intro: 'Nine minutes of noticing. A voice moves your attention down your '
       'body, one part at a time, and asks nothing of any of them except that '
       'you feel it is there.',
-  close: 'That is the journey. You were here the whole time.',
+  close: "That's the practice. You were here the whole time.",
   steps: [
     KriyaRelaxationStep(
       id: 'arrive',
@@ -258,7 +258,7 @@ const KriyaRelaxation kKriyaBodyAwareness = KriyaRelaxation(
       script: 'Lie on your side with a pillow between your knees, or sit '
           'propped up. Not flat on your back. Let your eyes close or soften. '
           'Notice the weight of you on the surface beneath you, and the '
-          'places where you touch it. You do not have to change anything.',
+          "places where you touch it. You don't have to change anything.",
     ),
     KriyaRelaxationStep(
       id: 'head',
@@ -266,7 +266,7 @@ const KriyaRelaxation kKriyaBodyAwareness = KriyaRelaxation(
       part: 0.03,
       seconds: 40,
       script: 'Bring your attention to the very top of your head. You cannot '
-          'see it; you can only feel that it is there. Notice the scalp, and '
+          "see it. You can only feel that it's there. Notice the scalp, and "
           'whatever is under your hair. Warm, cool, tingling, nothing at '
           'all. All of those are fine.',
     ),
@@ -314,7 +314,7 @@ const KriyaRelaxation kKriyaBodyAwareness = KriyaRelaxation(
       seconds: 55,
       script: 'Your belly, and everything it holds. Notice its shape, its '
           'warmth, the way it moves with your breath. Your baby is in here, '
-          'and this is a minute of simply being aware of that, with nothing '
+          'and this is a minute of just being aware of that, with nothing '
           'to do about it and nothing it has to mean.',
     ),
     KriyaRelaxationStep(
@@ -325,7 +325,7 @@ const KriyaRelaxation kKriyaBodyAwareness = KriyaRelaxation(
       script: 'The whole length of your back, from between your shoulder '
           'blades to the base of your spine. Your hips, and the pillow '
           'between your knees. Notice where you are held up, and where you '
-          'are simply resting.',
+          'are just resting.',
     ),
     KriyaRelaxationStep(
       id: 'legs',

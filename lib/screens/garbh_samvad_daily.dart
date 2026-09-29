@@ -147,8 +147,8 @@ class _GarbhSamvadDailyScreenState extends State<GarbhSamvadDailyScreen> {
       // than at what went wrong.
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text(
-            'ParentVeda needs the microphone to record your voice. You can '
-            'still listen to the narrator version below.'),
+            'To record your voice, ParentVeda needs the microphone. You can '
+            'still listen to the narrator below.'),
       ));
       return;
     }
@@ -235,7 +235,9 @@ class _GarbhSamvadDailyScreenState extends State<GarbhSamvadDailyScreen> {
           const Icon(Icons.favorite_rounded, size: 34, color: _accSamvad),
           const SizedBox(height: 14),
           // ⚠️ THE SENTENCE THE WHOLE SCREEN EXISTS FOR. Never "completed".
-          Text('Your baby heard your voice for $said today.',
+          // Rewritten 2026-09-29: "Your baby heard your voice" was not true
+          // before hearing starts (about week 18), so it now says what she did.
+          Text('You spoke to your baby for $said today.',
               textAlign: TextAlign.center,
               style: pvFraunces(
                   fontSize: 19,
@@ -243,7 +245,7 @@ class _GarbhSamvadDailyScreenState extends State<GarbhSamvadDailyScreen> {
                   height: 1.3,
                   color: _ink)),
           const SizedBox(height: 10),
-          Text('It is saved in My Journal, under week $_week.',
+          Text("It's saved in My Journal, under week $_week.",
               textAlign: TextAlign.center,
               style: pvManrope(fontSize: 13, height: 1.5, color: _muted)),
         ]),

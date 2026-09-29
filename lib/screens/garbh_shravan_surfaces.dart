@@ -281,8 +281,9 @@ class ShravanCreditsScreen extends StatelessWidget {
         hue: 42,
         eyebrow: 'Shravan',
         title: 'Where these sounds come from',
-        intro: 'Each track was recorded by a person and released for anyone '
-            'to use. Their names, and where to find the originals.',
+        intro: 'Each track was recorded by a real person and shared for '
+            'anyone to use. Here are their names, and where to find the '
+            'originals.',
         children: [
           for (final t in lib.tracks) ...[
             pvDoorPad(Container(
@@ -320,13 +321,13 @@ class ShravanCreditsScreen extends StatelessWidget {
           ],
           if (lib.isLoaded && lib.tracks.isEmpty)
             pvDoorPad(Text(
-                'No tracks are listed yet. The bundled drone plays in their '
+                'No tracks are listed yet. A soft drone plays in their '
                 'place.',
                 style: pvManrope(fontSize: 13, color: p.ink2))),
           const SizedBox(height: 8),
           pvDoorPad(Text(
-              'The Body Awareness Journey is not a recording: it is a written '
-              'script read by the app\'s own voice.',
+              "Body Awareness isn't a recording. It's a written script, read "
+              "aloud by the app's own voice.",
               style: pvManrope(fontSize: 12, height: 1.5, color: p.ink3))),
           const SizedBox(height: 10),
         ],

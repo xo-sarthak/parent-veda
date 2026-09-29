@@ -21,8 +21,8 @@ import '../../v2/v2_palette.dart';
 /// The three strengths, in the store's words.
 const List<(String, String, String)> kSeverities = [
   ('mild', 'Mild', 'There, but I can get on with things'),
-  ('moderate', 'Moderate', 'It is getting in the way'),
-  ('strong', 'Strong', 'It is most of what today is'),
+  ('moderate', 'Moderate', "It's getting in the way"),
+  ('strong', 'Strong', "It's taking over my day"),
 ];
 
 String severityLabel(String id) => kSeverities.where((s) => s.$1 == id).firstOrNull?.$2 ?? 'Logged';
@@ -111,6 +111,28 @@ TtcGlyph? symptomGlyphFor(String id) => switch (id) {
       'babyHiccups' => TtcGlyph.bounce,
       'pelvicPressure' => TtcGlyph.basinDown,
       'braxtonHicks' => TtcGlyph.tighten,
+      // ---- the thirteen of 2026-09-29, from marks TTC already draws ------------
+      // Five are the right object: TTC draws spotting, discharge, tender
+      // breasts and a raised heart for the same things. The rest are the
+      // closest unused mark, held until their own are drawn (the report lists
+      // them): cramps wear ripples (an ache spreading from one point),
+      // leaking breasts and extra saliva a plain and a stretched drop, sharp
+      // jabs the storm's bolt, clumsiness the stride, sciatica the seated
+      // stretch, blurry vision two blurred rings, red palms the warm
+      // thermometer, loose motions the dotted drop.
+      'spotting' => TtcGlyph.dropSpot,
+      'discharge' => TtcGlyph.dropCreamy,
+      'breasts' => TtcGlyph.tender,
+      'libido' => TtcGlyph.heartUp,
+      'cramps' => TtcGlyph.ripples,
+      'leakyBreasts' => TtcGlyph.dropWatery,
+      'excessSaliva' => TtcGlyph.dropStretch,
+      'lightningCrotch' => TtcGlyph.storm,
+      'clumsiness' => TtcGlyph.stride,
+      'sciatica' => TtcGlyph.lotus,
+      'blurryVision' => TtcGlyph.rings,
+      'redPalms' => TtcGlyph.thermometer,
+      'diarrhoea' => TtcGlyph.dropSticky,
       _ => null,
     };
 

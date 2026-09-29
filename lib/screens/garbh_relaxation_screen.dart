@@ -232,8 +232,8 @@ class _GarbhRelaxationScreenState extends State<GarbhRelaxationScreen> {
         hue: 42,
         eyebrow: 'Kriya',
         title: s.title,
-        intro: '$minutes minutes, head to toe. Your calm and your grounding; '
-            'nothing here is a claim about the baby.',
+        intro: '$minutes minutes, head to toe. This is for your own calm. '
+            'Nothing here makes a claim about your baby.',
         children: switch (_phase) {
           _Phase.intro => _intro(p, tint, ink),
           _Phase.running => _running(p, tint, ink),
