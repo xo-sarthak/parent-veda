@@ -2,7 +2,7 @@
   {
     "day": 71,
     "week": 11,
-    "babyLearning": { "en": "growing tiny fingers, softly stretching out", "hi": "नन्ही उँगलियाँ बन रही हैं, धीरे-धीरे खुलती हुई" },
+    "babyLearning": { "en": "Your baby's bones are starting to harden.", "hi": "नन्ही उँगलियाँ बन रही हैं, धीरे-धीरे खुलती हुई" },
     "grow": {
       "title": { "en": "Courage Is Quiet", "hi": "हिम्मत शांत होती है" },
       "insight": { "en": "Courage is not always loud. Most often it is the quiet choice to keep going, made softly, when no one is watching.", "hi": "हिम्मत हमेशा शोर नहीं मचाती। अक्सर तो यह आगे बढ़ते रहने का वह शांत फ़ैसला होता है, जो धीरे से लिया जाता है, जब कोई देख भी नहीं रहा होता।" },
@@ -42,7 +42,7 @@
   {
     "day": 72,
     "week": 11,
-    "babyLearning": { "en": "tiny tooth buds forming, deep within", "hi": "दाँतों की नन्ही कलियाँ बन रही हैं, गहरे भीतर" },
+    "babyLearning": { "en": "Your baby can stretch and kick, though you can't feel it yet.", "hi": "दाँतों की नन्ही कलियाँ बन रही हैं, गहरे भीतर" },
     "grow": {
       "title": { "en": "Brave Is Not Fearless", "hi": "बहादुर होना निडर होना नहीं है" },
       "insight": { "en": "Being brave has never meant feeling no fear. It means feeling the fear and choosing love anyway.", "hi": "बहादुर होने का मतलब कभी यह नहीं रहा कि डर लगे ही नहीं। इसका मतलब है डर महसूस करना और फिर भी प्यार चुनना।" },
@@ -82,7 +82,7 @@
   {
     "day": 73,
     "week": 11,
-    "babyLearning": { "en": "kicking and stretching, though too small to feel", "hi": "लात मारना और अंगड़ाई लेना, अभी इतना छोटा कि महसूस न हो" },
+    "babyLearning": { "en": "Your baby may get hiccups now, far too small for you to feel.", "hi": "लात मारना और अंगड़ाई लेना, अभी इतना छोटा कि महसूस न हो" },
     "grow": {
       "title": { "en": "You Are Stronger Than The Doubt", "hi": "आप शक़ से ज़्यादा मज़बूत हैं" },
       "insight": { "en": "The voice that whispers 'you can't' is not the truth about you. It is only fear, and you are far bigger than it.", "hi": "जो आवाज़ फुसफुसाती है 'तुमसे नहीं होगा', वह आपके बारे में सच नहीं है। वह सिर्फ़ डर है, और आप उससे कहीं बड़ी हैं।" },
@@ -122,7 +122,7 @@
   {
     "day": 74,
     "week": 11,
-    "babyLearning": { "en": "tiny hiccups beginning, soft and unseen", "hi": "नन्ही हिचकियाँ शुरू हो रही हैं, नरम और अनदेखी" },
+    "babyLearning": { "en": "Your baby's skin is still thin enough to see through.", "hi": "नन्ही हिचकियाँ शुरू हो रही हैं, नरम और अनदेखी" },
     "grow": {
       "title": { "en": "Small Acts Of Bravery", "hi": "बहादुरी के छोटे काम" },
       "insight": { "en": "You do not need one great act of courage. A life is changed by a hundred small, brave choices.", "hi": "आपको हिम्मत के एक बड़े कारनामे की ज़रूरत नहीं। ज़िंदगी सौ छोटे, बहादुर फ़ैसलों से बदलती है।" },
@@ -162,7 +162,7 @@
   {
     "day": 75,
     "week": 11,
-    "babyLearning": { "en": "skin still see-through, but thickening day by day", "hi": "त्वचा अभी भी आर-पार दिखती है, पर दिन-ब-दिन मोटी होती जा रही" },
+    "babyLearning": { "en": "Your baby's intestines, which grew partly in the cord, are moving inside.", "hi": "त्वचा अभी भी आर-पार दिखती है, पर दिन-ब-दिन मोटी होती जा रही" },
     "grow": {
       "title": { "en": "Fear And Love Can Coexist", "hi": "डर और प्यार साथ रह सकते हैं" },
       "insight": { "en": "You can love this baby with your whole heart and still feel afraid. The two were always meant to live together.", "hi": "आप इस शिशु को अपने पूरे दिल से प्यार कर सकती हैं और फिर भी डर महसूस कर सकती हैं। ये दोनों हमेशा से साथ ही रहने वाले थे।" },
@@ -202,7 +202,7 @@
   {
     "day": 76,
     "week": 11,
-    "babyLearning": { "en": "tiny nail beds beginning to appear", "hi": "नन्हे नाख़ूनों की जड़ें बनने लगी हैं" },
+    "babyLearning": { "en": "Your baby's head is about half the length of the whole body.", "hi": "नन्हे नाख़ूनों की जड़ें बनने लगी हैं" },
     "grow": {
       "title": { "en": "Showing Up Is Courage", "hi": "मौजूद रहना ही हिम्मत है" },
       "insight": { "en": "On the days you do nothing more than simply show up, you have already done the bravest thing.", "hi": "जिन दिनों आप सिर्फ़ मौजूद रह पाती हैं और कुछ नहीं, उन्हीं दिनों आप सबसे बहादुर काम कर चुकी होती हैं।" },
@@ -242,7 +242,7 @@
   {
     "day": 77,
     "week": 11,
-    "babyLearning": { "en": "closing the week, growing steadily stronger", "hi": "हफ़्ता पूरा होते-होते, लगातार मज़बूत होते हुए" },
+    "babyLearning": { "en": "Tiny nail beds are forming on your baby's fingers.", "hi": "हफ़्ता पूरा होते-होते, लगातार मज़बूत होते हुए" },
     "grow": {
       "title": { "en": "You Can Do Hard Things", "hi": "आप मुश्किल चीज़ें कर सकती हैं" },
       "insight": { "en": "Look back at all you have already carried. You are someone who does hard things — quietly, and well.", "hi": "पीछे मुड़कर देखिए, आप अब तक कितना कुछ सँभाल चुकी हैं। आप वह हैं जो मुश्किल चीज़ें करती हैं — चुपचाप, और अच्छे से।" },

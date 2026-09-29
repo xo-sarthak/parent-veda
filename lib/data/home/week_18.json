@@ -2,7 +2,7 @@
   {
     "day": 120,
     "week": 18,
-    "babyLearning": { "en": "tiny ears forming, soon ready to hear your voice", "hi": "नन्हे कान बनना — जल्द ही आपकी आवाज़ सुनने को तैयार" },
+    "babyLearning": { "en": "Your baby's ears are in place, and hearing is developing.", "hi": "नन्हे कान बनना — जल्द ही आपकी आवाज़ सुनने को तैयार" },
     "grow": {
       "title": { "en": "They Can Hear You Now", "hi": "अब वे आपको सुन सकते हैं" },
       "insight": { "en": "Around this week, your baby's hearing awakens. The sounds of your life are becoming their very first world.", "hi": "लगभग इसी हफ़्ते आपके शिशु के सुनने की शक्ति जागती है। आपकी ज़िंदगी की आवाज़ें उनकी सबसे पहली दुनिया बन रही हैं।" },
@@ -42,7 +42,7 @@
   {
     "day": 121,
     "week": 18,
-    "babyLearning": { "en": "starting to catch the muffled music of your world", "hi": "आपकी दुनिया का धीमा-सा संगीत पकड़ना शुरू" },
+    "babyLearning": { "en": "Your baby may start to hear some sounds around now.", "hi": "आपकी दुनिया का धीमा-सा संगीत पकड़ना शुरू" },
     "grow": {
       "title": { "en": "Your Voice Is Their Favourite Sound", "hi": "आपकी आवाज़ उनकी सबसे पसंदीदा आवाज़ है" },
       "insight": { "en": "Of every sound in the world, none will be as dear to your baby as the gentle sound of you.", "hi": "दुनिया की सारी आवाज़ों में से कोई भी आपके शिशु को उतनी प्यारी नहीं होगी जितनी आपकी अपनी नरम आवाज़।" },
@@ -82,7 +82,7 @@
   {
     "day": 122,
     "week": 18,
-    "babyLearning": { "en": "soothed by the gentle hum of sound around them", "hi": "आस-पास की आवाज़ की नरम गुनगुनाहट से सुकून पाना" },
+    "babyLearning": { "en": "Your baby's nerves are starting to grow a protective coating (myelin).", "hi": "आस-पास की आवाज़ की नरम गुनगुनाहट से सुकून पाना" },
     "grow": {
       "title": { "en": "Speak, Sing, Be Heard", "hi": "बोलिए, गाइए, सुनी जाइए" },
       "insight": { "en": "You do not need to be a singer or a storyteller. Your baby simply loves to hear you be you.", "hi": "आपको गायिका या क़िस्सागो होने की ज़रूरत नहीं। आपके शिशु को तो बस आपको आप ही की तरह सुनना अच्छा लगता है।" },
@@ -122,7 +122,7 @@
   {
     "day": 123,
     "week": 18,
-    "babyLearning": { "en": "feeling the rise and fall of feeling in your words", "hi": "आपके शब्दों में भाव का उतार-चढ़ाव महसूस करना" },
+    "babyLearning": { "en": "Your baby moves arms and legs with more control now.", "hi": "आपके शब्दों में भाव का उतार-चढ़ाव महसूस करना" },
     "grow": {
       "title": { "en": "Words Carry Feeling", "hi": "शब्द भाव लिए चलते हैं" },
       "insight": { "en": "Long before your baby knows what words mean, they feel the emotion riding inside them.", "hi": "शब्दों का मतलब जानने से बहुत पहले आपका शिशु उनके भीतर बैठे भाव को महसूस कर लेता है।" },
@@ -162,7 +162,7 @@
   {
     "day": 124,
     "week": 18,
-    "babyLearning": { "en": "swaying to the shared rhythm of sound and movement", "hi": "आवाज़ और हरकत की साझी ताल पर झूलना" },
+    "babyLearning": { "en": "Many women have the anomaly scan between 18 and 22 weeks.", "hi": "आवाज़ और हरकत की साझी ताल पर झूलना" },
     "grow": {
       "title": { "en": "The Music You Share", "hi": "वह संगीत जो आप बाँटती हैं" },
       "insight": { "en": "The songs you love can become a gift you share with your baby, long before they are born.", "hi": "जो गीत आपको प्यारे हैं, वे एक ऐसा तोहफ़ा बन सकते हैं जिसे आप अपने शिशु के साथ जन्म से बहुत पहले ही बाँट लेती हैं।" },
@@ -202,7 +202,7 @@
   {
     "day": 125,
     "week": 18,
-    "babyLearning": { "en": "lulled by the slow, steady sound of you", "hi": "आपकी धीमी, ठहरी हुई आवाज़ से सुकून पाना" },
+    "babyLearning": { "en": "Your baby's brain is building the links for learning and memory.", "hi": "आपकी धीमी, ठहरी हुई आवाज़ से सुकून पाना" },
     "grow": {
       "title": { "en": "A Lullaby Before Birth", "hi": "जन्म से पहले एक लोरी" },
       "insight": { "en": "A lullaby you sing now is not too early. It is the first song of a bond that will last a lifetime.", "hi": "जो लोरी आप अभी गाती हैं, वह जल्दी नहीं है। वह एक ऐसे रिश्ते का पहला गीत है जो उम्र भर चलेगा।" },
@@ -242,7 +242,7 @@
   {
     "day": 126,
     "week": 18,
-    "babyLearning": { "en": "quietly storing the familiar sounds of home", "hi": "घर की जानी-पहचानी आवाज़ें चुपचाप सँभालना" },
+    "babyLearning": { "en": "First movements often feel like bubbles or light tapping.", "hi": "घर की जानी-पहचानी आवाज़ें चुपचाप सँभालना" },
     "grow": {
       "title": { "en": "Sound Becomes Memory", "hi": "आवाज़ याद बन जाती है" },
       "insight": { "en": "The sounds your baby hears today do not simply pass by. They are quietly becoming their very first memories.", "hi": "जो आवाज़ें आपका शिशु आज सुनता है, वे बस गुज़र नहीं जातीं। वे चुपचाप उनकी सबसे पहली यादें बनती जा रही हैं।" },

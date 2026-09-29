@@ -2,7 +2,7 @@
   {
     "day": 50,
     "week": 8,
-    "babyLearning": { "en": "growing tiny fingers, soft and new", "hi": "नन्ही उँगलियाँ बन रही हैं, नरम और नई" },
+    "babyLearning": { "en": "Grooves are appearing on your baby's hands where fingers will be.", "hi": "नन्ही उँगलियाँ बन रही हैं, नरम और नई" },
     "grow": {
       "title": { "en": "Your Way Is A Good Way", "hi": "आपका तरीक़ा भी एक अच्छा तरीक़ा है" },
       "insight": { "en": "There is no single right way to do this. The way you love your baby, in your own rhythm, is already a good way.", "hi": "इसे करने का कोई एक ही सही तरीक़ा नहीं है। जिस तरह आप अपने बच्चे को प्यार करती हैं, अपनी ही चाल में — वह पहले से एक अच्छा तरीक़ा है।" },
@@ -42,7 +42,7 @@
   {
     "day": 51,
     "week": 8,
-    "babyLearning": { "en": "little arms and legs beginning to move", "hi": "नन्हे हाथ और पैर हिलने लगे हैं" },
+    "babyLearning": { "en": "Your baby may make tiny first movements, far too small to feel.", "hi": "नन्हे हाथ और पैर हिलने लगे हैं" },
     "grow": {
       "title": { "en": "Advice Is Not Instruction", "hi": "सलाह हुक्म नहीं होती" },
       "insight": { "en": "Advice is something offered, not something you must obey. You are always free to keep what fits and let the rest go.", "hi": "सलाह दी जाने वाली चीज़ है, ऐसी नहीं जिसे मानना ही पड़े। जो बात आप पर बैठे उसे रखना और बाक़ी को जाने देना — यह हमेशा आपके हाथ में है।" },
@@ -82,7 +82,7 @@
   {
     "day": 52,
     "week": 8,
-    "babyLearning": { "en": "eyelids slowly forming over tiny eyes", "hi": "नन्ही आँखों पर धीरे-धीरे पलकें बन रही हैं" },
+    "babyLearning": { "en": "Your baby's eyelids are just starting to form.", "hi": "नन्ही आँखों पर धीरे-धीरे पलकें बन रही हैं" },
     "grow": {
       "title": { "en": "No Two Journeys Match", "hi": "कोई दो सफ़र एक जैसे नहीं होते" },
       "insight": { "en": "Your pregnancy will not look like anyone else's, and it is not meant to. Each journey has its own shape.", "hi": "आपकी गर्भावस्था किसी और जैसी नहीं दिखेगी, और उसे दिखनी भी नहीं चाहिए। हर सफ़र का अपना आकार होता है।" },
@@ -122,7 +122,7 @@
   {
     "day": 53,
     "week": 8,
-    "babyLearning": { "en": "a little nose taking gentle shape", "hi": "एक नन्ही नाक नरम आकार ले रही है" },
+    "babyLearning": { "en": "Your baby's face is becoming easier to make out.", "hi": "एक नन्ही नाक नरम आकार ले रही है" },
     "grow": {
       "title": { "en": "Trust Your Quiet Instinct", "hi": "अपनी शांत सहज समझ पर भरोसा कीजिए" },
       "insight": { "en": "Beneath all the noise, you carry a quiet knowing about your baby. It is worth listening to.", "hi": "सारे शोर के नीचे, आपके भीतर अपने बच्चे के बारे में एक शांत सी समझ रहती है। उसे सुनना ज़रूरी है।" },
@@ -162,7 +162,7 @@
   {
     "day": 54,
     "week": 8,
-    "babyLearning": { "en": "growing steadily, every day a little more", "hi": "लगातार बढ़ते हुए, हर दिन थोड़ा और" },
+    "babyLearning": { "en": "The outer ears are beginning to form on your baby's head.", "hi": "लगातार बढ़ते हुए, हर दिन थोड़ा और" },
     "grow": {
       "title": { "en": "Comparison Steals Joy", "hi": "तुलना ख़ुशी चुरा लेती है" },
       "insight": { "en": "The moment you start comparing, the joy of your own moment quietly slips away. Your story is not theirs.", "hi": "जिस पल आप तुलना करने लगती हैं, आपके अपने पल की ख़ुशी चुपचाप खिसक जाती है। आपकी कहानी उनकी नहीं है।" },
@@ -202,7 +202,7 @@
   {
     "day": 55,
     "week": 8,
-    "babyLearning": { "en": "tiny features growing clearer each day", "hi": "नन्हे नक़्श हर दिन साफ़ होते जा रहे हैं" },
+    "babyLearning": { "en": "Your baby's feet have small ridges where the toes will grow.", "hi": "नन्हे नक़्श हर दिन साफ़ होते जा रहे हैं" },
     "grow": {
       "title": { "en": "You Know Your Baby Best", "hi": "अपने बच्चे को सबसे बेहतर आप जानती हैं" },
       "insight": { "en": "No book or expert spends every moment with your baby the way you do. In time, you will be the true expert on this little one.", "hi": "कोई किताब या जानकार आपके बच्चे के साथ हर पल नहीं बिताता, जैसे आप बिताती हैं। समय के साथ इस बच्चे की सबसे सच्ची जानकार आप ही होंगी।" },
@@ -242,7 +242,7 @@
   {
     "day": 56,
     "week": 8,
-    "babyLearning": { "en": "closing the week, stronger and more whole", "hi": "हफ़्ता पूरा करते हुए, पहले से ज़्यादा मज़बूत और पूरे" },
+    "babyLearning": { "en": "All your baby's main organs have started to grow.", "hi": "हफ़्ता पूरा करते हुए, पहले से ज़्यादा मज़बूत और पूरे" },
     "grow": {
       "title": { "en": "Write Your Own Story", "hi": "अपनी कहानी ख़ुद लिखिए" },
       "insight": { "en": "This pregnancy, and the parent you become, is a story only you can write. No one else holds the pen.", "hi": "यह गर्भावस्था, और आप जो माता-पिता बनती हैं — यह एक ऐसी कहानी है जिसे सिर्फ़ आप लिख सकती हैं। क़लम किसी और के हाथ में नहीं।" },

@@ -2,7 +2,7 @@
   {
     "day": 246,
     "week": 36,
-    "babyLearning": { "en": "growing rounder and fuller, getting ready to meet you", "hi": "और गोल और भरा-भरा होता जा रहा है, आपसे मिलने की तैयारी में" },
+    "babyLearning": { "en": "Your baby is practising sucking and swallowing, ready for feeds.", "hi": "और गोल और भरा-भरा होता जा रहा है, आपसे मिलने की तैयारी में" },
     "grow": {
       "title": { "en": "Your Journey Is Not A Competition", "hi": "आपका सफ़र कोई मुक़ाबला नहीं है" },
       "insight": { "en": "No two pregnancies, and no two babies, unfold the same way. Yours is not a race against anyone.", "hi": "कोई दो गर्भावस्थाएँ, और कोई दो शिशु, एक जैसे नहीं खुलते। आपका सफ़र किसी के ख़िलाफ़ कोई दौड़ नहीं है।" },
@@ -42,7 +42,7 @@
   {
     "day": 247,
     "week": 36,
-    "babyLearning": { "en": "settling lower, snug and getting cosy", "hi": "और नीचे बस रहा है, आराम से और सिमटा हुआ" },
+    "babyLearning": { "en": "Your baby may know voices and songs they've heard often.", "hi": "और नीचे बस रहा है, आराम से और सिमटा हुआ" },
     "grow": {
       "title": { "en": "Comparison Is A Thief", "hi": "तुलना एक चोर है" },
       "insight": { "en": "Comparison quietly steals the joy from moments that were perfectly lovely until you measured them against someone else's.", "hi": "तुलना चुपचाप उन पलों से ख़ुशी चुरा लेती है जो बिल्कुल प्यारे थे — जब तक आपने उन्हें किसी और के पलों से नाप नहीं लिया।" },
@@ -82,7 +82,7 @@
   {
     "day": 248,
     "week": 36,
-    "babyLearning": { "en": "practising tiny breaths, almost fully grown", "hi": "नन्ही साँसों का अभ्यास चल रहा है, लगभग पूरा बढ़ चुका है" },
+    "babyLearning": { "en": "Most of the fine hair (lanugo) has shed by now.", "hi": "नन्ही साँसों का अभ्यास चल रहा है, लगभग पूरा बढ़ चुका है" },
     "grow": {
       "title": { "en": "No Two Babies Are The Same", "hi": "कोई दो शिशु एक जैसे नहीं होते" },
       "insight": { "en": "Every baby arrives with their own pace, temperament and gifts. Yours was never meant to match anyone else's.", "hi": "हर शिशु अपनी ही रफ़्तार, अपने स्वभाव और अपनी ख़ूबियों के साथ आता है। आपका शिशु किसी और से मेल खाने के लिए बना ही नहीं था।" },
@@ -122,7 +122,7 @@
   {
     "day": 249,
     "week": 36,
-    "babyLearning": { "en": "soft and strong, resting in close", "hi": "नरम और मज़बूत, आपसे लगकर आराम करते हुए" },
+    "babyLearning": { "en": "You may feel your baby drop lower, which can ease your breathing.", "hi": "नरम और मज़बूत, आपसे लगकर आराम करते हुए" },
     "grow": {
       "title": { "en": "Run Your Own Race", "hi": "अपनी दौड़ ख़ुद दौड़िए" },
       "insight": { "en": "When you keep your eyes on your own lane, you stop tripping over everyone else's pace.", "hi": "जब आप अपनी ही राह पर नज़र रखती हैं, तो आप बाक़ी सबकी रफ़्तार पर ठोकर खाना बंद कर देती हैं।" },
@@ -162,7 +162,7 @@
   {
     "day": 250,
     "week": 36,
-    "babyLearning": { "en": "growing calmer and more curled, close now", "hi": "और शांत और सिमटा हुआ बढ़ रहा है, अब बहुत क़रीब" },
+    "babyLearning": { "en": "Your baby's lungs are almost ready for that first breath.", "hi": "और शांत और सिमटा हुआ बढ़ रहा है, अब बहुत क़रीब" },
     "grow": {
       "title": { "en": "Trust Beats Comparison", "hi": "भरोसा तुलना को हरा देता है" },
       "insight": { "en": "Comparison asks 'am I keeping up?' Trust asks 'is this right for us?' — and only one of those brings peace.", "hi": "तुलना पूछती है 'क्या मैं साथ चल पा रही हूँ?' भरोसा पूछता है 'क्या यह हमारे लिए सही है?' — और इन दोनों में शांति सिर्फ़ एक लाता है।" },
@@ -202,7 +202,7 @@
   {
     "day": 251,
     "week": 36,
-    "babyLearning": { "en": "plump and ready, listening for your voice", "hi": "गोल-मटोल और तैयार, आपकी आवाज़ सुनने को कान लगाए" },
+    "babyLearning": { "en": "Your baby's digestive system is ready, but waits until after birth.", "hi": "गोल-मटोल और तैयार, आपकी आवाज़ सुनने को कान लगाए" },
     "grow": {
       "title": { "en": "Other People's Highlights Aren't Your Reality", "hi": "दूसरों के चुने हुए पल आपकी असलियत नहीं" },
       "insight": { "en": "What you see of others is a highlight reel; what you live is the whole, unedited day. They are never a fair comparison.", "hi": "दूसरों का जो आप देखती हैं, वह चुने हुए पलों की झलक है; जो आप जीती हैं, वह पूरा, बिना काटा-छाँटा दिन है। इन दोनों की तुलना कभी इंसाफ़ नहीं है।" },
@@ -242,7 +242,7 @@
   {
     "day": 252,
     "week": 36,
-    "babyLearning": { "en": "rounding out the week, almost ready to arrive", "hi": "हफ़्ता पूरा हो रहा है, आने के लिए लगभग तैयार" },
+    "babyLearning": { "en": "Your baby has soft creases and dimples at the elbows and knees.", "hi": "हफ़्ता पूरा हो रहा है, आने के लिए लगभग तैयार" },
     "grow": {
       "title": { "en": "Your Baby Needs You, Not A Copy", "hi": "आपके शिशु को आप चाहिए, कोई नक़ल नहीं" },
       "insight": { "en": "Your baby is not waiting for a perfect, copied version of some other parent. They are waiting for you.", "hi": "आपका शिशु किसी और माँ की नक़ल की हुई परफ़ेक्ट कॉपी का इंतज़ार नहीं कर रहा। वे आपका इंतज़ार कर रहे हैं।" },

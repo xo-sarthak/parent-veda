@@ -2,7 +2,7 @@
   {
     "day": 169,
     "week": 25,
-    "babyLearning": { "en": "growing stronger, tiny hands learning to grip", "hi": "और मज़बूत होते हुए, नन्हे हाथ पकड़ना सीखते हुए" },
+    "babyLearning": { "en": "Your baby moves in response to sounds around you.", "hi": "और मज़बूत होते हुए, नन्हे हाथ पकड़ना सीखते हुए" },
     "grow": {
       "title": { "en": "Let Them Do It Themselves", "hi": "उन्हें ख़ुद करने दीजिए" },
       "insight": { "en": "One of the hardest, kindest gifts you will give your child is the space to do things on their own.", "hi": "सबसे मुश्किल और सबसे प्यारे तोहफ़ों में से एक जो आप अपने बच्चे को देंगी, वो है ख़ुद करने की जगह।" },
@@ -42,7 +42,7 @@
   {
     "day": 170,
     "week": 25,
-    "babyLearning": { "en": "responding to sounds, startling at a loud noise", "hi": "आवाज़ों पर जवाब देते हुए, तेज़ शोर पर चौंकते हुए" },
+    "babyLearning": { "en": "Your baby's nostrils, closed until now, are starting to open.", "hi": "आवाज़ों पर जवाब देते हुए, तेज़ शोर पर चौंकते हुए" },
     "grow": {
       "title": { "en": "Confidence Is Built, Not Given", "hi": "आत्मविश्वास बनता है, दिया नहीं जाता" },
       "insight": { "en": "You cannot hand your child confidence like a gift. It is built, brick by brick, every time they try and discover they can.", "hi": "आत्मविश्वास आप अपने बच्चे को तोहफ़े की तरह नहीं थमा सकतीं। ये ईंट-दर-ईंट बनता है, हर उस बार जब वो कोशिश करते हैं और पाते हैं कि उनसे हो जाता है।" },
@@ -82,7 +82,7 @@
   {
     "day": 171,
     "week": 25,
-    "babyLearning": { "en": "stretching and shifting, finding room to move", "hi": "खिंचते और करवट लेते हुए, हिलने की जगह ढूँढ़ते हुए" },
+    "babyLearning": { "en": "Your baby's hands are fully developed and can make a fist.", "hi": "खिंचते और करवट लेते हुए, हिलने की जगह ढूँढ़ते हुए" },
     "grow": {
       "title": { "en": "The Space To Try", "hi": "कोशिश करने की जगह" },
       "insight": { "en": "Children do not grow in the space where everything is done for them. They grow in the space where they are allowed to try.", "hi": "बच्चे उस जगह नहीं बढ़ते जहाँ सब कुछ उनके लिए कर दिया जाता है। वो उस जगह बढ़ते हैं जहाँ उन्हें कोशिश करने दी जाती है।" },
@@ -122,7 +122,7 @@
   {
     "day": 172,
     "week": 25,
-    "babyLearning": { "en": "settling into a rhythm of rest and gentle activity", "hi": "आराम और हल्की हलचल की एक लय में बसते हुए" },
+    "babyLearning": { "en": "Your baby's hair is growing, with its colour and texture forming.", "hi": "आराम और हल्की हलचल की एक लय में बसते हुए" },
     "grow": {
       "title": { "en": "Help Less, Trust More", "hi": "मदद थोड़ी कम, भरोसा थोड़ा ज़्यादा" },
       "insight": { "en": "Sometimes the most loving thing you can do is help a little less, and trust your child a little more.", "hi": "कभी सबसे प्यारी बात यही होती है कि मदद थोड़ी कम की जाए, और अपने बच्चे पर भरोसा थोड़ा ज़्यादा।" },
@@ -162,7 +162,7 @@
   {
     "day": 173,
     "week": 25,
-    "babyLearning": { "en": "growing more aware, soothed by your voice", "hi": "और सजग होते हुए, आपकी आवाज़ से शांत होते हुए" },
+    "babyLearning": { "en": "Your baby's spine is growing stronger to support the body.", "hi": "और सजग होते हुए, आपकी आवाज़ से शांत होते हुए" },
     "grow": {
       "title": { "en": "Struggle Is Not Suffering", "hi": "जूझना और दुख एक नहीं" },
       "insight": { "en": "A child's struggle is not always something to rescue them from. Often it is the very thing growing them.", "hi": "बच्चे का जूझना हमेशा ऐसी चीज़ नहीं जिससे उन्हें बचाया जाए। अक्सर वही उन्हें बड़ा कर रहा होता है।" },
@@ -202,7 +202,7 @@
   {
     "day": 174,
     "week": 25,
-    "babyLearning": { "en": "filling out softly, growing rounder and stronger", "hi": "धीरे-धीरे भरते हुए, और गोल और मज़बूत होते हुए" },
+    "babyLearning": { "en": "Your baby is filling out as fat builds under the skin.", "hi": "धीरे-धीरे भरते हुए, और गोल और मज़बूत होते हुए" },
     "grow": {
       "title": { "en": "Small Freedoms, Big Growth", "hi": "छोटी आज़ादियाँ, बड़ा बढ़ना" },
       "insight": { "en": "Big confidence grows from small freedoms — the little choices and tasks a child is trusted to own.", "hi": "बड़ा आत्मविश्वास छोटी आज़ादियों से बढ़ता है — उन छोटे चुनावों और कामों से जो बच्चे के अपने माने जाते हैं।" },
@@ -242,7 +242,7 @@
   {
     "day": 175,
     "week": 25,
-    "babyLearning": { "en": "closing the week, growing surer day by day", "hi": "हफ़्ता पूरा करते हुए, दिन-ब-दिन और पक्के होते हुए" },
+    "babyLearning": { "en": "You may feel your baby's hiccups as small rhythmic jumps.", "hi": "हफ़्ता पूरा करते हुए, दिन-ब-दिन और पक्के होते हुए" },
     "grow": {
       "title": { "en": "Step Back To Let Them Rise", "hi": "पीछे हटिए, ताकि वो उठ सकें" },
       "insight": { "en": "Sometimes the bravest, most loving thing a parent does is step back — and trust their child to rise.", "hi": "कभी सबसे बहादुर और सबसे प्यार भरा काम यही होता है कि माँ-बाप एक क़दम पीछे हटें — और भरोसा करें कि बच्चे ख़ुद उठ खड़े होंगे।" },

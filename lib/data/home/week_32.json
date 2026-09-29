@@ -2,7 +2,7 @@
   {
     "day": 218,
     "week": 32,
-    "babyLearning": { "en": "growing rounder and stronger, settling lower and snug", "hi": "गोल और मज़बूत होता जा रहा है, नीचे आराम से बस रहा है" },
+    "babyLearning": { "en": "Your baby sleeps in regular cycles for much of the day.", "hi": "गोल और मज़बूत होता जा रहा है, नीचे आराम से बस रहा है" },
     "grow": {
       "title": { "en": "Your Attention Is Love", "hi": "आपका ध्यान ही प्यार है" },
       "insight": { "en": "To a child, attention and love are the same thing. The fullest way to say 'I love you' is simply to be fully there.", "hi": "बच्चों के लिए ध्यान और प्यार एक ही चीज़ है। 'मुझे तुमसे प्यार है' कहने का सबसे पूरा तरीक़ा है — बस पूरी तरह वहाँ होना।" },
@@ -42,7 +42,7 @@
   {
     "day": 219,
     "week": 32,
-    "babyLearning": { "en": "practising tiny breaths, getting ready for the world", "hi": "नन्ही साँसों का अभ्यास कर रहा है, दुनिया के लिए तैयार होते हुए" },
+    "babyLearning": { "en": "Your baby is storing iron and nutrients for after birth.", "hi": "नन्ही साँसों का अभ्यास कर रहा है, दुनिया के लिए तैयार होते हुए" },
     "grow": {
       "title": { "en": "Put The Phone Down", "hi": "फ़ोन नीचे रख दीजिए" },
       "insight": { "en": "A child can feel the difference between you looking at them and you looking past them at a screen.", "hi": "बच्चे इस फ़र्क़ को महसूस कर लेते हैं कि आप उन्हें देख रही हैं, या उनके पार किसी स्क्रीन को।" },
@@ -82,7 +82,7 @@
   {
     "day": 220,
     "week": 32,
-    "babyLearning": { "en": "soft and snug, knowing your voice well by now", "hi": "नरम और आराम से सिमटा हुआ, अब तक आपकी आवाज़ अच्छे से पहचानता हुआ" },
+    "babyLearning": { "en": "Many babies turn head-down between now and week 36.", "hi": "नरम और आराम से सिमटा हुआ, अब तक आपकी आवाज़ अच्छे से पहचानता हुआ" },
     "grow": {
       "title": { "en": "Presence Over Presents", "hi": "तोहफ़ों से बढ़कर मौजूदगी" },
       "insight": { "en": "Years from now, your child will not remember most of the gifts. They will remember the moments you were truly there.", "hi": "सालों बाद आपके बच्चे को ज़्यादातर तोहफ़े याद नहीं रहेंगे। उसे वे पल याद रहेंगे जब आप सच में वहाँ थीं।" },
@@ -122,7 +122,7 @@
   {
     "day": 221,
     "week": 32,
-    "babyLearning": { "en": "tiny eyes opening and closing, sensing light and dark", "hi": "नन्ही आँखें खुलती और बंद होती हैं, रोशनी और अँधेरा महसूस करते हुए" },
+    "babyLearning": { "en": "Your baby's skin is no longer see-through.", "hi": "नन्ही आँखें खुलती और बंद होती हैं, रोशनी और अँधेरा महसूस करते हुए" },
     "grow": {
       "title": { "en": "Five Minutes Of Just You", "hi": "सिर्फ़ आपके पाँच मिनट" },
       "insight": { "en": "A child does not need hours of your time. They need small windows where they have all of you.", "hi": "बच्चे को आपके घंटों की ज़रूरत नहीं। उसे छोटी-छोटी खिड़कियाँ चाहिए, जहाँ आप पूरी-की-पूरी उसकी हों।" },
@@ -162,7 +162,7 @@
   {
     "day": 222,
     "week": 32,
-    "babyLearning": { "en": "filling out softly, curled close and warm", "hi": "धीरे-धीरे भर रहा है, पास सिमटा हुआ और गर्म" },
+    "babyLearning": { "en": "The bones of your baby's skull stay soft, to help at birth.", "hi": "धीरे-धीरे भर रहा है, पास सिमटा हुआ और गर्म" },
     "grow": {
       "title": { "en": "The Magic Of Being Seen", "hi": "देखे जाने का जादू" },
       "insight": { "en": "There is a quiet magic in being truly seen by someone. It is one of the deepest gifts you will give your child.", "hi": "किसी के द्वारा सच में देखे जाने में एक शांत जादू है। यह उन सबसे गहरे तोहफ़ों में से एक है जो आप अपने बच्चे को देंगी।" },
@@ -202,7 +202,7 @@
   {
     "day": 223,
     "week": 32,
-    "babyLearning": { "en": "growing steadily, plump and ready for cuddles", "hi": "लगातार बढ़ रहा है, गोल-मटोल और गले लगने को तैयार" },
+    "babyLearning": { "en": "Your baby practises breathing movements, without any air yet.", "hi": "लगातार बढ़ रहा है, गोल-मटोल और गले लगने को तैयार" },
     "grow": {
       "title": { "en": "Undivided Is Unforgettable", "hi": "पूरा ध्यान, जो कभी नहीं भूलता" },
       "insight": { "en": "The moments your child will carry forever are the ones where you were undivided — all there, nowhere else.", "hi": "जिन पलों को आपका बच्चा हमेशा साथ लिए चलेगा, वे वही हैं जहाँ आप पूरी-की-पूरी वहीं थीं — कहीं और नहीं।" },
@@ -242,7 +242,7 @@
   {
     "day": 224,
     "week": 32,
-    "babyLearning": { "en": "closing the week, calm and growing day by day", "hi": "हफ़्ता पूरा करते हुए, शांत और दिन-ब-दिन बढ़ता हुआ" },
+    "babyLearning": { "en": "Your baby's gut is getting ready for milk.", "hi": "हफ़्ता पूरा करते हुए, शांत और दिन-ब-दिन बढ़ता हुआ" },
     "grow": {
       "title": { "en": "A Moment Of True Attention", "hi": "सच्चे ध्यान का एक पल" },
       "insight": { "en": "A single moment of true attention can fill a child more than a whole day of half-noticed care.", "hi": "सच्चे ध्यान का एक पल बच्चे को आधे-अधूरे ध्यान वाली पूरे दिन की देखभाल से ज़्यादा भर देता है।" },

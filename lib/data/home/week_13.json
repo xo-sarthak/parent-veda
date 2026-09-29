@@ -2,7 +2,7 @@
   {
     "day": 85,
     "week": 13,
-    "babyLearning": { "en": "growing more sure of itself, tiny fingerprints forming", "hi": "ख़ुद पर भरोसा बढ़ता जा रहा है, नन्हे उँगलियों के निशान बन रहे हैं" },
+    "babyLearning": { "en": "Your baby's fingerprints are starting to appear.", "hi": "ख़ुद पर भरोसा बढ़ता जा रहा है, नन्हे उँगलियों के निशान बन रहे हैं" },
     "grow": {
       "title": { "en": "Hope Is Worth Holding", "hi": "उम्मीद थामे रखने लायक़ है" },
       "insight": { "en": "Hope is not a foolish thing to carry. It is the quiet trust that tomorrow can be good — and your baby is already learning it from you.", "hi": "उम्मीद थामना कोई नादानी नहीं है। यह वह शांत भरोसा है कि कल अच्छा हो सकता है — और आपका शिशु यह अभी से आपसे सीख रहा है।" },
@@ -42,7 +42,7 @@
   {
     "day": 86,
     "week": 13,
-    "babyLearning": { "en": "tiny vocal cords beginning to form, ready for a first cry one day", "hi": "नन्हे स्वर-तंतु बनने लगे हैं, एक दिन की पहली किलकारी के लिए तैयार" },
+    "babyLearning": { "en": "Your baby's vocal cords are forming.", "hi": "नन्हे स्वर-तंतु बनने लगे हैं, एक दिन की पहली किलकारी के लिए तैयार" },
     "grow": {
       "title": { "en": "The Best Is Still Coming", "hi": "सबसे अच्छा अभी आना बाक़ी है" },
       "insight": { "en": "However full your heart feels now, the most tender moments are still ahead. The best of this journey has not yet arrived.", "hi": "आपका दिल अभी चाहे कितना भी भरा लगे, सबसे नाज़ुक पल अभी आगे हैं। इस सफ़र का सबसे अच्छा हिस्सा अभी आया ही नहीं।" },
@@ -82,7 +82,7 @@
   {
     "day": 87,
     "week": 13,
-    "babyLearning": { "en": "growing steadily now, settling into a calmer rhythm", "hi": "अब लगातार बढ़ रहा है, एक ज़्यादा शांत लय में बस रहा है" },
+    "babyLearning": { "en": "Your baby's eyes are now closer to the front of the face.", "hi": "अब लगातार बढ़ रहा है, एक ज़्यादा शांत लय में बस रहा है" },
     "grow": {
       "title": { "en": "A Season Of Becoming", "hi": "बनने का एक मौसम" },
       "insight": { "en": "This whole stretch of waiting is not a pause before life begins. It is a season of becoming — for your baby, and for you.", "hi": "यह पूरा इंतज़ार का दौर ज़िंदगी शुरू होने से पहले का ठहराव नहीं है। यह बनने का एक मौसम है — आपके शिशु के लिए, और आपके लिए भी।" },
@@ -122,7 +122,7 @@
   {
     "day": 88,
     "week": 13,
-    "babyLearning": { "en": "tiny muscles growing stronger, beginning to move more freely", "hi": "नन्ही माँसपेशियाँ मज़बूत हो रही हैं, अब ज़्यादा खुलकर हिलना शुरू" },
+    "babyLearning": { "en": "Your baby has plenty of room to move around freely.", "hi": "नन्ही माँसपेशियाँ मज़बूत हो रही हैं, अब ज़्यादा खुलकर हिलना शुरू" },
     "grow": {
       "title": { "en": "Anticipation Is A Kind Of Love", "hi": "इंतज़ार भी एक तरह का प्यार है" },
       "insight": { "en": "The way you long for your baby, picture them, wait for them — that longing itself is love, already flowing toward them.", "hi": "जिस तरह आप अपने शिशु के लिए तरसती हैं, उन्हें सोचती हैं, उनका इंतज़ार करती हैं — वह चाहत ख़ुद प्यार है, जो पहले से उनकी ओर बह रहा है।" },
@@ -162,7 +162,7 @@
   {
     "day": 89,
     "week": 13,
-    "babyLearning": { "en": "growing softer features, a face all its own taking shape", "hi": "नरम नक़्श उभर रहे हैं, अपना एक ख़ास चेहरा आकार ले रहा है" },
+    "babyLearning": { "en": "Your baby's ears are nearly in their final place.", "hi": "नरम नक़्श उभर रहे हैं, अपना एक ख़ास चेहरा आकार ले रहा है" },
     "grow": {
       "title": { "en": "Gratitude For The Journey", "hi": "इस सफ़र के लिए शुक्रगुज़ारी" },
       "insight": { "en": "Before you reach the destination, it is worth pausing to be grateful for the road that brought you here — every step of it.", "hi": "मंज़िल तक पहुँचने से पहले, एक पल रुककर उस राह के लिए शुक्रगुज़ार होना अच्छा है जो आपको यहाँ तक लाई — उसके हर क़दम के लिए।" },
@@ -202,7 +202,7 @@
   {
     "day": 90,
     "week": 13,
-    "babyLearning": { "en": "growing peacefully, settled and safe within you", "hi": "शांति से बढ़ रहा है, आपके भीतर बसा हुआ और सुरक्षित" },
+    "babyLearning": { "en": "The placenta is now doing most of the work of feeding your baby.", "hi": "शांति से बढ़ रहा है, आपके भीतर बसा हुआ और सुरक्षित" },
     "grow": {
       "title": { "en": "Trust What Comes Next", "hi": "जो आगे आए, उस पर भरोसा रखिए" },
       "insight": { "en": "You cannot see the whole road ahead, and you do not need to. You only need to trust the next gentle step.", "hi": "आप आगे की पूरी राह नहीं देख सकतीं, और देखने की ज़रूरत भी नहीं। आपको बस अगले कोमल क़दम पर भरोसा करना है।" },
@@ -242,7 +242,7 @@
   {
     "day": 91,
     "week": 13,
-    "babyLearning": { "en": "closing the first trimester, growing strong and ready", "hi": "पहली तिमाही पूरी हो रही है, मज़बूत और तैयार होते हुए" },
+    "babyLearning": { "en": "Your second trimester starts around now.", "hi": "पहली तिमाही पूरी हो रही है, मज़बूत और तैयार होते हुए" },
     "grow": {
       "title": { "en": "Ready In Your Own Time", "hi": "अपने ही समय पर तैयार" },
       "insight": { "en": "Your baby will grow and arrive in their own time, not a moment too early or too late. And so will you, as a parent.", "hi": "आपका शिशु अपने ही समय पर बढ़ेगा और आएगा, न एक पल जल्दी, न देर से। और आप भी, एक माँ के रूप में।" },

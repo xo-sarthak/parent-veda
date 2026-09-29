@@ -2,7 +2,7 @@
   {
     "day": 64,
     "week": 10,
-    "babyLearning": { "en": "growing tiny fingers and toes, all their own", "hi": "नन्ही उँगलियाँ और पैर की उँगलियाँ बढ़ती हुईं, बिल्कुल अपनी" },
+    "babyLearning": { "en": "The webbing between your baby's fingers and toes is disappearing.", "hi": "नन्ही उँगलियाँ और पैर की उँगलियाँ बढ़ती हुईं, बिल्कुल अपनी" },
     "grow": {
       "title": { "en": "Patience Is Love, Slowed Down", "hi": "सब्र यानी धीमा हुआ प्यार" },
       "insight": { "en": "Patience is not waiting with gritted teeth. It is love that has learned to move at the right speed.", "hi": "सब्र दाँत भींचकर इंतज़ार करना नहीं है। यह वह प्यार है जिसने सही रफ़्तार से चलना सीख लिया है।" },
@@ -42,7 +42,7 @@
   {
     "day": 65,
     "week": 10,
-    "babyLearning": { "en": "tiny nails beginning to form on each finger", "hi": "हर उँगली पर नन्हे नाख़ून बनना शुरू" },
+    "babyLearning": { "en": "Your baby's jaw and mouth are taking shape.", "hi": "हर उँगली पर नन्हे नाख़ून बनना शुरू" },
     "grow": {
       "title": { "en": "The Long Game Of Love", "hi": "प्यार का लंबा खेल" },
       "insight": { "en": "Love is not built in a day or a single grand gesture. It is the long, quiet game of showing up again and again.", "hi": "प्यार एक दिन में या किसी एक बड़े काम से नहीं बनता। यह बार-बार मौजूद रहने का लंबा, शांत खेल है।" },
@@ -82,7 +82,7 @@
   {
     "day": 66,
     "week": 10,
-    "babyLearning": { "en": "little joints bending, learning to move", "hi": "नन्हे जोड़ मुड़ते हुए, हिलना सीखते हुए" },
+    "babyLearning": { "en": "Your baby's brain is building new connections every day.", "hi": "नन्हे जोड़ मुड़ते हुए, हिलना सीखते हुए" },
     "grow": {
       "title": { "en": "Nothing Good Is Rushed", "hi": "अच्छी चीज़ें जल्दबाज़ी में नहीं बनतीं" },
       "insight": { "en": "The best things in a life — trust, comfort, deep love — cannot be hurried into being. They grow only in their own good time.", "hi": "ज़िंदगी की सबसे अच्छी चीज़ें — भरोसा, सुकून, गहरा प्यार — जल्दबाज़ी में नहीं बनाई जा सकतीं। वे सिर्फ़ अपने सही समय पर उगती हैं।" },
@@ -122,7 +122,7 @@
   {
     "day": 67,
     "week": 10,
-    "babyLearning": { "en": "tiny taste buds beginning to form", "hi": "नन्ही स्वाद-कलियाँ बनना शुरू" },
+    "babyLearning": { "en": "Your baby's eyelids are closing, and will open again around week 26.", "hi": "नन्ही स्वाद-कलियाँ बनना शुरू" },
     "grow": {
       "title": { "en": "Slow Is Its Own Gift", "hi": "धीमापन ख़ुद एक तोहफ़ा है" },
       "insight": { "en": "Going slowly is not a delay on the way to something better. The slowness itself is part of the gift.", "hi": "धीरे चलना किसी बेहतर चीज़ के रास्ते की देरी नहीं है। धीमापन ख़ुद ही उस तोहफ़े का हिस्सा है।" },
@@ -162,7 +162,7 @@
   {
     "day": 68,
     "week": 10,
-    "babyLearning": { "en": "tiny limbs lengthening, getting ready to stretch", "hi": "नन्हे हाथ-पैर लंबे होते हुए, अंगड़ाई के लिए तैयार" },
+    "babyLearning": { "en": "Most of your baby's main parts are in place, and now they grow.", "hi": "नन्हे हाथ-पैर लंबे होते हुए, अंगड़ाई के लिए तैयार" },
     "grow": {
       "title": { "en": "Let Things Unfold", "hi": "चीज़ों को अपने आप खुलने दीजिए" },
       "insight": { "en": "Not everything needs to be solved or controlled. Some things simply need room to unfold in their own way.", "hi": "हर चीज़ को सुलझाने या क़ाबू में रखने की ज़रूरत नहीं। कुछ चीज़ों को बस अपने तरीक़े से खुलने की जगह चाहिए।" },
@@ -202,7 +202,7 @@
   {
     "day": 69,
     "week": 10,
-    "babyLearning": { "en": "soft eyelids forming over tiny eyes", "hi": "नन्ही आँखों पर नरम पलकें बनती हुईं" },
+    "babyLearning": { "en": "The buds of your baby's milk teeth are forming under the gums.", "hi": "नन्ही आँखों पर नरम पलकें बनती हुईं" },
     "grow": {
       "title": { "en": "Waiting Can Be Tender", "hi": "इंतज़ार कोमल भी हो सकता है" },
       "insight": { "en": "Waiting does not have to be restless or anxious. It can be a tender, hopeful kind of love all its own.", "hi": "इंतज़ार का बेचैन या परेशान होना ज़रूरी नहीं। यह अपने आप में एक कोमल, उम्मीद भरा प्यार भी हो सकता है।" },
@@ -242,7 +242,7 @@
   {
     "day": 70,
     "week": 10,
-    "babyLearning": { "en": "closing the week, growing steadily stronger", "hi": "हफ़्ता पूरा करते हुए, लगातार और मज़बूत होते हुए" },
+    "babyLearning": { "en": "Tiny taste buds are starting to form on your baby's tongue.", "hi": "हफ़्ता पूरा करते हुए, लगातार और मज़बूत होते हुए" },
     "grow": {
       "title": { "en": "One Day Holds Enough", "hi": "एक दिन में उतना ही काफ़ी है" },
       "insight": { "en": "You do not have to carry the whole future today. One day, lived gently, already holds enough.", "hi": "आपको आज पूरा भविष्य नहीं उठाना है। नरमी से जिया गया एक दिन, अपने आप में काफ़ी है।" },

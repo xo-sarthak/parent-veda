@@ -2,7 +2,7 @@
   {
     "day": 274,
     "week": 40,
-    "babyLearning": { "en": "fully grown and ready to meet you", "hi": "पूरी तरह बढ़ चुके, और अब आपसे मिलने को तैयार" },
+    "babyLearning": { "en": "This is your due week, and your baby is ready.", "hi": "पूरी तरह बढ़ चुके, और अब आपसे मिलने को तैयार" },
     "grow": {
       "title": { "en": "The Wait Is Nearly Over", "hi": "इंतज़ार बस ख़त्म ही होने वाला है" },
       "insight": { "en": "After all these months of waiting, the day you have dreamed of is almost here. Soon, you will finally hold your little one.", "hi": "इन सारे महीनों के इंतज़ार के बाद, वह दिन बस आने ही वाला है जिसका आपने सपना देखा था। जल्द ही आप आख़िरकार अपने बच्चे को बाँहों में थाम लेंगी।" },
@@ -42,7 +42,7 @@
   {
     "day": 275,
     "week": 40,
-    "babyLearning": { "en": "snug and complete, just waiting now", "hi": "आराम से सिमटे और पूरे, बस अब इंतज़ार में" },
+    "babyLearning": { "en": "Most babies arrive within about two weeks of the due date.", "hi": "आराम से सिमटे और पूरे, बस अब इंतज़ार में" },
     "grow": {
       "title": { "en": "You Were Worth Every Moment", "hi": "तुम हर एक पल के लायक़ हो" },
       "insight": { "en": "Every long day, every ache, every hope of these months was leading to one little face. And it was all worth it.", "hi": "इन महीनों का हर लंबा दिन, हर दर्द, हर उम्मीद एक नन्हे से चेहरे की ओर ले जा रही थी। और यह सब उसी के लायक़ था।" },
@@ -82,7 +82,7 @@
   {
     "day": 276,
     "week": 40,
-    "babyLearning": { "en": "ready to say hello to the world", "hi": "दुनिया को हैलो कहने के लिए तैयार" },
+    "babyLearning": { "en": "Your baby's first cry helps clear fluid and open the lungs.", "hi": "दुनिया को हैलो कहने के लिए तैयार" },
     "grow": {
       "title": { "en": "Hello Is Coming", "hi": "हैलो बस आने ही वाला है" },
       "insight": { "en": "Very soon, the first hello of your whole lives together will finally happen. The moment is almost here.", "hi": "बहुत जल्द, आपकी साथ की पूरी ज़िंदगी का पहला हैलो आख़िरकार होगा। वह पल बस आने ही वाला है।" },
@@ -122,7 +122,7 @@
   {
     "day": 277,
     "week": 40,
-    "babyLearning": { "en": "warm and waiting, loved beyond measure", "hi": "गर्माहट में, इंतज़ार में, और बेहिसाब प्यार में" },
+    "babyLearning": { "en": "Your baby will know your voice from the very first day.", "hi": "गर्माहट में, इंतज़ार में, और बेहिसाब प्यार में" },
     "grow": {
       "title": { "en": "A Love Like No Other", "hi": "ऐसा प्यार, जैसा कोई और नहीं" },
       "insight": { "en": "The love you are about to feel for your baby is unlike anything you have known before. It will surprise you with its depth.", "hi": "अपने बच्चे के लिए आप जो प्यार महसूस करने वाली हैं, वैसा आपने पहले कुछ नहीं जाना। उसकी गहराई आपको चौंका देगी।" },
@@ -162,7 +162,7 @@
   {
     "day": 278,
     "week": 40,
-    "babyLearning": { "en": "the newest piece of your family", "hi": "आपके परिवार का सबसे नया हिस्सा" },
+    "babyLearning": { "en": "Newborns see best about 20 to 30 cm away, near your face.", "hi": "आपके परिवार का सबसे नया हिस्सा" },
     "grow": {
       "title": { "en": "You Made Us A Family", "hi": "तुमने हमें एक परिवार बना दिया" },
       "insight": { "en": "With your baby's arrival, something new is born too — a family, shaped forever around this little one.", "hi": "आपके बच्चे के आने के साथ कुछ नया भी जन्म लेता है — एक परिवार, जो हमेशा के लिए इस नन्ही जान के इर्द-गिर्द बुन जाता है।" },
@@ -202,7 +202,7 @@
   {
     "day": 279,
     "week": 40,
-    "babyLearning": { "en": "loved from the very first breath", "hi": "पहली ही साँस से भरपूर प्यार में" },
+    "babyLearning": { "en": "Soon after birth, your baby will know your smell as well.", "hi": "पहली ही साँस से भरपूर प्यार में" },
     "grow": {
       "title": { "en": "Welcome To The World, Little One", "hi": "दुनिया में स्वागत है, मेरी जान" },
       "insight": { "en": "Your baby is about to open their eyes on a world that has been waiting just for them, and is already full of love.", "hi": "आपके बच्चे की आँखें जल्द ही ऐसी दुनिया में खुलेंगी जो सिर्फ़ उनका इंतज़ार करती रही है, और जो पहले से प्यार से भरी है।" },
@@ -242,7 +242,7 @@
   {
     "day": 280,
     "week": 40,
-    "babyLearning": { "en": "here at last, the beginning of everything", "hi": "आख़िरकार यहाँ — हर चीज़ की शुरुआत" },
+    "babyLearning": { "en": "Your baby's brain will grow faster this first year than ever again.", "hi": "आख़िरकार यहाँ — हर चीज़ की शुरुआत" },
     "grow": {
       "title": { "en": "The Beginning Of Everything", "hi": "हर चीज़ की शुरुआत" },
       "insight": { "en": "This is not the end of your journey together. It is the very beginning of everything — the first day of a whole shared life.", "hi": "यह आपके साथ के सफ़र का अंत नहीं है। यह तो हर चीज़ की बिल्कुल शुरुआत है — एक पूरी साझा ज़िंदगी का पहला दिन।" },

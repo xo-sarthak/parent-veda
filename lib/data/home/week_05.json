@@ -2,7 +2,7 @@
   {
     "day": 29,
     "week": 5,
-    "babyLearning": { "en": "growing fast, a tiny heart beginning to beat", "hi": "तेज़ी से बढ़ रहा है, एक नन्हा दिल धड़कना शुरू कर रहा है" },
+    "babyLearning": { "en": "A tiny tube that will become your baby's heart is forming.", "hi": "तेज़ी से बढ़ रहा है, एक नन्हा दिल धड़कना शुरू कर रहा है" },
     "grow": {
       "title": { "en": "Calm Is A Language", "hi": "शांति भी एक भाषा है" },
       "insight": { "en": "Long before your baby understands words, they understand your calm. It is the first language you will ever share.", "hi": "आपके शिशु के शब्द समझने से बहुत पहले, वह आपकी शांति समझ लेता है। यही पहली भाषा है जो आप दोनों बाँटेंगे।" },
@@ -42,7 +42,7 @@
   {
     "day": 30,
     "week": 5,
-    "babyLearning": { "en": "tiny limb buds starting to form", "hi": "नन्हे हाथ-पैर की कलियाँ बनना शुरू" },
+    "babyLearning": { "en": "The neural tube, which will become the brain and spine, is forming.", "hi": "नन्हे हाथ-पैर की कलियाँ बनना शुरू" },
     "grow": {
       "title": { "en": "You Cannot Pour From Empty", "hi": "ख़ाली से नहीं उँडेला जाता" },
       "insight": { "en": "Caring for your baby begins with caring for yourself. You cannot pour from a cup that is empty.", "hi": "अपने शिशु का ख़्याल रखना ख़ुद का ख़्याल रखने से शुरू होता है। ख़ाली प्याले से कुछ उँडेला नहीं जाता।" },
@@ -82,7 +82,7 @@
   {
     "day": 31,
     "week": 5,
-    "babyLearning": { "en": "a tiny heart now beating steadily", "hi": "एक नन्हा दिल अब लगातार धड़क रहा है" },
+    "babyLearning": { "en": "Your baby's heart is getting ready to start beating very soon.", "hi": "एक नन्हा दिल अब लगातार धड़क रहा है" },
     "grow": {
       "title": { "en": "Feelings Are Not Emergencies", "hi": "भावनाएँ कोई आफ़त नहीं होतीं" },
       "insight": { "en": "A big feeling is not a problem to fix. It is a wave to ride — and it always passes.", "hi": "कोई बड़ी भावना ठीक करने वाली समस्या नहीं है। यह एक लहर है, जिस पर बस बहना होता है — और यह हमेशा गुज़र जाती है।" },
@@ -122,7 +122,7 @@
   {
     "day": 32,
     "week": 5,
-    "babyLearning": { "en": "the brain growing in gentle waves", "hi": "दिमाग़ नरम लहरों में बढ़ रहा है" },
+    "babyLearning": { "en": "Tiny blocks along your baby's back will later become bones and muscles.", "hi": "दिमाग़ नरम लहरों में बढ़ रहा है" },
     "grow": {
       "title": { "en": "The Pause Is The Power", "hi": "ठहरने में ही ताक़त है" },
       "insight": { "en": "The most powerful thing you can do in a hard moment is simply to pause before you react.", "hi": "किसी मुश्किल पल में सबसे ताक़तवर काम यही है कि प्रतिक्रिया देने से पहले बस एक पल ठहर जाइए।" },
@@ -162,7 +162,7 @@
   {
     "day": 33,
     "week": 5,
-    "babyLearning": { "en": "curling up softly, snug inside", "hi": "नरमी से सिमट रहा है, भीतर आराम से" },
+    "babyLearning": { "en": "Your baby's first blood cells and blood vessels are forming.", "hi": "नरमी से सिमट रहा है, भीतर आराम से" },
     "grow": {
       "title": { "en": "Your Peace Travels Inward", "hi": "आपकी शांति भीतर तक जाती है" },
       "insight": { "en": "The calm you create for yourself does not stay with you. It travels inward, to your baby.", "hi": "जो शांति आप अपने लिए बनाती हैं वह सिर्फ़ आप तक नहीं रुकती। वह भीतर, आपके शिशु तक जाती है।" },
@@ -202,7 +202,7 @@
   {
     "day": 34,
     "week": 5,
-    "babyLearning": { "en": "tiny features beginning to take shape", "hi": "नन्हे नक़्श आकार लेने लगे हैं" },
+    "babyLearning": { "en": "The folds that will shape your baby's face are just beginning.", "hi": "नन्हे नक़्श आकार लेने लगे हैं" },
     "grow": {
       "title": { "en": "Soft Is Also Strong", "hi": "नरम होना भी मज़बूत होना है" },
       "insight": { "en": "Gentleness is not weakness. It takes real strength to stay soft in a hard world.", "hi": "नरमी कमज़ोरी नहीं है। एक सख़्त दुनिया में नरम बने रहने के लिए सच्ची ताक़त चाहिए।" },
@@ -242,7 +242,7 @@
   {
     "day": 35,
     "week": 5,
-    "babyLearning": { "en": "closing the week, growing stronger", "hi": "हफ़्ता पूरा करते हुए, और मज़बूत होते हुए" },
+    "babyLearning": { "en": "The placenta is growing so it can bring your baby food and oxygen.", "hi": "हफ़्ता पूरा करते हुए, और मज़बूत होते हुए" },
     "grow": {
       "title": { "en": "Begin Again, Gently", "hi": "फिर से शुरू कीजिए, नरमी से" },
       "insight": { "en": "You will have hard days and lose your calm. What matters is not never falling, but gently beginning again.", "hi": "मुश्किल दिन आएँगे और आपकी शांति भी छूटेगी। मायने यह नहीं रखता कि कभी गिरें ही नहीं, बल्कि यह कि नरमी से फिर शुरू कर दें।" },

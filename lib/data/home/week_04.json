@@ -2,7 +2,7 @@
   {
     "day": 22,
     "week": 4,
-    "babyLearning": { "en": "just beginning, a tiny spark of life", "hi": "बस शुरुआत — ज़िंदगी की एक नन्ही चिंगारी" },
+    "babyLearning": { "en": "Your baby is settling into the soft lining of your womb.", "hi": "बस शुरुआत — ज़िंदगी की एक नन्ही चिंगारी" },
     "grow": {
       "title": { "en": "A New Chapter Has Begun", "hi": "एक नया अध्याय शुरू हो चुका है" },
       "insight": { "en": "You are not just growing a baby. You are quietly becoming a parent, starting today.", "hi": "आप सिर्फ़ एक शिशु को नहीं पाल रहीं। आज से आप चुपचाप एक माँ भी बन रही हैं।" },
@@ -42,7 +42,7 @@
   {
     "day": 23,
     "week": 4,
-    "babyLearning": { "en": "settling in, gently taking root", "hi": "भीतर बसते हुए, धीरे से जड़ पकड़ते हुए" },
+    "babyLearning": { "en": "Your body is making the pregnancy hormone that a test picks up.", "hi": "भीतर बसते हुए, धीरे से जड़ पकड़ते हुए" },
     "grow": {
       "title": { "en": "You Don't Have To Know Everything", "hi": "आपको सब कुछ जानना ज़रूरी नहीं" },
       "insight": { "en": "Good parents are not people with all the answers. They are people willing to keep learning.", "hi": "अच्छे माँ-बाप वे नहीं होते जिनके पास हर जवाब हो। वे वे होते हैं जो सीखते रहने को तैयार रहते हैं।" },
@@ -82,7 +82,7 @@
   {
     "day": 24,
     "week": 4,
-    "babyLearning": { "en": "the first cells of a heart forming", "hi": "दिल की पहली कोशिकाएँ बनने लगी हैं" },
+    "babyLearning": { "en": "Your baby's cells are dividing and multiplying very fast.", "hi": "दिल की पहली कोशिकाएँ बनने लगी हैं" },
     "grow": {
       "title": { "en": "Love Is Already Enough", "hi": "प्यार अभी से काफ़ी है" },
       "insight": { "en": "Before you can do anything for your baby, you are already giving the one thing that matters most: love.", "hi": "अपने शिशु के लिए कुछ करने से पहले ही, आप वह एक चीज़ दे रही हैं जो सबसे ज़्यादा मायने रखती है: प्यार।" },
@@ -122,7 +122,7 @@
   {
     "day": 25,
     "week": 4,
-    "babyLearning": { "en": "growing safe and warm inside you", "hi": "आपके भीतर सुरक्षित और गर्म, बढ़ते हुए" },
+    "babyLearning": { "en": "A small sac of fluid is forming to cushion your baby.", "hi": "आपके भीतर सुरक्षित और गर्म, बढ़ते हुए" },
     "grow": {
       "title": { "en": "You Are Becoming, Too", "hi": "आप भी बन रही हैं" },
       "insight": { "en": "Your baby is growing — and so are you. This season is changing you in beautiful, lasting ways.", "hi": "आपका शिशु बढ़ रहा है — और आप भी। यह दौर आपको सुंदर और टिकाऊ तरीक़ों से बदल रहा है।" },
@@ -162,7 +162,7 @@
   {
     "day": 26,
     "week": 4,
-    "babyLearning": { "en": "tiny and busy, building day by day", "hi": "नन्हे और व्यस्त, दिन-ब-दिन बनते हुए" },
+    "babyLearning": { "en": "A yolk sac is feeding your baby until the placenta is ready.", "hi": "नन्हे और व्यस्त, दिन-ब-दिन बनते हुए" },
     "grow": {
       "title": { "en": "Small Moments Build A Parent", "hi": "छोटे-छोटे पल ही माँ बनाते हैं" },
       "insight": { "en": "You don't become a parent in one big moment. You become one in a thousand small, ordinary ones.", "hi": "आप किसी एक बड़े पल में माँ नहीं बनतीं। आप हज़ारों छोटे, आम पलों में बनती हैं।" },
@@ -202,7 +202,7 @@
   {
     "day": 27,
     "week": 4,
-    "babyLearning": { "en": "the beginnings of a brain and spine", "hi": "दिमाग़ और रीढ़ की शुरुआत" },
+    "babyLearning": { "en": "Your baby's cells are forming three layers that will build every part.", "hi": "दिमाग़ और रीढ़ की शुरुआत" },
     "grow": {
       "title": { "en": "Your Body Is Already Parenting", "hi": "आपका शरीर अभी से माँ का काम कर रहा है" },
       "insight": { "en": "Even while you rest, your body is feeding, protecting and growing your baby. You are already doing the work.", "hi": "जब आप आराम कर रही होती हैं तब भी, आपका शरीर आपके शिशु को खिला रहा है, बचा रहा है और बढ़ा रहा है। आप पहले से ही यह काम कर रही हैं।" },
@@ -242,7 +242,7 @@
   {
     "day": 28,
     "week": 4,
-    "babyLearning": { "en": "closing one tiny month, growing into the next", "hi": "एक नन्हा महीना पूरा करके, अगले में बढ़ते हुए" },
+    "babyLearning": { "en": "The first cells of the brain and spinal cord are forming around now.", "hi": "एक नन्हा महीना पूरा करके, अगले में बढ़ते हुए" },
     "grow": {
       "title": { "en": "The First Gift Is Presence", "hi": "पहला तोहफ़ा है साथ होना" },
       "insight": { "en": "Before toys, plans or advice, the greatest thing you will give your child is simply your presence.", "hi": "खिलौनों, योजनाओं या सलाह से पहले, सबसे बड़ी चीज़ जो आप अपने बच्चे को देंगी वह है बस आपका साथ होना।" },

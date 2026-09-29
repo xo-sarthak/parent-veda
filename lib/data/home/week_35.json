@@ -2,7 +2,7 @@
   {
     "day": 239,
     "week": 35,
-    "babyLearning": { "en": "growing rounder and softer, settling lower as the weeks turn", "hi": "और गोल, और नरम होते हुए — हफ़्तों के साथ धीरे-धीरे नीचे बसते हुए" },
+    "babyLearning": { "en": "Your baby may be settling head-down, ready for birth.", "hi": "और गोल, और नरम होते हुए — हफ़्तों के साथ धीरे-धीरे नीचे बसते हुए" },
     "grow": {
       "title": { "en": "Listen To Understand, Not To Reply", "hi": "समझने के लिए सुनिए, जवाब देने के लिए नहीं" },
       "insight": { "en": "Most of us listen while quietly preparing what we will say next. Real listening asks us to set that aside and simply receive.", "hi": "हम में से ज़्यादातर लोग सुनते हुए चुपचाप यही तैयार करते रहते हैं कि आगे क्या कहना है। सच्चा सुनना यही माँगता है कि उसे एक तरफ़ रख दीजिए और बात को बस अपने भीतर आने दीजिए।" },
@@ -42,7 +42,7 @@
   {
     "day": 240,
     "week": 35,
-    "babyLearning": { "en": "filling out gently, soft and snug in your warmth", "hi": "धीरे-धीरे भरते हुए, आपकी गर्माहट में नरम और आराम से" },
+    "babyLearning": { "en": "Your baby's kidneys are fully developed now.", "hi": "धीरे-धीरे भरते हुए, आपकी गर्माहट में नरम और आराम से" },
     "grow": {
       "title": { "en": "Small Voices, Big Thoughts", "hi": "छोटी आवाज़ें, बड़े ख़याल" },
       "insight": { "en": "A small child's words may be simple, but the thoughts and feelings behind them are often surprisingly large.", "hi": "एक छोटे बच्चे के शब्द भले ही सीधे-सादे हों, पर उनके पीछे के ख़याल और भावनाएँ अक्सर हैरान कर देने वाली बड़ी होती हैं।" },
@@ -82,7 +82,7 @@
   {
     "day": 241,
     "week": 35,
-    "babyLearning": { "en": "practising tiny breaths, getting ready for the world", "hi": "नन्ही-नन्ही साँसों का अभ्यास करते हुए, दुनिया के लिए तैयार होते हुए" },
+    "babyLearning": { "en": "Your baby's liver can now process some waste.", "hi": "नन्ही-नन्ही साँसों का अभ्यास करते हुए, दुनिया के लिए तैयार होते हुए" },
     "grow": {
       "title": { "en": "Hear The Feeling Beneath The Words", "hi": "शब्दों के नीचे की भावना सुनिए" },
       "insight": { "en": "Children, like all of us, often say one thing while feeling another. The real message lives beneath the words.", "hi": "बच्चे भी हम सबकी तरह अक्सर कहते कुछ हैं और महसूस कुछ और कर रहे होते हैं। असली बात शब्दों के नीचे छिपी रहती है।" },
@@ -122,7 +122,7 @@
   {
     "day": 242,
     "week": 35,
-    "babyLearning": { "en": "growing aware of your voice, soothed by its sound", "hi": "आपकी आवाज़ को पहचानते हुए, उसी की आहट से शांत होते हुए" },
+    "babyLearning": { "en": "Most of your baby's growing now is putting on weight.", "hi": "आपकी आवाज़ को पहचानते हुए, उसी की आहट से शांत होते हुए" },
     "grow": {
       "title": { "en": "Get Down To Their Level", "hi": "उनकी ऊँचाई तक झुक जाइए" },
       "insight": { "en": "When you kneel down to a child's height and meet their eyes, you tell them without words that they matter.", "hi": "जब आप बच्चे की ऊँचाई तक झुककर उसकी आँखों में देखती हैं, आप बिना कुछ कहे उसे बता देती हैं कि वह मायने रखता है।" },
@@ -162,7 +162,7 @@
   {
     "day": 243,
     "week": 35,
-    "babyLearning": { "en": "resting and turning gently, getting cosy", "hi": "आराम करते और धीरे-धीरे करवट लेते हुए, आराम से सिमटते हुए" },
+    "babyLearning": { "en": "Your baby's lungs are nearly mature.", "hi": "आराम करते और धीरे-धीरे करवट लेते हुए, आराम से सिमटते हुए" },
     "grow": {
       "title": { "en": "Silence Makes Room To Speak", "hi": "ख़ामोशी बोलने के लिए जगह बनाती है" },
       "insight": { "en": "Sometimes the kindest thing we can offer is not words at all, but a patient silence that invites another to speak.", "hi": "कभी-कभी सबसे मेहरबान चीज़ जो हम दे सकते हैं वह शब्द नहीं होते, बल्कि एक सब्र भरी ख़ामोशी होती है जो सामने वाले को बोलने का न्योता देती है।" },
@@ -202,7 +202,7 @@
   {
     "day": 244,
     "week": 35,
-    "babyLearning": { "en": "growing curious, soothed by gentle sounds", "hi": "जिज्ञासा से भरते हुए, कोमल आवाज़ों से शांत होते हुए" },
+    "babyLearning": { "en": "Your baby's brain is building the base for learning after birth.", "hi": "जिज्ञासा से भरते हुए, कोमल आवाज़ों से शांत होते हुए" },
     "grow": {
       "title": { "en": "Their Questions Deserve Answers", "hi": "उनके सवाल जवाब के हक़दार हैं" },
       "insight": { "en": "A child's endless questions are not interruptions to manage. They are the sound of a mind reaching out to understand the world.", "hi": "बच्चे के न ख़त्म होने वाले सवाल कोई रुकावट नहीं हैं जिन्हें सँभालना है। वे एक ऐसे मन की आवाज़ हैं जो दुनिया को समझने के लिए हाथ बढ़ा रहा है।" },
@@ -242,7 +242,7 @@
   {
     "day": 245,
     "week": 35,
-    "babyLearning": { "en": "closing the week, growing calm and ready", "hi": "हफ़्ते को पूरा करते हुए, शांत और तैयार होते हुए" },
+    "babyLearning": { "en": "Your baby's grip is strong now.", "hi": "हफ़्ते को पूरा करते हुए, शांत और तैयार होते हुए" },
     "grow": {
       "title": { "en": "To Listen Is To Honour", "hi": "सुनना ही सम्मान देना है" },
       "insight": { "en": "When you truly listen to someone, you are telling them, without a single word, that they matter to you.", "hi": "जब आप किसी को सचमुच सुनती हैं, आप उसे एक भी शब्द कहे बिना बता देती हैं कि वह आपके लिए मायने रखता है।" },

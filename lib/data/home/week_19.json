@@ -2,7 +2,7 @@
   {
     "day": 127,
     "week": 19,
-    "babyLearning": { "en": "growing fast, tiny ears tuning in to your voice", "hi": "तेज़ी से बढ़ते हुए, नन्हे कान आपकी आवाज़ पर लगे हुए" },
+    "babyLearning": { "en": "A creamy coating (vernix) is starting to protect your baby's skin.", "hi": "तेज़ी से बढ़ते हुए, नन्हे कान आपकी आवाज़ पर लगे हुए" },
     "grow": {
       "title": { "en": "All Feelings Are Allowed", "hi": "सारी भावनाएँ मंज़ूर हैं" },
       "insight": { "en": "There is no such thing as a bad feeling. Every emotion your child will ever have deserves a welcome, not a wall.", "hi": "बुरी भावना जैसी कोई चीज़ नहीं होती। आपके बच्चे के मन में जो भी भाव उठे, वह स्वागत का हक़दार है — दीवार का नहीं।" },
@@ -42,7 +42,7 @@
   {
     "day": 128,
     "week": 19,
-    "babyLearning": { "en": "stretching and turning, growing more aware", "hi": "खिंचते और करवट लेते हुए, और ज़्यादा सजग होते हुए" },
+    "babyLearning": { "en": "The parts of your baby's brain that handle the senses are growing.", "hi": "खिंचते और करवट लेते हुए, और ज़्यादा सजग होते हुए" },
     "grow": {
       "title": { "en": "Feelings Need A Witness", "hi": "भावनाओं को एक गवाह चाहिए" },
       "insight": { "en": "A feeling does not need to be fixed. Most of the time, it simply needs to be seen.", "hi": "भावना को ठीक करने की ज़रूरत नहीं होती। ज़्यादातर तो उसे बस देखे जाने की ज़रूरत होती है।" },
@@ -82,7 +82,7 @@
   {
     "day": 129,
     "week": 19,
-    "babyLearning": { "en": "tiny senses sharpening, soaking in the world", "hi": "नन्ही इंद्रियाँ तेज़ होती हुईं, दुनिया को सोखती हुईं" },
+    "babyLearning": { "en": "Your baby is more active and spends a lot of the day moving.", "hi": "नन्ही इंद्रियाँ तेज़ होती हुईं, दुनिया को सोखती हुईं" },
     "grow": {
       "title": { "en": "Big Emotions, Small People", "hi": "बड़ी भावनाएँ, छोटे लोग" },
       "insight": { "en": "A small child with a huge feeling is not misbehaving. They are simply overwhelmed by a storm they cannot yet name.", "hi": "बड़ी भावना में डूबे छोटे बच्चे बदतमीज़ी नहीं कर रहे होते। वे बस एक ऐसे तूफ़ान से भर जाते हैं जिसे वे अभी नाम नहीं दे सकते।" },
@@ -122,7 +122,7 @@
   {
     "day": 130,
     "week": 19,
-    "babyLearning": { "en": "growing stronger, settling into a gentle rhythm", "hi": "और मज़बूत होते हुए, एक नरम लय में बसते हुए" },
+    "babyLearning": { "en": "Your baby's arms and legs are now in proportion.", "hi": "और मज़बूत होते हुए, एक नरम लय में बसते हुए" },
     "grow": {
       "title": { "en": "You Can Hold The Hard Ones", "hi": "मुश्किल भावनाएँ भी आप थाम सकती हैं" },
       "insight": { "en": "Your child's biggest feelings will need a steady container. You are stronger than those storms, and you can hold them.", "hi": "आपके बच्चे की सबसे बड़ी भावनाओं को एक ठहरा हुआ बर्तन चाहिए होगा। आप उन तूफ़ानों से मज़बूत हैं, और आप उन्हें थाम सकती हैं।" },
@@ -162,7 +162,7 @@
   {
     "day": 131,
     "week": 19,
-    "babyLearning": { "en": "growing softly, calmed by your steady heartbeat", "hi": "नरमी से बढ़ते हुए, आपकी थमी हुई धड़कन से शांत" },
+    "babyLearning": { "en": "Your baby's kidneys make urine, which adds to the amniotic fluid.", "hi": "नरमी से बढ़ते हुए, आपकी थमी हुई धड़कन से शांत" },
     "grow": {
       "title": { "en": "Tears Are Not Trouble", "hi": "आँसू कोई मुसीबत नहीं" },
       "insight": { "en": "Crying is not a problem to be stopped. It is the body's own gentle way of letting a feeling move through and out.", "hi": "रोना कोई समस्या नहीं जिसे रोका जाए। यह शरीर का अपना नरम तरीक़ा है — किसी भावना को बहकर निकल जाने देने का।" },
@@ -202,7 +202,7 @@
   {
     "day": 132,
     "week": 19,
-    "babyLearning": { "en": "growing day by day, soothed when you are soothed", "hi": "दिन-ब-दिन बढ़ते हुए, जब आप शांत तब शांत" },
+    "babyLearning": { "en": "A little hair is growing on your baby's head.", "hi": "दिन-ब-दिन बढ़ते हुए, जब आप शांत तब शांत" },
     "grow": {
       "title": { "en": "Anger Has A Message", "hi": "ग़ुस्से का एक संदेश होता है" },
       "insight": { "en": "Anger is rarely the real story. It is usually a messenger, pointing to a hurt or a need underneath.", "hi": "ग़ुस्सा शायद ही असली कहानी होता है। वह तो अक्सर एक संदेश लाने वाला होता है — नीचे छिपी किसी चोट या किसी ज़रूरत की ओर इशारा करता हुआ।" },
@@ -242,7 +242,7 @@
   {
     "day": 133,
     "week": 19,
-    "babyLearning": { "en": "closing the week, growing calm and strong inside you", "hi": "हफ़्ता पूरा करते हुए, आपके भीतर शांत और मज़बूत होते हुए" },
+    "babyLearning": { "en": "Buds for your baby's adult teeth are forming behind the milk teeth.", "hi": "हफ़्ता पूरा करते हुए, आपके भीतर शांत और मज़बूत होते हुए" },
     "grow": {
       "title": { "en": "Comfort Comes Before Calm", "hi": "दिलासा पहले, शांति बाद में" },
       "insight": { "en": "We cannot reason a child into calm while they are still upset. Comfort comes first, and calm follows on its own.", "hi": "परेशान बच्चे को समझा-बुझाकर शांत नहीं किया जा सकता। पहले दिलासा आता है, शांति अपने आप पीछे-पीछे आ जाती है।" },

@@ -2,7 +2,7 @@
   {
     "day": 225,
     "week": 33,
-    "babyLearning": { "en": "growing rounder and softer, settling lower in your belly", "hi": "और गोल, और नरम होना — पेट में थोड़ा नीचे बसना" },
+    "babyLearning": { "en": "Your baby is getting antibodies from you to help protect them after birth.", "hi": "और गोल, और नरम होना — पेट में थोड़ा नीचे बसना" },
     "grow": {
       "title": { "en": "Patience Is A Daily Practice", "hi": "सब्र रोज़ का अभ्यास है" },
       "insight": { "en": "Patience is not a trait you are born with or without. It is a small practice you return to, day after day.", "hi": "सब्र कोई ऐसी चीज़ नहीं जो लेकर पैदा हुआ जाता हो। यह एक छोटा सा अभ्यास है, जिस पर आप दिन-ब-दिन लौटती हैं।" },
@@ -42,7 +42,7 @@
   {
     "day": 226,
     "week": 33,
-    "babyLearning": { "en": "practising tiny breaths, getting ready for the world", "hi": "नन्ही साँसों का अभ्यास, दुनिया के लिए तैयारी" },
+    "babyLearning": { "en": "Your baby's arm and leg bones are hardening.", "hi": "नन्ही साँसों का अभ्यास, दुनिया के लिए तैयारी" },
     "grow": {
       "title": { "en": "The Slow Yes", "hi": "धीमी हाँ" },
       "insight": { "en": "A quick yes can come from pressure. A slow yes comes from your own heart — and it is far kinder.", "hi": "जल्दी वाली हाँ दबाव से आ सकती है। धीमी हाँ आपके अपने दिल से आती है — और वह कहीं ज़्यादा नरम होती है।" },
@@ -82,7 +82,7 @@
   {
     "day": 227,
     "week": 33,
-    "babyLearning": { "en": "bones growing firm, kicks feeling stronger", "hi": "हड्डियों का मज़बूत होना, लातों का और तेज़ लगना" },
+    "babyLearning": { "en": "Your baby's nervous system is maturing quickly.", "hi": "हड्डियों का मज़बूत होना, लातों का और तेज़ लगना" },
     "grow": {
       "title": { "en": "Rushing Teaches Rushing", "hi": "जल्दबाज़ी जल्दबाज़ी सिखाती है" },
       "insight": { "en": "Children learn pace from us. A rushed home raises a rushed child; a calm one offers a different gift.", "hi": "बच्चे रफ़्तार हमसे सीखते हैं। जल्दबाज़ी वाला घर जल्दबाज़ी वाले बच्चे पालता है; शांत घर एक अलग ही तोहफ़ा देता है।" },
@@ -122,7 +122,7 @@
   {
     "day": 228,
     "week": 33,
-    "babyLearning": { "en": "filling out softly, curling snug in less space", "hi": "नरमी से भरना, कम जगह में आराम से सिमटना" },
+    "babyLearning": { "en": "Your baby's kicks may feel strong, with less room to stretch.", "hi": "नरमी से भरना, कम जगह में आराम से सिमटना" },
     "grow": {
       "title": { "en": "Let The Pace Be Gentle", "hi": "रफ़्तार को नरम रहने दीजिए" },
       "insight": { "en": "Not everything has to be fast to be good. Some of the best things in life unfold at a gentle, unhurried pace.", "hi": "अच्छा होने के लिए हर चीज़ का तेज़ होना ज़रूरी नहीं। ज़िंदगी की कुछ सबसे अच्छी चीज़ें एक नरम, बिना जल्दबाज़ी की रफ़्तार पर ही खुलती हैं।" },
@@ -162,7 +162,7 @@
   {
     "day": 229,
     "week": 33,
-    "babyLearning": { "en": "skin growing smooth, eyes opening and closing", "hi": "त्वचा का चिकना होना, आँखों का खुलना और बंद होना" },
+    "babyLearning": { "en": "Amniotic fluid is at about its highest level around now.", "hi": "त्वचा का चिकना होना, आँखों का खुलना और बंद होना" },
     "grow": {
       "title": { "en": "Repeat, Without Resentment", "hi": "दोहराइए, बिना नाराज़गी के" },
       "insight": { "en": "Much of loving care is repetition. The grace lies in doing the same gentle thing again, without bitterness.", "hi": "प्यार भरी देखभाल का बहुत बड़ा हिस्सा दोहराना ही है। ख़ूबसूरती उसी नरम काम को फिर से करने में है, बिना कड़वाहट के।" },
@@ -202,7 +202,7 @@
   {
     "day": 230,
     "week": 33,
-    "babyLearning": { "en": "gaining gentle weight, rounding out a little more", "hi": "धीरे-धीरे वज़न बढ़ना, थोड़ा और गोल होना" },
+    "babyLearning": { "en": "Your baby's lungs are still maturing, week by week.", "hi": "धीरे-धीरे वज़न बढ़ना, थोड़ा और गोल होना" },
     "grow": {
       "title": { "en": "Patience Outlasts Frustration", "hi": "सब्र झुंझलाहट से ज़्यादा टिकता है" },
       "insight": { "en": "Frustration burns hot and fades fast. Patience burns low and steady — and it is what remains.", "hi": "झुंझलाहट तेज़ जलती है और जल्दी बुझ जाती है। सब्र धीमा और ठहरा हुआ जलता है — और आख़िर में वही बचता है।" },
@@ -242,7 +242,7 @@
   {
     "day": 231,
     "week": 33,
-    "babyLearning": { "en": "closing the week, settling and growing steadily", "hi": "हफ़्ता पूरा करना, ठहरकर लगातार बढ़ना" },
+    "babyLearning": { "en": "Your baby's heart beats about twice as fast as yours.", "hi": "हफ़्ता पूरा करना, ठहरकर लगातार बढ़ना" },
     "grow": {
       "title": { "en": "Breathe Through The Wait", "hi": "इंतज़ार में साँस लेते रहिए" },
       "insight": { "en": "When the waiting feels long, your breath is always there — a steady place to return to, one moment at a time.", "hi": "जब इंतज़ार लंबा लगे, आपकी साँस हमेशा वहीं है — लौटने की एक ठहरी हुई जगह, एक-एक पल करके।" },

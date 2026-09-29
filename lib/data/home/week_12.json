@@ -2,7 +2,7 @@
   {
     "day": 78,
     "week": 12,
-    "babyLearning": { "en": "growing fast, tiny fingers and toes taking shape", "hi": "तेज़ी से बढ़ते हुए, हाथ-पैर की नन्ही उँगलियाँ आकार लेती हुईं" },
+    "babyLearning": { "en": "Most of your baby's organs are formed and starting to work.", "hi": "तेज़ी से बढ़ते हुए, हाथ-पैर की नन्ही उँगलियाँ आकार लेती हुईं" },
     "grow": {
       "title": { "en": "You Were Never Meant To Do This Alone", "hi": "यह सब अकेले करने के लिए आप कभी बनी ही नहीं थीं" },
       "insight": { "en": "Raising a child was never designed to be a solo task. Leaning on others is not failing — it is how parenting was always meant to work.", "hi": "बच्चे को पालना कभी अकेले का काम था ही नहीं। दूसरों का सहारा लेना नाकाम होना नहीं है — माँ-बाप बनना हमेशा से ऐसे ही चलने के लिए बना था।" },
@@ -42,7 +42,7 @@
   {
     "day": 79,
     "week": 12,
-    "babyLearning": { "en": "tiny reflexes beginning, curling and stretching gently", "hi": "पहली अनजानी हरकतें शुरू — नरमी से सिमटना और खिंचना" },
+    "babyLearning": { "en": "Your baby can open and close their tiny fingers.", "hi": "पहली अनजानी हरकतें शुरू — नरमी से सिमटना और खिंचना" },
     "grow": {
       "title": { "en": "It Takes A Village", "hi": "एक पूरा गाँव लगता है" },
       "insight": { "en": "The old saying is true: it takes a village to raise a child. Gathering your village now is real preparation.", "hi": "पुरानी कहावत सच है: एक बच्चे को पालने में एक पूरा गाँव लगता है। अपना गाँव अभी से जोड़ना असली तैयारी है।" },
@@ -82,7 +82,7 @@
   {
     "day": 80,
     "week": 12,
-    "babyLearning": { "en": "small movements beginning, though too gentle to feel yet", "hi": "छोटी हरकतें शुरू, पर अभी इतनी नरम कि महसूस न हों" },
+    "babyLearning": { "en": "Your baby's first reflexes are starting to appear.", "hi": "छोटी हरकतें शुरू, पर अभी इतनी नरम कि महसूस न हों" },
     "grow": {
       "title": { "en": "Leaning Is Not Weakness", "hi": "सहारा लेना कमज़ोरी नहीं" },
       "insight": { "en": "Leaning on someone does not make you less strong. The strongest people are often the ones who know how to ask.", "hi": "किसी का सहारा लेने से आप कम मज़बूत नहीं हो जातीं। सबसे मज़बूत लोग अक्सर वही होते हैं, जिन्हें माँगना आता है।" },
@@ -122,7 +122,7 @@
   {
     "day": 81,
     "week": 12,
-    "babyLearning": { "en": "growing rounder and stronger, settling into a rhythm", "hi": "और गोल, और मज़बूत होते हुए — एक लय में बसते हुए" },
+    "babyLearning": { "en": "Your baby's kidneys are starting to make urine.", "hi": "और गोल, और मज़बूत होते हुए — एक लय में बसते हुए" },
     "grow": {
       "title": { "en": "Let Love Help You", "hi": "प्यार को अपनी मदद करने दीजिए" },
       "insight": { "en": "The people who love you want to help — not out of duty, but out of love. Letting them in is a gift to you both.", "hi": "जो लोग आपसे प्यार करते हैं, वे मदद करना चाहते हैं — फ़र्ज़ से नहीं, प्यार से। उन्हें भीतर आने देना आप दोनों के लिए एक तोहफ़ा है।" },
@@ -162,7 +162,7 @@
   {
     "day": 82,
     "week": 12,
-    "babyLearning": { "en": "tiny vocal cords beginning to form, quiet and unseen", "hi": "नन्हे स्वर-तंतु बनने लगे — चुपचाप और आँखों से ओझल" },
+    "babyLearning": { "en": "Your baby has started to swallow a little amniotic fluid.", "hi": "नन्हे स्वर-तंतु बनने लगे — चुपचाप और आँखों से ओझल" },
     "grow": {
       "title": { "en": "Share The Load", "hi": "बोझ बाँट लीजिए" },
       "insight": { "en": "A weight shared is a weight halved. You do not have to carry every task of parenting alone.", "hi": "बाँटा हुआ बोझ आधा हो जाता है। माँ-बाप बनने का हर काम आपको अकेले नहीं उठाना है।" },
@@ -202,7 +202,7 @@
   {
     "day": 83,
     "week": 12,
-    "babyLearning": { "en": "growing steadily, every part working quietly together", "hi": "लगातार बढ़ते हुए — हर हिस्सा चुपचाप मिलकर काम करता हुआ" },
+    "babyLearning": { "en": "Your baby's thyroid gland is starting to make its own hormones.", "hi": "लगातार बढ़ते हुए — हर हिस्सा चुपचाप मिलकर काम करता हुआ" },
     "grow": {
       "title": { "en": "Together Is Lighter", "hi": "साथ हो तो बोझ हल्का है" },
       "insight": { "en": "What feels heavy alone becomes lighter the moment it is shared. Togetherness changes the weight of everything.", "hi": "जो अकेले भारी लगता है, बाँटते ही हल्का हो जाता है। साथ होना हर चीज़ का वज़न बदल देता है।" },
@@ -242,7 +242,7 @@
   {
     "day": 84,
     "week": 12,
-    "babyLearning": { "en": "closing the week, fully formed in miniature and growing on", "hi": "हफ़्ता पूरा करते हुए — नन्हे रूप में पूरा बना, और आगे बढ़ता हुआ" },
+    "babyLearning": { "en": "You're nearly at the end of the first trimester.", "hi": "हफ़्ता पूरा करते हुए — नन्हे रूप में पूरा बना, और आगे बढ़ता हुआ" },
     "grow": {
       "title": { "en": "Accept The Hand Offered", "hi": "जो हाथ बढ़े, उसे थाम लीजिए" },
       "insight": { "en": "When someone reaches out to help, let them. A hand offered and taken builds the very bonds your baby will grow up inside.", "hi": "जब कोई मदद के लिए हाथ बढ़ाए, तो उसे बढ़ाने दीजिए। बढ़ाया और थामा गया हाथ वही रिश्ते बनाता है, जिनके भीतर आपका शिशु बड़ा होगा।" },

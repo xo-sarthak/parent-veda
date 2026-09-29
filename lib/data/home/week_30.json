@@ -2,7 +2,7 @@
   {
     "day": 204,
     "week": 30,
-    "babyLearning": { "en": "growing softer and rounder, learning the sound of your voice", "hi": "नरम और गोल होता हुआ, आपकी आवाज़ की आहट पहचानता हुआ" },
+    "babyLearning": { "en": "Your baby's brain is starting to look much like a newborn's.", "hi": "नरम और गोल होता हुआ, आपकी आवाज़ की आहट पहचानता हुआ" },
     "grow": {
       "title": { "en": "Every Family Has A Story", "hi": "हर परिवार की एक कहानी होती है" },
       "insight": { "en": "Your baby is not arriving into an empty world. They are joining a long, living story that began far before them.", "hi": "आपका शिशु किसी ख़ाली दुनिया में नहीं आ रहा। वह एक लंबी, ज़िंदा कहानी में शामिल हो रहा है, जो उससे बहुत पहले शुरू हुई थी।" },
@@ -42,7 +42,7 @@
   {
     "day": 205,
     "week": 30,
-    "babyLearning": { "en": "filling out, practising tiny breaths in the warm dark", "hi": "भरता हुआ, गर्म अँधेरे में नन्ही साँसों का अभ्यास करता हुआ" },
+    "babyLearning": { "en": "Your baby is adding fat that will keep them warm after birth.", "hi": "भरता हुआ, गर्म अँधेरे में नन्ही साँसों का अभ्यास करता हुआ" },
     "grow": {
       "title": { "en": "Tell Them Where They Began", "hi": "उसे बताइए कि वह शुरू कहाँ से हुआ" },
       "insight": { "en": "One day your child will want to know how their story began — and that story starts with you and the people who came before.", "hi": "एक दिन आपका बच्चा जानना चाहेगा कि उसकी कहानी कैसे शुरू हुई — और वह कहानी आपसे और उन लोगों से शुरू होती है जो पहले आए।" },
@@ -82,7 +82,7 @@
   {
     "day": 206,
     "week": 30,
-    "babyLearning": { "en": "gaining gentle weight, settling into your rhythm", "hi": "धीरे-धीरे वज़न बढ़ाता हुआ, आपकी लय में बसता हुआ" },
+    "babyLearning": { "en": "The fine hair (lanugo) on your baby's body is starting to shed.", "hi": "धीरे-धीरे वज़न बढ़ाता हुआ, आपकी लय में बसता हुआ" },
     "grow": {
       "title": { "en": "Stories Are How We Remember", "hi": "याद हम कहानियों से रखते हैं" },
       "insight": { "en": "Facts fade, but a story stays. A family remembers itself not in dates, but in the tales it tells again and again.", "hi": "तथ्य धुँधले पड़ जाते हैं, पर कहानी ठहर जाती है। परिवार ख़ुद को तारीख़ों में नहीं, उन क़िस्सों में याद रखता है जो वह बार-बार सुनाता है।" },
@@ -122,7 +122,7 @@
   {
     "day": 207,
     "week": 30,
-    "babyLearning": { "en": "opening and closing tiny eyes, sensing soft light", "hi": "नन्ही आँखें खोलता-बंद करता, नरम रोशनी को महसूस करता हुआ" },
+    "babyLearning": { "en": "Your baby's pupils are starting to widen and narrow with light.", "hi": "नन्ही आँखें खोलता-बंद करता, नरम रोशनी को महसूस करता हुआ" },
     "grow": {
       "title": { "en": "The Past Lives In Us", "hi": "बीता कल हम में जीता है" },
       "insight": { "en": "The people who shaped you are not gone. They live on in the way you love, laugh, and care for your baby.", "hi": "जिन लोगों ने आपको गढ़ा, वे गए नहीं। वे उसी में जीते हैं — जिस तरह आप प्यार करती हैं, हँसती हैं, और अपने शिशु का ख़याल रखती हैं।" },
@@ -162,7 +162,7 @@
   {
     "day": 208,
     "week": 30,
-    "babyLearning": { "en": "growing stronger, kicking and stretching with purpose", "hi": "और मज़बूत होता हुआ, इरादे से लात मारता और अंगड़ाई लेता हुआ" },
+    "babyLearning": { "en": "Your baby's lungs keep maturing for that first breath.", "hi": "और मज़बूत होता हुआ, इरादे से लात मारता और अंगड़ाई लेता हुआ" },
     "grow": {
       "title": { "en": "Pass Down The Good", "hi": "अच्छाई आगे बढ़ाइए" },
       "insight": { "en": "Not everything in a family must be carried forward. You get to choose which threads to pass on — and which to gently set down.", "hi": "परिवार की हर चीज़ आगे ले जाना ज़रूरी नहीं। यह आपका चुनाव है कि कौन-से धागे आगे बढ़ाने हैं — और कौन-से नरमी से रख देने हैं।" },
@@ -202,7 +202,7 @@
   {
     "day": 209,
     "week": 30,
-    "babyLearning": { "en": "softening into your lullabies, knowing your touch", "hi": "आपकी लोरियों में नरम पड़ता हुआ, आपके स्पर्श को पहचानता हुआ" },
+    "babyLearning": { "en": "Your baby's toenails are growing in.", "hi": "आपकी लोरियों में नरम पड़ता हुआ, आपके स्पर्श को पहचानता हुआ" },
     "grow": {
       "title": { "en": "Names Carry Meaning", "hi": "नाम अपने साथ अर्थ लाते हैं" },
       "insight": { "en": "A name is the first story you tell about your child — a small word holding a wish, a memory, or a love.", "hi": "नाम वह पहली कहानी है जो आप अपने बच्चे के बारे में कहती हैं — एक छोटा-सा शब्द, जिसमें एक दुआ, एक याद या एक प्यार बंद है।" },
@@ -242,7 +242,7 @@
   {
     "day": 210,
     "week": 30,
-    "babyLearning": { "en": "closing the week curled close, listening to your heartbeat", "hi": "हफ़्ता पूरा करते हुए, पास सिमटा हुआ, आपकी धड़कन सुनता हुआ" },
+    "babyLearning": { "en": "Your baby spends much of the day asleep, in regular cycles.", "hi": "हफ़्ता पूरा करते हुए, पास सिमटा हुआ, आपकी धड़कन सुनता हुआ" },
     "grow": {
       "title": { "en": "Memory Is A Kind Of Love", "hi": "याद भी एक तरह का प्यार है" },
       "insight": { "en": "To remember someone is to keep loving them. The stories we hold are love that refuses to fade.", "hi": "किसी को याद रखना, उससे प्यार करते रहना है। जो कहानियाँ हम थामे रहते हैं, वे ऐसा प्यार हैं जो धुँधला होने से इनकार कर देता है।" },

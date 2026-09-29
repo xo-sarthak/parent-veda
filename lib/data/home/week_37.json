@@ -2,7 +2,7 @@
   {
     "day": 253,
     "week": 37,
-    "babyLearning": { "en": "growing rounder and ready, settling low for the journey ahead", "hi": "गोल और तैयार होते हुए, आगे के सफ़र के लिए नीचे बसते हुए" },
+    "babyLearning": { "en": "From around now, your baby counts as full term.", "hi": "गोल और तैयार होते हुए, आगे के सफ़र के लिए नीचे बसते हुए" },
     "grow": {
       "title": { "en": "You Are Already Enough", "hi": "आप पहले से ही काफ़ी हैं" },
       "insight": { "en": "You do not need to become someone better before your baby arrives. The parent you already are is exactly enough.", "hi": "शिशु के आने से पहले आपको कोई बेहतर इंसान बनने की ज़रूरत नहीं। आप जैसी माँ पहले से हैं, वही बिल्कुल काफ़ी है।" },
@@ -42,7 +42,7 @@
   {
     "day": 254,
     "week": 37,
-    "babyLearning": { "en": "practising tiny breaths, lungs growing strong and ready", "hi": "नन्ही साँसों का अभ्यास करते हुए, फेफड़े मज़बूत और तैयार होते हुए" },
+    "babyLearning": { "en": "Your baby's lungs are ready, or nearly ready, for air.", "hi": "नन्ही साँसों का अभ्यास करते हुए, फेफड़े मज़बूत और तैयार होते हुए" },
     "grow": {
       "title": { "en": "There Is No Perfect Parent", "hi": "कोई परफ़ेक्ट माता-पिता नहीं होता" },
       "insight": { "en": "The perfect parent does not exist, and never has. Your baby does not need one — they need you.", "hi": "परफ़ेक्ट माता-पिता का कोई वजूद नहीं है, और कभी था भी नहीं। आपके शिशु को कोई परफ़ेक्ट माँ नहीं चाहिए — उसे आप चाहिए।" },
@@ -82,7 +82,7 @@
   {
     "day": 255,
     "week": 37,
-    "babyLearning": { "en": "fingernails reaching the tips, soft and complete", "hi": "नाख़ून उँगलियों के सिरों तक पहुँचते हुए, नरम और पूरे" },
+    "babyLearning": { "en": "Your baby is practising blinking, sucking and turning the head.", "hi": "नाख़ून उँगलियों के सिरों तक पहुँचते हुए, नरम और पूरे" },
     "grow": {
       "title": { "en": "Your Love Is Qualification Enough", "hi": "आपका प्यार ही काफ़ी योग्यता है" },
       "insight": { "en": "No one hands out a licence to be a parent. The love already in your heart is the only qualification that matters.", "hi": "माँ बनने का कोई लाइसेंस नहीं बँटता। आपके दिल में पहले से मौजूद प्यार ही इकलौती योग्यता है जो मायने रखती है।" },
@@ -122,7 +122,7 @@
   {
     "day": 256,
     "week": 37,
-    "babyLearning": { "en": "turning towards your voice, learning the sound of home", "hi": "आपकी आवाज़ की तरफ़ मुड़ते हुए, घर की आवाज़ सीखते हुए" },
+    "babyLearning": { "en": "Your baby is gaining weight to store energy for after birth.", "hi": "आपकी आवाज़ की तरफ़ मुड़ते हुए, घर की आवाज़ सीखते हुए" },
     "grow": {
       "title": { "en": "Doubt Does Not Mean Failure", "hi": "शक़ का मतलब नाकामी नहीं" },
       "insight": { "en": "Feeling unsure is not a sign you will be a bad parent. It is often a sign of how deeply you already care.", "hi": "अनिश्चित महसूस करना इस बात की निशानी नहीं कि आप बुरी माँ बनेंगी। यह अक्सर इस बात की निशानी है कि आप पहले से कितनी गहराई से ख़याल करती हैं।" },
@@ -162,7 +162,7 @@
   {
     "day": 257,
     "week": 37,
-    "babyLearning": { "en": "soft and full-cheeked now, storing warmth for the world", "hi": "अब नरम और भरे गालों वाला, दुनिया के लिए गर्माहट संजोता हुआ" },
+    "babyLearning": { "en": "Your baby's cheeks have fat pads that help with sucking.", "hi": "अब नरम और भरे गालों वाला, दुनिया के लिए गर्माहट संजोता हुआ" },
     "grow": {
       "title": { "en": "This Is What You're Here For", "hi": "आप इसी के लिए यहाँ हैं" },
       "insight": { "en": "All the love you have been carrying was leading here. This — caring for one small person — is what you are here for.", "hi": "जो सारा प्यार आप थामे चल रही थीं, वह यहीं ला रहा था। यह — एक छोटे इंसान का ख़याल रखना — इसी के लिए आप यहाँ हैं।" },
@@ -202,7 +202,7 @@
   {
     "day": 258,
     "week": 37,
-    "babyLearning": { "en": "resting deeply, growing patient for the day to come", "hi": "गहराई से आराम करते हुए, आने वाले दिन के लिए सब्र सीखते हुए" },
+    "babyLearning": { "en": "Your baby's hair and nails keep growing.", "hi": "गहराई से आराम करते हुए, आने वाले दिन के लिए सब्र सीखते हुए" },
     "grow": {
       "title": { "en": "Trust What You Already Know", "hi": "जो आप पहले से जानती हैं, उस पर भरोसा कीजिए" },
       "insight": { "en": "Beneath all the books and advice, you already carry a quiet wisdom about your own baby. Learn to trust it.", "hi": "सारी किताबों और सलाह के नीचे, आप पहले से ही अपने शिशु के बारे में एक शांत समझ रखती हैं। उस पर भरोसा करना सीखिए।" },
@@ -242,7 +242,7 @@
   {
     "day": 259,
     "week": 37,
-    "babyLearning": { "en": "fully formed and waiting, enough exactly as they are", "hi": "पूरी तरह बना और इंतज़ार करता हुआ, बिल्कुल जैसा है वैसे ही काफ़ी" },
+    "babyLearning": { "en": "Your baby's skin has lost most of its wrinkles.", "hi": "पूरी तरह बना और इंतज़ार करता हुआ, बिल्कुल जैसा है वैसे ही काफ़ी" },
     "grow": {
       "title": { "en": "Enough Is A Beautiful Word", "hi": "'काफ़ी' एक सुंदर शब्द है" },
       "insight": { "en": "We are taught to chase 'more,' but 'enough' may be the kindest word of all — for your baby, and for you.", "hi": "हमें 'ज़्यादा' का पीछा करना सिखाया जाता है, पर 'काफ़ी' शायद सबसे नरम शब्द है — आपके शिशु के लिए, और आपके लिए भी।" },

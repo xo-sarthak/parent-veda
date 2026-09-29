@@ -2,7 +2,7 @@
   {
     "day": 267,
     "week": 39,
-    "babyLearning": { "en": "fully grown and snug, getting ready to meet you", "hi": "पूरी तरह बढ़े हुए और आराम से सिमटे, आपसे मिलने की तैयारी में" },
+    "babyLearning": { "en": "Your baby is fully developed and ready to be born.", "hi": "पूरी तरह बढ़े हुए और आराम से सिमटे, आपसे मिलने की तैयारी में" },
     "grow": {
       "title": { "en": "Almost Time To Meet You", "hi": "मिलने का समय लगभग आ गया" },
       "insight": { "en": "After all these months of waiting, the meeting you have dreamed of is finally close. Soon the little one you have carried will be in your arms.", "hi": "इतने महीनों के इंतज़ार के बाद, जिस मुलाक़ात के सपने आप देखती रही हैं वह आख़िर पास है। जल्द ही आपकी बाहें उस बच्चे को थाम लेंगी जिसे आपने इतने महीने भीतर संभाला है।" },
@@ -42,7 +42,7 @@
   {
     "day": 268,
     "week": 39,
-    "babyLearning": { "en": "soft and warm, almost ready to arrive", "hi": "नरम और गर्म, लगभग आने को तैयार" },
+    "babyLearning": { "en": "Your baby's lungs are ready to fill with air at birth.", "hi": "नरम और गर्म, लगभग आने को तैयार" },
     "grow": {
       "title": { "en": "Ready Is A Feeling That Grows", "hi": "तैयारी एक एहसास है, जो धीरे-धीरे बढ़ता है" },
       "insight": { "en": "You will not wake up one morning feeling perfectly ready. Readiness is not a switch — it is something that grows in you a little at a time.", "hi": "किसी सुबह आप यह महसूस करते हुए नहीं उठेंगी कि आप पूरी तरह तैयार हैं। तैयारी कोई ऐसा बटन नहीं जो एक झटके में चालू हो जाए — यह भीतर थोड़ा-थोड़ा करके बढ़ती है।" },
@@ -82,7 +82,7 @@
   {
     "day": 269,
     "week": 39,
-    "babyLearning": { "en": "curled close, waiting for the right moment", "hi": "पास सिमटे हुए, सही पल का इंतज़ार करते" },
+    "babyLearning": { "en": "Only a few babies arrive on the exact due date.", "hi": "पास सिमटे हुए, सही पल का इंतज़ार करते" },
     "grow": {
       "title": { "en": "The Nest Is Almost Ready", "hi": "घोंसला लगभग तैयार है" },
       "insight": { "en": "The urge to tidy, to arrange, to make things just so is not restlessness — it is love preparing a soft place to land.", "hi": "साफ़ करने, सजाने, चीज़ों को ठीक वैसा ही कर देने की जो इच्छा उठती है — वह बेचैनी नहीं है। वह प्यार है, जो उतरने के लिए एक नरम जगह तैयार कर रहा है।" },
@@ -122,7 +122,7 @@
   {
     "day": 270,
     "week": 39,
-    "babyLearning": { "en": "settled and snug, treasuring these last quiet days", "hi": "बसे हुए और आराम से, इन आख़िरी शांत दिनों को सँजोते" },
+    "babyLearning": { "en": "Your baby is still storing a little fat and energy.", "hi": "बसे हुए और आराम से, इन आख़िरी शांत दिनों को सँजोते" },
     "grow": {
       "title": { "en": "The First Days Will Be A Blur Of Love", "hi": "शुरू के दिन प्यार की एक धुंध होंगे" },
       "insight": { "en": "The first days with your newborn will pass in a soft, tired haze. Do not try to do them perfectly — just let yourself be soaked in love.", "hi": "अपने नवजात के साथ शुरू के दिन एक नरम, थकी हुई धुंध में गुज़रेंगे। उन्हें परफ़ेक्ट तरीक़े से करने की कोशिश मत कीजिए — बस ख़ुद को प्यार में भीग जाने दीजिए।" },
@@ -162,7 +162,7 @@
   {
     "day": 271,
     "week": 39,
-    "babyLearning": { "en": "tucked in close, growing more ready each day", "hi": "पास दुबके हुए, हर दिन थोड़ा और तैयार" },
+    "babyLearning": { "en": "Your baby's reflexes, like rooting and sucking, are in place.", "hi": "पास दुबके हुए, हर दिन थोड़ा और तैयार" },
     "grow": {
       "title": { "en": "Pack Light, Love Heavy", "hi": "सामान हल्का, प्यार भारी" },
       "insight": { "en": "Your baby will not remember which things you had ready. They will only ever feel how much they were loved.", "hi": "बच्चों को यह याद नहीं रहता कि कौन सी चीज़ें तैयार रखी थीं। याद बस यह रहता है कि उन्हें कितना प्यार मिला।" },
@@ -202,7 +202,7 @@
   {
     "day": 272,
     "week": 39,
-    "babyLearning": { "en": "resting deeply, saving energy for the big day", "hi": "गहरा आराम करते हुए, बड़े दिन के लिए ताक़त बचाते" },
+    "babyLearning": { "en": "Your baby should keep moving as usual right up to labour.", "hi": "गहरा आराम करते हुए, बड़े दिन के लिए ताक़त बचाते" },
     "grow": {
       "title": { "en": "Rest Now For What's Ahead", "hi": "जो आगे है, उसके लिए अभी आराम" },
       "insight": { "en": "The rest you take in these last days is not idle time. It is you quietly storing strength for the journey just ahead.", "hi": "इन आख़िरी दिनों में आप जो आराम लेती हैं, वह बेकार का समय नहीं है। वह आपका चुपचाप आगे के सफ़र के लिए ताक़त जमा करना है।" },
@@ -242,7 +242,7 @@
   {
     "day": 273,
     "week": 39,
-    "babyLearning": { "en": "fully ready, simply waiting for the perfect moment", "hi": "पूरी तरह तैयार, बस सही पल का इंतज़ार" },
+    "babyLearning": { "en": "Newborns cry with few tears for the first few weeks.", "hi": "पूरी तरह तैयार, बस सही पल का इंतज़ार" },
     "grow": {
       "title": { "en": "Your Arms Are Almost Full", "hi": "आपकी बाहें लगभग भर चुकी हैं" },
       "insight": { "en": "Soon the arms that have rested on your belly all these months will hold your baby for real. The waiting is nearly over.", "hi": "जल्द ही वे बाहें, जो इन सारे महीनों आपके पेट पर टिकी रहीं, आपके बच्चे को सच में थाम लेंगी। इंतज़ार लगभग पूरा हुआ।" },

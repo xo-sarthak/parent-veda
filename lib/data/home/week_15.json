@@ -2,7 +2,7 @@
   {
     "day": 99,
     "week": 15,
-    "babyLearning": { "en": "growing little fingerprints, all their own", "hi": "अपने ही नन्हे उँगलियों के निशान बनते हुए" },
+    "babyLearning": { "en": "Your baby's bones are getting harder and stronger.", "hi": "अपने ही नन्हे उँगलियों के निशान बनते हुए" },
     "grow": {
       "title": { "en": "Curiosity Lights The Way", "hi": "जिज्ञासा राह रोशन करती है" },
       "insight": { "en": "Children are born explorers. Long before lessons begin, curiosity is already lighting the path your little one will learn by.", "hi": "बच्चे खोजी पैदा होते हैं। सबक़ शुरू होने से बहुत पहले, जिज्ञासा पहले से ही वह राह रोशन कर रही होती है जिस पर आपका नन्हा सीखेगा।" },
@@ -42,7 +42,7 @@
   {
     "day": 100,
     "week": 15,
-    "babyLearning": { "en": "tiny taste buds beginning to form", "hi": "नन्ही स्वाद कलियाँ बनना शुरू" },
+    "babyLearning": { "en": "Your baby's movements are getting smoother and better controlled.", "hi": "नन्ही स्वाद कलियाँ बनना शुरू" },
     "grow": {
       "title": { "en": "Learning Looks Like Play", "hi": "सीखना खेल जैसा दिखता है" },
       "insight": { "en": "To a child, play is not a break from learning. Play is learning, in its happiest and most natural form.", "hi": "एक बच्चे के लिए खेल सीखने से छुट्टी नहीं है। खेल ही सीखना है, अपने सबसे ख़ुश और सहज रूप में।" },
@@ -82,7 +82,7 @@
   {
     "day": 101,
     "week": 15,
-    "babyLearning": { "en": "ears settling into place, ready to listen", "hi": "कान अपनी जगह बसते हुए, सुनने को तैयार" },
+    "babyLearning": { "en": "Your baby may sense light through closed eyelids.", "hi": "कान अपनी जगह बसते हुए, सुनने को तैयार" },
     "grow": {
       "title": { "en": "Every Question Is A Gift", "hi": "हर सवाल एक तोहफ़ा है" },
       "insight": { "en": "A child's endless questions are not interruptions to learning. Each 'why?' is the very engine of it.", "hi": "एक बच्चे के अनगिनत सवाल सीखने में रुकावट नहीं हैं। हर 'क्यों?' उसी सीखने का इंजन है।" },
@@ -122,7 +122,7 @@
   {
     "day": 102,
     "week": 15,
-    "babyLearning": { "en": "wiggling and stretching, learning to move", "hi": "हिलते और अंगड़ाई लेते हुए, हिलना-डुलना सीखते हुए" },
+    "babyLearning": { "en": "Your baby is practising breathing movements with amniotic fluid.", "hi": "हिलते और अंगड़ाई लेते हुए, हिलना-डुलना सीखते हुए" },
     "grow": {
       "title": { "en": "They Learn By Watching You", "hi": "वे आपको देखकर सीखते हैं" },
       "insight": { "en": "Long before children listen to what we say, they learn from what we do. You are your child's first and most-watched teacher.", "hi": "बच्चे हमारी कही बात सुनने से बहुत पहले, हमारे किए हुए से सीखते हैं। आप अपने बच्चे की पहली और सबसे ज़्यादा देखी जाने वाली गुरु हैं।" },
@@ -162,7 +162,7 @@
   {
     "day": 103,
     "week": 15,
-    "babyLearning": { "en": "practising tiny breaths of fluid", "hi": "गर्भ के पानी की नन्ही साँसों का अभ्यास करते हुए" },
+    "babyLearning": { "en": "Your baby's legs are growing longer than the arms.", "hi": "गर्भ के पानी की नन्ही साँसों का अभ्यास करते हुए" },
     "grow": {
       "title": { "en": "Boredom Sparks Imagination", "hi": "बोरियत कल्पना जगाती है" },
       "insight": { "en": "An empty, unhurried moment is not wasted on a child. Boredom is often where imagination is born.", "hi": "एक ख़ाली, बिना जल्दी वाला पल बच्चे पर बर्बाद नहीं होता। बोरियत अक्सर वही जगह है जहाँ कल्पना जन्म लेती है।" },
@@ -202,7 +202,7 @@
   {
     "day": 104,
     "week": 15,
-    "babyLearning": { "en": "soft hair beginning to grow", "hi": "नरम बाल उगना शुरू हो रहे हैं" },
+    "babyLearning": { "en": "The pattern of your baby's hair on the scalp is forming.", "hi": "नरम बाल उगना शुरू हो रहे हैं" },
     "grow": {
       "title": { "en": "The World Is Their Classroom", "hi": "दुनिया ही उनका क्लासरूम है" },
       "insight": { "en": "Your child will not learn most from books and screens, but from the ordinary world — markets, kitchens, gardens and walks.", "hi": "आपका बच्चा सबसे ज़्यादा किताबों और स्क्रीन से नहीं सीखेगा, बल्कि आम दुनिया से — बाज़ार, रसोई, बग़ीचे और सैर से।" },
@@ -242,7 +242,7 @@
   {
     "day": 105,
     "week": 15,
-    "babyLearning": { "en": "closing the week, steadily growing stronger", "hi": "हफ़्ता पूरा करते हुए, लगातार मज़बूत होते हुए" },
+    "babyLearning": { "en": "Your baby's taste buds are maturing.", "hi": "हफ़्ता पूरा करते हुए, लगातार मज़बूत होते हुए" },
     "grow": {
       "title": { "en": "Slow Learning Lasts Longest", "hi": "धीमे सीखा हुआ सबसे लंबा टिकता है" },
       "insight": { "en": "There is no rush to make a child learn faster. What is learned slowly, with joy, is what lasts a lifetime.", "hi": "बच्चे को तेज़ी से सिखाने की कोई जल्दी नहीं है। जो धीरे, ख़ुशी से सीखा जाता है, वही ज़िंदगी भर टिकता है।" },

@@ -2,7 +2,7 @@
   {
     "day": 134,
     "week": 20,
-    "babyLearning": { "en": "halfway there, ears tuning to your voice", "hi": "आधा सफ़र पूरा, कान आपकी आवाज़ पर ध्यान देने लगे" },
+    "babyLearning": { "en": "You're halfway through your pregnancy this week.", "hi": "आधा सफ़र पूरा, कान आपकी आवाज़ पर ध्यान देने लगे" },
     "grow": {
       "title": { "en": "You Cannot Force A Flower", "hi": "फूल को ज़बरदस्ती नहीं खिलाया जाता" },
       "insight": { "en": "A flower opens in its own time. You can offer warmth and water, but you cannot pull the petals apart.", "hi": "फूल अपने समय पर ही खिलता है। आप गरमाहट और पानी दे सकती हैं, पर पंखुड़ियों को ज़बरदस्ती खोल नहीं सकतीं।" },
@@ -42,7 +42,7 @@
   {
     "day": 135,
     "week": 20,
-    "babyLearning": { "en": "tiny fingerprints forming, unique to them", "hi": "नन्ही उँगलियों के निशान बन रहे हैं, दुनिया में सिर्फ़ इन्हीं के" },
+    "babyLearning": { "en": "Your baby can hear sounds now, including your voice.", "hi": "नन्ही उँगलियों के निशान बन रहे हैं, दुनिया में सिर्फ़ इन्हीं के" },
     "grow": {
       "title": { "en": "Lead, Don't Drag", "hi": "आगे चलिए, खींचिए नहीं" },
       "insight": { "en": "A child follows where they feel gently led — not where they are pushed from behind.", "hi": "बच्चे वहीं चलते हैं जहाँ उन्हें प्यार से ले जाया जाए — वहाँ नहीं जहाँ पीछे से धकेला जाए।" },
@@ -82,7 +82,7 @@
   {
     "day": 136,
     "week": 20,
-    "babyLearning": { "en": "swallowing gently, practising for life outside", "hi": "धीरे-धीरे निगलना, बाहर की ज़िंदगी की तैयारी" },
+    "babyLearning": { "en": "Your baby swallows amniotic fluid, practice for feeding later.", "hi": "धीरे-धीरे निगलना, बाहर की ज़िंदगी की तैयारी" },
     "grow": {
       "title": { "en": "The Calm Adult Wins", "hi": "शांत बड़ा ही जीतता है" },
       "insight": { "en": "In any tense moment between a grown-up and a child, the calmer one quietly leads the way.", "hi": "बड़े और बच्चे के बीच किसी भी तने हुए पल में, जो ज़्यादा शांत है वही चुपचाप राह दिखा देता है।" },
@@ -122,7 +122,7 @@
   {
     "day": 137,
     "week": 20,
-    "babyLearning": { "en": "learning to hear your voice and stretch", "hi": "आपकी आवाज़ सुनना और अंगड़ाई लेना सीखते हुए" },
+    "babyLearning": { "en": "Your baby is moving arms and legs on purpose now.", "hi": "आपकी आवाज़ सुनना और अंगड़ाई लेना सीखते हुए" },
     "grow": {
       "title": { "en": "Children Borrow Calm From Adults", "hi": "बच्चे शांति बड़ों से उधार लेते हैं" },
       "insight": { "en": "Your baby is learning from you long before they understand words. Your calm is their first lullaby.", "hi": "शब्द समझने से बहुत पहले ही आपका शिशु आपसे सीखने लगता है। आपकी शांति ही इनकी पहली लोरी है।" },
@@ -162,7 +162,7 @@
   {
     "day": 138,
     "week": 20,
-    "babyLearning": { "en": "growing eyebrows and soft little lashes", "hi": "भौंहें और नरम नन्ही पलकें बन रही हैं" },
+    "babyLearning": { "en": "Your baby's first stool (meconium) is collecting in the gut.", "hi": "भौंहें और नरम नन्ही पलकें बन रही हैं" },
     "grow": {
       "title": { "en": "Guidance Over Orders", "hi": "हुक्म से बेहतर है राह दिखाना" },
       "insight": { "en": "An order tells a child what to do. Guidance helps a child understand why — and that lasts far longer.", "hi": "हुक्म बच्चे को बताता है कि क्या करना है। राह दिखाना बच्चे को समझाता है कि क्यों — और यही कहीं ज़्यादा देर तक साथ रहता है।" },
@@ -202,7 +202,7 @@
   {
     "day": 139,
     "week": 20,
-    "babyLearning": { "en": "starting to settle into sleep and wake rhythms", "hi": "सोने और जागने की लय में बसना शुरू" },
+    "babyLearning": { "en": "Your baby's eyebrows and eyelashes are growing.", "hi": "सोने और जागने की लय में बसना शुरू" },
     "grow": {
       "title": { "en": "Respect Grows Respect", "hi": "सम्मान से सम्मान बढ़ता है" },
       "insight": { "en": "Children do not learn respect from being commanded. They learn it from being shown it.", "hi": "बच्चे हुक्म पाकर सम्मान नहीं सीखते। वे इसे तब सीखते हैं जब उन्हें ख़ुद सम्मान मिलता है।" },
@@ -242,7 +242,7 @@
   {
     "day": 140,
     "week": 20,
-    "babyLearning": { "en": "closing the week, kicking and curling with ease", "hi": "हफ़्ता पूरा होते-होते, आराम से लात मारना और सिमटना" },
+    "babyLearning": { "en": "Your baby's skin is growing thicker, with more layers.", "hi": "हफ़्ता पूरा होते-होते, आराम से लात मारना और सिमटना" },
     "grow": {
       "title": { "en": "Your Calm Is The Anchor", "hi": "आपकी शांति ही लंगर है" },
       "insight": { "en": "When everything around a child feels rough, your steadiness is the anchor that holds them safe.", "hi": "जब बच्चे के आस-पास सब कुछ मुश्किल लगे, आपकी स्थिरता ही वह लंगर है जो उन्हें सुरक्षित थामे रखती है।" },
