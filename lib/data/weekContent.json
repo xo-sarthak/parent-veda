@@ -898,7 +898,7 @@
     }
    },
    "reveal": {
-    "en": "Maa, I'm not an embryo any more. I'm properly your baby now.",
+    "en": "Maa, all my main organs have started to form. Soon I'll be called a fetus.",
     "hi": "माँ, अब मैं सिर्फ़ एक embryo नहीं रहा। अब मैं आधिकारिक रूप से आपका शिशु हूँ।"
    }
   },
@@ -4967,11 +4967,11 @@
   "phase": "bonding",
   "babySnapshot": {
    "milestone": {
-    "en": "Welcome To The Third Trimester",
+    "en": "Nearly The Third Trimester",
     "hi": "तीसरी तिमाही में स्वागत"
    },
    "weekHeadline": {
-    "en": "You've reached the third trimester. Your baby is growing fast and getting ready for life outside the womb.",
+    "en": "The third trimester starts next week. Your baby is growing fast and getting ready for life outside the womb.",
     "hi": "आप तीसरी तिमाही में पहुँच गई हैं। आपका शिशु तेज़ी से बढ़ रहा है और गर्भ के बाहर की ज़िंदगी की तैयारी कर रहा है।"
    },
    "size": {
@@ -5105,7 +5105,7 @@
   },
   "actionPlan": {
    "doThisWeek": {
-    "en": "Celebrate reaching the third trimester, and start a simple checklist for the birth.",
+    "en": "Celebrate how far you've come, and start a simple checklist for the birth.",
     "hi": "तीसरी तिमाही में पहुँचने का जश्न मनाइए और जन्म की तैयारी की एक सरल सूची बनाना शुरू कीजिए।"
    },
    "skipThisWeek": {
@@ -5139,7 +5139,7 @@
    },
    "spokenLine": {
     "hi": "माँ, हमने तीसरी तिमाही में क़दम रख दिया।",
-    "en": "Maa, we have entered the third trimester."
+    "en": "Maa, we're almost at the third trimester."
    }
   },
   "reflectAndRemember": {
@@ -5161,7 +5161,7 @@
   },
   "partnerCorner": {
    "whatSheMayFeel": {
-    "en": "Proud to reach the third trimester, and aware of how fast the due date is coming.",
+    "en": "Proud to be nearly at the third trimester, and aware of how fast the due date is coming.",
     "hi": "तीसरी तिमाही तक पहुँचने पर गर्व से भरी, और साथ ही यह महसूस करती हुई कि डिलीवरी की तारीख़ कितनी तेज़ी से क़रीब आ रही है।"
    },
    "whatYouCanDo": {
@@ -5173,7 +5173,7 @@
     "hi": "तीसरी तिमाही का एक साधारण जश्न या कोई ख़ास याद साथ मिलकर बनाइए।"
    },
    "shareMessage": {
-    "en": "Third trimester already. Look how far we've come together.",
+    "en": "Almost the third trimester. Look how far we've come together.",
     "hi": "तीसरी तिमाही भी आ गई ❤ देखिए, हम साथ मिलकर कितनी दूर आ गए।"
    }
   },
