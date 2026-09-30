@@ -25,6 +25,8 @@ import '../../services/stage_gateway.dart';
 import '../../theme/pv_fonts.dart';
 import '../doors/pv_door_screen.dart';
 import '../v2/v2_palette.dart';
+import '../products/pv_store_chrome.dart' show kPvInk, kPvLine;
+import '../doors/pv_list_row.dart' show PvMarkWell;
 
 const String kPregEndedRoute = 'pregnancy/ended';
 
@@ -159,16 +161,21 @@ class PregEndedHome extends StatelessWidget {
             for (final r in rows)
               Padding(
                 padding: const EdgeInsets.only(bottom: 10),
+                // One ParentVeda: white with a hairline, not a tinted block
+                // behind the words. Was: color: p.surfaceAlt.
                 child: Material(
-                  color: p.surfaceAlt,
-                  borderRadius: BorderRadius.circular(16),
+                  color: Colors.white,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16), side: const BorderSide(color: kPvLine)),
                   clipBehavior: Clip.antiAlias,
                   child: InkWell(
                     onTap: r.onTap,
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
                       child: Row(children: [
-                        Icon(r.icon, size: 22, color: p.ink2),
+                        // The tab's glyph in a tinted well: the door's own
+                        // icon, as the door's rail draws it.
+                        PvMarkWell(p: p, hue: 344, size: 40, icon: r.icon),
                         const SizedBox(width: 14),
                         Expanded(
                           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -277,14 +284,15 @@ class _Button extends StatelessWidget {
         width: double.infinity,
         height: 52,
         child: Material(
-          color: filled ? p.ink1 : Colors.transparent,
-          shape: StadiumBorder(side: BorderSide(color: filled ? p.ink1 : p.line)),
+          // The one ink for everything pressable (#2F2C30).
+          color: filled ? kPvInk : Colors.transparent,
+          shape: StadiumBorder(side: BorderSide(color: filled ? kPvInk : p.line)),
           clipBehavior: Clip.antiAlias,
           child: InkWell(
             onTap: onTap,
             child: Center(
               child: Text(label,
-                  style: pvManrope(fontSize: 15, fontWeight: FontWeight.w700, color: filled ? p.ground : p.ink1)),
+                  style: pvManrope(fontSize: 15, fontWeight: FontWeight.w700, color: filled ? Colors.white : p.ink1)),
             ),
           ),
         ),

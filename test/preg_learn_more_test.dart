@@ -149,7 +149,7 @@ void main() {
       expect(tester.takeException(), isNull);
       expect(find.text('Learn'), findsOneWidget);
       expect(find.text('Search reads, scans and questions'), findsOneWidget);
-      expect(find.text('EXPLORE BY TOPIC'), findsOneWidget);
+      expect(find.text('Explore by topic'), findsOneWidget); // the serif section heading
       expect(find.byKey(const ValueKey('preg_learn_topic_pregnancy_scans_tests')), findsOneWidget);
       await tester.scrollUntilVisible(find.text('Pregnancy 101'), 300,
           scrollable: find.byType(Scrollable).first);
@@ -215,7 +215,7 @@ void main() {
         (tester) async {
       await pump(tester, ToolsHubScreen(controller: pregnancy), height: 3000);
       expect(tester.takeException(), isNull);
-      for (final h in ['TRACK', 'GET READY', 'KEEP', 'CHECK AND ASK']) {
+      for (final h in ['Track', 'Get ready', 'Keep', 'Check and ask']) {
         expect(find.text(h, skipOffstage: false), findsOneWidget, reason: h);
       }
       expect(find.text('Birth plan', skipOffstage: false), findsOneWidget);

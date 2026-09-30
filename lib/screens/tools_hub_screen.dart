@@ -69,6 +69,7 @@ import 'doors/pv_live_search.dart';
 import 'pregnancy/birth_plan_screen.dart';
 import 'products/pv_store_chrome.dart' show pvStorePalette;
 import 'v2/v2_palette.dart';
+import 'pregnancy/preg_chrome.dart';
 
 // =============================================================================
 //  THE LIST — 2026-09-29, the structure pass
@@ -310,14 +311,18 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
   Widget _pad(Widget child) =>
       Padding(padding: const EdgeInsets.symmetric(horizontal: _g), child: child);
 
+  // ignore: unused_element
   Widget _eyebrow(V2Palette p, String t) => Text(t.toUpperCase(),
       style: pvManrope(
           fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.4, color: p.action));
 
   List<Widget> _group(V2Palette p, _ToolGroup g) => [
         const SizedBox(height: 26),
-        _pad(_eyebrow(p, g.title)),
-        const SizedBox(height: 8),
+        // One ParentVeda (2026-09-30): a page section takes the one serif
+        // heading; the violet caps eyebrow was a second heading style.
+        // Kept for revert: _pad(_eyebrow(p, g.title)),
+        _pad(PregSectionHeading(g.title)),
+        const SizedBox(height: 10),
         _pad(PvRowGroup(p: p, children: [
           // LEVEL 3 personalisation, inside the group: a stable sort, every
           // tool returned, the ones serving a priority she chose first.

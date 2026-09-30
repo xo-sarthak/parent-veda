@@ -37,7 +37,7 @@ import '../doors/pv_door_router.dart' show openPvDoorRead;
 import '../doors/pv_door_screen.dart' show pvDoorScreenForBracket;
 import '../doors/pv_list_row.dart';
 import '../preg_week_screen.dart';
-import '../products/pv_store_chrome.dart' show pvStorePalette;
+import '../products/pv_store_chrome.dart' show kPvInk, pvStorePalette;
 import '../profile/pv_you_sheets.dart' show showPvAddChildSheet;
 import '../reminders_screen.dart';
 import '../tools/baby_movement_screen.dart';
@@ -217,7 +217,7 @@ class _PregMessagesScreenState extends State<PregMessagesScreen> {
                                   width: 10,
                                   height: 10,
                                   decoration: BoxDecoration(
-                                    color: p.action,
+                                    color: kPvInk, // one ParentVeda: no violet
                                     shape: BoxShape.circle,
                                     border: Border.all(color: p.ground, width: 2),
                                   ),

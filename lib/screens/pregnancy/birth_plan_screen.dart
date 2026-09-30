@@ -48,6 +48,7 @@ import '../../theme/pv_fonts.dart';
 import '../doors/pv_door_chrome.dart';
 import '../doors/pv_door_router.dart' show openPvDoorRead;
 import '../v2/v2_palette.dart';
+import '../products/pv_store_chrome.dart' show kPvInk;
 
 /// The Labour prep door's hue. Passed as a default rather than read from the
 /// bracket so this screen has no dependency on the brackets file.
@@ -439,20 +440,22 @@ class _ShareBar extends StatelessWidget {
           child: Container(
             height: 50,
             alignment: Alignment.center,
+            // One ParentVeda (2026-09-30): the one ink, not the brand
+            // violet. Kept for revert: color: p.action.
             decoration: BoxDecoration(
-              color: p.action,
+              color: kPvInk,
               borderRadius: BorderRadius.circular(999),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.ios_share_rounded, size: 17, color: p.onAction),
+                Icon(Icons.ios_share_rounded, size: 17, color: Colors.white),
                 const SizedBox(width: 9),
                 Text('Share my plan',
                     style: pvManrope(
                         fontSize: 14,
                         fontWeight: FontWeight.w800,
-                        color: p.onAction)),
+                        color: Colors.white)),
               ],
             ),
           ),

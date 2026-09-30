@@ -53,7 +53,9 @@ import '../learn/pv_offering_screen.dart' show pvOpenOffering;
 import '../preg_week_screen.dart';
 import '../prepare/consultations_screen.dart';
 import '../prepare/prepare_hub_screen.dart';
-import '../profile/pv_you_chrome.dart';
+import '../brackets/hub/hub_intent_art.dart';
+import '../products/pv_store_chrome.dart' show pvStorePalette;
+import 'preg_chrome.dart';
 import '../referral/invite_friends_screen.dart';
 import '../watch_learn_screen.dart';
 import 'preg_learn_screen.dart' show showPregOpeningSoon;
@@ -117,218 +119,184 @@ class _PregMoreScreenState extends State<PregMoreScreen> {
       'prepare',
       () => PrepareHubScreen(lang: _c.language, backLabel: 'More'));
 
-  static IconData _iconOf(PvLearnKind k) => switch (k) {
-        PvLearnKind.consult => Icons.video_call_outlined,
-        PvLearnKind.course => Icons.play_lesson_outlined,
-        PvLearnKind.masterclass => Icons.co_present_outlined,
-        PvLearnKind.cohort => Icons.groups_2_outlined,
-        PvLearnKind.classPack => Icons.self_improvement_rounded,
+  static IntentMark _markOf(PvLearnKind k) => switch (k) {
+        PvLearnKind.consult => IntentMark.askDoctor,
+        PvLearnKind.course => IntentMark.schoolMark,
+        PvLearnKind.masterclass => IntentMark.lampMark,
+        PvLearnKind.cohort => IntentMark.seatMark,
+        PvLearnKind.classPack => IntentMark.lotusMark,
       };
 
-  Widget _offeringRow(PvOfferingView v) {
+  // ⚠️ ONE PARENTVEDA (2026-09-30, after main's TTC More tab): a drawn mark in
+  // the section's tint, a name, one grey line, the price or a tag on the
+  // right. Was `PvYouRow` with a line icon and the price as its value, kept in
+  // git at 8124341 (this branch's own, never on main).
+  Widget _offeringRow(PvOfferingView v, double hue) {
     final soon = kPrepOpeningSoon.contains(v.id);
     final who = [v.expert.name, v.expert.role].where((s) => s.isNotEmpty).join(' · ');
-    return PvYouRow(
-      icon: _iconOf(v.kind),
+    final free = !soon && v.priceMinor == 0;
+    return PregOfferRow(
+      key: ValueKey('preg_more_offer_${v.id}'),
+      mark: _markOf(v.kind),
+      hue: hue,
       title: v.title,
-      subtitle: who.isEmpty ? v.subtitle : who,
+      line: who.isEmpty ? v.subtitle : who,
       // "Opening soon" where the price would be: nothing is sold that cannot
       // be delivered (gap analysis, "Behind · Trust").
-      value: soon ? 'Opening soon' : v.priceLabel,
+      price: soon || free ? null : v.priceLabel,
+      tag: soon
+          ? PregOfferTagKind.openingSoon
+          : free
+              ? PregOfferTagKind.free
+              : null,
       onTap: () => _openOffering(v),
     );
   }
 
+  Widget _section(String id, String title, List<Widget> rows,
+          {String? lead, String? link, VoidCallback? onLink, String? empty}) =>
+      Padding(
+        key: ValueKey('preg_more_$id'),
+        padding: const EdgeInsets.fromLTRB(20, 26, 20, 0),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          PregSectionHeading(title, lead: lead, link: link, onLink: onLink),
+          const SizedBox(height: 12),
+          PregRowCard(empty: empty, children: rows),
+        ]),
+      );
+
+  PregOfferRow _row(String id, IntentMark mark, double hue, String title, String line, VoidCallback onTap,
+          {int? badge}) =>
+      PregOfferRow(
+          key: ValueKey(id), mark: mark, hue: hue, title: title, line: line, onTap: onTap, badge: badge);
+
   @override
   Widget build(BuildContext context) {
     final p = pvStorePalette;
-    return Container(
-      color: p.ground,
-      child: ListView(
-        padding: EdgeInsets.fromLTRB(
-            0, MediaQuery.of(context).padding.top + 12, 0, kAskFabReserve + 40),
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('More',
-                  style: pvFraunces(
-                      fontSize: 30, fontWeight: FontWeight.w500, height: 1.1, color: p.ink1)),
-              const SizedBox(height: 6),
-              Text(
-                  'Experts, courses and groups you can book, your calendar and your '
-                  'journey. What you have booked or ordered is on your profile.',
-                  style: pvManrope(fontSize: 14, height: 1.45, color: p.ink2)),
-            ]),
-          ),
+    return ListenableBuilder(
+      listenable: PregMessagesStore.instance,
+      builder: (context, _) => Container(
+        color: p.ground,
+        child: ListView(
+          padding: EdgeInsets.fromLTRB(
+              0, MediaQuery.of(context).padding.top + 12, 0, kAskFabReserve + 40),
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text('More',
+                    style: pvFraunces(
+                        fontSize: 30, fontWeight: FontWeight.w500, height: 1.1, color: p.ink1)),
+                const SizedBox(height: 6),
+                Text(
+                    'Experts, courses and groups you can book, and your journey. What you have '
+                    'booked or ordered is on your profile.',
+                    style: pvManrope(fontSize: 14, height: 1.45, color: p.ink2)),
+              ]),
+            ),
 
-          // ---- talk to an expert ---------------------------------------------
-          PvYouSection(
-            key: const ValueKey('preg_more_experts'),
-            title: 'Talk to an expert',
-            lead: 'Private video calls with a specialist',
-            children: [
-              for (final v in _consults.take(6)) _offeringRow(v),
-              PvYouRow(
-                icon: Icons.arrow_forward_rounded,
-                title: 'See all consults',
-                onTap: () => _push('prepare/consults',
-                    () => ConsultationsScreen(lang: _c.language)),
-              ),
-            ],
-          ),
+            // ---- talk to an expert ---------------------------------------------
+            _section(
+              'experts',
+              'Talk to an expert',
+              [for (final v in _consults.take(6)) _offeringRow(v, 176)],
+              lead: 'Private video calls with a specialist',
+              link: 'See all consults',
+              onLink: () => _push('prepare/consults', () => ConsultationsScreen(lang: _c.language)),
+              empty: 'No experts listed yet. New ones are added as they join.',
+            ),
 
-          // ---- courses and masterclasses --------------------------------------
-          PvYouSection(
-            key: const ValueKey('preg_more_courses'),
-            title: 'Courses and masterclasses',
-            lead: 'Learn at your own pace, or live with an expert',
-            children: [
-              for (final v in _courses.take(6)) _offeringRow(v),
-              if (_courses.isEmpty)
-                PvYouRow(
-                  icon: Icons.play_lesson_outlined,
-                  title: 'Nothing open yet',
-                  subtitle: 'New courses appear here as they open',
-                  onTap: _openPrepare,
-                ),
-            ],
-          ),
+            // ---- courses and masterclasses --------------------------------------
+            _section(
+              'courses',
+              'Courses and masterclasses',
+              [for (final v in _courses.take(6)) _offeringRow(v, 240)],
+              lead: 'Learn at your own pace, or live with an expert',
+              empty: 'Nothing open yet. New courses are added here as they open.',
+            ),
 
-          // ---- groups ---------------------------------------------------------
-          PvYouSection(
-            key: const ValueKey('preg_more_groups'),
-            title: 'Groups',
-            lead: 'A few weeks of live calls in a small group',
-            children: [
-              for (final v in _groups.take(6)) _offeringRow(v),
-              if (_groups.isEmpty)
-                PvYouRow(
-                  icon: Icons.groups_2_outlined,
-                  title: 'Nothing scheduled yet',
-                  subtitle: 'Groups appear here when a date is set',
-                  onTap: _openPrepare,
-                ),
-            ],
-          ),
+            // ---- groups ---------------------------------------------------------
+            _section(
+              'groups',
+              'Groups',
+              [for (final v in _groups.take(6)) _offeringRow(v, 160)],
+              lead: 'A few weeks of live calls in a small group',
+              empty: 'Nothing scheduled yet. Groups appear here when a date is set.',
+            ),
 
-          // ---- read and watch -------------------------------------------------
-          PvYouSection(
-            key: const ValueKey('preg_more_read_watch'),
-            title: 'Read and watch',
-            lead: 'Every read and every film, in one list each',
-            children: [
-              PvYouRow(
-                icon: Icons.menu_book_outlined,
-                title: 'All reads',
-                subtitle: 'Every door, by topic, in Learn',
-                onTap: () {
-                  pvCommitFeedback();
-                  AppNav.instance.go(kPregTabLearn);
-                },
-              ),
-              PvYouRow(
-                icon: Icons.play_circle_outline_rounded,
-                title: 'All films',
-                subtitle: 'Short films for each stage of your pregnancy',
-                onTap: () => _push('watch', () => WatchLearnScreen(controller: _c)),
-              ),
-            ],
-          ),
+            // ---- read and watch -------------------------------------------------
+            _section('read_watch', 'Read and watch', [
+              _row('preg_more_all_reads', IntentMark.pageMark, 212, 'All reads', 'Every door, by topic, in Learn',
+                  () {
+                pvCommitFeedback();
+                AppNav.instance.go(kPregTabLearn);
+              }),
+              _row('preg_more_all_films', IntentMark.listMark, 345, 'All films',
+                  'Short films for each stage of your pregnancy',
+                  () => _push('watch', () => WatchLearnScreen(controller: _c))),
+            ], lead: 'Every read and every film, in one list each'),
 
-          // ---- your journey ---------------------------------------------------
-          PvYouSection(
-            key: const ValueKey('preg_more_journey'),
-            title: 'Your journey',
-            children: [
+            // ---- your journey ---------------------------------------------------
+            _section('journey', 'Your journey', [
               // What the app said first (2026-09-30): the weekly note and the
               // moments that matter, kept so a missed one is not gone.
-              ListenableBuilder(
-                listenable: PregMessagesStore.instance,
-                builder: (context, _) => PvYouRow(
-                  key: const ValueKey('preg_more_messages'),
-                  icon: Icons.mail_outline_rounded,
-                  title: 'Messages',
-                  subtitle: 'Your weekly note, and the moments worth remembering',
-                  badge: PregMessagesStore.instance.unreadCount,
-                  onTap: () {
-                    pvCommitFeedback();
-                    openPregMessages(context, _c);
-                  },
-                ),
-              ),
+              _row('preg_more_messages', IntentMark.nextStep, 268, 'Messages',
+                  'Your weekly note, and the moments worth remembering',
+                  () {
+                pvCommitFeedback();
+                openPregMessages(context, _c);
+              }, badge: PregMessagesStore.instance.unreadCount),
               // ⚠️ CALENDAR'S TAB MOVED HERE (2026-09-29): Learn took its slot.
-              PvYouRow(
-                icon: Icons.calendar_today_outlined,
-                title: 'Calendar',
-                subtitle: 'Your appointments, scans and what is coming up',
-                onTap: () => _push('calendar', () => CalendarScreen(controller: _c)),
-              ),
-              PvYouRow(
-                icon: Icons.map_outlined,
-                title: 'Journey map',
-                subtitle: 'Where you are this month, and what comes next',
-                onTap: () => _push('journey_map', () => JourneyMapScreen(controller: _c)),
-              ),
-              PvYouRow(
-                icon: Icons.child_care_outlined,
-                title: 'Week by week',
-                subtitle: 'Your baby and your body, this week and every week',
-                onTap: () => _push('pregnancy/week',
-                    () => PregWeekScreen(pregnancy: _c, week: _c.currentWeek)),
-              ),
-            ],
-          ),
+              _row('preg_more_calendar', IntentMark.calendarDay, 206, 'Calendar',
+                  'Your appointments, scans and what is coming up',
+                  () => _push('calendar', () => CalendarScreen(controller: _c))),
+              _row('preg_more_journey_map', IntentMark.timelineRail, 104, 'Journey map',
+                  'Where you are this month, and what comes next',
+                  () => _push('journey_map', () => JourneyMapScreen(controller: _c))),
+              _row('preg_more_week', IntentMark.bodyMark, 24, 'Week by week',
+                  'Your baby and your body, this week and every week',
+                  () => _push('pregnancy/week', () => PregWeekScreen(pregnancy: _c, week: _c.currentWeek))),
+            ]),
 
-          // ---- benefits -------------------------------------------------------
-          PvYouSection(
-            key: const ValueKey('preg_more_benefits'),
-            title: 'Benefits',
-            children: [
-              PvYouRow(
-                icon: Icons.business_center_outlined,
-                title: 'Employer benefits',
-                subtitle: 'Does your employer offer ParentVeda?',
-                onTap: () => _push('employer', () => EmployerBenefitsScreen(lang: _c.language)),
-              ),
-              PvYouRow(
-                icon: Icons.card_giftcard_outlined,
-                title: 'Invite a friend',
-                subtitle: 'Share ParentVeda with someone who is expecting too',
-                onTap: () => _push('invite', () => InviteFriendsScreen(controller: _c)),
-              ),
-            ],
-          ),
+            // ---- benefits -------------------------------------------------------
+            _section('benefits', 'Benefits', [
+              _row('preg_more_employer', IntentMark.improveMark, 42, 'Employer benefits',
+                  'Does your employer offer ParentVeda?',
+                  () => _push('employer', () => EmployerBenefitsScreen(lang: _c.language))),
+              _row('preg_more_invite', IntentMark.cuppedHands, 344, 'Invite a friend',
+                  'Share ParentVeda with someone who is expecting too',
+                  () => _push('invite', () => InviteFriendsScreen(controller: _c))),
+            ]),
 
-          // ---- the whole of Prepare, unfiltered ---------------------------------
-          //
-          // ⚠️ UNSCOPED ON PURPOSE. Yoga, birthing classes and the nutrition
-          // funnel have no section above; this row is their door.
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 22, 20, 0),
-            child: Material(
-              color: Colors.white,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18), side: const BorderSide(color: kPvLine)),
-              clipBehavior: Clip.antiAlias,
+            // ---- the whole of Prepare, unfiltered: one outlined pill ------------
+            //
+            // ⚠️ UNSCOPED ON PURPOSE. Yoga, birthing classes and the nutrition
+            // funnel have no section above; this row is their door.
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
               child: InkWell(
                 key: const ValueKey('preg_more_all_programmes'),
                 onTap: _openPrepare,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                borderRadius: BorderRadius.circular(999),
+                child: Container(
+                  constraints: const BoxConstraints(minHeight: 48),
+                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(999),
+                    border: Border.all(color: p.line, width: 1.2),
+                  ),
                   child: Row(children: [
                     Expanded(
                       child: Text('All programmes and sessions',
-                          style: pvManrope(
-                              fontSize: 14.5, fontWeight: FontWeight.w600, color: p.ink1)),
+                          style: pvManrope(fontSize: 14, fontWeight: FontWeight.w700, color: p.ink1)),
                     ),
-                    Icon(Icons.arrow_forward_rounded, size: 20, color: p.ink2),
+                    Icon(Icons.arrow_forward_rounded, size: 18, color: p.ink2),
                   ]),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

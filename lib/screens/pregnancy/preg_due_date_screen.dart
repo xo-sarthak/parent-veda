@@ -239,9 +239,11 @@ class _PregDueDateScreenState extends State<PregDueDateScreen> {
               Container(
                 key: const ValueKey('preg_due_result'),
                 padding: const EdgeInsets.all(16),
+                // White with a hairline: no tinted block behind text.
                 decoration: BoxDecoration(
-                  color: p.surfaceAlt,
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: kPvLine),
                 ),
                 child: ok
                     ? Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -290,7 +292,8 @@ class _PregDueDateScreenState extends State<PregDueDateScreen> {
   }
 
   Widget _eyebrow(V2Palette p, String s) => Text(s.toUpperCase(),
-      style: pvManrope(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.4, color: p.action));
+      // A group label inside the form: grey caps, never the brand violet.
+      style: pvManrope(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.1, color: p.ink2));
 
   Widget _field(V2Palette p, String label, String value, VoidCallback onTap, {Key? key}) => Material(
         key: key,

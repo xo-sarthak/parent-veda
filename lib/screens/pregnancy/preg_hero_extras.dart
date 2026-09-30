@@ -30,6 +30,7 @@ import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_feedback.dart';
 import '../profile/pv_you_sheets.dart' show showPvAddChildSheet;
 import '../v2/v2_palette.dart';
+import 'preg_chrome.dart' show pregFilledStyle;
 
 /// The read "Past your due date" opens (the Labour door's own).
 const String kPregPastDueReadId = 'preg_labour_read_past_due';
@@ -170,11 +171,10 @@ class PregArrivalCard extends StatelessWidget {
           Wrap(spacing: 8, runSpacing: 6, children: [
             FilledButton(
               key: const ValueKey('preg_arrival_yes'),
-              style: FilledButton.styleFrom(
-                  backgroundColor: p.ink1, foregroundColor: p.ground, shape: const StadiumBorder()),
+              style: pregFilledStyle(), // the one ink, #2F2C30
               onPressed: () => _yes(context),
               child: Text('Yes, tell ParentVeda',
-                  style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w700, color: p.ground)),
+                  style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w700, color: Colors.white)),
             ),
             TextButton(
               key: const ValueKey('preg_arrival_not_yet'),

@@ -9898,3 +9898,16 @@ not here. Owed:
     insights rail, derived from the Scans door's own "Weeks 18–22" lines and limited to routine tests (NIPT, Doppler
     and GBS stay on the door: optional or doctor-advised). Owed: the week pages and the rest of the home still stop
     at week 40 (the week clamp is 4 to 40 everywhere); only the hero counts past it.
+  - **§81.12 One ParentVeda on pregnancy (2026-09-30, after merging main 54778fd).** Done on the screens this branch
+    built: More now takes main's TTC More shape (serif headings, a drawn mark in a tinted well on every row, the
+    price or an "Opening soon" / "Free" tag on the right, one outlined "All programmes and sessions"); Tools, Learn
+    and More head their sections with the one serif heading (`PregSectionHeading`, lib/screens/pregnancy/
+    preg_chrome.dart, the same numbers as `ttcSectionHeadingStyle`); every filled button, badge and unread dot is
+    the one ink #2F2C30; no violet on any file in lib/screens/pregnancy/ (the birth plan's Share button included);
+    the due-date result and the After a loss rows are white with a hairline, not a tinted block; Learn's shelf link
+    says "Open the door". Held by `test/preg_one_parentveda_test.dart`. **Owed, the older pregnancy screens**, still
+    in the plum/violet theme (`AppTheme.primary*`, `_vPurple`), counted 2026-09-30, live ones first: Ask Veda
+    (tools/ask_veda_screen.dart, 42), Calendar (38), Ready for birth (31), the Due Date calculator (27), My Journal
+    (26), Medicines (17), Reminders (17), Bump journey (17), Scans & appointments (17), the scan timeline (14), the
+    Symptom companion (13), Weight (11), Product checklist (10); unreached, leave until deleted: week_flow (68),
+    home_screen_b (39), week5/week6 previews, hospital_bag v1/v2, the Tools grid kept as `ToolsHubScreenClassic`.

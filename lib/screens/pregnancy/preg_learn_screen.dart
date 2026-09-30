@@ -71,7 +71,7 @@ import '../doors/pv_live_search.dart';
 import '../learn/pv_learn_catalog.dart';
 import '../learn/pv_offering_screen.dart' show pvOpenOffering;
 import '../products/pv_store_chrome.dart'
-    show PvRoundIcon, PvSectionHead, PvChip, kPvLine, pvStorePalette, pvSnack;
+    show PvRoundIcon, PvSectionHead, PvChip, kPvInk, kPvLine, pvStorePalette, pvSnack;
 import '../saved_screen.dart';
 import '../search/pv_search_screen.dart';
 import '../tools/ask_veda_screen.dart';
@@ -80,6 +80,7 @@ import '../v2/v3_bracket_art.dart';
 import '../v2/v3_film_screen.dart';
 import '../v2/v3_week_film.dart';
 import 'preg_ended_screen.dart' show openAfterLossDoor;
+import 'preg_chrome.dart';
 
 /// The Learn tab's route name, for anything that needs to detect it.
 const String kPregLearnRoute = 'pregnancy/learn';
@@ -402,9 +403,6 @@ class _PregLearnScreenState extends State<PregLearnScreen> {
         ])),
       ];
 
-  Widget _eyebrow(V2Palette p, String s) => Text(s.toUpperCase(),
-      style: pvManrope(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.4, color: p.action));
-
   Widget _head(String eyebrow, String title,
           {String? action, VoidCallback? onAction, String? lead}) =>
       Padding(
@@ -422,7 +420,9 @@ class _PregLearnScreenState extends State<PregLearnScreen> {
 
   Widget _topicRow(V2Palette p) =>
       Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        _pad(_eyebrow(p, 'Explore by topic')),
+        // One ParentVeda (2026-09-30): the one serif heading, not a violet
+        // caps eyebrow. Kept for revert: _pad(_eyebrow(p, 'Explore by topic')),
+        _pad(const PregSectionHeading('Explore by topic')),
         const SizedBox(height: 10),
         // 120, not TTC's 108: at 108 the label and its count overflow the
         // tile by a few points once text runs larger (a larger system text
@@ -572,7 +572,8 @@ class _PregLearnScreenState extends State<PregLearnScreen> {
     final shown = open ? pieces : pieces.take(fold).toList();
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       _head('Reads from the door', t.bracket.label.en,
-          action: 'Open', onAction: () => _openDoor(t.bracket, tab: chosen)),
+          // Names what it opens (one ParentVeda). Was 'Open'.
+          action: 'Open the door', onAction: () => _openDoor(t.bracket, tab: chosen)),
       if (tabs.length > 1) ...[
         const SizedBox(height: 10),
         SizedBox(
@@ -792,7 +793,7 @@ void showPregOpeningSoon(BuildContext context, String title, {String? id}) {
         padding: const EdgeInsets.fromLTRB(22, 22, 22, 18),
         child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text('Opening soon',
-              style: pvManrope(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.4, color: p.action)),
+              style: pvManrope(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.4, color: p.ink2)),
           const SizedBox(height: 8),
           Text(title,
               style: pvFraunces(fontSize: 22, fontWeight: FontWeight.w500, height: 1.2, color: p.ink1)),
@@ -807,7 +808,7 @@ void showPregOpeningSoon(BuildContext context, String title, {String? id}) {
             height: 50,
             child: FilledButton(
               style: FilledButton.styleFrom(
-                  backgroundColor: p.ink1, shape: const StadiumBorder()),
+                  backgroundColor: kPvInk, shape: const StadiumBorder()),
               onPressed: () {
                 pvCommitFeedback();
                 if (id != null) _rememberInterest(id);
@@ -815,7 +816,7 @@ void showPregOpeningSoon(BuildContext context, String title, {String? id}) {
                 pvSnack(context, "Noted. We'll tell you when it opens.");
               },
               child: Text('Tell me when it opens',
-                  style: pvManrope(fontSize: 15, fontWeight: FontWeight.w700, color: p.ground)),
+                  style: pvManrope(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white)),
             ),
           ),
         ]),
@@ -1021,10 +1022,10 @@ class _FaqItem extends StatelessWidget {
                             child: Text(from,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: pvManrope(fontSize: 13, fontWeight: FontWeight.w700, color: p.action)),
+                                style: pvManrope(fontSize: 13, fontWeight: FontWeight.w700, color: p.ink1)),
                           ),
                           const SizedBox(width: 4),
-                          Icon(Icons.arrow_forward_rounded, size: 15, color: p.action),
+                          Icon(Icons.arrow_forward_rounded, size: 15, color: p.ink1),
                         ]),
                       ),
                     ),
