@@ -263,7 +263,8 @@ final List<PvRead> kTtcReadsBodyConditions = [
       ),
       PvReadNextStep(
         kind: PvNextKind.tool,
-        title: _en("See if it's time for a fertility check"),
+        // Kept for revert (2026-09-28, explicit names): title: _en("See if it's time for a fertility check"),
+        title: _en('See whether you need a fertility check'),
         value: _en('A few questions that tell you whether to book now or '
             'give it more time.'),
         surfaceId: 'ttc_fertility_help',
@@ -1366,7 +1367,10 @@ final List<PvRead> kTtcReadsBodyConditions = [
             "of the tests."),
       ),
       PvReadFaq(
-        question: _en('Should my husband be tested too?'),
+        // Kept for revert (2026-09-28, no repetition; the same question is in
+        // the recurrent miscarriage read):
+        // question: _en('Should my husband be tested too?'),
+        question: _en('Should my husband be tested for TB too?'),
         answer: _en("Men can get genital TB too, though it's less common. If "
             "he has symptoms, has had TB before, or his semen test shows "
             "problems, his doctor may check."),
@@ -1593,7 +1597,10 @@ final List<PvRead> kTtcReadsBodyConditions = [
     ],
     faqs: [
       PvReadFaq(
-        question: _en('How do I bring this up with my husband?'),
+        // Kept for revert (2026-09-28, no repetition; the same question was in
+        // the infection-test read on this door):
+        // question: _en('How do I bring this up with my husband?'),
+        question: _en('How do I tell my husband he needs treating for PID too?'),
         answer: _en("Keep it about health, not blame. You could say the doctor "
             "wants you both treated so the infection doesn't come back. Many "
             "infections cause no symptoms, so neither of you may have known."),
@@ -1863,7 +1870,8 @@ final List<PvRead> kTtcReadsBodyConditions = [
     nextSteps: [
       PvReadNextStep(
         kind: PvNextKind.tool,
-        title: _en("Check if it's time to see someone"),
+        // Kept for revert (2026-09-28, explicit names): title: _en("Check if it's time to see someone"),
+        title: _en('Check whether to see a doctor now'),
         value: _en('A few questions about how long, your age and your cycles, '
             'and a clear answer at the end.'),
         surfaceId: 'ttc_fertility_help',

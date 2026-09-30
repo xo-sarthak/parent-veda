@@ -72,7 +72,7 @@ void main() {
       await tester.tap(find.text(kTtcCalendarAddPeriod));
       await tester.pumpAndSettle();
       expect(
-        find.text('When did it start?'),
+        find.text('When did your period start?' /* was 'When did it start?' */),
         findsOneWidget,
         reason: 'the empty calendar was a dead end with no way to fill it',
       );

@@ -59,7 +59,9 @@ void main() {
     await pumpV3(tester);
     // The sheet, not the field. A field with no sheet on it is the failure the
     // parenting equivalent of this test was written for.
-    expect(find.text('Start anywhere'), findsWidgets);
+    // Renamed 2026-09-28 (change 5). Kept for revert:
+    //   expect(find.text('Start anywhere'), findsWidgets);
+    expect(find.text('Explore by topic'), findsWidgets);
   });
 
   testWidgets('the four daily rows are all on it', (tester) async {

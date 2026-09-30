@@ -278,7 +278,8 @@ final List<PvRead> kTtcReadsWaiting = [
     nextSteps: [
       PvReadNextStep(
         kind: PvNextKind.read,
-        title: _en('When to take a test, and which one'),
+        // Kept for revert (2026-09-28, explicit names): title: _en('When to take a test, and which one'),
+        title: _en('When to take a pregnancy test, and which one'),
         value: _en('The day a test can give you a real answer, and how '
             'to choose one.'),
         surfaceId: 'ttc_read/ttc_read_when_to_test',
@@ -292,13 +293,19 @@ final List<PvRead> kTtcReadsWaiting = [
       ),
       PvReadNextStep(
         kind: PvNextKind.tool,
-        title: _en('Log your period when it comes'),
+        // Kept for revert (2026-09-28, explicit names): title: _en('Log your period when it comes'),
+        title: _en('Log your next period'),
         value: _en('Your own dates make next month easier to read.'),
         surfaceId: 'ttc_calendar',
       ),
     ],
 
-    readNext: ['ttc_read_when_to_test', 'ttc_read_early_signs', 'ttc_read_implantation_bleeding'],
+    // ⚠️ ONE READ, ONCE, AT THE FOOT (2026-09-28, no repetition):
+    // 'ttc_read_when_to_test' is the next step "When to take a test, and which one",
+    // so the Read next rail no longer lists it a second time.
+    // Kept for revert:
+    // readNext: ['ttc_read_when_to_test', 'ttc_read_early_signs', 'ttc_read_implantation_bleeding'],
+    readNext: ['ttc_read_early_signs', 'ttc_read_implantation_bleeding'],
   ),
 
   // ===========================================================================
@@ -484,7 +491,10 @@ final List<PvRead> kTtcReadsWaiting = [
 
     faqs: [
       PvReadFaq(
-        question: _en('Is morning urine really better?'),
+        // Kept for revert (2026-09-28, explicit names; shown on its own in
+        // Learn's Common questions):
+        // question: _en('Is morning urine really better?'),
+        question: _en('Is morning urine really better for a pregnancy test?'),
         answer: _en('Early on, yes. First-morning urine has been in '
             'your bladder longest, so it holds the most hCG. From a few days '
             'after a missed period, the level is usually high enough that any '
@@ -537,7 +547,8 @@ final List<PvRead> kTtcReadsWaiting = [
     nextSteps: [
       PvReadNextStep(
         kind: PvNextKind.read,
-        title: _en('How to take a test, step by step'),
+        // Kept for revert (2026-09-28, explicit names): title: _en('How to take a test, step by step'),
+        title: _en('How to take a pregnancy test, step by step'),
         value: _en('So you can trust the result you get.'),
         surfaceId: 'ttc_read/ttc_read_how_to_test',
       ),
@@ -556,7 +567,12 @@ final List<PvRead> kTtcReadsWaiting = [
       ),
     ],
 
-    readNext: ['ttc_read_how_to_test', 'ttc_read_faint_line', 'ttc_read_late_negative'],
+    // ⚠️ ONE READ, ONCE, AT THE FOOT (2026-09-28, no repetition):
+    // 'ttc_read_how_to_test' is the next step "How to take a test, step by step",
+    // so the Read next rail no longer lists it a second time.
+    // Kept for revert:
+    // readNext: ['ttc_read_how_to_test', 'ttc_read_faint_line', 'ttc_read_late_negative'],
+    readNext: ['ttc_read_faint_line', 'ttc_read_late_negative'],
   ),
 
   // ===========================================================================
@@ -801,7 +817,8 @@ final List<PvRead> kTtcReadsWaiting = [
     nextSteps: [
       PvReadNextStep(
         kind: PvNextKind.read,
-        title: _en('A faint line, explained'),
+        // Kept for revert (2026-09-28, explicit names): title: _en('A faint line, explained'),
+        title: _en('A faint line on a pregnancy test, explained'),
         value: _en('What it usually means, and when to test again.'),
         surfaceId: 'ttc_read/ttc_read_faint_line',
       ),
@@ -814,7 +831,12 @@ final List<PvRead> kTtcReadsWaiting = [
       ),
     ],
 
-    readNext: ['ttc_read_faint_line', 'ttc_read_when_to_test', 'ttc_read_late_negative'],
+    // ⚠️ ONE READ, ONCE, AT THE FOOT (2026-09-28, no repetition):
+    // 'ttc_read_faint_line' is the next step "A faint line, explained",
+    // so the Read next rail no longer lists it a second time.
+    // Kept for revert:
+    // readNext: ['ttc_read_faint_line', 'ttc_read_when_to_test', 'ttc_read_late_negative'],
+    readNext: ['ttc_read_when_to_test', 'ttc_read_late_negative'],
   ),
 
   // ===========================================================================
@@ -1059,7 +1081,8 @@ final List<PvRead> kTtcReadsWaiting = [
     nextSteps: [
       PvReadNextStep(
         kind: PvNextKind.read,
-        title: _en('How to take a test, step by step'),
+        // Kept for revert (2026-09-28, explicit names): title: _en('How to take a test, step by step'),
+        title: _en('How to take a pregnancy test, step by step'),
         value: _en('Get the next test right, so it can answer you.'),
         surfaceId: 'ttc_read/ttc_read_how_to_test',
       ),
@@ -1069,15 +1092,21 @@ final List<PvRead> kTtcReadsWaiting = [
         value: _en('Book and keep your first visit in one place.'),
         surfaceId: 'ttc_appointments',
       ),
-      PvReadNextStep(
-        kind: PvNextKind.activity,
-        title: _en('Write it down'),
-        value: _en('A few lines about today, just for you.'),
-        surfaceId: 'ttc_journal',
-      ),
+      // Kept for revert (2026-09-28, journal out of TTC): this next step opened the journal, which left the stage.
+      // PvReadNextStep(
+      //   kind: PvNextKind.activity,
+      //   title: _en('Write it down'),
+      //   value: _en('A few lines about today, just for you.'),
+      //   surfaceId: 'ttc_journal',
+      // ),
     ],
 
-    readNext: ['ttc_read_how_to_test', 'ttc_read_chemical_pregnancy', 'ttc_read_implantation_bleeding'],
+    // ⚠️ ONE READ, ONCE, AT THE FOOT (2026-09-28, no repetition):
+    // 'ttc_read_how_to_test' is the next step "How to take a test, step by step",
+    // so the Read next rail no longer lists it a second time.
+    // Kept for revert:
+    // readNext: ['ttc_read_how_to_test', 'ttc_read_chemical_pregnancy', 'ttc_read_implantation_bleeding'],
+    readNext: ['ttc_read_chemical_pregnancy', 'ttc_read_implantation_bleeding'],
   ),
 
   // ===========================================================================
@@ -1321,7 +1350,8 @@ final List<PvRead> kTtcReadsWaiting = [
     nextSteps: [
       PvReadNextStep(
         kind: PvNextKind.read,
-        title: _en('When to take a test, and which one'),
+        // Kept for revert (2026-09-28, explicit names): title: _en('When to take a test, and which one'),
+        title: _en('When to take a pregnancy test, and which one'),
         value: _en('The day a test can give you a real answer.'),
         surfaceId: 'ttc_read/ttc_read_when_to_test',
       ),
@@ -1334,7 +1364,12 @@ final List<PvRead> kTtcReadsWaiting = [
       ),
     ],
 
-    readNext: ['ttc_read_when_to_test', 'ttc_read_spotting', 'ttc_read_faint_line'],
+    // ⚠️ ONE READ, ONCE, AT THE FOOT (2026-09-28, no repetition):
+    // 'ttc_read_when_to_test' is the next step "When to take a test, and which one",
+    // so the Read next rail no longer lists it a second time.
+    // Kept for revert:
+    // readNext: ['ttc_read_when_to_test', 'ttc_read_spotting', 'ttc_read_faint_line'],
+    readNext: ['ttc_read_spotting', 'ttc_read_faint_line'],
   ),
 
   // ===========================================================================
@@ -1568,7 +1603,8 @@ final List<PvRead> kTtcReadsWaiting = [
       ),
       PvReadNextStep(
         kind: PvNextKind.tool,
-        title: _en('Is it time for a check?'),
+        // Kept for revert (2026-09-28, explicit names): title: _en('Is it time for a check?'),
+        title: _en('Should you get a fertility check?'),
         value: _en("When a late or irregular cycle is worth a doctor's "
             'visit.'),
         surfaceId: 'ttc_fertility_help',
@@ -1827,13 +1863,19 @@ final List<PvRead> kTtcReadsWaiting = [
       ),
       PvReadNextStep(
         kind: PvNextKind.read,
-        title: _en('When to take a test, and which one'),
+        // Kept for revert (2026-09-28, explicit names): title: _en('When to take a test, and which one'),
+        title: _en('When to take a pregnancy test, and which one'),
         value: _en('The day a test can give you a real answer.'),
         surfaceId: 'ttc_read/ttc_read_when_to_test',
       ),
     ],
 
-    readNext: ['ttc_read_feeling_pregnant', 'ttc_read_when_to_test', 'ttc_read_two_week_wait'],
+    // ⚠️ ONE READ, ONCE, AT THE FOOT (2026-09-28, no repetition):
+    // 'ttc_read_when_to_test' is the next step "When to take a test, and which one",
+    // so the Read next rail no longer lists it a second time.
+    // Kept for revert:
+    // readNext: ['ttc_read_feeling_pregnant', 'ttc_read_when_to_test', 'ttc_read_two_week_wait'],
+    readNext: ['ttc_read_feeling_pregnant', 'ttc_read_two_week_wait'],
   ),
 
   // ===========================================================================
@@ -2061,16 +2103,18 @@ final List<PvRead> kTtcReadsWaiting = [
         "India's mental health helpline. Sources checked September 2026."),
 
     nextSteps: [
-      PvReadNextStep(
-        kind: PvNextKind.activity,
-        title: _en('Write it down'),
-        value: _en('A few lines about today can help it feel less '
-            'heavy.'),
-        surfaceId: 'ttc_journal',
-      ),
+      // Kept for revert (2026-09-28, journal out of TTC): this next step opened the journal, which left the stage.
+      // PvReadNextStep(
+      //   kind: PvNextKind.activity,
+      //   title: _en('Write it down'),
+      //   value: _en('A few lines about today can help it feel less '
+      //       'heavy.'),
+      //   surfaceId: 'ttc_journal',
+      // ),
       PvReadNextStep(
         kind: PvNextKind.tool,
-        title: _en('Is it time for a check?'),
+        // Kept for revert (2026-09-28, explicit names): title: _en('Is it time for a check?'),
+        title: _en('Should you get a fertility check?'),
         value: _en("When trying for a while is worth a doctor's visit."),
         surfaceId: 'ttc_fertility_help',
       ),

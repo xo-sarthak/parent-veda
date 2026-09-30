@@ -26,7 +26,9 @@ import 'package:parentveda/screens/ttc/ttc_strings.dart';
 import 'package:parentveda/services/community_store.dart';
 import 'package:parentveda/ttc/ttc_can_i_data.dart';
 import 'package:parentveda/ttc/ttc_daily_data.dart';
-import 'package:parentveda/ttc/ttc_journal_store.dart';
+// Kept for revert (2026-09-28, the user: no journal in trying to conceive).
+// import 'package:parentveda/ttc/ttc_journal_store.dart';
+import 'package:parentveda/ttc/ttc_doctor_questions_store.dart';
 import 'package:parentveda/ttc/ttc_records_grouping.dart';
 import 'package:parentveda/ttc/ttc_records_store.dart';
 import 'package:parentveda/ttc/ttc_tests_data.dart';
@@ -47,7 +49,8 @@ void main() {
   setUp(() {
     TtcRecordsStore.instance.resetForTest();
     TtcAppointmentsStore.instance.resetForTest();
-    TtcJournalStore.instance.resetForTest();
+    // Kept for revert (2026-09-28): TtcJournalStore.instance.resetForTest();
+    TtcDoctorQuestionsStore.instance.resetForTest();
     TtcLang.instance.hinglish = false;
   });
 
@@ -192,12 +195,13 @@ void main() {
           .add(label: 'Thyroid panel', takenOn: DateTime(2026, 1, 8));
 
       await pumpTall(tester, const TtcRecordsScreen());
-      expect(find.text('Type it'), findsOneWidget);
+      // Change 5 (2026-09-28). Was: 'Type it' and 'Save it'.
+      expect(find.text('Type the number'), findsOneWidget);
 
-      await tester.tap(find.text('Type it'));
+      await tester.tap(find.text('Type the number'));
       await tester.pumpAndSettle();
       await tester.enterText(find.byType(TextField).first, '3.4');
-      await tester.tap(find.text('Save it'));
+      await tester.tap(find.text('Save the result'));
       await tester.pumpAndSettle();
 
       expect(
@@ -245,7 +249,8 @@ void main() {
       await tester.pumpAndSettle();
       // The sheet ends on what is NOT in it - the line that stops a summary
       // being mistaken for the whole file.
-      expect(find.text('NOT IN HERE'), findsOneWidget);
+      // Change 5 (2026-09-28). Was: find.text('NOT IN HERE')
+      expect(find.text('NOT IN YOUR RECORDS YET'), findsOneWidget);
     });
 
     test('a change is arithmetic on her own two readings, or it is nothing',
@@ -331,8 +336,10 @@ void main() {
     });
 
     testWidgets('saved doctor questions surface here', (tester) async {
-      TtcJournalStore.instance
-          .add(kind: TtcEntryKind.question, text: 'Should we test AMH?');
+      // Kept for revert (2026-09-28, journal out of TTC):
+      //   TtcJournalStore.instance
+      //       .add(kind: TtcEntryKind.question, text: 'Should we test AMH?');
+      TtcDoctorQuestionsStore.instance.add('Should we test AMH?');
       await pumpTall(tester, const TtcAppointmentsScreen());
       expect(find.text('Should we test AMH?'), findsOneWidget);
     });

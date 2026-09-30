@@ -20,14 +20,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:parentveda/screens/learn/pv_learn_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_bmi_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_garbh_course_screen.dart';
-import 'package:parentveda/screens/ttc/ttc_journal_screen.dart';
+// Kept for revert (2026-09-28, the user: no journal in trying to conceive).
+// import 'package:parentveda/screens/ttc/ttc_journal_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_journey_map_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_prepare_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_strings.dart';
-import 'package:parentveda/screens/ttc/ttc_tool_chrome.dart';
+// import 'package:parentveda/screens/ttc/ttc_tool_chrome.dart'; // only T11 used it (2026-09-28)
 import 'package:parentveda/ttc/ttc_bmi_store.dart';
-import 'package:parentveda/ttc/ttc_daily_data.dart';
-import 'package:parentveda/ttc/ttc_journal_store.dart';
+// import 'package:parentveda/ttc/ttc_daily_data.dart'; // only the journal tests used it (2026-09-28)
+// import 'package:parentveda/ttc/ttc_journal_store.dart';
 import 'package:parentveda/ttc/ttc_log_store.dart';
 import 'package:parentveda/ttc/ttc_store.dart';
 
@@ -51,7 +52,7 @@ void main() {
     TtcBmiStore.instance.resetForTest();
     await TtcBmiStore.instance.load();
     TtcStore.instance.resetForTest();
-    TtcJournalStore.instance.resetForTest();
+    // Kept for revert (2026-09-28): TtcJournalStore.instance.resetForTest();
   });
 
   // ===========================================================================
@@ -127,40 +128,46 @@ void main() {
       await _pump(tester, const TtcJourneyMapScreen());
       expect(find.text(kTtcMapTryHeading.toUpperCase()), findsOneWidget);
       expect(find.text('STILL AHEAD'), findsNothing);
-      expect(find.text('Whenever it comes.'), findsNothing);
+      // Kept for revert (2026-09-28): 'Whenever it comes.'
+      expect(find.text('Whenever your positive test comes.'), findsNothing);
       expect(find.byKey(const ValueKey('ttc_map_try_positive_test')),
           findsNothing);
       expect(find.byKey(const ValueKey('ttc_map_try_first_cycle_complete')),
           findsNothing);
       // Rows are the doing, not the achievement.
-      expect(find.text('Write in the journal'), findsOneWidget);
+      // Kept for revert (2026-09-28, journal out of TTC): the journal's row
+      // left the map with the journal.
+      //   expect(find.text('Write in the journal'), findsOneWidget);
+      expect(find.text('Write in the journal'), findsNothing);
       expect(find.text('Kept the daily ritual for a week'), findsNothing);
       expect(find.text('Open your daily ritual'), findsOneWidget);
     });
   });
 
   // ===========================================================================
-  group('T11: Our journal wears the tool shell, with one write action', () {
-    testWidgets('the tool header, and one write button', (tester) async {
-      await _pump(tester, const TtcJournalScreen());
-      expect(find.byType(TtcToolScaffold), findsOneWidget);
-      expect(find.byType(AppBar), findsNothing);
-      expect(find.text('OUR JOURNAL'), findsOneWidget);
-      expect(find.text('Write something'), findsOneWidget);
-      expect(find.text('Write about this'), findsNothing,
-          reason: 'the second write button is gone');
-      // Today's prompt is still offered, as a line under the button.
-      final prompt =
-          ttcPromptForToday(TtcStore.instance.today.chapter).text(false);
-      expect(find.text(prompt), findsOneWidget);
-      expect(find.byKey(const ValueKey('ttc_journal_prompt')), findsOneWidget);
-    });
-
-    testWidgets('entries still list under it', (tester) async {
-      TtcJournalStore.instance
-          .add(kind: TtcEntryKind.memory, text: 'A quiet evening');
-      await _pump(tester, const TtcJournalScreen());
-      expect(find.text('A quiet evening'), findsOneWidget);
-    });
-  });
+  // Kept for revert (2026-09-28, the user: no journal in trying to conceive).
+  // The journal page is commented out, so T11 is too.
+  // group('T11: Our journal wears the tool shell, with one write action', () {
+  //   testWidgets('the tool header, and one write button', (tester) async {
+  //     await _pump(tester, const TtcJournalScreen());
+  //     expect(find.byType(TtcToolScaffold), findsOneWidget);
+  //     expect(find.byType(AppBar), findsNothing);
+  //     expect(find.text('OUR JOURNAL'), findsOneWidget);
+  //     expect(find.text('Write something'), findsOneWidget);
+  //     expect(find.text('Write about this'), findsNothing,
+  //         reason: 'the second write button is gone');
+  //     // Today's prompt is still offered, as a line under the button.
+  //     final prompt =
+  //         ttcPromptForToday(TtcStore.instance.today.chapter).text(false);
+  //     expect(find.text(prompt), findsOneWidget);
+  //     expect(find.byKey(const ValueKey('ttc_journal_prompt')), findsOneWidget);
+  //   });
+  //
+  //   testWidgets('entries still list under it', (tester) async {
+  //     TtcJournalStore.instance
+  //         .add(kind: TtcEntryKind.memory, text: 'A quiet evening');
+  //     await _pump(tester, const TtcJournalScreen());
+  //     expect(find.text('A quiet evening'), findsOneWidget);
+  //   });
+  // });
 }

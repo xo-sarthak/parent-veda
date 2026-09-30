@@ -105,10 +105,12 @@ void main() {
       final observer = FabRouteObserver();
       observer.didPush(routed(kTtcRootRoute), null);
       FabState.instance.markAppLive();
-      // The FAB is off for now (kAskFabEnabled, 2026-09-19, §63.17); the
-      // suppression still has to fire underneath so the day it returns
-      // it hides where it always did.
-      expect(FabState.instance.visible, FabState.kAskFabEnabled);
+      // The FAB is off for now (kAskFabEnabled, 2026-09-19, §63.17), but back
+      // on trying to conceive since 2026-09-30 (kAskFabInTtc): it shows in
+      // the stage, and hides over its own Ask Veda screen. Kept for revert:
+      //   expect(FabState.instance.visible, FabState.kAskFabEnabled);
+      expect(FabState.instance.visible,
+          FabState.kAskFabEnabled || FabState.kAskFabInTtc);
       observer.didPush(routed(kAskVedaRoute), null);
       expect(FabState.instance.visible, isFalse);
     });

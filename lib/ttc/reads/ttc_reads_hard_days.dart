@@ -130,7 +130,10 @@ final List<PvRead> kTtcReadsHardDays = [
               'doctors or buying a new kind of test.'),
         ],
         tip: PvReadTip(
-          title: _en('Two lines in your journal'),
+          // Kept for revert (2026-09-28, journal out of TTC): the title named
+          // the app's journal, which left the stage.
+          //   title: _en('Two lines in your journal'),
+          title: _en('Two lines for today'),
           body: _en('Write one line about how today felt, and one line about '
               "something that isn't about trying. Over a few months, the "
               'second line matters more than it seems.'),
@@ -252,13 +255,14 @@ final List<PvRead> kTtcReadsHardDays = [
             'worked out for you.'),
         surfaceId: 'ttc_cycle',
       ),
-      PvReadNextStep(
-        kind: PvNextKind.activity,
-        title: _en('Write two lines'),
-        value: _en('How today felt, and one thing that has nothing to do with '
-            'trying.'),
-        surfaceId: 'ttc_journal',
-      ),
+      // Kept for revert (2026-09-28, journal out of TTC): this next step opened the journal, which left the stage.
+      // PvReadNextStep(
+      //   kind: PvNextKind.activity,
+      //   title: _en('Write two lines'),
+      //   value: _en('How today felt, and one thing that has nothing to do with '
+      //       'trying.'),
+      //   surfaceId: 'ttc_journal',
+      // ),
       PvReadNextStep(
         kind: PvNextKind.consult,
         title: _en('Talk to a psychologist'),
@@ -479,13 +483,14 @@ final List<PvRead> kTtcReadsHardDays = [
         '2026.'),
 
     nextSteps: [
-      PvReadNextStep(
-        kind: PvNextKind.activity,
-        title: _en('Write it down'),
-        value: _en('Getting the feeling onto a page often takes some of its '
-            'weight away.'),
-        surfaceId: 'ttc_journal',
-      ),
+      // Kept for revert (2026-09-28, journal out of TTC): this next step opened the journal, which left the stage.
+      // PvReadNextStep(
+      //   kind: PvNextKind.activity,
+      //   title: _en('Write it down'),
+      //   value: _en('Getting the feeling onto a page often takes some of its '
+      //       'weight away.'),
+      //   surfaceId: 'ttc_journal',
+      // ),
       PvReadNextStep(
         kind: PvNextKind.consult,
         title: _en('Talk to a psychologist'),
@@ -715,7 +720,8 @@ final List<PvRead> kTtcReadsHardDays = [
     nextSteps: [
       PvReadNextStep(
         kind: PvNextKind.tool,
-        title: _en('Talk it through with your partner'),
+        // Kept for revert (2026-09-28, explicit names): title: _en('Talk it through with your partner'),
+        title: _en('Agree with your partner what to tell family'),
         value: _en('Share what you both want before the next family visit.'),
         surfaceId: 'ttc_partner',
       ),
@@ -728,7 +734,12 @@ final List<PvRead> kTtcReadsHardDays = [
       ),
     ],
 
-    readNext: ['ttc_read_family_asking', 'ttc_read_good_news_answers'],
+    // ⚠️ ONE READ, ONCE, AT THE FOOT (2026-09-28, no repetition):
+    // 'ttc_read_family_asking' is the next step "When family keeps asking",
+    // so the Read next rail no longer lists it a second time.
+    // Kept for revert:
+    // readNext: ['ttc_read_family_asking', 'ttc_read_good_news_answers'],
+    readNext: ['ttc_read_good_news_answers'],
   ),
 
   // ---------------------------------------------------------------------------
@@ -935,7 +946,8 @@ final List<PvRead> kTtcReadsHardDays = [
       ),
       PvReadNextStep(
         kind: PvNextKind.read,
-        title: _en('Stress, and the thing everyone says about it'),
+        // Kept for revert (2026-09-28, explicit names): title: _en('Stress, and the thing everyone says about it'),
+        title: _en('What stress really does to fertility'),
         value: _en('What stress does and doesn\'t do to fertility, in plain '
             'words.'),
         surfaceId: 'ttc_read/ttc_read_stress_fertility',
@@ -948,7 +960,12 @@ final List<PvRead> kTtcReadsHardDays = [
       ),
     ],
 
-    readNext: ['ttc_read_stress_fertility', 'ttc_read_bringing_him_in'],
+    // ⚠️ ONE READ, ONCE, AT THE FOOT (2026-09-28, no repetition):
+    // 'ttc_read_stress_fertility' is the next step "Stress, and the thing everyone says about it",
+    // so the Read next rail no longer lists it a second time.
+    // Kept for revert:
+    // readNext: ['ttc_read_stress_fertility', 'ttc_read_bringing_him_in'],
+    readNext: ['ttc_read_bringing_him_in'],
   ),
 
   // ---------------------------------------------------------------------------
@@ -1180,7 +1197,12 @@ final List<PvRead> kTtcReadsHardDays = [
       ),
     ],
 
-    readNext: ['ttc_read_family_asking', 'ttc_read_telling_family'],
+    // ⚠️ ONE READ, ONCE, AT THE FOOT (2026-09-28, no repetition):
+    // 'ttc_read_family_asking' is the next step "When family keeps asking",
+    // so the Read next rail no longer lists it a second time.
+    // Kept for revert:
+    // readNext: ['ttc_read_family_asking', 'ttc_read_telling_family'],
+    readNext: ['ttc_read_telling_family'],
   ),
 
   // ---------------------------------------------------------------------------
@@ -1296,8 +1318,10 @@ final List<PvRead> kTtcReadsHardDays = [
         ],
         tip: PvReadTip(
           title: _en('Trying, in three words'),
+          // Kept for revert (2026-09-28, journal out of TTC):
+          //   'would they be? Write them in your journal, and ask your partner '
           body: _en('If you had to describe these months in three words, what '
-              'would they be? Write them in your journal, and ask your partner '
+              'would they be? Write them down, and ask your partner '
               'for his. Comparing them can start a conversation that has been '
               'hard to begin.'),
         ),
@@ -1406,15 +1430,17 @@ final List<PvRead> kTtcReadsHardDays = [
             'months.'),
         surfaceId: 'ttc_prepare',
       ),
-      PvReadNextStep(
-        kind: PvNextKind.activity,
-        title: _en('Your journal'),
-        value: _en('One line a day is enough, and it is only for you.'),
-        surfaceId: 'ttc_journal',
-      ),
+      // Kept for revert (2026-09-28, journal out of TTC): this next step opened the journal, which left the stage.
+      // PvReadNextStep(
+      //   kind: PvNextKind.activity,
+      //   title: _en('Your journal'),
+      //   value: _en('One line a day is enough, and it is only for you.'),
+      //   surfaceId: 'ttc_journal',
+      // ),
       PvReadNextStep(
         kind: PvNextKind.tool,
-        title: _en('Is it time for a check?'),
+        // Kept for revert (2026-09-28, explicit names): title: _en('Is it time for a check?'),
+        title: _en('Should you get a fertility check?'),
         value: _en('See when a fertility doctor makes sense for the two of '
             'you.'),
         surfaceId: 'ttc_fertility_help',

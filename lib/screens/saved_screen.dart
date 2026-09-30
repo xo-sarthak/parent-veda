@@ -81,6 +81,7 @@ import '../data/nutrition_data.dart' show kRecipes, Recipe;
 import 'nutrition/craving_detail_screen.dart' show CravingDetailScreen;
 import 'nutrition/door/recipe_cook_screen.dart' show RecipeCookScreen;
 import 'can_i/can_i_answer.dart' show openCanIAnswerById;
+import 'ttc/doors/ttc_tab_art.dart' show TtcTabArt, TtcTabMark;
 
 /// What a kind is called, and where it is saved from — the words on the chip
 /// and in the empty line. Display only; the identity is [SavedKind.id].
@@ -117,6 +118,29 @@ const List<_KindCopy> _kinds = [
 
 _KindCopy _copyFor(SavedKind k) => _kinds.firstWhere((c) => c.kind == k);
 
+/// What trying to conceive saves (2026-09-30, the user: "articles, videos,
+/// recipes, products").
+const Set<SavedKind> kTtcSavedKinds = {
+  SavedKind.article,
+  SavedKind.video,
+  SavedKind.recipe,
+  SavedKind.product,
+};
+
+TtcTabMark _savedMark(SavedKind k) => switch (k) {
+      SavedKind.video => TtcTabMark.sunrise,
+      SavedKind.recipe => TtcTabMark.bowl,
+      SavedKind.product => TtcTabMark.jarLeaf,
+      _ => TtcTabMark.openBook,
+    };
+
+double _savedHue(SavedKind k) => switch (k) {
+      SavedKind.video => 344,
+      SavedKind.recipe => 42,
+      SavedKind.product => 104,
+      _ => 206,
+    };
+
 String _stageLabel(String id) => switch (id) {
       'trying' => 'Trying',
       'pregnancy' => 'Pregnancy',
@@ -126,7 +150,15 @@ String _stageLabel(String id) => switch (id) {
     };
 
 class SavedScreen extends StatefulWidget {
-  const SavedScreen({super.key});
+  const SavedScreen({super.key, this.stage});
+
+  /// ⚠️ ONE STAGE'S SAVED (2026-09-30, the user on the trying-to-conceive
+  /// profile: pregnancy items "make no sense, pregnancy is in the future";
+  /// keep "articles, videos, recipes, products"; the purple bookmarks and old
+  /// icons are outdated). 'trying' shows that stage's saves only, the four
+  /// kinds that belong to it, no stage chips, ink instead of purple and our
+  /// drawn marks. Null keeps every stage, as the other homes open it.
+  final String? stage;
 
   @override
   State<SavedScreen> createState() => _SavedScreenState();
@@ -167,7 +199,20 @@ class _SavedScreenState extends State<SavedScreen> {
   void initState() {
     super.initState();
     SavedStore.instance.load();
+    _stage = widget.stage;
   }
+
+  bool get _trying => widget.stage == 'trying';
+
+  /// The kinds this screen offers. On trying to conceive, the four that stage
+  /// saves; the rest (questions, read to baby, tips, community, activities,
+  /// tools) belong to other stages and are left out here, not deleted.
+  List<_KindCopy> get _shown => _trying
+      ? [
+          for (final c in _kinds)
+            if (kTtcSavedKinds.contains(c.kind)) c,
+        ]
+      : _kinds;
 
   @override
   Widget build(BuildContext context) {
@@ -178,8 +223,14 @@ class _SavedScreenState extends State<SavedScreen> {
         final store = SavedStore.instance;
         final stages = store.stagesPresent;
         // A stage that no longer has items (she unsaved them all) drops its chip.
-        if (_stage != null && !stages.contains(_stage)) _stage = null;
-        final all = store.items(stage: _stage);
+        // Not on one stage's screen: that stage is the whole point of it.
+        if (!_trying && _stage != null && !stages.contains(_stage)) {
+          _stage = null;
+        }
+        final all = [
+          for (final i in store.items(stage: _stage))
+            if (!_trying || kTtcSavedKinds.contains(i.kind)) i,
+        ];
         final total = all.length;
 
         return Scaffold(
@@ -251,7 +302,7 @@ class _SavedScreenState extends State<SavedScreen> {
                   ),
                 ),
               SliverToBoxAdapter(child: _kindChips(p, store)),
-              if (stages.length > 1)
+              if (!_trying && stages.length > 1)
                 SliverToBoxAdapter(child: _stageChips(p, stages)),
               const SliverToBoxAdapter(child: SizedBox(height: 6)),
               if (_kind == null)
@@ -273,8 +324,8 @@ class _SavedScreenState extends State<SavedScreen> {
     // empty kind is not a chip — its invitation lives in the All view instead,
     // where every kind's header always renders.
     final present = [
-      for (final c in _kinds)
-        if (store.count(c.kind) > 0) c
+      for (final c in _shown)
+        if (_countOf(store, c.kind) > 0) c
     ];
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -283,12 +334,16 @@ class _SavedScreenState extends State<SavedScreen> {
         _chip(p, 'All', _kind == null, () => setState(() => _kind = null)),
         for (final c in present) ...[
           const SizedBox(width: 8),
-          _chip(p, '${c.label} · ${store.count(c.kind)}', _kind == c.kind,
+          _chip(p, '${c.label} · ${_countOf(store, c.kind)}', _kind == c.kind,
               () => setState(() => _kind = c.kind)),
         ],
       ]),
     );
   }
+
+  /// A kind's count on this screen: the stage's own when it is one stage's.
+  int _countOf(SavedStore store, SavedKind k) =>
+      _trying ? store.items(kind: k, stage: _stage).length : store.count(k);
 
   Widget _stageChips(V2Palette p, Set<String> stages) {
     const order = ['trying', 'pregnancy', 'parenting', 'skilling'];
@@ -345,7 +400,7 @@ class _SavedScreenState extends State<SavedScreen> {
   List<Widget> _allGrouped(V2Palette p, SavedStore store) {
     final out = <Widget>[];
     final searching = _query.text.trim().isNotEmpty;
-    for (final c in _kinds) {
+    for (final c in _shown) {
       final items = _filtered(store.items(kind: c.kind, stage: _stage));
       // While searching, only kinds with a hit render — the invitation lines
       // are about where to save, not about the query.
@@ -366,7 +421,9 @@ class _SavedScreenState extends State<SavedScreen> {
                     fontSize: 11.5,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 1.3,
-                    color: p.action.withValues(alpha: 0.85))),
+                    // Ink, not the purple action colour (2026-09-30).
+                    // Kept for revert: p.action.withValues(alpha: 0.85)
+                    color: p.ink2)),
             const SizedBox(width: 8),
             if (items.isNotEmpty)
               Text('${items.length}',
@@ -421,16 +478,26 @@ class _SavedScreenState extends State<SavedScreen> {
   Widget _rows(V2Palette p, List<SavedItem> items, _KindCopy c) {
     return SliverList.builder(
       itemCount: items.length,
-      itemBuilder: (context, i) => _SavedRow(item: items[i], copy: c, p: p),
+      itemBuilder: (context, i) =>
+          _SavedRow(item: items[i], copy: c, p: p, drawn: _trying),
     );
   }
 }
 
 class _SavedRow extends StatelessWidget {
-  const _SavedRow({required this.item, required this.copy, required this.p});
+  const _SavedRow(
+      {required this.item,
+      required this.copy,
+      required this.p,
+      this.drawn = false});
   final SavedItem item;
   final _KindCopy copy;
   final V2Palette p;
+
+  /// Our drawn mark for the kind instead of the grey icon square (the
+  /// trying-to-conceive screen, 2026-09-30: a row you tap to go somewhere
+  /// wears a drawn mark).
+  final bool drawn;
 
   @override
   Widget build(BuildContext context) {
@@ -462,12 +529,22 @@ class _SavedRow extends StatelessWidget {
             border: Border.all(color: p.line, width: 1),
           ),
           child: Row(children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(color: p.surfaceAlt, borderRadius: BorderRadius.circular(11)),
-              child: Icon(copy.icon, size: 20, color: gone ? p.ink3 : p.ink2),
-            ),
+            if (drawn)
+              SizedBox(
+                width: 40,
+                height: 40,
+                child: TtcTabArt(
+                  mark: _savedMark(copy.kind),
+                  tint: v2BlockTint(_savedHue(copy.kind), p),
+                ),
+              )
+            else
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(color: p.surfaceAlt, borderRadius: BorderRadius.circular(11)),
+                child: Icon(copy.icon, size: 20, color: gone ? p.ink3 : p.ink2),
+              ),
             const SizedBox(width: 12),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -496,7 +573,9 @@ class _SavedRow extends StatelessWidget {
             IconButton(
               tooltip: available ? 'Remove from saved' : 'Remove',
               onPressed: () => SavedStore.instance.unsave(item.kind, item.itemId),
-              icon: Icon(Icons.bookmark_rounded, color: gone ? p.ink3 : p.action, size: 22),
+              // The one black, not the purple action colour (2026-09-30).
+              // Kept for revert: color: gone ? p.ink3 : p.action
+              icon: Icon(Icons.bookmark_rounded, color: gone ? p.ink3 : p.ink1, size: 22),
             ),
           ]),
         ),

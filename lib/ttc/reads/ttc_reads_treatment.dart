@@ -152,7 +152,8 @@ final List<PvRead> kTtcReadsTreatment = [
       ),
       PvReadNextStep(
         kind: PvNextKind.read,
-        title: _en('OHSS: when to call the clinic'),
+        // Kept for revert (2026-09-28, explicit names): title: _en('OHSS: when to call the clinic'),
+        title: _en('OHSS, the one complication to know by name'),
         value: _en('The signs worth knowing in the days after the trigger.'),
         surfaceId: 'ttc_read/ttc_read_ivf_ohss',
       ),
@@ -417,12 +418,13 @@ final List<PvRead> kTtcReadsTreatment = [
         value: _en('Your test date and your medicines, in one place.'),
         surfaceId: 'ttc_treatment',
       ),
-      PvReadNextStep(
-        kind: PvNextKind.tool,
-        title: _en('A place for the hard days'),
-        value: _en('Write down what you feel, for no one but you.'),
-        surfaceId: 'ttc_journal',
-      ),
+      // Kept for revert (2026-09-28, journal out of TTC): this next step opened the journal, which left the stage.
+      // PvReadNextStep(
+      //   kind: PvNextKind.tool,
+      //   title: _en('A place for the hard days'),
+      //   value: _en('Write down what you feel, for no one but you.'),
+      //   surfaceId: 'ttc_journal',
+      // ),
     ],
     readNext: [
       'ttc_read_tx_beta_test',
@@ -552,11 +554,16 @@ final List<PvRead> kTtcReadsTreatment = [
         surfaceId: 'ttc_read/ttc_read_tx_negative_after_treatment',
       ),
     ],
-    readNext: [
-      'ttc_read_tx_negative_after_treatment',
-      'ttc_read_chemical_pregnancy',
-      'ttc_read_faint_line',
-    ],
+    // ⚠️ ONE READ, ONCE, AT THE FOOT (2026-09-28, no repetition):
+    // 'ttc_read_tx_negative_after_treatment' is the next step "When the test is negative after treatment",
+    // so the Read next rail no longer lists it a second time.
+    // Kept for revert:
+    // readNext: [
+    // 'ttc_read_tx_negative_after_treatment',
+    // 'ttc_read_chemical_pregnancy',
+    // 'ttc_read_faint_line',
+    // ],
+    readNext: ['ttc_read_chemical_pregnancy', 'ttc_read_faint_line'],
   ),
 
   // ===========================================================================
@@ -678,7 +685,10 @@ final List<PvRead> kTtcReadsTreatment = [
       PvReadNextStep(
         kind: PvNextKind.tool,
         title: _en("Close this round when you're ready"),
-        value: _en('It stays in your history, and your own cycle comes back.'),
+        // Kept for revert (2026-09-28, explicit names):
+        // value: _en('It stays in your history, and your own cycle comes back.'),
+        value: _en('The round stays in your history, and your own cycle '
+            'comes back.'),
         surfaceId: 'ttc_treatment',
       ),
       PvReadNextStep(
@@ -687,12 +697,13 @@ final List<PvRead> kTtcReadsTreatment = [
         value: _en('So the date and your questions sit together.'),
         surfaceId: 'ttc_appointments',
       ),
-      PvReadNextStep(
-        kind: PvNextKind.tool,
-        title: _en('A place for the hard days'),
-        value: _en('Write down what you feel, for no one but you.'),
-        surfaceId: 'ttc_journal',
-      ),
+      // Kept for revert (2026-09-28, journal out of TTC): this next step opened the journal, which left the stage.
+      // PvReadNextStep(
+      //   kind: PvNextKind.tool,
+      //   title: _en('A place for the hard days'),
+      //   value: _en('Write down what you feel, for no one but you.'),
+      //   surfaceId: 'ttc_journal',
+      // ),
     ],
     readNext: [
       'ttc_read_tx_review_appointment',
@@ -1092,13 +1103,15 @@ final List<PvRead> kTtcReadsTreatment = [
     nextSteps: [
       PvReadNextStep(
         kind: PvNextKind.tool,
-        title: _en('Add each scan as it is booked'),
+        // Kept for revert (2026-09-28, explicit names): title: _en('Add each scan as it is booked'),
+        title: _en('Add each scan once the clinic books a date'),
         value: _en('Your next visit and tonight\'s plan, always in one place.'),
         surfaceId: 'ttc_treatment',
       ),
       PvReadNextStep(
         kind: PvNextKind.read,
-        title: _en('OHSS: when to call the clinic'),
+        // Kept for revert (2026-09-28, explicit names): title: _en('OHSS: when to call the clinic'),
+        title: _en('OHSS, the one complication to know by name'),
         value: _en('The signs worth knowing during stimulation.'),
         surfaceId: 'ttc_read/ttc_read_ivf_ohss',
       ),
@@ -1379,11 +1392,16 @@ final List<PvRead> kTtcReadsTreatment = [
         surfaceId: 'ttc_read/ttc_read_tx_fresh_or_frozen',
       ),
     ],
-    readNext: [
-      'ttc_read_ivf_icsi',
-      'ttc_read_clinic_glossary',
-      'ttc_read_tx_fresh_or_frozen',
-    ],
+    // ⚠️ ONE READ, ONCE, AT THE FOOT (2026-09-28, no repetition):
+    // 'ttc_read_tx_fresh_or_frozen' is the next step "Fresh or frozen transfer",
+    // so the Read next rail no longer lists it a second time.
+    // Kept for revert:
+    // readNext: [
+    // 'ttc_read_ivf_icsi',
+    // 'ttc_read_clinic_glossary',
+    // 'ttc_read_tx_fresh_or_frozen',
+    // ],
+    readNext: ['ttc_read_ivf_icsi', 'ttc_read_clinic_glossary'],
   ),
 
   // ===========================================================================

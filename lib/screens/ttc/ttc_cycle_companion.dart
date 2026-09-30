@@ -60,6 +60,7 @@ import '../products/pv_store_chrome.dart' show pvSnack;
 import 'ttc_cycle_palette.dart';
 // Kept for revert (2026-09-27): import 'ttc_phase_colours.dart';
 import 'ttc_strings.dart';
+import 'ttc_tool_marks.dart' show ttcToolHeaderMark;
 
 /// Which of the four the screen is in.
 ///
@@ -144,7 +145,7 @@ class _TtcCycleCompanionScreenState extends State<TtcCycleCompanionScreen> {
               ListView(
                 padding: EdgeInsets.zero,
                 children: [
-                  _Hero(p: p, screen: screen, spans: spans),
+                  _Hero(p: p, screen: screen, spans: spans, hue: heroHue),
                   _CompanionSheet(
                     p: p,
                     t: t,
@@ -172,11 +173,19 @@ const double kTtcCompanionHue = 288;
 // =============================================================================
 
 class _Hero extends StatelessWidget {
-  const _Hero({required this.p, required this.screen, required this.spans});
+  const _Hero(
+      {required this.p,
+      required this.screen,
+      required this.spans,
+      required this.hue});
 
   final V2Palette p;
   final TtcCompanionState screen;
   final List<TtcPhaseSpan> spans;
+
+  /// The field's hue (the phase she is in), so the mark's disc belongs to
+  /// the colour behind it (2026-09-29).
+  final double hue;
 
   @override
   Widget build(BuildContext context) {
@@ -251,7 +260,13 @@ class _Hero extends StatelessWidget {
                 _SpineChip(p: p, label: 'Cycle day ${today.cycleDay}'),
               ],
             ]),
-            const SizedBox(height: 26),
+            // The tool's mark over the title (2026-09-29, ttc_tool_marks.dart):
+            // the object she tapped on the Tools row. 14 + 40 + 12 where the
+            // gap was 26, so the hero grows by 40 and no more. Kept for
+            // revert: const SizedBox(height: 26),
+            const SizedBox(height: 14),
+            ttcToolHeaderMark('cycle', v2BlockTint(hue % 360, p))!,
+            const SizedBox(height: 12),
             Text(title,
                 style: pvFraunces(
                     fontSize: 32,
@@ -587,7 +602,8 @@ class _CompanionSheet extends StatelessWidget {
               child: Row(mainAxisSize: MainAxisSize.min, children: [
                 const Icon(Icons.add_rounded, size: 17, color: ttcTitleInk),
                 const SizedBox(width: 4),
-                Text('Add a date',
+                // Kept for revert (2026-09-28): Text('Add a date',
+                Text('Add a period date',
                     style:
                         ttcBody(13, color: ttcTitleInk, w: FontWeight.w800)),
               ]),
@@ -605,14 +621,20 @@ class _CompanionSheet extends StatelessWidget {
       Text('Tap a date to change or remove it.',
           style: ttcBody(13, h: 1.45)),
       // H6 (2026-09-28): the reason for "Not in your average", said once.
+      // ⚠️ A QUIET LINE ON THE PAGE, NOT A SLAB (2026-09-29, the user: "again
+      // in that purple background, it looks not so good"). DESIGN-SYSTEM §4.0
+      // gives a note "an icon and a grey line, on the page"; Flo sets its
+      // "NOTE:" the same way under its cycle stats
+      // (https://mobbin.com/screens/f5511740-f90a-4965-b99f-1f8b1c883ed2).
+      // Same words, same icon. Kept for revert: the Container had
+      //   padding: EdgeInsets.fromLTRB(14, 11, 14, 11),
+      //   decoration: BoxDecoration(color: ttcPanel,
+      //       borderRadius: BorderRadius.circular(14)),
       if (ttcCompanionNotCountedNote() case final note?) ...[
         const SizedBox(height: 10),
-        Container(
+        SizedBox(
           key: const ValueKey('ttc_companion_not_counted_note'),
           width: double.infinity,
-          padding: const EdgeInsets.fromLTRB(14, 11, 14, 11),
-          decoration: BoxDecoration(
-              color: ttcPanel, borderRadius: BorderRadius.circular(14)),
           child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
             const Padding(
               padding: EdgeInsets.only(top: 1),
@@ -1801,7 +1823,8 @@ class _LogSheetState extends State<_LogSheet> {
       case TtcHomePeriodIntent.already:
         return 'Done';
       case TtcHomePeriodIntent.move:
-        return 'Move it to $day';
+        // Kept for revert (2026-09-28, explicit labels): 'Move it to $day'
+        return 'Move the start to $day';
       case TtcHomePeriodIntent.newCycle:
         return 'Log a new period';
       case TtcHomePeriodIntent.earlier:
@@ -2007,7 +2030,12 @@ class _LogSheetState extends State<_LogSheet> {
                           letterSpacing: 1.1,
                           color: ttcMuted)),
                   const SizedBox(height: 8),
-                  Text(_isEdit ? 'When did it really start?' : 'When did it start?',
+                  // Kept for revert (2026-09-28, explicit labels):
+                  //   'When did it really start?' : 'When did it start?'
+                  Text(
+                      _isEdit
+                          ? 'When did your period really start?'
+                          : 'When did your period start?',
                       style: ttcFraunces(22,
                           w: FontWeight.w600, color: ttcTitleInk, h: 1.2)),
                   const SizedBox(height: 6),
@@ -2070,7 +2098,8 @@ class _LogSheetState extends State<_LogSheet> {
                       width: double.infinity,
                       padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
                       decoration: BoxDecoration(
-                        color: ttcPanel,
+                        // Kept for revert (2026-09-29, no tinted slab behind text): color: ttcPanel,
+                        color: Colors.white, border: const Border.fromBorderSide(BorderSide(color: ttcLine)),
                         borderRadius: BorderRadius.circular(14),
                       ),
                       child: Text(
@@ -2344,18 +2373,30 @@ class _Fact extends StatelessWidget {
   final String? placeholder;
 
   @override
-  Widget build(BuildContext context) => Container(
+  // ⚠️ A LABEL AND A NUMBER ON THE CARD'S WHITE, NOT A NUMBER IN A SLAB
+  // (2026-09-29, the user on "A STARTING GUESS / 28 days": "a dark purplish
+  // background for no reason whatsoever… what is that even trying to do").
+  // The stat is the fact; a filled box around it adds a second surface that
+  // says nothing. Flo's cycle stats are exactly this, a grey label over a
+  // bold value on white (https://mobbin.com/screens/f5511740-f90a-4965-b99f-1f8b1c883ed2),
+  // and Clue's "Shortest: 26 days" sits bare on its page
+  // (https://mobbin.com/screens/fde0d1b4-7268-4f33-8079-2e97e98b77fc).
+  // The label moves to ttcSoft: at 9.5pt the old ttcMuted measured 3.6:1 on
+  // white, under WCAG AA's 4.5. Kept for revert:
+  //   padding: const EdgeInsets.fromLTRB(14, 12, 14, 13),
+  //   decoration: BoxDecoration(
+  //       color: ttcPanel, borderRadius: BorderRadius.circular(14)),
+  //   label color: ttcMuted
+  Widget build(BuildContext context) => SizedBox(
+        key: const ValueKey('ttc_companion_fact'),
         width: double.infinity,
-        padding: const EdgeInsets.fromLTRB(14, 12, 14, 13),
-        decoration: BoxDecoration(
-            color: ttcPanel, borderRadius: BorderRadius.circular(14)),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(label.toUpperCase(),
               style: pvManrope(
                   fontSize: 9.5,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 1.1,
-                  color: ttcMuted)),
+                  color: ttcSoft)),
           const SizedBox(height: 5),
           Text(value ?? placeholder ?? '',
               style: value != null

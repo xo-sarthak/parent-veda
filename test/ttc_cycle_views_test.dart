@@ -143,8 +143,11 @@ void main() {
         'lib/screens/ttc/ttc_cycle_report_v3.dart',
         'lib/screens/ttc/ttc_window_screen.dart',
       ];
-      // The destructive red on "Remove", and the window's tinted shadow.
-      const allowed = ['0xFFB3261E', '0xFFF3DEDE', '0xFFD0C8DC'];
+      // The destructive red on "Remove". The window's lilac shadow
+      // (0xFFD0C8DC) became the ink shadow, `ttcShadowInk`, on 2026-09-29.
+      // Kept for revert:
+      //   const allowed = ['0xFFB3261E', '0xFFF3DEDE', '0xFFD0C8DC'];
+      const allowed = ['0xFFB3261E', '0xFFF3DEDE'];
       final banned = RegExp(
           r'ttcPurple|ttcCoral|phase\.hue|ttcPhase(Band|Mark|Ink)\(|ttcBrown');
       final hex = RegExp(r'Color\((0x[0-9A-Fa-f]{8})\)');
@@ -292,7 +295,7 @@ void main() {
       expect(find.text('Add a period date'), findsOneWidget);
       await tester.tap(find.text('Add a period date'));
       await tester.pumpAndSettle();
-      expect(find.text('When did it start?'), findsOneWidget);
+      expect(find.text('When did your period start?' /* was 'When did it start?' */), findsOneWidget);
     });
 
     testWidgets('adding says it saved', (tester) async {
@@ -336,7 +339,7 @@ void main() {
       // Change opens the date sheet, replacing the menu, not stacking on it.
       await tester.tap(find.byKey(const ValueKey('ttc_period_action_change')));
       await tester.pumpAndSettle();
-      expect(find.text('When did it really start?'), findsOneWidget);
+      expect(find.text('When did your period really start?' /* was 'When did it really start?' */), findsOneWidget);
       expect(find.byKey(const ValueKey('ttc_period_action_facts')),
           findsNothing);
       await tester.tap(find.text('Not now'));
@@ -363,7 +366,7 @@ void main() {
       expect(tester.getSize(add).height, greaterThanOrEqualTo(36));
       await tester.tap(add);
       await tester.pumpAndSettle();
-      expect(find.text('When did it start?'), findsOneWidget);
+      expect(find.text('When did your period start?' /* was 'When did it start?' */), findsOneWidget);
     });
   });
 

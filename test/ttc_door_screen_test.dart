@@ -27,10 +27,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:parentveda/localization/app_language.dart';
+import 'package:parentveda/screens/doors/pv_live_search.dart'
+    show PvLiveSearchField;
 import 'package:parentveda/screens/ttc/doors/ttc_door_card.dart';
+import 'package:parentveda/screens/ttc/doors/ttc_door_hero.dart';
 import 'package:parentveda/screens/ttc/doors/ttc_door_rail.dart';
 import 'package:parentveda/screens/ttc/doors/ttc_door_screen.dart';
 import 'package:parentveda/screens/ttc/doors/ttc_door_search.dart';
+import 'package:parentveda/screens/ttc/doors/ttc_kind_cards.dart';
 import 'package:parentveda/screens/v2/v2_palette.dart';
 import 'package:parentveda/services/bracket_resolver.dart';
 import 'package:parentveda/ttc/ttc_focus_data.dart';
@@ -317,15 +321,10 @@ void main() {
               }
               final railTiles = ttcDoorRailTiles(s.tiles);
               if (railTiles.isEmpty) continue;
-              if (railTiles.length == 1) {
-                expect(
-                  find.byKey(ttcDoorSectionWideKey(s.heading),
-                      skipOffstage: false),
-                  findsOneWidget,
-                  reason: '"${s.heading}" holds one piece and is not wide',
-                );
-                continue;
-              }
+              // Since 2026-09-29 a one-piece section is a shelf of one Flo
+              // block too, so it falls through to the rail check below.
+              // Kept for revert:
+              //   if (railTiles.length == 1) { expect wide key; continue; }
               final rail = find.byKey(
                 ttcDoorSectionRailKey(s.heading),
                 skipOffstage: false,
@@ -343,14 +342,36 @@ void main() {
                 reason: '"${s.heading}" is padded in from the edge',
               );
               expect(tester.getTopLeft(rail).dx, 0);
-              // The one card, and only it, in the rail.
+              // The one card, and only it, in the rail. Since 2026-09-28 a
+              // door in `kTtcDoorsWithKindCards` (the Fertile window door)
+              // draws one look per kind instead; `ttc_door_kind_cards_test`
+              // holds that door. Kept for revert, the expectation on every
+              // door:
+              //   expect(find.descendant(of: rail,
+              //       matching: find.byType(TtcDoorSectionCard)),
+              //       findsWidgets, reason: ...);
+              // Since 2026-09-29 every door draws the one card family
+              // (`TtcKindCard`), and only it. Kept for revert (2026-09-28):
+              //   matching: find.byType(ttcDoorDrawsKinds(page.bracketId)
+              //       ? TtcKindCard : TtcDoorSectionCard),
+              // Since 2026-09-29 (the user on build 21) the shelves are Flo's
+              // small blocks, `TtcFloCard`. Kept for revert:
+              //   matching: find.byType(TtcKindCard)
+              // Since 2026-09-29 (the user on build 22) the shelf card:
+              // a picture, its title and one grey line. Kept for revert:
+              //   matching: find.byType(TtcFloCard)
+              expect(
+                find.descendant(of: rail, matching: find.byType(TtcShelfCard)),
+                findsWidgets,
+                reason: '"${s.heading}" draws some other card',
+              );
               expect(
                 find.descendant(
                   of: rail,
                   matching: find.byType(TtcDoorSectionCard),
                 ),
-                findsWidgets,
-                reason: '"${s.heading}" draws some other card',
+                findsNothing,
+                reason: '"${s.heading}" still draws the old photo card',
               );
             }
           }
@@ -365,7 +386,12 @@ void main() {
         expect(live.contains('_ArticleList('), isFalse);
         expect(live.contains('PvDoorRailCard('), isFalse,
             reason: 'the shared pregnancy card is back on a TTC rail');
-        expect(live.contains('TtcDoorSectionCard('), isTrue);
+        // 2026-09-29: the rail draws the one card family. Kept for revert:
+        //   expect(live.contains('TtcDoorSectionCard('), isTrue);
+        // 2026-09-29: Flo's blocks. Kept for revert: 'TtcKindCard('.
+        expect(live.contains('TtcFloCard('), isTrue);
+        // 2026-09-29 (build 22): the shelf card leads.
+        expect(live.contains('TtcShelfCard('), isTrue);
       });
 
       testWidgets('a card with no photo is typographic, not a ghost shape',
@@ -410,7 +436,84 @@ void main() {
   // ===========================================================================
   //  The hero is one height on every door (2026-09-27, the user: "the hero
   //  image height differs door to door").
-  group('the hero', () {
+  // ⚠️ SUPERSEDED 2026-09-29 (build 20, the hero for flat art): the hero is
+  // no longer the fixed 344, the photograph no longer parallaxes and the
+  // field is no longer glass. Kept for revert, the old group:
+  // group('the hero', () {
+  //   testWidgets('is the same height on all nine doors', (tester) async {
+  //     final heights = <String, double>{};
+  //     for (final page in kTtcFocusPages) {
+  //       await pumpDoor(tester, page);
+  //       heights[page.bracketId] =
+  //           tester.getSize(find.byKey(kTtcDoorHeroKey)).height;
+  //     }
+  //     expect(heights.values.toSet(), {kTtcDoorHeroHeight},
+  //         reason: 'hero heights differ: $heights');
+  //   });
+  //
+  //   testWidgets('the photo parallaxes: it climbs slower than the page',
+  //       (tester) async {
+  //     final page = kTtcFocusPages.firstWhere((p) => p.bracketId == 'ttc_pcos');
+  //     await pumpDoor(tester, page, height: 800);
+  //     final photo = find.descendant(
+  //         of: find.byKey(kTtcDoorHeroKey), matching: find.byType(Image));
+  //     final hero0 = tester.getTopLeft(find.byKey(kTtcDoorHeroKey)).dy;
+  //     final photo0 = tester.getTopLeft(photo.first).dy;
+  //     await tester.drag(find.byType(ListView).first, const Offset(0, -200));
+  //     await tester.pump();
+  //     final heroMoved = hero0 - tester.getTopLeft(find.byKey(kTtcDoorHeroKey)).dy;
+  //     final photoMoved = photo0 - tester.getTopLeft(photo.first).dy;
+  //     expect(heroMoved, greaterThan(100));
+  //     expect(photoMoved, lessThan(heroMoved * 0.7),
+  //         reason: 'the photo scrolls with the page, no parallax');
+  //     expect(photoMoved, greaterThan(0));
+  //   });
+  //
+  //   testWidgets('the field on a photograph is glass, and still a field',
+  //       (tester) async {
+  //     final page = kTtcFocusPages.firstWhere((p) => p.bracketId == 'ttc_pcos');
+  //     await pumpDoor(tester, page);
+  //     expect(
+  //         find.descendant(
+  //             of: find.byKey(kTtcDoorSearchKey),
+  //             matching: find.byType(BackdropFilter)),
+  //         findsOneWidget);
+  //     expect(tester.getSize(find.byKey(kTtcDoorSearchKey)).height,
+  //         TtcDoorGlassSearchField.height);
+  //   });
+  // });
+
+  // ===========================================================================
+  //  The hero for flat art (2026-09-29, the user on build 20: "the image must
+  //  be visible, the heading must be visible", and the search "feels like a
+  //  fit-to-fill" against the cards; the lead: never crop the art).
+  // RETIRED 2026-09-29: the user chose the photograph hero again (Flo's door,
+  // the words and search on the picture), so the flat-art layout's tests are
+  // skipped, kept for the day `TtcDoorHero` comes back.
+  group('the hero (flat-art layout, retired)',
+      skip: 'the user chose the photograph hero again (2026-09-29)', () {
+    Future<void> pumpScaled(
+      WidgetTester tester,
+      TtcFocusPage page, {
+      double scale = 1.5,
+    }) async {
+      tester.view.physicalSize = const Size(360, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+      await tester.pumpWidget(
+        MaterialApp(
+          builder: (context, child) => MediaQuery(
+            data: MediaQuery.of(context)
+                .copyWith(textScaler: TextScaler.linear(scale)),
+            child: child!,
+          ),
+          home: TtcDoorScreen(
+              page: page, bracket: bracketById(page.bracketId)!),
+        ),
+      );
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+
     testWidgets('is the same height on all nine doors', (tester) async {
       final heights = <String, double>{};
       for (final page in kTtcFocusPages) {
@@ -418,29 +521,85 @@ void main() {
         heights[page.bracketId] =
             tester.getSize(find.byKey(kTtcDoorHeroKey)).height;
       }
-      expect(heights.values.toSet(), {kTtcDoorHeroHeight},
+      // Kept for revert: {kTtcDoorHeroHeight}.
+      expect(heights.values.toSet(), {ttcDoorHeroHeight(360, 0)},
           reason: 'hero heights differ: $heights');
     });
 
-    testWidgets('the photo parallaxes: it climbs slower than the page',
+    testWidgets(
+        'the art frame is 3:2 and full width, and the picture is contained: '
+        'rendered aspect == source aspect, never cropped', (tester) async {
+      for (final page in kTtcFocusPages) {
+        await pumpDoor(tester, page);
+        final frame = tester.getSize(find.byKey(kTtcDoorHeroArtKey));
+        expect(frame.width, 360, reason: page.bracketId);
+        expect(frame.width / frame.height,
+            closeTo(kTtcDoorHeroArtAspect, 0.001),
+            reason: page.bracketId);
+        final img = find.descendant(
+            of: find.byKey(kTtcDoorHeroArtKey), matching: find.byType(Image));
+        expect(img, findsOneWidget, reason: '${page.bracketId}: no picture');
+        expect(tester.widget<Image>(img).fit, BoxFit.contain,
+            reason: '${page.bracketId}: cover crops the art');
+        expect(tester.getSize(img), frame, reason: page.bracketId);
+      }
+      // The arithmetic the frame relies on: the whole source is drawn, and
+      // a 3:2 source fills the 3:2 frame exactly, for the art and for the
+      // photographs (1200 x 800) that stand in for it.
+      const frame = Size(360, 240);
+      for (final src in [kTtcDoorHeroArtSize, const Size(1200, 800)]) {
+        final fit = applyBoxFit(BoxFit.contain, src, frame);
+        expect(fit.source, src, reason: 'part of the picture is cut');
+        expect(fit.destination, frame, reason: 'the picture is letterboxed');
+      }
+    });
+
+    testWidgets('no parallax: the frame scrolls with the page',
         (tester) async {
       final page = kTtcFocusPages.firstWhere((p) => p.bracketId == 'ttc_pcos');
       await pumpDoor(tester, page, height: 800);
-      final photo = find.descendant(
-          of: find.byKey(kTtcDoorHeroKey), matching: find.byType(Image));
+      final art = find.byKey(kTtcDoorHeroArtKey);
       final hero0 = tester.getTopLeft(find.byKey(kTtcDoorHeroKey)).dy;
-      final photo0 = tester.getTopLeft(photo.first).dy;
+      final art0 = tester.getTopLeft(art).dy;
       await tester.drag(find.byType(ListView).first, const Offset(0, -200));
       await tester.pump();
-      final heroMoved = hero0 - tester.getTopLeft(find.byKey(kTtcDoorHeroKey)).dy;
-      final photoMoved = photo0 - tester.getTopLeft(photo.first).dy;
+      final heroMoved =
+          hero0 - tester.getTopLeft(find.byKey(kTtcDoorHeroKey)).dy;
       expect(heroMoved, greaterThan(100));
-      expect(photoMoved, lessThan(heroMoved * 0.7),
-          reason: 'the photo scrolls with the page, no parallax');
-      expect(photoMoved, greaterThan(0));
+      expect(art0 - tester.getTopLeft(art).dy, heroMoved);
     });
 
-    testWidgets('the field on a photograph is glass, and still a field',
+    testWidgets(
+        'on every door the words sit below the art, never on it, and the '
+        'search has its own row', (tester) async {
+      for (final page in kTtcFocusPages) {
+        await pumpDoor(tester, page);
+        final art = tester.getRect(find.byKey(kTtcDoorHeroArtKey));
+        for (final k in [
+          kTtcDoorHeroEyebrowKey,
+          kTtcDoorHeroTitleKey,
+          kTtcDoorHeroIntroKey,
+        ]) {
+          final r = tester.getRect(find.byKey(k));
+          expect(r.top, greaterThanOrEqualTo(art.bottom),
+              reason: '${page.bracketId}: $k is on the picture');
+        }
+        final intro = tester.getRect(find.byKey(kTtcDoorHeroIntroKey));
+        final field = tester.getRect(find.byKey(kTtcDoorSearchKey));
+        final rail = tester.getRect(find.byKey(kTtcDoorRailKey));
+        expect(field.top - intro.bottom, greaterThanOrEqualTo(12),
+            reason: '${page.bracketId}: the search is against the intro');
+        expect(rail.top - field.bottom, greaterThanOrEqualTo(12),
+            reason: '${page.bracketId}: the search is against the rail');
+        expect(
+            rail.top,
+            greaterThanOrEqualTo(
+                tester.getRect(find.byKey(kTtcDoorHeroKey)).bottom),
+            reason: '${page.bracketId}: the rail rides over the hero');
+      }
+    });
+
+    testWidgets('the search is the white pill of Learn, named for the door',
         (tester) async {
       final page = kTtcFocusPages.firstWhere((p) => p.bracketId == 'ttc_pcos');
       await pumpDoor(tester, page);
@@ -448,9 +607,102 @@ void main() {
           find.descendant(
               of: find.byKey(kTtcDoorSearchKey),
               matching: find.byType(BackdropFilter)),
-          findsOneWidget);
+          findsNothing);
+      expect(tester.widget(find.byKey(kTtcDoorSearchKey)),
+          isA<PvLiveSearchField>());
       expect(tester.getSize(find.byKey(kTtcDoorSearchKey)).height,
-          TtcDoorGlassSearchField.height);
+          kTtcDoorHeroSearchHeight);
+      expect(find.text('Search PCOS'), findsOneWidget);
+    });
+
+    testWidgets('the headline and intro are ink on a ground they pass on',
+        (tester) async {
+      for (final page in kTtcFocusPages) {
+        await pumpDoor(tester, page);
+        final ground = (tester
+                .widget<AnimatedContainer>(find.byKey(kTtcDoorHeroGroundKey))
+                .decoration! as BoxDecoration)
+            .color!;
+        for (final k in [kTtcDoorHeroTitleKey, kTtcDoorHeroIntroKey]) {
+          final c = tester.widget<Text>(find.byKey(k)).style!.color!;
+          expect(ttcContrast(c, ground), greaterThanOrEqualTo(7),
+              reason: '${page.bracketId}: $k at '
+                  '${ttcContrast(c, ground).toStringAsFixed(2)}:1');
+        }
+      }
+    });
+
+    test('the ground keeps a pastel as it is and lifts a dark edge', () {
+      const ink = Color(0xFF201C24);
+      // The onboarding set's grounds: kept, so art and page are one colour.
+      for (final pastel in const [
+        Color(0xFFE6CFAF),
+        Color(0xFFD5C2E0),
+        Color(0xFFE5B3B6),
+      ]) {
+        expect(ttcDoorHeroGround(pastel, ink), pastel);
+      }
+      // The door photographs' left edges, sampled 2026-09-29: lifted.
+      for (final edge in const [
+        Color(0xFFA98B4C),
+        Color(0xFF785037),
+        Color(0xFF9C7557),
+      ]) {
+        final g = ttcDoorHeroGround(edge, ink);
+        expect(ttcContrast(ink, g), greaterThanOrEqualTo(7));
+      }
+    });
+
+    testWidgets('no overflow at 360 and 1.5x text on any door',
+        (tester) async {
+      for (final page in kTtcFocusPages) {
+        await pumpScaled(tester, page);
+        expect(tester.takeException(), isNull, reason: page.bracketId);
+        final art = tester.getRect(find.byKey(kTtcDoorHeroArtKey));
+        expect(tester.getRect(find.byKey(kTtcDoorHeroTitleKey)).top,
+            greaterThanOrEqualTo(art.bottom),
+            reason: page.bracketId);
+      }
+    });
+
+    testWidgets('until the art exists, the door photograph fills the frame',
+        (tester) async {
+      for (final page in kTtcFocusPages) {
+        await pumpDoor(tester, page);
+        await tester.pump(const Duration(milliseconds: 100));
+        final asset = ttcDoorHeroArtAsset(page.bracketId)!;
+        final img = tester.widget<Image>(find.descendant(
+            of: find.byKey(kTtcDoorHeroArtKey), matching: find.byType(Image)));
+        var provider = img.image;
+        if (provider is ResizeImage) provider = provider.imageProvider;
+        if (File(asset).existsSync()) {
+          expect(provider, isA<AssetImage>(), reason: page.bracketId);
+          expect((provider as AssetImage).assetName, asset);
+        } else {
+          expect(provider, isA<NetworkImage>(), reason: page.bracketId);
+          expect((provider as NetworkImage).url, page.heroImageUrl);
+        }
+      }
+    });
+
+    test('every door has an art slot, and any art present is 3:2', () {
+      expect(kTtcDoorHeroArtSlug.keys.toSet(),
+          {for (final p in kTtcFocusPages) p.bracketId});
+      expect(kTtcDoorHeroArtSlug.values.toSet(), hasLength(9));
+      final dir = Directory('assets/doors');
+      if (!dir.existsSync()) return;
+      for (final f in dir.listSync().whereType<File>()) {
+        final name = f.uri.pathSegments.last;
+        if (!name.startsWith('hero_')) continue;
+        final size = _jpegSize(f.readAsBytesSync());
+        expect(size, isNotNull, reason: '$name is not a JPEG');
+        expect(size!.width / size.height, closeTo(1.5, 0.01),
+            reason: '$name is ${size.width}x${size.height}, not 3:2: the '
+                'frame would letterbox it');
+        expect(kTtcDoorHeroArtSlug.values,
+            contains(name.substring(5, name.length - 4)),
+            reason: '$name has no door');
+      }
     });
   });
 
@@ -908,7 +1160,8 @@ void main() {
       expect(ordered.take(2).map((g) => g.id), kTtcIvfRoundTabsFirst);
       expect(ordered.map((g) => g.id).toSet(),
           page.groups!.map((g) => g.id).toSet());
-      expect(find.text('Going through it'), findsWidgets);
+      // Kept for revert (2026-09-28, explicit names): 'Going through it'.
+      expect(find.text('During a round'), findsWidgets);
       final going = tester.getTopLeft(find.byKey(ttcDoorRailCardKey(0)));
       expect(going.dx, lessThan(100));
     });
@@ -1120,7 +1373,10 @@ void main() {
       }
     });
 
+    // RETIRED 2026-09-29: every shelf is Flo's small blocks now, a section
+    // of one piece included (the user on build 21).
     testWidgets('D13: a section of one piece is one wide card',
+        skip: true,
         (tester) async {
       final page = kTtcFocusPages
           .firstWhere((p) => p.bracketId == 'ttc_male_fertility');
@@ -1261,4 +1517,22 @@ class _Names extends NavigatorObserver {
   @override
   void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) =>
       onPush(route.settings.name);
+}
+
+/// A JPEG's pixel size, from its first start-of-frame marker.
+Size? _jpegSize(List<int> b) {
+  if (b.length < 4 || b[0] != 0xFF || b[1] != 0xD8) return null;
+  var i = 2;
+  while (i + 9 < b.length) {
+    if (b[i] != 0xFF) return null;
+    final m = b[i + 1];
+    final len = (b[i + 2] << 8) | b[i + 3];
+    if (m >= 0xC0 && m <= 0xCF && m != 0xC4 && m != 0xC8 && m != 0xCC) {
+      final h = (b[i + 5] << 8) | b[i + 6];
+      final w = (b[i + 7] << 8) | b[i + 8];
+      return Size(w.toDouble(), h.toDouble());
+    }
+    i += 2 + len;
+  }
+  return null;
 }

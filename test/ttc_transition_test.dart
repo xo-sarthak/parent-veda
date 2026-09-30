@@ -21,7 +21,9 @@ import 'package:parentveda/services/life_stage_store.dart';
 import 'package:parentveda/services/pregnancy_controller.dart';
 import 'package:parentveda/ttc/cycle_store.dart';
 import 'package:parentveda/ttc/ttc_chapter.dart';
-import 'package:parentveda/ttc/ttc_journal_store.dart';
+// Kept for revert (2026-09-28, the user: no journal in trying to conceive).
+// import 'package:parentveda/ttc/ttc_journal_store.dart';
+import 'package:parentveda/ttc/ttc_doctor_questions_store.dart';
 import 'package:parentveda/ttc/ttc_store.dart';
 import 'package:parentveda/ttc/ttc_supplements_store.dart';
 import 'package:parentveda/ttc/ttc_transition.dart';
@@ -36,7 +38,8 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     CycleStore.instance.resetForTest();
     TtcStore.instance.resetForTest();
-    TtcJournalStore.instance.resetForTest();
+    // Kept for revert (2026-09-28): TtcJournalStore.instance.resetForTest();
+    TtcDoctorQuestionsStore.instance.resetForTest();
     TtcSupplementsStore.instance.resetForTest();
     FamilyTimeline.instance.resetForTest();
     LifeStageStore.instance.resetForTest();
@@ -53,9 +56,13 @@ void main() {
       ..logPeriodStart(DateTime(2026, 6, 26));
     TtcSupplementsStore.instance.add('Folic acid');
     TtcSupplementsStore.instance.add('Vitamin D');
-    TtcJournalStore.instance.add(kind: TtcEntryKind.memory, text: 'a hard month');
-    TtcJournalStore.instance
-        .add(kind: TtcEntryKind.letter, text: 'to whoever you turn out to be');
+    // Kept for revert (2026-09-28, journal out of TTC): two journal entries.
+    //   TtcJournalStore.instance.add(kind: TtcEntryKind.memory, text: 'a hard month');
+    //   TtcJournalStore.instance
+    //       .add(kind: TtcEntryKind.letter, text: 'to whoever you turn out to be');
+    // Her own words now live in her questions for the doctor.
+    TtcDoctorQuestionsStore.instance.add('Is my thyroid level fine?');
+    TtcDoctorQuestionsStore.instance.add('When should we test again?');
     TtcStore.instance.setPartnerJoined(true);
   }
 
@@ -84,27 +91,37 @@ void main() {
   group('nothing is lost', () {
     test('every store still holds exactly what it held', () async {
       seedAJourney();
-      final journalBefore = TtcJournalStore.instance.count;
+      // Kept for revert (2026-09-28): the journal's count.
+      //   final journalBefore = TtcJournalStore.instance.count;
+      final questionsBefore = TtcDoctorQuestionsStore.instance.count;
       final supplementsBefore = TtcSupplementsStore.instance.items.length;
       final cyclesBefore = CycleStore.instance.completedCycles;
 
       await engine.confirmPregnancy(on: DateTime(2026, 7, 24));
 
-      expect(TtcJournalStore.instance.count, journalBefore);
+      // Kept for revert (2026-09-28):
+      //   expect(TtcJournalStore.instance.count, journalBefore);
+      expect(TtcDoctorQuestionsStore.instance.count, questionsBefore);
       expect(TtcSupplementsStore.instance.items.length, supplementsBefore);
       expect(CycleStore.instance.completedCycles, cyclesBefore);
       expect(TtcStore.instance.partnerJoined, isTrue);
       // And the actual words are still there, not just the count.
+      // Kept for revert (2026-09-28):
+      //   expect(
+      //       TtcJournalStore.instance.entries
+      //           .any((e) => e.text == 'to whoever you turn out to be'),
+      //       isTrue);
       expect(
-          TtcJournalStore.instance.entries
-              .any((e) => e.text == 'to whoever you turn out to be'),
+          TtcDoctorQuestionsStore.instance.questions
+              .any((q) => q.text == 'When should we test again?'),
           isTrue);
     });
 
     test('the result reports real counts, not a reassurance', () async {
       seedAJourney();
       final r = await engine.confirmPregnancy(on: DateTime(2026, 7, 24));
-      expect(r.journalEntries, 2);
+      // Kept for revert (2026-09-28): the result no longer counts journal
+      // entries. expect(r.journalEntries, 2);
       expect(r.supplements, 2);
       expect(r.cyclesLogged, 2);
       expect(r.partnerJoined, isTrue);
@@ -223,11 +240,13 @@ void main() {
       expect(prefs.getString(PregnancyController.kDueDateKey), isNull);
     });
 
-    test('undo keeps the journal and everything else she wrote', () async {
+    // Kept for revert (2026-09-28): 'undo keeps the journal and everything
+    // else she wrote', with expect(TtcJournalStore.instance.count, 2).
+    test('undo keeps her questions and everything else she wrote', () async {
       seedAJourney();
       await engine.confirmPregnancy(on: DateTime(2026, 7, 24));
       await engine.undo();
-      expect(TtcJournalStore.instance.count, 2);
+      expect(TtcDoctorQuestionsStore.instance.count, 2);
       expect(TtcSupplementsStore.instance.items.length, 2);
       expect(CycleStore.instance.completedCycles, 2);
     });
@@ -248,7 +267,11 @@ void main() {
 
       final t = const TtcS(false);
       expect(find.text(t.transitionTitle), findsOneWidget);
-      expect(find.text(t.transitionJournal(2)), findsOneWidget);
+      // Kept for revert (2026-09-28, journal out of TTC): the journal left
+      // the stage, so this page no longer names it. The count is still in
+      // the result (asserted above); only the line is gone.
+      //   expect(find.text(t.transitionJournal(2)), findsOneWidget);
+      expect(find.text(t.transitionJournal(2)), findsNothing);
       expect(find.text(t.transitionSupplements(2)), findsOneWidget);
       expect(find.text(t.transitionPartner), findsOneWidget);
     });

@@ -91,13 +91,42 @@ void main() {
       ) async {
         await pumpTall(tester, PvYouScreen(stage: stage));
         expect(tester.takeException(), isNull);
-        expect(find.text('You'), findsWidgets);
+        // TTC's is titled Profile since 2026-09-29 (the avatar's page; the
+        // fifth tab is More, test/ttc_more_profile_test.dart). Kept for
+        // revert: expect(find.text('You'), findsWidgets); on every stage.
+        expect(
+          find.text(stage == LifeStage.tryingToConceive ? 'Profile' : 'You'),
+          findsWidgets,
+        );
         // ⚠️ TRYING TO CONCEIVE IS SHORT AND GROUPED (2026-09-27, the user's
         // choice after the launch walk): "Your details" folds into a "Your
         // answers" row, so that one section is absent there. Every other
         // section is where it was, in the same order.
+        //
+        // ⚠️ AND SINCE 2026-09-28 TRYING TO CONCEIVE IS THE MORE TAB, A BENTO
+        // (test/pv_more_bento_test.dart holds it): each section is a tile
+        // that opens its rows, so no eyebrow is drawn at the top level.
+        // Kept for revert, the 2026-09-27 expectation:
+        //   final expected = stage == LifeStage.tryingToConceive
+        //       ? [for (final e in kSkeleton) if (e != 'YOUR DETAILS') e]
+        //       : kSkeleton;
+        //
+        // ⚠️ AND SINCE 2026-09-29 TRYING TO CONCEIVE IS HER PROFILE (the
+        // bento retired): Family and Your things are sections again, her
+        // journey is "Your stage", her details are "Your answers", and
+        // Preferences, Support and Account sit behind one Settings row.
+        // Kept for revert, the 2026-09-28 expectation:
+        //   final expected = stage == LifeStage.tryingToConceive
+        //       ? const <String>[]
+        //       : kSkeleton;
+        //
+        // ⚠️ AND SINCE V3 (2026-09-29, build 19): a hero leads, the chapter
+        // stepper is gone, "Your journey" is a heading again (it holds "I got
+        // a positive test") and Family is "Family and partner". Kept for
+        // revert, the V2 expectation:
+        //   ? const ['FAMILY', 'YOUR THINGS']
         final expected = stage == LifeStage.tryingToConceive
-            ? [for (final e in kSkeleton) if (e != 'YOUR DETAILS') e]
+            ? const ['YOUR JOURNEY', 'YOUR THINGS']
             : kSkeleton;
         expect(
           eyebrows(tester),
@@ -106,6 +135,28 @@ void main() {
               '${stage.name} bent the skeleton — a stage changes what is '
               'inside a section, never which sections exist or where',
         );
+        // Kept for revert (2026-09-28): the bento's tiles
+        //   'journey', 'family', 'things', 'experts_and_courses',
+        //   'preferences', 'support', 'account' as `pv_more_tile_<id>`.
+        if (stage == LifeStage.tryingToConceive) {
+          // Kept for revert (V2): 'pv_profile_stage' in place of the hero
+          // and the journey.
+          for (final id in [
+            'pv_profile_hero',
+            'pv_profile_answers',
+            'pv_profile_doctor',
+            'pv_profile_journey',
+            'pv_profile_family',
+            'pv_profile_things',
+          ]) {
+            expect(
+              find.byKey(ValueKey(id)),
+              findsOneWidget,
+              reason: 'the profile has no "$id" section',
+            );
+          }
+          expect(find.byKey(kPvProfileSettingsRowKey), findsOneWidget);
+        }
       });
     }
 
@@ -163,9 +214,15 @@ void main() {
       for (final s in LifeStage.values) {
         expect(pvYouContentFor(s).whatWeStore, isNotEmpty);
         expect(pvYouContentFor(s).childrenInvitation, isNotEmpty);
+        // ⚠️ TTC HAS ONE SINCE 2026-09-28: the journal left the stage, and
+        // Orders moved under the More tab's "Bookings and orders" tile, which
+        // names it. Saved stays. Kept for revert: 3 on every stage, then 2.
+        // (2026-09-29: Orders is now the profile's own "Your orders" tile
+        // under the hero, drawn by the screen, not a content tile, so this
+        // count is unchanged. test/ttc_more_profile_test.dart holds it.)
         expect(
           pvYouContentFor(s).tiles.length,
-          3,
+          s == LifeStage.tryingToConceive ? 1 : 3,
           reason: 'three tiles is the row; ${s.name} has a different count',
         );
       }

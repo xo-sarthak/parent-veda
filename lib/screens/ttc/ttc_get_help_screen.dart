@@ -59,6 +59,7 @@ import '../../widgets/pv_feedback.dart';
 import '../doors/pv_list_row.dart' show PvMarkWell, PvRowGroup;
 import '../v2/v2_palette.dart';
 import 'ttc_tool_chrome.dart';
+import 'ttc_common.dart' show ttcTitleInk;
 
 /// The route name, so the rest of the app (and `global_ask_fab.dart`, which
 /// reads route names) can tell this page is on screen.
@@ -114,7 +115,9 @@ class TtcGetHelpScreen extends StatelessWidget {
     return TtcToolScaffold(
       // 160: the calm green this stage uses for Today and her own logs.
       hue: 160,
-      eyebrow: 'Help is here',
+      // Kept for revert (2026-09-28): 'Help is here'
+      // Not 'Get help now': that is the title right under it.
+      eyebrow: 'Helplines and support',
       title: kTtcGetHelpTitle,
       intro: "If you're struggling or something feels wrong right now, you "
           "don't have to wait.",
@@ -310,7 +313,7 @@ class _CallPill extends StatelessWidget {
       excludeSemantics: true,
       child: PvPress(
         child: Material(
-          color: p.ink1,
+          color: ttcTitleInk,
           borderRadius: BorderRadius.circular(999),
           child: InkWell(
             borderRadius: BorderRadius.circular(999),

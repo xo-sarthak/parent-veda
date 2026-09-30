@@ -36,6 +36,7 @@ import '../v2/v2_palette.dart';
 import 'ttc_fertility_help_summary.dart';
 import 'ttc_strings.dart';
 import 'ttc_surface_router.dart';
+import 'ttc_common.dart' show ttcTitleInk, TtcSectionHeading;
 
 /// IVF & IUI is 206 on the wheel.
 const double kFertilityHelpHue = 206;
@@ -204,7 +205,10 @@ class _TtcFertilityHelpScreenState extends State<TtcFertilityHelpScreen> {
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(t("HERE'S WHAT WE ALREADY KNOW", 'JO HUM PEHLE SE JAANTE HAIN'),
+                  // Kept for revert (2026-09-28): "HERE'S WHAT WE ALREADY KNOW"
+                  Text(
+                      t('WHAT WE ALREADY KNOW ABOUT YOU',
+                          'JO HUM PEHLE SE JAANTE HAIN'),
                       style: pvManrope(
                           fontSize: 10,
                           fontWeight: FontWeight.w800,
@@ -378,7 +382,11 @@ class _TtcFertilityHelpScreenState extends State<TtcFertilityHelpScreen> {
                 const SizedBox(height: 14),
                 _Button(
                     p: p,
-                    label: t('Continue', 'Aage badhein'),
+                    // Change 5 (2026-09-28): the button says where it
+                    // goes. Kept for revert: t('Continue', 'Aage badhein').
+                    label: _q + 1 >= _store.missingQuestionIds.length
+                        ? t('See my answer', 'Aage badhein')
+                        : t('Next question', 'Aage badhein'),
                     onTap: () {
                       if (_store.answerFor('conditions') == null) {
                         _store.answer('conditions', 'none');
@@ -458,7 +466,8 @@ class _TtcFertilityHelpScreenState extends State<TtcFertilityHelpScreen> {
           multi: true,
           options: [
             for (final c in kFertilityConditions) (c.id, c.label),
-            ('none', t('No, none of these', 'Nahi, inmein se koi nahi')),
+            // Kept for revert (2026-09-28): 'No, none of these'
+            ('none', t('No, none of these conditions', 'Nahi, inmein se koi nahi')),
           ]
         );
       case 'miscarriages':
@@ -561,7 +570,8 @@ class _TtcFertilityHelpScreenState extends State<TtcFertilityHelpScreen> {
         // 2. WHY — her own facts, at most three
         if (r.reasons.isNotEmpty) ...[
           const SizedBox(height: 24),
-          Text(t('WHY WE SAY THIS', 'HUM YAHAN KAISE PAHUNCHE'),
+          // Kept for revert (2026-09-28): 'WHY WE SAY THIS'
+          Text(t('WHY WE GAVE THIS ANSWER', 'HUM YAHAN KAISE PAHUNCHE'),
               style: pvManrope(
                   fontSize: 10.5,
                   fontWeight: FontWeight.w800,
@@ -577,7 +587,7 @@ class _TtcFertilityHelpScreenState extends State<TtcFertilityHelpScreen> {
                   width: 5,
                   height: 5,
                   decoration:
-                      BoxDecoration(color: p.action, shape: BoxShape.circle),
+                      BoxDecoration(color: ttcTitleInk, shape: BoxShape.circle),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -595,13 +605,17 @@ class _TtcFertilityHelpScreenState extends State<TtcFertilityHelpScreen> {
           Container(
             padding: const EdgeInsets.fromLTRB(16, 15, 16, 16),
             decoration: BoxDecoration(
-              color: p.surfaceAlt,
+              // Kept for revert (2026-09-29, no tinted slab behind text): color: p.surfaceAlt,
+              color: p.surface, border: Border.fromBorderSide(BorderSide(color: p.line)),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(t("What this doesn't mean", 'Iska matlab ye nahi hai'),
+                  // Kept for revert (2026-09-28): "What this doesn't mean"
+                  Text(
+                      t("What this answer doesn't mean",
+                          'Iska matlab ye nahi hai'),
                       style: pvJakarta(
                           fontSize: 14.5,
                           fontWeight: FontWeight.w700,
@@ -616,9 +630,9 @@ class _TtcFertilityHelpScreenState extends State<TtcFertilityHelpScreen> {
 
         // 4. HER NEXT STEP
         const SizedBox(height: 26),
-        Text(t('Your next step', 'Aapka agla kadam'),
-            style: pvFraunces(
-                fontSize: 19, fontWeight: FontWeight.w600, color: p.ink1)),
+        // Kept for revert (2026-09-29, one heading style): the same Text with
+        // style: pvFraunces(fontSize: 19, fontWeight: FontWeight.w600, color: p.ink1)
+        TtcSectionHeading(t('Your next step', 'Aapka agla kadam')),
         const SizedBox(height: 10),
         Text(r.nextStep.of(lang),
             style: pvManrope(fontSize: 15, height: 1.7, color: p.ink2)),
@@ -693,7 +707,8 @@ class _TtcFertilityHelpScreenState extends State<TtcFertilityHelpScreen> {
         _Button(
             p: p,
             filled: false,
-            label: t('Start again', 'Phir se shuru karein'),
+            // Kept for revert (2026-09-28): 'Start again'
+            label: t('Start the check again', 'Phir se shuru karein'),
             onTap: () async {
               await _store.reset();
               if (mounted) setState(() => _stage = _Stage.intro);
@@ -744,10 +759,13 @@ class _Option extends StatelessWidget {
           alignment: Alignment.centerLeft,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           decoration: BoxDecoration(
-            color: selected ? p.action.withValues(alpha: 0.08) : null,
+            // A chosen row is an ink edge and an ink tick; the row does not
+            // fill (DESIGN-SYSTEM §4.0, 2026-09-29). Kept for revert:
+            //   color: selected ? p.action.withValues(alpha: 0.08) : null,
+            color: null,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-                color: selected ? p.action : p.line, width: selected ? 1.5 : 1),
+                color: selected ? ttcTitleInk : p.line, width: selected ? 1.5 : 1),
           ),
           child: Row(children: [
             Expanded(
@@ -757,9 +775,9 @@ class _Option extends StatelessWidget {
                       height: 1.4,
                       fontWeight:
                           selected ? FontWeight.w700 : FontWeight.w500,
-                      color: selected ? p.action : p.ink1)),
+                      color: selected ? ttcTitleInk : p.ink1)),
             ),
-            if (selected) Icon(Icons.check_rounded, size: 19, color: p.action),
+            if (selected) Icon(Icons.check_rounded, size: 19, color: ttcTitleInk),
           ]),
         ),
       );
@@ -819,7 +837,7 @@ class _Button extends StatelessWidget {
           height: 54,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: filled ? p.action : null,
+            color: filled ? ttcTitleInk : null,
             borderRadius: BorderRadius.circular(999),
             border: filled ? null : Border.all(color: p.line),
           ),

@@ -27,7 +27,8 @@ import 'package:flutter/material.dart';
 import '../../ttc/ttc_chapter.dart';
 import '../../ttc/ttc_daily_data.dart';
 import '../../ttc/ttc_insight_read.dart';
-import '../../ttc/ttc_journal_store.dart';
+// Kept for revert (2026-09-28, the user: no journal in trying to conceive).
+// import '../../ttc/ttc_journal_store.dart';
 import '../../ttc/ttc_products_data.dart';
 import '../../ttc/ttc_ritual_store.dart';
 import '../../ttc/ttc_store.dart';
@@ -37,7 +38,9 @@ import 'ttc_common.dart';
 import 'ttc_cycle_screens.dart';
 // import 'ttc_insight_screen.dart'; // kept for revert — the insight opens in the reader now
 import 'ttc_journey_map_screen.dart';
-import 'ttc_journal_screen.dart';
+// Kept for revert (2026-09-28, journal out of TTC): used only by the
+// journal card, now commented out.
+// import 'ttc_journal_screen.dart';
 import 'ttc_partner_screen.dart';
 import 'ttc_products_screen.dart';
 import 'ttc_transition_screen.dart';
@@ -46,6 +49,8 @@ import 'ttc_treatment_screen.dart';
 // Kept for revert (2026-09-28), old `logTtcPeriod` body only: import '../../ttc/ttc_treatment_store.dart' show TtcTreatmentStore;
 import 'ttc_ritual_screen.dart';
 import 'ttc_strings.dart';
+import 'ttc_tool_chrome.dart'
+    show TtcHeroFieldCard, TtcHeroFieldTag, ttcChapterFieldHue;
 // Kept for revert (2026-09-28): used only by the old stock-picker body of
 // `logTtcPeriod`, now a comment.
 // import 'ttc_home_gap.dart' show showTtcPeriodCameNudge;
@@ -62,7 +67,7 @@ class TtcTodayScreen extends StatelessWidget {
       animation: Listenable.merge([
         TtcStore.instance,
         TtcRitualStore.instance,
-        TtcJournalStore.instance,
+        // Kept for revert (2026-09-28): TtcJournalStore.instance,
         TtcPartnerMode.instance,
         TtcLang.instance,
       ]),
@@ -130,8 +135,10 @@ class TtcTodayScreen extends StatelessWidget {
             //  know the difference between something you read and something you
             //  use.
             _RitualCard(t: t, chapter: chapter),
-            const SizedBox(height: 12),
-            _JournalCard(t: t, chapter: chapter),
+            // Kept for revert (2026-09-28, journal out of TTC): the user took
+            // the journal out of the stage.
+            //   const SizedBox(height: 12),
+            //   _JournalCard(t: t, chapter: chapter),
             const SizedBox(height: 20),
             // The door out of this stage. Always present, understated, and
             // never phrased as a prompt to test.
@@ -173,48 +180,35 @@ class _Hero extends StatelessWidget {
     // above the shortcuts, and circular shortcut buttons. TTC had a
     // purple-to-coral gradient, a flat bar and rounded squares - individually
     // small, together enough that the two never read as one component.
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(28),
-      child: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [ttcPurple, ttcPurpleDeep],
-          ),
-        ),
-        child: Stack(children: [
-          Positioned(
-            right: -36,
-            top: -36,
-            child: _circle(150, Colors.white.withValues(alpha: 0.10)),
-          ),
-          Positioned(
-            right: 30,
-            bottom: -40,
-            child: _circle(100, ttcCoral.withValues(alpha: 0.22)),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+    //
+    // ⚠️ THE TOOLS' LIGHT FIELD, INK TYPE (2026-09-29): see `TtcHeroFieldCard`.
+    // The field brings its own arcs, so the two soft circles went with the
+    // violet. Kept for revert (2026-09-29):
+    //   ClipRRect(borderRadius: 28, child: Container(
+    //     decoration: BoxDecoration(gradient: LinearGradient(
+    //         begin: topLeft, end: bottomRight,
+    //         colors: [ttcPurple, ttcPurpleDeep])),
+    //     child: Stack(children: [
+    //       Positioned(right: -36, top: -36,
+    //           child: _circle(150, Colors.white.withValues(alpha: 0.10))),
+    //       Positioned(right: 30, bottom: -40,
+    //           child: _circle(100, ttcCoral.withValues(alpha: 0.22))),
+    //       Padding(padding: 20, child: Column(...)),
+    //     ])))
+    // with every word white (the greeting 92%, the tagline 94%, the day
+    // count 80%), the days-trying tag a white 18% pill, the divider white
+    // 18%, and the ⓘ, the chapter bar and the shortcuts white.
+    return TtcHeroFieldCard(
+      hue: ttcChapterFieldHue(chapter),
+      variant: TtcChapter.values.indexOf(chapter) + 1,
+      radius: 28,
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
           Expanded(
             child: Text(_greeting(t),
-                style: ttcBody(13,
-                    color: Colors.white.withValues(alpha: 0.92),
-                    w: FontWeight.w600)),
+                style: ttcBody(13, color: ttcInk, w: FontWeight.w600)),
           ),
-          if (daysTrying != null)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.18),
-                borderRadius: BorderRadius.circular(999),
-              ),
-              child: Text(t.daysTrying(daysTrying!),
-                  style: ttcBody(11, color: Colors.white, w: FontWeight.w700)),
-            ),
+          if (daysTrying != null) TtcHeroFieldTag(t.daysTrying(daysTrying!)),
         ]),
         const SizedBox(height: 14),
 
@@ -228,15 +222,13 @@ class _Hero extends StatelessWidget {
         Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Expanded(
             child: Text(chapter.title(hi),
-                style:
-                    ttcFraunces(29, w: FontWeight.w600, color: Colors.white)),
+                style: ttcFraunces(29, w: FontWeight.w600, color: ttcInk)),
           ),
-          TtcChapterInfoButton(chapter: chapter, t: t),
+          TtcChapterInfoButton(chapter: chapter, t: t, color: ttcInk),
         ]),
         const SizedBox(height: 8),
         Text(chapter.tagline(hi),
-            style: ttcBody(13.5,
-                color: Colors.white.withValues(alpha: 0.94), h: 1.5)),
+            style: ttcBody(13.5, color: ttcInk, h: 1.5)),
         const SizedBox(height: 16),
 
         // Progress WITHIN this chapter only. Never a global 1→5 bar: chapters
@@ -251,9 +243,7 @@ class _Hero extends StatelessWidget {
         Row(children: [
           Expanded(
             child: Text(t.dayOfChapter(today.daysIntoChapter, today.chapterLength),
-                style: ttcBody(11,
-                    color: Colors.white.withValues(alpha: 0.8),
-                    w: FontWeight.w700)),
+                style: ttcBody(11, color: ttcInk, w: FontWeight.w700)),
           ),
           // The forward link both other stages carry - "View week ›" and
           // "Phase map ›". The Journey Map holds the sentence that answers
@@ -267,16 +257,15 @@ class _Hero extends StatelessWidget {
             behavior: HitTestBehavior.opaque,
             child: Row(mainAxisSize: MainAxisSize.min, children: [
               Text(t.journeyMapLink,
-                  style: ttcBody(11,
-                      color: Colors.white, w: FontWeight.w800)),
+                  style: ttcBody(11, color: ttcInk, w: FontWeight.w800)),
               const SizedBox(width: 3),
               const Icon(Icons.chevron_right_rounded,
-                  size: 15, color: Colors.white),
+                  size: 15, color: ttcInk),
             ]),
           ),
         ]),
         const SizedBox(height: 9),
-        TtcChapterBar(today: today),
+        TtcChapterBar(today: today, onLight: true),
         const SizedBox(height: 18),
 
         // ---------------------------------------------------------------------
@@ -304,32 +293,34 @@ class _Hero extends StatelessWidget {
 
         // Three shortcuts, exactly where pregnancy puts Baby / Mother /
         // What's next. Here the subject is the couple.
-        Container(height: 1, color: Colors.white.withValues(alpha: 0.18)),
+        Container(height: 1, color: ttcInk.withValues(alpha: 0.12)),
         const SizedBox(height: 14),
         Row(children: [
           TtcHeroShortcut(
+              onLight: true,
               icon: Icons.self_improvement_rounded,
               label: t.shortcutMe,
               onTap: () =>
                   openTtcChapter(context, today.chapter, tab: TtcChapterTab.me)),
           TtcHeroShortcut(
+              onLight: true,
               icon: Icons.favorite_rounded,
               label: t.shortcutUs,
               onTap: () =>
                   openTtcChapter(context, today.chapter, tab: TtcChapterTab.us)),
           TtcHeroShortcut(
+              onLight: true,
               icon: Icons.event_available_rounded,
               label: t.shortcutNext,
               onTap: () => openTtcChapter(context, today.chapter,
                   tab: TtcChapterTab.next)),
         ]),
-              ]),
-          ),
-        ]),
-      ),
+      ]),
     );
   }
 
+  // Kept for revert (2026-09-29): the two soft circles' painter.
+  // ignore: unused_element
   static Widget _circle(double size, Color color) => Container(
         width: size,
         height: size,
@@ -457,13 +448,13 @@ class _RhythmCard extends StatelessWidget {
               behavior: HitTestBehavior.opaque,
               child: Row(children: [
                 const Icon(Icons.add_circle_outline_rounded,
-                    size: 17, color: ttcPurple),
+                    size: 17, color: ttcTitleInk),
                 const SizedBox(width: 7),
                 Flexible(
                   child: Text(t.logNewPeriod,
                       overflow: TextOverflow.ellipsis,
                       style:
-                          ttcBody(13, color: ttcPurple, w: FontWeight.w800)),
+                          ttcBody(13, color: ttcTitleInk, w: FontWeight.w800)),
                 ),
               ]),
             ),
@@ -770,7 +761,8 @@ class _InsightCard extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: ttcPanel,
+            // Kept for revert (2026-09-29, no tinted slab behind text): color: ttcPanel,
+            color: Colors.white, border: const Border.fromBorderSide(BorderSide(color: ttcLine)),
             borderRadius: BorderRadius.circular(14),
           ),
           child: Text(insight.takeaway(hi),
@@ -870,7 +862,7 @@ class _RitualCard extends StatelessWidget {
           ),
           Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
             Text('$done/${store.total}',
-                style: ttcJakarta(16, color: ttcPurple)),
+                style: ttcJakarta(16, color: ttcTitleInk)),
             // A streak with no pressure attached: no colour, no warning, and
             // no "you lost it" state anywhere in the product.
             if (streak > 0)
@@ -914,9 +906,9 @@ class _RitualCard extends StatelessWidget {
               height: 22,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: done ? ttcPurple : Colors.transparent,
+                color: done ? ttcTitleInk : Colors.transparent,
                 shape: BoxShape.circle,
-                border: Border.all(color: done ? ttcPurple : ttcBorder, width: 1.6),
+                border: Border.all(color: done ? ttcTitleInk : ttcBorder, width: 1.6),
               ),
               child: done
                   ? const Icon(Icons.check_rounded, size: 13, color: Colors.white)
@@ -982,74 +974,76 @@ class _RitualCard extends StatelessWidget {
 
 // ---- Today's Journal --------------------------------------------------------
 
-class _JournalCard extends StatelessWidget {
-  const _JournalCard({required this.t, required this.chapter});
-  final TtcS t;
-  final TtcChapter chapter;
-
-  @override
-  Widget build(BuildContext context) {
-    final hi = t.hinglish;
-    final prompt = ttcPromptForToday(chapter);
-    final count = TtcJournalStore.instance.count;
-    return TtcCard(
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [
-          Expanded(child: Text(t.myJournal, style: ttcJakarta(17))),
-          GestureDetector(
-            onTap: () => openTtcJournal(context),
-            behavior: HitTestBehavior.opaque,
-            child: Text(count == 0 ? t.seeAll : t.entryCount(count),
-                style: ttcBody(12, color: ttcPurple, w: FontWeight.w800)),
-          ),
-        ]),
-        const SizedBox(height: 12),
-        // Today's prompt, written for this chapter where one exists.
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(13),
-          decoration: BoxDecoration(
-            color: ttcPanel,
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: Text(prompt.text(hi),
-              style: ttcBody(13.5, color: ttcTitleInk, w: FontWeight.w600, h: 1.5)),
-        ),
-        const SizedBox(height: 14),
-        // Four large quick-entries, the same shape as the pregnancy Home's.
-        Row(children: [
-          for (final kind in TtcEntryKind.values) ...[
-            Expanded(
-              child: GestureDetector(
-                onTap: () => writeTtcEntry(context,
-                    kind: kind,
-                    prompt: kind == TtcEntryKind.feeling ? prompt.text(hi) : null),
-                behavior: HitTestBehavior.opaque,
-                child: Column(children: [
-                  Container(
-                    width: 46,
-                    height: 46,
-                    alignment: Alignment.center,
-                    decoration: const BoxDecoration(
-                        color: ttcPanel, shape: BoxShape.circle),
-                    child: Icon(ttcEntryIcon(kind), size: 20, color: ttcPurple),
-                  ),
-                  const SizedBox(height: 7),
-                  Text(kind.label(hi),
-                      textAlign: TextAlign.center,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: ttcBody(10.5, w: FontWeight.w700, h: 1.25)),
-                ]),
-              ),
-            ),
-            if (kind != TtcEntryKind.values.last) const SizedBox(width: 8),
-          ],
-        ]),
-      ]),
-    );
-  }
-}
+// Kept for revert (2026-09-28, journal out of TTC): the user took the journal
+// out of the stage, so this card has no caller. The screen and store stay.
+// class _JournalCard extends StatelessWidget {
+//   const _JournalCard({required this.t, required this.chapter});
+//   final TtcS t;
+//   final TtcChapter chapter;
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     final hi = t.hinglish;
+//     final prompt = ttcPromptForToday(chapter);
+//     final count = TtcJournalStore.instance.count;
+//     return TtcCard(
+//       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+//         Row(children: [
+//           Expanded(child: Text(t.myJournal, style: ttcJakarta(17))),
+//           GestureDetector(
+//             onTap: () => openTtcJournal(context),
+//             behavior: HitTestBehavior.opaque,
+//             child: Text(count == 0 ? t.seeAll : t.entryCount(count),
+//                 style: ttcBody(12, color: ttcPurple, w: FontWeight.w800)),
+//           ),
+//         ]),
+//         const SizedBox(height: 12),
+//         // Today's prompt, written for this chapter where one exists.
+//         Container(
+//           width: double.infinity,
+//           padding: const EdgeInsets.all(13),
+//           decoration: BoxDecoration(
+//             color: ttcPanel,
+//             borderRadius: BorderRadius.circular(14),
+//           ),
+//           child: Text(prompt.text(hi),
+//               style: ttcBody(13.5, color: ttcTitleInk, w: FontWeight.w600, h: 1.5)),
+//         ),
+//         const SizedBox(height: 14),
+//         // Four large quick-entries, the same shape as the pregnancy Home's.
+//         Row(children: [
+//           for (final kind in TtcEntryKind.values) ...[
+//             Expanded(
+//               child: GestureDetector(
+//                 onTap: () => writeTtcEntry(context,
+//                     kind: kind,
+//                     prompt: kind == TtcEntryKind.feeling ? prompt.text(hi) : null),
+//                 behavior: HitTestBehavior.opaque,
+//                 child: Column(children: [
+//                   Container(
+//                     width: 46,
+//                     height: 46,
+//                     alignment: Alignment.center,
+//                     decoration: const BoxDecoration(
+//                         color: ttcPanel, shape: BoxShape.circle),
+//                     child: Icon(ttcEntryIcon(kind), size: 20, color: ttcPurple),
+//                   ),
+//                   const SizedBox(height: 7),
+//                   Text(kind.label(hi),
+//                       textAlign: TextAlign.center,
+//                       maxLines: 2,
+//                       overflow: TextOverflow.ellipsis,
+//                       style: ttcBody(10.5, w: FontWeight.w700, h: 1.25)),
+//                 ]),
+//               ),
+//             ),
+//             if (kind != TtcEntryKind.values.last) const SizedBox(width: 8),
+//           ],
+//         ]),
+//       ]),
+//     );
+//   }
+// }
 
 // ---- Today's Nutrition ------------------------------------------------------
 
@@ -1192,18 +1186,21 @@ class _JournalCard extends StatelessWidget {
 
 // ---- shared icon maps -------------------------------------------------------
 
-IconData ttcEntryIcon(TtcEntryKind kind) {
-  switch (kind) {
-    case TtcEntryKind.memory:
-      return Icons.auto_stories_outlined;
-    case TtcEntryKind.letter:
-      return Icons.drafts_outlined;
-    case TtcEntryKind.question:
-      return Icons.help_outline_rounded;
-    case TtcEntryKind.feeling:
-      return Icons.favorite_border_rounded;
-  }
-}
+// Kept for revert (2026-09-28, the user: no journal in trying to conceive).
+// The journal's kinds are commented out with its store, and this map's only
+// readers were the journal's own page and writer.
+// IconData ttcEntryIcon(TtcEntryKind kind) {
+//   switch (kind) {
+//     case TtcEntryKind.memory:
+//       return Icons.auto_stories_outlined;
+//     case TtcEntryKind.letter:
+//       return Icons.drafts_outlined;
+//     case TtcEntryKind.question:
+//       return Icons.help_outline_rounded;
+//     case TtcEntryKind.feeling:
+//       return Icons.favorite_border_rounded;
+//   }
+// }
 
 IconData ttcMovementIcon(String kind) {
   switch (kind) {
@@ -1256,7 +1253,8 @@ class _TodayList extends StatelessWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.all(15),
                 decoration: BoxDecoration(
-                  color: ttcPanel,
+                  // Kept for revert (2026-09-29, no tinted slab behind text): color: ttcPanel,
+                  color: Colors.white, border: const Border.fromBorderSide(BorderSide(color: ttcLine)),
                   borderRadius: BorderRadius.circular(ttcCardRadius),
                 ),
                 child: Text(myth.truth(hi),
@@ -1280,7 +1278,8 @@ class _TodayList extends StatelessWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.all(15),
                 decoration: BoxDecoration(
-                  color: ttcCautionCard,
+                  // Kept for revert (2026-09-29, no tinted slab behind text): color: ttcCautionCard,
+                  color: Colors.white, border: const Border.fromBorderSide(BorderSide(color: ttcLine)),
                   borderRadius: BorderRadius.circular(ttcCardRadius),
                 ),
                 child: Text(n.indian(hi),

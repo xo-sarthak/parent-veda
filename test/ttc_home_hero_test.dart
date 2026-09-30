@@ -179,12 +179,15 @@ void main() {
 
     testWidgets('it offers a way to understand itself', (tester) async {
       await pumpToday(tester);
-      expect(find.text('Understand this'), findsOneWidget);
+      // Kept for revert (2026-09-28, explicit labels):
+      //   expect(find.text('Understand this'), findsOneWidget);
+      expect(find.text('Understand your cycle'), findsOneWidget);
     });
 
     testWidgets('which opens the Cycle Companion', (tester) async {
       await pumpToday(tester);
-      await tester.tap(find.text('Understand this'));
+      // Kept for revert: await tester.tap(find.text('Understand this'));
+      await tester.tap(find.text('Understand your cycle'));
       await tester.pumpAndSettle();
       expect(find.byType(TtcCycleScreen), findsOneWidget);
     });

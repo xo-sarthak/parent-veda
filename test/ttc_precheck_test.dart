@@ -89,6 +89,12 @@ void main() {
       expect(precheckAutoDone(item, c), isFalse,
           reason: 'a matching string is not a conversation with a pharmacist');
       expect(precheckEvidenceFor(item, c), isNotNull);
+      // ⚠️ 2026-09-29 (launch sanity D12): the item IS shown done now, by a
+      // separate and narrower path, `precheckDerivedDone`: folic acid on her
+      // own list is her saying she takes it. The dose conversation stays
+      // open (the evidence line, and the "talked to my doctor" flag). Held
+      // in test/ttc_precheck_rebuild_test.dart.
+      expect(precheckDerivedDone(item, c), isTrue);
     });
 
     test('logged cycles do complete cycle tracking', () {

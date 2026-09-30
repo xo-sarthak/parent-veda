@@ -151,6 +151,7 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
   // `ttc_focus_page_test.dart` asserts against the data.
   headline: TtcMasterclassTile(
     title: 'Getting ready to conceive',
+    id: 'ttc_tile_getting_ready_to_conceive',
     blurb: 'A short course on the months before you start, with a doctor.',
     offeringId: 'ttc_course_basics',
   ),
@@ -182,6 +183,7 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
         // ),
         TtcArticleTile(
           title: 'What to eat and avoid',
+          id: 'ttc_tile_what_to_eat_and_avoid',
           blurb: 'Ordinary food. No special fertility diet.',
           readId: 'ttc_read_three_months_before',
           atHeading: 'What should I eat?',
@@ -227,7 +229,8 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
     ),
 
     TtcFocusSection(
-      heading: 'Supplements',
+      // Kept for revert (2026-09-28, explicit names): heading: 'Supplements',
+      heading: 'Which supplements, and when?',
       group: 'diet',
       tiles: [
         // ⚠️ TWO CARDS, NOT THREE — CORRECTED 2026-09-03, SAME DAY IT SHIPPED.
@@ -253,7 +256,9 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
         // asking "how early" would actually look for it. It also still sits on
         // the fertile-window door, which references the same id.
         TtcArticleTile(
-          title: 'When to start what, and how early',
+          // Kept for revert (2026-09-28, explicit names): title: 'When to start what, and how early',
+          title: 'When to start each supplement',
+          id: 'ttc_tile_when_to_start_each_supplement',
           blurb: 'Folic acid works best when it starts before a test turns '
               'positive. Almost nothing else has a deadline like that.',
           readId: 'ttc_read_supplement_timing',
@@ -282,6 +287,7 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
         // was built in the same session and this tile pointed at none of it.
         TtcProductTile.shelf(
           title: 'Folic acid and preconception supplements',
+          id: 'ttc_tile_folic_acid_and_preconception_supplements',
           blurb: "What's worth buying, and what we'd gently talk you out "
               'of.',
           category: 'supplements',
@@ -310,16 +316,20 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
       tiles: [
         TtcArticleTile(
           title: 'A week of Indian meals for trying',
+          id: 'ttc_tile_a_week_of_indian_meals_for_trying',
           blurb: 'Seven days of home food, with eggless and Jain swaps.',
           readId: 'ttc_read_meal_plan_week',
         ),
         TtcArticleTile(
           title: 'Ten everyday recipes',
+          id: 'ttc_tile_ten_everyday_recipes',
           blurb: 'Home dishes under 40 minutes that add iron, folate or protein.',
           readId: 'ttc_read_everyday_recipes',
         ),
         TtcToolTile(
-          title: 'Plan your own week',
+          // Kept for revert (2026-09-28, explicit names): title: 'Plan your own week',
+          title: 'Plan your own week of meals',
+          id: 'ttc_tile_plan_your_own_week',
           blurb: 'Pick meals from an Indian kitchen and see what each one does.',
           surfaceId: 'ttc_nutrition',
         ),
@@ -332,16 +342,19 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
       tiles: [
         TtcArticleTile(
           title: 'Iron before pregnancy',
+          id: 'ttc_tile_iron_before_pregnancy',
           blurb: 'Indian foods that help, and the tea timing that matters.',
           readId: 'ttc_read_iron_before_pregnancy',
         ),
         TtcArticleTile(
           title: 'Omega-3 without fish',
+          id: 'ttc_tile_omega_3_without_fish',
           blurb: 'Where a vegetarian kitchen finds it.',
           readId: 'ttc_read_omega3_without_fish',
         ),
         TtcArticleTile(
           title: 'Ask a dietitian: ten questions',
+          id: 'ttc_tile_ask_a_dietitian_ten_questions',
           blurb: 'The food questions people ask most, answered plainly.',
           readId: 'ttc_read_ask_dietitian',
         ),
@@ -352,11 +365,13 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
     //  2 — Tests and vaccines
     // =========================================================================
     TtcFocusSection(
-      heading: 'What to check first',
+      // Kept for revert (2026-09-28, explicit names): heading: 'What to check first',
+      heading: 'Which tests and vaccines come first?',
       group: 'tests',
       tiles: [
         TtcArticleTile(
           title: 'Tests and vaccines worth doing first',
+          id: 'ttc_tile_tests_and_vaccines_worth_doing_first',
           blurb: 'A short list to take to a doctor, and why each one is on '
               'it.',
           readId: 'ttc_read_preconception_tests',
@@ -374,6 +389,7 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
         // is the only difference, which is the entire point of it.
         TtcGuideTile(
           title: 'The carrier screening that matters in India',
+          id: 'ttc_tile_the_carrier_screening_that_matters_in_india',
           blurb: 'One cheap blood test, done once. Most Western advice '
               'for before pregnancy never mentions it, but it matters here '
               'more than almost anywhere.',
@@ -398,17 +414,20 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
     ),
 
     TtcFocusSection(
-      heading: 'Sort it out',
+      // Kept for revert (2026-09-28, explicit names): heading: 'Sort it out',
+      heading: 'Sort out your tests and vaccines',
       group: 'tests',
       tiles: [
         TtcToolTile(
           title: 'Check your vaccinations',
+          id: 'ttc_tile_check_your_vaccinations',
           blurb: 'Which ones matter before pregnancy, and which need doing '
               'a month ahead.',
           surfaceId: 'ttc_vaccinations',
         ),
         TtcToolTile(
           title: 'The full test library',
+          id: 'ttc_tile_the_full_test_library',
           blurb: "Every test, what it's for, when in your cycle to do it, "
               'and a real Indian price range.',
           surfaceId: 'ttc_tests',
@@ -426,7 +445,8 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
     //  3 — Weight and habits
     // =========================================================================
     TtcFocusSection(
-      heading: 'Weight, kindly',
+      // Kept for revert (2026-09-28, explicit names): heading: 'Weight, kindly',
+      heading: 'Does weight matter before pregnancy?',
       group: 'habits',
       tiles: [
         // ⚠️ NO NUMBER APPEARS IN THIS ARTICLE, ANYWHERE, and the brief asks
@@ -437,6 +457,7 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
         // `ttc_bmi` surface.
         TtcArticleTile(
           title: 'Weight before pregnancy, said kindly',
+          id: 'ttc_tile_weight_before_pregnancy_said_kindly',
           blurb: 'What weight really does, why the direction matters more '
               'than a goal, and no numbers at all.',
           readId: 'ttc_read_weight_kindly',
@@ -445,7 +466,8 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
     ),
 
     TtcFocusSection(
-      heading: 'Everyday habits',
+      // Kept for revert (2026-09-28, explicit names): heading: 'Everyday habits',
+      heading: 'Which habits are worth changing?',
       group: 'habits',
       tiles: [
         // ⚠️ THE TWELFTH FORMAT EARNS ITS KEEP HERE. Sleep and movement are
@@ -453,6 +475,7 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
         // `TtcDoTile`.
         TtcDoTile(
           title: 'Habits worth building now',
+          id: 'ttc_tile_habits_worth_building_now',
           blurb: 'Sleep, movement, alcohol and tobacco. These four have the '
               'clearest evidence behind them.',
           surfaceId: 'ttc_precheck/lifestyle',
@@ -463,7 +486,9 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
         // building now" is the practice, and this is the instrument you record
         // it with. Two rows, two formats, and the brief had them right.
         TtcToolTile(
-          title: "Track what you're working on",
+          // Kept for revert (2026-09-28, explicit names): title: "Track what you're working on",
+          title: 'Your habit trackers',
+          id: 'ttc_tile_track_what_you_re_working_on',
           blurb: "The four habit trackers in one place. It's a record, not a "
               'report card: no streaks and no score.',
           surfaceId: 'ttc_habits',
@@ -472,6 +497,7 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
         // audit).
         TtcArticleTile(
           title: 'What to cut before trying',
+          id: 'ttc_tile_what_to_cut_before_trying',
           blurb: 'Three things worth changing, and a longer list you can stop '
               'feeling guilty about.',
           readId: 'ttc_read_what_to_cut',
@@ -490,7 +516,8 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
     //  4 — Before you start
     // =========================================================================
     TtcFocusSection(
-      heading: 'Before you start',
+      // Kept for revert (2026-09-28, explicit names): heading: 'Before you start',
+      heading: 'What to sort out before you start trying',
       group: 'habits', // D11 (2026-09-28). Kept for revert: 'before'
       tiles: [
         // Moved here from "Eating before you try" (2026-09-27, relevance
@@ -498,12 +525,14 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
         // still says, early, that this is for both of you.
         TtcArticleTile(
           title: 'The three months before',
+          id: 'ttc_tile_the_three_months_before',
           blurb: "What's worth changing in the months before you start, and "
               "why it's for both of you, not just you.",
           readId: 'ttc_read_three_months_before',
         ),
         TtcArticleTile(
           title: 'Coming off birth control',
+          id: 'ttc_tile_coming_off_birth_control',
           blurb: 'What comes back quickly, what really takes months, and why '
               '"let it clear out of your system" costs people time.',
           readId: 'ttc_read_coming_off_birth_control',
@@ -514,13 +543,16 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
         // meant, and the most avoidable harm in this whole area.
         TtcArticleTile(
           title: 'Medicines and conditions to check with a doctor',
+          id: 'ttc_tile_medicines_and_conditions_to_check_with_a_doctor',
           blurb: 'Never stop a prescribed medicine to get ready. What to ask '
               'instead, and how far ahead.',
           readId: 'ttc_read_meds_and_conditions',
         ),
         // ⚠️ REFERENCED, NOT COPIED — Step 5c again. His side owns this.
         TtcArticleTile(
-          title: 'His part',
+          // Kept for revert (2026-09-28, explicit names): title: 'His part',
+          title: 'His half of getting ready',
+          id: 'ttc_tile_his_half_of_getting_ready',
           blurb: 'Whose "side" it really is, and the half of this that '
               'depends on him.',
           readId: 'ttc_read_whose_side',
@@ -532,21 +564,25 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
     // rows under the first, so "Before you start" stays about what to stop,
     // keep and ask, and this one is the visit and the practical side.
     TtcFocusSection(
-      heading: 'What is worth asking early?',
+      // Kept for revert (2026-09-28, explicit names): heading: 'What is worth asking early?',
+      heading: 'What is worth asking a doctor early?',
       group: 'habits', // D11 (2026-09-28). Kept for revert: 'before'
       tiles: [
         TtcArticleTile(
           title: 'Your first gynaecologist visit',
+          id: 'ttc_tile_your_first_gynaecologist_visit',
           blurb: 'What to take along, and the questions that make it count.',
           readId: 'ttc_read_first_gyn_visit',
         ),
         TtcArticleTile(
           title: 'Can a past abortion affect trying now?',
+          id: 'ttc_tile_can_a_past_abortion_affect_trying_now',
           blurb: 'What the evidence says, and the few things worth checking.',
           readId: 'ttc_read_after_abortion',
         ),
         TtcArticleTile(
           title: 'Money before a baby',
+          id: 'ttc_tile_money_before_a_baby',
           blurb: 'Insurance waiting periods, leave and help, written for India.',
           readId: 'ttc_read_money_before_baby',
         ),
@@ -568,6 +604,7 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
         // "Talk" offers a conversation where "Booking" offers a calendar slot.
         TtcChecklistTile(
           title: 'Your pre-pregnancy checklist',
+          id: 'ttc_tile_your_pre_pregnancy_checklist',
           blurb: "What's done, what's still worth talking about, and your "
               'next three things. Go at your own pace.',
           surfaceId: 'ttc_precheck',
@@ -590,13 +627,18 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
         //   action: kTtcActConsult,
         // ),
         TtcTalkTile(
-          title: 'Talk to someone before you start',
+          // Kept for revert (2026-09-28, explicit names): title: 'Talk to someone before you start',
+          // Not "Talk to a ...": the nutritionist card beside it opens on
+          // the same three words (ttc_focus_page_test).
+          title: 'See a gynaecologist before you start',
+          id: 'ttc_tile_talk_to_someone_before_you_start',
           blurb: 'A gynaecologist who sees people before pregnancy, for the '
               'questions that are yours.',
           action: 'ttc_consult_gynae',
         ),
         TtcTalkTile(
           title: 'Talk to a nutritionist',
+          id: 'ttc_tile_talk_to_a_nutritionist',
           blurb: 'A food plan for both of you, from what you already cook.',
           action: 'ttc_nutrition_consult',
         ),

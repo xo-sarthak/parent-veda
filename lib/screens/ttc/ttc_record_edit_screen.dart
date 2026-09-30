@@ -398,7 +398,8 @@ class _TtcRecordEditScreenState extends State<TtcRecordEditScreen> {
 
             // 3. The name, the thing that groups repeats together.
             TtcRecordBlock(
-              title: 'What test was it?',
+              // Kept for revert (2026-09-28): 'What test was it?'
+              title: 'Which test is this result for?',
               note: 'Pick a name from the list if it shows, so a second '
                   'reading sits next to the first.',
               child: Column(
@@ -462,7 +463,8 @@ class _TtcRecordEditScreenState extends State<TtcRecordEditScreen> {
 
             // 6. A doctor's words, if any.
             TtcRecordBlock(
-              title: 'Anything written on it',
+              // Kept for revert (2026-09-28): 'Anything written on it'
+              title: 'Anything written on the report',
               note: 'Optional. A line from the doctor, word for word.',
               child: TtcRecordField(
                   controller: _note,
@@ -489,12 +491,14 @@ class _TtcRecordEditScreenState extends State<TtcRecordEditScreen> {
                   key: const ValueKey('ttc_rec_remove'),
                   onPressed: _remove,
                   icon: const Icon(Icons.delete_outline_rounded,
-                      size: 17, color: Color(0xFFB42318)),
+                      // One danger red, DESIGN-SYSTEM §4.0 (2026-09-29). Kept for revert: Color(0xFFB42318)
+                      size: 17, color: Color(0xFFB3261E)),
                   label: Text('Remove this result',
                       style: pvManrope(
                           fontSize: 13.5,
                           fontWeight: FontWeight.w800,
-                          color: const Color(0xFFB42318))),
+                          // One danger red, DESIGN-SYSTEM §4.0 (2026-09-29). Kept for revert: Color(0xFFB42318)
+                          color: const Color(0xFFB3261E))),
                 ),
               ),
             ],
@@ -663,7 +667,8 @@ class TtcRecordDateField extends StatelessWidget {
                     : ttcRecordDate(taken),
                 style: ttcBody(14, color: ttcTitleInk, w: FontWeight.w700)),
           ),
-          Text('Change',
+          // Kept for revert (2026-09-28): 'Change'
+          Text('Change date',
               style: ttcBody(12.5, color: ttcSoft, w: FontWeight.w800)),
         ]),
       ),

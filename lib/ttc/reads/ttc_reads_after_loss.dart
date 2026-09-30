@@ -311,7 +311,8 @@ final List<PvRead> kTtcReadsAfterLoss = [
       // bracket. The one layer it actively wants is a person.
       PvReadNextStep(
         kind: PvNextKind.read,
-        title: _en('On trying again'),
+        // Kept for revert (2026-09-28, explicit names): title: _en('On trying again'),
+        title: _en('When to try again, and who decides'),
         value: _en("When it's safe, what the evidence says about waiting, and "
             'who decides.'),
         surfaceId: 'ttc_read/ttc_read_trying_again',
@@ -326,7 +327,12 @@ final List<PvRead> kTtcReadsAfterLoss = [
       // ),
     ],
 
-    readNext: ['ttc_read_trying_again', 'ttc_read_miscarriage_causes'],
+    // ⚠️ ONE READ, ONCE, AT THE FOOT (2026-09-28, no repetition):
+    // 'ttc_read_trying_again' is the next step "On trying again",
+    // so the Read next rail no longer lists it a second time.
+    // Kept for revert:
+    // readNext: ['ttc_read_trying_again', 'ttc_read_miscarriage_causes'],
+    readNext: ['ttc_read_miscarriage_causes'],
   ),
 
 
@@ -607,7 +613,8 @@ final List<PvRead> kTtcReadsAfterLoss = [
       // carries no price in its blurb.
       PvReadNextStep(
         kind: PvNextKind.consult,
-        title: _en('Talk to someone who helps with this'),
+        // Kept for revert (2026-09-28, explicit names): title: _en('Talk to someone who helps with this'),
+        title: _en('Talk to someone about your loss'),
         value: _en('A counsellor who works with pregnancy loss, or a doctor '
             'who can look at what happened. At your own pace.'),
         surfaceId: 'ttc_prepare',

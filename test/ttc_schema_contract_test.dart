@@ -61,6 +61,14 @@ const Map<String, List<String>> written = {
   'ttc_appointments': [
     'id', 'user_id', 'title', 'with_whom', 'starts_utc', 'note',
   ],
+  // 0092, 2026-09-28: the questions for the doctor left the journal for a
+  // table of their own (TtcDoctorQuestionsStore.pushToCloud).
+  // Kept for revert (2026-09-28): without the visit and the tick.
+  //   'id', 'user_id', 'body', 'written_at', 'updated_at', 'removed_at',
+  TtcTables.doctorQuestions: [
+    'id', 'user_id', 'body', 'written_at', 'updated_at', 'removed_at',
+    'appointment_id', 'asked_at',
+  ],
 };
 
 /// The column each read orders by. A missing one is a runtime error from
@@ -77,6 +85,7 @@ const Map<String, String> orderedBy = {
   TtcTables.timeline: 'happened_on',
   'ttc_records': 'taken_on',
   'ttc_appointments': 'starts_utc',
+  TtcTables.doctorQuestions: 'written_at',
 };
 
 /// The upsert conflict target for each table. Every one of these must be a
@@ -93,12 +102,15 @@ const Map<String, String> conflictTarget = {
   TtcTables.timeline: 'id',
   'ttc_records': 'id',
   'ttc_appointments': 'id',
+  TtcTables.doctorQuestions: 'id',
 };
 
 void main() {
   final sql = [
     File('supabase/migrations/0041_ttc.sql').readAsStringSync(),
     File('supabase/migrations/0042_ttc_records.sql').readAsStringSync(),
+    File('supabase/migrations/0092_ttc_doctor_questions.sql')
+        .readAsStringSync(),
   ].join('\n');
 
   /// The body of one `create table public.<name> ( ... )` block.
@@ -120,7 +132,8 @@ void main() {
   }
 
   group('every table the client uses exists', () {
-    test('all eleven', () {
+    // Kept for revert (2026-09-28): 'all eleven'. Twelve with 0092.
+    test('all twelve', () {
       for (final table in written.keys) {
         expect(sql.contains('create table if not exists public.$table'), isTrue,
             reason: 'the client writes to $table, which no migration creates');
@@ -226,8 +239,70 @@ void main() {
       expect(sql.contains('author_id = auth.uid()'), isTrue);
     });
 
+    test('questions for the doctor: the couple reads, only the owner writes',
+        () {
+      // docs/FAMILY-MODEL.md: the person owns what she writes; her partner
+      // may read, never write. So only the READ policy names the partner.
+      String policy(String name) {
+        final start = sql.indexOf('create policy $name');
+        expect(start, greaterThan(-1), reason: 'no policy $name');
+        return sql.substring(start, sql.indexOf(';', start));
+      }
+
+      expect(policy('ttc_doctor_questions_read'), contains('my_partner_id'));
+      for (final name in [
+        'ttc_doctor_questions_insert',
+        'ttc_doctor_questions_update',
+        'ttc_doctor_questions_delete',
+      ]) {
+        expect(policy(name), isNot(contains('my_partner_id')), reason: name);
+        expect(policy(name), contains('auth.uid() = user_id'), reason: name);
+      }
+      expect(
+          sql.contains(
+              'alter table public.ttc_doctor_questions enable row level security'),
+          isTrue);
+    });
+
+    test('the move from the journal is safe to run twice', () {
+      // The backfill keeps each question's id, so it meets the phone's own
+      // moved copy as one row, and a second run inserts nothing.
+      final at = sql.indexOf('insert into public.ttc_doctor_questions');
+      expect(at, greaterThan(-1));
+      final stmt = sql.substring(at, sql.indexOf(';', at));
+      expect(stmt, contains("where kind = 'question'"));
+      expect(stmt, contains('on conflict (id) do nothing'));
+    });
+
+    test('a question names its visit and its tick, both optional (0092)', () {
+      final body = tableBody(TtcTables.doctorQuestions);
+      final visit = RegExp(r'^\s*appointment_id\s+text\s*,', multiLine: true);
+      final asked = RegExp(r'^\s*asked_at\s+timestamptz\s*,', multiLine: true);
+      expect(visit.hasMatch(body), isTrue,
+          reason: 'appointment_id is nullable text: null is "the next visit"');
+      expect(asked.hasMatch(body), isTrue,
+          reason: 'asked_at is a nullable timestamp: null is "still to ask"');
+      // No foreign key: it may name a booking, and a deleted visit must not
+      // rewrite the question (its unticked questions roll forward, derived).
+      final line = body
+          .split('\n')
+          .firstWhere((l) => l.trim().startsWith('appointment_id'));
+      expect(line, isNot(contains('references')));
+      // The policies did not change with the columns: still owner-only
+      // writes and a couple read.
+      expect(sql, contains('add column if not exists appointment_id text'));
+      expect(sql, contains('add column if not exists asked_at timestamptz'));
+    });
+
     test('the timeline stays append-only', () {
-      expect(sql.contains('for update'), isFalse);
+      // Kept for revert (2026-09-28): expect(sql.contains('for update'),
+      // isFalse). 0092 has an own-row UPDATE policy of its own, which is
+      // right for an edited question, so the check now looks only at the
+      // timeline's policies.
+      expect(
+          RegExp(r'on public\.journey_timeline\s+for update')
+              .hasMatch(sql),
+          isFalse);
       expect(
           sql.contains(
               'grant select, insert, delete on public.journey_timeline'),

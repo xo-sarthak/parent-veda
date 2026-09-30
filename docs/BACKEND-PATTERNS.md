@@ -2270,7 +2270,90 @@ by default. If a deletion must survive a merge, it has to be written down as a r
 column, a soft-delete flag) and kept until every copy has seen it. Replicated databases (Cassandra, CouchDB, CRDT
 sets) all do this for the same reason, and `saved_items.removed_at` (16d) is the server-side version of it here.
 
-## 16r. What goes in an id decides what "the same message" means — `PregMessagesStore`
+## 16r. A feature that borrows another feature's table dies with it — questions for the doctor (`TtcDoctorQuestionsStore`, 0092)
+
+**The situation.** The Appointments page keeps the questions she wants to ask her doctor. When it was built, the
+TTC journal already had a free-text store with an author, cloud sync and a `kind` column, so a question became a
+journal entry of kind `question`, written through the journal's writer. It was quick, and it worked. On 2026-09-28
+the user took the journal out of Trying to Conceive entirely — and asked for the questions to stay: "they are not
+part of the journal. Because journal does not exist now."
+
+**The mechanism.** Reuse had made the two features one feature in storage. Commenting the journal out would have
+stopped its store loading, which stops its cache being read, which empties the Appointments list — her questions
+gone, with no code on the Appointments side having changed. That is *coupling*: two things that change for
+different reasons sharing one piece of state, so a change to one breaks the other. The warning sign was already in
+the code: a filter (`doctorQuestions => ofKind(question)`) standing in for a table of their own, and a writer that
+had to hide its own "what kind is this?" choice when opened from Appointments.
+
+**What we did.** A store and a table of their own: `lib/ttc/ttc_doctor_questions_store.dart` and
+`ttc_doctor_questions` (0092), with its own writer page. The house pattern, unchanged: a singleton `ChangeNotifier`,
+local-first in `shared_preferences`, app-generated ids, fire-and-forget upserts through `SupabaseRepo`. Two choices
+worth naming:
+
+- **Deletes are a column, not a missing row.** Removing a question stamps `removed_at` and moves `updated_at`; Undo
+  clears the stamp and moves the clock again. The merge is "newer `updated_at` wins". So the removal is just one more
+  upsert — it cannot lose a race with a push already in flight (the bug in 16q), and there is no second tombstone
+  list to persist beside the rows. The cost: removed rows stay in the table and on the phone, a few bytes each.
+- **The couple reads, only the owner writes.** `docs/FAMILY-MODEL.md`: the person owns what she writes. The RLS has
+  one read policy that names `my_partner_id()` and three write policies that do not, which is why the table needs no
+  `author_id`: the owner *is* the author. (0042's couple tables let either partner write, which is right for a
+  shared appointment and wrong for her words.)
+
+**The one-time move, and why it needs a flag.** Her existing questions live in the old journal cache. On its first
+load the new store reads that cache (`ttc_journal`), copies the entries of kind `question` with their **same ids,
+words and dates**, and sets `ttc_doctor_questions_from_journal_v1` in `shared_preferences`. The flag is what makes
+it *one-time*: without it, every launch would re-copy, and a question she had since deleted would come back. The
+same ids are the second guard — the move skips any id already present, so even a lost flag cannot make a
+duplicate — and they are what let the cloud half meet the phone half: 0092 ends with an
+`insert … select … from ttc_journal where kind = 'question' on conflict (id) do nothing`, so the server-side copy
+and the phone's copy of the same question are one row, and the migration is safe to run twice. The old cache and
+the old table are only *read*: the journal was commented out, not wiped.
+
+**The trade-off, both sides.** A new table costs a migration, a contract test, an RLS shape to get right and a
+second sync to keep alive; reuse cost none of that on day one. What the table buys is that each feature can now be
+changed, hidden or deleted without asking the other's permission. The general rule: **reuse storage when two
+features mean the same thing by it, not when they merely have the same shape.** A journal entry and a question
+for a doctor were both "some text with a date", and that was the whole of what they shared.
+
+**Until 0092 is run** the new table does not exist, so every cloud write fails silently (fire-and-forget) and the
+questions live on the phone only, exactly as a logged-out user's would. Nothing on screen changes either way.
+
+### A question belongs to a visit — store the choice, derive the move (2026-09-28)
+
+Until this change a question showed on every coming visit until she deleted it. Now a question belongs to one visit
+and is ticked when asked; unticked ones roll forward to the next visit. 0092 was not yet run, so it was changed in
+place: two nullable columns, **`appointment_id text`** (the visit she chose; null means "whichever visit comes
+next") and **`asked_at timestamptz`** (when she ticked it; null means still to ask). The RLS did not change.
+
+**What is stored is only what she decided.** Which visit an *unticked* question is on today is never written
+anywhere. `TtcDoctorQuestionsStore.visitFor(q, now:)` works it out every time: her chosen visit while that visit's
+day lasts, otherwise the first visit whose day has not passed. One rule covers every case — a visit that simply
+happened, a visit moved into the past, a visit deleted — and Undo of a deleted visit needs no code at all, because
+the question never stopped naming it.
+
+**Why derive, not store.** A stored roll-forward is a write nobody made. It needs something to run at midnight (a
+phone has no reliable scheduler), it must be redone whenever a visit moves, is deleted or is restored, and two
+phones must agree on when it happened or the couple see the question on different visits. The derived answer has
+none of that: it is a pure function of two things that already sync (the question's choice and the visits' dates).
+The cost is a little computation on every read — a few dozen rows against a handful of visits — and one subtlety:
+the answer depends on *when you ask*. That is a feature. The evening-before reminder asks "as of 7 pm tomorrow"
+(`openCountFor(id, now: reminderAt)`), so Wednesday's reminder already counts the questions Monday's visit will
+hand it on Tuesday morning. The general rule: **store decisions, derive consequences** — the same reason a bank
+stores transactions and computes the balance.
+
+**No foreign key on `appointment_id`, on purpose.** It can name a `ttc_appointments` row or a booking
+(`booking:<id>`), and the natural key would be `on delete set null` — which rewrites her question the moment a visit
+is deleted, so undoing the delete could not put it back. A dangling id is harmless here: the derivation treats a
+missing visit as passed.
+
+**The two answers she gives are writes.** "Done" (under "Did you get your answers?") stamps `asked_at` on her
+remaining questions for that visit; "Keep for the next visit" clears `appointment_id`. Both are Undo-able by
+writing the old values back with a fresh `updated_at`, the same newest-wins merge as everything else in this table.
+
+**Couple view, own writes, unchanged.** Both see both lists (labelled "Yours" and "His"/"Hers"); only the author
+can tick, move or edit, which is exactly what the own-row UPDATE policy already enforces.
+
+## 16s. What goes in an id decides what "the same message" means — `PregMessagesStore`
 
 **The situation.** Pregnancy now speaks first too (2026-09-30): a note the morning each week starts, and six
 moments (the NT and anomaly scan windows, Tdap, movements, the hospital bag, "Has your baby arrived?"). It uses the

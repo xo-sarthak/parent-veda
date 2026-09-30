@@ -257,7 +257,8 @@ void main() {
       await _pump(tester, const TtcIvfReadinessScreen());
       await _tap(tester, find.text('Yes, it was normal'));
       await _tap(tester, find.byKey(const ValueKey('ttc_ivf_see')));
-      expect(find.text('What this adds up to.'), findsOneWidget);
+      // Change 5 (2026-09-28). Was: find.text('What this adds up to.')
+      expect(find.text('What your answers add up to.'), findsOneWidget);
       expect(find.byKey(const ValueKey('ttc_ivf_change')), findsOneWidget);
 
       await _pump(tester, const TtcIvfReadinessScreen());
@@ -327,7 +328,11 @@ void main() {
     testWidgets('inside an item, the chosen answer taps off again',
         (tester) async {
       await _pump(tester, const TtcPrecheckScreen());
-      await _tap(tester, find.text('Folic acid'));
+      // By its row's key (2026-09-29): "Folic acid" is also the first of
+      // "Your next 3 steps" at the top of the list now. Kept for revert:
+      // await _tap(tester, find.text('Folic acid'));
+      await _tap(
+          tester, find.byKey(const ValueKey('ttc_precheck_folate_open')));
       final c = PrecheckContext.gather();
       // The item's own answer block, not the row's status label.
       final needToDo = find.descendant(
@@ -354,17 +359,27 @@ void main() {
       await s.setStatus('vaccines', PrecheckStatus.notRelevant);
       await s.setStatus('tobacco', PrecheckStatus.needsAttention);
       await _pump(tester, const TtcPrecheckScreen());
-      await _tap(tester, find.byKey(const ValueKey('ttc_precheck_next_steps')));
+      // ⚠️ THE THREE STEPS HEAD THE LIST NOW (2026-09-29), and a step opens
+      // its item in place. Kept for revert, when they lived on the summary:
+      // await _tap(tester, find.byKey(const ValueKey('ttc_precheck_next_steps')));
+      // expect(find.text('Your next 3 steps'), findsOneWidget);
+      // await _tap(tester, find.text('You marked this to come back to.'));
+      // expect(find.text('Your next 3 steps'), findsNothing,
+      //     reason: 'back on the list, not a dead tap');
+      // expect(find.text('Tobacco'), findsOneWidget);
       expect(find.text('Your next 3 steps'), findsOneWidget);
+      expect(find.text('WHERE YOU ARE'), findsNothing);
       // The step card for tobacco: the only one she marked to come back to.
-      await _tap(tester, find.text('You marked this to come back to.'));
-      // (The list's hero has scrolled away and been recycled by the time the
-      // item is in view, so the summary's absence is what is asserted.)
-      expect(find.text('Your next 3 steps'), findsNothing,
-          reason: 'back on the list, not a dead tap');
-      expect(find.text('Tobacco'), findsOneWidget);
+      await _tap(tester,
+          find.byKey(const ValueKey('ttc_precheck_step_tobacco')));
       expect(find.text('WHERE YOU ARE'), findsOneWidget,
           reason: 'with the tobacco item open');
+      // Its answer block for "Need to do" is the chosen one.
+      expect(
+          find.descendant(
+              of: find.byType(TtcToolOptions),
+              matching: find.text('Need to do')),
+          findsOneWidget);
     });
   });
 

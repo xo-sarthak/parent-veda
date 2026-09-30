@@ -80,14 +80,14 @@ match (pregnancy uses `Icons.grid_view_outlined`, the four squares in the screen
 
 - `AppNav.journeyTab` (`lib/services/app_nav.dart`) is 1, which is Journey in the partner's bar and now Learn in hers.
   Going to tab 1 snaps the selected week to this week; harmless on Learn, but the constant's name is now half true.
-- `UsageSurface` (`lib/services/usage_events.dart`) has no `more`; pregnancy logs More as `prepare` (STILL-OPEN §80.7).
+- `UsageSurface` (`lib/services/usage_events.dart`) has no `more`; pregnancy logs More as `prepare` (STILL-OPEN §81.7).
 
 ## 8. One inbox for both stages
 
 **Pregnancy has (2026-09-30):** its own messages, computed from her due date (`lib/services/preg_messages_store.dart`),
 with its own inbox (`lib/screens/pregnancy/preg_messages_screen.dart`, reached from More › Your journey › Messages)
 and its switches in Reminders. The store follows `TtcMessagesStore` line for line where it can; the one designed
-difference (what the id carries) is BACKEND-PATTERNS §16r.
+difference (what the id carries) is BACKEND-PATTERNS §16s.
 
 **What the gap analysis asked for:** "Reuse the trying-to-conceive inbox for pregnancy, so every computed message is
 also kept there. One ParentVeda: the same inbox in both stages." That means touching `TtcMessagesStore` and

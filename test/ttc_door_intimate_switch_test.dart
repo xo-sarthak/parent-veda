@@ -285,11 +285,11 @@ void main() {
       // 'his' sits after 'sex' on the rail. By index, hiding 'sex' would slide
       // the next tab under her finger; by id, she stays where she was.
       await pumpDoor(tester, initialGroup: 'his');
-      expect(find.text('What he should do'), findsOneWidget);
+      expect(find.text('What can he do for his fertility?'), findsOneWidget);
 
       await TtcContentPrefs.instance.setHideIntimate(true);
       await tester.pump(const Duration(milliseconds: 300));
-      expect(find.text('What he should do'), findsOneWidget);
+      expect(find.text('What can he do for his fertility?'), findsOneWidget);
     });
 
     testWidgets('a door opened on the hidden tab lands on the first one', (

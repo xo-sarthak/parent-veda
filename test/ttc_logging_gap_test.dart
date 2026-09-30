@@ -27,7 +27,8 @@ import 'package:parentveda/screens/ttc/ttc_symptom_log_screen.dart';
 import 'package:parentveda/ttc/cycle_store.dart';
 import 'package:parentveda/ttc/ttc_care_pathway.dart';
 import 'package:parentveda/ttc/ttc_cycle_report.dart';
-import 'package:parentveda/ttc/ttc_journal_store.dart';
+// Kept for revert (2026-09-28, the user: no journal in trying to conceive).
+// import 'package:parentveda/ttc/ttc_journal_store.dart';
 import 'package:parentveda/ttc/ttc_log_store.dart';
 import 'package:parentveda/ttc/ttc_logging_extras.dart';
 import 'package:parentveda/ttc/ttc_partner_data.dart';
@@ -44,7 +45,7 @@ void main() {
     CycleStore.instance.resetForTest();
     TtcStore.instance.resetForTest();
     TtcLogStore.instance.resetForTest();
-    TtcJournalStore.instance.resetForTest();
+    // Kept for revert (2026-09-28): TtcJournalStore.instance.resetForTest();
     TtcRitualStore.instance.resetForTest();
     TtcPartnerMode.instance.on = false;
     TtcLang.instance.hinglish = false;
@@ -344,13 +345,23 @@ void main() {
     // ⚠️ SKIPPED UNTIL THE LEAD APPLIES IT. The pairing screen lives in
     // `lib/screens/profile/pv_partner_screen.dart`, which another helper owns
     // this round. Remove the skip in the same change that edits the lists.
-    test('the pairing promise is true: private journal never, shared journal yes',
+    // Kept for revert (2026-09-28, journal out of TTC): the test was 'the
+    // pairing promise is true: private journal never, shared journal yes' and
+    // expected both lines in the source. The journal left the stage, so the
+    // promise is true only if neither line is live any more.
+    //   expect(src, contains("'Your private journal'"));
+    //   expect(src,
+    //       contains("'The shared journal, only what either of you writes there'"));
+    test('the pairing promise is true: it promises no journal',
         () {
-      final src =
-          File('lib/screens/profile/pv_partner_screen.dart').readAsStringSync();
-      expect(src, contains("'Your private journal'"));
+      final src = File('lib/screens/profile/pv_partner_screen.dart')
+          .readAsLinesSync()
+          .where((l) => !l.trimLeft().startsWith('//'))
+          .join('\n');
+      expect(src, isNot(contains("'Your private journal'")));
       expect(src,
-          contains("'The shared journal, only what either of you writes there'"));
+          isNot(contains(
+              "'The shared journal, only what either of you writes there'")));
     });
   });
 }

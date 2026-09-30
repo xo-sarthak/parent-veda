@@ -57,6 +57,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../data/reads/read_images.dart' show pvFilmStillFor;
 import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_placeholders.dart';
 import '../../ttc/cycle_store.dart';
@@ -64,6 +65,7 @@ import '../../ttc/ttc_care_pathway.dart';
 import '../../ttc/ttc_store.dart';
 import 'ttc_common.dart';
 import 'ttc_strings.dart';
+import 'ttc_tool_chrome.dart' show TtcToolClose, TtcToolLeading;
 
 /// The slot id the introduction film will be mapped to.
 ///
@@ -193,7 +195,21 @@ class _TtcIntroFlowState extends State<TtcIntroFlow> {
       animation: TtcLang.instance,
       builder: (context, _) {
         final t = TtcS.current();
-        return Scaffold(
+        // ⚠️ A WAY BACK ONE STEP, FROM STEP TWO ON (2026-09-29, the user:
+        // "multi-step flows should be getting a back arrow"). Five steps had
+        // Skip and nothing else, and the phone's back gesture on step four
+        // left the stage with three answers unsaved. Now steps two to five
+        // draw the tools' round back arrow, and a pop on them (the arrow, the
+        // gesture) steps back one with every answer kept. Step one has no
+        // arrow: this is the stage's first screen and Skip is its way out.
+        // Mobbin: Flo's onboarding shows its "<" only after the first step,
+        // https://mobbin.com/flows/d64dd348-5de3-40d0-8e2a-1fa781dad065
+        return PopScope(
+          canPop: _step == 0,
+          onPopInvokedWithResult: (didPop, _) {
+            if (!didPop && _step > 0) setState(() => _step--);
+          },
+          child: Scaffold(
           backgroundColor: ttcBg,
           body: SafeArea(
             child: Column(children: [
@@ -201,6 +217,10 @@ class _TtcIntroFlowState extends State<TtcIntroFlow> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(ttcGutter, 12, ttcGutter, 4),
                 child: Row(children: [
+                  if (_step > 0) ...[
+                    const TtcToolClose(mode: TtcToolLeading.back),
+                    const SizedBox(width: 12),
+                  ],
                   Expanded(
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(999),
@@ -232,6 +252,7 @@ class _TtcIntroFlowState extends State<TtcIntroFlow> {
               ),
               Expanded(child: _current(t)),
             ]),
+          ),
           ),
         );
       },
@@ -332,6 +353,10 @@ class _TtcIntroFlowState extends State<TtcIntroFlow> {
             duration: '2 MIN',
             hue: 268,
             slotId: ttcIntroVideoSlotId(TtcLang.instance.hinglish),
+            // A relevant still until the film is made (2026-09-29); "Coming
+            // soon" and the not-tappable rule are unchanged.
+            still: pvFilmStillFor(
+                ttcIntroVideoSlotId(TtcLang.instance.hinglish)),
           ),
           const SizedBox(height: 18),
           // The film's content, as words, so the screen is worth its place
@@ -343,7 +368,7 @@ class _TtcIntroFlowState extends State<TtcIntroFlow> {
                 width: 5,
                 height: 5,
                 decoration: const BoxDecoration(
-                    color: ttcPurple, shape: BoxShape.circle),
+                    color: ttcTitleInk, shape: BoxShape.circle),
               ),
               const SizedBox(width: 10),
               Expanded(
@@ -528,7 +553,7 @@ class _Choice extends StatelessWidget {
             color: selected ? ttcPanel : Colors.white,
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
-                color: selected ? ttcPurple : ttcLine,
+                color: selected ? ttcTitleInk : ttcLine,
                 width: selected ? 1.6 : 1),
           ),
           child: Row(children: [
@@ -549,7 +574,7 @@ class _Choice extends StatelessWidget {
             ),
             if (selected)
               const Icon(Icons.check_circle_rounded,
-                  size: 20, color: ttcPurple),
+                  size: 20, color: ttcTitleInk),
           ]),
         ),
       );
@@ -570,7 +595,7 @@ class _Primary extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 16),
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: ttcPurple,
+            color: ttcTitleInk,
             borderRadius: BorderRadius.circular(999),
           ),
           child: Text(label,
@@ -600,13 +625,13 @@ class _Ghost extends StatelessWidget {
           alignment: Alignment.center,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(999),
-            border: Border.all(color: emphasised ? ttcPurple : ttcLine),
+            border: Border.all(color: emphasised ? ttcTitleInk : ttcLine),
           ),
           child: Text(label,
               style: pvManrope(
                   fontSize: 13.5,
                   fontWeight: FontWeight.w700,
-                  color: emphasised ? ttcPurple : ttcSoft)),
+                  color: emphasised ? ttcTitleInk : ttcSoft)),
         ),
       );
 }

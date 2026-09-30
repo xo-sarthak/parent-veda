@@ -355,11 +355,16 @@ final List<PvRead> kTtcReadsGettingReady = [
       ),
     ],
 
-    readNext: [
-      'ttc_read_preconception_tests',
-      'ttc_read_first_gyn_visit',
-      'ttc_read_money_before_baby',
-    ],
+    // ⚠️ ONE READ, ONCE, AT THE FOOT (2026-09-28, no repetition):
+    // 'ttc_read_preconception_tests' is the next step "Next: the tests and vaccinations",
+    // so the Read next rail no longer lists it a second time.
+    // Kept for revert:
+    // readNext: [
+    // 'ttc_read_preconception_tests',
+    // 'ttc_read_first_gyn_visit',
+    // 'ttc_read_money_before_baby',
+    // ],
+    readNext: ['ttc_read_first_gyn_visit', 'ttc_read_money_before_baby'],
   ),
 
 
@@ -740,7 +745,12 @@ final List<PvRead> kTtcReadsGettingReady = [
       ),
     ],
 
-    readNext: ['ttc_read_three_months_before'],
+    // ⚠️ ONE READ, ONCE, AT THE FOOT (2026-09-28, no repetition):
+    // 'ttc_read_three_months_before' is the next step "Back to: the three months before",
+    // so the Read next rail no longer lists it a second time.
+    // Kept for revert:
+    // readNext: ['ttc_read_three_months_before'],
+    readNext: [],
   ),
 
 
@@ -895,8 +905,12 @@ final List<PvRead> kTtcReadsGettingReady = [
     ),
     faqs: [
       PvReadFaq(
-        question: _en("I've taken it for months and I'm not pregnant yet. Is "
-            'that a problem?'),
+        // Kept for revert (2026-09-28, explicit names; this question is shown
+        // on its own in Learn's Common questions, where "it" named nothing):
+        // question: _en("I've taken it for months and I'm not pregnant yet. Is "
+        //     'that a problem?'),
+        question: _en("I've taken folic acid for months and I'm not pregnant "
+            'yet. Is that a problem?'),
         answer: _en("No. Folic acid isn't a fertility treatment and doesn't "
             "change how quickly you conceive. It's protection kept ready for "
             'whenever conception happens. Taking it for a long time at the '
@@ -1991,7 +2005,12 @@ final List<PvRead> kTtcReadsGettingReady = [
         surfaceId: 'ttc_medication',
       ),
     ],
-    readNext: ['ttc_read_preconception_tests', 'ttc_read_after_abortion'],
+    // ⚠️ ONE READ, ONCE, AT THE FOOT (2026-09-28, no repetition):
+    // 'ttc_read_preconception_tests' is the next step "Next: the tests and vaccinations",
+    // so the Read next rail no longer lists it a second time.
+    // Kept for revert:
+    // readNext: ['ttc_read_preconception_tests', 'ttc_read_after_abortion'],
+    readNext: ['ttc_read_after_abortion'],
   ),
   // ===========================================================================
   //  ⚠️ THE MOST INDIA-SPECIFIC ARTICLE IN THIS DOOR, AND THE ONE MOST WESTERN

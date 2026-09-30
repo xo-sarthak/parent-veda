@@ -49,7 +49,21 @@ class PvVideoPlaceholder extends StatelessWidget {
     this.episodeCount = 1,
     this.flat = false,
     this.overlayTitle = false,
+    this.still,
   });
+
+  /// A photograph for the thumbnail while the film is not made yet.
+  ///
+  /// ⚠️ ADDED 2026-09-29 FOR TRYING TO CONCEIVE, OFF (NULL) BY DEFAULT. The
+  /// user: "stop leaving the placeholders and put random but relevant images
+  /// for them, from free resources on the web." A tint with a play mark
+  /// reads as an image that failed to load; a relevant still (a seedling for
+  /// "why three months") reads as a film that is coming. The still is drawn
+  /// over the tint, so a failed load falls back to exactly the old card, and
+  /// the "COMING SOON" mark and the not-tappable rule are unchanged. Stills
+  /// are chosen by film id in `read_images.dart` (`pvFilmStillFor`), never
+  /// from a keyword; other stages pass nothing and draw as before.
+  final String? still;
 
   /// Put the title INSIDE the 16:9 frame and drop the strip beneath it.
   ///
@@ -197,6 +211,16 @@ class PvVideoPlaceholder extends StatelessWidget {
                               ),
                       ),
                     ),
+                    // The still, when one is chosen (2026-09-29). Over the
+                    // tint, so a failed or slow load shows the old card.
+                    if (still case final url? when url.isNotEmpty)
+                      Image.network(
+                        url,
+                        key: const ValueKey('pv_video_still'),
+                        fit: BoxFit.cover,
+                        gaplessPlayback: true,
+                        errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                      ),
                     // A play control, drawn as the real one will be.
                     Center(
                       child: Container(

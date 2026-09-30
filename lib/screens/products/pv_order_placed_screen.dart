@@ -1,5 +1,5 @@
 // =============================================================================
-//  PvOrderPlacedScreen — "Thanks for your order" · View order
+//  PvOrderPlacedScreen — "Thanks for your order" · See your orders
 // -----------------------------------------------------------------------------
 //  7-Eleven / adidas's confirmation: one line of thanks, the reference, what
 //  happens next, one button. A PREVIEW order says so in the first sentence —
@@ -27,8 +27,17 @@ class PvOrderPlacedScreen extends StatelessWidget {
     final preview = o?.status == PvOrderStatus.preview;
     return Scaffold(
       backgroundColor: p.ground,
+      // ⚠️ SCROLLS WHEN IT MUST (2026-09-29): a fixed Column with a Spacer
+      // overflowed by 74px at 1.5x on a 360dp phone. It still fills the
+      // screen and pins the button to the foot when there is room. Kept for
+      // revert: SafeArea > Padding > Column, with no scroll view.
       body: SafeArea(
-        child: Padding(
+        child: LayoutBuilder(
+          builder: (context, box) => SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: box.maxHeight),
+              child: IntrinsicHeight(
+                child: Padding(
           padding: const EdgeInsets.fromLTRB(24, 30, 24, 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -67,7 +76,8 @@ class PvOrderPlacedScreen extends StatelessWidget {
               ),
               const SizedBox(height: 22),
               if (o != null)
-                PvWell(
+                // A white card, not a slab (2026-09-29). Kept for revert: PvWell.
+                PvCard(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -87,11 +97,21 @@ class PvOrderPlacedScreen extends StatelessWidget {
                   ),
                 ),
               const Spacer(),
+              // ⚠️ "SEE YOUR ORDERS" (2026-09-29). The store's top no longer
+              // carries an Orders circle (orders live on her profile), so the
+              // moment she has just bought is where the store points her to
+              // them: the orders screen, route 'store/orders', with this order
+              // first. Kept for revert:
+              //   PvCommit(label: 'View order', onTap: () => Navigator.of(context)
+              //       .pushReplacement(MaterialPageRoute<void>(builder: (_) =>
+              //       PvOrdersScreen(openId: orderId), settings:
+              //       const RouteSettings(name: 'store/orders')))),
               PvCommit(
-                label: 'View order',
+                key: const ValueKey('pv_order_placed_see_orders'),
+                label: 'See your orders',
                 onTap: () => Navigator.of(context).pushReplacement(
                   MaterialPageRoute<void>(
-                    builder: (_) => PvOrdersScreen(openId: orderId),
+                    builder: (_) => const PvOrdersScreen(),
                     settings: const RouteSettings(name: 'store/orders'),
                   ),
                 ),
@@ -115,6 +135,10 @@ class PvOrderPlacedScreen extends StatelessWidget {
                 ),
               ),
             ],
+          ),
+                ),
+              ),
+            ),
           ),
         ),
       ),

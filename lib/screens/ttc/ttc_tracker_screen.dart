@@ -255,7 +255,7 @@ class _Header extends StatelessWidget {
                     style: pvManrope(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
-                        color: _kGreenInk)),
+                        color: ttcTitleInk)),
               ),
             ),
           const SizedBox(width: 6),
@@ -578,20 +578,21 @@ class _FieldRow extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
-              color: ttcPanel,
+              // Kept for revert (2026-09-29, no tinted slab behind text): color: ttcPanel,
+              color: Colors.white, border: const Border.fromBorderSide(BorderSide(color: ttcLine)),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Row(children: [
-              Icon(Icons.article_outlined, size: 14, color: _kGreenInk),
+              Icon(Icons.article_outlined, size: 14, color: ttcTitleInk),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(read.title.of(AppLanguage.english),
                     maxLines: 2,
                     style: ttcBody(12.5,
-                        color: _kGreenInk, w: FontWeight.w700, h: 1.4)),
+                        color: ttcTitleInk, w: FontWeight.w700, h: 1.4)),
               ),
               const SizedBox(width: 6),
-              Icon(Icons.chevron_right_rounded, size: 17, color: _kGreenInk),
+              Icon(Icons.chevron_right_rounded, size: 17, color: ttcTitleInk),
             ]),
           ),
         ),
@@ -969,8 +970,9 @@ class _LookBackStrip extends StatelessWidget {
     final bars = field.kind == TtcFieldKind.number;
 
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(field.label(hi),
-          style: ttcFraunces(20, w: FontWeight.w600, color: ttcTitleInk)),
+      // Kept for revert (2026-09-29, one heading style): the same Text with
+      // style: ttcFraunces(20, w: FontWeight.w600, color: ttcTitleInk)
+      TtcSectionHeading(field.label(hi)),
       const SizedBox(height: 4),
       Text('Last four weeks', style: ttcBody(13, color: ttcMuted)),
       const SizedBox(height: 16),
@@ -994,7 +996,8 @@ class _LookBackStrip extends StatelessWidget {
   }
 
   String _caption(List<double> present, bool bars) {
-    if (present.isEmpty) return 'Nothing written down here yet.';
+    // Kept for revert (2026-09-28): 'Nothing written down here yet.'
+    if (present.isEmpty) return 'No days written down yet.';
     if (!bars) return 'One mark for what you chose that day.';
     final lo = present.reduce((a, b) => a < b ? a : b);
     final hi2 = present.reduce((a, b) => a > b ? a : b);
@@ -1338,7 +1341,8 @@ class _NumberSheetState extends State<_NumberSheet> {
                             borderRadius: BorderRadius.circular(999),
                             border: Border.all(color: ttcBorder, width: 1.2),
                           ),
-                          child: Text('Save',
+                          // Kept for revert (2026-09-28): 'Save'
+                          child: Text('Save the number',
                               style: ttcBody(13,
                                   color: ttcTitleInk, w: FontWeight.w800)),
                         ),
@@ -1491,7 +1495,8 @@ const String kTtcTrackerIntro =
     'is enough.';
 
 /// On his tracker, when he is the one looking.
-const String kTtcTrackerPartnerWhoHim = 'This one is yours to fill in.';
+// Kept for revert (2026-09-28): 'This one is yours to fill in.'
+const String kTtcTrackerPartnerWhoHim = 'This tracker is yours to fill in.';
 
 /// The first of the two views; the second is [kTtcTrackerLookBack].
 const String kTtcTrackerLogView = 'Log a day';
@@ -1550,6 +1555,8 @@ class _TtcTrackerScreenState extends State<TtcTrackerScreen> {
         final hue = _trackerHue(tracker);
         return TtcToolScaffold(
           hue: hue,
+          // The tool's mark over the eyebrow (2026-09-29, ttc_tool_marks.dart).
+          toolId: tracker.id,
           eyebrow: _trackerEyebrow(tracker, hi),
           title: ttcTrackerTitle(tracker),
           intro: kTtcTrackerIntro,
@@ -1748,9 +1755,9 @@ class _TtcTrackerScreenState extends State<TtcTrackerScreen> {
           ? _WeightLook(tracker: tracker, field: field)
           : _LookBackStrip(tracker: tracker, field: field, hi: hi)),
       const SizedBox(height: 26),
-      ttcToolPad(Text(kTtcTrackerEntriesTitle,
-          style: pvFraunces(
-              fontSize: 19, fontWeight: FontWeight.w600, color: p.ink1))),
+      // Kept for revert (2026-09-29, one heading style): the same Text with
+      // style: pvFraunces(fontSize: 19, fontWeight: FontWeight.w600, color: p.ink1)
+      ttcToolPad(const TtcSectionHeading(kTtcTrackerEntriesTitle)),
       const SizedBox(height: 4),
       ttcToolPad(Text(
           entries.isEmpty ? kTtcTrackerEntriesEmpty : kTtcTrackerEntriesHint,
@@ -2138,7 +2145,9 @@ class _NumberRow extends StatelessWidget {
 
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Row(children: [
-        stepButton('−', 'Less', () => _bump(-field.step)),
+        // Kept for revert (2026-09-28): the spoken labels were 'Less' and
+        // 'More'.
+        stepButton('−', 'Lower the number', () => _bump(-field.step)),
         const SizedBox(width: 10),
         Expanded(
           child: Semantics(
@@ -2195,7 +2204,7 @@ class _NumberRow extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 10),
-        stepButton('+', 'More', () => _bump(field.step)),
+        stepButton('+', 'Raise the number', () => _bump(field.step)),
       ]),
       if (field.presets.isNotEmpty) ...[
         const SizedBox(height: 10),
@@ -2284,7 +2293,8 @@ class _WeightLook extends StatelessWidget {
     ];
     final present = data.whereType<double>().toList();
     String caption() {
-      if (present.isEmpty) return 'Nothing written down here yet.';
+      // Kept for revert (2026-09-28): 'Nothing written down here yet.'
+      if (present.isEmpty) return 'No days written down yet.';
       final lo = present.reduce((a, b) => a < b ? a : b);
       final hi = present.reduce((a, b) => a > b ? a : b);
       if (lo == hi) return '${_fmtNum(lo)} kg on the days you wrote it down.';
@@ -2293,9 +2303,9 @@ class _WeightLook extends StatelessWidget {
     }
 
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(field.labelEn,
-          style: pvFraunces(
-              fontSize: 20, fontWeight: FontWeight.w600, color: p.ink1)),
+      // Kept for revert (2026-09-29, one heading style): the same Text with
+      // style: pvFraunces(fontSize: 20, fontWeight: FontWeight.w600, color: p.ink1)
+      TtcSectionHeading(field.labelEn),
       const SizedBox(height: 4),
       Text('Last four weeks', style: pvManrope(fontSize: 13, color: p.ink3)),
       const SizedBox(height: 16),
@@ -2512,7 +2522,8 @@ class _TypeSheetState extends State<_TypeSheet> {
                   const SizedBox(height: 18),
                   TtcToolPrimary(
                       key: const ValueKey('ttc_tracker_type_save'),
-                      label: 'Save',
+                      // Kept for revert (2026-09-28): 'Save'
+                      label: 'Save the number',
                       onTap: _save),
                 ]),
           ),
@@ -2570,12 +2581,16 @@ class _WhyRow extends StatelessWidget {
           child: Row(mainAxisSize: MainAxisSize.min, children: [
             Icon(Icons.info_outline_rounded, size: 15, color: p.ink1),
             const SizedBox(width: 6),
-            Text(kTtcTrackerWhyLabel,
-                style: pvManrope(
-                    fontSize: 12.5,
-                    fontWeight: FontWeight.w800,
-                    color: p.ink1,
-                    decoration: TextDecoration.underline)),
+            // Flexible (2026-09-29): 1pt past a 360dp screen at 1.5x text.
+            // Kept for revert: the Text unwrapped.
+            Flexible(
+              child: Text(kTtcTrackerWhyLabel,
+                  style: pvManrope(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w800,
+                      color: p.ink1,
+                      decoration: TextDecoration.underline)),
+            ),
           ]),
         ),
       ),

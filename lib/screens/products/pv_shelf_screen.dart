@@ -181,7 +181,7 @@ class _PvShelfScreenState extends State<PvShelfScreen> {
                   fontSize: 10.5,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 1.1,
-                  color: p.action,
+                  color: kPvInk,
                 ),
               ),
               Text(
@@ -269,7 +269,7 @@ class _PvShelfScreenState extends State<PvShelfScreen> {
                       fontSize: 10.5,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 1.1,
-                      color: p.action,
+                      color: kPvInk,
                     ),
                   ),
                   const Spacer(),
@@ -341,17 +341,18 @@ class _PvShelfScreenState extends State<PvShelfScreen> {
     child: InkWell(
       onTap: () => setState(() => _guideOpen = !_guideOpen),
       borderRadius: BorderRadius.circular(16),
-      child: PvWell(
+      // A white card, not a slab (2026-09-29). Kept for revert: PvWell.
+      child: PvCard(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                Icon(Icons.lightbulb_outline_rounded, size: 16, color: p.action),
+                Icon(Icons.lightbulb_outline_rounded, size: 16, color: kPvInk),
                 const SizedBox(width: 7),
                 Text(
                   '20-SECOND GUIDE',
-                  style: pvManrope(fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 1.1, color: p.action),
+                  style: pvManrope(fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 1.1, color: kPvInk),
                 ),
                 const Spacer(),
                 if (g.lookFor.isNotEmpty || g.avoid.isNotEmpty)
@@ -427,7 +428,8 @@ class _PvShelfScreenState extends State<PvShelfScreen> {
 
   Widget _empty(V2Palette p) => Padding(
     padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
-    child: PvWell(
+    // A white card, not a slab (2026-09-29). Kept for revert: PvWell.
+    child: PvCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -447,7 +449,7 @@ class _PvShelfScreenState extends State<PvShelfScreen> {
               style: pvManrope(
                 fontSize: 13.5,
                 fontWeight: FontWeight.w700,
-                color: p.action,
+                color: kPvInk,
               ),
             ),
           ),
@@ -554,7 +556,7 @@ class _PvShelfScreenState extends State<PvShelfScreen> {
                             style: pvManrope(
                               fontSize: 13.5,
                               fontWeight: FontWeight.w700,
-                              color: p.action,
+                              color: kPvInk,
                             ),
                           ),
                         ),

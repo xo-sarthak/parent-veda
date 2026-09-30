@@ -31,7 +31,7 @@ changes its named expert, run `py -3.11 tools/ttc_expert_signoff.py` (it reads t
 | Read | body conditions | Seven things that can slow conception | `ttc_read_slow_conception` | | |
 | Read | body conditions | Ovarian cysts: which ones matter when you're trying | `ttc_read_ovarian_cysts` | | |
 | Read | body cycle | What counts as a late period, and the usual reasons | `ttc_read_late_period` | | |
-| Read | body cycle | Irregular cycles when it isn't PCOS | `ttc_read_irregular_not_pcos` | | |
+| Read | body cycle | Irregular cycles that aren't PCOS | `ttc_read_irregular_not_pcos` | | |
 | Read | body cycle | Five kinds of bleeding, and how to tell them apart | `ttc_read_bleeding_kinds` | | |
 | Read | body cycle | Spotting between periods: what it usually means | `ttc_read_spotting` | | |
 | Read | body cycle | Ovulation pain and other mid-cycle signs | `ttc_read_ovulation_pain` | | |
@@ -83,9 +83,9 @@ changes its named expert, run `py -3.11 tools/ttc_expert_signoff.py` (it reads t
 | Read | waiting | Feeling pregnant, but the test says no | `ttc_read_feeling_pregnant` | | |
 | Door carousel | pcos | PCOS or ovarian cysts |  | | |
 | Door carousel | pcos | PCOS or thyroid |  | | |
-| Door carousel | pcos | Hair changes, explained |  | | |
+| Door carousel | pcos | Hair changes with PCOS, explained |  | | |
 | Door carousel | pcos | Cycles without ovulation |  | | |
-| Door carousel | pcos | When to see a doctor |  | | |
+| Door carousel | pcos | When to see a doctor about PCOS |  | | |
 | Film (not yet made) |  | PCOS, explained in five minutes | `ttc_vid_pcos_explained` | | |
 | Film (not yet made) |  | The PCOS treatments your doctor may offer | `ttc_vid_pcos_treatment` | | |
 | Film (not yet made) |  | Your cycle, drawn out step by step | `ttc_vid_cycle_basics` | | |
@@ -177,7 +177,7 @@ changes its named expert, run `py -3.11 tools/ttc_expert_signoff.py` (it reads t
 | Read | mind body | Why sleep matters when you're trying | `ttc_read_sleep_trying` | | |
 | Read | mind body | Setting a bedtime you can keep | `ttc_read_bedtime` | | |
 | Read | mind body | When family keeps asking | `ttc_read_family_asking` | | |
-| Read | mind body | Bringing him into this | `ttc_read_bringing_him_in` | | |
+| Read | mind body | Bringing him into trying | `ttc_read_bringing_him_in` | | |
 | Read | safety | When a relationship doesn't feel safe | `ttc_read_relationship_safety` | | |
 | Read | sex | When sex starts to feel like homework | `ttc_read_sex_homework` | | |
 | Read | sex | Low desire while trying, hers and his | `ttc_read_low_desire` | | |

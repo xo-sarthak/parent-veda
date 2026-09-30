@@ -20,7 +20,8 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/remote/supabase_repo.dart';
-import 'ttc_journal_store.dart' show TtcAuthor;
+// Moved (2026-09-28, journal out of TTC): was ttc_journal_store.dart.
+import 'ttc_author.dart';
 import 'ttc_sync.dart';
 
 class TtcSupplement {

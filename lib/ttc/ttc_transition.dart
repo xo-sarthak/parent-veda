@@ -59,7 +59,8 @@ import '../services/family_timeline.dart';
 import '../services/life_stage_store.dart';
 import '../services/pregnancy_controller.dart';
 import 'cycle_store.dart';
-import 'ttc_journal_store.dart';
+// Kept for revert (2026-09-28, the user: no journal in trying to conceive).
+// import 'ttc_journal_store.dart';
 import 'ttc_store.dart';
 import 'ttc_supplements_store.dart';
 import 'ttc_treatment_store.dart';
@@ -71,7 +72,7 @@ class TtcTransitionResult {
   const TtcTransitionResult({
     required this.dueDate,
     required this.weeksPregnant,
-    required this.journalEntries,
+    // Kept for revert (2026-09-28): required this.journalEntries,
     required this.timelineEvents,
     required this.supplements,
     required this.cyclesLogged,
@@ -85,7 +86,10 @@ class TtcTransitionResult {
   /// conception - which is why a positive test usually lands around week four.
   final int weeksPregnant;
 
-  final int journalEntries;
+  // Kept for revert (2026-09-28, journal out of TTC): the count of journal
+  // entries carried over. Its only reader on screen was already commented
+  // out, and the journal store is now commented out too.
+  // final int journalEntries;
   final int timelineEvents;
   final int supplements;
   final int cyclesLogged;
@@ -306,7 +310,8 @@ class TtcTransitionEngine {
     return TtcTransitionResult(
       dueDate: due,
       weeksPregnant: weeksFrom(effectiveLmp, on: today),
-      journalEntries: TtcJournalStore.instance.count,
+      // Kept for revert (2026-09-28):
+      //   journalEntries: TtcJournalStore.instance.count,
       timelineEvents: FamilyTimeline.instance.count,
       supplements: TtcSupplementsStore.instance.items.length,
       cyclesLogged: CycleStore.instance.completedCycles,

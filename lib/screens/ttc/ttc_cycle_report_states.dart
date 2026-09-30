@@ -122,7 +122,8 @@ class TtcReportEmptyBody extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Kept for revert: 'What this page becomes' (2026-09-27).
-          ttcSectionTitle("What you'll see here"),
+          // Kept for revert (2026-09-28, explicit labels): "What you'll see here"
+          ttcSectionTitle('What your report will show'),
           TtcCycleCard(
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -637,7 +638,8 @@ class TtcReportFact extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.fromLTRB(15, 13, 15, 14),
         decoration: BoxDecoration(
-            color: ttcPanel, borderRadius: BorderRadius.circular(16)),
+            // Kept for revert (2026-09-29, no tinted slab behind text): color: ttcPanel, borderRadius: BorderRadius.circular(16)),
+            color: Colors.white, border: const Border.fromBorderSide(BorderSide(color: ttcLine)), borderRadius: BorderRadius.circular(16)),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(label.toUpperCase(),
               style: pvManrope(
@@ -734,7 +736,8 @@ class TtcReportAbout extends StatelessWidget {
           border: Border.all(color: ttcLine),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('ABOUT THIS PAGE',
+          // Kept for revert (2026-09-28, explicit labels): 'ABOUT THIS PAGE'
+          Text('ABOUT THE CYCLE REPORT',
               key: const ValueKey('ttc_report_about'),
               style: pvManrope(
                   fontSize: 9.5,

@@ -34,6 +34,7 @@ import '../v2/v2_palette.dart';
 import 'ttc_pcos_check_screen.dart' show PcosPrimaryButton, kPcosHue;
 import 'ttc_strings.dart';
 import 'ttc_surface_router.dart';
+import 'ttc_common.dart' show ttcTitleInk, TtcSectionHeading;
 
 class TtcPcosCheckResultScreen extends StatelessWidget {
   const TtcPcosCheckResultScreen({super.key});
@@ -110,7 +111,8 @@ class TtcPcosCheckResultScreen extends StatelessWidget {
       Container(
         padding: const EdgeInsets.fromLTRB(17, 17, 17, 18),
         decoration: BoxDecoration(
-          color: p.surfaceAlt,
+          // Kept for revert (2026-09-29, no tinted slab behind text): color: p.surfaceAlt,
+          color: p.surface,
           borderRadius: BorderRadius.circular(18),
           // The coloured left rule (amber / green) is gone — BASE-UI §4.0:
           // urgency is told by the well and the words, never by a tint. Kept
@@ -213,9 +215,11 @@ class TtcPcosCheckResultScreen extends StatelessWidget {
       ),
       const SizedBox(height: 24),
 
-      Text(t('What this may mean', 'Iska matlab kya ho sakta hai'),
-          style: pvFraunces(
-              fontSize: 19, fontWeight: FontWeight.w600, color: p.ink1)),
+      // Kept for revert (2026-09-28): 'What this may mean'
+      // Kept for revert (2026-09-29, one heading style): the same Text with
+      // style: pvFraunces(fontSize: 19, fontWeight: FontWeight.w600, color: p.ink1)
+      TtcSectionHeading(
+          t('What your answers may mean', 'Iska matlab kya ho sakta hai')),
       const SizedBox(height: 11),
       Text(r.body.of(lang),
           style: pvManrope(fontSize: 15, height: 1.7, color: p.ink2)),
@@ -239,9 +243,9 @@ class TtcPcosCheckResultScreen extends StatelessWidget {
       ],
 
       const SizedBox(height: 28),
-      Text(t('What you can do next', 'Ab aap kya kar sakti hain'),
-          style: pvFraunces(
-              fontSize: 19, fontWeight: FontWeight.w600, color: p.ink1)),
+      // Kept for revert (2026-09-29, one heading style): the same Text with
+      // style: pvFraunces(fontSize: 19, fontWeight: FontWeight.w600, color: p.ink1)
+      TtcSectionHeading(t('What you can do next', 'Ab aap kya kar sakti hain')),
       const SizedBox(height: 14),
 
       // ⚠️ THE DOCTOR SUMMARY IS FIRST WHEN THERE IS SOMETHING TO DISCUSS, and
@@ -300,7 +304,8 @@ class TtcPcosCheckResultScreen extends StatelessWidget {
       PcosPrimaryButton(
         p: p,
         filled: false,
-        label: t('Start again', 'Phir se shuru karein'),
+        // Kept for revert (2026-09-28): 'Start again'
+        label: t('Start the check again', 'Phir se shuru karein'),
         onTap: () async {
           await store.reset();
           if (context.mounted) Navigator.of(context).maybePop();
@@ -628,12 +633,11 @@ class TtcPcosDoctorSummaryScreen extends StatelessWidget {
                     const SizedBox(height: 14),
                     Divider(color: p.line, height: 1),
                     const SizedBox(height: 22),
-                    Text(
-                        t('Questions worth asking', 'Poochhne layak sawaal'),
-                        style: pvFraunces(
-                            fontSize: 19,
-                            fontWeight: FontWeight.w600,
-                            color: p.ink1)),
+                    // Kept for revert (2026-09-29, one heading style): the
+                    // same Text with style: pvFraunces(fontSize: 19,
+                    //     fontWeight: FontWeight.w600, color: p.ink1)
+                    TtcSectionHeading(
+                        t('Questions worth asking', 'Poochhne layak sawaal')),
                     const SizedBox(height: 12),
                     for (final q in kPcosDoctorQuestions)
                       Padding(
@@ -646,7 +650,7 @@ class TtcPcosDoctorSummaryScreen extends StatelessWidget {
                                 width: 5,
                                 height: 5,
                                 decoration: BoxDecoration(
-                                    color: p.action, shape: BoxShape.circle),
+                                    color: ttcTitleInk, shape: BoxShape.circle),
                               ),
                               const SizedBox(width: 11),
                               Expanded(

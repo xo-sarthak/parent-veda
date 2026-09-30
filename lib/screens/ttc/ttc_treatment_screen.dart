@@ -37,10 +37,12 @@ import 'ttc_round_home_card.dart' show TtcRoundCheckInCard;
 import 'ttc_treatment_round_screens.dart';
 
 void openTtcTreatment(BuildContext context) {
-  Navigator.of(context).push(MaterialPageRoute<void>(
-    builder: (_) => const TtcTreatmentScreen(),
-    settings: const RouteSettings(name: 'ttc/treatment'),
-  ));
+  Navigator.of(context).push(
+    MaterialPageRoute<void>(
+      builder: (_) => const TtcTreatmentScreen(),
+      settings: const RouteSettings(name: 'ttc/treatment'),
+    ),
+  );
 }
 
 // ⚠️ KEPT FOR REVERT (2026-09-27, the tool rebuild): the screen until the
@@ -52,8 +54,10 @@ class TtcTreatmentScreenClassic extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation:
-          Listenable.merge([TtcTreatmentStore.instance, TtcLang.instance]),
+      animation: Listenable.merge([
+        TtcTreatmentStore.instance,
+        TtcLang.instance,
+      ]),
       builder: (context, _) {
         final t = TtcS.current();
         final hi = t.hinglish;
@@ -78,15 +82,16 @@ class TtcTreatmentScreenClassic extends StatelessWidget {
         // the five date rows below and is asked what kind it is.
         if (!store.isLoaded) {
           return const Scaffold(
-              backgroundColor: Colors.white,
-              body: Center(
-                  child: CircularProgressIndicator(color: ttcTitleInk)));
+            backgroundColor: Colors.white,
+            body: Center(child: CircularProgressIndicator(color: ttcTitleInk)),
+          );
         }
         final round = cycle;
         final hasKind = round.kind != null && !round.isEmpty;
         final legacy = round.kind == null && !round.isEmpty;
         final phase = ttcTreatmentPhase(round, DateTime.now());
-        final canResult = hasKind &&
+        final canResult =
+            hasKind &&
             (phase == TtcRoundPhase.testDay ||
                 ttcRoundBloodTest(round) != null &&
                     !ttcRoundBloodTest(round)!.isAfter(DateTime.now()));
@@ -106,264 +111,336 @@ class TtcTreatmentScreenClassic extends StatelessWidget {
           intro: hi
               ? t.treatmentIntro
               : "Add the dates your clinic gave you, and we'll remind you "
-                  'before the trigger injection. Fill in what you know. '
-                  'The rest can wait.',
+                    'before the trigger injection. Fill in what you know. '
+                    'The rest can wait.',
           children: [
-                const SizedBox(height: 22),
+            const SizedBox(height: 22),
 
-                // ---- no round: the way in -----------------------------------
-                if (round.isEmpty) ...[
-                  ttcToolPad(const TtcStartTreatmentCard()),
-                  const SizedBox(height: 20),
-                ],
+            // ---- no round: the way in -----------------------------------
+            if (round.isEmpty) ...[
+              ttcToolPad(const TtcStartTreatmentCard()),
+              const SizedBox(height: 20),
+            ],
 
-                // ---- the round she can still reopen (7 days) ----------------
-                if (store.canUndoClose()) ...[
-                  ttcToolPad(_UndoCloseCard(store: store)),
-                  const SizedBox(height: 20),
-                ],
+            // ---- the round she can still reopen (7 days) ----------------
+            if (store.canUndoClose()) ...[
+              ttcToolPad(_UndoCloseCard(store: store)),
+              const SizedBox(height: 20),
+            ],
 
-                // ---- the check-in, when it is due ----------------------------
-                if (store.checkInDue()) ...[
-                  ttcToolPad(TtcRoundCheckInCard(
-                      onAnswer: () => showTtcCheckInSheet(context))),
-                  const SizedBox(height: 20),
-                ],
+            // ---- the check-in, when it is due ----------------------------
+            if (store.checkInDue()) ...[
+              ttcToolPad(
+                TtcRoundCheckInCard(
+                  onAnswer: () => showTtcCheckInSheet(context),
+                ),
+              ),
+              const SizedBox(height: 20),
+            ],
 
-                // ---- a legacy round: what kind is it? ------------------------
-                if (legacy) ...[
-                  ttcToolPad(TtcRoundOption(
-                    key: const ValueKey('ttc_round_legacy_kind'),
-                    title: kTtcRoundLegacyTitle,
-                    line: kTtcRoundLegacyBody,
-                    icon: Icons.help_outline_rounded,
-                    onTap: () => openTtcTreatmentStart(context),
-                  )),
-                  const SizedBox(height: 20),
-                ],
+            // ---- a legacy round: what kind is it? ------------------------
+            if (legacy) ...[
+              ttcToolPad(
+                TtcRoundOption(
+                  key: const ValueKey('ttc_round_legacy_kind'),
+                  title: kTtcRoundLegacyTitle,
+                  line: kTtcRoundLegacyBody,
+                  icon: Icons.help_outline_rounded,
+                  onTap: () => openTtcTreatmentStart(context),
+                ),
+              ),
+              const SizedBox(height: 20),
+            ],
 
-                // ---- a round: its step today, then the plan ------------------
-                if (hasKind) ...[
-                  ttcToolPad(_RoundHeader(round: round, phase: phase)),
-                  const SizedBox(height: 18),
-                  if (canResult) ...[
-                    ttcToolPad(TtcRoundButton(
-                      key: const ValueKey('ttc_round_tell_result'),
-                      label: kTtcRoundTellResult,
-                      onTap: () => openTtcTreatmentResult(context),
-                    )),
-                    const SizedBox(height: 18),
-                  ],
-                  ttcToolPad(ttcSectionTitle(kTtcRoundPlanTitle)),
-                  ttcToolPad(Text(kTtcRoundPlanBody,
-                      style: ttcBody(12.5, h: 1.5))),
-                  const SizedBox(height: 16),
-                  ttcToolPad(TtcRoundTimeline(round: round)),
-                  const SizedBox(height: 6),
-                  // Daily injections live in the medication schedule
-                  // (decision 4), which already has times and a taken tick.
-                  ttcToolPad(TtcCard(
-                    onTap: () => openTtcSurface(context, 'ttc_medication'),
-                    color: ttcPanel,
-                    child: Row(children: [
-                      const Icon(Icons.medication_outlined,
-                          size: 18, color: ttcTitleInk),
+            // ---- a round: its step today, then the plan ------------------
+            if (hasKind) ...[
+              ttcToolPad(_RoundHeader(round: round, phase: phase)),
+              const SizedBox(height: 18),
+              if (canResult) ...[
+                ttcToolPad(
+                  TtcRoundButton(
+                    key: const ValueKey('ttc_round_tell_result'),
+                    label: kTtcRoundTellResult,
+                    onTap: () => openTtcTreatmentResult(context),
+                  ),
+                ),
+                const SizedBox(height: 18),
+              ],
+              ttcToolPad(ttcSectionTitle(kTtcRoundPlanTitle)),
+              ttcToolPad(Text(kTtcRoundPlanBody, style: ttcBody(12.5, h: 1.5))),
+              const SizedBox(height: 16),
+              ttcToolPad(TtcRoundTimeline(round: round)),
+              const SizedBox(height: 6),
+              // Daily injections live in the medication schedule
+              // (decision 4), which already has times and a taken tick.
+              ttcToolPad(
+                TtcCard(
+                  onTap: () => openTtcSurface(context, 'ttc_medication'),
+                  // Kept for revert (2026-09-29, no tinted slab behind text): color: ttcPanel,
+                  border: ttcLine,
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.medication_outlined,
+                        size: 18,
+                        color: ttcTitleInk,
+                      ),
                       const SizedBox(width: 11),
                       Expanded(
-                        child: Text(kTtcRoundMedicationLink,
-                            style: ttcBody(12.5, h: 1.5)),
+                        child: Text(
+                          kTtcRoundMedicationLink,
+                          style: ttcBody(12.5, h: 1.5),
+                        ),
                       ),
-                      const Icon(Icons.chevron_right_rounded,
-                          size: 18, color: ttcMuted),
-                    ]),
-                  )),
-                  const SizedBox(height: 22),
-                  ttcToolPad(TtcRoundButton(
-                    key: const ValueKey('ttc_round_plan_changed'),
-                    label: kTtcRoundPlanChanged,
-                    primary: false,
-                    onTap: () => showTtcPlanChangedSheet(context),
-                  )),
-                  const SizedBox(height: 8),
-                  ttcToolPad(TtcRoundButton(
-                    key: const ValueKey('ttc_round_pause'),
-                    label: kTtcRoundTakeBreak,
-                    primary: false,
-                    onTap: () =>
-                        ttcConfirmCloseRound(context, TtcRoundOutcome.paused),
-                  )),
-                  const SizedBox(height: 20),
-                ],
+                      const Icon(
+                        Icons.chevron_right_rounded,
+                        size: 18,
+                        color: ttcMuted,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 22),
+              ttcToolPad(
+                TtcRoundButton(
+                  key: const ValueKey('ttc_round_plan_changed'),
+                  label: kTtcRoundPlanChanged,
+                  primary: false,
+                  onTap: () => showTtcPlanChangedSheet(context),
+                ),
+              ),
+              const SizedBox(height: 8),
+              ttcToolPad(
+                TtcRoundButton(
+                  key: const ValueKey('ttc_round_pause'),
+                  label: kTtcRoundTakeBreak,
+                  primary: false,
+                  onTap: () =>
+                      ttcConfirmCloseRound(context, TtcRoundOutcome.paused),
+                ),
+              ),
+              const SizedBox(height: 20),
+            ],
 
-                // The next milestone, made large - it is the one thing she
-                // opens this screen to check.
-                // A round shows its step in the header above; the big card
-                // stays for a legacy round (2026-09-26).
-                if (next != null && !hasKind) ...[
-                  // ⚠️ FLAT, NOT A DIAGONAL GRADIENT. The two-stop purple wash
-                  // was the loudest object in the stage, on a screen someone
-                  // opens while anxious. It is also the exact texture that was
-                  // called out on the video placeholders: a gradient reads as
-                  // decoration, and decoration on a date she is dreading is the
-                  // wrong register.
-                  //
-                  // Solid `ttcPurple` keeps every bit of the emphasis — this is
-                  // still the only filled block on the page — and loses the
-                  // shine.
-                  ttcToolPad(Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: ttcPurple,
-                    ),
-                    child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(t.treatmentNext.toUpperCase(),
-                              style: ttcBody(10,
-                                  color: Colors.white.withValues(alpha: 0.8),
-                                  w: FontWeight.w800)),
-                          const SizedBox(height: 9),
-                          // One name with the rows (2026-09-27). Kept for
-                          // revert: Text(next.$1.label(hi), ...).
-                          Text(_StepRow._label(next.$1, hi),
-                              style: ttcFraunces(25,
-                                  w: FontWeight.w600, color: Colors.white)),
-                          const SizedBox(height: 8),
-                          Text(_when(next.$1, next.$2, hi),
-                              style: ttcBody(14,
-                                  color: Colors.white.withValues(alpha: 0.95),
-                                  w: FontWeight.w700)),
-                          // The day count, deliberately SECOND and smaller.
-                          //
-                          // Leading with a countdown turns the screen into
-                          // something to endure - "nine days left" is how the
-                          // wait already feels without our help. Leading with
-                          // the milestone makes it an appointment she has,
-                          // rather than a sentence she is serving. The number
-                          // still has to be here, though: leave it out and she
-                          // counts it herself, which is worse.
-                          const SizedBox(height: 5),
-                          Text(_daysAway(next.$2, hi),
-                              style: ttcBody(12,
-                                  color: Colors.white.withValues(alpha: 0.75))),
-                          const SizedBox(height: 10),
-                          Text(next.$1.note(hi),
-                              style: ttcBody(12.5,
-                                  color: Colors.white.withValues(alpha: 0.9),
-                                  h: 1.5)),
-                        ]),
-                  )),
-                  const SizedBox(height: 20),
-                ],
+            // The next milestone, made large - it is the one thing she
+            // opens this screen to check.
+            // A round shows its step in the header above; the big card
+            // stays for a legacy round (2026-09-26).
+            if (next != null && !hasKind) ...[
+              // ⚠️ FLAT, NOT A DIAGONAL GRADIENT. The two-stop purple wash
+              // was the loudest object in the stage, on a screen someone
+              // opens while anxious. It is also the exact texture that was
+              // called out on the video placeholders: a gradient reads as
+              // decoration, and decoration on a date she is dreading is the
+              // wrong register.
+              //
+              // Solid `ttcPurple` keeps every bit of the emphasis — this is
+              // still the only filled block on the page — and loses the
+              // shine.
+              ttcToolPad(
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: ttcTitleInk,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        t.treatmentNext.toUpperCase(),
+                        style: ttcBody(
+                          10,
+                          color: Colors.white.withValues(alpha: 0.8),
+                          w: FontWeight.w800,
+                        ),
+                      ),
+                      const SizedBox(height: 9),
+                      // One name with the rows (2026-09-27). Kept for
+                      // revert: Text(next.$1.label(hi), ...).
+                      Text(
+                        _StepRow._label(next.$1, hi),
+                        style: ttcFraunces(
+                          25,
+                          w: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        _when(next.$1, next.$2, hi),
+                        style: ttcBody(
+                          14,
+                          color: Colors.white.withValues(alpha: 0.95),
+                          w: FontWeight.w700,
+                        ),
+                      ),
+                      // The day count, deliberately SECOND and smaller.
+                      //
+                      // Leading with a countdown turns the screen into
+                      // something to endure - "nine days left" is how the
+                      // wait already feels without our help. Leading with
+                      // the milestone makes it an appointment she has,
+                      // rather than a sentence she is serving. The number
+                      // still has to be here, though: leave it out and she
+                      // counts it herself, which is worse.
+                      const SizedBox(height: 5),
+                      Text(
+                        _daysAway(next.$2, hi),
+                        style: ttcBody(
+                          12,
+                          color: Colors.white.withValues(alpha: 0.75),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        next.$1.note(hi),
+                        style: ttcBody(
+                          12.5,
+                          color: Colors.white.withValues(alpha: 0.9),
+                          h: 1.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+            ],
 
-                // WHICH pathway, before the two questions about it.
-                //
-                // This is the wiring that was missing entirely. TtcStore.setPath
-                // had no caller anywhere in the app, and the card that leads
-                // here only rendered once a non-natural path was set - so the
-                // only way in was through a door that could not open until you
-                // were already through it. Every user stayed on `natural`, and
-                // the whole ownership model, the two questions, the treatment
-                // cycle, the trigger reminders and the beta countdown were
-                // unreachable code with forty-seven passing tests over the top.
-                //
-                // ⚠️ COMMENTED OUT 2026-09-26, KEPT FOR REVERT (the user's
-                // decision 2, docs/TTC-TREATMENT-FLOW.md §7). The kind of round
-                // is asked by the start flow, and who owns the timing is worked
-                // out from the kind and whether a trigger is dated
-                // (`ttcRoundTier`), so neither the path chooser nor the two
-                // questions are asked here any more. Both widgets still exist
-                // below. To revert, restore these four lines:
-                //
-                // ttcToolPad(const TtcPathChooser()),
-                // const SizedBox(height: 20),
-                // ttcToolPad(const TtcPathwayQuestions()),
-                // const SizedBox(height: 20),
+            // WHICH pathway, before the two questions about it.
+            //
+            // This is the wiring that was missing entirely. TtcStore.setPath
+            // had no caller anywhere in the app, and the card that leads
+            // here only rendered once a non-natural path was set - so the
+            // only way in was through a door that could not open until you
+            // were already through it. Every user stayed on `natural`, and
+            // the whole ownership model, the two questions, the treatment
+            // cycle, the trigger reminders and the beta countdown were
+            // unreachable code with forty-seven passing tests over the top.
+            //
+            // ⚠️ COMMENTED OUT 2026-09-26, KEPT FOR REVERT (the user's
+            // decision 2, docs/TTC-TREATMENT-FLOW.md §7). The kind of round
+            // is asked by the start flow, and who owns the timing is worked
+            // out from the kind and whether a trigger is dated
+            // (`ttcRoundTier`), so neither the path chooser nor the two
+            // questions are asked here any more. Both widgets still exist
+            // below. To revert, restore these four lines:
+            //
+            // ttcToolPad(const TtcPathChooser()),
+            // const SizedBox(height: 20),
+            // ttcToolPad(const TtcPathwayQuestions()),
+            // const SizedBox(height: 20),
 
-                // The five original rows, for a legacy round only: a round
-                // with a kind shows its own timeline above. Kept for revert:
-                // the rows rendered for every round, over all five steps.
-                //
-                // ⚠️ AN IUI OR TABLETS CYCLE IS NOT SHOWN IVF ROWS (tools pass,
-                // 2026-09-27). A legacy round has no kind, but her path does:
-                // on IUI or ovulation induction the transfer row (and, on
-                // tablets, egg collection) could only ever sit empty and read
-                // like something missed, so it is left out unless a date is
-                // already on it. On IUI the retrieval row is named "IUI".
-                if (legacy) ...[
-                  ttcToolPad(ttcSectionTitle(t.treatmentDates)),
-                  for (final step in _legacySteps(cycle)) ...[
-                    ttcToolPad(_StepRow(step: step, at: cycle[step], t: t)),
-                    const SizedBox(height: 10),
-                  ],
-                ],
+            // The five original rows, for a legacy round only: a round
+            // with a kind shows its own timeline above. Kept for revert:
+            // the rows rendered for every round, over all five steps.
+            //
+            // ⚠️ AN IUI OR TABLETS CYCLE IS NOT SHOWN IVF ROWS (tools pass,
+            // 2026-09-27). A legacy round has no kind, but her path does:
+            // on IUI or ovulation induction the transfer row (and, on
+            // tablets, egg collection) could only ever sit empty and read
+            // like something missed, so it is left out unless a date is
+            // already on it. On IUI the retrieval row is named "IUI".
+            if (legacy) ...[
+              ttcToolPad(ttcSectionTitle(t.treatmentDates)),
+              for (final step in _legacySteps(cycle)) ...[
+                ttcToolPad(_StepRow(step: step, at: cycle[step], t: t)),
+                const SizedBox(height: 10),
+              ],
+            ],
 
-                const SizedBox(height: 14),
-                if (cycle[TtcTreatmentStep.trigger] != null)
-                  ttcToolPad(TtcCard(
-                    color: ttcPanel,
-                    child: Row(children: [
-                      const Icon(Icons.notifications_active_outlined,
-                          size: 17, color: ttcPurple),
+            const SizedBox(height: 14),
+            if (cycle[TtcTreatmentStep.trigger] != null)
+              ttcToolPad(
+                TtcCard(
+                  // Kept for revert (2026-09-29, no tinted slab behind text): color: ttcPanel,
+                  border: ttcLine,
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.notifications_active_outlined,
+                        size: 17,
+                        color: ttcTitleInk,
+                      ),
                       const SizedBox(width: 11),
                       Expanded(
-                        child: Text(t.treatmentTriggerReminder,
-                            style: ttcBody(12.5, h: 1.5)),
+                        child: Text(
+                          t.treatmentTriggerReminder,
+                          style: ttcBody(12.5, h: 1.5),
+                        ),
                       ),
-                    ]),
-                  )),
+                    ],
+                  ),
+                ),
+              ),
 
-                const SizedBox(height: 16),
-                // "Remove these dates": for a round entered by mistake. Ending
-                // a round is closing it (kept in history); this is the one
-                // action that removes dates, so it says so before it does.
-                // Kept for revert: the label was `t.treatmentClear`.
-                if (store.hasDates)
-                  ttcToolPad(Semantics(
-                    button: true,
-                    child: GestureDetector(
-                      key: const ValueKey('ttc_round_remove'),
-                      onTap: () => _confirmClear(context, t),
-                      behavior: HitTestBehavior.opaque,
-                      child: Center(
-                        child: Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: Text(kTtcRoundRemove,
-                              style: ttcBody(12.5,
-                                  color: ttcMuted, w: FontWeight.w700)),
+            const SizedBox(height: 16),
+            // "Remove these dates": for a round entered by mistake. Ending
+            // a round is closing it (kept in history); this is the one
+            // action that removes dates, so it says so before it does.
+            // Kept for revert: the label was `t.treatmentClear`.
+            if (store.hasDates)
+              ttcToolPad(
+                Semantics(
+                  button: true,
+                  child: GestureDetector(
+                    key: const ValueKey('ttc_round_remove'),
+                    onTap: () => _confirmClear(context, t),
+                    behavior: HitTestBehavior.opaque,
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Text(
+                          kTtcRoundRemove,
+                          style: ttcBody(
+                            12.5,
+                            color: ttcMuted,
+                            w: FontWeight.w700,
+                          ),
                         ),
                       ),
                     ),
-                  )),
+                  ),
+                ),
+              ),
 
-                // ---- past rounds: kept, never deleted ------------------------
-                if (store.history.isNotEmpty) ...[
-                  const SizedBox(height: 14),
-                  ttcToolPad(ttcSectionTitle(kTtcRoundPastTitle)),
-                  ttcToolPad(Text(kTtcRoundHistoryNote,
-                      style: ttcBody(12, color: ttcMuted))),
-                  const SizedBox(height: 10),
-                  for (var i = store.history.length - 1; i >= 0; i--) ...[
-                    ttcToolPad(_PastRoundRow(
-                        n: i + 1, round: store.history[i])),
-                    const SizedBox(height: 8),
-                  ],
+            // ---- past rounds: kept, never deleted ------------------------
+            if (store.history.isNotEmpty) ...[
+              const SizedBox(height: 14),
+              ttcToolPad(ttcSectionTitle(kTtcRoundPastTitle)),
+              ttcToolPad(
+                Text(kTtcRoundHistoryNote, style: ttcBody(12, color: ttcMuted)),
+              ),
+              const SizedBox(height: 10),
+              for (var i = store.history.length - 1; i >= 0; i--) ...[
+                ttcToolPad(_PastRoundRow(n: i + 1, round: store.history[i])),
+                const SizedBox(height: 8),
+              ],
+            ],
+
+            const SizedBox(height: 14),
+            ttcToolPad(
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(
+                    Icons.info_outline_rounded,
+                    size: 15,
+                    color: ttcMuted,
+                  ),
+                  const SizedBox(width: 9),
+                  Expanded(
+                    child: Text(
+                      t.treatmentDisclaimer,
+                      style: ttcBody(11.5, color: ttcMuted, h: 1.5),
+                    ),
+                  ),
                 ],
-
-                const SizedBox(height: 14),
-                ttcToolPad(Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Icon(Icons.info_outline_rounded,
-                          size: 15, color: ttcMuted),
-                      const SizedBox(width: 9),
-                      Expanded(
-                        child: Text(t.treatmentDisclaimer,
-                            style: ttcBody(11.5, color: ttcMuted, h: 1.5)),
-                      ),
-                    ])),
-                const SizedBox(height: 26),
+              ),
+            ),
+            const SizedBox(height: 26),
           ],
         );
       },
@@ -399,9 +476,11 @@ class TtcTreatmentScreenClassic extends StatelessWidget {
   /// changes the date.
   static String _daysAway(DateTime at, bool hi) {
     final today = DateTime.now();
-    final days = DateTime(at.year, at.month, at.day)
-        .difference(DateTime(today.year, today.month, today.day))
-        .inDays;
+    final days = DateTime(
+      at.year,
+      at.month,
+      at.day,
+    ).difference(DateTime(today.year, today.month, today.day)).inDays;
     if (days <= 0) return hi ? 'Aaj' : 'Today';
     if (days == 1) return hi ? 'Kal' : 'Tomorrow';
     return hi ? '$days din baad' : 'in $days days';
@@ -420,13 +499,17 @@ class TtcTreatmentScreenClassic extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(t.journalCancel,
-                style: ttcBody(13, color: ttcSoft, w: FontWeight.w700)),
+            child: Text(
+              t.journalCancel,
+              style: ttcBody(13, color: ttcSoft, w: FontWeight.w700),
+            ),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text(kTtcRoundRemove,
-                style: ttcBody(13, color: ttcPurple, w: FontWeight.w800)),
+            child: Text(
+              kTtcRoundRemove,
+              style: ttcBody(13, color: ttcTitleInk, w: FontWeight.w800),
+            ),
           ),
         ],
       ),
@@ -461,23 +544,34 @@ class _RoundHeader extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-          color: ttcPanel, borderRadius: BorderRadius.circular(20)),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(
+        // Kept for revert (2026-09-29, no tinted slab behind text): color: ttcPanel,
+        color: Colors.white, border: const Border.fromBorderSide(BorderSide(color: ttcLine)),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
             [
               ttcRoundKindName(round.kind!).toUpperCase(),
               if (round.clinic.isNotEmpty) round.clinic.toUpperCase(),
             ].join(' · '),
-            style: ttcBody(10, color: ttcSoft, w: FontWeight.w800)),
-        const SizedBox(height: 8),
-        Text(ttcRoundPhaseName(phase, round.kind),
-            style: ttcFraunces(24, w: FontWeight.w600, color: ttcTitleInk)),
-        if (nextLine != null) ...[
-          const SizedBox(height: 6),
-          Text(nextLine,
-              style: ttcBody(13.5, color: ttcTitleInk, w: FontWeight.w700)),
+            style: ttcBody(10, color: ttcSoft, w: FontWeight.w800),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            ttcRoundPhaseName(phase, round.kind),
+            style: ttcFraunces(24, w: FontWeight.w600, color: ttcTitleInk),
+          ),
+          if (nextLine != null) ...[
+            const SizedBox(height: 6),
+            Text(
+              nextLine,
+              style: ttcBody(13.5, color: ttcTitleInk, w: FontWeight.w700),
+            ),
+          ],
         ],
-      ]),
+      ),
     );
   }
 }
@@ -492,27 +586,38 @@ class _UndoCloseCard extends StatelessWidget {
     final last = store.lastClosed!;
     return TtcCard(
       key: const ValueKey('ttc_round_undo_card'),
-      color: ttcPanel,
-      child: Row(children: [
-        Expanded(
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(kTtcUndoCardLine,
-                style: ttcBody(13, color: ttcTitleInk, w: FontWeight.w800)),
-            const SizedBox(height: 4),
-            Text(
-                '${ttcRoundHistoryLabel(store.history.length, last)} · '
-                '${ttcRoundOutcomeLabel(last.outcome)}',
-                style: ttcBody(12, h: 1.4)),
-          ]),
-        ),
-        const SizedBox(width: 10),
-        TextButton(
-          key: const ValueKey('ttc_round_undo'),
-          onPressed: store.undoClose,
-          child: Text(kTtcRoundUndoCta,
-              style: ttcBody(13.5, color: ttcTitleInk, w: FontWeight.w800)),
-        ),
-      ]),
+      // Kept for revert (2026-09-29, no tinted slab behind text): color: ttcPanel,
+      border: ttcLine,
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  kTtcUndoCardLine,
+                  style: ttcBody(13, color: ttcTitleInk, w: FontWeight.w800),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '${ttcRoundHistoryLabel(store.history.length, last)} · '
+                  '${ttcRoundOutcomeLabel(last.outcome)}',
+                  style: ttcBody(12, h: 1.4),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 10),
+          TextButton(
+            key: const ValueKey('ttc_round_undo'),
+            onPressed: store.undoClose,
+            child: Text(
+              kTtcRoundUndoCta,
+              style: ttcBody(13.5, color: ttcTitleInk, w: FontWeight.w800),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -527,24 +632,32 @@ class _PastRoundRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return TtcCard(
       padding: const EdgeInsets.all(14),
-      child: Row(children: [
-        const Icon(Icons.history_rounded, size: 18, color: ttcMuted),
-        const SizedBox(width: 11),
-        Expanded(
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(ttcRoundHistoryLabel(n, round),
-                style: ttcBody(13.5, color: ttcTitleInk, w: FontWeight.w800)),
-            const SizedBox(height: 3),
-            Text(
-                [
-                  if (round.kind != null) ttcRoundKindName(round.kind!),
-                  ttcRoundOutcomeLabel(round.outcome),
-                  '${round.allDates.length} dates',
-                ].join(' · '),
-                style: ttcBody(12, h: 1.4)),
-          ]),
-        ),
-      ]),
+      child: Row(
+        children: [
+          const Icon(Icons.history_rounded, size: 18, color: ttcMuted),
+          const SizedBox(width: 11),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  ttcRoundHistoryLabel(n, round),
+                  style: ttcBody(13.5, color: ttcTitleInk, w: FontWeight.w800),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  [
+                    if (round.kind != null) ttcRoundKindName(round.kind!),
+                    ttcRoundOutcomeLabel(round.outcome),
+                    '${round.allDates.length} dates',
+                  ].join(' · '),
+                  style: ttcBody(12, h: 1.4),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -565,29 +678,44 @@ class _TakenTick extends StatelessWidget {
     return GestureDetector(
       onTap: () => TtcTreatmentStore.instance.setTriggerTaken(!taken),
       behavior: HitTestBehavior.opaque,
-      child: Row(mainAxisSize: MainAxisSize.min, children: [
-        Container(
-          width: 18,
-          height: 18,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: taken ? ttcPurple : Colors.transparent,
-            borderRadius: BorderRadius.circular(6),
-            border: Border.all(color: taken ? ttcPurple : ttcLine, width: 1.4),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 18,
+            height: 18,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: taken ? ttcTitleInk : Colors.transparent,
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(
+                color: taken ? ttcTitleInk : ttcLine,
+                width: 1.4,
+              ),
+            ),
+            child: taken
+                ? const Icon(Icons.check_rounded, size: 12, color: Colors.white)
+                : null,
           ),
-          child: taken
-              ? const Icon(Icons.check_rounded, size: 12, color: Colors.white)
-              : null,
-        ),
-        const SizedBox(width: 8),
-        Text(
-          taken
-              ? (hi ? 'Le liya - reminder band' : 'Taken · reminders off')
-              : (hi ? 'Le liya? Yahan tick karein' : 'Taken it? Tick here'),
-          style: ttcBody(11.5,
-              color: taken ? ttcPurple : ttcSoft, w: FontWeight.w700),
-        ),
-      ]),
+          const SizedBox(width: 8),
+          // Flexible since the label names the trigger (2026-09-28).
+          Flexible(
+            child: Text(
+              taken
+                  ? (hi ? 'Le liya - reminder band' : 'Taken · reminders off')
+                  // Kept for revert (2026-09-28): 'Taken it? Tick here'
+                  : (hi
+                        ? 'Le liya? Yahan tick karein'
+                        : 'Trigger taken? Tap to tick'),
+              style: ttcBody(
+                11.5,
+                color: taken ? ttcTitleInk : ttcSoft,
+                w: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -606,74 +734,90 @@ class _StepRow extends StatelessWidget {
     return TtcCard(
       onTap: () => _pick(context),
       padding: const EdgeInsets.all(16),
-      border: step.needsTime && set ? ttcPurple : null,
-      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Container(
-          width: 34,
-          height: 34,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: set ? ttcPanel : ttcBg,
-            shape: BoxShape.circle,
-            border: set ? null : Border.all(color: ttcLine),
-          ),
-          child: Icon(_icon(step),
-              size: 16, color: set ? ttcPurple : ttcMuted),
-        ),
-        const SizedBox(width: 13),
-        Expanded(
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(_label(step, hi),
-                style: ttcJakarta(14.5, color: set ? ttcTitleInk : ttcSoft)),
-            const SizedBox(height: 3),
-            Text(
-              set
-                  ? TtcTreatmentScreenClassic._when(step, at!, hi)
-                  : t.treatmentNotSet,
-              style: ttcBody(12.5,
-                  color: set ? ttcPurple : ttcMuted, w: FontWeight.w700),
+      border: step.needsTime && set ? ttcTitleInk : null,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 34,
+            height: 34,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: set ? ttcPanel : ttcBg,
+              shape: BoxShape.circle,
+              border: set ? null : Border.all(color: ttcLine),
             ),
-            const SizedBox(height: 5),
-            Text(step.note(hi), style: ttcBody(11.5, h: 1.45)),
-            // Only the trigger gets a tick, because only the trigger has
-            // reminders that must stop. A generic "done" on every step would be
-            // a tracker, and a treatment cycle is not hers to complete.
-            if (step == TtcTreatmentStep.trigger && set) ...[
-              const SizedBox(height: 9),
-              _TakenTick(taken: TtcTreatmentStore.instance.cycle.triggerTaken,
-                  hi: hi),
-            ],
-          ]),
-        ),
-        // The cross now offers Undo (tools pass, 2026-09-27): it sits right
-        // beside the row she taps to edit, and the date came off a printout.
-        // Kept for revert: onTap was `setDate(step, null)` alone.
-        if (set)
-          Semantics(
-            button: true,
-            label: 'Remove this date',
-            child: GestureDetector(
-              key: ValueKey('ttc_legacy_clear_${step.name}'),
-              onTap: () {
-                final store = TtcTreatmentStore.instance;
-                final was = at;
-                final taken = store.cycle.triggerTaken;
-                store.setDate(step, null);
-                ttcRoundDateRemoved(context, _label(step, hi), () {
-                  store.setDate(step, was);
-                  if (step == TtcTreatmentStep.trigger && taken) {
-                    store.setTriggerTaken(true);
-                  }
-                });
-              },
-              behavior: HitTestBehavior.opaque,
-              child: const Padding(
-                padding: EdgeInsets.only(left: 8),
-                child: Icon(Icons.close_rounded, size: 16, color: ttcMuted),
+            child: Icon(
+              _icon(step),
+              size: 16,
+              color: set ? ttcTitleInk : ttcMuted,
+            ),
+          ),
+          const SizedBox(width: 13),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _label(step, hi),
+                  style: ttcJakarta(14.5, color: set ? ttcTitleInk : ttcSoft),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  set
+                      ? TtcTreatmentScreenClassic._when(step, at!, hi)
+                      : t.treatmentNotSet,
+                  style: ttcBody(
+                    12.5,
+                    color: set ? ttcTitleInk : ttcMuted,
+                    w: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                Text(step.note(hi), style: ttcBody(11.5, h: 1.45)),
+                // Only the trigger gets a tick, because only the trigger has
+                // reminders that must stop. A generic "done" on every step would be
+                // a tracker, and a treatment cycle is not hers to complete.
+                if (step == TtcTreatmentStep.trigger && set) ...[
+                  const SizedBox(height: 9),
+                  _TakenTick(
+                    taken: TtcTreatmentStore.instance.cycle.triggerTaken,
+                    hi: hi,
+                  ),
+                ],
+              ],
+            ),
+          ),
+          // The cross now offers Undo (tools pass, 2026-09-27): it sits right
+          // beside the row she taps to edit, and the date came off a printout.
+          // Kept for revert: onTap was `setDate(step, null)` alone.
+          if (set)
+            Semantics(
+              button: true,
+              label: 'Remove this date',
+              child: GestureDetector(
+                key: ValueKey('ttc_legacy_clear_${step.name}'),
+                onTap: () {
+                  final store = TtcTreatmentStore.instance;
+                  final was = at;
+                  final taken = store.cycle.triggerTaken;
+                  store.setDate(step, null);
+                  ttcRoundDateRemoved(context, _label(step, hi), () {
+                    store.setDate(step, was);
+                    if (step == TtcTreatmentStep.trigger && taken) {
+                      store.setTriggerTaken(true);
+                    }
+                  });
+                },
+                behavior: HitTestBehavior.opaque,
+                child: const Padding(
+                  padding: EdgeInsets.only(left: 8),
+                  child: Icon(Icons.close_rounded, size: 16, color: ttcMuted),
+                ),
               ),
             ),
-          ),
-      ]),
+        ],
+      ),
     );
   }
 
@@ -684,11 +828,11 @@ class _StepRow extends StatelessWidget {
   /// "Beta hCG blood test". The Hindi build keeps the shipped labels.
   static String _label(TtcTreatmentStep step, bool hi) =>
       step == TtcTreatmentStep.retrieval &&
-              TtcStore.instance.path == TtcPath.iui
-          ? 'IUI'
-          : hi
-              ? step.label(hi)
-              : ttcStepLabel(step, null);
+          TtcStore.instance.path == TtcPath.iui
+      ? 'IUI'
+      : hi
+      ? step.label(hi)
+      : ttcStepLabel(step, null);
 
   // ⚠️ THE ROUND'S OWN PICKER NOW (tools pass, 2026-09-27). It titles the
   // calendar with the step's name, checks an out-of-order date, and never
@@ -700,8 +844,12 @@ class _StepRow extends StatelessWidget {
   //       time?.hour ?? 21, time?.minute ?? 0));
   Future<void> _pick(BuildContext context) async {
     final store = TtcTreatmentStore.instance;
-    final picked = await ttcPickRoundDate(context,
-        round: store.cycle, step: step, help: _label(step, t.hinglish));
+    final picked = await ttcPickRoundDate(
+      context,
+      round: store.cycle,
+      step: step,
+      help: _label(step, t.hinglish),
+    );
     if (picked == null || !context.mounted) return;
     store.setDate(step, picked);
   }
@@ -747,106 +895,140 @@ class TtcTreatmentEntryCard extends StatelessWidget {
       button: true,
       onTap: () => openTtcTreatment(context),
       child: Material(
-      key: const ValueKey('ttc_treatment_entry_card'),
-      color: Colors.white,
-      shape: RoundedRectangleBorder(
+        key: const ValueKey('ttc_treatment_entry_card'),
+        color: Colors.white,
+        shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
-          side: const BorderSide(color: ttcLine, width: 1.2)),
-      child: InkWell(
-      borderRadius: BorderRadius.circular(20),
-      onTap: () => openTtcTreatment(context),
-      child: Padding(
-      padding: const EdgeInsets.all(18),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [
-          const Icon(Icons.local_hospital_outlined,
-              size: 18, color: ttcTitleInk),
-          const SizedBox(width: 9),
-          Expanded(
-            child: Text(TtcStore.instance.ownership.title(hi),
-                style: pvManrope(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w800,
-                    color: p.ink1)),
-          ),
-        ]),
-        const SizedBox(height: 10),
-        // The copy differs between the two clinic tiers on purpose: "we are not
-        // naming a date, keep logging" is a different message from "nothing of
-        // your natural cycle applies here".
-        Text(TtcStore.instance.ownership.body(hi),
-            style: pvManrope(fontSize: 13.5, height: 1.55, color: p.ink2)),
-        const SizedBox(height: 12),
-        Divider(color: p.line, height: 1),
-        const SizedBox(height: 12),
+          side: const BorderSide(color: ttcLine, width: 1.2),
+        ),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(20),
+          onTap: () => openTtcTreatment(context),
+          child: Padding(
+            padding: const EdgeInsets.all(18),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.local_hospital_outlined,
+                      size: 18,
+                      color: ttcTitleInk,
+                    ),
+                    const SizedBox(width: 9),
+                    Expanded(
+                      child: Text(
+                        TtcStore.instance.ownership.title(hi),
+                        style: pvManrope(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w800,
+                          color: p.ink1,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                // The copy differs between the two clinic tiers on purpose: "we are not
+                // naming a date, keep logging" is a different message from "nothing of
+                // your natural cycle applies here".
+                Text(
+                  TtcStore.instance.ownership.body(hi),
+                  style: pvManrope(fontSize: 13.5, height: 1.55, color: p.ink2),
+                ),
+                const SizedBox(height: 12),
+                Divider(color: p.line, height: 1),
+                const SizedBox(height: 12),
 
-        if (next != null) ...[
-          Text(t.treatmentNext.toUpperCase(),
-              style: pvManrope(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 1.1,
-                  color: p.ink3)),
-          const SizedBox(height: 6),
-          Text(
-            // One name with the rows (2026-09-27). Was next.$1.label(hi).
-            '${_StepRow._label(next.$1, hi)} · '
-            '${TtcTreatmentScreenClassic._when(next.$1, next.$2, hi)}',
-            style: pvManrope(
-                fontSize: 14, fontWeight: FontWeight.w800, color: p.ink1),
-          ),
-        ] else ...[
-          // The invitation - this is what turns "we cannot help" into "tell us
-          // and we can".
-          Row(children: [
-            const Icon(Icons.add_circle_outline_rounded,
-                size: 17, color: ttcTitleInk),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(t.treatmentAddDates,
-                  style: pvManrope(
-                      fontSize: 13.5,
+                if (next != null) ...[
+                  Text(
+                    t.treatmentNext.toUpperCase(),
+                    style: pvManrope(
+                      fontSize: 10,
                       fontWeight: FontWeight.w800,
-                      color: p.ink1)),
-            ),
-          ]),
-          const SizedBox(height: 6),
-          Text(t.treatmentAddDatesBody,
-              style: pvManrope(fontSize: 12.5, height: 1.5, color: p.ink2)),
-        ],
+                      letterSpacing: 1.1,
+                      color: p.ink3,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    // One name with the rows (2026-09-27). Was next.$1.label(hi).
+                    '${_StepRow._label(next.$1, hi)} · '
+                    '${TtcTreatmentScreenClassic._when(next.$1, next.$2, hi)}',
+                    style: pvManrope(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w800,
+                      color: p.ink1,
+                    ),
+                  ),
+                ] else ...[
+                  // The invitation - this is what turns "we cannot help" into "tell us
+                  // and we can".
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.add_circle_outline_rounded,
+                        size: 17,
+                        color: ttcTitleInk,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          t.treatmentAddDates,
+                          style: pvManrope(
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.w800,
+                            color: p.ink1,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    t.treatmentAddDatesBody,
+                    style: pvManrope(
+                      fontSize: 12.5,
+                      height: 1.5,
+                      color: p.ink2,
+                    ),
+                  ),
+                ],
 
-        // If we are assuming rather than knowing, say so and offer the fix.
-        // Someone on unmonitored letrozole is currently having their fertile
-        // window withheld on a default, and two taps would give it back.
-        // ⚠️ COMMENTED OUT 2026-09-26 WITH THE TWO QUESTIONS (decision 2):
-        // the tier comes from the round now, so there is nothing to answer.
-        // Kept for revert: the condition was
-        //   !TtcStore.instance.pathwayAnswered &&
-        //       TtcStore.instance.path.answersMatter
-        // if (...) ...[
-          // const SizedBox(height: 12),
-          // ttcDivider(),
-          // const SizedBox(height: 11),
-          // Row(children: [
-            // const Icon(Icons.help_outline_rounded, size: 16, color: ttcBrown),
-            // const SizedBox(width: 8),
-            // Expanded(
-              // child: Column(
-                  // crossAxisAlignment: CrossAxisAlignment.start,
-                  // children: [
-                    // Text(t.pathwayAnswerCta,
-                        // style:
-                            // ttcBody(12.5, color: ttcBrown, w: FontWeight.w800)),
-                    // const SizedBox(height: 3),
-                    // Text(t.pathwayAnswerBody,
-                        // style: ttcBody(11.5, color: ttcBrown, h: 1.45)),
-                  // ]),
-            // ),
-          // ]),
-        // ],
-      ]),
-      ),
-      ),
+                // If we are assuming rather than knowing, say so and offer the fix.
+                // Someone on unmonitored letrozole is currently having their fertile
+                // window withheld on a default, and two taps would give it back.
+                // ⚠️ COMMENTED OUT 2026-09-26 WITH THE TWO QUESTIONS (decision 2):
+                // the tier comes from the round now, so there is nothing to answer.
+                // Kept for revert: the condition was
+                //   !TtcStore.instance.pathwayAnswered &&
+                //       TtcStore.instance.path.answersMatter
+                // if (...) ...[
+                // const SizedBox(height: 12),
+                // ttcDivider(),
+                // const SizedBox(height: 11),
+                // Row(children: [
+                // const Icon(Icons.help_outline_rounded, size: 16, color: ttcBrown),
+                // const SizedBox(width: 8),
+                // Expanded(
+                // child: Column(
+                // crossAxisAlignment: CrossAxisAlignment.start,
+                // children: [
+                // Text(t.pathwayAnswerCta,
+                // style:
+                // ttcBody(12.5, color: ttcBrown, w: FontWeight.w800)),
+                // const SizedBox(height: 3),
+                // Text(t.pathwayAnswerBody,
+                // style: ttcBody(11.5, color: ttcBrown, h: 1.45)),
+                // ]),
+                // ),
+                // ]),
+                // ],
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -886,78 +1068,95 @@ class TtcPathChooser extends StatelessWidget {
         final current = TtcStore.instance.path;
 
         return TtcCard(
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(t.pathwayChooseTitle, style: ttcJakarta(16)),
-            const SizedBox(height: 8),
-            Text(t.pathwayChooseBody, style: ttcBody(12.5, h: 1.55)),
-            const SizedBox(height: 16),
-            for (final path in TtcPath.values) ...[
-              GestureDetector(
-                onTap: () => TtcStore.instance.setPath(path),
-                behavior: HitTestBehavior.opaque,
-                child: Container(
-                  width: double.infinity,
-                  margin: const EdgeInsets.only(bottom: 9),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 15, vertical: 13),
-                  decoration: BoxDecoration(
-                    // ⚠️ THE PURPLE BAR IS GONE. Reported on sight: *"I can see
-                    // a purple bar which isn't what we are following right now
-                    // to select an option."* It was a full-width solid accent
-                    // block, which is the accent used as a surface — the one
-                    // thing the design system says it is never for.
-                    //
-                    // This is now the same treatment as the option blocks in
-                    // "Check my readiness" and "Where do I stand": the hue at
-                    // tint strength, an ink edge, ink type. One selection
-                    // language across every tool in the stage.
-                    color: path == current
-                        ? v2BlockTint(kIvfHue, V2PaletteStore.instance.current)
-                        : ttcPanel,
-                    borderRadius: BorderRadius.circular(16),
-                    border: path == current
-                        ? Border.all(color: ttcTitleInk, width: 1.5)
-                        : null,
-                  ),
-                  child: Row(children: [
-                    Expanded(
-                      child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(path.label(hi),
-                                style: ttcBody(13.5,
-                                    color: ttcTitleInk,
-                                    w: FontWeight.w700)),
-                            if (path == TtcPath.natural) ...[
-                              const SizedBox(height: 3),
-                              // ⚠️ ONE INK, BOTH STATES. This was white on the
-                              // selected row, which was correct while the row
-                              // was solid purple and invisible the moment it
-                              // became a pale tint — white on light blue, which
-                              // is how "no clinic involved with this cycle"
-                              // disappeared exactly when it was chosen.
-                              //
-                              // The general lesson is worth more than the fix:
-                              // a colour written as "white, because the
-                              // background is dark" is a colour that depends on
-                              // a fact stated somewhere else. When the two are
-                              // in different widgets, changing one silently
-                              // breaks the other and nothing fails.
-                              Text(t.pathwayNaturalNote,
-                                  style: ttcBody(11, color: ttcSoft)),
-                            ],
-                          ]),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(t.pathwayChooseTitle, style: ttcJakarta(16)),
+              const SizedBox(height: 8),
+              Text(t.pathwayChooseBody, style: ttcBody(12.5, h: 1.55)),
+              const SizedBox(height: 16),
+              for (final path in TtcPath.values) ...[
+                GestureDetector(
+                  onTap: () => TtcStore.instance.setPath(path),
+                  behavior: HitTestBehavior.opaque,
+                  child: Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.only(bottom: 9),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 15,
+                      vertical: 13,
                     ),
-                    // ⚠️ NO TICK. Same leftover: a white check mark on a solid
-                    // block, now invisible on a pale one. It was never needed —
-                    // the fill and the ink edge already say which row is
-                    // chosen, and a tick beside them is a third signal for a
-                    // fact that two are already carrying.
-                  ]),
+                    decoration: BoxDecoration(
+                      // ⚠️ THE PURPLE BAR IS GONE. Reported on sight: *"I can see
+                      // a purple bar which isn't what we are following right now
+                      // to select an option."* It was a full-width solid accent
+                      // block, which is the accent used as a surface — the one
+                      // thing the design system says it is never for.
+                      //
+                      // This is now the same treatment as the option blocks in
+                      // "Check my readiness" and "Where do I stand": the hue at
+                      // tint strength, an ink edge, ink type. One selection
+                      // language across every tool in the stage.
+                      color: path == current
+                          ? v2BlockTint(
+                              kIvfHue,
+                              V2PaletteStore.instance.current,
+                            )
+                          : ttcPanel,
+                      borderRadius: BorderRadius.circular(16),
+                      border: path == current
+                          ? Border.all(color: ttcTitleInk, width: 1.5)
+                          : null,
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                path.label(hi),
+                                style: ttcBody(
+                                  13.5,
+                                  color: ttcTitleInk,
+                                  w: FontWeight.w700,
+                                ),
+                              ),
+                              if (path == TtcPath.natural) ...[
+                                const SizedBox(height: 3),
+                                // ⚠️ ONE INK, BOTH STATES. This was white on the
+                                // selected row, which was correct while the row
+                                // was solid purple and invisible the moment it
+                                // became a pale tint — white on light blue, which
+                                // is how "no clinic involved with this cycle"
+                                // disappeared exactly when it was chosen.
+                                //
+                                // The general lesson is worth more than the fix:
+                                // a colour written as "white, because the
+                                // background is dark" is a colour that depends on
+                                // a fact stated somewhere else. When the two are
+                                // in different widgets, changing one silently
+                                // breaks the other and nothing fails.
+                                Text(
+                                  t.pathwayNaturalNote,
+                                  style: ttcBody(11, color: ttcSoft),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                        // ⚠️ NO TICK. Same leftover: a white check mark on a solid
+                        // block, now invisible on a pale one. It was never needed —
+                        // the fill and the ink edge already say which row is
+                        // chosen, and a tick beside them is a third signal for a
+                        // fact that two are already carrying.
+                      ],
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ],
-          ]),
+          ),
         );
       },
     );
@@ -982,29 +1181,32 @@ class TtcPathwayQuestions extends StatelessWidget {
         if (!pathway.path.answersMatter) return const SizedBox();
 
         return TtcCard(
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(t.pathwayQuestionsTitle, style: ttcJakarta(16)),
-            const SizedBox(height: 8),
-            Text(t.pathwayQuestionsWhy, style: ttcBody(12.5, h: 1.55)),
-            const SizedBox(height: 16),
-            _Question(
-              text: t.pathwayQMonitor,
-              examples: t.pathwayQMonitorEg,
-              value: pathway.clinicMonitors,
-              onChanged: store.setClinicMonitors,
-              t: t,
-            ),
-            const SizedBox(height: 14),
-            ttcDivider(),
-            const SizedBox(height: 14),
-            _Question(
-              text: t.pathwayQMedicated,
-              examples: t.pathwayQMedicatedEg,
-              value: pathway.medicationControlsOvulation,
-              onChanged: store.setMedicationControlsOvulation,
-              t: t,
-            ),
-          ]),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(t.pathwayQuestionsTitle, style: ttcJakarta(16)),
+              const SizedBox(height: 8),
+              Text(t.pathwayQuestionsWhy, style: ttcBody(12.5, h: 1.55)),
+              const SizedBox(height: 16),
+              _Question(
+                text: t.pathwayQMonitor,
+                examples: t.pathwayQMonitorEg,
+                value: pathway.clinicMonitors,
+                onChanged: store.setClinicMonitors,
+                t: t,
+              ),
+              const SizedBox(height: 14),
+              ttcDivider(),
+              const SizedBox(height: 14),
+              _Question(
+                text: t.pathwayQMedicated,
+                examples: t.pathwayQMedicatedEg,
+                value: pathway.medicationControlsOvulation,
+                onChanged: store.setMedicationControlsOvulation,
+                t: t,
+              ),
+            ],
+          ),
         );
       },
     );
@@ -1050,32 +1252,45 @@ class _Question extends StatelessWidget {
               // laid down as a fill. A solid violet chip beside a page of pale
               // blocks is also simply the loudest thing on screen, which puts
               // the emphasis on the control rather than the question.
-              color: on ? v2BlockTint(kIvfHue, V2PaletteStore.instance.current) : ttcPanel,
+              color: on
+                  ? v2BlockTint(kIvfHue, V2PaletteStore.instance.current)
+                  : ttcPanel,
               borderRadius: BorderRadius.circular(999),
-              border:
-                  on ? Border.all(color: ttcTitleInk, width: 1.5) : null,
+              border: on ? Border.all(color: ttcTitleInk, width: 1.5) : null,
             ),
-            child: Text(label,
-                style: ttcBody(12.5,
-                    color: on ? ttcTitleInk : ttcSoft, w: FontWeight.w800)),
+            child: Text(
+              label,
+              style: ttcBody(
+                12.5,
+                color: on ? ttcTitleInk : ttcSoft,
+                w: FontWeight.w800,
+              ),
+            ),
           ),
         ),
       );
     }
 
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(text, style: ttcBody(13.5, color: ttcInk, h: 1.5)),
-      const SizedBox(height: 6),
-      Text(examples, style: ttcBody(11.5, color: ttcMuted, h: 1.45)),
-      const SizedBox(height: 11),
-      Row(children: [
-        option(t.pathwayYes, true),
-        option(t.pathwayNo, false),
-        if (value == null)
-          Text(t.pathwayNotSure,
-              style: ttcBody(11.5, color: ttcMuted, w: FontWeight.w700)),
-      ]),
-    ]);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(text, style: ttcBody(13.5, color: ttcInk, h: 1.5)),
+        const SizedBox(height: 6),
+        Text(examples, style: ttcBody(11.5, color: ttcMuted, h: 1.45)),
+        const SizedBox(height: 11),
+        Row(
+          children: [
+            option(t.pathwayYes, true),
+            option(t.pathwayNo, false),
+            if (value == null)
+              Text(
+                t.pathwayNotSure,
+                style: ttcBody(11.5, color: ttcMuted, w: FontWeight.w700),
+              ),
+          ],
+        ),
+      ],
+    );
   }
 }
 
@@ -1112,15 +1327,12 @@ class _Question extends StatelessWidget {
 // =============================================================================
 
 /// The screen's section heading, in the tool shell's type.
-Widget _heading(String text) {
-  final p = V2PaletteStore.instance.current;
-  return Text(text,
-      style: pvFraunces(
-          fontSize: 20,
-          fontWeight: FontWeight.w600,
-          height: 1.25,
-          color: p.ink1));
-}
+///
+/// 2026-09-29 (one heading style): the stage's one heading now. Kept for
+/// revert: Text(text, style: pvFraunces(fontSize: 20,
+///     fontWeight: FontWeight.w600, height: 1.25,
+///     color: V2PaletteStore.instance.current.ink1)).
+Widget _heading(String text) => TtcSectionHeading(text);
 
 /// A white row with a hairline: an icon, words, and a chevron when it opens
 /// something. What `TtcCard(color: ttcPanel)` was used for here.
@@ -1147,26 +1359,30 @@ class TtcRoundInfoRow extends StatelessWidget {
       child: Material(
         color: Colors.white,
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-            side: const BorderSide(color: ttcLine, width: 1.2)),
+          borderRadius: BorderRadius.circular(16),
+          side: const BorderSide(color: ttcLine, width: 1.2),
+        ),
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
           onTap: onTap,
           child: Padding(
             padding: const EdgeInsets.fromLTRB(14, 13, 12, 13),
-            child: Row(children: [
-              Icon(icon, size: 18, color: ttcTitleInk),
-              const SizedBox(width: 11),
-              Expanded(
-                child: Text(text,
-                    style: pvManrope(
-                        fontSize: 13, height: 1.45, color: p.ink1)),
-              ),
-              if (onTap != null) ...[
-                const SizedBox(width: 6),
-                Icon(Icons.chevron_right_rounded, size: 18, color: p.ink3),
+            child: Row(
+              children: [
+                Icon(icon, size: 18, color: ttcTitleInk),
+                const SizedBox(width: 11),
+                Expanded(
+                  child: Text(
+                    text,
+                    style: pvManrope(fontSize: 13, height: 1.45, color: p.ink1),
+                  ),
+                ),
+                if (onTap != null) ...[
+                  const SizedBox(width: 6),
+                  Icon(Icons.chevron_right_rounded, size: 18, color: p.ink3),
+                ],
               ],
-            ]),
+            ),
           ),
         ),
       ),
@@ -1193,11 +1409,14 @@ Future<void> showTtcClinicSheet(BuildContext context) async {
   store.setClinic(name);
   final now = name.trim();
   if (now == was) return;
-  pvSnack(context, now.isEmpty ? 'Clinic name removed.' : 'Clinic saved.',
-      icon: Icons.check_rounded,
-      lift: 24,
-      action: kTtcRoundUndoCta,
-      onAction: () => store.setClinic(was));
+  pvSnack(
+    context,
+    now.isEmpty ? 'Clinic name removed.' : 'Clinic saved.',
+    icon: Icons.check_rounded,
+    lift: 24,
+    action: kTtcRoundUndoCta,
+    onAction: () => store.setClinic(was),
+  );
 }
 
 class _ClinicSheet extends StatefulWidget {
@@ -1209,8 +1428,9 @@ class _ClinicSheet extends StatefulWidget {
 }
 
 class _ClinicSheetState extends State<_ClinicSheet> {
-  late final TextEditingController _c =
-      TextEditingController(text: widget.initial);
+  late final TextEditingController _c = TextEditingController(
+    text: widget.initial,
+  );
 
   @override
   void dispose() {
@@ -1233,58 +1453,85 @@ class _ClinicSheetState extends State<_ClinicSheet> {
           child: Padding(
             padding: const EdgeInsets.fromLTRB(18, 12, 18, 18),
             child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                    child: Container(
-                      width: 38,
-                      height: 4,
-                      decoration: BoxDecoration(
-                          color: ttcLine,
-                          borderRadius: BorderRadius.circular(4)),
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 38,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: ttcLine,
+                      borderRadius: BorderRadius.circular(4),
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  Text(kTtcClinicSheetTitle,
-                      style: pvFraunces(
-                          fontSize: 23,
-                          fontWeight: FontWeight.w600,
-                          color: p.ink1)),
-                  const SizedBox(height: 6),
-                  Text(kTtcClinicSheetBody,
-                      style: pvManrope(
-                          fontSize: 13, height: 1.5, color: p.ink2)),
-                  const SizedBox(height: 14),
-                  TextField(
-                    key: const ValueKey('ttc_clinic_field'),
-                    controller: _c,
-                    autofocus: true,
-                    textCapitalization: TextCapitalization.words,
-                    onSubmitted: (v) => Navigator.of(context).pop(v),
-                    style: pvManrope(fontSize: 14.5, color: ttcTitleInk),
-                    decoration: InputDecoration(
-                      hintText: 'Clinic name',
-                      filled: true,
-                      fillColor: Colors.white,
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 14),
-                      enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(color: ttcLine)),
-                      focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide:
-                              const BorderSide(color: ttcTitleInk, width: 1.4)),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  kTtcClinicSheetTitle,
+                  style: pvFraunces(
+                    fontSize: 23,
+                    fontWeight: FontWeight.w600,
+                    color: p.ink1,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  kTtcClinicSheetBody,
+                  style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2),
+                ),
+                const SizedBox(height: 14),
+                TextField(
+                  key: const ValueKey('ttc_clinic_field'),
+                  controller: _c,
+                  autofocus: true,
+                  textCapitalization: TextCapitalization.words,
+                  onSubmitted: (v) => Navigator.of(context).pop(v),
+                  // A one-tap clear, as on the start flow (2026-09-29): Save
+                  // with the field empty removes the name, with Undo.
+                  onChanged: (_) => setState(() {}),
+                  style: pvManrope(fontSize: 14.5, color: ttcTitleInk),
+                  decoration: InputDecoration(
+                    suffixIcon: _c.text.isEmpty
+                        ? null
+                        : IconButton(
+                            key: const ValueKey('ttc_clinic_clear'),
+                            tooltip: 'Clear the clinic name',
+                            icon: Icon(
+                              Icons.close_rounded,
+                              size: 18,
+                              color: p.ink3,
+                            ),
+                            onPressed: () => setState(_c.clear),
+                          ),
+                    hintText: 'Clinic name',
+                    filled: true,
+                    fillColor: Colors.white,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: ttcLine),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(
+                        color: ttcTitleInk,
+                        width: 1.4,
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  TtcRoundButton(
-                    key: const ValueKey('ttc_clinic_save'),
-                    label: 'Save',
-                    onTap: () => Navigator.of(context).pop(_c.text),
-                  ),
-                ]),
+                ),
+                const SizedBox(height: 16),
+                TtcRoundButton(
+                  key: const ValueKey('ttc_clinic_save'),
+                  label: 'Save',
+                  onTap: () => Navigator.of(context).pop(_c.text),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -1298,17 +1545,19 @@ class TtcTreatmentScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation:
-          Listenable.merge([TtcTreatmentStore.instance, TtcLang.instance]),
+      animation: Listenable.merge([
+        TtcTreatmentStore.instance,
+        TtcLang.instance,
+      ]),
       builder: (context, _) {
         final t = TtcS.current();
         final hi = t.hinglish;
         final store = TtcTreatmentStore.instance;
         if (!store.isLoaded) {
           return const Scaffold(
-              backgroundColor: Colors.white,
-              body: Center(
-                  child: CircularProgressIndicator(color: ttcTitleInk)));
+            backgroundColor: Colors.white,
+            body: Center(child: CircularProgressIndicator(color: ttcTitleInk)),
+          );
         }
         final p = V2PaletteStore.instance.current;
         final round = store.cycle;
@@ -1320,7 +1569,8 @@ class TtcTreatmentScreen extends StatelessWidget {
         final now = DateTime.now();
         final phase = ttcTreatmentPhase(round, now);
         final blood = ttcRoundBloodTest(round);
-        final canResult = hasKind &&
+        final canResult =
+            hasKind &&
             !round.isEmpty &&
             (phase == TtcRoundPhase.testDay ||
                 blood != null && !blood.isAfter(now));
@@ -1328,13 +1578,15 @@ class TtcTreatmentScreen extends StatelessWidget {
 
         return TtcToolScaffold(
           hue: kIvfHue,
+          // The tool's mark over the eyebrow (2026-09-29, ttc_tool_marks.dart).
+          toolId: 'treatment',
           eyebrow: t.treatmentTitle,
           title: 'The dates your\nclinic gave you.',
           intro: hi
               ? t.treatmentIntro
               : "Add the dates your clinic gave you, and we'll remind you "
-                  'before the trigger injection. Fill in what you know. '
-                  'The rest can wait.',
+                    'before the trigger injection. Fill in what you know. '
+                    'The rest can wait.',
           children: [
             const SizedBox(height: 22),
 
@@ -1352,20 +1604,25 @@ class TtcTreatmentScreen extends StatelessWidget {
 
             // ---- the check-in, when it is due --------------------------------
             if (store.checkInDue()) ...[
-              ttcToolPad(TtcRoundCheckInCard(
-                  onAnswer: () => showTtcCheckInSheet(context))),
+              ttcToolPad(
+                TtcRoundCheckInCard(
+                  onAnswer: () => showTtcCheckInSheet(context),
+                ),
+              ),
               const SizedBox(height: 20),
             ],
 
             // ---- a legacy round: what kind is it? ----------------------------
             if (legacy) ...[
-              ttcToolPad(TtcRoundOption(
-                key: const ValueKey('ttc_round_legacy_kind'),
-                title: kTtcRoundLegacyTitle,
-                line: kTtcRoundLegacyBody,
-                icon: Icons.help_outline_rounded,
-                onTap: () => openTtcTreatmentStart(context),
-              )),
+              ttcToolPad(
+                TtcRoundOption(
+                  key: const ValueKey('ttc_round_legacy_kind'),
+                  title: kTtcRoundLegacyTitle,
+                  line: kTtcRoundLegacyBody,
+                  icon: Icons.help_outline_rounded,
+                  onTap: () => openTtcTreatmentStart(context),
+                ),
+              ),
               const SizedBox(height: 20),
             ],
 
@@ -1374,53 +1631,67 @@ class TtcTreatmentScreen extends StatelessWidget {
               ttcToolPad(_TodayCard(round: round, phase: phase)),
               const SizedBox(height: 18),
               if (canResult) ...[
-                ttcToolPad(TtcRoundButton(
-                  key: const ValueKey('ttc_round_tell_result'),
-                  label: kTtcRoundTellResult,
-                  onTap: () => openTtcTreatmentResult(context),
-                )),
+                ttcToolPad(
+                  TtcRoundButton(
+                    key: const ValueKey('ttc_round_tell_result'),
+                    label: kTtcRoundTellResult,
+                    onTap: () => openTtcTreatmentResult(context),
+                  ),
+                ),
                 const SizedBox(height: 18),
               ],
               ttcToolPad(_heading(kTtcRoundPlanTitle)),
               const SizedBox(height: 6),
-              ttcToolPad(Text(kTtcRoundPlanBody,
-                  style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2))),
+              ttcToolPad(
+                Text(
+                  kTtcRoundPlanBody,
+                  style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2),
+                ),
+              ),
               const SizedBox(height: 18),
               ttcToolPad(TtcRoundTimeline(round: round)),
               const SizedBox(height: 6),
               // Daily injections live in the medication schedule (decision
               // 4), which already has times and a taken tick.
-              ttcToolPad(TtcRoundInfoRow(
-                key: const ValueKey('ttc_round_medication_link'),
-                icon: Icons.medication_outlined,
-                text: kTtcRoundMedicationLink,
-                onTap: () => openTtcSurface(context, 'ttc_medication'),
-              )),
+              ttcToolPad(
+                TtcRoundInfoRow(
+                  key: const ValueKey('ttc_round_medication_link'),
+                  icon: Icons.medication_outlined,
+                  text: kTtcRoundMedicationLink,
+                  onTap: () => openTtcSurface(context, 'ttc_medication'),
+                ),
+              ),
               const SizedBox(height: 22),
               if (!round.isEmpty) ...[
-                ttcToolPad(TtcRoundButton(
-                  key: const ValueKey('ttc_round_plan_changed'),
-                  label: kTtcRoundPlanChanged,
-                  primary: false,
-                  onTap: () => showTtcPlanChangedSheet(context),
-                )),
+                ttcToolPad(
+                  TtcRoundButton(
+                    key: const ValueKey('ttc_round_plan_changed'),
+                    label: kTtcRoundPlanChanged,
+                    primary: false,
+                    onTap: () => showTtcPlanChangedSheet(context),
+                  ),
+                ),
                 const SizedBox(height: 8),
-                ttcToolPad(TtcRoundButton(
-                  key: const ValueKey('ttc_round_pause'),
-                  label: kTtcRoundTakeBreak,
-                  primary: false,
-                  onTap: () =>
-                      ttcConfirmCloseRound(context, TtcRoundOutcome.paused),
-                )),
+                ttcToolPad(
+                  TtcRoundButton(
+                    key: const ValueKey('ttc_round_pause'),
+                    label: kTtcRoundTakeBreak,
+                    primary: false,
+                    onTap: () =>
+                        ttcConfirmCloseRound(context, TtcRoundOutcome.paused),
+                  ),
+                ),
               ] else
                 // A round with no dates has nothing to pause or close; the
                 // one thing worth changing is the kind (confirmed, undoable).
-                ttcToolPad(TtcRoundButton(
-                  key: const ValueKey('ttc_round_change_kind'),
-                  label: kTtcPlanWrongKind,
-                  primary: false,
-                  onTap: () => ttcPickRoundKind(context),
-                )),
+                ttcToolPad(
+                  TtcRoundButton(
+                    key: const ValueKey('ttc_round_change_kind'),
+                    label: kTtcPlanWrongKind,
+                    primary: false,
+                    onTap: () => ttcPickRoundKind(context),
+                  ),
+                ),
               const SizedBox(height: 20),
             ],
 
@@ -1432,8 +1703,9 @@ class TtcTreatmentScreen extends StatelessWidget {
             if (legacy) ...[
               ttcToolPad(_heading(t.treatmentDates)),
               const SizedBox(height: 12),
-              for (final step in TtcTreatmentScreenClassic._legacySteps(round))
-                ...[
+              for (final step in TtcTreatmentScreenClassic._legacySteps(
+                round,
+              )) ...[
                 ttcToolPad(_LegacyRow(step: step, at: round[step], t: t)),
                 const SizedBox(height: 10),
               ],
@@ -1441,10 +1713,12 @@ class TtcTreatmentScreen extends StatelessWidget {
 
             if (round[TtcTreatmentStep.trigger] != null) ...[
               const SizedBox(height: 4),
-              ttcToolPad(TtcRoundInfoRow(
-                icon: Icons.notifications_active_outlined,
-                text: t.treatmentTriggerReminder,
-              )),
+              ttcToolPad(
+                TtcRoundInfoRow(
+                  icon: Icons.notifications_active_outlined,
+                  text: t.treatmentTriggerReminder,
+                ),
+              ),
             ],
 
             // "Remove these dates": for a round entered by mistake. Ending a
@@ -1458,21 +1732,27 @@ class TtcTreatmentScreen extends StatelessWidget {
                   onPressed: () async {
                     // The round's own confirm (2026-09-27). Kept for revert:
                     // `TtcTreatmentScreenClassic._confirmClear(context, t)`.
-                    if (await ttcRoundConfirm(context,
-                        title: '$kTtcRoundRemove?',
-                        body: kTtcRoundRemoveBody,
-                        yes: kTtcRoundRemove,
-                        no: 'Keep them',
-                        route: 'ttc/treatment/confirm_remove')) {
+                    if (await ttcRoundConfirm(
+                      context,
+                      title: '$kTtcRoundRemove?',
+                      body: kTtcRoundRemoveBody,
+                      yes: kTtcRoundRemove,
+                      // Kept for revert (2026-09-28): 'Keep them'
+                      no: 'Keep the dates',
+                      route: 'ttc/treatment/confirm_remove',
+                    )) {
                       store.clearCycle();
                     }
                   },
-                  child: Text(kTtcRoundRemove,
-                      style: pvManrope(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                          color: p.ink3,
-                          decoration: TextDecoration.underline)),
+                  child: Text(
+                    kTtcRoundRemove,
+                    style: pvManrope(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: p.ink3,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -1482,9 +1762,12 @@ class TtcTreatmentScreen extends StatelessWidget {
               const SizedBox(height: 18),
               ttcToolPad(_heading(kTtcRoundPastTitle)),
               const SizedBox(height: 4),
-              ttcToolPad(Text(
+              ttcToolPad(
+                Text(
                   '$kTtcRoundHistoryNote Tap one to see its dates.',
-                  style: pvManrope(fontSize: 12.5, color: p.ink3))),
+                  style: pvManrope(fontSize: 12.5, color: p.ink3),
+                ),
+              ),
               const SizedBox(height: 10),
               for (var i = store.history.length - 1; i >= 0; i--) ...[
                 ttcToolPad(_PastRow(n: i + 1, round: store.history[i])),
@@ -1493,8 +1776,12 @@ class TtcTreatmentScreen extends StatelessWidget {
             ],
 
             const SizedBox(height: 16),
-            ttcToolPad(Text(t.treatmentDisclaimer,
-                style: pvManrope(fontSize: 11.5, height: 1.5, color: p.ink3))),
+            ttcToolPad(
+              Text(
+                t.treatmentDisclaimer,
+                style: pvManrope(fontSize: 11.5, height: 1.5, color: p.ink3),
+              ),
+            ),
             const SizedBox(height: 26),
           ],
         );
@@ -1523,8 +1810,8 @@ class _TodayCard extends StatelessWidget {
     final title = round.isEmpty
         ? kTtcPanelNoDatesTitle
         : count == null || count.$1 <= 0
-            ? ttcRoundPhaseName(phase, kind)
-            : '${ttcRoundPhaseName(phase, kind)} · day ${count.$1}';
+        ? ttcRoundPhaseName(phase, kind)
+        : '${ttcRoundPhaseName(phase, kind)} · day ${count.$1}';
 
     // What is on today, named.
     final todays = <String>[
@@ -1544,8 +1831,9 @@ class _TodayCard extends StatelessWidget {
     } else if (phase == TtcRoundPhase.planned && first != null) {
       nextLine = 'Your home follows your round from ${ttcRoundDate(first)}.';
     } else if (next != null) {
-      final name =
-          next.$1 == null ? ttcScanLabel(kind) : ttcStepLabel(next.$1!, kind);
+      final name = next.$1 == null
+          ? ttcScanLabel(kind)
+          : ttcStepLabel(next.$1!, kind);
       final gap = day(next.$2).difference(today).inDays;
       final when = gap == 1 ? 'tomorrow' : 'in $gap days';
       final at = next.$1?.needsTime == true
@@ -1565,59 +1853,81 @@ class _TodayCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: ttcLine, width: 1.2),
       ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(ttcRoundKindName(kind!).toUpperCase(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            ttcRoundKindName(kind!).toUpperCase(),
             style: pvManrope(
-                fontSize: 10.5,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 1.1,
-                color: p.ink3)),
-        const SizedBox(height: 8),
-        Text(title,
-            style: pvFraunces(
-                fontSize: 24,
-                fontWeight: FontWeight.w600,
-                height: 1.2,
-                color: p.ink1)),
-        if (todays.isNotEmpty) ...[
+              fontSize: 10.5,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 1.1,
+              color: p.ink3,
+            ),
+          ),
           const SizedBox(height: 8),
-          Text('Today: ${todays.join(', ')}.',
+          Text(
+            title,
+            style: pvFraunces(
+              fontSize: 24,
+              fontWeight: FontWeight.w600,
+              height: 1.2,
+              color: p.ink1,
+            ),
+          ),
+          if (todays.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Text(
+              'Today: ${todays.join(', ')}.',
               key: const ValueKey('ttc_round_today_line'),
               style: pvManrope(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w800,
-                  height: 1.4,
-                  color: p.ink1)),
-        ],
-        const SizedBox(height: 6),
-        Text(nextLine,
+                fontSize: 14,
+                fontWeight: FontWeight.w800,
+                height: 1.4,
+                color: p.ink1,
+              ),
+            ),
+          ],
+          const SizedBox(height: 6),
+          Text(
+            nextLine,
             key: const ValueKey('ttc_round_next_line'),
-            style: pvManrope(fontSize: 13.5, height: 1.45, color: p.ink2)),
-        const SizedBox(height: 10),
-        Divider(color: p.line, height: 1),
-        Row(children: [
-          Icon(Icons.local_hospital_outlined, size: 16, color: p.ink3),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-                round.clinic.isEmpty ? 'No clinic added' : round.clinic,
-                style: pvManrope(
+            style: pvManrope(fontSize: 13.5, height: 1.45, color: p.ink2),
+          ),
+          const SizedBox(height: 10),
+          Divider(color: p.line, height: 1),
+          Row(
+            children: [
+              Icon(Icons.local_hospital_outlined, size: 16, color: p.ink3),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  round.clinic.isEmpty ? 'No clinic added' : round.clinic,
+                  style: pvManrope(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
-                    color: round.clinic.isEmpty ? p.ink3 : p.ink1)),
-          ),
-          TextButton(
-            key: const ValueKey('ttc_round_clinic'),
-            onPressed: () => showTtcClinicSheet(context),
-            child: Text(round.clinic.isEmpty ? 'Add clinic' : 'Change',
-                style: pvManrope(
+                    color: round.clinic.isEmpty ? p.ink3 : p.ink1,
+                  ),
+                ),
+              ),
+              TextButton(
+                key: const ValueKey('ttc_round_clinic'),
+                onPressed: () => showTtcClinicSheet(context),
+                // Kept for revert (2026-09-28): 'Change'
+                child: Text(
+                  round.clinic.isEmpty ? 'Add clinic' : 'Change clinic',
+                  style: pvManrope(
                     fontSize: 13,
                     fontWeight: FontWeight.w800,
                     color: ttcTitleInk,
-                    decoration: TextDecoration.underline)),
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ),
+            ],
           ),
-        ]),
-      ]),
+        ],
+      ),
     );
   }
 }
@@ -1639,30 +1949,44 @@ class _UndoCloseRow extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: ttcLine, width: 1.2),
       ),
-      child: Row(children: [
-        Expanded(
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(kTtcUndoCardLine,
-                style: pvManrope(
-                    fontSize: 13, fontWeight: FontWeight.w800, color: p.ink1)),
-            const SizedBox(height: 3),
-            Text(
-                '${ttcRoundHistoryLabel(store.history.length, last)} · '
-                '${ttcRoundOutcomeLabel(last.outcome)}',
-                style: pvManrope(fontSize: 12, height: 1.4, color: p.ink2)),
-          ]),
-        ),
-        TextButton(
-          key: const ValueKey('ttc_round_undo'),
-          onPressed: store.undoClose,
-          child: Text(kTtcRoundUndoCta,
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  kTtcUndoCardLine,
+                  style: pvManrope(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                    color: p.ink1,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  '${ttcRoundHistoryLabel(store.history.length, last)} · '
+                  '${ttcRoundOutcomeLabel(last.outcome)}',
+                  style: pvManrope(fontSize: 12, height: 1.4, color: p.ink2),
+                ),
+              ],
+            ),
+          ),
+          TextButton(
+            key: const ValueKey('ttc_round_undo'),
+            onPressed: store.undoClose,
+            child: Text(
+              kTtcRoundUndoCta,
               style: pvManrope(
-                  fontSize: 13.5,
-                  fontWeight: FontWeight.w800,
-                  color: ttcTitleInk,
-                  decoration: TextDecoration.underline)),
-        ),
-      ]),
+                fontSize: 13.5,
+                fontWeight: FontWeight.w800,
+                color: ttcTitleInk,
+                decoration: TextDecoration.underline,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -1676,10 +2000,12 @@ class _PastRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = V2PaletteStore.instance.current;
-    void open() => Navigator.of(context).push(MaterialPageRoute<void>(
-          builder: (_) => TtcPastRoundScreen(n: n, round: round),
-          settings: const RouteSettings(name: 'ttc/treatment/past'),
-        ));
+    void open() => Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => TtcPastRoundScreen(n: n, round: round),
+        settings: const RouteSettings(name: 'ttc/treatment/past'),
+      ),
+    );
     final label = ttcRoundHistoryLabel(n, round);
     final line = [
       if (round.kind != null) ttcRoundKindName(round.kind!),
@@ -1694,34 +2020,46 @@ class _PastRow extends StatelessWidget {
       child: Material(
         color: Colors.white,
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-            side: const BorderSide(color: ttcLine, width: 1.2)),
+          borderRadius: BorderRadius.circular(16),
+          side: const BorderSide(color: ttcLine, width: 1.2),
+        ),
         child: InkWell(
           key: ValueKey('ttc_round_past_$n'),
           borderRadius: BorderRadius.circular(16),
           onTap: open,
           child: Padding(
             padding: const EdgeInsets.fromLTRB(14, 13, 10, 13),
-            child: Row(children: [
-              Icon(Icons.history_rounded, size: 18, color: p.ink3),
-              const SizedBox(width: 11),
-              Expanded(
-                child: Column(
+            child: Row(
+              children: [
+                Icon(Icons.history_rounded, size: 18, color: p.ink3),
+                const SizedBox(width: 11),
+                Expanded(
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(label,
-                          style: pvManrope(
-                              fontSize: 13.5,
-                              fontWeight: FontWeight.w800,
-                              color: p.ink1)),
+                      Text(
+                        label,
+                        style: pvManrope(
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w800,
+                          color: p.ink1,
+                        ),
+                      ),
                       const SizedBox(height: 3),
-                      Text(line,
-                          style: pvManrope(
-                              fontSize: 12, height: 1.4, color: p.ink2)),
-                    ]),
-              ),
-              Icon(Icons.chevron_right_rounded, size: 18, color: p.ink3),
-            ]),
+                      Text(
+                        line,
+                        style: pvManrope(
+                          fontSize: 12,
+                          height: 1.4,
+                          color: p.ink2,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(Icons.chevron_right_rounded, size: 18, color: p.ink3),
+              ],
+            ),
           ),
         ),
       ),
@@ -1749,21 +2087,35 @@ class TtcPastRoundScreen extends StatelessWidget {
     return TtcToolScaffold(
       hue: kIvfHue,
       variant: 3,
+      // One past round, opened from the plan: back, not an X (2026-09-29).
+      leading: TtcToolLeading.back,
       eyebrow: kTtcRoundPastTitle,
       title: ttcRoundHistoryLabel(n, round),
-      intro: '${parts.join(' · ')}. Kept as a record: nothing here can be '
+      intro:
+          '${parts.join(' · ')}. Kept as a record: nothing here can be '
           'changed.',
       children: [
         const SizedBox(height: 22),
         if (round.clinic.isNotEmpty) ...[
-          ttcToolPad(Text(round.clinic,
+          ttcToolPad(
+            Text(
+              round.clinic,
               style: pvManrope(
-                  fontSize: 13.5, fontWeight: FontWeight.w800, color: p.ink1))),
+                fontSize: 13.5,
+                fontWeight: FontWeight.w800,
+                color: p.ink1,
+              ),
+            ),
+          ),
           const SizedBox(height: 14),
         ],
         if (round.isEmpty)
-          ttcToolPad(Text('This round had no dates.',
-              style: pvManrope(fontSize: 13.5, color: p.ink2)))
+          ttcToolPad(
+            Text(
+              'This round had no dates.',
+              style: pvManrope(fontSize: 13.5, color: p.ink2),
+            ),
+          )
         else
           ttcToolPad(TtcRoundTimeline(round: round, readOnly: true)),
         const SizedBox(height: 28),
@@ -1774,7 +2126,11 @@ class TtcPastRoundScreen extends StatelessWidget {
 
 /// A legacy round's next date, as a white card (it was a solid violet one).
 class _LegacyNextCard extends StatelessWidget {
-  const _LegacyNextCard({required this.step, required this.at, required this.t});
+  const _LegacyNextCard({
+    required this.step,
+    required this.at,
+    required this.t,
+  });
 
   final TtcTreatmentStep step;
   final DateTime at;
@@ -1792,27 +2148,44 @@ class _LegacyNextCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: ttcLine, width: 1.2),
       ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(t.treatmentNext.toUpperCase(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            t.treatmentNext.toUpperCase(),
             style: pvManrope(
-                fontSize: 10.5,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 1.1,
-                color: p.ink3)),
-        const SizedBox(height: 8),
-        Text(_StepRow._label(step, hi),
+              fontSize: 10.5,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 1.1,
+              color: p.ink3,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            _StepRow._label(step, hi),
             style: pvFraunces(
-                fontSize: 23, fontWeight: FontWeight.w600, color: p.ink1)),
-        const SizedBox(height: 6),
-        Text(
+              fontSize: 23,
+              fontWeight: FontWeight.w600,
+              color: p.ink1,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
             '${TtcTreatmentScreenClassic._when(step, at, hi)} · '
             '${TtcTreatmentScreenClassic._daysAway(at, hi)}',
             style: pvManrope(
-                fontSize: 14, fontWeight: FontWeight.w800, color: p.ink1)),
-        const SizedBox(height: 6),
-        Text(step.note(hi),
-            style: pvManrope(fontSize: 12.5, height: 1.5, color: p.ink2)),
-      ]),
+              fontSize: 14,
+              fontWeight: FontWeight.w800,
+              color: p.ink1,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            step.note(hi),
+            style: pvManrope(fontSize: 12.5, height: 1.5, color: p.ink2),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -1840,8 +2213,12 @@ class _LegacyRow extends StatelessWidget {
           ? TtcRoundTakenTick(taken: store.cycle.triggerTaken)
           : null,
       onTap: () async {
-        final picked = await ttcPickRoundDate(context,
-            round: store.cycle, step: step, help: label);
+        final picked = await ttcPickRoundDate(
+          context,
+          round: store.cycle,
+          step: step,
+          help: label,
+        );
         if (picked == null || !context.mounted) return;
         store.setDate(step, picked);
       },

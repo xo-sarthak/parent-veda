@@ -125,7 +125,11 @@ void main() {
       // ⚠️ 25 -> 24 ON 2026-09-27: Mood folded into "Symptoms and mood".
       // ⚠️ 24 -> 22 ON 2026-09-28 (launch sanity T1): BMI folded into
       // Weight, Products left the hub. Kept for revert: 24.
-      expect(TtcToolsScreen.toolCount, 22);
+      // ⚠️ 22 -> 21 ON 2026-09-28: the journal left the stage (the user's
+      // call). Kept for revert: 22.
+      // ⚠️ 21 -> 19 ON 2026-09-28 (Tools holds only tools): three rows left
+      // for More, the treatment cycle came in. Kept for revert: 21.
+      expect(TtcToolsScreen.toolCount, 19);
     });
 
     testWidgets('all nine Prepare categories render', (tester) async {

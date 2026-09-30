@@ -119,6 +119,10 @@ class TtcS {
   String get tabLearn => _p('Learn', 'Learn');
   String get tabYou => _p('You', 'You');
 
+  /// The fifth tab since 2026-09-28: More, a bento of tiles. English only,
+  /// like [tabYou]; [tabMore] above keeps its old Hindi side for revert.
+  String get tabMoreV3 => _p('More', 'More');
+
   // ---- the Learn tab --------------------------------------------------------
   String get learnTitle => _p('Learn', 'Learn');
   String get learnIntro => _p(
@@ -128,9 +132,11 @@ class TtcS {
       _p('Search reads, films and questions', 'Search reads, films and questions');
   String get learnRecent => _p('Recent', 'Recent');
   String get learnPopular => _p('People often look for', 'People often look for');
+  // Kept for revert (2026-09-28, explicit names): "Nothing here matches that
+  // yet. Try a shorter word, or ask Veda."
   String get learnNoMatch => _p(
-      "Nothing here matches that yet. Try a shorter word, or ask Veda.",
-      "Nothing here matches that yet. Try a shorter word, or ask Veda.");
+      "No read, film or tool matches those words yet. Try a shorter word, or ask Veda.",
+      "No read, film or tool matches those words yet. Try a shorter word, or ask Veda.");
   String learnAskVeda(String q) => _p('Ask Veda about "$q"', 'Ask Veda about "$q"');
   String get learnAskVedaLine =>
       _p('An answer from what we have written', 'An answer from what we have written');
@@ -138,34 +144,47 @@ class TtcS {
   String get learnYourReading => _p('Your reading', 'Your reading');
   String get learnContinue => _p('Pick up where you left off', 'Pick up where you left off');
   String get learnSaved => _p('Saved for later', 'Saved for later');
+  // Kept for revert (2026-09-28, explicit names): 'Tap the bookmark on any
+  // read and it waits for you here.' and 'All saved'.
   String get learnSavedEmpty => _p(
-      'Tap the bookmark on any read and it waits for you here.',
-      'Tap the bookmark on any read and it waits for you here.');
-  String get learnSeeSaved => _p('All saved', 'All saved');
-  String get learnStartEyebrow => _p('Start here', 'Start here');
+      'Tap the bookmark on any read, and the read waits for you in Saved.',
+      'Tap the bookmark on any read, and the read waits for you in Saved.');
+  String get learnSeeSaved => _p('See everything saved', 'See everything saved');
+  // Kept for revert (2026-09-28, explicit names): 'Start here'.
+  String get learnStartEyebrow => _p('Start with the basics', 'Start with the basics');
   // "Trying to conceive 101" since 2026-09-26 (the gap analysis's seven-step
   // course). Was: 'Five reads for the first few months'.
   String get learnStartTitle =>
       _p('Trying to conceive 101', 'Trying to conceive 101');
+  // Kept for revert (2026-09-28, explicit names): '... Each one makes the
+  // next easier.'
   String get learnStartLead => _p(
-      'Short reads for the first months, in order if you like. Each one makes the next easier.',
-      'Short reads for the first months, in order if you like. Each one makes the next easier.');
+      'Short reads for the first months, in order if you like. Each read makes the next one easier.',
+      'Short reads for the first months, in order if you like. Each read makes the next one easier.');
   String get learnFilmsEyebrow => _p('Films', 'Films');
   String get learnFilmsTitle => _p('Short films on the way', 'Short films on the way');
+  // Kept for revert (2026-09-28, explicit names): "We're still making these.
+  // Each one already has its notes, so you can read what it will cover."
   String get learnFilmsLead => _p(
-      "We're still making these. Each one already has its notes, so you can read what it will cover.",
-      "We're still making these. Each one already has its notes, so you can read what it will cover.");
+      "We're still making these films. Each film already has its notes, so you can read what the film will cover.",
+      "We're still making these films. Each film already has its notes, so you can read what the film will cover.");
   String get learnFilmComing => _p('Coming soon', 'Coming soon');
   String get learnFilmNotYet => _p(
       "We're still making this film. It will play here when it's ready.",
       "We're still making this film. It will play here when it's ready.");
   String get learnFilmTakeaways => _p("What you'll take away", "What you'll take away");
-  String get learnFilmCovers => _p('What it covers', 'What it covers');
-  String get learnFilmReadNow => _p('Read about it now', 'Read about it now');
+  // Kept for revert (2026-09-28, explicit names): 'What it covers' and
+  // 'Read about it now'.
+  String get learnFilmCovers => _p('What the film covers', 'What the film covers');
+  String get learnFilmReadNow => _p("Read the film's notes now", "Read the film's notes now");
   String get learnByTopicEyebrow => _p('By topic', 'By topic');
-  String get learnOpenDoor => _p('Open', 'Open');
+  // Kept for revert (2026-09-28, explicit names): 'Open'.
+  String get learnOpenDoor => _p('Open the door', 'Open the door');
   String get learnAll => _p('All', 'All');
-  String learnShowAll(int n) => _p('Show all $n', 'Show all $n');
+  // Kept for revert (2026-09-28, explicit names): 'Show all $n'. The noun
+  // after the count is Givingli's "See all 11 articles" under each help
+  // topic (https://mobbin.com/screens/e37498f9-ff6f-4a66-99cb-0ca68e3d7593).
+  String learnShowAll(int n) => _p('Show all $n reads', 'Show all $n reads');
   String get learnShowFewer => _p('Show fewer', 'Show fewer');
   String get learnMythsEyebrow => _p('Myths and stories', 'Myths and stories');
   String get learnMythsTitle =>
@@ -173,7 +192,8 @@ class TtcS {
   String get learnCoursesEyebrow => _p('Courses and programmes', 'Courses and programmes');
   String get learnCoursesTitle =>
       _p('Go deeper, with someone who knows', 'Go deeper, with someone who knows');
-  String get learnCoursesAll => _p('See all', 'See all');
+  // Kept for revert (2026-09-28, explicit names): 'See all'.
+  String get learnCoursesAll => _p('See all courses', 'See all courses');
   String get learnFaqEyebrow => _p('Common questions', 'Common questions');
   String get learnFaqTitle => _p('Short answers', 'Short answers');
   String learnFaqFrom(String title) => _p('From: $title', 'From: $title');
@@ -363,7 +383,8 @@ class TtcS {
   String tooCloseWarning(int days) => _p(
       'That\'s $days days after the last start you logged. Periods don\'t usually start that close together. If this is the same period, you may not need a second entry.',
       'Ye aapke pichhle start ke $days din baad hai. Periods aam taur par itne paas shuru nahi hote - agar ye wahi period hai toh shayad doosri entry ki zaroorat nahi.');
-  String get tooCloseKeep => _p('Add it anyway', 'Phir bhi add karein');
+  // Change 5 (2026-09-28): names the thing. Hindi unchanged. Kept for revert: 'Add it anyway'.
+  String get tooCloseKeep => _p('Add the date anyway', 'Phir bhi add karein');
   String get tooCloseCancel => _p('Cancel', 'Rehne dein');
 
   String estimatedOvulation(int day) =>
@@ -476,9 +497,11 @@ class TtcS {
   String get headerEditPeriod => _p('Edit period dates', 'Period dates badlein');
   String get headerCheckSymptoms => _p('Check symptoms', 'Symptoms dekhein');
 
-  String get headerStartHere => _p('Start here', 'Shuruaat');
+  // Change 5 (2026-09-28): the hero names what it asks for. Hindi unchanged.
+  // Kept for revert: 'Start here', and '…and your cycle takes shape here.'
+  String get headerStartHere => _p('Start with one date', 'Shuruaat');
   String get headerStartHereBody => _p(
-      'Add the date your last period started, and your cycle takes shape here.',
+      'Add the day your last period started to see your cycle and fertile days.',
       'Pichhle period ki date daalein, aur aapka cycle yahan banna shuru ho jayega.');
 
   /// ⚠️ WE DEFER, WE DO NOT COMPUTE. Truth hierarchy: a treating clinician
@@ -585,7 +608,8 @@ class TtcS {
   /// meant finding two questions on a screen nothing points at. So the line
   /// that delivers the bad news is also the door.
   String get headerNotOnTreatment =>
-      _p('Not on treatment? Change this ›', 'Treatment par nahi? Yahan badlein ›');
+      // Change 5 (2026-09-28). Kept for revert: 'Not on treatment? Change this ›'.
+      _p('Not on treatment? Change your answer ›', 'Treatment par nahi? Yahan badlein ›');
 
   /// The clinic-held hero's sub-line since 2026-09-26. A cycle is clinic-held
   /// only when her clinic's dates for it are in the tracker, so this state
@@ -605,7 +629,8 @@ class TtcS {
       'Abhi itna log nahi hua ki is cycle ke din bata sakein.');
 
   String get headerClinicHolds =>
-      _p('Your clinic is handling this', 'Yeh aapki clinic dekh rahi hai');
+      // Change 5 (2026-09-28). Kept for revert: 'Your clinic is handling this'.
+      _p('Your clinic is timing this cycle', 'Yeh aapki clinic dekh rahi hai');
 
   // Kept for revert: the hero's old two-line clinic body. It is good writing
   // and it is the wrong length for a headline slot that has to say something
@@ -880,8 +905,11 @@ class TtcS {
   String get chapterPartner => _p('For your partner', 'Aapke partner ke liye');
   String get chapterActions => _p('Worth doing this chapter', 'Is chapter mein karne layak');
   String get chapterMedical => _p('When to see someone', 'Doctor se kab milein');
-  String get chapterAskVeda => _p('Ask Veda about this', 'Iske baare mein Ask Veda');
-  String get chapterJournalPrompts => _p('Write about it', 'Iske baare mein likhein');
+  // Kept for revert (2026-09-28, explicit labels): 'Ask Veda about this'
+  String get chapterAskVeda => _p('Ask Veda about this chapter', 'Iske baare mein Ask Veda');
+  // Change 5 (2026-09-28): names the thing. Hindi unchanged. Kept for revert: 'Write about it'.
+  String get chapterJournalPrompts =>
+      _p('Write about this chapter', 'Iske baare mein likhein');
 
   // ---- the journal ----------------------------------------------------------
   String get journalTitle => _p('Our journal', 'Hamara journal');
@@ -901,7 +929,8 @@ class TtcS {
   String get ritualTitle => _p('Your daily ritual', 'Aapka roz ka ritual');
   String get ritualDone => _p('Done for today', 'Aaj ke liye ho gaya');
   String get ritualMarkDone => _p('Mark as done', 'Ho gaya');
-  String get ritualWhy => _p('Why this is here', 'Ye yahan kyun hai');
+  // Change 5 (2026-09-28): names the thing. Hindi unchanged. Kept for revert: 'Why this is here'.
+  String get ritualWhy => _p('Why we suggest this ritual', 'Ye yahan kyun hai');
 
   // ---- trackers -------------------------------------------------------------
   String get trackerToday => _p('Today', 'Aaj');
@@ -1003,7 +1032,8 @@ class TtcS {
       _p('Add it to my questions', 'Mere sawaalon mein jodein');
 
   /// Replaces "Mark as done".
-  String get ovulationRecordIt => _p('Record it', 'Record karein');
+  // Kept for revert (2026-09-28, explicit labels): 'Record it'
+  String get ovulationRecordIt => _p('Record the day', 'Record karein');
   String get ovulationWhichDay => _p('Which day?', 'Kis din?');
   String get ovulationToday => _p('Today', 'Aaj');
   String whichCycleDay(int day) => _p('Cycle day $day', 'Cycle din $day');
@@ -1047,7 +1077,8 @@ class TtcS {
   String get testReading => _p('Reading the result', 'Result samajhna');
   String get testForHim => _p('For him', 'Unke liye');
   String get testForHer => _p('For her', 'Uske liye');
-  String get testMore => _p('Read more', 'Aur padhein');
+  // Change 5 (2026-09-28): names the thing. Hindi unchanged. Kept for revert: 'Read more'.
+  String get testMore => _p('Read about this test', 'Aur padhein');
   String get testLess => _p('Less', 'Kam');
 
   // ---- journey map, milestones, timeline ------------------------------------
@@ -1066,7 +1097,8 @@ class TtcS {
       'One story that keeps going, from the day you decided, through pregnancy and into the years after. Nothing here starts over when you move to a new stage.',
       'Ek continuous kahani - jis din aapne socha, us din se pregnancy tak, aur uske baad ke saalon tak. Stage badalne par yahan kuch phir se shuru nahi hota.');
   String get timelineEmptyTitle =>
-      _p('Your story starts here', 'Aapki kahani yahin se');
+      // Change 5 (2026-09-28). Kept for revert: 'Your story starts here'.
+      _p('Your story starts today', 'Aapki kahani yahin se');
   String get timelineEmptyBody => _p(
       'As you log, write and reach milestones, they show up here in order. They stay here through pregnancy and parenting too.',
       'Jaise-jaise aap log karengi, likhengi aur cheezein poori karengi, wo yahan kramvaar aati jayengi - aur pregnancy aur parenting tak yahin rahengi.');
@@ -1100,7 +1132,9 @@ class TtcS {
   String get partnerSheMayFeel =>
       _p('What she may be carrying', 'Wo kya jhel rahi hain');
   String get partnerYouCan => _p('What you can do', 'Aap kya kar sakte hain');
-  String get partnerYourBody => _p('Your half of this', 'Iska aapka aadha hissa');
+  // Change 5 (2026-09-28). Kept for revert: 'Your half of this'.
+  String get partnerYourBody =>
+      _p('Your half of getting pregnant', 'Iska aapka aadha hissa');
 
   /// The biology card his side never had. Titled as understanding rather than
   /// instruction - "What is happening to her", not "Know her body", which reads
@@ -1117,7 +1151,9 @@ class TtcS {
   String get partnerJournalNote => _p(
       "She can read what you write here, and you can read what she writes. That's the idea.",
       'Aap jo yahan likhte hain wo padh sakti hain, aur aap unka. Yahi iska maqsad hai.');
-  String get partnerAboutHimself => _p('This one is about you', 'Ye aapke baare mein hai');
+  // Change 5 (2026-09-28): names the thing. Hindi unchanged. Kept for revert: 'This one is about you'.
+  String get partnerAboutHimself =>
+      _p('For your own health', 'Ye aapke baare mein hai');
   String get partnerReadTogether => _p('Read together', 'Saath padhein');
   String get partnerSwitch => _p('Her view', 'Unka view');
   /// Both of these were 'Unka' - the same word on both halves of a two-way
@@ -1221,8 +1257,11 @@ class TtcS {
 
   // ---- the transition -------------------------------------------------------
   String get transitionRecord => _p('Record a positive test', 'Positive test record karein');
+  // Change 5 (2026-09-28): the caption names the moment. Hindi unchanged.
+  // Kept for revert: 'Whenever it happens, this is where you tell us.
+  // Nothing restarts.'
   String get transitionRecordBody => _p(
-      'Whenever it happens, this is where you tell us. Nothing restarts.',
+      'Tap when a test comes back positive. Nothing restarts.',
       'Jab bhi ho, yahan bata dijiye. Kuch phir se shuru nahi hoga.');
   String get transitionConfirmTitle =>
       _p('Is the test positive?', 'Kya test positive hai?');
@@ -1261,7 +1300,8 @@ class TtcS {
           n == 1 ? '1 cycle log kiya' : '$n cycles log kiye');
   String get transitionPartner => _p('Your partner, still here', 'Aapka partner, abhi bhi saath');
   String get transitionNext => _p('Book your first appointment', 'Pehli appointment book karein');
-  String get transitionUndo => _p('That was a mistake, undo it', 'Wo galti thi - wapas karein');
+  // Kept for revert (2026-09-28, explicit labels): 'That was a mistake, undo it'
+  String get transitionUndo => _p('A mistake? Go back to trying', 'Wo galti thi - wapas karein');
   String get transitionUndone =>
       _p("Undone. You're back where you were.", 'Wapas ho gaya. Aap wahin hain jahan thin.');
 
@@ -1291,9 +1331,11 @@ class TtcS {
   String get recordsIntro => _p(
       'Both your results, in one place and in date order. So your appointment starts with facts, not with trying to remember.',
       'Aap dono ke results, ek jagah aur ek kram mein - taaki appointment yaad karne se nahi, jaankari se shuru ho.');
-  String get recordsAdd => _p('Add', 'Add karein');
+  // Kept for revert (2026-09-28, explicit labels): 'Add'
+  String get recordsAdd => _p('Add a record', 'Add karein');
   String get recordsBoth => _p('Both', 'Dono');
-  String get recordsLabel => _p('What was it?', 'Kya tha?');
+  // Kept for revert (2026-09-28, explicit labels): 'What was it?'
+  String get recordsLabel => _p('Which test was it?', 'Kya tha?');
   String get recordsValue => _p('Result (as printed)', 'Result (jaisa likha hai)');
   String get recordsWhose => _p('Whose result', 'Kiska result');
   String get recordsHistory => _p('Earlier results', 'Pehle ke results');
@@ -1320,7 +1362,8 @@ class TtcS {
 
   /// The expand control on a card. "More" rather than "Read more", because
   /// nothing leaves the screen - the paragraph simply opens where it is.
-  String get showMore => _p('More', 'Aur');
+  // Kept for revert (2026-09-28, explicit labels): 'More'
+  String get showMore => _p('Show the full text', 'Aur');
   String get showLess => _p('Less', 'Kam');
 
   // ---- the reader -----------------------------------------------------------
@@ -1364,8 +1407,9 @@ class TtcS {
   String get appointmentsIntro => _p(
       "Everything you've booked through ParentVeda and everything you've set up yourselves, on one list by date.",
       'Jo aapne ParentVeda se book kiya aur jo aapne khud tay kiya - sab ek list mein, samay ke hisaab se.');
-  String get appointmentsAdd => _p('Add', 'Add karein');
-  String get appointmentsWhat => _p('What is it?', 'Kya hai?');
+  // Change 5 (2026-09-28): names the thing. Hindi unchanged. Kept for revert: 'Add', 'What is it?'.
+  String get appointmentsAdd => _p('Add a visit', 'Add karein');
+  String get appointmentsWhat => _p('What kind of visit?', 'Kya hai?');
   String get appointmentsWho => _p('With whom (optional)', 'Kiske saath (optional)');
   String get appointmentsViaParentVeda => _p('Booked in ParentVeda', 'ParentVeda se book');
   String get appointmentsPast => _p('Earlier', 'Pehle');
@@ -1427,7 +1471,8 @@ class TtcS {
   /// A confidence line is a statement about OUR estimate. Showing one after we
   /// have just said we defer to the clinic tells her both things at once, and
   /// the quieter contradiction is the one that erodes trust.
-  String get clinicGuidingTiming => _p('Your clinic is guiding the timing here',
+  // Change 5 (2026-09-28): names the thing. Hindi unchanged. Kept for revert: '…the timing here'.
+  String get clinicGuidingTiming => _p('Your clinic is guiding the timing this cycle',
       'Timing yahan aapki clinic tay kar rahi hai');
   String clinicLedPath(String path) =>
       _p('You told us: $path', 'Aapne bataya: $path');
@@ -1453,7 +1498,8 @@ class TtcS {
   String get treatmentIntro => _p(
       "The dates your clinic gave you. We don't work these out. Your clinic chose them, and theirs are the ones that count. Fill in what you know. The rest can wait.",
       'Wo dates jo aapki clinic ne di. Hum inhe calculate nahi karte - unhone tay ki hain, aur unki hi chalti hai. Jo pata hai wo bhar dein; baaki baad mein.');
-  String get treatmentNext => _p('Next', 'Agla');
+  // Kept for revert (2026-09-28, explicit labels): 'Next'
+  String get treatmentNext => _p('Next step', 'Agla');
   String get treatmentDates => _p('Your dates', 'Aapki dates');
   String get treatmentNotSet => _p('Not added yet', 'Abhi add nahi kiya');
   String get treatmentAddDates =>
@@ -1561,7 +1607,8 @@ class TtcS {
   String get journeyMapLink => _p('Journey map', 'Journey map');
 
   /// The way out of the rhythm card, which used to route nowhere.
-  String get understandThis => _p('Understand this', 'Ye samjhein');
+  // Kept for revert (2026-09-28, explicit labels): 'Understand this'
+  String get understandThis => _p('Understand your cycle', 'Ye samjhein');
 
   // ---- profile --------------------------------------------------------------
   String get profileTitle => _p('Profile', 'Profile');
@@ -1614,13 +1661,15 @@ class TtcS {
       'Pregnancy par switch ho gaya. App band karke dobara kholein.');
 
   // ---- shared chrome --------------------------------------------------------
-  String get seeAll => _p('See all', 'Sab dekhein');
+  // Change 5 (2026-09-28): names the thing. Hindi unchanged. Kept for revert: 'See all'.
+  String get seeAll => _p('See all entries', 'Sab dekhein');
   String get comingSoon => _p('Coming soon', 'Jald aa raha hai');
   String get openTools => _p('Open Tools', 'Tools kholein');
 
   /// On every Tools tile. The card was already tappable and nothing said so -
   /// the pregnancy hub has carried an explicit "Open →" all along.
-  String get openTool => _p('Open', 'Kholein');
+  // Change 5 (2026-09-28): names the thing. Hindi unchanged. Kept for revert: 'Open'.
+  String get openTool => _p('Open tool', 'Kholein');
 
   /// Used by every section that is genuinely not built yet. Honest wording -
   /// "we are building this", never a dead button pretending to work.

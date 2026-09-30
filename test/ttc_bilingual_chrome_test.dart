@@ -20,6 +20,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:parentveda/screens/ttc/ttc_common.dart';
 import 'package:parentveda/screens/ttc/ttc_home_version.dart';
+import 'package:parentveda/screens/profile/pv_you_screen.dart'
+    show kPvProfileSettingsRowKey;
 import 'package:parentveda/screens/ttc/ttc_profile_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_strings.dart';
 import 'package:parentveda/screens/ttc/ttc_today_screen.dart';
@@ -101,6 +103,11 @@ void main() {
       // Where it lives is a product decision; that it says two things is not.
       TtcLang.instance.hinglish = true;
       await pumpTall(tester, const TtcProfileScreen());
+      // ⚠️ SINCE 2026-09-29 THE DEVELOPER SECTION IS IN SETTINGS, behind the
+      // profile's one Settings row. Kept for revert: read off the profile.
+      await tester.ensureVisible(find.byKey(kPvProfileSettingsRowKey));
+      await tester.tap(find.byKey(kPvProfileSettingsRowKey));
+      await tester.pumpAndSettle();
       const t = TtcS(true);
       expect(find.text(t.partnerHer), findsOneWidget);
       expect(find.text(t.partnerHim), findsOneWidget);

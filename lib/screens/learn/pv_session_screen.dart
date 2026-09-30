@@ -89,6 +89,104 @@ void pvOpenCall(BuildContext context, Booking b) {
 int pvBookingReminderId(String bookingId) =>
     700000 + (bookingId.hashCode & 0x3ffff);
 
+/// ⚠️ ONE CANCEL, TWO PLACES (2026-09-29). Lifted out of the session page so
+/// the Bookings list's cards can offer Cancel on the card (TheFork, Zocdoc)
+/// without a second copy of the rule. Asks, states the credit rule, and
+/// releases through the server (`BookingStore.release`: the seat is freed
+/// server-side, never decided here). True when it was cancelled.
+Future<bool> pvConfirmCancelBooking(
+  BuildContext context,
+  Booking b,
+  PvOfferingView? v,
+) async {
+  final p = pvStorePalette;
+  final rule = v == null
+      ? 'Your credit goes back so you can rebook any time.'
+      : pvTrustRowsFor(v)[1].line;
+  final yes = await showModalBottomSheet<bool>(
+    context: context,
+    backgroundColor: p.ground,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+    ),
+    builder: (ctx) => SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Cancel this booking?',
+              style: pvFraunces(
+                fontSize: 22,
+                fontWeight: FontWeight.w500,
+                color: p.ink1,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              '${b.title} · ${pvLearnDay(b.startsUtc)}, ${pvLearnTime(b.startsUtc)}',
+              style: pvManrope(fontSize: 13.5, color: p.ink2),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              rule,
+              style: pvManrope(fontSize: 13, height: 1.45, color: p.ink3),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: PvSecondary(
+                    label: 'Keep it',
+                    onTap: () => Navigator.of(ctx).pop(false),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: PvCommit(
+                    label: 'Cancel booking',
+                    onTap: () => Navigator.of(ctx).pop(true),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+  if (yes != true) return false;
+  await BookingStore.instance.release(b.id);
+  return true;
+}
+
+/// Reschedule, lifted out of the session page with [pvConfirmCancelBooking]
+/// (2026-09-29): pick a new slot, release the old one, claim the new one.
+/// Returns the new booking, or null (no slot picked, or the time just went,
+/// in which case she is told and her credit is back).
+Future<Booking?> pvRescheduleBooking(
+  BuildContext context,
+  Booking b,
+  PvOfferingView v,
+) async {
+  final slot = await showPvSlotSheet(context, v);
+  if (slot == null || !context.mounted) return null;
+  // Release first, then claim: the credit returns and is spent again.
+  await BookingStore.instance.release(b.id);
+  if (!context.mounted) return null;
+  final nb = await BookingStore.instance.reserve(slot);
+  if (!context.mounted) return null;
+  if (nb == null) {
+    pvSnack(
+      context,
+      'That time just went. Your credit is back — pick another.',
+    );
+  }
+  return nb;
+}
+
 class PvSessionScreen extends StatefulWidget {
   const PvSessionScreen({
     super.key,
@@ -119,85 +217,22 @@ class _PvSessionScreenState extends State<PvSessionScreen> {
     });
   }
 
+  // Both lifted to top-level functions below the imports (2026-09-29) so the
+  // Bookings cards share them. Kept for revert: the two private bodies are
+  // the functions' bodies, unchanged but for how they end.
   Future<void> _cancel(Booking b, PvOfferingView? v) async {
-    final p = pvStorePalette;
-    final rule = v == null
-        ? 'Your credit goes back so you can rebook any time.'
-        : pvTrustRowsFor(v)[1].line;
-    final yes = await showModalBottomSheet<bool>(
-      context: context,
-      backgroundColor: p.ground,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (ctx) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Cancel this booking?',
-                style: pvFraunces(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w500,
-                  color: p.ink1,
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                '${b.title} · ${pvLearnDay(b.startsUtc)}, ${pvLearnTime(b.startsUtc)}',
-                style: pvManrope(fontSize: 13.5, color: p.ink2),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                rule,
-                style: pvManrope(fontSize: 13, height: 1.45, color: p.ink3),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: PvSecondary(
-                      label: 'Keep it',
-                      onTap: () => Navigator.of(ctx).pop(false),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: PvCommit(
-                      label: 'Cancel booking',
-                      onTap: () => Navigator.of(ctx).pop(true),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-    if (yes == true) {
-      await BookingStore.instance.release(b.id);
-      if (mounted) Navigator.of(context).maybePop();
-    }
+    final done = await pvConfirmCancelBooking(context, b, v);
+    if (done && mounted) Navigator.of(context).maybePop();
   }
 
   Future<void> _reschedule(Booking b, PvOfferingView v) async {
-    final slot = await showPvSlotSheet(context, v);
-    if (slot == null || !mounted) return;
-    // Release first, then claim: the credit returns and is spent again.
-    await BookingStore.instance.release(b.id);
-    if (!mounted) return;
-    final nb = await BookingStore.instance.reserve(slot);
+    final nb = await pvRescheduleBooking(context, b, v);
     if (!mounted) return;
     if (nb == null) {
-      pvSnack(
-        context,
-        'That time just went. Your credit is back — pick another.',
-      );
-      Navigator.of(context).maybePop();
+      // Only a lost slot released the old booking; then leave its page.
+      if (BookingStore.instance.byId(b.id)?.isUpcoming != true) {
+        Navigator.of(context).maybePop();
+      }
       return;
     }
     Navigator.of(context).pushReplacement(

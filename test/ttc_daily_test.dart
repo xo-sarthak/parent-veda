@@ -14,7 +14,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:parentveda/screens/ttc/ttc_chapter_screen.dart';
 import 'package:parentveda/screens/reader/pv_reader_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_insight_screen.dart';
-import 'package:parentveda/screens/ttc/ttc_journal_screen.dart';
+// Kept for revert (2026-09-28, the user: no journal in trying to conceive).
+// import 'package:parentveda/screens/ttc/ttc_journal_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_ritual_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_strings.dart';
 import 'package:parentveda/screens/ttc/ttc_today_screen.dart';
@@ -22,7 +23,7 @@ import 'package:parentveda/ttc/cycle_store.dart';
 import 'package:parentveda/ttc/ttc_chapter.dart';
 import 'package:parentveda/ttc/ttc_chapter_data.dart';
 import 'package:parentveda/ttc/ttc_daily_data.dart';
-import 'package:parentveda/ttc/ttc_journal_store.dart';
+// import 'package:parentveda/ttc/ttc_journal_store.dart';
 import 'package:parentveda/ttc/ttc_ritual_store.dart';
 import 'package:parentveda/ttc/ttc_store.dart';
 
@@ -46,7 +47,7 @@ void main() {
     CycleStore.instance.resetForTest();
     TtcStore.instance.resetForTest();
     TtcRitualStore.instance.resetForTest();
-    TtcJournalStore.instance.resetForTest();
+    // Kept for revert (2026-09-28): TtcJournalStore.instance.resetForTest();
     TtcLang.instance.hinglish = false;
   });
 
@@ -205,70 +206,74 @@ void main() {
   });
 
   // ===========================================================================
-  group('the journal', () {
-    test('an entry round-trips through encoding', () {
-      final e = TtcJournalStore.instance
-          .add(kind: TtcEntryKind.memory, text: 'A quiet good day');
-      final back = TtcJournalEntry.decode(e.encode());
-      expect(back, isNotNull);
-      expect(back!.text, e.text);
-      expect(back.kind, e.kind);
-      expect(back.id, e.id);
-    });
-
-    test('free text survives - quotes, newlines, commas and Devanagari', () {
-      // This is why the store uses JSON rather than a delimiter: quietly
-      // corrupting a letter to a future child is not an acceptable failure.
-      const nasty = 'She said "maybe next month",\nand I wrote: सब ठीक है | ok';
-      final e = TtcJournalStore.instance
-          .add(kind: TtcEntryKind.letter, text: nasty);
-      final back = TtcJournalEntry.decode(e.encode());
-      expect(back!.text, nasty);
-    });
-
-    test('a corrupt row is dropped, never crashes the journal', () {
-      expect(TtcJournalEntry.decode('not json at all'), isNull);
-      expect(TtcJournalEntry.decode('{"id":1}'), isNull);
-    });
-
-    test('entries come back newest first', () {
-      final s = TtcJournalStore.instance;
-      s.add(
-          kind: TtcEntryKind.memory,
-          text: 'older',
-          on: DateTime(2026, 1, 1));
-      s.add(
-          kind: TtcEntryKind.memory,
-          text: 'newer',
-          on: DateTime(2026, 6, 1));
-      expect(s.entries.first.text, 'newer');
-    });
-
-    test('questions saved for the doctor are separable', () {
-      final s = TtcJournalStore.instance;
-      s.add(kind: TtcEntryKind.question, text: 'Ask about AMH');
-      s.add(kind: TtcEntryKind.memory, text: 'Not a question');
-      expect(s.doctorQuestions.length, 1);
-      expect(s.doctorQuestions.first.text, 'Ask about AMH');
-    });
-
-    test('the author is recorded from day one, for the shared journal', () {
-      final e = TtcJournalStore.instance.add(
-          kind: TtcEntryKind.feeling,
-          text: 'his entry',
-          author: TtcAuthor.partner);
-      expect(TtcJournalEntry.decode(e.encode())!.author, TtcAuthor.partner);
-    });
-
-    test('deleting removes it', () {
-      final e =
-          TtcJournalStore.instance.add(kind: TtcEntryKind.memory, text: 'x');
-      TtcJournalStore.instance.remove(e.id);
-      expect(TtcJournalStore.instance.count, 0);
-    });
-  });
-
-  // ===========================================================================
+  // Kept for revert (2026-09-28, the user: no journal in trying to conceive).
+  // The journal store is commented out. The encoding, corrupt-row, delete
+  // and question tests now hold TtcDoctorQuestionsStore, in
+  // test/ttc_doctor_questions_test.dart.
+  // group('the journal', () {
+  //   test('an entry round-trips through encoding', () {
+  //     final e = TtcJournalStore.instance
+  //         .add(kind: TtcEntryKind.memory, text: 'A quiet good day');
+  //     final back = TtcJournalEntry.decode(e.encode());
+  //     expect(back, isNotNull);
+  //     expect(back!.text, e.text);
+  //     expect(back.kind, e.kind);
+  //     expect(back.id, e.id);
+  //   });
+  //
+  //   test('free text survives - quotes, newlines, commas and Devanagari', () {
+  //     // This is why the store uses JSON rather than a delimiter: quietly
+  //     // corrupting a letter to a future child is not an acceptable failure.
+  //     const nasty = 'She said "maybe next month",\nand I wrote: सब ठीक है | ok';
+  //     final e = TtcJournalStore.instance
+  //         .add(kind: TtcEntryKind.letter, text: nasty);
+  //     final back = TtcJournalEntry.decode(e.encode());
+  //     expect(back!.text, nasty);
+  //   });
+  //
+  //   test('a corrupt row is dropped, never crashes the journal', () {
+  //     expect(TtcJournalEntry.decode('not json at all'), isNull);
+  //     expect(TtcJournalEntry.decode('{"id":1}'), isNull);
+  //   });
+  //
+  //   test('entries come back newest first', () {
+  //     final s = TtcJournalStore.instance;
+  //     s.add(
+  //         kind: TtcEntryKind.memory,
+  //         text: 'older',
+  //         on: DateTime(2026, 1, 1));
+  //     s.add(
+  //         kind: TtcEntryKind.memory,
+  //         text: 'newer',
+  //         on: DateTime(2026, 6, 1));
+  //     expect(s.entries.first.text, 'newer');
+  //   });
+  //
+  //   test('questions saved for the doctor are separable', () {
+  //     final s = TtcJournalStore.instance;
+  //     s.add(kind: TtcEntryKind.question, text: 'Ask about AMH');
+  //     s.add(kind: TtcEntryKind.memory, text: 'Not a question');
+  //     expect(s.doctorQuestions.length, 1);
+  //     expect(s.doctorQuestions.first.text, 'Ask about AMH');
+  //   });
+  //
+  //   test('the author is recorded from day one, for the shared journal', () {
+  //     final e = TtcJournalStore.instance.add(
+  //         kind: TtcEntryKind.feeling,
+  //         text: 'his entry',
+  //         author: TtcAuthor.partner);
+  //     expect(TtcJournalEntry.decode(e.encode())!.author, TtcAuthor.partner);
+  //   });
+  //
+  //   test('deleting removes it', () {
+  //     final e =
+  //         TtcJournalStore.instance.add(kind: TtcEntryKind.memory, text: 'x');
+  //     TtcJournalStore.instance.remove(e.id);
+  //     expect(TtcJournalStore.instance.count, 0);
+  //   });
+  // });
+  //
+  // // ===========================================================================
   group('chapter content follows the product rules', () {
     test('all five chapters have content', () {
       for (final c in TtcChapter.values) {
@@ -426,7 +431,10 @@ void main() {
             reason: 'missing section: $label');
       }
       // The journal leads with a card title rather than an eyebrow.
-      expect(find.text(t.myJournal), findsWidgets);
+      // Kept for revert (2026-09-28, journal out of TTC): the journal left
+      // the stage, so Today no longer carries its card.
+      //   expect(find.text(t.myJournal), findsWidgets);
+      expect(find.text(t.myJournal), findsNothing);
     });
 
     testWidgets('the video section is deliberately absent', (tester) async {
@@ -543,19 +551,21 @@ void main() {
       }
     });
 
-    testWidgets('the journal invites rather than showing a blank page',
-        (tester) async {
-      await tester.pumpWidget(const MaterialApp(home: TtcJournalScreen()));
-      await tester.pump();
-      expect(find.text(const TtcS(false).journalEmptyTitle), findsOneWidget);
-    });
-
-    testWidgets('a saved entry appears in the list', (tester) async {
-      TtcJournalStore.instance
-          .add(kind: TtcEntryKind.memory, text: 'A good quiet day');
-      await tester.pumpWidget(const MaterialApp(home: TtcJournalScreen()));
-      await tester.pump();
-      expect(find.text('A good quiet day'), findsOneWidget);
-    });
+    // Kept for revert (2026-09-28, the user: no journal in trying to
+    // conceive): the journal page is commented out.
+    // testWidgets('the journal invites rather than showing a blank page',
+    //     (tester) async {
+    //   await tester.pumpWidget(const MaterialApp(home: TtcJournalScreen()));
+    //   await tester.pump();
+    //   expect(find.text(const TtcS(false).journalEmptyTitle), findsOneWidget);
+    // });
+    //
+    // testWidgets('a saved entry appears in the list', (tester) async {
+    //   TtcJournalStore.instance
+    //       .add(kind: TtcEntryKind.memory, text: 'A good quiet day');
+    //   await tester.pumpWidget(const MaterialApp(home: TtcJournalScreen()));
+    //   await tester.pump();
+    //   expect(find.text('A good quiet day'), findsOneWidget);
+    // });
   });
 }

@@ -348,7 +348,12 @@ final List<PvRead> kTtcReadsMindBody = [
       ),
     ],
 
-    readNext: ['ttc_read_garbh_sanskar', 'ttc_read_trying_takes_over'],
+    // ⚠️ ONE READ, ONCE, AT THE FOOT (2026-09-28, no repetition):
+    // 'ttc_read_garbh_sanskar' is the next step "Preconception garbh sanskar, honestly",
+    // so the Read next rail no longer lists it a second time.
+    // Kept for revert:
+    // readNext: ['ttc_read_garbh_sanskar', 'ttc_read_trying_takes_over'],
+    readNext: ['ttc_read_trying_takes_over'],
   ),
 
 
@@ -832,7 +837,12 @@ final List<PvRead> kTtcReadsMindBody = [
       ),
     ],
 
-    readNext: ['ttc_read_bedtime', 'ttc_read_stress_fertility'],
+    // ⚠️ ONE READ, ONCE, AT THE FOOT (2026-09-28, no repetition):
+    // 'ttc_read_bedtime' is the next step "Setting a bedtime you can keep",
+    // so the Read next rail no longer lists it a second time.
+    // Kept for revert:
+    // readNext: ['ttc_read_bedtime', 'ttc_read_stress_fertility'],
+    readNext: ['ttc_read_stress_fertility'],
   ),
 
   // ---------------------------------------------------------------------------
@@ -1304,7 +1314,10 @@ final List<PvRead> kTtcReadsMindBody = [
     id: 'ttc_read_bringing_him_in',
     hue: 42,
     kicker: _en('Mind & body'),
-    title: _en('Bringing him into this'),
+    // Kept for revert (2026-09-28, explicit names; the title stands alone
+    // in Read next rails and Learn, where "this" named nothing):
+    // title: _en('Bringing him into this'),
+    title: _en('Bringing him into trying'),
     teaser: _en('Why it usually ends up being your project, and what changes '
         'that.'),
     shortAnswer: _en('It usually becomes one person\'s job because everything '

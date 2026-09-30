@@ -145,7 +145,7 @@ class _TtcMessagesScreenState extends State<TtcMessagesScreen> {
                           onPressed: _store.markAllRead,
                           child: Text('Mark all read',
                               style: ttcBody(13,
-                                  color: ttcPurple,
+                                  color: ttcTitleInk,
                                   w: FontWeight.w700,
                                   h: 1.2)),
                         ),

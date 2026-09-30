@@ -121,8 +121,32 @@ class TtcPrecheckStore extends ChangeNotifier {
     final mine = _entries[id];
     if (mine != null) return mine.status;
     final item = precheckItemById(id);
-    if (item != null && precheckAutoDone(item, c)) return PrecheckStatus.done;
+    // Kept for revert (2026-09-29):
+    // if (item != null && precheckAutoDone(item, c)) return PrecheckStatus.done;
+    // ⚠️ AND WHAT HER OWN RECORDS SETTLE (launch sanity D12): folic acid on
+    // her supplement list, her live vaccines settled. See
+    // `precheckDerivedDone` for why this is not auto-completion.
+    if (item != null &&
+        (precheckAutoDone(item, c) || precheckDerivedDone(item, c))) {
+      return PrecheckStatus.done;
+    }
     return PrecheckStatus.untouched;
+  }
+
+  /// Puts an item back exactly as it was, for Undo (2026-09-29).
+  ///
+  /// ⚠️ NULL MEANS "SHE HAD NEVER ANSWERED", WHICH IS NOT `untouched`. A tick
+  /// the app derived from her records is taken off by storing her answer
+  /// (`untouched`); undoing that must remove the answer, so the derived tick
+  /// comes back, rather than store a second answer on top of it.
+  Future<void> restore(String id, PrecheckEntry? entry) async {
+    if (entry == null) {
+      _entries.remove(id);
+    } else {
+      _entries[id] = entry;
+    }
+    notifyListeners();
+    await _persist();
   }
 
   Future<void> setStatus(String id, PrecheckStatus status) async {
@@ -176,7 +200,8 @@ class TtcPrecheckStore extends ChangeNotifier {
   /// so opting out of a section cannot make her look incomplete.
   ({int done, int open, int notSure, int tracking}) counts(PrecheckContext c) {
     var done = 0, open = 0, notSure = 0, tracking = 0;
-    for (final item in kPrecheckItems) {
+    // Visible items only (2026-09-29). Kept for revert: kPrecheckItems.
+    for (final item in kPrecheckVisibleItems) {
       final s = statusOf(item.id, c);
       if (s == PrecheckStatus.notRelevant) continue;
       tracking++;
@@ -201,15 +226,28 @@ class TtcPrecheckStore extends ChangeNotifier {
 
   /// Items she has flagged or left unsure — the "worth checking" list.
   List<PrecheckItem> openItems(PrecheckContext c) => [
-        for (final i in kPrecheckItems)
+        // Visible items only (2026-09-29). Kept for revert: kPrecheckItems.
+        for (final i in kPrecheckVisibleItems)
           if (statusOf(i.id, c).isOpen) i,
       ];
 
   /// Items settled as done, in the order they appear.
   List<PrecheckItem> doneItems(PrecheckContext c) => [
-        for (final i in kPrecheckItems)
+        // Visible items only (2026-09-29). Kept for revert: kPrecheckItems.
+        for (final i in kPrecheckVisibleItems)
           if (statusOf(i.id, c) == PrecheckStatus.done) i,
       ];
+
+  /// Forgets what is in memory and reads it back from the phone, as a fresh
+  /// launch would. Tests only (2026-09-29): "state persists across a reload"
+  /// has to be proven against storage, not against the singleton's memory.
+  @visibleForTesting
+  Future<void> reloadForTest() async {
+    _entries.clear();
+    _everOpened = false;
+    _loaded = false;
+    await load();
+  }
 
   Future<void> reset() async {
     _entries.clear();

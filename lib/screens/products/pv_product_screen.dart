@@ -17,6 +17,34 @@
 //    compare with similar · you might also like
 //    sticky bar: Add to cart | Buy now  (or Buy on <retailer> ↗, or nothing)
 //
+//  ⚠️ THE 2026-09-29 PASS (the one-app pass on the store), checked against
+//  Mobbin's shops and pharmacies. What changed, and why:
+//    · PACK SIZE NEXT TO THE PRICE. Alan puts "30 lenses · €29 per box" under
+//      the name; Thrive Market "12.75 oz bottle · $0.39/oz". Ours is derived
+//      (the chosen size, else the spec that names the pack), never stored.
+//      https://mobbin.com/screens/378fe975-ed29-4298-b6ed-128cb7e3afa8
+//      https://mobbin.com/screens/17688e81-264e-4df3-9aa5-9136dad2013c
+//    · SHORT SECTIONS, NOT TWO CRAMPED COLUMNS. Superpower answers "How to
+//      take this?" and "Things to know" as a heading and a few lines each;
+//      Hims "What it is / What it does". So: Why it helps (the good points),
+//      How to use (the specs that say when and how), Worth knowing (the
+//      watch-outs), and a Safety note that keeps the clinical copy word for
+//      word. At 360dp the old two columns wrapped every line to three words.
+//      https://mobbin.com/screens/60e81a73-3dfd-4b4a-8310-e2ddb31cba21
+//      https://mobbin.com/screens/195c3c99-f6eb-4ede-8ef5-1b78bbb4e476
+//    · ONE INK BUTTON IN THE STICKY BAR. On (price left, one black "Add to
+//      bag"), Yami and 1mg: one primary. "Add to bag" + "Buy now" were two
+//      pills of equal size in one bar; now the price and one ink "Add to
+//      cart", and once it is in her cart the same button says "Go to cart",
+//      which is Buy now's path (Nykaa and Blinkit). The store's one name is
+//      "cart" (the header's Cart, the cart screen's title).
+//      https://mobbin.com/screens/0e97c9e0-6577-4942-b142-8d9f288cf253
+//      https://mobbin.com/screens/0e3f3992-52a7-4a77-8ce0-5075d93332b2
+//    · RELATED PRODUCTS LAST, the safety note before them.
+//    · No violet: the verified tick, "Read reviews" and the eyebrows are ink.
+//    · No slab behind text: empty states are one quiet line, studies sit on a
+//      white card with a hairline.
+//
 //  ⚠️ THREE KINDS OF BUY BAR, DECIDED BY THE DATA, NOT THE SCREEN.
 //  `soldHere` → cart + checkout here. Affiliate → the retailer's page, after
 //  a one-line interstitial that says we may earn a commission (the honesty
@@ -27,10 +55,13 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../data/products/pv_product_extras.dart' show kPvIllustrativePhotoIds;
 import '../../models/pv_product.dart';
 import '../../services/cart_store.dart';
+import '../../services/life_stage_store.dart';
 import '../../services/pv_catalog_store.dart';
 import '../../services/pv_compare_store.dart';
+import '../../services/saved_store.dart';
 import '../../theme/pv_fonts.dart';
 import '../v2/v2_palette.dart';
 import 'pv_cart_screen.dart';
@@ -40,6 +71,49 @@ import 'pv_gallery_screen.dart';
 import 'pv_review_block.dart';
 import 'pv_reviews_screen.dart';
 import 'pv_store_chrome.dart';
+import 'pv_store_marks.dart' show kPvStoreMarkHue;
+
+/// The pack size, for the line under the price (2026-09-29). Derived, never
+/// stored: the size she picked, else the first size (whose price is shown),
+/// else the spec whose name says pack, size,
+/// count or contents ("Typical pack · 25 strips"). Null when the product
+/// says nothing about it, and then nothing is drawn: no guessed "1 unit".
+String? pvPackSize(PvProduct p, [PvVariant? chosen]) {
+  if (chosen != null) return chosen.label;
+  // The price line shows the first size's price until she picks one, so the
+  // pack beside it is that size's (the same rule as `_priceOf`).
+  if (p.variants.isNotEmpty) return p.variants.first.label;
+  for (final (k, v) in p.specs) {
+    final key = k.toLowerCase();
+    if (key.contains('pack') ||
+        key.contains('size') ||
+        key.contains('count') ||
+        key.contains('contents')) {
+      return v;
+    }
+  }
+  return null;
+}
+
+/// The specs that say HOW to use a product: when, how much, how long, how
+/// often (2026-09-29, the "How to use" section). The rest of the specs stay
+/// under Product details, so nothing is said twice.
+List<(String, String)> pvHowToUse(PvProduct p) => [
+  for (final (k, v) in p.specs)
+    if (_kHowWords.any(k.toLowerCase().startsWith) ||
+        k.toLowerCase().contains('dose'))
+      (k, v),
+];
+
+const List<String> _kHowWords = [
+  'when',
+  'how',
+  'use',
+  'take',
+  'apply',
+  'wash',
+  'standard dose',
+];
 
 class PvProductScreen extends StatefulWidget {
   const PvProductScreen({super.key, required this.productId, this.heroTag});
@@ -158,10 +232,12 @@ class _PvProductScreenState extends State<PvProductScreen> {
       );
       return;
     }
+    // "Cart", the store's one name for it (2026-09-29). Kept for revert:
+    // 'Added to your bag', action: 'View bag'.
     pvSnack(
       context,
-      'Added to your bag',
-      action: 'View bag',
+      'Added to your cart',
+      action: 'View cart',
       onAction: () => Navigator.of(context).push(
         MaterialPageRoute<void>(
           builder: (_) => const PvCartScreen(),
@@ -269,25 +345,55 @@ class _PvProductScreenState extends State<PvProductScreen> {
                 SliverToBoxAdapter(child: _recommend(p, product)),
               if (product.evidence != null)
                 SliverToBoxAdapter(child: _evidence(p, product)),
-              SliverToBoxAdapter(child: _goodAndConsider(p, product)),
+              // Kept for revert (2026-09-29): the two-column
+              //   SliverToBoxAdapter(child: _goodAndConsider(p, product)),
+              if (product.goods.isNotEmpty)
+                SliverToBoxAdapter(
+                  child: _shortSection(
+                    p,
+                    'why',
+                    'Why it helps',
+                    product.goods,
+                    Icons.check_rounded,
+                  ),
+                ),
+              if (pvHowToUse(product).isNotEmpty)
+                SliverToBoxAdapter(child: _howToUse(p, product)),
+              if (product.watchOuts.isNotEmpty)
+                SliverToBoxAdapter(
+                  child: _shortSection(
+                    p,
+                    'worth',
+                    'Worth knowing',
+                    product.watchOuts,
+                    Icons.remove_rounded,
+                  ),
+                ),
               if (product.bestFor.isNotEmpty)
                 SliverToBoxAdapter(child: _bestFor(p, product)),
               SliverToBoxAdapter(child: _accordions(p, product)),
               SliverToBoxAdapter(child: _ratings(p, product)),
               if (product.experts.isNotEmpty || product.expertsPct != null)
                 SliverToBoxAdapter(child: _experts(p, product)),
+              // The safety note before the rails, so related products are
+              // last (2026-09-29). Kept for revert: it sat after both rails.
+              SliverToBoxAdapter(child: _disclaimer(p)),
               if (similar.isNotEmpty)
                 SliverToBoxAdapter(child: _similar(p, product, similar)),
               if (related.isNotEmpty)
                 SliverToBoxAdapter(
                   child: _rail(p, 'You might also like', related),
                 ),
-              SliverToBoxAdapter(child: _disclaimer(p)),
               const SliverToBoxAdapter(child: SizedBox(height: 120)),
             ],
           ),
           _topButtons(product),
-          _stickyBar(p, product),
+          // Listens to the cart, so "Add to cart" becomes "Go to cart" the
+          // moment it lands (2026-09-29).
+          ListenableBuilder(
+            listenable: CartStore.instance,
+            builder: (context, _) => _stickyBar(p, product),
+          ),
         ],
       ),
     );
@@ -432,8 +538,14 @@ class _PvProductScreenState extends State<PvProductScreen> {
             padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
             child: Align(
               alignment: Alignment.centerLeft,
+              // A generic object standing in for the product says so
+              // (2026-09-29, kPvIllustrativePhotoIds). Kept for revert: the
+              // one "Representative photo" line for every product.
               child: Text(
-                'Representative photo — the pack you receive may look different.',
+                kPvIllustrativePhotoIds.contains(product.id)
+                    ? 'Illustrative photo, not this product. The pack you '
+                        'receive will look different.'
+                    : 'Representative photo — the pack you receive may look different.',
                 style: pvManrope(fontSize: 11, color: p.ink3),
               ),
             ),
@@ -554,10 +666,11 @@ class _PvProductScreenState extends State<PvProductScreen> {
                 onTap: () => _openReviews(product),
                 child: Text(
                   'Read reviews',
+                  // Ink (2026-09-29). Kept for revert: color: p.action.
                   style: pvManrope(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
-                    color: p.action,
+                    color: kPvInk,
                   ),
                 ),
               ),
@@ -592,6 +705,19 @@ class _PvProductScreenState extends State<PvProductScreen> {
               size: 24,
               price: product.variants.isNotEmpty ? _priceOf(product) : null,
             ),
+          // The pack size beside the price (Alan, Thrive Market), derived.
+          if (pvPackSize(product, _variant) case final pack?) ...[
+            const SizedBox(height: 4),
+            Text(
+              pack,
+              key: const ValueKey('pv_product_pack'),
+              style: pvManrope(
+                fontSize: 13.5,
+                fontWeight: FontWeight.w700,
+                color: p.ink2,
+              ),
+            ),
+          ],
           const SizedBox(height: 6),
           Row(
             children: [
@@ -697,8 +823,10 @@ class _PvProductScreenState extends State<PvProductScreen> {
             // The eyebrow: the verdict, in the brand's one allowed place.
             Row(
               children: [
+                // Ink, not the brand violet (2026-09-29, no purple chrome).
+                // Kept for revert: color: p.action.
                 if (recommends)
-                  Icon(Icons.verified_rounded, size: 15, color: p.action)
+                  const Icon(Icons.verified_rounded, size: 15, color: kPvInk)
                 else
                   Container(
                     width: 9,
@@ -717,7 +845,7 @@ class _PvProductScreenState extends State<PvProductScreen> {
                       fontSize: 10.5,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 1.1,
-                      color: recommends ? p.action : p.ink2,
+                      color: recommends ? kPvInk : p.ink2,
                     ),
                   ),
                 ),
@@ -790,10 +918,10 @@ class _PvProductScreenState extends State<PvProductScreen> {
                           ),
                           if (recommends && r.reviewerName.isNotEmpty) ...[
                             const SizedBox(width: 5),
-                            Icon(
+                            const Icon(
                               Icons.verified_rounded,
                               size: 14,
-                              color: p.action,
+                              color: kPvInk,
                             ),
                           ],
                         ],
@@ -840,12 +968,14 @@ class _PvProductScreenState extends State<PvProductScreen> {
   }
 
   // The pre-2026-09-20 band: a tinted well. Kept for revert; nothing calls it.
-  // ignore: unused_element
+  /* Commented out 2026-09-29 (a tinted well is the slab the store no longer draws); kept for revert:
   Widget _recommendClassic(V2Palette p, PvProduct product) {
     final r = product.reco!;
     final tone = pvToneColor(r.band.tone);
+    // Off the violet even in the kept body (2026-09-29): a revert must not
+    // bring purple chrome back. Was v2BlockTint(268, p) and p.action.
     final tint = r.band.recommends
-        ? v2BlockTint(268, p)
+        ? v2BlockTint(kPvStoreMarkHue, p)
         : HSLColor.fromAHSL(
             1,
             r.band.tone == 2 ? 345 : 40,
@@ -862,7 +992,7 @@ class _PvProductScreenState extends State<PvProductScreen> {
             Row(
               children: [
                 if (r.band.recommends)
-                  Icon(Icons.verified_rounded, size: 18, color: p.action)
+                  const Icon(Icons.verified_rounded, size: 18, color: kPvInk)
                 else
                   Container(
                     width: 10,
@@ -967,6 +1097,7 @@ class _PvProductScreenState extends State<PvProductScreen> {
       ),
     );
   }
+  */
 
   Widget _evidence(V2Palette p, PvProduct product) {
     final e = product.evidence!;
@@ -999,6 +1130,9 @@ class _PvProductScreenState extends State<PvProductScreen> {
     );
   }
 
+  // Kept for revert (2026-09-29): the two columns that became "Why it
+  // helps" and "Worth knowing". Nothing calls it.
+  // ignore: unused_element
   Widget _goodAndConsider(V2Palette p, PvProduct product) {
     if (product.goods.isEmpty && product.watchOuts.isEmpty) {
       return const SizedBox.shrink();
@@ -1187,7 +1321,16 @@ class _PvProductScreenState extends State<PvProductScreen> {
     );
   }
 
-  Widget _details(V2Palette p, PvProduct product) => Column(
+  // The specs "How to use" already shows are left out here (2026-09-29),
+  // so one fact is said once. Kept for revert: `for (final (k, v) in
+  // product.specs)`.
+  Widget _details(V2Palette p, PvProduct product) {
+    final how = pvHowToUse(product);
+    final specs = [
+      for (final s in product.specs)
+        if (!how.contains(s)) s,
+    ];
+    return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       if (product.summary.isNotEmpty)
@@ -1195,9 +1338,9 @@ class _PvProductScreenState extends State<PvProductScreen> {
           product.summary,
           style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2),
         ),
-      if (product.specs.isNotEmpty) ...[
+      if (specs.isNotEmpty) ...[
         const SizedBox(height: 10),
-        for (final (k, v) in product.specs)
+        for (final (k, v) in specs)
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 5),
             child: Row(
@@ -1221,13 +1364,14 @@ class _PvProductScreenState extends State<PvProductScreen> {
             ),
           ),
       ],
-      if (product.summary.isEmpty && product.specs.isEmpty)
+      if (product.summary.isEmpty && specs.isEmpty)
         Text(
           'Details are being written for this product.',
           style: pvManrope(fontSize: 13.5, color: p.ink3),
         ),
     ],
   );
+  }
 
   Widget _ingredients(V2Palette p, PvProduct product) => Column(
     children: [
@@ -1284,7 +1428,8 @@ class _PvProductScreenState extends State<PvProductScreen> {
       for (final s in product.studies)
         Padding(
           padding: const EdgeInsets.only(bottom: 12),
-          child: PvWell(
+          // A white card, not a slab (2026-09-29). Kept for revert: PvWell.
+          child: PvCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -1389,20 +1534,19 @@ class _PvProductScreenState extends State<PvProductScreen> {
             children: [
               PvSectionHead(
                 title: 'Ratings from parents',
-                action: product.reviews.length > 2 ? 'See all' : null,
+                // Kept for revert (2026-09-28): 'See all'. The link says
+                // how many ratings it opens.
+                action: product.reviews.length > 2
+                    ? 'See all ${product.reviews.length} ratings'
+                    : null,
                 onAction: () => _openReviews(product),
               ),
               const SizedBox(height: 12),
+              // One quiet line, no slab (2026-09-29). Kept for revert: the
+              // same words inside a PvWell.
               if (!has)
-                PvWell(
-                  child: Text(
-                    'No parent ratings yet. When parents on ParentVeda rate this, the number, the reasons and their words land here — never a figure we made up.',
-                    style: pvManrope(
-                      fontSize: 13.5,
-                      height: 1.5,
-                      color: p.ink2,
-                    ),
-                  ),
+                const PvQuietLine(
+                  'No parent ratings yet. When parents on ParentVeda rate this, the number, the reasons and their words land here — never a figure we made up.',
                 )
               else ...[
                 Row(
@@ -1478,8 +1622,10 @@ class _PvProductScreenState extends State<PvProductScreen> {
         if (has && product.reviews.isNotEmpty)
           Padding(
             padding: const EdgeInsets.only(top: 14),
+            // The store's one hue, not the violet (2026-09-29). Kept for
+            // revert: hue: 268.
             child: PvReviewRail(
-              hue: 268,
+              hue: kPvStoreMarkHue,
               voices: [
                 for (final r in product.reviews.take(6))
                   PvReviewVoice(
@@ -1584,17 +1730,24 @@ class _PvProductScreenState extends State<PvProductScreen> {
                 children: [
                   Row(
                     children: [
+                      // A person wears initials, never a stock figure, and no
+                      // violet (2026-09-29). Kept for revert: a v2BlockTint(268)
+                      // disc holding Icons.person_rounded.
                       Container(
                         width: 34,
                         height: 34,
+                        alignment: Alignment.center,
                         decoration: BoxDecoration(
-                          color: v2BlockTint(268, p),
+                          color: p.surfaceAlt,
                           shape: BoxShape.circle,
                         ),
-                        child: Icon(
-                          Icons.person_rounded,
-                          size: 18,
-                          color: p.ink2,
+                        child: Text(
+                          _initials(x.name),
+                          style: pvManrope(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w800,
+                            color: p.ink1,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 10),
@@ -1613,10 +1766,10 @@ class _PvProductScreenState extends State<PvProductScreen> {
                                   ),
                                 ),
                                 const SizedBox(width: 5),
-                                Icon(
+                                const Icon(
                                   Icons.verified_rounded,
                                   size: 14,
-                                  color: p.action,
+                                  color: kPvInk,
                                 ),
                               ],
                             ),
@@ -1674,11 +1827,8 @@ class _PvProductScreenState extends State<PvProductScreen> {
             ),
           ),
         if (product.experts.isEmpty)
-          PvWell(
-            child: Text(
-              'An expert film for this product is being recorded.',
-              style: pvManrope(fontSize: 13.5, color: p.ink2),
-            ),
+          const PvQuietLine(
+            'An expert film for this product is being recorded.',
           ),
       ],
     ),
@@ -1706,7 +1856,8 @@ class _PvProductScreenState extends State<PvProductScreen> {
                       PvChip(
                         label: tray.contains(product.id)
                             ? 'In compare'
-                            : 'Add this',
+                            // Kept for revert (2026-09-28): 'Add this'.
+                            : 'Add to compare',
                         leading: Icons.compare_arrows_rounded,
                         selected: tray.contains(product.id),
                         onTap: () {
@@ -1757,11 +1908,141 @@ class _PvProductScreenState extends State<PvProductScreen> {
     ),
   );
 
+  // ⚠️ A SAFETY NOTE WITH A NAME (2026-09-29). The same words as before,
+  // never a diagnosis and never against her doctor, now under their own
+  // heading beside an (i), so she finds them rather than scrolling past
+  // 11.5pt grey. Kept for revert: the bare Text at fontSize 11.5, ink3.
   Widget _disclaimer(V2Palette p) => Padding(
-    padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
-    child: Text(
-      'ParentVeda\'s recommendations are general guidance, not medical advice. If your doctor has told you something different, your doctor is right.',
-      style: pvManrope(fontSize: 11.5, height: 1.5, color: p.ink3),
+    key: const ValueKey('pv_product_safety'),
+    padding: const EdgeInsets.fromLTRB(20, 26, 20, 0),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(Icons.info_outline_rounded, size: 17, color: p.ink1),
+            const SizedBox(width: 8),
+            Text(
+              'Safety note',
+              style: pvManrope(
+                fontSize: 14.5,
+                fontWeight: FontWeight.w800,
+                color: p.ink1,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 6),
+        Text(
+          'ParentVeda\'s recommendations are general guidance, not medical advice. If your doctor has told you something different, your doctor is right.',
+          style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2),
+        ),
+      ],
+    ),
+  );
+
+  static String _initials(String name) {
+    final parts = name
+        .replaceAll('Dr. ', '')
+        .replaceAll('Dr ', '')
+        .split(' ')
+        .where((w) => w.isNotEmpty)
+        .toList();
+    if (parts.isEmpty) return '?';
+    return parts.take(2).map((w) => w[0].toUpperCase()).join();
+  }
+
+  // ---- short sections (2026-09-29) --------------------------------------------------
+
+  /// A heading and a few short lines, each with an ink mark. Superpower's
+  /// "Things to know": no box, no second column.
+  Widget _shortSection(
+    V2Palette p,
+    String key,
+    String title,
+    List<String> items,
+    IconData mark,
+  ) => Padding(
+    key: ValueKey('pv_product_section_$key'),
+    padding: const EdgeInsets.fromLTRB(20, 22, 20, 0),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: pvFraunces(
+            fontSize: 19,
+            fontWeight: FontWeight.w500,
+            color: p.ink1,
+          ),
+        ),
+        const SizedBox(height: 8),
+        for (final t in items.take(4))
+          Padding(
+            padding: const EdgeInsets.only(bottom: 7),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 2),
+                  child: Icon(mark, size: 16, color: p.ink1),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    t,
+                    style: pvManrope(
+                      fontSize: 13.5,
+                      height: 1.45,
+                      color: p.ink2,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+      ],
+    ),
+  );
+
+  /// How to use: the specs that say when, how much and how long, as label
+  /// and value (the stats rule: a plain label and the value, on white).
+  Widget _howToUse(V2Palette p, PvProduct product) => Padding(
+    key: const ValueKey('pv_product_section_how'),
+    padding: const EdgeInsets.fromLTRB(20, 22, 20, 0),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'How to use',
+          style: pvFraunces(
+            fontSize: 19,
+            fontWeight: FontWeight.w500,
+            color: p.ink1,
+          ),
+        ),
+        const SizedBox(height: 6),
+        for (final (k, v) in pvHowToUse(product))
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 5),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(k, style: pvManrope(fontSize: 12.5, color: p.ink3)),
+                const SizedBox(height: 1),
+                Text(
+                  v,
+                  style: pvManrope(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    height: 1.35,
+                    color: p.ink1,
+                  ),
+                ),
+              ],
+            ),
+          ),
+      ],
     ),
   );
 
@@ -1783,6 +2064,22 @@ class _PvProductScreenState extends State<PvProductScreen> {
         ],
       );
     } else if (product.soldHere) {
+      // ⚠️ ONE INK BUTTON (2026-09-29). The price, then one primary: "Add to
+      // cart", or "Go to cart" once this product (in the chosen size) is in
+      // it, which is where "Buy now" used to take her. Kept for revert, the
+      // two equal pills after the price column:
+      //   Expanded(child: PvSecondary(label: 'Add to bag',
+      //       onTap: () => _addToCart(product))),
+      //   const SizedBox(width: 8),
+      //   Expanded(child: PvCommit(label: 'Buy now',
+      //       onTap: () => _addToCart(product, thenCheckout: true))),
+      final inCart = CartStore.instance
+          .items(kProductsCartId)
+          .any(
+            (i) =>
+                i.productId == product.id &&
+                (product.variants.isEmpty || i.size == _variant?.label),
+          );
       body = Row(
         children: [
           Column(
@@ -1808,16 +2105,18 @@ class _PvProductScreenState extends State<PvProductScreen> {
           ),
           const SizedBox(width: 12),
           Expanded(
-            child: PvSecondary(
-              label: 'Add to bag',
-              onTap: () => _addToCart(product),
-            ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
             child: PvCommit(
-              label: 'Buy now',
-              onTap: () => _addToCart(product, thenCheckout: true),
+              key: const ValueKey('pv_product_primary'),
+              label: inCart ? 'Go to cart' : 'Add to cart',
+              icon: inCart ? null : Icons.add_rounded,
+              onTap: inCart
+                  ? () => Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => const PvCartScreen(),
+                        settings: const RouteSettings(name: 'store/cart'),
+                      ),
+                    )
+                  : () => _addToCart(product),
             ),
           ),
         ],
@@ -1838,6 +2137,7 @@ class _PvProductScreenState extends State<PvProductScreen> {
           ],
           Expanded(
             child: PvCommit(
+              key: const ValueKey('pv_product_primary'),
               label:
                   'Buy on ${product.retailer.isEmpty ? 'retailer' : product.retailer}',
               icon: Icons.open_in_new_rounded,
@@ -1858,10 +2158,32 @@ class _PvProductScreenState extends State<PvProductScreen> {
             ),
           ),
           const SizedBox(width: 12),
-          PvSecondary(
-            label: 'Save',
-            icon: Icons.favorite_border_rounded,
-            onTap: () {},
+          // ⚠️ IT SAVES NOW (2026-09-29): this "Save" had `onTap: () {}`, a
+          // button that did nothing. It is the heart's own toggle, through
+          // SavedStore, and says Saved once it is. Kept for revert: the same
+          // PvSecondary with an empty onTap.
+          ListenableBuilder(
+            listenable: SavedStore.instance,
+            builder: (context, _) {
+              final saved = SavedStore.instance.isSaved(
+                SavedKind.product,
+                product.id,
+              );
+              return PvSecondary(
+                key: const ValueKey('pv_product_save'),
+                label: saved ? 'Saved' : 'Save',
+                icon: saved
+                    ? Icons.favorite_rounded
+                    : Icons.favorite_border_rounded,
+                onTap: () => SavedStore.instance.toggle(
+                  SavedKind.product,
+                  product.id,
+                  title: product.name,
+                  subtitle: product.brand,
+                  stage: product.stage.id,
+                ),
+              );
+            },
           ),
         ],
       );

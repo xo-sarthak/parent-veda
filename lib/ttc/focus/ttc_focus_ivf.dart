@@ -123,7 +123,8 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
   groups: [
     TtcFocusGroup(
         id: 'understand', mark: IntentMark.bookMark, tabMark: TtcTabMark.openBook,
-        label: 'Understand',
+        // Kept for revert (2026-09-28, explicit names): label: 'Understand',
+        label: 'Understand treatment',
         icon: Icons.menu_book_outlined,
         hue: 206),
     TtcFocusGroup(
@@ -145,11 +146,13 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
         hue: 42),
     TtcFocusGroup(
         id: 'going', mark: IntentMark.cuppedHands, tabMark: TtcTabMark.heartHand,
-        label: 'Going through it',
+        // Kept for revert (2026-09-28, explicit names): label: 'Going through it',
+        label: 'During a round',
         icon: Icons.favorite_border_rounded,
         hue: 268),
     TtcFocusGroup(
-        id: 'track', mark: IntentMark.calendarDay, tabMark: TtcTabMark.timelineDots, label: 'Track', icon: Icons.calendar_today_outlined,
+        // Kept for revert (2026-09-28, explicit names): label: 'Track',
+        id: 'track', mark: IntentMark.calendarDay, tabMark: TtcTabMark.timelineDots, label: 'Track your round', icon: Icons.calendar_today_outlined,
         hue: 160),
   ],
 
@@ -164,7 +167,8 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
     //  is time. Making her scroll past an education section to reach the only
     //  question she came with is the same mistake as putting it behind a tab.
     TtcFocusSection(
-      heading: 'Is it time to get help?',
+      // Kept for revert (2026-09-28, explicit names): heading: 'Is it time to get help?',
+      heading: 'Should we get fertility help?',
       group: 'help',
       tiles: [
         // ⚠️ ONE NAME FOR ONE TOOL (2026-09-27, relevance audit). "Readiness"
@@ -174,6 +178,7 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
         //   title: 'Check my readiness',
         TtcToolTile(
           title: 'Should I seek fertility help?',
+          id: 'ttc_tile_should_i_seek_fertility_help',
           blurb: "Six short questions. It tells you whether it's worth talking "
               'to a doctor. It never gives you a score or a prediction.',
           surfaceId: 'ttc_fertility_help',
@@ -184,6 +189,7 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
         // this tab, and the tab had a tool and a person but nothing to read.
         TtcArticleTile(
           title: 'When to see a doctor',
+          id: 'ttc_tile_when_to_see_a_doctor',
           blurb: 'The usual guideline, and the reasons not to wait.',
           readId: 'ttc_read_when_to_seek_help',
         ),
@@ -200,6 +206,7 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
         // ),
         TtcTalkTile(
           title: 'Speak to a fertility specialist',
+          id: 'ttc_tile_speak_to_a_fertility_specialist',
           blurb: 'A 1:1 talk with someone who does this every day. Bring your '
               'dates and any results you have.',
           action: 'ttc_consult_fertility',
@@ -230,17 +237,20 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
         //   duration: '8 MIN',
         TtcVideoTile(
           title: 'An IVF cycle, start to finish',
+          id: 'ttc_tile_an_ivf_cycle_start_to_finish',
           blurb: 'The whole month, explained step by step by a specialist.',
           slotId: 'ttc_vid_ivf_walkthrough',
           duration: '9 MIN',
         ),
         TtcArticleTile(
           title: 'What IUI and IVF involve',
+          id: 'ttc_tile_what_iui_and_ivf_involve',
           blurb: 'Both treatments, step by step, in plain words.',
           readId: 'ttc_read_ivf_explained',
         ),
         TtcCarouselTile(
           title: 'IUI or IVF, and when to move from one to the other',
+          id: 'ttc_tile_iui_or_ivf_and_when_to_move_from_one_to_the_other',
           blurb: 'Two different treatments, and the point where you might '
               'switch.',
           coverTitle: 'IUI or IVF?',
@@ -284,7 +294,9 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
           reviewedBy: 'Reviewed by Dr Surbhi Sharma, IVF gynaecologist, Bloom IVF',
         ),
         TtcArticleTile(
-          title: "ICSI: when it's needed, and when it's just routine",
+          // Kept for revert (2026-09-28, explicit names): title: "ICSI: when it's needed, and when it's just routine",
+          title: 'ICSI: needed, or just routine?',
+          id: 'ttc_tile_icsi_needed_or_just_routine',
           blurb: "One step inside IVF that's sometimes essential, and often "
               'charged for anyway.',
           readId: 'ttc_read_ivf_icsi',
@@ -293,17 +305,21 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
     ),
 
     TtcFocusSection(
-      heading: 'What will they test, and why?',
+      // Kept for revert (2026-09-28, explicit names): heading: 'What will they test, and why?',
+      heading: 'What will the clinic test, and why?',
       group: 'understand',
       tiles: [
         TtcArticleTile(
           title: 'What a fertility check involves',
+          id: 'ttc_tile_what_a_fertility_check_involves',
           blurb: 'Every test usually ordered in a first round, and what each '
               'one is trying to find out.',
           readId: 'ttc_read_ivf_workup',
         ),
         TtcArticleTile(
-          title: 'His side of the tests',
+          // Kept for revert (2026-09-28, explicit names): title: 'His side of the tests',
+          title: 'His test: the semen analysis',
+          id: 'ttc_tile_his_test_the_semen_analysis',
           blurb: 'For what it costs, a semen analysis tells you more than any '
               "other test. It's also the one most often put off.",
           readId: 'ttc_read_semen_analysis',
@@ -320,19 +336,25 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
       tiles: [
         TtcArticleTile(
           title: 'Words your clinic uses',
+          id: 'ttc_tile_words_your_clinic_uses',
           blurb: 'AMH, HSG, ICSI and more, each in a line or two.',
           readId: 'ttc_read_clinic_glossary',
           keywords: ['glossary', 'AMH', 'HSG', 'beta'],
         ),
         TtcArticleTile(
           title: 'Ovulation tablets, in plain words',
+          id: 'ttc_tile_ovulation_tablets_in_plain_words',
           blurb: 'What letrozole and clomiphene do, and what to watch for.',
           readId: 'ttc_read_ovulation_tablets',
           keywords: ['letrozole', 'clomiphene', 'clomid'],
         ),
         TtcArticleTile(
-          title: 'Follicle scans',
-          blurb: 'What the doctor is looking for, and what the numbers mean.',
+          // Kept for revert (2026-09-28, explicit names): title: 'Follicle scans',
+          title: 'Follicle scans: what the doctor looks for',
+          id: 'ttc_tile_follicle_scans_what_the_doctor_looks_for',
+          // Kept for revert (2026-09-28, explicit names):
+          // blurb: 'What the doctor is looking for, and what the numbers mean.',
+          blurb: 'Why scans are done mid-cycle, what they show, and what the numbers mean.',
           readId: 'ttc_read_follicle_scans',
         ),
         // ⚠️ OFF THIS DOOR (2026-09-27, relevance audit). A second letrozole
@@ -356,11 +378,13 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
       tiles: [
         TtcArticleTile(
           title: 'Donor eggs and sperm',
+          id: 'ttc_tile_donor_eggs_and_sperm',
           blurb: 'Who can use them, and what the ART Act 2021 says.',
           readId: 'ttc_read_donor_eggs_sperm',
         ),
         TtcArticleTile(
           title: 'Surrogacy in India',
+          id: 'ttc_tile_surrogacy_in_india',
           blurb: 'The 2021 law in plain words: who it is for, how it works.',
           readId: 'ttc_read_surrogacy_india',
         ),
@@ -380,7 +404,9 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
         // Lands on the age section of the read (2026-09-27, relevance
         // audit), not the top of a general piece.
         TtcArticleTile(
-          title: 'How long it usually takes',
+          // Kept for revert (2026-09-28, explicit names): title: 'How long it usually takes',
+          title: 'How age changes how long trying takes',
+          id: 'ttc_tile_how_age_changes_how_long_trying_takes',
           blurb: "What's normal at each age, and when it's time to ask for "
               'help.',
           readId: 'ttc_read_how_long_it_takes',
@@ -388,11 +414,13 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
         ),
         TtcArticleTile(
           title: 'Trying after 35',
+          id: 'ttc_tile_trying_after_35',
           blurb: "What changes, what doesn't, and when to see a doctor sooner.",
           readId: 'ttc_read_age_after_35',
         ),
         TtcArticleTile(
           title: 'Trying after 40',
+          id: 'ttc_tile_trying_after_40',
           blurb: 'An honest look, and why seeing a doctor now helps.',
           readId: 'ttc_read_age_after_40',
         ),
@@ -412,7 +440,9 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
       group: 'age',
       tiles: [
         TtcArticleTile(
-          title: 'Harder the second time?',
+          // Kept for revert (2026-09-28, explicit names): title: 'Harder the second time?',
+          title: 'Why a second baby can take longer',
+          id: 'ttc_tile_why_a_second_baby_can_take_longer',
           blurb: 'Why it happens, what doctors check, and when to go.',
           readId: 'ttc_read_second_baby',
         ),
@@ -428,6 +458,7 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
       tiles: [
         TtcArticleTile(
           title: 'Egg freezing in India',
+          id: 'ttc_tile_egg_freezing_in_india',
           blurb: "What happens, what it costs, and what it can't promise.",
           readId: 'ttc_read_egg_freezing',
         ),
@@ -450,11 +481,13 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
     //  Money and clinics
     // -------------------------------------------------------------------------
     TtcFocusSection(
-      heading: 'What does this cost in India?',
+      // Kept for revert (2026-09-28, explicit names): heading: 'What does this cost in India?',
+      heading: 'What does treatment cost in India?',
       group: 'money',
       tiles: [
         TtcArticleTile(
           title: 'What IVF really costs in India',
+          id: 'ttc_tile_what_ivf_really_costs_in_india',
           blurb: 'Real price ranges, with the date we checked them.',
           readId: 'ttc_read_ivf_costs',
         ),
@@ -466,6 +499,7 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
         // reading card five.
         TtcArticleTile(
           title: 'What a package leaves out',
+          id: 'ttc_tile_what_a_package_leaves_out',
           blurb: "The price you're quoted is rarely the final one. What usually "
               'sits outside it, and the questions that let you compare two '
               'quotes.',
@@ -494,6 +528,7 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
         // the read's own header.
         TtcArticleTile(
           title: "How to read a clinic's success rate",
+          id: 'ttc_tile_how_to_read_a_clinic_s_success_rate',
           blurb: 'Two clinics can quote very different numbers and both be '
               'telling the truth. What the number is counting is the part '
               'that matters.',
@@ -542,7 +577,9 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
         ),
 */
         TtcCarouselTile(
-          title: 'Questions to ask before you sign up',
+          // Kept for revert (2026-09-28, explicit names): title: 'Questions to ask before you sign up',
+          title: 'Questions to ask a clinic before you sign up',
+          id: 'ttc_tile_questions_to_ask_before_you_sign_up',
           blurb: 'Eight things worth sorting out at the first appointment.',
           coverTitle: 'Before you sign',
           coverBlurb: 'Questions that are easier to ask now than later.',
@@ -599,13 +636,17 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
       group: 'going',
       tiles: [
         TtcArticleTile(
-          title: "The injections: what they're really like",
+          // Kept for revert (2026-09-28, explicit names): title: "The injections: what they're really like",
+          title: 'What the IVF injections are really like',
+          id: 'ttc_tile_what_the_ivf_injections_are_really_like',
           blurb: "What you'll be doing every evening for two weeks, and how it "
               'feels.',
           readId: 'ttc_read_ivf_injections',
         ),
         TtcArticleTile(
-          title: 'OHSS: when to call the clinic',
+          // Kept for revert (2026-09-28, explicit names): title: 'OHSS: when to call the clinic',
+          title: 'OHSS, the one complication to know by name',
+          id: 'ttc_tile_ohss_the_one_complication_to_know_by_name',
           blurb: 'The one complication worth knowing by name, and the signs '
               "that mean you shouldn't wait until morning.",
           readId: 'ttc_read_ivf_ohss',
@@ -632,41 +673,53 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
       tiles: [
         TtcArticleTile(
           title: 'Your first visit: the baseline scan',
+          id: 'ttc_tile_your_first_visit_the_baseline_scan',
           blurb: 'What the first scan of a round checks, and why it comes before any medicine.',
           readId: 'ttc_read_tx_baseline_scan',
         ),
         TtcArticleTile(
-          title: 'Monitoring scans',
-          blurb: 'What the clinic is measuring every few days, and what the numbers mean.',
+          // Kept for revert (2026-09-28, explicit names): title: 'Monitoring scans',
+          title: 'Monitoring scans during IVF',
+          id: 'ttc_tile_monitoring_scans_during_ivf',
+          // Kept for revert (2026-09-28, explicit names):
+          // blurb: 'What the clinic is measuring every few days, and what the numbers mean.',
+          blurb: 'Why you are at the clinic every few mornings, and why your dose keeps changing.',
           readId: 'ttc_read_tx_monitoring_scans',
         ),
         TtcArticleTile(
           title: 'The trigger injection',
+          id: 'ttc_tile_the_trigger_injection',
           blurb: 'Why it is timed to the hour, and what to do if you are late.',
           readId: 'ttc_read_tx_trigger_shot',
         ),
         TtcArticleTile(
           title: 'IUI day',
+          id: 'ttc_tile_iui_day',
           blurb: 'What happens on the day, how long it takes, and how it feels.',
           readId: 'ttc_read_tx_iui_day',
         ),
         TtcArticleTile(
-          title: 'Day 1, day 3, day 5',
+          // Kept for revert (2026-09-28, explicit names): title: 'Day 1, day 3, day 5',
+          title: 'Embryo day 1, day 3, day 5',
+          id: 'ttc_tile_embryo_day_1_day_3_day_5',
           blurb: 'The words the lab uses about embryos, in plain words.',
           readId: 'ttc_read_tx_embryo_days',
         ),
         TtcArticleTile(
           title: 'Fresh or frozen transfer',
+          id: 'ttc_tile_fresh_or_frozen_transfer',
           blurb: 'How clinics decide, and why frozen is common now.',
           readId: 'ttc_read_tx_fresh_or_frozen',
         ),
         TtcArticleTile(
           title: 'Frozen embryo transfer, step by step',
+          id: 'ttc_tile_frozen_embryo_transfer_step_by_step',
           blurb: 'Estrogen, the lining scan, then the transfer.',
           readId: 'ttc_read_tx_frozen_transfer',
         ),
         TtcArticleTile(
           title: 'Transfer day, and the progesterone after',
+          id: 'ttc_tile_transfer_day_and_the_progesterone_after',
           blurb: 'What happens on the day, and the medicine that comes next.',
           readId: 'ttc_read_tx_transfer_day',
         ),
@@ -679,6 +732,7 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
       tiles: [
         TtcArticleTile(
           title: 'The two-week wait after IVF or IUI',
+          id: 'ttc_tile_the_two_week_wait_after_ivf_or_iui',
           blurb: 'What your body is doing, and why the medicines can feel like signs.',
           readId: 'ttc_read_tx_wait_after_treatment',
         ),
@@ -686,22 +740,27 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
         // relevance audit): it is about the wait.
         TtcVideoTile(
           title: 'Getting through the two-week wait',
+          id: 'ttc_tile_getting_through_the_two_week_wait',
           blurb: 'The hardest fortnight of the cycle, and what helps.',
           slotId: 'ttc_ivf_two_week_wait',
           duration: '6 MIN',
         ),
         TtcArticleTile(
           title: 'The beta test',
+          id: 'ttc_tile_the_beta_test',
           blurb: "What the blood test measures, and why it's sometimes repeated.",
           readId: 'ttc_read_tx_beta_test',
         ),
         TtcArticleTile(
-          title: 'When the test is negative',
+          // Kept for revert (2026-09-28, explicit names): title: 'When the test is negative',
+          title: 'When the test is negative after treatment',
+          id: 'ttc_tile_when_the_test_is_negative_after_treatment',
           blurb: 'The next few weeks, for your body and for the two of you.',
           readId: 'ttc_read_tx_negative_after_treatment',
         ),
         TtcArticleTile(
           title: 'Your review appointment',
+          id: 'ttc_tile_your_review_appointment',
           blurb: 'The questions worth taking to the clinic after a round.',
           readId: 'ttc_read_tx_review_appointment',
         ),
@@ -718,12 +777,14 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
         // arrives.
         TtcArticleTile(
           title: 'Is egg retrieval painful?',
+          id: 'ttc_tile_is_egg_retrieval_painful',
           blurb: "What's done, what you're given for it, and how the days "
               'before and after really feel.',
           readId: 'ttc_read_ivf_retrieval',
         ),
         TtcMythTile(
           title: 'Does bed rest after transfer help?',
+          id: 'ttc_tile_does_bed_rest_after_transfer_help',
           blurb: 'One of the most widely held beliefs in fertility care.',
           myth: 'I should stay in bed after an embryo transfer to help it '
               'implant.',
@@ -740,7 +801,9 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
         // is "usually yes, and here is what to plan for". Forcing it into two
         // panels meant inventing a wrong belief to knock down.
         TtcArticleTile(
-          title: 'Can I work through a cycle?',
+          // Kept for revert (2026-09-28, explicit names): title: 'Can I work through a cycle?',
+          title: 'Can I work through an IVF cycle?',
+          id: 'ttc_tile_can_i_work_through_an_ivf_cycle',
           blurb: 'Most people do. What it asks of your calendar, which days '
               'are hard to move, and how much you need to tell anyone.',
           readId: 'ttc_read_ivf_working',
@@ -752,17 +815,20 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
     //  Track — tools you use, not things you read
     // -------------------------------------------------------------------------
     TtcFocusSection(
-      heading: "Keep track of a cycle you're in",
+      // Kept for revert (2026-09-28, explicit names): heading: "Keep track of a cycle you're in",
+      heading: 'Keep track of your treatment round',
       group: 'track',
       tiles: [
         TtcToolTile(
           title: 'Track this treatment cycle',
+          id: 'ttc_tile_track_this_treatment_cycle',
           blurb: 'Trigger, egg collection, transfer and the wait. The dates '
               'your clinic gave you, all in one place.',
           surfaceId: 'ttc_treatment',
         ),
         TtcToolTile(
           title: 'Keep your reports together',
+          id: 'ttc_tile_keep_your_reports_together',
           blurb: 'Every result and letter in one place, so your next '
               "appointment starts from what's already known.",
           surfaceId: 'ttc_records',
@@ -772,6 +838,7 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
         // times and reminders as the third thing someone mid-cycle tracks.
         TtcToolTile(
           title: 'Your medicines and timings',
+          id: 'ttc_tile_your_medicines_and_timings',
           blurb: 'What to take and when, including the trigger time that '
               'really matters.',
           surfaceId: 'ttc_medication',
@@ -796,6 +863,7 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
         // ),
         TtcArticleTile(
           title: 'OHSS: the signs to call about now',
+          id: 'ttc_tile_ohss_the_signs_to_call_about_now',
           blurb: 'The signs that mean you should call now, not wait for the '
               'morning. Worth reading before you need it.',
           readId: 'ttc_read_ivf_ohss',

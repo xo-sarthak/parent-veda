@@ -180,7 +180,8 @@ class _PvReviewsScreenState extends State<PvReviewsScreen> {
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: PvWell(
+                // A white card, not a slab (2026-09-29). Kept for revert: PvWell.
+                child: PvCard(
                   child: Text(
                     'No written reviews yet. Parents who buy this on ParentVeda are asked for one two weeks after delivery.',
                     style: pvManrope(

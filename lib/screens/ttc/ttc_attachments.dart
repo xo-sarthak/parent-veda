@@ -64,10 +64,10 @@ class TtcAttachments extends StatelessWidget {
         onTap: () => _add(context),
         behavior: HitTestBehavior.opaque,
         child: Row(mainAxisSize: MainAxisSize.min, children: [
-          const Icon(Icons.attach_file_rounded, size: 15, color: ttcPurple),
+          const Icon(Icons.attach_file_rounded, size: 15, color: ttcTitleInk),
           const SizedBox(width: 6),
           Text(files.isEmpty ? t.recordsAttach : t.recordsAttachMore,
-              style: ttcBody(12.5, color: ttcPurple, w: FontWeight.w700)),
+              style: ttcBody(12.5, color: ttcTitleInk, w: FontWeight.w700)),
         ]),
       ),
     ]);
@@ -110,7 +110,7 @@ class _Chip extends StatelessWidget {
       ),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
         Icon(isPdf ? Icons.picture_as_pdf_outlined : Icons.image_outlined,
-            size: 15, color: ttcPurple),
+            size: 15, color: ttcTitleInk),
         const SizedBox(width: 7),
         ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 150),
@@ -183,7 +183,7 @@ Widget _pickRow(BuildContext ctx, IconData icon, String label,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(color: ttcBorder)),
         child: Row(children: [
-          Icon(icon, size: 20, color: ttcPurple),
+          Icon(icon, size: 20, color: ttcTitleInk),
           const SizedBox(width: 14),
           Expanded(
               child: Text(label,

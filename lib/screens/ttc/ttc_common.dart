@@ -30,15 +30,19 @@ import 'ttc_cycle_palette.dart' show TtcCycleColours;
 // Kept for revert: More left the bar on 2026-09-26 (its rows live in You).
 // import 'ttc_more_screen.dart';
 import 'ttc_learn_screen.dart';
-import '../profile/pv_you_screen.dart' show PvYouScreen;
-import '../../services/life_stage_store.dart' show LifeStage;
+// Kept for revert (2026-09-29, the More tab is its own screen):
+// import '../profile/pv_you_screen.dart' show PvYouScreen;
+// import '../../services/life_stage_store.dart' show LifeStage;
+import 'ttc_more_tab.dart' show TtcMoreTab;
 import 'ttc_prepare_screen.dart';
 import 'ttc_shop_v3.dart' show TtcShopScreen;
 import 'ttc_profile_screen.dart';
 import 'ttc_strings.dart';
 import 'ttc_home_version.dart';
+import 'ttc_tab_host.dart' show TtcTabs, TtcTabScope;
 import 'ttc_tools_screen.dart';
 import '../../theme/pv_fonts.dart';
+import '../v2/v2_palette.dart' show V2PaletteStore;
 
 // ---- palette (same hexes as pregnancy & parenting) --------------------------
 // ⚠️ Unified with the pregnancy ground — see pp_common.dart for the
@@ -46,6 +50,20 @@ import '../../theme/pv_fonts.dart';
 const Color ttcBg = Color(0xFFFFFFFF); // white since 2026-09-17 (V2Palette's note); was 0xFFF5F3F6 // was 0xFFFBF9FE
 const Color ttcInk = Color(0xFF2F2C30);
 const Color ttcSoft = Color(0xFF69636C);
+// ⚠️ THE VIOLET IS SPENT ON EYEBROWS, PROGRESS AND THE NAV'S LIT TAB, AND ON
+// NOTHING SHE PRESSES — 2026-09-29, the user on build 19: "we cannot be using
+// random color buttons whenever we want… we don't want 10 colours of buttons
+// all over". Before this pass `ttcPurple` (and the palette's `action`, and
+// the shop's `kTtcActionInk`, all #6A30B6) filled buttons, chosen chips,
+// ticked boxes and step circles, coloured "Change", "See all" and "Add"
+// text-buttons, icons in wells, focused field rings and a text cursor, on
+// about 190 live lines across 40 files. Every one of those is now
+// `ttcTitleInk`, the switch black. What stays violet: section eyebrows (the
+// signature, DESIGN-SYSTEM §4.2), progress hairlines and spinners, the nav
+// bar's lit tab and the wordmark, and the hero gradient cards (white type on
+// violet, a decision left for the user). Kept for revert: each swapped
+// line read `ttcPurple` / `p.action` / `kTtcActionInk` where it now reads
+// `ttcTitleInk`; `test/ttc_palette_consistency_test.dart` names the rule.
 const Color ttcPurple = Color(0xFF6A30B6);
 
 /// The far end of every TTC gradient.
@@ -68,7 +86,14 @@ const Color ttcPanel = Color(0xFFEDEAF0);
 // eyebrows and links only. Kept for revert:
 // const Color ttcMuted = Color(0xFFA99CBB);
 // const Color ttcBorder = Color(0xFFE7DFEE);
-const Color ttcMuted = Color(0xFF8B8591);
+// ⚠️ AND THE GREY HAS TO BE READABLE — 2026-09-29, the user: "you can
+// understand that putting grey on white won't make the visibility good".
+// #8B8591 measured 3.6:1 on white, under WCAG AA's 4.5 for the 9-12pt meta
+// text it carries (captions, "Not in your average", eyebrows on stats). It
+// is now the palette's own `ink3`, #6F6878, which V2Palette moved to for the
+// same failure (4.85:1 on its ground, more on white). ~400 uses follow.
+// Kept for revert: const Color ttcMuted = Color(0xFF8B8591);
+const Color ttcMuted = Color(0xFF6F6878);
 const Color ttcBorder = ttcLine;
 const Color ttcLine = Color(0xFFE4E2E5);
 // ⚠️ THE "CLINIC / CAUTION" STATE HAS NO COLOUR — 2026-09-17 (BASE-UI §4.0).
@@ -82,7 +107,29 @@ const Color ttcBrown = ttcInk;
 /// The card fill that used to be cream (0xFFFDF6EC) — the panel well now.
 const Color ttcCautionCard = ttcPanel;
 const Color ttcCoralTint = Color(0xFFFFF0F3);
-const Color ttcTitleInk = Color(0xFF2D144C);
+// ⚠️ THE TITLE INK IS THE SWITCH BLACK — 2026-09-29, the user on build 19,
+// looking at "Start my round": "this color is not in the palette. It's a very
+// darkish tone of blue and it has been used at a lot of places inside the
+// newly made tools." It was a plum-indigo (#2D144C, AppTheme.primary900, a
+// BRAND shade), used ~455 times across the stage as titles, the commit pill's
+// fill, selected borders and field rings. DESIGN-SYSTEM §4.0 gives every one
+// of those roles to the ink: "near-black pill, ink fill, white label";
+// "selected = ink border". So the value, not the call sites, was wrong, and
+// one line recolours them all.
+//
+// ⚠️ WHICH BLACK: THE SWITCHES' (the user, same day, pointing at the toggles
+// on Symptoms and mood > More: "those toggle switches are all black, that is
+// what I want, that is unified, keep it black everywhere"). Those switches
+// take the theme's `colorScheme.onSurface`, which is `AppTheme.neutral900`,
+// #2F2C30, the same value as `ttcInk`. So buttons, pills, selected chips and
+// switches are ONE black, and it is this one. V2Palette's `ink1` (#201C24)
+// is a hair darker and stays a TEXT tier; it is not a second button colour.
+// `test/ttc_palette_consistency_test.dart` pins this to the theme's switch
+// colour, so the two cannot drift apart again.
+//
+// Kept for revert (2026-09-29, the user: this colour is not in the palette):
+// const Color ttcTitleInk = Color(0xFF2D144C);
+const Color ttcTitleInk = ttcInk;
 
 // ---- the partner's palette - "Slate" ----------------------------------------
 //  A deliberate counterpart rather than a recolour, carried over from the
@@ -109,10 +156,21 @@ const Color ttcSlateLine = Color(0xFFDDD4C7);
 const double ttcGutter = 18;
 const double ttcCardRadius = 26;
 
-/// The "ink lift" - a barely-there lavender-tinted shadow. Never a purple glow.
+/// The "ink lift" - a barely-there shadow in the palette's ink. Never a
+/// purple glow.
+// Kept for revert (2026-09-29, the user: this colour is not in the palette):
+// the lift was tinted with the same plum as the old ttcTitleInk -
+//   BoxShadow(color: Color(0x142D144C), blurRadius: 22, offset: Offset(0, 8)),
+// Same 8% alpha, same blur; only the hue is now the ink's.
 const List<BoxShadow> ttcCardShadow = [
-  BoxShadow(color: Color(0x142D144C), blurRadius: 22, offset: Offset(0, 8)),
+  BoxShadow(color: ttcShadowInk, blurRadius: 22, offset: Offset(0, 8)),
 ];
+
+/// The one shadow colour: the ink at 8% (2026-09-29). Named so a lift on
+/// another surface (the window's sheet, the shop's floating pill) takes the
+/// same value as the cards instead of typing a hex, which is how the lilac
+/// 0xFFD0C8DC got in. Kept for revert: the literal Color(0x142F2C30) above.
+const Color ttcShadowInk = Color(0x142F2C30);
 
 /// Leaves room for the floating pill nav so the last card is never trapped
 /// underneath it.
@@ -237,16 +295,75 @@ class _TtcExpandableTextState extends State<TtcExpandableText> {
             child: Row(mainAxisSize: MainAxisSize.min, children: [
               Text(_open ? widget.t.showLess : widget.t.showMore,
                   style:
-                      ttcBody(12, color: ttcPurple, w: FontWeight.w700)),
+                      ttcBody(12, color: ttcTitleInk, w: FontWeight.w700)),
               const SizedBox(width: 2),
               Icon(_open ? Icons.expand_less_rounded : Icons.expand_more_rounded,
-                  size: 17, color: ttcPurple),
+                  size: 17, color: ttcTitleInk),
             ]),
           ),
         ],
       ]);
     });
   }
+}
+
+// ---- THE ONE SECTION HEADING ---------------------------------------------------
+//
+// ⚠️ ONE HEADING STYLE — 2026-09-29, the user on build 20, Tools > Records and
+// reports: "The headings are of a different font than usual." They were. This
+// helper drew every TTC section heading in Manrope 17.5 bold (it predates the
+// serif), while the doors (`ttcDoorHeadingStyle`), Today (`_Head`), Learn and
+// the store (`PvSectionHead`) and the More tab drew theirs in the display
+// serif at 21-22. Two families for one job on one app, and about sixty call
+// sites of this helper were the sans half.
+//
+// THE RULE, in one line: **a page's section heading is our serif (Newsreader,
+// via `pvFraunces`) at 21 / w600 / -0.45 / ink1; a small grey caps label
+// (Manrope 11 w800 +1.1) is only for a group label inside a list or card, or a
+// stat's label, never for a page section.** DESIGN-SYSTEM §4.2 names the
+// serif; the door's numbers (21 w600, -0.45) are the one most of the stage
+// already used, so they win over the store's 21 w500 and Today's 22.
+//
+// Mobbin, heading hierarchy (2026-09-29):
+//  · Headspace Explore: "Featured Collection", "Guided Programs", "All
+//    Collections" one face, one size, one weight on every screen, the card
+//    titles a step smaller under them:
+//    https://mobbin.com/screens/9fb74046-d5b5-4af9-9204-78cacdd67661
+//    https://mobbin.com/screens/d05b1798-9389-4073-999b-693b84cca19e
+//  · Apple Health: a page section ("Health Records") in the title face above
+//    its rows; the small grey label ("Steps") only as a group label inside a
+//    list:
+//    https://mobbin.com/screens/8c245628-a453-4628-add0-113b844d513a
+//    https://mobbin.com/screens/584b8a83-d3e7-441b-8a6d-ba1d951cc4fe
+//
+// `test/ttc_one_heading_style_test.dart` holds the rule against the source.
+
+/// The one section-heading style. [color] is for his Slate side only.
+TextStyle ttcSectionHeadingStyle({Color? color}) => pvFraunces(
+      fontSize: 21,
+      fontWeight: FontWeight.w600,
+      height: 1.2,
+      letterSpacing: -0.45,
+      color: color ?? V2PaletteStore.instance.current.ink1,
+    );
+
+/// A section heading as a widget: the one style, announced as a heading to a
+/// screen reader. Use it (or [ttcSectionTitle], which wraps it) for every
+/// page section in the stage; never hand-roll a `Text` with its own style.
+class TtcSectionHeading extends StatelessWidget {
+  const TtcSectionHeading(this.text, {super.key, this.color, this.textAlign});
+
+  final String text;
+  final Color? color;
+  final TextAlign? textAlign;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+        header: true,
+        child: Text(text,
+            textAlign: textAlign,
+            style: ttcSectionHeadingStyle(color: color)),
+      );
 }
 
 /// The section title used above every block on every TTC screen.
@@ -264,7 +381,9 @@ Widget ttcSectionTitle(String title, {String? eyebrow, Widget? trailing}) =>
                   ttcEyebrow(eyebrow),
                   const SizedBox(height: 6),
                 ],
-                Text(title, style: ttcJakarta(17.5)),
+                // Kept for revert (2026-09-29, one heading style):
+                // Text(title, style: ttcJakarta(17.5)),
+                TtcSectionHeading(title),
               ],
             ),
           ),
@@ -344,7 +463,7 @@ class TtcEmpty extends StatelessWidget {
           height: 42,
           alignment: Alignment.center,
           decoration: const BoxDecoration(color: ttcPanel, shape: BoxShape.circle),
-          child: Icon(icon, size: 21, color: ttcPurple),
+          child: Icon(icon, size: 21, color: ttcTitleInk),
         ),
         const SizedBox(height: 13),
         Text(title, style: ttcJakarta(15.5)),
@@ -353,9 +472,9 @@ class TtcEmpty extends StatelessWidget {
         if (cta != null) ...[
           const SizedBox(height: 13),
           Row(children: [
-            Text(cta!, style: ttcBody(13, color: ttcPurple, w: FontWeight.w800)),
+            Text(cta!, style: ttcBody(13, color: ttcTitleInk, w: FontWeight.w800)),
             const SizedBox(width: 5),
-            const Icon(Icons.arrow_forward_rounded, size: 15, color: ttcPurple),
+            const Icon(Icons.arrow_forward_rounded, size: 15, color: ttcTitleInk),
           ]),
         ],
       ]),
@@ -458,7 +577,8 @@ class TtcClinicLedCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TtcCard(
-      color: ttcCautionCard,
+      // Kept for revert (2026-09-29, no tinted slab behind text): color: ttcCautionCard,
+      border: ttcLine,
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
           const Icon(Icons.local_hospital_outlined, size: 18, color: ttcBrown),
@@ -502,7 +622,8 @@ class TtcBuilding extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TtcCard(
-      color: ttcPanel,
+      // Kept for revert (2026-09-29, no tinted slab behind text): color: ttcPanel,
+      border: ttcLine,
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         ttcEyebrow(t.beingBuilt, color: ttcPurple),
         const SizedBox(height: 9),
@@ -625,6 +746,17 @@ void openTtcTab(BuildContext context, int index) {
 void openTtcTabV3(BuildContext context, int index) {
   final nav = Navigator.of(context);
   nav.popUntil((r) => r.isFirst || r.settings.name == ttcHomeRoute);
+  // ⚠️ A TAB SWITCH IS NOT A PUSH ANY MORE (2026-09-28, build 17: "home to
+  // Products, Tools and More play something overlapping"). When the V3 home
+  // is on the stack it hosts all five tabs, and switching fades one out and
+  // the next in, in place, under one bar that never moves. The mechanism and
+  // the trade-offs are in ttc_tab_host.dart. The pushes below stay for when
+  // no host is mounted (a screen pumped on its own, a surface-router push
+  // with no home under it).
+  if (TtcTabs.instance.hosted) {
+    TtcTabs.instance.select(index);
+    return;
+  }
   // ⚠️ TODAY · LEARN · PRODUCTS · TOOLS · YOU — 2026-09-26, the user's call
   // after the TTC gap analysis. Products takes the slot the analysis gave
   // Community (held back); everything that sat under More now lives in You;
@@ -656,15 +788,19 @@ void openTtcTabV3(BuildContext context, int index) {
           settings: const RouteSettings(name: 'ttc/tools')));
       break;
     case 4:
-      // ⚠️ THE SHARED PROFILE, WITH THIS STAGE'S BAR. `PvYouScreen` is one
-      // screen for four stages; the bar is an optional slot on it (the same
-      // idea as `PvStoreChrome`), so pregnancy, parenting and skilling push
-      // it exactly as before, with a back arrow and no bar.
+      // ⚠️ MORE IS ITS OWN SCREEN SINCE 2026-09-29 (ttc_more_tab.dart): what
+      // the app offers beyond the four tabs. The profile, which it used to
+      // be, is the avatar's (`openTtcProfile`). The route keeps its name, so
+      // the lit-tab map still reads it. Kept for revert:
+      //   nav.push(MaterialPageRoute<void>(
+      //       builder: (_) => const PvYouScreen(
+      //             stage: LifeStage.tryingToConceive,
+      //             bottomNav: TtcBottomNav(active: 4, v3: true),
+      //           ),
+      //       settings: const RouteSettings(name: kTtcYouRoute)));
       nav.push(MaterialPageRoute<void>(
-          builder: (_) => const PvYouScreen(
-                stage: LifeStage.tryingToConceive,
-                bottomNav: TtcBottomNav(active: 4, v3: true),
-              ),
+          builder: (_) =>
+              const TtcMoreTab(bottomNav: TtcBottomNav(active: 4, v3: true)),
           settings: const RouteSettings(name: kTtcYouRoute)));
       break;
   }
@@ -672,7 +808,14 @@ void openTtcTabV3(BuildContext context, int index) {
 
 /// The You tab's route. A name of its own rather than the shared 'you', so
 /// the bar can tell the tab (lit) from the avatar's push (on V1, no bar).
+///
+/// ⚠️ THE TAB READS "MORE" SINCE 2026-09-28 AND THE ROUTE KEEPS ITS NAME. The
+/// name is an identity the lit-tab map and the tests read; the label is what
+/// she sees. Renaming the route would move nothing she can see.
 const String kTtcYouRoute = 'ttc/you';
+
+/// The same route, by the tab's name.
+const String kTtcMoreRoute = kTtcYouRoute;
 
 /// Which V3 tab a route belongs under.
 ///
@@ -720,14 +863,16 @@ int ttcV3ActiveFor(String? route, int v1Active) {
     case 'ttc_shop': // the store pushed through the surface router
     case 'ttc/products':
       return 2;
+    // ⚠️ COURSES AND THE CONSULTS ARE MORE'S (2026-09-28, Tools holds only
+    // tools): both sit on More's "Experts and courses" tile, so the page
+    // lights More. Kept for revert: 'ttc/courses' and 'ttc/consults' → 3
+    // (they were Tools tiles from 2026-09-17 and 2026-09-26).
     case 'ttc/courses':
-      // Courses lives under Tools (its tile in Plan and learn).
-      return 3;
+      return 4;
     case 'ttc/tools':
       return 3;
     case 'ttc/consults':
-      // "Talk to an expert" is a Tools tile since 2026-09-26.
-      return 3;
+      return 4;
     case kTtcYouRoute:
     case 'you':
       return 4;
@@ -869,13 +1014,19 @@ class TtcBottomNav extends StatelessWidget {
   // of the Tools hub. Kept for revert: Icons.school_outlined / t.tabCourses.
   // ⚠️ 2026-09-26: Today · Learn · Products · Tools · You. Line icons, and
   // each one the glyph the other stages already use for the same word.
+  // ⚠️ 2026-09-28: the last tab is More, a bento of tiles (the user: "the
+  // last option in bottom navigation pill should be 'more' not you"). Its
+  // glyph is the four-square grid Remote's More tab uses, because what opens
+  // is a grid of tiles (https://mobbin.com/screens/cd0d67d9-aced-4b05-be4c-1a13010c617e).
   static const List<IconData> _iconsV3 = [
     Icons.home_outlined,
     Icons.menu_book_outlined,
     Icons.shopping_basket_outlined,
     Icons.handyman_outlined,
-    Icons.person_outline_rounded,
+    Icons.grid_view_outlined,
   ];
+  // Kept for revert (2026-09-26 to 2026-09-28), the fifth was You:
+  //     Icons.person_outline_rounded,
   // Kept for revert (2026-09-17 to 2026-09-26):
   //   static const List<IconData> _iconsV3 = [
   //     Icons.home_outlined,
@@ -897,7 +1048,9 @@ class TtcBottomNav extends StatelessWidget {
       [t.tabToday, t.tabPrepare, t.tabTools, t.tabCalendar, t.tabCommunity];
 
   static List<String> _labelsV3(TtcS t) =>
-      [t.tabToday, t.tabLearn, t.tabProducts, t.tabTools, t.tabYou];
+      [t.tabToday, t.tabLearn, t.tabProducts, t.tabTools, t.tabMoreV3];
+  // Kept for revert (2026-09-26 to 2026-09-28):
+  //   [t.tabToday, t.tabLearn, t.tabProducts, t.tabTools, t.tabYou];
   // Kept for revert:
   //   [t.tabToday, t.tabProducts, t.tabTools, t.tabTalkToExpert, t.tabMore];
 
@@ -907,6 +1060,15 @@ class TtcBottomNav extends StatelessWidget {
   // and slate palette are preserved by passing them in.
   @override
   Widget build(BuildContext context) {
+    // ⚠️ INSIDE THE TAB HOST ONLY THE HOST'S BAR DRAWS (2026-09-28). Each tab
+    // screen still carries its own copy for when it is pushed on its own;
+    // inside the host that copy was the second, differently placed bar that
+    // crossed the first during every switch. See ttc_tab_host.dart.
+    final scope = TtcTabScope.maybeOf(context);
+    if (scope != null && !scope.ownsBar) return const SizedBox.shrink();
+    // The tab's name when hosted, the route's otherwise: the lit-tab map
+    // reads the same strings either way.
+    final routeName = scope?.routeName ?? ModalRoute.of(context)?.settings.name;
     // Listening rather than reading once, so flipping the version pill in
     // Profile repaints every bar already on the stack instead of leaving the
     // old tab set behind on whatever was underneath it.
@@ -918,9 +1080,9 @@ class TtcBottomNav extends StatelessWidget {
             TtcHomeVersionStore.instance.version == TtcHomeVersion.v3;
         final labels = onV3 ? _labelsV3(t) : _labels(t);
         final icons = onV3 ? _iconsV3 : _icons;
-        final index = onV3
-            ? ttcV3ActiveFor(ModalRoute.of(context)?.settings.name, active)
-            : active;
+        // Kept for revert (2026-09-28): the route's name alone.
+        //   ttcV3ActiveFor(ModalRoute.of(context)?.settings.name, active)
+        final index = onV3 ? ttcV3ActiveFor(routeName, active) : active;
         return PvNavBar(
           items: [
             for (var i = 0; i < icons.length; i++)
@@ -1116,15 +1278,21 @@ class TtcHeader extends StatelessWidget {
 /// position marker wearing a progress bar's clothes: same shape, no claim about
 /// how much of anything is banked.
 class TtcChapterBar extends StatelessWidget {
-  const TtcChapterBar({super.key, required this.today});
+  const TtcChapterBar({super.key, required this.today, this.onLight = false});
 
   final TtcToday today;
+
+  /// True on a light hero field (2026-09-29): ink segments and numbers
+  /// instead of white ones. White stays the default for a dark ground.
+  final bool onLight;
 
   @override
   Widget build(BuildContext context) {
     final current = today.chapter.index;
     final frac = today.chapterProgress;
-    const track = Color(0x38FFFFFF);
+    // Kept for revert (2026-09-29): const track = Color(0x38FFFFFF);
+    final track = onLight ? ttcInk.withValues(alpha: 0.12) : const Color(0x38FFFFFF);
+    final fg = onLight ? ttcInk : Colors.white;
 
     Widget segment(int i) {
       final active = i == current;
@@ -1145,7 +1313,7 @@ class TtcChapterBar extends StatelessWidget {
                 child: Container(
                   height: 8,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: fg,
                     borderRadius: BorderRadius.circular(999),
                   ),
                 ),
@@ -1163,7 +1331,7 @@ class TtcChapterBar extends StatelessWidget {
           child: Text('${i + 1}',
               textAlign: TextAlign.center,
               style: ttcBody(10.5,
-                  color: Colors.white.withValues(alpha: active ? 1 : 0.55),
+                  color: fg.withValues(alpha: active ? 1 : (onLight ? 0.7 : 0.55)),
                   w: active ? FontWeight.w900 : FontWeight.w700)),
         ),
       );
@@ -1188,14 +1356,45 @@ class TtcHeroShortcut extends StatelessWidget {
     required this.icon,
     required this.label,
     required this.onTap,
+    this.onLight = false,
   });
 
   final IconData icon;
   final String label;
   final VoidCallback onTap;
 
+  /// True on a light hero field (2026-09-29): a white round with a hairline
+  /// and an ink glyph and label. His slate hero keeps the white default.
+  final bool onLight;
+
   @override
   Widget build(BuildContext context) {
+    if (onLight) {
+      return Expanded(
+        child: GestureDetector(
+          onTap: onTap,
+          behavior: HitTestBehavior.opaque,
+          child: Column(children: [
+            Container(
+              width: 44,
+              height: 44,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.85),
+                shape: BoxShape.circle,
+                border: Border.all(color: ttcLine),
+              ),
+              child: Icon(icon, size: 21, color: ttcInk),
+            ),
+            const SizedBox(height: 6),
+            Text(label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: ttcBody(11, color: ttcInk, w: FontWeight.w700)),
+          ]),
+        ),
+      );
+    }
     return Expanded(
       child: GestureDetector(
         onTap: onTap,

@@ -15,6 +15,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:parentveda/data/products/pv_product_extras.dart'
+    show kPvIllustrativePhotoIds;
 import 'package:parentveda/data/learn/pv_learn_view.dart';
 import 'package:parentveda/screens/learn/pv_learn_catalog.dart';
 import 'package:parentveda/screens/learn/pv_learn_screen.dart'
@@ -172,10 +174,23 @@ void main() {
       }
     });
 
-    test('the strips and the lubricant draw their mark until real photos',
-        () {
-      expect(PvCatalogStore.instance.byId('ttc_lh_strips')!.hasImage, isFalse);
-      expect(PvCatalogStore.instance.byId('ttc_lubricant')!.hasImage, isFalse);
+    // Kept for revert (2026-09-29): the strips and the lubricant drew their
+    // mark until real photos existed.
+    //   expect(PvCatalogStore.instance.byId('ttc_lh_strips')!.hasImage, isFalse);
+    //   expect(PvCatalogStore.instance.byId('ttc_lubricant')!.hasImage, isFalse);
+    // The user, 2026-09-29: "stop leaving the placeholders". Each now shows a
+    // generic object (unbranded strips, a plain white bottle), labelled as an
+    // illustration on its page, and still not the pregnancy test's photo.
+    test('the strips and the lubricant show an illustrative photo', () {
+      for (final id in ['ttc_lh_strips', 'ttc_lubricant']) {
+        final p = PvCatalogStore.instance.byId(id)!;
+        expect(p.hasImage, isTrue, reason: id);
+        expect(kPvIllustrativePhotoIds, contains(id));
+      }
+      expect(
+        PvCatalogStore.instance.byId('ttc_lh_strips')!.images.first,
+        isNot(PvCatalogStore.instance.byId('ttc_preg_test')!.images.first),
+      );
     });
   });
 

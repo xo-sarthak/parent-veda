@@ -240,6 +240,8 @@ class _TtcIvfReadinessScreenState extends State<TtcIvfReadinessScreen> {
 
     return TtcToolScaffold(
       hue: kIvfHue,
+      // The tool's mark over the eyebrow (2026-09-29, ttc_tool_marks.dart).
+      toolId: 'fertility_help',
       // ⚠️ ONE TOOL, ONE NAME (2026-09-27): the Tools tile's name, word for
       // word. Kept for revert: eyebrow: 'Should I get help?',
       // D18 (2026-09-28): the one name, and a title that describes rather
@@ -590,13 +592,16 @@ class TtcIvfReadinessResultScreen extends StatelessWidget {
     return TtcToolScaffold(
       hue: kIvfHue,
       variant: 3,
+      // Step two of the check: back to her answers, not an X (2026-09-29).
+      leading: TtcToolLeading.back,
       // One tool, one name (2026-09-27). Kept for revert: 'Your answer'.
       // D18 (2026-09-28). Kept for revert: eyebrow: 'See a specialist?',
       eyebrow: kTtcFertilityHelpName,
       // ⚠️ THE TITLE DESCRIBES WHAT SHE IS HOLDING, NOT WHAT SHE IS. This is
       // where a "you may be infertile" would go on a worse version of this
       // screen, and it is the first place the eye lands.
-      title: 'What this adds up to.',
+      // Kept for revert (2026-09-28): 'What this adds up to.'
+      title: 'What your answers add up to.',
       intro: "No score and no label. Just where you are, and what's worth "
           'doing about it.',
       children: [
@@ -609,7 +614,8 @@ class TtcIvfReadinessResultScreen extends StatelessWidget {
 
         const SizedBox(height: 26),
         ttcToolPad(const TtcToolBlockHead(
-            label: 'What this means for timing', hue: 42)),
+            // Kept for revert (2026-09-28): 'What this means for timing'
+            label: 'What your answers mean for timing', hue: 42)),
         const SizedBox(height: 10),
         // The one line from the routing rules. Outlined on every branch that
         // pushes toward a specialist — the whole escalation vocabulary.
@@ -646,7 +652,9 @@ class TtcIvfReadinessResultScreen extends StatelessWidget {
           )),
         ] else ...[
           ttcToolPad(TtcToolPrimary(
-            label: 'Make the most of this cycle',
+            // Change 5 (2026-09-28): the button names where it lands.
+            // Kept for revert: 'Make the most of this cycle'.
+            label: 'See your fertile window',
             onTap: () => openTtcSurface(context, 'ttc_window'),
           )),
           const SizedBox(height: 10),
@@ -708,6 +716,8 @@ class TtcIvfNotesScreen extends StatelessWidget {
   Widget build(BuildContext context) => TtcToolScaffold(
         hue: kIvfHue,
         variant: 4,
+        // Step three: back to the answer it came from (2026-09-29).
+        leading: TtcToolLeading.back,
         // One tool, one name (2026-09-27). Kept for revert:
         // eyebrow: 'Appointment notes',
         // D18 (2026-09-28). Kept for revert: eyebrow: 'See a specialist?',

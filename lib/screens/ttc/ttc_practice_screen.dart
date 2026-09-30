@@ -30,6 +30,7 @@ import 'ttc_mind_today_screen.dart'
     show kTtcMoveHue, kTtcBreatheHue, kTtcBreatheFieldHue;
 import 'ttc_practice_card_parts.dart';
 import 'ttc_practice_player.dart';
+import 'ttc_common.dart' show ttcTitleInk;
 import 'ttc_tool_chrome.dart';
 
 /// The hue for this area. 42 is the bracket's own, from `ttc_brackets.dart`.
@@ -229,6 +230,8 @@ class _TtcPracticeScreenState extends State<TtcPracticeScreen> {
               onProgress: _onProgress,
               stepClock: ringCounts,
               showVibrate: false,
+              // The sound switch sits with the other settings below.
+              showSound: false,
               caption: ringCounts
                   ? 'Step ${_step + 1} of ${pr.steps.length}'
                   : null,
@@ -325,7 +328,7 @@ class _TtcPracticeScreenState extends State<TtcPracticeScreen> {
                           height: 24,
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
-                            color: i == _step ? deep : pal.surfaceAlt,
+                            color: i == _step ? ttcTitleInk : pal.surfaceAlt,
                             borderRadius: BorderRadius.circular(999),
                           ),
                           child: Text('${i + 1}',
@@ -371,8 +374,12 @@ class _TtcPracticeScreenState extends State<TtcPracticeScreen> {
               ]),
             ],
 
-            // ---- the two settings, labelled, together -------------------
-            if (_followable || pr.anim is TtcBreathAnim) ...[
+            // ---- the settings, labelled, together ----------------------
+            // ⚠️ SHOWN FOR EVERY PRACTICE NOW (2026-09-28): every practice has
+            // at least the end tone, so every one carries "Sound cues". Kept
+            // for revert, the condition when there were two settings only:
+            //   if (_followable || pr.anim is TtcBreathAnim) ...[
+            ...[
               const SizedBox(height: 18),
               Container(
                 padding: const EdgeInsets.fromLTRB(18, 6, 8, 6),
@@ -388,6 +395,7 @@ class _TtcPracticeScreenState extends State<TtcPracticeScreen> {
                       onChanged: (v) => setState(() => _follow = v),
                     ),
                   if (pr.anim is TtcBreathAnim) const TtcVibrateSwitch(),
+                  const TtcSoundSwitch(),
                 ]),
               ),
             ],
@@ -426,7 +434,8 @@ class _TtcPracticeScreenState extends State<TtcPracticeScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             // Kept for revert (2026-09-27): 'SKIP IT IF'.
-                            Text('Skip it if',
+                            // And (2026-09-28): 'Skip it if'.
+                            Text('Skip this practice if',
                                 style: pvManrope(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w800,
@@ -460,7 +469,7 @@ class _TtcPracticeScreenState extends State<TtcPracticeScreen> {
                 height: 52,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: done ? pal.surfaceAlt : deep,
+                  color: done ? pal.surfaceAlt : ttcTitleInk,
                   borderRadius: BorderRadius.circular(16),
                   border: done ? Border.all(color: pal.line) : null,
                 ),
@@ -716,7 +725,7 @@ class _StepButton extends StatelessWidget {
           height: 52,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: filled && enabled ? deep : p.surfaceAlt,
+            color: filled && enabled ? ttcTitleInk : p.surfaceAlt,
             borderRadius: BorderRadius.circular(16),
           ),
           child: Row(mainAxisSize: MainAxisSize.min, children: [

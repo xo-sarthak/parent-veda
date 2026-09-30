@@ -53,6 +53,7 @@ import 'ttc_timeline_screen.dart';
 import 'ttc_today_screen.dart' show logTtcPeriod;
 import 'ttc_tool_chrome.dart';
 import 'ttc_tool_hues.dart';
+import 'ttc_common.dart' show ttcTitleInk;
 
 /// Where each milestone lives, and the plain action that reaches it
 /// (2026-09-27, night). `surface` opens once it is done ("where is it?");
@@ -83,8 +84,10 @@ const Map<String, ({String? surface, String? action, String? byItself})>
       (surface: 'ttc_care_circle', action: 'Invite your partner', byItself: null),
   'tests_done':
       (surface: 'ttc_symptom_log', action: 'Log your weight', byItself: null),
-  'wrote_something':
-      (surface: 'ttc_journal', action: 'Write in the journal', byItself: null),
+  // Kept for revert (2026-09-28, journal out of TTC): the milestone left the
+  // list in ttc_milestones.dart with the journal.
+  //   'wrote_something':
+  //       (surface: 'ttc_journal', action: 'Write in the journal', byItself: null),
   'ritual_week':
       (surface: 'ttc_ritual', action: 'Open your daily ritual', byItself: null),
   'lifestyle_tracked': (
@@ -92,7 +95,12 @@ const Map<String, ({String? surface, String? action, String? byItself})>
     action: 'Track your sleep or movement',
     byItself: null
   ),
-  'positive_test': (surface: null, action: null, byItself: 'Whenever it comes.'),
+  // Kept for revert (2026-09-28): byItself: 'Whenever it comes.'
+  'positive_test': (
+    surface: null,
+    action: null,
+    byItself: 'Whenever your positive test comes.'
+  ),
 };
 
 /// Opens where a milestone is DONE ([ahead] false) or where it is REACHED
@@ -278,7 +286,7 @@ class _ChapterStep extends StatelessWidget {
                 height: 24,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: current ? p.ink1 : p.surface,
+                  color: current ? ttcTitleInk : p.surface,
                   shape: BoxShape.circle,
                   border: Border.all(
                       color: current ? p.ink1 : p.line, width: 1.5),
@@ -317,7 +325,7 @@ class _ChapterStep extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 9, vertical: 4),
                           decoration: BoxDecoration(
-                              color: p.ink1,
+                              color: ttcTitleInk,
                               borderRadius: BorderRadius.circular(999)),
                           child: Text(t.chapterYouAreHere,
                               style: pvManrope(
@@ -415,7 +423,7 @@ class _MilestoneRow extends StatelessWidget {
         height: 30,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: done ? p.ink1 : p.surface,
+          color: done ? ttcTitleInk : p.surface,
           shape: BoxShape.circle,
           border: done ? null : Border.all(color: p.line, width: 1.5),
         ),
@@ -487,7 +495,8 @@ class _CycleLoop extends StatelessWidget {
           Icon(Icons.loop_rounded, size: 16, color: p.ink1),
           const SizedBox(width: 8),
           Expanded(
-            child: Text('These three repeat every cycle',
+            // Kept for revert (2026-09-28): 'These three repeat every cycle'.
+            child: Text('Three chapters that repeat every cycle',
                 style: pvManrope(
                     fontSize: 12.5, fontWeight: FontWeight.w800, color: p.ink1)),
           ),

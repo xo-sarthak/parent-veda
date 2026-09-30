@@ -1617,6 +1617,9 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
       duration: v.durationLabel,
       hue: v.hue,
       slotId: v.id,
+      // A relevant still until the film exists (2026-09-29); null for every
+      // film without a line in `kPvFilmStills`, which draws as before.
+      still: pvFilmStillFor(v.id),
       // ⚠️ FLAT INSIDE A READ. The diagonal gradient is right on a hub, where a
       // thumbnail competes with tiles for attention. At the head of an article
       // it is the loudest object on a page that is trying to read as editorial.

@@ -173,6 +173,19 @@ class TtcLogStore extends ChangeNotifier with TtcSyncedStore {
     return List.unmodifiable(out);
   }
 
+  /// The same values as [valuesOn], in the order she logged them: oldest
+  /// first, the latest last.
+  ///
+  /// `_values` is an insertion-ordered map. A new log appends; a clear
+  /// removes the key, so logging it again appends it anew; changing a value
+  /// in place keeps its slot. [valuesOn] sorts by field for stable displays,
+  /// which is exactly wrong for "what did she log last" (2026-09-28: the
+  /// home's "You logged today" card stayed on "Calm", the alphabetically
+  /// early mood, after newer logs).
+  List<TtcLogValue> valuesOnInLogOrder(String tracker, String dayKey) =>
+      List.unmodifiable(_values.values
+          .where((v) => v.tracker == tracker && v.dayKey == dayKey));
+
   bool hasAnythingFor(String tracker) =>
       _values.values.any((v) => v.tracker == tracker);
 

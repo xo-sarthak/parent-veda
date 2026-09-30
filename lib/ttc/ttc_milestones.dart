@@ -24,7 +24,8 @@
 import '../services/family_timeline.dart';
 import '../services/life_stage_store.dart';
 import 'cycle_store.dart';
-import 'ttc_journal_store.dart';
+// Kept for revert (2026-09-28, the user: no journal in trying to conceive).
+// import 'ttc_journal_store.dart';
 import 'ttc_log_store.dart';
 import 'ttc_ritual_store.dart';
 import 'ttc_store.dart';
@@ -134,17 +135,20 @@ const List<TtcMilestone> ttcMilestones = [
     bodyHi:
         'Jo numbers aap doctor ko dikha sakein, wo "aisa lag raha tha" se behtar hote hain.',
   ),
-  TtcMilestone(
-    id: 'wrote_something',
-    iconKey: 'write',
-    isOutcome: false,
-    titleEn: 'Wrote something down',
-    titleHi: 'Kuch likha',
-    bodyEn:
-        "Years from now, you'll be glad you kept this, including the hard entries.",
-    bodyHi:
-        'Kai saal baad yahi wo hissa hoga jise rakhne ki aapko khushi hogi - mushkil entries bhi.',
-  ),
+  // Kept for revert (2026-09-28, journal out of TTC): the journal was the one
+  // way to reach this milestone, and it left the stage. `isAchieved` keeps its
+  // case, and a milestone already written into the family timeline stays.
+  // TtcMilestone(
+  //   id: 'wrote_something',
+  //   iconKey: 'write',
+  //   isOutcome: false,
+  //   titleEn: 'Wrote something down',
+  //   titleHi: 'Kuch likha',
+  //   bodyEn:
+  //       "Years from now, you'll be glad you kept this, including the hard entries.",
+  //   bodyHi:
+  //       'Kai saal baad yahi wo hissa hoga jise rakhne ki aapko khushi hogi - mushkil entries bhi.',
+  // ),
   TtcMilestone(
     id: 'ritual_week',
     iconKey: 'spa',
@@ -203,8 +207,11 @@ class TtcMilestoneEngine {
         // Any recorded body measurement counts - this is about starting to
         // keep records at all, not about completing a particular panel.
         return TtcLogStore.instance.hasAnythingFor('weight');
-      case 'wrote_something':
-        return TtcJournalStore.instance.count > 0;
+      // Kept for revert (2026-09-28, the user: no journal in trying to
+      // conceive). The milestone is already off the list; its check read the
+      // journal store, which is commented out.
+      // case 'wrote_something':
+      //   return TtcJournalStore.instance.count > 0;
       case 'ritual_week':
         return TtcRitualStore.instance.streak() >= 7;
       case 'lifestyle_tracked':

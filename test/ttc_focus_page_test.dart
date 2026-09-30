@@ -371,19 +371,26 @@ void main() {
       // because two of its three myths are not about position, and "How does
       // it happen?" was added for the one read no door linked. Kept for
       // revert: 'Which sex position is best?', and no 'How does it happen?'.
+      // ⚠️ 2026-09-28 (explicit names): seven headings name their subject.
+      // The order is unchanged. Kept for revert, the old headings in order:
+      //   'How many times should we try?', 'How does it happen?',
+      //   'What happens in the two weeks after?',
+      //   'When should you test, and how?', 'What if the test says no?',
+      //   'The questions that are hard to ask', 'What he should do',
+      //   'What you should do'.
       expect(page.sections.map((s) => s.heading).toList(), [
         'When should we have sex?',
-        'How many times should we try?',
+        'How often should we have sex?',
         'Positions, lying down and other myths',
         'Does stress stop pregnancy?',
-        'How does it happen?',
-        'What happens in the two weeks after?',
-        'When should you test, and how?',
-        'What if the test says no?',
+        'How does conception happen?',
+        'What happens in the two weeks after ovulation?',
+        'When and how should you take a pregnancy test?',
+        'What if the pregnancy test says no?',
         'When trying changes your sex life',
-        'The questions that are hard to ask',
-        'What he should do',
-        'What you should do',
+        'The sex questions that are hard to ask',
+        'What can he do for his fertility?',
+        'What can you do before you conceive?',
         'When should we see a doctor?',
       ]);
     });

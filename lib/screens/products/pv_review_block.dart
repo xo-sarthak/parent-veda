@@ -320,10 +320,18 @@ class _Voice extends StatelessWidget {
     return SizedBox(
       width: width,
       child: Container(
+        key: const ValueKey('pv_review_voice_card'),
         padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+        // ⚠️ WHITE WITH A HAIRLINE, NOT A TINT (2026-09-29). A quote is text,
+        // and a tinted slab behind text is the one thing the base UI rules
+        // out ("tints are for tags and pills"). The product page and Learn
+        // both draw this card, so both change. The tint moves to what IS a
+        // tag: the initials disc and the endorsed pill.
+        // Kept for revert (2026-09-29): color: tint, and no border.
         decoration: BoxDecoration(
-          color: tint,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: kPvLine),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -388,9 +396,11 @@ class _Voice extends StatelessWidget {
                   width: 30,
                   height: 30,
                   alignment: Alignment.center,
+                  // The tint, now the card is white (2026-09-29). Kept for
+                  // revert: Colors.white.withValues(alpha: 0.75).
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.white.withValues(alpha: 0.75),
+                    color: tint,
                   ),
                   child: Text(
                     _initials(v.name),
@@ -432,8 +442,10 @@ class _Voice extends StatelessWidget {
               const SizedBox(height: 10),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                // The tint, a tag on a white card (2026-09-29). Kept for
+                // revert: Colors.white.withValues(alpha: 0.75).
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.75),
+                  color: tint,
                   borderRadius: BorderRadius.circular(99),
                 ),
                 child: Text(

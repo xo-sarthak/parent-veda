@@ -307,11 +307,16 @@ final List<PvRead> kTtcReadsMealPlan = [
         surfaceId: 'ttc_prepare',
       ),
     ],
-    readNext: [
-      'ttc_read_everyday_recipes',
-      'ttc_read_iron_before_pregnancy',
-      'ttc_read_three_months_before',
-    ],
+    // ⚠️ ONE READ, ONCE, AT THE FOOT (2026-09-28, no repetition):
+    // 'ttc_read_everyday_recipes' is the next step "Next: ten everyday recipes",
+    // so the Read next rail no longer lists it a second time.
+    // Kept for revert:
+    // readNext: [
+    // 'ttc_read_everyday_recipes',
+    // 'ttc_read_iron_before_pregnancy',
+    // 'ttc_read_three_months_before',
+    // ],
+    readNext: ['ttc_read_iron_before_pregnancy', 'ttc_read_three_months_before'],
   ),
 
   // ===========================================================================
@@ -572,7 +577,8 @@ final List<PvRead> kTtcReadsMealPlan = [
     nextSteps: [
       PvReadNextStep(
         kind: PvNextKind.tool,
-        title: _en('Put them into your week'),
+        // Kept for revert (2026-09-28, explicit names): title: _en('Put them into your week'),
+        title: _en('Add the recipes to your meal plan'),
         value: _en('Add these dishes to a meal plan you can follow day by '
             'day.'),
         surfaceId: 'ttc_nutrition',
@@ -585,10 +591,15 @@ final List<PvRead> kTtcReadsMealPlan = [
         surfaceId: 'ttc_read/ttc_read_iron_before_pregnancy',
       ),
     ],
-    readNext: [
-      'ttc_read_meal_plan_week',
-      'ttc_read_iron_before_pregnancy',
-    ],
+    // ⚠️ ONE READ, ONCE, AT THE FOOT (2026-09-28, no repetition):
+    // 'ttc_read_iron_before_pregnancy' is the next step "Next: iron before pregnancy",
+    // so the Read next rail no longer lists it a second time.
+    // Kept for revert:
+    // readNext: [
+    // 'ttc_read_meal_plan_week',
+    // 'ttc_read_iron_before_pregnancy',
+    // ],
+    readNext: ['ttc_read_meal_plan_week'],
   ),
 
   // ===========================================================================
@@ -1064,11 +1075,16 @@ final List<PvRead> kTtcReadsMealPlan = [
         surfaceId: 'ttc_read/ttc_read_everyday_recipes',
       ),
     ],
-    readNext: [
-      'ttc_read_everyday_recipes',
-      'ttc_read_preconception_tests',
-      'ttc_read_omega3_without_fish',
-    ],
+    // ⚠️ ONE READ, ONCE, AT THE FOOT (2026-09-28, no repetition):
+    // 'ttc_read_everyday_recipes' is the next step "Cook for iron",
+    // so the Read next rail no longer lists it a second time.
+    // Kept for revert:
+    // readNext: [
+    // 'ttc_read_everyday_recipes',
+    // 'ttc_read_preconception_tests',
+    // 'ttc_read_omega3_without_fish',
+    // ],
+    readNext: ['ttc_read_preconception_tests', 'ttc_read_omega3_without_fish'],
   ),
 
   // ===========================================================================
@@ -1288,9 +1304,14 @@ final List<PvRead> kTtcReadsMealPlan = [
         surfaceId: 'ttc_read/ttc_read_meal_plan_week',
       ),
     ],
-    readNext: [
-      'ttc_read_meal_plan_week',
-      'ttc_read_ask_dietitian',
-    ],
+    // ⚠️ ONE READ, ONCE, AT THE FOOT (2026-09-28, no repetition):
+    // 'ttc_read_meal_plan_week' is the next step "Back to: a week of meals",
+    // so the Read next rail no longer lists it a second time.
+    // Kept for revert:
+    // readNext: [
+    // 'ttc_read_meal_plan_week',
+    // 'ttc_read_ask_dietitian',
+    // ],
+    readNext: ['ttc_read_ask_dietitian'],
   ),
 ];

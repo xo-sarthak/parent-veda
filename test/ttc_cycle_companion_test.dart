@@ -249,7 +249,7 @@ void main() {
       await tester.tap(find.text('Add a period date'));
       await tester.pumpAndSettle();
 
-      expect(find.text('When did it start?'), findsOneWidget);
+      expect(find.text('When did your period start?' /* was 'When did it start?' */), findsOneWidget);
       // ⚠️ THE DEFINITION IS ON THE SCREEN THAT ASKS. Every derived number in
       // this stage hangs off her reading day 1 the same way we do.
       expect(find.text('The first day of real bleeding, not spotting.'),

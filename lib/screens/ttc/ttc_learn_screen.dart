@@ -71,9 +71,11 @@
 //    L11 the story card's title is the Manrope card title (one card language).
 // =============================================================================
 
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
-import '../../data/reads/read_images.dart' show readImageFor;
+import '../../data/reads/read_images.dart' show readImageFor, pvFilmStillFor;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../data/brackets/ttc_brackets.dart';
@@ -108,11 +110,12 @@ import '../v2/v3_bracket_art.dart';
 import 'doors/ttc_door_screen.dart' show ttcDoorVisiblePage;
 import 'doors/ttc_door_search.dart';
 import 'ttc_askveda_screen.dart';
-import 'ttc_common.dart' show TtcBottomNav;
+import 'ttc_common.dart' show TtcBottomNav, ttcTitleInk;
 import 'ttc_focus_screen.dart' show openTtcFocusTile;
 import 'ttc_prepare_screen.dart';
 import 'ttc_strings.dart';
 import 'ttc_surface_router.dart' show openTtcSurface, kTtcReadPrefix;
+import 'ttc_tab_root_header.dart';
 
 /// The Learn tab's route. `ttcV3ActiveFor` lights tab 1 for it.
 const String kTtcLearnRoute = 'ttc/learn';
@@ -609,21 +612,23 @@ class _TtcLearnScreenState extends State<TtcLearnScreen> {
             body: Stack(children: [
               Positioned.fill(
                 child: ListView(
-                  padding: EdgeInsets.fromLTRB(
-                      0,
-                      MediaQuery.of(context).padding.top + 12,
-                      0,
-                      pvNavClearance(context)),
+                  // ⚠️ THE HEADER CARRIES THE SAFE-AREA INSET (2026-09-29,
+                  // TtcTabRootHeader), so every tab root's title sits at one
+                  // y. Kept for revert:
+                  //   padding: EdgeInsets.fromLTRB(0,
+                  //       MediaQuery.of(context).padding.top + 12, 0,
+                  //       pvNavClearance(context)),
+                  padding:
+                      EdgeInsets.fromLTRB(0, 0, 0, pvNavClearance(context)),
                   children: [
                     _header(p, t),
-                    const SizedBox(height: 14),
-                    _pad(PvLiveSearchField(
-                      search: _search,
-                      p: p,
-                      hint: t.learnSearchHint,
-                      onSubmitted: (q) =>
-                          TtcLearnRecents.instance.remember(q),
-                    )),
+                    // The search is the header's `below` now, at the spec's
+                    // gap. Kept for revert:
+                    //   const SizedBox(height: 14),
+                    //   _pad(PvLiveSearchField(search: _search, p: p,
+                    //     hint: t.learnSearchHint,
+                    //     onSubmitted: (q) =>
+                    //         TtcLearnRecents.instance.remember(q))),
                     ConstrainedBox(
                       constraints: BoxConstraints(
                           minHeight: pvLiveSearchSheetMin(context, _search)),
@@ -675,34 +680,59 @@ class _TtcLearnScreenState extends State<TtcLearnScreen> {
   Widget _pad(Widget child) => Padding(
       padding: const EdgeInsets.symmetric(horizontal: _g), child: child);
 
-  Widget _header(V2Palette p, TtcS t) => _pad(Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(children: [
-            Expanded(
-              child: Text(t.learnTitle,
-                  style: pvFraunces(
-                      fontSize: 30,
-                      fontWeight: FontWeight.w500,
-                      height: 1.1,
-                      color: p.ink1)),
-            ),
-            // L7: no count. Kept for revert:
-            //   badge: SavedStore.instance.items(kind: SavedKind.article).length,
-            PvRoundIcon(
-              icon: Icons.bookmark_border_rounded,
-              onTap: _openSaved,
-              size: 42,
-            ),
-          ]),
-          const SizedBox(height: 6),
-          PvLiveSearchWords(
-            search: _search,
-            child: Text(t.learnIntro,
-                style: pvManrope(fontSize: 14, height: 1.45, color: p.ink2)),
+  /// ⚠️ ONE TAB-ROOT HEADER (2026-09-29, build 19): Learn's geometry became
+  /// the spec every tab root uses (ttc_tab_root_header.dart has the
+  /// measurements and the Mobbin evidence). Same title, same bookmark, same
+  /// intro, same search; only who owns the spacing changed.
+  Widget _header(V2Palette p, TtcS t) => TtcTabRootHeader(
+        title: t.learnTitle,
+        trailing: [
+          // L7: no count. Kept for revert:
+          //   badge: SavedStore.instance.items(kind: SavedKind.article).length,
+          PvRoundIcon(
+            icon: Icons.bookmark_border_rounded,
+            onTap: _openSaved,
+            size: kTtcTabRootRowHeight,
           ),
         ],
-      ));
+        intro: PvLiveSearchWords(
+          search: _search,
+          child: Text(t.learnIntro, style: ttcTabRootIntroStyle()),
+        ),
+        below: PvLiveSearchField(
+          search: _search,
+          p: p,
+          hint: t.learnSearchHint,
+          onSubmitted: (q) => TtcLearnRecents.instance.remember(q),
+        ),
+      );
+  // Kept for revert (2026-09-29), Learn's own header:
+  // Widget _header(V2Palette p, TtcS t) => _pad(Column(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         Row(children: [
+  //           Expanded(
+  //             child: Text(t.learnTitle,
+  //                 style: pvFraunces(
+  //                     fontSize: 30,
+  //                     fontWeight: FontWeight.w500,
+  //                     height: 1.1,
+  //                     color: p.ink1)),
+  //           ),
+  //           PvRoundIcon(
+  //             icon: Icons.bookmark_border_rounded,
+  //             onTap: _openSaved,
+  //             size: 42,
+  //           ),
+  //         ]),
+  //         const SizedBox(height: 6),
+  //         PvLiveSearchWords(
+  //           search: _search,
+  //           child: Text(t.learnIntro,
+  //               style: pvManrope(fontSize: 14, height: 1.45, color: p.ink2)),
+  //         ),
+  //       ],
+  //     ));
 
   // ---- the idle page ----------------------------------------------------------
 
@@ -755,7 +785,16 @@ class _TtcLearnScreenState extends State<TtcLearnScreen> {
       _pad(_eyebrow(p, t.learnTopics)),
       const SizedBox(height: 10),
       SizedBox(
-        height: 108,
+        // ⚠️ GROWS WITH HER TEXT SIZE (2026-09-29). A fixed 108 clipped the
+        // tile's name and count by 20-35px at 1.5x on a 360dp phone. The
+        // tile is 12 + a 38 mark + 8 + the name + 2 + the count + 12; at 1x
+        // that is under 108, so the common case is unchanged.
+        // Kept for revert (2026-09-29): height: 108,
+        height: math.max(
+            108.0,
+            72 +
+                MediaQuery.textScalerOf(context).scale(13.5) * 1.4 +
+                MediaQuery.textScalerOf(context).scale(11.5) * 1.4),
         child: ListView.separated(
           scrollDirection: Axis.horizontal,
           padding: const EdgeInsets.symmetric(horizontal: _g),
@@ -785,9 +824,14 @@ class _TtcLearnScreenState extends State<TtcLearnScreen> {
       for (final r in kTtcReads)
         if (store.isStarted(r.id) && ttcLearnShows(r)) r
     ];
+    // ⚠️ A READ ONCE IN THIS SECTION (2026-09-28, no repetition). A read she
+    // has started AND saved was a card in "Pick up where you left off" and
+    // again a row under it. It stays in the rail, where her place is kept;
+    // Saved (the screen) still lists it. Kept for revert: the saved list
+    // without the `going` check.
     final saved = [
       for (final r in kTtcReads)
-        if (store.isSaved(r.id) && ttcLearnShows(r)) r
+        if (store.isSaved(r.id) && ttcLearnShows(r) && !going.contains(r)) r
     ];
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       _head(t.learnYourReading, going.isNotEmpty ? t.learnContinue : t.learnSaved,
@@ -1176,11 +1220,16 @@ class _TtcLearnScreenState extends State<TtcLearnScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 foregroundColor: p.ink1),
             child: Row(mainAxisSize: MainAxisSize.min, children: [
-              Text(open ? t.learnShowFewer : t.learnShowAll(reads.length),
-                  style: pvManrope(
-                      fontSize: 13.5,
-                      fontWeight: FontWeight.w700,
-                      color: p.ink1)),
+              // Flexible (2026-09-29): at 1.5x on 360dp the words ran 44px
+              // past the edge. Kept for revert: the Text without Flexible.
+              Flexible(
+                child: Text(
+                    open ? t.learnShowFewer : t.learnShowAll(reads.length),
+                    style: pvManrope(
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w700,
+                        color: p.ink1)),
+              ),
               const SizedBox(width: 4),
               Icon(
                   open
@@ -1202,7 +1251,14 @@ class _TtcLearnScreenState extends State<TtcLearnScreen> {
       _head(t.learnMythsEyebrow, t.learnMythsTitle),
       const SizedBox(height: 12),
       SizedBox(
-        height: 150,
+        // Grows with her text size (2026-09-29): 28 of padding, the 26 kind
+        // row, 10, two lines of title, 6, two lines of blurb. At 1x that is
+        // under 150. Kept for revert (2026-09-29): height: 150,
+        height: math.max(
+            150.0,
+            70 +
+                MediaQuery.textScalerOf(context).scale(14) * 1.3 * 2 +
+                MediaQuery.textScalerOf(context).scale(12.5) * 1.4 * 2),
         child: ListView.separated(
           scrollDirection: Axis.horizontal,
           padding: const EdgeInsets.symmetric(horizontal: _g),
@@ -1239,7 +1295,15 @@ class _TtcLearnScreenState extends State<TtcLearnScreen> {
           ))
         else
           SizedBox(
-            height: 196,
+            // Grows with her text size (2026-09-29): a 16:9 cover on 220,
+            // 10, two lines of title, 3, the meta line. At 1x under 196.
+            // Kept for revert (2026-09-29): height: 196,
+            height: math.max(
+                196.0,
+                138 +
+                    MediaQuery.textScalerOf(context).scale(14) * 1.3 * 2 +
+                    MediaQuery.textScalerOf(context).scale(11.5) * 1.4 +
+                    4),
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: _g),
@@ -1649,7 +1713,10 @@ class _TopicTile extends StatelessWidget {
                           fontWeight: FontWeight.w800,
                           color: p.ink1)),
                   const SizedBox(height: 2),
+                  // One line, like the name above it (2026-09-29, 1.5x text).
                   Text(meta,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: pvManrope(fontSize: 11.5, color: p.ink3)),
                 ],
               ),
@@ -1787,6 +1854,13 @@ class _FilmCard extends StatelessWidget {
                 // for revert: the play mark centred, and
                 //   Positioned(right: 8, bottom: 8, child: _Pill(label: meta)),
                 child: Stack(children: [
+                  // ⚠️ A STILL, NOT A CLOCK ON A TINT (2026-09-29, the user:
+                  // "stop leaving the placeholders"). The film's still from
+                  // `kPvFilmStills`, the same photo its door card shows; the
+                  // clock stays underneath as what a failed load shows, and
+                  // "Coming soon" stays on top, so the card is honest about
+                  // the film and still looks like one. Kept for revert: the
+                  // Center(Icon(Icons.schedule_rounded)) alone.
                   Center(
                     child: Icon(Icons.schedule_rounded,
                         size: 30,
@@ -1795,6 +1869,14 @@ class _FilmCard extends StatelessWidget {
                             .withLightness(0.36)
                             .toColor()),
                   ),
+                  if (pvFilmStillFor(film.id) case final still?)
+                    Positioned.fill(
+                      child: Image.network(still,
+                          key: ValueKey('ttc_learn_film_still_${film.id}'),
+                          fit: BoxFit.cover,
+                          gaplessPlayback: true,
+                          errorBuilder: (_, _, _) => const SizedBox.shrink()),
+                    ),
                   Positioned(left: 8, top: 8, child: _Pill(label: coming)),
                   if (film.isLive)
                     Positioned(right: 8, bottom: 8, child: _Pill(label: meta)),
@@ -1828,9 +1910,11 @@ class _FilmCard extends StatelessWidget {
               child: ConstrainedBox(
                 constraints: const BoxConstraints(minHeight: 44),
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  // Names whose notes (2026-09-28, explicit names). Kept for
+                  // revert: 'Read the notes', maxLines: 1.
                   Flexible(
-                    child: Text('Read the notes',
-                        maxLines: 1,
+                    child: Text("Read the film's notes",
+                        maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: pvManrope(
                             fontSize: 12.5,
@@ -1948,11 +2032,20 @@ class _StoryCard extends StatelessWidget {
                           color: _wellInk(tint)),
                     ),
                     const SizedBox(width: 8),
-                    Text(myth ? 'Myth or fact' : 'Story',
-                        style: pvManrope(
-                            fontSize: 11.5,
-                            fontWeight: FontWeight.w800,
-                            color: p.ink2)),
+                    // One name for one kind (2026-09-28): the doors say
+                    // "Myth vs fact". Kept for revert: 'Myth or fact'.
+                    // Flexible (2026-09-29, 1.5x on 360dp). Kept for
+                    // revert: the Text without Flexible, maxLines or
+                    // overflow.
+                    Flexible(
+                      child: Text(myth ? 'Myth vs fact' : 'Story',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: pvManrope(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w800,
+                              color: p.ink2)),
+                    ),
                   ]),
                   const SizedBox(height: 10),
                   // L11: the Manrope card title, one card language on the
@@ -2128,11 +2221,11 @@ class _FaqItem extends StatelessWidget {
                                     style: pvManrope(
                                         fontSize: 13,
                                         fontWeight: FontWeight.w700,
-                                        color: p.action)),
+                                        color: ttcTitleInk)),
                               ),
                               const SizedBox(width: 4),
                               Icon(Icons.arrow_forward_rounded,
-                                  size: 15, color: p.action),
+                                  size: 15, color: ttcTitleInk),
                             ]),
                           ),
                         ),
@@ -2164,8 +2257,8 @@ class _StepMark extends StatelessWidget {
           alignment: Alignment.center,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: done ? p.ink1 : Colors.white,
-            border: Border.all(color: done ? p.ink1 : p.ink3, width: 1.3),
+            color: done ? ttcTitleInk : Colors.white,
+            border: Border.all(color: done ? ttcTitleInk : p.ink3, width: 1.3),
           ),
           child: done
               ? const Icon(Icons.check_rounded, size: 16, color: Colors.white)

@@ -71,7 +71,8 @@ class TtcPeriodCameChat extends TtcChatScript {
               'about it.',
         ],
         [
-          TtcChatChoice('What does it mean?', next: meaning),
+          // Kept for revert (2026-09-28, explicit labels): 'What does it mean?'
+          TtcChatChoice('What does my period mean?', next: meaning),
           TtcChatChoice("I'd rather not talk now", next: notNow),
         ],
       );
@@ -90,14 +91,17 @@ class TtcPeriodCameChat extends TtcChatScript {
           if (alreadyLogged)
             "It's logged for ${ttcDayDate((_loggedHere ?? lastStart)!)}."
           else
-            'Shall we log it?',
+            // Kept for revert (2026-09-28): 'Shall we log it?',
+            'Shall we log your period?',
         ],
         alreadyLogged
             ? support().choices
             : [
-                TtcChatChoice('Yes, it started today',
+                // Kept for revert (2026-09-28, explicit labels): 'Yes, it started today',
+                // 'It started yesterday'
+                TtcChatChoice('Yes, my period started today',
                     next: () => logged(today)),
-                TtcChatChoice('It started yesterday',
+                TtcChatChoice('My period started yesterday',
                     next: () =>
                         logged(today.subtract(const Duration(days: 1)))),
                 TtcChatChoice('Not now', next: support),
@@ -134,7 +138,8 @@ class TtcPeriodCameChat extends TtcChatScript {
         ],
         [
           if (!alreadyLogged)
-            const TtcChatChoice('Log it now', open: ['ttc_cycle']),
+            // Kept for revert (2026-09-28, explicit labels): 'Log it now'
+            const TtcChatChoice('Log my period now', open: ['ttc_cycle']),
           const TtcChatChoice('Done', done: true),
         ],
       );

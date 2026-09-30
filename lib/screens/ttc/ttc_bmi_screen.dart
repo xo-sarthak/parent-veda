@@ -70,6 +70,7 @@ import 'ttc_tool_chrome.dart';
 import 'ttc_tool_hues.dart';
 import '../../ttc/ttc_cycle_report.dart' show kTtcWeightTracker, kTtcWeightField;
 import '../../ttc/ttc_log_store.dart';
+import 'ttc_common.dart' show ttcTitleInk, TtcSectionHeading;
 
 /// ⚠️ T6 (launch sanity, 2026-09-28): the tool wears its Tools group's
 /// colour, "Your body" (see ttc_tool_hues.dart). Kept for revert (2026-09-28):
@@ -516,7 +517,7 @@ class _TtcBmiScreenState extends State<TtcBmiScreen> {
               border: Border.all(color: p.line),
             ),
             child: Row(children: [
-              Icon(Icons.history_rounded, size: 16, color: p.action),
+              Icon(Icons.history_rounded, size: 16, color: ttcTitleInk),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
@@ -596,7 +597,8 @@ class _TtcBmiScreenState extends State<TtcBmiScreen> {
           Container(
             padding: const EdgeInsets.fromLTRB(14, 12, 14, 13),
             decoration: BoxDecoration(
-              color: p.surfaceAlt,
+              // Kept for revert (2026-09-29, no tinted slab behind text): color: p.surfaceAlt,
+              color: p.surface, border: Border.fromBorderSide(BorderSide(color: p.line)),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -640,7 +642,7 @@ class _TtcBmiScreenState extends State<TtcBmiScreen> {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
-            borderSide: BorderSide(color: p.action, width: 1.5),
+            borderSide: BorderSide(color: ttcTitleInk, width: 1.5),
           ),
         ),
       );
@@ -769,9 +771,10 @@ class _TtcBmiScreenState extends State<TtcBmiScreen> {
             style: pvManrope(fontSize: 12, height: 1.5, color: p.ink3)),
 
         const SizedBox(height: 26),
-        Text(t('What this means', 'Iska matlab kya hai'),
-            style: pvFraunces(
-                fontSize: 19, fontWeight: FontWeight.w600, color: p.ink1)),
+        // Kept for revert (2026-09-28): 'What this means'
+        // Kept for revert (2026-09-29, one heading style): the same Text with
+        // style: pvFraunces(fontSize: 19, fontWeight: FontWeight.w600, color: p.ink1)
+        TtcSectionHeading(t('What your BMI means', 'Iska matlab kya hai')),
         const SizedBox(height: 10),
         Text(r.body.of(lang),
             style: pvManrope(fontSize: 15, height: 1.7, color: p.ink2)),
@@ -785,7 +788,9 @@ class _TtcBmiScreenState extends State<TtcBmiScreen> {
           ),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(
-                t('What does this mean before pregnancy?',
+                // Kept for revert (2026-09-28): 'What does this mean
+                // before pregnancy?'
+                t('What does your BMI mean before pregnancy?',
                     'Pregnancy se pehle iska kya matlab?'),
                 style: pvJakarta(
                     fontSize: 14.5,
@@ -893,9 +898,9 @@ class _TtcBmiScreenState extends State<TtcBmiScreen> {
         ),
 
         const SizedBox(height: 26),
-        Text(t('What next?', 'Ab kya?'),
-            style: pvFraunces(
-                fontSize: 19, fontWeight: FontWeight.w600, color: p.ink1)),
+        // Kept for revert (2026-09-29, one heading style): the same Text with
+        // style: pvFraunces(fontSize: 19, fontWeight: FontWeight.w600, color: p.ink1)
+        TtcSectionHeading(t('What next?', 'Ab kya?')),
         const SizedBox(height: 12),
         // "Add this to my checklist" is folded into Save above (2026-09-27).
         _Next(
@@ -928,9 +933,9 @@ class _TtcBmiScreenState extends State<TtcBmiScreen> {
         // first. Tap to see one, the cross removes it with Undo.
         if (_store.hasSavedMeasurements) ...[
           const SizedBox(height: 30),
-          Text('Your saved measurements',
-              style: pvFraunces(
-                  fontSize: 19, fontWeight: FontWeight.w600, color: p.ink1)),
+          // Kept for revert (2026-09-29, one heading style): the same Text with
+          // style: pvFraunces(fontSize: 19, fontWeight: FontWeight.w600, color: p.ink1)
+          const TtcSectionHeading('Your saved measurements'),
           const SizedBox(height: 4),
           Text('Tap one to see it. The cross removes it.',
               style: pvManrope(fontSize: 12.5, height: 1.5, color: p.ink3)),
@@ -1268,7 +1273,7 @@ class _Scale extends StatelessWidget {
                 width: 18,
                 height: 22,
                 decoration: BoxDecoration(
-                  color: p.ink1,
+                  color: ttcTitleInk,
                   borderRadius: BorderRadius.circular(999),
                   border: Border.all(color: p.ground, width: 3),
                 ),

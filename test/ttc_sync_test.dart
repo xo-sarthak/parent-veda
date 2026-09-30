@@ -27,7 +27,9 @@ import 'package:parentveda/services/life_stage_store.dart';
 import 'package:parentveda/services/remote/supabase_repo.dart';
 import 'package:parentveda/ttc/cycle_store.dart';
 import 'package:parentveda/ttc/ttc_daily_data.dart' show TtcRitualPart;
-import 'package:parentveda/ttc/ttc_journal_store.dart';
+// Kept for revert (2026-09-28, the user: no journal in trying to conceive).
+// import 'package:parentveda/ttc/ttc_journal_store.dart';
+import 'package:parentveda/ttc/ttc_doctor_questions_store.dart';
 import 'package:parentveda/ttc/ttc_log_store.dart';
 import 'package:parentveda/ttc/ttc_ritual_store.dart';
 import 'package:parentveda/ttc/ttc_store.dart';
@@ -42,7 +44,8 @@ void main() {
     CycleStore.instance.resetForTest();
     TtcStore.instance.resetForTest();
     TtcLogStore.instance.resetForTest();
-    TtcJournalStore.instance.resetForTest();
+    // Kept for revert (2026-09-28): TtcJournalStore.instance.resetForTest();
+    TtcDoctorQuestionsStore.instance.resetForTest();
     TtcRitualStore.instance.resetForTest();
     TtcSupplementsStore.instance.resetForTest();
     FamilyTimeline.instance.resetForTest();
@@ -95,11 +98,21 @@ void main() {
       expect(s.valueFor('mood', 'mood'), isNull);
     });
 
-    test('journal, including deleting', () {
-      final s = TtcJournalStore.instance;
-      final e = s.add(kind: TtcEntryKind.memory, text: 'hello');
+    // Kept for revert (2026-09-28, the user: no journal in trying to
+    // conceive): the journal store is commented out.
+    // test('journal, including deleting', () {
+    //   final s = TtcJournalStore.instance;
+    //   final e = s.add(kind: TtcEntryKind.memory, text: 'hello');
+    //   expect(s.count, 1);
+    //   s.remove(e.id);
+    //   expect(s.count, 0);
+    // });
+
+    test('questions for the doctor, including deleting', () {
+      final s = TtcDoctorQuestionsStore.instance;
+      final q = s.add('Should we test AMH?')!;
       expect(s.count, 1);
-      s.remove(e.id);
+      s.remove(q.id);
       expect(s.count, 0);
     });
 

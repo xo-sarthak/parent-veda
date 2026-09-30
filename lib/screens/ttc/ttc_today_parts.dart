@@ -62,10 +62,15 @@ class TtcChapterInfoButton extends StatelessWidget {
     super.key,
     required this.chapter,
     required this.t,
+    this.color,
   });
 
   final TtcChapter chapter;
   final TtcS t;
+
+  /// The glyph's colour; white at 85% when null (a dark hero). The light
+  /// hero field passes ink (2026-09-29).
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +80,7 @@ class TtcChapterInfoButton extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.only(left: 10, top: 4, bottom: 4),
         child: Icon(Icons.info_outline_rounded,
-            size: 19, color: Colors.white.withValues(alpha: 0.85)),
+            size: 19, color: color ?? Colors.white.withValues(alpha: 0.85)),
       ),
     );
   }
@@ -147,7 +152,8 @@ Future<void> showTtcChapterInfo(
               width: double.infinity,
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: ttcPanel,
+                // Kept for revert (2026-09-29, no tinted slab behind text): color: ttcPanel,
+                color: Colors.white, border: const Border.fromBorderSide(BorderSide(color: ttcLine)),
                 borderRadius: BorderRadius.circular(ttcCardRadius),
               ),
               child: Column(
@@ -221,7 +227,7 @@ class TtcTodayRow extends StatelessWidget {
                 color: ttcPanel,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(icon, size: 18, color: ttcPurple),
+              child: Icon(icon, size: 18, color: ttcTitleInk),
             ),
             const SizedBox(width: 13),
             Expanded(

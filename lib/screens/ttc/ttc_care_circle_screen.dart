@@ -91,7 +91,8 @@ class TtcCareCircleScreen extends StatelessWidget {
           return TtcToolScaffold(
             hue: kTtcCareCircleHue,
             eyebrow: t.careCircle,
-            title: 'Who is with you in this',
+            // Kept for revert (2026-09-28): 'Who is with you in this'
+            title: 'Who is with you while you try',
             intro: 'The people helping you, and how to reach each one. '
                 'Every suggestion in this app says where it came from.',
             children: [
@@ -109,8 +110,11 @@ class TtcCareCircleScreen extends StatelessWidget {
                     pal: pal,
                     icon: Icons.people_outline_rounded,
                     name: t.careCirclePartner,
+                    // Kept for revert (2026-09-28, journal out of TTC):
+                    //   '${t.careCircleJoined}. You share the journal.'
                     detail: joined
-                        ? '${t.careCircleJoined}. You share the journal.'
+                        ? '${t.careCircleJoined}. You share your fertile '
+                            'window and appointments.'
                         : 'Not joined yet.',
                     present: joined,
                     action: joined
@@ -142,7 +146,8 @@ class TtcCareCircleScreen extends StatelessWidget {
                     width: double.infinity,
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: pal.surfaceAlt,
+                      // Kept for revert (2026-09-29, no tinted slab behind text): color: pal.surfaceAlt,
+                      color: pal.surface, border: Border.fromBorderSide(BorderSide(color: pal.line)),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Row(
@@ -304,7 +309,10 @@ class TtcCareCircleScreenClassic extends StatelessWidget {
                   name: 'ParentVeda',
                   detail: hi
                       ? 'Har salaah ke saath ye likha hota hai ki wo kahan se aayi'
-                      : 'Every suggestion here says where it came from',
+                      // Kept for revert (2026-09-28): 'Every suggestion
+                      // here says where it came from'
+                      : 'Every suggestion in ParentVeda says where it came '
+                          'from',
                   present: true,
                   t: t,
                 ),
@@ -340,7 +348,8 @@ class TtcCareCircleScreenClassic extends StatelessWidget {
                 // waits on the care-partner question (STILL-OPEN §2.1), so the
                 // screen says so once.
                 TtcCard(
-                  color: ttcPanel,
+                  // Kept for revert (2026-09-29, no tinted slab behind text): color: ttcPanel,
+                  border: ttcLine,
                   child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -453,7 +462,7 @@ class _Member extends StatelessWidget {
               color: present ? ttcPanel : ttcBg,
               shape: BoxShape.circle,
               border: present ? null : Border.all(color: ttcLine)),
-          child: Icon(icon, size: 19, color: present ? ttcPurple : ttcMuted),
+          child: Icon(icon, size: 19, color: present ? ttcTitleInk : ttcMuted),
         ),
         const SizedBox(width: 13),
         Expanded(
@@ -462,7 +471,7 @@ class _Member extends StatelessWidget {
             const SizedBox(height: 3),
             Text(detail,
                 style: ttcBody(12.5,
-                    color: onTap != null ? ttcPurple : ttcSoft,
+                    color: onTap != null ? ttcTitleInk : ttcSoft,
                     w: onTap != null ? FontWeight.w700 : FontWeight.w400)),
           ]),
         ),

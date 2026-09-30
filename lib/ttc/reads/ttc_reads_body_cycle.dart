@@ -218,24 +218,31 @@ final List<PvRead> kTtcReadsBodyCycle = [
     nextSteps: [
       PvReadNextStep(
         kind: PvNextKind.tool,
-        title: _en('Log the day it comes'),
+        // Kept for revert (2026-09-28, explicit names): title: _en('Log the day it comes'),
+        title: _en('Log the day your period comes'),
         value: _en("A few months of dates shows your own usual length, so "
             "you'll know when a period is really late."),
         surfaceId: 'ttc_cycle',
       ),
       PvReadNextStep(
         kind: PvNextKind.read,
-        title: _en("Irregular cycles when it isn't PCOS"),
+        // Kept for revert (2026-09-28, explicit names): title: _en("Irregular cycles when it isn't PCOS"),
+        title: _en("Irregular cycles that aren't PCOS"),
         value: _en('If late periods keep happening, these are the usual '
             'reasons and the tests that find them.'),
         surfaceId: 'ttc_read/ttc_read_irregular_not_pcos',
       ),
     ],
-    readNext: [
-      'ttc_read_irregular_not_pcos',
-      'ttc_read_bleeding_kinds',
-      'ttc_read_stress_fertility',
-    ],
+    // ⚠️ ONE READ, ONCE, AT THE FOOT (2026-09-28, no repetition):
+    // 'ttc_read_irregular_not_pcos' is the next step "Irregular cycles when it isn't PCOS",
+    // so the Read next rail no longer lists it a second time.
+    // Kept for revert:
+    // readNext: [
+    // 'ttc_read_irregular_not_pcos',
+    // 'ttc_read_bleeding_kinds',
+    // 'ttc_read_stress_fertility',
+    // ],
+    readNext: ['ttc_read_bleeding_kinds', 'ttc_read_stress_fertility'],
   ),
 
   // ===========================================================================
@@ -248,7 +255,10 @@ final List<PvRead> kTtcReadsBodyCycle = [
     id: 'ttc_read_irregular_not_pcos',
     hue: 172,
     kicker: _en('Body and cycle'),
-    title: _en("Irregular cycles when it isn't PCOS"),
+    // Kept for revert (2026-09-28, explicit names; the title stands alone
+    // on Read next cards, where "it" named nothing):
+    // title: _en("Irregular cycles when it isn't PCOS"),
+    title: _en("Irregular cycles that aren't PCOS"),
     teaser: _en("The other common reasons cycles go irregular, how doctors "
         "check whether you're ovulating, and what the first tests look for."),
     shortAnswer: _en("PCOS is only one reason cycles go irregular. Thyroid "
@@ -655,7 +665,8 @@ final List<PvRead> kTtcReadsBodyCycle = [
     nextSteps: [
       PvReadNextStep(
         kind: PvNextKind.tool,
-        title: _en('Note it in your log'),
+        // Kept for revert (2026-09-28, explicit names): title: _en('Note it in your log'),
+        title: _en('Note the bleeding in your log'),
         value: _en('The day, the colour and how much, so a pattern shows up '
             'over a few cycles.'),
         surfaceId: 'ttc_cycle',
@@ -668,11 +679,16 @@ final List<PvRead> kTtcReadsBodyCycle = [
         surfaceId: 'ttc_read/ttc_read_spotting',
       ),
     ],
-    readNext: [
-      'ttc_read_spotting',
-      'ttc_read_late_period',
-      'ttc_read_heavy_flow',
-    ],
+    // ⚠️ ONE READ, ONCE, AT THE FOOT (2026-09-28, no repetition):
+    // 'ttc_read_spotting' is the next step "Spotting between periods",
+    // so the Read next rail no longer lists it a second time.
+    // Kept for revert:
+    // readNext: [
+    // 'ttc_read_spotting',
+    // 'ttc_read_late_period',
+    // 'ttc_read_heavy_flow',
+    // ],
+    readNext: ['ttc_read_late_period', 'ttc_read_heavy_flow'],
   ),
 
   // ===========================================================================
@@ -1067,7 +1083,8 @@ final List<PvRead> kTtcReadsBodyCycle = [
     nextSteps: [
       PvReadNextStep(
         kind: PvNextKind.tool,
-        title: _en("See this cycle's window"),
+        // Kept for revert (2026-09-28, explicit names): title: _en("See this cycle's window"),
+        title: _en("See this cycle's fertile window"),
         value: _en('Your own dates, turned into the days that count this '
             'month.'),
         surfaceId: 'ttc_window',
@@ -1278,7 +1295,8 @@ final List<PvRead> kTtcReadsBodyCycle = [
       ),
       PvReadNextStep(
         kind: PvNextKind.tool,
-        title: _en("See this cycle's window"),
+        // Kept for revert (2026-09-28, explicit names): title: _en("See this cycle's window"),
+        title: _en("See this cycle's fertile window"),
         value: _en('Counted back from your own cycle, not from day 14.'),
         surfaceId: 'ttc_window',
       ),

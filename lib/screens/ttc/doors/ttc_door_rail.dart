@@ -25,11 +25,15 @@ import '../../../ttc/ttc_focus_data.dart';
 import '../../../widgets/pv_feedback.dart';
 import '../../brackets/hub/hub_intent_art.dart';
 import '../../doors/pv_door_chrome.dart' show kPvDoorGutter;
-import '../../doors/pv_door_rail.dart' show PvDoorRail;
+// Kept for revert (2026-09-29, TTC's own rail numbers):
+// import '../../doors/pv_door_rail.dart' show PvDoorRail;
 import '../../v2/v2_palette.dart';
 import 'ttc_tab_art.dart';
 
 const Key kTtcDoorRailKey = ValueKey('ttc-door-rail');
+
+/// True: the quiet tab card (2026-09-29): no count line.
+const bool kTtcDoorRailQuiet = true;
 Key ttcDoorRailCardKey(int i) => ValueKey('ttc-door-rail-$i');
 
 class TtcDoorRail extends StatefulWidget {
@@ -55,9 +59,16 @@ class TtcDoorRail extends StatefulWidget {
   // about a fifth of the third card shows. Pregnancy keeps its own constant.
   // Kept for revert: static const double cardWidth = PvDoorRail.cardWidth;
   static const double cardWidth = 150;
-  static const double cardHeight = PvDoorRail.cardHeight;
-  static const double markSize = PvDoorRail.markSize;
-  static const double overlap = PvDoorRail.overlap;
+  // ⚠️ QUIETER, FLO'S SIZE (2026-09-29, the user with Flo's "How to get
+  // pregnant" beside our door: "it looks so much on the face"). Shorter, a
+  // smaller mark, no count line, a thin ring on the chosen card. TTC's own
+  // numbers now; the pregnancy rail keeps PvDoorRail's. Kept for revert:
+  //   static const double cardHeight = PvDoorRail.cardHeight; // 136
+  //   static const double markSize = PvDoorRail.markSize; // 48
+  //   static const double overlap = PvDoorRail.overlap; // 44
+  static const double cardHeight = 112;
+  static const double markSize = 38;
+  static const double overlap = 40;
 
   @override
   State<TtcDoorRail> createState() => _TtcDoorRailState();
@@ -132,19 +143,23 @@ class _TtcDoorRailState extends State<TtcDoorRail> {
           curve: Curves.easeOut,
           width: TtcDoorRail.cardWidth,
           height: TtcDoorRail.cardHeight,
-          padding: const EdgeInsets.fromLTRB(16, 14, 14, 14),
+          // Kept for revert (2026-09-29, quieter): padding 16/14/14/14,
+          // radius 24, the ring 1.2, a shadow of 0.10 blurred 18 down 6.
+          padding: const EdgeInsets.fromLTRB(14, 12, 10, 12),
           decoration: BoxDecoration(
             color: p.surface,
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(18),
             border: Border.all(
+              // Kept for revert (2026-09-29, build 23: "too aggressive"):
+              //   width: on ? 1.5 : 1,
               color: on ? p.ink1 : p.line,
-              width: on ? 1.2 : 1,
+              width: 1,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.10),
-                blurRadius: 18,
-                offset: const Offset(0, 6),
+                color: Colors.black.withValues(alpha: 0.06),
+                blurRadius: 14,
+                offset: const Offset(0, 4),
               ),
             ],
           ),
@@ -166,49 +181,72 @@ class _TtcDoorRailState extends State<TtcDoorRail> {
                 child: g.tabMark != null
                     ? TtcTabArt(mark: g.tabMark!, tint: tint)
                     : g.mark != null
-                        ? HubIntentArt(mark: g.mark!, tint: tint)
-                        : Icon(g.icon, size: 28, color: p.ink1),
+                    ? HubIntentArt(mark: g.mark!, tint: tint)
+                    : Icon(g.icon, size: 28, color: p.ink1),
               ),
-              const Spacer(),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          g.label,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: pvManrope(
-                            fontSize: 15,
-                            fontWeight: on ? FontWeight.w800 : FontWeight.w700,
-                            height: 1.2,
-                            letterSpacing: -0.2,
-                            color: p.ink1,
-                          ),
-                        ),
-                        if (count.isNotEmpty) ...[
-                          const SizedBox(height: 3),
-                          Text(
-                            count,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: pvManrope(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: p.ink3,
+              // ⚠️ AT A LARGE TEXT SIZE THE LABEL GIVES WAY, NOT THE CARD
+              // (2026-09-28). At text scale 1.5 the mark, a two-line label and
+              // the count were taller than the card and the rail overflowed on
+              // every door. The label now takes the room that is left and
+              // clips at its ellipsis; at the normal size the layout is the
+              // same as before (the label still sits at the foot). Kept for
+              // revert: `const Spacer(), Row(...)` with the label unwrapped.
+              Expanded(
+                child: Align(
+                  alignment: Alignment.bottomLeft,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Flexible(
+                              child: Text(
+                                g.label,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                // Kept for revert (2026-09-29): 15, w800
+                                // chosen and w700 otherwise.
+                                style: pvManrope(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                  height: 1.2,
+                                  letterSpacing: -0.1,
+                                  color: p.ink1,
+                                ),
+                              ),
                             ),
-                          ),
-                        ],
-                      ],
-                    ),
+                            // ⚠️ NO COUNT LINE (2026-09-29, quieter): Flo's
+                            // cards carry a name and an arrow only, and "17
+                            // things" said nothing she acts on. Kept for revert:
+                            // the block below with `count.isNotEmpty`.
+                            if (!kTtcDoorRailQuiet && count.isNotEmpty) ...[
+                              const SizedBox(height: 3),
+                              Text(
+                                count,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: pvManrope(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: p.ink3,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Icon(
+                        Icons.chevron_right_rounded,
+                        size: 20,
+                        color: p.ink2,
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 6),
-                  Icon(Icons.chevron_right_rounded, size: 22, color: p.ink2),
-                ],
+                ),
               ),
             ],
           ),

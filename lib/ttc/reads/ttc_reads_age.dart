@@ -258,7 +258,8 @@ final List<PvRead> kTtcReadsAge = [
       ),
       PvReadNextStep(
         kind: PvNextKind.tool,
-        title: _en('The tests, one by one'),
+        // Kept for revert (2026-09-28, explicit names): title: _en('The tests, one by one'),
+        title: _en('The full test library'),
         value: _en('What each test shows, when it is done and what it costs.'),
         surfaceId: 'ttc_tests',
       ),
@@ -472,7 +473,8 @@ final List<PvRead> kTtcReadsAge = [
       ),
       PvReadNextStep(
         kind: PvNextKind.tool,
-        title: _en('The tests, one by one'),
+        // Kept for revert (2026-09-28, explicit names): title: _en('The tests, one by one'),
+        title: _en('The full test library'),
         value: _en('What a first check looks at, with price ranges.'),
         surfaceId: 'ttc_tests',
       ),
@@ -692,7 +694,8 @@ final List<PvRead> kTtcReadsAge = [
     nextSteps: [
       PvReadNextStep(
         kind: PvNextKind.tool,
-        title: _en("See this cycle's window"),
+        // Kept for revert (2026-09-28, explicit names): title: _en("See this cycle's window"),
+        title: _en("See this cycle's fertile window"),
         value: _en('Your own dates, turned into the days that count.'),
         surfaceId: 'ttc_window',
       ),
@@ -1128,7 +1131,8 @@ final List<PvRead> kTtcReadsAge = [
     nextSteps: [
       PvReadNextStep(
         kind: PvNextKind.tool,
-        title: _en('The tests, one by one'),
+        // Kept for revert (2026-09-28, explicit names): title: _en('The tests, one by one'),
+        title: _en('The full test library'),
         value: _en('AMH and the follicle scan, with price ranges.'),
         surfaceId: 'ttc_tests',
       ),
@@ -1789,7 +1793,8 @@ final List<PvRead> kTtcReadsAge = [
     nextSteps: [
       PvReadNextStep(
         kind: PvNextKind.tool,
-        title: _en('The tests, one by one'),
+        // Kept for revert (2026-09-28, explicit names): title: _en('The tests, one by one'),
+        title: _en('The full test library'),
         value: _en('Each test in more depth, with price ranges.'),
         surfaceId: 'ttc_tests',
       ),
@@ -2237,7 +2242,8 @@ final List<PvRead> kTtcReadsAge = [
       ),
       PvReadNextStep(
         kind: PvNextKind.tool,
-        title: _en('The tests, one by one'),
+        // Kept for revert (2026-09-28, explicit names): title: _en('The tests, one by one'),
+        title: _en('The full test library'),
         value: _en('The scan and the day 21 test, with prices.'),
         surfaceId: 'ttc_tests',
       ),

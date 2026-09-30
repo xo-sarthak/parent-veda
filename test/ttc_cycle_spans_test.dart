@@ -266,7 +266,9 @@ void main() {
       // Was find.text('Circle'); the report has no toggle since H4.
       expect(find.byType(TtcCycleGrid), findsNothing,
           reason: 'phases were drawn over a cycle a clinician is directing');
-      expect(find.text('Your doctor is timing this one'), findsOneWidget);
+      // Renamed 2026-09-28 (change 5). Kept for revert: 'Your doctor is timing
+      // this one'.
+      expect(find.text('Your doctor is timing this cycle'), findsOneWidget);
       // ⚠️ HER DAYS AND HER HISTORY BOTH SURVIVE THE REFUSAL. Refusing to
       // interpret is not refusing to show.
       expect(find.text('The days you logged'), findsOneWidget);

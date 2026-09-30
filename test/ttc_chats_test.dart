@@ -73,6 +73,9 @@ final _banned = RegExp(
     r'chance|probabil|odds|%|per cent|success rate|—|–| - |!',
     caseSensitive: false);
 
+// 2026-09-28 (explicit labels): the chat choices name their thing. Was
+// 'I took one already', 'What does it mean?', 'Shall we log it?' and
+// 'It started yesterday'.
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   SharedPreferences.setMockInitialValues({});
@@ -175,7 +178,7 @@ void main() {
       final c = chat(last: _d(2026, 8, 5), len: 28);
       final s = c.begin();
       expect(s.say.join(' '), contains('was due on Wed 2 Sep, 8 days ago'));
-      final res = _choice(s, 'I took one already').next!();
+      final res = _choice(s, 'I took a test already').next!();
       final neg = _choice(res, 'Negative').next!();
       final text = neg.say.join(' ');
       expect(text, contains('test again in three days'));
@@ -184,7 +187,7 @@ void main() {
 
     test('a faint line and a positive both point to a doctor', () {
       final c = chat(last: _d(2026, 8, 13), len: 28);
-      final res = _choice(c.begin(), 'I took one already').next!();
+      final res = _choice(c.begin(), 'I took a test already').next!();
       expect(_choice(res, 'A faint line').next!().say.join(' '),
           contains('see your doctor'));
       final pos = _choice(res, 'Positive').next!().say.join(' ');
@@ -336,10 +339,10 @@ void main() {
           lastStart: _d(2026, 8, 12),
           ownership: TimingOwnership.parentveda,
           logPeriod: logged.add);
-      final meaning = _choice(c.start(), 'What does it mean?').next!();
+      final meaning = _choice(c.start(), 'What does my period mean?').next!();
       expect(logged, isEmpty);
-      expect(meaning.say, contains('Shall we log it?'));
-      _choice(meaning, 'It started yesterday').next!();
+      expect(meaning.say, contains('Shall we log your period?'));
+      _choice(meaning, 'My period started yesterday').next!();
       expect(logged, [_d(2026, 9, 9)]);
     });
 
@@ -349,7 +352,7 @@ void main() {
           lastStart: today,
           ownership: TimingOwnership.parentveda,
           logPeriod: (_) => fail('must not log twice'));
-      final meaning = _choice(c.start(), 'What does it mean?').next!();
+      final meaning = _choice(c.start(), 'What does my period mean?').next!();
       expect(meaning.say.last, "It's logged for Thu 10 Sep.");
     });
   });

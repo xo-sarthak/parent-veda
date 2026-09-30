@@ -469,11 +469,16 @@ class TtcDoseInkButton extends StatelessWidget {
             child: Row(mainAxisSize: MainAxisSize.min, children: [
               Icon(icon ?? Icons.add_rounded, size: 16, color: Colors.white),
               const SizedBox(width: 6),
-              Text(label,
-                  style: pvManrope(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.white)),
+              // Flexible (2026-09-29): at 1.5x text on 360dp "Add a
+              // medication" ran 84pt past the card; now it wraps inside the
+              // pill. Kept for revert: the Text unwrapped.
+              Flexible(
+                child: Text(label,
+                    style: pvManrope(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white)),
+              ),
             ]),
           ),
         ),
@@ -518,9 +523,10 @@ Widget ttcDoseHeading(String text) {
   final p = V2PaletteStore.instance.current;
   return Padding(
     padding: const EdgeInsets.only(bottom: 10),
-    child: Text(text,
-        style: pvJakarta(
-            fontSize: 17, fontWeight: FontWeight.w700, color: p.ink1)),
+    // Kept for revert (2026-09-29, one heading style):
+    // child: Text(text, style: pvJakarta(
+    //     fontSize: 17, fontWeight: FontWeight.w700, color: p.ink1)),
+    child: TtcSectionHeading(text, color: p.ink1),
   );
 }
 
@@ -719,7 +725,7 @@ class TtcDoseHistory extends StatelessWidget {
             height: 14,
             decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: p.ink1, width: 1.4)),
+                border: Border.all(color: ttcTitleInk, width: 1.4)),
           ),
           const SizedBox(width: 6),
           Text('Today',
@@ -920,12 +926,14 @@ class TtcDoseRemoveLine extends StatelessWidget {
           key: const ValueKey('ttc_dose_remove'),
           onPressed: onTap,
           icon: const Icon(Icons.delete_outline_rounded,
-              size: 17, color: Color(0xFFB42318)),
+              // One danger red, DESIGN-SYSTEM §4.0 (2026-09-29). Kept for revert: Color(0xFFB42318)
+              size: 17, color: Color(0xFFB3261E)),
           label: Text(label,
               style: pvManrope(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
-                  color: const Color(0xFFB42318))),
+                  // One danger red, DESIGN-SYSTEM §4.0 (2026-09-29). Kept for revert: Color(0xFFB42318)
+                  color: const Color(0xFFB3261E))),
         ),
       );
 }

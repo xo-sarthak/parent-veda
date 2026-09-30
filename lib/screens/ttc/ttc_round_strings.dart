@@ -394,13 +394,27 @@ String ttcRoundUpcomingLine(TtcHeroLine line) {
 
 // ---- the start flow -------------------------------------------------------------
 
-const String kTtcStartKindTitle = 'What kind of treatment is this?';
+// Kept for revert (2026-09-28, explicit labels): 'What kind of treatment is this?'
+const String kTtcStartKindTitle = 'What kind of treatment are you having?';
 const String kTtcStartKindBody =
     "Pick the closest. You can change it later if the plan changes.";
 const String kTtcStartDateTitle = "What's the first date your clinic gave you?";
 const String kTtcStartDateBody =
     "Add the ones you know. The rest can wait, and we'll show them as your clinic tells you.";
-const String kTtcStartLater = "I'll add it later";
+// Kept for revert (2026-09-28, explicit labels): "I'll add it later"
+const String kTtcStartLater = "I'll add the dates later";
+
+// Selecting and un-selecting in place, and why Next waits (2026-09-29, the
+// user on build 19: "I cannot unselect them if I have selected them").
+const String kTtcStartKindClearHint =
+    'Tap your choice again to clear it, or tap another treatment to change it.';
+const String kTtcStartKindNeeded =
+    'Choose one treatment above to go on. If you do not know yet, choose '
+    'Not sure yet.';
+const String kTtcStartDateNeeded =
+    'Next opens once you add a date. You can also go on now and add your '
+    'dates later.';
+const String kTtcStartBackToKind = 'Back: change the treatment';
 const String kTtcStartReviewTitle = "Here's what happens next";
 const String kTtcStartClinicLabel = 'Which clinic? (optional)';
 const String kTtcStartPartnerLine =
@@ -443,8 +457,10 @@ const String kTtcRoundEmbryoQ = 'Which day is the embryo?';
 const String kTtcRoundStartCardTitle = 'Starting treatment?';
 const String kTtcRoundStartCardBody =
     "Tell us your clinic's plan and we'll follow it with you.";
-const String kTtcRoundStartCta = 'Start';
-const String kTtcRoundLegacyTitle = 'What kind of treatment is this?';
+// Kept for revert (2026-09-28, explicit labels): 'Start'
+const String kTtcRoundStartCta = 'Start my round';
+// Kept for revert (2026-09-28, explicit labels): 'What kind of treatment is this?'
+const String kTtcRoundLegacyTitle = 'What kind of treatment are you having?';
 const String kTtcRoundLegacyBody =
     "Tell us, and we'll show every step of your round with the dates you added.";
 const String kTtcRoundPastTitle = 'Your past rounds';
@@ -453,7 +469,8 @@ const String kTtcRoundUndoCta = 'Undo';
 const String kTtcRoundPlanChanged = 'The plan changed';
 const String kTtcRoundTakeBreak = 'Take a break from treatment';
 const String kTtcRoundTellResult = 'Tell us how the test went';
-const String kTtcRoundRemove = 'Remove these dates';
+// Kept for revert (2026-09-28, explicit labels): 'Remove these dates'
+const String kTtcRoundRemove = "Remove this round's dates";
 const String kTtcRoundRemoveBody =
     "For a round entered by mistake. The dates of this round are removed. Your past rounds and everything else you've logged stay.";
 const String kTtcRoundMedicationLink =
@@ -477,7 +494,9 @@ String ttcRoundOutcomeLabel(TtcRoundOutcome? o) => switch (o) {
       TtcRoundOutcome.paused => 'Paused',
       TtcRoundOutcome.ended => 'Ended',
       TtcRoundOutcome.stopped => 'Stopped early',
-      null => 'Open',
+      // Kept for revert (2026-09-28): a status, not a button, so it no
+      // longer reads as one. Was: null => 'Open',
+      null => 'Still open',
     };
 
 // ---- date checks ------------------------------------------------------------------
@@ -513,7 +532,8 @@ const String kTtcCheckInStillLine = 'Keep following my round.';
 const String kTtcCheckInPaused = 'Paused';
 const String kTtcCheckInPausedLine =
     'Stop following it for now. Keep my dates.';
-const String kTtcCheckInOver = "It's over";
+// Kept for revert (2026-09-28, explicit labels): "It's over"
+const String kTtcCheckInOver = 'The round is over';
 const String kTtcCheckInOverLine =
     'Close this round and go back to my own cycle.';
 const String kTtcCheckInAddDate = 'Add the next date';
@@ -523,7 +543,8 @@ const String kTtcCheckInCardCta = 'Answer';
 
 // ---- confirmations: the consequence, restated -----------------------------------
 
-const String kTtcConfirmKeep = 'Keep it open';
+// Kept for revert (2026-09-28, explicit labels): 'Keep it open'
+const String kTtcConfirmKeep = 'Keep the round open';
 
 (String, String, String) ttcConfirmClose(TtcRoundOutcome how) => switch (how) {
       TtcRoundOutcome.paused => (
@@ -558,7 +579,8 @@ const String kTtcConfirmKeep = 'Keep it open';
           'Record a positive test?',
           "We'll close this round as positive. Keep taking your medicines until "
               'your clinic tells you otherwise. You can undo this for 7 days.',
-          'Record it',
+          // Kept for revert (2026-09-28): 'Record it',
+          'Record the positive test',
         ),
     };
 
@@ -577,7 +599,8 @@ const String kTtcResultPositiveLine = 'Close this round as a positive test.';
 const String kTtcResultNegative = 'Not this time';
 const String kTtcResultNegativeLine =
     'Close this round. Your own cycle comes back with your next period.';
-const String kTtcResultRepeat = 'My clinic wants to repeat it';
+// Kept for revert (2026-09-28, explicit labels): 'My clinic wants to repeat it'
+const String kTtcResultRepeat = 'My clinic will repeat the test';
 const String kTtcResultRepeatLine =
     'Add the date of the next test. The round stays open.';
 const String kTtcResultLater = "I'd rather not say now";
@@ -589,9 +612,11 @@ const String kTtcResultPositiveNext =
 const String kTtcPlanTitle = 'The plan changed';
 const String kTtcPlanBody =
     "Plans change often in treatment. It doesn't say anything about the next round.";
-const String kTtcPlanStopped = 'It stopped early';
+// Kept for revert (2026-09-28, explicit labels): 'It stopped early'
+const String kTtcPlanStopped = 'The round stopped early';
 const String kTtcPlanStoppedLine = 'Close this round. Keep my dates.';
-const String kTtcPlanIui = 'It became an IUI';
+// Kept for revert (2026-09-28, explicit labels): 'It became an IUI'
+const String kTtcPlanIui = 'The round became an IUI';
 const String kTtcPlanIuiLine = 'Keep my dates and show the IUI steps from here.';
 const String kTtcPlanFreeze = 'Freezing all the embryos';
 const String kTtcPlanFreezeLine =
@@ -601,7 +626,8 @@ const String kTtcPlanFreezeLine =
       'Change this round to ${ttcRoundKindName(kind).toLowerCase()}?',
       'Every date you added stays. The steps still ahead change to match. You '
           'can change it back from this screen.',
-      'Change it',
+      // Kept for revert (2026-09-28): 'Change it',
+      'Change the treatment',
     );
 
 // ---- the home's round card ---------------------------------------------------------

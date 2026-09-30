@@ -23,13 +23,19 @@ import 'package:flutter/material.dart';
 
 import '../../ttc/ttc_chapter.dart';
 import '../../ttc/ttc_chapter_data.dart';
-import '../../ttc/ttc_daily_data.dart';
-import '../../ttc/ttc_journal_store.dart';
+// Kept for revert (2026-09-28, journal out of TTC): used only by the
+// journal card, now commented out.
+// import '../../ttc/ttc_daily_data.dart';
+// Kept for revert (2026-09-28, journal out of TTC):
+// import '../../ttc/ttc_journal_store.dart';
 import '../../ttc/ttc_store.dart';
 import 'ttc_askveda_screen.dart';
 import 'ttc_common.dart';
-import 'ttc_journal_screen.dart';
+// Kept for revert (2026-09-28, journal out of TTC):
+// import 'ttc_journal_screen.dart';
 import 'ttc_strings.dart';
+import 'ttc_tool_chrome.dart'
+    show TtcHeroFieldCard, TtcHeroFieldTag, ttcChapterFieldHue;
 
 /// Which of the three faces of a chapter to open on.
 enum TtcChapterTab { me, us, next }
@@ -164,8 +170,10 @@ class _TtcChapterScreenState extends State<TtcChapterScreen> {
 
                 const SizedBox(height: 12),
                 _AskVedaCard(content: content, t: t),
-                const SizedBox(height: 12),
-                _WriteAboutIt(chapter: chapter, t: t),
+                // Kept for revert (2026-09-28, journal out of TTC): the card
+                // opened the journal's writer. The journal left the stage.
+                //   const SizedBox(height: 12),
+                //   _WriteAboutIt(chapter: chapter, t: t),
               ],
             ),
           ),
@@ -193,42 +201,29 @@ class _ChapterHero extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hi = t.hinglish;
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(ttcCardRadius),
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [ttcPurple, ttcPurpleDeep],
-        ),
-      ),
+    // ⚠️ THE TOOLS' LIGHT FIELD, INK TYPE (2026-09-29): see `TtcHeroFieldCard`.
+    // Kept for revert (2026-09-29): a Container, padding 20, decorated with
+    //   LinearGradient(begin: topLeft, end: bottomRight,
+    //       colors: [ttcPurple, ttcPurpleDeep]);
+    // the "You are here" tag a white 20% pill with white words, and the
+    // title, the plain part and the overview in white (overview at 95%).
+    return TtcHeroFieldCard(
+      hue: ttcChapterFieldHue(chapter),
+      variant: TtcChapter.values.indexOf(chapter) + 1,
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        if (isCurrent)
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(999),
-            ),
-            child: Text(t.chapterYouAreHere,
-                style: ttcBody(10.5, color: Colors.white, w: FontWeight.w800)),
-          ),
+        if (isCurrent) TtcHeroFieldTag(t.chapterYouAreHere),
         if (isCurrent) const SizedBox(height: 12),
         Text(chapter.title(hi),
-            style: ttcFraunces(27, w: FontWeight.w600, color: Colors.white)),
+            style: ttcFraunces(27, w: FontWeight.w600, color: ttcInk)),
         // ⚠️ WHAT PART OF THE MONTH THIS IS, IN PLAIN WORDS (2026-09-27).
         // The chapter names are ours ("Knowing Your Rhythm"), and nothing
         // said which days they cover or that they follow her cycle. One
         // wording for the whole stage: `ttcChapterPlainPart`.
         const SizedBox(height: 6),
         Text(ttcChapterPlainPart(chapter),
-            style: ttcBody(13.5,
-                color: Colors.white, w: FontWeight.w700, h: 1.45)),
+            style: ttcBody(13.5, color: ttcInk, w: FontWeight.w700, h: 1.45)),
         const SizedBox(height: 10),
-        Text(content.overview(hi),
-            style: ttcBody(14,
-                color: Colors.white.withValues(alpha: 0.95), h: 1.55)),
+        Text(content.overview(hi), style: ttcBody(14, color: ttcInk, h: 1.55)),
       ]),
     );
   }
@@ -309,7 +304,7 @@ class _ActionPlan extends StatelessWidget {
               height: 6,
               margin: const EdgeInsets.only(top: 7, right: 11),
               decoration: BoxDecoration(
-                color: content.actions[i].forPartner ? ttcCoral : ttcPurple,
+                color: content.actions[i].forPartner ? ttcCoral : ttcTitleInk,
                 shape: BoxShape.circle,
               ),
             ),
@@ -349,7 +344,8 @@ class _MedicalCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final hi = t.hinglish;
     return TtcCard(
-      color: ttcCautionCard,
+      // Kept for revert (2026-09-29, no tinted slab behind text): color: ttcCautionCard,
+      border: ttcLine,
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
           const Icon(Icons.medical_services_outlined, size: 17, color: ttcBrown),
@@ -390,7 +386,7 @@ class _AskVedaCard extends StatelessWidget {
     return TtcCard(
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          const Icon(Icons.auto_awesome_outlined, size: 17, color: ttcPurple),
+          const Icon(Icons.auto_awesome_outlined, size: 17, color: ttcTitleInk),
           const SizedBox(width: 9),
           Expanded(child: Text(t.chapterAskVeda, style: ttcJakarta(16))),
         ]),
@@ -404,7 +400,8 @@ class _AskVedaCard extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(13),
               decoration: BoxDecoration(
-                color: ttcPanel,
+                // Kept for revert (2026-09-29, no tinted slab behind text): color: ttcPanel,
+                color: Colors.white, border: const Border.fromBorderSide(BorderSide(color: ttcLine)),
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Row(children: [
@@ -414,7 +411,7 @@ class _AskVedaCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 const Icon(Icons.arrow_forward_rounded,
-                    size: 15, color: ttcPurple),
+                    size: 15, color: ttcTitleInk),
               ]),
             ),
           ),
@@ -427,40 +424,42 @@ class _AskVedaCard extends StatelessWidget {
 
 // ---- journal handoff --------------------------------------------------------
 
-class _WriteAboutIt extends StatelessWidget {
-  const _WriteAboutIt({required this.chapter, required this.t});
-
-  final TtcChapter chapter;
-  final TtcS t;
-
-  @override
-  Widget build(BuildContext context) {
-    final hi = t.hinglish;
-    final prompt = ttcPromptForToday(chapter);
-    return TtcCard(
-      onTap: () => writeTtcEntry(context,
-          kind: TtcEntryKind.feeling, prompt: prompt.text(hi)),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [
-          const Icon(Icons.edit_outlined, size: 17, color: ttcPurple),
-          const SizedBox(width: 9),
-          Expanded(
-              child: Text(t.chapterJournalPrompts, style: ttcJakarta(16))),
-        ]),
-        const SizedBox(height: 12),
-        Text(prompt.text(hi),
-            style: ttcBody(14, color: ttcInk, w: FontWeight.w600, h: 1.5)),
-        const SizedBox(height: 12),
-        Row(children: [
-          Text(t.journalWrite,
-              style: ttcBody(13, color: ttcPurple, w: FontWeight.w800)),
-          const SizedBox(width: 5),
-          const Icon(Icons.arrow_forward_rounded, size: 15, color: ttcPurple),
-        ]),
-      ]),
-    );
-  }
-}
+// Kept for revert (2026-09-28, journal out of TTC): no caller since the
+// journal left the stage.
+// class _WriteAboutIt extends StatelessWidget {
+//   const _WriteAboutIt({required this.chapter, required this.t});
+//
+//   final TtcChapter chapter;
+//   final TtcS t;
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     final hi = t.hinglish;
+//     final prompt = ttcPromptForToday(chapter);
+//     return TtcCard(
+//       onTap: () => writeTtcEntry(context,
+//           kind: TtcEntryKind.feeling, prompt: prompt.text(hi)),
+//       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+//         Row(children: [
+//           const Icon(Icons.edit_outlined, size: 17, color: ttcPurple),
+//           const SizedBox(width: 9),
+//           Expanded(
+//               child: Text(t.chapterJournalPrompts, style: ttcJakarta(16))),
+//         ]),
+//         const SizedBox(height: 12),
+//         Text(prompt.text(hi),
+//             style: ttcBody(14, color: ttcInk, w: FontWeight.w600, h: 1.5)),
+//         const SizedBox(height: 12),
+//         Row(children: [
+//           Text(t.journalWrite,
+//               style: ttcBody(13, color: ttcPurple, w: FontWeight.w800)),
+//           const SizedBox(width: 5),
+//           const Icon(Icons.arrow_forward_rounded, size: 15, color: ttcPurple),
+//         ]),
+//       ]),
+//     );
+//   }
+// }
 
 // ---- who an "Us" card is for -------------------------------------------------
 
@@ -494,13 +493,14 @@ class _BackToCurrent extends StatelessWidget {
   Widget build(BuildContext context) {
     return TtcCard(
       key: const ValueKey('ttc_chapter_back_to_current'),
-      color: ttcPanel,
+      // Kept for revert (2026-09-29, no tinted slab behind text): color: ttcPanel,
+      border: ttcLine,
       onTap: () => Navigator.of(context).pushReplacement(MaterialPageRoute<void>(
         builder: (_) => TtcChapterScreen(chapter: current),
         settings: const RouteSettings(name: 'ttc/chapter'),
       )),
       child: Row(children: [
-        const Icon(Icons.my_location_rounded, size: 17, color: ttcPurple),
+        const Icon(Icons.my_location_rounded, size: 17, color: ttcTitleInk),
         const SizedBox(width: 10),
         Expanded(
           child: Text(
@@ -509,7 +509,7 @@ class _BackToCurrent extends StatelessWidget {
               style: ttcBody(13, color: ttcTitleInk, w: FontWeight.w700, h: 1.4)),
         ),
         const SizedBox(width: 6),
-        const Icon(Icons.arrow_forward_rounded, size: 15, color: ttcPurple),
+        const Icon(Icons.arrow_forward_rounded, size: 15, color: ttcTitleInk),
       ]),
     );
   }

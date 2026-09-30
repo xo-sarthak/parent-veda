@@ -328,7 +328,8 @@ final List<PvRead> kTtcReadsConceiving = [
       ),
       PvReadNextStep(
         kind: PvNextKind.tool,
-        title: _en("See this cycle's window"),
+        // Kept for revert (2026-09-28, explicit names): title: _en("See this cycle's window"),
+        title: _en("See this cycle's fertile window"),
         value: _en('Your own dates, turned into the days that count this '
             'month.'),
         surfaceId: 'ttc_window',
@@ -716,7 +717,8 @@ final List<PvRead> kTtcReadsConceiving = [
     nextSteps: [
       PvReadNextStep(
         kind: PvNextKind.tool,
-        title: _en("See this cycle's window"),
+        // Kept for revert (2026-09-28, explicit names): title: _en("See this cycle's window"),
+        title: _en("See this cycle's fertile window"),
         value: _en('Your own dates, turned into the days that count this '
             'month.'),
         surfaceId: 'ttc_window',
@@ -989,7 +991,10 @@ final List<PvRead> kTtcReadsConceiving = [
     ),
     faqs: [
       PvReadFaq(
-        question: _en('Is it too late if the kit is already positive?'),
+        // Kept for revert (2026-09-28, explicit names; this question is shown
+        // on its own in Learn's Common questions):
+        // question: _en('Is it too late if the kit is already positive?'),
+        question: _en('Is it too late to try if the ovulation kit is already positive?'),
         answer: _en('No. A positive means the best two days are now: that day '
             "and the next. It's the start of the most useful stretch, not the "
             'end of it.'),

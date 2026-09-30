@@ -1,5 +1,10 @@
 // =============================================================================
 //  TTC V3 tabs: Today · Learn · Products · Tools · You (2026-09-26)
+//  Since 2026-09-28 the fifth tab reads More: the same screen, drawn as a
+//  bento of tiles for trying to conceive (test/pv_more_bento_test.dart).
+//  Since 2026-09-29 More is its own screen of what the app offers
+//  (ttc_more_tab.dart) and the avatar opens her profile; the split is held
+//  by test/ttc_more_profile_test.dart.
 // -----------------------------------------------------------------------------
 //  The user's call after the TTC gap analysis: Products takes the slot the
 //  analysis gave Community (held back), everything under More moves into You,
@@ -35,6 +40,7 @@ import 'package:parentveda/screens/ttc/ttc_common.dart';
 import 'package:parentveda/screens/ttc/ttc_home_version.dart';
 import 'package:parentveda/screens/ttc/ttc_learn_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_more_screen.dart';
+import 'package:parentveda/screens/ttc/ttc_more_tab.dart';
 import 'package:parentveda/screens/ttc/ttc_strings.dart';
 import 'package:parentveda/screens/ttc/ttc_tools_screen.dart';
 import 'package:parentveda/services/life_stage_store.dart';
@@ -53,7 +59,10 @@ String _code(String path) => _src(path)
     .where((l) => !l.trimLeft().startsWith('//'))
     .join('\n');
 
-const _labels = ['Today', 'Learn', 'Products', 'Tools', 'You'];
+// ⚠️ THE LAST TAB IS MORE SINCE 2026-09-28 (the user; the bento is held by
+// test/pv_more_bento_test.dart). Kept for revert:
+//   const _labels = ['Today', 'Learn', 'Products', 'Tools', 'You'];
+const _labels = ['Today', 'Learn', 'Products', 'Tools', 'More'];
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -92,7 +101,7 @@ void main() {
 
   // ===========================================================================
   group('the bar', () {
-    testWidgets('five labels, in order, and More and Talk to expert are gone',
+    testWidgets('five labels, in order, and You and Talk to expert are gone',
         (tester) async {
       await pumpTall(tester, host(), height: 1600);
       final xs = <double>[];
@@ -104,7 +113,9 @@ void main() {
         expect(xs[i], greaterThan(xs[i - 1]),
             reason: '${_labels[i]} is out of order');
       }
-      expect(find.text('More'), findsNothing);
+      // Kept for revert (More was the retired tab until 2026-09-28):
+      //   expect(find.text('More'), findsNothing);
+      expect(find.text('You'), findsNothing);
       expect(find.text('Talk to expert'), findsNothing);
       expect(find.text('Community'), findsNothing);
     });
@@ -114,8 +125,14 @@ void main() {
       expect(ttcV3ActiveFor(kTtcLearnRoute, 0), 1);
       expect(ttcV3ActiveFor('ttc/products', 0), 2);
       expect(ttcV3ActiveFor('ttc/tools', 0), 3);
-      expect(ttcV3ActiveFor('ttc/consults', 0), 3,
-          reason: 'the consults are a Tools tile now');
+      // 2026-09-28 (Tools holds only tools): the consults and the courses
+      // are More's "Experts and courses" tile. Kept for revert:
+      //   expect(ttcV3ActiveFor('ttc/consults', 0), 3,
+      //       reason: 'the consults are a Tools tile now');
+      expect(ttcV3ActiveFor('ttc/consults', 0), 4,
+          reason: 'the consults are a More row now');
+      expect(ttcV3ActiveFor('ttc/courses', 0), 4,
+          reason: 'the courses are a More row now');
       expect(ttcV3ActiveFor(kTtcYouRoute, 0), 4);
       // More's old rows live under You; the calendar is Today's since the
       // launch walk (its front door is the home header). Was 4.
@@ -130,7 +147,10 @@ void main() {
       'Learn': (TtcLearnScreen, 1),
       'Products': (PvStoreScreen, 2),
       'Tools': (TtcToolsScreen, 3),
-      'You': (PvYouScreen, 4),
+      // Kept for revert: 'You': (PvYouScreen, 4),
+      // Kept for revert (2026-09-29, More is its own screen):
+      //   'More': (PvYouScreen, 4),
+      'More': (TtcMoreTab, 4),
     };
     for (final e in expected.entries) {
       testWidgets('${e.key} opens its screen, with the bar, lit', (tester) async {
@@ -236,9 +256,57 @@ void main() {
             for (final t in pvYouContentFor(LifeStage.tryingToConceive).tiles)
               t.title
           ],
-          contains('Journal'));
+          // Kept for revert (the journal left TTC on 2026-09-28):
+          //   contains('Journal'));
+          contains('Saved'));
     });
 
+    // ⚠️ 2026-09-29: the fifth tab is More, its own screen of offerings,
+    // and the rows below that were About her went to the profile and its
+    // Settings (test/ttc_more_profile_test.dart holds where each went). The
+    // 2026-09-28 bento version of this test is kept below as a comment.
+    testWidgets('the More tab: its sections, the bar, no back arrow',
+        (tester) async {
+      await pumpTall(
+        tester,
+        const TtcMoreTab(bottomNav: TtcBottomNav(active: 4, v3: true)),
+        height: 9000,
+      );
+      expect(find.byType(TtcBottomNav), findsOneWidget);
+      expect(find.byIcon(Icons.arrow_back_rounded), findsNothing,
+          reason: 'a tab root has no back arrow');
+      for (final row in [
+        kTtcMoreSeeAllConsults,
+        'Preconception garbh sanskar',
+        kTtcMoreAllProgrammes,
+        // Kept for revert (2026-09-29, now tiles on the profile):
+        //   'Bookings',
+        //   'Orders',
+        // Off More since 2026-09-30 (the user). Kept for revert:
+        //   'Journey map',
+      ]) {
+        expect(find.text(row), findsWidgets, reason: row);
+      }
+      expect(find.text('Journey map'), findsNothing);
+      // What she HAS booked or bought is on her profile (2026-09-29), and
+      // the addresses are in Settings: none of it is on More.
+      for (final gone in [
+        'Bookings',
+        'Orders',
+        'Delivery addresses',
+        'Your orders',
+        'Your bookings',
+      ]) {
+        expect(find.text(gone), findsNothing,
+            reason: '$gone lives on the profile or in Settings');
+      }
+      for (final gone in ['Calendar', 'Cycle companion', 'Fertile window']) {
+        expect(find.text(gone), findsNothing,
+            reason: '$gone lives on Today and Tools');
+      }
+    });
+
+    /* Kept for revert (2026-09-29), the bento version:
     testWidgets('the You tab: the rows, the bar, no back arrow',
         (tester) async {
       await pumpTall(
@@ -254,25 +322,51 @@ void main() {
       // the programmes row is "Programmes and sessions". Kept for revert:
       //   'Calendar', 'Cycle companion', 'Fertile window',
       //   'All programmes and sessions'
-      for (final row in [
-        'Notes for your doctor',
-        'Records and reports',
-        'Treatment',
-        'Your answers',
-        'Messages',
-        'What you see',
-        'Programmes and sessions',
-        'Bookings',
-      ]) {
-        expect(find.text(row), findsWidgets, reason: row);
-      }
-      for (final gone in ['Calendar', 'Cycle companion', 'Fertile window']) {
-        expect(find.text(gone), findsNothing, reason: '$gone lives on Today and Tools');
-      }
+      //
+      // ⚠️ AND SINCE 2026-09-28 THE ROWS ARE BEHIND THE MORE TAB'S TILES: a
+      // tile opens its rows on a page of their own. Kept for revert, the rows
+      // were read straight off the tab:
+      //   for (final row in [...]) expect(find.text(row), findsWidgets);
       expect(find.byType(TtcBottomNav), findsOneWidget);
       expect(find.byIcon(Icons.arrow_back_rounded), findsNothing,
           reason: 'a tab root has no back arrow');
+      // ⚠️ 2026-09-28 (Tools holds only tools): Records and reports and the
+      // treatment round are Tools rows now, and the programmes sit with the
+      // expert and the courses that left Tools. Kept for revert:
+      //   'your_health': ['Notes for your doctor', 'Records and reports',
+      //       'Treatment', 'Your answers'],
+      //   'bookings_and_orders': ['Programmes and sessions', 'Bookings'],
+      const behind = {
+        'your_health': [
+          'Notes for your doctor',
+          'Your answers',
+        ],
+        'your_app': ['Messages', 'What you see'],
+        'experts_and_courses': [
+          'Talk to an expert',
+          'Courses',
+          'All programmes and sessions',
+        ],
+        'journey': ['Journey map'],
+        'bookings_and_orders': ['Bookings', 'Orders'],
+      };
+      for (final e in behind.entries) {
+        await tester.ensureVisible(
+            find.byKey(ValueKey('pv_more_tile_${e.key}')));
+        await tester.tap(find.byKey(ValueKey('pv_more_tile_${e.key}')));
+        await tester.pumpAndSettle();
+        for (final row in e.value) {
+          expect(find.text(row), findsWidgets, reason: '${e.key}: $row');
+        }
+        for (final gone in ['Calendar', 'Cycle companion', 'Fertile window']) {
+          expect(find.text(gone), findsNothing,
+              reason: '$gone lives on Today and Tools');
+        }
+        await tester.tap(find.byIcon(Icons.arrow_back_rounded).last);
+        await tester.pumpAndSettle();
+      }
     });
+    */
 
     testWidgets('other stages: You is exactly as before', (tester) async {
       await pumpTall(tester, const PvYouScreen(stage: LifeStage.pregnancy),
@@ -284,14 +378,31 @@ void main() {
 
   // ===========================================================================
   group('Tools', () {
-    test('Talk to an expert is a tile', () {
-      expect(ttcToolById('expert')?.nameEn, 'Talk to an expert');
+    // ⚠️ 2026-09-28 (the user: Tools holds only tools): "Talk to an expert"
+    // is not a tool; it is a row on More's "Experts and courses" tile, with
+    // the same words and destination. Kept for revert:
+    //   test('Talk to an expert is a tile', () {
+    //     expect(ttcToolById('expert')?.nameEn, 'Talk to an expert');
+    //   });
+    //   testWidgets('the expert tile opens the consults', ...) on TtcToolsScreen
+    test('Talk to an expert left Tools for More, word for word', () {
+      expect(ttcToolById('expert'), isNull);
+      expect(ttcMovedToMoreById('expert')?.nameEn, 'Talk to an expert');
     });
 
-    testWidgets('the expert tile opens the consults', (tester) async {
-      await pumpTall(tester, const TtcToolsScreen());
+    // 2026-09-29: "Talk to an expert" is More's first heading, and its link
+    // opens the consults. Kept for revert: the bento's tile, then the row.
+    //   await tester.tap(find.byKey(
+    //       const ValueKey('pv_more_tile_experts_and_courses')));
+    //   await tester.tap(find.text('Talk to an expert').first);
+    testWidgets('the expert link on More opens the consults', (tester) async {
+      await pumpTall(
+        tester,
+        const TtcMoreTab(bottomNav: TtcBottomNav(active: 4, v3: true)),
+        height: 9000,
+      );
       expect(find.text('Talk to an expert'), findsWidgets);
-      await tester.tap(find.text('Talk to an expert').first);
+      await tester.tap(find.byKey(const ValueKey('ttc_more_link_experts')));
       await tester.pumpAndSettle();
       expect(find.byType(PvLearnScreen), findsOneWidget);
     });
@@ -305,14 +416,31 @@ void main() {
       expect(find.text('Supplements'), findsNothing);
     });
 
-    testWidgets('the strip is never empty, and shows what she opened last',
+    // ⚠️ THE STRIP IS GONE (2026-09-28, no random repetition): its three
+    // tools were also in the list below, so each was on the page twice.
+    // test/ttc_no_repetition_test.dart holds the hub. Kept for revert:
+    // testWidgets('the strip is never empty, and shows what she opened last',
+    //     (tester) async {
+    //   await pumpTall(tester, const TtcToolsScreen());
+    //   expect(find.text('GOOD PLACES TO START'), findsOneWidget);
+    //   // 'mood' left the hub on 2026-09-27 (folded into 'symptoms').
+    //   await TtcToolRecents.instance.touch('symptoms');
+    //   await tester.pump();
+    //   expect(find.text('RECENTLY USED'), findsOneWidget);
+    // });
+    testWidgets('no strip above the list: each tool is on the hub once',
         (tester) async {
       await pumpTall(tester, const TtcToolsScreen());
-      expect(find.text('GOOD PLACES TO START'), findsOneWidget);
-      // 'mood' left the hub on 2026-09-27 (folded into 'symptoms').
+      expect(find.text('GOOD PLACES TO START'), findsNothing);
       await TtcToolRecents.instance.touch('symptoms');
       await tester.pump();
-      expect(find.text('RECENTLY USED'), findsOneWidget);
+      expect(find.text('RECENTLY USED'), findsNothing);
+      for (final g in ttcToolGroups) {
+        for (final tool in g.tools) {
+          expect(find.text(tool.name(false)), findsOneWidget,
+              reason: '${tool.id} is on the hub more than once');
+        }
+      }
     });
   });
 
@@ -340,6 +468,10 @@ void main() {
             stage: LifeStage.tryingToConceive,
             bottomNav: TtcBottomNav(active: 4, v3: true),
           ));
+      expect(tester.takeException(), isNull);
+      // The More tab itself (2026-09-29).
+      await pumpPhone(tester,
+          const TtcMoreTab(bottomNav: TtcBottomNav(active: 4, v3: true)));
       expect(tester.takeException(), isNull);
     });
   });

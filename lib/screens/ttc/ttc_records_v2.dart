@@ -103,12 +103,15 @@ import '../../localization/app_language.dart';
 import '../../services/remote/storage_service.dart';
 import '../../services/ttc_records_pdf.dart';
 import '../products/pv_store_chrome.dart' show pvSnack;
+import '../v2/v2_palette.dart' show V2PaletteStore, v2BlockTint;
+import 'doors/ttc_tab_art.dart' show TtcTabArt, TtcTabMark;
 import 'ttc_attachments.dart';
 import 'ttc_common.dart';
 import 'ttc_record_edit_screen.dart';
 import 'ttc_strings.dart';
 import 'ttc_tool_chrome.dart';
 import 'ttc_tool_confirm.dart';
+import 'ttc_tool_marks.dart' show TtcToolArt, TtcToolMark;
 
 /// The clinical blue-grey this area wears.
 const double kTtcRecordsHue = 206;
@@ -247,12 +250,14 @@ class TtcRecordsRemoveButton extends StatelessWidget {
         child: TextButton.icon(
           onPressed: onTap,
           icon: const Icon(Icons.delete_outline_rounded,
-              size: 17, color: Color(0xFFB42318)),
+              // One danger red, DESIGN-SYSTEM §4.0 (2026-09-29). Kept for revert: Color(0xFFB42318)
+              size: 17, color: Color(0xFFB3261E)),
           label: Text(label,
               style: pvManrope(
                   fontSize: 13.5,
                   fontWeight: FontWeight.w800,
-                  color: const Color(0xFFB42318))),
+                  // One danger red, DESIGN-SYSTEM §4.0 (2026-09-29). Kept for revert: Color(0xFFB42318)
+                  color: const Color(0xFFB3261E))),
         ),
       );
 }
@@ -262,6 +267,7 @@ class TtcRecordsBody extends StatelessWidget {
     super.key,
     required this.onlyPartner,
     this.resultsOnly = false,
+    this.summary,
   });
 
   /// null shows everyone, true only his, false only hers.
@@ -270,6 +276,11 @@ class TtcRecordsBody extends StatelessWidget {
   /// The Reports tile's narrowing — library results only. Kept from the screen
   /// this replaces; two tiles have always opened one folder.
   final bool resultsOnly;
+
+  /// The count line and the whose-filter, drawn UNDER the heading
+  /// (2026-09-29): they describe "Your results", so they sit inside that
+  /// section instead of floating above its title.
+  final Widget? summary;
 
   @override
   Widget build(BuildContext context) {
@@ -285,7 +296,13 @@ class TtcRecordsBody extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Was "What you've had done": said what the list is, in her words.
+        // The one section heading (2026-09-29): `ttcSectionTitle` is the serif
+        // now, see ttc_common.dart.
         ttcSectionTitle('Your results'),
+        if (summary != null) ...[
+          summary!,
+          const SizedBox(height: 14),
+        ],
         if (groups.isEmpty)
           // The filter narrowed to nothing. It says so, and offers the add
           // rather than leaving a blank under a heading.
@@ -308,7 +325,8 @@ class TtcRecordsBody extends StatelessWidget {
           TtcRecordList(children: [
             for (final g in groups) _GroupRow(group: g),
           ]),
-        const SizedBox(height: 24),
+        // 28 = DESIGN-SYSTEM §2.3 xl, "between sections". Kept for revert: 24.
+        const SizedBox(height: 28),
         _Coverage(coverage: coverage),
       ],
     );
@@ -328,22 +346,26 @@ class _GroupRow extends StatelessWidget {
 
     // One line under the value, as one Text so it wraps at 360pt instead of
     // running off the row (two Texts in a Row did, with a long first value).
+    // ⚠️ "YOURS" / "YOUR PARTNER'S", NOT "You" / "Partner" (2026-09-29): the
+    // row says whose in the words the add page uses. Kept for revert: each
+    // line below began with `ttcWhose(group.forPartner)`.
+    final whose = ttcWhoseLong(group.forPartner);
     final String under;
     if (group.repeated && ttcRecordValue(group.oldest).isNotEmpty) {
-      under = '${ttcWhose(group.forPartner)} · first was '
+      under = '$whose · first was '
           '${ttcRecordValue(group.oldest)}, '
           '${_months[group.oldest.takenOn.month - 1]} '
           '${group.oldest.takenOn.year}';
     } else if (latest.note != null && latest.note!.trim().isNotEmpty) {
-      under = '${ttcWhose(group.forPartner)} · with a note';
+      under = '$whose · with a note';
     } else if (latest.attachments.isNotEmpty) {
       // The row says the report itself is in here, because that is the thing
       // she is actually looking for in a waiting room: the paper.
-      under = '${ttcWhose(group.forPartner)} · '
+      under = '$whose · '
           '${latest.attachments.length} '
           '${latest.attachments.length == 1 ? 'photo' : 'photos'}';
     } else {
-      under = ttcWhose(group.forPartner);
+      under = whose;
     }
 
     return InkWell(
@@ -354,8 +376,16 @@ class _GroupRow extends StatelessWidget {
             : TtcRecordDetailScreen(recordId: latest.id),
       )),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 14, 10, 14),
+        padding: const EdgeInsets.fromLTRB(14, 14, 10, 14),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          // ⚠️ A DRAWN MARK PER KIND OF TEST (2026-09-29): a blood test's
+          // vial, a scan's magnifier, his test's heart, a folder for anything
+          // typed by hand; the Tools rail's family (`TtcTabArt`), so a result
+          // row looks like the rest of the app. The mark says what KIND of
+          // test it is, never anything about the value.
+          TtcRecordMark(
+              kind: ttcRecordKindOf(group.testKey, group.label)),
+          const SizedBox(width: 13),
           Expanded(
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -392,24 +422,31 @@ class _GroupRow extends StatelessWidget {
                     // ever be a photograph, and the row has to hold that
                     // without looking like a failure, so it says what it has
                     // and offers the one thing that would complete it.
-                    Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Expanded(
-                        child: Text(
-                            '${ttcRecordDate(latest.takenOn)} · photo saved, '
-                            'number not entered',
-                            style: ttcBody(13, color: ttcSoft, h: 1.4)),
-                      ),
-                      GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onTap: () => showTtcTypeValue(context, latest),
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 8),
-                          child: Text('Type it',
-                              style: ttcBody(12.5,
-                                  color: ttcTitleInk, w: FontWeight.w800)),
-                        ),
-                      ),
-                    ]),
+                    // ⚠️ STACKED, NOT SIDE BY SIDE (2026-09-29): with the
+                    // mark on the row, the words and "Type the number" in one
+                    // Row overflowed by 74px at 360dp and 1.5x text. The
+                    // action sits under the line it completes. Kept for
+                    // revert: Row(children: [Expanded(the line), the action
+                    // with left: 8 padding]).
+                    Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                              '${ttcRecordDate(latest.takenOn)} · photo saved, '
+                              'number not entered',
+                              style: ttcBody(13, color: ttcSoft, h: 1.4)),
+                          GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: () => showTtcTypeValue(context, latest),
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 6, bottom: 2),
+                              // Kept for revert (2026-09-28): 'Type it'
+                              child: Text('Type the number',
+                                  style: ttcBody(13,
+                                      color: ttcTitleInk, w: FontWeight.w800)),
+                            ),
+                          ),
+                        ]),
                   const SizedBox(height: 4),
                   Text(under,
                       style: ttcBody(12, color: ttcMuted, w: FontWeight.w600)),
@@ -442,100 +479,266 @@ class _Pill extends StatelessWidget {
 /// ⚠️ EVERY "NOT ADDED" LINE CARRIES ITS OWN ADD (2026-09-27). It named ten
 /// tests she had not filed and offered no way to file one; the rule is that
 /// every "add X" line has its action right there.
+///
+/// ⚠️ CLEAN ROWS (2026-09-29, the user on build 20: "elevate the UI, it still
+/// seems a bit different from our application"). The list was a panel of
+/// dots with "· not added" tacked onto each name. Now it is the same white
+/// list as "Your results" above it: a filed test shows an ink tick, whose it
+/// is and its latest value, and opens that result; a test not filed is a
+/// quiet line with one "Add result" in ink, which opens the add page on that
+/// test. Mobbin:
+///  · Zocdoc "Your Well Guide": each check a row, the missing one a quiet
+///    "Last visit: add" with its action on the row:
+///    https://mobbin.com/screens/86529650-4ea4-42ec-ad0e-a1d14a9c9fb0
+///  · Apple Health "All Recorded Data": value and date as one grouped list,
+///    a hairline between rows, a chevron where a row opens:
+///    https://mobbin.com/screens/584b8a83-d3e7-441b-8a6d-ba1d951cc4fe
+///  · Apple Health "Health Checklist": a section heading in the title face,
+///    rows under it, the action as a text button in the row:
+///    https://mobbin.com/screens/0420e040-cdba-419e-a764-21d85beffdd5
 class _Coverage extends StatelessWidget {
   const _Coverage({required this.coverage});
   final TtcCoverage coverage;
 
   @override
-  Widget build(BuildContext context) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ttcSectionTitle('What a first check usually covers'),
-          TtcRecordPanel(
-            child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // ⚠️ "NOT ADDED", NEVER "MISSING". "Missing" says her workup
-                  // is incomplete, which is a judgement about the clinician
-                  // looking after her. "Not added" says this app does not have
-                  // it — a fact about her filing, which is the only thing this
-                  // screen is entitled to know.
-                  Text(
-                      'These are the tests a fertility check usually includes. '
-                      'You have ${coverage.added.length} of '
-                      '${coverage.total} saved here.',
-                      style: ttcBody(13, h: 1.5)),
-                  const SizedBox(height: 12),
-                  for (final t in coverage.added)
-                    _CoverRow(name: t.name, added: true),
-                  for (final t in coverage.notAdded)
-                    _CoverRow(
-                      name: t.name,
-                      added: false,
-                      addKey: ValueKey('ttc_rec_cover_add_${t.id}'),
-                      onAdd: () => openTtcRecordEdit(context, testId: t.id),
-                    ),
-                  const SizedBox(height: 8),
-                  Text(
-                      "If one isn't saved here, that doesn't mean you haven't "
-                      'had it. Your clinic decides which of these you need.',
-                      style: ttcBody(12, color: ttcMuted, h: 1.5)),
-                ]),
-          ),
-        ],
-      );
+  Widget build(BuildContext context) {
+    final groups = ttcGroupedRecords();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ttcSectionTitle('What a first check usually covers'),
+        // ⚠️ "NOT ADDED", NEVER "MISSING". "Missing" says her workup is
+        // incomplete, which is a judgement about the clinician looking after
+        // her. "Not added" says this app does not have it — a fact about her
+        // filing, which is the only thing this screen is entitled to know.
+        Text(
+            'These are the tests a fertility check usually includes. '
+            'You have ${coverage.added.length} of '
+            '${coverage.total} saved here.',
+            style: ttcBody(13, h: 1.5)),
+        const SizedBox(height: 12),
+        TtcRecordList(children: [
+          for (final t in coverage.added)
+            _CoverRow(test: t, group: ttcCoverageGroup(t, groups)),
+          for (final t in coverage.notAdded)
+            _CoverRow(
+              test: t,
+              group: null,
+              addKey: ValueKey('ttc_rec_cover_add_${t.id}'),
+              onAdd: () => openTtcRecordEdit(context, testId: t.id),
+            ),
+        ]),
+        const SizedBox(height: 10),
+        Text(
+            "If one isn't saved here, that doesn't mean you haven't "
+            'had it. Your clinic decides which of these you need.',
+            style: ttcBody(12, color: ttcMuted, h: 1.5)),
+      ],
+    );
+  }
 }
 
 class _CoverRow extends StatelessWidget {
   const _CoverRow({
-    required this.name,
-    required this.added,
+    required this.test,
+    required this.group,
     this.onAdd,
     this.addKey,
   });
-  final String name;
-  final bool added;
+  final TtcTest test;
+
+  /// The filed group, when the test has one. Null draws the quiet line.
+  final TtcRecordGroup? group;
   final VoidCallback? onAdd;
   final Key? addKey;
 
   @override
-  Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 5),
-        child: Row(children: [
-          // ⚠️ A DOT, NOT A TICK AND A CROSS. A cross is a failure mark, and
-          // nothing here has failed — half these tests are ones her clinic may
-          // never order.
-          Container(
-            width: 7,
-            height: 7,
-            margin: const EdgeInsets.only(right: 11),
-            decoration: BoxDecoration(
-              color: added ? ttcTitleInk : Colors.transparent,
-              shape: BoxShape.circle,
-              border: added ? null : Border.all(color: ttcBorder, width: 1.4),
-            ),
-          ),
-          Expanded(
-            child: Text(added ? name : '$name · not added',
-                style: ttcBody(13,
-                    color: added ? ttcTitleInk : ttcMuted,
-                    w: added ? FontWeight.w700 : FontWeight.w600)),
-          ),
-          if (onAdd != null)
-            GestureDetector(
+  Widget build(BuildContext context) {
+    final g = group;
+    final whose = ttcWhoseLong(test.forHim);
+    final String under;
+    if (g == null) {
+      under = test.forHim ? "Your partner's test · not added yet" : 'Not added yet';
+    } else {
+      final value = ttcRecordValue(g.latest);
+      under = '$whose · '
+          '${value.isEmpty ? 'photo saved' : value} · '
+          '${ttcRecordDate(g.latest.takenOn)}';
+    }
+
+    final row = Padding(
+      padding: const EdgeInsets.fromLTRB(16, 13, 10, 13),
+      child: Row(children: [
+        // ⚠️ AN INK TICK FOR FILED, NOTHING THAT READS AS A FAILURE FOR NOT
+        // FILED. A cross would say something went wrong, and half these tests
+        // are ones her clinic may never order; the empty ring is a place
+        // waiting, not a mark against her.
+        SizedBox(
+          width: 22,
+          child: g != null
+              ? const Icon(Icons.check_rounded, size: 20, color: ttcInk)
+              : Container(
+                  width: 16,
+                  height: 16,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: ttcLine, width: 1.5),
+                  ),
+                ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(test.name,
+                style: ttcBody(14,
+                    color: ttcInk,
+                    w: g != null ? FontWeight.w700 : FontWeight.w600,
+                    h: 1.3)),
+            const SizedBox(height: 2),
+            Text(under,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: ttcBody(12.5,
+                    color: g != null ? ttcSoft : ttcMuted, h: 1.4)),
+          ]),
+        ),
+        if (onAdd != null)
+          Semantics(
+            button: true,
+            label: 'Add result for ${test.name}',
+            excludeSemantics: true,
+            child: InkWell(
               key: addKey,
-              behavior: HitTestBehavior.opaque,
               onTap: onAdd,
+              borderRadius: BorderRadius.circular(999),
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(10, 4, 2, 4),
-                child: Text('Add',
-                    style: ttcBody(12.5,
-                        color: ttcTitleInk, w: FontWeight.w800)),
+                padding: const EdgeInsets.fromLTRB(10, 10, 6, 10),
+                // Kept for revert (2026-09-28): 'Add'
+                child: Text('Add result',
+                    style: ttcBody(13, color: ttcInk, w: FontWeight.w800)),
               ),
             ),
-        ]),
-      );
+          )
+        else if (g != null)
+          const Icon(Icons.chevron_right_rounded, size: 20, color: ttcMuted),
+      ]),
+    );
+
+    if (g == null) return row;
+    return InkWell(
+      key: ValueKey('ttc_rec_cover_done_${test.id}'),
+      onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+        settings: const RouteSettings(name: 'ttc/record'),
+        builder: (_) => g.repeated
+            ? TtcRecordTrendScreen(groupKey: g.key)
+            : TtcRecordDetailScreen(recordId: g.latest.id),
+      )),
+      child: row,
+    );
+  }
 }
+
+// Kept for revert (2026-09-29, clean rows): the panel of dots.
+// /// What a first check usually covers, against what she has filed.
+// ///
+// /// ⚠️ EVERY "NOT ADDED" LINE CARRIES ITS OWN ADD (2026-09-27). It named ten
+// /// tests she had not filed and offered no way to file one; the rule is that
+// /// every "add X" line has its action right there.
+// class _Coverage extends StatelessWidget {
+//   const _Coverage({required this.coverage});
+//   final TtcCoverage coverage;
+//
+//   @override
+//   Widget build(BuildContext context) => Column(
+//         crossAxisAlignment: CrossAxisAlignment.start,
+//         children: [
+//           ttcSectionTitle('What a first check usually covers'),
+//           TtcRecordPanel(
+//             child: Column(
+//                 crossAxisAlignment: CrossAxisAlignment.start,
+//                 children: [
+//                   // ⚠️ "NOT ADDED", NEVER "MISSING". "Missing" says her workup
+//                   // is incomplete, which is a judgement about the clinician
+//                   // looking after her. "Not added" says this app does not have
+//                   // it — a fact about her filing, which is the only thing this
+//                   // screen is entitled to know.
+//                   Text(
+//                       'These are the tests a fertility check usually includes. '
+//                       'You have ${coverage.added.length} of '
+//                       '${coverage.total} saved here.',
+//                       style: ttcBody(13, h: 1.5)),
+//                   const SizedBox(height: 12),
+//                   for (final t in coverage.added)
+//                     _CoverRow(name: t.name, added: true),
+//                   for (final t in coverage.notAdded)
+//                     _CoverRow(
+//                       name: t.name,
+//                       added: false,
+//                       addKey: ValueKey('ttc_rec_cover_add_${t.id}'),
+//                       onAdd: () => openTtcRecordEdit(context, testId: t.id),
+//                     ),
+//                   const SizedBox(height: 8),
+//                   Text(
+//                       "If one isn't saved here, that doesn't mean you haven't "
+//                       'had it. Your clinic decides which of these you need.',
+//                       style: ttcBody(12, color: ttcMuted, h: 1.5)),
+//                 ]),
+//           ),
+//         ],
+//       );
+// }
+//
+// class _CoverRow extends StatelessWidget {
+//   const _CoverRow({
+//     required this.name,
+//     required this.added,
+//     this.onAdd,
+//     this.addKey,
+//   });
+//   final String name;
+//   final bool added;
+//   final VoidCallback? onAdd;
+//   final Key? addKey;
+//
+//   @override
+//   Widget build(BuildContext context) => Padding(
+//         padding: const EdgeInsets.symmetric(vertical: 5),
+//         child: Row(children: [
+//           // ⚠️ A DOT, NOT A TICK AND A CROSS. A cross is a failure mark, and
+//           // nothing here has failed — half these tests are ones her clinic may
+//           // never order.
+//           Container(
+//             width: 7,
+//             height: 7,
+//             margin: const EdgeInsets.only(right: 11),
+//             decoration: BoxDecoration(
+//               color: added ? ttcTitleInk : Colors.transparent,
+//               shape: BoxShape.circle,
+//               border: added ? null : Border.all(color: ttcBorder, width: 1.4),
+//             ),
+//           ),
+//           Expanded(
+//             child: Text(added ? name : '$name · not added',
+//                 style: ttcBody(13,
+//                     color: added ? ttcTitleInk : ttcMuted,
+//                     w: added ? FontWeight.w700 : FontWeight.w600)),
+//           ),
+//           if (onAdd != null)
+//             GestureDetector(
+//               key: addKey,
+//               behavior: HitTestBehavior.opaque,
+//               onTap: onAdd,
+//               child: Padding(
+//                 padding: const EdgeInsets.fromLTRB(10, 4, 2, 4),
+//                 // Kept for revert (2026-09-28): 'Add'
+//                 child: Text('Add result',
+//                     style: ttcBody(12.5,
+//                         color: ttcTitleInk, w: FontWeight.w800)),
+//               ),
+//             ),
+//         ]),
+//       );
+// }
 
 // =============================================================================
 //  1g — empty
@@ -579,7 +782,8 @@ class TtcRecordsEmpty extends StatelessWidget {
             ]),
           ),
           const SizedBox(height: 26),
-          ttcSectionTitle('What this becomes'),
+          // Kept for revert (2026-09-28): 'What this becomes'
+          ttcSectionTitle('What your records become'),
           const TtcRecordList(children: [
             _Becomes(
               title: 'The same test, twice',
@@ -735,7 +939,8 @@ class _GroupRow extends StatelessWidget {
                         onTap: () => showTtcTypeValue(context, latest),
                         child: Padding(
                           padding: const EdgeInsets.only(left: 8),
-                          child: Text('Type it',
+                          // Kept for revert (2026-09-28): 'Type it'
+                          child: Text('Type the number',
                               style: ttcBody(12.5,
                                   color: ttcTitleInk, w: FontWeight.w800)),
                         ),
@@ -917,7 +1122,8 @@ class TtcRecordsEmpty extends StatelessWidget {
             ]),
           ),
           const SizedBox(height: 26),
-          ttcSectionTitle('What this becomes'),
+          // Kept for revert (2026-09-28): 'What this becomes'
+          ttcSectionTitle('What your records become'),
           const _Becomes(
             title: 'The same test, twice',
             body: 'A second AMH sits next to the first, so you can see which '
@@ -949,7 +1155,8 @@ class _Becomes extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.fromLTRB(15, 14, 15, 15),
         decoration: BoxDecoration(
-            color: ttcPanel, borderRadius: BorderRadius.circular(16)),
+            // Kept for revert (2026-09-29, no tinted slab behind text): color: ttcPanel, borderRadius: BorderRadius.circular(16)),
+            color: Colors.white, border: const Border.fromBorderSide(BorderSide(color: ttcLine)), borderRadius: BorderRadius.circular(16)),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(title, style: ttcJakarta(14)),
           const SizedBox(height: 4),
@@ -958,6 +1165,81 @@ class _Becomes extends StatelessWidget {
       );
 }
 */
+
+/// "0.9 lower" and "ng/mL" -> "0.9 ng/mL lower"; "unchanged" stays as it is.
+String ttcSpanWithUnit(String span, String unit) {
+  final u = unit.trim();
+  if (u.isEmpty) return span;
+  final parts = span.split(' ');
+  if (parts.length != 2) return span;
+  return '${parts[0]} $u ${parts[1]}';
+}
+
+/// What kind of test a result is, for its drawn mark. Never a verdict.
+enum TtcRecordKind { blood, imaging, semen, other }
+
+const Set<String> _kBloodIds = {
+  'tsh', 'amh', 'fsh_lh', 'vitd', 'b12', 'hba1c', 'prolactin',
+};
+const Set<String> _kImagingIds = {'ultrasound', 'hsg'};
+
+/// The kind from the library id, or from the words she typed.
+TtcRecordKind ttcRecordKindOf(String testKey, String label) {
+  if (testKey == 'semen') return TtcRecordKind.semen;
+  if (_kBloodIds.contains(testKey)) return TtcRecordKind.blood;
+  if (_kImagingIds.contains(testKey)) return TtcRecordKind.imaging;
+  final l = '${label.toLowerCase()} ${testKey.toLowerCase()}';
+  bool any(List<String> words) => words.any(l.contains);
+  if (any(['semen', 'sperm'])) return TtcRecordKind.semen;
+  if (any(['scan', 'ultrasound', 'sonograph', 'usg', 'hsg', 'x-ray', 'xray',
+    'mri', 'follicle', 'tvs', 'laparoscop', 'hysteroscop'])) {
+    return TtcRecordKind.imaging;
+  }
+  if (any(['blood', 'amh', 'tsh', 'thyroid', 'fsh', 'prolactin', 'vitamin',
+    'hba1c', 'sugar', 'hormone', 'cbc', 'haemoglobin', 'hemoglobin',
+    'estradiol', 'progesterone', 'testosterone', 'insulin', 'rubella',
+    'serum', 'lh '])) {
+    return TtcRecordKind.blood;
+  }
+  return TtcRecordKind.other;
+}
+
+/// A result's drawn mark: an object on a disc of the records hue, in the door
+/// rails' hand (`TtcTabArt`) and the Tools marks (`TtcToolArt`). Decorative;
+/// the row's words already say what the test is. Keyed per kind for tests.
+class TtcRecordMark extends StatelessWidget {
+  const TtcRecordMark({super.key, required this.kind, this.size = 40});
+
+  final TtcRecordKind kind;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    final tint = v2BlockTint(kTtcRecordsHue, V2PaletteStore.instance.current);
+    final Widget art = switch (kind) {
+      // The rail's "Tests and results": a vial in front of a report.
+      TtcRecordKind.blood =>
+        TtcTabArt(mark: TtcTabMark.vialReport, tint: tint),
+      // A magnifier over a page: a scan is someone looking inside.
+      TtcRecordKind.imaging =>
+        TtcTabArt(mark: TtcTabMark.magnifier, tint: tint),
+      // His health's heart with a pulse, as on the Tools row for him.
+      TtcRecordKind.semen =>
+        TtcToolArt(mark: TtcToolMark.partnerHealth, tint: tint),
+      // The Records tool's own folder, for anything typed by hand.
+      TtcRecordKind.other =>
+        TtcToolArt(mark: TtcToolMark.records, tint: tint),
+    };
+    return ExcludeSemantics(
+      child: SizedBox(
+        key: ValueKey('ttc_rec_mark_${kind.name}'),
+        width: size,
+        height: size,
+        child: art,
+      ),
+    );
+  }
+}
 
 /// The stage's one button.
 class TtcRecordsAction extends StatelessWidget {
@@ -1069,6 +1351,8 @@ class TtcRecordTrendScreen extends StatelessWidget {
           return TtcToolScaffold(
             hue: kTtcRecordsHue,
             variant: 2,
+            // One test's results, opened from Records: back (2026-09-29).
+            leading: TtcToolLeading.back,
             // One name per thing: the tool's name, as on every records page.
             // Kept for revert: eyebrow: ttcWhose(group.forPartner),
             eyebrow: 'Records and reports',
@@ -1083,7 +1367,8 @@ class TtcRecordTrendScreen extends StatelessWidget {
             action: TtcRecordsHeroPill(
                 key: const ValueKey('ttc_rec_trend_add'),
                 icon: Icons.add_rounded,
-                label: 'Add',
+                // Kept for revert (2026-09-28): 'Add'
+                label: 'Add a result',
                 onTap: addOne),
             children: [
               ttcToolPad(Column(
@@ -1106,12 +1391,13 @@ class TtcRecordTrendScreen extends StatelessWidget {
                     // "0.9 lower over 17 months" describes what she recorded.
                     // Anything comparing it to a population would be a second
                     // opinion, and this screen does not give one.
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.fromLTRB(15, 14, 15, 15),
-                      decoration: BoxDecoration(
-                          color: ttcPanel.withValues(alpha: 0.55),
-                          borderRadius: BorderRadius.circular(16)),
+                    // ⚠️ NO TINTED SLAB BEHIND A STAT (2026-09-29, the
+                    // one-app rule: stats are a plain label and a large value
+                    // on white). Kept for revert: padding
+                    // fromLTRB(15, 14, 15, 15) and a BoxDecoration of
+                    // ttcPanel at 55% with radius 16 round this Column.
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(4, 6, 4, 4),
                       child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -1123,8 +1409,11 @@ class TtcRecordTrendScreen extends StatelessWidget {
                                     color: ttcMuted)),
                             const SizedBox(height: 5),
                             Text(
-                                '$span${latest.unit.trim().isEmpty ? '' : ' '
-                                    '${latest.unit.trim()}'}, '
+                                // "0.9 ng/mL lower", not "0.9 lower ng/mL"
+                                // (2026-09-29, seen on the rendered page):
+                                // the unit belongs to the number. Kept for
+                                // revert: '$span${unit.isEmpty ? '' : ' $unit'}, '
+                                '${ttcSpanWithUnit(span, latest.unit)}, '
                                 '${ttcReadingGap(latest.takenOn, oldest.takenOn)
                                     .replaceAll(' later', ' apart')}',
                                 style: ttcFraunces(17,
@@ -1271,6 +1560,8 @@ class _Gone extends StatelessWidget {
   @override
   Widget build(BuildContext context) => TtcToolScaffold(
         hue: kTtcRecordsHue,
+        // Opened from Records: back, not an X (2026-09-29).
+        leading: TtcToolLeading.back,
         eyebrow: 'Records and reports',
         title: 'This result has been removed.',
         intro: "It's no longer in your records.",
@@ -1352,7 +1643,8 @@ class TtcRecordTrendScreen extends StatelessWidget {
                       width: double.infinity,
                       padding: const EdgeInsets.fromLTRB(15, 14, 15, 15),
                       decoration: BoxDecoration(
-                          color: ttcPanel,
+                          // Kept for revert (2026-09-29, no tinted slab behind text): color: ttcPanel,
+                          color: Colors.white, border: const Border.fromBorderSide(BorderSide(color: ttcLine)),
                           borderRadius: BorderRadius.circular(16)),
                       child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1545,6 +1837,8 @@ class TtcRecordDetailScreen extends StatelessWidget {
           return TtcToolScaffold(
             hue: kTtcRecordsHue,
             variant: 3,
+            // One result, opened from Records: back, not an X (2026-09-29).
+            leading: TtcToolLeading.back,
             // Kept for revert: eyebrow: ttcWhose(r.forPartner), intro: date.
             eyebrow: 'Records and reports',
             title: r.label,
@@ -1552,7 +1846,8 @@ class TtcRecordDetailScreen extends StatelessWidget {
             action: TtcRecordsHeroPill(
                 key: const ValueKey('ttc_rec_edit'),
                 icon: Icons.edit_outlined,
-                label: 'Edit',
+                // Kept for revert (2026-09-28): 'Edit'
+                label: 'Edit result',
                 onTap: () => _edit(context, r)),
             children: [
               ttcToolPad(Column(
@@ -1625,7 +1920,8 @@ class TtcRecordDetailScreen extends StatelessWidget {
                   // says nothing about HER number.
                   if (test != null) ...[
                     const SizedBox(height: 24),
-                    ttcSectionTitle('What this test measures'),
+                    // Kept for revert (2026-09-28): 'What this test measures'
+                    ttcSectionTitle('What ${test.name} measures'),
                     TtcRecordPanel(
                       child: Text(test.reading(TtcS.current().hinglish),
                           style: ttcBody(13.5, h: 1.6, color: ttcTitleInk)),
@@ -1638,7 +1934,9 @@ class TtcRecordDetailScreen extends StatelessWidget {
                       child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('No photo saved for this one.',
+                            // Kept for revert (2026-09-28): 'No photo
+                            // saved for this one.'
+                            Text('No photo saved for this result.',
                                 style: ttcBody(13.5, h: 1.5)),
                             const SizedBox(height: 14),
                             // Kept for revert (2026-09-27): this opened the
@@ -1725,12 +2023,15 @@ class _Sheet extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.fromLTRB(14, 12, 10, 12),
         child: Row(children: [
+          // A hairline page, not a tinted square (2026-09-29: tinted-square
+          // wells are retired). Kept for revert: color ttcPanel at 60%.
           Container(
             width: 44,
             height: 44,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-                color: ttcPanel.withValues(alpha: 0.6),
+                color: Colors.white,
+                border: Border.all(color: ttcLine),
                 borderRadius: BorderRadius.circular(12)),
             child: Icon(
                 pdf ? Icons.picture_as_pdf_outlined : Icons.description_outlined,
@@ -1849,7 +2150,8 @@ class TtcRecordDetailScreen extends StatelessWidget {
                   // cross.
                   if (test != null) ...[
                     const SizedBox(height: 24),
-                    ttcSectionTitle('What this test measures'),
+                    // Kept for revert (2026-09-28): 'What this test measures'
+                    ttcSectionTitle('What ${test.name} measures'),
                     TtcCard(
                       child: Text(test.reading(TtcS.current().hinglish),
                           style: ttcBody(13.5, h: 1.6, color: ttcTitleInk)),
@@ -1862,7 +2164,9 @@ class TtcRecordDetailScreen extends StatelessWidget {
                       child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('No photo saved for this one.',
+                            // Kept for revert (2026-09-28): 'No photo
+                            // saved for this one.'
+                            Text('No photo saved for this result.',
                                 style: ttcBody(13.5, h: 1.5)),
                             const SizedBox(height: 14),
                             TtcRecordsAction(
@@ -2377,7 +2681,8 @@ class _AddSheetState extends State<_AddSheet> {
                       width: double.infinity,
                       padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                          color: ttcPanel,
+                          // Kept for revert (2026-09-29, no tinted slab behind text): color: ttcPanel,
+                          color: Colors.white, border: const Border.fromBorderSide(BorderSide(color: ttcLine)),
                           borderRadius: BorderRadius.circular(16)),
                       child: Row(children: [
                         Icon(Icons.check_circle_outline_rounded,
@@ -2425,7 +2730,8 @@ class _AddSheetState extends State<_AddSheet> {
                     onPick: (partner) => setState(() => _partner = partner),
                   ),
                   const SizedBox(height: 14),
-                  _Field(label: 'What test was it', controller: _label),
+                  // Kept for revert (2026-09-28): 'What test was it'
+                  _Field(label: 'Name of the test', controller: _label),
                   if (_suggestions.isNotEmpty) ...[
                     const SizedBox(height: 8),
                     Wrap(spacing: 8, runSpacing: 8, children: [
@@ -2904,7 +3210,8 @@ class _AppointmentSheetState extends State<_AppointmentSheet> {
                   const SizedBox(height: 6),
                   ttcDivider(),
                   const SizedBox(height: 14),
-                  Text('NOT IN HERE',
+                  // Kept for revert (2026-09-28): 'NOT IN HERE'
+                  Text('NOT IN YOUR RECORDS YET',
                       style: pvManrope(
                           fontSize: 10,
                           fontWeight: FontWeight.w800,
@@ -3060,7 +3367,8 @@ class _TypeSheetState extends State<_TypeSheet> {
                       ),
                     ]),
                     const SizedBox(height: 20),
-                    TtcToolPrimary(label: 'Save it', onTap: _save),
+                    // Kept for revert (2026-09-28): 'Save it'
+                    TtcToolPrimary(label: 'Save the result', onTap: _save),
                     const SizedBox(height: 10),
                     Center(
                       child: Text('The photo stays either way.',

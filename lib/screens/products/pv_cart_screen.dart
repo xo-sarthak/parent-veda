@@ -27,7 +27,7 @@ class PvCartScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = pvStorePalette;
-    // The "Added to your bag" snack is app-level and would cover this
+    // The "Added to your cart" snack is app-level and would cover this
     // screen's commit button; the bag IS the confirmation, so clear it.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (context.mounted) ScaffoldMessenger.of(context).clearSnackBars();
@@ -63,7 +63,9 @@ class PvCartScreen extends StatelessWidget {
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
-                              'Your bag',
+                              // One name, "cart", everywhere in the store
+                              // (2026-09-29). Kept for revert: 'Your bag'.
+                              'Your cart',
                               style: pvFraunces(
                                 fontSize: 24,
                                 fontWeight: FontWeight.w500,
@@ -111,7 +113,7 @@ class PvCartScreen extends StatelessWidget {
                                           .clamp(0, 1),
                                   minHeight: 4,
                                   backgroundColor: p.surfaceAlt,
-                                  color: p.action,
+                                  color: kPvInk,
                                 ),
                               ),
                             ],
@@ -196,7 +198,8 @@ class PvCartScreen extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Nothing in your bag yet.',
+          // Kept for revert: 'Nothing in your bag yet.'
+          'Nothing in your cart yet.',
           style: pvFraunces(
             fontSize: 22,
             fontWeight: FontWeight.w500,
@@ -331,7 +334,8 @@ class PvCartScreen extends StatelessWidget {
 
   Widget _summary(V2Palette p, double subtotal, double delivery) => Padding(
     padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
-    child: PvWell(
+    // A white card, not a slab (2026-09-29). Kept for revert: PvWell.
+    child: PvCard(
       child: Column(
         children: [
           _sumRow(p, 'Subtotal', '₹${PvProduct.groupRupees(subtotal.round())}'),

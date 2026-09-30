@@ -21,6 +21,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/notification_service.dart';
 import '../services/remote/supabase_repo.dart';
+// The evening-before reminder says how many questions a visit has
+// (2026-09-28). The two stores import each other, which Dart allows; the
+// questions store reads the visits' dates, this one reads the counts.
+import 'ttc_doctor_questions_store.dart' show TtcDoctorQuestionsStore;
 import 'ttc_sync.dart';
 
 // =============================================================================
@@ -548,8 +552,17 @@ class TtcAppointmentsStore extends ChangeNotifier with TtcSyncedStore {
     String? note,
     bool remindEveningBefore = false,
   }) {
+    // ⚠️ THE CLOCK IS NOT AN ID GENERATOR ON ITS OWN (2026-09-28, the same
+    // fix the questions store carries). Two adds in one Windows clock tick
+    // gave two visits one id, and a question pinned to one then sat on
+    // both. Stepped past any id already taken.
+    // Kept for revert: id: 'ttca_${DateTime.now().microsecondsSinceEpoch}',
+    var n = DateTime.now().microsecondsSinceEpoch;
+    while (_items.any((e) => e.id == 'ttca_$n')) {
+      n++;
+    }
     final a = TtcAppointment(
-      id: 'ttca_${DateTime.now().microsecondsSinceEpoch}',
+      id: 'ttca_$n',
       title: title.trim(),
       withWhom: withWhom.trim(),
       startsUtc: startsLocal.toUtc(),
@@ -559,6 +572,8 @@ class TtcAppointmentsStore extends ChangeNotifier with TtcSyncedStore {
     _items.add(a);
     _persist();
     _arm(a);
+    // A new visit can take unticked questions from the one after it.
+    rearmReminders(except: a.id);
     notifyListeners();
     return a;
   }
@@ -576,6 +591,7 @@ class TtcAppointmentsStore extends ChangeNotifier with TtcSyncedStore {
     _items[i] = updated;
     _persist();
     _arm(updated);
+    rearmReminders(except: updated.id);
     notifyListeners();
   }
 
@@ -604,18 +620,59 @@ class TtcAppointmentsStore extends ChangeNotifier with TtcSyncedStore {
     cancelPhone(id).catchError((_) {});
     if (!a.remindEveningBefore) return;
     if (!a.reminderAt.isAfter(DateTime.now())) return;
+    // Kept for revert (2026-09-28): the title and body were built inline
+    // here; they now come from `reminderText`, which adds the questions.
+    //   final l = a.startsLocal; ... title: 'Tomorrow: ${a.title}',
+    //   body: a.withWhom.isEmpty ? 'At $time.' : 'At $time, with ${a.withWhom}.',
+    //
+    // ⚠️ COUNTED AS OF THE MOMENT IT RINGS, NOT NOW. A visit on Monday rolls
+    // its unticked questions onto Wednesday's visit on Tuesday morning;
+    // Wednesday's reminder rings on Tuesday evening, so it has to count them.
+    // The questions store derives that from a clock, so it is asked for 7 pm
+    // tomorrow rather than this minute.
+    var questions = 0;
+    try {
+      questions = TtcDoctorQuestionsStore.instance
+          .openCountFor(a.id, now: a.reminderAt);
+    } catch (_) {/* a count must never stop a reminder */}
+    final text = reminderText(a, questions: questions);
+    schedulePhone(
+      id: id,
+      title: text.title,
+      body: text.body,
+      when: a.reminderAt,
+    ).catchError((_) {});
+  }
+
+  /// What the evening-before reminder says. With questions saved for the
+  /// visit it adds "· 2 questions to ask"; with none it is exactly what it
+  /// said before (2026-09-28).
+  static ({String title, String body}) reminderText(TtcAppointment a,
+      {int questions = 0}) {
     final l = a.startsLocal;
     final h = l.hour % 12 == 0 ? 12 : l.hour % 12;
     final time = '$h:${l.minute.toString().padLeft(2, '0')}'
         '${l.hour < 12 ? 'am' : 'pm'}';
-    schedulePhone(
-      id: id,
+    final where =
+        a.withWhom.isEmpty ? 'At $time' : 'At $time, with ${a.withWhom}';
+    return (
       title: 'Tomorrow: ${a.title}',
-      body: a.withWhom.isEmpty
-          ? 'At $time.'
-          : 'At $time, with ${a.withWhom}.',
-      when: a.reminderAt,
-    ).catchError((_) {});
+      body: questions <= 0
+          ? '$where.'
+          : '$where · $questions '
+              '${questions == 1 ? 'question' : 'questions'} to ask.',
+    );
+  }
+
+  /// Sets every coming reminder again, except [except]'s (the caller has
+  /// just armed that one). Called when a question changes, because each
+  /// reminder carries its visit's count, and when a visit is added, moved or
+  /// removed, because unticked questions follow the order of the visits.
+  void rearmReminders({String? except}) {
+    for (final a in _items) {
+      if (a.id == except) continue;
+      if (a.remindEveningBefore && a.isUpcoming) _arm(a);
+    }
   }
 
   /// Sets every upcoming reminder again after launch.
@@ -626,6 +683,11 @@ class TtcAppointmentsStore extends ChangeNotifier with TtcSyncedStore {
   /// See `main.dart` and the head of `ttc_messages_store.dart`.
   Future<void> rearmAfterStartup() async {
     await _loading;
+    // The reminders count each visit's questions (2026-09-28), so the local
+    // list must be in first. Local only: this never waits on a network.
+    try {
+      await TtcDoctorQuestionsStore.instance.init();
+    } catch (_) {/* armed without a count, never not armed */}
     for (final a in _items) {
       if (a.remindEveningBefore && a.isUpcoming) _arm(a);
     }
@@ -635,6 +697,8 @@ class TtcAppointmentsStore extends ChangeNotifier with TtcSyncedStore {
     final before = _items.length;
     _items.removeWhere((e) => e.id == id);
     if (_items.length == before) return;
+    // Its unticked questions roll to the next visit, whose count changes.
+    rearmReminders();
     cancelPhone(ttcAppointmentReminderId(id)).catchError((_) {});
     _persist();
     if (SupabaseRepo.isLoggedIn) {
@@ -656,6 +720,7 @@ class TtcAppointmentsStore extends ChangeNotifier with TtcSyncedStore {
     _items.add(a);
     _persist();
     _arm(a);
+    rearmReminders(except: a.id);
     notifyListeners();
   }
 

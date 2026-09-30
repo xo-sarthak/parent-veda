@@ -46,7 +46,7 @@ import '../../ttc/ttc_home_prefs.dart';
 import '../../ttc/ttc_period_due.dart' show ttcDays;
 import '../../ttc/ttc_reads_data.dart' show ttcReadById;
 import '../v2/v2_palette.dart';
-import 'ttc_common.dart' show ttcCoral;
+import 'ttc_common.dart' show ttcCoral, ttcTitleInk;
 import 'ttc_surface_router.dart';
 
 // =============================================================================
@@ -72,7 +72,9 @@ const String kTtcPeriodCameLine =
     "Your period came. If you were hoping this month, that's hard.";
 
 /// The link under it, to the "Your period came" read.
-const String kTtcPeriodCameLink = "What it does and doesn't mean";
+// Kept for revert (2026-09-28): "What it does and doesn't mean". A link
+// names what it opens.
+const String kTtcPeriodCameLink = "What your period does and doesn't mean";
 const String kTtcPeriodCameReadId = 'ttc_read_period_came';
 
 /// The envelope's name for screen readers.
@@ -81,10 +83,12 @@ const String kTtcMessagesLabel = 'Messages';
 /// The waiting-days card on the daily rail.
 const String kTtcShouldTestEyebrow = 'The waiting days';
 const String kTtcShouldTestValue = 'Should I test?';
-const String kTtcShouldTestCaption = "We'll work it out together";
+// Kept for revert (2026-09-28): "We'll work it out together".
+const String kTtcShouldTestCaption = "We'll work out your test day";
 
 /// Under the recommended reads.
-const String kTtcSeeEverything = 'See everything';
+// Kept for revert (2026-09-28): 'See everything'.
+const String kTtcSeeEverything = 'See every read';
 
 /// The two one-tap buttons beside "Check symptoms".
 const String kTtcQuickSex = 'Sex';
@@ -95,9 +99,11 @@ const String kTtcQuickTest = 'Test';
 const String kTtcTestGroupToOpen = 'ovulation_test';
 
 /// The check card.
+// Kept for revert (2026-09-28): "It's been about six months" / "It's been
+// about a year". The heading names what has run that long.
 String ttcCheckTitle(int months) => months <= 6
-    ? "It's been about six months"
-    : "It's been about a year";
+    ? 'About six months of trying'
+    : 'About a year of trying';
 
 String ttcCheckBody(int months) => months <= 6
     ? 'At 35 and over, or when cycles vary a lot, this is the point where '
@@ -114,14 +120,18 @@ const String kTtcCheckReadId = 'ttc_read_ivf_workup';
 const String kTtcCheckEyebrow = 'For both of you';
 
 /// The course card for someone new.
-const String kTtc101Eyebrow = 'New here?';
+// Change 5 (2026-09-28): "New here?" did not say new to what. Kept for
+// revert: 'New here?'.
+const String kTtc101Eyebrow = 'New to trying?';
 const String kTtc101Title = 'Start with Trying to conceive 101';
-const String kTtc101AllSteps = 'All steps';
+// Kept for revert (2026-09-28): 'All steps'.
+const String kTtc101AllSteps = 'See all 101 steps';
 
 /// After a period is logged.
 const String kTtcPeriodLoggedNote =
     'Your period is logged. If this month was hard, we can talk it through.';
-const String kTtcTalkItThrough = 'Talk it through';
+// Kept for revert (2026-09-28): 'Talk it through'.
+const String kTtcTalkItThrough = 'Talk about this month';
 
 // =============================================================================
 //  Opening things
@@ -160,7 +170,7 @@ class TtcHowToTestButton extends StatelessWidget {
         label: kTtcLateButton,
         child: PvPress(
           child: Material(
-            color: p.ink1,
+            color: ttcTitleInk,
             shape: const StadiumBorder(),
             child: InkWell(
               key: const ValueKey('ttc_home_how_to_test'),
@@ -228,7 +238,7 @@ class TtcPeriodCameLine extends StatelessWidget {
                         style: pvManrope(
                             fontSize: 12.5,
                             fontWeight: FontWeight.w800,
-                            color: p.action)),
+                            color: ttcTitleInk)),
                   ]),
             ),
             Icon(Icons.chevron_right_rounded, size: 18, color: p.ink3),
@@ -360,14 +370,14 @@ class TtcCheckCard extends StatelessWidget {
                 ]);
               },
               style: TextButton.styleFrom(
-                  foregroundColor: p.action,
+                  foregroundColor: ttcTitleInk,
                   minimumSize: const Size(44, 44),
                   padding: const EdgeInsets.symmetric(horizontal: 0)),
               child: Text(kTtcCheckWhat,
                   style: pvManrope(
                       fontSize: 13.5,
                       fontWeight: FontWeight.w800,
-                      color: p.action)),
+                      color: ttcTitleInk)),
             ),
             TextButton(
               key: const ValueKey('ttc_home_check_not_now'),
@@ -480,14 +490,14 @@ class Ttc101Card extends StatelessWidget {
           key: const ValueKey('ttc_home_101_all'),
           onPressed: onAllSteps,
           style: TextButton.styleFrom(
-              foregroundColor: p.action,
+              foregroundColor: ttcTitleInk,
               minimumSize: const Size(44, 44),
               padding: const EdgeInsets.symmetric(horizontal: 8)),
           child: Text(kTtc101AllSteps,
               style: pvManrope(
                   fontSize: 12.5,
                   fontWeight: FontWeight.w800,
-                  color: p.action)),
+                  color: ttcTitleInk)),
         ),
       ),
     ]);

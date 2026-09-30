@@ -109,13 +109,14 @@ class TtcMoreScreen extends StatelessWidget {
                       p: p,
                       onTap: () => openTtcSurface(context, 'ttc_community'),
                     ),
-                    _MoreRow(
-                      icon: Icons.favorite_border_rounded,
-                      hue: 344,
-                      label: t.myJournal,
-                      p: p,
-                      onTap: () => openTtcSurface(context, 'ttc_journal'),
-                    ),
+                    // Kept for revert (2026-09-28, journal out of TTC):
+                    // _MoreRow(
+                    //   icon: Icons.favorite_border_rounded,
+                    //   hue: 344,
+                    //   label: t.myJournal,
+                    //   p: p,
+                    //   onTap: () => openTtcSurface(context, 'ttc_journal'),
+                    // ),
                     _MoreRow(
                       icon: Icons.person_outline_rounded,
                       hue: 104,
@@ -154,7 +155,7 @@ class TtcMoreScreen extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Icon(Icons.auto_awesome_outlined,
-                                  size: 19, color: ttcPurple),
+                                  size: 19, color: ttcTitleInk),
                             ),
                             const SizedBox(width: 13),
                             Expanded(

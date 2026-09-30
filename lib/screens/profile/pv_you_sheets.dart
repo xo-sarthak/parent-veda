@@ -6,6 +6,8 @@
 //  top-right, action pinned).
 // =============================================================================
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../screens/post_pregnancy/pp_child_profile.dart';
@@ -148,7 +150,9 @@ Future<bool> showPvAddChildSheet(
                   ),
                   const SizedBox(height: 18),
                   PvCommit(
-                    label: arrival ? 'Open the parenting home' : 'Add',
+                    // Change 5 (2026-09-28), right for every stage. Kept for
+                    // revert: 'Add'.
+                    label: arrival ? 'Open the parenting home' : 'Add child',
                     onTap: ok
                         ? () async {
                             await ChildProfileStore.instance.addChild(
@@ -211,8 +215,15 @@ String _date(DateTime d) {
 /// here and one added at checkout are the same thing in the same store.
 Future<void> showPvAddressesSheet(BuildContext context) async {
   final p = pvStorePalette;
-  await PvOrderStore.instance.init();
-  if (!context.mounted) return;
+  // ⚠️ LOCAL-FIRST: THE SHEET OPENS AT ONCE (2026-09-30, found by
+  // test/pv_profile_walk_test.dart). `init()` loads the phone's copy AND then
+  // awaits the cloud sync, so awaiting it here made the tap wait on the
+  // network: slow on a weak signal, and never opening when the sync hung.
+  // The sheet listens to the store, so saved addresses appear the moment the
+  // local copy loads, and the sync finishes behind it. Kept for revert:
+  //   await PvOrderStore.instance.init();
+  //   if (!context.mounted) return;
+  unawaited(PvOrderStore.instance.init());
   await showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
@@ -251,15 +262,15 @@ Future<void> showPvAddressesSheet(BuildContext context) async {
                   ],
                 ),
                 const SizedBox(height: 12),
+                // An empty list is one quiet line, not a lavender slab
+                // (2026-09-29), as the store's empty shelf is. Kept for
+                // revert: PvWell(child: Text(..., pvManrope(fontSize: 13.5,
+                //     height: 1.45, color: p.ink2))).
                 if (store.addresses.isEmpty)
-                  PvWell(
-                    child: Text(
+                  const Padding(
+                    padding: EdgeInsets.only(bottom: 8),
+                    child: PvQuietLine(
                       'No address yet. Add one here or at checkout — it is the same list.',
-                      style: pvManrope(
-                        fontSize: 13.5,
-                        height: 1.45,
-                        color: p.ink2,
-                      ),
                     ),
                   ),
                 for (final a in store.addresses)

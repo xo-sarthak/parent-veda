@@ -84,6 +84,7 @@ class PrecheckContext {
     required this.vaccinesRecorded,
     required this.liveVaccineOutstanding,
     required this.daysTrying,
+    this.liveImmunitySettled = false,
   });
 
   final int loggedCycles;
@@ -103,6 +104,15 @@ class PrecheckContext {
   final bool liveVaccineOutstanding;
 
   final int? daysTrying;
+
+  /// Her vaccination record says every live vaccine is settled: immune, not
+  /// needed, or had with its month's wait already over (2026-09-29).
+  ///
+  /// ⚠️ HER OWN RECORD, NOT AN INFERENCE. Each live vaccine has a status she
+  /// set herself on the Vaccinations tool, usually from a blood test. Optional
+  /// with a false default so a context built by hand (the tests) stays
+  /// exactly what it was.
+  final bool liveImmunitySettled;
 
   bool get tryingOverAYear => (daysTrying ?? 0) >= 365;
   bool get tryingOverSixMonths => (daysTrying ?? 0) >= 182;
@@ -149,6 +159,13 @@ class PrecheckContext {
       vaccinesRecorded: recorded,
       liveVaccineOutstanding: vax.liveOutstanding.isNotEmpty,
       daysTrying: TtcStore.instance.daysTrying,
+      liveImmunitySettled: ttcLiveVaccines.isNotEmpty &&
+          ttcLiveVaccines.every((v) => const {
+                TtcVaccineStatus.immune,
+                TtcVaccineStatus.notApplicable,
+                TtcVaccineStatus.done,
+              }.contains(vax.statusOf(v.id))) &&
+          vax.clearToTryFrom() == null,
     );
   }
 }
@@ -238,6 +255,58 @@ bool precheckAutoDone(PrecheckItem item, PrecheckContext c) {
 }
 
 // -----------------------------------------------------------------------------
+//  Done, from her own records (2026-09-29, launch sanity D12)
+// -----------------------------------------------------------------------------
+//
+// ⚠️ A SECOND KIND OF "ALREADY DONE", AND IT IS NOT AUTO-COMPLETION. The walk
+// found the folic acid item saying "You have folic acid on your supplement
+// list" beside an empty circle: we knew, and still made her tick it, and the
+// count under-reported her. `precheckAutoDone` stays what it was (only things
+// she does IN THE APP, never a core medical item, held by the test). This is
+// narrower and separate: two items whose whole action is a fact she has
+// already RECORDED herself on another tool.
+//
+//   · `folate`: the item is "Folic acid", and folic acid on her own
+//     supplement list is her saying she takes it. The dose check is a
+//     different fact, and it stays open: the evidence line on the row still
+//     says to check the dose, and "I talked to my doctor about this" is
+//     still hers to tick. Taking it and having the dose confirmed are two
+//     facts, which is why the store keeps them as two fields.
+//   · `vaccines`: every live vaccine on her Vaccinations list is immune, not
+//     needed, or had with the month's wait over. That is the item's whole
+//     point ("the one item on this list with a deadline").
+//
+// Never the medication or supplement review: a list of medicines is not a
+// review of them, and nothing she can record elsewhere says one happened.
+// Her own answer always wins (see `TtcPrecheckStore.statusOf`), so a derived
+// tick is one tap from being taken off, with Undo.
+
+/// The items that may be ticked from her own records. Nothing else, ever.
+const Set<String> kPrecheckFromRecords = {'folate', 'vaccines'};
+
+/// True when her own records on another tool already settle this item.
+bool precheckDerivedDone(PrecheckItem item, PrecheckContext c) {
+  if (!kPrecheckFromRecords.contains(item.id)) return false;
+  return switch (item.id) {
+    'folate' => c.takesFolate,
+    'vaccines' => c.liveImmunitySettled && !c.liveVaccineOutstanding,
+    _ => false,
+  };
+}
+
+/// Where a tick she did not make came from, said on the row ("From your
+/// supplements"). Null when the app has not ticked it.
+LocalizedText? precheckDoneSource(PrecheckItem item, PrecheckContext c) {
+  if (precheckAutoDone(item, c)) return _en('From your cycle log');
+  if (!precheckDerivedDone(item, c)) return null;
+  return switch (item.id) {
+    'folate' => _en('From your supplements'),
+    'vaccines' => _en('From your vaccinations'),
+    _ => null,
+  };
+}
+
+// -----------------------------------------------------------------------------
 //  Priority
 // -----------------------------------------------------------------------------
 
@@ -268,6 +337,10 @@ List<PrecheckPriority> precheckPriorities(
     if (out.any((p) => p.item.id == id)) return;
     final item = precheckItemById(id);
     if (item == null) return;
+    // ⚠️ ONLY WHAT THE LIST DRAWS (2026-09-29). "His side of it" is core and
+    // sits in the hidden partner section, so the core fallback below could
+    // offer a step the checklist has no row for. Kept for revert: no check.
+    if (!ttcVisiblePrecheckSections.contains(item.section)) return;
     final s = statusOf(id);
     // Something she has settled, either way, is not a next step.
     if (s == PrecheckStatus.done || s == PrecheckStatus.notRelevant) return;
@@ -339,8 +412,34 @@ List<PrecheckPriority> precheckPriorities(
         'everyone.'));
   }
 
+  // ⚠️ ONE REASON, SAID ONCE (no-repetition sweep, 2026-09-29). The two
+  // fallbacks give every step they pick the same line, so two core items
+  // she has not looked at read "One of the few items here that applies to
+  // almost everyone." twice, one above the other. The second says "also".
+  final times = <String, int>{};
+  for (var i = 0; i < out.length; i++) {
+    final r = out[i].reason.en;
+    final n = times[r] = (times[r] ?? 0) + 1;
+    final also = _kPrecheckAlsoReason[r];
+    if (n < 2 || also == null) continue;
+    out[i] = PrecheckPriority(
+        item: out[i].item, reason: also[(n - 2).clamp(0, also.length - 1)]);
+  }
+
   return out;
 }
+
+/// What a fallback reason says the second and the third time.
+final Map<String, List<LocalizedText>> _kPrecheckAlsoReason = {
+  'You marked this to come back to.': [
+    _en('Also marked by you to come back to.'),
+    _en('You marked this one too.'),
+  ],
+  'One of the few items here that applies to almost everyone.': [
+    _en('Also core: most people should do this one.'),
+    _en('Core as well: it applies to almost everyone.'),
+  ],
+};
 
 // -----------------------------------------------------------------------------
 //  The clinical-review register

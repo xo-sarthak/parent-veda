@@ -182,7 +182,11 @@ void main() {
       await pump360(tester, const TtcLearnScreen());
       final films = find.byWidgetPredicate((w) =>
           w.key is ValueKey<String> &&
-          (w.key as ValueKey<String>).value.startsWith('ttc_learn_film_'));
+          (w.key as ValueKey<String>).value.startsWith('ttc_learn_film_') &&
+          // A film card now carries a still with its own key
+          // (`ttc_learn_film_still_<id>`, 2026-09-29, no placeholders); count
+          // the cards, not their pictures. Kept for revert: the prefix alone.
+          !(w.key as ValueKey<String>).value.startsWith('ttc_learn_film_still_'));
       expect(films.evaluate().length, lessThanOrEqualTo(2));
       for (final e in films.evaluate()) {
         expect(
@@ -270,7 +274,10 @@ void main() {
           for (final t in g.tools)
             if (t.icon == Icons.support_agent_outlined) t.id
       ];
-      expect(headsets, ['expert']);
+      // 2026-09-28: "Talk to an expert" left Tools for More (not a tool), so
+      // no Tools row wears the headset now. Kept for revert:
+      //   expect(headsets, ['expert']);
+      expect(headsets, isEmpty);
     });
   });
 
@@ -312,14 +319,23 @@ void main() {
         ),
       ], DateTime.now());
       await TtcContentPrefs.instance.setHideIntimate(true);
+      // ⚠️ SINCE 2026-09-29 BOTH ROWS ARE IN SETTINGS, behind the profile's
+      // one Settings row (Messages under Notifications, What you see under
+      // Preferences); Today's envelope is still the first way to Messages.
+      // Kept for revert: the More bento, where the Your app tile carried the
+      // dot:
+      //   await pump360(tester, const PvYouScreen(
+      //       stage: LifeStage.tryingToConceive,
+      //       bottomNav: TtcBottomNav(active: 4, v3: true)), width: 392);
+      //   expect(find.byKey(const ValueKey('pv_more_tile_dot')), findsOneWidget);
+      //   await tester.tap(find.byKey(const ValueKey('pv_more_tile_your_app')));
       await pump360(
-          tester,
-          const PvYouScreen(
-            stage: LifeStage.tryingToConceive,
-            bottomNav: TtcBottomNav(active: 4, v3: true),
-          ),
+          tester, const PvYouScreen(stage: LifeStage.tryingToConceive),
           width: 392);
       expect(tester.takeException(), isNull);
+      await tester.ensureVisible(find.byKey(kPvProfileSettingsRowKey));
+      await tester.tap(find.byKey(kPvProfileSettingsRowKey));
+      await tester.pumpAndSettle();
       expect(find.byKey(const ValueKey('pv_you_thing_dot')), findsOneWidget);
       expect(find.text('1'), findsNothing, reason: 'no count on Messages');
       expect(find.text(kTtcIntimateStateHidden), findsOneWidget);

@@ -23,6 +23,18 @@
 //  supabase/seed/sponsor_demo.sql carries a bypass string — see 0059 for why
 //  that is done per-sponsor and audited separately rather than by handing the
 //  real code back to the caller.
+//
+//  ---------------------------------------------------------------------------
+//  ON THE BASE UI, 2026-09-29, the same pass as Employer benefits (read its
+//  header): the page was on the lilac `surfaceContainer` with a violet
+//  button, a violet link, a lilac field and the privacy promise on a lilac
+//  slab. It opens from that page's "Activate with your work email", so it
+//  looked like leaving the app for a form. Now: a white ground and bar, each
+//  step led by a drawn mark from the door family in the Benefits tint (the
+//  wallet she tapped, and a ticked list when it is done), a serif heading,
+//  the field on white with a hairline, the one ink pill, ink links, and the
+//  privacy promise as a heading and rows on white under a hairline. Every
+//  word, every refusal and every branch is unchanged.
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -33,7 +45,17 @@ import '../../localization/app_language.dart';
 import '../../services/entitlement_store.dart';
 import '../../services/sponsor_benefits.dart';
 import '../../theme/app_theme.dart';
+import '../../theme/pv_fonts.dart';
+import '../ttc/doors/ttc_tab_art.dart';
+import '../v2/v2_palette.dart';
+import 'employer_benefits_screen.dart' show kEmployerBenefitsHue;
 import 'enterprise_common.dart';
+
+/// The page's ground and bar: white, like Employer benefits.
+const Color kActivationGround = Colors.white;
+
+/// A hairline, the base UI's (0x1F on white).
+const Color _kLine = Color(0x1F000000);
 
 /// Returns true when the benefit was activated.
 Future<bool> openActivationFlow(BuildContext context,
@@ -100,6 +122,62 @@ class _ActivationFlowScreenState extends State<ActivationFlowScreen> {
 
   AppLanguage get _l => widget.lang;
   String _p(String en, String hi) => ep(_l, en, hi);
+
+  V2Palette get _pal => V2PaletteStore.instance.current;
+
+  /// A drawn mark from the door family, in the Benefits section's tint.
+  Widget _mark(TtcTabMark m, {double size = 72}) => SizedBox(
+        width: size,
+        height: size,
+        child: TtcTabArt(mark: m, tint: v2BlockTint(kEmployerBenefitsHue, _pal)),
+      );
+
+  /// The step's heading on white: a serif line and an ink-2 sub. Replaces
+  /// `EnterpriseHeading` here (kept for the sponsor dashboard, which is not
+  /// part of this pass).
+  Widget _heading(String text, {String? sub}) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Semantics(
+            header: true,
+            child: Text(text,
+                style: pvFraunces(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w500,
+                    height: 1.2,
+                    color: _pal.ink1)),
+          ),
+          if (sub != null) ...[
+            const SizedBox(height: 8),
+            Text(sub,
+                style: pvManrope(fontSize: 14, height: 1.5, color: _pal.ink2)),
+          ],
+        ],
+      );
+
+  /// A field on white with a hairline, ink when focused.
+  InputDecoration _field(String hint, {TextStyle? hintStyle}) =>
+      InputDecoration(
+        hintText: hint,
+        hintStyle: hintStyle ?? pvManrope(fontSize: 15, color: _pal.ink3),
+        filled: true,
+        fillColor: Colors.white,
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: const BorderSide(color: _kLine),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: const BorderSide(color: _kLine),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide:
+              const BorderSide(color: AppTheme.neutral900, width: 1.4),
+        ),
+      );
 
   @override
   void dispose() {
@@ -170,9 +248,14 @@ class _ActivationFlowScreenState extends State<ActivationFlowScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.surfaceContainer,
+      // Kept for revert (2026-09-29): AppTheme.surfaceContainer on both.
+      backgroundColor: kActivationGround,
       appBar: AppBar(
-        backgroundColor: AppTheme.surfaceContainer,
+        backgroundColor: kActivationGround,
+        surfaceTintColor: Colors.transparent,
+        scrolledUnderElevation: 0,
+        foregroundColor: AppTheme.neutral900,
+        iconTheme: const IconThemeData(color: AppTheme.neutral900),
         elevation: 0,
         leading: _step == _Step.welcome
             // No going back out of a success into a form that would refuse
@@ -180,7 +263,10 @@ class _ActivationFlowScreenState extends State<ActivationFlowScreen> {
             ? null
             : const BackButton(),
         automaticallyImplyLeading: _step != _Step.welcome,
-        title: Text(_p('Employer benefits', 'Employer benefits')),
+        // Kept for revert (2026-09-29): the theme's title style.
+        title: Text(_p('Employer benefits', 'Employer benefits'),
+            style: pvManrope(
+                fontSize: 16, fontWeight: FontWeight.w700, color: _pal.ink1)),
       ),
       body: SafeArea(
         top: false,
@@ -201,11 +287,14 @@ class _ActivationFlowScreenState extends State<ActivationFlowScreen> {
   // ---- step 1 --------------------------------------------------------------
 
   Widget _emailStep() {
-    final t = Theme.of(context).textTheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        EnterpriseHeading(
+        // The wallet, the object on the Benefits row she tapped to get here.
+        _mark(TtcTabMark.wallet),
+        const SizedBox(height: 16),
+        // Kept for revert (2026-09-29): EnterpriseHeading(...).
+        _heading(
           _p('Your employer may already provide this.',
               'हो सकता है आपकी कंपनी यह पहले से दे रही हो।'),
           sub: _p(
@@ -214,8 +303,10 @@ class _ActivationFlowScreenState extends State<ActivationFlowScreen> {
               'कुछ कंपनियाँ अपनी टीम के लिए ParentVeda का ख़र्च उठाती हैं। अपना ऑफ़िस वाला ईमेल डालिए, हम जाँच लेते हैं।'),
         ),
         const SizedBox(height: 22),
-        EnterpriseCard(
-          child: Column(
+        // No card round the field (DESIGN-SYSTEM: a form is a label, a field
+        // and a line on white). Kept for revert (2026-09-29): EnterpriseCard(
+        // child: Column(...)).
+        Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // NOT "work email", deliberately. Plenty of Indian companies --
@@ -227,7 +318,11 @@ class _ActivationFlowScreenState extends State<ActivationFlowScreen> {
               // their company gave us, which is what this says.
               Text(_p('The email your company has for you',
                   'जो ईमेल आपकी कंपनी के पास है'),
-                  style: t.labelLarge?.copyWith(fontWeight: FontWeight.w700)),
+                  // Kept for revert (2026-09-29): t.labelLarge w700.
+                  style: pvManrope(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: _pal.ink1)),
               const SizedBox(height: 8),
               TextField(
                 controller: _email,
@@ -236,21 +331,11 @@ class _ActivationFlowScreenState extends State<ActivationFlowScreen> {
                 enableSuggestions: false,
                 textInputAction: TextInputAction.go,
                 onSubmitted: (_) => _requestCode(),
-                decoration: InputDecoration(
-                  hintText: 'you@company.com',
-                  filled: true,
-                  fillColor: AppTheme.surfaceContainerLow,
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(13),
-                    borderSide: BorderSide(color: AppTheme.outlineVariant),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(13),
-                    borderSide: BorderSide(color: AppTheme.outlineVariant),
-                  ),
-                ),
+                style: pvManrope(fontSize: 15, color: _pal.ink1),
+                // Kept for revert (2026-09-29): an InputDecoration filled
+                // with the lilac `surfaceContainerLow`, radius 13, borders in
+                // `outlineVariant`.
+                decoration: _field('you@company.com'),
               ),
               const SizedBox(height: 10),
               Text(
@@ -258,11 +343,11 @@ class _ActivationFlowScreenState extends State<ActivationFlowScreen> {
                     'your company uses a different one for you. Either way we '
                     'check it once and never show it to them.',
                     'हमने आपका ParentVeda वाला ईमेल भर दिया है — अगर कंपनी आपके लिए कोई और ईमेल इस्तेमाल करती है तो उसे बदल लीजिए। दोनों ही हाल में हम इसे एक बार जाँचते हैं, उन्हें कभी दिखाते नहीं।'),
-                style: t.bodySmall
-                    ?.copyWith(color: AppTheme.neutral600, height: 1.45),
+                // Kept for revert (2026-09-29): t.bodySmall in neutral600.
+                style:
+                    pvManrope(fontSize: 12.5, height: 1.5, color: _pal.ink2),
               ),
             ],
-          ),
         ),
         if (_notice != null) ...[
           const SizedBox(height: 14),
@@ -283,11 +368,13 @@ class _ActivationFlowScreenState extends State<ActivationFlowScreen> {
   // ---- step 2 --------------------------------------------------------------
 
   Widget _codeStep() {
-    final t = Theme.of(context).textTheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        EnterpriseHeading(
+        _mark(TtcTabMark.wallet),
+        const SizedBox(height: 16),
+        // Kept for revert (2026-09-29): EnterpriseHeading(...).
+        _heading(
           _p('Check your work inbox.', 'अपना ऑफ़िस वाला इनबॉक्स देखिए।'),
           sub: _p(
               'We sent a six-digit code to ${_email.text.trim()}. It is good '
@@ -295,8 +382,9 @@ class _ActivationFlowScreenState extends State<ActivationFlowScreen> {
               'हमने ${_email.text.trim()} पर छह अंकों का कोड भेजा है। यह दस मिनट तक चलेगा।'),
         ),
         const SizedBox(height: 22),
-        EnterpriseCard(
-          child: TextField(
+        // The field alone, on white (kept for revert, 2026-09-29: inside an
+        // EnterpriseCard with no border of its own).
+        TextField(
             controller: _code,
             // TEXT, NOT NUMBER, and this cost a demo before it was noticed.
             //
@@ -319,16 +407,20 @@ class _ActivationFlowScreenState extends State<ActivationFlowScreen> {
             // silently eats what someone typed is the worst kind of refusal —
             // one with no message.
             inputFormatters: [LengthLimitingTextInputFormatter(24)],
-            style: t.headlineSmall
-                ?.copyWith(letterSpacing: 6, fontWeight: FontWeight.w800),
+            // Kept for revert (2026-09-29): t.headlineSmall, letterSpacing 6,
+            // w800; the hint in neutral400 with no border.
+            style: pvManrope(
+                fontSize: 24,
+                letterSpacing: 6,
+                fontWeight: FontWeight.w800,
+                color: _pal.ink1),
             onSubmitted: (_) => _confirm(),
-            decoration: InputDecoration(
-              hintText: '000000',
-              hintStyle: t.headlineSmall?.copyWith(
-                  letterSpacing: 6, color: AppTheme.neutral400),
-              border: InputBorder.none,
-            ),
-          ),
+            decoration: _field('000000',
+                hintStyle: pvManrope(
+                    fontSize: 24,
+                    letterSpacing: 6,
+                    fontWeight: FontWeight.w800,
+                    color: _pal.ink3)),
         ),
         if (_notice != null) ...[
           const SizedBox(height: 14),
@@ -349,7 +441,12 @@ class _ActivationFlowScreenState extends State<ActivationFlowScreen> {
                   ? _p('Send a new code', 'नया कोड भेजिए')
                   : _p('Did not get it? Send again',
                       'नहीं मिला? दोबारा भेजिए'),
-              style: t.bodyMedium?.copyWith(color: AppTheme.primary600),
+              // Ink, not violet (2026-09-29). Kept for revert:
+              //   t.bodyMedium?.copyWith(color: AppTheme.primary600)
+              style: pvManrope(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: AppTheme.neutral900),
             ),
           ),
         ),
@@ -362,7 +459,8 @@ class _ActivationFlowScreenState extends State<ActivationFlowScreen> {
                       _notice = null;
                     }),
             child: Text(_p('Use a different email', 'कोई दूसरा ईमेल इस्तेमाल कीजिए'),
-                style: t.bodySmall?.copyWith(color: AppTheme.neutral600)),
+                // Kept for revert (2026-09-29): t.bodySmall in neutral600.
+                style: pvManrope(fontSize: 13, color: _pal.ink2)),
           ),
         ),
       ],
@@ -379,19 +477,12 @@ class _ActivationFlowScreenState extends State<ActivationFlowScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          width: 56,
-          height: 56,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: AppTheme.primary100,
-            borderRadius: BorderRadius.circular(18),
-          ),
-          child: const Icon(Icons.check_rounded,
-              color: AppTheme.primary600, size: 30),
-        ),
-        const SizedBox(height: 18),
-        EnterpriseHeading(
+        // A ticked list: it is done. Kept for revert (2026-09-29): a 56pt
+        // `primary100` square with a violet `Icons.check_rounded`.
+        _mark(TtcTabMark.checklist),
+        const SizedBox(height: 16),
+        // Kept for revert (2026-09-29): EnterpriseHeading(...).
+        _heading(
           _p("You're all set.", 'सब हो गया।'),
           sub: _p('ParentVeda Premium, provided by $name.',
               'ParentVeda Premium, $name की तरफ़ से।'),
@@ -413,7 +504,7 @@ class _ActivationFlowScreenState extends State<ActivationFlowScreen> {
 
   Widget _privacyPromise({bool compact = false, String? company}) {
     final name = company ?? _p('your employer', 'आपकी कंपनी');
-    final t = Theme.of(context).textTheme;
+    final p = _pal;
     final lines = [
       _p('Your pregnancy and your child', 'आपकी गर्भावस्था और आपका शिशु'),
       _p('Your journal and your photos', 'आपका जर्नल और आपकी तस्वीरें'),
@@ -422,23 +513,32 @@ class _ActivationFlowScreenState extends State<ActivationFlowScreen> {
       _p('Your appointments and reports', 'आपके अपॉइंटमेंट और रिपोर्ट'),
     ];
 
-    return EnterpriseCard(
-      color: AppTheme.surfaceContainerLow,
+    // ⚠️ A HEADING AND ROWS ON WHITE UNDER A HAIRLINE, NOT A SLAB
+    // (2026-09-29), as Employer benefits' privacy note is. Kept for revert:
+    //   EnterpriseCard(color: AppTheme.surfaceContainerLow, child: ...) with
+    //   a violet `Icons.lock_outline_rounded` beside a titleSmall w800
+    //   heading, the rows in bodySmall, the closing line in neutral600.
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.only(top: 18),
+      decoration: const BoxDecoration(
+        border: Border(top: BorderSide(color: _kLine)),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(children: [
-            const Icon(Icons.lock_outline_rounded,
-                size: 18, color: AppTheme.primary600),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                _p('What your employer never sees',
-                    'आपकी कंपनी को क्या कभी नहीं दिखता'),
-                style: t.titleSmall?.copyWith(fontWeight: FontWeight.w800),
-              ),
+          Semantics(
+            header: true,
+            child: Text(
+              _p('What your employer never sees',
+                  'आपकी कंपनी को क्या कभी नहीं दिखता'),
+              style: pvFraunces(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                  height: 1.25,
+                  color: p.ink1),
             ),
-          ]),
+          ),
           const SizedBox(height: 12),
           for (final line in lines)
             Padding(
@@ -446,15 +546,17 @@ class _ActivationFlowScreenState extends State<ActivationFlowScreen> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Padding(
-                    padding: EdgeInsets.only(top: 2),
-                    child: Icon(Icons.close_rounded,
-                        size: 15, color: AppTheme.neutral400),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2),
+                    // Ink 2, not neutral400 (2.6:1 on white). Kept for
+                    // revert: color: AppTheme.neutral400.
+                    child: Icon(Icons.close_rounded, size: 15, color: p.ink2),
                   ),
                   const SizedBox(width: 9),
                   Expanded(
                       child: Text(line,
-                          style: t.bodySmall?.copyWith(height: 1.45))),
+                          style: pvManrope(
+                              fontSize: 13.5, height: 1.45, color: p.ink1))),
                 ],
               ),
             ),
@@ -469,8 +571,7 @@ class _ActivationFlowScreenState extends State<ActivationFlowScreen> {
                         'and how many consultations were used across everyone. '
                         'Never who, never what.',
                     '$name को सिर्फ़ इतना दिखता है कि कितने लोगों ने यह सुविधा चालू की और सब मिलाकर कितने कंसल्टेशन इस्तेमाल हुए। कौन, यह कभी नहीं — क्या, यह भी कभी नहीं।'),
-            style: t.bodySmall
-                ?.copyWith(color: AppTheme.neutral600, height: 1.45),
+            style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2),
           ),
         ],
       ),

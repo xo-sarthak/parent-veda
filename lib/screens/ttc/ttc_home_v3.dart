@@ -42,13 +42,16 @@
 //  its own sentence, not a hole.
 // =============================================================================
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import '../../data/reads/read_images.dart' show readImageFor;
 import '../brackets/hub/journey_screen.dart';
 import '../../data/journeys/journey_registry.dart';
-import 'ttc_journal_screen.dart' show writeTtcEntry;
-import '../../ttc/ttc_journal_store.dart' show TtcEntryKind;
+// Kept for revert (2026-09-28, journal out of TTC):
+// import 'ttc_journal_screen.dart' show writeTtcEntry;
+// import '../../ttc/ttc_journal_store.dart' show TtcEntryKind;
 import 'ttc_prepare_screen.dart';
 import '../../data/hubs/ttc_hubs.dart';
 import '../brackets/hub/hub_owed_screen.dart';
@@ -57,6 +60,7 @@ import '../../data/hubs/hub_registry.dart';
 
 import '../../localization/app_language.dart';
 import '../../services/bracket_resolver.dart';
+import '../../services/profile_photo_store.dart';
 import '../../services/life_stage_store.dart';
 import '../../services/ttc_surfaces.dart';
 import '../../theme/pv_fonts.dart';
@@ -93,6 +97,8 @@ import '../../ttc/ttc_treatment_store.dart';
 // ---- the treatment round (2026-09-26, docs/TTC-TREATMENT-FLOW.md B4) --------
 import '../../ttc/ttc_treatment_round.dart' show TtcRoundPhaseX;
 import 'ttc_round_home_card.dart';
+import 'ttc_tool_chrome.dart' show ttcChapterFieldHue;
+import 'ttc_visit_today_card.dart';
 import 'ttc_round_strings.dart';
 import 'ttc_treatment_round_screens.dart' show openTtcTreatmentResult;
 // ---- the gap analysis's home work (2026-09-26) ------------------------------
@@ -124,6 +130,7 @@ import '../../data/brackets/ttc_brackets.dart' show kTtcBrackets;
 import '../../models/bracket.dart' show Bracket;
 import '../../models/pv_read.dart' show PvRead;
 import 'ttc_shop_v3.dart' show openTtcProductPage;
+import '../../data/products/pv_catalog_adapters.dart' show pvIdForTtc;
 import 'ttc_products_screen.dart';
 import 'ttc_profile_screen.dart';
 import 'ttc_ritual_screen.dart';
@@ -149,16 +156,21 @@ import 'ttc_transition_screen.dart';
 /// four different places, not a progress ramp from cold to warm. A palette that
 /// got visibly "better" toward one chapter would be scoring her cycle, which is
 /// the pressure this entire stage is built to remove.
-double _chapterHue(TtcChapter c) => switch (c) {
-      TtcChapter.preparingTogether => 344,
-      TtcChapter.knowingYourRhythm => 160,
-      TtcChapter.tryingTogether => 42,
-      TtcChapter.theWaitingDays => 268,
-      // The fifth chapter, and the only one that is an ENDING rather than a
-      // place in the loop: she is pregnant, and this stage is handing her over.
-      // Green, the same hue pregnancy's own arrival wears.
-      TtcChapter.aNewBeginning => 104,
-    };
+///
+/// ⚠️ ONE TABLE (2026-09-29): the chapter hero cards now wear the same field,
+/// so the numbers moved to `ttcChapterFieldHue` (ttc_tool_chrome.dart) and
+/// this reads it. Kept for revert (2026-09-29):
+/// double _chapterHue(TtcChapter c) => switch (c) {
+///       TtcChapter.preparingTogether => 344,
+///       TtcChapter.knowingYourRhythm => 160,
+///       TtcChapter.tryingTogether => 42,
+///       TtcChapter.theWaitingDays => 268,
+///       // The fifth chapter, and the only one that is an ENDING rather than a
+///       // place in the loop: she is pregnant, and this stage is handing her over.
+///       // Green, the same hue pregnancy's own arrival wears.
+///       TtcChapter.aNewBeginning => 104,
+///     };
+double _chapterHue(TtcChapter c) => ttcChapterFieldHue(c);
 
 int _chapterNumber(TtcChapter c) => TtcChapter.values.indexOf(c) + 1;
 
@@ -435,6 +447,14 @@ class _TtcHomeV3State extends State<TtcHomeV3>
                     const SizedBox(height: 24),
                   ],
 
+                  // ---- A VISIT TODAY (2026-09-28) ----------------------------
+                  //
+                  // "Follicle scan today at 10:30am · 2 questions to ask",
+                  // opening the visit. Only on the day of a visit; draws
+                  // nothing (and keeps its own spacing) on every other day.
+                  // See ttc_visit_today_card.dart.
+                  _pad(const TtcVisitTodayCard()),
+
                   // ---- THE DAILY INSIGHTS ----------------------------------
                   //
                   // ⚠️ THE TITLE IS THE SELECTED DATE, NOT THE WORD "TODAY".
@@ -499,9 +519,12 @@ class _TtcHomeV3State extends State<TtcHomeV3>
                   // was a label explaining a label — the title already says
                   // what the grid is for, and the eyebrow only earned its place
                   // when this section was buried in the middle of the page.
+                  // Named for what the grid holds (change 5, 2026-09-28):
+                  // "Start anywhere" did not say what she would start. Hindi
+                  // unchanged. Kept for revert: 'Start anywhere'.
                   _pad(_Head(
                       eyebrow: '',
-                      title: hinglish ? 'Kahin se bhi shuru karein' : 'Start anywhere',
+                      title: hinglish ? 'Kahin se bhi shuru karein' : 'Explore by topic',
                       p: p)),
                   const SizedBox(height: 14),
                   // ⚠️ ORDERED BY HER SITUATION, NEVER FILTERED (2026-09-26,
@@ -736,8 +759,17 @@ class _TtcHomeV3State extends State<TtcHomeV3>
                   ListenableBuilder(
                     listenable: PvCatalogStore.instance,
                     builder: (context, _) {
-                      final picks = PvCatalogStore.instance
-                          .forYou(LifeStage.tryingToConceive);
+                      // Without the day's pick, which the insight rail
+                      // above already shows (2026-09-30). Kept for revert:
+                      //   final picks = PvCatalogStore.instance
+                      //       .forYou(LifeStage.tryingToConceive);
+                      final pickId =
+                          pvIdForTtc(ttcHomeTodaysPick(_selected).id);
+                      final picks = [
+                        for (final x in PvCatalogStore.instance
+                            .forYou(LifeStage.tryingToConceive))
+                          if (x.id != pickId) x,
+                      ];
                       return picks.isEmpty
                           ? _ProductRail(p: p, hinglish: hinglish)
                           : PvCardRail(products: picks, scope: 'ttc_home');
@@ -761,7 +793,9 @@ class _TtcHomeV3State extends State<TtcHomeV3>
                   //       ? 'Aaj ke liye reads'
                   //       : 'Recommended reads for today',
                   _pad(_Head(
-                      eyebrow: hinglish ? 'Padhne ke liye' : 'Read',
+                      // "Read" read as a verb over the title (change 5,
+                      // 2026-09-28). Kept for revert: 'Read'.
+                      eyebrow: hinglish ? 'Padhne ke liye' : 'Reads',
                       title: _selected == _today
                           ? (hinglish
                               ? 'Aaj ke liye reads'
@@ -885,35 +919,39 @@ class _TtcHomeV3State extends State<TtcHomeV3>
                   //           onTap: () => _openSurface(context, 'ttc_partner')),
                   //     ],
                   //   )),
-                  _pad(_Head(
-                      // One name with the page it opens (launch sanity H18,
-                      // 2026-09-28): the journal is shared with him and its
-                      // page and the Tools tile say "Our journal". Kept for
-                      // revert: hinglish ? 'Aapki journal' : 'Your journal'.
-                      eyebrow: TtcS.current().journalTitle,
-                      title: hinglish
-                          ? 'Aaj ka kuch rakh lein'
-                          : 'Keep something from today',
-                      action: 'See all',
-                      onAction: () => _openSurface(context, 'ttc_journal'),
-                      p: p)),
-                  const SizedBox(height: 14),
-                  // ⚠️ THE JOURNAL, AS THE PREGNANCY HOME DRAWS IT (the user,
-                  // 2026-09-27: "looks very vague… improve the
-                  // representation"). A pen in a well, a paragraph and four
-                  // grey chips read as a form. Now three drawn tiles, one per
-                  // kind of writing, each opening that writer; the way to
-                  // everything written is "See all" in the heading, not a row
-                  // of its own. Kept for revert: the `_JournalInvite` call below.
-                  _pad(_TtcJournalTiles(
-                    p: p,
-                    onNoticed: () =>
-                        writeTtcEntry(context, kind: TtcEntryKind.memory),
-                    onFelt: () =>
-                        writeTtcEntry(context, kind: TtcEntryKind.feeling),
-                    onDoctor: () =>
-                        writeTtcEntry(context, kind: TtcEntryKind.question),
-                  )),
+                  // Kept for revert (2026-09-28, journal out of TTC): the user took the
+                  // journal out of the stage, so the home no longer has a journal section
+                  // (its heading, its "See all" and its three writing tiles). The screen
+                  // and the store stay; this block and the spacer below come back together.
+                  // _pad(_Head(
+                  //     // One name with the page it opens (launch sanity H18,
+                  //     // 2026-09-28): the journal is shared with him and its
+                  //     // page and the Tools tile say "Our journal". Kept for
+                  //     // revert: hinglish ? 'Aapki journal' : 'Your journal'.
+                  //     eyebrow: TtcS.current().journalTitle,
+                  //     title: hinglish
+                  //         ? 'Aaj ka kuch rakh lein'
+                  //         : 'Keep something from today',
+                  //     action: 'See all',
+                  //     onAction: () => _openSurface(context, 'ttc_journal'),
+                  //     p: p)),
+                  // const SizedBox(height: 14),
+                  // // ⚠️ THE JOURNAL, AS THE PREGNANCY HOME DRAWS IT (the user,
+                  // // 2026-09-27: "looks very vague… improve the
+                  // // representation"). A pen in a well, a paragraph and four
+                  // // grey chips read as a form. Now three drawn tiles, one per
+                  // // kind of writing, each opening that writer; the way to
+                  // // everything written is "See all" in the heading, not a row
+                  // // of its own. Kept for revert: the `_JournalInvite` call below.
+                  // _pad(_TtcJournalTiles(
+                  //   p: p,
+                  //   onNoticed: () =>
+                  //       writeTtcEntry(context, kind: TtcEntryKind.memory),
+                  //   onFelt: () =>
+                  //       writeTtcEntry(context, kind: TtcEntryKind.feeling),
+                  //   onDoctor: () =>
+                  //       writeTtcEntry(context, kind: TtcEntryKind.question),
+                  // )),
                   // _pad(_JournalInvite(
                     // p: p,
                     // hinglish: hinglish,
@@ -937,7 +975,8 @@ class _TtcHomeV3State extends State<TtcHomeV3>
                         // writeTtcEntry(context, kind: TtcEntryKind.question),
                     // onOpenAll: () => _openSurface(context, 'ttc_journal'),
                   // )),
-                  const SizedBox(height: 32),
+                  // Kept for revert (2026-09-28, journal out of TTC):
+                  //   const SizedBox(height: 32),
 
                   // ---- PEOPLE ----------------------------------------------
                   //
@@ -975,7 +1014,9 @@ class _TtcHomeV3State extends State<TtcHomeV3>
                   _pad(_Head(
                       eyebrow: hinglish ? 'Log' : 'People',
                       title: hinglish ? 'Expert se baat karein' : 'Talk to experts',
-                      action: 'See all',
+                      // Names what it lists (change 5, 2026-09-28). Kept for
+                      // revert: 'See all'.
+                      action: 'See all consults',
                       onAction: () => Navigator.of(context).push(
                           MaterialPageRoute<void>(
                               settings:
@@ -1424,11 +1465,16 @@ class _CycleHeader extends StatelessWidget {
               width: 88,
               child: Align(
                 alignment: Alignment.centerLeft,
-                child: _RoundButton(
-                    icon: Icons.person_outline_rounded,
-                    p: p,
-                    onTap: onProfile,
-                    semantic: t.profileTitle),
+                // Her photo when she has one (2026-09-30).
+                child: ListenableBuilder(
+                  listenable: ProfilePhotoStore.instance..load(),
+                  builder: (context, _) => _RoundButton(
+                      icon: Icons.person_outline_rounded,
+                      p: p,
+                      onTap: onProfile,
+                      semantic: t.profileTitle,
+                      photoPath: ProfilePhotoStore.instance.path),
+                ),
               ),
             ),
             // ⚠️ THE SELECTED DAY, NOT `now`. It read `DateTime.now()`, which
@@ -1606,7 +1652,8 @@ class _CycleHeader extends StatelessWidget {
                 _HeroQuickAction(
                   key: const ValueKey('ttc_home_quick_sex'),
                   label: kTtcQuickSex,
-                  semantic: sexOn ? 'Sex logged. Tap to take it off' : 'Log sex',
+                  // Change 5 (2026-09-28). Kept for revert: 'Sex logged. Tap to take it off'.
+                  semantic: sexOn ? 'Sex logged. Tap to remove the log' : 'Log sex',
                   icon: sexOn
                       ? Icons.favorite_rounded
                       : Icons.favorite_border_rounded,
@@ -1838,9 +1885,9 @@ class _HeroQuickAction extends StatelessWidget {
           height: 48,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: lit ? p.ink1 : p.surface,
+            color: lit ? ttcTitleInk : p.surface,
             shape: BoxShape.circle,
-            border: Border.all(color: lit ? p.ink1 : p.line),
+            border: Border.all(color: lit ? ttcTitleInk : p.line),
           ),
           child: Icon(icon, size: 20, color: lit ? Colors.white : p.ink1),
         ),
@@ -2955,12 +3002,17 @@ class _RoundButton extends StatelessWidget {
       {required this.icon,
       required this.p,
       required this.onTap,
-      required this.semantic});
+      required this.semantic,
+      this.photoPath});
 
   final IconData icon;
   final V2Palette p;
   final VoidCallback onTap;
   final String semantic;
+
+  /// Her photo in the disc instead of the icon (the profile button,
+  /// 2026-09-30), or null.
+  final String? photoPath;
 
   @override
   Widget build(BuildContext context) => Semantics(
@@ -2978,12 +3030,22 @@ class _RoundButton extends StatelessWidget {
                 width: 38,
                 height: 38,
                 alignment: Alignment.center,
+                clipBehavior: Clip.antiAlias,
                 decoration: BoxDecoration(
                   color: p.surface.withValues(alpha: 0.85),
                   shape: BoxShape.circle,
                   border: Border.all(color: p.line),
                 ),
-                child: Icon(icon, size: 18, color: p.ink2),
+                child: photoPath == null
+                    ? Icon(icon, size: 18, color: p.ink2)
+                    : Image.file(
+                        File(photoPath!),
+                        width: 38,
+                        height: 38,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, _, _) =>
+                            Icon(icon, size: 18, color: p.ink2),
+                      ),
               ),
             ),
           ),
@@ -3305,13 +3367,10 @@ class _Head extends StatelessWidget {
         ],
         Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
           Expanded(
-            child: Text(title,
-                style: pvFraunces(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w600,
-                    height: 1.2,
-                    letterSpacing: -0.5,
-                    color: p.ink1)),
+            // Kept for revert (2026-09-29, one heading style): the same Text
+            // with style: pvFraunces(fontSize: 22, fontWeight: FontWeight.w600,
+            //     height: 1.2, letterSpacing: -0.5, color: p.ink1)
+            child: TtcSectionHeading(title, color: p.ink1),
           ),
           if (action != null && onAction != null)
             Semantics(
@@ -3329,9 +3388,9 @@ class _Head extends StatelessWidget {
                         style: pvManrope(
                             fontSize: 13.5,
                             fontWeight: FontWeight.w700,
-                            color: p.action)),
+                            color: ttcTitleInk)),
                     Icon(Icons.chevron_right_rounded,
-                        size: 18, color: p.action),
+                        size: 18, color: ttcTitleInk),
                   ]),
                 ),
               ),
@@ -3368,13 +3427,10 @@ class _SectionIntro extends StatelessWidget {
   @override
   Widget build(BuildContext context) =>
       Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(title,
-            style: pvFraunces(
-                fontSize: 22,
-                fontWeight: FontWeight.w600,
-                height: 1.2,
-                letterSpacing: -0.5,
-                color: p.ink1)),
+        // Kept for revert (2026-09-29, one heading style): the same Text with
+        // style: pvFraunces(fontSize: 22, fontWeight: FontWeight.w600,
+        //     height: 1.2, letterSpacing: -0.5, color: p.ink1)
+        TtcSectionHeading(title, color: p.ink1),
         const SizedBox(height: 4),
         Text(subtitle,
             style: pvManrope(
@@ -3652,28 +3708,57 @@ class _InsightRail extends StatelessWidget {
     // Today names. Kept for revert:
     //   final m = ttcPickForToday(ttcMovements, now: selected, offset: 2);
     final m = ttcTodaysMoveTip(on: selected);
-    final product = ttcPickForToday(ttcProducts, now: selected, offset: 4);
+    // ⚠️ NEVER A PRODUCT THE RAIL BELOW ALREADY SHOWS (2026-09-28, the user:
+    // "no random repetition"). Today's pick rotates through the guide by
+    // date, and on some days it landed on Folic acid while the Recommended
+    // products rail two sections down showed the same pack, so one product
+    // sat behind two cards on one screen. The pick now rotates only through
+    // what the rail leaves out (test/ttc_no_repetition_test.dart). Kept for
+    // revert:
+    //   final product = ttcPickForToday(ttcProducts, now: selected, offset: 4);
+    // ⚠️ ONLY WHAT WE RECOMMEND (2026-09-30, the user: "only show the products
+    // that are ParentVeda recommended… you cannot shuffle between the products
+    // that are not worthy"). See `ttcHomeTodaysPick`. The "ParentVeda
+    // recommends" rail below holds every recommended product, so the order
+    // flipped: the pick is chosen first and the rail leaves it out that day,
+    // which keeps one product behind one card. Kept for revert (2026-09-28):
+    //   final onRail = ttcHomeProductRailIds();
+    //   final pickable = [for (final x in ttcProducts)
+    //       if (!onRail.contains(pvIdForTtc(x.id))) x];
+    //   final product = ttcPickForToday(
+    //       pickable.isEmpty ? ttcProducts : pickable, now: selected, offset: 4);
+    final product = ttcHomeTodaysPick(selected);
 
     // ⚠️ A RUNNING ROUND LEADS THE RAIL (2026-09-26, §3e): its step, and
     // its blood test named by DATE where "Should I test?" would sit. The
     // natural "Should I test?" card never shows on a clinic cycle anyway
     // (its phases are the waiting and late days).
-    final roundStep = ttcHomeRoundPhaseOn(selected);
+    // final roundStep = ttcHomeRoundPhaseOn(selected);
     final roundKind = TtcTreatmentStore.instance.cycle.kind;
     final bloodTest = ttcHomeBloodTestOn(selected);
 
+    // ⚠️ THE ROUND IS SAID ONCE (2026-09-28, the user: "no random
+    // repetition"). While a round runs the hero already leads with its step
+    // ("IVF · Stimulation") and opens the round, so the "Your round" card here
+    // said it again, a second way to one screen. And on an IVF-shaped round
+    // the blood-test pill under the hero names the test by its date and opens
+    // the round, so the blood-test card is left for the rounds that have no
+    // pill (`ttcHomeHidesQuickRow`). test/ttc_no_repetition_test.dart holds
+    // it. Kept for revert: the round-step card, and the blood-test card on
+    // every round.
     final cards = <TtcInsightCard>[
-      if (roundStep != null && roundStep.isRunning)
-        TtcInsightCard(
-          id: 'round_step',
-          eyebrow: ttcRoundKindShort(roundKind).toUpperCase(),
-          value: ttcRoundPhaseName(roundStep, roundKind),
-          caption: 'Your round',
-          hue: 206,
-          art: TtcInsightArt.note,
-          go: TtcInsightGo.treatment,
-        ),
-      if (bloodTest != null)
+      // if (roundStep != null && roundStep.isRunning)
+      //   TtcInsightCard(
+      //     id: 'round_step',
+      //     eyebrow: ttcRoundKindShort(roundKind).toUpperCase(),
+      //     value: ttcRoundPhaseName(roundStep, roundKind),
+      //     caption: 'Your round',
+      //     hue: 206,
+      //     art: TtcInsightArt.note,
+      //     go: TtcInsightGo.treatment,
+      //   ),
+      // if (bloodTest != null)
+      if (bloodTest != null && !ttcHomeHidesQuickRow(selected))
         TtcInsightCard(
           id: 'blood_test',
           eyebrow: ttcStepLabel(TtcTreatmentStep.betaTest, roundKind)
@@ -3959,6 +4044,8 @@ class _InsightTile extends StatelessWidget {
         caption: card.caption,
         hue: card.hue,
         art: card.art,
+        // Every card one clean colour, no mark under the words (2026-09-30).
+        showArt: false,
         p: p,
         onTap: onTap,
       );
@@ -4258,7 +4345,8 @@ class _DailyRail extends StatelessWidget {
                   width: double.infinity,
                   padding: const EdgeInsets.all(15),
                   decoration: BoxDecoration(
-                    color: ttcPanel,
+                    // Kept for revert (2026-09-29, no tinted slab behind text): color: ttcPanel,
+                    color: Colors.white, border: const Border.fromBorderSide(BorderSide(color: ttcLine)),
                     borderRadius: BorderRadius.circular(ttcCardRadius),
                   ),
                   child: Text(myth.truth(hi),
@@ -4283,7 +4371,8 @@ class _DailyRail extends StatelessWidget {
                   width: double.infinity,
                   padding: const EdgeInsets.all(15),
                   decoration: BoxDecoration(
-                    color: ttcCautionCard,
+                    // Kept for revert (2026-09-29, no tinted slab behind text): color: ttcCautionCard,
+                    color: Colors.white, border: const Border.fromBorderSide(BorderSide(color: ttcLine)),
                     borderRadius: BorderRadius.circular(ttcCardRadius),
                   ),
                   child: Text(n.indian(hi),
@@ -4423,6 +4512,34 @@ class _Story extends StatelessWidget {
 /// acid. That is all most people need.") is a shopping instruction, makes no
 /// claim about outcome, and is what the catalogue was written to put beside
 /// a price. The category rides in the chip.
+/// The products the home's Recommended products rail shows today, by their
+/// unified id (`ttc_folic`): the store's own "for you" cards, or the guide's
+/// four when the catalogue is empty (`_ProductRail`). Today's pick on the
+/// insight rail leaves these out, so one product is never behind two cards on
+/// the home (2026-09-28).
+/// Today's pick for [day]: a product ParentVeda recommends (the Highly
+/// recommended and Recommended bands), never "Only in some cases" or
+/// "Generally not needed", rotating by date (2026-09-30).
+TtcProduct ttcHomeTodaysPick(DateTime day) {
+  final recommended = [
+    for (final x in ttcProducts)
+      if (x.band == TtcRecoBand.strong || x.band == TtcRecoBand.buy) x,
+  ];
+  return ttcPickForToday(
+      recommended.isEmpty ? ttcProducts : recommended,
+      now: day,
+      offset: 4);
+}
+
+Set<String> ttcHomeProductRailIds() {
+  final forYou = PvCatalogStore.instance.forYou(LifeStage.tryingToConceive);
+  if (forYou.isNotEmpty) return {for (final x in forYou) x.id};
+  return {
+    for (var i = 0; i < 4; i++)
+      pvIdForTtc(ttcPickForToday(ttcProducts, offset: 4 + i).id),
+  };
+}
+
 class _ProductRail extends StatelessWidget {
   const _ProductRail({required this.p, required this.hinglish});
 
@@ -4641,8 +4758,16 @@ class _ReadRail extends StatelessWidget {
     // kept for revert, and as the fallback if the phase lists ever come back
     // empty, so the rail is never a blank strip:
     //   kTtcReads[(_dayOfYear() + i) % kTtcReads.length]
+    // ⚠️ AND NEVER A READ A RAIL CARD ALREADY OPENS (2026-09-28, the user:
+    // "no random repetition"). "Day of your cycle" opens How conception works
+    // and "Your cycle" opens the normal-cycle read; listed again here, one
+    // read sat behind two tiles on one screen. Kept for revert:
+    //   for (final id in ttcHomeReadIdsFor(day, phase: phase)) ?ttcReadById(id),
+    final onRail = ttcRailReadIds(day);
     final byPhase = [
-      for (final id in ttcHomeReadIdsFor(day, phase: phase)) ?ttcReadById(id),
+      for (final id in ttcHomeReadIdsFor(day,
+          phase: phase, count: 4 + onRail.length))
+        if (!onRail.contains(id)) ?ttcReadById(id),
     ];
     final picks = byPhase.isNotEmpty
         ? byPhase
@@ -6389,7 +6514,7 @@ class _ExpertRail extends StatelessWidget {
                               WidgetSpan(
                                 alignment: PlaceholderAlignment.middle,
                                 child: Icon(Icons.verified_rounded,
-                                    size: 14, color: p.action),
+                                    size: 14, color: ttcTitleInk),
                               ),
                           ]),
                           key: ValueKey('ttc_expert_rail_name_$id'),
@@ -6473,6 +6598,8 @@ class _SeeAllRow extends StatelessWidget {
 /// kind of writing, in the pregnancy home's shape (`V3JournalSection`'s tile
 /// look), and one honest line on who reads it. The way to everything written
 /// is the section heading's "See all", not a full-width row.
+// Unreached since 2026-09-28 (journal out of TTC); kept for revert.
+// ignore: unused_element
 class _TtcJournalTiles extends StatelessWidget {
   const _TtcJournalTiles({
     required this.p,

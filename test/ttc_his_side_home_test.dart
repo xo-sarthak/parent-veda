@@ -17,7 +17,8 @@ import 'package:parentveda/screens/ttc/ttc_partner_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_tools_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_strings.dart';
 import 'package:parentveda/ttc/cycle_store.dart';
-import 'package:parentveda/ttc/ttc_journal_store.dart';
+// Kept for revert (2026-09-28, the user: no journal in trying to conceive).
+// import 'package:parentveda/ttc/ttc_journal_store.dart';
 import 'package:parentveda/ttc/ttc_ritual_store.dart';
 import 'package:parentveda/ttc/ttc_store.dart';
 
@@ -37,7 +38,7 @@ void main() {
   setUp(() {
     CycleStore.instance.resetForTest();
     TtcStore.instance.resetForTest();
-    TtcJournalStore.instance.resetForTest();
+    // Kept for revert (2026-09-28): TtcJournalStore.instance.resetForTest();
     TtcRitualStore.instance.resetForTest();
     TtcPartnerMode.instance.on = true;
   });
@@ -57,7 +58,15 @@ void main() {
     expect(find.text('FOR YOU TODAY'), findsOneWidget);
     expect(find.byKey(const ValueKey('ttc_partner_his_door')), findsOneWidget);
     // Her private quick actions and her door grid are not on his home.
-    for (final hers in ['Symptoms', 'Sex', 'Start anywhere', 'Fertile window']) {
+    // 'Explore by topic' is the doors' heading since 2026-09-28 (was 'Start
+    // anywhere'); both stay on the list.
+    for (final hers in [
+      'Symptoms',
+      'Sex',
+      'Start anywhere',
+      'Explore by topic',
+      'Fertile window',
+    ]) {
       expect(find.text(hers), findsNothing, reason: hers);
     }
   });
@@ -71,6 +80,13 @@ void main() {
     for (final hers in ['cycle', 'symptoms', 'weight', 'pcos_check', 'mood']) {
       expect(his, isNot(contains(hers)), reason: hers);
     }
+    // 2026-09-28 (Tools holds only tools): his experts, courses and journey
+    // map are on More, like hers; the couple's treatment cycle is his Tools
+    // row, as it was his More row.
+    for (final moved in ['expert', 'courses', 'map']) {
+      expect(his, isNot(contains(moved)), reason: moved);
+    }
+    expect(his, contains('treatment'));
     for (final id in kTtcHisToolsStartIds) {
       expect(kTtcHisToolIds, contains(id));
     }

@@ -18,7 +18,8 @@ import 'package:parentveda/screens/ttc/ttc_tests_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_tools_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_tracker_screen.dart';
 import 'package:parentveda/ttc/cycle_store.dart';
-import 'package:parentveda/ttc/ttc_journal_store.dart' show TtcAuthor;
+// Moved (2026-09-28, journal out of TTC): was ttc_journal_store.dart.
+import 'package:parentveda/ttc/ttc_author.dart';
 import 'package:parentveda/ttc/ttc_log_store.dart';
 import 'package:parentveda/ttc/ttc_reads_data.dart';
 import 'package:parentveda/ttc/ttc_store.dart';
@@ -82,9 +83,16 @@ void main() {
 
       for (final capability in [
         'cycle', 'ovulation', 'fertility', 'symptom', 'weight', 'sleep',
-        'partner', 'mood', 'stress', 'lifestyle', 'journal',
+        // 2026-09-28 (journal out of TTC): the user took the journal out of
+        // the stage, so it is no longer a capability of the hub. Kept for
+        // revert: 'journal', after 'lifestyle'.
+        'partner', 'mood', 'stress', 'lifestyle',
         'supplement', 'medication', 'test', 'report', 'record', 'appointment',
-        'movement', 'nutrition', 'journey', 'can i',
+        // 2026-09-28 (Tools holds only tools): the journey map left the hub
+        // for More's "Your journey" tile, so 'journey' is not a capability
+        // of Tools any more; the treatment cycle came in. Kept for revert:
+        //   'movement', 'nutrition', 'journey', 'can i',
+        'movement', 'nutrition', 'can i', 'treatment', 'ivf',
         // 2026-09-27: the product guide is named "Products" now. Kept for
         // revert: 'worth knowing',
         // 2026-09-28 (launch sanity T1): the Products row left the hub; it
@@ -97,7 +105,13 @@ void main() {
         // 2026-09-28 (T1/T2/D18): BMI is found on the Weight row, and the
         // specialist check goes by its one name. Kept for revert:
         // 'pcos', 'weight and fertility', 'specialist', 'vaccination',
-        'pcos', 'bmi', 'fertility help', 'specialist', 'vaccination',
+        // 2026-09-28 (Tools holds only tools): "specialist" was found in the
+        // expert row's line, which left for More; the specialist check is
+        // found by its name, "fertility help", and a search for "specialist"
+        // on Tools now says where the expert row went (ttcMovedNote). Kept
+        // for revert:
+        //   'pcos', 'bmi', 'fertility help', 'specialist', 'vaccination',
+        'pcos', 'bmi', 'fertility help', 'vaccination',
         'checklist',
       ]) {
         expect(names, contains(capability),
@@ -135,7 +149,12 @@ void main() {
       // ⚠️ 24 -> 22 ON 2026-09-28 (launch sanity T1): "Weight and fertility"
       // folded into Weight (the BMI page opens from the Weight page) and
       // "Products" left the hub (it opened a tab). Kept for revert: 24.
-      expect(TtcToolsScreen.toolCount, 22);
+      // ⚠️ 22 -> 21 ON 2026-09-28: the journal left the stage (the user's
+      // call). Kept for revert: 22.
+      // ⚠️ 21 -> 19 ON 2026-09-28 (the user: Tools holds only tools). Talk to
+      // an expert, Courses and the Journey map left for More; the treatment
+      // cycle came in from More. Kept for revert: 21.
+      expect(TtcToolsScreen.toolCount, 19);
     });
 
     test('supplements and medication are not the same destination', () {
@@ -171,6 +190,11 @@ void main() {
       for (final g in ttcToolGroups) {
         for (final t in g.tools) {
           expect(find.text(t.name(false)), findsWidgets, reason: t.id);
+          // 2026-09-29: each row leads with its drawn mark, the doors' family
+          // (test/ttc_tool_marks_test.dart holds the rest). Before, a Material
+          // glyph in a square well led the row.
+          expect(find.byKey(ValueKey('ttc_tool_mark_${t.id}')), findsOneWidget,
+              reason: t.id);
         }
       }
     });

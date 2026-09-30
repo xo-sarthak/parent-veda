@@ -31,7 +31,8 @@ import '../../services/pv_order_store.dart';
 import '../../services/saved_store.dart';
 import '../../services/stage_gateway.dart';
 import '../../ttc/ttc_content_prefs.dart' show TtcContentPrefs;
-import '../../ttc/ttc_journal_store.dart' show TtcJournalStore;
+// Kept for revert (2026-09-28, journal out of TTC):
+// import '../../ttc/ttc_journal_store.dart' show TtcJournalStore;
 import '../../ttc/ttc_messages_store.dart' show TtcMessagesStore;
 import '../../ttc/ttc_records_store.dart';
 import '../../ttc/ttc_treatment_store.dart';
@@ -50,16 +51,20 @@ import '../../services/pregnancy_ended_store.dart';
 import '../products/pv_orders_screen.dart';
 import '../saved_screen.dart';
 import '../skilling/sk_child_store.dart';
+import '../ttc/doors/ttc_tab_art.dart' show TtcTabMark;
+import '../ttc/ttc_more_marks.dart';
 import '../ttc/ttc_content_prefs_sheet.dart'
     show showTtcContentPrefsSheet, kTtcWhatYouSee, kTtcHideIntimate;
 import '../ttc/ttc_get_help_screen.dart'
     show kTtcGetHelpTitle, openTtcGetHelp;
-import '../ttc/ttc_journal_screen.dart';
+// Kept for revert (2026-09-28, journal out of TTC):
+// import '../ttc/ttc_journal_screen.dart';
 import '../ttc/ttc_prepare_screen.dart' show TtcPrepareScreen;
 // Records now opens through the Tools table (Y2), which calls openTtcRecords.
 // import '../ttc/ttc_records_screen.dart' show openTtcRecords;
 import '../ttc/ttc_surface_router.dart' show openTtcSurface;
-import '../ttc/ttc_tools_screen.dart' show TtcTool, ttcToolById;
+import '../ttc/ttc_tools_screen.dart'
+    show TtcTool, ttcToolById, ttcMovedToMoreById, kTtcMoreExpertsTitle;
 import '../ttc/ttc_transition_screen.dart' show recordPositiveTest;
 import 'pv_details_screen.dart';
 import 'pv_doctor_notes_screen.dart';
@@ -72,10 +77,22 @@ class PvYouDetail {
     required this.value,
     required this.edit,
     this.note,
+    this.art,
+    this.hideWhenEmpty = false,
   });
   final String label;
   final String Function() value;
   final void Function(BuildContext) edit;
+
+  /// ⚠️ ADDITIVE (2026-09-29, TTC's profile V3). True for a fact that is a
+  /// RECORD rather than an answer (her treatment dates, her test records):
+  /// the profile shows it once there is one, and leaves the `--` to the
+  /// tool that keeps it. False, every other detail, draws as before.
+  final bool hideWhenEmpty;
+
+  /// The drawn mark on TTC's profile (2026-09-29), for the section's tint.
+  /// Null elsewhere: the row keeps its line icon.
+  final Widget Function(Color tint)? art;
 
   /// A quiet line under the value ("your doctor's word comes first").
   final String? note;
@@ -92,7 +109,12 @@ class PvYouThing {
     this.dot,
     this.subtitleNow,
     this.listen,
+    this.art,
   });
+
+  /// The drawn mark on TTC's profile (2026-09-29), for the section's tint.
+  /// Null elsewhere: the row keeps its line [icon].
+  final Widget Function(Color tint)? art;
   final IconData icon;
   final String title;
   final String? subtitle;
@@ -128,6 +150,19 @@ PvYouThing _toolThing(String id) {
   );
 }
 
+/// A More row that LEFT Tools because it is not a tool (2026-09-28): its
+/// name, icon, line and destination read from `ttcMovedToMore`, so the row
+/// is word for word what the Tools row was.
+PvYouThing _movedThing(String id) {
+  final TtcTool tool = ttcMovedToMoreById(id)!;
+  return PvYouThing(
+    icon: tool.icon,
+    title: tool.nameEn,
+    subtitle: tool.descEn,
+    open: tool.open,
+  );
+}
+
 /// The one forward action of a stage.
 class PvYouAction {
   const PvYouAction({
@@ -144,9 +179,37 @@ class PvYouAction {
 
 /// A titled group of rows ("Your health", "Your app").
 class PvYouGroup {
-  const PvYouGroup({required this.title, required this.things});
+  const PvYouGroup({
+    required this.title,
+    required this.things,
+    this.caption,
+    this.icon,
+    this.status,
+    this.dot,
+    this.listen,
+  });
   final String title;
   final List<PvYouThing> things;
+
+  // ⚠️ ADDITIVE (2026-09-28, the More tab's bento, pv_more_bento.dart). A
+  // group is a TILE there, and a tile names what is inside it before she
+  // taps. Every field below is optional and only the bento reads them.
+
+  /// One line naming the rows inside ("Doctor notes, records, treatment").
+  final String? caption;
+
+  /// The tile's line icon.
+  final IconData? icon;
+
+  /// A live state for the tile ("A treatment round is in progress"), or
+  /// null for none. PayPal's value on a card, never a score.
+  final String? Function()? status;
+
+  /// A dot on the tile, never a number (the Messages rule, review Y1).
+  final bool Function()? dot;
+
+  /// What [status] and [dot] read, so the tile repaints when they change.
+  final Listenable? listen;
 }
 
 class PvYouStageContent {
@@ -160,6 +223,13 @@ class PvYouStageContent {
     required this.childrenInvitation,
     required this.whatWeStore,
     this.groups,
+    this.journeyThings = const [],
+    this.journeyCaption,
+    this.tilesCaption,
+    this.profileThings = const [],
+    this.preferenceThings = const [],
+    this.notificationThings = const [],
+    this.supportThings = const [],
   });
   final LifeStage stage;
 
@@ -183,6 +253,38 @@ class PvYouStageContent {
   /// ("Your answers"), so the top level is short and nothing sits twice.
   /// Null on every other stage, which draws exactly as before.
   final List<PvYouGroup>? groups;
+
+  // ⚠️ ADDITIVE (2026-09-28, Tools holds only tools). Read by the More
+  // bento only; every other stage leaves them empty and draws as before.
+
+  /// Rows under "Your journey" after the chapters and the forward action
+  /// (TTC: the journey map, which left Tools).
+  final List<PvYouThing> journeyThings;
+
+  /// The "Your journey" tile's caption, naming what is inside, or null for
+  /// the screen's own line.
+  final String? journeyCaption;
+
+  /// The "Your things" tile's caption, or null for the tiles' names.
+  final String? tilesCaption;
+
+  // ⚠️ ADDITIVE (2026-09-29, the Profile and Settings split, TTC only). The
+  // profile draws [profileThings] under its own heading; the Settings page
+  // draws the other three in its Preferences, Notifications and Support
+  // groups. Every other stage leaves them empty and draws as before.
+
+  /// Rows about her health on the profile (TTC: Notes for your doctor).
+  /// Hers only: the partner's view never draws them.
+  final List<PvYouThing> profileThings;
+
+  /// Extra rows in Settings, Preferences (TTC: What you see).
+  final List<PvYouThing> preferenceThings;
+
+  /// Extra rows in Settings, Notifications (TTC: Messages).
+  final List<PvYouThing> notificationThings;
+
+  /// Extra rows in Settings, Support (TTC: Get help now).
+  final List<PvYouThing> supportThings;
 }
 
 // ---- helpers ------------------------------------------------------------------
@@ -244,11 +346,20 @@ String _monthWord(DateTime d) {
 
 // ---- the common things -----------------------------------------------------------
 
-PvYouThing _saved() => PvYouThing(
+// [stage]: one stage's saves only (2026-09-30: trying to conceive's profile
+// counted and opened pregnancy saves too). Kept for revert: no stage, every
+// item counted, `const SavedScreen()`.
+PvYouThing _saved({Widget Function(Color)? art, String? stage}) => PvYouThing(
   icon: Icons.bookmark_outline_rounded,
+  art: art,
   title: 'Saved',
-  count: () => SavedStore.instance.items().length,
-  open: (c) => _push(c, const SavedScreen(), 'saved'),
+  count: () => stage == 'trying'
+      ? [
+          for (final i in SavedStore.instance.items(stage: stage))
+            if (kTtcSavedKinds.contains(i.kind)) i,
+        ].length
+      : SavedStore.instance.items().length,
+  open: (c) => _push(c, SavedScreen(stage: stage), 'saved'),
 );
 
 PvYouThing _orders() => PvYouThing(
@@ -280,8 +391,10 @@ PvYouThing _addresses() => PvYouThing(
   open: (c) => showPvAddressesSheet(c),
 );
 
-PvYouThing _doctorNotes(LifeStage stage) => PvYouThing(
+PvYouThing _doctorNotes(LifeStage stage, {Widget Function(Color)? art}) =>
+    PvYouThing(
   icon: Icons.medical_information_outlined,
+  art: art,
   title: 'Notes for your doctor',
   subtitle: 'What you have logged, laid out for the appointment',
   open: (c) => _push(c, PvDoctorNotesScreen(stage: stage), 'you/doctor_notes'),
@@ -292,6 +405,41 @@ PvYouThing _findHelp() => PvYouThing(
   title: 'Find help near you',
   subtitle: 'Lactation, paediatrics and night help',
   open: (c) => _push(c, const ProviderResultsScreen(), 'pp/providers'),
+);
+
+// ---- TTC rows for the profile and Settings (2026-09-29) --------------------------
+//
+// The same words, icons, lines and destinations as the rows in `_trying`'s
+// groups below (kept for the bento's revert), built once here.
+
+/// The Messages row: what the app has sent her. A dot, never a number (Y1).
+PvYouThing _ttcMessages() => PvYouThing(
+  icon: Icons.mail_outline_rounded,
+  title: 'Messages',
+  subtitle: 'What we have sent you, and when we send it',
+  dot: () => TtcMessagesStore.instance.unreadCount > 0,
+  listen: TtcMessagesStore.instance,
+  open: (c) => openTtcSurface(c, 'ttc_messages'),
+);
+
+/// The shared-phone switch's row, with its state as the line (Y3).
+PvYouThing _ttcWhatYouSee() => PvYouThing(
+  icon: Icons.visibility_outlined,
+  title: kTtcWhatYouSee,
+  subtitle: kTtcHideIntimate,
+  subtitleNow: () => TtcContentPrefs.instance.hideIntimate
+      ? kTtcIntimateStateHidden
+      : kTtcIntimateStateShown,
+  listen: TtcContentPrefs.instance,
+  open: (c) => showTtcContentPrefsSheet(c),
+);
+
+/// The one calm page of helplines.
+PvYouThing _ttcGetHelp() => PvYouThing(
+  icon: Icons.phone_in_talk_outlined,
+  title: kTtcGetHelpTitle,
+  subtitle: 'Helplines you can call now, and who to call when',
+  open: (c) => openTtcGetHelp(c),
 );
 
 // ---- per stage -------------------------------------------------------------------
@@ -331,23 +479,30 @@ final PvYouStageContent _trying = PvYouStageContent(
     },
   ),
   details: [
+    // "Trying for" (2026-09-29): the answer is a length of time ("6 to 12
+    // months"), and "since" read wrongly before a duration. Kept for revert:
+    //   label: 'Trying since',
     PvYouDetail(
-      label: 'Trying since',
+      label: 'Trying for',
+      art: ttcArtTab(TtcTabMark.clock),
       value: () => _answer('trying', 'ttc_duration'),
       edit: (c) => _editQuestion(c, 'trying', 'ttc_duration'),
     ),
     PvYouDetail(
       label: 'Cycles',
+      art: ttcArtTool('cycle'),
       value: () => _answer('trying', 'ttc_cycles'),
       edit: (c) => _editQuestion(c, 'trying', 'ttc_cycles'),
     ),
     PvYouDetail(
       label: 'Folic acid',
+      art: ttcArtTool('supplements'),
       value: () => _answer('trying', 'ttc_folic'),
       edit: (c) => _editQuestion(c, 'trying', 'ttc_folic'),
     ),
     PvYouDetail(
       label: 'Treatment',
+      art: ttcArtTool('treatment'),
       value: () {
         final t = TtcTreatmentStore.instance;
         if (!t.hasDates) return '--';
@@ -359,13 +514,16 @@ final PvYouStageContent _trying = PvYouStageContent(
         'you/details',
       ),
       note: 'Dates from your clinic. We remind; we never reschedule.',
+      hideWhenEmpty: true,
     ),
     PvYouDetail(
       label: 'Test records',
+      art: ttcArtTool('records'),
       value: () {
         final n = TtcRecordsStore.instance.count;
         return n == 0 ? '--' : '$n on file';
       },
+      hideWhenEmpty: true,
       edit: (c) => _push(
         c,
         PvDetailsScreen(stageId: 'trying', focusId: 'records'),
@@ -373,18 +531,24 @@ final PvYouStageContent _trying = PvYouStageContent(
       ),
     ),
   ],
+  // The bookmark mark on the profile (2026-09-29). Kept for revert: _saved(),
   tiles: [
-    _saved(),
+    _saved(art: ttcArtMore(TtcMoreMark.bookmark), stage: 'trying'),
     // A count like its two neighbours (2026-09-27, build 11): "11 Saved",
     // "2 Orders" and a bare "Journal" read as three different kinds of tile.
     // Kept for revert: no count.
-    PvYouThing(
-      icon: Icons.edit_note_rounded,
-      title: 'Journal',
-      count: () => TtcJournalStore.instance.count,
-      open: (c) => _push(c, const TtcJournalScreen(), 'ttc/journal'),
-    ),
-    _orders(),
+    // Kept for revert (2026-09-28, journal out of TTC): the user took the
+    // journal out of the stage.
+    // PvYouThing(
+    //   icon: Icons.edit_note_rounded,
+    //   title: 'Journal',
+    //   count: () => TtcJournalStore.instance.count,
+    //   open: (c) => _push(c, const TtcJournalScreen(), 'ttc/journal'),
+    // ),
+    // ⚠️ ORDERS LIVES UNDER "BOOKINGS AND ORDERS" (2026-09-28, the More
+    // bento): a tile named for orders with no Orders row broke the rule that a
+    // label names what is behind it, and Orders sits beside the delivery
+    // addresses it uses. Kept for revert: _orders(),
   ],
   // ⚠️ MORE'S ROWS LIVE HERE SINCE 2026-09-26. The V3 bar became Today ·
   // Learn · Products · Tools · You, and the More tab went. Everything it held
@@ -469,19 +633,39 @@ final PvYouStageContent _trying = PvYouStageContent(
   // (the header's calendar, the hero) and on Tools, and three doors to one
   // screen made You the longest list in the app.
   groups: [
-    PvYouGroup(title: 'Your health', things: [
+    // The bento fields (2026-09-28): a caption naming the five rows, the
+    // round's state on the tile. Kept for revert:
+    //   PvYouGroup(title: 'Your health', things: [
+    // ⚠️ NO TOOLS IN MORE (2026-09-28, the user: More holds everything that
+    // is not a tool). Records and reports is a Tools row already, so its
+    // second door here is gone; the treatment round records her clinic's
+    // dates, so it moved to Tools as "Treatment cycle", taking the tile's
+    // "round in progress" state with it (the Tools row shows it now).
+    // Kept for revert (2026-09-28):
+    //   caption: 'Notes for your doctor, records, treatment, your answers and helplines',
+    //   status: () => TtcTreatmentStore.instance.hasDates
+    //       ? 'A treatment round is in progress' : null,
+    //   listen: TtcTreatmentStore.instance,
+    PvYouGroup(
+        title: 'Your health',
+        caption:
+            'Notes for your doctor, your answers about trying, and helplines to call',
+        icon: Icons.favorite_border_rounded,
+        things: [
       _doctorNotes(LifeStage.tryingToConceive),
-      _toolThing('records'),
-      PvYouThing(
-        icon: Icons.event_note_outlined,
-        title: 'Treatment',
-        subtitle: "Your clinic's dates, step by step",
-        subtitleNow: () => TtcTreatmentStore.instance.hasDates
-            ? 'A round is in progress'
-            : "Your clinic's dates, step by step",
-        listen: TtcTreatmentStore.instance,
-        open: (c) => openTtcSurface(c, 'ttc_treatment'),
-      ),
+      // Kept for revert (2026-09-28): a Tools row.
+      // _toolThing('records'),
+      // Kept for revert (2026-09-28): Tools' "Treatment cycle" row now.
+      // PvYouThing(
+      //   icon: Icons.event_note_outlined,
+      //   title: 'Treatment',
+      //   subtitle: "Your clinic's dates, step by step",
+      //   subtitleNow: () => TtcTreatmentStore.instance.hasDates
+      //       ? 'A round is in progress'
+      //       : "Your clinic's dates, step by step",
+      //   listen: TtcTreatmentStore.instance,
+      //   open: (c) => openTtcSurface(c, 'ttc_treatment'),
+      // ),
       PvYouThing(
         icon: Icons.fact_check_outlined,
         title: 'Your answers',
@@ -504,7 +688,14 @@ final PvYouStageContent _trying = PvYouStageContent(
         open: (c) => openTtcGetHelp(c),
       ),
     ]),
-    PvYouGroup(title: 'Your app', things: [
+    // Kept for revert: PvYouGroup(title: 'Your app', things: [
+    PvYouGroup(
+        title: 'Your app',
+        caption: 'Messages we send you, and the topics you choose to see',
+        icon: Icons.mail_outline_rounded,
+        dot: () => TtcMessagesStore.instance.unreadCount > 0,
+        listen: TtcMessagesStore.instance,
+        things: [
       PvYouThing(
         icon: Icons.mail_outline_rounded,
         title: 'Messages',
@@ -524,22 +715,88 @@ final PvYouStageContent _trying = PvYouStageContent(
         open: (c) => showTtcContentPrefsSheet(c),
       ),
     ]),
-    PvYouGroup(title: 'Bookings and orders', things: [
+    // ⚠️ A NEW TILE FOR WHAT LEFT TOOLS (2026-09-28, the user: Tools holds
+    // only tools). Booking an expert and the courses are not tools, so they
+    // are here, with the whole catalogue they belong to beside them: what she
+    // can book sits on one tile, what she HAS booked on the next. The rows
+    // read their words from `ttcMovedToMore`, so they say what Tools said.
+    // American Airlines' More (booking and help as tiles over grouped rows,
+    // https://mobbin.com/screens/71e3fc57-af3c-446a-863e-a76f4088e03a).
+    PvYouGroup(
+        title: kTtcMoreExpertsTitle,
+        caption:
+            'Book a video call with a specialist, your free course, and every programme you can join',
+        icon: Icons.support_agent_outlined,
+        things: [
+      _movedThing('expert'),
+      _movedThing('courses'),
+      // From "Bookings and orders" (2026-09-28): the catalogue belongs with
+      // the two filtered doors into it, and "All" says it is the whole of
+      // what the two rows above are part of. Kept for revert:
+      //   title: 'Programmes and sessions',
+      //   subtitle: 'Consults, courses and classes you can book',
       PvYouThing(
         icon: Icons.auto_awesome_outlined,
-        title: 'Programmes and sessions',
-        subtitle: 'Consults, courses and classes you can book',
+        title: 'All programmes and sessions',
+        subtitle:
+            'Yoga, food, mind, tests, partner workshops and IVF support, as well as the two above',
         open: (c) => _push(c, const TtcPrepareScreen(), 'ttc/prepare'),
       ),
+    ]),
+    // Kept for revert: PvYouGroup(title: 'Bookings and orders', things: [
+    // Kept for revert (2026-09-28), the caption before the programmes moved:
+    //   'Programmes to book, what you have booked, delivery addresses'
+    PvYouGroup(
+        title: 'Bookings and orders',
+        caption: 'What you have booked, your orders and delivery addresses',
+        icon: Icons.event_available_outlined,
+        things: [
+      // Moved to "Experts and courses" (2026-09-28). Kept for revert:
+      // PvYouThing(
+      //   icon: Icons.auto_awesome_outlined,
+      //   title: 'Programmes and sessions',
+      //   subtitle: 'Consults, courses and classes you can book',
+      //   open: (c) => _push(c, const TtcPrepareScreen(), 'ttc/prepare'),
+      // ),
       _bookings(),
+      _orders(),
       _addresses(),
     ]),
   ],
+  // The journey map left Tools (2026-09-28): a view of her journey, so it
+  // sits on the journey's tile, under the chapters.
+  // The journey map left More and Tools' moved list on 2026-09-30 (the
+  // user). Kept for revert: journeyThings: [_movedThing('map')],
+  journeyThings: const [],
+  journeyCaption:
+      'Where you are across the four chapters, the "I got a positive test" button, and your journey map with its family timeline',
+  // What Saved holds on this stage since 2026-09-30 (kTtcSavedKinds). Kept
+  // for revert: 'What you bookmarked: reads, tests, answers and cards',
+  tilesCaption: 'Articles, videos, recipes and products you bookmarked',
+  // ⚠️ THE PROFILE AND SETTINGS SPLIT (2026-09-29, the user: More holds what
+  // the app offers; account, preferences, support and developer sit behind
+  // ONE Settings row on the profile). The rows are built by the same
+  // functions the groups above use, so a row says the same words wherever it
+  // is drawn. Where each former row went: `kTtcFormerYouRows` in
+  // lib/screens/ttc/ttc_more_tab.dart.
+  profileThings: [
+    _doctorNotes(
+      LifeStage.tryingToConceive,
+      // A note for the doctor: the door family's "See a doctor" bubble.
+      art: ttcArtTab(TtcTabMark.doctorChat),
+    ),
+  ],
+  preferenceThings: [_ttcWhatYouSee()],
+  notificationThings: [_ttcMessages()],
+  supportThings: [_ttcGetHelp()],
   childrenInvitation: 'Your first child\'s page appears here after the birth.',
   whatWeStore: [
     'Your name, phone and email, and the partner you paired with.',
     'What you log while trying: cycle days, symptoms, tests and their readings, supplements and medicines, appointments.',
-    'What you save, journal and buy.',
+    // Kept for revert (2026-09-28, journal out of TTC):
+    //   'What you save, journal and buy.',
+    // Still honest about storage: older entries stay on the phone and in sync.
+    'What you save and buy, and any journal entries you wrote before.',
     'Nothing about you is sold. Community posts are never used as a source.',
   ],
 );

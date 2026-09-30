@@ -18,6 +18,7 @@ import 'package:flutter/material.dart';
 
 import '../../localization/app_language.dart';
 import '../../theme/app_theme.dart';
+import '../../theme/pv_fonts.dart';
 
 String ep(AppLanguage lang, String en, String hi) => lang.isHinglish ? hi : en;
 
@@ -155,6 +156,15 @@ class EnterpriseCard extends StatelessWidget {
 }
 
 /// The primary button. One shape, so the flow reads as one flow.
+///
+/// ⚠️ THE ONE INK PILL (2026-09-29). It was a violet (`primary600`) rounded
+/// box: the last violet button on a path every stage reaches (Profile, the
+/// TTC More tab's Benefits, sign-up). The app has one button colour, the
+/// switches' black (`AppTheme.neutral900`, #2F2C30), in a pill. Disabled
+/// stays the neutral grey it was, so "not yet" still reads as not yet.
+/// Kept for revert (2026-09-29): `color: live ? AppTheme.primary600 :
+/// AppTheme.neutral400`, `BorderRadius.circular(15)`, height 52, and the
+/// label in `textTheme.titleSmall` white w800.
 class EnterpriseButton extends StatelessWidget {
   const EnterpriseButton({
     super.key,
@@ -172,27 +182,34 @@ class EnterpriseButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final live = enabled && !busy && onTap != null;
-    return GestureDetector(
-      onTap: live ? onTap : null,
-      behavior: HitTestBehavior.opaque,
-      child: Container(
-        height: 52,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: live ? AppTheme.primary600 : AppTheme.neutral400,
-          borderRadius: BorderRadius.circular(15),
+    return Semantics(
+      button: true,
+      enabled: live,
+      child: Material(
+        color: live || busy ? AppTheme.neutral900 : AppTheme.neutral400,
+        shape: const StadiumBorder(),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: live ? onTap : null,
+          child: Container(
+            constraints: const BoxConstraints(minHeight: 52),
+            width: double.infinity,
+            alignment: Alignment.center,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            child: busy
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                        strokeWidth: 2, color: Colors.white))
+                : Text(label,
+                    textAlign: TextAlign.center,
+                    style: pvManrope(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white)),
+          ),
         ),
-        child: busy
-            ? const SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                    strokeWidth: 2, color: Colors.white))
-            : Text(label,
-                style: Theme.of(context)
-                    .textTheme
-                    .titleSmall
-                    ?.copyWith(color: Colors.white, fontWeight: FontWeight.w800)),
       ),
     );
   }

@@ -72,13 +72,19 @@ import '../../booking/booking_models.dart';
 import '../../booking/booking_store.dart';
 import '../../services/notification_service.dart';
 import '../../theme/pv_fonts.dart';
-import '../../ttc/ttc_journal_store.dart';
+// Kept for revert (2026-09-28, the user: no journal in trying to conceive).
+// The questions for the doctor were journal entries; they have their own
+// store now, and nothing on this page touches the journal.
+// import '../../ttc/ttc_journal_store.dart';
+import '../../ttc/ttc_doctor_questions_store.dart';
 import '../../ttc/ttc_records_store.dart';
 import '../products/pv_store_chrome.dart' show pvSnack;
 import '../v2/v2_palette.dart';
 import 'ttc_common.dart';
 import 'ttc_ivf_readiness_screen.dart' show kIvfHue;
-import 'ttc_journal_screen.dart' show writeTtcEntry, openTtcJournalEntry;
+// Kept for revert (2026-09-28): the journal's writer and entry page.
+// import 'ttc_journal_screen.dart' show writeTtcEntry, openTtcJournalEntry;
+import 'ttc_doctor_question_screen.dart';
 import 'ttc_strings.dart';
 import 'ttc_tool_chrome.dart';
 import 'ttc_tool_confirm.dart';
@@ -91,7 +97,8 @@ void openTtcAppointments(BuildContext context) {
 }
 
 /// The red a destructive word takes. The same one Records uses.
-const Color _kDanger = Color(0xFFB42318);
+// One danger red, DESIGN-SYSTEM §4.0 (2026-09-29). Kept for revert: Color(0xFFB42318)
+const Color _kDanger = Color(0xFFB3261E);
 
 /// One row on the merged list, from either source.
 class TtcApptEntry {
@@ -101,6 +108,7 @@ class TtcApptEntry {
     required this.detail,
     required this.fromParentVeda,
     this.own,
+    this.bookingId,
   });
 
   final String title;
@@ -112,9 +120,20 @@ class TtcApptEntry {
   /// read-only here because the booking engine owns the seat.
   final TtcAppointment? own;
 
+  /// The booking's id, for a ParentVeda booking (2026-09-28), so its
+  /// questions can belong to it like any visit's.
+  final String? bookingId;
+
+  /// The id her questions use for this visit (`TtcDoctorQuestion.appointmentId`).
+  String get visitId =>
+      own?.id ?? ttcBookingVisitId(bookingId ?? '$title@$startsUtc');
+
   DateTime get startsLocal => startsUtc.toLocal();
   bool get isUpcoming => startsUtc.isAfter(DateTime.now().toUtc());
 }
+
+/// "Follicle scan, Thu 2 Oct": a visit named the way a caption names it.
+String ttcVisitName(TtcVisitRef v) => '${v.title}, ${ttcApptDay(v.startsLocal)}';
 
 /// Both sources, soonest first.
 List<TtcApptEntry> ttcApptEntries() {
@@ -137,6 +156,7 @@ List<TtcApptEntry> ttcApptEntries() {
         startsUtc: b.startsUtc,
         detail: t.appointmentsViaParentVeda,
         fromParentVeda: true,
+        bookingId: b.id,
       ),
   ]..sort((a, b) => a.startsUtc.compareTo(b.startsUtc));
 }
@@ -202,7 +222,8 @@ class _TtcAppointmentsScreenState extends State<TtcAppointmentsScreen> {
       animation: Listenable.merge([
         TtcAppointmentsStore.instance,
         BookingStore.instance,
-        TtcJournalStore.instance,
+        // Kept for revert (2026-09-28): TtcJournalStore.instance,
+        TtcDoctorQuestionsStore.instance,
         TtcLang.instance,
         V2PaletteStore.instance,
       ]),
@@ -213,7 +234,18 @@ class _TtcAppointmentsScreenState extends State<TtcAppointmentsScreen> {
         final upcoming = entries.where((e) => e.isUpcoming).toList();
         final past = entries.where((e) => !e.isUpcoming).toList().reversed
             .toList();
-        final questions = TtcJournalStore.instance.doctorQuestions;
+        // Kept for revert (2026-09-28):
+        //   final questions = TtcJournalStore.instance.doctorQuestions;
+        // Kept for revert (2026-09-28, a question belongs to a visit): every
+        // question on every visit.
+        //   final questions = TtcDoctorQuestionsStore.instance.questions;
+        final qs = TtcDoctorQuestionsStore.instance;
+        // The ones still to ask, soonest visit first. Ticked ones fold under
+        // the visit they were asked at, on that visit's page.
+        final questions = qs.openAll();
+        // The one quiet "Did you get your answers?" line, for the latest
+        // visit that has happened with her questions still unticked.
+        final followUp = qs.visitToFollowUp();
         // With nothing in the past there is nothing to switch to, so the
         // switch is not drawn. It appears the day the first visit passes.
         final showPast = _past && past.isNotEmpty;
@@ -222,6 +254,8 @@ class _TtcAppointmentsScreenState extends State<TtcAppointmentsScreen> {
 
         return TtcToolScaffold(
           hue: kIvfHue,
+          // The tool's mark over the eyebrow (2026-09-29, ttc_tool_marks.dart).
+          toolId: 'appointments',
           eyebrow: t.appointmentsTitle,
           // Monitoring scans arrive at short notice, which is the whole reason
           // this screen exists during a treatment cycle.
@@ -253,6 +287,15 @@ class _TtcAppointmentsScreenState extends State<TtcAppointmentsScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: 22),
+
+                // ⚠️ ONE QUIET LINE, NOT A BANNER (2026-09-28). The day
+                // after a visit, her unticked questions have already moved to
+                // the next visit (derived); this line says so where she will
+                // see it, and opens the visit where she answers it.
+                if (followUp != null) ...[
+                  TtcApptFollowUpLine(visit: followUp, p: p),
+                  const SizedBox(height: 16),
+                ],
 
                 if (past.isNotEmpty) ...[
                   TtcToolOptions(
@@ -290,10 +333,12 @@ class _TtcAppointmentsScreenState extends State<TtcAppointmentsScreen> {
                     onTap: () => addTtcAppointment(context),
                   )
                 else ...[
+                  // Kept for revert (2026-09-28): questions: questions.length,
+                  // which counted every question on every visit.
                   _NextUp(
                       entry: upcoming.first,
                       p: p,
-                      questions: questions.length),
+                      questions: qs.openCountFor(upcoming.first.visitId)),
                   if (upcoming.length > 1) ...[
                     const SizedBox(height: 14),
                     _RowGroup(p: p, children: [
@@ -306,21 +351,23 @@ class _TtcAppointmentsScreenState extends State<TtcAppointmentsScreen> {
                 const SizedBox(height: 30),
 
                 // The questions saved at 2am, ready to walk in with.
-                Text(t.appointmentsQuestions,
-                    style: pvJakarta(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w700,
-                        color: p.ink1)),
+                // Kept for revert (2026-09-29, one heading style):
+                // Text(t.appointmentsQuestions, style: pvJakarta(
+                //     fontSize: 17, fontWeight: FontWeight.w700, color: p.ink1)),
+                TtcSectionHeading(t.appointmentsQuestions),
                 const SizedBox(height: 5),
+                // Kept for revert (2026-09-28): 'These show on every visit
+                // that is coming up. Tap one to change it.'
                 Text(
                     questions.isEmpty
                         ? t.appointmentsNoQuestionsBody
-                        : 'These show on every visit that is coming up. '
-                            'Tap one to change it.',
+                        : 'Each question is kept for one visit, and moves to '
+                            'the next visit if it is not ticked as asked. Tap '
+                            'a question to change it or choose its visit.',
                     style:
                         pvManrope(fontSize: 13, height: 1.5, color: p.ink3)),
                 const SizedBox(height: 12),
-                TtcApptQuestions(p: p, questions: questions),
+                TtcApptQuestions(p: p, questions: questions, showVisit: true),
 
                 // ⚠️ SAID ONCE (tools pass, 2026-09-27): the intro already
                 // says this list is what you and ParentVeda added, and the
@@ -479,7 +526,8 @@ class _NextUp extends StatelessWidget {
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('NEXT',
+                    // Change 5 (2026-09-28). Kept for revert: 'NEXT'.
+                    Text('NEXT VISIT',
                         style: pvManrope(
                             fontSize: 10,
                             fontWeight: FontWeight.w800,
@@ -520,9 +568,9 @@ class _NextUp extends StatelessWidget {
                       _Mini(
                           p: p,
                           icon: Icons.help_outline_rounded,
-                          text: questions == 1
-                              ? '1 question to take'
-                              : '$questions questions to take'),
+                          // Kept for revert (2026-09-28): '… to take'. Now
+                          // the same words as the reminder and the home card.
+                          text: ttcQuestionsToAsk(questions)),
                     ],
                   ]),
             ),
@@ -608,6 +656,20 @@ class TtcApptRow extends StatelessWidget {
                         icon: Icons.notifications_none_rounded,
                         text: 'Reminder the evening before'),
                   ],
+                  // Each visit says how many questions are kept for it
+                  // (2026-09-28), as the next visit's block does.
+                  if (upcoming &&
+                      TtcDoctorQuestionsStore.instance
+                              .openCountFor(entry.visitId) >
+                          0) ...[
+                    const SizedBox(height: 6),
+                    _Mini(
+                        p: p,
+                        icon: Icons.help_outline_rounded,
+                        text: ttcQuestionsToAsk(TtcDoctorQuestionsStore
+                            .instance
+                            .openCountFor(entry.visitId))),
+                  ],
                   // The source is a tag, never a section heading.
                   if (entry.fromParentVeda) ...[
                     const SizedBox(height: 7),
@@ -662,65 +724,658 @@ class _Mini extends StatelessWidget {
       ]);
 }
 
+/// "1 question to ask", "3 questions to ask". The words the visit's block,
+/// the evening-before reminder and the home's visit-day card all use.
+String ttcQuestionsToAsk(int n) =>
+    n == 1 ? '1 question to ask' : '$n questions to ask';
+
+/// Who wrote a question, as a row label: "Yours", or her partner's as "His"
+/// on her phone and "Hers" on his (his side names her "Her", as in "Her
+/// round").
+String ttcQuestionWhose(TtcDoctorQuestion q) => q.isMine
+    ? 'Yours'
+    : (TtcPartnerMode.instance.on ? 'Hers' : 'His');
+
+/// The caption under one question: whose it is, and only when her partner
+/// writes questions too ("Yours" on every row of a list only she writes
+/// would be a word with nothing to tell apart).
+String ttcQuestionCaption(TtcDoctorQuestion q) =>
+    TtcDoctorQuestionsStore.instance.hasPartnerQuestions
+        ? ttcQuestionWhose(q)
+        : '';
+
+/// The heading a question sits under: which visit it is for (on the list
+/// page), or where it moved from (on a visit's page). Empty for a question
+/// that is simply on the visit it was written for.
+///
+/// ⚠️ A HEADING ONCE, NOT A CAPTION ON EVERY ROW (the no-repetition rule,
+/// 2026-09-28). Three questions for one scan under three "For Follicle scan,
+/// Thu 2 Oct" lines is the same sentence said three times.
+String ttcQuestionGroup(TtcDoctorQuestion q,
+    {bool showVisit = false, String? onVisitId}) {
+  final store = TtcDoctorQuestionsStore.instance;
+  if (showVisit) {
+    final v = store.visitById(store.visitFor(q));
+    return v == null
+        ? 'For whichever visit comes next'
+        : 'For the ${ttcVisitName(v)}';
+  }
+  if (onVisitId != null &&
+      !q.isAsked &&
+      q.appointmentId != null &&
+      q.appointmentId != onVisitId) {
+    // The derived roll-forward, said once over the rows it brought here.
+    final from = store.visitById(q.appointmentId);
+    return from == null
+        ? 'Moved from a visit that was removed'
+        : 'Moved from the ${ttcVisitName(from)}';
+  }
+  return '';
+}
+
 /// The saved questions for the doctor, each one opening to change it, and
 /// the way to write another. Used on the list and on each visit's page.
+///
+/// ⚠️ A TICK ONCE THE VISIT'S DAY HAS COME (2026-09-28). Before the day a
+/// question is something to change, so a row opens the writer; from the day
+/// of the visit, each of HER rows leads with a round tick that marks it
+/// asked (with an Undo), and ticked ones fold away under "Asked" on the
+/// visit (see [TtcApptAskedFold]). Her partner's rows carry no tick: only
+/// the one who wrote a question may change it (0092's own-row writes).
+///
+/// Shape from Mobbin (2026-09-28): open items with an empty circle and the
+/// done ones folded under a count, Amie's to-do list ("Hide 1 done"):
+/// https://mobbin.com/screens/8651d9b8-539c-4a87-af9a-53a2f492dc3a and
+/// Structured's round ticks on a card:
+/// https://mobbin.com/screens/8c6ff378-2fcd-49f2-9639-54f563e1d06c
 class TtcApptQuestions extends StatelessWidget {
-  const TtcApptQuestions(
-      {super.key, required this.p, required this.questions});
+  const TtcApptQuestions({
+    super.key,
+    required this.p,
+    required this.questions,
+    this.showVisit = false,
+    this.visitId,
+    this.tickable = false,
+    this.canAdd = true,
+  });
 
   final V2Palette p;
-  final List<TtcJournalEntry> questions;
+  // Kept for revert (2026-09-28): final List<TtcJournalEntry> questions;
+  final List<TtcDoctorQuestion> questions;
+
+  /// On the list page: each row names the visit it is kept for.
+  final bool showVisit;
+
+  /// On a visit's page: the visit. A new question from here is for it, and
+  /// a ticked question is asked at it.
+  final String? visitId;
+
+  /// The visit's day has come, so her rows carry a tick.
+  final bool tickable;
+
+  /// False on a visit whose day has passed: a question cannot be for it.
+  final bool canAdd;
 
   @override
   Widget build(BuildContext context) {
     final add = InkWell(
       key: const ValueKey('ttc_appt_add_question'),
-      onTap: () => writeTtcEntry(context, kind: TtcEntryKind.question),
+      // Kept for revert (2026-09-28, journal out of TTC):
+      //   onTap: () => writeTtcEntry(context, kind: TtcEntryKind.question),
+      onTap: () => writeTtcDoctorQuestion(context, visitId: visitId),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
         child: Row(children: [
           Icon(Icons.add_rounded, size: 19, color: p.ink1),
           const SizedBox(width: 9),
-          Text(
-              questions.isEmpty
-                  ? 'Write a question'
-                  : TtcS.current().appointmentsAddQuestion,
-              style: pvManrope(
-                  fontSize: 14, fontWeight: FontWeight.w800, color: p.ink1)),
+          Flexible(
+            child: Text(
+                questions.isEmpty
+                    ? 'Write a question'
+                    : TtcS.current().appointmentsAddQuestion,
+                style: pvManrope(
+                    fontSize: 14, fontWeight: FontWeight.w800, color: p.ink1)),
+          ),
+        ]),
+      ),
+    );
+    // Rows in their groups: the ones written for this visit first (no
+    // heading), then each group under its heading, in the order given.
+    final groups = <String, List<TtcDoctorQuestion>>{};
+    for (final q in questions) {
+      groups
+          .putIfAbsent(
+              ttcQuestionGroup(q, showVisit: showVisit, onVisitId: visitId),
+              () => [])
+          .add(q);
+    }
+    final order = [
+      if (groups.containsKey('')) '',
+      ...groups.keys.where((k) => k.isNotEmpty),
+    ];
+    return _RowGroup(p: p, children: [
+      for (final g in order) ...[
+        if (g.isNotEmpty) _GroupHeading(p: p, text: g),
+        for (final q in groups[g]!)
+          TtcApptQuestionRow(
+            p: p,
+            question: q,
+            caption: ttcQuestionCaption(q),
+            onTick: tickable && q.isMine && visitId != null
+                ? () => ttcTickQuestion(context, q, visitId!)
+                : null,
+          ),
+      ],
+      if (canAdd) add,
+    ]);
+  }
+}
+
+/// A small heading inside a group of questions: the visit they are for, or
+/// where they moved from. Words, not a control.
+class _GroupHeading extends StatelessWidget {
+  const _GroupHeading({required this.p, required this.text});
+  final V2Palette p;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        width: double.infinity,
+        color: p.ground,
+        padding: const EdgeInsets.fromLTRB(14, 9, 14, 8),
+        child: Text(text,
+            style: pvManrope(
+                fontSize: 12,
+                height: 1.35,
+                fontWeight: FontWeight.w800,
+                color: p.ink2)),
+      );
+}
+
+/// Ticks one question as asked at [visitId], with an Undo.
+void ttcTickQuestion(
+    BuildContext context, TtcDoctorQuestion q, String visitId) {
+  final store = TtcDoctorQuestionsStore.instance;
+  final before = store.ask(q.id, visitId: visitId);
+  if (before == null) return;
+  HapticFeedback.selectionClick();
+  pvSnack(context, 'Marked as asked.',
+      action: 'Undo', onAction: () => store.revert([before]), lift: 24);
+}
+
+/// One question as a row: a tick (her rows, from the visit's day) or a
+/// question mark, the words, a caption, and a chevron to open it.
+class TtcApptQuestionRow extends StatelessWidget {
+  const TtcApptQuestionRow({
+    super.key,
+    required this.p,
+    required this.question,
+    required this.caption,
+    this.onTick,
+    this.asked = false,
+    this.onUntick,
+  });
+
+  final V2Palette p;
+  final TtcDoctorQuestion question;
+  final String caption;
+
+  /// Marks it asked. Null: no tick on the row.
+  final VoidCallback? onTick;
+
+  /// Drawn as asked: a filled tick, the words muted.
+  final bool asked;
+
+  /// Takes the tick off (her own asked rows).
+  final VoidCallback? onUntick;
+
+  @override
+  Widget build(BuildContext context) {
+    final q = question;
+    Widget lead;
+    if (asked) {
+      lead = _TickButton(
+        key: ValueKey('ttc_question_untick_${q.id}'),
+        on: true,
+        p: p,
+        label: 'Asked: ${q.text}. Tap to mark it not asked yet.',
+        onTap: onUntick,
+      );
+    } else if (onTick != null) {
+      lead = _TickButton(
+        key: ValueKey('ttc_question_tick_${q.id}'),
+        on: false,
+        p: p,
+        label: 'Mark as asked: ${q.text}',
+        onTap: onTick,
+      );
+    } else {
+      lead = Padding(
+        padding: const EdgeInsets.fromLTRB(2, 2, 0, 0),
+        child: Icon(Icons.help_outline_rounded, size: 17, color: p.ink3),
+      );
+    }
+    return InkWell(
+      // ⚠️ A QUESTION OPENS (tool rebuild, 2026-09-27). It was a line of
+      // text with a purple dot and no way to change or remove it once
+      // the visit had answered it.
+      // Kept for revert (2026-09-28):
+      //   onTap: () => openTtcJournalEntry(context, q),
+      key: ValueKey('ttc_appt_question_${q.id}'),
+      onTap: () => openTtcDoctorQuestion(context, q),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(10, 11, 10, 11),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          SizedBox(width: 30, child: Align(alignment: Alignment.topLeft, child: lead)),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(q.text,
+                      maxLines: 4,
+                      overflow: TextOverflow.ellipsis,
+                      style: pvManrope(
+                          fontSize: 14,
+                          height: 1.5,
+                          color: asked ? p.ink3 : p.ink1)),
+                  if (caption.isNotEmpty) ...[
+                    const SizedBox(height: 2),
+                    Text(caption,
+                        style: pvManrope(
+                            fontSize: 11.5,
+                            height: 1.4,
+                            fontWeight: FontWeight.w700,
+                            color: p.ink3)),
+                  ],
+                ]),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Icon(Icons.chevron_right_rounded, size: 19, color: p.ink3),
+          ),
+        ]),
+      ),
+    );
+  }
+}
+
+/// A round tick: an empty ring to tap, or a filled ink disc with a check.
+class _TickButton extends StatelessWidget {
+  const _TickButton({
+    super.key,
+    required this.on,
+    required this.p,
+    required this.label,
+    this.onTap,
+  });
+
+  final bool on;
+  final V2Palette p;
+  final String label;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+        button: onTap != null,
+        checked: on,
+        label: label,
+        onTap: onTap,
+        excludeSemantics: true,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(2),
+            child: Container(
+              width: 22,
+              height: 22,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: on ? ttcTitleInk : Colors.white,
+                border: Border.all(
+                    color: on ? ttcTitleInk : p.ink3, width: 1.6),
+              ),
+              child: on
+                  ? const Icon(Icons.check_rounded,
+                      size: 15, color: Colors.white)
+                  : null,
+            ),
+          ),
+        ),
+      );
+}
+
+/// "Asked · 3", folded shut, under a visit. Opening it shows each ticked
+/// question; her own can be unticked from here.
+class TtcApptAskedFold extends StatefulWidget {
+  const TtcApptAskedFold({
+    super.key,
+    required this.p,
+    required this.questions,
+  });
+
+  final V2Palette p;
+  final List<TtcDoctorQuestion> questions;
+
+  @override
+  State<TtcApptAskedFold> createState() => _TtcApptAskedFoldState();
+}
+
+class _TtcApptAskedFoldState extends State<TtcApptAskedFold> {
+  bool _open = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = widget.p;
+    final n = widget.questions.length;
+    final head = InkWell(
+      key: const ValueKey('ttc_appt_asked_fold'),
+      onTap: () => setState(() => _open = !_open),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(14, 13, 12, 13),
+        child: Row(children: [
+          Icon(Icons.check_circle_outline_rounded, size: 18, color: p.ink2),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+                // Named for what is inside, with the count, so the fold says
+                // what opening it will show.
+                n == 1 ? 'Asked · 1 question' : 'Asked · $n questions',
+                style: pvManrope(
+                    fontSize: 14, fontWeight: FontWeight.w800, color: p.ink1)),
+          ),
+          Icon(
+              _open
+                  ? Icons.keyboard_arrow_up_rounded
+                  : Icons.keyboard_arrow_down_rounded,
+              size: 21,
+              color: p.ink2),
         ]),
       ),
     );
     return _RowGroup(p: p, children: [
-      for (final q in questions)
-        InkWell(
-          // ⚠️ A QUESTION OPENS (tool rebuild, 2026-09-27). It was a line of
-          // text with a purple dot and no way to change or remove it once
-          // the visit had answered it.
-          onTap: () => openTtcJournalEntry(context, q),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(14, 13, 10, 13),
-            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 2),
-                child: Icon(Icons.help_outline_rounded,
-                    size: 17, color: p.ink3),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(q.text,
-                    maxLines: 4,
-                    overflow: TextOverflow.ellipsis,
-                    style: pvManrope(
-                        fontSize: 14, height: 1.5, color: p.ink1)),
-              ),
-              Icon(Icons.chevron_right_rounded, size: 19, color: p.ink3),
-            ]),
+      head,
+      if (_open)
+        for (final q in widget.questions)
+          TtcApptQuestionRow(
+            p: p,
+            question: q,
+            asked: true,
+            caption: ttcQuestionCaption(q),
+            onUntick: q.isMine
+                ? () {
+                    final store = TtcDoctorQuestionsStore.instance;
+                    if (!store.unask(q.id)) return;
+                    HapticFeedback.selectionClick();
+                    pvSnack(context, 'Marked as not asked yet.',
+                        action: 'Undo',
+                        onAction: () => store.revert([q]),
+                        lift: 24);
+                  }
+                : null,
           ),
-        ),
-      add,
     ]);
   }
 }
+
+/// "Did you get your answers?" on a visit whose day has passed, while any of
+/// her questions pinned to it are unticked. It is the one announcement of
+/// the roll-forward ("2 questions moved to your next visit"), with the two
+/// answers the user approved: keep them for the next visit, or Done (ticks
+/// the rest as asked). Each Undo-able.
+///
+/// Shape from Mobbin (2026-09-28): a tinted "Action required" block on an
+/// appointment's page with its action under the words, Fresha:
+/// https://mobbin.com/screens/5ef9f1bf-25b5-487c-b347-2dd30dc2d263
+class TtcApptFollowUpCard extends StatelessWidget {
+  const TtcApptFollowUpCard({
+    super.key,
+    required this.p,
+    required this.visitId,
+  });
+
+  final V2Palette p;
+  final String visitId;
+
+  @override
+  Widget build(BuildContext context) {
+    final store = TtcDoctorQuestionsStore.instance;
+    final left = store.notTickedAfter(visitId);
+    if (left.isEmpty) return const SizedBox.shrink();
+    final n = left.length;
+    final next = store.visitById(store.visitFor(left.first));
+    final moved = n == 1
+        ? '1 question was not ticked'
+        : '$n questions were not ticked';
+    final body = next == null
+        ? '$moved, so ${n == 1 ? 'it waits' : 'they wait'} for your next '
+            'visit. Tick any you did ask.'
+        : '$moved, so ${n == 1 ? 'it' : 'they'} moved to your next visit, '
+            '${ttcVisitName(next)}. Tick any you did ask.';
+    Widget button(String label, Key key, VoidCallback onTap, bool ink) =>
+        Semantics(
+          button: true,
+          label: label,
+          onTap: onTap,
+          excludeSemantics: true,
+          child: InkWell(
+            key: key,
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(999),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+              decoration: BoxDecoration(
+                color: ink ? ttcTitleInk : Colors.white,
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(color: ink ? ttcTitleInk : p.line),
+              ),
+              child: Text(label,
+                  style: pvManrope(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                      color: ink ? Colors.white : p.ink1)),
+            ),
+          ),
+        );
+    return Container(
+      key: const ValueKey('ttc_appt_follow_up'),
+      decoration: BoxDecoration(
+        color: v2BlockTint(kIvfHue, p),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text('Did you get your answers?',
+            style: pvJakarta(
+                fontSize: 16.5, fontWeight: FontWeight.w700, color: p.ink1)),
+        const SizedBox(height: 5),
+        Text(body,
+            style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2)),
+        const SizedBox(height: 12),
+        _RowGroup(p: p, children: [
+          for (final q in left)
+            TtcApptQuestionRow(
+              p: p,
+              question: q,
+              caption: ttcQuestionCaption(q),
+              onTick: () => ttcTickQuestion(context, q, visitId),
+            ),
+        ]),
+        const SizedBox(height: 12),
+        Wrap(spacing: 8, runSpacing: 8, children: [
+          button('Keep for the next visit',
+              const ValueKey('ttc_appt_keep_next'), () {
+            final before = store.keepForNextVisit(visitId);
+            if (before.isEmpty) return;
+            HapticFeedback.selectionClick();
+            pvSnack(context, 'Kept for your next visit.',
+                action: 'Undo',
+                onAction: () => store.revert(before),
+                lift: 24);
+          }, false),
+          button('Done', const ValueKey('ttc_appt_done'), () {
+            final before = store.doneAt(visitId);
+            if (before.isEmpty) return;
+            HapticFeedback.selectionClick();
+            pvSnack(
+                context,
+                before.length == 1
+                    ? '1 question marked as asked.'
+                    : '${before.length} questions marked as asked.',
+                action: 'Undo',
+                onAction: () => store.revert(before),
+                lift: 24);
+          }, true),
+        ]),
+      ]),
+    );
+  }
+}
+
+/// The one quiet line on the Appointments list: the latest visit that has
+/// happened with her questions unticked. Opens that visit's page, where the
+/// ticks and "Done" are.
+class TtcApptFollowUpLine extends StatelessWidget {
+  const TtcApptFollowUpLine({super.key, required this.visit, required this.p});
+
+  final TtcVisitRef visit;
+  final V2Palette p;
+
+  @override
+  Widget build(BuildContext context) {
+    final passed = TtcDoctorQuestionsStore.dayPassed(visit, DateTime.now());
+    final title = '${visit.title}, '
+        '${ttcApptRelative(visit.startsLocal).toLowerCase()}';
+    final ask = passed
+        ? 'Did you get your answers?'
+        : 'Tick the questions you asked';
+    return Semantics(
+      button: true,
+      label: '$title. $ask',
+      excludeSemantics: true,
+      child: InkWell(
+        key: const ValueKey('ttc_appt_follow_up_line'),
+        borderRadius: BorderRadius.circular(16),
+        onTap: () {
+          final entry = ttcApptEntries()
+              .where((e) => e.visitId == visit.id)
+              .firstOrNull;
+          // A booking that has happened is off the list (the list shows
+          // upcoming bookings), so its entry is built from the visit.
+          openTtcAppointment(
+              context,
+              entry ??
+                  TtcApptEntry(
+                    title: visit.title,
+                    startsUtc: visit.startsUtc,
+                    detail: TtcS.current().appointmentsViaParentVeda,
+                    fromParentVeda: true,
+                    bookingId: visit.id.startsWith('booking:')
+                        ? visit.id.substring('booking:'.length)
+                        : visit.id,
+                  ));
+        },
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(14, 12, 10, 12),
+          decoration: BoxDecoration(
+            color: p.surface,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: p.line),
+          ),
+          child: Row(children: [
+            Icon(Icons.fact_check_outlined, size: 19, color: p.ink2),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(ask,
+                        style: pvManrope(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w800,
+                            color: p.ink1)),
+                    const SizedBox(height: 2),
+                    Text(title,
+                        style: pvManrope(
+                            fontSize: 12.5, height: 1.4, color: p.ink2)),
+                  ]),
+            ),
+            Icon(Icons.chevron_right_rounded, size: 20, color: p.ink3),
+          ]),
+        ),
+      ),
+    );
+  }
+}
+
+// Kept for revert (2026-09-28, a question belongs to a visit): the list of
+// questions before ticks, captions and the visit a new one goes to.
+// /// The saved questions for the doctor, each one opening to change it, and
+// /// the way to write another. Used on the list and on each visit's page.
+// class TtcApptQuestions extends StatelessWidget {
+//   const TtcApptQuestions(
+//       {super.key, required this.p, required this.questions});
+//
+//   final V2Palette p;
+//   // Kept for revert (2026-09-28): final List<TtcJournalEntry> questions;
+//   final List<TtcDoctorQuestion> questions;
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     final add = InkWell(
+//       key: const ValueKey('ttc_appt_add_question'),
+//       // Kept for revert (2026-09-28, journal out of TTC):
+//       //   onTap: () => writeTtcEntry(context, kind: TtcEntryKind.question),
+//       onTap: () => writeTtcDoctorQuestion(context),
+//       child: Padding(
+//         padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+//         child: Row(children: [
+//           Icon(Icons.add_rounded, size: 19, color: p.ink1),
+//           const SizedBox(width: 9),
+//           Text(
+//               questions.isEmpty
+//                   ? 'Write a question'
+//                   : TtcS.current().appointmentsAddQuestion,
+//               style: pvManrope(
+//                   fontSize: 14, fontWeight: FontWeight.w800, color: p.ink1)),
+//         ]),
+//       ),
+//     );
+//     return _RowGroup(p: p, children: [
+//       for (final q in questions)
+//         InkWell(
+//           // ⚠️ A QUESTION OPENS (tool rebuild, 2026-09-27). It was a line of
+//           // text with a purple dot and no way to change or remove it once
+//           // the visit had answered it.
+//           // Kept for revert (2026-09-28):
+//           //   onTap: () => openTtcJournalEntry(context, q),
+//           key: ValueKey('ttc_appt_question_${q.id}'),
+//           onTap: () => openTtcDoctorQuestion(context, q),
+//           child: Padding(
+//             padding: const EdgeInsets.fromLTRB(14, 13, 10, 13),
+//             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+//               Padding(
+//                 padding: const EdgeInsets.only(top: 2),
+//                 child: Icon(Icons.help_outline_rounded,
+//                     size: 17, color: p.ink3),
+//               ),
+//               const SizedBox(width: 10),
+//               Expanded(
+//                 child: Text(q.text,
+//                     maxLines: 4,
+//                     overflow: TextOverflow.ellipsis,
+//                     style: pvManrope(
+//                         fontSize: 14, height: 1.5, color: p.ink1)),
+//               ),
+//               Icon(Icons.chevron_right_rounded, size: 19, color: p.ink3),
+//             ]),
+//           ),
+//         ),
+//       add,
+//     ]);
+//   }
+// }
 
 // =============================================================================
 //  2. One visit's page
@@ -745,7 +1400,8 @@ class TtcAppointmentScreen extends StatelessWidget {
     return AnimatedBuilder(
       animation: Listenable.merge([
         TtcAppointmentsStore.instance,
-        TtcJournalStore.instance,
+        // Kept for revert (2026-09-28): TtcJournalStore.instance,
+        TtcDoctorQuestionsStore.instance,
         V2PaletteStore.instance,
       ]),
       builder: (context, _) {
@@ -764,11 +1420,28 @@ class TtcAppointmentScreen extends StatelessWidget {
         final when = rel == ttcApptDay(local)
             ? '$rel at ${ttcApptTime(local)}.'
             : '$rel, ${ttcApptDay(local)} at ${ttcApptTime(local)}.';
-        final questions = TtcJournalStore.instance.doctorQuestions;
+        // Kept for revert (2026-09-28):
+        //   final questions = TtcJournalStore.instance.doctorQuestions;
+        // Kept for revert (2026-09-28, a question belongs to a visit):
+        //   final questions = TtcDoctorQuestionsStore.instance.questions;
+        final qs = TtcDoctorQuestionsStore.instance;
+        final visitId = entry.visitId;
+        final now = DateTime.now();
+        final visitDay = DateTime(local.year, local.month, local.day);
+        final today = DateTime(now.year, now.month, now.day);
+        // Its day has come: her questions carry a tick.
+        final dayCame = !visitDay.isAfter(today);
+        // Its day is over: unticked questions are on the next visit now.
+        final dayOver = visitDay.isBefore(today);
+        final questions = qs.openFor(visitId);
+        final asked = qs.askedAt(visitId);
+        final pendingAfter = qs.notTickedAfter(visitId);
 
         return TtcToolScaffold(
           hue: kIvfHue,
           variant: 1,
+          // One visit, opened from the list: back, not an X (2026-09-29).
+          leading: TtcToolLeading.back,
           eyebrow: 'Appointment',
           title: title,
           intro: upcoming
@@ -789,16 +1462,20 @@ class TtcAppointmentScreen extends StatelessWidget {
                     _InfoRow(
                         p: p,
                         icon: Icons.storefront_outlined,
-                        label: 'Where it came from',
-                        value: 'Booked in ParentVeda. It can\'t be changed '
-                            'here.')
+                        // Change 5 (2026-09-28). Kept for revert: 'Where it
+                        // came from' / "…It can't be changed here."
+                        label: 'Where the visit came from',
+                        value: 'Booked in ParentVeda. A booked visit can\'t '
+                            'be changed on this page.')
                   else ...[
                     _InfoRow(
                         p: p,
                         icon: Icons.person_outline_rounded,
                         label: 'Who with',
                         value: a.withWhom,
-                        addLabel: 'Add who it\'s with',
+                        // Change 5 (2026-09-28). Kept for revert: "Add who
+                        // it's with".
+                        addLabel: 'Add who the visit is with',
                         onAdd: () => editTtcAppointment(context, a)),
                     _InfoRow(
                         p: p,
@@ -826,24 +1503,60 @@ class TtcAppointmentScreen extends StatelessWidget {
                   ]),
                 ],
 
-                if (upcoming) ...[
-                  const SizedBox(height: 26),
-                  Text('Questions to take',
-                      style: pvJakarta(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w700,
-                          color: p.ink1)),
-                  const SizedBox(height: 5),
-                  Text(
-                      questions.isEmpty
-                          ? 'Write them down when you think of them, so '
-                              'nothing is forgotten in the room.'
-                          : 'Everything you saved for the doctor. Tap one to '
-                              'change it or remove it once it\'s answered.',
-                      style: pvManrope(
-                          fontSize: 13, height: 1.5, color: p.ink3)),
+                // Kept for revert (2026-09-28, a question belongs to a visit):
+                // every saved question, on every coming visit, no ticks.
+                //   if (upcoming) ...[ Text('Questions to take'), Text(
+                //     questions.isEmpty ? 'Write them down when you think of
+                //     them, so nothing is forgotten in the room.' :
+                //     'Everything you saved for the doctor. Tap one to change
+                //     it or remove it once it\'s answered.'),
+                //     TtcApptQuestions(p: p, questions: questions) ],
+                //
+                // ⚠️ THREE STATES, BY THE VISIT'S DAY. Before it: the
+                // questions kept for it, each opening to change. On the day:
+                // the same rows with a tick each. After it: the one "Did you
+                // get your answers?" card for any of hers left unticked
+                // (already on the next visit, derived), then the ticked ones
+                // folded under "Asked".
+                const SizedBox(height: 26),
+                // Kept for revert (2026-09-29, one heading style):
+                // Text('Questions to ask', style: pvJakarta(
+                //     fontSize: 17, fontWeight: FontWeight.w700, color: p.ink1)),
+                const TtcSectionHeading('Questions to ask'),
+                const SizedBox(height: 5),
+                Text(
+                    dayOver
+                        ? (asked.isEmpty && pendingAfter.isEmpty
+                            ? 'No questions were saved for the $title.'
+                            : 'What you asked at the $title.')
+                        : dayCame
+                            ? 'Tick each question once you have asked it. '
+                                'Any left unticked move to your next visit '
+                                'the day after.'
+                            : questions.isEmpty
+                                ? 'Write questions for the $title when you '
+                                    'think of them, so nothing is forgotten '
+                                    'in the room.'
+                                : 'Kept for the $title. On the day, tick '
+                                    'each one once you have asked it.',
+                    style:
+                        pvManrope(fontSize: 13, height: 1.5, color: p.ink3)),
+                const SizedBox(height: 12),
+                if (dayOver) ...[
+                  if (pendingAfter.isNotEmpty) ...[
+                    TtcApptFollowUpCard(p: p, visitId: visitId),
+                    const SizedBox(height: 12),
+                  ],
+                ] else
+                  TtcApptQuestions(
+                    p: p,
+                    questions: questions,
+                    visitId: visitId,
+                    tickable: dayCame,
+                  ),
+                if (asked.isNotEmpty) ...[
                   const SizedBox(height: 12),
-                  TtcApptQuestions(p: p, questions: questions),
+                  TtcApptAskedFold(p: p, questions: asked),
                 ],
 
                 if (a != null) ...[
@@ -1157,7 +1870,8 @@ class _TtcAppointmentEditScreenState extends State<TtcAppointmentEditScreen> {
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
-        title: Text(_editing ? 'Leave without saving?' : 'Discard this?',
+        // Change 5 (2026-09-28). Kept for revert: 'Discard this?'.
+        title: Text(_editing ? 'Leave without saving?' : 'Discard this visit?',
             style: pvFraunces(fontSize: 20, color: p.ink1)),
         content: Text(
             _editing
@@ -1214,7 +1928,8 @@ class _TtcAppointmentEditScreenState extends State<TtcAppointmentEditScreen> {
               const SizedBox(height: 22),
               _FormBlock(
                 p: p,
-                title: 'What is it?',
+                // Change 5 (2026-09-28). Kept for revert: 'What is it?'.
+                title: 'What kind of visit?',
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -1557,7 +2272,7 @@ class TtcAppointmentsScreen extends StatelessWidget {
               padding:
                   const EdgeInsets.symmetric(horizontal: 13, vertical: 9),
               decoration: BoxDecoration(
-                  color: ttcPurple,
+                  color: ttcTitleInk,
                   borderRadius: BorderRadius.circular(999)),
               child: Text(t.appointmentsAdd,
                   style: ttcBody(12,
@@ -1616,7 +2331,7 @@ class TtcAppointmentsScreen extends StatelessWidget {
                                     margin: const EdgeInsets.only(
                                         top: 7, right: 11),
                                     decoration: const BoxDecoration(
-                                        color: ttcPurple,
+                                        color: ttcTitleInk,
                                         shape: BoxShape.circle),
                                   ),
                                   Expanded(
@@ -1633,11 +2348,11 @@ class TtcAppointmentsScreen extends StatelessWidget {
                             behavior: HitTestBehavior.opaque,
                             child: Row(children: [
                               const Icon(Icons.add_circle_outline_rounded,
-                                  size: 16, color: ttcPurple),
+                                  size: 16, color: ttcTitleInk),
                               const SizedBox(width: 7),
                               Text(t.appointmentsAddQuestion,
                                   style: ttcBody(12.5,
-                                      color: ttcPurple, w: FontWeight.w800)),
+                                      color: ttcTitleInk, w: FontWeight.w800)),
                             ]),
                           ),
                         ]),
@@ -1700,7 +2415,7 @@ class _EntryCard extends StatelessWidget {
           ),
           child: Column(children: [
             Text('${local.day}',
-                style: ttcJakarta(16, color: faded ? ttcMuted : ttcPurple)),
+                style: ttcJakarta(16, color: faded ? ttcMuted : ttcTitleInk)),
             Text(_month(local),
                 style: ttcBody(9.5, color: ttcMuted, w: FontWeight.w800)),
           ]),
@@ -1721,7 +2436,7 @@ class _EntryCard extends StatelessWidget {
               const SizedBox(height: 6),
               Row(children: [
                 const Icon(Icons.notifications_none_rounded,
-                    size: 14, color: ttcPurple),
+                    size: 14, color: ttcTitleInk),
                 const SizedBox(width: 5),
                 Text('Reminder the evening before',
                     style: ttcBody(11.5, color: ttcSoft, w: FontWeight.w600)),
@@ -1735,7 +2450,7 @@ class _EntryCard extends StatelessWidget {
                 decoration: BoxDecoration(
                     color: ttcPanel, borderRadius: BorderRadius.circular(999)),
                 child: Text(t.appointmentsViaParentVeda,
-                    style: ttcBody(9.5, color: ttcPurple, w: FontWeight.w800)),
+                    style: ttcBody(9.5, color: ttcTitleInk, w: FontWeight.w800)),
               ),
             ],
           ]),
@@ -1955,7 +2670,7 @@ class _ApptSheetState extends State<_ApptSheet> {
                           border: Border.all(color: ttcBorder)),
                       child: Row(children: [
                         const Icon(Icons.schedule_rounded,
-                            size: 16, color: ttcPurple),
+                            size: 16, color: ttcTitleInk),
                         const SizedBox(width: 11),
                         Expanded(
                           child: Text(
@@ -1967,7 +2682,7 @@ class _ApptSheetState extends State<_ApptSheet> {
                         ),
                         Text('Change',
                             style: ttcBody(12.5,
-                                color: ttcPurple, w: FontWeight.w800)),
+                                color: ttcTitleInk, w: FontWeight.w800)),
                       ]),
                     ),
                   ),
@@ -2013,11 +2728,12 @@ class _ApptSheetState extends State<_ApptSheet> {
                           alignment: Alignment.center,
                           padding: const EdgeInsets.symmetric(vertical: 15),
                           decoration: BoxDecoration(
-                              color: ttcPanel,
+                              // Kept for revert (2026-09-29, no tinted slab behind text): color: ttcPanel,
+                              color: Colors.white, border: const Border.fromBorderSide(BorderSide(color: ttcLine)),
                               borderRadius: BorderRadius.circular(16)),
                           child: Text(t.journalCancel,
                               style: ttcBody(14,
-                                  color: ttcSoft, w: FontWeight.w800)),
+                                  color: ttcTitleInk, w: FontWeight.w800)),
                         ),
                       ),
                     ),
@@ -2032,7 +2748,7 @@ class _ApptSheetState extends State<_ApptSheet> {
                           alignment: Alignment.center,
                           padding: const EdgeInsets.symmetric(vertical: 15),
                           decoration: BoxDecoration(
-                              color: ttcPurple,
+                              color: ttcTitleInk,
                               borderRadius: BorderRadius.circular(16)),
                           child: Text(t.journalSave,
                               style: ttcBody(14,
@@ -2137,7 +2853,7 @@ Future<void> addTtcAppointment(BuildContext context) async {
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(color: ttcBorder)),
                 child: Row(children: [
-                  const Icon(Icons.schedule_rounded, size: 16, color: ttcPurple),
+                  const Icon(Icons.schedule_rounded, size: 16, color: ttcTitleInk),
                   const SizedBox(width: 11),
                   Text(
                       '${when.day}/${when.month}/${when.year} · '
@@ -2156,10 +2872,11 @@ Future<void> addTtcAppointment(BuildContext context) async {
                     alignment: Alignment.center,
                     padding: const EdgeInsets.symmetric(vertical: 15),
                     decoration: BoxDecoration(
-                        color: ttcPanel,
+                        // Kept for revert (2026-09-29, no tinted slab behind text): color: ttcPanel,
+                        color: Colors.white, border: const Border.fromBorderSide(BorderSide(color: ttcLine)),
                         borderRadius: BorderRadius.circular(16)),
                     child: Text(t.journalCancel,
-                        style: ttcBody(14, color: ttcSoft, w: FontWeight.w800)),
+                        style: ttcBody(14, color: ttcTitleInk, w: FontWeight.w800)),
                   ),
                 ),
               ),
@@ -2181,7 +2898,7 @@ Future<void> addTtcAppointment(BuildContext context) async {
                     alignment: Alignment.center,
                     padding: const EdgeInsets.symmetric(vertical: 15),
                     decoration: BoxDecoration(
-                        color: ttcPurple,
+                        color: ttcTitleInk,
                         borderRadius: BorderRadius.circular(16)),
                     child: Text(t.journalSave,
                         style: ttcBody(14,
@@ -2224,7 +2941,7 @@ Widget _sheetField(TextEditingController c, String hint,
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: ttcPurple, width: 1.4),
+          borderSide: const BorderSide(color: ttcTitleInk, width: 1.4),
         ),
       ),
     );

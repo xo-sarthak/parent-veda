@@ -22,6 +22,15 @@
 //  forbids all three, and the reason is the same one that keeps streaks out of
 //  this area: a screen that celebrates finishing makes the days you did not open
 //  it into days you let something down.
+//
+//  ⚠️ A SOUND IS NOT A CELEBRATION (2026-09-28). The user asked for sound
+//  wherever something counts or times, including a chime at the end. The
+//  brief's "no chime" was about praise for finishing; the end tone here is a
+//  signal that the time is up, for someone whose eyes are closed, the same
+//  job the last vibration already did. It is one soft two-note bell, with no
+//  words and nothing on screen added to it. Every cue has a "Sound cues"
+//  switch beside the vibration switch, and the phone's silent mode wins. See
+//  lib/ttc/ttc_cue_sounds.dart for the cues and the audio-context choice.
 // =============================================================================
 
 import 'dart:async';
@@ -33,6 +42,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../../theme/pv_fonts.dart';
+import '../../ttc/ttc_cue_sounds.dart';
 import '../../ttc/ttc_practice_data.dart';
 import '../../widgets/breathing_circle.dart';
 import '../../widgets/figure_highlight.dart';
@@ -137,6 +147,36 @@ class TtcVibrateSwitch extends StatelessWidget {
   }
 }
 
+/// The sound cues as a labelled switch, the same shape as the vibration one
+/// (2026-09-28). ON by default and remembered on this phone; the store is
+/// `TtcCueSounds`, so every player on screen reads one value.
+///
+/// "Sound cues" names what it turns on: a tone as each breath or timed step
+/// begins and one as the practice ends, never music or a voice. Opal keeps a
+/// Mute control beside its breathing player
+/// (https://mobbin.com/screens/b7a85dff-8e86-4211-9dec-73f5bf2ac492).
+class TtcSoundSwitch extends StatelessWidget {
+  const TtcSoundSwitch({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final p = V2PaletteStore.instance.current;
+    final cues = TtcCueSounds.instance;
+    return ListenableBuilder(
+      listenable: cues,
+      builder: (context, _) => MergeSemantics(
+        child: Row(children: [
+          Expanded(
+            child: Text('Sound cues',
+                style: pvManrope(fontSize: 13.5, height: 1.4, color: p.ink1)),
+          ),
+          Switch(value: cues.enabled, onChanged: cues.setEnabled),
+        ]),
+      ),
+    );
+  }
+}
+
 /// The wall clock the player reads. A seam for tests only (2026-09-27): a
 /// widget test's pump moves timers, not `DateTime.now`, so a test that wants
 /// to see a practice finish sets this and moves it. Never set it in the app.
@@ -194,6 +234,7 @@ class TtcPracticeSession extends StatefulWidget {
     this.caption,
     this.stepClock = false,
     this.showVibrate = true,
+    this.showSound = true,
   })  : anim = practice.anim,
         steps = practice.steps,
         skinFor = (() => TtcPracticeSkin.of(practice));
@@ -209,6 +250,8 @@ class TtcPracticeSession extends StatefulWidget {
         caption = null,
         stepClock = false,
         showVibrate = false,
+        // A sit has an end tone, so it carries the switch that silences it.
+        showSound = true,
         skinFor = (() => TtcPracticeSkin.breathe());
 
   /// Called once, when the timer reaches the end on its own (never on a
@@ -236,6 +279,11 @@ class TtcPracticeSession extends StatefulWidget {
   /// page passes false and draws `TtcVibrateSwitch` with its other setting;
   /// the course sessions keep it here.
   final bool showVibrate;
+
+  /// Whether the session draws its own "Sound cues" switch (2026-09-28). The
+  /// practice page passes false and draws `TtcSoundSwitch` with its other
+  /// settings; the Sanskar breath and the course sessions keep it here.
+  final bool showSound;
 
   final TtcPracticeAnim anim;
 
@@ -277,6 +325,10 @@ class TtcPracticeSessionState extends State<TtcPracticeSession> {
   bool get _vibrate => ttcPracticeVibrate.value;
   String? _lastPhase;
 
+  /// The timed step the last tick was on, for the step cue. Null before the
+  /// first tick of a run, so pressing Start does not sound a "step changed".
+  int? _lastStep;
+
   int get _total => widget.anim.seconds;
   int get _left => (_total - _clock.elapsed.inSeconds).clamp(0, _total);
 
@@ -290,6 +342,9 @@ class TtcPracticeSessionState extends State<TtcPracticeSession> {
     super.initState();
     _loadPracticeVibrate();
     ttcPracticeVibrate.addListener(_onVibrateChanged);
+    // The five tones load when a player opens and unload when the last one
+    // closes (2026-09-28). See lib/ttc/ttc_cue_sounds.dart.
+    TtcCueSounds.instance.open();
   }
 
   void _onVibrateChanged() {
@@ -299,6 +354,7 @@ class TtcPracticeSessionState extends State<TtcPracticeSession> {
   @override
   void dispose() {
     ttcPracticeVibrate.removeListener(_onVibrateChanged);
+    TtcCueSounds.instance.close();
     _ticker?.cancel();
     if (_clock.running) WakelockPlus.disable().catchError((Object _) {});
     super.dispose();
@@ -312,18 +368,65 @@ class TtcPracticeSessionState extends State<TtcPracticeSession> {
       ? 0
       : (_clock.elapsed.inMilliseconds / 1000.0 / _total).clamp(0.0, 1.0);
 
+  /// Which step the TIMER is on, or null where the timer does not move the
+  /// steps. The same splits the ring and the body scan draw with, so the tap
+  /// sounds on the frame the words change.
+  int? _timedStep() {
+    final n = widget.steps.length;
+    if (n == 0 || _total == 0) return null;
+    final t = _clock.elapsed.inMilliseconds / 1000.0;
+    return switch (widget.anim) {
+      TtcFigureAnim() when widget.stepClock =>
+        (t / (_total / n)).floor().clamp(0, n - 1),
+      TtcBodyScanAnim() => (_fraction * (n > 2 ? n - 2 : n))
+          .floor()
+          .clamp(0, (n > 2 ? n - 2 : n) - 1),
+      _ => null,
+    };
+  }
+
   void _tick() {
     if (!mounted) return;
     final finished = _left == 0;
-    if (_vibrate && _isBreath && !finished) {
-      final m = (widget.anim as TtcBreathAnim)
-          .toBreathPattern()
-          .at(_clock.elapsed.inMilliseconds / 1000.0);
+    // Kept for revert (2026-09-28), the vibration-only phase check:
+    //   if (_vibrate && _isBreath && !finished) {
+    //     final m = (widget.anim as TtcBreathAnim)
+    //         .toBreathPattern()
+    //         .at(_clock.elapsed.inMilliseconds / 1000.0);
+    //     final key = '${m.cycle}:${m.index}';
+    //     if (_lastPhase != null && key != _lastPhase) {
+    //       HapticFeedback.mediumImpact();
+    //     }
+    //     _lastPhase = key;
+    //   }
+    //
+    // ⚠️ A TONE AS EACH BREATH PHASE BEGINS (2026-09-28). The phase is worked
+    // out whether or not she asked for vibration now, because the sound needs
+    // it too. The FIRST phase sounds (the in-breath she starts on, or the
+    // phase she resumes into), where the vibration still waits for a change:
+    // a buzz under the finger that just pressed Start tells her nothing, a
+    // rising tone tells her to breathe in.
+    if (_isBreath && !finished) {
+      final pattern = (widget.anim as TtcBreathAnim).toBreathPattern();
+      final m = pattern.at(_clock.elapsed.inMilliseconds / 1000.0);
       final key = '${m.cycle}:${m.index}';
-      if (_lastPhase != null && key != _lastPhase) {
-        HapticFeedback.mediumImpact();
+      if (key != _lastPhase) {
+        if (_vibrate && _lastPhase != null) HapticFeedback.mediumImpact();
+        TtcCueSounds.instance
+            .play(ttcCueForBreath(pattern.steps[m.index].kind));
       }
       _lastPhase = key;
+    }
+    // ⚠️ A SOFT TAP AS A TIMED STEP CHANGES (2026-09-28): the drawn-figure
+    // ring while the steps follow the timer, and the body scan as it moves to
+    // the next part. Not on the first tick (Start was her own tap), and not
+    // when she moves the steps by hand (the button is her own tap too).
+    if (!finished) {
+      final step = _timedStep();
+      if (step != null && _lastStep != null && step != _lastStep) {
+        TtcCueSounds.instance.play(TtcCue.step);
+      }
+      _lastStep = step;
     }
     if (finished) {
       _clock.pause();
@@ -331,6 +434,9 @@ class TtcPracticeSessionState extends State<TtcPracticeSession> {
       _ticker = null;
       WakelockPlus.disable().catchError((Object _) {});
       if (_vibrate) HapticFeedback.heavyImpact();
+      // The end tone: the time is up, for eyes that are closed. Not praise;
+      // see the file's header.
+      TtcCueSounds.instance.play(TtcCue.done);
       setState(() {});
       widget.onProgress?.call(1, false);
       widget.onFinished?.call();
@@ -350,6 +456,7 @@ class TtcPracticeSessionState extends State<TtcPracticeSession> {
       } else {
         if (_left == 0) _clock.reset();
         _lastPhase = null;
+        _lastStep = null;
         _clock.start();
         WakelockPlus.enable().catchError((Object _) {});
         // 100ms rather than 1s: the breathing circle moves continuously, and a
@@ -427,9 +534,11 @@ class TtcPracticeSessionState extends State<TtcPracticeSession> {
                       ? 'Pause'
                       : done
                           // Was 'Again' (2026-09-27), which read as a prompt
-                          // to repeat the practice.
-                          ? 'Start again'
-                          : 'Start',
+                          // to repeat the practice. Kept for revert
+                          // (2026-09-28): 'Start again' and 'Start'; the
+                          // button names the timer it starts.
+                          ? 'Restart timer'
+                          : 'Start timer',
                   style: pvManrope(
                       fontSize: 14.5,
                       fontWeight: FontWeight.w700,
@@ -493,6 +602,14 @@ class TtcPracticeSessionState extends State<TtcPracticeSession> {
         // ),
         // ),
         const TtcVibrateSwitch(),
+      ],
+
+      // ---- the sound cues, every kind of session (2026-09-28) -------------
+      // Under the vibration switch where there is one, alone where there is
+      // not: every session has at least the end tone.
+      if (widget.showSound) ...[
+        SizedBox(height: _isBreath && widget.showVibrate ? 0 : 6),
+        const TtcSoundSwitch(),
       ],
 
       if (done) ...[

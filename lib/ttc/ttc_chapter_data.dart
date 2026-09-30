@@ -488,10 +488,14 @@ const Map<TtcChapter, TtcChapterContent> ttcChapterContent = {
 
   // ===========================================================================
   TtcChapter.aNewBeginning: TtcChapterContent(
+    // Kept for revert (2026-09-28, journal out of TTC): both lines named the
+    // journal first, which left the stage.
+    //   'A positive test. Nothing here starts over. Your journal, your partner, your calendar, your reports and your care circle all carry straight through.',
+    //   'Positive test. Yahan kuch phir se shuru nahi hota - aapka journal, partner, calendar, reports aur care circle, sab seedhe aage chalte hain.',
     overviewEn:
-        'A positive test. Nothing here starts over. Your journal, your partner, your calendar, your reports and your care circle all carry straight through.',
+        'A positive test. Nothing here starts over. Your partner, your calendar, your reports and your care circle all carry straight through.',
     overviewHi:
-        'Positive test. Yahan kuch phir se shuru nahi hota - aapka journal, partner, calendar, reports aur care circle, sab seedhe aage chalte hain.',
+        'Positive test. Yahan kuch phir se shuru nahi hota - aapka partner, calendar, reports aur care circle, sab seedhe aage chalte hain.',
     me: [
       TtcSection(
         titleEn: 'What happens now',

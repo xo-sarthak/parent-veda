@@ -618,6 +618,16 @@ PrecheckItem? precheckItemById(String id) {
 List<PrecheckItem> precheckItemsIn(PrecheckSection s) =>
     [for (final i in kPrecheckItems) if (i.section == s) i];
 
+/// The items the checklist draws: those in a visible section (2026-09-29).
+///
+/// ⚠️ COUNTS AND LISTS READ THIS, NOT `kPrecheckItems`. The two partner items
+/// sit in a hidden section, so counting the whole catalogue put two rows she
+/// can never see into "Not looked at" on her summary.
+List<PrecheckItem> get kPrecheckVisibleItems => [
+      for (final i in kPrecheckItems)
+        if (ttcVisiblePrecheckSections.contains(i.section)) i,
+    ];
+
 /// The editorial beat after the first section — §26. Not labelled a tip.
 final LocalizedText kPrecheckPatternBreak = _en(
     "Getting ready for pregnancy isn't about a perfect score. It's about "

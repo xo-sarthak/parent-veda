@@ -202,6 +202,8 @@ class _TtcMedicationScreenState extends State<TtcMedicationScreen> {
 
         return TtcToolScaffold(
           hue: kIvfHue,
+          // The tool's mark over the eyebrow (2026-09-29, ttc_tool_marks.dart).
+          toolId: 'medication',
           // ⚠️ ONE TOOL, ONE NAME (2026-09-27): the Tools tile's name, word
           // for word. Kept for revert: eyebrow: t.medTitle ("Your medication").
           eyebrow: t.hinglish ? 'Dawaiyan' : 'Medication',
@@ -221,7 +223,17 @@ class _TtcMedicationScreenState extends State<TtcMedicationScreen> {
           // Kept for revert (2026-09-27): "NO `action` HERE" — the add lived
           // beside the "Today" title as a quiet link. Every list tool now
           // carries its add in the same corner, so it is found in one place.
-          action: TtcDoseHeroAdd(onTap: () => editTtcMedication(context, null)),
+          // ⚠️ ONE ADD ON AN EMPTY SCREEN (the launch sanity T13 rule,
+          // applied here 2026-09-28): while the list is empty the empty
+          // card's "Add a medication" is the only add; the header pill
+          // appears once there are items. Kept for revert (2026-09-28):
+          //   action: TtcDoseHeroAdd(
+          //       onTap: () => editTtcMedication(context, null)),
+          action: meds.isEmpty
+              ? null
+              : TtcDoseHeroAdd(
+                  label: 'New medicine',
+                  onTap: () => editTtcMedication(context, null)),
           children: [
             ttcToolPad(Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -406,9 +418,13 @@ class _TtcMedicineDetailScreenState extends State<TtcMedicineDetailScreen> {
         if (m == null) {
           return TtcToolScaffold(
             hue: kIvfHue,
+            // Opened from the list: back, not an X (2026-09-29).
+            leading: TtcToolLeading.back,
             eyebrow: eyebrow,
             title: 'Not on the list any more.',
-            intro: 'It was removed. Close this to go back to the list.',
+            // The button is an arrow now (2026-09-29). Kept for revert:
+            // intro: 'It was removed. Close this to go back to the list.',
+            intro: 'This medicine was removed. Go back to see your list.',
             children: const [SizedBox(height: 40)],
           );
         }
@@ -433,6 +449,8 @@ class _TtcMedicineDetailScreenState extends State<TtcMedicineDetailScreen> {
 
         return TtcToolScaffold(
           hue: kIvfHue,
+          // One medicine, opened from the list: back, not an X (2026-09-29).
+          leading: TtcToolLeading.back,
           eyebrow: eyebrow,
           title: m.name,
           intro: what.isEmpty ? 'No dose written down yet.' : what,
@@ -464,7 +482,8 @@ class _TtcMedicineDetailScreenState extends State<TtcMedicineDetailScreen> {
                           const SizedBox(height: 12),
                           TtcDoseInkButton(
                             key: const ValueKey('ttc_med_again'),
-                            label: 'Take it again',
+                            // Kept for revert (2026-09-28): 'Take it again'
+                            label: 'Take this medicine again',
                             icon: Icons.replay_rounded,
                             onTap: () => editTtcMedication(context, m,
                                 again: true),
@@ -632,8 +651,9 @@ class _MedSheetState extends State<_MedSheet> {
     final editing = widget.existing != null;
     return TtcDoseSheet(
       eyebrow: t.hinglish ? 'Dawaiyan' : 'Medication',
+      // Kept for revert (2026-09-28): 'Take it again'
       title: widget.again
-          ? 'Take it again'
+          ? 'Take this medicine again'
           : editing
               ? 'Change this medicine'
               : 'Add a medicine',
@@ -761,7 +781,8 @@ class _MedSheetState extends State<_MedSheet> {
                             fontWeight: FontWeight.w600,
                             color: p.ink1)),
                   ),
-                  Text(_lastDay == null ? 'Set' : 'Change',
+                  // Kept for revert (2026-09-28): 'Set' : 'Change'
+                  Text(_lastDay == null ? 'Set last day' : 'Change last day',
                       style: pvManrope(
                           fontSize: 12.5,
                           fontWeight: FontWeight.w800,
@@ -820,7 +841,8 @@ class _MedSheetState extends State<_MedSheet> {
     final first = today.subtract(const Duration(days: 90));
     final picked = await showDatePicker(
       context: context,
-      helpText: 'Last day you take it',
+      // Kept for revert (2026-09-28): 'Last day you take it'
+      helpText: 'Last day of this medicine',
       initialDate: _lastDay != null && !_lastDay!.isBefore(first)
           ? _lastDay!
           : today,

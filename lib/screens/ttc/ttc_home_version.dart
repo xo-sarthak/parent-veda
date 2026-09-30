@@ -25,6 +25,7 @@ import 'ttc_home_v3.dart';
 import 'ttc_intro_flow.dart';
 import 'ttc_partner_screen.dart' show TtcPartnerTodayScreen;
 import 'ttc_strings.dart' show TtcPartnerMode;
+import 'ttc_tab_host.dart';
 import 'ttc_today_screen.dart';
 
 enum TtcHomeVersion {
@@ -116,13 +117,27 @@ class _TtcHomeBody extends StatelessWidget {
         listenable: Listenable.merge(
             [TtcHomeVersionStore.instance, TtcPartnerMode.instance]),
         builder: (context, _) => Stack(children: [
-          if (TtcPartnerMode.instance.on)
+          // ⚠️ ON V3 THE HOME HOSTS ALL FIVE TABS (2026-09-28): a tab switch
+          // fades in place under one bar instead of pushing a route with a
+          // bar of its own. Today is tab 0, hers or his. Classic keeps its
+          // pushed tabs. See ttc_tab_host.dart. Kept for revert:
+          //   if (TtcPartnerMode.instance.on)
+          //     const TtcPartnerTodayScreen()
+          //   else
+          //   switch (TtcHomeVersionStore.instance.version) {
+          //     TtcHomeVersion.v1 => const TtcTodayScreen(),
+          //     TtcHomeVersion.v3 => const TtcHomeV3(),
+          //   },
+          if (TtcHomeVersionStore.instance.version == TtcHomeVersion.v3)
+            TtcTabHost(
+              today: TtcPartnerMode.instance.on
+                  ? const TtcPartnerTodayScreen()
+                  : const TtcHomeV3(),
+            )
+          else if (TtcPartnerMode.instance.on)
             const TtcPartnerTodayScreen()
           else
-          switch (TtcHomeVersionStore.instance.version) {
-            TtcHomeVersion.v1 => const TtcTodayScreen(),
-            TtcHomeVersion.v3 => const TtcHomeV3(),
-          },
+            const TtcTodayScreen(),
           // ⚠️ ON `Current` ONLY. V3 CARRIES IT IN PROFILE INSTEAD.
           //
           // Asymmetric on purpose, and the asymmetry is the whole point:

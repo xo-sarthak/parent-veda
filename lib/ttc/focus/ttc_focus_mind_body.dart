@@ -56,14 +56,37 @@ const String _kGarbh = 'ttc_read_garbh_sanskar';
 /// The cost is that the section's contents are not readable in this file. That
 /// is the correct trade: a reader who wants to know what is in the Move library
 /// should be reading the library.
+///
+/// ⚠️ THE ID IS THE PRACTICE'S PHOTO KEY, PINNED (2026-09-29, every door tile
+/// carries a stable `id`). Each photo was filed under the title the practice
+/// had then (`ttc_tile_<title>`); the map below pins that key to the
+/// practice's own id, so retitling a practice in the library keeps its photo.
+/// A practice added later falls back to its title's key.
 List<TtcTile> _practiceTiles(TtcPracticeKind kind) => [
       for (final p in ttcPracticesOfKind(kind))
         TtcDoTile(
           title: p.title,
+          id: _kPracticePhotoIds[p.id] ?? ttcTileTitleKey(p.title),
           blurb: p.blurb,
           surfaceId: 'ttc_practice/${p.id}',
         ),
     ];
+
+/// Practice id to the key its photo is filed under. See [_practiceTiles].
+const Map<String, String> _kPracticePhotoIds = {
+  'mb_loosen': 'ttc_tile_loosen_up_neck_shoulders_side_bends',
+  'mb_catcow': 'ttc_tile_cat_and_cow_then_child_s_pose',
+  'mb_hips': 'ttc_tile_hip_openers_butterfly_and_slow_lunge',
+  'mb_walk': 'ttc_tile_a_ten_minute_walk',
+  'mb_legsup': 'ttc_tile_legs_up_the_wall',
+  'mb_sun': 'ttc_tile_slow_sun_salutation_three_rounds',
+  'mb_longout': 'ttc_tile_breathe_in_for_4_out_for_6',
+  'mb_nostril': 'ttc_tile_alternate_nostril_breathing',
+  'mb_box': 'ttc_tile_box_breathing',
+  'mb_bodyrelax': 'ttc_tile_two_minute_body_relaxation',
+  'mb_listen': 'ttc_tile_two_minute_calm_listen',
+  'mb_together': 'ttc_tile_ten_slow_breaths_together',
+};
 
 final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
   bracketId: 'ttc_mind_body',
@@ -103,7 +126,8 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
   groups: [
     TtcFocusGroup(
       id: 'today', mark: IntentMark.sunMark, tabMark: TtcTabMark.sun, inlineLabel: 'A few minutes',
-      label: 'Today',
+      // Kept for revert (2026-09-28, explicit names): label: 'Today',
+      label: "Today's practice",
       icon: Icons.wb_sunny_outlined,
       hue: 160,
       toolSurfaceId: 'ttc_mind_today',
@@ -121,12 +145,14 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
     ),
     TtcFocusGroup(
         id: 'understand', mark: IntentMark.bookMark, tabMark: TtcTabMark.openBook,
-        label: 'Understand',
+        // Kept for revert (2026-09-28, explicit names): label: 'Understand',
+        label: 'Stress and tradition',
         icon: Icons.menu_book_outlined,
         hue: 206),
     TtcFocusGroup(
       id: 'practice', mark: IntentMark.lotusMark, tabMark: TtcTabMark.lotus,
-      label: 'The practice',
+      // Kept for revert (2026-09-28, explicit names): label: 'The practice',
+      label: 'Move and breathe',
       icon: Icons.self_improvement_outlined,
       hue: 104,
       // ⚠️ ONCE, HERE — NOT ON TWELVE CARDS. The brief's own heading, and
@@ -152,7 +178,8 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
     // callout whole is what guarantees it travels.
     TtcFocusGroup(
       id: 'talk', mark: IntentMark.moodArc, tabMark: TtcTabMark.twoBubbles,
-      label: 'Talk',
+      // Kept for revert (2026-09-28, explicit names): label: 'Talk',
+      label: 'Talk to someone',
       icon: Icons.chat_bubble_outline_rounded,
       hue: 344,
       pinnedRedFlagReadIds: [_kStress, _kGarbh],
@@ -185,12 +212,16 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
       group: 'hard',
       tiles: [
         TtcToolTile(
-          title: 'Talk it through',
+          // Kept for revert (2026-09-28, explicit names): title: 'Talk it through',
+          title: 'Talk through the day your period came',
+          id: 'ttc_tile_talk_it_through',
           blurb: 'A short, gentle chat for the day your period comes.',
           surfaceId: 'ttc_chat/period_came',
         ),
         TtcArticleTile(
-          title: 'What today means, and what it doesn\'t',
+          // Kept for revert (2026-09-28, explicit names): title: 'What today means, and what it doesn\'t',
+          title: "What a period day means, and what it doesn't",
+          id: 'ttc_tile_what_a_period_day_means_and_what_it_doesn_t',
           blurb: 'A few small things that help you get to next month.',
           readId: 'ttc_read_period_came',
         ),
@@ -198,21 +229,25 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
     ),
 
     TtcFocusSection(
-      heading: 'When other people make it harder',
+      // Kept for revert (2026-09-28, explicit names): heading: 'When other people make it harder',
+      heading: 'When other people make trying harder',
       group: 'hard',
       tiles: [
         TtcArticleTile(
           title: "When other people's pregnancy news is hard",
+          id: 'ttc_tile_when_other_people_s_pregnancy_news_is_hard',
           blurb: "Why the envy comes, and why it doesn't make you a bad person.",
           readId: 'ttc_read_others_news',
         ),
         TtcArticleTile(
           title: 'Should you tell family you\'re trying?',
+          id: 'ttc_tile_should_you_tell_family_you_re_trying',
           blurb: 'What telling gives you, what it costs, and how to decide.',
           readId: 'ttc_read_telling_family',
         ),
         TtcArticleTile(
           title: 'Three answers for "Koi good news?"',
+          id: 'ttc_tile_three_answers_for_koi_good_news',
           blurb: 'A gentle answer and a firmer one, for each person who asks.',
           readId: 'ttc_read_good_news_answers',
         ),
@@ -220,6 +255,7 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
         // relevance audit): it answers the same questions as the two above.
         TtcGuideTile(
           title: 'When family keeps asking',
+          id: 'ttc_tile_when_family_keeps_asking',
           blurb: "What to say, what you owe them, and what you don't.",
           readId: 'ttc_read_family_asking',
         ),
@@ -227,16 +263,19 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
     ),
 
     TtcFocusSection(
-      heading: 'When it goes on for months',
+      // Kept for revert (2026-09-28, explicit names): heading: 'When it goes on for months',
+      heading: 'When trying goes on for months',
       group: 'hard',
       tiles: [
         TtcArticleTile(
           title: 'When trying takes over your life',
+          id: 'ttc_tile_when_trying_takes_over_your_life',
           blurb: 'How to notice, and how to give it a smaller place.',
           readId: 'ttc_read_trying_takes_over',
         ),
         TtcArticleTile(
           title: "Coping when month after month doesn't work",
+          id: 'ttc_tile_coping_when_month_after_month_doesn_t_work',
           blurb: 'How to look after each other, and where to get help.',
           readId: 'ttc_read_month_after_month',
         ),
@@ -247,18 +286,25 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
     //  Understand
     // =========================================================================
     TtcFocusSection(
-      heading: 'About stress',
+      // Kept for revert (2026-09-28, explicit names): heading: 'About stress',
+      heading: 'What does stress really do?',
       group: 'understand',
       tiles: [
         // reuse, locked — not retitled, not rewritten.
         TtcArticleTile(
+          // ⚠️ NOT RETITLED (2026-09-28): the brief locks this title ("do not
+          // edit or re-title the two locked articles"), and it already names
+          // its subject before the "it". Considered and left: 'What stress
+          // really does to fertility'.
           title: 'Stress, and the thing everyone says about it',
+          id: 'ttc_tile_stress_and_the_thing_everyone_says_about_it',
           blurb: 'What the evidence shows, and why "just relax" is wrong and '
               'unkind.',
           readId: _kStress,
         ),
         TtcVideoTile(
           title: 'Why "just relax" is the wrong advice',
+          id: 'ttc_tile_why_just_relax_is_the_wrong_advice',
           blurb: 'Parmeshwari, in under five minutes.',
           slotId: 'ttc_vid_stress_fertility',
           duration: '5 MIN',
@@ -269,7 +315,9 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
           // D14 (2026-09-28): every myth card is titled as the question, so a
           // true statement never sits under a Myth vs fact chip. Kept for
           // revert: title: 'Stop thinking about it and it will happen',
-          title: 'Will it happen if you stop thinking about it?',
+          // Kept for revert (2026-09-28, explicit names): title: 'Will it happen if you stop thinking about it?',
+          title: 'Will you conceive once you stop trying so hard?',
+          id: 'ttc_tile_will_it_happen_if_you_stop_thinking_about_it',
           blurb: 'The advice everyone gives, and what the evidence says.',
           myth: "If you stop thinking about it, you'll conceive.",
           fact: 'The largest studies find that emotional distress before '
@@ -280,6 +328,7 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
         ),
         TtcGuideTile(
           title: 'Where stress does have a real effect',
+          id: 'ttc_tile_where_stress_does_have_a_real_effect',
           blurb: "The one honest exception, and why it isn't the everyday "
               'worry of trying.',
           readId: _kStress,
@@ -296,6 +345,7 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
       tiles: [
         TtcArticleTile(
           title: 'Preconception garbh sanskar, honestly',
+          id: 'ttc_tile_preconception_garbh_sanskar_honestly',
           blurb: "What the tradition is, what it's good for, and what it "
               "doesn't claim.",
           readId: _kGarbh,
@@ -319,15 +369,27 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
         //
         // Recorded as a real conflict between the brief and a shipped
         // invariant in `docs/STILL-OPEN.md` §32.8 rather than settled quietly.
-        TtcVideoTile(
-          title: 'The eight sessions, taught',
-          blurb: 'Garbh sanskar done with you, not just described. For both '
-              'of you, and nothing to believe in.',
-          slotId: 'ttc_vid_garbh_preconception',
-          duration: '36 MIN',
-        ),
+        //
+        // ⚠️ COMMENTED OUT, NOT DELETED (2026-09-28, no random repetition).
+        // This card and "The free garbh sanskar course, eight sessions" on
+        // Move and breathe were the same eight sessions twice on one door,
+        // with near-identical lines ("done with you, not just described. For
+        // both of you" and "for both of you, taught properly, not just
+        // described"). The course is the one she can open today; this film is
+        // not made yet. Nothing loses its way in: the film is still the hero
+        // of the garbh sanskar read, the card directly above.
+        // Kept for revert (2026-09-28):
+        // TtcVideoTile(
+        //   title: 'The eight sessions, taught',
+        //   blurb: 'Garbh sanskar done with you, not just described. For both '
+        //       'of you, and nothing to believe in.',
+        //   slotId: 'ttc_vid_garbh_preconception',
+        //   duration: '36 MIN',
+        // ),
         TtcMythTile(
-          title: 'Does it make a smarter baby?',
+          // Kept for revert (2026-09-28, explicit names): title: 'Does it make a smarter baby?',
+          title: 'Does garbh sanskar make a smarter baby?',
+          id: 'ttc_tile_does_it_make_a_smarter_baby',
           blurb: "What the tradition can fairly claim, and what it can't.",
           myth: 'Doing this shapes your baby\'s intelligence and nature.',
           fact: "No. There's no controlled evidence that any practice before "
@@ -337,7 +399,9 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
               "the months feel, and that's a full reason on its own.",
         ),
         TtcGuideTile(
-          title: "And if you're not religious",
+          // Kept for revert (2026-09-28, explicit names): title: "And if you're not religious",
+          title: 'Garbh sanskar if you are not religious',
+          id: 'ttc_tile_and_if_you_re_not_religious',
           blurb: 'The practice works without the belief, and loses nothing '
               'that way.',
           readId: _kGarbh,
@@ -347,11 +411,13 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
     ),
 
     TtcFocusSection(
-      heading: 'What a practice is for',
+      // Kept for revert (2026-09-28, explicit names): heading: 'What a practice is for',
+      heading: 'What is a daily practice for?',
       group: 'understand',
       tiles: [
         TtcGuideTile(
           title: 'What a daily practice is for',
+          id: 'ttc_tile_what_a_daily_practice_is_for',
           // ⚠️ "Not a better chance" WAS AN EARLIER ATTEMPT, AND THE SCANNER
           // WAS RIGHT TO REJECT IT. The sentence denies the claim — but it
           // denies it by printing it, and a card skimmed on a rail leaves
@@ -372,7 +438,9 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
         //   readId: _kStress,
         //   atHeading: 'So what is a daily practice for?',
         TtcGuideTile(
-          title: 'Five minutes, and not as a target',
+          // Kept for revert (2026-09-28, explicit names): title: 'Five minutes, and not as a target',
+          title: 'A five-minute practice, not a target',
+          id: 'ttc_tile_five_minutes_and_not_as_a_target',
           blurb: 'Keep it short enough that missing a day costs nothing.',
           readId: _kGarbh,
           atHeading: 'What does a daily practice look like?',
@@ -393,22 +461,26 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
     // contents in this file. That is the correct trade — somebody who wants to
     // know what is in the Move library should be reading the library.
     TtcFocusSection(
-      heading: 'Move',
+      // Kept for revert (2026-09-28, explicit names): heading: 'Move',
+      heading: 'Gentle ways to move',
       group: 'practice',
       tiles: _practiceTiles(TtcPracticeKind.move),
     ),
     TtcFocusSection(
-      heading: 'Breathe and calm',
+      // Kept for revert (2026-09-28, explicit names): heading: 'Breathe and calm',
+      heading: 'Breathing to calm down',
       group: 'practice',
       tiles: _practiceTiles(TtcPracticeKind.breathe),
     ),
 
     TtcFocusSection(
-      heading: 'Go deeper',
+      // Kept for revert (2026-09-28, explicit names): heading: 'Go deeper',
+      heading: 'Want a longer session?',
       group: 'practice',
       tiles: [
         TtcVideoTile(
           title: 'A longer session this week',
+          id: 'ttc_tile_a_longer_session_this_week',
           blurb: 'One longer practice, for a day when you have time.',
           slotId: 'ttc_vid_mind_longer_session',
           duration: '25 MIN',
@@ -428,6 +500,7 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
         // something. `ttc_garbh_course` is the course itself.
         TtcDoTile(
           title: 'The free garbh sanskar course, eight sessions',
+          id: 'ttc_tile_the_free_garbh_sanskar_course_eight_sessions',
           blurb: 'For both of you, taught properly, not just described. No fee.',
           surfaceId: 'ttc_garbh_course',
         ),
@@ -533,11 +606,13 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
       tiles: [
         TtcGuideTile(
           title: "Why sleep matters when you're trying",
+          id: 'ttc_tile_why_sleep_matters_when_you_re_trying',
           blurb: 'Not because it makes conception happen.',
           readId: 'ttc_read_sleep_trying',
         ),
         TtcGuideTile(
           title: 'Setting a bedtime you can keep',
+          id: 'ttc_tile_setting_a_bedtime_you_can_keep',
           blurb: 'Bedtimes fail for three reasons. None is willpower.',
           readId: 'ttc_read_bedtime',
         ),
@@ -555,6 +630,7 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
         // ),
         TtcDoTile(
           title: 'A calming breath for bedtime',
+          id: 'ttc_tile_a_calming_breath_for_bedtime',
           blurb: 'One minute, sitting or lying. Breathing out for longer than '
               'you breathe in is what does the work.',
           surfaceId: 'ttc_practice/mb_longout',
@@ -570,6 +646,7 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
       tiles: [
         TtcDoorTile(
           title: 'More in Getting ready',
+          id: 'ttc_tile_more_in_getting_ready',
           blurb: 'Food, folic acid, tests, vaccines and habits for the months '
               'before, for both of you, in their own door.',
           bracketId: 'ttc_preconception_health',
@@ -589,6 +666,7 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
         //   title: 'What to say to people who keep offering this advice',
         TtcGuideTile(
           title: 'When people tell you to "just relax"',
+          id: 'ttc_tile_when_people_tell_you_to_just_relax',
           blurb: 'What to say, and how to protect the two of you from it.',
           readId: _kStress,
           atHeading: 'The people around you',
@@ -603,7 +681,9 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
         // Moved here from "Talk to someone" (2026-09-27, relevance audit): it
         // is about the two of you, not about a professional.
         TtcGuideTile(
-          title: 'Bringing him into this',
+          // Kept for revert (2026-09-28, explicit names): title: 'Bringing him into this',
+          title: 'Bringing him into trying',
+          id: 'ttc_tile_bringing_him_into_trying',
           blurb: 'Why it becomes one person\'s job, and what changes it.',
           readId: 'ttc_read_bringing_him_in',
         ),
@@ -626,6 +706,7 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
         // ),
         TtcTalkTile(
           title: 'Talk to a psychologist',
+          id: 'ttc_tile_talk_to_a_psychologist',
           blurb: 'A private talk with someone who does this work. ₹799.',
           action: 'ttc_psych_consult',
         ),
@@ -640,6 +721,7 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
         // about who to talk to; its own callout carries 112 and 181.
         TtcArticleTile(
           title: "When home doesn't feel safe",
+          id: 'ttc_tile_when_home_doesn_t_feel_safe',
           blurb: 'What it can look like, and who can help in India.',
           readId: 'ttc_read_relationship_safety',
         ),

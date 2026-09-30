@@ -311,15 +311,15 @@ void main() {
       await tester.pumpWidget(
           const MaterialApp(home: TtcSemenReportScreen()));
       await tester.pumpAndSettle();
-      expect(find.text('Read it back to me'), findsOneWidget);
+      expect(find.text('Read my report back to me'), findsOneWidget);
 
-      await tester.tap(find.text('Read it back to me'));
+      await tester.tap(find.text('Read my report back to me'));
       await tester.pumpAndSettle();
 
       // ⚠️ THE TWO ACTIONS EVERY PATH ENDS WITH, from the brief.
       expect(find.text('Have the report read properly'), findsOneWidget);
       // Neutral wording since 2026-09-27; was 'Keep his reports with yours'.
-      expect(find.text('Keep this with your reports'), findsOneWidget);
+      expect(find.text('Keep the report in your records'), findsOneWidget);
     });
 
     test('the surface resolves', () {
@@ -425,8 +425,10 @@ void main() {
           reason: 'a read is opened by more than one tile: $ids');
     });
 
+    // Retitled 2026-09-28 (explicit names). Kept for revert:
+    // tileTitled('What three months looks like').
     test('"What three months looks like" is a Guide with its own plan', () {
-      final t = tileTitled('What three months looks like');
+      final t = tileTitled('What his three months of changes look like');
       expect(t, isA<TtcGuideTile>());
       final read = ttcReadById((t as TtcGuideTile).readId)!;
       expect(read.id, isNot('ttc_read_heat_habits'));
@@ -456,14 +458,17 @@ void main() {
       }
       // Article before product, in the same section — the order is the ethics.
       final section = kTtcHisSideFocus.sections
-          .firstWhere((s) => s.heading == 'Supplements, honestly');
+          // Kept for revert (2026-09-28): 'Supplements, honestly'.
+          .firstWhere((s) => s.heading == 'Do supplements help his sperm?');
       expect(section.tiles.first, isA<TtcArticleTile>());
       expect(section.tiles.last, isA<TtcProductTile>());
     });
 
     test('"The case for testing early" is its own short piece that bridges on',
         () {
-      final t = tileTitled('The case for testing early') as TtcArticleTile;
+      // Kept for revert (2026-09-28): 'The case for testing early'.
+      final t =
+          tileTitled('The case for an early sperm test') as TtcArticleTile;
       final read = ttcReadById(t.readId!)!;
       expect(read.id, isNot('ttc_read_semen_analysis'));
       // The bridge into tab 2: the piece hands over to the test article and
@@ -579,7 +584,9 @@ void main() {
     });
 
     testWidgets(
-        '"Keep this with your reports" writes ONE record and opens the folder',
+        // Change 5 (2026-09-28): the button was "Keep this with your reports".
+        '"Keep the report in your records" writes ONE record and opens the '
+        'folder',
         (tester) async {
       tester.view.physicalSize = const Size(1200, 6000);
       tester.view.devicePixelRatio = 1.0;
@@ -593,11 +600,11 @@ void main() {
       await tester.pumpWidget(
           const MaterialApp(home: TtcSemenReportScreen()));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Read it back to me'));
+      await tester.tap(find.text('Read my report back to me'));
       await tester.pumpAndSettle();
 
       // Was 'Keep his reports with yours' (renamed 2026-09-27).
-      await tester.tap(find.text('Keep this with your reports'));
+      await tester.tap(find.text('Keep the report in your records'));
       await tester.pumpAndSettle();
 
       expect(store.count, before + 1);
@@ -636,7 +643,7 @@ void main() {
         await tester.enterText(fields.at(i), '${good[i]}');
       }
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Read it back to me'));
+      await tester.tap(find.text('Read my report back to me'));
       await tester.pumpAndSettle();
 
       expect(find.text('These are in the usual range.'), findsOneWidget);

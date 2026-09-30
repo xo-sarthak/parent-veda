@@ -290,7 +290,11 @@ void main() {
 
     testWidgets('My learning renders empty with an invitation', (tester) async {
       await pumpTall(tester, const PvMyLearningScreen());
-      expect(find.textContaining('Nothing here yet'), findsOneWidget);
+      // Since 2026-09-29 the Upcoming section always draws and says so
+      // itself, with a way to book (test/pv_store_consistency_test.dart).
+      // Kept for revert:
+      //   expect(find.textContaining('Nothing here yet'), findsOneWidget);
+      expect(find.text('Nothing booked yet.'), findsOneWidget);
     });
   });
 

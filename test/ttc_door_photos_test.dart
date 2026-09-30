@@ -16,11 +16,18 @@
 //      licence line, because a CC BY picture without its credit is not free;
 //    * no photo repeats inside one tab, so a rail never shows a twin;
 //    * every read the home's rail can pick, by phase or by treatment step,
-//      has a photo, so "Recommended reads" never shows two identical marks.
+//      has a photo, so "Recommended reads" never shows two identical marks;
+//    * (2026-09-29) every tile on every door has a stable `id`, and it is the
+//      key its photo is filed under, so a retitle never drops a photo;
+//    * (2026-09-29) every card shows a real picture: a photo, or for a tool
+//      and a chat a drawing of the thing (`TtcKindCard`), and the text-only
+//      practices draw their mark.
 // =============================================================================
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:parentveda/data/reads/read_images.dart';
+import 'package:parentveda/screens/ttc/doors/ttc_kind_cards.dart'
+    show ttcCardKindOf, ttcKindDrawsNoPhoto;
 import 'package:parentveda/screens/ttc/ttc_focus_screen.dart'
     show photoForTile, ttcTilePhotoId;
 import 'package:parentveda/ttc/ttc_focus_data.dart';
@@ -138,6 +145,42 @@ void main() {
     ];
     expect(missing, isEmpty,
         reason: 'reads the home can show with only a drawn mark: $missing');
+  });
+
+  test('every tile on every door has a stable id, and it is the photo key',
+      () {
+    final missing = <String>[];
+    for (final page in kTtcFocusPages) {
+      for (final s in page.sections) {
+        for (final t in s.tiles) {
+          if (t.id == null || t.id!.isEmpty) {
+            missing.add('${page.bracketId} › ${t.title}');
+            continue;
+          }
+          expect(ttcTilePhotoId(t), t.id, reason: t.title);
+          expect(t.id, startsWith('ttc_tile_'), reason: t.title);
+        }
+      }
+    }
+    expect(missing, isEmpty, reason: 'tiles with no id: $missing');
+  });
+
+  test('every card shows a photo, or a drawing where the kind is drawn', () {
+    final bare = <String>[];
+    for (final page in kTtcFocusPages) {
+      for (final s in page.sections) {
+        for (final t in s.tiles) {
+          final kind = ttcCardKindOf(t);
+          if (kind == null) continue; // a link row to another door
+          if (ttcKindDrawsNoPhoto(kind)) continue; // a tool, a chat: drawn
+          if (photoForTile(t) != null) continue;
+          // A practice with no honest photo draws its mark (`_kTextOnly`).
+          if (_kTextOnly.contains('${page.bracketId} › ${t.title}')) continue;
+          bare.add('${page.bracketId} › ${s.heading} › ${t.title}');
+        }
+      }
+    }
+    expect(bare, isEmpty, reason: 'cards with no picture: $bare');
   });
 
   test('a tile photo key is the title, lower case, joined by _', () {

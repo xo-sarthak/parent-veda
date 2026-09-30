@@ -769,6 +769,8 @@ class _TtcShelfScreenState extends State<TtcShelfScreenClassic> {
             hue: kTtcShopHue,
             chroma: kTtcShopChroma,
             variant: 2,
+            // One shelf, opened from the shop: back, not an X (2026-09-29).
+            leading: TtcToolLeading.back,
             eyebrow: 'Products',
             title: label,
             intro: _guidanceFor(widget.category),
@@ -1354,7 +1356,7 @@ Widget _compareBack(BuildContext context, String eyebrow,
             padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
             child: Text('Clear',
                 style:
-                    ttcBody(12.5, color: kTtcActionInk, w: FontWeight.w700)),
+                    ttcBody(12.5, color: ttcTitleInk, w: FontWeight.w700)),
           ),
         ),
     ]));
@@ -1383,7 +1385,7 @@ class _CompareEmpty extends StatelessWidget {
                   decoration: const BoxDecoration(
                       color: ttcPanel, shape: BoxShape.circle),
                   child: const Icon(Icons.compare_arrows_rounded,
-                      size: 40, color: kTtcActionInk),
+                      size: 40, color: ttcTitleInk),
                 ),
               ),
               const SizedBox(height: 26),
@@ -1404,7 +1406,7 @@ class _CompareEmpty extends StatelessWidget {
                   height: 50,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                      color: kTtcActionInk,
+                      color: ttcTitleInk,
                       borderRadius: BorderRadius.circular(16)),
                   child: Text('Back to the shelf',
                       style: ttcBody(14.5,
@@ -1516,7 +1518,7 @@ class _CompareSuggestion extends StatelessWidget {
               padding:
                   const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
               decoration: BoxDecoration(
-                  color: kTtcActionInk,
+                  color: ttcTitleInk,
                   borderRadius: BorderRadius.circular(999)),
               child: Text('Add',
                   style: ttcBody(12,
@@ -1584,14 +1586,15 @@ class _CompareBoth extends StatelessWidget {
               _comparePad(Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: ttcPanel,
+                  // Kept for revert (2026-09-29, no tinted slab behind text): color: ttcPanel,
+                  color: Colors.white, border: const Border.fromBorderSide(BorderSide(color: ttcLine)),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Icon(Icons.info_outline_rounded,
-                          size: 16, color: kTtcActionInk),
+                          size: 16, color: ttcTitleInk),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
@@ -1739,11 +1742,11 @@ class _CompareBoth extends StatelessWidget {
                                 const EdgeInsets.symmetric(horizontal: 8),
                             decoration: BoxDecoration(
                                 color: i == 0
-                                    ? kTtcActionInk
+                                    ? ttcTitleInk
                                     : Colors.transparent,
                                 borderRadius: BorderRadius.circular(14),
                                 border: Border.all(
-                                    color: kTtcActionInk,
+                                    color: ttcTitleInk,
                                     width: i == 0 ? 1 : 1.3)),
                             child: Text('Buy ${_buyLabel(pair[i], hi)}',
                                 maxLines: 1,
@@ -1751,7 +1754,7 @@ class _CompareBoth extends StatelessWidget {
                                 style: ttcBody(13,
                                     color: i == 0
                                         ? Colors.white
-                                        : kTtcActionInk,
+                                        : ttcTitleInk,
                                     w: FontWeight.w800)),
                           ),
                         ),
@@ -1843,7 +1846,7 @@ class _CompareOverview extends StatelessWidget {
               behavior: HitTestBehavior.opaque,
               child: Text('See the full page',
                   style: ttcBody(11.5,
-                      color: kTtcActionInk, w: FontWeight.w700)),
+                      color: ttcTitleInk, w: FontWeight.w700)),
             ),
           ]),
     );
@@ -2058,6 +2061,8 @@ class _TtcProductPageState extends State<TtcProductPageClassic> {
             hue: kTtcShopHue,
             chroma: kTtcShopChroma,
             variant: 3,
+            // One product, opened from a shelf or a card: back (2026-09-29).
+            leading: TtcToolLeading.back,
             scrollController: _scroll,
             eyebrow: category,
             title: p.name(hi),
@@ -2247,7 +2252,7 @@ class _TtcProductPageState extends State<TtcProductPageClassic> {
                     onTap: () => showTtcAllRatings(context, p),
                     child: Text('See all ${p.voices.length} ratings →',
                         style: ttcBody(12.5,
-                            color: kTtcActionInk, w: FontWeight.w800)),
+                            color: ttcTitleInk, w: FontWeight.w800)),
                   ),
                 ],
               )),
@@ -2744,7 +2749,8 @@ class _InsideCard extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                  color: ttcPanel, borderRadius: BorderRadius.circular(14)),
+                  // Kept for revert (2026-09-29, no tinted slab behind text): color: ttcPanel, borderRadius: BorderRadius.circular(14)),
+                  color: Colors.white, border: const Border.fromBorderSide(BorderSide(color: ttcLine)), borderRadius: BorderRadius.circular(14)),
               child: Text(item.$4,
                   style: ttcBody(13, color: ttcTitleInk, h: 1.5)),
             ),
@@ -2787,7 +2793,8 @@ class _StudyCard extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-                color: ttcPanel, borderRadius: BorderRadius.circular(14)),
+                // Kept for revert (2026-09-29, no tinted slab behind text): color: ttcPanel, borderRadius: BorderRadius.circular(14)),
+                color: Colors.white, border: const Border.fromBorderSide(BorderSide(color: ttcLine)), borderRadius: BorderRadius.circular(14)),
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -2872,7 +2879,7 @@ class _AskVedaRow extends StatelessWidget {
                 ]),
           ),
           const SizedBox(width: 10),
-          Icon(Icons.chevron_right_rounded, size: 20, color: kTtcActionInk),
+          Icon(Icons.chevron_right_rounded, size: 20, color: ttcTitleInk),
         ]),
       );
 }
@@ -3203,6 +3210,8 @@ class _GoneProduct extends StatelessWidget {
   @override
   Widget build(BuildContext context) => TtcToolScaffold(
         hue: kTtcShopHue,
+        // A product page that lost its product: back, not an X (2026-09-29).
+        leading: TtcToolLeading.back,
         eyebrow: 'Products',
         title: 'That one is gone.',
         intro: "It isn't in the library any more.",
@@ -3493,7 +3502,8 @@ class _BuySheet extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   decoration: BoxDecoration(
-                      color: ttcPanel,
+                      // Kept for revert (2026-09-29, no tinted slab behind text): color: ttcPanel,
+                      color: Colors.white, border: const Border.fromBorderSide(BorderSide(color: ttcLine)),
                       borderRadius: BorderRadius.circular(14)),
                   child: Row(children: [
                     Expanded(
@@ -4415,7 +4425,10 @@ class _CompareFab extends StatelessWidget {
           border: Border.all(color: ttcTitleInk, width: 1.3),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFD0C8DC).withValues(alpha: 0.7),
+              // Neutral ink, the ttcCardShadow value (2026-09-29): a lilac lift is a
+              // second hue under a white surface. Kept for revert (2026-09-29):
+              //   color: const Color(0xFFD0C8DC).withValues(alpha: 0.7),
+              color: ttcShadowInk,
               blurRadius: 18,
               offset: const Offset(0, 6),
             ),

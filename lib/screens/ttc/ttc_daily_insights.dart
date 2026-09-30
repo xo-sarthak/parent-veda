@@ -111,6 +111,17 @@ enum TtcInsightGo {
 String ttcRailDestination(TtcInsightCard c) =>
     c.go == TtcInsightGo.read ? 'read:${c.readId}' : c.go.name;
 
+/// The read the "Day of your cycle" card opens (2026-09-28).
+const String kTtcCycleDayReadId = 'ttc_read_how_conception_works';
+
+/// Every read a card on [day]'s rail opens. The home's read rows leave these
+/// out, so one read is never behind a card and a row on the same screen
+/// (2026-09-28, test/ttc_no_repetition_test.dart).
+Set<String> ttcRailReadIds(DateTime day) => {
+      for (final c in ttcInsightsFor(day))
+        if (c.go == TtcInsightGo.read && c.readId != null) c.readId!,
+    };
+
 /// One card on the rail.
 class TtcInsightCard {
   const TtcInsightCard({
@@ -247,7 +258,15 @@ List<TtcInsightCard> ttcInsightsFor(DateTime day) {
       caption: 'Counted from day 1 of your period',
       hue: 268,
       art: TtcInsightArt.number,
-      go: TtcInsightGo.cycle,
+      // ⚠️ ONE PLACE PER SCREEN, HERO INCLUDED (2026-09-28, the user: "no
+      // random repetition"). The hero above the rail already opens the Cycle
+      // companion, so this card was a second door to it. A number of days
+      // asks "what is my cycle doing on this day?", and the read on how
+      // conception works answers that in plain words. The home's read rows
+      // leave out any read a rail card opens (`ttcRailReadIds`), so it is
+      // never listed twice. Kept for revert: go: TtcInsightGo.cycle,
+      go: TtcInsightGo.read,
+      readId: kTtcCycleDayReadId,
     ));
   }
 
@@ -279,7 +298,18 @@ List<TtcInsightCard> ttcInsightsFor(DateTime day) {
     ));
   }
 
-  final bodySymptom = logged.firstWhere(
+  // ⚠️ HER LATEST LOG, NOT THE FIRST IN THE ALPHABET (the user on build 18,
+  // 2026-09-28: "once you log calm it stays on calm"). `logged` above comes
+  // from `valuesOn`, which sorts by field id, so "calm" kept winning over
+  // anything logged after it. The card now plays back the most recent entry,
+  // read in log order. Kept for revert:
+  //   final bodySymptom = logged.firstWhere((id) => …, orElse: () => '');
+  final inLogOrder = log
+      .valuesOnInLogOrder(kTtcSymptomTracker, TtcLogStore.dayKey(day))
+      .where((v) => v.value > 0)
+      .map((v) => v.field)
+      .toList();
+  final bodySymptom = inLogOrder.reversed.firstWhere(
       (id) =>
           !id.startsWith('disch_') &&
           !id.startsWith('sex_') &&
@@ -299,15 +329,20 @@ List<TtcInsightCard> ttcInsightsFor(DateTime day) {
     // logged items. Kept for revert:
     //   eyebrow: (sym?.label ?? 'Logged').toUpperCase(),
     //   value: isToday ? 'You logged this today' : 'You logged this',
-    final others = logged
-        .where((id) =>
-            id != bodySymptom &&
+    // The rest of the day's log, newest first, BY NAME (2026-09-28): Flo's
+    // day card lists every logged item rather than a count, so "And 2 more"
+    // became "Also Cramps and Bloating". Kept for revert: `others` as a count
+    // over `logged`.
+    final otherNames = [
+      for (final id in inLogOrder.reversed)
+        if (id != bodySymptom &&
             !id.startsWith('sex_') &&
             !id.startsWith('ov_') &&
             !id.startsWith('pt_') &&
             id != 'all_fine' &&
             id != 'disch_none')
-        .length;
+          ttcSymptomById(id)?.label ?? id,
+    ];
     out.add(TtcInsightCard(
       id: 'symptom',
       eyebrow: isToday ? 'YOU LOGGED TODAY' : 'YOU LOGGED',
@@ -324,11 +359,10 @@ List<TtcInsightCard> ttcInsightsFor(DateTime day) {
       // the report. Kept for revert:
       //   value: 'Where it falls in your cycle', go: TtcInsightGo.report,
       value: sym?.label ?? 'Something',
-      caption: others == 0
-          ? 'Tap to see or change it'
-          : others == 1
-              ? 'And 1 more. Tap to see or change'
-              : 'And $others more. Tap to see or change',
+      // The caption names what she will see (change 5, 2026-09-28). Kept for
+      // revert: 'Tap to see or change it', 'And 1 more. Tap to see or change',
+      // 'And $others more. Tap to see or change'.
+      caption: ttcLoggedAlsoLine(otherNames),
       hue: sym?.hue ?? 344,
       art: TtcInsightArt.symptom,
       go: TtcInsightGo.logger,
@@ -341,25 +375,31 @@ List<TtcInsightCard> ttcInsightsFor(DateTime day) {
   // next week is the app asking her to report on something that has not
   // happened. The strip shows six days forward so she can watch the fertile
   // tint arrive; those days are for looking at, not for filling in.
-  final now = DateTime.now();
-  final isFuture = d.isAfter(DateTime(now.year, now.month, now.day));
-  if (logged.isEmpty && !isFuture) {
-    out.add(TtcInsightCard(
-      id: 'log_prompt',
-      eyebrow: 'NOTHING YET',
-      // ⚠️ THE TENSE FOLLOWS THE DATE. "How did today feel?" printed under
-      // Tuesday last week is the copy-names-a-thing-that-is-wrong failure in
-      // miniature: nothing breaks, nothing fails a test, and the screen is
-      // confidently talking about the wrong day.
-      value: d == DateTime(now.year, now.month, now.day)
-          ? 'How did today feel?'
-          : 'How did that day feel?',
-      caption: 'A few taps. No wrong answers.',
-      hue: 160,
-      art: TtcInsightArt.log,
-      go: TtcInsightGo.logger,
-    ));
-  }
+  // ⚠️ THE "NOTHING YET" CARD IS OFF THE RAIL (2026-09-28, the user: "no
+  // random repetition"). The hero's Symptoms button, one row above the rail,
+  // opens the same logger on the same selected day, so "How did today feel?
+  // A few taps" was a second button for one thing. The Symptoms button is
+  // the invitation now, and it is never hidden: it dims only on a day not
+  // lived yet, exactly when this card stayed away too. Kept for revert:
+  // final now = DateTime.now();
+  // final isFuture = d.isAfter(DateTime(now.year, now.month, now.day));
+  // if (logged.isEmpty && !isFuture) {
+  //   out.add(TtcInsightCard(
+  //     id: 'log_prompt',
+  //     eyebrow: 'NOTHING YET',
+  //     // ⚠️ THE TENSE FOLLOWS THE DATE. "How did today feel?" printed under
+  //     // Tuesday last week is the copy-names-a-thing-that-is-wrong failure in
+  //     // miniature: nothing breaks, nothing fails a test, and the screen is
+  //     // confidently talking about the wrong day.
+  //     value: d == DateTime(now.year, now.month, now.day)
+  //         ? 'How did today feel?'
+  //         : 'How did that day feel?',
+  //     caption: 'A few taps. No wrong answers.',
+  //     hue: 160,
+  //     art: TtcInsightArt.log,
+  //     go: TtcInsightGo.logger,
+  //   ));
+  // }
 
   // ---- 5. her own rhythm, once there is one -------------------------------
   final lengths = CycleStore.instance.cycleLengths;
@@ -372,7 +412,9 @@ List<TtcInsightCard> ttcInsightsFor(DateTime day) {
       id: 'cycle_length',
       eyebrow: 'YOUR CYCLE',
       value: '$usual days',
-      caption: 'What that means for trying',
+      // Names the number (change 5, 2026-09-28). Kept for revert:
+      // 'What that means for trying'.
+      caption: 'What $usual days means for trying',
       hue: 104,
       art: TtcInsightArt.ring,
       // ⚠️ ONE CARD, ONE PLACE (2026-09-28). "Day of your cycle" already
@@ -435,3 +477,16 @@ List<TtcInsightCard> ttcInsightsFor(DateTime day) {
 bool ttcHasAnyLog(DateTime day) => TtcLogStore.instance
     .valuesOn(kTtcSymptomTracker, TtcLogStore.dayKey(day))
     .isNotEmpty;
+
+/// The caption under "You logged today" and her latest entry: the rest of the day's log
+/// by name, newest first, two names at most, then how many more.
+/// "Tap to see or change your log" when the latest is all there is.
+String ttcLoggedAlsoLine(List<String> others) {
+  if (others.isEmpty) return 'Tap to see or change your log';
+  if (others.length == 1) return 'Also ${others[0]}. Tap to see your log';
+  if (others.length == 2) {
+    return 'Also ${others[0]} and ${others[1]}. Tap to see your log';
+  }
+  final more = others.length - 2;
+  return 'Also ${others[0]}, ${others[1]} and $more more. Tap to see your log';
+}

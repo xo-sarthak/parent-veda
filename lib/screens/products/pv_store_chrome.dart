@@ -65,6 +65,15 @@ V2Palette get pvStorePalette => V2PaletteStore.instance.current;
 /// Card hairline — 0x1F on white (the White ground spec).
 const Color kPvLine = Color(0x1F000000);
 
+/// ⚠️ THE ONE BUTTON INK (2026-09-29). The user, on build 19: "we don't want
+/// 10 colors of buttons … keep it black everywhere, keep that color", pointing
+/// at the Symptoms logger's switches. That black is `AppTheme.neutral900` /
+/// `ttcInk`, 0xFF2F2C30. Every filled store button (Add to cart, Buy,
+/// Checkout, Place order), every outlined secondary, a selected chip, a count
+/// badge and every "See all" or eyebrow that was the brand violet draw in it.
+/// `test/pv_store_consistency_test.dart` scans the store for the violet.
+const Color kPvInk = Color(0xFF2F2C30);
+
 /// The three tones the recommendation band draws in. Green for yes, sand for
 /// "it depends", the rose for "generally not needed" — the same weight each.
 Color pvToneColor(int tone) => switch (tone) {
@@ -224,13 +233,22 @@ class PvStoreNav extends StatelessWidget {
       bottom: 18,
       child: PpBottomNav(active: PpTab.products),
     ),
+    // ⚠️ THE SAME PLACE AS EVERY OTHER TTC TAB (2026-09-28). This was
+    // bottom 18 / sides 16 with NO SafeArea, where Today, Learn, Tools and
+    // More sit 14 from the sides and 14 above the system inset. With gesture
+    // navigation that put the Products bar ~20dp lower (build 17: "on
+    // Products it sits lower"). Inside the TTC tab host this copy draws
+    // nothing (the host's bar does); it still draws when the store is pushed
+    // on its own. Kept for revert:
+    //   const Positioned(left: 16, right: 16, bottom: 18,
+    //       child: TtcBottomNav(active: 2, v3: true)),
     PvStoreChrome.ttc => const Positioned(
-      left: 16,
-      right: 16,
-      bottom: 18,
+      left: 14,
+      right: 14,
+      bottom: 14,
       // Slot 3 on TTC since 2026-09-26 (Today · Learn · Products · Tools ·
       // You). Was `active: 1`. The V3 bar reads the route name anyway.
-      child: TtcBottomNav(active: 2, v3: true),
+      child: SafeArea(top: false, child: TtcBottomNav(active: 2, v3: true)),
     ),
     _ => const SizedBox.shrink(),
   };
@@ -466,7 +484,8 @@ class PvRecoMark extends StatelessWidget {
             Icon(
               Icons.verified_rounded,
               size: compact ? 12 : 14,
-              color: p.action,
+              // Ink (2026-09-29). Kept for revert: color: p.action.
+              color: kPvInk,
             )
           else
             Container(
@@ -551,6 +570,12 @@ class PvHeart extends StatelessWidget {
                 saved ? Icons.favorite_rounded : Icons.favorite_border_rounded,
                 size: size * 0.55,
                 color: saved ? const Color(0xFFC6295A) : p.ink1,
+                // The heart names its product to a screen reader (explicit
+                // labels, 2026-09-28): a row of hearts that each said nothing
+                // was five unnamed buttons on the TTC home. Every stage.
+                semanticLabel: saved
+                    ? 'Remove ${product.name} from your wishlist'
+                    : 'Save ${product.name} to your wishlist',
               ),
             ),
           ),
@@ -577,7 +602,8 @@ class PvSectionHead extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = pvStorePalette;
-    return Row(
+    return LayoutBuilder(
+      builder: (context, box) => Row(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Expanded(
@@ -589,43 +615,71 @@ class PvSectionHead extends StatelessWidget {
                   padding: const EdgeInsets.only(bottom: 4),
                   child: Text(
                     eyebrow!.toUpperCase(),
+                    // Ink grey, not the brand violet (2026-09-29, no purple
+                    // on chrome). Kept for revert: color: p.action.
                     style: pvManrope(
                       fontSize: 10.5,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 1.1,
-                      color: p.action,
+                      color: p.ink2,
                     ),
                   ),
                 ),
-              Text(
-                title,
-                style: pvFraunces(
-                  fontSize: 21,
-                  fontWeight: FontWeight.w500,
-                  height: 1.15,
-                  color: p.ink1,
+              // ⚠️ ONE HEADING STYLE (2026-09-29): the same numbers as the
+              // doors' and every TTC tool page's section heading
+              // (`ttcSectionHeadingStyle`, ttc_common.dart), so Learn's and
+              // the store's shelves no longer sit a weight lighter than the
+              // door beside them. Inline, not imported: this file serves every
+              // stage and does not depend on a stage. Kept for revert:
+              //   fontSize: 21, fontWeight: FontWeight.w500, height: 1.15,
+              Semantics(
+                header: true,
+                child: Text(
+                  title,
+                  style: pvFraunces(
+                    fontSize: 21,
+                    fontWeight: FontWeight.w600,
+                    height: 1.2,
+                    letterSpacing: -0.45,
+                    color: p.ink1,
+                  ),
                 ),
               ),
             ],
           ),
         ),
+        // ⚠️ FLEXIBLE (2026-09-29): at 1.5x text on a 360dp phone the link
+        // was a rigid box beside an Expanded title and the Row overflowed.
+        // It is capped at 45% of the row and may wrap to a second line; the
+        // title takes the rest. (Not `Flexible`: two flex children split the
+        // row in halves and left "See all" floating mid-row.) Kept for
+        // revert: the InkWell as a direct child of the Row.
         if (action != null)
-          InkWell(
+          ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: box.maxWidth * 0.45),
+            child: InkWell(
             onTap: onAction,
             borderRadius: BorderRadius.circular(8),
             child: Padding(
               padding: const EdgeInsets.fromLTRB(8, 6, 0, 6),
+              // "See all" stays plain words, in ink (2026-09-29). Kept for
+              // revert: color: p.action.
               child: Text(
                 action!,
+                textAlign: TextAlign.end,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
                 style: pvManrope(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
-                  color: p.action,
+                  color: kPvInk,
                 ),
               ),
             ),
           ),
+          ),
       ],
+    ),
     );
   }
 }
@@ -661,9 +715,9 @@ class PvChip extends StatelessWidget {
         // is given, and inside a Wrap that is the whole line (found on the
         // phone - every size chip rendered full-width). The Row centres.
         decoration: BoxDecoration(
-          color: selected ? p.ink1 : Colors.white,
+          color: selected ? kPvInk : Colors.white,
           borderRadius: BorderRadius.circular(999),
-          border: Border.all(color: selected ? p.ink1 : kPvLine, width: 1.1),
+          border: Border.all(color: selected ? kPvInk : kPvLine, width: 1.1),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -736,7 +790,8 @@ class PvCommit extends StatelessWidget {
         height: 52,
         padding: const EdgeInsets.symmetric(horizontal: 18),
         decoration: BoxDecoration(
-          color: enabled || busy ? p.ink1 : p.surfaceAlt,
+          // The one ink (kPvInk). Kept for revert: `p.ink1`.
+          color: enabled || busy ? kPvInk : p.surfaceAlt,
           borderRadius: BorderRadius.circular(999),
         ),
         child: Row(
@@ -802,7 +857,7 @@ class PvSecondary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final p = pvStorePalette;
+    // All in kPvInk now (2026-09-29); the palette read went with p.ink1.
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(999),
@@ -813,13 +868,13 @@ class PvSecondary extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(999),
-          border: Border.all(color: p.ink1, width: 1.2),
+          border: Border.all(color: kPvInk, width: 1.2),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             if (icon != null) ...[
-              Icon(icon, size: 18, color: p.ink1),
+              Icon(icon, size: 18, color: kPvInk),
               const SizedBox(width: 8),
             ],
             Flexible(
@@ -830,7 +885,7 @@ class PvSecondary extends StatelessWidget {
                 style: pvManrope(
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
-                  color: p.ink1,
+                  color: kPvInk,
                 ),
               ),
             ),
@@ -849,11 +904,16 @@ class PvRoundIcon extends StatelessWidget {
     required this.onTap,
     this.badge,
     this.size = 40,
+    this.semanticLabel,
   });
   final IconData icon;
   final VoidCallback onTap;
   final int? badge;
   final double size;
+
+  /// What the button does, for a screen reader ("Back to More"). Optional
+  /// and additive (2026-09-28): an icon-only circle said nothing.
+  final String? semanticLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -872,7 +932,8 @@ class PvRoundIcon extends StatelessWidget {
               shape: BoxShape.circle,
               border: Border.all(color: kPvLine),
             ),
-            child: Icon(icon, size: size * 0.5, color: p.ink1),
+            child: Icon(icon,
+                size: size * 0.5, color: p.ink1, semanticLabel: semanticLabel),
           ),
         ),
         if (badge != null && badge! > 0)
@@ -885,7 +946,7 @@ class PvRoundIcon extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                 decoration: BoxDecoration(
-                  color: p.ink1,
+                  color: kPvInk,
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
@@ -1114,16 +1175,22 @@ class PvCardRail extends StatelessWidget {
     this.cardWidth = 164,
     this.compare = false,
     this.scope = 'rail',
+    this.gutter = 20,
   });
   final List<PvProduct> products;
   final double cardWidth;
   final bool compare;
   final String scope;
 
+  /// The rail's side inset, the page's gutter (2026-09-29): the TTC tab
+  /// root passes its 18; every other caller keeps 20.
+  final double gutter;
+
   @override
   Widget build(BuildContext context) => SingleChildScrollView(
     scrollDirection: Axis.horizontal,
-    padding: const EdgeInsets.symmetric(horizontal: 20),
+    // Kept for revert (2026-09-29): const EdgeInsets.symmetric(horizontal: 20).
+    padding: EdgeInsets.symmetric(horizontal: gutter),
     child: Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1482,6 +1549,45 @@ class PvProductGridSliver extends StatelessWidget {
 
 /// The well-tinted "why" panel — used for guidance, the reco reason, the
 /// "before you buy" sentence. surfaceAlt, no border (a quiet fact card).
+/// ⚠️ A WHITE CARD WITH A HAIRLINE, NOT A TINTED SLAB (2026-09-29). The user
+/// on the Cycle companion: a lavender-grey panel behind a note or a stat is
+/// noise; tints are for tags and pills only. `PvWell` filled with
+/// `surfaceAlt`, and the store drew every empty state, receipt, summary and
+/// study in it. The store's screens now use this: the card style the rest
+/// of the app uses (More's sections, the recommends signature), white on the
+/// white ground, held by its hairline. `PvWell` stays below for the screens
+/// outside the store that still call it (profile), and for revert.
+class PvCard extends StatelessWidget {
+  const PvCard({super.key, required this.child, this.padding});
+  final Widget child;
+  final EdgeInsetsGeometry? padding;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    width: double.infinity,
+    padding: padding ?? const EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(16),
+      border: Border.all(color: kPvLine),
+    ),
+    child: child,
+  );
+}
+
+/// One quiet grey line: an empty state or a note, with no box at all
+/// ("notes = one quiet grey line", 2026-09-29).
+class PvQuietLine extends StatelessWidget {
+  const PvQuietLine(this.text, {super.key});
+  final String text;
+
+  @override
+  Widget build(BuildContext context) => Text(
+    text,
+    style: pvManrope(fontSize: 13.5, height: 1.5, color: pvStorePalette.ink2),
+  );
+}
+
 class PvWell extends StatelessWidget {
   const PvWell({super.key, required this.child, this.tint});
   final Widget child;

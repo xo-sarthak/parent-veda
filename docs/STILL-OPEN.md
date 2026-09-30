@@ -9697,39 +9697,190 @@ Owed:
     user scheduled as a whole. (c) **his messages at key moments** (Flo: "Her period is due soon, ways to support
     her"): not built; the five computed messages are hers.
 
-## 80.0 Pregnancy gap pass — warmth, new doors, and the structure pass — 2026-09-29
+---
+
+## 80.0 TTC after build 17: journal out, More bento, typed door cards, no repetition, named labels. 2026-09-28
+
+The user asked for five changes after using build 17 (commit f4e7f0e), then a few more on the same pass. All are built
+in code and tested. **Build 18 is not made yet**: the user took the phone away and said to build only on their word.
+
+- **80.1 The journal is out of TTC completely.** The screen, `TtcJournalStore`, its loading and its sync are commented
+  out, not deleted. Old entries stay on the phone and in `ttc_journal`, unseen (the user: no need to preserve them).
+  *Open:* nothing, unless the journal is ever wanted back. It comes back by uncommenting.
+- **80.2 Questions for the doctor are their own feature** (`TtcDoctorQuestionsStore`, `ttc_doctor_question_screen.dart`,
+  `ttc_visit_today_card.dart`). What it does:
+  - A question belongs to a visit and is ticked when asked; unticked questions roll forward (derived, never stored).
+  - "Did you get your answers?" follows the visit day.
+  - His questions sit beside hers, and each person edits only their own.
+  - The evening-before reminder counts them, the home shows a visit-day card, and the doctor's note lists them.
+
+  **Open:**
+  1. **The user must run `supabase/migrations/0092_ttc_doctor_questions.sql`, but only when told.** Until then cloud writes fail silently and the phone works fully.
+  2. An "about him" flag was not built.
+  3. The pattern is written up in BACKEND-PATTERNS §16r.
+- **80.3 More is a CRED-style bento** (`pv_more_bento.dart`, gated by `kPvTtcMoreBento`), and **Tools holds only tools**
+  (`kTtcToolKinds`). Talk to an expert and Courses moved to More under "Experts and courses", the journey map to Your
+  journey, and Treatment cycle into Tools. *Open:* **his More still shows her "Notes for your doctor" and "Your answers"**.
+  The recommended fix is a partner-aware More, not built.
+- **80.4 Door cards show their kind, on the Fertile window door only** (`ttc_kind_cards.dart`, gated by
+  `kTtcDoorsWithKindCards`; the table is in DESIGN-SYSTEM §4.0f). Fertile window tiles carry stable `id`s, so a retitle
+  no longer loses the photo. **Open:**
+  1. Roll it out to the other eight doors after the user sees Fertile window on the phone. Mind & body's practice card has not been seen on a device.
+  2. Give every door's tiles an `id`.
+- **80.5 No repetition and named labels,** across Today, Tools, More, all nine doors, Learn and the reads. About 150 UI
+  labels and 170 door titles and headings were renamed; old words are kept as comments. Held by `ttc_no_repetition_test`,
+  `ttc_explicit_labels_test`, `ttc_doors_no_repetition_test` and `ttc_doors_explicit_names_test`.
+
+  **Open:**
+  1. **Ask Veda:** re-export the TTC corpus (`tool/export_ttc_corpus.dart`) and refresh the pool in `parentveda-askveda`. Door answer links key by card title; retitled cards without an `id` open the door until then.
+  2. The user was to see "decision 2" on the phone: the hero and the one pill under it open the same screen ("Time to test" / "Should I test?"). Kept, allow-listed.
+  3. Prepare's "Get this" / "You have this" labels were left, because no noun fits both consults and programmes.
+- **80.6 The bottom bar:** one host for the five tabs (`ttc_tab_host.dart`), one Material fade-through, one bar at one
+  fixed position, and tab state kept across switches. Hide-on-scroll was checked on Mobbin and not built. *Open:* judge
+  the motion on the release build.
+- **80.7 Sound cues** in every TTC timer (`ttc_cue_sounds.dart`, generated WAVs in `assets/audio/cues/`, and a "Sound cues"
+  switch that is on by default and follows the phone's System volume). *Open:* listen on the phone.
+- **80.8 Owed later, by the user's word:**
+  - pictures of how to do each movement practice;
+  - notifications as a whole: a tap on the evening "How was today?" reminder only opens the app. Its words were made stage-neutral.
+- **80.9 Found in passing and fixed:**
+  - `WhatsAppPrefs` crashed with no backend;
+  - clock-tick id collisions in the appointments and questions stores;
+  - a 61px overflow on his home;
+  - the edit-name sheet disposed its controller too early;
+  - the Products hero band overflowed at 360dp.
+- **80.10 Superseded on 2026-09-29, after the user saw build 18: the bento was "poor" and More duplicated the avatar.**
+  - **More** (`ttc_more_tab.dart`) now lists only offerings, in headed sections: Talk to an expert, Courses and
+    masterclasses, Groups, Your bookings and orders, Your journey, Benefits. It holds nothing about account, settings,
+    support or developer.
+  - **Profile** (the avatar, `kPvTtcProfileV2`): identity, Your stage, Your answers, For your doctor, Family, Your
+    things, and one Settings row.
+  - **Settings** (`pv_settings_screen.dart`): Account, Preferences, Notifications, Privacy and data, Support (Get help
+    now lives here), About, and Developer last, gated.
+  - His More and his Profile hide her private rows, which closes 80.3's open point. The bento is kept but
+    `kPvTtcMoreBento` is false.
+  - **Tools** and every tool page header use our drawn marks (`ttc_tool_marks.dart`).
+  - **Door cards on all nine doors** follow the user's reference (per-kind tints, type pill, meta pill, image, serif
+    title) as `TtcKindCard`, and all 290 tiles carry ids. *Open:* the user chooses rails (recommended, titles stay
+    whole) or the reference's two-column grid (`kTtcDoorCardsAsGrid`).
+  - **Placeholders** are being replaced with free credited images; see that helper's report.
+- **80.11 Later on 2026-09-29 (builds 20 to 22, committed 3e29f7f):**
+  - **Doors:** the photo hero stays (words and search on the picture). The flat-art hero (`ttc_door_hero.dart`, slots in
+    `assets/doors/`) is built and kept off. Shelves on all nine doors are Flo-size blocks (`TtcFloCard`,
+    `kTtcDoorCardsFlo`): tag and title on the kind's tint, picture at the foot; a video shows its length, or Coming soon
+    with no play mark while unmade. The two-column grid question in 80.10 is closed by this. *Open:* the nine hero images
+    from the ChatGPT prompts, if the user makes them.
+  - **Tools, heading by heading:** Plan and check is rebuilt (Can I...? with verdict tags and recently checked; Food
+    ideas with a day strip, meal photo cards and swaps; the pre-pregnancy checklist with a ring and the next three steps).
+    *Open:* the user reviews it on the phone before Care and medicines, which is ON HOLD by the user's word. Food ideas
+    owes two decisions: the default kitchen (veg with eggs, or no eggs) and a real pulao photo.
+  - **One section-heading style** across the stage; Records keeps her and his results apart.
+  - **More gains Read and watch:** every article and every film, each in one searchable list.
+  - **Owed decisions:** Store "Buy now" removed (Add to cart, then Go to cart; recommended keep); whether a hero and a
+    pill may open the same screen (to show on the phone).
+- **80.12 The door made quiet, Fertile window first (2026-09-29, the user with Flo's "How to get pregnant" beside ours:
+  "so much on the face"; Flo's is "minimalistic and subtle").** One template, so all nine doors changed:
+  - **Hero** (`kTtcDoorHeroQuiet`): the door's name as the title, the headline sentence as the one line under it, the
+    white search pill; no caps eyebrow and no three-line blurb (both kept, commented). Doors in `kTtcDoorHeroLightArt`
+    draw bundled light art (`assets/doors/hero_<slug>.jpg`) full width with ink words and no shade; the Fertile window
+    door has the user's art (the pencil and six dots). The other eight keep their photo with a lighter shade behind the
+    words. *Open:* light art for the other eight doors (prompt style in Downloads/door-hero-prompts).
+  - **Tab cards:** shorter (112), a smaller mark, no count line, a thin ink ring on the chosen one.
+  - **Shelf cards** (`TtcShelfCard`, `kTtcDoorCardsShelf`): a rounded picture, the title and one grey line that says
+    what the thing is ("Article · 9 min read", "Myth or fact", "Tool"). A film is known by its play button and length,
+    or "Coming soon" with no play button while unmade. A drawn card takes its tab's colour.
+  - **Photos judged by eye** (`ttc_card_art.dart`): on the Fertile window door 24 card photos that did not show their
+    subject (cherry blossom, a glacier, light bulbs, "weirdo" mugs, an hourglass on black) draw a chosen mark instead.
+    *Open:* (a) the READ pages behind those cards still show the old photos, and so does Learn, so replacing the read
+    photos themselves is owed; (b) the other eight doors' card photos are not judged yet.
+- **80.13 ⚠️ PREVIEW ON, MUST BE OFF BEFORE LAUNCH: `kTtcShelfFilmPreview` (ttc_kind_cards.dart).** The user on build
+  23 wanted to see Flo's play triangle and length on every door video, made or not ("I know it goes against it, I just
+  want to see how it would look"). While true, an unmade film shows a play mark and a made-up length fixed by its
+  title (0:30 to 4:59), which breaks D3: she taps "1:02" and lands on "coming soon". Decide after seeing it: keep the
+  look for real films only (set false; unmade films show "Coming soon"), or keep the preview until films exist.
+  Same pass: the chosen tab card's ring is 1pt now (was 1.5, "too aggressive").
+  Later the same night (build 25): every film is dimmed evenly under Flo's veil (0.30 black, photo or drawing) with a
+  white triangle and a white length; a carousel is a fanned deck, its picture on the front slide and two drawn slides
+  behind (TheFork's fanned photos on Mobbin), so a real photo drops into the front slide as it is.
+  Build 26: a tool card shows a small white round badge with the wrench in its picture's bottom-right corner (a chat:
+  a speech bubble), where a film shows its length. Tried first and dropped the same night: a slider (read as a video's
+  progress bar), then a full-width white control bar with an arrow button (the user: a waste of space that a photo
+  added later would lose a third of).
+  Build 27, paid cards (Mobbin: Alan leads a consult with faces, Clue puts the offer on a product card): the price rides
+  in the same bottom-right corner as a film's length and a tool's wrench; a product's tag carries a bag. A consult shows
+  its roster person's initials in a white circle (no roster photos exist yet; a stock face would be false) and names
+  her in the grey line. *Open:* the roster photos, which would replace the initials; offering prices print without a
+  thousands comma ("₹2499") while the store prints "₹1,150" — one format owed.
+  Build 29 (2026-09-30, the user on build 28): no prices on the pictures. A consult shows one doctor image
+  (`assets/doors/card_consult.jpg`: a doctor from the shoulders down, no face, because the card names a real roster
+  person), a product a white bag badge, a course or masterclass an "Enroll" pill with a clock; the grey line says
+  "Masterclass · Paid". Prices are one tap in.
+- **80.14 The profile, cleaner (2026-09-30, the user: look at how other apps do it; a photo; no "Not paired" and no
+  dashes; let her know her onboarding answers can be changed; make sure everything in Profile and Settings works).**
+  Mobbin: Flo (pencil on the avatar, Edit info), Paired "About you" (every answer a row with its value and an arrow),
+  Airbnb (a white photo-led profile), Deepstash and Apple Games (invite is a card to act on), Oura (a stat she lacks is
+  named, not dashed).
+  - **Photo** (`ProfilePhotoStore`): a camera badge on the avatar opens Take a photo, Choose from your photos, Remove
+    photo; the camera asks its permission first (the app declares the camera for calls). The copy lives in the app's
+    documents folder, path in shared_preferences, and shows on the profile and the Today avatar. *Open:* sync the
+    photo to a second phone (Supabase Storage, a private bucket, RLS by user); his side has no photo yet.
+  - **White hero**, no tinted band; the verified tick sits beside the name; the partner line shows only once paired
+    (unpaired, the Family row with Invite says it once).
+  - **The glance with nothing logged** is an invitation ("Your cycle at a glance", what will show, a Log your period
+    button to the calendar); with one period, "Not yet" and what brings it. No "--" anywhere.
+  - **Your answers**: the values shown ("Not answered" when empty, never "--"), the line "You can change any answer",
+    and one "Change your answers" row. Each answer as its own tappable row, and a Settings "Your details" row, were
+    tried and taken out the same night: they all opened the one Your details page (Reminders opens it too), three
+    doors to one room (test/ttc_no_repetition_test.dart). The avatar and its camera badge are one tap.
+  - **Found by the new walk test** (`test/pv_profile_walk_test.dart`, every row tapped): Delivery addresses waited on
+    the cloud sync before opening (now opens at once, local-first); WhatsApp updates turned "on" with no phone number
+    (now stays off and says it needs the number).
+- **80.15 Ask Veda is trying to conceive's search (2026-09-30, the user: "I can search for anything inside the trying to
+  conceive side … the range should be within the side of the app you are in").**
+  - **The button is back on this stage only** (`FabState.kAskFabInTtc`), in the one black; other stages stay off.
+  - **Search as she types** (`ttc_stage_search.dart`): the stage's tools, articles, videos, Can I answers, topics and
+    products, from the phone (offline, free), grouped, each opening its real screen; one black "Ask Veda: …" row asks
+    the whole question.
+  - **The service answers inside the stage** (parentveda-askveda, `scope_domain`; askveda.md "Stage scope"): the answer
+    and its pointers come from trying-to-conceive content only; the pool was refreshed (1,055 docs, 16 stale removed,
+    2,187 chunks). No wire change.
+  - *Open:* the service is not hosted, so on a phone it answers only through `adb reverse tcp:8000 tcp:8000` to a laptop
+    running it (Phase 9, hosting); the three `service_role` grants (recipes, reads, products) are still owed, so the app
+    content tables are not in the pool; the pregnancy and parenting passes.
+
+## 81.0 Pregnancy gap pass — warmth, new doors, and the structure pass — 2026-09-29
 
 Branch `claude/magical-ritchie-ynob3a`, from the pregnancy gap analysis (Flo and What to Expect vs ParentVeda, the PDF is
 the source of truth). Anything that needs trying to conceive or a shared file changed is in `docs/PREG-TTC-HANDOFF.md`,
 not here. Owed:
 
-  - **§80.1 "If your pregnancy has ended" is on this phone only.** `PregnancyEndedStore` is one local flag. A new phone
+  - **§81.1 "If your pregnancy has ended" is on this phone only.** `PregnancyEndedStore` is one local flag. A new phone
     shows the pregnancy again (the safe failure: the You row is one tap away). Owed: a column or row the partner's
     phone can read too, so his Today follows hers across devices.
-  - **§80.2 The week pages' sources need a clinician's check before launch.** `kPregWeekSources` in
+  - **§81.2 The week pages' sources need a clinician's check before launch.** `kPregWeekSources` in
     `lib/data/preg_week_extras.dart` lists real, published guidance (MoHFW, ICMR-NIN, WHO, NICE, ACOG, RCOG, Moore);
     which week cites which has not been reviewed by a doctor.
-  - **§80.3 "Tell me when it opens" is counted on this phone only.** The three recorded courses with no lesson made
+  - **§81.3 "Tell me when it opens" is counted on this phone only.** The three recorded courses with no lesson made
     (`kPrepOpeningSoon`) show "Opening soon" on the pregnancy Learn and More tabs, and the button saves the course id
     locally (`preg_course_interest_v1`). The gap analysis wants "we learn which course to make first", which needs a
     table (course id, user id, created at) behind RLS, written fire-and-forget like the other local-first stores.
-  - **§80.4 The shared course page still sells them.** `PvOfferingScreen` / `PvLearnScreen` have no "opening soon"
+  - **§81.4 The shared course page still sells them.** `PvOfferingScreen` / `PvLearnScreen` have no "opening soon"
     state; see `docs/PREG-TTC-HANDOFF.md` §5. Until then a course reached through Prepare › Courses still shows a price.
-  - **§80.5 Masterclasses and cohorts still carry made-up counts.** `_fromMasterclass` and `_fromCohort` in
+  - **§81.5 Masterclasses and cohorts still carry made-up counts.** `_fromMasterclass` and `_fromCohort` in
     `lib/data/prepare_data.dart` compute a "N mothers" label from the testimonial count and the seats, and
     `PrepProgram.rating` defaults to 4.9. Only the three courses were cleaned in this pass (the PDF's item names
     courses without lessons). Owed: the same for every programme that has not run.
-  - **§80.6 Mind & mood's film and audio tiles stay, by the user's call** ("don't hide them for now", 2026-09-29). The
+  - **§81.6 Mind & mood's film and audio tiles stay, by the user's call** ("don't hide them for now", 2026-09-29). The
     PDF asks to comment out the meditation video tiles until they exist and to record the four calming tracks and
     three guided breaths first. When the user wants it, the tiles are in `lib/data/doors/pv_door_mind.dart`
     ("Breathe", "Calming audio", "Longer, when you have time").
-  - **§80.7 More logs as `prepare`.** `UsageSurface` is a closed list in a shared file; the pregnancy More tab logs its
+  - **§81.7 More logs as `prepare`.** `UsageSurface` is a closed list in a shared file; the pregnancy More tab logs its
     tap as `prepare` (most of it is experts, courses and groups). A `more` surface is a one-line change there when
     someone wants the two told apart.
-  - **§80.8 The Tools tab asks her priorities under the list now.** The strip (`pregPrioritiesStrip`) still re-sorts
+  - **§81.8 The Tools tab asks her priorities under the list now.** The strip (`pregPrioritiesStrip`) still re-sorts
     the tools inside each group; it moved below the groups so the list leads. Whether it stays at all is the user's
     call ("derive, never ask").
-  - **§80.9 Pregnancy messages, owed (2026-09-30).** Built: the weekly note and six moments, the inbox (More › Your
+  - **§81.9 Pregnancy messages, owed (2026-09-30).** Built: the weekly note and six moments, the inbox (More › Your
     journey › Messages), the switches (Reminders › From ParentVeda), taps that open the page each names. Owed:
     (a) **onboarding's preview** still says "Week N starts tomorrow, here's what to expect." while the note arrives the
     morning the week starts ("Week N starts today"); onboarding is parked by the user, so the one-line change waits.
@@ -9737,10 +9888,10 @@ not here. Owed:
     (c) **His messages** at the same moments are the father-mode pass; today the partner side gets none, on purpose.
     (d) **A doctor's read** of the six moment lines before launch (the Tdap line in particular says what it protects
     against).
-  - **§80.10 The due date is changed from You now.** You › Details › Due date opens "Your due date" (the four ways,
+  - **§81.10 The due date is changed from You now.** You › Details › Due date opens "Your due date" (the four ways,
     Scan date first from week 12, a note when a last-period date would replace a clinic's). The Tools › Due Date
     calculator stays as it was; whether both should exist is the user's call.
-  - **§80.11 The home pass (2026-09-30).** Built: "20 weeks to go" under the day with an (i) on how weeks are counted
+  - **§81.11 The home pass (2026-09-30).** Built: "20 weeks to go" under the day with an (i) on how weeks are counted
     (the size half of the PDF's line left off on the user's 2026-09-22 call); past the due date the hero counts on
     ("40 weeks and 3 days") and opens the past-due read; from week 37 "Has your baby arrived?" at the foot of the
     hero ("Not yet" rests it three days, on this phone); and with nothing booked, the usual scan for her week on the

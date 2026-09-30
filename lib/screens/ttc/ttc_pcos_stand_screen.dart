@@ -88,6 +88,8 @@ class _TtcPcosStandScreenState extends State<TtcPcosStandScreen> {
     // and `TtcPcosStandBody()` with no hue.
     return const TtcToolScaffold(
       hue: kTtcToolHueBody,
+      // The tool's mark over the eyebrow (2026-09-29, ttc_tool_marks.dart).
+      toolId: 'pcos_check',
       variant: 2,
       eyebrow: kPcosStandEyebrow,
       title: kPcosStandTitle,
@@ -464,7 +466,10 @@ class _TtcPcosStandBodyState extends State<TtcPcosStandBody> {
                 hue: widget.hue,
                 n: 5,
                 title: "Acne for 6 months or more that skincare didn't fix?",
-                note: kPcosDegreeHint,
+                // Said once, on question 4 (no repetition, 2026-09-28).
+                // Kept for revert: note: kPcosDegreeHint,
+                note: 'Mild, moderate and severe mean the same as in '
+                    'question 4.',
                 child: _Degree(
                     value: _a.acne,
                     onTap: (v) => _set(() => _a.acne = v),
@@ -648,6 +653,8 @@ class TtcPcosStandResultScreen extends StatelessWidget {
     return TtcToolScaffold(
       hue: hue,
       variant: 3,
+      // Step two of the check: back to her answers, not an X (2026-09-29).
+      leading: TtcToolLeading.back,
       // One tool, one name (2026-09-27). Kept for revert: 'Your pattern'.
       eyebrow: kPcosStandEyebrow,
       title: "Here's what you told us,\nin plain words.",
@@ -773,6 +780,8 @@ class TtcPcosChecklistScreen extends StatelessWidget {
     return TtcToolScaffold(
       hue: hue,
       variant: 4,
+      // Step three: back to the answer it came from (2026-09-29).
+      leading: TtcToolLeading.back,
       // One tool, one name (2026-09-27). Kept for revert:
       // eyebrow: 'Appointment notes',
       eyebrow: kPcosStandEyebrow,

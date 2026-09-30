@@ -41,6 +41,7 @@ import 'ttc_surface_router.dart';
 import 'ttc_tool_chrome.dart';
 import '../learn/pv_offering_screen.dart';
 import '../learn/pv_learn_catalog.dart';
+import 'ttc_common.dart' show ttcTitleInk;
 
 /// Sage. The hue of "The practice" tab, which is where this course is reached
 /// from — see `ttc_focus_mind_body.dart`. The course is the deep end of that
@@ -99,7 +100,9 @@ class TtcGarbhCourseScreenClassic extends StatelessWidget {
                   _Panel(
                     p: p,
                     tint: v2BlockTint(kTtcCourseHue, p),
-                    heading: "WHAT THIS IS, AND WHAT IT ISN'T",
+                    // Kept for revert (2026-09-28): "WHAT THIS IS, AND WHAT IT
+                    // ISN'T". A heading names the course, not "this".
+                    heading: "WHAT THE COURSE IS, AND ISN'T",
                     body: kTtcCourseFrame,
                   ),
                   const SizedBox(height: 12),
@@ -125,8 +128,10 @@ class TtcGarbhCourseScreenClassic extends StatelessWidget {
                   // up with.
                   Text(
                       TtcGarbhCourseStore.instance.openedCount == 0
+                          // Kept for revert (2026-09-28): '... Session one
+                          // explains what this is, ...'
                           ? 'Start wherever you like. Session one explains '
-                              'what this is, and session two is the one most '
+                              'what the course is, and session two is the one most '
                               'people use most.'
                           : 'Open them in any order, and open them again '
                               'whenever you like.',
@@ -248,9 +253,12 @@ enum TtcCoursePart { read, doIt, keep }
 
 extension TtcCoursePartCopy on TtcCoursePart {
   String get label => switch (this) {
+        // Kept for revert (2026-09-28): 'Read', 'Do it', 'Keep it'. The
+        // pills and the Next button name the part she lands on ("Next: The
+        // practice"), not an "it".
         TtcCoursePart.read => 'Read',
-        TtcCoursePart.doIt => 'Do it',
-        TtcCoursePart.keep => 'Keep it',
+        TtcCoursePart.doIt => 'The practice',
+        TtcCoursePart.keep => 'Your plan',
       };
 
   /// One plain line under the part picker: what this part is.
@@ -377,6 +385,8 @@ class _TtcCourseSessionScreenState extends State<TtcCourseSessionScreen> {
 
         return TtcToolScaffold(
           hue: kTtcCourseHue,
+          // One lesson, opened from the course: back, not an X (2026-09-29).
+          leading: TtcToolLeading.back,
           scrollController: _scroll,
           eyebrow: 'SESSION ${s.number} OF 8',
           title: s.title,
@@ -492,7 +502,8 @@ class _TtcCourseSessionScreenState extends State<TtcCourseSessionScreen> {
           Container(
             padding: kTtcCardPad,
             decoration: BoxDecoration(
-              color: p.surfaceAlt,
+              // Kept for revert (2026-09-29, no tinted slab behind text): color: p.surfaceAlt,
+              color: p.surface, border: Border.fromBorderSide(BorderSide(color: p.line)),
               borderRadius: BorderRadius.circular(kTtcCardRadius),
             ),
             child: Row(children: [
@@ -510,7 +521,12 @@ class _TtcCourseSessionScreenState extends State<TtcCourseSessionScreen> {
         ],
         if (s.number == 1) ...[
           const SizedBox(height: 16),
-          _Panel(p: p, tint: tint, heading: 'What this is', body: kTtcCourseFrame),
+          // Kept for revert (2026-09-28): heading 'What this is'.
+          _Panel(
+              p: p,
+              tint: tint,
+              heading: 'What the course is',
+              body: kTtcCourseFrame),
           const SizedBox(height: 12),
           _Panel(
             p: p,
@@ -559,7 +575,8 @@ class _TtcCourseSessionScreenState extends State<TtcCourseSessionScreen> {
           width: double.infinity,
           padding: kTtcCardPad,
           decoration: BoxDecoration(
-            color: p.surfaceAlt,
+            // Kept for revert (2026-09-29, no tinted slab behind text): color: p.surfaceAlt,
+            color: p.surface, border: Border.fromBorderSide(BorderSide(color: p.line)),
             borderRadius: BorderRadius.circular(kTtcCardRadius),
           ),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -685,7 +702,8 @@ class _TtcCourseSessionScreenClassicState
                     Container(
                       padding: const EdgeInsets.all(13),
                       decoration: BoxDecoration(
-                        color: p.surfaceAlt,
+                        // Kept for revert (2026-09-29, no tinted slab behind text): color: p.surfaceAlt,
+                        color: p.surface, border: Border.fromBorderSide(BorderSide(color: p.line)),
                         borderRadius: BorderRadius.circular(14),
                       ),
                       child: Row(children: [
@@ -717,7 +735,8 @@ class _TtcCourseSessionScreenClassicState
                       tint: tint,
                       // Sentence case (tools pass, 2026-09-27). Kept for
                       // revert: 'WHAT THIS IS, PLAINLY'
-                      heading: 'What this is',
+                      // Kept for revert (2026-09-28): 'What this is'.
+                      heading: 'What the course is',
                       body: kTtcCourseFrame,
                     ),
                     const SizedBox(height: 12),
@@ -822,7 +841,8 @@ class _TtcCourseSessionScreenClassicState
                   Container(
                     padding: const EdgeInsets.all(15),
                     decoration: BoxDecoration(
-                      color: p.surfaceAlt,
+                      // Kept for revert (2026-09-29, no tinted slab behind text): color: p.surfaceAlt,
+                      color: p.surface, border: Border.fromBorderSide(BorderSide(color: p.line)),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Column(
@@ -1135,11 +1155,14 @@ class _AssembleBlockState extends State<_AssembleBlock> {
   Widget build(BuildContext context) {
     final p = widget.p;
     final store = TtcGarbhCourseStore.instance;
-    final tint = v2BlockTint(kTtcCourseHue, p);
-    final deep = HSLColor.fromColor(tint)
-        .withSaturation(0.44)
-        .withLightness(0.36)
-        .toColor();
+    // Kept for revert (2026-09-29), with `deep` below:
+    //   final tint = v2BlockTint(kTtcCourseHue, p);
+    // Kept for revert (2026-09-29): the button below was filled with the
+    // course hue's deep tone; it is the one ink now, so this is unused.
+    //   final deep = HSLColor.fromColor(tint)
+    //       .withSaturation(0.44)
+    //       .withLightness(0.36)
+    //       .toColor();
 
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       _Keep(
@@ -1249,7 +1272,7 @@ class _AssembleBlockState extends State<_AssembleBlock> {
           height: 52,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: deep,
+            color: ttcTitleInk,
             borderRadius: BorderRadius.circular(16),
           ),
           child: Text(_saved ? 'Update my daily practice' : 'Set as my daily practice',
@@ -1269,7 +1292,8 @@ class _AssembleBlockState extends State<_AssembleBlock> {
       if (_saved) ...[
         const SizedBox(height: 26),
         // Kept for revert (2026-09-27): 'THIS IS NOW YOUR TODAY'.
-        Text('This is now your Today',
+        // Kept for revert (2026-09-28): 'This is now your Today'.
+        Text('Your practice is now on Today',
             style: pvManrope(
                 fontSize: 13.5,
                 fontWeight: FontWeight.w800,
@@ -1322,7 +1346,7 @@ class _Pick extends StatelessWidget {
               height: 20,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: on ? p.action : Colors.transparent,
+                color: on ? ttcTitleInk : Colors.transparent,
                 shape: BoxShape.circle,
                 border: on ? null : Border.all(color: p.line, width: 1.6),
               ),
@@ -1378,7 +1402,8 @@ class _TodayPreview extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(13),
       decoration: BoxDecoration(
-        color: p.surfaceAlt,
+        // Kept for revert (2026-09-29, no tinted slab behind text): color: p.surfaceAlt,
+        color: p.surface, border: Border.fromBorderSide(BorderSide(color: p.line)),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Text(
@@ -1532,13 +1557,13 @@ class _TimeRow extends StatelessWidget {
               // instead of a bare "Set" (2026-09-27).
               child: Row(mainAxisSize: MainAxisSize.min, children: [
                 Icon(Icons.schedule_rounded,
-                    size: 14, color: value == null ? p.action : p.ink3),
+                    size: 14, color: value == null ? ttcTitleInk : p.ink3),
                 const SizedBox(width: 5),
                 Text(value ?? 'Set time',
                     style: pvManrope(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w800,
-                        color: value == null ? p.action : p.ink1)),
+                        color: value == null ? ttcTitleInk : p.ink1)),
               ]),
             ),
           ]),

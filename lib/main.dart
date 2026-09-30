@@ -87,6 +87,7 @@ import 'services/size_view_pref.dart';
 import 'services/journey_dates_store.dart';
 import 'services/reminder_store.dart';
 import 'ttc/ttc_content_prefs.dart';
+import 'ttc/ttc_doctor_questions_store.dart' show TtcDoctorQuestionsStore;
 import 'ttc/ttc_messages_store.dart';
 import 'ttc/ttc_records_store.dart' show TtcAppointmentsStore;
 import 'ttc/ttc_treatment_store.dart';
@@ -261,6 +262,11 @@ class _ParentVedaAppState extends State<ParentVedaApp>
     ScansStore.instance.init();
     // What she chose to see in TTC (the shared-phone switch).
     TtcContentPrefs.instance.init();
+    // Her questions for the doctor (2026-09-28), loaded here rather than on
+    // first touch: the TTC home's visit-day card, the doctor's note and the
+    // appointments' evening-before reminder all count them. One local read;
+    // the one-time move out of the old journal cache runs inside it, once.
+    TtcDoctorQuestionsStore.instance.init();
     // Load customizable reminders.
     //
     // ⚠️ THEN the TTC messages, and only then: `ReminderStore.init` ends in

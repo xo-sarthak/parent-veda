@@ -39,6 +39,8 @@ import '../../../services/ttc_search_store.dart';
 import '../../../ttc/ttc_content_prefs.dart';
 import '../../doors/pv_live_search.dart' show PvLiveSearch;
 import '../../v2/v2_palette.dart';
+import '../ttc_tool_marks.dart'
+    show TtcToolArt, TtcToolMark, ttcToolMarkForSurface;
 import '../ttc_focus_screen.dart'
     show iconForFormat, openTtcFocusTile, openTtcArticle;
 // The one filter for the shared-phone switch. An import cycle with the door
@@ -361,6 +363,19 @@ void openTtcDoorHit(
   if (h.readId case final id?) openTtcArticle(context, id, hue: hue);
 }
 
+/// The drawn mark of the tool a hit opens, or null when the hit is not a
+/// tool (a read, a film, a story, a chat). Same map as the door's tool card
+/// and the Tools tab, so one tool is one drawing wherever she meets it.
+TtcToolMark? ttcDoorHitToolMark(TtcDoorHit h) => switch (h.tile) {
+  TtcToolTile(:final surfaceId) ||
+  TtcChecklistTile(:final surfaceId) => ttcToolMarkForSurface(surfaceId),
+  _ => null,
+};
+
+/// The tint a tool hit's disc is drawn on: the door tool card's amber
+/// (`ttcCardKindHue(TtcCardKind.tool)`), so the row and the card agree.
+const double kTtcToolHitHue = 40;
+
 /// One result row: the format in a neutral well, the title, one grey line,
 /// where it lives, a chevron. The same object as the pregnancy search row.
 class TtcDoorHitRow extends StatelessWidget {
@@ -387,15 +402,30 @@ class TtcDoorHitRow extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: well,
-                  borderRadius: BorderRadius.circular(12),
+              // ⚠️ A TOOL WEARS ITS DRAWN MARK (2026-09-29, one app): a hit
+              // that opens a tool draws the object the Tools tab and the door
+              // card draw for it (`ttcToolMarkForSurface`), on its tint disc,
+              // instead of a format glyph in a grey well. Everything else keeps
+              // the well. Kept for revert: the well for every hit.
+              if (ttcDoorHitToolMark(h) case final mark?)
+                SizedBox(
+                  width: 40,
+                  height: 40,
+                  child: TtcToolArt(
+                    mark: mark,
+                    tint: v2BlockTint(kTtcToolHitHue, p),
+                  ),
+                )
+              else
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: well,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(h.icon, size: 20, color: p.ink2),
                 ),
-                child: Icon(h.icon, size: 20, color: p.ink2),
-              ),
               const SizedBox(width: 14),
               Expanded(
                 child: Column(

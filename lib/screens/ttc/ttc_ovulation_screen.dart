@@ -162,7 +162,8 @@ const String kTtcOvPositiveLabel = 'Positive';
 const String kTtcOvMoved = 'Your fertile days now follow this test.';
 const String kTtcOvBack = 'Your fertile days go back to our calendar estimate.';
 const String kTtcOvTempHeading = 'Temperature rise';
-const String kTtcOvTempAdd = 'Add the day it rose';
+// Kept for revert (2026-09-28): 'Add the day it rose'
+const String kTtcOvTempAdd = 'Add the day your temperature rose';
 const String kTtcOvNoPeriod =
     'Log the first day of your last period first. Then each test sits on '
     'the right day of your cycle.';
@@ -339,6 +340,8 @@ class _TtcOvulationTestsScreenState extends State<TtcOvulationTestsScreen> {
 
         return TtcToolScaffold(
           hue: kTtcOvHue,
+          // The tool's mark over the eyebrow (2026-09-29, ttc_tool_marks.dart).
+          toolId: 'ovulation',
           eyebrow: ttcToolById('ovulation')?.name(hi) ?? t.ovulationCompanion,
           title: kTtcOvTitle,
           intro: kTtcOvIntro,
@@ -384,14 +387,10 @@ class _TtcOvulationTestsScreenState extends State<TtcOvulationTestsScreen> {
 
             if (logs && start != null) ...[
               ttcToolPad(
-                Text(
-                  kTtcOvTestsHeading,
-                  style: pvFraunces(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                    color: p.ink1,
-                  ),
-                ),
+                // Kept for revert (2026-09-29, one heading style): the same
+                // Text with style: pvFraunces(fontSize: 20,
+                //     fontWeight: FontWeight.w600, color: p.ink1)
+                const TtcSectionHeading(kTtcOvTestsHeading),
               ),
               const SizedBox(height: 12),
               _CycleStrip(
@@ -577,7 +576,11 @@ class _TtcOvulationTestsScreenState extends State<TtcOvulationTestsScreen> {
               const SizedBox(height: 12),
               TtcToolPrimary(
                 key: const ValueKey('ttc_ov_adopt_yes'),
-                label: far == null ? 'Use it' : 'Yes, it was clear. Use it',
+                // Kept for revert (2026-09-28): 'Use it' / 'Yes, it was
+                // clear. Use it'
+                label: far == null
+                    ? 'Use this test'
+                    : 'Yes, it was clear. Use this test',
                 onTap: () => _adopt(first),
               ),
               if (far != null) ...[
@@ -602,14 +605,10 @@ class _TtcOvulationTestsScreenState extends State<TtcOvulationTestsScreen> {
     final currentDay = now.difference(start).inDays + 1;
     return [
       ttcToolPad(
-        Text(
-          kTtcOvTempHeading,
-          style: pvFraunces(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: p.ink1,
-          ),
-        ),
+        // Kept for revert (2026-09-29, one heading style): the same Text
+        // with style: pvFraunces(fontSize: 20, fontWeight: FontWeight.w600,
+        //     color: p.ink1)
+        const TtcSectionHeading(kTtcOvTempHeading),
       ),
       const SizedBox(height: 8),
       ttcToolPad(
@@ -638,8 +637,9 @@ class _TtcOvulationTestsScreenState extends State<TtcOvulationTestsScreen> {
               TextButton(
                 key: const ValueKey('ttc_ov_temp_change'),
                 onPressed: () => _pickTempDay(currentDay, t),
+                // Kept for revert (2026-09-28): 'Change'
                 child: Text(
-                  'Change',
+                  'Change the day',
                   style: pvManrope(
                     fontSize: 13,
                     fontWeight: FontWeight.w800,
