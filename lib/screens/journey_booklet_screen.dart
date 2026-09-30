@@ -132,7 +132,7 @@ class _JourneyBookletScreenState extends State<JourneyBookletScreen> {
                       Text(
                         missing.isEmpty ? s.noMissingWeeks : s.missingWeeksTitle,
                         style: text.headlineSmall
-                            ?.copyWith(color: AppTheme.primary700),
+                            ?.copyWith(color: AppTheme.neutral900),
                       ),
                       const SizedBox(height: 8),
                       Text(
@@ -165,7 +165,7 @@ class _JourneyBookletScreenState extends State<JourneyBookletScreen> {
                     child: FilledButton.icon(
                       onPressed: _busy ? null : _create,
                       style: FilledButton.styleFrom(
-                        backgroundColor: AppTheme.primary500,
+                        backgroundColor: AppTheme.neutral900,
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
                       icon: _busy

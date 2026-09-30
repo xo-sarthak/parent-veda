@@ -375,7 +375,7 @@ class _BabyMovementScreenState extends State<BabyMovementScreen>
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppTheme.primary50,
+        color: AppTheme.neutral50,
         borderRadius: BorderRadius.circular(18),
       ),
       child: Column(

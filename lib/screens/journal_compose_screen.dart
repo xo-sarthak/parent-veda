@@ -72,12 +72,12 @@ const int kJournalMaxPhotos = 3;
 // =============================================================================
 const _ground = Color(0xFFFFFFFF); // V3 ground — white since 2026-09-17; was 0xFFF5F3F6
 const _surface = Color(0xFFFFFFFF); // V3 surface
-const _surfaceAlt = Color(0xFFEDEAF0); // V3 surfaceAlt
+const _surfaceAlt = Color(0xFFEDECEE); // V3 surfaceAlt
 const _line = Color(0x14000000); // V3 line
 const _ink1 = Color(0xFF201C24); // V3 ink1
-const _ink2 = Color(0xFF5B5464); // V3 ink2
-const _ink3 = Color(0xFF6F6878); // V3 ink3
-const _action = Color(0xFF6A30B6); // V3 action
+const _ink2 = Color(0xFF2F2C30); // V3 ink2
+const _ink3 = Color(0xFF2F2C30); // V3 ink3
+const _action = Color(0xFF2F2C30); // V3 action
 
 Future<void> openJournalCompose(
   BuildContext context,

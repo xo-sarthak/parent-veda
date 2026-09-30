@@ -82,13 +82,13 @@ class _PregnancyProfileScreenState extends State<PregnancyProfileScreen> {
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
             const Icon(Icons.auto_awesome_rounded,
-                size: 20, color: AppTheme.primary600),
+                size: 20, color: AppTheme.neutral900),
             const SizedBox(width: 8),
             Text('${_p.completenessPercent}% complete',
                 style: pvJakarta(
                     fontSize: 14,
                     fontWeight: FontWeight.w800,
-                    color: AppTheme.primary900)),
+                    color: AppTheme.neutral900)),
           ]),
           const SizedBox(height: 10),
           Text(
@@ -189,7 +189,7 @@ class _PregnancyProfileScreenState extends State<PregnancyProfileScreen> {
               style: pvJakarta(
                   fontSize: 15.5,
                   fontWeight: FontWeight.w800,
-                  color: AppTheme.primary900)),
+                  color: AppTheme.neutral900)),
           const SizedBox(height: 6),
           // Every question says what it unlocks. A question that cannot explain
           // its own payoff should not be asked at all.
@@ -210,10 +210,10 @@ class _PregnancyProfileScreenState extends State<PregnancyProfileScreen> {
             duration: const Duration(milliseconds: 140),
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
-              color: on ? AppTheme.primary600 : AppTheme.surfaceContainer,
+              color: on ? AppTheme.neutral900 : AppTheme.surfaceContainer,
               borderRadius: BorderRadius.circular(999),
               border: Border.all(
-                  color: on ? AppTheme.primary600 : AppTheme.outlineVariant),
+                  color: on ? AppTheme.neutral900 : AppTheme.outlineVariant),
             ),
             child: Row(mainAxisSize: MainAxisSize.min, children: [
               if (on) ...[
@@ -224,7 +224,7 @@ class _PregnancyProfileScreenState extends State<PregnancyProfileScreen> {
                   style: pvManrope(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
-                      color: on ? Colors.white : AppTheme.primary900)),
+                      color: on ? Colors.white : AppTheme.neutral900)),
             ]),
           ),
         ),

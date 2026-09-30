@@ -183,12 +183,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       style: pvJakarta(
                           fontSize: 22,
                           fontWeight: FontWeight.w700,
-                          color: AppTheme.primary900)),
+                          color: AppTheme.neutral900)),
             ),
             IconButton(
               icon: Icon(
                   _searching ? Icons.close_rounded : Icons.search_rounded,
-                  color: AppTheme.primary700),
+                  color: AppTheme.neutral900),
               onPressed: () => setState(() {
                 _searching = !_searching;
                 if (!_searching) {
@@ -200,7 +200,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
             if (!_searching)
               IconButton(
                 icon: const Icon(Icons.add_circle_outline_rounded,
-                    color: AppTheme.primary700),
+                    color: AppTheme.neutral900),
                 tooltip: s.calAddPersonal,
                 onPressed: () => _addPersonal(s),
               ),
@@ -252,7 +252,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         style: pvJakarta(
                             fontSize: 17,
                             fontWeight: FontWeight.w700,
-                            color: AppTheme.primary900)),
+                            color: AppTheme.neutral900)),
                     const SizedBox(height: 2),
                     Text('${s.calDaysTogether(p.daysCompleted)} ❤',
                         style: pvManrope(
@@ -271,16 +271,16 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       value: pct,
                       strokeWidth: 5,
                       strokeCap: StrokeCap.round,
-                      backgroundColor: AppTheme.primary100,
+                      backgroundColor: AppTheme.neutral100,
                       valueColor:
-                          const AlwaysStoppedAnimation(AppTheme.primary500),
+                          const AlwaysStoppedAnimation(AppTheme.neutral900),
                     ),
                   ),
                   Text('${p.progressPercent}%',
                       style: pvJakarta(
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
-                          color: AppTheme.primary700)),
+                          color: AppTheme.neutral900)),
                 ]),
               ),
             ],
@@ -318,7 +318,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: _tab == i ? AppTheme.primary500 : Colors.transparent,
+                    color: _tab == i ? AppTheme.neutral900 : Colors.transparent,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(tabs[i],
@@ -368,7 +368,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 14),
                 decoration: BoxDecoration(
                   color: _filter == c.$1
-                      ? AppTheme.primary500
+                      ? AppTheme.neutral900
                       : AppTheme.surface,
                   borderRadius: BorderRadius.circular(99),
                   boxShadow: _filter == c.$1 ? null : _soft,
@@ -404,7 +404,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     final m = calMeta(e.category);
     final cur = e.status == CalEventStatus.current;
     final done = e.status == CalEventStatus.completed;
-    final dotColor = cur ? AppTheme.primary500 : (done ? _green : AppTheme.neutral300);
+    final dotColor = cur ? AppTheme.neutral900 : (done ? _green : AppTheme.neutral300);
     return IntrinsicHeight(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -417,7 +417,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 height: 18,
                 margin: const EdgeInsets.only(top: 16),
                 decoration: BoxDecoration(
-                  color: done ? _green : (cur ? AppTheme.primary500 : AppTheme.surface),
+                  color: done ? _green : (cur ? AppTheme.neutral900 : AppTheme.surface),
                   shape: BoxShape.circle,
                   border: Border.all(color: dotColor, width: 2),
                 ),
@@ -438,7 +438,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
                     color: cur
-                        ? AppTheme.primary500.withValues(alpha: 0.06)
+                        ? AppTheme.neutral900.withValues(alpha: 0.06)
                         : AppTheme.surface,
                     borderRadius: BorderRadius.circular(18),
                     boxShadow: _soft,
@@ -455,10 +455,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
                               style: pvJakarta(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w700,
-                                  color: AppTheme.primary900)),
+                                  color: AppTheme.neutral900)),
                         ),
                         if (cur)
-                          _pill(s.youAreHere, AppTheme.primary500)
+                          _pill(s.youAreHere, AppTheme.neutral900)
                         else if (done)
                           _pill(s.calStatusCompleted, _green)
                         else
@@ -538,7 +538,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
             children: [
               IconButton(
                 icon: const Icon(Icons.chevron_left_rounded),
-                color: AppTheme.primary600,
+                color: AppTheme.neutral900,
                 onPressed: () => setState(() =>
                     _month = DateTime(_month.year, _month.month - 1)),
               ),
@@ -548,11 +548,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     style: pvJakarta(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
-                        color: AppTheme.primary900)),
+                        color: AppTheme.neutral900)),
               ),
               IconButton(
                 icon: const Icon(Icons.chevron_right_rounded),
-                color: AppTheme.primary600,
+                color: AppTheme.neutral900,
                 onPressed: () => setState(() =>
                     _month = DateTime(_month.year, _month.month + 1)),
               ),
@@ -671,13 +671,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: isToday
-                      ? AppTheme.primary500
+                      ? AppTheme.neutral900
                       : (selected
-                          ? AppTheme.primary500.withValues(alpha: 0.16)
+                          ? AppTheme.neutral900.withValues(alpha: 0.16)
                           : Colors.transparent),
                   shape: BoxShape.circle,
                   border: selected && !isToday
-                      ? Border.all(color: AppTheme.primary500, width: 1.5)
+                      ? Border.all(color: AppTheme.neutral900, width: 1.5)
                       : null,
                 ),
                 child: Text('$day',
@@ -752,7 +752,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     fontSize: 11.5,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 0.6,
-                    color: AppTheme.primary500)),
+                    color: AppTheme.neutral900)),
           ),
           for (final e in list) _upcomingRow(s, e),
         ],
@@ -807,7 +807,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       style: pvJakarta(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
-                          color: AppTheme.primary900)),
+                          color: AppTheme.neutral900)),
                   const SizedBox(height: 2),
                   Text(s.calInDays(n),
                       style: pvManrope(
@@ -843,7 +843,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
               style: pvJakarta(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
-                  color: AppTheme.primary900)),
+                  color: AppTheme.neutral900)),
           if (week >= 4 && week <= 40) ...[
             const SizedBox(height: 4),
             Text('${s.weekWord} $week · ${s.trimesterName(week)}',
@@ -854,7 +854,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
             const SizedBox(height: 10),
             Text(s.babyIsSize(snap.fruit.of(p.language)),
                 style: pvManrope(
-                    fontSize: 13, color: AppTheme.primary700)),
+                    fontSize: 13, color: AppTheme.neutral900)),
           ],
           const SizedBox(height: 14),
           if (events.isEmpty)
@@ -891,7 +891,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   style: pvJakarta(
                       fontSize: 17,
                       fontWeight: FontWeight.w700,
-                      color: AppTheme.primary900)),
+                      color: AppTheme.neutral900)),
             ),
           ]),
           const SizedBox(height: 6),
@@ -941,7 +941,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
               style: pvManrope(
                   fontSize: 13.5,
                   fontWeight: FontWeight.w600,
-                  color: AppTheme.primary900)),
+                  color: AppTheme.neutral900)),
         ),
       ]),
     );
@@ -957,13 +957,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
           child: Row(children: [
             Icon(icon,
                 size: 20,
-                color: danger ? AppTheme.danger : AppTheme.primary600),
+                color: danger ? AppTheme.danger : AppTheme.neutral900),
             const SizedBox(width: 12),
             Text(label,
                 style: pvManrope(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
-                    color: danger ? AppTheme.danger : AppTheme.primary700)),
+                    color: danger ? AppTheme.danger : AppTheme.neutral900)),
           ]),
         ),
       );
@@ -1039,7 +1039,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     style: pvJakarta(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
-                        color: AppTheme.primary900)),
+                        color: AppTheme.neutral900)),
                 const SizedBox(height: 14),
                 TextField(
                   controller: titleCtrl,
@@ -1086,11 +1086,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         borderRadius: BorderRadius.circular(16)),
                     child: Row(children: [
                       const Icon(Icons.calendar_today_rounded,
-                          size: 18, color: AppTheme.primary600),
+                          size: 18, color: AppTheme.neutral900),
                       const SizedBox(width: 12),
                       Text(s.formatLongDate(date),
                           style: pvManrope(
-                              fontSize: 13.5, color: AppTheme.primary900)),
+                              fontSize: 13.5, color: AppTheme.neutral900)),
                     ]),
                   ),
                 ),
@@ -1154,7 +1154,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 style: pvJakarta(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
-                    color: AppTheme.primary900)),
+                    color: AppTheme.neutral900)),
           ),
           if (wk >= 4 && wk <= 40)
             Text('$wk ${s.calWeeksUpper}',
@@ -1190,13 +1190,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
           behavior: HitTestBehavior.opaque,
           child: Row(children: [
             const Icon(Icons.add_circle_outline_rounded,
-                size: 20, color: AppTheme.primary500),
+                size: 20, color: AppTheme.neutral900),
             const SizedBox(width: 8),
             Text(s.calAddNote,
                 style: pvManrope(
                     fontSize: 13.5,
                     fontWeight: FontWeight.w700,
-                    color: AppTheme.primary600)),
+                    color: AppTheme.neutral900)),
           ]),
         ),
       ]),
@@ -1233,7 +1233,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       style: pvJakarta(
                           fontSize: 13.5,
                           fontWeight: FontWeight.w700,
-                          color: AppTheme.primary900)),
+                          color: AppTheme.neutral900)),
                   // Names the dot's colour + what it means, so it's never a guess.
                   Text('${_catName(s, e.category)} · ${_catMeaning(s, e.category)}',
                       maxLines: 2,
@@ -1290,14 +1290,14 @@ class _CalendarScreenState extends State<CalendarScreen> {
             padding: const EdgeInsets.fromLTRB(16, 13, 14, 13),
             child: Row(children: [
               const Icon(Icons.palette_outlined,
-                  size: 18, color: AppTheme.primary500),
+                  size: 18, color: AppTheme.neutral900),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(s.calLegendTitle,
                     style: pvJakarta(
                         fontSize: 13.5,
                         fontWeight: FontWeight.w800,
-                        color: AppTheme.primary900)),
+                        color: AppTheme.neutral900)),
               ),
               Icon(
                   _legendOpen
@@ -1341,7 +1341,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       style: pvManrope(
                           fontSize: 12.5,
                           fontWeight: FontWeight.w800,
-                          color: AppTheme.primary900)),
+                          color: AppTheme.neutral900)),
                   Text(meaning,
                       style: pvManrope(
                           fontSize: 11,
@@ -1410,7 +1410,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
   // Distinct, on-brand colours for the three trimester-start pills.
   static Color _triColor(int t) => t == 1
       ? const Color(0xFFC07A4E)
-      : (t == 2 ? const Color(0xFF7A4FC2) : const Color(0xFF3E9A66));
+      : (t == 2 ? const Color(0xFF2F2C30) : const Color(0xFF3E9A66));
 
   bool _sameDay(DateTime a, DateTime b) =>
       a.year == b.year && a.month == b.month && a.day == b.day;

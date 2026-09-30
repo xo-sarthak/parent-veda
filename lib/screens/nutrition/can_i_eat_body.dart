@@ -588,7 +588,7 @@ class _ChipAnswer extends StatelessWidget {
                       style: pvManrope(
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
-                          color: p.action)),
+                          color: p.ink1)),
                 ),
               ],
             ),
@@ -740,7 +740,7 @@ class _FoodList extends StatelessWidget {
                         style: pvManrope(
                             fontSize: 12.5,
                             fontWeight: FontWeight.w700,
-                            color: p.action)),
+                            color: p.ink1)),
                   ),
               ],
             ),

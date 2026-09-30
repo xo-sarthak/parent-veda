@@ -2075,7 +2075,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                       padding: const EdgeInsets.all(15),
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                          color: const Color(0xFF6A30B6),
+                          color: const Color(0xFF2F2C30),
                           borderRadius: BorderRadius.circular(16)),
                       child: Text(S.now.uiOpenMomSView,
                           style: _body(15, Colors.white, w: FontWeight.w600)),

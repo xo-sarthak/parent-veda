@@ -181,13 +181,13 @@ class _Row extends StatelessWidget {
             margin: const EdgeInsets.only(top: 2, right: 12),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: done ? p.action.withValues(alpha: 0.14) : null,
+              color: done ? p.ink1.withValues(alpha: 0.14) : null,
               border: done
                   ? null
                   : Border.all(color: p.ink3.withValues(alpha: 0.42)),
             ),
             child: done
-                ? Icon(Icons.check_rounded, size: 13, color: p.action)
+                ? Icon(Icons.check_rounded, size: 13, color: p.ink1)
                 : null,
           ),
           Expanded(

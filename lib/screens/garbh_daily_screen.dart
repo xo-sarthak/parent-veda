@@ -78,7 +78,7 @@ class GarbhDailyScreen extends StatelessWidget {
             tag: 'Listening',
             today: shravanForDay(cd).title.now,
             icon: Icons.music_note_rounded,
-            accent: const Color(0xFF6B5B95),
+            accent: const Color(0xFF2F2C30),
             open: () => ShravanScreen(controller: pregnancy, daily: true),
           ),
           _Pillar(
@@ -129,7 +129,7 @@ class GarbhDailyScreen extends StatelessWidget {
             tag: 'Just for you',
             today: buddhiTodayLine(cd).now,
             icon: Icons.psychology_alt_outlined,
-            accent: const Color(0xFF7A6E9B),
+            accent: const Color(0xFF2F2C30),
             open: () => GarbhBuddhiScreen(
               controller: pregnancy,
               daily: true,
@@ -191,7 +191,7 @@ class GarbhDailyScreen extends StatelessWidget {
                       fontSize: 12,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 0.8,
-                      color: p.action)),
+                      color: p.ink1)),
               const SizedBox(height: 20),
 
               // ---- THE WEEK, SHOWN -------------------------------------
@@ -474,9 +474,9 @@ class _RitualRow extends StatelessWidget {
                     child: LinearProgressIndicator(
                       value: plan.progress,
                       minHeight: 5,
-                      backgroundColor: p.action.withValues(alpha: 0.15),
+                      backgroundColor: p.ink1.withValues(alpha: 0.15),
                       valueColor:
-                          AlwaysStoppedAnimation<Color>(p.action),
+                          AlwaysStoppedAnimation<Color>(p.ink1),
                     ),
                   ),
                   const SizedBox(height: 6),
@@ -536,7 +536,7 @@ class _WhyToday extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.fromLTRB(15, 13, 15, 14),
         decoration: BoxDecoration(
-          color: p.action.withValues(alpha: 0.08),
+          color: p.ink1.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -545,7 +545,7 @@ class _WhyToday extends StatelessWidget {
                   fontSize: 9.5,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 1.2,
-                  color: p.action)),
+                  color: p.ink1)),
           const SizedBox(height: 7),
           Text(garbhWeekReason(week).of(lang),
               style: pvManrope(fontSize: 13.5, height: 1.6, color: p.ink1)),

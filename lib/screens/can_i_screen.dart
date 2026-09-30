@@ -41,7 +41,7 @@ import 'tools/ask_veda_screen.dart';
       );
     case CanIVerdict.askDoctor:
       return (
-        color: const Color(0xFF7A4FC2),
+        color: const Color(0xFF2F2C30),
         icon: Icons.medical_information_rounded
       );
   }
@@ -82,7 +82,7 @@ String _catLabel(S s, CanICategory c) {
     case CanICategory.drink:
       return (icon: Icons.local_cafe_rounded, emoji: '🥤', color: const Color(0xFF3B82C4));
     case CanICategory.take:
-      return (icon: Icons.medication_rounded, emoji: '💊', color: const Color(0xFF7A4FC2));
+      return (icon: Icons.medication_rounded, emoji: '💊', color: const Color(0xFF2F2C30));
     case CanICategory.doActivity:
       return (icon: Icons.directions_run_rounded, emoji: '🏃', color: const Color(0xFFE8833A));
   }
@@ -255,7 +255,7 @@ class _SearchBar extends StatelessWidget {
           border: Border.all(color: AppTheme.outlineVariant, width: 1.2),
           boxShadow: [
             BoxShadow(
-              color: AppTheme.primary900.withValues(alpha: 0.04),
+              color: AppTheme.neutral900.withValues(alpha: 0.04),
               blurRadius: 16,
               offset: const Offset(0, 6),
             ),
@@ -616,7 +616,7 @@ class _TrimesterRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
-    final accent = const Color(0xFF7A4FC2);
+    final accent = const Color(0xFF2F2C30);
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
@@ -708,7 +708,7 @@ class _AskVedaCard extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            AppTheme.primary500.withValues(alpha: 0.10),
+            AppTheme.neutral900.withValues(alpha: 0.10),
             AppTheme.secondary500.withValues(alpha: 0.08),
           ],
         ),
@@ -717,7 +717,7 @@ class _AskVedaCard extends StatelessWidget {
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          const Icon(Icons.auto_awesome_rounded, size: 18, color: AppTheme.primary500),
+          const Icon(Icons.auto_awesome_rounded, size: 18, color: AppTheme.neutral900),
           const SizedBox(width: 8),
           Expanded(
             child: Text(title,
@@ -731,7 +731,7 @@ class _AskVedaCard extends StatelessWidget {
           width: double.infinity,
           child: FilledButton.icon(
             style: FilledButton.styleFrom(
-              backgroundColor: AppTheme.primary500,
+              backgroundColor: AppTheme.neutral900,
               padding: const EdgeInsets.symmetric(vertical: 13),
             ),
             onPressed: onTap,

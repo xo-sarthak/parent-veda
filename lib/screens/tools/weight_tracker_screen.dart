@@ -236,7 +236,7 @@ class _SetupFlowState extends State<_SetupFlow> {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppTheme.primary50,
+          color: AppTheme.neutral50,
           borderRadius: BorderRadius.circular(18),
         ),
         child: Text(note, style: text.bodyMedium),
@@ -468,7 +468,7 @@ class _Dashboard extends StatelessWidget {
                 minHeight: 8,
                 backgroundColor: AppTheme.surfaceContainerHigh,
                 valueColor:
-                    const AlwaysStoppedAnimation<Color>(AppTheme.primary400),
+                    const AlwaysStoppedAnimation<Color>(AppTheme.neutral500),
               ),
             ),
           ),
@@ -544,7 +544,7 @@ class _Dashboard extends StatelessWidget {
       margin: const EdgeInsets.only(top: 10),
       padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 10),
       decoration: BoxDecoration(
-        color: AppTheme.primary50,
+        color: AppTheme.neutral50,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(children: [
@@ -555,13 +555,13 @@ class _Dashboard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
-                color: AppTheme.primary100,
+                color: AppTheme.neutral100,
                 borderRadius: BorderRadius.circular(40),
               ),
               child: Text(
                 s.startWord.toUpperCase(),
                 style: text.labelSmall?.copyWith(
-                  color: AppTheme.primary700,
+                  color: AppTheme.neutral900,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 0.5,
                 ),
@@ -575,7 +575,7 @@ class _Dashboard extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: text.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w700,
-                  color: AppTheme.primary800,
+                  color: AppTheme.neutral900,
                 ),
               ),
             ),
@@ -756,11 +756,11 @@ class _ChartView extends StatelessWidget {
       ),
       const SizedBox(height: 10),
       Row(children: [
-        _legendDot(AppTheme.primary500),
+        _legendDot(AppTheme.neutral900),
         const SizedBox(width: 6),
         Text(s.chartActualWeight, style: text.labelSmall),
         const SizedBox(width: 16),
-        _legendDot(AppTheme.primary100),
+        _legendDot(AppTheme.neutral100),
         const SizedBox(width: 6),
         Text(s.chartRecommendedRange, style: text.labelSmall),
       ]),
@@ -814,12 +814,12 @@ class _WeightChartPainter extends CustomPainter {
       ..lineTo(x(_wkStart), y(preWeight))
       ..close();
     canvas.drawPath(
-        band, Paint()..color = AppTheme.primary100.withValues(alpha: 0.6));
+        band, Paint()..color = AppTheme.neutral100.withValues(alpha: 0.6));
 
     // Actual line + dots.
     if (points.isNotEmpty) {
       final line = Paint()
-        ..color = AppTheme.primary500
+        ..color = AppTheme.neutral900
         ..style = PaintingStyle.stroke
         ..strokeWidth = 3
         ..strokeCap = StrokeCap.round
@@ -834,7 +834,7 @@ class _WeightChartPainter extends CustomPainter {
         }
       }
       canvas.drawPath(path, line);
-      final dot = Paint()..color = AppTheme.primary500;
+      final dot = Paint()..color = AppTheme.neutral900;
       for (final p in points) {
         canvas.drawCircle(Offset(x(p.week), y(p.weight)), 4, dot);
       }

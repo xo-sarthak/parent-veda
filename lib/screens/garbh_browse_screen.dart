@@ -136,7 +136,7 @@ class GarbhBrowseScreen extends StatelessWidget {
     // reference.
     const ground = Color(0xFFFFFFFF); // V3 ground — white since 2026-09-17; was 0xFFF5F3F6
     const ink = Color(0xFF201C24); // V3 ink1
-    const muted = Color(0xFF6F6878); // V3 ink3
+    const muted = Color(0xFF2F2C30); // V3 ink3
 
     return Scaffold(
       backgroundColor: ground,
@@ -284,7 +284,7 @@ class _PinButton extends StatelessWidget {
               child: Icon(
                   on ? Icons.push_pin_rounded : Icons.push_pin_outlined,
                   size: 17,
-                  color: on ? const Color(0xFF6A30B6) : const Color(0xFF6F6878)),
+                  color: on ? const Color(0xFF2F2C30) : const Color(0xFF2F2C30)),
             ),
           ),
         );

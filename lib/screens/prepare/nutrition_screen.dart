@@ -337,7 +337,7 @@ class NutritionTrailerScreen extends StatelessWidget {
   Widget _mealRow(String meal, String food, {bool bottom = false}) => Container(
         padding: const EdgeInsets.symmetric(vertical: 13),
         decoration: BoxDecoration(
-            border: Border(bottom: bottom ? BorderSide.none : const BorderSide(color: Color(0xFFE1D7EC)))),
+            border: Border(bottom: bottom ? BorderSide.none : const BorderSide(color: Color(0xFFE2E0E3)))),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
           SizedBox(
             width: 96,

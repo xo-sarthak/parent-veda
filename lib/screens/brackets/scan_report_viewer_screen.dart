@@ -295,14 +295,14 @@ class _ScanChip extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
-            color: p.action.withValues(alpha: 0.10),
+            color: p.ink1.withValues(alpha: 0.10),
             borderRadius: BorderRadius.circular(999),
           ),
           child: Text(label,
               style: pvManrope(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
-                  color: p.action)),
+                  color: p.ink1)),
         ),
       );
 }

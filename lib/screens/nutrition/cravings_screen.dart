@@ -236,11 +236,11 @@ class _StageBanner extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(14, 11, 14, 12),
       decoration: BoxDecoration(
-        color: p.action.withValues(alpha: 0.09),
+        color: p.ink1.withValues(alpha: 0.09),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Row(children: [
-        Icon(Icons.my_location_rounded, size: 16, color: p.action),
+        Icon(Icons.my_location_rounded, size: 16, color: p.ink1),
         const SizedBox(width: 10),
         Expanded(
           child: Text('You are in week $week, your ${names[tri]} trimester.',

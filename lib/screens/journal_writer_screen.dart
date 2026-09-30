@@ -184,7 +184,7 @@ class _JournalWriterScreenState extends State<JournalWriterScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                 decoration: BoxDecoration(
-                  color: AppTheme.primary50,
+                  color: AppTheme.neutral50,
                   borderRadius: BorderRadius.circular(40),
                 ),
                 child: Text(
@@ -192,12 +192,12 @@ class _JournalWriterScreenState extends State<JournalWriterScreen> {
                       ? 'Week ${widget.week}'
                       : 'हफ़्ता ${widget.week}',
                   style: text.labelMedium?.copyWith(
-                      color: AppTheme.primary600, fontWeight: FontWeight.w700),
+                      color: AppTheme.neutral900, fontWeight: FontWeight.w700),
                 ),
               ),
               const SizedBox(height: 16),
               Text(_promptText,
-                  style: text.headlineSmall?.copyWith(color: AppTheme.primary700)),
+                  style: text.headlineSmall?.copyWith(color: AppTheme.neutral900)),
               const SizedBox(height: 16),
               _PhotoStrip(
                 photos: _photos,
@@ -306,9 +306,9 @@ class _PhotoStrip extends StatelessWidget {
                 width: 88,
                 height: 88,
                 decoration: BoxDecoration(
-                  color: AppTheme.primary50,
+                  color: AppTheme.neutral50,
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: AppTheme.primary100, width: 1.2),
+                  border: Border.all(color: AppTheme.neutral100, width: 1.2),
                 ),
                 child: busy
                     ? const Center(
@@ -322,12 +322,12 @@ class _PhotoStrip extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(Icons.add_a_photo_rounded,
-                              color: AppTheme.primary500, size: 24),
+                              color: AppTheme.neutral900, size: 24),
                           const SizedBox(height: 4),
                           Text(s.addUpToTwoPhotos,
                               textAlign: TextAlign.center,
                               style: text.labelSmall
-                                  ?.copyWith(color: AppTheme.primary600)),
+                                  ?.copyWith(color: AppTheme.neutral900)),
                         ],
                       ),
               ),
@@ -364,11 +364,11 @@ class _MicBar extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           color: listening
-              ? AppTheme.primary500
-              : AppTheme.primary50,
+              ? AppTheme.neutral900
+              : AppTheme.neutral50,
           borderRadius: BorderRadius.circular(40),
           border: Border.all(
-            color: listening ? AppTheme.primary500 : AppTheme.primary100,
+            color: listening ? AppTheme.neutral900 : AppTheme.neutral100,
             width: 1.2,
           ),
         ),
@@ -378,13 +378,13 @@ class _MicBar extends StatelessWidget {
             Icon(
               listening ? Icons.stop_rounded : Icons.mic_rounded,
               size: 20,
-              color: listening ? Colors.white : AppTheme.primary600,
+              color: listening ? Colors.white : AppTheme.neutral900,
             ),
             const SizedBox(width: 10),
             Text(
               listening ? s.listening : s.tapMicToSpeak,
               style: text.labelLarge?.copyWith(
-                color: listening ? Colors.white : AppTheme.primary700,
+                color: listening ? Colors.white : AppTheme.neutral900,
                 fontWeight: FontWeight.w700,
               ),
             ),

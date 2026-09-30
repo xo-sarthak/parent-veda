@@ -46,7 +46,7 @@ class PrepareVideoScreen extends StatelessWidget {
             child: AspectRatio(
               aspectRatio: 16 / 10,
               child: Stack(children: [
-                const PvStriped(height: 999, colorA: Color(0xFFE4D5F0), colorB: kStripeA, radius: 22),
+                const PvStriped(height: 999, colorA: Color(0xFFE3E1E4), colorB: kStripeA, radius: 22),
                 Center(
                   child: Column(mainAxisSize: MainAxisSize.min, children: [
                     Container(

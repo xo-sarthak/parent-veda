@@ -411,7 +411,7 @@ class _Eyebrow extends StatelessWidget {
   // eyebrow reads as metadata rather than as the name of what follows.
   Widget build(BuildContext context) => Text(text.toUpperCase(),
       style: pvManrope(
-          fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.2, color: p.action));
+          fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.2, color: p.ink1));
 }
 
 /// "Week 24 · Same window, same light. Whenever you're ready. [Add this week]"

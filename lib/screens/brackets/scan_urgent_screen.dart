@@ -88,7 +88,7 @@ class ScanUrgentScreen extends StatelessWidget {
                           height: 7,
                           margin: const EdgeInsets.only(top: 7, right: 12),
                           decoration: BoxDecoration(
-                              color: p.action, shape: BoxShape.circle),
+                              color: p.ink1, shape: BoxShape.circle),
                         ),
                         Expanded(
                           child: Text(sign.of(lang),

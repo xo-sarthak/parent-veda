@@ -39,7 +39,7 @@ import 'garbh_relaxation_screen.dart';
 import 'v2/v2_palette.dart';
 
 const Color _ink = Color(0xFF201C24);
-const Color _muted = Color(0xFF6F6878);
+const Color _muted = Color(0xFF2F2C30);
 const Color _accShravan = Color(0xFFBE9C4E);
 
 /// The player for one Shravan track, on whatever the manifest says it is.

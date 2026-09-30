@@ -50,20 +50,20 @@ import '../../services/remote/ask_veda_service.dart';
 import '../../theme/pv_fonts.dart';
 
 // ---- design palette (the "Ask Veda Results" mock - our brand purple/coral) ----
-const _vBgTop = Color(0xFFF8F4FD);
-const _vBgMid = Color(0xFFF2EBF9);
-const _vBgBot = Color(0xFFEFE7F6);
-const _vPurple = Color(0xFF6D28D9);
-const _vPurple2 = Color(0xFF7C3AED);
+const _vBgTop = Color(0xFFF9F8F9);
+const _vBgMid = Color(0xFFF2F1F3);
+const _vBgBot = Color(0xFFEFEEEF);
+const _vPurple = Color(0xFF2F2C30);
+const _vPurple2 = Color(0xFF2F2C30);
 const _vCoral = Color(0xFFF0476A);
-const _vInk = Color(0xFF241640);
-const _vInk2 = Color(0xFF2A1B47);
-const _vBody = Color(0xFF352A4A);
-const _vBody2 = Color(0xFF4A4263);
-const _vMuted = Color(0xFF948BA6);
-const _vMuted2 = Color(0xFF9B8BB5);
+const _vInk = Color(0xFF2F2C30);
+const _vInk2 = Color(0xFF2F2C30);
+const _vBody = Color(0xFF2F2C30);
+const _vBody2 = Color(0xFF2F2C30);
+const _vMuted = Color(0xFF2F2C30);
+const _vMuted2 = Color(0xFFA29BA5);
 const _vCardBorder = Color(0x147C3AED);
-const _vDivider = Color(0xFFF4EEFA);
+const _vDivider = Color(0xFFF4F3F5);
 const List<BoxShadow> _vCardShadow = [
   BoxShadow(color: Color(0x0D281646), blurRadius: 6, offset: Offset(0, 2)),
   BoxShadow(
@@ -387,7 +387,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
   }
 
   Widget _pillEdit(S s) => Row(children: [
-        const Icon(Icons.search_rounded, size: 21, color: Color(0xFF9384B0)),
+        const Icon(Icons.search_rounded, size: 21, color: Color(0xFF9D959F)),
         const SizedBox(width: 10),
         Expanded(
           child: TextField(
@@ -407,7 +407,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
               focusedBorder: InputBorder.none,
               contentPadding: const EdgeInsets.symmetric(vertical: 11),
               hintStyle: pvManrope(
-                  fontSize: 14.5, color: const Color(0xFFB6A9CC)),
+                  fontSize: 14.5, color: const Color(0xFFBCB7BE)),
             ),
           ),
         ),
@@ -429,7 +429,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
       ]);
 
   Widget _pillResult(S s) => Row(children: [
-        const Icon(Icons.search_rounded, size: 21, color: Color(0xFF9384B0)),
+        const Icon(Icons.search_rounded, size: 21, color: Color(0xFF9D959F)),
         const SizedBox(width: 11),
         Expanded(
           child: Text(_query ?? '',
@@ -443,11 +443,11 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
           child: const Padding(
             padding: EdgeInsets.symmetric(horizontal: 4),
             child:
-                Icon(Icons.close_rounded, size: 19, color: Color(0xFFB6A9CC)),
+                Icon(Icons.close_rounded, size: 19, color: Color(0xFFBCB7BE)),
           ),
         ),
         const SizedBox(width: 8),
-        Container(width: 1, height: 20, color: const Color(0xFFEADFF5)),
+        Container(width: 1, height: 20, color: const Color(0xFFEBE9EB)),
         const SizedBox(width: 12),
         // Ask again by voice → return to the search field (its mic does the STT).
         GestureDetector(
@@ -531,7 +531,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
           decoration: BoxDecoration(
             color: active
                 ? _vPurple.withValues(alpha: 0.06)
-                : const Color(0xFFF3EEFA),
+                : const Color(0xFFF4F3F5),
             borderRadius: BorderRadius.circular(99),
             border: Border.all(
                 color:
@@ -631,7 +631,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
   Widget _comingSoon(String label) => _card(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 17),
         child: Row(children: [
-          const Icon(Icons.hourglass_empty_rounded, size: 17, color: Color(0xFFB6A9CC)),
+          const Icon(Icons.hourglass_empty_rounded, size: 17, color: Color(0xFFBCB7BE)),
           const SizedBox(width: 10),
           Expanded(child: Text(label, style: pvManrope(fontSize: 13, fontWeight: FontWeight.w600, color: _vMuted2))),
         ]),
@@ -641,7 +641,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
   Widget _feedAnswerCard(String answer, S s) => _card(
         radius: 22,
         padding: const EdgeInsets.fromLTRB(18, 18, 18, 20),
-        gradient: const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.white, Color(0xFFFCFAFF)]),
+        gradient: const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.white, Color(0xFFFDFCFD)]),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
             const Icon(Icons.auto_awesome_rounded, size: 20, color: _vPurple2),
@@ -688,7 +688,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         Container(
           width: 40, height: 40, alignment: Alignment.center,
           decoration: BoxDecoration(
-            gradient: LinearGradient(colors: coral ? const [Color(0xFFFFE9EE), Color(0xFFFCE0E8)] : const [Color(0xFFF3E9FF), Color(0xFFEDE2FC)]),
+            gradient: LinearGradient(colors: coral ? const [Color(0xFFFFE9EE), Color(0xFFFCE0E8)] : const [Color(0xFFF4F3F5), Color(0xFFEFEEF0)]),
             borderRadius: BorderRadius.circular(13),
           ),
           child: Icon(icon, size: 21, color: coral ? _vCoral : _vPurple),
@@ -740,7 +740,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
               ],
             ]),
           ),
-          const Padding(padding: EdgeInsets.only(left: 4, top: 18), child: Icon(Icons.chevron_right_rounded, size: 20, color: Color(0xFFCBBFDD))),
+          const Padding(padding: EdgeInsets.only(left: 4, top: 18), child: Icon(Icons.chevron_right_rounded, size: 20, color: Color(0xFFCFCCD0))),
         ]),
       ),
     );
@@ -765,7 +765,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
             Container(width: 48, height: 48, alignment: Alignment.center, decoration: BoxDecoration(color: const Color(0xFF3E9A8C).withValues(alpha: 0.12), borderRadius: BorderRadius.circular(13)), child: const Icon(Icons.shopping_bag_rounded, size: 22, color: Color(0xFF3E9A8C))),
             const SizedBox(width: 13),
             Expanded(child: Text(it.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: pvManrope(fontSize: 14, fontWeight: FontWeight.w700, height: 1.3, color: _vInk))),
-            const Icon(Icons.chevron_right_rounded, size: 20, color: Color(0xFFCBBFDD)),
+            const Icon(Icons.chevron_right_rounded, size: 20, color: Color(0xFFCFCCD0)),
           ]),
         ),
       );
@@ -814,7 +814,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
             controller: sc,
             padding: const EdgeInsets.fromLTRB(22, 14, 22, 28),
             children: [
-              Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: const Color(0xFFD7CCE8), borderRadius: BorderRadius.circular(99)))),
+              Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: const Color(0xFFDBD8DC), borderRadius: BorderRadius.circular(99)))),
               const SizedBox(height: 16),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -981,7 +981,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
             gradient: LinearGradient(
                 colors: coral
                     ? const [Color(0xFFFFE9EE), Color(0xFFFCE0E8)]
-                    : const [Color(0xFFF3E9FF), Color(0xFFEDE2FC)]),
+                    : const [Color(0xFFF4F3F5), Color(0xFFEFEEF0)]),
             borderRadius: BorderRadius.circular(13),
           ),
           child: Icon(icon, size: 21, color: coral ? _vCoral : _vPurple),
@@ -1060,7 +1060,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
           const Padding(
             padding: EdgeInsets.only(left: 4, top: 18),
             child: Icon(Icons.chevron_right_rounded,
-                size: 20, color: Color(0xFFCBBFDD)),
+                size: 20, color: Color(0xFFCFCCD0)),
           ),
         ]),
       ),
@@ -1094,7 +1094,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
                           fontSize: 13.5, height: 1.5, color: _vBody2)),
                 ),
                 const Icon(Icons.chevron_right_rounded,
-                    size: 20, color: Color(0xFFCBBFDD)),
+                    size: 20, color: Color(0xFFCFCCD0)),
               ]),
             ),
           ),
@@ -1166,7 +1166,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
-              colors: [Color(0xFFF3E9FF), Color(0xFFFBEAF1)]),
+              colors: [Color(0xFFF4F3F5), Color(0xFFFBEAF1)]),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -1210,7 +1210,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         gradient: const LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.white, Color(0xFFFCFAFF)]),
+            colors: [Colors.white, Color(0xFFFDFCFD)]),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           if (sc.urgent) _urgentBanner(s),
           Row(children: [
@@ -1247,7 +1247,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
           height: 32,
           alignment: Alignment.center,
           decoration: const BoxDecoration(
-              color: Color(0xFFF6F0FE), shape: BoxShape.circle),
+              color: Color(0xFFF7F7F7), shape: BoxShape.circle),
           child: const Icon(Icons.volume_up_rounded, size: 18, color: _vPurple2),
         ),
       );
@@ -1268,11 +1268,11 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         gradient: const LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFFEFE4FB), Color(0xFFF8EDF6)]),
+            colors: [Color(0xFFF0EFF0), Color(0xFFF8EDF6)]),
         borderRadius: BorderRadius.circular(16),
       ),
       alignment: Alignment.center,
-      child: Icon(icon, size: 38, color: const Color(0xFFC6B2E4)),
+      child: Icon(icon, size: 38, color: const Color(0xFFCCC8CE)),
     );
   }
 
@@ -1401,7 +1401,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
             gradient: LinearGradient(
                 colors: coral
                     ? const [Color(0xFFFFE9EE), Color(0xFFFCE0E8)]
-                    : const [Color(0xFFF3E9FF), Color(0xFFEDE2FC)]),
+                    : const [Color(0xFFF4F3F5), Color(0xFFEFEEF0)]),
             borderRadius: BorderRadius.circular(13),
           ),
           child: Icon(icon, size: 21, color: coral ? _vCoral : _vPurple),
@@ -1479,7 +1479,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
                 ]),
           ),
           const Icon(Icons.chevron_right_rounded,
-              size: 20, color: Color(0xFFCBBFDD)),
+              size: 20, color: Color(0xFFCFCCD0)),
         ]),
       ),
     );
@@ -1494,7 +1494,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
           gradient: const LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [_vPurple2, Color(0xFF9D6BF0)]),
+              colors: [_vPurple2, Color(0xFFB0A9B2)]),
           borderRadius: BorderRadius.circular(14),
         ),
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
@@ -1523,7 +1523,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
             end: Alignment.bottomRight,
             colors: isVideo
                 ? const [Color(0xFFF4E6F3), Color(0xFFFBE9EE)]
-                : const [Color(0xFFEEE4FB), Color(0xFFF4ECF7)]),
+                : const [Color(0xFFF0EFF0), Color(0xFFF2F1F2)]),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Icon(
@@ -1533,7 +1533,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
                 ? Icons.build_rounded
                 : Icons.menu_book_rounded,
         size: isVideo ? 32 : 26,
-        color: isVideo ? const Color(0xFFEC6A87) : const Color(0xFFB9A6DC),
+        color: isVideo ? const Color(0xFFEC6A87) : const Color(0xFFC3BEC4),
       ),
     );
   }
@@ -1560,7 +1560,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
                           color: _vBody2)),
                 ),
                 const Icon(Icons.chevron_right_rounded,
-                    size: 20, color: Color(0xFFCBBFDD)),
+                    size: 20, color: Color(0xFFCFCCD0)),
               ]),
             ),
           ),
@@ -1572,7 +1572,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         height: 28,
         child: Stack(children: [
           _miniAvatar(0, const [Color(0xFFF0476A), Color(0xFFFF8AA0)]),
-          _miniAvatar(18, const [Color(0xFF7C3AED), Color(0xFFB08BF0)]),
+          _miniAvatar(18, const [Color(0xFF2F2C30), Color(0xFFBFBAC1)]),
           _miniAvatar(36, const [Color(0xFFF0A046), Color(0xFFFFD08A)]),
         ]),
       );
@@ -1643,12 +1643,12 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
             gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [Color(0xFFEEE4FB), Color(0xFFF5ECF7)]),
+                colors: [Color(0xFFF0EFF0), Color(0xFFF2F1F2)]),
           ),
           child: prod != null
               ? Text(prod.emoji, style: const TextStyle(fontSize: 40))
               : const Icon(Icons.redeem_rounded,
-                  size: 30, color: Color(0xFFBDABDF)),
+                  size: 30, color: Color(0xFFC6C2C8)),
         ),
         Padding(
           padding: const EdgeInsets.fromLTRB(11, 11, 13, 13),
@@ -1729,7 +1729,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
             gradient: LinearGradient(
                 colors: coral
                     ? const [Color(0xFFFFE9EE), Color(0xFFFCE0E8)]
-                    : const [Color(0xFFF3E9FF), Color(0xFFEDE2FC)]),
+                    : const [Color(0xFFF4F3F5), Color(0xFFEFEEF0)]),
             borderRadius: BorderRadius.circular(14),
           ),
           child: Icon(icon, size: 23, color: coral ? _vCoral : _vPurple),
@@ -1772,7 +1772,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(22),
-                    border: Border.all(color: const Color(0xFFE3D6F4)),
+                    border: Border.all(color: const Color(0xFFE6E4E6)),
                   ),
                   child: Text(s.vedaCall,
                       style: pvManrope(
@@ -1790,7 +1790,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
           const Padding(
             padding: EdgeInsets.only(top: 1),
-            child: Icon(Icons.shield_rounded, size: 17, color: Color(0xFFB6A9CC)),
+            child: Icon(Icons.shield_rounded, size: 17, color: Color(0xFFBCB7BE)),
           ),
           const SizedBox(width: 9),
           Expanded(
@@ -1808,7 +1808,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         gradient: const LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.white, Color(0xFFFCFAFF)]),
+            colors: [Colors.white, Color(0xFFFDFCFD)]),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
             const Icon(Icons.auto_awesome_rounded, size: 20, color: _vPurple2),
@@ -1895,7 +1895,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
           const Padding(
             padding: EdgeInsets.only(left: 4, top: 18),
             child: Icon(Icons.chevron_right_rounded,
-                size: 20, color: Color(0xFFCBBFDD)),
+                size: 20, color: Color(0xFFCFCCD0)),
           ),
         ]),
       ),
@@ -1966,7 +1966,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
                     width: 40,
                     height: 4,
                     decoration: BoxDecoration(
-                        color: const Color(0xFFD7CCE8),
+                        color: const Color(0xFFDBD8DC),
                         borderRadius: BorderRadius.circular(99))),
               ),
               const SizedBox(height: 16),
@@ -2028,7 +2028,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
       case VedaKind.trimesterTip:
         return const Color(0xFFE0921C);
       case VedaKind.spiritual:
-        return const Color(0xFF7C5CC4);
+        return const Color(0xFF2F2C30);
       case VedaKind.readToBaby:
         return _vCoral;
       case VedaKind.garbh:

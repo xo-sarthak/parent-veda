@@ -125,13 +125,13 @@ class ProfileScreenClassic extends StatelessWidget {
                 height: 60,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: AppTheme.primary100,
+                  color: AppTheme.neutral100,
                   shape: BoxShape.circle,
                 ),
                 child: Text(
                   initial,
                   style: text.headlineSmall?.copyWith(
-                    color: AppTheme.primary600,
+                    color: AppTheme.neutral900,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
@@ -209,8 +209,8 @@ class ProfileScreenClassic extends StatelessWidget {
                 subtitle: s.jrSubtitle,
                 trailing: count > 0 ? '$count' : '',
                 icon: Icons.auto_stories_rounded,
-                accent: AppTheme.primary500,
-                accentBg: AppTheme.primary50,
+                accent: AppTheme.neutral900,
+                accentBg: AppTheme.neutral50,
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (_) => JournalScreen(controller: controller),
@@ -313,7 +313,7 @@ class ProfileScreenClassic extends StatelessWidget {
                     : 'Your profile is $pct% complete - the more we know, the more useful ParentVeda gets.',
                 trailing: pct > 0 ? '$pct%' : '',
                 icon: Icons.auto_awesome_rounded,
-                accent: AppTheme.primary600,
+                accent: AppTheme.neutral900,
                 accentBg: AppTheme.surfaceContainer,
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(
@@ -371,7 +371,7 @@ class ProfileScreenClassic extends StatelessWidget {
                 gradient: const LinearGradient(
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
-                  colors: [Color(0xFF6A30B6), Color(0xFF8B5CD6)],
+                  colors: [Color(0xFF2F2C30), Color(0xFF9C949E)],
                 ),
                 borderRadius: BorderRadius.circular(18),
               ),
@@ -426,7 +426,7 @@ class ProfileScreenClassic extends StatelessWidget {
               ),
               child: Row(children: [
                 const Icon(Icons.auto_awesome_outlined,
-                    size: 22, color: Color(0xFF5A4A6B)),
+                    size: 22, color: Color(0xFF2F2C30)),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -443,7 +443,7 @@ class ProfileScreenClassic extends StatelessWidget {
                       ]),
                 ),
                 const Icon(Icons.arrow_forward_rounded,
-                    size: 20, color: Color(0xFF5A4A6B)),
+                    size: 20, color: Color(0xFF2F2C30)),
               ]),
             ),
           ),
@@ -475,8 +475,8 @@ class ProfileScreenClassic extends StatelessWidget {
             icon: const Icon(Icons.medical_services_outlined, size: 18),
             label: Text(S.now.uiEnterDoctorModeTesting),
             style: OutlinedButton.styleFrom(
-              foregroundColor: AppTheme.primary600,
-              side: BorderSide(color: AppTheme.primary500.withValues(alpha: 0.35)),
+              foregroundColor: AppTheme.neutral900,
+              side: BorderSide(color: AppTheme.neutral900.withValues(alpha: 0.35)),
               padding: const EdgeInsets.symmetric(vertical: 13),
               shape:
                   RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
@@ -698,7 +698,7 @@ class ProfileScreenClassic extends StatelessWidget {
         ListTile(
           contentPadding: EdgeInsets.zero,
           leading: CircleAvatar(
-            backgroundColor: AppTheme.primary500,
+            backgroundColor: AppTheme.neutral900,
             child: Text(
                 d.name.replaceAll(RegExp(r'^Dr\.?\s*'), '').characters.first
                     .toUpperCase(),
@@ -838,14 +838,14 @@ class _InvitePartnerCardState extends State<_InvitePartnerCard> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppTheme.primary50,
+        color: AppTheme.neutral50,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppTheme.primary100),
+        border: Border.all(color: AppTheme.neutral100),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
           const Icon(Icons.favorite_rounded,
-              color: AppTheme.primary500, size: 20),
+              color: AppTheme.neutral900, size: 20),
           const SizedBox(width: 8),
           Text(S.now.uiInvitePartner,
               style: text.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
@@ -867,7 +867,7 @@ class _InvitePartnerCardState extends State<_InvitePartnerCard> {
               style: text.headlineSmall?.copyWith(
                   fontWeight: FontWeight.w800,
                   letterSpacing: 4,
-                  color: AppTheme.primary600)),
+                  color: AppTheme.neutral900)),
         ),
         const SizedBox(height: 12),
         Row(children: [
@@ -1009,8 +1009,8 @@ class _EmployerBenefitsCard extends StatelessWidget {
           icon: active
               ? Icons.workspace_premium_outlined
               : Icons.business_outlined,
-          accent: AppTheme.primary600,
-          accentBg: AppTheme.primary50,
+          accent: AppTheme.neutral900,
+          accentBg: AppTheme.neutral50,
           onTap: () {
             if (active) {
               Navigator.of(context).push(
@@ -1199,11 +1199,11 @@ class _LanguageCard extends StatelessWidget {
             height: 50,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: AppTheme.primary50,
+              color: AppTheme.neutral50,
               borderRadius: BorderRadius.circular(16),
             ),
             child: Icon(Icons.translate_rounded,
-                color: AppTheme.primary500, size: 24),
+                color: AppTheme.neutral900, size: 24),
           ),
           const SizedBox(width: 14),
           Expanded(child: Text(s.languageLabel, style: text.titleMedium)),
@@ -1262,7 +1262,7 @@ class _Segmented extends StatelessWidget {
         duration: const Duration(milliseconds: 180),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
         decoration: BoxDecoration(
-          color: selected ? AppTheme.primary500 : Colors.transparent,
+          color: selected ? AppTheme.neutral900 : Colors.transparent,
           borderRadius: BorderRadius.circular(40),
         ),
         child: Text(
@@ -1335,7 +1335,7 @@ class _OrgSignInGroupState extends State<_OrgSignInGroup> {
         ListTile(
           contentPadding: EdgeInsets.zero,
           leading: CircleAvatar(
-            backgroundColor: AppTheme.primary500,
+            backgroundColor: AppTheme.neutral900,
             child: Text(
                 ('${o['name']}'.trim().isEmpty ? '?' : '${o['name']}'.trim())
                     .characters

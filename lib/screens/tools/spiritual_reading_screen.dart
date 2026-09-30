@@ -22,7 +22,7 @@ import '../../services/spiritual_prefs_store.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/pv_fonts.dart';
 
-const Color _accent = Color(0xFF9A7BB5);
+const Color _accent = Color(0xFF2F2C30);
 const int _previewCount = 3;
 
 // Preferred browse order (matches the section spec). Any tradition not listed
@@ -125,7 +125,7 @@ class _SpiritualReadingScreenState extends State<SpiritualReadingScreen> {
                       style: pvManrope(
                           fontSize: 12.5,
                           height: 1.45,
-                          color: AppTheme.primary700)),
+                          color: AppTheme.neutral900)),
                 ),
               ]),
             ),
@@ -224,7 +224,7 @@ class _SpiritualReadingScreenState extends State<SpiritualReadingScreen> {
                       style: pvJakarta(
                           fontSize: 16,
                           fontWeight: FontWeight.w800,
-                          color: AppTheme.primary900)),
+                          color: AppTheme.neutral900)),
                   const SizedBox(height: 2),
                   Text(t.blurb.now,
                       style: pvManrope(
@@ -326,7 +326,7 @@ class _TraditionDetailScreen extends StatelessWidget {
             style: pvJakarta(
                 fontSize: 17,
                 fontWeight: FontWeight.w800,
-                color: AppTheme.primary900)),
+                color: AppTheme.neutral900)),
       ),
       body: AnimatedBuilder(
         animation: SpiritualPrefsStore.instance,
@@ -415,13 +415,13 @@ class _SpiritualReadScreen extends StatelessWidget {
                   fontSize: 25,
                   height: 1.2,
                   fontWeight: FontWeight.w600,
-                  color: AppTheme.primary900)),
+                  color: AppTheme.neutral900)),
           const SizedBox(height: 16),
           Text(read.body.now,
               style: pvManrope(
                   fontSize: 15.5,
                   height: 1.7,
-                  color: const Color(0xFF4A4358))),
+                  color: const Color(0xFF2F2C30))),
           const SizedBox(height: 20),
           // Interested / Not-interested preference (persists).
           AnimatedBuilder(

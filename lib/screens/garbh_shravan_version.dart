@@ -77,7 +77,7 @@ class ShravanVersionPill extends StatelessWidget {
               boxShadow: [
                 BoxShadow(
                   // Tinted to the ground, never black.
-                  color: const Color(0xFFD0C8DC).withValues(alpha: 0.55),
+                  color: const Color(0xFFD3D0D4).withValues(alpha: 0.55),
                   blurRadius: 14,
                   offset: const Offset(0, 3),
                 ),
@@ -99,7 +99,7 @@ class ShravanVersionPill extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
           decoration: BoxDecoration(
-            color: on ? p.action : Colors.transparent,
+            color: on ? p.ink1 : Colors.transparent,
             borderRadius: BorderRadius.circular(999),
           ),
           child: Text(label,

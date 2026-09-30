@@ -77,7 +77,7 @@ class GroundPicker extends StatelessWidget {
               boxShadow: [
                 BoxShadow(
                   // Tinted to the ground, never black.
-                  color: const Color(0xFFD0C8DC).withValues(alpha: 0.5),
+                  color: const Color(0xFFD3D0D4).withValues(alpha: 0.5),
                   blurRadius: 14,
                   offset: const Offset(0, 3),
                 ),

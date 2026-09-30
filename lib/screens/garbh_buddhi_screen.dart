@@ -42,9 +42,9 @@ import '../models/garbh_content.dart';
 import '../services/pregnancy_controller.dart';
 import '../theme/pv_fonts.dart';
 
-const _accBuddhi = Color(0xFF7A6E9B); // muted indigo, its own place on the wheel
+const _accBuddhi = Color(0xFF2F2C30); // muted indigo, its own place on the wheel
 const _ink = Color(0xFF201C24); // V3 ink1
-const _muted = Color(0xFF6F6878); // V3 ink3
+const _muted = Color(0xFF2F2C30); // V3 ink3
 const _ground = Color(0xFFFFFFFF); // V3 ground — white since 2026-09-17; was 0xFFF5F3F6
 
 class GarbhBuddhiScreen extends StatelessWidget {

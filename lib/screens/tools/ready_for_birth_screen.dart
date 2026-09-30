@@ -186,7 +186,7 @@ class _ReadyForBirthScreenState extends State<ReadyForBirthScreen> {
       decoration: BoxDecoration(
         gradient: const LinearGradient(
             begin: Alignment.topLeft, end: Alignment.bottomRight,
-            colors: [Color(0xFFF3ECFA), Color(0xFFFDF3F5)]),
+            colors: [Color(0xFFF3F2F4), Color(0xFFFDF3F5)]),
         borderRadius: BorderRadius.circular(26),
         border: Border.all(color: AppTheme.outlineVariant),
       ),
@@ -228,7 +228,7 @@ class _ReadyForBirthScreenState extends State<ReadyForBirthScreen> {
           child: Center(
             child: Column(mainAxisSize: MainAxisSize.min, children: [
               Text('$percent%',
-                  style: _t.titleLarge?.copyWith(color: AppTheme.primary900, fontWeight: FontWeight.w800)),
+                  style: _t.titleLarge?.copyWith(color: AppTheme.neutral900, fontWeight: FontWeight.w800)),
               Text(S.now.uiReady, style: _t.labelSmall?.copyWith(color: AppTheme.neutral600)),
             ]),
           ),
@@ -308,15 +308,15 @@ class _ReadyForBirthScreenState extends State<ReadyForBirthScreen> {
           margin: const EdgeInsets.only(bottom: 10),
           padding: const EdgeInsets.all(15),
           decoration: BoxDecoration(
-            color: AppTheme.primary50,
+            color: AppTheme.neutral50,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppTheme.primary100),
+            border: Border.all(color: AppTheme.neutral100),
           ),
           child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Icon(ins.icon, size: 18, color: AppTheme.primary),
             const SizedBox(width: 12),
             Expanded(child: Text(ins.text,
-                style: _t.bodyMedium?.copyWith(color: AppTheme.primary900, height: 1.45))),
+                style: _t.bodyMedium?.copyWith(color: AppTheme.neutral900, height: 1.45))),
           ]),
         ),
       ],
@@ -623,7 +623,7 @@ class _CategoryScreenState extends State<_CategoryScreen> {
                 style: OutlinedButton.styleFrom(
                   minimumSize: const Size.fromHeight(48),
                   foregroundColor: AppTheme.primary,
-                  side: BorderSide(color: AppTheme.primary200),
+                  side: BorderSide(color: AppTheme.neutral200),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                 ),
               ),
@@ -852,7 +852,7 @@ class _EmergencyScreen extends StatelessWidget {
               child: Row(children: [
                 Container(
                   width: 44, height: 44, alignment: Alignment.center,
-                  decoration: BoxDecoration(color: AppTheme.primary50, borderRadius: BorderRadius.circular(13)),
+                  decoration: BoxDecoration(color: AppTheme.neutral50, borderRadius: BorderRadius.circular(13)),
                   child: Icon(g.icon, color: AppTheme.primary),
                 ),
                 const SizedBox(width: 14),
@@ -1021,12 +1021,12 @@ class _BagOptionsScreenState extends State<_BagOptionsScreen> {
               // how-to-choose intro
               Container(
                 padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(color: AppTheme.primary50, borderRadius: BorderRadius.circular(18), border: Border.all(color: AppTheme.primary100)),
+                decoration: BoxDecoration(color: AppTheme.neutral50, borderRadius: BorderRadius.circular(18), border: Border.all(color: AppTheme.neutral100)),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(S.now.uiHowChoose, style: t.labelLarge?.copyWith(color: AppTheme.primary700)),
+                  Text(S.now.uiHowChoose, style: t.labelLarge?.copyWith(color: AppTheme.neutral900)),
                   const SizedBox(height: 6),
                   Text(S.now.rfbWhyThenPicks(whyPack(item)),
-                      style: t.bodyMedium?.copyWith(color: AppTheme.primary900, height: 1.5)),
+                      style: t.bodyMedium?.copyWith(color: AppTheme.neutral900, height: 1.5)),
                 ]),
               ),
               const SizedBox(height: 20),
@@ -1111,9 +1111,9 @@ class _BagOptionsScreenState extends State<_BagOptionsScreen> {
         child: Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: selected ? AppTheme.primary50 : AppTheme.surface,
+            color: selected ? AppTheme.neutral50 : AppTheme.surface,
             borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: selected ? AppTheme.primary400 : AppTheme.outlineVariant, width: selected ? 1.6 : 1),
+            border: Border.all(color: selected ? AppTheme.neutral500 : AppTheme.outlineVariant, width: selected ? 1.6 : 1),
           ),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -1128,7 +1128,7 @@ class _BagOptionsScreenState extends State<_BagOptionsScreen> {
                   if (affiliate)
                     Text(p.store, style: t.labelSmall?.copyWith(color: AppTheme.secondary600, fontWeight: FontWeight.w800))
                   else if (p.topPick)
-                    Text(S.now.uiBestOverall, style: t.labelSmall?.copyWith(color: AppTheme.primary600, fontWeight: FontWeight.w800)),
+                    Text(S.now.uiBestOverall, style: t.labelSmall?.copyWith(color: AppTheme.neutral900, fontWeight: FontWeight.w800)),
                   Text(affiliate ? S.now.rfbBuyOn(p.store) : p.name.now, style: t.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
                   const SizedBox(height: 2),
                   Text('₹${p.price}', style: t.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
@@ -1136,7 +1136,7 @@ class _BagOptionsScreenState extends State<_BagOptionsScreen> {
               ),
               Icon(
                 affiliate ? Icons.open_in_new_rounded : (selected ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded),
-                color: affiliate ? AppTheme.secondary500 : (selected ? AppTheme.primary500 : AppTheme.neutral400),
+                color: affiliate ? AppTheme.secondary500 : (selected ? AppTheme.neutral900 : AppTheme.neutral400),
               ),
             ]),
             if (p.why.isNotEmpty) ...[

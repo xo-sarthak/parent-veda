@@ -386,7 +386,7 @@ class _Eyebrow extends StatelessWidget {
           fontSize: 9.5,
           fontWeight: FontWeight.w800,
           letterSpacing: 1.1,
-          color: p.action));
+          color: p.ink1));
 }
 
 class _Pointer extends StatelessWidget {

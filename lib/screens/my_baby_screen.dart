@@ -56,12 +56,12 @@ class MyBabyScreen extends StatelessWidget {
                 gradient: const LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [AppTheme.primary500, AppTheme.primary700],
+                  colors: [AppTheme.neutral900, AppTheme.neutral900],
                 ),
                 borderRadius: BorderRadius.circular(28),
                 boxShadow: [
                   BoxShadow(
-                    color: AppTheme.primary500.withValues(alpha: 0.30),
+                    color: AppTheme.neutral900.withValues(alpha: 0.30),
                     blurRadius: 24,
                     offset: const Offset(0, 12),
                   ),

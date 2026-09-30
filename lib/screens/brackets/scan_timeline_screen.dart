@@ -380,7 +380,7 @@ class _UpNext extends StatelessWidget {
                   fontSize: 10,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 1.3,
-                  color: p.ink2)), // was p.action — the last violet on the door (2026-09-19)
+                  color: p.ink2)), // was p.ink1 — the last violet on the door (2026-09-19)
           const SizedBox(height: 8),
           Text(scan.name.of(lang),
               style: pvFraunces(
@@ -617,7 +617,7 @@ class _WhereYouAre extends StatelessWidget {
                   fontSize: 9.5,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 1.1,
-                  color: p.action)),
+                  color: p.ink1)),
           const SizedBox(height: 8),
           Text(_en('Week $week').of(lang),
               style: pvFraunces(
@@ -706,7 +706,7 @@ class _TimelineRow extends StatelessWidget {
       // label on an otherwise identical row; the wash is what makes the row
       // itself look different when the page is scanned rather than read.
       child: Container(
-        color: isNext ? p.action.withValues(alpha: 0.05) : null,
+        color: isNext ? p.ink1.withValues(alpha: 0.05) : null,
         padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -779,7 +779,7 @@ class _TimelineRow extends StatelessWidget {
                         style: pvManrope(
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
-                            color: isDone ? p.ink3 : p.action)),
+                            color: isDone ? p.ink3 : p.ink1)),
                   ),
                   ],
                   // Her own booking outranks the window — if she has a date,
@@ -793,7 +793,7 @@ class _TimelineRow extends StatelessWidget {
                         style: pvManrope(
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
-                            color: p.action)),
+                            color: p.ink1)),
                   ],
                   // ⚠️ PRICES ARE OFF ON THIS SCREEN, KEPT FOR REVERT.
                   //
@@ -824,8 +824,8 @@ class _TimelineRow extends StatelessWidget {
                     const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
                 decoration: BoxDecoration(
                   color: isNext
-                      ? p.action
-                      : p.action.withValues(alpha: 0.10),
+                      ? p.ink1
+                      : p.ink1.withValues(alpha: 0.10),
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
@@ -834,7 +834,7 @@ class _TimelineRow extends StatelessWidget {
                         fontSize: 9,
                         fontWeight: FontWeight.w800,
                         letterSpacing: 1.0,
-                        color: isNext ? p.onAction : p.action)),
+                        color: isNext ? p.onAction : p.ink1)),
               ),
           ],
         ),
@@ -936,10 +936,10 @@ class _StationState extends State<_Station>
       height: next ? 18 : 14,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: done || next ? p.action : Colors.transparent,
+        color: done || next ? p.ink1 : Colors.transparent,
         border: Border.all(
           color: done || next
-              ? p.action
+              ? p.ink1
               : p.ink3.withValues(alpha: passed ? 0.28 : 0.45),
           width: 2,
         ),
@@ -995,7 +995,7 @@ class _StationState extends State<_Station>
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           border: Border.all(
-            color: p.action.withValues(alpha: 0.45 * (1 - t)),
+            color: p.ink1.withValues(alpha: 0.45 * (1 - t)),
             width: 2,
           ),
         ),
@@ -1066,9 +1066,9 @@ class _Dot extends StatelessWidget {
       alignment: Alignment.center,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: filled ? p.action : Colors.transparent,
+        color: filled ? p.ink1 : Colors.transparent,
         border: Border.all(
-            color: filled ? p.action : p.ink3.withValues(alpha: 0.45),
+            color: filled ? p.ink1 : p.ink3.withValues(alpha: 0.45),
             width: 1.6),
       ),
       child: tick ? Icon(Icons.check, size: 7, color: p.onAction) : null,
@@ -1084,7 +1084,7 @@ class _Dot extends StatelessWidget {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border:
-                Border.all(color: p.action.withValues(alpha: 0.35), width: 1.4),
+                Border.all(color: p.ink1.withValues(alpha: 0.35), width: 1.4),
           ),
         ),
         core,

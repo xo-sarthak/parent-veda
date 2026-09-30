@@ -258,9 +258,9 @@ class _GlobalSearchDelegate extends SearchDelegate<void> {
         height: 40,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-            color: AppTheme.primary500.withValues(alpha: 0.10),
+            color: AppTheme.neutral900.withValues(alpha: 0.10),
             borderRadius: BorderRadius.circular(12)),
-        child: Icon(icon, size: 20, color: AppTheme.primary600),
+        child: Icon(icon, size: 20, color: AppTheme.neutral900),
       );
 
   Widget _header(String t) => Padding(

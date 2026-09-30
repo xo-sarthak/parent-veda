@@ -831,7 +831,7 @@ class _SessionScreenState extends State<_SessionScreen>
   Widget build(BuildContext context) {
     final s = S(widget.controller.language);
     final text = Theme.of(context).textTheme;
-    final color = _holding ? AppTheme.secondary500 : AppTheme.primary400;
+    final color = _holding ? AppTheme.secondary500 : AppTheme.neutral500;
 
     return Scaffold(
       appBar: AppBar(

@@ -172,7 +172,7 @@ class _JournalScreenState extends State<JournalScreenClassic> {
               )
             : Text(s.jrTitle,
                 style: pvJakarta(
-                    fontWeight: FontWeight.w700, color: AppTheme.primary900)),
+                    fontWeight: FontWeight.w700, color: AppTheme.neutral900)),
         actions: [
           if (!_searching && !_combined)
             IconButton(
@@ -244,7 +244,7 @@ class _JournalScreenState extends State<JournalScreenClassic> {
       // spilling out of the button).
       floatingActionButton: FloatingActionButton(
         onPressed: () => _openCreate(s),
-        backgroundColor: AppTheme.primary500,
+        backgroundColor: AppTheme.neutral900,
         child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
       ),
     );
@@ -308,19 +308,19 @@ class _JournalScreenState extends State<JournalScreenClassic> {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
           decoration: BoxDecoration(
             color: sel
-                ? AppTheme.primary500.withValues(alpha: 0.12)
+                ? AppTheme.neutral900.withValues(alpha: 0.12)
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(99),
             border: Border.all(
                 color: sel
-                    ? AppTheme.primary500.withValues(alpha: 0.4)
+                    ? AppTheme.neutral900.withValues(alpha: 0.4)
                     : AppTheme.outlineVariant),
           ),
           child: Text(label,
               style: pvManrope(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
-                  color: sel ? AppTheme.primary600 : AppTheme.neutral500)),
+                  color: sel ? AppTheme.neutral900 : AppTheme.neutral500)),
         ),
       );
 
@@ -422,7 +422,7 @@ class _JournalScreenState extends State<JournalScreenClassic> {
                 style: pvJakarta(
                     fontSize: 13.5,
                     fontWeight: FontWeight.w800,
-                    color: AppTheme.primary600)),
+                    color: AppTheme.neutral900)),
             if (dateRange.isNotEmpty) ...[
               const SizedBox(width: 8),
               Text(dateRange,
@@ -464,7 +464,7 @@ class _JournalScreenState extends State<JournalScreenClassic> {
                         style: pvJakarta(
                             fontSize: 14.5,
                             fontWeight: FontWeight.w800,
-                            color: AppTheme.primary900)),
+                            color: AppTheme.neutral900)),
                   ),
                   if (subLabel != null) ...[
                     const SizedBox(width: 8),
@@ -485,13 +485,13 @@ class _JournalScreenState extends State<JournalScreenClassic> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
-                  color: AppTheme.primary500.withValues(alpha: 0.10),
+                  color: AppTheme.neutral900.withValues(alpha: 0.10),
                   borderRadius: BorderRadius.circular(99)),
               child: Text('$count',
                   style: pvManrope(
                       fontSize: 11.5,
                       fontWeight: FontWeight.w800,
-                      color: AppTheme.primary600)),
+                      color: AppTheme.neutral900)),
             ),
             const SizedBox(width: 8),
             AnimatedRotation(
@@ -521,7 +521,7 @@ class _JournalScreenState extends State<JournalScreenClassic> {
           alignment: Alignment.center,
           padding: const EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
-            color: sel ? AppTheme.primary500 : AppTheme.surface,
+            color: sel ? AppTheme.neutral900 : AppTheme.surface,
             borderRadius: BorderRadius.circular(99),
             boxShadow: sel ? null : _soft,
           ),
@@ -607,7 +607,7 @@ class _JournalScreenState extends State<JournalScreenClassic> {
                             style: pvJakarta(
                                 fontSize: 14.5,
                                 fontWeight: FontWeight.w700,
-                                color: AppTheme.primary900)),
+                                color: AppTheme.neutral900)),
                         if (e.description.isNotEmpty) ...[
                           const SizedBox(height: 3),
                           Text(e.description,
@@ -762,7 +762,7 @@ class _JournalScreenState extends State<JournalScreenClassic> {
               alignment: Alignment.center,
               padding: const EdgeInsets.symmetric(horizontal: 12),
               decoration: BoxDecoration(
-                  color: AppTheme.primary500.withValues(alpha: 0.10),
+                  color: AppTheme.neutral900.withValues(alpha: 0.10),
                   borderRadius: BorderRadius.circular(99)),
               child: Row(mainAxisSize: MainAxisSize.min, children: [
                 Icon(
@@ -770,13 +770,13 @@ class _JournalScreenState extends State<JournalScreenClassic> {
                         ? Icons.stop_rounded
                         : Icons.play_arrow_rounded,
                     size: 18,
-                    color: AppTheme.primary500),
+                    color: AppTheme.neutral900),
                 const SizedBox(width: 6),
                 Text('${s.jcVoiceNote} ${i + 1}',
                     style: pvManrope(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w700,
-                        color: AppTheme.primary600)),
+                        color: AppTheme.neutral900)),
               ]),
             ),
           );
@@ -795,7 +795,7 @@ class _JournalScreenState extends State<JournalScreenClassic> {
             style: pvManrope(
                 fontSize: 10.5,
                 fontWeight: FontWeight.w700,
-                color: AppTheme.primary600)),
+                color: AppTheme.neutral900)),
       );
 
   // --- photo grid ------------------------------------------------------------
@@ -843,7 +843,7 @@ class _JournalScreenState extends State<JournalScreenClassic> {
 
   // A small "You" / "Dad" pill shown on each entry in the Combined booklet.
   Widget _authorChip(bool father) {
-    final c = father ? const Color(0xFF2E5266) : AppTheme.primary500;
+    final c = father ? const Color(0xFF2E5266) : AppTheme.neutral900;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
@@ -955,7 +955,7 @@ class _JournalScreenState extends State<JournalScreenClassic> {
               shape: BoxShape.circle,
               boxShadow: _soft),
           child: Icon(icon,
-              color: enabled ? AppTheme.primary500 : AppTheme.neutral300),
+              color: enabled ? AppTheme.neutral900 : AppTheme.neutral300),
         ),
       );
 
@@ -979,7 +979,7 @@ class _JournalScreenState extends State<JournalScreenClassic> {
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [AppTheme.primary500, AppTheme.primary700],
+                colors: [AppTheme.neutral900, AppTheme.neutral900],
               ),
             ),
             child: Stack(children: [
@@ -1110,7 +1110,7 @@ class _JournalScreenState extends State<JournalScreenClassic> {
                   style: pvFraunces(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
-                      color: AppTheme.primary900)),
+                      color: AppTheme.neutral900)),
               const SizedBox(height: 6),
               Container(height: 1, color: const Color(0xFFEADFCB)),
               const SizedBox(height: 14),
@@ -1136,7 +1136,7 @@ class _JournalScreenState extends State<JournalScreenClassic> {
                 style: pvJakarta(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
-                    color: AppTheme.primary900)),
+                    color: AppTheme.neutral900)),
           ),
           if (combined) ...[
             _authorChip(ae.father),
@@ -1192,8 +1192,8 @@ class _JournalScreenState extends State<JournalScreenClassic> {
               height: 84,
               alignment: Alignment.center,
               decoration: const BoxDecoration(
-                  color: AppTheme.primary50, shape: BoxShape.circle),
-              child: Icon(icon, size: 38, color: AppTheme.primary400),
+                  color: AppTheme.neutral50, shape: BoxShape.circle),
+              child: Icon(icon, size: 38, color: AppTheme.neutral500),
             ),
             const SizedBox(height: 18),
             if (isAll) ...[
@@ -1202,7 +1202,7 @@ class _JournalScreenState extends State<JournalScreenClassic> {
                   style: pvFraunces(
                       fontSize: 21,
                       fontWeight: FontWeight.w500,
-                      color: AppTheme.primary900)),
+                      color: AppTheme.neutral900)),
               const SizedBox(height: 8),
             ],
             Text(body,
@@ -1282,7 +1282,7 @@ class _JournalScreenState extends State<JournalScreenClassic> {
                   style: pvJakarta(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
-                      color: AppTheme.primary900)),
+                      color: AppTheme.neutral900)),
               const SizedBox(height: 6),
               Text(s.jrInfoIntro,
                   style: pvManrope(
@@ -1323,7 +1323,7 @@ class _JournalScreenState extends State<JournalScreenClassic> {
           ),
           title: Text(label,
               style: pvJakarta(
-                  fontWeight: FontWeight.w700, color: AppTheme.primary900)),
+                  fontWeight: FontWeight.w700, color: AppTheme.neutral900)),
           onTap: onTap,
         );
 
@@ -1395,7 +1395,7 @@ class _JournalScreenState extends State<JournalScreenClassic> {
               }),
               // Custom-tag entry removed per request (the enum + existing custom
               // entries are kept; only creating new ones is gone).
-              // opt(Icons.label_rounded, AppTheme.primary500, s.jcCustom, () {
+              // opt(Icons.label_rounded, AppTheme.neutral900, s.jcCustom, () {
               //   Navigator.pop(ctx);
               //   openJournalText(context, p, JournalEntryType.custom);
               // }),

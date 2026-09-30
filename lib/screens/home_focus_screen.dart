@@ -402,13 +402,13 @@ class HomeFocusScreen extends StatelessWidget {
               border: Border.all(color: p.line),
             ),
             child: Row(mainAxisSize: MainAxisSize.min, children: [
-              Icon(Icons.tune_rounded, size: 15, color: p.action),
+              Icon(Icons.tune_rounded, size: 15, color: p.ink1),
               const SizedBox(width: 5),
               Text('Focus',
                   style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
-                      color: p.action)),
+                      color: p.ink1)),
             ]),
           ),
         ),
@@ -420,7 +420,7 @@ class HomeFocusScreen extends StatelessWidget {
           fontSize: 11,
           fontWeight: FontWeight.w800,
           letterSpacing: 1.2,
-          color: p.action.withValues(alpha: 0.85),
+          color: p.ink1.withValues(alpha: 0.85),
         ),
       );
 
@@ -519,7 +519,7 @@ class HomeFocusScreen extends StatelessWidget {
                 style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
-                    color: p.action.withValues(alpha: 0.7))),
+                    color: p.ink1.withValues(alpha: 0.7))),
           ],
         ]),
       ),
@@ -555,10 +555,10 @@ class HomeFocusScreen extends StatelessWidget {
               child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 9),
               decoration: BoxDecoration(
-                color: identical(q, p) ? p.action : p.surface,
+                color: identical(q, p) ? p.ink1 : p.surface,
                 borderRadius: BorderRadius.circular(999),
                 border: Border.all(
-                    color: identical(q, p) ? p.action : p.line),
+                    color: identical(q, p) ? p.ink1 : p.line),
               ),
               child: Row(mainAxisSize: MainAxisSize.min, children: [
                 // A swatch of the ground itself, so the chip previews what it

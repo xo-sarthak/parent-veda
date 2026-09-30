@@ -109,7 +109,7 @@ class RemindersScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => showReminderEditor(context, controller),
-        backgroundColor: AppTheme.primary500,
+        backgroundColor: AppTheme.neutral900,
         foregroundColor: Colors.white,
         elevation: 2,
         highlightElevation: 5,
@@ -130,21 +130,21 @@ class RemindersScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
                 decoration: BoxDecoration(
-                  color: AppTheme.primary50,
+                  color: AppTheme.neutral50,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                      color: AppTheme.primary500.withValues(alpha: 0.12)),
+                      color: AppTheme.neutral900.withValues(alpha: 0.12)),
                 ),
                 child: Row(children: [
                   const Icon(Icons.notifications_active_rounded,
-                      size: 18, color: AppTheme.primary500),
+                      size: 18, color: AppTheme.neutral900),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(s.rmdScheduleNote,
                         style: pvManrope(
                             fontSize: 13,
                             height: 1.4,
-                            color: AppTheme.primary800)),
+                            color: AppTheme.neutral900)),
                   ),
                 ]),
               ),
@@ -162,7 +162,7 @@ class RemindersScreen extends StatelessWidget {
                   style: pvJakarta(
                       fontSize: 15,
                       fontWeight: FontWeight.w800,
-                      color: AppTheme.primary900)),
+                      color: AppTheme.neutral900)),
               const SizedBox(height: 4),
               Text('Notes we send from your dates. Each one opens the page it is about.',
                   style: pvManrope(
@@ -175,7 +175,7 @@ class RemindersScreen extends StatelessWidget {
                   style: pvJakarta(
                       fontSize: 15,
                       fontWeight: FontWeight.w800,
-                      color: AppTheme.primary900)),
+                      color: AppTheme.neutral900)),
               const SizedBox(height: 10),
               Wrap(spacing: 8, runSpacing: 8, children: [
                 for (final p in _presets) _presetChip(context, s, store, p),
@@ -198,7 +198,7 @@ class RemindersScreen extends StatelessWidget {
               style: pvJakarta(
                   fontSize: 16,
                   fontWeight: FontWeight.w800,
-                  color: AppTheme.primary900)),
+                  color: AppTheme.neutral900)),
           const SizedBox(height: 6),
           Text(s.rmdEmptySub,
               textAlign: TextAlign.center,
@@ -217,11 +217,11 @@ class RemindersScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
             color: r.enabled
-                ? AppTheme.primary500.withValues(alpha: 0.20)
+                ? AppTheme.neutral900.withValues(alpha: 0.20)
                 : AppTheme.outlineVariant),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.primary900.withValues(alpha: 0.05),
+            color: AppTheme.neutral900.withValues(alpha: 0.05),
             blurRadius: 14,
             offset: const Offset(0, 5),
           ),
@@ -239,27 +239,27 @@ class RemindersScreen extends StatelessWidget {
           height: 44,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: AppTheme.primary500.withValues(alpha: r.enabled ? 0.12 : 0.06),
+            color: AppTheme.neutral900.withValues(alpha: r.enabled ? 0.12 : 0.06),
             borderRadius: BorderRadius.circular(13),
           ),
           child: Icon(_categoryIcon(r.category),
               size: 22,
               color:
-                  r.enabled ? AppTheme.primary500 : AppTheme.neutral400),
+                  r.enabled ? AppTheme.neutral900 : AppTheme.neutral400),
         ),
         title: Text(r.title,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: text.titleSmall?.copyWith(
                 fontWeight: FontWeight.w700,
-                color: r.enabled ? AppTheme.primary900 : AppTheme.neutral500)),
+                color: r.enabled ? AppTheme.neutral900 : AppTheme.neutral500)),
         subtitle: Text(reminderSummary(s, r, context),
             style: text.labelMedium?.copyWith(color: AppTheme.neutral500)),
         trailing: Switch(
           value: r.enabled,
           onChanged: (_) => store.toggle(r.id),
           // Kept for revert (2026-09-28, one black switch app-wide): activeThumbColor: Colors.white,
-          // Kept for revert (2026-09-28, one black switch app-wide): activeTrackColor: AppTheme.primary500,
+          // Kept for revert (2026-09-28, one black switch app-wide): activeTrackColor: AppTheme.neutral900,
           // Kept for revert (2026-09-28, one black switch app-wide): inactiveThumbColor: Colors.white,
           // Kept for revert (2026-09-28, one black switch app-wide): inactiveTrackColor: AppTheme.neutral300,
           trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
@@ -272,7 +272,7 @@ class RemindersScreen extends StatelessWidget {
       BuildContext context, S s, ReminderStore store, _Preset p) {
     return ActionChip(
       avatar: Icon(_categoryIcon(p.category),
-          size: 17, color: AppTheme.primary500),
+          size: 17, color: AppTheme.neutral900),
       label: Text(p.title(s)),
       onPressed: () => showReminderEditor(
         context,
@@ -636,7 +636,7 @@ class _ReminderEditorState extends State<_ReminderEditor> {
   //             style: pvJakarta(
   //                 fontSize: 14,
   //                 fontWeight: FontWeight.w800,
-  //                 color: AppTheme.primary900)),
+  //                 color: AppTheme.neutral900)),
   //         trailing,
   //       ],
   //     );
@@ -1041,7 +1041,7 @@ class _MedReminderEditorState extends State<_MedReminderEditor> {
                 style: pvJakarta(
                     fontSize: 14,
                     fontWeight: FontWeight.w800,
-                    color: AppTheme.primary900)),
+                    color: AppTheme.neutral900)),
           ),
           trailing,
         ],

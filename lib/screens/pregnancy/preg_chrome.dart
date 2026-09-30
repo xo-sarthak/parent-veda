@@ -252,3 +252,55 @@ ButtonStyle pregFilledStyle() => FilledButton.styleFrom(
       foregroundColor: Colors.white,
       shape: const StadiumBorder(),
     );
+
+/// A white card with the page hairline: the one surface for a group of
+/// content. Never a tinted block behind text.
+class PregCard extends StatelessWidget {
+  const PregCard({super.key, required this.child, this.padding = const EdgeInsets.all(16), this.onTap});
+  final Widget child;
+  final EdgeInsetsGeometry padding;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final body = Padding(padding: padding, child: child);
+    return Material(
+      color: Colors.white,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20), side: const BorderSide(color: kPvLine)),
+      clipBehavior: Clip.antiAlias,
+      child: onTap == null ? body : InkWell(onTap: onTap, child: body),
+    );
+  }
+}
+
+/// A quiet note: a small line icon (a control-sized glyph) and grey words, on
+/// the page itself. What a lavender "info banner" becomes.
+class PregNote extends StatelessWidget {
+  const PregNote(this.text, {super.key, this.icon = Icons.info_outline_rounded});
+  final String text;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = pvStorePalette;
+    return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Padding(
+        padding: const EdgeInsets.only(top: 1),
+        child: Icon(icon, size: 16, color: p.ink3),
+      ),
+      const SizedBox(width: 8),
+      Expanded(child: Text(text, style: pvManrope(fontSize: 12.5, height: 1.45, color: p.ink2))),
+    ]);
+  }
+}
+
+/// The page title on a pushed tool page: the serif at 26, ink. The AppBar
+/// above it carries only the back arrow.
+TextStyle pregPageTitleStyle() => pvFraunces(
+      fontSize: 26,
+      fontWeight: FontWeight.w600,
+      height: 1.15,
+      letterSpacing: -0.5,
+      color: pvStorePalette.ink1,
+    );

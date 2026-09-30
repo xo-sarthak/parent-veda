@@ -356,7 +356,7 @@ class _MainScaffoldState extends State<MainScaffold> with WidgetsBindingObserver
   // mode the active segment takes the father (Slate) accent.
   Widget _modePill(bool father) {
     final activeColor =
-        father ? const Color(0xFF2E5266) : AppTheme.primary600;
+        father ? const Color(0xFF2E5266) : AppTheme.neutral900;
     Widget seg(String label, bool active, VoidCallback onTap) =>
         GestureDetector(
           onTap: onTap,
@@ -442,14 +442,14 @@ class _V3Pill extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
-            color: on ? AppTheme.primary600 : Colors.transparent,
+            color: on ? AppTheme.neutral900 : Colors.transparent,
             borderRadius: BorderRadius.circular(999),
           ),
           child: Text(label,
               style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
-                  color: on ? Colors.white : AppTheme.primary700)),
+                  color: on ? Colors.white : AppTheme.neutral900)),
         ),
       );
     }

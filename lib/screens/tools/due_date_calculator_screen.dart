@@ -125,7 +125,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
         backgroundColor: AppTheme.surfaceContainer,
         title: Text(s.ddcTitle,
             style: pvJakarta(
-                fontWeight: FontWeight.w700, color: AppTheme.primary900)),
+                fontWeight: FontWeight.w700, color: AppTheme.neutral900)),
       ),
       body: _edd == null ? _inputView(s) : _resultView(s, _edd!),
     );
@@ -143,7 +143,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
             style: pvFraunces(
                 fontSize: 25,
                 fontWeight: FontWeight.w500,
-                color: AppTheme.primary900,
+                color: AppTheme.neutral900,
                 height: 1.15)),
         const SizedBox(height: 6),
         Text(s.ddcSub,
@@ -154,7 +154,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
             style: pvJakarta(
                 fontSize: 15,
                 fontWeight: FontWeight.w700,
-                color: AppTheme.primary900)),
+                color: AppTheme.neutral900)),
         const SizedBox(height: 10),
         _methodCards(s),
         const SizedBox(height: 18),
@@ -193,12 +193,12 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
                 color: _method == it.$1
-                    ? AppTheme.primary500.withValues(alpha: 0.08)
+                    ? AppTheme.neutral900.withValues(alpha: 0.08)
                     : AppTheme.surface,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                     color: _method == it.$1
-                        ? AppTheme.primary500
+                        ? AppTheme.neutral900
                         : AppTheme.outlineVariant,
                     width: _method == it.$1 ? 1.5 : 1),
               ),
@@ -206,7 +206,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
                 Icon(it.$2,
                     size: 20,
                     color: _method == it.$1
-                        ? AppTheme.primary500
+                        ? AppTheme.neutral900
                         : AppTheme.neutral500),
                 const SizedBox(width: 12),
                 Expanded(
@@ -214,11 +214,11 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
                       style: pvManrope(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
-                          color: AppTheme.primary900)),
+                          color: AppTheme.neutral900)),
                 ),
                 if (_method == it.$1)
                   const Icon(Icons.check_circle_rounded,
-                      size: 20, color: AppTheme.primary500),
+                      size: 20, color: AppTheme.neutral900),
               ]),
             ),
           ),
@@ -290,7 +290,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
               boxShadow: _soft),
           child: Row(children: [
             const Icon(Icons.calendar_today_rounded,
-                size: 18, color: AppTheme.primary500),
+                size: 18, color: AppTheme.neutral900),
             const SizedBox(width: 12),
             Text(value == null ? s.ddcPickDate : s.formatLongDate(value),
                 style: pvManrope(
@@ -298,7 +298,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
                     fontWeight: FontWeight.w600,
                     color: value == null
                         ? AppTheme.neutral400
-                        : AppTheme.primary900)),
+                        : AppTheme.neutral900)),
           ]),
         ),
       ),
@@ -343,7 +343,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
                 decoration: BoxDecoration(
                   color: selected == o.$1
-                      ? AppTheme.primary500
+                      ? AppTheme.neutral900
                       : AppTheme.surface,
                   borderRadius: BorderRadius.circular(99),
                   boxShadow: selected == o.$1 ? null : _soft,
@@ -379,7 +379,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
                     style: pvJakarta(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
-                        color: AppTheme.primary900))),
+                        color: AppTheme.neutral900))),
             _rnd(Icons.add_rounded, inc),
           ],
         );
@@ -409,7 +409,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
           decoration: BoxDecoration(
               color: AppTheme.surfaceContainerHigh,
               borderRadius: BorderRadius.circular(10)),
-          child: Icon(icon, size: 18, color: AppTheme.primary700),
+          child: Icon(icon, size: 18, color: AppTheme.neutral900),
         ),
       );
 
@@ -434,7 +434,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
             gradient: const LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [AppTheme.primary500, AppTheme.primary700],
+              colors: [AppTheme.neutral900, AppTheme.neutral900],
             ),
             borderRadius: BorderRadius.circular(28),
             boxShadow: _soft,
@@ -514,7 +514,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
               style: pvJakarta(
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
-                  color: AppTheme.primary900)),
+                  color: AppTheme.neutral900)),
           const SizedBox(height: 14),
           child,
         ]),
@@ -546,7 +546,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
               height: 8,
               width: x,
               decoration: BoxDecoration(
-                  color: AppTheme.primary500,
+                  color: AppTheme.neutral900,
                   borderRadius: BorderRadius.circular(99)),
             ),
           ),
@@ -558,7 +558,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                    color: AppTheme.primary900,
+                    color: AppTheme.neutral900,
                     borderRadius: BorderRadius.circular(99)),
                 child: Text(s.youAreHere,
                     style: pvManrope(
@@ -578,7 +578,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
                   color: Colors.white,
                   shape: BoxShape.circle,
                   border:
-                      Border.all(color: AppTheme.primary500, width: 3)),
+                      Border.all(color: AppTheme.neutral900, width: 3)),
             ),
           ),
         ]),
@@ -608,7 +608,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
                       : Icons.radio_button_unchecked_rounded,
                   size: 18,
                   color: week >= m.$1
-                      ? AppTheme.primary500
+                      ? AppTheme.neutral900
                       : AppTheme.neutral300),
               const SizedBox(width: 10),
               Expanded(
@@ -616,7 +616,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
                     style: pvManrope(
                         fontSize: 13.5,
                         fontWeight: FontWeight.w600,
-                        color: AppTheme.primary900)),
+                        color: AppTheme.neutral900)),
               ),
               Text(s.jrWeekLabel(m.$1),
                   style: pvManrope(
@@ -636,7 +636,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
                   style: pvManrope(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
-                      color: AppTheme.primary900)),
+                      color: AppTheme.neutral900)),
             ),
             Text('${s.formatShortDate(a)} – ${s.formatShortDate(b)}',
                 style: pvManrope(
@@ -683,7 +683,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 color: m == month
-                    ? AppTheme.primary500
+                    ? AppTheme.neutral900
                     : AppTheme.surfaceContainerHigh,
                 shape: BoxShape.circle,
               ),
@@ -724,7 +724,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
             style: pvFraunces(
                 fontSize: 20,
                 fontWeight: FontWeight.w500,
-                color: AppTheme.primary900)),
+                color: AppTheme.neutral900)),
         const SizedBox(height: 14),
         Wrap(
           spacing: 10,
@@ -732,13 +732,13 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
           children: [
             for (final b in benefits)
               Row(mainAxisSize: MainAxisSize.min, children: [
-                Icon(b.$1, size: 16, color: AppTheme.primary500),
+                Icon(b.$1, size: 16, color: AppTheme.neutral900),
                 const SizedBox(width: 6),
                 Text(b.$2,
                     style: pvManrope(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: AppTheme.primary800)),
+                        color: AppTheme.neutral900)),
               ]),
           ],
         ),
@@ -748,7 +748,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
           const SizedBox(height: 14),
           Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Icon(Icons.info_outline_rounded,
-                size: 15, color: AppTheme.primary500),
+                size: 15, color: AppTheme.neutral900),
             const SizedBox(width: 8),
             Expanded(
               child: Text(s.ddcScanWins,
@@ -756,7 +756,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
                       fontSize: 11.5,
                       height: 1.5,
                       fontWeight: FontWeight.w600,
-                      color: AppTheme.primary800)),
+                      color: AppTheme.neutral900)),
             ),
           ]),
         ],

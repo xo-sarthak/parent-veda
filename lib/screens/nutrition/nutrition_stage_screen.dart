@@ -87,9 +87,9 @@ class _NutritionStageScreenState extends State<NutritionStageScreen>
                 style: pvFraunces(fontSize: 18, fontWeight: FontWeight.w600, color: p.ink1)),
             bottom: TabBar(
               controller: _tab,
-              labelColor: p.action,
+              labelColor: p.ink1,
               unselectedLabelColor: p.ink3,
-              indicatorColor: p.action,
+              indicatorColor: p.ink1,
               labelStyle: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w800),
               unselectedLabelStyle: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w700),
               tabs: const [Tab(text: 'By trimester'), Tab(text: 'By condition')],
@@ -544,7 +544,7 @@ class _ExpertOptionRow extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(13, 12, 12, 12),
           decoration: BoxDecoration(borderRadius: BorderRadius.circular(14), border: Border.all(color: p.line)),
           child: Row(children: [
-            Icon(option.icon, size: 19, color: p.action),
+            Icon(option.icon, size: 19, color: p.ink1),
             const SizedBox(width: 11),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -579,7 +579,7 @@ void _openBookingSheet(BuildContext context, V2Palette p, _ExpertOption option) 
         SizedBox(
           width: double.infinity,
           child: FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: p.action, padding: const EdgeInsets.symmetric(vertical: 14)),
+            style: FilledButton.styleFrom(backgroundColor: p.ink1, padding: const EdgeInsets.symmetric(vertical: 14)),
             onPressed: () {
               Navigator.of(sheetContext).pop();
               requestExpertOptionPlaceholder(option.title);

@@ -76,7 +76,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
 
   // A solid deep-purple bar for the Key-Ideas "milestone" markers — fixed so it
   // stays a proper dark bar (white text) across light / sepia / dark modes.
-  static const Color _ideaBar = Color(0xFF54268C);
+  static const Color _ideaBar = Color(0xFF2F2C30);
 
   // The light "card" surface beneath a bar / for chapter cards.
   Color get _companionCardBg => _prefs.mode == ReadReaderMode.light ? Colors.white : _t.panel;
@@ -109,13 +109,13 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
     switch (_prefs.mode) {
       case ReadReaderMode.sepia:
         return const _RTheme(Color(0xFFF4ECD8), Color(0xFF423A2A), Color(0xFF6E6250),
-            Color(0xFFEDE3CB), Color(0xFFE1D6BD), Color(0xFF7A4CC0));
+            Color(0xFFEDE3CB), Color(0xFFE1D6BD), Color(0xFF2F2C30));
       case ReadReaderMode.dark:
-        return const _RTheme(Color(0xFF171320), Color(0xFFE9E5EF), Color(0xFFA9A2B5),
-            Color(0xFF241F2E), Color(0xFF322B3D), Color(0xFFB794F6));
+        return const _RTheme(Color(0xFF2F2C30), Color(0xFFEBE9EB), Color(0xFFADA9AE),
+            Color(0xFF2F2C30), Color(0xFF2F2C30), Color(0xFFC6C2C8));
       case ReadReaderMode.light:
-        return const _RTheme(Color(0xFFFBF9FE), Color(0xFF2A2530), Color(0xFF69636C),
-            Color(0xFFF3EEF7), Color(0xFFE4E2E5), Color(0xFF6A30B6));
+        return const _RTheme(Color(0xFFFCFBFC), Color(0xFF2A2530), Color(0xFF69636C),
+            Color(0xFFF3F2F3), Color(0xFFE4E2E5), Color(0xFF2F2C30));
     }
   }
 

@@ -199,7 +199,7 @@ class _JourneyMapScreenState extends State<JourneyMapScreen>
                   style: pvJakarta(
                       fontSize: 13.5,
                       fontWeight: FontWeight.w800,
-                      color: AppTheme.primary900)),
+                      color: AppTheme.neutral900)),
               const SizedBox(height: 2),
               Text(s.jmOverdueBody(_c.daysPastDue),
                   style: pvManrope(
@@ -229,7 +229,7 @@ class _JourneyMapScreenState extends State<JourneyMapScreen>
                   style: pvJakarta(
                       fontSize: 13.5,
                       fontWeight: FontWeight.w800,
-                      color: AppTheme.primary900)),
+                      color: AppTheme.neutral900)),
               const SizedBox(height: 2),
               Text(s.jmCatchUpBody,
                   style: pvManrope(
@@ -291,7 +291,7 @@ class _JourneyMapScreenState extends State<JourneyMapScreen>
                       style: pvJakarta(
                           fontSize: 18,
                           fontWeight: FontWeight.w800,
-                          color: AppTheme.primary900)),
+                          color: AppTheme.neutral900)),
                 ),
                 const SizedBox(height: 12),
                 if (list.isEmpty)
@@ -329,7 +329,7 @@ class _JourneyMapScreenState extends State<JourneyMapScreen>
                 style: pvJakarta(
                     fontSize: 14.5,
                     fontWeight: FontWeight.w700,
-                    color: AppTheme.primary900)),
+                    color: AppTheme.neutral900)),
           ),
           OutlinedButton.icon(
             onPressed: () => _pickCatchUpDate(m),
@@ -374,7 +374,7 @@ class _JourneyMapScreenState extends State<JourneyMapScreen>
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [Color(0xFFF3EEF7), Color(0xFFEAF1EA)],
+                colors: [Color(0xFFF3F2F3), Color(0xFFEAF1EA)],
                 stops: [0.0, 0.9],
               ),
             ),
@@ -705,7 +705,7 @@ class _TrailHeaderCard extends StatelessWidget {
               style: pvFraunces(
                 fontSize: 21,
                 fontWeight: FontWeight.w600,
-                color: AppTheme.primary900,
+                color: AppTheme.neutral900,
               ),
             ),
           ]),
@@ -731,7 +731,7 @@ class _TrailHeaderCard extends StatelessWidget {
               style: pvJakarta(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
-                color: AppTheme.primary900,
+                color: AppTheme.neutral900,
               ),
             ),
           ]),

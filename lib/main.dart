@@ -26,6 +26,8 @@ import 'screens/post_pregnancy/pp_journeys_data.dart';
 import 'booking/server_slots.dart';
 import 'services/pregnancy_ended_store.dart';
 import 'services/preg_messages_store.dart';
+import 'screens/pregnancy/preg_theme.dart' show pregThemeFrom;
+import 'services/life_stage_store.dart';
 import 'screens/pregnancy/preg_messages_screen.dart' show pregOpenMessageFromPhone;
 import 'services/auth/session_watch.dart';
 import 'services/family_profile.dart';
@@ -458,7 +460,9 @@ class _ParentVedaAppState extends State<ParentVedaApp>
     // line metrics - see lib/theme/pv_fonts.dart), so the ThemeData itself has
     // to be rebuilt, not just the strings inside it.
     return AnimatedBuilder(
-      animation: _controller,
+      // LifeStageStore too: the theme follows the stage (2026-09-30, the
+      // pregnancy theme below).
+      animation: Listenable.merge([_controller, LifeStageStore.instance]),
       builder: (context, _) {
         // Mirror the language for inline call sites that style or word
         // themselves without reading the text theme or holding the controller.
@@ -469,6 +473,11 @@ class _ParentVedaAppState extends State<ParentVedaApp>
         return _app(context);
       },
     );
+  }
+
+  bool get _pregnancyStage {
+    final st = LifeStageStore.instance.stage;
+    return st == null || st == LifeStage.pregnancy;
   }
 
   Widget _app(BuildContext context) {
@@ -493,7 +502,15 @@ class _ParentVedaAppState extends State<ParentVedaApp>
       locale: const Locale('en', 'GB'),
       supportedLocales: const [Locale('en', 'GB'), Locale('en', 'IN')],
       localizationsDelegates: GlobalMaterialLocalizations.delegates,
-      theme: AppTheme.lightFor(_controller.language),
+      // ⚠️ THE PREGNANCY THEME WHILE THE STAGE IS PREGNANCY (2026-09-30): the
+      // same theme with the violet swapped for the one ink, so a default
+      // Switch, chip, slider or FAB on a pregnancy screen is not violet
+      // (lib/screens/pregnancy/preg_theme.dart). No stage yet is the pregnancy
+      // shell's. Every other stage keeps the plain theme. Kept for revert:
+      //   theme: AppTheme.lightFor(_controller.language),
+      theme: _pregnancyStage
+          ? pregThemeFrom(AppTheme.lightFor(_controller.language))
+          : AppTheme.lightFor(_controller.language),
       darkTheme: AppTheme.dark,
       themeMode: ThemeMode.light,
       // Root navigator key + observer power the global "Ask Veda" FAB.

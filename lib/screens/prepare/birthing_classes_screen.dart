@@ -205,7 +205,7 @@ class BirthingClassesScreenClassic extends StatelessWidget {
                       return PpExpertTapRow(expert: expert, child: row);
                     }),
                     const SizedBox(height: 18),
-                    const Divider(height: 1, color: Color(0xFFF0EBF5)),
+                    const Divider(height: 1, color: Color(0xFFF0EFF1)),
                     const SizedBox(height: 16),
                     Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                       Flexible(
@@ -325,7 +325,7 @@ class BirthingClassesScreenClassic extends StatelessWidget {
               child: const Text('▸', style: TextStyle(color: kPurple, fontSize: 14)),
             )
           else
-            const Icon(Icons.lock_outline_rounded, size: 16, color: Color(0xFFC7BBD6)),
+            const Icon(Icons.lock_outline_rounded, size: 16, color: Color(0xFFCAC6CB)),
         ]),
       ),
     );

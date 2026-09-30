@@ -153,7 +153,7 @@ class _ScanReportEditScreenState extends State<ScanReportEditScreen> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(color: p.ink1, width: 1.4), // was p.action
+                borderSide: BorderSide(color: p.ink1, width: 1.4), // was p.ink1
               ),
             ),
           ),
@@ -305,7 +305,7 @@ class _ScanReportEditScreenState extends State<ScanReportEditScreen> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(color: p.ink1, width: 1.4), // was p.action
+                borderSide: BorderSide(color: p.ink1, width: 1.4), // was p.ink1
               ),
             ),
           ),
@@ -432,7 +432,7 @@ class _Chip extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
           decoration: BoxDecoration(
-            color: selected ? p.ink1 : p.surface, // was p.action
+            color: selected ? p.ink1 : p.surface, // was p.ink1
             borderRadius: BorderRadius.circular(999),
             border: Border.all(color: selected ? p.ink1 : p.line),
           ),

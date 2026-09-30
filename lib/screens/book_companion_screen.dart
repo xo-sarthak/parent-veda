@@ -32,12 +32,12 @@ import '../theme/pv_fonts.dart';
 import '../localization/app_language.dart';
 
 // ---- palette (light-only, matching the app) ---------------------------------
-const _bg = Color(0xFFFBF9FE);
+const _bg = Color(0xFFFCFBFC);
 const _ink = Color(0xFF2F2C30);
 const _soft = Color(0xFF69636C);
-const _muted = Color(0xFFA99CBB);
-const _line = Color(0xFFE7E2EC);
-const _panel = Color(0xFFF4EFF9);
+const _muted = Color(0xFFAEA7B0);
+const _line = Color(0xFFE8E6E8);
+const _panel = Color(0xFFF4F3F5);
 
 /// Reading never runs edge to edge on a wide screen: past ~65 characters the
 /// eye loses the line. Phones are unaffected; tablets stop being unreadable.
@@ -168,7 +168,7 @@ class _BookCompanionScreenState extends State<BookCompanionScreen> {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFFF3ECFA), _bg],
+          colors: [Color(0xFFF3F2F4), _bg],
         ),
       ),
       child: SafeArea(
@@ -196,7 +196,7 @@ class _BookCompanionScreenState extends State<BookCompanionScreen> {
                     fontSize: 25,
                     height: 1.1,
                     fontWeight: FontWeight.w600,
-                    color: AppTheme.primary900,
+                    color: AppTheme.neutral900,
                     letterSpacing: -0.5,
                   ),
                 ),
@@ -280,7 +280,7 @@ class _BookCompanionScreenState extends State<BookCompanionScreen> {
           gradient: const LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFF6A30B6), Color(0xFF4A1F84)],
+            colors: [Color(0xFF2F2C30), Color(0xFF2F2C30)],
           ),
           boxShadow: const [BoxShadow(color: Color(0x336A30B6), blurRadius: 18, offset: Offset(0, 8))],
         ),
@@ -464,7 +464,7 @@ class _BookCompanionScreenState extends State<BookCompanionScreen> {
           fontSize: 24,
           height: 1.15,
           fontWeight: FontWeight.w600,
-          color: AppTheme.primary900,
+          color: AppTheme.neutral900,
           letterSpacing: -0.4,
         ),
       );
@@ -552,7 +552,7 @@ class _BookCompanionScreenState extends State<BookCompanionScreen> {
               fontSize: 19,
               height: 1.58,
               fontWeight: FontWeight.w400,
-              color: AppTheme.primary900,
+              color: AppTheme.neutral900,
               letterSpacing: -0.2,
             ),
           ),

@@ -26,7 +26,7 @@ import 'doors/pv_door_router.dart';
 import '../data/reads/pregnancy_reads.dart';
 import 'reader/pv_reader_screen.dart';
 
-const Color _accent = AppTheme.primary500;
+const Color _accent = AppTheme.neutral900;
 const Color _gold = Color(0xFFE6A817);
 const Color _green = Color(0xFF3FA56A);
 
@@ -713,7 +713,7 @@ class ReadNextHomeCard extends StatelessWidget {
         border: Border.all(color: AppTheme.outlineVariant, width: 1),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.primary900.withValues(alpha: 0.05),
+            color: AppTheme.neutral900.withValues(alpha: 0.05),
             blurRadius: 22,
             offset: const Offset(0, 10),
           ),
@@ -787,7 +787,7 @@ class ReadNextHomeCard extends StatelessWidget {
 Color _readTint(String category) {
   switch (category) {
     case 'Baby Development':
-      return AppTheme.primary100;
+      return AppTheme.neutral100;
     case 'Mother Changes':
       return AppTheme.secondary100;
     case 'Nutrition':
@@ -795,11 +795,11 @@ Color _readTint(String category) {
     case 'Preparation':
       return const Color(0xFFF6ECD8);
     case 'Emotional Wellbeing':
-      return const Color(0xFFEDE7FA);
+      return const Color(0xFFF1F0F1);
     case 'Partner Support':
       return const Color(0xFFE4ECF8);
     default:
-      return AppTheme.primary100;
+      return AppTheme.neutral100;
   }
 }
 
@@ -834,7 +834,7 @@ class DailyReadsHomeCard extends StatelessWidget {
         border: Border.all(color: AppTheme.outlineVariant, width: 1),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.primary900.withValues(alpha: 0.05),
+            color: AppTheme.neutral900.withValues(alpha: 0.05),
             blurRadius: 22,
             offset: const Offset(0, 10),
           ),
@@ -849,7 +849,7 @@ class DailyReadsHomeCard extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
-              colors: [AppTheme.primary600, AppTheme.primary400],
+              colors: [AppTheme.neutral900, AppTheme.neutral500],
             ),
           ),
           child: Text(
@@ -1061,13 +1061,13 @@ class DailyReadsHomeCard extends StatelessWidget {
             child: Row(mainAxisSize: MainAxisSize.min, children: [
               Icon(icon,
                   size: 15,
-                  color: filled ? Colors.white : AppTheme.primary700),
+                  color: filled ? Colors.white : AppTheme.neutral900),
               const SizedBox(width: 6),
               Text(label,
                   style: pvManrope(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
-                      color: filled ? Colors.white : AppTheme.primary700)),
+                      color: filled ? Colors.white : AppTheme.neutral900)),
             ]),
           ),
         ),

@@ -11,15 +11,15 @@ import 'package:flutter/material.dart';
 
 import '../../theme/pv_fonts.dart';
 
-const pgBg = Color(0xFFFBF9FE);
+const pgBg = Color(0xFFFCFBFC);
 const pgInk = Color(0xFF2F2C30);
-const pgTitleInk = Color(0xFF2D144C);
+const pgTitleInk = Color(0xFF2F2C30);
 const pgSoft = Color(0xFF69636C);
-const pgMuted = Color(0xFFA99CBB);
-const pgPurple = Color(0xFF6A30B6);
+const pgMuted = Color(0xFFAEA7B0);
+const pgPurple = Color(0xFF2F2C30);
 const pgCoral = Color(0xFFFF5A79);
-const pgPanel = Color(0xFFF3EEF7);
-const pgHair = Color(0xFFEFEAF2);
+const pgPanel = Color(0xFFF3F2F3);
+const pgHair = Color(0xFFEEEDEF);
 const pgLine = Color(0xFFE4E2E5);
 const pgGreen = Color(0xFF2E7D57);
 const pgAmber = Color(0xFFB26A00);

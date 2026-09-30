@@ -16,7 +16,7 @@ import '../services/cart_store.dart';
 import '../services/pregnancy_controller.dart';
 import '../theme/app_theme.dart';
 
-const Color _accent = AppTheme.primary500;
+const Color _accent = AppTheme.neutral900;
 
 void _push(BuildContext c, Widget w) =>
     Navigator.of(c).push(MaterialPageRoute(builder: (_) => w));
@@ -374,7 +374,7 @@ class CartScreen extends StatelessWidget {
         borderRadius: const BorderRadius.vertical(top: Radius.circular(22)),
         boxShadow: [
           BoxShadow(
-              color: AppTheme.primary900.withValues(alpha: 0.08),
+              color: AppTheme.neutral900.withValues(alpha: 0.08),
               blurRadius: 20,
               offset: const Offset(0, -4)),
         ],

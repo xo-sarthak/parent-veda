@@ -169,7 +169,7 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
               () => _open('tools/kegel', () => KegelCareScreen(controller: controller)),
               line: 'A few minutes a day for your pelvic floor',
               priority: PregPriority.fitness),
-          _Tool(s.tsrTitle, Icons.fact_check_outlined, AppTheme.primary500,
+          _Tool(s.tsrTitle, Icons.fact_check_outlined, AppTheme.neutral900,
               () => _open('tools/tests_scans', () => TestsScansReportsScreen(controller: controller)),
               line: 'Your scans and reports, and what each one checks',
               priority: PregPriority.symptoms),
@@ -189,11 +189,11 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
               () => _open(kLabourSurfaceBirthPlan, () => BirthPlanScreen(pregnancy: controller)),
               line: 'What you would like on the day, to share with your doctor',
               priority: PregPriority.birthPrep),
-          _Tool(s.toolContractionTitle, Icons.timer_outlined, AppTheme.primary400,
+          _Tool(s.toolContractionTitle, Icons.timer_outlined, AppTheme.neutral500,
               () => _open('tools/contractions', () => ContractionTrackerScreen(controller: controller)),
               line: 'Time your contractions and see when to go in',
               priority: PregPriority.birthPrep),
-          _Tool(s.ddcToolTitle, Icons.calendar_month_outlined, AppTheme.primary500,
+          _Tool(s.ddcToolTitle, Icons.calendar_month_outlined, AppTheme.neutral900,
               () => _open('tools/due_date', () => DueDateCalculatorScreen(controller: controller)),
               line: 'Work out your due date, or update it after a scan',
               staleDueDate: controller.dueDateMayBeStale),
@@ -203,7 +203,7 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
               priority: PregPriority.birthPrep),
         ]),
         _ToolGroup('Keep', 330, [
-          _Tool(s.jrTitle, Icons.menu_book_outlined, const Color(0xFF8A6BBF),
+          _Tool(s.jrTitle, Icons.menu_book_outlined, const Color(0xFF2F2C30),
               () => _open('journal', () => JournalScreen(controller: controller)),
               line: 'Write to yourself, or to your baby'),
           _Tool(s.bumpTitle, Icons.pregnant_woman_rounded, const Color(0xFFCB6F94),
@@ -215,7 +215,7 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
                   GarbhScreen(controller: controller)),
               line: "Today's practice: a story, a sound, a quiet minute",
               priority: PregPriority.anxiety),
-          _Tool(s.sprToolTitle, Icons.auto_stories_outlined, const Color(0xFF9A7BB5),
+          _Tool(s.sprToolTitle, Icons.auto_stories_outlined, const Color(0xFF2F2C30),
               () => _open('tools/spiritual_reading', () => SpiritualReadingScreen(controller: controller)),
               line: 'Short readings to hear, or to read aloud',
               priority: PregPriority.anxiety),
@@ -226,7 +226,7 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
           _Tool('Is it safe?', Icons.help_outline_rounded, AppTheme.secondary600,
               () => _open('can_i', () => CanIScreen(controller: controller)),
               line: 'Food, medicines and everyday things, answered'),
-          _Tool(s.vedaToolTitle, Icons.auto_awesome_outlined, AppTheme.primary600,
+          _Tool(s.vedaToolTitle, Icons.auto_awesome_outlined, AppTheme.neutral900,
               () => _open(kAskVedaRoute, () => AskVedaScreen(controller: controller)),
               line: 'Ask anything, in your own words'),
         ]),
@@ -314,7 +314,7 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
   // ignore: unused_element
   Widget _eyebrow(V2Palette p, String t) => Text(t.toUpperCase(),
       style: pvManrope(
-          fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.4, color: p.action));
+          fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.4, color: p.ink1));
 
   List<Widget> _group(V2Palette p, _ToolGroup g) => [
         const SizedBox(height: 26),
@@ -417,7 +417,7 @@ class ToolsHubScreenClassic extends StatelessWidget {
       _Tool(
         'Learn',
         Icons.play_lesson_outlined,
-        AppTheme.primary500,
+        AppTheme.neutral900,
         () => open(() => const PvLearnScreen(stage: LifeStage.pregnancy)),
         priority: PregPriority.birthPrep,
       ),
@@ -428,7 +428,7 @@ class ToolsHubScreenClassic extends StatelessWidget {
       _Tool(
         s.tabPrepare,
         Icons.school_outlined,
-        AppTheme.primary400,
+        AppTheme.neutral500,
         () => open(
           () => PrepareHubScreen(
             lang: controller.language,
@@ -460,7 +460,7 @@ class ToolsHubScreenClassic extends StatelessWidget {
       _Tool(
         s.sprToolTitle,
         Icons.auto_stories_rounded,
-        const Color(0xFF9A7BB5),
+        const Color(0xFF2F2C30),
         () => open(() => SpiritualReadingScreen(controller: controller)),
         priority: PregPriority.anxiety,
       ),
@@ -480,7 +480,7 @@ class ToolsHubScreenClassic extends StatelessWidget {
       _Tool(
         s.jrTitle,
         Icons.menu_book_rounded,
-        const Color(0xFF8A6BBF),
+        const Color(0xFF2F2C30),
         () => open(() => JournalScreen(controller: controller)),
       ),
       _Tool(
@@ -506,7 +506,7 @@ class ToolsHubScreenClassic extends StatelessWidget {
       _Tool(
         s.toolContractionTitle,
         Icons.timer_rounded,
-        AppTheme.primary400,
+        AppTheme.neutral500,
         () => open(() => ContractionTrackerScreen(controller: controller)),
         priority: PregPriority.birthPrep,
       ),
@@ -530,7 +530,7 @@ class ToolsHubScreenClassic extends StatelessWidget {
       _Tool(
         'Product Guide',
         Icons.menu_book_outlined,
-        AppTheme.primary400,
+        AppTheme.neutral500,
         () => open(() => const ProductGuideHubScreen()),
       ),
       // The Launch Hub's only front door. A destination is visited on purpose —
@@ -551,7 +551,7 @@ class ToolsHubScreenClassic extends StatelessWidget {
       _Tool(
         'Brand Studio',
         Icons.workspace_premium_outlined,
-        const Color(0xFF6A30B6),
+        const Color(0xFF2F2C30),
         () => open(
           () => BrandShowcaseScreen(pregnancyWeek: controller.currentWeek),
         ),
@@ -596,11 +596,11 @@ class ToolsHubScreenClassic extends StatelessWidget {
       _Tool(
         s.tsrTitle,
         Icons.fact_check_rounded,
-        AppTheme.primary500,
+        AppTheme.neutral900,
         () => open(() => TestsScansReportsScreen(controller: controller)),
         priority: PregPriority.symptoms,
       ),
-      // _Tool(s.rTitle, Icons.description_rounded, AppTheme.primary500,
+      // _Tool(s.rTitle, Icons.description_rounded, AppTheme.neutral900,
       //     () => open(() => ReportScreen(controller: controller))),
       _Tool(
         s.toolCanI,
@@ -625,14 +625,14 @@ class ToolsHubScreenClassic extends StatelessWidget {
       _Tool(
         s.ddcToolTitle,
         Icons.calendar_month_rounded,
-        AppTheme.primary500,
+        AppTheme.neutral900,
         () => open(() => DueDateCalculatorScreen(controller: controller)),
         staleDueDate: controller.dueDateMayBeStale,
       ),
       _Tool(
         s.vedaToolTitle,
         Icons.auto_awesome_rounded,
-        AppTheme.primary600,
+        AppTheme.neutral900,
         () => open(() => AskVedaScreen(controller: controller)),
       ),
       // Father's "Stories, Fables & Mythology" removed (the feature was retired
@@ -668,7 +668,7 @@ class ToolsHubScreenClassic extends StatelessWidget {
               style: pvJakarta(
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
-                color: AppTheme.primary900,
+                color: AppTheme.neutral900,
               ),
             ),
             const SizedBox(height: 4),
@@ -718,7 +718,7 @@ class ToolsHubScreenClassic extends StatelessWidget {
                   const Icon(
                     Icons.verified_user_rounded,
                     size: 20,
-                    color: AppTheme.primary500,
+                    color: AppTheme.neutral900,
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -727,7 +727,7 @@ class ToolsHubScreenClassic extends StatelessWidget {
                       style: pvManrope(
                         fontSize: 12,
                         height: 1.4,
-                        color: AppTheme.primary700,
+                        color: AppTheme.neutral900,
                       ),
                     ),
                   ),
@@ -752,7 +752,7 @@ class ToolsHubScreenClassic extends StatelessWidget {
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [AppTheme.primary500, AppTheme.primary700],
+          colors: [AppTheme.neutral900, AppTheme.neutral900],
         ),
         borderRadius: BorderRadius.circular(24),
         boxShadow: const [
@@ -833,7 +833,7 @@ class ToolsHubScreenClassic extends StatelessWidget {
             style: pvJakarta(
               fontSize: 14,
               fontWeight: FontWeight.w700,
-              color: AppTheme.primary900,
+              color: AppTheme.neutral900,
             ),
           ),
           // A quiet line, only when there is something true to say.
@@ -860,7 +860,7 @@ class ToolsHubScreenClassic extends StatelessWidget {
                 fontSize: 10.5,
                 height: 1.4,
                 fontWeight: FontWeight.w600,
-                color: AppTheme.primary700,
+                color: AppTheme.neutral900,
               ),
             ),
           ],

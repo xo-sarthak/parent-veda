@@ -95,7 +95,7 @@ class MasterclassesScreenClassic extends StatelessWidget {
                         Expanded(child: Text(_coachLine(s, featured), style: pvBody(kSoft, 13))),
                       ]),
                       const SizedBox(height: 18),
-                      const Divider(height: 1, color: Color(0xFFF0EBF5)),
+                      const Divider(height: 1, color: Color(0xFFF0EFF1)),
                       const SizedBox(height: 16),
                       Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                         Text.rich(

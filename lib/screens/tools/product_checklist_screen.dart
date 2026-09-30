@@ -172,7 +172,7 @@ Future<void> showAddToChecklistSheet(
                     style: pvJakarta(
                         fontSize: 16,
                         fontWeight: FontWeight.w800,
-                        color: AppTheme.primary900)),
+                        color: AppTheme.neutral900)),
               ),
             ),
             Flexible(
@@ -270,7 +270,7 @@ class ProductChecklistScreen extends StatelessWidget {
                       style: pvJakarta(
                           fontSize: 16,
                           fontWeight: FontWeight.w800,
-                          color: AppTheme.primary900)),
+                          color: AppTheme.neutral900)),
                 ),
                 TextButton.icon(
                   onPressed: () => _newChecklist(context, s),
@@ -290,7 +290,7 @@ class ProductChecklistScreen extends StatelessWidget {
                   style: pvJakarta(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
-                      color: AppTheme.primary900)),
+                      color: AppTheme.neutral900)),
               const SizedBox(height: 2),
               Text(s.pclCuratedSub,
                   style: pvManrope(
@@ -394,7 +394,7 @@ class ProductChecklistScreen extends StatelessWidget {
                           style: pvJakarta(
                               fontSize: 15.5,
                               fontWeight: FontWeight.w800,
-                              color: AppTheme.primary900)),
+                              color: AppTheme.neutral900)),
                       const SizedBox(height: 3),
                       Text(s.pclListSummary(total, got),
                           style: pvManrope(
@@ -501,7 +501,7 @@ class ProductChecklistScreen extends StatelessWidget {
                   style: pvJakarta(
                       fontSize: 14.5,
                       fontWeight: FontWeight.w700,
-                      color: AppTheme.primary900)),
+                      color: AppTheme.neutral900)),
               const SizedBox(height: 2),
               Text(s.pclItemsCount(c.items.length),
                   style: pvManrope(
@@ -544,7 +544,7 @@ class ProductChecklistScreen extends StatelessWidget {
                       style: pvJakarta(
                           fontSize: 17,
                           fontWeight: FontWeight.w800,
-                          color: AppTheme.primary900)),
+                          color: AppTheme.neutral900)),
                 ),
               ]),
             ),
@@ -914,7 +914,7 @@ class _ChecklistDetailScreen extends StatelessWidget {
                                   fontWeight: FontWeight.w700,
                                   color: owned
                                       ? AppTheme.neutral400
-                                      : AppTheme.primary900,
+                                      : AppTheme.neutral900,
                                   decoration: owned
                                       ? TextDecoration.lineThrough
                                       : null)),
@@ -1198,7 +1198,7 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
                       style: pvJakarta(
                           fontSize: 14,
                           fontWeight: FontWeight.w800,
-                          color: AppTheme.primary900)),
+                          color: AppTheme.neutral900)),
                 ));
                 for (final p in prods) {
                   children.add(_productCard(s, p));
@@ -1314,7 +1314,7 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
                       style: pvJakarta(
                           fontSize: 13.5,
                           fontWeight: FontWeight.w700,
-                          color: AppTheme.primary900)),
+                          color: AppTheme.neutral900)),
                   const SizedBox(height: 5),
                   Row(children: [
                     const Icon(Icons.star_rounded, size: 14, color: _star),
@@ -1555,7 +1555,7 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
                       style: pvJakarta(
                           fontSize: 17,
                           fontWeight: FontWeight.w800,
-                          color: AppTheme.primary900)),
+                          color: AppTheme.neutral900)),
                   const SizedBox(height: 14),
                   _customField(nameC, s.pclCustomName),
                   const SizedBox(height: 10),

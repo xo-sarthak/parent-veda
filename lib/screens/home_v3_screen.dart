@@ -838,7 +838,7 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
                       tag: 'Just for you',
                       today: buddhiTodayLine(cd).now,
                       icon: Icons.psychology_alt_outlined,
-                      accent: const Color(0xFF7A6E9B),
+                      accent: const Color(0xFF2F2C30),
                       done: store.isDone('buddhi'),
                       onToggleDone: () => _toggleGarbh(store, 'buddhi'),
                       onTap: () => Navigator.of(context).push(MaterialPageRoute(
@@ -1791,7 +1791,7 @@ class _AlsoRow extends StatelessWidget {
                         style: TextStyle(
                             fontSize: 12.5,
                             fontWeight: FontWeight.w700,
-                            color: p.action.withValues(alpha: 0.7))),
+                            color: p.ink1.withValues(alpha: 0.7))),
                   ],
                 ]),
               ),
@@ -1830,9 +1830,9 @@ class _ArtToggle extends StatelessWidget {
               padding:
                   const EdgeInsets.symmetric(horizontal: 13, vertical: 8),
               decoration: BoxDecoration(
-                color: on ? p.action : p.surface,
+                color: on ? p.ink1 : p.surface,
                 borderRadius: BorderRadius.circular(999),
-                border: Border.all(color: on ? p.action : p.line),
+                border: Border.all(color: on ? p.ink1 : p.line),
               ),
               child: Text(label,
                   style: TextStyle(

@@ -103,7 +103,7 @@ class _TestsScansReportsScreenState extends State<TestsScansReportsScreen> {
         backgroundColor: AppTheme.surfaceContainer,
         title: Text(widget.title ?? s.tsrTitle,
             style: pvJakarta(
-                fontWeight: FontWeight.w700, color: AppTheme.primary900)),
+                fontWeight: FontWeight.w700, color: AppTheme.neutral900)),
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
@@ -338,7 +338,7 @@ class _LibraryCard extends StatelessWidget {
                       style: pvJakarta(
                           fontSize: 14.5,
                           fontWeight: FontWeight.w700,
-                          color: AppTheme.primary900)),
+                          color: AppTheme.neutral900)),
                   if (subtitle != null && subtitle!.trim().isNotEmpty)
                     Padding(
                       padding: const EdgeInsets.only(top: 1),
@@ -407,7 +407,7 @@ class TestScanDetailScreen extends StatelessWidget {
         backgroundColor: AppTheme.surfaceContainer,
         title: Text(info.name.now,
             style: pvJakarta(
-                fontWeight: FontWeight.w700, color: AppTheme.primary900)),
+                fontWeight: FontWeight.w700, color: AppTheme.neutral900)),
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
@@ -584,7 +584,7 @@ class FindingDetailScreen extends StatelessWidget {
         backgroundColor: AppTheme.surfaceContainer,
         title: Text(info.name.now,
             style: pvJakarta(
-                fontWeight: FontWeight.w700, color: AppTheme.primary900)),
+                fontWeight: FontWeight.w700, color: AppTheme.neutral900)),
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
@@ -643,7 +643,7 @@ class _FaqCard extends StatelessWidget {
             style: pvJakarta(
                 fontSize: 13.5,
                 fontWeight: FontWeight.w800,
-                color: AppTheme.primary900)),
+                color: AppTheme.neutral900)),
         const SizedBox(height: 5),
         Text(faq.a.now,
             style: pvManrope(
@@ -701,7 +701,7 @@ class _DetailHeader extends StatelessWidget {
                     style: pvJakarta(
                         fontSize: 18,
                         fontWeight: FontWeight.w800,
-                        color: AppTheme.primary900)),
+                        color: AppTheme.neutral900)),
                 if (subtitle != null && subtitle!.trim().isNotEmpty)
                   Text(subtitle!,
                       style: pvManrope(
@@ -773,7 +773,7 @@ class _ExpandableSectionState extends State<_ExpandableSection> {
                         fontWeight: FontWeight.w800,
                         color: widget.highlight
                             ? const Color(0xFFB36B12)
-                            : AppTheme.primary900)),
+                            : AppTheme.neutral900)),
               ),
               AnimatedRotation(
                 turns: _open ? 0.5 : 0,

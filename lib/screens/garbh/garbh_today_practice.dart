@@ -140,7 +140,7 @@ List<GarbhTodayItem> garbhTodayItems({required int day, required int week}) {
       // target she could fail — the thing this pillar refuses to be.
       meta: 'A quiet game · as long as you like',
       icon: Icons.extension_rounded,
-      accent: const Color(0xFF7A6E9B),
+      accent: const Color(0xFF2F2C30),
       tab: kGarbhTabForYouId,
     ),
     GarbhTodayItem(

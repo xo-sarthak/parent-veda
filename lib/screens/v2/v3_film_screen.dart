@@ -175,7 +175,7 @@ class _V3FilmScreenState extends State<V3FilmScreen> {
                                     saved
                                         ? Icons.bookmark_rounded
                                         : Icons.bookmark_border_rounded,
-                                    color: p.action),
+                                    color: p.ink1),
                               ),
                             ]),
                         const SizedBox(height: 4),
@@ -193,7 +193,7 @@ class _V3FilmScreenState extends State<V3FilmScreen> {
                                   fontSize: 11.5,
                                   fontWeight: FontWeight.w800,
                                   letterSpacing: 1.3,
-                                  color: p.action.withValues(alpha: 0.85))),
+                                  color: p.ink1.withValues(alpha: 0.85))),
                           const SizedBox(height: 6),
                           Text(v.reason.en,
                               style: pvJakarta(
@@ -348,10 +348,10 @@ class _ToolDoor extends StatelessWidget {
                 height: 40,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: p.action.withValues(alpha: 0.1),
+                  color: p.ink1.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(Icons.touch_app_outlined, size: 20, color: p.action),
+                child: Icon(Icons.touch_app_outlined, size: 20, color: p.ink1),
               ),
               const SizedBox(width: 12),
               Expanded(

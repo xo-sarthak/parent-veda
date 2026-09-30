@@ -47,7 +47,7 @@ class DeveloperSwitches extends StatelessWidget {
                     fontSize: 11.5,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 1.3,
-                    color: p.action.withValues(alpha: 0.85))),
+                    color: p.ink1.withValues(alpha: 0.85))),
             const SizedBox(height: 4),
             Text('Home versions. V3 is what ships; the others are kept for comparison and reset on every launch.',
                 style: pvManrope(fontSize: 12.5, height: 1.4, color: p.ink3)),

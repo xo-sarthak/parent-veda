@@ -64,7 +64,7 @@ class _ScansAppointmentsScreenState extends State<ScansAppointmentsScreen> {
         backgroundColor: AppTheme.surfaceContainer,
         title: Text(s.scnTitle,
             style: pvJakarta(
-                fontWeight: FontWeight.w700, color: AppTheme.primary900)),
+                fontWeight: FontWeight.w700, color: AppTheme.neutral900)),
         actions: [
           IconButton(
             tooltip: s.scnAddAppt,
@@ -184,7 +184,7 @@ class _ScansAppointmentsScreenState extends State<ScansAppointmentsScreen> {
             style: pvFraunces(
                 fontSize: 22,
                 fontWeight: FontWeight.w500,
-                color: AppTheme.primary900)),
+                color: AppTheme.neutral900)),
         const SizedBox(height: 2),
         Text(
             '${m.rangeLabel?.of(lang) ?? s.jrWeekLabel(m.anchorWeek)} · ${s.calInDays(n < 0 ? 0 : n)}',
@@ -251,7 +251,7 @@ class _ScansAppointmentsScreenState extends State<ScansAppointmentsScreen> {
                     style: pvJakarta(
                         fontSize: 14.5,
                         fontWeight: FontWeight.w700,
-                        color: AppTheme.primary900)),
+                        color: AppTheme.neutral900)),
                 Text(m.rangeLabel?.of(lang) ?? s.jrWeekLabel(m.anchorWeek),
                     style: pvManrope(
                         fontSize: 12, color: AppTheme.neutral500)),
@@ -293,7 +293,7 @@ class _ScansAppointmentsScreenState extends State<ScansAppointmentsScreen> {
                 style: pvJakarta(
                     fontSize: 14.5,
                     fontWeight: FontWeight.w700,
-                    color: AppTheme.primary900)),
+                    color: AppTheme.neutral900)),
           ),
           if (d != null)
             Text(s.formatShortDate(d),
@@ -338,7 +338,7 @@ class _ScansAppointmentsScreenState extends State<ScansAppointmentsScreen> {
       VoidCallback? onTap}) {
     final dot = completed
         ? _scanColor
-        : (current ? AppTheme.primary500 : AppTheme.neutral300);
+        : (current ? AppTheme.neutral900 : AppTheme.neutral300);
     return IntrinsicHeight(
       child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Column(children: [
@@ -347,7 +347,7 @@ class _ScansAppointmentsScreenState extends State<ScansAppointmentsScreen> {
             height: 18,
             margin: const EdgeInsets.only(top: 14),
             decoration: BoxDecoration(
-              color: completed ? _scanColor : (current ? AppTheme.primary500 : AppTheme.surface),
+              color: completed ? _scanColor : (current ? AppTheme.neutral900 : AppTheme.surface),
               shape: BoxShape.circle,
               border: Border.all(color: dot, width: 2),
             ),
@@ -367,7 +367,7 @@ class _ScansAppointmentsScreenState extends State<ScansAppointmentsScreen> {
                 padding: const EdgeInsets.all(13),
                 decoration: BoxDecoration(
                   color: current
-                      ? AppTheme.primary500.withValues(alpha: 0.06)
+                      ? AppTheme.neutral900.withValues(alpha: 0.06)
                       : AppTheme.surface,
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: _soft,
@@ -381,7 +381,7 @@ class _ScansAppointmentsScreenState extends State<ScansAppointmentsScreen> {
                             style: pvJakarta(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,
-                                color: AppTheme.primary900)),
+                                color: AppTheme.neutral900)),
                         Text(sub,
                             style: pvManrope(
                                 fontSize: 11.5, color: AppTheme.neutral500)),
@@ -393,7 +393,7 @@ class _ScansAppointmentsScreenState extends State<ScansAppointmentsScreen> {
                         style: pvManrope(
                             fontSize: 9.5,
                             fontWeight: FontWeight.w800,
-                            color: AppTheme.primary500)),
+                            color: AppTheme.neutral900)),
                 ]),
               ),
             ),
@@ -406,7 +406,7 @@ class _ScansAppointmentsScreenState extends State<ScansAppointmentsScreen> {
   // --- helpers ---------------------------------------------------------------
   Widget _sectionTitle(String t) => Text(t,
       style: pvJakarta(
-          fontSize: 15, fontWeight: FontWeight.w700, color: AppTheme.primary900));
+          fontSize: 15, fontWeight: FontWeight.w700, color: AppTheme.neutral900));
 
   Widget _apptRow(S s, Appointment a) {
     final sub = [a.time, a.location, a.doctor]
@@ -439,7 +439,7 @@ class _ScansAppointmentsScreenState extends State<ScansAppointmentsScreen> {
                   style: pvJakarta(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
-                      color: AppTheme.primary900)),
+                      color: AppTheme.neutral900)),
               Text('${s.formatShortDate(a.date)}${sub.isNotEmpty ? ' · $sub' : ''}',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -530,7 +530,7 @@ class _ScansAppointmentsScreenState extends State<ScansAppointmentsScreen> {
                       style: pvJakarta(
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
-                          color: AppTheme.primary900)),
+                          color: AppTheme.neutral900)),
                   const SizedBox(height: 12),
                   Wrap(spacing: 8, runSpacing: 8, children: [
                     for (final t in ApptType.values)
@@ -581,7 +581,7 @@ class _ScansAppointmentsScreenState extends State<ScansAppointmentsScreen> {
                         const SizedBox(width: 12),
                         Text(s.formatLongDate(date),
                             style: pvManrope(
-                                fontSize: 13.5, color: AppTheme.primary900)),
+                                fontSize: 13.5, color: AppTheme.neutral900)),
                       ]),
                     ),
                   ),
@@ -671,7 +671,7 @@ class _ScanDetail extends StatelessWidget {
         backgroundColor: AppTheme.surfaceContainer,
         title: Text(m.title.of(lang),
             style: pvJakarta(
-                fontWeight: FontWeight.w700, color: AppTheme.primary900)),
+                fontWeight: FontWeight.w700, color: AppTheme.neutral900)),
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
@@ -693,7 +693,7 @@ class _ScanDetail extends StatelessWidget {
                   style: pvFraunces(
                       fontSize: 22,
                       fontWeight: FontWeight.w500,
-                      color: AppTheme.primary900)),
+                      color: AppTheme.neutral900)),
             ),
           ]),
           const SizedBox(height: 18),
@@ -852,7 +852,7 @@ class _ScanDetail extends StatelessWidget {
                           style: pvJakarta(
                               fontSize: 15,
                               fontWeight: FontWeight.w800,
-                              color: AppTheme.primary900)),
+                              color: AppTheme.neutral900)),
                       const SizedBox(height: 2),
                       Text(s.scnInterpretSub,
                           style: pvManrope(
@@ -895,7 +895,7 @@ class _ScanInterpretScreen extends StatelessWidget {
               style: pvFraunces(
                   fontSize: 22,
                   fontWeight: FontWeight.w500,
-                  color: AppTheme.primary900)),
+                  color: AppTheme.neutral900)),
           const SizedBox(height: 4),
           Text(s.scnInterpretHeading,
               style:

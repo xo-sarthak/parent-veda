@@ -94,7 +94,7 @@ class _SymptomCompanionScreenState extends State<SymptomCompanionScreen> {
         backgroundColor: AppTheme.surfaceContainer,
         title: Text(s.symTitle,
             style: pvJakarta(
-                fontWeight: FontWeight.w700, color: AppTheme.primary900)),
+                fontWeight: FontWeight.w700, color: AppTheme.neutral900)),
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 28),
@@ -196,7 +196,7 @@ class _SymptomCompanionScreenState extends State<SymptomCompanionScreen> {
       style: pvJakarta(
           fontSize: 16,
           fontWeight: FontWeight.w700,
-          color: AppTheme.primary900));
+          color: AppTheme.neutral900));
 
   Widget _categoryChips(S s) => Wrap(
         spacing: 8,
@@ -210,7 +210,7 @@ class _SymptomCompanionScreenState extends State<SymptomCompanionScreen> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
                 decoration: BoxDecoration(
-                  color: _category == c ? AppTheme.primary500 : AppTheme.surface,
+                  color: _category == c ? AppTheme.neutral900 : AppTheme.surface,
                   borderRadius: BorderRadius.circular(99),
                   boxShadow: _category == c ? null : _soft,
                 ),
@@ -266,7 +266,7 @@ class _SymptomCompanionScreenState extends State<SymptomCompanionScreen> {
                     style: pvJakarta(
                         fontSize: 14.5,
                         fontWeight: FontWeight.w700,
-                        color: AppTheme.primary900)),
+                        color: AppTheme.neutral900)),
                 Text(x.commonness.of(lang),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -397,7 +397,7 @@ class _SymptomDetail extends StatelessWidget {
         backgroundColor: AppTheme.surfaceContainer,
         title: Text(x.name.of(lang),
             style: pvJakarta(
-                fontWeight: FontWeight.w700, color: AppTheme.primary900)),
+                fontWeight: FontWeight.w700, color: AppTheme.neutral900)),
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
@@ -418,7 +418,7 @@ class _SymptomDetail extends StatelessWidget {
                   style: pvFraunces(
                       fontSize: 22,
                       fontWeight: FontWeight.w500,
-                      color: AppTheme.primary900)),
+                      color: AppTheme.neutral900)),
             ),
           ]),
           const SizedBox(height: 18),
@@ -431,7 +431,7 @@ class _SymptomDetail extends StatelessWidget {
                   borderRadius: BorderRadius.circular(14)),
               child: Text(s.symInsight(x.name.of(lang), count),
                   style: pvManrope(
-                      fontSize: 13, height: 1.4, color: AppTheme.primary800)),
+                      fontSize: 13, height: 1.4, color: AppTheme.neutral900)),
             ),
             const SizedBox(height: 16),
           ],
@@ -480,7 +480,7 @@ class _SymptomDetail extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: (x.urgent ? AppTheme.secondary700 : AppTheme.primary500)
+              color: (x.urgent ? AppTheme.secondary700 : AppTheme.neutral900)
                   .withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(16),
             ),
@@ -492,7 +492,7 @@ class _SymptomDetail extends StatelessWidget {
                         : Icons.medical_services_rounded,
                     size: 18,
                     color:
-                        x.urgent ? AppTheme.secondary700 : AppTheme.primary600),
+                        x.urgent ? AppTheme.secondary700 : AppTheme.neutral900),
                 const SizedBox(width: 8),
                 Text(s.symWhenDoctor,
                     style: pvManrope(
@@ -500,7 +500,7 @@ class _SymptomDetail extends StatelessWidget {
                         fontWeight: FontWeight.w800,
                         color: x.urgent
                             ? AppTheme.secondary700
-                            : AppTheme.primary600)),
+                            : AppTheme.neutral900)),
               ]),
               const SizedBox(height: 6),
               Text(x.doctorGuidance.of(lang),
@@ -561,7 +561,7 @@ class _SymptomDetail extends StatelessWidget {
                     style: pvJakarta(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
-                        color: AppTheme.primary900)),
+                        color: AppTheme.neutral900)),
                 const SizedBox(height: 14),
                 Text(s.symSeverity,
                     style: pvManrope(
@@ -580,7 +580,7 @@ class _SymptomDetail extends StatelessWidget {
                               horizontal: 14, vertical: 8),
                           decoration: BoxDecoration(
                             color: severity == sev
-                                ? AppTheme.primary500
+                                ? AppTheme.neutral900
                                 : AppTheme.surfaceContainer,
                             borderRadius: BorderRadius.circular(99),
                           ),
@@ -621,7 +621,7 @@ class _SymptomDetail extends StatelessWidget {
                   onChanged: (v) => setSheet(() => addToJournal = v),
                   title: Text(s.symAddToJournal,
                       style: pvManrope(
-                          fontSize: 13.5, color: AppTheme.primary900)),
+                          fontSize: 13.5, color: AppTheme.neutral900)),
                 ),
                 SizedBox(
                   width: double.infinity,

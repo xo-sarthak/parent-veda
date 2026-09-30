@@ -427,7 +427,7 @@ class _FilterChip extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
         // Ink, not violet (2026-09-18, DESIGN-SYSTEM §4.0: selection is
-        // ink). Kept for revert: AppTheme.primary600 fill and border.
+        // ink). Kept for revert: AppTheme.neutral900 fill and border.
         decoration: BoxDecoration(
           color: selected ? AppTheme.neutral900 : AppTheme.surface,
           borderRadius: BorderRadius.circular(999),
@@ -465,7 +465,7 @@ class _SearchBar extends StatelessWidget {
           border: Border.all(color: AppTheme.outlineVariant, width: 1.2),
           boxShadow: [
             BoxShadow(
-              color: AppTheme.primary900.withValues(alpha: 0.04),
+              color: AppTheme.neutral900.withValues(alpha: 0.04),
               blurRadius: 16,
               offset: const Offset(0, 6),
             ),
@@ -787,10 +787,10 @@ class _QuestionRow extends StatelessWidget {
           height: 22,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: AppTheme.primary500.withValues(alpha: 0.12),
+            color: AppTheme.neutral900.withValues(alpha: 0.12),
             shape: BoxShape.circle,
           ),
-          child: const Icon(Icons.help_outline_rounded, size: 14, color: AppTheme.primary500),
+          child: const Icon(Icons.help_outline_rounded, size: 14, color: AppTheme.neutral900),
         ),
         const SizedBox(width: 10),
         Expanded(
@@ -871,7 +871,7 @@ class _AskVedaCard extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            AppTheme.primary500.withValues(alpha: 0.10),
+            AppTheme.neutral900.withValues(alpha: 0.10),
             AppTheme.secondary500.withValues(alpha: 0.08),
           ],
         ),
@@ -880,7 +880,7 @@ class _AskVedaCard extends StatelessWidget {
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          const Icon(Icons.auto_awesome_rounded, size: 18, color: AppTheme.primary500),
+          const Icon(Icons.auto_awesome_rounded, size: 18, color: AppTheme.neutral900),
           const SizedBox(width: 8),
           Expanded(
             child: Text(title,
@@ -894,7 +894,7 @@ class _AskVedaCard extends StatelessWidget {
           width: double.infinity,
           child: FilledButton.icon(
             style: FilledButton.styleFrom(
-              backgroundColor: AppTheme.primary500,
+              backgroundColor: AppTheme.neutral900,
               padding: const EdgeInsets.symmetric(vertical: 13),
             ),
             onPressed: onTap,

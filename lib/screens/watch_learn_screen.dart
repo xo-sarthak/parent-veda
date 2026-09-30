@@ -115,7 +115,7 @@ void _openDetail(BuildContext context, PvVideo v, AppLanguage lang) {
                 style: pvJakarta(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
-                    color: AppTheme.primary900)),
+                    color: AppTheme.neutral900)),
             const SizedBox(height: 4),
             Text(v.duration,
                 style: pvManrope(
@@ -207,7 +207,7 @@ class TodaysVideoCard extends StatelessWidget {
                       style: pvJakarta(
                           fontSize: 16,
                           fontWeight: FontWeight.w800,
-                          color: AppTheme.primary900)),
+                          color: AppTheme.neutral900)),
                   const Spacer(),
                   GestureDetector(
                     onTap: () => Navigator.of(context).push(MaterialPageRoute(
@@ -217,7 +217,7 @@ class TodaysVideoCard extends StatelessWidget {
                         style: pvManrope(
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
-                            color: AppTheme.primary500)),
+                            color: AppTheme.neutral900)),
                   ),
                 ]),
               ),
@@ -234,7 +234,7 @@ class TodaysVideoCard extends StatelessWidget {
                           style: pvJakarta(
                               fontSize: 15.5,
                               fontWeight: FontWeight.w700,
-                              color: AppTheme.primary900)),
+                              color: AppTheme.neutral900)),
                       const SizedBox(height: 6),
                       Text('${s.vidWhyNow}: ${v.reason.of(lang)}',
                           style: pvManrope(
@@ -258,7 +258,7 @@ class TodaysVideoCard extends StatelessWidget {
                                   ? Icons.bookmark_rounded
                                   : Icons.bookmark_border_rounded,
                               size: 20,
-                              color: AppTheme.primary600),
+                              color: AppTheme.neutral900),
                         ),
                       ]),
                     ],
@@ -306,7 +306,7 @@ class WatchLearnScreen extends StatelessWidget {
         backgroundColor: AppTheme.surfaceContainer,
         title: Text(s.vidScreenTitle,
             style: pvJakarta(
-                fontWeight: FontWeight.w700, color: AppTheme.primary900)),
+                fontWeight: FontWeight.w700, color: AppTheme.neutral900)),
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(0, 8, 0, 28),
@@ -343,7 +343,7 @@ class WatchLearnScreen extends StatelessWidget {
               style: pvJakarta(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  color: AppTheme.primary900)),
+                  color: AppTheme.neutral900)),
         ),
         Padding(
           padding: const EdgeInsets.fromLTRB(18, 0, 18, 4),
@@ -377,7 +377,7 @@ class WatchLearnScreen extends StatelessWidget {
               style: pvJakarta(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  color: AppTheme.primary900)),
+                  color: AppTheme.neutral900)),
         ),
         SizedBox(
           height: 198,
@@ -422,7 +422,7 @@ class WatchLearnScreen extends StatelessWidget {
                           style: pvJakarta(
                               fontSize: 13.5,
                               fontWeight: FontWeight.w700,
-                              color: AppTheme.primary900)),
+                              color: AppTheme.neutral900)),
                       const SizedBox(height: 3),
                       Text(v.reason.of(lang),
                           maxLines: 2,

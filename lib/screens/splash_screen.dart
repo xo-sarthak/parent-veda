@@ -286,7 +286,7 @@ class _SplashScreenState extends State<SplashScreen>
             Positioned(
               bottom: 80,
               right: -50,
-              child: _blob(200, AppTheme.primary100.withValues(alpha: 0.60)),
+              child: _blob(200, AppTheme.neutral100.withValues(alpha: 0.60)),
             ),
             Center(
               child: FadeTransition(
@@ -309,7 +309,7 @@ class _SplashScreenState extends State<SplashScreen>
                         style: pvFraunces(
                           fontSize: 17,
                           fontStyle: FontStyle.italic,
-                          color: AppTheme.primary700,
+                          color: AppTheme.neutral900,
                         ),
                       ),
                     ],

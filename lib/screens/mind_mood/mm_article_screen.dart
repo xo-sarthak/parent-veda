@@ -184,9 +184,9 @@ class _LinkRow extends StatelessWidget {
           Expanded(
             child: Text(label,
                 style: pvManrope(
-                    fontSize: 14, fontWeight: FontWeight.w700, color: p.action)),
+                    fontSize: 14, fontWeight: FontWeight.w700, color: p.ink1)),
           ),
-          Icon(Icons.chevron_right_rounded, size: 20, color: p.action),
+          Icon(Icons.chevron_right_rounded, size: 20, color: p.ink1),
         ]),
       );
 }

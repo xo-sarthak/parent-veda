@@ -62,7 +62,7 @@ class GrowReaderScreen extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text('“${grow.title.of(lang)}”',
-                style: text.headlineLarge?.copyWith(color: AppTheme.primary700, height: 1.2)),
+                style: text.headlineLarge?.copyWith(color: AppTheme.neutral900, height: 1.2)),
             const SizedBox(height: 18),
             Text(grow.insight.of(lang),
                 style: text.titleMedium?.copyWith(height: 1.5, color: AppTheme.neutral800)),
@@ -80,7 +80,7 @@ class GrowReaderScreen extends StatelessWidget {
                 ),
                 Text(S.now.listenLabel,
                     style: text.labelMedium
-                        ?.copyWith(color: AppTheme.primary600)),
+                        ?.copyWith(color: AppTheme.neutral900)),
               ]),
             Text(grow.expanded.of(lang),
                 style: text.bodyLarge?.copyWith(height: 1.6)),
@@ -95,11 +95,11 @@ class GrowReaderScreen extends StatelessWidget {
                 ),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Row(children: [
-                    const Icon(Icons.science_rounded, size: 16, color: AppTheme.primary500),
+                    const Icon(Icons.science_rounded, size: 16, color: AppTheme.neutral900),
                     const SizedBox(width: 6),
                     Text(s.deepDiveLabel.toUpperCase(),
                         style: text.labelSmall?.copyWith(
-                            color: AppTheme.primary600, letterSpacing: 1, fontWeight: FontWeight.w800)),
+                            color: AppTheme.neutral900, letterSpacing: 1, fontWeight: FontWeight.w800)),
                   ]),
                   const SizedBox(height: 10),
                   Row(children: [
@@ -124,18 +124,18 @@ class GrowReaderScreen extends StatelessWidget {
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [AppTheme.primary100, AppTheme.surface],
+                  colors: [AppTheme.neutral100, AppTheme.surface],
                 ),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(s.rememberLabel.toUpperCase(),
                     style: text.labelSmall?.copyWith(
-                        color: AppTheme.primary600, letterSpacing: 1, fontWeight: FontWeight.w800)),
+                        color: AppTheme.neutral900, letterSpacing: 1, fontWeight: FontWeight.w800)),
                 const SizedBox(height: 8),
                 Text(grow.remember.of(lang),
                     style: text.titleMedium?.copyWith(
-                        color: AppTheme.primary900, fontStyle: FontStyle.italic, height: 1.45)),
+                        color: AppTheme.neutral900, fontStyle: FontStyle.italic, height: 1.45)),
               ]),
             ),
           ]),
@@ -448,7 +448,7 @@ class _TalkComposerScreenState extends State<TalkComposerScreen> {
           padding: const EdgeInsets.all(24),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text('“${widget.prompt}”',
-                style: text.headlineSmall?.copyWith(color: AppTheme.primary700, height: 1.3)),
+                style: text.headlineSmall?.copyWith(color: AppTheme.neutral900, height: 1.3)),
             const SizedBox(height: 8),
             Text(widget.motivation,
                 style: text.bodyMedium?.copyWith(fontStyle: FontStyle.italic)),

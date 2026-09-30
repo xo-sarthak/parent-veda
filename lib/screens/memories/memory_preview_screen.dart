@@ -173,8 +173,8 @@ class _MemoryPreviewScreenState extends State<MemoryPreviewScreen> {
               height: 6,
               decoration: BoxDecoration(
                 color: i == _index
-                    ? AppTheme.primary500
-                    : AppTheme.primary500.withValues(alpha: 0.25),
+                    ? AppTheme.neutral900
+                    : AppTheme.neutral900.withValues(alpha: 0.25),
                 borderRadius: BorderRadius.circular(999),
               ),
             ),
@@ -199,17 +199,17 @@ class _MemoryPreviewScreenState extends State<MemoryPreviewScreen> {
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                      color: AppTheme.primary500.withValues(alpha: 0.4)),
+                      color: AppTheme.neutral900.withValues(alpha: 0.4)),
                 ),
                 child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                   Icon(Icons.download_rounded,
-                      size: 18, color: AppTheme.primary500),
+                      size: 18, color: AppTheme.neutral900),
                   const SizedBox(width: 7),
                   Text(S.now.uiSave,
                       style: pvManrope(
                           fontSize: 14.5,
                           fontWeight: FontWeight.w700,
-                          color: AppTheme.primary500)),
+                          color: AppTheme.neutral900)),
                 ]),
               ),
             ),
@@ -223,7 +223,7 @@ class _MemoryPreviewScreenState extends State<MemoryPreviewScreen> {
                 height: 52,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                    color: AppTheme.primary500,
+                    color: AppTheme.neutral900,
                     borderRadius: BorderRadius.circular(16)),
                 child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                   Icon(_busy ? Icons.hourglass_top_rounded : Icons.ios_share_rounded,

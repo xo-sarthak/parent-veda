@@ -251,15 +251,15 @@ class _CategoryChip extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
         decoration: BoxDecoration(
-          color: selected ? p.action.withValues(alpha: 0.10) : p.surface,
+          color: selected ? p.ink1.withValues(alpha: 0.10) : p.surface,
           borderRadius: BorderRadius.circular(999),
-          border: Border.all(color: selected ? p.action.withValues(alpha: 0.5) : p.line),
+          border: Border.all(color: selected ? p.ink1.withValues(alpha: 0.5) : p.line),
         ),
         child: Text(label,
             style: pvManrope(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
-                color: selected ? p.action : p.ink2)),
+                color: selected ? p.ink1 : p.ink2)),
       ),
     );
   }

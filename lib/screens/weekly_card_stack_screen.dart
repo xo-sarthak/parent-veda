@@ -118,7 +118,7 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
               color: on
-                  ? (father ? kFAccent : AppTheme.primary500)
+                  ? (father ? kFAccent : AppTheme.neutral900)
                   : Colors.transparent,
               borderRadius: BorderRadius.circular(99),
             ),
@@ -150,7 +150,7 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
   /// Week-5 Standard | Full compare toggle, shown above the flow on week 5 only.
   Widget _w5ToggleBar() {
     final father = FatherPreview.instance.on;
-    final active = father ? kFAccent : AppTheme.primary500;
+    final active = father ? kFAccent : AppTheme.neutral900;
     Widget seg(String label, bool on, VoidCallback onTap) => GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
@@ -192,7 +192,7 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
   Widget _backToDaily() {
     final s = S(_c.language);
     final father = FatherPreview.instance.on; // Slate chrome on ALL weeks now
-    final tint = father ? kFAccent : AppTheme.primary600;
+    final tint = father ? kFAccent : AppTheme.neutral900;
     return Center(
       child: GestureDetector(
         onTap: AppNav.instance.goToday,
@@ -249,7 +249,7 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
                     : pvJakarta(
                         fontSize: 18,
                         fontWeight: FontWeight.w800,
-                        color: AppTheme.primary600,
+                        color: AppTheme.neutral900,
                         letterSpacing: -0.5,
                       ),
               ),
@@ -279,7 +279,7 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
                     height: 42,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: (father ? kFAccent : AppTheme.primary500)
+                      color: (father ? kFAccent : AppTheme.neutral900)
                           .withValues(alpha: 0.08),
                       shape: BoxShape.circle,
                     ),
@@ -288,7 +288,7 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
                       size: 20,
                       color: muted
                           ? AppTheme.neutral400
-                          : (father ? kFAccent : AppTheme.primary600),
+                          : (father ? kFAccent : AppTheme.neutral900),
                     ),
                   ),
                 ),
@@ -628,7 +628,7 @@ class _Segment extends StatelessWidget {
         curve: Curves.easeOut,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: selected ? AppTheme.primary500 : Colors.transparent,
+          color: selected ? AppTheme.neutral900 : Colors.transparent,
           borderRadius: BorderRadius.circular(40),
         ),
         child: Text(
@@ -721,7 +721,7 @@ class _WeekHeaderDelegate extends SliverPersistentHeaderDelegate {
                               : pvJakarta(
                                   fontSize: 20,
                                   fontWeight: FontWeight.w800,
-                                  color: AppTheme.primary900,
+                                  color: AppTheme.neutral900,
                                 ),
                         ),
                       ),
@@ -746,7 +746,7 @@ class _WeekHeaderDelegate extends SliverPersistentHeaderDelegate {
                           decoration: BoxDecoration(
                             // Flat single-colour track - no two-colour gradient
                             // (the slate→amber "ghost" was removed per request).
-                            color: (father ? kFAccent : AppTheme.primary500)
+                            color: (father ? kFAccent : AppTheme.neutral900)
                                 .withValues(alpha: 0.14),
                             borderRadius: BorderRadius.circular(999),
                           ),
@@ -756,7 +756,7 @@ class _WeekHeaderDelegate extends SliverPersistentHeaderDelegate {
                             child: Container(
                               decoration: BoxDecoration(
                                 // Single fill colour (was a 2-colour gradient).
-                                color: father ? kFAccent : AppTheme.primary500,
+                                color: father ? kFAccent : AppTheme.neutral900,
                                 borderRadius: BorderRadius.circular(999),
                               ),
                             ),
@@ -769,7 +769,7 @@ class _WeekHeaderDelegate extends SliverPersistentHeaderDelegate {
                         style: pvManrope(
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
-                          color: father ? kFAccent : AppTheme.primary600,
+                          color: father ? kFAccent : AppTheme.neutral900,
                         ),
                       ),
                     ],
@@ -1032,7 +1032,7 @@ class _WeekBarState extends State<_WeekBar> {
     if (weeks.isEmpty) return const SizedBox.shrink();
     final father = widget.father;
     final connector =
-        father ? const Color(0xFFCBD6DA) : const Color(0xFFD8CAEC);
+        father ? const Color(0xFFCBD6DA) : const Color(0xFFDCD9DD);
     return SingleChildScrollView(
       controller: _sc,
       scrollDirection: Axis.horizontal,
@@ -1104,7 +1104,7 @@ class _WeekDot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accent = father ? kFAccent : AppTheme.primary500;
+    final accent = father ? kFAccent : AppTheme.neutral900;
     // Selected week - a filled disc with a soft glow (design).
     if (isSelected) {
       return GestureDetector(
@@ -1196,7 +1196,7 @@ class _DotsPill extends StatelessWidget {
         borderRadius: BorderRadius.circular(40),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.primary900.withValues(alpha: 0.08),
+            color: AppTheme.neutral900.withValues(alpha: 0.08),
             blurRadius: 12,
             offset: const Offset(0, 3),
           ),
@@ -1226,8 +1226,8 @@ class _PageDots extends StatelessWidget {
             height: 7,
             decoration: BoxDecoration(
               color: i == active
-                  ? AppTheme.primary500
-                  : AppTheme.primary200,
+                  ? AppTheme.neutral900
+                  : AppTheme.neutral200,
               borderRadius: BorderRadius.circular(40),
             ),
           ),

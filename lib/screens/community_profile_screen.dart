@@ -19,9 +19,9 @@ import '../theme/app_theme.dart';
 import 'community_screen.dart';
 import '../theme/pv_fonts.dart';
 
-const Color _proInk = Color(0xFF2C1A45);
-const Color _proPurple = Color(0xFF7C3AED);
-const Color _proPurpleDeep = Color(0xFF6D28D9);
+const Color _proInk = Color(0xFF2F2C30);
+const Color _proPurple = Color(0xFF2F2C30);
+const Color _proPurpleDeep = Color(0xFF2F2C30);
 
 String _handleOf(String author) {
   var h = author.toLowerCase().replaceAll('dr.', '').replaceAll('dr ', '');
@@ -235,7 +235,7 @@ class _CommunityProfileScreenState extends State<CommunityProfileScreen> {
         alignment: Alignment.center,
         decoration: const BoxDecoration(
           shape: BoxShape.circle,
-          gradient: LinearGradient(colors: [_proPurple, Color(0xFFA855F7)]),
+          gradient: LinearGradient(colors: [_proPurple, Color(0xFFA8A2AA)]),
         ),
         child: Text(initial,
             style: pvFraunces(

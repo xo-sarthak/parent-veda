@@ -284,11 +284,11 @@ class V3FilmPoster extends StatelessWidget {
                 height: 68,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: p.action,
+                  color: p.ink1,
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                        color: p.action.withValues(alpha: 0.34),
+                        color: p.ink1.withValues(alpha: 0.34),
                         blurRadius: 22,
                         offset: const Offset(0, 8)),
                   ],
@@ -351,7 +351,7 @@ class V3VideoRow extends StatelessWidget {
                         child: Padding(
                           padding: const EdgeInsets.only(left: 2),
                           child: Icon(Icons.play_arrow_rounded,
-                              size: 15, color: p.action),
+                              size: 15, color: p.ink1),
                         ),
                       ),
                     ),

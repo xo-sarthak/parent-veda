@@ -611,7 +611,7 @@ class V3SectionHead extends StatelessWidget {
                     fontSize: 11.5,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 1.3,
-                    color: p.action.withValues(alpha: 0.85))),
+                    color: p.ink1.withValues(alpha: 0.85))),
             if (note != null) ...[
               const Spacer(),
               Text(note!.toUpperCase(),

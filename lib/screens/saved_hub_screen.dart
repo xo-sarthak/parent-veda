@@ -106,7 +106,7 @@ class SavedHubScreen extends StatelessWidget {
                 for (final r in reads)
                   _tile(
                     emoji: r.emoji,
-                    color: AppTheme.primary500,
+                    color: AppTheme.neutral900,
                     title: r.title.now,
                     subtitle: '${r.category} · ${r.readingTime}',
                     date: _date(s, ReadNextStore.instance.savedAt(r.id)),
@@ -145,7 +145,7 @@ class SavedHubScreen extends StatelessWidget {
             style: pvJakarta(
                 fontSize: 16,
                 fontWeight: FontWeight.w800,
-                color: AppTheme.primary900)),
+                color: AppTheme.neutral900)),
       );
 
   // Sits under a section header when that section has nothing saved, so the
@@ -183,10 +183,10 @@ class SavedHubScreen extends StatelessWidget {
                             style: pvManrope(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w700,
-                                color: AppTheme.primary600)),
+                                color: AppTheme.neutral900)),
                         const SizedBox(width: 3),
                         const Icon(Icons.arrow_forward_rounded,
-                            size: 14, color: AppTheme.primary600),
+                            size: 14, color: AppTheme.neutral900),
                       ]),
                     ]),
               ),
@@ -273,7 +273,7 @@ class SavedHubScreen extends StatelessWidget {
             icon: const Icon(Icons.video_library_outlined, size: 18),
             label: Text(s.shWatch),
             style: OutlinedButton.styleFrom(
-              foregroundColor: AppTheme.primary600,
+              foregroundColor: AppTheme.neutral900,
               padding: const EdgeInsets.symmetric(vertical: 12),
               shape:
                   RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
@@ -288,7 +288,7 @@ class SavedHubScreen extends StatelessWidget {
             icon: const Icon(Icons.auto_stories_outlined, size: 18),
             label: Text(s.shRead),
             style: OutlinedButton.styleFrom(
-              foregroundColor: AppTheme.primary600,
+              foregroundColor: AppTheme.neutral900,
               padding: const EdgeInsets.symmetric(vertical: 12),
               shape:
                   RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
@@ -327,11 +327,11 @@ class SavedRtbReadScreen extends StatelessWidget {
                   fontSize: 24,
                   height: 1.2,
                   fontWeight: FontWeight.w600,
-                  color: AppTheme.primary900)),
+                  color: AppTheme.neutral900)),
           const SizedBox(height: 16),
           Text(piece.body,
               style: pvManrope(
-                  fontSize: 16, height: 1.7, color: const Color(0xFF4A4358))),
+                  fontSize: 16, height: 1.7, color: const Color(0xFF2F2C30))),
         ],
       ),
     );

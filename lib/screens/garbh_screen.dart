@@ -72,7 +72,7 @@ import '../data/samvad_mantras_data.dart';
 const _cream = Color(0xFFFFFFFF); // V3 ground — white since 2026-09-17; was 0xFFF5F3F6
 const _surface = Color(0xFFFFFFFF); // V3 surface (already matched)
 const _ink = Color(0xFF201C24); // V3 ink1
-const _muted = Color(0xFF6F6878); // V3 ink3
+const _muted = Color(0xFF2F2C30); // V3 ink3
 const _line = Color(0x14000000); // V3 line
 const _accShravan = Color(0xFFBE9C4E); // gold
 const _accVichara = Color(0xFF6E8C74); // muted green
@@ -81,7 +81,7 @@ const _accKriya = Color(0xFF5E8B7E); // teal-green
 const _accAhara = Color(0xFFC97B4A); // terracotta
 const _green = Color(0xFF3FA56A);
 /// Buddhi's own place on the wheel - see garbh_buddhi_screen.dart.
-const _accBuddhiPillar = Color(0xFF7A6E9B);
+const _accBuddhiPillar = Color(0xFF2F2C30);
 
 void _push(BuildContext c, Widget w) =>
     Navigator.of(c).push(MaterialPageRoute(builder: (_) => w));
@@ -181,7 +181,7 @@ class GarbhScreen extends StatelessWidget {
       appBar: AppBar(
           backgroundColor: AppTheme.surfaceContainer,
           elevation: 0,
-          foregroundColor: AppTheme.primary900),
+          foregroundColor: AppTheme.neutral900),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(18, 0, 18, 32),
         children: [
@@ -191,7 +191,7 @@ class GarbhScreen extends StatelessWidget {
               style: pvFraunces(
                   fontSize: 28,
                   fontWeight: FontWeight.w600,
-                  color: AppTheme.primary900)),
+                  color: AppTheme.neutral900)),
           const SizedBox(height: 10),
           Text(s.gsAboutBody,
               style: text.bodyMedium?.copyWith(color: _ink, height: 1.55)),
@@ -330,7 +330,7 @@ class _RagaHero extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [AppTheme.primary400, AppTheme.primary700],
+              colors: [AppTheme.neutral500, AppTheme.neutral900],
             ),
           ),
           child: Stack(alignment: Alignment.center, children: [
@@ -359,7 +359,7 @@ class _RagaHero extends StatelessWidget {
                   decoration: const BoxDecoration(
                       color: Colors.white, shape: BoxShape.circle),
                   child: const Icon(Icons.play_arrow_rounded,
-                      size: 30, color: AppTheme.primary600),
+                      size: 30, color: AppTheme.neutral900),
                 ),
               ),
               const SizedBox(height: 16),

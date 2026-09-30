@@ -95,7 +95,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
         backgroundColor: AppTheme.surfaceContainer,
         title: Text(s.medTitle,
             style: pvJakarta(
-                fontWeight: FontWeight.w700, color: AppTheme.primary900)),
+                fontWeight: FontWeight.w700, color: AppTheme.neutral900)),
       ),
       body: store.isEmpty ? _setup(s) : _main(s, store),
       floatingActionButton: store.isEmpty
@@ -130,7 +130,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
               style: pvFraunces(
                   fontSize: 22,
                   fontWeight: FontWeight.w500,
-                  color: AppTheme.primary900)),
+                  color: AppTheme.neutral900)),
           const SizedBox(height: 8),
           Text(s.medSetupBody,
               textAlign: TextAlign.center,
@@ -172,7 +172,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                       style: pvManrope(
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
-                          color: AppTheme.primary800)),
+                          color: AppTheme.neutral900)),
                 ]),
               ),
             ),
@@ -249,7 +249,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
               style: pvJakarta(
                   fontSize: 17,
                   fontWeight: FontWeight.w700,
-                  color: AppTheme.primary900)),
+                  color: AppTheme.neutral900)),
           const SizedBox(height: 10),
           ClipRRect(
             borderRadius: BorderRadius.circular(99),
@@ -313,7 +313,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                         style: pvJakarta(
                             fontSize: 14.5,
                             fontWeight: FontWeight.w700,
-                            color: AppTheme.primary900)),
+                            color: AppTheme.neutral900)),
                     if (sub.isNotEmpty)
                       Text(sub,
                           style: pvManrope(
@@ -378,7 +378,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                 style: pvManrope(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: a.enabled ? AppTheme.primary800 : AppTheme.neutral500,
+                  color: a.enabled ? AppTheme.neutral900 : AppTheme.neutral500,
                 ),
               ),
             ),
@@ -408,7 +408,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
           style: pvJakarta(
               fontSize: 15,
               fontWeight: FontWeight.w700,
-              color: AppTheme.primary900)),
+              color: AppTheme.neutral900)),
       const SizedBox(height: 10),
       for (final m in meds)
         Container(
@@ -425,7 +425,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                   style: pvJakarta(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
-                      color: AppTheme.primary900)),
+                      color: AppTheme.neutral900)),
             ),
             Text(s.medDaysOf7(store.weeklyDays(m.id)),
                 style: pvManrope(
@@ -443,7 +443,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
         ),
         child: Text(s.medConsistency(store.consistencyDays30),
             style: pvManrope(
-                fontSize: 13, height: 1.5, color: AppTheme.primary800)),
+                fontSize: 13, height: 1.5, color: AppTheme.neutral900)),
       ),
     ];
   }
@@ -568,7 +568,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                       style: pvJakarta(
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
-                          color: AppTheme.primary900)),
+                          color: AppTheme.neutral900)),
                   const SizedBox(height: 14),
                   field(s.medName, nameCtrl),
                   field(s.medDose, doseCtrl),
@@ -650,7 +650,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
               style: pvJakarta(
                   fontSize: 14.5,
                   fontWeight: FontWeight.w700,
-                  color: AppTheme.primary900)),
+                  color: AppTheme.neutral900)),
         ]),
         const SizedBox(height: 8),
         for (int i = 0; i < alarms.length; i++)
@@ -680,7 +680,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                       style: pvManrope(
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
-                          color: AppTheme.primary800),
+                          color: AppTheme.neutral900),
                     ),
                     Text(_alarmSummary(alarms[i]),
                         style: pvManrope(
@@ -779,7 +779,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                       style: pvJakarta(
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
-                          color: AppTheme.primary900)),
+                          color: AppTheme.neutral900)),
                   const SizedBox(height: 14),
                   // Title
                   TextField(
@@ -868,7 +868,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                           style: pvManrope(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
-                              color: AppTheme.primary800)),
+                              color: AppTheme.neutral900)),
                     ),
                     Switch(
                       value: enabled,
@@ -1029,7 +1029,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                 style: pvManrope(
                     fontSize: 13.5,
                     fontWeight: FontWeight.w600,
-                    color: AppTheme.primary800)),
+                    color: AppTheme.neutral900)),
           ),
           Text(has ? _fmtDate(iso) : 'Not set',
               style: pvManrope(
@@ -1079,7 +1079,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                   style: pvJakarta(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
-                      color: AppTheme.primary900)),
+                      color: AppTheme.neutral900)),
               if ([m.dose, m.time, m.frequency]
                   .any((x) => x.trim().isNotEmpty)) ...[
                 const SizedBox(height: 4),
@@ -1120,7 +1120,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                             style: pvManrope(
                                 fontSize: 12.5,
                                 color: a.enabled
-                                    ? AppTheme.primary800
+                                    ? AppTheme.neutral900
                                     : AppTheme.neutral500)),
                       ),
                     ]),

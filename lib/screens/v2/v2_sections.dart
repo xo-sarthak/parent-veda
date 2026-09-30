@@ -61,7 +61,7 @@ class V2SectionHead extends StatelessWidget {
                   fontSize: 11.5,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 1.3,
-                  color: p.action.withValues(alpha: 0.85))),
+                  color: p.ink1.withValues(alpha: 0.85))),
           const SizedBox(height: 5),
           Text(title,
               style: pvFraunces(
@@ -301,7 +301,7 @@ class V2PracticeCard extends StatelessWidget {
               padding:
                   const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
               decoration: BoxDecoration(
-                color: p.action,
+                color: p.ink1,
                 borderRadius: BorderRadius.circular(999),
               ),
               child: Text(actionLabel!,
@@ -413,7 +413,7 @@ class V2InsightBlock extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.only(left: 16),
       decoration: BoxDecoration(
-        border: Border(left: BorderSide(color: p.action.withValues(alpha: 0.35), width: 2)),
+        border: Border(left: BorderSide(color: p.ink1.withValues(alpha: 0.35), width: 2)),
       ),
       child: Text(line,
           style: pvFraunces(
@@ -742,7 +742,7 @@ class V2ComingUp extends StatelessWidget {
             const SizedBox(width: 10),
             Text(when,
                 style: pvManrope(
-                    fontSize: 14, fontWeight: FontWeight.w700, color: p.action)),
+                    fontSize: 14, fontWeight: FontWeight.w700, color: p.ink1)),
           ]),
         );
       },

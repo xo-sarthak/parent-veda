@@ -51,7 +51,7 @@ class MasterclassDetailScreenClassic extends StatelessWidget {
             SizedBox(
               height: 250,
               child: Stack(children: [
-                const PvStriped(height: 250, colorA: Color(0xFFE4D5F0), colorB: kStripeA),
+                const PvStriped(height: 250, colorA: Color(0xFFE3E1E4), colorB: kStripeA),
                 Positioned(
                   top: 52,
                   left: 20,

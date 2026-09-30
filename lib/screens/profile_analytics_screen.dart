@@ -49,7 +49,7 @@ class ProfileAnalyticsScreen extends StatelessWidget {
                       style: pvJakarta(
                           fontSize: 15,
                           fontWeight: FontWeight.w800,
-                          color: AppTheme.primary900)),
+                          color: AppTheme.neutral900)),
                   const SizedBox(height: 6),
                   Text(
                     S.now.uiAlwaysOpenToolAsk,
@@ -84,13 +84,13 @@ class ProfileAnalyticsScreen extends StatelessWidget {
                           style: pvJakarta(
                               fontSize: 15,
                               fontWeight: FontWeight.w800,
-                              color: AppTheme.primary900)),
+                              color: AppTheme.neutral900)),
                     ),
                     Text('${FamilyProfileStore.instance.completenessPercent}%',
                         style: pvJakarta(
                             fontSize: 15,
                             fontWeight: FontWeight.w800,
-                            color: AppTheme.primary600)),
+                            color: AppTheme.neutral900)),
                   ]),
                   const SizedBox(height: 10),
                   Text(
@@ -107,7 +107,7 @@ class ProfileAnalyticsScreen extends StatelessWidget {
                       style: pvJakarta(
                           fontSize: 15,
                           fontWeight: FontWeight.w800,
-                          color: AppTheme.primary900)),
+                          color: AppTheme.neutral900)),
                 ),
                 if (events.isNotEmpty)
                   TextButton(
@@ -135,7 +135,7 @@ class ProfileAnalyticsScreen extends StatelessWidget {
                           style: GoogleFonts.robotoMono(
                               fontSize: 11.5,
                               height: 1.4,
-                              color: AppTheme.primary900)),
+                              color: AppTheme.neutral900)),
                     ),
                   ),
             ],
