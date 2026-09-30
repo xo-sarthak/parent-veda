@@ -188,6 +188,18 @@ void main() {
       expect(find.textContaining('mistake'), findsNothing);
     });
 
+    // ⚠️ EVERY PICTURE, NOT THE ONE THE DICE PICK (2026-09-30). The test
+    // below opens a random picture, and one of them overflowed its clue strip
+    // by 0.75px, so the suite failed on some runs only. This draws each.
+    testWidgets('Logic Puzzle: every picture draws its clues without spilling',
+        (tester) async {
+      for (var i = 0; i < kNonogramPictures.length; i++) {
+        await pump(tester,
+            LogicGame(key: ValueKey(i), controller: PregnancyController(), markComplete: false, startAt: i));
+        expect(tester.takeException(), isNull, reason: 'picture $i');
+      }
+    });
+
     testWidgets('Logic Puzzle: a nonogram that hints to a finish',
         (tester) async {
       await pump(tester,

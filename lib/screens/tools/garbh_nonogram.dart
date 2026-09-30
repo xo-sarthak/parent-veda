@@ -31,9 +31,14 @@ import 'games/nonogram_engine.dart';
 
 class LogicGame extends StatefulWidget {
   const LogicGame(
-      {super.key, required this.controller, this.markComplete = true});
+      {super.key, required this.controller, this.markComplete = true, this.startAt});
   final PregnancyController controller;
   final bool markComplete;
+
+  /// The picture to open on. Null: a random one, as she sees it. Set by the
+  /// test that draws every picture (a random pick once hid an overflow that
+  /// only some pictures had, 2026-09-30).
+  final int? startAt;
 
   @override
   State<LogicGame> createState() => _LogicGameState();
@@ -50,7 +55,7 @@ class _LogicGameState extends State<LogicGame> {
   @override
   void initState() {
     super.initState();
-    _which = _rng.nextInt(kNonogramPictures.length);
+    _which = widget.startAt ?? _rng.nextInt(kNonogramPictures.length);
     _load();
   }
 
@@ -135,13 +140,24 @@ class _LogicGameState extends State<LogicGame> {
                     SizedBox(
                       width: cell,
                       height: colClueHeight,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          for (final k in _puzzle.colClues[c])
-                            Text('$k',
-                                style: _clue(_puzzle.colDone(_marks, c))),
-                        ],
+                      // ⚠️ SHRINK TO FIT, NEVER SPILL (2026-09-30). The strip
+                      // is a fixed height and the gutter is capped at three
+                      // clues' width, so a picture with a longer run of clues,
+                      // or a two-digit one, overflowed by a fraction of a
+                      // pixel. Which picture opens is random, so it failed on
+                      // some runs only. Scale down only: short clues keep
+                      // their size.
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.bottomCenter,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            for (final k in _puzzle.colClues[c])
+                              Text('$k',
+                                  style: _clue(_puzzle.colDone(_marks, c))),
+                          ],
+                        ),
                       ),
                     ),
                 ]),
@@ -150,18 +166,23 @@ class _LogicGameState extends State<LogicGame> {
                     SizedBox(
                       width: rowClueWidth,
                       height: cell,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          for (final k in _puzzle.rowClues[r])
-                            Padding(
-                              padding: const EdgeInsets.only(right: 4),
-                              child: Text('$k',
-                                  style:
-                                      _clue(_puzzle.rowDone(_marks, r))),
-                            ),
-                          const SizedBox(width: 4),
-                        ],
+                      // Shrink to fit, as the column clues above.
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerRight,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            for (final k in _puzzle.rowClues[r])
+                              Padding(
+                                padding: const EdgeInsets.only(right: 4),
+                                child: Text('$k',
+                                    style:
+                                        _clue(_puzzle.rowDone(_marks, r))),
+                              ),
+                            const SizedBox(width: 4),
+                          ],
+                        ),
                       ),
                     ),
                     for (var c = 0; c < n; c++) _cellBox(r * n + c, cell),
