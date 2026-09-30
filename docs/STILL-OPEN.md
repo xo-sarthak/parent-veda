@@ -10002,6 +10002,14 @@ not here. Owed:
     safe from week 12") is authored exercise copy we do not have, so the card names the read instead; a clinician
     should read which Move reads are offered from which week; the rail is now up to nine cards on a full day, and
     whether that is too many is a call to make on a device; the myth is week-level, so it changes weekly, not daily.
+  - **§81.20 "This week's plate" is already built, so not rebuilt (2026-09-30).** The PDF asks to turn the vegetarian
+    chart into a day-at-a-time story with a shopping-list button. The Nutrition door already does the story:
+    `DietChartPlanScreen` (a week grid and a day strip, meal rows with photos, "Make this my chart" to pin it so Today
+    follows it, and a PDF export), and its Today tab draws the plate for the day from the pinned chart. The door also
+    has "Your shopping list". **The one real gap:** the shopping list fills only from recipes (recipe to ingredients),
+    and a chart's meals are plain text ("Rajma with rice, palak sabzi, salad") with no ingredient data, so a chart
+    day cannot add itself to the list. Closing it needs a meal-to-ingredients mapping (new content a nutritionist
+    should check); left owed, on the user's call to skip work the door already covers.
   - **§81.16 A migration for Spiritual reading's "not interested" marks (2026-09-30).** The screen saved "not
     interested" under `title.now` (the display title) while "interested" and the sort used `title.en`, so in Hindi
     the mark was saved as a Devanagari title and matched nothing after a switch (the `.en` is identity, `.now` is
