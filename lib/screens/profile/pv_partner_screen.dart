@@ -204,7 +204,15 @@ class _PvPartnerScreenState extends State<PvPartnerScreen> {
                       onChanged: _setShare,
                     ),
                   ),
-                  const SizedBox(height: 22),
+                  // The reassurance the gap analysis asked for (2026-09-30, "Can I
+                  // stop sharing at any time?"): true of the switch and of every
+                  // stage, so it says only what the switch does. It does NOT say she
+                  // can unpair from here: unpairing still goes through the partner's
+                  // phone or Help (the line below).
+                  const SizedBox(height: 10),
+                  PvQuietLine(
+                      'Turn this off whenever you like and $_who stops seeing your week and calendar.'),
+                  const SizedBox(height: 12),
                   if (!_linked) ...[
                     Text(
                       'How pairing works',

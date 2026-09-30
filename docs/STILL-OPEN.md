@@ -10004,6 +10004,33 @@ not here. Owed:
     the hero art, the week card stack, the calendar and Garbh daily still stop at 40; the size and "what your baby is
     doing" cards on the home speak of week 40 while she is past it; the 41 and 42 pages' wording is owed a
     clinician's read (already noted in §81.2).
+  - **§81.22 His side: the skeleton and the words (2026-09-30).** The user's call: first pass is content and structure, the
+    design pass comes later. **Built:** (1) a **For partners door** (`lib/data/doors/pv_door_partner.dart`, not a home tile,
+    Twins' shape): Your week, Supporting her, Labour and birth, You too, Before the baby; it links the labour reads
+    that already exist (including "What your partner should do", so the PDF's coming-soon labour read is that one, not
+    a second) and the contraction timer, the bag and the baby checklist. (2) **Eight new partner reads**
+    (`pregnancy_reads_partner.dart`): the first days after the news, things to do trimester by trimester, seven things
+    before the baby (first-time dads), helping with feeding, pregnancy symptoms of his own, his own feelings, twelve
+    couple questions, and how to be there if the pregnancy ends; all `reviewed: false`. (3) **A week by week guide**
+    (`FatherWeekGuideScreen`) drawn from the partner corner already written for every week (no new writing): three
+    trimesters, this week open, each week shareable. (4) **His bar's third tab is Learn, not Reads** (`FatherLearnScreen`:
+    the guide, the door's five tabs, and the old reads list one tap in, unchanged). (5) **His Today** has "Your part this
+    week" with the week's one mission and the way into the guide and the door. (6) **His journal's empty state** says
+    "Write the first line. She will not see it unless you share it." (7) **Her side:** a "Share with your partner"
+    button under "For your partner" on the week page, and a line under the pairing switch ("Turn this off whenever you
+    like and they stop seeing your week and calendar"; it does not promise unpairing, which still goes through the
+    partner's phone or Help; that screen is shared with TTC and parenting, so the line appears there too). Held by
+    `test/father_side_test.dart`. **TO BE VERIFIED by a clinician / the editor:** the eight reads (every one is a
+    desk read, unreviewed); the **two citations the writer gave from memory**, "Brennan and colleagues, Journal of
+    Reproductive and Infant Psychology (2007)" on couvade (in the sympathy read) and "Paulson and Bazemore, JAMA
+    (2010)" on fathers' depression (in the feelings read), which must be checked against the papers or removed; the
+    shared "take her in" callout (bleeding: call for any, go straight in for heavy); and a few small practical lines
+    in no existing read (burping upright on the shoulder, keep smoke away from her and the house, "lay the baby down
+    safely and take a minute", his own doctor the same day for chest pain, breathlessness or fainting). **Not done:**
+    (a) his **skin**: his side is still Slate with its own layout; it has not been brought onto the shared look
+    (design pass, on hold); (b) **messages for him** at the moments (§81.9 c); (c) his Today, Journey, Read aloud
+    and Journal are otherwise as they were; (d) a partner "what to buy" list of his own; (e) Hindi (new copy is
+    English).
   - **§81.19 Myth or fact and Move on the rail (2026-09-30).** Built, from the PDF's "A Myth or fact and a Move card"
     (P3), the two cards §72 listed as owed. **Myth or fact**: the week's own `mythBuster` (written for all 37
     weeks), the myth as the card and the answer in a small sheet (`lib/screens/pregnancy/preg_myth_sheet.dart`),

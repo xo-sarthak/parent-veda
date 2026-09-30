@@ -257,10 +257,14 @@ class _FatherJournalScreenState extends State<FatherJournalScreen> {
                     color: kFAccent, size: 30),
               ),
               const SizedBox(height: 16),
-              Text(S.now.uiStartJournal, style: _serif(20)),
+              // The PDF's empty state (2026-09-30, "His journal is his"): it says the
+              // two things a father needs to know. Kept for revert:
+              //   Text(S.now.uiStartJournal, style: _serif(20)),
+              //   Text(S.now.uiWriteMemoryNoteSomething, ...)
+              Text('Write the first line', style: _serif(20)),
               const SizedBox(height: 8),
               Text(
-                  S.now.uiWriteMemoryNoteSomething,
+                  'She will not see it unless you share it.',
                   textAlign: TextAlign.center,
                   style: _body(13.5, c: kFMuted)),
             ],

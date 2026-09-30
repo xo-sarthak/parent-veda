@@ -146,7 +146,9 @@ import '../tools/kegel_care_screen.dart';
 import '../tools/product_checklist_screen.dart';
 import '../tools/due_date_calculator_screen.dart';
 import '../post_pregnancy/baby_naming_home_screen.dart';
+import '../../data/doors/pv_door_partner.dart';
 import '../../data/doors/pv_door_twins.dart';
+import '../father/father_week_guide_screen.dart';
 
 /// A tile's OWN drawn mark, where the door has something better than its
 /// format's. Null means "the format mark", which is the rule everywhere else.
@@ -478,6 +480,11 @@ Widget? pvDoorScreenFor(String id, PregnancyController c) => switch (id) {
   kFirstSurfaceDueDate => DueDateCalculatorScreen(controller: c),
   kTwinsSurfaceDoor => PvDoorScreen(
       page: kTwinsDoor, bracket: kPregTwinsBracket, pregnancy: c),
+
+  // ---- For partners: his side (2026-09-30) --------------------------------
+  kPartnerSurfaceDoor => PvDoorScreen(
+      page: kPartnerDoor, bracket: kPregPartnerBracket, pregnancy: c),
+  kPartnerSurfaceWeekGuide => FatherWeekGuideScreen(controller: c),
 
   _ => null,
 };
@@ -923,6 +930,8 @@ bool pvDoorSurfaceResolves(String id) => switch (id) {
   kMoveSurfaceYoga || kMoveSurfaceKegel => true,
   kReadySurfaceNames || kReadySurfaceStore || kReadySurfaceBag => true,
   kTwinsSurfaceDoor => true,
+  kPartnerSurfaceDoor => true,
+  kPartnerSurfaceWeekGuide => true,
   kFirstSurfaceDueDate => true,
   _ when id.startsWith('mind/breathe/') => kMmBreathingExercises.any(
     (e) => mindSurfaceBreathe(e.id) == id,

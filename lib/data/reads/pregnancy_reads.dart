@@ -50,6 +50,7 @@
 //  the policy says Hindi is not owed unless it is asked for.
 // =============================================================================
 
+import 'pregnancy_reads_partner.dart';
 import '../../localization/app_language.dart';
 import '../../models/pv_read.dart';
 import 'pregnancy_reads_conditions.dart';
@@ -100,6 +101,8 @@ final List<PvRead> kPregnancyReads = [
   ...kPregnancyReadsFirst,
   ...kPregnancyReadsReady,
   ...kPregnancyReadsTwins,
+  // For partners (2026-09-30): opened from the For partners door (his side).
+  ...kPregnancyReadsPartner,
   ...kPregnancyReadsWork,
   // The weekly reads, written out 2026-09-18 — see pregnancy_reads_weekly_a.
   ...kPregnancyReadsWeeklyA,

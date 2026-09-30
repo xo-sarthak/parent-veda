@@ -40,9 +40,10 @@ import '../services/pregnancy_controller.dart';
 import '../theme/pv_fonts.dart';
 import 'v2/v2_palette.dart';
 import 'v2/v3_preg_hero.dart' show PregField, pregBabyArt;
+import 'package:share_plus/share_plus.dart';
 import 'pregnancy/preg_twins.dart';
 import 'pregnancy/preg_chrome.dart' show pregSectionHeadingStyle;
-import 'products/pv_store_chrome.dart' show kPvLine;
+import 'products/pv_store_chrome.dart' show kPvInk, kPvLine;
 
 const String kPregWeekRoute = 'pregnancy/week';
 
@@ -470,6 +471,27 @@ class _WeekBody extends StatelessWidget {
           h('For your partner'),
           const SizedBox(height: 6),
           body(partner),
+          // A Share button (2026-09-30, gap analysis: "For your partner on her week
+          // page, with a Share button"). The message is the week's own
+          // `partnerCorner.shareMessage`, written to be sent.
+          if (content.partner.shareMessage.en.trim().isNotEmpty) ...[
+            const SizedBox(height: 10),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: OutlinedButton.icon(
+                key: const ValueKey('week_share_partner'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: kPvInk,
+                  side: const BorderSide(color: kPvLine),
+                  shape: const StadiumBorder(),
+                ),
+                onPressed: () => Share.share(content.partner.shareMessage.en.trim()),
+                icon: const Icon(Icons.ios_share_rounded, size: 16),
+                label: Text('Share with your partner',
+                    style: pvManrope(fontSize: 13, fontWeight: FontWeight.w700, color: kPvInk)),
+              ),
+            ),
+          ],
         ],
 
         if (extra != null && extra.sources.isNotEmpty) ...[

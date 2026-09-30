@@ -37,6 +37,9 @@ import '../../widgets/trimester_progress_bar.dart';
 import '../profile_screen.dart';
 import '../week_flow_screen.dart';
 import 'father_journal_screen.dart';
+import 'father_week_guide_screen.dart';
+import '../../data/doors/pv_door_partner.dart' show kPartnerSurfaceDoor;
+import '../doors/pv_door_router.dart' show openPvDoorSurface;
 import 'father_stories_screen.dart';
 import '../../theme/pv_fonts.dart';
 import '../../localization/app_language.dart';
@@ -402,6 +405,12 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Column(children: [
                       _heroTip(p),
+                      const SizedBox(height: 14),
+                      // His week, and the guide behind it (2026-09-30, gap analysis
+                      // "Partner (his side)": a week by week guide reachable from his
+                      // home). One card: this week's one mission, then the way in to
+                      // every week and to the partner door.
+                      _weekGuideCard(p),
                       const SizedBox(height: 14),
                       _supportPartner(p),
                       const SizedBox(height: 14),
@@ -834,6 +843,58 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
   }
 
   // ---- card 1: hero tip ----
+  /// This week's one mission for him, and the way in to the week by week guide
+  /// and the For partners door (2026-09-30). The words are `WeekContent.partner`,
+  /// written for every week; nothing is new here but the place they are reached.
+  Widget _weekGuideCard(_Pal p) {
+    final c = widget.controller;
+    final w = c.weekData(c.currentWeek);
+    final mission = w?.partner.oneMission.en.trim() ?? '';
+    return _whiteCard(
+      p,
+      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text('YOUR PART THIS WEEK', style: _eyebrow(p.muted, 0.14)),
+        const SizedBox(height: 8),
+        Text(mission.isEmpty ? 'Week ${c.currentWeek}: be there, and ask how she is.' : mission,
+            style: _body(15, p.ink, h: 1.5)),
+        const SizedBox(height: 14),
+        Row(children: [
+          Expanded(
+            child: _tap(
+              () => openFatherWeekGuide(context, c),
+              Container(
+                key: const ValueKey('father_week_guide_open'),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                    color: p.accent, borderRadius: BorderRadius.circular(14)),
+                child: Text('Every week',
+                    style: _body(13.5, p.cream, w: FontWeight.w700)),
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: _tap(
+              () => openPvDoorSurface(context, kPartnerSurfaceDoor, c),
+              Container(
+                key: const ValueKey('father_partner_door_open'),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                    color: p.card,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: p.line)),
+                child: Text('The partner guide',
+                    style: _body(13.5, p.ink, w: FontWeight.w700)),
+              ),
+            ),
+          ),
+        ]),
+      ]),
+    );
+  }
+
   Widget _heroTip(_Pal p) => _tap(
         () => _openCard('tip'),
         Container(

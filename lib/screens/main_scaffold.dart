@@ -31,8 +31,9 @@ import '../widgets/pv_tab_bar.dart';
 // import 'community_screen.dart';
 import 'father/father_daily_screen.dart';
 import 'father/father_journal_screen.dart';
+import 'father/father_learn_screen.dart';
 import 'father/father_read_aloud_screen.dart';
-import 'father/father_reads_screen.dart';
+// import 'father/father_reads_screen.dart'; // kept for revert: the Reads tab is now FatherLearnScreen
 // Kept: the revert line in the tab list constructs HomeScreenB directly, and
 // TodayHomeScreen's Classic branch is the live path to it.
 // ignore: unused_import
@@ -194,7 +195,10 @@ class _MainScaffoldState extends State<MainScaffold> with WidgetsBindingObserver
                     ? PregEndedHome(pregnancy: widget.pregnancy, forPartner: true)
                     : FatherDailyScreen(controller: widget.pregnancy, embedded: true),
                 WeeklyCardStackScreen(controller: widget.pregnancy),
-                const FatherReadsScreen(),
+                // Learn, not Reads (2026-09-30): the topics of the For partners door,
+                // with the old list one tap in. Kept for revert:
+                //   const FatherReadsScreen(),
+                FatherLearnScreen(controller: widget.pregnancy),
                 FatherReadAloudScreen(controller: widget.pregnancy),
                 FatherJournalScreen(
                     controller: widget.pregnancy, embedded: true),
@@ -237,7 +241,8 @@ class _MainScaffoldState extends State<MainScaffold> with WidgetsBindingObserver
             ? const [
                 PvTab(Icons.home_rounded, 'Today'),
                 PvTab(Icons.explore_rounded, 'Journey'),
-                PvTab(Icons.menu_book_rounded, 'Reads'),
+                // Kept for revert: PvTab(Icons.menu_book_rounded, 'Reads'),
+                PvTab(Icons.menu_book_rounded, 'Learn'),
                 PvTab(Icons.auto_stories_rounded, 'Read'),
                 PvTab(Icons.edit_outlined, 'Journal'),
               ]
