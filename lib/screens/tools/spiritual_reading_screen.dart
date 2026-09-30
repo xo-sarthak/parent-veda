@@ -281,7 +281,7 @@ Widget _readRow(BuildContext context, PregnancyController controller,
     TextTheme text, SpiritualTradition t, SpiritualRead r) {
   final store = SpiritualPrefsStore.instance;
   final interested = store.isInterested(r.title.en);
-  final notInterested = store.isNotInterested(r.title.now);
+  final notInterested = store.isNotInterested(r.title.en);
   return InkWell(
     onTap: () => _openRead(context, controller, t, r),
     child: Opacity(
@@ -440,7 +440,7 @@ class _SpiritualReadScreen extends StatelessWidget {
             builder: (context, _) {
               final store = SpiritualPrefsStore.instance;
               final interested = store.isInterested(read.title.en);
-              final notInterested = store.isNotInterested(read.title.now);
+              final notInterested = store.isNotInterested(read.title.en);
               return Row(children: [
                 Expanded(
                   child: OutlinedButton.icon(
@@ -467,7 +467,7 @@ class _SpiritualReadScreen extends StatelessWidget {
                 Expanded(
                   child: OutlinedButton.icon(
                     onPressed: () =>
-                        store.toggleNotInterested(read.title.now),
+                        store.toggleNotInterested(read.title.en),
                     style: OutlinedButton.styleFrom(
                       // The one ink once chosen, like Interested (was a grey
                       // fill, AppTheme.neutral500).

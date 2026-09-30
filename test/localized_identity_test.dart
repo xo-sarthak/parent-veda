@@ -34,6 +34,9 @@ const _identityCalls = [
   'toggleSave',
   'isInterested',
   'toggleInterested',
+  // Added 2026-09-30: these two took `.now` and lost the mark on a language switch.
+  'isNotInterested',
+  'toggleNotInterested',
   'setNotInterested',
   'rank',
   // A community poll vote is persisted under the option's text and synced to

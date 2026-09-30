@@ -9957,3 +9957,15 @@ not here. Owed:
     supporting" and "What changed". **Could be promoted into the shell:** a bottom-bar slot (two tools wrap the
     shell in an outer Scaffold for a pinned button) and a shared round "add" control (Weight and Medicines each
     carry a private copy). Held by `test/preg_tools_shell_test.dart`.
+  - **§81.16 A migration for Spiritual reading's "not interested" marks (2026-09-30).** The screen saved "not
+    interested" under `title.now` (the display title) while "interested" and the sort used `title.en`, so in Hindi
+    the mark was saved as a Devanagari title and matched nothing after a switch (the `.en` is identity, `.now` is
+    display trap in CLAUDE.md). Fixed in two parts: the screen now uses `.en` for both marks, and
+    `SpiritualPrefsStore` **runs a migration on every local load and every cloud apply** that re-keys any mark saved
+    under a read's Hindi title onto its English title (`migrateSpiritualNotInterested`, pure and idempotent, in
+    lib/services/spiritual_prefs_store.dart). English marks already matched and are untouched. **Not migrated, on
+    purpose:** a Hindi title that two different English reads share (a couple of pairs in the seed, for
+    example "बड़ों का आशीर्वाद"), because a stale mark under it cannot say which read she meant and a wrong guess
+    would mark the wrong one; she taps it again. The cloud copy is rewritten to English keys the next time the
+    store writes. Held by `test/spiritual_prefs_migration_test.dart`, and `isNotInterested` and
+    `toggleNotInterested` are now in the identity-call list of `test/localized_identity_test.dart`.
