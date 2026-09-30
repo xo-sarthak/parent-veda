@@ -51,6 +51,8 @@ import 'package:flutter/services.dart';
 import '../data/product_data.dart' show productImageUrl;
 import '../services/app_nav.dart';
 import 'calendar_screen.dart';
+import 'doors/pv_door_router.dart' show openPvDoorSurface, openPvDoorRead;
+import 'pregnancy/preg_hero_extras.dart';
 import 'pregnancy/preg_more_screen.dart' show kPregTabMore, kPregTabProducts, kPregTabTools;
 import '../services/app_structure.dart';
 import '../services/home_content_controller.dart';
@@ -161,6 +163,7 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    PregArrivalPrompt.instance.load();
   }
 
   @override
@@ -295,6 +298,8 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
         SymptomStore.instance,
         ScansStore.instance,
         NutritionDayStore.instance,
+        // "Not yet" on the arrival card rests it (2026-09-30).
+        PregArrivalPrompt.instance,
         // The hero line and the size card name the set she chose.
         PregSizeSetStore.instance,
       ]),
@@ -442,6 +447,17 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
                 //   sizeLine: _sizeLine(week, weekContent),
                 //   onSize / onThisWeek: () => _openWeekSheet(context, week, weekContent, p),
                 onDetails: () => openPregWeek(context, pregnancy, week),
+                // "20 weeks to go" with an (i), and past the due date the
+                // count keeps going (2026-09-30, gap analysis). Counted for the
+                // SELECTED day, like everything else on the fold.
+                timeLeft: pregTimeLeft(_daysToDue(_selected)),
+                pastDueCount: pregPastDueCount(_daysToDue(_selected)),
+                onHowCounted: () => showPregHowWeeksCounted(context, pregnancy),
+                onPastDue: () => openPvDoorRead(context, kPregPastDueReadId, pregnancy),
+                // "Has your baby arrived?" from week 37, today's week.
+                footer: PregArrivalPrompt.instance.showsFor(pregnancy.currentWeek)
+                    ? PregArrivalCard(p: p)
+                    : null,
                 onAvatar: () => openPvYou(context, stage: LifeStage.pregnancy),
                 onSaved: () => Navigator.of(context).push(MaterialPageRoute<void>(
                     settings: const RouteSettings(name: 'saved'),
@@ -1650,6 +1666,9 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
       //   openSymptomDetail(context, s, pregnancy);
       case PregInsightGo.scan:
         _openBracket(context, 'pregnancy_scans_tests');
+      // The timeline, where each scan has "Add the date" (2026-09-30).
+      case PregInsightGo.scanWindow:
+        openPvDoorSurface(context, kScansSurfaceTimeline, pregnancy);
       case PregInsightGo.week:
         // The week page, Flo's Details (2026-09-22). Not the stack (the user
         // cut that wire, 2026-09-21); the size sheet before that. Kept for
@@ -1669,6 +1688,11 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
         }
     }
   }
+
+  /// Days from [date] to the due date; negative once it has passed.
+  int _daysToDue(DateTime date) => DateTime(pregnancy.dueDate.year, pregnancy.dueDate.month, pregnancy.dueDate.day)
+      .difference(DateTime(date.year, date.month, date.day))
+      .inDays;
 
   void _open(BuildContext context, String surfaceId) {
     final h = homeFor(surfaceId);

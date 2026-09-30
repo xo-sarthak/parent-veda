@@ -34,6 +34,14 @@
 //  above as well … a wastage of space." The size lives on the insight card
 //  and on the week page. `Details` is Flo's word and opens `PregWeekScreen`.
 //
+//  ⚠️ ONE SMALL LINE CAME BACK, AND IT IS NOT THE SIZE (2026-09-30, the gap
+//  analysis, "Show the size and 'weeks to go' on the hero"). Under the day:
+//  "20 weeks to go" with an (i) that opens "How your weeks are counted". The
+//  PDF's line also had the size; that half stays off, on the user's words
+//  above. Past the due date "Day N" becomes "40 weeks and 3 days" and the line
+//  opens "what happens now". From week 37 a `footer` card asks, gently,
+//  whether the baby has arrived (lib/screens/pregnancy/preg_hero_extras.dart).
+//
 //  `V3Hero` (v3_sections.dart), the full-bleed photograph, stays for revert.
 // =============================================================================
 
@@ -157,6 +165,11 @@ class V3PregHero extends StatefulWidget {
     this.onDetails,
     this.onAvatar,
     this.onSaved,
+    this.timeLeft,
+    this.pastDueCount,
+    this.onHowCounted,
+    this.onPastDue,
+    this.footer,
   });
 
   final V2Palette p;
@@ -180,6 +193,21 @@ class V3PregHero extends StatefulWidget {
   /// The avatar. Null: the stage-door menu, as the shared chrome does.
   final VoidCallback? onAvatar;
   final VoidCallback? onSaved;
+
+  /// "20 weeks to go", under the day (2026-09-30, gap analysis). Null: none.
+  final String? timeLeft;
+
+  /// "40 weeks and 3 days", in place of "Day N" once the due date has passed.
+  final String? pastDueCount;
+
+  /// The (i) after the time left: "How your weeks are counted".
+  final VoidCallback? onHowCounted;
+
+  /// Past the due date, the time-left line opens "what happens now".
+  final VoidCallback? onPastDue;
+
+  /// A card at the foot of the hero ("Has your baby arrived?", from week 37).
+  final Widget? footer;
 
   static const _months = [
     'January', 'February', 'March', 'April', 'May', 'June',
@@ -279,8 +307,35 @@ class _V3PregHeroState extends State<V3PregHero> {
                           style: pvFraunces(
                               fontSize: 30, letterSpacing: -0.75, fontWeight: FontWeight.w600, height: 1.1, color: p.ink1)),
                       const SizedBox(height: 2),
-                      Text('Day $dayInWeek',
+                      // Past the due date it keeps counting (the gap analysis:
+                      // "40 weeks and 3 days", instead of stopping).
+                      Text(widget.pastDueCount ?? 'Day $dayInWeek',
                           style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w800, letterSpacing: 0.6, color: p.ink2)),
+                      if (widget.timeLeft != null) ...[
+                        const SizedBox(height: 3),
+                        // Its own tap target inside the figure's: the (i) and
+                        // the past-due line must not open the week page.
+                        GestureDetector(
+                          key: const ValueKey('preg_hero_time_left'),
+                          behavior: HitTestBehavior.opaque,
+                          onTap: widget.pastDueCount != null ? widget.onPastDue : widget.onHowCounted,
+                          child: Row(mainAxisSize: MainAxisSize.min, children: [
+                            Text(
+                                widget.pastDueCount != null
+                                    ? '${widget.timeLeft}: what happens now'
+                                    : widget.timeLeft!,
+                                style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w600, color: p.ink2)),
+                            if (widget.pastDueCount == null && widget.onHowCounted != null) ...[
+                              const SizedBox(width: 4),
+                              Icon(Icons.info_outline_rounded, size: 14, color: p.ink3),
+                            ],
+                            if (widget.pastDueCount != null) ...[
+                              const SizedBox(width: 2),
+                              Icon(Icons.chevron_right_rounded, size: 16, color: p.ink3),
+                            ],
+                          ]),
+                        ),
+                      ],
                     ]),
                   ),
                   if (widget.onDetails != null)
@@ -305,6 +360,10 @@ class _V3PregHeroState extends State<V3PregHero> {
               ),
             ),
           ),
+          if (widget.footer != null) ...[
+            const SizedBox(height: 4),
+            widget.footer!,
+          ],
         ]),
       ),
     );

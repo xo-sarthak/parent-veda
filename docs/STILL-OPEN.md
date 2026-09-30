@@ -9740,3 +9740,10 @@ not here. Owed:
   - **§80.10 The due date is changed from You now.** You › Details › Due date opens "Your due date" (the four ways,
     Scan date first from week 12, a note when a last-period date would replace a clinic's). The Tools › Due Date
     calculator stays as it was; whether both should exist is the user's call.
+  - **§80.11 The home pass (2026-09-30).** Built: "20 weeks to go" under the day with an (i) on how weeks are counted
+    (the size half of the PDF's line left off on the user's 2026-09-22 call); past the due date the hero counts on
+    ("40 weeks and 3 days") and opens the past-due read; from week 37 "Has your baby arrived?" at the foot of the
+    hero ("Not yet" rests it three days, on this phone); and with nothing booked, the usual scan for her week on the
+    insights rail, derived from the Scans door's own "Weeks 18–22" lines and limited to routine tests (NIPT, Doppler
+    and GBS stay on the door: optional or doctor-advised). Owed: the week pages and the rest of the home still stop
+    at week 40 (the week clamp is 4 to 40 everywhere); only the hero counts past it.

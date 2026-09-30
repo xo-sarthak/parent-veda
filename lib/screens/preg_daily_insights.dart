@@ -34,6 +34,8 @@
 // =============================================================================
 
 import '../data/can_i_data.dart';
+import '../data/doors/pv_door_data.dart' show PvDoorEntryTile, PvDoorLibrary;
+import '../data/doors/pv_door_scans.dart' show kScansDoor;
 import '../data/nutrition/nutrition_plate.dart';
 import '../data/symptoms/symptom_library.dart';
 import '../models/can_i_entry.dart';
@@ -59,6 +61,10 @@ enum PregInsightGo {
 
   /// The Scans & tests door.
   scan,
+
+  /// The scan timeline, where she adds the date of the usual scan for her
+  /// week (2026-09-30, "Upcoming tests on the home").
+  scanWindow,
 
   /// What is forming this week — the week sheet (was the week stack until
   /// the user cut that wire on 2026-09-21).
@@ -91,6 +97,7 @@ class PregInsight {
     this.entry,
     this.read,
     this.needId,
+    this.scanId,
   });
 
   /// Stable, so a test can assert which cards a given day produces.
@@ -107,6 +114,52 @@ class PregInsight {
   final CanIEntry? entry;
   final ReadItem? read;
   final String? needId;
+
+  /// The scan a [PregInsightGo.scanWindow] card is about.
+  final String? scanId;
+}
+
+/// A routine scan or test and the weeks it is usually done in.
+typedef PregScanWindow = ({String id, String title, int from, int to});
+
+/// The scans and tests the home may remind her of, by id.
+///
+/// ⚠️ ROUTINE ONLY, AND THAT IS A CLINICAL CHOICE, NOT A GAP. NIPT is an
+/// optional private test, a Doppler is done when a doctor advises it, and a
+/// Group B Strep swab is not routine in India. A home card about any of them
+/// would prompt a test she may not need; they stay on the Scans door, where she
+/// reads about them on purpose.
+const Set<String> kPregRoutineScans = {
+  'blood_tests',
+  'dating_scan',
+  'nt_scan',
+  'anomaly_scan',
+  'ogtt',
+  'growth_scan',
+};
+
+/// The windows, DERIVED from the Scans door's own tiles ("Weeks 18–22"), so
+/// the home and the door cannot say two different things. Door order.
+List<PregScanWindow> pregScanWindows() {
+  final out = <PregScanWindow>[];
+  final seen = <String>{};
+  final range = RegExp(r'Weeks?\s+(\d+)\s*[–-]\s*(\d+)');
+  for (final t in kScansDoor.allTiles) {
+    if (t is! PvDoorEntryTile || t.library != PvDoorLibrary.scan) continue;
+    if (!kPregRoutineScans.contains(t.entryId) || !seen.add(t.entryId)) continue;
+    final m = range.firstMatch(t.meta ?? '');
+    if (m == null) continue;
+    out.add((id: t.entryId, title: t.title, from: int.parse(m.group(1)!), to: int.parse(m.group(2)!)));
+  }
+  return out;
+}
+
+/// The usual scan for [week], or null when none is due around then.
+PregScanWindow? pregScanWindowFor(int week) {
+  for (final w in pregScanWindows()) {
+    if (week >= w.from && week <= w.to) return w;
+  }
+  return null;
 }
 
 /// The cards [date] earns.
@@ -193,6 +246,25 @@ List<PregInsight> pregInsightsFor({
       art: PvInsightArt.scan,
       go: PregInsightGo.scan,
     ));
+  } else if (!isFuture && _hasNoUpcoming(today)) {
+    // ⚠️ NOTHING BOOKED, SO THE WINDOW SHE IS IN (2026-09-30, the gap
+    // analysis, "Upcoming tests on the home"): "If she has not booked, the
+    // home says nothing about the scan window she is in." Only when she has
+    // no upcoming appointment at all; one booked further out means she knows.
+    // "Usually", never "you need": her doctor decides which tests she has.
+    final w = pregScanWindowFor(week);
+    if (w != null) {
+      cards.add(PregInsight(
+        id: 'scan_window_${w.id}',
+        eyebrow: 'Usually around now',
+        value: w.title,
+        caption: 'Weeks ${w.from} to ${w.to} · Add my date',
+        hue: 206,
+        art: PvInsightArt.scan,
+        go: PregInsightGo.scanWindow,
+        scanId: w.id,
+      ));
+    }
   }
 
   // ---- 3. What is forming this week ----------------------------------------
@@ -314,6 +386,9 @@ List<PregInsight> pregInsightsFor({
   }
   return null;
 }
+
+/// True when no appointment lies ahead at all.
+bool _hasNoUpcoming(DateTime today) => _nextAppointment(today) == null;
 
 /// The first two foods from a need's line — "Dal, greens" — as the caption.
 String _firstFoods(String line) {
