@@ -9931,3 +9931,14 @@ not here. Owed:
     migration); the private helpers the restyle wrote twice (`_SafetyWarning`, a neutral tag, an ink choice
     pill, an outlined ink stadium) could move into `preg_chrome.dart`; `hospital_bag_ready_test` taps after
     `scrollUntilVisible` without a `pump()`.
+  - **§81.14 The door tiles follow her week and her answers (2026-09-30).** Built, from the PDF's "Order the door
+    tiles by her week and her answers" (P2): on the pregnancy home the tiles lead with what she chose in onboarding
+    ("What would you most like help with?"), then what her trimester needs (first trimester: Symptoms, Is it safe?,
+    Scans & tests; Labour prep from week 32), then the table's own demand-ranked order. Ranking only: every door is
+    still there, once, in the same four-column grid (`lib/services/preg_tile_order.dart`, wired in
+    `home_v3_screen.dart`; held by `test/preg_tile_order_test.dart`). Decisions worth knowing: it uses the week she
+    is in, not the day the strip is showing, so tiles do not shuffle while she browses; sleep points at Symptoms and
+    "how the baby's growing" at Scans & tests, because those are the nearest doors (there is no door of their own);
+    the PDF names nothing for weeks 14 to 31, so those weeks lead with nothing and the table's order stands. **Not
+    done:** the three doors added on 2026-09-29 (Your first weeks, Getting ready, Work & money) have no onboarding
+    answer that points at them, so they only move with the table; a chosen door is not marked as chosen.

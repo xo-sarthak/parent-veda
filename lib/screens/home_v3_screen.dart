@@ -118,6 +118,8 @@ import 'nutrition/door/nutrition_door.dart';
 // five below it.
 // import 'brackets/scans_hub_screen.dart';
 import '../services/bracket_resolver.dart';
+import '../services/family_profile.dart' show FamilyProfileStore;
+import '../services/preg_tile_order.dart';
 import '../services/surface_router.dart';
 import 'v2/v3_bracket_art.dart';
 import 'v2/v3_daily.dart';
@@ -306,6 +308,9 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
         PregArrivalPrompt.instance,
         // The hero line and the size card name the set she chose.
         PregSizeSetStore.instance,
+        // The door tiles lead with what she chose in onboarding, so a change
+        // in Profile must reorder them (2026-09-30, preg_tile_order.dart).
+        FamilyProfileStore.instance,
       ]),
       builder: (context, _) => _build(context),
     );
@@ -1264,7 +1269,17 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
   /// `surfaceId -> homeFor() -> AppNav.go(tabIndex)`; these push a bracket
   /// route. Same rectangle, different kind of object.
   List<V2Block> _brackets(BuildContext context, V2Palette p) => [
-        for (final b in bracketsFor(LifeStage.pregnancy))
+        // ⚠️ RANKED, NEVER HIDDEN (2026-09-30, gap analysis "Order the door tiles
+        // by her week and her answers"). Her onboarding choices lead, then her
+        // trimester's, then the table's own order; every door is still here.
+        // It takes the week she is IN, not the day the strip is showing, so the
+        // tiles do not shuffle while she browses. Kept for revert:
+        //   for (final b in bracketsFor(LifeStage.pregnancy))
+        for (final b in orderPregnancyTiles(
+          bracketsFor(LifeStage.pregnancy),
+          week: pregnancy.currentWeek,
+          priorities: FamilyProfileStore.instance.pregPriorities,
+        ))
           V2Block(
             label: b.label.of(pregnancy.language),
             // Never rendered — bracketMark always wins — but required, and a

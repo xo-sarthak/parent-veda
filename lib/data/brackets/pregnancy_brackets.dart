@@ -11,6 +11,10 @@
 //  carries anomaly scan ~135,000 and ectopic ~74,000 — the highest-volume entry
 //  point in the product. It is door one because of the data, not because of
 //  taste. Do not reorder for visual balance.
+//  The pregnancy home leads with her onboarding choices and her trimester's
+//  doors on top of this order (lib/services/preg_tile_order.dart, 2026-09-30);
+//  this table stays the default and the tie-breaker, so it is still the order
+//  to edit if the demand ranking changes.
 //
 //  ⚠️ EVERY LAYER IS DECLARED ON EVERY BRACKET, including the ones that render
 //  nothing. Seventy cells, no defaulting. An omitted layer would inherit
