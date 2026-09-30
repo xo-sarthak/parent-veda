@@ -31,6 +31,7 @@ import 'services/life_stage_store.dart';
 import 'screens/pregnancy/preg_messages_screen.dart' show pregOpenMessageFromPhone;
 import 'services/auth/session_watch.dart';
 import 'services/family_profile.dart';
+import 'services/ready_birth_context_store.dart';
 import 'services/profile_analytics.dart';
 import 'doctor/doctor_schedule_store.dart';
 import 'memories/memory_analytics.dart';
@@ -376,6 +377,9 @@ class _ParentVedaAppState extends State<ParentVedaApp>
     // source of truth (health/feeding/sleep/priorities/learning). Features read
     // it to tailor content, recommendations and ordering (never navigation).
     FamilyProfileStore.instance.init();
+    // Twins or more (2026-09-30): the answer lives here, and the home, the week
+    // page and Learn read it on a cold start, not only after the hospital bag opens.
+    ReadyBirthContextStore.instance.init();
     // Send profiling analytics to Supabase (profile_events, 0028) instead of
     // the debug sink - one line, covers both sides of the app, and every insert
     // is fire-and-forget so a network hiccup can never touch a session.

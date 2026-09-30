@@ -44,6 +44,7 @@ import '../memories/memories_home_screen.dart';
 import '../post_pregnancy/my_bookings_screen.dart';
 import '../post_pregnancy/provider_results_screen.dart';
 import '../pregnancy_profile_screen.dart';
+import '../pregnancy/preg_twins.dart';
 import '../pregnancy/preg_due_date_screen.dart' show openPregDueDate;
 import '../pregnancy/preg_ended_screen.dart' show openPregEnded;
 import '../../data/doors/pv_door_after_loss.dart' show kPregEndedRowTitle, kPregEndedRowSub;
@@ -851,6 +852,14 @@ final PvYouStageContent _pregnancy = PvYouStageContent(
       },
       note:
           'A date from a scan or your doctor is theirs — we never recalculate it.',
+    ),
+    // The promise onboarding makes ("You can say so later"), kept (2026-09-30,
+    // gap analysis P2). One answer, shared with the hospital bag's switch.
+    PvYouDetail(
+      label: 'Twins or more',
+      value: pregTwinsValue,
+      edit: (c) => showPregTwinsSheet(c),
+      note: 'Your weeks will say so, and the pieces for twins lead. Your due date is not changed.',
     ),
     PvYouDetail(
       label: 'First pregnancy',

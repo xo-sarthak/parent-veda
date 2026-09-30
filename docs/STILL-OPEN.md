@@ -9975,6 +9975,22 @@ not here. Owed:
     anything more needs the service side (CLAUDE.md, the wire body is a two-repo contract); (4) the Weight tool
     is a separate log, and a doctor may want the three together on one page; (5) no chart yet, on purpose: a
     line through her numbers invites reading a trend into them.
+  - **§81.18 Twins or more (2026-09-30).** Built, from the PDF's "Make the twins promise true" (P2): a **Twins or
+    more** row in You › Details (One baby / Twins or more, in a small sheet, `lib/screens/pregnancy/preg_twins.dart`).
+    It is the SAME value the hospital bag's twins switch already wrote and the profile engine already read
+    (`ReadyBirthContextStore.twins`), so there is one answer and two ways to set it, and `main.dart` now loads that
+    store at start so a cold start remembers it. What it changes: the hero's size line says "Each about the size of a
+    banana"; the week page says "What your babies are doing" and adds one line ("averages for one baby, twins often
+    grow a little more slowly in the last weeks, your scans are the measure"); Twins and more leads Learn. **It never
+    touches her due date** (What to Expect offers "Re-Calculate Due Date" for twins; a clinic-owned date is not ours).
+    Held by `test/preg_twins_test.dart`. **Not done:** (1) the reveal screen line ("Carrying more than one? Tell us and
+    your weeks will say so") and the onboarding footnote, left alone because the user said to leave the onboarding
+    screens for now; (2) every other "your baby" on the week pages, the daily pieces and the reads is still singular:
+    only the size line, the doing heading and the footnote change, because the authored copy is singular and a blanket
+    replace would put "your babies is" into it; (3) a "Twins" size set (What to Expect has one) is not built; (4) the
+    27 twin articles the PDF counts are the door's own reads, not new content; (5) a clinician should read the twin
+    growth line; (6) Ask Veda is not told, which needs the service side (CLAUDE.md, the wire body is a two-repo
+    contract): the field would be `expecting_twins` (bool) and the service should frame twin questions accordingly.
   - **§81.16 A migration for Spiritual reading's "not interested" marks (2026-09-30).** The screen saved "not
     interested" under `title.now` (the display title) while "interested" and the sort used `title.en`, so in Hindi
     the mark was saved as a Devanagari title and matched nothing after a switch (the `.en` is identity, `.now` is

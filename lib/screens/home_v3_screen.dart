@@ -119,6 +119,8 @@ import 'nutrition/door/nutrition_door.dart';
 // import 'brackets/scans_hub_screen.dart';
 import '../services/bracket_resolver.dart';
 import '../services/family_profile.dart' show FamilyProfileStore;
+import '../services/ready_birth_context_store.dart' show ReadyBirthContextStore;
+import 'pregnancy/preg_twins.dart' show pregSizeLineFor;
 import '../services/preg_tile_order.dart';
 import '../services/surface_router.dart';
 import 'v2/v3_bracket_art.dart';
@@ -311,6 +313,8 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
         // The door tiles lead with what she chose in onboarding, so a change
         // in Profile must reorder them (2026-09-30, preg_tile_order.dart).
         FamilyProfileStore.instance,
+        // "Each about the size of" for twins (2026-09-30, preg_twins.dart).
+        ReadyBirthContextStore.instance,
       ]),
       builder: (context, _) => _build(context),
     );
@@ -1627,7 +1631,8 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
         pregSizeOrFallback(week, PregSizeSetStore.instance.set, w.snapshot.fruit.en);
     if (item == null) return null;
     final parts = [
-      item.line,
+      // Twins: "Each about the size of ..." (preg_twins.dart). Kept for revert: item.line,
+      pregSizeLineFor(item.line),
       w.snapshot.length.en.trim(),
       w.snapshot.weight.en.trim(),
     ].where((s) => s.isNotEmpty);

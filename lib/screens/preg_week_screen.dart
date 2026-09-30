@@ -40,6 +40,7 @@ import '../services/pregnancy_controller.dart';
 import '../theme/pv_fonts.dart';
 import 'v2/v2_palette.dart';
 import 'v2/v3_preg_hero.dart' show PregField, pregBabyArt;
+import 'pregnancy/preg_twins.dart';
 import 'pregnancy/preg_chrome.dart' show pregSectionHeadingStyle;
 import 'products/pv_store_chrome.dart' show kPvLine;
 
@@ -338,9 +339,13 @@ class _WeekBody extends StatelessWidget {
         // The desk, not a doctor: we have no named reviewer and will not print
         // one. The line still says whose words these are.
         Text(
-          'ParentVeda editorial · averages for the week, never a measurement of your baby',
+          'ParentVeda editorial · averages for the week, never a measurement of your ${pregBabies()}',
           style: pvManrope(fontSize: 12, height: 1.45, color: p.ink3),
         ),
+        if (pregExpectingTwins) ...[
+          const SizedBox(height: 6),
+          Text(kPregTwinWeekNote, style: pvManrope(fontSize: 12, height: 1.45, color: p.ink3)),
+        ],
         const SizedBox(height: 18),
 
         // ---- length · weight · size ------------------------------------------
@@ -389,7 +394,8 @@ class _WeekBody extends StatelessWidget {
         ],
         if (doing.isNotEmpty) ...[
           const SizedBox(height: 18),
-          h('What your baby is doing'),
+          // Kept for revert: h('What your baby is doing'),
+          h('What your ${pregBabies()} ${pregExpectingTwins ? 'are' : 'is'} doing'),
           const SizedBox(height: 6),
           body(doing),
         ],

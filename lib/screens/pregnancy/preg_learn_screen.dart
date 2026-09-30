@@ -49,6 +49,8 @@ import '../../data/brackets/pregnancy_brackets.dart';
 import '../../data/doors/pv_door_after_loss.dart';
 import '../../data/doors/pv_door_data.dart';
 import '../../data/doors/pv_door_twins.dart';
+import '../../services/ready_birth_context_store.dart';
+import 'preg_twins.dart' show pregExpectingTwins;
 import '../../data/learn/pv_learn_view.dart';
 import '../../data/prepare_data.dart' show kPrepOpeningSoon;
 import '../../data/reads/pregnancy_reads.dart' show pregnancyReadById;
@@ -218,7 +220,19 @@ class _PregLearnScreenState extends State<PregLearnScreen> {
   final Set<String> _expanded = {};
   final Set<int> _openFaq = {};
 
-  late final List<PregLearnTopic> _topics = pregLearnTopics();
+  late final List<PregLearnTopic> _baseTopics = pregLearnTopics();
+
+  /// Twins and more leads once she has said she is carrying more than one
+  /// (2026-09-30, gap analysis P2). Ranking only: every topic is still here, once.
+  // Kept for revert: `late final _topics = pregLearnTopics();`
+  List<PregLearnTopic> get _topics => pregExpectingTwins
+      ? [
+          for (final t in _baseTopics)
+            if (t.bracket.id == kPregTwinsBracket.id) t,
+          for (final t in _baseTopics)
+            if (t.bracket.id != kPregTwinsBracket.id) t,
+        ]
+      : _baseTopics;
   late final List<PvRead> _start = pregLearnStartHere();
   late final List<(PvReadFaq, PvRead)> _faqs = pregLearnFaqs();
   late final List<PvOfferingView> _courses = _loadCourses();
@@ -318,6 +332,8 @@ class _PregLearnScreenState extends State<PregLearnScreen> {
         SavedStore.instance,
         PvReadStore.instance,
         PvSearchStore.instance,
+        // Twins and more leads when she says so (preg_twins.dart).
+        ReadyBirthContextStore.instance,
       ]),
       builder: (context, _) {
         final p = pvStorePalette;

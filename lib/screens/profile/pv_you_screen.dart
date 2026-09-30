@@ -44,6 +44,7 @@ import '../../screens/post_pregnancy/pp_child_profile.dart';
 import '../../services/app_nav.dart';
 import '../../services/entitlement_store.dart';
 import '../../services/family_profile.dart';
+import '../../services/ready_birth_context_store.dart';
 import '../../services/journey_dates_store.dart';
 import '../../services/father_preview.dart';
 import '../../models/pv_product.dart' show PvStageCopy;
@@ -249,6 +250,8 @@ class _PvYouScreenState extends State<PvYouScreen> {
     BookingStore.instance,
     // Her photo on the hero (2026-09-30).
     ProfilePhotoStore.instance,
+    // The Twins or more row reads it (2026-09-30).
+    ReadyBirthContextStore.instance,
     if (PregnancyController.current != null) PregnancyController.current!,
   ];
 
