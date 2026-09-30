@@ -10,6 +10,7 @@
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../data/nutrition/chart_ingredients.dart';
 import '../../../data/nutrition_data.dart';
 import '../../../services/nutrition_day_store.dart';
 import '../../../theme/pv_fonts.dart';
@@ -18,14 +19,25 @@ import '../../doors/pv_door_chrome.dart';
 import '../../v2/v2_palette.dart';
 import 'nutrition_widgets.dart';
 
+/// What a group on the list is called: a recipe's name, or "Vegetarian chart ·
+/// Day 2" for the things a chart day asked for (2026-09-30), else the id itself.
+String shoppingGroupTitle(String rid) {
+  final c = parseChartListId(rid);
+  if (c != null) {
+    final chart = kDietCharts.where((x) => x.id == c.chartId).firstOrNull;
+    final name = chart?.title.en ?? c.chartId;
+    return c.dayIndex == null ? '$name · every day' : '$name · Day ${c.dayIndex! + 1}';
+  }
+  return kRecipes.where((x) => x.id == rid).firstOrNull?.name.en ?? rid;
+}
+
 class ShoppingListScreen extends StatelessWidget {
   const ShoppingListScreen({super.key});
 
   String _text(List<ShoppingItem> items) {
     final b = StringBuffer('Shopping list, from ParentVeda\n');
     for (final rid in items.map((s) => s.recipeId).toSet()) {
-      final r = kRecipes.where((x) => x.id == rid).firstOrNull;
-      b.writeln('\n${r?.name.en ?? rid}');
+      b.writeln('\n${shoppingGroupTitle(rid)}');
       for (final s in items.where((s) => s.recipeId == rid && !s.done)) {
         b.writeln('  · ${s.name}');
       }
@@ -38,7 +50,7 @@ class ShoppingListScreen extends StatelessWidget {
         hue: 104,
         eyebrow: 'Nutrition · Your list',
         title: 'Your list',
-        intro: 'Ingredients from the recipes you picked. Tick them off at the shop, or send the list to whoever is going.',
+        intro: 'Ingredients from the recipes and diet chart days you picked. Tick them off at the shop, or send the list to whoever is going.',
         children: [
           ListenableBuilder(
             listenable: NutritionDayStore.instance,
@@ -51,7 +63,7 @@ class ShoppingListScreen extends StatelessWidget {
                 return pvDoorPad(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   nutritionHeading(p, 'Nothing on it yet'),
                   const SizedBox(height: 8),
-                  Text('Open any recipe and tap "Add to my list". Its ingredients land here, grouped by dish.',
+                  Text('Open a recipe or a diet chart day and tap "Add to my list". What it needs lands here, grouped by dish or day.',
                       style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2)),
                 ]));
               }
@@ -83,9 +95,9 @@ class ShoppingListScreen extends StatelessWidget {
                 const SizedBox(height: 22),
                 for (final rid in recipes) ...[
                   pvDoorPad(Row(children: [
-                    Expanded(child: nutritionHeading(p, kRecipes.where((x) => x.id == rid).firstOrNull?.name.en ?? rid)),
+                    Expanded(child: nutritionHeading(p, shoppingGroupTitle(rid))),
                     IconButton(
-                      tooltip: 'Remove this recipe',
+                      tooltip: 'Remove this group',
                       icon: Icon(Icons.close_rounded, size: 18, color: p.ink3),
                       onPressed: () {
                         pvCommitFeedback();

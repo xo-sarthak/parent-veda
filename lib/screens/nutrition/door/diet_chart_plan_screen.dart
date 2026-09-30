@@ -26,6 +26,7 @@ import 'package:flutter/material.dart';
 
 import '../../../data/diet_chart_content.dart';
 import '../../../data/nutrition/nutrition_photos.dart';
+import '../../../data/nutrition/chart_ingredients.dart';
 import '../../../data/nutrition/food_values.dart';
 import '../../../data/nutrition_data.dart';
 import '../../../services/nutrition_day_store.dart';
@@ -39,6 +40,7 @@ import '../../../services/diet_chart_pdf.dart';
 import 'meal_sheet.dart';
 import '../../../data/nutrition/nutrition_plate.dart';
 import 'nutrition_widgets.dart';
+import 'recipe_cook_screen.dart' show openShoppingList;
 
 class DietChartPlanScreen extends StatefulWidget {
   const DietChartPlanScreen({super.key, required this.chart, this.pregnancy});
@@ -160,6 +162,13 @@ class _DietChartPlanScreenState extends State<DietChartPlanScreen> {
                       child: NutritionValuesGrid(p: p, values: total, title: '${content.days[_day].label.en}, estimated'),
                     );
                   }),
+                  // ---- what to buy, for this day or for all of them --------
+                  // (2026-09-30, the PDF's "with a shopping list button".) The
+                  // chart's sentences become things to buy (chart_ingredients.dart,
+                  // for a nutritionist to verify) and land on the same list the
+                  // recipes use, grouped under this day.
+                  pvDoorPad(_shopping(p, content, store)),
+                  const SizedBox(height: 26),
                   // ---- make it hers ---------------------------------------
                   pvDoorPad(mine
                       ? Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
@@ -231,6 +240,71 @@ class _DietChartPlanScreenState extends State<DietChartPlanScreen> {
         );
       },
     );
+  }
+
+  /// "To buy for Day 1": the things, then one button for the day and a quiet one
+  /// for the whole chart. Once a day is on the list the button says so and opens
+  /// the list, so a second tap is never an accidental duplicate.
+  Widget _shopping(V2Palette p, ChartContent content, NutritionDayStore store) {
+    final chartId = widget.chart.id;
+    final dayItems = chartDayIngredients(content.days[_day]);
+    final dayId = chartListId(chartId, dayIndex: _day);
+    final dayOn = dayItems.isNotEmpty && dayItems.every((n) => store.itemOnList(dayId, n));
+    final weekItems = chartWeekIngredients(content);
+    final weekId = chartListId(chartId);
+    final weekOn = weekItems.isNotEmpty && weekItems.every((n) => store.itemOnList(weekId, n));
+    if (dayItems.isEmpty) return const SizedBox.shrink();
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      _heading(p, 'To buy for ${content.days[_day].label.en}',
+          sub: 'The things this day needs, from the meals above. You know what is already in your kitchen.'),
+      const SizedBox(height: 14),
+      Wrap(spacing: 8, runSpacing: 8, children: [
+        for (final n in dayItems)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(color: p.line),
+            ),
+            child: Text(n, style: pvManrope(fontSize: 13, height: 1.3, color: p.ink1)),
+          ),
+      ]),
+      const SizedBox(height: 16),
+      OutlinedButton.icon(
+        key: const ValueKey('chart_add_day'),
+        style: _pill(p),
+        onPressed: () {
+          pvCommitFeedback();
+          if (dayOn) {
+            openShoppingList(context);
+          } else {
+            store.addToList(dayId, dayItems);
+          }
+        },
+        icon: Icon(dayOn ? Icons.check_rounded : Icons.add_shopping_cart_outlined, size: 18, color: p.ink1),
+        label: Text(dayOn ? 'On your list  ·  view list' : 'Add ${content.days[_day].label.en} to my list',
+            style: pvManrope(fontSize: 14, fontWeight: FontWeight.w700, color: p.ink1)),
+      ),
+      if (content.days.length > 1) ...[
+        const SizedBox(height: 4),
+        Center(
+          child: TextButton(
+            key: const ValueKey('chart_add_week'),
+            onPressed: () {
+              pvCommitFeedback();
+              if (weekOn) {
+                openShoppingList(context);
+              } else {
+                store.addToList(weekId, weekItems);
+              }
+            },
+            child: Text(weekOn ? 'Every day is on your list  ·  view list' : 'Add all ${content.days.length} days',
+                style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w700, color: p.ink2)),
+          ),
+        ),
+      ],
+    ]);
   }
 
   ButtonStyle _pill(V2Palette p) => OutlinedButton.styleFrom(

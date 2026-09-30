@@ -10002,14 +10002,23 @@ not here. Owed:
     safe from week 12") is authored exercise copy we do not have, so the card names the read instead; a clinician
     should read which Move reads are offered from which week; the rail is now up to nine cards on a full day, and
     whether that is too many is a call to make on a device; the myth is week-level, so it changes weekly, not daily.
-  - **§81.20 "This week's plate" is already built, so not rebuilt (2026-09-30).** The PDF asks to turn the vegetarian
-    chart into a day-at-a-time story with a shopping-list button. The Nutrition door already does the story:
-    `DietChartPlanScreen` (a week grid and a day strip, meal rows with photos, "Make this my chart" to pin it so Today
-    follows it, and a PDF export), and its Today tab draws the plate for the day from the pinned chart. The door also
-    has "Your shopping list". **The one real gap:** the shopping list fills only from recipes (recipe to ingredients),
-    and a chart's meals are plain text ("Rajma with rice, palak sabzi, salad") with no ingredient data, so a chart
-    day cannot add itself to the list. Closing it needs a meal-to-ingredients mapping (new content a nutritionist
-    should check); left owed, on the user's call to skip work the door already covers.
+  - **§81.20 "This week's plate", and the diet chart shopping list (2026-09-30).** The PDF's "7-day plan she can
+    follow, day by day, with a shopping list button" was mostly built already: the Nutrition door draws a chart as a
+    day-by-day plan (`DietChartPlanScreen`: week grid, day strip, meal rows with photos, "Make this my chart", PDF
+    export) and its Today tab follows the pinned chart, so the story was not rebuilt. **The gap was the shopping list**,
+    which filled only from recipes while a chart's meals are plain sentences. Closed: `lib/data/nutrition/
+    chart_ingredients.dart` turns every meal sentence into what to buy (about 130 rules over an Indian kitchen, with
+    "a named vegetable replaces seasonal vegetables" style drops, no salt, oil, water or sugar, no quantities), all 251
+    distinct meals across all 19 charts produce a list, and the chart screen has **"To buy for Day N"** (the things, then
+    **Add Day N to my list** and **Add all N days**), filed under "Chart title · Day N" on the existing list, which now
+    also names chart groups. Held by `test/chart_shopping_test.dart`. **TO BE VERIFIED BY THE NUTRITIONIST:** the
+    ingredient names and which dish implies which ingredient are our reading of everyday Indian cooking, written to
+    follow the chart's own norms; a nutritionist should read `_kRules` and the two drop tables in
+    `chart_ingredients.dart` (that is the whole of it; the parsing code does not change). Known simplifications to
+    check: dals are named "toor or moong" where the chart says only "dal"; regional dishes (undhiyu, handvo, idada,
+    bisi bele bath, pesarattu) list their base ingredients rather than every spice; kheer and shrikhand are
+    listed as themselves or by their base; "seasonal vegetables" stands where a chart says only "a sabzi".
+
   - **§81.16 A migration for Spiritual reading's "not interested" marks (2026-09-30).** The screen saved "not
     interested" under `title.now` (the display title) while "interested" and the sort used `title.en`, so in Hindi
     the mark was saved as a Devanagari title and matched nothing after a switch (the `.en` is identity, `.now` is
