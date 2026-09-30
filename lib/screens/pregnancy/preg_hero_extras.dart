@@ -45,6 +45,24 @@ String pregTimeLeft(int daysToDue) {
   return w == 1 ? '1 week to go' : '$w weeks to go';
 }
 
+/// The week PAGE a mother past her due date belongs on (2026-09-30): 41 from
+/// 41 weeks (a full week past), 42 from 42 weeks, and null before that, where week
+/// 40's own page still fits ("40 weeks and 3 days"). It follows the hero's count
+/// ([pregPastDueCount]) exactly, so the line under "Week 41" and the page it opens
+/// cannot disagree. The pages exist (`preg_week_extras_special.dart`, "One week
+/// past your due date" and "Two weeks past") but the home clamped the week to 40,
+/// so Details opened week 40 for as long as she waited. The figure's art stays at
+/// week 40 (there is none past it, `pregBabyArt` clamps), the carry-forward the
+/// user chose.
+///
+/// [daysToDue] is negative once the date has passed, as in [pregTimeLeft].
+int? pregPastDueWeek(int daysToDue) {
+  if (daysToDue >= 0) return null;
+  final over = -daysToDue;
+  if (over < 7) return null;
+  return over < 14 ? 41 : 42;
+}
+
 /// "40 weeks and 3 days", for a day past the due date. Null before it.
 String? pregPastDueCount(int daysToDue) {
   if (daysToDue >= 0) return null;

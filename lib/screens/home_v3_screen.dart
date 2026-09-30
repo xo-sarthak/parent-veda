@@ -120,6 +120,8 @@ import 'nutrition/door/nutrition_door.dart';
 import '../services/bracket_resolver.dart';
 import '../services/family_profile.dart' show FamilyProfileStore;
 import '../services/ready_birth_context_store.dart' show ReadyBirthContextStore;
+import '../services/preg_messages_store.dart' show PregMessagesStore;
+import 'pregnancy/preg_messages_screen.dart' show openPregMessages;
 import 'pregnancy/preg_myth_sheet.dart' show showPregMythSheet;
 import 'pregnancy/preg_twins.dart' show pregSizeLineFor;
 import '../services/preg_tile_order.dart';
@@ -316,6 +318,8 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
         FamilyProfileStore.instance,
         // "Each about the size of" for twins (2026-09-30, preg_twins.dart).
         ReadyBirthContextStore.instance,
+        // The envelope's unread count (2026-09-30).
+        PregMessagesStore.instance,
       ]),
       builder: (context, _) => _build(context),
     );
@@ -432,7 +436,10 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
             if (day != null)
               V3PregHero(
                 p: p,
-                week: week,
+                // "Week 41" once she is past her due date (2026-09-30); the
+                // figure's art clamps to week 40 inside the hero. Kept for revert:
+                // week: week,
+                week: _pageWeek(week),
                 day: activeDay,
                 selected: _selected,
                 today: _today,
@@ -460,7 +467,10 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
                 // the rest. Kept for revert:
                 //   sizeLine: _sizeLine(week, weekContent),
                 //   onSize / onThisWeek: () => _openWeekSheet(context, week, weekContent, p),
-                onDetails: () => openPregWeek(context, pregnancy, week),
+                onDetails: () => openPregWeek(context, pregnancy, _pageWeek(week)),
+                // The envelope, top right (2026-09-30).
+                onMessages: () => openPregMessages(context, pregnancy),
+                unreadMessages: PregMessagesStore.instance.unreadCount,
                 // "20 weeks to go" with an (i), and past the due date the
                 // count keeps going (2026-09-30, gap analysis). Counted for the
                 // SELECTED day, like everything else on the fold.
@@ -1698,9 +1708,9 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
         // The week page, Flo's Details (2026-09-22). Not the stack (the user
         // cut that wire, 2026-09-21); the size sheet before that. Kept for
         // revert: _openWeek(context, week); _openWeekSheet(…).
-        openPregWeek(context, pregnancy, week);
+        openPregWeek(context, pregnancy, _pageWeek(week));
       case PregInsightGo.size:
-        openPregWeek(context, pregnancy, week);
+        openPregWeek(context, pregnancy, _pageWeek(week));
       case PregInsightGo.eat:
         _openBracket(context, kNutritionBracketId);
       case PregInsightGo.safe:
@@ -1716,6 +1726,14 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
               builder: (_) => ReadItemScreen(item: r, controller: pregnancy)));
         }
     }
+  }
+
+  /// The week page to open: the week itself, or 41 / 42 once she is past her due
+  /// date and the fold has reached week 40 (2026-09-30, `pregPastDueWeek`). The
+  /// hero's figure keeps week 40's art; there is none past it.
+  int _pageWeek(int week) {
+    if (week < 40) return week;
+    return pregPastDueWeek(_daysToDue(_today)) ?? week;
   }
 
   /// Days from [date] to the due date; negative once it has passed.

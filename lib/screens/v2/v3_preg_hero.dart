@@ -165,6 +165,8 @@ class V3PregHero extends StatefulWidget {
     this.onDetails,
     this.onAvatar,
     this.onSaved,
+    this.onMessages,
+    this.unreadMessages = 0,
     this.timeLeft,
     this.pastDueCount,
     this.onHowCounted,
@@ -193,6 +195,14 @@ class V3PregHero extends StatefulWidget {
   /// The avatar. Null: the stage-door menu, as the shared chrome does.
   final VoidCallback? onAvatar;
   final VoidCallback? onSaved;
+
+  /// The Messages inbox, top right beside Saved (2026-09-30: the inbox was on More
+  /// only, so a mother had to know it existed). Null draws no envelope.
+  final VoidCallback? onMessages;
+
+  /// Unread messages, drawn as a small ink count on the envelope, never the brand
+  /// colour. Zero draws none.
+  final int unreadMessages;
 
   /// "20 weeks to go", under the day (2026-09-30, gap analysis). Null: none.
   final String? timeLeft;
@@ -240,30 +250,88 @@ class _V3PregHeroState extends State<V3PregHero> {
           // ⚠️ THE SELECTED DAY, NOT `now` (the TTC rule): tap back three days
           // and the date at the top moves with the cards. The year appears
           // only when the selection leaves the current one.
-          Row(children: [
-            _Round(
-              p: p,
-              boxKey: _avatarKey,
-              semantic: 'You',
-              onTap: widget.onAvatar ?? () => showStageDoorMenu(context, _avatarKey),
-              child: widget.initial.isEmpty
-                  ? Icon(Icons.person_outline_rounded, size: 18, color: p.ink2)
-                  : Text(widget.initial.toUpperCase(),
-                      style: pvJakarta(fontSize: 14, fontWeight: FontWeight.w700, color: p.ink1)),
-            ),
-            const Spacer(),
-            Text(
-                '${sel.day} ${V3PregHero._months[sel.month - 1]}'
-                '${sel.year == now.year ? '' : ' ${sel.year}'}',
-                style: pvManrope(fontSize: 15, fontWeight: FontWeight.w800, letterSpacing: 0.1, color: p.ink1)),
-            const Spacer(),
-            _Round(
-              p: p,
-              semantic: 'Saved',
-              onTap: widget.onSaved ?? () {},
-              child: Icon(Icons.bookmark_border_rounded, size: 18, color: p.ink2),
-            ),
-          ]),
+          // ⚠️ THE DATE STAYS CENTRED WHATEVER SITS EITHER SIDE (2026-09-30, the
+          // envelope joined Saved on the right). A row of `Spacer`s centres the date
+          // only while both sides are the same width, so each side now has one fixed
+          // width (the wider of the two), and the date scales down before it would
+          // overflow at a large text size. Kept for revert: the Row of two Spacers.
+          Builder(builder: (context) {
+            final side = widget.onMessages != null ? 84.0 : 38.0;
+            return Row(children: [
+              SizedBox(
+                width: side,
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: _Round(
+                    p: p,
+                    boxKey: _avatarKey,
+                    semantic: 'You',
+                    onTap: widget.onAvatar ?? () => showStageDoorMenu(context, _avatarKey),
+                    child: widget.initial.isEmpty
+                        ? Icon(Icons.person_outline_rounded, size: 18, color: p.ink2)
+                        : Text(widget.initial.toUpperCase(),
+                            style: pvJakarta(fontSize: 14, fontWeight: FontWeight.w700, color: p.ink1)),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Center(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                        '${sel.day} ${V3PregHero._months[sel.month - 1]}'
+                        '${sel.year == now.year ? '' : ' ${sel.year}'}',
+                        style: pvManrope(fontSize: 15, fontWeight: FontWeight.w800, letterSpacing: 0.1, color: p.ink1)),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: side,
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    // The envelope (2026-09-30): the weekly note and the moments worth
+                    // remembering, one tap from Today. Ink count, never coral.
+                    if (widget.onMessages != null) ...[
+                      Stack(clipBehavior: Clip.none, children: [
+                        _Round(
+                          p: p,
+                          boxKey: const ValueKey('preg_hero_messages'),
+                          semantic:
+                              widget.unreadMessages > 0 ? 'Messages, ${widget.unreadMessages} unread' : 'Messages',
+                          onTap: widget.onMessages!,
+                          child: Icon(Icons.mail_outline_rounded, size: 18, color: p.ink2),
+                        ),
+                        if (widget.unreadMessages > 0)
+                          Positioned(
+                            top: -3,
+                            right: -3,
+                            child: IgnorePointer(
+                              child: Container(
+                                key: const ValueKey('preg_hero_messages_count'),
+                                constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+                                padding: const EdgeInsets.symmetric(horizontal: 4),
+                                alignment: Alignment.center,
+                                decoration: const BoxDecoration(color: Color(0xFF2F2C30), shape: BoxShape.circle),
+                                child: Text(widget.unreadMessages > 9 ? '9+' : '${widget.unreadMessages}',
+                                    style: pvManrope(fontSize: 9.5, fontWeight: FontWeight.w800, color: Colors.white)),
+                              ),
+                            ),
+                          ),
+                      ]),
+                      const SizedBox(width: 8),
+                    ],
+                    _Round(
+                      p: p,
+                      semantic: 'Saved',
+                      onTap: widget.onSaved ?? () {},
+                      child: Icon(Icons.bookmark_border_rounded, size: 18, color: p.ink2),
+                    ),
+                  ]),
+                ),
+              ),
+            ]);
+          }),
           const SizedBox(height: 16),
 
           // ---- the week ---------------------------------------------------------

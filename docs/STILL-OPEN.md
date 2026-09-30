@@ -9884,7 +9884,7 @@ not here. Owed:
     journey › Messages), the switches (Reminders › From ParentVeda), taps that open the page each names. Owed:
     (a) **onboarding's preview** still says "Week N starts tomorrow, here's what to expect." while the note arrives the
     morning the week starts ("Week N starts today"); onboarding is parked by the user, so the one-line change waits.
-    (b) **A way in from Today.** The inbox is on More only; a quiet envelope on the V3 home is the natural second door.
+    (b) ~~A way in from Today.~~ **Done 2026-09-30, §81.21:** an envelope top right of the home hero.
     (c) **His messages** at the same moments are the father-mode pass; today the partner side gets none, on purpose.
     (d) **A doctor's read** of the six moment lines before launch (the Tdap line in particular says what it protects
     against).
@@ -9991,6 +9991,19 @@ not here. Owed:
     27 twin articles the PDF counts are the door's own reads, not new content; (5) a clinician should read the twin
     growth line; (6) Ask Veda is not told, which needs the service side (CLAUDE.md, the wire body is a two-repo
     contract): the field would be `expecting_twins` (bool) and the service should frame twin questions accordingly.
+  - **§81.21 The envelope on Today, and the week 41 and 42 pages reached (2026-09-30).** Two small things. (1) **A way into
+    Messages from Today** (§81.9 b): a round envelope top right of the pregnancy hero, beside Saved, with a small ink
+    count of unread messages (capped at 9+, none at zero, never the brand colour); it opens the same inbox as More.
+    The date stays centred: each side of the top row is one fixed width and the date scales down before it would
+    overflow. (2) **Past her due date she lands on the page for it.** The pages for weeks 41 and 42 already existed
+    (`preg_week_extras_special.dart`) but the home clamped the week to 40, so Details opened week 40 however long she
+    waited. Now `pregPastDueWeek` (in `preg_hero_extras.dart`) gives 41 from "41 weeks" and 42 from "42 weeks", exactly
+    the hero's own count, so the line under "Week 41" and the page it opens cannot disagree; before that (40 weeks and
+    a few days) week 40's page still fits. The hero says "Week 41" / "Week 42"; the figure keeps week 40's art (none
+    past it), which is the carry-forward the user chose. Held by `test/preg_messages_way_in_test.dart`. **Not done:**
+    the hero art, the week card stack, the calendar and Garbh daily still stop at 40; the size and "what your baby is
+    doing" cards on the home speak of week 40 while she is past it; the 41 and 42 pages' wording is owed a
+    clinician's read (already noted in §81.2).
   - **§81.19 Myth or fact and Move on the rail (2026-09-30).** Built, from the PDF's "A Myth or fact and a Move card"
     (P3), the two cards §72 listed as owed. **Myth or fact**: the week's own `mythBuster` (written for all 37
     weeks), the myth as the card and the answer in a small sheet (`lib/screens/pregnancy/preg_myth_sheet.dart`),
