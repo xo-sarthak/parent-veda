@@ -17,6 +17,17 @@
 //  with a reusable Medical Disclaimer.
 //
 //  Content: lib/data/tests_scans_reports_data.dart.
+//
+//  ⚠️ ONE PARENTVEDA (2026-09-30, the pregnancy restyle, after main's TTC
+//  records and test library). The page is the TTC tool's shape in pregnancy's
+//  pieces (`preg_chrome.dart`): the app bar carries only the back arrow and
+//  the serif page title sits on the page; the library is ONE white card of
+//  rows with drawn marks (a scan's fan, a report's page, a body for a
+//  finding) and hairlines between them, in the Tools tab's "Track" hue, so
+//  the row and the tile that opened it read as one place. The teal accent,
+//  the soft shadows, the gradient header and the amber blocks behind text are
+//  gone: selected chips and the toggle are the one ink, a section is a white
+//  card with the hairline, and the disclaimer is a quiet note on the page.
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -24,15 +35,36 @@ import 'package:flutter/material.dart';
 import '../../data/tests_scans_reports_data.dart';
 import '../../localization/app_language.dart';
 import '../../services/pregnancy_controller.dart';
-import '../../theme/app_theme.dart';
 // Kept for revert alongside the commented-out `pregHealthStrip` call below.
 // import '../../widgets/profile_ask_strip.dart';
 import '../../theme/pv_fonts.dart';
+import '../brackets/hub/hub_intent_art.dart';
+import '../doors/pv_list_row.dart' show PvMarkWell;
+import '../pregnancy/preg_chrome.dart';
+import '../products/pv_store_chrome.dart' show PvChip, kPvInk, kPvLine, pvStorePalette;
 
-const Color _accent = Color(0xFF2E9C8E); // calm teal (matches Scans / Journal)
-const List<BoxShadow> _soft = [
-  BoxShadow(color: Color(0x0F2D144C), blurRadius: 12, offset: Offset(0, 3)),
-];
+// Kept for revert (2026-09-30): the teal accent and the soft card shadow.
+// const Color _accent = Color(0xFF2E9C8E); // calm teal (matches Scans / Journal)
+// const List<BoxShadow> _soft = [
+//   BoxShadow(color: Color(0x0F2D144C), blurRadius: 12, offset: Offset(0, 3)),
+// ];
+
+/// The Tools tab's "Track" hue (`tools_hub_screen.dart`), where this tool's
+/// tile sits: the row's mark wears the same tint as the tile that opened it.
+const double _kHue = 206;
+
+/// The scans among the nine, drawn as the ultrasound fan; the rest are tests
+/// read off a report, drawn as the page.
+const Set<String> _kScanIds = {
+  'dating_scan',
+  'nt_scan',
+  'anomaly_scan',
+  'growth_scan',
+  'doppler',
+};
+
+IntentMark _markForTest(TestScanInfo t) =>
+    _kScanIds.contains(t.id) ? IntentMark.scanFan : IntentMark.reportPage;
 
 // ===========================================================================
 //  Home (library)
@@ -97,16 +129,16 @@ class _TestsScansReportsScreenState extends State<TestsScansReportsScreen> {
   @override
   Widget build(BuildContext context) {
     final s = S(p.language);
+    final pal = pvStorePalette;
     return Scaffold(
-      backgroundColor: AppTheme.surfaceContainer,
-      appBar: AppBar(
-        backgroundColor: AppTheme.surfaceContainer,
-        title: Text(widget.title ?? s.tsrTitle,
-            style: pvJakarta(
-                fontWeight: FontWeight.w700, color: AppTheme.neutral900)),
-      ),
+      backgroundColor: pal.ground,
+      // The back arrow only; the title is the page's own, in the serif, below
+      // (the TTC tool's shape). Kept for revert: the title in the app bar,
+      //   title: Text(widget.title ?? s.tsrTitle, style: pvJakarta(
+      //       fontWeight: FontWeight.w700, color: AppTheme.neutral900)),
+      appBar: _pregToolAppBar(),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+        padding: const EdgeInsets.fromLTRB(20, 4, 20, 40),
         children: [
           // The natural home for "what has your doctor said". Asks once, ever.
           // ⚠️ OFF, KEPT FOR REVERT — the review said "at all".
@@ -130,14 +162,18 @@ class _TestsScansReportsScreenState extends State<TestsScansReportsScreen> {
           // whether it exists.
           //
           // pregHealthStrip(p.language, 'tests_scans_reports'),
+          Semantics(
+            header: true,
+            child: Text(widget.title ?? s.tsrTitle, style: pregPageTitleStyle()),
+          ),
+          const SizedBox(height: 8),
           Text(
             widget.intro ??
                 'The tests, scans and findings you may meet in pregnancy: what '
                     'each one means, and how to read your report.',
-            style: pvManrope(
-                fontSize: 13.5, height: 1.5, color: AppTheme.neutral600),
+            style: pvManrope(fontSize: 14, height: 1.45, color: pal.ink2),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           // ⚠️ THE TOGGLE GOES WHEN THERE IS NOTHING TO TOGGLE TO. A two-tab
           // control with one live tab is a control that lies about having a
           // choice behind it.
@@ -147,47 +183,56 @@ class _TestsScansReportsScreenState extends State<TestsScansReportsScreen> {
           ],
           _filterChips(),
           const SizedBox(height: 16),
-          if (widget.testsOnly || _section == 0)
-            ..._testsList()
-          else
-            ..._findingsList(),
+          // One white card of rows (the TTC library's list). Kept for revert:
+          // each entry was its own shadowed `_LibraryCard`, 10 apart.
+          PregRowCard(
+            empty: S.now.uiNothingFilterYet,
+            children: widget.testsOnly || _section == 0
+                ? _testsList()
+                : _findingsList(),
+          ),
         ],
       ),
     );
   }
 
   // --- Section toggle --------------------------------------------------------
+  // The chosen half is the one ink with white words, on a white track with the
+  // hairline. Kept for revert: the teal fill on a shadowed white track.
   Widget _sectionToggle() {
+    final pal = pvStorePalette;
     final tabs = ['Tests & Scans', 'Findings & Conditions'];
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: _soft,
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: kPvLine),
       ),
       child: Row(children: [
         for (int i = 0; i < tabs.length; i++)
           Expanded(
-            child: GestureDetector(
-              onTap: () => setState(() => _section = i),
-              behavior: HitTestBehavior.opaque,
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 180),
-                padding: const EdgeInsets.symmetric(vertical: 11),
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: _section == i ? _accent : Colors.transparent,
-                  borderRadius: BorderRadius.circular(12),
+            child: Semantics(
+              button: true,
+              selected: _section == i,
+              child: GestureDetector(
+                onTap: () => setState(() => _section = i),
+                behavior: HitTestBehavior.opaque,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 180),
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: _section == i ? kPvInk : Colors.transparent,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Text(tabs[i],
+                      textAlign: TextAlign.center,
+                      style: pvManrope(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w700,
+                          color: _section == i ? Colors.white : pal.ink2)),
                 ),
-                child: Text(tabs[i],
-                    textAlign: TextAlign.center,
-                    style: pvManrope(
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w700,
-                        color: _section == i
-                            ? Colors.white
-                            : AppTheme.neutral600)),
               ),
             ),
           ),
@@ -196,6 +241,8 @@ class _TestsScansReportsScreenState extends State<TestsScansReportsScreen> {
   }
 
   // --- Filter chips ----------------------------------------------------------
+  // The store's hairline chip, ink when chosen. Kept for revert: a hand-drawn
+  // pill with the teal fill.
   Widget _filterChips() {
     final options = <(String, TrimesterTag?)>[
       ('All', null),
@@ -208,29 +255,15 @@ class _TestsScansReportsScreenState extends State<TestsScansReportsScreen> {
       height: 36,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
+        clipBehavior: Clip.none,
         itemCount: options.length,
         separatorBuilder: (_, _) => const SizedBox(width: 8),
         itemBuilder: (context, i) {
           final (label, tag) = options[i];
-          final selected = _filter == tag;
-          return GestureDetector(
+          return PvChip(
+            label: label,
+            selected: _filter == tag,
             onTap: () => setState(() => _filter = tag),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              decoration: BoxDecoration(
-                color: selected ? _accent : AppTheme.surface,
-                borderRadius: BorderRadius.circular(99),
-                border: Border.all(
-                    color: selected ? _accent : AppTheme.outlineVariant,
-                    width: 1),
-              ),
-              child: Text(label,
-                  style: pvManrope(
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.w700,
-                      color:
-                          selected ? Colors.white : AppTheme.neutral700)),
-            ),
           );
         },
       ),
@@ -238,13 +271,15 @@ class _TestsScansReportsScreenState extends State<TestsScansReportsScreen> {
   }
 
   // --- Lists -----------------------------------------------------------------
+  // Empty lists return nothing: the card says `uiNothingFilterYet` itself (a
+  // feature is never hidden). Kept for revert: `if (items.isEmpty) return
+  // [_empty()];` with `_empty()` a centred grey line.
   List<Widget> _testsList() {
     final items = testsScansByTag(_filter);
-    if (items.isEmpty) return [_empty()];
     return [
       for (final t in items)
-        _LibraryCard(
-          icon: Icons.biotech_rounded,
+        _LibraryRow(
+          mark: _markForTest(t),
           title: t.name.now,
           subtitle: t.altName?.now,
           badge: t.tag.badge.now,
@@ -266,11 +301,10 @@ class _TestsScansReportsScreenState extends State<TestsScansReportsScreen> {
 
   List<Widget> _findingsList() {
     final items = findingsByTag(_filter);
-    if (items.isEmpty) return [_empty()];
     return [
       for (final f in items)
-        _LibraryCard(
-          icon: Icons.description_outlined,
+        _LibraryRow(
+          mark: IntentMark.bodyMark,
           title: f.name.now,
           subtitle: f.altName?.now,
           badge: f.tag.badge.now,
@@ -280,28 +314,58 @@ class _TestsScansReportsScreenState extends State<TestsScansReportsScreen> {
         ),
     ];
   }
-
-  Widget _empty() => Padding(
-        padding: const EdgeInsets.fromLTRB(20, 40, 20, 20),
-        child: Center(
-          child: Text(S.now.uiNothingFilterYet,
-              textAlign: TextAlign.center,
-              style: pvManrope(
-                  fontSize: 13.5, color: AppTheme.neutral500)),
-        ),
-      );
 }
 
-// A list card for either a test/scan or a finding.
-class _LibraryCard extends StatelessWidget {
-  const _LibraryCard({
-    required this.icon,
+/// The app bar of a pushed pregnancy tool page: the page's ground, the back
+/// arrow in ink, no title (the page draws its own, in the serif).
+PreferredSizeWidget _pregToolAppBar() {
+  final pal = pvStorePalette;
+  return AppBar(
+    backgroundColor: pal.ground,
+    surfaceTintColor: Colors.transparent,
+    elevation: 0,
+    scrolledUnderElevation: 0,
+    foregroundColor: pal.ink1,
+  );
+}
+
+/// A small tag: the trimester a test or finding belongs to. A tint is allowed
+/// here, and only here: it is a tag, not a block behind text.
+class _Tag extends StatelessWidget {
+  const _Tag(this.text);
+  final String text;
+  @override
+  Widget build(BuildContext context) {
+    final pal = pvStorePalette;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: pal.surfaceAlt,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(text,
+          style: pvManrope(
+              fontSize: 11, fontWeight: FontWeight.w800, color: pal.ink2)),
+    );
+  }
+}
+
+/// One entry in the library: a drawn mark in the Track hue, the name, its
+/// other name, the trimester tag, a chevron. Laid out on `PregOfferRow`'s
+/// grid (14 + 44 + 14) so `PregRowCard`'s hairlines start past the mark.
+///
+/// Kept for revert (2026-09-30): `_LibraryCard`, a shadowed white card per
+/// entry with a teal-tinted line icon (`Icons.biotech_rounded` /
+/// `Icons.description_outlined`) and a teal `_Badge` pill.
+class _LibraryRow extends StatelessWidget {
+  const _LibraryRow({
+    required this.mark,
     required this.title,
     required this.subtitle,
     required this.badge,
     required this.onTap,
   });
-  final IconData icon;
+  final IntentMark mark;
   final String title;
   final String? subtitle;
   final String badge;
@@ -309,71 +373,51 @@ class _LibraryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    final pal = pvStorePalette;
+    final sub = subtitle?.trim() ?? '';
+    return Semantics(
+      button: true,
+      container: true,
+      label: [title, if (sub.isNotEmpty) sub, badge].join('. '),
+      excludeSemantics: true,
       onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 10),
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: AppTheme.surface,
-          borderRadius: BorderRadius.circular(18),
-          boxShadow: _soft,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(14, 12, 12, 12),
+          child: Row(children: [
+            PvMarkWell(p: pal, hue: _kHue, size: 44, mark: mark),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title,
+                        style: pvManrope(
+                            fontSize: 14.5,
+                            fontWeight: FontWeight.w700,
+                            height: 1.25,
+                            color: pal.ink1)),
+                    if (sub.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 2),
+                        child: Text(sub,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: pvManrope(
+                                fontSize: 12.5, height: 1.35, color: pal.ink3)),
+                      ),
+                    const SizedBox(height: 6),
+                    _Tag(badge),
+                  ]),
+            ),
+            const SizedBox(width: 4),
+            Icon(Icons.chevron_right_rounded, size: 20, color: pal.ink3),
+          ]),
         ),
-        child: Row(children: [
-          Container(
-            width: 42,
-            height: 42,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-                color: _accent.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(13)),
-            child: Icon(icon, color: _accent, size: 21),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title,
-                      style: pvJakarta(
-                          fontSize: 14.5,
-                          fontWeight: FontWeight.w700,
-                          color: AppTheme.neutral900)),
-                  if (subtitle != null && subtitle!.trim().isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 1),
-                      child: Text(subtitle!,
-                          style: pvManrope(
-                              fontSize: 12, color: AppTheme.neutral500)),
-                    ),
-                  const SizedBox(height: 6),
-                  _Badge(badge),
-                ]),
-          ),
-          const Icon(Icons.chevron_right_rounded, color: AppTheme.neutral400),
-        ]),
       ),
     );
   }
-}
-
-class _Badge extends StatelessWidget {
-  const _Badge(this.text);
-  final String text;
-  @override
-  Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
-        decoration: BoxDecoration(
-          color: _accent.withValues(alpha: 0.10),
-          borderRadius: BorderRadius.circular(99),
-        ),
-        child: Text(text,
-            style: pvManrope(
-                fontSize: 10.5,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 0.2,
-                color: _accent)),
-      );
 }
 
 // ===========================================================================
@@ -402,16 +446,25 @@ class TestScanDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.surfaceContainer,
-      appBar: AppBar(
-        backgroundColor: AppTheme.surfaceContainer,
-        title: Text(info.name.now,
-            style: pvJakarta(
-                fontWeight: FontWeight.w700, color: AppTheme.neutral900)),
-      ),
+      backgroundColor: pvStorePalette.ground,
+      // ⚠️ THE NAME IS SAID ONCE (2026-09-30). The app bar used to carry it
+      // and the header card below said it again, a centimetre apart. The app
+      // bar is the back arrow only now, and the page title is the one name,
+      // on both arrivals. Kept for revert:
+      //   title: Text(info.name.now, style: pvJakarta(
+      //       fontWeight: FontWeight.w700, color: AppTheme.neutral900)),
+      appBar: _pregToolAppBar(),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+        padding: const EdgeInsets.fromLTRB(20, 4, 20, 40),
         children: [
+          _DetailTitle(
+            title: info.name.now,
+            // The other name and the tag were the header card's; on the
+            // parameters arrival that card did not render, so neither do they.
+            subtitle: openParameters ? null : info.altName?.now,
+            badge: openParameters ? null : info.tag.badge.now,
+          ),
+          const SizedBox(height: 18),
           // ⚠️ WHEN SHE ARRIVES HERE TO READ A REPORT, THE PAGE STARTS AT THE
           // PARAMETERS AND NOTHING SITS ABOVE THEM.
           //
@@ -433,12 +486,11 @@ class TestScanDetailScreen extends StatelessWidget {
           // default arrival is untouched. One screen, two arrivals, and the
           // arrival decides what exists rather than merely what is open.
           if (!openParameters) ...[
-            _DetailHeader(
-                icon: Icons.biotech_rounded,
-                title: info.name.now,
-                subtitle: info.altName?.now,
-                badge: info.tag.badge.now),
-            const SizedBox(height: 16),
+            // Kept for revert (2026-09-30): the gradient header card, now
+            // `_DetailTitle` above.
+            //   _DetailHeader(icon: Icons.biotech_rounded, title: info.name.now,
+            //       subtitle: info.altName?.now, badge: info.tag.badge.now),
+            //   const SizedBox(height: 16),
             _ExpandableSection(
                 title: S.now.uiWhat,
                 body: info.whatItIs.now,
@@ -477,7 +529,7 @@ class TestScanDetailScreen extends StatelessWidget {
                   _InterpretPointer(pointer.now),
               ],
             ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 8),
           MedicalDisclaimerCard(text: info.disclaimer.now),
         ],
       ),
@@ -495,48 +547,49 @@ class _InterpretPointer extends StatelessWidget {
   final String text;
 
   @override
-  Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.only(top: 10),
-        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Container(
-            margin: const EdgeInsets.only(top: 7),
-            width: 5,
-            height: 5,
-            decoration: const BoxDecoration(color: _accent, shape: BoxShape.circle),
-          ),
-          const SizedBox(width: 11),
-          Expanded(
-            child: Text(text,
-                style: pvManrope(
-                    fontSize: 13.5,
-                    height: 1.55,
-                    color: AppTheme.neutral600)),
-          ),
-        ]),
-      );
+  Widget build(BuildContext context) {
+    final pal = pvStorePalette;
+    return Padding(
+      padding: const EdgeInsets.only(top: 10),
+      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Container(
+          margin: const EdgeInsets.only(top: 7),
+          width: 5,
+          height: 5,
+          decoration: BoxDecoration(color: pal.ink3, shape: BoxShape.circle),
+        ),
+        const SizedBox(width: 11),
+        Expanded(
+          child: Text(text,
+              style: pvManrope(fontSize: 13.5, height: 1.55, color: pal.ink2)),
+        ),
+      ]),
+    );
+  }
 }
 
 /// One report parameter, fully explained (measures / why / range / low / high).
+///
+/// Inside its section's white card it is a block under a hairline, not a card
+/// in a card. Kept for revert (2026-09-30): a bordered white box per
+/// parameter, 10 apart, the name in teal.
 class _ParameterCard extends StatelessWidget {
   const _ParameterCard(this.param);
   final ReportParameter param;
 
   @override
   Widget build(BuildContext context) {
+    final pal = pvStorePalette;
     return Container(
-      margin: const EdgeInsets.only(top: 10),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppTheme.outlineVariant),
+      margin: const EdgeInsets.only(top: 14),
+      padding: const EdgeInsets.only(top: 14),
+      decoration: const BoxDecoration(
+        border: Border(top: BorderSide(color: kPvLine)),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(param.name.now,
-            style: pvJakarta(
-                fontSize: 14.5,
-                fontWeight: FontWeight.w800,
-                color: _accent)),
+            style: pvManrope(
+                fontSize: 14.5, fontWeight: FontWeight.w800, color: pal.ink1)),
         const SizedBox(height: 8),
         _kv('What it measures', param.measures.now),
         _kv('Why it\'s important', param.whyImportant.now),
@@ -549,21 +602,22 @@ class _ParameterCard extends StatelessWidget {
     );
   }
 
-  Widget _kv(String k, String v) => Padding(
-        padding: const EdgeInsets.only(bottom: 8),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(k,
-              style: pvManrope(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 0.2,
-                  color: AppTheme.neutral500)),
-          const SizedBox(height: 2),
-          Text(v,
-              style: pvManrope(
-                  fontSize: 13.5, height: 1.5, color: AppTheme.neutral800)),
-        ]),
-      );
+  Widget _kv(String k, String v) {
+    final pal = pvStorePalette;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(k,
+            style: pvManrope(
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.2,
+                color: pal.ink3)),
+        const SizedBox(height: 2),
+        Text(v, style: pvManrope(fontSize: 13.5, height: 1.5, color: pal.ink1)),
+      ]),
+    );
+  }
 }
 
 // ===========================================================================
@@ -579,22 +633,23 @@ class FindingDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.surfaceContainer,
-      appBar: AppBar(
-        backgroundColor: AppTheme.surfaceContainer,
-        title: Text(info.name.now,
-            style: pvJakarta(
-                fontWeight: FontWeight.w700, color: AppTheme.neutral900)),
-      ),
+      backgroundColor: pvStorePalette.ground,
+      // The name is said once, on the page. Kept for revert:
+      //   title: Text(info.name.now, style: pvJakarta(
+      //       fontWeight: FontWeight.w700, color: AppTheme.neutral900)),
+      appBar: _pregToolAppBar(),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+        padding: const EdgeInsets.fromLTRB(20, 4, 20, 40),
         children: [
-          _DetailHeader(
-              icon: Icons.description_outlined,
+          // Kept for revert (2026-09-30): the gradient header card,
+          //   _DetailHeader(icon: Icons.description_outlined, title:
+          //       info.name.now, subtitle: info.altName?.now,
+          //       badge: info.tag.badge.now),
+          _DetailTitle(
               title: info.name.now,
               subtitle: info.altName?.now,
               badge: info.tag.badge.now),
-          const SizedBox(height: 16),
+          const SizedBox(height: 18),
           _ExpandableSection(
               title: S.now.uiWhat2,
               body: info.whatIsIt.now,
@@ -617,7 +672,7 @@ class FindingDetailScreen extends StatelessWidget {
               title: S.now.uiFaq,
               children: [for (final f in info.faqs) _FaqCard(f)],
             ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 8),
           MedicalDisclaimerCard(text: info.disclaimer.now),
         ],
       ),
@@ -625,29 +680,27 @@ class FindingDetailScreen extends StatelessWidget {
   }
 }
 
+/// One question and its answer, a block under a hairline inside the FAQ card.
+/// Kept for revert (2026-09-30): a bordered white box per question.
 class _FaqCard extends StatelessWidget {
   const _FaqCard(this.faq);
   final Faq faq;
   @override
   Widget build(BuildContext context) {
+    final pal = pvStorePalette;
     return Container(
-      margin: const EdgeInsets.only(top: 10),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppTheme.outlineVariant),
+      margin: const EdgeInsets.only(top: 14),
+      padding: const EdgeInsets.only(top: 14),
+      decoration: const BoxDecoration(
+        border: Border(top: BorderSide(color: kPvLine)),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(faq.q.now,
-            style: pvJakarta(
-                fontSize: 13.5,
-                fontWeight: FontWeight.w800,
-                color: AppTheme.neutral900)),
+            style: pvManrope(
+                fontSize: 13.5, fontWeight: FontWeight.w800, color: pal.ink1)),
         const SizedBox(height: 5),
         Text(faq.a.now,
-            style: pvManrope(
-                fontSize: 13.5, height: 1.5, color: AppTheme.neutral700)),
+            style: pvManrope(fontSize: 13.5, height: 1.5, color: pal.ink2)),
       ]),
     );
   }
@@ -657,66 +710,43 @@ class _FaqCard extends StatelessWidget {
 //  Shared building blocks
 // ===========================================================================
 
-class _DetailHeader extends StatelessWidget {
-  const _DetailHeader({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.badge,
-  });
-  final IconData icon;
+/// The detail page's title: the name in the serif, the other name under it,
+/// and the trimester tag. Replaces `_DetailHeader`'s gradient card (a tint
+/// behind text) and the app-bar title it repeated.
+class _DetailTitle extends StatelessWidget {
+  const _DetailTitle({required this.title, this.subtitle, this.badge});
   final String title;
   final String? subtitle;
-  final String badge;
+  final String? badge;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [_accent.withValues(alpha: 0.14), AppTheme.surface],
-        ),
-        borderRadius: BorderRadius.circular(22),
-        boxShadow: _soft,
-      ),
-      child: Row(children: [
-        Container(
-          width: 48,
-          height: 48,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-              color: _accent.withValues(alpha: 0.16),
-              borderRadius: BorderRadius.circular(14)),
-          child: Icon(icon, color: _accent, size: 24),
-        ),
-        const SizedBox(width: 14),
-        Expanded(
-          child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title,
-                    style: pvJakarta(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w800,
-                        color: AppTheme.neutral900)),
-                if (subtitle != null && subtitle!.trim().isNotEmpty)
-                  Text(subtitle!,
-                      style: pvManrope(
-                          fontSize: 12.5, color: AppTheme.neutral600)),
-                const SizedBox(height: 6),
-                _Badge(badge),
-              ]),
-        ),
-      ]),
-    );
+    final pal = pvStorePalette;
+    final sub = subtitle?.trim() ?? '';
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Semantics(header: true, child: Text(title, style: pregPageTitleStyle())),
+      if (sub.isNotEmpty) ...[
+        const SizedBox(height: 4),
+        Text(sub, style: pvManrope(fontSize: 14, height: 1.4, color: pal.ink2)),
+      ],
+      if (badge != null) ...[
+        const SizedBox(height: 10),
+        _Tag(badge!),
+      ],
+    ]);
   }
 }
 
+// Kept for revert (2026-09-30): `_DetailHeader`, a card with a teal-to-white
+// gradient, a 48-pt teal icon well, the name in Jakarta 18 / w800, the other
+// name and a teal `_Badge`. Now `_DetailTitle` on the page.
+
 /// A collapsible section block. Supports a body paragraph, a bullet list, and/or
 /// arbitrary child widgets (used for parameter cards and FAQ cards).
+///
+/// A white card with the page hairline (`PregCard`'s surface). The "when to
+/// contact" section keeps its bell, and nothing else: it used to sit on an
+/// amber block with amber words, a tint behind text.
 class _ExpandableSection extends StatefulWidget {
   const _ExpandableSection({
     required this.title,
@@ -731,7 +761,7 @@ class _ExpandableSection extends StatefulWidget {
   final List<String>? bullets;
   final List<Widget>? children;
   final bool initiallyOpen;
-  final bool highlight; // subtle amber tint (e.g. "when to contact")
+  final bool highlight; // the bell (e.g. "when to contact")
 
   @override
   State<_ExpandableSection> createState() => _ExpandableSectionState();
@@ -742,59 +772,61 @@ class _ExpandableSectionState extends State<_ExpandableSection> {
 
   @override
   Widget build(BuildContext context) {
-    final Color tint =
-        widget.highlight ? const Color(0xFFB36B12) : _accent;
+    final pal = pvStorePalette;
+    // Kept for revert (2026-09-30): the amber block for `highlight`,
+    //   color: widget.highlight ? const Color(0xFFFFF6E9) : AppTheme.surface,
+    //   border: widget.highlight ? const Color(0x33D9822B) : outlineVariant,
+    // with the title and chevron in amber (0xFFB36B12) or teal.
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
-        color: widget.highlight ? const Color(0xFFFFF6E9) : AppTheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-            color: widget.highlight
-                ? const Color(0x33D9822B)
-                : AppTheme.outlineVariant),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: kPvLine),
       ),
       child: Column(children: [
-        GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: () => setState(() => _open = !_open),
-          child: Padding(
-            padding: const EdgeInsets.all(15),
-            child: Row(children: [
-              if (widget.highlight) ...[
-                const Icon(Icons.notifications_active_outlined,
-                    size: 18, color: Color(0xFFB36B12)),
-                const SizedBox(width: 8),
-              ],
-              Expanded(
-                child: Text(widget.title,
-                    style: pvJakarta(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w800,
-                        color: widget.highlight
-                            ? const Color(0xFFB36B12)
-                            : AppTheme.neutral900)),
-              ),
-              AnimatedRotation(
-                turns: _open ? 0.5 : 0,
-                duration: const Duration(milliseconds: 180),
-                child: Icon(Icons.keyboard_arrow_down_rounded, color: tint),
-              ),
-            ]),
+        Semantics(
+          button: true,
+          expanded: _open,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(20),
+            onTap: () => setState(() => _open = !_open),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 15, 14, 15),
+              child: Row(children: [
+                if (widget.highlight) ...[
+                  Icon(Icons.notifications_active_outlined,
+                      size: 18, color: pal.ink1),
+                  const SizedBox(width: 8),
+                ],
+                Expanded(
+                  child: Text(widget.title,
+                      style: pvManrope(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          height: 1.3,
+                          color: pal.ink1)),
+                ),
+                AnimatedRotation(
+                  turns: _open ? 0.5 : 0,
+                  duration: const Duration(milliseconds: 180),
+                  child: Icon(Icons.keyboard_arrow_down_rounded,
+                      color: pal.ink2),
+                ),
+              ]),
+            ),
           ),
         ),
         if (_open)
           Padding(
-            padding: const EdgeInsets.fromLTRB(15, 0, 15, 15),
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (widget.body != null && widget.body!.trim().isNotEmpty)
                     Text(widget.body!,
                         style: pvManrope(
-                            fontSize: 13.5,
-                            height: 1.55,
-                            color: AppTheme.neutral800)),
+                            fontSize: 13.5, height: 1.55, color: pal.ink1)),
                   if (widget.bullets != null)
                     for (final b in widget.bullets!)
                       Padding(
@@ -804,14 +836,14 @@ class _ExpandableSectionState extends State<_ExpandableSection> {
                             children: [
                               Padding(
                                 padding: const EdgeInsets.only(top: 6, right: 8),
-                                child: Icon(Icons.circle, size: 5, color: tint),
+                                child: Icon(Icons.circle, size: 5, color: pal.ink3),
                               ),
                               Expanded(
                                 child: Text(b,
                                     style: pvManrope(
                                         fontSize: 13.5,
                                         height: 1.5,
-                                        color: AppTheme.neutral800)),
+                                        color: pal.ink1)),
                               ),
                             ]),
                       ),
@@ -824,6 +856,11 @@ class _ExpandableSectionState extends State<_ExpandableSection> {
 }
 
 /// Reusable medical disclaimer - shown on EVERY detail page.
+///
+/// A quiet note on the page (`PregNote`'s shape, with its title kept): a line
+/// icon, the title in ink, the words in grey. Kept for revert (2026-09-30): an
+/// amber block (0xFFFFF6E9, border 0x33D9822B) with the title and icon in
+/// amber, text on a tint.
 class MedicalDisclaimerCard extends StatelessWidget {
   // `text` defaults to null rather than to a resolved string: a const
   // default cannot read the current language, and resolving it once at
@@ -834,33 +871,25 @@ class MedicalDisclaimerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(top: 8),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFFF6E9),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0x33D9822B)),
-      ),
+    final pal = pvStorePalette;
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
       child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Icon(Icons.health_and_safety_outlined,
-            size: 22, color: Color(0xFFB36B12)),
-        const SizedBox(width: 12),
+        Padding(
+          padding: const EdgeInsets.only(top: 1),
+          child: Icon(Icons.health_and_safety_outlined, size: 18, color: pal.ink3),
+        ),
+        const SizedBox(width: 10),
         Expanded(
           child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(S.now.uiMedicalDisclaimer,
-                    style: pvJakarta(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w800,
-                        color: const Color(0xFFB36B12))),
-                const SizedBox(height: 4),
-                Text(text ?? kMedicalDisclaimer.now,
                     style: pvManrope(
-                        fontSize: 12.5,
-                        height: 1.5,
-                        color: AppTheme.neutral800)),
+                        fontSize: 13, fontWeight: FontWeight.w700, color: pal.ink1)),
+                const SizedBox(height: 3),
+                Text(text ?? kMedicalDisclaimer.now,
+                    style: pvManrope(fontSize: 12.5, height: 1.5, color: pal.ink2)),
               ]),
         ),
       ]),

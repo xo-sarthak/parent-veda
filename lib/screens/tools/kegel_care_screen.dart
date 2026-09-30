@@ -5,6 +5,15 @@
 //  No levels, XP, streaks or achievements. A pregnancy-aware adaptive routine
 //  (3 stages by week), a guided hold/relax session, and a calm "Care Journey".
 //  Per the product spec.
+//
+//  ⚠️ ONE PARENTVEDA (2026-09-30, the pregnancy restyle). The page wears the
+//  trying-to-conceive tool shape through `preg_chrome.dart`: the serif page
+//  title under a bare back arrow, white cards with the hairline, the one ink
+//  for every button, and the safety list in the warning form (an ink rule, the
+//  serif heading, one coral dot a line; no tinted box). Care Journey moved
+//  from the app bar into the page as a row with a drawn mark, because a row
+//  that opens somewhere carries a mark and the app bar of a pushed tool page
+//  carries only the way back.
 // =============================================================================
 
 import 'dart:math' as math;
@@ -16,7 +25,15 @@ import 'package:flutter_tts/flutter_tts.dart';
 import '../../localization/app_language.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../services/tools_store.dart';
-import '../../theme/app_theme.dart';
+import '../../theme/pv_fonts.dart';
+import '../brackets/hub/hub_intent_art.dart';
+import '../doors/pv_door_chrome.dart' show kPvUrgentInk;
+import '../doors/pv_list_row.dart' show PvMarkWell;
+import '../pregnancy/preg_chrome.dart';
+import '../products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
+
+/// The Tools tab's "Track" hue, so the marks here match the row she tapped.
+const double _kKegelHue = 206;
 
 typedef _Routine = ({
   String Function(S) stage,
@@ -80,6 +97,48 @@ _Routine _routineFor(int week) {
   return rec;
 }
 
+// ---- shared pieces (private: the stages stay code-isolated) -----------------
+
+/// The page title on a pushed tool page (`pregPageTitleStyle`), announced as a
+/// heading.
+Widget _pageTitle(String text) =>
+    Semantics(header: true, child: Text(text, style: pregPageTitleStyle()));
+
+/// A card's own title: the serif, smaller than a section heading.
+TextStyle _cardTitleStyle() => pvFraunces(
+    fontSize: 18,
+    fontWeight: FontWeight.w600,
+    height: 1.2,
+    letterSpacing: -0.3,
+    color: pvStorePalette.ink1);
+
+TextStyle _bodyStyle() =>
+    pvManrope(fontSize: 13.5, height: 1.5, color: pvStorePalette.ink2);
+
+/// An outlined stadium: a second action beside the ink one.
+ButtonStyle _outlinedStyle() => OutlinedButton.styleFrom(
+      foregroundColor: kPvInk,
+      side: const BorderSide(color: kPvLine, width: 1.5),
+      shape: const StadiumBorder(),
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+      textStyle: pvManrope(fontSize: 14, fontWeight: FontWeight.w700),
+    );
+
+/// A tag: a neutral pill with grey words (a tint is allowed on a tag).
+Widget _tag(String label) => Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: pvStorePalette.surfaceAlt,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(label,
+          style: pvManrope(
+              fontSize: 11,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.4,
+              color: pvStorePalette.ink2)),
+    );
+
 class KegelCareScreen extends StatefulWidget {
   const KegelCareScreen({super.key, required this.controller});
   final PregnancyController controller;
@@ -104,31 +163,34 @@ class _KegelCareScreenState extends State<KegelCareScreen> {
 
   S get _s => S(widget.controller.language);
 
+  void _openCareJourney() => Navigator.of(context).push(MaterialPageRoute(
+        builder: (_) => _CareJourneyScreen(controller: widget.controller),
+      ));
+
   @override
   Widget build(BuildContext context) {
     final s = _s;
-    final text = Theme.of(context).textTheme;
+    final p = pvStorePalette;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(s.kegelToolTitle),
-        actions: [
-          TextButton.icon(
-            onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-              builder: (_) => _CareJourneyScreen(controller: widget.controller),
-            )),
-            icon: const Icon(Icons.favorite_rounded, size: 18),
-            label: Text(s.careJourneyCta),
-          ),
-          const SizedBox(width: 6),
-        ],
-      ),
+      // One ParentVeda: the app bar carries only the back arrow; the title is
+      // the serif at the top of the page, and Care Journey is a row below.
+      // Kept for revert:
+      // appBar: AppBar(title: Text(s.kegelToolTitle), actions: [
+      //   TextButton.icon(onPressed: <push _CareJourneyScreen>,
+      //       icon: const Icon(Icons.favorite_rounded, size: 18),
+      //       label: Text(s.careJourneyCta)),
+      //   const SizedBox(width: 6),
+      // ]),
+      appBar: AppBar(),
       body: AnimatedBuilder(
         animation: _store,
         builder: (context, _) {
           final r = _routineFor(widget.controller.currentWeek);
           return ListView(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
+            padding: const EdgeInsets.fromLTRB(18, 4, 18, 32),
             children: [
+              _pageTitle(s.kegelToolTitle),
+              const SizedBox(height: 20),
               // Hero ("Pelvic Floor Care") removed per request - its intro now
               // lives inside the "Why am I doing this?" collapsible below.
               // INTRODUCTION - split into three small titled cards (was a single
@@ -156,13 +218,32 @@ class _KegelCareScreenState extends State<KegelCareScreen> {
               _IntroCard(
                 title: S.now.uiHowDoKegel,
                 body: s.kegelHowBody,
-                // Placeholder for the animated instructional video (no asset yet).
-                footer: _videoPlaceholder(context, s),
+                // One ParentVeda, rule 9 (no placeholder images): the 16:9
+                // gradient box with a play disc is now a quiet line saying the
+                // same thing. Kept for revert: footer: _videoPlaceholder(context, s),
+                footer: Padding(
+                  padding: const EdgeInsets.only(top: 12),
+                  child: PregNote(S.now.uiAnimatedGuideComingSoon,
+                      icon: Icons.play_circle_outline_rounded),
+                ),
               ),
               const SizedBox(height: 14),
               // Current routine - now contains the ℹ️ "Why this routine?", the
               // Edit ✏️ (Customize), and the Start session button.
-              _currentRoutineCard(context, s, text, r),
+              _currentRoutineCard(context, s, r),
+              const SizedBox(height: 14),
+              // Care Journey (was the app bar's action): a row that opens
+              // somewhere, so a drawn mark, a name and one line.
+              PregRowCard(children: [
+                PregOfferRow(
+                  key: const ValueKey('kegel_care_journey_row'),
+                  mark: IntentMark.chartLog,
+                  hue: _kKegelHue,
+                  title: s.careJourneyCta,
+                  line: 'Your stage, your sessions and how each one felt',
+                  onTap: _openCareJourney,
+                ),
+              ]),
               const SizedBox(height: 14),
               // "Why this routine?" box removed - it opens from the ℹ️ in the
               // card. Standalone "Start Care Session" button removed - now in card.
@@ -175,48 +256,29 @@ class _KegelCareScreenState extends State<KegelCareScreen> {
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(s.kegelHeroBody, style: text.bodyMedium),
+                      Text(s.kegelHeroBody, style: _bodyStyle()),
                       const SizedBox(height: 10),
-                      _benefit(text, s.kegelBenefitBladder),
-                      _benefit(text, s.kegelBenefitSupport),
-                      _benefit(text, s.kegelBenefitRecovery),
+                      _benefit(s.kegelBenefitBladder),
+                      _benefit(s.kegelBenefitSupport),
+                      _benefit(s.kegelBenefitRecovery),
                       const SizedBox(height: 8),
-                      Text(s.kegelFollowProvider, style: text.bodySmall),
+                      Text(s.kegelFollowProvider,
+                          style: pvManrope(
+                              fontSize: 12.5, height: 1.45, color: p.ink3)),
                     ]),
               ),
-              const SizedBox(height: 14),
-              // Safety - styled as a clear WARNING banner, not a plain text box.
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFFF4E5),
-                  borderRadius: BorderRadius.circular(16),
-                  border:
-                      Border.all(color: const Color(0x66E08A2B), width: 1.4),
-                ),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Icon(Icons.warning_amber_rounded,
-                                color: Color(0xFFC9700F), size: 22),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Text(s.kegelSafetyTitle,
-                                  style: text.titleSmall?.copyWith(
-                                      fontWeight: FontWeight.w800,
-                                      color: const Color(0xFFA85B0C))),
-                            ),
-                          ]),
-                      const SizedBox(height: 10),
-                      _bullet(text, s.kegelSafetyPain),
-                      _bullet(text, s.kegelSafetyBleeding),
-                      _bullet(text, s.kegelSafetyDizziness),
-                      _bullet(text, s.kegelSafetyContractions),
-                    ]),
-              ),
+              const SizedBox(height: 28),
+              // Safety - the warning form (DESIGN-SYSTEM §4.0 addendum): an ink
+              // rule, the heading in the serif, the lines with one coral dot
+              // each. Same lines, same place, no tinted box. Kept for revert:
+              // an amber box (0xFFFFF4E5, border 0x66E08A2B at 1.4) with a
+              // warning_amber icon (0xFFC9700F) and the title in 0xFFA85B0C.
+              _SafetyWarning(title: s.kegelSafetyTitle, lines: [
+                s.kegelSafetyPain,
+                s.kegelSafetyBleeding,
+                s.kegelSafetyDizziness,
+                s.kegelSafetyContractions,
+              ]),
             ],
           );
         },
@@ -224,127 +286,85 @@ class _KegelCareScreenState extends State<KegelCareScreen> {
     );
   }
 
-  /// Tappable 16:9 placeholder for the animated instructional video. There is no
-  /// video asset yet, so tapping shows a gentle "coming soon". Mirrors the
-  /// media-placeholder pattern used in the weekly reading flow (week_flow_screen).
-  Widget _videoPlaceholder(BuildContext context, S s) {
-    final text = Theme.of(context).textTheme;
-    return Padding(
-      padding: const EdgeInsets.only(top: 12),
-      child: GestureDetector(
-        onTap: () => ScaffoldMessenger.of(context)
-          ..clearSnackBars()
-          ..showSnackBar(
-              SnackBar(content: Text(S.now.uiAnimatedGuideComingSoon))),
-        child: AspectRatio(
-          aspectRatio: 16 / 9,
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  AppTheme.secondary500.withValues(alpha: 0.16),
-                  AppTheme.secondary500.withValues(alpha: 0.05),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(
-                  color: AppTheme.secondary500.withValues(alpha: 0.16)),
-            ),
-            child: Stack(children: [
-              Center(
-                child: Container(
-                  width: 54,
-                  height: 54,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.92),
-                      shape: BoxShape.circle),
-                  child: Icon(Icons.play_arrow_rounded,
-                      size: 30, color: AppTheme.secondary600),
-                ),
-              ),
-              Positioned(
-                left: 10,
-                bottom: 10,
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-                  decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.88),
-                      borderRadius: BorderRadius.circular(40)),
-                  child: Text(S.now.uiAnimatedGuideComingSoon,
-                      style: text.labelSmall?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 0.3,
-                          color: AppTheme.secondary600)),
-                ),
-              ),
-            ]),
+  // Tappable 16:9 placeholder for the animated instructional video (no asset
+  // yet). Retired by rule 9 (no placeholder images); the page now shows the
+  // same "coming soon" line as a PregNote. Kept for revert, as it stood:
+  // Widget _videoPlaceholder(BuildContext context, S s) => Padding(
+  //   padding: const EdgeInsets.only(top: 12),
+  //   child: GestureDetector(
+  //     onTap: () => ScaffoldMessenger.of(context)..clearSnackBars()
+  //       ..showSnackBar(SnackBar(content: Text(S.now.uiAnimatedGuideComingSoon))),
+  //     child: AspectRatio(aspectRatio: 16 / 9, child: Container(
+  //       decoration: BoxDecoration(
+  //         gradient: LinearGradient(colors: [
+  //           AppTheme.secondary500.withValues(alpha: 0.16),
+  //           AppTheme.secondary500.withValues(alpha: 0.05)]),
+  //         borderRadius: BorderRadius.circular(18)),
+  //       child: Stack(children: [
+  //         Center(child: <white 54 disc, play_arrow_rounded in secondary600>),
+  //         Positioned(left: 10, bottom: 10,
+  //             child: <pill: S.now.uiAnimatedGuideComingSoon>),
+  //       ]))),
+  //   ));
+
+  // The benefit bullets were a ❤️ emoji each; no decorative emoji, so a small
+  // line glyph.
+  Widget _benefit(String label) => Padding(
+        padding: const EdgeInsets.only(bottom: 6),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 2, right: 8),
+            child: Icon(Icons.check_rounded, size: 16, color: pvStorePalette.ink2),
           ),
-        ),
-      ),
+          Expanded(
+              child: Text(label,
+                  style: pvManrope(
+                      fontSize: 14,
+                      height: 1.45,
+                      fontWeight: FontWeight.w600,
+                      color: pvStorePalette.ink1))),
+        ]),
+      );
+
+  Widget _routineRow(String label, String value) {
+    final p = pvStorePalette;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(label, style: pvManrope(fontSize: 13.5, color: p.ink2)),
+            Text(value,
+                style: pvManrope(
+                    fontSize: 14, fontWeight: FontWeight.w800, color: p.ink1)),
+          ]),
     );
   }
-
-  Widget _benefit(TextTheme text, String label) => Padding(
-        padding: const EdgeInsets.only(bottom: 4),
-        child: Row(children: [
-          const Text('❤️ ', style: TextStyle(fontSize: 13)),
-          Expanded(child: Text(label, style: text.bodyLarge)),
-        ]),
-      );
-
-  Widget _bullet(TextTheme text, String label) => Padding(
-        padding: const EdgeInsets.only(bottom: 4),
-        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text('•  '),
-          Expanded(child: Text(label, style: text.bodyMedium)),
-        ]),
-      );
-
-  Widget _routineRow(TextTheme text, String label, String value) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 5),
-        child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(label, style: text.bodyMedium),
-              Text(value,
-                  style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
-            ]),
-      );
 
   /// The "Current routine" card: shows the effective routine, an info (i) that
   /// explains the recommendation, and a Customize button (with Reset when a
   /// custom routine is active).
-  Widget _currentRoutineCard(
-      BuildContext context, S s, TextTheme text, _Routine r) {
+  Widget _currentRoutineCard(BuildContext context, S s, _Routine r) {
+    final p = pvStorePalette;
     final rec = _recommendedFor(widget.controller.currentWeek);
     final isCustom = _store.hasCustomKegelRoutine;
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppTheme.outlineVariant),
-      ),
+    return PregCard(
+      padding: const EdgeInsets.fromLTRB(18, 16, 10, 18),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [
                 Flexible(
-                  child: Text(s.currentRoutineLabel,
-                      style: text.titleMedium
-                          ?.copyWith(fontWeight: FontWeight.w700)),
+                  child: Text(s.currentRoutineLabel, style: _cardTitleStyle()),
                 ),
                 if (isCustom) ...[
                   const SizedBox(width: 8),
-                  _badge(text, s.customLabel),
+                  // Kept for revert: a coral pill (secondary50 / secondary600).
+                  _tag(s.customLabel.toUpperCase()),
                 ],
               ]),
-              const SizedBox(height: 4),
+              const SizedBox(height: 6),
               // Replaces the old stage line ("Building consistency"). Tapping
               // this ℹ️ opens the "Why this routine?" explanation.
               InkWell(
@@ -353,13 +373,13 @@ class _KegelCareScreenState extends State<KegelCareScreen> {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 2),
                   child: Row(mainAxisSize: MainAxisSize.min, children: [
-                    Icon(Icons.info_outline_rounded,
-                        size: 16, color: AppTheme.secondary600),
+                    Icon(Icons.info_outline_rounded, size: 16, color: p.ink2),
                     const SizedBox(width: 5),
                     Text(s.whyThisRoutine,
-                        style: text.labelMedium?.copyWith(
-                            color: AppTheme.secondary600,
-                            fontWeight: FontWeight.w700)),
+                        style: pvManrope(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w700,
+                            color: p.ink1)),
                   ]),
                 ),
               ),
@@ -371,70 +391,77 @@ class _KegelCareScreenState extends State<KegelCareScreen> {
             visualDensity: VisualDensity.compact,
             tooltip: s.customizeLabel,
             onPressed: () => _showCustomize(context, s, rec),
-            icon: const Icon(Icons.edit_rounded, size: 20),
+            icon: Icon(Icons.edit_outlined, size: 20, color: p.ink1),
           ),
         ]),
-        const SizedBox(height: 8),
-        _routineRow(text, s.holdLabel, '${r.hold} ${s.secShort}'),
-        _routineRow(text, s.relaxLabel, '${r.relax} ${s.secShort}'),
-        _routineRow(text, s.repsLabel, '${r.reps}'),
-        _routineRow(text, s.estTimeLabel, s.minutesShort(r.minutes)),
+        const SizedBox(height: 10),
+        Padding(
+          padding: const EdgeInsets.only(right: 8),
+          child: Column(children: [
+            _routineRow(s.holdLabel, '${r.hold} ${s.secShort}'),
+            _routineRow(s.relaxLabel, '${r.relax} ${s.secShort}'),
+            _routineRow(s.repsLabel, '${r.reps}'),
+            _routineRow(s.estTimeLabel, s.minutesShort(r.minutes)),
+          ]),
+        ),
         if (isCustom) ...[
           const SizedBox(height: 6),
           Text(
             '${s.recommendedLabel}: ${rec.hold} ${s.secShort} · '
             '${rec.relax} ${s.secShort} · ${rec.reps} '
             '${s.repsLabel.toLowerCase()}',
-            style: text.bodySmall?.copyWith(color: AppTheme.neutral500),
+            style: pvManrope(fontSize: 12, height: 1.4, color: p.ink3),
           ),
         ],
-        const SizedBox(height: 14),
+        const SizedBox(height: 16),
         // Start session - replaces the old "Customize" button (the standalone
         // Start Care Session button was removed; Customize is now the ✏️ above).
-        SizedBox(
-          width: double.infinity,
-          child: FilledButton.icon(
-            onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-              builder: (_) => _SessionScreen(
-                controller: widget.controller,
-                hold: r.hold,
-                relax: r.relax,
-                reps: r.reps,
+        Padding(
+          padding: const EdgeInsets.only(right: 8),
+          child: SizedBox(
+            width: double.infinity,
+            child: FilledButton.icon(
+              style: pregFilledStyle().copyWith(
+                minimumSize: const WidgetStatePropertyAll(Size.fromHeight(50)),
               ),
-            )),
-            icon: const Icon(Icons.play_arrow_rounded),
-            label: Text(s.startCareSession),
+              onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                builder: (_) => _SessionScreen(
+                  controller: widget.controller,
+                  hold: r.hold,
+                  relax: r.relax,
+                  reps: r.reps,
+                ),
+              )),
+              icon: const Icon(Icons.play_arrow_rounded),
+              label: Text(s.startCareSession,
+                  style: pvManrope(fontSize: 14.5, fontWeight: FontWeight.w800)),
+            ),
           ),
         ),
       ]),
     );
   }
 
-  Widget _badge(TextTheme text, String label) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-        decoration: BoxDecoration(
-          color: AppTheme.secondary50,
-          borderRadius: BorderRadius.circular(40),
-        ),
-        child: Text(label.toUpperCase(),
-            style: text.labelSmall?.copyWith(
-              color: AppTheme.secondary600,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 0.5,
-            )),
-      );
-
   /// Opens the "Why this routine?" explanation (from the ℹ️ in the card).
   Future<void> _showWhyThisRoutine(BuildContext context, S s) {
-    final text = Theme.of(context).textTheme;
+    final p = pvStorePalette;
     return showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(s.whyThisRoutine),
-        content: Text(s.whyThisRoutineBody, style: text.bodyMedium),
+        backgroundColor: Colors.white,
+        title: Text(s.whyThisRoutine,
+            style: pvFraunces(
+                fontSize: 19, fontWeight: FontWeight.w600, color: p.ink1)),
+        content: Text(s.whyThisRoutineBody,
+            style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2)),
         actions: [
           TextButton(
-              onPressed: () => Navigator.of(ctx).pop(), child: Text(s.gotIt)),
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: Text(s.gotIt,
+                  style: pvManrope(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w700,
+                      color: p.ink1))),
         ],
       ),
     );
@@ -473,14 +500,14 @@ class _KegelCareScreenState extends State<KegelCareScreen> {
     int hold = _store.kegelCustomHold ?? rec.hold;
     int relax = _store.kegelCustomRelax ?? rec.relax;
     int reps = _store.kegelCustomReps ?? rec.reps;
+    final p = pvStorePalette;
 
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      backgroundColor: AppTheme.surface,
+      backgroundColor: Colors.white,
       builder: (ctx) {
-        final text = Theme.of(ctx).textTheme;
         return StatefulBuilder(builder: (ctx, setSheet) {
           final minutes = _minutesFor(hold, relax, reps);
           return Padding(
@@ -490,65 +517,80 @@ class _KegelCareScreenState extends State<KegelCareScreen> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(s.customizeRoutineTitle, style: text.headlineSmall),
+                  Text(s.customizeRoutineTitle,
+                      style: pvFraunces(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: -0.4,
+                          color: p.ink1)),
                   const SizedBox(height: 6),
                   Text(s.kegelCustomizeInfo,
-                      style:
-                          text.bodySmall?.copyWith(color: AppTheme.neutral600)),
+                      style: pvManrope(fontSize: 12.5, height: 1.45, color: p.ink2)),
                   const SizedBox(height: 12),
-                  _stepper(text, s.holdLabel, '${s.recommendedLabel}: ${rec.hold}',
+                  _stepper(s.holdLabel, '${s.recommendedLabel}: ${rec.hold}',
                       '$hold ${s.secShort}',
                       () => setSheet(() => hold = (hold - 1).clamp(2, 15)),
                       () => setSheet(() => hold = (hold + 1).clamp(2, 15))),
                   _stepper(
-                      text,
                       s.relaxLabel,
                       '${s.recommendedLabel}: ${rec.relax}',
                       '$relax ${s.secShort}',
                       () => setSheet(() => relax = (relax - 1).clamp(2, 15)),
                       () => setSheet(() => relax = (relax + 1).clamp(2, 15))),
-                  _stepper(text, s.repsLabel, '${s.recommendedLabel}: ${rec.reps}',
+                  _stepper(s.repsLabel, '${s.recommendedLabel}: ${rec.reps}',
                       '$reps',
                       () => setSheet(() => reps = (reps - 1).clamp(5, 25)),
                       () => setSheet(() => reps = (reps + 1).clamp(5, 25))),
                   const SizedBox(height: 10),
+                  // Kept for revert: this row sat on a grey block
+                  // (AppTheme.surfaceContainer, radius 14). A hairline above it
+                  // now, no tint behind the words.
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 12),
-                    decoration: BoxDecoration(
-                      color: AppTheme.surfaceContainer,
-                      borderRadius: BorderRadius.circular(14),
-                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    decoration: const BoxDecoration(
+                        border: Border(top: BorderSide(color: kPvLine))),
                     child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(s.estTimeLabel, style: text.bodyMedium),
+                          Text(s.estTimeLabel,
+                              style: pvManrope(fontSize: 13.5, color: p.ink2)),
                           Text(s.minutesShort(minutes),
-                              style: text.titleSmall
-                                  ?.copyWith(fontWeight: FontWeight.w800)),
+                              style: pvManrope(
+                                  fontSize: 14.5,
+                                  fontWeight: FontWeight.w800,
+                                  color: p.ink1)),
                         ]),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 16),
                   SizedBox(
                     width: double.infinity,
                     child: FilledButton(
+                      style: pregFilledStyle().copyWith(
+                        minimumSize:
+                            const WidgetStatePropertyAll(Size.fromHeight(50)),
+                      ),
                       onPressed: () {
                         _store.setKegelCustomRoutine(
                             hold: hold, relax: relax, reps: reps);
                         Navigator.of(ctx).pop();
                       },
-                      child: Text(s.saveCta),
+                      child: Text(s.saveCta,
+                          style: pvManrope(
+                              fontSize: 14.5, fontWeight: FontWeight.w800)),
                     ),
                   ),
                   const SizedBox(height: 6),
                   SizedBox(
                     width: double.infinity,
                     child: TextButton(
+                      style: TextButton.styleFrom(foregroundColor: p.ink2),
                       onPressed: () {
                         _store.clearKegelCustomRoutine();
                         Navigator.of(ctx).pop();
                       },
-                      child: Text(s.resetToRecommended),
+                      child: Text(s.resetToRecommended,
+                          style: pvManrope(
+                              fontSize: 13.5, fontWeight: FontWeight.w700)),
                     ),
                   ),
                 ]),
@@ -558,17 +600,18 @@ class _KegelCareScreenState extends State<KegelCareScreen> {
     );
   }
 
-  Widget _stepper(TextTheme text, String label, String sub, String value,
+  Widget _stepper(String label, String sub, String value,
       VoidCallback onMinus, VoidCallback onPlus) {
+    final p = pvStorePalette;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(children: [
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(label,
-                style: text.bodyLarge?.copyWith(fontWeight: FontWeight.w700)),
-            Text(sub,
-                style: text.labelSmall?.copyWith(color: AppTheme.neutral500)),
+                style: pvManrope(
+                    fontSize: 14.5, fontWeight: FontWeight.w700, color: p.ink1)),
+            Text(sub, style: pvManrope(fontSize: 11.5, color: p.ink3)),
           ]),
         ),
         _roundBtn(Icons.remove_rounded, onMinus),
@@ -576,22 +619,25 @@ class _KegelCareScreenState extends State<KegelCareScreen> {
           width: 64,
           child: Text(value,
               textAlign: TextAlign.center,
-              style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+              style: pvManrope(
+                  fontSize: 16, fontWeight: FontWeight.w800, color: p.ink1)),
         ),
         _roundBtn(Icons.add_rounded, onPlus),
       ]),
     );
   }
 
+  // Kept for revert: a coral disc (secondary50) with a secondary600 glyph.
+  // Pressable, so white with the hairline and the ink.
   Widget _roundBtn(IconData icon, VoidCallback onTap) => Material(
-        color: AppTheme.secondary50,
-        shape: const CircleBorder(),
+        color: Colors.white,
+        shape: const CircleBorder(side: BorderSide(color: kPvLine, width: 1.5)),
         child: InkWell(
           customBorder: const CircleBorder(),
           onTap: onTap,
           child: Padding(
             padding: const EdgeInsets.all(8),
-            child: Icon(icon, size: 20, color: AppTheme.secondary600),
+            child: Icon(icon, size: 20, color: kPvInk),
           ),
         ),
       );
@@ -599,7 +645,7 @@ class _KegelCareScreenState extends State<KegelCareScreen> {
 
 /// A small, always-visible titled intro block/card (used for the three split
 /// Introduction sub-sections: What / Why / How). Optional [footer] hosts extra
-/// content such as the animated-video placeholder under "How to do Kegel?".
+/// content such as the "animated guide" note under "How to do Kegel?".
 class _IntroCard extends StatelessWidget {
   const _IntroCard({required this.title, required this.body, this.footer});
   final String title;
@@ -608,22 +654,16 @@ class _IntroCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final text = Theme.of(context).textTheme;
-    return Container(
+    return SizedBox(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppTheme.outlineVariant),
+      child: PregCard(
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(title, style: _cardTitleStyle()),
+          const SizedBox(height: 8),
+          Text(body, style: _bodyStyle()),
+          ?footer,
+        ]),
       ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(title,
-            style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
-        const SizedBox(height: 8),
-        Text(body, style: text.bodyMedium),
-        ?footer,
-      ]),
     );
   }
 }
@@ -647,24 +687,31 @@ class _Expandable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final text = Theme.of(context).textTheme;
-    return Container(
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.outlineVariant),
-      ),
+    final p = pvStorePalette;
+    return PregCard(
+      padding: EdgeInsets.zero,
       child: Column(children: [
-        ListTile(
-          title: Text(title,
-              style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
-          trailing: Icon(
-              expanded ? Icons.expand_less_rounded : Icons.expand_more_rounded),
-          onTap: onToggle,
+        Semantics(
+          button: true,
+          expanded: expanded,
+          child: InkWell(
+            onTap: onToggle,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(18, 14, 14, 14),
+              child: Row(children: [
+                Expanded(child: Text(title, style: _cardTitleStyle())),
+                Icon(
+                    expanded
+                        ? Icons.expand_less_rounded
+                        : Icons.expand_more_rounded,
+                    color: p.ink2),
+              ]),
+            ),
+          ),
         ),
         if (expanded)
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            padding: const EdgeInsets.fromLTRB(18, 0, 18, 18),
             child: Align(
               alignment: Alignment.centerLeft,
               child: child ?? const SizedBox.shrink(),
@@ -672,6 +719,47 @@ class _Expandable extends StatelessWidget {
           ),
       ]),
     );
+  }
+}
+
+/// The safety list in the warning form: an ink rule (1.5), the heading in the
+/// serif, the lines as a list with one coral dot each, a hairline under. The
+/// dot is the only colour and it is the signal (DESIGN-SYSTEM §4.0 addendum).
+class _SafetyWarning extends StatelessWidget {
+  const _SafetyWarning({required this.title, required this.lines});
+  final String title;
+  final List<String> lines;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = pvStorePalette;
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Container(height: 1.5, color: p.ink1),
+      const SizedBox(height: 14),
+      Semantics(
+          header: true, child: Text(title, style: pregSectionHeadingStyle())),
+      const SizedBox(height: 10),
+      for (final line in lines)
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 5),
+          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 8, right: 11),
+              child: Container(
+                width: 6,
+                height: 6,
+                decoration: const BoxDecoration(
+                    color: kPvUrgentInk, shape: BoxShape.circle),
+              ),
+            ),
+            Expanded(
+                child: Text(line,
+                    style: pvManrope(fontSize: 14, height: 1.5, color: p.ink1))),
+          ]),
+        ),
+      const SizedBox(height: 12),
+      Container(height: 1, color: kPvLine),
+    ]);
   }
 }
 
@@ -830,16 +918,21 @@ class _SessionScreenState extends State<_SessionScreen>
   @override
   Widget build(BuildContext context) {
     final s = S(widget.controller.language);
-    final text = Theme.of(context).textTheme;
-    final color = _holding ? AppTheme.secondary500 : AppTheme.neutral500;
+    final p = pvStorePalette;
+    // Kept for revert: hold drew in coral (AppTheme.secondary500), relax in
+    // neutral500. The ink holds, the grey rests.
+    final color = _holding ? kPvInk : p.ink3;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(s.kegelToolTitle),
-        leading: IconButton(
-          icon: const Icon(Icons.close_rounded),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
+        // One ParentVeda, rule 7: this page is pushed from Kegel Care, so its
+        // way out is the back arrow (the default). Exit below still leaves.
+        // Kept for revert:
+        // leading: IconButton(
+        //   icon: const Icon(Icons.close_rounded),
+        //   onPressed: () => Navigator.of(context).pop(),
+        // ),
         actions: [
           IconButton(
             tooltip: s.voiceCuesLabel,
@@ -851,7 +944,7 @@ class _SessionScreenState extends State<_SessionScreen>
       ),
       body: SafeArea(
         child: _done
-            ? _completion(context, s, text)
+            ? _completion(context, s)
             : Padding(
                 padding: const EdgeInsets.all(24),
                 child: Column(children: [
@@ -877,12 +970,17 @@ class _SessionScreenState extends State<_SessionScreen>
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Text(_holding ? s.holdLabel : s.relaxLabel,
-                                      style: text.headlineSmall
-                                          ?.copyWith(color: color)),
+                                      style: pvFraunces(
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.w600,
+                                          color: color)),
                                   const SizedBox(height: 4),
                                   Text('$_remaining',
-                                      style: text.displayLarge?.copyWith(
-                                          fontWeight: FontWeight.w800)),
+                                      style: pvManrope(
+                                          fontSize: 60,
+                                          height: 1.1,
+                                          fontWeight: FontWeight.w800,
+                                          color: p.ink1)),
                                 ],
                               ),
                             ),
@@ -892,12 +990,17 @@ class _SessionScreenState extends State<_SessionScreen>
                     },
                   ),
                   const SizedBox(height: 28),
-                  Text(s.repOf(_rep, widget.reps), style: text.titleMedium),
+                  Text(s.repOf(_rep, widget.reps),
+                      style: pvManrope(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          color: p.ink2)),
                   const Spacer(),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       OutlinedButton.icon(
+                        style: _outlinedStyle(),
                         onPressed: _togglePause,
                         icon: Icon(_paused
                             ? Icons.play_arrow_rounded
@@ -905,6 +1008,7 @@ class _SessionScreenState extends State<_SessionScreen>
                         label: Text(_paused ? s.resumeLabel : s.pauseLabel),
                       ),
                       OutlinedButton.icon(
+                        style: _outlinedStyle(),
                         onPressed: () => Navigator.of(context).pop(),
                         icon: const Icon(Icons.close_rounded),
                         label: Text(s.exitLabel),
@@ -917,39 +1021,47 @@ class _SessionScreenState extends State<_SessionScreen>
     );
   }
 
-  Widget _completion(BuildContext context, S s, TextTheme text) {
+  Widget _completion(BuildContext context, S s) {
+    final p = pvStorePalette;
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(children: [
         const Spacer(),
-        const Text('❤️', style: TextStyle(fontSize: 64)),
-        const SizedBox(height: 16),
+        // Kept for revert: const Text('❤️', style: TextStyle(fontSize: 64)).
+        // No decorative emoji; the drawn mark in the tool's tint.
+        PvMarkWell(p: p, hue: _kKegelHue, size: 88, mark: IntentMark.cuppedHands),
+        const SizedBox(height: 18),
         Text(s.kegelSessionDoneTitle,
-            textAlign: TextAlign.center, style: text.headlineMedium),
+            textAlign: TextAlign.center, style: pregPageTitleStyle()),
         const SizedBox(height: 12),
         Text(s.kegelSessionDoneBody,
-            textAlign: TextAlign.center, style: text.bodyLarge),
+            textAlign: TextAlign.center,
+            style: pvManrope(fontSize: 14.5, height: 1.5, color: p.ink2)),
         const SizedBox(height: 28),
-        Text(s.howDidItFeel, style: text.titleMedium),
+        Text(s.howDidItFeel,
+            style: pvManrope(
+                fontSize: 15, fontWeight: FontWeight.w800, color: p.ink1)),
         const SizedBox(height: 14),
-        _feedbackButton(s, '😊', s.feedbackEasy, 'easy'),
+        // Kept for revert: each label led with an emoji (😊 / 🙂 / 😓).
+        _feedbackButton(s.feedbackEasy, 'easy'),
         const SizedBox(height: 10),
-        _feedbackButton(s, '🙂', s.feedbackComfortable, 'comfortable'),
+        _feedbackButton(s.feedbackComfortable, 'comfortable'),
         const SizedBox(height: 10),
-        _feedbackButton(s, '😓', s.feedbackDifficult, 'difficult'),
+        _feedbackButton(s.feedbackDifficult, 'difficult'),
         const Spacer(),
       ]),
     );
   }
 
-  Widget _feedbackButton(S s, String emoji, String label, String value) {
+  Widget _feedbackButton(String label, String value) {
     return SizedBox(
       width: double.infinity,
       child: OutlinedButton(
+        style: _outlinedStyle(),
         onPressed: () => _saveFeedback(value),
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 6),
-          child: Text('$emoji   $label'),
+          padding: const EdgeInsets.symmetric(vertical: 2),
+          child: Text(label),
         ),
       ),
     );
@@ -967,9 +1079,12 @@ class _CareJourneyScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = S(controller.language);
-    final text = Theme.of(context).textTheme;
+    final p = pvStorePalette;
     return Scaffold(
-      appBar: AppBar(title: Text(s.careJourneyCta)),
+      // Kept for revert: appBar: AppBar(title: Text(s.careJourneyCta)), with
+      // the body opening on Text(s.careJourneyTitle, headlineMedium). The two
+      // said the same thing; one serif title now, the name she tapped.
+      appBar: AppBar(),
       body: AnimatedBuilder(
         animation: ToolsStore.instance,
         builder: (context, _) {
@@ -978,30 +1093,54 @@ class _CareJourneyScreen extends StatelessWidget {
           final last = store.kegelLast != null
               ? DateTime.tryParse(store.kegelLast!)
               : null;
+          final stats = <(String, String)>[
+            (s.stageLabel, r.stage(s)),
+            (
+              s.currentRoutineLabel,
+              '${r.hold} ${s.secShort} · ${r.relax} ${s.secShort} · ${r.reps} ${s.repsLabel.toLowerCase()}'
+            ),
+            (s.sessionsCompletedLabel, '${store.kegelSessions}'),
+            (s.completedThisWeekLabel, '${store.kegelCompletedThisWeek}'),
+            (
+              s.lastCompletedLabel,
+              last != null ? s.formatLongDate(last) : s.neverWord
+            ),
+          ];
           return ListView(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
+            padding: const EdgeInsets.fromLTRB(18, 4, 18, 32),
             children: [
-              Text(s.careJourneyTitle, style: text.headlineMedium),
-              const SizedBox(height: 16),
-              _stat(text, s.stageLabel, r.stage(s)),
-              _stat(text, s.currentRoutineLabel,
-                  '${r.hold} ${s.secShort} · ${r.relax} ${s.secShort} · ${r.reps} ${s.repsLabel.toLowerCase()}'),
-              _stat(text, s.sessionsCompletedLabel, '${store.kegelSessions}'),
-              _stat(text, s.completedThisWeekLabel,
-                  '${store.kegelCompletedThisWeek}'),
-              _stat(text, s.lastCompletedLabel,
-                  last != null ? s.formatLongDate(last) : s.neverWord),
-              const SizedBox(height: 20),
+              _pageTitle(s.careJourneyCta),
+              const SizedBox(height: 18),
+              // Kept for revert: five separate outlined cards, one per stat.
+              // One white card with hairlines between the rows now.
+              PregCard(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                child: Column(children: [
+                  for (var i = 0; i < stats.length; i++) ...[
+                    if (i > 0) const Divider(height: 1, thickness: 1, color: kPvLine),
+                    _stat(stats[i].$1, stats[i].$2),
+                  ],
+                ]),
+              ),
+              const SizedBox(height: 28),
               // History always renders its heading, even before the first
               // session - otherwise a new user never learns sessions are kept.
-              Text(s.historyLabel, style: text.headlineSmall),
-              const SizedBox(height: 10),
+              PregSectionHeading(s.historyLabel),
+              const SizedBox(height: 12),
               if (store.kegelHistory.isEmpty)
                 Text(s.historyEmptyNote,
-                    style: text.bodyMedium?.copyWith(color: AppTheme.neutral500))
+                    style: pvManrope(fontSize: 13, height: 1.45, color: p.ink3))
               else
-                for (final rec in store.kegelHistory)
-                  _historyRow(context, rec, s, text),
+                PregCard(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  child: Column(children: [
+                    for (var i = 0; i < store.kegelHistory.length; i++) ...[
+                      if (i > 0)
+                        const Divider(height: 1, thickness: 1, color: kPvLine),
+                      _historyRow(store.kegelHistory[i], s),
+                    ],
+                  ]),
+                ),
             ],
           );
         },
@@ -1009,48 +1148,50 @@ class _CareJourneyScreen extends StatelessWidget {
     );
   }
 
-  Widget _stat(TextTheme text, String label, String value) => Container(
-        margin: const EdgeInsets.only(bottom: 10),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppTheme.surface,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppTheme.outlineVariant),
-        ),
-        child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Flexible(child: Text(label, style: text.bodyMedium)),
-              const SizedBox(width: 12),
-              Text(value,
-                  style:
-                      text.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
-            ]),
-      );
+  Widget _stat(String label, String value) {
+    final p = pvStorePalette;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 13),
+      child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Flexible(
+                child: Text(label, style: pvManrope(fontSize: 13.5, color: p.ink2))),
+            const SizedBox(width: 12),
+            Flexible(
+              child: Text(value,
+                  textAlign: TextAlign.right,
+                  style: pvManrope(
+                      fontSize: 14, fontWeight: FontWeight.w800, color: p.ink1)),
+            ),
+          ]),
+    );
+  }
 
-  Widget _historyRow(
-      BuildContext context, KegelRecord rec, S s, TextTheme text) {
+  Widget _historyRow(KegelRecord rec, S s) {
+    final p = pvStorePalette;
     final d = DateTime.tryParse(rec.dateIso);
     final fb = switch (rec.feedback) {
       'easy' => s.feedbackEasy,
       'difficult' => s.feedbackDifficult,
       _ => s.feedbackComfortable,
     };
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppTheme.outlineVariant),
-      ),
-      child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-        Text(d != null ? s.formatShortDate(d) : rec.dateIso,
-            style: text.bodyMedium),
-        Text(
-            '${rec.holdSeconds}${s.secShort} · ${rec.repetitions} ${s.repsLabel.toLowerCase()}',
-            style: text.labelSmall),
-        Text(fb, style: text.labelMedium),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Row(children: [
+        Expanded(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(d != null ? s.formatShortDate(d) : rec.dateIso,
+                style: pvManrope(
+                    fontSize: 14, fontWeight: FontWeight.w700, color: p.ink1)),
+            const SizedBox(height: 2),
+            Text(
+                '${rec.holdSeconds}${s.secShort} · ${rec.repetitions} ${s.repsLabel.toLowerCase()}',
+                style: pvManrope(fontSize: 12.5, color: p.ink3)),
+          ]),
+        ),
+        const SizedBox(width: 10),
+        _tag(fb),
       ]),
     );
   }
@@ -1074,13 +1215,13 @@ class _RingPainter extends CustomPainter {
 
     // Soft inner disc behind the text.
     canvas.drawCircle(
-        center, radius - 6, Paint()..color = color.withValues(alpha: 0.10));
+        center, radius - 6, Paint()..color = color.withValues(alpha: 0.06));
 
     // Track + depleting arc.
     final track = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 10
-      ..color = color.withValues(alpha: 0.15);
+      ..color = color.withValues(alpha: 0.12);
     canvas.drawCircle(center, radius, track);
 
     final arc = Paint()

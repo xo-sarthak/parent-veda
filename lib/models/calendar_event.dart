@@ -79,7 +79,10 @@ class CalMeta {
   final IconData icon;
 }
 
-const Color _cPurple = AppTheme.primary500;
+// Kept for revert (2026-09-30, one ParentVeda: no violet): milestones were the
+// brand violet. Only the pregnancy calendar reads calMeta, so they take the ink.
+// const Color _cPurple = AppTheme.primary500;
+const Color _cPurple = AppTheme.neutral900;
 const Color _cBlue = Color(0xFF4A7BC8);
 const Color _cGreen = Color(0xFF4F7A52);
 const Color _cPink = Color(0xFFFF5A79);

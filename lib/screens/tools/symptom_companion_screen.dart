@@ -16,10 +16,38 @@ import '../../services/pregnancy_controller.dart';
 import '../../services/symptom_store.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/pv_fonts.dart';
+import '../brackets/hub/hub_intent_art.dart' show IntentMark;
+import '../doors/pv_list_row.dart' show PvMarkWell;
+import '../pregnancy/preg_chrome.dart';
+import '../products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 
-const List<BoxShadow> _soft = [
-  BoxShadow(color: Color(0x0F2D144C), blurRadius: 12, offset: Offset(0, 3)),
-];
+// Kept for revert: the soft shadow every card and chip cast before the
+// one-ParentVeda pass (2026-09-30), which draws hairlines instead.
+// const List<BoxShadow> _soft = [
+//   BoxShadow(color: Color(0x0F2D144C), blurRadius: 12, offset: Offset(0, 3)),
+// ];
+
+/// The white card with the page hairline, for a row or a field.
+final BoxDecoration _card = BoxDecoration(
+  color: Colors.white,
+  borderRadius: BorderRadius.circular(16),
+  border: Border.all(color: kPvLine),
+);
+
+/// The drawn mark for a category, on a row that opens a symptom's page. The
+/// well's hue is the category's own colour, so the family stays recognisable.
+IntentMark _markOf(SymptomCategory c) => switch (c) {
+      SymptomCategory.digestive => IntentMark.plate,
+      SymptomCategory.physical => IntentMark.bodyMark,
+      SymptomCategory.sleep => IntentMark.moonMark,
+      SymptomCategory.emotional => IntentMark.moodArc,
+      SymptomCategory.circulation => IntentMark.chartLog,
+      SymptomCategory.movement => IntentMark.stepsMark,
+      SymptomCategory.labour => IntentMark.timelineRail,
+      SymptomCategory.urgent => IntentMark.askDoctor,
+    };
+
+double _hueOf(SymptomCategory c) => HSLColor.fromColor(symptomCatMeta(c).color).hue;
 
 String _catLabel(S s, SymptomCategory c) => switch (c) {
       SymptomCategory.digestive => s.symCatDigestive,
@@ -89,9 +117,9 @@ class _SymptomCompanionScreenState extends State<SymptomCompanionScreen> {
     }
 
     return Scaffold(
-      backgroundColor: AppTheme.surfaceContainer,
+      backgroundColor: pvStorePalette.ground,
       appBar: AppBar(
-        backgroundColor: AppTheme.surfaceContainer,
+        backgroundColor: pvStorePalette.ground,
         title: Text(s.symTitle,
             style: pvJakarta(
                 fontWeight: FontWeight.w700, color: AppTheme.neutral900)),
@@ -128,11 +156,7 @@ class _SymptomCompanionScreenState extends State<SymptomCompanionScreen> {
           // pregHealthStrip(lang, 'symptom_companion'),
           // search
           Container(
-            decoration: BoxDecoration(
-              color: AppTheme.surface,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: _soft,
-            ),
+            decoration: _card,
             child: TextField(
               controller: _searchCtrl,
               onChanged: (v) => setState(() => _query = v),
@@ -186,17 +210,15 @@ class _SymptomCompanionScreenState extends State<SymptomCompanionScreen> {
             for (final x in listed) _symRow(s, lang, x),
 
           const SizedBox(height: 16),
-          _disclaimer(s),
+          // A quiet note on the page (2026-09-30). Kept for revert: _disclaimer(s),
+          PregNote(s.symDisclaimer),
         ],
       ),
     );
   }
 
-  Widget _sectionTitle(String t) => Text(t,
-      style: pvJakarta(
-          fontSize: 16,
-          fontWeight: FontWeight.w700,
-          color: AppTheme.neutral900));
+  // One section heading (2026-09-30): the serif. Was pvJakarta 16 / w700.
+  Widget _sectionTitle(String t) => PregSectionHeading(t);
 
   Widget _categoryChips(S s) => Wrap(
         spacing: 8,
@@ -210,9 +232,9 @@ class _SymptomCompanionScreenState extends State<SymptomCompanionScreen> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
                 decoration: BoxDecoration(
-                  color: _category == c ? AppTheme.neutral900 : AppTheme.surface,
+                  color: _category == c ? kPvInk : Colors.white,
                   borderRadius: BorderRadius.circular(99),
-                  boxShadow: _category == c ? null : _soft,
+                  border: Border.all(color: _category == c ? kPvInk : kPvLine),
                 ),
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
                   Icon(symptomCatMeta(c).icon,
@@ -235,28 +257,17 @@ class _SymptomCompanionScreenState extends State<SymptomCompanionScreen> {
       );
 
   Widget _symRow(S s, AppLanguage lang, Symptom x) {
-    final m = symptomCatMeta(x.category);
     return GestureDetector(
       onTap: () => Navigator.of(context).push(MaterialPageRoute(
           builder: (_) => _SymptomDetail(symptom: x, controller: p))),
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: AppTheme.surface,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: _soft,
-        ),
+        decoration: _card,
         child: Row(children: [
-          Container(
-            width: 40,
-            height: 40,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-                color: m.color.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(12)),
-            child: Icon(m.icon, size: 19, color: m.color),
-          ),
+          // A row that opens somewhere carries a drawn mark (2026-09-30).
+          // Kept for revert: a 40pt `m.color` 0.12 box with `Icon(m.icon)`.
+          PvMarkWell(p: pvStorePalette, hue: _hueOf(x.category), size: 40, mark: _markOf(x.category)),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -281,22 +292,23 @@ class _SymptomCompanionScreenState extends State<SymptomCompanionScreen> {
     );
   }
 
+  // ⚠️ ONE PARENTVEDA (2026-09-30): a white card with the hairline, not a
+  // coral-tinted block behind text. The coral stays only on the icon, which is
+  // the signal; the words are ink. Kept for revert: the Container carried
+  // `c.withValues(alpha: 0.06)` with a `c` 0.2 border, the title was coral
+  // pvJakarta 15, and each pill was a white fill with coral words.
   Widget _urgentCard(S s, AppLanguage lang, List<Symptom> urgent) {
     const c = AppTheme.secondary700;
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: c.withValues(alpha: 0.06),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: c.withValues(alpha: 0.2)),
-      ),
+    return PregCard(
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
           const Icon(Icons.health_and_safety_rounded, size: 20, color: c),
           const SizedBox(width: 10),
-          Text(s.symUrgentTitle,
-              style: pvJakarta(
-                  fontSize: 15, fontWeight: FontWeight.w700, color: c)),
+          Expanded(
+            child: Text(s.symUrgentTitle,
+                style: pvManrope(
+                    fontSize: 15, fontWeight: FontWeight.w800, color: kPvInk)),
+          ),
         ]),
         const SizedBox(height: 6),
         Text(s.symUrgentBody,
@@ -316,13 +328,14 @@ class _SymptomCompanionScreenState extends State<SymptomCompanionScreen> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
-                      color: AppTheme.surface,
-                      borderRadius: BorderRadius.circular(99)),
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(99),
+                      border: Border.all(color: kPvLine)),
                   child: Text(x.name.of(lang),
                       style: pvManrope(
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
-                          color: c)),
+                          color: kPvInk)),
                 ),
               ),
           ],
@@ -331,6 +344,8 @@ class _SymptomCompanionScreenState extends State<SymptomCompanionScreen> {
     );
   }
 
+  // Kept for revert: replaced by `PregNote(s.symDisclaimer)` (2026-09-30).
+  // ignore: unused_element
   Widget _disclaimer(S s) => Row(children: [
         const Icon(Icons.info_outline_rounded,
             size: 15, color: AppTheme.neutral400),
@@ -375,16 +390,13 @@ class _SymptomDetail extends StatelessWidget {
     final m = symptomCatMeta(x.category);
     final count = SymptomStore.instance.countThisWeek(x.id);
 
-    Widget section(String label, String body, {Color? color}) => Padding(
-          padding: const EdgeInsets.only(bottom: 16),
+    // One section heading (2026-09-30): the serif, ink. Was a Manrope 11.5
+    // w800 label in the category's colour.
+    Widget section(String label, String body) => Padding(
+          padding: const EdgeInsets.only(bottom: 18),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(label,
-                style: pvManrope(
-                    fontSize: 11.5,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 0.3,
-                    color: color ?? m.color)),
-            const SizedBox(height: 4),
+            PregSectionHeading(label),
+            const SizedBox(height: 6),
             Text(body,
                 style: pvManrope(
                     fontSize: 14, height: 1.5, color: AppTheme.neutral700)),
@@ -392,9 +404,9 @@ class _SymptomDetail extends StatelessWidget {
         );
 
     return Scaffold(
-      backgroundColor: AppTheme.surfaceContainer,
+      backgroundColor: pvStorePalette.ground,
       appBar: AppBar(
-        backgroundColor: AppTheme.surfaceContainer,
+        backgroundColor: pvStorePalette.ground,
         title: Text(x.name.of(lang),
             style: pvJakarta(
                 fontWeight: FontWeight.w700, color: AppTheme.neutral900)),
@@ -403,15 +415,9 @@ class _SymptomDetail extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
         children: [
           Row(children: [
-            Container(
-              width: 44,
-              height: 44,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                  color: m.color.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(13)),
-              child: Icon(m.icon, size: 22, color: m.color),
-            ),
+            // The category's drawn mark in its well (2026-09-30). Kept for
+            // revert: a 44pt `m.color` 0.12 box with `Icon(m.icon)`.
+            PvMarkWell(p: pvStorePalette, hue: _hueOf(x.category), size: 44, mark: _markOf(x.category)),
             const SizedBox(width: 12),
             Expanded(
               child: Text(x.name.of(lang),
@@ -424,11 +430,10 @@ class _SymptomDetail extends StatelessWidget {
           const SizedBox(height: 18),
 
           if (count >= 2) ...[
-            Container(
+            // White card with the hairline, not a category-tinted block
+            // (2026-09-30). Kept for revert: `m.color` 0.08 fill, radius 14.
+            PregCard(
               padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                  color: m.color.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(14)),
               child: Text(s.symInsight(x.name.of(lang), count),
                   style: pvManrope(
                       fontSize: 13, height: 1.4, color: AppTheme.neutral900)),
@@ -442,13 +447,8 @@ class _SymptomDetail extends StatelessWidget {
             section(s.symWhy, x.why.of(lang)),
 
           if (x.tips.isNotEmpty) ...[
-            Text(s.symWhatHelps,
-                style: pvManrope(
-                    fontSize: 11.5,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 0.3,
-                    color: m.color)),
-            const SizedBox(height: 6),
+            PregSectionHeading(s.symWhatHelps),
+            const SizedBox(height: 8),
             for (final t in x.tips)
               Padding(
                 padding: const EdgeInsets.only(bottom: 6),
@@ -477,30 +477,31 @@ class _SymptomDetail extends StatelessWidget {
           ],
 
           // When to contact your doctor (always shown; prominent for urgent).
+          //
+          // ⚠️ THE WARNING FORM, NOT A TINTED BLOCK (2026-09-30, DESIGN-SYSTEM
+          // §4.0 addendum): an ink rule, the heading in the display face, the
+          // words under it. The coral icon is the only colour, and only when
+          // the symptom is urgent. Kept for revert: a Container filled with
+          // `(x.urgent ? secondary700 : neutral900)` at 0.08, radius 16, a
+          // Manrope 12 w800 heading in the same colour.
           Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: (x.urgent ? AppTheme.secondary700 : AppTheme.neutral900)
-                  .withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(16),
+            padding: const EdgeInsets.only(top: 14),
+            decoration: const BoxDecoration(
+              border: Border(top: BorderSide(color: kPvInk, width: 1.5)),
             ),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Row(children: [
-                Icon(
-                    x.urgent
-                        ? Icons.health_and_safety_rounded
-                        : Icons.medical_services_rounded,
-                    size: 18,
-                    color:
-                        x.urgent ? AppTheme.secondary700 : AppTheme.neutral900),
+              Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 3),
+                  child: Icon(
+                      x.urgent
+                          ? Icons.health_and_safety_rounded
+                          : Icons.medical_services_outlined,
+                      size: 18,
+                      color: x.urgent ? AppTheme.secondary700 : kPvInk),
+                ),
                 const SizedBox(width: 8),
-                Text(s.symWhenDoctor,
-                    style: pvManrope(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w800,
-                        color: x.urgent
-                            ? AppTheme.secondary700
-                            : AppTheme.neutral900)),
+                Expanded(child: PregSectionHeading(s.symWhenDoctor)),
               ]),
               const SizedBox(height: 6),
               Text(x.doctorGuidance.of(lang),
@@ -580,7 +581,7 @@ class _SymptomDetail extends StatelessWidget {
                               horizontal: 14, vertical: 8),
                           decoration: BoxDecoration(
                             color: severity == sev
-                                ? AppTheme.neutral900
+                                ? kPvInk
                                 : AppTheme.surfaceContainer,
                             borderRadius: BorderRadius.circular(99),
                           ),
@@ -626,6 +627,7 @@ class _SymptomDetail extends StatelessWidget {
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton(
+                    style: pregFilledStyle(),
                     onPressed: () async {
                       await SymptomStore.instance.log(
                         symptomId: x.id,

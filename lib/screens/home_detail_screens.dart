@@ -21,6 +21,39 @@ import '../services/daily_store.dart';
 import '../services/narration_service.dart';
 import '../widgets/narration/narrate_button.dart';
 import '../theme/app_theme.dart';
+import 'brackets/hub/hub_intent_art.dart' show IntentMark;
+import 'doors/pv_list_row.dart' show PvMarkWell;
+import 'pregnancy/preg_chrome.dart' show PregCard, pregFilledStyle, pregGroupLabelStyle;
+import 'products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
+
+/// A remembered line, in the tip form (DESIGN-SYSTEM §4.0 addendum): a left
+/// hairline in the ink, the group label, the line. What the gradient
+/// "Remember" panels became on 2026-09-30, since a tint is never behind text.
+class _RememberAside extends StatelessWidget {
+  const _RememberAside({required this.label, required this.body, this.bodyColor});
+  final String label;
+  final String body;
+  final Color? bodyColor;
+
+  @override
+  Widget build(BuildContext context) {
+    final text = Theme.of(context).textTheme;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(16, 4, 4, 4),
+      decoration: const BoxDecoration(
+        border: Border(left: BorderSide(color: kPvInk, width: 2)),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(label.toUpperCase(), style: pregGroupLabelStyle()),
+        const SizedBox(height: 8),
+        Text(body,
+            style: text.titleMedium?.copyWith(
+                color: bodyColor ?? kPvInk, fontStyle: FontStyle.italic, height: 1.45)),
+      ]),
+    );
+  }
+}
 
 // ---------------------------------------------------------------------------
 //  Grow reader
@@ -86,20 +119,19 @@ class GrowReaderScreen extends StatelessWidget {
                 style: text.bodyLarge?.copyWith(height: 1.6)),
             if (grow.deepDive != null && grow.deepDive!.of(lang).trim().isNotEmpty) ...[
               const SizedBox(height: 22),
-              Container(
-                width: double.infinity,
+              // A white card with the hairline, not a tinted panel behind text
+              // (2026-09-30). Kept for revert: a Container on
+              // `AppTheme.surfaceContainer`, radius 20, its label in
+              // labelSmall w800 +1 neutral900.
+              PregCard(
                 padding: const EdgeInsets.all(18),
-                decoration: BoxDecoration(
-                  color: AppTheme.surfaceContainer,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                child: SizedBox(
+                  width: double.infinity,
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Row(children: [
-                    const Icon(Icons.science_rounded, size: 16, color: AppTheme.neutral900),
+                    Icon(Icons.science_outlined, size: 16, color: pvStorePalette.ink2),
                     const SizedBox(width: 6),
-                    Text(s.deepDiveLabel.toUpperCase(),
-                        style: text.labelSmall?.copyWith(
-                            color: AppTheme.neutral900, letterSpacing: 1, fontWeight: FontWeight.w800)),
+                    Text(s.deepDiveLabel.toUpperCase(), style: pregGroupLabelStyle()),
                   ]),
                   const SizedBox(height: 10),
                   Row(children: [
@@ -114,30 +146,14 @@ class GrowReaderScreen extends StatelessWidget {
                   ]),
                   Text(grow.deepDive!.of(lang), style: text.bodyMedium?.copyWith(height: 1.6)),
                 ]),
+                ),
               ),
             ],
             const SizedBox(height: 22),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [AppTheme.neutral100, AppTheme.surface],
-                ),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(s.rememberLabel.toUpperCase(),
-                    style: text.labelSmall?.copyWith(
-                        color: AppTheme.neutral900, letterSpacing: 1, fontWeight: FontWeight.w800)),
-                const SizedBox(height: 8),
-                Text(grow.remember.of(lang),
-                    style: text.titleMedium?.copyWith(
-                        color: AppTheme.neutral900, fontStyle: FontStyle.italic, height: 1.45)),
-              ]),
-            ),
+            // The tip form, not a gradient panel (2026-09-30). Kept for revert:
+            // a Container with a neutral100 to surface gradient, radius 20,
+            // padding 18, the label in labelSmall w800 and the line italic.
+            _RememberAside(label: s.rememberLabel, body: grow.remember.of(lang)),
           ]),
         ),
       ),
@@ -186,54 +202,33 @@ class FatherLearnReaderScreen extends StatelessWidget {
                 style: text.bodyLarge?.copyWith(height: 1.6)),
             if (deepDive.isNotEmpty) ...[
               const SizedBox(height: 22),
-              Container(
-                width: double.infinity,
+              // A white card with the hairline (2026-09-30). Kept for revert:
+              // a Container on `AppTheme.surfaceContainer`, radius 20, the
+              // label in fatherSlate600 labelSmall w800 +1.
+              PregCard(
                 padding: const EdgeInsets.all(18),
-                decoration: BoxDecoration(
-                  color: AppTheme.surfaceContainer,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Row(children: [
-                    const Icon(Icons.menu_book_rounded, size: 16, color: _slate),
-                    const SizedBox(width: 6),
-                    Text(s.deepDiveLabel.toUpperCase(),
-                        style: text.labelSmall?.copyWith(
-                            color: AppTheme.fatherSlate600,
-                            letterSpacing: 1,
-                            fontWeight: FontWeight.w800)),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Row(children: [
+                      const Icon(Icons.menu_book_outlined, size: 16, color: _slate),
+                      const SizedBox(width: 6),
+                      Text(s.deepDiveLabel.toUpperCase(), style: pregGroupLabelStyle()),
+                    ]),
+                    const SizedBox(height: 10),
+                    Text(deepDive, style: text.bodyMedium?.copyWith(height: 1.6)),
                   ]),
-                  const SizedBox(height: 10),
-                  Text(deepDive, style: text.bodyMedium?.copyWith(height: 1.6)),
-                ]),
+                ),
               ),
             ],
             const SizedBox(height: 22),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [AppTheme.fatherSlate100, AppTheme.surface],
-                ),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(s.rememberLabel.toUpperCase(),
-                    style: text.labelSmall?.copyWith(
-                        color: AppTheme.fatherSlate600,
-                        letterSpacing: 1,
-                        fontWeight: FontWeight.w800)),
-                const SizedBox(height: 8),
-                Text(lesson.remember.of(lang),
-                    style: text.titleMedium?.copyWith(
-                        color: AppTheme.fatherSlate900,
-                        fontStyle: FontStyle.italic,
-                        height: 1.45)),
-              ]),
-            ),
+            // The tip form, not a gradient panel (2026-09-30). Kept for revert:
+            // a Container with a fatherSlate100 to surface gradient, radius 20,
+            // the label fatherSlate600, the line italic in fatherSlate900.
+            _RememberAside(
+                label: s.rememberLabel,
+                body: lesson.remember.of(lang),
+                bodyColor: AppTheme.fatherSlate900),
           ]),
         ),
       ),
@@ -299,7 +294,7 @@ class StoryReaderScreen extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text('“${story.title.of(lang)}”',
-                style: text.headlineLarge?.copyWith(color: AppTheme.secondary700, height: 1.2)),
+                style: text.headlineLarge?.copyWith(color: kPvInk, height: 1.2)),
             const SizedBox(height: 8),
             Text(story.summary.of(lang),
                 style: text.titleMedium?.copyWith(color: AppTheme.neutral600, height: 1.4)),
@@ -480,21 +475,25 @@ class _TalkComposerScreenState extends State<TalkComposerScreen> {
               child: Container(
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                // The one ink for what is pressed; white with the hairline at
+                // rest (2026-09-30). Kept for revert: secondary500 when
+                // listening, a secondary50 fill with a secondary100 border and
+                // coral words at rest.
                 decoration: BoxDecoration(
-                  color: _listening ? AppTheme.secondary500 : AppTheme.secondary50,
+                  color: _listening ? kPvInk : Colors.white,
                   borderRadius: BorderRadius.circular(40),
                   border: Border.all(
-                    color: _listening ? AppTheme.secondary500 : AppTheme.secondary100,
+                    color: _listening ? kPvInk : kPvLine,
                     width: 1.2,
                   ),
                 ),
                 child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  Icon(_listening ? Icons.stop_rounded : Icons.mic_rounded,
-                      size: 20, color: _listening ? Colors.white : AppTheme.secondary600),
+                  Icon(_listening ? Icons.stop_rounded : Icons.mic_none_rounded,
+                      size: 20, color: _listening ? Colors.white : kPvInk),
                   const SizedBox(width: 10),
                   Text(_listening ? s.talkListening : s.recordCta,
                       style: text.labelLarge?.copyWith(
-                          color: _listening ? Colors.white : AppTheme.secondary700,
+                          color: _listening ? Colors.white : kPvInk,
                           fontWeight: FontWeight.w700)),
                 ]),
               ),
@@ -547,16 +546,14 @@ Future<void> showGarbhInfoSheet(
             ),
             const SizedBox(height: 18),
             Row(children: [
-              Container(
-                width: 42,
-                height: 42,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: accent.withValues(alpha: 0.14),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Icon(Icons.self_improvement_rounded, color: accent, size: 24),
-              ),
+              // A drawn mark in its well, in the accent's hue (2026-09-30).
+              // Kept for revert: a 42pt `accent` 0.14 box holding
+              // Icon(Icons.self_improvement_rounded, color: accent).
+              PvMarkWell(
+                  p: pvStorePalette,
+                  hue: HSLColor.fromColor(accent).hue,
+                  size: 42,
+                  mark: IntentMark.lotusMark),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(s.aboutGarbhTitle,
@@ -581,7 +578,8 @@ Future<void> showGarbhInfoSheet(
             SizedBox(
               width: double.infinity,
               child: FilledButton(
-                style: FilledButton.styleFrom(backgroundColor: accent),
+                // The one ink (2026-09-30). Was `backgroundColor: accent`.
+                style: pregFilledStyle(),
                 onPressed: () => Navigator.of(context).pop(),
                 child: Text(s.gotIt),
               ),
@@ -608,12 +606,12 @@ class _InfoSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      // The grey group label, inside a sheet (2026-09-30). Kept for revert:
+      // the icon and the label in `accent`, labelSmall w800 +1.
       Row(children: [
-        Icon(icon, size: 16, color: accent),
+        Icon(icon, size: 16, color: pvStorePalette.ink3),
         const SizedBox(width: 7),
-        Text(label.toUpperCase(),
-            style: text.labelSmall?.copyWith(
-                color: accent, letterSpacing: 1, fontWeight: FontWeight.w800)),
+        Text(label.toUpperCase(), style: pregGroupLabelStyle()),
       ]),
       const SizedBox(height: 8),
       Text(body, style: text.bodyLarge?.copyWith(height: 1.6)),

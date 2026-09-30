@@ -19,10 +19,17 @@ import '../../data/spiritual_reading_data.dart';
 import '../../localization/app_language.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../services/spiritual_prefs_store.dart';
-import '../../theme/app_theme.dart';
 import '../../theme/pv_fonts.dart';
+import '../pregnancy/preg_chrome.dart';
+import '../products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 
-const Color _accent = Color(0xFF2F2C30);
+// ⚠️ ONE PARENTVEDA (2026-09-30, the pregnancy restyle): a white ground, the
+// serif page title under a back arrow, white cards with the page hairline
+// (no shadows), chips that are white with a hairline until chosen and then
+// the one ink, the framing and the footnote as quiet notes on the page
+// instead of tinted blocks, and each tradition's groups under the one serif
+// section heading. Nothing about what is shown or stored changed.
+const Color _accent = kPvInk;
 const int _previewCount = 3;
 
 // Preferred browse order (matches the section spec). Any tradition not listed
@@ -96,40 +103,34 @@ class _SpiritualReadingScreenState extends State<SpiritualReadingScreen> {
     final shown = _religion == null
         ? traditions
         : traditions.where((t) => t.id == _religion).toList();
+    final p = pvStorePalette;
+    // Kept for revert: AppBar(backgroundColor: AppTheme.surfaceContainer,
+    // title: Text(s.sprTitle)) on the grey ground. The title is now the serif
+    // page title in the body, and the AppBar carries only the back arrow.
     return Scaffold(
-      backgroundColor: AppTheme.surfaceContainer,
+      backgroundColor: p.ground,
       appBar: AppBar(
-        backgroundColor: AppTheme.surfaceContainer,
+        backgroundColor: p.ground,
+        surfaceTintColor: Colors.transparent,
+        foregroundColor: p.ink1,
         elevation: 0,
-        title: Text(s.sprTitle),
       ),
       body: AnimatedBuilder(
         animation: SpiritualPrefsStore.instance,
         builder: (context, _) => ListView(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 32),
           children: [
-            // Respectful framing - informational, not instruction.
-            Container(
-              padding: const EdgeInsets.all(15),
-              decoration: BoxDecoration(
-                color: _accent.withValues(alpha: 0.10),
-                borderRadius: BorderRadius.circular(18),
-              ),
-              child:
-                  Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                const Icon(Icons.favorite_border_rounded,
-                    size: 20, color: _accent),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(s.sprDisclaimer,
-                      style: pvManrope(
-                          fontSize: 12.5,
-                          height: 1.45,
-                          color: AppTheme.neutral900)),
-                ),
-              ]),
+            Semantics(
+              header: true,
+              child: Text(s.sprTitle, style: pregPageTitleStyle()),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 12),
+            // Respectful framing - informational, not instruction. A quiet
+            // note on the page. Kept for revert: the same Row(Icon(favorite_
+            // border), Text(s.sprDisclaimer)) in a Container(padding 15,
+            // color: _accent 10%, radius 18).
+            PregNote(s.sprDisclaimer, icon: Icons.favorite_border_rounded),
+            const SizedBox(height: 16),
             // Browse-by-religion selector.
             _religionSelector(traditions),
             const SizedBox(height: 14),
@@ -148,16 +149,14 @@ class _SpiritualReadingScreenState extends State<SpiritualReadingScreen> {
         padding: const EdgeInsets.only(right: 8),
         child: GestureDetector(
           onTap: () => setState(() => _religion = id),
+          // The store's chip (`PvChip`): white with the hairline, the one
+          // ink once chosen. Its own copy because it carries the symbol.
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
             decoration: BoxDecoration(
-              color:
-                  selected ? _accent : _accent.withValues(alpha: 0.10),
-              borderRadius: BorderRadius.circular(22),
-              border: Border.all(
-                  color: selected
-                      ? _accent
-                      : _accent.withValues(alpha: 0.20)),
+              color: selected ? _accent : Colors.white,
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(color: selected ? _accent : kPvLine, width: 1.1),
             ),
             child: Row(mainAxisSize: MainAxisSize.min, children: [
               if (symbol.isNotEmpty) ...[
@@ -166,9 +165,9 @@ class _SpiritualReadingScreenState extends State<SpiritualReadingScreen> {
               ],
               Text(label,
                   style: pvManrope(
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.w800,
-                      color: selected ? Colors.white : _accent)),
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: selected ? Colors.white : pvStorePalette.ink2)),
             ]),
           ),
         ),
@@ -191,16 +190,17 @@ class _SpiritualReadingScreenState extends State<SpiritualReadingScreen> {
     final text = Theme.of(context).textTheme;
     // Interest-aware preview (interested reads float to the top).
     final preview = _sortedReads(t).take(_previewCount).toList();
+    final p = pvStorePalette;
+    // A white card with the hairline (kept for revert: boxShadow
+    // Color(0x0F2D144C) blur 12, radius 22).
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(22),
-        boxShadow: const [
-          BoxShadow(
-              color: Color(0x0F2D144C), blurRadius: 12, offset: Offset(0, 3)),
-        ],
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: kPvLine),
       ),
+      clipBehavior: Clip.antiAlias,
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         // header
         Padding(
@@ -211,8 +211,8 @@ class _SpiritualReadingScreenState extends State<SpiritualReadingScreen> {
               height: 46,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                  color: _accent.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(14)),
+                  color: p.surfaceAlt,
+                  borderRadius: BorderRadius.circular(12)),
               child: Text(t.symbol, style: const TextStyle(fontSize: 24)),
             ),
             const SizedBox(width: 12),
@@ -221,28 +221,28 @@ class _SpiritualReadingScreenState extends State<SpiritualReadingScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(t.name.now,
-                      style: pvJakarta(
+                      style: pvManrope(
                           fontSize: 16,
                           fontWeight: FontWeight.w800,
-                          color: AppTheme.neutral900)),
+                          color: p.ink1)),
                   const SizedBox(height: 2),
                   Text(t.blurb.now,
                       style: pvManrope(
-                          fontSize: 12,
+                          fontSize: 12.5,
                           height: 1.35,
-                          color: AppTheme.neutral600)),
+                          color: p.ink3)),
                 ],
               ),
             ),
           ]),
         ),
-        const Divider(height: 1, color: AppTheme.outlineVariant),
+        const Divider(height: 1, thickness: 1, color: kPvLine),
         // preview reads
         for (var i = 0; i < preview.length; i++) ...[
-          if (i > 0) const Divider(height: 1, color: AppTheme.outlineVariant),
+          if (i > 0) const Divider(height: 1, thickness: 1, color: kPvLine, indent: 16),
           _readRow(context, widget.controller, text, t, preview[i]),
         ],
-        const Divider(height: 1, color: AppTheme.outlineVariant),
+        const Divider(height: 1, thickness: 1, color: kPvLine),
         // view all
         InkWell(
           onTap: () => Navigator.of(context).push(MaterialPageRoute(
@@ -251,13 +251,16 @@ class _SpiritualReadingScreenState extends State<SpiritualReadingScreen> {
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 13, 14, 13),
             child: Row(children: [
-              Text(s.sprViewAll(t.readCount),
-                  style: pvManrope(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w800,
-                      color: _accent)),
-              const Spacer(),
-              const Icon(Icons.arrow_forward_rounded, size: 18, color: _accent),
+              Expanded(
+                child: Text(s.sprViewAll(t.readCount),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: pvManrope(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: p.ink1)),
+              ),
+              Icon(Icons.chevron_right_rounded, size: 20, color: p.ink2),
             ]),
           ),
         ),
@@ -284,21 +287,23 @@ Widget _readRow(BuildContext context, PregnancyController controller,
             const Icon(Icons.favorite_rounded, size: 15, color: _accent),
             const SizedBox(width: 8),
           ] else if (notInterested) ...[
-            const Icon(Icons.not_interested_rounded,
-                size: 15, color: AppTheme.neutral400),
+            Icon(Icons.not_interested_rounded,
+                size: 15, color: pvStorePalette.ink3),
             const SizedBox(width: 8),
           ],
           Expanded(
             child: Text(r.title.now,
-                style: text.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
+                style: pvManrope(
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w700,
                     height: 1.25,
+                    color: pvStorePalette.ink1,
                     decoration:
                         notInterested ? TextDecoration.lineThrough : null)),
           ),
           const SizedBox(width: 8),
-          const Icon(Icons.chevron_right_rounded,
-              size: 20, color: AppTheme.neutral400),
+          Icon(Icons.chevron_right_rounded,
+              size: 20, color: pvStorePalette.ink3),
         ]),
       ),
     ),
@@ -317,45 +322,43 @@ class _TraditionDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
+    final p = pvStorePalette;
+    // Kept for revert: the tradition's name in the AppBar (pvJakarta 17 /
+    // w800) on the grey ground, each group under a small Jakarta label, and
+    // each group's card with a soft shadow. Now: a back arrow, the serif page
+    // title, the one section heading per group, white hairline cards.
     return Scaffold(
-      backgroundColor: AppTheme.surfaceContainer,
+      backgroundColor: p.ground,
       appBar: AppBar(
-        backgroundColor: AppTheme.surfaceContainer,
+        backgroundColor: p.ground,
+        surfaceTintColor: Colors.transparent,
+        foregroundColor: p.ink1,
         elevation: 0,
-        title: Text('${tradition.symbol}  ${tradition.name}',
-            style: pvJakarta(
-                fontSize: 17,
-                fontWeight: FontWeight.w800,
-                color: AppTheme.neutral900)),
       ),
       body: AnimatedBuilder(
         animation: SpiritualPrefsStore.instance,
         builder: (context, _) {
           final store = SpiritualPrefsStore.instance;
           return ListView(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 32),
             children: [
+              Semantics(
+                header: true,
+                child: Text('${tradition.symbol}  ${tradition.name}',
+                    style: pregPageTitleStyle()),
+              ),
               for (final sec in tradition.sections) ...[
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(4, 12, 4, 8),
-                  child: Text(sec.title.now,
-                      style: pvJakarta(
-                          fontSize: 13.5,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 0.2,
-                          color: _accent)),
+                  padding: const EdgeInsets.fromLTRB(0, 26, 0, 12),
+                  child: PregSectionHeading(sec.title.now),
                 ),
                 Container(
                   decoration: BoxDecoration(
-                    color: AppTheme.surface,
-                    borderRadius: BorderRadius.circular(18),
-                    boxShadow: const [
-                      BoxShadow(
-                          color: Color(0x0F2D144C),
-                          blurRadius: 10,
-                          offset: Offset(0, 2)),
-                    ],
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: kPvLine),
                   ),
+                  clipBehavior: Clip.antiAlias,
                   child: Builder(builder: (context) {
                     // Sort this section's reads by interest rank.
                     final reads = [...sec.reads]..sort((a, b) {
@@ -366,13 +369,12 @@ class _TraditionDetailScreen extends StatelessWidget {
                       for (var i = 0; i < reads.length; i++) ...[
                         if (i > 0)
                           const Divider(
-                              height: 1, color: AppTheme.outlineVariant),
+                              height: 1, thickness: 1, color: kPvLine, indent: 16),
                         _readRow(context, controller, text, tradition, reads[i]),
                       ],
                     ]);
                   }),
                 ),
-                const SizedBox(height: 6),
               ],
             ],
           );
@@ -396,16 +398,19 @@ class _SpiritualReadScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final s = S(controller.language);
     final hinglish = controller.language.isHinglish;
+    final p = pvStorePalette;
     return Scaffold(
-      backgroundColor: AppTheme.surface,
+      backgroundColor: p.ground,
       appBar: AppBar(
-        backgroundColor: AppTheme.surface,
+        backgroundColor: p.ground,
+        surfaceTintColor: Colors.transparent,
+        foregroundColor: p.ink1,
         elevation: 0,
         title: Text('${tradition.symbol}  ${tradition.name}',
             style: pvManrope(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
-                color: AppTheme.neutral700)),
+                color: p.ink2)),
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(22, 8, 22, 40),
@@ -415,13 +420,13 @@ class _SpiritualReadScreen extends StatelessWidget {
                   fontSize: 25,
                   height: 1.2,
                   fontWeight: FontWeight.w600,
-                  color: AppTheme.neutral900)),
+                  color: p.ink1)),
           const SizedBox(height: 16),
           Text(read.body.now,
               style: pvManrope(
                   fontSize: 15.5,
                   height: 1.7,
-                  color: const Color(0xFF2F2C30))),
+                  color: p.ink1)),
           const SizedBox(height: 20),
           // Interested / Not-interested preference (persists).
           AnimatedBuilder(
@@ -439,7 +444,8 @@ class _SpiritualReadScreen extends StatelessWidget {
                       foregroundColor: interested ? Colors.white : _accent,
                       backgroundColor:
                           interested ? _accent : Colors.transparent,
-                      side: const BorderSide(color: _accent),
+                      side: BorderSide(color: interested ? _accent : kPvLine),
+                      shape: const StadiumBorder(),
                       padding: const EdgeInsets.symmetric(vertical: 11),
                     ),
                     icon: Icon(
@@ -457,13 +463,13 @@ class _SpiritualReadScreen extends StatelessWidget {
                     onPressed: () =>
                         store.toggleNotInterested(read.title.now),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: notInterested
-                          ? Colors.white
-                          : AppTheme.neutral600,
-                      backgroundColor: notInterested
-                          ? AppTheme.neutral500
-                          : Colors.transparent,
-                      side: const BorderSide(color: AppTheme.neutral400),
+                      // The one ink once chosen, like Interested (was a grey
+                      // fill, AppTheme.neutral500).
+                      foregroundColor: notInterested ? Colors.white : p.ink2,
+                      backgroundColor:
+                          notInterested ? _accent : Colors.transparent,
+                      side: BorderSide(color: notInterested ? _accent : kPvLine),
+                      shape: const StadiumBorder(),
                       padding: const EdgeInsets.symmetric(vertical: 11),
                     ),
                     icon: Icon(
@@ -479,19 +485,10 @@ class _SpiritualReadScreen extends StatelessWidget {
             },
           ),
           const SizedBox(height: 20),
-          Container(
-            padding: const EdgeInsets.all(13),
-            decoration: BoxDecoration(
-              color: AppTheme.surfaceContainer,
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Text(s.sprFootnote,
-                style: pvManrope(
-                    fontSize: 11.5,
-                    height: 1.4,
-                    fontStyle: FontStyle.italic,
-                    color: AppTheme.neutral500)),
-          ),
+          // A quiet note on the page, not a grey block. Kept for revert:
+          // Container(padding 13, color: AppTheme.surfaceContainer, radius
+          // 14, Text(s.sprFootnote, italic 11.5, neutral500)).
+          PregNote(s.sprFootnote),
         ],
       ),
     );

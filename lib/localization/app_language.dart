@@ -716,15 +716,15 @@ class S {
   String get medTitle =>
       _p('Medication & Supplements', 'दवाइयाँ और सप्लीमेंट');
   String get medTodayNourishment =>
-      _p("Today's Nourishment ❤", 'आज का पोषण ❤');
+      _p("Today's Nourishment", 'आज का पोषण');
   String medProgress(int done, int total) =>
       _p('$done of $total completed today', 'आज $total में से $done पूरे');
   String get medTaken => _p('Taken', 'ले लिया');
   String get medTakenDone => _p('Taken ✓', 'ले लिया ✓');
-  String medLogged(String name) => _p('$name logged ❤', '$name दर्ज हो गया ❤');
+  String medLogged(String name) => _p('$name logged', '$name दर्ज हो गया');
   String get medAddNew => _p('Add New', 'नया जोड़ें');
   String get medSetupTitle => _p(
-      "Let's set up your supplements ❤", 'आइए आपके सप्लीमेंट सेट करें ❤');
+      "Let's set up your supplements", 'आइए आपके सप्लीमेंट सेट करें');
   String get medSetupBody => _p(
       'Which supplements has your doctor recommended?',
       'आपके डॉक्टर ने कौन से सप्लीमेंट बताए हैं?');
@@ -812,8 +812,8 @@ class S {
   String get vidSave => _p('Save', 'सेव');
   String get vidSaved => _p('Saved', 'सेव किया');
   String get vidMoreVideos => _p('More videos', 'और वीडियो');
-  String get vidComingSoon => _p('This video is on its way - coming soon ❤',
-      'यह वीडियो जल्द आ रहा है ❤');
+  String get vidComingSoon => _p('This video is on its way - coming soon',
+      'यह वीडियो जल्द आ रहा है');
   String get vidScreenTitle => _p('Watch & Learn', 'Watch & Learn');
   String get vidSecRecommended =>
       _p('Recommended for this week', 'इस हफ़्ते के लिए');
@@ -1073,8 +1073,8 @@ class S {
   String get ddcMsThirdTri => _p('Third Trimester', 'तीसरी तिमाही');
   String get ddcMsFullTerm => _p('Full Term', 'पूरा समय');
   String get ddcMsDue => _p('Due Date', 'डिलीवरी की तारीख़');
-  String get ddcReady => _p('Your pregnancy journey is ready 💜',
-      'आपकी गर्भावस्था का सफ़र तैयार है 💜');
+  String get ddcReady => _p('Your pregnancy journey is ready',
+      'आपकी गर्भावस्था का सफ़र तैयार है');
   String get ddcBenWeekly => _p('Weekly development', 'साप्ताहिक विकास');
   String get ddcBenDaily => _p('Daily guidance', 'रोज़ाना मार्गदर्शन');
   String get ddcBenScans => _p('Scan reminders', 'स्कैन के रिमाइंडर');
@@ -1084,7 +1084,7 @@ class S {
   String get ddcStart => _p('Start My Pregnancy Journey',
       'मेरा गर्भावस्था सफ़र शुरू करें');
   String get ddcStarted =>
-      _p('Your journey is set 💜', 'आपका सफ़र तय हो गया 💜');
+      _p('Your journey is set', 'आपका सफ़र तय हो गया');
   String get ddcRecalculate => _p('Recalculate', 'दोबारा निकालें');
 
   // ===========================================================================
@@ -1676,12 +1676,12 @@ class S {
       _p('When did these happen?', 'ये कब हुए थे?');
   String get jmSetWhen => _p('Set date', 'तारीख़ सेट करें');
   String get jmAllCaughtUp =>
-      _p("You're all caught up ❤️", 'आप सब पूरा कर चुकी हैं ❤️');
+      _p("You're all caught up", 'आप सब पूरा कर चुकी हैं');
   // Overdue (past the due date) - calm, reassuring.
   String get jmOverdueTitle => _p('Past your due date', 'डिलीवरी की तारीख़ निकल गई');
   String jmOverdueBody(int days) => _p(
-      '$days ${days == 1 ? 'day' : 'days'} past your due date - your baby will come when ready 💛',
-      '$days दिन डिलीवरी की तारीख़ के बाद — आपका शिशु तैयार होने पर आएगा 💛');
+      '$days ${days == 1 ? 'day' : 'days'} past your due date - your baby will come when ready',
+      '$days दिन डिलीवरी की तारीख़ के बाद — आपका शिशु तैयार होने पर आएगा');
   String get launchFeatureCta => _p('Launch', 'शुरू करें');
   String get featureComingSoonTitle =>
       _p('Coming soon 💜', 'जल्द आ रहा है 💜');
@@ -1833,7 +1833,7 @@ class S {
       'अभी कोई वज़न एंट्री नहीं। ज़्यादातर माँएँ डॉक्टर के पास जाने पर या हफ़्ते में एक बार वज़न दर्ज करती हैं।');
   String get addTodaysWeight => _p("Add Today's Weight", 'आज का वज़न जोड़ें');
   String get bodySupportingTitle =>
-      _p('Your body is supporting ❤️', 'आपका शरीर सहारा दे रहा है ❤️');
+      _p('Your body is supporting', 'आपका शरीर सहारा दे रहा है');
   String get supportGrowingBaby =>
       _p('Your growing baby', 'आपका बढ़ता शिशु');
   String get supportPlacenta => _p('Placenta development', 'Placenta का विकास');
@@ -1961,7 +1961,7 @@ class S {
   String get feedbackComfortable => _p('Comfortable', 'ठीक-ठाक');
   String get feedbackDifficult => _p('Difficult', 'मुश्किल');
   String get doneWord => _p('Done', 'हो गया');
-  String get careJourneyTitle => _p('Your Care Journey ❤️', 'आपका केयर सफ़र ❤️');
+  String get careJourneyTitle => _p('Your Care Journey', 'आपका केयर सफ़र');
   String get sessionsCompletedLabel =>
       _p('Sessions completed', 'सेशन पूरे');
   String get completedThisWeekLabel =>
@@ -3779,7 +3779,7 @@ class S {
   String get rnKnowMore => _p('Know more', 'और जानें');
   String get rnBuyNow => _p('Buy now', 'अभी ख़रीदें');
   String get rnBuyComingSoon =>
-      _p('Buying opens soon - saving works now ❤️', 'ख़रीदारी जल्द — सेव करना अभी चलता है ❤️');
+      _p('Buying opens soon - saving works now', 'ख़रीदारी जल्द — सेव करना अभी चलता है');
   String get rnSearchHint => _p('Search reading', 'पढ़ाई खोजें');
   String get rnNewResearch => _p('New research', 'नया शोध');
 

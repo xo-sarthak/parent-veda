@@ -68,6 +68,10 @@ import '../../widgets/storage_image.dart';
 import '../bump_book_screen.dart';
 import '../doors/pv_door_chrome.dart';
 import '../v2/v2_palette.dart';
+import '../brackets/hub/hub_intent_art.dart' show IntentMark;
+import '../doors/pv_list_row.dart' show PvMarkWell;
+import '../pregnancy/preg_chrome.dart' show PregSectionHeading, pregSectionHeadingStyle;
+import '../products/pv_store_chrome.dart' show kPvInk, kPvLine;
 
 /// This tab's hue — the soft amber the coverflow card wears.
 const double kBumpRitualHue = 26;
@@ -246,8 +250,10 @@ class _BumpRitualBodyState extends State<BumpRitualBody> {
 
             // ---- her weeks: trimester bands, read forward like a book -------
             const SizedBox(height: 26),
-            _Eyebrow('Your weeks', p: p),
-            const SizedBox(height: 14),
+            // One section heading (2026-09-30): the serif. Kept for revert:
+            // _Eyebrow('Your weeks', p: p),
+            const PregSectionHeading('Your weeks'),
+            const SizedBox(height: 16),
             for (final t in [1, 2, 3])
               if (photos.any((x) => x.trimester == t)) ...[
                 _TrimesterBand(
@@ -652,12 +658,8 @@ class _AheadBand extends StatelessWidget {
   @override
   Widget build(BuildContext context) =>
       Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text('Still ahead',
-            style: pvFraunces(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                letterSpacing: -0.4,
-                color: p.ink1)),
+        // A page section, so the one heading (2026-09-30). Was pvFraunces 18.
+        Semantics(header: true, child: Text('Still ahead', style: pregSectionHeadingStyle())),
         const SizedBox(height: 3),
         Text(
             moments.length == 1
@@ -700,13 +702,16 @@ class _Fact extends StatelessWidget {
   final V2Palette p;
   final String label;
   final String value;
+  // White with the hairline, not a grey block behind text (2026-09-30).
+  // Kept for revert: `color: p.surfaceAlt`, radius 12, no border.
   @override
   Widget build(BuildContext context) => Container(
         width: double.infinity,
         padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
         decoration: BoxDecoration(
-          color: p.surfaceAlt,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: kPvLine),
         ),
         child: Row(children: [
           Text(label.toUpperCase(),
@@ -735,15 +740,10 @@ class _BookRow extends StatelessWidget {
         child: PvDoorCard(
           p: p,
           child: Row(children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: v2BlockTint(12, p),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Icon(Icons.menu_book_outlined, size: 22, color: p.ink1),
-            ),
+            // The book's drawn mark in its well (2026-09-30). Kept for
+            // revert: a 44pt v2BlockTint(12) box with
+            // Icon(Icons.menu_book_outlined, size: 22, color: p.ink1).
+            PvMarkWell(p: p, hue: 12, size: 44, mark: IntentMark.bookMark),
             const SizedBox(width: 14),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -806,7 +806,9 @@ class _Empty extends StatelessWidget {
         const SizedBox(height: 26),
         _HairlineButton(p: p, label: 'Add your first photo', onTap: onAdd),
         const SizedBox(height: 30),
-        _Eyebrow('What it becomes', p: p),
+        // One section heading (2026-09-30). Kept for revert:
+        // _Eyebrow('What it becomes', p: p),
+        const PregSectionHeading('What it becomes'),
         const SizedBox(height: 12),
         _Fact(p: p, label: 'Then & Now', value: 'Once you have two weeks to put side by side.'),
         const SizedBox(height: 10),
@@ -1584,18 +1586,21 @@ class _Chips extends StatelessWidget {
               child: Container(
                 height: 32,
                 padding: const EdgeInsets.symmetric(horizontal: 13),
+                // A selected chip is the one ink, white words (2026-09-30).
+                // Kept for revert: a v2BlockTint(kBumpRitualHue) fill with an
+                // ink1 1.2 border and ink words.
                 decoration: BoxDecoration(
-                  color: x.id == selected ? v2BlockTint(kBumpRitualHue, p) : p.surface,
+                  color: x.id == selected ? kPvInk : p.surface,
                   borderRadius: BorderRadius.circular(999),
                   border: Border.all(
-                      color: x.id == selected ? p.ink1 : p.line, width: x.id == selected ? 1.2 : 1),
+                      color: x.id == selected ? kPvInk : p.line, width: x.id == selected ? 1.2 : 1),
                 ),
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
                   Text(chipLabel(x),
                       style: pvManrope(
                           fontSize: 12.5,
                           fontWeight: x.id == selected ? FontWeight.w700 : FontWeight.w600,
-                          color: x.id == selected ? p.ink1 : p.ink2)),
+                          color: x.id == selected ? Colors.white : p.ink2)),
                 ]),
               ),
             ),

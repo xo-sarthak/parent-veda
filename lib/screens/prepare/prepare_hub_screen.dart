@@ -34,6 +34,20 @@ import '../post_pregnancy/yoga_home_screen.dart';
 import 'prepare_common.dart';
 import 'program_detail_screen.dart';
 import '../../localization/app_language.dart';
+import '../brackets/hub/hub_intent_art.dart' show IntentMark;
+import '../doors/pv_list_row.dart' show PvMarkWell;
+import '../pregnancy/preg_chrome.dart' show PregNote, PregSectionHeading, pregGroupLabelStyle;
+import '../products/pv_store_chrome.dart' show kPvLine, pvStorePalette;
+
+/// A caps string read as a sentence ("RECOMMENDED AT 30 WEEKS" becomes
+/// "Recommended at 30 weeks"), so a heading that was a grey caps label can
+/// take the one serif heading without its copy changing. Leaves a string
+/// with no Latin capitals (Hindi) exactly as it is.
+String _sentenceCase(String t) {
+  if (t.isEmpty || t != t.toUpperCase() || t == t.toLowerCase()) return t;
+  final l = t.toLowerCase();
+  return l[0].toUpperCase() + l.substring(1);
+}
 
 class PrepareHubScreen extends StatelessWidget {
   const PrepareHubScreen({super.key, required this.lang, this.backLabel});
@@ -84,8 +98,10 @@ class PrepareHubScreen extends StatelessWidget {
             ])),
 
             const SizedBox(height: 26),
-            pad(Text(s.uiRecommendedWeeks,
-                style: pvBody(kSoft, 11).copyWith(fontWeight: FontWeight.w700, letterSpacing: 1.1))),
+            // One section heading (2026-09-30): the serif. Kept for revert:
+            // pad(Text(s.uiRecommendedWeeks, style: pvBody(kSoft, 11)
+            //     .copyWith(fontWeight: FontWeight.w700, letterSpacing: 1.1))),
+            pad(PregSectionHeading(_sentenceCase(s.uiRecommendedWeeks))),
             const SizedBox(height: 14),
 
             // Renders nothing unless the live sessions are sponsored. The
@@ -109,6 +125,8 @@ class PrepareHubScreen extends StatelessWidget {
                     _railCard(
                       tag: s.prepTagMasterclass,
                       tagColor: kPurple,
+                      mark: IntentMark.lampMark,
+                      hue: 240,
                       title: railMasterclass.title.now,
                       meta: '${railMasterclass.durationLabel} · ${railMasterclass.price}',
                       onTap: () =>
@@ -119,6 +137,8 @@ class PrepareHubScreen extends StatelessWidget {
                     _railCard(
                       tag: s.prepTagCohortStartsMon,
                       tagColor: kCoral,
+                      mark: IntentMark.seatMark,
+                      hue: 160,
                       title: railCohort.title.now,
                       meta: '${railCohort.durationLabel} · ${railCohort.price}',
                       onTap: () =>
@@ -132,16 +152,16 @@ class PrepareHubScreen extends StatelessWidget {
 
             // category tiles - the four sections
             pad(Column(children: [
-              _tile(context, Icons.school_outlined, s.uiCoursesCohorts,
+              _tile(context, IntentMark.schoolMark, 240, s.uiCoursesCohorts,
                   s.prepTileCoursesSub, s.prepProgramsCount(kPrepPrograms.length),
                   top: true, onTap: () => openSection(CoursesCohortsScreen(lang: lang))),
-              _tile(context, Icons.child_friendly_outlined, s.uiBirthingClasses,
+              _tile(context, IntentMark.cuppedHands, 20, s.uiBirthingClasses,
                   s.prepTileBirthingSub, s.prepTileBirthingCount,
                   onTap: () => openSection(BirthingClassesScreen(lang: lang))),
               // Yoga now uses the SAME cult.fit screen as the parenting side,
               // filtered to pregnancy categories — one UI both tabs. The old
               // month-tabbed PrenatalYogaScreen is retired (kept for revert).
-              _tile(context, Icons.self_improvement_rounded, s.uiYoga, s.prepTileYogaSub,
+              _tile(context, IntentMark.lotusMark, 160, s.uiYoga, s.prepTileYogaSub,
                   s.prepTileYogaCount, onTap: () => openSection(YogaHomeScreen(
                         categoryFilter: kPregnancyYogaCategories,
                         backLabel: s.uiPrepare,
@@ -151,7 +171,7 @@ class PrepareHubScreen extends StatelessWidget {
                       ))),
               // _tile(context, Icons.self_improvement_rounded, 'Yoga', 'Trimester-safe movement, month by month.',
               //     '9-month program', onTap: () => openSection(const PrenatalYogaScreen())),
-              _tile(context, Icons.restaurant_outlined, s.uiNutrition,
+              _tile(context, IntentMark.plate, 30, s.uiNutrition,
                   s.prepTileNutritionSub, s.prepTileNutritionCount,
                   bottom: true, onTap: () => openSection(NutritionScreen(lang: lang))),
               // --- retired standalone tiles (folded into the above) --------------
@@ -165,36 +185,31 @@ class PrepareHubScreen extends StatelessWidget {
             ])),
 
             const SizedBox(height: 22),
-            pad(Container(
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-              decoration: BoxDecoration(color: kPanel, borderRadius: BorderRadius.circular(18)),
-              child: Row(children: [
-                const Icon(Icons.auto_awesome_outlined, size: 16, color: kPurple),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text.rich(
-                    TextSpan(children: [
-                      // Kept for revert — "Most are free, or included with
-                      // ParentVeda+":
-                      //   pvText(s.uiMostFree),
-                      //   pvPurple('ParentVeda+'),
-                      //   pvText('.'),
-                      pvText(s.uiMostFreeRest),
-                    ]),
-                    style: pvBody(kInk, 13),
-                  ),
-                ),
-              ]),
-            )),
+            // A quiet note on the page, not a grey panel behind text
+            // (2026-09-30). Kept for revert: a Container on `kPanel`, radius
+            // 18, holding the icon and
+            //   Text.rich(TextSpan(children: [
+            //     // "Most are free, or included with ParentVeda+":
+            //     //   pvText(s.uiMostFree), pvPurple('ParentVeda+'), pvText('.'),
+            //     pvText(s.uiMostFreeRest),
+            //   ]), style: pvBody(kInk, 13)),
+            pad(PregNote(s.uiMostFreeRest, icon: Icons.auto_awesome_outlined)),
           ],
         ),
       ),
     );
   }
 
+  // ⚠️ ONE PARENTVEDA (2026-09-30): the hairline and no shadow; the drawn
+  // mark in its well where a striped placeholder image stood (no placeholder
+  // images); the tag in the grey group label, ink rather than a coloured word.
+  // Kept for revert: `boxShadow: pvCardShadow`, `const PvStriped(height: 100)`,
+  // and the tag styled `pvBody(tagColor, 10)` w700 +0.6.
   Widget _railCard({
     required String tag,
     required Color tagColor,
+    required IntentMark mark,
+    required double hue,
     required String title,
     required String meta,
     required VoidCallback onTap,
@@ -204,22 +219,29 @@ class PrepareHubScreen extends StatelessWidget {
       child: Container(
         width: 230,
         decoration: BoxDecoration(
+          color: Colors.white,
           borderRadius: BorderRadius.circular(22),
-          border: Border.all(color: kBorder),
-          boxShadow: pvCardShadow,
+          border: Border.all(color: kPvLine),
         ),
         clipBehavior: Clip.antiAlias,
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const PvStriped(height: 100),
+          SizedBox(
+            height: 100,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(14, 16, 14, 0),
+              child: Align(
+                alignment: Alignment.topLeft,
+                child: PvMarkWell(p: pvStorePalette, hue: hue, size: 64, mark: mark),
+              ),
+            ),
+          ),
           Expanded(
             child: Container(
               color: Colors.white,
               padding: const EdgeInsets.all(14),
               width: double.infinity,
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(tag.toUpperCase(),
-                    style: pvBody(tagColor, 10)
-                        .copyWith(fontWeight: FontWeight.w700, letterSpacing: 0.6)),
+                Text(tag.toUpperCase(), style: pregGroupLabelStyle()),
                 const SizedBox(height: 6),
                 Text(title, style: pvTitleStyle(16), maxLines: 2, overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 8),
@@ -232,7 +254,10 @@ class PrepareHubScreen extends StatelessWidget {
     );
   }
 
-  Widget _tile(BuildContext context, IconData icon, String title, String sub, String count,
+  // A row that opens somewhere carries a drawn mark in its tint (2026-09-30).
+  // Kept for revert: a 44pt `kPanel` box holding `Icon(icon, color: kPurple)`,
+  // and a '→' glyph under the count where the chevron now is.
+  Widget _tile(BuildContext context, IntentMark mark, double hue, String title, String sub, String count,
       {bool top = false, bool bottom = false, required VoidCallback onTap}) {
     return GestureDetector(
       onTap: onTap,
@@ -246,13 +271,7 @@ class PrepareHubScreen extends StatelessWidget {
           ),
         ),
         child: Row(children: [
-          Container(
-            width: 44,
-            height: 44,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(color: kPanel, borderRadius: BorderRadius.circular(14)),
-            child: Icon(icon, size: 22, color: kPurple),
-          ),
+          PvMarkWell(p: pvStorePalette, hue: hue, size: 44, mark: mark),
           const SizedBox(width: 15),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -264,7 +283,7 @@ class PrepareHubScreen extends StatelessWidget {
           const SizedBox(width: 10),
           Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
             Text(count, style: pvBody(kMuted, 12)),
-            const Text('→', style: TextStyle(color: kMuted, fontSize: 15)),
+            const Icon(Icons.chevron_right_rounded, size: 20, color: kMuted),
           ]),
         ]),
       ),

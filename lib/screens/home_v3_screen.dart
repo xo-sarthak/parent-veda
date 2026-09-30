@@ -48,7 +48,7 @@ import 'package:flutter/services.dart';
 
 // brand_models / launch_spotlight imports removed with the LaunchSpotlight
 // block below. Restore both if that block is uncommented.
-import '../data/product_data.dart' show productImageUrl;
+// import '../data/product_data.dart' show productImageUrl; // kept for revert, see build()
 import '../services/app_nav.dart';
 import 'calendar_screen.dart';
 import 'doors/pv_door_router.dart' show openPvDoorSurface, openPvDoorRead;
@@ -279,7 +279,11 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
   @override
   Widget build(BuildContext context) {
     // Wired once, here, so v3_sections does not have to import product_data.
-    productImageUrlV3 = productImageUrl;
+    // Kept for revert (2026-09-30, one ParentVeda: no placeholder images):
+    // `productImageUrl` falls back to a random loremflickr photo when a product
+    // has no picture of its own, so the shelf showed strangers' stock photos.
+    // The shelf now uses the product's own `imageUrl` and a quiet tile without.
+    // productImageUrlV3 = productImageUrl;
     return AnimatedBuilder(
       animation: Listenable.merge([
         pregnancy,

@@ -22,6 +22,8 @@ import 'package:flutter/material.dart';
 import '../../data/nutrition_data.dart';
 import '../../theme/pv_fonts.dart';
 import '../v2/v2_palette.dart';
+import '../pregnancy/preg_chrome.dart' show PregCard, PregSectionHeading, pregGroupLabelStyle;
+import '../products/pv_store_chrome.dart' show kPvInk;
 
 /// Opens search over the food library and pushes the verdict page on pick.
 /// Shared entry point — the Nutrition landing's search bar calls this too, so
@@ -120,10 +122,11 @@ class _FoodCheckBodyState extends State<FoodCheckBody> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _SearchBar(p: p, onTap: () => openFoodSearch(context)),
-                const SizedBox(height: 20),
-                Text('Most searched',
-                    style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w800, letterSpacing: 0.6, color: p.ink3)),
-                const SizedBox(height: 10),
+                const SizedBox(height: 22),
+                // One section heading (2026-09-30): the serif. Kept for
+                // revert: Manrope 12.5 w800 +0.6 in p.ink3.
+                const PregSectionHeading('Most searched'),
+                const SizedBox(height: 12),
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
@@ -143,10 +146,10 @@ class _FoodCheckBodyState extends State<FoodCheckBody> {
                       }),
                   ],
                 ),
-                const SizedBox(height: 22),
-                Text('Browse by category',
-                    style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w800, letterSpacing: 0.6, color: p.ink3)),
-                const SizedBox(height: 10),
+                const SizedBox(height: 26),
+                // One section heading (2026-09-30). Kept for revert: as above.
+                const PregSectionHeading('Browse by category'),
+                const SizedBox(height: 12),
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(children: [
@@ -227,11 +230,10 @@ class _Chip extends StatelessWidget {
           borderRadius: BorderRadius.circular(999),
           border: Border.all(color: p.line),
         ),
-        child: Row(mainAxisSize: MainAxisSize.min, children: [
-          Text(emoji, style: const TextStyle(fontSize: 15)),
-          const SizedBox(width: 7),
-          Text(label, style: pvManrope(fontSize: 13, fontWeight: FontWeight.w700, color: p.ink1)),
-        ]),
+        // No decorative emoji in chrome (2026-09-30). Kept for revert:
+        // Text(emoji, style: const TextStyle(fontSize: 15)) and a 7pt gap
+        // before the label.
+        child: Text(label, style: pvManrope(fontSize: 13, fontWeight: FontWeight.w700, color: p.ink1)),
       ),
     );
   }
@@ -250,16 +252,18 @@ class _CategoryChip extends StatelessWidget {
       borderRadius: BorderRadius.circular(999),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+        // Selected is the one ink, white words (2026-09-30). Kept for revert:
+        // an ink1 0.10 fill with an ink1 0.5 border and ink words.
         decoration: BoxDecoration(
-          color: selected ? p.ink1.withValues(alpha: 0.10) : p.surface,
+          color: selected ? kPvInk : p.surface,
           borderRadius: BorderRadius.circular(999),
-          border: Border.all(color: selected ? p.ink1.withValues(alpha: 0.5) : p.line),
+          border: Border.all(color: selected ? kPvInk : p.line),
         ),
         child: Text(label,
             style: pvManrope(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
-                color: selected ? p.ink1 : p.ink2)),
+                color: selected ? Colors.white : p.ink2)),
       ),
     );
   }
@@ -293,8 +297,10 @@ class FoodEntryRow extends StatelessWidget {
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(entry.name.now, style: pvManrope(fontSize: 14.5, fontWeight: FontWeight.w700, color: p.ink1)),
+                // Ink words; the verdict's colour stays on its glyph
+                // (2026-09-30). Was `color: v.color`.
                 Text(entry.verdict.label.now,
-                    style: pvManrope(fontSize: 11.5, fontWeight: FontWeight.w800, color: v.color)),
+                    style: pvManrope(fontSize: 11.5, fontWeight: FontWeight.w800, color: p.ink2)),
               ]),
             ),
             Icon(Icons.chevron_right_rounded, color: p.ink3),
@@ -335,25 +341,28 @@ class FoodVerdictScreen extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(18, 4, 18, 32),
               children: [
                 // --- Verdict card ---
-                Container(
-                  width: double.infinity,
+                //
+                // ⚠️ A WHITE CARD WITH THE HAIRLINE, NOT A TINTED BLOCK
+                // (2026-09-30, one ParentVeda). The verdict's colour is the
+                // signal, so it stays on the glyph; the words are ink. Kept
+                // for revert: a Container filled `v.color` at 0.09 with a
+                // `v.color` 0.30 border, radius 22, the label in `v.color`.
+                PregCard(
                   padding: const EdgeInsets.fromLTRB(18, 20, 18, 20),
-                  decoration: BoxDecoration(
-                    color: v.color.withValues(alpha: 0.09),
-                    borderRadius: BorderRadius.circular(22),
-                    border: Border.all(color: v.color.withValues(alpha: 0.30), width: 1.2),
-                  ),
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Row(children: [
                       Icon(v.icon, color: v.color, size: 30),
                       const SizedBox(width: 12),
                       Text(entry.verdict.label.now.toUpperCase(),
                           style: pvManrope(
-                              fontSize: 15, fontWeight: FontWeight.w800, letterSpacing: 1.0, color: v.color)),
+                              fontSize: 15, fontWeight: FontWeight.w800, letterSpacing: 1.0, color: kPvInk)),
                     ]),
                     const SizedBox(height: 14),
                     Text(entry.lines.now, style: pvManrope(fontSize: 14, height: 1.55, color: p.ink1)),
                   ]),
+                  ),
                 ),
 
                 if (entry.myth != null) ...[
@@ -368,9 +377,9 @@ class FoodVerdictScreen extends StatelessWidget {
 
                 if (entry.related.isNotEmpty) ...[
                   const SizedBox(height: 26),
-                  Text('Related foods',
-                      style: pvFraunces(fontSize: 17, fontWeight: FontWeight.w600, color: p.ink1)),
-                  const SizedBox(height: 10),
+                  // One section heading (2026-09-30). Was pvFraunces 17.
+                  const PregSectionHeading('Related foods'),
+                  const SizedBox(height: 12),
                   for (final rid in entry.related)
                     if (foodById(rid) != null) ...[
                       FoodEntryRow(
@@ -401,22 +410,23 @@ class _MythCard extends StatelessWidget {
   final String body;
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
+    // A white card with the hairline, not a grey block (2026-09-30). Kept
+    // for revert: a Container on `p.surfaceAlt`, radius 18, the label
+    // Manrope 12 w800 +0.5 in p.ink3.
+    return PregCard(
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
-      decoration: BoxDecoration(
-        color: p.surfaceAlt,
-        borderRadius: BorderRadius.circular(18),
-      ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [
-          Icon(Icons.auto_stories_outlined, size: 16, color: p.ink3),
-          const SizedBox(width: 8),
-          Text('The myth', style: pvManrope(fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: 0.5, color: p.ink3)),
+      child: SizedBox(
+        width: double.infinity,
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            Icon(Icons.auto_stories_outlined, size: 16, color: p.ink3),
+            const SizedBox(width: 8),
+            Text('The myth', style: pregGroupLabelStyle()),
+          ]),
+          const SizedBox(height: 8),
+          Text(body, style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2)),
         ]),
-        const SizedBox(height: 8),
-        Text(body, style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2)),
-      ]),
+      ),
     );
   }
 }
@@ -427,21 +437,25 @@ class _LimitCard extends StatelessWidget {
   final String body;
   @override
   Widget build(BuildContext context) {
+    // A white card with the hairline, not an amber block (2026-09-30). The
+    // amber stays on the glyph, as on the verdict. Kept for revert: a
+    // Container filled 0xFFC9932F at 0.08 with a 0.25 border, radius 18, the
+    // label Manrope 12 w800 +0.5 in the amber.
     const accent = Color(0xFFC9932F);
-    return Container(
-      width: double.infinity,
+    return PregCard(
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
-      decoration: BoxDecoration(
-        color: accent.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: accent.withValues(alpha: 0.25)),
+      child: SizedBox(
+        width: double.infinity,
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            const Icon(Icons.balance_rounded, size: 16, color: accent),
+            const SizedBox(width: 8),
+            Text('How much is fine', style: pregGroupLabelStyle()),
+          ]),
+          const SizedBox(height: 8),
+          Text(body, style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink1)),
+        ]),
       ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text('How much is fine',
-            style: pvManrope(fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: 0.5, color: accent)),
-        const SizedBox(height: 8),
-        Text(body, style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink1)),
-      ]),
     );
   }
 }

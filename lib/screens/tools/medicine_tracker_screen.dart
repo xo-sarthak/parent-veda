@@ -4,6 +4,18 @@
 //  A calm "nourishment companion": Today's Nourishment with a gentle
 //  mark-as-taken, a weekly awareness view, supplement education, and custom
 //  medicines. Never shaming, never gamified - just easy tracking. Warm-Nest UI.
+//
+//  ⚠️ ONE PARENTVEDA (restyle, 2026-09-30). Rebuilt in the shape of trying to
+//  conceive's Medication tool (`ttc_medication_screen.dart`, read, never
+//  imported): the page title in the serif on the page, the AppBar carrying
+//  only the back arrow; white cards on the hairline instead of plum-tinted
+//  shadows and a green gradient; every pressable thing (the Taken pill, the
+//  Daily / Weekly switch, Save, the add button, the weekday dots) in the one
+//  ink; a drawn pill mark on each medicine row, because a row opens its
+//  details; the week overview headed with the one serif section heading; the
+//  tinted consistency block and the disclaimer made a white card and a quiet
+//  note. Behaviour, copy and data are unchanged. The add button now names
+//  what it adds ("Add medication", not "Add New").
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -14,6 +26,10 @@ import '../../services/medicine_store.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/pv_fonts.dart';
+import '../brackets/hub/hub_intent_art.dart' show IntentMark;
+import '../doors/pv_list_row.dart' show PvMarkWell;
+import '../pregnancy/preg_chrome.dart';
+import '../products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 
 class MedicineTrackerScreen extends StatefulWidget {
   const MedicineTrackerScreen({super.key, required this.controller});
@@ -27,10 +43,17 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
   int _tab = 0; // 0 Daily · 1 Weekly
   PregnancyController get p => widget.controller;
 
-  static const List<BoxShadow> _soft = [
-    BoxShadow(color: Color(0x0F2D144C), blurRadius: 12, offset: Offset(0, 3)),
-  ];
-  static const Color _accent = Color(0xFF4F7A52); // calm green - "nourishment"
+  // Hairlines, not shadows (2026-09-30). Kept for revert:
+  // static const List<BoxShadow> _soft = [
+  //   BoxShadow(color: Color(0x0F2D144C), blurRadius: 12, offset: Offset(0, 3)),
+  // ];
+  // The one ink for everything pressable (2026-09-30). Kept for revert:
+  // static const Color _accent = Color(0xFF4F7A52); // calm green - "nourishment"
+  static const Color _accent = kPvInk;
+
+  /// The Tools hub's "Track" group hue, so the mark here matches its tile's
+  /// section.
+  static const double _hue = 206;
 
   // Weekday short labels, index 0..6 == Dart weekday 1..7 (Mon..Sun).
   static const List<String> _wdShort = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
@@ -89,60 +112,85 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
   Widget _build(BuildContext context) {
     final s = S(p.language);
     final store = MedicineStore.instance;
+    final ground = pvStorePalette.ground;
     return Scaffold(
-      backgroundColor: AppTheme.surfaceContainer,
+      backgroundColor: ground,
+      // The AppBar carries only the back arrow; the title is on the page
+      // (2026-09-30). Kept for revert:
+      //   backgroundColor: AppTheme.surfaceContainer,
+      //   title: Text(s.medTitle, style: pvJakarta(
+      //       fontWeight: FontWeight.w700, color: AppTheme.neutral900)),
       appBar: AppBar(
-        backgroundColor: AppTheme.surfaceContainer,
-        title: Text(s.medTitle,
-            style: pvJakarta(
-                fontWeight: FontWeight.w700, color: AppTheme.neutral900)),
+        backgroundColor: ground,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
       ),
       body: store.isEmpty ? _setup(s) : _main(s, store),
       floatingActionButton: store.isEmpty
           ? null
           : FloatingActionButton.extended(
               onPressed: () => _addSheet(s),
-              backgroundColor: _accent,
+              backgroundColor: kPvInk,
               icon: const Icon(Icons.add_rounded, color: Colors.white),
-              label: Text(s.medAddNew,
+              // Names what it adds (2026-09-30). Kept for revert: s.medAddNew
+              label: Text(s.medAddTitle,
                   style: pvManrope(
                       fontWeight: FontWeight.w700, color: Colors.white)),
             ),
     );
   }
 
+  /// The page title: the serif, ink, announced as a heading.
+  Widget _pageTitle(S s) => Semantics(
+        header: true,
+        child: Text(s.medTitle, style: pregPageTitleStyle()),
+      );
+
   // --- setup / empty ---------------------------------------------------------
+  // The empty state is the feature's invitation: a white card with the drawn
+  // pill mark, the question, the presets and the custom add, the shape of
+  // TTC's `TtcDoseEmpty`.
   Widget _setup(S s) => ListView(
-        padding: const EdgeInsets.fromLTRB(20, 24, 20, 28),
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
         children: [
-          Container(
-            width: 84,
-            height: 84,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-                color: _accent.withValues(alpha: 0.12), shape: BoxShape.circle),
-            child: const Icon(Icons.medication_liquid_rounded,
-                size: 40, color: _accent),
-          ),
-          const SizedBox(height: 18),
-          Text(s.medSetupTitle,
-              textAlign: TextAlign.center,
-              style: pvFraunces(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w500,
-                  color: AppTheme.neutral900)),
-          const SizedBox(height: 8),
-          Text(s.medSetupBody,
-              textAlign: TextAlign.center,
-              style: pvManrope(
-                  fontSize: 14, height: 1.5, color: AppTheme.neutral600)),
-          const SizedBox(height: 22),
-          _presetWrap(s),
-          const SizedBox(height: 16),
-          OutlinedButton.icon(
-            onPressed: () => _medForm(s, null),
-            icon: const Icon(Icons.add_rounded, size: 18),
-            label: Text(s.medAddCustom),
+          _pageTitle(s),
+          const SizedBox(height: 20),
+          PregCard(
+            padding: const EdgeInsets.fromLTRB(18, 22, 18, 20),
+            child: Column(children: [
+              // A drawn mark, not a tinted line icon (2026-09-30). Kept for revert:
+              // Container(width: 84, height: 84, alignment: Alignment.center,
+              //   decoration: BoxDecoration(color: _accent.withValues(alpha: 0.12),
+              //     shape: BoxShape.circle),
+              //   child: const Icon(Icons.medication_liquid_rounded, size: 40, color: _accent)),
+              PvMarkWell(
+                  p: pvStorePalette, hue: _hue, size: 64, mark: IntentMark.pillMark),
+              const SizedBox(height: 16),
+              Text(s.medSetupTitle,
+                  textAlign: TextAlign.center,
+                  style: pvFraunces(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: pvStorePalette.ink1)),
+              const SizedBox(height: 8),
+              Text(s.medSetupBody,
+                  textAlign: TextAlign.center,
+                  style: pvManrope(
+                      fontSize: 13.5, height: 1.5, color: pvStorePalette.ink2)),
+              const SizedBox(height: 20),
+              _presetWrap(s),
+              const SizedBox(height: 16),
+              OutlinedButton.icon(
+                onPressed: () => _medForm(s, null),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: kPvInk,
+                  side: const BorderSide(color: kPvInk, width: 1.2),
+                  shape: const StadiumBorder(),
+                ),
+                icon: const Icon(Icons.add_rounded, size: 18),
+                label: Text(s.medAddCustom),
+              ),
+            ]),
           ),
           const SizedBox(height: 18),
           _disclaimer(s),
@@ -163,7 +211,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                 decoration: BoxDecoration(
                   color: AppTheme.surface,
                   borderRadius: BorderRadius.circular(99),
-                  boxShadow: _soft,
+                  border: Border.all(color: kPvLine),
                 ),
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
                   const Icon(Icons.add_rounded, size: 16, color: _accent),
@@ -182,8 +230,10 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
   // --- main (daily / weekly) -------------------------------------------------
   Widget _main(S s, MedicineStore store) {
     return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
       children: [
+        _pageTitle(s),
+        const SizedBox(height: 18),
         _segmented(s),
         const SizedBox(height: 14),
         if (_tab == 0) ..._daily(s, store) else ..._weekly(s, store),
@@ -200,7 +250,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
       decoration: BoxDecoration(
         color: AppTheme.surface,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: _soft,
+        border: Border.all(color: kPvLine),
       ),
       child: Row(children: [
         for (int i = 0; i < tabs.length; i++)
@@ -220,7 +270,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                     style: pvManrope(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
-                        color: _tab == i ? Colors.white : AppTheme.neutral600)),
+                        color: _tab == i ? Colors.white : pvStorePalette.ink2)),
               ),
             ),
           ),
@@ -233,30 +283,24 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
     final done = store.takenTodayCount;
     final total = store.todayTotal;
     return [
-      Container(
+      // A white card on the hairline; no tint behind the words (2026-09-30).
+      // Kept for revert: a Container with a LinearGradient from
+      // _accent.withValues(alpha: 0.14) to AppTheme.surface, radius 22, _soft.
+      PregCard(
         padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [_accent.withValues(alpha: 0.14), AppTheme.surface],
-          ),
-          borderRadius: BorderRadius.circular(22),
-          boxShadow: _soft,
-        ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(s.medTodayNourishment,
               style: pvJakarta(
                   fontSize: 17,
                   fontWeight: FontWeight.w700,
-                  color: AppTheme.neutral900)),
+                  color: pvStorePalette.ink1)),
           const SizedBox(height: 10),
           ClipRRect(
             borderRadius: BorderRadius.circular(99),
             child: LinearProgressIndicator(
               value: total == 0 ? 0 : done / total,
               minHeight: 8,
-              backgroundColor: AppTheme.surfaceContainerHigh,
+              backgroundColor: pvStorePalette.surfaceAlt,
               valueColor: const AlwaysStoppedAnimation(_accent),
             ),
           ),
@@ -265,7 +309,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
               style: pvManrope(
                   fontSize: 12.5,
                   fontWeight: FontWeight.w600,
-                  color: AppTheme.neutral600)),
+                  color: pvStorePalette.ink2)),
         ]),
       ),
       const SizedBox(height: 14),
@@ -276,17 +320,15 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
   Widget _dailyItem(S s, MedicineStore store, Medication m) {
     final taken = store.isTakenToday(m.id);
     final sub = [m.dose, m.time].where((x) => x.trim().isNotEmpty).join(' · ');
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: _soft,
-      ),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
       child: Material(
-        color: Colors.transparent,
+        color: AppTheme.surface,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+            side: const BorderSide(color: kPvLine)),
+        clipBehavior: Clip.antiAlias,
         child: InkWell(
-          borderRadius: BorderRadius.circular(18),
           onTap: () => _details(s, store, m),
           child: Padding(
             padding: const EdgeInsets.all(14),
@@ -294,16 +336,14 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(children: [
-              Container(
-                width: 42,
-                height: 42,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                    color: _accent.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(12)),
-                child: const Icon(Icons.medication_rounded,
-                    color: _accent, size: 20),
-              ),
+              // The row opens its details, so it carries a drawn mark
+              // (2026-09-30). Kept for revert:
+              // Container(width: 42, height: 42, alignment: Alignment.center,
+              //   decoration: BoxDecoration(color: _accent.withValues(alpha: 0.12),
+              //     borderRadius: BorderRadius.circular(12)),
+              //   child: const Icon(Icons.medication_rounded, color: _accent, size: 20)),
+              PvMarkWell(
+                  p: pvStorePalette, hue: _hue, size: 40, mark: IntentMark.pillMark),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -313,11 +353,11 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                         style: pvJakarta(
                             fontSize: 14.5,
                             fontWeight: FontWeight.w700,
-                            color: AppTheme.neutral900)),
+                            color: pvStorePalette.ink1)),
                     if (sub.isNotEmpty)
                       Text(sub,
                           style: pvManrope(
-                              fontSize: 12, color: AppTheme.neutral500)),
+                              fontSize: 12, color: pvStorePalette.ink3)),
                   ],
                 ),
               ),
@@ -331,9 +371,13 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                   duration: const Duration(milliseconds: 160),
                   padding:
                       const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+                  // Taken: the ink, white words. Not yet: white, the ink's
+                  // outline (2026-09-30). Kept for revert:
+                  //   color: taken ? _accent : _accent.withValues(alpha: 0.10),
                   decoration: BoxDecoration(
-                    color: taken ? _accent : _accent.withValues(alpha: 0.10),
+                    color: taken ? _accent : Colors.white,
                     borderRadius: BorderRadius.circular(99),
+                    border: Border.all(color: _accent, width: 1.2),
                   ),
                   child: Row(mainAxisSize: MainAxisSize.min, children: [
                     Icon(taken ? Icons.check_rounded : Icons.circle_outlined,
@@ -363,14 +407,14 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
     if (m.alarms.isEmpty) return const [];
     return [
       const SizedBox(height: 8),
-      const Divider(height: 1, color: AppTheme.outlineVariant),
+      const Divider(height: 1, color: kPvLine),
       for (final a in m.alarms)
         Padding(
           padding: const EdgeInsets.only(top: 8),
           child: Row(children: [
             Icon(Icons.alarm_rounded,
                 size: 16,
-                color: a.enabled ? _accent : AppTheme.neutral400),
+                color: a.enabled ? pvStorePalette.ink2 : pvStorePalette.ink3),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
@@ -378,7 +422,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                 style: pvManrope(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: a.enabled ? AppTheme.neutral900 : AppTheme.neutral500,
+                  color: a.enabled ? pvStorePalette.ink1 : pvStorePalette.ink3,
                 ),
               ),
             ),
@@ -403,61 +447,55 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
 
   List<Widget> _weekly(S s, MedicineStore store) {
     final meds = store.activeMeds;
+    final ink = pvStorePalette;
     return [
-      Text(s.medWeekOverview,
-          style: pvJakarta(
-              fontSize: 15,
-              fontWeight: FontWeight.w700,
-              color: AppTheme.neutral900)),
-      const SizedBox(height: 10),
-      for (final m in meds)
-        Container(
-          margin: const EdgeInsets.only(bottom: 10),
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: AppTheme.surface,
-            borderRadius: BorderRadius.circular(18),
-            boxShadow: _soft,
-          ),
-          child: Row(children: [
-            Expanded(
-              child: Text(m.name,
-                  style: pvJakarta(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: AppTheme.neutral900)),
+      // The one section heading (2026-09-30). Kept for revert: a pvJakarta
+      // 15 / w700 Text(s.medWeekOverview).
+      PregSectionHeading(s.medWeekOverview),
+      const SizedBox(height: 12),
+      // One white card of rows on the hairline, instead of a shadowed card
+      // per medicine (2026-09-30). These rows open nothing, so no mark.
+      PregCard(
+        padding: EdgeInsets.zero,
+        child: Column(children: [
+          for (int i = 0; i < meds.length; i++) ...[
+            if (i > 0)
+              const Divider(
+                  height: 1, thickness: 1, color: kPvLine, indent: 16, endIndent: 16),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(children: [
+                Expanded(
+                  child: Text(meds[i].name,
+                      style: pvJakarta(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: ink.ink1)),
+                ),
+                Text(s.medDaysOf7(store.weeklyDays(meds[i].id)),
+                    style: pvManrope(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: ink.ink1)),
+              ]),
             ),
-            Text(s.medDaysOf7(store.weeklyDays(m.id)),
-                style: pvManrope(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: _accent)),
-          ]),
-        ),
-      const SizedBox(height: 8),
-      Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: _accent.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(18),
-        ),
+          ],
+        ]),
+      ),
+      const SizedBox(height: 12),
+      // A white card, not a green tint behind the words (2026-09-30). Kept
+      // for revert: Container(padding: all(16), decoration: BoxDecoration(
+      //   color: _accent.withValues(alpha: 0.08), radius 18), child: Text(...)).
+      PregCard(
         child: Text(s.medConsistency(store.consistencyDays30),
-            style: pvManrope(
-                fontSize: 13, height: 1.5, color: AppTheme.neutral900)),
+            style: pvManrope(fontSize: 13, height: 1.5, color: ink.ink1)),
       ),
     ];
   }
 
-  Widget _disclaimer(S s) => Row(children: [
-        const Icon(Icons.info_outline_rounded,
-            size: 15, color: AppTheme.neutral400),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(s.medDisclaimer,
-              style: pvManrope(
-                  fontSize: 11.5, color: AppTheme.neutral500)),
-        ),
-      ]);
+  // The quiet note (2026-09-30). Kept for revert: a Row of an
+  // info_outline_rounded icon (15, neutral400) and pvManrope 11.5 neutral500.
+  Widget _disclaimer(S s) => PregNote(s.medDisclaimer);
 
   // --- add / form ------------------------------------------------------------
   void _addSheet(S s) {
@@ -494,6 +532,11 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: kPvInk,
+                    side: const BorderSide(color: kPvInk, width: 1.2),
+                    shape: const StadiumBorder(),
+                  ),
                   onPressed: () {
                     Navigator.pop(ctx);
                     _medForm(s, null);
@@ -585,7 +628,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                   SizedBox(
                     width: double.infinity,
                     child: FilledButton(
-                      style: FilledButton.styleFrom(backgroundColor: _accent),
+                      style: pregFilledStyle(),
                       onPressed: () {
                         final name = nameCtrl.text.trim();
                         if (name.isEmpty) {
@@ -644,7 +687,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(children: [
-          const Icon(Icons.alarm_rounded, size: 18, color: _accent),
+          Icon(Icons.alarm_rounded, size: 18, color: pvStorePalette.ink2),
           const SizedBox(width: 8),
           Text(S.now.uiAlarms,
               style: pvJakarta(
@@ -657,15 +700,19 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
           Container(
             margin: const EdgeInsets.only(bottom: 8),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            // White on the hairline, not a grey block behind the words
+            // (2026-09-30). Kept for revert: color: AppTheme.surfaceContainer.
             decoration: BoxDecoration(
-              color: AppTheme.surfaceContainer,
+              color: AppTheme.surface,
               borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: kPvLine),
             ),
             child: Row(children: [
               Icon(Icons.alarm_rounded,
                   size: 16,
-                  color:
-                      alarms[i].enabled ? _accent : AppTheme.neutral400),
+                  color: alarms[i].enabled
+                      ? pvStorePalette.ink2
+                      : pvStorePalette.ink3),
               const SizedBox(width: 10),
               Expanded(
                 child: Column(
@@ -715,6 +762,11 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
         Align(
           alignment: Alignment.centerLeft,
           child: OutlinedButton.icon(
+            style: OutlinedButton.styleFrom(
+              foregroundColor: kPvInk,
+              side: const BorderSide(color: kPvInk, width: 1.2),
+              shape: const StadiumBorder(),
+            ),
             onPressed: () => _alarmSheet(
               null,
               getDefaultTitle(),
@@ -810,10 +862,13 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                           onDeleted: times.length == 1
                               ? null
                               : () => setSheet(() => times.removeAt(i)),
-                          backgroundColor:
-                              _accent.withValues(alpha: 0.10),
+                          // A pill's tint, grey (2026-09-30). Kept for revert:
+                          // backgroundColor: _accent.withValues(alpha: 0.10),
+                          backgroundColor: pvStorePalette.surfaceAlt,
+                          side: BorderSide.none,
                           labelStyle: pvManrope(
-                              fontWeight: FontWeight.w700, color: _accent),
+                              fontWeight: FontWeight.w700,
+                              color: pvStorePalette.ink1),
                         ),
                       ActionChip(
                         avatar: const Icon(Icons.add_rounded,
@@ -880,7 +935,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                   SizedBox(
                     width: double.infinity,
                     child: FilledButton(
-                      style: FilledButton.styleFrom(backgroundColor: _accent),
+                      style: pregFilledStyle(),
                       onPressed: times.isEmpty
                           ? null
                           : () {
@@ -1016,9 +1071,12 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        // White on the hairline, like the due date's date field
+        // (2026-09-30). Kept for revert: color: AppTheme.surfaceContainer.
         decoration: BoxDecoration(
-          color: AppTheme.surfaceContainer,
+          color: AppTheme.surface,
           borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: kPvLine),
         ),
         child: Row(children: [
           const Icon(Icons.event_rounded,
@@ -1035,7 +1093,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
               style: pvManrope(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
-                  color: has ? _accent : AppTheme.neutral400)),
+                  color: has ? pvStorePalette.ink1 : pvStorePalette.ink3)),
           if (has)
             GestureDetector(
               onTap: onClear,
@@ -1112,8 +1170,9 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                     child: Row(children: [
                       Icon(Icons.alarm_rounded,
                           size: 16,
-                          color:
-                              a.enabled ? _accent : AppTheme.neutral400),
+                          color: a.enabled
+                              ? pvStorePalette.ink2
+                              : pvStorePalette.ink3),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(_alarmSummary(a),

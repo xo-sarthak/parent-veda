@@ -5,6 +5,15 @@
 //  baby, water, or her own) at a time + repeat she chooses. This is the full
 //  management UX + persistence; the actual OS notification firing plugs in via
 //  NotificationService once flutter_local_notifications is installed.
+//
+//  ⚠️ ONE PARENTVEDA (2026-09-30, the structural restyle). Shaped like trying
+//  to conceive's Messages and Appointments (read for shape only, never
+//  imported): the serif page title under a back-arrow-only AppBar; the "what
+//  this does" banner is a quiet note on the page, not a tinted box; her
+//  reminders share one white hairline card, each row leading with a drawn
+//  mark (a row opens its editor); "From ParentVeda" and the quick ideas are
+//  page sections under the one serif heading; the add button, a selected chip
+//  and the save buttons are the one ink.
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -16,7 +25,11 @@ import '../services/pregnancy_controller.dart';
 import '../services/reminder_store.dart';
 import '../theme/app_theme.dart';
 import '../theme/pv_fonts.dart';
+import 'brackets/hub/hub_intent_art.dart' show IntentMark;
+import 'doors/pv_list_row.dart' show PvMarkWell;
+import 'pregnancy/preg_chrome.dart';
 import 'pregnancy/preg_messages_screen.dart' show PregMessageSwitches;
+import 'products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 
 /// A quick-add suggestion (its title comes from S so it stays bilingual).
 typedef _Preset = ({
@@ -39,6 +52,90 @@ String _vitamin(S s) => s.rmdSugVitamin;
 String _read(S s) => s.rmdSugRead;
 String _water(S s) => s.rmdSugWater;
 String _calm(S s) => s.rmdSugCalm;
+
+/// A drawn mark per reminder kind: a row opens its editor, so it leads with a
+/// mark, not a line icon (2026-09-30).
+IntentMark _categoryMark(String c) => switch (c) {
+      'kegel' => IntentMark.lotusMark,
+      'medication' => IntentMark.pillMark,
+      'reads' => IntentMark.bookMark,
+      'water' => IntentMark.dropMark,
+      'bag' => IntentMark.bagMark,
+      _ => IntentMark.calendarDay,
+    };
+
+double _categoryHue(String c) => switch (c) {
+      'kegel' => 160,
+      'medication' => 344,
+      'reads' => 42,
+      'water' => 206,
+      'bag' => 28,
+      _ => 180,
+    };
+
+/// A group label inside a form: the small grey caps (was labelLarge / w800).
+Widget _groupLabel(String t) => Align(
+      alignment: Alignment.centerLeft,
+      child: Text(t.toUpperCase(), style: pregGroupLabelStyle()),
+    );
+
+/// A form field: white with the hairline, the ink ring when focused. Was a
+/// tinted fill (AppTheme.surfaceContainer) with no border, kept for revert.
+InputDecoration _fieldDecoration({String? label, String? hint}) {
+  OutlineInputBorder b(Color c) => OutlineInputBorder(
+      borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: c));
+  return InputDecoration(
+    labelText: label,
+    hintText: hint,
+    filled: true,
+    fillColor: Colors.white,
+    border: b(kPvLine),
+    enabledBorder: b(kPvLine),
+    focusedBorder: b(kPvInk),
+  );
+}
+
+/// The box a dropdown sits in: white with the hairline (was a tinted fill).
+BoxDecoration _dropdownBox(double radius) => BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(radius),
+      border: Border.all(color: kPvLine),
+    );
+
+/// A selected chip is the one ink with white words; the rest white with the
+/// hairline. The pregnancy theme alone gives a pale grey selection.
+Text _chipText(String label, bool selected) => Text(label,
+    style: pvManrope(
+        fontSize: 13,
+        fontWeight: FontWeight.w700,
+        color: selected ? Colors.white : pvStorePalette.ink1));
+
+BorderSide _chipSide(bool selected) =>
+    BorderSide(color: selected ? kPvInk : kPvLine);
+
+ChoiceChip _choiceChip(String label, bool selected, ValueChanged<bool> onSelected) =>
+    ChoiceChip(
+      label: _chipText(label, selected),
+      selected: selected,
+      onSelected: onSelected,
+      showCheckmark: false,
+      selectedColor: kPvInk,
+      backgroundColor: Colors.white,
+      side: _chipSide(selected),
+      shape: const StadiumBorder(),
+    );
+
+FilterChip _filterChip(String label, bool selected, ValueChanged<bool> onSelected) =>
+    FilterChip(
+      label: _chipText(label, selected),
+      selected: selected,
+      onSelected: onSelected,
+      showCheckmark: false,
+      selectedColor: kPvInk,
+      backgroundColor: Colors.white,
+      side: _chipSide(selected),
+      shape: const StadiumBorder(),
+    );
 
 IconData _categoryIcon(String c) {
   switch (c) {
@@ -66,10 +163,18 @@ class RemindersScreen extends StatelessWidget {
     final s = S(controller.language);
     final store = ReminderStore.instance;
     store.init();
+    final pal = pvStorePalette;
     return Scaffold(
-      backgroundColor: AppTheme.scaffoldBackground,
+      backgroundColor: pal.ground,
+      // The AppBar carries the back arrow and the two test controls; the
+      // title is the serif on the page. Kept for revert:
+      //   backgroundColor: AppTheme.scaffoldBackground,
+      //   appBar: AppBar(title: Text(s.rmdTitle), actions: [...]),
       appBar: AppBar(
-        title: Text(s.rmdTitle),
+        backgroundColor: pal.ground,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        foregroundColor: pal.ink1,
         actions: [
           IconButton(
             tooltip: S.now.uiSendTestNotificationNow,
@@ -109,74 +214,56 @@ class RemindersScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => showReminderEditor(context, controller),
-        backgroundColor: AppTheme.neutral900,
+        backgroundColor: kPvInk,
         foregroundColor: Colors.white,
         elevation: 2,
         highlightElevation: 5,
         shape: const StadiumBorder(),
         icon: const Icon(Icons.add_rounded),
         label: Text(s.rmdAdd,
-            style: pvJakarta(
-                fontWeight: FontWeight.w700, fontSize: 14.5)),
+            style: pvManrope(fontWeight: FontWeight.w700, fontSize: 14.5)),
       ),
       body: AnimatedBuilder(
         animation: store,
         builder: (context, _) {
           final items = store.all;
           return ListView(
-            padding: const EdgeInsets.fromLTRB(18, 12, 18, 100),
+            padding: const EdgeInsets.fromLTRB(20, 4, 20, 100),
             children: [
-              // Gentle "what this does" note.
-              Container(
-                padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
-                decoration: BoxDecoration(
-                  color: AppTheme.neutral50,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                      color: AppTheme.neutral900.withValues(alpha: 0.12)),
-                ),
-                child: Row(children: [
-                  const Icon(Icons.notifications_active_rounded,
-                      size: 18, color: AppTheme.neutral900),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(s.rmdScheduleNote,
-                        style: pvManrope(
-                            fontSize: 13,
-                            height: 1.4,
-                            color: AppTheme.neutral900)),
-                  ),
-                ]),
-              ),
+              Text(s.rmdTitle, style: pregPageTitleStyle()),
+              const SizedBox(height: 10),
+              // Gentle "what this does" note, on the page. Kept for revert
+              // (2026-09-30, no tinted block behind text): a Container in
+              // AppTheme.neutral50 with a neutral900 @ 0.12 border, radius 16,
+              // Row(Icon(notifications_active_rounded, 18), the text in ink).
+              PregNote(s.rmdScheduleNote, icon: Icons.notifications_none_rounded),
               const SizedBox(height: 18),
+              // Her reminders share one white card, hairlines between rows.
+              // Kept for revert: `for (final r in items) _reminderCard(...)`,
+              // a shadowed card each, and `_empty` bare on the page.
               if (items.isEmpty)
-                _empty(context, s)
+                PregCard(child: _empty(context, s))
               else
-                for (final r in items) _reminderCard(context, s, store, r),
+                PregRowCard(children: [
+                  for (final r in items) _reminderRow(context, s, store, r),
+                ]),
               // ---- From ParentVeda (2026-09-30) ---------------------------
               // The messages the app sends on its own, from her dates: the
               // new week and the moments that matter. The gap analysis puts
               // their off switches here, beside the reminders she sets.
-              const SizedBox(height: 22),
-              Text('From ParentVeda',
-                  style: pvJakarta(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w800,
-                      color: AppTheme.neutral900)),
-              const SizedBox(height: 4),
-              Text('Notes we send from your dates. Each one opens the page it is about.',
-                  style: pvManrope(
-                      fontSize: 13, height: 1.4, color: AppTheme.neutral600)),
-              const SizedBox(height: 10),
+              // The one section heading (2026-09-30). Kept for revert: a
+              // pvJakarta 15 / w800 title, SizedBox(4), the lead in
+              // pvManrope 13 neutral600.
+              const SizedBox(height: 30),
+              const PregSectionHeading('From ParentVeda',
+                  lead: 'Notes we send from your dates. Each one opens the page it is about.'),
+              const SizedBox(height: 12),
               const PregMessageSwitches(),
-              const SizedBox(height: 22),
-              // Quick ideas (one-tap add).
-              Text(s.rmdSuggestions,
-                  style: pvJakarta(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w800,
-                      color: AppTheme.neutral900)),
-              const SizedBox(height: 10),
+              const SizedBox(height: 30),
+              // Quick ideas (one-tap add), under the one section heading.
+              // Kept for revert: Text(s.rmdSuggestions) in pvJakarta 15 / w800.
+              PregSectionHeading(s.rmdSuggestions),
+              const SizedBox(height: 12),
               Wrap(spacing: 8, runSpacing: 8, children: [
                 for (final p in _presets) _presetChip(context, s, store, p),
               ]),
@@ -187,26 +274,83 @@ class RemindersScreen extends StatelessWidget {
     );
   }
 
-  Widget _empty(BuildContext context, S s) => Padding(
-        padding: const EdgeInsets.fromLTRB(8, 22, 8, 22),
-        child: Column(children: [
-          const Icon(Icons.notifications_none_rounded,
-              size: 52, color: AppTheme.neutral300),
-          const SizedBox(height: 14),
-          Text(s.rmdEmpty,
-              textAlign: TextAlign.center,
-              style: pvJakarta(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w800,
-                  color: AppTheme.neutral900)),
-          const SizedBox(height: 6),
-          Text(s.rmdEmptySub,
-              textAlign: TextAlign.center,
-              style: pvManrope(
-                  fontSize: 13, height: 1.5, color: AppTheme.neutral600)),
-        ]),
-      );
+  // The empty state, inside the card her reminders will fill: a drawn mark,
+  // then the invitation. Kept for revert: Padding(8, 22, 8, 22) with a 52
+  // Icon(notifications_none_rounded) in neutral300 and pvJakarta 16 / w800.
+  Widget _empty(BuildContext context, S s) {
+    final pal = pvStorePalette;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Column(children: [
+        PvMarkWell(p: pal, hue: 180, size: 52, mark: IntentMark.calendarDay),
+        const SizedBox(height: 14),
+        Text(s.rmdEmpty,
+            textAlign: TextAlign.center,
+            style: pvManrope(
+                fontSize: 15.5, fontWeight: FontWeight.w700, color: pal.ink1)),
+        const SizedBox(height: 6),
+        Text(s.rmdEmptySub,
+            textAlign: TextAlign.center,
+            style: pvManrope(fontSize: 13, height: 1.5, color: pal.ink2)),
+      ]),
+    );
+  }
 
+  /// One of her reminders: the kind's drawn mark, the title, how often, and
+  /// the switch. A tap opens its editor (medication has the richer one).
+  Widget _reminderRow(
+      BuildContext context, S s, ReminderStore store, Reminder r) {
+    final pal = pvStorePalette;
+    // A transparent Material so the press shows on the white card.
+    return Material(
+      type: MaterialType.transparency,
+      child: InkWell(
+        onTap: () => r.isMedication
+            ? showMedReminderEditor(context, controller, existing: r)
+            : showReminderEditor(context, controller, existing: r),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(14, 12, 8, 12),
+          child: Row(children: [
+            // A reminder that is off keeps its mark, faded.
+            Opacity(
+              opacity: r.enabled ? 1 : 0.45,
+              child: PvMarkWell(
+                  p: pal,
+                  hue: _categoryHue(r.category),
+                  size: 44,
+                  mark: _categoryMark(r.category)),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(r.title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: pvManrope(
+                        fontSize: 14.5,
+                        fontWeight: FontWeight.w700,
+                        height: 1.25,
+                        color: r.enabled ? pal.ink1 : pal.ink3)),
+                const SizedBox(height: 2),
+                Text(reminderSummary(s, r, context),
+                    style: pvManrope(fontSize: 12.5, height: 1.35, color: pal.ink3)),
+              ]),
+            ),
+            const SizedBox(width: 4),
+            Switch(
+              value: r.enabled,
+              onChanged: (_) => store.toggle(r.id),
+              trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
+            ),
+          ]),
+        ),
+      ),
+    );
+  }
+
+  // Superseded by [_reminderRow] inside a [PregRowCard] (2026-09-30); kept
+  // for revert.
+  // ignore: unused_element
   Widget _reminderCard(
       BuildContext context, S s, ReminderStore store, Reminder r) {
     final text = Theme.of(context).textTheme;
@@ -270,10 +414,17 @@ class RemindersScreen extends StatelessWidget {
 
   Widget _presetChip(
       BuildContext context, S s, ReminderStore store, _Preset p) {
+    // White with the hairline, ink words (2026-09-30).
     return ActionChip(
-      avatar: Icon(_categoryIcon(p.category),
-          size: 17, color: AppTheme.neutral900),
-      label: Text(p.title(s)),
+      avatar: Icon(_categoryIcon(p.category), size: 17, color: kPvInk),
+      label: Text(p.title(s),
+          style: pvManrope(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: pvStorePalette.ink1)),
+      backgroundColor: Colors.white,
+      side: const BorderSide(color: kPvLine),
+      shape: const StadiumBorder(),
       onPressed: () => showReminderEditor(
         context,
         controller,
@@ -489,24 +640,11 @@ class _ReminderEditorState extends State<_ReminderEditor> {
             autofocus: !editing,
             textCapitalization: TextCapitalization.sentences,
             onChanged: (_) => setState(() {}),
-            decoration: InputDecoration(
-              labelText: s.rmdWhatLabel,
-              hintText: s.rmdWhatHint,
-              filled: true,
-              fillColor: AppTheme.surfaceContainer,
-              border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide.none),
-            ),
+            decoration: _fieldDecoration(label: s.rmdWhatLabel, hint: s.rmdWhatHint),
           ),
           const SizedBox(height: 16),
           // Repeat (Once / Daily / Weekly / Custom-specific-days)
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Text(s.rmdRepeat,
-                style:
-                    text.labelLarge?.copyWith(fontWeight: FontWeight.w800)),
-          ),
+          _groupLabel(s.rmdRepeat),
           const SizedBox(height: 8),
           Wrap(spacing: 8, runSpacing: 8, children: [
             _repeatChip(s.rmdOnce, ReminderRepeat.once),
@@ -516,12 +654,7 @@ class _ReminderEditorState extends State<_ReminderEditor> {
           ]),
           const SizedBox(height: 14),
           // Time(s) - single for once/weekly; add/remove list for daily & custom.
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Text(_multiTime ? s.mrTimes : s.rmdTime,
-                style:
-                    text.labelLarge?.copyWith(fontWeight: FontWeight.w800)),
-          ),
+          _groupLabel(_multiTime ? s.mrTimes : s.rmdTime),
           const SizedBox(height: 8),
           for (var i = 0; i < (_multiTime ? _times.length : 1); i++)
             Padding(
@@ -559,45 +692,29 @@ class _ReminderEditorState extends State<_ReminderEditor> {
           // Single weekday (weekly)
           if (_repeat == ReminderRepeat.weekly) ...[
             const SizedBox(height: 12),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(s.rmdOnDay,
-                  style:
-                      text.labelLarge?.copyWith(fontWeight: FontWeight.w800)),
-            ),
+            _groupLabel(s.rmdOnDay),
             const SizedBox(height: 8),
             Wrap(spacing: 8, runSpacing: 8, children: [
               for (var wd = 1; wd <= 7; wd++)
-                ChoiceChip(
-                  label: Text(s.rmdWeekdayShort(wd)),
-                  selected: _weekday == wd,
-                  onSelected: (_) => setState(() => _weekday = wd),
-                ),
+                _choiceChip(s.rmdWeekdayShort(wd), _weekday == wd,
+                    (_) => setState(() => _weekday = wd)),
             ]),
           ],
           // Multi-select weekdays (custom / specific days)
           if (_repeat == ReminderRepeat.customDays) ...[
             const SizedBox(height: 12),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(s.mrOnDays,
-                  style:
-                      text.labelLarge?.copyWith(fontWeight: FontWeight.w800)),
-            ),
+            _groupLabel(s.mrOnDays),
             const SizedBox(height: 8),
             Wrap(spacing: 8, runSpacing: 8, children: [
               for (var wd = 1; wd <= 7; wd++)
-                FilterChip(
-                  label: Text(s.rmdWeekdayShort(wd)),
-                  selected: _weekdays.contains(wd),
-                  onSelected: (sel) => setState(() {
-                    if (sel) {
-                      _weekdays.add(wd);
-                    } else if (_weekdays.length > 1) {
-                      _weekdays.remove(wd);
-                    }
-                  }),
-                ),
+                _filterChip(s.rmdWeekdayShort(wd), _weekdays.contains(wd),
+                    (sel) => setState(() {
+                          if (sel) {
+                            _weekdays.add(wd);
+                          } else if (_weekdays.length > 1) {
+                            _weekdays.remove(wd);
+                          }
+                        })),
             ]),
           ],
           const SizedBox(height: 22),
@@ -605,8 +722,9 @@ class _ReminderEditorState extends State<_ReminderEditor> {
             width: double.infinity,
             child: FilledButton(
               onPressed: _canSave ? () => _save(s) : null,
-              style: FilledButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 14)),
+              style: pregFilledStyle().copyWith(
+                  padding: const WidgetStatePropertyAll(
+                      EdgeInsets.symmetric(vertical: 14))),
               child: Text(s.rmdSave,
                   style: const TextStyle(
                       fontSize: 15, fontWeight: FontWeight.w800)),
@@ -641,11 +759,8 @@ class _ReminderEditorState extends State<_ReminderEditor> {
   //       ],
   //     );
 
-  Widget _repeatChip(String label, ReminderRepeat r) => ChoiceChip(
-        label: Text(label),
-        selected: _repeat == r,
-        onSelected: (_) => setState(() => _repeat = r),
-      );
+  Widget _repeatChip(String label, ReminderRepeat r) =>
+      _choiceChip(label, _repeat == r, (_) => setState(() => _repeat = r));
 }
 
 // =============================================================================
@@ -864,17 +979,11 @@ class _MedReminderEditorState extends State<_MedReminderEditor> {
           ),
           const SizedBox(height: 16),
           // Frequency
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Text(s.mrFreq,
-                style: text.labelLarge?.copyWith(fontWeight: FontWeight.w800)),
-          ),
+          _groupLabel(s.mrFreq),
           const SizedBox(height: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14),
-            decoration: BoxDecoration(
-                color: AppTheme.surfaceContainer,
-                borderRadius: BorderRadius.circular(14)),
+            decoration: _dropdownBox(14),
             child: DropdownButtonHideUnderline(
               child: DropdownButton<_MedFreq>(
                 isExpanded: true,
@@ -890,12 +999,7 @@ class _MedReminderEditorState extends State<_MedReminderEditor> {
           const SizedBox(height: 16),
           // Times (one per occurrence for daily-N; a single time otherwise)
           if (isDailyN) ...[
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(s.mrTimes,
-                  style:
-                      text.labelLarge?.copyWith(fontWeight: FontWeight.w800)),
-            ),
+            _groupLabel(s.mrTimes),
             const SizedBox(height: 8),
             for (var i = 0; i < _times.length; i++)
               Padding(
@@ -921,45 +1025,29 @@ class _MedReminderEditorState extends State<_MedReminderEditor> {
           // Weekday (weekly / fortnightly - single)
           if (needsWeekday) ...[
             const SizedBox(height: 12),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(s.rmdOnDay,
-                  style:
-                      text.labelLarge?.copyWith(fontWeight: FontWeight.w800)),
-            ),
+            _groupLabel(s.rmdOnDay),
             const SizedBox(height: 8),
             Wrap(spacing: 8, runSpacing: 8, children: [
               for (var wd = 1; wd <= 7; wd++)
-                ChoiceChip(
-                  label: Text(s.rmdWeekdayShort(wd)),
-                  selected: _weekday == wd,
-                  onSelected: (_) => setState(() => _weekday = wd),
-                ),
+                _choiceChip(s.rmdWeekdayShort(wd), _weekday == wd,
+                    (_) => setState(() => _weekday = wd)),
             ]),
           ],
           // Specific weekdays (custom - multi)
           if (_freq == _MedFreq.custom) ...[
             const SizedBox(height: 12),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(s.mrOnDays,
-                  style:
-                      text.labelLarge?.copyWith(fontWeight: FontWeight.w800)),
-            ),
+            _groupLabel(s.mrOnDays),
             const SizedBox(height: 8),
             Wrap(spacing: 8, runSpacing: 8, children: [
               for (var wd = 1; wd <= 7; wd++)
-                FilterChip(
-                  label: Text(s.rmdWeekdayShort(wd)),
-                  selected: _weekdays.contains(wd),
-                  onSelected: (sel) => setState(() {
-                    if (sel) {
-                      _weekdays.add(wd);
-                    } else if (_weekdays.length > 1) {
-                      _weekdays.remove(wd);
-                    }
-                  }),
-                ),
+                _filterChip(s.rmdWeekdayShort(wd), _weekdays.contains(wd),
+                    (sel) => setState(() {
+                          if (sel) {
+                            _weekdays.add(wd);
+                          } else if (_weekdays.length > 1) {
+                            _weekdays.remove(wd);
+                          }
+                        })),
             ]),
           ],
           // Day of month (monthly)
@@ -969,9 +1057,7 @@ class _MedReminderEditorState extends State<_MedReminderEditor> {
               s.mrDayOfMonth,
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
-                decoration: BoxDecoration(
-                    color: AppTheme.surfaceContainer,
-                    borderRadius: BorderRadius.circular(12)),
+                decoration: _dropdownBox(12),
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<int>(
                     value: _dayOfMonth,
@@ -993,23 +1079,16 @@ class _MedReminderEditorState extends State<_MedReminderEditor> {
             textCapitalization: TextCapitalization.sentences,
             maxLines: 2,
             minLines: 1,
-            decoration: InputDecoration(
-              labelText: s.mrNote,
-              hintText: s.mrNoteHint,
-              filled: true,
-              fillColor: AppTheme.surfaceContainer,
-              border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide.none),
-            ),
+            decoration: _fieldDecoration(label: s.mrNote, hint: s.mrNoteHint),
           ),
           const SizedBox(height: 22),
           SizedBox(
             width: double.infinity,
             child: FilledButton(
               onPressed: () => _save(s),
-              style: FilledButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 14)),
+              style: pregFilledStyle().copyWith(
+                  padding: const WidgetStatePropertyAll(
+                      EdgeInsets.symmetric(vertical: 14))),
               child: Text(s.mrSave,
                   style: const TextStyle(
                       fontSize: 15, fontWeight: FontWeight.w800)),

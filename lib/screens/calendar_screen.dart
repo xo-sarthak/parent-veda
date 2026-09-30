@@ -6,6 +6,20 @@
 //  personal events. Answers: where am I, what's happened, what's next. Warm-Nest
 //  visual language (no mockup existed; extrapolated). Reuses the shared event
 //  assembly in CalendarStore.
+//
+//  ⚠️ ONE PARENTVEDA (2026-09-30, the structural restyle). The calendar now
+//  reads as the same app as trying to conceive's (`ttc_calendar_screen.dart`,
+//  read for shape only, never imported):
+//    * A pushed page with a back arrow and the serif page title. It was a bare
+//      Container from the days it was a tab, so a push landed with no way back
+//      but the system gesture and no Material under its search field.
+//    * White cards with the hairline in place of plum-tinted shadows.
+//    * The month sits on the page, its name large and left, the arrows two
+//      round hairline buttons (TTC's grid).
+//    * Rows that open an event carry a drawn mark in the category's hue.
+//    * Group labels inside a list or a card are the small grey caps.
+//    * No violet: the milestone colour from `calMeta` is the brand violet, so
+//      this screen draws milestones in the ink (see [_catColor]).
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -22,7 +36,12 @@ import '../widgets/global_ask_fab.dart' show kAskFabReserve;
 import '../theme/app_theme.dart';
 import '../widgets/mic_dictation_button.dart';
 import '../widgets/trimester_progress_bar.dart';
+import 'brackets/hub/hub_intent_art.dart' show IntentMark;
+import 'doors/pv_list_row.dart' show PvMarkWell;
 import 'journal_screen.dart';
+import 'pregnancy/preg_chrome.dart';
+import 'products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
+import 'v2/v2_palette.dart' show V2Palette;
 import 'weekly_card_stack_screen.dart';
 import '../theme/pv_fonts.dart';
 
@@ -50,9 +69,20 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   PregnancyController get p => widget.controller;
 
-  static const List<BoxShadow> _soft = [
-    BoxShadow(color: Color(0x0F2D144C), blurRadius: 12, offset: Offset(0, 3)),
-  ];
+  V2Palette get _pal => pvStorePalette;
+
+  // Kept for revert (2026-09-30, hairline cards, no plum shadow):
+  // static const List<BoxShadow> _soft = [
+  //   BoxShadow(color: Color(0x0F2D144C), blurRadius: 12, offset: Offset(0, 3)),
+  // ];
+
+  /// The one card surface: white, the page hairline. [ring] draws the ink
+  /// border a current or selected thing wears instead of a tint.
+  static BoxDecoration _card({double radius = 20, bool ring = false}) => BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(radius),
+        border: Border.all(color: ring ? kPvInk : kPvLine, width: ring ? 1.5 : 1),
+      );
 
   @override
   void initState() {
@@ -116,9 +146,20 @@ class _CalendarScreenState extends State<CalendarScreen> {
   Widget _build(BuildContext context) {
     final s = S(p.language);
     final events = _filtered();
-    return Container(
-      color: AppTheme.surfaceContainer,
-      child: SafeArea(
+    // A pushed page: the AppBar carries only the back arrow, the serif title
+    // sits in the header below it. Kept for revert (2026-09-30):
+    //   Container(color: AppTheme.surfaceContainer, child: SafeArea(
+    //     bottom: false, child: Column(...)))
+    return Scaffold(
+      backgroundColor: _pal.ground,
+      appBar: AppBar(
+        backgroundColor: _pal.ground,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        foregroundColor: _pal.ink1,
+      ),
+      body: SafeArea(
+        top: false,
         bottom: false,
         child: Column(
           children: [
@@ -167,7 +208,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   // --- header ----------------------------------------------------------------
   Widget _header(S s) => Padding(
-        padding: const EdgeInsets.fromLTRB(18, 8, 12, 4),
+        padding: const EdgeInsets.fromLTRB(20, 0, 8, 6),
         child: Row(
           children: [
             Expanded(
@@ -176,19 +217,17 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       controller: _searchCtrl,
                       autofocus: true,
                       onChanged: (v) => setState(() => _query = v),
+                      style: pvManrope(fontSize: 16, color: _pal.ink1),
                       decoration: InputDecoration(
                           hintText: s.calSearchHint, border: InputBorder.none),
                     )
-                  : Text(s.calTitle,
-                      style: pvJakarta(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w700,
-                          color: AppTheme.neutral900)),
+                  // The serif page title (was pvJakarta 22 / w700).
+                  : Text(s.calTitle, style: pregPageTitleStyle()),
             ),
             IconButton(
               icon: Icon(
                   _searching ? Icons.close_rounded : Icons.search_rounded,
-                  color: AppTheme.neutral900),
+                  color: _pal.ink1),
               onPressed: () => setState(() {
                 _searching = !_searching;
                 if (!_searching) {
@@ -199,8 +238,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
             ),
             if (!_searching)
               IconButton(
-                icon: const Icon(Icons.add_circle_outline_rounded,
-                    color: AppTheme.neutral900),
+                icon: Icon(Icons.add_circle_outline_rounded, color: _pal.ink1),
                 tooltip: s.calAddPersonal,
                 onPressed: () => _addPersonal(s),
               ),
@@ -214,11 +252,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
   Widget _progressCard(S s) {
     return Container(
       padding: const EdgeInsets.fromLTRB(18, 18, 18, 18),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(22),
-        boxShadow: _soft,
-      ),
+      decoration: _card(),
       child: TrimesterProgressBar(
         week: p.currentWeek,
         daysRemaining: p.daysRemaining,
@@ -234,11 +268,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     final pct = p.progress;
     return Container(
       padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(22),
-        boxShadow: _soft,
-      ),
+      decoration: _card(radius: 22),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -301,11 +331,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     final tabs = [s.calTabTimeline, s.calTabCalendar, s.calTabUpcoming];
     return Container(
       padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: _soft,
-      ),
+      decoration: _card(radius: 16),
       child: Row(
         children: [
           for (int i = 0; i < tabs.length; i++)
@@ -318,16 +344,14 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: _tab == i ? AppTheme.neutral900 : Colors.transparent,
+                    color: _tab == i ? kPvInk : Colors.transparent,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(tabs[i],
                       style: pvManrope(
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
-                          color: _tab == i
-                              ? Colors.white
-                              : AppTheme.neutral600)),
+                          color: _tab == i ? Colors.white : _pal.ink2)),
                 ),
               ),
             ),
@@ -366,20 +390,18 @@ class _CalendarScreenState extends State<CalendarScreen> {
               child: Container(
                 alignment: Alignment.center,
                 padding: const EdgeInsets.symmetric(horizontal: 14),
+                // A selected chip is the ink; the rest white with the
+                // hairline (was a plum-tinted shadow).
                 decoration: BoxDecoration(
-                  color: _filter == c.$1
-                      ? AppTheme.neutral900
-                      : AppTheme.surface,
+                  color: _filter == c.$1 ? kPvInk : Colors.white,
                   borderRadius: BorderRadius.circular(99),
-                  boxShadow: _filter == c.$1 ? null : _soft,
+                  border: _filter == c.$1 ? null : Border.all(color: kPvLine),
                 ),
                 child: Text(c.$2,
                     style: pvManrope(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w700,
-                        color: _filter == c.$1
-                            ? Colors.white
-                            : AppTheme.neutral600)),
+                        color: _filter == c.$1 ? Colors.white : _pal.ink1)),
               ),
             ),
             const SizedBox(width: 8),
@@ -401,10 +423,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
   }
 
   Widget _timelineRow(S s, CalendarEvent e) {
-    final m = calMeta(e.category);
     final cur = e.status == CalEventStatus.current;
     final done = e.status == CalEventStatus.completed;
-    final dotColor = cur ? AppTheme.neutral900 : (done ? _green : AppTheme.neutral300);
+    final dotColor = cur ? kPvInk : (done ? _green : AppTheme.neutral300);
     return IntrinsicHeight(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -417,7 +438,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 height: 18,
                 margin: const EdgeInsets.only(top: 16),
                 decoration: BoxDecoration(
-                  color: done ? _green : (cur ? AppTheme.neutral900 : AppTheme.surface),
+                  color: done ? _green : (cur ? kPvInk : Colors.white),
                   shape: BoxShape.circle,
                   border: Border.all(color: dotColor, width: 2),
                 ),
@@ -425,7 +446,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     ? const Icon(Icons.check_rounded, size: 11, color: Colors.white)
                     : null,
               ),
-              Expanded(child: Container(width: 2, color: AppTheme.outlineVariant)),
+              Expanded(child: Container(width: 2, color: kPvLine)),
             ],
           ),
           const SizedBox(width: 12),
@@ -434,52 +455,60 @@ class _CalendarScreenState extends State<CalendarScreen> {
               padding: const EdgeInsets.only(bottom: 10),
               child: GestureDetector(
                 onTap: () => _eventSheet(s, e),
+                // A white card with the hairline; "now" wears an ink ring,
+                // not a tint behind its words, and the row leads with the
+                // category's drawn mark. Kept for revert (2026-09-30):
+                //   color: cur ? neutral900 @ 0.06 : AppTheme.surface,
+                //   borderRadius 18, boxShadow: _soft,
+                //   border: Border(left: BorderSide(color: m.color, width: 3)),
+                //   and Icon(m.icon, size: 16, color: m.color) before the title.
                 child: Container(
                   padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: cur
-                        ? AppTheme.neutral900.withValues(alpha: 0.06)
-                        : AppTheme.surface,
-                    borderRadius: BorderRadius.circular(18),
-                    boxShadow: _soft,
-                    border: Border(left: BorderSide(color: m.color, width: 3)),
-                  ),
-                  child: Column(
+                  decoration: _card(radius: 18, ring: cur),
+                  child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(children: [
-                        Icon(m.icon, size: 16, color: m.color),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(e.title,
-                              style: pvJakarta(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppTheme.neutral900)),
+                      _mark(e.category, 36),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(children: [
+                              Expanded(
+                                child: Text(e.title,
+                                    style: pvManrope(
+                                        fontSize: 14.5,
+                                        fontWeight: FontWeight.w700,
+                                        height: 1.25,
+                                        color: _pal.ink1)),
+                              ),
+                              if (cur)
+                                _pill(s.youAreHere, kPvInk, filled: true)
+                              else if (done)
+                                _pill(s.calStatusCompleted, _green)
+                              else
+                                _pill(s.calStatusUpcoming, _pal.ink3),
+                            ]),
+                            if (e.description.isNotEmpty) ...[
+                              const SizedBox(height: 5),
+                              Text(e.description,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: pvManrope(
+                                      fontSize: 12.5,
+                                      height: 1.4,
+                                      color: _pal.ink2)),
+                            ],
+                            const SizedBox(height: 5),
+                            Text(s.formatShortDate(e.date),
+                                style: pvManrope(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
+                                    color: _pal.ink3)),
+                          ],
                         ),
-                        if (cur)
-                          _pill(s.youAreHere, AppTheme.neutral900)
-                        else if (done)
-                          _pill(s.calStatusCompleted, _green)
-                        else
-                          _pill(s.calStatusUpcoming, AppTheme.neutral400),
-                      ]),
-                      if (e.description.isNotEmpty) ...[
-                        const SizedBox(height: 5),
-                        Text(e.description,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: pvManrope(
-                                fontSize: 12.5,
-                                height: 1.4,
-                                color: AppTheme.neutral600)),
-                      ],
-                      const SizedBox(height: 5),
-                      Text(s.formatShortDate(e.date),
-                          style: pvManrope(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                              color: AppTheme.neutral400)),
+                      ),
                     ],
                   ),
                 ),
@@ -491,14 +520,18 @@ class _CalendarScreenState extends State<CalendarScreen> {
     );
   }
 
-  Widget _pill(String label, Color c) => Container(
+  // A tint is allowed on a pill. "You are here" is a badge, so it is the ink
+  // with white words ([filled]).
+  Widget _pill(String label, Color c, {bool filled = false}) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
         decoration: BoxDecoration(
-            color: c.withValues(alpha: 0.12),
+            color: filled ? c : c.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(99)),
         child: Text(label,
             style: pvManrope(
-                fontSize: 9.5, fontWeight: FontWeight.w800, color: c)),
+                fontSize: 9.5,
+                fontWeight: FontWeight.w800,
+                color: filled ? Colors.white : c)),
       );
 
   // --- TAB 2: Calendar grid --------------------------------------------------
@@ -524,40 +557,52 @@ class _CalendarScreenState extends State<CalendarScreen> {
       cells.add(_dayCell(s, date, d, dayEvents, isToday));
     }
 
-    return Container(
-      margin: const EdgeInsets.only(top: 8),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(22),
-        boxShadow: _soft,
-      ),
+    // ⚠️ NO CARD ROUND THE MONTH (2026-09-30, TTC's grid): the month sits on
+    // the page, its name large and left in the serif, the arrows two round
+    // hairline buttons. Kept for revert: Container(margin top 8, padding 12,
+    // AppTheme.surface, radius 22, boxShadow: _soft) round a Column of
+    // Row(IconButton(chevron_left), centred pvJakarta 15 / w700 month,
+    // IconButton(chevron_right)), then the weekday row and the grid.
+    Widget arrow(IconData icon, int delta, String label) => Semantics(
+          button: true,
+          label: label,
+          excludeSemantics: true,
+          child: InkWell(
+            onTap: () => setState(
+                () => _month = DateTime(_month.year, _month.month + delta)),
+            customBorder: const CircleBorder(),
+            child: Container(
+              width: 40,
+              height: 40,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: kPvLine),
+              ),
+              child: Icon(icon, size: 20, color: _pal.ink1),
+            ),
+          ),
+        );
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
       child: Column(
         children: [
           Row(
             children: [
-              IconButton(
-                icon: const Icon(Icons.chevron_left_rounded),
-                color: AppTheme.neutral900,
-                onPressed: () => setState(() =>
-                    _month = DateTime(_month.year, _month.month - 1)),
-              ),
               Expanded(
                 child: Text(s.calMonthYear(_month),
-                    textAlign: TextAlign.center,
-                    style: pvJakarta(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: AppTheme.neutral900)),
+                    style: pvFraunces(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: -0.4,
+                        color: _pal.ink1)),
               ),
-              IconButton(
-                icon: const Icon(Icons.chevron_right_rounded),
-                color: AppTheme.neutral900,
-                onPressed: () => setState(() =>
-                    _month = DateTime(_month.year, _month.month + 1)),
-              ),
+              arrow(Icons.chevron_left_rounded, -1, 'Previous month'),
+              const SizedBox(width: 8),
+              arrow(Icons.chevron_right_rounded, 1, 'Next month'),
             ],
           ),
+          const SizedBox(height: 14),
           Row(
             children: [
               for (final w in s.calWeekdayLetters)
@@ -567,7 +612,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         style: pvManrope(
                             fontSize: 11,
                             fontWeight: FontWeight.w700,
-                            color: AppTheme.neutral400)),
+                            color: _pal.ink3)),
                   ),
                 ),
             ],
@@ -589,7 +634,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
       bool isToday) {
     final dots = <Color>[];
     for (final e in events) {
-      final c = calMeta(e.category).color;
+      final c = _catColor(e.category);
       if (!dots.contains(c) && dots.length < 3) dots.add(c);
     }
     // Descriptive markers: label the start of each pregnancy week (e.g. "21w"),
@@ -671,13 +716,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: isToday
-                      ? AppTheme.neutral900
+                      ? kPvInk
                       : (selected
-                          ? AppTheme.neutral900.withValues(alpha: 0.16)
+                          ? kPvInk.withValues(alpha: 0.16)
                           : Colors.transparent),
                   shape: BoxShape.circle,
                   border: selected && !isToday
-                      ? Border.all(color: AppTheme.neutral900, width: 1.5)
+                      ? Border.all(color: kPvInk, width: 1.5)
                       : null,
                 ),
                 child: Text('$day',
@@ -685,7 +730,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         fontSize: 12.5,
                         fontWeight:
                             isToday ? FontWeight.w800 : FontWeight.w600,
-                        color: isToday ? Colors.white : AppTheme.neutral700)),
+                        color: isToday ? Colors.white : _pal.ink1)),
               ),
               const SizedBox(height: 3),
               SizedBox(
@@ -740,21 +785,22 @@ class _CalendarScreenState extends State<CalendarScreen> {
         future.where((e) => daysOut(e) > 14 && daysOut(e) <= 30).toList();
     final later = future.where((e) => daysOut(e) > 30).toList();
 
+    // A group label inside the list is the small grey caps, and a group's
+    // rows share one white card with hairlines between them. Kept for revert
+    // (2026-09-30): the label in pvManrope 11.5 / w800 / 0.6 in neutral900,
+    // and `for (final e in list) _upcomingRow(s, e)`, a shadowed card each.
     Widget group(String title, List<CalendarEvent> list) {
       if (list.isEmpty) return const SizedBox.shrink();
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(4, 14, 4, 8),
-            child: Text(title.toUpperCase(),
-                style: pvManrope(
-                    fontSize: 11.5,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 0.6,
-                    color: AppTheme.neutral900)),
+            padding: const EdgeInsets.fromLTRB(4, 16, 4, 8),
+            child: Text(title.toUpperCase(), style: pregGroupLabelStyle()),
           ),
-          for (final e in list) _upcomingRow(s, e),
+          PregRowCard(children: [
+            for (final e in list) _inked(_upcomingOfferRow(s, e)),
+          ]),
         ],
       );
     }
@@ -770,6 +816,26 @@ class _CalendarScreenState extends State<CalendarScreen> {
     );
   }
 
+  // One upcoming event: the category's drawn mark, the title, "in N days".
+  // It opens the event's sheet, as the old card did.
+  Widget _upcomingOfferRow(S s, CalendarEvent e) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final n = DateTime(e.date.year, e.date.month, e.date.day)
+        .difference(today)
+        .inDays;
+    return PregOfferRow(
+      mark: _markOf(e.category),
+      hue: _hueOf(e.category),
+      title: e.title,
+      line: s.calInDays(n),
+      onTap: () => _eventSheet(s, e),
+    );
+  }
+
+  // Superseded by [_upcomingOfferRow] in a [PregRowCard] (2026-09-30); kept
+  // for revert.
+  // ignore: unused_element
   Widget _upcomingRow(S s, CalendarEvent e) {
     final m = calMeta(e.category);
     final now = DateTime.now();
@@ -782,11 +848,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: AppTheme.surface,
-          borderRadius: BorderRadius.circular(18),
-          boxShadow: _soft,
-        ),
+        decoration: _card(radius: 18),
         child: Row(
           children: [
             Container(
@@ -869,40 +931,32 @@ class _CalendarScreenState extends State<CalendarScreen> {
   }
 
   void _eventSheet(S s, CalendarEvent e) {
-    final m = calMeta(e.category);
     _sheet(
       Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(children: [
-            Container(
-              width: 42,
-              height: 42,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                  color: m.color.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(12)),
-              child: Icon(m.icon, size: 21, color: m.color),
-            ),
+            // The category's drawn mark (2026-09-30). Kept for revert: a 42
+            // Container in m.color @ 0.12, radius 12, Icon(m.icon, 21, m.color).
+            _mark(e.category, 44),
             const SizedBox(width: 12),
             Expanded(
               child: Text(e.title,
                   style: pvJakarta(
                       fontSize: 17,
                       fontWeight: FontWeight.w700,
-                      color: AppTheme.neutral900)),
+                      color: _pal.ink1)),
             ),
           ]),
           const SizedBox(height: 6),
           Text(s.formatLongDate(e.date),
-              style: pvManrope(
-                  fontSize: 12, color: AppTheme.neutral500)),
+              style: pvManrope(fontSize: 12, color: _pal.ink3)),
           if (e.description.isNotEmpty) ...[
             const SizedBox(height: 12),
             Text(e.description,
                 style: pvManrope(
-                    fontSize: 13.5, height: 1.5, color: AppTheme.neutral700)),
+                    fontSize: 13.5, height: 1.5, color: _pal.ink2)),
           ],
           const SizedBox(height: 16),
           if (e.weekRef != null)
@@ -955,15 +1009,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 10),
           child: Row(children: [
-            Icon(icon,
-                size: 20,
-                color: danger ? AppTheme.danger : AppTheme.neutral900),
+            Icon(icon, size: 20, color: danger ? AppTheme.danger : _pal.ink1),
             const SizedBox(width: 12),
             Text(label,
                 style: pvManrope(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
-                    color: danger ? AppTheme.danger : AppTheme.neutral900)),
+                    color: danger ? AppTheme.danger : _pal.ink1)),
           ]),
         ),
       );
@@ -1039,32 +1091,22 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     style: pvJakarta(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
-                        color: AppTheme.neutral900)),
+                        color: _pal.ink1)),
                 const SizedBox(height: 14),
+                // White fields with the hairline, not a tinted fill behind
+                // her words. Kept for revert: filled, fillColor:
+                // AppTheme.surfaceContainer, OutlineInputBorder(radius 16,
+                // BorderSide.none).
                 TextField(
                   controller: titleCtrl,
                   autofocus: true,
-                  decoration: InputDecoration(
-                    hintText: s.calEventTitleHint,
-                    filled: true,
-                    fillColor: AppTheme.surfaceContainer,
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide.none),
-                  ),
+                  decoration: _fieldDecoration(s.calEventTitleHint),
                 ),
                 const SizedBox(height: 10),
                 TextField(
                   controller: noteCtrl,
-                  decoration: InputDecoration(
-                    hintText: s.calEventNoteHint,
-                    filled: true,
-                    fillColor: AppTheme.surfaceContainer,
-                    suffixIcon: MicDictateButton(controller: noteCtrl, s: s),
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide.none),
-                  ),
+                  decoration: _fieldDecoration(s.calEventNoteHint,
+                      suffix: MicDictateButton(controller: noteCtrl, s: s)),
                 ),
                 const SizedBox(height: 10),
                 InkWell(
@@ -1081,16 +1123,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   child: Container(
                     padding:
                         const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                    decoration: BoxDecoration(
-                        color: AppTheme.surfaceContainer,
-                        borderRadius: BorderRadius.circular(16)),
+                    decoration: _card(radius: 16),
                     child: Row(children: [
-                      const Icon(Icons.calendar_today_rounded,
-                          size: 18, color: AppTheme.neutral900),
+                      Icon(Icons.calendar_today_rounded,
+                          size: 18, color: _pal.ink1),
                       const SizedBox(width: 12),
                       Text(s.formatLongDate(date),
-                          style: pvManrope(
-                              fontSize: 13.5, color: AppTheme.neutral900)),
+                          style: pvManrope(fontSize: 13.5, color: _pal.ink1)),
                     ]),
                   ),
                 ),
@@ -1098,6 +1137,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton(
+                    style: pregFilledStyle(),
                     onPressed: () async {
                       final t = titleCtrl.text.trim();
                       if (t.isEmpty) {
@@ -1125,10 +1165,58 @@ class _CalendarScreenState extends State<CalendarScreen> {
         child: Center(
           child: Text(msg,
               textAlign: TextAlign.center,
-              style: pvManrope(
-                  fontSize: 13.5, height: 1.5, color: AppTheme.neutral500)),
+              style: pvManrope(fontSize: 13.5, height: 1.5, color: _pal.ink2)),
         ),
       );
+
+  /// A transparent Material under an InkWell that sits inside a white card,
+  /// so the press shows on the card and not under it.
+  static Widget _inked(Widget child) =>
+      Material(type: MaterialType.transparency, child: child);
+
+  /// A form field: white, the hairline, the ink ring when focused.
+  InputDecoration _fieldDecoration(String hint, {Widget? suffix}) {
+    OutlineInputBorder b(Color c) => OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide(color: c));
+    return InputDecoration(
+      hintText: hint,
+      filled: true,
+      fillColor: Colors.white,
+      suffixIcon: suffix,
+      border: b(kPvLine),
+      enabledBorder: b(kPvLine),
+      focusedBorder: b(kPvInk),
+    );
+  }
+
+  /// This screen's colour for a category. `calMeta` gives milestones the
+  /// brand violet (`AppTheme.primary500` in lib/models/calendar_event.dart,
+  /// not this file's to change), so a milestone is drawn in the ink here.
+  static Color _catColor(CalEventCategory c) =>
+      c == CalEventCategory.milestone ? kPvInk : calMeta(c).color;
+
+  /// A drawn mark per category, for rows that open an event.
+  static IntentMark _markOf(CalEventCategory c) => switch (c) {
+        CalEventCategory.milestone => IntentMark.timelineRail,
+        CalEventCategory.medical => IntentMark.scanFan,
+        CalEventCategory.appointment => IntentMark.askDoctor,
+        CalEventCategory.program => IntentMark.schoolMark,
+        CalEventCategory.journal => IntentMark.pageMark,
+        CalEventCategory.personal => IntentMark.calendarDay,
+        CalEventCategory.parentveda => IntentMark.lotusMark,
+      };
+
+  /// The well's hue: the category's dot colour, so a mark and its dot on the
+  /// grid read as one thing. Milestones take a warm hue (28): their dot is
+  /// the ink, which has no hue to borrow, and their `calMeta` colour is the
+  /// violet this screen no longer draws.
+  static double _hueOf(CalEventCategory c) => c == CalEventCategory.milestone
+      ? 28
+      : HSLColor.fromColor(calMeta(c).color).hue;
+
+  Widget _mark(CalEventCategory c, double size) =>
+      PvMarkWell(p: _pal, hue: _hueOf(c), size: size, mark: _markOf(c));
 
   // The selected-day panel below the grid - date + pregnancy week + that day's
   // events + an "Add Note" entry (a calendar-only note for any date).
@@ -1139,89 +1227,95 @@ class _CalendarScreenState extends State<CalendarScreen> {
     // named + explained (she never has to guess what a dot means).
     final dayEvents = events.where((e) => _sameDay(e.date, date)).toList()
       ..sort((a, b) => a.category.index.compareTo(b.category.index));
+    // ⚠️ THE DAY'S CARD (2026-09-30, TTC's day panel): a white hairline card,
+    // the day in the serif, its week in grey, a group label in the small grey
+    // caps, event rows with the category's drawn mark, and "Add note" as an
+    // outlined pill at its foot. Kept for revert: AppTheme.surface, radius 22,
+    // boxShadow: _soft; the date in pvJakarta 16 / w700; the week in the gold
+    // 0xFFE0921C; "ON THIS DAY" in pvManrope 10.5 / w800 neutral400; a
+    // Divider(height 18) then a GestureDetector Row(add_circle icon, text).
     return Container(
       key: _detailsKey, // Task 2: scroll target for tap-a-date
       padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(22),
-        boxShadow: _soft,
-      ),
+      decoration: _card(),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [
+        Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
           Expanded(
             child: Text(s.formatLongDate(date),
-                style: pvJakarta(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: AppTheme.neutral900)),
+                style: pvFraunces(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                    height: 1.2,
+                    color: _pal.ink1)),
           ),
           if (wk >= 4 && wk <= 40)
             Text('$wk ${s.calWeeksUpper}',
                 style: pvManrope(
                     fontSize: 12.5,
-                    fontWeight: FontWeight.w800,
-                    color: const Color(0xFFE0921C))),
+                    fontWeight: FontWeight.w700,
+                    color: _pal.ink3)),
         ]),
-        const SizedBox(height: 6),
+        const SizedBox(height: 10),
         if (dayEvents.isEmpty)
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
+            padding: const EdgeInsets.only(bottom: 8),
             child: Text(s.calNoEventsDay,
-                style: pvManrope(
-                    fontSize: 12.5, color: AppTheme.neutral500)),
+                style: pvManrope(fontSize: 13, height: 1.4, color: _pal.ink2)),
           )
         else ...[
           Padding(
-            padding: const EdgeInsets.only(top: 2, bottom: 4),
+            padding: const EdgeInsets.only(bottom: 4),
             child: Text(s.calOnThisDay.toUpperCase(),
-                style: pvManrope(
-                    fontSize: 10.5,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 0.6,
-                    color: AppTheme.neutral400)),
+                style: pregGroupLabelStyle()),
           ),
-          for (final e in dayEvents) _panelEventRow(s, e),
+          for (final e in dayEvents) _inked(_panelEventRow(s, e)),
         ],
-        const SizedBox(height: 6),
-        const Divider(height: 18, color: AppTheme.outlineVariant),
-        GestureDetector(
-          onTap: () => _addPersonal(s, date),
-          behavior: HitTestBehavior.opaque,
-          child: Row(children: [
-            const Icon(Icons.add_circle_outline_rounded,
-                size: 20, color: AppTheme.neutral900),
-            const SizedBox(width: 8),
-            Text(s.calAddNote,
-                style: pvManrope(
-                    fontSize: 13.5,
-                    fontWeight: FontWeight.w700,
-                    color: AppTheme.neutral900)),
-          ]),
+        const SizedBox(height: 10),
+        Semantics(
+          button: true,
+          label: s.calAddNote,
+          excludeSemantics: true,
+          child: _inked(InkWell(
+            onTap: () => _addPersonal(s, date),
+            borderRadius: BorderRadius.circular(999),
+            child: Container(
+              constraints: const BoxConstraints(minHeight: 44),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(color: kPvLine, width: 1.2),
+              ),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                Icon(Icons.add_rounded, size: 18, color: _pal.ink1),
+                const SizedBox(width: 7),
+                Text(s.calAddNote,
+                    style: pvManrope(
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w700,
+                        color: _pal.ink1)),
+              ]),
+            ),
+          )),
         ),
       ]),
     );
   }
 
-  // A tidy event row for the selected-day panel: category icon + title (+ note),
-  // tap opens the event's detail sheet.
+  // A tidy event row for the selected-day panel: the category's drawn mark +
+  // title (+ note), tap opens the event's detail sheet. The line naming the
+  // dot keeps the dot's colour as a small swatch before grey words (it was
+  // the words themselves in the colour). Kept for revert: a 34 Container in
+  // m.color @ 0.12 with Icon(m.icon, 17), the title in pvJakarta 13.5, the
+  // category line in m.color.
   Widget _panelEventRow(S s, CalendarEvent e) {
-    final m = calMeta(e.category);
-    return GestureDetector(
+    return InkWell(
       onTap: () => _eventSheet(s, e),
-      behavior: HitTestBehavior.opaque,
+      borderRadius: BorderRadius.circular(12),
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 6),
+        padding: const EdgeInsets.symmetric(vertical: 7),
         child: Row(children: [
-          Container(
-            width: 34,
-            height: 34,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-                color: m.color.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(11)),
-            child: Icon(m.icon, size: 17, color: m.color),
-          ),
+          _mark(e.category, 40),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -1230,29 +1324,37 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   Text(e.title,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: pvJakarta(
-                          fontSize: 13.5,
-                          fontWeight: FontWeight.w700,
-                          color: AppTheme.neutral900)),
-                  // Names the dot's colour + what it means, so it's never a guess.
-                  Text('${_catName(s, e.category)} · ${_catMeaning(s, e.category)}',
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
                       style: pvManrope(
-                          fontSize: 10.5,
-                          height: 1.3,
+                          fontSize: 14,
                           fontWeight: FontWeight.w700,
-                          color: m.color)),
+                          color: _pal.ink1)),
+                  const SizedBox(height: 2),
+                  // Names the dot's colour + what it means, so it's never a guess.
+                  Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4, right: 6),
+                      child: _dotSwatch(_catColor(e.category), size: 7),
+                    ),
+                    Expanded(
+                      child: Text(
+                          '${_catName(s, e.category)} · ${_catMeaning(s, e.category)}',
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: pvManrope(
+                              fontSize: 11.5,
+                              height: 1.3,
+                              fontWeight: FontWeight.w600,
+                              color: _pal.ink2)),
+                    ),
+                  ]),
                   if (e.description.isNotEmpty)
                     Text(e.description,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: pvManrope(
-                            fontSize: 11.5, color: AppTheme.neutral600)),
+                        style: pvManrope(fontSize: 11.5, color: _pal.ink3)),
                 ]),
           ),
-          const Icon(Icons.chevron_right_rounded,
-              size: 16, color: AppTheme.neutral400),
+          Icon(Icons.chevron_right_rounded, size: 18, color: _pal.ink3),
         ]),
       ),
     );
@@ -1276,44 +1378,41 @@ class _CalendarScreenState extends State<CalendarScreen> {
       (CalEventCategory.personal, s.calMeanPersonal),
       // (CalEventCategory.parentveda, s.calMeanParentveda),
     ];
+    // A white hairline card (was AppTheme.surface with boxShadow: _soft,
+    // its title in pvJakarta 13.5 / w800). Still folds open and shut.
     return Container(
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: _soft,
-      ),
+      decoration: _card(radius: 18),
+      clipBehavior: Clip.antiAlias,
       child: Column(children: [
-        InkWell(
-          borderRadius: BorderRadius.circular(18),
+        _inked(InkWell(
           onTap: () => setState(() => _legendOpen = !_legendOpen),
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 13, 14, 13),
             child: Row(children: [
-              const Icon(Icons.palette_outlined,
-                  size: 18, color: AppTheme.neutral900),
+              Icon(Icons.palette_outlined, size: 18, color: _pal.ink1),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(s.calLegendTitle,
-                    style: pvJakarta(
-                        fontSize: 13.5,
-                        fontWeight: FontWeight.w800,
-                        color: AppTheme.neutral900)),
+                    style: pvManrope(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: _pal.ink1)),
               ),
               Icon(
                   _legendOpen
                       ? Icons.expand_less_rounded
                       : Icons.expand_more_rounded,
-                  color: AppTheme.neutral400),
+                  color: _pal.ink3),
             ]),
           ),
-        ),
+        )),
         if (_legendOpen) ...[
-          const Divider(height: 1, color: AppTheme.outlineVariant),
+          const Divider(height: 1, thickness: 1, color: kPvLine),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 14),
             child: Column(children: [
               for (final c in cats)
-                _legendRow(_dotSwatch(calMeta(c.$1).color), _catName(s, c.$1),
+                _legendRow(_dotSwatch(_catColor(c.$1)), _catName(s, c.$1),
                     c.$2),
               _legendRow(_textSwatch('21w', const Color(0xFFE0921C)),
                   s.calLegendWeekStart, s.calMeanWeekStart),
@@ -1341,20 +1440,18 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       style: pvManrope(
                           fontSize: 12.5,
                           fontWeight: FontWeight.w800,
-                          color: AppTheme.neutral900)),
+                          color: _pal.ink1)),
                   Text(meaning,
                       style: pvManrope(
-                          fontSize: 11,
-                          height: 1.3,
-                          color: AppTheme.neutral500)),
+                          fontSize: 11, height: 1.3, color: _pal.ink3)),
                 ]),
           ),
         ]),
       );
 
-  Widget _dotSwatch(Color c) => Container(
-      width: 12,
-      height: 12,
+  Widget _dotSwatch(Color c, {double size = 12}) => Container(
+      width: size,
+      height: size,
       decoration: BoxDecoration(color: c, shape: BoxShape.circle));
 
   Widget _textSwatch(String t, Color c) => Text(t,

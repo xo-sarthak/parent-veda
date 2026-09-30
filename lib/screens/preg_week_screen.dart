@@ -39,7 +39,9 @@ import '../services/preg_size_set_store.dart';
 import '../services/pregnancy_controller.dart';
 import '../theme/pv_fonts.dart';
 import 'v2/v2_palette.dart';
-import 'v2/v3_preg_hero.dart' show PregField, kPregHalo, pregBabyArt;
+import 'v2/v3_preg_hero.dart' show PregField, pregBabyArt;
+import 'pregnancy/preg_chrome.dart' show pregSectionHeadingStyle;
+import 'products/pv_store_chrome.dart' show kPvLine;
 
 const String kPregWeekRoute = 'pregnancy/week';
 
@@ -292,13 +294,10 @@ class _WeekBody extends StatelessWidget {
         if (sym.en.trim().isNotEmpty) sym.en.trim(),
     ];
 
-    Widget h(String t) => Text(
-      t,
-      style: pvFraunces(
-        fontSize: 18,
-        fontWeight: FontWeight.w600,
-        color: p.ink1,
-      ),
+    // One section heading (one ParentVeda, 2026-09-30). Was pvFraunces 18.
+    Widget h(String t) => Semantics(
+      header: true,
+      child: Text(t, style: pregSectionHeadingStyle()),
     );
     Widget body(String t) =>
         Text(t, style: pvManrope(fontSize: 14, height: 1.55, color: p.ink2));
@@ -489,13 +488,10 @@ class _SpecialWeekBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget h(String t) => Text(
-      t,
-      style: pvFraunces(
-        fontSize: 18,
-        fontWeight: FontWeight.w600,
-        color: p.ink1,
-      ),
+    // One section heading (one ParentVeda, 2026-09-30). Was pvFraunces 18.
+    Widget h(String t) => Semantics(
+      header: true,
+      child: Text(t, style: pregSectionHeadingStyle()),
     );
     Widget body(String t) =>
         Text(t, style: pvManrope(fontSize: 14, height: 1.55, color: p.ink2));
@@ -598,9 +594,12 @@ class _Note extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     width: double.infinity,
     padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+    // White with the hairline, not a tint behind the words (one ParentVeda).
+    // Was: color: kPregHalo.withValues(alpha: 0.6).
     decoration: BoxDecoration(
-      color: kPregHalo.withValues(alpha: 0.6),
+      color: Colors.white,
       borderRadius: BorderRadius.circular(14),
+      border: Border.all(color: kPvLine),
     ),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -647,9 +646,11 @@ class _Labelled extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     width: double.infinity,
     padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+    // White with the hairline, not a tint behind the words. Was p.surfaceAlt.
     decoration: BoxDecoration(
-      color: p.surfaceAlt,
+      color: Colors.white,
       borderRadius: BorderRadius.circular(14),
+      border: Border.all(color: kPvLine),
     ),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -691,8 +692,10 @@ class _SymptomRow extends StatelessWidget {
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.only(bottom: 8),
     child: Material(
-      color: p.surfaceAlt,
-      borderRadius: BorderRadius.circular(14),
+      // White with the hairline (one ParentVeda). Was p.surfaceAlt.
+      color: Colors.white,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14), side: const BorderSide(color: kPvLine)),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
@@ -878,7 +881,9 @@ class _Tile extends StatelessWidget {
   Widget build(BuildContext context) => Container(
         width: wide ? double.infinity : null,
         padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
-        decoration: BoxDecoration(color: p.surfaceAlt, borderRadius: BorderRadius.circular(14)),
+        // White with the hairline (one ParentVeda). Was p.surfaceAlt.
+        decoration: BoxDecoration(
+            color: Colors.white, borderRadius: BorderRadius.circular(14), border: Border.all(color: kPvLine)),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(label, style: pvManrope(fontSize: 9.5, fontWeight: FontWeight.w800, letterSpacing: 1.2, color: p.ink3)),
           const SizedBox(height: 4),

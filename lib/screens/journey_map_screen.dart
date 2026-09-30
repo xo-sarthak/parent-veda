@@ -25,6 +25,22 @@ import '../widgets/journey/journey_path.dart';
 import '../widgets/journey/node_cards.dart';
 import 'weekly_card_stack_screen.dart';
 import '../theme/pv_fonts.dart';
+import 'pregnancy/preg_chrome.dart';
+import 'products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
+
+// ⚠️ ONE PARENTVEDA (2026-09-30, the pregnancy restyle): the serif page title
+// under a back arrow, the header as a white card with the hairline (no
+// shadow, the ring in the one ink), and the overdue and catch-up notes as
+// white hairline cards instead of a tinted block and a peach-to-pink
+// gradient with an emoji. The trail keeps its field: the path is painted
+// white, so it needs a ground that is not. The markers themselves are drawn
+// by lib/widgets/journey (shared), which still carries the brand violet for
+// a completed week; that is logged, not changed here.
+
+/// A milestone's colour on the trail. The shared palette paints medical
+/// milestones the brand violet; this screen draws them in a steel blue.
+Color _markColor(JourneyNodeType t) =>
+    t == JourneyNodeType.medical ? const Color(0xFF5B7A99) : JourneyColors.forType(t);
 
 class JourneyMapScreen extends StatefulWidget {
   const JourneyMapScreen({super.key, required this.controller});
@@ -182,87 +198,86 @@ class _JourneyMapScreenState extends State<JourneyMapScreen>
         .toList();
   }
 
-  Widget _overdueBanner(S s) => Container(
-        margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-        padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
-        decoration: BoxDecoration(
-          color: AppTheme.secondary100,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Row(children: [
-          const Text('💛', style: TextStyle(fontSize: 20)),
-          const SizedBox(width: 10),
-          Expanded(
+  // Kept for revert: the overdue note on a tinted block (AppTheme.secondary100,
+  // radius 16) led by a '💛' emoji, title pvJakarta 13.5 / w800.
+  Widget _overdueBanner(S s) => Padding(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+        child: PregCard(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+          child: SizedBox(
+            width: double.infinity,
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(s.jmOverdueTitle,
-                  style: pvJakarta(
-                      fontSize: 13.5,
+                  style: pvManrope(
+                      fontSize: 14,
                       fontWeight: FontWeight.w800,
-                      color: AppTheme.neutral900)),
+                      color: pvStorePalette.ink1)),
               const SizedBox(height: 2),
               Text(s.jmOverdueBody(_c.daysPastDue),
                   style: pvManrope(
-                      fontSize: 12, height: 1.35, color: AppTheme.neutral700)),
+                      fontSize: 12.5, height: 1.4, color: pvStorePalette.ink2)),
             ]),
           ),
-        ]),
+        ),
       );
 
-  Widget _catchUpBanner(S s) => Container(
-        margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-        padding: const EdgeInsets.fromLTRB(14, 10, 6, 10),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-              colors: [Color(0xFFFFF1E6), Color(0xFFFDE8F0)]),
-          borderRadius: BorderRadius.circular(16),
-          border:
-              Border.all(color: AppTheme.secondary500.withValues(alpha: 0.16)),
-        ),
-        child: Row(children: [
-          const Text('🧭', style: TextStyle(fontSize: 20)),
-          const SizedBox(width: 10),
-          Expanded(
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(s.jmCatchUpTitle,
-                  style: pvJakarta(
-                      fontSize: 13.5,
-                      fontWeight: FontWeight.w800,
-                      color: AppTheme.neutral900)),
-              const SizedBox(height: 2),
-              Text(s.jmCatchUpBody,
-                  style: pvManrope(
-                      fontSize: 12, height: 1.35, color: AppTheme.neutral700)),
-              const SizedBox(height: 6),
-              GestureDetector(
-                onTap: _showCatchUp,
-                behavior: HitTestBehavior.opaque,
-                child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  Text(s.jmCatchUpCta,
-                      style: pvManrope(
-                          fontSize: 12.5,
-                          fontWeight: FontWeight.w800,
-                          color: AppTheme.secondary600)),
-                  const Icon(Icons.arrow_forward_rounded,
-                      size: 15, color: AppTheme.secondary600),
-                ]),
+  // Kept for revert: the catch-up note on a peach-to-pink gradient
+  // (0xFFFFF1E6 to 0xFFFDE8F0) with a coral hairline, led by a '🧭' emoji,
+  // its link in AppTheme.secondary600 with an arrow.
+  Widget _catchUpBanner(S s) => Padding(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+        child: PregCard(
+          padding: const EdgeInsets.fromLTRB(16, 10, 6, 10),
+          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 2),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(s.jmCatchUpTitle,
+                          style: pvManrope(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w800,
+                              color: pvStorePalette.ink1)),
+                      const SizedBox(height: 2),
+                      Text(s.jmCatchUpBody,
+                          style: pvManrope(
+                              fontSize: 12.5,
+                              height: 1.4,
+                              color: pvStorePalette.ink2)),
+                      const SizedBox(height: 6),
+                      GestureDetector(
+                        onTap: _showCatchUp,
+                        behavior: HitTestBehavior.opaque,
+                        child: Row(mainAxisSize: MainAxisSize.min, children: [
+                          Text(s.jmCatchUpCta,
+                              style: pvManrope(
+                                  fontSize: 12.5,
+                                  fontWeight: FontWeight.w700,
+                                  color: pvStorePalette.ink1)),
+                          Icon(Icons.chevron_right_rounded,
+                              size: 16, color: pvStorePalette.ink2),
+                        ]),
+                      ),
+                    ]),
               ),
-            ]),
-          ),
-          IconButton(
-            visualDensity: VisualDensity.compact,
-            icon: const Icon(Icons.close_rounded,
-                size: 18, color: AppTheme.neutral500),
-            onPressed: () => setState(() => _catchUpDismissed = true),
-          ),
-        ]),
+            ),
+            IconButton(
+              visualDensity: VisualDensity.compact,
+              icon: Icon(Icons.close_rounded,
+                  size: 18, color: pvStorePalette.ink3),
+              onPressed: () => setState(() => _catchUpDismissed = true),
+            ),
+          ]),
+        ),
       );
 
   void _showCatchUp() {
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: AppTheme.surface,
+      backgroundColor: Colors.white,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
@@ -281,17 +296,18 @@ class _JourneyMapScreenState extends State<JourneyMapScreen>
                       width: 40,
                       height: 4,
                       decoration: BoxDecoration(
-                          color: AppTheme.outlineVariant,
+                          color: kPvLine,
                           borderRadius: BorderRadius.circular(99))),
                 ),
                 const SizedBox(height: 14),
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(s.jmCatchUpSheet,
-                      style: pvJakarta(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w800,
-                          color: AppTheme.neutral900)),
+                      style: pvFraunces(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: -0.4,
+                          color: pvStorePalette.ink1)),
                 ),
                 const SizedBox(height: 12),
                 if (list.isEmpty)
@@ -299,7 +315,7 @@ class _JourneyMapScreenState extends State<JourneyMapScreen>
                     padding: const EdgeInsets.symmetric(vertical: 20),
                     child: Text(s.jmAllCaughtUp,
                         style: pvManrope(
-                            fontSize: 14, color: AppTheme.neutral600)),
+                            fontSize: 14, color: pvStorePalette.ink2)),
                   )
                 else
                   for (final m in list) _catchUpRow(s, m),
@@ -319,19 +335,24 @@ class _JourneyMapScreenState extends State<JourneyMapScreen>
             height: 40,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-                color: JourneyColors.forType(m.type).withValues(alpha: 0.12),
+                color: _markColor(m.type).withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(12)),
             child: Text(m.emoji, style: const TextStyle(fontSize: 20)),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Text(m.title.of(_c.language),
-                style: pvJakarta(
+                style: pvManrope(
                     fontSize: 14.5,
                     fontWeight: FontWeight.w700,
-                    color: AppTheme.neutral900)),
+                    color: pvStorePalette.ink1)),
           ),
           OutlinedButton.icon(
+            style: OutlinedButton.styleFrom(
+              foregroundColor: kPvInk,
+              side: const BorderSide(color: kPvLine),
+              shape: const StadiumBorder(),
+            ),
             onPressed: () => _pickCatchUpDate(m),
             icon: const Icon(Icons.edit_calendar_rounded, size: 16),
             label: Text(s.jmSetWhen),
@@ -362,12 +383,17 @@ class _JourneyMapScreenState extends State<JourneyMapScreen>
       builder: (context, _) {
         WidgetsBinding.instance
             .addPostFrameCallback((_) => _maybeLandOnCurrent());
+        final p = pvStorePalette;
+        // Kept for revert: AppBar(backgroundColor: AppTheme.surfaceContainer,
+        // title: Text(s.journeyTitle)). The AppBar now carries only the back
+        // arrow; the title is the serif page title above the header card.
         return Scaffold(
-          backgroundColor: AppTheme.surfaceContainer,
+          backgroundColor: p.ground,
           appBar: AppBar(
-            backgroundColor: AppTheme.surfaceContainer,
+            backgroundColor: p.ground,
+            surfaceTintColor: Colors.transparent,
+            foregroundColor: p.ink1,
             elevation: 0,
-            title: Text(s.journeyTitle),
           ),
           body: Container(
             decoration: const BoxDecoration(
@@ -382,6 +408,15 @@ class _JourneyMapScreenState extends State<JourneyMapScreen>
             // (so a node's viewport-Y = nodeY − scrollOffset drives the depth).
             child: Column(
               children: [
+                Container(
+                  width: double.infinity,
+                  color: p.ground,
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+                  child: Semantics(
+                    header: true,
+                    child: Text(s.journeyTitle, style: pregPageTitleStyle()),
+                  ),
+                ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 12, 16, 10),
                   child: _TrailHeaderCard(controller: _c),
@@ -516,7 +551,9 @@ class _JourneyMapScreenState extends State<JourneyMapScreen>
       // A soft radiating glow behind Birth: faint & small while LOCKED ("something
       // special waits here, not yet"), bright, warm & wide once UNLOCKED ("something
       // joyful is happening"). Same white disc; the glow is the addition.
-      final glow = unlocked ? JourneyColors.arrivalGold : AppTheme.secondary300;
+      // Unlocked was JourneyColors.arrivalGold, which is the brand violet in
+      // the shared palette; the gold the name promised is the achievement one.
+      final glow = unlocked ? JourneyColors.typeAchievement : AppTheme.secondary300;
       final auraAlpha = unlocked ? 0.40 : 0.12;
       final pingAlpha = unlocked ? 0.55 : 0.18;
       final pingScale = unlocked ? 0.95 : 0.42;
@@ -577,7 +614,7 @@ class _JourneyMapScreenState extends State<JourneyMapScreen>
     } else {
       final m = node.milestone!;
       return MilestoneMarker(
-        color: JourneyColors.forType(m.type),
+        color: _markColor(m.type),
         icon: JourneyColors.iconForType(m.type),
         reached: node.posDay <= _c.currentDay,
         diameter: size,
@@ -677,27 +714,17 @@ class _TrailHeaderCard extends StatelessWidget {
     final c = controller;
     final togo = PregnancyController.lastContentWeek - c.currentWeek;
     final pct = c.progress;
-    return Container(
+    final p = pvStorePalette;
+    // A white card with the hairline (kept for revert: a soft shadow
+    // Color(0x0F2D144C), a coral kicker, a coral ring on a coral track).
+    return PregCard(
       padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(22),
-        boxShadow: const [
-          BoxShadow(
-              color: Color(0x0F2D144C), blurRadius: 14, offset: Offset(0, 4)),
-        ],
-      ),
       child: Row(children: [
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(
               s.journeyTrailKicker.toUpperCase(),
-              style: pvManrope(
-                fontSize: 11,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 0.8,
-                color: AppTheme.secondary600,
-              ),
+              style: pregGroupLabelStyle(),
             ),
             const SizedBox(height: 4),
             Text(
@@ -705,7 +732,7 @@ class _TrailHeaderCard extends StatelessWidget {
               style: pvFraunces(
                 fontSize: 21,
                 fontWeight: FontWeight.w600,
-                color: AppTheme.neutral900,
+                color: p.ink1,
               ),
             ),
           ]),
@@ -722,16 +749,16 @@ class _TrailHeaderCard extends StatelessWidget {
                 value: pct,
                 strokeWidth: 6,
                 strokeCap: StrokeCap.round,
-                backgroundColor: AppTheme.secondary100,
-                valueColor: const AlwaysStoppedAnimation(AppTheme.secondary500),
+                backgroundColor: p.surfaceAlt,
+                valueColor: const AlwaysStoppedAnimation(kPvInk),
               ),
             ),
             Text(
               '${(pct * 100).round()}%',
-              style: pvJakarta(
+              style: pvManrope(
                 fontSize: 12,
-                fontWeight: FontWeight.w700,
-                color: AppTheme.neutral900,
+                fontWeight: FontWeight.w800,
+                color: p.ink1,
               ),
             ),
           ]),

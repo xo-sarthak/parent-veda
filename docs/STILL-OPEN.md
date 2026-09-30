@@ -9911,3 +9911,23 @@ not here. Owed:
     (26), Medicines (17), Reminders (17), Bump journey (17), Scans & appointments (17), the scan timeline (14), the
     Symptom companion (13), Weight (11), Product checklist (10); unreached, leave until deleted: week_flow (68),
     home_screen_b (39), week5/week6 previews, hospital_bag v1/v2, the Tools grid kept as `ToolsHubScreenClassic`.
+  - **§81.13 The pregnancy restyle (2026-09-30).** The owed list in §81.12 is done, in two layers. *Colour:* while
+    the stage is pregnancy the app theme swaps its violet for the ink (`lib/screens/pregnancy/preg_theme.dart`,
+    picked in `main.dart`), so every default Switch, chip, slider, spinner and date picker follows; and every live
+    pregnancy-only screen moved off `AppTheme.primary*` and violet hex. *Structure:* the older screens (Ask Veda,
+    Calendar, Reminders, Ready for birth, the Due Date calculator, My Journal, Medicines, Weight, Scans &
+    appointments, the scan timeline, Tests & reports, the Symptom companion, the Product checklist, Kegel,
+    Contractions, Baby movement, the Journey map, the week stack, Watch & Learn, Read next, spiritual reading,
+    Saved, the pregnancy profile, Prepare, the nutrition stage page, Garbh daily, the bump ritual) take TTC's shape:
+    a back arrow and a serif page title in the body, `PregSectionHeading` for sections, white hairline cards
+    (`PregCard`, `PregRowCard`) instead of tinted blocks and shadows, `PregNote` for disclaimers, a drawn mark
+    (`PvMarkWell`) on every row that opens somewhere, the one ink for everything pressable, no decorative emoji
+    (the pregnancy-only strings in app_language.dart lost theirs on both sides), and no placeholder photos or
+    unsourced ratings. Red stays only where it means "now" (the contraction timer's emergency reading, delete).
+    Held by `test/preg_one_parentveda_test.dart`. **Still owed:** the shared screens and data listed in
+    PREG-TTC-HANDOFF §9 (the reader, the Product Guide, the journey palette, the journal and video model colours,
+    `productImageUrl`); `spiritual_reading_screen` still has its own reader (one-reader rule) and stores
+    not-interested marks under `title.now` rather than `.en` (fixing it strands saved marks, so it needs a
+    migration); the private helpers the restyle wrote twice (`_SafetyWarning`, a neutral tag, an ink choice
+    pill, an outlined ink stadium) could move into `preg_chrome.dart`; `hospital_bag_ready_test` taps after
+    `scrollUntilVisible` without a `pump()`.

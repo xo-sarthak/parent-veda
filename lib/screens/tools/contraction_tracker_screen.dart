@@ -4,6 +4,20 @@
 //  A calm, non-alarmist decision-support tool: effortless tap-to-time, automatic
 //  pattern insights (never a diagnosis), and a doctor-ready summary. No emergency
 //  language, predictions, risk scores or red warning screens. Per the spec.
+//
+//  ⚠️ ONE PARENTVEDA (2026-09-30, the pregnancy restyle). Surfaces only; the
+//  two-layer assessment engine below is untouched. White cards with the
+//  hairline instead of tinted blocks, the one ink for the big start/stop
+//  button and every other control, neutral tags, serif titles. The timer keeps
+//  its app bar title: it is an instrument whose body changes by phase (home,
+//  active, rest), so the name stays put above all three.
+//
+//  ⚠️ RED STAYS WHERE IT MEANS "NOW". The emergency and preterm readings keep
+//  their red and orange (icon, title and a red edge on the card), and the
+//  safety check's shield still turns red in the app bar during an emergency.
+//  Red is for the urgent and the irreversible, not a brand colour, so nothing
+//  else on the page is coloured. Every clinical line is the same line in the
+//  same place.
 // =============================================================================
 
 import 'dart:async';
@@ -16,12 +30,58 @@ import 'package:flutter_tts/flutter_tts.dart';
 import '../../localization/app_language.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../services/tools_store.dart';
-import '../../theme/app_theme.dart';
+import '../../theme/pv_fonts.dart';
+import '../brackets/hub/hub_intent_art.dart';
+import '../doors/pv_list_row.dart' show PvMarkWell;
+import '../pregnancy/preg_chrome.dart';
+import '../products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 
-const Color _activeColor = Color(0xFFE8833A); // orange - active contraction
-const Color _restColor = Color(0xFF3B82C4); // blue - rest interval
+// Kept for revert: the phase colours before the one ink.
+// const Color _activeColor = Color(0xFFE8833A); // orange - active contraction
+// const Color _restColor = Color(0xFF3B82C4); // blue - rest interval
+
+/// The urgent colours. Only the emergency and preterm readings use them.
+const Color _kUrgentRed = Color(0xFFC62828);
+const Color _kUrgentOrange = Color(0xFFD9822B);
+
+/// The Tools tab's "Get ready" hue, so the marks here match the row she tapped.
+const double _kContractionHue = 28;
 
 enum _Phase { home, active, rest }
+
+// ---- shared pieces (private: the stages stay code-isolated) -----------------
+
+/// The page title on a pushed page, announced as a heading.
+Widget _pageTitle(String text) =>
+    Semantics(header: true, child: Text(text, style: pregPageTitleStyle()));
+
+/// A card's own title: the serif, smaller than a section heading.
+TextStyle _cardTitleStyle() => pvFraunces(
+    fontSize: 18,
+    fontWeight: FontWeight.w600,
+    height: 1.2,
+    letterSpacing: -0.3,
+    color: pvStorePalette.ink1);
+
+/// A tag: a neutral pill with grey words (a tint is allowed on a tag).
+Widget _tag(String label) => Container(
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+      decoration: BoxDecoration(
+        color: pvStorePalette.surfaceAlt,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(label,
+          style: pvManrope(
+              fontSize: 11.5,
+              fontWeight: FontWeight.w800,
+              color: pvStorePalette.ink2)),
+    );
+
+/// A column label inside a table (a group label, allowed inside a card).
+TextStyle _columnStyle() => pvManrope(
+    fontSize: 11.5, fontWeight: FontWeight.w700, color: pvStorePalette.ink3);
+
+TextStyle _cellStyle() => pvManrope(fontSize: 13.5, color: pvStorePalette.ink1);
 
 class ContractionTrackerScreen extends StatefulWidget {
   const ContractionTrackerScreen({super.key, required this.controller});
@@ -192,29 +252,35 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
 
   Future<void> _showLaborPrompt() async {
     final s = _s;
+    final p = pvStorePalette;
     await showDialog<void>(
       context: context,
       builder: (ctx) {
-        final text = Theme.of(ctx).textTheme;
         return AlertDialog(
-          title: Text(s.laborPromptTitle),
+          backgroundColor: Colors.white,
+          title: Text(s.laborPromptTitle,
+              style: pvFraunces(
+                  fontSize: 19, fontWeight: FontWeight.w600, color: p.ink1)),
           content: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(s.laborPromptBody, style: text.bodyMedium),
+                Text(s.laborPromptBody,
+                    style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink1)),
                 const SizedBox(height: 12),
                 Text(s.consultProvider,
-                    style: text.bodySmall?.copyWith(color: AppTheme.neutral600)),
+                    style: pvManrope(fontSize: 12.5, height: 1.45, color: p.ink2)),
               ]),
           actions: [
             TextButton(
+                style: TextButton.styleFrom(foregroundColor: p.ink1),
                 onPressed: () {
                   Navigator.of(ctx).pop();
                   _setLabor('no');
                 },
                 child: Text(s.laborNo)),
             FilledButton(
+                style: pregFilledStyle(),
                 onPressed: () {
                   Navigator.of(ctx).pop();
                   _setLabor('yes');
@@ -275,11 +341,15 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
                   : Icons.volume_up_rounded),
               onPressed: _toggleVoice,
             ),
+            // ⚠️ KEPT, THOUGH THE SAFETY CARD OPENS THE SAME SHEET: during a
+            // contraction (the active phase) this is the only way to it, and
+            // it turns red in an emergency. A clinical entry point is not
+            // trimmed for tidiness.
             IconButton(
               tooltip: s.safetyCheckTitle,
               icon: Icon(
-                Icons.health_and_safety_rounded,
-                color: _symptoms.isEmergency ? const Color(0xFFC62828) : null,
+                Icons.health_and_safety_outlined,
+                color: _symptoms.isEmergency ? _kUrgentRed : null,
               ),
               onPressed: _showSafetySheet,
             ),
@@ -308,33 +378,41 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
 
   Widget _homeView(BuildContext context) {
     final s = _s;
-    final text = Theme.of(context).textTheme;
+    final p = pvStorePalette;
     return Column(children: [
       Expanded(
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
+          padding: const EdgeInsets.fromLTRB(18, 12, 18, 16),
           children: [
             if (_symptoms.isEmergency) ...[
               _assessBanner(s),
               const SizedBox(height: 16),
             ],
             // What contractions are + true vs false (Braxton Hicks) + how to time.
-            _aboutCard(s, text),
-            const SizedBox(height: 14),
+            _aboutCard(s),
+            const SizedBox(height: 12),
             // Clear "we're a timer, not a medical app" disclaimer.
-            _disclaimerCard(s, text),
-            const SizedBox(height: 16),
+            _disclaimerCard(s),
+            const SizedBox(height: 12),
             _safetyCard(s),
             const SizedBox(height: 30),
-            const Center(child: Text('🤍', style: TextStyle(fontSize: 56))),
+            // Kept for revert: const Text('🤍', style: TextStyle(fontSize: 56)).
+            // No decorative emoji; the drawn mark in the tool's tint.
+            Center(
+              child: PvMarkWell(
+                  p: p,
+                  hue: _kContractionHue,
+                  size: 64,
+                  mark: IntentMark.cuppedHands),
+            ),
             const SizedBox(height: 16),
             Text(s.contractionEmpty,
-                textAlign: TextAlign.center, style: text.bodyLarge),
+                textAlign: TextAlign.center,
+                style: pvManrope(fontSize: 14.5, height: 1.5, color: p.ink2)),
           ],
         ),
       ),
-      _bottomButton(context, s.contractionStartedCta, _activeColor,
-          _startContraction),
+      _bottomButton(context, s.contractionStartedCta, _startContraction),
     ]);
   }
 
@@ -342,25 +420,27 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
 
   Widget _activeView(BuildContext context) {
     final s = _s;
-    final text = Theme.of(context).textTheme;
+    final p = pvStorePalette;
     final elapsed =
         _activeStart == null ? 0 : DateTime.now().difference(_activeStart!).inSeconds;
     return Column(children: [
       Expanded(
         child: Center(
           child: Column(mainAxisSize: MainAxisSize.min, children: [
-            Text(s.currentContraction, style: text.titleMedium),
+            Text(s.currentContraction, style: _cardTitleStyle()),
             const SizedBox(height: 4),
             Text(s.contractionNumber(_current.length + 1),
-                style: text.labelMedium?.copyWith(color: AppTheme.neutral500)),
+                style: pvManrope(
+                    fontSize: 12.5, fontWeight: FontWeight.w700, color: p.ink3)),
             const SizedBox(height: 22),
-            _timerCircle(s.formatStopwatch(elapsed), _activeColor),
+            _timerCircle(s.formatStopwatch(elapsed), active: true),
             const SizedBox(height: 24),
-            Text(s.tapWhenEnds, style: text.bodyMedium),
+            Text(s.tapWhenEnds,
+                style: pvManrope(fontSize: 14, height: 1.45, color: p.ink2)),
           ]),
         ),
       ),
-      _bottomButton(context, s.contractionEndedCta, _activeColor, _endContraction),
+      _bottomButton(context, s.contractionEndedCta, _endContraction),
     ]);
   }
 
@@ -368,41 +448,47 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
 
   Widget _restView(BuildContext context) {
     final s = _s;
-    final text = Theme.of(context).textTheme;
+    final p = pvStorePalette;
     final rest =
         _lastEnd == null ? 0 : DateTime.now().difference(_lastEnd!).inSeconds;
     final last = _current.isNotEmpty ? _current.last : null;
     return Column(children: [
       Expanded(
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
+          padding: const EdgeInsets.fromLTRB(18, 12, 18, 16),
           children: [
             _assessBanner(s),
             const SizedBox(height: 12),
             _safetyCard(s),
-            const SizedBox(height: 18),
-            Center(child: Text(s.timeSinceLast, style: text.titleMedium)),
+            const SizedBox(height: 22),
+            Center(child: Text(s.timeSinceLast, style: _cardTitleStyle())),
             const SizedBox(height: 14),
-            Center(child: _timerCircle(s.formatStopwatch(rest), _restColor)),
+            Center(child: _timerCircle(s.formatStopwatch(rest), active: false)),
             const SizedBox(height: 20),
             Row(children: [
               if (last != null)
                 Expanded(
-                    child: _stat(text, s.lastContractionLabel,
+                    child: _stat(s.lastContractionLabel,
                         s.minSecLabel(last.durationSeconds))),
               Expanded(
-                  child: _stat(text, s.avgDurationLabel,
-                      s.minSecLabel(_avgDuration.round()))),
+                  child: _stat(
+                      s.avgDurationLabel, s.minSecLabel(_avgDuration.round()))),
               Expanded(
-                  child: _stat(text, s.avgIntervalLabel,
+                  child: _stat(s.avgIntervalLabel,
                       s.minSecLabel(_avgIntervalSec.round()))),
             ]),
             const SizedBox(height: 22),
             // The session, building live in front of the mother.
-            _sessionList(s, text),
+            _sessionList(s),
             const SizedBox(height: 16),
             if (_current.length >= 3)
               OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: kPvInk,
+                  side: const BorderSide(color: kPvLine, width: 1.5),
+                  shape: const StadiumBorder(),
+                  minimumSize: const Size.fromHeight(48),
+                ),
                 onPressed: () => Navigator.of(context).push(MaterialPageRoute(
                   builder: (_) => _SummaryScreen(
                     controller: widget.controller,
@@ -410,40 +496,53 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
                   ),
                 )),
                 icon: const Icon(Icons.insights_rounded, size: 18),
-                label: Text(s.viewSummaryCta),
+                label: Text(s.viewSummaryCta,
+                    style: pvManrope(fontSize: 14, fontWeight: FontWeight.w700)),
               ),
             const SizedBox(height: 10),
-            TextButton(onPressed: _endSession, child: Text(s.endSessionCta)),
+            TextButton(
+                style: TextButton.styleFrom(foregroundColor: p.ink2),
+                onPressed: _endSession,
+                child: Text(s.endSessionCta,
+                    style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w700))),
           ],
         ),
       ),
-      _bottomButton(
-          context, s.contractionStartedCta, _activeColor, _startContraction),
+      _bottomButton(context, s.contractionStartedCta, _startContraction),
     ]);
   }
 
+  /// A reading's glyph and colour. The emergency and preterm readings keep
+  /// their red and orange; every calm reading draws in the ink. Kept for
+  /// revert: activeLabor was _activeColor (orange), laborLikely 0xFFE6A817,
+  /// earlyLabor and noPattern _restColor (blue), insufficient neutral500.
   ({Color color, IconData icon}) _levelStyle(AssessLevel l) {
+    final p = pvStorePalette;
     switch (l) {
       case AssessLevel.emergency:
-        return (color: const Color(0xFFC62828), icon: Icons.warning_amber_rounded);
+        return (color: _kUrgentRed, icon: Icons.warning_amber_rounded);
       case AssessLevel.preterm:
-        return (color: const Color(0xFFD9822B), icon: Icons.priority_high_rounded);
+        return (color: _kUrgentOrange, icon: Icons.priority_high_rounded);
       case AssessLevel.activeLabor:
-        return (color: _activeColor, icon: Icons.favorite_rounded);
+        return (color: p.ink1, icon: Icons.favorite_border_rounded);
       case AssessLevel.laborLikely:
-        return (color: const Color(0xFFE6A817), icon: Icons.trending_up_rounded);
+        return (color: p.ink1, icon: Icons.trending_up_rounded);
       case AssessLevel.earlyLabor:
-        return (color: _restColor, icon: Icons.water_drop_rounded);
+        return (color: p.ink1, icon: Icons.water_drop_outlined);
       case AssessLevel.noPattern:
-        return (color: _restColor, icon: Icons.timelapse_rounded);
+        return (color: p.ink2, icon: Icons.timelapse_rounded);
       case AssessLevel.insufficient:
-        return (color: AppTheme.neutral500, icon: Icons.timelapse_rounded);
+        return (color: p.ink3, icon: Icons.timelapse_rounded);
     }
   }
 
   /// The final assessment banner (Layer 2 override applied over Layer 1).
+  ///
+  /// Kept for revert: the whole banner sat on its level's colour at 10-14%
+  /// with a matching edge. A white card now; an urgent reading keeps a red (or
+  /// orange) edge, glyph and title, so it still stands out from a calm one.
   Widget _assessBanner(S s) {
-    final text = Theme.of(context).textTheme;
+    final p = pvStorePalette;
     final level = assessContractions(
         _current, widget.controller.currentWeek, _symptoms);
     final style = _levelStyle(level);
@@ -453,11 +552,10 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: style.color.withValues(alpha: urgent ? 0.14 : 0.10),
-        borderRadius: BorderRadius.circular(16),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(
-            color: style.color.withValues(alpha: urgent ? 0.6 : 0.3),
-            width: urgent ? 1.4 : 1),
+            color: urgent ? style.color : kPvLine, width: urgent ? 1.5 : 1),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
@@ -465,26 +563,28 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
           const SizedBox(width: 8),
           Expanded(
             child: Text(s.assessTitle(key),
-                style: text.titleSmall
-                    ?.copyWith(fontWeight: FontWeight.w800, color: style.color)),
+                style: pvManrope(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                    height: 1.3,
+                    color: urgent ? style.color : p.ink1)),
           ),
-          if (_laborResponse != null) _laborChip(s, text, _laborResponse == 'yes'),
+          if (_laborResponse != null) _tag(s.feltInLabour(_laborResponse == 'yes')),
         ]),
         const SizedBox(height: 6),
         Text(s.assessSummary(key),
-            style: text.bodyMedium?.copyWith(color: AppTheme.neutral800)),
+            style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink1)),
         // ALWAYS point to the doctor - even on a calm "no pattern" reading, since
         // timing can't rule labour in or out. (Emergency/preterm already carry
         // their own urgent contact message, so skip the softer line there.)
         if (!urgent) ...[
           const SizedBox(height: 10),
           Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const Icon(Icons.local_hospital_outlined,
-                size: 15, color: AppTheme.neutral500),
+            Icon(Icons.local_hospital_outlined, size: 15, color: p.ink3),
             const SizedBox(width: 6),
             Expanded(
               child: Text(s.ctAlwaysConsult,
-                  style: text.bodySmall?.copyWith(color: AppTheme.neutral600)),
+                  style: pvManrope(fontSize: 12.5, height: 1.45, color: p.ink2)),
             ),
           ]),
         ],
@@ -494,111 +594,114 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
 
   /// "Understanding contractions" - what they are, true vs false (Braxton
   /// Hicks), and how to time one. Helps a first-time user know what this is.
-  Widget _aboutCard(S s, TextTheme text) => Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppTheme.surfaceContainer,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [
-            const Icon(Icons.info_outline_rounded, size: 18, color: _restColor),
-            const SizedBox(width: 8),
-            Text(s.ctAboutTitle,
-                style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
+  /// Kept for revert: a grey block (surfaceContainer) with a blue info glyph.
+  Widget _aboutCard(S s) => SizedBox(
+        width: double.infinity,
+        child: PregCard(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(s.ctAboutTitle, style: _cardTitleStyle()),
+            const SizedBox(height: 8),
+            Text(s.ctAboutBody,
+                style: pvManrope(
+                    fontSize: 13.5, height: 1.5, color: pvStorePalette.ink2)),
           ]),
-          const SizedBox(height: 8),
-          Text(s.ctAboutBody,
-              style: text.bodyMedium?.copyWith(height: 1.5)),
-        ]),
+        ),
       );
 
   /// The "this is a timer, not a diagnosis / not a medical app" disclaimer -
   /// kept clearly visible so the tool never reads as medical advice.
-  Widget _disclaimerCard(S s, TextTheme text) => Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: const Color(0xFFFFF6E9),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0x33D9822B)),
+  /// Kept for revert: an amber block (0xFFFFF6E9, edge 0x33D9822B) with the
+  /// title in 0xFFB36B12. A white card, the same two lines, still on the page.
+  Widget _disclaimerCard(S s) {
+    final p = pvStorePalette;
+    return PregCard(
+      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 1),
+          child: Icon(Icons.health_and_safety_outlined, size: 20, color: p.ink1),
         ),
-        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Icon(Icons.health_and_safety_outlined,
-              size: 20, color: Color(0xFFB36B12)),
-          const SizedBox(width: 10),
-          Expanded(
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(s.ctDisclaimerTitle,
-                  style: text.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w800,
-                      color: const Color(0xFFB36B12))),
-              const SizedBox(height: 4),
-              Text(s.ctDisclaimerBody,
-                  style: text.bodySmall
-                      ?.copyWith(color: AppTheme.neutral700, height: 1.45)),
-            ]),
-          ),
-        ]),
-      );
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(s.ctDisclaimerTitle,
+                style: pvManrope(
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w800,
+                    height: 1.35,
+                    color: p.ink1)),
+            const SizedBox(height: 4),
+            Text(s.ctDisclaimerBody,
+                style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2)),
+          ]),
+        ),
+      ]),
+    );
+  }
 
   /// The Layer-2 symptom "safety check" entry - shows current state + Update.
+  /// Kept for revert: a grey block (surfaceContainer); the all-clear shield was
+  /// tertiary500. The shield keeps red (emergency) and orange (reported).
   Widget _safetyCard(S s) {
-    final text = Theme.of(context).textTheme;
+    final p = pvStorePalette;
     final reported = _symptoms.anyReported;
     final emergency = _symptoms.isEmergency;
     final color = emergency
-        ? const Color(0xFFC62828)
-        : (reported ? const Color(0xFFD9822B) : AppTheme.tertiary500);
-    return Container(
+        ? _kUrgentRed
+        : (reported ? _kUrgentOrange : p.ink2);
+    return PregCard(
       padding: const EdgeInsets.fromLTRB(14, 12, 8, 12),
-      decoration: BoxDecoration(
-        color: AppTheme.surfaceContainer,
-        borderRadius: BorderRadius.circular(16),
-      ),
       child: Row(children: [
-        Icon(Icons.health_and_safety_rounded, color: color, size: 22),
+        Icon(Icons.health_and_safety_outlined, color: color, size: 22),
         const SizedBox(width: 12),
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(s.safetyCheckTitle,
-                style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
+                style: pvManrope(
+                    fontSize: 14.5, fontWeight: FontWeight.w800, color: p.ink1)),
             const SizedBox(height: 2),
             Text(reported ? s.safetyReported : s.safetyAllClear,
-                style: text.bodySmall?.copyWith(color: AppTheme.neutral600)),
+                style: pvManrope(fontSize: 12.5, color: p.ink2)),
           ]),
         ),
-        TextButton(onPressed: _showSafetySheet, child: Text(s.safetyUpdate)),
+        TextButton(
+            style: TextButton.styleFrom(foregroundColor: kPvInk),
+            onPressed: _showSafetySheet,
+            child: Text(s.safetyUpdate,
+                style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w800))),
       ]),
     );
   }
 
   Future<void> _showSafetySheet() async {
     final s = _s;
+    final p = pvStorePalette;
     var sym = _symptoms;
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      backgroundColor: AppTheme.surface,
+      backgroundColor: Colors.white,
       builder: (ctx) {
         return StatefulBuilder(builder: (ctx, setSheet) {
-          final text = Theme.of(ctx).textTheme;
           Widget q(String title, List<(String, String)> opts, String current,
               void Function(String) onPick) {
             return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(title,
-                      style:
-                          text.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
+                      style: pvManrope(
+                          fontSize: 14.5,
+                          fontWeight: FontWeight.w700,
+                          color: p.ink1)),
                   const SizedBox(height: 8),
                   Wrap(spacing: 8, runSpacing: 8, children: [
+                    // Kept for revert: a Material ChoiceChip. The one pill:
+                    // white with the hairline, the ink when chosen.
                     for (final (label, value) in opts)
-                      ChoiceChip(
-                        label: Text(label),
+                      _ChoicePill(
+                        label: label,
                         selected: current == value,
-                        onSelected: (_) => setSheet(() => onPick(value)),
+                        onTap: () => setSheet(() => onPick(value)),
                       ),
                   ]),
                   const SizedBox(height: 18),
@@ -613,11 +716,16 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(s.safetyCheckTitle, style: text.headlineSmall),
+                    Text(s.safetyCheckTitle,
+                        style: pvFraunces(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: -0.4,
+                            color: p.ink1)),
                     const SizedBox(height: 6),
                     Text(s.safetyCheckSub,
-                        style:
-                            text.bodySmall?.copyWith(color: AppTheme.neutral600)),
+                        style: pvManrope(
+                            fontSize: 12.5, height: 1.45, color: p.ink2)),
                     const SizedBox(height: 18),
                     q(s.qWaterBroken, [
                       (s.optNo, 'no'),
@@ -643,13 +751,19 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
                     SizedBox(
                       width: double.infinity,
                       child: FilledButton(
+                        style: pregFilledStyle().copyWith(
+                          minimumSize: const WidgetStatePropertyAll(
+                              Size.fromHeight(50)),
+                        ),
                         onPressed: () {
                           setState(() => _symptoms = sym);
                           Navigator.of(ctx).pop();
                           // Symptoms can override the reading (e.g. emergency).
                           _speakInterpretation();
                         },
-                        child: Text(s.doneWord),
+                        child: Text(s.doneWord,
+                            style: pvManrope(
+                                fontSize: 14.5, fontWeight: FontWeight.w800)),
                       ),
                     ),
                   ]),
@@ -660,54 +774,41 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
     );
   }
 
-  Widget _laborChip(S s, TextTheme text, bool yes) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-        decoration: BoxDecoration(
-          color: (yes ? _activeColor : _restColor).withValues(alpha: 0.15),
-          borderRadius: BorderRadius.circular(40),
-        ),
-        child: Text(s.feltInLabour(yes),
-            style: text.labelSmall?.copyWith(
-                fontWeight: FontWeight.w700,
-                color: yes ? _activeColor : _restColor)),
-      );
+  // Kept for revert: `_laborChip` drew "felt like labour" as an orange (yes)
+  // or blue (no) pill at 15%. It is the neutral `_tag` now.
 
   /// The contractions logged so far this session, newest first - so the record
   /// grows in front of the mother without opening the summary or history.
-  Widget _sessionList(S s, TextTheme text) {
+  Widget _sessionList(S s) {
     if (_current.isEmpty) return const SizedBox.shrink();
+    final p = pvStorePalette;
     final items = _current.reversed.toList();
-    return Container(
+    return PregCard(
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.outlineVariant),
-      ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          Text(s.thisSessionContractions,
-              style: text.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
-          const Spacer(),
+          Expanded(child: Text(s.thisSessionContractions, style: _cardTitleStyle())),
+          // Kept for revert: the count in _activeColor (orange).
           Text('${_current.length}',
-              style: text.titleSmall?.copyWith(
-                  color: _activeColor, fontWeight: FontWeight.w800)),
+              style: pvManrope(
+                  fontSize: 15, fontWeight: FontWeight.w800, color: p.ink1)),
         ]),
         const SizedBox(height: 10),
         Row(children: [
           const SizedBox(width: 28),
-          Expanded(child: Text(s.timeColumn, style: text.labelSmall)),
-          Expanded(child: Text(s.durationColumn, style: text.labelSmall)),
-          Expanded(child: Text(s.intervalColumn, style: text.labelSmall)),
+          Expanded(child: Text(s.timeColumn, style: _columnStyle())),
+          Expanded(child: Text(s.durationColumn, style: _columnStyle())),
+          Expanded(child: Text(s.intervalColumn, style: _columnStyle())),
         ]),
-        const Divider(height: 14),
+        const Divider(height: 14, thickness: 1, color: kPvLine),
         for (int i = 0; i < items.length; i++)
-          _sessionRow(s, text, items[i], _current.length - i),
+          _sessionRow(s, items[i], _current.length - i),
       ]),
     );
   }
 
-  Widget _sessionRow(S s, TextTheme text, Contraction c, int number) {
+  Widget _sessionRow(S s, Contraction c, int number) {
+    final p = pvStorePalette;
     final start = DateTime.tryParse(c.startIso) ?? DateTime.now();
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 7),
@@ -715,61 +816,108 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
         SizedBox(
             width: 28,
             child: Text('$number',
-                style: text.labelMedium?.copyWith(
-                    color: AppTheme.neutral500, fontWeight: FontWeight.w700))),
-        Expanded(child: Text(s.formatClock(start), style: text.bodyMedium)),
+                style: pvManrope(
+                    fontSize: 12.5, fontWeight: FontWeight.w700, color: p.ink3))),
+        Expanded(child: Text(s.formatClock(start), style: _cellStyle())),
         Expanded(
-            child: Text(s.minSecLabel(c.durationSeconds), style: text.bodyMedium)),
+            child: Text(s.minSecLabel(c.durationSeconds), style: _cellStyle())),
         Expanded(
             child: Text(
                 c.intervalSeconds == 0 ? '-' : s.minSecLabel(c.intervalSeconds),
-                style: text.bodyMedium)),
+                style: _cellStyle())),
       ]),
     );
   }
 
   // ---- shared bits ----------------------------------------------------------
 
-  Widget _timerCircle(String label, Color color) {
+  /// The timer face. Kept for revert: an orange (active) or blue (rest) ring
+  /// on its own colour at 12%, the numbers in that colour. The ink ring while
+  /// a contraction runs, a grey one while she rests; white inside.
+  Widget _timerCircle(String label, {required bool active}) {
+    final p = pvStorePalette;
     return Container(
       width: 230,
       height: 230,
       alignment: Alignment.center,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: color.withValues(alpha: 0.12),
-        border: Border.all(color: color, width: 4),
+        color: Colors.white,
+        border: Border.all(color: active ? kPvInk : p.ink3, width: 4),
       ),
       child: Text(label,
-          style: TextStyle(
-              fontSize: 52, fontWeight: FontWeight.w800, color: color)),
+          style: pvManrope(
+              fontSize: 52, fontWeight: FontWeight.w800, color: p.ink1)),
     );
   }
 
-  Widget _stat(TextTheme text, String label, String value) => Column(children: [
-        Text(value,
-            style: text.titleLarge?.copyWith(fontWeight: FontWeight.w800)),
-        const SizedBox(height: 2),
-        Text(label, textAlign: TextAlign.center, style: text.labelSmall),
-      ]);
+  Widget _stat(String label, String value) {
+    final p = pvStorePalette;
+    return Column(children: [
+      Text(value,
+          style: pvManrope(
+              fontSize: 20, fontWeight: FontWeight.w800, color: p.ink1)),
+      const SizedBox(height: 2),
+      Text(label,
+          textAlign: TextAlign.center,
+          style: pvManrope(fontSize: 11.5, height: 1.3, color: p.ink3)),
+    ]);
+  }
 
-  Widget _bottomButton(
-      BuildContext context, String label, Color color, VoidCallback onTap) {
+  /// The big button. Kept for revert: it was filled with _activeColor (orange)
+  /// on every phase. The one ink: it is the thing she presses.
+  Widget _bottomButton(BuildContext context, String label, VoidCallback onTap) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+      padding: const EdgeInsets.fromLTRB(18, 8, 18, 16),
       child: SizedBox(
         width: double.infinity,
         height: 60,
         child: FilledButton(
-          style: FilledButton.styleFrom(backgroundColor: color),
+          style: pregFilledStyle(),
           onPressed: onTap,
           child: Text(label,
-              style: const TextStyle(
-                  fontSize: 16, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
+              style: pvManrope(
+                  fontSize: 16, fontWeight: FontWeight.w800, letterSpacing: 0.3)),
         ),
       ),
     );
   }
+}
+
+/// One answer in the safety check: white with the hairline, the ink when
+/// chosen (the trying-to-conceive tool pill, redrawn here).
+class _ChoicePill extends StatelessWidget {
+  const _ChoicePill(
+      {required this.label, required this.selected, required this.onTap});
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+        button: true,
+        selected: selected,
+        label: label,
+        excludeSemantics: true,
+        child: GestureDetector(
+          onTap: onTap,
+          behavior: HitTestBehavior.opaque,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 130),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: selected ? kPvInk : Colors.white,
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(color: selected ? kPvInk : kPvLine, width: 1.5),
+            ),
+            child: Text(label,
+                style: pvManrope(
+                    fontSize: 13,
+                    fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+                    color: selected ? Colors.white : pvStorePalette.ink1)),
+          ),
+        ),
+      );
 }
 
 // ---------------------------------------------------------------------------
@@ -956,6 +1104,7 @@ String contractionPattern(S s, List<Contraction> cs) {
   return s.assessSummary(_levelKey(level));
 }
 
+
 // ---------------------------------------------------------------------------
 //  Session summary
 // ---------------------------------------------------------------------------
@@ -968,7 +1117,7 @@ class _SummaryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = S(controller.language);
-    final text = Theme.of(context).textTheme;
+    final p = pvStorePalette;
     final cs = contractions;
     final durations = cs.map((c) => c.durationSeconds).toList();
     final intervals =
@@ -993,11 +1142,15 @@ class _SummaryScreen extends StatelessWidget {
         '${s.consultProvider}';
 
     return Scaffold(
-      appBar: AppBar(title: Text(s.sessionSummaryTitle)),
+      // Kept for revert: appBar: AppBar(title: Text(s.sessionSummaryTitle)).
+      appBar: AppBar(),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
+        padding: const EdgeInsets.fromLTRB(18, 4, 18, 32),
         children: [
-          Text(s.currentPatternLabel, style: text.headlineSmall),
+          _pageTitle(s.sessionSummaryTitle),
+          const SizedBox(height: 22),
+          // Kept for revert: Text(s.currentPatternLabel, headlineSmall).
+          PregSectionHeading(s.currentPatternLabel),
           const SizedBox(height: 12),
           GridView.count(
             crossAxisCount: 2,
@@ -1007,58 +1160,66 @@ class _SummaryScreen extends StatelessWidget {
             mainAxisSpacing: 12,
             crossAxisSpacing: 12,
             children: [
-              _metric(text, s.contractionsLoggedLabel, '${cs.length}'),
-              _metric(text, s.avgDurationLabel, s.minSecLabel(avgDur)),
-              _metric(text, s.avgIntervalLabel, s.minSecLabel(avgIntSec)),
-              _metric(text, s.longestDurationLabel, s.minSecLabel(longest)),
+              _metric(s.contractionsLoggedLabel, '${cs.length}'),
+              _metric(s.avgDurationLabel, s.minSecLabel(avgDur)),
+              _metric(s.avgIntervalLabel, s.minSecLabel(avgIntSec)),
+              _metric(s.longestDurationLabel, s.minSecLabel(longest)),
             ],
           ),
           const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppTheme.neutral50,
-              borderRadius: BorderRadius.circular(16),
+          // Kept for revert: a grey block (neutral50, radius 16). A white card.
+          SizedBox(
+            width: double.infinity,
+            child: PregCard(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(contractionPattern(s, cs),
+                    style: pvManrope(fontSize: 14.5, height: 1.5, color: p.ink1)),
+                const SizedBox(height: 8),
+                Text(s.consultProvider,
+                    style: pvManrope(fontSize: 12.5, height: 1.45, color: p.ink2)),
+              ]),
             ),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(contractionPattern(s, cs), style: text.bodyLarge),
-              const SizedBox(height: 8),
-              Text(s.consultProvider, style: text.bodySmall),
-            ]),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 18),
           FilledButton.icon(
+            style: pregFilledStyle().copyWith(
+              minimumSize: const WidgetStatePropertyAll(Size.fromHeight(50)),
+            ),
             onPressed: () async {
               final messenger = ScaffoldMessenger.of(context);
               await Clipboard.setData(ClipboardData(text: summaryText()));
               messenger.showSnackBar(SnackBar(content: Text(s.summaryCopied)));
             },
             icon: const Icon(Icons.copy_rounded, size: 18),
-            label: Text(s.copySummaryCta),
+            label: Text(s.copySummaryCta,
+                style: pvManrope(fontSize: 14.5, fontWeight: FontWeight.w800)),
           ),
         ],
       ),
     );
   }
 
-  Widget _metric(TextTheme text, String label, String value) => Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: AppTheme.surface,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppTheme.outlineVariant),
-        ),
-        child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(value,
-                  style:
-                      text.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
-              const SizedBox(height: 2),
-              Text(label, style: text.labelSmall),
-            ]),
-      );
+  Widget _metric(String label, String value) {
+    final p = pvStorePalette;
+    return PregCard(
+      padding: const EdgeInsets.all(14),
+      child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(value,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: pvFraunces(
+                    fontSize: 24, fontWeight: FontWeight.w600, color: p.ink1)),
+            const SizedBox(height: 2),
+            Text(label,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: pvManrope(fontSize: 12, height: 1.3, color: p.ink3)),
+          ]),
+    );
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -1072,27 +1233,27 @@ class _ContractionHistoryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = S(controller.language);
-    final text = Theme.of(context).textTheme;
     return Scaffold(
-      appBar: AppBar(title: Text(s.historyLabel)),
+      // Kept for revert: appBar: AppBar(title: Text(s.historyLabel)).
+      appBar: AppBar(),
       body: AnimatedBuilder(
         animation: ToolsStore.instance,
         builder: (context, _) {
           final sessions = ToolsStore.instance.contractionSessions;
-          if (sessions.isEmpty) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(36),
-                child: Text(s.noContractionSessions,
-                    textAlign: TextAlign.center, style: text.bodyMedium),
-              ),
-            );
-          }
           return ListView(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
+            padding: const EdgeInsets.fromLTRB(18, 4, 18, 32),
             children: [
-              for (final session in sessions)
-                _sessionCard(context, session, s, text),
+              _pageTitle(s.historyLabel),
+              const SizedBox(height: 16),
+              // Kept for revert: one outlined card per session. They open a
+              // session, so they are rows with a drawn mark in one white card.
+              PregRowCard(
+                empty: s.noContractionSessions,
+                children: [
+                  for (final session in sessions)
+                    _sessionRow(context, session, s),
+                ],
+              ),
             ],
           );
         },
@@ -1100,8 +1261,8 @@ class _ContractionHistoryScreen extends StatelessWidget {
     );
   }
 
-  Widget _sessionCard(
-      BuildContext context, ContractionSession session, S s, TextTheme text) {
+  Widget _sessionRow(BuildContext context, ContractionSession session, S s) {
+    final p = pvStorePalette;
     final date = DateTime.tryParse(session.dateIso);
     final cs = session.contractions;
     final durations = cs.map((c) => c.durationSeconds).toList();
@@ -1114,54 +1275,41 @@ class _ContractionHistoryScreen extends StatelessWidget {
         ? 0
         : (intervals.reduce((a, b) => a + b) / intervals.length).round();
     final labor = session.laborResponse;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: () => Navigator.of(context).push(MaterialPageRoute(
-          builder: (_) =>
-              _SessionDetailScreen(controller: controller, session: session),
-        )),
-        child: Ink(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: AppTheme.surface,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppTheme.outlineVariant),
-          ),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Row(children: [
-              Expanded(
-                child: Text(date != null ? s.formatLongDate(date) : session.dateIso,
-                    style: text.titleMedium),
-              ),
-              if (labor != null)
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: (labor == 'yes' ? _activeColor : _restColor)
-                        .withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(40),
-                  ),
-                  child: Text(s.feltInLabour(labor == 'yes'),
-                      style: text.labelSmall?.copyWith(
-                          fontWeight: FontWeight.w700,
-                          color: labor == 'yes' ? _activeColor : _restColor)),
-                ),
+    return InkWell(
+      onTap: () => Navigator.of(context).push(MaterialPageRoute(
+        builder: (_) =>
+            _SessionDetailScreen(controller: controller, session: session),
+      )),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(14, 12, 12, 12),
+        child: Row(children: [
+          PvMarkWell(p: p, hue: _kContractionHue, size: 44, mark: IntentMark.chartLog),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(date != null ? s.formatLongDate(date) : session.dateIso,
+                  style: pvManrope(
+                      fontSize: 14.5,
+                      fontWeight: FontWeight.w700,
+                      height: 1.25,
+                      color: p.ink1)),
+              const SizedBox(height: 2),
+              Text(
+                  '${cs.length} ${s.contractionsLoggedLabel.toLowerCase()} · '
+                  '${s.avgDurationLabel} ${s.minSecLabel(avgDur)} · '
+                  '${s.avgIntervalLabel} ${s.minSecLabel(avgIntSec)}',
+                  style: pvManrope(fontSize: 12.5, height: 1.35, color: p.ink3)),
+              if (labor != null) ...[
+                const SizedBox(height: 6),
+                // Kept for revert: an orange (yes) or blue (no) pill.
+                _tag(s.feltInLabour(labor == 'yes')),
+              ],
             ]),
-            const SizedBox(height: 6),
-            Text(
-                '${cs.length} ${s.contractionsLoggedLabel.toLowerCase()} · '
-                '${s.avgDurationLabel} ${s.minSecLabel(avgDur)} · '
-                '${s.avgIntervalLabel} ${s.minSecLabel(avgIntSec)}',
-                style: text.bodyMedium),
-          ]),
-        ),
+          ),
+          const SizedBox(width: 4),
+          Icon(Icons.chevron_right_rounded, size: 20, color: p.ink3),
+        ]),
       ),
-    ),
     );
   }
 }
@@ -1174,59 +1322,54 @@ class _SessionDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = S(controller.language);
-    final text = Theme.of(context).textTheme;
     return Scaffold(
-      appBar: AppBar(title: Text(s.sessionSummaryTitle)),
+      // Kept for revert: appBar: AppBar(title: Text(s.sessionSummaryTitle)).
+      appBar: AppBar(),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
+        padding: const EdgeInsets.fromLTRB(18, 4, 18, 32),
         children: [
+          _pageTitle(s.sessionSummaryTitle),
+          const SizedBox(height: 16),
           if (session.laborResponse != null) ...[
-            Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: (session.laborResponse == 'yes' ? _activeColor : _restColor)
-                    .withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Row(children: [
-                Icon(Icons.favorite_rounded,
-                    size: 18,
-                    color: session.laborResponse == 'yes'
-                        ? _activeColor
-                        : _restColor),
-                const SizedBox(width: 8),
-                Text(s.feltInLabour(session.laborResponse == 'yes'),
-                    style: text.titleSmall),
-              ]),
+            // Kept for revert: a tinted block (orange or blue at 12%) with a
+            // heart glyph. A tag now.
+            Align(
+              alignment: Alignment.centerLeft,
+              child: _tag(s.feltInLabour(session.laborResponse == 'yes')),
             ),
             const SizedBox(height: 16),
           ],
-          Row(children: [
-            Expanded(child: Text(s.timeColumn, style: text.labelMedium)),
-            Expanded(child: Text(s.durationColumn, style: text.labelMedium)),
-            Expanded(child: Text(s.intervalColumn, style: text.labelMedium)),
-          ]),
-          const Divider(),
-          for (final c in session.contractions)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Row(children: [
-                Expanded(
-                    child: Text(
-                        s.formatClock(
-                            DateTime.tryParse(c.startIso) ?? DateTime.now()),
-                        style: text.bodyMedium)),
-                Expanded(
-                    child: Text(s.minSecLabel(c.durationSeconds),
-                        style: text.bodyMedium)),
-                Expanded(
-                    child: Text(
-                        c.intervalSeconds == 0
-                            ? '-'
-                            : s.minSecLabel(c.intervalSeconds),
-                        style: text.bodyMedium)),
+          PregCard(
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
+            child: Column(children: [
+              Row(children: [
+                Expanded(child: Text(s.timeColumn, style: _columnStyle())),
+                Expanded(child: Text(s.durationColumn, style: _columnStyle())),
+                Expanded(child: Text(s.intervalColumn, style: _columnStyle())),
               ]),
-            ),
+              const Divider(height: 18, thickness: 1, color: kPvLine),
+              for (final c in session.contractions)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Row(children: [
+                    Expanded(
+                        child: Text(
+                            s.formatClock(
+                                DateTime.tryParse(c.startIso) ?? DateTime.now()),
+                            style: _cellStyle())),
+                    Expanded(
+                        child: Text(s.minSecLabel(c.durationSeconds),
+                            style: _cellStyle())),
+                    Expanded(
+                        child: Text(
+                            c.intervalSeconds == 0
+                                ? '-'
+                                : s.minSecLabel(c.intervalSeconds),
+                            style: _cellStyle())),
+                  ]),
+                ),
+            ]),
+          ),
         ],
       ),
     );

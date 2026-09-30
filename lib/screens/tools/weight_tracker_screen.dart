@@ -9,6 +9,22 @@
 //
 //  Entries are kept individually - multiple weigh-ins per day are allowed and
 //  never overwrite each other (so the record never appears to "reset").
+//
+//  ⚠️ ONE PARENTVEDA (restyle, 2026-09-30), in the shape of trying to
+//  conceive's BMI tool (`ttc_bmi_screen.dart`, read, never imported): the
+//  page title in the serif on the page and the AppBar carrying only the back
+//  arrow; the hero a white card on the hairline, not a pink block behind the
+//  number; each dashboard section headed with the one serif heading over a
+//  white card; the decorative emoji (the scale, the hearts) gone from the
+//  chrome; the "Start" row of the history no longer tinted (its tag keeps the
+//  tint, a tag may have one); the note a quiet line on the page; every
+//  filled button and the add in the one ink.
+//
+//  ⚠️ ONE ADD AT A TIME (TTC's launch sanity T13 rule): the AppBar's "Add
+//  weight" and a bottom "Add Today's Weight" button opened the same sheet on
+//  one screen. Before the first weigh-in the hero card carries the add; once
+//  there is one, the AppBar's add is the only one. Same sheet, same flow.
+//  The Asian BMI cut-offs (23 / 25) are untouched.
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -17,6 +33,9 @@ import '../../localization/app_language.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../services/tools_store.dart';
 import '../../theme/app_theme.dart';
+import '../../theme/pv_fonts.dart';
+import '../pregnancy/preg_chrome.dart';
+import '../products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 // Kept for revert alongside the commented-out `pregHealthStrip` call below.
 // import '../../widgets/profile_ask_strip.dart';
 
@@ -41,22 +60,32 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
   @override
   Widget build(BuildContext context) {
     final s = S(widget.controller.language);
+    final ground = pvStorePalette.ground;
     return Scaffold(
+      backgroundColor: ground,
+      // The AppBar carries the back arrow and the one add; the title is on
+      // the page (2026-09-30). Kept for revert: title: Text(s.weightToolTitle),
       appBar: AppBar(
-        title: Text(s.weightToolTitle),
+        backgroundColor: ground,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
         actions: [
           // The single top-level add affordance - labelled so it's obvious what
-          // the + does. (Only once the profile is set.)
+          // the + does. (Only once the profile is set, and once there is a
+          // weigh-in: before that the hero card carries the add, 2026-09-30.
+          // Kept for revert: `_store.weightOnboarded` alone.)
           AnimatedBuilder(
             animation: _store,
-            builder: (context, _) => _store.weightOnboarded
+            builder: (context, _) =>
+                _store.weightOnboarded && _store.latestWeight != null
                 ? Padding(
                     padding: const EdgeInsets.only(right: 8),
                     child: TextButton.icon(
                       onPressed: () =>
                           showAddWeight(context, widget.controller),
                       style: TextButton.styleFrom(
-                        foregroundColor: AppTheme.secondary600,
+                        // The one ink. Kept for revert: AppTheme.secondary600
+                        foregroundColor: kPvInk,
                       ),
                       icon: const Icon(Icons.add_rounded, size: 20),
                       label: Text(s.addWeightShort),
@@ -122,16 +151,23 @@ class _SetupFlowState extends State<_SetupFlow> {
   Widget build(BuildContext context) {
     final s = S(widget.controller.language);
     final text = Theme.of(context).textTheme;
+    final p = pvStorePalette;
 
     if (_step == 1 && _weight != null) {
       final gain = _height != null ? _gainFor(_weight!, _height!) : null;
       return ListView(
-        padding: const EdgeInsets.fromLTRB(20, 24, 20, 28),
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
         children: [
-          const Center(child: Text('❤️', style: TextStyle(fontSize: 56))),
-          const SizedBox(height: 12),
-          Center(child: Text(s.profileTitleWeight, style: text.headlineMedium)),
-          const SizedBox(height: 24),
+          // No decorative emoji; the step's title is the page title
+          // (2026-09-30). Kept for revert:
+          // const Center(child: Text('❤️', style: TextStyle(fontSize: 56))),
+          // const SizedBox(height: 12),
+          // Center(child: Text(s.profileTitleWeight, style: text.headlineMedium)),
+          Semantics(
+            header: true,
+            child: Text(s.profileTitleWeight, style: pregPageTitleStyle()),
+          ),
+          const SizedBox(height: 20),
           _summaryCard(s.startingWeightLabel,
               '${_weight!.toStringAsFixed(1)} ${s.kgUnit}', text),
           if (_height != null)
@@ -148,6 +184,7 @@ class _SetupFlowState extends State<_SetupFlow> {
             _noteCard(s.gainNeedsHeight, text),
           const SizedBox(height: 16),
           FilledButton(
+            style: _bigFilled(),
             onPressed: () async {
               await ToolsStore.instance.setWeightProfile(_weight!, _height);
               widget.onDone();
@@ -159,11 +196,17 @@ class _SetupFlowState extends State<_SetupFlow> {
     }
 
     return ListView(
-      padding: const EdgeInsets.fromLTRB(20, 24, 20, 28),
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
       children: [
-        const Center(child: Text('⚖️', style: TextStyle(fontSize: 56))),
-        const SizedBox(height: 16),
-        Text(s.weightWelcomeBody, style: text.bodyLarge),
+        // The tool's name as the page title, no emoji (2026-09-30). Kept for
+        // revert: const Center(child: Text('⚖️', style: TextStyle(fontSize: 56))),
+        Semantics(
+          header: true,
+          child: Text(s.weightToolTitle, style: pregPageTitleStyle()),
+        ),
+        const SizedBox(height: 10),
+        Text(s.weightWelcomeBody,
+            style: pvManrope(fontSize: 14, height: 1.55, color: p.ink2)),
         const SizedBox(height: 24),
         Text(s.prePregnancyWeightLabel, style: text.titleMedium),
         const SizedBox(height: 8),
@@ -190,6 +233,7 @@ class _SetupFlowState extends State<_SetupFlow> {
         ),
         const SizedBox(height: 28),
         FilledButton(
+          style: _bigFilled(),
           onPressed: () {
             final w = double.tryParse(_weightCtrl.text.trim());
             if (w == null) return; // weight required; height optional
@@ -208,40 +252,43 @@ class _SetupFlowState extends State<_SetupFlow> {
 
   Widget _summaryCard(String label, String value, TextTheme text,
       {String? note}) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppTheme.outlineVariant),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label, style: text.bodyMedium),
-          const SizedBox(height: 4),
-          Text(value,
-              style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
-          if (note != null) ...[
-            const SizedBox(height: 8),
-            Text(note, style: text.bodySmall),
+    // The one white card on the hairline (2026-09-30). Kept for revert: a
+    // Container, AppTheme.surface, radius 18, AppTheme.outlineVariant border.
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: PregCard(
+        padding: const EdgeInsets.all(18),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(label, style: text.bodyMedium),
+            const SizedBox(height: 4),
+            Text(value,
+                style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
+            if (note != null) ...[
+              const SizedBox(height: 8),
+              Text(note, style: text.bodySmall),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }
 
-  Widget _noteCard(String note, TextTheme text) => Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppTheme.neutral50,
-          borderRadius: BorderRadius.circular(18),
-        ),
-        child: Text(note, style: text.bodyMedium),
+  // A quiet note on the page, not a grey block behind text (2026-09-30).
+  // Kept for revert: Container(margin: bottom 12, padding: all(16),
+  //   decoration: BoxDecoration(color: AppTheme.neutral50, radius 18),
+  //   child: Text(note, style: text.bodyMedium)).
+  Widget _noteCard(String note, TextTheme text) => Padding(
+        padding: const EdgeInsets.only(bottom: 12, top: 2),
+        child: PregNote(note),
       );
 }
+
+/// The one filled button, full width and tall enough to find.
+ButtonStyle _bigFilled() => pregFilledStyle().copyWith(
+      padding: const WidgetStatePropertyAll(EdgeInsets.symmetric(vertical: 15)),
+    );
 
 // ---------------------------------------------------------------------------
 //  Dashboard
@@ -276,6 +323,7 @@ class _Dashboard extends StatelessWidget {
     final pre = store.prePregnancyWeight ?? 0;
     final gain = latest != null ? latest.weight - pre : null;
     final entries = store.weightEntries; // newest first
+    final p = pvStorePalette;
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
@@ -305,41 +353,65 @@ class _Dashboard extends StatelessWidget {
         // whether it exists.
         //
         // pregHealthStrip(controller.language, 'weight_tracker'),
-        // Hero: current weight (or empty state).
-        Container(
-          padding: const EdgeInsets.all(22),
-          decoration: BoxDecoration(
-            color: AppTheme.secondary50,
-            borderRadius: BorderRadius.circular(20),
-          ),
+        // The page title on the page; the AppBar carries only the back arrow
+        // and the add (2026-09-30).
+        Semantics(
+          header: true,
+          child: Text(s.weightToolTitle, style: pregPageTitleStyle()),
+        ),
+        const SizedBox(height: 18),
+        // Hero: current weight (or empty state). A white card on the
+        // hairline, not a pink block behind the number (2026-09-30). Kept for
+        // revert: Container(padding: all(22), decoration: BoxDecoration(
+        //   color: AppTheme.secondary50, radius 20), child: ...same children).
+        PregCard(
+          padding: const EdgeInsets.all(20),
           child: latest == null
               ? Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text('${s.weekWord} $week', style: text.bodyMedium),
+                  Text('${s.weekWord} $week', style: pregGroupLabelStyle()),
                   const SizedBox(height: 8),
-                  Text(s.weightEmptyState(week), style: text.bodyLarge),
+                  Text(s.weightEmptyState(week),
+                      style: pvManrope(fontSize: 14.5, height: 1.5, color: p.ink1)),
+                  // The one add while there is nothing yet (2026-09-30): the
+                  // AppBar's add appears once there is a weigh-in.
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton.icon(
+                      style: _bigFilled(),
+                      onPressed: () => showAddWeight(context, controller),
+                      icon: const Icon(Icons.add_rounded),
+                      label: Text(s.addTodaysWeight),
+                    ),
+                  ),
                 ])
               : Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text('${s.weekWord} $week', style: text.bodyMedium),
+                  Text('${s.weekWord} $week', style: pregGroupLabelStyle()),
                   const SizedBox(height: 6),
                   Text('${latest.weight.toStringAsFixed(1)} ${s.kgUnit}',
-                      style: text.displaySmall
-                          ?.copyWith(fontWeight: FontWeight.w800)),
+                      style: pvFraunces(
+                          fontSize: 36,
+                          fontWeight: FontWeight.w600,
+                          height: 1.1,
+                          color: p.ink1)),
                   const SizedBox(height: 4),
                   Text('${s.currentWeightLabel} · ${s.lastUpdatedLabel}: '
                       '${_lastUpdated(s, latest)}',
-                      style: text.bodySmall),
+                      style: pvManrope(fontSize: 12.5, color: p.ink3)),
                 ]),
         ),
         const SizedBox(height: 14),
         // Weight gain (calm - small, not celebrated). Moved to sit directly
         // above the "Your Body Supporting" card so the gain number is read
         // alongside its reassurance (the two are kept adjacent).
+        // A fact, not a section: a card with its own small label, no heading
+        // (2026-09-30).
         if (gain != null)
-          _card(context, title: s.weightGainSince, child: Text(
+          _card(context, title: s.weightGainSince, section: false, child: Text(
             '${gain >= 0 ? '+' : ''}${gain.toStringAsFixed(1)} ${s.kgUnit}',
-            style: text.titleLarge?.copyWith(color: AppTheme.neutral700),
+            style: text.titleLarge?.copyWith(color: p.ink2),
           )),
-        if (gain != null) const SizedBox(height: 14),
+        if (gain != null) const SizedBox(height: 24),
         // Supportive insight.
         _card(context, title: s.bodySupportingTitle, child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -352,12 +424,12 @@ class _Dashboard extends StatelessWidget {
             Text(s.everyPregnancyUnique, style: text.bodySmall),
           ],
         )),
-        const SizedBox(height: 14),
+        const SizedBox(height: 24),
         // Where weight comes from.
         _card(context, title: s.whereWeightComesFrom, child: _contributorsView(
           context, _contributors(week), s, text,
         )),
-        const SizedBox(height: 14),
+        const SizedBox(height: 24),
         // What changed (only once there is at least one entry).
         if (latest != null)
           _card(context, title: s.whatChangedTitle, child: Column(
@@ -369,11 +441,11 @@ class _Dashboard extends StatelessWidget {
               _heartLine(text, s.changedUterus),
             ],
           )),
-        if (latest != null) const SizedBox(height: 14),
+        if (latest != null) const SizedBox(height: 24),
         // Weekly insight.
         _card(context, title: s.thisWeekLabel,
             child: Text(s.weeklyWeightInsight(week), style: text.bodyLarge)),
-        const SizedBox(height: 14),
+        const SizedBox(height: 24),
         // Chart REMOVED per request - the plotted weight graph is hidden.
         // Commented out (not deleted) so it can be reverted. The _ChartView /
         // _WeightChartPainter classes below are also commented out to avoid
@@ -391,19 +463,24 @@ class _Dashboard extends StatelessWidget {
               const Divider(height: 16),
               for (int i = 0; i < entries.length; i++) ...[
                 _historyRow(context, entries[i], pre, s, text),
-                Divider(height: 1, color: AppTheme.outlineVariant),
+                const Divider(height: 1, color: kPvLine),
               ],
               // The starting (pre-pregnancy) weight - the baseline every "change"
               // is measured from. Tinted + badged so it reads as the origin.
               if (pre > 0) _startingRow(pre, s, text),
             ],
           )),
-        const SizedBox(height: 18),
-        FilledButton.icon(
-          onPressed: () => showAddWeight(context, controller),
-          icon: const Icon(Icons.add_rounded),
-          label: Text(s.addTodaysWeight),
-        ),
+        // ⚠️ SAID ONCE (2026-09-30): the AppBar's "Add weight" opens this
+        // same sheet, so a second add at the foot was the same button twice.
+        // Before the first weigh-in the hero card carries the add. Kept for
+        // revert:
+        // const SizedBox(height: 18),
+        // FilledButton.icon(
+        //   onPressed: () => showAddWeight(context, controller),
+        //   icon: const Icon(Icons.add_rounded),
+        //   label: Text(s.addTodaysWeight),
+        // ),
+        const SizedBox(height: 8),
       ],
     );
   }
@@ -418,29 +495,51 @@ class _Dashboard extends StatelessWidget {
     return s.formatShortDate(d);
   }
 
+  /// A page section: the one serif heading over a white card on the
+  /// hairline (2026-09-30). With [section] false it is a single fact, a card
+  /// with its own small label inside.
+  ///
+  /// Kept for revert: one Container (AppTheme.surface, radius 18,
+  /// AppTheme.outlineVariant border) with the title inside it as
+  /// `text.titleMedium?.copyWith(fontWeight: FontWeight.w700)`.
   Widget _card(BuildContext context,
-      {required String title, required Widget child}) {
-    final text = Theme.of(context).textTheme;
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppTheme.outlineVariant),
-      ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(title, style: text.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
-        const SizedBox(height: 10),
-        child,
-      ]),
-    );
+      {required String title, required Widget child, bool section = true}) {
+    if (!section) {
+      return SizedBox(
+        width: double.infinity,
+        child: PregCard(
+          padding: const EdgeInsets.all(18),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(title,
+                style: pvManrope(
+                    fontSize: 13, fontWeight: FontWeight.w700, color: pvStorePalette.ink2)),
+            const SizedBox(height: 6),
+            child,
+          ]),
+        ),
+      );
+    }
+    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      PregSectionHeading(title),
+      const SizedBox(height: 12),
+      PregCard(padding: const EdgeInsets.all(18), child: child),
+    ]);
   }
 
+  // A small drawn dot, not a decorative emoji (2026-09-30). Kept for revert:
+  //   const Text('❤️ ', style: TextStyle(fontSize: 13)),
   Widget _heartLine(TextTheme text, String label) => Padding(
         padding: const EdgeInsets.only(bottom: 6),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text('❤️ ', style: TextStyle(fontSize: 13)),
+          Padding(
+            padding: const EdgeInsets.only(top: 8, right: 10),
+            child: Container(
+              width: 6,
+              height: 6,
+              decoration: BoxDecoration(
+                  color: pvStorePalette.ink3, shape: BoxShape.circle),
+            ),
+          ),
           Expanded(child: Text(label, style: text.bodyLarge)),
         ]),
       );
@@ -466,9 +565,9 @@ class _Dashboard extends StatelessWidget {
               child: LinearProgressIndicator(
                 value: maxV <= 0 ? 0 : entry.value / maxV,
                 minHeight: 8,
-                backgroundColor: AppTheme.surfaceContainerHigh,
+                backgroundColor: pvStorePalette.surfaceAlt,
                 valueColor:
-                    const AlwaysStoppedAnimation<Color>(AppTheme.neutral500),
+                    AlwaysStoppedAnimation<Color>(pvStorePalette.ink3),
               ),
             ),
           ),
@@ -485,11 +584,10 @@ class _Dashboard extends StatelessWidget {
 
   /// Column headings for the history table.
   Widget _historyHeader(S s, TextTheme text) {
-    final style = text.labelSmall?.copyWith(
-      color: AppTheme.neutral500,
-      fontWeight: FontWeight.w800,
-      letterSpacing: 0.4,
-    );
+    // The group label inside a card (2026-09-30). Kept for revert:
+    // text.labelSmall?.copyWith(color: AppTheme.neutral500,
+    //     fontWeight: FontWeight.w800, letterSpacing: 0.4)
+    final style = pregGroupLabelStyle();
     return Row(children: [
       Expanded(flex: 5, child: Text(s.dateLabel, style: style)),
       Expanded(flex: 3, child: Text(s.weekWord, style: style)),
@@ -540,13 +638,12 @@ class _Dashboard extends StatelessWidget {
   /// a leading "START" chip + label (sharing the Date+Week width so it never
   /// crowds), with the weight aligned under the Weight column.
   Widget _startingRow(double pre, S s, TextTheme text) {
-    return Container(
-      margin: const EdgeInsets.only(top: 10),
-      padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 10),
-      decoration: BoxDecoration(
-        color: AppTheme.neutral50,
-        borderRadius: BorderRadius.circular(12),
-      ),
+    // No tint behind the row; the START tag keeps its tint, a tag may have
+    // one (2026-09-30). Kept for revert: Container(margin: top 10,
+    //   padding: symmetric(vertical: 11, horizontal: 10),
+    //   decoration: BoxDecoration(color: AppTheme.neutral50, radius 12)).
+    return Padding(
+      padding: const EdgeInsets.only(top: 12, bottom: 2),
       child: Row(children: [
         // Date + Week columns combined (flex 8) → roomy for chip + label.
         Expanded(
@@ -555,7 +652,7 @@ class _Dashboard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
-                color: AppTheme.neutral100,
+                color: pvStorePalette.surfaceAlt,
                 borderRadius: BorderRadius.circular(40),
               ),
               child: Text(
@@ -676,6 +773,7 @@ Future<void> showAddWeight(
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton(
+                    style: _bigFilled(),
                     onPressed: () {
                       final w = double.tryParse(ctrl.text.trim());
                       if (w == null) return;

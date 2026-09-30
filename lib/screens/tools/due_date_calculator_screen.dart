@@ -6,6 +6,17 @@
 //  pregnancy roadmap (EDD, current week·day·trimester, mini timeline, key
 //  milestones, trimester breakdown, conception window, month view) ending in
 //  "Start My Pregnancy Journey" → sets the app's real due date.
+//
+//  ⚠️ ONE PARENTVEDA (restyle, 2026-09-30), in the shape of trying to
+//  conceive's tool pages (`ttc_tool_chrome.dart`, read, never imported): the
+//  page title in the serif on the page and the AppBar carrying only the back
+//  arrow; hairlines, not plum-tinted shadows; the result a white card with
+//  ink words, not a solid black block (the ink is for what can be pressed);
+//  each roadmap section headed with the one serif heading over a white card;
+//  the "ready" block a white card, not a pink gradient behind text, its
+//  clinic note a quiet line; a chosen method an ink outline and check on
+//  white, not a grey tint; line icons on the method choices; the decorative
+//  emoji gone. `ddcComputeEdd`, `ddcSourceFor` and `DdcMethod` are untouched.
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -14,6 +25,8 @@ import '../../localization/app_language.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/pv_fonts.dart';
+import '../pregnancy/preg_chrome.dart';
+import '../products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 
 enum DdcMethod { lmp, conception, ivf, ultrasound, known }
 
@@ -97,9 +110,10 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
     if (p.isDueDateSet) _edd = p.dueDate;
   }
 
-  static const List<BoxShadow> _soft = [
-    BoxShadow(color: Color(0x0F2D144C), blurRadius: 14, offset: Offset(0, 6)),
-  ];
+  // Hairlines, not shadows (2026-09-30). Kept for revert:
+  // static const List<BoxShadow> _soft = [
+  //   BoxShadow(color: Color(0x0F2D144C), blurRadius: 14, offset: Offset(0, 6)),
+  // ];
 
   DateTime _dOnly(DateTime d) => DateTime(d.year, d.month, d.day);
 
@@ -119,17 +133,32 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
   @override
   Widget build(BuildContext context) {
     final s = S(p.language);
+    final ground = pvStorePalette.ground;
     return Scaffold(
-      backgroundColor: AppTheme.surfaceContainer,
+      backgroundColor: ground,
+      // The AppBar carries only the back arrow; the title is on the page
+      // (2026-09-30). Kept for revert:
+      //   backgroundColor: AppTheme.surfaceContainer,
+      //   title: Text(s.ddcTitle, style: pvJakarta(
+      //       fontWeight: FontWeight.w700, color: AppTheme.neutral900)),
       appBar: AppBar(
-        backgroundColor: AppTheme.surfaceContainer,
-        title: Text(s.ddcTitle,
-            style: pvJakarta(
-                fontWeight: FontWeight.w700, color: AppTheme.neutral900)),
+        backgroundColor: ground,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
       ),
       body: _edd == null ? _inputView(s) : _resultView(s, _edd!),
     );
   }
+
+  /// The page title: the serif at 26, ink, announced as a heading.
+  Widget _pageTitle(String t) =>
+      Semantics(header: true, child: Text(t, style: pregPageTitleStyle()));
+
+  /// The one filled button, full width and tall.
+  static ButtonStyle _bigFilled() => pregFilledStyle().copyWith(
+        padding: const WidgetStatePropertyAll(
+            EdgeInsets.symmetric(vertical: 16)),
+      );
 
   // ===========================================================================
   //  Input
@@ -137,25 +166,19 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
   Widget _inputView(S s) {
     final ready = _compute() != null;
     return ListView(
-      padding: const EdgeInsets.fromLTRB(18, 12, 18, 28),
+      padding: const EdgeInsets.fromLTRB(18, 8, 18, 28),
       children: [
-        Text(s.ddcHeader,
-            style: pvFraunces(
-                fontSize: 25,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.neutral900,
-                height: 1.15)),
-        const SizedBox(height: 6),
+        // The page title (2026-09-30). Kept for revert: pvFraunces 25 / w500.
+        _pageTitle(s.ddcHeader),
+        const SizedBox(height: 8),
         Text(s.ddcSub,
             style: pvManrope(
-                fontSize: 13.5, height: 1.5, color: AppTheme.neutral600)),
-        const SizedBox(height: 20),
-        Text(s.ddcMethod,
-            style: pvJakarta(
-                fontSize: 15,
-                fontWeight: FontWeight.w700,
-                color: AppTheme.neutral900)),
-        const SizedBox(height: 10),
+                fontSize: 13.5, height: 1.5, color: pvStorePalette.ink2)),
+        const SizedBox(height: 24),
+        // The one section heading (2026-09-30). Kept for revert: a pvJakarta
+        // 15 / w700 Text(s.ddcMethod).
+        PregSectionHeading(s.ddcMethod),
+        const SizedBox(height: 12),
         _methodCards(s),
         const SizedBox(height: 18),
         _inputs(s),
@@ -164,8 +187,9 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
           width: double.infinity,
           child: FilledButton(
             onPressed: ready ? () => setState(() => _edd = _compute()) : null,
-            style: FilledButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16)),
+            // The one ink. Kept for revert: FilledButton.styleFrom(padding:
+            // const EdgeInsets.symmetric(vertical: 16)).
+            style: _bigFilled(),
             child: Text(s.ddcCalculate,
                 style: pvManrope(
                     fontSize: 15, fontWeight: FontWeight.w800)),
@@ -176,13 +200,17 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
   }
 
   Widget _methodCards(S s) {
+    // Line icons on the choices, a control (2026-09-30). Kept for revert:
+    // calendar_month_rounded, favorite_rounded, science_rounded,
+    // monitor_heart_rounded, event_available_rounded.
     final items = <(DdcMethod, IconData, String)>[
-      (DdcMethod.lmp, Icons.calendar_month_rounded, s.ddcLmp),
-      (DdcMethod.conception, Icons.favorite_rounded, s.ddcConception),
-      (DdcMethod.ivf, Icons.science_rounded, s.ddcIvf),
-      (DdcMethod.ultrasound, Icons.monitor_heart_rounded, s.ddcUltrasound),
-      (DdcMethod.known, Icons.event_available_rounded, s.ddcKnown),
+      (DdcMethod.lmp, Icons.calendar_month_outlined, s.ddcLmp),
+      (DdcMethod.conception, Icons.favorite_border_rounded, s.ddcConception),
+      (DdcMethod.ivf, Icons.science_outlined, s.ddcIvf),
+      (DdcMethod.ultrasound, Icons.monitor_heart_outlined, s.ddcUltrasound),
+      (DdcMethod.known, Icons.event_available_outlined, s.ddcKnown),
     ];
+    final ink = pvStorePalette;
     return Column(
       children: [
         for (final it in items)
@@ -191,34 +219,33 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
             child: Container(
               margin: const EdgeInsets.only(bottom: 10),
               padding: const EdgeInsets.all(14),
+              // Chosen: white with the ink's outline and check, no grey tint
+              // behind the words (2026-09-30). Kept for revert:
+              //   color: _method == it.$1
+              //       ? AppTheme.neutral900.withValues(alpha: 0.08)
+              //       : AppTheme.surface,
               decoration: BoxDecoration(
-                color: _method == it.$1
-                    ? AppTheme.neutral900.withValues(alpha: 0.08)
-                    : AppTheme.surface,
+                color: AppTheme.surface,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                    color: _method == it.$1
-                        ? AppTheme.neutral900
-                        : AppTheme.outlineVariant,
+                    color: _method == it.$1 ? kPvInk : kPvLine,
                     width: _method == it.$1 ? 1.5 : 1),
               ),
               child: Row(children: [
                 Icon(it.$2,
                     size: 20,
-                    color: _method == it.$1
-                        ? AppTheme.neutral900
-                        : AppTheme.neutral500),
+                    color: _method == it.$1 ? kPvInk : ink.ink3),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(it.$3,
                       style: pvManrope(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
-                          color: AppTheme.neutral900)),
+                          color: ink.ink1)),
                 ),
                 if (_method == it.$1)
                   const Icon(Icons.check_circle_rounded,
-                      size: 20, color: AppTheme.neutral900),
+                      size: 20, color: kPvInk),
               ]),
             ),
           ),
@@ -268,7 +295,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
           style: pvManrope(
               fontSize: 12.5,
               fontWeight: FontWeight.w700,
-              color: AppTheme.neutral600)),
+              color: pvStorePalette.ink2)),
       const SizedBox(height: 6),
       InkWell(
         borderRadius: BorderRadius.circular(14),
@@ -287,18 +314,18 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
           decoration: BoxDecoration(
               color: AppTheme.surface,
               borderRadius: BorderRadius.circular(14),
-              boxShadow: _soft),
+              border: Border.all(color: kPvLine)),
           child: Row(children: [
-            const Icon(Icons.calendar_today_rounded,
-                size: 18, color: AppTheme.neutral900),
+            Icon(Icons.calendar_today_outlined,
+                size: 18, color: pvStorePalette.ink2),
             const SizedBox(width: 12),
             Text(value == null ? s.ddcPickDate : s.formatLongDate(value),
                 style: pvManrope(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: value == null
-                        ? AppTheme.neutral400
-                        : AppTheme.neutral900)),
+                        ? pvStorePalette.ink3
+                        : pvStorePalette.ink1)),
           ]),
         ),
       ),
@@ -311,7 +338,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
           style: pvManrope(
               fontSize: 12.5,
               fontWeight: FontWeight.w700,
-              color: AppTheme.neutral600)),
+              color: pvStorePalette.ink2)),
       Slider(
         value: _cycle.toDouble(),
         min: 21,
@@ -330,7 +357,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
           style: pvManrope(
               fontSize: 12.5,
               fontWeight: FontWeight.w700,
-              color: AppTheme.neutral600)),
+              color: pvStorePalette.ink2)),
       const SizedBox(height: 8),
       Row(children: [
         for (final o in opts)
@@ -342,11 +369,10 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
                 decoration: BoxDecoration(
-                  color: selected == o.$1
-                      ? AppTheme.neutral900
-                      : AppTheme.surface,
+                  color: selected == o.$1 ? kPvInk : AppTheme.surface,
                   borderRadius: BorderRadius.circular(99),
-                  boxShadow: selected == o.$1 ? null : _soft,
+                  border: Border.all(
+                      color: selected == o.$1 ? kPvInk : kPvLine),
                 ),
                 child: Text(o.$2,
                     style: pvManrope(
@@ -354,7 +380,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
                         fontWeight: FontWeight.w700,
                         color: selected == o.$1
                             ? Colors.white
-                            : AppTheme.neutral700)),
+                            : pvStorePalette.ink1)),
               ),
             ),
           ),
@@ -369,7 +395,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
                 style: pvManrope(
                     fontSize: 12.5,
                     fontWeight: FontWeight.w700,
-                    color: AppTheme.neutral600)),
+                    color: pvStorePalette.ink2)),
             const Spacer(),
             _rnd(Icons.remove_rounded, dec),
             SizedBox(
@@ -388,7 +414,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
           style: pvManrope(
               fontSize: 12.5,
               fontWeight: FontWeight.w700,
-              color: AppTheme.neutral600)),
+              color: pvStorePalette.ink2)),
       const SizedBox(height: 8),
       step(s.weekWord, _gaWeeks,
           () => setState(() => _gaWeeks = (_gaWeeks - 1).clamp(4, 40)),
@@ -407,9 +433,10 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
           height: 32,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-              color: AppTheme.surfaceContainerHigh,
+              color: AppTheme.surface,
+              border: Border.all(color: kPvLine),
               borderRadius: BorderRadius.circular(10)),
-          child: Icon(icon, size: 18, color: AppTheme.neutral900),
+          child: Icon(icon, size: 18, color: kPvInk),
         ),
       );
 
@@ -424,69 +451,74 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
     final dayOfWeek = ((day - 1) % 7) + 1;
     final start = edd.subtract(const Duration(days: 280));
 
+    final ink = pvStorePalette;
     return ListView(
-      padding: const EdgeInsets.fromLTRB(18, 12, 18, 28),
+      padding: const EdgeInsets.fromLTRB(18, 8, 18, 28),
       children: [
-        // celebration
-        Container(
-          padding: const EdgeInsets.all(22),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [AppTheme.neutral900, AppTheme.neutral900],
-            ),
-            borderRadius: BorderRadius.circular(28),
-            boxShadow: _soft,
-          ),
-          child: Column(children: [
-            const Text('🤍', style: TextStyle(fontSize: 34)),
-            const SizedBox(height: 10),
-            Text(s.ddcResultLead,
-                textAlign: TextAlign.center,
-                style: pvManrope(
-                    fontSize: 13,
-                    color: Colors.white.withValues(alpha: 0.85))),
-            const SizedBox(height: 6),
-            Text(s.formatLongDate(edd),
-                textAlign: TextAlign.center,
-                style: pvFraunces(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white)),
-            const SizedBox(height: 12),
-            Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.16),
-                  borderRadius: BorderRadius.circular(99)),
-              child: Text(
-                  '${s.weekDayLine(week, dayOfWeek)} · ${s.trimesterName(week)}',
-                  style: pvManrope(
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white)),
-            ),
-          ]),
-        ),
+        // The tool's name as the page title (2026-09-30); it sat in the
+        // AppBar before.
+        _pageTitle(s.ddcTitle),
         const SizedBox(height: 18),
+        // celebration: a white card with ink words. The ink is for what can
+        // be pressed, so a solid black block holding text is not the hero
+        // (2026-09-30). Kept for revert:
+        //   Container(padding: all(22), decoration: BoxDecoration(
+        //     gradient: LinearGradient(colors: [AppTheme.neutral900,
+        //       AppTheme.neutral900]), radius 28, boxShadow: _soft),
+        //   child: Column(children: [
+        //     const Text('🤍', style: TextStyle(fontSize: 34)), ...white text,
+        //     a Colors.white 16% pill ...]))
+        PregCard(
+          padding: const EdgeInsets.fromLTRB(20, 22, 20, 22),
+          child: SizedBox(
+            width: double.infinity,
+            child: Column(children: [
+              Text(s.ddcResultLead,
+                  textAlign: TextAlign.center,
+                  style: pvManrope(fontSize: 13, color: ink.ink2)),
+              const SizedBox(height: 6),
+              Text(s.formatLongDate(edd),
+                  textAlign: TextAlign.center,
+                  style: pvFraunces(
+                      fontSize: 28,
+                      fontWeight: FontWeight.w600,
+                      color: ink.ink1)),
+              const SizedBox(height: 12),
+              // A pill may carry a tint.
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                decoration: BoxDecoration(
+                    color: ink.surfaceAlt,
+                    borderRadius: BorderRadius.circular(99)),
+                child: Text(
+                    '${s.weekDayLine(week, dayOfWeek)} · ${s.trimesterName(week)}',
+                    textAlign: TextAlign.center,
+                    style: pvManrope(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w700,
+                        color: ink.ink1)),
+              ),
+            ]),
+          ),
+        ),
+        const SizedBox(height: 26),
 
         // timeline preview
         _card(s.ddcTimeline, _timelineBar(s, week)),
-        const SizedBox(height: 14),
+        const SizedBox(height: 26),
 
         // key milestones
         _card(s.ddcMilestones, _milestones(s, week)),
-        const SizedBox(height: 14),
+        const SizedBox(height: 26),
 
         // trimester breakdown
         _card(s.ddcTrimesters, _trimesters(s, start, edd)),
-        const SizedBox(height: 14),
+        const SizedBox(height: 26),
 
         // conception window + months
         _card(s.ddcConceptionTitle, _conceptionMonths(s, edd, week)),
-        const SizedBox(height: 18),
+        const SizedBox(height: 26),
 
         // conversion
         _conversion(s, edd),
@@ -494,6 +526,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
         Center(
           child: TextButton.icon(
             onPressed: () => setState(() => _edd = null),
+            style: TextButton.styleFrom(foregroundColor: kPvInk),
             icon: const Icon(Icons.refresh_rounded, size: 18),
             label: Text(s.ddcRecalculate),
           ),
@@ -502,23 +535,16 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
     );
   }
 
-  Widget _card(String title, Widget child) => Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(
-            color: AppTheme.surface,
-            borderRadius: BorderRadius.circular(22),
-            boxShadow: _soft),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(title,
-              style: pvJakarta(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
-                  color: AppTheme.neutral900)),
-          const SizedBox(height: 14),
-          child,
-        ]),
-      );
+  /// A roadmap section: the one serif heading over a white card on the
+  /// hairline (2026-09-30). Kept for revert: one Container (AppTheme.surface,
+  /// radius 22, boxShadow: _soft) with the title inside it as pvJakarta
+  /// 15 / w700 neutral900, 14 above the child.
+  Widget _card(String title, Widget child) =>
+      Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        PregSectionHeading(title),
+        const SizedBox(height: 12),
+        PregCard(padding: const EdgeInsets.all(18), child: child),
+      ]);
 
   Widget _timelineBar(S s, int week) {
     final frac = (week / 40).clamp(0.0, 1.0);
@@ -535,7 +561,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
             child: Container(
               height: 8,
               decoration: BoxDecoration(
-                  color: AppTheme.surfaceContainerHigh,
+                  color: pvStorePalette.surfaceAlt,
                   borderRadius: BorderRadius.circular(99)),
             ),
           ),
@@ -620,7 +646,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
               ),
               Text(s.jrWeekLabel(m.$1),
                   style: pvManrope(
-                      fontSize: 11.5, color: AppTheme.neutral500)),
+                      fontSize: 11.5, color: pvStorePalette.ink3)),
             ]),
           ),
       ],
@@ -640,7 +666,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
             ),
             Text('${s.formatShortDate(a)} – ${s.formatShortDate(b)}',
                 style: pvManrope(
-                    fontSize: 12, color: AppTheme.neutral600)),
+                    fontSize: 12, color: pvStorePalette.ink2)),
           ]),
         );
     final t1End = start.add(const Duration(days: 13 * 7));
@@ -657,20 +683,20 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
     final month = ((week - 1) / 4.444).floor().clamp(0, 8) + 1;
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Row(children: [
-        const Icon(Icons.spa_rounded, size: 16, color: AppTheme.secondary500),
+        // A small glyph for a fact, grey, not a pink accent (2026-09-30).
+        // Kept for revert: Icons.spa_rounded, color: AppTheme.secondary500.
+        Icon(Icons.spa_outlined, size: 16, color: pvStorePalette.ink3),
         const SizedBox(width: 8),
         Expanded(
           child: Text('${s.ddcConceptionAround}: ${s.formatLongDate(conception)}',
               style: pvManrope(
-                  fontSize: 13, color: AppTheme.neutral700)),
+                  fontSize: 13, color: pvStorePalette.ink1)),
         ),
       ]),
       const SizedBox(height: 14),
-      Text(s.ddcMonths,
-          style: pvManrope(
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
-              color: AppTheme.neutral600)),
+      // A group label inside the card (2026-09-30). Kept for revert:
+      // pvManrope 12 / w700 neutral600.
+      Text(s.ddcMonths, style: pregGroupLabelStyle()),
       const SizedBox(height: 8),
       Wrap(
         spacing: 8,
@@ -682,9 +708,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
               height: 38,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: m == month
-                    ? AppTheme.neutral900
-                    : AppTheme.surfaceContainerHigh,
+                color: m == month ? kPvInk : pvStorePalette.surfaceAlt,
                 shape: BoxShape.circle,
               ),
               child: Text('$m',
@@ -692,7 +716,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
                       color:
-                          m == month ? Colors.white : AppTheme.neutral600)),
+                          m == month ? Colors.white : pvStorePalette.ink2)),
             ),
         ],
       ),
@@ -708,23 +732,18 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
       (Icons.healing_rounded, s.ddcBenSymptoms),
       (Icons.luggage_rounded, s.ddcBenBag),
     ];
-    return Container(
+    // A white card, not a pink gradient behind text (2026-09-30). Kept for
+    // revert: Container(padding: all(20), decoration: BoxDecoration(
+    //   gradient: LinearGradient(colors: [AppTheme.secondary100,
+    //   AppTheme.surface]), radius 24, boxShadow: _soft)).
+    return PregCard(
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [AppTheme.secondary100, AppTheme.surface],
-        ),
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: _soft,
-      ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(s.ddcReady,
             style: pvFraunces(
                 fontSize: 20,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.neutral900)),
+                fontWeight: FontWeight.w600,
+                color: pvStorePalette.ink1)),
         const SizedBox(height: 14),
         Wrap(
           spacing: 10,
@@ -732,13 +751,13 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
           children: [
             for (final b in benefits)
               Row(mainAxisSize: MainAxisSize.min, children: [
-                Icon(b.$1, size: 16, color: AppTheme.neutral900),
+                Icon(b.$1, size: 16, color: pvStorePalette.ink2),
                 const SizedBox(width: 6),
                 Text(b.$2,
                     style: pvManrope(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: AppTheme.neutral900)),
+                        color: pvStorePalette.ink1)),
               ]),
           ],
         ),
@@ -746,19 +765,9 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
         // date we work out and a date her clinic measured.
         if (!ddcSourceFor(_method).clinicOwned) ...[
           const SizedBox(height: 14),
-          Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Icon(Icons.info_outline_rounded,
-                size: 15, color: AppTheme.neutral900),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(s.ddcScanWins,
-                  style: pvManrope(
-                      fontSize: 11.5,
-                      height: 1.5,
-                      fontWeight: FontWeight.w600,
-                      color: AppTheme.neutral900)),
-            ),
-          ]),
+          // The quiet note (2026-09-30). Kept for revert: a Row of an
+          // info_outline_rounded icon and pvManrope 11.5 / w600 neutral900.
+          PregNote(s.ddcScanWins),
         ],
         const SizedBox(height: 18),
         SizedBox(
@@ -774,8 +783,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
                   .showSnackBar(SnackBar(content: Text(s.ddcStarted)));
               Navigator.of(context).popUntil((r) => r.isFirst);
             },
-            style: FilledButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16)),
+            style: _bigFilled(),
             child: Text(s.ddcStart,
                 style: pvManrope(
                     fontSize: 15, fontWeight: FontWeight.w800)),

@@ -12,6 +12,15 @@
 //  replace articles. Reuses the existing bag data (HospitalBagV2Store + catalogue
 //  + seed); personalisation lives in ReadyBirthContextStore. Replaces the old
 //  HospitalBagScreen wrapper as the live entry (old files kept for revert).
+//
+//  ⚠️ ONE PARENTVEDA (2026-09-30, the pregnancy restyle). The page wore the
+//  brand violet (the week eyebrow, the ring, every filled button, the chosen
+//  pill) and a tinted block behind most sentences. Now: the serif page title
+//  under the back arrow, a white hero card, the one ink for everything she
+//  presses, the insights as one white card, the four categories as rows with
+//  drawn marks (they open somewhere), and the section headings in the serif.
+//  The category colours in `kReadyCatMeta` include the violet, so this file
+//  no longer reads `meta.color`; each category's mark is `_kCatMark` below.
 // =============================================================================
 
 import 'dart:math' as math;
@@ -28,7 +37,52 @@ import '../../services/hospital_bag_v2_store.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../services/ready_birth_context_store.dart';
 import '../../theme/app_theme.dart';
+import '../../theme/pv_fonts.dart';
+import '../brackets/hub/hub_intent_art.dart';
+import '../doors/pv_door_chrome.dart' show kPvUrgentInk;
+import '../doors/pv_list_row.dart' show PvMarkWell;
+import '../pregnancy/preg_chrome.dart';
 import '../product_guide/product_guide_chooser.dart';
+import '../products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
+
+/// The Tools tab's "Get ready" hue, so the marks here match the row she tapped.
+const double _kReadyHue = 28;
+
+/// Each category's drawn mark (was `meta.icon` in `meta.color`).
+const Map<ReadyCategory, IntentMark> _kCatMark = {
+  ReadyCategory.mom: IntentMark.lotusMark,
+  ReadyCategory.baby: IntentMark.feedMark,
+  ReadyCategory.documents: IntentMark.reportPage,
+  ReadyCategory.partnerExtras: IntentMark.cuppedHands,
+};
+
+// ---- shared pieces (private: the stages stay code-isolated) -----------------
+
+/// The page title on a pushed page, announced as a heading.
+Widget _pageTitle(String text) =>
+    Semantics(header: true, child: Text(text, style: pregPageTitleStyle()));
+
+/// A filled ink button at a given height (`pregFilledStyle`).
+ButtonStyle _filled({double height = 52}) => pregFilledStyle().copyWith(
+      minimumSize: WidgetStatePropertyAll(Size.fromHeight(height)),
+    );
+
+/// An outlined ink stadium: the second action.
+ButtonStyle _outlined({double height = 48}) => OutlinedButton.styleFrom(
+      minimumSize: Size.fromHeight(height),
+      foregroundColor: kPvInk,
+      side: const BorderSide(color: kPvLine, width: 1.5),
+      shape: const StadiumBorder(),
+    );
+
+TextStyle _buttonText() => pvManrope(fontSize: 14.5, fontWeight: FontWeight.w800);
+
+/// A sheet's or a dialog's title.
+TextStyle _sheetTitleStyle() => pvFraunces(
+    fontSize: 22,
+    fontWeight: FontWeight.w600,
+    letterSpacing: -0.4,
+    color: pvStorePalette.ink1);
 
 void _push(BuildContext c, Widget s) =>
     Navigator.of(c).push(MaterialPageRoute<void>(builder: (_) => s));
@@ -79,6 +133,7 @@ class _Readiness {
   }
 }
 
+
 // ===========================================================================
 //  Dashboard
 // ===========================================================================
@@ -124,7 +179,9 @@ class _ReadyForBirthScreenState extends State<ReadyForBirthScreen> {
     return Scaffold(
       backgroundColor: AppTheme.scaffoldBackground,
       appBar: AppBar(
-        title: Text(S.now.uiReadyBirth),
+        // One ParentVeda: the title is the serif at the top of the page; the
+        // app bar keeps the way back and the two controls. Kept for revert:
+        // title: Text(S.now.uiReadyBirth),
         actions: [
           IconButton(
             tooltip: S.now.uiPersonalise,
@@ -146,23 +203,27 @@ class _ReadyForBirthScreenState extends State<ReadyForBirthScreen> {
               builder: (context, _) {
                 final r = _Readiness(_bag, _ctx);
                 return ListView(
-                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
+                  padding: const EdgeInsets.fromLTRB(18, 4, 18, 28),
                   children: [
-                    _hero(r),
-                    const SizedBox(height: 16),
-                    _packTogetherButton(r),
-                    const SizedBox(height: 22),
-                    ..._insightCards(r),
-                    const SizedBox(height: 8),
-                    Text(S.now.uiFourSimpleParts, style: _t.titleMedium),
-                    const SizedBox(height: 4),
-                    Text(S.now.uiTapAnyOneContinue,
-                        style: _t.bodySmall?.copyWith(color: AppTheme.neutral600)),
+                    _pageTitle(S.now.uiReadyBirth),
                     const SizedBox(height: 14),
-                    for (final c in kReadyOrder) ...[
-                      _categoryCard(r, c),
-                      const SizedBox(height: 12),
-                    ],
+                    _hero(r),
+                    const SizedBox(height: 12),
+                    _packTogetherButton(r),
+                    const SizedBox(height: 12),
+                    ..._insightCards(r),
+                    const SizedBox(height: 20),
+                    // Kept for revert: Text(uiFourSimpleParts, titleMedium) with
+                    // uiTapAnyOneContinue in bodySmall under it.
+                    PregSectionHeading(S.now.uiFourSimpleParts,
+                        lead: S.now.uiTapAnyOneContinue),
+                    const SizedBox(height: 12),
+                    // Kept for revert: one outlined card per category with its
+                    // icon in `meta.color`. They open somewhere, so they are
+                    // rows with drawn marks in one white card.
+                    PregRowCard(children: [
+                      for (final c in kReadyOrder) _categoryRow(r, c),
+                    ]),
                   ],
                 );
               },
@@ -170,10 +231,11 @@ class _ReadyForBirthScreenState extends State<ReadyForBirthScreen> {
     );
   }
 
-  TextTheme get _t => Theme.of(context).textTheme;
-
   // ---- hero ---------------------------------------------------------------
+  // Kept for revert: a grey-to-pink gradient card (0xFFF3F2F4 to 0xFFFDF3F5,
+  // radius 26) with the week eyebrow in AppTheme.primary. A white card.
   Widget _hero(_Readiness r) {
+    final p = pvStorePalette;
     final w = widget.controller.currentWeek;
     final due = widget.controller.isDueDateSet ? widget.controller.daysToDueDate : null;
     final dueLine = due == null
@@ -181,36 +243,33 @@ class _ReadyForBirthScreenState extends State<ReadyForBirthScreen> {
         : (due > 0
             ? S.now.rfbDaysToDue(due)
             : (due == 0 ? S.now.rfbDueToday : S.now.rfbPastDue));
-    return Container(
-      padding: const EdgeInsets.all(22),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-            begin: Alignment.topLeft, end: Alignment.bottomRight,
-            colors: [Color(0xFFF3F2F4), Color(0xFFFDF3F5)]),
-        borderRadius: BorderRadius.circular(26),
-        border: Border.all(color: AppTheme.outlineVariant),
-      ),
+    return PregCard(
+      padding: const EdgeInsets.all(18),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(S.now.rfbWeekCaps(w).toUpperCase(),
-            style: _t.labelSmall?.copyWith(color: AppTheme.primary, letterSpacing: 1.4, fontWeight: FontWeight.w800)),
-        const SizedBox(height: 12),
+        Text(S.now.rfbWeekCaps(w).toUpperCase(), style: pregGroupLabelStyle()),
+        const SizedBox(height: 10),
         Row(children: [
           _ring(r.percent, r.isReady),
           const SizedBox(width: 18),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(r.isReady ? S.now.rfbReadyForBirth : S.now.rfbGettingReady,
-                  style: _t.headlineSmall?.copyWith(height: 1.05)),
+                  style: pvFraunces(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w600,
+                      height: 1.1,
+                      letterSpacing: -0.4,
+                      color: p.ink1)),
               const SizedBox(height: 6),
               Text(r.focusLine(),
-                  style: _t.bodyMedium?.copyWith(color: AppTheme.neutral700, height: 1.4)),
+                  style: pvManrope(fontSize: 13.5, height: 1.4, color: p.ink2)),
               const SizedBox(height: 10),
               Row(children: [
                 _chip(Icons.timelapse_rounded,
                     r.remaining == 0 ? S.now.rfbAllDone : S.now.rfbMinLeft(estMinutesFor(r.remaining))),
                 if (dueLine != null) ...[
                   const SizedBox(width: 8),
-                  Flexible(child: _chip(Icons.event_rounded, dueLine, soft: true)),
+                  Flexible(child: _chip(Icons.event_rounded, dueLine)),
                 ],
               ]),
             ]),
@@ -220,80 +279,93 @@ class _ReadyForBirthScreenState extends State<ReadyForBirthScreen> {
     );
   }
 
-  Widget _ring(int percent, bool ready) => SizedBox(
-        width: 92,
-        height: 92,
-        child: CustomPaint(
-          painter: _RingPainter(percent / 100, ready ? AppTheme.tertiary500 : AppTheme.primary),
-          child: Center(
-            child: Column(mainAxisSize: MainAxisSize.min, children: [
-              Text('$percent%',
-                  style: _t.titleLarge?.copyWith(color: AppTheme.neutral900, fontWeight: FontWeight.w800)),
-              Text(S.now.uiReady, style: _t.labelSmall?.copyWith(color: AppTheme.neutral600)),
-            ]),
-          ),
+  // Kept for revert: the arc was AppTheme.primary (tertiary500 once ready).
+  Widget _ring(int percent, bool ready) {
+    final p = pvStorePalette;
+    return SizedBox(
+      width: 92,
+      height: 92,
+      child: CustomPaint(
+        painter: _RingPainter(percent / 100, kPvInk, p.surfaceAlt),
+        child: Center(
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Text('$percent%',
+                style: pvManrope(
+                    fontSize: 20, fontWeight: FontWeight.w800, color: p.ink1)),
+            Text(S.now.uiReady, style: pvManrope(fontSize: 11.5, color: p.ink3)),
+          ]),
         ),
-      );
+      ),
+    );
+  }
 
-  Widget _chip(IconData icon, String label, {bool soft = false}) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        decoration: BoxDecoration(
-          color: soft ? Colors.white.withValues(alpha: 0.6) : Colors.white,
-          borderRadius: BorderRadius.circular(999),
-          border: Border.all(color: AppTheme.outlineVariant),
-        ),
-        child: Row(mainAxisSize: MainAxisSize.min, children: [
-          Icon(icon, size: 13, color: AppTheme.primary),
-          const SizedBox(width: 5),
-          Flexible(child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis,
-              style: _t.labelSmall?.copyWith(color: AppTheme.neutral700, fontWeight: FontWeight.w600))),
-        ]),
-      );
+  Widget _chip(IconData icon, String label) {
+    final p = pvStorePalette;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: kPvLine),
+      ),
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
+        // Kept for revert: the glyph in AppTheme.primary.
+        Icon(icon, size: 13, color: p.ink2),
+        const SizedBox(width: 5),
+        Flexible(child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis,
+            style: pvManrope(fontSize: 11.5, fontWeight: FontWeight.w700, color: p.ink2))),
+      ]),
+    );
+  }
 
   // ---- pack together CTA --------------------------------------------------
   Widget _packTogetherButton(_Readiness r) {
+    final p = pvStorePalette;
     if (r.isReady) {
-      return Container(
+      // Kept for revert: a brown-tinted block (tertiary50 / tertiary200) with
+      // the words in tertiary900. A white card, the tick in the ink.
+      return SizedBox(
         width: double.infinity,
-        padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(
-          color: AppTheme.tertiary50,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: AppTheme.tertiary200),
+        child: PregCard(
+          padding: const EdgeInsets.all(18),
+          child: Row(children: [
+            const Icon(Icons.check_circle_rounded, color: kPvInk),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(S.now.uiEverythingPackedIfBaby,
+                  style: pvManrope(fontSize: 14, height: 1.45, color: p.ink1)),
+            ),
+          ]),
         ),
-        child: Row(children: [
-          Icon(Icons.check_circle_rounded, color: AppTheme.tertiary600),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(S.now.uiEverythingPackedIfBaby,
-                style: _t.bodyMedium?.copyWith(color: AppTheme.tertiary900, height: 1.4)),
-          ),
-        ]),
       );
     }
     return FilledButton(
       onPressed: () => _push(context, _GuidedPackingScreen(controller: widget.controller)),
-      style: FilledButton.styleFrom(
-        minimumSize: const Size.fromHeight(56),
-        backgroundColor: AppTheme.primary,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      ),
+      // Kept for revert: backgroundColor: AppTheme.primary, radius 16.
+      style: _filled(height: 56),
       child: FittedBox(
         fit: BoxFit.scaleDown,
         child: Row(mainAxisSize: MainAxisSize.min, children: [
           const Icon(Icons.auto_awesome_rounded, size: 20),
           const SizedBox(width: 10),
-          Text(S.now.uiLetSPackTogether, style: _t.titleMedium?.copyWith(color: Colors.white)),
+          Text(S.now.uiLetSPackTogether,
+              style: pvManrope(fontSize: 15.5, fontWeight: FontWeight.w800, color: Colors.white)),
           const SizedBox(width: 8),
           Text(S.now.rfbMin(estMinutesFor(r.remaining)),
-              style: _t.labelMedium?.copyWith(color: Colors.white.withValues(alpha: 0.85))),
+              style: pvManrope(
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white.withValues(alpha: 0.85))),
         ]),
       ),
     );
   }
 
   // ---- insight cards ------------------------------------------------------
+  // Kept for revert: each insight on its own grey block (neutral50) with the
+  // glyph in AppTheme.primary. One white card with hairlines between now.
   List<Widget> _insightCards(_Readiness r) {
+    final p = pvStorePalette;
     final insights = readyInsights(
       week: widget.controller.currentWeek,
       delivery: _ctx.delivery,
@@ -301,31 +373,31 @@ class _ReadyForBirthScreenState extends State<ReadyForBirthScreen> {
       twins: _ctx.twins,
       hospitalProvides: _ctx.hospitalProvides,
     ).take(3).toList();
+    if (insights.isEmpty) return const [];
     return [
-      for (final ins in insights) ...[
-        Container(
-          width: double.infinity,
-          margin: const EdgeInsets.only(bottom: 10),
-          padding: const EdgeInsets.all(15),
-          decoration: BoxDecoration(
-            color: AppTheme.neutral50,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppTheme.neutral100),
-          ),
-          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Icon(ins.icon, size: 18, color: AppTheme.primary),
-            const SizedBox(width: 12),
-            Expanded(child: Text(ins.text,
-                style: _t.bodyMedium?.copyWith(color: AppTheme.neutral900, height: 1.45))),
-          ]),
-        ),
-      ],
-      const SizedBox(height: 12),
+      PregCard(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        child: Column(children: [
+          for (var i = 0; i < insights.length; i++) ...[
+            if (i > 0) const Divider(height: 1, thickness: 1, color: kPvLine),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 11),
+              child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Icon(insights[i].icon, size: 18, color: p.ink2),
+                const SizedBox(width: 12),
+                Expanded(child: Text(insights[i].text,
+                    style: pvManrope(fontSize: 13.5, height: 1.45, color: p.ink1))),
+              ]),
+            ),
+          ],
+        ]),
+      ),
     ];
   }
 
-  // ---- category card ------------------------------------------------------
-  Widget _categoryCard(_Readiness r, ReadyCategory c) {
+  // ---- category row -------------------------------------------------------
+  Widget _categoryRow(_Readiness r, ReadyCategory c) {
+    final p = pvStorePalette;
     final meta = kReadyCatMeta[c]!;
     final total = r.totalIn(c);
     final packed = r.packedIn(c);
@@ -333,79 +405,81 @@ class _ReadyForBirthScreenState extends State<ReadyForBirthScreen> {
     final done = total > 0 && remaining == 0;
     return InkWell(
       onTap: () => _push(context, _CategoryScreen(controller: widget.controller, category: c)),
-      borderRadius: BorderRadius.circular(20),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppTheme.surface,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppTheme.outlineVariant),
-        ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(14, 12, 12, 12),
         child: Row(children: [
-          Container(
-            width: 46, height: 46,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(color: meta.color.withValues(alpha: 0.14), borderRadius: BorderRadius.circular(14)),
-            child: Icon(meta.icon, color: meta.color, size: 22),
-          ),
+          PvMarkWell(p: p, hue: _kReadyHue, size: 44, mark: _kCatMark[c]),
           const SizedBox(width: 14),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(meta.label.now, style: _t.titleMedium),
-              const SizedBox(height: 3),
+              Text(meta.label.now,
+                  style: pvManrope(
+                      fontSize: 14.5, fontWeight: FontWeight.w700, height: 1.25, color: p.ink1)),
+              const SizedBox(height: 2),
               Text(done ? S.now.rfbAllPacked : S.now.rfbPackedToGo(packed, remaining),
-                  style: _t.bodySmall?.copyWith(color: done ? AppTheme.tertiary600 : AppTheme.neutral600)),
+                  style: pvManrope(fontSize: 12.5, height: 1.35, color: p.ink3)),
               const SizedBox(height: 8),
               ClipRRect(
                 borderRadius: BorderRadius.circular(99),
                 child: LinearProgressIndicator(
                   value: total == 0 ? 0 : packed / total,
-                  minHeight: 5,
-                  backgroundColor: AppTheme.surfaceContainerHigh,
-                  valueColor: AlwaysStoppedAnimation(done ? AppTheme.tertiary500 : meta.color),
+                  minHeight: 4,
+                  backgroundColor: p.surfaceAlt,
+                  // Kept for revert: meta.color (tertiary500 once done).
+                  valueColor: const AlwaysStoppedAnimation(kPvInk),
                 ),
               ),
             ]),
           ),
           const SizedBox(width: 10),
           Icon(done ? Icons.check_circle_rounded : Icons.chevron_right_rounded,
-              color: done ? AppTheme.tertiary500 : AppTheme.neutral400),
+              size: done ? 22 : 20, color: done ? kPvInk : p.ink3),
         ]),
       ),
     );
   }
 
   // ---- persistent "Labour started?" --------------------------------------
+  // Kept for revert: a coral-tinted outlined button (secondary50 fill,
+  // secondary200 edge, secondary700 words). White with the ink edge; the bell
+  // keeps the one rose accent, because this is the urgent way out.
   Widget _labourBar() => SafeArea(
-        minimum: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+        minimum: const EdgeInsets.fromLTRB(18, 0, 18, 12),
         child: OutlinedButton(
           onPressed: () => _push(context, _EmergencyScreen(controller: widget.controller)),
           style: OutlinedButton.styleFrom(
             minimumSize: const Size.fromHeight(52),
-            foregroundColor: AppTheme.secondary700,
-            side: BorderSide(color: AppTheme.secondary200),
-            backgroundColor: AppTheme.secondary50,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            foregroundColor: kPvInk,
+            backgroundColor: Colors.white,
+            side: const BorderSide(color: kPvInk, width: 1.5),
+            shape: const StadiumBorder(),
           ),
           child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Icon(Icons.notifications_active_rounded, size: 19, color: AppTheme.secondary600),
+            const Icon(Icons.notifications_active_outlined, size: 19, color: kPvUrgentInk),
             const SizedBox(width: 10),
-            Text(S.now.uiLabourStarted, style: _t.titleSmall?.copyWith(color: AppTheme.secondary700)),
+            Text(S.now.uiLabourStarted, style: _buttonText()),
           ]),
         ),
       );
 
   void _confirmRestart() {
+    final p = pvStorePalette;
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(S.now.uiStartAgain),
+        backgroundColor: Colors.white,
+        title: Text(S.now.uiStartAgain,
+            style: pvFraunces(fontSize: 19, fontWeight: FontWeight.w600, color: p.ink1)),
         content: Text(
-            S.now.uiClearsEverythingPackedItems),
+            S.now.uiClearsEverythingPackedItems,
+            style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2)),
         actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: Text(S.now.uiCancel3)),
+          TextButton(
+              style: TextButton.styleFrom(foregroundColor: p.ink1),
+              onPressed: () => Navigator.of(ctx).pop(), child: Text(S.now.uiCancel3)),
           FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: AppTheme.primary),
+            // Kept for revert: backgroundColor: AppTheme.primary.
+            style: pregFilledStyle(),
             onPressed: () async {
               Navigator.of(ctx).pop();
               await _bag.createBag(generateDefaultBag(_ctx.delivery), _ctx.delivery);
@@ -425,7 +499,7 @@ class _ReadyForBirthScreenState extends State<ReadyForBirthScreen> {
       showModalBottomSheet<void>(
         context: context,
         isScrollControlled: true,
-        backgroundColor: AppTheme.scaffoldBackground,
+        backgroundColor: Colors.white,
         shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(26))),
         builder: (_) => _PersonalizeSheet(ctx: ctx),
       );
@@ -444,49 +518,52 @@ class _ItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final t = Theme.of(context).textTheme;
+    final p = pvStorePalette;
     final packed = item.packed;
     final showActions = !packed && (onNeedOne != null || onNotNeeded != null);
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: packed ? AppTheme.tertiary200 : AppTheme.outlineVariant),
+    // Kept for revert: a packed card took a brown edge (tertiary200).
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: PregCard(
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(item.name.of(lang),
+                  style: pvManrope(
+                      fontSize: 14.5,
+                      fontWeight: FontWeight.w700,
+                      height: 1.3,
+                      decoration: packed ? TextDecoration.lineThrough : null,
+                      color: packed ? p.ink3 : p.ink1)),
+              const SizedBox(height: 4),
+              Text(whyPack(item), style: pvManrope(fontSize: 12.5, height: 1.4, color: p.ink2)),
+              if (showActions) ...[
+                const SizedBox(height: 10),
+                Wrap(spacing: 16, runSpacing: 8, crossAxisAlignment: WrapCrossAlignment.center, children: [
+                  if (onNeedOne != null)
+                    InkWell(
+                      onTap: onNeedOne,
+                      child: Row(mainAxisSize: MainAxisSize.min, children: [
+                        // Kept for revert: the words and chevron in AppTheme.primary.
+                        Text(S.now.uiNeedOne,
+                            style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w800, color: p.ink1)),
+                        Icon(Icons.chevron_right_rounded, size: 16, color: p.ink1),
+                      ]),
+                    ),
+                  if (onNotNeeded != null)
+                    InkWell(
+                      onTap: onNotNeeded,
+                      child: Text(S.now.uiIDonTNeed,
+                          style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w600, color: p.ink3)),
+                    ),
+                ]),
+              ],
+            ]),
+          ),
+          const SizedBox(width: 12),
+          _PackToggle(packed: packed, onTap: onToggle),
+        ]),
       ),
-      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Expanded(
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(item.name.of(lang),
-                style: t.titleSmall?.copyWith(
-                    decoration: packed ? TextDecoration.lineThrough : null,
-                    color: packed ? AppTheme.neutral500 : AppTheme.neutral900)),
-            const SizedBox(height: 4),
-            Text(whyPack(item), style: t.bodySmall?.copyWith(color: AppTheme.neutral600, height: 1.4)),
-            if (showActions) ...[
-              const SizedBox(height: 10),
-              Wrap(spacing: 16, runSpacing: 8, crossAxisAlignment: WrapCrossAlignment.center, children: [
-                if (onNeedOne != null)
-                  InkWell(
-                    onTap: onNeedOne,
-                    child: Row(mainAxisSize: MainAxisSize.min, children: [
-                      Text(S.now.uiNeedOne, style: t.labelMedium?.copyWith(color: AppTheme.primary, fontWeight: FontWeight.w700)),
-                      const Icon(Icons.chevron_right_rounded, size: 16, color: AppTheme.primary),
-                    ]),
-                  ),
-                if (onNotNeeded != null)
-                  InkWell(
-                    onTap: onNotNeeded,
-                    child: Text(S.now.uiIDonTNeed, style: t.labelMedium?.copyWith(color: AppTheme.neutral500, fontWeight: FontWeight.w600)),
-                  ),
-              ]),
-            ],
-          ]),
-        ),
-        const SizedBox(width: 12),
-        _PackToggle(packed: packed, onTap: onToggle),
-      ]),
     );
   }
 }
@@ -495,19 +572,24 @@ class _PackToggle extends StatelessWidget {
   const _PackToggle({required this.packed, required this.onTap});
   final bool packed;
   final VoidCallback onTap;
+  // Kept for revert: filled and edged in tertiary500 when packed. The ink.
   @override
-  Widget build(BuildContext context) => GestureDetector(
-        onTap: onTap,
-        behavior: HitTestBehavior.opaque,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 150),
-          width: 30, height: 30,
-          decoration: BoxDecoration(
-            color: packed ? AppTheme.tertiary500 : Colors.transparent,
-            shape: BoxShape.circle,
-            border: Border.all(color: packed ? AppTheme.tertiary500 : AppTheme.outline, width: 2),
+  Widget build(BuildContext context) => Semantics(
+        checked: packed,
+        button: true,
+        child: GestureDetector(
+          onTap: onTap,
+          behavior: HitTestBehavior.opaque,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 150),
+            width: 30, height: 30,
+            decoration: BoxDecoration(
+              color: packed ? kPvInk : Colors.transparent,
+              shape: BoxShape.circle,
+              border: Border.all(color: packed ? kPvInk : pvStorePalette.ink3, width: 2),
+            ),
+            child: packed ? const Icon(Icons.check_rounded, size: 18, color: Colors.white) : null,
           ),
-          child: packed ? const Icon(Icons.check_rounded, size: 18, color: Colors.white) : null,
         ),
       );
 }
@@ -530,10 +612,11 @@ class _CategoryScreenState extends State<_CategoryScreen> {
   @override
   Widget build(BuildContext context) {
     final meta = kReadyCatMeta[widget.category]!;
-    final t = Theme.of(context).textTheme;
+    final p = pvStorePalette;
     return Scaffold(
       backgroundColor: AppTheme.scaffoldBackground,
-      appBar: AppBar(title: Text(meta.label.now)),
+      // Kept for revert: appBar: AppBar(title: Text(meta.label.now)).
+      appBar: AppBar(),
       body: AnimatedBuilder(
         animation: Listenable.merge([_bag, _ctx]),
         builder: (context, _) {
@@ -545,25 +628,20 @@ class _CategoryScreenState extends State<_CategoryScreen> {
               .toList();
           final notNeeded = _bag.maybeLater.where((i) => readyCategoryOf(i) == widget.category).toList();
           return ListView(
-            padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
+            padding: const EdgeInsets.fromLTRB(18, 4, 18, 32),
             children: [
-              // small header
+              // small header: the mark she tapped, the title, the blurb.
+              // Kept for revert: meta.icon in meta.color on a 14% well.
               Row(children: [
-                Container(
-                  width: 42, height: 42, alignment: Alignment.center,
-                  decoration: BoxDecoration(color: meta.color.withValues(alpha: 0.14), borderRadius: BorderRadius.circular(13)),
-                  child: Icon(meta.icon, color: meta.color),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(meta.blurb.now, style: t.bodyMedium?.copyWith(color: AppTheme.neutral700)),
-                    const SizedBox(height: 2),
-                    Text(S.now.rfbPackedOf(packed, items.length),
-                        style: t.labelMedium?.copyWith(color: AppTheme.neutral600)),
-                  ]),
-                ),
+                PvMarkWell(p: p, hue: _kReadyHue, size: 48, mark: _kCatMark[widget.category]),
+                const SizedBox(width: 14),
+                Expanded(child: _pageTitle(meta.label.now)),
               ]),
+              const SizedBox(height: 12),
+              Text(meta.blurb.now, style: pvManrope(fontSize: 13.5, height: 1.45, color: p.ink2)),
+              const SizedBox(height: 2),
+              Text(S.now.rfbPackedOf(packed, items.length),
+                  style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w700, color: p.ink3)),
               const SizedBox(height: 18),
               for (final i in items)
                 _ItemCard(
@@ -576,42 +654,52 @@ class _CategoryScreenState extends State<_CategoryScreen> {
                   onNotNeeded: () => _bag.moveToMaybeLater(i.id),
                 ),
               if (notNeeded.isNotEmpty) ...[
-                const SizedBox(height: 6),
-                Text(S.now.uiNotUs, style: t.titleSmall?.copyWith(color: AppTheme.neutral600)),
-                const SizedBox(height: 2),
-                Text(S.now.uiSetAsideNotCounted,
-                    style: t.bodySmall?.copyWith(color: AppTheme.neutral500)),
-                const SizedBox(height: 10),
-                for (final i in notNeeded)
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 8),
-                    padding: const EdgeInsets.fromLTRB(14, 10, 8, 10),
-                    decoration: BoxDecoration(color: AppTheme.surfaceContainer, borderRadius: BorderRadius.circular(14)),
-                    child: Row(children: [
-                      Expanded(child: Text(i.name.of(widget.controller.language),
-                          style: t.bodyMedium?.copyWith(color: AppTheme.neutral600))),
-                      TextButton(
-                        onPressed: () => _bag.restore(i.id),
-                        style: TextButton.styleFrom(foregroundColor: AppTheme.primary, visualDensity: VisualDensity.compact),
-                        child: Text(S.now.uiAddBack),
-                      ),
+                const SizedBox(height: 14),
+                // Kept for revert: Text(uiNotUs, titleSmall) and the lead in
+                // bodySmall; each item on a grey block (surfaceContainer).
+                // One child with its card, so the heading is never built
+                // without the items it heads.
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  PregSectionHeading(S.now.uiNotUs, lead: S.now.uiSetAsideNotCounted),
+                  const SizedBox(height: 10),
+                  PregCard(
+                    padding: const EdgeInsets.fromLTRB(16, 2, 6, 2),
+                    child: Column(children: [
+                      for (var k = 0; k < notNeeded.length; k++) ...[
+                        if (k > 0) const Divider(height: 1, thickness: 1, color: kPvLine),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          child: Row(children: [
+                            Expanded(child: Text(notNeeded[k].name.of(widget.controller.language),
+                                style: pvManrope(fontSize: 13.5, color: p.ink2))),
+                            TextButton(
+                              onPressed: () => _bag.restore(notNeeded[k].id),
+                              // Kept for revert: foregroundColor: AppTheme.primary.
+                              style: TextButton.styleFrom(foregroundColor: kPvInk, visualDensity: VisualDensity.compact),
+                              child: Text(S.now.uiAddBack,
+                                  style: pvManrope(fontSize: 13, fontWeight: FontWeight.w800)),
+                            ),
+                          ]),
+                        ),
+                      ],
                     ]),
                   ),
-                const SizedBox(height: 6),
+                ]),
+                const SizedBox(height: 14),
               ],
               if (provided.isNotEmpty) ...[
                 const SizedBox(height: 4),
                 Text(S.now.uiHospitalProvidesTheseNo,
-                    style: t.labelMedium?.copyWith(color: AppTheme.neutral500)),
+                    style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w700, color: p.ink3)),
                 const SizedBox(height: 8),
                 for (final i in provided)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 8),
                     child: Row(children: [
-                      Icon(Icons.local_hospital_outlined, size: 16, color: AppTheme.neutral400),
+                      Icon(Icons.local_hospital_outlined, size: 16, color: p.ink3),
                       const SizedBox(width: 10),
                       Expanded(child: Text(i.name.of(widget.controller.language),
-                          style: t.bodyMedium?.copyWith(color: AppTheme.neutral500))),
+                          style: pvManrope(fontSize: 13.5, color: p.ink3))),
                     ]),
                   ),
               ],
@@ -619,13 +707,9 @@ class _CategoryScreenState extends State<_CategoryScreen> {
               OutlinedButton.icon(
                 onPressed: _addOwn,
                 icon: const Icon(Icons.add_rounded, size: 18),
-                label: Text(S.now.uiAddOwn),
-                style: OutlinedButton.styleFrom(
-                  minimumSize: const Size.fromHeight(48),
-                  foregroundColor: AppTheme.primary,
-                  side: BorderSide(color: AppTheme.neutral200),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                ),
+                label: Text(S.now.uiAddOwn, style: _buttonText()),
+                // Kept for revert: foregroundColor: AppTheme.primary, radius 14.
+                style: _outlined(),
               ),
             ],
           );
@@ -636,11 +720,10 @@ class _CategoryScreenState extends State<_CategoryScreen> {
 
   void _addOwn() {
     final ctrl = TextEditingController();
-    final t = Theme.of(context).textTheme;
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: AppTheme.scaffoldBackground,
+      backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (ctx) => Padding(
         padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
@@ -649,9 +732,9 @@ class _CategoryScreenState extends State<_CategoryScreen> {
           child: Padding(
             padding: const EdgeInsets.fromLTRB(22, 16, 22, 22),
             child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: AppTheme.outlineVariant, borderRadius: BorderRadius.circular(99)))),
+              Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: kPvLine, borderRadius: BorderRadius.circular(99)))),
               const SizedBox(height: 16),
-              Text(S.now.uiAddOwn, style: t.titleLarge),
+              Text(S.now.uiAddOwn, style: _sheetTitleStyle()),
               const SizedBox(height: 12),
               TextField(
                 controller: ctrl,
@@ -659,8 +742,8 @@ class _CategoryScreenState extends State<_CategoryScreen> {
                 decoration: InputDecoration(
                   hintText: S.now.uiWhatWouldLikeAdd,
                   filled: true,
-                  fillColor: AppTheme.surface,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: AppTheme.outlineVariant)),
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: kPvLine)),
                 ),
               ),
               const SizedBox(height: 14),
@@ -670,8 +753,9 @@ class _CategoryScreenState extends State<_CategoryScreen> {
                   if (name.isNotEmpty) _bag.addCustomItem(name, _bagCatFor(widget.category));
                   Navigator.of(ctx).pop();
                 },
-                style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(50), backgroundColor: AppTheme.primary),
-                child: Text(S.now.uiAddMyBag),
+                // Kept for revert: backgroundColor: AppTheme.primary.
+                style: _filled(height: 50),
+                child: Text(S.now.uiAddMyBag, style: _buttonText()),
               ),
             ]),
           ),
@@ -698,18 +782,19 @@ class _GuidedPackingScreenState extends State<_GuidedPackingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final t = Theme.of(context).textTheme;
+    final p = pvStorePalette;
     // Only the categories that still have something to do.
     final r0 = _Readiness(_bag, _ctx);
     final steps = kGuidedOrder.where((c) => r0.totalIn(c) > 0).toList();
-    if (steps.isEmpty || _step >= steps.length) return _done(t);
+    if (steps.isEmpty || _step >= steps.length) return _done();
 
     final cat = steps[_step];
     final meta = kReadyCatMeta[cat]!;
     return Scaffold(
       backgroundColor: AppTheme.scaffoldBackground,
       appBar: AppBar(
-        title: Text(S.now.rfbStepOf(_step + 1, steps.length)),
+        title: Text(S.now.rfbStepOf(_step + 1, steps.length),
+            style: pvManrope(fontSize: 14, fontWeight: FontWeight.w700, color: p.ink2)),
       ),
       body: AnimatedBuilder(
         animation: _bag,
@@ -718,16 +803,17 @@ class _GuidedPackingScreenState extends State<_GuidedPackingScreen> {
           final items = r.inCat(cat);
           final remaining = items.where((i) => !i.packed).length;
           return Column(children: [
-            // progress dots
+            // progress segments. Kept for revert: done in tertiary500, the
+            // current one in meta.color, the rest surfaceContainerHigh.
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 4, 20, 8),
+              padding: const EdgeInsets.fromLTRB(18, 4, 18, 8),
               child: Row(children: [
                 for (int i = 0; i < steps.length; i++) ...[
                   Expanded(
                     child: Container(
-                      height: 5,
+                      height: 4,
                       decoration: BoxDecoration(
-                        color: i < _step ? AppTheme.tertiary500 : (i == _step ? meta.color : AppTheme.surfaceContainerHigh),
+                        color: i <= _step ? kPvInk : p.surfaceAlt,
                         borderRadius: BorderRadius.circular(99),
                       ),
                     ),
@@ -738,20 +824,18 @@ class _GuidedPackingScreenState extends State<_GuidedPackingScreen> {
             ),
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+                padding: const EdgeInsets.fromLTRB(18, 12, 18, 20),
                 children: [
                   Row(children: [
-                    Container(
-                      width: 46, height: 46, alignment: Alignment.center,
-                      decoration: BoxDecoration(color: meta.color.withValues(alpha: 0.14), borderRadius: BorderRadius.circular(14)),
-                      child: Icon(meta.icon, color: meta.color),
-                    ),
-                    const SizedBox(width: 12),
+                    // Kept for revert: meta.icon in meta.color on a 14% well.
+                    PvMarkWell(p: p, hue: _kReadyHue, size: 48, mark: _kCatMark[cat]),
+                    const SizedBox(width: 14),
                     Expanded(
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Text(meta.label.now, style: t.titleLarge),
+                        _pageTitle(meta.label.now),
+                        const SizedBox(height: 2),
                         Text(remaining == 0 ? S.now.rfbAllDoneHere : S.now.rfbLeftToPack(remaining),
-                            style: t.bodySmall?.copyWith(color: AppTheme.neutral600)),
+                            style: pvManrope(fontSize: 12.5, color: p.ink3)),
                       ]),
                     ),
                   ]),
@@ -762,17 +846,15 @@ class _GuidedPackingScreenState extends State<_GuidedPackingScreen> {
               ),
             ),
             SafeArea(
-              minimum: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+              minimum: const EdgeInsets.fromLTRB(18, 0, 18, 12),
               child: FilledButton(
                 onPressed: () => setState(() => _step++),
-                style: FilledButton.styleFrom(
-                  minimumSize: const Size.fromHeight(54),
-                  backgroundColor: remaining == 0 ? AppTheme.tertiary500 : AppTheme.primary,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                ),
+                // Kept for revert: tertiary500 when the step was done,
+                // AppTheme.primary otherwise; radius 16.
+                style: _filled(height: 54),
                 child: Text(
                   _step == steps.length - 1 ? S.now.rfbFinish : (remaining == 0 ? S.now.rfbDoneNext : 'Next'),
-                  style: t.titleMedium?.copyWith(color: Colors.white),
+                  style: pvManrope(fontSize: 15, fontWeight: FontWeight.w800, color: Colors.white),
                 ),
               ),
             ),
@@ -782,33 +864,36 @@ class _GuidedPackingScreenState extends State<_GuidedPackingScreen> {
     );
   }
 
-  Widget _done(TextTheme t) => Scaffold(
-        backgroundColor: AppTheme.scaffoldBackground,
-        appBar: AppBar(),
-        body: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(28),
-            child: Column(mainAxisSize: MainAxisSize.min, children: [
-              Container(
-                width: 88, height: 88, alignment: Alignment.center,
-                decoration: BoxDecoration(color: AppTheme.tertiary50, shape: BoxShape.circle),
-                child: Icon(Icons.check_rounded, size: 44, color: AppTheme.tertiary600),
-              ),
-              const SizedBox(height: 22),
-              Text(S.now.uiSBigStepDone, style: t.headlineSmall, textAlign: TextAlign.center),
-              const SizedBox(height: 10),
-              Text(S.now.uiVeMovedThroughEverything,
-                  style: t.bodyMedium?.copyWith(color: AppTheme.neutral600, height: 1.5), textAlign: TextAlign.center),
-              const SizedBox(height: 24),
-              FilledButton(
-                onPressed: () => Navigator.of(context).pop(),
-                style: FilledButton.styleFrom(minimumSize: const Size(200, 52), backgroundColor: AppTheme.primary),
-                child: Text(S.now.uiBackMyReadiness),
-              ),
-            ]),
-          ),
+  Widget _done() {
+    final p = pvStorePalette;
+    return Scaffold(
+      backgroundColor: AppTheme.scaffoldBackground,
+      appBar: AppBar(),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(28),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            // Kept for revert: a brown-tinted disc (tertiary50) with a
+            // tertiary600 tick. The drawn mark in the tool's tint.
+            PvMarkWell(p: p, hue: _kReadyHue, size: 88, mark: IntentMark.checkMark),
+            const SizedBox(height: 22),
+            Text(S.now.uiSBigStepDone, style: pregPageTitleStyle(), textAlign: TextAlign.center),
+            const SizedBox(height: 10),
+            Text(S.now.uiVeMovedThroughEverything,
+                style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2), textAlign: TextAlign.center),
+            const SizedBox(height: 24),
+            FilledButton(
+              onPressed: () => Navigator.of(context).pop(),
+              // Kept for revert: backgroundColor: AppTheme.primary.
+              style: pregFilledStyle().copyWith(
+                  minimumSize: const WidgetStatePropertyAll(Size(200, 52))),
+              child: Text(S.now.uiBackMyReadiness, style: _buttonText()),
+            ),
+          ]),
         ),
-      );
+      ),
+    );
+  }
 }
 
 // ===========================================================================
@@ -819,64 +904,64 @@ class _EmergencyScreen extends StatelessWidget {
   final PregnancyController controller;
   @override
   Widget build(BuildContext context) {
-    final t = Theme.of(context).textTheme;
+    final p = pvStorePalette;
     return Scaffold(
       backgroundColor: AppTheme.scaffoldBackground,
-      appBar: AppBar(title: Text(S.now.uiLabourStarted)),
+      // Kept for revert: appBar: AppBar(title: Text(S.now.uiLabourStarted)).
+      appBar: AppBar(),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(22, 12, 22, 28),
+        padding: const EdgeInsets.fromLTRB(18, 4, 18, 32),
         children: [
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: AppTheme.secondary50,
-              borderRadius: BorderRadius.circular(22),
-              border: Border.all(color: AppTheme.secondary100),
-            ),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(S.now.uiFirstTakeBreath, style: t.headlineSmall?.copyWith(color: AppTheme.secondary900)),
-              const SizedBox(height: 8),
-              Text(S.now.uiHaveTimeCallDoctor,
-                  style: t.bodyMedium?.copyWith(color: AppTheme.secondary900, height: 1.5)),
+          _pageTitle(S.now.uiLabourStarted),
+          const SizedBox(height: 16),
+          // Kept for revert: these two lines sat on a coral block
+          // (secondary50 / secondary100, radius 22) in secondary900. The same
+          // two lines on the page, the first one first: breathe, then call.
+          Text(S.now.uiFirstTakeBreath,
+              style: pvFraunces(
+                  fontSize: 21, fontWeight: FontWeight.w600, height: 1.25, color: p.ink1)),
+          const SizedBox(height: 8),
+          Text(S.now.uiHaveTimeCallDoctor,
+              style: pvManrope(fontSize: 15, height: 1.5, fontWeight: FontWeight.w600, color: p.ink1)),
+          const SizedBox(height: 26),
+          // Kept for revert: Text(uiTakeTheseFirst, titleMedium).
+          PregSectionHeading(S.now.uiTakeTheseFirst),
+          const SizedBox(height: 12),
+          // Kept for revert: one outlined card per item, the glyph in
+          // AppTheme.primary on a grey well. One card, hairlines, ink glyphs.
+          PregCard(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+            child: Column(children: [
+              for (var i = 0; i < kEmergencyGrab.length; i++) ...[
+                if (i > 0) const Divider(height: 1, thickness: 1, color: kPvLine),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  child: Row(children: [
+                    Icon(kEmergencyGrab[i].icon, size: 22, color: p.ink1),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Text(kEmergencyGrab[i].title.now,
+                            style: pvManrope(fontSize: 14.5, fontWeight: FontWeight.w700, color: p.ink1)),
+                        const SizedBox(height: 2),
+                        Text(kEmergencyGrab[i].sub.now,
+                            style: pvManrope(fontSize: 12.5, height: 1.4, color: p.ink2)),
+                      ]),
+                    ),
+                  ]),
+                ),
+              ],
             ]),
           ),
           const SizedBox(height: 22),
-          Text(S.now.uiTakeTheseFirst, style: t.titleMedium),
-          const SizedBox(height: 12),
-          for (final g in kEmergencyGrab)
-            Container(
-              margin: const EdgeInsets.only(bottom: 12),
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(color: AppTheme.surface, borderRadius: BorderRadius.circular(18), border: Border.all(color: AppTheme.outlineVariant)),
-              child: Row(children: [
-                Container(
-                  width: 44, height: 44, alignment: Alignment.center,
-                  decoration: BoxDecoration(color: AppTheme.neutral50, borderRadius: BorderRadius.circular(13)),
-                  child: Icon(g.icon, color: AppTheme.primary),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(g.title.now, style: t.titleSmall),
-                    const SizedBox(height: 2),
-                    Text(g.sub.now, style: t.bodySmall?.copyWith(color: AppTheme.neutral600)),
-                  ]),
-                ),
-              ]),
-            ),
-          const SizedBox(height: 10),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(18),
-            decoration: BoxDecoration(color: AppTheme.tertiary50, borderRadius: BorderRadius.circular(18)),
-            child: Row(children: [
-              Icon(Icons.directions_car_rounded, color: AppTheme.tertiary600),
-              const SizedBox(width: 12),
-              Expanded(child: Text(S.now.uiThenLeaveHospitalVe,
-                  style: t.bodyMedium?.copyWith(color: AppTheme.tertiary900, height: 1.4))),
-            ]),
-          ),
+          // Kept for revert: a brown-tinted block (tertiary50) with the car in
+          // tertiary600. The closing line on the page, in the ink.
+          Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Icon(Icons.directions_car_outlined, size: 22, color: p.ink1),
+            const SizedBox(width: 12),
+            Expanded(child: Text(S.now.uiThenLeaveHospitalVe,
+                style: pvManrope(fontSize: 15, height: 1.45, fontWeight: FontWeight.w700, color: p.ink1))),
+          ]),
         ],
       ),
     );
@@ -898,20 +983,20 @@ class _PersonalizeSheetState extends State<_PersonalizeSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final t = Theme.of(context).textTheme;
+    final p = pvStorePalette;
     return SafeArea(
       top: false,
       child: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(22, 14, 22, 24),
         child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: AppTheme.outlineVariant, borderRadius: BorderRadius.circular(99)))),
+          Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: kPvLine, borderRadius: BorderRadius.circular(99)))),
           const SizedBox(height: 16),
-          Text(S.now.uiPersonaliseBag, style: t.titleLarge),
+          Text(S.now.uiPersonaliseBag, style: _sheetTitleStyle()),
           const SizedBox(height: 4),
-          Text(S.now.uiFewDetailsMakeSuggestions, style: t.bodySmall?.copyWith(color: AppTheme.neutral600)),
+          Text(S.now.uiFewDetailsMakeSuggestions, style: pvManrope(fontSize: 12.5, height: 1.45, color: p.ink2)),
           const SizedBox(height: 20),
 
-          _label(S.now.rfbDeliveryType, t),
+          _label(S.now.rfbDeliveryType),
           Row(children: [
             _pick(S.now.rfbNotSure, _ctx.delivery == DeliveryType.unsure, () => _set(() => _ctx.setDelivery(DeliveryType.unsure))),
             const SizedBox(width: 8),
@@ -921,7 +1006,7 @@ class _PersonalizeSheetState extends State<_PersonalizeSheet> {
           ]),
           const SizedBox(height: 18),
 
-          _label(S.now.rfbSeasonOfDue, t),
+          _label(S.now.rfbSeasonOfDue),
           Wrap(spacing: 8, runSpacing: 8, children: [
             _pick('Auto', _ctx.seasonOverride == null, () => _set(() => _ctx.setSeasonOverride(null)), expand: false),
             for (final s in Season.values)
@@ -931,14 +1016,15 @@ class _PersonalizeSheetState extends State<_PersonalizeSheet> {
 
           Row(children: [
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(S.now.uiExpectingTwins, style: t.titleSmall),
-              Text(S.now.uiWeLlSuggestFew, style: t.bodySmall?.copyWith(color: AppTheme.neutral600)),
+              Text(S.now.uiExpectingTwins,
+                  style: pvManrope(fontSize: 14, fontWeight: FontWeight.w700, color: p.ink1)),
+              Text(S.now.uiWeLlSuggestFew, style: pvManrope(fontSize: 12.5, height: 1.4, color: p.ink2)),
             ])),
             Switch(value: _ctx.twins, onChanged: (v) => _set(() => _ctx.setTwins(v))), // Kept for revert (2026-09-28, one black switch app-wide): activeThumbColor: AppTheme.primary
           ]),
           const SizedBox(height: 8),
 
-          _label(S.now.rfbHospitalProvides, t),
+          _label(S.now.rfbHospitalProvides),
           Wrap(spacing: 8, runSpacing: 8, children: [
             for (final e in kHospitalProvidableLabel.entries)
               _pick(e.value.now, _ctx.providesFor(e.key), () => _set(() => _ctx.toggleProvides(e.key)), expand: false),
@@ -946,8 +1032,9 @@ class _PersonalizeSheetState extends State<_PersonalizeSheet> {
           const SizedBox(height: 22),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(),
-            style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(50), backgroundColor: AppTheme.primary),
-            child: Text(S.now.uiDone),
+            // Kept for revert: backgroundColor: AppTheme.primary.
+            style: _filled(height: 50),
+            child: Text(S.now.uiDone, style: _buttonText()),
           ),
         ]),
       ),
@@ -956,26 +1043,35 @@ class _PersonalizeSheetState extends State<_PersonalizeSheet> {
 
   void _set(VoidCallback f) { f(); setState(() {}); }
 
-  Widget _label(String s, TextTheme t) => Padding(
+  Widget _label(String s) => Padding(
         padding: const EdgeInsets.only(bottom: 10),
-        child: Text(s, style: t.labelLarge?.copyWith(color: AppTheme.neutral700)),
+        child: Text(s,
+            style: pvManrope(fontSize: 13, fontWeight: FontWeight.w800, color: pvStorePalette.ink1)),
       );
 
+  // Kept for revert: a chosen pill was filled and edged in AppTheme.primary,
+  // radius 12. The one pill: white with the hairline, the ink when chosen.
   Widget _pick(String label, bool on, VoidCallback onTap, {bool expand = true}) {
-    final chip = GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: on ? AppTheme.primary : AppTheme.surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: on ? AppTheme.primary : AppTheme.outlineVariant),
+    final chip = Semantics(
+      button: true,
+      selected: on,
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: on ? kPvInk : Colors.white,
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(color: on ? kPvInk : kPvLine, width: 1.5),
+          ),
+          child: Text(label,
+              style: pvManrope(
+                  fontSize: 13,
+                  fontWeight: on ? FontWeight.w800 : FontWeight.w600,
+                  color: on ? Colors.white : pvStorePalette.ink1)),
         ),
-        child: Text(label,
-            style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                color: on ? Colors.white : AppTheme.neutral800, fontWeight: FontWeight.w600)),
       ),
     );
     return expand ? Expanded(child: chip) : chip;
@@ -1002,11 +1098,12 @@ class _BagOptionsScreenState extends State<_BagOptionsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final t = Theme.of(context).textTheme;
+    final p = pvStorePalette;
     final name = _bag.byId(widget.itemId)?.name.of(_lang) ?? S.now.rfbOptions;
     return Scaffold(
       backgroundColor: AppTheme.scaffoldBackground,
-      appBar: AppBar(title: Text(name)),
+      // Kept for revert: appBar: AppBar(title: Text(name)).
+      appBar: AppBar(),
       body: AnimatedBuilder(
         animation: _bag,
         builder: (context, _) {
@@ -1016,44 +1113,52 @@ class _BagOptionsScreenState extends State<_BagOptionsScreen> {
           final picks = products.where((p) => !p.isAffiliate).toList();
           final elsewhere = products.where((p) => p.isAffiliate).toList();
           return ListView(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
+            padding: const EdgeInsets.fromLTRB(18, 4, 18, 32),
             children: [
-              // how-to-choose intro
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(color: AppTheme.neutral50, borderRadius: BorderRadius.circular(18), border: Border.all(color: AppTheme.neutral100)),
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(S.now.uiHowChoose, style: t.labelLarge?.copyWith(color: AppTheme.neutral900)),
-                  const SizedBox(height: 6),
-                  Text(S.now.rfbWhyThenPicks(whyPack(item)),
-                      style: t.bodyMedium?.copyWith(color: AppTheme.neutral900, height: 1.5)),
-                ]),
+              _pageTitle(name),
+              const SizedBox(height: 16),
+              // how-to-choose intro. Kept for revert: a grey block (neutral50).
+              SizedBox(
+                width: double.infinity,
+                child: PregCard(
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text(S.now.uiHowChoose,
+                        style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w800, color: p.ink1)),
+                    const SizedBox(height: 6),
+                    Text(S.now.rfbWhyThenPicks(whyPack(item)),
+                        style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2)),
+                  ]),
+                ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 24),
               if (picks.isNotEmpty) ...[
-                Text(S.now.uiOurPicks, style: t.titleMedium),
+                // Kept for revert: Text(uiOurPicks, titleMedium).
+                PregSectionHeading(S.now.uiOurPicks),
                 const SizedBox(height: 12),
                 for (final p in picks) _optionCard(item, p),
               ],
               if (elsewhere.isNotEmpty) ...[
-                const SizedBox(height: 8),
-                Text(S.now.uiAlsoAvailableElsewhere, style: t.titleMedium),
-                const SizedBox(height: 4),
-                Text(S.now.uiPreferStoreKnowThese,
-                    style: t.bodySmall?.copyWith(color: AppTheme.neutral500)),
+                const SizedBox(height: 12),
+                // Kept for revert: Text(uiAlsoAvailableElsewhere, titleMedium)
+                // with uiPreferStoreKnowThese in bodySmall under it.
+                PregSectionHeading(S.now.uiAlsoAvailableElsewhere,
+                    lead: S.now.uiPreferStoreKnowThese),
                 const SizedBox(height: 12),
                 for (final p in elsewhere) _optionCard(item, p),
               ],
               const SizedBox(height: 10),
-              const Divider(height: 1),
+              const Divider(height: 1, thickness: 1, color: kPvLine),
               const SizedBox(height: 16),
-              FilledButton.tonal(
+              // Kept for revert: FilledButton.tonal (the scheme's coral
+              // secondaryContainer on a pregnancy screen). The second action is
+              // the outlined ink stadium.
+              OutlinedButton(
                 onPressed: () {
                   _bag.setStatus(item.id, BagItemStatus.have);
                   Navigator.of(context).pop();
                 },
-                style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(50)),
-                child: Text(S.now.uiIVeAlreadyGot),
+                style: _outlined(height: 50),
+                child: Text(S.now.uiIVeAlreadyGot, style: _buttonText()),
               ),
               const SizedBox(height: 10),
               TextButton(
@@ -1061,8 +1166,9 @@ class _BagOptionsScreenState extends State<_BagOptionsScreen> {
                   _bag.moveToMaybeLater(item.id);
                   Navigator.of(context).pop();
                 },
-                style: TextButton.styleFrom(foregroundColor: AppTheme.neutral600),
-                child: Text(S.now.uiIDonTNeed),
+                style: TextButton.styleFrom(foregroundColor: p.ink2),
+                child: Text(S.now.uiIDonTNeed,
+                    style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w700)),
               ),
             ],
           );
@@ -1072,7 +1178,7 @@ class _BagOptionsScreenState extends State<_BagOptionsScreen> {
   }
 
   Widget _optionCard(BagItem item, BagProduct p) {
-    final t = Theme.of(context).textTheme;
+    final pal = pvStorePalette;
     final affiliate = p.isAffiliate;
     final selected = affiliate
         ? (item.status == BagItemStatus.buyElse && item.store == p.store)
@@ -1103,72 +1209,83 @@ class _BagOptionsScreenState extends State<_BagOptionsScreen> {
       }
     }
 
+    // Kept for revert: a chosen card filled grey (neutral50) with a neutral500
+    // edge; a 56pt grey well held the product's emoji as its picture. No
+    // placeholder pictures (rule 9), so no well; a chosen card is white with
+    // the ink edge.
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(18),
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: selected ? AppTheme.neutral50 : AppTheme.surface,
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: selected ? AppTheme.neutral500 : AppTheme.outlineVariant, width: selected ? 1.6 : 1),
-          ),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Container(
-                width: 56, height: 56, alignment: Alignment.center,
-                decoration: BoxDecoration(color: AppTheme.surfaceContainer, borderRadius: BorderRadius.circular(14)),
-                child: Text(p.emoji, style: const TextStyle(fontSize: 26)),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  if (affiliate)
-                    Text(p.store, style: t.labelSmall?.copyWith(color: AppTheme.secondary600, fontWeight: FontWeight.w800))
-                  else if (p.topPick)
-                    Text(S.now.uiBestOverall, style: t.labelSmall?.copyWith(color: AppTheme.neutral900, fontWeight: FontWeight.w800)),
-                  Text(affiliate ? S.now.rfbBuyOn(p.store) : p.name.now, style: t.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
-                  const SizedBox(height: 2),
-                  Text('₹${p.price}', style: t.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
-                ]),
-              ),
-              Icon(
-                affiliate ? Icons.open_in_new_rounded : (selected ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded),
-                color: affiliate ? AppTheme.secondary500 : (selected ? AppTheme.neutral900 : AppTheme.neutral400),
-              ),
+      child: Material(
+        color: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(color: selected ? kPvInk : kPvLine, width: selected ? 1.5 : 1),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Expanded(
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    if (affiliate)
+                      // Kept for revert: color: AppTheme.secondary600.
+                      Text(p.store, style: pvManrope(fontSize: 11.5, fontWeight: FontWeight.w800, color: pal.ink2))
+                    else if (p.topPick)
+                      Text(S.now.uiBestOverall, style: pvManrope(fontSize: 11.5, fontWeight: FontWeight.w800, color: pal.ink1)),
+                    Text(affiliate ? S.now.rfbBuyOn(p.store) : p.name.now,
+                        style: pvManrope(fontSize: 14.5, fontWeight: FontWeight.w700, height: 1.3, color: pal.ink1)),
+                    const SizedBox(height: 2),
+                    Text('₹${p.price}',
+                        style: pvManrope(fontSize: 15, fontWeight: FontWeight.w800, color: pal.ink1)),
+                  ]),
+                ),
+                const SizedBox(width: 10),
+                // Kept for revert: open_in_new in AppTheme.secondary500.
+                Icon(
+                  affiliate ? Icons.open_in_new_rounded : (selected ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded),
+                  color: affiliate ? pal.ink2 : (selected ? kPvInk : pal.ink3),
+                ),
+              ]),
+              if (p.why.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                if (p.topPick)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 6),
+                    child: Text(S.now.uiWhyWeRecommend,
+                        style: pvManrope(fontSize: 12, fontWeight: FontWeight.w700, color: pal.ink2)),
+                  ),
+                for (final w in p.why)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      // Kept for revert: a '✓' in tertiary600.
+                      Padding(
+                        padding: const EdgeInsets.only(top: 2, right: 8),
+                        child: Icon(Icons.check_rounded, size: 15, color: pal.ink2),
+                      ),
+                      Expanded(child: Text(w.now, style: pvManrope(fontSize: 13.5, height: 1.45, color: pal.ink1))),
+                    ]),
+                  ),
+              ],
+              if (p.consider.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Text(S.now.uiThingsConsider,
+                    style: pvManrope(fontSize: 12, fontWeight: FontWeight.w700, color: pal.ink2)),
+                const SizedBox(height: 6),
+                for (final c in p.consider)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text('•  ', style: pvManrope(fontSize: 13.5, color: pal.ink2)),
+                      Expanded(child: Text(c.now, style: pvManrope(fontSize: 13.5, height: 1.45, color: pal.ink1))),
+                    ]),
+                  ),
+              ],
             ]),
-            if (p.why.isNotEmpty) ...[
-              const SizedBox(height: 12),
-              if (p.topPick)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 6),
-                  child: Text(S.now.uiWhyWeRecommend, style: t.labelSmall?.copyWith(color: AppTheme.neutral600, fontWeight: FontWeight.w700)),
-                ),
-              for (final w in p.why)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 4),
-                  child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text('✓  ', style: TextStyle(color: AppTheme.tertiary600, fontSize: 13)),
-                    Expanded(child: Text(w.now, style: t.bodyMedium)),
-                  ]),
-                ),
-            ],
-            if (p.consider.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              Text(S.now.uiThingsConsider, style: t.labelSmall?.copyWith(color: AppTheme.neutral600, fontWeight: FontWeight.w700)),
-              const SizedBox(height: 6),
-              for (final c in p.consider)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 4),
-                  child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    const Text('•  '),
-                    Expanded(child: Text(c.now, style: t.bodyMedium)),
-                  ]),
-                ),
-            ],
-          ]),
+          ),
         ),
       ),
     );
@@ -1177,16 +1294,19 @@ class _BagOptionsScreenState extends State<_BagOptionsScreen> {
 
 // ---- readiness ring painter -------------------------------------------------
 class _RingPainter extends CustomPainter {
-  _RingPainter(this.value, this.color);
+  _RingPainter(this.value, this.color, this.track);
   final double value; // 0..1
   final Color color;
+
+  /// The unfilled ring. Kept for revert: AppTheme.surfaceContainerHigh.
+  final Color track;
 
   @override
   void paint(Canvas canvas, Size size) {
     final c = size.center(Offset.zero);
     final r = size.width / 2 - 5;
     final bg = Paint()
-      ..color = AppTheme.surfaceContainerHigh
+      ..color = track
       ..style = PaintingStyle.stroke
       ..strokeWidth = 8
       ..strokeCap = StrokeCap.round;
@@ -1200,5 +1320,6 @@ class _RingPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _RingPainter old) => old.value != value || old.color != color;
+  bool shouldRepaint(covariant _RingPainter old) =>
+      old.value != value || old.color != color || old.track != track;
 }

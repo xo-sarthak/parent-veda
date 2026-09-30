@@ -70,7 +70,9 @@ void main() {
 
       for (final accent in [
         '0xFF9C5F51', // Samvad
-        '0xFF7A6E9B', // Buddhi
+        // Buddhi was 0xFF7A6E9B, a violet the one-ParentVeda colour pass
+        // (2026-09-30) took out of both screens; it is the ink on both now.
+        '0xFF2F2C30', // Buddhi
         '0xFF8A6D3B', // Kriya
       ]) {
         expect(home.contains(accent) && daily.contains(accent), isTrue,

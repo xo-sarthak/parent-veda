@@ -4,6 +4,16 @@
 //  The mother browses ParentVeda's product catalogue and assembles her own
 //  named checklists: each item carries a custom "when/for" note and a tick-off.
 //  Curated starter lists give her a quick head start. All local + persisted.
+//
+//  ⚠️ ONE PARENTVEDA (2026-09-30, the pregnancy restyle, after main's TTC
+//  tools). The app bar is the back arrow (and a menu where the page has one);
+//  the page title is the serif on the page; "Your checklists" and "Curated
+//  starters" are the one serif section heading. Rows that open somewhere carry
+//  a drawn mark in the Tools tab's "Get ready" hue; the teal accent, the soft
+//  shadows, the green, amber and rose tints, the decorative emoji in chrome,
+//  the star beside our own score, the review count (seed reviews, not real
+//  ones), the brand line (the name's first word, said twice) and the stock
+//  photo placeholders are gone. Every filled button is the one ink.
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -17,15 +27,95 @@ import '../../services/bought_store.dart';
 import '../../services/cart_store.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../services/product_checklist_store.dart';
-import '../../theme/app_theme.dart';
 import '../../widgets/mic_dictation_button.dart';
+import '../brackets/hub/hub_intent_art.dart';
 import '../cart_screen.dart';
+import '../doors/pv_list_row.dart' show PvMarkWell;
+import '../pregnancy/preg_chrome.dart';
+import '../products/pv_store_chrome.dart' show PvChip, kPvInk, kPvLine, pvStorePalette;
 import '../products_screen.dart';
 import '../../theme/pv_fonts.dart';
 
-const Color _accent = Color(0xFF3E9A8C);
-const Color _green = Color(0xFF3FA56A);
-const Color _star = Color(0xFFF5A623); // rating star glyph accent
+// Kept for revert (2026-09-30): the teal accent, the "bought" green and the
+// star glyph's amber. Everything they drew is the one ink or a neutral tag.
+// const Color _accent = Color(0xFF3E9A8C);
+// const Color _green = Color(0xFF3FA56A);
+// const Color _star = Color(0xFFF5A623); // rating star glyph accent
+
+/// The Tools tab's "Get ready" hue (`tools_hub_screen.dart`), where this
+/// tool's tile sits.
+const double _kHue = 28;
+
+/// A curated starter's drawn mark, by its name (the name is a const English
+/// identity in `kCuratedChecklists`). Replaces the list's emoji in chrome.
+IntentMark _curatedMark(CuratedList c) => switch (c.name) {
+      'Newborn essentials' => IntentMark.feedMark,
+      'Bump comfort' => IntentMark.lotusMark,
+      'Skin & body' => IntentMark.bodyMark,
+      _ => IntentMark.listMark,
+    };
+
+/// The one outlined button: white, an ink hairline, ink words, a stadium.
+ButtonStyle _outlineStyle() => OutlinedButton.styleFrom(
+      foregroundColor: kPvInk,
+      side: const BorderSide(color: kPvInk, width: 1.2),
+      padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 16),
+      shape: const StadiumBorder(),
+    );
+
+/// The filled button with the bar's padding.
+ButtonStyle _filledStyle() => pregFilledStyle().copyWith(
+      padding: const WidgetStatePropertyAll(
+          EdgeInsets.symmetric(vertical: 13, horizontal: 16)),
+    );
+
+/// A pushed page's app bar: the ground, the back arrow in ink, no title.
+PreferredSizeWidget _pregAppBar({List<Widget>? actions}) {
+  final pal = pvStorePalette;
+  return AppBar(
+    backgroundColor: pal.ground,
+    surfaceTintColor: Colors.transparent,
+    elevation: 0,
+    scrolledUnderElevation: 0,
+    foregroundColor: pal.ink1,
+    actions: actions,
+  );
+}
+
+/// A white field with the hairline, ink when focused. Replaces the filled
+/// grey fields (a tint behind text).
+InputDecoration _fieldDecoration(String hint, {Widget? prefix, Widget? suffix}) {
+  final pal = pvStorePalette;
+  OutlineInputBorder b(Color c, [double w = 1]) => OutlineInputBorder(
+      borderRadius: BorderRadius.circular(14),
+      borderSide: BorderSide(color: c, width: w));
+  return InputDecoration(
+    hintText: hint,
+    hintStyle: pvManrope(fontSize: 14, color: pal.ink3),
+    prefixIcon: prefix,
+    suffixIcon: suffix,
+    filled: true,
+    fillColor: Colors.white,
+    contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+    border: b(kPvLine),
+    enabledBorder: b(kPvLine),
+    focusedBorder: b(kPvInk, 1.4),
+  );
+}
+
+/// A small neutral tag on an item (Bought, Amazon, Your own). A tint is for a
+/// tag; the words are ink. Kept for revert: green, amber and teal tints with
+/// the words in the same colour.
+Widget _miniTag(String text) {
+  final pal = pvStorePalette;
+  return Container(
+    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+    decoration: BoxDecoration(
+        color: pal.surfaceAlt, borderRadius: BorderRadius.circular(999)),
+    child: Text(text,
+        style: pvManrope(fontSize: 10, fontWeight: FontWeight.w800, color: pal.ink2)),
+  );
+}
 
 // Section 12 top filters (audience / stage). Shown ABOVE the existing
 // category-grouped browse in the product picker.
@@ -59,10 +149,18 @@ String _itemName(ChecklistItem i) =>
 String _itemPrice(ChecklistItem i) => _itemProduct(i)?.price ?? i.price;
 String _itemEmoji(ChecklistItem i) => _itemProduct(i)?.emoji ?? '🛍️';
 
+/// The product's own photo, or none. ⚠️ NEVER A STOCK PLACEHOLDER: when a
+/// product has no `imageUrl`, `productImageUrl` returns a random loremflickr
+/// picture, which is a placeholder image passed off as the product. The emoji
+/// well stands in instead.
+String? _realImage(Product p) => p.imageUrl.isEmpty ? null : p.imageUrl;
+
 // --- product card helpers (Section 12) --------------------------------------
 // The Product model has no explicit `brand` field, so we derive a sensible
 // stand-in from the first token of the name (e.g. "ComfyBump Full-Body
 // Pillow" -> "ComfyBump"). TODO: replace with a real Product.brand field.
+// Kept for revert: the card no longer draws it (the name, said twice).
+// ignore: unused_element
 String _productBrand(Product p) {
   final first = p.name.now.trim().split(RegExp(r'\s+')).first;
   return first;
@@ -130,9 +228,11 @@ Future<String?> _promptText(BuildContext context, S s, String title, String hint
       ),
       actions: [
         TextButton(
+            style: TextButton.styleFrom(foregroundColor: kPvInk),
             onPressed: () => Navigator.of(c).pop(),
             child: Text(s.pclCancel)),
         FilledButton(
+            style: pregFilledStyle(),
             onPressed: () => Navigator.of(c).pop(ctrl.text.trim()),
             child: Text(s.pclSave)),
       ],
@@ -146,9 +246,10 @@ Future<void> showAddToChecklistSheet(
     BuildContext context, PregnancyController controller, Product product) {
   final s = S(controller.language);
   final store = ProductChecklistStore.instance;
+  final pal = pvStorePalette;
   return showModalBottomSheet<void>(
     context: context,
-    backgroundColor: AppTheme.surface,
+    backgroundColor: Colors.white,
     shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
     builder: (sheetCtx) => AnimatedBuilder(
@@ -162,17 +263,17 @@ Future<void> showAddToChecklistSheet(
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                    color: AppTheme.outlineVariant,
-                    borderRadius: BorderRadius.circular(2))),
+                    color: kPvLine, borderRadius: BorderRadius.circular(2))),
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 14, 20, 6),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(s.pclAddToChecklist,
-                    style: pvJakarta(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w800,
-                        color: AppTheme.neutral900)),
+                    style: pvFraunces(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        height: 1.2,
+                        color: pal.ink1)),
               ),
             ),
             Flexible(
@@ -186,15 +287,14 @@ Future<void> showAddToChecklistSheet(
                             ? Icons.check_circle_rounded
                             : Icons.radio_button_unchecked_rounded,
                         color: store.isInChecklist(l.id, product.id)
-                            ? _accent
-                            : AppTheme.neutral400,
+                            ? kPvInk
+                            : pal.ink3,
                       ),
                       title: Text(l.name,
-                          style: pvJakarta(
-                              fontWeight: FontWeight.w700)),
-                      subtitle: Text(s.pclItemsCount(l.items.length),
                           style: pvManrope(
-                              fontSize: 12, color: AppTheme.neutral500)),
+                              fontWeight: FontWeight.w700, color: pal.ink1)),
+                      subtitle: Text(s.pclItemsCount(l.items.length),
+                          style: pvManrope(fontSize: 12, color: pal.ink3)),
                       onTap: () {
                         if (!store.isInChecklist(l.id, product.id)) {
                           store.addItem(l.id, product.id);
@@ -205,10 +305,10 @@ Future<void> showAddToChecklistSheet(
                       },
                     ),
                   ListTile(
-                    leading: const Icon(Icons.add_rounded, color: _accent),
+                    leading: const Icon(Icons.add_rounded, color: kPvInk),
                     title: Text(s.pclNewChecklist,
-                        style: pvJakarta(
-                            fontWeight: FontWeight.w700, color: _accent)),
+                        style: pvManrope(
+                            fontWeight: FontWeight.w700, color: kPvInk)),
                     onTap: () async {
                       final name = await _promptText(
                           sheetCtx, s, s.pclNewChecklist, s.pclNamePrompt);
@@ -245,39 +345,39 @@ class ProductChecklistScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = S(controller.language);
+    final pal = pvStorePalette;
     return Scaffold(
-      backgroundColor: AppTheme.surfaceContainer,
-      appBar: AppBar(
-        backgroundColor: AppTheme.surfaceContainer,
-        elevation: 0,
-        title: Text(s.pclTitle),
-      ),
+      backgroundColor: pal.ground,
+      // The back arrow only; the title is the serif on the page. Kept for
+      // revert: `title: Text(s.pclTitle)` in the app bar.
+      appBar: _pregAppBar(),
       body: AnimatedBuilder(
         animation: ProductChecklistStore.instance,
         builder: (context, _) {
           final store = ProductChecklistStore.instance;
           final lists = store.checklists;
           return ListView(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 36),
+            padding: const EdgeInsets.fromLTRB(20, 4, 20, 40),
             children: [
+              Semantics(
+                header: true,
+                child: Text(s.pclTitle, style: pregPageTitleStyle()),
+              ),
+              const SizedBox(height: 8),
               Text(s.pclIntro,
-                  style: pvManrope(
-                      fontSize: 13.5, height: 1.45, color: AppTheme.neutral600)),
-              const SizedBox(height: 18),
-              Row(children: [
-                Expanded(
-                  child: Text(s.pclYourLists,
-                      style: pvJakarta(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w800,
-                          color: AppTheme.neutral900)),
-                ),
+                  style: pvManrope(fontSize: 14, height: 1.45, color: pal.ink2)),
+              const SizedBox(height: 26),
+              // The one serif heading, with its add on the right. Kept for
+              // revert: the heading in Jakarta 16 / w800, the add in teal.
+              Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+                Expanded(child: PregSectionHeading(s.pclYourLists)),
                 TextButton.icon(
+                  style: TextButton.styleFrom(foregroundColor: kPvInk),
                   onPressed: () => _newChecklist(context, s),
-                  icon: const Icon(Icons.add_rounded, size: 18, color: _accent),
+                  icon: const Icon(Icons.add_rounded, size: 18, color: kPvInk),
                   label: Text(s.pclNewChecklist,
-                      style: pvJakarta(
-                          fontWeight: FontWeight.w700, color: _accent)),
+                      style: pvManrope(
+                          fontSize: 13, fontWeight: FontWeight.w700, color: kPvInk)),
                 ),
               ]),
               const SizedBox(height: 4),
@@ -285,18 +385,16 @@ class ProductChecklistScreen extends StatelessWidget {
                 _emptyLists(s)
               else
                 for (final l in lists) _checklistCard(context, s, l),
-              const SizedBox(height: 24),
-              Text(s.pclCurated,
-                  style: pvJakarta(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
-                      color: AppTheme.neutral900)),
-              const SizedBox(height: 2),
-              Text(s.pclCuratedSub,
-                  style: pvManrope(
-                      fontSize: 12.5, color: AppTheme.neutral500)),
+              const SizedBox(height: 28),
+              // Kept for revert: the heading in Jakarta 16 / w800 and the
+              // grey line under it, drawn separately.
+              PregSectionHeading(s.pclCurated, lead: s.pclCuratedSub),
               const SizedBox(height: 12),
-              for (final c in kCuratedChecklists) _curatedCard(context, s, c),
+              // One white card of rows with drawn marks. Kept for revert:
+              // `_curatedCard` per list, a bordered card with the list's emoji.
+              PregRowCard(children: [
+                for (final c in kCuratedChecklists) _curatedRow(context, s, c),
+              ]),
             ],
           );
         },
@@ -315,25 +413,27 @@ class ProductChecklistScreen extends StatelessWidget {
     }
   }
 
-  Widget _emptyLists(S s) => Container(
-        width: double.infinity,
-        margin: const EdgeInsets.only(top: 8),
+  // The empty state is the feature's advertisement: a white card with the
+  // checklist's drawn mark. Kept for revert: a teal `Icons.checklist_rounded`.
+  Widget _emptyLists(S s) {
+    final pal = pvStorePalette;
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: PregCard(
         padding: const EdgeInsets.all(22),
-        decoration: BoxDecoration(
-            color: AppTheme.surface,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: AppTheme.outlineVariant)),
         child: Column(children: [
-          const Icon(Icons.checklist_rounded, size: 34, color: _accent),
-          const SizedBox(height: 10),
+          PvMarkWell(p: pal, hue: _kHue, size: 48, mark: IntentMark.checkMark),
+          const SizedBox(height: 12),
           Text(s.pclEmpty,
               textAlign: TextAlign.center,
-              style: pvManrope(
-                  fontSize: 13, height: 1.45, color: AppTheme.neutral600)),
+              style: pvManrope(fontSize: 13.5, height: 1.45, color: pal.ink2)),
         ]),
-      );
+      ),
+    );
+  }
 
   Widget _checklistCard(BuildContext context, S s, ProductChecklist l) {
+    final pal = pvStorePalette;
     final total = l.items.length;
     final got = l.gotCount;
     final pct = total == 0 ? 0.0 : got / total;
@@ -341,49 +441,32 @@ class ProductChecklistScreen extends StatelessWidget {
     return Dismissible(
       key: ValueKey('cl_${l.id}'),
       direction: DismissDirection.endToStart,
+      // A neutral well behind the bin. Kept for revert: the rose tint
+      // (`AppTheme.secondary500` at 0.14) with a rose bin.
       background: Container(
         margin: const EdgeInsets.only(top: 12),
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: 24),
         decoration: BoxDecoration(
-            color: AppTheme.secondary500.withValues(alpha: 0.14),
-            borderRadius: BorderRadius.circular(20)),
-        child: const Icon(Icons.delete_outline_rounded,
-            color: AppTheme.secondary500),
+            color: pal.surfaceAlt, borderRadius: BorderRadius.circular(20)),
+        child: Icon(Icons.delete_outline_rounded, color: pal.ink1),
       ),
       confirmDismiss: (_) => _confirmDeleteList(context, s, l),
       onDismissed: (_) => _deleteList(context, s, l),
-      child: GestureDetector(
-        onTap: () => _push(context,
-            _ChecklistDetailScreen(controller: controller, checklistId: l.id)),
-        child: Container(
-          margin: const EdgeInsets.only(top: 12),
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: AppTheme.surface,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: const [
-              BoxShadow(
-                  color: Color(0x0F2D144C),
-                  blurRadius: 12,
-                  offset: Offset(0, 3)),
-            ],
-          ),
+      // A white card with the hairline and a drawn mark (it opens the list).
+      // Kept for revert: a shadowed card with a teal-tinted
+      // `Icons.fact_check_rounded` well and a teal progress bar.
+      child: Padding(
+        padding: const EdgeInsets.only(top: 12),
+        child: PregCard(
+          padding: const EdgeInsets.fromLTRB(14, 12, 4, 14),
+          onTap: () => _push(context,
+              _ChecklistDetailScreen(controller: controller, checklistId: l.id)),
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(children: [
-              // A tidy single list icon instead of the old emoji pile.
-              Container(
-                width: 46,
-                height: 46,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                    color: _accent.withValues(alpha: 0.10),
-                    borderRadius: BorderRadius.circular(14)),
-                child: const Icon(Icons.fact_check_rounded,
-                    color: _accent, size: 24),
-              ),
-              const SizedBox(width: 13),
+              PvMarkWell(p: pal, hue: _kHue, size: 44, mark: IntentMark.checkMark),
+              const SizedBox(width: 14),
               Expanded(
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -391,21 +474,17 @@ class ProductChecklistScreen extends StatelessWidget {
                       Text(l.name,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: pvJakarta(
-                              fontSize: 15.5,
-                              fontWeight: FontWeight.w800,
-                              color: AppTheme.neutral900)),
+                          style: pvManrope(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                              color: pal.ink1)),
                       const SizedBox(height: 3),
                       Text(s.pclListSummary(total, got),
-                          style: pvManrope(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: AppTheme.neutral500)),
+                          style: pvManrope(fontSize: 12.5, color: pal.ink3)),
                     ]),
               ),
               PopupMenuButton<String>(
-                icon: const Icon(Icons.more_vert_rounded,
-                    color: AppTheme.neutral400),
+                icon: Icon(Icons.more_vert_rounded, color: pal.ink3),
                 onSelected: (v) async {
                   if (v == 'delete') {
                     final ok = await _confirmDeleteList(context, s, l);
@@ -418,8 +497,8 @@ class ProductChecklistScreen extends StatelessWidget {
                   PopupMenuItem(
                     value: 'delete',
                     child: Row(children: [
-                      const Icon(Icons.delete_outline_rounded,
-                          size: 18, color: AppTheme.secondary500),
+                      Icon(Icons.delete_outline_rounded,
+                          size: 18, color: pal.ink2),
                       const SizedBox(width: 8),
                       Text(s.pclDelete),
                     ]),
@@ -429,14 +508,9 @@ class ProductChecklistScreen extends StatelessWidget {
             ]),
             if (total > 0) ...[
               const SizedBox(height: 12),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(99),
-                child: LinearProgressIndicator(
-                  value: pct,
-                  minHeight: 7,
-                  backgroundColor: _accent.withValues(alpha: 0.12),
-                  valueColor: const AlwaysStoppedAnimation(_accent),
-                ),
+              Padding(
+                padding: const EdgeInsets.only(right: 10),
+                child: _progress(pct, 6),
               ),
             ],
           ]),
@@ -454,11 +528,12 @@ class ProductChecklistScreen extends StatelessWidget {
         content: Text(l.name),
         actions: [
           TextButton(
+              style: TextButton.styleFrom(foregroundColor: kPvInk),
               onPressed: () => Navigator.of(c).pop(false),
               child: Text(s.pclCancel)),
+          // The one ink. Kept for revert: the rose fill (`secondary500`).
           FilledButton(
-              style: FilledButton.styleFrom(
-                  backgroundColor: AppTheme.secondary500),
+              style: pregFilledStyle(),
               onPressed: () => Navigator.of(c).pop(true),
               child: Text(s.pclDelete)),
         ],
@@ -473,51 +548,23 @@ class ProductChecklistScreen extends StatelessWidget {
       ..showSnackBar(SnackBar(content: Text(s.pclDeleted)));
   }
 
-  Widget _curatedCard(BuildContext context, S s, CuratedList c) {
-    return GestureDetector(
-      onTap: () => _curatedPreview(context, s, c),
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 10),
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: AppTheme.surface,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: AppTheme.outlineVariant),
-        ),
-        child: Row(children: [
-          Container(
-            width: 46,
-            height: 46,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-                color: _accent.withValues(alpha: 0.10),
-                borderRadius: BorderRadius.circular(14)),
-            child: Text(c.emoji, style: const TextStyle(fontSize: 22)),
-          ),
-          const SizedBox(width: 13),
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(c.name,
-                  style: pvJakarta(
-                      fontSize: 14.5,
-                      fontWeight: FontWeight.w700,
-                      color: AppTheme.neutral900)),
-              const SizedBox(height: 2),
-              Text(s.pclItemsCount(c.items.length),
-                  style: pvManrope(
-                      fontSize: 12, color: AppTheme.neutral500)),
-            ]),
-          ),
-          const Icon(Icons.chevron_right_rounded, color: AppTheme.neutral400),
-        ]),
-      ),
-    );
-  }
+  Widget _curatedRow(BuildContext context, S s, CuratedList c) => PregOfferRow(
+        mark: _curatedMark(c),
+        hue: _kHue,
+        title: c.name,
+        line: s.pclItemsCount(c.items.length),
+        onTap: () => _curatedPreview(context, s, c),
+      );
+
+  // Kept for revert (2026-09-30): `_curatedCard`, a bordered white card per
+  // curated list with the list's emoji in a teal-tinted 46-pt well, the name
+  // in Jakarta 14.5 / w700, the count and a chevron. Now `_curatedRow`.
 
   void _curatedPreview(BuildContext context, S s, CuratedList c) {
+    final pal = pvStorePalette;
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: AppTheme.surface,
+      backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (sheetCtx) {
@@ -532,19 +579,21 @@ class ProductChecklistScreen extends StatelessWidget {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                    color: AppTheme.outlineVariant,
-                    borderRadius: BorderRadius.circular(2))),
+                    color: kPvLine, borderRadius: BorderRadius.circular(2))),
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 14, 20, 4),
+              // The list's drawn mark, not its emoji. Kept for revert:
+              // Text(c.emoji, style: const TextStyle(fontSize: 22)).
               child: Row(children: [
-                Text(c.emoji, style: const TextStyle(fontSize: 22)),
-                const SizedBox(width: 10),
+                PvMarkWell(p: pal, hue: _kHue, size: 40, mark: _curatedMark(c)),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Text(c.name,
-                      style: pvJakarta(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w800,
-                          color: AppTheme.neutral900)),
+                      style: pvFraunces(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                          height: 1.2,
+                          color: pal.ink1)),
                 ),
               ]),
             ),
@@ -558,14 +607,15 @@ class ProductChecklistScreen extends StatelessWidget {
                       leading:
                           Text(e.product!.emoji, style: const TextStyle(fontSize: 24)),
                       title: Text(e.product!.name.now,
-                          style: pvJakarta(
-                              fontSize: 14, fontWeight: FontWeight.w700)),
+                          style: pvManrope(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: pal.ink1)),
                       subtitle: Text(
                           e.note.isEmpty
                               ? e.product!.price
                               : '${e.note} · ${e.product!.price}',
-                          style: pvManrope(
-                              fontSize: 12, color: AppTheme.neutral500)),
+                          style: pvManrope(fontSize: 12, color: pal.ink3)),
                     ),
                 ],
               ),
@@ -575,9 +625,7 @@ class ProductChecklistScreen extends StatelessWidget {
               child: SizedBox(
                 width: double.infinity,
                 child: FilledButton(
-                  style: FilledButton.styleFrom(
-                      backgroundColor: _accent,
-                      padding: const EdgeInsets.symmetric(vertical: 13)),
+                  style: _filledStyle(),
                   onPressed: () {
                     final id =
                         ProductChecklistStore.instance.adoptCurated(c);
@@ -588,8 +636,7 @@ class ProductChecklistScreen extends StatelessWidget {
                             controller: controller, checklistId: id));
                   },
                   child: Text(s.pclAdopt,
-                      style: pvJakarta(
-                          fontWeight: FontWeight.w800)),
+                      style: pvManrope(fontWeight: FontWeight.w800)),
                 ),
               ),
             ),
@@ -599,6 +646,64 @@ class ProductChecklistScreen extends StatelessWidget {
     );
   }
 }
+
+/// The progress line: the one ink on a neutral track. Kept for revert: teal
+/// on a teal tint.
+Widget _progress(double value, double height) {
+  final pal = pvStorePalette;
+  return ClipRRect(
+    borderRadius: BorderRadius.circular(99),
+    child: LinearProgressIndicator(
+      value: value,
+      minHeight: height,
+      backgroundColor: pal.surfaceAlt,
+      valueColor: const AlwaysStoppedAnimation(kPvInk),
+    ),
+  );
+}
+
+/// The finish bar under a list: a hairline above, the outlined second and the
+/// one ink. Kept for revert: a shadow above, teal outline and teal fill.
+Widget _finishBar(
+        {required String saveLabel,
+        required VoidCallback onSave,
+        required String goLabel,
+        required IconData goIcon,
+        required VoidCallback onGo}) =>
+    SafeArea(
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          border: Border(top: BorderSide(color: kPvLine)),
+        ),
+        child: Row(children: [
+          Expanded(
+            child: OutlinedButton.icon(
+              style: _outlineStyle(),
+              onPressed: onSave,
+              icon: const Icon(Icons.check_rounded, size: 18, color: kPvInk),
+              label: Text(saveLabel,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: pvManrope(fontWeight: FontWeight.w800, color: kPvInk)),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: FilledButton.icon(
+              style: _filledStyle(),
+              icon: Icon(goIcon, size: 18, color: Colors.white),
+              label: Text(goLabel,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: pvManrope(fontWeight: FontWeight.w800, color: Colors.white)),
+              onPressed: onGo,
+            ),
+          ),
+        ]),
+      ),
+    );
 
 // ===========================================================================
 //  Checklist detail
@@ -614,84 +719,90 @@ class _ChecklistDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final s = S(controller.language);
     final store = ProductChecklistStore.instance;
+    final pal = pvStorePalette;
     return AnimatedBuilder(
       animation: Listenable.merge([store, BoughtStore.instance]),
       builder: (context, _) {
         final list = store.byId(checklistId);
         if (list == null) {
           return Scaffold(
-            appBar: AppBar(title: Text(s.pclTitle)),
-            body: Center(child: Text(s.pclDeleted)),
+            backgroundColor: pal.ground,
+            appBar: _pregAppBar(),
+            body: ListView(
+              padding: const EdgeInsets.fromLTRB(20, 4, 20, 40),
+              children: [
+                Text(s.pclTitle, style: pregPageTitleStyle()),
+                const SizedBox(height: 12),
+                Text(s.pclDeleted,
+                    style: pvManrope(fontSize: 14, color: pal.ink2)),
+              ],
+            ),
+            // Kept for revert: AppBar(title: Text(s.pclTitle)) over
+            // Center(child: Text(s.pclDeleted)).
           );
         }
         final total = list.items.length;
         final got = list.gotCount;
         return Scaffold(
-          backgroundColor: AppTheme.surfaceContainer,
-          appBar: AppBar(
-            backgroundColor: AppTheme.surfaceContainer,
-            elevation: 0,
-            title: Text(list.name, maxLines: 1, overflow: TextOverflow.ellipsis),
-            actions: [
-              PopupMenuButton<String>(
-                onSelected: (v) async {
-                  if (v == 'rename') {
-                    final name = await _promptText(
-                        context, s, s.pclRename, s.pclNamePrompt,
-                        initial: list.name);
-                    if (name != null) store.renameChecklist(list.id, name);
-                  } else if (v == 'delete') {
-                    final ok = await showDialog<bool>(
-                      context: context,
-                      builder: (c) => AlertDialog(
-                        title: Text(s.pclDeleteConfirm),
-                        actions: [
-                          TextButton(
-                              onPressed: () => Navigator.of(c).pop(false),
-                              child: Text(s.pclCancel)),
-                          FilledButton(
-                              style: FilledButton.styleFrom(
-                                  backgroundColor: AppTheme.secondary500),
-                              onPressed: () => Navigator.of(c).pop(true),
-                              child: Text(s.pclDelete)),
-                        ],
-                      ),
-                    );
-                    if (ok == true) {
-                      store.deleteChecklist(list.id);
-                      if (context.mounted) Navigator.of(context).pop();
-                    }
+          backgroundColor: pal.ground,
+          // The back arrow and the list's menu; the list's name is the serif
+          // on the page. Kept for revert: `title: Text(list.name, maxLines: 1,
+          // overflow: TextOverflow.ellipsis)` in the app bar.
+          appBar: _pregAppBar(actions: [
+            PopupMenuButton<String>(
+              onSelected: (v) async {
+                if (v == 'rename') {
+                  final name = await _promptText(
+                      context, s, s.pclRename, s.pclNamePrompt,
+                      initial: list.name);
+                  if (name != null) store.renameChecklist(list.id, name);
+                } else if (v == 'delete') {
+                  final ok = await showDialog<bool>(
+                    context: context,
+                    builder: (c) => AlertDialog(
+                      title: Text(s.pclDeleteConfirm),
+                      actions: [
+                        TextButton(
+                            style: TextButton.styleFrom(foregroundColor: kPvInk),
+                            onPressed: () => Navigator.of(c).pop(false),
+                            child: Text(s.pclCancel)),
+                        // The one ink. Kept for revert: the rose fill.
+                        FilledButton(
+                            style: pregFilledStyle(),
+                            onPressed: () => Navigator.of(c).pop(true),
+                            child: Text(s.pclDelete)),
+                      ],
+                    ),
+                  );
+                  if (ok == true) {
+                    store.deleteChecklist(list.id);
+                    if (context.mounted) Navigator.of(context).pop();
                   }
-                },
-                itemBuilder: (c) => [
-                  PopupMenuItem(value: 'rename', child: Text(s.pclRename)),
-                  PopupMenuItem(value: 'delete', child: Text(s.pclDelete)),
-                ],
-              ),
-            ],
-          ),
+                }
+              },
+              itemBuilder: (c) => [
+                PopupMenuItem(value: 'rename', child: Text(s.pclRename)),
+                PopupMenuItem(value: 'delete', child: Text(s.pclDelete)),
+              ],
+            ),
+          ]),
           body: ListView(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 36),
+            padding: const EdgeInsets.fromLTRB(20, 4, 20, 40),
             children: [
+              Semantics(
+                header: true,
+                child: Text(list.name, style: pregPageTitleStyle()),
+              ),
+              const SizedBox(height: 14),
               // progress
               Row(children: [
-                Expanded(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(99),
-                    child: LinearProgressIndicator(
-                      value: total == 0 ? 0.0 : got / total,
-                      minHeight: 8,
-                      backgroundColor: _accent.withValues(alpha: 0.12),
-                      valueColor: const AlwaysStoppedAnimation(_accent),
-                    ),
-                  ),
-                ),
+                Expanded(child: _progress(total == 0 ? 0.0 : got / total, 8)),
                 const SizedBox(width: 12),
                 Text(s.pclGotOf(got, total),
                     style: pvManrope(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w800,
-                        color: _accent)),
+                        color: pal.ink1)),
               ]),
               const SizedBox(height: 16),
               SizedBox(
@@ -701,32 +812,45 @@ class _ChecklistDetailScreen extends StatelessWidget {
                       context,
                       _AddProductsScreen(
                           controller: controller, checklistId: list.id)),
-                  icon: const Icon(Icons.add_rounded, color: _accent),
+                  icon: const Icon(Icons.add_rounded, color: kPvInk),
                   label: Text(s.pclAddProducts,
-                      style: pvJakarta(
-                          fontWeight: FontWeight.w800, color: _accent)),
-                  style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: _accent.withValues(alpha: 0.5)),
-                    padding: const EdgeInsets.symmetric(vertical: 13),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14)),
-                  ),
+                      style: pvManrope(
+                          fontWeight: FontWeight.w800, color: kPvInk)),
+                  style: _outlineStyle(),
                 ),
               ),
               const SizedBox(height: 14),
-              if (list.items.isEmpty)
-                Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Center(
-                    child: Text(s.pclEmptyItems,
-                        textAlign: TextAlign.center,
-                        style: pvManrope(
-                            fontSize: 13, color: AppTheme.neutral500)),
-                  ),
-                )
-              else
-                for (final item in list.items)
-                  _itemRow(context, s, store, list.id, item),
+              // Every item in one white card, hairlines between. Kept for
+              // revert: a shadowed card per item, 10 apart; the empty line
+              // centred on the page.
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: kPvLine),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: list.items.isEmpty
+                    ? Padding(
+                        padding: const EdgeInsets.all(18),
+                        child: Text(s.pclEmptyItems,
+                            textAlign: TextAlign.center,
+                            style: pvManrope(
+                                fontSize: 13.5, height: 1.45, color: pal.ink2)),
+                      )
+                    : Column(children: [
+                        for (var i = 0; i < list.items.length; i++) ...[
+                          if (i > 0)
+                            const Divider(
+                                height: 1,
+                                thickness: 1,
+                                color: kPvLine,
+                                indent: 64,
+                                endIndent: 16),
+                          _itemRow(context, s, store, list.id, list.items[i]),
+                        ],
+                      ]),
+              ),
             ],
           ),
           // Sticky finish bar - Save list (back to your lists) + Add to cart.
@@ -737,60 +861,17 @@ class _ChecklistDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _bottomBar(BuildContext context, S s, ProductChecklist list) => SafeArea(
-        child: Container(
-          padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
-          decoration: const BoxDecoration(
-            color: AppTheme.surface,
-            boxShadow: [
-              BoxShadow(
-                  color: Color(0x142D144C),
-                  blurRadius: 16,
-                  offset: Offset(0, -3)),
-            ],
-          ),
-          child: Row(children: [
-            Expanded(
-              child: OutlinedButton.icon(
-                onPressed: () {
-                  ScaffoldMessenger.of(context)
-                    ..clearSnackBars()
-                    ..showSnackBar(SnackBar(content: Text(s.pclSavedSnack)));
-                  Navigator.of(context).pop();
-                },
-                icon: const Icon(Icons.check_rounded, size: 18, color: _accent),
-                label: Text(s.pclSaveList,
-                    style: pvJakarta(
-                        fontWeight: FontWeight.w800, color: _accent)),
-                style: OutlinedButton.styleFrom(
-                  side: BorderSide(color: _accent.withValues(alpha: 0.5)),
-                  padding: const EdgeInsets.symmetric(vertical: 13),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14)),
-                ),
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: FilledButton.icon(
-                style: FilledButton.styleFrom(
-                  backgroundColor: _accent,
-                  padding: const EdgeInsets.symmetric(vertical: 13),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14)),
-                ),
-                icon: const Icon(Icons.add_shopping_cart_rounded,
-                    size: 18, color: Colors.white),
-                label: Text(s.pclAddRemaining,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: pvJakarta(
-                        fontWeight: FontWeight.w800, color: Colors.white)),
-                onPressed: () => _addRemainingToCart(context, s, list),
-              ),
-            ),
-          ]),
-        ),
+  Widget _bottomBar(BuildContext context, S s, ProductChecklist list) => _finishBar(
+        saveLabel: s.pclSaveList,
+        onSave: () {
+          ScaffoldMessenger.of(context)
+            ..clearSnackBars()
+            ..showSnackBar(SnackBar(content: Text(s.pclSavedSnack)));
+          Navigator.of(context).pop();
+        },
+        goLabel: s.pclAddRemaining,
+        goIcon: Icons.add_shopping_cart_rounded,
+        onGo: () => _addRemainingToCart(context, s, list),
       );
 
   // Cart ONLY the items she still needs: un-got, catalogue, non-affiliate.
@@ -834,6 +915,7 @@ class _ChecklistDetailScreen extends StatelessWidget {
 
   Widget _itemRow(BuildContext context, S s, ProductChecklistStore store,
       String listId, ChecklistItem item) {
+    final pal = pvStorePalette;
     final product = _itemProduct(item);
     final done = item.checked;
     final name = _itemName(item);
@@ -842,20 +924,12 @@ class _ChecklistDetailScreen extends StatelessWidget {
     // Bought via our preview checkout → show it as owned (no buy actions).
     final bought = product != null && BoughtStore.instance.isBought(product.id);
     final owned = done || bought;
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
+    return Padding(
       padding: const EdgeInsets.fromLTRB(8, 8, 4, 8),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: const [
-          BoxShadow(
-              color: Color(0x0A2D144C), blurRadius: 10, offset: Offset(0, 2)),
-        ],
-      ),
       child: Row(children: [
-        // Bought via checkout → a locked green check (she owns it already).
-        // Otherwise a normal tick-off box.
+        // Bought via checkout → a locked ink check (she owns it already).
+        // Otherwise a normal tick-off box. Kept for revert: the check was
+        // green (0xFF3FA56A).
         if (bought)
           const Padding(
             padding: EdgeInsets.all(13),
@@ -863,7 +937,7 @@ class _ChecklistDetailScreen extends StatelessWidget {
               width: 22,
               height: 22,
               child: DecoratedBox(
-                decoration: BoxDecoration(color: _green, shape: BoxShape.circle),
+                decoration: BoxDecoration(color: kPvInk, shape: BoxShape.circle),
                 child: Icon(Icons.check_rounded, size: 15, color: Colors.white),
               ),
             ),
@@ -871,7 +945,7 @@ class _ChecklistDetailScreen extends StatelessWidget {
         else
           Checkbox(
             value: done,
-            activeColor: _accent,
+            activeColor: kPvInk,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
             onChanged: (_) => _onCheck(context, s, store, listId, item),
           ),
@@ -894,7 +968,7 @@ class _ChecklistDetailScreen extends StatelessWidget {
                 height: 42,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                    color: AppTheme.surfaceContainer,
+                    color: pal.surfaceAlt,
                     borderRadius: BorderRadius.circular(12)),
                 child:
                     Text(_itemEmoji(item), style: const TextStyle(fontSize: 22)),
@@ -909,25 +983,23 @@ class _ChecklistDetailScreen extends StatelessWidget {
                           child: Text(name,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
-                              style: pvJakarta(
-                                  fontSize: 13.5,
+                              style: pvManrope(
+                                  fontSize: 14,
                                   fontWeight: FontWeight.w700,
-                                  color: owned
-                                      ? AppTheme.neutral400
-                                      : AppTheme.neutral900,
+                                  color: owned ? pal.ink3 : pal.ink1,
                                   decoration: owned
                                       ? TextDecoration.lineThrough
                                       : null)),
                         ),
                         if (bought) ...[
                           const SizedBox(width: 6),
-                          _miniTag(s.pclBoughtTag, _green),
+                          _miniTag(s.pclBoughtTag),
                         ] else if (affiliate) ...[
                           const SizedBox(width: 6),
-                          _miniTag(s.pclAffiliate, const Color(0xFFD98A2B)),
+                          _miniTag(s.pclAffiliate),
                         ] else if (item.isCustom) ...[
                           const SizedBox(width: 6),
-                          _miniTag(s.pclCustomTag, _accent),
+                          _miniTag(s.pclCustomTag),
                         ],
                       ]),
                       const SizedBox(height: 4),
@@ -936,9 +1008,7 @@ class _ChecklistDetailScreen extends StatelessWidget {
                         child: Row(children: [
                           Icon(Icons.schedule_rounded,
                               size: 13,
-                              color: item.note.isEmpty
-                                  ? AppTheme.neutral400
-                                  : _accent),
+                              color: item.note.isEmpty ? pal.ink3 : pal.ink2),
                           const SizedBox(width: 4),
                           Flexible(
                             child: Text(
@@ -949,15 +1019,14 @@ class _ChecklistDetailScreen extends StatelessWidget {
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
                                     color: item.note.isEmpty
-                                        ? AppTheme.neutral400
-                                        : _accent)),
+                                        ? pal.ink3
+                                        : pal.ink2)),
                           ),
                           if (price.isNotEmpty) ...[
                             const SizedBox(width: 6),
                             Text(price,
                                 style: pvManrope(
-                                    fontSize: 11.5,
-                                    color: AppTheme.neutral500)),
+                                    fontSize: 11.5, color: pal.ink3)),
                           ],
                         ]),
                       ),
@@ -967,7 +1036,7 @@ class _ChecklistDetailScreen extends StatelessWidget {
           ),
         ),
         PopupMenuButton<String>(
-          icon: const Icon(Icons.more_vert_rounded, color: AppTheme.neutral400),
+          icon: Icon(Icons.more_vert_rounded, color: pal.ink3),
           onSelected: (v) {
             switch (v) {
               case 'cart':
@@ -1010,16 +1079,6 @@ class _ChecklistDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _miniTag(String text, Color color) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-        decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.14),
-            borderRadius: BorderRadius.circular(6)),
-        child: Text(text,
-            style: pvManrope(
-                fontSize: 9.5, fontWeight: FontWeight.w800, color: color)),
-      );
-
   // Ticking a NOT-yet-got item asks "Already got this?" first (Yes = owned, no
   // cart for it). Un-ticking a got item just clears it.
   void _onCheck(BuildContext context, S s, ProductChecklistStore store,
@@ -1035,10 +1094,11 @@ class _ChecklistDetailScreen extends StatelessWidget {
         content: Text(s.pclGotPromptBody),
         actions: [
           TextButton(
+              style: TextButton.styleFrom(foregroundColor: kPvInk),
               onPressed: () => Navigator.of(c).pop(false),
               child: Text(s.pclGotPromptNo)),
           FilledButton(
-              style: FilledButton.styleFrom(backgroundColor: _accent),
+              style: pregFilledStyle(),
               onPressed: () => Navigator.of(c).pop(true),
               child: Text(s.pclGotPromptYes)),
         ],
@@ -1113,57 +1173,53 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
   @override
   Widget build(BuildContext context) {
     final s = S(widget.controller.language);
+    final pal = pvStorePalette;
     return Scaffold(
-      backgroundColor: AppTheme.surfaceContainer,
-      appBar: AppBar(
-        backgroundColor: AppTheme.surfaceContainer,
-        elevation: 0,
-        title: Text(s.pclAddProducts),
-      ),
+      backgroundColor: pal.ground,
+      // The back arrow only; the title is the serif on the page. Kept for
+      // revert: `title: Text(s.pclAddProducts)` in the app bar.
+      appBar: _pregAppBar(),
       bottomNavigationBar: _pickerBottomBar(s),
       body: Column(children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-          child: TextField(
-            controller: _searchCtrl,
-            onChanged: (v) => setState(() => _query = v),
-            decoration: InputDecoration(
-              hintText: s.pclSearchHint,
-              prefixIcon: const Icon(Icons.search_rounded),
-              filled: true,
-              fillColor: AppTheme.surface,
-              contentPadding: const EdgeInsets.symmetric(vertical: 0),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(color: AppTheme.outlineVariant),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(color: AppTheme.outlineVariant),
-              ),
+          padding: const EdgeInsets.fromLTRB(20, 4, 20, 12),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Semantics(
+              header: true,
+              child: Text(s.pclAddProducts, style: pregPageTitleStyle()),
             ),
           ),
         ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+          child: TextField(
+            controller: _searchCtrl,
+            onChanged: (v) => setState(() => _query = v),
+            style: pvManrope(fontSize: 14.5, color: pal.ink1),
+            decoration: _fieldDecoration(s.pclSearchHint,
+                    prefix: Icon(Icons.search_rounded, color: pal.ink2))
+                .copyWith(contentPadding: const EdgeInsets.symmetric(vertical: 0)),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
           child: OutlinedButton.icon(
             onPressed: _addOwnProduct,
-            icon: const Icon(Icons.add_circle_outline_rounded,
-                size: 18, color: _accent),
+            icon: const Icon(Icons.add_rounded, size: 18, color: kPvInk),
             label: Text(s.pclAddOwn,
-                style: pvJakarta(
-                    fontWeight: FontWeight.w800, color: _accent)),
-            style: OutlinedButton.styleFrom(
-              minimumSize: const Size(double.infinity, 44),
-              side: BorderSide(color: _accent.withValues(alpha: 0.4)),
-              shape:
-                  RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                style: pvManrope(fontWeight: FontWeight.w800, color: kPvInk)),
+            style: _outlineStyle().copyWith(
+              minimumSize: const WidgetStatePropertyAll(Size(double.infinity, 44)),
+              padding: const WidgetStatePropertyAll(
+                  EdgeInsets.symmetric(horizontal: 16)),
             ),
           ),
         ),
         // Section 12: top filter chips (audience / stage) ABOVE the existing
         // category-grouped browse below.
         _topFilterChips(),
+        const SizedBox(height: 4),
         Expanded(
           child: AnimatedBuilder(
             animation: ProductChecklistStore.instance,
@@ -1176,7 +1232,7 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
                 if (results.isEmpty) {
                   return Center(
                     child: Text(s.pclNoResults,
-                        style: pvManrope(color: AppTheme.neutral500)),
+                        style: pvManrope(color: pal.ink3)),
                   );
                 }
                 return ListView(
@@ -1192,13 +1248,13 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
                     .where((p) => _productMatchesTopFilter(p, _topFilter))
                     .toList();
                 if (prods.isEmpty) continue;
+                // A group label inside the list: the small caps label, no
+                // emoji. Kept for revert: Text('${cat.emoji}  ${cat.name}')
+                // in Jakarta 14 / w800.
                 children.add(Padding(
-                  padding: const EdgeInsets.fromLTRB(2, 14, 2, 8),
-                  child: Text('${cat.emoji}  ${cat.name}',
-                      style: pvJakarta(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w800,
-                          color: AppTheme.neutral900)),
+                  padding: const EdgeInsets.fromLTRB(4, 16, 4, 8),
+                  child: Text(cat.name.now.toUpperCase(),
+                      style: pregGroupLabelStyle()),
                 ));
                 for (final p in prods) {
                   children.add(_productCard(s, p));
@@ -1207,7 +1263,7 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
               if (children.isEmpty) {
                 return Center(
                   child: Text(s.pclNoResults,
-                      style: pvManrope(color: AppTheme.neutral500)),
+                      style: pvManrope(color: pal.ink3)),
                 );
               }
               return ListView(
@@ -1223,7 +1279,7 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
 
   // --- Top filter chips row (Section 12) ------------------------------------
   Widget _topFilterChips() => SizedBox(
-        height: 42,
+        height: 38,
         child: ListView(
           scrollDirection: Axis.horizontal,
           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -1231,144 +1287,125 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
         ),
       );
 
+  // The store's hairline chip, ink when chosen. Kept for revert: a
+  // hand-drawn pill, teal when chosen.
   Widget _chip(String f) {
     final sel = _topFilter == f;
     return Padding(
       padding: const EdgeInsets.only(right: 8),
-      child: GestureDetector(
+      child: PvChip(
+        label: f,
+        selected: sel,
         onTap: () => setState(() => _topFilter = sel ? '' : f),
-        child: Container(
-          alignment: Alignment.center,
-          padding: const EdgeInsets.symmetric(horizontal: 14),
-          decoration: BoxDecoration(
-            color: sel ? _accent : AppTheme.surface,
-            borderRadius: BorderRadius.circular(20),
-            border:
-                Border.all(color: sel ? _accent : AppTheme.outlineVariant),
-          ),
-          child: Text(f,
-              style: pvJakarta(
-                  fontSize: 12.5,
-                  fontWeight: FontWeight.w700,
-                  color: sel ? Colors.white : AppTheme.neutral600)),
-        ),
       ),
     );
   }
 
-  // Full product CARD (Section 12): image, brand, name, rating, review count,
-  // price + the add/remove toggle. Tapping the card opens the pregnancy-side
+  // Full product CARD (Section 12): photo, name, our score, price + the
+  // add/remove toggle. Tapping the card opens the pregnancy-side
   // ProductDetailScreen (reused from products_screen.dart).
+  //
+  // ⚠️ 2026-09-30, what went and why. The brand line was the name's first
+  // word (`_productBrand`), printed over the name that begins with it: one
+  // fact, twice. The star beside the score read as a rating from mothers,
+  // and the score is ours. The "(n)" beside it counted seed reviews. The
+  // photo fell back to a random stock picture. Kept for revert:
+  //   Text(_productBrand(p).toUpperCase(), ...)
+  //   const Icon(Icons.star_rounded, size: 14, color: _star)
+  //   if (reviewCount > 0) Text('($reviewCount)', ...)
+  //   Image.network(productImageUrl(p), ...)
   Widget _productCard(S s, Product p) {
+    final pal = pvStorePalette;
     final store = ProductChecklistStore.instance;
     final added = store.isInChecklist(widget.checklistId, p.id);
-    final reviewCount = p.reviews.length; // model has no count field; use list
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: () => _push(
-          context,
-          ProductDetailScreen(
-              product: p, controller: widget.controller)),
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 10),
+    final photo = _realImage(p);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: PregCard(
         padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: AppTheme.surface,
-          borderRadius: BorderRadius.circular(18),
-          boxShadow: const [
-            BoxShadow(
-                color: Color(0x0F2D144C), blurRadius: 12, offset: Offset(0, 3)),
-          ],
-        ),
+        onTap: () => _push(
+            context,
+            ProductDetailScreen(
+                product: p, controller: widget.controller)),
         child: Row(children: [
-          // Product photo (falls back to the emoji if the image fails/loads).
+          // The product's own photo, or its emoji in a neutral well.
           ClipRRect(
             borderRadius: BorderRadius.circular(14),
-            child: Image.network(
-              productImageUrl(p),
-              width: 62,
-              height: 62,
-              fit: BoxFit.cover,
-              errorBuilder: (_, _, _) => _imgFallback(p),
-              loadingBuilder: (ctx, child, progress) =>
-                  progress == null ? child : _imgFallback(p),
-            ),
+            child: photo == null
+                ? _imgFallback(p)
+                : Image.network(
+                    photo,
+                    width: 62,
+                    height: 62,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, _, _) => _imgFallback(p),
+                    loadingBuilder: (ctx, child, progress) =>
+                        progress == null ? child : _imgFallback(p),
+                  ),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(_productBrand(p).toUpperCase(),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: pvManrope(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 0.4,
-                          color: AppTheme.neutral500)),
-                  const SizedBox(height: 1),
                   Text(p.name.now,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: pvJakarta(
-                          fontSize: 13.5,
+                      style: pvManrope(
+                          fontSize: 14,
                           fontWeight: FontWeight.w700,
-                          color: AppTheme.neutral900)),
-                  const SizedBox(height: 5),
-                  Row(children: [
-                    const Icon(Icons.star_rounded, size: 14, color: _star),
-                    const SizedBox(width: 2),
-                    // score is the ParentVeda Score (x/10) — used as the rating.
-                    Text('${p.score.toStringAsFixed(1)}/10',
-                        style: pvManrope(
-                            fontSize: 11.5,
-                            fontWeight: FontWeight.w800,
-                            color: AppTheme.neutral600)),
-                    if (reviewCount > 0) ...[
-                      const SizedBox(width: 4),
-                      Text('($reviewCount)',
-                          style: pvManrope(
-                              fontSize: 11, color: AppTheme.neutral400)),
-                    ],
-                    const SizedBox(width: 8),
-                    Flexible(
-                      child: Text(p.price,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: pvManrope(
-                              fontSize: 12.5,
-                              fontWeight: FontWeight.w800,
-                              color: _accent)),
-                    ),
-                  ]),
+                          height: 1.3,
+                          color: pal.ink1)),
+                  const SizedBox(height: 4),
+                  Text(p.price,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: pvManrope(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w800,
+                          color: pal.ink1)),
+                  const SizedBox(height: 2),
+                  // score is the ParentVeda Score (x/10), said as ours.
+                  Text('Score ${p.score.toStringAsFixed(1)}/10',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: pvManrope(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w600,
+                          color: pal.ink3)),
                 ]),
           ),
           const SizedBox(width: 8),
-          GestureDetector(
-            onTap: () {
-              if (added) {
-                store.removeItem(widget.checklistId, p.id);
-              } else {
-                store.addItem(widget.checklistId, p.id);
-              }
-            },
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 8),
-              decoration: BoxDecoration(
-                color: added ? _accent.withValues(alpha: 0.12) : _accent,
-                borderRadius: BorderRadius.circular(12),
+          // Add is the one ink; once added it is white with the hairline and
+          // a tick. Kept for revert: teal fill, and a teal tint once added.
+          Semantics(
+            button: true,
+            child: GestureDetector(
+              onTap: () {
+                if (added) {
+                  store.removeItem(widget.checklistId, p.id);
+                } else {
+                  store.addItem(widget.checklistId, p.id);
+                }
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 8),
+                decoration: BoxDecoration(
+                  color: added ? Colors.white : kPvInk,
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(color: added ? kPvLine : kPvInk),
+                ),
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  Icon(added ? Icons.check_rounded : Icons.add_rounded,
+                      size: 16, color: added ? kPvInk : Colors.white),
+                  const SizedBox(width: 4),
+                  Text(added ? s.pclAdded : s.pclAdd,
+                      style: pvManrope(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w800,
+                          color: added ? kPvInk : Colors.white)),
+                ]),
               ),
-              child: Row(mainAxisSize: MainAxisSize.min, children: [
-                Icon(added ? Icons.check_rounded : Icons.add_rounded,
-                    size: 16, color: added ? _accent : Colors.white),
-                const SizedBox(width: 4),
-                Text(added ? s.pclAdded : s.pclAdd,
-                    style: pvJakarta(
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w800,
-                        color: added ? _accent : Colors.white)),
-              ]),
             ),
           ),
         ]),
@@ -1380,9 +1417,10 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
         width: 62,
         height: 62,
         alignment: Alignment.center,
-        color: AppTheme.surfaceContainer,
+        color: pvStorePalette.surfaceAlt,
         child: Text(p.emoji, style: const TextStyle(fontSize: 26)),
       );
+
 
   // Old compact row, replaced by _productCard above. Kept for reference/revert.
   // Widget _productRow(S s, Product p) {
@@ -1443,54 +1481,14 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
   //   );
   // }
 
+
   // Finish-right-here bar: Save list (back to your lists) or Add to cart.
-  Widget _pickerBottomBar(S s) => SafeArea(
-        child: Container(
-          padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
-          decoration: const BoxDecoration(
-            color: AppTheme.surface,
-            boxShadow: [
-              BoxShadow(
-                  color: Color(0x142D144C),
-                  blurRadius: 16,
-                  offset: Offset(0, -3)),
-            ],
-          ),
-          child: Row(children: [
-            Expanded(
-              child: OutlinedButton.icon(
-                onPressed: _saveAndBack,
-                icon: const Icon(Icons.check_rounded, size: 18, color: _accent),
-                label: Text(s.pclSaveList,
-                    style: pvJakarta(
-                        fontWeight: FontWeight.w800, color: _accent)),
-                style: OutlinedButton.styleFrom(
-                  side: BorderSide(color: _accent.withValues(alpha: 0.5)),
-                  padding: const EdgeInsets.symmetric(vertical: 13),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14)),
-                ),
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: FilledButton.icon(
-                style: FilledButton.styleFrom(
-                  backgroundColor: _accent,
-                  padding: const EdgeInsets.symmetric(vertical: 13),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14)),
-                ),
-                icon: const Icon(Icons.add_shopping_cart_rounded,
-                    size: 18, color: Colors.white),
-                label: Text(s.cartAddToCart,
-                    style: pvJakarta(
-                        fontWeight: FontWeight.w800, color: Colors.white)),
-                onPressed: _addToCartAndOpen,
-              ),
-            ),
-          ]),
-        ),
+  Widget _pickerBottomBar(S s) => _finishBar(
+        saveLabel: s.pclSaveList,
+        onSave: _saveAndBack,
+        goLabel: s.cartAddToCart,
+        goIcon: Icons.add_shopping_cart_rounded,
+        onGo: _addToCartAndOpen,
       );
 
   void _saveAndBack() {
@@ -1531,6 +1529,7 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
   // Add a product we don't stock - her own name + link + price + note.
   void _addOwnProduct() {
     final s = S(widget.controller.language);
+    final pal = pvStorePalette;
     final nameC = TextEditingController();
     final linkC = TextEditingController();
     final priceC = TextEditingController();
@@ -1538,7 +1537,7 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: AppTheme.surface,
+      backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (sheetCtx) => Padding(
@@ -1552,10 +1551,11 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(s.pclAddOwn,
-                      style: pvJakarta(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w800,
-                          color: AppTheme.neutral900)),
+                      style: pvFraunces(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                          height: 1.2,
+                          color: pal.ink1)),
                   const SizedBox(height: 14),
                   _customField(nameC, s.pclCustomName),
                   const SizedBox(height: 10),
@@ -1569,9 +1569,7 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
                   SizedBox(
                     width: double.infinity,
                     child: FilledButton(
-                      style: FilledButton.styleFrom(
-                          backgroundColor: _accent,
-                          padding: const EdgeInsets.symmetric(vertical: 13)),
+                      style: _filledStyle(),
                       onPressed: () {
                         final name = nameC.text.trim();
                         if (name.isEmpty) return;
@@ -1589,8 +1587,7 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
                               SnackBar(content: Text(s.pclCustomAdded(name))));
                       },
                       child: Text(s.pclSave,
-                          style: pvJakarta(
-                              fontWeight: FontWeight.w800)),
+                          style: pvManrope(fontWeight: FontWeight.w800)),
                     ),
                   ),
                 ]),
@@ -1600,6 +1597,7 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
     );
   }
 
+  // A white field with the hairline. Kept for revert: a filled grey field.
   Widget _customField(TextEditingController c, String hint,
           {TextInputType? keyboard}) =>
       TextField(
@@ -1608,15 +1606,7 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
         textCapitalization: keyboard == TextInputType.url
             ? TextCapitalization.none
             : TextCapitalization.sentences,
-        decoration: InputDecoration(
-          hintText: hint,
-          filled: true,
-          fillColor: AppTheme.surfaceContainer,
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-          border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
-              borderSide: BorderSide.none),
-        ),
+        style: pvManrope(fontSize: 14.5, color: pvStorePalette.ink1),
+        decoration: _fieldDecoration(hint),
       );
 }

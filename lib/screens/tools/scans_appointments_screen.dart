@@ -5,6 +5,15 @@
 //  Completed / Care Roadmap. Scan content is reused from kJourneyMilestones
 //  (medical). Mark a scan completed → a Journal "Scans" entry; add an
 //  appointment → it appears in the Calendar's "Appointment" lane.
+//
+//  ⚠️ ONE PARENTVEDA (2026-09-30, the pregnancy restyle, after main's TTC
+//  appointments screen). The app bar carries the back arrow and the one add
+//  control; the serif page title sits on the page. The next scan is one white
+//  card with the one ink button; the rest of the run is one white card of
+//  rows with drawn marks (the scan's fan), because each row opens the scan;
+//  appointments and completed scans are logged data, so they carry a small
+//  glyph, not a mark. The teal accent, the soft shadows, the gradient hero,
+//  the tinted "what is this scan" block and the amber disclaimer are gone.
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -16,13 +25,23 @@ import '../../models/journey_node.dart';
 import '../../models/scan_appointment.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../services/scans_store.dart';
+// Still read by the Roadmap rows below, which are kept for revert.
 import '../../theme/app_theme.dart';
 import '../../theme/pv_fonts.dart';
+import '../brackets/hub/hub_intent_art.dart';
+import '../doors/pv_list_row.dart' show PvMarkWell;
+import '../pregnancy/preg_chrome.dart';
+import '../products/pv_store_chrome.dart' show PvChip, kPvInk, kPvLine, pvStorePalette;
 
+// Kept for the Roadmap rows (unreached, kept for revert); nothing live draws
+// in the teal since 2026-09-30.
 const Color _scanColor = Color(0xFF2E9C8E); // teal - matches Journal "Scans"
 const List<BoxShadow> _soft = [
   BoxShadow(color: Color(0x0F2D144C), blurRadius: 12, offset: Offset(0, 3)),
 ];
+
+/// The Tools tab's "Track" hue, the same one the Tests & scans library wears.
+const double _kHue = 206;
 
 List<JourneyMilestone> _allScans() {
   final list = kJourneyMilestones
@@ -31,6 +50,46 @@ List<JourneyMilestone> _allScans() {
     ..sort((a, b) => a.anchorWeek.compareTo(b.anchorWeek));
   return list;
 }
+
+/// A pushed pregnancy page's app bar: the ground, the back arrow in ink, no
+/// title (the page draws its own, in the serif).
+PreferredSizeWidget _pregAppBar({List<Widget>? actions}) {
+  final pal = pvStorePalette;
+  return AppBar(
+    backgroundColor: pal.ground,
+    surfaceTintColor: Colors.transparent,
+    elevation: 0,
+    scrolledUnderElevation: 0,
+    foregroundColor: pal.ink1,
+    actions: actions,
+  );
+}
+
+/// The one outlined button: white, an ink hairline, ink words, a stadium.
+ButtonStyle _pregOutlineStyle() => OutlinedButton.styleFrom(
+      foregroundColor: kPvInk,
+      side: const BorderSide(color: kPvInk, width: 1.2),
+      shape: const StadiumBorder(),
+    );
+
+/// A white card of logged rows (appointments, completed scans): hairlines
+/// between them, indented past the small glyph.
+Widget _loggedCard(List<Widget> rows) => Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: kPvLine),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(children: [
+        for (var i = 0; i < rows.length; i++) ...[
+          if (i > 0)
+            const Divider(
+                height: 1, thickness: 1, color: kPvLine, indent: 48, endIndent: 16),
+          rows[i],
+        ],
+      ]),
+    );
 
 class ScansAppointmentsScreen extends StatefulWidget {
   const ScansAppointmentsScreen({super.key, required this.controller});
@@ -58,63 +117,75 @@ class _ScansAppointmentsScreenState extends State<ScansAppointmentsScreen> {
 
   Widget _build(BuildContext context) {
     final s = S(p.language);
+    final pal = pvStorePalette;
     return Scaffold(
-      backgroundColor: AppTheme.surfaceContainer,
-      appBar: AppBar(
-        backgroundColor: AppTheme.surfaceContainer,
-        title: Text(s.scnTitle,
-            style: pvJakarta(
-                fontWeight: FontWeight.w700, color: AppTheme.neutral900)),
-        actions: [
-          IconButton(
-            tooltip: s.scnAddAppt,
-            icon: const Icon(Icons.add_circle_outline_rounded),
-            onPressed: () => _addAppt(s),
-          ),
-        ],
-      ),
+      backgroundColor: pal.ground,
+      // Kept for revert: the title in the app bar,
+      //   title: Text(s.scnTitle, style: pvJakarta(
+      //       fontWeight: FontWeight.w700, color: AppTheme.neutral900)),
+      appBar: _pregAppBar(actions: [
+        IconButton(
+          tooltip: s.scnAddAppt,
+          // A plain add, the line icon for a control. Kept for revert:
+          // `Icons.add_circle_outline_rounded`.
+          icon: const Icon(Icons.add_rounded),
+          onPressed: () => _addAppt(s),
+        ),
+      ]),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
+        padding: const EdgeInsets.fromLTRB(20, 4, 20, 40),
         children: [
+          Semantics(
+            header: true,
+            child: Text(s.scnTitle, style: pregPageTitleStyle()),
+          ),
+          const SizedBox(height: 18),
           _segmented(s),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           if (_tab == 0) ..._upcoming(s) else ..._completed(s),
         ],
       ),
     );
   }
 
+  // The chosen tab is the one ink with white words, on a white track with the
+  // hairline. Kept for revert: the teal fill on a shadowed white track.
   Widget _segmented(S s) {
     // Care roadmap removed - Roadmap tab dropped. _roadmap/_roadmapRow kept
     // (ignore: unused_element) for revert.
+    final pal = pvStorePalette;
     final tabs = [s.scnTabUpcoming, s.scnTabCompleted];
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: _soft,
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: kPvLine),
       ),
       child: Row(children: [
         for (int i = 0; i < tabs.length; i++)
           Expanded(
-            child: GestureDetector(
-              onTap: () => setState(() => _tab = i),
-              behavior: HitTestBehavior.opaque,
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 180),
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: _tab == i ? _scanColor : Colors.transparent,
-                  borderRadius: BorderRadius.circular(12),
+            child: Semantics(
+              button: true,
+              selected: _tab == i,
+              child: GestureDetector(
+                onTap: () => setState(() => _tab = i),
+                behavior: HitTestBehavior.opaque,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 180),
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: _tab == i ? kPvInk : Colors.transparent,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Text(tabs[i],
+                      textAlign: TextAlign.center,
+                      style: pvManrope(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w700,
+                          color: _tab == i ? Colors.white : pal.ink2)),
                 ),
-                child: Text(tabs[i],
-                    textAlign: TextAlign.center,
-                    style: pvManrope(
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w700,
-                        color: _tab == i ? Colors.white : AppTheme.neutral600)),
               ),
             ),
           ),
@@ -140,75 +211,78 @@ class _ScansAppointmentsScreenState extends State<ScansAppointmentsScreen> {
     }
     if (upcomingScans.isNotEmpty) {
       out.add(_nextUpHero(s, lang, upcomingScans.first));
-      out.add(const SizedBox(height: 14));
-      for (final m in upcomingScans.skip(1)) {
-        out.add(_scanRow(s, lang, m));
+      if (upcomingScans.length > 1) {
+        out.add(const SizedBox(height: 14));
+        // One white card of rows (the TTC list). Kept for revert: each scan
+        // was its own shadowed card, 10 apart.
+        out.add(PregRowCard(children: [
+          for (final m in upcomingScans.skip(1)) _scanRow(s, lang, m),
+        ]));
       }
     }
     if (appts.isNotEmpty) {
-      out.add(const SizedBox(height: 8));
-      out.add(_sectionTitle(s.scnAppts));
-      out.add(const SizedBox(height: 8));
-      for (final a in appts) {
-        out.add(_apptRow(s, a));
-      }
+      out.add(const SizedBox(height: 26));
+      // A page section: the one serif heading. Kept for revert:
+      //   out.add(_sectionTitle(s.scnAppts));
+      out.add(PregSectionHeading(s.scnAppts));
+      out.add(const SizedBox(height: 12));
+      out.add(_loggedCard([for (final a in appts) _apptRow(s, a)]));
     }
     return out;
   }
 
+  // The next scan: a white card with the hairline, a group label, the name in
+  // the serif, the one ink button and an outlined second. Kept for revert: a
+  // teal-to-white gradient card with a teal eyebrow, the scan's emoji before
+  // its name, a teal filled "Learn more".
   Widget _nextUpHero(S s, AppLanguage lang, JourneyMilestone m) {
+    final pal = pvStorePalette;
     final n = _scanDate(m).difference(DateTime(
             DateTime.now().year, DateTime.now().month, DateTime.now().day))
         .inDays;
     final why = m.sections.isNotEmpty ? m.sections.first.body.of(lang) : '';
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [_scanColor.withValues(alpha: 0.14), AppTheme.surface],
-        ),
-        borderRadius: BorderRadius.circular(22),
-        boxShadow: _soft,
-      ),
+    return PregCard(
+      padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(s.scnNextUp,
-            style: pvManrope(
-                fontSize: 11,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 0.8,
-                color: _scanColor)),
-        const SizedBox(height: 6),
-        Text('${m.emoji} ${m.title.of(lang)}',
+        Row(children: [
+          PvMarkWell(p: pal, hue: _kHue, size: 40, mark: IntentMark.scanFan),
+          const SizedBox(width: 12),
+          Expanded(child: Text(s.scnNextUp, style: pregGroupLabelStyle())),
+        ]),
+        const SizedBox(height: 12),
+        // No emoji before the name (no decorative emoji in chrome). Kept for
+        // revert: Text('${m.emoji} ${m.title.of(lang)}', ...).
+        Text(m.title.of(lang),
             style: pvFraunces(
                 fontSize: 22,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.neutral900)),
-        const SizedBox(height: 2),
+                fontWeight: FontWeight.w600,
+                height: 1.2,
+                letterSpacing: -0.3,
+                color: pal.ink1)),
+        const SizedBox(height: 4),
         Text(
             '${m.rangeLabel?.of(lang) ?? s.jrWeekLabel(m.anchorWeek)} · ${s.calInDays(n < 0 ? 0 : n)}',
             style: pvManrope(
-                fontSize: 12.5,
-                fontWeight: FontWeight.w600,
-                color: AppTheme.neutral600)),
+                fontSize: 12.5, fontWeight: FontWeight.w600, color: pal.ink2)),
         if (why.isNotEmpty) ...[
           const SizedBox(height: 10),
           Text(why,
-              style: pvManrope(
-                  fontSize: 13.5, height: 1.5, color: AppTheme.neutral700)),
+              style: pvManrope(fontSize: 13.5, height: 1.5, color: pal.ink2)),
         ],
-        const SizedBox(height: 14),
+        const SizedBox(height: 16),
         Row(children: [
           Expanded(
             child: FilledButton(
-              style: FilledButton.styleFrom(backgroundColor: _scanColor),
+              style: pregFilledStyle(),
               onPressed: () => _openScan(s, m),
-              child: Text(s.scnLearnMore),
+              // ⚠️ THE LABEL NAMES WHAT IT OPENS: the scan's own page. Hindi
+              // keeps its words. Kept for revert: Text(s.scnLearnMore).
+              child: Text(lang.isHindi ? s.scnLearnMore : 'About this scan'),
             ),
           ),
           const SizedBox(width: 10),
           OutlinedButton(
+            style: _pregOutlineStyle(),
             onPressed: () => _markDone(s, m),
             child: Text(s.scnMarkDone),
           ),
@@ -217,56 +291,26 @@ class _ScansAppointmentsScreenState extends State<ScansAppointmentsScreen> {
     );
   }
 
+  // A row that opens the scan: the scan's fan in the Track hue, the name, its
+  // window. Kept for revert: a shadowed card with a teal-tinted line icon
+  // (`Icons.medical_services_rounded`, or a check when completed).
   Widget _scanRow(S s, AppLanguage lang, JourneyMilestone m) {
     final completed = ScansStore.instance.isCompleted(m.id);
-    return GestureDetector(
+    return PregOfferRow(
+      mark: completed ? IntentMark.checkMark : IntentMark.scanFan,
+      hue: _kHue,
+      title: m.title.of(lang),
+      line: m.rangeLabel?.of(lang) ?? s.jrWeekLabel(m.anchorWeek),
       onTap: () => _openScan(s, m),
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 10),
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: AppTheme.surface,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: _soft,
-        ),
-        child: Row(children: [
-          Container(
-            width: 40,
-            height: 40,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-                color: _scanColor.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(12)),
-            child: completed
-                ? const Icon(Icons.check_rounded, color: _scanColor, size: 20)
-                : const Icon(Icons.medical_services_rounded,
-                    color: _scanColor, size: 19),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(m.title.of(lang),
-                    style: pvJakarta(
-                        fontSize: 14.5,
-                        fontWeight: FontWeight.w700,
-                        color: AppTheme.neutral900)),
-                Text(m.rangeLabel?.of(lang) ?? s.jrWeekLabel(m.anchorWeek),
-                    style: pvManrope(
-                        fontSize: 12, color: AppTheme.neutral500)),
-              ],
-            ),
-          ),
-          const Icon(Icons.chevron_right_rounded, color: AppTheme.neutral400),
-        ]),
-      ),
     );
   }
 
   // --- Completed -------------------------------------------------------------
+  // Logged data: a small tick glyph, the name, the date. One white card of
+  // rows. Kept for revert: a shadowed card per scan with a teal check.
   List<Widget> _completed(S s) {
     final lang = p.language;
+    final pal = pvStorePalette;
     final scans = _allScans()
         .where((m) => ScansStore.instance.isCompleted(m.id))
         .toList();
@@ -274,35 +318,35 @@ class _ScansAppointmentsScreenState extends State<ScansAppointmentsScreen> {
         .where((a) => a.date.isBefore(DateTime.now()))
         .toList();
     if (scans.isEmpty && doneAppts.isEmpty) return [_note(s.scnNoCompleted)];
-    final out = <Widget>[];
-    for (final m in scans) {
-      final c = ScansStore.instance.completedOf(m.id);
-      final d = DateTime.tryParse(c?.dateIso ?? '');
-      out.add(Container(
-        margin: const EdgeInsets.only(bottom: 10),
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-            color: AppTheme.surface,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: _soft),
-        child: Row(children: [
-          const Icon(Icons.check_circle_rounded, color: _scanColor, size: 22),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(m.title.of(lang),
-                style: pvJakarta(
-                    fontSize: 14.5,
-                    fontWeight: FontWeight.w700,
-                    color: AppTheme.neutral900)),
-          ),
-          if (d != null)
-            Text(s.formatShortDate(d),
-                style: pvManrope(
-                    fontSize: 11.5, color: AppTheme.neutral500)),
-        ]),
-      ));
-    }
-    return out;
+    // ⚠️ UNCHANGED: past appointments only decide whether the empty line
+    // shows; the list itself was only ever the completed scans.
+    if (scans.isEmpty) return const [];
+    return [
+      _loggedCard([
+        for (final m in scans)
+          Builder(builder: (context) {
+            final c = ScansStore.instance.completedOf(m.id);
+            final d = DateTime.tryParse(c?.dateIso ?? '');
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+              child: Row(children: [
+                Icon(Icons.check_circle_rounded, color: pal.ink1, size: 20),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(m.title.of(lang),
+                      style: pvManrope(
+                          fontSize: 14.5,
+                          fontWeight: FontWeight.w700,
+                          color: pal.ink1)),
+                ),
+                if (d != null)
+                  Text(s.formatShortDate(d),
+                      style: pvManrope(fontSize: 12, color: pal.ink3)),
+              ]),
+            );
+          }),
+      ]),
+    ];
   }
 
   // --- Roadmap (removed from the UI; kept for revert) ------------------------
@@ -404,68 +448,53 @@ class _ScansAppointmentsScreenState extends State<ScansAppointmentsScreen> {
   }
 
   // --- helpers ---------------------------------------------------------------
+  // Kept for revert: the Jakarta 15 heading, replaced by `PregSectionHeading`.
+  // ignore: unused_element
   Widget _sectionTitle(String t) => Text(t,
       style: pvJakarta(
           fontSize: 15, fontWeight: FontWeight.w700, color: AppTheme.neutral900));
 
+  // An appointment is logged data: a small glyph, not a drawn mark, inside the
+  // white card. Kept for revert: a shadowed card with a green-tinted icon well
+  // and an X to delete (an X only closes now; delete is the bin).
   Widget _apptRow(S s, Appointment a) {
+    final pal = pvStorePalette;
     final sub = [a.time, a.location, a.doctor]
         .where((x) => x.trim().isNotEmpty)
         .join(' · ');
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-          color: AppTheme.surface,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: _soft),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 10, 4, 10),
       child: Row(children: [
-        Container(
-          width: 40,
-          height: 40,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-              color: const Color(0xFF4F7A52).withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(12)),
-          child: const Icon(Icons.event_available_rounded,
-              color: Color(0xFF4F7A52), size: 19),
-        ),
+        Icon(Icons.event_available_outlined, color: pal.ink2, size: 20),
         const SizedBox(width: 12),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(a.title,
-                  style: pvJakarta(
-                      fontSize: 14,
+                  style: pvManrope(
+                      fontSize: 14.5,
                       fontWeight: FontWeight.w700,
-                      color: AppTheme.neutral900)),
+                      color: pal.ink1)),
+              const SizedBox(height: 2),
               Text('${s.formatShortDate(a.date)}${sub.isNotEmpty ? ' · $sub' : ''}',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: pvManrope(
-                      fontSize: 12, color: AppTheme.neutral500)),
+                  style: pvManrope(fontSize: 12.5, color: pal.ink3)),
             ],
           ),
         ),
         IconButton(
-          icon: const Icon(Icons.close_rounded,
-              size: 18, color: AppTheme.neutral400),
+          icon: Icon(Icons.delete_outline_rounded, size: 20, color: pal.ink3),
           onPressed: () => ScansStore.instance.deleteAppointment(a.id),
         ),
       ]),
     );
   }
 
-  Widget _note(String msg) => Padding(
-        padding: const EdgeInsets.fromLTRB(20, 40, 20, 20),
-        child: Center(
-          child: Text(msg,
-              textAlign: TextAlign.center,
-              style: pvManrope(
-                  fontSize: 13.5, height: 1.5, color: AppTheme.neutral500)),
-        ),
-      );
+  // An empty tab still draws its card, with the line in it (a feature is
+  // never hidden). Kept for revert: the line alone, centred, 40 down.
+  Widget _note(String msg) => PregRowCard(empty: msg, children: const []);
 
   void _markDone(S s, JourneyMilestone m) {
     ScansStore.instance.markCompleted(
@@ -490,6 +519,7 @@ class _ScansAppointmentsScreenState extends State<ScansAppointmentsScreen> {
     final notesCtrl = TextEditingController();
     var type = ApptType.doctor;
     var date = DateTime.now();
+    final pal = pvStorePalette;
 
     String typeLabel(ApptType t) => switch (t) {
           ApptType.doctor => s.scnTypeDoctor,
@@ -508,7 +538,7 @@ class _ScansAppointmentsScreenState extends State<ScansAppointmentsScreen> {
           padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
           child: Container(
             decoration: const BoxDecoration(
-              color: AppTheme.surface,
+              color: Colors.white,
               borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
             ),
             padding: const EdgeInsets.fromLTRB(20, 14, 20, 20),
@@ -522,40 +552,28 @@ class _ScansAppointmentsScreenState extends State<ScansAppointmentsScreen> {
                         width: 40,
                         height: 4,
                         decoration: BoxDecoration(
-                            color: AppTheme.neutral300,
+                            color: kPvLine,
                             borderRadius: BorderRadius.circular(99))),
                   ),
                   const SizedBox(height: 16),
                   Text(s.scnAddAppt,
-                      style: pvJakarta(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                          color: AppTheme.neutral900)),
-                  const SizedBox(height: 12),
+                      style: pvFraunces(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w600,
+                          height: 1.2,
+                          color: pal.ink1)),
+                  const SizedBox(height: 14),
+                  // The store's hairline chip, ink when chosen. Kept for
+                  // revert: a hand-drawn pill, teal when chosen.
                   Wrap(spacing: 8, runSpacing: 8, children: [
                     for (final t in ApptType.values)
-                      GestureDetector(
+                      PvChip(
+                        label: typeLabel(t),
+                        selected: type == t,
                         onTap: () => setSheet(() => type = t),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: type == t
-                                ? _scanColor
-                                : AppTheme.surfaceContainer,
-                            borderRadius: BorderRadius.circular(99),
-                          ),
-                          child: Text(typeLabel(t),
-                              style: pvManrope(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w700,
-                                  color: type == t
-                                      ? Colors.white
-                                      : AppTheme.neutral700)),
-                        ),
                       ),
                   ]),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
                   _field(s.scnApptTitle, titleCtrl),
                   InkWell(
                     borderRadius: BorderRadius.circular(14),
@@ -573,15 +591,15 @@ class _ScansAppointmentsScreenState extends State<ScansAppointmentsScreen> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 14),
                       decoration: BoxDecoration(
-                          color: AppTheme.surfaceContainer,
+                          color: Colors.white,
+                          border: Border.all(color: kPvLine),
                           borderRadius: BorderRadius.circular(14)),
                       child: Row(children: [
-                        const Icon(Icons.calendar_today_rounded,
-                            size: 18, color: _scanColor),
+                        Icon(Icons.calendar_today_rounded,
+                            size: 18, color: pal.ink2),
                         const SizedBox(width: 12),
                         Text(s.formatLongDate(date),
-                            style: pvManrope(
-                                fontSize: 13.5, color: AppTheme.neutral900)),
+                            style: pvManrope(fontSize: 13.5, color: pal.ink1)),
                       ]),
                     ),
                   ),
@@ -593,7 +611,7 @@ class _ScansAppointmentsScreenState extends State<ScansAppointmentsScreen> {
                   SizedBox(
                     width: double.infinity,
                     child: FilledButton(
-                      style: FilledButton.styleFrom(backgroundColor: _scanColor),
+                      style: pregFilledStyle(),
                       onPressed: () {
                         final t = titleCtrl.text.trim();
                         if (t.isEmpty) {
@@ -624,22 +642,32 @@ class _ScansAppointmentsScreenState extends State<ScansAppointmentsScreen> {
     );
   }
 
-  Widget _field(String hint, TextEditingController c, {int max = 1}) => Padding(
-        padding: const EdgeInsets.only(bottom: 10),
-        child: TextField(
-          controller: c,
-          minLines: 1,
-          maxLines: max,
-          decoration: InputDecoration(
-            hintText: hint,
-            filled: true,
-            fillColor: AppTheme.surfaceContainer,
-            border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide: BorderSide.none),
-          ),
+  // A white field with the hairline, ink when focused. Kept for revert: a
+  // filled grey field with no border (a tint behind text).
+  Widget _field(String hint, TextEditingController c, {int max = 1}) {
+    final pal = pvStorePalette;
+    OutlineInputBorder b(Color color, [double w = 1]) => OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide(color: color, width: w));
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: TextField(
+        controller: c,
+        minLines: 1,
+        maxLines: max,
+        style: pvManrope(fontSize: 14.5, color: pal.ink1),
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: pvManrope(fontSize: 14, color: pal.ink3),
+          filled: true,
+          fillColor: Colors.white,
+          border: b(kPvLine),
+          enabledBorder: b(kPvLine),
+          focusedBorder: b(kPvInk, 1.4),
         ),
-      );
+      ),
+    );
+  }
 }
 
 // =============================================================================
@@ -664,76 +692,73 @@ class _ScanDetail extends StatelessWidget {
     final m = milestone;
     final completed = ScansStore.instance.isCompleted(m.id);
     final guide = kScanGuides[m.id];
+    final pal = pvStorePalette;
+    final blocks = <Widget>[
+      for (final sec in m.sections)
+        if (sec.body.of(lang).trim().isNotEmpty)
+          _block(sec.label.of(lang), sec.body.of(lang)),
+      for (final b in m.bullets) _bulletBlock(b.label.of(lang), b, lang),
+    ];
 
     return Scaffold(
-      backgroundColor: AppTheme.surfaceContainer,
-      appBar: AppBar(
-        backgroundColor: AppTheme.surfaceContainer,
-        title: Text(m.title.of(lang),
-            style: pvJakarta(
-                fontWeight: FontWeight.w700, color: AppTheme.neutral900)),
-      ),
+      backgroundColor: pal.ground,
+      // ⚠️ THE NAME IS SAID ONCE. It was in the app bar and again, with its
+      // emoji, beside a teal icon well a centimetre below. Kept for revert:
+      //   title: Text(m.title.of(lang), style: pvJakarta(
+      //       fontWeight: FontWeight.w700, color: AppTheme.neutral900)),
+      appBar: _pregAppBar(),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
+        padding: const EdgeInsets.fromLTRB(20, 4, 20, 40),
         children: [
-          Row(children: [
-            Container(
-              width: 46,
-              height: 46,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                  color: _scanColor.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(13)),
-              child: const Icon(Icons.medical_services_rounded,
-                  color: _scanColor, size: 22),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text('${m.emoji} ${m.title.of(lang)}',
-                  style: pvFraunces(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w500,
-                      color: AppTheme.neutral900)),
-            ),
-          ]),
+          // The scan's drawn mark over the serif title. Kept for revert: a
+          // teal-tinted `Icons.medical_services_rounded` well beside
+          // Text('${m.emoji} ${m.title.of(lang)}') in Fraunces 22.
+          PvMarkWell(p: pal, hue: _kHue, size: 48, mark: IntentMark.scanFan),
+          const SizedBox(height: 14),
+          Semantics(
+            header: true,
+            child: Text(m.title.of(lang), style: pregPageTitleStyle()),
+          ),
           const SizedBox(height: 18),
           // "What is this scan?" - a plain-language intro at the very top.
           if (guide != null) ...[
             _whatIsCard(s, guide.whatIs.of(lang)),
-            const SizedBox(height: 18),
+            const SizedBox(height: 12),
           ],
-          for (final sec in m.sections)
-            if (sec.body.of(lang).trim().isNotEmpty)
-              _block(sec.label.of(lang), sec.body.of(lang)),
-          for (final b in m.bullets) _bulletBlock(b.label.of(lang), b, lang),
-          // Important note.
-          Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-                color: AppTheme.surfaceContainerHigh,
-                borderRadius: BorderRadius.circular(14)),
-            child: Text(s.scnImportantNote,
-                style: pvManrope(
-                    fontSize: 12.5, height: 1.5, color: AppTheme.neutral700)),
-          ),
-          const SizedBox(height: 18),
+          // The rest of the scan's page, in one white card with a group label
+          // over each part. Kept for revert: each part on the page with a
+          // teal caps label.
+          if (blocks.isNotEmpty) ...[
+            PregCard(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 2),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: blocks),
+            ),
+            const SizedBox(height: 16),
+          ],
+          // Important note: a quiet note on the page. Kept for revert: the
+          // same words on a grey block (`AppTheme.surfaceContainerHigh`).
+          PregNote(s.scnImportantNote),
+          const SizedBox(height: 20),
           // "How to interpret the report" → full-screen guide (with disclaimer).
           if (guide != null && guide.interpret.isNotEmpty) ...[
             _interpretCta(context, s, m, guide, lang),
-            const SizedBox(height: 14),
+            const SizedBox(height: 16),
           ],
           SizedBox(
             width: double.infinity,
             child: completed
                 ? OutlinedButton.icon(
+                    style: _pregOutlineStyle(),
                     onPressed: () =>
                         ScansStore.instance.unmarkCompleted(m.id),
                     icon: const Icon(Icons.check_circle_rounded,
-                        size: 18, color: _scanColor),
+                        size: 18, color: kPvInk),
                     label: Text(s.scnMarkedDone),
                   )
                 : FilledButton.icon(
-                    style: FilledButton.styleFrom(backgroundColor: _scanColor),
+                    style: pregFilledStyle(),
                     onPressed: () {
                       ScansStore.instance.markCompleted(
                         scanId: m.id,
@@ -751,120 +776,81 @@ class _ScanDetail extends StatelessWidget {
     );
   }
 
-  Widget _block(String label, String body) => Padding(
-        padding: const EdgeInsets.only(bottom: 16),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          if (label.trim().isNotEmpty) ...[
-            Text(label,
-                style: pvManrope(
-                    fontSize: 11.5,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 0.3,
-                    color: _scanColor)),
-            const SizedBox(height: 4),
-          ],
-          Text(body,
-              style: pvManrope(
-                  fontSize: 14, height: 1.5, color: AppTheme.neutral700)),
-        ]),
-      );
+  Widget _block(String label, String body) {
+    final pal = pvStorePalette;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        if (label.trim().isNotEmpty) ...[
+          Text(label.toUpperCase(), style: pregGroupLabelStyle()),
+          const SizedBox(height: 5),
+        ],
+        Text(body, style: pvManrope(fontSize: 14, height: 1.5, color: pal.ink1)),
+      ]),
+    );
+  }
 
-  Widget _bulletBlock(String label, BulletBlock b, AppLanguage lang) => Padding(
-        padding: const EdgeInsets.only(bottom: 16),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(label,
-              style: pvManrope(
-                  fontSize: 11.5,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 0.3,
-                  color: _scanColor)),
-          const SizedBox(height: 6),
-          for (final item in b.items)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 6),
-              child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                const Padding(
-                  padding: EdgeInsets.only(top: 6, right: 8),
-                  child: Icon(Icons.circle, size: 5, color: _scanColor),
-                ),
-                Expanded(
-                  child: Text(item.of(lang),
-                      style: pvManrope(
-                          fontSize: 14, height: 1.5, color: AppTheme.neutral700)),
-                ),
-              ]),
-            ),
-        ]),
-      );
+  Widget _bulletBlock(String label, BulletBlock b, AppLanguage lang) {
+    final pal = pvStorePalette;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(label.toUpperCase(), style: pregGroupLabelStyle()),
+        const SizedBox(height: 6),
+        for (final item in b.items)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 6),
+            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 6, right: 8),
+                child: Icon(Icons.circle, size: 5, color: pal.ink3),
+              ),
+              Expanded(
+                child: Text(item.of(lang),
+                    style: pvManrope(fontSize: 14, height: 1.5, color: pal.ink1)),
+              ),
+            ]),
+          ),
+      ]),
+    );
+  }
 
-  // "What is this scan?" intro card (shown at the very top).
-  Widget _whatIsCard(S s, String body) => Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: _scanColor.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: _scanColor.withValues(alpha: 0.16)),
-        ),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [
-            const Icon(Icons.info_outline_rounded, size: 18, color: _scanColor),
-            const SizedBox(width: 8),
-            Text(s.scnWhatIs,
-                style: pvJakarta(
-                    fontSize: 14.5,
-                    fontWeight: FontWeight.w800,
-                    color: _scanColor)),
-          ]),
-          const SizedBox(height: 8),
-          Text(body,
-              style: pvManrope(
-                  fontSize: 14, height: 1.55, color: AppTheme.neutral800)),
-        ]),
-      );
+  // "What is this scan?" intro card (shown at the very top): a white card with
+  // the hairline. Kept for revert: a teal-tinted block with a teal info icon
+  // and a teal title (a tint behind text).
+  Widget _whatIsCard(S s, String body) {
+    final pal = pvStorePalette;
+    return PregCard(
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(s.scnWhatIs,
+            style: pvManrope(
+                fontSize: 15, fontWeight: FontWeight.w700, color: pal.ink1)),
+        const SizedBox(height: 6),
+        Text(body, style: pvManrope(fontSize: 14, height: 1.55, color: pal.ink2)),
+      ]),
+    );
+  }
 
-  // "How to interpret the report" → opens the full-screen guide.
+  // "How to interpret the report" → opens the full guide: a row that opens
+  // somewhere, so a drawn mark (the report's page). Kept for revert: a white
+  // card with a teal border and a teal `Icons.fact_check_rounded`.
   Widget _interpretCta(BuildContext context, S s, JourneyMilestone m,
           ScanGuide guide, AppLanguage lang) =>
-      Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(16),
+      PregRowCard(children: [
+        PregOfferRow(
+          mark: IntentMark.reportPage,
+          hue: _kHue,
+          title: s.scnHowToInterpret,
+          line: s.scnInterpretSub,
           onTap: () => Navigator.of(context).push(MaterialPageRoute(
-            fullscreenDialog: true,
+            // ⚠️ A PUSHED PAGE GOES BACK WITH AN ARROW (2026-09-30). It was a
+            // `fullscreenDialog`, whose app bar draws an X, on a page opened
+            // from the scan's own. Kept for revert: fullscreenDialog: true,
             builder: (_) => _ScanInterpretScreen(
                 controller: controller, milestone: m, guide: guide),
           )),
-          child: Ink(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppTheme.surface,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: _scanColor.withValues(alpha: 0.4)),
-            ),
-            child: Row(children: [
-              const Icon(Icons.fact_check_rounded, color: _scanColor),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(s.scnHowToInterpret,
-                          style: pvJakarta(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w800,
-                              color: AppTheme.neutral900)),
-                      const SizedBox(height: 2),
-                      Text(s.scnInterpretSub,
-                          style: pvManrope(
-                              fontSize: 12.5, color: AppTheme.neutral600)),
-                    ]),
-              ),
-              const Icon(Icons.chevron_right_rounded,
-                  color: AppTheme.neutral400),
-            ]),
-          ),
         ),
-      );
+      ]);
 }
 
 // ---------------------------------------------------------------------------
@@ -881,82 +867,83 @@ class _ScanInterpretScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final s = S(controller.language);
     final lang = controller.language;
+    final pal = pvStorePalette;
     return Scaffold(
-      backgroundColor: AppTheme.surfaceContainer,
-      appBar: AppBar(
-        backgroundColor: _scanColor,
-        foregroundColor: Colors.white,
-        title: Text(s.scnHowToInterpret),
-      ),
+      backgroundColor: pal.ground,
+      // Kept for revert: a teal app bar with white words,
+      //   AppBar(backgroundColor: _scanColor, foregroundColor: Colors.white,
+      //       title: Text(s.scnHowToInterpret)),
+      appBar: _pregAppBar(),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+        padding: const EdgeInsets.fromLTRB(20, 4, 20, 40),
         children: [
-          Text('${milestone.emoji} ${milestone.title.of(lang)}',
-              style: pvFraunces(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w500,
-                  color: AppTheme.neutral900)),
+          Semantics(
+            header: true,
+            child: Text(s.scnHowToInterpret, style: pregPageTitleStyle()),
+          ),
+          const SizedBox(height: 6),
+          // The scan, named once, without its emoji. Kept for revert:
+          // Text('${milestone.emoji} ${milestone.title.of(lang)}') in the serif.
+          Text(milestone.title.of(lang),
+              style: pvManrope(
+                  fontSize: 15, fontWeight: FontWeight.w700, color: pal.ink1)),
           const SizedBox(height: 4),
           Text(s.scnInterpretHeading,
-              style:
-                  pvManrope(fontSize: 13, color: AppTheme.neutral600)),
+              style: pvManrope(fontSize: 13, height: 1.45, color: pal.ink2)),
           const SizedBox(height: 16),
-          // BIG, unmissable "not for diagnosis" disclaimer.
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: const Color(0xFFFFF6E9),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0x33D9822B)),
-            ),
+          // BIG, unmissable "not for diagnosis" disclaimer: a white card with
+          // the hairline, first on the page, so it is read before the terms.
+          // Kept for revert: an amber block (0xFFFFF6E9) with amber words.
+          PregCard(
             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const Icon(Icons.health_and_safety_outlined,
-                  size: 22, color: Color(0xFFB36B12)),
+              Icon(Icons.health_and_safety_outlined, size: 22, color: pal.ink1),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(s.scnInterpretDisclaimerTitle,
-                          style: pvJakarta(
+                          style: pvManrope(
                               fontSize: 14.5,
                               fontWeight: FontWeight.w800,
-                              color: const Color(0xFFB36B12))),
+                              color: pal.ink1)),
                       const SizedBox(height: 4),
                       Text(s.scnInterpretDisclaimer,
                           style: pvManrope(
-                              fontSize: 12.5,
-                              height: 1.5,
-                              color: AppTheme.neutral800)),
+                              fontSize: 12.5, height: 1.5, color: pal.ink2)),
                     ]),
               ),
             ]),
           ),
-          const SizedBox(height: 18),
-          for (final row in guide.interpret) _interpretRow(row, lang),
+          const SizedBox(height: 16),
+          // Every term in one white card, hairlines between. Kept for revert:
+          // a bordered box per term, the term in teal.
+          PregCard(
+            padding: EdgeInsets.zero,
+            child: Column(children: [
+              for (var i = 0; i < guide.interpret.length; i++) ...[
+                if (i > 0) const Divider(height: 1, thickness: 1, color: kPvLine),
+                _interpretRow(guide.interpret[i], lang),
+              ],
+            ]),
+          ),
         ],
       ),
     );
   }
 
-  Widget _interpretRow(ScanInterpretRow row, AppLanguage lang) => Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: AppTheme.surface,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppTheme.outlineVariant),
-        ),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(row.term.of(lang),
-              style: pvJakarta(
-                  fontSize: 14.5,
-                  fontWeight: FontWeight.w800,
-                  color: _scanColor)),
-          const SizedBox(height: 4),
-          Text(row.meaning.of(lang),
-              style: pvManrope(
-                  fontSize: 14, height: 1.5, color: AppTheme.neutral800)),
-        ]),
-      );
+  Widget _interpretRow(ScanInterpretRow row, AppLanguage lang) {
+    final pal = pvStorePalette;
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(row.term.of(lang),
+            style: pvManrope(
+                fontSize: 14.5, fontWeight: FontWeight.w800, color: pal.ink1)),
+        const SizedBox(height: 4),
+        Text(row.meaning.of(lang),
+            style: pvManrope(fontSize: 14, height: 1.5, color: pal.ink2)),
+      ]),
+    );
+  }
 }

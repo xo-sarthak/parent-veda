@@ -21,7 +21,11 @@ import '../theme/app_theme.dart';
 import '../widgets/journal/journal_create.dart';
 import '../widgets/storage_image.dart';
 import '../theme/pv_fonts.dart';
+import 'brackets/hub/hub_intent_art.dart' show IntentMark;
+import 'doors/pv_list_row.dart' show PvMarkWell;
 import 'journal_compose_screen.dart';
+import 'pregnancy/preg_chrome.dart' show pregGroupLabelStyle;
+import 'products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 
 export 'journal/pv_journal_screen.dart' show JournalScreen;
 
@@ -34,6 +38,18 @@ enum _GroupBy { month, week }
 /// A journal entry tagged with its author, for the Combined (you + Dad) booklet.
 /// `father == false` covers the mother's own entries (manual + auto).
 typedef _AE = ({JournalEntry e, bool father});
+
+/// A type's colour for its small glyph, never the retired violet.
+///
+/// Milestones and custom tags wear `AppTheme`'s brand violet in
+/// `kJournalMeta` (models/journal_entry.dart, not this file's to change), and
+/// no pregnancy screen may show it (one ParentVeda, 2026-09-30). Here they
+/// wear the one ink; every other type keeps its gentle colour, which is
+/// information (what kind of entry this is), not chrome.
+Color _tone(JournalEntryType t) => switch (t) {
+      JournalEntryType.milestone || JournalEntryType.custom => kPvInk,
+      _ => metaFor(t).color,
+    };
 
 /// ⚠️ THE PREVIOUS JOURNAL, KEPT (2026-09-23). `JournalScreen` is now the
 /// redrawn journal in `journal/pv_journal_screen.dart` — exported from this
@@ -79,15 +95,19 @@ class _JournalScreenState extends State<JournalScreenClassic> {
 
   PregnancyController get p => widget.controller;
 
-  static const List<BoxShadow> _soft = [
-    BoxShadow(color: Color(0x0F2D144C), blurRadius: 12, offset: Offset(0, 3)),
-  ];
+  // Kept for revert (2026-09-30, one ParentVeda: hairlines, not shadows, on
+  // everything on the page):
+  // static const List<BoxShadow> _soft = [
+  //   BoxShadow(color: Color(0x0F2D144C), blurRadius: 12, offset: Offset(0, 3)),
+  // ];
 
-  // A warmer, deeper shadow so a booklet page reads as a real sheet of paper
-  // resting on the backdrop (keeps even a sparse page feeling tactile).
+  // A booklet page still lifts off the ground a little, so the book reads as
+  // sheets of paper; the shadow is neutral now, not the warm tan of the linen
+  // desk it used to rest on. Kept for revert:
+  //   BoxShadow(color: Color(0x336B4E2E), blurRadius: 22, offset: Offset(0, 12)),
+  //   BoxShadow(color: Color(0x16000000), blurRadius: 5, offset: Offset(0, 2)),
   static const List<BoxShadow> _paperShadow = [
-    BoxShadow(color: Color(0x336B4E2E), blurRadius: 22, offset: Offset(0, 12)),
-    BoxShadow(color: Color(0x16000000), blurRadius: 5, offset: Offset(0, 2)),
+    BoxShadow(color: Color(0x14000000), blurRadius: 18, offset: Offset(0, 8)),
   ];
 
   @override
@@ -156,10 +176,15 @@ class _JournalScreenState extends State<JournalScreenClassic> {
     }
     final list = items.toList();
 
+    // A white page, as every stage's pages are now: the grey ground was the
+    // one tinted block this screen laid behind all of its text.
+    // Kept for revert: backgroundColor: AppTheme.surfaceContainer (both).
     return Scaffold(
-      backgroundColor: AppTheme.surfaceContainer,
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: AppTheme.surfaceContainer,
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
+        foregroundColor: kPvInk,
         title: _searching
             ? TextField(
                 controller: _searchCtrl,
@@ -171,8 +196,11 @@ class _JournalScreenState extends State<JournalScreenClassic> {
                 ),
               )
             : Text(s.jrTitle,
-                style: pvJakarta(
-                    fontWeight: FontWeight.w700, color: AppTheme.neutral900)),
+                style: pvFraunces(
+                    fontSize: 21,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: -0.3,
+                    color: kPvInk)),
         actions: [
           if (!_searching && !_combined)
             IconButton(
@@ -244,7 +272,7 @@ class _JournalScreenState extends State<JournalScreenClassic> {
       // spilling out of the button).
       floatingActionButton: FloatingActionButton(
         onPressed: () => _openCreate(s),
-        backgroundColor: AppTheme.neutral900,
+        backgroundColor: kPvInk,
         child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
       ),
     );
@@ -290,7 +318,7 @@ class _JournalScreenState extends State<JournalScreenClassic> {
               style: pvManrope(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
-                  color: AppTheme.neutral500)),
+                  color: pvStorePalette.ink2)),
           const SizedBox(width: 10),
           _seg(s.jrByMonth, _groupBy == _GroupBy.month,
               () => _setGroupBy(_GroupBy.month)),
@@ -306,21 +334,18 @@ class _JournalScreenState extends State<JournalScreenClassic> {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 160),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+          // The chosen one is the one ink, white words; the other a hairline.
+          // Kept for revert: a 12% ink tint with a 40% ink edge when chosen.
           decoration: BoxDecoration(
-            color: sel
-                ? AppTheme.neutral900.withValues(alpha: 0.12)
-                : Colors.transparent,
+            color: sel ? kPvInk : Colors.white,
             borderRadius: BorderRadius.circular(99),
-            border: Border.all(
-                color: sel
-                    ? AppTheme.neutral900.withValues(alpha: 0.4)
-                    : AppTheme.outlineVariant),
+            border: Border.all(color: sel ? kPvInk : kPvLine),
           ),
           child: Text(label,
               style: pvManrope(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
-                  color: sel ? AppTheme.neutral900 : AppTheme.neutral500)),
+                  color: sel ? Colors.white : pvStorePalette.ink1)),
         ),
       );
 
@@ -418,18 +443,16 @@ class _JournalScreenState extends State<JournalScreenClassic> {
           crossAxisAlignment: CrossAxisAlignment.baseline,
           textBaseline: TextBaseline.alphabetic,
           children: [
-            Text(weekLabel,
-                style: pvJakarta(
-                    fontSize: 13.5,
-                    fontWeight: FontWeight.w800,
-                    color: AppTheme.neutral900)),
+            // A group label inside the list: the one small grey caps label.
+            // Kept for revert: pvJakarta 13.5 / w800, neutral900, as typed.
+            Text(weekLabel.toUpperCase(), style: pregGroupLabelStyle()),
             if (dateRange.isNotEmpty) ...[
               const SizedBox(width: 8),
               Text(dateRange,
                   style: pvManrope(
-                      fontSize: 10.5,
+                      fontSize: 11,
                       fontWeight: FontWeight.w600,
-                      color: AppTheme.neutral400)),
+                      color: pvStorePalette.ink3)),
             ],
           ],
         ),
@@ -444,9 +467,10 @@ class _JournalScreenState extends State<JournalScreenClassic> {
           margin: const EdgeInsets.only(top: 12, bottom: 6),
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           decoration: BoxDecoration(
-            color: AppTheme.surface,
+            color: Colors.white,
             borderRadius: BorderRadius.circular(16),
-            boxShadow: _soft,
+            // Kept for revert: boxShadow: _soft,
+            border: Border.all(color: kPvLine),
           ),
           child: Row(children: [
             // Title (the highlight) + an optional date-range sub-label that is
@@ -520,16 +544,18 @@ class _JournalScreenState extends State<JournalScreenClassic> {
         child: Container(
           alignment: Alignment.center,
           padding: const EdgeInsets.symmetric(horizontal: 16),
+          // The one ink when chosen; a hairline, not a shadow, when not.
+          // Kept for revert: boxShadow: sel ? null : _soft, neutral600 words.
           decoration: BoxDecoration(
-            color: sel ? AppTheme.neutral900 : AppTheme.surface,
+            color: sel ? kPvInk : Colors.white,
             borderRadius: BorderRadius.circular(99),
-            boxShadow: sel ? null : _soft,
+            border: Border.all(color: sel ? kPvInk : kPvLine),
           ),
           child: Text(label,
               style: pvManrope(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
-                  color: sel ? Colors.white : AppTheme.neutral600)),
+                  color: sel ? Colors.white : pvStorePalette.ink1)),
         ),
       );
 
@@ -561,15 +587,20 @@ class _JournalScreenState extends State<JournalScreenClassic> {
 
   Widget _card(S s, JournalEntry e) {
     final m = metaFor(e.type);
+    final tone = _tone(e.type);
     final images = e.images;
     final audios = e.audios;
+    // A white card with the page hairline. The coloured left edge and the
+    // shadow went (the boxed, colour-coded list the redraw retired); the
+    // type still shows, in the glyph's well. Kept for revert:
+    //   color: AppTheme.surface, boxShadow: _soft,
+    //   border: Border(left: BorderSide(color: m.color, width: 3)),
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
-        color: AppTheme.surface,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: _soft,
-        border: Border(left: BorderSide(color: m.color, width: 3)),
+        border: Border.all(color: kPvLine),
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(20),
@@ -593,10 +624,10 @@ class _JournalScreenState extends State<JournalScreenClassic> {
                     height: 38,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: m.color.withValues(alpha: 0.12),
+                      color: tone.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Icon(m.icon, size: 19, color: m.color),
+                    child: Icon(m.icon, size: 19, color: tone),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -622,20 +653,20 @@ class _JournalScreenState extends State<JournalScreenClassic> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 8, vertical: 3),
                             decoration: BoxDecoration(
-                              color: m.color.withValues(alpha: 0.10),
+                              color: tone.withValues(alpha: 0.10),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(Icons.favorite_rounded,
-                                    size: 11, color: m.color),
+                                    size: 11, color: tone),
                                 const SizedBox(width: 4),
                                 Text('From ${p.fatherName}',
                                     style: pvManrope(
                                         fontSize: 11,
                                         fontWeight: FontWeight.w700,
-                                        color: m.color)),
+                                        color: tone)),
                               ],
                             ),
                           ),
@@ -690,7 +721,7 @@ class _JournalScreenState extends State<JournalScreenClassic> {
                 const SizedBox(height: 8),
                 Align(
                   alignment: Alignment.centerLeft,
-                  child: _tagChip(e.customTag, m.color),
+                  child: _tagChip(e.customTag, tone),
                 ),
               ],
               if (images.isNotEmpty) ...[
@@ -916,15 +947,16 @@ class _JournalScreenState extends State<JournalScreenClassic> {
               Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                // Kept for revert: boxShadow: _soft, neutral600 words.
                 decoration: BoxDecoration(
-                    color: AppTheme.surface,
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(99),
-                    boxShadow: _soft),
+                    border: Border.all(color: kPvLine)),
                 child: Text('${cur + 1} / $pages',
                     style: pvManrope(
                         fontSize: 11.5,
                         fontWeight: FontWeight.w700,
-                        color: AppTheme.neutral600)),
+                        color: pvStorePalette.ink2)),
               ),
               const SizedBox(width: 14),
               _bookArrow(Icons.chevron_right_rounded, cur < pages - 1,
@@ -950,12 +982,13 @@ class _JournalScreenState extends State<JournalScreenClassic> {
           width: 40,
           height: 40,
           alignment: Alignment.center,
+          // Kept for revert: boxShadow: _soft.
           decoration: BoxDecoration(
-              color: AppTheme.surface,
+              color: Colors.white,
               shape: BoxShape.circle,
-              boxShadow: _soft),
+              border: Border.all(color: kPvLine)),
           child: Icon(icon,
-              color: enabled ? AppTheme.neutral900 : AppTheme.neutral300),
+              color: enabled ? kPvInk : AppTheme.neutral300),
         ),
       );
 
@@ -975,23 +1008,21 @@ class _JournalScreenState extends State<JournalScreenClassic> {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(24),
           child: Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [AppTheme.neutral900, AppTheme.neutral900],
-              ),
-            ),
+            // The cover is the one ink, white words on it (a dark ground).
+            // Kept for revert: a LinearGradient of neutral900 to neutral900.
+            decoration: const BoxDecoration(color: kPvInk),
             child: Stack(children: [
               Positioned(
                   right: -34,
                   top: -34,
                   child: _coverBlob(150, Colors.white.withValues(alpha: 0.10))),
+              // White, as the blob above it: the pink one was a second
+              // colour on the one-ink cover. Kept for revert:
+              //   _coverBlob(120, AppTheme.secondary300.withValues(alpha: 0.22))
               Positioned(
                   left: -24,
                   bottom: -24,
-                  child: _coverBlob(
-                      120, AppTheme.secondary300.withValues(alpha: 0.22))),
+                  child: _coverBlob(120, Colors.white.withValues(alpha: 0.06))),
               // a quiet inset frame for a more "bound diary cover" feel
               Positioned.fill(
                 child: Padding(
@@ -1071,32 +1102,35 @@ class _JournalScreenState extends State<JournalScreenClassic> {
       padding: const EdgeInsets.fromLTRB(16, 10, 16, 60),
       child: Container(
         clipBehavior: Clip.antiAlias,
+        // A white sheet with the page hairline: the cream paper was a tinted
+        // block behind every word of the book. The ruled lines, the margin
+        // and the ribbon still make it a page. Kept for revert:
+        //   color: const Color(0xFFFBF7EF),
+        //   border: Border.all(color: const Color(0xFFEADFCB)),
         decoration: BoxDecoration(
-          color: const Color(0xFFFBF7EF),
+          color: Colors.white,
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: const Color(0xFFEADFCB)),
+          border: Border.all(color: kPvLine),
           boxShadow: _paperShadow,
         ),
         child: Stack(children: [
           // faint ruled-paper texture so a near-empty page still reads as paper
           const Positioned.fill(
               child: CustomPaint(painter: _PaperLinesPainter())),
-          // a soft botanical watermark resting in the lower corner
-          Positioned(
-            right: 6,
-            bottom: 2,
-            child: Icon(Icons.spa_rounded,
-                size: 124,
-                color: AppTheme.secondary500.withValues(alpha: 0.05)),
-          ),
-          // notebook margin line
+          // Kept for revert: a pink botanical watermark in the lower corner.
+          // Positioned(
+          //   right: 6,
+          //   bottom: 2,
+          //   child: Icon(Icons.spa_rounded,
+          //       size: 124,
+          //       color: AppTheme.secondary500.withValues(alpha: 0.05)),
+          // ),
+          // notebook margin line, a hairline (kept for revert: pink at 25%)
           Positioned(
             left: 40,
             top: 14,
             bottom: 14,
-            child: Container(
-                width: 1.5,
-                color: AppTheme.secondary500.withValues(alpha: 0.25)),
+            child: Container(width: 1.5, color: kPvLine),
           ),
           // a little ribbon-bookmark down the top-right edge
           const Positioned(top: 0, right: 28, child: _BookmarkRibbon()),
@@ -1110,9 +1144,10 @@ class _JournalScreenState extends State<JournalScreenClassic> {
                   style: pvFraunces(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
-                      color: AppTheme.neutral900)),
+                      color: kPvInk)),
               const SizedBox(height: 6),
-              Container(height: 1, color: const Color(0xFFEADFCB)),
+              // Kept for revert: color: const Color(0xFFEADFCB).
+              Container(height: 1, color: kPvLine),
               const SizedBox(height: 14),
               for (final ae in es) _bookletEntry(s, ae, combined: combined),
             ]),
@@ -1129,7 +1164,7 @@ class _JournalScreenState extends State<JournalScreenClassic> {
       padding: const EdgeInsets.only(bottom: 18),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Icon(m.icon, size: 16, color: m.color),
+          Icon(m.icon, size: 16, color: _tone(e.type)),
           const SizedBox(width: 8),
           Expanded(
             child: Text(e.title,
@@ -1151,10 +1186,10 @@ class _JournalScreenState extends State<JournalScreenClassic> {
         if (e.description.isNotEmpty) ...[
           const SizedBox(height: 5),
           Text(e.description,
+              // Kept for revert: color: const Color(0xFF5B5142) (the brown
+              // ink of the cream page).
               style: pvManrope(
-                  fontSize: 13.5,
-                  height: 1.55,
-                  color: const Color(0xFF5B5142))),
+                  fontSize: 13.5, height: 1.55, color: pvStorePalette.ink2)),
         ],
         if (e.images.isNotEmpty) ...[
           const SizedBox(height: 10),
@@ -1169,17 +1204,35 @@ class _JournalScreenState extends State<JournalScreenClassic> {
   }
 
   // --- empty state (filter-aware: explains where each category fills from) ----
+  //
+  // The empty page is words, as the stage's other empty pages are (a serif
+  // line, one grey sentence): the big grey icon in a grey circle was a line
+  // icon doing a drawn mark's job. And the "where entries come from" button
+  // went, because the same sheet is one tap away in the app bar above it:
+  // one screen, one way to each thing. Kept for revert, above the title:
+  //   Container(width: 84, height: 84, alignment: Alignment.center,
+  //       decoration: const BoxDecoration(
+  //           color: AppTheme.neutral50, shape: BoxShape.circle),
+  //       child: Icon(icon, size: 38, color: AppTheme.neutral500)),
+  //   const SizedBox(height: 18),
+  // and below the body:
+  //   const SizedBox(height: 14),
+  //   TextButton.icon(onPressed: () => _infoSheet(s),
+  //       icon: const Icon(Icons.info_outline_rounded, size: 16),
+  //       label: Text(s.jrInfoTitle)),
+  // with each filter's icon paired to its body in the switch:
+  //   all/memories auto_stories, photos photo, milestones emoji_events,
+  //   health monitor_heart, scans medical_services, baby favorite.
   Widget _empty(S s) {
     final isAll = _filter == JournalFilter.all;
-    final (IconData icon, String body) = switch (_filter) {
-      JournalFilter.all => (Icons.auto_stories_rounded, s.jrEmptyBody),
-      JournalFilter.memories => (Icons.auto_stories_rounded, s.jrEmptyMemories),
-      JournalFilter.photos => (Icons.photo_rounded, s.jrEmptyPhotos),
-      JournalFilter.milestones =>
-        (Icons.emoji_events_rounded, s.jrEmptyMilestones),
-      JournalFilter.health => (Icons.monitor_heart_rounded, s.jrEmptyHealth),
-      JournalFilter.scans => (Icons.medical_services_rounded, s.jrEmptyScans),
-      JournalFilter.baby => (Icons.favorite_rounded, s.jrEmptyBaby),
+    final String body = switch (_filter) {
+      JournalFilter.all => s.jrEmptyBody,
+      JournalFilter.memories => s.jrEmptyMemories,
+      JournalFilter.photos => s.jrEmptyPhotos,
+      JournalFilter.milestones => s.jrEmptyMilestones,
+      JournalFilter.health => s.jrEmptyHealth,
+      JournalFilter.scans => s.jrEmptyScans,
+      JournalFilter.baby => s.jrEmptyBaby,
     };
     return Center(
       child: Padding(
@@ -1187,34 +1240,20 @@ class _JournalScreenState extends State<JournalScreenClassic> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: 84,
-              height: 84,
-              alignment: Alignment.center,
-              decoration: const BoxDecoration(
-                  color: AppTheme.neutral50, shape: BoxShape.circle),
-              child: Icon(icon, size: 38, color: AppTheme.neutral500),
-            ),
-            const SizedBox(height: 18),
             if (isAll) ...[
               Text(s.jrEmptyTitle,
                   textAlign: TextAlign.center,
                   style: pvFraunces(
                       fontSize: 21,
-                      fontWeight: FontWeight.w500,
-                      color: AppTheme.neutral900)),
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: -0.45,
+                      color: kPvInk)),
               const SizedBox(height: 8),
             ],
             Text(body,
                 textAlign: TextAlign.center,
                 style: pvManrope(
-                    fontSize: 13.5, height: 1.5, color: AppTheme.neutral600)),
-            const SizedBox(height: 14),
-            TextButton.icon(
-              onPressed: () => _infoSheet(s),
-              icon: const Icon(Icons.info_outline_rounded, size: 16),
-              label: Text(s.jrInfoTitle),
-            ),
+                    fontSize: 13.5, height: 1.5, color: pvStorePalette.ink2)),
           ],
         ),
       ),
@@ -1223,7 +1262,8 @@ class _JournalScreenState extends State<JournalScreenClassic> {
 
   // Explains where each category's entries come from (and why some sit empty).
   void _infoSheet(S s) {
-    Color col(JournalEntryType t) => metaFor(t).color;
+    // Kept for revert: metaFor(t).color, which put the violet on milestones.
+    Color col(JournalEntryType t) => _tone(t);
     Widget row(IconData icon, Color c, String text) => Padding(
           padding: const EdgeInsets.symmetric(vertical: 7),
           child: Row(
@@ -1246,7 +1286,7 @@ class _JournalScreenState extends State<JournalScreenClassic> {
                       style: pvManrope(
                           fontSize: 13,
                           height: 1.4,
-                          color: AppTheme.neutral700)),
+                          color: pvStorePalette.ink1)),
                 ),
               ),
             ],
@@ -1282,11 +1322,11 @@ class _JournalScreenState extends State<JournalScreenClassic> {
                   style: pvJakarta(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
-                      color: AppTheme.neutral900)),
+                      color: kPvInk)),
               const SizedBox(height: 6),
               Text(s.jrInfoIntro,
                   style: pvManrope(
-                      fontSize: 13, height: 1.45, color: AppTheme.neutral600)),
+                      fontSize: 13, height: 1.45, color: pvStorePalette.ink2)),
               const SizedBox(height: 12),
               row(Icons.auto_stories_rounded, col(JournalEntryType.memory),
                   s.jrSrcMemories),
@@ -1309,97 +1349,112 @@ class _JournalScreenState extends State<JournalScreenClassic> {
   }
 
   // --- create flow -----------------------------------------------------------
+  // Each option opens a page, so it wears a drawn mark in its well (as rows
+  // that open somewhere do on every stage), not a line icon in a coloured
+  // square. The hues are the old colours' (orange 36, blue 216).
+  // Kept for revert, the old option:
+  //   Widget opt(IconData icon, Color c, String label, VoidCallback onTap) =>
+  //       ListTile(
+  //         leading: Container(width: 42, height: 42,
+  //             alignment: Alignment.center,
+  //             decoration: BoxDecoration(color: c.withValues(alpha: 0.12),
+  //                 borderRadius: BorderRadius.circular(12)),
+  //             child: Icon(icon, color: c)),
+  //         title: Text(label, style: pvJakarta(
+  //             fontWeight: FontWeight.w700, color: AppTheme.neutral900)),
+  //         onTap: onTap);
+  // called as opt(Icons.post_add_rounded, const Color(0xFFE0921C), ...) and
+  // opt(Icons.mic_rounded, const Color(0xFF4A7BC8), ...).
   void _openCreate(S s) {
-    Widget opt(IconData icon, Color c, String label, VoidCallback onTap) =>
+    Widget opt(IntentMark mark, double hue, String label, VoidCallback onTap) =>
         ListTile(
-          leading: Container(
-            width: 42,
-            height: 42,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-                color: c.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(12)),
-            child: Icon(icon, color: c),
-          ),
+          leading: PvMarkWell(p: pvStorePalette, hue: hue, size: 40, mark: mark),
           title: Text(label,
-              style: pvJakarta(
-                  fontWeight: FontWeight.w700, color: AppTheme.neutral900)),
+              style: pvManrope(
+                  fontSize: 14.5, fontWeight: FontWeight.w700, color: kPvInk)),
+          trailing: Icon(Icons.chevron_right_rounded,
+              size: 20, color: pvStorePalette.ink3),
           onTap: onTap,
         );
 
+    // The sheet is a Material, not a coloured Container: its options are
+    // ListTiles, whose ripple paints on the nearest Material and was hidden
+    // under the Container's white (Flutter asserts on it). Kept for revert:
+    //   Container(decoration: const BoxDecoration(color: AppTheme.surface,
+    //       borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+    //     padding: ..., child: SafeArea(...))
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
-      builder: (ctx) => Container(
-        decoration: const BoxDecoration(
-          color: AppTheme.surface,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-        ),
-        padding: const EdgeInsets.fromLTRB(8, 12, 8, 12),
-        child: SafeArea(
-          top: false,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                    color: AppTheme.neutral300,
-                    borderRadius: BorderRadius.circular(99)),
-              ),
-              const SizedBox(height: 10),
-              // ⚠️ FOUR ACTIONS BECAME TWO, AND THE COLLAPSE IS THE POINT.
-              //
-              // "Write a memory" and "Add a photo" were the SAME entry seen
-              // from two ends, and splitting them meant a mother who started
-              // with a photo could not add a sentence and one who started
-              // writing could not attach a picture. One composer takes either
-              // or both. Review: "user either wrote a note and attached pics
-              // to it, or just added pics in this section."
-              //
-              // ⚠️ THE ICON IS NEUTRAL ON PURPOSE. A pencil says "write" and a
-              // camera says "photo", and this action is neither specifically -
-              // so it is a note-add mark that promises no particular medium.
-              opt(Icons.post_add_rounded, const Color(0xFFE0921C),
-                  'Add a memory or note', () {
-                Navigator.pop(ctx);
-                openJournalCompose(context, p);
-              }),
-              // ⚠️ "NOTE FOR BABY" IS REMOVED, KEPT FOR REVERT. Removed per
-              // review. The type itself survives in `JournalEntryType` and
-              // existing entries still render - only the way to CREATE a new
-              // one is gone, which is the same treatment the custom tag got
-              // below.
-              //
-              // opt(Icons.favorite_rounded, const Color(0xFF4F7A52),
-              //     s.jrNoteForBaby, () {
-              //   Navigator.pop(ctx);
-              //   openJournalText(context, p, JournalEntryType.noteForBaby);
-              // }),
-              //
-              // ⚠️ "ADD A PHOTO" IS REMOVED, KEPT FOR REVERT. Folded into the
-              // composer above rather than deleted as a capability: photos are
-              // still addable, from a screen that also lets her say something
-              // about them.
-              //
-              // opt(Icons.add_a_photo_rounded, const Color(0xFFFF5A79),
-              //     s.jrAddPhoto, () {
-              //   Navigator.pop(ctx);
-              //   openJournalAddPhoto(context, p);
-              // }),
-              opt(Icons.mic_rounded, const Color(0xFF4A7BC8), 'Add a voice note',
-                  () {
-                Navigator.pop(ctx);
-                openJournalRecordVoice(context, p);
-              }),
-              // Custom-tag entry removed per request (the enum + existing custom
-              // entries are kept; only creating new ones is gone).
-              // opt(Icons.label_rounded, AppTheme.neutral900, s.jcCustom, () {
-              //   Navigator.pop(ctx);
-              //   openJournalText(context, p, JournalEntryType.custom);
-              // }),
-            ],
+      builder: (ctx) => Material(
+        color: Colors.white,
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(8, 12, 8, 12),
+          child: SafeArea(
+            top: false,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                      color: AppTheme.neutral300,
+                      borderRadius: BorderRadius.circular(99)),
+                ),
+                const SizedBox(height: 10),
+                // ⚠️ FOUR ACTIONS BECAME TWO, AND THE COLLAPSE IS THE POINT.
+                //
+                // "Write a memory" and "Add a photo" were the SAME entry seen
+                // from two ends, and splitting them meant a mother who started
+                // with a photo could not add a sentence and one who started
+                // writing could not attach a picture. One composer takes either
+                // or both. Review: "user either wrote a note and attached pics
+                // to it, or just added pics in this section."
+                //
+                // ⚠️ THE ICON IS NEUTRAL ON PURPOSE. A pencil says "write" and a
+                // camera says "photo", and this action is neither specifically -
+                // so it is a note-add mark that promises no particular medium.
+                opt(IntentMark.pageMark, 36, 'Add a memory or note', () {
+                  Navigator.pop(ctx);
+                  openJournalCompose(context, p);
+                }),
+                // ⚠️ "NOTE FOR BABY" IS REMOVED, KEPT FOR REVERT. Removed per
+                // review. The type itself survives in `JournalEntryType` and
+                // existing entries still render - only the way to CREATE a new
+                // one is gone, which is the same treatment the custom tag got
+                // below.
+                //
+                // opt(Icons.favorite_rounded, const Color(0xFF4F7A52),
+                //     s.jrNoteForBaby, () {
+                //   Navigator.pop(ctx);
+                //   openJournalText(context, p, JournalEntryType.noteForBaby);
+                // }),
+                //
+                // ⚠️ "ADD A PHOTO" IS REMOVED, KEPT FOR REVERT. Folded into the
+                // composer above rather than deleted as a capability: photos are
+                // still addable, from a screen that also lets her say something
+                // about them.
+                //
+                // opt(Icons.add_a_photo_rounded, const Color(0xFFFF5A79),
+                //     s.jrAddPhoto, () {
+                //   Navigator.pop(ctx);
+                //   openJournalAddPhoto(context, p);
+                // }),
+                opt(IntentMark.audioMark, 216, 'Add a voice note', () {
+                  Navigator.pop(ctx);
+                  openJournalRecordVoice(context, p);
+                }),
+                // Custom-tag entry removed per request (the enum + existing custom
+                // entries are kept; only creating new ones is gone).
+                // opt(Icons.label_rounded, AppTheme.neutral900, s.jcCustom, () {
+                //   Navigator.pop(ctx);
+                //   openJournalText(context, p, JournalEntryType.custom);
+                // }),
+              ],
+            ),
           ),
         ),
       ),
@@ -1442,30 +1497,24 @@ class _JournalScreenState extends State<JournalScreenClassic> {
 //  Quiet, low-opacity warm elements so even a single-entry page feels cosy.
 // ---------------------------------------------------------------------------
 
-/// A warm linen/desk backdrop the cream pages rest on.
+/// The ground the pages rest on: the page's own white now, so the book is
+/// sheets on the page rather than on a tan linen desk (a tinted block behind
+/// the page counter and every page).
 class _BookletBackdrop extends StatelessWidget {
   const _BookletBackdrop();
   @override
-  Widget build(BuildContext context) => const DecoratedBox(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFFEFE7D8), Color(0xFFE2D4BD)],
-          ),
-        ),
-        // a faint top glow so the surface isn't flat
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: RadialGradient(
-              center: Alignment.topCenter,
-              radius: 1.1,
-              colors: [Color(0x16FFFFFF), Color(0x00FFFFFF)],
-            ),
-          ),
-          child: SizedBox.expand(),
-        ),
-      );
+  Widget build(BuildContext context) =>
+      const ColoredBox(color: Colors.white, child: SizedBox.expand());
+  // Kept for revert, the linen desk:
+  //   const DecoratedBox(
+  //     decoration: BoxDecoration(gradient: LinearGradient(
+  //       begin: Alignment.topCenter, end: Alignment.bottomCenter,
+  //       colors: [Color(0xFFEFE7D8), Color(0xFFE2D4BD)])),
+  //     child: DecoratedBox(
+  //       decoration: BoxDecoration(gradient: RadialGradient(
+  //         center: Alignment.topCenter, radius: 1.1,
+  //         colors: [Color(0x16FFFFFF), Color(0x00FFFFFF)])),
+  //       child: SizedBox.expand()));
 }
 
 /// Faint horizontal ruled lines, like notebook paper.
@@ -1473,8 +1522,9 @@ class _PaperLinesPainter extends CustomPainter {
   const _PaperLinesPainter();
   @override
   void paint(Canvas canvas, Size size) {
+    // A neutral rule (kept for revert: 0xFFEADFCB at 50%, the cream page's).
     final paint = Paint()
-      ..color = const Color(0xFFEADFCB).withValues(alpha: 0.5)
+      ..color = const Color(0x0F000000)
       ..strokeWidth = 1;
     const gap = 30.0;
     for (double y = 46; y < size.height - 6; y += gap) {
@@ -1509,7 +1559,8 @@ class _RibbonPainter extends CustomPainter {
       ..lineTo(size.width / 2, size.height - notch)
       ..lineTo(0, size.height)
       ..close();
-    canvas.drawPath(path, Paint()..color = AppTheme.secondary500);
+    // The one ink (kept for revert: AppTheme.secondary500, the brand pink).
+    canvas.drawPath(path, Paint()..color = kPvInk);
     // a thin highlight down the centre for a touch of dimension
     canvas.drawLine(
       Offset(size.width / 2, 2),

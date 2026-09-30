@@ -47,6 +47,8 @@ import '../../services/pregnancy_controller.dart';
 import '../../services/scans_store.dart';
 import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_feedback.dart';
+import '../pregnancy/preg_chrome.dart';
+import '../products/pv_store_chrome.dart' show kPvInk, kPvLine;
 import '../v2/v2_palette.dart';
 // import '../tools/scans_appointments_screen.dart'; // the roadmap, kept for revert
 import 'scan_detail_screen.dart';
@@ -104,22 +106,32 @@ class ScanTimelineScreen extends StatelessWidget {
       builder: (context, _) {
         final p = V2PaletteStore.instance.current;
 
+        // ⚠️ ONE PARENTVEDA (2026-09-30): the app bar is the back arrow
+        // only, and the page title is the serif on the page, as on every
+        // pushed pregnancy tool and the TTC tools. Kept for revert: the title
+        // in the app bar,
+        //   title: Text(_en('Your timeline').of(lang), style: pvManrope(
+        //       fontSize: 16, fontWeight: FontWeight.w700, color: p.ink1)),
         return Scaffold(
           backgroundColor: p.ground,
           appBar: AppBar(
             backgroundColor: p.ground,
             surfaceTintColor: Colors.transparent,
             elevation: 0,
+            scrolledUnderElevation: 0,
             foregroundColor: p.ink1,
-            title: Text(_en('Your timeline').of(lang),
-                style: pvManrope(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: p.ink1)),
           ),
           body: ListView(
-            padding: const EdgeInsets.fromLTRB(18, 6, 18, 40),
-            children: [ScanTimelineBody(pregnancy: pregnancy)],
+            padding: const EdgeInsets.fromLTRB(20, 4, 20, 40),
+            children: [
+              Semantics(
+                header: true,
+                child: Text(_en('Your timeline').of(lang),
+                    style: pregPageTitleStyle()),
+              ),
+              const SizedBox(height: 18),
+              ScanTimelineBody(pregnancy: pregnancy),
+            ],
           ),
         );
       },
@@ -200,28 +212,43 @@ class ScanTimelineBody extends StatelessWidget {
                 lang: lang,
                 pregnancy: pregnancy,
               ),
-            const SizedBox(height: 26),
-            Text(_en('THE USUAL RUN').of(lang),
-                style: pvManrope(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1.3,
-                    color: p.ink3)),
-            const SizedBox(height: 6),
-            for (final (id, from, to) in kScanRun)
-              if (_byId(id) case final scan?)
-                _RunRow(
-                  scan: scan,
-                  from: from,
-                  to: to,
-                  where: _placeOf(id, from, to, week, store, nextId),
-                  booked: _bookedFor(id, store),
-                  week: week,
-                  p: p,
-                  lang: lang,
-                  pregnancy: pregnancy,
-                  last: id == kScanRun.last.$1,
-                ),
+            const SizedBox(height: 28),
+            // ⚠️ ONE HEADING (2026-09-30): a page section is headed in the
+            // serif; a small grey caps label is only a group label inside a
+            // card. Kept for revert:
+            //   Text(_en('THE USUAL RUN').of(lang), style: pvManrope(
+            //       fontSize: 10, fontWeight: FontWeight.w800,
+            //       letterSpacing: 1.3, color: p.ink3)),
+            //   const SizedBox(height: 6),
+            PregSectionHeading(_en('The usual run').of(lang)),
+            const SizedBox(height: 12),
+            // The run as ONE white card with hairlines between its rows (the
+            // TTC list), not rows loose on the page. Kept for revert: the
+            // same rows straight in this Column.
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+              decoration: BoxDecoration(
+                color: p.surface,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: kPvLine),
+              ),
+              child: Column(children: [
+                for (final (id, from, to) in kScanRun)
+                  if (_byId(id) case final scan?)
+                    _RunRow(
+                      scan: scan,
+                      from: from,
+                      to: to,
+                      where: _placeOf(id, from, to, week, store, nextId),
+                      booked: _bookedFor(id, store),
+                      week: week,
+                      p: p,
+                      lang: lang,
+                      pregnancy: pregnancy,
+                      last: id == kScanRun.last.$1,
+                    ),
+              ]),
+            ),
             if (showFooter) ...[
               const SizedBox(height: 18),
               // ⚠️ THE FOOTER LINE IS UNCHANGED, AND THE BRIEF SAYS SO IN SO
@@ -320,6 +347,14 @@ TestScanInfo? _byId(String id) {
 //  The 2026-09-18 timeline: one card for what is next, and the run as a list
 // =============================================================================
 
+/// The one outlined button: white, an ink hairline, ink words, a stadium
+/// (`pregFilledStyle`'s partner; preg_chrome has no outlined one yet).
+ButtonStyle _outlineStyle() => OutlinedButton.styleFrom(
+      foregroundColor: kPvInk,
+      side: const BorderSide(color: kPvInk, width: 1.2),
+      shape: const StadiumBorder(),
+    );
+
 /// The next scan, as the one card on the page.
 ///
 /// Eyebrow says which week she is in and that this is what is next; the
@@ -372,15 +407,12 @@ class _UpNext extends StatelessWidget {
         decoration: BoxDecoration(
           color: p.surface,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: p.line, width: 1.2),
+          border: Border.all(color: kPvLine),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          // A group label inside the card: the one caps label style.
           Text(_en('UP NEXT  ·  WEEK $week').of(lang),
-              style: pvManrope(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 1.3,
-                  color: p.ink2)), // was p.ink1 — the last violet on the door (2026-09-19)
+              style: pregGroupLabelStyle()), // was p.ink1 — the last violet on the door (2026-09-19)
           const SizedBox(height: 8),
           Text(scan.name.of(lang),
               style: pvFraunces(
@@ -416,6 +448,7 @@ class _UpNext extends StatelessWidget {
           Row(children: [
             Expanded(
               child: OutlinedButton(
+                style: _outlineStyle(),
                 // A sheet for THIS scan's date — not the old "Scans &
                 // appointments" roadmap, which listed every scan again on
                 // a page of its own (the door walk, 2026-09-18: "remove
@@ -431,6 +464,7 @@ class _UpNext extends StatelessWidget {
             const SizedBox(width: 10),
             Expanded(
               child: OutlinedButton(
+                style: _outlineStyle(),
                 onPressed: () => showScanNoteSheet(context, scan: scan, lang: lang),
                 child: Text(note == null
                     ? _en('Add a note').of(lang)
@@ -506,15 +540,14 @@ class _RunRow extends StatelessWidget {
     final b = booked;
 
     final note = ScansStore.instance.noteFor(scan.id);
-    final meta = note != null
-        ? note
-        : isDone
+    final meta = note ??
+        (isDone
             ? _en('Done').of(lang)
             : b != null
                 ? _UpNext._dateLine(b)
                 : where == _Where.passed
                     ? _en('Not marked as done').of(lang)
-                    : (scan.altName ?? scan.when).of(lang);
+                    : (scan.altName ?? scan.when).of(lang));
 
     return InkWell(
       onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
@@ -1115,12 +1148,7 @@ Future<void> showScanNoteSheet(BuildContext context,
       padding: EdgeInsets.fromLTRB(
           20, 18, 20, 20 + MediaQuery.viewInsetsOf(ctx).bottom),
       child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(_en('A NOTE ON').of(lang),
-            style: pvManrope(
-                fontSize: 10,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 1.3,
-                color: p.ink3)),
+        Text(_en('A NOTE ON').of(lang), style: pregGroupLabelStyle()),
         const SizedBox(height: 4),
         Text(scan.name.of(lang),
             style: pvFraunces(
@@ -1167,6 +1195,7 @@ Future<void> showScanNoteSheet(BuildContext context,
           Expanded(
             flex: existing.isNotEmpty ? 0 : 1,
             child: FilledButton(
+              style: pregFilledStyle(),
               onPressed: () async {
                 pvCommitFeedback();
                 await ScansStore.instance.setNote(scan.id, ctl.text);
@@ -1240,12 +1269,7 @@ Future<void> showScanDateSheet(BuildContext context,
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(_en('THE DATE FOR').of(lang),
-                  style: pvManrope(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 1.3,
-                      color: p.ink3)),
+              Text(_en('THE DATE FOR').of(lang), style: pregGroupLabelStyle()),
               const SizedBox(height: 4),
               Text(scan.name.of(lang),
                   style: pvFraunces(
@@ -1265,12 +1289,7 @@ Future<void> showScanDateSheet(BuildContext context,
                 ),
               ),
               // ---- the time, as slots --------------------------------------
-              Text(_en('TIME').of(lang),
-                  style: pvManrope(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 1.3,
-                      color: p.ink3)),
+              Text(_en('TIME').of(lang), style: pregGroupLabelStyle()),
               const SizedBox(height: 8),
               _TimeSlots(
                   value: time,
@@ -1317,6 +1336,7 @@ Future<void> showScanDateSheet(BuildContext context,
                 Expanded(
                   flex: existing != null ? 0 : 1,
                   child: FilledButton(
+                    style: pregFilledStyle(),
                     onPressed: () async {
                       pvCommitFeedback();
                       final store = ScansStore.instance;
@@ -1354,6 +1374,7 @@ class _SheetRow extends StatelessWidget {
       required this.label,
       required this.p,
       required this.onTap,
+      // ignore: unused_element_parameter
       this.muted = false});
 
   final IconData icon;

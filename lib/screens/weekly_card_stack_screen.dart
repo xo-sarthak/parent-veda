@@ -24,6 +24,14 @@ import '../widgets/week_cards/week_cards.dart';
 import 'week5_full_flow_screen.dart';
 import 'week_flow_screen.dart';
 import '../theme/pv_fonts.dart';
+import 'pregnancy/preg_chrome.dart' show pregFilledStyle;
+import 'products/pv_store_chrome.dart' show pvStorePalette;
+
+// ⚠️ ONE PARENTVEDA (2026-09-30, the pregnancy restyle): this screen already
+// drew its chrome in the one ink. What changed: the pill that returns to the
+// Today tab now says "Today" (the tab's own name) instead of "Daily"; the
+// weeks-to-go count is ink, not the coral accent; the retry button is the
+// one filled ink button. The father (Slate) skin is his, and unchanged.
 
 class WeeklyCardStackScreen extends StatefulWidget {
   const WeeklyCardStackScreen({super.key, required this.controller});
@@ -207,7 +215,9 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
           child: Row(mainAxisSize: MainAxisSize.min, children: [
             Icon(Icons.chevron_left_rounded, size: 16, color: tint),
             const SizedBox(width: 1),
-            Text(s.weeklyBackToDaily,
+            // Names what it opens: the tab is "Today" (s.tabToday). Kept for
+            // revert: Text(s.weeklyBackToDaily, ...), which read "Daily".
+            Text(s.tabToday,
                 style: pvManrope(
                     fontSize: 11.5, fontWeight: FontWeight.w700, color: tint)),
           ]),
@@ -731,7 +741,7 @@ class _WeekHeaderDelegate extends SliverPersistentHeaderDelegate {
                         style: pvManrope(
                           fontSize: 13,
                           fontWeight: FontWeight.w800,
-                          color: father ? kFAccent2 : AppTheme.secondary500,
+                          color: father ? kFAccent2 : pvStorePalette.ink2,
                         ),
                       ),
                     ],
@@ -1269,7 +1279,10 @@ class _ErrorState extends StatelessWidget {
             Text('$error',
                 style: text.bodySmall, textAlign: TextAlign.center),
             const SizedBox(height: 20),
-            FilledButton(onPressed: onRetry, child: Text(strings.tryAgain)),
+            FilledButton(
+                style: pregFilledStyle(),
+                onPressed: onRetry,
+                child: Text(strings.tryAgain)),
           ],
         ),
       ),

@@ -8,6 +8,13 @@
 //  The primary screen NEVER shows a long scroll of timestamps: it gives a calm
 //  count + the last time, with all times one tap away. An optional memory note
 //  saves to Dear Baby. Philosophy per the product spec.
+//
+//  ⚠️ ONE PARENTVEDA (2026-09-30, the pregnancy restyle). The trying-to-
+//  conceive tool shape through `preg_chrome.dart`: the serif page title under
+//  a bare back arrow, the disclaimer as a quiet note on the page (not an amber
+//  box), white cards with the hairline, and the one ink for the heart she taps
+//  and every button. Movement records moved from the app bar into the page as
+//  a row with a drawn mark, named for what it opens.
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -16,7 +23,40 @@ import '../../localization/app_language.dart';
 import '../../services/daily_store.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../services/tools_store.dart';
-import '../../theme/app_theme.dart';
+import '../../theme/pv_fonts.dart';
+import '../brackets/hub/hub_intent_art.dart';
+import '../doors/pv_list_row.dart' show PvMarkWell;
+import '../pregnancy/preg_chrome.dart';
+import '../products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
+
+/// The Tools tab's "Track" hue, so the marks here match the row she tapped.
+const double _kMovementHue = 206;
+
+/// The page title on a pushed tool page, announced as a heading.
+Widget _pageTitle(String text) =>
+    Semantics(header: true, child: Text(text, style: pregPageTitleStyle()));
+
+/// A card's own title: the serif, smaller than a section heading.
+TextStyle _cardTitleStyle() => pvFraunces(
+    fontSize: 18,
+    fontWeight: FontWeight.w600,
+    height: 1.2,
+    letterSpacing: -0.3,
+    color: pvStorePalette.ink1);
+
+/// A tag or a time: a neutral pill (a tint is allowed on a pill).
+Widget _pill(String label, {bool strong = false}) => Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: pvStorePalette.surfaceAlt,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(label,
+          style: pvManrope(
+              fontSize: strong ? 12.5 : 12,
+              fontWeight: strong ? FontWeight.w800 : FontWeight.w600,
+              color: strong ? pvStorePalette.ink1 : pvStorePalette.ink2)),
+    );
 
 class BabyMovementScreen extends StatefulWidget {
   const BabyMovementScreen({super.key, required this.controller});
@@ -104,43 +144,50 @@ class _BabyMovementScreenState extends State<BabyMovementScreen>
     messenger.showSnackBar(SnackBar(content: Text(_s.movementNoteSaved)));
   }
 
+  void _openRecords() => Navigator.of(context).push(MaterialPageRoute(
+        builder: (_) => _MovementHistoryScreen(controller: widget.controller),
+      ));
+
   @override
   Widget build(BuildContext context) {
     final s = _s;
-    final text = Theme.of(context).textTheme;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(s.babyMovementTracker),
-        actions: [
-          TextButton.icon(
-            onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-              builder: (_) =>
-                  _MovementHistoryScreen(controller: widget.controller),
-            )),
-            icon: const Icon(Icons.history_rounded, size: 18),
-            label: Text(s.historyLabel),
-          ),
-          const SizedBox(width: 8),
-        ],
-      ),
+      // One ParentVeda: the app bar carries only the back arrow; the title is
+      // the serif on the page and the records are a row below. Kept for revert:
+      // appBar: AppBar(title: Text(s.babyMovementTracker), actions: [
+      //   TextButton.icon(onPressed: <push _MovementHistoryScreen>,
+      //       icon: const Icon(Icons.history_rounded, size: 18),
+      //       label: Text(s.historyLabel)),
+      //   const SizedBox(width: 8),
+      // ]),
+      appBar: AppBar(),
       body: AnimatedBuilder(
         animation: _store,
         builder: (context, _) {
           final active = _store.hasActiveMovementSession;
           return ListView(
-            padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
+            padding: const EdgeInsets.fromLTRB(18, 4, 18, 32),
             children: [
-              // Disclaimer (always visible).
-              Container(
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: AppTheme.fatherAmber.withValues(alpha: 0.10),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Text(s.movementDisclaimer, style: text.bodySmall),
-              ),
-              const SizedBox(height: 24),
+              _pageTitle(s.babyMovementTracker),
+              const SizedBox(height: 12),
+              // Disclaimer (always visible). Kept for revert: it sat on an
+              // amber block (fatherAmber at 10%, radius 14). A quiet note now.
+              PregNote(s.movementDisclaimer),
+              const SizedBox(height: 22),
               if (active) ..._activeViews(context) else ..._startViews(context),
+              const SizedBox(height: 22),
+              // The records (was the app bar's "History"): a row that opens
+              // somewhere, named for the page it opens.
+              PregRowCard(children: [
+                PregOfferRow(
+                  key: const ValueKey('movement_records_row'),
+                  mark: IntentMark.chartLog,
+                  hue: _kMovementHue,
+                  title: s.movementRecordsTitle,
+                  line: 'Every session, with its times',
+                  onTap: _openRecords,
+                ),
+              ]),
             ],
           );
         },
@@ -152,38 +199,36 @@ class _BabyMovementScreenState extends State<BabyMovementScreen>
 
   List<Widget> _startViews(BuildContext context) {
     final s = _s;
-    final text = Theme.of(context).textTheme;
+    final p = pvStorePalette;
     return [
-      Container(
-        width: double.infinity,
-        padding: const EdgeInsets.fromLTRB(22, 26, 22, 24),
-        decoration: BoxDecoration(
-          color: AppTheme.secondary50,
-          borderRadius: BorderRadius.circular(22),
-        ),
+      // Kept for revert: a coral block (secondary50, radius 22) with a 🤰
+      // emoji and a coral button. A white card, a drawn mark, the ink.
+      PregCard(
+        padding: const EdgeInsets.fromLTRB(22, 24, 22, 22),
         child: Column(
           children: [
-            const Text('🤰', style: TextStyle(fontSize: 44)),
+            PvMarkWell(p: p, hue: _kMovementHue, size: 64, mark: IntentMark.bodyMark),
             const SizedBox(height: 14),
             Text(s.startSessionTitle,
-                textAlign: TextAlign.center, style: text.headlineSmall),
+                textAlign: TextAlign.center, style: _cardTitleStyle()),
             const SizedBox(height: 8),
             Text(
               s.startSessionSub,
               textAlign: TextAlign.center,
-              style: text.bodyMedium?.copyWith(color: AppTheme.neutral700),
+              style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2),
             ),
             const SizedBox(height: 20),
             SizedBox(
               width: double.infinity,
               child: FilledButton.icon(
                 onPressed: _startSession,
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppTheme.secondary500,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
+                style: pregFilledStyle().copyWith(
+                  padding: const WidgetStatePropertyAll(
+                      EdgeInsets.symmetric(vertical: 14)),
                 ),
                 icon: const Icon(Icons.play_arrow_rounded),
-                label: Text(s.startSession),
+                label: Text(s.startSession,
+                    style: pvManrope(fontSize: 14.5, fontWeight: FontWeight.w800)),
               ),
             ),
           ],
@@ -205,13 +250,17 @@ class _BabyMovementScreenState extends State<BabyMovementScreen>
         width: double.infinity,
         child: OutlinedButton.icon(
           onPressed: _endSession,
+          // Kept for revert: coral words on a coral edge (secondary600 /
+          // secondary300).
           style: OutlinedButton.styleFrom(
-            foregroundColor: AppTheme.secondary600,
-            side: const BorderSide(color: AppTheme.secondary300),
+            foregroundColor: kPvInk,
+            side: const BorderSide(color: kPvLine, width: 1.5),
+            shape: const StadiumBorder(),
             padding: const EdgeInsets.symmetric(vertical: 14),
           ),
           icon: const Icon(Icons.stop_circle_outlined),
-          label: Text(s.endSession),
+          label: Text(s.endSession,
+              style: pvManrope(fontSize: 14.5, fontWeight: FontWeight.w700)),
         ),
       ),
       const SizedBox(height: 20),
@@ -223,53 +272,44 @@ class _BabyMovementScreenState extends State<BabyMovementScreen>
   /// time, and all times one tap away - never a long scroll.
   Widget _sessionSummary(BuildContext context) {
     final s = _s;
-    final text = Theme.of(context).textTheme;
+    final p = pvStorePalette;
     final times = _store.currentSessionMovements; // oldest → newest
     final count = times.length;
 
-    return Container(
+    return SizedBox(
       width: double.infinity,
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppTheme.outlineVariant),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(child: Text(s.thisSessionLabel, style: text.titleMedium)),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: AppTheme.secondary50,
-                  borderRadius: BorderRadius.circular(40),
+      child: PregCard(
+        padding: const EdgeInsets.all(18),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(child: Text(s.thisSessionLabel, style: _cardTitleStyle())),
+                // Kept for revert: a coral pill (secondary50 / secondary600).
+                _pill(s.movementsLoggedCount(count), strong: true),
+              ],
+            ),
+            if (count == 0) ...[
+              const SizedBox(height: 10),
+              Text(s.noMovementsThisSession,
+                  style: pvManrope(fontSize: 13.5, height: 1.45, color: p.ink2)),
+            ] else ...[
+              const SizedBox(height: 8),
+              // Kept for revert: the line led with a ❤️ emoji. A small glyph.
+              Row(children: [
+                Icon(Icons.favorite_border_rounded, size: 15, color: p.ink3),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(s.lastMovementAt(s.formatClock(times.last)),
+                      style: pvManrope(fontSize: 13.5, color: p.ink2)),
                 ),
-                child: Text(
-                  s.movementsLoggedCount(count),
-                  style: text.labelLarge?.copyWith(
-                    color: AppTheme.secondary600,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ),
+              ]),
+              const SizedBox(height: 12),
+              _timesWrap(context, times),
             ],
-          ),
-          if (count == 0) ...[
-            const SizedBox(height: 10),
-            Text(s.noMovementsThisSession,
-                style: text.bodyMedium?.copyWith(color: AppTheme.neutral600)),
-          ] else ...[
-            const SizedBox(height: 6),
-            Text('❤️ ${s.lastMovementAt(s.formatClock(times.last))}',
-                style: text.bodyMedium?.copyWith(color: AppTheme.neutral700)),
-            const SizedBox(height: 12),
-            _timesWrap(context, times),
           ],
-        ],
+        ),
       ),
     );
   }
@@ -278,7 +318,7 @@ class _BabyMovementScreenState extends State<BabyMovementScreen>
   /// a "View all times" toggle, so a busy day never becomes an endless scroll.
   Widget _timesWrap(BuildContext context, List<DateTime> times) {
     final s = _s;
-    final text = Theme.of(context).textTheme;
+    final p = pvStorePalette;
     final newestFirst = times.reversed.toList();
     final overflow = newestFirst.length - _timesPreview;
     final shown = _showAllTimes
@@ -292,16 +332,7 @@ class _BabyMovementScreenState extends State<BabyMovementScreen>
           spacing: 8,
           runSpacing: 8,
           children: [
-            for (final t in shown)
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                decoration: BoxDecoration(
-                  color: AppTheme.surfaceContainer,
-                  borderRadius: BorderRadius.circular(40),
-                ),
-                child: Text(s.formatClock(t), style: text.labelSmall),
-              ),
+            for (final t in shown) _pill(s.formatClock(t)),
           ],
         ),
         if (overflow > 0) ...[
@@ -309,11 +340,13 @@ class _BabyMovementScreenState extends State<BabyMovementScreen>
           GestureDetector(
             onTap: () => setState(() => _showAllTimes = !_showAllTimes),
             behavior: HitTestBehavior.opaque,
-            child: Text(
-              _showAllTimes ? s.hideTimesLabel : s.viewAllTimes,
-              style: text.labelLarge?.copyWith(
-                color: AppTheme.secondary600,
-                fontWeight: FontWeight.w700,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Text(
+                _showAllTimes ? s.hideTimesLabel : s.viewAllTimes,
+                // Kept for revert: color: AppTheme.secondary600.
+                style: pvManrope(
+                    fontSize: 13, fontWeight: FontWeight.w700, color: p.ink1),
               ),
             ),
           ),
@@ -324,46 +357,54 @@ class _BabyMovementScreenState extends State<BabyMovementScreen>
 
   Widget _tapCircle(BuildContext context) {
     final s = _s;
-    final text = Theme.of(context).textTheme;
-    return GestureDetector(
-      onTap: _logMovement,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
-        width: 220,
-        height: 220,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: _justLogged ? AppTheme.secondary400 : AppTheme.secondary500,
-          boxShadow: [
-            BoxShadow(
-              color: AppTheme.secondary500.withValues(alpha: 0.35),
-              blurRadius: 28,
-              spreadRadius: _justLogged ? 6 : 2,
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text('❤️', style: TextStyle(fontSize: 40)),
-            const SizedBox(height: 8),
-            Text(
-              _justLogged ? s.movementLogged : s.babyMovedLabel,
-              textAlign: TextAlign.center,
-              style: text.titleLarge?.copyWith(
-                  color: Colors.white, fontWeight: FontWeight.w800),
-            ),
-            const SizedBox(height: 6),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Text(
-                s.babyMovedSub,
-                textAlign: TextAlign.center,
-                style: text.bodySmall
-                    ?.copyWith(color: Colors.white.withValues(alpha: 0.92)),
+    // The one thing she presses, so the one ink. Kept for revert: coral
+    // (secondary500, secondary400 on a tap) with a coral glow and a ❤️ emoji.
+    // The heart stays as a white glyph: the copy says "tap the heart".
+    final fill = _justLogged ? pvStorePalette.ink2 : kPvInk;
+    return Semantics(
+      button: true,
+      child: GestureDetector(
+        onTap: _logMovement,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          width: 220,
+          height: 220,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: fill,
+            boxShadow: [
+              BoxShadow(
+                color: kPvInk.withValues(alpha: 0.18),
+                blurRadius: 28,
+                spreadRadius: _justLogged ? 6 : 2,
               ),
-            ),
-          ],
+            ],
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.favorite_rounded, size: 40, color: Colors.white),
+              const SizedBox(height: 8),
+              Text(
+                _justLogged ? s.movementLogged : s.babyMovedLabel,
+                textAlign: TextAlign.center,
+                style: pvFraunces(
+                    fontSize: 22, fontWeight: FontWeight.w600, color: Colors.white),
+              ),
+              const SizedBox(height: 6),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Text(
+                  s.babyMovedSub,
+                  textAlign: TextAlign.center,
+                  style: pvManrope(
+                      fontSize: 12,
+                      height: 1.4,
+                      color: Colors.white.withValues(alpha: 0.92)),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -371,17 +412,12 @@ class _BabyMovementScreenState extends State<BabyMovementScreen>
 
   Widget _memoryCard(BuildContext context) {
     final s = _s;
-    final text = Theme.of(context).textTheme;
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppTheme.neutral50,
-        borderRadius: BorderRadius.circular(18),
-      ),
+    // Kept for revert: a grey block (neutral50, radius 18). A white card.
+    return PregCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(s.rememberThisMoment, style: text.titleMedium),
+          Text(s.rememberThisMoment, style: _cardTitleStyle()),
           const SizedBox(height: 10),
           TextField(
             controller: _noteCtrl,
@@ -393,9 +429,11 @@ class _BabyMovementScreenState extends State<BabyMovementScreen>
           SizedBox(
             width: double.infinity,
             child: FilledButton.icon(
+              style: pregFilledStyle(),
               onPressed: _saveNote,
               icon: const Icon(Icons.favorite_rounded, size: 18),
-              label: Text(s.talkSaveCta),
+              label: Text(s.talkSaveCta,
+                  style: pvManrope(fontSize: 14, fontWeight: FontWeight.w800)),
             ),
           ),
         ],
@@ -416,29 +454,33 @@ class _MovementHistoryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = S(controller.language);
-    final text = Theme.of(context).textTheme;
+    final p = pvStorePalette;
     return Scaffold(
-      appBar: AppBar(title: Text(s.movementRecordsTitle)),
+      // Kept for revert: appBar: AppBar(title: Text(s.movementRecordsTitle)).
+      appBar: AppBar(),
       body: AnimatedBuilder(
         animation: ToolsStore.instance,
         builder: (context, _) {
           final history = ToolsStore.instance.movementSessionHistory;
-          if (history.isEmpty) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(36),
-                child: Text(s.noMovementsYet,
-                    textAlign: TextAlign.center, style: text.bodyMedium),
-              ),
-            );
-          }
           return ListView(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
+            padding: const EdgeInsets.fromLTRB(18, 4, 18, 32),
             children: [
-              Text(s.movementRecordsIntro, style: text.bodyMedium),
-              const SizedBox(height: 16),
-              for (final rec in history)
-                _SessionCard(controller: controller, rec: rec),
+              _pageTitle(s.movementRecordsTitle),
+              const SizedBox(height: 10),
+              if (history.isEmpty)
+                // The empty state keeps its words, under the title now.
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Text(s.noMovementsYet,
+                      style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink3)),
+                )
+              else ...[
+                Text(s.movementRecordsIntro,
+                    style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2)),
+                const SizedBox(height: 16),
+                for (final rec in history)
+                  _SessionCard(controller: controller, rec: rec),
+              ],
             ],
           );
         },
@@ -456,66 +498,43 @@ class _SessionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = S(controller.language);
-    final text = Theme.of(context).textTheme;
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppTheme.outlineVariant),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(s.formatLongDate(rec.start), style: text.titleMedium),
-              ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AppTheme.secondary50,
-                  borderRadius: BorderRadius.circular(40),
+    final p = pvStorePalette;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: PregCard(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(s.formatLongDate(rec.start),
+                      style: pvManrope(
+                          fontSize: 15, fontWeight: FontWeight.w800, color: p.ink1)),
                 ),
-                child: Text(
-                  s.sessionNumber(rec.dayIndex),
-                  style: text.labelMedium?.copyWith(
-                    color: AppTheme.secondary600,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Text(
-              '${s.startWord}: ${s.formatClock(rec.start)}   ·   '
-              '${s.endWord}: ${s.formatClock(rec.end)}',
-              style: text.bodyMedium),
-          const SizedBox(height: 4),
-          Text(s.movementsLoggedCount(rec.times.length),
-              style: text.titleSmall?.copyWith(color: AppTheme.secondary600)),
-          const SizedBox(height: 10),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              for (final t in rec.times)
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: AppTheme.surfaceContainer,
-                    borderRadius: BorderRadius.circular(40),
-                  ),
-                  child: Text(s.formatClock(t), style: text.labelSmall),
-                ),
-            ],
-          ),
-        ],
+                // Kept for revert: a coral pill (secondary50 / secondary600).
+                _pill(s.sessionNumber(rec.dayIndex), strong: true),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Text(
+                '${s.startWord}: ${s.formatClock(rec.start)}   ·   '
+                '${s.endWord}: ${s.formatClock(rec.end)}',
+                style: pvManrope(fontSize: 13, color: p.ink2)),
+            const SizedBox(height: 4),
+            Text(s.movementsLoggedCount(rec.times.length),
+                style: pvManrope(
+                    fontSize: 13.5, fontWeight: FontWeight.w800, color: p.ink1)),
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                for (final t in rec.times) _pill(s.formatClock(t)),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

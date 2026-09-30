@@ -31,7 +31,6 @@ import '../../models/product_models.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../services/veda_answer.dart';
 import '../../services/veda_index.dart';
-import '../../theme/app_theme.dart';
 import '../../widgets/mic_dictation_button.dart';
 import '../calendar_screen.dart';
 import '../community_screen.dart';
@@ -48,30 +47,37 @@ import 'kegel_care_screen.dart';
 import 'weight_tracker_screen.dart';
 import '../../services/remote/ask_veda_service.dart';
 import '../../theme/pv_fonts.dart';
+import '../pregnancy/preg_chrome.dart';
+import '../products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 
-// ---- design palette (the "Ask Veda Results" mock - our brand purple/coral) ----
-const _vBgTop = Color(0xFFF9F8F9);
-const _vBgMid = Color(0xFFF2F1F3);
-const _vBgBot = Color(0xFFEFEEEF);
-const _vPurple = Color(0xFF2F2C30);
-const _vPurple2 = Color(0xFF2F2C30);
+// ⚠️ ONE PARENTVEDA (2026-09-30, the pregnancy restyle): the trying-to-conceive
+// Ask Veda's shape, in the pregnancy pieces. A back arrow and "Ask Veda" in
+// the serif at the top (this page is always pushed), a white ground, white
+// cards with the page hairline and no shadows, the one serif section heading
+// under each of the answer's sections, question chips that are white with a
+// hairline, no emoji in the suggestion cards, and the disclaimer as a quiet
+// note. Restyle only: the request, the sections shown and what each opens
+// are unchanged.
+//
+// ---- design palette. Kept for revert, the "Ask Veda Results" mock's values:
+//   _vBgTop 0xFFF9F8F9, _vBgMid 0xFFF2F1F3, _vBgBot 0xFFEFEEEF (a grey
+//   gradient ground), _vMuted 0xFF2F2C30, _vCardBorder 0x147C3AED (a violet
+//   hairline) and _vCardShadow, two shadows in violet.
+const _vBgTop = Colors.white;
+const _vBgMid = Colors.white;
+const _vBgBot = Colors.white;
+const _vPurple = kPvInk;
+const _vPurple2 = kPvInk;
 const _vCoral = Color(0xFFF0476A);
-const _vInk = Color(0xFF2F2C30);
-const _vInk2 = Color(0xFF2F2C30);
-const _vBody = Color(0xFF2F2C30);
-const _vBody2 = Color(0xFF2F2C30);
-const _vMuted = Color(0xFF2F2C30);
-const _vMuted2 = Color(0xFFA29BA5);
-const _vCardBorder = Color(0x147C3AED);
-const _vDivider = Color(0xFFF4F3F5);
-const List<BoxShadow> _vCardShadow = [
-  BoxShadow(color: Color(0x0D281646), blurRadius: 6, offset: Offset(0, 2)),
-  BoxShadow(
-      color: Color(0x14602EA0),
-      blurRadius: 30,
-      offset: Offset(0, 16),
-      spreadRadius: -10),
-];
+const _vInk = kPvInk;
+const _vInk2 = kPvInk;
+const _vBody = kPvInk;
+const _vBody2 = kPvInk;
+const _vMuted = Color(0xFF6F6B72); // a neutral grey near the palette's ink3
+const _vMuted2 = Color(0xFF6F6B72);
+const _vCardBorder = kPvLine;
+const _vDivider = kPvLine;
+const List<BoxShadow> _vCardShadow = [];
 
 class AskVedaScreen extends StatefulWidget {
   const AskVedaScreen({super.key, required this.controller, this.initialQuery});
@@ -247,17 +253,12 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
 
   Widget _build(BuildContext context, S s) {
     final hasResult = _query != null;
+    // The page's own ground (kept for revert: a grey top-to-bottom gradient
+    // of _vBgTop, _vBgMid, _vBgBot at 0, 0.52, 1).
     return Scaffold(
-      backgroundColor: _vBgMid,
+      backgroundColor: pvStorePalette.ground,
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [_vBgTop, _vBgMid, _vBgBot],
-            stops: [0.0, 0.52, 1.0],
-          ),
-        ),
+        color: pvStorePalette.ground,
         child: SafeArea(
           child: Column(children: [
             _topBar(context, s),
@@ -304,32 +305,38 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
     );
   }
 
-  // ---- top app bar : logo · Ask Veda wordmark · profile ---------------------
+  // ---- top bar : back · Ask Veda · profile -----------------------------------
+  //
+  // ⚠️ A BACK ARROW, NOT THE LOGO (2026-09-30). Ask Veda is always pushed
+  // (the Ask button, a door, Can I, Learn), and the trying-to-conceive Ask
+  // Veda leads with the arrow. Kept for revert: the brand mark
+  // Image.asset('assets/brand/pv-mark.png', 34) on the left, "Ask Veda"
+  // centred at 23 with "Veda" in coral, and the profile disc as a violet to
+  // coral gradient with a violet shadow (0x4D6D28D9).
   Widget _topBar(BuildContext context, S s) {
     final initial = p.motherName.isNotEmpty ? p.motherName[0].toUpperCase() : '';
     return Padding(
-      padding: const EdgeInsets.fromLTRB(18, 8, 18, 12),
+      padding: const EdgeInsets.fromLTRB(6, 4, 18, 8),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Image.asset('assets/brand/pv-mark.png',
-              width: 34, height: 34, fit: BoxFit.contain),
-          Row(mainAxisSize: MainAxisSize.min, children: [
-            const Icon(Icons.auto_awesome_rounded, size: 17, color: _vCoral),
-            const SizedBox(width: 7),
-            RichText(
-              text: TextSpan(
+          IconButton(
+            tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+            onPressed: () => Navigator.of(context).maybePop(),
+            icon: const Icon(Icons.arrow_back_rounded, size: 22, color: _vInk),
+          ),
+          const SizedBox(width: 2),
+          const Icon(Icons.auto_awesome_rounded, size: 17, color: _vCoral),
+          const SizedBox(width: 7),
+          Expanded(
+            child: Text('Ask Veda',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: pvFraunces(
-                    fontSize: 23,
+                    fontSize: 21,
                     fontWeight: FontWeight.w600,
-                    letterSpacing: -0.2),
-                children: const [
-                  TextSpan(text: 'Ask ', style: TextStyle(color: _vPurple)),
-                  TextSpan(text: 'Veda', style: TextStyle(color: _vCoral)),
-                ],
-              ),
-            ),
-          ]),
+                    letterSpacing: -0.2,
+                    color: _vInk)),
+          ),
           GestureDetector(
             onTap: () => Navigator.of(context).push(MaterialPageRoute(
                 builder: (_) => ProfileScreen(controller: p))),
@@ -337,16 +344,9 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
               width: 36,
               height: 36,
               alignment: Alignment.center,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(colors: [_vPurple2, _vCoral]),
+              decoration: const BoxDecoration(
+                color: kPvInk,
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 2),
-                boxShadow: const [
-                  BoxShadow(
-                      color: Color(0x4D6D28D9),
-                      blurRadius: 9,
-                      offset: Offset(0, 3)),
-                ],
               ),
               child: initial.isEmpty
                   ? const Icon(Icons.person_rounded, size: 21, color: Colors.white)
@@ -368,19 +368,12 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
       key: ValueKey(result),
       padding: EdgeInsets.symmetric(
           horizontal: 16, vertical: result ? 12 : 5),
+      // The hairline (kept for revert: a violet hairline 0x1A7C3AED and two
+      // violet shadows).
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: const Color(0x1A7C3AED)),
-        boxShadow: const [
-          BoxShadow(
-              color: Color(0x0D281646), blurRadius: 6, offset: Offset(0, 2)),
-          BoxShadow(
-              color: Color(0x334D2EA0),
-              blurRadius: 30,
-              offset: Offset(0, 14),
-              spreadRadius: -16),
-        ],
+        border: Border.all(color: kPvLine),
       ),
       child: result ? _pillResult(s) : _pillEdit(s),
     );
@@ -471,15 +464,10 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
     final lang = p.language;
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Row(children: [
+        // The one section heading (kept for revert: the same two Texts,
+        // pvFraunces 21 / w600 and pvManrope 12.5).
         Expanded(
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(s.vedaSuggestHeader,
-                style: pvFraunces(
-                    fontSize: 21, fontWeight: FontWeight.w600, color: _vInk2)),
-            const SizedBox(height: 3),
-            Text(s.vedaSuggestSub,
-                style: pvManrope(fontSize: 12.5, color: _vMuted)),
-          ]),
+          child: PregSectionHeading(s.vedaSuggestHeader, lead: s.vedaSuggestSub),
         ),
         IconButton(
           tooltip: s.vedaShuffle,
@@ -498,22 +486,27 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.fromLTRB(14, 13, 14, 14),
+      // A white card with the hairline, active or not; the stage that is not
+      // open yet says so in its tag and its quieter words. Kept for revert:
+      // white at 60% when inactive, a shadow when active, and the stage's
+      // emoji (Text(sec.emoji, fontSize 17)) before its name.
       decoration: BoxDecoration(
-        color: active ? Colors.white : Colors.white.withValues(alpha: 0.6),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: active ? _vCardBorder : AppTheme.outlineVariant),
-        boxShadow: active ? _vCardShadow : null,
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: kPvLine),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          Text(sec.emoji, style: const TextStyle(fontSize: 17)),
-          const SizedBox(width: 8),
-          Text(sec.title.of(lang),
-              style: pvJakarta(
-                  fontSize: 14.5,
-                  fontWeight: FontWeight.w800,
-                  color: active ? _vInk : _vMuted)),
-          if (!active) ...[const Spacer(), _soonTag(s)],
+          Expanded(
+            child: Text(sec.title.of(lang),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: pvManrope(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                    color: active ? _vInk : _vMuted)),
+          ),
+          if (!active) ...[const SizedBox(width: 8), _soonTag(s)],
         ]),
         const SizedBox(height: 11),
         Wrap(spacing: 8, runSpacing: 8, children: [
@@ -526,16 +519,14 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
 
   Widget _qChip(String text, bool active) => GestureDetector(
         onTap: () => _send(text),
+        // White with the hairline (kept for revert: the ink at 6% with a
+        // violet hairline 0x1F7C3AED when active, 0xFFF4F3F5 when not).
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
           decoration: BoxDecoration(
-            color: active
-                ? _vPurple.withValues(alpha: 0.06)
-                : const Color(0xFFF4F3F5),
+            color: Colors.white,
             borderRadius: BorderRadius.circular(99),
-            border: Border.all(
-                color:
-                    active ? const Color(0x1F7C3AED) : AppTheme.outlineVariant),
+            border: Border.all(color: kPvLine),
           ),
           child: Text(text,
               style: pvManrope(
@@ -545,17 +536,18 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         ),
       );
 
+  // The "Opening soon" tag's look (`PregOfferTag`), with this screen's own
+  // words. Kept for revert: a pink pill 0xFFFBEAF1 with coral words at 9.
   Widget _soonTag(S s) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
         decoration: BoxDecoration(
-            color: const Color(0xFFFBEAF1),
+            color: pvStorePalette.surfaceAlt,
             borderRadius: BorderRadius.circular(99)),
         child: Text(s.vedaStageSoon,
             style: pvManrope(
-                fontSize: 9,
+                fontSize: 11,
                 fontWeight: FontWeight.w800,
-                letterSpacing: 0.2,
-                color: _vCoral)),
+                color: pvStorePalette.ink2)),
       );
 
   // ===========================================================================
@@ -638,10 +630,10 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
       );
 
   // S1 - Veda Answer
+  // A plain white card (kept for revert: gradient white to 0xFFFDFCFD).
   Widget _feedAnswerCard(String answer, S s) => _card(
-        radius: 22,
+        radius: 20,
         padding: const EdgeInsets.fromLTRB(18, 18, 18, 20),
-        gradient: const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.white, Color(0xFFFDFCFD)]),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
             const Icon(Icons.auto_awesome_rounded, size: 20, color: _vPurple2),
@@ -687,9 +679,10 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
       child: Row(children: [
         Container(
           width: 40, height: 40, alignment: Alignment.center,
+          // A flat well (kept for revert: two-stop gradients, pink or grey).
           decoration: BoxDecoration(
-            gradient: LinearGradient(colors: coral ? const [Color(0xFFFFE9EE), Color(0xFFFCE0E8)] : const [Color(0xFFF4F3F5), Color(0xFFEFEEF0)]),
-            borderRadius: BorderRadius.circular(13),
+            color: coral ? const Color(0xFFFFE9EE) : pvStorePalette.surfaceAlt,
+            borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(icon, size: 21, color: coral ? _vCoral : _vPurple),
         ),
@@ -705,13 +698,12 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         // Kept for revert: the "coming soon" line when content is empty.
         //   if (f.content.isEmpty) _comingSoon('More articles on this are coming soon') else
         for (final it in f.content) _feedItemCard(it),
+        // A group label inside the section, not a second heading style.
+        // Kept for revert: Row(Icon(play_circle_outline), Text(uiVideos,
+        // pvFraunces 17 / w600)).
         if (f.videos.isNotEmpty) Padding(
-          padding: const EdgeInsets.fromLTRB(2, 20, 2, 12),
-          child: Row(children: [
-            const Icon(Icons.play_circle_outline_rounded, size: 19, color: _vPurple2),
-            const SizedBox(width: 9),
-            Text(S.now.uiVideos, style: pvFraunces(fontSize: 17, fontWeight: FontWeight.w600, color: _vInk2)),
-          ]),
+          padding: const EdgeInsets.fromLTRB(2, 14, 2, 10),
+          child: Text(S.now.uiVideos.toUpperCase(), style: pregGroupLabelStyle()),
         ),
         // Kept for revert: _comingSoon('Videos for this are coming soon') when empty.
         for (final it in f.videos) _feedItemCard(it),
@@ -731,7 +723,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
           const SizedBox(width: 13),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(_kindLabel(it.kind), maxLines: 1, overflow: TextOverflow.ellipsis, style: pvManrope(fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 0.7, color: _vPurple2)),
+              Text(_kindLabel(it.kind), maxLines: 1, overflow: TextOverflow.ellipsis, style: pregGroupLabelStyle().copyWith(fontSize: 10.5)),
               const SizedBox(height: 4),
               Text(it.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: pvManrope(fontSize: 14.5, fontWeight: FontWeight.w700, height: 1.3, color: _vInk)),
               if (snippet.isNotEmpty) ...[
@@ -740,7 +732,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
               ],
             ]),
           ),
-          const Padding(padding: EdgeInsets.only(left: 4, top: 18), child: Icon(Icons.chevron_right_rounded, size: 20, color: Color(0xFFCFCCD0))),
+          const Padding(padding: EdgeInsets.only(left: 4, top: 18), child: Icon(Icons.chevron_right_rounded, size: 20, color: _vMuted)),
         ]),
       ),
     );
@@ -765,7 +757,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
             Container(width: 48, height: 48, alignment: Alignment.center, decoration: BoxDecoration(color: const Color(0xFF3E9A8C).withValues(alpha: 0.12), borderRadius: BorderRadius.circular(13)), child: const Icon(Icons.shopping_bag_rounded, size: 22, color: Color(0xFF3E9A8C))),
             const SizedBox(width: 13),
             Expanded(child: Text(it.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: pvManrope(fontSize: 14, fontWeight: FontWeight.w700, height: 1.3, color: _vInk))),
-            const Icon(Icons.chevron_right_rounded, size: 20, color: Color(0xFFCFCCD0)),
+            const Icon(Icons.chevron_right_rounded, size: 20, color: _vMuted),
           ]),
         ),
       );
@@ -814,7 +806,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
             controller: sc,
             padding: const EdgeInsets.fromLTRB(22, 14, 22, 28),
             children: [
-              Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: const Color(0xFFDBD8DC), borderRadius: BorderRadius.circular(99)))),
+              Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: kPvLine, borderRadius: BorderRadius.circular(99)))),
               const SizedBox(height: 16),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -1125,10 +1117,12 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
       );
 
   // ---- shared building blocks ----
+  // A white card with the page hairline; `_vCardShadow` is empty now (kept
+  // for revert above).
   Widget _card(
           {required Widget child,
           EdgeInsets? padding,
-          double radius = 18,
+          double radius = 20,
           Gradient? gradient}) =>
       Container(
         padding: padding ?? const EdgeInsets.all(16),
@@ -1142,19 +1136,15 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         child: child,
       );
 
+  // The one section heading, led by the section's line icon, as the
+  // trying-to-conceive Ask Veda draws it. Kept for revert: the title in
+  // pvFraunces 19 / w600 / -0.2.
   Widget _sectionHead(IconData icon, String title, {double top = 28}) => Padding(
-        padding: EdgeInsets.fromLTRB(2, top, 2, 13),
+        padding: EdgeInsets.fromLTRB(2, top, 2, 12),
         child: Row(children: [
-          Icon(icon, size: 20, color: _vPurple2),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(title,
-                style: pvFraunces(
-                    fontSize: 19,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: -0.2,
-                    color: _vInk2)),
-          ),
+          Icon(icon, size: 18, color: _vPurple2),
+          const SizedBox(width: 9),
+          Expanded(child: PregSectionHeading(title)),
         ]),
       );
 
@@ -1162,11 +1152,11 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
     final wk = p.currentWeek;
     return Align(
       alignment: Alignment.centerLeft,
+      // A pill in the quiet tint (kept for revert: a grey to pink gradient).
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-              colors: [Color(0xFFF4F3F5), Color(0xFFFBEAF1)]),
+          color: pvStorePalette.surfaceAlt,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -1785,20 +1775,11 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
     );
   }
 
+  // A quiet note on the page. Kept for revert: the same Row with a filled
+  // shield in 0xFFBCB7BE and the words at 11.5 in 0xFFA29BA5.
   Widget _disclaimer(S s) => Padding(
-        padding: const EdgeInsets.fromLTRB(6, 26, 6, 0),
-        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Padding(
-            padding: EdgeInsets.only(top: 1),
-            child: Icon(Icons.shield_rounded, size: 17, color: Color(0xFFBCB7BE)),
-          ),
-          const SizedBox(width: 9),
-          Expanded(
-            child: Text(s.vedaDisclaimer,
-                style: pvManrope(
-                    fontSize: 11.5, height: 1.55, color: _vMuted2)),
-          ),
-        ]),
+        padding: const EdgeInsets.fromLTRB(2, 26, 2, 0),
+        child: PregNote(s.vedaDisclaimer, icon: Icons.shield_outlined),
       );
 
   // ---- non-showcase fallback: plain Veda answer + source cards --------------

@@ -96,3 +96,36 @@ also kept there. One ParentVeda: the same inbox in both stages." That means touc
 **What it would need:** a stage-neutral message model (id, kind, at, title, body, read, destination) and one inbox
 screen that lists a stage's messages, with TTC and pregnancy each keeping their own rules for *what* to say. The two
 phone-id blocks (918xxx TTC, 919xxx pregnancy) already do not overlap.
+
+## 9. Shared screens still in the old violet (the pregnancy restyle left them alone)
+
+**Pregnancy has (2026-09-30):** every live pregnancy-only screen moved to the one-ParentVeda look (the one ink
+#2F2C30, no violet, serif section headings), and while the stage is pregnancy the app theme swaps its violet for the
+ink (`lib/screens/pregnancy/preg_theme.dart`, picked in `main.dart`). Held by `test/preg_one_parentveda_test.dart`.
+
+**What was left, because another stage opens it too:**
+- `lib/screens/reader/pv_reader_screen.dart`: the one reader, every stage.
+- `lib/screens/product_guide/*`: opened from parenting's tools hub and surface router.
+- `lib/screens/brackets/hub/problem_hub_screen.dart` and `hub_owed_screen.dart`: parenting's and TTC's V3 homes open them.
+- `lib/screens/memories/memories_home_screen.dart` and `memory_personalize_screen.dart`: parenting's More and surfaces.
+- `lib/screens/referral/invite_nudge_card.dart`: parenting's My child.
+- `lib/screens/prepare/prepare_common.dart`: its `showPrepareBooking` sheet is shown in parenting.
+- `lib/screens/v2/v3_daily.dart`, `lib/screens/nutrition/nutrition_recipes_screen.dart`: imported by parenting.
+- `lib/widgets/journey/journey_palette.dart`: the journey map's completed week nodes, `arrivalGold` and
+  `typeMedical` are violet (0xFF6A30B6 / 0xFF7A4FC2), painted inside the shared `JourneyNodeMarker` and
+  `JourneyProgressCard`. The pregnancy map swapped what it sets itself; the completed weeks still show violet.
+- `lib/models/journal_entry.dart` (`_jPurple = AppTheme.primary500`): the journal kind colour, also read by the
+  father's journal and the parenting journal.
+- `lib/models/pv_video.dart` (`kVideoMeta`, the recommended shelf in `primary500`): the parenting video config reads
+  it too. The pregnancy Watch & Learn no longer paints thumbnails from it (a drawn mark per category instead).
+- `lib/data/product_data.dart` `productImageUrl()`: returns loremflickr placeholder photos, against the "no
+  placeholder images" rule. The pregnancy V3 home no longer wires it (its shelf shows the product's own picture or
+  a quiet tile); the shared products screen still calls it. The fix belongs in the data file (a real image or
+  empty, and every caller falls back to a tile or a drawn mark), so it is one change for all stages.
+- `lib/localization/app_language.dart` `prComingSoon` still ends in a heart; it is read by the shared products
+  screen. The pregnancy-only keys (`med*`, `ddc*`, `vid*`, `jm*`, `rnBuyComingSoon`, `bodySupportingTitle`) lost
+  theirs in this pass, on both the English and Hindi sides.
+
+**What it would need:** whoever owns the other stage decides the look once, for all stages, in these files. The
+pregnancy theme already covers the Material defaults in them while the stage is pregnancy; only their hand-set
+violets remain.

@@ -21,6 +21,8 @@ import '../widgets/pv_feedback.dart';
 import '../widgets/pv_placeholders.dart';
 import 'brackets/hub/hub_solution_cards.dart' show SolutionMeta, SolutionType;
 import 'doors/pv_door_chrome.dart' show PvDoorRow, PvDoorToolScaffold, pvDoorPad;
+import 'pregnancy/preg_chrome.dart' show PregCard, PregSectionHeading, pregSectionHeadingStyle;
+import 'products/pv_store_chrome.dart' show kPvInk, kPvLine;
 import 'tools/ask_veda_screen.dart';
 import 'v2/v2_palette.dart';
 import '../data/reads/read_adapters.dart';
@@ -268,14 +270,11 @@ class _ReportScreenState extends State<ReportScreen> {
           // section renders an invitation, and only the copy changes.
           if (_picked.isNotEmpty && popular.isEmpty && all.isEmpty) ...[
             const SizedBox(height: 26),
-            Container(
+            // White + hairline, not the lavender well (2026-09-18); the one
+            // pregnancy card since 2026-09-30. Kept for revert: a Container
+            // with AppTheme.surface, radius 18, AppTheme.outlineVariant border.
+            PregCard(
               padding: const EdgeInsets.fromLTRB(16, 18, 16, 18),
-              // White + hairline, not the lavender well (2026-09-18).
-              decoration: BoxDecoration(
-                color: AppTheme.surface,
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: AppTheme.outlineVariant),
-              ),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(
                     lang.isEnglish
@@ -288,7 +287,7 @@ class _ReportScreenState extends State<ReportScreen> {
                   child: Text(
                       lang.isEnglish ? 'Show everything' : 'सब कुछ दिखाएँ',
                       style: text.labelLarge?.copyWith(
-                          color: AppTheme.neutral900, // was primary600
+                          color: kPvInk, // was primary600
                           fontWeight: FontWeight.w800)),
                 ),
               ]),
@@ -296,9 +295,8 @@ class _ReportScreenState extends State<ReportScreen> {
           ],
 
           if (popular.isNotEmpty) const SizedBox(height: 26),
-          if (popular.isNotEmpty)
-            Text(s.rPopularTitle,
-                style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+          // One section heading (2026-09-30): the serif. Was titleMedium w800.
+          if (popular.isNotEmpty) PregSectionHeading(s.rPopularTitle),
           if (popular.isNotEmpty) const SizedBox(height: 12),
           for (final f in popular)
             _TopicRow(
@@ -325,12 +323,14 @@ class _ReportScreenState extends State<ReportScreen> {
                   padding: const EdgeInsets.symmetric(vertical: 6),
                   child: Row(children: [
                     Expanded(
-                      child: Text(
-                          lang.isEnglish
-                              ? 'More topics  ·  ${all.length}'
-                              : 'और विषय  ·  ${all.length}',
-                          style: text.titleMedium
-                              ?.copyWith(fontWeight: FontWeight.w800)),
+                      child: Semantics(
+                        header: true,
+                        child: Text(
+                            lang.isEnglish
+                                ? 'More topics  ·  ${all.length}'
+                                : 'और विषय  ·  ${all.length}',
+                            style: pregSectionHeadingStyle()),
+                      ),
                     ),
                     AnimatedRotation(
                       turns: _moreOpen ? 0.5 : 0,
@@ -358,7 +358,7 @@ class _ReportScreenState extends State<ReportScreen> {
                     : (lang.isEnglish
                         ? 'Topics on these reports'
                         : 'इन रिपोर्टों के विषय'),
-                style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+                style: pregSectionHeadingStyle()),
           if (all.isNotEmpty) const SizedBox(height: 12),
           // The fold opens like a drawer, not a jump.
           AnimatedSize(
@@ -429,10 +429,10 @@ class _FilterChip extends StatelessWidget {
         // Ink, not violet (2026-09-18, DESIGN-SYSTEM §4.0: selection is
         // ink). Kept for revert: AppTheme.neutral900 fill and border.
         decoration: BoxDecoration(
-          color: selected ? AppTheme.neutral900 : AppTheme.surface,
+          color: selected ? kPvInk : Colors.white,
           borderRadius: BorderRadius.circular(999),
           border: Border.all(
-              color: selected ? AppTheme.neutral900 : AppTheme.outlineVariant,
+              color: selected ? kPvInk : kPvLine,
               width: 1.2),
         ),
         child: Text(label,
@@ -459,17 +459,12 @@ class _SearchBar extends StatelessWidget {
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        // Hairline, no shadow (2026-09-30, one ParentVeda). Kept for revert:
+        // a 0.04 neutral900 shadow, blur 16, offset (0, 6).
         decoration: BoxDecoration(
-          color: AppTheme.surface,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: AppTheme.outlineVariant, width: 1.2),
-          boxShadow: [
-            BoxShadow(
-              color: AppTheme.neutral900.withValues(alpha: 0.04),
-              blurRadius: 16,
-              offset: const Offset(0, 6),
-            ),
-          ],
+          border: Border.all(color: kPvLine),
         ),
         child: Row(children: [
           const Icon(Icons.search_rounded, color: AppTheme.neutral500),

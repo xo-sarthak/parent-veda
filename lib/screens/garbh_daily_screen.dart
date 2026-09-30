@@ -46,6 +46,10 @@ import 'garbh_ritual_screen.dart';
 import 'garbh_screen.dart'
     show ShravanScreen, SamvadScreen, KriyaScreen, gameForPuzzle;
 import 'v2/v2_palette.dart';
+import 'brackets/hub/hub_intent_art.dart' show IntentMark;
+import 'doors/pv_list_row.dart' show PvMarkWell;
+import 'pregnancy/preg_chrome.dart' show PregCard, pregGroupLabelStyle;
+import 'products/pv_store_chrome.dart' show kPvInk;
 
 LocalizedText _en(String s) => LocalizedText(en: s, hi: s);
 
@@ -79,6 +83,8 @@ class GarbhDailyScreen extends StatelessWidget {
             today: shravanForDay(cd).title.now,
             icon: Icons.music_note_rounded,
             accent: const Color(0xFF2F2C30),
+            mark: IntentMark.audioMark,
+            hue: 212,
             open: () => ShravanScreen(controller: pregnancy, daily: true),
           ),
           _Pillar(
@@ -100,6 +106,8 @@ class GarbhDailyScreen extends StatelessWidget {
             today: promptForDay(cd, tri).title.now,
             icon: Icons.record_voice_over_rounded,
             accent: const Color(0xFF9C5F51),
+            mark: IntentMark.cuppedHands,
+            hue: 12,
             // ⚠️ THE DAILY ARRIVAL IS NOW THE RECORD-FIRST SCREEN, not the
             // four-tab one. `SamvadScreen(daily:false)` survives untouched as
             // the library it always was, reached from below the fold - which
@@ -130,6 +138,8 @@ class GarbhDailyScreen extends StatelessWidget {
             today: buddhiTodayLine(cd).now,
             icon: Icons.psychology_alt_outlined,
             accent: const Color(0xFF2F2C30),
+            mark: IntentMark.blocksMark,
+            hue: 268,
             open: () => GarbhBuddhiScreen(
               controller: pregnancy,
               daily: true,
@@ -146,6 +156,8 @@ class GarbhDailyScreen extends StatelessWidget {
             today: kriyaForDay(cd).title.now,
             icon: Icons.spa_rounded,
             accent: const Color(0xFF8A6D3B),
+            mark: IntentMark.lotusMark,
+            hue: 38,
             open: () => KriyaScreen(controller: pregnancy, daily: true),
           ),
         ];
@@ -267,6 +279,8 @@ class _Pillar {
     required this.today,
     required this.icon,
     required this.accent,
+    required this.mark,
+    required this.hue,
     required this.open,
   });
 
@@ -274,8 +288,15 @@ class _Pillar {
   final String name;
   final String tag;
   final String today;
+
+  /// Kept for revert: the line icon and accent the pillar's tinted box drew
+  /// before its drawn mark (2026-09-30).
   final IconData icon;
   final Color accent;
+
+  /// The pillar's drawn mark, and the hue of its well.
+  final IntentMark mark;
+  final double hue;
   final Widget Function() open;
 }
 
@@ -311,16 +332,14 @@ class _RitualRows extends StatelessWidget {
         // `ritualsAsked` is the flag that tells the two apart, and it was
         // written and never read until now.
         if (chosen.isEmpty) {
+          // A white card with the hairline, not a grey block behind text
+          // (2026-09-30). Kept for revert: a Material on `p.surfaceAlt`,
+          // radius 18, with an InkWell around the same padding.
           return Padding(
             padding: const EdgeInsets.only(top: 14),
-            child: Material(
-              color: p.surfaceAlt,
-              borderRadius: BorderRadius.circular(18),
-              child: InkWell(
+            child: PregCard(
                 onTap: open,
-                borderRadius: BorderRadius.circular(18),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 14, 14, 15),
+                padding: const EdgeInsets.fromLTRB(16, 14, 14, 15),
                   child: Row(children: [
                     Icon(Icons.add_circle_outline_rounded,
                         size: 20, color: p.ink2),
@@ -352,8 +371,6 @@ class _RitualRows extends StatelessWidget {
                     ),
                     Icon(Icons.chevron_right_rounded, size: 19, color: p.ink3),
                   ]),
-                ),
-              ),
             ),
           );
         }
@@ -452,8 +469,10 @@ class _RitualRow extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(children: [
-                  Icon(Icons.self_improvement_rounded,
-                      size: 18, color: p.ink3),
+                  // A drawn mark: the row opens her rituals (2026-09-30).
+                  // Kept for revert: Icon(Icons.self_improvement_rounded,
+                  // size: 18, color: p.ink3).
+                  PvMarkWell(p: p, hue: 38, size: 32, mark: IntentMark.lotusMark),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(ritual.name.now,
@@ -531,21 +550,19 @@ class _WhyToday extends StatelessWidget {
   final V2Palette p;
   final AppLanguage lang;
 
+  // ⚠️ THE TIP FORM, NOT A TINTED BLOCK (2026-09-30, DESIGN-SYSTEM §4.0
+  // addendum): a left hairline in the ink, the grey group label, the line.
+  // Kept for revert: a Container filled `p.ink1` at 0.08, radius 16, padding
+  // 15 x 13, its label Manrope 9.5 w800 +1.2 in `p.ink1`.
   @override
   Widget build(BuildContext context) => Container(
         width: double.infinity,
-        padding: const EdgeInsets.fromLTRB(15, 13, 15, 14),
-        decoration: BoxDecoration(
-          color: p.ink1.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(16),
+        padding: const EdgeInsets.fromLTRB(16, 4, 4, 4),
+        decoration: const BoxDecoration(
+          border: Border(left: BorderSide(color: kPvInk, width: 2)),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('WHY WEEK $week MATTERS',
-              style: pvManrope(
-                  fontSize: 9.5,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 1.2,
-                  color: p.ink1)),
+          Text('WHY WEEK $week MATTERS', style: pregGroupLabelStyle()),
           const SizedBox(height: 7),
           Text(garbhWeekReason(week).of(lang),
               style: pvManrope(fontSize: 13.5, height: 1.6, color: p.ink1)),
@@ -577,17 +594,16 @@ class _JournalStrip extends StatelessWidget {
               builder: (_) => const GarbhJournalScreen(),
             ));
 
+        // A white card with the hairline and the journal's drawn mark
+        // (2026-09-30). Kept for revert: a Material on `p.surfaceAlt`, radius
+        // 18, with an InkWell; the leading was Icon(Icons.auto_stories_outlined,
+        // size: 20, color: p.ink2).
         return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Material(
-            color: p.surfaceAlt,
-            borderRadius: BorderRadius.circular(18),
-            child: InkWell(
+          PregCard(
               onTap: open,
-              borderRadius: BorderRadius.circular(18),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 14, 14, 15),
+              padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
                 child: Row(children: [
-                  Icon(Icons.auto_stories_outlined, size: 20, color: p.ink2),
+                  PvMarkWell(p: p, hue: 30, size: 40, mark: IntentMark.bookMark),
                   const SizedBox(width: 13),
                   Expanded(
                     child: Column(
@@ -610,8 +626,6 @@ class _JournalStrip extends StatelessWidget {
                   ),
                   Icon(Icons.chevron_right_rounded, size: 19, color: p.ink3),
                 ]),
-              ),
-            ),
           ),
 
           // ⚠️ THE ACTUAL STRIP - THE THINGS, NOT A COUNT OF THEM.
@@ -654,26 +668,16 @@ class _PillarCard extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => InkWell(
+  Widget build(BuildContext context) => PregCard(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(18),
+        padding: EdgeInsets.zero,
         child: Container(
           padding: const EdgeInsets.fromLTRB(14, 14, 12, 14),
-          decoration: BoxDecoration(
-            color: p.surface,
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: p.line),
-          ),
           child: Row(children: [
-            Container(
-              width: 46,
-              height: 46,
-              decoration: BoxDecoration(
-                color: pillar.accent.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Icon(pillar.icon, size: 23, color: pillar.accent),
-            ),
+            // The pillar's drawn mark in its well (2026-09-30). Kept for
+            // revert: a 46pt `pillar.accent` 0.12 box holding
+            // Icon(pillar.icon, size: 23, color: pillar.accent).
+            PvMarkWell(p: p, hue: pillar.hue, size: 46, mark: pillar.mark),
             const SizedBox(width: 13),
             Expanded(
               child: Column(
@@ -716,10 +720,11 @@ class _PillarCard extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
-            // Done is a quiet tick, not a trophy.
+            // Done is a quiet tick, not a trophy. In the one ink
+            // (2026-09-30); was `pillar.accent`.
             Icon(done ? Icons.check_circle_rounded : Icons.chevron_right_rounded,
                 size: done ? 21 : 20,
-                color: done ? pillar.accent : p.ink3),
+                color: done ? kPvInk : p.ink3),
           ]),
         ),
       );

@@ -224,11 +224,13 @@ class PregRowCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = pvStorePalette;
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
+    // A Material rather than a decorated Container, so a row's InkWell has a
+    // surface of its own to paint the press on (behind a white box it is lost).
+    return Material(
+      color: Colors.white,
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: kPvLine),
+        side: const BorderSide(color: kPvLine),
       ),
       clipBehavior: Clip.antiAlias,
       child: children.isEmpty

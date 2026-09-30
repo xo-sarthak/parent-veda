@@ -25,6 +25,10 @@ import 'garbh_screen.dart';
 import 'read_next_screen.dart';
 import 'watch_learn_screen.dart';
 import '../theme/pv_fonts.dart';
+import 'brackets/hub/hub_intent_art.dart' show IntentMark;
+import 'doors/pv_list_row.dart' show PvMarkWell;
+import 'pregnancy/preg_chrome.dart';
+import 'products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 
 PvVideo? _videoById(String id) {
   for (final v in kVideos) {
@@ -48,10 +52,12 @@ class SavedHubScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final s = S(controller.language);
     final lang = controller.language;
+    // One ParentVeda (2026-09-30): the page ground, not the old grey
+    // container tint.
     return Scaffold(
-      backgroundColor: AppTheme.surfaceContainer,
+      backgroundColor: pvStorePalette.ground,
       appBar: AppBar(
-        backgroundColor: AppTheme.surfaceContainer,
+        backgroundColor: pvStorePalette.ground,
         elevation: 0,
         title: Text(s.shTitle),
       ),
@@ -89,8 +95,8 @@ class SavedHubScreen extends StatelessWidget {
               else
                 for (final p in rtb)
                   _tile(
-                    leadingIcon: Icons.menu_book_rounded,
-                    color: AppTheme.secondary500,
+                    mark: IntentMark.bookMark,
+                    hue: 30,
                     title: p.title,
                     subtitle: p.tag,
                     date: _date(s, p.savedAt),
@@ -105,8 +111,9 @@ class SavedHubScreen extends StatelessWidget {
               else
                 for (final r in reads)
                   _tile(
-                    emoji: r.emoji,
-                    color: AppTheme.neutral900,
+                    // Kept for revert: emoji: r.emoji, color: AppTheme.neutral900,
+                    mark: IntentMark.pageMark,
+                    hue: 212,
                     title: r.title.now,
                     subtitle: '${r.category} · ${r.readingTime}',
                     date: _date(s, ReadNextStore.instance.savedAt(r.id)),
@@ -121,8 +128,10 @@ class SavedHubScreen extends StatelessWidget {
               else
                 for (final v in videos)
                   _tile(
-                    leadingIcon: videoMeta(v.category).icon,
-                    color: videoMeta(v.category).color,
+                    // Kept for revert: leadingIcon: videoMeta(v.category).icon,
+                    // color: videoMeta(v.category).color,
+                    mark: IntentMark.playMark,
+                    hue: 345,
                     title: v.title.of(lang),
                     subtitle: v.duration,
                     date: _date(s, VideoStore.instance.savedAt(v.id)),
@@ -139,31 +148,25 @@ class SavedHubScreen extends StatelessWidget {
     );
   }
 
+  // One section heading (2026-09-30): the serif. Was pvJakarta 16 / w800.
   Widget _header(String t) => Padding(
-        padding: const EdgeInsets.fromLTRB(2, 18, 2, 8),
-        child: Text(t,
-            style: pvJakarta(
-                fontSize: 16,
-                fontWeight: FontWeight.w800,
-                color: AppTheme.neutral900)),
+        padding: const EdgeInsets.fromLTRB(2, 22, 2, 10),
+        child: PregSectionHeading(t),
       );
 
   // Sits under a section header when that section has nothing saved, so the
   // section (and the fact that this kind of thing can be saved) stays visible.
   // It is TAPPABLE and carries a CTA: an empty state that only explains itself
   // is still dead space - it has to offer the way in, not just describe it.
-  Widget _emptyNote(String text, String cta, VoidCallback onTap) => Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(16),
-          child: Container(
+  //
+  // One ParentVeda (2026-09-30): a white card with the hairline, never a grey
+  // block behind text. Kept for revert: the InkWell > Container carried
+  // `color: AppTheme.surfaceContainer`, radius 16, padding 14 x 16.
+  Widget _emptyNote(String text, String cta, VoidCallback onTap) => PregCard(
+        onTap: onTap,
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
+        child: SizedBox(
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
-            decoration: BoxDecoration(
-              color: AppTheme.surfaceContainer,
-              borderRadius: BorderRadius.circular(16),
-            ),
             child: Row(children: [
               const Icon(Icons.bookmark_border_rounded,
                   size: 18, color: AppTheme.neutral500),
@@ -183,22 +186,25 @@ class SavedHubScreen extends StatelessWidget {
                             style: pvManrope(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w700,
-                                color: AppTheme.neutral900)),
+                                color: kPvInk)),
                         const SizedBox(width: 3),
                         const Icon(Icons.arrow_forward_rounded,
-                            size: 14, color: AppTheme.neutral900),
+                            size: 14, color: kPvInk),
                       ]),
                     ]),
               ),
             ]),
-          ),
         ),
       );
 
+  // One ParentVeda (2026-09-30): a white card with the hairline and no
+  // shadow; a row that opens somewhere carries a drawn mark in its group's
+  // tint, not an emoji or a tinted line icon. Kept for revert: the leading was
+  // a 44pt `color.withValues(alpha: 0.12)` box holding `emoji` or
+  // `Icon(leadingIcon, color: color)`, and the card cast a 0x0A2D144C shadow.
   Widget _tile({
-    String? emoji,
-    IconData? leadingIcon,
-    required Color color,
+    required IntentMark mark,
+    required double hue,
     required String title,
     required String subtitle,
     required String date,
@@ -207,32 +213,20 @@ class SavedHubScreen extends StatelessWidget {
       Container(
         margin: const EdgeInsets.only(bottom: 10),
         decoration: BoxDecoration(
-          color: AppTheme.surface,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(18),
-          boxShadow: const [
-            BoxShadow(
-                color: Color(0x0A2D144C), blurRadius: 10, offset: Offset(0, 2)),
-          ],
+          border: Border.all(color: kPvLine),
         ),
         child: ListTile(
           onTap: onTap,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
           contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-          leading: Container(
-            width: 44,
-            height: 44,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(12)),
-            child: emoji != null
-                ? Text(emoji, style: const TextStyle(fontSize: 20))
-                : Icon(leadingIcon, size: 20, color: color),
-          ),
+          leading: PvMarkWell(p: pvStorePalette, hue: hue, size: 44, mark: mark),
           title: Text(title,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: pvJakarta(
-                  fontSize: 14, fontWeight: FontWeight.w700)),
+              style: pvManrope(
+                  fontSize: 14, fontWeight: FontWeight.w700, color: kPvInk)),
           subtitle: Text(
               date.isEmpty ? subtitle : '$subtitle · $date',
               maxLines: 1,
@@ -273,7 +267,7 @@ class SavedHubScreen extends StatelessWidget {
             icon: const Icon(Icons.video_library_outlined, size: 18),
             label: Text(s.shWatch),
             style: OutlinedButton.styleFrom(
-              foregroundColor: AppTheme.neutral900,
+              foregroundColor: kPvInk,
               padding: const EdgeInsets.symmetric(vertical: 12),
               shape:
                   RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
@@ -288,7 +282,7 @@ class SavedHubScreen extends StatelessWidget {
             icon: const Icon(Icons.auto_stories_outlined, size: 18),
             label: Text(s.shRead),
             style: OutlinedButton.styleFrom(
-              foregroundColor: AppTheme.neutral900,
+              foregroundColor: kPvInk,
               padding: const EdgeInsets.symmetric(vertical: 12),
               shape:
                   RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),

@@ -57,13 +57,15 @@ final Map<ReadyCategory, ReadyCatMeta> kReadyCatMeta = {
       _t('The papers the hospital will ask for',
           'वे काग़ज़ जो अस्पताल माँगेगा'),
       Icons.folder_rounded,
-      AppTheme.primary500),
+      // Was AppTheme.primary500, kept for revert (2026-09-30, no violet).
+      AppTheme.neutral900),
   ReadyCategory.partnerExtras: ReadyCatMeta(
       _t('Partner & extras', 'साथी और बाक़ी'),
       _t('For your partner, and the nice-to-haves',
           'आपके साथी के लिए, और वे चीज़ें जो अच्छी लगती हैं'),
       Icons.handshake_rounded,
-      AppTheme.primary300),
+      // Was AppTheme.primary300, kept for revert (2026-09-30, no violet).
+      AppTheme.neutral300),
 };
 
 /// Collapse the six bag sections into the four readiness categories.

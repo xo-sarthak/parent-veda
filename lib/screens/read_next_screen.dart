@@ -25,6 +25,33 @@ import '../data/reads/read_adapters.dart';
 import 'doors/pv_door_router.dart';
 import '../data/reads/pregnancy_reads.dart';
 import 'reader/pv_reader_screen.dart';
+import 'brackets/hub/hub_intent_art.dart';
+import 'doors/pv_list_row.dart' show PvMarkWell;
+import 'pregnancy/preg_chrome.dart';
+import 'products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
+
+// ⚠️ ONE PARENTVEDA (2026-09-30, the pregnancy restyle) on the full Read
+// recommendations page: the serif page title under a back arrow (no emoji in
+// the AppBar), one serif section heading, white cards with the page hairline,
+// a drawn mark in a tinted well where each read showed an emoji, "Why this
+// matters now" as words in the card rather than a gold block, the one filled
+// ink button, and no book ratings (their counts had no source we can show).
+// The Home cards further down (ReadNextHomeCard, DailyReadsHomeCard) sit on
+// home screens that are no longer reached and are left as they were.
+
+/// The drawn mark and well hue for a read, by what kind of read it is.
+(IntentMark, double) _markOf(ReadItem r) => switch (r.type) {
+      ReadType.book => (IntentMark.bookMark, 24),
+      ReadType.research => (IntentMark.compareMark, 176),
+      ReadType.expert => (IntentMark.askDoctor, 150),
+      ReadType.reflection => (IntentMark.lotusMark, 345),
+      ReadType.article => (IntentMark.pageMark, 212),
+    };
+
+Widget _markWell(ReadItem r, double size) {
+  final (mark, hue) = _markOf(r);
+  return PvMarkWell(p: pvStorePalette, hue: hue, size: size, mark: mark);
+}
 
 const Color _accent = AppTheme.neutral900;
 const Color _gold = Color(0xFFE6A817);
@@ -72,8 +99,9 @@ String _statusLabel(S s, String status) {
   }
 }
 
-String _fmtCount(int n) =>
-    n >= 1000 ? '${(n / 1000).toStringAsFixed(1)}k' : '$n';
+// Kept for revert: the book rating count, no longer shown (see _BookCard).
+// String _fmtCount(int n) =>
+//     n >= 1000 ? '${(n / 1000).toStringAsFixed(1)}k' : '$n';
 
 // ===========================================================================
 //  Full screen
@@ -87,7 +115,6 @@ class ReadNextScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final lang = controller.language;
     final s = S(lang);
-    final text = Theme.of(context).textTheme;
     final week = controller.currentWeek;
     final hero = heroForWeek(week);
     final recommended =
@@ -97,14 +124,17 @@ class ReadNextScreen extends StatelessWidget {
     final research = readByType(ReadType.research);
     final experts = readByType(ReadType.expert);
 
+    final p = pvStorePalette;
+    // Kept for revert: title: Row(Text(s.rnTitle), Text(' ❤️')) in the
+    // AppBar on AppTheme.scaffoldBackground. The AppBar now carries the back
+    // arrow and search; the title is the serif page title in the body.
     return Scaffold(
-      backgroundColor: AppTheme.scaffoldBackground,
+      backgroundColor: p.ground,
       appBar: AppBar(
-        backgroundColor: AppTheme.scaffoldBackground,
+        backgroundColor: p.ground,
+        surfaceTintColor: Colors.transparent,
+        foregroundColor: p.ink1,
         elevation: 0,
-        title: Row(mainAxisSize: MainAxisSize.min, children: [
-          Text(s.rnTitle), const Text(' ❤️'),
-        ]),
         actions: [
           IconButton(
             icon: const Icon(Icons.search_rounded),
@@ -121,11 +151,16 @@ class ReadNextScreen extends StatelessWidget {
               .whereType<ReadItem>()
               .toList();
           return ListView(
-            padding: const EdgeInsets.fromLTRB(16, 6, 16, 28),
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 28),
             children: [
+              Semantics(
+                header: true,
+                child: Text(s.rnTitle, style: pregPageTitleStyle()),
+              ),
+              const SizedBox(height: 6),
               Text(s.rnSubtitle,
-                  style: text.bodyMedium?.copyWith(color: AppTheme.neutral600, height: 1.4)),
-              const SizedBox(height: 16),
+                  style: pvManrope(fontSize: 14, height: 1.45, color: p.ink2)),
+              const SizedBox(height: 18),
               if (hero != null) _HeroCard(item: hero, controller: controller),
               if (recommended.isNotEmpty) ...[
                 _heading(context, s.rnRecommended),
@@ -173,13 +208,10 @@ class ReadNextScreen extends StatelessWidget {
   }
 }
 
+// The one section heading. Kept for revert: Text(t, titleMedium w800).
 Widget _heading(BuildContext context, String t) => Padding(
-      padding: const EdgeInsets.fromLTRB(0, 22, 0, 12),
-      child: Text(t,
-          style: Theme.of(context)
-              .textTheme
-              .titleMedium
-              ?.copyWith(fontWeight: FontWeight.w800)),
+      padding: const EdgeInsets.fromLTRB(0, 26, 0, 12),
+      child: PregSectionHeading(t),
     );
 
 // ===========================================================================
@@ -196,38 +228,38 @@ class _HeroCard extends StatelessWidget {
     final text = Theme.of(context).textTheme;
     return GestureDetector(
       onTap: () => _openItem(context, item, controller),
+      // A white card with the hairline. Kept for revert: a gradient from
+      // the ink at 16% to white with an ink hairline at 20%, a gold star and
+      // gold kicker, and the read's emoji at 40.
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [_accent.withValues(alpha: 0.16), AppTheme.surface],
-          ),
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: _accent.withValues(alpha: 0.20)),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: kPvLine),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
-            const Icon(Icons.star_rounded, size: 16, color: _gold),
-            const SizedBox(width: 6),
-            Text(s.rnThisWeekPick.toUpperCase(),
-                style: text.labelSmall?.copyWith(
-                    color: _gold, letterSpacing: 0.6, fontWeight: FontWeight.w800)),
+            Text(s.rnThisWeekPick.toUpperCase(), style: pregGroupLabelStyle()),
             const Spacer(),
             _SaveHeart(id: item.id),
           ]),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(item.emoji, style: const TextStyle(fontSize: 40)),
+            _markWell(item, 56),
             const SizedBox(width: 14),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(item.title.now,
-                    style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w800, height: 1.2)),
+                    style: pvFraunces(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w600,
+                        height: 1.2,
+                        letterSpacing: -0.4,
+                        color: pvStorePalette.ink1)),
                 const SizedBox(height: 4),
                 Text('${item.category} · ${item.readingTime}',
-                    style: text.labelMedium?.copyWith(color: AppTheme.neutral500)),
+                    style: pvManrope(fontSize: 12.5, color: pvStorePalette.ink3)),
               ]),
             ),
           ]),
@@ -237,9 +269,9 @@ class _HeroCard extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: FilledButton.icon(
-              style: FilledButton.styleFrom(
-                  backgroundColor: _accent,
-                  padding: const EdgeInsets.symmetric(vertical: 13)),
+              style: pregFilledStyle().copyWith(
+                  padding: const WidgetStatePropertyAll(
+                      EdgeInsets.symmetric(vertical: 13))),
               onPressed: () => _openItem(context, item, controller),
               icon: const Icon(Icons.menu_book_rounded, size: 18, color: Colors.white),
               label: Text(s.rnReadNow,
@@ -264,7 +296,6 @@ class _ReadCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = S(controller.language);
-    final text = Theme.of(context).textTheme;
     final status = ReadNextStore.instance.statusOf(item.id);
     return GestureDetector(
       onTap: () => _openItem(context, item, controller),
@@ -272,21 +303,14 @@ class _ReadCard extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: AppTheme.surface,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: AppTheme.outlineVariant),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: kPvLine),
         ),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Container(
-            width: 48,
-            height: 48,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: _accent.withValues(alpha: 0.10),
-              borderRadius: BorderRadius.circular(13),
-            ),
-            child: Text(item.emoji, style: const TextStyle(fontSize: 24)),
-          ),
+          // A drawn mark in its well. Kept for revert: the read's emoji at 24
+          // on the ink at 10%, 48 square.
+          _markWell(item, 48),
           const SizedBox(width: 12),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -294,13 +318,19 @@ class _ReadCard extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(aheadLabel!,
-                      style: text.labelSmall?.copyWith(
-                          color: _gold, fontWeight: FontWeight.w800)),
+                      style: pvManrope(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w800,
+                          color: pvStorePalette.ink2)),
                 ),
               Row(children: [
                 Expanded(
                   child: Text(item.title.now,
-                      style: text.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
+                      style: pvManrope(
+                          fontSize: 14.5,
+                          fontWeight: FontWeight.w700,
+                          height: 1.25,
+                          color: pvStorePalette.ink1)),
                 ),
                 if (status != null) ...[
                   const SizedBox(width: 6),
@@ -308,12 +338,12 @@ class _ReadCard extends StatelessWidget {
                 ],
               ]),
               Text('${item.category} · ${item.readingTime}',
-                  style: text.labelSmall?.copyWith(color: AppTheme.neutral500)),
+                  style: pvManrope(fontSize: 12, color: pvStorePalette.ink3)),
               const SizedBox(height: 6),
               Text('${s.rnWhyNow}: ${item.reason}',
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: text.bodySmall?.copyWith(color: AppTheme.neutral600, height: 1.35)),
+                  style: pvManrope(fontSize: 12.5, height: 1.4, color: pvStorePalette.ink2)),
             ]),
           ),
           _SaveHeart(id: item.id),
@@ -337,13 +367,14 @@ class _BookCard extends StatelessWidget {
         width: 214,
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: AppTheme.surface,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: AppTheme.outlineVariant),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: kPvLine),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
-            Text(item.emoji, style: const TextStyle(fontSize: 32)),
+            // Kept for revert: Text(item.emoji, fontSize 32).
+            _markWell(item, 44),
             const Spacer(),
             _SaveHeart(id: item.id),
           ]),
@@ -351,36 +382,44 @@ class _BookCard extends StatelessWidget {
           Text(item.title.now,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: text.titleSmall?.copyWith(fontWeight: FontWeight.w800, height: 1.2)),
+              style: pvManrope(
+                  fontSize: 14.5,
+                  fontWeight: FontWeight.w700,
+                  height: 1.25,
+                  color: pvStorePalette.ink1)),
           Text(item.author,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: text.labelSmall?.copyWith(color: AppTheme.neutral500)),
-          if (item.hasRating) ...[
-            const SizedBox(height: 5),
-            Row(children: [
-              const Icon(Icons.star_rounded, size: 15, color: _gold),
-              const SizedBox(width: 3),
-              Text(item.rating.toStringAsFixed(1),
-                  style: text.labelSmall?.copyWith(fontWeight: FontWeight.w800)),
-              const SizedBox(width: 4),
-              Text('(${_fmtCount(item.ratingCount)})',
-                  style: text.labelSmall?.copyWith(color: AppTheme.neutral500)),
-            ]),
-          ],
+              style: pvManrope(fontSize: 12, color: pvStorePalette.ink3)),
+          // ⚠️ NO RATING (2026-09-30, rule "no fake counts"): the stars and
+          // the "(15.0k)" were typed into the seed with no source to show.
+          // Kept for revert:
+          // if (item.hasRating) ...[
+          //   const SizedBox(height: 5),
+          //   Row(children: [
+          //     const Icon(Icons.star_rounded, size: 15, color: _gold),
+          //     const SizedBox(width: 3),
+          //     Text(item.rating.toStringAsFixed(1),
+          //         style: text.labelSmall?.copyWith(fontWeight: FontWeight.w800)),
+          //     const SizedBox(width: 4),
+          //     Text('(${_fmtCount(item.ratingCount)})',
+          //         style: text.labelSmall?.copyWith(color: AppTheme.neutral500)),
+          //   ]),
+          // ],
           const SizedBox(height: 8),
           Expanded(
             child: Text(item.why.now,
                 maxLines: 5,
                 overflow: TextOverflow.ellipsis,
-                style: text.bodySmall?.copyWith(color: AppTheme.neutral600, height: 1.35)),
+                style: pvManrope(fontSize: 12.5, height: 1.4, color: pvStorePalette.ink2)),
           ),
           const SizedBox(height: 10),
           SizedBox(
             width: double.infinity,
             child: FilledButton(
               style: FilledButton.styleFrom(
-                backgroundColor: _accent,
+                backgroundColor: kPvInk,
+                shape: const StadiumBorder(),
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 minimumSize: const Size(0, 36),
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -396,8 +435,9 @@ class _BookCard extends StatelessWidget {
             width: double.infinity,
             child: OutlinedButton(
               style: OutlinedButton.styleFrom(
-                foregroundColor: _accent,
-                side: BorderSide(color: _accent.withValues(alpha: 0.5), width: 1.3),
+                foregroundColor: kPvInk,
+                side: const BorderSide(color: kPvLine, width: 1.1),
+                shape: const StadiumBorder(),
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 minimumSize: const Size(0, 36),
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -419,42 +459,43 @@ class _ExpertCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = S(controller.language);
-    final text = Theme.of(context).textTheme;
     return GestureDetector(
       onTap: () => _openItem(context, item, controller),
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppTheme.surface,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: AppTheme.outlineVariant),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: kPvLine),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
-            CircleAvatar(
-              radius: 18,
-              backgroundColor: _accent.withValues(alpha: 0.12),
-              child: Text(item.emoji, style: const TextStyle(fontSize: 18)),
-            ),
+            // Kept for revert: CircleAvatar(radius 18, the ink at 12%,
+            // Text(item.emoji)).
+            _markWell(item, 40),
             const SizedBox(width: 10),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text('${s.rnRecommendedBy} ${item.author}',
-                    style: text.labelSmall?.copyWith(color: AppTheme.neutral500)),
+                    style: pvManrope(fontSize: 12, color: pvStorePalette.ink3)),
                 Text(item.authorRole.now,
-                    style: text.labelSmall?.copyWith(
-                        color: _accent, fontWeight: FontWeight.w700)),
+                    style: pvManrope(
+                        fontSize: 12, fontWeight: FontWeight.w700, color: pvStorePalette.ink1)),
               ]),
             ),
             _SaveHeart(id: item.id),
           ]),
           const SizedBox(height: 12),
           Text(item.title.now,
-              style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+              style: pvManrope(
+                  fontSize: 15.5,
+                  fontWeight: FontWeight.w700,
+                  height: 1.25,
+                  color: pvStorePalette.ink1)),
           const SizedBox(height: 6),
           Text(item.why.now,
-              style: text.bodyMedium?.copyWith(color: AppTheme.neutral700, height: 1.4)),
+              style: pvManrope(fontSize: 13.5, height: 1.45, color: pvStorePalette.ink2)),
         ]),
       ),
     );
@@ -469,26 +510,17 @@ class _WhyNow extends StatelessWidget {
   Widget build(BuildContext context) {
     final s = S(lang);
     final text = Theme.of(context).textTheme;
-    return Container(
+    // No tinted block behind the words: a group label and the reason, in the
+    // card they sit in. Kept for revert: the same Column in a Container
+    // (padding 14, gold at 10% with a gold hairline at 22%, radius 14) led by
+    // a gold lightbulb, the label in 0xFF9A7A14.
+    return SizedBox(
       width: double.infinity,
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: _gold.withValues(alpha: 0.10),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: _gold.withValues(alpha: 0.22)),
-      ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [
-          const Icon(Icons.lightbulb_rounded, size: 14, color: Color(0xFF9A7A14)),
-          const SizedBox(width: 6),
-          Text(s.rnWhyNow.toUpperCase(),
-              style: text.labelSmall?.copyWith(
-                  color: const Color(0xFF9A7A14),
-                  letterSpacing: 0.5,
-                  fontWeight: FontWeight.w800)),
-        ]),
-        const SizedBox(height: 6),
-        Text(reason, style: text.bodyMedium?.copyWith(height: 1.4)),
+        Text(s.rnWhyNow.toUpperCase(), style: pregGroupLabelStyle()),
+        const SizedBox(height: 4),
+        Text(reason,
+            style: text.bodyMedium?.copyWith(height: 1.45, color: pvStorePalette.ink1)),
       ]),
     );
   }
@@ -521,7 +553,8 @@ class _SaveHeart extends StatelessWidget {
           radius: 22,
           onTap: () => ReadNextStore.instance.toggleSave(id),
           child: Icon(saved ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-              color: saved ? const Color(0xFFEF6F8E) : AppTheme.neutral400, size: 22),
+              // A pressed control is the one ink (was pink, 0xFFEF6F8E).
+              color: saved ? kPvInk : AppTheme.neutral400, size: 22),
         );
       },
     );

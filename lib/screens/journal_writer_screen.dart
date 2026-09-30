@@ -14,7 +14,9 @@ import '../localization/app_language.dart';
 import '../models/memory_models.dart';
 import '../widgets/storage_image.dart';
 import '../services/memory_store.dart';
-import '../theme/app_theme.dart';
+import '../theme/pv_fonts.dart';
+import 'pregnancy/preg_chrome.dart' show pregPageTitleStyle;
+import 'products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 
 const int kMaxNotePhotos = 2;
 
@@ -159,16 +161,32 @@ class _JournalWriterScreenState extends State<JournalWriterScreen> {
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
     final s = S(widget.lang);
+    final pal = pvStorePalette;
+    // The writer's bar, as every stage's writer has it: a white bar, the page
+    // named in the sans, Save in the ink on the right. Kept for revert:
+    //   backgroundColor: AppTheme.scaffoldBackground,
+    //   title: Text(s.myJournal, style: text.headlineSmall),
     return Scaffold(
-      backgroundColor: AppTheme.scaffoldBackground,
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
+        foregroundColor: kPvInk,
+        elevation: 0,
         leading: const BackButton(),
-        title: Text(s.myJournal, style: text.headlineSmall),
+        title: Text(s.myJournal,
+            style: pvManrope(
+                fontSize: 17, fontWeight: FontWeight.w700, color: kPvInk)),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 12),
             child: TextButton.icon(
               onPressed: _save,
+              style: TextButton.styleFrom(
+                foregroundColor: kPvInk,
+                textStyle:
+                    pvManrope(fontSize: 15, fontWeight: FontWeight.w800),
+              ),
               icon: const Icon(Icons.check_rounded, size: 18),
               label: Text(s.saveToJournal),
             ),
@@ -181,23 +199,27 @@ class _JournalWriterScreenState extends State<JournalWriterScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // The week as a tag: a white pill with the hairline.
+              // Kept for revert: color: AppTheme.neutral50, no border.
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                 decoration: BoxDecoration(
-                  color: AppTheme.neutral50,
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(40),
+                  border: Border.all(color: kPvLine),
                 ),
                 child: Text(
                   widget.lang.isEnglish
                       ? 'Week ${widget.week}'
                       : 'हफ़्ता ${widget.week}',
-                  style: text.labelMedium?.copyWith(
-                      color: AppTheme.neutral900, fontWeight: FontWeight.w700),
+                  style: pvManrope(
+                      fontSize: 12, fontWeight: FontWeight.w700, color: kPvInk),
                 ),
               ),
               const SizedBox(height: 16),
-              Text(_promptText,
-                  style: text.headlineSmall?.copyWith(color: AppTheme.neutral900)),
+              // The question is the page's title: the serif.
+              // Kept for revert: text.headlineSmall in neutral900.
+              Text(_promptText, style: pregPageTitleStyle()),
               const SizedBox(height: 16),
               _PhotoStrip(
                 photos: _photos,
@@ -223,7 +245,7 @@ class _JournalWriterScreenState extends State<JournalWriterScreen> {
                     focusedBorder: InputBorder.none,
                     hintText: _listening ? s.listening : s.writePlaceholder,
                     hintStyle: text.bodyLarge?.copyWith(
-                      color: AppTheme.neutral400,
+                      color: pal.ink3,
                       fontStyle: FontStyle.italic,
                     ),
                   ),
@@ -302,13 +324,17 @@ class _PhotoStrip extends StatelessWidget {
           if (canAdd)
             GestureDetector(
               onTap: busy ? null : onAdd,
+              // White with the hairline: a grey tile was a tinted block
+              // behind its words. Kept for revert:
+              //   color: AppTheme.neutral50,
+              //   border: Border.all(color: AppTheme.neutral100, width: 1.2),
               child: Container(
                 width: 88,
                 height: 88,
                 decoration: BoxDecoration(
-                  color: AppTheme.neutral50,
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: AppTheme.neutral100, width: 1.2),
+                  border: Border.all(color: kPvLine),
                 ),
                 child: busy
                     ? const Center(
@@ -321,13 +347,20 @@ class _PhotoStrip extends StatelessWidget {
                     : Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.add_a_photo_rounded,
-                              color: AppTheme.neutral900, size: 24),
+                          const Icon(Icons.add_a_photo_rounded,
+                              color: kPvInk, size: 24),
                           const SizedBox(height: 4),
-                          Text(s.addUpToTwoPhotos,
-                              textAlign: TextAlign.center,
-                              style: text.labelSmall
-                                  ?.copyWith(color: AppTheme.neutral900)),
+                          // Two lines at most, inside the tile: at a large
+                          // text size the words ran out of its bottom edge.
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 6),
+                            child: Text(s.addUpToTwoPhotos,
+                                textAlign: TextAlign.center,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: text.labelSmall
+                                    ?.copyWith(color: kPvInk)),
+                          ),
                         ],
                       ),
               ),
@@ -359,18 +392,19 @@ class _MicBar extends StatelessWidget {
     final s = S(lang);
     return GestureDetector(
       onTap: onTap,
+      // The quieter button, in the one ink: an ink outline and ink words at
+      // rest, filled ink with white words while it listens. A grey pill with
+      // a grey edge read as a disabled button. Kept for revert:
+      //   color: listening ? AppTheme.neutral900 : AppTheme.neutral50,
+      //   border: Border.all(color: listening ? AppTheme.neutral900
+      //       : AppTheme.neutral100, width: 1.2),
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: listening
-              ? AppTheme.neutral900
-              : AppTheme.neutral50,
+          color: listening ? kPvInk : Colors.white,
           borderRadius: BorderRadius.circular(40),
-          border: Border.all(
-            color: listening ? AppTheme.neutral900 : AppTheme.neutral100,
-            width: 1.2,
-          ),
+          border: Border.all(color: kPvInk, width: 1.5),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -378,14 +412,20 @@ class _MicBar extends StatelessWidget {
             Icon(
               listening ? Icons.stop_rounded : Icons.mic_rounded,
               size: 20,
-              color: listening ? Colors.white : AppTheme.neutral900,
+              color: listening ? Colors.white : kPvInk,
             ),
             const SizedBox(width: 10),
-            Text(
-              listening ? s.listening : s.tapMicToSpeak,
-              style: text.labelLarge?.copyWith(
-                color: listening ? Colors.white : AppTheme.neutral900,
-                fontWeight: FontWeight.w700,
+            // Flexible, so a long label (or a large text size) ellipsises
+            // inside the button instead of running out of its right edge.
+            Flexible(
+              child: Text(
+                listening ? s.listening : s.tapMicToSpeak,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: text.labelLarge?.copyWith(
+                  color: listening ? Colors.white : kPvInk,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
           ],

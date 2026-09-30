@@ -277,12 +277,15 @@ class PregMessageSwitches extends StatelessWidget {
               value: on,
               onChanged: set,
             );
-        return Container(
+        // A Material, not a coloured Container: a ListTile paints its ink on
+        // the nearest Material, so a coloured box between them hid the press.
+        return Material(
           key: const ValueKey('preg_msg_switches'),
-          decoration: BoxDecoration(
-            color: Colors.white,
+          color: Colors.white,
+          clipBehavior: Clip.antiAlias,
+          shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: p.line),
+            side: BorderSide(color: p.line),
           ),
           child: Column(children: [
             row('On your phone too', 'Off keeps them in Messages only', store.phoneOn,

@@ -540,9 +540,12 @@ class V3ProductRow extends StatelessWidget {
                 color: v2CoverTint('prod-${item.id}', p),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Image.network(productImageUrlV3(item),
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, _, _) => const SizedBox.shrink()),
+              // No picture of its own: the quiet tile, never a stand-in photo.
+              child: productImageUrlV3(item).isEmpty
+                  ? null
+                  : Image.network(productImageUrlV3(item),
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, _, _) => const SizedBox.shrink()),
             ),
             const SizedBox(width: 13),
             Expanded(
@@ -611,7 +614,9 @@ class V3SectionHead extends StatelessWidget {
                     fontSize: 11.5,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 1.3,
-                    color: p.ink1.withValues(alpha: 0.85))),
+                    // Grey, as main's shared section head draws its eyebrow
+                    // (one ParentVeda, 2026-09-30). Was p.ink1 at 85%.
+                    color: p.ink2)),
             if (note != null) ...[
               const Spacer(),
               Text(note!.toUpperCase(),

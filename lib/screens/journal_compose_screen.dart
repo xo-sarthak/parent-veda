@@ -51,6 +51,8 @@ import '../services/journal_store.dart';
 import '../services/pregnancy_controller.dart';
 import '../theme/pv_fonts.dart';
 import '../widgets/mic_dictation_button.dart';
+import 'pregnancy/preg_chrome.dart' show PregNote, pregGroupLabelStyle;
+import 'products/pv_store_chrome.dart' show kPvInk, kPvLine;
 
 /// ⚠️ THREE, AND THE CAP IS DELIBERATE RATHER THAN ARBITRARY. Review set it,
 /// and it holds up: a journal entry with twelve photos is an album, and the
@@ -73,11 +75,18 @@ const int kJournalMaxPhotos = 3;
 const _ground = Color(0xFFFFFFFF); // V3 ground — white since 2026-09-17; was 0xFFF5F3F6
 const _surface = Color(0xFFFFFFFF); // V3 surface
 const _surfaceAlt = Color(0xFFEDECEE); // V3 surfaceAlt
-const _line = Color(0x14000000); // V3 line
+// The page hairline, shared (2026-09-30). Kept for revert: Color(0x14000000).
+const _line = kPvLine; // V3 line
 const _ink1 = Color(0xFF201C24); // V3 ink1
 const _ink2 = Color(0xFF2F2C30); // V3 ink2
-const _ink3 = Color(0xFF2F2C30); // V3 ink3
-const _action = Color(0xFF2F2C30); // V3 action
+// ⚠️ A GREY AGAIN, AND A NEUTRAL ONE (2026-09-30). The violet sweep set this
+// to the ink, which made every hint, the disabled Save and the stamp's glyphs
+// exactly as dark as the words she types: an empty field read as filled and a
+// Save she could not press looked pressable. The V3 grey (0xFF6F6878) has a
+// violet cast, so this is a neutral grey at the same weight (5.3:1 on white).
+// Kept for revert: Color(0xFF2F2C30).
+const _ink3 = Color(0xFF726C75); // a neutral ink3
+const _action = kPvInk; // the one ink
 
 Future<void> openJournalCompose(
   BuildContext context,
@@ -298,12 +307,15 @@ class _JournalComposeScreenState extends State<JournalComposeScreen> {
 
     return Scaffold(
       backgroundColor: _ground,
+      // The writer's bar, as every stage's writer has it: the page named in the
+      // sans at 17, Save in the ink. Kept for revert: pvJakarta for the title.
       appBar: AppBar(
         backgroundColor: _ground,
         surfaceTintColor: Colors.transparent,
+        foregroundColor: _ink1,
         elevation: 0,
         title: Text(widget.edit == null ? 'Add a memory' : 'Edit memory',
-            style: pvJakarta(
+            style: pvManrope(
                 fontSize: 17,
                 fontWeight: FontWeight.w700,
                 color: _ink1)),
@@ -311,8 +323,8 @@ class _JournalComposeScreenState extends State<JournalComposeScreen> {
           TextButton(
             onPressed: _canSave && !_saving ? _save : null,
             child: Text('Save',
-                style: pvJakarta(
-                    fontSize: 15,
+                style: pvManrope(
+                    fontSize: 15.5,
                     fontWeight: FontWeight.w800,
                     color: _canSave
                         ? _action
@@ -346,7 +358,7 @@ class _JournalComposeScreenState extends State<JournalComposeScreen> {
               contentPadding: EdgeInsets.zero,
             ),
           ),
-          const Divider(height: 22),
+          const Divider(height: 22, thickness: 1, color: _line),
 
           // ---- body, with dictation ------------------------------------
           TextField(
@@ -374,12 +386,9 @@ class _JournalComposeScreenState extends State<JournalComposeScreen> {
 
           // ---- photos ---------------------------------------------------
           Row(children: [
-            Text('PHOTOS',
-                style: pvManrope(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1.1,
-                    color: _ink3)),
+            // A group label inside the form: the one small grey caps label.
+            // Kept for revert: pvManrope 10 / w800 / 1.1, _ink3.
+            Text('PHOTOS', style: pregGroupLabelStyle()),
             const SizedBox(width: 8),
             Text('${_photos.length} of $kJournalMaxPhotos',
                 style: pvManrope(fontSize: 11, color: _ink3)),
@@ -415,13 +424,13 @@ class _JournalComposeScreenState extends State<JournalComposeScreen> {
           const SizedBox(height: 14),
           _MetaPreview(stamp: _stamp, place: _placeOrNull),
 
+          // A quiet note on the page, the stage's one shape for a line like
+          // this. Kept for revert: a bare Text, pvManrope 12.5, _ink3.
           if (!_canSave) ...[
             const SizedBox(height: 18),
-            Text(
+            const PregNote(
                 'Write something, or add a photo. Either one is enough to '
-                'save.',
-                style: pvManrope(
-                    fontSize: 12.5, height: 1.5, color: _ink3)),
+                'save.'),
           ],
         ],
       ),
@@ -448,11 +457,15 @@ class _MetaPreview extends StatelessWidget {
   }
 
   @override
+  // A white card with the page hairline. Without the hairline it was a white
+  // box on a white page, so the stamp floated with no edge.
+  // Kept for revert: no border.
   Widget build(BuildContext context) => Container(
         padding: const EdgeInsets.fromLTRB(14, 12, 14, 13),
         decoration: BoxDecoration(
           color: _surface,
           borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: _line),
         ),
         child: Row(children: [
           Icon(Icons.schedule_rounded, size: 15, color: _ink3),
@@ -620,7 +633,8 @@ class _PlaceField extends StatelessWidget {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
-                borderSide: BorderSide(color: _ink3, width: 1.4),
+                // The one ink (kept for revert: _ink3, 1.4).
+                borderSide: const BorderSide(color: kPvInk, width: 1.4),
               ),
             ),
           ),

@@ -21,6 +21,8 @@ import '../services/profile_analytics.dart';
 import '../theme/app_theme.dart';
 import '../theme/pv_fonts.dart';
 import '../localization/app_language.dart';
+import 'pregnancy/preg_chrome.dart' show PregCard;
+import 'products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 
 class PregnancyProfileScreen extends StatefulWidget {
   const PregnancyProfileScreen({super.key});
@@ -43,9 +45,9 @@ class _PregnancyProfileScreenState extends State<PregnancyProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.surfaceContainer,
+      backgroundColor: pvStorePalette.ground,
       appBar: AppBar(
-        backgroundColor: AppTheme.surfaceContainer,
+        backgroundColor: pvStorePalette.ground,
         elevation: 0,
         title: Text(S.now.uiPersonaliseParentveda),
       ),
@@ -73,22 +75,20 @@ class _PregnancyProfileScreenState extends State<PregnancyProfileScreen> {
     );
   }
 
-  Widget _intro() => Container(
+  // The one pregnancy card, white with the hairline (2026-09-30). Kept for
+  // revert: a white Container, radius 20, no border.
+  Widget _intro() => PregCard(
         padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-        ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
             const Icon(Icons.auto_awesome_rounded,
-                size: 20, color: AppTheme.neutral900),
+                size: 20, color: kPvInk),
             const SizedBox(width: 8),
             Text('${_p.completenessPercent}% complete',
                 style: pvJakarta(
                     fontSize: 14,
                     fontWeight: FontWeight.w800,
-                    color: AppTheme.neutral900)),
+                    color: kPvInk)),
           ]),
           const SizedBox(height: 10),
           Text(
@@ -178,18 +178,17 @@ class _PregnancyProfileScreenState extends State<PregnancyProfileScreen> {
 
   // ---- pieces ---------------------------------------------------------------
 
-  Widget _card(String title, String why, Widget body) => Container(
+  // The one pregnancy card, white with the hairline (2026-09-30). Kept for
+  // revert: a white Container, radius 20, no border. The question is the
+  // card's title and keeps its own size.
+  Widget _card(String title, String why, Widget body) => PregCard(
         padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-        ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(title,
               style: pvJakarta(
                   fontSize: 15.5,
                   fontWeight: FontWeight.w800,
-                  color: AppTheme.neutral900)),
+                  color: kPvInk)),
           const SizedBox(height: 6),
           // Every question says what it unlocks. A question that cannot explain
           // its own payoff should not be asked at all.
@@ -210,10 +209,9 @@ class _PregnancyProfileScreenState extends State<PregnancyProfileScreen> {
             duration: const Duration(milliseconds: 140),
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
-              color: on ? AppTheme.neutral900 : AppTheme.surfaceContainer,
+              color: on ? kPvInk : Colors.white,
               borderRadius: BorderRadius.circular(999),
-              border: Border.all(
-                  color: on ? AppTheme.neutral900 : AppTheme.outlineVariant),
+              border: Border.all(color: on ? kPvInk : kPvLine),
             ),
             child: Row(mainAxisSize: MainAxisSize.min, children: [
               if (on) ...[
@@ -224,7 +222,7 @@ class _PregnancyProfileScreenState extends State<PregnancyProfileScreen> {
                   style: pvManrope(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
-                      color: on ? Colors.white : AppTheme.neutral900)),
+                      color: on ? Colors.white : kPvInk)),
             ]),
           ),
         ),

@@ -31,6 +31,9 @@ import '../../localization/app_language.dart';
 import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_placeholders.dart';
 import '../v2/v2_palette.dart';
+import '../brackets/hub/hub_intent_art.dart' show IntentMark;
+import '../doors/pv_list_row.dart' show PvMarkWell;
+import '../pregnancy/preg_chrome.dart' show PregCard, pregFilledStyle, pregSectionHeadingStyle;
 
 class NutritionStageScreen extends StatefulWidget {
   const NutritionStageScreen(
@@ -118,6 +121,8 @@ class _TrimesterList extends StatelessWidget {
           for (final g in kTrimesterGuides) ...[
             _RowCard(
               p: p,
+              mark: IntentMark.plate,
+              hue: 26,
               title: g.label.now,
               subtitle: g.focus.now,
               onTap: () => Navigator.of(context).push(MaterialPageRoute(
@@ -147,6 +152,8 @@ class _ConditionList extends StatelessWidget {
           for (final g in kConditionGuides) ...[
             _RowCard(
               p: p,
+              mark: IntentMark.bodyMark,
+              hue: 206,
               title: g.label.now,
               subtitle: g.summary.now,
               onTap: () => Navigator.of(context).push(MaterialPageRoute(
@@ -163,9 +170,19 @@ class _ConditionList extends StatelessWidget {
   }
 }
 
+// A row that opens somewhere carries a drawn mark in its tint (2026-09-30,
+// one ParentVeda). The card was already white with the hairline.
 class _RowCard extends StatelessWidget {
-  const _RowCard({required this.p, required this.title, required this.subtitle, required this.onTap});
+  const _RowCard(
+      {required this.p,
+      required this.mark,
+      required this.hue,
+      required this.title,
+      required this.subtitle,
+      required this.onTap});
   final V2Palette p;
+  final IntentMark mark;
+  final double hue;
   final String title;
   final String subtitle;
   final VoidCallback onTap;
@@ -181,6 +198,8 @@ class _RowCard extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(16, 14, 14, 14),
           decoration: BoxDecoration(borderRadius: BorderRadius.circular(18), border: Border.all(color: p.line)),
           child: Row(children: [
+            PvMarkWell(p: p, hue: hue, size: 44, mark: mark),
+            const SizedBox(width: 14),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(title, style: pvFraunces(fontSize: 16, fontWeight: FontWeight.w600, color: p.ink1)),
@@ -366,15 +385,13 @@ class _ComplicationsLink extends StatelessWidget {
     final id = guide.linkId;
     if (id == null) return const SizedBox.shrink();
 
-    return Material(
-      color: p.surfaceAlt,
-      borderRadius: BorderRadius.circular(16),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: () => openConditionFromDiet(context, guide, pregnancy),
-        child: Container(
-          padding: const EdgeInsets.fromLTRB(14, 13, 14, 13),
-          child: Row(children: [
+    // A white card with the hairline, not a grey block behind text
+    // (2026-09-30). Kept for revert: a Material on `p.surfaceAlt`, radius 16,
+    // with an InkWell and the same padding.
+    return PregCard(
+      onTap: () => openConditionFromDiet(context, guide, pregnancy),
+      padding: const EdgeInsets.fromLTRB(14, 13, 14, 13),
+      child: Row(children: [
             Icon(Icons.medical_information_outlined, size: 18, color: p.ink3),
             const SizedBox(width: 10),
             Expanded(
@@ -382,12 +399,10 @@ class _ComplicationsLink extends StatelessWidget {
                   'This page is about what to eat. For the condition itself '
                   '(what it is, what happens next and when to call), read '
                   '${guide.label.now}.',
-                  style: pvManrope(fontSize: 12, height: 1.4, color: p.ink3)),
+                  style: pvManrope(fontSize: 12, height: 1.4, color: p.ink2)),
             ),
             Icon(Icons.chevron_right_rounded, size: 18, color: p.ink3),
           ]),
-        ),
-      ),
     );
   }
 }
@@ -442,9 +457,10 @@ class _SectionTitle extends StatelessWidget {
   const _SectionTitle({required this.p, required this.title});
   final V2Palette p;
   final String title;
+  // One section heading (2026-09-30): the serif at 21. Was pvFraunces 17.
   @override
   Widget build(BuildContext context) =>
-      Text(title, style: pvFraunces(fontSize: 17, fontWeight: FontWeight.w600, color: p.ink1));
+      Semantics(header: true, child: Text(title, style: pregSectionHeadingStyle()));
 }
 
 class _Bullet extends StatelessWidget {
@@ -472,10 +488,14 @@ class _Bullet extends StatelessWidget {
 // ===========================================================================
 
 class _ExpertOption {
-  const _ExpertOption({required this.title, required this.forWhom, required this.icon});
+  const _ExpertOption(
+      {required this.title, required this.forWhom, required this.icon, required this.mark});
   final String title;
   final String forWhom;
+
+  /// Kept for revert: the line icon each row drew before its drawn mark.
   final IconData icon;
+  final IntentMark mark;
 }
 
 const List<_ExpertOption> _kExpertOptions = [
@@ -483,21 +503,25 @@ const List<_ExpertOption> _kExpertOptions = [
     title: 'Personal diet plan',
     forWhom: 'For when you want a plan built around your own reports and routine.',
     icon: Icons.assignment_outlined,
+    mark: IntentMark.listMark,
   ),
   _ExpertOption(
     title: 'Weekly expert calls',
     forWhom: 'For steady check-ins as your needs change through pregnancy.',
     icon: Icons.call_outlined,
+    mark: IntentMark.askDoctor,
   ),
   _ExpertOption(
     title: 'Daily diet management',
     forWhom: 'For hands-on help, day to day, if a condition needs close watching.',
     icon: Icons.event_repeat_rounded,
+    mark: IntentMark.chartLog,
   ),
   _ExpertOption(
     title: 'Book a consultation',
     forWhom: 'For a single session to get your specific questions answered.',
     icon: Icons.calendar_month_outlined,
+    mark: IntentMark.calendarDay,
   ),
 ];
 
@@ -509,15 +533,16 @@ class ExpertOptionsBlock extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = V2PaletteStore.instance.current;
-    return Container(
+    // A white card with the hairline, not a tinted block behind text
+    // (2026-09-30). Kept for revert: a Container on `p.surfaceAlt`, radius 20.
+    return PregCard(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: p.surfaceAlt, borderRadius: BorderRadius.circular(20)),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('Want a real person on this?',
             style: pvFraunces(fontSize: 16.5, fontWeight: FontWeight.w600, color: p.ink1)),
         const SizedBox(height: 4),
         Text('Everything above is free. This is the one part that is not: our dieticians, on call.',
-            style: pvManrope(fontSize: 12.5, height: 1.4, color: p.ink3)),
+            style: pvManrope(fontSize: 12.5, height: 1.4, color: p.ink2)),
         const SizedBox(height: 14),
         for (final o in _kExpertOptions) ...[
           _ExpertOptionRow(p: p, option: o),
@@ -544,7 +569,9 @@ class _ExpertOptionRow extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(13, 12, 12, 12),
           decoration: BoxDecoration(borderRadius: BorderRadius.circular(14), border: Border.all(color: p.line)),
           child: Row(children: [
-            Icon(option.icon, size: 19, color: p.ink1),
+            // A drawn mark: the row opens somewhere (2026-09-30). Kept for
+            // revert: Icon(option.icon, size: 19, color: p.ink1).
+            PvMarkWell(p: p, hue: 26, size: 36, mark: option.mark),
             const SizedBox(width: 11),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -579,7 +606,8 @@ void _openBookingSheet(BuildContext context, V2Palette p, _ExpertOption option) 
         SizedBox(
           width: double.infinity,
           child: FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: p.ink1, padding: const EdgeInsets.symmetric(vertical: 14)),
+            style: pregFilledStyle().copyWith(
+                padding: const WidgetStatePropertyAll(EdgeInsets.symmetric(vertical: 14))),
             onPressed: () {
               Navigator.of(sheetContext).pop();
               requestExpertOptionPlaceholder(option.title);
