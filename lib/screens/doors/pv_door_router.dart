@@ -131,6 +131,7 @@ import 'pv_door_chrome.dart' show PvDoorToolScaffold;
 import 'pv_door_screen.dart' show PvDoorScreen;
 import '../prepare/birthing_classes_screen.dart';
 import '../prepare/consultations_screen.dart';
+import '../tools/readings_log_screen.dart';
 import '../tools/contraction_tracker_screen.dart';
 import '../tools/ready_for_birth_screen.dart';
 import '../reader/pv_reader_screen.dart';
@@ -363,6 +364,7 @@ Widget? pvDoorScreenFor(String id, PregnancyController c) => switch (id) {
   // the button then does exactly what it always did. Building a second
   // adder here would be a second way to write the same set.
   kCondSurfaceJourney => ConditionsHomeScreen(pregnancy: c),
+  kCondSurfaceReadings => ReadingsLogScreen(controller: c),
 
   // ---- Labour prep ----------------------------------------------------
   //
@@ -884,6 +886,7 @@ bool pvDoorSurfaceResolves(String id) => switch (id) {
   kCondSurfaceFind ||
   kCondSurfaceSameDay ||
   kCondSurfaceJourney ||
+  kCondSurfaceReadings ||
   kCondSurfaceQuestions ||
   kDietSurfaceCanIEat ||
   kDietSurfaceToday ||

@@ -88,6 +88,10 @@ const String kCondTabLiving = 'living';
 /// The After a loss door, from Living with it (2026-09-29, pregnancy gap
 /// analysis, "Give miscarriage and stillbirth a proper home").
 const String kCondSurfaceAfterLoss = 'conditions/after_loss';
+
+/// The blood pressure and sugar log (2026-09-30, gap analysis P2): her numbers, next to
+/// the door that explains them.
+const String kCondSurfaceReadings = 'conditions/readings';
 const String kCondTabTalk = 'talk';
 
 final PvDoorPage kComplicationsDoor = PvDoorPage(
@@ -397,6 +401,21 @@ final PvDoorPage kComplicationsDoor = PvDoorPage(
           title: 'With a disability or long-term illness',
           blurb: 'Care that fits you, from appointments to the birth.',
           readId: 'preg_cond_read_disability',
+        ),
+      ],
+    ),
+
+    // The readings log (gap analysis, P2): "her readings live next to the door
+    // that explains them". One screen; the Tools list opens the same one.
+    PvDoorSection(
+      group: kCondTabLiving,
+      heading: 'Keep your numbers',
+      tiles: [
+        PvDoorToolTile(
+          title: 'Blood pressure and sugar log',
+          blurb: 'Note each reading your doctor asked you to check, and take '
+              'them to your next visit.',
+          surfaceId: kCondSurfaceReadings,
         ),
       ],
     ),

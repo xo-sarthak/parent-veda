@@ -2387,6 +2387,47 @@ backlog is noise, a still-useful reminder is not. (2) Its phone ids are a block 
 refresh cancels only those, and it starts in the `main.dart` chain after `ReminderStore.init`, because the
 `syncAll` cancel-all trap in §16m applies to every scheduler until that function is fixed.
 
+## 16t. A log that keeps numbers and never judges them — `ReadingsStore` (2026-09-30)
+
+The blood pressure and sugar log is the first store in the app whose whole
+content is a clinical number, so three decisions in it are worth carrying to the
+next one (a temperature log, a contraction history, a glucose curve).
+
+**1. Where a comparison lives decides who is responsible for it.** The store
+keeps `Reading`s and one optional `ReadingTargets` — the target HER DOCTOR gave
+her, typed by her. The screen prints that target beside her last reading and
+compares nothing. The alternative, colouring a reading red above 140/90, would
+have cost about ten lines and bought a screen that looks clinical. It also puts
+ParentVeda's threshold in the seat of the clinician's: a woman with chronic
+hypertension has a different target for reasons we cannot see, and a red number
+that contradicts her doctor is the exact failure `TruthSource` ranks us last to
+prevent. The trade-off, named: the screen is quieter than a "smart" tracker. What
+it buys is that it cannot be wrong about a body it has never examined.
+
+**2. Validate the typing, never the meaning.** `Reading.plausible` rejects
+values no person has (1180/76, a bottom number above the top, sugar of 5). That is
+input hygiene: one slipped finger makes every later chart wrong. The bounds are
+deliberately wide (systolic to 260, sugar to 600 mg/dL) so a genuine emergency
+reading is still loggable, because a log that refuses a real 190/120 teaches her
+to stop writing them down. The message says "check the number", never "that is
+too high".
+
+**3. A blob, not a table, and why.** The log syncs as one `user_state` blob under
+`readings` (`CloudSyncedStore`), so shipping it changed no schema and needed no
+migration run in Supabase. That is the right shape while nobody reads it across
+users: each mother's log is read only by her, in whole, on one screen. The moment
+a doctor dashboard or a per-week aggregate needs to query readings, it becomes a
+table with RLS (§16a), and the row ids already mint on the phone (`rd_<µs>`) so
+that move is an idempotent merge rather than a rewrite. Cost of the blob: two
+phones writing in the same minute race, and the later push wins the whole log; for
+a log one person adds to a few times a day that is acceptable, and it is the reason
+`applyCloudData` replaces instead of merging (cloud wins on first sync, as every
+store here).
+
+Read next: `lib/services/readings_store.dart` (the header states the rule),
+`test/readings_log_test.dart` (a scan that the log source never contains a red, a
+green or the words high / low / normal).
+
 ## 17. Reading list, in order
 
 1. `0001_create_profiles.sql` — the two layers (grant + RLS), own-row.

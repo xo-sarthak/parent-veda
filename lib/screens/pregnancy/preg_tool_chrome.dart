@@ -220,3 +220,32 @@ class _Sheet extends StatelessWidget {
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: children),
       );
 }
+
+/// The round ink "add" control that sits opposite the back button ([PregToolScaffold.action]).
+/// One copy for the tools written from here on; Weight and Medicines still carry
+/// private copies from the Tools audit that can move onto this (STILL-OPEN §81.15).
+class PregToolAddAction extends StatelessWidget {
+  const PregToolAddAction({super.key, required this.label, required this.onTap});
+
+  /// What the button does, for a screen reader ("Add a reading").
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+        container: true,
+        button: true,
+        label: label,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(999),
+          child: Container(
+            width: 38,
+            height: 38,
+            alignment: Alignment.center,
+            decoration: const BoxDecoration(color: kPvInk, shape: BoxShape.circle),
+            child: const Icon(Icons.add_rounded, size: 20, color: Colors.white),
+          ),
+        ),
+      );
+}

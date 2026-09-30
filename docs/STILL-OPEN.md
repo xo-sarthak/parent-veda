@@ -9957,6 +9957,24 @@ not here. Owed:
     supporting" and "What changed". **Could be promoted into the shell:** a bottom-bar slot (two tools wrap the
     shell in an outer Scaffold for a pinned button) and a shared round "add" control (Weight and Medicines each
     carry a private copy). Held by `test/preg_tools_shell_test.dart`.
+  - **§81.17 The blood pressure and sugar log (2026-09-30).** Built, from the PDF's "A blood pressure and sugar
+    log" (P2): `ReadingsLogScreen` (lib/screens/tools/readings_log_screen.dart) on `PregToolScaffold`, kept by
+    `ReadingsStore` (lib/services/readings_store.dart). One screen with a Blood pressure / Blood sugar switch:
+    her last reading big and in ink, add (top number and bottom number; sugar in mg/dL with Fasting, Before food,
+    After food, Bedtime, Other), a note for her doctor, history by day (tap to edit or delete), "Share with my
+    doctor" (plain text through the share sheet), and an optional "Your doctor's target" she types in and we print
+    beside her readings. **It never judges a reading**: no colour, no high or low, no comparison with any range
+    of ours; a test scans the source for it. Reached from the Complications door ("Keep your numbers", Living
+    tab) and the Tools list (Track), one screen behind both; the blood pressure page also links to the vetted
+    "Signs to get help the same day" rather than carrying new clinical words. Local-first, synced as one
+    `user_state` blob (`readings`), so **no Supabase migration is needed**; BACKEND-PATTERNS §16t explains the
+    choices. **Owed:** (1) a clinician should read the wording on the empty and intro lines; (2) the PDF's
+    "What the ranges usually mean" read and "Monitors, and what to look for" product page in the old
+    `kPgTrackReadings` journey are still owed content and are NOT linked (the log does not need them); (3) Ask
+    Veda does not know the log exists, so it cannot be asked about her numbers, which is right for now, and
+    anything more needs the service side (CLAUDE.md, the wire body is a two-repo contract); (4) the Weight tool
+    is a separate log, and a doctor may want the three together on one page; (5) no chart yet, on purpose: a
+    line through her numbers invites reading a trend into them.
   - **§81.16 A migration for Spiritual reading's "not interested" marks (2026-09-30).** The screen saved "not
     interested" under `title.now` (the display title) while "interested" and the sort used `title.en`, so in Hindi
     the mark was saved as a Devanagari title and matched nothing after a switch (the `.en` is identity, `.now` is

@@ -48,6 +48,7 @@ import 'tools/due_date_calculator_screen.dart';
 import 'tools/ready_for_birth_screen.dart';
 import 'tools/kegel_care_screen.dart';
 import 'tools/medicine_tracker_screen.dart';
+import 'tools/readings_log_screen.dart';
 import 'tools/product_checklist_screen.dart';
 // Old "Scans & Care" screen - merged into TestsScansReportsScreen. Kept
 // commented for revert.
@@ -169,6 +170,13 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
           // SymptomCompanionScreen(controller: controller)),
           // line: "What's normal, what helps, and when to call",
           // priority: PregPriority.symptoms),
+          // The readings log (2026-09-30, gap analysis P2). The scale mark is Weight's
+          // and the pill is Medicines', so this takes the chart with a logged point.
+          _Tool('Blood pressure & sugar', Icons.monitor_heart_outlined, const Color(0xFF4A7BC8),
+              () => _open('tools/readings', () => ReadingsLogScreen(controller: controller)),
+              line: 'Log the numbers your doctor asked for, and share them',
+              mark: IntentMark.chartLog,
+              priority: PregPriority.symptoms),
           _Tool(s.toolKegelTitle, Icons.self_improvement_rounded,
               AppTheme.secondary400,
               () => _open('tools/kegel', () => KegelCareScreen(controller: controller)),
