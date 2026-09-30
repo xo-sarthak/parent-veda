@@ -43,6 +43,7 @@ import '../memories/memories_home_screen.dart';
 import '../post_pregnancy/my_bookings_screen.dart';
 import '../post_pregnancy/provider_results_screen.dart';
 import '../pregnancy_profile_screen.dart';
+import '../pregnancy/preg_due_date_screen.dart' show openPregDueDate;
 import '../pregnancy/preg_ended_screen.dart' show openPregEnded;
 import '../../data/doors/pv_door_after_loss.dart' show kPregEndedRowTitle, kPregEndedRowSub;
 import '../../services/pregnancy_ended_store.dart';
@@ -580,8 +581,17 @@ final PvYouStageContent _pregnancy = PvYouStageContent(
             ? _monthWord(c.dueDate)
             : '${_monthWord(c.dueDate)} · $src';
       },
-      edit: (c) =>
-          _push(c, const PregnancyProfileScreen(), 'pregnancy_profile'),
+      // ⚠️ THE DATE EDITOR, NOT THE PROFILE (2026-09-30, pregnancy gap
+      // analysis P1): the profile screen had no due-date field. Kept for
+      // revert: _push(c, const PregnancyProfileScreen(), 'pregnancy_profile')
+      edit: (c) {
+        final pc = PregnancyController.current;
+        if (pc == null) {
+          _push(c, const PregnancyProfileScreen(), 'pregnancy_profile');
+          return;
+        }
+        openPregDueDate(c, pc);
+      },
       note:
           'A date from a scan or your doctor is theirs — we never recalculate it.',
     ),

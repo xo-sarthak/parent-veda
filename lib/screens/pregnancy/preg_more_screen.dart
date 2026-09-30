@@ -57,6 +57,8 @@ import '../profile/pv_you_chrome.dart';
 import '../referral/invite_friends_screen.dart';
 import '../watch_learn_screen.dart';
 import 'preg_learn_screen.dart' show showPregOpeningSoon;
+import 'preg_messages_screen.dart' show openPregMessages;
+import '../../services/preg_messages_store.dart';
 
 /// The pregnancy bar, by position. Positional because the labels are display
 /// text (see `_pregnancySurfaces` in main_scaffold.dart).
@@ -239,6 +241,22 @@ class _PregMoreScreenState extends State<PregMoreScreen> {
             key: const ValueKey('preg_more_journey'),
             title: 'Your journey',
             children: [
+              // What the app said first (2026-09-30): the weekly note and the
+              // moments that matter, kept so a missed one is not gone.
+              ListenableBuilder(
+                listenable: PregMessagesStore.instance,
+                builder: (context, _) => PvYouRow(
+                  key: const ValueKey('preg_more_messages'),
+                  icon: Icons.mail_outline_rounded,
+                  title: 'Messages',
+                  subtitle: 'Your weekly note, and the moments worth remembering',
+                  badge: PregMessagesStore.instance.unreadCount,
+                  onTap: () {
+                    pvCommitFeedback();
+                    openPregMessages(context, _c);
+                  },
+                ),
+              ),
               // ⚠️ CALENDAR'S TAB MOVED HERE (2026-09-29): Learn took its slot.
               PvYouRow(
                 icon: Icons.calendar_today_outlined,

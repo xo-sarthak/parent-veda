@@ -2270,6 +2270,40 @@ by default. If a deletion must survive a merge, it has to be written down as a r
 column, a soft-delete flag) and kept until every copy has seen it. Replicated databases (Cassandra, CouchDB, CRDT
 sets) all do this for the same reason, and `saved_items.removed_at` (16d) is the server-side version of it here.
 
+## 16r. What goes in an id decides what "the same message" means — `PregMessagesStore`
+
+**The situation.** Pregnancy now speaks first too (2026-09-30): a note the morning each week starts, and six
+moments (the NT and anomaly scan windows, Tdap, movements, the hospital bag, "Has your baby arrived?"). It uses the
+§16m design unchanged in shape: candidates recomputed from her dates, delivered messages frozen, pending ones
+rebuilt. One thing is deliberately different, and it is a choice worth being able to name.
+
+**The choice: what the id carries.** TTC's ids carry the date the message is about (`window:2026-09-20`), and a
+pending message keeps the moment it was first given. Pregnancy's ids carry the *thing itself* (`week:21`, `tdap`),
+and a pending message always takes the time today's due date gives it.
+
+Both are correct, for different facts. In TTC the thing that changes is a *cycle*: a moved period is a genuinely
+different window, so it should be a different message, and a message already given for the old window was true
+when it was sent. In pregnancy the thing that changes is the *due date*, and a correction does not create a
+different week 21; it tells us when the same week 21 really starts. So:
+
+- **after a dating scan, every upcoming message moves with the date** (pending messages are replaced, not kept);
+- **a message already delivered is never sent again**, even though its moment moved (the id is already in the
+  delivered set, and the date is not part of the id).
+
+A date in the id would have done the opposite of both: the corrected week 21 would count as new and arrive a second
+time, and the pending one would stay pinned to the wrong day.
+
+**The general lesson.** An id is a statement of identity: "two of these with the same id are the same thing". Put
+in it exactly the facts whose change should make it a *different* thing, and nothing else. The same question comes
+up for idempotency keys, cache keys (§16p) and upsert conflict targets: every one of them is "what does *same*
+mean here?", and getting it wrong shows up as duplicates on one side or lost updates on the other.
+
+**Two smaller decisions.** (1) A first launch mid-pregnancy delivers only *this* week's note, not every week she
+has already lived through, but does deliver a moment still inside its window (the anomaly line at week 20): a
+backlog is noise, a still-useful reminder is not. (2) Its phone ids are a block of its own (919101 up) and a
+refresh cancels only those, and it starts in the `main.dart` chain after `ReminderStore.init`, because the
+`syncAll` cancel-all trap in §16m applies to every scheduler until that function is fixed.
+
 ## 17. Reading list, in order
 
 1. `0001_create_profiles.sql` — the two layers (grant + RLS), own-row.

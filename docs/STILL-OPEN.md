@@ -9729,3 +9729,14 @@ not here. Owed:
   - **§80.8 The Tools tab asks her priorities under the list now.** The strip (`pregPrioritiesStrip`) still re-sorts
     the tools inside each group; it moved below the groups so the list leads. Whether it stays at all is the user's
     call ("derive, never ask").
+  - **§80.9 Pregnancy messages, owed (2026-09-30).** Built: the weekly note and six moments, the inbox (More › Your
+    journey › Messages), the switches (Reminders › From ParentVeda), taps that open the page each names. Owed:
+    (a) **onboarding's preview** still says "Week N starts tomorrow, here's what to expect." while the note arrives the
+    morning the week starts ("Week N starts today"); onboarding is parked by the user, so the one-line change waits.
+    (b) **A way in from Today.** The inbox is on More only; a quiet envelope on the V3 home is the natural second door.
+    (c) **His messages** at the same moments are the father-mode pass; today the partner side gets none, on purpose.
+    (d) **A doctor's read** of the six moment lines before launch (the Tdap line in particular says what it protects
+    against).
+  - **§80.10 The due date is changed from You now.** You › Details › Due date opens "Your due date" (the four ways,
+    Scan date first from week 12, a note when a last-period date would replace a clinic's). The Tools › Due Date
+    calculator stays as it was; whether both should exist is the user's call.

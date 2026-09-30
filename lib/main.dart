@@ -25,6 +25,8 @@ import 'screens/post_pregnancy/pp_vaccine_data.dart';
 import 'screens/post_pregnancy/pp_journeys_data.dart';
 import 'booking/server_slots.dart';
 import 'services/pregnancy_ended_store.dart';
+import 'services/preg_messages_store.dart';
+import 'screens/pregnancy/preg_messages_screen.dart' show pregOpenMessageFromPhone;
 import 'services/auth/session_watch.dart';
 import 'services/family_profile.dart';
 import 'services/profile_analytics.dart';
@@ -268,6 +270,13 @@ class _ParentVedaAppState extends State<ParentVedaApp>
     ReminderStore.instance
         .init()
         .then((_) => TtcMessagesStore.instance.init())
+        // The pregnancy messages (2026-09-30), after the same wipe and for
+        // the same reason: its phone ids are its own block and would be
+        // cancelled by `syncAll` if armed before it.
+        .then((_) {
+          PregMessagesStore.phoneTapOpener = pregOpenMessageFromPhone;
+          return PregMessagesStore.instance.init();
+        })
         // The IVF trigger reminders are re-armed here too, for the same
         // reason (they used to be wiped on every launch).
         .then((_) => TtcTreatmentStore.instance.rearmAfterStartup())

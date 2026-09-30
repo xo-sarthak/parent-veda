@@ -16,6 +16,7 @@ import '../services/pregnancy_controller.dart';
 import '../services/reminder_store.dart';
 import '../theme/app_theme.dart';
 import '../theme/pv_fonts.dart';
+import 'pregnancy/preg_messages_screen.dart' show PregMessageSwitches;
 
 /// A quick-add suggestion (its title comes from S so it stays bilingual).
 typedef _Preset = ({
@@ -152,6 +153,22 @@ class RemindersScreen extends StatelessWidget {
                 _empty(context, s)
               else
                 for (final r in items) _reminderCard(context, s, store, r),
+              // ---- From ParentVeda (2026-09-30) ---------------------------
+              // The messages the app sends on its own, from her dates: the
+              // new week and the moments that matter. The gap analysis puts
+              // their off switches here, beside the reminders she sets.
+              const SizedBox(height: 22),
+              Text('From ParentVeda',
+                  style: pvJakarta(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800,
+                      color: AppTheme.primary900)),
+              const SizedBox(height: 4),
+              Text('Notes we send from your dates. Each one opens the page it is about.',
+                  style: pvManrope(
+                      fontSize: 13, height: 1.4, color: AppTheme.neutral600)),
+              const SizedBox(height: 10),
+              const PregMessageSwitches(),
               const SizedBox(height: 22),
               // Quick ideas (one-tap add).
               Text(s.rmdSuggestions,

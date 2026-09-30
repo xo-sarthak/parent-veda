@@ -42,6 +42,10 @@ class PregnancyEndedStore extends ChangeNotifier {
   /// True once she has told ParentVeda her pregnancy has ended.
   bool get ended => _ended;
 
+  /// True once [load] has run, so a reader can tell "not ended" from "not
+  /// known yet" (the pregnancy messages wait for it, 2026-09-30).
+  bool get isLoaded => _loaded;
+
   /// When she said so, for "take things slowly" copy; never shown as a count.
   DateTime? get endedAt => _endedAt;
 
