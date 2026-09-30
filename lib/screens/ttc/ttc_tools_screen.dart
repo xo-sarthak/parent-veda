@@ -705,19 +705,22 @@ final List<TtcTool> ttcMovedToMore = [
         builder: (_) => const TtcPrepareScreen(onlyCategory: 'courses'),
         settings: const RouteSettings(name: 'ttc/courses'))),
   ),
-  TtcTool(
-    id: 'map',
-    icon: Icons.map_outlined,
-    nameEn: 'Journey map',
-    nameHi: 'Journey Map',
-    // Names the timeline too: it opens from the map, and the map is where
-    // she now finds it.
-    descEn: 'Where you are this month, what comes next, and your family timeline',
-    descHi: 'Poora safar, ek nazar mein',
-    open: (c) => Navigator.of(c).push(MaterialPageRoute<void>(
-        builder: (_) => const TtcJourneyMapScreen(),
-        settings: const RouteSettings(name: 'ttc/map'))),
-  ),
+  // ⚠️ THE JOURNEY MAP LEFT MORE TOO (2026-09-30, the user; see
+  // ttc_more_tab.dart), so a Tools search no longer says it is there. Kept
+  // for revert:
+  // TtcTool(
+  //   id: 'map',
+  //   icon: Icons.map_outlined,
+  //   nameEn: 'Journey map',
+  //   nameHi: 'Journey Map',
+  //   // Names the timeline too: it opens from the map, and the map is where
+  //   // she now finds it.
+  //   descEn: 'Where you are this month, what comes next, and your family timeline',
+  //   descHi: 'Poora safar, ek nazar mein',
+  //   open: (c) => Navigator.of(c).push(MaterialPageRoute<void>(
+  //       builder: (_) => const TtcJourneyMapScreen(),
+  //       settings: const RouteSettings(name: 'ttc/map'))),
+  // ),
 ];
 
 /// Which More tile each moved row sits under, for the note a Tools search
@@ -730,7 +733,8 @@ final List<TtcTool> ttcMovedToMore = [
 const Map<String, String> kTtcMovedToMoreTile = {
   'expert': 'Talk to an expert', // kTtcMoreExpertsHeading
   'courses': 'Courses and masterclasses', // kTtcMoreCoursesHeading
-  'map': kTtcMoreJourneyTitle, // 'Your journey', kTtcMoreJourneyHeading
+  // Off More since 2026-09-30. Kept for revert:
+  // 'map': kTtcMoreJourneyTitle, // 'Your journey', kTtcMoreJourneyHeading
 };
 
 TtcTool? ttcMovedToMoreById(String id) {

@@ -105,7 +105,16 @@ class FabState extends ChangeNotifier {
   /// STILL-OPEN §63.11.
   static const bool kAskFabEnabled = false;
 
-  bool get visible => kAskFabEnabled && _appLive && !_suppressed;
+  /// ⚠️ BACK ON TRYING TO CONCEIVE ONLY (2026-09-30, the user: "if I'm on the
+  /// trying to conceive side and I click the Ask Veda button … I can search
+  /// for anything inside the trying to conceive side"). Ask Veda is now that
+  /// stage's search as well as its answers (ttc_stage_search.dart), so the
+  /// button is the way into it from every screen of the stage. The other
+  /// stages stay behind [kAskFabEnabled] until their own pass.
+  static const bool kAskFabInTtc = true;
+
+  bool get visible =>
+      (kAskFabEnabled || (kAskFabInTtc && _inTtc)) && _appLive && !_suppressed;
   bool get inParenting => _inParenting;
   bool get inTtc => _inTtc;
 
@@ -310,7 +319,19 @@ class GlobalAskFab extends StatelessWidget {
               width: kAskFabSize,
               height: kAskFabSize,
               alignment: Alignment.center,
-              decoration: const BoxDecoration(
+              // ⚠️ THE ONE BLACK ON TRYING TO CONCEIVE (2026-09-30): the stage's
+              // rule since 2026-09-29 is one black for everything pressable,
+              // never violet, so the violet disc would be the one purple thing
+              // on the stage. The other stages keep the violet above.
+              decoration: FabState.instance.inTtc
+                  ? const BoxDecoration(
+                      color: Color(0xFF2F2C30),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(color: Color(0x402F2C30), blurRadius: 16, spreadRadius: -2, offset: Offset(0, 7)),
+                      ],
+                    )
+                  : const BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,

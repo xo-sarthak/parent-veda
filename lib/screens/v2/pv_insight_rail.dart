@@ -73,6 +73,7 @@ class PvInsightTile extends StatelessWidget {
     required this.onTap,
     this.caption,
     this.artWidget,
+    this.showArt = true,
   });
 
   static const double width = 100;
@@ -95,6 +96,12 @@ class PvInsightTile extends StatelessWidget {
   /// art cannot: the painted set is anchored bottom-right and a long value
   /// ("Constipation") ran straight through it.
   final Widget? artWidget;
+
+  /// False: no painted mark at all, the card one clean colour (2026-09-30,
+  /// the TTC home; the user: the mark "overlaps with the text… make them like
+  /// Chance of pregnancy today and Day of your cycle, clean with a solid
+  /// single colour background"). Other stages keep the default.
+  final bool showArt;
   final V2Palette p;
   final VoidCallback onTap;
 
@@ -129,7 +136,9 @@ class PvInsightTile extends StatelessWidget {
             // caption says what the card means; the drawing was decoration.
             // Every stage shares this tile, so the rule holds everywhere. Kept
             // for revert: `if (artWidget == null)` alone.
-            if (artWidget == null && caption == null)
+            if (!showArt)
+              const SizedBox.shrink()
+            else if (artWidget == null && caption == null)
               Positioned.fill(
                 child: CustomPaint(
                     painter: PvInsightMark(

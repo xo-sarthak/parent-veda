@@ -6,6 +6,8 @@
 //  top-right, action pinned).
 // =============================================================================
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../screens/post_pregnancy/pp_child_profile.dart';
@@ -213,8 +215,15 @@ String _date(DateTime d) {
 /// here and one added at checkout are the same thing in the same store.
 Future<void> showPvAddressesSheet(BuildContext context) async {
   final p = pvStorePalette;
-  await PvOrderStore.instance.init();
-  if (!context.mounted) return;
+  // ⚠️ LOCAL-FIRST: THE SHEET OPENS AT ONCE (2026-09-30, found by
+  // test/pv_profile_walk_test.dart). `init()` loads the phone's copy AND then
+  // awaits the cloud sync, so awaiting it here made the tap wait on the
+  // network: slow on a weak signal, and never opening when the sync hung.
+  // The sheet listens to the store, so saved addresses appear the moment the
+  // local copy loads, and the sync finishes behind it. Kept for revert:
+  //   await PvOrderStore.instance.init();
+  //   if (!context.mounted) return;
+  unawaited(PvOrderStore.instance.init());
   await showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,

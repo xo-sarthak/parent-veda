@@ -35,6 +35,7 @@ import 'package:parentveda/ttc/ttc_content_prefs.dart';
 import 'package:parentveda/ttc/ttc_reads_data.dart';
 import 'package:parentveda/ttc/ttc_store.dart';
 import 'package:parentveda/ttc/ttc_videos_data.dart';
+import 'package:parentveda/screens/ttc/doors/ttc_kind_cards.dart' show kTtcShelfFilmPreview;
 
 const _more = TtcMoreTab(bottomNav: TtcBottomNav(active: 4, v3: true));
 
@@ -98,6 +99,7 @@ void main() {
 
   // ===========================================================================
   group('1. More: the section and its two rows', () {
+    // Your journey left More on 2026-09-30; Benefits follows now.
     testWidgets('Read and watch sits after Groups, before Your journey',
         (tester) async {
       await pump(tester, _more);
@@ -105,7 +107,8 @@ void main() {
       final y = [
         kTtcMoreGroupsHeading,
         kTtcMoreReadWatchHeading,
-        kTtcMoreJourneyHeading,
+        // Kept for revert (off More since 2026-09-30): kTtcMoreJourneyHeading,
+        kTtcMoreBenefitsHeading,
       ].map((h) => tester.getTopLeft(find.text(h)).dy).toList();
       expect(y[0] < y[1] && y[1] < y[2], isTrue, reason: '$y');
       expect(find.byKey(const ValueKey('ttc_more_row_all_reads')),
@@ -276,7 +279,10 @@ void main() {
         expect(row, findsOneWidget, reason: f.slotId);
         final play = find.descendant(
             of: row, matching: find.byIcon(Icons.play_arrow_rounded));
-        if (f.live) {
+        // ⚠️ THE PREVIEW (kTtcShelfFilmPreview, the user on build 23-24:
+        // every film shows its play mark and a length, made or not, until
+        // launch). While it is on, an unmade film looks like a made one.
+        if (f.live || kTtcShelfFilmPreview) {
           expect(play, findsOneWidget, reason: f.slotId);
         } else {
           expect(play, findsNothing, reason: '${f.slotId} is not made');

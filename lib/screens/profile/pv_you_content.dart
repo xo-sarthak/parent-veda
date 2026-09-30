@@ -342,12 +342,20 @@ String _monthWord(DateTime d) {
 
 // ---- the common things -----------------------------------------------------------
 
-PvYouThing _saved({Widget Function(Color)? art}) => PvYouThing(
+// [stage]: one stage's saves only (2026-09-30: trying to conceive's profile
+// counted and opened pregnancy saves too). Kept for revert: no stage, every
+// item counted, `const SavedScreen()`.
+PvYouThing _saved({Widget Function(Color)? art, String? stage}) => PvYouThing(
   icon: Icons.bookmark_outline_rounded,
   art: art,
   title: 'Saved',
-  count: () => SavedStore.instance.items().length,
-  open: (c) => _push(c, const SavedScreen(), 'saved'),
+  count: () => stage == 'trying'
+      ? [
+          for (final i in SavedStore.instance.items(stage: stage))
+            if (kTtcSavedKinds.contains(i.kind)) i,
+        ].length
+      : SavedStore.instance.items().length,
+  open: (c) => _push(c, SavedScreen(stage: stage), 'saved'),
 );
 
 PvYouThing _orders() => PvYouThing(
@@ -521,7 +529,7 @@ final PvYouStageContent _trying = PvYouStageContent(
   ],
   // The bookmark mark on the profile (2026-09-29). Kept for revert: _saved(),
   tiles: [
-    _saved(art: ttcArtMore(TtcMoreMark.bookmark)),
+    _saved(art: ttcArtMore(TtcMoreMark.bookmark), stage: 'trying'),
     // A count like its two neighbours (2026-09-27, build 11): "11 Saved",
     // "2 Orders" and a bare "Journal" read as three different kinds of tile.
     // Kept for revert: no count.
@@ -753,10 +761,14 @@ final PvYouStageContent _trying = PvYouStageContent(
   ],
   // The journey map left Tools (2026-09-28): a view of her journey, so it
   // sits on the journey's tile, under the chapters.
-  journeyThings: [_movedThing('map')],
+  // The journey map left More and Tools' moved list on 2026-09-30 (the
+  // user). Kept for revert: journeyThings: [_movedThing('map')],
+  journeyThings: const [],
   journeyCaption:
       'Where you are across the four chapters, the "I got a positive test" button, and your journey map with its family timeline',
-  tilesCaption: 'What you bookmarked: reads, tests, answers and cards',
+  // What Saved holds on this stage since 2026-09-30 (kTtcSavedKinds). Kept
+  // for revert: 'What you bookmarked: reads, tests, answers and cards',
+  tilesCaption: 'Articles, videos, recipes and products you bookmarked',
   // ⚠️ THE PROFILE AND SETTINGS SPLIT (2026-09-29, the user: More holds what
   // the app offers; account, preferences, support and developer sit behind
   // ONE Settings row on the profile). The rows are built by the same

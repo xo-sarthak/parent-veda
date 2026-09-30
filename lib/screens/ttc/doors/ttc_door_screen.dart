@@ -242,6 +242,32 @@ const double kTtcDoorHeroOverlap = 38;
 /// Kept for revert and for `_Hero`.
 const double kTtcDoorHeroHeight = 344;
 
+// ⚠️ THE QUIET HERO (2026-09-29, the user with Flo's "How to get pregnant"
+// beside our Fertile window door: ours "looks so much on the face", Flo's
+// "minimalistic and subtle but yet it looks good"). The door's NAME is the
+// title (Flo's "How to get pregnant"), the headline sentence is the one line
+// under it, the white search pill, and nothing else: no caps eyebrow over a
+// serif headline over a three-line blurb. Shorter, so the cards start in the
+// first screen. Kept for revert: false (the eyebrow, headline, blurb, glass
+// search, [kTtcDoorHeroHeight]).
+const bool kTtcDoorHeroQuiet = true;
+
+/// The quiet hero's height under the status bar.
+const double kTtcDoorHeroQuietHeight = 262;
+
+/// Doors whose hero is LIGHT art in `assets/doors/` (`ttcDoorHeroArtAsset`):
+/// a pale plain ground on the left with the subject on the right, as Flo's
+/// is. Those draw ink words on the picture and no shade at all. The rest keep
+/// their photograph with a shade behind the words only. Add a door here the
+/// day its `hero_<slug>.jpg` lands in `assets/doors/`.
+const Set<String> kTtcDoorHeroLightArt = {'ttc_conceiving'};
+
+/// The light art's own ground, sampled from its plain left half, so the hero
+/// continues the picture below it on a phone taller than 3:2. One pale blush
+/// for every light hero: the prompts ask for it (#F3E6E1; the art came back
+/// at #F1DFD8).
+const Color kTtcDoorHeroLightGround = Color(0xFFF1DFD8);
+
 /// The gap from the sheet's edge to the tab rail (2026-09-29): the same as
 /// the search pill keeps above the edge (`kTtcDoorHeroFootGap`), so the pill
 /// and the cards each have their own clear space.
@@ -1170,7 +1196,43 @@ class _TtcDoorScreenState extends State<TtcDoorScreen> {
                             // 21): every shelf, one piece or many, is a row of
                             // [TtcFloCard]s at Flo's size. Kept for revert: the
                             // three branches below, behind kTtcDoorCardsFlo.
-                            if (kTtcDoorCardsFlo &&
+                            // ⚠️ THE SHELF CARD (2026-09-29, the user on
+                            // build 22: minimal, a picture with its title and
+                            // one line under it, a film known by its play
+                            // button). Kept for revert: the Flo blocks below,
+                            // behind kTtcDoorCardsShelf = false.
+                            if (kTtcDoorCardsShelf &&
+                                ttcDoorRailTiles(section.tiles)
+                                    .any((t) => ttcCardKindOf(t) != null))
+                              Builder(builder: (context) {
+                                final tiles = [
+                                  for (final t in ttcDoorRailTiles(section.tiles))
+                                    if (ttcCardKindOf(t) != null) t,
+                                ];
+                                return SizedBox(
+                                  key: ttcDoorSectionRailKey(section.heading),
+                                  height: ttcShelfRailHeight(
+                                    MediaQuery.textScalerOf(context),
+                                  ),
+                                  child: ListView.separated(
+                                    scrollDirection: Axis.horizontal,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: kPvDoorGutter,
+                                    ),
+                                    itemCount: tiles.length,
+                                    separatorBuilder: (_, _) =>
+                                        const SizedBox(width: 12),
+                                    itemBuilder: (context, i) => TtcShelfCard(
+                                      tile: tiles[i],
+                                      kind: ttcCardKindOf(tiles[i])!,
+                                      p: p,
+                                      hue: group?.hue.toDouble(),
+                                      onTap: () => _openTile(tiles[i]),
+                                    ),
+                                  ),
+                                );
+                              })
+                            else if (kTtcDoorCardsFlo &&
                                 ttcDoorRailTiles(section.tiles)
                                     .any((t) => ttcCardKindOf(t) != null))
                               Builder(builder: (context) {
@@ -1692,6 +1754,51 @@ class _Hero extends StatelessWidget {
     // that the scrim is lighter.
     const shadow = [Shadow(color: Color(0x59000000), blurRadius: 12)];
 
+    // The quiet hero's own words (2026-09-29): the door's name, then the
+    // headline sentence as the one line under it. Ink on light art, white
+    // with a soft shadow on a photograph.
+    final light = kTtcDoorHeroQuiet && kTtcDoorHeroLightArt.contains(bracket.id);
+    final lightAsset = light ? ttcDoorHeroArtAsset(bracket.id) : null;
+    final quietWords = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          eyebrow,
+          maxLines: 2,
+          // (the door's name fits the left half at 28 on a 360dp phone)
+          overflow: TextOverflow.ellipsis,
+          style: pvFraunces(
+            fontSize: 28,
+            fontWeight: FontWeight.w600,
+            height: 1.12,
+            letterSpacing: -0.5,
+            color: light ? p.ink1 : Colors.white,
+          ).copyWith(shadows: light ? null : shadow),
+        ),
+        const SizedBox(height: 6),
+        ConstrainedBox(
+          // On light art the words keep to its plain left half.
+          constraints: BoxConstraints(
+            maxWidth: light
+                ? MediaQuery.sizeOf(context).width * 0.5
+                : 300,
+          ),
+          child: Text(
+            page.heroTitle ?? blurb,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: pvManrope(
+              fontSize: 14.5,
+              height: 1.4,
+              fontWeight: FontWeight.w500,
+              color: light ? p.ink2 : Colors.white.withValues(alpha: 0.95),
+            ).copyWith(shadows: light ? null : shadow),
+          ),
+        ),
+      ],
+    );
+
     final words = PvLiveSearchWords(
       search: search,
       child: ValueListenableBuilder<double>(
@@ -1700,7 +1807,7 @@ class _Hero extends StatelessWidget {
           opacity: (1 - o / _kFade).clamp(0.0, 1.0),
           child: child,
         ),
-        child: Column(
+        child: kTtcDoorHeroQuiet ? quietWords : Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -1758,7 +1865,8 @@ class _Hero extends StatelessWidget {
     // as she types. Glass on a photograph; the shared solid field where
     // there is none, because white type would not read on the pale field.
     // Kept for revert: PvLiveSearchField(key: kTtcDoorSearchKey, ...) always.
-    final Widget field = photo == null
+    // The quiet hero: the white pill everywhere, as Flo's is (2026-09-29).
+    final Widget field = kTtcDoorHeroQuiet || photo == null
         ? PvLiveSearchField(
             key: kTtcDoorSearchKey,
             search: search,
@@ -1782,7 +1890,38 @@ class _Hero extends StatelessWidget {
         // climbs slower than the page. Its top edge stays above the screen
         // (it moves down by less than the page moved up), and what runs on
         // below is under the sheet, which paints over it.
-        if (photo != null)
+        // ---- light art (2026-09-29): the picture as it is, no shade ----
+        if (lightAsset != null)
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: -_bleed,
+            child: ValueListenableBuilder<double>(
+              valueListenable: scroll,
+              builder: (context, o, child) => Transform.translate(
+                offset: Offset(0, (o * _kRate).clamp(0.0, double.infinity)),
+                child: child,
+              ),
+              // The picture across the full width, never cropped (the user
+              // on the earlier heroes: "zoomed in… senseless"); its own
+              // ground carries on below it on a tall phone.
+              child: ColoredBox(
+                color: kTtcDoorHeroLightGround,
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: Image.asset(
+                    lightAsset,
+                    width: double.infinity,
+                    fit: BoxFit.fitWidth,
+                    alignment: Alignment.topCenter,
+                    errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                  ),
+                ),
+              ),
+            ),
+          )
+        else if (photo != null)
           Positioned(
             top: 0,
             left: 0,
@@ -1825,6 +1964,45 @@ class _Hero extends StatelessWidget {
                   // 4.8:1, over the 4.5:1 body-text line (WCAG AA), before
                   // the type's own shadow. Kept for revert:
                   //   colors: 0.42 / 0.20 / 0.44, stops: 0 / 0.45 / 1.
+                  // ⚠️ THE QUIET HERO'S SHADE (2026-09-29): across, not
+                  // down. The words sit on the left, so the shade is deepest
+                  // there and the right of the picture stays the picture.
+                  // Under the headline sentence (x up to about 0.8 of the
+                  // width, 0.52 to 0.38 black) a bright patch of luminance
+                  // 0.6 is at most 0.6 x 0.62 = 0.37, and white on 0.37 is
+                  // 1.05 / 0.42 = 2.5:1 before the type's shadow — so the
+                  // bottom band below adds 0.35 more where the words are.
+                  if (kTtcDoorHeroQuiet) ...[
+                    DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            Colors.black.withValues(alpha: 0.52),
+                            Colors.black.withValues(alpha: 0.38),
+                            Colors.black.withValues(alpha: 0.12),
+                          ],
+                          stops: const [0, 0.62, 1],
+                        ),
+                      ),
+                    ),
+                    DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.black.withValues(alpha: 0.18),
+                            Colors.black.withValues(alpha: 0.0),
+                            Colors.black.withValues(alpha: 0.35),
+                            Colors.black.withValues(alpha: 0.35),
+                          ],
+                          stops: const [0, 0.25, 0.55, 1],
+                        ),
+                      ),
+                    ),
+                  ] else
                   DecoratedBox(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
@@ -1872,7 +2050,9 @@ class _Hero extends StatelessWidget {
             alignment: Alignment.bottomLeft,
             children: [
               const SizedBox(
-                height: kTtcDoorHeroHeight,
+                height: kTtcDoorHeroQuiet
+                    ? kTtcDoorHeroQuietHeight
+                    : kTtcDoorHeroHeight,
                 width: double.infinity,
               ),
               Padding(
@@ -1887,7 +2067,7 @@ class _Hero extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     words,
-                    const SizedBox(height: 16),
+                    SizedBox(height: kTtcDoorHeroQuiet ? 18 : 16),
                     field,
                   ],
                 ),

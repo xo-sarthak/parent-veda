@@ -9764,3 +9764,86 @@ in code and tested. **Build 18 is not made yet**: the user took the phone away a
     title) as `TtcKindCard`, and all 290 tiles carry ids. *Open:* the user chooses rails (recommended, titles stay
     whole) or the reference's two-column grid (`kTtcDoorCardsAsGrid`).
   - **Placeholders** are being replaced with free credited images; see that helper's report.
+- **80.11 Later on 2026-09-29 (builds 20 to 22, committed 3e29f7f):**
+  - **Doors:** the photo hero stays (words and search on the picture). The flat-art hero (`ttc_door_hero.dart`, slots in
+    `assets/doors/`) is built and kept off. Shelves on all nine doors are Flo-size blocks (`TtcFloCard`,
+    `kTtcDoorCardsFlo`): tag and title on the kind's tint, picture at the foot; a video shows its length, or Coming soon
+    with no play mark while unmade. The two-column grid question in 80.10 is closed by this. *Open:* the nine hero images
+    from the ChatGPT prompts, if the user makes them.
+  - **Tools, heading by heading:** Plan and check is rebuilt (Can I...? with verdict tags and recently checked; Food
+    ideas with a day strip, meal photo cards and swaps; the pre-pregnancy checklist with a ring and the next three steps).
+    *Open:* the user reviews it on the phone before Care and medicines, which is ON HOLD by the user's word. Food ideas
+    owes two decisions: the default kitchen (veg with eggs, or no eggs) and a real pulao photo.
+  - **One section-heading style** across the stage; Records keeps her and his results apart.
+  - **More gains Read and watch:** every article and every film, each in one searchable list.
+  - **Owed decisions:** Store "Buy now" removed (Add to cart, then Go to cart; recommended keep); whether a hero and a
+    pill may open the same screen (to show on the phone).
+- **80.12 The door made quiet, Fertile window first (2026-09-29, the user with Flo's "How to get pregnant" beside ours:
+  "so much on the face"; Flo's is "minimalistic and subtle").** One template, so all nine doors changed:
+  - **Hero** (`kTtcDoorHeroQuiet`): the door's name as the title, the headline sentence as the one line under it, the
+    white search pill; no caps eyebrow and no three-line blurb (both kept, commented). Doors in `kTtcDoorHeroLightArt`
+    draw bundled light art (`assets/doors/hero_<slug>.jpg`) full width with ink words and no shade; the Fertile window
+    door has the user's art (the pencil and six dots). The other eight keep their photo with a lighter shade behind the
+    words. *Open:* light art for the other eight doors (prompt style in Downloads/door-hero-prompts).
+  - **Tab cards:** shorter (112), a smaller mark, no count line, a thin ink ring on the chosen one.
+  - **Shelf cards** (`TtcShelfCard`, `kTtcDoorCardsShelf`): a rounded picture, the title and one grey line that says
+    what the thing is ("Article · 9 min read", "Myth or fact", "Tool"). A film is known by its play button and length,
+    or "Coming soon" with no play button while unmade. A drawn card takes its tab's colour.
+  - **Photos judged by eye** (`ttc_card_art.dart`): on the Fertile window door 24 card photos that did not show their
+    subject (cherry blossom, a glacier, light bulbs, "weirdo" mugs, an hourglass on black) draw a chosen mark instead.
+    *Open:* (a) the READ pages behind those cards still show the old photos, and so does Learn, so replacing the read
+    photos themselves is owed; (b) the other eight doors' card photos are not judged yet.
+- **80.13 ⚠️ PREVIEW ON, MUST BE OFF BEFORE LAUNCH: `kTtcShelfFilmPreview` (ttc_kind_cards.dart).** The user on build
+  23 wanted to see Flo's play triangle and length on every door video, made or not ("I know it goes against it, I just
+  want to see how it would look"). While true, an unmade film shows a play mark and a made-up length fixed by its
+  title (0:30 to 4:59), which breaks D3: she taps "1:02" and lands on "coming soon". Decide after seeing it: keep the
+  look for real films only (set false; unmade films show "Coming soon"), or keep the preview until films exist.
+  Same pass: the chosen tab card's ring is 1pt now (was 1.5, "too aggressive").
+  Later the same night (build 25): every film is dimmed evenly under Flo's veil (0.30 black, photo or drawing) with a
+  white triangle and a white length; a carousel is a fanned deck, its picture on the front slide and two drawn slides
+  behind (TheFork's fanned photos on Mobbin), so a real photo drops into the front slide as it is.
+  Build 26: a tool card shows a small white round badge with the wrench in its picture's bottom-right corner (a chat:
+  a speech bubble), where a film shows its length. Tried first and dropped the same night: a slider (read as a video's
+  progress bar), then a full-width white control bar with an arrow button (the user: a waste of space that a photo
+  added later would lose a third of).
+  Build 27, paid cards (Mobbin: Alan leads a consult with faces, Clue puts the offer on a product card): the price rides
+  in the same bottom-right corner as a film's length and a tool's wrench; a product's tag carries a bag. A consult shows
+  its roster person's initials in a white circle (no roster photos exist yet; a stock face would be false) and names
+  her in the grey line. *Open:* the roster photos, which would replace the initials; offering prices print without a
+  thousands comma ("₹2499") while the store prints "₹1,150" — one format owed.
+  Build 29 (2026-09-30, the user on build 28): no prices on the pictures. A consult shows one doctor image
+  (`assets/doors/card_consult.jpg`: a doctor from the shoulders down, no face, because the card names a real roster
+  person), a product a white bag badge, a course or masterclass an "Enroll" pill with a clock; the grey line says
+  "Masterclass · Paid". Prices are one tap in.
+- **80.14 The profile, cleaner (2026-09-30, the user: look at how other apps do it; a photo; no "Not paired" and no
+  dashes; let her know her onboarding answers can be changed; make sure everything in Profile and Settings works).**
+  Mobbin: Flo (pencil on the avatar, Edit info), Paired "About you" (every answer a row with its value and an arrow),
+  Airbnb (a white photo-led profile), Deepstash and Apple Games (invite is a card to act on), Oura (a stat she lacks is
+  named, not dashed).
+  - **Photo** (`ProfilePhotoStore`): a camera badge on the avatar opens Take a photo, Choose from your photos, Remove
+    photo; the camera asks its permission first (the app declares the camera for calls). The copy lives in the app's
+    documents folder, path in shared_preferences, and shows on the profile and the Today avatar. *Open:* sync the
+    photo to a second phone (Supabase Storage, a private bucket, RLS by user); his side has no photo yet.
+  - **White hero**, no tinted band; the verified tick sits beside the name; the partner line shows only once paired
+    (unpaired, the Family row with Invite says it once).
+  - **The glance with nothing logged** is an invitation ("Your cycle at a glance", what will show, a Log your period
+    button to the calendar); with one period, "Not yet" and what brings it. No "--" anywhere.
+  - **Your answers**: the values shown ("Not answered" when empty, never "--"), the line "You can change any answer",
+    and one "Change your answers" row. Each answer as its own tappable row, and a Settings "Your details" row, were
+    tried and taken out the same night: they all opened the one Your details page (Reminders opens it too), three
+    doors to one room (test/ttc_no_repetition_test.dart). The avatar and its camera badge are one tap.
+  - **Found by the new walk test** (`test/pv_profile_walk_test.dart`, every row tapped): Delivery addresses waited on
+    the cloud sync before opening (now opens at once, local-first); WhatsApp updates turned "on" with no phone number
+    (now stays off and says it needs the number).
+- **80.15 Ask Veda is trying to conceive's search (2026-09-30, the user: "I can search for anything inside the trying to
+  conceive side … the range should be within the side of the app you are in").**
+  - **The button is back on this stage only** (`FabState.kAskFabInTtc`), in the one black; other stages stay off.
+  - **Search as she types** (`ttc_stage_search.dart`): the stage's tools, articles, videos, Can I answers, topics and
+    products, from the phone (offline, free), grouped, each opening its real screen; one black "Ask Veda: …" row asks
+    the whole question.
+  - **The service answers inside the stage** (parentveda-askveda, `scope_domain`; askveda.md "Stage scope"): the answer
+    and its pointers come from trying-to-conceive content only; the pool was refreshed (1,055 docs, 16 stale removed,
+    2,187 chunks). No wire change.
+  - *Open:* the service is not hosted, so on a phone it answers only through `adb reverse tcp:8000 tcp:8000` to a laptop
+    running it (Phase 9, hosting); the three `service_role` grants (recipes, reads, products) are still owed, so the app
+    content tables are not in the pool; the pregnancy and parenting passes.

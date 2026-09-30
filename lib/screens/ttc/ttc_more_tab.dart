@@ -114,7 +114,10 @@ const String kTtcMoreTitle = 'More';
 /// The section headings, in order. Tests and the ledger read these.
 const String kTtcMoreExpertsHeading = 'Talk to an expert';
 const String kTtcMoreCoursesHeading = 'Courses and masterclasses';
-const String kTtcMoreGroupsHeading = 'Groups';
+// ⚠️ "COHORTS", NOT "GROUPS" (2026-09-30, the user: "Groups" sounds like a
+// community, which this is not; it sells cohort programmes, a few weeks of
+// live calls with a small group). Kept for revert: 'Groups'.
+const String kTtcMoreGroupsHeading = 'Cohorts';
 /// ⚠️ NO LONGER DRAWN (2026-09-29): the section moved to the profile.
 /// Kept so the tests can hold that it stays gone.
 const String kTtcMoreBookingsHeading = 'Your bookings and orders';
@@ -175,7 +178,9 @@ const Map<String, (TtcRowHome, String)> kTtcFormerYouRows = {
   'Bookings': (TtcRowHome.profile, 'Your bookings'),
   'Orders': (TtcRowHome.profile, 'Your orders'),
   'Addresses': (TtcRowHome.settings, 'Delivery addresses'),
-  'Journey map': (TtcRowHome.more, 'Journey map'),
+  // Left More on 2026-09-30 (the user; see the Your journey note below). It has
+  // no home in the three pages now. Kept for revert:
+  //   'Journey map': (TtcRowHome.more, 'Journey map'),
   'Invite a friend': (TtcRowHome.more, 'Invite a friend'),
   'Employer benefits': (TtcRowHome.more, 'Employer benefits'),
 };
@@ -383,8 +388,9 @@ List<TtcMoreSection> ttcMoreSections({required bool partner}) {
   // final bookings = BookingStore.instance.bookings().length;
   // final orders = PvOrderStore.instance.orders.length;
   // final addresses = PvOrderStore.instance.addresses.length;
-  final map = ttcMovedToMoreById('map')!;
-  final chapter = TtcStore.instance.today.chapter;
+  // Kept for revert (2026-09-30), read by the Your journey section:
+  // final map = ttcMovedToMoreById('map')!;
+  // final chapter = TtcStore.instance.today.chapter;
   final sponsor = EntitlementStore.instance.sponsor;
 
   return [
@@ -483,32 +489,39 @@ List<TtcMoreSection> ttcMoreSections({required bool partner}) {
         ),
       ],
     ),
-    TtcMoreSection(
-      id: 'journey',
-      title: kTtcMoreJourneyHeading,
-      hue: 350,
-      rows: [
-        TtcMoreRow(
-          id: 'map',
-          // The Tools hub's own mark for the map (ttc_tool_marks.dart).
-          art: ttcArtTool('map'),
-          title: map.nameEn,
-          line: map.descEn,
-          open: map.open,
-        ),
-        TtcMoreRow(
-          id: 'chapter',
-          art: ttcArtTab(TtcTabMark.flagPath),
-          // Named, never "Your chapter" alone (2026-09-28: a chapter name
-          // never stands alone).
-          title: 'Your chapter: ${chapter.title(false)}',
-          line: partner
-              ? 'The chapter you are in together, and what comes next'
-              : 'What your chapter means for you both, and what comes next',
-          open: (c) => openTtcChapter(c, chapter),
-        ),
-      ],
-    ),
+    // ⚠️ "YOUR JOURNEY" LEFT MORE (2026-09-30, the user: "I don't understand
+    // the relevance of any of them… so text heavy"). Researched first: neither
+    // Flo nor What to Expect has a journey map or a chapter for trying to
+    // conceive; the map's family timeline and "log your period" repeat the
+    // calendar and the logger, and what a chapter says is on the doors and
+    // the home. Both screens stay in code (his partner screen still links
+    // them, decided in the his-side pass). Kept for revert:
+    // TtcMoreSection(
+    //   id: 'journey',
+    //   title: kTtcMoreJourneyHeading,
+    //   hue: 350,
+    //   rows: [
+    //     TtcMoreRow(
+    //       id: 'map',
+    //       // The Tools hub's own mark for the map (ttc_tool_marks.dart).
+    //       art: ttcArtTool('map'),
+    //       title: map.nameEn,
+    //       line: map.descEn,
+    //       open: map.open,
+    //     ),
+    //     TtcMoreRow(
+    //       id: 'chapter',
+    //       art: ttcArtTab(TtcTabMark.flagPath),
+    //       // Named, never "Your chapter" alone (2026-09-28: a chapter name
+    //       // never stands alone).
+    //       title: 'Your chapter: ${chapter.title(false)}',
+    //       line: partner
+    //           ? 'The chapter you are in together, and what comes next'
+    //           : 'What your chapter means for you both, and what comes next',
+    //       open: (c) => openTtcChapter(c, chapter),
+    //     ),
+    //   ],
+    // ),
     TtcMoreSection(
       id: 'benefits',
       title: kTtcMoreBenefitsHeading,
@@ -697,53 +710,117 @@ class _TtcMoreSectionView extends StatelessWidget {
         children: [
           // A WRAP, so at large text the link drops under the heading
           // instead of squeezing it to one letter a line (360dp at 1.5x).
-          Wrap(
-            alignment: WrapAlignment.spaceBetween,
-            crossAxisAlignment: WrapCrossAlignment.end,
-            runSpacing: 4,
-            children: [
-              Semantics(
-                header: true,
-                // Kept for revert (2026-09-29, one heading style): style:
-                // pvFraunces(fontSize: 21, fontWeight: FontWeight.w500,
-                //     height: 1.15, color: p.ink1)
-                child: Text(
-                  s.title,
-                  style: ttcSectionHeadingStyle(color: p.ink1),
-                ),
-              ),
-              if (s.link != null && s.onLink != null)
-                InkWell(
-                  key: ValueKey('ttc_more_link_${s.id}'),
-                  onTap: () => s.onLink!(context),
-                  borderRadius: BorderRadius.circular(999),
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(8, 6, 0, 2),
-                    child: Row(mainAxisSize: MainAxisSize.min, children: [
-                      Flexible(
-                        child: Text(
-                          s.link!,
+          // ⚠️ THE LINK ON THE LEAD'S ROW (2026-09-30, the user: "See all
+          // consults" beside the heading "is not looking right"; put it "in a
+          // row below on the right, in the same row as Private video calls
+          // with a specialist"). The heading stands alone; under it the lead
+          // on the left and the link on the right, a size smaller. Kept for
+          // revert: a Wrap of the heading and the link, then the lead.
+          Semantics(
+            header: true,
+            child: Text(
+              s.title,
+              style: ttcSectionHeadingStyle(color: p.ink1),
+            ),
+          ),
+          if (s.lead != null || (s.link != null && s.onLink != null)) ...[
+            const SizedBox(height: 3),
+            LayoutBuilder(builder: (context, box) => Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: s.lead == null
+                      ? const SizedBox.shrink()
+                      : Text(
+                          s.lead!,
                           style: pvManrope(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700,
-                            color: p.ink1,
+                            fontSize: 12.5,
+                            height: 1.4,
+                            color: p.ink3,
                           ),
                         ),
-                      ),
-                      Icon(Icons.chevron_right_rounded,
-                          size: 18, color: p.ink2),
-                    ]),
-                  ),
                 ),
-            ],
-          ),
-          if (s.lead != null) ...[
-            const SizedBox(height: 3),
-            Text(
-              s.lead!,
-              style: pvManrope(fontSize: 12.5, height: 1.4, color: p.ink3),
-            ),
+                if (s.link != null && s.onLink != null)
+                  // At most 60% of the row, so a very large text size
+                  // shortens the link rather than push past the edge.
+                  ConstrainedBox(
+                    constraints: BoxConstraints(maxWidth: box.maxWidth * 0.6),
+                    child: InkWell(
+                      key: ValueKey('ttc_more_link_${s.id}'),
+                      onTap: () => s.onLink!(context),
+                      borderRadius: BorderRadius.circular(999),
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(8, 4, 0, 4),
+                        child: Row(mainAxisSize: MainAxisSize.min, children: [
+                          Flexible(
+                            child: Text(
+                              s.link!,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: pvManrope(
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.w700,
+                                color: p.ink1,
+                              ),
+                            ),
+                          ),
+                          Icon(Icons.chevron_right_rounded,
+                              size: 16, color: p.ink2),
+                        ]),
+                      ),
+                    ),
+                  ),
+              ],
+            )),
           ],
+          // Kept for revert (2026-09-30), the heading row:
+          //          Wrap(
+          //            alignment: WrapAlignment.spaceBetween,
+          //            crossAxisAlignment: WrapCrossAlignment.end,
+          //            runSpacing: 4,
+          //            children: [
+          //              Semantics(
+          //                header: true,
+          //                // Kept for revert (2026-09-29, one heading style): style:
+          //                // pvFraunces(fontSize: 21, fontWeight: FontWeight.w500,
+          //                //     height: 1.15, color: p.ink1)
+          //                child: Text(
+          //                  s.title,
+          //                  style: ttcSectionHeadingStyle(color: p.ink1),
+          //                ),
+          //              ),
+          //              if (s.link != null && s.onLink != null)
+          //                InkWell(
+          //                  key: ValueKey('ttc_more_link_${s.id}'),
+          //                  onTap: () => s.onLink!(context),
+          //                  borderRadius: BorderRadius.circular(999),
+          //                  child: Padding(
+          //                    padding: const EdgeInsets.fromLTRB(8, 6, 0, 2),
+          //                    child: Row(mainAxisSize: MainAxisSize.min, children: [
+          //                      Flexible(
+          //                        child: Text(
+          //                          s.link!,
+          //                          style: pvManrope(
+          //                            fontSize: 13,
+          //                            fontWeight: FontWeight.w700,
+          //                            color: p.ink1,
+          //                          ),
+          //                        ),
+          //                      ),
+          //                      Icon(Icons.chevron_right_rounded,
+          //                          size: 18, color: p.ink2),
+          //                    ]),
+          //                  ),
+          //                ),
+          //            ],
+          //          ),
+          //          if (s.lead != null) ...[
+          //            const SizedBox(height: 3),
+          //            Text(
+          //              s.lead!,
+          //              style: pvManrope(fontSize: 12.5, height: 1.4, color: p.ink3),
+          //            ),
+          //          ],
           const SizedBox(height: 12),
           Container(
             decoration: BoxDecoration(

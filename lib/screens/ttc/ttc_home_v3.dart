@@ -42,6 +42,8 @@
 //  its own sentence, not a hole.
 // =============================================================================
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import '../../data/reads/read_images.dart' show readImageFor;
@@ -58,6 +60,7 @@ import '../../data/hubs/hub_registry.dart';
 
 import '../../localization/app_language.dart';
 import '../../services/bracket_resolver.dart';
+import '../../services/profile_photo_store.dart';
 import '../../services/life_stage_store.dart';
 import '../../services/ttc_surfaces.dart';
 import '../../theme/pv_fonts.dart';
@@ -756,8 +759,17 @@ class _TtcHomeV3State extends State<TtcHomeV3>
                   ListenableBuilder(
                     listenable: PvCatalogStore.instance,
                     builder: (context, _) {
-                      final picks = PvCatalogStore.instance
-                          .forYou(LifeStage.tryingToConceive);
+                      // Without the day's pick, which the insight rail
+                      // above already shows (2026-09-30). Kept for revert:
+                      //   final picks = PvCatalogStore.instance
+                      //       .forYou(LifeStage.tryingToConceive);
+                      final pickId =
+                          pvIdForTtc(ttcHomeTodaysPick(_selected).id);
+                      final picks = [
+                        for (final x in PvCatalogStore.instance
+                            .forYou(LifeStage.tryingToConceive))
+                          if (x.id != pickId) x,
+                      ];
                       return picks.isEmpty
                           ? _ProductRail(p: p, hinglish: hinglish)
                           : PvCardRail(products: picks, scope: 'ttc_home');
@@ -1453,11 +1465,16 @@ class _CycleHeader extends StatelessWidget {
               width: 88,
               child: Align(
                 alignment: Alignment.centerLeft,
-                child: _RoundButton(
-                    icon: Icons.person_outline_rounded,
-                    p: p,
-                    onTap: onProfile,
-                    semantic: t.profileTitle),
+                // Her photo when she has one (2026-09-30).
+                child: ListenableBuilder(
+                  listenable: ProfilePhotoStore.instance..load(),
+                  builder: (context, _) => _RoundButton(
+                      icon: Icons.person_outline_rounded,
+                      p: p,
+                      onTap: onProfile,
+                      semantic: t.profileTitle,
+                      photoPath: ProfilePhotoStore.instance.path),
+                ),
               ),
             ),
             // ⚠️ THE SELECTED DAY, NOT `now`. It read `DateTime.now()`, which
@@ -2985,12 +3002,17 @@ class _RoundButton extends StatelessWidget {
       {required this.icon,
       required this.p,
       required this.onTap,
-      required this.semantic});
+      required this.semantic,
+      this.photoPath});
 
   final IconData icon;
   final V2Palette p;
   final VoidCallback onTap;
   final String semantic;
+
+  /// Her photo in the disc instead of the icon (the profile button,
+  /// 2026-09-30), or null.
+  final String? photoPath;
 
   @override
   Widget build(BuildContext context) => Semantics(
@@ -3008,12 +3030,22 @@ class _RoundButton extends StatelessWidget {
                 width: 38,
                 height: 38,
                 alignment: Alignment.center,
+                clipBehavior: Clip.antiAlias,
                 decoration: BoxDecoration(
                   color: p.surface.withValues(alpha: 0.85),
                   shape: BoxShape.circle,
                   border: Border.all(color: p.line),
                 ),
-                child: Icon(icon, size: 18, color: p.ink2),
+                child: photoPath == null
+                    ? Icon(icon, size: 18, color: p.ink2)
+                    : Image.file(
+                        File(photoPath!),
+                        width: 38,
+                        height: 38,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, _, _) =>
+                            Icon(icon, size: 18, color: p.ink2),
+                      ),
               ),
             ),
           ),
@@ -3684,15 +3716,18 @@ class _InsightRail extends StatelessWidget {
     // what the rail leaves out (test/ttc_no_repetition_test.dart). Kept for
     // revert:
     //   final product = ttcPickForToday(ttcProducts, now: selected, offset: 4);
-    final onRail = ttcHomeProductRailIds();
-    final pickable = [
-      for (final x in ttcProducts)
-        if (!onRail.contains(pvIdForTtc(x.id))) x,
-    ];
-    final product = ttcPickForToday(
-        pickable.isEmpty ? ttcProducts : pickable,
-        now: selected,
-        offset: 4);
+    // ⚠️ ONLY WHAT WE RECOMMEND (2026-09-30, the user: "only show the products
+    // that are ParentVeda recommended… you cannot shuffle between the products
+    // that are not worthy"). See `ttcHomeTodaysPick`. The "ParentVeda
+    // recommends" rail below holds every recommended product, so the order
+    // flipped: the pick is chosen first and the rail leaves it out that day,
+    // which keeps one product behind one card. Kept for revert (2026-09-28):
+    //   final onRail = ttcHomeProductRailIds();
+    //   final pickable = [for (final x in ttcProducts)
+    //       if (!onRail.contains(pvIdForTtc(x.id))) x];
+    //   final product = ttcPickForToday(
+    //       pickable.isEmpty ? ttcProducts : pickable, now: selected, offset: 4);
+    final product = ttcHomeTodaysPick(selected);
 
     // ⚠️ A RUNNING ROUND LEADS THE RAIL (2026-09-26, §3e): its step, and
     // its blood test named by DATE where "Should I test?" would sit. The
@@ -4009,6 +4044,8 @@ class _InsightTile extends StatelessWidget {
         caption: card.caption,
         hue: card.hue,
         art: card.art,
+        // Every card one clean colour, no mark under the words (2026-09-30).
+        showArt: false,
         p: p,
         onTap: onTap,
       );
@@ -4480,6 +4517,20 @@ class _Story extends StatelessWidget {
 /// four when the catalogue is empty (`_ProductRail`). Today's pick on the
 /// insight rail leaves these out, so one product is never behind two cards on
 /// the home (2026-09-28).
+/// Today's pick for [day]: a product ParentVeda recommends (the Highly
+/// recommended and Recommended bands), never "Only in some cases" or
+/// "Generally not needed", rotating by date (2026-09-30).
+TtcProduct ttcHomeTodaysPick(DateTime day) {
+  final recommended = [
+    for (final x in ttcProducts)
+      if (x.band == TtcRecoBand.strong || x.band == TtcRecoBand.buy) x,
+  ];
+  return ttcPickForToday(
+      recommended.isEmpty ? ttcProducts : recommended,
+      now: day,
+      offset: 4);
+}
+
 Set<String> ttcHomeProductRailIds() {
   final forYou = PvCatalogStore.instance.forYou(LifeStage.tryingToConceive);
   if (forYou.isNotEmpty) return {for (final x in forYou) x.id};

@@ -86,6 +86,10 @@ import '../ttc/ttc_content_prefs_sheet.dart' show kTtcWhatYouSee;
 import '../ttc/ttc_get_help_screen.dart' show kTtcGetHelpTitle;
 import '../v2/v2_palette.dart';
 import 'pv_you_chrome.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
+import '../../services/profile_photo_store.dart';
+import '../ttc/ttc_surface_router.dart' show openTtcSurface;
 import 'pv_you_content.dart';
 import 'pv_you_sheets.dart';
 
@@ -243,6 +247,8 @@ class _PvYouScreenState extends State<PvYouScreen> {
     CycleStore.instance,
     // The bookings tile's line reads the next session (2026-09-29).
     BookingStore.instance,
+    // Her photo on the hero (2026-09-30).
+    ProfilePhotoStore.instance,
     if (PregnancyController.current != null) PregnancyController.current!,
   ];
 
@@ -250,7 +256,109 @@ class _PvYouScreenState extends State<PvYouScreen> {
   void initState() {
     super.initState();
     PvOrderStore.instance.init();
+    ProfilePhotoStore.instance.load();
     _load();
+  }
+
+  // ---- her photo (2026-09-30) ---------------------------------------------------
+
+  /// Add, change or remove her photo: one sheet, three plain choices (Flo's
+  /// avatar pencil, the platform's own photo sheet). The camera asks for its
+  /// permission first, because the app declares the camera for video calls
+  /// and Android then refuses a camera intent without it; a refusal says so
+  /// kindly and changes nothing.
+  Future<void> _photoSheet() async {
+    final has = ProfilePhotoStore.instance.hasPhoto;
+    final choice = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
+      ),
+      builder: (ctx) {
+        Widget row(String id, IconData icon, String label, {bool danger = false}) =>
+            ListTile(
+              key: ValueKey('pv_profile_photo_$id'),
+              leading: Icon(icon, color: danger ? const Color(0xFFC6295A) : pvStorePalette.ink1),
+              title: Text(
+                label,
+                style: pvManrope(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  color: danger ? const Color(0xFFC6295A) : pvStorePalette.ink1,
+                ),
+              ),
+              onTap: () => Navigator.of(ctx).pop(id),
+            );
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(8, 14, 8, 8),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 6),
+                  child: Text(
+                    has ? 'Your photo' : 'Add a photo',
+                    style: pvFraunces(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: pvStorePalette.ink1,
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                  child: Text(
+                    'It stays on this phone and shows on your profile and your home.',
+                    style: pvManrope(
+                      fontSize: 13,
+                      height: 1.4,
+                      color: pvStorePalette.ink3,
+                    ),
+                  ),
+                ),
+                row('camera', Icons.photo_camera_outlined, 'Take a photo'),
+                row('gallery', Icons.photo_library_outlined, 'Choose from your photos'),
+                if (has)
+                  row('remove', Icons.delete_outline_rounded, 'Remove photo',
+                      danger: true),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+    if (!mounted || choice == null) return;
+    if (choice == 'remove') {
+      await ProfilePhotoStore.instance.remove();
+      if (mounted) pvSnack(context, 'Photo removed', icon: Icons.check_rounded);
+      return;
+    }
+    final camera = choice == 'camera';
+    try {
+      if (camera) {
+        final status = await Permission.camera.request();
+        if (!status.isGranted) {
+          if (mounted) {
+            pvSnack(context,
+                'The camera needs your permission. You can choose a photo instead.');
+          }
+          return;
+        }
+      }
+      final x = await ImagePicker().pickImage(
+        source: camera ? ImageSource.camera : ImageSource.gallery,
+        maxWidth: 800,
+        imageQuality: 88,
+      );
+      if (x == null) return;
+      await ProfilePhotoStore.instance.setFrom(x.path);
+      if (mounted) pvSnack(context, 'Photo saved', icon: Icons.check_rounded);
+    } catch (_) {
+      if (mounted) pvSnack(context, 'That photo could not be added. Try another.');
+    }
   }
 
   Future<void> _load() async {
@@ -1245,6 +1353,17 @@ class _PvYouScreenState extends State<PvYouScreen> {
             : 'To $_phone',
         value: _whatsapp,
         onChanged: (v) async {
+          // ⚠️ NO NUMBER, NO "ON" (2026-09-30, found by the profile walk
+          // test). With no phone on file the switch said "WhatsApp updates
+          // on." with nowhere to send them. It stays off and says what it
+          // needs instead.
+          if (v && (_phone == null || _phone!.isEmpty)) {
+            pvSnack(
+              context,
+              'WhatsApp needs your phone number. Sign in with your number to turn this on.',
+            );
+            return;
+          }
           setState(() => _whatsapp = v);
           final ok = await WhatsAppPrefs.save(
             optIn: v,
@@ -1645,17 +1764,36 @@ class _PvYouScreenState extends State<PvYouScreen> {
     } catch (_) {
       own = false;
     }
+    // ⚠️ NO DASHES (2026-09-30, the user: two dashes over "Your usual
+    // cycle" when nothing is logged). Nothing logged: one card that says
+    // what will be here and starts it. One period: "Not yet", in words, and
+    // what brings it. Kept for revert: facts ('--', 'Your usual cycle') and
+    // ('0', 'Periods logged') with a grey note.
+    if (n == 0) {
+      return PvProfileGlance(
+        key: const ValueKey('pv_profile_glance'),
+        top: top,
+        facts: const [],
+        mark: TtcTabArt(
+          mark: TtcTabMark.cycleDrops,
+          tint: _profileTint(pvStorePalette),
+        ),
+        title: 'Your cycle at a glance',
+        note: 'Log your first period and your usual cycle length and the '
+            'periods you have logged show here.',
+        actionLabel: 'Log your period',
+        onAction: () => openTtcSurface(context, 'ttc_calendar'),
+      );
+    }
     return PvProfileGlance(
       key: const ValueKey('pv_profile_glance'),
       top: top,
       facts: [
-        (own ? '$usual days' : '--', 'Your usual cycle'),
+        (own ? '$usual days' : kPvGlancePending, 'Your usual cycle'),
         ('$n', n == 1 ? 'Period logged' : 'Periods logged'),
       ],
-      // What unlocks a dash, said once (derive, never ask).
-      note: n == 0
-          ? 'Log your period on Today and your cycle facts fill in.'
-          : (own ? null : 'Your usual cycle shows once two periods are logged.'),
+      // What unlocks "Not yet", said once (derive, never ask).
+      note: own ? null : 'Your usual cycle shows after your next period.',
     );
   }
 
@@ -1749,9 +1887,14 @@ class _PvYouScreenState extends State<PvYouScreen> {
     final tint = _profileTint(p);
     final him = widget.father;
     final a = content.action;
-    final partnerLine = _partnerLinked
-        ? 'Paired with $_partnerName'
-        : 'Not paired with ${him ? _partnerName : 'your partner'} yet';
+    // ⚠️ THE PARTNER LINE ONLY ONCE THEY ARE PAIRED (2026-09-30, the user:
+    // "Not paired with your partner yet" under her name). Unpaired, the
+    // Family and partner row below says it with its Invite, the one place to
+    // act. Kept for revert:
+    //   final partnerLine = _partnerLinked ? 'Paired with $_partnerName'
+    //       : 'Not paired with ${him ? _partnerName : 'your partner'} yet';
+    final String? partnerLine =
+        _partnerLinked ? 'Paired with $_partnerName' : null;
     return [
       PvProfileHero(
         key: const ValueKey('pv_profile_hero'),
@@ -1761,10 +1904,15 @@ class _PvYouScreenState extends State<PvYouScreen> {
         partnerLine: partnerLine,
         partnerMark: TtcTabArt(mark: TtcTabMark.twoFigures, tint: tint),
         bandTint: tint,
+        // White from the top, no tinted band (2026-09-30, "cleaner").
+        showBand: false,
         verified: _phoneVerified,
         showBack: widget.bottomNav == null,
         onEdit: him ? null : _editName,
         editLabel: _hasName ? 'Edit name' : 'Add your name',
+        // Her photo, on her side (2026-09-30).
+        photoPath: him ? null : ProfilePhotoStore.instance.path,
+        onPhoto: him ? null : _photoSheet,
       ),
       // ⚠️ WHAT SHE BOUGHT AND BOOKED, FIRST UNDER THE HERO (2026-09-29, the
       // lead with the user: things she HAS bought or booked live on the
@@ -1781,16 +1929,32 @@ class _PvYouScreenState extends State<PvYouScreen> {
           // Apple Health's Health Details: the facts as values, read-only,
           // and one way to change them. Five taps to one page read as
           // repetition (test/ttc_no_repetition_test.dart).
+          // ⚠️ EACH ANSWER IS ITS OWN EDIT (2026-09-30, the user: we collect
+          // data at onboarding, so let her know she can change it; Paired's
+          // "About you": every answer a row with its value and an arrow).
+          // Each row opens its own question, so no two rows share a
+          // destination. An empty answer says "Not answered", never "--".
+          // Kept for revert: read-only rows and one "Change your answers" row
+          // opening PvDetailsScreen(stageId: 'trying').
+          //
+          // ⚠️ AND ONE WAY IN, THE SAME NIGHT (test/ttc_no_repetition_test):
+          // every answer's editor is the one Your details page, scrolled to
+          // its question, so three tappable rows were three doors to one
+          // room. The rows show the values; one row changes them, and the
+          // line above says she can. Kept for revert: onTap: () =>
+          // d.edit(context) on each row, and no Change your answers row.
+          lead: 'What you told us when you joined. You can change any answer.',
           children: [
             for (final d in content.details)
               if (!d.hideWhenEmpty || d.value() != '--')
                 PvProfileRow(
+                  key: ValueKey('pv_profile_answer_${d.label}'),
                   mark:
                       d.art?.call(tint) ??
                       PvProfileArt(mark: PvProfileMark.info, tint: tint),
                   title: d.label,
                   subtitle: d.note,
-                  value: d.value(),
+                  value: d.value() == '--' ? 'Not answered' : d.value(),
                 ),
             PvProfileRow(
               key: const ValueKey('pv_profile_change_answers'),
@@ -2002,6 +2166,31 @@ class _PvYouScreenState extends State<PvYouScreen> {
             m(r),
             // After how she is signed in, before Sign out and Delete.
             if (i == 0) _deliveryAddressesRow(p),
+            // ⚠️ WHAT SHE TOLD US, CHANGEABLE HERE TOO (2026-09-30, the user:
+            // the onboarding answers should be visible in Settings, or let
+            // her know she can change them). The same page every answer row
+            // on the profile leads to; hers only.
+            // ⚠️ OFF THE SAME NIGHT: Reminders already opens Your details, so
+            // this was a second door to it (test/ttc_no_repetition_test). The
+            // profile's "Change your answers" is the one way in. Kept for
+            // revert: the condition was `i == 0 && !widget.father`.
+            if (false)
+              m(
+                PvYouRow(
+                  key: const ValueKey('pv_settings_your_details'),
+                  icon: Icons.fact_check_outlined,
+                  leading: PvProfileArt(
+                    mark: PvProfileMark.person,
+                    tint: _profileTint(p),
+                  ),
+                  title: 'Your details',
+                  subtitle: 'What you told us when you joined. Change any of it.',
+                  onTap: () => _push(
+                    const PvDetailsScreen(stageId: 'trying'),
+                    'you/details',
+                  ),
+                ),
+              ),
           ],
         ],
       ),

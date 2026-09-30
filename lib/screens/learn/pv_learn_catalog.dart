@@ -692,6 +692,10 @@ class PvLearnCatalog {
   /// Who runs a TTC offering, from the expert roster (2026-09-27): the
   /// offering first where one role has two people, then the role. A role the
   /// roster has nobody for (an andrologist) stays a role.
+  /// The roster person behind a TTC offering, for a door card (2026-09-29):
+  /// the same answer the Learn rows give, so one person has one name.
+  static (String, String) ttcRosterFor(TtcOffering o) => _ttcRosterFor(o);
+
   static (String, String) _ttcRosterFor(TtcOffering o) => switch (o.id) {
         'ttc_consult_fertility' ||
         'ttc_ivf_prep' =>

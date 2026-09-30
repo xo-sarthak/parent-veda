@@ -11,6 +11,8 @@
 //  irreversible thing at the very end. Nothing here is a filled violet button.
 // =============================================================================
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import '../../theme/app_theme.dart' show AppTheme;
@@ -1229,7 +1231,23 @@ class PvProfileHero extends StatelessWidget {
     this.editLabel = 'Edit name',
     this.showBack = true,
     this.verified = false,
+    this.photoPath,
+    this.onPhoto,
+    this.showBand = true,
   });
+
+  /// Her own photo on this phone (`ProfilePhotoStore`), or null for the
+  /// monogram (2026-09-30).
+  final String? photoPath;
+
+  /// Opens add, change or remove photo. A camera badge sits on the avatar
+  /// and the avatar itself is the tap (Flo's pencil on the avatar, Airbnb's
+  /// photo-led profile). Null: no badge, as on his side.
+  final VoidCallback? onPhoto;
+
+  /// False: no tinted band behind the top, the page white from the top down
+  /// (2026-09-30, the user: "make it look cleaner"; Airbnb's white profile).
+  final bool showBand;
 
   final String name;
 
@@ -1237,7 +1255,12 @@ class PvProfileHero extends StatelessWidget {
   /// the placeholder's first letter.
   final bool hasName;
   final String status;
-  final String partnerLine;
+
+  /// One line about her partner, or null for none. Since 2026-09-30 the TTC
+  /// profile passes it only once they are paired: "Not paired with your
+  /// partner yet" said here AND on the Family row with its Invite was the
+  /// same thing twice, and a status line is not where one acts.
+  final String? partnerLine;
 
   /// A small drawn mark before [partnerLine], or null.
   final Widget? partnerMark;
@@ -1266,6 +1289,7 @@ class PvProfileHero extends StatelessWidget {
         : name.trim().characters.first.toUpperCase();
     return Stack(
       children: [
+        if (showBand)
         Positioned(
           left: 0,
           right: 0,
@@ -1335,12 +1359,26 @@ class PvProfileHero extends StatelessWidget {
                     ),
                     child: Container(
                       alignment: Alignment.center,
+                      clipBehavior: Clip.antiAlias,
                       decoration: BoxDecoration(
                         color: p.ground,
                         shape: BoxShape.circle,
                         border: Border.all(color: kPvLine),
                       ),
-                      child: hasName && initial.isNotEmpty
+                      child: photoPath != null
+                          ? Image.file(
+                              File(photoPath!),
+                              key: const ValueKey('pv_profile_photo'),
+                              width: _avatar,
+                              height: _avatar,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, _, _) => Icon(
+                                Icons.person_outline_rounded,
+                                size: 44,
+                                color: p.ink2,
+                              ),
+                            )
+                          : hasName && initial.isNotEmpty
                           ? Text(
                               initial,
                               // The monogram is a picture of a letter: it
@@ -1359,7 +1397,58 @@ class PvProfileHero extends StatelessWidget {
                             ),
                     ),
                   ),
-                  if (verified)
+                  // The whole avatar opens the photo sheet.
+                  if (onPhoto != null)
+                    Positioned.fill(
+                      child: Semantics(
+                        button: true,
+                        label: photoPath == null
+                            ? 'Add a photo'
+                            : 'Change your photo',
+                        excludeSemantics: true,
+                        child: Material(
+                          type: MaterialType.transparency,
+                          shape: const CircleBorder(),
+                          clipBehavior: Clip.antiAlias,
+                          child: InkWell(
+                            key: const ValueKey('pv_profile_avatar_tap'),
+                            onTap: onPhoto,
+                          ),
+                        ),
+                      ),
+                    ),
+                  // The camera badge, bottom right, in the one black: the
+                  // sign that the picture can change (Flo's pencil).
+                  if (onPhoto != null)
+                    Positioned(
+                      right: 0,
+                      bottom: 2,
+                      child: ExcludeSemantics(
+                        // The badge is drawn, not a second button: the
+                        // avatar's own tap covers it (one way in).
+                        child: IgnorePointer(
+                          key: const ValueKey('pv_profile_photo_badge'),
+                          child: Container(
+                            width: 32,
+                            height: 32,
+                            decoration: BoxDecoration(
+                              color: p.ink1,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white, width: 3),
+                            ),
+                            child: const Icon(
+                              Icons.photo_camera_outlined,
+                              size: 15,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    )
+                  // Kept for revert (2026-09-30): the verified tick sat here;
+                  // it moved beside the name when the corner became the
+                  // camera's. Drawn here still where there is no camera.
+                  else if (verified)
                     Positioned(
                       right: 2,
                       bottom: 2,
@@ -1380,18 +1469,31 @@ class PvProfileHero extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 14),
-              Text(
-                name,
-                key: const ValueKey('pv_profile_name'),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-                style: pvFraunces(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w500,
-                  height: 1.15,
-                  color: p.ink1,
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Flexible(
+                    child: Text(
+                      name,
+                      key: const ValueKey('pv_profile_name'),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                      style: pvFraunces(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w500,
+                        height: 1.15,
+                        color: p.ink1,
+                      ),
+                    ),
+                  ),
+                  // The verified tick beside the name when the avatar's
+                  // corner holds the camera (2026-09-30).
+                  if (verified && onPhoto != null) ...[
+                    const SizedBox(width: 6),
+                    Icon(Icons.verified_rounded, size: 20, color: p.ink1),
+                  ],
+                ],
               ),
               const SizedBox(height: 6),
               Text(
@@ -1405,6 +1507,7 @@ class PvProfileHero extends StatelessWidget {
                   color: p.ink2,
                 ),
               ),
+              if (partnerLine != null) ...[
               const SizedBox(height: 8),
               Row(
                 key: const ValueKey('pv_profile_partner'),
@@ -1418,7 +1521,7 @@ class PvProfileHero extends StatelessWidget {
                   ],
                   Flexible(
                     child: Text(
-                      partnerLine,
+                      partnerLine!,
                       textAlign: TextAlign.center,
                       style: pvManrope(
                         fontSize: 13,
@@ -1429,6 +1532,7 @@ class PvProfileHero extends StatelessWidget {
                   ),
                 ],
               ),
+              ],
               if (onEdit != null) ...[
                 const SizedBox(height: 16),
                 PvProfilePill(
@@ -1455,7 +1559,21 @@ class PvProfileGlance extends StatelessWidget {
     required this.facts,
     this.note,
     this.top = 24,
+    this.title,
+    this.mark,
+    this.actionLabel,
+    this.onAction,
   });
+
+  /// ⚠️ THE EMPTY STATE IS AN INVITATION, NOT A ROW OF DASHES (2026-09-30,
+  /// the user: two dashes over "Your usual cycle" when nothing is logged).
+  /// With no [facts], the card is a [mark], a [title], the [note] saying what
+  /// will show here, and one [actionLabel] button that starts it (Oura's
+  /// cycle stats before data, Headspace's empty Stats with a way in).
+  final String? title;
+  final Widget? mark;
+  final String? actionLabel;
+  final VoidCallback? onAction;
 
   /// (value, label). A value of `--` is drawn grey.
   final List<(String, String)> facts;
@@ -1470,6 +1588,7 @@ class PvProfileGlance extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = pvStorePalette;
+    if (facts.isEmpty) return _glanceInvite(this, p);
     return Padding(
       padding: EdgeInsets.fromLTRB(
         kPvProfileGutter,
@@ -1508,14 +1627,16 @@ class PvProfileGlance extends StatelessWidget {
                             FittedBox(
                               fit: BoxFit.scaleDown,
                               alignment: Alignment.centerLeft,
+                              // "Not yet" (2026-09-30) is words, not a
+                              // number: smaller and grey, never "--".
                               child: Text(
                                 facts[i].$1,
                                 maxLines: 1,
                                 style: pvFraunces(
-                                  fontSize: 22,
+                                  fontSize: _pending(facts[i].$1) ? 18 : 22,
                                   fontWeight: FontWeight.w500,
                                   height: 1.1,
-                                  color: facts[i].$1 == '--' ? p.ink3 : p.ink1,
+                                  color: _pending(facts[i].$1) ? p.ink3 : p.ink1,
                                 ),
                               ),
                             ),
@@ -1552,6 +1673,83 @@ class PvProfileGlance extends StatelessWidget {
     );
   }
 }
+
+/// The words a glance fact shows before it is hers.
+const String kPvGlancePending = 'Not yet';
+
+bool _pending(String v) => v == '--' || v == kPvGlancePending;
+
+Widget _glanceInvite(PvProfileGlance g, V2Palette p) => Padding(
+    padding: EdgeInsets.fromLTRB(kPvProfileGutter, g.top, kPvProfileGutter, 0),
+    child: Container(
+      key: const ValueKey('pv_profile_glance_invite'),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: kPvLine),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (g.mark != null) ...[
+            SizedBox(width: 44, height: 44, child: g.mark),
+            const SizedBox(width: 14),
+          ],
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (g.title != null)
+                  Text(
+                    g.title!,
+                    style: pvManrope(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      height: 1.3,
+                      color: p.ink1,
+                    ),
+                  ),
+                if (g.note != null) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    g.note!,
+                    style: pvManrope(fontSize: 13, height: 1.4, color: p.ink2),
+                  ),
+                ],
+                if (g.actionLabel != null && g.onAction != null) ...[
+                  const SizedBox(height: 12),
+                  Material(
+                    color: p.ink1,
+                    shape: const StadiumBorder(),
+                    child: InkWell(
+                      key: const ValueKey('pv_profile_glance_action'),
+                      customBorder: const StadiumBorder(),
+                      onTap: g.onAction,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 9,
+                        ),
+                        child: Text(
+                          g.actionLabel!,
+                          style: pvManrope(
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
 
 // =============================================================================
 //  WHAT SHE BOUGHT AND WHAT SHE BOOKED, as two tiles under the hero

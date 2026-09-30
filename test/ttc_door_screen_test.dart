@@ -357,8 +357,11 @@ void main() {
               // Since 2026-09-29 (the user on build 21) the shelves are Flo's
               // small blocks, `TtcFloCard`. Kept for revert:
               //   matching: find.byType(TtcKindCard)
+              // Since 2026-09-29 (the user on build 22) the shelf card:
+              // a picture, its title and one grey line. Kept for revert:
+              //   matching: find.byType(TtcFloCard)
               expect(
-                find.descendant(of: rail, matching: find.byType(TtcFloCard)),
+                find.descendant(of: rail, matching: find.byType(TtcShelfCard)),
                 findsWidgets,
                 reason: '"${s.heading}" draws some other card',
               );
@@ -387,6 +390,8 @@ void main() {
         //   expect(live.contains('TtcDoorSectionCard('), isTrue);
         // 2026-09-29: Flo's blocks. Kept for revert: 'TtcKindCard('.
         expect(live.contains('TtcFloCard('), isTrue);
+        // 2026-09-29 (build 22): the shelf card leads.
+        expect(live.contains('TtcShelfCard('), isTrue);
       });
 
       testWidgets('a card with no photo is typographic, not a ghost shape',

@@ -41,6 +41,7 @@ import 'ttc_prepare_screen.dart';
 import 'ttc_products_screen.dart';
 import 'ttc_strings.dart';
 import 'ttc_surface_router.dart';
+import 'ttc_stage_search.dart';
 import 'ttc_tests_screen.dart';
 
 /// What these lists have to clear at the bottom: the pinned composer, and
@@ -80,6 +81,10 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
   final _scroll = ScrollController();
 
   String? _query;
+
+  /// What she has typed so far: the stage search runs on it as she types
+  /// (2026-09-30), before she asks.
+  String _typed = '';
   AskVedaResult? _feed;
   bool _loading = false;
   bool _failed = false;
@@ -112,6 +117,7 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
       _failed = false;
       _loading = true;
       _ctrl.clear();
+      _typed = '';
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scroll.hasClients) _scroll.jumpTo(0);
@@ -160,6 +166,7 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
         _loading = false;
         _failed = false;
         _ctrl.clear();
+        _typed = '';
       });
 
   @override
@@ -175,8 +182,13 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
             padding: const EdgeInsets.fromLTRB(ttcGutter, 4, ttcGutter, 10),
             child: hasResult ? _pillResult() : _pillEdit(t),
           ),
+          // Typing, not yet asked: the stage search (2026-09-30).
           Expanded(
-            child: hasResult ? _resultScroll(t) : _initialScroll(t),
+            child: hasResult
+                ? _resultScroll(t)
+                : (_typed.trim().length >= 2
+                    ? _searchScroll(_typed)
+                    : _initialScroll(t)),
           ),
         ]),
       ),
@@ -214,10 +226,15 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
               controller: _ctrl,
               textInputAction: TextInputAction.search,
               onSubmitted: _send,
+              onChanged: (v) => setState(() => _typed = v),
               cursorColor: ttcTitleInk,
               style: ttcBody(14, color: ttcInk, w: FontWeight.w600),
               decoration: InputDecoration(
-                hintText: t.hinglish ? 'Kuch bhi poochho…' : 'Ask anything…',
+                // Search and ask, in one field (2026-09-30). Kept for revert:
+                //   'Ask anything…'
+                hintText: t.hinglish
+                    ? 'Kuch bhi poochho…'
+                    : 'Search or ask anything…',
                 isDense: true,
                 filled: false, // the theme fills fields; this sits in its own pill
                 border: InputBorder.none,
@@ -322,6 +339,118 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
               ],
             ]),
           ),
+      ],
+    );
+  }
+
+  // ---- typing : the stage's own things, then the answer ---------------------
+  //
+  // ⚠️ ASK VEDA IS THE STAGE'S SEARCH TOO (2026-09-30, the user: "I can search
+  // for anything inside the trying to conceive side … the range should be
+  // within the side of the app you are in"). As she types, the stage's own
+  // tools, articles, videos, Can I answers, topics and products appear,
+  // grouped, straight from the phone (offline, free), each opening its real
+  // screen; one black row at the top asks Veda the whole question.
+  Widget _searchScroll(String typed) {
+    final hits = ttcStageSearch(typed, him: widget.partnerMode);
+    final q = typed.trim();
+    return ListView(
+      key: const ValueKey('ttc_ask_search'),
+      padding: const EdgeInsets.fromLTRB(ttcGutter, 2, ttcGutter, _composerInset),
+      children: [
+        // Ask Veda the whole question.
+        Material(
+          color: ttcTitleInk,
+          borderRadius: BorderRadius.circular(16),
+          child: InkWell(
+            key: const ValueKey('ttc_ask_search_ask'),
+            borderRadius: BorderRadius.circular(16),
+            onTap: () => _send(q),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(14, 13, 12, 13),
+              child: Row(children: [
+                const Icon(Icons.auto_awesome_rounded,
+                    size: 17, color: Colors.white),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text('Ask Veda: "$q"',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: ttcBody(13.5,
+                          color: Colors.white, w: FontWeight.w700)),
+                ),
+                const Icon(Icons.arrow_forward_rounded,
+                    size: 17, color: Colors.white),
+              ]),
+            ),
+          ),
+        ),
+        const SizedBox(height: 18),
+        if (hits.isEmpty)
+          Text(
+            'Nothing in trying to conceive matches "$q" yet. Ask Veda above.',
+            key: const ValueKey('ttc_ask_search_empty'),
+            style: ttcBody(13, color: ttcMuted, h: 1.45),
+          )
+        else ...[
+          Text('IN TRYING TO CONCEIVE',
+              style: ttcBody(11,
+                  color: ttcMuted, w: FontWeight.w800).copyWith(letterSpacing: 1.1)),
+          const SizedBox(height: 8),
+          for (final kind in TtcStageHitKind.values)
+            if (hits.any((h) => h.kind == kind)) ...[
+              Padding(
+                padding: const EdgeInsets.only(top: 10, bottom: 6),
+                child: Text(kind.heading,
+                    style: ttcBody(14, color: ttcInk, w: FontWeight.w800)),
+              ),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: ttcLine),
+                ),
+                child: Column(children: [
+                  for (final (i, h) in hits.where((h) => h.kind == kind).indexed) ...[
+                    if (i > 0)
+                      const Divider(height: 1, thickness: 1, color: ttcLine, indent: 48),
+                    InkWell(
+                      key: ValueKey('ttc_ask_hit_${kind.name}_$i'),
+                      onTap: () => h.open(context),
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(14, 11, 10, 11),
+                        child: Row(children: [
+                          Icon(kind.icon, size: 19, color: ttcTitleInk),
+                          const SizedBox(width: 15),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(h.title,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: ttcBody(13.5,
+                                        color: ttcInk, w: FontWeight.w700)),
+                                if (h.line.isNotEmpty) ...[
+                                  const SizedBox(height: 2),
+                                  Text(h.line,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: ttcBody(12, color: ttcMuted)),
+                                ],
+                              ],
+                            ),
+                          ),
+                          const Icon(Icons.chevron_right_rounded,
+                              size: 20, color: ttcMuted),
+                        ]),
+                      ),
+                    ),
+                  ],
+                ]),
+              ),
+            ],
+        ],
       ],
     );
   }

@@ -282,10 +282,12 @@ void main() {
         // Kept for revert (2026-09-29, now tiles on the profile):
         //   'Bookings',
         //   'Orders',
-        'Journey map',
+        // Off More since 2026-09-30 (the user). Kept for revert:
+        //   'Journey map',
       ]) {
         expect(find.text(row), findsWidgets, reason: row);
       }
+      expect(find.text('Journey map'), findsNothing);
       // What she HAS booked or bought is on her profile (2026-09-29), and
       // the addresses are in Settings: none of it is on More.
       for (final gone in [

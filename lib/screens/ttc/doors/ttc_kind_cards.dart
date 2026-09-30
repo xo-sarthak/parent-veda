@@ -153,10 +153,14 @@ import '../../../theme/pv_fonts.dart';
 import '../../../widgets/pv_feedback.dart';
 import '../../brackets/hub/hub_intent_art.dart';
 import '../../v2/v2_palette.dart';
-import '../ttc_focus_screen.dart' show photoForTile;
+import '../ttc_focus_screen.dart' show photoForTile, ttcTilePhotoId;
 import '../ttc_tool_marks.dart' show TtcToolArt, ttcToolMarkForSurface;
 import 'ttc_tab_art.dart' show TtcTabArt, TtcTabMark;
 import '../ttc_common.dart' show ttcTitleInk;
+import '../../../ttc/ttc_prepare_data.dart' show TtcOffering;
+import '../../../ttc/ttc_products_data.dart' show ttcProducts;
+import '../../learn/pv_learn_catalog.dart' show PvLearnCatalog;
+import 'ttc_card_art.dart';
 import 'ttc_door_screen.dart'
     show
         ttcTileIsUnmadeFilm,
@@ -1181,8 +1185,9 @@ class TtcKindCardV1 extends StatelessWidget {
 /// the Tools tab (`ttcToolMarkForSurface`), two bubbles for a chat, and for
 /// any other kind the tab family's mark for its meaning, so an offline photo
 /// or a card without one is a finished picture, never a grey box.
-Widget ttcKindCardDrawing(TtcTile t, TtcCardKind kind) {
-  final tint = ttcCardKindArtTint(kind);
+Widget ttcKindCardDrawing(TtcTile t, TtcCardKind kind, {Color? tint}) {
+  // [tint]: a shelf card on a door tab passes its tab's colour (2026-09-29).
+  tint ??= ttcCardKindArtTint(kind);
   final surface = switch (t) {
     TtcToolTile(:final surfaceId) => surfaceId,
     TtcChecklistTile(:final surfaceId) => surfaceId,
@@ -1586,6 +1591,9 @@ class _TtcKindScene extends StatelessWidget {
     ),
   );
 }
+
+/// The key on a tool card's corner badge (2026-09-29).
+Key ttcKindToolBarKey(String title) => ValueKey('ttc-kind-toolbar-$title');
 
 /// The key on a card's drawn picture, so a test can tell a drawing from a
 /// photograph.
@@ -2089,4 +2097,788 @@ class TtcFloCard extends StatelessWidget {
       ],
     ),
   );
+}
+
+// =============================================================================
+//  TtcShelfCard: a picture, then its title and one plain line (2026-09-29)
+// -----------------------------------------------------------------------------
+//  ⚠️ THE USER, ON BUILD 22, FLO'S "HOW TO GET PREGNANT" BESIDE OUR FERTILE
+//  WINDOW DOOR: the half-tint, half-photo block "does not look good", the
+//  photos were random, and the whole door "looks so much on the face"; Flo's
+//  is "minimalistic and subtle but yet it looks good". The brief: simple,
+//  minimal, and she knows what she is tapping; a video shows it is a video
+//  "with just a play button", no tag needed.
+//
+//  So one card, Flo's "Countdown to conception" shelf: a rounded picture, and
+//  under it the title and one grey line that says what the thing is ("Article
+//  · 9 min read", "Myth or fact", "Tool"). A film is the only card with marks
+//  on its picture: the play button and its length, or "Coming soon" and no
+//  play button while it is unmade (the D3 honesty rule). The picture is a
+//  photo only where it shows the subject (`kTtcCardPhotoOff`); otherwise a
+//  drawn object on the kind's soft colour (`kTtcCardMarks`), as Flo draws its
+//  hourglass on blue. Same taps and keys as the cards before it. Kept for
+//  revert: [TtcFloCard] behind [kTtcDoorCardsShelf] = false.
+// =============================================================================
+
+/// True: a door's shelves draw [TtcShelfCard]s (2026-09-29).
+const bool kTtcDoorCardsShelf = true;
+
+/// ⚠️ A PREVIEW, NOT A LAUNCH STATE (2026-09-29, the user on build 23: "show
+/// me that for video tabs in our doors no matter if they are coming soon,
+/// take a random length"). True: an UNMADE film draws Flo's play triangle and
+/// a made-up length, so the look can be judged before the films exist. It
+/// breaks the D3 rule (no play mark on a film that cannot play: she taps
+/// "0:42" and lands on "coming soon"), so it MUST be false before launch.
+/// STILL-OPEN §80.13. False: "Coming soon" and no play mark, as before.
+const bool kTtcShelfFilmPreview = true;
+
+/// The preview's made-up length for an unmade film: 0:30 to 4:59, fixed by
+/// the title so the same card never shows two lengths.
+int ttcShelfPreviewSeconds(String title) {
+  var h = 0;
+  for (final c in title.codeUnits) {
+    h = (h * 31 + c) & 0x7fffffff;
+  }
+  return 30 + h % 270;
+}
+
+/// A card's width: two and a bit across a 360-411dp phone, so the shelf says
+/// "more this way" without a hint.
+const double kTtcShelfCardWidth = 148;
+
+/// The picture's height: a little under square, Flo's proportion.
+const double kTtcShelfPictureHeight = 128;
+
+const double _kShelfTitleSize = 14;
+const double _kShelfTitleLine = 1.25;
+const double _kShelfMetaSize = 12;
+const double _kShelfMetaLine = 1.3;
+
+/// One height for a shelf, grown with the text size: the picture, the title
+/// kept at two lines and the one grey line.
+double ttcShelfRailHeight(TextScaler s) =>
+    (kTtcShelfPictureHeight +
+            8 +
+            s.scale(_kShelfTitleSize) * _kShelfTitleLine * 2 +
+            3 +
+            s.scale(_kShelfMetaSize) * _kShelfMetaLine +
+            4)
+        .ceilToDouble();
+
+/// The grey line under a card's title: what the thing is, then the one fact
+/// worth knowing before the tap. Every fact is derived, never typed.
+String ttcShelfMeta(TtcTile t, TtcCardKind kind) {
+  final paid = ttcCardIsPaid(t);
+  String withPaid(String w) => paid ? '$w · $kTtcCardPaid' : w;
+  switch (kind) {
+    case TtcCardKind.video:
+      // The picture says "Coming soon"; the line only says what it is.
+      // In the preview the made-up length reads the same as a real one.
+      if (ttcTileIsUnmadeFilm(t)) {
+        return kTtcShelfFilmPreview
+            ? '${(ttcShelfPreviewSeconds(t.title) / 60).ceil()} min watch'
+            : 'Video';
+      }
+      final s = switch (t) {
+        TtcVideoTile(:final slotId) => ttcVideoBySlot(slotId)?.seconds,
+        _ => null,
+      };
+      return s == null ? 'Video' : '${(s / 60).ceil()} min watch';
+    case TtcCardKind.read:
+      final m = ttcCardReadMinutes(t);
+      return m == null ? 'Article' : 'Article · $m';
+    case TtcCardKind.story:
+      final n = switch (t) {
+        TtcCarouselTile(:final cards) => cards.length,
+        _ => 0,
+      };
+      return n == 0 ? 'Carousel' : 'Carousel · $n cards';
+    case TtcCardKind.myth:
+      return 'Myth or fact';
+    case TtcCardKind.practice:
+      final d = ttcCardMeta(t);
+      return d == null ? 'Practice' : 'Practice · $d';
+    // The price rides on the picture (`ttcShelfPrice`), so the line names
+    // who she would talk to instead of saying "Paid" twice.
+    case TtcCardKind.consult:
+      final who = ttcShelfPerson(t);
+      // The name alone: "Consult · Dr Ruchika Sood" cut off at 148pt, and
+      // her initials and the price already say what this is.
+      if (who != null) return who;
+      return ttcShelfPrice(t) == null
+          ? withPaid('Talk to an expert')
+          : 'Talk to an expert';
+    // The price left the picture (2026-09-30), so a paid course says so here.
+    // Kept for revert:
+    //   return ttcShelfPrice(t) == null ? withPaid('Masterclass') : 'Masterclass';
+    case TtcCardKind.course:
+      return withPaid('Masterclass');
+    case TtcCardKind.tool ||
+        TtcCardKind.chat ||
+        TtcCardKind.product ||
+        TtcCardKind.recipe ||
+        TtcCardKind.community ||
+        TtcCardKind.infographic:
+      return ttcCardKindWord(kind);
+  }
+}
+
+/// The offering behind a consult or a course card, if the catalogue has it.
+TtcOffering? _shelfOffering(TtcTile t) {
+  final id = switch (t) {
+    TtcTalkTile(:final action) => action,
+    TtcBookingTile(:final action) => action,
+    TtcMasterclassTile(:final offeringId) => offeringId,
+    _ => null,
+  };
+  return id == null ? null : ttcOfferingById(id);
+}
+
+/// The price on a paid card's picture (2026-09-29, the user: "an intuitive
+/// representation for paid stuff like talk to an expert and products… the
+/// user should know what they are clicking on"): the catalogue's own figure,
+/// "₹599" or "Free" for an offering, the shelf price for a product. Null when
+/// the catalogue has none, and then the card claims nothing.
+String? ttcShelfPrice(TtcTile t) {
+  if (t case TtcProductTile(:final productId?)) {
+    final p = ttcProducts.where((p) => p.id == productId).firstOrNull;
+    return p == null || p.price.isEmpty ? null : p.price;
+  }
+  return _shelfOffering(t)?.priceLabel;
+}
+
+/// The roster person behind a consult card, by name, or null. The same
+/// answer the Learn rows give (`PvLearnCatalog.ttcRosterFor`); a role
+/// ("A gynaecologist") is not a name and is not shown as one.
+String? ttcShelfPerson(TtcTile t) {
+  final o = _shelfOffering(t);
+  if (o == null) return null;
+  final name = PvLearnCatalog.ttcRosterFor(o).$1;
+  return name.startsWith('A ') || name.startsWith('An ') ? null : name;
+}
+
+/// "Dr Ruchika Sood" → "RS".
+String _initials(String name) {
+  final words = name
+      .split(RegExp(r'\s+'))
+      .where((w) => w.isNotEmpty && w.toLowerCase() != 'dr')
+      .toList();
+  if (words.isEmpty) return '';
+  final first = words.first[0];
+  final last = words.length > 1 ? words.last[0] : '';
+  return (first + last).toUpperCase();
+}
+
+/// The one doctor picture on every consult card (2026-09-30).
+const String kTtcConsultCardArt = 'assets/doors/card_consult.jpg';
+
+/// The word on a course's corner pill.
+const String kTtcCourseEnroll = 'Enroll';
+
+/// The key on a paid card's price tag.
+Key ttcKindPriceKey(String title) => ValueKey('ttc-kind-price-$title');
+
+class TtcShelfCard extends StatelessWidget {
+  const TtcShelfCard({
+    super.key,
+    required this.tile,
+    required this.kind,
+    required this.p,
+    required this.onTap,
+    this.hue,
+    this.width = kTtcShelfCardWidth,
+    this.pictureHeight = kTtcShelfPictureHeight,
+    this.playCircle = false,
+    this.metaPrefix,
+  });
+
+  /// The card's width and picture height: a door shelf's by default; the All
+  /// videos page draws the same card at the content width, 16:9 (2026-09-30).
+  final double width;
+  final double pictureHeight;
+
+  /// A film's play mark as a black circle with a white triangle (the All
+  /// videos page, the user: "a circle in which there is a play triangle",
+  /// after pregnancy's This week explained) instead of Flo's bare triangle.
+  final bool playCircle;
+
+  /// Words before the grey line, e.g. the door a film belongs to.
+  final String? metaPrefix;
+
+  final TtcTile tile;
+  final TtcCardKind kind;
+  final V2Palette p;
+  final VoidCallback onTap;
+
+  /// The tab's hue, when the card sits on a door tab. ⚠️ A DRAWN CARD TAKES
+  /// ITS TAB'S COLOUR, NOT ITS KIND'S (2026-09-29): with every read in the
+  /// read blue a tab was a wall of blue; Flo colours a shelf, not a type. The
+  /// grey line under the title says the kind now. Null: the kind's colour.
+  final double? hue;
+
+  Color get _ground => hue == null
+      ? ttcCardKindWell(kind)
+      : HSLColor.fromAHSL(1, hue! % 360, 0.52, 0.9).toColor();
+
+  Color get _artTint => hue == null
+      ? ttcCardKindArtTint(kind)
+      : HSLColor.fromAHSL(1, hue! % 360, 0.6, 0.8).toColor();
+
+  bool get _unmade => kind == TtcCardKind.video && ttcTileIsUnmadeFilm(tile);
+
+  int? get _filmSeconds => switch (tile) {
+    TtcVideoTile(:final slotId) when !_unmade => ttcVideoBySlot(
+      slotId,
+    )?.seconds,
+    // The preview's made-up length (kTtcShelfFilmPreview).
+    TtcVideoTile() when _unmade && kTtcShelfFilmPreview =>
+      ttcShelfPreviewSeconds(tile.title),
+    _ => null,
+  };
+
+  /// The photo, if this card shows one: never for a tool or a chat (they are
+  /// shown as themselves), never where the photo misses the subject.
+  String? get _photo {
+    // A tool or a chat is drawn today (`ttcKindDrawsNoPhoto`); a photo given
+    // to one later sits above its control bar, see [_toolPicture].
+    if (ttcKindDrawsNoPhoto(kind)) return null;
+    if (kTtcCardPhotoOff.contains(ttcTilePhotoId(tile))) return null;
+    final url = photoForTile(tile);
+    return url == null || url.isEmpty ? null : url;
+  }
+
+  Widget _drawn({Alignment align = Alignment.center, double size = 0.56}) {
+    final mark = kTtcCardMarks[ttcTilePhotoId(tile)];
+    return ColoredBox(
+      key: ttcKindDrawingKey(tile.title),
+      color: _ground,
+      child: Align(
+        alignment: align,
+        child: FractionallySizedBox(
+          widthFactor: size,
+          heightFactor: size,
+          child: mark != null
+              ? TtcTabArt(mark: mark, tint: _artTint)
+              : ttcKindCardDrawing(tile, kind, tint: _artTint),
+        ),
+      ),
+    );
+  }
+
+  Widget _picture() {
+    final url = _photo;
+    // A film with no photo is its colour and the play mark alone: the
+    // drawing under a triangle read as two pictures at once (build 23).
+    //
+    // ⚠️ UNDONE the same night: under Flo's veil a plain colour read as an
+    // empty box, and Flo's own illustrated films keep the drawing under the
+    // veil and the triangle. Kept for revert:
+    //   if (url == null && kind == TtcCardKind.video && _filmSeconds != null) {
+    //     return ColoredBox(key: ttcKindDrawingKey(tile.title), color: _ground);
+    //   }
+    // A carousel shows it is one: its first slide in front with the picture
+    // and the slide's own title, two more behind (the user on build 23: the
+    // deck "like we had before", at this card's size).
+    // A wide film with no photo (All videos): its colour and the play circle
+    // alone; the drawing under a 56pt circle read as two pictures at once.
+    if (url == null && kind == TtcCardKind.video && playCircle) {
+      return ColoredBox(key: ttcKindDrawingKey(tile.title), color: _ground);
+    }
+    if (kind == TtcCardKind.story) return _deck(url);
+    if (kind == TtcCardKind.consult) return _person();
+    if (kind == TtcCardKind.tool || kind == TtcCardKind.chat) {
+      return _toolPicture(url);
+    }
+    if (url == null) return _drawn();
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        ColoredBox(color: _ground),
+        Image.network(
+          url,
+          fit: BoxFit.cover,
+          errorBuilder: (_, _, _) => _drawn(),
+        ),
+      ],
+    );
+  }
+
+  /// A tool's picture: the picture itself (its drawn mark today, a photo
+  /// later) and one small white round badge in the bottom-right corner, the
+  /// wrench for a tool and a speech bubble for a chat, where a film shows its
+  /// length (2026-09-29, the user: "make visual representation easy, that
+  /// also doesn't collide with an image added later").
+  ///
+  /// ⚠️ TWO TRIES BEFORE IT, THE SAME NIGHT. A slider (a thing you set) read
+  /// as a video's progress bar ("as if a video is getting completed"); a
+  /// full-width white control bar with a black arrow button, after Mobbin's
+  /// tool cards (MacroFactor, Oura, Me+), was "a waste of space" that a photo
+  /// added later would lose a third of. A corner badge costs the picture
+  /// almost nothing. Kept for revert: git.
+  Widget _toolPicture(String? url) {
+    final chat = kind == TtcCardKind.chat;
+    final deep = HSLColor.fromColor(_artTint).withLightness(0.36).toColor();
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        if (url != null)
+          Image.network(
+            url,
+            fit: BoxFit.cover,
+            errorBuilder: (_, _, _) => _drawn(),
+          )
+        else
+          _drawn(),
+        Positioned(
+          key: ttcKindToolBarKey(tile.title),
+          right: 7,
+          bottom: 7,
+          child: Container(
+            width: 30,
+            height: 30,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.10),
+                  blurRadius: 5,
+                  offset: const Offset(0, 1),
+                ),
+              ],
+            ),
+            child: Icon(
+              chat ? Icons.chat_bubble_outline_rounded : Icons.build_outlined,
+              size: 16,
+              color: deep,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// A consult's picture: the person, not a stethoscope (Mobbin: Alan's
+  /// "Talk with our medical team" leads with faces,
+  /// https://mobbin.com/screens/1d8e8577-abc5-4234-8d8e-ebdfd43eae92). No
+  /// roster photo exists yet, so her initials in a white circle, which is
+  /// true; a stock face would not be. A consult with no named person draws
+  /// the doctor mark instead.
+  Widget _person() {
+    // ⚠️ ONE DOCTOR PICTURE (2026-09-30, the user on build 28: "for paid like
+    // 1:1 in door take one doctor image and add it"). A doctor from the
+    // shoulders down, no face: the card names a real roster person, and a
+    // stranger's face beside her name would read as her photograph, the same
+    // honesty line as the reviewers (docs/TTC-EXPERT-SIGNOFF.md). The image
+    // lives in assets/doors/ (prompt in Downloads/door-hero-prompts); until
+    // it is there, or if it fails, her initials as before.
+    return Image.asset(
+      kTtcConsultCardArt,
+      key: ttcKindDrawingKey(tile.title),
+      fit: BoxFit.cover,
+      errorBuilder: (_, _, _) => _initialsPicture(),
+    );
+  }
+
+  /// Her initials in a white circle: the consult picture before the doctor
+  /// image (build 27), and its fallback.
+  Widget _initialsPicture() {
+    final who = ttcShelfPerson(tile);
+    if (who == null) return _drawn();
+    final deep = HSLColor.fromColor(_artTint).withLightness(0.34).toColor();
+    return ColoredBox(
+      key: ttcKindDrawingKey(tile.title),
+      color: _ground,
+      child: Align(
+        alignment: const Alignment(0, -0.2),
+        child: Container(
+          width: 62,
+          height: 62,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+            border: Border.all(color: _artTint, width: 3),
+          ),
+          child: Text(
+            _initials(who),
+            textScaler: TextScaler.noScaling,
+            style: pvManrope(
+              fontSize: 20,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.5,
+              color: deep,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// The mark in the picture's bottom-right corner for a thing that costs
+  /// money, where a film shows its length and a tool its wrench.
+  ///
+  /// ⚠️ NO PRICES ON THE PICTURE (2026-09-30, the user on build 28: "remove
+  /// that price pill; for products just use the shopping bag; for
+  /// masterclasses and paid courses, instead of the price something like
+  /// Join now or Enroll, with a clock"). A product wears a bag, a course or
+  /// masterclass an "Enroll" pill with a clock, and a consult nothing: its
+  /// doctor picture already says what it is. The price is one tap in, on the
+  /// page it opens. Kept for revert: the white price pill ("₹599", a bag
+  /// before the price on a product) on consults, products and courses.
+  Widget? _priceTag() {
+    switch (kind) {
+      case TtcCardKind.product:
+        return Positioned(
+          key: ttcKindPriceKey(tile.title),
+          right: 7,
+          bottom: 7,
+          child: Container(
+            width: 30,
+            height: 30,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.10),
+                  blurRadius: 5,
+                  offset: const Offset(0, 1),
+                ),
+              ],
+            ),
+            child: Icon(Icons.shopping_bag_outlined, size: 16, color: p.ink1),
+          ),
+        );
+      case TtcCardKind.course:
+        return Positioned(
+          key: ttcKindPriceKey(tile.title),
+          right: 7,
+          bottom: 7,
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(7, 4, 9, 4),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(999),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.10),
+                  blurRadius: 5,
+                  offset: const Offset(0, 1),
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.schedule_rounded, size: 13, color: p.ink1),
+                const SizedBox(width: 4),
+                Text(
+                  kTtcCourseEnroll,
+                  textScaler: TextScaler.noScaling,
+                  style: pvManrope(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                    color: p.ink1,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      default:
+        return null;
+    }
+  }
+
+  // Kept for revert (2026-09-30), the price pill:
+  // Widget? _priceTagV1() {
+  //   if (kind != TtcCardKind.consult && kind != TtcCardKind.product &&
+  //       kind != TtcCardKind.course) return null;
+  //   final price = ttcShelfPrice(tile);
+  //   if (price == null) return null;
+  //   return Positioned(right: 7, bottom: 7, child: <a white pill: a bag on a
+  //     product, then the price in w800 ink>);
+  // }
+
+  /// The carousel's picture: a fanned deck (2026-09-29, the user on build
+  /// 23: "initial image, then a few behind it drawn with a mark, the front
+  /// image is what we put"; TheFork's fanned photos,
+  /// https://mobbin.com/screens/91457673-4806-4064-81d0-ae6225b7689f). The
+  /// front slide is the card's picture, photo or drawing, whole in its own
+  /// white frame, so a real photo fits it as it is; two slides fan out behind
+  /// it to the right, each with a drawn mark, so "more than one" reads at a
+  /// glance. Kept for revert: the slide with its "1. title" words (git).
+  Widget _deck(String? url) {
+    final mark = kTtcCardMarks[ttcTilePhotoId(tile)];
+    final Widget front = url != null
+        ? Image.network(
+            url,
+            fit: BoxFit.cover,
+            errorBuilder: (_, _, _) => ColoredBox(color: _artTint),
+          )
+        : ColoredBox(
+            color: _artTint.withValues(alpha: 0.45),
+            child: Center(
+              child: FractionallySizedBox(
+                widthFactor: 0.7,
+                heightFactor: 0.7,
+                child: mark != null
+                    ? TtcTabArt(mark: mark, tint: _artTint)
+                    : ttcKindCardDrawing(tile, kind, tint: _artTint),
+              ),
+            ),
+          );
+    Widget slide({required Widget child, double pad = 3}) => DecoratedBox(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.10),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(pad),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: child,
+        ),
+      ),
+    );
+    // A slide behind: the tint and a mark, drawn in its visible right part.
+    Widget behind(TtcTabMark m, double depth) => slide(
+      child: ColoredBox(
+        color: _artTint.withValues(alpha: 0.30 + depth * 0.12),
+        child: Align(
+          alignment: const Alignment(0.95, 0),
+          child: FractionallySizedBox(
+            widthFactor: 0.36,
+            heightFactor: 0.36,
+            child: TtcTabArt(mark: m, tint: _artTint),
+          ),
+        ),
+      ),
+    );
+    return ColoredBox(
+      key: ttcKindDeckKey(tile.title),
+      color: _ground,
+      child: LayoutBuilder(
+        builder: (context, box) {
+          final w = box.maxWidth, h = box.maxHeight;
+          return Stack(
+            children: [
+              Positioned(
+                left: w * 0.36,
+                top: h * 0.15,
+                width: w * 0.54,
+                height: h * 0.70,
+                child: Transform.rotate(
+                  angle: 0.12,
+                  child: behind(TtcTabMark.openBook, 0),
+                ),
+              ),
+              Positioned(
+                left: w * 0.26,
+                top: h * 0.11,
+                width: w * 0.56,
+                height: h * 0.78,
+                child: Transform.rotate(
+                  angle: 0.05,
+                  child: behind(TtcTabMark.lotus, 1),
+                ),
+              ),
+              Positioned(
+                left: w * 0.07,
+                top: h * 0.08,
+                width: w * 0.58,
+                height: h * 0.84,
+                child: Transform.rotate(
+                  angle: -0.03,
+                  child: slide(child: front),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final meta = metaPrefix == null
+        ? ttcShelfMeta(tile, kind)
+        : '$metaPrefix · ${ttcShelfMeta(tile, kind)}';
+    final seconds = _filmSeconds;
+    return Semantics(
+      button: true,
+      label: '${tile.title}, $meta',
+      excludeSemantics: true,
+      child: PvPress(
+        child: InkWell(
+          key: ttcKindCardKey(kind, tile.title),
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(14),
+          child: SizedBox(
+            width: width,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(14),
+                  child: SizedBox(
+                    width: width,
+                    height: pictureHeight,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        _picture(),
+                        ?_priceTag(),
+                        // ⚠️ A FILM IS KNOWN BY ITS PLAY BUTTON (the user,
+                        // 2026-09-29: "with just a play button", as Flo), and
+                        // only a film that plays has one (D3; the preview
+                        // above bends that on purpose).
+                        //
+                        // FLO'S MARKS (the user on build 23): a bare white
+                        // triangle, no disc, and the length in white at the
+                        // foot, no pill. A drawn picture is pale, so a film
+                        // drawn rather than photographed is dimmed a little,
+                        // like a still, for the white to read. Kept for
+                        // revert: a 42pt white disc with an ink triangle, and
+                        // the length on a black pill.
+                        if (kind == TtcCardKind.video && seconds != null) ...[
+                          // FLO'S VEIL (the user on build 24, Flo's "Sex for
+                          // pregnancy" shelf): the whole picture dimmed
+                          // evenly, photo or drawing, so every film reads as
+                          // a still and the white marks hold on any picture.
+                          // Kept for revert: 0.22, on a drawn picture only.
+                          ColoredBox(
+                            color: Colors.black.withValues(alpha: 0.30),
+                          ),
+                          if (playCircle)
+                            Center(
+                              child: Container(
+                                width: 56,
+                                height: 56,
+                                decoration: BoxDecoration(
+                                  // The one black for what is pressable.
+                                  color: ttcTitleInk,
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black
+                                          .withValues(alpha: 0.25),
+                                      blurRadius: 14,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
+                                ),
+                                child: const Padding(
+                                  padding: EdgeInsets.only(left: 3),
+                                  child: Icon(
+                                    Icons.play_arrow_rounded,
+                                    size: 32,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            )
+                          else
+                          const Center(
+                            child: Icon(
+                              Icons.play_arrow_rounded,
+                              size: 52,
+                              color: Colors.white,
+                              shadows: [
+                                Shadow(
+                                  color: Color(0x66000000),
+                                  blurRadius: 10,
+                                ),
+                              ],
+                            ),
+                          ),
+                          Positioned(
+                            right: 9,
+                            bottom: 7,
+                            child: Text(
+                              _clock(seconds),
+                              key: ttcKindMetaKey(tile.title),
+                              style: pvManrope(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                              ).copyWith(
+                                shadows: const [
+                                  Shadow(
+                                    color: Color(0x80000000),
+                                    blurRadius: 6,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ] else if (kind == TtcCardKind.video)
+                          Positioned(
+                            right: 6,
+                            bottom: 6,
+                            child: Container(
+                              key: ttcKindMetaKey(tile.title),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withValues(alpha: 0.62),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                kTtcFilmComingSoon,
+                                style: pvManrope(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  tile.title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: pvManrope(
+                    fontSize: _kShelfTitleSize,
+                    height: _kShelfTitleLine,
+                    fontWeight: FontWeight.w600,
+                    color: p.ink1,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  meta,
+                  key: ttcKindPillKey(kind, tile.title),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: pvManrope(
+                    fontSize: _kShelfMetaSize,
+                    height: _kShelfMetaLine,
+                    fontWeight: FontWeight.w500,
+                    color: p.ink3,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }

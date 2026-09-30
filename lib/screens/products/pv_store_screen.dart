@@ -445,6 +445,12 @@ class _PvStoreScreenState extends State<PvStoreScreen> {
   // "Other stages" link that opens it; every other storefront keeps the
   // switch as it was. Kept for revert: the PvStageSwitch alone.
   Widget _stageRow(V2Palette p) {
+    // ⚠️ NO "OTHER STAGES" ON THE TRYING STORE (2026-09-30, the user: it sits
+    // "at a very abrupt position", and the store should simply open on trying
+    // to conceive). Nothing at all is drawn here now. Kept for revert: the
+    // quiet link below, behind `!_showStages`.
+    if (_stage == LifeStage.tryingToConceive) return const SizedBox.shrink();
+    // ignore: dead_code
     if (_stage == LifeStage.tryingToConceive && !_showStages) {
       return Padding(
         padding: EdgeInsets.fromLTRB(_g, 6, _g, 0),

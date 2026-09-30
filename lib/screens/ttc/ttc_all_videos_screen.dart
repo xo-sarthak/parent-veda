@@ -361,6 +361,8 @@ class _TtcAllVideosScreenState extends State<TtcAllVideosScreen> {
   /// The door's video card at the content width, a 16:9 picture, the door
   /// named first in its caption.
   Widget _card(V2Palette p, TtcFilmEntry f, double width) {
+    // Kept for revert (2026-09-30), the tile the kind card drew:
+    // ignore: unused_local_variable
     final shown = TtcVideoTile(
       title: f.tile.title,
       blurb: '${f.doorLabel} · ${f.tile.blurb}',
@@ -369,14 +371,27 @@ class _TtcAllVideosScreenState extends State<TtcAllVideosScreen> {
       // Same id, so the same photo as the door's card.
       id: f.tile.id,
     );
+    // ⚠️ THE DOOR'S NEW CARD, WIDE (2026-09-30, the user: "a random overlay…
+    // a background behind each video that is red in colour", and "a circle
+    // in which there is a play triangle, so it is very evident it's a
+    // video"). The old kind card painted every film on the video rose. Now
+    // the shelf card at the content width, 16:9, its door's calm colour, the
+    // veil, a black play circle and its length, then the title and the door
+    // with the watch time. Kept for revert:
+    //   TtcKindCard(tile: shown, kind: TtcCardKind.video, p: p, width: width,
+    //     imageHeight: ((width - 12) * 9 / 16).roundToDouble(),
+    //     onTap: () => _open(f)),
     return KeyedSubtree(
       key: ValueKey('ttc_all_videos_row_${f.slotId}'),
-      child: TtcKindCard(
-        tile: shown,
+      child: TtcShelfCard(
+        tile: f.tile,
         kind: TtcCardKind.video,
         p: p,
+        hue: f.hue,
         width: width,
-        imageHeight: ((width - 12) * 9 / 16).roundToDouble(),
+        pictureHeight: (width * 9 / 16).roundToDouble(),
+        playCircle: true,
+        metaPrefix: f.doorLabel,
         onTap: () => _open(f),
       ),
     );

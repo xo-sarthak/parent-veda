@@ -386,15 +386,27 @@ class _TtcSymptomLogScreenState extends State<TtcSymptomLogScreen> {
   /// The way out that says what was kept. Taps have already saved; this only
   /// closes, and the confirmation lands on the screen she returns to.
   void _done(int saved) {
-    // ⚠️ SHOWN BEFORE THE POP, ON PURPOSE. The app's one ScaffoldMessenger
-    // carries a snack across a route change, so it arrives on the screen she
-    // goes back to; asked for after the pop, this context is already gone.
+    // ⚠️ SHOWN AFTER THE SCREEN HAS CHANGED (2026-09-30, the user: the
+    // pop-up "comes abruptly in the very lower middle of the screen… should
+    // feel smooth, its position fixed at the bottom"). It used to be asked for
+    // BEFORE the pop, so it was born over the logger (no bar there, so 96
+    // points up read as mid-air) and then jumped onto the home as the route
+    // slid away. Now the logger closes first and, once the slide has
+    // finished, the note slides up once on the screen she is back on, just
+    // above its bar. The navigator's own context outlives this screen, so
+    // it carries the note; this context is gone after the pop. Kept for
+    // revert: pvSnack(context, …, lift: 96) before maybePop().
+    final nav = Navigator.of(context);
+    final host = nav.context;
+    final line = ttcLogDoneLine(saved, _dayName);
+    nav.maybePop();
     if (saved > 0) {
-      // Lifted clear of the home's bar, where it usually lands.
-      pvSnack(context, ttcLogDoneLine(saved, _dayName),
-          icon: Icons.check_rounded, lift: 96);
+      Future<void>.delayed(const Duration(milliseconds: 360), () {
+        if (!host.mounted) return;
+        // Lifted clear of the home's bar, where it lands.
+        pvSnack(host, line, icon: Icons.check_rounded, lift: 96);
+      });
     }
-    Navigator.of(context).maybePop();
   }
 
   /// Everything saved for the day on screen, in the order the screen shows it.

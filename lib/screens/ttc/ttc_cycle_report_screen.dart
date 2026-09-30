@@ -1033,10 +1033,29 @@ class _CycleCard extends StatelessWidget {
               onPick: onPickSeries,
             ),
         ]),
+        // ⚠️ WHAT THE GRAPH SAYS, IN WORDS (2026-09-30, the user: "the graph
+        // should be made more intuitive for the user to understand what it is
+        // trying to tell them… labelling has not been done"). One plain line
+        // under the title: what each dot is, and how to read the shape.
+        if (hasSeries) ...[
+          const SizedBox(height: 6),
+          Text(
+            temp
+                ? 'Each dot is your morning temperature on a day you logged it. '
+                    'A small rise that stays up for a few days usually means '
+                    'ovulation has passed.'
+                : 'Each dot is your weight on a day you logged it. A change '
+                    'of up to a kilo from day to day is normal: water and food '
+                    'move it.',
+            key: const ValueKey('ttc_report_chart_explain'),
+            style: ttcBody(12.5, color: ttcMuted, h: 1.45),
+          ),
+        ],
         const SizedBox(height: 14),
 
         SizedBox(
-          height: hasSeries ? 200 : 96,
+          // 200 → 216 (2026-09-30): the unit has its own line above the plot.
+          height: hasSeries ? 216 : 96,
           child: CustomPaint(
             painter: _ChartPainter(
               report: report,
@@ -1190,12 +1209,20 @@ class _ChartPainter extends CustomPainter {
     final days = report.days;
     if (days.isEmpty) return;
 
-    const leftGutter = 30.0;
+    // ⚠️ THE UNIT HAS ITS OWN LINE (2026-09-30, the user: "62" and "kg"
+    // drew over each other). The unit sat at the plot's top edge, exactly
+    // where the top value's label is drawn. Now the plot starts [unitRoom]
+    // down and the unit sits above it, and the values are right-aligned in a
+    // wider gutter that also names the two marker rows. Kept for revert:
+    // leftGutter 30, the plot from y = 2.
+    const leftGutter = 38.0;
+    const unitRoom = 16.0;
     const rowHeight = 15.0;
     const tickHeight = 14.0;
     final markersTop = size.height - _rows * rowHeight;
     final ticksTop = markersTop - tickHeight;
-    final plot = Rect.fromLTRB(leftGutter, 2, size.width, ticksTop - 4);
+    final plot =
+        Rect.fromLTRB(leftGutter, unitRoom, size.width, ticksTop - 4);
 
     final n = days.length;
     final colWidth = (size.width - leftGutter) / n;
@@ -1244,9 +1271,14 @@ class _ChartPainter extends CustomPainter {
             Offset(0, y - 6),
             9,
             axis,
-            bold: true);
+            bold: true,
+            rightTo: leftGutter - 5);
       }
-      _text(canvas, temp ? '°C' : 'kg', Offset(0, plot.top - 1), 8.5, axis);
+      // Kept for revert: _text(canvas, temp ? '°C' : 'kg',
+      //     Offset(0, plot.top - 1), 8.5, axis);
+      _text(canvas, temp ? 'Temp (°C)' : 'Weight (kg)', const Offset(0, 0),
+          9, axis,
+          bold: true);
 
       final pts = <Offset>[];
       for (final d in series) {
@@ -1275,8 +1307,17 @@ class _ChartPainter extends CustomPainter {
     }
 
     // ---- date ticks -------------------------------------------------------
+    // The first date names its month ("12 Sep"), so the numbers along the
+    // bottom read as dates (2026-09-30: the x axis had no label).
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug',
+        'Sep', 'Oct', 'Nov', 'Dec'];
     for (var i = 0; i < n; i += (n / 6).ceil().clamp(1, 99)) {
-      _text(canvas, '${days[i].date.day}', Offset(xOf(i) - 5, ticksTop + 1), 9,
+      final d = days[i].date;
+      _text(
+          canvas,
+          i == 0 ? '${d.day} ${months[d.month - 1]}' : '${d.day}',
+          Offset(xOf(i) - 5, ticksTop + 1),
+          9,
           axis);
     }
 
@@ -1287,6 +1328,9 @@ class _ChartPainter extends CustomPainter {
     // "period here, and you logged on these days" underneath is a month.
     for (var row = 0; row < _rows; row++) {
       final y = markersTop + rowHeight * row + rowHeight / 2;
+      // Each row names itself in the gutter (2026-09-30).
+      _text(canvas, row == 0 ? 'Period' : 'Logged', Offset(0, y - 5.5), 8.5,
+          axis);
       for (var i = 0; i < n; i++) {
         final d = days[i];
         final on = row == 0
@@ -1300,7 +1344,7 @@ class _ChartPainter extends CustomPainter {
   }
 
   void _text(Canvas c, String s, Offset at, double size, Color colour,
-      {bool bold = false}) {
+      {bool bold = false, double? rightTo}) {
     final tp = TextPainter(
       text: TextSpan(
           text: s,
@@ -1310,7 +1354,8 @@ class _ChartPainter extends CustomPainter {
               fontWeight: bold ? FontWeight.w700 : FontWeight.w600)),
       textDirection: TextDirection.ltr,
     )..layout();
-    tp.paint(c, at);
+    // [rightTo]: right-align the text so its end sits at that x.
+    tp.paint(c, rightTo == null ? at : Offset(rightTo - tp.width, at.dy));
   }
 
   @override

@@ -231,8 +231,9 @@ void main() {
         expect(ids, isNot(contains(m.id)), reason: m.id);
         expect(kTtcMovedToMoreTile[m.id], isNotNull, reason: m.id);
       }
-      expect({for (final m in ttcMovedToMore) m.id},
-          {'expert', 'courses', 'map'});
+      // The journey map left More too on 2026-09-30. Kept for revert:
+      //   {'expert', 'courses', 'map'}
+      expect({for (final m in ttcMovedToMore) m.id}, {'expert', 'courses'});
     });
 
     test('the treatment cycle came in, for both of them', () {
@@ -266,7 +267,7 @@ void main() {
         final headings = {
           kTtcMoreExpertsHeading,
           kTtcMoreCoursesHeading,
-          kTtcMoreJourneyHeading,
+          // Kept for revert (off More since 2026-09-30): kTtcMoreJourneyHeading,
         };
         for (final m in ttcMovedToMore) {
           expect(headings, contains(kTtcMovedToMoreTile[m.id]), reason: m.id);
@@ -309,7 +310,9 @@ void main() {
         }
         expect(pages['experts_and_courses'],
             containsAll(['Talk to an expert', 'Courses']));
-        expect(pages['journey'], contains('Journey map'));
+        // Off More since 2026-09-30. Kept for revert:
+        //   expect(pages['journey'], contains('Journey map'));
+        expect(pages.containsKey('journey'), isFalse);
         // 3. No tool is inside More, by her names and by his.
         final toolNames = {
           for (final t in toolsFor(him: false)) t.nameEn,
@@ -436,7 +439,9 @@ void main() {
       //   ['More › journey › Journey map']
       expect(where['ttc/consults'], ['More › $kTtcMoreSeeAllConsults']);
       expect(where['ttc/courses'], ['More › Preconception garbh sanskar']);
-      expect(where['ttc/map'], ['More › Journey map']);
+      // Off More since 2026-09-30. Kept for revert:
+      //   expect(where['ttc/map'], ['More › Journey map']);
+      expect(where['ttc/map'], isNull);
     });
   });
 

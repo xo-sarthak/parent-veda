@@ -154,7 +154,8 @@ void main() {
         //   kTtcMoreBookingsHeading,
         // 2026-09-29: every article and every film, one list each.
         kTtcMoreReadWatchHeading,
-        kTtcMoreJourneyHeading,
+        // Off More since 2026-09-30 (the user). Kept for revert:
+        //   kTtcMoreJourneyHeading,
         kTtcMoreBenefitsHeading,
       ];
       var y = -1.0;
@@ -233,8 +234,9 @@ void main() {
         // 2026-09-29, Read and watch.
         'all_reads': 'ttc/all_reads',
         'all_videos': 'ttc/all_videos',
-        'map': 'ttc/map',
-        'chapter': 'ttc/chapter',
+        // Off More since 2026-09-30. Kept for revert:
+        //   'map': 'ttc/map',
+        //   'chapter': 'ttc/chapter',
         'employer': 'employer',
         'invite': 'invite',
       };
@@ -337,8 +339,11 @@ void main() {
       ]) {
         expect(find.text(w), findsNothing, reason: '"$w" is not on Profile');
       }
-      // The identity names the partner status.
-      expect(find.text('Not paired with your partner yet'), findsOneWidget);
+      // Unpaired, the partner is said once, on the Family row with its
+      // Invite, not under her name as well (2026-09-30). Kept for revert:
+      //   expect(find.text('Not paired with your partner yet'), findsOneWidget);
+      expect(find.text('Not paired with your partner yet'), findsNothing);
+      expect(find.byKey(const ValueKey('pv_profile_partner_row')), findsOneWidget);
     });
 
     testWidgets('Settings: its sections in order, Developer last and gated',
@@ -436,10 +441,10 @@ void main() {
               of: hero,
               matching: find.text('Trying to conceive · cycle day 12')),
           findsOneWidget);
-      expect(
-          find.descendant(
-              of: hero, matching: find.text('Not paired with your partner yet')),
-          findsOneWidget);
+      // Kept for revert (2026-09-30, the partner line only once paired):
+      //   find.descendant(of: hero,
+      //       matching: find.text('Not paired with your partner yet'))
+      expect(find.byKey(const ValueKey('pv_profile_partner')), findsNothing);
       // The glance: her usual cycle (28 days, her own) and periods logged.
       final glance = find.byKey(const ValueKey('pv_profile_glance'));
       expect(glance, findsOneWidget);
@@ -454,10 +459,54 @@ void main() {
       await pump(tester, _profile);
       expect(find.text('Trying to conceive'), findsOneWidget);
       expect(find.textContaining('cycle day'), findsNothing);
-      expect(
-          find.text('Log your period on Today and your cycle facts fill in.'),
+      // An invitation, not dashes (2026-09-30). Kept for revert:
+      //   find.text('Log your period on Today and your cycle facts fill in.')
+      expect(find.byKey(const ValueKey('pv_profile_glance_invite')),
+          findsOneWidget);
+      expect(find.text('Your cycle at a glance'), findsOneWidget);
+      expect(find.text('--'), findsNothing);
+      expect(find.byKey(const ValueKey('pv_profile_glance_action')),
           findsOneWidget);
     });
+
+    testWidgets('the photo: a camera badge on the avatar opens add a photo',
+        (tester) async {
+      await pump(tester, _profile);
+      expect(find.byKey(const ValueKey('pv_profile_photo_badge')),
+          findsOneWidget);
+      // One way in: the avatar, with the badge drawn on it.
+      await tester.tap(find.byKey(const ValueKey('pv_profile_avatar_tap')));
+      await tester.pumpAndSettle();
+      expect(find.text('Add a photo'), findsOneWidget);
+      expect(find.byKey(const ValueKey('pv_profile_photo_camera')),
+          findsOneWidget);
+      expect(find.byKey(const ValueKey('pv_profile_photo_gallery')),
+          findsOneWidget);
+      // No photo yet, so nothing to remove.
+      expect(find.byKey(const ValueKey('pv_profile_photo_remove')),
+          findsNothing);
+    });
+
+    testWidgets('his profile has no camera badge: the photo is hers',
+        (tester) async {
+      await pump(tester, _hisProfile);
+      expect(find.byKey(const ValueKey('pv_profile_photo_badge')),
+          findsNothing);
+    });
+
+    testWidgets('an empty answer says so, and one row changes them',
+        (tester) async {
+      await pump(tester, _profile);
+      expect(find.text('Not answered'), findsWidgets);
+      expect(find.text('--'), findsNothing);
+      expect(find.text('What you told us when you joined. You can change any answer.'),
+          findsOneWidget);
+      expect(find.byKey(const ValueKey('pv_profile_change_answers')),
+          findsOneWidget);
+    });
+
+    // Settings' "Your details" was taken back out the same night: Reminders
+    // already opens that page (test/ttc_no_repetition_test.dart).
 
     testWidgets('no chapter stepper: the positive test is a row of its own',
         (tester) async {
