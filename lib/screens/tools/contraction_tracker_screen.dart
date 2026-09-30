@@ -34,6 +34,7 @@ import '../../theme/pv_fonts.dart';
 import '../brackets/hub/hub_intent_art.dart';
 import '../doors/pv_list_row.dart' show PvMarkWell;
 import '../pregnancy/preg_chrome.dart';
+import '../pregnancy/preg_tool_chrome.dart';
 import '../products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 
 // Kept for revert: the phase colours before the one ink.
@@ -328,7 +329,22 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
     return PopScope(
       canPop: true,
       onPopInvokedWithResult: (didPop, _) => _save(),
-      child: Scaffold(
+      child: _phase == _Phase.home
+          // The front page wears the shared shell (2026-09-30, Tools audit). The
+          // live phases below keep their app bar: a running timer is an
+          // instrument, and a hero would only push it down.
+          ? Scaffold(
+              backgroundColor: pvStorePalette.ground,
+              body: Column(children: [
+                Expanded(child: _homeView(context)),
+                // Pinned, so the one action is on screen whatever she scrolls.
+                SafeArea(
+                    top: false,
+                    child: _bottomButton(
+                        context, s.contractionStartedCta, _startContraction)),
+              ]),
+            )
+          : Scaffold(
         appBar: AppBar(
           title: Text(s.contractionToolTitle),
           actions: [
@@ -365,6 +381,7 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
         ),
         body: SafeArea(
           child: switch (_phase) {
+            // Home is built above, on the shell.
             _Phase.home => _homeView(context),
             _Phase.active => _activeView(context),
             _Phase.rest => _restView(context),
@@ -378,42 +395,81 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
 
   Widget _homeView(BuildContext context) {
     final s = _s;
-    final p = pvStorePalette;
-    return Column(children: [
-      Expanded(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(18, 12, 18, 16),
-          children: [
-            if (_symptoms.isEmergency) ...[
-              _assessBanner(s),
-              const SizedBox(height: 16),
-            ],
-            // What contractions are + true vs false (Braxton Hicks) + how to time.
-            _aboutCard(s),
-            const SizedBox(height: 12),
-            // Clear "we're a timer, not a medical app" disclaimer.
-            _disclaimerCard(s),
-            const SizedBox(height: 12),
-            _safetyCard(s),
-            const SizedBox(height: 30),
-            // Kept for revert: const Text('🤍', style: TextStyle(fontSize: 56)).
-            // No decorative emoji; the drawn mark in the tool's tint.
-            Center(
-              child: PvMarkWell(
-                  p: p,
-                  hue: _kContractionHue,
-                  size: 64,
-                  mark: IntentMark.cuppedHands),
+    final hi = widget.controller.language.isHinglish;
+    // Kept for revert: a Column of a ListView (about card, disclaimer card,
+    // safety card, then a 64-pt cuppedHands mark and s.contractionEmpty) over
+    // the pinned start button, under an AppBar with voice, safety and history.
+    // The mark and the "ready to start" line are now the shell's mark and intro
+    // (REDUNDANT there, 2026-09-30, Tools audit). The order below puts the
+    // disclaimer first (the line that says what this is) and the long
+    // explainer last, so the safety lines are read before the teaching.
+    return PregToolScaffold(
+      hue: _kContractionHue,
+      eyebrow: 'Get ready',
+      title: s.contractionToolTitle,
+      intro: s.contractionEmpty,
+      mark: IntentMark.timelineRail,
+      action: Semantics(
+        button: true,
+        label: s.historyLabel,
+        child: Tooltip(
+          message: s.historyLabel,
+          child: InkWell(
+            key: const ValueKey('ct_history'),
+            onTap: () => Navigator.of(context).push(MaterialPageRoute(
+              builder: (_) =>
+                  _ContractionHistoryScreen(controller: widget.controller),
+            )),
+            borderRadius: BorderRadius.circular(999),
+            child: Container(
+              width: 38,
+              height: 38,
+              alignment: Alignment.center,
+              decoration:
+                  const BoxDecoration(color: kPvInk, shape: BoxShape.circle),
+              child: const Icon(Icons.history_rounded, size: 19, color: Colors.white),
             ),
-            const SizedBox(height: 16),
-            Text(s.contractionEmpty,
-                textAlign: TextAlign.center,
-                style: pvManrope(fontSize: 14.5, height: 1.5, color: p.ink2)),
-          ],
+          ),
         ),
       ),
-      _bottomButton(context, s.contractionStartedCta, _startContraction),
-    ]);
+      children: [
+        pregToolPad(Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          if (_symptoms.isEmergency) ...[
+            _assessBanner(s),
+            const SizedBox(height: 16),
+          ],
+          // Clear "we're a timer, not a medical app" disclaimer.
+          _disclaimerCard(s),
+          const SizedBox(height: 12),
+          _safetyCard(s),
+          const SizedBox(height: 12),
+          // What contractions are + true vs false (Braxton Hicks) + how to time.
+          _aboutCard(s),
+          const SizedBox(height: 8),
+          // Voice guidance used to be an app-bar speaker on this page too. It
+          // only speaks once a contraction has been timed, and the running
+          // phases still carry the speaker, so here it is a quiet line.
+          Center(
+            child: TextButton.icon(
+              key: const ValueKey('ct_voice_toggle'),
+              onPressed: _toggleVoice,
+              style: TextButton.styleFrom(foregroundColor: pvStorePalette.ink3),
+              icon: Icon(
+                  _voiceMuted ? Icons.volume_off_rounded : Icons.volume_up_rounded,
+                  size: 16),
+              label: Text(
+                  hi
+                      ? (_voiceMuted ? 'Awaaz on karein' : 'Awaaz band karein')
+                      : (_voiceMuted ? 'Turn voice guidance on' : 'Mute voice guidance'),
+                  style: pvManrope(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w700,
+                      color: pvStorePalette.ink3)),
+            ),
+          ),
+        ])),
+      ],
+    );
   }
 
   // ---- Active ---------------------------------------------------------------

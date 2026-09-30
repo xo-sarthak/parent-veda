@@ -9942,3 +9942,18 @@ not here. Owed:
     the PDF names nothing for weeks 14 to 31, so those weeks lead with nothing and the table's order stands. **Not
     done:** the three doors added on 2026-09-29 (Your first weeks, Getting ready, Work & money) have no onboarding
     answer that points at them, so they only move with the table; a chosen door is not marked as chosen.
+  - **§81.15 The pregnancy Tools audit (2026-09-30).** Each tool was read for its purpose (why she opens it, the one
+    job, where else it lives, what got in the way) and its front page moved onto one shell, `PregToolScaffold`
+    (lib/screens/pregnancy/preg_tool_chrome.dart, a copy of TTC's `TtcToolScaffold` built from the shared field,
+    palette and marks): tinted field, round back button, the tool's drawn mark, eyebrow, serif title, one intro
+    sentence, a white sheet; "Add" is one round ink control opposite Back. The Tools hub draws marks, not Material
+    glyphs. Done for: Baby movement, Kegel, Weight, Medicines, Reminders, Hospital bag, Contraction timer (home
+    phase only), Due date, Product checklist, My bump journey, Read next, Spiritual reading. Not touched: My Journal
+    (already right). **Commented out as redundant, kept for revert** (Tools hub rows): Symptoms (the home tile opens
+    that door), Tests & scans & reports (inside Scans & tests), Garbh Sanskar and Is it safe? (home tiles); the
+    hub's last group is now "Ask". Screens behind them were not worked on. **Unsure, left in place:** the due
+    date's roadmap sections may overlap the bump journey and the journey home; the hospital-bag insight card may
+    overlap Today; the contraction "about" card may overlap Learn; Kegel's two "why" blocks; Weight's "Your body is
+    supporting" and "What changed". **Could be promoted into the shell:** a bottom-bar slot (two tools wrap the
+    shell in an outer Scaffold for a pinned button) and a shared round "add" control (Weight and Medicines each
+    carry a private copy). Held by `test/preg_tools_shell_test.dart`.

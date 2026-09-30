@@ -67,10 +67,12 @@ import '../../theme/pv_fonts.dart';
 import '../../widgets/storage_image.dart';
 import '../bump_book_screen.dart';
 import '../doors/pv_door_chrome.dart';
+import '../pregnancy/preg_tool_chrome.dart';
 import '../v2/v2_palette.dart';
 import '../brackets/hub/hub_intent_art.dart' show IntentMark;
 import '../doors/pv_list_row.dart' show PvMarkWell;
-import '../pregnancy/preg_chrome.dart' show PregSectionHeading, pregSectionHeadingStyle;
+import '../pregnancy/preg_chrome.dart'
+    show PregCard, PregSectionHeading, pregSectionHeadingStyle;
 import '../products/pv_store_chrome.dart' show kPvInk, kPvLine;
 
 /// This tab's hue — the soft amber the coverflow card wears.
@@ -80,7 +82,7 @@ const double kBumpRitualHue = 26;
 /// "Still ahead"; `passed` is the two lines written beside the week once it
 /// is behind her.
 const List<({int week, String ahead, String passedTitle, String passedLine})>
-    kBumpMoments = [
+kBumpMoments = [
   (
     week: 12,
     ahead: 'The first trimester ends',
@@ -114,8 +116,18 @@ const List<String> _captionSuggestions = [
 ];
 
 const _monthsShort = [
-  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
 ];
 const _daysShort = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
@@ -127,9 +139,26 @@ String bumpDate(DateTime d) =>
 /// digits rather than producing a wrong word.
 String weeksInWords(int n) {
   const ones = [
-    '', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine',
-    'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen',
-    'seventeen', 'eighteen', 'nineteen',
+    '',
+    'one',
+    'two',
+    'three',
+    'four',
+    'five',
+    'six',
+    'seven',
+    'eight',
+    'nine',
+    'ten',
+    'eleven',
+    'twelve',
+    'thirteen',
+    'fourteen',
+    'fifteen',
+    'sixteen',
+    'seventeen',
+    'eighteen',
+    'nineteen',
   ];
   const tens = ['', '', 'twenty', 'thirty', 'forty'];
   String w;
@@ -153,15 +182,72 @@ class BumpRitualScreen extends StatelessWidget {
 
   final PregnancyController controller;
 
+  // ⚠️ THE FRONT PAGE WEARS THE TOOLS SHELL (2026-09-30, Tools audit).
+  // WH: she opens this to see her book growing, in a quiet minute, once a
+  // week, and to add this week's photo. So the first screen is the cover of
+  // the book (her latest picture and the one action), not a form and not a
+  // repeated title. The shell's intro carries the promise the body used to
+  // repeat. Round ink "add" sits opposite Back only once this week is in the
+  // book; until then the cover's own button is the one add, so the same
+  // action is never on the page twice.
+  // Comparison: Day One and Apple Photos' Memories put the latest picture on
+  // the cover of a collection: https://mobbin.com (Day One, journal home).
+  //
+  // Kept for revert: PvDoorToolScaffold(hue: kBumpRitualHue, eyebrow:
+  // 'Belly & skin', title: 'The bump ritual', intro: 'One photo a week, in the
+  // same spot. By week 40 you will have a book you can flip through, and
+  // later, show your child.', children: [pvDoorPad(BumpRitualBody(...))]).
   @override
-  Widget build(BuildContext context) => PvDoorToolScaffold(
-        hue: kBumpRitualHue,
-        eyebrow: 'Belly & skin',
-        title: 'The bump ritual',
-        intro: 'One photo a week, in the same spot. By week 40 you will have a '
-            'book you can flip through — and later, show your child.',
-        children: [pvDoorPad(BumpRitualBody(controller: controller))],
+  Widget build(BuildContext context) => AnimatedBuilder(
+    animation: BumpStore.instance,
+    builder: (context, _) {
+      final week = controller.currentWeek;
+      final store = BumpStore.instance;
+      final showAdd = store.photos.isNotEmpty && store.hasWeek(week);
+      return PregToolScaffold(
+        hue: 330,
+        eyebrow: 'Keep',
+        title: 'My bump journey',
+        intro:
+            'One photo a week, in the same spot. By week 40 you will have a '
+            'book to flip through, and later, to show your child.',
+        mark: IntentMark.bodyMark,
+        action: showAdd ? _AddAction(week: week, controller: controller) : null,
+        children: [
+          pregToolPad(BumpRitualBody(controller: controller, inShell: true)),
+        ],
       );
+    },
+  );
+}
+
+/// The round ink control opposite Back: another photo for this week.
+class _AddAction extends StatelessWidget {
+  const _AddAction({required this.week, required this.controller});
+  final int week;
+  final PregnancyController controller;
+  @override
+  Widget build(BuildContext context) => Semantics(
+    container: true,
+    button: true,
+    label: 'Add another photo for week $week',
+    child: InkWell(
+      key: const ValueKey('bump_add_action'),
+      borderRadius: BorderRadius.circular(999),
+      onTap: () =>
+          _startAddPhoto(context, V2PaletteStore.instance.current, week),
+      child: Container(
+        width: 38,
+        height: 38,
+        decoration: const BoxDecoration(color: kPvInk, shape: BoxShape.circle),
+        child: const Icon(
+          Icons.add_a_photo_outlined,
+          size: 18,
+          color: Colors.white,
+        ),
+      ),
+    ),
+  );
 }
 
 // -----------------------------------------------------------------------------
@@ -169,9 +255,17 @@ class BumpRitualScreen extends StatelessWidget {
 // -----------------------------------------------------------------------------
 
 class BumpRitualBody extends StatefulWidget {
-  const BumpRitualBody({super.key, required this.controller});
+  const BumpRitualBody({
+    super.key,
+    required this.controller,
+    this.inShell = false,
+  });
 
   final PregnancyController controller;
+
+  /// True when the Tools shell above already says what this is (its title and
+  /// intro), so the empty state does not say it a second time.
+  final bool inShell;
 
   @override
   State<BumpRitualBody> createState() => _BumpRitualBodyState();
@@ -188,186 +282,143 @@ class _BumpRitualBodyState extends State<BumpRitualBody> {
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
-        animation: Listenable.merge([BumpStore.instance, V2PaletteStore.instance]),
-        builder: (context, _) {
-          final p = V2PaletteStore.instance.current;
-          final store = BumpStore.instance;
-          final week = c.currentWeek;
-          final photos = store.photos.reversed.toList(); // newest first
-          final thisWeekIn = store.hasWeek(week);
+    animation: Listenable.merge([BumpStore.instance, V2PaletteStore.instance]),
+    builder: (context, _) {
+      final p = V2PaletteStore.instance.current;
+      final store = BumpStore.instance;
+      final week = c.currentWeek;
+      final photos = store.photos.reversed.toList(); // newest first
+      final thisWeekIn = store.hasWeek(week);
 
-          if (photos.isEmpty) {
-            return _Empty(p: p, week: week, onAdd: () => _startAdd(context, p, week));
-          }
+      if (photos.isEmpty) {
+        return _Empty(
+          p: p,
+          week: week,
+          inShell: widget.inShell,
+          onAdd: () => _startAddPhoto(context, p, week),
+        );
+      }
 
-          final first = photos.last.weekNumber;
-          final latest = photos.first.weekNumber;
-          final ahead = kBumpMoments.where((m) => m.week > week).toList();
+      final first = photos.last.weekNumber;
+      final latest = photos.first.weekNumber;
+      final ahead = kBumpMoments.where((m) => m.week > week).toList();
 
-          return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            // ---- header: a description, never a progress state --------------
-            _Eyebrow('Your book', p: p),
-            const SizedBox(height: 7),
-            Text(weeksInWords(week),
-                style: pvFraunces(
-                    fontSize: 27,
-                    fontWeight: FontWeight.w600,
-                    height: 1.12,
-                    letterSpacing: -0.6,
-                    color: p.ink1)),
-            const SizedBox(height: 7),
-            Text(
-                thisWeekIn
-                    ? 'Week $week is in your book.'
-                    : first == latest
-                        ? "It has week $first in it. This week isn't in it yet."
-                        : "It runs from week $first to week $latest. This "
-                            "week isn't in it yet.",
-                style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2)),
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // ---- the cover: her latest picture, where she is, the one add ----
+          // A description, never a progress state. The photo leads; the
+          // add button lives here only while this week is not in the book.
+          _Cover(
+            p: p,
+            latest: photos.first,
+            week: week,
+            status: thisWeekIn
+                ? 'Week $week is in your book.'
+                : first == latest
+                ? "It has week $first in it. This week isn't in it yet."
+                : "It runs from week $first to week $latest. This "
+                      "week isn't in it yet.",
+            onAdd: thisWeekIn ? null : () => _startAddPhoto(context, p, week),
+            onOpen: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                settings: const RouteSettings(name: 'bump_journey/photo'),
+                builder: (_) => _PhotoScreen(p: p, id: photos.first.id),
+              ),
+            ),
+          ),
 
-            // ---- this week, if it is not in yet -----------------------------
-            if (!thisWeekIn) ...[
-              const SizedBox(height: 28),
-              _AddCard(p: p, week: week, onAdd: () => _startAdd(context, p, week)),
-            ],
+          // Kept for revert: the text header and the separate add card.
+          // _Eyebrow('Your book', p: p), Text(weeksInWords(week), 27 serif),
+          // the status line, then `_AddCard(...)` when !thisWeekIn.
 
-            // ---- Then & Now -------------------------------------------------
-            const SizedBox(height: 28),
-            if (photos.length >= 2)
-              _ThenNowRow(
-                p: p,
-                first: first,
-                latest: latest,
-                onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+          // ---- Then & Now -------------------------------------------------
+          const SizedBox(height: 18),
+          if (photos.length >= 2)
+            _ThenNowRow(
+              p: p,
+              first: first,
+              latest: latest,
+              firstPhoto: photos.last,
+              latestPhoto: photos.first,
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
                   settings: const RouteSettings(name: 'bump_journey/then_now'),
                   builder: (_) => _ThenNowScreen(
-                      p: p, initialLeft: photos.last.id, initialRight: photos.first.id),
-                )),
-              )
-            else
-              Text('Then & Now opens once you have two weeks to put side by side.',
-                  style: pvManrope(fontSize: 12.5, height: 1.5, color: p.ink3)),
+                    p: p,
+                    initialLeft: photos.last.id,
+                    initialRight: photos.first.id,
+                  ),
+                ),
+              ),
+            )
+          else
+            Text(
+              'Then & Now opens once you have two weeks to put side by side.',
+              style: pvManrope(fontSize: 12.5, height: 1.5, color: p.ink3),
+            ),
 
-            // ---- her weeks: trimester bands, read forward like a book -------
-            const SizedBox(height: 26),
-            // One section heading (2026-09-30): the serif. Kept for revert:
-            // _Eyebrow('Your weeks', p: p),
-            const PregSectionHeading('Your weeks'),
-            const SizedBox(height: 16),
-            for (final t in [1, 2, 3])
-              if (photos.any((x) => x.trimester == t)) ...[
-                _TrimesterBand(
-                  p: p,
-                  trimester: t,
-                  week: week,
-                  photos: photos.where((x) => x.trimester == t).toList().reversed.toList(),
-                  onOpen: (photo) => Navigator.of(context).push(MaterialPageRoute<void>(
+          // ---- her weeks: trimester bands, read forward like a book -------
+          const SizedBox(height: 26),
+          // One section heading (2026-09-30): the serif. Kept for revert:
+          // _Eyebrow('Your weeks', p: p),
+          const PregSectionHeading('Your weeks'),
+          const SizedBox(height: 16),
+          for (final t in [1, 2, 3])
+            if (photos.any((x) => x.trimester == t)) ...[
+              _TrimesterBand(
+                p: p,
+                trimester: t,
+                week: week,
+                photos: photos
+                    .where((x) => x.trimester == t)
+                    .toList()
+                    .reversed
+                    .toList(),
+                onOpen: (photo) => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
                     settings: const RouteSettings(name: 'bump_journey/photo'),
                     builder: (_) => _PhotoScreen(p: p, id: photo.id),
-                  )),
+                  ),
                 ),
-                const SizedBox(height: 22),
-              ],
-
-            // ---- still ahead: the moments to come, in the book's own type ---
-            if (ahead.isNotEmpty) ...[
-              _AheadBand(p: p, moments: ahead),
+              ),
               const SizedBox(height: 22),
             ],
 
-            // ---- the book, at the end ---------------------------------------
-            _BookRow(
-              p: p,
-              line: 'Flip through your weeks — view, download or print.',
-              onTap: () => _openBookSheet(context, p, first, latest),
-            ),
-          ]);
-        },
+          // ---- still ahead: the moments to come, in the book's own type ---
+          if (ahead.isNotEmpty) ...[
+            _AheadBand(p: p, moments: ahead),
+            const SizedBox(height: 22),
+          ],
+
+          // ---- the book, at the end ---------------------------------------
+          _BookRow(
+            p: p,
+            line: 'Flip through your weeks — view, download or print.',
+            onTap: () => _openBookSheet(context, p, first, latest),
+          ),
+        ],
       );
-
-  // ---- adding this week: source → pick → caption → save ----------------------
-
-  Future<void> _startAdd(BuildContext context, V2Palette p, int week) async {
-    final source = await showModalBottomSheet<ImageSource>(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) => _Sheet(
-        p: p,
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('Week $week',
-              style: pvFraunces(
-                  fontSize: 22, fontWeight: FontWeight.w600, letterSpacing: -0.5, color: p.ink1)),
-          const SizedBox(height: 5),
-          Text('However you have it.',
-              style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2)),
-          const SizedBox(height: 18),
-          Row(children: [
-            Expanded(
-              child: _SourceButton(
-                p: p,
-                icon: Icons.photo_camera_outlined,
-                hue: kBumpRitualHue,
-                label: 'Take a photo',
-                onTap: () => Navigator.of(ctx).pop(ImageSource.camera),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _SourceButton(
-                p: p,
-                icon: Icons.photo_library_outlined,
-                hue: 12,
-                label: 'Choose from gallery',
-                onTap: () => Navigator.of(ctx).pop(ImageSource.gallery),
-              ),
-            ),
-          ]),
-          const SizedBox(height: 14),
-          _QuietButton(p: p, label: 'Not now', onTap: () => Navigator.of(ctx).pop()),
-        ]),
-      ),
-    );
-    if (source == null || !context.mounted) return;
-
-    String? path;
-    try {
-      final x = await ImagePicker()
-          .pickImage(source: source, maxWidth: 1600, imageQuality: 88);
-      path = x?.path;
-    } catch (_) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text("Couldn't open the camera. Try the gallery.")));
-      }
-      return;
-    }
-    if (path == null || !context.mounted) return;
-
-    final caption = await showModalBottomSheet<String>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) => _CaptionSheet(p: p, week: week, imagePath: path!),
-    );
-    if (caption == null || !context.mounted) return; // dismissed: not saved
-
-    await BumpStore.instance.addPhoto(
-      sourcePath: path,
-      week: week,
-      caption: caption,
-      journalLabel: 'Bump, week $week',
-    );
-  }
+    },
+  );
 
   // ---- the book, opening to the three things it does -----------------------
 
-  void _openBookSheet(BuildContext context, V2Palette p, int first, int latest) {
+  void _openBookSheet(
+    BuildContext context,
+    V2Palette p,
+    int first,
+    int latest,
+  ) {
     void open(BumpBookAction action) {
       Navigator.of(context).pop();
-      Navigator.of(context).push(MaterialPageRoute<void>(
-        settings: const RouteSettings(name: 'bump_journey/book'),
-        builder: (_) => BumpBookScreen(lang: c.language, initialAction: action),
-      ));
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          settings: const RouteSettings(name: 'bump_journey/book'),
+          builder: (_) =>
+              BumpBookScreen(lang: c.language, initialAction: action),
+        ),
+      );
     }
 
     showModalBottomSheet<void>(
@@ -375,32 +426,155 @@ class _BumpRitualBodyState extends State<BumpRitualBody> {
       backgroundColor: Colors.transparent,
       builder: (ctx) => _Sheet(
         p: p,
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('Your bump journey book',
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Your bump journey book',
               style: pvFraunces(
-                  fontSize: 22, fontWeight: FontWeight.w600, letterSpacing: -0.5, color: p.ink1)),
-          const SizedBox(height: 5),
-          Text(
+                fontSize: 22,
+                fontWeight: FontWeight.w600,
+                letterSpacing: -0.5,
+                color: p.ink1,
+              ),
+            ),
+            const SizedBox(height: 5),
+            Text(
               first == latest
                   ? 'Week $first, one to a page.'
                   : 'Weeks $first to $latest, in order, one to a page.',
-              style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2)),
-          const SizedBox(height: 16),
-          _SheetRow(p: p, icon: Icons.auto_stories_outlined, title: 'Flip through it',
+              style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2),
+            ),
+            const SizedBox(height: 16),
+            _SheetRow(
+              p: p,
+              icon: Icons.auto_stories_outlined,
+              title: 'Flip through it',
               line: 'Page by page, here in the app.',
-              onTap: () => open(BumpBookAction.view)),
-          _SheetRow(p: p, icon: Icons.download_outlined, title: 'Download as a PDF',
+              onTap: () => open(BumpBookAction.view),
+            ),
+            _SheetRow(
+              p: p,
+              icon: Icons.download_outlined,
+              title: 'Download as a PDF',
               line: 'To keep, or to send to family.',
-              onTap: () => open(BumpBookAction.download)),
-          _SheetRow(p: p, icon: Icons.print_outlined, title: 'Print it',
+              onTap: () => open(BumpBookAction.download),
+            ),
+            _SheetRow(
+              p: p,
+              icon: Icons.print_outlined,
+              title: 'Print it',
               line: 'A4, four weeks to a sheet.',
-              onTap: () => open(BumpBookAction.print)),
-          const SizedBox(height: 10),
-          _QuietButton(p: p, label: 'Close', onTap: () => Navigator.of(ctx).pop()),
-        ]),
+              onTap: () => open(BumpBookAction.print),
+            ),
+            const SizedBox(height: 10),
+            _QuietButton(
+              p: p,
+              label: 'Close',
+              onTap: () => Navigator.of(ctx).pop(),
+            ),
+          ],
+        ),
       ),
     );
   }
+}
+
+// ---- adding this week: source → pick → caption → save ----------------------
+
+Future<void> _startAddPhoto(BuildContext context, V2Palette p, int week) async {
+  final source = await showModalBottomSheet<ImageSource>(
+    context: context,
+    backgroundColor: Colors.transparent,
+    builder: (ctx) => _Sheet(
+      p: p,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Week $week',
+            style: pvFraunces(
+              fontSize: 22,
+              fontWeight: FontWeight.w600,
+              letterSpacing: -0.5,
+              color: p.ink1,
+            ),
+          ),
+          const SizedBox(height: 5),
+          Text(
+            'However you have it.',
+            style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2),
+          ),
+          const SizedBox(height: 18),
+          Row(
+            children: [
+              Expanded(
+                child: _SourceButton(
+                  p: p,
+                  icon: Icons.photo_camera_outlined,
+                  hue: kBumpRitualHue,
+                  label: 'Take a photo',
+                  onTap: () => Navigator.of(ctx).pop(ImageSource.camera),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _SourceButton(
+                  p: p,
+                  icon: Icons.photo_library_outlined,
+                  hue: 12,
+                  label: 'Choose from gallery',
+                  onTap: () => Navigator.of(ctx).pop(ImageSource.gallery),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          _QuietButton(
+            p: p,
+            label: 'Not now',
+            onTap: () => Navigator.of(ctx).pop(),
+          ),
+        ],
+      ),
+    ),
+  );
+  if (source == null || !context.mounted) return;
+
+  String? path;
+  try {
+    final x = await ImagePicker().pickImage(
+      source: source,
+      maxWidth: 1600,
+      imageQuality: 88,
+    );
+    path = x?.path;
+  } catch (_) {
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Couldn't open the camera. Try the gallery."),
+        ),
+      );
+    }
+    return;
+  }
+  if (path == null || !context.mounted) return;
+
+  final caption = await showModalBottomSheet<String>(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (ctx) => _CaptionSheet(p: p, week: week, imagePath: path!),
+  );
+  if (caption == null || !context.mounted) return; // dismissed: not saved
+
+  await BumpStore.instance.addPhoto(
+    sourcePath: path,
+    week: week,
+    caption: caption,
+    journalLabel: 'Bump, week $week',
+  );
 }
 
 // -----------------------------------------------------------------------------
@@ -415,102 +589,236 @@ class _Eyebrow extends StatelessWidget {
   // ⚠️ THE ACCENT, NOT INK-3. The design system's eyebrow is the one violet
   // on the screen — "the only violet is the section eyebrow" — and a grey
   // eyebrow reads as metadata rather than as the name of what follows.
-  Widget build(BuildContext context) => Text(text.toUpperCase(),
-      style: pvManrope(
-          fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.2, color: p.ink1));
+  Widget build(BuildContext context) => Text(
+    text.toUpperCase(),
+    style: pvManrope(
+      fontSize: 11,
+      fontWeight: FontWeight.w800,
+      letterSpacing: 1.2,
+      color: p.ink1,
+    ),
+  );
 }
 
-/// "Week 24 · Same window, same light. Whenever you're ready. [Add this week]"
-class _AddCard extends StatelessWidget {
-  const _AddCard({required this.p, required this.week, required this.onAdd});
+// Kept for revert (merged into the cover above, 2026-09-30):
+// /// "Week 24 · Same window, same light. Whenever you're ready. [Add this week]"
+// class _AddCard extends StatelessWidget {
+//   const _AddCard({required this.p, required this.week, required this.onAdd});
+//   final V2Palette p;
+//   final int week;
+//   final VoidCallback onAdd;
+//   @override
+//   Widget build(BuildContext context) => PvDoorCard(
+//         p: p,
+//         child: Row(children: [
+//           Container(
+//             width: 62,
+//             height: 78,
+//             decoration: BoxDecoration(
+//               borderRadius: BorderRadius.circular(14),
+//               border: Border.all(color: p.ink1.withValues(alpha: 0.22), width: 1.2),
+//             ),
+//             child: Icon(Icons.add_rounded, size: 22, color: p.ink1.withValues(alpha: 0.3)),
+//           ),
+//           const SizedBox(width: 14),
+//           Expanded(
+//             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+//               Text('Week $week',
+//                   style: pvFraunces(
+//                       fontSize: 16.5, fontWeight: FontWeight.w600, letterSpacing: -0.3, color: p.ink1)),
+//               const SizedBox(height: 6),
+//               Text("Same window, same light. Whenever you're ready.",
+//                   style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2)),
+//               const SizedBox(height: 10),
+//               _HairlineButton(p: p, label: 'Add this week', onTap: onAdd),
+//             ]),
+//           ),
+//         ]),
+//       );
+// }
+
+/// The cover of the book. Her latest photo, three-by-four, beside where she is
+/// in words, one line saying what the book holds, and (only while this week is
+/// not in it) the one add button, with the old add card's line
+/// "Same window, same light." A white card with the hairline, no tint.
+class _Cover extends StatelessWidget {
+  const _Cover({
+    required this.p,
+    required this.latest,
+    required this.week,
+    required this.status,
+    required this.onOpen,
+    this.onAdd,
+  });
   final V2Palette p;
+  final BumpPhoto latest;
   final int week;
-  final VoidCallback onAdd;
+  final String status;
+  final VoidCallback onOpen;
+  final VoidCallback? onAdd;
+
   @override
-  Widget build(BuildContext context) => PvDoorCard(
-        p: p,
-        child: Row(children: [
-          Container(
-            width: 62,
-            height: 78,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: p.ink1.withValues(alpha: 0.22), width: 1.2),
+  Widget build(BuildContext context) => PregCard(
+    padding: const EdgeInsets.all(12),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        GestureDetector(
+          onTap: onOpen,
+          behavior: HitTestBehavior.opaque,
+          child: SizedBox(
+            width: 104,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                AspectRatio(
+                  aspectRatio: 3 / 4,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(14),
+                    child: ColoredBox(
+                      color: v2BlockTint(kBumpRitualHue, p),
+                      child: StorageImage(latest.imageUrl, fit: BoxFit.cover),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'Latest, ${bumpDate(latest.date)}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: pvManrope(fontSize: 11, color: p.ink3),
+                ),
+              ],
             ),
-            child: Icon(Icons.add_rounded, size: 22, color: p.ink1.withValues(alpha: 0.3)),
           ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('Week $week',
-                  style: pvFraunces(
-                      fontSize: 16.5, fontWeight: FontWeight.w600, letterSpacing: -0.3, color: p.ink1)),
-              const SizedBox(height: 6),
-              Text("Same window, same light. Whenever you're ready.",
-                  style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2)),
-              const SizedBox(height: 10),
-              _HairlineButton(p: p, label: 'Add this week', onTap: onAdd),
-            ]),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 4),
+              _Eyebrow('Your book', p: p),
+              const SizedBox(height: 7),
+              Text(
+                weeksInWords(week),
+                style: pvFraunces(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w600,
+                  height: 1.12,
+                  letterSpacing: -0.6,
+                  color: p.ink1,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                status,
+                style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2),
+              ),
+              if (onAdd != null) ...[
+                const SizedBox(height: 8),
+                Text(
+                  "Same window, same light. Whenever you're ready.",
+                  style: pvManrope(fontSize: 12.5, height: 1.5, color: p.ink3),
+                ),
+                const SizedBox(height: 12),
+                _HairlineButton(
+                  p: p,
+                  label: 'Add this week',
+                  filled: true,
+                  onTap: onAdd!,
+                ),
+              ],
+            ],
           ),
-        ]),
-      );
+        ),
+      ],
+    ),
+  );
 }
 
-/// Two overlapping frames, a title, a line, a chevron.
+/// Two overlapping frames holding her first and latest photos, a title, a
+/// line, a chevron. Her real pictures rather than two blank tints, so the row
+/// shows what Then & Now will make.
 class _ThenNowRow extends StatelessWidget {
-  const _ThenNowRow(
-      {required this.p, required this.first, required this.latest, required this.onTap});
+  const _ThenNowRow({
+    required this.p,
+    required this.first,
+    required this.latest,
+    required this.firstPhoto,
+    required this.latestPhoto,
+    required this.onTap,
+  });
   final V2Palette p;
   final int first;
   final int latest;
+  final BumpPhoto firstPhoto;
+  final BumpPhoto latestPhoto;
   final VoidCallback onTap;
   @override
-  Widget build(BuildContext context) => GestureDetector(
-        onTap: onTap,
-        behavior: HitTestBehavior.opaque,
-        child: Row(children: [
-          SizedBox(
-            width: 74,
-            height: 55,
-            child: Stack(children: [
-              _frame(const HSLColor.fromAHSL(1, 20, .16, .89).toColor(), 0),
-              _frame(const HSLColor.fromAHSL(1, 12, .14, .86).toColor(), 30),
-            ]),
+  Widget build(BuildContext context) => PregCard(
+    onTap: onTap,
+    padding: const EdgeInsets.all(12),
+    child: Row(
+      children: [
+        SizedBox(
+          width: 74,
+          height: 55,
+          child: Stack(
+            children: [_frame(firstPhoto, 0), _frame(latestPhoto, 30)],
           ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('Then & Now',
-                  style: pvFraunces(
-                      fontSize: 16.5, fontWeight: FontWeight.w600, letterSpacing: -0.3, color: p.ink1)),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Then & Now',
+                style: pvFraunces(
+                  fontSize: 16.5,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: -0.3,
+                  color: p.ink1,
+                ),
+              ),
               const SizedBox(height: 3),
               // Every photo the same week (a test device, or a late starter
               // who took three in week 30) would read "week 30 beside week
               // 30", so the line drops the pair when there is no pair.
               Text(
-                  first == latest
-                      ? 'Any two of your photos, side by side.'
-                      : 'Week $first beside week $latest, or any two you like.',
-                  style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2)),
-            ]),
-          ),
-          const SizedBox(width: 6),
-          Icon(Icons.chevron_right_rounded, size: 20, color: p.ink3),
-        ]),
-      );
-
-  Widget _frame(Color tone, double left) => Positioned(
-        left: left,
-        child: Container(
-          width: 44,
-          height: 55,
-          decoration: BoxDecoration(
-            color: tone,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: p.ground, width: 2),
+                first == latest
+                    ? 'Any two of your photos, side by side.'
+                    : 'Week $first beside week $latest, or any two you like.',
+                style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2),
+              ),
+            ],
           ),
         ),
-      );
+        const SizedBox(width: 6),
+        Icon(Icons.chevron_right_rounded, size: 20, color: p.ink3),
+      ],
+    ),
+  );
+
+  Widget _frame(BumpPhoto photo, double left) => Positioned(
+    left: left,
+    child: Container(
+      width: 44,
+      height: 55,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white, width: 2),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: ColoredBox(
+          color: v2BlockTint(kBumpRitualHue, p),
+          child: StorageImage(photo.imageUrl, fit: BoxFit.cover),
+        ),
+      ),
+    ),
+  );
 }
 
 /// One trimester: a quiet heading with its moment written into it, then a
@@ -540,7 +848,9 @@ class _TrimesterBand extends StatelessWidget {
     final parts = <String>[];
     switch (trimester) {
       case 1:
-        parts.add(week > 13 ? 'It ended in week 12.' : "You're in week $week now.");
+        parts.add(
+          week > 13 ? 'It ended in week 12.' : "You're in week $week now.",
+        );
       case 2:
         if (week >= 20) parts.add('Halfway was week 20.');
         if (week > 27) {
@@ -557,22 +867,27 @@ class _TrimesterBand extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) =>
-      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(_title,
-            style: pvFraunces(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                letterSpacing: -0.4,
-                color: p.ink1)),
-        if (_line.isNotEmpty) ...[
-          const SizedBox(height: 3),
-          Text(_line, style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2)),
-        ],
-        const SizedBox(height: 10),
-        Container(height: 1, color: p.line),
-        const SizedBox(height: 14),
-        LayoutBuilder(builder: (context, c) {
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        _title,
+        style: pvFraunces(
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+          letterSpacing: -0.4,
+          color: p.ink1,
+        ),
+      ),
+      if (_line.isNotEmpty) ...[
+        const SizedBox(height: 3),
+        Text(_line, style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2)),
+      ],
+      const SizedBox(height: 10),
+      Container(height: 1, color: p.line),
+      const SizedBox(height: 14),
+      LayoutBuilder(
+        builder: (context, c) {
           const gap = 12.0;
           final w = (c.maxWidth - gap) / 2;
           return Wrap(
@@ -581,12 +896,15 @@ class _TrimesterBand extends StatelessWidget {
             children: [
               for (final x in photos)
                 SizedBox(
-                    width: w,
-                    child: _GridTile(p: p, photo: x, onTap: () => onOpen(x))),
+                  width: w,
+                  child: _GridTile(p: p, photo: x, onTap: () => onOpen(x)),
+                ),
             ],
           );
-        }),
-      ]);
+        },
+      ),
+    ],
+  );
 }
 
 /// One week in the grid: a three-by-four photo, the heart if she marked it,
@@ -598,12 +916,16 @@ class _GridTile extends StatelessWidget {
   final VoidCallback onTap;
   @override
   Widget build(BuildContext context) => GestureDetector(
-        onTap: onTap,
-        behavior: HitTestBehavior.opaque,
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          AspectRatio(
-            aspectRatio: 3 / 4,
-            child: Stack(fit: StackFit.expand, children: [
+    onTap: onTap,
+    behavior: HitTestBehavior.opaque,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        AspectRatio(
+          aspectRatio: 3 / 4,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(16),
                 child: ColoredBox(
@@ -622,29 +944,54 @@ class _GridTile extends StatelessWidget {
                       color: Colors.white.withValues(alpha: 0.9),
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.favorite_rounded, size: 14, color: p.ink1),
+                    child: Icon(
+                      Icons.favorite_rounded,
+                      size: 14,
+                      color: p.ink1,
+                    ),
                   ),
                 ),
-            ]),
+            ],
           ),
-          const SizedBox(height: 7),
-          Row(
-              crossAxisAlignment: CrossAxisAlignment.baseline,
-              textBaseline: TextBaseline.alphabetic,
-              children: [
-                Text('Week ${photo.weekNumber}',
-                    style: pvManrope(
-                        fontSize: 12.5, fontWeight: FontWeight.w700, color: p.ink1)),
-                const SizedBox(width: 6),
-                Flexible(
-                  child: Text(bumpDate(photo.date),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: pvManrope(fontSize: 11.5, color: p.ink3)),
-                ),
-              ]),
-        ]),
-      );
+        ),
+        const SizedBox(height: 7),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
+          children: [
+            Text(
+              'Week ${photo.weekNumber}',
+              style: pvManrope(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w700,
+                color: p.ink1,
+              ),
+            ),
+            const SizedBox(width: 6),
+            Flexible(
+              child: Text(
+                bumpDate(photo.date),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: pvManrope(fontSize: 11.5, color: p.ink3),
+              ),
+            ),
+          ],
+        ),
+        // Her own words under the picture, so the album reads without
+        // opening every page (Day One shows the first line under each entry).
+        if (photo.caption.trim().isNotEmpty) ...[
+          const SizedBox(height: 2),
+          Text(
+            photo.caption.trim(),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: pvManrope(fontSize: 12, height: 1.4, color: p.ink2),
+          ),
+        ],
+      ],
+    ),
+  );
 }
 
 /// The moments still to come, in the same type the passed ones are written
@@ -654,46 +1001,58 @@ class _AheadBand extends StatelessWidget {
   const _AheadBand({required this.p, required this.moments});
   final V2Palette p;
   final List<({int week, String ahead, String passedTitle, String passedLine})>
-      moments;
+  moments;
   @override
-  Widget build(BuildContext context) =>
-      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        // A page section, so the one heading (2026-09-30). Was pvFraunces 18.
-        Semantics(header: true, child: Text('Still ahead', style: pregSectionHeadingStyle())),
-        const SizedBox(height: 3),
-        Text(
-            moments.length == 1
-                ? 'One more page the book will turn on its own.'
-                : '${const ['', 'One', 'Two', 'Three', 'Four'][moments.length]} more '
-                    'pages the book will turn on its own.',
-            style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2)),
-        const SizedBox(height: 10),
-        Container(height: 1, color: p.line),
-        for (final m in moments) ...[
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            child: Row(
-                crossAxisAlignment: CrossAxisAlignment.baseline,
-                textBaseline: TextBaseline.alphabetic,
-                children: [
-                  SizedBox(
-                    width: 84,
-                    child: Text('Week ${m.week}',
-                        style: pvFraunces(
-                            fontSize: 16.5,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: -0.3,
-                            color: p.ink1)),
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      // A page section, so the one heading (2026-09-30). Was pvFraunces 18.
+      Semantics(
+        header: true,
+        child: Text('Still ahead', style: pregSectionHeadingStyle()),
+      ),
+      const SizedBox(height: 3),
+      Text(
+        moments.length == 1
+            ? 'One more page the book will turn on its own.'
+            : '${const ['', 'One', 'Two', 'Three', 'Four'][moments.length]} more '
+                  'pages the book will turn on its own.',
+        style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2),
+      ),
+      const SizedBox(height: 10),
+      Container(height: 1, color: p.line),
+      for (final m in moments) ...[
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              SizedBox(
+                width: 84,
+                child: Text(
+                  'Week ${m.week}',
+                  style: pvFraunces(
+                    fontSize: 16.5,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: -0.3,
+                    color: p.ink1,
                   ),
-                  Expanded(
-                    child: Text(m.ahead,
-                        style: pvManrope(fontSize: 13.5, height: 1.4, color: p.ink2)),
-                  ),
-                ]),
+                ),
+              ),
+              Expanded(
+                child: Text(
+                  m.ahead,
+                  style: pvManrope(fontSize: 13.5, height: 1.4, color: p.ink2),
+                ),
+              ),
+            ],
           ),
-          if (m != moments.last) Container(height: 1, color: p.line),
-        ],
-      ]);
+        ),
+        if (m != moments.last) Container(height: 1, color: p.line),
+      ],
+    ],
+  );
 }
 
 /// A label and a value on one line — used by the empty state.
@@ -706,26 +1065,34 @@ class _Fact extends StatelessWidget {
   // Kept for revert: `color: p.surfaceAlt`, radius 12, no border.
   @override
   Widget build(BuildContext context) => Container(
-        width: double.infinity,
-        padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: kPvLine),
+    width: double.infinity,
+    padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(12),
+      border: Border.all(color: kPvLine),
+    ),
+    child: Row(
+      children: [
+        Text(
+          label.toUpperCase(),
+          style: pvManrope(
+            fontSize: 10,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 1.0,
+            color: p.ink3,
+          ),
         ),
-        child: Row(children: [
-          Text(label.toUpperCase(),
-              style: pvManrope(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 1.0,
-                  color: p.ink3)),
-          const SizedBox(width: 12),
-          Expanded(
-              child: Text(value,
-                  style: pvManrope(fontSize: 13, height: 1.4, color: p.ink1))),
-        ]),
-      );
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            value,
+            style: pvManrope(fontSize: 13, height: 1.4, color: p.ink1),
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 class _BookRow extends StatelessWidget {
@@ -735,88 +1102,150 @@ class _BookRow extends StatelessWidget {
   final VoidCallback onTap;
   @override
   Widget build(BuildContext context) => GestureDetector(
-        onTap: onTap,
-        behavior: HitTestBehavior.opaque,
-        child: PvDoorCard(
-          p: p,
-          child: Row(children: [
-            // The book's drawn mark in its well (2026-09-30). Kept for
-            // revert: a 44pt v2BlockTint(12) box with
-            // Icon(Icons.menu_book_outlined, size: 22, color: p.ink1).
-            PvMarkWell(p: p, hue: 12, size: 44, mark: IntentMark.bookMark),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('Your bump journey book',
-                    style: pvFraunces(
-                        fontSize: 16.5, fontWeight: FontWeight.w600, letterSpacing: -0.3, color: p.ink1)),
+    onTap: onTap,
+    behavior: HitTestBehavior.opaque,
+    child: PvDoorCard(
+      p: p,
+      child: Row(
+        children: [
+          // The book's drawn mark in its well (2026-09-30). Kept for
+          // revert: a 44pt v2BlockTint(12) box with
+          // Icon(Icons.menu_book_outlined, size: 22, color: p.ink1).
+          PvMarkWell(p: p, hue: 12, size: 44, mark: IntentMark.bookMark),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Your bump journey book',
+                  style: pvFraunces(
+                    fontSize: 16.5,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: -0.3,
+                    color: p.ink1,
+                  ),
+                ),
                 const SizedBox(height: 3),
-                Text(line, style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2)),
-              ]),
+                Text(
+                  line,
+                  style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2),
+                ),
+              ],
             ),
-            const SizedBox(width: 6),
-            Icon(Icons.chevron_right_rounded, size: 20, color: p.ink3),
-          ]),
-        ),
-      );
+          ),
+          const SizedBox(width: 6),
+          Icon(Icons.chevron_right_rounded, size: 20, color: p.ink3),
+        ],
+      ),
+    ),
+  );
 }
 
 /// Nothing yet. What it becomes, stated — and the two features named rather
 /// than hidden. "Miss a week and nothing breaks. Most people do."
 class _Empty extends StatelessWidget {
-  const _Empty({required this.p, required this.week, required this.onAdd});
+  const _Empty({
+    required this.p,
+    required this.week,
+    required this.onAdd,
+    this.inShell = false,
+  });
   final V2Palette p;
   final int week;
   final VoidCallback onAdd;
+  final bool inShell;
   @override
-  Widget build(BuildContext context) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      // Inside the Tools shell its title and intro already say this
+      // (2026-09-30), so the payoff, three frames waiting, comes first.
+      if (!inShell) ...[
         _Eyebrow('The bump ritual', p: p),
         const SizedBox(height: 8),
-        Text('One photo a week, in the same spot.',
-            style: pvFraunces(
-                fontSize: 27, fontWeight: FontWeight.w600, height: 1.12, letterSpacing: -0.6, color: p.ink1)),
+        Text(
+          'One photo a week, in the same spot.',
+          style: pvFraunces(
+            fontSize: 27,
+            fontWeight: FontWeight.w600,
+            height: 1.12,
+            letterSpacing: -0.6,
+            color: p.ink1,
+          ),
+        ),
         const SizedBox(height: 8),
-        Text("By week 40 you'll have a book you can flip through — and later, "
-            'show your child.',
-            style: pvManrope(fontSize: 14, height: 1.55, color: p.ink2)),
+        Text(
+          "By week 40 you'll have a book you can flip through — and later, "
+          'show your child.',
+          style: pvManrope(fontSize: 14, height: 1.55, color: p.ink2),
+        ),
         const SizedBox(height: 26),
-        Row(children: [
+      ],
+      Row(
+        children: [
           for (var i = 0; i < 3; i++) ...[
             if (i > 0) const SizedBox(width: 10),
             Expanded(
               child: Opacity(
                 opacity: [1.0, 0.72, 0.45][i],
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  AspectRatio(
-                    aspectRatio: 3 / 4,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: p.ink1.withValues(alpha: 0.2), width: 1.2),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    AspectRatio(
+                      aspectRatio: 3 / 4,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: p.ink1.withValues(alpha: 0.2),
+                            width: 1.2,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 7),
-                  Text('Week ${week + i}', style: pvManrope(fontSize: 12, color: p.ink3)),
-                ]),
+                    const SizedBox(height: 7),
+                    Text(
+                      'Week ${week + i}',
+                      style: pvManrope(fontSize: 12, color: p.ink3),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
-        ]),
-        const SizedBox(height: 26),
-        _HairlineButton(p: p, label: 'Add your first photo', onTap: onAdd),
-        const SizedBox(height: 30),
-        // One section heading (2026-09-30). Kept for revert:
-        // _Eyebrow('What it becomes', p: p),
-        const PregSectionHeading('What it becomes'),
-        const SizedBox(height: 12),
-        _Fact(p: p, label: 'Then & Now', value: 'Once you have two weeks to put side by side.'),
-        const SizedBox(height: 10),
-        _Fact(p: p, label: 'Your book', value: "Once there's something to flip through."),
-        const SizedBox(height: 22),
-        Text('Miss a week and nothing breaks. Most people do.',
-            style: pvManrope(fontSize: 13, height: 1.5, color: p.ink3)),
-      ]);
+        ],
+      ),
+      const SizedBox(height: 26),
+      _HairlineButton(
+        p: p,
+        label: 'Add your first photo',
+        filled: true,
+        onTap: onAdd,
+      ),
+      const SizedBox(height: 30),
+      // One section heading (2026-09-30). Kept for revert:
+      // _Eyebrow('What it becomes', p: p),
+      const PregSectionHeading('What it becomes'),
+      const SizedBox(height: 12),
+      _Fact(
+        p: p,
+        label: 'Then & Now',
+        value: 'Once you have two weeks to put side by side.',
+      ),
+      const SizedBox(height: 10),
+      _Fact(
+        p: p,
+        label: 'Your book',
+        value: "Once there's something to flip through.",
+      ),
+      const SizedBox(height: 22),
+      Text(
+        'Miss a week and nothing breaks. Most people do.',
+        style: pvManrope(fontSize: 13, height: 1.5, color: p.ink3),
+      ),
+    ],
+  );
 }
 
 // -----------------------------------------------------------------------------
@@ -824,52 +1253,88 @@ class _Empty extends StatelessWidget {
 // -----------------------------------------------------------------------------
 
 class _HairlineButton extends StatelessWidget {
-  const _HairlineButton({required this.p, required this.label, required this.onTap});
+  const _HairlineButton({
+    required this.p,
+    required this.label,
+    required this.onTap,
+    this.filled = false,
+  });
   final V2Palette p;
   final String label;
   final VoidCallback onTap;
+
+  /// The one primary action on a page: the ink, white words (rule 1).
+  final bool filled;
   @override
-  Widget build(BuildContext context) => Row(mainAxisSize: MainAxisSize.min, children: [
-        GestureDetector(
+  Widget build(BuildContext context) => Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Flexible(
+        child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: Container(
             height: 38,
             padding: const EdgeInsets.symmetric(horizontal: 16),
             decoration: BoxDecoration(
-              color: p.surface,
+              color: filled ? kPvInk : p.surface,
               borderRadius: BorderRadius.circular(999),
               border: Border.all(color: p.ink1, width: 1.2),
             ),
-            child: Row(mainAxisSize: MainAxisSize.min, children: [
-              Text(label,
-                  style: pvManrope(fontSize: 13, fontWeight: FontWeight.w700, color: p.ink1)),
-            ]),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Flexible(
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: pvManrope(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: filled ? Colors.white : p.ink1,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
-      ]);
+      ),
+    ],
+  );
 }
 
 class _QuietButton extends StatelessWidget {
-  const _QuietButton({required this.p, required this.label, required this.onTap});
+  const _QuietButton({
+    required this.p,
+    required this.label,
+    required this.onTap,
+  });
   final V2Palette p;
   final String label;
   final VoidCallback onTap;
   @override
   Widget build(BuildContext context) => GestureDetector(
-        onTap: onTap,
-        behavior: HitTestBehavior.opaque,
-        child: Container(
-          height: 44,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(999),
-            border: Border.all(color: p.line),
-          ),
-          child: Text(label,
-              style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w700, color: p.ink2)),
+    onTap: onTap,
+    behavior: HitTestBehavior.opaque,
+    child: Container(
+      height: 44,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: p.line),
+      ),
+      child: Text(
+        label,
+        style: pvManrope(
+          fontSize: 13.5,
+          fontWeight: FontWeight.w700,
+          color: p.ink2,
         ),
-      );
+      ),
+    ),
+  );
 }
 
 class _Sheet extends StatelessWidget {
@@ -878,18 +1343,28 @@ class _Sheet extends StatelessWidget {
   final Widget child;
   @override
   Widget build(BuildContext context) => Container(
-        decoration: BoxDecoration(
-          color: p.surface,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-        ),
-        padding: EdgeInsets.fromLTRB(18, 24, 18, 30 + MediaQuery.paddingOf(context).bottom),
-        child: child,
-      );
+    decoration: BoxDecoration(
+      color: p.surface,
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+    ),
+    padding: EdgeInsets.fromLTRB(
+      18,
+      24,
+      18,
+      30 + MediaQuery.paddingOf(context).bottom,
+    ),
+    child: child,
+  );
 }
 
 class _SourceButton extends StatelessWidget {
-  const _SourceButton(
-      {required this.p, required this.icon, required this.hue, required this.label, required this.onTap});
+  const _SourceButton({
+    required this.p,
+    required this.icon,
+    required this.hue,
+    required this.label,
+    required this.onTap,
+  });
   final V2Palette p;
   final IconData icon;
   final double hue;
@@ -897,36 +1372,50 @@ class _SourceButton extends StatelessWidget {
   final VoidCallback onTap;
   @override
   Widget build(BuildContext context) => GestureDetector(
-        onTap: onTap,
-        behavior: HitTestBehavior.opaque,
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: p.surface,
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: p.line),
-          ),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: v2BlockTint(hue, p),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(icon, size: 20, color: p.ink1),
+    onTap: onTap,
+    behavior: HitTestBehavior.opaque,
+    child: Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: p.surface,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: p.line),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: v2BlockTint(hue, p),
+              borderRadius: BorderRadius.circular(12),
             ),
-            const SizedBox(height: 10),
-            Text(label,
-                style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w700, color: p.ink1)),
-          ]),
-        ),
-      );
+            child: Icon(icon, size: 20, color: p.ink1),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            label,
+            style: pvManrope(
+              fontSize: 12.5,
+              fontWeight: FontWeight.w700,
+              color: p.ink1,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
 }
 
 class _SheetRow extends StatelessWidget {
-  const _SheetRow(
-      {required this.p, required this.icon, required this.title, required this.line, required this.onTap});
+  const _SheetRow({
+    required this.p,
+    required this.icon,
+    required this.title,
+    required this.line,
+    required this.onTap,
+  });
   final V2Palette p;
   final IconData icon;
   final String title;
@@ -934,31 +1423,49 @@ class _SheetRow extends StatelessWidget {
   final VoidCallback onTap;
   @override
   Widget build(BuildContext context) => GestureDetector(
-        onTap: onTap,
-        behavior: HitTestBehavior.opaque,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 11),
-          child: Row(children: [
-            Icon(icon, size: 20, color: p.ink2),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(title,
-                    style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w700, color: p.ink1)),
+    onTap: onTap,
+    behavior: HitTestBehavior.opaque,
+    child: Padding(
+      padding: const EdgeInsets.symmetric(vertical: 11),
+      child: Row(
+        children: [
+          Icon(icon, size: 20, color: p.ink2),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: pvManrope(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w700,
+                    color: p.ink1,
+                  ),
+                ),
                 const SizedBox(height: 2),
-                Text(line, style: pvManrope(fontSize: 12.5, height: 1.4, color: p.ink3)),
-              ]),
+                Text(
+                  line,
+                  style: pvManrope(fontSize: 12.5, height: 1.4, color: p.ink3),
+                ),
+              ],
             ),
-            Icon(Icons.chevron_right_rounded, size: 18, color: p.ink3),
-          ]),
-        ),
-      );
+          ),
+          Icon(Icons.chevron_right_rounded, size: 18, color: p.ink3),
+        ],
+      ),
+    ),
+  );
 }
 
 /// "A line about this week? You can skip it." — returns the caption, '' for
 /// skip, and null when dismissed (not saved).
 class _CaptionSheet extends StatefulWidget {
-  const _CaptionSheet({required this.p, required this.week, required this.imagePath});
+  const _CaptionSheet({
+    required this.p,
+    required this.week,
+    required this.imagePath,
+  });
   final V2Palette p;
   final int week;
   final String imagePath;
@@ -981,98 +1488,135 @@ class _CaptionSheetState extends State<_CaptionSheet> {
       padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
       child: _Sheet(
         p: p,
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-          Row(children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(14),
-              child: SizedBox(
-                width: 62,
-                height: 78,
-                child: StorageImage(widget.imagePath, fit: BoxFit.cover),
-              ),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('A line about this week?',
-                    style: pvFraunces(
-                        fontSize: 19, fontWeight: FontWeight.w600, letterSpacing: -0.4, color: p.ink1)),
-                const SizedBox(height: 4),
-                Text('You can skip it.', style: pvManrope(fontSize: 13, color: p.ink2)),
-              ]),
-            ),
-          ]),
-          const SizedBox(height: 16),
-          Container(
-            height: 46,
-            padding: const EdgeInsets.symmetric(horizontal: 14),
-            decoration: BoxDecoration(
-              color: p.surface,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: p.line),
-            ),
-            child: TextField(
-              controller: _c,
-              autofocus: true,
-              style: pvManrope(fontSize: 14, color: p.ink1),
-              decoration: InputDecoration(
-                isDense: true,
-                filled: false,
-                border: InputBorder.none,
-                enabledBorder: InputBorder.none,
-                focusedBorder: InputBorder.none,
-                hintText: "Anything you'll want to remember",
-                hintStyle: pvManrope(fontSize: 14, color: p.ink3),
-              ),
-            ),
-          ),
-          const SizedBox(height: 10),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              for (final s in _captionSuggestions)
-                GestureDetector(
-                  onTap: () => setState(() => _c.text = s),
-                  behavior: HitTestBehavior.opaque,
-                  child: Container(
-                    height: 32,
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    decoration: BoxDecoration(
-                      color: p.surface,
-                      borderRadius: BorderRadius.circular(999),
-                      border: Border.all(color: p.line),
-                    ),
-                    child: Row(mainAxisSize: MainAxisSize.min, children: [
-                      Text(s, style: pvManrope(fontSize: 12.5, color: p.ink2)),
-                    ]),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(14),
+                  child: SizedBox(
+                    width: 62,
+                    height: 78,
+                    child: StorageImage(widget.imagePath, fit: BoxFit.cover),
                   ),
                 ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(children: [
-            Expanded(
-              child: _WideHairlineButton(
-                  p: p, label: 'Save', strong: true,
-                  onTap: () => Navigator.of(context).pop(_c.text.trim())),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'A line about this week?',
+                        style: pvFraunces(
+                          fontSize: 19,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: -0.4,
+                          color: p.ink1,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'You can skip it.',
+                        style: pvManrope(fontSize: 13, color: p.ink2),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: _WideHairlineButton(
-                  p: p, label: 'Skip', strong: false,
-                  onTap: () => Navigator.of(context).pop('')),
+            const SizedBox(height: 16),
+            Container(
+              height: 46,
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              decoration: BoxDecoration(
+                color: p.surface,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: p.line),
+              ),
+              child: TextField(
+                controller: _c,
+                autofocus: true,
+                style: pvManrope(fontSize: 14, color: p.ink1),
+                decoration: InputDecoration(
+                  isDense: true,
+                  filled: false,
+                  border: InputBorder.none,
+                  enabledBorder: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                  hintText: "Anything you'll want to remember",
+                  hintStyle: pvManrope(fontSize: 14, color: p.ink3),
+                ),
+              ),
             ),
-          ]),
-        ]),
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                for (final s in _captionSuggestions)
+                  GestureDetector(
+                    onTap: () => setState(() => _c.text = s),
+                    behavior: HitTestBehavior.opaque,
+                    child: Container(
+                      height: 32,
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      decoration: BoxDecoration(
+                        color: p.surface,
+                        borderRadius: BorderRadius.circular(999),
+                        border: Border.all(color: p.line),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            s,
+                            style: pvManrope(fontSize: 12.5, color: p.ink2),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: _WideHairlineButton(
+                    p: p,
+                    label: 'Save',
+                    strong: true,
+                    onTap: () => Navigator.of(context).pop(_c.text.trim()),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _WideHairlineButton(
+                    p: p,
+                    label: 'Skip',
+                    strong: false,
+                    onTap: () => Navigator.of(context).pop(''),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
 class _WideHairlineButton extends StatelessWidget {
-  const _WideHairlineButton(
-      {required this.p, required this.label, required this.strong, required this.onTap, this.color});
+  const _WideHairlineButton({
+    required this.p,
+    required this.label,
+    required this.strong,
+    required this.onTap,
+    this.color,
+  });
   final V2Palette p;
   final String label;
   final bool strong;
@@ -1080,21 +1624,29 @@ class _WideHairlineButton extends StatelessWidget {
   final Color? color;
   @override
   Widget build(BuildContext context) => GestureDetector(
-        onTap: onTap,
-        behavior: HitTestBehavior.opaque,
-        child: Container(
-          height: 44,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: p.surface,
-            borderRadius: BorderRadius.circular(999),
-            border: Border.all(color: strong ? p.ink1 : p.line, width: strong ? 1.2 : 1),
-          ),
-          child: Text(label,
-              style: pvManrope(
-                  fontSize: 13.5, fontWeight: FontWeight.w700, color: color ?? (strong ? p.ink1 : p.ink2))),
+    onTap: onTap,
+    behavior: HitTestBehavior.opaque,
+    child: Container(
+      height: 44,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: p.surface,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(
+          color: strong ? p.ink1 : p.line,
+          width: strong ? 1.2 : 1,
         ),
-      );
+      ),
+      child: Text(
+        label,
+        style: pvManrope(
+          fontSize: 13.5,
+          fontWeight: FontWeight.w700,
+          color: color ?? (strong ? p.ink1 : p.ink2),
+        ),
+      ),
+    ),
+  );
 }
 
 // -----------------------------------------------------------------------------
@@ -1122,23 +1674,30 @@ class _PhotoScreenState extends State<_PhotoScreen> {
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
-        animation: BumpStore.instance,
-        builder: (context, _) {
-          final p = widget.p;
-          final photo = BumpStore.instance.photos.where((x) => x.id == widget.id).firstOrNull;
-          if (photo == null) {
-            // Deleted underneath us — go back rather than draw a blank.
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (mounted) Navigator.of(context).maybePop();
-            });
-            return Scaffold(backgroundColor: p.ground);
-          }
-          final moment = kBumpMoments.where((m) => m.week == photo.weekNumber).firstOrNull;
+    animation: BumpStore.instance,
+    builder: (context, _) {
+      final p = widget.p;
+      final photo = BumpStore.instance.photos
+          .where((x) => x.id == widget.id)
+          .firstOrNull;
+      if (photo == null) {
+        // Deleted underneath us — go back rather than draw a blank.
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) Navigator.of(context).maybePop();
+        });
+        return Scaffold(backgroundColor: p.ground);
+      }
+      final moment = kBumpMoments
+          .where((m) => m.week == photo.weekNumber)
+          .firstOrNull;
 
-          return Scaffold(
-            backgroundColor: p.ground,
-            body: ListView(padding: EdgeInsets.zero, children: [
-              Stack(children: [
+      return Scaffold(
+        backgroundColor: p.ground,
+        body: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            Stack(
+              children: [
                 SizedBox(
                   height: 430,
                   width: double.infinity,
@@ -1160,37 +1719,64 @@ class _PhotoScreenState extends State<_PhotoScreen> {
                         shape: BoxShape.circle,
                         border: Border.all(color: p.line),
                       ),
-                      child: Icon(Icons.arrow_back_rounded, size: 18, color: p.ink1),
+                      child: Icon(
+                        Icons.arrow_back_rounded,
+                        size: 18,
+                        color: p.ink1,
+                      ),
                     ),
                   ),
                 ),
-              ]),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(18, 22, 18, 26),
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Row(crossAxisAlignment: CrossAxisAlignment.baseline, textBaseline: TextBaseline.alphabetic, children: [
-                    Text('Week ${photo.weekNumber}',
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(18, 22, 18, 26),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
+                    children: [
+                      Text(
+                        'Week ${photo.weekNumber}',
                         style: pvFraunces(
-                            fontSize: 22, fontWeight: FontWeight.w600, letterSpacing: -0.5, color: p.ink1)),
-                    const SizedBox(width: 10),
-                    Text('${bumpDate(photo.date)} ${photo.date.year}',
-                        style: pvManrope(fontSize: 12, color: p.ink3)),
-                  ]),
+                          fontSize: 22,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: -0.5,
+                          color: p.ink1,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        '${bumpDate(photo.date)} ${photo.date.year}',
+                        style: pvManrope(fontSize: 12, color: p.ink3),
+                      ),
+                    ],
+                  ),
                   if (moment != null) ...[
                     const SizedBox(height: 6),
-                    Text('${moment.passedTitle} ${moment.passedLine}',
-                        style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2)),
+                    Text(
+                      '${moment.passedTitle} ${moment.passedLine}',
+                      style: pvManrope(
+                        fontSize: 13,
+                        height: 1.5,
+                        color: p.ink2,
+                      ),
+                    ),
                   ],
                   const SizedBox(height: 16),
                   if (!_editing)
                     Text(
-                        photo.caption.trim().isEmpty
-                            ? 'No caption — that is fine too.'
-                            : photo.caption,
-                        style: pvManrope(
-                            fontSize: 14.5,
-                            height: 1.55,
-                            color: photo.caption.trim().isEmpty ? p.ink3 : p.ink1))
+                      photo.caption.trim().isEmpty
+                          ? 'No caption — that is fine too.'
+                          : photo.caption,
+                      style: pvManrope(
+                        fontSize: 14.5,
+                        height: 1.55,
+                        color: photo.caption.trim().isEmpty ? p.ink3 : p.ink1,
+                      ),
+                    )
                   else ...[
                     Container(
                       height: 46,
@@ -1214,31 +1800,46 @@ class _PhotoScreenState extends State<_PhotoScreen> {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    Row(children: [
-                      Expanded(
-                        child: _WideHairlineButton(
-                            p: p, label: 'Save', strong: true,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _WideHairlineButton(
+                            p: p,
+                            label: 'Save',
+                            strong: true,
                             onTap: () async {
-                              await BumpStore.instance.updateCaption(photo.id, _draft.text.trim());
+                              await BumpStore.instance.updateCaption(
+                                photo.id,
+                                _draft.text.trim(),
+                              );
                               if (mounted) setState(() => _editing = false);
-                            }),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: _WideHairlineButton(
-                            p: p, label: 'Cancel', strong: false,
-                            onTap: () => setState(() => _editing = false)),
-                      ),
-                    ]),
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: _WideHairlineButton(
+                            p: p,
+                            label: 'Cancel',
+                            strong: false,
+                            onTap: () => setState(() => _editing = false),
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                   const SizedBox(height: 16),
                   Container(height: 1, color: p.line),
                   if (!_confirm) ...[
                     _Action(
                       p: p,
-                      icon: photo.isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                      icon: photo.isFavorite
+                          ? Icons.favorite_rounded
+                          : Icons.favorite_border_rounded,
                       iconColor: photo.isFavorite ? p.ink1 : p.ink2,
-                      label: photo.isFavorite ? 'Favourited' : 'Favourite this week',
+                      label: photo.isFavorite
+                          ? 'Favourited'
+                          : 'Favourite this week',
                       onTap: () => BumpStore.instance.toggleFavorite(photo.id),
                     ),
                     _Action(
@@ -1265,41 +1866,72 @@ class _PhotoScreenState extends State<_PhotoScreen> {
                     ),
                   ] else ...[
                     const SizedBox(height: 16),
-                    Text('Delete week ${photo.weekNumber}?',
-                        style: pvFraunces(
-                            fontSize: 16.5, fontWeight: FontWeight.w600, letterSpacing: -0.3, color: p.ink1)),
+                    Text(
+                      'Delete week ${photo.weekNumber}?',
+                      style: pvFraunces(
+                        fontSize: 16.5,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: -0.3,
+                        color: p.ink1,
+                      ),
+                    ),
                     const SizedBox(height: 4),
-                    Text("It leaves your book and your journal. This can't be undone.",
-                        style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2)),
+                    Text(
+                      "It leaves your book and your journal. This can't be undone.",
+                      style: pvManrope(
+                        fontSize: 13,
+                        height: 1.5,
+                        color: p.ink2,
+                      ),
+                    ),
                     const SizedBox(height: 12),
-                    Row(children: [
-                      Expanded(
-                        child: _WideHairlineButton(
-                            p: p, label: 'Delete', strong: true, color: kPvUrgentInk,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _WideHairlineButton(
+                            p: p,
+                            label: 'Delete',
+                            strong: true,
+                            color: kPvUrgentInk,
                             onTap: () async {
                               await BumpStore.instance.delete(photo.id);
-                              if (context.mounted) Navigator.of(context).maybePop();
-                            }),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: _WideHairlineButton(
-                            p: p, label: 'Keep it', strong: false,
-                            onTap: () => setState(() => _confirm = false)),
-                      ),
-                    ]),
+                              if (context.mounted) {
+                                Navigator.of(context).maybePop();
+                              }
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: _WideHairlineButton(
+                            p: p,
+                            label: 'Keep it',
+                            strong: false,
+                            onTap: () => setState(() => _confirm = false),
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
-                ]),
+                ],
               ),
-            ]),
-          );
-        },
+            ),
+          ],
+        ),
       );
+    },
+  );
 }
 
 class _Action extends StatelessWidget {
-  const _Action(
-      {required this.p, required this.icon, required this.iconColor, required this.label, required this.onTap, this.labelColor});
+  const _Action({
+    required this.p,
+    required this.icon,
+    required this.iconColor,
+    required this.label,
+    required this.onTap,
+    this.labelColor,
+  });
   final V2Palette p;
   final IconData icon;
   final Color iconColor;
@@ -1308,18 +1940,26 @@ class _Action extends StatelessWidget {
   final VoidCallback onTap;
   @override
   Widget build(BuildContext context) => GestureDetector(
-        onTap: onTap,
-        behavior: HitTestBehavior.opaque,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 13),
-          child: Row(children: [
-            Icon(icon, size: 20, color: iconColor),
-            const SizedBox(width: 12),
-            Text(label,
-                style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w700, color: labelColor ?? p.ink1)),
-          ]),
-        ),
-      );
+    onTap: onTap,
+    behavior: HitTestBehavior.opaque,
+    child: Padding(
+      padding: const EdgeInsets.symmetric(vertical: 13),
+      child: Row(
+        children: [
+          Icon(icon, size: 20, color: iconColor),
+          const SizedBox(width: 12),
+          Text(
+            label,
+            style: pvManrope(
+              fontSize: 13.5,
+              fontWeight: FontWeight.w700,
+              color: labelColor ?? p.ink1,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
 }
 
 // -----------------------------------------------------------------------------
@@ -1338,7 +1978,11 @@ class _Action extends StatelessWidget {
 //  which is not true here. Both are white with the same ink hairline.
 
 class _ThenNowScreen extends StatefulWidget {
-  const _ThenNowScreen({required this.p, required this.initialLeft, required this.initialRight});
+  const _ThenNowScreen({
+    required this.p,
+    required this.initialLeft,
+    required this.initialRight,
+  });
   final V2Palette p;
   final String initialLeft;
   final String initialRight;
@@ -1356,15 +2000,16 @@ class _ThenNowScreenState extends State<_ThenNowScreen> {
     if (_busy) return;
     setState(() => _busy = true);
     try {
-      final boundary = _pair.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+      final boundary =
+          _pair.currentContext?.findRenderObject() as RenderRepaintBoundary?;
       if (boundary == null) return;
       final img = await boundary.toImage(pixelRatio: 3);
       final bytes = await img.toByteData(format: ui.ImageByteFormat.png);
       if (bytes == null) return;
       final data = Uint8List.view(bytes.buffer);
-      await Share.shareXFiles(
-        [XFile.fromData(data, mimeType: 'image/png', name: 'then-and-now.png')],
-      );
+      await Share.shareXFiles([
+        XFile.fromData(data, mimeType: 'image/png', name: 'then-and-now.png'),
+      ]);
     } catch (_) {
       // The share sheet failing is not worth an error screen.
     } finally {
@@ -1374,34 +2019,41 @@ class _ThenNowScreenState extends State<_ThenNowScreen> {
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
-        animation: BumpStore.instance,
-        builder: (context, _) {
-          final p = widget.p;
-          final photos = BumpStore.instance.photos;
-          final left = photos.where((x) => x.id == _left).firstOrNull ?? photos.first;
-          final right = photos.where((x) => x.id == _right).firstOrNull ?? photos.last;
+    animation: BumpStore.instance,
+    builder: (context, _) {
+      final p = widget.p;
+      final photos = BumpStore.instance.photos;
+      final left =
+          photos.where((x) => x.id == _left).firstOrNull ?? photos.first;
+      final right =
+          photos.where((x) => x.id == _right).firstOrNull ?? photos.last;
 
-          return Scaffold(
-            backgroundColor: p.ground,
-            body: SafeArea(
-              child: Column(children: [
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(18, 8, 18, 12),
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      return Scaffold(
+        backgroundColor: p.ground,
+        body: SafeArea(
+          child: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(18, 8, 18, 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                       _BackButton(p: p),
                       const SizedBox(height: 18),
                       _Eyebrow('Then & Now', p: p),
                       const SizedBox(height: 6),
                       Text(
-                          left.weekNumber == right.weekNumber
-                              ? 'Week ${left.weekNumber}, twice'
-                              : 'Week ${left.weekNumber} and week ${right.weekNumber}',
-                          style: pvFraunces(
-                              fontSize: 22,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: -0.5,
-                              color: p.ink1)),
+                        left.weekNumber == right.weekNumber
+                            ? 'Week ${left.weekNumber}, twice'
+                            : 'Week ${left.weekNumber} and week ${right.weekNumber}',
+                        style: pvFraunces(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: -0.5,
+                          color: p.ink1,
+                        ),
+                      ),
                       const SizedBox(height: 16),
                       // What she sees is what she gets.
                       RepaintBoundary(
@@ -1409,37 +2061,60 @@ class _ThenNowScreenState extends State<_ThenNowScreen> {
                         child: _PairCard(p: p, left: left, right: right),
                       ),
                       const SizedBox(height: 22),
-                      _Chips(p: p, label: 'Then', photos: photos, selected: _left,
-                          onPick: (id) => setState(() => _left = id)),
+                      _Chips(
+                        p: p,
+                        label: 'Then',
+                        photos: photos,
+                        selected: _left,
+                        onPick: (id) => setState(() => _left = id),
+                      ),
                       const SizedBox(height: 14),
-                      _Chips(p: p, label: 'Now', photos: photos, selected: _right,
-                          onPick: (id) => setState(() => _right = id)),
-                    ]),
+                      _Chips(
+                        p: p,
+                        label: 'Now',
+                        photos: photos,
+                        selected: _right,
+                        onPick: (id) => setState(() => _right = id),
+                      ),
+                    ],
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(18, 8, 18, 14),
-                  child: Row(children: [
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(18, 8, 18, 14),
+                child: Row(
+                  children: [
                     Expanded(
                       child: _WideHairlineButton(
-                          p: p, label: 'Full screen', strong: true,
-                          onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
-                                builder: (_) => _FullScreenPair(p: p, left: left, right: right),
-                              ))),
+                        p: p,
+                        label: 'Full screen',
+                        strong: true,
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (_) =>
+                                _FullScreenPair(p: p, left: left, right: right),
+                          ),
+                        ),
+                      ),
                     ),
                     const SizedBox(width: 10),
                     Expanded(
                       child: _WideHairlineButton(
-                          p: p, label: _busy ? 'Saving…' : 'Save as one image', strong: true,
-                          onTap: _saveAsImage),
+                        p: p,
+                        label: _busy ? 'Saving…' : 'Save as one image',
+                        strong: true,
+                        onTap: _saveAsImage,
+                      ),
                     ),
-                  ]),
+                  ],
                 ),
-              ]),
-            ),
-          );
-        },
+              ),
+            ],
+          ),
+        ),
       );
+    },
+  );
 }
 
 /// The keepsake itself: a white card, two photos, their weeks and dates, and
@@ -1451,38 +2126,53 @@ class _PairCard extends StatelessWidget {
   final BumpPhoto right;
   @override
   Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.fromLTRB(12, 12, 12, 14),
-        decoration: BoxDecoration(
-          color: p.surface,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: p.line),
-        ),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [
-            Expanded(child: _Half(p: p, photo: left, tag: 'Then')),
+    padding: const EdgeInsets.fromLTRB(12, 12, 12, 14),
+    decoration: BoxDecoration(
+      color: p.surface,
+      borderRadius: BorderRadius.circular(20),
+      border: Border.all(color: p.line),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: _Half(p: p, photo: left, tag: 'Then'),
+            ),
             const SizedBox(width: 10),
-            Expanded(child: _Half(p: p, photo: right, tag: 'Now')),
-          ]),
-          const SizedBox(height: 12),
-          Container(height: 1, color: p.line),
-          const SizedBox(height: 10),
-          Row(children: [
+            Expanded(
+              child: _Half(p: p, photo: right, tag: 'Now'),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Container(height: 1, color: p.line),
+        const SizedBox(height: 10),
+        Row(
+          children: [
             Expanded(
               child: Text(
-                  left.weekNumber == right.weekNumber
-                      ? 'Week ${left.weekNumber}, ${bumpDate(left.date)} and ${bumpDate(right.date)}'
-                      : '${right.weekNumber - left.weekNumber} weeks apart',
-                  style: pvManrope(fontSize: 12, height: 1.4, color: p.ink2)),
+                left.weekNumber == right.weekNumber
+                    ? 'Week ${left.weekNumber}, ${bumpDate(left.date)} and ${bumpDate(right.date)}'
+                    : '${right.weekNumber - left.weekNumber} weeks apart',
+                style: pvManrope(fontSize: 12, height: 1.4, color: p.ink2),
+              ),
             ),
-            Text('PARENTVEDA',
-                style: pvManrope(
-                    fontSize: 9.5,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1.2,
-                    color: p.ink3)),
-          ]),
-        ]),
-      );
+            Text(
+              'PARENTVEDA',
+              style: pvManrope(
+                fontSize: 9.5,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1.2,
+                color: p.ink3,
+              ),
+            ),
+          ],
+        ),
+      ],
+    ),
+  );
 }
 
 class _Half extends StatelessWidget {
@@ -1491,10 +2181,14 @@ class _Half extends StatelessWidget {
   final BumpPhoto photo;
   final String tag;
   @override
-  Widget build(BuildContext context) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        AspectRatio(
-          aspectRatio: 3 / 4,
-          child: Stack(fit: StackFit.expand, children: [
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      AspectRatio(
+        aspectRatio: 3 / 4,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(14),
               child: ColoredBox(
@@ -1512,51 +2206,75 @@ class _Half extends StatelessWidget {
                   color: Colors.white.withValues(alpha: 0.92),
                   borderRadius: BorderRadius.circular(999),
                 ),
-                child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  Text(tag.toUpperCase(),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      tag.toUpperCase(),
                       style: pvManrope(
-                          fontSize: 9.5,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 1.1,
-                          color: p.ink1)),
-                ]),
+                        fontSize: 9.5,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 1.1,
+                        color: p.ink1,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ]),
+          ],
         ),
-        const SizedBox(height: 8),
-        Text('Week ${photo.weekNumber}',
-            style: pvFraunces(
-                fontSize: 15.5, fontWeight: FontWeight.w600, letterSpacing: -0.3, color: p.ink1)),
-        const SizedBox(height: 1),
-        Text(bumpDate(photo.date), style: pvManrope(fontSize: 11.5, color: p.ink3)),
-      ]);
+      ),
+      const SizedBox(height: 8),
+      Text(
+        'Week ${photo.weekNumber}',
+        style: pvFraunces(
+          fontSize: 15.5,
+          fontWeight: FontWeight.w600,
+          letterSpacing: -0.3,
+          color: p.ink1,
+        ),
+      ),
+      const SizedBox(height: 1),
+      Text(
+        bumpDate(photo.date),
+        style: pvManrope(fontSize: 11.5, color: p.ink3),
+      ),
+    ],
+  );
 }
 
 class _BackButton extends StatelessWidget {
   const _BackButton({required this.p});
   final V2Palette p;
   @override
-  Widget build(BuildContext context) => Row(children: [
-        GestureDetector(
-          onTap: () => Navigator.of(context).maybePop(),
-          child: Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.9),
-              shape: BoxShape.circle,
-              border: Border.all(color: p.line),
-            ),
-            child: Icon(Icons.arrow_back_rounded, size: 18, color: p.ink1),
+  Widget build(BuildContext context) => Row(
+    children: [
+      GestureDetector(
+        onTap: () => Navigator.of(context).maybePop(),
+        child: Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.9),
+            shape: BoxShape.circle,
+            border: Border.all(color: p.line),
           ),
+          child: Icon(Icons.arrow_back_rounded, size: 18, color: p.ink1),
         ),
-      ]);
+      ),
+    ],
+  );
 }
 
 class _Chips extends StatelessWidget {
-  const _Chips(
-      {required this.p, required this.label, required this.photos, required this.selected, required this.onPick});
+  const _Chips({
+    required this.p,
+    required this.label,
+    required this.photos,
+    required this.selected,
+    required this.onPick,
+  });
   final V2Palette p;
   final String label;
   final List<BumpPhoto> photos;
@@ -1572,64 +2290,88 @@ class _Chips extends StatelessWidget {
     String chipLabel(BumpPhoto x) => dup(x.weekNumber)
         ? 'Wk ${x.weekNumber} · ${x.date.day} ${_monthsShort[x.date.month - 1]}'
         : 'Wk ${x.weekNumber}';
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(label, style: pvManrope(fontSize: 12, fontWeight: FontWeight.w700, color: p.ink3)),
-      const SizedBox(height: 8),
-      Wrap(
-        spacing: 8,
-        runSpacing: 8,
-        children: [
-          for (final x in photos)
-            GestureDetector(
-              onTap: () => onPick(x.id),
-              behavior: HitTestBehavior.opaque,
-              child: Container(
-                height: 32,
-                padding: const EdgeInsets.symmetric(horizontal: 13),
-                // A selected chip is the one ink, white words (2026-09-30).
-                // Kept for revert: a v2BlockTint(kBumpRitualHue) fill with an
-                // ink1 1.2 border and ink words.
-                decoration: BoxDecoration(
-                  color: x.id == selected ? kPvInk : p.surface,
-                  borderRadius: BorderRadius.circular(999),
-                  border: Border.all(
-                      color: x.id == selected ? kPvInk : p.line, width: x.id == selected ? 1.2 : 1),
-                ),
-                child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  Text(chipLabel(x),
-                      style: pvManrope(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: pvManrope(
+            fontSize: 12,
+            fontWeight: FontWeight.w700,
+            color: p.ink3,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            for (final x in photos)
+              GestureDetector(
+                onTap: () => onPick(x.id),
+                behavior: HitTestBehavior.opaque,
+                child: Container(
+                  height: 32,
+                  padding: const EdgeInsets.symmetric(horizontal: 13),
+                  // A selected chip is the one ink, white words (2026-09-30).
+                  // Kept for revert: a v2BlockTint(kBumpRitualHue) fill with an
+                  // ink1 1.2 border and ink words.
+                  decoration: BoxDecoration(
+                    color: x.id == selected ? kPvInk : p.surface,
+                    borderRadius: BorderRadius.circular(999),
+                    border: Border.all(
+                      color: x.id == selected ? kPvInk : p.line,
+                      width: x.id == selected ? 1.2 : 1,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        chipLabel(x),
+                        style: pvManrope(
                           fontSize: 12.5,
-                          fontWeight: x.id == selected ? FontWeight.w700 : FontWeight.w600,
-                          color: x.id == selected ? Colors.white : p.ink2)),
-                ]),
+                          fontWeight: x.id == selected
+                              ? FontWeight.w700
+                              : FontWeight.w600,
+                          color: x.id == selected ? Colors.white : p.ink2,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            ),
-        ],
-      ),
-    ]);
+          ],
+        ),
+      ],
+    );
   }
 }
 
 /// The same card, large, on a dark ground. Tap anywhere to come back.
 class _FullScreenPair extends StatelessWidget {
-  const _FullScreenPair({required this.p, required this.left, required this.right});
+  const _FullScreenPair({
+    required this.p,
+    required this.left,
+    required this.right,
+  });
   final V2Palette p;
   final BumpPhoto left;
   final BumpPhoto right;
   @override
   Widget build(BuildContext context) => Scaffold(
-        backgroundColor: const Color(0xFF1B1820),
-        body: GestureDetector(
-          onTap: () => Navigator.of(context).maybePop(),
-          behavior: HitTestBehavior.opaque,
-          child: SafeArea(
-            child: Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(18),
-                child: _PairCard(p: p, left: left, right: right),
-              ),
-            ),
+    backgroundColor: const Color(0xFF1B1820),
+    body: GestureDetector(
+      onTap: () => Navigator.of(context).maybePop(),
+      behavior: HitTestBehavior.opaque,
+      child: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(18),
+            child: _PairCard(p: p, left: left, right: right),
           ),
         ),
-      );
+      ),
+    ),
+  );
 }

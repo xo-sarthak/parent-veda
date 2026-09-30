@@ -30,6 +30,7 @@ import '../brackets/hub/hub_intent_art.dart';
 import '../doors/pv_door_chrome.dart' show kPvUrgentInk;
 import '../doors/pv_list_row.dart' show PvMarkWell;
 import '../pregnancy/preg_chrome.dart';
+import '../pregnancy/preg_tool_chrome.dart';
 import '../products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 
 /// The Tools tab's "Track" hue, so the marks here match the row she tapped.
@@ -171,118 +172,110 @@ class _KegelCareScreenState extends State<KegelCareScreen> {
   Widget build(BuildContext context) {
     final s = _s;
     final p = pvStorePalette;
-    return Scaffold(
-      // One ParentVeda: the app bar carries only the back arrow; the title is
-      // the serif at the top of the page, and Care Journey is a row below.
-      // Kept for revert:
-      // appBar: AppBar(title: Text(s.kegelToolTitle), actions: [
-      //   TextButton.icon(onPressed: <push _CareJourneyScreen>,
-      //       icon: const Icon(Icons.favorite_rounded, size: 18),
-      //       label: Text(s.careJourneyCta)),
-      //   const SizedBox(width: 6),
-      // ]),
-      appBar: AppBar(),
-      body: AnimatedBuilder(
-        animation: _store,
-        builder: (context, _) {
-          final r = _routineFor(widget.controller.currentWeek);
-          return ListView(
-            padding: const EdgeInsets.fromLTRB(18, 4, 18, 32),
-            children: [
-              _pageTitle(s.kegelToolTitle),
-              const SizedBox(height: 20),
-              // Hero ("Pelvic Floor Care") removed per request - its intro now
-              // lives inside the "Why am I doing this?" collapsible below.
-              // INTRODUCTION - split into three small titled cards (was a single
-              // collapsible "What is a Kegel & how to do it"):
-              //   1. What is Kegel?   2. Why should I do Kegel?   3. How to do Kegel?
-              // NOTE (i18n): section titles + the "How" step copy are literal
-              // English here because this screen-only change may not touch
-              // app_language.dart; the bodies reuse existing bilingual strings
-              // where they fit (kegelHowBody, whyAmIDoingThisBody).
-              _IntroCard(
-                title: S.now.uiWhatKegel,
-                body:
-                    'A Kegel is a simple exercise that squeezes and lifts the '
-                    'pelvic-floor muscles - the sling of muscles supporting your '
-                    'bladder, bowel and uterus - and then fully relaxes them. '
-                    'During pregnancy these muscles carry extra weight, so keeping '
-                    'them working well matters.',
-              ),
-              const SizedBox(height: 12),
-              _IntroCard(
-                title: S.now.uiWhyShouldIDo,
-                body: s.whyAmIDoingThisBody,
-              ),
-              const SizedBox(height: 12),
-              _IntroCard(
-                title: S.now.uiHowDoKegel,
-                body: s.kegelHowBody,
-                // One ParentVeda, rule 9 (no placeholder images): the 16:9
-                // gradient box with a play disc is now a quiet line saying the
-                // same thing. Kept for revert: footer: _videoPlaceholder(context, s),
-                footer: Padding(
-                  padding: const EdgeInsets.only(top: 12),
-                  child: PregNote(S.now.uiAnimatedGuideComingSoon,
-                      icon: Icons.play_circle_outline_rounded),
+    // FRONT PAGE ON THE TOOL SHELL (2026-09-30, Tools audit). WH: she opens this
+    // to DO her routine, so the routine and its Start button lead, straight under
+    // the hero. The three explainer cards (what / why / how) used to come first
+    // and made her read before she could begin; they now sit under a heading
+    // below, for the visit when she wants them.
+    // Kept for revert: Scaffold(appBar: AppBar(), body: ListView([_pageTitle(
+    //   s.kegelToolTitle), _IntroCard x3, routine card, Care Journey row,
+    //   _Expandable, _SafetyWarning])).
+    return AnimatedBuilder(
+      animation: _store,
+      builder: (context, _) {
+        final r = _routineFor(widget.controller.currentWeek);
+        return PregToolScaffold(
+          hue: _kKegelHue,
+          eyebrow: 'Track',
+          title: s.kegelToolTitle,
+          mark: IntentMark.lotusMark,
+          intro: 'A gentle pelvic floor routine for your stage of pregnancy. '
+              'It is self-care, not treatment, and your doctor\'s advice comes first.',
+          children: [
+            pregToolPad(Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Current routine, with the Edit and the Start session button.
+                _currentRoutineCard(context, s, r),
+                const SizedBox(height: 14),
+                // Care Journey (was the app bar's action): a row that opens
+                // somewhere, so a drawn mark, a name and one line.
+                PregRowCard(children: [
+                  PregOfferRow(
+                    key: const ValueKey('kegel_care_journey_row'),
+                    mark: IntentMark.chartLog,
+                    hue: _kKegelHue,
+                    title: s.careJourneyCta,
+                    line: 'Your stage, your sessions and how each one felt',
+                    onTap: _openCareJourney,
+                  ),
+                ]),
+                const SizedBox(height: 28),
+                // INTRODUCTION - three small titled cards: What / Why / How.
+                // NOTE (i18n): section titles + the "How" step copy are literal
+                // English here; the bodies reuse existing bilingual strings
+                // where they fit (kegelHowBody, whyAmIDoingThisBody).
+                const PregSectionHeading('How a Kegel works'),
+                const SizedBox(height: 12),
+                _IntroCard(
+                  title: S.now.uiWhatKegel,
+                  body:
+                      'A Kegel is a simple exercise that squeezes and lifts the '
+                      'pelvic-floor muscles - the sling of muscles supporting your '
+                      'bladder, bowel and uterus - and then fully relaxes them. '
+                      'During pregnancy these muscles carry extra weight, so keeping '
+                      'them working well matters.',
                 ),
-              ),
-              const SizedBox(height: 14),
-              // Current routine - now contains the ℹ️ "Why this routine?", the
-              // Edit ✏️ (Customize), and the Start session button.
-              _currentRoutineCard(context, s, r),
-              const SizedBox(height: 14),
-              // Care Journey (was the app bar's action): a row that opens
-              // somewhere, so a drawn mark, a name and one line.
-              PregRowCard(children: [
-                PregOfferRow(
-                  key: const ValueKey('kegel_care_journey_row'),
-                  mark: IntentMark.chartLog,
-                  hue: _kKegelHue,
-                  title: s.careJourneyCta,
-                  line: 'Your stage, your sessions and how each one felt',
-                  onTap: _openCareJourney,
+                const SizedBox(height: 12),
+                _IntroCard(
+                  title: S.now.uiWhyShouldIDo,
+                  body: s.whyAmIDoingThisBody,
                 ),
-              ]),
-              const SizedBox(height: 14),
-              // "Why this routine?" box removed - it opens from the ℹ️ in the
-              // card. Standalone "Start Care Session" button removed - now in card.
-              // Why am I doing this? - now holds the Pelvic Floor Care intro
-              // (its old text dropped).
-              _Expandable(
-                title: s.whyAmIDoingThis,
-                expanded: _whyExpanded,
-                onToggle: () => setState(() => _whyExpanded = !_whyExpanded),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(s.kegelHeroBody, style: _bodyStyle()),
-                      const SizedBox(height: 10),
-                      _benefit(s.kegelBenefitBladder),
-                      _benefit(s.kegelBenefitSupport),
-                      _benefit(s.kegelBenefitRecovery),
-                      const SizedBox(height: 8),
-                      Text(s.kegelFollowProvider,
-                          style: pvManrope(
-                              fontSize: 12.5, height: 1.45, color: p.ink3)),
-                    ]),
-              ),
-              const SizedBox(height: 28),
-              // Safety - the warning form (DESIGN-SYSTEM §4.0 addendum): an ink
-              // rule, the heading in the serif, the lines with one coral dot
-              // each. Same lines, same place, no tinted box. Kept for revert:
-              // an amber box (0xFFFFF4E5, border 0x66E08A2B at 1.4) with a
-              // warning_amber icon (0xFFC9700F) and the title in 0xFFA85B0C.
-              _SafetyWarning(title: s.kegelSafetyTitle, lines: [
-                s.kegelSafetyPain,
-                s.kegelSafetyBleeding,
-                s.kegelSafetyDizziness,
-                s.kegelSafetyContractions,
-              ]),
-            ],
-          );
-        },
-      ),
+                const SizedBox(height: 12),
+                _IntroCard(
+                  title: S.now.uiHowDoKegel,
+                  body: s.kegelHowBody,
+                  // Rule 9 (no placeholder images): a quiet line. Kept for
+                  // revert: footer: _videoPlaceholder(context, s),
+                  footer: Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: PregNote(S.now.uiAnimatedGuideComingSoon,
+                        icon: Icons.play_circle_outline_rounded),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                _Expandable(
+                  title: s.whyAmIDoingThis,
+                  expanded: _whyExpanded,
+                  onToggle: () => setState(() => _whyExpanded = !_whyExpanded),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(s.kegelHeroBody, style: _bodyStyle()),
+                        const SizedBox(height: 10),
+                        _benefit(s.kegelBenefitBladder),
+                        _benefit(s.kegelBenefitSupport),
+                        _benefit(s.kegelBenefitRecovery),
+                        const SizedBox(height: 8),
+                        Text(s.kegelFollowProvider,
+                            style: pvManrope(
+                                fontSize: 12.5, height: 1.45, color: p.ink3)),
+                      ]),
+                ),
+                const SizedBox(height: 28),
+                // Safety - the warning form (DESIGN-SYSTEM §4.0 addendum): an ink
+                // rule, the heading in the serif, one coral dot a line.
+                _SafetyWarning(title: s.kegelSafetyTitle, lines: [
+                  s.kegelSafetyPain,
+                  s.kegelSafetyBleeding,
+                  s.kegelSafetyDizziness,
+                  s.kegelSafetyContractions,
+                ]),
+              ],
+            )),
+          ],
+        );
+      },
     );
   }
 
@@ -333,7 +326,10 @@ class _KegelCareScreenState extends State<KegelCareScreen> {
       child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(label, style: pvManrope(fontSize: 13.5, color: p.ink2)),
+            Flexible(
+                child: Text(label,
+                    style: pvManrope(fontSize: 13.5, color: p.ink2))),
+            const SizedBox(width: 8),
             Text(value,
                 style: pvManrope(
                     fontSize: 14, fontWeight: FontWeight.w800, color: p.ink1)),
@@ -375,11 +371,11 @@ class _KegelCareScreenState extends State<KegelCareScreen> {
                   child: Row(mainAxisSize: MainAxisSize.min, children: [
                     Icon(Icons.info_outline_rounded, size: 16, color: p.ink2),
                     const SizedBox(width: 5),
-                    Text(s.whyThisRoutine,
+                    Flexible(child: Text(s.whyThisRoutine,
                         style: pvManrope(
                             fontSize: 12.5,
                             fontWeight: FontWeight.w700,
-                            color: p.ink1)),
+                            color: p.ink1))),
                   ]),
                 ),
               ),

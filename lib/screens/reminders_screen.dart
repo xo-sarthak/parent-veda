@@ -29,6 +29,7 @@ import 'brackets/hub/hub_intent_art.dart' show IntentMark;
 import 'doors/pv_list_row.dart' show PvMarkWell;
 import 'pregnancy/preg_chrome.dart';
 import 'pregnancy/preg_messages_screen.dart' show PregMessageSwitches;
+import 'pregnancy/preg_tool_chrome.dart';
 import 'products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 
 /// A quick-add suggestion (its title comes from S so it stays bilingual).
@@ -163,114 +164,124 @@ class RemindersScreen extends StatelessWidget {
     final s = S(controller.language);
     final store = ReminderStore.instance;
     store.init();
-    final pal = pvStorePalette;
-    return Scaffold(
-      backgroundColor: pal.ground,
-      // The AppBar carries the back arrow and the two test controls; the
-      // title is the serif on the page. Kept for revert:
-      //   backgroundColor: AppTheme.scaffoldBackground,
-      //   appBar: AppBar(title: Text(s.rmdTitle), actions: [...]),
-      appBar: AppBar(
-        backgroundColor: pal.ground,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        foregroundColor: pal.ink1,
-        actions: [
-          IconButton(
-            tooltip: S.now.uiSendTestNotificationNow,
-            icon: const Icon(Icons.notifications_active_outlined),
-            onPressed: () async {
-              await NotificationService.instance.requestPermission();
-              await NotificationService.instance.showNow();
-              if (context.mounted) {
-                ScaffoldMessenger.of(context)
-                  ..clearSnackBars()
-                  ..showSnackBar(SnackBar(
-                      content: Text(
-                          S.now.uiTestNotificationSentCheck)));
-              }
-            },
+    // ⚠️ THE FRONT PAGE WEARS THE TOOLS SHELL (2026-09-30, Tools audit).
+    // WH: she opens this to stop holding things in her head (vitamin, water,
+    // Kegels, "read to baby"), usually once at setup and then to tick one off
+    // or change a time. Its one job: her list of nudges, and a one-tap way to
+    // make the first one. So: her reminders (or, while there are none, the
+    // invitation) lead; the quick ideas, which are the fastest way to add,
+    // come next; the notes ParentVeda sends on its own come last. The add
+    // button is the round ink control on the field (it was a floating button
+    // that sat under Ask Veda's). The two developer-looking test buttons that
+    // sat in the app bar are now one quiet "not getting them?" line at the
+    // foot, where a mother who is not receiving notifications will look.
+    // Comparison: Apple Health and Flo reminder lists lead with the list and
+    // a single add control.
+    //
+    // Kept for revert: Scaffold + AppBar(actions: [test notification, schedule
+    // test in 1 min]) + FloatingActionButton.extended(rmdAdd) + the page title
+    // and PregNote(s.rmdScheduleNote) at the top of the ListView (the intro
+    // now says the same thing once).
+    return AnimatedBuilder(
+      animation: store,
+      builder: (context, _) {
+        final items = store.all;
+        return PregToolScaffold(
+          hue: 206,
+          eyebrow: 'Track',
+          title: s.rmdTitle,
+          intro: 'Gentle nudges at the times you choose, for vitamins, water, '
+              'Kegels or anything of your own.',
+          mark: IntentMark.nextStep,
+          action: Semantics(
+            container: true,
+            button: true,
+            label: s.rmdAdd,
+            child: InkWell(
+              key: const ValueKey('reminders_add'),
+              borderRadius: BorderRadius.circular(999),
+              onTap: () => showReminderEditor(context, controller),
+              child: Container(
+                width: 38,
+                height: 38,
+                decoration: const BoxDecoration(color: kPvInk, shape: BoxShape.circle),
+                child: const Icon(Icons.add_rounded, size: 21, color: Colors.white),
+              ),
+            ),
           ),
-          IconButton(
-            tooltip: S.now.uiScheduleTestMinFrom,
-            icon: const Icon(Icons.alarm_add_outlined),
-            onPressed: () async {
-              await NotificationService.instance.requestPermission();
-              // Show what ACTUALLY happened — the scheduled time, or the real
-              // error / the "exact alarms are off" warning. A silent failure is
-              // how a broken reminder goes unnoticed.
-              final result =
-                  await NotificationService.instance.scheduleTestIn1Min();
-              if (context.mounted) {
-                ScaffoldMessenger.of(context)
-                  ..clearSnackBars()
-                  ..showSnackBar(SnackBar(
-                      duration: const Duration(seconds: 8),
-                      content: Text(result)));
-              }
-            },
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => showReminderEditor(context, controller),
-        backgroundColor: kPvInk,
-        foregroundColor: Colors.white,
-        elevation: 2,
-        highlightElevation: 5,
-        shape: const StadiumBorder(),
-        icon: const Icon(Icons.add_rounded),
-        label: Text(s.rmdAdd,
-            style: pvManrope(fontWeight: FontWeight.w700, fontSize: 14.5)),
-      ),
-      body: AnimatedBuilder(
-        animation: store,
-        builder: (context, _) {
-          final items = store.all;
-          return ListView(
-            padding: const EdgeInsets.fromLTRB(20, 4, 20, 100),
-            children: [
-              Text(s.rmdTitle, style: pregPageTitleStyle()),
-              const SizedBox(height: 10),
-              // Gentle "what this does" note, on the page. Kept for revert
-              // (2026-09-30, no tinted block behind text): a Container in
-              // AppTheme.neutral50 with a neutral900 @ 0.12 border, radius 16,
-              // Row(Icon(notifications_active_rounded, 18), the text in ink).
-              PregNote(s.rmdScheduleNote, icon: Icons.notifications_none_rounded),
-              const SizedBox(height: 18),
+          children: [
+            pregToolPad(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               // Her reminders share one white card, hairlines between rows.
-              // Kept for revert: `for (final r in items) _reminderCard(...)`,
-              // a shadowed card each, and `_empty` bare on the page.
               if (items.isEmpty)
                 PregCard(child: _empty(context, s))
               else
                 PregRowCard(children: [
                   for (final r in items) _reminderRow(context, s, store, r),
                 ]),
-              // ---- From ParentVeda (2026-09-30) ---------------------------
-              // The messages the app sends on its own, from her dates: the
-              // new week and the moments that matter. The gap analysis puts
-              // their off switches here, beside the reminders she sets.
-              // The one section heading (2026-09-30). Kept for revert: a
-              // pvJakarta 15 / w800 title, SizedBox(4), the lead in
-              // pvManrope 13 neutral600.
+              // Quick ideas: the one-tap way to make a first (or next) reminder,
+              // so they sit straight under her list, not below the fold.
               const SizedBox(height: 30),
-              const PregSectionHeading('From ParentVeda',
-                  lead: 'Notes we send from your dates. Each one opens the page it is about.'),
-              const SizedBox(height: 12),
-              const PregMessageSwitches(),
-              const SizedBox(height: 30),
-              // Quick ideas (one-tap add), under the one section heading.
-              // Kept for revert: Text(s.rmdSuggestions) in pvJakarta 15 / w800.
               PregSectionHeading(s.rmdSuggestions),
               const SizedBox(height: 12),
               Wrap(spacing: 8, runSpacing: 8, children: [
                 for (final p in _presets) _presetChip(context, s, store, p),
               ]),
-            ],
-          );
-        },
-      ),
+              // ---- From ParentVeda (2026-09-30) -----------------------------
+              // The messages the app sends on its own, from her dates. The
+              // gap analysis puts their off switches beside the reminders.
+              const SizedBox(height: 30),
+              const PregSectionHeading('From ParentVeda',
+                  lead: 'Notes we send from your dates. Each one opens the page it is about.'),
+              const SizedBox(height: 12),
+              const PregMessageSwitches(),
+              // ---- Not getting them? The two test actions, moved here ----
+              const SizedBox(height: 30),
+              PregSectionHeading('Not getting them?',
+                  lead: 'Send yourself a test to check that this phone shows our notifications.'),
+              const SizedBox(height: 8),
+              Wrap(spacing: 8, runSpacing: 4, children: [
+                TextButton.icon(
+                  key: const ValueKey('reminders_test_now'),
+                  style: TextButton.styleFrom(foregroundColor: kPvInk),
+                  icon: const Icon(Icons.notifications_active_outlined, size: 18),
+                  label: Text(S.now.uiSendTestNotificationNow),
+                  onPressed: () async {
+                    await NotificationService.instance.requestPermission();
+                    await NotificationService.instance.showNow();
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context)
+                        ..clearSnackBars()
+                        ..showSnackBar(SnackBar(
+                            content: Text(S.now.uiTestNotificationSentCheck)));
+                    }
+                  },
+                ),
+                TextButton.icon(
+                  key: const ValueKey('reminders_test_in_1_min'),
+                  style: TextButton.styleFrom(foregroundColor: kPvInk),
+                  icon: const Icon(Icons.alarm_add_outlined, size: 18),
+                  label: Text(S.now.uiScheduleTestMinFrom),
+                  onPressed: () async {
+                    await NotificationService.instance.requestPermission();
+                    // Show what ACTUALLY happened: the scheduled time, or the
+                    // real error / the "exact alarms are off" warning. A silent
+                    // failure is how a broken reminder goes unnoticed.
+                    final result =
+                        await NotificationService.instance.scheduleTestIn1Min();
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context)
+                        ..clearSnackBars()
+                        ..showSnackBar(SnackBar(
+                            duration: const Duration(seconds: 8),
+                            content: Text(result)));
+                    }
+                  },
+                ),
+              ]),
+            ])),
+          ],
+        );
+      },
     );
   }
 

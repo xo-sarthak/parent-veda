@@ -20,7 +20,9 @@ import '../../localization/app_language.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../services/spiritual_prefs_store.dart';
 import '../../theme/pv_fonts.dart';
+import '../brackets/hub/hub_intent_art.dart' show IntentMark;
 import '../pregnancy/preg_chrome.dart';
+import '../pregnancy/preg_tool_chrome.dart';
 import '../products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 
 // ⚠️ ONE PARENTVEDA (2026-09-30, the pregnancy restyle): a white ground, the
@@ -31,6 +33,9 @@ import '../products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 // section heading. Nothing about what is shown or stored changed.
 const Color _accent = kPvInk;
 const int _previewCount = 3;
+
+/// With "All" chosen, two reads per tradition, so seven cards are not a wall.
+const int _previewCountAll = 2;
 
 // Preferred browse order (matches the section spec). Any tradition not listed
 // still appears, appended after these.
@@ -103,40 +108,38 @@ class _SpiritualReadingScreenState extends State<SpiritualReadingScreen> {
     final shown = _religion == null
         ? traditions
         : traditions.where((t) => t.id == _religion).toList();
-    final p = pvStorePalette;
-    // Kept for revert: AppBar(backgroundColor: AppTheme.surfaceContainer,
-    // title: Text(s.sprTitle)) on the grey ground. The title is now the serif
-    // page title in the body, and the AppBar carries only the back arrow.
-    return Scaffold(
-      backgroundColor: p.ground,
-      appBar: AppBar(
-        backgroundColor: p.ground,
-        surfaceTintColor: Colors.transparent,
-        foregroundColor: p.ink1,
-        elevation: 0,
-      ),
-      body: AnimatedBuilder(
-        animation: SpiritualPrefsStore.instance,
-        builder: (context, _) => ListView(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 32),
-          children: [
-            Semantics(
-              header: true,
-              child: Text(s.sprTitle, style: pregPageTitleStyle()),
-            ),
-            const SizedBox(height: 12),
-            // Respectful framing - informational, not instruction. A quiet
-            // note on the page. Kept for revert: the same Row(Icon(favorite_
-            // border), Text(s.sprDisclaimer)) in a Container(padding 15,
-            // color: _accent 10%, radius 18).
-            PregNote(s.sprDisclaimer, icon: Icons.favorite_border_rounded),
-            const SizedBox(height: 16),
-            // Browse-by-religion selector.
-            _religionSelector(traditions),
-            const SizedBox(height: 14),
+    // ⚠️ THE FRONT PAGE WEARS THE TOOLS SHELL (2026-09-30, Tools audit).
+    // WH: she opens this in a quiet, reflective moment (a night feed of
+    // thoughts, a festival, before the birth) wanting comfort in her own
+    // tradition, or curiosity about others'. One job: find a reading that
+    // speaks to her, then read it. It is a small library, not a daily habit.
+    // The framing that it is comfort and not instruction moves from a note
+    // under the title into the shell's intro (the one sentence saying what it
+    // does and does not do). The chips are the one control she must find, so
+    // they sit straight under the hero, bleeding to the screen edge so the
+    // row reads as scrollable. With "All" chosen each tradition previews two
+    // reads instead of three, so seven cards are not a wall; choosing one
+    // shows three and "View all".
+    // Comparison: Headspace and Calm browse a guided library by chips first.
+    //
+    // Kept for revert: Scaffold + AppBar (back arrow only), the serif page
+    // title, PregNote(s.sprDisclaimer, favorite_border) and a 20 gutter.
+    return AnimatedBuilder(
+      animation: SpiritualPrefsStore.instance,
+      builder: (context, _) => PregToolScaffold(
+        hue: 330,
+        eyebrow: 'Keep',
+        title: s.sprTitle,
+        intro: s.sprDisclaimer,
+        mark: IntentMark.lampMark,
+        children: [
+          // Browse-by-religion selector, full width so it scrolls edge to edge.
+          _religionSelector(traditions),
+          const SizedBox(height: 16),
+          pregToolPad(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             for (final t in shown) _traditionCard(context, s, t),
-          ],
-        ),
+          ])),
+        ],
       ),
     );
   }
@@ -178,6 +181,7 @@ class _SpiritualReadingScreenState extends State<SpiritualReadingScreen> {
       height: 40,
       child: ListView(
         scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 18),
         children: [
           chip(null, hinglish ? 'सभी' : 'All', ''),
           for (final t in traditions) chip(t.id, t.name.now, t.symbol),
@@ -189,7 +193,9 @@ class _SpiritualReadingScreenState extends State<SpiritualReadingScreen> {
   Widget _traditionCard(BuildContext context, S s, SpiritualTradition t) {
     final text = Theme.of(context).textTheme;
     // Interest-aware preview (interested reads float to the top).
-    final preview = _sortedReads(t).take(_previewCount).toList();
+    final preview = _sortedReads(t)
+        .take(_religion == null ? _previewCountAll : _previewCount)
+        .toList();
     final p = pvStorePalette;
     // A white card with the hairline (kept for revert: boxShadow
     // Color(0x0F2D144C) blur 12, radius 22).

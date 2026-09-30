@@ -38,6 +38,10 @@ void main() {
   Future<void> openCategory(WidgetTester tester, String name) async {
     final scrollable = find.byType(Scrollable).first;
     await tester.scrollUntilVisible(find.text(name), 200, scrollable: scrollable, maxScrolls: 20);
+    // The front page is now a tall shell (hero above the sheet), so a row can be
+    // built but below the fold: bring it on screen before tapping (2026-09-30).
+    await tester.ensureVisible(find.text(name).first);
+    await tester.pumpAndSettle();
     await tester.tap(find.text(name).first);
     await tester.pumpAndSettle();
   }
@@ -95,7 +99,11 @@ void main() {
 
   testWidgets("'Start again' asks for confirmation", (tester) async {
     await boot(tester);
-    await tester.tap(find.byTooltip('Start again'));
+    // "Start again" moved from the app bar to a quiet link at the foot of the
+    // page when the front page took the shared shell (2026-09-30).
+    await tester.ensureVisible(find.byKey(const ValueKey('rfb_start_again')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('rfb_start_again')));
     await tester.pumpAndSettle();
     expect(find.text('Start again?'), findsOneWidget);
   });

@@ -64,6 +64,7 @@ import '../data/doors/pv_door_symptoms.dart' show kSymptomsBracketId;
 import '../data/doors/pv_door_labour.dart' show kLabourSurfaceBirthPlan;
 import '../widgets/global_ask_fab.dart' show kAskVedaRoute;
 import '../widgets/pv_feedback.dart';
+import 'brackets/hub/hub_intent_art.dart' show IntentMark;
 import 'doors/pv_list_row.dart';
 import 'doors/pv_live_search.dart';
 import 'pregnancy/birth_plan_screen.dart';
@@ -147,88 +148,107 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
               AppTheme.secondary500,
               () => _open('tools/movement', () => BabyMovementScreen(controller: controller)),
               line: "Count kicks and get to know your baby's pattern",
+              mark: IntentMark.stepsMark,
               priority: PregPriority.babyDevelopment),
           _Tool(s.toolWeightTitle, Icons.monitor_weight_outlined,
               AppTheme.tertiary500,
               () => _open('tools/weight', () => WeightTrackerScreen(controller: controller)),
               line: 'Log your weight and see a healthy range for you',
+              mark: IntentMark.scaleMark,
               priority: PregPriority.nutrition),
           _Tool(s.medTitle, Icons.medication_outlined, const Color(0xFF4F7A52),
               () => _open('tools/medicines', () => MedicineTrackerScreen(controller: controller)),
               line: 'What your doctor prescribed, with reminders',
+              mark: IntentMark.pillMark,
               priority: PregPriority.symptoms),
-          _Tool(s.symToolTitle, Icons.healing_outlined, const Color(0xFF4A7BC8),
-              // The Symptoms door (2026-09-23), as the grid opened it.
-              () => _open('bracket/symptoms', () =>
-                  pvDoorScreenForBracket(kSymptomsBracketId, controller) ??
-                  SymptomCompanionScreen(controller: controller)),
-              line: "What's normal, what helps, and when to call",
-              priority: PregPriority.symptoms),
+          // REDUNDANT (2026-09-30, Tools audit): the Symptoms tile on the home already opens this door. Kept for revert:
+          // _Tool(s.symToolTitle, Icons.healing_outlined, const Color(0xFF4A7BC8),
+          // // The Symptoms door (2026-09-23), as the grid opened it.
+          // () => _open('bracket/symptoms', () =>
+          // pvDoorScreenForBracket(kSymptomsBracketId, controller) ??
+          // SymptomCompanionScreen(controller: controller)),
+          // line: "What's normal, what helps, and when to call",
+          // priority: PregPriority.symptoms),
           _Tool(s.toolKegelTitle, Icons.self_improvement_rounded,
               AppTheme.secondary400,
               () => _open('tools/kegel', () => KegelCareScreen(controller: controller)),
               line: 'A few minutes a day for your pelvic floor',
+              mark: IntentMark.lotusMark,
               priority: PregPriority.fitness),
-          _Tool(s.tsrTitle, Icons.fact_check_outlined, AppTheme.neutral900,
-              () => _open('tools/tests_scans', () => TestsScansReportsScreen(controller: controller)),
-              line: 'Your scans and reports, and what each one checks',
-              priority: PregPriority.symptoms),
+          // REDUNDANT (2026-09-30, Tools audit): Tests & reports lives inside the Scans & tests door. Kept for revert:
+          // _Tool(s.tsrTitle, Icons.fact_check_outlined, AppTheme.neutral900,
+          // () => _open('tools/tests_scans', () => TestsScansReportsScreen(controller: controller)),
+          // line: 'Your scans and reports, and what each one checks',
+          // priority: PregPriority.symptoms),
           _Tool(s.rmdTitle, Icons.notifications_none_rounded,
               const Color(0xFFE0921C),
               () => _open('tools/reminders', () => RemindersScreen(controller: controller)),
-              line: 'What we remind you about, and when'),
+              line: 'What we remind you about, and when',
+              mark: IntentMark.nextStep),
         ]),
         _ToolGroup('Get ready', 28, [
           _Tool(s.hbName, Icons.luggage_outlined, AppTheme.tertiary400,
               () => _open('tools/hospital_bag', () => ReadyForBirthScreen(controller: controller)),
               line: 'What to pack for you, your baby and your partner',
+              mark: IntentMark.bagMark,
               priority: PregPriority.birthPrep),
           // Added by the gap analysis: the birth plan was built for the Labour
           // door and never listed here.
           _Tool('Birth plan', Icons.edit_note_rounded, const Color(0xFFB0654A),
               () => _open(kLabourSurfaceBirthPlan, () => BirthPlanScreen(pregnancy: controller)),
               line: 'What you would like on the day, to share with your doctor',
+              mark: IntentMark.reportPage,
               priority: PregPriority.birthPrep),
           _Tool(s.toolContractionTitle, Icons.timer_outlined, AppTheme.neutral500,
               () => _open('tools/contractions', () => ContractionTrackerScreen(controller: controller)),
               line: 'Time your contractions and see when to go in',
+              mark: IntentMark.timelineRail,
               priority: PregPriority.birthPrep),
           _Tool(s.ddcToolTitle, Icons.calendar_month_outlined, AppTheme.neutral900,
               () => _open('tools/due_date', () => DueDateCalculatorScreen(controller: controller)),
               line: 'Work out your due date, or update it after a scan',
+              mark: IntentMark.calendarDay,
               staleDueDate: controller.dueDateMayBeStale),
           _Tool(s.pclTitle, Icons.checklist_rounded, const Color(0xFF3E9A8C),
               () => _open('tools/product_checklist', () => ProductChecklistScreen(controller: controller)),
               line: 'What you really need before the baby comes',
+              mark: IntentMark.listMark,
               priority: PregPriority.birthPrep),
         ]),
         _ToolGroup('Keep', 330, [
           _Tool(s.jrTitle, Icons.menu_book_outlined, const Color(0xFF2F2C30),
               () => _open('journal', () => JournalScreen(controller: controller)),
-              line: 'Write to yourself, or to your baby'),
+              line: 'Write to yourself, or to your baby',
+              mark: IntentMark.bookMark),
           _Tool(s.bumpTitle, Icons.pregnant_woman_rounded, const Color(0xFFCB6F94),
               () => _open('tools/bump', () => BumpRitualScreen(controller: controller)),
-              line: 'A photo of your bump, week by week'),
-          _Tool(s.garbhToolTitle, Icons.spa_outlined, const Color(0xFFBE9C4E),
-              () => _open('garbh_daily', () =>
-                  screenForSurface('garbh_daily', controller, controller.language) ??
-                  GarbhScreen(controller: controller)),
-              line: "Today's practice: a story, a sound, a quiet minute",
-              priority: PregPriority.anxiety),
+              line: 'A photo of your bump, week by week',
+              mark: IntentMark.bodyMark),
+          // REDUNDANT (2026-09-30, Tools audit): the Garbh Sanskar tile on the home opens the door that holds today's practice. Kept for revert:
+          // _Tool(s.garbhToolTitle, Icons.spa_outlined, const Color(0xFFBE9C4E),
+          // () => _open('garbh_daily', () =>
+          // screenForSurface('garbh_daily', controller, controller.language) ??
+          // GarbhScreen(controller: controller)),
+          // line: "Today's practice: a story, a sound, a quiet minute",
+          // priority: PregPriority.anxiety),
           _Tool(s.sprToolTitle, Icons.auto_stories_outlined, const Color(0xFF2F2C30),
               () => _open('tools/spiritual_reading', () => SpiritualReadingScreen(controller: controller)),
               line: 'Short readings to hear, or to read aloud',
+              mark: IntentMark.lampMark,
               priority: PregPriority.anxiety),
         ]),
-        _ToolGroup('Check and ask', 268, [
+        // Was 'Check and ask' while Is it safe? sat beside Ask Veda (2026-09-30).
+        _ToolGroup('Ask', 268, [
           // "Is it safe?" is what the door and the home call it; the string
           // table's "Can I?" is its older name. Kept for revert: s.toolCanI.
-          _Tool('Is it safe?', Icons.help_outline_rounded, AppTheme.secondary600,
-              () => _open('can_i', () => CanIScreen(controller: controller)),
-              line: 'Food, medicines and everyday things, answered'),
+          // REDUNDANT (2026-09-30, Tools audit): Is it safe? is a tile on the home. Kept for revert:
+          // _Tool('Is it safe?', Icons.help_outline_rounded, AppTheme.secondary600,
+          // () => _open('can_i', () => CanIScreen(controller: controller)),
+          // line: 'Food, medicines and everyday things, answered'),
           _Tool(s.vedaToolTitle, Icons.auto_awesome_outlined, AppTheme.neutral900,
               () => _open(kAskVedaRoute, () => AskVedaScreen(controller: controller)),
-              line: 'Ask anything, in your own words'),
+              line: 'Ask anything, in your own words',
+              mark: IntentMark.askDoctor),
         ]),
         // The two workbenches the grid carried, debug builds only, as before.
         if (kDebugMode)
@@ -334,7 +354,10 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
 
   Widget _row(V2Palette p, _Tool t, double hue) => PvListRow(
         p: p,
-        leading: PvMarkWell(p: p, hue: hue, size: 40, icon: t.icon),
+        // Kept for revert: leading: PvMarkWell(p: p, hue: hue, size: 40, icon: t.icon),
+        leading: t.mark != null
+            ? PvMarkWell(p: p, hue: hue, size: 40, mark: t.mark)
+            : PvMarkWell(p: p, hue: hue, size: 40, icon: t.icon),
         title: t.title,
         line: t.line,
         // The one conditional line (§9.1b): her date is ours and a scan has
@@ -891,8 +914,15 @@ class _Tool {
     this.priority,
     this.staleDueDate = false,
     this.line,
+    this.mark,
   });
   final String title;
+
+  /// The tool's drawn mark (2026-09-30): the object on its row, and the same one
+  /// above the title on its front page. Marks, not Material glyphs, for rows that
+  /// open somewhere (DESIGN-SYSTEM, "bye bye to the generic icons"). The `icon`
+  /// stays as the fallback and for the classic grid, which nothing pushes.
+  final IntentMark? mark;
 
   /// One line saying what the tool does (the list, 2026-09-29). The grid
   /// never showed one.

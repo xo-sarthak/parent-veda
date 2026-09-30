@@ -215,7 +215,7 @@ void main() {
         (tester) async {
       await pump(tester, ToolsHubScreen(controller: pregnancy), height: 3000);
       expect(tester.takeException(), isNull);
-      for (final h in ['Track', 'Get ready', 'Keep', 'Check and ask']) {
+      for (final h in ['Track', 'Get ready', 'Keep', 'Ask']) {
         expect(find.text(h, skipOffstage: false), findsOneWidget, reason: h);
       }
       expect(find.text('Birth plan', skipOffstage: false), findsOneWidget);

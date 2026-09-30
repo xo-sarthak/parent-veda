@@ -25,7 +25,9 @@ import '../../localization/app_language.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/pv_fonts.dart';
+import '../brackets/hub/hub_intent_art.dart' show IntentMark;
 import '../pregnancy/preg_chrome.dart';
+import '../pregnancy/preg_tool_chrome.dart';
 import '../products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 
 enum DdcMethod { lmp, conception, ivf, ultrasound, known }
@@ -133,26 +135,16 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
   @override
   Widget build(BuildContext context) {
     final s = S(p.language);
-    final ground = pvStorePalette.ground;
-    return Scaffold(
-      backgroundColor: ground,
-      // The AppBar carries only the back arrow; the title is on the page
-      // (2026-09-30). Kept for revert:
-      //   backgroundColor: AppTheme.surfaceContainer,
-      //   title: Text(s.ddcTitle, style: pvJakarta(
-      //       fontWeight: FontWeight.w700, color: AppTheme.neutral900)),
-      appBar: AppBar(
-        backgroundColor: ground,
-        surfaceTintColor: Colors.transparent,
-        elevation: 0,
-      ),
-      body: _edd == null ? _inputView(s) : _resultView(s, _edd!),
-    );
+    // The tool's front page wears the shared shell (2026-09-30, Tools audit):
+    // field, round back, calendar mark, eyebrow, serif title, one sentence.
+    // Kept for revert: a Scaffold with a back-only AppBar and the title in the
+    // body (see _pageTitle below).
+    return _edd == null ? _inputView(s) : _resultView(s, _edd!);
   }
 
-  /// The page title: the serif at 26, ink, announced as a heading.
-  Widget _pageTitle(String t) =>
-      Semantics(header: true, child: Text(t, style: pregPageTitleStyle()));
+  // Kept for revert: the in-body page title, now the shell's serif title.
+  // Widget _pageTitle(String t) =>
+  //     Semantics(header: true, child: Text(t, style: pregPageTitleStyle()));
 
   /// The one filled button, full width and tall.
   static ButtonStyle _bigFilled() => pregFilledStyle().copyWith(
@@ -165,36 +157,34 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
   // ===========================================================================
   Widget _inputView(S s) {
     final ready = _compute() != null;
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(18, 8, 18, 28),
+    return PregToolScaffold(
+      hue: 28,
+      eyebrow: 'Get ready',
+      title: s.ddcTitle,
+      // ddcSub says what it does; it moved from the body into the shell.
+      intro: s.ddcSub,
+      mark: IntentMark.calendarDay,
       children: [
-        // The page title (2026-09-30). Kept for revert: pvFraunces 25 / w500.
-        _pageTitle(s.ddcHeader),
-        const SizedBox(height: 8),
-        Text(s.ddcSub,
-            style: pvManrope(
-                fontSize: 13.5, height: 1.5, color: pvStorePalette.ink2)),
-        const SizedBox(height: 24),
-        // The one section heading (2026-09-30). Kept for revert: a pvJakarta
-        // 15 / w700 Text(s.ddcMethod).
-        PregSectionHeading(s.ddcMethod),
+        // The in-body header "When is my baby due?" is now the section
+        // heading over the choices, so the question is asked once.
+        // Kept for revert: _pageTitle(s.ddcHeader) and the ddcSub text, then
+        // PregSectionHeading(s.ddcMethod).
+        pregToolPad(PregSectionHeading(s.ddcHeader, lead: s.ddcMethod)),
         const SizedBox(height: 12),
-        _methodCards(s),
+        pregToolPad(_methodCards(s)),
         const SizedBox(height: 18),
-        _inputs(s),
+        pregToolPad(_inputs(s)),
         const SizedBox(height: 22),
-        SizedBox(
+        pregToolPad(SizedBox(
           width: double.infinity,
           child: FilledButton(
             onPressed: ready ? () => setState(() => _edd = _compute()) : null,
-            // The one ink. Kept for revert: FilledButton.styleFrom(padding:
-            // const EdgeInsets.symmetric(vertical: 16)).
             style: _bigFilled(),
             child: Text(s.ddcCalculate,
                 style: pvManrope(
                     fontSize: 15, fontWeight: FontWeight.w800)),
           ),
-        ),
+        )),
       ],
     );
   }
@@ -452,13 +442,14 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
     final start = edd.subtract(const Duration(days: 280));
 
     final ink = pvStorePalette;
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(18, 8, 18, 28),
+    return PregToolScaffold(
+      hue: 28,
+      eyebrow: 'Get ready',
+      title: s.ddcTitle,
+      mark: IntentMark.calendarDay,
+      variant: 3,
       children: [
-        // The tool's name as the page title (2026-09-30); it sat in the
-        // AppBar before.
-        _pageTitle(s.ddcTitle),
-        const SizedBox(height: 18),
+        pregToolPad(Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         // celebration: a white card with ink words. The ink is for what can
         // be pressed, so a solid black block holding text is not the hero
         // (2026-09-30). Kept for revert:
@@ -531,6 +522,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
             label: Text(s.ddcRecalculate),
           ),
         ),
+        ])),
       ],
     );
   }
@@ -664,9 +656,14 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
                       fontWeight: FontWeight.w700,
                       color: AppTheme.neutral900)),
             ),
-            Text('${s.formatShortDate(a)} – ${s.formatShortDate(b)}',
-                style: pvManrope(
-                    fontSize: 12, color: pvStorePalette.ink2)),
+            const SizedBox(width: 8),
+            // Flexible, so a large text scale wraps the dates, not overflows.
+            Flexible(
+              child: Text('${s.formatShortDate(a)} – ${s.formatShortDate(b)}',
+                  textAlign: TextAlign.end,
+                  style: pvManrope(
+                      fontSize: 12, color: pvStorePalette.ink2)),
+            ),
           ]),
         );
     final t1End = start.add(const Duration(days: 13 * 7));
@@ -753,11 +750,13 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
               Row(mainAxisSize: MainAxisSize.min, children: [
                 Icon(b.$1, size: 16, color: pvStorePalette.ink2),
                 const SizedBox(width: 6),
-                Text(b.$2,
-                    style: pvManrope(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: pvStorePalette.ink1)),
+                Flexible(
+                  child: Text(b.$2,
+                      style: pvManrope(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: pvStorePalette.ink1)),
+                ),
               ]),
           ],
         ),

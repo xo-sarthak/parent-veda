@@ -29,6 +29,7 @@ import '../../theme/pv_fonts.dart';
 import '../brackets/hub/hub_intent_art.dart' show IntentMark;
 import '../doors/pv_list_row.dart' show PvMarkWell;
 import '../pregnancy/preg_chrome.dart';
+import '../pregnancy/preg_tool_chrome.dart';
 import '../products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 
 class MedicineTrackerScreen extends StatefulWidget {
@@ -112,49 +113,53 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
   Widget _build(BuildContext context) {
     final s = S(p.language);
     final store = MedicineStore.instance;
-    final ground = pvStorePalette.ground;
-    return Scaffold(
-      backgroundColor: ground,
-      // The AppBar carries only the back arrow; the title is on the page
-      // (2026-09-30). Kept for revert:
-      //   backgroundColor: AppTheme.surfaceContainer,
-      //   title: Text(s.medTitle, style: pvJakarta(
-      //       fontWeight: FontWeight.w700, color: AppTheme.neutral900)),
-      appBar: AppBar(
-        backgroundColor: ground,
-        surfaceTintColor: Colors.transparent,
-        elevation: 0,
-      ),
-      body: store.isEmpty ? _setup(s) : _main(s, store),
-      floatingActionButton: store.isEmpty
+    // TOOL SHELL (2026-09-30, Tools audit): the hero replaces the AppBar and the
+    // serif page title, and the add is the round ink control opposite the back
+    // button (it was a floating "Add medication" button that sat over the last
+    // row and the Ask Veda button). Kept for revert: Scaffold(backgroundColor:
+    // ground, appBar: AppBar(...), body: ..., floatingActionButton: store.isEmpty
+    // ? null : FloatingActionButton.extended(onPressed: () => _addSheet(s),
+    // backgroundColor: kPvInk, icon: add_rounded, label: s.medAddTitle)).
+    return PregToolScaffold(
+      hue: _hue,
+      eyebrow: 'Track',
+      title: s.medTitle,
+      mark: IntentMark.pillMark,
+      intro: 'Tick off what you take each day, and set reminders if you like.',
+      action: store.isEmpty
           ? null
-          : FloatingActionButton.extended(
-              onPressed: () => _addSheet(s),
-              backgroundColor: kPvInk,
-              icon: const Icon(Icons.add_rounded, color: Colors.white),
-              // Names what it adds (2026-09-30). Kept for revert: s.medAddNew
-              label: Text(s.medAddTitle,
-                  style: pvManrope(
-                      fontWeight: FontWeight.w700, color: Colors.white)),
+          : Tooltip(
+              message: s.medAddTitle,
+              child: Material(
+                color: kPvInk,
+                shape: const CircleBorder(),
+                child: InkWell(
+                  key: const ValueKey('med_add_action'),
+                  customBorder: const CircleBorder(),
+                  onTap: () => _addSheet(s),
+                  child: const SizedBox(
+                      width: 38,
+                      height: 38,
+                      child: Icon(Icons.add_rounded,
+                          size: 20, color: Colors.white)),
+                ),
+              ),
             ),
+      children: [store.isEmpty ? _setup(s) : _main(s, store)],
     );
   }
 
-  /// The page title: the serif, ink, announced as a heading.
-  Widget _pageTitle(S s) => Semantics(
-        header: true,
-        child: Text(s.medTitle, style: pregPageTitleStyle()),
-      );
+  // Kept for revert: the serif title on the page, now the shell's title.
+  // Widget _pageTitle(S s) => Semantics(header: true,
+  //     child: Text(s.medTitle, style: pregPageTitleStyle()));
 
   // --- setup / empty ---------------------------------------------------------
   // The empty state is the feature's invitation: a white card with the drawn
   // pill mark, the question, the presets and the custom add, the shape of
   // TTC's `TtcDoseEmpty`.
-  Widget _setup(S s) => ListView(
-        padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
+  Widget _setup(S s) => pregToolPad(Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _pageTitle(s),
-          const SizedBox(height: 20),
           PregCard(
             padding: const EdgeInsets.fromLTRB(18, 22, 18, 20),
             child: Column(children: [
@@ -163,9 +168,11 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
               //   decoration: BoxDecoration(color: _accent.withValues(alpha: 0.12),
               //     shape: BoxShape.circle),
               //   child: const Icon(Icons.medication_liquid_rounded, size: 40, color: _accent)),
-              PvMarkWell(
-                  p: pvStorePalette, hue: _hue, size: 64, mark: IntentMark.pillMark),
-              const SizedBox(height: 16),
+              // REDUNDANT (2026-09-30, Tools audit): the hero wears the pill
+              // mark now. Kept for revert:
+              // PvMarkWell(p: pvStorePalette, hue: _hue, size: 64,
+              //     mark: IntentMark.pillMark),
+              // const SizedBox(height: 16),
               Text(s.medSetupTitle,
                   textAlign: TextAlign.center,
                   style: pvFraunces(
@@ -195,7 +202,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
           const SizedBox(height: 18),
           _disclaimer(s),
         ],
-      );
+      ));
 
   Widget _presetWrap(S s) => Wrap(
         spacing: 10,
@@ -216,11 +223,15 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
                   const Icon(Icons.add_rounded, size: 16, color: _accent),
                   const SizedBox(width: 6),
-                  Text(s.medPresetName(k),
-                      style: pvManrope(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                          color: AppTheme.neutral900)),
+                  // Flexible: a long preset name wraps instead of overflowing the
+                  // chip at a narrow width or a large text size (2026-09-30).
+                  Flexible(
+                    child: Text(s.medPresetName(k),
+                        style: pvManrope(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: AppTheme.neutral900)),
+                  ),
                 ]),
               ),
             ),
@@ -229,18 +240,16 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
 
   // --- main (daily / weekly) -------------------------------------------------
   Widget _main(S s, MedicineStore store) {
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
+    return pregToolPad(Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _pageTitle(s),
-        const SizedBox(height: 18),
         _segmented(s),
         const SizedBox(height: 14),
         if (_tab == 0) ..._daily(s, store) else ..._weekly(s, store),
         const SizedBox(height: 18),
         _disclaimer(s),
       ],
-    );
+    ));
   }
 
   Widget _segmented(S s) {

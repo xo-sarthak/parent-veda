@@ -42,6 +42,7 @@ import '../brackets/hub/hub_intent_art.dart';
 import '../doors/pv_door_chrome.dart' show kPvUrgentInk;
 import '../doors/pv_list_row.dart' show PvMarkWell;
 import '../pregnancy/preg_chrome.dart';
+import '../pregnancy/preg_tool_chrome.dart';
 import '../product_guide/product_guide_chooser.dart';
 import '../products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 
@@ -176,60 +177,92 @@ class _ReadyForBirthScreenState extends State<ReadyForBirthScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // The tool's front page wears the shared shell (2026-09-30, Tools audit,
+    // brief: tools_brief.md). Personalise is the one control opposite the back
+    // button. "Start again" is destructive and rare, so it left the top bar
+    // for a quiet link at the foot of the page (`_startAgainLink`).
+    // The persistent "Labour started?" bar stays a bottom bar: the shell has no
+    // slot for one, so an outer Scaffold holds it.
+    // Kept for revert: Scaffold(appBar: AppBar(actions: [tune IconButton,
+    // refresh IconButton]), bottomNavigationBar: _labourBar(), body: ListView
+    // with _pageTitle(S.now.uiReadyBirth) first).
     return Scaffold(
-      backgroundColor: AppTheme.scaffoldBackground,
-      appBar: AppBar(
-        // One ParentVeda: the title is the serif at the top of the page; the
-        // app bar keeps the way back and the two controls. Kept for revert:
-        // title: Text(S.now.uiReadyBirth),
-        actions: [
-          IconButton(
-            tooltip: S.now.uiPersonalise,
-            icon: const Icon(Icons.tune_rounded),
-            onPressed: _booting ? null : () => _openPersonalize(context, _ctx),
-          ),
-          IconButton(
-            tooltip: S.now.uiStartAgain2,
-            icon: const Icon(Icons.refresh_rounded),
-            onPressed: _booting ? null : _confirmRestart,
-          ),
-        ],
-      ),
+      backgroundColor: pvStorePalette.ground,
       bottomNavigationBar: _booting ? null : _labourBar(),
-      body: _booting
-          ? const Center(child: CircularProgressIndicator())
-          : AnimatedBuilder(
-              animation: Listenable.merge([_bag, _ctx]),
-              builder: (context, _) {
-                final r = _Readiness(_bag, _ctx);
-                return ListView(
-                  padding: const EdgeInsets.fromLTRB(18, 4, 18, 28),
-                  children: [
-                    _pageTitle(S.now.uiReadyBirth),
-                    const SizedBox(height: 14),
-                    _hero(r),
-                    const SizedBox(height: 12),
-                    _packTogetherButton(r),
-                    const SizedBox(height: 12),
-                    ..._insightCards(r),
-                    const SizedBox(height: 20),
-                    // Kept for revert: Text(uiFourSimpleParts, titleMedium) with
-                    // uiTapAnyOneContinue in bodySmall under it.
-                    PregSectionHeading(S.now.uiFourSimpleParts,
-                        lead: S.now.uiTapAnyOneContinue),
-                    const SizedBox(height: 12),
-                    // Kept for revert: one outlined card per category with its
-                    // icon in `meta.color`. They open somewhere, so they are
-                    // rows with drawn marks in one white card.
-                    PregRowCard(children: [
-                      for (final c in kReadyOrder) _categoryRow(r, c),
-                    ]),
+      body: AnimatedBuilder(
+        animation: Listenable.merge([_bag, _ctx]),
+        builder: (context, _) {
+          final r = _booting ? null : _Readiness(_bag, _ctx);
+          return PregToolScaffold(
+            hue: _kReadyHue,
+            eyebrow: 'Get ready',
+            title: S.now.uiReadyBirth,
+            intro: 'What to take to the hospital, packed in small steps.',
+            mark: IntentMark.bagMark,
+            action: _booting
+                ? null
+                : Semantics(
+                    button: true,
+                    label: S.now.uiPersonalise,
+                    child: Tooltip(
+                      message: S.now.uiPersonalise,
+                      child: InkWell(
+                        key: const ValueKey('rfb_personalise'),
+                        onTap: () => _openPersonalize(context, _ctx),
+                        borderRadius: BorderRadius.circular(999),
+                        child: Container(
+                          width: 38,
+                          height: 38,
+                          alignment: Alignment.center,
+                          decoration: const BoxDecoration(color: kPvInk, shape: BoxShape.circle),
+                          child: const Icon(Icons.tune_rounded, size: 19, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ),
+            children: r == null
+                ? const [Padding(padding: EdgeInsets.all(40), child: Center(child: CircularProgressIndicator()))]
+                : [
+                    pregToolPad(Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                      _hero(r),
+                      const SizedBox(height: 12),
+                      _packTogetherButton(r),
+                      const SizedBox(height: 12),
+                      ..._insightCards(r),
+                      const SizedBox(height: 20),
+                      // Kept for revert: Text(uiFourSimpleParts, titleMedium) with
+                      // uiTapAnyOneContinue in bodySmall under it.
+                      PregSectionHeading(S.now.uiFourSimpleParts,
+                          lead: S.now.uiTapAnyOneContinue),
+                      const SizedBox(height: 12),
+                      // Kept for revert: one outlined card per category with its
+                      // icon in `meta.color`. They open somewhere, so they are
+                      // rows with drawn marks in one white card.
+                      PregRowCard(children: [
+                        for (final c in kReadyOrder) _categoryRow(r, c),
+                      ]),
+                      const SizedBox(height: 8),
+                      _startAgainLink(),
+                    ])),
                   ],
-                );
-              },
-            ),
+          );
+        },
+      ),
     );
   }
+
+  /// "Start again", demoted from the app bar to a quiet link (it clears every
+  /// packed tick, so it should not sit one tap from the title).
+  Widget _startAgainLink() => Center(
+        child: TextButton.icon(
+          key: const ValueKey('rfb_start_again'),
+          onPressed: _confirmRestart,
+          style: TextButton.styleFrom(foregroundColor: pvStorePalette.ink3),
+          icon: const Icon(Icons.refresh_rounded, size: 16),
+          label: Text(S.now.uiStartAgain2,
+              style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w700, color: pvStorePalette.ink3)),
+        ),
+      );
 
   // ---- hero ---------------------------------------------------------------
   // Kept for revert: a grey-to-pink gradient card (0xFFF3F2F4 to 0xFFFDF3F5,
@@ -264,13 +297,13 @@ class _ReadyForBirthScreenState extends State<ReadyForBirthScreen> {
               Text(r.focusLine(),
                   style: pvManrope(fontSize: 13.5, height: 1.4, color: p.ink2)),
               const SizedBox(height: 10),
-              Row(children: [
+              // A Wrap, so two chips never overflow a narrow card (a Row
+              // overflowed by 3 px at 360 wide). Kept for revert: a Row with
+              // the second chip in a Flexible.
+              Wrap(spacing: 8, runSpacing: 6, children: [
                 _chip(Icons.timelapse_rounded,
                     r.remaining == 0 ? S.now.rfbAllDone : S.now.rfbMinLeft(estMinutesFor(r.remaining))),
-                if (dueLine != null) ...[
-                  const SizedBox(width: 8),
-                  Flexible(child: _chip(Icons.event_rounded, dueLine)),
-                ],
+                if (dueLine != null) _chip(Icons.event_rounded, dueLine),
               ]),
             ]),
           ),
@@ -457,7 +490,9 @@ class _ReadyForBirthScreenState extends State<ReadyForBirthScreen> {
           child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
             const Icon(Icons.notifications_active_outlined, size: 19, color: kPvUrgentInk),
             const SizedBox(width: 10),
-            Text(S.now.uiLabourStarted, style: _buttonText()),
+            Flexible(
+                child: Text(S.now.uiLabourStarted,
+                    textAlign: TextAlign.center, style: _buttonText())),
           ]),
         ),
       );

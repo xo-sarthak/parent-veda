@@ -28,6 +28,7 @@ import 'reader/pv_reader_screen.dart';
 import 'brackets/hub/hub_intent_art.dart';
 import 'doors/pv_list_row.dart' show PvMarkWell;
 import 'pregnancy/preg_chrome.dart';
+import 'pregnancy/preg_tool_chrome.dart';
 import 'products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 
 // ⚠️ ONE PARENTVEDA (2026-09-30, the pregnancy restyle) on the full Read
@@ -124,87 +125,99 @@ class ReadNextScreen extends StatelessWidget {
     final research = readByType(ReadType.research);
     final experts = readByType(ReadType.expert);
 
-    final p = pvStorePalette;
-    // Kept for revert: title: Row(Text(s.rnTitle), Text(' ❤️')) in the
-    // AppBar on AppTheme.scaffoldBackground. The AppBar now carries the back
-    // arrow and search; the title is the serif page title in the body.
-    return Scaffold(
-      backgroundColor: p.ground,
-      appBar: AppBar(
-        backgroundColor: p.ground,
-        surfaceTintColor: Colors.transparent,
-        foregroundColor: p.ink1,
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search_rounded),
-            onPressed: () => showSearch<void>(
-                context: context, delegate: _ReadSearchDelegate(controller)),
-          ),
-        ],
-      ),
-      body: AnimatedBuilder(
+    // ⚠️ THE FRONT PAGE WEARS THE TOOLS SHELL (2026-09-30, Tools audit).
+    // WH: she opens this when she wants something to read that fits HER week
+    // (a spare ten minutes, often at night), reached from Saved, Ask Veda and
+    // the Tools list. Its one job is the week's pick, above the fold. It does
+    // NOT duplicate the Learn tab: Learn is the library by topic (every door's
+    // written pieces, films, courses, questions); this is the week-aware
+    // shelf, with the curated books, research summaries and expert picks Learn
+    // does not hold. So the two relate as "browse everything" (Learn) and
+    // "what should I read now" (here); the shell's intro says so in one line.
+    // Comparison: Headspace's Today shelf and Flo's "For you" lead with one pick.
+    //
+    // Kept for revert: Scaffold with an AppBar (back arrow + search icon) and
+    // the serif page title and subtitle at the top of the ListView.
+    return AnimatedBuilder(
         animation: ReadNextStore.instance,
         builder: (context, _) {
           final saved = ReadNextStore.instance.savedIds
               .map(readById)
               .whereType<ReadItem>()
               .toList();
-          return ListView(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 28),
-            children: [
-              Semantics(
-                header: true,
-                child: Text(s.rnTitle, style: pregPageTitleStyle()),
-              ),
-              const SizedBox(height: 6),
-              Text(s.rnSubtitle,
-                  style: pvManrope(fontSize: 14, height: 1.45, color: p.ink2)),
-              const SizedBox(height: 18),
-              if (hero != null) _HeroCard(item: hero, controller: controller),
-              if (recommended.isNotEmpty) ...[
-                _heading(context, s.rnRecommended),
-                for (final r in recommended) _ReadCard(item: r, controller: controller),
-              ],
-              if (ahead.isNotEmpty) ...[
-                _heading(context, s.rnLookingAhead),
-                for (final r in ahead)
-                  _ReadCard(
-                      item: r,
-                      controller: controller,
-                      aheadLabel: s.rnComingUp(r.weekStart)),
-              ],
-              if (books.isNotEmpty) ...[
-                _heading(context, s.rnBooks),
-                SizedBox(
-                  height: 340,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 2),
-                    itemCount: books.length,
-                    separatorBuilder: (_, _) => const SizedBox(width: 12),
-                    itemBuilder: (context, i) =>
-                        _BookCard(item: books[i], controller: controller),
-                  ),
+          return PregToolScaffold(
+            hue: 330,
+            eyebrow: 'Read',
+            title: s.rnTitle,
+            intro: s.rnSubtitle,
+            mark: IntentMark.pageMark,
+            action: Semantics(
+              container: true,
+              button: true,
+              label: 'Search reading',
+              child: InkWell(
+                key: const ValueKey('read_next_search'),
+                borderRadius: BorderRadius.circular(999),
+                onTap: () => showSearch<void>(
+                    context: context, delegate: _ReadSearchDelegate(controller)),
+                child: Container(
+                  width: 38,
+                  height: 38,
+                  decoration: const BoxDecoration(color: kPvInk, shape: BoxShape.circle),
+                  child: const Icon(Icons.search_rounded, size: 19, color: Colors.white),
                 ),
-              ],
-              if (research.isNotEmpty) ...[
-                _heading(context, s.rnResearch),
-                for (final r in research) _ReadCard(item: r, controller: controller),
-              ],
-              if (experts.isNotEmpty) ...[
-                _heading(context, s.rnExperts),
-                for (final r in experts) _ExpertCard(item: r, controller: controller),
-              ],
-              if (saved.isNotEmpty) ...[
-                _heading(context, s.rnSavedSection),
-                for (final r in saved) _ReadCard(item: r, controller: controller),
-              ],
+              ),
+            ),
+            children: [
+              pregToolPad(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                if (hero != null) _HeroCard(item: hero, controller: controller),
+                if (recommended.isNotEmpty) ...[
+                  _heading(context, s.rnRecommended),
+                  for (final r in recommended) _ReadCard(item: r, controller: controller),
+                ],
+                if (ahead.isNotEmpty) ...[
+                  _heading(context, s.rnLookingAhead),
+                  for (final r in ahead)
+                    _ReadCard(
+                        item: r,
+                        controller: controller,
+                        aheadLabel: s.rnComingUp(r.weekStart)),
+                ],
+                if (books.isNotEmpty) ...[
+                  _heading(context, s.rnBooks),
+                  SizedBox(
+                    height: 340,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: 2),
+                      itemCount: books.length,
+                      separatorBuilder: (_, _) => const SizedBox(width: 12),
+                      itemBuilder: (context, i) =>
+                          _BookCard(item: books[i], controller: controller),
+                    ),
+                  ),
+                ],
+                if (research.isNotEmpty) ...[
+                  _heading(context, s.rnResearch),
+                  for (final r in research) _ReadCard(item: r, controller: controller),
+                ],
+                if (experts.isNotEmpty) ...[
+                  _heading(context, s.rnExperts),
+                  for (final r in experts) _ExpertCard(item: r, controller: controller),
+                ],
+                // UNSURE (2026-09-30, Tools audit): the Saved hub, which opens
+                // this page, already lists these hearted reads under "Daily
+                // reads", and Learn has "Your reading". Left in place because
+                // the heart is tapped HERE and she expects to see it land here.
+                if (saved.isNotEmpty) ...[
+                  _heading(context, s.rnSavedSection),
+                  for (final r in saved) _ReadCard(item: r, controller: controller),
+                ],
+              ])),
             ],
           );
         },
-      ),
-    );
+      );
   }
 }
 
@@ -240,7 +253,11 @@ class _HeroCard extends StatelessWidget {
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
-            Text(s.rnThisWeekPick.toUpperCase(), style: pregGroupLabelStyle()),
+            Flexible(
+                child: Text(s.rnThisWeekPick.toUpperCase(),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: pregGroupLabelStyle())),
             const Spacer(),
             _SaveHeart(id: item.id),
           ]),

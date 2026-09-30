@@ -32,6 +32,7 @@ import '../brackets/hub/hub_intent_art.dart';
 import '../cart_screen.dart';
 import '../doors/pv_list_row.dart' show PvMarkWell;
 import '../pregnancy/preg_chrome.dart';
+import '../pregnancy/preg_tool_chrome.dart';
 import '../products/pv_store_chrome.dart' show PvChip, kPvInk, kPvLine, pvStorePalette;
 import '../products_screen.dart';
 import '../../theme/pv_fonts.dart';
@@ -345,60 +346,70 @@ class ProductChecklistScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = S(controller.language);
-    final pal = pvStorePalette;
-    return Scaffold(
-      backgroundColor: pal.ground,
-      // The back arrow only; the title is the serif on the page. Kept for
-      // revert: `title: Text(s.pclTitle)` in the app bar.
-      appBar: _pregAppBar(),
-      body: AnimatedBuilder(
-        animation: ProductChecklistStore.instance,
-        builder: (context, _) {
-          final store = ProductChecklistStore.instance;
-          final lists = store.checklists;
-          return ListView(
-            padding: const EdgeInsets.fromLTRB(20, 4, 20, 40),
-            children: [
-              Semantics(
-                header: true,
-                child: Text(s.pclTitle, style: pregPageTitleStyle()),
-              ),
-              const SizedBox(height: 8),
-              Text(s.pclIntro,
-                  style: pvManrope(fontSize: 14, height: 1.45, color: pal.ink2)),
-              const SizedBox(height: 26),
-              // The one serif heading, with its add on the right. Kept for
-              // revert: the heading in Jakarta 16 / w800, the add in teal.
-              Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-                Expanded(child: PregSectionHeading(s.pclYourLists)),
-                TextButton.icon(
-                  style: TextButton.styleFrom(foregroundColor: kPvInk),
-                  onPressed: () => _newChecklist(context, s),
-                  icon: const Icon(Icons.add_rounded, size: 18, color: kPvInk),
-                  label: Text(s.pclNewChecklist,
-                      style: pvManrope(
-                          fontSize: 13, fontWeight: FontWeight.w700, color: kPvInk)),
+    // The front page wears the shared shell (2026-09-30, Tools audit): field,
+    // round back, list mark, eyebrow, serif title, the intro. "New checklist"
+    // is the one round ink control opposite the back button. Kept for revert:
+    // Scaffold(appBar: _pregAppBar(), body: ListView with the serif title, the
+    // pclIntro line, and a Row of PregSectionHeading + a TextButton.icon "add").
+    return AnimatedBuilder(
+      animation: ProductChecklistStore.instance,
+      builder: (context, _) {
+        final store = ProductChecklistStore.instance;
+        final lists = store.checklists;
+        return PregToolScaffold(
+          hue: _kHue,
+          eyebrow: 'Get ready',
+          title: s.pclTitle,
+          // A shorter English line; Hindi keeps the shipped sentence.
+          // Kept for revert: intro: s.pclIntro.
+          intro: controller.language.isHindi
+              ? s.pclIntro
+              : 'Your own lists of what to get, with a note on when you need each thing.',
+          mark: IntentMark.listMark,
+          action: Semantics(
+            button: true,
+            label: s.pclNewChecklist,
+            child: Tooltip(
+              message: s.pclNewChecklist,
+              child: InkWell(
+                key: const ValueKey('pcl_new_checklist'),
+                onTap: () => _newChecklist(context, s),
+                borderRadius: BorderRadius.circular(999),
+                child: Container(
+                  width: 38,
+                  height: 38,
+                  alignment: Alignment.center,
+                  decoration:
+                      const BoxDecoration(color: kPvInk, shape: BoxShape.circle),
+                  child: const Icon(Icons.add_rounded, size: 20, color: Colors.white),
                 ),
-              ]),
-              const SizedBox(height: 4),
-              if (lists.isEmpty)
-                _emptyLists(s)
-              else
-                for (final l in lists) _checklistCard(context, s, l),
-              const SizedBox(height: 28),
-              // Kept for revert: the heading in Jakarta 16 / w800 and the
-              // grey line under it, drawn separately.
-              PregSectionHeading(s.pclCurated, lead: s.pclCuratedSub),
-              const SizedBox(height: 12),
-              // One white card of rows with drawn marks. Kept for revert:
-              // `_curatedCard` per list, a bordered card with the list's emoji.
-              PregRowCard(children: [
-                for (final c in kCuratedChecklists) _curatedRow(context, s, c),
-              ]),
-            ],
-          );
-        },
-      ),
+              ),
+            ),
+          ),
+          children: [
+            pregToolPad(Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  PregSectionHeading(s.pclYourLists),
+                  const SizedBox(height: 4),
+                  if (lists.isEmpty)
+                    _emptyLists(s)
+                  else
+                    for (final l in lists) _checklistCard(context, s, l),
+                  const SizedBox(height: 28),
+                  // Kept for revert: the heading in Jakarta 16 / w800 and the
+                  // grey line under it, drawn separately.
+                  PregSectionHeading(s.pclCurated, lead: s.pclCuratedSub),
+                  const SizedBox(height: 12),
+                  // One white card of rows with drawn marks. Kept for revert:
+                  // `_curatedCard` per list, a bordered card with the emoji.
+                  PregRowCard(children: [
+                    for (final c in kCuratedChecklists) _curatedRow(context, s, c),
+                  ]),
+                ])),
+          ],
+        );
+      },
     );
   }
 
