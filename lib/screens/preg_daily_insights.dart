@@ -17,10 +17,10 @@
 //  content: a card is only added here when its destination is built. What we
 //  do not have yet, and would have been a card (kept as a list, not as dead
 //  tiles):
-//    · "Myth or fact" — three pregnancy reads carry a mythFact opening today
-//      (scans, conditions, labour); three is not a daily rotation. Owed.
-//    · "Move" — no pregnancy movement set exists (TTC has one). Owed.
-//  Both are recorded in docs/STILL-OPEN.md §72.
+//    · "Myth or fact" and "Move" were owed here (docs/STILL-OPEN.md §72). Both
+//      are built (2026-09-30, gap analysis P3): Myth or fact is the week's own
+//      `mythBuster`, and Move is one of the Move door's reads, picked by her
+//      trimester and the day. Neither needed new writing.
 //
 //  ⚠️ NOTHING HERE IS A DIAGNOSIS OR A PREDICTION. "You logged nausea → what
 //  helps" opens the symptom's own page, whose copy ends at the doctor line.
@@ -34,6 +34,7 @@
 // =============================================================================
 
 import '../data/can_i_data.dart';
+import '../data/reads/pregnancy_reads.dart' show pregnancyReadById;
 import '../data/doors/pv_door_data.dart' show PvDoorEntryTile, PvDoorLibrary;
 import '../data/doors/pv_door_scans.dart' show kScansDoor;
 import '../data/nutrition/nutrition_plate.dart';
@@ -81,6 +82,12 @@ enum PregInsightGo {
 
   /// A read for this week.
   read,
+
+  /// The week's myth and its answer, in a small sheet (2026-09-30).
+  myth,
+
+  /// One of the Move door's reads (2026-09-30).
+  move,
 }
 
 /// One card on the pregnancy rail.
@@ -98,6 +105,8 @@ class PregInsight {
     this.read,
     this.needId,
     this.scanId,
+    this.truth,
+    this.readId,
   });
 
   /// Stable, so a test can assert which cards a given day produces.
@@ -117,7 +126,27 @@ class PregInsight {
 
   /// The scan a [PregInsightGo.scanWindow] card is about.
   final String? scanId;
+
+  /// A [PregInsightGo.myth] card: the answer to the myth in [value].
+  final String? truth;
+
+  /// A [PregInsightGo.move] card: the Move door read it opens.
+  final String? readId;
 }
+
+/// The Move door's reads that suit [week], in the order they are offered. Ids
+/// only: each is the door's own read, so the card and the door cannot say two
+/// things. Walking and the pelvic floor suit every week; the rest follow her
+/// trimester, and the two late ones wait for the weeks they are about.
+List<String> pregMoveReadIdsFor(int week) => [
+      'preg_move_read_walking',
+      'preg_move_read_pelvic_floor',
+      if (week <= 13) 'preg_move_read_first_trimester',
+      if (week >= 14 && week <= 27) ...['preg_move_read_second_trimester', 'preg_move_read_yoga'],
+      if (week >= 28) 'preg_move_read_third_trimester',
+      if (week >= 28) 'preg_move_read_side_sleeping',
+      if (week >= 34) 'preg_move_read_perineal_massage',
+    ];
 
 /// A routine scan or test and the weeks it is usually done in.
 typedef PregScanWindow = ({String id, String title, int from, int to});
@@ -354,6 +383,57 @@ List<PregInsight> pregInsightsFor({
       art: PvInsightArt.question,
       go: PregInsightGo.safe,
       entry: e,
+    ));
+  }
+
+  // ---- 6b. Myth or fact — the week's own ------------------------------------
+  //
+  // (2026-09-30, gap analysis P3.) `mythBuster` is already written for every
+  // week and was shown only deep in the week page. The card carries the myth as
+  // a claim; the sheet gives the answer. Skipped when a week has none, never
+  // filled with a stand-in: a card with nothing behind it is the tile that does
+  // nothing. Not on a future date, which would show next week's myth early.
+  if (weekContent != null && !isFuture) {
+    final mb = weekContent.actionPlan.mythBuster;
+    final myth = mb.myth.en.trim();
+    final truth = mb.truth.en.trim();
+    if (myth.isNotEmpty && truth.isNotEmpty) {
+      cards.add(PregInsight(
+        id: 'myth_w$week',
+        eyebrow: 'Myth or fact',
+        value: myth,
+        caption: 'Tap for the answer',
+        hue: 60,
+        art: PvInsightArt.question,
+        go: PregInsightGo.myth,
+        truth: truth,
+      ));
+    }
+  }
+
+  // ---- 6c. Move — one of the Move door's reads --------------------------------
+  //
+  // (2026-09-30, gap analysis P3, "a Move card once the Move and rest section
+  // exists".) A DOOR READ, NOT NEW EXERCISE COPY: the reads already say what is
+  // safe, when to stop and when her doctor may say not to, so the card is the
+  // door's words and adds none of ours. A different one each day within her
+  // trimester's pool, stable for the day.
+  final movePool = [
+    for (final id in pregMoveReadIdsFor(week))
+      if (pregnancyReadById(id) != null) id,
+  ];
+  if (movePool.isNotEmpty) {
+    final id = ttcPickForToday(movePool, now: date, offset: 3);
+    final r = pregnancyReadById(id)!;
+    cards.add(PregInsight(
+      id: 'move_$id',
+      eyebrow: 'Move',
+      value: r.title.en,
+      caption: 'Move & rest',
+      hue: 168,
+      art: PvInsightArt.move,
+      go: PregInsightGo.move,
+      readId: id,
     ));
   }
 

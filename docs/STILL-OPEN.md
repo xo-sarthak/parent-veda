@@ -9991,6 +9991,17 @@ not here. Owed:
     27 twin articles the PDF counts are the door's own reads, not new content; (5) a clinician should read the twin
     growth line; (6) Ask Veda is not told, which needs the service side (CLAUDE.md, the wire body is a two-repo
     contract): the field would be `expecting_twins` (bool) and the service should frame twin questions accordingly.
+  - **§81.19 Myth or fact and Move on the rail (2026-09-30).** Built, from the PDF's "A Myth or fact and a Move card"
+    (P3), the two cards §72 listed as owed. **Myth or fact**: the week's own `mythBuster` (written for all 37
+    weeks), the myth as the card and the answer in a small sheet (`lib/screens/pregnancy/preg_myth_sheet.dart`),
+    headed "ParentVeda editorial" and ending at the doctor; not shown on a future date. **Move**: one of the Move
+    door's own reads, picked by her trimester and the day (walking and the pelvic floor every week; the trimester's
+    read; side sleeping from 28; perineal massage from 34), so the card carries none of our words and opens the
+    reader through `openPvDoorRead`. Both are in `preg_daily_insights.dart`, resolved by the home's exhaustive switch,
+    held by `test/preg_myth_move_test.dart`. **Not done:** the PDF's example card text ("Five minutes: pelvic tilts,
+    safe from week 12") is authored exercise copy we do not have, so the card names the read instead; a clinician
+    should read which Move reads are offered from which week; the rail is now up to nine cards on a full day, and
+    whether that is too many is a call to make on a device; the myth is week-level, so it changes weekly, not daily.
   - **§81.16 A migration for Spiritual reading's "not interested" marks (2026-09-30).** The screen saved "not
     interested" under `title.now` (the display title) while "interested" and the sort used `title.en`, so in Hindi
     the mark was saved as a Devanagari title and matched nothing after a switch (the `.en` is identity, `.now` is

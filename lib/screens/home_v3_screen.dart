@@ -120,6 +120,7 @@ import 'nutrition/door/nutrition_door.dart';
 import '../services/bracket_resolver.dart';
 import '../services/family_profile.dart' show FamilyProfileStore;
 import '../services/ready_birth_context_store.dart' show ReadyBirthContextStore;
+import 'pregnancy/preg_myth_sheet.dart' show showPregMythSheet;
 import 'pregnancy/preg_twins.dart' show pregSizeLineFor;
 import '../services/preg_tile_order.dart';
 import '../services/surface_router.dart';
@@ -1704,6 +1705,10 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
         _openBracket(context, kNutritionBracketId);
       case PregInsightGo.safe:
         if (c.entry case final e?) openCanIAnswer(context, e, pregnancy);
+      case PregInsightGo.myth:
+        showPregMythSheet(context, myth: c.value, truth: c.truth ?? '');
+      case PregInsightGo.move:
+        if (c.readId case final id?) openPvDoorRead(context, id, pregnancy);
       case PregInsightGo.read:
         if (c.read case final r?) {
           Navigator.of(context).push(MaterialPageRoute<void>(
