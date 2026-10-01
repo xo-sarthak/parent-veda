@@ -52,6 +52,8 @@ import 'package:flutter/services.dart';
 import '../services/app_nav.dart';
 import 'calendar_screen.dart';
 import 'doors/pv_door_router.dart' show openPvDoorSurface, openPvDoorRead;
+import 'doors/pv_door_chrome.dart' show PvDoorDisclaimer;
+import 'pregnancy/preg_chrome.dart' show PregOfferRow, PregRowCard;
 import 'pregnancy/preg_hero_extras.dart';
 import 'pregnancy/preg_more_screen.dart' show kPregTabMore, kPregTabProducts, kPregTabTools;
 import '../services/app_structure.dart';
@@ -1204,6 +1206,45 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
             _ToolsRow(p: p, week: week, onOpen: (id) => _open(context, id)),
             const SizedBox(height: 28),
 
+            // ---- TALK TO SOMEONE (2026-09-30, gap analysis P2) ---------------
+            //
+            // "Talk to experts, with named people": the trying-to-conceive home has
+            // the block and the pregnancy home had none, so a person was reachable
+            // only from a door tile or More. ROLES ONLY: the PDF says "real roster
+            // names once they exist; until then the roles only, never placeholder
+            // names", so no name appears here. Each row opens the consult list
+            // filtered to that role, where the roster itself lives.
+            V3SectionHead(eyebrow: 'People', title: 'Talk to someone', p: p),
+            const SizedBox(height: 12),
+            PregRowCard(children: [
+              for (final r in kPregHomeExpertRoles)
+                PregOfferRow(
+                  key: ValueKey('preg_home_expert_${r.id}'),
+                  mark: r.mark,
+                  hue: r.hue,
+                  title: r.title,
+                  line: r.line,
+                  onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+                    settings: const RouteSettings(name: 'consults'),
+                    builder: (_) => ConsultationsScreen(lang: pregnancy.language, onlyRole: r.id),
+                  )),
+                ),
+            ]),
+            const SizedBox(height: 6),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton(
+                key: const ValueKey('preg_home_expert_all'),
+                onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(
+                  settings: const RouteSettings(name: 'consults'),
+                  builder: (_) => ConsultationsScreen(lang: pregnancy.language),
+                )),
+                child: Text('See all consults',
+                    style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w700, color: p.ink2)),
+              ),
+            ),
+            const SizedBox(height: 20),
+
             // ---- Commerce, after the content --------------------------------
             //
             // ⚠️ LAUNCH SPOTLIGHT REMOVED FROM V3, kept commented per the
@@ -1244,6 +1285,14 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
                           builder: (_) => const InviteFriendsScreen())),
                 );
               },
+            ),
+            const SizedBox(height: 20),
+            // The medical note the home lacked (2026-09-30, gap analysis "A medical
+            // note on every page", P3: "the doors end with one; the home has no
+            // note at the foot"). The same line and widget every door ends with.
+            Container(
+              key: const ValueKey('preg_home_medical_note'),
+              child: PvDoorDisclaimer(p: p),
             ),
             const SizedBox(height: 20),
             // ⚠️ OFF, KEPT FOR REVERT. `_ArtToggle` switched the door marks
@@ -2122,3 +2171,23 @@ class _ToolsRow extends StatelessWidget {
     );
   }
 }
+
+/// One role on the home's "Talk to someone" block (2026-09-30). The id is the
+/// consult catalogue's own specialist id (`prepare_data.dart`), so a role that is
+/// renamed or removed there fails `test/preg_home_experts_test.dart`.
+class PregHomeExpertRole {
+  const PregHomeExpertRole(this.id, this.title, this.line, this.mark, this.hue);
+  final String id;
+  final String title;
+  final String line;
+  final IntentMark mark;
+  final double hue;
+}
+
+/// Roles, never names. The four the PDF lists, in its order.
+const List<PregHomeExpertRole> kPregHomeExpertRoles = [
+  PregHomeExpertRole('sp_ob', 'Obstetrician', 'About your pregnancy, your scans and your tests', IntentMark.askDoctor, 206),
+  PregHomeExpertRole('sp_nutrition', 'Nutritionist', 'Eating well, weight, and conditions like gestational diabetes', IntentMark.plate, 104),
+  PregHomeExpertRole('sp_counsellor', 'Counsellor', 'Worry, low mood and the change of becoming a parent', IntentMark.moodArc, 160),
+  PregHomeExpertRole('sp_lactation', 'Lactation consultant', 'Feeding your baby, before and after the birth', IntentMark.feedMark, 344),
+];

@@ -26,6 +26,8 @@ import '../../services/tools_store.dart';
 import '../../theme/pv_fonts.dart';
 import '../brackets/hub/hub_intent_art.dart';
 // Kept for revert (the start card's own mark, now the hero's): import '../doors/pv_list_row.dart' show PvMarkWell;
+import '../../data/reads/pregnancy_reads_weekly_a.dart' show kPregWeekReadPrefix;
+import '../doors/pv_door_router.dart' show openPvDoorRead;
 import '../pregnancy/preg_chrome.dart';
 import '../pregnancy/preg_tool_chrome.dart';
 import '../products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
@@ -205,6 +207,42 @@ class _BabyMovementScreenState extends State<BabyMovementScreen>
                       ),
                     ],
                   ),
+                  // The teaching the PDF found missing (2026-09-30, "Movement
+                  // counting", P3: the gap is "when and why to know the pattern").
+                  // Not drawn during a session, so the heart stays above the fold.
+                  // The words are the short answers of two reads that already exist.
+                  if (!active) ...[
+                    const SizedBox(height: 28),
+                    const PregSectionHeading("Knowing your baby's pattern"),
+                    const SizedBox(height: 8),
+                    Text(
+                        'From about 28 weeks the pattern matters more than a count. Get to know how '
+                        "your baby usually moves. Babies don't move less as they run out of room. If "
+                        'the movements are fewer, weaker or different, call your doctor or hospital '
+                        'the same day, at any hour. You do not need to count unless your doctor asks you to.',
+                        style: pvManrope(fontSize: 14, height: 1.55, color: pvStorePalette.ink2)),
+                    const SizedBox(height: 12),
+                    PregRowCard(
+                      children: [
+                        PregOfferRow(
+                          key: const ValueKey('movement_read_awareness'),
+                          mark: IntentMark.bookMark,
+                          hue: _kMovementHue,
+                          title: "Knowing your baby's movements",
+                          line: "How to learn your baby's pattern, and why the advice is to call, not wait",
+                          onTap: () => openPvDoorRead(context, '${kPregWeekReadPrefix}movement_awareness', widget.controller),
+                        ),
+                        PregOfferRow(
+                          key: const ValueKey('movement_read_less'),
+                          mark: IntentMark.askDoctor,
+                          hue: _kMovementHue,
+                          title: 'When the baby moves less',
+                          line: "Don't wait until tomorrow, and don't count first",
+                          onTap: () => openPvDoorRead(context, 'preg_cond_read_less_movement', widget.controller),
+                        ),
+                      ],
+                    ),
+                  ],
                 ],
               ),
             ),

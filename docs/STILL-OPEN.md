@@ -10031,6 +10031,20 @@ not here. Owed:
     (design pass, on hold); (b) **messages for him** at the moments (§81.9 c); (c) his Today, Journey, Read aloud
     and Journal are otherwise as they were; (d) a partner "what to buy" list of his own; (e) Hindi (new copy is
     English).
+  - **§81.23 Three small items from the PDF (2026-10-01).** (1) **Movement counting** (P3, "when and why to know the
+    pattern"): the kick tracker now has "Knowing your baby's pattern" under the records row (not drawn while a session
+    runs, so the heart stays above the fold): from about 28 weeks the pattern matters more than a count, babies do not
+    move less as they run out of room, fewer, weaker or different movements mean call the same day at any hour, and "You
+    do not need to count unless your doctor asks you to" (so it agrees with the tracker's own "only if your doctor
+    asked" line). It carries no new clinical claim: the words are the short answers of two reads that exist and are
+    linked from it ("Knowing your baby's movements", "When the baby moves less"). (2) **A medical note at the foot of
+    Today** (P3): the same `PvDoorDisclaimer` every door ends with ("general information, not medical advice ... if
+    anything here disagrees with them, they are right"). (3) **"Talk to someone" on Today** (P2): Obstetrician,
+    Nutritionist, Counsellor, Lactation consultant, ROLES ONLY (the PDF: "real roster names once they exist; until then
+    the roles only, never placeholder names"), each opening the consult list filtered to that role, with "See all
+    consults". Held by `test/preg_small_items_test.dart`. **Still owed:** the consult roster behind the tap still carries
+    seed names (e.g. "Dr. Aparna Joshi"); real names need a real roster, and until then the list itself is the place a
+    placeholder name can show; More › "Talk to an expert" is unchanged, so two doors reach the same list.
   - **§81.19 Myth or fact and Move on the rail (2026-09-30).** Built, from the PDF's "A Myth or fact and a Move card"
     (P3), the two cards §72 listed as owed. **Myth or fact**: the week's own `mythBuster` (written for all 37
     weeks), the myth as the card and the answer in a small sheet (`lib/screens/pregnancy/preg_myth_sheet.dart`),
