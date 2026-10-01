@@ -74,10 +74,30 @@ class PvInsightTile extends StatelessWidget {
     this.caption,
     this.artWidget,
     this.showArt = true,
+    this.large = false,
+    this.centreValue = false,
   });
+
+  /// The value sits in the middle of the card's space under the eyebrow,
+  /// not pinned to the bottom (2026-09-30, trying to conceive: the user,
+  /// "they look empty from the center… keep the size same… align the text
+  /// towards the center"). Same tile, same type sizes. Opt-in.
+  final bool centreValue;
+
+  /// Bigger words that fill the card (2026-09-30, trying to conceive: the
+  /// user, "they look empty from the center"). Opt-in, so every other
+  /// stage's rail is unchanged. Sized so a value fits its lines without
+  /// "…" (`largeValueSize`).
+  final bool large;
 
   static const double width = 100;
   static const double height = 112;
+
+  /// The large tile's size (2026-09-30): wide enough that the longest single
+  /// words in trying to conceive ("implantation", "Myo-inositol") fit a line
+  /// at a readable size. A rail of large tiles is [largeHeight] tall.
+  static const double largeWidth = 124;
+  static const double largeHeight = 128;
 
   /// The small line at the top — "SIZE OF A", "YOU LOGGED".
   final String eyebrow;
@@ -122,8 +142,8 @@ class PvInsightTile extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(18),
         child: Container(
-          width: width,
-          height: height,
+          width: large ? largeWidth : width,
+          height: large ? largeHeight : height,
           decoration: BoxDecoration(
             color: tint,
             borderRadius: BorderRadius.circular(18),
@@ -158,18 +178,25 @@ class PvInsightTile extends StatelessWidget {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: pvManrope(
-                            fontSize: 7.5,
+                            fontSize: large ? 8 : 7.5,
                             fontWeight: FontWeight.w800,
                             letterSpacing: 0.6,
                             height: 1.25,
                             color: deep)),
                     ),
-                    const Spacer(),
+                    // Pinned to the foot, or centred in the space under the
+                    // eyebrow (`centreValue`, 2026-09-30).
+                    if (!centreValue) ...[
+                      const Spacer(),
                     Text(value,
                         maxLines: caption == null ? 4 : 3,
                         overflow: TextOverflow.ellipsis,
                         style: pvJakarta(
-                            fontSize: valueSize(value),
+                            fontSize: large
+                                ? fitValueSize(context, value,
+                                    maxLines: caption == null ? 4 : 3,
+                                    caption: caption != null)
+                                : valueSize(value),
                             fontWeight: FontWeight.w800,
                             height: 1.2,
                             color: p.ink1)),
@@ -179,10 +206,44 @@ class PvInsightTile extends StatelessWidget {
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: pvManrope(
-                              fontSize: 8.5,
+                              fontSize: large ? 9 : 8.5,
                               height: 1.25,
                               color: p.ink2.withValues(alpha: 0.85))),
                     ],
+                    ] else
+                      Expanded(
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                    Text(value,
+                              maxLines: caption == null ? 4 : 3,
+                              overflow: TextOverflow.ellipsis,
+                              style: pvJakarta(
+                                  fontSize: large
+                                      ? fitValueSize(context, value,
+                                          maxLines: caption == null ? 4 : 3,
+                                          caption: caption != null)
+                                      : valueSize(value),
+                                  fontWeight: FontWeight.w800,
+                                  height: 1.2,
+                                  color: p.ink1)),
+                          if (caption != null) ...[
+                            const SizedBox(height: 3),
+                            Text(caption!,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: pvManrope(
+                                    fontSize: large ? 9 : 8.5,
+                                    height: 1.25,
+                                    color: p.ink2.withValues(alpha: 0.85))),
+                          ],
+                            ],
+                          ),
+                        ),
+                      ),
                   ]),
             ),
           ]),
@@ -194,6 +255,55 @@ class PvInsightTile extends StatelessWidget {
   /// The size follows the length: the same slot holds "8" and "Cut back on
   /// chai to two cups". Three steps, chosen at the lengths where the text
   /// stops fitting rather than at round numbers.
+  /// The large tile's value size, MEASURED (2026-09-30): the biggest of
+  /// [_fitSizes] at which [v] fits [maxLines] lines of the text box with no
+  /// word broken across a line and no "…". Guessing from the character count
+  /// cut 37 of the stage's 101 values when checked against the real font, so
+  /// the tile measures its own words with the font it draws them in.
+  static const List<double> _fitSizes = [30, 24, 20, 17, 15, 13.5, 12, 11];
+
+  static double fitValueSize(BuildContext context, String v,
+      {required int maxLines, bool caption = false}) {
+    const box = largeWidth - 20; // the tile's side padding, 10 each side
+    final scaler = MediaQuery.textScalerOf(context);
+    // AND DOWN, NOT ONLY ACROSS (2026-09-30, a render test at 360dp caught a
+    // 43-point overflow): the value's height has to leave room for the
+    // eyebrow's two lines and a caption's two, at the text size she uses.
+    final tall = largeHeight -
+        18 - // top and bottom padding
+        scaler.scale(8 * 1.25 * 2) - // the eyebrow, two lines
+        (caption ? scaler.scale(9 * 1.25 * 2) + 3 : 0) -
+        2; // a hair of slack for rounding
+    final direction = Directionality.maybeOf(context) ?? TextDirection.ltr;
+    for (final size in _fitSizes) {
+      final style = pvJakarta(
+          fontSize: size, fontWeight: FontWeight.w800, height: 1.2);
+      // No single word may be wider than a line (it would break mid-word).
+      var wordFits = true;
+      for (final word in v.split(RegExp(r'\s+'))) {
+        final w = TextPainter(
+            text: TextSpan(text: word, style: style),
+            textDirection: direction,
+            textScaler: scaler,
+            maxLines: 1)
+          ..layout();
+        if (w.width > box) {
+          wordFits = false;
+          break;
+        }
+      }
+      if (!wordFits) continue;
+      final tp = TextPainter(
+          text: TextSpan(text: v, style: style),
+          textDirection: direction,
+          textScaler: scaler,
+          maxLines: maxLines)
+        ..layout(maxWidth: box);
+      if (!tp.didExceedMaxLines && tp.height <= tall) return size;
+    }
+    return _fitSizes.last;
+  }
+
   static double valueSize(String v) {
     if (v.length <= 3) return 22;
     if (v.length <= 12) return 14;

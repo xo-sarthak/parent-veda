@@ -260,13 +260,52 @@ const double kTtcDoorHeroQuietHeight = 262;
 /// is. Those draw ink words on the picture and no shade at all. The rest keep
 /// their photograph with a shade behind the words only. Add a door here the
 /// day its `hero_<slug>.jpg` lands in `assets/doors/`.
-const Set<String> kTtcDoorHeroLightArt = {'ttc_conceiving'};
+// 2026-09-30: all nine, the day the other eight pictures landed. Kept for
+// revert: {'ttc_conceiving'}.
+const Set<String> kTtcDoorHeroLightArt = {
+  'ttc_conceiving',
+  'ttc_pcos',
+  'ttc_infertility',
+  'ttc_preconception_health',
+  'ttc_not_yet',
+  'ttc_male_fertility',
+  'ttc_mind_body',
+  'ttc_body_cycle',
+  'ttc_after_loss',
+};
 
 /// The light art's own ground, sampled from its plain left half, so the hero
 /// continues the picture below it on a phone taller than 3:2. One pale blush
 /// for every light hero: the prompts ask for it (#F3E6E1; the art came back
 /// at #F1DFD8).
 const Color kTtcDoorHeroLightGround = Color(0xFFF1DFD8);
+
+
+/// Each door's own ground (2026-09-30): every picture was made on its own
+/// pale colour (the prompts in Downloads/door-hero-prompts), so each is
+/// sampled from its own plain left side. A door missing here falls back to
+/// the blush above.
+const Map<String, Color> kTtcDoorHeroLightGrounds = {
+  // The painted heroes (2026-10-01, the user's nine ChatGPT paintings in the
+  // website's style): each door's own ground, the median of the picture's
+  // plain left side (flat to under 1 in 255). Kept for revert, the earlier
+  // photo-style grounds: pcos E4EBE0, infertility DEE7EF, preconception
+  // F3E5D8, not_yet ECE6EE, male_fertility E2ECEB, mind_body F3E2D6,
+  // body_cycle F0DCDC, after_loss EBE7E3, and the fertile window's own
+  // 'ttc_conceiving': kTtcDoorHeroLightGround.
+  'ttc_conceiving': Color(0xFFEFD8CE),
+  'ttc_pcos': Color(0xFFE1E7DA),
+  'ttc_infertility': Color(0xFFD9E3ED),
+  'ttc_preconception_health': Color(0xFFF1DFCE),
+  'ttc_not_yet': Color(0xFFE8E1E8),
+  'ttc_male_fertility': Color(0xFFE0E9E7),
+  'ttc_mind_body': Color(0xFFF2DCCC),
+  'ttc_body_cycle': Color(0xFFEFD6D2),
+  'ttc_after_loss': Color(0xFFEAE3DD),
+};
+
+Color ttcDoorHeroLightGround(String bracketId) =>
+    kTtcDoorHeroLightGrounds[bracketId] ?? kTtcDoorHeroLightGround;
 
 /// The gap from the sheet's edge to the tab rail (2026-09-29): the same as
 /// the search pill keeps above the edge (`kTtcDoorHeroFootGap`), so the pill
@@ -894,10 +933,26 @@ class _TtcDoorScreenState extends State<TtcDoorScreen> {
         return PvLiveSearchScope(
           search: _search,
           child: Scaffold(
-            backgroundColor: p.ground,
+            // White below the hero (see the field above). Kept for revert:
+            //   backgroundColor: p.ground,
+            backgroundColor: Colors.white,
             body: Stack(
               children: [
-                Positioned.fill(
+                // ⚠️ THE FIELD ONLY BEHIND THE HERO (2026-09-30, the user's
+                // screenshots of See a doctor: under a short tab the white
+                // sheet ended and the pink field with its curve showed
+                // below, "filler going off"). The field fills the hero's own
+                // height; below it the page is white, the sheet's colour,
+                // so a short tab or an overscroll shows white. Kept for
+                // revert: Positioned.fill(child: V3HeroField(...)).
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: MediaQuery.paddingOf(context).top +
+                      kTtcDoorHeroQuietHeight +
+                      kTtcDoorHeroOverlap +
+                      TtcDoorRail.overlap,
                   child: V3HeroField(
                     accent: tint,
                     ground: p.ground,
@@ -1081,7 +1136,13 @@ class _TtcDoorScreenState extends State<TtcDoorScreen> {
                           //   if (group != null &&
                           //       group.pinnedRedFlagReadIds
                           //           .any((r) => ttcReadById(r) != null)) ...[
-                          if (group != null &&
+                          // ⚠️ NOT FIRST ANY MORE (2026-09-30, the user: "is it
+                          // necessary to be on the top?"). With the quiet row
+                          // it sits after the tab's first shelf (see below),
+                          // still in the first screen or two of Your body.
+                          // Kept for revert: this block, first in the tab.
+                          if (!kTtcDoorFlagQuiet &&
+                              group != null &&
                               ttcDoorShowsFlag(page.bracketId, group.id) &&
                               group.pinnedRedFlagReadIds
                                   .any((r) => ttcReadById(r) != null)) ...[
@@ -1137,7 +1198,34 @@ class _TtcDoorScreenState extends State<TtcDoorScreen> {
                           // heading style, then a rail of the one card, cut
                           // off at the right edge so it reads as "more this
                           // way". Every section, every door.
-                          for (final section in sections) ...[
+                          for (final (si, section) in sections.indexed) ...[
+                            // The quiet safety row, after the first shelf
+                            // (2026-09-30).
+                            if (si == 1 &&
+                                kTtcDoorFlagQuiet &&
+                                group != null &&
+                                ttcDoorShowsFlag(page.bracketId, group.id))
+                              for (final rid in group.pinnedRedFlagReadIds)
+                                if (ttcReadById(rid) case final read?)
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        bottom: _kTtcDoorBlockGap),
+                                    child: pvDoorPad(
+                                      TtcDoorFlagRow(
+                                        key: ttcDoorFlagKey(rid),
+                                        compact: true,
+                                        callout: read.whenToSeeSomeone,
+                                        lang: lang,
+                                        p: p,
+                                        onOpen: () => _openFlag(
+                                          rid,
+                                          read.whenToSeeSomeone,
+                                          lang,
+                                          p,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                             pvDoorPad(
                               Text(
                                 section.heading,
@@ -1759,6 +1847,7 @@ class _Hero extends StatelessWidget {
     // with a soft shadow on a photograph.
     final light = kTtcDoorHeroQuiet && kTtcDoorHeroLightArt.contains(bracket.id);
     final lightAsset = light ? ttcDoorHeroArtAsset(bracket.id) : null;
+
     final quietWords = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -1803,10 +1892,16 @@ class _Hero extends StatelessWidget {
       search: search,
       child: ValueListenableBuilder<double>(
         valueListenable: scroll,
-        builder: (context, o, child) => Opacity(
-          opacity: (1 - o / _kFade).clamp(0.0, 1.0),
-          child: child,
-        ),
+        // ⚠️ LIGHT ART SCROLLS AS ONE PIECE (2026-09-30, the user: the
+        // header "gets stuck in a jittery way that fades away"). The words
+        // faded while the picture lagged behind them. On light art the words
+        // stay whole and scroll with it. Kept for revert: the fade for all.
+        builder: (context, o, child) => light
+            ? child!
+            : Opacity(
+                opacity: (1 - o / _kFade).clamp(0.0, 1.0),
+                child: child,
+              ),
         child: kTtcDoorHeroQuiet ? quietWords : Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
@@ -1897,17 +1992,21 @@ class _Hero extends StatelessWidget {
             left: 0,
             right: 0,
             bottom: -_bleed,
+            // ⚠️ NO PARALLAX ON LIGHT ART (2026-09-30): the picture moving
+            // down at 0.45 of the scroll uncovered the field above it, a
+            // darker pink strip under the status bar, and left the search pill
+            // over white when it rode to the top. It scrolls with the page.
+            // Kept for revert: Transform.translate(offset: o * _kRate).
             child: ValueListenableBuilder<double>(
               valueListenable: scroll,
-              builder: (context, o, child) => Transform.translate(
-                offset: Offset(0, (o * _kRate).clamp(0.0, double.infinity)),
-                child: child,
-              ),
+              builder: (context, o, child) => child!,
               // The picture across the full width, never cropped (the user
               // on the earlier heroes: "zoomed in… senseless"); its own
               // ground carries on below it on a tall phone.
               child: ColoredBox(
-                color: kTtcDoorHeroLightGround,
+                // Its own ground (2026-09-30). Kept for revert:
+                // color: kTtcDoorHeroLightGround,
+                color: ttcDoorHeroLightGround(bracket.id),
                 child: Align(
                   alignment: Alignment.topCenter,
                   child: Image.asset(

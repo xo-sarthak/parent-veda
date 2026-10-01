@@ -57,7 +57,7 @@ import '../../ttc/ttc_treatment_store.dart';
 import '../../theme/pv_fonts.dart';
 import 'ttc_common.dart';
 import 'ttc_cycle_companion.dart'
-    show showTtcPeriodDateActions, showTtcPeriodLogSheet;
+    show showTtcPeriodDateActions, showTtcPeriodLogSheet, ttcShortDate;
 import 'ttc_cycle_palette.dart';
 import 'ttc_appointments_screen.dart'
     show TtcApptEntry, openTtcAppointment;
@@ -573,7 +573,7 @@ class _MonthGrid extends StatelessWidget {
               child: Row(children: [
                 for (var col = 0; col < 7; col++)
                   Expanded(
-                    child: TtcFertileBand.isFertile(
+                    child: TtcFertileBand.shows(
                             _dateAt(month, row, col, leading, daysInMonth))
                         ? TtcFertileBand(
                             date:
@@ -725,15 +725,34 @@ class TtcFertileBand extends StatelessWidget {
     return f != null && f != FertilityLevel.low;
   }
 
+  /// Whether the band is DRAWN on [d] (2026-09-30): a fertile day that is
+  /// not also a bleeding day. Period wins an overlap (rule 4 of the day
+  /// resolver), and the band drawn under the pink circles read as one mess
+  /// (the user: "the purple border… the days overlapping, going away from
+  /// each other"). Kept for revert: `isFertile` alone.
+  static bool shows(DateTime? d) {
+    if (!isFertile(d)) return false;
+    final f = ttcFactsFor(d!);
+    return !(f.isPeriodStart || f.isBleedDay);
+  }
+
   @override
   Widget build(BuildContext context) {
-    final openLeft = isFertile(before) && !firstInRow;
-    final openRight = isFertile(after) && !lastInRow;
+    final openLeft = shows(before) && !firstInRow;
+    final openRight = shows(after) && !lastInRow;
     const r = Radius.circular(999);
 
-    return Center(
+    // ⚠️ THE BAND IS THE DAY CIRCLE'S HEIGHT, ON THE DAY CIRCLE'S LINE
+    // (2026-09-30). It was 34 tall and centred in the 46 cell while the
+    // circles are 30 and sit 2 from its top, so the band rode 6 points lower
+    // than the numbers it shaded and was wider than the pink circles over it.
+    // Kept for revert: `Center(child: Container(height: 34, ...))`.
+    return Align(
+      alignment: Alignment.topCenter,
+      child: Padding(
+        padding: const EdgeInsets.only(top: _kBandTop),
       child: Container(
-        height: 34,
+        height: _kBandHeight,
         decoration: BoxDecoration(
           // Deliberately a shade you can actually see. The old per-day tint at
           // "medium" was indistinguishable from white.
@@ -751,9 +770,14 @@ class TtcFertileBand extends StatelessWidget {
           ),
         ),
       ),
+      ),
     );
   }
 }
+
+/// The band's line, from the day circle (30 tall, 2 from the cell's top).
+const double _kBandTop = 2;
+const double _kBandHeight = 30;
 
 /// One column's slice of a round's soft band, rounded where the stretch
 /// starts and ends, like [TtcFertileBand]. Public so a test can find it.
@@ -788,9 +812,13 @@ class TtcRoundBandSlice extends StatelessWidget {
     final openLeft = bandOf(before) == mine && !firstInRow;
     final openRight = bandOf(after) == mine && !lastInRow;
     const r = Radius.circular(999);
-    return Center(
+    // Same line as the fertile band (2026-09-30).
+    return Align(
+      alignment: Alignment.topCenter,
+      child: Padding(
+        padding: const EdgeInsets.only(top: _kBandTop),
       child: Container(
-        height: 34,
+        height: _kBandHeight,
         decoration: BoxDecoration(
           color: tintFor(mine),
           borderRadius: BorderRadius.only(
@@ -800,6 +828,7 @@ class TtcRoundBandSlice extends StatelessWidget {
             bottomRight: openRight ? Radius.zero : r,
           ),
         ),
+      ),
       ),
     );
   }
@@ -1002,7 +1031,10 @@ class _Legend extends StatelessWidget {
             _row(TtcCycleColours.ovulation, t.calendarOvulation, bold: true),
           ],
           // "Today" was missing entirely, while being the boldest ring drawn.
-          _row(TtcCycleColours.today, t.calendarToday, outline: true),
+          // The Today key is gone (2026-09-30, "very out of touch"): the ring
+          // round today's number says it, and the key made a third row. Kept
+          // for revert: _row(TtcCycleColours.today, t.calendarToday,
+          // outline: true),
           _row(TtcCycleColours.logged, t.calendarLogged),
           if (behaviour.countsToPeriod)
             _row(TtcCycleColours.period, t.calendarNextPeriod, outline: true),
@@ -1058,6 +1090,16 @@ class _Legend extends StatelessWidget {
 }
 
 // ---- selected day -----------------------------------------------------------
+
+// Unused since 2026-09-30 (milestones left the day card); kept for revert.
+// ignore: unused_element
+IconData _timelineIcon(TimelineKind kind) => switch (kind) {
+      TimelineKind.milestone => Icons.flag_outlined,
+      TimelineKind.medical => Icons.medical_services_outlined,
+      TimelineKind.written => Icons.edit_outlined,
+      TimelineKind.people => Icons.people_outline_rounded,
+      TimelineKind.action => Icons.check_circle_outline_rounded,
+    };
 
 class _DayPanel extends StatelessWidget {
   const _DayPanel({required this.day, required this.t});
@@ -1178,8 +1220,21 @@ class _DayPanel extends StatelessWidget {
                 ),
               ),
             ),
-          for (final e in facts.timelineEvents)
-            _line(Icons.auto_awesome_rounded, ttcSoft, e.title(hi)),
+          // ⚠️ ONE ICON PER KIND, NOT ONE SPARKLE FOR ALL (2026-09-30, the
+          // user: "icons of Ask Veda, all of them are same, makes no sense").
+          // The sparkle is Ask Veda's own mark. Kept for revert:
+          // _line(Icons.auto_awesome_rounded, ttcSoft, e.title(hi)).
+          // ⚠️ NO APP MILESTONES ON A CALENDAR DAY (2026-09-30, the user, the
+          // second time: "calendar is still not fixed"). "You decided to
+          // start", "Started your supplements" and "Started keeping your
+          // health records" are the app's own milestones, dated the day it
+          // noticed them, so they piled under Today as three identical ticks
+          // that say nothing about the day. The day card holds what happened
+          // in HER cycle that day: a period, what she logged, a visit, a
+          // clinic step. The milestones live on the Family Timeline, one tap
+          // below. Kept for revert:
+          // for (final e in facts.timelineEvents)
+          //   _line(_timelineIcon(e.kind), ttcSoft, e.title(hi)),
         ],
         const SizedBox(height: 6),
         Row(children: [
@@ -1385,7 +1440,9 @@ const String kTtcCalendarAddClinicDates = "Add your clinic's dates";
 
 /// The day card's period button, by what it will do.
 const String kTtcCalendarLogPeriod = 'Log a period';
-const String kTtcCalendarChangePeriod = 'Change this period';
+// 'Change this period' was cut to "Change this pe…" beside Log symptoms
+// (2026-09-30, the user's phone). Kept for revert: 'Change this period'.
+const String kTtcCalendarChangePeriod = 'Edit period';
 
 /// "You logged symptoms" in the day card. The tracker's own title named the
 /// retired five-point screen ("Symptom Companion"), not what she did.
@@ -1574,12 +1631,45 @@ class _Upcoming extends StatelessWidget {
     final nextPeriod = ctx.periodDueOn;
     if (nextPeriod == null || today.cycleDay == null) return const SizedBox();
     final daysAway = nextPeriod.difference(ctx.today).inDays;
+    // ⚠️ THE FERTILE DAYS BELONG HERE TOO (2026-09-30, the user: the hero said
+    // "your fertile days open tomorrow" and this card, one tap away, only
+    // knew the next period). Only her own cycle's window, still ahead or
+    // open now, from the same resolver the hero reads.
+    final opens = ctx.windowOpensOn, closes = ctx.windowClosesOn;
+    Widget? fertileRow;
+    if (opens != null && closes != null && !closes.isBefore(ctx.today)) {
+      final toOpen = opens.difference(ctx.today).inDays;
+      final left = closes.difference(ctx.today).inDays + 1;
+      fertileRow = Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: Row(children: [
+          const Icon(Icons.circle,
+              size: 15, color: TtcCycleColours.ovulation),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text.rich(TextSpan(children: [
+              TextSpan(text: t.calendarFertile, style: ttcBody(13.5)),
+              TextSpan(
+                  text: '  ${ttcShortDate(opens)} to ${ttcShortDate(closes)}',
+                  style: ttcBody(12, color: ttcMuted)),
+            ])),
+          ),
+          Text(
+            toOpen > 0
+                ? (toOpen == 1 ? 'tomorrow' : 'in $toOpen days')
+                : (left <= 1 ? 'last day' : 'open, $left days left'),
+            style: ttcBody(12.5, color: ttcTitleInk, w: FontWeight.w800),
+          ),
+        ]),
+      );
+    }
 
     return TtcCycleCard(
       // Kept for revert (2026-09-29, no tinted slab behind text): color: ttcPanel,
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         ttcEyebrow(t.calendarUpcoming, color: ttcSoft),
         const SizedBox(height: 10),
+        ?fertileRow,
         Row(children: [
           const Icon(Icons.circle_outlined,
               size: 15, color: TtcCycleColours.period),

@@ -178,45 +178,78 @@ void main() {
       (t) => ttcCardKindOf(t) == TtcCardKind.tool,
     );
     await _pumpCard(tester, tool);
-    expect(find.byKey(ttcKindToolBarKey(tool.title)), findsOneWidget);
+    // The wrench is the top-left kind badge since 2026-09-30.
+    expect(find.byKey(ttcKindBadgeKey(tool.title)), findsOneWidget);
     expect(find.byIcon(Icons.build_outlined), findsOneWidget);
     final chat = _allTiles().firstWhere(
       (t) => ttcCardKindOf(t) == TtcCardKind.chat,
     );
     await _pumpCard(tester, chat);
-    expect(find.byIcon(Icons.chat_bubble_outline_rounded), findsOneWidget);
+    expect(find.byIcon(ttcCardKindIcon(TtcCardKind.chat)), findsOneWidget);
     final read = _allTiles().whereType<TtcArticleTile>().first;
     await _pumpCard(tester, read);
-    expect(find.byKey(ttcKindToolBarKey(read.title)), findsNothing);
+    expect(find.byIcon(Icons.build_outlined), findsNothing);
   });
 
-  testWidgets('a paid card shows its corner mark; a free read does not',
+  // ⚠️ AT MOST TWO MARKS (2026-09-30, the user): top left says what it is
+  // (a kind badge), unless a pill already says it; ₹ when it costs money;
+  // bottom right the fact or action (a film's length, Enroll, Live 1:1).
+  testWidgets('a consult: ₹ top left and Live 1:1, no kind badge',
       (tester) async {
     final consult = _allTiles().firstWhere(
       (t) => ttcCardKindOf(t) == TtcCardKind.consult && ttcShelfPrice(t) != null,
     );
-    // No prices on the picture since 2026-09-30 (the user). Kept for revert:
-    //   expect(find.byKey(ttcKindPriceKey(consult.title)), findsOneWidget);
-    //   expect(find.text(ttcShelfPrice(consult)!), findsOneWidget);
     await _pumpCard(tester, consult);
-    expect(find.byKey(ttcKindPriceKey(consult.title)), findsNothing);
+    expect(find.byKey(ttcKindRupeeKey(consult.title)), findsOneWidget);
+    expect(find.text(kTtcConsultLive), findsOneWidget);
+    expect(find.byKey(ttcKindBadgeKey(consult.title)), findsNothing);
     expect(find.text(ttcShelfPrice(consult)!), findsNothing);
+  });
+
+  testWidgets('a product: its bag top left and ₹ top right', (tester) async {
     final product = _allTiles().firstWhere(
       (t) => ttcCardKindOf(t) == TtcCardKind.product,
     );
     await _pumpCard(tester, product);
-    expect(find.byKey(ttcKindPriceKey(product.title)), findsOneWidget);
+    expect(find.byKey(ttcKindBadgeKey(product.title)), findsOneWidget);
+    expect(find.byKey(ttcKindRupeeKey(product.title)), findsOneWidget);
     expect(find.byIcon(Icons.shopping_bag_outlined), findsOneWidget);
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump(const Duration(seconds: 2));
+  });
+
+  testWidgets('a course: Enroll with a clock, no kind badge', (tester) async {
     final course = _allTiles().firstWhere(
       (t) => ttcCardKindOf(t) == TtcCardKind.course,
     );
     await _pumpCard(tester, course);
     expect(find.text(kTtcCourseEnroll), findsOneWidget);
     expect(find.byIcon(Icons.schedule_rounded), findsOneWidget);
+    expect(find.byKey(ttcKindBadgeKey(course.title)), findsNothing);
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump(const Duration(seconds: 2));
+  });
+
+  testWidgets('a read wears one kind badge and no ₹', (tester) async {
     final read = _allTiles().whereType<TtcArticleTile>().first;
     await _pumpCard(tester, read);
-    expect(find.byKey(ttcKindPriceKey(read.title)), findsNothing);
-    // A course card's photo starts a network load; let it settle.
+    expect(find.byKey(ttcKindBadgeKey(read.title)), findsOneWidget);
+    expect(find.byKey(ttcKindRupeeKey(read.title)), findsNothing);
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump(const Duration(seconds: 2));
+  });
+
+  testWidgets('no card carries more than two marks', (tester) async {
+    for (final t in _allTiles()) {
+      final kind = ttcCardKindOf(t);
+      if (kind == null) continue;
+      await _pumpCard(tester, t);
+      var marks = 0;
+      if (find.byKey(ttcKindBadgeKey(t.title)).evaluate().isNotEmpty) marks++;
+      if (find.byKey(ttcKindRupeeKey(t.title)).evaluate().isNotEmpty) marks++;
+      if (find.byKey(ttcKindPriceKey(t.title)).evaluate().isNotEmpty) marks++;
+      expect(marks, lessThanOrEqualTo(2), reason: t.title);
+    }
     await tester.pumpWidget(const SizedBox());
     await tester.pump(const Duration(seconds: 2));
   });

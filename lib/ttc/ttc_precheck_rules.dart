@@ -408,8 +408,13 @@ List<PrecheckPriority> precheckPriorities(
   // ---- and finally anything core she has not looked at ---------------------
   for (final item in kPrecheckItems) {
     if (item.tier != PrecheckTier.core) continue;
-    consider(item.id, _en('One of the few items here that applies to almost '
-        'everyone.'));
+    // ⚠️ THE ITEM'S OWN REASON (2026-09-30, tools review, fix E): this line
+    // said "One of the few items here that applies to almost everyone" under
+    // every core item she had not looked at, which says nothing about THIS one
+    // and had to be reworded "Also core…" when it repeated. The first
+    // sentence of the item's own "why" is specific and cannot repeat. Kept for
+    // revert: _en('One of the few items here that applies to almost everyone.').
+    consider(item.id, _firstSentence(item.why));
   }
 
   // ⚠️ ONE REASON, SAID ONCE (no-repetition sweep, 2026-09-29). The two
@@ -427,6 +432,16 @@ List<PrecheckPriority> precheckPriorities(
   }
 
   return out;
+}
+
+/// The first sentence of [t], for a one-line reason (2026-09-30).
+LocalizedText _firstSentence(LocalizedText t) {
+  String first(String s) {
+    final m = RegExp(r'^.*?[.!?](?=\s|$)').firstMatch(s.trim());
+    return m?.group(0) ?? s.trim();
+  }
+
+  return LocalizedText(en: first(t.en), hi: first(t.hi));
 }
 
 /// What a fallback reason says the second and the third time.

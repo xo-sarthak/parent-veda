@@ -598,9 +598,17 @@ class _TtcSymptomLogScreenState extends State<TtcSymptomLogScreen> {
               onBack: () => _step(-1),
               onForward: () => _step(1),
               onPick: _pickDay,
-              onToday: _canGoForward
-                  ? () => setState(() => _day = _dayOnly(DateTime.now()))
-                  : null,
+              // ⚠️ "BACK TO TODAY" LEFT THE ARROWS (2026-09-30, the user on
+              // the phone: "at the very top, Monday 28, it's all getting
+              // cluttered up"). Between the arrows there is room for about
+              // 110 points, so "Mon 28 Sep", "Cycle day 41", a dot and "Back
+              // to today" wrapped into four ragged lines. The day and its
+              // cycle day stay here; the way back is its own row at the top
+              // of the page (`_BackToTodayRow`). Kept for revert:
+              //   onToday: _canGoForward
+              //       ? () => setState(() => _day = _dayOnly(DateTime.now()))
+              //       : null,
+              onToday: null,
               // ⚠️ WHAT IS SAVED IS A QUIET COUNT UP HERE, NOT A CARD ABOVE
               // THE SEARCH (the user, 2026-09-28: "Nothing saved for this
               // day yet… makes no sense at the top… don't stack
@@ -629,6 +637,14 @@ class _TtcSymptomLogScreenState extends State<TtcSymptomLogScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: 18),
+                if (_canGoForward) ...[
+                  _BackToTodayRow(
+                    day: _dayName,
+                    onTap: () =>
+                        setState(() => _day = _dayOnly(DateTime.now())),
+                  ),
+                  const SizedBox(height: 14),
+                ],
                 // Kept for revert (2026-09-28): the saved card above the
                 // search, which said "Nothing saved for this day yet" on
                 // every first open and pushed the form down a card's height.
@@ -3441,12 +3457,17 @@ class _DayPicker extends StatelessWidget {
           behavior: HitTestBehavior.opaque,
           onTap: onPick,
           child: Row(mainAxisSize: MainAxisSize.min, children: [
+            // ⚠️ THE DATE SHRINKS BEFORE IT CUTS (2026-09-30): "Thu 24 …" hid
+            // the month on the very day she needs to see which one it is.
+            // Kept for revert: the Text with `overflow: ellipsis`.
             Flexible(
-              child: Text(label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.center,
-                  style: ttcJakarta(16)),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(label,
+                    maxLines: 1,
+                    textAlign: TextAlign.center,
+                    style: ttcJakarta(16)),
+              ),
             ),
             // Kept for revert (2026-09-29, the user on build 19: "why do we
             // need a calendar icon altogether… it's just taking space"). It
@@ -3776,7 +3797,12 @@ class _SavedPill extends StatelessWidget {
       textScaler: MediaQuery.textScalerOf(context),
       maxLines: 1,
     )..layout();
-    final w = 9 + 15 + 4 + tp.width + 11 + 2;
+    // ⚠️ NO TICK, TIGHTER (2026-09-30, the user: "remove that tick in that
+    // saved pill… the month is not visible… the date is not visible
+    // clearly"). The day sits on the screen's centre line, so every point
+    // the pill gives up is given to the date twice, on both sides. Kept for
+    // revert: `9 + 15 + 4 + tp.width + 11 + 2` (a 15pt tick and a 4pt gap).
+    final w = 12 + tp.width + 12 + 2;
     tp.dispose();
     return w;
   }
@@ -3794,12 +3820,10 @@ class _SavedPill extends StatelessWidget {
             customBorder: const StadiumBorder(),
             onTap: onTap,
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(9, 7, 11, 7),
-              child: Row(mainAxisSize: MainAxisSize.min, children: [
-                const Icon(Icons.check_rounded, size: 15, color: ttcInk),
-                const SizedBox(width: 4),
-                Text(ttcLogSavedPill(count), style: _style),
-              ]),
+              padding: const EdgeInsets.fromLTRB(12, 7, 12, 7),
+              // Kept for revert: a Row of `Icons.check_rounded` (15, ink), a
+              // 4pt gap and the words, padding (9, 7, 11, 7).
+              child: Text(ttcLogSavedPill(count), style: _style),
             ),
           ),
         ),
@@ -3980,3 +4004,48 @@ class _FoldState extends State<_Fold> {
 /// The focus id for the weight and morning temperature cards (2026-09-28): pass
 /// it as [TtcSymptomLogScreen.focusGroup] to open the log scrolled to them.
 const String kTtcLogMeasurementsGroup = 'measurements';
+
+
+/// On a past day: which day she is on, and one tap back to today. A row of
+/// its own at the top of the page (2026-09-30) instead of a third line
+/// squeezed between the day arrows, where it wrapped.
+class _BackToTodayRow extends StatelessWidget {
+  const _BackToTodayRow({required this.day, required this.onTap});
+
+  final String day;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(children: [
+      Expanded(
+        child: Text('Logging for $day',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: ttcBody(13, color: ttcSoft, w: FontWeight.w700)),
+      ),
+      const SizedBox(width: 10),
+      Material(
+        color: ttcTitleInk,
+        shape: const StadiumBorder(),
+        child: InkWell(
+          key: const ValueKey('ttc_log_back_to_today'),
+          customBorder: const StadiumBorder(),
+          onTap: onTap,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 36),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              child: Center(
+                widthFactor: 1,
+                child: Text(kTtcLogBackToToday,
+                    style: ttcBody(12.5,
+                        color: Colors.white, w: FontWeight.w800)),
+              ),
+            ),
+          ),
+        ),
+      ),
+    ]);
+  }
+}

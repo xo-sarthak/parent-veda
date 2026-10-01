@@ -192,6 +192,10 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
 
   bool _tocOpen = false;
   double _progress = 0;
+
+  /// The section a card opened this read at, shown as a pill until she heads
+  /// back up (2026-09-30), or null.
+  String? _openedAt;
   bool _reachedEnd = false;
 
   /// "▸ References" — collapsed by default (READER-AUDIT §3.2 rule 2). Session
@@ -244,6 +248,11 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
     if (heading == null) return;
     final i = a.sections.indexWhere((s) => s.heading?.en == heading);
     if (i < 0) return; // A heading that no longer exists opens at the top.
+    // ⚠️ SAID, NOT SILENT (2026-09-30, the user: articles "navigate to a
+    // random position inside them"). The jump was right (the card asked a
+    // question this section answers) but invisible, so it read as a bug. A
+    // pill now says where she was taken and offers the top.
+    _openedAt = heading;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _jumpTo(i);
     });
@@ -263,6 +272,8 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
     // Repaint the hairline only when it would actually move a pixel. Without
     // the epsilon this is a setState on every scroll frame.
     if ((p - _progress).abs() > 0.004) setState(() => _progress = p);
+    // Back near the top: the "opened at" pill has done its job.
+    if (_openedAt != null && _sc.offset < 60) setState(() => _openedAt = null);
     _store.setProgress(a.id, p);
     if (!_reachedEnd && p >= 0.9) {
       _reachedEnd = true;
@@ -374,7 +385,8 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
               ),
             ),
             Expanded(
-              child: ListView(
+              child: Stack(children: [
+              ListView(
                 controller: _sc,
                 // The FAB's reserve only while the FAB exists (kAskFabEnabled,
                 // 2026-09-19) — with it off this was a blank band under Read
@@ -630,6 +642,59 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
                   ],
                 ],
               ),
+              // "Opened at …" (2026-09-30): where a card took her, and the top.
+              if (_openedAt case final h?)
+                Positioned(
+                  top: 10,
+                  left: 16,
+                  right: 16,
+                  child: Center(
+                    child: Material(
+                      key: const ValueKey('pv_reader_opened_at'),
+                      color: Colors.white,
+                      elevation: 3,
+                      shadowColor: Colors.black26,
+                      shape: const StadiumBorder(),
+                      child: InkWell(
+                        customBorder: const StadiumBorder(),
+                        onTap: () {
+                          setState(() => _openedAt = null);
+                          if (_sc.hasClients) {
+                            _sc.animateTo(0,
+                                duration: const Duration(milliseconds: 320),
+                                curve: Curves.easeOutCubic);
+                          }
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(14, 8, 12, 8),
+                          child: Row(mainAxisSize: MainAxisSize.min, children: [
+                            Flexible(
+                              child: Text(
+                                'Opened at: $h',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: pvManrope(
+                                    fontSize: 12.5,
+                                    fontWeight: FontWeight.w600,
+                                    color: s.soft),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Icon(Icons.arrow_upward_rounded,
+                                size: 14, color: s.ink),
+                            const SizedBox(width: 3),
+                            Text('Top',
+                                style: pvManrope(
+                                    fontSize: 12.5,
+                                    fontWeight: FontWeight.w800,
+                                    color: s.ink)),
+                          ]),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ]),
             ),
           ]),
         );

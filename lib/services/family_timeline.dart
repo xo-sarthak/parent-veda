@@ -178,6 +178,37 @@ class FamilyTimeline extends ChangeNotifier with TtcSyncedStore {
     notifyListeners();
   }
 
+  /// Corrects the DATE and WORDS of an event the app derived itself, never
+  /// one she wrote (2026-09-30). Trying to conceive writes its milestones
+  /// ("Logged your first period") the day the app first notices them, so a
+  /// period logged today for 19 Aug read "30 Sep" on the timeline and the
+  /// calendar's day card. The date is now the day it happened
+  /// (`TtcMilestoneEngine.syncToTimeline`), and an entry already stored with
+  /// the noticing date is corrected here. Still append-only for anything she
+  /// typed: only milestone ids call this, and nothing is created.
+  void refreshDerived(String id, {required DateTime on, String? titleEn, String? detailEn}) {
+    final e = _events[id];
+    if (e == null) return;
+    final iso = DateTime(on.year, on.month, on.day).toIso8601String();
+    final newTitle = titleEn ?? e.titleEn;
+    final newDetail = detailEn ?? e.detailEn;
+    if (e.dateIso == iso && e.titleEn == newTitle && e.detailEn == newDetail) {
+      return;
+    }
+    _events[id] = TimelineEvent(
+      id: e.id,
+      dateIso: iso,
+      stage: e.stage,
+      kind: e.kind,
+      titleEn: newTitle,
+      titleHi: e.titleHi,
+      detailEn: newDetail,
+      detailHi: e.detailHi,
+    );
+    _persist();
+    notifyListeners();
+  }
+
   /// Removing exists only for a mis-tap the parent made themselves - there is
   /// deliberately no bulk clear and no edit.
   void remove(String id) {

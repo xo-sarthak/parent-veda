@@ -695,6 +695,14 @@ class TtcDoorPinnedBar extends StatelessWidget {
 //  https://mobbin.com/screens/77d1bc6e-a8ee-4672-82cd-60d7f430fe29
 // =============================================================================
 
+/// True: the safety row is the quiet white form, after the tab's first shelf
+/// (2026-09-30). False: the pink one-line row, first in the tab.
+const bool kTtcDoorFlagQuiet = true;
+
+/// The quiet row's title. The read's own callout keeps its words in the list
+/// the row opens.
+const String kTtcDoorFlagQuietTitle = 'When to go to hospital';
+
 class TtcDoorFlagRow extends StatelessWidget {
   const TtcDoorFlagRow({
     super.key,
@@ -722,6 +730,7 @@ class TtcDoorFlagRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final title = callout.title.of(lang);
+    if (kTtcDoorFlagQuiet) return _quiet();
     if (compact) return _compact(title);
     return Semantics(
       button: true,
@@ -789,6 +798,104 @@ class TtcDoorFlagRow extends StatelessWidget {
                     Icon(Icons.chevron_right_rounded, size: 22, color: p.ink2),
                   ],
                 ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// ⚠️ THE QUIET FORM (2026-09-30, the user on After a loss › Your body: the
+  /// pink row with a red "!" is "a sore thumb … can it not be represented
+  /// better, subtle but there"). A white row like every other row on the
+  /// door: an ink hospital mark with one small coral dot (the one colour, the
+  /// reader's own signal for "call"), "When to go to hospital", and the first
+  /// signs from the read's own callout in grey, so the row says what it is
+  /// about without shouting. The tap opens the same full list.
+  Widget _quiet() {
+    final lines = callout.body
+        .of(lang)
+        .split('\n')
+        .map((l) => l.replaceFirst(RegExp(r'^[-•*\s]+'), '').trim())
+        .where((l) => l.isNotEmpty)
+        .toList();
+    final signs = lines.isEmpty ? '' : lines.first;
+    return Semantics(
+      button: true,
+      label: '$kTtcDoorFlagQuietTitle. $signs',
+      excludeSemantics: true,
+      child: PvPress(
+        child: Material(
+          color: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+            side: BorderSide(color: p.line),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            key: const ValueKey('ttc_door_flag_quiet'),
+            onTap: () {
+              pvCommitFeedback();
+              onOpen();
+            },
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(14, 12, 10, 12),
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 26,
+                    height: 26,
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Icon(Icons.local_hospital_outlined,
+                            size: 22, color: p.ink1),
+                        Positioned(
+                          right: -1,
+                          top: -1,
+                          child: Container(
+                            width: 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFE5484D),
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white, width: 1.5),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          kTtcDoorFlagQuietTitle,
+                          style: pvManrope(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            height: 1.3,
+                            color: p.ink1,
+                          ),
+                        ),
+                        if (signs.isNotEmpty) ...[
+                          const SizedBox(height: 2),
+                          Text(
+                            signs,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: pvManrope(fontSize: 12.5, color: p.ink2),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  Icon(Icons.chevron_right_rounded, size: 20, color: p.ink2),
+                ],
               ),
             ),
           ),

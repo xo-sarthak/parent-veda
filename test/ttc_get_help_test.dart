@@ -208,10 +208,14 @@ void main() {
       final page = _door('ttc_after_loss');
       await pumpDoor(tester, page);
       final rid = page.groups!.first.pinnedRedFlagReadIds.first;
-      final row = find.byKey(ttcDoorFlagKey(rid));
+      // After the first shelf since 2026-09-30, so it may be below the fold.
+      final row = find.byKey(ttcDoorFlagKey(rid), skipOffstage: false);
       expect(row, findsOneWidget);
       expect(tester.widget<TtcDoorFlagRow>(row).compact, isTrue);
-      expect(tester.getSize(row).height, lessThan(60));
+      // Two quiet lines since 2026-09-30. Kept for revert: lessThan(60).
+      expect(tester.getSize(row).height, lessThan(90));
+      await tester.ensureVisible(row);
+      await tester.pump();
       expect(find.text('Tap to see the signs'), findsNothing,
           reason: 'one line, not two');
       // Still opens the whole list.

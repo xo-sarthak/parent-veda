@@ -251,17 +251,19 @@ void main() {
       tester,
     ) async {
       await _pump(tester, const TtcPrecheckScreen());
-      expect(find.text('WHERE YOU ARE'), findsNothing);
+      // 2026-09-30: the item's own question replaced "WHERE YOU ARE".
+      final folateAsk = precheckAskFor('folate').question;
+      expect(find.text(folateAsk), findsNothing);
       // The step IS the item's row: drawn once, in the steps card.
       expect(find.text('Folic acid'), findsOneWidget);
       await _tap(tester, _key('ttc_precheck_step_folate'));
-      expect(find.text('WHERE YOU ARE'), findsOneWidget);
+      expect(find.text(folateAsk), findsOneWidget);
       expect(find.text('ASK YOUR DOCTOR'), findsOneWidget);
       // Its link rows name where they go.
       expect(find.text('Open Supplements'), findsOneWidget);
       // Tapping the row again closes it.
       await _tap(tester, _key('ttc_precheck_folate_open'));
-      expect(find.text('WHERE YOU ARE'), findsNothing);
+      expect(find.text(folateAsk), findsNothing);
     });
 
     // Kept for revert (2026-09-29): 'ticking a step takes it off the next
@@ -301,7 +303,9 @@ void main() {
         tester,
         find.descendant(
           of: find.byType(TtcToolOptions),
-          matching: find.text('Not relevant to me'),
+          // Tobacco's own word for "not relevant" (2026-09-30). Kept for
+          // revert: 'Not relevant to me'.
+          matching: find.text(precheckAskFor('tobacco').notRelevant),
         ),
       );
 

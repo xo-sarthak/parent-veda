@@ -16,14 +16,19 @@
 //  core medical item. Collapsing them into one tick would let the list report
 //  a medication review that never happened.
 //
-//  ⚠️ NO CLOUD SYNC. TTC takes no new tables while its UI is settling —
-//  `docs/STILL-OPEN.md` §9.7, the same call attachments, vaccinations and the
-//  PCOS checker all made.
+//  ⚠️ CLOUD COPY SINCE 2026-10-01, WITH STILL NO NEW TABLE. TTC takes no new
+//  tables while its UI is settling (`docs/STILL-OPEN.md` §9.7, the call
+//  attachments, vaccinations and the PCOS checker made). This store now syncs
+//  as one blob in the EXISTING `user_state` table, which is own-row by policy,
+//  so a new phone gets her answers back and her partner can never read them.
+//  Kept for revert: the old line said "NO CLOUD SYNC".
 // =============================================================================
 
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../services/remote/cloud_synced_store.dart';
+import '../services/remote/supabase_repo.dart';
 import 'ttc_precheck_data.dart';
 import 'ttc_precheck_rules.dart';
 
@@ -75,18 +80,61 @@ class PrecheckEntry {
   }
 }
 
-class TtcPrecheckStore extends ChangeNotifier {
+class TtcPrecheckStore extends ChangeNotifier with CloudSyncedStore {
   TtcPrecheckStore._();
   static final TtcPrecheckStore instance = TtcPrecheckStore._();
 
   static const _kEntries = 'ttc_precheck_entries';
   static const _kOpened = 'ttc_precheck_opened';
 
+  /// When she last opened the checklist (ISO), for "since you were last here"
+  /// (2026-10-01, the fifth change to what the checklist gives back).
+  static const _kLastVisit = 'ttc_precheck_last_visit';
+
   final Map<String, PrecheckEntry> _entries = {};
   bool _everOpened = false;
   bool _loaded = false;
 
   bool get everOpened => _everOpened;
+
+  /// The visit BEFORE this one, or null on the first. Held for the whole
+  /// visit so the note does not move while she ticks.
+  DateTime? _sinceVisit;
+  DateTime? get sinceVisit => _sinceVisit;
+
+  /// Called when the checklist opens: remembers the previous visit for the
+  /// note, then stamps this one. Safe to call again in one visit (the first
+  /// call's value is kept).
+  Future<void> beginVisit({DateTime? now}) async {
+    if (_visitBegun) return;
+    _visitBegun = true;
+    final p = await SharedPreferences.getInstance();
+    final raw = p.getString(_kLastVisit);
+    _sinceVisit = raw == null ? null : DateTime.tryParse(raw);
+    await p.setString(_kLastVisit, (now ?? DateTime.now()).toIso8601String());
+    notifyListeners();
+  }
+
+  bool _visitBegun = false;
+
+  /// How many items she settled as DONE since the previous visit, by her own
+  /// answers (a tick the app made from her records is not counted: she did not
+  /// do it here). Zero on a first visit or when she was here today.
+  int settledSinceLastVisit({DateTime? now}) {
+    final since = _sinceVisit;
+    if (since == null) return 0;
+    final n = now ?? DateTime.now();
+    if (DateTime(since.year, since.month, since.day) ==
+        DateTime(n.year, n.month, n.day)) {
+      return 0;
+    }
+    return _entries.values
+        .where((e) =>
+            e.status == PrecheckStatus.done &&
+            e.settledOn != null &&
+            e.settledOn!.isAfter(since))
+        .length;
+  }
 
   Future<void> load() async {
     if (_loaded) return;
@@ -100,7 +148,59 @@ class TtcPrecheckStore extends ChangeNotifier {
     }
     _everOpened = p.getBool(_kOpened) ?? false;
     notifyListeners();
+    // ⚠️ A CLOUD COPY (2026-10-01, change 4 of the checklist's "what does she
+    // get back"): her answers used to live on one phone, so a new phone or a
+    // reinstall started the list from nothing. Synced as one blob in
+    // `user_state`, the house pattern for a person's own small state. That
+    // table is own-row by policy (0011), so her partner can never read it:
+    // the checklist is hers, and no migration is needed.
+    await syncStateFromCloud();
   }
+
+  // ---------------------------------------------------------------------------
+  //  Cloud copy (one blob in user_state; hers only)
+  // ---------------------------------------------------------------------------
+
+  @override
+  String get cloudKey => 'ttc_precheck';
+
+  @override
+  Object cloudData() =>
+      {for (final e in _entries.entries) e.key: e.value.encode()};
+
+  /// ⚠️ A MERGE, NOT "CLOUD WINS". The mixin's default adopts the cloud copy
+  /// whole, which would discard a tick she made offline on this phone before
+  /// the first sync. Per item, the answer settled LAST wins (an answer with no
+  /// date is the oldest). If this phone held answers the cloud lacked, they are
+  /// sent up once, so the two end up equal.
+  @override
+  void applyCloudData(Object data) {
+    if (data is! Map) return;
+    var localOnly = false;
+    final seen = <String>{};
+    data.forEach((k, v) {
+      if (k is! String || v is! String) return;
+      final cloud = PrecheckEntry.decode(v);
+      if (cloud == null) return;
+      seen.add(k);
+      final mine = _entries[k];
+      final cloudAt = cloud.settledOn;
+      final mineAt = mine?.settledOn;
+      if (mine == null ||
+          (cloudAt != null && (mineAt == null || cloudAt.isAfter(mineAt)))) {
+        _entries[k] = cloud;
+      } else if (mineAt != null && (cloudAt == null || mineAt.isAfter(cloudAt))) {
+        localOnly = true;
+      }
+    });
+    if (_entries.keys.any((k) => !seen.contains(k))) localOnly = true;
+    if (localOnly) {
+      SupabaseRepo.saveState(cloudKey, cloudData()).catchError((_) {});
+    }
+  }
+
+  @override
+  Future<void> persistLocalCache() => _persist();
 
   Future<void> markOpened() async {
     if (_everOpened) return;
@@ -251,8 +351,11 @@ class TtcPrecheckStore extends ChangeNotifier {
 
   Future<void> reset() async {
     _entries.clear();
+    _sinceVisit = null;
+    _visitBegun = false;
     notifyListeners();
     final p = await SharedPreferences.getInstance();
     await p.remove(_kEntries);
+    await p.remove(_kLastVisit);
   }
 }

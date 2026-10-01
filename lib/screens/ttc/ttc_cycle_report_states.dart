@@ -436,8 +436,11 @@ class TtcReportRefusalBody extends StatelessWidget {
                 ],
                 const SizedBox(height: 8),
                 Text(body, style: ttcBody(13, h: 1.55)),
-                const SizedBox(height: 12),
-                Text(body2, style: ttcBody(13, h: 1.55)),
+                // An empty second paragraph takes no room (2026-09-30).
+                if (body2.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  Text(body2, style: ttcBody(13, h: 1.55)),
+                ],
                 if (!actionFirst) ...[
                   const SizedBox(height: 18),
                   TtcReportAction(label: actionLabel, onTap: onAction),

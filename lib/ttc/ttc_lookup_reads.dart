@@ -174,11 +174,11 @@ PvRead ttcCanIAsRead(TtcCanI item) {
     id: kTtcCanIReadPrefix + item.id,
     kicker: LocalizedText(
         en: const TtcS(false).canITitle, hi: const TtcS(true).canITitle),
-    title: LocalizedText(en: item.questionEn, hi: item.questionHi),
+    title: LocalizedText(en: item.question(false), hi: item.question(true)),
     // The verdict IS the standfirst: the word, and its limit where it has
     // one, before a single sentence of reasoning.
     teaser: LocalizedText(en: verdict(false), hi: verdict(true)),
-    shortAnswer: LocalizedText(en: item.shortEn, hi: item.shortHi),
+    shortAnswer: LocalizedText(en: item.short(false), hi: item.short(true)),
     scaleSetter: _en(''),
     author: _en('ParentVeda team'),
     authorRole: LocalizedText(
@@ -188,12 +188,12 @@ PvRead ttcCanIAsRead(TtcCanI item) {
     sections: [
       PvReadSection(
         heading: _en('Why is that the answer?'),
-        paragraphs: [LocalizedText(en: item.whyEn, hi: item.whyHi)],
+        paragraphs: [LocalizedText(en: item.why(false), hi: item.why(true))],
       ),
       PvReadSection(
         tip: PvReadTip(
           title: _en('In an Indian home'),
-          body: LocalizedText(en: item.indianEn, hi: item.indianHi),
+          body: LocalizedText(en: item.indian(false), hi: item.indian(true)),
         ),
       ),
     ],

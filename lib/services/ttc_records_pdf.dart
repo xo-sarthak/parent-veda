@@ -50,6 +50,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 
 import '../localization/app_language.dart';
+import '../ttc/ttc_precheck_notes.dart';
 import '../ttc/ttc_records_grouping.dart';
 import 'pdf_fonts.dart';
 import 'remote/storage_service.dart';
@@ -118,6 +119,7 @@ class TtcRecordsPdf {
 
     final groups = ttcGroupedRecords();
     final coverage = ttcRecordCoverage();
+    final checklist = ttcPrecheckNotes(lang);
     final shots = await _resolveShots(groups);
     final unshown = _unshown(groups);
 
@@ -247,6 +249,46 @@ class TtcRecordsPdf {
           ]),
         ),
         for (final g in groups) block(g),
+
+        // ⚠️ HER CHECKLIST NOTES, ON A PAGE FOR A VISIT (2026-10-01, change 2
+        // of the checklist's "what does she get back"): the same covered /
+        // to-talk-about / questions the notes page copies, so the one sheet
+        // she hands over holds her results and what she wants to ask. Only
+        // for an appointment, and only when there is something. What she
+        // told the app, never a reading of it. Kept for revert: absent.
+        if (forAppointment != null && !checklist.isEmpty) ...[
+          pw.SizedBox(height: 22),
+          label('My checklist notes'),
+          pw.SizedBox(height: 5),
+          pw.Text('Getting ready for pregnancy',
+              style: pw.TextStyle(font: serif, fontSize: 14, color: _ink)),
+          pw.SizedBox(height: 6),
+          if (checklist.covered.isNotEmpty)
+            pw.Text('Already covered: ${checklist.covered.join(', ')}.',
+                style: pw.TextStyle(
+                    font: body, fontSize: 9.5, lineSpacing: 1.5, color: _ink2)),
+          if (checklist.toTalkAbout.isNotEmpty) ...[
+            pw.SizedBox(height: 4),
+            pw.Text("I'd like to talk about: ${checklist.toTalkAbout.join(', ')}.",
+                style: pw.TextStyle(
+                    font: body, fontSize: 9.5, lineSpacing: 1.5, color: _ink2)),
+          ],
+          if (checklist.questions.isNotEmpty) ...[
+            pw.SizedBox(height: 6),
+            label('My questions'),
+            pw.SizedBox(height: 3),
+            for (final q in checklist.questions)
+              pw.Padding(
+                padding: const pw.EdgeInsets.only(bottom: 2),
+                child: pw.Text('- $q',
+                    style: pw.TextStyle(
+                        font: body,
+                        fontSize: 9.5,
+                        lineSpacing: 1.4,
+                        color: _ink)),
+              ),
+          ],
+        ],
 
         if (coverage.notAdded.isNotEmpty) ...[
           pw.SizedBox(height: 20),

@@ -103,6 +103,10 @@ enum TtcInsightGo {
   /// One read, by [TtcInsightCard.readId]. Added 2026-09-28 so that no two
   /// cards on one rail open the same screen (see `ttcRailDestination`).
   read,
+
+  /// The Pre-pregnancy checklist (`ttc_precheck`): "Your next step". Added
+  /// 2026-10-01, so the answers she gives there come back to the home.
+  precheck,
 }
 
 /// Where a card lands, as one comparable string: the destination, plus the

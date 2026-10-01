@@ -121,8 +121,10 @@ void main() {
       final handle = tester.ensureSemantics();
       await _pump(tester, const TtcCanIScreen());
       // The row merges it into one announcement with its question.
+      // 2026-09-30: vaping joined smoking on this verdict, so two rows say
+      // it. Kept for revert: findsOneWidget.
       expect(find.bySemanticsLabel(RegExp('Answer: No, best to stop')),
-          findsOneWidget);
+          findsNWidgets(2));
       handle.dispose();
     });
   });

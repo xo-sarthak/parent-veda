@@ -316,7 +316,9 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 400));
       expect(CycleStore.instance.periodStarts, contains(ago(3)));
-      expect(find.text('Period saved: started ${ttcShortDate(ago(3))}'),
+      // 2026-09-30: the notice now also says what the save changed. Kept
+      // for revert: find.text('Period saved: started ${ttcShortDate(ago(3))}')
+      expect(find.textContaining('Period saved: ${ttcShortDate(ago(3))}.'),
           findsOneWidget);
     });
 

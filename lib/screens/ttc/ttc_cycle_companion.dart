@@ -46,11 +46,13 @@ import 'package:flutter/services.dart';
 import '../../theme/pv_fonts.dart';
 import '../../ttc/cycle_store.dart';
 import '../../ttc/ttc_chapter.dart';
+import '../../ttc/ttc_day_context.dart' show ttcDayContext;
 import '../../ttc/ttc_cycle_report.dart';
 import '../../ttc/ttc_store.dart';
 import '../v2/v2_palette.dart';
 import '../v2/v3_hero_field.dart';
 import 'ttc_common.dart';
+import 'ttc_what_is_this.dart';
 import 'ttc_cycle_report_screen.dart';
 import 'ttc_cycle_report_v3.dart';
 import 'ttc_home_gap.dart' show showTtcPeriodCameNudge;
@@ -237,13 +239,15 @@ class _Hero extends StatelessWidget {
               Expanded(
                 // One name with the Tools tile (2026-09-27). Kept for revert:
                 // 'Cycle Companion'.
-                child: Text('Cycle companion',
+                child: Text(kTtcCycleCompanionName,
                     style: pvManrope(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
                         letterSpacing: -0.2,
                         color: p.ink1)),
               ),
+              // What this screen is, in three lines (2026-09-30).
+              const TtcWhatIsButton(what: kTtcWhatIsCompanion),
               // ⚠️ THE CHIP CARRIES THE RAW CYCLE DAY, and it is the only place
               // on the screen that does. The engine calls it backend truth and
               // warns against rendering it in the calm surfaces; a small chip
@@ -987,7 +991,13 @@ class _DayCell extends StatelessWidget {
                                 : TtcCycleColours.onFill(phase!),
                     w: isToday ? FontWeight.w800 : FontWeight.w700)),
           ),
-          if (isToday && !expected)
+          // ⚠️ NOT "NOW" ON THE 1ST (2026-10-01, a test that runs on the date
+          // caught it the morning it was October 1st): the first day of a
+          // month shows its month name, and with today's "Now" as well the cell
+          // held three lines in 34.8 points and overflowed by 8.2. Today is
+          // already the filled ink cell; the month name wins. Kept for revert:
+          // `if (isToday && !expected)`.
+          if (isToday && !expected && !showsMonth)
             FittedBox(
               fit: BoxFit.scaleDown,
               child: Text(kTtcNowLabel,
@@ -1722,9 +1732,15 @@ String ttcHomePeriodLine(
   switch (intent) {
     case TtcHomePeriodIntent.first:
       return 'Your period started on $day.';
+    // ⚠️ SAID AS A CHOICE, NOT A RULE (2026-09-30, the user: "nothing
+    // changes unless you pick another day… what does it mean?"). The sheet
+    // opens on the start she already logged, so the line says that, and
+    // what to do if a new period has begun. Kept for revert:
+    //   'Your period started on $day. Nothing changes unless you pick '
+    //       'another day.'
     case TtcHomePeriodIntent.keep:
-      return 'Your period started on $day. Nothing changes unless you pick '
-          'another day.';
+      return 'Your period started on $day. If a new one has started, tap '
+          'the day it began.';
     case TtcHomePeriodIntent.already:
       return 'A period starting $day is already logged. Nothing changes.';
     case TtcHomePeriodIntent.move:
@@ -1739,6 +1755,25 @@ String ttcHomePeriodLine(
       return 'Add an earlier period starting $day. Your current cycle, from '
           '$from, stays as it is.';
   }
+}
+
+/// What a saved period changed, in one short line (2026-09-30): the fertile
+/// days it now gives her, or what is still needed before there are any.
+/// Read after the save, from the one resolver every date screen uses.
+String ttcPeriodSavedNote(DateTime picked, {bool earlier = false}) {
+  final saved = earlier
+      ? 'Earlier period added: ${ttcShortDate(picked)}.'
+      : 'Period saved: ${ttcShortDate(picked)}.';
+  final ctx = ttcDayContext(DateTime.now());
+  final opens = ctx.windowOpensOn, closes = ctx.windowClosesOn;
+  if (!ctx.isCurrentCycle || ctx.cycleOwnership != TimingOwnership.parentveda) {
+    return saved;
+  }
+  if (opens != null && closes != null) {
+    return '$saved Fertile days: ${ttcShortDate(opens)} to '
+        '${ttcShortDate(closes)}.';
+  }
+  return '$saved Log your next one too, and your fertile days will show.';
 }
 
 /// The home's Period button. Opens the stage's own log sheet on her logged
@@ -1805,6 +1840,19 @@ class _LogSheetState extends State<_LogSheet> {
     final owner = widget.correcting ?? anchor;
     _bleed = owner == null ? null : CycleStore.instance.bleedDaysFor(owner);
   }
+
+  /// A period starting on the picked day is already logged (2026-09-30).
+  /// Only for the plain "Add a period date" sheet: the home's sheet says so
+  /// through its own intent (`already`), and a correction moves a date.
+  bool get _duplicate =>
+      !widget.home &&
+      !_isEdit &&
+      _picked != null &&
+      CycleStore.instance.periodStarts.any((s) => _sameDay(s, _picked!));
+
+  /// The duplicate's bleeding days differ from what the sheet now holds.
+  bool get _duplicateBleedChanged =>
+      _duplicate && CycleStore.instance.bleedDaysFor(_picked!) != _bleed;
 
   TtcHomePeriodIntent? get _homeIntent => !widget.home || _picked == null
       ? null
@@ -1910,17 +1958,27 @@ class _LogSheetState extends State<_LogSheet> {
       case TtcHomePeriodIntent.earlier:
         store.logPeriodStart(picked);
         store.logBleedDays(picked, _bleed);
-        note = intent == TtcHomePeriodIntent.earlier
-            ? 'Earlier period added: ${ttcShortDate(picked)}'
-            : 'Period saved: started ${ttcShortDate(picked)}';
+        // ⚠️ THE NOTICE SAYS WHAT THE SAVE CHANGED (2026-09-30). She logged
+        // 8 September, the home still said "Not enough logged", and it read
+        // as a tap that did nothing (the user: "I kept logging the period,
+        // nothing was happening"). Now the notice names the result: her
+        // fertile days if there are some, or what is still needed.
+        // Kept for revert:
+        //   note = intent == TtcHomePeriodIntent.earlier
+        //       ? 'Earlier period added: ${ttcShortDate(picked)}'
+        //       : 'Period saved: started ${ttcShortDate(picked)}';
+        note = ttcPeriodSavedNote(picked,
+            earlier: intent == TtcHomePeriodIntent.earlier);
         undo = () => store.removePeriodStart(picked);
     }
     HapticFeedback.selectionClick();
     navigator.maybePop();
     if (note != null && messenger != null && widget.notify) {
+      // No `lift` (2026-09-30): pvSnack places it by the screen underneath,
+      // above the home's tab bar or at the foot of any other TTC page. The
+      // fixed 24 hid it behind the home's bar. Kept for revert: lift: 24.
       pvSnack(navigator.context, note,
           icon: Icons.check_rounded,
-          lift: 24,
           action: undo == null ? null : 'Undo',
           onAction: undo);
     }
@@ -1942,6 +2000,30 @@ class _LogSheetState extends State<_LogSheet> {
     final picked = _picked;
     if (picked == null) return;
     final store = CycleStore.instance;
+
+    // ⚠️ ALREADY LOGGED IS SAID, NOT SAVED AGAIN (2026-09-30, the user: "if
+    // I have logged the period for 8th of September and I re-log it… it
+    // should tell me that you have already done that… if I change the
+    // bleeding days then… make the change in the original log"). The line
+    // above the button said so before the tap; this does what it said.
+    if (_duplicate) {
+      final changed = _duplicateBleedChanged;
+      if (changed) store.logBleedDays(picked, _bleed);
+      HapticFeedback.selectionClick();
+      final navigator = Navigator.of(context);
+      final messenger = ScaffoldMessenger.maybeOf(context);
+      navigator.maybePop();
+      if (messenger != null && widget.notify) {
+        pvSnack(
+          navigator.context,
+          changed
+              ? 'Bleeding days updated for ${ttcShortDate(picked)}.'
+              : '${ttcShortDate(picked)} was already logged. Nothing changed.',
+          icon: Icons.check_rounded,
+        );
+      }
+      return;
+    }
 
     if (_isEdit) {
       // ⚠️ A MOVE, NOT A DELETE AND AN ADD. Removing clears the bleed length,
@@ -1968,13 +2050,14 @@ class _LogSheetState extends State<_LogSheet> {
     // as a tap that did nothing. The "talk it through" offer, when it
     // applies, replaces this notice (it says the period was logged too).
     if (messenger != null && widget.notify) {
+      // The result, not only the save (2026-09-30), placed by pvSnack.
+      // Kept for revert: 'Period saved: started …' with lift: 24.
       pvSnack(
         navigator.context,
         _isEdit
             ? 'Changed to ${ttcShortDate(picked)}'
-            : 'Period saved: started ${ttcShortDate(picked)}',
+            : ttcPeriodSavedNote(picked),
         icon: Icons.check_rounded,
-        lift: 24,
       );
     }
     if (!_isEdit && messenger != null) {
@@ -2123,12 +2206,46 @@ class _LogSheetState extends State<_LogSheet> {
                         onTap: () => _saveHome(separate: true),
                       ),
                     ],
-                  ] else
+                  ] else ...[
+                    // A day already logged says so before the tap
+                    // (2026-09-30), in the home sheet's white line.
+                    if (_duplicate) ...[
+                      Container(
+                        key: const ValueKey('ttc_period_already_line'),
+                        width: double.infinity,
+                        padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: const Border.fromBorderSide(
+                              BorderSide(color: ttcLine)),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: Text(
+                            _duplicateBleedChanged
+                                ? 'You already logged a period starting '
+                                    '${ttcShortDate(_picked!)}. Saving '
+                                    'updates its bleeding days.'
+                                : 'You already logged a period starting '
+                                    '${ttcShortDate(_picked!)}.',
+                            style: ttcBody(13.5,
+                                color: ttcTitleInk,
+                                w: FontWeight.w600,
+                                h: 1.45)),
+                      ),
+                      const SizedBox(height: 12),
+                    ],
                     // Kept as it was for every other caller.
                     _QuietAction(
-                      label: _isEdit ? 'Save the correction' : 'Save this period',
+                      label: _isEdit
+                          ? 'Save the correction'
+                          : _duplicate
+                              ? (_duplicateBleedChanged
+                                  ? 'Update bleeding days'
+                                  : 'Done')
+                              : 'Save this period',
                       onTap: _picked == null ? null : _save,
                     ),
+                  ],
                   const SizedBox(height: 10),
                   _QuietAction(
                     label: 'Not now',
@@ -2303,8 +2420,14 @@ class _Step extends StatelessWidget {
           width: 34,
           height: 34,
           alignment: Alignment.center,
+          // ⚠️ NO LAVENDER FILL (2026-09-30, the user on the month arrows:
+          // "you can still see that purple background which is not needed").
+          // White with a hairline, as the day chips below. Kept for revert:
+          //   color: ttcPanel, borderRadius: BorderRadius.circular(11)
           decoration: BoxDecoration(
-              color: ttcPanel, borderRadius: BorderRadius.circular(11)),
+              color: Colors.white,
+              border: Border.all(color: ttcLine),
+              shape: BoxShape.circle),
           child: Icon(icon,
               size: 18, color: onTap == null ? ttcBorder : ttcTitleInk),
         ),
@@ -2324,8 +2447,14 @@ class _Chip extends StatelessWidget {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 130),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          // ⚠️ NO LAVENDER FILL BEHIND THE NUMBERS (2026-09-30, the user:
+          // "why is there this purple background thing still behind the
+          // numbers? I said no to it"). An unpicked chip is white with a
+          // hairline, a picked one ink, the base UI's chip. Kept for revert:
+          //   color: on ? ttcTitleInk : ttcPanel,
           decoration: BoxDecoration(
-            color: on ? ttcTitleInk : ttcPanel,
+            color: on ? ttcTitleInk : Colors.white,
+            border: Border.all(color: on ? ttcTitleInk : ttcLine),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Text(label,

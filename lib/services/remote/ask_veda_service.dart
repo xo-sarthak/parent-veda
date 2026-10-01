@@ -124,6 +124,20 @@ class AskVedaService {
     /// it only while a clinic owns the cycle, and NEVER from the partner's
     /// account (same rule as [cycleDay]).
     String? treatmentStep,
+
+    /// What she has already covered in the Pre-pregnancy checklist, and what
+    /// she has flagged to ask a doctor about: `{covered: [item ids], flagged:
+    /// [item ids]}`. IDS ONLY, never her notes or any free text. Framing
+    /// only: so an answer does not tell her to start what she already has
+    /// started, and can say a flagged item is worth raising with her doctor.
+    /// Her own device only, NEVER the partner's (the checklist is hers).
+    ///
+    /// ⚠️ TWO-REPO FIELD (2026-10-01). Sending it alone does nothing: the
+    /// service must declare `ttc_checklist` and use it. See
+    /// `docs/ASKVEDA-CHECKLIST-HANDOVER.md` for the field's shape and what the
+    /// service should do. Until then this half is inert (the service logs the
+    /// unknown field).
+    Map<String, List<String>>? ttcChecklist,
     int? monthsTrying,
     /// 'en' | 'hi' — which language's content cards to show (bilingual content
     /// is stored as an English doc plus a Hinglish twin).
@@ -154,6 +168,7 @@ class AskVedaService {
               if (ttcPath != null) 'ttc_path': ttcPath,
               if (timingOwnership != null) 'timing_ownership': timingOwnership,
               if (treatmentStep != null) 'treatment_step': treatmentStep,
+              if (ttcChecklist != null) 'ttc_checklist': ttcChecklist,
               if (monthsTrying != null) 'months_trying': monthsTrying,
               if (lang != null) 'lang': lang,
               if (domain != null) 'domain': domain,

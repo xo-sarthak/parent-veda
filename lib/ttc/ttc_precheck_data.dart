@@ -117,10 +117,16 @@ enum PrecheckSection {
 ///     unreachable, and that is deliberate — see the wiring gate.
 ///
 /// To put it back: return `PrecheckSection.values` here. Nothing else changed.
+// ⚠️ THE ORDER IS THE ORDER OF URGENCY (2026-09-30): what has to start or
+// change BEFORE conceiving (folic acid, what she takes), then the check-up and
+// the vaccines that need a month's gap, then everyday things, then the rest.
+// Medicines was third, after the check-up, though its own blurb calls it "the
+// most important section here". Kept for revert: folate, health, medicines,
+// vaccines, ...
 const List<PrecheckSection> ttcVisiblePrecheckSections = [
   PrecheckSection.folate,
-  PrecheckSection.health,
   PrecheckSection.medicines,
+  PrecheckSection.health,
   PrecheckSection.vaccines,
   PrecheckSection.lifestyle,
   PrecheckSection.body,
@@ -277,7 +283,11 @@ final List<PrecheckItem> kPrecheckItems = [
 
   PrecheckItem(
     id: 'supplement_review',
-    section: PrecheckSection.folate,
+    // ⚠️ IN THE SECTION THAT NAMES IT (2026-09-30, the user: "why is medicine
+    // and supplements randomly placed?"). "Medicines and supplements" held
+    // one item, a review of medicines, while "Supplement review" sat under
+    // "Folic acid and food". Kept for revert: section: PrecheckSection.folate.
+    section: PrecheckSection.medicines,
     tier: PrecheckTier.core,
     title: _en('Supplement review'),
     why: _en('Supplements are medicines with a friendlier label. Some '
@@ -633,3 +643,125 @@ final LocalizedText kPrecheckPatternBreak = _en(
     "Getting ready for pregnancy isn't about a perfect score. It's about "
     'giving yourself a little more to go on before the next chapter '
     'begins.');
+
+// -----------------------------------------------------------------------------
+//  Each item asks its OWN question (2026-09-30)
+// -----------------------------------------------------------------------------
+//
+//  ⚠️ THE USER, LOOKING AT THE TOOL ON THE PHONE: "Everywhere you open, where
+//  are you? Your reproductive history, where are you? Done? Need to do? Not
+//  sure, not relevant to me? For every drop down the same question with the
+//  same options." Every opened item carried the one question "Where you are"
+//  and the four answers "Done / Need to do / Not sure / Not relevant to me",
+//  which fit "Folic acid" and made no sense on "Tobacco" ("Done?") or "Your
+//  reproductive history" ("Need to do?"). The tools review had rendered one
+//  opened item and called it good.
+//
+//  So each item now asks the question it is about, and its four answers say
+//  what they mean for that item. UNDERNEATH NOTHING CHANGES: the four answers
+//  still store as the same four statuses (done, needsAttention, notSure,
+//  notRelevant), so the ring, the next-3 steps, the folds and the doctor
+//  notes read exactly what they read before. Only the words are the item's.
+//  English only (new copy); an item with no entry falls back to the generic
+//  question, which a test forbids for every shipped item.
+
+class PrecheckAsk {
+  const PrecheckAsk(
+      this.question, this.done, this.need, this.notSure, this.notRelevant);
+
+  final String question;
+
+  /// Stored as [PrecheckStatus.done].
+  final String done;
+
+  /// Stored as [PrecheckStatus.needsAttention].
+  final String need;
+
+  /// Stored as [PrecheckStatus.notSure].
+  final String notSure;
+
+  /// Stored as [PrecheckStatus.notRelevant]. Leaves her count, as before.
+  final String notRelevant;
+
+  String labelFor(PrecheckStatus s) => switch (s) {
+        PrecheckStatus.done => done,
+        PrecheckStatus.needsAttention => need,
+        PrecheckStatus.notSure => notSure,
+        PrecheckStatus.notRelevant => notRelevant,
+        PrecheckStatus.untouched => 'Not looked at',
+      };
+}
+
+/// The old one-question-for-everything, kept as the fallback and for revert.
+const PrecheckAsk kPrecheckGenericAsk = PrecheckAsk(
+  'Where are you with this?',
+  'Done',
+  'Need to do',
+  'Not sure',
+  'Not relevant to me',
+);
+
+const Map<String, PrecheckAsk> kPrecheckAsks = {
+  'folate': PrecheckAsk('Are you taking folic acid?', 'Yes, I take it',
+      'Not yet', 'Not sure of the dose', "Doesn't apply to me"),
+  'nutrition': PrecheckAsk('Is your eating covering the basics?', 'Yes, mostly',
+      'Not really', 'Not sure', "Doesn't apply to me"),
+  'supplement_review': PrecheckAsk(
+      'Have you checked your supplements with a doctor or pharmacist?',
+      'Yes, checked',
+      'Not yet',
+      'Not sure',
+      'I take none'),
+  'preconception_visit': PrecheckAsk('Have you had a check-up before trying?',
+      "Yes, I've had one", 'I need to book one', 'Not sure I need one',
+      "Doesn't apply to me"),
+  'conditions': PrecheckAsk('Do you have a long-term condition?',
+      "Yes, it's under control", 'Yes, it needs a check', 'Not sure',
+      'No, I have none'),
+  'baseline_tests': PrecheckAsk('Have you had these blood tests?',
+      'Yes, recently', 'Not yet', 'Not sure which', "Doesn't apply to me"),
+  'medication_review': PrecheckAsk('Has a doctor reviewed your medicines?',
+      'Yes, reviewed', 'Not yet', 'Not sure', 'I take none'),
+  'vaccines': PrecheckAsk('Are your vaccines up to date?', 'Yes, up to date',
+      'I need some', 'Not sure', "Doesn't apply to me"),
+  'tobacco': PrecheckAsk('Do you use tobacco?', "I've stopped",
+      'I want to stop', 'Only sometimes', 'I never have'),
+  'alcohol': PrecheckAsk('How is alcohol for you?', "I've cut right back",
+      'I want to cut back', 'Not sure', "I don't drink"),
+  'caffeine': PrecheckAsk('How much caffeine do you have?',
+      'Within about 200 mg', 'More than that', 'Not sure how much',
+      "I don't have it"),
+  'movement': PrecheckAsk('Are you active most days?', 'Yes, most days',
+      'I want to do more', 'Not sure', 'My doctor says rest'),
+  'sleep': PrecheckAsk('Are you sleeping well?', 'Yes, mostly', "It's broken",
+      'Not sure', "Doesn't apply to me"),
+  'body': PrecheckAsk('Have you looked at your weight and health?',
+      "Yes, it's fine", 'I want to work on it', 'Not sure',
+      "Doesn't apply to me"),
+  'dental': PrecheckAsk('Have you had a dental check lately?', 'Yes, recently',
+      'I need to book', 'Not sure when', "Doesn't apply to me"),
+  'family_history': PrecheckAsk('Do you know what runs in your family?',
+      "Yes, I've checked", 'I need to ask', 'Not sure', "I can't find out"),
+  'reproductive_history': PrecheckAsk(
+      'Has a doctor heard about your past pregnancies or treatment?',
+      'Yes, they have',
+      'I should mention it',
+      'Not sure it matters',
+      'Nothing to report'),
+  'partner_health': PrecheckAsk('Has he had a check-up?', 'Yes, he has',
+      'He needs one', 'Not sure', "Doesn't apply to us"),
+  'partner_meds': PrecheckAsk('Has he checked his medicines?', 'Yes, he has',
+      'He needs to', 'Not sure', 'He takes none'),
+  'fertile_window': PrecheckAsk('Do you know your fertile days?',
+      'Yes, I know them', 'I want to learn', 'Not sure', "Doesn't apply to me"),
+  'cycle_tracking': PrecheckAsk('Do you keep a record of your cycles?',
+      'Yes, I log them', 'I need to start', 'Not sure how',
+      "Doesn't apply to me"),
+  'when_to_seek_help': PrecheckAsk('Do you know when to ask for help?',
+      'Yes, I know', "I'd like to read it", 'Not sure', "Doesn't apply to me"),
+  'who_to_see': PrecheckAsk('Do you know who to see?', 'Yes, I have someone',
+      'I need to find someone', 'Not sure who', "Doesn't apply to me"),
+};
+
+PrecheckAsk precheckAskFor(String itemId) =>
+    kPrecheckAsks[itemId] ?? kPrecheckGenericAsk;

@@ -2353,6 +2353,31 @@ writing the old values back with a fresh `updated_at`, the same newest-wins merg
 **Couple view, own writes, unchanged.** Both see both lists (labelled "Yours" and "His"/"Hers"); only the author
 can tick, move or edit, which is exactly what the own-row UPDATE policy already enforces.
 
+## 16u. Pick the table by who may read it, not by what is convenient — the checklist's cloud copy (`TtcPrecheckStore`, no migration)
+
+The Pre-pregnancy checklist kept her answers on one phone. A new phone or a reinstall started her list from nothing.
+The user's rule: a cloud copy, **hers only, nothing for his side**.
+
+**The choice that mattered was the table, not the code.** TTC's other stores (16q, 16r) sync to real tables whose
+policies let her partner *read* (couple-scoped). That is right for the journal and the questions, and wrong here.
+`user_state` (0011) is one JSON blob per `(user_id, store_key)` and every policy is `auth.uid() = user_id`, with no
+`my_partner_id()` anywhere. So choosing it made "he can never read this" a property of the table, not a thing the app
+must remember to hold. A test reads the migration to pin that. The general fact: **privacy that rests on the schema
+survives every future bug in the client; privacy that rests on the client does not.**
+
+**It also needed no migration.** No new table, nothing for the user to run, nothing to forget. A cloud copy with no
+schema change is the cheapest kind to ship and to roll back.
+
+**The house mixin is cloud-wins; this store overrides that.** `CloudSyncedStore` adopts the cloud blob whole on the first
+sync. For a preference that is fine; for answers it would drop a tick she made offline on this phone before the first
+sync. `applyCloudData` therefore merges per item, the answer settled **last** winning (an undated one is the oldest),
+and if the phone held answers the cloud lacked it sends them up once so the two end equal. The trade-off, named: a
+blob has no per-row clock, so conflict resolution is per item inside the blob, and an item she *removed* on one device
+can come back from the other. For a checklist that is harmless; for a ledger it would not be.
+
+**What stayed local on purpose:** "when did I last open it" (the since-last-visit note). That is about this device's
+visits; syncing it would make the note on a second phone claim ticks she made here a minute ago.
+
 ## 17. Reading list, in order
 
 1. `0001_create_profiles.sql` — the two layers (grant + RLS), own-row.

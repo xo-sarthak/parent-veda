@@ -243,7 +243,9 @@ void main() {
         ..logPeriodStart(ago(28))
         ..logPeriodStart(today);
       await pumpHome(tester);
-      expect(find.text(kTtcPeriodCameLine), findsOneWidget);
+      // 2026-09-30: one slim pill with the link only; the kind sentence
+      // moved into the read. Kept for revert:
+      // expect(find.text(kTtcPeriodCameLine), findsOneWidget);
       expect(find.text(kTtcPeriodCameLink), findsOneWidget);
       expect(ttcFirstSurface(['ttc_read/$kTtcPeriodCameReadId']), isNotNull,
           reason: 'the read the line promises does not resolve');

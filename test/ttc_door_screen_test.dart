@@ -766,7 +766,10 @@ void main() {
         final rid = page.groups!.first.pinnedRedFlagReadIds.first;
         expect(find.byKey(ttcDoorFlagKey(rid)), findsOneWidget);
         final read = ttcReadById(rid)!;
-        expect(find.text(read.whenToSeeSomeone.title.en), findsOneWidget);
+        // The quiet row (2026-09-30) says "When to go to hospital"; the read's
+        // own title heads the list it opens. Kept for revert:
+        //   expect(find.text(read.whenToSeeSomeone.title.en), findsOneWidget);
+        expect(find.text(kTtcDoorFlagQuietTitle), findsOneWidget);
         // FOLDED since 2026-09-27: the tab shows one compact row with the
         // read's own title; the lines open in a sheet from it. Kept for
         // revert: the lines were on the tab itself, before any tap.
@@ -809,22 +812,28 @@ void main() {
         for (final rid in g.pinnedRedFlagReadIds) {
           final row = find.byKey(ttcDoorFlagKey(rid), skipOffstage: false);
           expect(row, findsOneWidget, reason: rid);
-          // One short line now (2026-09-28). Kept for revert: lessThan(90).
-          expect(tester.getSize(row).height, lessThan(60),
+          // One short row (2026-09-28); two quiet lines since 2026-09-30.
+          // Kept for revert: lessThan(90), then lessThan(60).
+          expect(tester.getSize(row).height, lessThan(90),
               reason: '$rid: the flag is a block again, not a line');
           seen++;
         }
-        // Above every section heading on the tab.
+        // ⚠️ AFTER THE FIRST SHELF SINCE 2026-09-30 (the user: "is it
+        // necessary to be on the top?"): below the tab's first heading and
+        // above its second. Kept for revert: above every section heading.
         final flagTop = tester
             .getTopLeft(find.byKey(ttcDoorFlagKey(g.pinnedRedFlagReadIds.first),
                 skipOffstage: false))
             .dy;
-        for (final s in page.sections.where((s) => s.group == g.id)) {
-          expect(
-              tester.getTopLeft(find.text(s.heading, skipOffstage: false).first)
-                  .dy,
-              greaterThan(flagTop),
-              reason: '${g.id}: "${s.heading}" sits above the flag');
+        final heads = [
+          for (final s in page.sections.where((s) => s.group == g.id))
+            tester.getTopLeft(find.text(s.heading, skipOffstage: false).first).dy,
+        ];
+        expect(heads.first, lessThan(flagTop),
+            reason: '${g.id}: the flag sits above the first shelf');
+        if (heads.length > 1) {
+          expect(heads[1], greaterThan(flagTop),
+              reason: '${g.id}: the flag is not right after the first shelf');
         }
       }
       expect(seen, greaterThan(0));
@@ -1101,8 +1110,11 @@ void main() {
       ));
       await tester.pump(const Duration(milliseconds: 400));
       final rid = page.groups!.first.pinnedRedFlagReadIds.first;
-      final title = ttcReadById(rid)!.whenToSeeSomeone.title.en;
-      await tester.tap(find.text(title));
+      // The quiet row carries its own title (2026-09-30). Kept for revert:
+      //   await tester.tap(find.text(ttcReadById(rid)!.whenToSeeSomeone.title.en));
+      final row = find.byKey(ttcDoorFlagKey(rid));
+      await tester.ensureVisible(row);
+      await tester.tap(row);
       await tester.pump();
         await tester.pump(const Duration(milliseconds: 600));
       expect(names.length, greaterThan(1), reason: 'the flag opened nothing');

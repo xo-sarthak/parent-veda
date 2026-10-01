@@ -87,20 +87,72 @@ void openTtcCanI(BuildContext context) {
 /// The three short headings the answers sit under (tools pass, 2026-09-27),
 /// so she can scan without searching. Ids are the data file's; an id missing
 /// here falls into "Body and habits", so a new entry is never dropped.
+// 2026-09-30: thirty questions added (42 in all) and a fourth heading, For
+// him, so his five do not hide among hers. Kept for revert, the twelve-entry
+// table:
+// const List<(String, List<String>)> kTtcCanIGroups = [
+//   ('Food and drink', ['chai', 'alcohol', 'papaya']),
+//   ('Body and habits', ['smoking', 'exercise', 'hot_bath', 'hair_dye',
+//       'travel', 'sex_frequency']),
+//   ('Medicines and tests', ['painkillers', 'xray', 'ayurvedic']),
+// ];
 const List<(String, List<String>)> kTtcCanIGroups = [
-  ('Food and drink', ['chai', 'alcohol', 'papaya']),
+  (
+    'Food and drink',
+    [
+      'chai',
+      'alcohol',
+      'papaya',
+      'fish',
+      'green_tea',
+      'energy_drinks',
+      'spicy_food',
+      'fasting',
+      'dieting',
+      'herbal_tea',
+      'raw_milk',
+    ]
+  ),
   (
     'Body and habits',
     [
       'smoking',
+      'vaping',
       'exercise',
+      'yoga',
+      'swimming',
       'hot_bath',
+      'sauna',
+      'massage',
       'hair_dye',
+      'skincare',
       'travel',
+      'fly_wait',
+      'night_shifts',
       'sex_frequency',
+      'lubricant',
+      'get_up_after',
     ]
   ),
-  ('Medicines and tests', ['painkillers', 'xray', 'ayurvedic']),
+  (
+    'Medicines and tests',
+    [
+      'painkillers',
+      'cold_medicine',
+      'antibiotics',
+      'vaccines',
+      'regular_meds',
+      'thyroid_tablets',
+      'after_pill',
+      'isotretinoin',
+      'xray',
+      'ayurvedic',
+    ]
+  ),
+  (
+    'For him',
+    ['laptop_lap', 'cycling', 'underwear', 'phone_pocket', 'testosterone']
+  ),
 ];
 
 /// Which heading [id] sits under.

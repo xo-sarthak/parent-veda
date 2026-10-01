@@ -451,16 +451,65 @@ List<PvLearnSession> pvHowItWorks(PvOfferingView v) => switch (v.kind) {
   _ => const [],
 };
 
-/// The FAQ every kind carries when the source has none.
+/// ⚠️ EIGHT QUESTIONS, NOT TWO (2026-09-30, the user, on Talk to an expert,
+/// Courses and Cohorts: "the FAQs are very less… questions should be more.
+/// This page should be converting"). A page that asks someone to book,
+/// enrol or pay has to answer what stops them: is it for me, what happens,
+/// what if I cannot go, what if it is not for me, is it medical advice.
+/// Every answer here repeats only what the page's own trust rows already
+/// promise (7-day refund on a course, 24 hours on a masterclass or consult,
+/// before the first call on a cohort, no diagnosis from ParentVeda); no new
+/// policy is invented in a question. The two questions each kind had before
+/// come first and are unchanged.
+const int kPvFaqMax = 8;
+
+/// What the page shows: the source's own questions first, then these, with
+/// no question said twice, at most [kPvFaqMax].
+List<PvLearnFaq> pvFaqsFor(PvOfferingView v) {
+  final out = <PvLearnFaq>[...v.faqs];
+  final seen = {for (final f in out) f.q.toLowerCase()};
+  for (final f in pvDefaultFaqs(v)) {
+    if (seen.add(f.q.toLowerCase())) out.add(f);
+  }
+  return out.take(kPvFaqMax).toList();
+}
+
+/// The FAQ every kind carries, after the source's own.
 List<PvLearnFaq> pvDefaultFaqs(PvOfferingView v) => switch (v.kind) {
-  PvLearnKind.course => const [
-    PvLearnFaq(
+  PvLearnKind.course => [
+    const PvLearnFaq(
       'Do I have to watch in order?',
       'No. The order is the one that makes most sense, not a lock.',
     ),
-    PvLearnFaq(
+    const PvLearnFaq(
       'Can my partner watch too?',
       'Yes — sign in on his phone and it is there.',
+    ),
+    const PvLearnFaq(
+      'Who is it for?',
+      'Anyone at the stage it is written for who wants it explained calmly, in order. No medical background needed.',
+    ),
+    const PvLearnFaq(
+      'How long will it take?',
+      'Each lesson is short, and the minutes are next to it. Most people do one a day or one a week. There is no deadline.',
+    ),
+    const PvLearnFaq(
+      'Can I watch again later?',
+      'Yes. It is yours to keep, on any phone you sign into.',
+    ),
+    PvLearnFaq(
+      'What if it is not for me?',
+      v.isFree
+          ? 'It is free, so there is nothing to lose. Stop whenever you like.'
+          : 'Say so within 7 days and the money comes back in full.',
+    ),
+    const PvLearnFaq(
+      'Is this medical advice?',
+      "No. It explains what is known and helps you prepare for a conversation with your doctor. Your own clinician's word always comes first.",
+    ),
+    const PvLearnFaq(
+      'Will it remember where I stopped?',
+      'Yes. Your place is kept, and it follows you to any phone you sign into.',
     ),
   ],
   PvLearnKind.masterclass => const [
@@ -472,6 +521,30 @@ List<PvLearnFaq> pvDefaultFaqs(PvOfferingView v) => switch (v.kind) {
       'Can I ask questions?',
       'Yes, in the thread during and after the class.',
     ),
+    PvLearnFaq(
+      'Do I have to switch my camera on?',
+      'No. Cameras are optional, and you can ask in the thread instead.',
+    ),
+    PvLearnFaq(
+      'Can I get a refund?',
+      'Yes. A full refund up to 24 hours before it starts. Cancel from the app and the seat goes back to someone else.',
+    ),
+    PvLearnFaq(
+      'What do I need to join?',
+      'Just your phone and the app. The time and length are at the top of this page, and you join from the same place you booked.',
+    ),
+    PvLearnFaq(
+      'Can my partner join too?',
+      'Yes. A partner can join from their own phone on your booking.',
+    ),
+    PvLearnFaq(
+      'Is it for beginners?',
+      'Yes. It starts from the beginning and assumes no background.',
+    ),
+    PvLearnFaq(
+      'Is this medical advice?',
+      "No. It is teaching, not treatment. For anything about your own health, your doctor's word comes first.",
+    ),
   ],
   PvLearnKind.cohort => const [
     PvLearnFaq(
@@ -482,15 +555,63 @@ List<PvLearnFaq> pvDefaultFaqs(PvOfferingView v) => switch (v.kind) {
       'What if I miss a week?',
       'The call is recorded for the group, and the thread keeps going.',
     ),
+    PvLearnFaq(
+      'What happens each week?',
+      'A live call, something short to read or watch beforehand, and a thread for the group in between. "Week by week" on this page has the plan.',
+    ),
+    PvLearnFaq(
+      'Do I have to speak on the calls?',
+      'Speak as much as you like. The thread is there if you would rather write.',
+    ),
+    PvLearnFaq(
+      'Can I get a refund?',
+      'Yes, in full before the first call. After it starts, the seat is yours and so is the thread.',
+    ),
+    PvLearnFaq(
+      'Who else is in the group?',
+      'People at the same stage as you, a small group with the same faces every call. Seats close when the run starts.',
+    ),
+    PvLearnFaq(
+      'Can my partner join too?',
+      'Yes, on your booking.',
+    ),
+    PvLearnFaq(
+      'Does a cohort replace my doctor?',
+      "No. It is support and teaching from someone qualified, in company. Your own clinician's word comes first.",
+    ),
   ],
   PvLearnKind.consult => const [
     PvLearnFaq(
       'Is this a replacement for my own doctor?',
-      'No. It is a second pair of eyes and a calm half hour. Your own clinician\'s word comes first.',
+      "No. It is a second pair of eyes and a calm half hour. Your own clinician's word comes first.",
     ),
     PvLearnFaq(
       'Can my partner join the call?',
       'Yes — the room allows two from one booking.',
+    ),
+    PvLearnFaq(
+      'What can I ask?',
+      'Anything about the stage you are in: your dates, your tests, whether to see a specialist, what a report means. A few questions written down beforehand make the half hour go further.',
+    ),
+    PvLearnFaq(
+      'Who will I be talking to?',
+      'A named clinician. You see who they are and what they do before you book.',
+    ),
+    PvLearnFaq(
+      'Will I get a diagnosis or a prescription?',
+      "The consult is the clinician's, and any advice is theirs. ParentVeda only arranges the time and never gives a diagnosis. If they think you need tests or treatment, they will say so.",
+    ),
+    PvLearnFaq(
+      'What if I need to cancel?',
+      'Free up to 24 hours before. Later than that the session is spent, because the doctor held the time.',
+    ),
+    PvLearnFaq(
+      'How does the call work?',
+      'You choose a time, and at that time you join from the app. "How it works" on this page goes through the steps.',
+    ),
+    PvLearnFaq(
+      'Should I bring anything?',
+      'Your dates, and any reports or test results you have. Having them to hand saves time.',
     ),
   ],
   PvLearnKind.classPack => const [
@@ -502,8 +623,79 @@ List<PvLearnFaq> pvDefaultFaqs(PvOfferingView v) => switch (v.kind) {
       'Is it safe in my trimester?',
       'Every class is pregnancy-safe by design, and the teacher asks at the start. If your doctor has said to rest, rest.',
     ),
+    PvLearnFaq(
+      'What if I cannot make a class?',
+      'Book each one when it suits; skip a week without losing it.',
+    ),
+    PvLearnFaq(
+      'Can I get a refund?',
+      'Unused classes are refunded. Change your mind before the first class and the pack comes back in full.',
+    ),
+    PvLearnFaq(
+      'Do I need any experience?',
+      'No. The teacher starts from the basics and shows an easier way for each move.',
+    ),
+    PvLearnFaq(
+      'Is it live?',
+      'Yes, with the teacher, at the times listed on this page.',
+    ),
   ],
 };
+
+// Kept for revert (2026-09-30): the two-question version.
+// /// The FAQ every kind carries when the source has none.
+// List<PvLearnFaq> pvDefaultFaqs(PvOfferingView v) => switch (v.kind) {
+//   PvLearnKind.course => const [
+//     PvLearnFaq(
+//       'Do I have to watch in order?',
+//       'No. The order is the one that makes most sense, not a lock.',
+//     ),
+//     PvLearnFaq(
+//       'Can my partner watch too?',
+//       'Yes — sign in on his phone and it is there.',
+//     ),
+//   ],
+//   PvLearnKind.masterclass => const [
+//     PvLearnFaq(
+//       'What if I miss it?',
+//       'If the recording is included, it appears under Your learning the next day. If not, the next run is listed here.',
+//     ),
+//     PvLearnFaq(
+//       'Can I ask questions?',
+//       'Yes, in the thread during and after the class.',
+//     ),
+//   ],
+//   PvLearnKind.cohort => const [
+//     PvLearnFaq(
+//       'How big is the group?',
+//       'Capped, and the cap is the number on this page. Usually eight to twelve.',
+//     ),
+//     PvLearnFaq(
+//       'What if I miss a week?',
+//       'The call is recorded for the group, and the thread keeps going.',
+//     ),
+//   ],
+//   PvLearnKind.consult => const [
+//     PvLearnFaq(
+//       'Is this a replacement for my own doctor?',
+//       'No. It is a second pair of eyes and a calm half hour. Your own clinician\'s word comes first.',
+//     ),
+//     PvLearnFaq(
+//       'Can my partner join the call?',
+//       'Yes — the room allows two from one booking.',
+//     ),
+//   ],
+//   PvLearnKind.classPack => const [
+//     PvLearnFaq(
+//       'What do I need?',
+//       'A mat, some floor, and clothes you can move in.',
+//     ),
+//     PvLearnFaq(
+//       'Is it safe in my trimester?',
+//       'Every class is pregnancy-safe by design, and the teacher asks at the start. If your doctor has said to rest, rest.',
+//     ),
+//   ],
+// };
 
 /// Whether a partner can join her booked session from his own phone.
 /// Group things and consults: yes, on her booking. A pack: no — one mat.

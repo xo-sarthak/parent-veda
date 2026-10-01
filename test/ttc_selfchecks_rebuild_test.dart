@@ -313,7 +313,7 @@ void main() {
       await _tap(tester, mark);
       expect(TtcPrecheckStore.instance.statusOf('folate', c),
           PrecheckStatus.done);
-      expect(find.text('WHERE YOU ARE'), findsNothing,
+      expect(find.text(precheckAskFor('folate').question), findsNothing,
           reason: 'marking did not open the item');
 
       await _tap(tester, mark);
@@ -336,7 +336,10 @@ void main() {
       final c = PrecheckContext.gather();
       // The item's own answer block, not the row's status label.
       final needToDo = find.descendant(
-          of: find.byType(TtcToolOptions), matching: find.text('Need to do'));
+          of: find.byType(TtcToolOptions),
+          // Folic acid's own word (2026-09-30). Kept for revert:
+          // 'Need to do'.
+          matching: find.text(precheckAskFor('folate').need));
       await _tap(tester, needToDo);
       expect(TtcPrecheckStore.instance.statusOf('folate', c),
           PrecheckStatus.needsAttention);
@@ -368,17 +371,17 @@ void main() {
       //     reason: 'back on the list, not a dead tap');
       // expect(find.text('Tobacco'), findsOneWidget);
       expect(find.text('Your next 3 steps'), findsOneWidget);
-      expect(find.text('WHERE YOU ARE'), findsNothing);
+      expect(find.text(precheckAskFor('tobacco').question), findsNothing);
       // The step card for tobacco: the only one she marked to come back to.
       await _tap(tester,
           find.byKey(const ValueKey('ttc_precheck_step_tobacco')));
-      expect(find.text('WHERE YOU ARE'), findsOneWidget,
+      expect(find.text(precheckAskFor('tobacco').question), findsOneWidget,
           reason: 'with the tobacco item open');
       // Its answer block for "Need to do" is the chosen one.
       expect(
           find.descendant(
               of: find.byType(TtcToolOptions),
-              matching: find.text('Need to do')),
+              matching: find.text(precheckAskFor('tobacco').need)),
           findsOneWidget);
     });
   });

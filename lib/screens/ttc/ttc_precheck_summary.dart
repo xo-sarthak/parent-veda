@@ -35,6 +35,9 @@ import 'package:flutter/services.dart';
 import '../../localization/app_language.dart';
 import '../../theme/pv_fonts.dart';
 import '../../ttc/ttc_precheck_data.dart';
+import '../../ttc/ttc_precheck_notes.dart';
+import '../products/pv_store_chrome.dart' show pvSnack;
+import 'ttc_appointments_screen.dart' show ttcApptDay;
 import '../../ttc/ttc_precheck_rules.dart';
 import '../../ttc/ttc_precheck_store.dart';
 import '../v2/v2_palette.dart';
@@ -177,11 +180,14 @@ class TtcPrecheckSummaryScreen extends StatelessWidget {
                           p: p,
                           n: counts.open,
                           label: t('Worth checking', 'Dekhna baaki')),
-                      const SizedBox(width: 10),
-                      _Count(
-                          p: p,
-                          n: counts.tracking - counts.done - counts.open,
-                          label: t('Not looked at', 'Chhoot gaye')),
+                      // ⚠️ NO "NOT LOOKED AT" TILE (2026-09-30, tools review,
+                      // fix D): "16" in big type was the debt number the
+                      // ring was redesigned to avoid ("0 of 21"), on the
+                      // page she hands to her doctor. Kept for revert:
+                      //   const SizedBox(width: 10),
+                      //   _Count(p: p, n: counts.tracking - counts.done -
+                      //       counts.open, label: t('Not looked at',
+                      //       'Chhoot gaye')),
                     ]),
                     const SizedBox(height: 28),
 
@@ -286,6 +292,24 @@ class TtcPrecheckSummaryScreen extends StatelessWidget {
                         ),
                       ),
                     ),
+                    // ⚠️ THE QUESTIONS GO TO HER VISIT (2026-10-01, change 2 of
+                    // the checklist's "what does she get back"): copying text
+                    // was the only thing this page could do. Now her
+                    // questions can go straight onto her next visit in the
+                    // Appointments tool, where she already keeps what to ask.
+                    const SizedBox(height: 10),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: KeyedSubtree(
+                        key: const ValueKey('ttc_precheck_to_visit'),
+                        child: TtcInkPill(
+                          label: t('Add my questions to my next visit',
+                              'Meri visit mein sawaal jodein'),
+                          icon: Icons.event_note_outlined,
+                          onTap: () => _toVisit(context, lang),
+                        ),
+                      ),
+                    ),
                     // ⚠️ COMMENTED OUT 2026-09-29: the round Back arrow at the
                     // top already does this, and two ways back on one page is
                     // the repetition the one-app rules refuse. Kept for revert:
@@ -330,6 +354,21 @@ class TtcPrecheckSummaryScreen extends StatelessWidget {
       settings: RouteSettings(name: id),
       builder: (_) => screen,
     ));
+  }
+
+  /// Says what happened, with the visit's date, so the tap is never silent.
+  void _toVisit(BuildContext context, AppLanguage lang) {
+    final r = ttcAddPrecheckQuestionsToNextVisit(lang);
+    final where = r.visit == null
+        ? 'They will wait for your next visit.'
+        : 'On your visit: ${r.visit!.title}, ${ttcApptDay(r.visit!.startsLocal)}.';
+    pvSnack(
+      context,
+      r.added == 0
+          ? 'Those questions are already with your visit.'
+          : '${r.added} ${r.added == 1 ? 'question' : 'questions'} added. $where',
+      icon: Icons.check_rounded,
+    );
   }
 
   // ---------------------------------------------------------------------------

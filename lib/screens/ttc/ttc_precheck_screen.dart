@@ -83,6 +83,7 @@ import '../../ttc/ttc_precheck_data.dart';
 import '../../ttc/ttc_precheck_rules.dart';
 import '../../ttc/ttc_precheck_store.dart';
 import '../../ttc/ttc_reads_data.dart' show ttcReadTitle;
+import '../../ttc/ttc_store.dart' show TtcStore;
 import '../products/pv_store_chrome.dart' show pvSnack;
 import '../v2/v2_palette.dart';
 import 'ttc_common.dart' show ttcTitleInk;
@@ -103,6 +104,14 @@ import 'ttc_tool_marks.dart';
 // the constant rather than repeating the number. Kept for revert:
 // const double kPrecheckHue = 104;
 const double kPrecheckHue = kTtcToolHuePlan;
+
+/// Days in the stage after which the checklist says "while you try".
+const int kPrecheckWhileTryingDays = 30;
+
+String ttcPrecheckTitle() =>
+    (TtcStore.instance.daysTrying ?? 0) >= kPrecheckWhileTryingDays
+        ? 'Things to sort out while you try'
+        : 'Things to sort out before trying';
 
 class TtcPrecheckScreen extends StatefulWidget {
   const TtcPrecheckScreen({super.key, this.openSection});
@@ -174,9 +183,12 @@ class _TtcPrecheckScreenState extends State<TtcPrecheckScreen> {
   @override
   void initState() {
     super.initState();
-    _store.load().then((_) {
+    _store.load().then((_) async {
       if (!mounted) return;
       _store.markOpened();
+      // The previous visit, for the "since you were last here" line.
+      await _store.beginVisit();
+      if (!mounted) return;
       // A door that named a section has already made the decision the intro
       // exists to prompt.
       // ⚠️ NO INTRO SCREEN ANY MORE (tools pass, 2026-09-27). It was one
@@ -261,7 +273,13 @@ class _TtcPrecheckScreenState extends State<TtcPrecheckScreen> {
           // ⚠️ ONE TOOL, ONE NAME: the Tools tile's name, word for word.
           eyebrow: 'Pre-pregnancy checklist',
           // ---- WHAT THIS IS, FIRST (tools pass, 2026-09-27) ---------------
-          title: 'Things to sort out before trying',
+          // ⚠️ BY WHERE SHE IS (2026-09-30, tools review, fix B): "before
+          // trying" is wrong for someone 43 days in. The app has no "actively
+          // trying" flag, only how long she has been in the stage (or her own
+          // answer, which sets the same start), so from kPrecheckWhileTryingDays
+          // on it says "while you try". Derived, never asked. Kept for revert:
+          // 'Things to sort out before trying'.
+          title: ttcPrecheckTitle(),
           // Says the one-tap mark (2026-09-27). Kept for revert:
           // 'Open an item to read why it matters and mark where you '
           // 'are. It saves as you tap. You only need what fits you.'
@@ -615,10 +633,10 @@ class _TtcPrecheckScreenState extends State<TtcPrecheckScreen> {
     //         style: pvManrope(fontSize: 14, height: 1.55, color: p.ink2)),
     //     const SizedBox(height: 10),
     return <Widget>[
-      // The tier key, once, the first time the labels appear.
+      // The tier key, once, the first time the labels appear. One line since
+      // 2026-09-30 (only Core is tagged).
       Text(
-        'Core: most people should do this. Worth doing: helps most '
-        'people. Helpful if it applies: only if it fits your situation.',
+        'Core: most people should do this.',
         style: pvManrope(fontSize: 12, height: 1.5, color: p.ink3),
       ),
       if (known.isNotEmpty) ...[
@@ -836,11 +854,20 @@ class _TtcPrecheckScreenState extends State<TtcPrecheckScreen> {
                             color: p.ink1,
                           ),
                         ),
+                        // ⚠️ ONLY "CORE" IS SAID (2026-09-30, tools review,
+                        // fix C): 21 rows each carried a tier word and only
+                        // one tier is worth knowing. "Worth doing" and
+                        // "Helpful if it applies" are not shown; the status
+                        // still is. Kept for revert: the tier word on every
+                        // row, always.
+                        if (item.tier == PrecheckTier.core ||
+                            status != PrecheckStatus.untouched) ...[
                         const SizedBox(height: 5),
                         // A Wrap, not a Row (2026-09-27): "Helpful if it
                         // applies · Not relevant to me" ran off a 360dp row.
                         Wrap(
                           children: [
+                            if (item.tier == PrecheckTier.core)
                             Text(
                               item.tier.label.of(lang),
                               style: pvManrope(
@@ -856,12 +883,16 @@ class _TtcPrecheckScreenState extends State<TtcPrecheckScreen> {
                               ),
                             ),
                             if (status != PrecheckStatus.untouched) ...[
+                              if (item.tier == PrecheckTier.core)
                               Text(
                                 '  ·  ',
                                 style: pvManrope(fontSize: 11, color: p.ink3),
                               ),
                               Text(
-                                status.label.of(lang),
+                                // The item's own word for the answer she gave
+                                // (2026-09-30). Kept for revert:
+                                // status.label.of(lang).
+                                precheckAskFor(item.id).labelFor(status),
                                 style: pvManrope(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w600,
@@ -871,6 +902,7 @@ class _TtcPrecheckScreenState extends State<TtcPrecheckScreen> {
                             ],
                           ],
                         ),
+                        ],
                         // ⚠️ EVIDENCE, SHOWN EVEN WHEN COLLAPSED. It is the most
                         // useful line on the card and the one that proves the app
                         // has been paying attention.
@@ -914,13 +946,19 @@ class _TtcPrecheckScreenState extends State<TtcPrecheckScreen> {
                   // an item is what she opened it for, and the chips sat under
                   // three blocks of reading. Kept for revert: the chips came
                   // after WHY IT MATTERS, WHAT TO DO and ASK YOUR DOCTOR.
+                  // ⚠️ THE ITEM'S OWN QUESTION (2026-09-30, the user: "for
+                  // every drop down the same question with the same
+                  // options"). Kept for revert: 'WHERE YOU ARE' in small
+                  // capitals over "Done / Need to do / Not sure / Not
+                  // relevant to me" on every item.
                   Text(
-                    t('WHERE YOU ARE', 'AAP KAHAN HAIN'),
+                    precheckAskFor(item.id).question,
+                    key: ValueKey('ttc_precheck_${item.id}_ask'),
                     style: pvManrope(
-                      fontSize: 10.5,
+                      fontSize: 14,
                       fontWeight: FontWeight.w800,
-                      letterSpacing: 1.1,
-                      color: p.ink3,
+                      height: 1.35,
+                      color: p.ink1,
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -939,7 +977,9 @@ class _TtcPrecheckScreenState extends State<TtcPrecheckScreen> {
                         PrecheckStatus.notRelevant,
                       ])
                         TtcToolOption(
-                          label: s.label.of(lang),
+                          // The item's own words for the same four answers
+                          // (2026-09-30). Kept for revert: s.label.of(lang).
+                          label: precheckAskFor(item.id).labelFor(s),
                           on: status == s,
                           onTap: () => _store.setStatus(
                             item.id,
@@ -1101,10 +1141,12 @@ class _TtcPrecheckScreenState extends State<TtcPrecheckScreen> {
       // Kept for revert (2026-09-29): _nextSteps(p, lang, priorities),
       _nextStepsRows(p, lang, t, c, priorities),
       const SizedBox(height: 30),
-      // The tier key, once, above the first tier tag.
+      // The tier key, once, above the first tier tag. One line since
+      // 2026-09-30 (only Core is tagged). Kept for revert: 'Core: most people
+      // should do this. Worth doing: helps most people. Helpful if it
+      // applies: only if it fits your situation.'
       Text(
-        'Core: most people should do this. Worth doing: helps most '
-        'people. Helpful if it applies: only if it fits your situation.',
+        'Core: most people should do this.',
         style: pvManrope(fontSize: 12.5, height: 1.5, color: p.ink2),
       ),
       const SizedBox(height: 22),
@@ -1152,6 +1194,14 @@ class _TtcPrecheckScreenState extends State<TtcPrecheckScreen> {
   /// ⚠️ NO FRACTION BEFORE ANYTHING IS DONE (kept from 2026-09-27: "0 of 21"
   /// before a single tap read like a debt). Until something is done the card
   /// invites instead of counting.
+  String _sinceLabel(DateTime d) {
+    const m = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+    ];
+    return '${d.day} ${m[d.month - 1]}';
+  }
+
   Widget _progressCard(
     V2Palette p,
     String Function(String, String) t,
@@ -1190,6 +1240,25 @@ class _TtcPrecheckScreenState extends State<TtcPrecheckScreen> {
                         color: p.ink1,
                       ),
                     ),
+                    // ⚠️ "SINCE YOU WERE LAST HERE" (2026-10-01, the fifth change
+                    // to what the checklist gives back): the one line that
+                    // shows her the list remembered, and that something moved.
+                    // Her own ticks only, and only after a visit on another
+                    // day. Nothing when there is nothing to say.
+                    if (_store.settledSinceLastVisit() > 0) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        '${_store.settledSinceLastVisit()} more settled since '
+                        '${_sinceLabel(_store.sinceVisit!)}.',
+                        key: const ValueKey('ttc_precheck_since'),
+                        style: pvManrope(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w700,
+                          height: 1.4,
+                          color: p.ink1,
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: 5),
                     Text(
                       started
@@ -1494,32 +1563,39 @@ class _TtcPrecheckScreenState extends State<TtcPrecheckScreen> {
       for (final i in all)
         if (!_folded(i, c) && !steps.contains(i.id)) i,
     ];
-    final inSteps = all.where((i) => steps.contains(i.id)).length;
-    if (rows.isEmpty && inSteps == 0) {
-      // Everything here was settled before she came: its rows are in the
-      // folds below. The key still has to exist for a door's scroll.
+    // Unused since 2026-09-30 (the pointer line is gone). Kept for revert:
+    // final inSteps = all.where((i) => steps.contains(i.id)).length;
+    // ⚠️ A SECTION WITH NOTHING TO SHOW IS NOT DRAWN (2026-09-30, the user,
+    // twice: "why is it randomly placed" about the heading "Medicines and
+    // supplements"). On her real data the app ticks folic acid and her cycle
+    // record itself, and the two medicine items move up into "Your next 3
+    // steps", which left a heading, a blurb and "Its one item is in your next
+    // 3 steps, above." with no rows under them: a heading dropped in at
+    // random. Now a section draws only while it has rows of its own; its
+    // items are in the steps card or in the folds below. The key still exists
+    // for a door's scroll. Kept for revert: `rows.isEmpty && inSteps == 0`,
+    // and the heading drew whenever a step came from it.
+    if (rows.isEmpty) {
       return [SizedBox.shrink(key: _sectionKeys.putIfAbsent(s, GlobalKey.new))];
     }
-    final done = all
-        .where((i) => _store.statusOf(i.id, c) == PrecheckStatus.done)
-        .length;
-    final counted = all
-        .where((i) => _store.statusOf(i.id, c) != PrecheckStatus.notRelevant)
-        .length;
+    // ⚠️ NO "N of M done" BESIDE A SECTION HEADING (2026-09-30, tools review
+    // of this tool, fix A). Six of the eleven sections hold one item, so the
+    // pill read "0 of 1 done" under a heading and a blurb; and where items had
+    // moved up into "Your next 3 steps" it said "0 of 3 done" over one row.
+    // The ring at the top is the one count. Kept for revert:
+    //   final done = all.where((i) => _store.statusOf(i.id, c) ==
+    //       PrecheckStatus.done).length;
+    //   final counted = all.where((i) => _store.statusOf(i.id, c) !=
+    //       PrecheckStatus.notRelevant).length;
+    //   ... Row(children: [Expanded(heading), SizedBox(width: 10),
+    //       Padding(bottom: 3, child: PrecheckTag('$done of $counted done',
+    //       filled: counted > 0 && done == counted))]).
     return [
       Row(
         key: _sectionKeys.putIfAbsent(s, GlobalKey.new),
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Expanded(child: TtcSectionHeading(s.title.of(lang))),
-          const SizedBox(width: 10),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 3),
-            child: PrecheckTag(
-              '$done of $counted done',
-              filled: counted > 0 && done == counted,
-            ),
-          ),
         ],
       ),
       const SizedBox(height: 5),
@@ -1527,21 +1603,16 @@ class _TtcPrecheckScreenState extends State<TtcPrecheckScreen> {
         s.blurb.of(lang),
         style: pvManrope(fontSize: 13, height: 1.45, color: p.ink2),
       ),
-      // Where the rest of this section is, so the count above adds up.
-      if (inSteps > 0) ...[
-        const SizedBox(height: 6),
-        Text(
-          inSteps == 1 && rows.isEmpty
-              ? 'Its one item is in your next 3 steps, above.'
-              : '$inSteps more in your next 3 steps, above.',
-          style: pvManrope(
-            fontSize: 12.5,
-            fontWeight: FontWeight.w700,
-            height: 1.45,
-            color: p.ink1,
-          ),
-        ),
-      ],
+      // Kept for revert (2026-09-30): the pointer under a heading whose
+      // items had moved into "Your next 3 steps".
+      //   if (inSteps > 0) ...[
+      //     const SizedBox(height: 6),
+      //     Text(inSteps == 1 && rows.isEmpty
+      //         ? 'Its one item is in your next 3 steps, above.'
+      //         : '$inSteps more in your next 3 steps, above.',
+      //         style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w700,
+      //             height: 1.45, color: p.ink1)),
+      //   ],
       const SizedBox(height: 12),
       if (rows.isNotEmpty)
         Container(
@@ -1683,9 +1754,11 @@ class _TtcPrecheckScreenState extends State<TtcPrecheckScreen> {
                                   spacing: 6,
                                   runSpacing: 6,
                                   children: [
+                                    // Core only (2026-09-30, fix C).
+                                    if (item.tier == PrecheckTier.core)
                                     PrecheckTag(
                                       item.tier.label.of(lang),
-                                      filled: item.tier == PrecheckTier.core,
+                                      filled: true,
                                     ),
                                     if (source != null)
                                       PrecheckTag(
@@ -1695,7 +1768,8 @@ class _TtcPrecheckScreenState extends State<TtcPrecheckScreen> {
                                       ),
                                     if (status.isOpen ||
                                         status == PrecheckStatus.notRelevant)
-                                      PrecheckTag(status.label.of(lang)),
+                                      PrecheckTag(
+                                          precheckAskFor(item.id).labelFor(status)),
                                     if (_store
                                             .entryFor(item.id)
                                             ?.discussedWithDoctor ??
@@ -1770,7 +1844,17 @@ class _TtcPrecheckScreenState extends State<TtcPrecheckScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          PrecheckLabel(t('WHERE YOU ARE', 'AAP KAHAN HAIN')),
+          // The item's own question (2026-09-30). Kept for revert:
+          // PrecheckLabel(t('WHERE YOU ARE', 'AAP KAHAN HAIN')),
+          Text(
+            precheckAskFor(item.id).question,
+            style: pvManrope(
+              fontSize: 14,
+              fontWeight: FontWeight.w800,
+              height: 1.35,
+              color: p.ink1,
+            ),
+          ),
           const SizedBox(height: 10),
           TtcToolOptions(
             p: p,
@@ -1783,7 +1867,8 @@ class _TtcPrecheckScreenState extends State<TtcPrecheckScreen> {
                 PrecheckStatus.notRelevant,
               ])
                 TtcToolOption(
-                  label: s.label.of(lang),
+                  // The item's own words (2026-09-30).
+                  label: precheckAskFor(item.id).labelFor(s),
                   on: status == s,
                   onTap: () => _store.setStatus(
                     item.id,

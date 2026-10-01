@@ -95,7 +95,9 @@ const List<TtcMilestone> ttcMilestones = [
     id: 'first_cycle_complete',
     iconKey: 'loop',
     isOutcome: false,
-    titleEn: 'Completed a full cycle together',
+    // "together" read as if someone else had done it (2026-09-30). Kept for
+    // revert: 'Completed a full cycle together'.
+    titleEn: 'Completed your first full cycle',
     titleHi: 'Ek poora cycle saath mein poora kiya',
     bodyEn:
         "A month of paying attention. However it ended, you now know something about your body that you didn't know last month.",
@@ -236,6 +238,11 @@ class TtcMilestoneEngine {
   /// call on every build - FamilyTimeline.add is idempotent on the id.
   void syncToTimeline() {
     for (final m in achieved) {
+      // ⚠️ THE DAY IT HAPPENED, NOT THE DAY WE NOTICED (2026-09-30, the
+      // user: the timeline and the calendar's Today card listed "Logged your
+      // first period" and "Completed a full cycle together" on 30 Sep for a
+      // period that began on 19 Aug). Kept for revert: no `on:`.
+      final on = _happenedOn(m.id);
       FamilyTimeline.instance.add(
         id: 'ttc_ms_${m.id}',
         stage: LifeStage.tryingToConceive,
@@ -244,7 +251,30 @@ class TtcMilestoneEngine {
         titleHi: m.titleHi,
         detailEn: m.bodyEn,
         detailHi: m.bodyHi,
+        on: on,
       );
+      // An entry stored before this fix keeps its wrong date until now.
+      if (on != null) {
+        FamilyTimeline.instance.refreshDerived('ttc_ms_${m.id}',
+            on: on, titleEn: m.titleEn, detailEn: m.bodyEn);
+      }
+    }
+  }
+
+  /// The real date behind a milestone, where the stores hold one. Null means
+  /// "today", the day she reached it (a signal noted, a partner joined).
+  DateTime? _happenedOn(String id) {
+    final starts = [...CycleStore.instance.periodStarts]..sort();
+    switch (id) {
+      case 'first_cycle_logged':
+        return starts.isEmpty ? null : starts.first;
+      case 'first_cycle_complete':
+        // A cycle is complete on the day the NEXT period began.
+        return starts.length < 2 ? null : starts[1];
+      case 'journey_started':
+        return TtcStore.instance.journeyStart;
+      default:
+        return null;
     }
   }
 }

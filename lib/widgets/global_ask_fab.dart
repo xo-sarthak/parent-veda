@@ -111,7 +111,11 @@ class FabState extends ChangeNotifier {
   /// stage's search as well as its answers (ttc_stage_search.dart), so the
   /// button is the way into it from every screen of the stage. The other
   /// stages stay behind [kAskFabEnabled] until their own pass.
-  static const bool kAskFabInTtc = true;
+  //
+  // ⚠️ HIDDEN AGAIN THE SAME DAY (2026-09-30, the user: "for now hide the Ask
+  // Veda FAB"). The search screen and the stage search stay; the doors' "Ask
+  // Veda about …" rows still open it. Flip back to true to show the button.
+  static const bool kAskFabInTtc = false;
 
   bool get visible =>
       (kAskFabEnabled || (kAskFabInTtc && _inTtc)) && _appLive && !_suppressed;
@@ -147,6 +151,19 @@ class FabState extends ChangeNotifier {
 /// Tracks the route stack so the FAB knows where it is and whether to hide.
 class FabRouteObserver extends NavigatorObserver {
   final List<Route<dynamic>> _stack = [];
+
+  /// The name of the top PAGE, skipping sheets, dialogs and menus
+  /// (2026-09-30). A notice shown as a sheet closes asks where it will land;
+  /// the sheet is still on the stack for a frame (`maybePop` is async), so
+  /// the page under it is the answer. Read by `pvSnackLiftFor`.
+  String? get topPageName {
+    for (var i = _stack.length - 1; i >= 0; i--) {
+      final r = _stack[i];
+      if (r is PopupRoute) continue;
+      return r.settings.name;
+    }
+    return null;
+  }
 
   void _recompute() {
     final inParenting = _stack.any((r) => r.settings.name == kParentingRootRoute);

@@ -480,10 +480,21 @@ class TtcS {
       "A few days are missing from your log, so marking fertile days here would only be a guess. Everything you've logged is safe. The colours come back once a couple of cycles are recorded.",
       'Log mein gap hai, isliye fertile din batana sirf andaaza hoga. Aapke din yahan hain — do-ek cycle log hone par rang wapas aa jayenge.');
 
-  String get reportThinTitle => _p('A start', 'Shuruaat');
+  // ⚠️ SAID WHAT IT IS AND WHAT TO DO (2026-09-30, the user: "'A start' and a
+  // line below it, what's the relevance… it's just random text"). The title
+  // said nothing and "there's nothing to catch up on" answered a worry she
+  // had not raised. One plain reason, one thing to do. Kept for revert:
+  // 'A start' / "A couple of days isn't a pattern yet, and that's fine. Most
+  // of what this page shows needs about one cycle of logging. There's
+  // nothing to catch up on."
+  String get reportThinTitle => _p('Patterns need about a week of logs',
+      'Shuruaat');
   String get reportThinBody => _p(
-      "A couple of days isn't a pattern yet, and that's fine. Most of what this page shows needs about one cycle of logging. There's nothing to catch up on.",
+      "Log how you feel for a few more days. Things that repeat, like a headache before your period, show up here.",
       'Do-teen din se pattern nahi banta, aur ye theek hai. Is page ko kuch kehne ke liye lagbhag ek cycle chahiye.');
+  // The heading over it (2026-09-30): "What you logged" promised logs she has
+  // not made yet. Kept for revert: reportWhatYouLogged.
+  String get reportThinHeading => "What your logs will show";
 
   String get reportDisclaimer => _p(
       "This shows what you recorded. It doesn't read anything into it, and it's never a diagnosis. If something here worries you, that's just the kind of thing to show a doctor.",
@@ -546,6 +557,8 @@ class TtcS {
   String get leadPastUsual =>
       _p('Past your usual length by', 'Aam length se aage');
   String get leadYouAreOn => _p("You're on", 'Aap hain');
+  // 2026-09-30, the long-gap hero (ttc_home_v3.dart). English only.
+  String get leadItsBeen => 'Since your last period';
   String get leadBetaOn => _p('Beta test on', 'Beta test');
 
   String bigInDays(int days) => _p(
