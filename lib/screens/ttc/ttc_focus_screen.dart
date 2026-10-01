@@ -3454,6 +3454,45 @@ class _CarouselState extends State<_Carousel> {
 /// `global_ask_fab.dart` reads the route name to decide which Ask Veda opens.
 /// Constructing the screen locally and letting the name drift would work
 /// perfectly and silently open the wrong assistant.
+/// One section of [whole] as a short read of its own (2026-09-30): the
+/// section's heading is the title, the article's title the kicker, and the
+/// whole article first in Read next. Null when no section has [heading].
+PvRead? ttcSectionRead(PvRead whole, String heading) {
+  final i = whole.sections.indexWhere((s) => s.heading?.en == heading);
+  if (i < 0) return null;
+  final section = whole.sections[i];
+  return PvRead(
+    id: whole.id,
+    kicker: whole.title,
+    title: section.heading!,
+    teaser: LocalizedText(
+        en: 'One part of "${whole.title.en}". The whole read is at the foot.',
+        hi: 'One part of "${whole.title.en}". The whole read is at the foot.'),
+    scaleSetter: const LocalizedText(en: '', hi: ''),
+    author: whole.author,
+    authorRole: whole.authorRole,
+    hue: whole.hue,
+    // The heading is the page's title now, so the section keeps its body
+    // and drops its heading (said once, not twice), opened, not folded.
+    sections: [
+      PvReadSection(
+        paragraphs: section.paragraphs,
+        bullets: section.bullets,
+        tip: section.tip,
+        mythFact: section.mythFact,
+        callout: section.callout,
+        videoSlot: section.videoSlot,
+        custom: section.custom,
+      ),
+    ],
+    whenToSeeSomeone: whole.whenToSeeSomeone,
+    faqs: const [],
+    readNext: [whole.id, ...whole.readNext.where((id) => id != whole.id)],
+    imageUrl: whole.imageUrl,
+    reviewed: whole.reviewed,
+  );
+}
+
 void openTtcArticle(
   BuildContext context,
   String readId, {
@@ -3462,10 +3501,19 @@ void openTtcArticle(
   required double hue,
   String? atHeading,
 }) {
-  final read = ttcReadById(readId);
+  final whole = ttcReadById(readId);
   // Null is a real answer — an unknown id opens nothing rather than the wrong
   // article. Same call the router makes.
-  if (read == null) return;
+  if (whole == null) return;
+  // ⚠️ A CARD THAT NAMES A SECTION OPENS THAT SECTION, NOT A JUMP INTO A
+  // LONGER READ (2026-09-30, the user, second time: "when I click on that it
+  // takes me to another… scrolls itself and lands me in another section").
+  // The jump, even with its "Opened at" pill, still read as the app moving
+  // on its own. Now the section is its own short page under its own
+  // heading, and the whole article leads its Read next rail. Kept for
+  // revert: `final read = whole;` and `openAtHeading: atHeading` below.
+  final part = atHeading == null ? null : ttcSectionRead(whole, atHeading);
+  final read = part ?? whole;
 
   final p = V2PaletteStore.instance.current;
   final tint = v2BlockTint(hue, p);
@@ -3478,7 +3526,8 @@ void openTtcArticle(
     builder: (_) => PvReaderScreen(
       read: read,
       lang: lang,
-        openAtHeading: atHeading,
+        // A section that no longer exists falls back to the old jump.
+        openAtHeading: part == null ? atHeading : null,
       resolveVideo: ttcVideoBySlot,
       readTitle: ttcReadTitle,
       resolveRead: ttcReadById,

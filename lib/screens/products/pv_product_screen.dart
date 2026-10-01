@@ -825,8 +825,10 @@ class _PvProductScreenState extends State<PvProductScreen> {
               children: [
                 // Ink, not the brand violet (2026-09-29, no purple chrome).
                 // Kept for revert: color: p.action.
+                // Blue (2026-09-30). Kept for revert: color: kPvInk.
                 if (recommends)
-                  const Icon(Icons.verified_rounded, size: 15, color: kPvInk)
+                  const Icon(Icons.verified_rounded,
+                      size: 15, color: kPvRecommendedBlue)
                 else
                   Container(
                     width: 9,
@@ -991,8 +993,10 @@ class _PvProductScreenState extends State<PvProductScreen> {
           children: [
             Row(
               children: [
+                // Blue (2026-09-30). Kept for revert: color: kPvInk.
                 if (r.band.recommends)
-                  const Icon(Icons.verified_rounded, size: 18, color: kPvInk)
+                  const Icon(Icons.verified_rounded,
+                      size: 18, color: kPvRecommendedBlue)
                 else
                   Container(
                     width: 10,

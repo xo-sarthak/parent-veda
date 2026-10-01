@@ -1075,21 +1075,26 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
           accentBg: const Color(0x1A1F9E86),
           onTap: () => _go('pairCode'),
         ),
-        const SizedBox(height: 13),
-        // Third role — the expert. For testing it asks WHICH doctor; a live
-        // build would recognise a verified doctor account instead.
-        _roleCard(
-          title: S.now.uiIMDoctor,
-          subtitle: 'Manage my consults & sessions',
-          icon: Icons.medical_services_rounded,
-          accent: _purple,
-          accentBg: const Color(0x1A7C3FC4),
-          onTap: _pickDoctorRole,
-        ),
+        // ⚠️ NO DOCTOR ROLE IN THE PARENT APP (2026-09-30, the user: "doctor
+        // app is different… that path should not exist on the parent
+        // application"). Doctors use the doctor flavour. Kept for revert:
+        // const SizedBox(height: 13),
+        // // Third role — the expert. For testing it asks WHICH doctor; a live
+        // // build would recognise a verified doctor account instead.
+        // _roleCard(
+        //   title: S.now.uiIMDoctor,
+        //   subtitle: 'Manage my consults & sessions',
+        //   icon: Icons.medical_services_rounded,
+        //   accent: _purple,
+        //   accentBg: const Color(0x1A7C3FC4),
+        //   onTap: _pickDoctorRole,
+        // ),
       ]);
 
   /// Testing: choose which doctor to sign in as, then enter the doctor app.
   /// Lists doctors from BOTH sides (pregnancy specialists + parenting experts).
+  /// Unreachable since 2026-09-30 (the role card above is commented out).
+  // ignore: unused_element
   void _pickDoctorRole() {
     showModalBottomSheet<void>(
       context: context,

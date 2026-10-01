@@ -386,7 +386,9 @@ void main() {
       expect(find.text('Continue with Google'), findsNothing);
       expect(find.text('Get started'), findsOneWidget);
       expect(find.text('I already have an account'), findsOneWidget);
-      expect(find.text("I'm a doctor"), findsOneWidget);
+      // 2026-09-30: no doctor path in the parent app. Kept for revert:
+      // expect(find.text("I'm a doctor"), findsOneWidget);
+      expect(find.text("I'm a doctor"), findsNothing);
       expect(find.text('Have a code?'), findsOneWidget);
       expect(
         find.text('For the whole journey — trying, expecting, raising.'),

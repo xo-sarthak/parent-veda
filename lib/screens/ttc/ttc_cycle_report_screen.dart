@@ -34,6 +34,7 @@ import '../../ttc/ttc_cycle_report.dart';
 import '../v2/v2_palette.dart';
 import '../../theme/pv_fonts.dart';
 import 'ttc_common.dart';
+import 'ttc_what_is_this.dart';
 import '../v2/v3_hero_field.dart' show v3FieldChroma;
 import 'ttc_cycle_companion.dart' show showTtcPeriodLogSheet;
 // Kept for revert (2026-09-27): ... show kTtcCompanionHue, showTtcPeriodLogSheet;
@@ -89,7 +90,9 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
 
   /// Whether the ⓘ panel is open. Not remembered between visits — it is an
   /// aside, and one she has read once she does not need reopened for her.
-  bool _about = false;
+  /// Since 2026-09-30 the ⓘ opens the shared "What is this?" sheet and
+  /// nothing sets this, so the inline panel stays closed; kept for revert.
+  final bool _about = false;
 
   /// ⚠️ THE DIAL, AND IT IS NOT REMEMBERED BETWEEN VISITS. A stored preference
   /// here would be a setting nobody set — she picks a picture to answer the
@@ -194,11 +197,12 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
       },
       eyebrow: t.reportTitle,
       title: title,
-      action: IconButton(
-        icon: const Icon(Icons.info_outline_rounded, size: 21),
-        color: ttcInk, // ink on the field (2026-09-29, 2.8:1 in ttcSoft); was ttcMuted
-        onPressed: () => setState(() => _about = !_about),
-      ),
+      // ⚠️ THE i SAYS WHAT THIS SCREEN IS (2026-09-30): the shared "What is
+      // this?" sheet, three short lines and a way to the Cycle companion,
+      // instead of an inline disclaimer. Kept for revert: the IconButton
+      // toggling `_about` (the inline `TtcReportAbout`).
+      action: TtcWhatIsButton(
+          what: ttcWhatIsReport(note: ttcReportAboutText(clinic: clinic))),
       heroLead: _CyclePicker(
         // ⚠️ THE PICKER STAYS, DIMMED, ON THE EMPTY PAGE. Removing it would
         // change the shape of the header between states, and she would have to
@@ -261,8 +265,18 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
               TtcReportRefusalBody(
                 report: r,
                 facts: facts,
+                // ⚠️ TWO DIFFERENT REASONS, TWO DIFFERENT CARDS (2026-09-30).
+                // With no long gap the only problem is too few dates, but the
+                // card still said "Fill in the missing month" and "if we
+                // counted it in", about a month nobody missed (the user:
+                // "I logged September… it still says fill the missing
+                // month"). Now the gap card names the gap, and the other one
+                // says what is needed, in three short lines. Kept for revert:
+                // the gap wording below, used for both.
                 eyebrow: 'Why there are no phases',
-                title: "We'd rather not guess",
+                title: facts.longestGap == null
+                    ? 'Not enough dates yet'
+                    : "We'd rather not guess",
                 // ⚠️ THE ACTUAL NUMBER, READ FROM HER DATA. The design writes
                 // 46 days because that is what its fixture held. A refusal that
                 // cannot name the gap it is refusing over is asking to be
@@ -274,10 +288,16 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
                     : 'One gap in your dates runs ${facts.longestGap} days. '
                         "That's long enough to be a month that went unlogged, "
                         'not a cycle that really lasted that long.',
-                body2: 'If we counted it in, the fertile days we showed could '
-                    "be off by more than a week. So we've left them off this "
-                    "cycle, instead of showing you dates we don't trust.",
-                actionLabel: 'Fill in the missing month',
+                body2: facts.longestGap == null
+                    ? 'Each period you log adds a cycle. Once there are two '
+                        'whole cycles, the four parts show up here.'
+                    : 'If we counted it in, the fertile days we showed could '
+                        "be off by more than a week. So we've left them off "
+                        "this cycle, instead of showing you dates we don't "
+                        'trust.',
+                actionLabel: facts.longestGap == null
+                    ? 'Log a period'
+                    : 'Fill in the missing month',
                 onAction: () => _openLog(context),
                 // The action that fixes it, above the reason (2026-09-27).
                 actionFirst: true,
@@ -528,13 +548,10 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
       // opened a sheet here and an inline panel on the other three. Now the
       // same inline panel everywhere. Kept for revert:
       //   onPressed: () => _showDisclaimer(context, t),
-      action: IconButton(
-        icon: const Icon(Icons.info_outline_rounded, size: 21),
-        color: ttcInk, // ink on the field (2026-09-29, 2.8:1 in ttcSoft); was ttcMuted
-        // Kept for revert (2026-09-28, explicit labels): 'About this page'
-        tooltip: 'About the cycle report',
-        onPressed: () => setState(() => _about = !_about),
-      ),
+      // The shared "What is this?" sheet (2026-09-30), as on the other
+      // states. Kept for revert: the IconButton toggling `_about`, tooltip
+      // 'About the cycle report'.
+      action: TtcWhatIsButton(what: ttcWhatIsReport(note: t.reportDisclaimer)),
       heroLead: _CyclePicker(
         label: r.start == null ? '' : '${_fmt(r.start!)} to ${_fmt(r.end!)}',
         caption: ttcWhichCycle(_index, r.cyclesAvailable),
@@ -720,7 +737,9 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
             // quiet line instead, because an absent section on a screen that
             // just drew a full cycle reads as something failing to load.
             if (r.state == TtcReportState.thin && _notes(r).isEmpty) ...[
-              ttcSectionTitle(t.reportWhatYouLogged),
+              // Its own heading (2026-09-30). Kept for revert:
+              // ttcSectionTitle(t.reportWhatYouLogged),
+              ttcSectionTitle(t.reportThinHeading),
               _Note(title: t.reportThinTitle, body: t.reportThinBody),
               // The note says this fills with logging; the way to log is
               // here (2026-09-27).

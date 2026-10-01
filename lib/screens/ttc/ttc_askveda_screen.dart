@@ -38,6 +38,7 @@ import 'ttc_can_i_screen.dart';
 import 'ttc_common.dart';
 // import 'ttc_insight_screen.dart'; // kept for revert — the insight opens in the reader now
 import 'ttc_prepare_screen.dart';
+import '../../ttc/ttc_precheck_notes.dart';
 import 'ttc_products_screen.dart';
 import 'ttc_strings.dart';
 import 'ttc_surface_router.dart';
@@ -143,6 +144,11 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
       treatmentStep: widget.partnerMode
           ? null
           : ttcHomeRoundPhaseOn(DateTime.now())?.name,
+      // What she has covered / flagged in her checklist (ids only). Hers: it
+      // never leaves the partner's device. Null when she has answered
+      // nothing. Needs the service half to do anything: see
+      // docs/ASKVEDA-CHECKLIST-HANDOVER.md.
+      ttcChecklist: widget.partnerMode ? null : ttcPrecheckAskVedaContext(),
       monthsTrying: days == null ? null : (days / 30).floor(),
       // PRIVACY: her cycle day never leaves the partner's device. See the header.
       cycleDay: widget.partnerMode ? null : s.today.cycleDay,

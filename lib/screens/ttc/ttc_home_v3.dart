@@ -82,6 +82,8 @@ import '../../ttc/ttc_prepare_data.dart';
 import '../../ttc/ttc_products_data.dart';
 import '../../ttc/ttc_reads_data.dart';
 import '../../ttc/ttc_ritual_store.dart';
+import '../../ttc/ttc_precheck_home.dart';
+import '../../ttc/ttc_precheck_store.dart';
 import '../../ttc/ttc_store.dart';
 import '../../ttc/ttc_symptom_data.dart';
 import '../brackets/bracket_screen.dart';
@@ -111,6 +113,7 @@ import '../../ttc/ttc_fertility_help_store.dart';
 import '../../ttc/ttc_messages_store.dart';
 import '../../ttc/ttc_period_due.dart' show TtcTestAdvice;
 import 'ttc_home_gap.dart';
+import 'ttc_what_is_this.dart';
 import '../v2/pv_day_strip.dart';
 import '../v2/pv_insight_rail.dart';
 import '../v2/v3_hero_field.dart';
@@ -341,6 +344,8 @@ class _TtcHomeV3State extends State<TtcHomeV3>
         TtcMessagesStore.instance,
         TtcContentPrefs.instance,
         TtcHomePrefs.instance,
+        // Her checklist answers redraw "Your next step" (2026-10-01).
+        TtcPrecheckStore.instance,
         // ⚠️ HER AGE BAND (2026-09-26, consistency pass). Answering it in the
         // "Trying after 35" read or the help tool changes the check card and
         // the door order; without this the home kept the old answer until
@@ -1438,7 +1443,9 @@ class _CycleHeader extends StatelessWidget {
             ttcHomeHeroLine(on: selected).state == TtcHeroState.periodLate
         ? ttcHomeLateAdvice()
         : null;
-    final periodCame = onToday && ttcIsNewPeriodDayOne(selected);
+    // Its one reader, the hero's period pill, moved to the insights rail
+    // (2026-09-30), which checks the same day itself. Kept for revert:
+    //   final periodCame = onToday && ttcIsNewPeriodDayOne(selected);
     final future = selected.isAfter(todayDate);
     final sexOn = ttcSexLoggedOn(selected);
 
@@ -1571,6 +1578,22 @@ class _CycleHeader extends StatelessWidget {
           // 18 before the launch walk tightened the hero (2026-09-27).
           const SizedBox(height: 10),
 
+          // ---- the two tools by name, and what this screen is (2026-09-30) -
+          // The dates pill above opens the Cycle companion but never said so,
+          // and the Cycle report sat at the far end of the insight rail.
+          // Only on her own cycle: a clinic's round leads the hero with its
+          // own screen, and a new user with nothing logged has "Start here".
+          // ⚠️ TAKEN OUT THE SAME DAY (2026-09-30, the user on the phone:
+          // "seems very cluttered… remove those two pill buttons… the
+          // position is fixed in the today's insights"). The rail's two cards
+          // carry both tools; the dates pill names the companion and the ⓘ
+          // sits beside it (`_block`). Kept for revert:
+          //   if (!today.clinicInvolved &&
+          //       CycleStore.instance.periodStarts.isNotEmpty) ...[
+          //     TtcHeroToolsRow(onCompanion: onCycle),
+          //     const SizedBox(height: 12),
+          //   ],
+
           // ---- the hero's note (gap analysis, "Behind: Home & daily", P1) --
           //
           // ⚠️ ONLY ON TODAY, AND ONLY ONE. On a late day of her own cycle, a
@@ -1581,10 +1604,19 @@ class _CycleHeader extends StatelessWidget {
           if (late != null) ...[
             TtcHowToTestButton(p: p),
             const SizedBox(height: 16),
-          ] else if (periodCame) ...[
-            TtcPeriodCameLine(p: p),
-            const SizedBox(height: 16),
-          ],
+          ]
+          // ⚠️ THE PERIOD READ LIVES IN THE RAIL (2026-09-30, the user: "all
+          // of this is cluttering the hero… if it's covered under today's
+          // insights then keep it there only"). Flo puts its reads in "My
+          // daily insights", not the hero
+          // (https://mobbin.com/screens/02b66001-153c-4a12-9435-d841460a1cd1);
+          // it is now that rail's first card on day one of a new period.
+          // Kept for revert:
+          //   else if (periodCame) ...[
+          //     TtcPeriodCameLine(p: p),
+          //     const SizedBox(height: 16),
+          //   ],
+          ,
 
           // ---- the two actions ---------------------------------------------
           //
@@ -2805,6 +2837,23 @@ class _WindowLine extends StatelessWidget {
     // once a test is already reliable, and it says so. A clinic cycle never
     // reaches here (`ttcHomeLateAdvice` refuses first), and neither does a
     // future day or an irregular history; those keep the words above.
+    // ⚠️ A LONG GAP SAYS WHAT IT IS AND WHAT TO DO (2026-09-30). With one
+    // period logged and a cycle run well past a normal length, the engine
+    // rightly refuses a window, and the hero was left with "You're on / Cycle
+    // day 43 / Not enough logged to estimate your days this cycle", a number
+    // with no meaning and a sentence with no way out (the user: "to show
+    // someone your cycle day 43… makes no sense"). Flo says "Period late: N
+    // days" on the same data; we do not call it late on a guess (rule 8), so
+    // the words are the fact itself, how long it has been, and the question
+    // she actually has, with the sheet that answers it one tap away. Only
+    // past [kTtcLongGapDays], the far end of a normal cycle, so a short or
+    // ordinary cycle never sees it.
+    if (line.state == TtcHeroState.noEstimate &&
+        line.days > kTtcLongGapDays) {
+      return _block(t.leadItsBeen, t.bigDays(line.days), kTtcLongGapBody,
+          onTapOverride: () => showTtcHomePeriodSheet(context));
+    }
+
     final advice = late;
     if (advice != null && line.state == TtcHeroState.periodLate) {
       return _block('', kTtcTimeToTest, ttcTimeToTestBody(advice.daysLate),
@@ -2957,31 +3006,75 @@ class _WindowLine extends StatelessWidget {
               // summary reads everywhere else in the app. Kept for revert: the
               // Row of Flexible(Text(sub)), SizedBox(6) and
               // Icon(info_outline_rounded, 17, p.action).
-              Container(
-                padding: const EdgeInsets.fromLTRB(12, 7, 8, 7),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.72),
-                  borderRadius: BorderRadius.circular(999),
-                  border: Border.all(color: p.line),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Flexible(
-                      child: Text(sub,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: pvManrope(
-                              fontSize: 13,
-                              height: 1.3,
-                              fontWeight: FontWeight.w600,
-                              color: p.ink1)),
+              // ⚠️ THE PILL SAYS WHERE IT GOES, AND THE ⓘ SITS BESIDE IT
+              // (2026-09-30, the user: "when someone clicks on the range they
+              // will be opening their cycle companion… it's not visible that
+              // it's a cycle companion"). The companion's drop mark leads, and
+              // a short line (the dates) is followed by its name in grey; a
+              // long sentence keeps the mark alone so it still fits. The ⓘ,
+              // which the user kept, explains the whole Today screen. Kept for
+              // revert: the pill alone (sub + chevron), no mark, no ⓘ.
+              Row(mainAxisSize: MainAxisSize.min, children: [
+                Flexible(
+                  child: Container(
+                    padding: const EdgeInsets.fromLTRB(10, 7, 8, 7),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.72),
+                      borderRadius: BorderRadius.circular(999),
+                      border: Border.all(color: p.line),
                     ),
-                    const SizedBox(width: 2),
-                    Icon(Icons.chevron_right_rounded, size: 18, color: p.ink2),
-                  ],
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // The Cycle companion's own mark, a loop (2026-09-30,
+                        // the user: the drop "is again the same as the log a
+                        // period one"). Kept for revert: water_drop_outlined.
+                        Icon(Icons.loop_rounded, size: 16, color: p.ink1),
+                        const SizedBox(width: 6),
+                        Flexible(
+                          child: Text.rich(
+                              TextSpan(children: [
+                                TextSpan(text: sub),
+                                if (sub.length <= 22)
+                                  TextSpan(
+                                      text: '  ·  $kTtcCycleCompanionName',
+                                      style: pvManrope(
+                                          fontSize: 12.5,
+                                          fontWeight: FontWeight.w600,
+                                          color: p.ink3)),
+                              ]),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: pvManrope(
+                                  fontSize: 13,
+                                  height: 1.3,
+                                  fontWeight: FontWeight.w600,
+                                  color: p.ink1)),
+                        ),
+                        const SizedBox(width: 2),
+                        Icon(Icons.chevron_right_rounded,
+                            size: 18, color: p.ink2),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
+                const SizedBox(width: 8),
+                Material(
+                  color: Colors.white.withValues(alpha: 0.72),
+                  shape: CircleBorder(side: BorderSide(color: p.line)),
+                  child: InkWell(
+                    key: const ValueKey('ttc_hero_what_is'),
+                    customBorder: const CircleBorder(),
+                    onTap: () => showTtcWhatIs(context, kTtcWhatIsToday),
+                    child: SizedBox(
+                      width: 34,
+                      height: 34,
+                      child: Icon(Icons.info_outline_rounded,
+                          size: 18, color: p.ink1),
+                    ),
+                  ),
+                ),
+              ]),
             ]),
         ),
         ),
@@ -3703,6 +3796,10 @@ class _InsightRail extends StatelessWidget {
     //   final insight = ttcPickForToday(ttcInsights, now: selected);
     final insight = ttcHomeInsightFor(selected, phase: phase);
     final myth = ttcPickForToday(ttcMyths, now: selected, offset: 3);
+    // "Your next step" from her checklist (2026-10-01); null when nothing
+    // that matters is left, or on a clinic round.
+    final nextStep = ttcPrecheckNextStep();
+    final todayState = TtcStore.instance.today;
     final n = ttcPickForToday(ttcNutrition, now: selected, offset: 1);
     // One picker (launch sanity MB18, 2026-09-28): the movement Mind & body ›
     // Today names. Kept for revert:
@@ -3747,6 +3844,18 @@ class _InsightRail extends StatelessWidget {
     // it. Kept for revert: the round-step card, and the blood-test card on
     // every round.
     final cards = <TtcInsightCard>[
+      // Day one of a new period: the read about it leads the rail
+      // (2026-09-30), where the hero's pill used to be. Same condition.
+      if (selected == today && ttcIsNewPeriodDayOne(selected))
+        const TtcInsightCard(
+          id: 'period_came',
+          eyebrow: 'YOUR PERIOD CAME',
+          value: kTtcPeriodCameLink,
+          hue: 344,
+          art: TtcInsightArt.note,
+          go: TtcInsightGo.read,
+          readId: kTtcPeriodCameReadId,
+        ),
       // if (roundStep != null && roundStep.isRunning)
       //   TtcInsightCard(
       //     id: 'round_step',
@@ -3795,6 +3904,42 @@ class _InsightRail extends StatelessWidget {
           go: TtcInsightGo.shouldTest,
         ),
       ...ttcInsightsFor(selected),
+      // ⚠️ THE CYCLE REPORT RIGHT AFTER HER CYCLE (2026-09-30, the user:
+      // "cycle companion and cycle report… come at the very end, so their
+      // position can be put a bit further [forward]"). The cycle cards above
+      // open her cycle; the report is the next thing about the same subject.
+      // The Cycle companion had no card at all (2026-09-30): its only way in
+      // was the hero's dates, which never said where they led.
+      const TtcInsightCard(
+        id: 'companion',
+        eyebrow: 'CYCLE COMPANION',
+        value: 'Your period dates',
+        hue: 344,
+        art: TtcInsightArt.ring,
+        go: TtcInsightGo.cycle,
+      ),
+      TtcInsightCard(
+        id: 'report',
+        eyebrow: t.reportShort,
+        value: 'What your cycle shows',
+        hue: 268,
+        art: TtcInsightArt.ring,
+        go: TtcInsightGo.report,
+      ),
+      // ⚠️ "YOUR NEXT STEP": THE CHECKLIST'S FIRST OPEN STEP (2026-10-01).
+      // Her answers in the Pre-pregnancy checklist used to go nowhere; now
+      // the home shows the one thing to do next and opens the checklist. Only
+      // on today, only on her own cycle (a clinic round has its own steps),
+      // and gone when nothing that matters is left.
+      if (selected == today && !todayState.clinicInvolved && nextStep != null)
+        TtcInsightCard(
+          id: 'precheck',
+          eyebrow: 'YOUR NEXT STEP',
+          value: nextStep.item.title.en,
+          hue: 104,
+          art: TtcInsightArt.note,
+          go: TtcInsightGo.precheck,
+        ),
       TtcInsightCard(
         id: 'insight',
         eyebrow: t.todaysInsight,
@@ -3814,8 +3959,14 @@ class _InsightRail extends StatelessWidget {
       TtcInsightCard(
         id: 'nutrition',
         eyebrow: t.todaysNutrition,
-        value: n.meal(hi),
-        caption: n.nutrient(hi),
+        // ⚠️ THE NUTRIENT LEADS, THE MEAL IS INSIDE (2026-09-30). A meal is a
+        // whole sentence ("Fortified milk, egg yolk, and fifteen minutes of
+        // morning sun.") and six of them could not fit the card at any size
+        // without "…" (the user: nothing should "seem like dot dot dot"). The
+        // page it opens gives the meal in full. Kept for revert:
+        //   value: n.meal(hi), caption: n.nutrient(hi),
+        value: n.nutrient(hi),
+        caption: 'A meal idea inside',
         hue: 104,
         art: TtcInsightArt.meal,
         go: TtcInsightGo.nutrition,
@@ -3832,14 +3983,8 @@ class _InsightRail extends StatelessWidget {
       // daily insights"* - and the placement earns it. It was a button at the
       // FOOT of the logging screen: the payoff for logging, reachable only by
       // going back into the thing you had just finished doing.
-      TtcInsightCard(
-        id: 'report',
-        eyebrow: t.reportShort,
-        value: 'What your cycle shows',
-        hue: 268,
-        art: TtcInsightArt.ring,
-        go: TtcInsightGo.report,
-      ),
+      // The Cycle report card moved up behind the cycle cards (2026-09-30).
+      // Kept for revert: it sat here, second to last.
       TtcInsightCard(
         id: 'pick',
         eyebrow: t.todaysPick,
@@ -3865,6 +4010,8 @@ class _InsightRail extends StatelessWidget {
       // A `SizedBox` around a rail must equal its tallest child. Reserve more
       // and the surplus lands on top of the section gap below as a hole; this
       // rail has already shipped that bug once at 128 around a 104pt child.
+      // Back to 112 (2026-09-30, reverted with the large tiles). Kept for
+      // revert: height: PvInsightTile.largeHeight,
       height: 112,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
@@ -3922,6 +4069,8 @@ void _openInsight(
     case TtcInsightGo.read:
       final id = card.readId;
       if (id != null) _openSurface(context, 'ttc_read/$id');
+    case TtcInsightGo.precheck:
+      _openSurface(context, 'ttc_precheck');
     case TtcInsightGo.report:
       Navigator.of(context).push(MaterialPageRoute<void>(
         settings: const RouteSettings(name: 'ttc/cycle_report'),
@@ -4029,6 +4178,24 @@ void _openInsight(
 /// SKIP. A card resized without its type resized is not a smaller card, it is
 /// the same card clipping its own contents — and `maxLines` hides that as
 /// ellipses rather than as an overflow anyone would notice.
+/// A shorter title for the few that cannot fit an insight card's four lines
+/// without "…" (2026-09-30, the user: nothing should "seem like dot dot dot…
+/// choose a better title for that particular card"). Measured against the
+/// real font at the card's size; the page each card opens keeps the full
+/// title.
+const Map<String, String> kTtcCardTitles = {
+  'Your fertile window is wider than most people think':
+      'Your fertile window is wider than you think',
+  "Folic acid works before you know you're pregnant":
+      'Folic acid works before you know',
+  'If you got pregnant before, it will happen easily again.':
+      'It was easy before, so it will be again.',
+  "You can choose the baby's sex by timing or position.":
+      "You can choose your baby's sex.",
+};
+
+String ttcInsightCardTitle(String v) => kTtcCardTitles[v] ?? v;
+
 class _InsightTile extends StatelessWidget {
   const _InsightTile(
       {required this.card, required this.p, required this.onTap});
@@ -4040,12 +4207,17 @@ class _InsightTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) => PvInsightTile(
         eyebrow: card.eyebrow,
-        value: card.value,
+        value: ttcInsightCardTitle(card.value),
         caption: card.caption,
         hue: card.hue,
         art: card.art,
         // Every card one clean colour, no mark under the words (2026-09-30).
         showArt: false,
+        // REVERTED the same day (the user: "keep the size same of the card…
+        // you just made everything enlarged"): the tile is its old size and
+        // its words their old size; the value now sits in the card's middle
+        // instead (`centreValue`). Kept for revert of the revert: large: true.
+        centreValue: true,
         p: p,
         onTap: onTap,
       );

@@ -2217,69 +2217,134 @@ class TtcStartTreatmentCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(22),
           side: const BorderSide(color: ttcLine, width: 1.2),
         ),
+        // ⚠️ ONE COMPACT ROW (2026-09-30, the user on the IVF door: "this
+        // whole card, this whole section seems too big… bad space
+        // optimization"). The icon, a 19pt title, the sentence and a big
+        // "Start my round" pill shared one row, so the words were squeezed
+        // into a narrow column four lines tall. Now the words get the width,
+        // the title is the door's card size, and the way on is a small ink
+        // arrow; the whole card is the tap, as before, and its label still
+        // names what it opens. Kept for revert, the tall row:
+        // child: InkWell(
+        //   borderRadius: BorderRadius.circular(22),
+        //   onTap: onTap ?? () => openTtcTreatmentStart(context),
+        //   child: Padding(
+        //     padding: const EdgeInsets.all(18),
+        //     child: Row(
+        //       children: [
+        //         const Icon(
+        //           Icons.event_note_outlined,
+        //           size: 24,
+        //           color: ttcTitleInk,
+        //         ),
+        //         const SizedBox(width: 14),
+        //         Expanded(
+        //           child: Column(
+        //             crossAxisAlignment: CrossAxisAlignment.start,
+        //             children: [
+        //               Text(
+        //                 kTtcRoundStartCardTitle,
+        //                 style: pvFraunces(
+        //                   fontSize: 19,
+        //                   fontWeight: FontWeight.w600,
+        //                   color: ttcTitleInk,
+        //                 ),
+        //               ),
+        //               const SizedBox(height: 4),
+        //               Text(
+        //                 kTtcRoundStartCardBody,
+        //                 style: pvManrope(
+        //                   fontSize: 13,
+        //                   height: 1.45,
+        //                   color: ttcSoft,
+        //                 ),
+        //               ),
+        //             ],
+        //           ),
+        //         ),
+        //         const SizedBox(width: 8),
+        //         // ⚠️ THE PILL GIVES WAY AT A LARGE TEXT SIZE (2026-09-29, the
+        //         // door overflow test at 360pt and 1.5): it overflowed the row
+        //         // by 63. Flexible with one ellipsised line; at the normal size
+        //         // the pill is as before. Kept for revert: the Container bare
+        //         // and its Text without maxLines.
+        //         Flexible(
+        //           child: Container(
+        //             padding: const EdgeInsets.symmetric(
+        //               horizontal: 14,
+        //               vertical: 9,
+        //             ),
+        //             decoration: const ShapeDecoration(
+        //               color: ttcTitleInk,
+        //               shape: StadiumBorder(),
+        //             ),
+        //             child: Text(
+        //               kTtcRoundStartCta,
+        //               maxLines: 1,
+        //               overflow: TextOverflow.ellipsis,
+        //               style: pvManrope(
+        //                 fontSize: 13,
+        //                 fontWeight: FontWeight.w800,
+        //                 color: Colors.white,
+        //               ),
+        //             ),
+        //           ),
+        //         ),
+        //       ],
+        //     ),
+        //   ),
+        // ),
         child: InkWell(
           borderRadius: BorderRadius.circular(22),
           onTap: onTap ?? () => openTtcTreatmentStart(context),
           child: Padding(
-            padding: const EdgeInsets.all(18),
+            padding: const EdgeInsets.fromLTRB(16, 13, 12, 13),
             child: Row(
               children: [
                 const Icon(
                   Icons.event_note_outlined,
-                  size: 24,
+                  size: 22,
                   color: ttcTitleInk,
                 ),
-                const SizedBox(width: 14),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         kTtcRoundStartCardTitle,
-                        style: pvFraunces(
-                          fontSize: 19,
-                          fontWeight: FontWeight.w600,
+                        style: pvManrope(
+                          fontSize: 14.5,
+                          fontWeight: FontWeight.w800,
                           color: ttcTitleInk,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 2),
                       Text(
                         kTtcRoundStartCardBody,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                         style: pvManrope(
-                          fontSize: 13,
-                          height: 1.45,
+                          fontSize: 12.5,
+                          height: 1.35,
                           color: ttcSoft,
                         ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(width: 8),
-                // ⚠️ THE PILL GIVES WAY AT A LARGE TEXT SIZE (2026-09-29, the
-                // door overflow test at 360pt and 1.5): it overflowed the row
-                // by 63. Flexible with one ellipsised line; at the normal size
-                // the pill is as before. Kept for revert: the Container bare
-                // and its Text without maxLines.
-                Flexible(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 9,
-                    ),
-                    decoration: const ShapeDecoration(
-                      color: ttcTitleInk,
-                      shape: StadiumBorder(),
-                    ),
-                    child: Text(
-                      kTtcRoundStartCta,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: pvManrope(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
-                      ),
-                    ),
+                const SizedBox(width: 10),
+                Container(
+                  width: 34,
+                  height: 34,
+                  decoration: const BoxDecoration(
+                    color: ttcTitleInk,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.arrow_forward_rounded,
+                    size: 18,
+                    color: Colors.white,
                   ),
                 ),
               ],

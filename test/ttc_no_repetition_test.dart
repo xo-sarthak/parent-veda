@@ -432,7 +432,27 @@ final List<(List<RegExp>, String)> _allowedDestinationRules = [
         'round; the pill under it (in the place of the one-tap row) names the '
         'blood test by date, or "See your round" when none is dated yet.',
   ),
+  (
+    [RegExp(r'^Cycle report$'), RegExp(r'^CYCLE REPORT · ')],
+    'The user, 2026-09-30: the Cycle report "is very little visible… you '
+        'have to work for it". The hero names it in its tools row and the '
+        'rail carries it right after the cycle cards.',
+  ),
 ];
+
+/// The Cycle companion's three ways in on her home (2026-09-30). The user:
+/// it "is not at all visible… just that click [the dates] which is not even
+/// indicating that it's a cycle companion", and asked for it "way ahead" in
+/// the rail. So the hero's headline opens it as before, the pill under it
+/// names it, and the rail card carries it for a scroll. Tight on purpose:
+/// the rail card must be one of them, and besides it and the named pill only
+/// ONE other label (the headline) may share the page.
+bool _companionShared(Set<String> labels) {
+  const card = 'CYCLE COMPANION · Your period dates';
+  if (!labels.contains(card)) return false;
+  final others = labels.where((l) => l != card && l != 'Cycle companion');
+  return others.length <= 1;
+}
 
 /// Images that may be drawn twice.
 const Map<String, String> _allowedImages = {};
@@ -466,7 +486,8 @@ List<String> _findings(String screen, _Sweep s) {
     if (distinct.length > 1) {
       final key = (distinct.toList()..sort()).join(' + ');
       final ruled = _allowedDestinationRules.any((r) => distinct
-          .every((l) => r.$1.any((shape) => shape.hasMatch(l))));
+              .every((l) => r.$1.any((shape) => shape.hasMatch(l)))) ||
+          _companionShared(distinct);
       if (!_allowedDestinations.containsKey(key) && !ruled) {
         out.add('$screen: ${distinct.map((l) => '"$l"').join(' and ')} '
             'all open ${dest.length > 160 ? '${dest.substring(0, 160)}…' : dest}');

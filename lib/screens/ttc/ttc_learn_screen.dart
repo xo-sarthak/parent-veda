@@ -568,8 +568,13 @@ class _TtcLearnScreenState extends State<TtcLearnScreen> {
     );
   }
 
+  // ⚠️ `stage: 'trying'` (2026-09-30). Learn opened Saved with no stage, so
+  // it showed every kind, community and read to baby included, although the
+  // You screen's Saved had been limited to this stage's four kinds that
+  // morning (the user: "I told you to comment out the community ones… it is
+  // still there"). Kept for revert: `const SavedScreen()`.
   void _openSaved() => Navigator.of(context).push(MaterialPageRoute<void>(
-        builder: (_) => const SavedScreen(),
+        builder: (_) => const SavedScreen(stage: 'trying'),
         settings: const RouteSettings(name: 'saved'),
       ));
 

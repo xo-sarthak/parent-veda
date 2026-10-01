@@ -583,10 +583,14 @@ class PvLearnCatalog {
       subtitle: ttcOfferingPlainLine(o.id) ?? who,
       about: o.bodyEn,
       // Kept for revert: role: 'ParentVeda expert',
+      // A full record, when one exists for this name (2026-09-30): the card
+      // then opens their profile page. None exists for these clinicians yet,
+      // so it opens the profile sheet. Kept for revert: no `expert:`.
       expert: PvLearnExpert(
         id: o.expertId,
         name: who,
         role: qualification,
+        expert: expertByName(who),
       ),
       hue: 344,
       cover: pvLearnCoverFor(o.id, [o.category, 'trying'], kind),

@@ -1996,6 +1996,97 @@ const Map<String, String> kReadImageUrls = {
   // same photo as cani_ayurvedic_medicine
   'ttc_cani_ayurvedic':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Ayurvedic_herbs_02.jpg/960px-Ayurvedic_herbs_02.jpg',
+  // ---- Can I...? answers added 2026-09-30: each reuses the photo of the same (or the nearest) question on the pregnancy side, already picked by eye; none new.
+  // same photo as cani_fish
+  'ttc_cani_fish':
+      'https://cdn.stocksnap.io/img-thumbs/960w/FWJC3SUNGR.jpg',
+  // same photo as cani_green_tea
+  'ttc_cani_green_tea':
+      'https://cdn.stocksnap.io/img-thumbs/960w/04E3HNGAKH.jpg',
+  // same photo as cani_energy_drinks
+  'ttc_cani_energy_drinks':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Energy_Drink_Battery_Cans.jpg/960px-Energy_Drink_Battery_Cans.jpg',
+  // same photo as cani_spicy_food
+  'ttc_cani_spicy_food':
+      'https://cdn.stocksnap.io/img-thumbs/960w/7OHAJSJDVW.jpg',
+  // same photo as cani_fasting
+  'ttc_cani_fasting':
+      'https://cdn.stocksnap.io/img-thumbs/960w/AMW6XPP8AT.jpg',
+  // same photo as cani_raw_salad
+  'ttc_cani_dieting':
+      'https://cdn.stocksnap.io/img-thumbs/960w/PLOA1CWIRK.jpg',
+  // same photo as cani_herbal_tea
+  'ttc_cani_herbal_tea':
+      'https://cdn.stocksnap.io/img-thumbs/960w/UASWOBMBJ0.jpg',
+  // same photo as cani_milk
+  'ttc_cani_raw_milk':
+      'https://cdn.stocksnap.io/img-thumbs/960w/P2QSUXKCN5.jpg',
+  // same photo as ttc_read_lubricants
+  'ttc_cani_lubricant':
+      'https://cdn.stocksnap.io/img-thumbs/960w/W6OK3HV9FW.jpg',
+  // same photo as cani_sleeping_back
+  'ttc_cani_get_up_after':
+      'https://cdn.stocksnap.io/img-thumbs/960w/46BMYP2BDJ.jpg',
+  // same photo as cani_sauna
+  'ttc_cani_sauna':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Sauna_of_the_spa_at_Amantaka_luxury_Resort_%26_Hotel_in_Luang_Prabang_Laos.jpg/960px-Sauna_of_the_spa_at_Amantaka_luxury_Resort_%26_Hotel_in_Luang_Prabang_Laos.jpg',
+  // same photo as cani_yoga
+  'ttc_cani_yoga':
+      'https://cdn.stocksnap.io/img-thumbs/960w/W23EUNXBCG.jpg',
+  // same photo as cani_swimming
+  'ttc_cani_swimming':
+      'https://cdn.stocksnap.io/img-thumbs/960w/EQOZK44067.jpg',
+  // same photo as cani_massage
+  'ttc_cani_massage':
+      'https://cdn.stocksnap.io/img-thumbs/960w/VH22RVC5UT.jpg',
+  // same photo as ttc_read_sleep_trying
+  'ttc_cani_night_shifts':
+      'https://cdn.stocksnap.io/img-thumbs/960w/CXH58XHXTI.jpg',
+  // same photo as cani_flight_travel
+  'ttc_cani_fly_wait':
+      'https://cdn.stocksnap.io/img-thumbs/960w/J9FFZI8YC0.jpg',
+  // same photo as cani_retinol
+  'ttc_cani_skincare':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Person_applies_cream_for_skin_from_a_jar_closeup.jpg/960px-Person_applies_cream_for_skin_from_a_jar_closeup.jpg',
+  // same photo as cani_vaping
+  'ttc_cani_vaping':
+      'https://cdn.stocksnap.io/img-thumbs/960w/JLDXQBNPWC.jpg',
+  // same photo as ttc_tile_check_your_vaccinations
+  'ttc_cani_laptop_lap':
+      'https://cdn.stocksnap.io/img-thumbs/960w/TBJ9OPDGMK.jpg',
+  // same photo as cani_cycling
+  'ttc_cani_cycling':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Cycling_Amsterdam_03.jpg/960px-Cycling_Amsterdam_03.jpg',
+  // same photo as ttc_insight_heat_and_sperm
+  'ttc_cani_underwear':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ef/Sauna_of_the_spa_at_Amantaka_luxury_Resort_%26_Hotel_in_Luang_Prabang_Laos.jpg/960px-Sauna_of_the_spa_at_Amantaka_luxury_Resort_%26_Hotel_in_Luang_Prabang_Laos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // same photo as cani_mobile_phone
+  'ttc_cani_phone_pocket':
+      'https://cdn.stocksnap.io/img-thumbs/960w/DLITZEAVJJ.jpg',
+  // same photo as cani_gym
+  'ttc_cani_testosterone':
+      'https://cdn.stocksnap.io/img-thumbs/960w/00RNNUWGLM.jpg',
+  // same photo as cani_cough_syrup
+  'ttc_cani_cold_medicine':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Vintage_Turkish_pediatric_cough_syrup_bottle.png/960px-Vintage_Turkish_pediatric_cough_syrup_bottle.png',
+  // same photo as cani_antibiotics
+  'ttc_cani_antibiotics':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Co-fluampicil_capsules_and_container.jpg/960px-Co-fluampicil_capsules_and_container.jpg',
+  // same photo as cani_vaccines
+  'ttc_cani_vaccines':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Comirnaty_Omicron_XBB.1.5_vial_and_influenza_vaccine_2023.jpg/960px-Comirnaty_Omicron_XBB.1.5_vial_and_influenza_vaccine_2023.jpg',
+  // same photo as cani_multivitamin
+  'ttc_cani_regular_meds':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/New_Reference_Material_Can_Improve_testing_of_Multivitamin_Tablets_%285880985736%29.jpg/960px-New_Reference_Material_Can_Improve_testing_of_Multivitamin_Tablets_%285880985736%29.jpg',
+  // same photo as cani_thyroid_medicine
+  'ttc_cani_thyroid_tablets':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Levothyroxine_25mcg_Tablets.jpg/960px-Levothyroxine_25mcg_Tablets.jpg',
+  // same photo as cani_folic_acid
+  'ttc_cani_after_pill':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Prenatal_vitamin_tablets.jpg/960px-Prenatal_vitamin_tablets.jpg',
+  // same photo as cani_chemical_peel
+  'ttc_cani_isotretinoin':
+      'https://cdn.stocksnap.io/img-thumbs/960w/HIZNJOUVSY.jpg',
 };
 
 /// Read id → licence · source · creator, for the credit line.
@@ -2771,6 +2862,37 @@ const Map<String, String> kReadImageCredits = {
   'ttc_cani_papaya': 'CC BY 3.0 · Wikimedia Commons · Marek Ślusarczyk (Tupungato) Photo portf',
   'ttc_cani_xray': 'CC BY-SA 4.0 · Wikimedia Commons · Adoscam',
   'ttc_cani_ayurvedic': 'CC BY-SA 4.0 · Wikimedia Commons · Vis M',
+  // ttc_cani_* added 2026-09-30
+  'ttc_cani_fish': 'CC0 · StockSnap · Malidate Van',
+  'ttc_cani_green_tea': 'CC0 · StockSnap · Jorge Garcia',
+  'ttc_cani_energy_drinks': 'CC BY-SA 3.0 · Wikimedia Commons · Klooni',
+  'ttc_cani_spicy_food': 'CC0 · StockSnap · ela haney',
+  'ttc_cani_fasting': 'CC0 · StockSnap · The World is a Stage',
+  'ttc_cani_dieting': 'CC0 · StockSnap · FOCA Stock',
+  'ttc_cani_herbal_tea': 'CC0 · StockSnap · Marina Pershina',
+  'ttc_cani_raw_milk': 'CC0 · StockSnap · Krzysztof Puszczyński',
+  'ttc_cani_lubricant': 'CC0 · StockSnap · George Becker',
+  'ttc_cani_get_up_after': 'CC0 · StockSnap · Alexandre Vanier',
+  'ttc_cani_sauna': 'CC BY-SA 4.0 · Wikimedia Commons · Basile Morin',
+  'ttc_cani_yoga': 'CC0 · StockSnap · Burst',
+  'ttc_cani_swimming': 'CC0 · StockSnap · Ian Prince',
+  'ttc_cani_massage': 'CC0 · StockSnap · Authentic Stock',
+  'ttc_cani_night_shifts': 'CC0 · StockSnap · Kelly Ishmael',
+  'ttc_cani_fly_wait': 'CC0 · StockSnap · The Pic Pac',
+  'ttc_cani_skincare': 'CC BY 2.0 · Wikimedia Commons · Shixart1985',
+  'ttc_cani_vaping': 'CC0 · StockSnap · Isabella Mendes',
+  'ttc_cani_laptop_lap': 'CC0 · StockSnap · Glenn Carstens-Peters',
+  'ttc_cani_cycling': 'CC BY-SA 4.0 · Wikimedia Commons · Alfredo Borba',
+  'ttc_cani_underwear': 'CC BY-SA 4.0 · Wikimedia Commons · Basile Morin',
+  'ttc_cani_phone_pocket': 'CC0 · StockSnap · JESHOOTS.com',
+  'ttc_cani_testosterone': 'CC0 · StockSnap · Khusen Rustamov',
+  'ttc_cani_cold_medicine': 'CC0 · Wikimedia Commons · Necatorina',
+  'ttc_cani_antibiotics': 'CC BY-SA 4.0 · Wikimedia Commons · Whispyhistory',
+  'ttc_cani_vaccines': 'CC BY-SA 4.0 · Wikimedia Commons · Whispyhistory',
+  'ttc_cani_regular_meds': 'Public domain · Wikimedia Commons · National Institute of Standards and Tech',
+  'ttc_cani_thyroid_tablets': 'Public domain · Wikimedia Commons · User:Ash',
+  'ttc_cani_after_pill': 'CC BY-SA 3.0 · Wikimedia Commons · Ragesoss',
+  'ttc_cani_isotretinoin': 'CC0 · StockSnap · Authentic Stock',
 };
 
 /// ⚠️ OUR OWN HOST, ONCE IT EXISTS — 2026-09-20. Every URL in the table
@@ -3205,6 +3327,26 @@ const Map<String, String> kOpenverseIds = {
   'ttc_cani_painkillers': '827f21cc-303b-4256-b72a-10c967f34108',
   'ttc_cani_sex_frequency': '1ce9f84d-a670-40cb-be37-ec0600f435ad',
   'ttc_cani_travel': '502b1380-51b7-4dc6-bae7-108e8cfe1fd2',
+  // ttc_cani_* added 2026-09-30, the ids of the photos they reuse
+  'ttc_cani_fish': 'd6e74b4a-395c-4799-a141-90c1b586643a',
+  'ttc_cani_green_tea': '0368d3b1-fd76-42ec-b49d-5cb96381d362',
+  'ttc_cani_spicy_food': 'c8a2e427-59b5-465e-b099-50c9c1ec7222',
+  'ttc_cani_fasting': 'ad60eeb8-7f1b-4e03-8045-22e79c7611a1',
+  'ttc_cani_dieting': 'a516f54b-9d2f-442a-9308-471fe2a62d55',
+  'ttc_cani_herbal_tea': '87b3b06d-8c26-4ae5-a277-071aba1177f3',
+  'ttc_cani_raw_milk': '35e968c1-06c3-439d-819c-6eb28c339317',
+  'ttc_cani_lubricant': 'f5de2671-5929-49fb-a7fa-2fcdf1023d0e',
+  'ttc_cani_get_up_after': '635a480d-2365-4ef4-b0f9-665abf04dac3',
+  'ttc_cani_yoga': '126d6729-71c2-4ad8-823f-cd77f9fb3a09',
+  'ttc_cani_swimming': 'aaf2363f-5838-44c6-8bc5-780605f91d52',
+  'ttc_cani_massage': 'edff9d5d-cbc5-49d5-a5ae-f55cb8b55671',
+  'ttc_cani_night_shifts': '2eeeb60c-253d-475f-812b-d72a852fc266',
+  'ttc_cani_fly_wait': 'e54a8258-1cef-48bc-8667-e57d2ee28e26',
+  'ttc_cani_vaping': 'ee6b1a71-c3fc-47e5-8f82-a3253f705cf3',
+  'ttc_cani_laptop_lap': 'e069bf08-07a3-4330-bd99-d939d419ce14',
+  'ttc_cani_phone_pocket': '11cd1d83-581a-46ba-b047-3f04abd3dc74',
+  'ttc_cani_testosterone': 'a9541001-99a6-4fd4-ac30-78a90dfdfe94',
+  'ttc_cani_isotretinoin': 'ff075f38-71f8-4dc0-b930-5e383c2bc8a7',
 };
 
 // =============================================================================

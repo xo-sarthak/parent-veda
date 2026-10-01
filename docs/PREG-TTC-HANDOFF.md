@@ -130,7 +130,10 @@ ink (`lib/screens/pregnancy/preg_theme.dart`, picked in `main.dart`). Held by `t
 pregnancy theme already covers the Material defaults in them while the stage is pregnancy; only their hand-set
 violets remain.
 
-## 10. A trying-to-conceive test that fails on main (found 2026-10-01, not caused by this branch)
+## 10. A trying-to-conceive test that failed on main (found 2026-10-01, not caused by this branch) — DONE
+
+**Status: fixed on main in 666b348** (the day cell no longer shows "Now" under a month label), and brought into this
+branch by the merge of origin/main on 2026-10-01. Nothing further is owed. The note below is kept as the record.
 
 `test/ttc_cycle_companion_test.dart`, "the four states render at phone width: the picture can be switched to days",
 fails with **"A RenderFlex overflowed by 8.2 pixels on the bottom"**, raised at line 199 (`expect(tester.takeException(),

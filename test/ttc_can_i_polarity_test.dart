@@ -69,17 +69,22 @@ void main() {
               reason: '"${e.questionEn}" contains "$w", which flips what '
                   '"${e.verdict.label(false)}" means');
         }
-        final hi = e.questionHi.toLowerCase();
-        expect(hi.startsWith('kya '), isTrue, reason: e.questionHi);
-        for (final w in _flippingWordsHi) {
-          expect(_hasWord(hi, w), isFalse,
-              reason: '"${e.questionHi}" contains "$w"');
+        // 2026-09-30: the Hindi side is optional (the thirty added then are
+        // English only, CLAUDE.md "New work is English"); where it exists it
+        // is held exactly as before.
+        final hiQ = e.questionHi;
+        if (hiQ != null) {
+          final hi = hiQ.toLowerCase();
+          expect(hi.startsWith('kya '), isTrue, reason: hiQ);
+          for (final w in _flippingWordsHi) {
+            expect(_hasWord(hi, w), isFalse, reason: '"$hiQ" contains "$w"');
+          }
         }
       });
 
       test('${e.id}: the answer\'s first word agrees with the verdict', () {
         final en = _firstWord(e.shortEn);
-        final hi = _firstWord(e.shortHi);
+        final hi = _firstWord(e.short(true));
         switch (e.verdict) {
           case TtcVerdict.safe:
           case TtcVerdict.moderate:
@@ -87,13 +92,13 @@ void main() {
             expect(en, isNot(anyOf('no', 'not', 'never', 'avoid')),
                 reason: '${e.verdict.label(false)} above "${e.shortEn}"');
             expect(hi, isNot(anyOf('nahi', 'nahin', 'mat')),
-                reason: '${e.verdict.label(true)} above "${e.shortHi}"');
+                reason: '${e.verdict.label(true)} above "${e.short(true)}"');
           case TtcVerdict.avoid:
             // "Better not" must not sit above an answer opening "Yes".
             expect(en, isNot(anyOf('yes', 'sure', 'fine')),
                 reason: '${e.verdict.label(false)} above "${e.shortEn}"');
             expect(hi, isNot(anyOf('haan', 'theek')),
-                reason: '${e.verdict.label(true)} above "${e.shortHi}"');
+                reason: '${e.verdict.label(true)} above "${e.short(true)}"');
           case TtcVerdict.askDoctor:
             // A referral can open either way; it only must not be a flat no
             // that the chip does not say.

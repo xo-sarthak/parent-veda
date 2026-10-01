@@ -2275,6 +2275,15 @@ const String kTtcConsultCardArt = 'assets/doors/card_consult.jpg';
 /// The word on a course's corner pill.
 const String kTtcCourseEnroll = 'Enroll';
 
+/// The key on a card's top-right ₹ (2026-09-30).
+Key ttcKindRupeeKey(String title) => ValueKey('ttc-kind-rupee-$title');
+
+/// The word on a consult's corner pill, after a red dot (2026-09-30).
+const String kTtcConsultLive = 'Live 1:1';
+
+/// The key on a card's top-left kind badge (2026-09-30).
+Key ttcKindBadgeKey(String title) => ValueKey('ttc-kind-badge-$title');
+
 /// The key on a paid card's price tag.
 Key ttcKindPriceKey(String title) => ValueKey('ttc-kind-price-$title');
 
@@ -2416,46 +2425,18 @@ class TtcShelfCard extends StatelessWidget {
   /// added later would lose a third of. A corner badge costs the picture
   /// almost nothing. Kept for revert: git.
   Widget _toolPicture(String? url) {
-    final chat = kind == TtcCardKind.chat;
-    final deep = HSLColor.fromColor(_artTint).withLightness(0.36).toColor();
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        if (url != null)
-          Image.network(
-            url,
-            fit: BoxFit.cover,
-            errorBuilder: (_, _, _) => _drawn(),
-          )
-        else
-          _drawn(),
-        Positioned(
-          key: ttcKindToolBarKey(tile.title),
-          right: 7,
-          bottom: 7,
-          child: Container(
-            width: 30,
-            height: 30,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.10),
-                  blurRadius: 5,
-                  offset: const Offset(0, 1),
-                ),
-              ],
-            ),
-            child: Icon(
-              chat ? Icons.chat_bubble_outline_rounded : Icons.build_outlined,
-              size: 16,
-              color: deep,
-            ),
-          ),
-        ),
-      ],
-    );
+    // The wrench (a chat's bubble) moved to the top-left kind badge on every
+    // card (2026-09-30); the picture is the picture. Kept for revert: git
+    // (the corner badge, bottom right, key ttcKindToolBarKey).
+    if (url != null) {
+      return Image.network(
+        url,
+        key: ttcKindToolBarKey(tile.title),
+        fit: BoxFit.cover,
+        errorBuilder: (_, _, _) => _drawn(),
+      );
+    }
+    return KeyedSubtree(key: ttcKindToolBarKey(tile.title), child: _drawn());
   }
 
   /// A consult's picture: the person, not a stethoscope (Mobbin: Alan's
@@ -2528,17 +2509,32 @@ class TtcShelfCard extends StatelessWidget {
   /// before the price on a product) on consults, products and courses.
   Widget? _priceTag() {
     switch (kind) {
+      // The bag moved to the top-left kind badge (2026-09-30). Kept for revert:
+      // the white bag disc here, bottom right.
+      // ⚠️ ₹ ON WHAT COSTS MONEY (2026-09-30, the user: "a rupee sign … for
+      // the one-on-one consultation … and it's paid; the same for products").
+      // A small white disc, bottom right, where a film's length sits: a
+      // product, and a consult that has a price. The price itself is one tap
+      // in. A course keeps its Enroll pill there.
+      // The ₹ is top right now (`_rupee`); bottom right is the fact.
       case TtcCardKind.product:
+        return null;
+      // ⚠️ "LIVE 1:1", A FORMAT, NOT A PRESENCE (2026-09-30, the user: "that
+      // red dot that displays something is live"). The dot says the consult
+      // is a live video call with one expert, which is true of every consult;
+      // it never claims she is online now, because nothing here knows that.
+      case TtcCardKind.consult:
         return Positioned(
           key: ttcKindPriceKey(tile.title),
           right: 7,
           bottom: 7,
           child: Container(
-            width: 30,
-            height: 30,
+            // Smaller (2026-09-30, the user: "comes so to the face"). Kept
+            // for revert: padding 8/4/9/4, a 7pt dot, 12pt words.
+            padding: const EdgeInsets.fromLTRB(6, 3, 7, 3),
             decoration: BoxDecoration(
               color: Colors.white,
-              shape: BoxShape.circle,
+              borderRadius: BorderRadius.circular(999),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.10),
@@ -2547,9 +2543,54 @@ class TtcShelfCard extends StatelessWidget {
                 ),
               ],
             ),
-            child: Icon(Icons.shopping_bag_outlined, size: 16, color: p.ink1),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 5,
+                  height: 5,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFE5484D),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  kTtcConsultLive,
+                  textScaler: TextScaler.noScaling,
+                  style: pvManrope(
+                    fontSize: 10.5,
+                    fontWeight: FontWeight.w800,
+                    color: p.ink1,
+                  ),
+                ),
+              ],
+            ),
           ),
         );
+      // Kept for revert (2026-09-30), the old product bag, bottom right:
+      // case TtcCardKind.product when false:
+      // return Positioned(
+      // key: ttcKindPriceKey(tile.title),
+      // right: 7,
+      // bottom: 7,
+      // child: Container(
+      // width: 30,
+      // height: 30,
+      // decoration: BoxDecoration(
+      // color: Colors.white,
+      // shape: BoxShape.circle,
+      // boxShadow: [
+      // BoxShadow(
+      // color: Colors.black.withValues(alpha: 0.10),
+      // blurRadius: 5,
+      // offset: const Offset(0, 1),
+      // ),
+      // ],
+      // ),
+      // child: Icon(Icons.shopping_bag_outlined, size: 16, color: p.ink1),
+      // ),
+      // );
       case TtcCardKind.course:
         return Positioned(
           key: ttcKindPriceKey(tile.title),
@@ -2600,6 +2641,94 @@ class TtcShelfCard extends StatelessWidget {
   //   return Positioned(right: 7, bottom: 7, child: <a white pill: a bag on a
   //     product, then the price in w800 ink>);
   // }
+
+  /// The ₹ disc, TOP RIGHT, on a card that costs money (2026-09-30, the
+  /// user: top left says what it is, top right that it is paid). A product,
+  /// and a consult or a course that has a price.
+  bool get _paid =>
+      kind == TtcCardKind.product ||
+      ((kind == TtcCardKind.consult || kind == TtcCardKind.course) &&
+          ttcCardIsPaid(tile));
+
+  /// A consult's Live 1:1, a course's Enroll, a film's play and length:
+  /// the card already says what it is, so it wears no kind badge.
+  // A film wears its camera badge again (2026-09-30, the user: "for the
+  // video, just add a video logo at top left"). Kept for revert: `||
+  // kind == TtcCardKind.video` here.
+  bool get _pillSaysWhatItIs =>
+      kind == TtcCardKind.consult || kind == TtcCardKind.course;
+
+  // Top left where there is no kind badge (a consult, a course); top right
+  // beside a product's bag.
+  // A product's ₹ sits bottom right, under its bag's diagonal (2026-09-30,
+  // the user); a consult's or course's top left, where no badge is.
+  // Kept for revert: a product's top right.
+  Widget _rupee() => Positioned(
+    key: ttcKindRupeeKey(tile.title),
+    left: _pillSaysWhatItIs ? 7 : null,
+    right: _pillSaysWhatItIs ? null : 7,
+    top: _pillSaysWhatItIs ? 7 : null,
+    bottom: _pillSaysWhatItIs ? null : 7,
+    child: Semantics(
+      label: 'Paid',
+      child: Container(
+        width: 28,
+        height: 28,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.10),
+              blurRadius: 5,
+              offset: const Offset(0, 1),
+            ),
+          ],
+        ),
+        child: Icon(Icons.currency_rupee_rounded, size: 15, color: p.ink1),
+      ),
+    ),
+  );
+
+  /// ⚠️ WHAT IT IS, TOP LEFT, ON EVERY CARD (2026-09-30, the user: "icons for
+  /// each and every situation … placed at a position"; top left chosen: it is
+  /// read first, and the bottom right already carries the one fact, a film's
+  /// length or a course's Enroll). A small white disc with the kind's own
+  /// line icon, the same size and place on every kind, so a shelf reads as
+  /// one system: top left says what it is, bottom right its fact.
+  Widget _kindBadge() => Positioned(
+    key: ttcKindBadgeKey(tile.title),
+    left: 7,
+    top: 7,
+    child: ExcludeSemantics(
+      child: Container(
+        width: 28,
+        height: 28,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.10),
+              blurRadius: 5,
+              offset: const Offset(0, 1),
+            ),
+          ],
+        ),
+        // A consult is a call, not a chat (2026-09-30, the user: the chat
+        // card wears the same bubble); every other kind its own icon.
+        child: Icon(
+          // A phone, not a camera: a film already wears the camera
+          // (2026-09-30, the user: "maybe a call sign").
+          kind == TtcCardKind.consult
+              ? Icons.call_outlined
+              : ttcCardKindIcon(kind),
+          size: 15,
+          color: p.ink1,
+        ),
+      ),
+    ),
+  );
 
   /// The carousel's picture: a fanned deck (2026-09-29, the user on build
   /// 23: "initial image, then a few behind it drawn with a mark, the front
@@ -2845,6 +2974,15 @@ class TtcShelfCard extends StatelessWidget {
                               ),
                             ),
                           ),
+                        // On top of every layer, a film's veil included.
+                        // ⚠️ AT MOST TWO MARKS ON A CARD (2026-09-30, the user:
+                        // "let's try to keep it maximum two logos"). Where a
+                        // pill or the play button already says what it is (a
+                        // consult's Live 1:1, a course's Enroll, a film's play
+                        // and length) there is no kind badge; a paid consult
+                        // or course takes the ₹ at the top left instead.
+                        if (!_pillSaysWhatItIs) _kindBadge(),
+                        if (_paid) _rupee(),
                       ],
                     ),
                   ),

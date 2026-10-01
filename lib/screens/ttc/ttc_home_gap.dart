@@ -125,7 +125,17 @@ const String kTtcCheckEyebrow = 'For both of you';
 const String kTtc101Eyebrow = 'New to trying?';
 const String kTtc101Title = 'Start with Trying to conceive 101';
 // Kept for revert (2026-09-28): 'All steps'.
-const String kTtc101AllSteps = 'See all 101 steps';
+// 2026-09-30: "See all 101 steps" read as a count of 101 (the user, on the
+// phone: "there are only 7"). The 101 is the course's name, not its size, so
+// the label now says the real number. Kept for revert:
+// const String kTtc101AllSteps = 'See all 101 steps';
+String ttc101AllSteps(int n) => n == 1 ? 'See the 1 step' : 'See all $n steps';
+
+/// The long-gap hero (2026-09-30): past this cycle day with no window to
+/// show, the home says how long it has been instead of "Cycle day N". 35 is
+/// the far end of a normal cycle (21 to 35 days, the range the reads use).
+const int kTtcLongGapDays = 35;
+const String kTtcLongGapBody = 'Has a new one come? Tap to log it ›';
 
 /// After a period is logged.
 const String kTtcPeriodLoggedNote =
@@ -207,42 +217,81 @@ class TtcPeriodCameLine extends StatelessWidget {
 
   final V2Palette p;
 
+  // ⚠️ ONE SLIM PILL, NOT A CARD (2026-09-30, the user: "maybe its
+  // representation can be better, not like this, completely covering").
+  // The two-line white card took a block of the hero between the headline
+  // and the quick actions. It is now the shape of the date pill above it:
+  // the heart and the link, on one line. The kind sentence lives on in the
+  // read it opens. Kept for revert, the card:
+  // Widget build(BuildContext context) => InkWell(
+  //       key: const ValueKey('ttc_home_period_came'),
+  //       onTap: () => _open(context, const [
+  //         '$kTtcReadPrefix$kTtcPeriodCameReadId',
+  //         'ttc_chat/period_came',
+  //       ]),
+  //       borderRadius: BorderRadius.circular(16),
+  //       child: Container(
+  //         width: double.infinity,
+  //         padding: const EdgeInsets.fromLTRB(14, 12, 10, 12),
+  //         decoration: BoxDecoration(
+  //           color: p.surface.withValues(alpha: 0.92),
+  //           borderRadius: BorderRadius.circular(16),
+  //         ),
+  //         child: Row(children: [
+  //           // H9: ink, not violet. Was color: p.action.
+  //           Icon(Icons.favorite_border_rounded, size: 18, color: p.ink2),
+  //           const SizedBox(width: 10),
+  //           Expanded(
+  //             child: Column(
+  //                 crossAxisAlignment: CrossAxisAlignment.start,
+  //                 children: [
+  //                   Text(kTtcPeriodCameLine,
+  //                       style: pvManrope(
+  //                           fontSize: 13, height: 1.4, color: p.ink1)),
+  //                   const SizedBox(height: 3),
+  //                   Text(kTtcPeriodCameLink,
+  //                       style: pvManrope(
+  //                           fontSize: 12.5,
+  //                           fontWeight: FontWeight.w800,
+  //                           color: ttcTitleInk)),
+  //                 ]),
+  //           ),
+  //           Icon(Icons.chevron_right_rounded, size: 18, color: p.ink3),
+  //         ]),
+  //       ),
+  //     );
   @override
-  Widget build(BuildContext context) => InkWell(
-        key: const ValueKey('ttc_home_period_came'),
-        onTap: () => _open(context, const [
-          '$kTtcReadPrefix$kTtcPeriodCameReadId',
-          'ttc_chat/period_came',
-        ]),
-        borderRadius: BorderRadius.circular(16),
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.fromLTRB(14, 12, 10, 12),
-          decoration: BoxDecoration(
-            color: p.surface.withValues(alpha: 0.92),
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Row(children: [
-            // H9: ink, not violet. Was color: p.action.
-            Icon(Icons.favorite_border_rounded, size: 18, color: p.ink2),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(kTtcPeriodCameLine,
-                        style: pvManrope(
-                            fontSize: 13, height: 1.4, color: p.ink1)),
-                    const SizedBox(height: 3),
-                    Text(kTtcPeriodCameLink,
-                        style: pvManrope(
-                            fontSize: 12.5,
-                            fontWeight: FontWeight.w800,
-                            color: ttcTitleInk)),
-                  ]),
+  Widget build(BuildContext context) => Align(
+        alignment: Alignment.centerLeft,
+        child: Material(
+          color: p.surface.withValues(alpha: 0.92),
+          shape: const StadiumBorder(),
+          child: InkWell(
+            key: const ValueKey('ttc_home_period_came'),
+            customBorder: const StadiumBorder(),
+            onTap: () => _open(context, const [
+              '$kTtcReadPrefix$kTtcPeriodCameReadId',
+              'ttc_chat/period_came',
+            ]),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(12, 9, 10, 9),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                Icon(Icons.favorite_border_rounded, size: 16, color: p.ink2),
+                const SizedBox(width: 8),
+                Flexible(
+                  child: Text(kTtcPeriodCameLink,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: pvManrope(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: ttcTitleInk)),
+                ),
+                const SizedBox(width: 4),
+                Icon(Icons.chevron_right_rounded, size: 18, color: p.ink3),
+              ]),
             ),
-            Icon(Icons.chevron_right_rounded, size: 18, color: p.ink3),
-          ]),
+          ),
         ),
       );
 }
@@ -422,6 +471,8 @@ class Ttc101Card extends StatelessWidget {
       }
     }
     final next = nextId == null ? null : ttcReadById(nextId);
+    // Only the steps that resolve, the same ones the list draws.
+    final stepCount = kTtc101ReadIds.where((id) => ttcReadById(id) != null).length;
 
     // H8: ONE tap target at radius 16, with a press; "All steps" is a row
     // of its own under the card rather than a button inside it. Kept for
@@ -493,7 +544,7 @@ class Ttc101Card extends StatelessWidget {
               foregroundColor: ttcTitleInk,
               minimumSize: const Size(44, 44),
               padding: const EdgeInsets.symmetric(horizontal: 8)),
-          child: Text(kTtc101AllSteps,
+          child: Text(ttc101AllSteps(stepCount),
               style: pvManrope(
                   fontSize: 12.5,
                   fontWeight: FontWeight.w800,

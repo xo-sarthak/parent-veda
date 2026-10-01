@@ -56,14 +56,14 @@ class TtcCanI {
   const TtcCanI({
     required this.id,
     required this.questionEn,
-    required this.questionHi,
+    this.questionHi,
     required this.verdict,
     required this.shortEn,
-    required this.shortHi,
+    this.shortHi,
     required this.whyEn,
-    required this.whyHi,
+    this.whyHi,
     required this.indianEn,
-    required this.indianHi,
+    this.indianHi,
     this.forPartner = false,
     this.limitEn,
     this.limitHi,
@@ -81,27 +81,30 @@ class TtcCanI {
 
   final String id;
   final String questionEn;
-  final String questionHi;
+  final String? questionHi;
   final TtcVerdict verdict;
 
   /// The answer in one line, above the fold.
   final String shortEn;
-  final String shortHi;
+  final String? shortHi;
 
   final String whyEn;
-  final String whyHi;
+  final String? whyHi;
 
   /// The India-specific line - what this actually means in an Indian home.
   final String indianEn;
-  final String indianHi;
+  final String? indianHi;
 
   /// True when the question is really about him.
   final bool forPartner;
 
-  String question(bool hi) => hi ? questionHi : questionEn;
-  String short(bool hi) => hi ? shortHi : shortEn;
-  String why(bool hi) => hi ? whyHi : whyEn;
-  String indian(bool hi) => hi ? indianHi : indianEn;
+  // The Hindi side is optional since 2026-09-30: the questions added then are
+  // English only (CLAUDE.md, "New work is English") and fall back to it. The
+  // first twelve keep their Hindi. Kept for revert: `hi ? questionHi : questionEn`.
+  String question(bool hi) => hi ? (questionHi ?? questionEn) : questionEn;
+  String short(bool hi) => hi ? (shortHi ?? shortEn) : shortEn;
+  String why(bool hi) => hi ? (whyHi ?? whyEn) : whyEn;
+  String indian(bool hi) => hi ? (indianHi ?? indianEn) : indianEn;
 }
 
 const List<TtcCanI> ttcCanI = [
@@ -358,6 +361,343 @@ const List<TtcCanI> ttcCanI = [
         'Take the real packet to your appointment. A doctor can\'t check "some ayurvedic tablets", but they can check a label.',
     indianHi:
         'Appointment par asli packet le jaayein. "Kuch ayurvedic goliyan" doctor check nahi kar sakte; label kar sakte hain.',
+  ),
+  // ===========================================================================
+  //  2026-09-30: thirty more (the user: "why do we have so few questions in
+  //  Can I?"). Written to docs/TTC-VOICE.md, English only (CLAUDE.md, "New work
+  //  is English"; the Hindi side falls back to it). Verdicts stay calm: mostly
+  //  yes, "No" only where the evidence is clear (vaping, beside smoking), and
+  //  "Ask your doctor" where a doctor must decide (isotretinoin, testosterone,
+  //  regular medicines). Each is general guidance, never a diagnosis.
+  // ===========================================================================
+
+  // ---- Food and drink ---------------------------------------------------------
+  TtcCanI(
+    id: 'fish',
+    limitEn: 'two or three portions a week, low-mercury fish',
+    questionEn: 'Can I eat fish while trying?',
+    verdict: TtcVerdict.moderate,
+    shortEn: 'Yes, two or three portions a week of low-mercury fish.',
+    whyEn:
+        "Fish gives you protein, iodine and omega-3 fats, which are good for you and for an early pregnancy. The one thing to watch is mercury, which builds up in large fish that eat other fish. Choosing smaller fish keeps the benefit without the mercury.",
+    indianEn:
+        'Rohu, pomfret, sardines (mathi), mackerel (bangda) and prawns are all good choices. Keep large surmai (king mackerel) and shark to now and then.',
+  ),
+  TtcCanI(
+    id: 'green_tea',
+    limitEn: 'counts towards about 200mg of caffeine a day',
+    questionEn: 'Can I drink green tea?',
+    verdict: TtcVerdict.moderate,
+    shortEn: 'Yes. It has caffeine too, so count it with your chai and coffee.',
+    whyEn:
+        "A cup of green tea has less caffeine than coffee, but it still adds up. Two or three cups a day is fine alongside a little chai. Very large amounts of green tea extract, in capsules, are a different thing and are best left out while you try.",
+    indianEn:
+        "Many people switch to green tea thinking it's caffeine-free. It isn't, so keep your total for the day under about 200mg.",
+  ),
+  TtcCanI(
+    id: 'energy_drinks',
+    limitEn: 'one can now and then, counted with your caffeine',
+    questionEn: 'Can I have energy drinks?',
+    verdict: TtcVerdict.moderate,
+    shortEn: 'Yes, now and then. One can can use up half your caffeine for the day.',
+    whyEn:
+        'Energy drinks often hold 80 to 160mg of caffeine a can, plus a lot of sugar. One now and then is fine. Having them every day makes it easy to go over the 200mg most guidelines suggest while trying.',
+    indianEn:
+        'Check the label: the caffeine is usually printed in mg per can. Colas count too, at about 40mg a can.',
+  ),
+  TtcCanI(
+    id: 'spicy_food',
+    questionEn: 'Can I eat spicy food?',
+    verdict: TtcVerdict.safe,
+    shortEn: "Yes. Spicy food doesn't affect your chances of conceiving.",
+    whyEn:
+        "There's no evidence that chilli, masala or spicy food changes ovulation, sperm or implantation. If it gives you heartburn or an upset stomach, that's a comfort question, not a fertility one.",
+    indianEn:
+        "You don't need to cut out pickles, chutneys or your usual masala. Eat the way you enjoy, with plenty of vegetables and dal alongside.",
+  ),
+  TtcCanI(
+    id: 'fasting',
+    limitEn: 'short fasts, eating well on the other days',
+    questionEn: 'Can I keep my religious fasts?',
+    verdict: TtcVerdict.moderate,
+    shortEn: 'Yes, short fasts are fine if you eat well on the other days.',
+    whyEn:
+        "A day's fast now and then doesn't stop you conceiving. What matters is your overall eating over weeks: enough food, protein and folic acid. Long or very strict fasts can unsettle your cycle, and during treatment your clinic may ask you to eat normally.",
+    indianEn:
+        'Navratri, Ramadan, ekadashi or a weekly vrat are all fine for most people. Drink enough water, break the fast with a proper meal, and keep taking folic acid.',
+  ),
+  TtcCanI(
+    id: 'dieting',
+    limitEn: 'slow and steady, no crash diets',
+    questionEn: 'Can I diet to lose weight while trying?',
+    verdict: TtcVerdict.moderate,
+    shortEn: 'Yes, gently. Slow weight loss can help, but crash diets can upset your cycle.',
+    whyEn:
+        "If you carry extra weight, losing even a small amount can help ovulation. Very low-calorie or fad diets can have the opposite effect and stop you getting enough of what a pregnancy needs. About half a kilo to a kilo a week is a steady pace.",
+    indianEn:
+        'Smaller portions of rice and roti, more dal, vegetables and curd, and a daily walk work better than skipping meals. A dietitian can help if you want a plan.',
+  ),
+  TtcCanI(
+    id: 'herbal_tea',
+    limitEn: 'ordinary teas in normal amounts',
+    questionEn: 'Can I drink herbal teas?',
+    verdict: TtcVerdict.moderate,
+    shortEn: 'Yes, ordinary ones like tulsi, ginger or mint, in normal amounts.',
+    whyEn:
+        "Everyday herbal teas are fine a cup or two a day. Strong herbal mixtures sold for fertility or cleansing are different: their contents and doses aren't tested, and some herbs aren't known to be safe in early pregnancy.",
+    indianEn:
+        'Tulsi, adrak, saunf or pudina tea is fine. Ask your doctor before a kadha or blend taken every day for weeks.',
+  ),
+  TtcCanI(
+    id: 'raw_milk',
+    questionEn: 'Can I drink unboiled milk?',
+    verdict: TtcVerdict.moderate,
+    limitEn: 'boil it first',
+    shortEn: 'Yes, once it is boiled. Raw milk can carry germs that matter in early pregnancy.',
+    whyEn:
+        "Unboiled milk and cheese made from it can carry listeria, an infection that is rare but serious in pregnancy. You may be pregnant for a couple of weeks before you know, so it's worth boiling milk from now on.",
+    indianEn:
+        'Packet milk is pasteurised and fine. Milk straight from a dairy or a doodhwala should be boiled, and so should paneer made from it.',
+  ),
+
+  // ---- Body and habits ----------------------------------------------------------
+  TtcCanI(
+    id: 'lubricant',
+    limitEn: 'a sperm-friendly one, or none',
+    questionEn: 'Can I use lubricant?',
+    verdict: TtcVerdict.moderate,
+    shortEn: 'Yes, but choose a sperm-friendly one. Many regular lubes slow sperm down.',
+    whyEn:
+        "Most everyday lubricants, and saliva, can make it harder for sperm to swim. Sperm-friendly lubricants are made to match the body's own fluid. If you need one, it's much better than sex that hurts.",
+    indianEn:
+        'Look for "sperm-friendly" or "fertility-friendly" on the pack at a chemist or online. A little plain coconut oil is another option many couples use.',
+  ),
+  TtcCanI(
+    id: 'get_up_after',
+    questionEn: 'Can I get up straight after sex?',
+    verdict: TtcVerdict.safe,
+    shortEn: 'Yes. Getting up straight away does not wash anything away.',
+    whyEn:
+        'Sperm reach the cervix within minutes. Lying still with your legs up has never been shown to make pregnancy more likely. Stay lying down if you like it, and get up if you need to.',
+    indianEn:
+        "Going to the bathroom afterwards is fine too. It's a common worry, and there's no need for it.",
+  ),
+  TtcCanI(
+    id: 'sauna',
+    limitEn: 'short sessions, and not in the two-week wait',
+    questionEn: 'Can I use a sauna or steam room?',
+    verdict: TtcVerdict.moderate,
+    shortEn: 'Yes, for short sessions. In the two-week wait, skip the very hot ones.',
+    whyEn:
+        "A short sauna doesn't affect your eggs. In the days after ovulation you could be in a very early pregnancy, when a long stay at high heat is best avoided. A warm shower or bath is always fine.",
+    indianEn:
+        'Salon steam and spa sessions are the same thing: keep them short, and leave them out from ovulation until your period or a test.',
+  ),
+  TtcCanI(
+    id: 'yoga',
+    questionEn: 'Can I do yoga while trying?',
+    verdict: TtcVerdict.safe,
+    shortEn: 'Yes. Yoga is a good way to stay active and calm while trying.',
+    whyEn:
+        "Regular yoga is gentle exercise and can help you sleep and feel less tense. There's no pose that stops you conceiving. In the two-week wait, many people choose gentler practice and skip hot yoga.",
+    indianEn:
+        'Home yoga, a class or a YouTube routine are all fine. Pranayama and slow stretching are a good fit for the waiting days.',
+  ),
+  TtcCanI(
+    id: 'swimming',
+    questionEn: 'Can I go swimming?',
+    verdict: TtcVerdict.safe,
+    shortEn: 'Yes. Swimming is safe and good exercise while trying.',
+    whyEn:
+        "Pool chlorine doesn't affect fertility. Swimming works your whole body without strain, and it's fine to keep going into a pregnancy.",
+    indianEn:
+        "A club or hotel pool is fine. If you get thrush easily, change out of a wet costume soon after.",
+  ),
+  TtcCanI(
+    id: 'massage',
+    questionEn: 'Can I get a massage?',
+    verdict: TtcVerdict.safe,
+    shortEn: 'Yes. A massage is fine, and good for stress.',
+    whyEn:
+        "There's no evidence that a massage affects conceiving. In the two-week wait, a gentle one is a kind way to rest. Tell the therapist you're trying if they use strong oils or very deep pressure on the belly.",
+    indianEn:
+        'A home champi or an oil massage is fine. The same goes for a spa, with its steam kept short.',
+  ),
+  TtcCanI(
+    id: 'night_shifts',
+    questionEn: 'Can I keep working night shifts?',
+    verdict: TtcVerdict.moderate,
+    limitEn: 'with as much regular sleep as you can get',
+    shortEn: 'Yes. Shifts can unsettle your cycle a little, so protect your sleep.',
+    whyEn:
+        "Many people conceive while working nights. Changing shifts can make cycles less regular for some, which makes your fertile days harder to spot. Regular sleep, even at odd hours, helps. If your cycle becomes very irregular, see a doctor.",
+    indianEn:
+        'Nurses, doctors, call centre and IT teams often work shifts. Blackout curtains and a fixed sleep time after a night shift help most.',
+  ),
+  TtcCanI(
+    id: 'fly_wait',
+    questionEn: 'Can I fly in the two-week wait?',
+    verdict: TtcVerdict.safe,
+    shortEn: 'Yes. Flying does not affect implantation.',
+    whyEn:
+        "Airport scanners, cabin pressure and sitting on a plane don't stop an egg implanting. Drink water and walk around on long flights, the same advice as for anyone.",
+    indianEn:
+        'Weddings, work trips and visits home are all fine to go ahead with. Carry your folic acid.',
+  ),
+  TtcCanI(
+    id: 'skincare',
+    limitEn: 'pause retinol and retinoid creams',
+    questionEn: 'Can I keep using my skincare?',
+    verdict: TtcVerdict.moderate,
+    shortEn: 'Yes, mostly. Pause retinol and retinoid creams while you try.',
+    whyEn:
+        'Moisturisers, sunscreen, face wash and most creams are fine. Vitamin A creams (retinol, tretinoin, adapalene) are usually paused while trying, because you may be pregnant for a while before you know. Tablets for acne are a separate question for your doctor.',
+    indianEn:
+        'Check the ingredients for "retinol", "retinoid", "tretinoin" or "adapalene". Niacinamide, azelaic acid and plain sunscreen are gentler swaps for now.',
+  ),
+  TtcCanI(
+    id: 'vaping',
+    questionEn: 'Can I keep vaping while we try?',
+    verdict: TtcVerdict.avoid,
+    shortEn: 'No, best to stop. Nicotine affects fertility whether you smoke or vape.',
+    whyEn:
+        "Vapes still deliver nicotine, which affects eggs, sperm and an early pregnancy. They aren't a safe swap for cigarettes while trying. Stopping helps both of you, and a doctor can help you do it.",
+    indianEn:
+        "The same goes for gutka, khaini and paan with tobacco. Tele-MANAS (14416) and your doctor can help if stopping is hard.",
+  ),
+
+  // ---- For him --------------------------------------------------------------------
+  TtcCanI(
+    id: 'laptop_lap',
+    forPartner: true,
+    limitEn: 'on a table rather than on the lap',
+    questionEn: 'Can he use a laptop on his lap?',
+    verdict: TtcVerdict.moderate,
+    shortEn: 'Yes, but a table is better. Heat on the lap can lower sperm quality a little.',
+    whyEn:
+        'Sperm are made best a little cooler than the body. A laptop resting on the lap for hours warms the testicles. It\'s a small effect, but an easy one to fix.',
+    indianEn:
+        'A desk, a table or a pillow under the laptop is enough. Work-from-home days on the bed are the usual culprit.',
+  ),
+  TtcCanI(
+    id: 'cycling',
+    forPartner: true,
+    questionEn: 'Can he keep cycling?',
+    verdict: TtcVerdict.safe,
+    shortEn: 'Yes. Everyday cycling is fine for his fertility.',
+    whyEn:
+        "Normal cycling to work or for fitness hasn't been shown to harm sperm. A well-fitting seat and padded shorts help on long rides. Staying active is good for sperm.",
+    indianEn:
+        'If he rides a lot, standing up now and then on long rides relieves pressure. Otherwise, keep going.',
+  ),
+  TtcCanI(
+    id: 'underwear',
+    forPartner: true,
+    questionEn: 'Can he wear tight underwear?',
+    verdict: TtcVerdict.moderate,
+    limitEn: 'looser is a little better',
+    shortEn: 'Yes. Looser underwear may help a little, but it is a small effect.',
+    whyEn:
+        "Some studies found men in looser underwear had slightly better sperm counts, because the testicles stay cooler. It's a small, easy change, not a cause of trouble on its own.",
+    indianEn:
+        'Cotton boxers are an easy switch. Tight jeans all day in the heat add to the warmth too.',
+  ),
+  TtcCanI(
+    id: 'phone_pocket',
+    forPartner: true,
+    questionEn: 'Can he keep his phone in his pocket?',
+    verdict: TtcVerdict.safe,
+    shortEn: "Yes. The evidence on phones and sperm is weak.",
+    whyEn:
+        "A few studies suggest a link between phones in trouser pockets and sperm, but they don't show the phone is the cause. There's no need to worry about it. A laptop on the lap and long hot baths are clearer things to change.",
+    indianEn:
+        'If he wants to, a shirt or bag pocket is an easy option. It isn\'t something to argue about.',
+  ),
+  TtcCanI(
+    id: 'testosterone',
+    forPartner: true,
+    questionEn: 'Can he take testosterone or muscle-building boosters?',
+    verdict: TtcVerdict.askDoctor,
+    shortEn: 'Ask a doctor first. Testosterone and steroids can stop sperm being made.',
+    whyEn:
+        "Extra testosterone, from injections, gels or gym steroids, tells the body to stop making its own, and sperm production can drop sharply. It usually recovers after stopping, but that can take months. Plain protein powder is a different thing and is fine.",
+    indianEn:
+        'Gym "boosters" sold online sometimes contain hidden steroids. If he uses any, a doctor or andrologist can advise how to come off them.',
+  ),
+
+  // ---- Medicines and tests ------------------------------------------------------------
+  TtcCanI(
+    id: 'cold_medicine',
+    questionEn: 'Can I take cold and flu medicine?',
+    verdict: TtcVerdict.moderate,
+    limitEn: 'simple ones; ask about combination tablets in the two-week wait',
+    shortEn: 'Yes, simple ones. Paracetamol, steam and rest are fine while trying.',
+    whyEn:
+        "A cold won't stop you conceiving. Paracetamol for fever or aches is fine. Some combination cold tablets contain decongestants that are best avoided in early pregnancy, so in the two-week wait ask the chemist for a simpler option.",
+    indianEn:
+        'Haldi doodh, steam, ginger tea and rest are fine too. Tell the chemist you are trying for a baby.',
+  ),
+  TtcCanI(
+    id: 'antibiotics',
+    questionEn: 'Can I take antibiotics?',
+    verdict: TtcVerdict.moderate,
+    limitEn: 'when a doctor prescribes them',
+    shortEn: 'Yes, when a doctor prescribes them. Tell them you are trying.',
+    whyEn:
+        "Common antibiotics don't affect fertility, and an untreated infection can do more harm. A few antibiotics are avoided in early pregnancy, so your doctor can pick one that suits someone trying.",
+    indianEn:
+        "Don't buy antibiotics over the counter without a prescription. Finish the course your doctor gives you.",
+  ),
+  TtcCanI(
+    id: 'vaccines',
+    questionEn: 'Can I get vaccines while trying?',
+    verdict: TtcVerdict.moderate,
+    limitEn: 'wait a month after MMR or chickenpox',
+    shortEn: 'Yes. For MMR or chickenpox vaccines, wait a month before trying.',
+    whyEn:
+        "Most vaccines, like flu and tetanus, are fine at any time. MMR (rubella) and chickenpox are live vaccines, so doctors advise waiting a month after them before trying. It's a good time to check you're protected against rubella.",
+    indianEn:
+        'Ask your doctor for a rubella test if you are not sure you had the MMR vaccine as a child. The Vaccines tool keeps a note of what you have had.',
+  ),
+  TtcCanI(
+    id: 'regular_meds',
+    questionEn: 'Can I keep taking my regular medicines?',
+    verdict: TtcVerdict.askDoctor,
+    shortEn: 'Ask your doctor. Do not stop any regular medicine on your own.',
+    whyEn:
+        "Most regular medicines are fine, and stopping some suddenly can be harmful. A few need changing before pregnancy, such as some for epilepsy, blood pressure or acne. Your doctor can check each one and switch any that need it.",
+    indianEn:
+        'Take the strips or a photo of each medicine to your appointment. Include ayurvedic and homeopathic ones too.',
+  ),
+  TtcCanI(
+    id: 'thyroid_tablets',
+    questionEn: 'Can I keep taking my thyroid tablets?',
+    verdict: TtcVerdict.safe,
+    shortEn: 'Yes. Keep taking them, and get your TSH checked while trying.',
+    whyEn:
+        "Thyroxine is safe while trying and in pregnancy, and a well-controlled thyroid helps you conceive. Your dose often needs to go up once you're pregnant, so tell your doctor as soon as you get a positive test.",
+    indianEn:
+        'Thyroid problems are common in India. Take your tablet on an empty stomach, apart from calcium and iron.',
+  ),
+  TtcCanI(
+    id: 'after_pill',
+    questionEn: 'Can we try straight after I come off the pill?',
+    verdict: TtcVerdict.safe,
+    shortEn: 'Yes. You can try as soon as you stop.',
+    whyEn:
+        "The pill doesn't harm future fertility. Some people ovulate in the first month, others take a few months for cycles to settle. There's no need to wait, though your first period helps date a pregnancy.",
+    indianEn:
+        'After the injection (Depo), fertility can take longer to come back, sometimes up to a year. That is normal.',
+  ),
+  TtcCanI(
+    id: 'isotretinoin',
+    questionEn: 'Can I take isotretinoin for acne?',
+    verdict: TtcVerdict.askDoctor,
+    shortEn: 'Ask your doctor now. It must be stopped at least a month before you try.',
+    whyEn:
+        "Isotretinoin tablets can seriously harm a baby in early pregnancy. Doctors advise stopping at least one month before trying, and using contraception until then. Your dermatologist and your gynaecologist can plan the timing with you.",
+    indianEn:
+        'It is sold under several brand names. Check the strip for "isotretinoin", and tell your doctor even if you only take it now and then.',
   ),
 ];
 

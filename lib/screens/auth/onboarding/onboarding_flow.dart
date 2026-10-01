@@ -533,11 +533,18 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                     alignment: WrapAlignment.center,
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
-                      ObLink(p: p, label: "I'm a doctor", onTap: _doctor),
-                      if (!invited) ...[
-                        Text('·', style: TextStyle(color: p.ink3)),
+                      // ⚠️ NO DOCTOR PATH IN THE PARENT APP (2026-09-30, the
+                      // user: "doctor app is different, it has nothing to do
+                      // with the parent app... that path should not exist").
+                      // Doctors use the doctor flavour (`--flavor doctor`,
+                      // main_doctor.dart). Kept for revert:
+                      // ObLink(p: p, label: "I'm a doctor", onTap: _doctor),
+                      // if (!invited) ...[
+                      //   Text('·', style: TextStyle(color: p.ink3)),
+                      //   ObLink(p: p, label: 'Have a code?', onTap: _code),
+                      // ],
+                      if (!invited)
                         ObLink(p: p, label: 'Have a code?', onTap: _code),
-                      ],
                     ],
                   ),
                 ],
@@ -563,6 +570,23 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
       _say(r.message ?? 'Could not sign in. Try again.');
       return;
     }
+    // ⚠️ THE FLAG THE SPLASH READS (2026-09-30). This path signed her in but
+    // never set `kAuthCompletedKey`, so every restart found a live session
+    // with no flag and sent her through onboarding again (the user, on a hot
+    // restart: "it is making me go back to the initial sign in screen"). The
+    // other finishing path sets it in step 5 of `_finish`; this one now does
+    // too. The role already on the phone is kept, so a father signing back in
+    // is not turned into a mother.
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool(kAuthCompletedKey, true);
+      if (prefs.getString(kUserRoleKey) == null) {
+        await prefs.setString(kUserRoleKey, 'mother');
+      }
+    } catch (_) {
+      /* best-effort */
+    }
+    if (!mounted) return;
     widget.onDone(null, false);
   }
 
@@ -703,6 +727,9 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
     }
   }
 
+  // Unreachable since 2026-09-30 (no doctor link in the parent app); kept for
+  // revert with the link above.
+  // ignore: unused_element
   void _doctor() {
     // The doctor entry lives on the old screen, unchanged.
     Navigator.of(context).push(

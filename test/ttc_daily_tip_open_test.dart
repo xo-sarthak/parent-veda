@@ -16,6 +16,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:parentveda/screens/v2/pv_insight_rail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:parentveda/screens/reader/pv_reader_screen.dart';
@@ -54,6 +55,18 @@ void main() {
 
     Future<void> tapCard(WidgetTester tester, String eyebrow) async {
       final f = find.text(eyebrow.toUpperCase(), skipOffstage: false);
+      // 2026-09-30: the rail's tiles are larger and two tool cards come
+      // earlier, so a later card is past what the lazy rail has built. Scroll
+      // the rail (the horizontal list holding the first tile) until it is.
+      if (f.evaluate().isEmpty) {
+        final rail = find
+            .ancestor(
+                of: find.byType(PvInsightTile).first,
+                matching: find.byType(Scrollable))
+            .first;
+        await tester.dragUntilVisible(f, rail, const Offset(-160, 0),
+            maxIteration: 30);
+      }
       expect(f, findsWidgets, reason: '"$eyebrow" is not on the rail');
       await tester.ensureVisible(f.first);
       await tester.pump(const Duration(milliseconds: 300));

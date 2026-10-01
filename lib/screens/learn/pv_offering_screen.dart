@@ -35,6 +35,7 @@ import '../../theme/pv_fonts.dart';
 import '../post_pregnancy/pp_expert_link.dart' show openExpertProfile;
 import 'pv_learn_catalog.dart';
 import '../products/pv_review_block.dart';
+import '../products/pv_store_chrome.dart' show kPvInk;
 import 'pv_learn_chrome.dart';
 import 'pv_learn_flow.dart';
 import 'pv_lesson_screen.dart';
@@ -55,6 +56,123 @@ bool pvOpenOfferingById(BuildContext context, String id) {
   if (v == null) return false;
   pvOpenOffering(context, v);
   return true;
+}
+
+/// The doctor's profile sheet, for a clinician with no full record yet
+/// (2026-09-30). Only what is true and already on the page: name,
+/// qualification, and the sessions they lead, each one opening its page.
+Future<void> pvShowExpertSheet(BuildContext context, PvOfferingView v) {
+  final led = PvLearnCatalog.instance.forExpert(v.expert.id);
+  const kinds = {
+    PvLearnKind.course: 'Course',
+    PvLearnKind.masterclass: 'Masterclass',
+    PvLearnKind.cohort: 'Cohort',
+    PvLearnKind.consult: 'One-to-one consult',
+    PvLearnKind.classPack: 'Class pack',
+  };
+  return showModalBottomSheet<void>(
+    context: context,
+    backgroundColor: Colors.transparent,
+    isScrollControlled: true,
+    routeSettings: const RouteSettings(name: 'pv/expert_sheet'),
+    builder: (sheet) => SafeArea(
+      top: false,
+      child: Container(
+        margin: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+        padding: const EdgeInsets.fromLTRB(22, 12, 22, 20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(26),
+        ),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+              maxHeight: MediaQuery.sizeOf(context).height * 0.8),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 36,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: kPvLine,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 18),
+                Text(v.expert.name,
+                    key: const ValueKey('pv_expert_sheet_name'),
+                    style: pvFraunces(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w600,
+                        height: 1.15,
+                        color: kPvInk)),
+                if (v.expert.role.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Text(v.expert.role,
+                      style: pvManrope(
+                          fontSize: 14, height: 1.4, color: kPvInk)),
+                ],
+                const SizedBox(height: 18),
+                Text('WHAT THEY LEAD HERE',
+                    style: pvManrope(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 1.1,
+                        color: kPvInk.withValues(alpha: 0.6))),
+                const SizedBox(height: 6),
+                for (final o in led.isEmpty ? [v] : led)
+                  InkWell(
+                    key: ValueKey('pv_expert_sheet_${o.id}'),
+                    borderRadius: BorderRadius.circular(12),
+                    onTap: () {
+                      Navigator.of(sheet).pop();
+                      if (o.id != v.id) pvOpenOffering(context, o);
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: Row(children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(o.title,
+                                  style: pvManrope(
+                                      fontSize: 14.5,
+                                      fontWeight: FontWeight.w800,
+                                      height: 1.3,
+                                      color: kPvInk)),
+                              const SizedBox(height: 2),
+                              Text(kinds[o.kind] ?? '',
+                                  style: pvManrope(
+                                      fontSize: 12.5,
+                                      color: kPvInk.withValues(alpha: 0.6))),
+                            ],
+                          ),
+                        ),
+                        const Icon(Icons.chevron_right_rounded,
+                            size: 20, color: kPvInk),
+                      ]),
+                    ),
+                  ),
+                const SizedBox(height: 10),
+                Text(
+                    'Their fuller profile, with their background and reviews, '
+                    'is coming.',
+                    style: pvManrope(
+                        fontSize: 12.5,
+                        height: 1.45,
+                        color: kPvInk.withValues(alpha: 0.6))),
+              ],
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
 }
 
 class PvOfferingScreen extends StatefulWidget {
@@ -97,7 +215,10 @@ class _PvOfferingScreenState extends State<PvOfferingScreen> {
             .where((x) => x.id != v.id)
             .take(6)
             .toList();
-        final faqs = v.faqs.isNotEmpty ? v.faqs : pvDefaultFaqs(v);
+        // The source's own questions first, then the kind's, up to eight
+        // (2026-09-30). Kept for revert:
+        // v.faqs.isNotEmpty ? v.faqs : pvDefaultFaqs(v)
+        final faqs = pvFaqsFor(v);
         return Scaffold(
           backgroundColor: p.ground,
           body: Stack(
@@ -169,12 +290,18 @@ class _PvOfferingScreenState extends State<PvOfferingScreen> {
                           line: v.expert.bio.isNotEmpty
                               ? v.expert.bio
                               : v.expert.role,
-                          onTap: v.expert.expert == null
-                              ? null
-                              : () => openExpertProfile(
-                                  context,
-                                  v.expert.expert!,
-                                ),
+                          // ⚠️ A DOCTOR'S NAME ALWAYS OPENS SOMETHING (2026-09-30,
+                          // the user: "the doctor page does not open up for
+                          // that particular doctor"). Trying to conceive has
+                          // no full `Expert` record for its clinicians yet, so
+                          // the card was dead. With a record: the full
+                          // profile page, as before. Without one: a sheet
+                          // built only from what we know, their name, their
+                          // qualification and every session they lead here.
+                          // Kept for revert: onTap null when no record.
+                          onTap: () => v.expert.expert != null
+                              ? openExpertProfile(context, v.expert.expert!)
+                              : pvShowExpertSheet(context, v),
                         ),
                       ),
                     ),
@@ -340,6 +467,37 @@ class _PvOfferingScreenState extends State<PvOfferingScreen> {
                 v.kind == PvLearnKind.consult ? v.expert.role : v.subtitle,
                 style: pvManrope(fontSize: 14, height: 1.45, color: p.ink2),
               ),
+            // ⚠️ THE NAME NEEDS A WAY TO THE PROFILE (2026-09-30, the user:
+            // "the doctor page does not open up for that particular doctor…
+            // so that the user can see what's the profile of the doctor").
+            // A consult page is titled with the person and draws no expert
+            // card (it would say the name twice), so the title was the only
+            // place the name lived and it was not tappable. One quiet link
+            // under the role: the full profile when a record exists, else the
+            // sheet of what we know.
+            if (v.kind == PvLearnKind.consult) ...[
+              const SizedBox(height: 4),
+              InkWell(
+                key: const ValueKey('pv_consult_view_profile'),
+                borderRadius: BorderRadius.circular(8),
+                onTap: () => v.expert.expert != null
+                    ? openExpertProfile(context, v.expert.expert!)
+                    : pvShowExpertSheet(context, v),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 6),
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    Text('View profile',
+                        style: pvManrope(
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.w800,
+                            color: kPvInk)),
+                    const SizedBox(width: 2),
+                    const Icon(Icons.chevron_right_rounded,
+                        size: 18, color: kPvInk),
+                  ]),
+                ),
+              ),
+            ],
             const SizedBox(height: 10),
             if (v.kind == PvLearnKind.consult)
               // Zocdoc's one line under the name: how good, how long in the
@@ -592,7 +750,7 @@ class _PvOfferingScreenState extends State<PvOfferingScreen> {
       ),
       child: Column(
         children: [
-          for (var i = 0; i < faqs.length && i < 5; i++) ...[
+          for (var i = 0; i < faqs.length; i++) ...[
             if (i > 0)
               const Divider(
                 height: 1,
@@ -628,7 +786,7 @@ class _PvOfferingScreenState extends State<PvOfferingScreen> {
               borderRadius: BorderRadius.vertical(
                 top: Radius.circular(i == 0 ? 15 : 0),
                 bottom: Radius.circular(
-                  i == faqs.length - 1 || i == 4 ? 15 : 0,
+                  i == faqs.length - 1 ? 15 : 0,
                 ),
               ),
               splashColor: p.ink1.withValues(alpha: 0.05),

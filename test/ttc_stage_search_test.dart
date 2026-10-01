@@ -88,8 +88,9 @@ void main() {
     expect(find.text('Can I…?'), findsOneWidget);
   });
 
-  test('the floating button is back on trying to conceive only', () {
-    expect(FabState.kAskFabInTtc, isTrue);
+  // Hidden again the same day on the user's word; the rule that holds is that
+  // the other stages stay off. Kept for revert: expect(kAskFabInTtc, isTrue).
+  test('the floating button: other stages stay off', () {
     expect(FabState.kAskFabEnabled, isFalse,
         reason: 'the other stages stay off until their own pass');
   });

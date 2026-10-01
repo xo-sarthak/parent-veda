@@ -39,6 +39,7 @@ import '../../services/pv_catalog_store.dart';
 import '../../services/pv_compare_store.dart';
 import '../../services/saved_store.dart';
 import '../../theme/pv_fonts.dart';
+import '../../widgets/global_ask_fab.dart' show fabRouteObserver;
 import '../post_pregnancy/pp_common.dart' show PpBottomNav, PpTab;
 import '../ttc/ttc_common.dart' show TtcBottomNav;
 import '../auth/onboarding/onboarding_chrome.dart' show ObPress;
@@ -73,6 +74,13 @@ const Color kPvLine = Color(0x1F000000);
 /// badge and every "See all" or eyebrow that was the brand violet draw in it.
 /// `test/pv_store_consistency_test.dart` scans the store for the violet.
 const Color kPvInk = Color(0xFF2F2C30);
+
+/// The tick that says "ParentVeda recommends" (2026-09-30, the user: "we can
+/// have a blue tick. Right now it's black… just make it blue"). A verified
+/// blue everyone reads as a check mark; only on the ticks that mean
+/// "recommended" (the card's badge and the product page's band), not on the
+/// reviewer's tick, the filter chip or the white tick on a photograph.
+const Color kPvRecommendedBlue = Color(0xFF1D74E0);
 
 /// The three tones the recommendation band draws in. Green for yes, sand for
 /// "it depends", the rose for "generally not needed" — the same weight each.
@@ -129,6 +137,7 @@ void pvSnack(
   final p = pvStorePalette;
   final inset = MediaQuery.of(context).padding.bottom;
   final messenger = ScaffoldMessenger.of(context);
+  lift ??= pvSnackLiftFor(context);
   // ⚠️ REDESIGNED 2026-09-23 — the user: "these pop ups… look very bland and
   // poor, and it is just staying on the screen." Two fixes in one:
   //  · STAYING: Flutter 3.44 made a SnackBar with an `action` persist until
@@ -153,7 +162,21 @@ void pvSnack(
         padding: EdgeInsets.zero,
         margin: EdgeInsets.fromLTRB(16, 0, 16, (lift ?? kPvStickyBarClearance) + inset),
         duration: Duration(milliseconds: action == null ? 2200 : 3600),
-        content: Container(
+        // ⚠️ IT RISES INTO PLACE (2026-09-30, the user: "very abrupt… no
+        // animation, no effect, no motion, no smoothness"). The SnackBar's
+        // own entrance is a plain fade; the card now also lifts 14 points
+        // and settles with an ease-out, the way iOS and Material 3 toasts
+        // arrive. Kept for revert: `content: Container(` with no wrapper.
+        content: TweenAnimationBuilder<double>(
+          tween: Tween(begin: 0, end: 1),
+          duration: const Duration(milliseconds: 320),
+          curve: Curves.easeOutCubic,
+          builder: (context, v, child) => Opacity(
+            opacity: v,
+            child: Transform.translate(
+                offset: Offset(0, (1 - v) * 14), child: child),
+          ),
+          child: Container(
           padding: EdgeInsets.fromLTRB(icon == null ? 16 : 12, 10, action == null ? 16 : 8, 10),
           decoration: BoxDecoration(
             color: Colors.white,
@@ -204,6 +227,7 @@ void pvSnack(
             ],
           ]),
         ),
+        ),
       ),
     );
   // Kept for revert — the white card with a hairline and a text action:
@@ -218,6 +242,33 @@ void pvSnack(
 /// so a notice with an action never has its action under the FAB — found on
 /// the phone with "View bag" half-covered.
 const double kPvStickyBarClearance = 164;
+
+/// ⚠️ WHERE A NOTICE SITS IN TRYING TO CONCEIVE (2026-09-30). Every caller
+/// that passed no `lift` got the Store's 164, which clears the Store's sticky
+/// buy bar and nothing else. Trying to conceive has no such bar, so "Logged
+/// for 28 September" and "Your period is logged" floated in the middle of the
+/// home and the cycle report, over the content (the user: "the pop up that is
+/// appearing in the center of the screen has not been fixed"). So, by the top
+/// route: the TTC home, which hosts all five tabs under a floating bar 14
+/// above the inset and about 70 tall, sits the notice just above that bar;
+/// any other TTC screen sits it at the foot like every lifted TTC call
+/// already did (`lift: 24`). Other stages and the Store keep 164 until
+/// someone walks them. Null means "the caller's default".
+const double kPvSnackOverTtcBar = 96;
+const double kPvSnackAtFoot = 24;
+
+double? pvSnackLiftFor(BuildContext context) {
+  // ⚠️ THE TOP PAGE, NOT THE TOP ROUTE (2026-09-30, second pass). The first
+  // version read the top route with popUntil, and a sheet that had just
+  // called `maybePop` (async) was still that route: unnamed, so the notice
+  // fell back to the Store's 164 and floated mid-screen over the Cycle
+  // companion's dates (seen on the phone). The app's route observer skips
+  // sheets, dialogs and menus. Kept for revert: the popUntil read of
+  // `Navigator.maybeOf(context)`.
+  final name = fabRouteObserver.topPageName;
+  if (name == null || !name.startsWith('ttc')) return null;
+  return name == 'ttc/today' ? kPvSnackOverTtcBar : kPvSnackAtFoot;
+}
 
 // ---- the bottom bar for a tab-root screen ------------------------------------
 
@@ -484,8 +535,9 @@ class PvRecoMark extends StatelessWidget {
             Icon(
               Icons.verified_rounded,
               size: compact ? 12 : 14,
-              // Ink (2026-09-29). Kept for revert: color: p.action.
-              color: kPvInk,
+              // Blue (2026-09-30). Kept for revert: color: kPvInk (ink,
+              // 2026-09-29), and before that color: p.action.
+              color: kPvRecommendedBlue,
             )
           else
             Container(

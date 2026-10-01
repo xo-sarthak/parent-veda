@@ -35,6 +35,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:parentveda/screens/v2/pv_insight_rail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:parentveda/screens/ttc/chats/ttc_should_test_chat.dart';
@@ -1592,9 +1593,14 @@ void main() {
       expect(find.text('today and tomorrow'), findsOneWidget,
           reason: 'the hero did not count from the selected day');
       final o = ctx.windowOpensOn!, c = ctx.windowClosesOn!;
+      // 2026-09-30: the pill now reads "<dates>  ·  Cycle companion", one
+      // rich text, so the dates are matched inside it. Kept for revert:
+      // find.text('${o.day} ${short[o.month - 1]} to ${c.day} ...')
       expect(
-          find.text('${o.day} ${short[o.month - 1]} to '
-              '${c.day} ${short[c.month - 1]}'),
+          find.textContaining(
+              '${o.day} ${short[o.month - 1]} to '
+              '${c.day} ${short[c.month - 1]}',
+              findRichText: true),
           findsOneWidget,
           reason: 'the hero printed a different window from the one it counts '
               "in (next cycle's, from the clock)");
@@ -1604,7 +1610,25 @@ void main() {
       // The insight card is one written for that stretch.
       final card = ttcHomeInsightFor(target);
       expect(card.phases, contains(TtcDayPhase.window));
-      expect(find.text(card.titleEn, skipOffstage: false), findsWidgets,
+      // 2026-09-30: the rail's tiles are larger and two tool cards come
+      // first, so this card can be past what the lazy rail has built; scroll
+      // the rail to it before looking.
+      // 2026-10-01: a few long titles show a shorter wording on the card
+      // (`ttcInsightCardTitle`); look for what the card shows. Kept for
+      // revert: find.text(card.titleEn, skipOffstage: false).
+      final insightFinder =
+          find.text(ttcInsightCardTitle(card.titleEn), skipOffstage: false);
+      if (insightFinder.evaluate().isEmpty) {
+        final rail = find
+            .ancestor(
+                of: find.byType(PvInsightTile).first,
+                matching: find.byType(Scrollable))
+            .first;
+        await tester.dragUntilVisible(
+            insightFinder, rail, const Offset(-160, 0),
+            maxIteration: 30);
+      }
+      expect(insightFinder, findsWidgets,
           reason: "the insight rail is not showing the selected day's card");
 
       await tester.pumpWidget(const SizedBox());
