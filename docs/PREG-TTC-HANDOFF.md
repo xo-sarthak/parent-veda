@@ -129,3 +129,20 @@ ink (`lib/screens/pregnancy/preg_theme.dart`, picked in `main.dart`). Held by `t
 **What it would need:** whoever owns the other stage decides the look once, for all stages, in these files. The
 pregnancy theme already covers the Material defaults in them while the stage is pregnancy; only their hand-set
 violets remain.
+
+## 10. A trying-to-conceive test that fails on main (found 2026-10-01, not caused by this branch)
+
+`test/ttc_cycle_companion_test.dart`, "the four states render at phone width: the picture can be switched to days",
+fails with **"A RenderFlex overflowed by 8.2 pixels on the bottom"**, raised at line 199 (`expect(tester.takeException(),
+isNull)`) after the test taps **Calendar** in the cycle companion.
+
+- **Not from the pregnancy branch.** It fails identically on `origin/main` (54778fd) with none of this branch's
+  changes, and nothing in `lib/screens/ttc/` or `lib/ttc/` was edited here. It was the one failure in an otherwise
+  green full suite (6,922 passed, 17 skipped).
+- **Likely date-dependent.** The test builds its cycle from `DateTime.now()` (`DateTime.now().subtract(...)`, lines 43
+  and 212), and it passed in the full runs on 2026-09-30 and failed on the first run on 2026-10-01, so the Calendar
+  view probably gets one more row (a sixth week of the month, or a taller month label) on some dates than the test's
+  phone-width fixture has room for. A test that depends on the day it runs, plus a fixed-height layout, would do this.
+- **Who fixes it:** the trying-to-conceive owner. Either the Calendar picture needs to be allowed to grow (a scrollable
+  or a `Flexible` month grid) or the test needs a fixed `now`. It was left alone here because that folder is not ours.
+- **Reproduce:** `flutter test test/ttc_cycle_companion_test.dart` on any date that triggers it.
