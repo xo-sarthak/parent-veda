@@ -44,7 +44,9 @@ import '../../services/pregnancy_controller.dart';
 import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_feedback.dart';
 import '../doors/pv_door_screen.dart' show PvDoorScreen, PvDoorTabSwitch;
-import '../garbh_buddhi_screen.dart' show buddhiTodayLine;
+import '../garbh_buddhi_screen.dart' show GarbhBuddhiScreen, buddhiTodayLine;
+import '../garbh_samvad_daily.dart' show GarbhSamvadDailyScreen;
+import '../garbh_screen.dart' show KriyaScreen, ShravanScreen, gameForPuzzle;
 import '../v2/v2_palette.dart';
 
 /// The Garbh door's bracket and its tabs — the destinations. Kept as strings
@@ -166,6 +168,65 @@ void garbhOpenPillar(BuildContext context, PregnancyController c, String tab) {
   openGarbhDoor(context, c, at: tab);
 }
 
+/// Open TODAY'S PRACTICE itself, for the day the row names.
+///
+/// ⚠️ THE PRACTICE, NOT THE DOOR'S LANDING PAGE (2026-10-02, the user: "when
+/// clicked on any one of them, instead of leaving the user hanging by taking
+/// them on the Garbh Sanskar door page, considering it is the daily practice,
+/// open it, like open the audio when clicked on Shravan that is meant for that
+/// day. Same for all the other pillars"). Each row used to call
+/// `garbhOpenPillar`, which opens the door at a tab: right for browsing, wrong
+/// for a row that says "Morning Calm Raga · Audio · 7 min", because she then
+/// had to find the raga again. Now:
+///
+///   Shravan → today's raga's player      (ShravanScreen, daily)
+///   Samvad  → today's piece, record first (GarbhSamvadDailyScreen)
+///   Buddhi  → today's quiet game          (GarbhBuddhiScreen → the puzzle)
+///   Kriya   → today's breath or relaxation (KriyaScreen, daily)
+///
+/// ⚠️ THE SAME DAY THE ROW NAMES. [day] is the day on the home's date strip, and
+/// each screen takes it, so the raga on the row is the raga that plays even for an
+/// earlier day. The screens that finish a practice still mark it done, as they
+/// always did: "finishes on its own when you're done".
+///
+/// ⚠️ THE LIBRARY IS STILL ONE TAP AWAY. Each screen keeps its "see all" line, and
+/// the door's tabs are unchanged; "About" on the home still opens the door. Only a
+/// row's tap changed. `garbhOpenPillar` is kept for any caller that wants the tab.
+void garbhOpenToday(BuildContext context, PregnancyController c,
+    GarbhTodayItem item, {required int day}) {
+  final Widget screen = switch (item.pillarId) {
+    'shravan' => ShravanScreen(controller: c, daily: true, day: day),
+    'samvad' => GarbhSamvadDailyScreen(
+        controller: c,
+        day: day,
+        // The shelves of the library are the door's Read tab: leave this screen
+        // and go there.
+        onOpenLibrary: () {
+          Navigator.of(context).pop();
+          garbhOpenPillar(context, c, kGarbhTabReadId);
+        },
+      ),
+    'buddhi' => GarbhBuddhiScreen(
+        controller: c,
+        daily: true,
+        day: day,
+        onOpenPuzzle: (ctx, puzzle) => Navigator.of(ctx).push(MaterialPageRoute<void>(
+            builder: (_) => gameForPuzzle(puzzle, c, markComplete: true))),
+      ),
+    'kriya' => KriyaScreen(controller: c, daily: true, day: day),
+    // An unknown pillar falls back to where it lives, never to nothing.
+    _ => const SizedBox.shrink(),
+  };
+  if (screen is SizedBox) {
+    garbhOpenPillar(context, c, item.tab);
+    return;
+  }
+  Navigator.of(context).push(MaterialPageRoute<void>(
+    settings: RouteSettings(name: 'garbh/today/${item.pillarId}'),
+    builder: (_) => screen,
+  ));
+}
+
 /// The Garbh Sanskar door, from outside it (the pregnancy home).
 void openGarbhDoor(BuildContext context, PregnancyController c, {String? at}) {
   final page = pvDoorPageFor(kGarbhBracketId);
@@ -208,7 +269,10 @@ class GarbhTodayPractice extends StatelessWidget {
                 p: p,
                 item: items[i],
                 done: store.isDone(items[i].pillarId),
-                onOpen: () => garbhOpenPillar(context, c, items[i].tab),
+                // Kept for revert: `garbhOpenPillar(context, c, items[i].tab)`,
+                // which opened the door at the pillar's tab.
+                onOpen: () => garbhOpenToday(context, c, items[i],
+                    day: day ?? c.currentDay),
                 onToggleDone: () {
                   pvCommitFeedback();
                   final id = items[i].pillarId;

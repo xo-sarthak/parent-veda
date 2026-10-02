@@ -14,6 +14,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../data/spiritual_reading_data.dart';
 import '../../localization/app_language.dart';
@@ -98,17 +99,54 @@ class SpiritualReadingScreen extends StatefulWidget {
   State<SpiritualReadingScreen> createState() => _SpiritualReadingScreenState();
 }
 
+/// The "All" chip's id. Null is "nothing chosen yet".
+const String _kAllTraditions = 'all';
+
+/// Her last choice, so only the very first visit opens with nothing chosen.
+const String _kLastTraditionKey = 'spr_last_tradition';
+
 class _SpiritualReadingScreenState extends State<SpiritualReadingScreen> {
-  // null = "All religions".
+  // ⚠️ NOTHING CHOSEN BY DEFAULT (2026-10-02, the Garbh Sanskar pillars brief:
+  // "Let her choose the tradition; default to none selected"). It opened on
+  // "All", seven traditions' cards before she had said which is hers. Null is now
+  // "not chosen": the page invites her to choose (each tradition a row) and draws
+  // no reads until she does. Her choice is remembered on the phone, so this is
+  // only the first visit. "All" is a chip like any other.
+  // Kept for revert: `String? _religion;` with null meaning "All religions".
   String? _religion;
+
+  @override
+  void initState() {
+    super.initState();
+    _restore();
+  }
+
+  Future<void> _restore() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final last = prefs.getString(_kLastTraditionKey);
+      if (last != null && mounted && _religion == null) {
+        setState(() => _religion = last);
+      }
+    } catch (_) {/* a first visit, then */}
+  }
+
+  void _choose(String id) {
+    setState(() => _religion = id);
+    SharedPreferences.getInstance()
+        .then((p) => p.setString(_kLastTraditionKey, id))
+        .catchError((_) => false);
+  }
 
   @override
   Widget build(BuildContext context) {
     final s = S(widget.controller.language);
     final traditions = _orderedTraditions();
     final shown = _religion == null
-        ? traditions
-        : traditions.where((t) => t.id == _religion).toList();
+        ? const <SpiritualTradition>[]
+        : _religion == _kAllTraditions
+            ? traditions
+            : traditions.where((t) => t.id == _religion).toList();
     // ⚠️ THE FRONT PAGE WEARS THE TOOLS SHELL (2026-09-30, Tools audit).
     // WH: she opens this in a quiet, reflective moment (a night feed of
     // thoughts, a festival, before the birth) wanting comfort in her own
@@ -138,7 +176,10 @@ class _SpiritualReadingScreenState extends State<SpiritualReadingScreen> {
           _religionSelector(traditions),
           const SizedBox(height: 16),
           pregToolPad(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            for (final t in shown) _traditionCard(context, s, t),
+            if (_religion == null)
+              _chooseFirst(traditions)
+            else
+              for (final t in shown) _traditionCard(context, s, t),
           ])),
         ],
       ),
@@ -152,7 +193,8 @@ class _SpiritualReadingScreenState extends State<SpiritualReadingScreen> {
       return Padding(
         padding: const EdgeInsets.only(right: 8),
         child: GestureDetector(
-          onTap: () => setState(() => _religion = id),
+          key: ValueKey('spr_chip_${id ?? 'none'}'),
+          onTap: () => _choose(id ?? _kAllTraditions),
           // The store's chip (`PvChip`): white with the hairline, the one
           // ink once chosen. Its own copy because it carries the symbol.
           child: Container(
@@ -186,10 +228,64 @@ class _SpiritualReadingScreenState extends State<SpiritualReadingScreen> {
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 18),
         children: [
-          chip(null, hinglish ? 'सभी' : 'All'),
+          chip(_kAllTraditions, hinglish ? 'सभी' : 'All'),
           for (final t in traditions) chip(t.id, t.name.now, t.id),
         ],
       ),
+    );
+  }
+
+  /// Nothing chosen yet: one line, then each tradition as a row she can pick.
+  /// The empty page is the invitation (a feature is never hidden).
+  Widget _chooseFirst(List<SpiritualTradition> traditions) {
+    final p = pvStorePalette;
+    return Column(
+      key: const ValueKey('spr_choose_first'),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Choose the tradition that feels like yours',
+            style: pvFraunces(
+                fontSize: 20, fontWeight: FontWeight.w600, height: 1.25, color: p.ink1)),
+        const SizedBox(height: 6),
+        Text('You can change it any time, or pick All to read across every one.',
+            style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2)),
+        const SizedBox(height: 14),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: kPvLine),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Column(children: [
+            for (var i = 0; i < traditions.length; i++) ...[
+              if (i > 0) const Divider(height: 1, thickness: 1, color: kPvLine, indent: 72),
+              InkWell(
+                key: ValueKey('spr_pick_${traditions[i].id}'),
+                onTap: () => _choose(traditions[i].id),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(14, 10, 12, 10),
+                  child: Row(children: [
+                    spiritualMark(traditions[i].id, size: 44),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Text(traditions[i].name.now,
+                            style: pvManrope(
+                                fontSize: 15, fontWeight: FontWeight.w700, color: p.ink1)),
+                        const SizedBox(height: 2),
+                        Text('${traditions[i].readCount} readings',
+                            style: pvManrope(fontSize: 13, color: p.ink3)),
+                      ]),
+                    ),
+                    Icon(Icons.chevron_right_rounded, size: 22, color: p.ink3),
+                  ]),
+                ),
+              ),
+            ],
+          ]),
+        ),
+      ],
     );
   }
 
@@ -197,7 +293,7 @@ class _SpiritualReadingScreenState extends State<SpiritualReadingScreen> {
     final text = Theme.of(context).textTheme;
     // Interest-aware preview (interested reads float to the top).
     final preview = _sortedReads(t)
-        .take(_religion == null ? _previewCountAll : _previewCount)
+        .take(_religion == _kAllTraditions ? _previewCountAll : _previewCount)
         .toList();
     final p = pvStorePalette;
     // A white card with the hairline (kept for revert: boxShadow

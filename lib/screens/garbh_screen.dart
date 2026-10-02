@@ -36,6 +36,11 @@ import '../data/garbh_rebuild_data.dart';
 import 'garbh_buddhi_screen.dart';
 import 'garbh_relaxation_screen.dart';
 import 'garbh_samvad_daily.dart';
+import 'doors/pv_door_chrome.dart' show pvDoorPad;
+import 'garbh/garbh_daily_shell.dart';
+import 'doors/pv_door_chrome.dart' show kPvUrgentInk;
+import 'pregnancy/preg_chrome.dart' show pregFilledStyle, pregSectionHeadingStyle;
+import 'products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 import 'garbh_shravan_surfaces.dart';
 import '../data/samvad_mantras_data.dart';
 
@@ -701,8 +706,13 @@ class _LearnMore extends StatelessWidget {
 // ===========================================================================
 
 class ShravanScreen extends StatelessWidget {
-  const ShravanScreen({super.key, required this.controller, this.daily = false});
+  const ShravanScreen(
+      {super.key, required this.controller, this.daily = false, this.day});
   final PregnancyController controller;
+
+  /// The pregnancy day to serve in daily mode; null is today. The home passes the
+  /// day on its date strip so the raga it names is the raga that plays.
+  final int? day;
 
   /// Daily (Home) mode: rotate the raga by day and hide the recommendations.
   final bool daily;
@@ -710,7 +720,8 @@ class ShravanScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final lang = controller.language;
     final s = S(lang);
-    final text = Theme.of(context).textTheme;
+    // Kept for revert (2026-10-02): `text` fed the old daily body.
+    // final text = Theme.of(context).textTheme;
 
     // Tools library: browse listening sessions month-by-month (opens on the
     // current month), each tappable; no mark-complete. (Old flat "all ragas"
@@ -741,46 +752,147 @@ class ShravanScreen extends StatelessWidget {
     }
 
     // Daily (Home): today's session + mark-complete.
-    final t = garbhTrimester(controller.currentWeek);
-    final audio = shravanForDay(controller.currentDay);
-    return _PillarScaffold(
-      title: s.gsShravan,
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(18, 6, 18, 28),
-        children: [
-          Text(s.gsTodaysSession,
-              style: text.labelMedium?.copyWith(color: _muted)),
-          const SizedBox(height: 12),
-          _ShravanHero(audio: audio, s: s),
-          const SizedBox(height: 16),
-          _WhyCard(label: s.gsWhyToday, text: shravanWhy(t).now, accent: _accShravan),
-          const SizedBox(height: 16),
-          // ⚠️ COMPLETION FIRES HERE, AT THE END OF THE TRACK, AND IT WRITES
-          // TO MY JOURNAL AT THE SAME MOMENT. Both halves of the rebuild's
-          // principle in one callback: the practice completes because it was
-          // done, and it leaves something behind rather than being consumed.
-          //
-          // The journal entry is "what your baby heard in week N", which is
-          // the honest description - she did not make the raga, so it is
-          // filed as listening rather than counted as her voice. See
-          // GarbhJournalStore.myVoiceSeconds for why that distinction is
-          // load-bearing on the album header.
-          //
-          // ⚠️ THE PLAYER READS THE MANIFEST NOW — Shravan to final,
-          // 2026-09-12. `ShravanTrackPlayer` plays the real track (streamed,
-          // then cached), shows who recorded it, and keeps the completion
-          // callback above in `daily` mode. With no manifest entry it draws
-          // the drone and the "sample" line, as this screen always did.
-          ShravanTrackPlayer(audio: audio, controller: controller, daily: true),
-          const SizedBox(height: 16),
-          _PracticeFoot(pillarId: 'shravan', accent: _accShravan, lang: lang),
-          _SeeAll(
-              label: lang.isHindi ? 'सभी राग देखिए' : 'See all ragas',
-              accent: _accShravan,
-              builder: () => shravanBrowse(lang, _accShravan)),
-          _LearnMore(controller: controller),
-        ],
-      ),
+    final dayN = day ?? controller.currentDay;
+    final t = garbhTrimester(
+        day == null ? controller.currentWeek : garbhWeekForDay(dayN));
+    final audio = shravanForDay(dayN);
+//  // Kept for revert (2026-10-02): the cream page, the emoji hero, the tinted "why" box and the
+//  // old foot. The pillar shell (`GarbhDailyShell`) replaced it.
+//      return _PillarScaffold(
+//        title: s.gsShravan,
+//        child: ListView(
+//          padding: const EdgeInsets.fromLTRB(18, 6, 18, 28),
+//          children: [
+//            Text(s.gsTodaysSession,
+//                style: text.labelMedium?.copyWith(color: _muted)),
+//            const SizedBox(height: 12),
+//            _ShravanHero(audio: audio, s: s),
+//            const SizedBox(height: 16),
+//            _WhyCard(label: s.gsWhyToday, text: shravanWhy(t).now, accent: _accShravan),
+//            const SizedBox(height: 16),
+//            // ⚠️ COMPLETION FIRES HERE, AT THE END OF THE TRACK, AND IT WRITES
+//            // TO MY JOURNAL AT THE SAME MOMENT. Both halves of the rebuild's
+//            // principle in one callback: the practice completes because it was
+//            // done, and it leaves something behind rather than being consumed.
+//            //
+//            // The journal entry is "what your baby heard in week N", which is
+//            // the honest description - she did not make the raga, so it is
+//            // filed as listening rather than counted as her voice. See
+//            // GarbhJournalStore.myVoiceSeconds for why that distinction is
+//            // load-bearing on the album header.
+//            //
+//            // ⚠️ THE PLAYER READS THE MANIFEST NOW — Shravan to final,
+//            // 2026-09-12. `ShravanTrackPlayer` plays the real track (streamed,
+//            // then cached), shows who recorded it, and keeps the completion
+//            // callback above in `daily` mode. With no manifest entry it draws
+//            // the drone and the "sample" line, as this screen always did.
+//            ShravanTrackPlayer(audio: audio, controller: controller, daily: true),
+//            const SizedBox(height: 16),
+//            _PracticeFoot(pillarId: 'shravan', accent: _accShravan, lang: lang),
+//            _SeeAll(
+//                label: lang.isHindi ? 'सभी राग देखिए' : 'See all ragas',
+//                accent: _accShravan,
+//                builder: () => shravanBrowse(lang, _accShravan)),
+//            _LearnMore(controller: controller),
+//          ],
+//        ),
+    // THE SESSION LAYOUT (2026-10-02, the user: update every pillar screen, use
+    // Mobbin). Oura's and Noom's audio sessions: a title, one line, one big
+    // control. The raga's emoji hero is gone (the pillar's drawn mark is in the
+    // shell), the "why today" box is a line that opens, and the player is the
+    // big ink disc. Completion is exactly as it was: the track ending marks it
+    // done and files "what your baby heard" into My Journal.
+    return GarbhDailyShell(
+      pillarId: 'shravan',
+      title: audio.title.now,
+      intro: '${audio.subtitle} · ${s.gsMinutes(audio.minutes)}',
+      children: [
+        pvDoorPad(
+            ShravanTrackPlayer(audio: audio, controller: controller, daily: true, large: true)),
+        const SizedBox(height: 12),
+        pvDoorPad(Align(
+            alignment: Alignment.centerLeft,
+            child: GarbhPinChip(pinId: 'shravan_${audio.id}'))),
+        const SizedBox(height: 16),
+        const GarbhDoneLine(
+            pillarId: 'shravan', finishLine: 'This finishes when the track ends.'),
+        const SizedBox(height: 16),
+        // WHY TODAY STAYS ON THE PAGE: the question this section exists to answer.
+        garbhNote('shravan', s.gsWhyToday, shravanWhy(t).now),
+        const SizedBox(height: 10),
+        // What she pinned, one tap from today (gap 6). Today's own raga is left
+        // out: it is already the player above. Nothing is drawn until she pins.
+        AnimatedBuilder(
+          animation: GarbhJournalStore.instance,
+          builder: (context, _) {
+            final mine = [
+              for (final a in kShravan)
+                if (a.id != audio.id &&
+                    GarbhJournalStore.instance.isPinned('shravan_${a.id}'))
+                  a,
+            ];
+            if (mine.isEmpty) return const SizedBox.shrink();
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: pvDoorPad(Container(
+                key: const ValueKey('shravan_your_daily'),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: kPvLine),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 14, 16, 4),
+                    child: Text('YOUR DAILY',
+                        style: pvManrope(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 1.2,
+                            color: pvStorePalette.ink3)),
+                  ),
+                  for (final a in mine)
+                    InkWell(
+                      key: ValueKey('shravan_daily_${a.id}'),
+                      onTap: () => _push(context,
+                          ShravanDetailScreen(audio: a, controller: controller)),
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 11, 12, 11),
+                        child: Row(children: [
+                          Icon(Icons.push_pin_rounded, size: 16, color: pvStorePalette.ink2),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(a.title.now,
+                                style: pvManrope(
+                                    fontSize: 14.5,
+                                    fontWeight: FontWeight.w700,
+                                    color: pvStorePalette.ink1)),
+                          ),
+                          Text(s.gsMinutes(a.minutes),
+                              style: pvManrope(fontSize: 12.5, color: pvStorePalette.ink3)),
+                          const SizedBox(width: 4),
+                          Icon(Icons.chevron_right_rounded, size: 20, color: pvStorePalette.ink3),
+                        ]),
+                      ),
+                    ),
+                  const SizedBox(height: 4),
+                ]),
+              )),
+            );
+          },
+        ),
+        GarbhOnwardRow(
+          pillarId: 'shravan',
+          label: lang.isHindi ? 'सभी राग देखिए' : 'See all ragas',
+          onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+              settings: const RouteSettings(name: 'garbh/browse'),
+              builder: (_) => shravanBrowse(lang, _accShravan))),
+        ),
+        const SizedBox(height: 4),
+        pvDoorPad(Align(
+            alignment: Alignment.centerLeft, child: _LearnMore(controller: controller))),
+      ],
     );
   }
 }
@@ -845,6 +957,11 @@ class ShravanDetailScreen extends StatelessWidget {
           const SizedBox(height: 16),
           // The manifest's track, or the drone with its honest line.
           ShravanTrackPlayer(audio: audio, controller: controller),
+          const SizedBox(height: 12),
+          // Her pin, on the track's own page (gap 6, 2026-10-02).
+          Align(
+              alignment: Alignment.centerLeft,
+              child: GarbhPinChip(pinId: 'shravan_${audio.id}')),
           const SizedBox(height: 18),
           Center(
             child: TextButton.icon(
@@ -1891,15 +2008,22 @@ class _MemorySavedScreen extends StatelessWidget {
 // ===========================================================================
 
 class KriyaScreen extends StatelessWidget {
-  const KriyaScreen({super.key, required this.controller, this.daily = false});
+  const KriyaScreen(
+      {super.key, required this.controller, this.daily = false, this.day});
   final PregnancyController controller;
   final bool daily;
+
+  /// The pregnancy day to serve in daily mode; null is today (see ShravanScreen).
+  final int? day;
   @override
   Widget build(BuildContext context) {
     final lang = controller.language;
     final s = S(lang);
-    final text = Theme.of(context).textTheme;
-    final t = garbhTrimester(controller.currentWeek);
+    // Kept for revert (2026-10-02): `text` fed the old daily body.
+    // final text = Theme.of(context).textTheme;
+    final dayN = day ?? controller.currentDay;
+    final weekN = day == null ? controller.currentWeek : garbhWeekForDay(dayN);
+    final t = garbhTrimester(weekN);
 
     // Tools library: TWO sections in tabs -
     //   1) Breathing & Meditation - kKriya practices as large cards.
@@ -1934,18 +2058,126 @@ class KriyaScreen extends StatelessWidget {
       );
     }
 
-    // Daily (Home): today's practice + mark-complete.
-    final practice = kriyaForDay(controller.currentDay);
-    return _PillarScaffold(
-      title: s.gsKriya,
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(18, 10, 18, 28),
-        children:
-            _kriyaPracticeBody(context, s, text, t, practice, lang,
-                daily: true,
-                week: controller.currentWeek,
-                controller: controller),
+//  // Kept for revert (2026-10-02): the cream page with the emoji, the two tinted boxes and
+//  // `_kriyaPracticeBody`. The pillar shell (`GarbhDailyShell`) replaced it.
+//      // Daily (Home): today's practice + mark-complete.
+//      final practice = kriyaForDay(dayN);
+//      return _PillarScaffold(
+//        title: s.gsKriya,
+//        child: ListView(
+//          padding: const EdgeInsets.fromLTRB(18, 10, 18, 28),
+//          children:
+//              _kriyaPracticeBody(context, s, text, t, practice, lang,
+//                  daily: true,
+//                  week: weekN,
+//                  controller: controller),
+//        ),
+    // Daily (Home): today's practice. THE SESSION LAYOUT (2026-10-02, Life Reset's
+    // "how the exercise works": the steps, the length, one Start). The emoji is
+    // gone, "why this week" and the safety note are lines that open, and the
+    // "stop if" list is always open on the page: it is the one thing here that
+    // must never be a tap away.
+    final practice = kriyaForDay(dayN);
+    final isRelax = practice.id == 'relax';
+    void begin() => _push(
+        context,
+        // ⚠️ `relax` IS A SESSION, NOT A BREATH (2026-09-12): the guided
+        // relaxation has its own screen; every other practice is a pattern on the
+        // shared circle. As before.
+        isRelax
+            ? GarbhRelaxationScreen(pregnancy: controller, daily: true)
+            : _BreathingScreen(practice: practice, lang: lang, daily: true));
+    return GarbhDailyShell(
+      pillarId: 'kriya',
+      title: practice.title.now,
+      intro: '${practice.blurb.now} · ${s.gsMinutes(practice.minutes)}',
+      children: [
+        if (!isRelax && practice.phases.isNotEmpty) ...[
+          pvDoorPad(_KriyaSteps(phases: practice.phases)),
+          const SizedBox(height: 14),
+        ],
+        pvDoorPad(SizedBox(
+          width: double.infinity,
+          child: FilledButton.icon(
+            key: const ValueKey('kriya_start'),
+            style: pregFilledStyle().copyWith(
+                minimumSize: const WidgetStatePropertyAll(Size.fromHeight(54))),
+            onPressed: begin,
+            icon: const Icon(Icons.play_arrow_rounded),
+            label: Text(s.gsStart,
+                style: pvManrope(fontSize: 15, fontWeight: FontWeight.w800)),
+          ),
+        )),
+        const SizedBox(height: 14),
+        const GarbhDoneLine(
+            pillarId: 'kriya', finishLine: 'This finishes when the timer ends.'),
+        const SizedBox(height: 20),
+        // Always open: what should make her stop, and who to call.
+        pvDoorPad(const KriyaStopIfCard()),
+        const SizedBox(height: 12),
+        // Both stay on the page: why this week is the question the section exists
+        // to answer, and the safety note is read before she starts.
+        garbhNote('kriya', 'Why this week', garbhWeekReason(weekN).now),
+        const SizedBox(height: 10),
+        garbhNote('kriya', s.gsSafetyNotes, kriyaSafety(t).now),
+        const SizedBox(height: 10),
+        GarbhOnwardRow(
+          pillarId: 'kriya',
+          label: lang.isHindi ? 'सभी अभ्यास देखिए' : 'See all practices',
+          onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+              settings: const RouteSettings(name: 'garbh/browse'),
+              builder: (_) => kriyaBrowse(lang, _accKriya))),
+        ),
+      ],
+    );
+  }
+}
+
+/// How the practice goes: one row a phase (Breathe in, Hold, Breathe out, Rest)
+/// with its seconds, in a white card. A phase has no number she could fail.
+class _KriyaSteps extends StatelessWidget {
+  const _KriyaSteps({required this.phases});
+  final List<BreathPhase> phases;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = pvStorePalette;
+    return Container(
+      key: const ValueKey('kriya_steps'),
+      padding: const EdgeInsets.fromLTRB(16, 6, 16, 6),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0x14000000)),
       ),
+      child: Column(children: [
+        for (var i = 0; i < phases.length; i++) ...[
+          if (i > 0) const Divider(height: 1, thickness: 1, color: Color(0x14000000)),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 11),
+            child: Row(children: [
+              Container(
+                width: 26,
+                height: 26,
+                alignment: Alignment.center,
+                decoration: const BoxDecoration(color: kPvInk, shape: BoxShape.circle),
+                child: Text('${i + 1}',
+                    style: pvManrope(
+                        fontSize: 12.5, fontWeight: FontWeight.w800, color: Colors.white)),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(phases[i].label.now,
+                    style: pvManrope(
+                        fontSize: 14.5, fontWeight: FontWeight.w700, color: p.ink1)),
+              ),
+              Text('${phases[i].seconds}s',
+                  style: pvManrope(
+                      fontSize: 14, fontWeight: FontWeight.w800, color: p.ink2)),
+            ]),
+          ),
+        ],
+      ]),
     );
   }
 }
@@ -1972,55 +2204,107 @@ class KriyaStopIfCard extends StatelessWidget {
     'Your baby moving noticeably less than usual',
   ];
 
+//  // Kept for revert (2026-10-02): the clay box headed "STOP IF".
+//    @override
+//    Widget build(BuildContext context) {
+//      // A steady clay tone, not alarm red - the same treatment the itching page
+//      // uses. The unmistakability comes from the border and the heading, not
+//      // from a colour that reads as an emergency during a breathing exercise.
+//      const accent = Color(0xFFB5623E);
+//      return Container(
+//        width: double.infinity,
+//        padding: const EdgeInsets.fromLTRB(16, 14, 16, 15),
+//        decoration: BoxDecoration(
+//          color: accent.withValues(alpha: 0.08),
+//          borderRadius: BorderRadius.circular(16),
+//          border: Border.all(color: accent.withValues(alpha: 0.40), width: 1.3),
+//        ),
+//        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+//          Row(children: [
+//            const Icon(Icons.pan_tool_outlined, size: 17, color: accent),
+//            const SizedBox(width: 9),
+//            Text('STOP IF',
+//                style: pvJakarta(
+//                    fontSize: 10.5,
+//                    fontWeight: FontWeight.w800,
+//                    letterSpacing: 1.1,
+//                    color: accent)),
+//          ]),
+//          const SizedBox(height: 10),
+//          for (final x in _signs)
+//            Padding(
+//              padding: const EdgeInsets.only(bottom: 6),
+//              child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+//                Container(
+//                  width: 5,
+//                  height: 5,
+//                  margin: const EdgeInsets.only(top: 7, right: 10),
+//                  decoration: const BoxDecoration(
+//                      color: accent, shape: BoxShape.circle),
+//                ),
+//                Expanded(
+//                  child: Text(x,
+//                      style: pvJakarta(
+//                          fontSize: 13, height: 1.45, color: _ink)),
+//                ),
+//              ]),
+//            ),
+//          const SizedBox(height: 6),
+//          Text('Stop, sit down, and call your doctor today.',
+//              style: pvJakarta(
+//                  fontSize: 13, fontWeight: FontWeight.w700, color: _ink)),
+//        ]),
+//      );
+  /// The heading the Rebuild brief asks for, spoken to her.
+  static const String heading = 'Stop and call your doctor today if...';
+
+  // ⚠️ REWORDED AND REDRAWN (2026-10-02, the Garbh Sanskar rebuild brief:
+  // "Rewrite the Kriya STOP IF block to open with 'Stop and call your doctor
+  // today if...'"). The door's pinned flag already said it; this card, drawn on
+  // the daily Kriya screen, the relaxation intro and a practice's detail, still
+  // said "STOP IF" in a clay box. It is now the app's warning form, the same as
+  // the door's: an ink rule, the heading in the serif, one urgent dot a line, a
+  // hairline under. The six signs and the closing line are word for word.
   @override
   Widget build(BuildContext context) {
-    // A steady clay tone, not alarm red - the same treatment the itching page
-    // uses. The unmistakability comes from the border and the heading, not
-    // from a colour that reads as an emergency during a breathing exercise.
-    const accent = Color(0xFFB5623E);
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 15),
-      decoration: BoxDecoration(
-        color: accent.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: accent.withValues(alpha: 0.40), width: 1.3),
-      ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [
-          const Icon(Icons.pan_tool_outlined, size: 17, color: accent),
-          const SizedBox(width: 9),
-          Text('STOP IF',
-              style: pvJakarta(
-                  fontSize: 10.5,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 1.1,
-                  color: accent)),
-        ]),
+    final p = pvStorePalette;
+    return Column(
+      key: const ValueKey('kriya_stop_if'),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(height: 1.5, color: p.ink1),
+        const SizedBox(height: 14),
+        Semantics(
+          header: true,
+          child: Text(heading, style: pregSectionHeadingStyle()),
+        ),
         const SizedBox(height: 10),
         for (final x in _signs)
           Padding(
-            padding: const EdgeInsets.only(bottom: 6),
+            padding: const EdgeInsets.symmetric(vertical: 5),
             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Container(
-                width: 5,
-                height: 5,
-                margin: const EdgeInsets.only(top: 7, right: 10),
-                decoration: const BoxDecoration(
-                    color: accent, shape: BoxShape.circle),
+              Padding(
+                padding: const EdgeInsets.only(top: 8, right: 11),
+                child: Container(
+                  width: 6,
+                  height: 6,
+                  decoration: const BoxDecoration(
+                      color: kPvUrgentInk, shape: BoxShape.circle),
+                ),
               ),
               Expanded(
                 child: Text(x,
-                    style: pvJakarta(
-                        fontSize: 13, height: 1.45, color: _ink)),
+                    style: pvManrope(fontSize: 14.5, height: 1.5, color: p.ink1)),
               ),
             ]),
           ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 8),
         Text('Stop, sit down, and call your doctor today.',
-            style: pvJakarta(
-                fontSize: 13, fontWeight: FontWeight.w700, color: _ink)),
-      ]),
+            style: pvManrope(
+                fontSize: 14.5, fontWeight: FontWeight.w800, color: p.ink1)),
+        const SizedBox(height: 12),
+        Container(height: 1, color: kPvLine),
+      ],
     );
   }
 }

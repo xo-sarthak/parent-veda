@@ -20,6 +20,7 @@ import 'package:parentveda/data/garbh_data.dart';
 import 'package:parentveda/data/garbh_rebuild_data.dart';
 import 'package:parentveda/data/read_to_baby_data.dart';
 import 'package:parentveda/screens/doors/pv_door_router.dart';
+import 'package:parentveda/screens/garbh_screen.dart' show ShravanScreen;
 import 'package:parentveda/screens/doors/pv_door_screen.dart';
 import 'package:parentveda/services/bracket_resolver.dart';
 import 'package:parentveda/services/pregnancy_controller.dart';
@@ -266,7 +267,13 @@ void main() {
   });
 
   group('on a phone', () {
-    testWidgets('a Today card switches tab instead of pushing',
+    // CHANGED 2026-10-02 (the user: "open the audio when clicked on Shravan that is
+    // meant for that day; same for all the other pillars"). A Today card used to
+    // SWITCH TAB to the pillar's rail, which left her looking for the raga she had
+    // just tapped. It now opens that practice itself, over the door; the door and
+    // its tabs are still underneath and unchanged. Kept for revert: it switched to
+    // Listen and showed "Today's pick" and "Ragas".
+    testWidgets("a Today card opens that day's practice, over the door",
         (tester) async {
       await pump(tester);
       expect(find.byKey(const ValueKey('garbh_today_shravan')), findsOneWidget);
@@ -275,11 +282,10 @@ void main() {
       await tester.pump();
       await tester.tap(card);
       await tester.pump();
-      await tester.pump(const Duration(milliseconds: 500));
-      // Listen's first rail is on screen, inside the same door.
-      expect(find.text("Today's pick"), findsOneWidget);
-      expect(find.text('Ragas'), findsOneWidget);
-      expect(find.byType(PvDoorScreen), findsOneWidget);
+      await tester.pump(const Duration(milliseconds: 600));
+      expect(find.byType(ShravanScreen), findsOneWidget);
+      // The door is still there under it.
+      expect(find.byType(PvDoorScreen, skipOffstage: false), findsOneWidget);
     });
 
     testWidgets('the ritual rail follows the store', (tester) async {

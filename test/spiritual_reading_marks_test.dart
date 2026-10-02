@@ -99,10 +99,55 @@ void main() {
     });
   });
 
+  group('nothing chosen by default (pillars brief: "default to none selected")', () {
+    testWidgets('a first visit invites her to choose, and shows no reads yet',
+        (t) async {
+      await pump(t);
+      expect(find.byKey(const ValueKey('spr_choose_first')), findsOneWidget);
+      expect(find.text('Choose the tradition that feels like yours'), findsOneWidget);
+      for (final tr in kSpiritualTraditions) {
+        expect(find.byKey(ValueKey('spr_pick_${tr.id}'), skipOffstage: false),
+            findsOneWidget, reason: tr.id);
+      }
+      // No tradition's reading cards until she picks.
+      expect(find.text(s.sprViewAll(kSpiritualTraditions.first.readCount),
+          skipOffstage: false), findsNothing);
+    });
+
+    testWidgets('picking one shows that tradition only, and is remembered',
+        (t) async {
+      await pump(t);
+      final tr = kSpiritualTraditions.first;
+      await t.ensureVisible(find.byKey(ValueKey('spr_pick_${tr.id}')));
+      await t.tap(find.byKey(ValueKey('spr_pick_${tr.id}')));
+      await t.pump(const Duration(milliseconds: 300));
+      expect(find.byKey(const ValueKey('spr_choose_first')), findsNothing);
+      expect(find.text(s.sprViewAll(tr.readCount), skipOffstage: false), findsOneWidget);
+      final prefs = await SharedPreferences.getInstance();
+      expect(prefs.getString('spr_last_tradition'), tr.id);
+      // Back again: it opens on her choice, not on the invitation.
+      await t.pumpWidget(const SizedBox());
+      await pump(t);
+      await t.pump(const Duration(milliseconds: 300));
+      expect(find.byKey(const ValueKey('spr_choose_first')), findsNothing);
+    });
+
+    testWidgets('All shows every tradition', (t) async {
+      await pump(t);
+      await t.tap(find.byKey(const ValueKey('spr_chip_all')));
+      await t.pump(const Duration(milliseconds: 300));
+      // One card a tradition, each with its "View all" line.
+      expect(find.textContaining('View all', skipOffstage: false),
+          findsNWidgets(kSpiritualTraditions.length));
+    });
+  });
+
   group('a tradition and a read', () {
     testWidgets('View all opens the tradition with its mark and no emoji',
         (t) async {
       await pump(t);
+      await t.tap(find.byKey(const ValueKey('spr_chip_all')));
+      await t.pump(const Duration(milliseconds: 300));
       final first = kSpiritualTraditions.first;
       final viewAll = find.text(s.sprViewAll(first.readCount));
       await t.ensureVisible(viewAll.first);
@@ -117,6 +162,8 @@ void main() {
 
     testWidgets('a read opens with the mark in its bar and no emoji', (t) async {
       await pump(t);
+      await t.tap(find.byKey(const ValueKey('spr_chip_all')));
+      await t.pump(const Duration(milliseconds: 300));
       final read = kSpiritualTraditions.first.sections.first.reads.first;
       // The preview row for the first read.
       final row = find.text(read.title.now);

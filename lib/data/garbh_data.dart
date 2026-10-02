@@ -330,6 +330,15 @@ GarbhPrompt promptForDay(int day, int trimester) {
 // ===========================================================================
 int garbhTrimester(int week) => week <= 13 ? 1 : (week <= 27 ? 2 : 3);
 
+/// The week a pregnancy day falls in, by the same rule the home uses for the day
+/// she has selected on its date strip (`((day - 1) ~/ 7) + 1`, held to 4..40).
+///
+/// ⚠️ ADDED 2026-10-02 for "open today's practice": the four daily screens take
+/// an optional `day` so that the practice a row NAMES is the practice it OPENS,
+/// even when she has picked an earlier day on the strip. Without it a row would
+/// say one raga and the player would play another.
+int garbhWeekForDay(int day) => (((day - 1) ~/ 7) + 1).clamp(4, 40);
+
 // --- Shravan (today's listening session) ---
 GarbhAudio shravanForTrimester(int t) {
   switch (t) {

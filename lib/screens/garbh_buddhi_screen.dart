@@ -37,6 +37,10 @@
 import 'package:flutter/material.dart';
 
 import '../data/garbh_data.dart';
+import 'doors/pv_door_chrome.dart' show pvDoorPad;
+import 'garbh/garbh_daily_shell.dart';
+import 'pregnancy/preg_chrome.dart' show pregFilledStyle;
+import 'products/pv_store_chrome.dart' show pvStorePalette;
 import '../localization/app_language.dart';
 import '../models/garbh_content.dart';
 import '../services/pregnancy_controller.dart';
@@ -45,6 +49,8 @@ import '../theme/pv_fonts.dart';
 const _accBuddhi = Color(0xFF2F2C30); // muted indigo, its own place on the wheel
 const _ink = Color(0xFF201C24); // V3 ink1
 const _muted = Color(0xFF2F2C30); // V3 ink3
+// Kept for revert (2026-10-02): the page ground the old build sat on.
+// ignore: unused_element
 const _ground = Color(0xFFFFFFFF); // V3 ground — white since 2026-09-17; was 0xFFF5F3F6
 
 class GarbhBuddhiScreen extends StatelessWidget {
@@ -53,9 +59,14 @@ class GarbhBuddhiScreen extends StatelessWidget {
     required this.controller,
     this.daily = false,
     this.onOpenPuzzle,
+    this.day,
   });
 
   final PregnancyController controller;
+
+  /// The pregnancy day to serve in daily mode; null is today. The home passes the
+  /// day on its date strip, so the puzzle it names is the puzzle it opens.
+  final int? day;
 
   /// Daily mode serves today's rotation and shows the foot; library mode is
   /// the full set with no "today" framing, matching the other three pillars.
@@ -73,128 +84,311 @@ class GarbhBuddhiScreen extends StatelessWidget {
     // The rotation, so today's is stable within a day and moves between days.
     final today = kPuzzles.isEmpty
         ? null
-        : kPuzzles[controller.currentDay % kPuzzles.length];
+        : kPuzzles[(day ?? controller.currentDay) % kPuzzles.length];
 
-    return Scaffold(
-      backgroundColor: _ground,
-      appBar: AppBar(
-        backgroundColor: _ground,
-        surfaceTintColor: Colors.transparent,
-        elevation: 0,
-        foregroundColor: _ink,
-        title: Text(lang.isHindi ? 'बुद्धि' : 'Buddhi',
-            style: pvFraunces(
-                fontSize: 18, fontWeight: FontWeight.w600, color: _ink)),
-      ),
-      body: SafeArea(
-        top: false,
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 6, 20, 40),
-          children: [
-            // ---- the intent, stated before anything else -----------------
-            Text('A few quiet minutes that are yours.',
-                style: pvFraunces(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w600,
-                    height: 1.25,
-                    color: _ink)),
-            const SizedBox(height: 8),
-            Text(
-                'Every other practice here is for your baby. This one is not.',
-                style: pvManrope(fontSize: 13.5, height: 1.55, color: _muted)),
-            const SizedBox(height: 22),
-
-            // ---- the why line, in the same format as the other pillars ---
-            //
-            // ⚠️ AND HONEST ABOUT WHAT IT IS. The other three say what is
-            // developing in the baby this week. This one cannot say that
-            // without inventing a benefit, so it says what is true instead.
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.fromLTRB(15, 13, 15, 14),
-              decoration: BoxDecoration(
-                color: _accBuddhi.withValues(alpha: 0.08),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('WHY THIS',
-                        style: pvManrope(
-                            fontSize: 9.5,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 1.2,
-                            color: _accBuddhi)),
-                    const SizedBox(height: 7),
-                    Text(
-                        'Ten minutes of focused attention is one of the few '
-                        'reliable ways to stop a worried mind going round in '
-                        'circles. It will not make your baby cleverer, and '
-                        "nobody can honestly tell you it will. It's here "
-                        'because pregnancy is long, and your head deserves a '
-                        'break from it.',
-                        style: pvManrope(
-                            fontSize: 13.5, height: 1.6, color: _ink)),
-                  ]),
-            ),
-            const SizedBox(height: 26),
-
-            if (daily && today != null) ...[
-              Text('TODAY',
-                  style: pvManrope(
-                      fontSize: 9.5,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 1.2,
-                      color: _muted)),
-              const SizedBox(height: 10),
-              _PuzzleCard(
-                puzzle: today,
-                feature: true,
-                onTap: () => onOpenPuzzle?.call(context, today),
-              ),
-              const SizedBox(height: 12),
-              // ⚠️ NO "MARK COMPLETE". Completion fires when the puzzle is
-              // finished or the session timer ends, same rule as every other
-              // pillar in this section.
-              Text(
-                  'This finishes on its own when the puzzle is done. Skipping '
-                  "it doesn't spoil your day.",
-                  style: pvManrope(fontSize: 12, height: 1.5, color: _muted)),
-              const SizedBox(height: 30),
-              Text('MORE',
-                  style: pvManrope(
-                      fontSize: 9.5,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 1.2,
-                      color: _muted)),
-              const SizedBox(height: 10),
+//  // Kept for revert (2026-10-02): the cream page, its app bar, the tinted "why" box and
+//  // the `_PuzzleCard` list. The pillar shell (`GarbhDailyShell`) replaced it.
+//      return Scaffold(
+//        backgroundColor: _ground,
+//        appBar: AppBar(
+//          backgroundColor: _ground,
+//          surfaceTintColor: Colors.transparent,
+//          elevation: 0,
+//          foregroundColor: _ink,
+//          title: Text(lang.isHindi ? 'बुद्धि' : 'Buddhi',
+//              style: pvFraunces(
+//                  fontSize: 18, fontWeight: FontWeight.w600, color: _ink)),
+//        ),
+//        body: SafeArea(
+//          top: false,
+//          child: ListView(
+//            padding: const EdgeInsets.fromLTRB(20, 6, 20, 40),
+//            children: [
+//              // ---- the intent, stated before anything else -----------------
+//              Text('A few quiet minutes that are yours.',
+//                  style: pvFraunces(
+//                      fontSize: 22,
+//                      fontWeight: FontWeight.w600,
+//                      height: 1.25,
+//                      color: _ink)),
+//              const SizedBox(height: 8),
+//              Text(
+//                  'Every other practice here is for your baby. This one is not.',
+//                  style: pvManrope(fontSize: 13.5, height: 1.55, color: _muted)),
+//              const SizedBox(height: 22),
+//
+//              // ---- the why line, in the same format as the other pillars ---
+//              //
+//              // ⚠️ AND HONEST ABOUT WHAT IT IS. The other three say what is
+//              // developing in the baby this week. This one cannot say that
+//              // without inventing a benefit, so it says what is true instead.
+//              Container(
+//                width: double.infinity,
+//                padding: const EdgeInsets.fromLTRB(15, 13, 15, 14),
+//                decoration: BoxDecoration(
+//                  color: _accBuddhi.withValues(alpha: 0.08),
+//                  borderRadius: BorderRadius.circular(16),
+//                ),
+//                child: Column(
+//                    crossAxisAlignment: CrossAxisAlignment.start,
+//                    children: [
+//                      Text('WHY THIS',
+//                          style: pvManrope(
+//                              fontSize: 9.5,
+//                              fontWeight: FontWeight.w800,
+//                              letterSpacing: 1.2,
+//                              color: _accBuddhi)),
+//                      const SizedBox(height: 7),
+//                      Text(
+//                          'Ten minutes of focused attention is one of the few '
+//                          'reliable ways to stop a worried mind going round in '
+//                          'circles. It will not make your baby cleverer, and '
+//                          "nobody can honestly tell you it will. It's here "
+//                          'because pregnancy is long, and your head deserves a '
+//                          'break from it.',
+//                          style: pvManrope(
+//                              fontSize: 13.5, height: 1.6, color: _ink)),
+//                    ]),
+//              ),
+//              const SizedBox(height: 26),
+//
+//              if (daily && today != null) ...[
+//                Text('TODAY',
+//                    style: pvManrope(
+//                        fontSize: 9.5,
+//                        fontWeight: FontWeight.w800,
+//                        letterSpacing: 1.2,
+//                        color: _muted)),
+//                const SizedBox(height: 10),
+//                _PuzzleCard(
+//                  puzzle: today,
+//                  feature: true,
+//                  onTap: () => onOpenPuzzle?.call(context, today),
+//                ),
+//                const SizedBox(height: 12),
+//                // ⚠️ NO "MARK COMPLETE". Completion fires when the puzzle is
+//                // finished or the session timer ends, same rule as every other
+//                // pillar in this section.
+//                Text(
+//                    'This finishes on its own when the puzzle is done. Skipping '
+//                    "it doesn't spoil your day.",
+//                    style: pvManrope(fontSize: 12, height: 1.5, color: _muted)),
+//                const SizedBox(height: 30),
+//                Text('MORE',
+//                    style: pvManrope(
+//                        fontSize: 9.5,
+//                        fontWeight: FontWeight.w800,
+//                        letterSpacing: 1.2,
+//                        color: _muted)),
+//                const SizedBox(height: 10),
+//              ],
+//
+//              for (final p in kPuzzles)
+//                if (!daily || p != today) ...[
+//                  _PuzzleCard(
+//                      puzzle: p, onTap: () => onOpenPuzzle?.call(context, p)),
+//                  const SizedBox(height: 10),
+//                ],
+//
+//              const SizedBox(height: 22),
+//              // ⚠️ SAYING OUT LOUD THAT THIS ONE DOES NOT GO IN THE JOURNAL.
+//              // She will have watched three other practices land there, so its
+//              // absence needs an explanation or it reads as a bug.
+//              Text(
+//                  'Nothing here goes into My Journal. The journal is for what '
+//                  "you're making for your baby, and week $week of it is already "
+//                  'there.',
+//                  style: pvManrope(fontSize: 12, height: 1.55, color: _muted)),
+//            ],
+//          ),
+//        ),
+    // THE DAILY-GAME LAYOUT (2026-10-02, Mobbin: LinkedIn's and Quizlet's game
+    // cards, Tolan's "Today's questions"). Today's game is one card with a Play
+    // button; the others are rows under it. No scores, no streak, no timer, which
+    // is what this pillar refuses to be. The emoji on each puzzle is a line icon.
+    final others = [
+      for (final pz in kPuzzles)
+        if (!daily || pz != today) pz,
+    ];
+    return GarbhDailyShell(
+      pillarId: 'buddhi',
+      title: daily && today != null ? today.title.now : (lang.isHindi ? 'बुद्धि' : 'Buddhi'),
+      intro: 'A few quiet minutes that are yours. Every other practice here is '
+          'for your baby. This one is not.',
+      children: [
+        if (daily && today != null) ...[
+          pvDoorPad(_TodayGame(
+            puzzle: today,
+            onPlay: () => onOpenPuzzle?.call(context, today),
+          )),
+          const SizedBox(height: 14),
+          const GarbhDoneLine(
+              pillarId: 'buddhi',
+              finishLine:
+                  "This finishes on its own when the puzzle is done. Skipping it doesn't spoil your day."),
+          const SizedBox(height: 24),
+          pvDoorPad(Text('MORE',
+              style: pvManrope(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.3,
+                  color: pvStorePalette.ink3))),
+          const SizedBox(height: 10),
+        ],
+        pvDoorPad(Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: const Color(0x14000000)),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Column(children: [
+            for (var i = 0; i < others.length; i++) ...[
+              if (i > 0)
+                const Divider(height: 1, thickness: 1, color: Color(0x14000000), indent: 64),
+              _GameRow(
+                  puzzle: others[i],
+                  onTap: () => onOpenPuzzle?.call(context, others[i])),
             ],
+          ]),
+        )),
+        const SizedBox(height: 22),
+        // ⚠️ ON THE PAGE, NOT FOLDED: it says outright that this makes no claim about
+        // the baby, and a page that only omits the claim leaves a mother to assume
+        // it, because every competitor in this category makes it.
+        garbhNote(
+            'buddhi',
+            'Why this',
+            'Ten minutes of focused attention is one of the few reliable ways '
+                'to stop a worried mind going round in circles. It will not make '
+                "your baby cleverer, and nobody can honestly tell you it will. It's "
+                'here because pregnancy is long, and your head deserves a break from it.'),
+        const SizedBox(height: 14),
+        // Saying out loud that this one does not go in the journal: she will have
+        // watched three other practices land there.
+        pvDoorPad(Text(
+            'Nothing here goes into My Journal. The journal is for what you are '
+            'making for your baby, and week $week of it is already there.',
+            style: pvManrope(fontSize: 13, height: 1.55, color: pvStorePalette.ink3))),
+      ],
+    );
+  }
+}
 
-            for (final p in kPuzzles)
-              if (!daily || p != today) ...[
-                _PuzzleCard(
-                    puzzle: p, onTap: () => onOpenPuzzle?.call(context, p)),
-                const SizedBox(height: 10),
-              ],
+/// A line icon for a puzzle (the emoji it carried is not drawn).
+IconData _puzzleIcon(String titleEn) => switch (titleEn) {
+      'Sudoku' => Icons.grid_on_rounded,
+      'Logic Puzzle' => Icons.extension_outlined,
+      'Memory Match' => Icons.style_outlined,
+      _ => Icons.search_rounded,
+    };
 
-            const SizedBox(height: 22),
-            // ⚠️ SAYING OUT LOUD THAT THIS ONE DOES NOT GO IN THE JOURNAL.
-            // She will have watched three other practices land there, so its
-            // absence needs an explanation or it reads as a bug.
-            Text(
-                'Nothing here goes into My Journal. The journal is for what '
-                "you're making for your baby, and week $week of it is already "
-                'there.',
-                style: pvManrope(fontSize: 12, height: 1.55, color: _muted)),
-          ],
+/// Today's game: its name, one line, and Play. The mark sits in the card.
+class _TodayGame extends StatelessWidget {
+  const _TodayGame({required this.puzzle, required this.onPlay});
+  final GarbhPuzzle puzzle;
+  final VoidCallback onPlay;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = pvStorePalette;
+    return Container(
+      key: const ValueKey('buddhi_today'),
+      padding: const EdgeInsets.fromLTRB(18, 18, 18, 18),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: const Color(0x14000000)),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+                color: p.surfaceAlt, borderRadius: BorderRadius.circular(14)),
+            child: Icon(_puzzleIcon(puzzle.title.en), size: 22, color: p.ink1),
+          ),
+          const SizedBox(width: 12),
+          Text('TODAY',
+              style: pvManrope(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.3,
+                  color: p.ink3)),
+        ]),
+        const SizedBox(height: 14),
+        Text(puzzle.title.now,
+            style: pvFraunces(
+                fontSize: 24, fontWeight: FontWeight.w600, height: 1.15, color: p.ink1)),
+        const SizedBox(height: 6),
+        Text(puzzle.blurb.now,
+            style: pvManrope(fontSize: 14.5, height: 1.5, color: p.ink2)),
+        const SizedBox(height: 18),
+        SizedBox(
+          width: double.infinity,
+          child: FilledButton.icon(
+            key: const ValueKey('buddhi_play'),
+            style: pregFilledStyle().copyWith(
+                minimumSize: const WidgetStatePropertyAll(Size.fromHeight(52))),
+            onPressed: onPlay,
+            icon: const Icon(Icons.play_arrow_rounded),
+            label: Text('Play',
+                style: pvManrope(fontSize: 15, fontWeight: FontWeight.w800)),
+          ),
         ),
+      ]),
+    );
+  }
+}
+
+/// One of the other games: a line icon, its name and line, a chevron.
+class _GameRow extends StatelessWidget {
+  const _GameRow({required this.puzzle, required this.onTap});
+  final GarbhPuzzle puzzle;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = pvStorePalette;
+    return InkWell(
+      key: ValueKey('buddhi_game_${puzzle.title.en}'),
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 13, 12, 13),
+        child: Row(children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+                color: p.surfaceAlt, borderRadius: BorderRadius.circular(11)),
+            child: Icon(_puzzleIcon(puzzle.title.en), size: 19, color: p.ink1),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(puzzle.title.now,
+                  style: pvManrope(
+                      fontSize: 15, fontWeight: FontWeight.w700, color: p.ink1)),
+              const SizedBox(height: 2),
+              Text(puzzle.blurb.now,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: pvManrope(fontSize: 13, height: 1.4, color: p.ink3)),
+            ]),
+          ),
+          Icon(Icons.chevron_right_rounded, size: 22, color: p.ink3),
+        ]),
       ),
     );
   }
 }
 
+// Kept for revert (2026-10-02): `_TodayGame` and `_GameRow` replaced it.
+// ignore: unused_element
 class _PuzzleCard extends StatelessWidget {
   const _PuzzleCard(
+      // ignore: unused_element_parameter
       {required this.puzzle, required this.onTap, this.feature = false});
 
   final GarbhPuzzle puzzle;

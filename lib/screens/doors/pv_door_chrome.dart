@@ -170,9 +170,15 @@ class PvDoorToolScaffold extends StatelessWidget {
     required this.children,
     this.variant = 2,
     this.action,
+    this.mark,
   });
 
   final double hue;
+
+  /// A drawn mark for the tool, in the hero opposite the back button (2026-10-02,
+  /// the Garbh Sanskar pillars). Null draws nothing, so every other caller is as
+  /// it was.
+  final Widget? mark;
 
   /// Small, letterspaced, above the title. What this tool is called.
   final String eyebrow;
@@ -228,9 +234,8 @@ class PvDoorToolScaffold extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Material(
+                          Row(children: [
+                            Material(
                               color: Colors.white.withValues(alpha: 0.55),
                               shape: const CircleBorder(),
                               clipBehavior: Clip.antiAlias,
@@ -244,7 +249,9 @@ class PvDoorToolScaffold extends StatelessWidget {
                                         size: 19, color: p.ink1)),
                               ),
                             ),
-                          ),
+                            const Spacer(),
+                            ?mark,
+                          ]),
                           const SizedBox(height: 18),
                           Text(eyebrow.toUpperCase(),
                               style: pvManrope(

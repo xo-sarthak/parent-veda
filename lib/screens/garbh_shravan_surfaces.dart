@@ -59,11 +59,16 @@ class ShravanTrackPlayer extends StatefulWidget {
     /// Daily mode: finishing marks Shravan done and files "what your baby
     /// heard" into My Journal. Library mode: just listening.
     this.daily = false,
+
+    /// The session layout (2026-10-02): the daily screen draws one big ink play
+    /// disc. Off, the player is as it was, which the library detail still uses.
+    this.large = false,
   });
 
   final GarbhAudio audio;
   final PregnancyController controller;
   final bool daily;
+  final bool large;
 
   @override
   State<ShravanTrackPlayer> createState() => _ShravanTrackPlayerState();
@@ -138,6 +143,7 @@ class _ShravanTrackPlayerState extends State<ShravanTrackPlayer> {
             RagaPlayer(
                 title: audio.title.now,
                 subtitle: '${audio.minutes} min',
+                large: widget.large,
                 onFinished: _finished),
             const SizedBox(height: 8),
             Text(s.gsSampleAudio,
@@ -155,22 +161,37 @@ class _ShravanTrackPlayerState extends State<ShravanTrackPlayer> {
             isFile: playable.isFile,
             isUrl: !playable.isFile,
             loop: false,
+            large: widget.large,
             onFinished: _finished,
           ),
           const SizedBox(height: 10),
-          Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Expanded(
-              child: Text(track.attribution,
-                  style: pvManrope(fontSize: 11.5, height: 1.4, color: _muted)),
-            ),
-            const SizedBox(width: 10),
+          // In the session layout the credit and the pill STACK (2026-10-02): side
+          // by side the pill is wider than the line has room for at a large text
+          // size on a narrow phone, once the manifest has loaded.
+          if (widget.large) ...[
+            Text(track.attribution,
+                style: pvManrope(fontSize: 12.5, height: 1.4, color: _muted)),
+            const SizedBox(height: 8),
             _OfflinePill(
               cached: cached,
               downloading: downloading,
               onTap: () =>
                   cached ? lib.removeDownload(audio.id) : lib.download(audio.id),
             ),
-          ]),
+          ] else
+            Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Expanded(
+                child: Text(track.attribution,
+                    style: pvManrope(fontSize: 11.5, height: 1.4, color: _muted)),
+              ),
+              const SizedBox(width: 10),
+              _OfflinePill(
+                cached: cached,
+                downloading: downloading,
+                onTap: () =>
+                    cached ? lib.removeDownload(audio.id) : lib.download(audio.id),
+              ),
+            ]),
         ]);
       },
     );
@@ -208,11 +229,17 @@ class _OfflinePill extends StatelessWidget {
               size: 15,
               color: cached ? _accShravan : _muted),
           const SizedBox(width: 5),
-          Text(label,
-              style: pvManrope(
-                  fontSize: 11.5,
-                  fontWeight: FontWeight.w700,
-                  color: cached ? _accShravan : _ink)),
+          // Flexible: at a large text size on a narrow phone the label shrinks
+          // with an ellipsis instead of running off the pill (2026-10-02).
+          Flexible(
+            child: Text(label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: pvManrope(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w700,
+                    color: cached ? _accShravan : _ink)),
+          ),
         ]),
       ),
     );

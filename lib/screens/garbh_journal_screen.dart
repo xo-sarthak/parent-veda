@@ -35,6 +35,8 @@
 //  stamped weeks and never asks the controller what week it is.
 // =============================================================================
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import '../data/garbh_rebuild_data.dart';
@@ -561,14 +563,14 @@ class _EntryRow extends StatelessWidget {
                     isFile: true,
                     loop: false),
             borderRadius: BorderRadius.circular(16),
-            child: _body(playing),
+            child: _body(context, playing),
           ),
         );
       },
     );
   }
 
-  Widget _body(bool playing) {
+  Widget _body(BuildContext context, bool playing) {
     final lang = S.current;
     // ⚠️ THE RELATIONSHIP LABEL WINS OVER THE KIND LABEL. She chose the word
     // "Dadi"; showing "Family" instead would replace her word with our
@@ -611,13 +613,86 @@ class _EntryRow extends StatelessWidget {
                   : Icons.play_circle_outline_rounded,
               size: 22,
               color: _accent),
+        // ⚠️ DELETE, AT LAST (2026-10-02, the pillars brief: "record and stop,
+        // playback, re-record and delete"). "Again" let her throw a take away
+        // before keeping it; once kept, nothing could remove it. A menu, not a
+        // swipe, so a recording of her voice is never lost to a stray gesture,
+        // and an Undo after it (`garbhDeleteJournalEntry`).
+        PopupMenuButton<String>(
+          key: ValueKey('journal_menu_${entry.id}'),
+          tooltip: 'More',
+          icon: const Icon(Icons.more_vert_rounded, size: 20, color: _muted),
+          onSelected: (v) {
+            if (v == 'delete') garbhDeleteJournalEntry(context, entry);
+          },
+          itemBuilder: (_) => [
+            PopupMenuItem(
+              key: ValueKey('journal_delete_${entry.id}'),
+              value: 'delete',
+              child: Row(children: [
+                const Icon(Icons.delete_outline_rounded, size: 18, color: _ink),
+                const SizedBox(width: 10),
+                Flexible(child: Text(_deleteLabel(entry.kind))),
+              ]),
+            ),
+          ],
+        ),
       ]),
     );
   }
+
+  static String _deleteLabel(GarbhEntryKind k) => switch (k) {
+        GarbhEntryKind.myVoice || GarbhEntryKind.familyVoice => 'Delete this recording',
+        GarbhEntryKind.letter => 'Delete this letter',
+        GarbhEntryKind.photo => 'Delete this photo',
+        GarbhEntryKind.heard => 'Remove from My Journal',
+      };
 
   static String _dur(int s) {
     final m = s ~/ 60;
     final r = s % 60;
     return m > 0 ? '$m min ${r}s' : '${r}s';
   }
+}
+
+/// Delete one journal entry: gone from the album at once, with Undo.
+///
+/// ⚠️ THE FILE GOES ONLY WHEN THE UNDO HAS PASSED. Removing the entry first and
+/// the audio file after the snackbar closes means Undo puts back the very same
+/// recording, not a row pointing at a file that no longer exists. If she undoes,
+/// nothing on the phone was touched. A path that is not a file on this phone (a
+/// link) is never deleted from here.
+Future<void> garbhDeleteJournalEntry(
+    BuildContext context, GarbhJournalEntry entry) async {
+  final store = GarbhJournalStore.instance;
+  final messenger = ScaffoldMessenger.of(context);
+  final path = entry.path;
+  final audio = RagaAudioStore.instance;
+  if (path != null && audio.isPlayingAsset(path)) await audio.stop();
+  await store.remove(entry.id);
+  var undone = false;
+  final what = switch (entry.kind) {
+    GarbhEntryKind.myVoice || GarbhEntryKind.familyVoice => 'Recording deleted.',
+    GarbhEntryKind.letter => 'Letter deleted.',
+    GarbhEntryKind.photo => 'Photo deleted.',
+    GarbhEntryKind.heard => 'Removed from My Journal.',
+  };
+  messenger.clearSnackBars();
+  final bar = messenger.showSnackBar(SnackBar(
+    persist: false,
+    content: Text(what),
+    action: SnackBarAction(
+      label: 'Undo',
+      onPressed: () {
+        undone = true;
+        store.add(entry);
+      },
+    ),
+  ));
+  await bar.closed;
+  if (undone || path == null || path.startsWith('http')) return;
+  try {
+    final f = File(path);
+    if (f.existsSync()) f.deleteSync();
+  } catch (_) {/* the entry is gone; a file left behind is harmless */}
 }

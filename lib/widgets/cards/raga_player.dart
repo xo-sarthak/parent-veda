@@ -34,8 +34,10 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../../screens/products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 import '../../services/raga_audio_store.dart';
 import '../../theme/app_theme.dart';
+import '../../theme/pv_fonts.dart';
 
 class RagaPlayer extends StatefulWidget {
   const RagaPlayer({
@@ -47,10 +49,18 @@ class RagaPlayer extends StatefulWidget {
     this.isUrl = false,
     this.loop = true,
     this.onFinished,
+    this.large = false,
   });
 
   final String title;
   final String subtitle;
+
+  /// The session layout (2026-10-02, Oura's and Noom's audio sessions): one big
+  /// ink play disc under a row of moving bars, the scrubber and the two times
+  /// below it, on a white card with the page hairline. The title and subtitle
+  /// are not repeated here; the screen above already says them. Off by default,
+  /// so the three other places this player draws are as they were.
+  final bool large;
 
   /// A bundled asset path by default; a device file or a URL when the caller
   /// says so (Shravan's manifest tracks). See `RagaAudioStore.toggle`.
@@ -149,6 +159,79 @@ class _RagaPlayerState extends State<RagaPlayer>
     );
   }
 
+  /// The session layout: bars, one big ink disc, the scrubber and the times.
+  Widget _largeCard(BuildContext context, bool playing, Duration position,
+      Duration duration, double totalSecs, double posSecs) {
+    final p = pvStorePalette;
+    return Container(
+      key: const ValueKey('raga_player_large'),
+      padding: const EdgeInsets.fromLTRB(20, 22, 20, 14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: kPvLine),
+      ),
+      child: Column(children: [
+        _Equalizer(
+            animation: _eq,
+            active: playing,
+            width: 150,
+            height: 34,
+            bars: 15,
+            color: kPvInk.withValues(alpha: playing ? 0.85 : 0.25)),
+        const SizedBox(height: 18),
+        Semantics(
+          button: true,
+          label: playing ? 'Pause' : 'Play',
+          child: GestureDetector(
+            key: const ValueKey('raga_play'),
+            onTap: () => _audio.toggle(widget.asset,
+                title: widget.title,
+                isFile: widget.isFile,
+                isUrl: widget.isUrl,
+                loop: widget.loop),
+            child: Container(
+              width: 84,
+              height: 84,
+              decoration: const BoxDecoration(color: kPvInk, shape: BoxShape.circle),
+              child: Icon(playing ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                  color: Colors.white, size: 46),
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
+        SliderTheme(
+          data: SliderTheme.of(context).copyWith(
+            trackHeight: 4,
+            activeTrackColor: kPvInk,
+            inactiveTrackColor: kPvLine,
+            thumbColor: kPvInk,
+            thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 7),
+            overlayShape: const RoundSliderOverlayShape(overlayRadius: 16),
+          ),
+          child: Slider(
+            value: posSecs.clamp(0, totalSecs <= 0 ? 1 : totalSecs),
+            max: totalSecs <= 0 ? 1 : totalSecs,
+            onChanged: (v) =>
+                _audio.seek(widget.asset, Duration(milliseconds: (v * 1000).round())),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 6),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(_fmt(position),
+                  style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w700, color: p.ink3)),
+              Text(_fmt(duration),
+                  style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w700, color: p.ink3)),
+            ],
+          ),
+        ),
+      ]),
+    );
+  }
+
   Widget _card(BuildContext context) {
     final text = Theme.of(context).textTheme;
     final playing = _audio.isPlayingAsset(widget.asset);
@@ -158,6 +241,9 @@ class _RagaPlayerState extends State<RagaPlayer>
     final posSecs = position.inMilliseconds / 1000.0;
     _checkFinished(position, duration);
 
+    if (widget.large) {
+      return _largeCard(context, playing, position, duration, totalSecs, posSecs);
+    }
     return Container(
       padding: const EdgeInsets.fromLTRB(18, 18, 18, 12),
       decoration: BoxDecoration(
@@ -241,22 +327,33 @@ class _RagaPlayerState extends State<RagaPlayer>
 }
 
 class _Equalizer extends StatelessWidget {
-  const _Equalizer({required this.animation, required this.active});
+  const _Equalizer({
+    required this.animation,
+    required this.active,
+    this.width = 30,
+    this.height = 26,
+    this.bars = 5,
+    this.color,
+  });
 
   final Animation<double> animation;
   final bool active;
+  final double width;
+  final double height;
+  final int bars;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 30,
-      height: 26,
+      width: width,
+      height: height,
       child: AnimatedBuilder(
         animation: animation,
         builder: (context, _) {
           return Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: List.generate(5, (i) {
+            children: List.generate(bars, (i) {
               final base = active
                   ? (0.35 +
                       0.65 *
@@ -267,9 +364,9 @@ class _Equalizer extends StatelessWidget {
                   : 0.28;
               return Container(
                 width: 3.5,
-                height: 26 * base.clamp(0.12, 1.0),
+                height: height * base.clamp(0.12, 1.0),
                 decoration: BoxDecoration(
-                  color: AppTheme.primary400,
+                  color: color ?? AppTheme.primary400,
                   borderRadius: BorderRadius.circular(4),
                 ),
               );
