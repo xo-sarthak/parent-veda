@@ -15,9 +15,32 @@
 //  box), white cards with the hairline, and the one ink for the heart she taps
 //  and every button. Movement records moved from the app bar into the page as
 //  a row with a drawn mark, named for what it opens.
+//
+//  ⚠️ REDRAWN AROUND ONE CONTROL (2026-10-02, the user: "do the same for the baby
+//  movement tracker: the Mobbin pass, the UI, UX and usability"). The same pass
+//  as the contraction timer, with the same references: Garmin's hydration
+//  counter (a big numeral in a circle you tap, with the last time under it,
+//  https://mobbin.com/screens/0bae4e24-9731-4f36-8b1c-91e5545a873c), Oura's and
+//  Messages' one-numeral timer, and Shop's and Structured's timelines (an event
+//  as a dot on a line, the full list one tap away).
+//    · THE HEART IS THE COUNT: one disc, the number of movements in it, nothing
+//      pinned and no second button to find. Idle, the same disc is "start".
+//    · THE CHIPS BECAME A LINE: each movement is a dot on the session's own
+//      timeline, so a cluster or a quiet stretch shows at a glance; the times
+//      are one tap away.
+//    · THE NOTE FOLDS: "Remember this moment" opens only when she wants it.
+//    · NO TARGET, ON PURPOSE. The tool is awareness, not counting; the disc
+//      shows a count and never a goal, a ring to fill or a "good" number.
+//    · THE TWO READS at the foot are the reader's own "Read next" rail
+//      (`pregToolReadNext`), the way they sit at the end of an article.
+//  Every clinical line is word for word what it was.
 // =============================================================================
 
+import 'dart:async';
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../localization/app_language.dart';
 import '../../services/daily_store.dart';
@@ -30,6 +53,7 @@ import '../../data/reads/pregnancy_reads_weekly_a.dart' show kPregWeekReadPrefix
 import '../doors/pv_door_router.dart' show openPvDoorRead;
 import '../pregnancy/preg_chrome.dart';
 import '../pregnancy/preg_tool_chrome.dart';
+import '../pregnancy/preg_tool_parts.dart';
 import '../products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 
 /// The Tools tab's "Track" hue, so the marks here match the row she tapped.
@@ -86,16 +110,24 @@ class _BabyMovementScreenState extends State<BabyMovementScreen>
   /// How many recent times to show before "View all times".
   static const _timesPreview = 12;
 
+  /// Redraws the page twice a minute while a session runs, so the length of
+  /// the session and the end of its timeline keep up without her touching it.
+  Timer? _tick;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _tick = Timer.periodic(const Duration(seconds: 30), (_) {
+      if (mounted && _store.hasActiveMovementSession) setState(() {});
+    });
     _store.init();
     // No auto-start: the mother begins a session explicitly.
   }
 
   @override
   void dispose() {
+    _tick?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     // Leaving this screen ends the active session.
     _store.endMovementSession();
@@ -159,6 +191,236 @@ class _BabyMovementScreenState extends State<BabyMovementScreen>
 
   @override
   Widget build(BuildContext context) {
+    final s = _s;
+    // The shell is unchanged (hero, eyebrow, title, the intro only while idle).
+    // What is inside it is the one disc and what follows from it.
+    return AnimatedBuilder(
+      animation: _store,
+      builder: (context, _) {
+        final active = _store.hasActiveMovementSession;
+        return PregToolScaffold(
+          hue: _kMovementHue,
+          eyebrow: 'Track',
+          title: s.babyMovementTracker,
+          mark: active ? null : IntentMark.stepsMark,
+          intro: active
+              ? null
+              : 'A calm way to log your baby\'s movements, one session at a time.',
+          children: [
+            pregToolPad(
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (active) ..._liveViews(context) else ..._idleViews(context),
+                  const SizedBox(height: 18),
+                  PregNote(s.movementDisclaimer),
+                  const SizedBox(height: 22),
+                  PregRowCard(
+                    children: [
+                      PregOfferRow(
+                        key: const ValueKey('movement_records_row'),
+                        mark: IntentMark.chartLog,
+                        hue: _kMovementHue,
+                        title: s.movementRecordsTitle,
+                        line: 'Every session, with its times',
+                        onTap: _openRecords,
+                      ),
+                    ],
+                  ),
+                  if (!active) ...[
+                    const SizedBox(height: 14),
+                    // The teaching the PDF found missing, folded. The line she
+                    // must not miss is the title, so it is always on the page.
+                    PregFoldRow(
+                      keyPrefix: 'bm_fold',
+                      fold: 'pattern',
+                      icon: Icons.favorite_border_rounded,
+                      title:
+                          'Fewer, weaker or different movements? Call the same day',
+                      body: Text(
+                        'From about 28 weeks the pattern matters more than a count. Get to know how '
+                        "your baby usually moves. Babies don't move less as they run out of room. If "
+                        'the movements are fewer, weaker or different, call your doctor or hospital '
+                        'the same day, at any hour. You do not need to count unless your doctor asks you to.',
+                        style: pvManrope(
+                            fontSize: 13.5, height: 1.55, color: pvStorePalette.ink2),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            // The two reads, as the reader's own foot: small tiles with their
+            // pictures. Not while a session runs, so the heart stays above the fold.
+            if (!active) ...[
+              const SizedBox(height: 26),
+              ...pregToolReadNext(
+                context,
+                widget.controller,
+                const [
+                  '${kPregWeekReadPrefix}movement_awareness',
+                  'preg_cond_read_less_movement',
+                ],
+                railKey: const ValueKey('movement_read_next'),
+              ),
+              const SizedBox(height: 12),
+            ],
+          ],
+        );
+      },
+    );
+  }
+
+  // ---- No session: the same disc, as "start" --------------------------------
+
+  List<Widget> _idleViews(BuildContext context) {
+    final s = _s;
+    return [
+      Center(
+        child: _MovementDisc(
+          key: const ValueKey('bm_disc_idle'),
+          active: false,
+          count: 0,
+          label: s.startSession,
+          semanticLabel: s.startSession,
+          pulse: false,
+          onTap: _startSession,
+        ),
+      ),
+      const SizedBox(height: 14),
+      // One line, not the paragraph the start card carried (kept in `_startViews`).
+      Text(
+        s.babyMovedSub,
+        textAlign: TextAlign.center,
+        style: pvManrope(fontSize: 13.5, height: 1.5, color: pvStorePalette.ink3),
+      ),
+    ];
+  }
+
+  // ---- A session: the heart is the count ------------------------------------
+
+  List<Widget> _liveViews(BuildContext context) {
+    final s = _s;
+    final p = pvStorePalette;
+    final times = _store.currentSessionMovements;
+    final count = times.length;
+    final session = _store.activeMovementSession;
+    final start = DateTime.tryParse(session?.startIso ?? '') ??
+        (times.isEmpty ? DateTime.now() : times.first);
+    final now = DateTime.now();
+    final mins = now.difference(start).inMinutes;
+    return [
+      Center(
+        child: _MovementDisc(
+          key: const ValueKey('bm_disc_active'),
+          active: true,
+          count: count,
+          label: _justLogged ? s.movementLogged : s.babyMovedLabel,
+          semanticLabel: '${s.babyMovedLabel}. ${s.movementsLoggedCount(count)}',
+          pulse: _justLogged,
+          onTap: _logMovement,
+        ),
+      ),
+      const SizedBox(height: 20),
+      if (count == 0)
+        // The empty state keeps its invitation, in one line.
+        Text(
+          s.babyMovedSub,
+          key: const ValueKey('bm_empty'),
+          textAlign: TextAlign.center,
+          style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink3),
+        )
+      else ...[
+        IntrinsicHeight(
+          child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            Expanded(child: _stat('Last movement', s.formatClock(times.last))),
+            VerticalDivider(width: 1, thickness: 1, color: kPvLine),
+            Expanded(
+                child: _stat(s.thisSessionLabel, mins < 1 ? '<1m' : '${mins}m')),
+          ]),
+        ),
+        const SizedBox(height: 18),
+        PregCard(
+          padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
+          child: _MovementStrip(
+            key: const ValueKey('bm_strip'),
+            start: start,
+            end: now.isAfter(times.last) ? now : times.last,
+            times: times,
+            startLabel: s.formatClock(start),
+            endLabel: 'now',
+          ),
+        ),
+        const SizedBox(height: 12),
+        PregFoldRow(
+          keyPrefix: 'bm_fold',
+          fold: 'times',
+          icon: Icons.schedule_rounded,
+          title: s.thisSessionLabel,
+          count: '$count',
+          body: _timesWrap(context, times),
+        ),
+      ],
+      const SizedBox(height: 12),
+      PregFoldRow(
+        keyPrefix: 'bm_fold',
+        fold: 'note',
+        icon: Icons.favorite_rounded,
+        title: s.rememberThisMoment,
+        body: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          TextField(
+            key: const ValueKey('bm_note_field'),
+            controller: _noteCtrl,
+            minLines: 2,
+            maxLines: 4,
+            decoration: InputDecoration(hintText: s.movementNoteHint),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton.icon(
+              style: pregFilledStyle(),
+              onPressed: _saveNote,
+              icon: const Icon(Icons.favorite_rounded, size: 18),
+              label: Text(s.talkSaveCta,
+                  style: pvManrope(fontSize: 14, fontWeight: FontWeight.w800)),
+            ),
+          ),
+        ]),
+      ),
+      const SizedBox(height: 14),
+      OutlinedButton.icon(
+        key: const ValueKey('bm_end'),
+        onPressed: _endSession,
+        style: OutlinedButton.styleFrom(
+          foregroundColor: kPvInk,
+          side: const BorderSide(color: kPvLine, width: 1.5),
+          shape: const StadiumBorder(),
+          minimumSize: const Size.fromHeight(48),
+        ),
+        icon: const Icon(Icons.stop_circle_outlined),
+        label: Text(s.endSession,
+            style: pvManrope(fontSize: 14.5, fontWeight: FontWeight.w700)),
+      ),
+    ];
+  }
+
+  Widget _stat(String label, String value) {
+    final p = pvStorePalette;
+    return Column(mainAxisSize: MainAxisSize.min, children: [
+      Text(value,
+          style: pvManrope(fontSize: 22, fontWeight: FontWeight.w800, color: p.ink1)),
+      const SizedBox(height: 2),
+      Text(label,
+          textAlign: TextAlign.center,
+          style: pvManrope(fontSize: 12, fontWeight: FontWeight.w700, color: p.ink3)),
+    ]);
+  }
+
+  // Kept for revert (2026-10-02): the start card, the heart with its words, the
+  // chips, and the note card always open. `build` replaced it.
+  // ignore: unused_element
+  Widget _buildClassic(BuildContext context) {
     final s = _s;
     // FRONT PAGE ON THE TOOL SHELL (2026-09-30, Tools audit). The shell's hero
     // (mark, eyebrow, title, intro) replaces the app bar and the in-body title.
@@ -536,6 +798,212 @@ class _BabyMovementScreenState extends State<BabyMovementScreen>
 }
 
 // ---------------------------------------------------------------------------
+//  The disc and the timeline (2026-10-02)
+// ---------------------------------------------------------------------------
+
+/// The one control: idle it is a white disc that starts a session; in a session
+/// it is the ink heart with the number of movements in it. A tap logs one.
+class _MovementDisc extends StatelessWidget {
+  const _MovementDisc({
+    super.key,
+    required this.active,
+    required this.count,
+    required this.label,
+    required this.semanticLabel,
+    required this.pulse,
+    required this.onTap,
+  });
+
+  final bool active;
+  final int count;
+  final String label;
+  final String semanticLabel;
+
+  /// Just logged: the halo widens for a moment.
+  final bool pulse;
+  final VoidCallback onTap;
+
+  static const double size = 236;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = pvStorePalette;
+    final onInk = active ? Colors.white : p.ink1;
+    final quiet = active ? Colors.white.withValues(alpha: 0.82) : p.ink3;
+    return Semantics(
+      button: true,
+      label: semanticLabel,
+      excludeSemantics: true,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          boxShadow: active
+              ? [
+                  BoxShadow(
+                    color: kPvInk.withValues(alpha: pulse ? 0.22 : 0.12),
+                    blurRadius: 30,
+                    spreadRadius: pulse ? 12 : 4,
+                  ),
+                ]
+              : const [],
+        ),
+        child: Material(
+          color: active ? (pulse ? p.ink2 : kPvInk) : Colors.white,
+          shape: CircleBorder(
+            side: active
+                ? BorderSide.none
+                : const BorderSide(color: kPvLine, width: 7),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: () {
+              HapticFeedback.mediumImpact();
+              onTap();
+            },
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 26),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (active) ...[
+                      Icon(Icons.favorite_rounded, size: 26, color: quiet),
+                      const SizedBox(height: 2),
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text('$count',
+                            key: const ValueKey('bm_count'),
+                            style: pvManrope(
+                                fontSize: 72,
+                                fontWeight: FontWeight.w800,
+                                height: 1.05,
+                                letterSpacing: -1.5,
+                                color: onInk)),
+                      ),
+                    ] else
+                      Icon(Icons.play_arrow_rounded, size: 58, color: onInk),
+                    const SizedBox(height: 6),
+                    Text(label,
+                        textAlign: TextAlign.center,
+                        textScaler: const TextScaler.linear(1.0),
+                        style: pvManrope(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.4,
+                            height: 1.25,
+                            color: quiet)),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// A session as a line from its start to now (or its end), with a dot for each
+/// movement. A cluster and a quiet stretch both show at a glance. It states no
+/// norm: there is no "good" gap drawn on it.
+class _MovementStrip extends StatelessWidget {
+  const _MovementStrip({
+    super.key,
+    required this.start,
+    required this.end,
+    required this.times,
+    required this.startLabel,
+    required this.endLabel,
+  });
+
+  final DateTime start;
+  final DateTime end;
+  final List<DateTime> times;
+  final String startLabel;
+  final String endLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = pvStorePalette;
+    // A session under a minute long is drawn as a minute, so two taps in the
+    // first seconds do not sit on top of each other at the left edge.
+    final spanMs = math.max(end.difference(start).inMilliseconds, 60000);
+    return Column(children: [
+      SizedBox(
+        height: 30,
+        child: CustomPaint(
+          size: const Size(double.infinity, 30),
+          painter: _StripPainter(
+            fractions: [
+              for (final t in times)
+                (t.difference(start).inMilliseconds / spanMs).clamp(0.0, 1.0),
+            ],
+            line: kPvLine,
+            dot: kPvInk,
+          ),
+        ),
+      ),
+      const SizedBox(height: 6),
+      Row(children: [
+        Text(startLabel,
+            textScaler: const TextScaler.linear(1.0),
+            style: pvManrope(fontSize: 11.5, fontWeight: FontWeight.w700, color: p.ink3)),
+        const Spacer(),
+        Text(endLabel,
+            textScaler: const TextScaler.linear(1.0),
+            style: pvManrope(fontSize: 11.5, fontWeight: FontWeight.w700, color: p.ink3)),
+      ]),
+    ]);
+  }
+}
+
+class _StripPainter extends CustomPainter {
+  _StripPainter({required this.fractions, required this.line, required this.dot});
+  final List<double> fractions;
+  final Color line;
+  final Color dot;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    const pad = 7.0;
+    final y = size.height / 2;
+    canvas.drawLine(
+        Offset(pad, y),
+        Offset(size.width - pad, y),
+        Paint()
+          ..color = line
+          ..strokeWidth = 3
+          ..strokeCap = StrokeCap.round);
+    final w = size.width - pad * 2;
+    for (var i = 0; i < fractions.length; i++) {
+      final newest = i == fractions.length - 1;
+      canvas.drawCircle(
+        Offset(pad + w * fractions[i], y),
+        newest ? 7 : 5,
+        Paint()..color = newest ? dot : dot.withValues(alpha: 0.55),
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(_StripPainter old) =>
+      old.fractions.length != fractions.length ||
+      old.line != line ||
+      old.dot != dot ||
+      !_same(old.fractions, fractions);
+
+  static bool _same(List<double> a, List<double> b) {
+    for (var i = 0; i < a.length && i < b.length; i++) {
+      if (a[i] != b[i]) return false;
+    }
+    return true;
+  }
+}
+
+// ---------------------------------------------------------------------------
 //  History (one entry per session; counts live here, never on the tracker)
 // ---------------------------------------------------------------------------
 
@@ -637,11 +1105,28 @@ class _SessionCard extends StatelessWidget {
                 color: p.ink1,
               ),
             ),
+            const SizedBox(height: 12),
+            // The session as a line, and its times one tap away (2026-10-02).
+            // Kept for revert: a Wrap of every time as a pill, always open.
+            _MovementStrip(
+              start: rec.start,
+              end: rec.end.isAfter(rec.start) ? rec.end : rec.times.last,
+              times: rec.times,
+              startLabel: s.formatClock(rec.start),
+              endLabel: s.formatClock(rec.end),
+            ),
             const SizedBox(height: 10),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [for (final t in rec.times) _pill(s.formatClock(t))],
+            PregFoldRow(
+              keyPrefix: 'bm_hist',
+              fold: rec.id,
+              icon: Icons.schedule_rounded,
+              title: s.viewAllTimes,
+              count: '${rec.times.length}',
+              body: Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [for (final t in rec.times) _pill(s.formatClock(t))],
+              ),
             ),
           ],
         ),

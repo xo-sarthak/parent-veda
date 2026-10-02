@@ -67,7 +67,7 @@ import 'ttc_tool_chrome.dart';
 import 'ttc_pcos_check_screen.dart' show kPcosHue;
 import 'ttc_tool_hues.dart';
 import 'ttc_prepare_screen.dart';
-import 'ttc_focus_screen.dart' show openTtcArticle;
+import 'ttc_read_next.dart' show ttcToolReadNext;
 
 class TtcPcosStandScreen extends StatefulWidget {
   const TtcPcosStandScreen({super.key});
@@ -363,6 +363,8 @@ class _TtcPcosStandBodyState extends State<TtcPcosStandBody> {
               if (_saved.pcosAt case final at?) ...[
                 ttcToolPad(TtcToolLastCheck(
                   key: const ValueKey('ttc_pcos_stand_last'),
+                  // One collapsible card on every tool (2026-10-02). Yesterday's
+                  // `compact: true` made PCOS and fertility help disagree.
                   at: at,
                   line: 'Your answers are filled in below. Change anything '
                       "that's different, then see your pattern again.",
@@ -716,16 +718,12 @@ class TtcPcosStandResultScreen extends StatelessWidget {
                         builder: (_) =>
                             TtcPcosChecklistScreen(result: result, hue: hue))),
               )),
-              const SizedBox(height: 10),
-              _pad(TtcToolSecondary(
-                key: const ValueKey('ttc_pcos_stand_read'),
-                label: 'Read: irregular periods, explained',
-                onTap: () => openTtcArticle(
-                    context, 'ttc_read_pcos_irregular',
-                    // The read keeps its door's colour; only the tool's own
-                    // screens follow the Tools rule (T6).
-                    hue: kPcosHue),
-              )),
+              // ⚠️ THE ARTICLE MOVED TO THE FOOT (2026-10-02, the user: the
+              // article on a tool screen should be the reader's "Read next"
+              // rail at the bottom, and "other screens in tools might contain
+              // the same layout, so update them as well"). It was a third
+              // button in this stack, keyed `ttc_pcos_stand_read`, labelled
+              // 'Read: irregular periods, explained'. Kept for revert.
               const SizedBox(height: 10),
               _pad(TtcToolSecondary(
                 label: 'Book a PCOS specialist',
@@ -748,6 +746,16 @@ class TtcPcosStandResultScreen extends StatelessWidget {
 
               const SizedBox(height: 16),
               _pad(const TtcToolPrivacyLine()),
+              const SizedBox(height: 26),
+              // The reader's own foot, last on the screen.
+              ...ttcToolReadNext(
+                context,
+                const ['ttc_read_pcos_irregular'],
+                // The read keeps its door's colour; only the tool's own
+                // screens follow the Tools rule (T6).
+                hue: kPcosHue,
+                railKey: const ValueKey('ttc_pcos_stand_read_next'),
+              ),
               const SizedBox(height: 26),
       ],
     );

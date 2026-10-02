@@ -345,12 +345,19 @@ class TtcDoseLinkRow extends StatelessWidget {
     required this.text,
     required this.onTap,
     this.eyebrow,
+    this.mark,
   });
 
   final IconData icon;
   final String text;
   final String? eyebrow;
   final VoidCallback onTap;
+
+  /// ⚠️ A DRAWN MARK INSTEAD OF THE LINE ICON (2026-10-01, the user: the
+  /// gateway from Supplements to Medication, and from Medication to
+  /// Supplements, should wear the other tool's own mark). One object, one
+  /// drawing, wherever it appears. Null keeps [icon], as every other row does.
+  final Widget? mark;
 
   @override
   Widget build(BuildContext context) {
@@ -365,7 +372,10 @@ class TtcDoseLinkRow extends StatelessWidget {
           border: Border.all(color: p.line),
         ),
         child: Row(children: [
-          Icon(icon, size: 19, color: p.ink2),
+          if (mark != null)
+            SizedBox(width: 38, height: 38, child: mark)
+          else
+            Icon(icon, size: 19, color: p.ink2),
           const SizedBox(width: 12),
           Expanded(
             child: Column(

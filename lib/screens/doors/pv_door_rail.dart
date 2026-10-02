@@ -29,9 +29,13 @@ import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_feedback.dart';
 import '../brackets/hub/hub_intent_art.dart';
 import '../v2/v2_palette.dart';
+import '../ttc/ttc_tool_marks.dart' show ttcFamilyMarkForIntent;
 import 'pv_door_chrome.dart';
 
 const Key kPvDoorRailKey = ValueKey('pv-door-rail');
+
+/// True: the quiet tab card, no count line (TTC's `kTtcDoorRailQuiet`).
+const bool kPvDoorRailQuiet = true;
 Key pvDoorRailCardKey(int i) => ValueKey('pv-door-rail-$i');
 
 class PvDoorRail extends StatefulWidget {
@@ -50,21 +54,26 @@ class PvDoorRail extends StatefulWidget {
   final V2Palette p;
   final ValueChanged<int> onPick;
 
-  static const double cardWidth = 168;
+  // ⚠️ TTC'S DOOR RAIL, QUIETER (2026-10-02, the user: make the pregnancy
+  // doors the same as TTC's). 150 wide so a fifth of the third card shows, 112
+  // tall, a 38 mark, a thin ring, no count line, Flo's size. These were 168,
+  // 136, 48 and 44 (and a count line, a 1.2 ring, a 24 radius, a deeper
+  // shadow); kept for revert in each line's note below.
+  static const double cardWidth = 150; // was 168
 
   /// 164 for the first day (Flo's ~170). The user, 2026-09-18 evening: the
   /// gap between the mark and the heading was air, not composition — so the
   /// card is shorter. Flip back to 164 to revert.
-  static const double cardHeight = 136; // was 164
+  static const double cardHeight = 112; // was 136, and 164 before that
 
   /// The mark bare on the white card, larger, no tinted square around it —
   /// Flo's own cards carry a bare icon. `false` restores the 44pt tinted
   /// well (kept below for revert).
   static const bool bareMark = true;
-  static const double markSize = 48;
+  static const double markSize = 38; // was 48
 
   /// How much of the rail rides up over the hero photograph.
-  static const double overlap = 44; // was 70 — the cards covered the hero's blurb
+  static const double overlap = 40; // was 44, and 70 — the cards covered the hero's blurb
 
   @override
   State<PvDoorRail> createState() => _PvDoorRailState();
@@ -138,18 +147,19 @@ class _PvDoorRailState extends State<PvDoorRail> {
           curve: Curves.easeOut,
           width: PvDoorRail.cardWidth,
           height: PvDoorRail.cardHeight,
-          padding: const EdgeInsets.fromLTRB(16, 14, 14, 14), // top was 16
+          // TTC's door card (2026-10-02). Kept for revert: padding
+          // fromLTRB(16, 14, 14, 14), radius 24, a 1.2 ring when chosen, and a
+          // shadow of 0.10 at blur 18, offset 6.
+          padding: const EdgeInsets.fromLTRB(14, 12, 10, 12),
           decoration: BoxDecoration(
             color: p.surface,
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(
-                color: on ? p.ink1 : p.line,
-                width: on ? 1.2 : 1), // selected was 1.8 — "less thick" (user)
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: on ? p.ink1 : p.line, width: 1),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.10),
-                blurRadius: 18,
-                offset: const Offset(0, 6),
+                color: Colors.black.withValues(alpha: 0.06),
+                blurRadius: 14,
+                offset: const Offset(0, 4),
               ),
             ],
           ),
@@ -164,9 +174,12 @@ class _PvDoorRailState extends State<PvDoorRail> {
                 SizedBox(
                   width: PvDoorRail.markSize,
                   height: PvDoorRail.markSize,
-                  child: g.mark != null
-                      ? HubIntentArt(mark: g.mark!, tint: tint)
-                      : Icon(g.icon, size: 28, color: p.ink1),
+                  // The TTC family's object where there is one (2026-10-02),
+                  // else the tab's own mark, as before.
+                  child: ttcFamilyMarkForIntent(g.mark, tint, forDoor: true) ??
+                      (g.mark != null
+                          ? HubIntentArt(mark: g.mark!, tint: tint)
+                          : Icon(g.icon, size: 28, color: p.ink1)),
                 )
               else
                 Container(
@@ -188,16 +201,26 @@ class _PvDoorRailState extends State<PvDoorRail> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                      // ⚠️ ONE LINE AT A LARGE TEXT SIZE (2026-10-02): the card
+                      // is 112 tall now (was 136), and a 38 mark plus two lines
+                      // at 1.5x is 2pt more than it has. The label ellipsizes
+                      // rather than the card clip it. Kept for revert:
+                      // `maxLines: 2` always.
                       Text(g.label,
-                          maxLines: 2,
+                          maxLines: MediaQuery.textScalerOf(context).scale(10) > 13
+                              ? 1
+                              : 2,
                           overflow: TextOverflow.ellipsis,
                           style: pvManrope(
-                              fontSize: 15,
+                              fontSize: 14,
                               fontWeight: on ? FontWeight.w800 : FontWeight.w700,
                               height: 1.2,
-                              letterSpacing: -0.2,
+                              letterSpacing: -0.1,
                               color: p.ink1)),
-                      if (count.isNotEmpty) ...[
+                      // ⚠️ NO COUNT LINE (2026-10-02), as TTC's quiet tab card:
+                      // the number of pieces under a tab is not what she
+                      // chooses by. Kept for revert: `kPvDoorRailQuiet = false`.
+                      if (!kPvDoorRailQuiet && count.isNotEmpty) ...[
                         const SizedBox(height: 3),
                         Text(count,
                             maxLines: 1,
@@ -211,7 +234,7 @@ class _PvDoorRailState extends State<PvDoorRail> {
                   ),
                 ),
                 const SizedBox(width: 6),
-                Icon(Icons.chevron_right_rounded, size: 22, color: p.ink2),
+                Icon(Icons.chevron_right_rounded, size: 20, color: p.ink2),
               ]),
             ],
           ),

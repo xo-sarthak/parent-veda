@@ -306,7 +306,9 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
           );
         },
       ),
-    ).whenComplete(ctl.dispose);
+    ).whenComplete(() {
+      Future<void>.delayed(const Duration(milliseconds: 600), ctl.dispose);
+    });
   }
 
   Widget _hero() {

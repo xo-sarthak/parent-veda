@@ -56,8 +56,9 @@ import '../v2/v2_palette.dart';
 import 'ttc_dose_parts.dart';
 import 'ttc_ivf_readiness_screen.dart' show kIvfHue;
 import 'ttc_medication_screen.dart' show openTtcMedication;
+import 'ttc_read_next.dart' show ttcToolReadNext;
+import 'ttc_tool_marks.dart' show TtcToolArt, TtcToolMark;
 import 'ttc_strings.dart';
-import 'ttc_surface_router.dart' show openTtcSurface, kTtcReadPrefix;
 import 'ttc_tool_chrome.dart';
 import 'ttc_tool_confirm.dart';
 
@@ -236,18 +237,13 @@ class _TtcSupplementsScreenState extends State<TtcSupplementsScreen> {
                   ],
 
                   const SizedBox(height: 8),
-                  // What to Expect's vitamin log opens with one read; this is
-                  // ours, where she is deciding what to take.
-                  TtcDoseLinkRow(
-                    key: const ValueKey('ttc_supp_read'),
-                    icon: Icons.menu_book_outlined,
-                    eyebrow: 'Read',
-                    text: 'When to start what, and how early',
-                    onTap: () => openTtcSurface(
-                      context,
-                      '$kTtcReadPrefix$kTtcSupplementsRead',
-                    ),
-                  ),
+                  // ⚠️ THE ARTICLE MOVED TO THE FOOT (2026-10-01, the user:
+                  // "provide the article at the end of the screen … at the
+                  // bottom"). It was a bordered "Read" row between her list
+                  // and the suggestions; it is the reader's "Read next" rail
+                  // at the very end now (`ttcToolReadNext`). Kept for revert:
+                  // a `TtcDoseLinkRow` keyed `ttc_supp_read`, eyebrow 'Read',
+                  // opening '$kTtcReadPrefix$kTtcSupplementsRead'.
 
                   if (ideas.isNotEmpty) ...[
                     const SizedBox(height: 26),
@@ -282,7 +278,15 @@ class _TtcSupplementsScreenState extends State<TtcSupplementsScreen> {
                   // on Medication: two tiles sit side by side in Tools, and
                   // nothing said which one a prescription goes in.
                   TtcDoseLinkRow(
+                    key: const ValueKey('ttc_supp_to_medication'),
                     icon: Icons.medication_outlined,
+                    // The Medication tool's own drawn mark (2026-10-01, the
+                    // user), so one tool keeps one drawing. Kept for revert:
+                    // the line icon above is still the fallback.
+                    mark: TtcToolArt(
+                      mark: TtcToolMark.medication,
+                      tint: v2BlockTint(kIvfHue, p),
+                    ),
                     text:
                         'Something your clinic prescribed? That goes in '
                         'Medication.',
@@ -310,6 +314,14 @@ class _TtcSupplementsScreenState extends State<TtcSupplementsScreen> {
                 ],
               ),
             ),
+            // The last thing on the screen: the reader's own foot.
+            ...ttcToolReadNext(
+              context,
+              const [kTtcSupplementsRead],
+              hue: kIvfHue,
+              railKey: const ValueKey('ttc_supp_read_next'),
+            ),
+            const SizedBox(height: 26),
           ],
         );
       },
@@ -430,6 +442,87 @@ class _SuggestionGroupRow extends StatelessWidget {
     );
   }
 
+  /// The first sentence of a note: what it is for, in a line. The whole note
+  /// is one tap away ("More"), so the list reads as names and reasons, not as
+  /// paragraphs (2026-10-01, the user: "so much info" under Commonly taken).
+  static String _short(String note) {
+    final m = RegExp(r'^(.+?[.!?])(\s|$)').firstMatch(note.trim());
+    return m?.group(1) ?? note.trim();
+  }
+
+  /// The full note or notes, with the add buttons, in a sheet.
+  void _more(BuildContext context) {
+    final p = V2PaletteStore.instance.current;
+    final hi = t.hinglish;
+    final both = variants.length > 1;
+    final first = variants.first;
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: p.ground,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(22, 22, 22, 18),
+          child: Column(
+            key: ValueKey('ttc_supp_more_${first.name}'),
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(first.name,
+                  style: pvFraunces(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w600,
+                      color: p.ink1)),
+              if (first.dose.isNotEmpty) ...[
+                const SizedBox(height: 4),
+                Text(first.dose,
+                    style: pvManrope(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: p.ink2)),
+              ],
+              const SizedBox(height: 14),
+              for (final v in variants) ...[
+                if (both)
+                  Text(v.forPartner ? 'For him' : 'For you',
+                      style: pvManrope(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w800,
+                          color: p.ink1)),
+                Text(v.note(hi),
+                    style: pvManrope(fontSize: 14, height: 1.6, color: p.ink2)),
+                const SizedBox(height: 12),
+              ],
+              Text(
+                "Listing one here isn't advice to take it.",
+                style: pvManrope(fontSize: 12, height: 1.5, color: p.ink3),
+              ),
+              const SizedBox(height: 14),
+              for (final v in variants) ...[
+                TtcDoseInkButton(
+                  label: both
+                      ? (v.forPartner ? 'Add for him' : 'Add for you')
+                      : (v.forPartner
+                            ? "Add to your partner's list"
+                            : 'Add to my list'),
+                  icon: Icons.add_rounded,
+                  onTap: () {
+                    Navigator.of(ctx).pop();
+                    _add(context, v);
+                  },
+                ),
+                if (v != variants.last) const SizedBox(height: 8),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final p = V2PaletteStore.instance.current;
@@ -520,8 +613,14 @@ class _SuggestionGroupRow extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 6),
+        // ⚠️ A LINE, NOT A PARAGRAPH (2026-10-01, the user, with a Mobbin pass:
+        // MacroFactor's "Common … See more", Chick-fil-A's compact rows with
+        // the detail one tap away). Each row shows what the thing is for in
+        // its first sentence and "More" opens the whole note. Kept for revert:
+        // the full `note` text here, on every row.
         if (!both)
-          Text(first.note(hi), style: noteStyle)
+          Text(_short(first.note(hi)),
+              maxLines: 2, overflow: TextOverflow.ellipsis, style: noteStyle)
         else
           for (final v in variants) ...[
             Text.rich(
@@ -531,13 +630,35 @@ class _SuggestionGroupRow extends StatelessWidget {
                     text: v.forPartner ? 'For him: ' : 'For you: ',
                     style: forLabelStyle,
                   ),
-                  TextSpan(text: v.note(hi)),
+                  TextSpan(text: _short(v.note(hi))),
                 ],
               ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
               style: noteStyle,
             ),
             if (v != variants.last) const SizedBox(height: 6),
           ],
+        InkWell(
+          key: ValueKey('ttc_supp_more_link_${first.name}'),
+          onTap: () => _more(context),
+          borderRadius: BorderRadius.circular(8),
+          child: Padding(
+            padding: const EdgeInsets.only(top: 6, bottom: 2, right: 12),
+            child: Text(
+              // Names what it opens (the repo's rule: every label says what she
+              // is tapping, and two tappables never share one). Kept for
+              // revert: 'More'.
+              'More on ${first.name}',
+              style: pvManrope(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w800,
+                color: p.ink1,
+                decoration: TextDecoration.underline,
+              ),
+            ),
+          ),
+        ),
       ],
     );
 

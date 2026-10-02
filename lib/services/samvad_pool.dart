@@ -162,7 +162,9 @@ List<SamvadGroup> samvadLibraryGroups(ReadToBabyStore store, int trimester) {
         final reads = t.sections[i].reads;
         if (reads.isEmpty) continue;
         groups.add(SamvadGroup(
-            heading: '${t.symbol} ${t.name} · ${t.sections[i].title}',
+            // The emoji left the heading (2026-10-02). Kept for revert:
+            // '${t.symbol} ${t.name} · ${t.sections[i].title}'.
+            heading: '${t.name} · ${t.sections[i].title}',
             pieces: [
               for (final r in reads)
                 SamvadPiece(title: r.title.now, body: r.body.now, group: t.name.now)

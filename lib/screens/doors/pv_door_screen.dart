@@ -45,6 +45,7 @@
 //  fortnight later with a different question.
 // =============================================================================
 
+import 'package:flutter/foundation.dart' show ValueListenable;
 import 'package:flutter/material.dart';
 
 import '../../data/doors/pv_door_data.dart';
@@ -66,6 +67,9 @@ import 'pv_door_chips.dart';
 import 'pv_door_chrome.dart';
 import 'pv_door_rail.dart';
 import 'pv_door_tiles.dart';
+import 'pv_shelf_card.dart';
+import 'pv_shelf_spec.dart';
+import '../ttc/doors/ttc_door_card.dart' show showTtcDoorFlagSheet;
 import 'pv_door_router.dart';
 import '../search/pv_search_screen.dart';
 import '../tools/ask_veda_screen.dart';
@@ -156,6 +160,38 @@ const Set<String> kPvDoorSelfPaddedTools = {
 /// reappears in the sheet's rounded corners or the page grows a gap.
 const Key kPvDoorSearchKey = ValueKey('pv-door-search');
 
+/// The folded warning-signs row (a test finds it).
+const Key kPvDoorFlagRowKey = ValueKey('pv-door-flag-row');
+
+/// The hero's title: the door's own name (a test finds it).
+const Key kPvDoorHeroTitleKey = ValueKey('pv-door-hero-title');
+
+/// True: a tab's warning signs are one folded row that opens the full list in
+/// a sheet, as TTC's doors do (2026-10-02, the user: "the warning signs can be
+/// folded"). Nothing is removed: the sheet is the same block, every sign, its
+/// footer and its way to the full page. False draws the block open on the tab,
+/// as it was.
+const bool kPvDoorFlagFolded = true;
+
+/// True: every section is a rail of TTC-format shelf cards (`PvShelfCard`,
+/// 2026-10-02). False restores the rows-when-all-written list and the tall rail
+/// cards.
+const bool kPvDoorShelf = true;
+
+/// TTC's one vertical rhythm (`_kTtcDoorBlockGap`, `_kTtcDoorHeadingGap`):
+/// between blocks, and from a heading to its shelf.
+const double kPvDoorBlockGap = 24;
+const double kPvDoorHeadingGap = 12;
+
+/// True: TTC's quiet hero (2026-10-02). False restores the eyebrow, headline
+/// and blurb hero.
+const bool kPvDoorHeroQuiet = true;
+
+/// The quiet hero's height under the status bar, the same on every door
+/// (TTC's `kTtcDoorHeroQuietHeight`; `test/pv_door_ttc_format_test.dart` holds
+/// the two equal).
+const double kPvDoorHeroQuietHeight = 262;
+
 const double kPvDoorHeroOverlap =
     38; // the rail lifts by PvDoorRail.overlap (70); see _Hero's `bottom`
 
@@ -238,15 +274,30 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
   // (`PvSearchHitRow`), her recents (`PvSearchStore`) and the two ways on.
   final PvLiveSearch _search = PvLiveSearch();
 
+  /// The hero's parallax reads this (2026-10-02, TTC's quiet hero): the photo
+  /// climbs at under half the scroll speed while the sheet slides up over it,
+  /// and the words fade as it goes.
+  final ScrollController _scroll = ScrollController();
+  final ValueNotifier<double> _offset = ValueNotifier(0);
+
+  void _onScroll() {
+    final o = _scroll.offset;
+    if (o != _offset.value) _offset.value = o;
+  }
+
   @override
   void initState() {
     super.initState();
+    _scroll.addListener(_onScroll);
     PvDoorStripStore.instance.init();
     PvSearchStore.instance.init();
   }
 
   @override
   void dispose() {
+    _scroll.removeListener(_onScroll);
+    _scroll.dispose();
+    _offset.dispose();
     _search.dispose();
     super.dispose();
   }
@@ -377,11 +428,13 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
                   ),
                 ),
                 ListView(
+                  controller: _scroll,
                   // ⚠️ NO BOTTOM PADDING HERE — THE SHEET OWNS THE CLEARANCE. See
                   // `PvDoorSheet`.
                   padding: EdgeInsets.zero,
                   children: [
                     _Hero(
+                      scroll: _offset,
                       page: page,
                       p: p,
                       tint: tint,
@@ -483,7 +536,8 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
                               p: p,
                               onPick: (i) => setState(() => _group = i),
                             ),
-                          const SizedBox(height: 18), // was 26
+                          // TTC's block gap (2026-10-02). Kept for revert: 18.
+                          const SizedBox(height: kPvDoorBlockGap), // was 18, and 26
                           // ---- a pinned red flag, above everything ---------------
                           //
                           // ⚠️ ABOVE THE CONTENT AND NEVER IN AN ACCORDION. A rail is a
@@ -491,6 +545,42 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
                           // matches her situation has already been asked to make a
                           // choice. This should not wait for one.
                           if (group.pinnedRedFlag case final flag?) ...[
+                            // ⚠️ FOLDED (2026-10-02): one quiet row; the whole
+                            // block opens in a sheet. Where a tab opens on a
+                            // flag it is still the first thing on the tab.
+                            // Kept for revert: `kPvDoorFlagFolded = false`.
+                            if (kPvDoorFlagFolded)
+                              pvDoorPad(
+                                _PinnedRedFlagRow(
+                                  flag: flag,
+                                  p: p,
+                                  onOpen: () => showTtcDoorFlagSheet(
+                                    context,
+                                    p: p,
+                                    body: (sheet) => _PinnedRedFlag(
+                                      flag: flag,
+                                      p: p,
+                                      onTap: () {
+                                        Navigator.of(sheet).pop();
+                                        openPvDoorSurface(
+                                          context,
+                                          flag.surfaceId,
+                                          widget.pregnancy,
+                                        );
+                                      },
+                                      onLine: (conditionId) {
+                                        Navigator.of(sheet).pop();
+                                        openPvDoorConditionPage(
+                                          context,
+                                          conditionId,
+                                          widget.pregnancy,
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              )
+                            else
                             pvDoorPad(
                               _PinnedRedFlag(
                                 flag: flag,
@@ -508,7 +598,8 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
                                     ),
                               ),
                             ),
-                            const SizedBox(height: 22),
+                            // 24 (2026-10-02, TTC's rhythm). Kept for revert: 22.
+                            const SizedBox(height: kPvDoorBlockGap),
                           ],
 
                           // ---- a note that belongs to the tab, if it has one -----
@@ -527,7 +618,8 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
                                   )
                               case final note?) ...[
                             pvDoorPad(_TabNote(note: note, p: p)),
-                            const SizedBox(height: 20),
+                            // 24 (2026-10-02, TTC's rhythm). Kept for revert: 20.
+                            const SizedBox(height: kPvDoorBlockGap),
                           ],
 
                           // ---- the tool, rendered in place ----------------------
@@ -743,7 +835,9 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
                                     ],
                                   ),
                                 ),
-                              const SizedBox(height: 13),
+                              // 12 (2026-10-02, TTC's heading gap). Kept for
+                              // revert: 13.
+                              const SizedBox(height: kPvDoorHeadingGap),
                               // ⚠️ EVERY SECTION IS A RAIL. ONE TILE, TWO TILES, A TOOL
                               // TAB — A RAIL. Decided by the user on the phone,
                               // 2026-09-11, and it reverses two earlier rules in this
@@ -795,6 +889,50 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
                               // rail. One layout rule, no per-door flag.
                               // Written, or all tracks — see `pvDoorSectionIsRows`.
                               // Was `tiles.every(pvDoorTileIsWritten)`.
+                              // ⚠️ TTC'S SHELF (2026-10-02, the user: make the
+                              // pregnancy doors the same as TTC's). Every
+                              // section that is not an inline tool is a rail of
+                              // `PvShelfCard`: a picture, a badge, the title and
+                              // one grey line. This retires the
+                              // rows-when-all-written list below and the tall
+                              // rail card after it, which stay as written
+                              // behind `kPvDoorShelf = false`. A folded section
+                              // still folds.
+                              else if (kPvDoorShelf)
+                                AnimatedSize(
+                                  duration: const Duration(milliseconds: 220),
+                                  curve: Curves.easeOutCubic,
+                                  alignment: Alignment.topCenter,
+                                  child:
+                                      section.folded &&
+                                          !_open.contains(section.heading)
+                                      ? const SizedBox(width: double.infinity)
+                                      : SizedBox(
+                                          key: pvDoorSectionShelfKey(
+                                            section.heading,
+                                          ),
+                                          height: pvShelfRailHeight(
+                                            MediaQuery.textScalerOf(context),
+                                          ),
+                                          child: ListView.separated(
+                                            scrollDirection: Axis.horizontal,
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: kPvDoorGutter,
+                                            ),
+                                            itemCount: tiles.length,
+                                            separatorBuilder: (_, _) =>
+                                                const SizedBox(width: 12),
+                                            itemBuilder: (context, i) =>
+                                                _ShelfCard(
+                                                  tile: tiles[i],
+                                                  p: p,
+                                                  hue: group.hue.toDouble(),
+                                                  onTap: () =>
+                                                      _openTile(tiles[i]),
+                                                ),
+                                          ),
+                                        ),
+                                )
                               else if (pvDoorSectionIsRows(tiles))
                                 AnimatedSize(
                                   duration: const Duration(milliseconds: 220),
@@ -833,7 +971,8 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
                                     ),
                                   ),
                                 ),
-                              const SizedBox(height: 26),
+                              // 24 (2026-10-02, TTC's rhythm). Kept for revert: 26.
+                              const SizedBox(height: kPvDoorBlockGap),
                             ],
 
                           // ⚠️ THE CLOSING LINE, UNDER WHATEVER TAB IS OPEN. "Shown
@@ -1011,6 +1150,7 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
 
 class _Hero extends StatelessWidget {
   const _Hero({
+    required this.scroll,
     required this.page,
     required this.p,
     required this.tint,
@@ -1020,6 +1160,7 @@ class _Hero extends StatelessWidget {
     required this.search,
   });
 
+  final ValueListenable<double> scroll;
   final PvDoorPage page;
   final PvLiveSearch search;
   final PregnancyController pregnancy;
@@ -1039,8 +1180,217 @@ class _Hero extends StatelessWidget {
       ? kPvDoorHeroOverlap + PvDoorRail.overlap
       : kPvDoorHeroOverlap;
 
+  /// ⚠️ THE QUIET HERO, TTC'S (2026-10-02, the user: make the pregnancy doors
+  /// the same as TTC's, keeping the pregnancy hero pictures for now). The
+  /// door's NAME is the title, the headline sentence the one line under it,
+  /// and the white search pill: no caps eyebrow over a serif headline over a
+  /// three-line blurb. One height on every door ([kPvDoorHeroQuietHeight]), the
+  /// photograph parallaxing behind a shade that sits behind the words only.
+  /// Kept for revert: `kPvDoorHeroQuiet = false` draws the eyebrow, headline
+  /// and blurb as before (`_classic`).
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) =>
+      kPvDoorHeroQuiet ? _quiet(context) : _classic(context);
+
+  static const double _kRate = 0.45;
+  static const double _kFade = 200;
+  static const double _kTopRoom = 58;
+
+  Widget _quiet(BuildContext context) {
+    final mark = bracketMarkFor(bracket.id);
+    final photo = page.heroImageUrl;
+    final top = MediaQuery.paddingOf(context).top;
+    final onRail = kPvDoorRailDoors.contains(page.bracketId);
+    const shadow = [Shadow(color: Color(0x59000000), blurRadius: 12)];
+    final onPhoto = photo != null;
+
+    final words = PvLiveSearchWords(
+      search: search,
+      child: ValueListenableBuilder<double>(
+        valueListenable: scroll,
+        builder: (context, o, child) => Opacity(
+          opacity: (1 - o / _kFade).clamp(0.0, 1.0),
+          child: child,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              eyebrow,
+              key: kPvDoorHeroTitleKey,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: pvFraunces(
+                fontSize: 28,
+                fontWeight: FontWeight.w600,
+                height: 1.12,
+                letterSpacing: -0.5,
+                color: onPhoto ? Colors.white : p.ink1,
+              ).copyWith(shadows: onPhoto ? shadow : null),
+            ),
+            const SizedBox(height: 6),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 300),
+              child: Text(
+                page.heroTitle,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: pvManrope(
+                  fontSize: 14.5,
+                  height: 1.4,
+                  fontWeight: FontWeight.w500,
+                  color: onPhoto ? Colors.white.withValues(alpha: 0.95) : p.ink2,
+                ).copyWith(shadows: onPhoto ? shadow : null),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    final field = PvLiveSearchField(
+      key: kPvDoorSearchKey,
+      search: search,
+      p: p,
+      hint: 'Search $eyebrow',
+      onSubmitted: (q) {
+        final hits = pvSearch(q.trim(), pvSearchIndexOf(page));
+        if (hits.isNotEmpty) {
+          openPvSearchHit(context, hits.first, pregnancy, query: q);
+        } else if (q.trim().isNotEmpty) {
+          openPvSearch(context, pregnancy, query: q.trim());
+        }
+      },
+    );
+
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        // The photograph runs on under the sheet's rounded top (and, on a rail
+        // door, under the lifted cards), so there is picture behind them and
+        // not the tinted field. It parallaxes (the doctor app's `DcHero`
+        // mechanism, as TTC's door): translated by a fraction of the scroll.
+        if (photo != null)
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: -_bleed,
+            child: ValueListenableBuilder<double>(
+              valueListenable: scroll,
+              builder: (context, o, child) => Transform.translate(
+                offset: Offset(0, (o * _kRate).clamp(0.0, double.infinity)),
+                child: child,
+              ),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Image.network(
+                    photo,
+                    fit: BoxFit.cover,
+                    alignment: Alignment.topCenter,
+                    errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                    loadingBuilder: (context, child, progress) =>
+                        progress == null ? child : const SizedBox.shrink(),
+                  ),
+                  // A shade behind the words only: darker at the left where
+                  // they are, clear at the right, a touch under the search.
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [
+                          Colors.black.withValues(alpha: 0.52),
+                          Colors.black.withValues(alpha: 0.38),
+                          Colors.black.withValues(alpha: 0.12),
+                        ],
+                        stops: const [0, 0.62, 1],
+                      ),
+                    ),
+                  ),
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.black.withValues(alpha: 0.18),
+                          Colors.black.withValues(alpha: 0.0),
+                          Colors.black.withValues(alpha: 0.35),
+                          Colors.black.withValues(alpha: 0.35),
+                        ],
+                        stops: const [0, 0.25, 0.55, 1],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        if (photo == null)
+          Positioned(
+            right: -26,
+            top: 52,
+            child: Opacity(
+              opacity: 0.5,
+              child: SizedBox(
+                width: 146,
+                height: 146,
+                child: mark == null
+                    ? const SizedBox.shrink()
+                    : V3BracketArt(mark: mark, tint: tint),
+              ),
+            ),
+          ),
+        Padding(
+          padding: EdgeInsets.only(top: top),
+          child: Stack(
+            alignment: Alignment.bottomLeft,
+            children: [
+              const SizedBox(
+                height: kPvDoorHeroQuietHeight,
+                width: double.infinity,
+              ),
+              Padding(
+                padding: EdgeInsets.fromLTRB(
+                  20,
+                  _kTopRoom,
+                  22,
+                  20 + (onRail ? PvDoorRail.overlap - 12 : 0),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [words, const SizedBox(height: 18), field],
+                ),
+              ),
+            ],
+          ),
+        ),
+        Positioned(
+          top: top + 8,
+          left: 20,
+          child: Material(
+            color: Colors.white.withValues(alpha: 0.55),
+            shape: const CircleBorder(),
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              onTap: () => Navigator.of(context).maybePop(),
+              child: SizedBox(
+                width: 38,
+                height: 38,
+                child: Icon(Icons.arrow_back_rounded, size: 19, color: p.ink1),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _classic(BuildContext context) {
     final mark = bracketMarkFor(bracket.id);
     final photo = page.heroImageUrl;
 
@@ -1342,6 +1692,46 @@ IconData pvDoorFormatIcon(PvDoorFormat format) => switch (format) {
 /// reports locker's "Add a report") can draw the same card without a tile.
 /// The hue-step, the quiet 96pt mark, the meta line and the title-only face
 /// are all unchanged — see the chrome file for the reasoning on each.
+/// The key on a section's shelf, by its heading, so a test can count them.
+Key pvDoorSectionShelfKey(String heading) =>
+    ValueKey('pv-door-shelf-$heading');
+
+/// A pregnancy tile as a TTC-format shelf card (2026-10-02).
+class _ShelfCard extends StatelessWidget {
+  const _ShelfCard({
+    required this.tile,
+    required this.p,
+    required this.hue,
+    required this.onTap,
+  });
+
+  final PvDoorTile tile;
+  final V2Palette p;
+  final double hue;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    // What it says it is (2026-10-02, TTC's identification: the badge by kind,
+    // the word and one fact, a ₹ and "Live 1:1" where they are true). The
+    // PICTURE is the tile's own and unchanged: its photograph, else its mark.
+    final spec = pvShelfSpecFor(tile);
+    return PvShelfCard(
+      p: p,
+      hue: hue,
+      kind: spec.kind,
+      fact: spec.fact,
+      paid: spec.paid,
+      live: spec.live,
+      mark: pvDoorTileMark(tile) ?? pvDoorFormatMark(tile.format),
+      imageUrl: tile.comingSoon ? null : pvDoorTilePhoto(tile),
+      title: tile.title,
+      comingSoon: tile.comingSoon,
+      onTap: onTap,
+    );
+  }
+}
+
 class _RailCard extends StatelessWidget {
   const _RailCard({
     required this.tile,
@@ -1428,6 +1818,111 @@ class _RailCard extends StatelessWidget {
 /// system is reserved for destructive confirmation, never urgency, and a red
 /// block on a records screen shouts at somebody who is already frightened. It
 /// earns attention by sitting above everything rather than by being loud.
+/// The folded form of a tab's warning signs: a hospital mark with a small red
+/// dot, the door's own flag title, its first sign on one grey line, a chevron
+/// (TTC's `TtcDoorFlagRow` in its quiet form, with this door's words rather
+/// than a fixed title). Tapping opens the full block in a sheet.
+class _PinnedRedFlagRow extends StatelessWidget {
+  const _PinnedRedFlagRow({
+    required this.flag,
+    required this.p,
+    required this.onOpen,
+  });
+
+  final PvDoorRedFlag flag;
+  final V2Palette p;
+  final VoidCallback onOpen;
+
+  @override
+  Widget build(BuildContext context) {
+    final first = flag.lines.isEmpty ? '' : flag.lines.first.text;
+    return Semantics(
+      button: true,
+      label: '${flag.title}. ${first.isEmpty ? 'See the signs' : first}',
+      excludeSemantics: true,
+      child: PvPress(
+        child: Material(
+          color: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+            side: BorderSide(color: p.line),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            key: kPvDoorFlagRowKey,
+            onTap: () {
+              pvCommitFeedback();
+              onOpen();
+            },
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(14, 12, 10, 12),
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 26,
+                    height: 26,
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Icon(Icons.local_hospital_outlined,
+                            size: 22, color: p.ink1),
+                        Positioned(
+                          right: -1,
+                          top: -1,
+                          child: Container(
+                            width: 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFE5484D),
+                              shape: BoxShape.circle,
+                              border:
+                                  Border.all(color: Colors.white, width: 1.5),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          flag.title,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: pvManrope(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            height: 1.3,
+                            color: p.ink1,
+                          ),
+                        ),
+                        if (first.isNotEmpty) ...[
+                          const SizedBox(height: 2),
+                          Text(
+                            first,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: pvManrope(fontSize: 12.5, color: p.ink2),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  Icon(Icons.chevron_right_rounded, size: 20, color: p.ink2),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _PinnedRedFlag extends StatelessWidget {
   const _PinnedRedFlag({
     required this.flag,

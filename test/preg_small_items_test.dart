@@ -54,9 +54,13 @@ void main() {
       addTearDown(t.view.reset);
       await t.pumpWidget(MaterialApp(home: BabyMovementScreen(controller: pregnancy)));
       await t.pump(const Duration(milliseconds: 300));
-      expect(find.text("Knowing your baby's pattern"), findsOneWidget);
-      expect(find.byKey(const ValueKey('movement_read_awareness')), findsOneWidget);
-      expect(find.byKey(const ValueKey('movement_read_less')), findsOneWidget);
+      // 2026-10-02: the teaching folds behind the line she must not miss, and
+      // the two reads are the reader's own "Read next" rail at the foot.
+      expect(find.text('Fewer, weaker or different movements? Call the same day'), findsOneWidget);
+      expect(find.byKey(const ValueKey('movement_read_next')), findsOneWidget);
+      for (final id in ['${kPregWeekReadPrefix}movement_awareness', 'preg_cond_read_less_movement']) {
+        expect(find.text(pregnancyReadById(id)!.title.en, skipOffstage: false), findsOneWidget, reason: id);
+      }
       expect(find.byKey(const ValueKey('movement_records_row')), findsOneWidget);
       expect(t.takeException(), isNull);
     });

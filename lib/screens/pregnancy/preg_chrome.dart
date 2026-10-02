@@ -135,9 +135,15 @@ class PregOfferRow extends StatelessWidget {
     this.price,
     this.tag,
     this.badge,
+    this.leading,
   });
 
   final IntentMark mark;
+
+  /// A mark of the TTC family in place of the well (2026-10-02, the user:
+  /// match More to TTC's marks). Drawn in a 44 box, as the TTC More rows draw
+  /// theirs. Null keeps the well, so every other caller draws as before.
+  final Widget? leading;
   final double hue;
   final String title;
   final String line;
@@ -174,7 +180,9 @@ class PregOfferRow extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.fromLTRB(14, 12, 12, 12),
           child: Row(children: [
-            PvMarkWell(p: p, hue: hue, size: 44, mark: mark),
+            leading != null
+                ? SizedBox(width: 44, height: 44, child: leading)
+                : PvMarkWell(p: p, hue: hue, size: 44, mark: mark),
             const SizedBox(width: 14),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

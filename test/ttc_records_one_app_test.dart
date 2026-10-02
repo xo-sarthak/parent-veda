@@ -200,7 +200,7 @@ void main() {
   group('add, edit, remove and Undo, from the folder', () {
     testWidgets('the whole round trip', (tester) async {
       await _pump(tester, const TtcRecordsScreen());
-      await tester.tap(find.text('Type a number instead'));
+      await tester.tap(find.text('Type in a result'));
       await tester.pumpAndSettle();
       await tester.enterText(find.byKey(const ValueKey('ttc_rec_label')), 'AMH');
       await tester.enterText(find.byKey(const ValueKey('ttc_rec_value')), '2.1');

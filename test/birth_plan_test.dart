@@ -224,6 +224,64 @@ void main() {
       expect(find.text('Share my plan'), findsOneWidget);
     });
 
+    testWidgets('reads at the size of the rest of the pregnancy tools',
+        (tester) async {
+      // 2026-10-02, the user: "the font of the birth plan is smaller than the
+      // rest of the application." Its reading text was 12.5 to 13.5; the tools
+      // around it read at 14 to 15. This holds the floor: nothing the mother
+      // reads or types on this page is below 14, so it cannot drift back.
+      // (The tool shell's own eyebrow and intro, and the shared disclaimer, are
+      // the same on every door tool and are not this screen's to set.)
+      tester.view.physicalSize = const Size(900, 9000);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+      await tester.pumpWidget(MaterialApp(
+        home: BirthPlanScreen(pregnancy: PregnancyController()),
+      ));
+      await tester.pumpAndSettle();
+      // One answer, so the share bar and "Start again" are on the page too.
+      final chip = find.text("I'll decide on the day");
+      await tester.ensureVisible(chip);
+      await tester.tap(chip);
+      await tester.pumpAndSettle();
+
+      final chrome = {'LABOUR PREP', 'Your birth plan'};
+      var checked = 0;
+      for (final w in tester.widgetList<Text>(find.byType(Text, skipOffstage: false))) {
+        final text = w.data ?? w.textSpan?.toPlainText() ?? '';
+        if (chrome.contains(text) ||
+            text.startsWith('One page your hospital') ||
+            text.startsWith("This records what you'd prefer")) {
+          continue;
+        }
+        final size = w.style?.fontSize;
+        if (size == null || text.isEmpty) continue;
+        checked++;
+        expect(size, greaterThanOrEqualTo(14), reason: '"$text" reads at $size');
+      }
+      expect(checked, greaterThan(20), reason: 'the check did not see the page');
+      // The typed answers and their hint, too.
+      for (final f in tester.widgetList<TextField>(find.byType(TextField, skipOffstage: false))) {
+        expect(f.style?.fontSize, greaterThanOrEqualTo(14));
+        expect(f.decoration?.hintStyle?.fontSize, greaterThanOrEqualTo(14));
+      }
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('holds at 1.5x text on a narrow phone', (tester) async {
+      tester.view.physicalSize = const Size(360, 9000);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+      await tester.pumpWidget(MaterialApp(
+        builder: (context, child) => MediaQuery(
+            data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.5)),
+            child: child!),
+        home: BirthPlanScreen(pregnancy: PregnancyController()),
+      ));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('never shows a count or a progress state', (tester) async {
       await tester.pumpWidget(MaterialApp(
         home: BirthPlanScreen(pregnancy: PregnancyController()),

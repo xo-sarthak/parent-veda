@@ -285,15 +285,30 @@ class _PvStoreScreenState extends State<PvStoreScreen> {
   /// every `_g` in this file was a literal 20 (`const EdgeInsets.fromLTRB(20,
   /// …, 20, …)`, `const EdgeInsets.symmetric(horizontal: 20)`, `gutter: 20`)
   /// and the rails took PvCardRail's default 20.
-  double get _g =>
-      widget.chrome == PvStoreChrome.ttc ? kTtcTabRootGutter : 20;
+  ///
+  /// ⚠️ PREGNANCY'S PRODUCTS TAB TOO (2026-10-02, the user: make Products
+  /// match TTC's): the embedded chrome wears the same tab-root header, so it
+  /// takes the same 18. Parenting's storefront stays on 20.
+  double get _g => widget.chrome == PvStoreChrome.ttc ||
+          widget.chrome == PvStoreChrome.embedded
+      ? kTtcTabRootGutter
+      : 20;
 
   // ---- header: search + cart + orders -----------------------------------------
 
   Widget _header(V2Palette p) {
     // TTC's tab root wears the stage's one tab-root header; the pregnancy
     // and parenting storefronts keep theirs below, unchanged.
-    if (widget.chrome == PvStoreChrome.ttc) return _ttcHeader(p);
+    // ⚠️ AND PREGNANCY'S (2026-10-02, the user: "make the products section of
+    // pregnancy consistent with TTC"). It was the old pill-first header, so
+    // leaving Learn for Products swapped a serif title for a grey pill. Now
+    // the title, the intro and the search pill are TTC's, and the stage
+    // switch (Trying / Pregnancy / Parenting) stays, drawn UNDER the search
+    // (`_stageRow`). Kept for revert: `if (widget.chrome == PvStoreChrome.ttc)`.
+    if (widget.chrome == PvStoreChrome.ttc ||
+        widget.chrome == PvStoreChrome.embedded) {
+      return _ttcHeader(p);
+    }
     final cartCount = CartStore.instance.count(kProductsCartId);
     // Kept for revert (2026-09-29, the Orders circle is off the store top):
     //   final hasOrders = PvOrderStore.instance.orders.isNotEmpty;
@@ -389,7 +404,16 @@ class _PvStoreScreenState extends State<PvStoreScreen> {
         gutter: _g,
         // One plain line, like the other tabs' intros (2026-09-29).
         intro: Text(
-          "What to buy while you're trying, and why each one helps.",
+          // The sentence follows the stage shown, so the switch under the
+          // search changes it. Kept for revert (TTC's, the only one before):
+          // "What to buy while you're trying, and why each one helps."
+          switch (_stage) {
+            LifeStage.pregnancy =>
+              "What to buy while you're expecting, and why each one helps.",
+            LifeStage.parenting =>
+              'What to buy for your baby, and why each one helps.',
+            _ => "What to buy while you're trying, and why each one helps.",
+          },
           style: ttcTabRootIntroStyle(),
         ),
         trailing: [
@@ -476,8 +500,15 @@ class _PvStoreScreenState extends State<PvStoreScreen> {
         ),
       );
     }
+    // ⚠️ UNDER THE SEARCH PILL, AND WHY (2026-10-02, Mobbin: Glovo and Yami
+    // draw the search pill first with the scoping chips and tabs directly
+    // beneath it; Ro puts its tabs above content). The stage is a filter on
+    // what the shop shows, so it follows the search, and the search then
+    // sits at the same height as TTC's, which has no switch at all (its
+    // store opens on trying, 2026-09-30). Gutter follows `_g`: 14 in 20 on
+    // the old edge, 12 in 18 here.
     return Padding(
-      padding: const EdgeInsets.fromLTRB(14, 10, 20, 4),
+      padding: EdgeInsets.fromLTRB(_g - 6, 10, _g, 4),
       child: PvStageSwitch(
         stage: _stage,
         onChanged: (s) => setState(() => _stage = s),

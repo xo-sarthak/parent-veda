@@ -54,6 +54,12 @@ import '../preg_week_screen.dart';
 import '../prepare/consultations_screen.dart';
 import '../prepare/prepare_hub_screen.dart';
 import '../brackets/hub/hub_intent_art.dart';
+import '../ttc/doors/ttc_tab_art.dart' show TtcTabMark;
+import '../ttc/ttc_more_marks.dart'
+    show TtcArtBuilder, TtcMoreMark, ttcArtMore, ttcArtTab, ttcArtTool;
+import '../ttc/ttc_tab_root_header.dart'
+    show TtcTabRootHeader, kTtcTabRootGutter, ttcTabRootIntroStyle;
+import '../v2/v2_palette.dart' show v2BlockTint;
 import '../products/pv_store_chrome.dart' show pvStorePalette;
 import 'preg_chrome.dart';
 import '../referral/invite_friends_screen.dart';
@@ -119,6 +125,33 @@ class _PregMoreScreenState extends State<PregMoreScreen> {
       'prepare',
       () => PrepareHubScreen(lang: _c.language, backLabel: 'More'));
 
+  /// ⚠️ TTC'S MARKS (2026-10-02, the user: match Tools and More to TTC's
+  /// marks). The same objects the TTC More tab draws for the same rows:
+  /// the expert and course marks for the offerings, the open book and the
+  /// film for Read and watch, the wallet and the two hearts for Benefits.
+  /// Rows with no TTC twin take the nearest object (a calendar page, the
+  /// map, two speech bubbles, a sprout). Kept for revert: `PvMarkWell` of
+  /// each row's `IntentMark`, still passed and still drawn when no entry is
+  /// here.
+  static final Map<String, TtcArtBuilder> _art = {
+    'preg_more_all_reads': ttcArtTab(TtcTabMark.openBook),
+    'preg_more_all_films': ttcArtMore(TtcMoreMark.film),
+    'preg_more_messages': ttcArtTab(TtcTabMark.twoBubbles),
+    'preg_more_calendar': ttcArtTool('appointments'),
+    'preg_more_journey_map': ttcArtTool('map'),
+    'preg_more_week': ttcArtTab(TtcTabMark.sprout),
+    'preg_more_employer': ttcArtTab(TtcTabMark.wallet),
+    'preg_more_invite': ttcArtTab(TtcTabMark.bigSmallHearts),
+  };
+
+  static TtcArtBuilder _artOfKind(PvLearnKind k) => switch (k) {
+        PvLearnKind.consult => ttcArtTool('expert'),
+        PvLearnKind.course => ttcArtTool('courses'),
+        PvLearnKind.masterclass => ttcArtTab(TtcTabMark.openBook),
+        PvLearnKind.cohort => ttcArtTab(TtcTabMark.twoFigures),
+        PvLearnKind.classPack => ttcArtTab(TtcTabMark.lotus),
+      };
+
   static IntentMark _markOf(PvLearnKind k) => switch (k) {
         PvLearnKind.consult => IntentMark.askDoctor,
         PvLearnKind.course => IntentMark.schoolMark,
@@ -138,6 +171,7 @@ class _PregMoreScreenState extends State<PregMoreScreen> {
     return PregOfferRow(
       key: ValueKey('preg_more_offer_${v.id}'),
       mark: _markOf(v.kind),
+      leading: _artOfKind(v.kind)(v2BlockTint(hue % 360, pvStorePalette)),
       hue: hue,
       title: v.title,
       line: who.isEmpty ? v.subtitle : who,
@@ -157,7 +191,9 @@ class _PregMoreScreenState extends State<PregMoreScreen> {
           {String? lead, String? link, VoidCallback? onLink, String? empty}) =>
       Padding(
         key: ValueKey('preg_more_$id'),
-        padding: const EdgeInsets.fromLTRB(20, 26, 20, 0),
+        // 18, the stage's gutter, as TTC's More sections sit (2026-10-02).
+        // Kept for revert: fromLTRB(20, 26, 20, 0).
+        padding: const EdgeInsets.fromLTRB(kTtcTabRootGutter, 26, kTtcTabRootGutter, 0),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           PregSectionHeading(title, lead: lead, link: link, onLink: onLink),
           const SizedBox(height: 12),
@@ -168,7 +204,14 @@ class _PregMoreScreenState extends State<PregMoreScreen> {
   PregOfferRow _row(String id, IntentMark mark, double hue, String title, String line, VoidCallback onTap,
           {int? badge}) =>
       PregOfferRow(
-          key: ValueKey(id), mark: mark, hue: hue, title: title, line: line, onTap: onTap, badge: badge);
+          key: ValueKey(id),
+          mark: mark,
+          leading: _art[id]?.call(v2BlockTint(hue % 360, pvStorePalette)),
+          hue: hue,
+          title: title,
+          line: line,
+          onTap: onTap,
+          badge: badge);
 
   @override
   Widget build(BuildContext context) {
@@ -178,21 +221,18 @@ class _PregMoreScreenState extends State<PregMoreScreen> {
       builder: (context, _) => Container(
         color: p.ground,
         child: ListView(
-          padding: EdgeInsets.fromLTRB(
-              0, MediaQuery.of(context).padding.top + 12, 0, kAskFabReserve + 40),
+          // The header carries the safe-area inset (2026-10-02), as TTC's More
+          // does. Kept for revert: EdgeInsets.fromLTRB(0,
+          // MediaQuery.of(context).padding.top + 12, 0, kAskFabReserve + 40)
+          // and the hand-drawn Fraunces 30 title with a 20 gutter.
+          padding: const EdgeInsets.fromLTRB(0, 0, 0, kAskFabReserve + 40),
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('More',
-                    style: pvFraunces(
-                        fontSize: 30, fontWeight: FontWeight.w500, height: 1.1, color: p.ink1)),
-                const SizedBox(height: 6),
-                Text(
-                    'Experts, courses and groups you can book, and your journey. What you have '
-                    'booked or ordered is on your profile.',
-                    style: pvManrope(fontSize: 14, height: 1.45, color: p.ink2)),
-              ]),
+            TtcTabRootHeader(
+              title: 'More',
+              intro: Text(
+                  'Experts, courses and groups you can book, and your journey. What you have '
+                  'booked or ordered is on your profile.',
+                  style: ttcTabRootIntroStyle()),
             ),
 
             // ---- talk to an expert ---------------------------------------------
@@ -273,7 +313,7 @@ class _PregMoreScreenState extends State<PregMoreScreen> {
             // ⚠️ UNSCOPED ON PURPOSE. Yoga, birthing classes and the nutrition
             // funnel have no section above; this row is their door.
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
+              padding: const EdgeInsets.fromLTRB(kTtcTabRootGutter, 24, kTtcTabRootGutter, 0),
               child: InkWell(
                 key: const ValueKey('preg_more_all_programmes'),
                 onTap: _openPrepare,

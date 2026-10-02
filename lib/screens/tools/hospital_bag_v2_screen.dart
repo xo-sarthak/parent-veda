@@ -988,7 +988,6 @@ class _ProductExperience extends StatelessWidget {
               showSingleBuyNow(context, controller,
                   productId: p.id,
                   name: p.name.now,
-                  emoji: p.emoji,
                   unitPrice: p.price.toDouble(),
                   title: s.hb2v2Title);
             },

@@ -141,8 +141,9 @@ void main() {
       // FSH and LH read on the wrong day are not a slightly worse result, they
       // are a repeat test next cycle - so this cannot sit behind a fold.
       final fsh = ttcTests.firstWhere((t) => t.name.contains('FSH'));
-      expect(find.textContaining(fsh.when(false).split('.').first),
-          findsWidgets);
+      // The row says it short (2026-10-02): the whole sentence is on the
+      // test's page. Kept for revert: `fsh.when(false).split('.').first`.
+      expect(find.text(ttcTestWhenShort(fsh, false)), findsWidgets);
     });
   });
 

@@ -608,26 +608,38 @@ class V3SectionHead extends StatelessWidget {
   Widget build(BuildContext context) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(children: [
-            Text(eyebrow.toUpperCase(),
-                style: pvManrope(
-                    fontSize: 11.5,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1.3,
-                    // Grey, as main's shared section head draws its eyebrow
-                    // (one ParentVeda, 2026-09-30). Was p.ink1 at 85%.
-                    color: p.ink2)),
-            if (note != null) ...[
-              const Spacer(),
-              Text(note!.toUpperCase(),
+          // ⚠️ AN EMPTY EYEBROW DRAWS NOTHING (2026-10-02), as trying to
+          // conceive's `_Head` does: the doors heading on the pregnancy home
+          // takes TTC's "Explore by topic" with no eyebrow over it, and a
+          // blank `Text` would still reserve its line and the 5pt gap.
+          if (eyebrow.isNotEmpty || note != null) ...[
+            Row(children: [
+              Text(eyebrow.toUpperCase(),
                   style: pvManrope(
                       fontSize: 11.5,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 1.1,
-                      color: p.ink3)),
-            ],
-          ]),
-          const SizedBox(height: 5),
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.3,
+                      // ⚠️ VIOLET, LIKE TRYING TO CONCEIVE'S (2026-10-02, the
+                      // user: "my daily insights eyebrow heading needs to be
+                      // purple like in TTC"). The section eyebrow is the
+                      // stage's signature violet (`p.action`, DESIGN-SYSTEM
+                      // §4.2), and this head had gone grey with the
+                      // pregnancy restyle. Kept for revert: `color: p.ink2`,
+                      // grey "as main's shared section head draws its
+                      // eyebrow (one ParentVeda, 2026-09-30)".
+                      color: p.action)),
+              if (note != null) ...[
+                const Spacer(),
+                Text(note!.toUpperCase(),
+                    style: pvManrope(
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1.1,
+                        color: p.ink3)),
+              ],
+            ]),
+            const SizedBox(height: 5),
+          ],
           Text(title,
               style: pvFraunces(
                   fontSize: 21,

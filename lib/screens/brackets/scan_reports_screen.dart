@@ -337,7 +337,8 @@ class _ScanReportsScreenState extends State<ScanReportsBody> {
         ],
       ),
     );
-    controller.dispose();
+    // ⚠️ NOT DISPOSED THE MOMENT THE ROUTE CLOSES (2026-10-02, the red screen '_dependents.isEmpty'): the TextField is still on screen for the exit animation and still listening. Same fix as the add-child sheet.
+    Future<void>.delayed(const Duration(milliseconds: 600), controller.dispose);
     return (name == null || name.isEmpty) ? null : name;
   }
 

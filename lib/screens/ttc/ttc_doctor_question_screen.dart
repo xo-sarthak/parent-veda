@@ -251,15 +251,32 @@ class _TtcDoctorQuestionScreenState extends State<TtcDoctorQuestionScreen> {
     if (_readOnly) {
       final v = _store.visitById(_store.visitFor(e!));
       return v == null
-          ? 'Kept for whichever visit comes next.'
+          // Kept for revert (2026-10-01): 'Kept for whichever visit comes
+          // next.'
+          ? 'Not tied to a visit. It shows on the next one.'
           : 'Kept for the ${ttcVisitName(v)}.';
     }
+    // ⚠️ SAYS WHAT HER CHOICE DOES, AND WHERE THE TICK IS (2026-10-01, the
+    // user: "which tick does this talk about? … if it's not ticked, seems
+    // random and confusing"). The tick is the circle beside a question on a
+    // visit's page, which she taps once she has asked it. The behaviour is
+    // unchanged: a question with no visit shows on the next one and rolls
+    // forward until ticked. Kept for revert: 'The question shows on the visit
+    // you choose, with a tick for the day. If it is not ticked, it moves to
+    // your next visit.'
     if (_visitChoices.isEmpty) {
       return 'No visit is on your appointments yet, so the question waits '
-          'for the next visit you add. On the day, you can tick it as asked.';
+          'for the next visit you add. Once you have asked it, tap the circle '
+          "beside it on that visit's page.";
     }
-    return 'The question shows on the visit you choose, with a tick for the '
-        'day. If it is not ticked, it moves to your next visit.';
+    final chosen = _store.visitById(_visit);
+    if (chosen == null) {
+      return 'Not tied to one visit. It shows on your next visit, and the '
+          'one after, until you tap the circle beside it to say you asked.';
+    }
+    return 'It goes on the ${ttcVisitName(chosen)}. On the page for that '
+        'visit, tap the circle beside it once you have asked. Anything you '
+        'have not ticked moves on to your next visit.';
   }
 
   @override
@@ -389,8 +406,8 @@ class _TtcDoctorQuestionScreenState extends State<TtcDoctorQuestionScreen> {
   }
 }
 
-/// "For which visit?": one pill per visit still to come, and "Whichever
-/// visit comes next". The same pills the appointment form's quick names use.
+/// "For which visit?": one pill per visit still to come, and "No particular
+/// visit". The same pills the appointment form's quick names use.
 class _VisitChoice extends StatelessWidget {
   const _VisitChoice({
     required this.pal,
@@ -422,7 +439,11 @@ class _VisitChoice extends StatelessWidget {
           ),
         TtcToolPill(
           key: const ValueKey('ttc_question_visit_next'),
-          label: 'Whichever visit comes next',
+          // ⚠️ NOT "WHICHEVER VISIT COMES NEXT" (2026-10-01, the user: random
+          // doubts "shouldn't randomly apply to the very next appointment").
+          // The question is for no visit in particular; it is carried on the
+          // next one until she says she asked it, and the line below says so.
+          label: 'No particular visit',
           on: value == null,
           hue: kIvfHue,
           onTap: () => onChanged(null),

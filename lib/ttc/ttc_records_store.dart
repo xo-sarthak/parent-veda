@@ -402,6 +402,52 @@ class TtcRecordsStore extends ChangeNotifier with TtcSyncedStore {
 /// An appointment the couple arranged themselves.
 ///
 /// Separate from the booking engine's `Booking`, deliberately: those are things
+/// When a visit's reminder rings, and why (2026-10-01).
+///
+/// ⚠️ THE EVENING BEFORE IS ONLY RIGHT WHEN THERE IS AN EVENING BEFORE. The
+/// reminder was fixed at 7 pm the day before. A visit booked for 10 am
+/// tomorrow, at 10 pm tonight, had that moment already behind it, so `_arm`
+/// quietly set nothing, while the screen still said "Your phone will remind
+/// you at 7 pm the day before" (the user). A promise the app cannot keep and
+/// does not retract is the worst version of the bug.
+///
+/// So it is a rule, worked out when she saves, and said on the screen:
+///   · the evening before (7 pm the day before), when that is still ahead;
+///   · otherwise 2 hours before the visit;
+///   · otherwise 30 minutes before;
+///   · otherwise none: the visit is too soon, and the app says so.
+/// "Derive, never ask": she is not made to choose among three. The time it
+/// settles on is stored with the visit (local only, like the switch itself),
+/// so it does not move later: the evening reminder that has rung is not
+/// followed by a "2 hours before" the next time the app opens.
+enum TtcApptReminderKind {
+  eveningBefore,
+  twoHoursBefore,
+  thirtyMinutesBefore,
+  none,
+}
+
+({DateTime? at, TtcApptReminderKind kind}) ttcApptReminderPlan(
+  DateTime startsLocal, {
+  DateTime? now,
+}) {
+  final n = (now ?? DateTime.now()).add(const Duration(minutes: 1));
+  final d = startsLocal.subtract(const Duration(days: 1));
+  final evening = DateTime(d.year, d.month, d.day, 19);
+  if (evening.isAfter(n)) {
+    return (at: evening, kind: TtcApptReminderKind.eveningBefore);
+  }
+  final two = startsLocal.subtract(const Duration(hours: 2));
+  if (two.isAfter(n)) {
+    return (at: two, kind: TtcApptReminderKind.twoHoursBefore);
+  }
+  final thirty = startsLocal.subtract(const Duration(minutes: 30));
+  if (thirty.isAfter(n)) {
+    return (at: thirty, kind: TtcApptReminderKind.thirtyMinutesBefore);
+  }
+  return (at: null, kind: TtcApptReminderKind.none);
+}
+
 /// bought through ParentVeda, these are the clinic visits a couple books over
 /// the phone. Both show on the Calendar; only these are theirs to edit.
 class TtcAppointment {
@@ -412,6 +458,7 @@ class TtcAppointment {
     this.withWhom = '',
     this.note,
     this.remindEveningBefore = false,
+    this.remindAtUtc,
   });
 
   final String id;
@@ -432,13 +479,33 @@ class TtcAppointment {
   /// appointment itself comes back from the cloud. That is the cheap side.
   final bool remindEveningBefore;
 
+  /// When the reminder rings, as decided when she saved ([ttcApptReminderPlan]),
+  /// stored with the visit and kept on this phone only. Null on a visit saved
+  /// before 2026-10-01, which keeps its 7 pm the day before.
+  final DateTime? remindAtUtc;
+
   DateTime get startsLocal => startsUtc.toLocal();
   bool get isUpcoming => startsUtc.isAfter(DateTime.now().toUtc());
 
-  /// When the evening-before reminder rings: 7 pm on the day before.
+  /// When the reminder rings: the time it settled on, or 7 pm the day before
+  /// for a visit that was saved with the old fixed rule.
   DateTime get reminderAt {
+    final stored = remindAtUtc;
+    if (stored != null) return stored.toLocal();
     final d = startsLocal.subtract(const Duration(days: 1));
     return DateTime(d.year, d.month, d.day, 19);
+  }
+
+  /// Which of the rule's three times [reminderAt] is, from the two dates.
+  TtcApptReminderKind get reminderKind {
+    final r = reminderAt;
+    final s = startsLocal;
+    if (DateTime(r.year, r.month, r.day).isBefore(DateTime(s.year, s.month, s.day))) {
+      return TtcApptReminderKind.eveningBefore;
+    }
+    return s.difference(r).inMinutes >= 90
+        ? TtcApptReminderKind.twoHoursBefore
+        : TtcApptReminderKind.thirtyMinutesBefore;
   }
 
   TtcAppointment copyWith({
@@ -446,6 +513,8 @@ class TtcAppointment {
     String? withWhom,
     DateTime? startsLocal,
     bool? remindEveningBefore,
+    DateTime? remindAtUtc,
+    bool clearRemindAt = false,
     // Added 2026-09-27 (tool rebuild): the notes box on the appointment
     // page. Null keeps the note; an empty string clears it, because a
     // cleared box has to be able to say "no note now".
@@ -460,6 +529,7 @@ class TtcAppointment {
             ? this.note
             : (note.trim().isEmpty ? null : note.trim()),
         remindEveningBefore: remindEveningBefore ?? this.remindEveningBefore,
+        remindAtUtc: clearRemindAt ? null : (remindAtUtc ?? this.remindAtUtc),
       );
 
   Map<String, Object?> toJson() => {
@@ -469,6 +539,8 @@ class TtcAppointment {
         'at': startsUtc.toIso8601String(),
         if (note != null) 'note': note,
         if (remindEveningBefore) 'remind': true,
+        if (remindEveningBefore && remindAtUtc != null)
+          'remind_at': remindAtUtc!.toIso8601String(),
       };
 
   static TtcAppointment? fromJson(Object? raw) {
@@ -484,6 +556,7 @@ class TtcAppointment {
       startsUtc: at.toUtc(),
       note: raw['note'] as String?,
       remindEveningBefore: raw['remind'] == true,
+      remindAtUtc: DateTime.tryParse(raw['remind_at']?.toString() ?? '')?.toUtc(),
     );
   }
 }
@@ -561,14 +634,14 @@ class TtcAppointmentsStore extends ChangeNotifier with TtcSyncedStore {
     while (_items.any((e) => e.id == 'ttca_$n')) {
       n++;
     }
-    final a = TtcAppointment(
+    final a = _withReminderPlan(TtcAppointment(
       id: 'ttca_$n',
       title: title.trim(),
       withWhom: withWhom.trim(),
       startsUtc: startsLocal.toUtc(),
       note: note,
       remindEveningBefore: remindEveningBefore,
-    );
+    ));
     _items.add(a);
     _persist();
     _arm(a);
@@ -588,11 +661,37 @@ class TtcAppointmentsStore extends ChangeNotifier with TtcSyncedStore {
   void update(TtcAppointment updated) {
     final i = _items.indexWhere((e) => e.id == updated.id);
     if (i < 0) return;
-    _items[i] = updated;
+    final planned = _withReminderPlan(updated, before: _items[i]);
+    _items[i] = planned;
     _persist();
-    _arm(updated);
-    rearmReminders(except: updated.id);
+    _arm(planned);
+    rearmReminders(except: planned.id);
     notifyListeners();
+  }
+
+  /// Settles WHEN the reminder rings and keeps it, or switches it off when
+  /// the visit is too soon for one ([ttcApptReminderPlan]).
+  ///
+  /// A visit whose start and switch have not changed keeps the time it already
+  /// settled on, so a reminder that has rung is never followed by a fresh one
+  /// the next time the list is saved.
+  TtcAppointment _withReminderPlan(TtcAppointment a, {TtcAppointment? before}) {
+    if (!a.remindEveningBefore) {
+      return a.remindAtUtc == null ? a : a.copyWith(clearRemindAt: true);
+    }
+    if (before != null &&
+        before.remindEveningBefore &&
+        before.remindAtUtc != null &&
+        before.startsUtc == a.startsUtc) {
+      return a.copyWith(remindAtUtc: before.remindAtUtc);
+    }
+    final plan = ttcApptReminderPlan(a.startsLocal);
+    if (plan.at == null) {
+      // Too soon for any reminder: the switch goes off, and the screen has
+      // already said so before she saved.
+      return a.copyWith(remindEveningBefore: false, clearRemindAt: true);
+    }
+    return a.copyWith(remindAtUtc: plan.at!.toUtc());
   }
 
   // ---- the evening-before reminder ------------------------------------------
@@ -655,8 +754,13 @@ class TtcAppointmentsStore extends ChangeNotifier with TtcSyncedStore {
         '${l.hour < 12 ? 'am' : 'pm'}';
     final where =
         a.withWhom.isEmpty ? 'At $time' : 'At $time, with ${a.withWhom}';
+    // "Tomorrow" only when it rings the evening before; a same-day reminder
+    // says "Today" (2026-10-01).
+    final day = a.reminderKind == TtcApptReminderKind.eveningBefore
+        ? 'Tomorrow'
+        : 'Today';
     return (
-      title: 'Tomorrow: ${a.title}',
+      title: '$day: ${a.title}',
       body: questions <= 0
           ? '$where.'
           : '$where · $questions '

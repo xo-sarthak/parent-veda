@@ -71,6 +71,7 @@ import 'ttc_common.dart';
 import 'ttc_focus_screen.dart' show openTtcArticle;
 import 'ttc_round_strings.dart' show ttcRoundDate;
 import 'ttc_strings.dart';
+import 'doors/ttc_tab_art.dart' show TtcTabArt, TtcTabMark;
 import 'ttc_tool_chrome.dart';
 import 'ttc_tools_screen.dart' show ttcToolById;
 import 'ttc_tool_hues.dart';
@@ -1681,25 +1682,59 @@ class _TtcTrackerScreenState extends State<TtcTrackerScreen> {
                 color: p.ink2))),
       ],
       const SizedBox(height: 24),
+      // ⚠️ A GROUP IS A CARD WITH ITS OWN DRAWN MARK (2026-10-02, the user:
+      // "What you're working on looks kinda bland", then "habits card redesign
+      // has my go"; Mobbin: Brick's calm rows, Lifesum and Noom's drawn picture
+      // on every item, MacroFactor's grouped cards). A tracker whose fields
+      // carry a `group` (What you're working on, and his Partner health) drew a
+      // small grey capitals label and a hairline between blocks, so Sleep,
+      // Movement and Stress read as one long form. Now each group is a white
+      // card, its mark and name on top and its fields inside; a tracker with no
+      // groups (everything else) draws exactly as before. Kept for revert (the
+      // old label-and-hairline loop):
+      // for (var b = 0; b < blocks.length; b++) ...[
+      //   if (b > 0) ...[
+      //     const SizedBox(height: 22),
+      //     ttcToolPad(Container(height: 1, color: p.line)),
+      //     const SizedBox(height: 22),
+      //   ],
+      //   if (blocks[b].$1 != null) ...[
+      //     ttcToolPad(Text(blocks[b].$1!.toUpperCase(),
+      //         style: pvManrope(
+      //             fontSize: 10.5,
+      //             fontWeight: FontWeight.w800,
+      //             letterSpacing: 1.3,
+      //             color: p.ink3))),
+      //     const SizedBox(height: 14),
+      //   ],
+      //   for (var i = 0; i < blocks[b].$2.length; i++) ...[
+      //     if (i > 0) const SizedBox(height: 20),
+      //     ttcToolPad(_FieldBlock(
+      //         tracker: tracker, field: blocks[b].$2[i], day: _day, t: t)),
+      //   ],
+      // ],
       for (var b = 0; b < blocks.length; b++) ...[
-        if (b > 0) ...[
-          const SizedBox(height: 22),
-          ttcToolPad(Container(height: 1, color: p.line)),
-          const SizedBox(height: 22),
-        ],
         if (blocks[b].$1 != null) ...[
-          ttcToolPad(Text(blocks[b].$1!.toUpperCase(),
-              style: pvManrope(
-                  fontSize: 10.5,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 1.3,
-                  color: p.ink3))),
-          const SizedBox(height: 14),
-        ],
-        for (var i = 0; i < blocks[b].$2.length; i++) ...[
-          if (i > 0) const SizedBox(height: 20),
-          ttcToolPad(_FieldBlock(
-              tracker: tracker, field: blocks[b].$2[i], day: _day, t: t)),
+          if (b > 0) const SizedBox(height: 14),
+          ttcToolPad(_GroupCard(
+            name: blocks[b].$1!,
+            hue: _trackerHue(tracker),
+            children: [
+              for (final f in blocks[b].$2)
+                _FieldBlock(tracker: tracker, field: f, day: _day, t: t),
+            ],
+          )),
+        ] else ...[
+          if (b > 0) ...[
+            const SizedBox(height: 22),
+            ttcToolPad(Container(height: 1, color: p.line)),
+            const SizedBox(height: 22),
+          ],
+          for (var i = 0; i < blocks[b].$2.length; i++) ...[
+            if (i > 0) const SizedBox(height: 20),
+            ttcToolPad(_FieldBlock(
+                tracker: tracker, field: blocks[b].$2[i], day: _day, t: t)),
+          ],
         ],
       ],
       ttcToolPad(_SevereLine(tracker: tracker, day: _day, t: t)),
@@ -1876,6 +1911,71 @@ class _DayStrip extends StatelessWidget {
 }
 
 /// One field for one day: its label, "Saved" and Clear, then the control.
+/// The drawn mark for a field group, from the marks the stage already owns, so
+/// one subject keeps one drawing. Null for a group the table does not know,
+/// which then draws its name alone.
+TtcTabMark? _groupMark(String name) => switch (name) {
+      'Sleep' => TtcTabMark.sunrise,
+      'Movement' => TtcTabMark.sprout,
+      'Stress' => TtcTabMark.lotus,
+      'Food' || 'Food and water' => TtcTabMark.bowl,
+      'Cutting down' => TtcTabMark.flagPath,
+      'Heat' => TtcTabMark.sun,
+      _ => null,
+    };
+
+/// One group of a grouped tracker: a white hairline card, the group's mark and
+/// name on top, its fields inside (2026-10-02).
+class _GroupCard extends StatelessWidget {
+  const _GroupCard({
+    required this.name,
+    required this.hue,
+    required this.children,
+  });
+
+  final String name;
+  final double hue;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = V2PaletteStore.instance.current;
+    final mark = _groupMark(name);
+    return Container(
+      key: ValueKey('ttc_group_$name'),
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 18),
+      decoration: BoxDecoration(
+        color: p.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: p.line),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          if (mark != null) ...[
+            SizedBox(
+              width: 38,
+              height: 38,
+              child: TtcTabArt(mark: mark, tint: v2BlockTint(hue % 360, p)),
+            ),
+            const SizedBox(width: 12),
+          ],
+          Expanded(
+            child: Text(name,
+                style: pvJakarta(
+                    fontSize: 16.5, fontWeight: FontWeight.w700, color: p.ink1)),
+          ),
+        ]),
+        const SizedBox(height: 18),
+        for (var i = 0; i < children.length; i++) ...[
+          if (i > 0) const SizedBox(height: 22),
+          children[i],
+        ],
+      ]),
+    );
+  }
+}
+
 class _FieldBlock extends StatelessWidget {
   const _FieldBlock({
     required this.tracker,

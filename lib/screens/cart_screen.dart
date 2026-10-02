@@ -15,6 +15,8 @@ import '../services/bought_store.dart';
 import '../services/cart_store.dart';
 import '../services/pregnancy_controller.dart';
 import '../theme/app_theme.dart';
+import 'ttc/ttc_tool_marks.dart' show TtcMarkLeading, TtcToolMark;
+import 'v2/v2_palette.dart' show V2PaletteStore, v2BlockTint;
 
 const Color _accent = AppTheme.neutral900;
 
@@ -102,9 +104,9 @@ Future<void> showAddToCartFlow(
     kProductsCartId,
     productId: p.id,
     name: p.name.now,
-    emoji: p.emoji,
     unitPrice: parsePriceString(p.price),
     size: size,
+    image: p.imageUrl,
   );
   if (!context.mounted) return;
   if (openCart) {
@@ -265,15 +267,9 @@ class CartScreen extends StatelessWidget {
         border: Border.all(color: AppTheme.outlineVariant),
       ),
       child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Container(
-          width: 62,
-          height: 62,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-              color: AppTheme.surfaceContainer,
-              borderRadius: BorderRadius.circular(14)),
-          child: Text(it.emoji, style: const TextStyle(fontSize: 30)),
-        ),
+        // The product's photo, or the family's bag mark in a quiet well. Kept for
+        // revert (2026-10-02): its emoji in a 62 well, Text(it.emoji, fontSize 30).
+        _cartThumb(it, 62),
         const SizedBox(width: 12),
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -445,8 +441,8 @@ void showSingleItemBuyNow(
     kBuyNowCartId,
     productId: p.id,
     name: p.name.now,
-    emoji: p.emoji,
     unitPrice: parsePriceString(p.price),
+    image: p.imageUrl,
   );
   _push(
       context,
@@ -464,7 +460,6 @@ void showSingleBuyNow(
   PregnancyController controller, {
   required String productId,
   required String name,
-  required String emoji,
   required double unitPrice,
   String? title,
 }) {
@@ -474,7 +469,6 @@ void showSingleBuyNow(
     kBuyNowCartId,
     productId: productId,
     name: name,
-    emoji: emoji,
     unitPrice: unitPrice,
   );
   _push(
@@ -656,16 +650,8 @@ class _CheckoutScreenState extends State<_CheckoutScreen> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Row(children: [
-        Container(
-          width: 44,
-          height: 44,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-              color: AppTheme.surface,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppTheme.outlineVariant)),
-          child: Text(it.emoji, style: const TextStyle(fontSize: 22)),
-        ),
+        // Kept for revert (2026-10-02): its emoji, Text(it.emoji, fontSize 22).
+        _cartThumb(it, 44),
         const SizedBox(width: 12),
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -698,3 +684,32 @@ Widget _card(BuildContext context, List<Widget> children) => Container(
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: children),
     );
+
+
+/// A cart line's picture (2026-10-02): its photo, or the family's drawn bag mark
+/// in a quiet well. Never an emoji.
+Widget _cartThumb(CartItem it, double size) {
+  final tint = v2BlockTint(28, V2PaletteStore.instance.current);
+  Widget mark() => Container(
+        width: size,
+        height: size,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+            color: AppTheme.surfaceContainer,
+            borderRadius: BorderRadius.circular(size > 50 ? 14 : 12)),
+        child: TtcMarkLeading(
+            tool: TtcToolMark.hospitalBag, tint: tint, size: size * 0.74),
+      );
+  if (it.image.isEmpty) return mark();
+  return ClipRRect(
+    borderRadius: BorderRadius.circular(size > 50 ? 14 : 12),
+    child: Image.network(
+      it.image,
+      width: size,
+      height: size,
+      fit: BoxFit.cover,
+      errorBuilder: (_, _, _) => mark(),
+      loadingBuilder: (ctx, child, progress) => progress == null ? child : mark(),
+    ),
+  );
+}

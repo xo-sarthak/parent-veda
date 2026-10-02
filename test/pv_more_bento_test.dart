@@ -396,8 +396,10 @@ void main() {
 
   // ===========================================================================
   group('the other stages', () {
+    // Pregnancy left this list on 2026-10-01: it draws the short profile now
+    // (test/pv_you_pregnancy_test.dart). Kept for revert: it was the first of
+    // these three.
     for (final stage in [
-      LifeStage.pregnancy,
       LifeStage.parenting,
       LifeStage.skilling,
     ]) {

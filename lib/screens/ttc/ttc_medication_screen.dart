@@ -87,8 +87,9 @@ import 'ttc_dose_parts.dart';
 import 'ttc_ivf_readiness_screen.dart' show kIvfHue;
 import 'ttc_strings.dart';
 import 'ttc_supplements_screen.dart';
-import 'ttc_surface_router.dart' show openTtcSurface, kTtcReadPrefix;
+import 'ttc_read_next.dart' show ttcToolReadNext;
 import 'ttc_tool_chrome.dart';
+import 'ttc_tool_marks.dart' show TtcToolArt, TtcToolMark;
 import 'ttc_tool_confirm.dart';
 
 /// The read that sits under the list.
@@ -328,20 +329,23 @@ class _TtcMedicationScreenState extends State<TtcMedicationScreen> {
                 ],
 
                 const SizedBox(height: 22),
-                TtcDoseLinkRow(
-                  key: const ValueKey('ttc_med_read'),
-                  icon: Icons.menu_book_outlined,
-                  eyebrow: 'Read',
-                  text: 'Medicines and conditions to check with a doctor',
-                  onTap: () => openTtcSurface(
-                      context, '$kTtcReadPrefix$kTtcMedicationRead'),
-                ),
-                const SizedBox(height: 12),
+                // The article moved to the foot of the screen (2026-10-01, the
+                // user): the reader's own "Read next" rail, below. Kept for
+                // revert: a `TtcDoseLinkRow` keyed `ttc_med_read`, eyebrow
+                // 'Read', 'Medicines and conditions to check with a doctor'.
+
                 // ⚠️ ONE PLAIN LINE ON THE DIFFERENCE (tools pass): two tiles,
                 // Supplements and Medication, sit side by side in Tools, and
                 // nothing said which one folic acid goes in.
                 TtcDoseLinkRow(
+                  key: const ValueKey('ttc_med_to_supplements'),
                   icon: Icons.eco_outlined,
+                  // The Supplements tool's own drawn mark (2026-10-01, the
+                  // user), so one tool keeps one drawing.
+                  mark: TtcToolArt(
+                    mark: TtcToolMark.supplements,
+                    tint: v2BlockTint(kIvfHue, p),
+                  ),
                   text: 'Vitamins you chose yourself, like folic acid? '
                       'Those go in Supplements.',
                   onTap: () => Navigator.of(context).push(
@@ -362,6 +366,14 @@ class _TtcMedicationScreenState extends State<TtcMedicationScreen> {
                 const SizedBox(height: 26),
               ],
             )),
+            // The last thing on the screen: the reader's own foot.
+            ...ttcToolReadNext(
+              context,
+              const [kTtcMedicationRead],
+              hue: kIvfHue,
+              railKey: const ValueKey('ttc_med_read_next'),
+            ),
+            const SizedBox(height: 26),
           ],
         );
       },

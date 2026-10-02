@@ -94,10 +94,12 @@ void main() {
         // TTC's is titled Profile since 2026-09-29 (the avatar's page; the
         // fifth tab is More, test/ttc_more_profile_test.dart). Kept for
         // revert: expect(find.text('You'), findsWidgets); on every stage.
-        expect(
-          find.text(stage == LifeStage.tryingToConceive ? 'Profile' : 'You'),
-          findsWidgets,
-        );
+        // ⚠️ PREGNANCY IS THE SHORT PROFILE TOO SINCE 2026-10-01 (the user:
+        // "in pregnancy profile, settings need to be like the way it's in TTC
+        // side"). Kept for revert: `stage == LifeStage.tryingToConceive`.
+        final shortProfile =
+            stage == LifeStage.tryingToConceive || stage == LifeStage.pregnancy;
+        expect(find.text(shortProfile ? 'Profile' : 'You'), findsWidgets);
         // ⚠️ TRYING TO CONCEIVE IS SHORT AND GROUPED (2026-09-27, the user's
         // choice after the launch walk): "Your details" folds into a "Your
         // answers" row, so that one section is absent there. Every other
@@ -125,7 +127,7 @@ void main() {
         // a positive test") and Family is "Family and partner". Kept for
         // revert, the V2 expectation:
         //   ? const ['FAMILY', 'YOUR THINGS']
-        final expected = stage == LifeStage.tryingToConceive
+        final expected = shortProfile
             ? const ['YOUR JOURNEY', 'YOUR THINGS']
             : kSkeleton;
         expect(
@@ -138,7 +140,7 @@ void main() {
         // Kept for revert (2026-09-28): the bento's tiles
         //   'journey', 'family', 'things', 'experts_and_courses',
         //   'preferences', 'support', 'account' as `pv_more_tile_<id>`.
-        if (stage == LifeStage.tryingToConceive) {
+        if (shortProfile) {
           // Kept for revert (V2): 'pv_profile_stage' in place of the hero
           // and the journey.
           for (final id in [
@@ -164,7 +166,11 @@ void main() {
       tester,
     ) async {
       // A feature is never hidden: the empty state is the invitation.
+      // The short profile (2026-10-01) draws it as "Add an older child" under
+      // Family and partner; the legacy stages still draw "Children".
       await pumpTall(tester, const PvYouScreen(stage: LifeStage.pregnancy));
+      expect(find.text('Add an older child'), findsOneWidget);
+      await pumpTall(tester, const PvYouScreen(stage: LifeStage.parenting));
       expect(find.text('Children'), findsOneWidget);
     });
 

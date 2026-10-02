@@ -762,9 +762,20 @@ class TtcRecordsEmpty extends StatelessWidget {
               // ⚠️ THIS LINE PROMISES ONLY WHAT THE SCREEN DOES (rewritten
               // 2026-09-03): it holds the report so a person can read it; it
               // reads nothing itself, and it cannot pull values off a photo.
+              // ⚠️ THE ONE PLACE THIS SCREEN SAYS WHAT IT IS FOR (2026-10-01,
+              // the user: "what your records become … is unclear, and what is
+              // written under it confuses me … is it needed that way?"). The
+              // heading below and its three cards explained the app to someone
+              // who simply had a report in hand, and repeated this panel. They
+              // are commented out, and the one idea they added (whose result
+              // it is) is a sentence here. Kept for revert: the earlier text
+              // 'Take a photo now, and it's on your phone when a doctor asks.
+              // It keeps the date, next to whatever came before it.'
               Text(
-                  "Take a photo now, and it's on your phone when a doctor "
-                  'asks. It keeps the date, next to whatever came before it.',
+                  "Take a photo of a test report and it's kept on your phone "
+                  'with its date, ready to show a doctor. Add the same test '
+                  'later and the two sit side by side. Each one says whose it '
+                  'is, yours or his.',
                   textAlign: TextAlign.center,
                   style: ttcBody(13.5, h: 1.55)),
               const SizedBox(height: 18),
@@ -775,36 +786,44 @@ class TtcRecordsEmpty extends StatelessWidget {
                   label: 'Photograph a report',
                   onTap: () => openTtcRecordEdit(context, camera: true)),
               const SizedBox(height: 10),
+              // ⚠️ SAYS WHAT SHE TYPES (2026-10-01, the user: "type a number
+              // instead … no. of what? unclear"). "A number" meant the result,
+              // the AMH or the TSH on her sheet, and nothing said so. Kept for
+              // revert: 'Type a number instead'.
               TtcRecordsAction(
-                  label: 'Type a number instead',
+                  label: 'Type in a result',
                   muted: true,
                   onTap: () => openTtcRecordEdit(context)),
             ]),
           ),
-          const SizedBox(height: 26),
-          // Kept for revert (2026-09-28): 'What this becomes'
-          ttcSectionTitle('What your records become'),
-          const TtcRecordList(children: [
-            _Becomes(
-              title: 'The same test, twice',
-              body: 'A second AMH sits next to the first, so you can see which '
-                  'way it moved without having to remember.',
-            ),
-            _Becomes(
-              title: 'His results and yours',
-              body: 'Every result shows whose it is, so a semen analysis is as '
-                  'easy to find as an AMH.',
-            ),
-            _Becomes(
-              title: 'The sheet itself, on the phone',
-              body: 'In the waiting room, you can show the report instead of '
-                  'describing it.',
-            ),
-          ]),
+          // Kept for revert (2026-10-01): the heading and three cards below
+          // explained what a record "becomes"; the panel above says it now.
+          // const SizedBox(height: 26),
+          // // Kept for revert (2026-09-28): 'What this becomes'
+          // ttcSectionTitle('What your records become'),
+          // const TtcRecordList(children: [
+          //   _Becomes(
+          //     title: 'The same test, twice',
+          //     body: 'A second AMH sits next to the first, so you can see which '
+          //         'way it moved without having to remember.',
+          //   ),
+          //   _Becomes(
+          //     title: 'His results and yours',
+          //     body: 'Every result shows whose it is, so a semen analysis is as '
+          //         'easy to find as an AMH.',
+          //   ),
+          //   _Becomes(
+          //     title: 'The sheet itself, on the phone',
+          //     body: 'In the waiting room, you can show the report instead of '
+          //         'describing it.',
+          //   ),
+          // ]),
         ],
       );
 }
 
+// Kept for revert (2026-10-01): used by the commented heading above.
+// ignore: unused_element
 class _Becomes extends StatelessWidget {
   const _Becomes({required this.title, required this.body});
   final String title;

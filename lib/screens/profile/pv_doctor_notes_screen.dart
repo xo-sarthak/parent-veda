@@ -32,13 +32,60 @@ import '../../theme/pv_fonts.dart';
 import '../../ttc/ttc_doctor_questions_store.dart';
 import '../../ttc/ttc_records_store.dart';
 import '../../ttc/ttc_treatment_store.dart';
-import '../ttc/ttc_appointments_screen.dart' show ttcVisitName;
+import '../ttc/ttc_appointments_screen.dart'
+    show TtcAppointmentsScreen, ttcVisitName;
+import '../tools/baby_movement_screen.dart';
+import '../tools/medicine_tracker_screen.dart';
+import '../tools/weight_tracker_screen.dart';
+import '../ttc/ttc_medication_screen.dart' show TtcMedicationScreen;
+import '../ttc/ttc_records_screen.dart' show TtcRecordsScreen;
+import 'pv_details_screen.dart';
 import 'pv_you_chrome.dart';
 import 'pv_you_content.dart';
 
-class PvDoctorNotesScreen extends StatelessWidget {
+class PvDoctorNotesScreen extends StatefulWidget {
   const PvDoctorNotesScreen({super.key, required this.stage});
   final LifeStage stage;
+
+  @override
+  State<PvDoctorNotesScreen> createState() => _PvDoctorNotesScreenState();
+}
+
+/// Where a section can be edited: what the button says, and the screen it opens.
+///
+/// ⚠️ ADDED 2026-10-02 (the user: "when the user is on this screen they might get
+/// confused, do I have to go back and find where to edit? provide a gate from
+/// here"). This page is read-only by design (it repeats her entries and does
+/// not interpret them), so the way to change one is a door to the place that
+/// owns it, never an editor here. Each label names its place.
+class _Edit {
+  const _Edit(this.label, this.route, this.build);
+  final String label;
+  final String route;
+  final Widget Function() build;
+}
+
+class _PvDoctorNotesScreenState extends State<PvDoctorNotesScreen> {
+  LifeStage get stage => widget.stage;
+
+  String get _stageId => switch (stage.shopStage) {
+        LifeStage.tryingToConceive => 'trying',
+        LifeStage.pregnancy => 'pregnancy',
+        LifeStage.parenting => 'parenting',
+        LifeStage.skilling => 'skilling',
+      };
+
+  /// The screen the profile's "Change your answers" opens.
+  _Edit get _details => _Edit('Edit your details', 'you/details',
+      () => PvDetailsScreen(stageId: _stageId));
+
+  /// Opens the place that owns a section, then rebuilds: this page reads the
+  /// stores each time it builds, so the change shows the moment she is back.
+  Future<void> _go(_Edit e) async {
+    await Navigator.of(context).push(MaterialPageRoute<void>(
+        settings: RouteSettings(name: e.route), builder: (_) => e.build()));
+    if (mounted) setState(() {});
+  }
 
   static String _d(DateTime d) {
     const m = [
@@ -60,9 +107,9 @@ class PvDoctorNotesScreen extends StatelessWidget {
 
   /// The sections as (title, lines, emptyHint). Built once for the screen and
   /// once for the share text so the two can never differ.
-  List<(String, List<String>, String)> _sections() {
+  List<(String, List<String>, String, _Edit?)> _sections() {
     final s = stage.shopStage;
-    final out = <(String, List<String>, String)>[];
+    final out = <(String, List<String>, String, _Edit?)>[];
     final content = pvYouContentFor(stage);
 
     // Who, and the facts on the profile.
@@ -74,6 +121,7 @@ class PvDoctorNotesScreen extends StatelessWidget {
           if (d.value() != '--') '${d.label}: ${d.value()}',
       ],
       'Fill in Your details on the You screen.',
+      _details,
     ));
 
     if (s == LifeStage.tryingToConceive) {
@@ -85,6 +133,7 @@ class PvDoctorNotesScreen extends StatelessWidget {
             '${e.key.label(false)}: ${_d(e.value)}',
         ],
         'No clinic dates logged. Treatment dates live under Your details.',
+        _details,
       ));
       out.add((
         'Test records',
@@ -93,6 +142,7 @@ class PvDoctorNotesScreen extends StatelessWidget {
             '${_d(r.takenOn)} · ${r.label}: ${r.display}${r.forPartner ? ' (partner)' : ''}',
         ],
         'No readings logged. Records live under Your details.',
+        _Edit('Open records', 'ttc/records', () => const TtcRecordsScreen()),
       ));
     }
 
@@ -108,6 +158,10 @@ class PvDoctorNotesScreen extends StatelessWidget {
             'Week ${w.week} (${w.dateIso}): ${w.weight} kg',
         ],
         'No weight logged. The weight tracker is under Tools.',
+        c == null
+            ? null
+            : _Edit('Open weight tracker', 'tools/weight',
+                () => WeightTrackerScreen(controller: c)),
       ));
       out.add((
         'Movements',
@@ -117,6 +171,10 @@ class PvDoctorNotesScreen extends StatelessWidget {
               'Session: ${m.times.length} movements',
         ],
         'No movement sessions yet. The tracker is under Tools.',
+        c == null
+            ? null
+            : _Edit('Open movement tracker', 'tools/movement',
+                () => BabyMovementScreen(controller: c)),
       ));
     }
 
@@ -139,6 +197,7 @@ class PvDoctorNotesScreen extends StatelessWidget {
               'Sleep: ${fam.sleeps.map((e) => e.label).join(', ')}',
           ],
           '',
+          _details,
         ));
         out.add((
           'Growth',
@@ -147,6 +206,7 @@ class PvDoctorNotesScreen extends StatelessWidget {
               '${_d(g.date)}: ${g.weightKg} kg · ${g.heightCm} cm${g.headCm != null ? ' · head ${g.headCm} cm' : ''}',
           ],
           'No measurements yet. Growth is under Tools.',
+          null,
         ));
         final vax = VaxStore.instance;
         out.add((
@@ -156,6 +216,7 @@ class PvDoctorNotesScreen extends StatelessWidget {
               if (vax.isDone(v.id)) '${v.ageLabel}: done',
           ],
           'None marked done yet. The vaccination schedule is under Health.',
+          null,
         ));
       }
     }
@@ -169,6 +230,15 @@ class PvDoctorNotesScreen extends StatelessWidget {
           '${m.name}${m.dose.isNotEmpty ? ' · ${m.dose}' : ''}${m.frequency.isNotEmpty ? ' · ${m.frequency}' : ''}',
       ],
       'None recorded. Medicines live under Tools.',
+      // Pregnancy's tracker needs her pregnancy; trying to conceive has its own.
+      s == LifeStage.pregnancy && PregnancyController.current != null
+          ? _Edit('Open medicines', 'tools/medicines',
+              () => MedicineTrackerScreen(
+                  controller: PregnancyController.current!))
+          : s == LifeStage.tryingToConceive
+              ? _Edit('Open medicines', 'ttc/medication',
+                  () => const TtcMedicationScreen())
+              : null,
     ));
 
     // ⚠️ LAST, AND TRYING TO CONCEIVE ONLY (2026-09-28): the questions she
@@ -189,6 +259,8 @@ class PvDoctorNotesScreen extends StatelessWidget {
             q.isMine ? q.text : '${q.text} (from your partner)',
         ],
         'No questions saved. Write them on Appointments, under Tools.',
+        _Edit('Open appointments', 'ttc/appointments',
+            () => const TtcAppointmentsScreen()),
       ));
     }
 
@@ -197,7 +269,7 @@ class PvDoctorNotesScreen extends StatelessWidget {
 
   String _shareText() {
     final b = StringBuffer('Notes for my doctor — from ParentVeda\n');
-    for (final (title, lines, _) in _sections()) {
+    for (final (title, lines, _, _) in _sections()) {
       if (lines.isEmpty) continue;
       b.writeln('\n$title');
       for (final l in lines) {
@@ -235,22 +307,52 @@ class PvDoctorNotesScreen extends StatelessWidget {
               ),
             ),
           ),
-          for (final (title, lines, empty) in sections)
+          for (final (title, lines, empty, edit) in sections)
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(20, 18, 20, 0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      title,
-                      style: pvFraunces(
-                        fontSize: 19,
-                        fontWeight: FontWeight.w500,
-                        color: p.ink1,
-                      ),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            title,
+                            style: pvFraunces(
+                              fontSize: 19,
+                              fontWeight: FontWeight.w500,
+                              color: p.ink1,
+                            ),
+                          ),
+                        ),
+                        // The gate to where this is edited (2026-10-02).
+                        if (edit != null)
+                          TextButton.icon(
+                            key: ValueKey('notes_edit_$title'),
+                            onPressed: () => _go(edit),
+                            style: TextButton.styleFrom(
+                              foregroundColor: p.ink1,
+                              minimumSize: const Size(48, 44),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8),
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            ),
+                            icon: Icon(Icons.edit_outlined,
+                                size: 16, color: p.ink1),
+                            label: Text(
+                              edit.label,
+                              style: pvManrope(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w800,
+                                color: p.ink1,
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 4),
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.all(14),

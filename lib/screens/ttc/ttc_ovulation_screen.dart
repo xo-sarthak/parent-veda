@@ -56,13 +56,12 @@ import '../../theme/pv_fonts.dart';
 import '../../ttc/cycle_store.dart';
 import '../../ttc/ttc_chapter.dart';
 import '../../ttc/ttc_log_store.dart';
-import '../../ttc/ttc_reads_data.dart' show ttcReadById;
 import '../../ttc/ttc_store.dart';
 import '../../ttc/ttc_symptom_data.dart' show kTtcSymptomTracker;
 import '../products/pv_store_chrome.dart' show pvSnack;
+import 'ttc_read_next.dart' show ttcToolReadNext;
 import '../v2/v2_palette.dart';
 import 'ttc_common.dart';
-import 'ttc_focus_screen.dart' show openTtcArticle;
 import 'ttc_round_strings.dart' show ttcRoundDate;
 import 'ttc_strings.dart';
 import 'ttc_today_screen.dart' show logTtcPeriod;
@@ -431,20 +430,13 @@ class _TtcOvulationTestsScreenState extends State<TtcOvulationTestsScreen> {
             ],
 
             const SizedBox(height: 24),
-            for (final id in const [
-              'ttc_read_ovulation_kits',
-              'ttc_read_ovulation_tests_irregular',
-            ])
-              if (ttcReadById(id) case final r?) ...[
-                ttcToolPad(
-                  _ReadRow(
-                    key: ValueKey('ttc_ov_read_$id'),
-                    title: r.title.en,
-                    onTap: () => openTtcArticle(context, id, hue: kTtcOvHue),
-                  ),
-                ),
-                const SizedBox(height: 8),
-              ],
+            // ⚠️ THE FOOT IS THE READER'S FOOT (2026-10-01, the user: the two
+            // articles at the bottom "need to be like the way we have at
+            // the bottom of each article reader"). A rule, "Read next", and
+            // the same two-tile rail the reader draws (`PvReadNextRail`), not
+            // a bordered text row of its own. Kept for revert: a `_ReadRow`
+            // per id, with the key `ttc_ov_read_<id>`.
+            ..._readNext(context, p),
             const SizedBox(height: 14),
             ttcToolPad(
               Text(
@@ -458,6 +450,19 @@ class _TtcOvulationTestsScreenState extends State<TtcOvulationTestsScreen> {
       },
     );
   }
+
+  /// The reads this page offers at its foot, in the reader's own shape: the
+  /// shared `ttcToolReadNext` (2026-10-01, one block for every tool screen).
+  /// Kept for revert: the same rule, heading and rail were built here.
+  List<Widget> _readNext(BuildContext context, V2Palette p) => ttcToolReadNext(
+        context,
+        const [
+          'ttc_read_ovulation_kits',
+          'ttc_read_ovulation_tests_irregular',
+        ],
+        hue: kTtcOvHue,
+        railKey: const ValueKey('ttc_ov_read_next'),
+      );
 
   List<Widget> _resultBlock(DateTime start, DateTime now, V2Palette p) {
     final day = _day.isBefore(start) ? now : _day;
@@ -871,8 +876,19 @@ class _CycleStrip extends StatelessWidget {
                     onTap: () => onPick(d),
                     child: Container(
                       width: 44,
+                      // ⚠️ ONE HEIGHT FOR EVERY DAY, AND THE CONTENT CENTRED IN
+                      // IT (2026-10-01, the user: with no result logged "the
+                      // border … is taking extra space from below which isn't
+                      // needed… it looks like a bug"). The empty days reserved
+                      // a 9pt slot for a result mark that was not there, so the
+                      // card had a blank band under its date. Now a day with no
+                      // result shows only its label and date, centred in a card
+                      // the same height as one with a mark, so the strip stays
+                      // even. Kept for revert: `padding: vertical 8` and an
+                      // always-drawn 9pt circle (transparent when empty).
+                      height: 62,
+                      alignment: Alignment.center,
                       margin: const EdgeInsets.symmetric(horizontal: 2),
-                      padding: const EdgeInsets.symmetric(vertical: 8),
                       decoration: BoxDecoration(
                         color: on ? ttcTitleInk : Colors.white,
                         borderRadius: BorderRadius.circular(14),
@@ -882,6 +898,7 @@ class _CycleStrip extends StatelessWidget {
                         ),
                       ),
                       child: Column(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
                             d == today ? 'Today' : 'Day $cd',
@@ -901,23 +918,24 @@ class _CycleStrip extends StatelessWidget {
                               color: on ? Colors.white : ttcTitleInk,
                             ),
                           ),
-                          const SizedBox(height: 5),
-                          Container(
-                            width: 9,
-                            height: 9,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: r == kTtcOvPositive
-                                  ? (on ? Colors.white : ttcTitleInk)
-                                  : Colors.transparent,
-                              border: r == kTtcOvNegative || r == kTtcOvPositive
-                                  ? Border.all(
-                                      color: on ? Colors.white : ttcTitleInk,
-                                      width: 1.4,
-                                    )
-                                  : null,
+                          // The result mark, only when there is a result.
+                          if (r == kTtcOvNegative || r == kTtcOvPositive) ...[
+                            const SizedBox(height: 5),
+                            Container(
+                              width: 9,
+                              height: 9,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: r == kTtcOvPositive
+                                    ? (on ? Colors.white : ttcTitleInk)
+                                    : Colors.transparent,
+                                border: Border.all(
+                                  color: on ? Colors.white : ttcTitleInk,
+                                  width: 1.4,
+                                ),
+                              ),
                             ),
-                          ),
+                          ],
                         ],
                       ),
                     ),
@@ -931,7 +949,10 @@ class _CycleStrip extends StatelessWidget {
   }
 }
 
+// Kept for revert (2026-10-01): the foot is `PvReadNextRail` now, the reader's.
+// ignore: unused_element
 class _ReadRow extends StatelessWidget {
+  // ignore: unused_element_parameter
   const _ReadRow({super.key, required this.title, required this.onTap});
   final String title;
   final VoidCallback onTap;

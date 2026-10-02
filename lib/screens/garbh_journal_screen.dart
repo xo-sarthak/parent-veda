@@ -41,8 +41,11 @@ import '../data/garbh_rebuild_data.dart';
 import '../localization/app_language.dart';
 import '../services/raga_audio_store.dart';
 import '../theme/pv_fonts.dart';
-import 'doors/pv_door_chrome.dart'
-    show PvDoorRailCard, kPvRailCardHeight, kPvRailGap;
+// Kept for revert (2026-10-02, the tall rail cards became shelf cards):
+// import 'doors/pv_door_chrome.dart'
+//     show PvDoorRailCard, kPvRailCardHeight, kPvRailGap;
+import 'doors/pv_shelf_card.dart' show PvShelfCard, pvShelfRailHeight;
+import 'doors/pv_shelf_spec.dart' show PvShelfKind;
 import 'garbh_invite_screen.dart';
 import 'v2/v2_palette.dart';
 
@@ -283,29 +286,29 @@ Widget _embeddedBody(BuildContext context, GarbhJournalStore store,
       // ListViews per SECTION, and this tab has none — it is a tool tab. A
       // scroll view holding two cards keeps the card language without
       // registering as a section.
+      // // ⚠️ THE SHELF CARD, NOT THE TALL RAIL CARD (2026-10-02, the user: a tool drawn
+      // inside a door should wear the same card as the door's own sections, TTC's
+      // format). `PvDoorRailCard` at `kPvRailCardHeight` (176) is kept for revert in
+      // each caller's note.
       SizedBox(
-        height: kPvRailCardHeight,
+        height: pvShelfRailHeight(MediaQuery.textScalerOf(context)),
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(children: [
-            PvDoorRailCard(
+            PvShelfCard(
               p: p,
               hue: 42,
-              icon: Icons.edit_note_rounded,
-              chip: 'Tool',
+              kind: PvShelfKind.tool,
               title: 'Write a letter to your baby',
-              index: 0,
               onTap: () => _writeLetter(context),
             ),
-            const SizedBox(width: kPvRailGap),
-            PvDoorRailCard(
+            const SizedBox(width: 12),
+            PvShelfCard(
               p: p,
               hue: 42,
-              icon: Icons.group_add_outlined,
-              chip: 'Tool',
+              kind: PvShelfKind.tool,
               title: 'Invite someone to record',
-              meta: 'PAPA, DADI, NANI',
-              index: 1,
+              fact: 'Papa, Dadi, Nani',
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute<void>(
                   settings: const RouteSettings(name: 'garbh/invite'),
@@ -412,7 +415,8 @@ Future<void> _writeLetter(BuildContext context) async {
     ),
   );
 
-  ctrl.dispose();
+  // ⚠️ NOT DISPOSED THE MOMENT THE ROUTE CLOSES (2026-10-02, the red screen '_dependents.isEmpty'): the TextField is still on screen for the exit animation and still listening. Same fix as the add-child sheet.
+  Future<void>.delayed(const Duration(milliseconds: 600), ctrl.dispose);
   if (text == null || text.isEmpty) return;
 
   await GarbhJournalStore.instance.add(GarbhJournalEntry(

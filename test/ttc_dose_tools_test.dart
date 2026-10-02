@@ -61,7 +61,9 @@ void main() {
       expect(tester.takeException(), isNull);
       expect(find.text(const TtcS(false).supplementsEmptyTitle), findsOneWidget);
       expect(find.text('Add your own'), findsOneWidget);
-      expect(find.byKey(const ValueKey('ttc_supp_read')), findsOneWidget,
+      // The read moved to the foot of the screen, as the reader's own "Read
+      // next" rail (2026-10-01). Kept for revert: the key `ttc_supp_read`.
+      expect(find.byKey(const ValueKey('ttc_supp_read_next')), findsOneWidget,
           reason: 'What to Expect opens its vitamin log with a read');
       // No day strip over an empty list: there is nothing to tick yet.
       expect(find.byType(TtcDayStrip), findsNothing);
@@ -315,7 +317,7 @@ void main() {
         (tester) async {
       await pumpTall(tester, const TtcMedicationScreen());
       expect(find.text(const TtcS(false).medEmptyTitle), findsOneWidget);
-      expect(find.byKey(const ValueKey('ttc_med_read')), findsOneWidget);
+      expect(find.byKey(const ValueKey('ttc_med_read_next')), findsOneWidget);
       await tester.tap(find.text(const TtcS(false).medAdd));
       await tester.pumpAndSettle();
       expect(find.text('Add a medicine'), findsOneWidget);
@@ -537,7 +539,10 @@ void main() {
 
     testWidgets('the read opens in the one reader', (tester) async {
       await pumpTall(tester, const TtcMedicationScreen());
-      await tester.tap(find.byKey(const ValueKey('ttc_med_read')));
+      await tester.ensureVisible(find.byKey(const ValueKey('ttc_med_read_next')));
+      await tester.tap(find.descendant(
+          of: find.byKey(const ValueKey('ttc_med_read_next')),
+          matching: find.byType(InkWell)).first);
       await tester.pumpAndSettle();
       expect(find.byType(PvReaderScreen), findsOneWidget);
     });

@@ -41,6 +41,7 @@ import '../../theme/pv_fonts.dart';
 import '../../widgets/global_ask_fab.dart' show kAskFabReserve;
 import '../brackets/hub/hub_intent_art.dart' show IntentMark;
 import '../doors/pv_list_row.dart' show PvMarkWell;
+import '../ttc/ttc_tool_marks.dart' show ttcFamilyMarkForIntent;
 import '../products/pv_store_chrome.dart' show kPvInk;
 import '../v2/v2_palette.dart';
 import '../v2/v3_hero_field.dart';
@@ -154,13 +155,20 @@ class PregToolScaffold extends StatelessWidget {
                   ]),
                   const SizedBox(height: 14),
                   if (mark != null) ...[
+                    // ⚠️ THE TTC FAMILY'S OBJECT (2026-10-02, the user: the
+                    // tool's front page should wear the same mark as its row
+                    // on the Tools list, which is TTC's now). The drawn disc,
+                    // bare, 40, in the field's own tint, as `TtcToolScaffold`
+                    // draws its header mark. A mark with no counterpart keeps
+                    // the well. Kept for revert: the `PvMarkWell` alone.
                     ExcludeSemantics(
-                      child: PvMarkWell(
-                          key: const ValueKey('preg_tool_header_mark'),
-                          p: p,
-                          hue: h,
-                          size: 40,
-                          mark: mark),
+                      child: SizedBox(
+                        key: const ValueKey('preg_tool_header_mark'),
+                        width: 40,
+                        height: 40,
+                        child: ttcFamilyMarkForIntent(mark, accent) ??
+                            PvMarkWell(p: p, hue: h, size: 40, mark: mark),
+                      ),
                     ),
                     const SizedBox(height: 10),
                   ],

@@ -299,7 +299,6 @@ void main() {
           lineId: 'l1',
           productId: 'sw_overall',
           name: 'Swaddle',
-          emoji: '',
           unitPrice: 1199,
           qty: 1,
         );
@@ -329,7 +328,6 @@ void main() {
         lineId: 'x',
         productId: 'p',
         name: 'n',
-        emoji: '',
         unitPrice: 1,
         image: 'https://x/y.jpg',
       );

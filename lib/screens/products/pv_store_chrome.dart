@@ -34,6 +34,7 @@ import 'package:flutter/material.dart';
 
 import '../../data/products/pv_category_images.dart';
 import '../../models/pv_product.dart';
+import '../../services/father_preview.dart';
 import '../../services/life_stage_store.dart';
 import '../../services/pv_catalog_store.dart';
 import '../../services/pv_compare_store.dart';
@@ -181,9 +182,17 @@ void pvSnack(
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(18),
+            // ⚠️ A SHADOW YOU CAN SEE (2026-10-01, the user: the notice "needs
+            // shadow … it blends with the screen, so no difference"). White on
+            // a white page with a 10% shadow read as no card at all. Now a
+            // deeper, wider fall, a tighter contact shadow under the edge and
+            // a hairline, so it lifts off every ground. Kept for revert: the
+            // two shadows were alpha 0.10 blur 24 offset 8, and alpha 0.06
+            // blur 3 offset 1, with no border.
+            border: Border.all(color: p.ink1.withValues(alpha: 0.10), width: 1),
             boxShadow: [
-              BoxShadow(color: p.ink1.withValues(alpha: 0.10), blurRadius: 24, offset: const Offset(0, 8)),
-              BoxShadow(color: p.ink1.withValues(alpha: 0.06), blurRadius: 3, offset: const Offset(0, 1)),
+              BoxShadow(color: p.ink1.withValues(alpha: 0.24), blurRadius: 30, spreadRadius: 1, offset: const Offset(0, 12)),
+              BoxShadow(color: p.ink1.withValues(alpha: 0.16), blurRadius: 8, offset: const Offset(0, 3)),
             ],
           ),
           child: Row(children: [
@@ -266,8 +275,24 @@ double? pvSnackLiftFor(BuildContext context) {
   // sheets, dialogs and menus. Kept for revert: the popUntil read of
   // `Navigator.maybeOf(context)`.
   final name = fabRouteObserver.topPageName;
-  if (name == null || !name.startsWith('ttc')) return null;
-  return name == 'ttc/today' ? kPvSnackOverTtcBar : kPvSnackAtFoot;
+  if (name != null && name.startsWith('ttc')) {
+    return name == 'ttc/today' ? kPvSnackOverTtcBar : kPvSnackAtFoot;
+  }
+  // ⚠️ PREGNANCY SITS WHERE TRYING TO CONCEIVE'S DOES (2026-10-02, the user:
+  // "toast alert in pregnancy side needs to be like TTC"). Pregnancy's shell
+  // is unnamed, so it got the Store's 164, which floated a notice mid-screen
+  // over the content. Now: just above the bottom bar while only the shell is
+  // showing (the same `PvNavBar` as trying to conceive, so the same 96), and
+  // at the foot on any screen pushed over it. The Store's own screens keep
+  // the default, because their sticky buy bar needs the 164. The father's
+  // shell is not drawn the same way and keeps the default.
+  final stage = LifeStageStore.instance.stage ?? LifeStage.pregnancy;
+  if (stage == LifeStage.pregnancy &&
+      !FatherPreview.instance.on &&
+      !(name ?? '').startsWith('store/')) {
+    return fabRouteObserver.pageCount <= 1 ? kPvSnackOverTtcBar : kPvSnackAtFoot;
+  }
+  return null;
 }
 
 // ---- the bottom bar for a tab-root screen ------------------------------------

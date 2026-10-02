@@ -218,7 +218,6 @@ class _PvProductScreenState extends State<PvProductScreen> {
       kProductsCartId,
       productId: p.id,
       name: p.name,
-      emoji: '',
       unitPrice: _priceOf(p).toDouble(),
       size: _variant?.label ?? '',
       image: p.images.isNotEmpty ? p.images.first : '',

@@ -306,7 +306,16 @@ void main() {
     testWidgets('the whole week opens as a read in the one reader',
         (tester) async {
       await _pump(tester);
-      await tester.tap(find.text('The whole week and the shopping list'));
+      // The week's read is the "Read next" rail at the foot now (2026-10-02,
+      // the user: the article on a tool screen is the reader's rail). Kept for
+      // revert: tapping the row 'The whole week and the shopping list'.
+      final title = ttcReadById(kTtcMealPlanReadId)!.title.en;
+      final tile = find.descendant(
+          of: find.byKey(const ValueKey('ttc_food_read_next')),
+          matching: find.text(title));
+      await tester.ensureVisible(tile);
+      await tester.pumpAndSettle();
+      await tester.tap(tile);
       await tester.pumpAndSettle();
       expect(find.byType(PvReaderScreen), findsOneWidget);
     });

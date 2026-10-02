@@ -14,6 +14,28 @@
 //  the star beside our own score, the review count (seed reviews, not real
 //  ones), the brand line (the name's first word, said twice) and the stock
 //  photo placeholders are gone. Every filled button is the one ink.
+//
+//  ⚠️ FRESHENED (2026-10-02, the user: "it uses outdated emojis that are not used
+//  in the app, and glyphs or marks not used any more; update it, make sure it
+//  does not sound bad, use Mobbin so it is less confusing"). References: Noom's
+//  and Lloyds' round-tick rows (https://mobbin.com/screens/b7950de7-6b61-481f-abfe-959c3916ef58,
+//  https://mobbin.com/screens/82e6ae99-166c-4886-956b-c3dd8a6b9e56), Glovo's, Fresha's
+//  and Subway's catalogue rows with one add control
+//  (https://mobbin.com/screens/e5b6befa-470e-4809-8b65-f2df26535744), and Perplexity's
+//  and Brick's starter cards (https://mobbin.com/screens/be80b9f7-f891-44b9-85ef-c8b6180d76c8).
+//    · NO EMOJI: a product shows its own photo, or the family's drawn bag mark in
+//      a quiet well; the starter lists and the lists she makes wear the TTC mark
+//      family (the clipboard, the hands, the lotus, the jar), the marks the rest
+//      of the app uses. The old hub marks (`IntentMark.*` wells) are gone here.
+//    · TICKING IS ONE TAP. A dialog asked "Already got this?" before a tick took;
+//      now it ticks, says what it did ("it won't go in your cart") and offers Undo.
+//    · TICKED THINGS SINK to a "Got" group, so the list shows what is left.
+//    · ONE ACTION AT THE FOOT. "Save list" saved nothing (the list saves as she
+//      goes, now said once); the foot is one button: add what is left to the cart.
+//    · THE WORDS: "Affiliate" is "Via Amazon", "Add when" is "Add a note", "Curated
+//      starters" is "Starter lists", "ticked" is "ticked off". English only; the
+//      shipped Hindi is untouched (`_Copy` returns it unchanged in Hindi).
+//  The old pieces are kept below, commented, for revert.
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -30,12 +52,15 @@ import '../../services/product_checklist_store.dart';
 import '../../widgets/mic_dictation_button.dart';
 import '../brackets/hub/hub_intent_art.dart';
 import '../cart_screen.dart';
-import '../doors/pv_list_row.dart' show PvMarkWell;
+// Kept for revert (2026-10-02, the wells are the TTC family marks now): import '../doors/pv_list_row.dart' show PvMarkWell;
 import '../pregnancy/preg_chrome.dart';
 import '../pregnancy/preg_tool_chrome.dart';
 import '../products/pv_store_chrome.dart' show PvChip, kPvInk, kPvLine, pvStorePalette;
 import '../products_screen.dart';
 import '../../theme/pv_fonts.dart';
+import '../ttc/doors/ttc_tab_art.dart' show TtcTabMark;
+import '../ttc/ttc_tool_marks.dart' show TtcMarkLeading, TtcToolMark;
+import '../v2/v2_palette.dart' show V2PaletteStore, v2BlockTint;
 
 // Kept for revert (2026-09-30): the teal accent, the "bought" green and the
 // star glyph's amber. Everything they drew is the one ink or a neutral tag.
@@ -47,8 +72,105 @@ import '../../theme/pv_fonts.dart';
 /// tool's tile sits.
 const double _kHue = 28;
 
+// ---------------------------------------------------------------------------
+//  Marks and words (2026-10-02)
+// ---------------------------------------------------------------------------
+
+/// The Tools tab's pastel for this tool, the tint the TTC family marks draw on.
+Color _tint() => v2BlockTint(_kHue % 360, V2PaletteStore.instance.current);
+
+/// A mark of the TTC tab family in the 44 box the app's lists draw it in.
+Widget _tabMark(TtcTabMark m, {double size = 44}) =>
+    TtcMarkLeading(tab: m, tint: _tint(), size: size);
+
+/// The starter list's own mark, by its name (a const English identity in
+/// `kCuratedChecklists`). Replaces the emoji and the old hub marks.
+Widget _curatedLeading(CuratedList c, {double size = 44}) => _tabMark(
+      switch (c.name) {
+        'Newborn essentials' => TtcTabMark.heartHand,
+        'Bump comfort' => TtcTabMark.lotus,
+        'Skin & body' => TtcTabMark.jarLeaf,
+        _ => TtcTabMark.checklist,
+      },
+      size: size,
+    );
+
+/// A product's picture: its own photo, or the family's bag mark in a quiet
+/// well. Never an emoji and never a stock photo.
+Widget _thumb(Product? p, double size) {
+  final pal = pvStorePalette;
+  Widget mark() => Container(
+        width: size,
+        height: size,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+            color: pal.surfaceAlt, borderRadius: BorderRadius.circular(12)),
+        child: TtcMarkLeading(
+            tool: TtcToolMark.hospitalBag, tint: _tint(), size: size * 0.74),
+      );
+  final photo = p == null ? null : _realImage(p);
+  if (photo == null) return mark();
+  return ClipRRect(
+    borderRadius: BorderRadius.circular(12),
+    child: Image.network(
+      photo,
+      width: size,
+      height: size,
+      fit: BoxFit.cover,
+      errorBuilder: (_, _, _) => mark(),
+      loadingBuilder: (ctx, child, progress) => progress == null ? child : mark(),
+    ),
+  );
+}
+
+/// The words this tool says in English, plainer than the shipped ones. In
+/// Hindi every line is the shipped one, untouched (new copy is English only).
+class _Copy {
+  const _Copy(this.s, this.hi);
+  final S s;
+  final bool hi;
+
+  String get curated => hi ? s.pclCurated : 'Starter lists';
+  String get curatedSub =>
+      hi ? s.pclCuratedSub : 'Start from a ready-made list. Change anything you like.';
+  String get empty => hi
+      ? s.pclEmpty
+      : 'No lists yet. Start your own, or begin from a starter list below.';
+  String get emptyItems => hi
+      ? s.pclEmptyItems
+      : 'Nothing here yet. Add products from our catalogue, or add your own.';
+  String get addOwn => hi ? s.pclAddOwn : 'Add your own item';
+  String get customName => hi ? s.pclCustomName : 'Item name';
+  String get customNote =>
+      hi ? s.pclCustomNote : 'Note, such as when you need it (optional)';
+  String get addNote => hi ? s.pclAddWhen : 'Add a note';
+  String get notePrompt => hi ? s.pclNotePrompt : 'A note, such as when you need it';
+  String listSummary(int total, int got) => hi
+      ? s.pclListSummary(total, got)
+      : total == 0
+          ? 'Nothing added yet'
+          : '$total items · $got ticked off';
+  String gotOf(int got, int total) =>
+      hi ? s.pclGotOf(got, total) : '$got of $total ticked off';
+  String get adopt => hi ? s.pclAdopt : 'Use this list';
+  String addRemaining(int n) =>
+      hi ? s.pclAddRemaining : "Add what's left to cart ($n)";
+  String get affiliate => hi ? s.pclAffiliate : 'Via Amazon';
+  String get customTag => hi ? s.pclCustomTag : 'Added by you';
+  String get boughtTag => hi ? s.pclBoughtTag : 'Bought';
+  String gotHeading(int n) => hi ? 'Got · $n' : 'Got · $n';
+  String get gotSnack =>
+      hi ? s.pclGotPromptBody : "Ticked off. It won't go in your cart.";
+  String get undo => hi ? 'Undo' : 'Undo';
+  String get savedAuto => hi ? '' : 'Saved as you go';
+  String get allDone => hi ? '' : 'Everything on this list is ticked off.';
+  String get done => hi ? s.pclSave : 'Done';
+}
+
 /// A curated starter's drawn mark, by its name (the name is a const English
 /// identity in `kCuratedChecklists`). Replaces the list's emoji in chrome.
+// Kept for revert (2026-10-02): the old hub marks; `_curatedLeading` replaced it.
+// ignore: unused_element
 IntentMark _curatedMark(CuratedList c) => switch (c.name) {
       'Newborn essentials' => IntentMark.feedMark,
       'Bump comfort' => IntentMark.lotusMark,
@@ -148,7 +270,9 @@ Product? _itemProduct(ChecklistItem i) =>
 String _itemName(ChecklistItem i) =>
     _itemProduct(i)?.name.now ?? (i.name.isEmpty ? 'Item' : i.name);
 String _itemPrice(ChecklistItem i) => _itemProduct(i)?.price ?? i.price;
-String _itemEmoji(ChecklistItem i) => _itemProduct(i)?.emoji ?? '🛍️';
+// Kept for revert (2026-10-02, no emoji anywhere): `_itemEmoji` returned the
+// product's emoji for the picture; `_thumb` draws the photo or the family mark.
+// String _itemEmoji(ChecklistItem i) => _itemProduct(i)?.emoji ?? '🛍️';
 
 /// The product's own photo, or none. ⚠️ NEVER A STOCK PLACEHOLDER: when a
 /// product has no `imageUrl`, `productImageUrl` returns a random loremflickr
@@ -356,6 +480,7 @@ class ProductChecklistScreen extends StatelessWidget {
       builder: (context, _) {
         final store = ProductChecklistStore.instance;
         final lists = store.checklists;
+        final c = _Copy(s, controller.language.isHindi);
         return PregToolScaffold(
           hue: _kHue,
           eyebrow: 'Get ready',
@@ -393,18 +518,18 @@ class ProductChecklistScreen extends StatelessWidget {
                   PregSectionHeading(s.pclYourLists),
                   const SizedBox(height: 4),
                   if (lists.isEmpty)
-                    _emptyLists(s)
+                    _emptyLists(s, c)
                   else
-                    for (final l in lists) _checklistCard(context, s, l),
+                    for (final l in lists) _checklistCard(context, s, c, l),
                   const SizedBox(height: 28),
                   // Kept for revert: the heading in Jakarta 16 / w800 and the
                   // grey line under it, drawn separately.
-                  PregSectionHeading(s.pclCurated, lead: s.pclCuratedSub),
+                  PregSectionHeading(c.curated, lead: c.curatedSub),
                   const SizedBox(height: 12),
                   // One white card of rows with drawn marks. Kept for revert:
                   // `_curatedCard` per list, a bordered card with the emoji.
                   PregRowCard(children: [
-                    for (final c in kCuratedChecklists) _curatedRow(context, s, c),
+                    for (final l in kCuratedChecklists) _curatedRow(context, s, c, l),
                   ]),
                 ])),
           ],
@@ -426,16 +551,18 @@ class ProductChecklistScreen extends StatelessWidget {
 
   // The empty state is the feature's advertisement: a white card with the
   // checklist's drawn mark. Kept for revert: a teal `Icons.checklist_rounded`.
-  Widget _emptyLists(S s) {
+  Widget _emptyLists(S s, _Copy c) {
     final pal = pvStorePalette;
     return Padding(
       padding: const EdgeInsets.only(top: 8),
       child: PregCard(
         padding: const EdgeInsets.all(22),
         child: Column(children: [
-          PvMarkWell(p: pal, hue: _kHue, size: 48, mark: IntentMark.checkMark),
+          // The family's clipboard (2026-10-02). Kept for revert:
+          // PvMarkWell(p: pal, hue: _kHue, size: 48, mark: IntentMark.checkMark).
+          _tabMark(TtcTabMark.checklist, size: 56),
           const SizedBox(height: 12),
-          Text(s.pclEmpty,
+          Text(c.empty,
               textAlign: TextAlign.center,
               style: pvManrope(fontSize: 13.5, height: 1.45, color: pal.ink2)),
         ]),
@@ -443,7 +570,7 @@ class ProductChecklistScreen extends StatelessWidget {
     );
   }
 
-  Widget _checklistCard(BuildContext context, S s, ProductChecklist l) {
+  Widget _checklistCard(BuildContext context, S s, _Copy c, ProductChecklist l) {
     final pal = pvStorePalette;
     final total = l.items.length;
     final got = l.gotCount;
@@ -476,7 +603,9 @@ class ProductChecklistScreen extends StatelessWidget {
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(children: [
-              PvMarkWell(p: pal, hue: _kHue, size: 44, mark: IntentMark.checkMark),
+              // Kept for revert: PvMarkWell(p: pal, hue: _kHue, size: 44,
+              // mark: IntentMark.checkMark).
+              _tabMark(TtcTabMark.checklist),
               const SizedBox(width: 14),
               Expanded(
                 child: Column(
@@ -490,7 +619,7 @@ class ProductChecklistScreen extends StatelessWidget {
                               fontWeight: FontWeight.w700,
                               color: pal.ink1)),
                       const SizedBox(height: 3),
-                      Text(s.pclListSummary(total, got),
+                      Text(c.listSummary(total, got),
                           style: pvManrope(fontSize: 12.5, color: pal.ink3)),
                     ]),
               ),
@@ -559,19 +688,20 @@ class ProductChecklistScreen extends StatelessWidget {
       ..showSnackBar(SnackBar(content: Text(s.pclDeleted)));
   }
 
-  Widget _curatedRow(BuildContext context, S s, CuratedList c) => PregOfferRow(
-        mark: _curatedMark(c),
+  Widget _curatedRow(BuildContext context, S s, _Copy c, CuratedList l) => PregOfferRow(
+        mark: _curatedMark(l),
+        leading: _curatedLeading(l),
         hue: _kHue,
-        title: c.name,
-        line: s.pclItemsCount(c.items.length),
-        onTap: () => _curatedPreview(context, s, c),
+        title: l.name,
+        line: s.pclItemsCount(l.items.length),
+        onTap: () => _curatedPreview(context, s, c, l),
       );
 
   // Kept for revert (2026-09-30): `_curatedCard`, a bordered white card per
   // curated list with the list's emoji in a teal-tinted 46-pt well, the name
   // in Jakarta 14.5 / w700, the count and a chevron. Now `_curatedRow`.
 
-  void _curatedPreview(BuildContext context, S s, CuratedList c) {
+  void _curatedPreview(BuildContext context, S s, _Copy cp, CuratedList c) {
     final pal = pvStorePalette;
     showModalBottomSheet<void>(
       context: context,
@@ -596,7 +726,9 @@ class ProductChecklistScreen extends StatelessWidget {
               // The list's drawn mark, not its emoji. Kept for revert:
               // Text(c.emoji, style: const TextStyle(fontSize: 22)).
               child: Row(children: [
-                PvMarkWell(p: pal, hue: _kHue, size: 40, mark: _curatedMark(c)),
+                // Kept for revert: PvMarkWell(p: pal, hue: _kHue, size: 40,
+                // mark: _curatedMark(c)).
+                _curatedLeading(c, size: 44),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(c.name,
@@ -615,8 +747,9 @@ class ProductChecklistScreen extends StatelessWidget {
                 children: [
                   for (final e in products)
                     ListTile(
-                      leading:
-                          Text(e.product!.emoji, style: const TextStyle(fontSize: 24)),
+                      // The photo or the family mark. Kept for revert:
+                      // Text(e.product!.emoji, style: const TextStyle(fontSize: 24)).
+                      leading: _thumb(e.product, 40),
                       title: Text(e.product!.name.now,
                           style: pvManrope(
                               fontSize: 14,
@@ -646,7 +779,7 @@ class ProductChecklistScreen extends StatelessWidget {
                         _ChecklistDetailScreen(
                             controller: controller, checklistId: id));
                   },
-                  child: Text(s.pclAdopt,
+                  child: Text(cp.adopt,
                       style: pvManrope(fontWeight: FontWeight.w800)),
                 ),
               ),
@@ -754,6 +887,15 @@ class _ChecklistDetailScreen extends StatelessWidget {
         }
         final total = list.items.length;
         final got = list.gotCount;
+        final c = _Copy(s, controller.language.isHindi);
+        bool owned(ChecklistItem it) {
+          final pr = _itemProduct(it);
+          return it.checked ||
+              (pr != null && BoughtStore.instance.isBought(pr.id));
+        }
+
+        final todo = [for (final it in list.items) if (!owned(it)) it];
+        final gotItems = [for (final it in list.items) if (owned(it)) it];
         return Scaffold(
           backgroundColor: pal.ground,
           // The back arrow and the list's menu; the list's name is the serif
@@ -805,20 +947,100 @@ class _ChecklistDetailScreen extends StatelessWidget {
                 child: Text(list.name, style: pregPageTitleStyle()),
               ),
               const SizedBox(height: 14),
-              // progress
-              Row(children: [
-                Expanded(child: _progress(total == 0 ? 0.0 : got / total, 8)),
-                const SizedBox(width: 12),
-                Text(s.pclGotOf(got, total),
-                    style: pvManrope(
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w800,
-                        color: pal.ink1)),
-              ]),
+//  // Kept for revert (2026-10-02): the single list of every item, ticked or not.
+//                // progress
+//                Row(children: [
+//                  Expanded(child: _progress(total == 0 ? 0.0 : got / total, 8)),
+//                  const SizedBox(width: 12),
+//                  Text(s.pclGotOf(got, total),
+//                      style: pvManrope(
+//                          fontSize: 12.5,
+//                          fontWeight: FontWeight.w800,
+//                          color: pal.ink1)),
+//                ]),
+//                const SizedBox(height: 16),
+//                SizedBox(
+//                  width: double.infinity,
+//                  child: OutlinedButton.icon(
+//                    onPressed: () => _push(
+//                        context,
+//                        _AddProductsScreen(
+//                            controller: controller, checklistId: list.id)),
+//                    icon: const Icon(Icons.add_rounded, color: kPvInk),
+//                    label: Text(s.pclAddProducts,
+//                        style: pvManrope(
+//                            fontWeight: FontWeight.w800, color: kPvInk)),
+//                    style: _outlineStyle(),
+//                  ),
+//                ),
+//                const SizedBox(height: 14),
+//                // Every item in one white card, hairlines between. Kept for
+//                // revert: a shadowed card per item, 10 apart; the empty line
+//                // centred on the page.
+//                Container(
+//                  decoration: BoxDecoration(
+//                    color: Colors.white,
+//                    borderRadius: BorderRadius.circular(20),
+//                    border: Border.all(color: kPvLine),
+//                  ),
+//                  clipBehavior: Clip.antiAlias,
+//                  child: list.items.isEmpty
+//                      ? Padding(
+//                          padding: const EdgeInsets.all(18),
+//                          child: Text(s.pclEmptyItems,
+//                              textAlign: TextAlign.center,
+//                              style: pvManrope(
+//                                  fontSize: 13.5, height: 1.45, color: pal.ink2)),
+//                        )
+//                      : Column(children: [
+//                          for (var i = 0; i < list.items.length; i++) ...[
+//                            if (i > 0)
+//                              const Divider(
+//                                  height: 1,
+//                                  thickness: 1,
+//                                  color: kPvLine,
+//                                  indent: 64,
+//                                  endIndent: 16),
+//                            _itemRow(context, s, store, list.id, list.items[i]),
+//                          ],
+//                        ]),
+//                ),
+//              ],
+//            ),
+              // ---- progress, and what has been done for her (2026-10-02) -------
+              // Side by side; stacked at a large text size, where the words need
+              // the whole line.
+              if (MediaQuery.textScalerOf(context).scale(10) > 13)
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(c.gotOf(got, total),
+                      style: pvManrope(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w800,
+                          color: pal.ink1)),
+                  const SizedBox(height: 8),
+                  _progress(total == 0 ? 0.0 : got / total, 8),
+                ])
+              else
+                Row(children: [
+                  Expanded(child: _progress(total == 0 ? 0.0 : got / total, 8)),
+                  const SizedBox(width: 12),
+                  Text(c.gotOf(got, total),
+                      style: pvManrope(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w800,
+                          color: pal.ink1)),
+                ]),
+              if (total > 0 && c.savedAuto.isNotEmpty) ...[
+                const SizedBox(height: 6),
+                Text(c.savedAuto,
+                    key: const ValueKey('pcl_saved_auto'),
+                    style: pvManrope(fontSize: 12.5, color: pal.ink3)),
+              ],
               const SizedBox(height: 16),
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(
+                  key: const ValueKey('pcl_add_products'),
                   onPressed: () => _push(
                       context,
                       _AddProductsScreen(
@@ -831,47 +1053,122 @@ class _ChecklistDetailScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 14),
-              // Every item in one white card, hairlines between. Kept for
-              // revert: a shadowed card per item, 10 apart; the empty line
-              // centred on the page.
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: kPvLine),
-                ),
-                clipBehavior: Clip.antiAlias,
-                child: list.items.isEmpty
-                    ? Padding(
-                        padding: const EdgeInsets.all(18),
-                        child: Text(s.pclEmptyItems,
-                            textAlign: TextAlign.center,
-                            style: pvManrope(
-                                fontSize: 13.5, height: 1.45, color: pal.ink2)),
-                      )
-                    : Column(children: [
-                        for (var i = 0; i < list.items.length; i++) ...[
-                          if (i > 0)
-                            const Divider(
-                                height: 1,
-                                thickness: 1,
-                                color: kPvLine,
-                                indent: 64,
-                                endIndent: 16),
-                          _itemRow(context, s, store, list.id, list.items[i]),
-                        ],
-                      ]),
-              ),
+              // What is left first, what is got in its own group below, so the
+              // list shows what still needs doing (Noom, Structured).
+              if (list.items.isEmpty)
+                _itemsCard(Padding(
+                  padding: const EdgeInsets.all(18),
+                  child: Text(c.emptyItems,
+                      textAlign: TextAlign.center,
+                      style: pvManrope(
+                          fontSize: 14, height: 1.45, color: pal.ink2)),
+                ))
+              else ...[
+                if (todo.isNotEmpty)
+                  _itemsCard(Column(children: [
+                    for (var i = 0; i < todo.length; i++) ...[
+                      if (i > 0) _rowDivider(),
+                      _itemRow(context, s, store, list.id, todo[i]),
+                    ],
+                  ]))
+                else if (c.allDone.isNotEmpty)
+                  _itemsCard(Padding(
+                    padding: const EdgeInsets.all(18),
+                    child: Text(c.allDone,
+                        key: const ValueKey('pcl_all_done'),
+                        textAlign: TextAlign.center,
+                        style: pvManrope(
+                            fontSize: 14, height: 1.45, color: pal.ink2)),
+                  )),
+                if (gotItems.isNotEmpty) ...[
+                  const SizedBox(height: 22),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
+                    child: Text(c.gotHeading(gotItems.length).toUpperCase(),
+                        key: const ValueKey('pcl_got_heading'),
+                        style: pregGroupLabelStyle()),
+                  ),
+                  _itemsCard(Column(children: [
+                    for (var i = 0; i < gotItems.length; i++) ...[
+                      if (i > 0) _rowDivider(),
+                      _itemRow(context, s, store, list.id, gotItems[i]),
+                    ],
+                  ])),
+                ],
+              ],
             ],
           ),
           // Sticky finish bar - Save list (back to your lists) + Add to cart.
-          bottomNavigationBar:
-              list.items.isEmpty ? null : _bottomBar(context, s, list),
+          // ONE ACTION (2026-10-02): add what is left to the cart, with how many.
+          // Not drawn when nothing is left to add. Kept for revert: the two-button
+          // `_bottomBar` (Save list and Add remaining to cart).
+          bottomNavigationBar: _cartBar(context, s, c, list),
         );
       },
     );
   }
 
+  /// The items the cart can take: not got, a catalogue product, not Amazon's,
+  /// not bought and not in the cart. The same rule as `_addRemainingToCart`.
+  List<Product> _cartable(ProductChecklist list) {
+    final out = <Product>[];
+    for (final item in list.items) {
+      if (item.checked) continue;
+      final p = productById(item.productId);
+      if (p == null) continue;
+      if (productIsAffiliate(p)) continue;
+      if (BoughtStore.instance.isBought(p.id)) continue;
+      if (CartStore.instance.contains(kProductsCartId, p.id)) continue;
+      out.add(p);
+    }
+    return out;
+  }
+
+  Widget? _cartBar(BuildContext context, S s, _Copy c, ProductChecklist list) {
+    final n = _cartable(list).length;
+    if (n == 0) return null;
+    return SafeArea(
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          border: Border(top: BorderSide(color: kPvLine)),
+        ),
+        child: SizedBox(
+          width: double.infinity,
+          child: FilledButton.icon(
+            key: const ValueKey('pcl_cart_bar'),
+            style: _filledStyle(),
+            icon: const Icon(Icons.add_shopping_cart_rounded,
+                size: 18, color: Colors.white),
+            label: Text(c.addRemaining(n),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: pvManrope(fontWeight: FontWeight.w800, color: Colors.white)),
+            onPressed: () => _addRemainingToCart(context, s, list),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// One white card with the hairline: the surface for a group of items.
+  Widget _itemsCard(Widget child) => Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: kPvLine),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: child,
+      );
+
+  Widget _rowDivider() => const Divider(
+      height: 1, thickness: 1, color: kPvLine, indent: 64, endIndent: 16);
+
+  // Kept for revert (2026-10-02): two buttons, "Save list" (the list had already
+  // saved) and "Add remaining to cart". `_cartBar` replaced it.
+  // ignore: unused_element
   Widget _bottomBar(BuildContext context, S s, ProductChecklist list) => _finishBar(
         saveLabel: s.pclSaveList,
         onSave: () {
@@ -900,8 +1197,8 @@ class _ChecklistDetailScreen extends StatelessWidget {
         kProductsCartId,
         productId: p.id,
         name: p.name.now,
-        emoji: p.emoji,
         unitPrice: parsePriceString(p.price),
+        image: p.imageUrl,
       );
       added++;
     }
@@ -924,42 +1221,190 @@ class _ChecklistDetailScreen extends StatelessWidget {
       ));
   }
 
+//  // Kept for revert (2026-10-02): the checkbox row with the clock line and the emoji well.
+//    Widget _itemRow(BuildContext context, S s, ProductChecklistStore store,
+//        String listId, ChecklistItem item) {
+//      final pal = pvStorePalette;
+//      final product = _itemProduct(item);
+//      final done = item.checked;
+//      final name = _itemName(item);
+//      final price = _itemPrice(item);
+//      final affiliate = product != null && productIsAffiliate(product);
+//      // Bought via our preview checkout → show it as owned (no buy actions).
+//      final bought = product != null && BoughtStore.instance.isBought(product.id);
+//      final owned = done || bought;
+//      return Padding(
+//        padding: const EdgeInsets.fromLTRB(8, 8, 4, 8),
+//        child: Row(children: [
+//          // Bought via checkout → a locked ink check (she owns it already).
+//          // Otherwise a normal tick-off box. Kept for revert: the check was
+//          // green (0xFF3FA56A).
+//          if (bought)
+//            const Padding(
+//              padding: EdgeInsets.all(13),
+//              child: SizedBox(
+//                width: 22,
+//                height: 22,
+//                child: DecoratedBox(
+//                  decoration: BoxDecoration(color: kPvInk, shape: BoxShape.circle),
+//                  child: Icon(Icons.check_rounded, size: 15, color: Colors.white),
+//                ),
+//              ),
+//            )
+//          else
+//            Checkbox(
+//              value: done,
+//              activeColor: kPvInk,
+//              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+//              onChanged: (_) => _onCheck(context, s, store, listId, item),
+//            ),
+//          Expanded(
+//            child: GestureDetector(
+//              behavior: HitTestBehavior.opaque,
+//              onTap: () {
+//                if (product != null) {
+//                  _push(
+//                      context,
+//                      ProductDetailScreen(
+//                          product: product, controller: controller));
+//                } else if (item.link.isNotEmpty) {
+//                  _openUrl(item.link);
+//                }
+//              },
+//              child: Row(children: [
+//                Container(
+//                  width: 42,
+//                  height: 42,
+//                  alignment: Alignment.center,
+//                  decoration: BoxDecoration(
+//                      color: pal.surfaceAlt,
+//                      borderRadius: BorderRadius.circular(12)),
+//                  child:
+//                      Text(_itemEmoji(item), style: const TextStyle(fontSize: 22)),
+//                ),
+//                const SizedBox(width: 12),
+//                Expanded(
+//                  child: Column(
+//                      crossAxisAlignment: CrossAxisAlignment.start,
+//                      children: [
+//                        Row(children: [
+//                          Flexible(
+//                            child: Text(name,
+//                                maxLines: 2,
+//                                overflow: TextOverflow.ellipsis,
+//                                style: pvManrope(
+//                                    fontSize: 14,
+//                                    fontWeight: FontWeight.w700,
+//                                    color: owned ? pal.ink3 : pal.ink1,
+//                                    decoration: owned
+//                                        ? TextDecoration.lineThrough
+//                                        : null)),
+//                          ),
+//                          if (bought) ...[
+//                            const SizedBox(width: 6),
+//                            _miniTag(s.pclBoughtTag),
+//                          ] else if (affiliate) ...[
+//                            const SizedBox(width: 6),
+//                            _miniTag(s.pclAffiliate),
+//                          ] else if (item.isCustom) ...[
+//                            const SizedBox(width: 6),
+//                            _miniTag(s.pclCustomTag),
+//                          ],
+//                        ]),
+//                        const SizedBox(height: 4),
+//                        GestureDetector(
+//                          onTap: () => _editNote(context, s, store, listId, item),
+//                          child: Row(children: [
+//                            Icon(Icons.schedule_rounded,
+//                                size: 13,
+//                                color: item.note.isEmpty ? pal.ink3 : pal.ink2),
+//                            const SizedBox(width: 4),
+//                            Flexible(
+//                              child: Text(
+//                                  item.note.isEmpty ? s.pclAddWhen : item.note,
+//                                  maxLines: 1,
+//                                  overflow: TextOverflow.ellipsis,
+//                                  style: pvManrope(
+//                                      fontSize: 12,
+//                                      fontWeight: FontWeight.w600,
+//                                      color: item.note.isEmpty
+//                                          ? pal.ink3
+//                                          : pal.ink2)),
+//                            ),
+//                            if (price.isNotEmpty) ...[
+//                              const SizedBox(width: 6),
+//                              Text(price,
+//                                  style: pvManrope(
+//                                      fontSize: 11.5, color: pal.ink3)),
+//                            ],
+//                          ]),
+//                        ),
+//                      ]),
+//                ),
+//              ]),
+//            ),
+//          ),
+//          PopupMenuButton<String>(
+//            icon: Icon(Icons.more_vert_rounded, color: pal.ink3),
+//            onSelected: (v) {
+//              switch (v) {
+//                case 'cart':
+//                  if (product != null) _cartSingle(context, s, product);
+//                  break;
+//                case 'buynow':
+//                  if (product != null) {
+//                    showSingleItemBuyNow(context, controller, product);
+//                  }
+//                  break;
+//                case 'amazon':
+//                  if (product != null) _openUrl(amazonSearchUrl(product));
+//                  break;
+//                case 'link':
+//                  _openUrl(item.link);
+//                  break;
+//                case 'note':
+//                  _editNote(context, s, store, listId, item);
+//                  break;
+//                case 'remove':
+//                  store.removeItem(listId, item.id);
+//                  break;
+//              }
+//            },
+//            // Buy actions only on items she doesn't have yet (got/bought = none).
+//            itemBuilder: (c) => [
+//              if (!owned && product != null && !affiliate) ...[
+//                PopupMenuItem(value: 'cart', child: Text(s.cartAddToCart)),
+//                PopupMenuItem(value: 'buynow', child: Text(s.cartBuyNow)),
+//              ],
+//              if (!owned && affiliate)
+//                PopupMenuItem(value: 'amazon', child: Text(s.prBuyOnAmazon)),
+//              if (!done && item.isCustom && item.link.isNotEmpty)
+//                PopupMenuItem(value: 'link', child: Text(s.pclOpenLink)),
+//              PopupMenuItem(value: 'note', child: Text(s.pclEditNote)),
+//              PopupMenuItem(value: 'remove', child: Text(s.pclRemove)),
+//            ],
+//          ),
+//        ]),
+//      );
+//    }
+
   Widget _itemRow(BuildContext context, S s, ProductChecklistStore store,
       String listId, ChecklistItem item) {
     final pal = pvStorePalette;
+    final c = _Copy(s, controller.language.isHindi);
     final product = _itemProduct(item);
     final done = item.checked;
     final name = _itemName(item);
     final price = _itemPrice(item);
     final affiliate = product != null && productIsAffiliate(product);
-    // Bought via our preview checkout → show it as owned (no buy actions).
+    // Bought via our preview checkout: shown as owned, nothing left to buy.
     final bought = product != null && BoughtStore.instance.isBought(product.id);
     final owned = done || bought;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(8, 8, 4, 8),
+      key: ValueKey('pcl_item_${item.id}'),
+      padding: const EdgeInsets.fromLTRB(2, 6, 0, 6),
       child: Row(children: [
-        // Bought via checkout → a locked ink check (she owns it already).
-        // Otherwise a normal tick-off box. Kept for revert: the check was
-        // green (0xFF3FA56A).
-        if (bought)
-          const Padding(
-            padding: EdgeInsets.all(13),
-            child: SizedBox(
-              width: 22,
-              height: 22,
-              child: DecoratedBox(
-                decoration: BoxDecoration(color: kPvInk, shape: BoxShape.circle),
-                child: Icon(Icons.check_rounded, size: 15, color: Colors.white),
-              ),
-            ),
-          )
-        else
-          Checkbox(
-            value: done,
-            activeColor: kPvInk,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-            onChanged: (_) => _onCheck(context, s, store, listId, item),
-          ),
+        _tick(context, c, store, listId, item, owned: owned, locked: bought),
         Expanded(
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
@@ -974,16 +1419,7 @@ class _ChecklistDetailScreen extends StatelessWidget {
               }
             },
             child: Row(children: [
-              Container(
-                width: 42,
-                height: 42,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                    color: pal.surfaceAlt,
-                    borderRadius: BorderRadius.circular(12)),
-                child:
-                    Text(_itemEmoji(item), style: const TextStyle(fontSize: 22)),
-              ),
+              _thumb(product, 44),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -995,7 +1431,7 @@ class _ChecklistDetailScreen extends StatelessWidget {
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: pvManrope(
-                                  fontSize: 14,
+                                  fontSize: 14.5,
                                   fontWeight: FontWeight.w700,
                                   color: owned ? pal.ink3 : pal.ink1,
                                   decoration: owned
@@ -1004,40 +1440,43 @@ class _ChecklistDetailScreen extends StatelessWidget {
                         ),
                         if (bought) ...[
                           const SizedBox(width: 6),
-                          _miniTag(s.pclBoughtTag),
+                          _miniTag(c.boughtTag),
                         ] else if (affiliate) ...[
                           const SizedBox(width: 6),
-                          _miniTag(s.pclAffiliate),
+                          _miniTag(c.affiliate),
                         ] else if (item.isCustom) ...[
                           const SizedBox(width: 6),
-                          _miniTag(s.pclCustomTag),
+                          _miniTag(c.customTag),
                         ],
                       ]),
                       const SizedBox(height: 4),
                       GestureDetector(
+                        behavior: HitTestBehavior.opaque,
                         onTap: () => _editNote(context, s, store, listId, item),
                         child: Row(children: [
-                          Icon(Icons.schedule_rounded,
-                              size: 13,
-                              color: item.note.isEmpty ? pal.ink3 : pal.ink2),
-                          const SizedBox(width: 4),
+                          if (item.note.isEmpty) ...[
+                            Icon(Icons.edit_outlined, size: 13, color: pal.ink3),
+                            const SizedBox(width: 4),
+                          ],
                           Flexible(
                             child: Text(
-                                item.note.isEmpty ? s.pclAddWhen : item.note,
+                                item.note.isEmpty ? c.addNote : item.note,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: pvManrope(
-                                    fontSize: 12,
+                                    fontSize: 12.5,
                                     fontWeight: FontWeight.w600,
                                     color: item.note.isEmpty
                                         ? pal.ink3
                                         : pal.ink2)),
                           ),
                           if (price.isNotEmpty) ...[
-                            const SizedBox(width: 6),
+                            const SizedBox(width: 8),
                             Text(price,
                                 style: pvManrope(
-                                    fontSize: 11.5, color: pal.ink3)),
+                                    fontSize: 12.5,
+                                    fontWeight: FontWeight.w700,
+                                    color: pal.ink2)),
                           ],
                         ]),
                       ),
@@ -1090,8 +1529,65 @@ class _ChecklistDetailScreen extends StatelessWidget {
     );
   }
 
+  /// The round tick: a ring, and the one ink with a check when it is got. One
+  /// tap ticks it, says what that did, and offers Undo (2026-10-02; a dialog
+  /// used to ask first). A bought item is locked: she owns it already.
+  Widget _tick(BuildContext context, _Copy c, ProductChecklistStore store,
+      String listId, ChecklistItem item,
+      {required bool owned, required bool locked}) {
+    final pal = pvStorePalette;
+    return Semantics(
+      checked: owned,
+      label: _itemName(item),
+      child: InkResponse(
+        key: ValueKey('pcl_tick_${item.id}'),
+        radius: 26,
+        onTap: locked ? null : () => _toggle(context, c, store, listId, item),
+        child: SizedBox(
+          width: 48,
+          height: 48,
+          child: Center(
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 160),
+              width: 24,
+              height: 24,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: owned ? kPvInk : Colors.transparent,
+                border: owned
+                    ? null
+                    : Border.all(color: pal.ink3.withValues(alpha: 0.7), width: 1.6),
+              ),
+              child: owned
+                  ? const Icon(Icons.check_rounded, size: 15, color: Colors.white)
+                  : null,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _toggle(BuildContext context, _Copy c, ProductChecklistStore store,
+      String listId, ChecklistItem item) {
+    final wasDone = item.checked;
+    store.toggleChecked(listId, item.id);
+    if (wasDone) return; // un-ticking needs no words
+    ScaffoldMessenger.of(context)
+      ..clearSnackBars()
+      ..showSnackBar(SnackBar(
+        persist: false,
+        content: Text(c.gotSnack),
+        action: SnackBarAction(
+            label: c.undo,
+            onPressed: () => store.toggleChecked(listId, item.id)),
+      ));
+  }
+
   // Ticking a NOT-yet-got item asks "Already got this?" first (Yes = owned, no
-  // cart for it). Un-ticking a got item just clears it.
+  // cart for it). Un-ticking a got item just clears it. Kept for revert
+  // (2026-10-02): `_toggle` ticks at once and offers Undo instead.
+  // ignore: unused_element
   void _onCheck(BuildContext context, S s, ProductChecklistStore store,
       String listId, ChecklistItem item) async {
     if (item.checked) {
@@ -1125,8 +1621,8 @@ class _ChecklistDetailScreen extends StatelessWidget {
         kProductsCartId,
         productId: p.id,
         name: p.name.now,
-        emoji: p.emoji,
         unitPrice: parsePriceString(p.price),
+        image: p.imageUrl,
       );
     }
     ScaffoldMessenger.of(context)
@@ -1150,7 +1646,8 @@ class _ChecklistDetailScreen extends StatelessWidget {
 
   void _editNote(BuildContext context, S s, ProductChecklistStore store,
       String listId, ChecklistItem item) async {
-    final note = await _promptText(context, s, s.pclEditNote, s.pclNotePrompt,
+    final note = await _promptText(context, s, s.pclEditNote,
+        _Copy(s, controller.language.isHindi).notePrompt,
         initial: item.note);
     if (note != null) store.setNote(listId, item.id, note);
   }
@@ -1218,7 +1715,7 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
           child: OutlinedButton.icon(
             onPressed: _addOwnProduct,
             icon: const Icon(Icons.add_rounded, size: 18, color: kPvInk),
-            label: Text(s.pclAddOwn,
+            label: Text(_Copy(s, widget.controller.language.isHindi).addOwn,
                 style: pvManrope(fontWeight: FontWeight.w800, color: kPvInk)),
             style: _outlineStyle().copyWith(
               minimumSize: const WidgetStatePropertyAll(Size(double.infinity, 44)),
@@ -1329,7 +1826,6 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
     final pal = pvStorePalette;
     final store = ProductChecklistStore.instance;
     final added = store.isInChecklist(widget.checklistId, p.id);
-    final photo = _realImage(p);
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: PregCard(
@@ -1339,21 +1835,9 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
             ProductDetailScreen(
                 product: p, controller: widget.controller)),
         child: Row(children: [
-          // The product's own photo, or its emoji in a neutral well.
-          ClipRRect(
-            borderRadius: BorderRadius.circular(14),
-            child: photo == null
-                ? _imgFallback(p)
-                : Image.network(
-                    photo,
-                    width: 62,
-                    height: 62,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, _, _) => _imgFallback(p),
-                    loadingBuilder: (ctx, child, progress) =>
-                        progress == null ? child : _imgFallback(p),
-                  ),
-          ),
+          // The product's own photo, or the family's bag mark in a quiet well
+          // (2026-10-02). Kept for revert: its emoji in a neutral well.
+          _thumb(p, 62),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -1424,13 +1908,15 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
     );
   }
 
-  Widget _imgFallback(Product p) => Container(
-        width: 62,
-        height: 62,
-        alignment: Alignment.center,
-        color: pvStorePalette.surfaceAlt,
-        child: Text(p.emoji, style: const TextStyle(fontSize: 26)),
-      );
+//    // Kept for revert (2026-10-02, no emoji anywhere): the emoji well. `_thumb`
+//    // draws the photo or the family mark instead.
+//    Widget _imgFallback(Product p) => Container(
+//          width: 62,
+//          height: 62,
+//          alignment: Alignment.center,
+//          color: pvStorePalette.surfaceAlt,
+//          child: Text(p.emoji, style: const TextStyle(fontSize: 26)),
+//        );
 
 
   // Old compact row, replaced by _productCard above. Kept for reference/revert.
@@ -1494,14 +1980,38 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
 
 
   // Finish-right-here bar: Save list (back to your lists) or Add to cart.
-  Widget _pickerBottomBar(S s) => _finishBar(
-        saveLabel: s.pclSaveList,
-        onSave: _saveAndBack,
-        goLabel: s.cartAddToCart,
-        goIcon: Icons.add_shopping_cart_rounded,
-        onGo: _addToCartAndOpen,
+  // ONE BUTTON (2026-10-02): "Done", with how many are on the list. The cart is
+  // one tap away on the list itself. Kept for revert: `_finishBar` with Save
+  // list and Add to cart (`_addToCartAndOpen` below).
+  Widget _pickerBottomBar(S s) => AnimatedBuilder(
+        animation: ProductChecklistStore.instance,
+        builder: (context, _) {
+          final n =
+              ProductChecklistStore.instance.byId(widget.checklistId)?.items.length ?? 0;
+          final c = _Copy(s, widget.controller.language.isHindi);
+          return SafeArea(
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                border: Border(top: BorderSide(color: kPvLine)),
+              ),
+              child: SizedBox(
+                width: double.infinity,
+                child: FilledButton(
+                  key: const ValueKey('pcl_picker_done'),
+                  style: _filledStyle(),
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text(n == 0 ? c.done : '${c.done} · $n',
+                      style: pvManrope(fontWeight: FontWeight.w800, color: Colors.white)),
+                ),
+              ),
+            ),
+          );
+        },
       );
 
+  // ignore: unused_element
   void _saveAndBack() {
     final s = S(widget.controller.language);
     ScaffoldMessenger.of(context)
@@ -1510,6 +2020,7 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
     Navigator.of(context).pop();
   }
 
+  // ignore: unused_element
   void _addToCartAndOpen() {
     final s = S(widget.controller.language);
     final list = ProductChecklistStore.instance.byId(widget.checklistId);
@@ -1524,8 +2035,8 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
           kProductsCartId,
           productId: p.id,
           name: p.name.now,
-          emoji: p.emoji,
           unitPrice: parsePriceString(p.price),
+          image: p.imageUrl,
         );
       }
     }
@@ -1540,6 +2051,7 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
   // Add a product we don't stock - her own name + link + price + note.
   void _addOwnProduct() {
     final s = S(widget.controller.language);
+    final cp = _Copy(s, widget.controller.language.isHindi);
     final pal = pvStorePalette;
     final nameC = TextEditingController();
     final linkC = TextEditingController();
@@ -1561,21 +2073,21 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(s.pclAddOwn,
+                  Text(cp.addOwn,
                       style: pvFraunces(
                           fontSize: 20,
                           fontWeight: FontWeight.w600,
                           height: 1.2,
                           color: pal.ink1)),
                   const SizedBox(height: 14),
-                  _customField(nameC, s.pclCustomName),
+                  _customField(nameC, cp.customName),
                   const SizedBox(height: 10),
                   _customField(linkC, s.pclCustomLink,
                       keyboard: TextInputType.url),
                   const SizedBox(height: 10),
                   _customField(priceC, s.pclCustomPrice),
                   const SizedBox(height: 10),
-                  _customField(noteC, s.pclCustomNote),
+                  _customField(noteC, cp.customNote),
                   const SizedBox(height: 16),
                   SizedBox(
                     width: double.infinity,

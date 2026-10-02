@@ -352,3 +352,15 @@ chunk is what gets matched as one meaning.
 **And the model.** Groq retired `llama-3.1-8b-instant`; the service runs `openai/gpt-oss-20b` with low reasoning
 effort. A hosted model name is a dependency with an expiry date, so a daily probe now asks it for one word and fails
 loudly (BACKEND-PATTERNS has the launch-order lesson; this is the same "a silent dependency must be made to shout").
+
+### Pregnancy Ask Veda (2026-10-02) — the TTC pattern, for the side that had none
+
+Pregnancy's Ask Veda sent only the week, grounded on an offline corpus exported before the doors existed, and
+opened a text sheet for most cards. It now follows TTC: the question carries `stage: "pregnancy"` (the service
+scopes retrieval and buckets its cache on it), the app's reads, door cards and tools are exported as `pv…`
+documents (`tool/export_pregnancy_corpus.dart`), and a card's id is resolved back to the real screen
+(`lib/ask_veda/pv_veda_links.dart`). The general lesson, which travels: **an id is a contract between an exporter
+and a resolver, and the failure when they disagree is silent**, so both live in one file and a test round-trips
+every exported id. The other one: **a prune must be scoped to the namespace the export owns**, because two exports
+can share a domain (`--prune-prefix pv`, never a plain `--prune`). Full run order and the two-repo contract:
+`docs/PREGNANCY-ASKVEDA-HANDOFF.md`.

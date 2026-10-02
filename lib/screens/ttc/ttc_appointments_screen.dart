@@ -561,7 +561,9 @@ class _NextUp extends StatelessWidget {
                       _Mini(
                           p: p,
                           icon: Icons.notifications_none_rounded,
-                          text: 'Reminder the evening before'),
+                          // Says which reminder it is (2026-10-01). Kept for
+                          // revert: 'Reminder the evening before'.
+                          text: ttcApptReminderTag(own)),
                     ],
                     if (questions > 0) ...[
                       const SizedBox(height: 6),
@@ -654,7 +656,7 @@ class TtcApptRow extends StatelessWidget {
                     _Mini(
                         p: p,
                         icon: Icons.notifications_none_rounded,
-                        text: 'Reminder the evening before'),
+                        text: ttcApptReminderTag(own)),
                   ],
                   // Each visit says how many questions are kept for it
                   // (2026-09-28), as the next visit's block does.
@@ -757,7 +759,8 @@ String ttcQuestionGroup(TtcDoctorQuestion q,
   if (showVisit) {
     final v = store.visitById(store.visitFor(q));
     return v == null
-        ? 'For whichever visit comes next'
+        // Kept for revert (2026-10-01): 'For whichever visit comes next'.
+        ? 'Not tied to a visit yet'
         : 'For the ${ttcVisitName(v)}';
   }
   if (onVisitId != null &&
@@ -1493,11 +1496,27 @@ class TtcAppointmentScreen extends StatelessWidget {
                     TtcApptRemindRow(
                       p: p,
                       value: a.remindEveningBefore,
-                      sub: 'At 7 pm on ${ttcApptDay(a.reminderAt)}.',
+                      // The time it really rings, 2026-10-01. Kept for
+                      // revert: 'At 7 pm on ${ttcApptDay(a.reminderAt)}.'
+                      // Off: what it WOULD do; on: what it will.
+                      sub: a.remindEveningBefore
+                          ? ttcApptReminderSaidAt(a)
+                          : ttcApptReminderLine(a.startsLocal),
                       onChanged: (v) {
+                        final tooSoon = v &&
+                            ttcApptReminderPlan(a.startsLocal).kind ==
+                                TtcApptReminderKind.none;
                         TtcAppointmentsStore.instance
                             .update(a.copyWith(remindEveningBefore: v));
-                        if (v) _askPhonePermission();
+                        if (tooSoon) {
+                          pvSnack(
+                              context,
+                              'This is too soon for a reminder, so none is '
+                              'set.',
+                              lift: 24);
+                        } else if (v) {
+                          _askPhonePermission();
+                        }
                       },
                     ),
                   ]),
@@ -1671,7 +1690,50 @@ class _InfoRow extends StatelessWidget {
   }
 }
 
-/// "Remind me the evening before", with when it will ring said under it.
+/// The reminder, said from a visit's day and time while she is still choosing
+/// them ([ttcApptReminderPlan]): when it will ring, why that time, or that it
+/// cannot.
+String ttcApptReminderLine(DateTime startsLocal, {DateTime? now}) {
+  final plan = ttcApptReminderPlan(startsLocal, now: now);
+  final at = plan.at;
+  switch (plan.kind) {
+    case TtcApptReminderKind.eveningBefore:
+      return 'At 7 pm on ${ttcApptDay(at!)}, the evening before.';
+    case TtcApptReminderKind.twoHoursBefore:
+      return 'The evening before has passed, so it will ring 2 hours '
+          'before, at ${ttcApptTime(at!)}.';
+    case TtcApptReminderKind.thirtyMinutesBefore:
+      return 'This is soon, so it will ring 30 minutes before, at '
+          '${ttcApptTime(at!)}.';
+    case TtcApptReminderKind.none:
+      return 'This is too soon for a reminder, so none will be set.';
+  }
+}
+
+/// The reminder of a saved visit, said at the time it rings.
+String ttcApptReminderSaidAt(TtcAppointment a) {
+  final at = a.reminderAt;
+  switch (a.reminderKind) {
+    case TtcApptReminderKind.eveningBefore:
+      return 'At 7 pm on ${ttcApptDay(at)}, the evening before.';
+    case TtcApptReminderKind.twoHoursBefore:
+      return 'At ${ttcApptTime(at)}, 2 hours before.';
+    case TtcApptReminderKind.thirtyMinutesBefore:
+      return 'At ${ttcApptTime(at)}, 30 minutes before.';
+    case TtcApptReminderKind.none:
+      return '';
+  }
+}
+
+/// The short tag on a visit's row.
+String ttcApptReminderTag(TtcAppointment a) => switch (a.reminderKind) {
+      TtcApptReminderKind.eveningBefore => 'Reminder the evening before',
+      TtcApptReminderKind.twoHoursBefore => 'Reminder 2 hours before',
+      TtcApptReminderKind.thirtyMinutesBefore => 'Reminder 30 minutes before',
+      TtcApptReminderKind.none => 'Reminder the evening before',
+    };
+
+/// "Remind me before it", with when it will ring said under it.
 ///
 /// Mobbin: Hers and Lifesum put a reminder on one switch row with its time
 /// said beside it, so the switch says exactly what it will do.
@@ -1699,7 +1761,9 @@ class TtcApptRemindRow extends StatelessWidget {
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Remind me the evening before',
+                  // Kept for revert (2026-10-01): 'Remind me the evening
+                  // before', which was untrue for a visit soon after saving.
+                  Text('Remind me before the visit',
                       style: pvManrope(
                           fontSize: 14.5,
                           fontWeight: FontWeight.w700,
@@ -1855,8 +1919,21 @@ class _TtcAppointmentEditScreenState extends State<TtcAppointmentEditScreen> {
     }
     _saved = true;
     HapticFeedback.selectionClick();
-    pvSnack(context, e == null ? 'Added to your appointments.' : 'Changes saved.',
-        icon: Icons.check_rounded, lift: 24);
+    // ⚠️ NEVER SILENT ABOUT A REMINDER THAT WILL NOT RING (2026-10-01, the
+    // user). She switched it on; if the visit is too soon for any reminder it
+    // was switched off, so the message says so rather than leave her trusting
+    // it.
+    final tooSoon = _remind &&
+        ttcApptReminderPlan(_when).kind == TtcApptReminderKind.none;
+    pvSnack(
+        context,
+        tooSoon
+            ? (e == null
+                ? 'Added. It is too soon for a reminder, so none is set.'
+                : 'Saved. It is too soon for a reminder, so none is set.')
+            : (e == null ? 'Added to your appointments.' : 'Changes saved.'),
+        icon: Icons.check_rounded,
+        lift: 24);
     Navigator.of(context).pop();
   }
 
@@ -2021,10 +2098,20 @@ class _TtcAppointmentEditScreenState extends State<TtcAppointmentEditScreen> {
                 child: TtcApptRemindRow(
                   p: p,
                   value: _remind,
-                  sub: 'Your phone will remind you at 7 pm the day before.',
+                  // ⚠️ SAYS THE REAL TIME, FROM THE DAY AND TIME SHE PICKED
+                  // (2026-10-01). It said "at 7 pm the day before" even for a
+                  // visit tomorrow morning, whose 7 pm had already gone, and
+                  // nothing rang. Now it shows when it will ring, or says it
+                  // cannot. Kept for revert: 'Your phone will remind you at 7
+                  // pm the day before.'
+                  sub: ttcApptReminderLine(_when),
                   onChanged: (v) {
                     setState(() => _remind = v);
-                    if (v) _askPhonePermission();
+                    if (v &&
+                        ttcApptReminderPlan(_when).kind !=
+                            TtcApptReminderKind.none) {
+                      _askPhonePermission();
+                    }
                   },
                 ),
               ),
@@ -2159,10 +2246,16 @@ class _PickChip extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 13),
+          // ⚠️ A HAIRLINE LIKE EVERY OTHER FIELD ON THE FORM (2026-10-01, the
+          // user: "why is date and time having a black border for no reason,
+          // without even being clicked"). A 1.5pt ink border is how this app
+          // draws a CHOSEN option, so an untouched date read as selected. The
+          // chevron says it opens a picker. Kept for revert: the border was
+          // `Border.all(color: ttcTitleInk, width: 1.5)`.
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: ttcTitleInk, width: 1.5),
+            border: Border.all(color: p.line, width: 1.2),
           ),
           child: Row(children: [
             Icon(icon, size: 16, color: ttcTitleInk),
@@ -2173,6 +2266,8 @@ class _PickChip extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: ttcBody(14, color: ttcTitleInk, w: FontWeight.w700)),
             ),
+            const SizedBox(width: 4),
+            Icon(Icons.expand_more_rounded, size: 18, color: p.ink3),
           ]),
         ),
       );
@@ -2912,8 +3007,9 @@ Future<void> addTtcAppointment(BuildContext context) async {
       ),
     ),
   );
-  titleC.dispose();
-  whoC.dispose();
+  // ⚠️ NOT DISPOSED THE MOMENT THE ROUTE CLOSES (2026-10-02, the red screen '_dependents.isEmpty'): the TextField is still on screen for the exit animation and still listening. Same fix as the add-child sheet.
+  Future<void>.delayed(const Duration(milliseconds: 600), titleC.dispose);
+  Future<void>.delayed(const Duration(milliseconds: 600), whoC.dispose);
 }
 
 */

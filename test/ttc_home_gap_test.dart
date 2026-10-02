@@ -29,6 +29,7 @@ import 'package:parentveda/screens/profile/pv_you_content.dart';
 import 'package:parentveda/screens/ttc/chats/ttc_should_test_chat.dart';
 import 'package:parentveda/screens/ttc/ttc_calendar_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_content_prefs_sheet.dart';
+import 'package:parentveda/screens/ttc/ttc_daily_insights.dart' show ttcRailReadIds;
 import 'package:parentveda/screens/ttc/ttc_home_gap.dart';
 import 'package:parentveda/screens/ttc/ttc_home_v3.dart';
 import 'package:parentveda/screens/ttc/ttc_learn_screen.dart';
@@ -330,9 +331,16 @@ void main() {
         (tester) async {
       inWindow();
       await pumpHome(tester);
+      // ⚠️ NOT THE FIRST READ BLINDLY (2026-10-02): the home leaves out any
+      // read a rail card already opens ("no random repetition"), and which
+      // read that is changes with the day ("Day of your cycle" opens How
+      // conception works). The test took `ids.first` and failed on a day it
+      // happened to be that one. Kept for revert: `ids.first` below.
       final ids = ttcHomeReadIdsFor(today, phase: TtcDayPhase.window);
-      expect(find.text(ttcReadById(ids.first)!.title.en), findsWidgets);
-      expect(find.byKey(ValueKey('ttc_home_read_${ids.first}')), findsOneWidget);
+      final onRail = ttcRailReadIds(today);
+      final id = ids.firstWhere((i) => !onRail.contains(i));
+      expect(find.text(ttcReadById(id)!.title.en), findsWidgets);
+      expect(find.byKey(ValueKey('ttc_home_read_$id')), findsOneWidget);
       expect(find.byKey(const ValueKey('ttc_home_reads_see_all')), findsNothing);
     });
 

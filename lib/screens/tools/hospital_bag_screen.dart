@@ -745,7 +745,6 @@ class _MyBagScreenState extends State<_MyBagScreen> {
       c,
       productId: pid,
       name: it.name.of(c.language),
-      emoji: _emojiFor(it),
       unitPrice: price.toDouble(),
     );
   }
@@ -1391,7 +1390,6 @@ void _addPlannedToCart(BuildContext context, PregnancyController controller) {
       kHospitalCartId,
       productId: item.id,
       name: item.name.of(lang),
-      emoji: '🧳',
       unitPrice: price,
     );
     added++;
@@ -2188,9 +2186,10 @@ Future<void> _buyElsewhereSheet(
     },
   );
 
-  linkCtrl.dispose();
-  priceCtrl.dispose();
-  notesCtrl.dispose();
+  // ⚠️ NOT DISPOSED THE MOMENT THE ROUTE CLOSES (2026-10-02, the red screen '_dependents.isEmpty'): the TextField is still on screen for the exit animation and still listening. Same fix as the add-child sheet.
+  Future<void>.delayed(const Duration(milliseconds: 600), linkCtrl.dispose);
+  Future<void>.delayed(const Duration(milliseconds: 600), priceCtrl.dispose);
+  Future<void>.delayed(const Duration(milliseconds: 600), notesCtrl.dispose);
 }
 
 Widget _buyElseSummary(
@@ -2555,7 +2554,7 @@ Future<void> showAddCustomBag(BuildContext context, S s,
       });
     },
   );
-  nameCtrl.dispose();
+  Future<void>.delayed(const Duration(milliseconds: 600), nameCtrl.dispose);
 }
 
 // ===========================================================================

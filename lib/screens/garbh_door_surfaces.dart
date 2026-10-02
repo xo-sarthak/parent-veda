@@ -24,6 +24,8 @@ import '../data/doors/pv_door_garbh.dart';
 import '../data/garbh_rebuild_data.dart';
 import '../services/pregnancy_controller.dart';
 import 'doors/pv_door_chrome.dart';
+import 'doors/pv_shelf_card.dart';
+import 'doors/pv_shelf_spec.dart' show PvShelfKind;
 import 'doors/pv_door_router.dart' show openPvDoorSurface;
 import 'v2/v2_palette.dart';
 
@@ -46,42 +48,40 @@ class GarbhRitualRail extends StatelessWidget {
           for (final r in kGarbhRituals)
             if (store.hasRitual(r.id)) r,
         ];
+        // // ⚠️ THE SHELF CARD, NOT THE TALL RAIL CARD (2026-10-02, the user: a tool drawn
+        // inside a door should wear the same card as the door's own sections, TTC's
+        // format). `PvDoorRailCard` at `kPvRailCardHeight` (176) is kept for revert in
+        // each caller's note.
         return SizedBox(
-          height: kPvRailCardHeight,
+          height: pvShelfRailHeight(MediaQuery.textScalerOf(context)),
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: kPvDoorGutter),
             itemCount: picked.length + 1,
-            separatorBuilder: (_, _) => const SizedBox(width: kPvRailGap),
+            separatorBuilder: (_, _) => const SizedBox(width: 12),
             itemBuilder: (context, i) {
               if (i == 0) {
-                return PvDoorRailCard(
+                return PvShelfCard(
                   key: const ValueKey('garbh_ritual_picker'),
                   p: p,
                   hue: 42,
-                  icon: Icons.tune_rounded,
-                  chip: 'Tool',
+                  kind: PvShelfKind.tool,
                   title: picked.isEmpty
                       ? 'Do you already have a daily practice?'
                       : 'Change what you do daily',
-                  meta: picked.isEmpty ? null : '${picked.length} PICKED',
-                  index: 0,
+                  fact: picked.isEmpty ? null : '${picked.length} picked',
                   onTap: () => openPvDoorSurface(
                       context, kGarbhSurfaceRitual, pregnancy),
                 );
               }
               final r = picked[i - 1];
-              return PvDoorRailCard(
+              return PvShelfCard(
                 key: ValueKey('garbh_ritual_${r.id}'),
                 p: p,
                 hue: 42,
-                icon: r.hasCounter
-                    ? Icons.radio_button_checked_rounded
-                    : Icons.auto_awesome_outlined,
-                chip: 'Tool',
+                kind: PvShelfKind.tool,
                 title: r.name.en,
-                meta: r.planWeeks > 0 ? '${r.planWeeks}-WEEK PLAN' : 'DAILY',
-                index: i,
+                fact: r.planWeeks > 0 ? '${r.planWeeks}-week plan' : 'Daily',
                 onTap: () =>
                     openPvDoorSurface(context, kGarbhSurfaceRitual, pregnancy),
               );

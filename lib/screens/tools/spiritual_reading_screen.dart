@@ -24,6 +24,7 @@ import '../brackets/hub/hub_intent_art.dart' show IntentMark;
 import '../pregnancy/preg_chrome.dart';
 import '../pregnancy/preg_tool_chrome.dart';
 import '../products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
+import 'spiritual_marks.dart';
 
 // ⚠️ ONE PARENTVEDA (2026-09-30, the pregnancy restyle): a white ground, the
 // serif page title under a back arrow, white cards with the page hairline
@@ -146,7 +147,7 @@ class _SpiritualReadingScreenState extends State<SpiritualReadingScreen> {
 
   Widget _religionSelector(List<SpiritualTradition> traditions) {
     final hinglish = widget.controller.language.isHinglish;
-    Widget chip(String? id, String label, String symbol) {
+    Widget chip(String? id, String label, [String? markId]) {
       final selected = _religion == id;
       return Padding(
         padding: const EdgeInsets.only(right: 8),
@@ -162,9 +163,11 @@ class _SpiritualReadingScreenState extends State<SpiritualReadingScreen> {
               border: Border.all(color: selected ? _accent : kPvLine, width: 1.1),
             ),
             child: Row(mainAxisSize: MainAxisSize.min, children: [
-              if (symbol.isNotEmpty) ...[
-                Text(symbol, style: const TextStyle(fontSize: 14)),
-                const SizedBox(width: 6),
+              // The tradition's drawn mark, not its emoji (2026-10-02). Kept for
+              // revert: Text(symbol, style: const TextStyle(fontSize: 14)).
+              if (markId != null) ...[
+                spiritualMark(markId, size: 24),
+                const SizedBox(width: 7),
               ],
               Text(label,
                   style: pvManrope(
@@ -183,8 +186,8 @@ class _SpiritualReadingScreenState extends State<SpiritualReadingScreen> {
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 18),
         children: [
-          chip(null, hinglish ? 'सभी' : 'All', ''),
-          for (final t in traditions) chip(t.id, t.name.now, t.symbol),
+          chip(null, hinglish ? 'सभी' : 'All'),
+          for (final t in traditions) chip(t.id, t.name.now, t.id),
         ],
       ),
     );
@@ -212,15 +215,9 @@ class _SpiritualReadingScreenState extends State<SpiritualReadingScreen> {
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
           child: Row(children: [
-            Container(
-              width: 46,
-              height: 46,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                  color: p.surfaceAlt,
-                  borderRadius: BorderRadius.circular(12)),
-              child: Text(t.symbol, style: const TextStyle(fontSize: 24)),
-            ),
+            // The tradition's mark; the disc is the well. Kept for revert: a
+            // 46 neutral well holding Text(t.symbol, fontSize 24), an emoji.
+            spiritualMark(t.id, size: 48),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -350,8 +347,15 @@ class _TraditionDetailScreen extends StatelessWidget {
             children: [
               Semantics(
                 header: true,
-                child: Text('${tradition.symbol}  ${tradition.name}',
-                    style: pregPageTitleStyle()),
+                // The mark beside the name (2026-10-02). Kept for revert:
+                // Text('${tradition.symbol}  ${tradition.name}').
+                child: Row(children: [
+                  spiritualMark(tradition.id, size: 40),
+                  const SizedBox(width: 12),
+                  Expanded(
+                      child: Text('${tradition.name}',
+                          style: pregPageTitleStyle())),
+                ]),
               ),
               for (final sec in tradition.sections) ...[
                 Padding(
@@ -412,11 +416,20 @@ class _SpiritualReadScreen extends StatelessWidget {
         surfaceTintColor: Colors.transparent,
         foregroundColor: p.ink1,
         elevation: 0,
-        title: Text('${tradition.symbol}  ${tradition.name}',
-            style: pvManrope(
-                fontSize: 14,
-                fontWeight: FontWeight.w700,
-                color: p.ink2)),
+        // Kept for revert: Text('${tradition.symbol}  ${tradition.name}').
+        title: Row(mainAxisSize: MainAxisSize.min, children: [
+          spiritualMark(tradition.id, size: 26),
+          const SizedBox(width: 8),
+          Flexible(
+            child: Text('${tradition.name}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: pvManrope(
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w700,
+                    color: p.ink2)),
+          ),
+        ]),
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(22, 8, 22, 40),

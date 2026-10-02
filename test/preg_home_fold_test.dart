@@ -17,6 +17,8 @@
 //    · the rail runs edge to edge — not inside the page gutter
 // =============================================================================
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:parentveda/data/preg_size_sets.dart';
@@ -196,6 +198,46 @@ void main() {
       final box = tester.getRect(rail);
       expect(box.left, 0, reason: 'the rail must start at the screen edge');
       expect(box.width, 360, reason: 'and span it');
+    });
+
+    testWidgets('every card is the trying-to-conceive card: one clean colour, '
+        'the value centred, no corner mark', (tester) async {
+      // 2026-10-02, the user: "look at the same section in trying to conceive,
+      // the design is a little different for the cards in the rail; implement
+      // the same UI." TTC draws `PvInsightTile(showArt: false, centreValue:
+      // true)`; the pregnancy rail did not, and a logged symptom also wore a
+      // glyph in the corner. Same tile, same size, now the same settings.
+      await pumpHome(tester);
+      final tiles = tester
+          .widgetList<PvInsightTile>(find.byType(PvInsightTile))
+          .toList();
+      expect(tiles, isNotEmpty);
+      for (final t in tiles) {
+        expect(t.showArt, isFalse, reason: '${t.eyebrow} draws a mark');
+        expect(t.centreValue, isTrue, reason: '${t.eyebrow} is not centred');
+        expect(t.artWidget, isNull, reason: '${t.eyebrow} wears a corner glyph');
+        expect(t.large, isFalse, reason: 'the size is the TTC one, unchanged');
+      }
+      // The tile is the TTC size, so nothing resized to get here.
+      final first = tester.getSize(find.byType(PvInsightTile).first);
+      expect(first.width, PvInsightTile.width);
+      expect(first.height, PvInsightTile.height);
+      expect(tester.takeException(), isNull);
+    });
+
+    test('the pregnancy and TTC rails pass the same card settings', () {
+      String code(String p) => File(p)
+          .readAsStringSync()
+          .replaceAll('\r\n', '\n')
+          .split('\n')
+          .where((l) => !l.trimLeft().startsWith('//'))
+          .join('\n');
+      final preg = code('lib/screens/home_v3_screen.dart');
+      final ttc = code('lib/screens/ttc/ttc_home_v3.dart');
+      for (final setting in ['showArt: false', 'centreValue: true']) {
+        expect(ttc, contains(setting), reason: 'TTC lost $setting');
+        expect(preg, contains(setting), reason: 'pregnancy is not like TTC: $setting');
+      }
     });
 
     testWidgets('the learning line left the hero for the first week card',

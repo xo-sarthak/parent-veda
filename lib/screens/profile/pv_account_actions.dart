@@ -225,7 +225,14 @@ Future<void> pvDeleteAccount(BuildContext context) async {
       ),
     ),
   );
-  input.dispose();
+  // ⚠️ NOT DISPOSED THE MOMENT THE SHEET CLOSES (2026-10-01, the user: a red
+  // screen, "'_dependents.isEmpty': is not true", on Delete account). The
+  // future completes when the route is popped, but the sheet is still on
+  // screen for its exit animation and its field and listener are still
+  // attached to [input]; disposing under them tore the tree down mid-frame.
+  // The name editor in pv_you_screen.dart waits for the same reason. Kept for
+  // revert: `input.dispose();` here.
+  Future<void>.delayed(const Duration(milliseconds: 600), input.dispose);
   if (confirmed != true) return;
 
   messenger

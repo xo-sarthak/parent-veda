@@ -114,6 +114,40 @@ bool ttcTestMatches(TtcTest t, String query) {
   ].any((s) => s.toLowerCase().contains(q));
 }
 
+/// ⚠️ THE ROW SAYS WHEN IN FOUR WORDS, THE PAGE SAYS IT IN FULL (2026-10-01,
+/// the user: the list "looks so cluttered and text heavy"). Each row used to
+/// carry the whole "what it checks" sentence AND the whole "when to have it"
+/// sentence under the name, two to four lines a test. The WHEN is the fact that
+/// costs a month if it is wrong, so it stays on the row, short and strong with
+/// its clock; the full sentence, with its reason, is the first thing on the
+/// test's own page. Mobbin pass: Lloyds' toolkit (a bold title over one grey
+/// line in one grouped card), Lifesum's insight rows (a name, one word of
+/// state), MacroFactor's food rows (a name and one short fact).
+const Map<String, String> kTtcTestWhenShort = {
+  'tsh': 'Any day',
+  'amh': 'Any day',
+  'fsh_lh': 'Day 2 or 3 of your cycle',
+  'semen': 'After 2 to 5 days without ejaculating',
+  'vitd': 'Any day',
+  'b12': 'Any day',
+  'hba1c': 'Any day',
+  'ultrasound': 'Early in your cycle',
+  'hsg': 'After your period, before ovulation',
+  'prolactin': 'In the morning',
+};
+
+/// The short "when" for a row: the label above, or the test's first sentence
+/// (cut at a full stop) for a test added later without one.
+String ttcTestWhenShort(TtcTest test, bool hi) {
+  if (!hi) {
+    final short = kTtcTestWhenShort[test.id];
+    if (short != null) return short;
+  }
+  final full = test.when(hi).trim();
+  final m = RegExp(r'^(.+?[.!?])(\s|$)').firstMatch(full);
+  return m?.group(1) ?? full;
+}
+
 class TtcTestsScreen extends StatefulWidget {
   const TtcTestsScreen({super.key, this.focusId});
 
@@ -167,9 +201,14 @@ class _TtcTestsScreenState extends State<TtcTestsScreen> {
               title: test.name,
               onTap: () => openTtcTestRead(context, test),
               lines: [
-                ttcLookupLine(test.what(hi)),
-                ttcLookupLine(test.when(hi),
-                    icon: Icons.schedule_rounded, strong: true),
+                // One line of what it checks, not two (the full sentence is on
+                // the test's page). Kept for revert: `maxLines: 2` default.
+                ttcLookupLine(test.what(hi), maxLines: 1),
+                // The WHEN, short, with its clock. Kept for revert:
+                // `ttcLookupLine(test.when(hi), icon: schedule, strong: true)`,
+                // the whole sentence.
+                ttcLookupLine(ttcTestWhenShort(test, hi),
+                    maxLines: 1, icon: Icons.schedule_rounded, strong: true),
                 if (sayWhose && test.forHim)
                   ttcLookupLine(t.testForHim, maxLines: 1),
               ],

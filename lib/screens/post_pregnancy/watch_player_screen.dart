@@ -222,7 +222,9 @@ class _WatchPlayerScreenState extends State<WatchPlayerScreen> {
           ),
         ),
       ),
-    ).whenComplete(nameCtrl.dispose);
+    ).whenComplete(() {
+      Future<void>.delayed(const Duration(milliseconds: 600), nameCtrl.dispose);
+    });
   }
 
   Widget _collectionToggleRow(UserWatchCollection c) {

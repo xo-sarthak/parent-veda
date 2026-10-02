@@ -269,7 +269,10 @@ void main() {
       expect(kPregEndedTabLines.keys.toSet(),
           kAfterLossDoor.groups.map((g) => g.id).toSet());
       expect(kPregEndedBody.length, inInclusiveRange(2, 3));
-      expect(kPregEndedConfirm, 'Yes, update ParentVeda');
+      // The button names the action (2026-10-02, the user: "Yes, update
+      // ParentVeda" meant nothing). Kept for revert: 'Yes, update ParentVeda'.
+      expect(kPregEndedConfirm, 'Stop the weekly updates');
+      expect(kPregEndedConfirm.toLowerCase(), isNot(contains('update parentveda')));
       expect(kPregEndedCancel, 'Not now');
     });
   });

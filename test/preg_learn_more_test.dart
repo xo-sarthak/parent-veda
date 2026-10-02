@@ -215,7 +215,9 @@ void main() {
         (tester) async {
       await pump(tester, ToolsHubScreen(controller: pregnancy), height: 3000);
       expect(tester.takeException(), isNull);
-      for (final h in ['Track', 'Get ready', 'Keep', 'Ask']) {
+      // The groups are TTC's violet caps eyebrows now (2026-10-02). Kept for
+      // revert: the serif headings 'Track', 'Get ready', 'Keep', 'Ask'.
+      for (final h in ['TRACK', 'GET READY', 'KEEP', 'ASK']) {
         expect(find.text(h, skipOffstage: false), findsOneWidget, reason: h);
       }
       expect(find.text('Birth plan', skipOffstage: false), findsOneWidget);

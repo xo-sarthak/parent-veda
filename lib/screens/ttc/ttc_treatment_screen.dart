@@ -102,7 +102,13 @@ class TtcTreatmentScreenClassic extends StatelessWidget {
           // ⚠️ THE HERO ANSWERS "WHAT AM I LOOKING AT", not "what is this
           // called". A tool opened mid-cycle at speed needs the sentence, not
           // the label — the label is the eyebrow above it.
-          title: 'The dates your\nclinic gave you.',
+          // ⚠️ ONE LINE, NO FORCED BREAK (2026-10-02, the user: "why is the
+          // dates your clinic gave you in half written in next line?"). The
+          // title was a hard break in the middle of a phrase ('The dates
+          // your' / 'clinic gave you.'), and the intro below says "Add the
+          // dates your clinic gave you" straight after. It is the clinic's
+          // dates, said short. Kept for revert: the two-line title.
+          title: "Your clinic's dates.",
           // ⚠️ SAYS WHAT SHE DOES HERE, ONCE (tools pass, 2026-09-27). The
           // old intro opened by repeating the title, and its "your clinic's
           // dates count" line is said again by the note at the foot, so it

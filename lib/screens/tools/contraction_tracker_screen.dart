@@ -18,6 +18,31 @@
 //  Red is for the urgent and the irreversible, not a brand colour, so nothing
 //  else on the page is coloured. Every clinical line is the same line in the
 //  same place.
+//
+//  ⚠️ REDRAWN AROUND ONE CONTROL (2026-10-02, the user: "very text heavy; run
+//  Mobbin and figure out a good UI, UX and functionality"). Mobbin has no
+//  contraction timer, so this follows its closest patterns: Oura's and
+//  Messages' timer (one huge numeral on a calm ground, one control; see
+//  https://mobbin.com/screens/242a57a8-f0de-4669-a9a6-4d7d46e0582c and
+//  https://mobbin.com/screens/f8d9681d-1640-4d56-b333-893c9cd440e5), Bumble's
+//  record button (one round press target with a ring,
+//  https://mobbin.com/screens/aa5c865f-6881-4f20-b494-a1d786bb0b1e), and Noom's
+//  and Garmin's session summaries (three big numbers and a small bar chart,
+//  https://mobbin.com/screens/dcd65d53-0134-419d-8a5a-3aa41ad45dfa,
+//  https://mobbin.com/screens/ea11133b-fd2c-4d39-a12b-a2d4723c68b3).
+//    · THE DISC IS THE TIMER AND THE BUTTON: one big circle she can hit with a
+//      shaking hand. Tap to start, the numerals count, tap to end, then it
+//      rests and counts the gap. Its ring fills over a minute while a
+//      contraction runs and over five while she rests. No pinned bar.
+//    · THE PARAGRAPHS FOLD: "we can't tell you if it's labour" stays a line she
+//      always sees; its body, and "Understanding contractions", open on a tap.
+//    · A CALM READING IS ONE LINE (a chip that opens its full wording); an
+//      URGENT one stays the full red card, always. Red stays where it means NOW.
+//    · TWO SMALL BAR CHARTS replace the table: how long, and how far apart. The
+//      table is one tap away. Their reference lines are the 1 minute and 5
+//      minute marks the reading already uses, drawn as axis ticks, not advice.
+//  The engine below (`classifyContractions`, `assessContractions`) is untouched,
+//  and so is every clinical line. The old views are kept for revert.
 // =============================================================================
 
 import 'dart:async';
@@ -35,6 +60,7 @@ import '../brackets/hub/hub_intent_art.dart';
 import '../doors/pv_list_row.dart' show PvMarkWell;
 import '../pregnancy/preg_chrome.dart';
 import '../pregnancy/preg_tool_chrome.dart';
+import '../pregnancy/preg_tool_parts.dart' show PregFoldRow;
 import '../products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 
 // Kept for revert: the phase colours before the one ink.
@@ -333,16 +359,12 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
           // The front page wears the shared shell (2026-09-30, Tools audit). The
           // live phases below keep their app bar: a running timer is an
           // instrument, and a hero would only push it down.
+          // The disc is the button now, so nothing is pinned (2026-10-02).
+          // Kept for revert: a Column of `_homeView` over a pinned
+          // `_bottomButton(contractionStartedCta)`.
           ? Scaffold(
               backgroundColor: pvStorePalette.ground,
-              body: Column(children: [
-                Expanded(child: _homeView(context)),
-                // Pinned, so the one action is on screen whatever she scrolls.
-                SafeArea(
-                    top: false,
-                    child: _bottomButton(
-                        context, s.contractionStartedCta, _startContraction)),
-              ]),
+              body: _homeViewV2(context),
             )
           : Scaffold(
         appBar: AppBar(
@@ -380,12 +402,9 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
           ],
         ),
         body: SafeArea(
-          child: switch (_phase) {
-            // Home is built above, on the shell.
-            _Phase.home => _homeView(context),
-            _Phase.active => _activeView(context),
-            _Phase.rest => _restView(context),
-          },
+          // One live view for both phases (2026-10-02): the disc changes, the
+          // page does not. Kept for revert: `_activeView` and `_restView`.
+          child: _liveView(context),
         ),
       ),
     );
@@ -393,6 +412,315 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
 
   // ---- Home -----------------------------------------------------------------
 
+  /// The home page on the one control: the disc, a safety line she always
+  /// sees, and the long text folded.
+  Widget _homeViewV2(BuildContext context) {
+    final s = _s;
+    final hi = widget.controller.language.isHinglish;
+    return PregToolScaffold(
+      hue: _kContractionHue,
+      eyebrow: 'Get ready',
+      title: s.contractionToolTitle,
+      intro: s.contractionEmpty,
+      mark: IntentMark.timelineRail,
+      action: Semantics(
+        button: true,
+        label: s.historyLabel,
+        child: Tooltip(
+          message: s.historyLabel,
+          child: InkWell(
+            key: const ValueKey('ct_history'),
+            onTap: () => Navigator.of(context).push(MaterialPageRoute(
+              builder: (_) =>
+                  _ContractionHistoryScreen(controller: widget.controller),
+            )),
+            borderRadius: BorderRadius.circular(999),
+            child: Container(
+              width: 38,
+              height: 38,
+              alignment: Alignment.center,
+              decoration:
+                  const BoxDecoration(color: kPvInk, shape: BoxShape.circle),
+              child: const Icon(Icons.history_rounded, size: 19, color: Colors.white),
+            ),
+          ),
+        ),
+      ),
+      children: [
+        pregToolPad(Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          if (_symptoms.isEmergency) ...[
+            _assessBanner(s),
+            const SizedBox(height: 16),
+          ],
+          Center(
+            child: _TimerDisc(
+              key: const ValueKey('ct_disc_home'),
+              phase: _Phase.home,
+              time: null,
+              label: s.contractionStartedCta,
+              progress: 0,
+              semanticLabel: s.contractionStartedCta,
+              onTap: _startContraction,
+            ),
+          ),
+          const SizedBox(height: 26),
+          // The line that says what this is stays on the page; its body folds.
+          _FoldRow(
+            fold: 'disclaimer',
+            icon: Icons.health_and_safety_outlined,
+            title: s.ctDisclaimerTitle,
+            body: Text(s.ctDisclaimerBody,
+                style: pvManrope(fontSize: 13, height: 1.5, color: pvStorePalette.ink2)),
+          ),
+          const SizedBox(height: 10),
+          _safetyCard(s),
+          const SizedBox(height: 10),
+          _FoldRow(
+            fold: 'about',
+            icon: Icons.info_outline_rounded,
+            title: s.ctAboutTitle,
+            body: Text(s.ctAboutBody,
+                style: pvManrope(fontSize: 13, height: 1.5, color: pvStorePalette.ink2)),
+          ),
+          const SizedBox(height: 8),
+          Center(
+            child: TextButton.icon(
+              key: const ValueKey('ct_voice_toggle'),
+              onPressed: _toggleVoice,
+              style: TextButton.styleFrom(foregroundColor: pvStorePalette.ink3),
+              icon: Icon(
+                  _voiceMuted ? Icons.volume_off_rounded : Icons.volume_up_rounded,
+                  size: 16),
+              label: Text(
+                  hi
+                      ? (_voiceMuted ? 'Awaaz on karein' : 'Awaaz band karein')
+                      : (_voiceMuted ? 'Turn voice guidance on' : 'Mute voice guidance'),
+                  style: pvManrope(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w700,
+                      color: pvStorePalette.ink3)),
+            ),
+          ),
+        ])),
+      ],
+    );
+  }
+
+  // ---- Live (active and rest on one page) -------------------------------------
+
+  Widget _liveView(BuildContext context) {
+    final s = _s;
+    final p = pvStorePalette;
+    final active = _phase == _Phase.active;
+    final now = DateTime.now();
+    final elapsed = active
+        ? (_activeStart == null ? 0 : now.difference(_activeStart!).inSeconds)
+        : (_lastEnd == null ? 0 : now.difference(_lastEnd!).inSeconds);
+    final level = assessContractions(
+        _current, widget.controller.currentWeek, _symptoms);
+    final urgent =
+        level == AssessLevel.emergency || level == AssessLevel.preterm;
+    final last = _current.isNotEmpty ? _current.last : null;
+    return ListView(
+      key: const ValueKey('ct_live'),
+      padding: const EdgeInsets.fromLTRB(18, 10, 18, 28),
+      children: [
+        if (!active) ...[
+          // An urgent reading is the full red card, always. A calm one is a line.
+          if (urgent) _assessBanner(s) else _assessChip(s, level),
+          const SizedBox(height: 14),
+        ],
+        if (_symptoms.anyReported && !_symptoms.isEmergency) ...[
+          _safetyCard(s),
+          const SizedBox(height: 14),
+        ],
+        Center(
+          child: Text(
+            active
+                ? s.contractionNumber(_current.length + 1)
+                : s.timeSinceLast,
+            key: const ValueKey('ct_caption'),
+            style: pvManrope(
+                fontSize: 13, fontWeight: FontWeight.w700, color: p.ink3),
+          ),
+        ),
+        const SizedBox(height: 14),
+        Center(
+          child: _TimerDisc(
+            key: ValueKey(active ? 'ct_disc_active' : 'ct_disc_rest'),
+            phase: _phase,
+            time: s.formatStopwatch(elapsed),
+            label: active ? s.contractionEndedCta : s.contractionStartedCta,
+            // A minute while a contraction runs, five while she rests.
+            progress: (elapsed / (active ? 60 : 300)).clamp(0.0, 1.0),
+            semanticLabel:
+                '${s.formatStopwatch(elapsed)}. ${active ? s.contractionEndedCta : s.contractionStartedCta}',
+            onTap: active ? _endContraction : _startContraction,
+          ),
+        ),
+        if (!active) ...[
+          const SizedBox(height: 26),
+          IntrinsicHeight(
+            child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+              if (last != null) ...[
+                Expanded(
+                    child: _stat(s.lastContractionLabel,
+                        s.minSecLabel(last.durationSeconds))),
+                VerticalDivider(width: 1, thickness: 1, color: kPvLine),
+              ],
+              Expanded(
+                  child: _stat(
+                      s.avgDurationLabel, s.minSecLabel(_avgDuration.round()))),
+              VerticalDivider(width: 1, thickness: 1, color: kPvLine),
+              Expanded(
+                  child: _stat(s.avgIntervalLabel,
+                      s.minSecLabel(_avgIntervalSec.round()))),
+            ]),
+          ),
+          const SizedBox(height: 22),
+          if (_current.isNotEmpty)
+            _ContractionCharts(
+              key: const ValueKey('ct_charts'),
+              s: s,
+              durations: [for (final c in _current) c.durationSeconds],
+              intervals: [
+                for (final c in _current)
+                  if (c.intervalSeconds > 0) c.intervalSeconds
+              ],
+            ),
+          const SizedBox(height: 14),
+          if (_current.isNotEmpty)
+            _FoldRow(
+              fold: 'session',
+              icon: Icons.format_list_numbered_rounded,
+              title: s.thisSessionContractions,
+              count: '${_current.length}',
+              body: _sessionTable(s),
+            ),
+          const SizedBox(height: 14),
+          if (_current.length >= 3)
+            OutlinedButton.icon(
+              style: OutlinedButton.styleFrom(
+                foregroundColor: kPvInk,
+                side: const BorderSide(color: kPvLine, width: 1.5),
+                shape: const StadiumBorder(),
+                minimumSize: const Size.fromHeight(48),
+              ),
+              onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                builder: (_) => _SummaryScreen(
+                  controller: widget.controller,
+                  contractions: List.of(_current),
+                ),
+              )),
+              icon: const Icon(Icons.insights_rounded, size: 18),
+              label: Text(s.viewSummaryCta,
+                  style: pvManrope(fontSize: 14, fontWeight: FontWeight.w700)),
+            ),
+          const SizedBox(height: 6),
+          TextButton(
+              style: TextButton.styleFrom(foregroundColor: p.ink2),
+              onPressed: _endSession,
+              child: Text(s.endSessionCta,
+                  style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w700))),
+        ],
+      ],
+    );
+  }
+
+  /// A calm reading, as one line that opens its full wording. (An urgent one
+  /// never comes here: it is `_assessBanner`, the whole red card.)
+  Widget _assessChip(S s, AssessLevel level) {
+    final p = pvStorePalette;
+    final style = _levelStyle(level);
+    return Semantics(
+      button: true,
+      label: s.assessTitle(_levelKey(level)),
+      excludeSemantics: true,
+      child: InkWell(
+        key: const ValueKey('ct_assess_chip'),
+        onTap: () => _showAssessSheet(s, level),
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 52),
+          padding: const EdgeInsets.fromLTRB(14, 10, 12, 10),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: kPvLine),
+          ),
+          child: Row(children: [
+            Icon(style.icon, color: style.color, size: 20),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(s.assessTitle(_levelKey(level)),
+                  style: pvManrope(
+                      fontSize: 14.5, fontWeight: FontWeight.w800, height: 1.3, color: p.ink1)),
+            ),
+            if (_laborResponse != null) ...[
+              _tag(s.feltInLabour(_laborResponse == 'yes')),
+              const SizedBox(width: 6),
+            ],
+            Icon(Icons.chevron_right_rounded, size: 20, color: p.ink3),
+          ]),
+        ),
+      ),
+    );
+  }
+
+  /// The reading in full: what it says, and the line that always points to her
+  /// doctor. The same words the banner carried.
+  Future<void> _showAssessSheet(S s, AssessLevel level) {
+    final p = pvStorePalette;
+    final key = _levelKey(level);
+    return showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      backgroundColor: Colors.white,
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.fromLTRB(20, 4, 20, 28),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(s.assessTitle(key),
+                style: pvFraunces(
+                    fontSize: 21, fontWeight: FontWeight.w600, height: 1.2, color: p.ink1)),
+            const SizedBox(height: 10),
+            Text(s.assessSummary(key),
+                style: pvManrope(fontSize: 14, height: 1.55, color: p.ink1)),
+            const SizedBox(height: 14),
+            Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Icon(Icons.local_hospital_outlined, size: 16, color: p.ink3),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(s.ctAlwaysConsult,
+                    style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2)),
+              ),
+            ]),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// The contractions of this session, as the table, for the fold.
+  Widget _sessionTable(S s) {
+    final items = _current.reversed.toList();
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Row(children: [
+        const SizedBox(width: 28),
+        Expanded(child: Text(s.timeColumn, style: _columnStyle())),
+        Expanded(child: Text(s.durationColumn, style: _columnStyle())),
+        Expanded(child: Text(s.intervalColumn, style: _columnStyle())),
+      ]),
+      const Divider(height: 14, thickness: 1, color: kPvLine),
+      for (int i = 0; i < items.length; i++)
+        _sessionRow(s, items[i], _current.length - i),
+    ]);
+  }
+
+  // Kept for revert (2026-10-02): the three paragraph cards over a pinned bar.
+  // ignore: unused_element
   Widget _homeView(BuildContext context) {
     final s = _s;
     final hi = widget.controller.language.isHinglish;
@@ -474,6 +802,8 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
 
   // ---- Active ---------------------------------------------------------------
 
+  // Kept for revert (2026-10-02): the live view replaced it.
+  // ignore: unused_element
   Widget _activeView(BuildContext context) {
     final s = _s;
     final p = pvStorePalette;
@@ -502,6 +832,8 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
 
   // ---- Rest -----------------------------------------------------------------
 
+  // Kept for revert (2026-10-02): the live view replaced it.
+  // ignore: unused_element
   Widget _restView(BuildContext context) {
     final s = _s;
     final p = pvStorePalette;
@@ -889,7 +1221,9 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
 
   /// The timer face. Kept for revert: an orange (active) or blue (rest) ring
   /// on its own colour at 12%, the numbers in that colour. The ink ring while
-  /// a contraction runs, a grey one while she rests; white inside.
+  /// a contraction runs, a grey one while she rests; white inside. The disc
+  /// (`_TimerDisc`) replaced it (2026-10-02).
+  // ignore: unused_element
   Widget _timerCircle(String label, {required bool active}) {
     final p = pvStorePalette;
     return Container(
@@ -912,7 +1246,7 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
     return Column(children: [
       Text(value,
           style: pvManrope(
-              fontSize: 20, fontWeight: FontWeight.w800, color: p.ink1)),
+              fontSize: 22, fontWeight: FontWeight.w800, color: p.ink1)),
       const SizedBox(height: 2),
       Text(label,
           textAlign: TextAlign.center,
@@ -921,7 +1255,9 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
   }
 
   /// The big button. Kept for revert: it was filled with _activeColor (orange)
-  /// on every phase. The one ink: it is the thing she presses.
+  /// on every phase. The one ink: it is the thing she presses. The disc is the
+  /// button now (2026-10-02).
+  // ignore: unused_element
   Widget _bottomButton(BuildContext context, String label, VoidCallback onTap) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(18, 8, 18, 16),
@@ -938,6 +1274,297 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
       ),
     );
   }
+}
+
+// ---------------------------------------------------------------------------
+//  The disc, the fold and the charts (2026-10-02)
+// ---------------------------------------------------------------------------
+
+/// The one control, and the timer: a big round target with the time in it and
+/// a ring around it. Filled ink to start a contraction and while one runs
+/// (press to stop); white while she rests (press to start the next).
+class _TimerDisc extends StatelessWidget {
+  const _TimerDisc({
+    super.key,
+    required this.phase,
+    required this.time,
+    required this.label,
+    required this.progress,
+    required this.semanticLabel,
+    required this.onTap,
+  });
+
+  final _Phase phase;
+
+  /// The numerals, or null at home (a play mark instead).
+  final String? time;
+  final String label;
+  final double progress;
+  final String semanticLabel;
+  final VoidCallback onTap;
+
+  static const double size = 236;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = pvStorePalette;
+    final filled = phase != _Phase.rest;
+    final onInk = filled ? Colors.white : p.ink1;
+    final quiet = filled ? Colors.white.withValues(alpha: 0.78) : p.ink3;
+    return Semantics(
+      button: true,
+      label: semanticLabel,
+      excludeSemantics: true,
+      child: SizedBox(
+        width: size,
+        height: size,
+        child: CustomPaint(
+          painter: _RingPainter(progress: progress, track: kPvLine, color: kPvInk),
+          child: Padding(
+            padding: const EdgeInsets.all(14),
+            child: Material(
+              color: filled ? kPvInk : Colors.white,
+              shape: CircleBorder(
+                side: filled ? BorderSide.none : const BorderSide(color: kPvLine),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: InkWell(
+                onTap: () {
+                  HapticFeedback.mediumImpact();
+                  onTap();
+                },
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 22),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (time == null)
+                          Icon(Icons.play_arrow_rounded, size: 58, color: onInk)
+                        else
+                          FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(time!,
+                                style: pvManrope(
+                                    fontSize: 58,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: -1,
+                                    color: onInk)),
+                          ),
+                        const SizedBox(height: 6),
+                        Text(label,
+                            textAlign: TextAlign.center,
+                            textScaler: const TextScaler.linear(1.0),
+                            style: pvManrope(
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 0.8,
+                                height: 1.25,
+                                color: quiet)),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The ring round the disc: a hairline track and the part that has passed.
+class _RingPainter extends CustomPainter {
+  _RingPainter({required this.progress, required this.track, required this.color});
+  final double progress;
+  final Color track;
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    const w = 7.0;
+    final r = (math.min(size.width, size.height) - w) / 2;
+    final c = Offset(size.width / 2, size.height / 2);
+    canvas.drawCircle(
+        c,
+        r,
+        Paint()
+          ..color = track
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = w);
+    if (progress > 0) {
+      canvas.drawArc(
+          Rect.fromCircle(center: c, radius: r),
+          -math.pi / 2,
+          2 * math.pi * progress.clamp(0.0, 1.0),
+          false,
+          Paint()
+            ..color = color
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = w
+            ..strokeCap = StrokeCap.round);
+    }
+  }
+
+  @override
+  bool shouldRepaint(_RingPainter old) =>
+      old.progress != progress || old.track != track || old.color != color;
+}
+
+/// A line that opens: its icon and title are always there, its body is one tap
+/// away. The long text of this tool lives behind these. Moved to
+/// `PregFoldRow` (`preg_tool_parts.dart`) on 2026-10-02 when the baby movement
+/// tracker needed the same; this keeps the contraction tool's own key prefix
+/// (`ct_fold_...`), so nothing that finds them changes.
+class _FoldRow extends PregFoldRow {
+  const _FoldRow({
+    required super.fold,
+    required super.icon,
+    required super.title,
+    required super.body,
+    super.count,
+  }) : super(keyPrefix: 'ct_fold');
+}
+
+/// Two small bar charts of the session: how long each contraction lasted, and
+/// how far apart they were. The reference lines are the one minute and five
+/// minute marks, drawn as axis ticks (not advice), so a bar's height reads
+/// against the same marks the reading already uses.
+class _ContractionCharts extends StatelessWidget {
+  const _ContractionCharts({
+    super.key,
+    required this.s,
+    required this.durations,
+    required this.intervals,
+  });
+  final S s;
+  final List<int> durations;
+  final List<int> intervals;
+
+  @override
+  Widget build(BuildContext context) {
+    return PregCard(
+      padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(s.durationColumn, style: _columnStyle()),
+        const SizedBox(height: 6),
+        _MiniBars(
+            key: const ValueKey('ct_chart_duration'),
+            values: durations,
+            reference: 60,
+            referenceLabel: s.minSecLabel(60)),
+        if (intervals.isNotEmpty) ...[
+          const SizedBox(height: 14),
+          Text(s.intervalColumn, style: _columnStyle()),
+          const SizedBox(height: 6),
+          _MiniBars(
+              key: const ValueKey('ct_chart_interval'),
+              values: intervals,
+              reference: 300,
+              referenceLabel: s.minSecLabel(300)),
+        ],
+      ]),
+    );
+  }
+}
+
+/// The last ten values as bars, the newest on the right, against one reference
+/// line. A bar is never taller than the chart: the scale is whichever is larger,
+/// the reference with some room above it or the biggest value.
+class _MiniBars extends StatelessWidget {
+  const _MiniBars({
+    super.key,
+    required this.values,
+    required this.reference,
+    required this.referenceLabel,
+  });
+  final List<int> values;
+  final int reference;
+  final String referenceLabel;
+
+  static const double height = 54;
+  static const double labelWidth = 34;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = pvStorePalette;
+    final shown = values.length > 10 ? values.sublist(values.length - 10) : values;
+    final top = math.max(reference * 1.25, shown.fold<int>(0, math.max).toDouble());
+    final refY = height - height * reference / top;
+    return SizedBox(
+      height: height,
+      child: Stack(children: [
+        Positioned.fill(
+          left: labelWidth,
+          child: CustomPaint(
+            painter: _BarsPainter(
+              values: shown,
+              top: top,
+              reference: reference.toDouble(),
+              bar: kPvInk,
+              line: p.ink3.withValues(alpha: 0.55),
+              slots: 10,
+            ),
+          ),
+        ),
+        Positioned(
+          left: 0,
+          top: (refY - 7).clamp(0.0, height - 14),
+          child: Text(referenceLabel,
+              textScaler: const TextScaler.linear(1.0),
+              style: pvManrope(fontSize: 10.5, fontWeight: FontWeight.w700, color: p.ink3)),
+        ),
+      ]),
+    );
+  }
+}
+
+class _BarsPainter extends CustomPainter {
+  _BarsPainter({
+    required this.values,
+    required this.top,
+    required this.reference,
+    required this.bar,
+    required this.line,
+    required this.slots,
+  });
+  final List<int> values;
+  final double top;
+  final double reference;
+  final Color bar;
+  final Color line;
+  final int slots;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final slotW = size.width / slots;
+    final w = slotW * 0.56;
+    // The reference line, dashed.
+    final y = size.height - size.height * reference / top;
+    final dash = Paint()
+      ..color = line
+      ..strokeWidth = 1;
+    for (double x = 0; x < size.width; x += 7) {
+      canvas.drawLine(Offset(x, y), Offset(math.min(x + 3.5, size.width), y), dash);
+    }
+    // Bars from the right, so the newest is always at the edge.
+    for (var i = 0; i < values.length; i++) {
+      final slot = slots - values.length + i;
+      final h = math.max(3.0, size.height * values[i] / top);
+      final x = slot * slotW + (slotW - w) / 2;
+      final newest = i == values.length - 1;
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+            Rect.fromLTWH(x, size.height - h, w, h), const Radius.circular(3)),
+        Paint()..color = newest ? bar : bar.withValues(alpha: 0.35),
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(_BarsPainter old) =>
+      old.values != values || old.top != top || old.reference != reference;
 }
 
 /// One answer in the safety check: white with the hairline, the ink when
@@ -1223,6 +1850,16 @@ class _SummaryScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
+          // The same two charts as the live page (2026-10-02).
+          if (cs.isNotEmpty) ...[
+            _ContractionCharts(
+              key: const ValueKey('ct_summary_charts'),
+              s: s,
+              durations: durations,
+              intervals: intervals,
+            ),
+            const SizedBox(height: 16),
+          ],
           // Kept for revert: a grey block (neutral50, radius 16). A white card.
           SizedBox(
             width: double.infinity,

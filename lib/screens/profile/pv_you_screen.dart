@@ -65,6 +65,9 @@ import '../enterprise/employer_benefits_screen.dart';
 import '../learn/pv_my_learning_screen.dart' show PvMyLearningScreen;
 import '../post_pregnancy/family_profile_screen.dart';
 import '../pregnancy_profile_screen.dart';
+import '../pregnancy/preg_due_date_screen.dart' show openPregDueDate;
+import '../pregnancy/preg_hero_extras.dart' show pregTimeLeft;
+import '../../services/pregnancy_ended_store.dart';
 import '../products/pv_orders_screen.dart';
 import '../referral/invite_friends_screen.dart';
 import '../reminders_screen.dart';
@@ -533,7 +536,13 @@ class _PvYouScreenState extends State<PvYouScreen> {
     final content = pvYouContentFor(stage);
     // TTC only: the groups are its signal, as they were for the short list.
     // Kept for revert: final bento = kPvTtcMoreBento && content.groups != null;
-    final ttcProfile = kPvTtcProfileV2 && content.groups != null;
+    // ⚠️ THE SHORT PROFILE IS NO LONGER TTC'S ALONE (2026-10-01, the user:
+    // the pregnancy profile and its Settings "need to be like the way it's in
+    // TTC side"). Pregnancy asks with `shortProfile`, and leaves `groups`
+    // null because `groups` also builds the More tab's bento, which it has its
+    // own screen for. Kept for revert: `kPvTtcProfileV2 && content.groups != null`.
+    final ttcProfile =
+        kPvTtcProfileV2 && (content.groups != null || content.shortProfile);
     final ttcV3 = ttcProfile && kPvTtcProfileV3;
     final bento = !ttcProfile && kPvTtcMoreBento && content.groups != null;
     return ListenableBuilder(
@@ -1676,6 +1685,14 @@ class _PvYouScreenState extends State<PvYouScreen> {
               icon: Icons.edit_outlined,
               leading: TtcTabArt(mark: TtcTabMark.checklist, tint: tint(206)),
               title: 'Change your answers',
+              // ⚠️ AN ACTION, NOT AN ANSWER (2026-10-02, the user: "the option to
+              // change your answers feels like one of the items isn't
+              // visible"). Every row above it carries a value on its right
+              // edge; this one had nothing there, so it read as an answer
+              // whose value had gone missing. The pill says what the row is
+              // (the same Edit pill the hero and the partner row use), in
+              // both stages. Kept for revert: no `trailing`.
+              trailing: const _EditAnswersPill(),
               onTap: () => _push(
                 const PvDetailsScreen(stageId: 'trying'),
                 'you/details',
@@ -1751,6 +1768,111 @@ class _PvYouScreenState extends State<PvYouScreen> {
       // Local-first: a store that has not loaded is a line without a day.
     }
     return 'Trying to conceive';
+  }
+
+  /// Her older children on the pregnancy profile: one row each, then the way
+  /// to add one (the old chips' Add), saying what it is for when there is none.
+  List<Widget> _pregChildrenRows(
+    LifeStage stage,
+    PvYouStageContent content,
+    Color tint,
+  ) {
+    final kids = ChildProfileStore.instance;
+    final real = kids.hasRealChild ? kids.children : const [];
+    return [
+      for (final c in real)
+        PvProfileRow(
+          key: ValueKey('pv_profile_child_${c.id}'),
+          mark: TtcTabArt(mark: TtcTabMark.sun, tint: tint),
+          title: c.name,
+          subtitle: _ageOf(c),
+          onTap: () =>
+              _push(PvChildScreen(childId: c.id, stage: stage), 'you/child/${c.id}'),
+        ),
+      PvProfileRow(
+        key: const ValueKey('pv_profile_add_child'),
+        mark: TtcTabArt(mark: TtcTabMark.sun, tint: tint),
+        title: real.isEmpty ? 'Add an older child' : 'Add another child',
+        subtitle: real.isEmpty ? content.childrenInvitation : null,
+        onTap: () => showPvAddChildSheet(context),
+      ),
+    ];
+  }
+
+  /// The pregnancy hero's one status line (2026-10-01): "Pregnancy · week 20".
+  /// Derived from the due date she gave; it says nothing about the weeks once
+  /// a pregnancy has ended (her Today has already stopped counting).
+  String _pregStatus() {
+    try {
+      if (PregnancyEndedStore.instance.ended) return 'Pregnancy';
+      final c = PregnancyController.current;
+      if (c != null) return 'Pregnancy · week ${c.currentWeek}';
+    } catch (_) {
+      // Local-first: a store that has not loaded is a line without a week.
+    }
+    return 'Pregnancy';
+  }
+
+  /// Two facts from her own dates, the pregnancy's version of TTC's glance:
+  /// her due date and how long is left. Both are DERIVED from the one date the
+  /// app holds, never a prediction beyond it. A date from a scan or her doctor
+  /// is theirs, and the card says so (the clinical-ownership rule).
+  ///
+  /// With no real date (the app's default week, source unknown) the card is an
+  /// invitation to add one, as TTC's is to log a first period.
+  Widget _pregGlance({double top = 24}) {
+    final c = PregnancyController.current;
+    final tint = _profileTint(pvStorePalette);
+    if (c == null || c.dueDateSource == DueDateSource.unknown) {
+      return PvProfileGlance(
+        key: const ValueKey('pv_profile_glance'),
+        top: top,
+        facts: const [],
+        mark: TtcTabArt(mark: TtcTabMark.clock, tint: tint),
+        title: 'Your pregnancy at a glance',
+        note: 'Add your due date and your week, and how long is left, show '
+            'here. A date from a scan or your doctor is the one to use.',
+        actionLabel: 'Add your due date',
+        onAction: () {
+          final pc = PregnancyController.current;
+          if (pc != null) openPregDueDate(context, pc);
+        },
+      );
+    }
+    final days = c.dueDate
+        .difference(DateTime(
+          DateTime.now().year,
+          DateTime.now().month,
+          DateTime.now().day,
+        ))
+        .inDays;
+    final source = switch (c.dueDateSource) {
+      DueDateSource.scan => 'From your scan. We never recalculate it.',
+      DueDateSource.clinician => 'From your doctor. We never recalculate it.',
+      DueDateSource.ivfTransfer =>
+        'From your transfer date. We never recalculate it.',
+      DueDateSource.lastPeriod =>
+        'From your last period. A scan or your doctor’s date will replace it.',
+      DueDateSource.conception => 'From your conception date.',
+      DueDateSource.unknown => '',
+    };
+    return PvProfileGlance(
+      key: const ValueKey('pv_profile_glance'),
+      top: top,
+      facts: [
+        (_pregShortDate(c.dueDate), 'Your due date'),
+        (pregTimeLeft(days), 'Time left'),
+      ],
+      note: source.isEmpty ? null : source,
+    );
+  }
+
+  static String _pregShortDate(DateTime d) {
+    const m = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+    ];
+    return '${d.day} ${m[d.month - 1]}';
   }
 
   /// Two facts from her own logs (Lifesum's card, Headspace's Stats): her
@@ -1903,7 +2025,8 @@ class _PvYouScreenState extends State<PvYouScreen> {
         key: const ValueKey('pv_profile_hero'),
         name: _name,
         hasName: _hasName,
-        status: _ttcStatus(),
+        // Kept for revert: status: _ttcStatus(),
+        status: stage == LifeStage.pregnancy ? _pregStatus() : _ttcStatus(),
         partnerLine: partnerLine,
         partnerMark: TtcTabArt(mark: TtcTabMark.twoFigures, tint: tint),
         bandTint: tint,
@@ -1917,14 +2040,71 @@ class _PvYouScreenState extends State<PvYouScreen> {
         photoPath: him ? null : ProfilePhotoStore.instance.path,
         onPhoto: him ? null : _photoSheet,
       ),
-      // ⚠️ WHAT SHE BOUGHT AND BOOKED, FIRST UNDER THE HERO (2026-09-29, the
+      // ⚠️ YOUR JOURNEY IS RIGHT UNDER THE HERO (2026-10-01, the user: the
+      // "I got a positive test" button was "very below in the profile section,
+      // should be on top or above"). It is the one thing on this page she
+      // acts on, and she acts on it once, at the moment that matters most, so
+      // it should never need a scroll. The group stays whole; only its place
+      // moved (it sat after the answers and the doctor note). Pregnancy's
+      // "Baby has arrived" moves with it; its quiet "If your pregnancy has
+      // ended" row stays low, in the group above Settings.
+      // ⚠️ THE STEPPER IS GONE (2026-09-29, the user: the top "which
+      // displays where are you right now ... does not make any sense"). The
+      // four chapters as a track told her nothing she could act on. What she
+      // can act on is one thing: recording a positive test. Kept for revert:
+      //   PvYouSection(title: 'Your stage',
+      //       children: _journeyRows(p, stage, content, stepper: true)),
+      PvProfileGroup(
+        key: const ValueKey('pv_profile_journey'),
+        title: 'Your journey',
+        children: [
+          if (!him && a != null)
+            PvProfileRow(
+              key: stage == LifeStage.pregnancy
+                  ? const ValueKey('pv_profile_baby_arrived')
+                  : const ValueKey('pv_profile_positive_test'),
+              mark: TtcTabArt(
+                mark: stage == LifeStage.pregnancy
+                    ? TtcTabMark.bigSmallHearts
+                    : TtcTabMark.testStrip,
+                tint: tint,
+              ),
+              title: a.label,
+              subtitle: stage == LifeStage.pregnancy
+                  ? (a.note ?? '')
+                  : 'Dates your pregnancy and carries over everything you have logged',
+              onTap: () => a.run(context),
+            )
+          else
+            // His side moves with hers; there is nothing for him to press.
+            PvProfileRow(
+              key: const ValueKey('pv_profile_journey_his'),
+              mark: TtcTabArt(
+                mark: stage == LifeStage.pregnancy
+                    ? TtcTabMark.bigSmallHearts
+                    : TtcTabMark.testStrip,
+                tint: tint,
+              ),
+              // "your partner" stays lower case mid-sentence.
+              title: 'Moves when $_partnerName says so',
+              subtitle: stage == LifeStage.pregnancy
+                  ? 'When she tells ParentVeda the baby has arrived, your side moves into parenting with hers'
+                  : 'When she records a positive test, your side moves into pregnancy with hers',
+            ),
+        ],
+      ),
+      // ⚠️ WHAT SHE BOUGHT AND BOOKED, UNDER THE JOURNEY (was first under the
+      // hero until 2026-10-01) (2026-09-29, the
       // lead with the user: things she HAS bought or booked live on the
       // profile, things she COULD buy or book live on More and the store).
       // His side too: the orders and bookings on this phone are his as much
       // as hers. Mobbin evidence in pv_you_chrome.dart, PvProfileTile.
       _ttcOrdersAndBookings(tint),
       // Kept for revert (2026-09-29): if (!him) _ttcGlance(),
-      if (!him) _ttcGlance(top: 12),
+      if (!him)
+        (stage == LifeStage.pregnancy
+            ? _pregGlance(top: 12)
+            : _ttcGlance(top: 12)),
       if (!him)
         PvProfileGroup(
           key: const ValueKey('pv_profile_answers'),
@@ -1946,7 +2126,9 @@ class _PvYouScreenState extends State<PvYouScreen> {
           // room. The rows show the values; one row changes them, and the
           // line above says she can. Kept for revert: onTap: () =>
           // d.edit(context) on each row, and no Change your answers row.
-          lead: 'What you told us when you joined. You can change any answer.',
+          lead: stage == LifeStage.pregnancy
+              ? 'What you told us, and your due date. A row with an arrow opens its own editor; the rest change under Change your answers.'
+              : 'What you told us when you joined. You can change any answer.',
           children: [
             for (final d in content.details)
               if (!d.hideWhenEmpty || d.value() != '--')
@@ -1958,14 +2140,28 @@ class _PvYouScreenState extends State<PvYouScreen> {
                   title: d.label,
                   subtitle: d.note,
                   value: d.value() == '--' ? 'Not answered' : d.value(),
+                  // ⚠️ ONLY A FACT WITH AN EDITOR OF ITS OWN IS TAPPABLE
+                  // (pregnancy: the due date, twins, conditions), so no two
+                  // rows share a destination. TTC leaves `ownEditor` false on
+                  // every row, so its rows stay read-only as before.
+                  onTap: d.ownEditor ? () => d.edit(context) : null,
                 ),
             PvProfileRow(
               key: const ValueKey('pv_profile_change_answers'),
               mark: TtcTabArt(mark: TtcTabMark.checklist, tint: tint),
               title: 'Change your answers',
               subtitle: 'They decide what leads on your home',
+              // ⚠️ AN ACTION, NOT AN ANSWER (2026-10-02, the user: "the option to
+              // change your answers feels like one of the items isn't
+              // visible"). Every row above it carries a value on its right
+              // edge; this one had nothing there, so it read as an answer
+              // whose value had gone missing. The pill says what the row is
+              // (the same Edit pill the hero and the partner row use), in
+              // both stages. Kept for revert: no `trailing`.
+              trailing: const _EditAnswersPill(),
+              // Kept for revert: const PvDetailsScreen(stageId: 'trying').
               onTap: () => _push(
-                const PvDetailsScreen(stageId: 'trying'),
+                PvDetailsScreen(stageId: _stageId(stage)),
                 'you/details',
               ),
             ),
@@ -1979,37 +2175,6 @@ class _PvYouScreenState extends State<PvYouScreen> {
             for (final t in content.profileThings) _profileThingRow(p, t),
           ],
         ),
-      // ⚠️ THE STEPPER IS GONE (2026-09-29, the user: the top "which
-      // displays where are you right now ... does not make any sense"). The
-      // four chapters as a track told her nothing she could act on. What she
-      // can act on is one thing: recording a positive test. Kept for revert:
-      //   PvYouSection(title: 'Your stage',
-      //       children: _journeyRows(p, stage, content, stepper: true)),
-      PvProfileGroup(
-        key: const ValueKey('pv_profile_journey'),
-        title: 'Your journey',
-        children: [
-          if (!him && a != null)
-            PvProfileRow(
-              key: const ValueKey('pv_profile_positive_test'),
-              mark: TtcTabArt(mark: TtcTabMark.testStrip, tint: tint),
-              title: a.label,
-              subtitle:
-                  'Dates your pregnancy and carries over everything you have logged',
-              onTap: () => a.run(context),
-            )
-          else
-            // His side moves with hers; there is nothing for him to press.
-            PvProfileRow(
-              key: const ValueKey('pv_profile_journey_his'),
-              mark: TtcTabArt(mark: TtcTabMark.testStrip, tint: tint),
-              // "your partner" stays lower case mid-sentence.
-              title: 'Moves when $_partnerName says so',
-              subtitle:
-                  'When she records a positive test, your side moves into pregnancy with hers',
-            ),
-        ],
-      ),
       PvProfileGroup(
         key: const ValueKey('pv_profile_family'),
         title: 'Family and partner',
@@ -2046,6 +2211,11 @@ class _PvYouScreenState extends State<PvYouScreen> {
               'you/partner',
             ),
           ),
+          // ⚠️ THE CHILDREN ROW SURVIVES THE SHORT PROFILE (2026-10-01): the
+          // old pregnancy You invited her to add an older child, and a feature
+          // is never hidden. TTC has no child to add and draws none.
+          if (stage == LifeStage.pregnancy)
+            ..._pregChildrenRows(stage, content, tint),
         ],
       ),
       PvProfileGroup(
@@ -2053,14 +2223,33 @@ class _PvYouScreenState extends State<PvYouScreen> {
         title: 'Your things',
         children: [
           for (final t in content.tiles)
-            _profileThingRow(
-              p,
-              t,
-              // Saved names what is in it (content.tilesCaption).
-              subtitle: t.title == 'Saved' ? content.tilesCaption : null,
-            ),
+            // ⚠️ ORDERS IS THE TILE UNDER THE HERO, so a second row for it
+            // here would be the repetition `test/ttc_no_repetition_test.dart`
+            // refuses (pregnancy still lists it for the older callers).
+            if (t.title != 'Orders')
+              _profileThingRow(
+                p,
+                t,
+                // Saved names what is in it (content.tilesCaption).
+                subtitle: t.title == 'Saved' ? content.tilesCaption : null,
+              ),
+          // Her own keepsakes (pregnancy: letters to her baby, the journal,
+          // the bump photos). Hers: his view never draws them.
+          if (!him)
+            for (final t in content.keepsakeThings) _profileThingRow(p, t),
         ],
       ),
+      // Her quiet rows (pregnancy: "If your pregnancy has ended"), last before
+      // Settings and without a heading: found when looked for, never a
+      // feature to advertise. Hers only; TTC leaves `journeyThings` empty, so
+      // this draws nothing there.
+      if (!him && content.journeyThings.isNotEmpty)
+        PvProfileGroup(
+          key: const ValueKey('pv_profile_quiet'),
+          children: [
+            for (final t in content.journeyThings) _profileThingRow(p, t),
+          ],
+        ),
       // ONE Settings row, apart from the groups (Airbnb's "Account settings"
       // under the profile's rows), with no heading of its own.
       PvProfileGroup(
@@ -2093,6 +2282,8 @@ class _PvYouScreenState extends State<PvYouScreen> {
     'Help' => PvProfileMark.lifebuoy,
     'Contact us' => PvProfileMark.plane,
     kTtcGetHelpTitle => PvProfileMark.phone,
+    // Pregnancy's Support row (2026-10-01): providers near her.
+    'Find help near you' => PvProfileMark.lifebuoy,
     'About ParentVeda' => PvProfileMark.info,
     _ => null,
   };
@@ -2581,3 +2772,16 @@ String pvProfileBookingsLine({
 
 /// The Settings row's title for delivery addresses (Account section, TTC).
 const String kPvDeliveryAddressesTitle = 'Delivery addresses';
+
+/// The "Edit answers" pill on the profile's Change your answers row, which
+/// steps aside at large text: at 360pt and 1.5x the pill and the row's words
+/// do not both fit, and the row is the tap either way.
+class _EditAnswersPill extends StatelessWidget {
+  const _EditAnswersPill();
+
+  @override
+  Widget build(BuildContext context) =>
+      MediaQuery.textScalerOf(context).scale(10) > 12.5
+          ? const SizedBox.shrink()
+          : const PvProfilePill(label: 'Edit answers');
+}

@@ -58,6 +58,28 @@ class ObQuestion {
   final void Function(FamilyProfileStore store, Set<String> chosen) apply;
 }
 
+/// What each question is CALLED on the "Keep all of this" card (2026-10-01).
+///
+/// The card used to show only the chosen option's label, so a mother saw
+/// "Just starting" or "Yes, mostly" with no hint of what it answered (the
+/// user: the answers "look very vague"). One short name per question, kept
+/// here beside the questions rather than in the screen so a new question
+/// gets its name where it is written. `test/onboarding_flow_test.dart` fails
+/// the build if a question has none.
+const Map<String, String> kObSummaryLabels = {
+  'ttc_duration': 'Trying for',
+  'ttc_cycles': 'Your cycles',
+  'ttc_folic': 'Folic acid',
+  'preg_parity': 'This pregnancy',
+  'preg_priorities': 'Most help with',
+  'preg_diet': 'How you eat',
+  'pp_feeding': 'Feeding',
+  'pp_sleep': 'Sleep',
+  'pp_priorities': 'Matters most',
+  'sk_interests': 'Enjoys',
+  'sk_time': 'Time each day',
+};
+
 /// The questions for a stage, in order. [childName] personalises the skilling
 /// and parenting titles when it is known.
 List<ObQuestion> onboardingQuestionsFor(String stageId, {String? childName}) {

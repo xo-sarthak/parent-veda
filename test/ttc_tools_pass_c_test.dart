@@ -203,7 +203,8 @@ void main() {
           TtcPcosStandResultScreen(result: pcosBuildStand(PcosStandAnswers())));
       expect(top(tester, 'What to take with you'),
           lessThan(top(tester, 'Book a PCOS specialist')));
-      expect(find.byKey(const ValueKey('ttc_pcos_stand_read')), findsOneWidget);
+      // The article is the reader's Read next rail at the foot (2026-10-02).
+      expect(find.byKey(const ValueKey('ttc_pcos_stand_read_next')), findsOneWidget);
     });
 
     testWidgets('the readiness check says the skip up front', (tester) async {

@@ -58,6 +58,16 @@ Future<void> _tap(WidgetTester tester, Finder f) async {
   await tester.pumpAndSettle();
 }
 
+/// "Your last check" is one collapsible row on every tool (2026-10-02): its
+/// "See my ..." and "Clear my answers" are inside it, so it is opened first.
+Future<void> _openLastCheck(WidgetTester tester) async {
+  final toggle = find.byKey(const ValueKey('ttc_tool_last_toggle'));
+  await tester.ensureVisible(toggle);
+  await tester.pumpAndSettle();
+  await tester.tap(toggle);
+  await tester.pumpAndSettle();
+}
+
 FontWeight? _weightOf(WidgetTester tester, Finder label) => tester
     .widget<AnimatedDefaultTextStyle>(find
         .ancestor(of: label, matching: find.byType(AnimatedDefaultTextStyle))
@@ -129,6 +139,7 @@ void main() {
           kg: 55))!);
       await _pump(tester, const TtcBmiScreen());
       expect(find.byKey(const ValueKey('ttc_bmi_last')), findsOneWidget);
+      await _openLastCheck(tester);
       expect(find.textContaining('Your BMI was 21.5'), findsOneWidget);
       await _tap(tester, find.byKey(const ValueKey('ttc_tool_last_see')));
       expect(find.text('Where your number sits.'), findsOneWidget);
@@ -145,6 +156,7 @@ void main() {
           cm: 160,
           kg: 55))!);
       await _pump(tester, const TtcBmiScreen());
+      await _openLastCheck(tester);
       await _tap(tester, find.byKey(const ValueKey('ttc_tool_last_see')));
       await _tap(
           tester,
@@ -202,6 +214,7 @@ void main() {
       expect(_weightOf(tester, find.text('Mostly 21 to 35 days')),
           FontWeight.w800,
           reason: 'her answer is still chosen');
+      await _openLastCheck(tester);
       await _tap(tester, find.byKey(const ValueKey('ttc_tool_last_see')));
       expect(find.text('What your cycle looks like'), findsOneWidget);
     });
@@ -213,6 +226,7 @@ void main() {
       await _pump(tester, const TtcPcosStandScreen());
       expect(_weightOf(tester, find.text('Often longer than 35')),
           FontWeight.w800);
+      await _openLastCheck(tester);
       await _tap(tester, find.byKey(const ValueKey('ttc_tool_last_again')));
       expect(TtcSelfCheckStore.instance.pcosAt, isNull);
       expect(_weightOf(tester, find.text('Often longer than 35')),

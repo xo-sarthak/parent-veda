@@ -25,7 +25,6 @@ class CartItem {
     required this.lineId,
     required this.productId,
     required this.name,
-    required this.emoji,
     required this.unitPrice,
     this.qty = 1,
     this.size = '',
@@ -36,7 +35,12 @@ class CartItem {
   final String lineId;
   final String productId;
   final String name;
-  final String emoji;
+
+  // ⚠️ NO EMOJI ON A CART LINE (2026-10-02, the user: "no emoji needed, change it
+  // internally as well"). The line carried the product's emoji ('e') and the cart
+  // drew it. It carries the photo ([image]) alone now, and the cart draws the
+  // photo or the family's drawn mark. Old saved carts still load: 'e' is simply
+  // not read, and it is no longer written. Kept for revert: `final String emoji;`.
   final double unitPrice;
   int qty;
   String size; // optional variant
@@ -52,7 +56,6 @@ class CartItem {
         'l': lineId,
         'p': productId,
         'n': name,
-        'e': emoji,
         'u': unitPrice,
         'q': qty,
         's': size,
@@ -64,7 +67,6 @@ class CartItem {
         lineId: j['l'] as String? ?? '',
         productId: j['p'] as String? ?? '',
         name: j['n'] as String? ?? '',
-        emoji: j['e'] as String? ?? '🛍️',
         unitPrice: (j['u'] as num?)?.toDouble() ?? 0,
         qty: (j['q'] as num?)?.toInt() ?? 1,
         size: j['s'] as String? ?? '',
@@ -121,7 +123,6 @@ class CartStore extends ChangeNotifier with CloudSyncedStore {
     String cartId, {
     required String productId,
     required String name,
-    required String emoji,
     required double unitPrice,
     String size = '',
     String color = '',
@@ -142,7 +143,6 @@ class CartStore extends ChangeNotifier with CloudSyncedStore {
       lineId: 'ln_${DateTime.now().microsecondsSinceEpoch}_$_seq',
       productId: productId,
       name: name,
-      emoji: emoji,
       unitPrice: unitPrice,
       qty: qty,
       size: size,

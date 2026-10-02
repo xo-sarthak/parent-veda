@@ -133,15 +133,24 @@ Future<bool> showPvAddChildSheet(
                         children: [
                           Icon(Icons.cake_outlined, size: 18, color: p.ink2),
                           const SizedBox(width: 10),
-                          Text(
-                            dob == null
-                                ? (arrival
-                                      ? 'Date of birth'
-                                      : 'Date of birth (or the closest you know)')
-                                : _date(dob!),
-                            style: pvManrope(
-                              fontSize: 14.5,
-                              color: dob == null ? p.ink3 : p.ink1,
+                          // ⚠️ FLEXIBLE (2026-10-02, found while reproducing
+                          // the add-child red screen): "Date of birth (or the
+                          // closest you know)" is about 266 wide at 14.5 and
+                          // the row has 264 on a 360dp phone, so it ran off
+                          // the sheet, and further at a larger text size. It
+                          // wraps to a second line instead. Kept for revert:
+                          // the same Text without the Expanded.
+                          Expanded(
+                            child: Text(
+                              dob == null
+                                  ? (arrival
+                                        ? 'Date of birth'
+                                        : 'Date of birth (or the closest you know)')
+                                  : _date(dob!),
+                              style: pvManrope(
+                                fontSize: 14.5,
+                                color: dob == null ? p.ink3 : p.ink1,
+                              ),
                             ),
                           ),
                         ],
@@ -172,7 +181,13 @@ Future<bool> showPvAddChildSheet(
       },
     ),
   );
-  name.dispose();
+  // ⚠️ NOT DISPOSED THE MOMENT THE SHEET CLOSES (2026-10-02, the user: a red
+  // screen "'_dependents.isEmpty': is not true" while adding an older child).
+  // The future completes when the route is popped, but the sheet is still on
+  // screen for its exit animation with its field attached to [name]. The
+  // same cause as Delete account; the name editor waits for the same reason.
+  // Kept for revert: `name.dispose();` here.
+  Future<void>.delayed(const Duration(milliseconds: 600), name.dispose);
   return added ?? false;
 }
 

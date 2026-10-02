@@ -429,7 +429,6 @@ void main() {
             kProductsCartId,
             productId: p.id,
             name: p.name,
-            emoji: '',
             unitPrice: 95,
             size: '30 tablets',
           );

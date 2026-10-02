@@ -493,12 +493,18 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           // Kept for revert (2026-09-28): 'START HERE'
+          // ⚠️ NOT VIOLET (2026-10-01, the user: "this eyebrow heading is
+          // written in purple … none I saw in any tools is in purple"). The
+          // tools' small capitals headings are the quiet grey (`p.ink3`, as
+          // `TtcLookupHeading` and the form blocks draw them); this one kept
+          // the palette's action violet, the old section-eyebrow signature,
+          // so it stood out for no reason. Kept for revert: `color: p.action`.
           Text(t('START WITH ONE BLOOD TEST', 'YAHAN SE SHURU'),
               style: pvManrope(
                   fontSize: 10.5,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 1.1,
-                  color: p.action)),
+                  color: p.ink3)),
           const SizedBox(height: 9),
           Text(
               // Kept for revert (2026-09-28): 'Ask for these tests by name'

@@ -65,7 +65,7 @@ import '../services/pregnancy_controller.dart';
 import 'weekly_card_stack_screen.dart';
 import 'preg_daily_insights.dart';
 import '../data/preg_daily_tips.dart' show pregDailyTipFor;
-import 'symptoms/door/symptoms_widgets.dart' show symptomLineMark;
+// Kept for revert (2026-10-02, the cards no longer wear a corner glyph): import 'symptoms/door/symptoms_widgets.dart' show symptomLineMark;
 import '../data/symptoms/symptom_library.dart' show symptomById;
 import 'v2/preg_size_sheet.dart';
 import '../data/preg_size_sets.dart';
@@ -630,13 +630,20 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
                     caption: c.caption,
                     hue: c.hue,
                     art: c.art,
-                    // A logged symptom wears its own drawn mark — two cards
-                    // both showing the generic one read as a duplicate.
-                    artWidget: switch (c.symptomId) {
-                      final id? when symptomById(id) != null =>
-                        symptomLineMark(symptomById(id)!, size: 22, ink: p.ink2),
-                      _ => null,
-                    },
+                    // ⚠️ THE TRYING-TO-CONCEIVE CARD (2026-10-02, the user: "look
+                    // at the same section in trying to conceive, the design is a
+                    // little different for the cards in the rail, implement the
+                    // same UI"). Its rail draws every card one clean colour with
+                    // no mark behind or beside the words (`showArt: false`) and
+                    // the value in the middle of the card (`centreValue: true`),
+                    // the same tile at the same size. So a logged symptom no
+                    // longer wears its own drawn glyph in the corner; the words
+                    // carry it, as on TTC. Kept for revert: the two lines below,
+                    // and `artWidget: switch (c.symptomId) { final id?
+                    // when symptomById(id) != null => symptomLineMark(
+                    // symptomById(id)!, size: 22, ink: p.ink2), _ => null }`.
+                    showArt: false,
+                    centreValue: true,
                     p: p,
                     onTap: () => _openInsight(context, c, week, weekContent),
                   ),
@@ -686,10 +693,14 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
             // "Six doors" counted the tiles, which is a fact about the layout and
             // not a thing she needs. This gives permission instead: no order, no
             // right answer, nothing waiting to be worked through.
-            V3SectionHead(
-                eyebrow: 'What are you looking for?',
-                title: 'Start anywhere',
-                p: p),
+            // ⚠️ TRYING TO CONCEIVE'S DOORS HEADING (2026-10-02, the user: "in
+            // TTC home screen there is no 'what are you looking for?' heading
+            // and 'start anywhere' is replaced by something else, so make that
+            // heading same as TTC's one to maintain consistency"). Its home
+            // heads the grid "Explore by topic" with no eyebrow over it: the
+            // title already says what the grid is for. Kept for revert:
+            // eyebrow 'What are you looking for?', title 'Start anywhere'.
+            V3SectionHead(eyebrow: '', title: 'Explore by topic', p: p),
             const SizedBox(height: 12),
             // ---- SEARCH — NOT HERE. 2026-09-18: a bar sat between this
             // heading and the grid for an hour; the user: "not below Start

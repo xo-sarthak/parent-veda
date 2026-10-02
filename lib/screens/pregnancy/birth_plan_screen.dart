@@ -54,6 +54,20 @@ import '../products/pv_store_chrome.dart' show kPvInk;
 /// bracket so this screen has no dependency on the brackets file.
 const double kBirthPlanHue = 344;
 
+// ⚠️ THE TYPE WAS A STEP SMALLER THAN THE REST OF THE APP (2026-10-02, the user:
+// "the font of it is smaller than the rest of the application, fix that").
+// Reading text was 12.5 to 13.5 here (lead lines, chips, the tick, the notes)
+// while the pregnancy tools around it read at 14 to 15 (Ready for birth, the
+// medicine tracker, the movement tracker). Every size below is raised one
+// step to that scale, and nothing else moved: the words, the order, the
+// colours and the chip, tick and share shapes are as they were. `kBp...` below
+// names the scale so the next edit does not drift back.
+/// The sizes this screen reads at (2026-10-02): what the other pregnancy tools use.
+const double kBpBody = 14.5; // answers, the dialog text, buttons
+const double kBpPrompt = 15; // a question, a typed answer and its hint
+const double kBpLead = 14; // a section's lead line, chips, the quiet lines
+const double kBpSectionTitle = 20;
+
 class BirthPlanScreen extends StatefulWidget {
   const BirthPlanScreen({
     super.key,
@@ -121,15 +135,16 @@ class _BirthPlanScreenState extends State<BirthPlanScreen> {
                     "Answer whatever you've thought about. Even two answers is "
                     "a plan. A share button appears once there's something "
                     'to send.',
+                    // Kept for revert: fontSize 12.5.
                     style: pvManrope(
-                        fontSize: 12.5, height: 1.55, color: p.ink3))),
+                        fontSize: kBpLead, height: 1.55, color: p.ink3))),
               if (!store.isEmpty)
                 pvDoorPad(GestureDetector(
                   onTap: () => _confirmClear(context, p),
                   behavior: HitTestBehavior.opaque,
                   child: Text('Start again',
                       style: pvManrope(
-                          fontSize: 12.5,
+                          fontSize: kBpLead,
                           fontWeight: FontWeight.w700,
                           color: p.ink3)),
                 )),
@@ -154,20 +169,20 @@ class _BirthPlanScreenState extends State<BirthPlanScreen> {
             style: pvFraunces(
                 fontSize: 19, fontWeight: FontWeight.w600, color: p.ink1)),
         content: Text('This clears every answer on the plan. Nothing else.',
-            style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2)),
+            style: pvManrope(fontSize: kBpBody, height: 1.5, color: p.ink2)),
         actions: [
           TextButton(
               onPressed: () => Navigator.of(ctx).pop(false),
               child: Text('Keep it',
                   style: pvManrope(
-                      fontSize: 13.5,
+                      fontSize: kBpBody,
                       fontWeight: FontWeight.w700,
                       color: p.ink1))),
           TextButton(
               onPressed: () => Navigator.of(ctx).pop(true),
               child: Text('Clear',
                   style: pvManrope(
-                      fontSize: 13.5,
+                      fontSize: kBpBody,
                       fontWeight: FontWeight.w700,
                       color: p.ink3))),
         ],
@@ -210,27 +225,31 @@ class _SectionCard extends StatelessWidget {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(section.title,
             style: pvFraunces(
-                fontSize: 18,
+                fontSize: kBpSectionTitle,
                 fontWeight: FontWeight.w600,
                 height: 1.2,
                 letterSpacing: -0.4,
                 color: p.ink1)),
         const SizedBox(height: 4),
         Text(section.lead,
-            style: pvManrope(fontSize: 12.5, height: 1.5, color: p.ink3)),
+            style: pvManrope(fontSize: kBpLead, height: 1.5, color: p.ink3)),
         if (onOpenRead != null) ...[
           const SizedBox(height: 8),
           GestureDetector(
             onTap: onOpenRead,
             behavior: HitTestBehavior.opaque,
             child: Row(mainAxisSize: MainAxisSize.min, children: [
-              Icon(Icons.menu_book_outlined, size: 14, color: deep),
+              Icon(Icons.menu_book_outlined, size: 16, color: deep),
               const SizedBox(width: 6),
-              Text('Read about this first',
-                  style: pvManrope(
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.w700,
-                      color: deep)),
+              // Flexible: at a large text size the line wraps instead of
+              // running off the card (2026-10-02, with the larger type).
+              Flexible(
+                child: Text('Read about this first',
+                    style: pvManrope(
+                        fontSize: kBpLead,
+                        fontWeight: FontWeight.w700,
+                        color: deep)),
+              ),
             ]),
           ),
         ],
@@ -238,7 +257,7 @@ class _SectionCard extends StatelessWidget {
         for (final q in section.questions) ...[
           Text(q.prompt,
               style: pvManrope(
-                  fontSize: 13,
+                  fontSize: kBpPrompt,
                   fontWeight: FontWeight.w700,
                   height: 1.4,
                   color: p.ink1)),
@@ -297,7 +316,7 @@ class _SectionCard extends StatelessWidget {
               Expanded(
                 child: Text('Talked this through with my doctor',
                     style: pvManrope(
-                        fontSize: 13,
+                        fontSize: kBpBody,
                         fontWeight:
                             discussed ? FontWeight.w700 : FontWeight.w500,
                         color: p.ink1)),
@@ -335,7 +354,7 @@ class _Chip extends StatelessWidget {
           behavior: HitTestBehavior.opaque,
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 160),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
               // ⚠️ A CHOSEN CHIP GOES TINTED WITH AN INK EDGE, NOT FILLED. A
               // filled chip on a screen of preferences reads as a decision
@@ -346,7 +365,7 @@ class _Chip extends StatelessWidget {
             ),
             child: Text(label,
                 style: pvManrope(
-                    fontSize: 12.5,
+                    fontSize: kBpLead,
                     height: 1.3,
                     fontWeight: chosen ? FontWeight.w700 : FontWeight.w500,
                     color: p.ink1)),
@@ -392,7 +411,7 @@ class _TextBoxState extends State<_TextBox> {
         controller: _c,
         minLines: 2,
         maxLines: 6,
-        style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink1),
+        style: pvManrope(fontSize: kBpPrompt, height: 1.5, color: p.ink1),
         onChanged: (v) => widget.store.setText(widget.question.id, v),
         decoration: InputDecoration(
           isDense: true,
@@ -406,7 +425,7 @@ class _TextBoxState extends State<_TextBox> {
           enabledBorder: InputBorder.none,
           focusedBorder: InputBorder.none,
           hintText: widget.question.hint,
-          hintStyle: pvManrope(fontSize: 13, height: 1.5, color: p.ink3),
+          hintStyle: pvManrope(fontSize: kBpPrompt, height: 1.5, color: p.ink3),
         ),
       ),
     );
@@ -453,7 +472,7 @@ class _ShareBar extends StatelessWidget {
                 const SizedBox(width: 9),
                 Text('Share my plan',
                     style: pvManrope(
-                        fontSize: 14,
+                        fontSize: kBpPrompt,
                         fontWeight: FontWeight.w800,
                         color: Colors.white)),
               ],

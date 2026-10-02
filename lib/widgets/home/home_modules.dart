@@ -700,7 +700,8 @@ class ReadModule extends StatelessWidget {
                       children: [
                         for (final t in kSpiritualTraditions)
                           FilterChip(
-                            label: Text('${t.symbol} ${t.name}',
+                            label: Text('${t.name}', // emoji removed 2026-10-02; was '${t.symbol} ${t.name}'
+                              
                                 style: TextStyle(
                                     fontWeight: store.isReligionOn(t.id)
                                         ? FontWeight.w700
@@ -729,7 +730,8 @@ class ReadModule extends StatelessWidget {
                         const SizedBox(height: 12),
                         Align(
                           alignment: Alignment.centerLeft,
-                          child: Text('${t.symbol} ${t.name}',
+                          child: Text('${t.name}', // emoji removed 2026-10-02; was '${t.symbol} ${t.name}'
+                              
                               style: const TextStyle(
                                   fontSize: 12.5,
                                   fontWeight: FontWeight.w800,

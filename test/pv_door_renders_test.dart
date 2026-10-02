@@ -85,6 +85,25 @@ Future<void> _goTab(WidgetTester tester, String bracketId, int i) async {
 int _selectedOf(WidgetTester tester) =>
     tester.widget<PvDoorCarousel>(find.byType(PvDoorCarousel)).selected;
 
+/// Opens the folded warning-signs row into its sheet, and returns the finder
+/// for the sheet (2026-10-02: the signs are folded, as TTC's doors fold them).
+Future<Finder> _openFlag(WidgetTester tester) async {
+  final row = find.byKey(kPvDoorFlagRowKey);
+  await tester.ensureVisible(row);
+  await tester.pump();
+  await tester.tap(row);
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 500));
+  return find.byType(BottomSheet);
+}
+
+/// Closes the sheet again, by its route, so the next tab can be reached.
+Future<void> _closeSheet(WidgetTester tester) async {
+  Navigator.of(tester.element(find.byType(BottomSheet))).pop();
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 500));
+}
+
 Future<void> _pump(WidgetTester tester,
     [String bracketId = 'pregnancy_scans_tests']) async {
   tester.view.physicalSize = _phone;
@@ -119,7 +138,10 @@ void main() {
 
     // The bracket's own name is still on screen, above it — which is what
     // answers the "tapped one name, landed on another" objection.
-    expect(find.text('SCANS & TESTS'), findsOneWidget);
+    // The quiet hero (2026-10-02) draws the door's name as its title, in the
+    // case the tile has it. Kept for revert: the caps eyebrow 'SCANS & TESTS'.
+    expect(find.byKey(kPvDoorHeroTitleKey), findsOneWidget);
+    expect(find.text('Scans & tests'), findsWidgets);
 
     // ⚠️ THE TIMELINE ITSELF, NOT A CARD THAT OPENS IT. "WHERE YOU ARE" is the
     // timeline body's own eyebrow and appears nowhere else in the app, so
@@ -202,12 +224,17 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
 
+    // Folded (2026-10-02): the tab opens on one row, first on the tab, and
+    // the sheet it opens carries the whole flag.
     expect(find.text('Call your doctor if'), findsOneWidget);
+    expect(find.byKey(kPvDoorFlagRowKey), findsOneWidget);
 
     // ⚠️ EVERY LINE, NOT A SELECTION. Shoulder-tip pain is the classic sign of
     // a ruptured ectopic and is the entry a layout compromise drops first.
+    final sheet = await _openFlag(tester);
     for (final line in kScanUrgentSignsEn) {
-      expect(find.text(line.text), findsOneWidget,
+      expect(find.descendant(of: sheet, matching: find.text(line.text)),
+          findsOneWidget,
           reason: 'a red-flag line is missing: ${line.text}');
     }
   });
@@ -405,18 +432,14 @@ void _everyDoor() {
       }
     });
 
-    testWidgets('$name: a written section is a list, a mixed one is a rail',
+    // ⚠️ THE LAYOUT RULE CHANGED AGAIN, 2026-10-02 (the user: make the
+    // pregnancy doors the same as TTC's). 2026-09-19's "a written section is a
+    // list, a mixed one is a rail" is retired: every section that is not an
+    // inline tool is ONE rail of shelf cards (`PvShelfCard`, TTC's door
+    // format), written or mixed. The old test is kept below, commented, for
+    // revert (`kPvDoorShelf = false` restores the behaviour it described).
+    testWidgets('$name: every section is one shelf of cards',
         (tester) async {
-      // ⚠️ THE LAYOUT RULE, 2026-09-19 (it replaced 2026-09-11's "every
-      // section is a rail, even a section of one"). A section whose tiles
-      // are ALL written — article, guide, read, myth-fact — draws as a
-      // vertical list of rows with a thumbnail; a section with a tool, a
-      // film, a checklist or a person in it keeps the rail. Decided on the
-      // phone from Complications' three rails of identical "Article" cards,
-      // against Mobbin (Equinox, Alan, Gentler Streak, Liven list same-kind
-      // articles; Clue and Atoms rail mixed content). So the number of
-      // horizontal ListViews on a tab is the number of MIXED sections, and
-      // every written section is present as its rows.
       await _pump(tester, name);
       for (var i = 0; i < door.groups.length; i++) {
         if (i > 0) {
@@ -424,39 +447,80 @@ void _everyDoor() {
           await tester.pump(const Duration(milliseconds: 500));
         }
         final g = door.groups[i];
-        final sections = door.sectionsOf(g.id);
-        final mixed = sections.where((s) =>
-            s.inlineSurfaceId == null &&
-            s.tiles.isNotEmpty &&
-            !pvDoorSectionIsRows(s.tiles));
-        // An inline tool may draw a horizontal list of its own (Garbh's
-        // ritual rail does); it is counted as at most one per inline
-        // section, and never as a section rail.
-        final inlineRails = sections.where((s) => s.inlineSurfaceId != null).length;
-        final rails = find.byWidgetPredicate((w) =>
-            w is ListView && w.scrollDirection == Axis.horizontal);
-        final n = tester.widgetList(rails).length;
-        // A tab whose whole body is a tool (`group.inlineSurfaceId`, e.g.
-        // Nutrition's Today: the plate, the cravings chips) draws what the
-        // tool needs; only the floor holds there.
-        final toolTab = g.inlineSurfaceId != null;
-        expect(n >= mixed.length && (toolTab || n <= mixed.length + inlineRails), isTrue,
-            reason: '$name / "${g.label}": ${mixed.length} mixed sections must '
-                'draw ${mixed.length} rails (found $n, with $inlineRails inline '
-                'tools that may add one each).');
-        // And every written section is rows: its first tile's title is on
-        // the page as a row title, not inside a horizontal list.
-        for (final sec in sections) {
+        for (final sec in door.sectionsOf(g.id)) {
           if (sec.inlineSurfaceId != null || sec.tiles.isEmpty) continue;
-          if (!pvDoorSectionIsRows(sec.tiles)) continue; // written, or all tracks
+          if (sec.folded) continue; // folds until she opens it
+          expect(
+              find.byKey(pvDoorSectionShelfKey(sec.heading), skipOffstage: false),
+              findsOneWidget,
+              reason: '$name / "${g.label}" / "${sec.heading}" must be one '
+                  'shelf of cards, written or mixed.');
+          // And its first piece is a card on that shelf, not a list row.
           final first = sec.tilesFor(20).first;
-          final inRail = find.descendant(of: rails, matching: find.text(first.title));
-          expect(inRail, findsNothing,
-              reason: '$name / "${g.label}" / "${sec.heading}" is all written '
-                  'is rows (written or all tracks) and must be a list, not a rail.');
+          expect(
+              find.descendant(
+                  of: find.byKey(pvDoorSectionShelfKey(sec.heading),
+                      skipOffstage: false),
+                  matching: find.text(first.title, skipOffstage: false)),
+              findsOneWidget,
+              reason: '$name / "${g.label}" / "${sec.heading}": the first '
+                  'piece, "${first.title}", is not a card on the shelf.');
         }
       }
     });
+
+    //     testWidgets('$name: a written section is a list, a mixed one is a rail',
+    //         (tester) async {
+    //       // ⚠️ THE LAYOUT RULE, 2026-09-19 (it replaced 2026-09-11's "every
+    //       // section is a rail, even a section of one"). A section whose tiles
+    //       // are ALL written — article, guide, read, myth-fact — draws as a
+    //       // vertical list of rows with a thumbnail; a section with a tool, a
+    //       // film, a checklist or a person in it keeps the rail. Decided on the
+    //       // phone from Complications' three rails of identical "Article" cards,
+    //       // against Mobbin (Equinox, Alan, Gentler Streak, Liven list same-kind
+    //       // articles; Clue and Atoms rail mixed content). So the number of
+    //       // horizontal ListViews on a tab is the number of MIXED sections, and
+    //       // every written section is present as its rows.
+    //       await _pump(tester, name);
+    //       for (var i = 0; i < door.groups.length; i++) {
+    //         if (i > 0) {
+    //           await _goTab(tester, name, i);
+    //           await tester.pump(const Duration(milliseconds: 500));
+    //         }
+    //         final g = door.groups[i];
+    //         final sections = door.sectionsOf(g.id);
+    //         final mixed = sections.where((s) =>
+    //             s.inlineSurfaceId == null &&
+    //             s.tiles.isNotEmpty &&
+    //             !pvDoorSectionIsRows(s.tiles));
+    //         // An inline tool may draw a horizontal list of its own (Garbh's
+    //         // ritual rail does); it is counted as at most one per inline
+    //         // section, and never as a section rail.
+    //         final inlineRails = sections.where((s) => s.inlineSurfaceId != null).length;
+    //         final rails = find.byWidgetPredicate((w) =>
+    //             w is ListView && w.scrollDirection == Axis.horizontal);
+    //         final n = tester.widgetList(rails).length;
+    //         // A tab whose whole body is a tool (`group.inlineSurfaceId`, e.g.
+    //         // Nutrition's Today: the plate, the cravings chips) draws what the
+    //         // tool needs; only the floor holds there.
+    //         final toolTab = g.inlineSurfaceId != null;
+    //         expect(n >= mixed.length && (toolTab || n <= mixed.length + inlineRails), isTrue,
+    //             reason: '$name / "${g.label}": ${mixed.length} mixed sections must '
+    //                 'draw ${mixed.length} rails (found $n, with $inlineRails inline '
+    //                 'tools that may add one each).');
+    //         // And every written section is rows: its first tile's title is on
+    //         // the page as a row title, not inside a horizontal list.
+    //         for (final sec in sections) {
+    //           if (sec.inlineSurfaceId != null || sec.tiles.isEmpty) continue;
+    //           if (!pvDoorSectionIsRows(sec.tiles)) continue; // written, or all tracks
+    //           final first = sec.tilesFor(20).first;
+    //           final inRail = find.descendant(of: rails, matching: find.text(first.title));
+    //           expect(inRail, findsNothing,
+    //               reason: '$name / "${g.label}" / "${sec.heading}" is all written '
+    //                   'is rows (written or all tracks) and must be a list, not a rail.');
+    //         }
+    //       }
+    //     });
 
     testWidgets('$name: nothing overflows at 360dp on any tab',
         (tester) async {
@@ -507,11 +571,24 @@ void _everyDoor() {
           await _goTab(tester, name, i);
           await tester.pump(const Duration(milliseconds: 500));
         }
+        // ⚠️ FOLDED, NOT REMOVED (2026-10-02, the user: the warning signs can
+        // be folded): the tab shows ONE quiet row with the door's own title,
+        // and the sheet it opens holds every sign, whole. Kept for revert (the
+        // block open on the tab): expect(find.text(flag.title), findsOneWidget)
+        // and every line findsOneWidget on the page itself.
+        expect(find.byKey(kPvDoorFlagRowKey), findsOneWidget,
+            reason: '$name / "${door.groups[i].label}": the flag row is gone');
         expect(find.text(flag.title), findsOneWidget);
+        final sheet = await _openFlag(tester);
+        expect(find.descendant(of: sheet, matching: find.text(flag.title)),
+            findsOneWidget);
         for (final line in flag.lines) {
-          expect(find.text(line.text), findsOneWidget,
-              reason: '$name: a red-flag line is missing: ${line.text}');
+          expect(find.descendant(of: sheet, matching: find.text(line.text)),
+              findsOneWidget,
+              reason: '$name: a red-flag line is missing from the sheet: '
+                  '${line.text}');
         }
+        await _closeSheet(tester);
       }
     });
   }

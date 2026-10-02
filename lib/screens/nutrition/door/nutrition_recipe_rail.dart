@@ -18,6 +18,8 @@ import '../../../services/nutrition_day_store.dart';
 import '../../../services/pregnancy_controller.dart';
 import '../../../widgets/pv_feedback.dart';
 import '../../doors/pv_door_chrome.dart';
+import '../../doors/pv_shelf_card.dart';
+import '../../doors/pv_shelf_spec.dart' show PvShelfKind;
 import '../../v2/v2_palette.dart';
 import 'recipe_cook_screen.dart';
 
@@ -40,21 +42,23 @@ class NutritionRecipeRail extends StatelessWidget {
               final bh = b.tags.any(unticked.contains) ? 0 : 1;
               return ah.compareTo(bh);
             });
+          // // ⚠️ THE SHELF CARD, NOT THE TALL RAIL CARD (2026-10-02, the user: a tool drawn
+          // inside a door should wear the same card as the door's own sections, TTC's
+          // format). `PvDoorRailCard` at `kPvRailCardHeight` (176) is kept for revert in
+          // each caller's note.
           return SizedBox(
-            height: kPvRailCardHeight,
+            height: pvShelfRailHeight(MediaQuery.textScalerOf(context)),
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: kPvDoorGutter),
               itemCount: mine.length,
-              separatorBuilder: (_, _) => const SizedBox(width: kPvRailGap),
-              itemBuilder: (_, i) => PvDoorRailCard(
+              separatorBuilder: (_, _) => const SizedBox(width: 12),
+              itemBuilder: (_, i) => PvShelfCard(
                 p: p,
                 hue: 104,
-                index: i,
-                icon: Icons.soup_kitchen_outlined,
-                chip: 'RECIPE',
+                kind: PvShelfKind.recipe,
                 title: mine[i].name.en,
-                meta: mine[i].nutritionGlance.isEmpty ? null : mine[i].nutritionGlance.first,
+                fact: mine[i].nutritionGlance.isEmpty ? null : mine[i].nutritionGlance.first,
                 imageUrl: nutritionRecipePhoto(mine[i].id, mine[i].name.en),
                 onTap: () {
                   pvCommitFeedback();

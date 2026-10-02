@@ -278,12 +278,14 @@ void main() {
         tester,
         TtcTrackerScreen(tracker: ttcTrackerById('habits')!),
       );
+      // The group is a card with its name now (2026-10-02). Kept for revert:
+      // the grey capitals 'SLEEP' and 'CUTTING DOWN'.
       expect(
-        find.text('SLEEP'),
+        find.text('Sleep'),
         findsOneWidget,
         reason: '"In bed by about eleven" opened a second Sleep heading',
       );
-      expect(find.text('CUTTING DOWN'), findsOneWidget);
+      expect(find.text('Cutting down'), findsOneWidget);
     });
 
     testWidgets('his tracker says who fills it in', (tester) async {

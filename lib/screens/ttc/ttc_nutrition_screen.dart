@@ -63,7 +63,8 @@ import '../products/pv_store_chrome.dart' show pvSnack;
 import '../v2/v2_palette.dart';
 import 'ttc_lookup_parts.dart';
 import 'ttc_strings.dart';
-import 'ttc_surface_router.dart' show openTtcSurface, kTtcReadPrefix;
+import 'ttc_ivf_readiness_screen.dart' show kIvfHue;
+import 'ttc_read_next.dart' show ttcToolReadNext;
 import 'ttc_tool_chrome.dart';
 import 'ttc_tool_hues.dart' show kTtcToolHuePlan;
 import 'ttc_tool_marks.dart' show TtcToolArt, TtcToolMark;
@@ -573,27 +574,23 @@ class _TtcNutritionScreenState extends State<TtcNutritionScreen> {
                 ]),
 
                 // ---- the whole week, as the nutritionist wrote it -----------
-                const SizedBox(height: 26),
-                PvRowGroup(p: p, children: [
-                  TtcLookupRow(
-                    key: const ValueKey('ttc_food_open_week_read'),
-                    title: 'The whole week and the shopping list',
-                    leading: _FoodPhoto(
-                        url: readImageFor(kTtcMealPlanReadId), size: 44),
-                    lines: [
-                      ttcLookupLine(
-                          "The nutritionist's plan: every day, the swaps, and "
-                          'what to buy.'),
-                    ],
-                    onTap: () => openTtcSurface(
-                        context, '$kTtcReadPrefix$kTtcMealPlanReadId'),
-                  ),
-                ]),
+                // ⚠️ MOVED TO THE FOOT AS "READ NEXT" (2026-10-02, the user:
+                // the article on a tool screen is the reader's rail at the
+                // bottom, on every tool). It was a photo row here, keyed
+                // `ttc_food_open_week_read`, 'The whole week and the shopping
+                // list'. Kept for revert.
                 const SizedBox(height: 22),
                 TtcLookupNote(t.nutritionDisclaimer),
                 const SizedBox(height: 26),
               ],
             )),
+            ...ttcToolReadNext(
+              context,
+              const [kTtcMealPlanReadId],
+              hue: kIvfHue,
+              railKey: const ValueKey('ttc_food_read_next'),
+            ),
+            const SizedBox(height: 26),
           ],
         );
       },

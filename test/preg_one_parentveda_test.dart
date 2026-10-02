@@ -45,11 +45,13 @@ void main() {
     expect(pregFilledStyle().backgroundColor?.resolve({}), kPvInk);
   });
 
-  test('More, Tools and Learn head their sections with the one heading', () {
+  test('More and Learn head their sections with the one heading', () {
+    // Tools left this list on 2026-10-02 (the user: match Tools to TTC's
+    // format): its groups take TTC's violet caps eyebrow, pinned in
+    // test/preg_tools_more_ttc_format_test.dart.
     for (final f in [
       'lib/screens/pregnancy/preg_more_screen.dart',
       'lib/screens/pregnancy/preg_learn_screen.dart',
-      'lib/screens/tools_hub_screen.dart',
     ]) {
       expect(_code(f), contains('PregSectionHeading('), reason: f);
     }

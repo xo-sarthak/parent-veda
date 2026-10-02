@@ -607,26 +607,34 @@ class TtcIvfReadinessResultScreen extends StatelessWidget {
       children: [
         const SizedBox(height: 24),
 
+        // ⚠️ ONE COLOUR FOR THE THREE BLOCKS (2026-10-01, the user: a blue
+        // heading disc, a mustard outlined block and a green one "seems very
+        // random"). Blue 206, mustard 42 and green 160 had no meaning the
+        // reader could learn, and the headings drew an empty circle each. All
+        // three are now the tool's own hue, so the page is one family and the
+        // only emphasis left is the one that means something: the hairline on
+        // the timing block when the answer is to talk to someone. Kept for
+        // revert: hues 206, 42 and 160.
         ttcToolPad(const TtcToolBlockHead(
-            label: 'Where you are', hue: 206)),
+            label: 'Where you are', hue: kIvfHue)),
         const SizedBox(height: 10),
-        ttcToolPad(TtcToolBlock(text: result.where, hue: 206)),
+        ttcToolPad(TtcToolBlock(text: result.where, hue: kIvfHue)),
 
         const SizedBox(height: 26),
         ttcToolPad(const TtcToolBlockHead(
             // Kept for revert (2026-09-28): 'What this means for timing'
-            label: 'What your answers mean for timing', hue: 42)),
+            label: 'What your answers mean for timing', hue: kIvfHue)),
         const SizedBox(height: 10),
         // The one line from the routing rules. Outlined on every branch that
         // pushes toward a specialist — the whole escalation vocabulary.
         ttcToolPad(TtcToolBlock(
-            text: result.timing, hue: 42, outlined: push)),
+            text: result.timing, hue: kIvfHue, outlined: push)),
 
         const SizedBox(height: 26),
         ttcToolPad(const TtcToolBlockHead(
-            label: 'What to do next', hue: 160)),
+            label: 'What to do next', hue: kIvfHue)),
         const SizedBox(height: 10),
-        ttcToolPad(TtcToolBlock(text: result.openDoor, hue: 160)),
+        ttcToolPad(TtcToolBlock(text: result.openDoor, hue: kIvfHue)),
 
         const SizedBox(height: 18),
 

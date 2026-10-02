@@ -47,6 +47,8 @@ import '../pregnancy_profile_screen.dart';
 import '../pregnancy/preg_twins.dart';
 import '../pregnancy/preg_due_date_screen.dart' show openPregDueDate;
 import '../pregnancy/preg_ended_screen.dart' show openPregEnded;
+import '../pregnancy/preg_messages_screen.dart' show openPregMessages;
+import '../../services/preg_messages_store.dart' show PregMessagesStore;
 import '../../data/doors/pv_door_after_loss.dart' show kPregEndedRowTitle, kPregEndedRowSub;
 import '../../services/pregnancy_ended_store.dart';
 import '../products/pv_orders_screen.dart';
@@ -80,6 +82,7 @@ class PvYouDetail {
     this.note,
     this.art,
     this.hideWhenEmpty = false,
+    this.ownEditor = false,
   });
   final String label;
   final String Function() value;
@@ -94,6 +97,14 @@ class PvYouDetail {
   /// The drawn mark on TTC's profile (2026-09-29), for the section's tint.
   /// Null elsewhere: the row keeps its line icon.
   final Widget Function(Color tint)? art;
+
+  /// ⚠️ ADDITIVE (2026-10-01, the pregnancy profile). True when this fact has
+  /// an editor of its OWN, not the shared "Your answers" page: a due date has
+  /// its date editor, twins its sheet, conditions their screen. The short
+  /// profile makes such a row tappable (it is a different destination from the
+  /// one "Change your answers" row, so nothing repeats); every other row stays
+  /// a read-only value. TTC leaves it false on every row, so it draws as before.
+  final bool ownEditor;
 
   /// A quiet line under the value ("your doctor's word comes first").
   final String? note;
@@ -231,6 +242,8 @@ class PvYouStageContent {
     this.preferenceThings = const [],
     this.notificationThings = const [],
     this.supportThings = const [],
+    this.shortProfile = false,
+    this.keepsakeThings = const [],
   });
   final LifeStage stage;
 
@@ -286,6 +299,22 @@ class PvYouStageContent {
 
   /// Extra rows in Settings, Support (TTC: Get help now).
   final List<PvYouThing> supportThings;
+
+  // ⚠️ ADDITIVE (2026-10-01, UNIFY THE PROFILE: the user asked for the
+  // pregnancy You and Settings to be the way TTC's are). The short profile
+  // was TTC's alone, switched on by having [groups]. [groups] also drives the
+  // More tab's bento, which pregnancy has its own screen for, so pregnancy
+  // asks for the short profile with this flag instead and leaves [groups]
+  // null. Every other stage leaves both empty and draws as before.
+
+  /// True: draw the short profile (hero, orders and bookings, a glance, her
+  /// answers, her doctor, her journey, family, her things, ONE Settings row)
+  /// and move the footer and Developer into Settings.
+  final bool shortProfile;
+
+  /// Her own keepsakes, drawn under "Your things" after the tiles (pregnancy:
+  /// the Dear Baby vault, the Journal, the Bump journey).
+  final List<PvYouThing> keepsakeThings;
 }
 
 // ---- helpers ------------------------------------------------------------------
@@ -370,8 +399,9 @@ PvYouThing _orders() => PvYouThing(
   open: (c) => _push(c, const PvOrdersScreen(), 'store/orders'),
 );
 
-PvYouThing _memories() => PvYouThing(
+PvYouThing _memories({Widget Function(Color)? art}) => PvYouThing(
   icon: Icons.photo_library_outlined,
+  art: art,
   title: 'Memories',
   open: (c) => _push(c, const MemoriesHomeScreen(), 'memories'),
 );
@@ -399,6 +429,80 @@ PvYouThing _doctorNotes(LifeStage stage, {Widget Function(Color)? art}) =>
   title: 'Notes for your doctor',
   subtitle: 'What you have logged, laid out for the appointment',
   open: (c) => _push(c, PvDoctorNotesScreen(stage: stage), 'you/doctor_notes'),
+);
+
+// ---- Pregnancy rows, built once (2026-10-01) ---------------------------------------
+//
+// The old long list (`_pregnancy.things`) and the short profile both draw
+// these, so a row says the same words, opens the same screen and carries the
+// same mark wherever it appears.
+
+PvYouThing _dearBabyVault() => PvYouThing(
+  icon: Icons.mail_outline_rounded,
+  art: ttcArtTab(TtcTabMark.heartHand),
+  title: 'Dear Baby vault',
+  subtitle: 'Letters that open when your baby is born',
+  open: (c) {
+    final ctl = PregnancyController.current;
+    if (ctl != null) {
+      _push(c, DearBabyVaultScreen(controller: ctl), 'dear_baby');
+    }
+  },
+);
+
+PvYouThing _pregJournal() => PvYouThing(
+  icon: Icons.edit_note_rounded,
+  art: ttcArtTab(TtcTabMark.openBook),
+  title: 'Journal',
+  open: (c) {
+    final ctl = PregnancyController.current;
+    if (ctl != null) _push(c, JournalScreen(controller: ctl), 'journal');
+  },
+);
+
+PvYouThing _bumpJourney() => PvYouThing(
+  icon: Icons.pregnant_woman_rounded,
+  art: ttcArtTab(TtcTabMark.tulip),
+  title: 'Bump journey',
+  subtitle: 'One photo a week, kept in order',
+  count: () => BumpStore.instance.count,
+  open: (c) {
+    final ctl = PregnancyController.current;
+    if (ctl != null) _push(c, BumpRitualScreen(controller: ctl), 'bump');
+  },
+);
+
+/// ⚠️ LAST, AND QUIET ON PURPOSE (2026-09-29, pregnancy gap analysis,
+/// "Behind · After a loss", P1). Oura keeps "My pregnancy ended" as one plain
+/// row in its pregnancy details; a loss is not a feature to advertise, it is a
+/// door that has to be findable on the worst day.
+PvYouThing _pregEnded() => PvYouThing(
+  icon: Icons.spa_outlined,
+  art: ttcArtTab(TtcTabMark.lotus),
+  title: kPregEndedRowTitle,
+  subtitle: kPregEndedRowSub,
+  subtitleNow: () => PregnancyEndedStore.instance.ended
+      ? 'Your Today shows support pages. Tap to change this.'
+      : kPregEndedRowSub,
+  listen: PregnancyEndedStore.instance,
+  open: (c) {
+    final ctl = PregnancyController.current;
+    if (ctl != null) openPregEnded(c, ctl);
+  },
+);
+
+/// The Messages row for Settings, Notifications: what the app has sent her,
+/// the same words as TTC's. A dot, never a number (Y1).
+PvYouThing _pregMessages() => PvYouThing(
+  icon: Icons.mail_outline_rounded,
+  title: 'Messages',
+  subtitle: 'What we have sent you, and when we send it',
+  dot: () => PregMessagesStore.instance.unreadCount > 0,
+  listen: PregMessagesStore.instance,
+  open: (c) {
+    final ctl = PregnancyController.current;
+    if (ctl != null) openPregMessages(c, ctl);
+  },
 );
 
 PvYouThing _findHelp() => PvYouThing(
@@ -824,6 +928,8 @@ final PvYouStageContent _pregnancy = PvYouStageContent(
   details: [
     PvYouDetail(
       label: 'Due date',
+      art: ttcArtTab(TtcTabMark.clock),
+      ownEditor: true,
       value: () {
         final c = PregnancyController.current;
         if (c == null) return '--';
@@ -857,12 +963,15 @@ final PvYouStageContent _pregnancy = PvYouStageContent(
     // gap analysis P2). One answer, shared with the hospital bag's switch.
     PvYouDetail(
       label: 'Twins or more',
+      art: ttcArtTab(TtcTabMark.twoCircles),
+      ownEditor: true,
       value: pregTwinsValue,
       edit: (c) => showPregTwinsSheet(c),
       note: 'Your weeks will say so, and the pieces for twins lead. Your due date is not changed.',
     ),
     PvYouDetail(
       label: 'First pregnancy',
+      art: ttcArtTab(TtcTabMark.sprout),
       value: () => switch (FamilyProfileStore.instance.parity) {
         Parity.first => 'Yes',
         Parity.subsequent => 'No — I have been pregnant before',
@@ -872,6 +981,8 @@ final PvYouStageContent _pregnancy = PvYouStageContent(
     ),
     PvYouDetail(
       label: 'Conditions',
+      art: ttcArtTab(TtcTabMark.vialReport),
+      ownEditor: true,
       value: () =>
           _list(FamilyProfileStore.instance.pregConditions, (x) => x.label.en),
       edit: (c) =>
@@ -881,69 +992,55 @@ final PvYouStageContent _pregnancy = PvYouStageContent(
     ),
     PvYouDetail(
       label: 'How you eat',
+      art: ttcArtTab(TtcTabMark.bowl),
       value: () => _orDash(FamilyProfileStore.instance.diet?.label.en),
       edit: (c) => _editQuestion(c, 'pregnancy', 'preg_diet'),
     ),
     PvYouDetail(
       label: 'What you want help with',
+      art: ttcArtTab(TtcTabMark.signpost),
       value: () =>
           _list(FamilyProfileStore.instance.pregPriorities, (x) => x.label.en),
       edit: (c) => _editQuestion(c, 'pregnancy', 'preg_priorities'),
     ),
   ],
-  tiles: [_saved(), _memories(), _orders()],
+  // Marks for the short profile (2026-10-01). Orders stays in the list (the
+  // older callers read three tiles) and the short profile leaves it out,
+  // because its own "Your orders" tile sits under the hero.
+  tiles: [
+    _saved(art: ttcArtMore(TtcMoreMark.bookmark)),
+    _memories(art: ttcArtMore(TtcMoreMark.film)),
+    _orders(),
+  ],
   things: [
-    PvYouThing(
-      icon: Icons.mail_outline_rounded,
-      title: 'Dear Baby vault',
-      subtitle: 'Letters that open when your baby is born',
-      open: (c) {
-        final ctl = PregnancyController.current;
-        if (ctl != null) {
-          _push(c, DearBabyVaultScreen(controller: ctl), 'dear_baby');
-        }
-      },
-    ),
-    PvYouThing(
-      icon: Icons.edit_note_rounded,
-      title: 'Journal',
-      open: (c) {
-        final ctl = PregnancyController.current;
-        if (ctl != null) _push(c, JournalScreen(controller: ctl), 'journal');
-      },
-    ),
-    PvYouThing(
-      icon: Icons.pregnant_woman_rounded,
-      title: 'Bump journey',
-      subtitle: 'One photo a week, kept in order',
-      count: () => BumpStore.instance.count,
-      open: (c) {
-        final ctl = PregnancyController.current;
-        if (ctl != null) _push(c, BumpRitualScreen(controller: ctl), 'bump');
-      },
-    ),
+    _dearBabyVault(),
+    _pregJournal(),
+    _bumpJourney(),
     _bookings(),
     _addresses(),
     _doctorNotes(LifeStage.pregnancy),
     _findHelp(),
-    // ⚠️ LAST, AND QUIET ON PURPOSE (2026-09-29, pregnancy gap analysis,
-    // "Behind · After a loss", P1). Oura keeps "My pregnancy ended" as one
-    // plain row in its pregnancy details; a loss is not a feature to
-    // advertise, it is a door that has to be findable on the worst day.
-    PvYouThing(
-      icon: Icons.spa_outlined,
-      title: kPregEndedRowTitle,
-      subtitle: kPregEndedRowSub,
-      subtitleNow: () => PregnancyEndedStore.instance.ended
-          ? 'Your Today shows support pages. Tap to change this.'
-          : kPregEndedRowSub,
-      listen: PregnancyEndedStore.instance,
-      open: (c) {
-        final ctl = PregnancyController.current;
-        if (ctl != null) openPregEnded(c, ctl);
-      },
-    ),
+    // ⚠️ LAST, AND QUIET ON PURPOSE: see `_pregEnded`.
+    _pregEnded(),
   ],
+  // ⚠️ THE SHORT PROFILE (2026-10-01, the user: "in pregnancy profile,
+  // settings need to be like the way it's in TTC side of app, just make sure
+  // profile contains pregnancy relevant content"). `things` above stays as the
+  // list the older callers read; the screen draws the short profile from
+  // these. Where each former row went: the journal, the bump photos and the
+  // letters to her baby sit under Your things; the doctor note has its own
+  // group; "I have been pregnant before" and the rest of her answers are the
+  // Your answers group; Bookings are the tile under the hero and Addresses
+  // are in Settings; "If your pregnancy has ended" is under Your journey,
+  // last and quiet; Messages and Find help moved into Settings.
+  shortProfile: true,
+  keepsakeThings: [_dearBabyVault(), _pregJournal(), _bumpJourney()],
+  journeyThings: [_pregEnded()],
+  profileThings: [
+    _doctorNotes(LifeStage.pregnancy, art: ttcArtTab(TtcTabMark.doctorChat)),
+  ],
+  notificationThings: [_pregMessages()],
+  supportThings: [_findHelp()],
   childrenInvitation:
       'Your baby\'s page appears here after the birth. An older child can be added now.',
   whatWeStore: [

@@ -69,7 +69,7 @@ void main() {
   group('records: Save is never a dead tap', () {
     testWidgets('with nothing to save, the button says why', (tester) async {
       await pumpTall(tester, const TtcRecordsScreen());
-      await tester.tap(find.text('Type a number instead'));
+      await tester.tap(find.text('Type in a result'));
       await tester.pumpAndSettle();
 
       expect(find.text('Add a photo or the test name to save.'),
@@ -82,7 +82,7 @@ void main() {
     testWidgets('typing a name offers the library test, and saves under it',
         (tester) async {
       await pumpTall(tester, const TtcRecordsScreen());
-      await tester.tap(find.text('Type a number instead'));
+      await tester.tap(find.text('Type in a result'));
       await tester.pumpAndSettle();
 
       await tester.enterText(find.byType(TextField).first, 'am');
@@ -102,7 +102,7 @@ void main() {
 
     testWidgets('whose it is is a visible two-way switch', (tester) async {
       await pumpTall(tester, const TtcRecordsScreen());
-      await tester.tap(find.text('Type a number instead'));
+      await tester.tap(find.text('Type in a result'));
       await tester.pumpAndSettle();
       // The add page (tool rebuild, 2026-09-27) asks it as a question.
       // Was: expect(find.text('WHOSE RESULT IS THIS'), findsOneWidget);

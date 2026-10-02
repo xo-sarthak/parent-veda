@@ -113,18 +113,34 @@ const String kPregEndedRowSub =
     "Let ParentVeda know, and we'll change what you see.";
 
 /// The confirm screen, before she confirms.
+///
+/// ⚠️ SAYS WHAT WILL CHANGE, AND THE BUTTON NAMES IT (2026-10-02, the user:
+/// "'Yes, update ParentVeda'… what does it mean at all? … user just went
+/// through child loss, don't give this random button … justify the ask by
+/// making it clear and easy to understand"). The button answered "Yes" to a
+/// question the screen never asked, and "update ParentVeda" said nothing about
+/// what would happen to her. Now the screen says, in her terms, what stops,
+/// what she will see instead and what stays, and the button is the action
+/// itself: "Stop the weekly updates". Nothing is asked of her that she has to
+/// work out. Kept for revert (the earlier words):
+///   body[1]: "If you confirm, the weekly baby updates, the daily tip and the
+///     week reminders will stop. Your partner's side will stop showing the
+///     week too. In their place you'll find a quiet page with help for your
+///     body and your heart."
+///   body[2]: "... and you can undo this at any time from this same place."
+///   confirm: 'Yes, update ParentVeda'
 const String kPregEndedTitle = "We're so sorry.";
 const List<String> kPregEndedBody = [
   "You don't have to explain anything, and you don't have to do this now.",
-  "If you confirm, the weekly baby updates, the daily tip and the week "
-      "reminders will stop. Your partner's side will stop showing the week "
-      "too. In their place you'll find a quiet page with help for your body "
-      "and your heart.",
+  "If you'd like, ParentVeda can stop the weekly baby updates, the daily tip "
+      "and the week reminders, and your partner's side will stop showing the "
+      "week too. In their place there will be a quiet page with help for "
+      "your body and your heart.",
   "Nothing you saved is deleted. Your notes, photos, reports and bookmarks "
-      "stay just as they are, and you can undo this at any time from this "
-      "same place.",
+      "stay just as they are, and you can go back to the weekly view whenever "
+      "you want, from this same place.",
 ];
-const String kPregEndedConfirm = 'Yes, update ParentVeda';
+const String kPregEndedConfirm = 'Stop the weekly updates';
 const String kPregEndedCancel = 'Not now';
 
 /// The same screen, opened again after she has confirmed.

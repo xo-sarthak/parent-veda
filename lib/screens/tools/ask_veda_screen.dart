@@ -45,7 +45,10 @@ import 'contraction_tracker_screen.dart';
 import 'ready_for_birth_screen.dart';
 import 'kegel_care_screen.dart';
 import 'weight_tracker_screen.dart';
+import '../../ask_veda/pv_veda_links.dart' show openPvVedaDoc;
 import '../../services/remote/ask_veda_service.dart';
+import '../search/pv_search_screen.dart'
+    show PvSearchHit, openPvSearchHit, pvSearch, pvSearchIndex;
 import '../../theme/pv_fonts.dart';
 import '../pregnancy/preg_chrome.dart';
 import '../products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
@@ -160,9 +163,17 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
     // reading the whole app in Hindi was never TOLD to be reading Hindi,
     // so Ask Veda answered her in English. The TTC screen already passed
     // it; this one did not.
+    // ⚠️ `stage: 'pregnancy'` IS WHAT SCOPES THE ANSWER (2026-10-02, the user:
+    // Ask Veda "the way we did for TTC"). The service grounds a pregnancy
+    // question in, and points to, pregnancy content only, and buckets its cache
+    // on it. Until now this sent only the week, so the service could not tell
+    // this side of the app from any other. The wire body is a contract across
+    // two repos: `app/answer.py` `scope_domain` and `app/cache.py`
+    // `stage_key_for` read this field. Kept for revert: no `stage:`.
     final res = await AskVedaService.ask(
       t,
       week: p.currentWeek,
+      stage: 'pregnancy',
       lang: p.language.isHindi ? 'hi' : 'en',
     );
     if (!mounted || _query != t) return; // ignore stale / superseded replies
@@ -560,7 +571,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         children: _loading
             ? [_loadingCard()]
             : (_failed || _feed == null)
-                ? [_offlineCard()]
+                ? [_offlineCard(), ..._localOffline()]
                 : _feedSections(_feed!, s),
       );
 
@@ -580,7 +591,14 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         _feedAnswerCard(f.answer, s),
         if (f.meaning.isNotEmpty) _feedMeaning(f.meaning),
         if (f.actions.isNotEmpty) _feedActions(f.actions),
-        if (f.content.isNotEmpty || f.videos.isNotEmpty) _feedMoreInfo(f),
+        if (f.content.isNotEmpty || f.videos.isNotEmpty)
+          _feedMoreInfo(f)
+        // ⚠️ BUILT, NOT LEFT OUT (2026-10-02, TTC's rule: "when the service
+        // sends no reading, we find our own"). The app's own search matches the
+        // question on the phone, so More information is never empty when the
+        // app has the page. Kept for revert: nothing here.
+        else if (_localHits().isNotEmpty)
+          _localMoreInfo(),
         // _feedCommunityComingSoon(), // held back with the community, kept for revert
         if (f.products.isNotEmpty) _feedProducts(f),
         if (f.services.isNotEmpty) _feedServices(f),
@@ -778,7 +796,91 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
       ]);
 
   // ---- deep-linking : open the exact content on TOP of Ask Veda -------------
+  // ---- the app's own search, on the phone (2026-10-02) ---------------------------
+  //
+  // The in-app search index (`pvSearchIndex`) knows every door, card, recipe,
+  // symptom and report page on this side of the app, and how to open each. The
+  // question is run through it so the answer never leaves her without a way
+  // into the app: it fills "More information" when the service sends nothing,
+  // and it is all she has when she is offline.
+  List<PvSearchHit> _localHits() {
+    final q = (_query ?? '').trim();
+    if (q.length < 2) return const [];
+    return pvSearch(q, pvSearchIndex()).take(5).toList();
+  }
+
+  Widget _localCard(PvSearchHit h) => GestureDetector(
+        key: ValueKey('veda_local_${h.title}'),
+        onTap: () => openPvSearchHit(context, h, p, query: _query),
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 11),
+          padding: const EdgeInsets.all(13),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: _vCardBorder),
+          ),
+          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Container(
+              width: 56,
+              height: 56,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: _vPurple.withValues(alpha: 0.10),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Icon(h.icon, size: 22, color: _vPurple2),
+            ),
+            const SizedBox(width: 13),
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(h.meta.isEmpty ? 'IN THE APP' : h.meta.toUpperCase(),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: pregGroupLabelStyle().copyWith(fontSize: 10.5)),
+                const SizedBox(height: 4),
+                Text(h.title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: pvManrope(fontSize: 14.5, fontWeight: FontWeight.w700, height: 1.25, color: _vInk)),
+                if (h.blurb.trim().isNotEmpty) ...[
+                  const SizedBox(height: 3),
+                  Text(h.blurb,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: pvManrope(fontSize: 12, height: 1.35, color: _vMuted)),
+                ],
+              ]),
+            ),
+            const Padding(
+                padding: EdgeInsets.only(left: 4, top: 18),
+                child: Icon(Icons.chevron_right_rounded, size: 20, color: _vMuted)),
+          ]),
+        ),
+      );
+
+  Widget _localMoreInfo() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        _sectionHead(Icons.library_books_rounded, 'More information'),
+        for (final h in _localHits()) _localCard(h),
+      ]);
+
+  /// What she can still open when there is no connection.
+  List<Widget> _localOffline() {
+    final hits = _localHits();
+    if (hits.isEmpty) return const [];
+    return [
+      _sectionHead(Icons.phone_iphone_rounded, 'Meanwhile, in the app'),
+      for (final h in hits) _localCard(h),
+    ];
+  }
+
   void _openFeedItem(VedaFeedItem it) {
+    // ⚠️ THE REAL PAGE FIRST (2026-10-02, the user: Ask Veda's answers should be
+    // in-app stuff, so she can search the app through it). A card whose id is
+    // one of this side's own (`pvread_`, `pvfaq_`, `pvdoor_`, `pvtool_`) opens
+    // the read, the door card or the tool itself, not a text sheet. Anything
+    // else (an older document, a product, a film) keeps the handling below.
+    if (openPvVedaDoc(context, it.docId, p)) return;
     final kind = (it.kind ?? '').toLowerCase();
     if (kind == 'product') {
       _openProducts();

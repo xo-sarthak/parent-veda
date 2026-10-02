@@ -82,7 +82,9 @@ void main() {
       expect(find.text('AMH'), findsOneWidget);
       // The when stays on the row: it is the fact that costs a month.
       final fsh = ttcTestById('fsh_lh')!;
-      expect(find.text(fsh.when(false)), findsOneWidget);
+      // Short on the row, whole on the page (2026-10-02). Kept for revert:
+      // `find.text(fsh.when(false))`.
+      expect(find.text(ttcTestWhenShort(fsh, false)), findsOneWidget);
       // Kept for revert: the V1 shadowed card was the row.
       expect(find.byType(TtcCard), findsNothing,
           reason: 'old-UI cards inside the new shell were the complaint');

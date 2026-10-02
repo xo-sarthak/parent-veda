@@ -53,6 +53,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../brackets/hub/hub_intent_art.dart' show IntentMark;
 import 'doors/ttc_tab_art.dart';
 
 /// One mark per tool, named for the TOOL (unlike `TtcTabMark`, which is named
@@ -90,6 +91,12 @@ enum TtcToolMark {
   cycleReport,
   practice,
   careCircle,
+  // ---- drawn for the PREGNANCY Tools tab (2026-10-02), in this family's own
+  // style, for the three things TTC's set had no object for. Not in
+  // `kTtcToolMarks`: they are not TTC hub rows.
+  hospitalBag,
+  stopwatch,
+  bell,
 }
 
 /// Every hub row's id (hers and his) and every moved row's id, to its mark.
@@ -386,6 +393,52 @@ class TtcToolPainter extends CustomPainter {
             stroke(inkC, 8));
         canvas.drawCircle(const Offset(50, 60), 4.8, ink);
 
+      // ---- HOSPITAL BAG (pregnancy Tools) ------------------------------------
+      case TtcToolMark.hospitalBag:
+        // A packed bag: its handle over a rounded body, a small cross on it.
+        canvas.drawOval(const Rect.fromLTRB(26, 83, 74, 91), soft);
+        canvas.drawPath(
+            Path()
+              ..moveTo(35, 34)
+              ..cubicTo(35, 12, 65, 12, 65, 34),
+            stroke(inkC, kLine));
+        canvas.drawRRect(rr(18, 30, 82, 83, 14), ink);
+        canvas.drawLine(const Offset(18, 47), const Offset(82, 47), knock);
+        canvas.drawRRect(rr(45, 54, 55, 76, 3), ground);
+        canvas.drawRRect(rr(38, 60, 62, 70, 3), ground);
+
+      // ---- STOPWATCH (pregnancy Tools: the contraction timer) -----------------
+      case TtcToolMark.stopwatch:
+        // A stopwatch: crown on top, a hand part-way round the face.
+        canvas.drawRRect(rr(42, 10, 58, 20, 4), soft);
+        canvas.drawLine(const Offset(50, 20), const Offset(50, 27), stroke(inkC, kLine));
+        canvas.drawLine(const Offset(75, 30), const Offset(81, 24), stroke(inkC, kLine));
+        canvas.drawCircle(const Offset(50, 58), 31, ink);
+        canvas.drawArc(Rect.fromCircle(center: const Offset(50, 58), radius: 22),
+            -math.pi / 2, math.pi * 0.7, false, stroke(groundC.withValues(alpha: 0.5), kDetail));
+        canvas.drawLine(const Offset(50, 58), const Offset(63, 46), stroke(groundC, kLine));
+        canvas.drawCircle(const Offset(50, 58), 4, ground);
+
+      // ---- BELL (pregnancy Tools: reminders) ----------------------------------
+      case TtcToolMark.bell:
+        // A bell with its clapper, and a soft ring either side.
+        canvas.drawCircle(const Offset(50, 15), 4.5, ink);
+        canvas.drawPath(
+            Path()
+              ..moveTo(22, 70)
+              ..cubicTo(33, 62, 33, 52, 33, 42)
+              ..cubicTo(33, 28, 42, 21, 50, 21)
+              ..cubicTo(58, 21, 67, 28, 67, 42)
+              ..cubicTo(67, 52, 67, 62, 78, 70)
+              ..close(),
+            ink);
+        canvas.drawLine(const Offset(20, 72), const Offset(80, 72), stroke(inkC, kLine));
+        canvas.drawCircle(const Offset(50, 83), 7, soft);
+        canvas.drawArc(Rect.fromCircle(center: const Offset(50, 46), radius: 40),
+            math.pi * 1.12, math.pi * 0.2, false, stroke(inkC.withValues(alpha: 0.32), kLine));
+        canvas.drawArc(Rect.fromCircle(center: const Offset(50, 46), radius: 40),
+            math.pi * 1.68, math.pi * 0.2, false, stroke(inkC.withValues(alpha: 0.32), kLine));
+
       // Borrowed marks never reach here (see the top of `paint`).
       default:
         break;
@@ -397,6 +450,89 @@ class TtcToolPainter extends CustomPainter {
   @override
   bool shouldRepaint(TtcToolPainter old) =>
       old.mark != mark || old.tint != tint;
+}
+
+/// The TTC-family mark for a pregnancy `IntentMark`, so a list or a tab rail on
+/// the pregnancy side draws the same objects as the trying-to-conceive side
+/// (2026-10-02, the user: match Tools, More and the doors to TTC's marks).
+/// Null for a mark with no counterpart: the caller keeps its own drawing.
+///
+/// [forDoor] only changes one answer, because one pregnancy mark means two
+/// things: a calendar page is the due date on the Tools list (the cycle ring
+/// with one day marked) and a visit or a scan schedule on a door tab (the
+/// appointments calendar).
+Widget? ttcFamilyMarkForIntent(IntentMark? m, Color tint,
+        {bool forDoor = false}) =>
+    switch (m) {
+      IntentMark.stepsMark => TtcMarkLeading(tab: TtcTabMark.heartHand, tint: tint),
+      IntentMark.scaleMark => TtcMarkLeading(tool: TtcToolMark.weight, tint: tint),
+      IntentMark.pillMark => TtcMarkLeading(tool: TtcToolMark.medication, tint: tint),
+      IntentMark.chartLog => TtcMarkLeading(tab: TtcTabMark.chartLine, tint: tint),
+      IntentMark.lotusMark => TtcMarkLeading(tab: TtcTabMark.lotus, tint: tint),
+      IntentMark.nextStep => TtcMarkLeading(tool: TtcToolMark.bell, tint: tint),
+      IntentMark.bagMark => TtcMarkLeading(tool: TtcToolMark.hospitalBag, tint: tint),
+      IntentMark.reportPage => TtcMarkLeading(tool: TtcToolMark.records, tint: tint),
+      IntentMark.timelineRail => TtcMarkLeading(tool: TtcToolMark.stopwatch, tint: tint),
+      IntentMark.calendarDay => forDoor
+          ? TtcMarkLeading(tool: TtcToolMark.appointments, tint: tint)
+          : TtcMarkLeading(tab: TtcTabMark.windowRing, tint: tint),
+      IntentMark.listMark => TtcMarkLeading(tab: TtcTabMark.checklist, tint: tint),
+      IntentMark.bookMark => TtcMarkLeading(tab: TtcTabMark.openBook, tint: tint),
+      IntentMark.bodyMark => TtcMarkLeading(tab: TtcTabMark.bigSmallHearts, tint: tint),
+      IntentMark.lampMark => TtcMarkLeading(tab: TtcTabMark.sunrise, tint: tint),
+      IntentMark.askDoctor => TtcMarkLeading(tab: TtcTabMark.twoBubbles, tint: tint),
+      // Door tabs only: marks the Tools list never uses.
+      IntentMark.scanFan => forDoor
+          ? TtcMarkLeading(tab: TtcTabMark.vialReport, tint: tint)
+          : null,
+      IntentMark.cuppedHands => forDoor
+          ? TtcMarkLeading(tab: TtcTabMark.heartHand, tint: tint)
+          : null,
+      IntentMark.sunMark =>
+        forDoor ? TtcMarkLeading(tab: TtcTabMark.sun, tint: tint) : null,
+      IntentMark.checkMark => forDoor
+          ? TtcMarkLeading(tab: TtcTabMark.checklist, tint: tint)
+          : null,
+      IntentMark.questionMark =>
+        forDoor ? TtcMarkLeading(tool: TtcToolMark.canI, tint: tint) : null,
+      IntentMark.pageMark => forDoor
+          ? TtcMarkLeading(tab: TtcTabMark.openBook, tint: tint)
+          : null,
+      IntentMark.forkMark || IntentMark.cookMark =>
+        forDoor ? TtcMarkLeading(tab: TtcTabMark.bowl, tint: tint) : null,
+      _ => null,
+    };
+
+/// A mark by its object rather than by a TTC tool id: either a tool mark or a
+/// rail mark, in the same 44 box and disc as `TtcToolMarkLeading`. The
+/// pregnancy Tools and More rows use it, so the two stages' lists draw one
+/// family (2026-10-02).
+class TtcMarkLeading extends StatelessWidget {
+  const TtcMarkLeading({
+    super.key,
+    this.tool,
+    this.tab,
+    required this.tint,
+    this.size = 44,
+  });
+
+  final TtcToolMark? tool;
+  final TtcTabMark? tab;
+  final Color tint;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) => ExcludeSemantics(
+        child: SizedBox(
+          width: size,
+          height: size,
+          child: tool != null
+              ? TtcToolArt(mark: tool!, tint: tint)
+              : tab != null
+                  ? TtcTabArt(mark: tab!, tint: tint)
+                  : CustomPaint(painter: _DiscOnly(tint)),
+        ),
+      );
 }
 
 /// The hub row's leading mark: the disc is the well, as on the door rail.

@@ -2194,10 +2194,11 @@ class _MyChildScreenState extends State<MyChildScreen> {
         ),
       ),
     );
-    nameCtl.dispose();
-    wCtl.dispose();
-    hCtl.dispose();
-    headCtl.dispose();
+    // ⚠️ NOT DISPOSED THE MOMENT THE ROUTE CLOSES (2026-10-02, the red screen '_dependents.isEmpty'): the TextField is still on screen for the exit animation and still listening. Same fix as the add-child sheet.
+    Future<void>.delayed(const Duration(milliseconds: 600), nameCtl.dispose);
+    Future<void>.delayed(const Duration(milliseconds: 600), wCtl.dispose);
+    Future<void>.delayed(const Duration(milliseconds: 600), hCtl.dispose);
+    Future<void>.delayed(const Duration(milliseconds: 600), headCtl.dispose);
   }
 
   Widget _field(String label, TextEditingController ctl, {bool number = false}) => Column(

@@ -398,4 +398,150 @@ void main() {
       expect(find.byType(LinearProgressIndicator), findsNothing);
     });
   });
+
+  // ===========================================================================
+  //  The "Keep all of this" card, and an account that already exists
+  //  (2026-10-01).
+  //
+  //  The user, from the emulator: signed in with a Gmail that already had an
+  //  account and "it took me back to the first screen… no alert of any sort";
+  //  and the card above the Google button showed "Just starting / Yes,
+  //  mostly / Yes", answers with no question beside them.
+  // ===========================================================================
+  group('the card says what each answer is for', () {
+    test('every question has a short name on the card', () {
+      for (final s in ['trying', 'pregnancy', 'parenting', 'skilling']) {
+        for (final q in onboardingQuestionsFor(s, childName: 'Aarav')) {
+          expect(kObSummaryLabels[q.id], isNotNull,
+              reason: '${q.id} would show a bare answer on the card');
+          expect(kObSummaryLabels[q.id]!.trim(), isNotEmpty, reason: q.id);
+        }
+      }
+    });
+
+    testWidgets('trying: each row is a name over the answer', (t) async {
+      SharedPreferences.setMockInitialValues({});
+      t.view.physicalSize = const Size(1170, 2532);
+      t.view.devicePixelRatio = 3.0;
+      addTearDown(t.view.resetPhysicalSize);
+      addTearDown(t.view.resetDevicePixelRatio);
+      await t.pumpWidget(
+        MaterialApp(
+          home: OnboardingFlow(
+            pregnancy: PregnancyController(now: DateTime(2026, 9, 17)),
+            onDone: (_, _) {},
+            startAt: ObStep.stage,
+            startName: 'Priya',
+          ),
+        ),
+      );
+      await t.pumpAndSettle();
+      await t.tap(find.text('Trying to conceive'));
+      await t.pumpAndSettle();
+      await t.tap(find.text('Continue'));
+      await t.pumpAndSettle();
+      await t.tap(find.text('Continue'));
+      await t.pumpAndSettle();
+      await t.tap(find.text('Just starting'));
+      await t.pumpAndSettle();
+      await t.tap(find.text('Continue'));
+      await t.pumpAndSettle();
+      await t.tap(find.text('Yes, mostly'));
+      await t.pumpAndSettle();
+      await t.tap(find.text('Continue'));
+      await t.pumpAndSettle();
+      await t.tap(find.text('Good'));
+      await t.pumpAndSettle();
+      await t.tap(find.text('Yes'));
+      await t.pumpAndSettle();
+      await t.tap(find.text('Continue'));
+      await t.pumpAndSettle();
+      await t.pump(const Duration(seconds: 3));
+      await t.pumpAndSettle();
+      expect(find.text('ON THIS PHONE NOW'), findsOneWidget);
+      // Its own stage, which trying used to have no line for.
+      expect(find.text('Your journey'), findsOneWidget);
+      expect(find.text('Trying to conceive'), findsOneWidget);
+      // Each answer under the name of its question.
+      expect(find.text('Trying for'), findsOneWidget);
+      expect(find.text('Just starting'), findsOneWidget);
+      expect(find.text('Your cycles'), findsOneWidget);
+      expect(find.text('Yes, mostly'), findsOneWidget);
+      expect(find.text('Folic acid'), findsOneWidget);
+      expect(find.text('Yes'), findsOneWidget);
+      expect(t.takeException(), isNull);
+    });
+  });
+
+  group('an account that already exists is said so', () {
+    final now = DateTime(2026, 10, 1, 15, 0);
+
+    test('an account made on another day is existing, a new one is not', () {
+      expect(obAccountIsExisting(DateTime(2026, 6, 1), now: now), isTrue);
+      expect(
+          obAccountIsExisting(now.subtract(const Duration(days: 1)), now: now),
+          isTrue);
+      expect(
+          obAccountIsExisting(now.subtract(const Duration(seconds: 4)),
+              now: now),
+          isFalse,
+          reason: 'a Google sign-in creates the account in the same breath');
+      expect(
+          obAccountIsExisting(now.subtract(const Duration(minutes: 3)),
+              now: now),
+          isFalse,
+          reason: 'a slow network must not make a new account look old');
+    });
+
+    test('when it cannot tell, it says new: the old behaviour', () {
+      expect(obAccountIsExisting(null, now: now), isFalse);
+    });
+
+    testWidgets('the notice names the account and has two plain ways out',
+        (t) async {
+      t.view.physicalSize = const Size(1170, 2532);
+      t.view.devicePixelRatio = 3.0;
+      addTearDown(t.view.resetPhysicalSize);
+      addTearDown(t.view.resetDevicePixelRatio);
+      bool? answer;
+      await t.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (ctx) => Scaffold(
+              body: Center(
+                child: TextButton(
+                  onPressed: () async => answer =
+                      await showObExistingAccountSheet(ctx, 'sarth@gmail.com'),
+                  child: const Text('open'),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await t.tap(find.text('open'));
+      await t.pumpAndSettle();
+      expect(find.text('You already have an account.'), findsOneWidget);
+      expect(find.textContaining('sarth@gmail.com'), findsOneWidget);
+      expect(find.textContaining('will not replace anything'), findsOneWidget);
+      expect(find.text('Open my account'), findsOneWidget);
+      expect(find.text('Use a different account'), findsOneWidget);
+      await t.tap(find.text('Use a different account'));
+      await t.pumpAndSettle();
+      expect(answer, isFalse);
+      expect(t.takeException(), isNull);
+    });
+
+    test('the Google step checks BEFORE it carries on to finish', () {
+      final src = File('lib/screens/auth/onboarding/onboarding_flow.dart')
+          .readAsStringSync();
+      final google = src.indexOf('Future<void> _google()');
+      final check = src.indexOf('obAccountIsExisting(who.createdAt)', google);
+      final carryOn = src.indexOf('_go(ObStep.reach);', google);
+      expect(check, greaterThan(google));
+      expect(check, lessThan(carryOn),
+          reason: 'finishing writes the fresh answers over the profile '
+              'an existing account already has');
+    });
+  });
 }

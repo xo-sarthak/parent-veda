@@ -1002,13 +1002,20 @@ class TtcToolBlockHead extends StatelessWidget {
     final p = V2PaletteStore.instance.current;
     final tint = v2BlockTint(hue % 360, p);
     return Row(children: [
-      Container(
-        width: 30,
-        height: 30,
-        decoration: BoxDecoration(color: tint, shape: BoxShape.circle),
-        child: mark == null ? null : CustomPaint(painter: mark),
-      ),
-      const SizedBox(width: 11),
+      // ⚠️ A CIRCLE ONLY WHEN THERE IS A MARK IN IT (2026-10-01, the user: "a
+      // light blue colour circle on the left of the heading … seems very
+      // random"). A heading with no mark drew an empty tinted disc, a
+      // decoration that said nothing. Now it draws none and the words lead.
+      // Kept for revert: the disc drew whether or not [mark] was set.
+      if (mark != null) ...[
+        Container(
+          width: 30,
+          height: 30,
+          decoration: BoxDecoration(color: tint, shape: BoxShape.circle),
+          child: CustomPaint(painter: mark),
+        ),
+        const SizedBox(width: 11),
+      ],
       Expanded(
         child: Text(label,
             style: pvJakarta(
@@ -1230,8 +1237,29 @@ String ttcToolDate(DateTime d) {
   return '${d.day} ${m[d.month - 1]}$y';
 }
 
-/// Her last saved check, above the questions.
-class TtcToolLastCheck extends StatelessWidget {
+/// Her last saved check, above the questions: ONE collapsible card for every
+/// tool that keeps one (PCOS "Where do I stand", "Should I seek fertility
+/// help", BMI).
+///
+/// ⚠️ A ROW THAT OPENS, THE SAME SIZE EVERYWHERE (2026-10-02, the user: "your
+/// last check can be represented as a drop down wherever it's there in tools",
+/// and "the card on top of Should I seek fertility help and PCOS symptom check
+/// is of different sizes, run Mobbin to fix it for once"). The card was an
+/// eyebrow, a paragraph and two buttons always open, about 190pt above the
+/// first question, and its size changed with the sentence in it. Yesterday's
+/// slim variant only on PCOS made the two tools disagree. Now it is one 52pt
+/// row, "Your last check · 28 Sep" and a chevron, and the sentence and the two
+/// actions open under it. Collapsed by default, so every tool shows the same
+/// row whatever it says inside.
+///
+/// Mobbin: American Airlines' trip card (the key line in a hairline card with
+/// a chevron that opens the details,
+/// https://mobbin.com/screens/61f4b115-8672-486f-8229-3ad3f0614581), Noom's
+/// Health reports (one compact row, a date and a chevron,
+/// https://mobbin.com/screens/47a8cfe9-9981-4927-88b4-bb0f9967cfa1), Jomo's
+/// "Learn more" bar (a collapsed row that opens in place,
+/// https://mobbin.com/screens/ff02cae6-b628-4323-9f7b-f26086ed9056).
+class TtcToolLastCheck extends StatefulWidget {
   const TtcToolLastCheck({
     super.key,
     required this.at,
@@ -1240,7 +1268,183 @@ class TtcToolLastCheck extends StatelessWidget {
     required this.onSee,
     this.againLabel,
     this.onAgain,
+    this.initiallyOpen = false,
   });
+
+  /// When she saved it.
+  final DateTime at;
+
+  /// One plain sentence: what it said, or what is filled in below.
+  final String line;
+
+  final String seeLabel;
+  final VoidCallback onSee;
+
+  /// "Start again", when the tool can clear it. Null hides it.
+  final String? againLabel;
+  final VoidCallback? onAgain;
+
+  /// Open when it first draws. False everywhere, so the row is the same size
+  /// on every tool; a test may open it.
+  final bool initiallyOpen;
+
+  @override
+  State<TtcToolLastCheck> createState() => _TtcToolLastCheckState();
+}
+
+class _TtcToolLastCheckState extends State<TtcToolLastCheck> {
+  late bool _open = widget.initiallyOpen;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = V2PaletteStore.instance.current;
+    final date = ttcToolDate(widget.at);
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: p.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: p.line),
+      ),
+      child: Column(mainAxisSize: MainAxisSize.min, children: [
+        Semantics(
+          button: true,
+          expanded: _open,
+          label: 'Your last check, $date. ${_open ? 'Close' : 'Open'} the details.',
+          excludeSemantics: true,
+          onTap: () => setState(() => _open = !_open),
+          child: InkWell(
+            key: const ValueKey('ttc_tool_last_toggle'),
+            borderRadius: BorderRadius.circular(16),
+            onTap: () => setState(() => _open = !_open),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(minHeight: 52),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(14, 8, 10, 8),
+                child: Row(children: [
+                  Icon(Icons.history_rounded, size: 17, color: p.ink2),
+                  const SizedBox(width: 9),
+                  Expanded(
+                    child: Text.rich(
+                      TextSpan(children: [
+                        TextSpan(
+                          text: 'Your last check',
+                          style: pvManrope(
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.w800,
+                              color: p.ink1),
+                        ),
+                        TextSpan(
+                          text: '  ·  $date',
+                          style: pvManrope(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: p.ink3),
+                        ),
+                      ]),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  AnimatedRotation(
+                    turns: _open ? 0.5 : 0,
+                    duration: const Duration(milliseconds: 180),
+                    child: Icon(Icons.expand_more_rounded,
+                        size: 22, color: p.ink2),
+                  ),
+                ]),
+              ),
+            ),
+          ),
+        ),
+        AnimatedSize(
+          duration: const Duration(milliseconds: 180),
+          curve: Curves.easeOut,
+          alignment: Alignment.topCenter,
+          child: _open
+              ? Padding(
+                  padding: const EdgeInsets.fromLTRB(14, 0, 10, 10),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(height: 1, color: p.line),
+                        const SizedBox(height: 10),
+                        Text(widget.line,
+                            style: pvManrope(
+                                fontSize: 12.5, height: 1.5, color: p.ink1)),
+                        const SizedBox(height: 10),
+                        // A Wrap, not a Row: at a large system font the
+                        // "clear" link drops under the button.
+                        Wrap(
+                            alignment: WrapAlignment.spaceBetween,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            runSpacing: 2,
+                            children: [
+                              InkWell(
+                                key: const ValueKey('ttc_tool_last_see'),
+                                onTap: widget.onSee,
+                                borderRadius: BorderRadius.circular(999),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 9),
+                                  decoration: BoxDecoration(
+                                      color: ttcTitleInk,
+                                      borderRadius:
+                                          BorderRadius.circular(999)),
+                                  child: Text(widget.seeLabel,
+                                      style: pvManrope(
+                                          fontSize: 12.5,
+                                          fontWeight: FontWeight.w800,
+                                          color: Colors.white)),
+                                ),
+                              ),
+                              if (widget.againLabel != null &&
+                                  widget.onAgain != null)
+                                TextButton(
+                                  key: const ValueKey('ttc_tool_last_again'),
+                                  onPressed: widget.onAgain,
+                                  style: TextButton.styleFrom(
+                                      minimumSize: const Size(48, 40),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8)),
+                                  child: Text(widget.againLabel!,
+                                      style: pvManrope(
+                                          fontSize: 12.5,
+                                          fontWeight: FontWeight.w700,
+                                          color: p.ink2)),
+                                ),
+                            ]),
+                      ]),
+                )
+              : const SizedBox(width: double.infinity, height: 0),
+        ),
+      ]),
+    );
+  }
+}
+
+/// Kept for revert (2026-10-02): the always-open card `TtcToolLastCheck` was
+/// until the collapsible one below replaced it on every tool.
+class TtcToolLastCheckFull extends StatelessWidget {
+  const TtcToolLastCheckFull({
+    super.key,
+    required this.at,
+    required this.line,
+    required this.seeLabel,
+    required this.onSee,
+    this.againLabel,
+    this.onAgain,
+    this.compact = false,
+  });
+
+  /// ⚠️ A SLIM VERSION (2026-10-01, the user, on PCOS "Where do I stand":
+  /// "your last check takes too much space, can be reduced to a great extent").
+  /// The card was an eyebrow, a two-line paragraph, a full-width button and a
+  /// centred text button, about 190pt above the first question. Compact is the
+  /// same card with the button and the "clear" link on one line under the
+  /// sentence, about half the height. Off by default, so every other tool that
+  /// shows its last check draws exactly what it drew.
+  final bool compact;
 
   /// When she saved it.
   final DateTime at;
@@ -1258,6 +1462,73 @@ class TtcToolLastCheck extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = V2PaletteStore.instance.current;
+    if (compact) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.fromLTRB(14, 11, 10, 8),
+        decoration: BoxDecoration(
+          color: p.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: p.line),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            Icon(Icons.history_rounded, size: 14, color: p.ink2),
+            const SizedBox(width: 6),
+            Expanded(
+              child: Text('YOUR LAST CHECK · ${ttcToolDate(at).toUpperCase()}',
+                  style: pvManrope(
+                      fontSize: 9.5,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.0,
+                      color: p.ink2)),
+            ),
+          ]),
+          const SizedBox(height: 5),
+          Text(line,
+              style: pvManrope(fontSize: 12.5, height: 1.45, color: p.ink1)),
+          const SizedBox(height: 6),
+          // A Wrap, not a Row: at a large system font or on a narrow phone
+          // the "clear" link drops under the button instead of overflowing.
+          Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              runSpacing: 2,
+              children: [
+            InkWell(
+              key: const ValueKey('ttc_tool_last_see'),
+              onTap: onSee,
+              borderRadius: BorderRadius.circular(999),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                decoration: BoxDecoration(
+                    color: ttcTitleInk,
+                    borderRadius: BorderRadius.circular(999)),
+                child: Text(seeLabel,
+                    style: pvManrope(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white)),
+              ),
+            ),
+            if (againLabel != null && onAgain != null)
+              TextButton(
+                key: const ValueKey('ttc_tool_last_again'),
+                onPressed: onAgain,
+                style: TextButton.styleFrom(
+                    minimumSize: const Size(48, 40),
+                    padding: const EdgeInsets.symmetric(horizontal: 8)),
+                child: Text(againLabel!,
+                    style: pvManrope(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w700,
+                        color: p.ink2)),
+              ),
+          ]),
+        ]),
+      );
+    }
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(16, 15, 16, 16),

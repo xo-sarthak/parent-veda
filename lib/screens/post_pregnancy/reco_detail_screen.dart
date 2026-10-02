@@ -399,6 +399,8 @@ class _RecoDetailScreenState extends State<RecoDetailScreen> {
           ),
         ),
       ),
-    ).whenComplete(ctl.dispose);
+    ).whenComplete(() {
+      Future<void>.delayed(const Duration(milliseconds: 600), ctl.dispose);
+    });
   }
 }

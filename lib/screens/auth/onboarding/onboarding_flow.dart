@@ -104,6 +104,84 @@ enum ObStep {
   reach,
 }
 
+/// True when the account that just signed in was created well before now,
+/// so it is somebody coming back rather than somebody who has just joined.
+///
+/// ⚠️ A TIME, NOT A TABLE LOOK-UP. A brand-new Google sign-in creates the
+/// account in the same breath, so its creation time is seconds old; an
+/// account made on another day is not. It needs no query and no schema, and
+/// when the time is unknown (Supabase not up, a preview) it says "new", which
+/// is the old behaviour. The window is generous so a slow network cannot make
+/// a new account look old. The trade-off: an account made earlier but never
+/// finished is opened as it is, which is what signing back in means.
+bool obAccountIsExisting(DateTime? createdAt, {DateTime? now}) {
+  if (createdAt == null) return false;
+  return (now ?? DateTime.now()).difference(createdAt.toLocal()) >
+      const Duration(minutes: 10);
+}
+
+/// The "You already have an account" notice. Top-level so a widget test can
+/// draw it without running Google. True: open it; false: use another.
+Future<bool?> showObExistingAccountSheet(BuildContext context, String email) {
+  final p = V2PaletteStore.instance.current;
+  return showModalBottomSheet<bool>(
+    context: context,
+    isDismissible: false,
+    enableDrag: false,
+    backgroundColor: p.ground,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+    ),
+    builder: (ctx) => SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+        child: Column(
+          key: const ValueKey('ob_existing_account'),
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'You already have an account.',
+              style: pvFraunces(
+                fontSize: 24,
+                fontWeight: FontWeight.w600,
+                letterSpacing: -0.4,
+                height: 1.2,
+                color: p.ink1,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              email.isEmpty
+                  ? 'This Google account was set up on ParentVeda before. '
+                        'We will open it as you left it. What you answered '
+                        'just now will not replace anything in it.'
+                  : '$email was set up on ParentVeda before. We will open '
+                        'it as you left it. What you answered just now will '
+                        'not replace anything in it.',
+              style: pvManrope(fontSize: 14.5, height: 1.5, color: p.ink2),
+            ),
+            const SizedBox(height: 22),
+            ObPrimary(
+              p: p,
+              label: 'Open my account',
+              onTap: () => Navigator.of(ctx).pop(true),
+            ),
+            const SizedBox(height: 4),
+            Center(
+              child: ObLink(
+                p: p,
+                label: 'Use a different account',
+                onTap: () => Navigator.of(ctx).pop(false),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
 class OnboardingFlow extends StatefulWidget {
   const OnboardingFlow({
     super.key,
@@ -570,13 +648,22 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
       _say(r.message ?? 'Could not sign in. Try again.');
       return;
     }
-    // ⚠️ THE FLAG THE SPLASH READS (2026-09-30). This path signed her in but
-    // never set `kAuthCompletedKey`, so every restart found a live session
-    // with no flag and sent her through onboarding again (the user, on a hot
-    // restart: "it is making me go back to the initial sign in screen"). The
-    // other finishing path sets it in step 5 of `_finish`; this one now does
-    // too. The role already on the phone is kept, so a father signing back in
-    // is not turned into a mother.
+    await _enterExistingAccount();
+  }
+
+  /// Hands a signed-in, already-existing account straight to the app.
+  ///
+  /// ⚠️ THE FLAG THE SPLASH READS (2026-09-30). This path signed her in but
+  /// never set `kAuthCompletedKey`, so every restart found a live session
+  /// with no flag and sent her through onboarding again (the user, on a hot
+  /// restart: "it is making me go back to the initial sign in screen"). The
+  /// other finishing path sets it in step 5 of `_finish`; this one now does
+  /// too. The role already on the phone is kept, so a father signing back in
+  /// is not turned into a mother.
+  ///
+  /// Shared since 2026-10-01 by the first-screen link and by the sign-in at
+  /// the end of the questions, when that account turns out to exist already.
+  Future<void> _enterExistingAccount() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool(kAuthCompletedKey, true);
@@ -698,9 +785,65 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
     // on a shared family phone is frequently her husband's, and overwriting
     // "Priya" with "Rahul Menon" at the last moment would be the app
     // forgetting her at the exact point it promised to remember.
+    // ⚠️ AN ACCOUNT THAT ALREADY EXISTS IS NOT A NEW ONE (2026-10-01, the
+    // user: signed in with a Gmail that had an account, "it took me back to
+    // the first screen of the onboarding flow… no alert of any sort").
+    // Carrying on would run `_finish`, which WRITES this session's fresh
+    // answers (stage, name, due date) over the profile that account already
+    // has. So say so first, and open the account as it was; her answers from
+    // this session do not replace anything. She can also choose a different
+    // account, which signs this one back out.
+    final who = _currentAccount();
+    if (obAccountIsExisting(who.createdAt)) {
+      final open = await _existingAccountSheet(who.email);
+      if (!mounted) return;
+      if (open == true) {
+        setState(() => _busy = true);
+        await _enterExistingAccount();
+        if (mounted) setState(() => _busy = false);
+      } else {
+        await _signOutThisAccount();
+      }
+      return;
+    }
     if (_name.trim().isEmpty) _name = _googleName();
     _go(ObStep.reach);
   }
+
+  /// Who just signed in. Supabase may not be initialised (tests, previews):
+  /// that is "unknown", never a crash.
+  static ({String email, DateTime? createdAt}) _currentAccount() {
+    try {
+      final u = Supabase.instance.client.auth.currentUser;
+      return (
+        email: u?.email ?? '',
+        createdAt: u == null ? null : DateTime.tryParse(u.createdAt),
+      );
+    } catch (_) {
+      return (email: '', createdAt: null);
+    }
+  }
+
+  /// "Use a different account": drops this session so the next tap on
+  /// Continue with Google offers the account chooser again.
+  Future<void> _signOutThisAccount() async {
+    try {
+      await Supabase.instance.client.auth.signOut();
+    } catch (_) {
+      /* best-effort */
+    }
+    try {
+      await SocialAuth.signOutGoogle();
+    } catch (_) {
+      /* best-effort */
+    }
+  }
+
+  /// The notice. Two ways out, both said in words: open the account, or use
+  /// another. Not dismissible by a stray tap: either choice changes what
+  /// happens next.
+  Future<bool?> _existingAccountSheet(String email) =>
+      showObExistingAccountSheet(context, email);
 
   /// Supabase may not be initialised (tests, previews) — that is "no name",
   /// never a crash; the Hello screen offers "Add your name" instead.
@@ -828,34 +971,47 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
   /// and, more importantly, a question REMOVED cannot leave a stale line
   /// behind. The option labels are the source of the words; this file does
   /// not get its own copy of them to drift from.
-  List<String> _summaryRows() {
-    final out = <String>[];
+  ///
+  /// ⚠️ EVERY ROW SAYS WHAT IT IS AN ANSWER TO (2026-10-01, the user: the
+  /// answers "look very vague"). It was the bare option label, "Just
+  /// starting", "Yes, mostly", with nothing to say which question it
+  /// answered, and trying to conceive had no line for its own stage at all.
+  /// Now a row is (what it is, what she said), drawn as a small heading over
+  /// the answer. The names live in `kObSummaryLabels`, beside the questions.
+  /// Kept for revert: this returned `List<String>` of the bare labels.
+  List<(String, String)> _summaryRows() {
+    final out = <(String, String)>[];
     switch (_stage) {
+      case 'trying':
+        out.add(('Your journey', 'Trying to conceive'));
       case 'pregnancy':
         final edd = _edd;
         if (edd != null) {
           final days = 280 - edd.difference(_today()).inDays;
           final w = (days ~/ 7).clamp(0, 42);
-          out.add('Week $w · due ${_short(edd)}');
+          out.add(('Your pregnancy', 'Week $w · due ${_short(edd)}'));
         }
       case 'parenting':
         final dob = _childDob;
-        final who = _childName.text.trim().isEmpty
-            ? 'Your baby'
-            : _childName.text.trim();
+        final named = _childName.text.trim();
         if (dob != null) {
           final age = _monthsWeeks(dob);
-          out.add(
-            age.$1 == 0
-                ? '$who · ${age.$2} ${age.$2 == 1 ? 'week' : 'weeks'} old'
-                : '$who · ${age.$1} ${age.$1 == 1 ? 'month' : 'months'} old',
-          );
+          final old = age.$1 == 0
+              ? '${age.$2} ${age.$2 == 1 ? 'week' : 'weeks'} old'
+              : '${age.$1} ${age.$1 == 1 ? 'month' : 'months'} old';
+          out.add((
+            'Your little one',
+            named.isEmpty ? old : '$named · $old',
+          ));
         }
       case 'skilling':
-        final who = _childName.text.trim().isEmpty
-            ? 'Your child'
-            : _childName.text.trim();
-        if (_childAge != null) out.add('$who · age $_childAge');
+        final named = _childName.text.trim();
+        if (_childAge != null) {
+          out.add((
+            'Your child',
+            named.isEmpty ? 'Age $_childAge' : '$named · age $_childAge',
+          ));
+        }
     }
     for (final q in _questions) {
       final chosen = _answers[q.id];
@@ -864,7 +1020,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
           .where((o) => chosen.contains(o.id))
           .map((o) => o.label)
           .join(' · ');
-      if (labels.isNotEmpty) out.add(labels);
+      if (labels.isNotEmpty) out.add((kObSummaryLabels[q.id] ?? '', labels));
     }
     return out;
   }
@@ -1160,14 +1316,29 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                     ),
                     const SizedBox(width: 10),
                     Expanded(
-                      child: Text(
-                        row,
-                        style: pvManrope(
-                          fontSize: 14.5,
-                          height: 1.4,
-                          fontWeight: FontWeight.w600,
-                          color: p.ink1,
-                        ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (row.$1.isNotEmpty)
+                            Text(
+                              row.$1,
+                              style: pvManrope(
+                                fontSize: 11.5,
+                                height: 1.3,
+                                fontWeight: FontWeight.w600,
+                                color: p.ink3,
+                              ),
+                            ),
+                          Text(
+                            row.$2,
+                            style: pvManrope(
+                              fontSize: 14.5,
+                              height: 1.4,
+                              fontWeight: FontWeight.w600,
+                              color: p.ink1,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],

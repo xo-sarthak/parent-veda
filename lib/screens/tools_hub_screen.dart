@@ -66,12 +66,14 @@ import '../data/doors/pv_door_labour.dart' show kLabourSurfaceBirthPlan;
 import '../widgets/global_ask_fab.dart' show kAskVedaRoute;
 import '../widgets/pv_feedback.dart';
 import 'brackets/hub/hub_intent_art.dart' show IntentMark;
+import 'ttc/ttc_tab_root_header.dart' show TtcTabRootHeader, ttcTabRootIntroStyle;
+import 'ttc/ttc_tool_marks.dart' show ttcFamilyMarkForIntent;
 import 'doors/pv_list_row.dart';
 import 'doors/pv_live_search.dart';
 import 'pregnancy/birth_plan_screen.dart';
 import 'products/pv_store_chrome.dart' show pvStorePalette;
 import 'v2/v2_palette.dart';
-import 'pregnancy/preg_chrome.dart';
+// Kept for revert (PregSectionHeading, 2026-10-02): import 'pregnancy/preg_chrome.dart';
 
 // =============================================================================
 //  THE LIST — 2026-09-29, the structure pass
@@ -301,24 +303,30 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
             child: ListView(
               // kAskFabReserve, as the grid had it: the Ask Veda button floats
               // over every tab, and the last row must clear it.
-              padding: EdgeInsets.fromLTRB(
-                  0, MediaQuery.of(context).padding.top + 12, 0, kAskFabReserve + 40),
+              // ⚠️ THE HEADER CARRIES THE SAFE-AREA INSET (2026-10-02), as TTC's
+              // Tools does, so the title sits at the one y every tab root uses.
+              // Kept for revert: EdgeInsets.fromLTRB(0,
+              // MediaQuery.of(context).padding.top + 12, 0, kAskFabReserve + 40)
+              // and the title, intro and search drawn by hand below.
+              padding: const EdgeInsets.fromLTRB(0, 0, 0, kAskFabReserve + 40),
               children: [
-                _pad(Text(s.toolsTitle,
-                    style: pvFraunces(
-                        fontSize: 30, fontWeight: FontWeight.w500, height: 1.1, color: p.ink1))),
-                const SizedBox(height: 6),
-                _pad(PvLiveSearchWords(
-                  search: _search,
-                  // Kept for revert: s.toolsIntro ("Helpful companions for your
-                  // journey - more arriving soon").
-                  child: Text(
-                      'Tools to track your pregnancy, get ready for the birth and '
-                      'keep what matters. Tap one to open it. None of them are required.',
-                      style: pvManrope(fontSize: 14, height: 1.45, color: p.ink2)),
-                )),
-                const SizedBox(height: 14),
-                _pad(PvLiveSearchField(search: _search, p: p, hint: 'Find a tool')),
+                TtcTabRootHeader(
+                  title: s.toolsTitle,
+                  intro: PvLiveSearchWords(
+                    search: _search,
+                    // Kept for revert: s.toolsIntro ("Helpful companions for
+                    // your journey - more arriving soon").
+                    child: Text(
+                        'Tools to track your pregnancy, get ready for the birth and '
+                        'keep what matters. Tap one to open it. None of them are required.',
+                        style: ttcTabRootIntroStyle()),
+                  ),
+                  below: PvLiveSearchField(search: _search, p: p, hint: 'Find a tool'),
+                ),
+                // Kept for revert: the hand-drawn title, intro and search.
+                // _pad(Text(s.toolsTitle,
+                //     style: pvFraunces(
+                //         fontSize: 30, fontWeight: FontWeight.w500, height: 1.1, color: p.ink1))),
                 if (_search.searching)
                   ..._results(p, groups)
                 else ...[
@@ -339,18 +347,20 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
   Widget _pad(Widget child) =>
       Padding(padding: const EdgeInsets.symmetric(horizontal: _g), child: child);
 
-  // ignore: unused_element
   Widget _eyebrow(V2Palette p, String t) => Text(t.toUpperCase(),
       style: pvManrope(
-          fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.4, color: p.ink1));
+          fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.4, color: p.action));
 
   List<Widget> _group(V2Palette p, _ToolGroup g) => [
-        const SizedBox(height: 26),
-        // One ParentVeda (2026-09-30): a page section takes the one serif
-        // heading; the violet caps eyebrow was a second heading style.
-        // Kept for revert: _pad(_eyebrow(p, g.title)),
-        _pad(PregSectionHeading(g.title)),
-        const SizedBox(height: 10),
+        const SizedBox(height: 28),
+        // ⚠️ TTC'S GROUP HEADING (2026-10-02, the user: match the Tools tab to
+        // TTC's format, marks and structure). The violet caps eyebrow, 28 above
+        // and 6 below, as `ttc_tools_screen.dart` draws it. On 2026-09-30 the
+        // serif heading replaced it "for one ParentVeda"; one ParentVeda now
+        // means this one. Kept for revert: `_pad(PregSectionHeading(g.title))`
+        // with 26 above and 10 below.
+        _pad(_eyebrow(p, g.title)),
+        const SizedBox(height: 6),
         _pad(PvRowGroup(p: p, children: [
           // LEVEL 3 personalisation, inside the group: a stable sort, every
           // tool returned, the ones serving a priority she chose first.
@@ -363,9 +373,14 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
   Widget _row(V2Palette p, _Tool t, double hue) => PvListRow(
         p: p,
         // Kept for revert: leading: PvMarkWell(p: p, hue: hue, size: 40, icon: t.icon),
-        leading: t.mark != null
-            ? PvMarkWell(p: p, hue: hue, size: 40, mark: t.mark)
-            : PvMarkWell(p: p, hue: hue, size: 40, icon: t.icon),
+        // ⚠️ TTC'S MARKS (2026-10-02): the drawn object on a disc, 44, as the
+        // TTC Tools rows draw theirs (`TtcToolMarkLeading`). A tool with no
+        // such mark (the debug rows) keeps its well. Kept for revert:
+        // `PvMarkWell(p: p, hue: hue, size: 40, mark: t.mark)`.
+        leading: ttcFamilyMarkForIntent(t.mark, v2BlockTint(hue % 360, p)) ??
+            (t.mark != null
+                ? PvMarkWell(p: p, hue: hue, size: 40, mark: t.mark)
+                : PvMarkWell(p: p, hue: hue, size: 40, icon: t.icon)),
         title: t.title,
         line: t.line,
         // The one conditional line (§9.1b): her date is ours and a scan has
@@ -912,6 +927,30 @@ class ToolsHubScreenClassic extends StatelessWidget {
     ),
   );
 }
+
+// Kept for revert (2026-10-02): the mapping lived here before the door tabs
+// shared it (`ttcFamilyMarkForIntent`, ttc_tool_marks.dart).
+// /// The TTC-family mark for a pregnancy tool's own mark, so the Tools list
+// /// draws one family on both stages (2026-10-02). Null for a mark with no
+// /// counterpart.
+// Widget? _ttcMarkFor(IntentMark? m, Color tint) => switch (m) {
+//       IntentMark.stepsMark => TtcMarkLeading(tab: TtcTabMark.heartHand, tint: tint),
+//       IntentMark.scaleMark => TtcMarkLeading(tool: TtcToolMark.weight, tint: tint),
+//       IntentMark.pillMark => TtcMarkLeading(tool: TtcToolMark.medication, tint: tint),
+//       IntentMark.chartLog => TtcMarkLeading(tab: TtcTabMark.chartLine, tint: tint),
+//       IntentMark.lotusMark => TtcMarkLeading(tab: TtcTabMark.lotus, tint: tint),
+//       IntentMark.nextStep => TtcMarkLeading(tool: TtcToolMark.bell, tint: tint),
+//       IntentMark.bagMark => TtcMarkLeading(tool: TtcToolMark.hospitalBag, tint: tint),
+//       IntentMark.reportPage => TtcMarkLeading(tool: TtcToolMark.records, tint: tint),
+//       IntentMark.timelineRail => TtcMarkLeading(tool: TtcToolMark.stopwatch, tint: tint),
+//       IntentMark.calendarDay => TtcMarkLeading(tab: TtcTabMark.windowRing, tint: tint),
+//       IntentMark.listMark => TtcMarkLeading(tab: TtcTabMark.checklist, tint: tint),
+//       IntentMark.bookMark => TtcMarkLeading(tab: TtcTabMark.openBook, tint: tint),
+//       IntentMark.bodyMark => TtcMarkLeading(tab: TtcTabMark.bigSmallHearts, tint: tint),
+//       IntentMark.lampMark => TtcMarkLeading(tab: TtcTabMark.sunrise, tint: tint),
+//       IntentMark.askDoctor => TtcMarkLeading(tab: TtcTabMark.twoBubbles, tint: tint),
+//       _ => null,
+//     };
 
 class _Tool {
   const _Tool(

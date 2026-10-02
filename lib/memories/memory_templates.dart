@@ -246,6 +246,9 @@ Widget _messageText(MemoryData d, MemoryPalette p, {Color? color}) {
   );
 }
 
+/// The brand mark drawn on every card's footer.
+const String kMemoryBrandMark = 'assets/brand/pv-mark.png';
+
 Widget _footer(MemoryData d, MemoryPalette p, {Color? color}) {
   final names = _footerNames(d);
   final c = color ?? p.soft;
@@ -257,9 +260,26 @@ Widget _footer(MemoryData d, MemoryPalette p, {Color? color}) {
           overflow: TextOverflow.ellipsis),
     ),
     // Subtle brand mark — a keepsake, not an ad.
+    //
+    // ⚠️ THE REAL LOGO, NOT A LEAF (2026-10-02, the user, on a template: "ParentVeda
+    // is written but the logo is not used, there is a different icon of a leaf").
+    // It was Material's `eco_rounded` beside the word. It is now the brand mark
+    // (a parent holding a child inside a heart, `assets/brand/pv-mark.png`), in
+    // its own colours, small. `cacheHeight` decodes it at the size it is drawn,
+    // not at 749 x 862, because a card is drawn once per template in the grid.
+    // The leaf stays as the fallback if the asset cannot load. Kept for revert:
+    // `Icon(Icons.eco_rounded, size: 9, color: c.withValues(alpha: 0.7))`.
     Row(mainAxisSize: MainAxisSize.min, children: [
-      Icon(Icons.eco_rounded, size: 9, color: c.withValues(alpha: 0.7)),
-      const SizedBox(width: 3),
+      Image.asset(
+        kMemoryBrandMark,
+        key: const ValueKey('memory_brand_mark'),
+        height: 12,
+        cacheHeight: 72,
+        filterQuality: FilterQuality.medium,
+        errorBuilder: (_, _, _) =>
+            Icon(Icons.eco_rounded, size: 9, color: c.withValues(alpha: 0.7)),
+      ),
+      const SizedBox(width: 4),
       Text('ParentVeda',
           style: _sans(8.5, c.withValues(alpha: 0.7), w: FontWeight.w700, ls: 0.3)),
     ]),

@@ -82,7 +82,7 @@ void main() {
       await _pump(tester, const TtcRecordsScreen());
       expect(find.byType(TtcRecordsEmpty), findsOneWidget);
       expect(find.text('Photograph a report'), findsOneWidget);
-      expect(find.text('Type a number instead'), findsOneWidget);
+      expect(find.text('Type in a result'), findsOneWidget);
       expect(find.text('Your test results, in one place.'), findsOneWidget);
     });
   });
@@ -138,7 +138,7 @@ void main() {
     testWidgets('a typed result saves with whose, date and note',
         (tester) async {
       await _pump(tester, const TtcRecordsScreen());
-      await tester.tap(find.text('Type a number instead'));
+      await tester.tap(find.text('Type in a result'));
       await tester.pumpAndSettle();
 
       expect(find.text('Add a photo or the test name to save.'),

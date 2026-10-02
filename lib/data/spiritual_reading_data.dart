@@ -40,6 +40,9 @@ class SpiritualTradition {
   });
   final String id;
   final LocalizedText name;
+  // ⚠️ NO LONGER DRAWN (2026-10-02, the user: remove the emoji, make new marks).
+  // Kept as data, for revert and so nothing that reads it breaks; every screen
+  // draws `spiritualMark(id)` (lib/screens/tools/spiritual_marks.dart) instead.
   final String symbol; // a neutral faith symbol (emoji)
   final LocalizedText blurb;
   final List<SpiritualSection> sections;

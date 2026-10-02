@@ -165,6 +165,13 @@ class FabRouteObserver extends NavigatorObserver {
     return null;
   }
 
+  /// How many PAGES are on the stack (sheets, dialogs and menus not counted):
+  /// 1 means only the stage's shell, with its bottom bar, is showing; more
+  /// means a screen has been pushed over it. Read by `pvSnackLiftFor` to put a
+  /// notice above the bar on the shell and at the foot everywhere else
+  /// (2026-10-02, the pregnancy side, as trying to conceive already did).
+  int get pageCount => _stack.where((r) => r is! PopupRoute).length;
+
   void _recompute() {
     final inParenting = _stack.any((r) => r.settings.name == kParentingRootRoute);
     final inTtc = _stack.any((r) => r.settings.name == kTtcRootRoute);

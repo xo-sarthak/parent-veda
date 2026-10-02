@@ -57,6 +57,7 @@ import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_placeholders.dart';
 import '../../widgets/pv_feedback.dart';
 import '../brackets/hub/hub_solution_cards.dart';
+import 'pv_read_tile.dart';
 import '../v2/v2_palette.dart';
 import '../v2/v3_bracket_art.dart' show V3BracketArt, bracketMarkFor;
 import '../../data/brackets/ttc_brackets.dart' show kTtcBrackets;
@@ -1636,28 +1637,15 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
     // had its own quieter card (panel, hairline, a small icon well), and the
     // user asked for the tool tiles' treatment instead: one tile family at the
     // foot of an article, not two. The 2026-09-16 card is in git for revert.
-    return SizedBox(
-      height: 172,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 22),
-        itemCount: items.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 10),
-        itemBuilder: (context, i) {
-          final (id, (title, teaser, image)) = items[i];
-          final width = (MediaQuery.of(context).size.width - 44 - 10) / 2;
-          return SizedBox(
-            width: width,
-            child: _tile(
-              type: SolutionType.read,
-              title: title.of(_lang),
-              value: teaser?.of(_lang),
-              imageUrl: image,
-              onTap: () => widget.openRead?.call(context, id),
-            ),
-          );
-        },
-      ),
+    // The rail itself moved to `PvReadNextRail` (2026-10-01) so a tool screen
+    // can offer reads at its foot in this exact shape. Same list, same sizes.
+    return PvReadNextRail(
+      items: [
+        for (final (id, (title, teaser, image)) in items)
+          (id, title, teaser, image),
+      ],
+      lang: _lang,
+      onOpen: (id) => widget.openRead?.call(context, id),
     );
   }
 
@@ -1803,112 +1791,18 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
     IconData? icon,
     required VoidCallback onTap,
   }) {
-    final p = V2PaletteStore.instance.current;
-    final tint = v2BlockTint(type.hue % 360, p);
-    final deep = HSLColor.fromColor(tint)
-        .withSaturation(0.46)
-        .withLightness(0.34)
-        .toColor();
-    final photo = imageUrl != null && imageUrl.isNotEmpty;
-
-    return PvPress(
-        child: InkWell(
+    // Moved whole to `pv_read_tile.dart` (2026-10-01) so every screen that
+    // offers reads at its foot draws the same tile. Kept there, not deleted.
+    return PvReadTile(
+      type: type,
+      title: title,
+      value: value,
+      imageUrl: imageUrl,
+      chip: chip,
+      icon: icon,
+      lang: _lang,
       onTap: onTap,
-      borderRadius: BorderRadius.circular(18),
-      child: Container(
-        height: 172,
-        decoration: BoxDecoration(
-          color: tint,
-          borderRadius: BorderRadius.circular(18),
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: Stack(children: [
-          // ⚠️ THE MARK IS THE PICTURE, cropped by the block's own edge rather
-          // than sitting in a well of its own. Same device as the focus rail:
-          // it fills the space an illustration will eventually take, at an
-          // alpha low enough that the title never has to fight it. Where the
-          // piece HAS a picture, the picture fills the block and a scrim
-          // rises under the type — the door rail's own treatment.
-          if (photo)
-            Positioned.fill(
-              child: Image.network(imageUrl, fit: BoxFit.cover,
-                  errorBuilder: (_, _, _) => const SizedBox.shrink()),
-            )
-          else
-            Positioned(
-              right: -22,
-              bottom: -14,
-              child: Icon(icon ?? type.icon,
-                  size: 108, color: Colors.white.withValues(alpha: 0.42)),
-            ),
-          if (photo)
-            Positioned.fill(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.white.withValues(alpha: 0.0),
-                      Colors.white.withValues(alpha: 0.86),
-                    ],
-                    stops: const [0.30, 0.72],
-                  ),
-                ),
-              ),
-            ),
-          Padding(
-            padding: const EdgeInsets.all(13),
-            child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.82),
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                    child: Row(mainAxisSize: MainAxisSize.min, children: [
-                      Icon(icon ?? type.icon, size: 10, color: deep),
-                      const SizedBox(width: 4),
-                      Flexible(
-                        child: Text(chip ?? type.chip(_lang),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: pvManrope(
-                                fontSize: 9,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: 0.6,
-                                color: deep)),
-                      ),
-                    ]),
-                  ),
-                  const Spacer(),
-                  Text(title,
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                      style: pvFraunces(
-                          fontSize: 14.5,
-                          fontWeight: FontWeight.w600,
-                          height: 1.22,
-                          letterSpacing: -0.3,
-                          color: p.ink1)),
-                  if (value case final v?) ...[
-                    const SizedBox(height: 5),
-                    Text(v,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: pvManrope(
-                            fontSize: 10.5,
-                            height: 1.32,
-                            color: p.ink2.withValues(alpha: 0.9))),
-                  ],
-                ]),
-          ),
-        ]),
-      ),
-    ));
+    );
   }
 
   // Kept for revert — the stacked rows; [_readNextRail] replaced it 2026-09-16.
