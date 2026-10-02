@@ -612,14 +612,20 @@ class _PvProductScreenState extends State<PvProductScreen> {
       children: [
         Row(
           children: [
+            // Flexible (2026-10-02): a long brand beside the badge ran off a
+            // narrow phone at a large text size.
             if (product.brand.isNotEmpty)
-              Text(
-                product.brand.toUpperCase(),
-                style: pvManrope(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 1,
-                  color: p.ink3,
+              Flexible(
+                child: Text(
+                  product.brand.toUpperCase(),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: pvManrope(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1,
+                    color: p.ink3,
+                  ),
                 ),
               ),
             const Spacer(),
@@ -652,7 +658,12 @@ class _PvProductScreenState extends State<PvProductScreen> {
           ),
         ),
         const SizedBox(height: 8),
-        Row(
+        // A Wrap (2026-10-02): at a large text size on a narrow phone "Read
+        // reviews" moves under the stars instead of running off the edge.
+        // Kept for revert: Row.
+        Wrap(
+          crossAxisAlignment: WrapCrossAlignment.center,
+          runSpacing: 4,
           children: [
             PvStars(
               rating: product.rating,
@@ -2083,9 +2094,9 @@ class _PvProductScreenState extends State<PvProductScreen> {
                 i.productId == product.id &&
                 (product.variants.isEmpty || i.size == _variant?.label),
           );
-      body = Row(
-        children: [
-          Column(
+      // The price, then the two buttons. At a large text size on a narrow
+      // phone the three do not fit one line, so the price goes above them.
+      final priceCol = Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -2105,13 +2116,17 @@ class _PvProductScreenState extends State<PvProductScreen> {
                 style: pvManrope(fontSize: 11, color: p.ink3),
               ),
             ],
-          ),
-          const SizedBox(width: 12),
+          );
+      final buttonRow = Row(children: [
+          // ⚠️ BUY NOW IS BACK (2026-10-02, the user: "don't remove the Buy now
+          // button from the product page, I can only see Add to cart"). Two
+          // buttons again: Add to cart (Go to cart once it is in) as the outlined
+          // one, Buy now as the one ink, which adds it and goes straight to
+          // checkout. Kept for revert (2026-09-29): Add to cart alone as the ink.
           Expanded(
-            child: PvCommit(
+            child: PvSecondary(
               key: const ValueKey('pv_product_primary'),
               label: inCart ? 'Go to cart' : 'Add to cart',
-              icon: inCart ? null : Icons.add_rounded,
               onTap: inCart
                   ? () => Navigator.of(context).push(
                       MaterialPageRoute<void>(
@@ -2122,8 +2137,26 @@ class _PvProductScreenState extends State<PvProductScreen> {
                   : () => _addToCart(product),
             ),
           ),
-        ],
-      );
+          const SizedBox(width: 8),
+          Expanded(
+            child: PvCommit(
+              key: const ValueKey('pv_product_buy_now'),
+              label: 'Buy now',
+              onTap: () => _addToCart(product, thenCheckout: true),
+            ),
+          ),
+      ]);
+      body = MediaQuery.textScalerOf(context).scale(10) > 12.5
+          ? Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [priceCol, const SizedBox(height: 10), buttonRow],
+            )
+          : Row(children: [
+              priceCol,
+              const SizedBox(width: 12),
+              Expanded(child: buttonRow),
+            ]);
     } else if (product.canBuy) {
       body = Row(
         children: [

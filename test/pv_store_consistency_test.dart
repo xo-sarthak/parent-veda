@@ -342,20 +342,34 @@ void main() {
       (p) => p.soldHere && !p.reviewOnly && p.variants.isEmpty,
     );
 
-    testWidgets('sticky bar: the price and ONE primary, Add then Go to cart', (
+    // 2026-10-02, the user: Buy now back beside Add to cart. Still ONE ink
+    // (Buy now); Add to cart is the outlined one.
+    testWidgets('sticky bar: the price, Add to cart and Buy now', (
       tester,
     ) async {
       CartStore.instance.clear(kProductsCartId);
       final prod = soldHere();
       await _pump(tester, PvProductScreen(productId: prod.id), height: 900);
       expect(find.byType(PvCommit), findsOneWidget);
-      expect(find.byType(PvSecondary), findsNothing);
+      expect(find.byType(PvSecondary), findsOneWidget);
+      expect(find.text('Buy now'), findsOneWidget);
+      expect(find.byKey(const ValueKey('pv_product_buy_now')), findsOneWidget);
       expect(find.byKey(const ValueKey('pv_product_primary')), findsOneWidget);
       expect(find.text('Add to cart'), findsOneWidget);
       await tester.tap(find.text('Add to cart'));
       await tester.pump(const Duration(milliseconds: 300));
       expect(find.text('Go to cart'), findsOneWidget);
       CartStore.instance.clear(kProductsCartId);
+    });
+
+    testWidgets('the two buttons hold at 1.5x text on a narrow phone', (
+      tester,
+    ) async {
+      final prod = soldHere();
+      await _pump(tester, PvProductScreen(productId: prod.id),
+          width: 360, height: 900, scale: 1.5);
+      expect(find.text('Buy now'), findsOneWidget);
+      expect(tester.takeException(), isNull);
     });
 
     testWidgets('an affiliate product: one primary to the retailer', (
