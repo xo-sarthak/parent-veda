@@ -63,7 +63,9 @@ class _PvStoreScreenState extends State<PvStoreScreen> {
   /// Whether the stage switch is drawn in full (H11, 2026-09-28). On the
   /// Trying to conceive storefront it starts folded to a quiet "Other
   /// stages" link, so another stage's shop is not on her screen by default.
-  bool _showStages = false;
+  // Kept for revert (2026-10-02): the "Other stages" link's state, no longer read.
+  // ignore: unused_field
+  final bool _showStages = false;
 
   @override
   void initState() {
@@ -473,33 +475,44 @@ class _PvStoreScreenState extends State<PvStoreScreen> {
     // "at a very abrupt position", and the store should simply open on trying
     // to conceive). Nothing at all is drawn here now. Kept for revert: the
     // quiet link below, behind `!_showStages`.
-    if (_stage == LifeStage.tryingToConceive) return const SizedBox.shrink();
-    // ignore: dead_code
-    if (_stage == LifeStage.tryingToConceive && !_showStages) {
-      return Padding(
-        padding: EdgeInsets.fromLTRB(_g, 6, _g, 0),
-        child: Align(
-          alignment: Alignment.centerRight,
-          child: TextButton(
-            key: const ValueKey('pv_store_other_stages'),
-            onPressed: () => setState(() => _showStages = true),
-            style: TextButton.styleFrom(
-              foregroundColor: p.ink2,
-              padding: const EdgeInsets.symmetric(horizontal: 6),
-              minimumSize: const Size(44, 36),
-            ),
-            child: Text(
-              'Other stages',
-              style: pvManrope(
-                fontSize: 12.5,
-                fontWeight: FontWeight.w700,
-                color: p.ink2,
-              ),
-            ),
-          ),
-        ),
-      );
-    }
+    //
+    // ⚠️ THE SWITCH IS BACK, VISIBLE (2026-10-02, the user, on the TTC product
+    // section: "under the search bar we don't have the Trying, Pregnancy,
+    // Parenting options to switch stores"). What felt abrupt on 2026-09-30 was
+    // the HIDING, not the switch: a quiet "Other stages" link that, once tapped,
+    // revealed the other stores. So the Trying store now draws the same
+    // `PvStageSwitch` as every other store, under the search pill, always there;
+    // the other two stores are one tap away ("never hidden", the reason there is
+    // one store). Kept for revert, the line that drew nothing:
+    // if (_stage == LifeStage.tryingToConceive) return const SizedBox.shrink();
+    // Kept for revert (2026-10-02): the "Other stages" link, now never drawn.
+    // // ignore: dead_code
+    // if (_stage == LifeStage.tryingToConceive && !_showStages) {
+    //   return Padding(
+    //     padding: EdgeInsets.fromLTRB(_g, 6, _g, 0),
+    //     child: Align(
+    //       alignment: Alignment.centerRight,
+    //       child: TextButton(
+    //         key: const ValueKey('pv_store_other_stages'),
+    //         onPressed: () => setState(() => _showStages = true),
+    //         style: TextButton.styleFrom(
+    //           foregroundColor: p.ink2,
+    //           padding: const EdgeInsets.symmetric(horizontal: 6),
+    //           minimumSize: const Size(44, 36),
+    //         ),
+    //         child: Text(
+    //           'Other stages',
+    //           style: pvManrope(
+    //             fontSize: 12.5,
+    //             fontWeight: FontWeight.w700,
+    //             color: p.ink2,
+    //           ),
+    //         ),
+    //       ),
+    //     ),
+    //   );
+    // }
+
     // ⚠️ UNDER THE SEARCH PILL, AND WHY (2026-10-02, Mobbin: Glovo and Yami
     // draw the search pill first with the scoping chips and tabs directly
     // beneath it; Ro puts its tabs above content). The stage is a filter on
