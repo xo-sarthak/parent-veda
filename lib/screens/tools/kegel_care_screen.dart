@@ -14,6 +14,27 @@
 //  from the app bar into the page as a row with a drawn mark, because a row
 //  that opens somewhere carries a mark and the app bar of a pushed tool page
 //  carries only the way back.
+//
+//  ⚠️ REDRAWN FOR A GLANCE (2026-10-02, the user: "do a Mobbin check for the Kegel
+//  care screen as well"). Mobbin has no pelvic-floor app, so: Life Reset's and
+//  Opal's guided breathing (a phase word, a count and a row of step dots,
+//  https://mobbin.com/screens/8cad3cd9-ead8-429c-8d48-a9fd14c76bc9,
+//  https://mobbin.com/screens/b7a85dff-8e86-4211-9dec-73f5bf2ac492), Oura's
+//  session controls (one main button, the exit quiet,
+//  https://mobbin.com/screens/a9a0536b-e933-41d5-9215-05c9ead0b4fb), Noom's short
+//  "how was it" close (https://mobbin.com/screens/b3d41581-4f34-49fc-85a9-0d0cb38b85df),
+//  Brick's one-card summary and Future Pro's consistency dots
+//  (https://mobbin.com/screens/e8973bdb-59de-4269-8edf-167892981eaa).
+//    · THE ROUTINE IS THREE NUMBERS (hold, relax, reps), not a table of label rows.
+//    · THE EXPLAINERS FOLD: what, why and how are a line each, opened by a tap; the
+//      safety list stays open on the page, always.
+//    · THE SESSION GETS REP DOTS and one ink button (Pause); Exit is a quiet line.
+//    · THE CLOSE IS ONE LINE OF CHOICES, and the Care Journey leads with three
+//      numbers and a seven-day dot strip.
+//  ⚠️ NO STREAKS, NO TARGET, ON PURPOSE (the spec: "not a workout, no levels, XP or
+//  streaks"). Two Mobbin references (Alta, pushr) are streak screens and were left
+//  out. The seven dots show the days she did a session and nothing is drawn for a
+//  day she did not: no empty goal, no "missed".
 // =============================================================================
 
 import 'dart:math' as math;
@@ -31,6 +52,7 @@ import '../doors/pv_door_chrome.dart' show kPvUrgentInk;
 import '../doors/pv_list_row.dart' show PvMarkWell;
 import '../pregnancy/preg_chrome.dart';
 import '../pregnancy/preg_tool_chrome.dart';
+import '../pregnancy/preg_tool_parts.dart' show PregFoldRow;
 import '../products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 
 /// The Tools tab's "Track" hue, so the marks here match the row she tapped.
@@ -150,7 +172,10 @@ class KegelCareScreen extends StatefulWidget {
 
 class _KegelCareScreenState extends State<KegelCareScreen> {
   final _store = ToolsStore.instance;
-  bool _whyExpanded = false;
+  // Kept for revert (2026-10-02): the "Why am I doing this" collapsible; the page
+  // folds it with `PregFoldRow` now.
+  // ignore: unused_field
+  final bool _whyExpanded = false;
   // The old single "What is a Kegel & how to do it" collapsible was replaced by
   // three always-visible intro cards (see build). Field kept (commented) for a
   // quick revert to the collapsible version.
@@ -211,56 +236,108 @@ class _KegelCareScreenState extends State<KegelCareScreen> {
                   ),
                 ]),
                 const SizedBox(height: 28),
-                // INTRODUCTION - three small titled cards: What / Why / How.
-                // NOTE (i18n): section titles + the "How" step copy are literal
-                // English here; the bodies reuse existing bilingual strings
-                // where they fit (kegelHowBody, whyAmIDoingThisBody).
+//  // Kept for revert (2026-10-02): three open _IntroCards and the _Expandable "why".
+//                  // INTRODUCTION - three small titled cards: What / Why / How.
+//                  // NOTE (i18n): section titles + the "How" step copy are literal
+//                  // English here; the bodies reuse existing bilingual strings
+//                  // where they fit (kegelHowBody, whyAmIDoingThisBody).
+//                  const PregSectionHeading('How a Kegel works'),
+//                  const SizedBox(height: 12),
+//                  _IntroCard(
+//                    title: S.now.uiWhatKegel,
+//                    body:
+//                        'A Kegel is a simple exercise that squeezes and lifts the '
+//                        'pelvic-floor muscles - the sling of muscles supporting your '
+//                        'bladder, bowel and uterus - and then fully relaxes them. '
+//                        'During pregnancy these muscles carry extra weight, so keeping '
+//                        'them working well matters.',
+//                  ),
+//                  const SizedBox(height: 12),
+//                  _IntroCard(
+//                    title: S.now.uiWhyShouldIDo,
+//                    body: s.whyAmIDoingThisBody,
+//                  ),
+//                  const SizedBox(height: 12),
+//                  _IntroCard(
+//                    title: S.now.uiHowDoKegel,
+//                    body: s.kegelHowBody,
+//                    // Rule 9 (no placeholder images): a quiet line. Kept for
+//                    // revert: footer: _videoPlaceholder(context, s),
+//                    footer: Padding(
+//                      padding: const EdgeInsets.only(top: 12),
+//                      child: PregNote(S.now.uiAnimatedGuideComingSoon,
+//                          icon: Icons.play_circle_outline_rounded),
+//                    ),
+//                  ),
+//                  const SizedBox(height: 14),
+//                  _Expandable(
+//                    title: s.whyAmIDoingThis,
+//                    expanded: _whyExpanded,
+//                    onToggle: () => setState(() => _whyExpanded = !_whyExpanded),
+//                    child: Column(
+//                        crossAxisAlignment: CrossAxisAlignment.start,
+//                        children: [
+//                          Text(s.kegelHeroBody, style: _bodyStyle()),
+//                          const SizedBox(height: 10),
+//                          _benefit(s.kegelBenefitBladder),
+//                          _benefit(s.kegelBenefitSupport),
+//                          _benefit(s.kegelBenefitRecovery),
+//                          const SizedBox(height: 8),
+//                          Text(s.kegelFollowProvider,
+//                              style: pvManrope(
+//                                  fontSize: 12.5, height: 1.45, color: p.ink3)),
+//                        ]),
+//                  ),
+                // INTRODUCTION - what / why / how, one line each, opened by a tap
+                // (2026-10-02). The words are the same words, shorter on the page.
                 const PregSectionHeading('How a Kegel works'),
                 const SizedBox(height: 12),
-                _IntroCard(
+                PregFoldRow(
+                  keyPrefix: 'kg_fold',
+                  fold: 'what',
+                  icon: Icons.help_outline_rounded,
                   title: S.now.uiWhatKegel,
-                  body:
+                  body: Text(
                       'A Kegel is a simple exercise that squeezes and lifts the '
                       'pelvic-floor muscles - the sling of muscles supporting your '
                       'bladder, bowel and uterus - and then fully relaxes them. '
                       'During pregnancy these muscles carry extra weight, so keeping '
                       'them working well matters.',
+                      style: _bodyStyle()),
                 ),
-                const SizedBox(height: 12),
-                _IntroCard(
+                const SizedBox(height: 10),
+                PregFoldRow(
+                  keyPrefix: 'kg_fold',
+                  fold: 'why',
+                  icon: Icons.favorite_border_rounded,
                   title: S.now.uiWhyShouldIDo,
-                  body: s.whyAmIDoingThisBody,
+                  body: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text(s.whyAmIDoingThisBody, style: _bodyStyle()),
+                    const SizedBox(height: 10),
+                    Text(s.kegelHeroBody, style: _bodyStyle()),
+                    const SizedBox(height: 10),
+                    _benefit(s.kegelBenefitBladder),
+                    _benefit(s.kegelBenefitSupport),
+                    _benefit(s.kegelBenefitRecovery),
+                    const SizedBox(height: 4),
+                    Text(s.kegelFollowProvider,
+                        style: pvManrope(fontSize: 13, height: 1.45, color: p.ink3)),
+                  ]),
                 ),
-                const SizedBox(height: 12),
-                _IntroCard(
+                const SizedBox(height: 10),
+                PregFoldRow(
+                  keyPrefix: 'kg_fold',
+                  fold: 'how',
+                  icon: Icons.self_improvement_rounded,
                   title: S.now.uiHowDoKegel,
-                  body: s.kegelHowBody,
-                  // Rule 9 (no placeholder images): a quiet line. Kept for
-                  // revert: footer: _videoPlaceholder(context, s),
-                  footer: Padding(
-                    padding: const EdgeInsets.only(top: 12),
-                    child: PregNote(S.now.uiAnimatedGuideComingSoon,
-                        icon: Icons.play_circle_outline_rounded),
-                  ),
-                ),
-                const SizedBox(height: 14),
-                _Expandable(
-                  title: s.whyAmIDoingThis,
-                  expanded: _whyExpanded,
-                  onToggle: () => setState(() => _whyExpanded = !_whyExpanded),
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(s.kegelHeroBody, style: _bodyStyle()),
-                        const SizedBox(height: 10),
-                        _benefit(s.kegelBenefitBladder),
-                        _benefit(s.kegelBenefitSupport),
-                        _benefit(s.kegelBenefitRecovery),
-                        const SizedBox(height: 8),
-                        Text(s.kegelFollowProvider,
-                            style: pvManrope(
-                                fontSize: 12.5, height: 1.45, color: p.ink3)),
-                      ]),
+                  body: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text(s.kegelHowBody, style: _bodyStyle()),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 12),
+                      child: PregNote(S.now.uiAnimatedGuideComingSoon,
+                          icon: Icons.play_circle_outline_rounded),
+                    ),
+                  ]),
                 ),
                 const SizedBox(height: 28),
                 // Safety - the warning form (DESIGN-SYSTEM §4.0 addendum): an ink
@@ -319,6 +396,8 @@ class _KegelCareScreenState extends State<KegelCareScreen> {
         ]),
       );
 
+  // Kept for revert (2026-10-02): `_BigStats` shows the routine now.
+  // ignore: unused_element
   Widget _routineRow(String label, String value) {
     final p = pvStorePalette;
     return Padding(
@@ -390,14 +469,24 @@ class _KegelCareScreenState extends State<KegelCareScreen> {
             icon: Icon(Icons.edit_outlined, size: 20, color: p.ink1),
           ),
         ]),
-        const SizedBox(height: 10),
+        const SizedBox(height: 16),
+        // THE ROUTINE AS THREE NUMBERS (2026-10-02). Kept for revert: four label
+        // rows (`_routineRow`): Hold, Relax, Repetitions, Estimated time.
         Padding(
           padding: const EdgeInsets.only(right: 8),
           child: Column(children: [
-            _routineRow(s.holdLabel, '${r.hold} ${s.secShort}'),
-            _routineRow(s.relaxLabel, '${r.relax} ${s.secShort}'),
-            _routineRow(s.repsLabel, '${r.reps}'),
-            _routineRow(s.estTimeLabel, s.minutesShort(r.minutes)),
+            _BigStats(
+              key: const ValueKey('kg_routine_numbers'),
+              items: [
+                ('${r.hold}', '${s.holdLabel} · ${s.secShort}'),
+                ('${r.relax}', '${s.relaxLabel} · ${s.secShort}'),
+                ('${r.reps}', s.repsLabel),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text('${s.estTimeLabel}: ${s.minutesShort(r.minutes)}',
+                key: const ValueKey('kg_routine_time'),
+                style: pvManrope(fontSize: 13, color: p.ink3)),
           ]),
         ),
         if (isCustom) ...[
@@ -429,6 +518,7 @@ class _KegelCareScreenState extends State<KegelCareScreen> {
                 ),
               )),
               icon: const Icon(Icons.play_arrow_rounded),
+              key: const ValueKey('kg_start'),
               label: Text(s.startCareSession,
                   style: pvManrope(fontSize: 14.5, fontWeight: FontWeight.w800)),
             ),
@@ -642,7 +732,10 @@ class _KegelCareScreenState extends State<KegelCareScreen> {
 /// A small, always-visible titled intro block/card (used for the three split
 /// Introduction sub-sections: What / Why / How). Optional [footer] hosts extra
 /// content such as the "animated guide" note under "How to do Kegel?".
+// Kept for revert (2026-10-02): three of these opened the page; `PregFoldRow` folds them now.
+// ignore: unused_element
 class _IntroCard extends StatelessWidget {
+  // ignore: unused_element_parameter
   const _IntroCard({required this.title, required this.body, this.footer});
   final String title;
   final String body;
@@ -664,6 +757,8 @@ class _IntroCard extends StatelessWidget {
   }
 }
 
+// Kept for revert (2026-10-02): `PregFoldRow` replaced it.
+// ignore: unused_element
 class _Expandable extends StatelessWidget {
   const _Expandable({
     required this.title,
@@ -671,6 +766,7 @@ class _Expandable extends StatelessWidget {
     // top intro moved to the always-visible _IntroCard blocks. Kept commented
     // for a quick revert to a text-only collapsible.
     // this.body,
+    // ignore: unused_element_parameter
     this.child,
     required this.expanded,
     required this.onToggle,
@@ -985,31 +1081,64 @@ class _SessionScreenState extends State<_SessionScreen>
                       );
                     },
                   ),
-                  const SizedBox(height: 28),
+                  // A one-line cue for the phase (English only; the Hindi build keeps
+                  // its own shipped words and shows none).
+                  if (!widget.controller.language.isHindi) ...[
+                    const SizedBox(height: 18),
+                    Text(
+                        _holding
+                            ? 'Gently squeeze and lift'
+                            : 'Let everything go soft',
+                        key: const ValueKey('kg_cue'),
+                        textAlign: TextAlign.center,
+                        style: pvManrope(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: p.ink2)),
+                  ],
+                  const SizedBox(height: 18),
+                  // One dot a rep: ink for those done, a ring for the one she is on,
+                  // a faint dot for those to come (Life Reset's step row). No target.
+                  _RepDots(
+                      key: const ValueKey('kg_rep_dots'),
+                      total: widget.reps,
+                      done: _completedReps,
+                      current: _rep - 1),
+                  const SizedBox(height: 10),
                   Text(s.repOf(_rep, widget.reps),
                       style: pvManrope(
-                          fontSize: 15,
+                          fontSize: 13.5,
                           fontWeight: FontWeight.w700,
-                          color: p.ink2)),
+                          color: p.ink3)),
                   const Spacer(),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      OutlinedButton.icon(
-                        style: _outlinedStyle(),
-                        onPressed: _togglePause,
-                        icon: Icon(_paused
-                            ? Icons.play_arrow_rounded
-                            : Icons.pause_rounded),
-                        label: Text(_paused ? s.resumeLabel : s.pauseLabel),
+                  // ONE MAIN BUTTON, the exit quiet (Oura). Kept for revert: two
+                  // outlined buttons side by side, Pause and Exit.
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton.icon(
+                      key: const ValueKey('kg_pause'),
+                      style: pregFilledStyle().copyWith(
+                        minimumSize: const WidgetStatePropertyAll(Size.fromHeight(52)),
                       ),
-                      OutlinedButton.icon(
-                        style: _outlinedStyle(),
-                        onPressed: () => Navigator.of(context).pop(),
-                        icon: const Icon(Icons.close_rounded),
-                        label: Text(s.exitLabel),
-                      ),
-                    ],
+                      onPressed: _togglePause,
+                      icon: Icon(_paused
+                          ? Icons.play_arrow_rounded
+                          : Icons.pause_rounded),
+                      label: Text(_paused ? s.resumeLabel : s.pauseLabel,
+                          style: pvManrope(
+                              fontSize: 15, fontWeight: FontWeight.w800)),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  TextButton(
+                    key: const ValueKey('kg_exit'),
+                    style: TextButton.styleFrom(
+                        foregroundColor: p.ink2,
+                        minimumSize: const Size(64, 48)),
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: Text(s.exitLabel,
+                        style: pvManrope(
+                            fontSize: 14.5, fontWeight: FontWeight.w700)),
                   ),
                 ]),
               ),
@@ -1019,32 +1148,78 @@ class _SessionScreenState extends State<_SessionScreen>
 
   Widget _completion(BuildContext context, S s) {
     final p = pvStorePalette;
-    return Padding(
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(children: [
-        const Spacer(),
+        const SizedBox(height: 24),
         // Kept for revert: const Text('❤️', style: TextStyle(fontSize: 64)).
         // No decorative emoji; the drawn mark in the tool's tint.
         PvMarkWell(p: p, hue: _kKegelHue, size: 88, mark: IntentMark.cuppedHands),
         const SizedBox(height: 18),
-        Text(s.kegelSessionDoneTitle,
-            textAlign: TextAlign.center, style: pregPageTitleStyle()),
+//  // Kept for revert (2026-10-02): the title with its heart, and three stacked buttons.
+//          Text(s.kegelSessionDoneTitle,
+//              textAlign: TextAlign.center, style: pregPageTitleStyle()),
+//          const SizedBox(height: 12),
+//          Text(s.kegelSessionDoneBody,
+//              textAlign: TextAlign.center,
+//              style: pvManrope(fontSize: 14.5, height: 1.5, color: p.ink2)),
+//          const SizedBox(height: 28),
+//          Text(s.howDidItFeel,
+//              style: pvManrope(
+//                  fontSize: 15, fontWeight: FontWeight.w800, color: p.ink1)),
+//          const SizedBox(height: 14),
+//          // Kept for revert: each label led with an emoji (😊 / 🙂 / 😓).
+//          _feedbackButton(s.feedbackEasy, 'easy'),
+//          const SizedBox(height: 10),
+//          _feedbackButton(s.feedbackComfortable, 'comfortable'),
+//          const SizedBox(height: 10),
+//          _feedbackButton(s.feedbackDifficult, 'difficult'),
+        // The shipped title carries a heart emoji ("Well Done ❤️"); it is not drawn
+        // (2026-10-02, no emoji). The Hindi string is untouched, only stripped here.
+        Text(s.kegelSessionDoneTitle.replaceAll('❤️', '').replaceAll('❤', '').trim(),
+            key: const ValueKey('kg_done_title'),
+            textAlign: TextAlign.center,
+            style: pregPageTitleStyle()),
         const SizedBox(height: 12),
         Text(s.kegelSessionDoneBody,
             textAlign: TextAlign.center,
             style: pvManrope(fontSize: 14.5, height: 1.5, color: p.ink2)),
-        const SizedBox(height: 28),
+        const SizedBox(height: 20),
+        // What she just did, as three numbers (Brick's one-card summary).
+        PregCard(
+          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
+          child: _BigStats(
+            key: const ValueKey('kg_done_numbers'),
+            items: [
+              ('${widget.hold}', '${s.holdLabel} · ${s.secShort}'),
+              ('${widget.relax}', '${s.relaxLabel} · ${s.secShort}'),
+              ('$_completedReps', s.repsLabel),
+            ],
+          ),
+        ),
+        const SizedBox(height: 22),
         Text(s.howDidItFeel,
+            textAlign: TextAlign.center,
             style: pvManrope(
                 fontSize: 15, fontWeight: FontWeight.w800, color: p.ink1)),
-        const SizedBox(height: 14),
-        // Kept for revert: each label led with an emoji (😊 / 🙂 / 😓).
-        _feedbackButton(s.feedbackEasy, 'easy'),
-        const SizedBox(height: 10),
-        _feedbackButton(s.feedbackComfortable, 'comfortable'),
-        const SizedBox(height: 10),
-        _feedbackButton(s.feedbackDifficult, 'difficult'),
-        const Spacer(),
+        const SizedBox(height: 12),
+        // Three choices in a row, stacked at a large text size (Noom's one-line
+        // close). Kept for revert: three tall outlined buttons, one under the other.
+        if (MediaQuery.textScalerOf(context).scale(10) > 12.5) ...[
+          _feedbackButton(s.feedbackEasy, 'easy'),
+          const SizedBox(height: 10),
+          _feedbackButton(s.feedbackComfortable, 'comfortable'),
+          const SizedBox(height: 10),
+          _feedbackButton(s.feedbackDifficult, 'difficult'),
+        ] else
+          Row(children: [
+            Expanded(child: _feedbackButton(s.feedbackEasy, 'easy')),
+            const SizedBox(width: 8),
+            Expanded(child: _feedbackButton(s.feedbackComfortable, 'comfortable')),
+            const SizedBox(width: 8),
+            Expanded(child: _feedbackButton(s.feedbackDifficult, 'difficult')),
+          ]),
+        const SizedBox(height: 24),
       ]),
     );
   }
@@ -1053,11 +1228,16 @@ class _SessionScreenState extends State<_SessionScreen>
     return SizedBox(
       width: double.infinity,
       child: OutlinedButton(
-        style: _outlinedStyle(),
+        key: ValueKey('kg_fb_$value'),
+        style: _outlinedStyle().copyWith(
+          padding: const WidgetStatePropertyAll(
+              EdgeInsets.symmetric(horizontal: 6, vertical: 12)),
+          minimumSize: const WidgetStatePropertyAll(Size(0, 48)),
+        ),
         onPressed: () => _saveFeedback(value),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 2),
-          child: Text(label),
+          child: Text(label, textAlign: TextAlign.center, maxLines: 2),
         ),
       ),
     );
@@ -1107,15 +1287,42 @@ class _CareJourneyScreen extends StatelessWidget {
             children: [
               _pageTitle(s.careJourneyCta),
               const SizedBox(height: 18),
-              // Kept for revert: five separate outlined cards, one per stat.
-              // One white card with hairlines between the rows now.
+              // THREE NUMBERS FIRST (2026-10-02), then the seven days, then the
+              // stage and routine as quiet rows. Kept for revert: five rows in one
+              // card (`stats`), the first of them the sessions count.
+              PregCard(
+                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+                child: _BigStats(
+                  key: const ValueKey('kg_journey_numbers'),
+                  items: [
+                    ('${store.kegelSessions}', s.sessionsCompletedLabel),
+                    ('${store.kegelCompletedThisWeek}', s.completedThisWeekLabel),
+                    (
+                      last != null ? s.formatShortDate(last) : s.neverWord,
+                      s.lastCompletedLabel
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+              // The last seven days: a filled dot for a day she did a session, a
+              // plain ring for a day she did not. No goal, no streak, no "missed".
+              PregCard(
+                padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+                child: _WeekDots(
+                    key: const ValueKey('kg_week_dots'),
+                    days: [
+                      for (final rec in store.kegelHistory)
+                        ?DateTime.tryParse(rec.dateIso),
+                    ]),
+              ),
+              const SizedBox(height: 12),
               PregCard(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                 child: Column(children: [
-                  for (var i = 0; i < stats.length; i++) ...[
-                    if (i > 0) const Divider(height: 1, thickness: 1, color: kPvLine),
-                    _stat(stats[i].$1, stats[i].$2),
-                  ],
+                  _stat(stats[0].$1, stats[0].$2),
+                  const Divider(height: 1, thickness: 1, color: kPvLine),
+                  _stat(stats[1].$1, stats[1].$2),
                 ]),
               ),
               const SizedBox(height: 28),
@@ -1237,4 +1444,135 @@ class _RingPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _RingPainter old) =>
       old.progress != progress || old.color != color;
+}
+
+// ---------------------------------------------------------------------------
+//  Numbers, rep dots and the week (2026-10-02)
+// ---------------------------------------------------------------------------
+
+/// Two to three big numbers side by side with a small caption each, hairlines
+/// between. How this tool says a routine, a session and a journey.
+class _BigStats extends StatelessWidget {
+  const _BigStats({super.key, required this.items});
+  final List<(String, String)> items;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = pvStorePalette;
+    return IntrinsicHeight(
+      child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        for (var i = 0; i < items.length; i++) ...[
+          if (i > 0) const VerticalDivider(width: 1, thickness: 1, color: kPvLine),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6),
+              child: Column(mainAxisSize: MainAxisSize.min, children: [
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(items[i].$1,
+                      maxLines: 1,
+                      style: pvManrope(
+                          fontSize: 28,
+                          fontWeight: FontWeight.w800,
+                          height: 1.1,
+                          color: p.ink1)),
+                ),
+                const SizedBox(height: 4),
+                Text(items[i].$2,
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: pvManrope(
+                        fontSize: 12,
+                        height: 1.25,
+                        fontWeight: FontWeight.w700,
+                        color: p.ink3)),
+              ]),
+            ),
+          ),
+        ],
+      ]),
+    );
+  }
+}
+
+/// A dot a rep. Ink for the reps done, a ring for the one she is on, a faint
+/// dot for those still to come. It never shows a target or a "good" number.
+class _RepDots extends StatelessWidget {
+  const _RepDots({super.key, required this.total, required this.done, required this.current});
+  final int total;
+  final int done;
+  final int current;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = pvStorePalette;
+    return ExcludeSemantics(
+      child: Wrap(
+        alignment: WrapAlignment.center,
+        spacing: 7,
+        runSpacing: 7,
+        children: [
+          for (var i = 0; i < total; i++)
+            Container(
+              width: i == current ? 12 : 9,
+              height: i == current ? 12 : 9,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: i < done
+                    ? kPvInk
+                    : i == current
+                        ? Colors.transparent
+                        : p.ink3.withValues(alpha: 0.28),
+                border: i == current ? Border.all(color: kPvInk, width: 2) : null,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The last seven days, oldest to today: a filled dot for a day with a session,
+/// a plain ring for a day without, and the date number under each. Nothing is
+/// counted against her: no goal, no streak, no "missed".
+class _WeekDots extends StatelessWidget {
+  const _WeekDots({super.key, required this.days});
+  final List<DateTime> days;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = pvStorePalette;
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    bool did(DateTime d) => days.any(
+        (x) => x.year == d.year && x.month == d.month && x.day == d.day);
+    return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+      for (var i = 6; i >= 0; i--)
+        Builder(builder: (context) {
+          final d = today.subtract(Duration(days: i));
+          final yes = did(d);
+          return Column(mainAxisSize: MainAxisSize.min, children: [
+            Container(
+              width: 26,
+              height: 26,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: yes ? kPvInk : Colors.transparent,
+                border: yes ? null : Border.all(color: kPvLine, width: 1.5),
+              ),
+              child: yes
+                  ? const Icon(Icons.check_rounded, size: 15, color: Colors.white)
+                  : null,
+            ),
+            const SizedBox(height: 4),
+            Text('${d.day}',
+                style: pvManrope(
+                    fontSize: 11.5,
+                    fontWeight: i == 0 ? FontWeight.w800 : FontWeight.w600,
+                    color: i == 0 ? p.ink1 : p.ink3)),
+          ]);
+        }),
+    ]);
+  }
 }
