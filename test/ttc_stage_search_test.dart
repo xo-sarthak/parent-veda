@@ -90,9 +90,10 @@ void main() {
 
   // Hidden again the same day on the user's word; the rule that holds is that
   // the other stages stay off. Kept for revert: expect(kAskFabInTtc, isTrue).
-  test('the floating button: other stages stay off', () {
-    expect(FabState.kAskFabEnabled, isFalse,
-        reason: 'the other stages stay off until their own pass');
+  // 2026-10-02, the user: Ask Veda visible for the whole app, one fixed spot.
+  // Kept for revert: expect(FabState.kAskFabEnabled, isFalse).
+  test('the floating button: on for the whole app', () {
+    expect(FabState.kAskFabEnabled, isTrue);
   });
 }
 

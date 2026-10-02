@@ -516,8 +516,12 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                         // is one a real phone reaches on purpose: a person who
                         // has turned their system font size up.
                         Flexible(
+                          // No number (2026-10-02, the user: "remove that
+                          // 'loved by 50,000+', add a better filler line with
+                          // no numbers"). A count we cannot show is a claim.
+                          // Kept for revert: 'Loved by 50,000+ parents'.
                           child: Text(
-                            'Loved by 50,000+ parents',
+                            'A calm companion, from trying to parenting',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: pvManrope(

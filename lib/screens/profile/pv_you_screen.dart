@@ -93,6 +93,7 @@ import 'pv_you_chrome.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../../services/profile_photo_store.dart';
+import '../../widgets/global_ask_fab.dart' show FabState;
 import '../ttc/ttc_surface_router.dart' show openTtcSurface;
 import 'pv_you_content.dart';
 import 'pv_you_sheets.dart';
@@ -2275,6 +2276,7 @@ class _PvYouScreenState extends State<PvYouScreen> {
     'Delete account' => PvProfileMark.bin,
     'Data and privacy' => PvProfileMark.shield,
     'Language' => PvProfileMark.globe,
+    'Ask Veda button' => PvProfileMark.bubble,
     'Reminders' => PvProfileMark.bell,
     'WhatsApp updates' => PvProfileMark.bubble,
     'Messages' => PvProfileMark.envelope,
@@ -2393,6 +2395,27 @@ class _PvYouScreenState extends State<PvYouScreen> {
         rows: [
           m(_languageRow(stage)),
           for (final t in content.preferenceThings) thing(t),
+          // Show or hide the floating Ask Veda button, for the whole app
+          // (2026-10-02). The same page serves every stage, so one switch.
+          ListenableBuilder(
+            listenable: FabState.instance,
+            builder: (context, _) => m(PvYouSwitchRow(
+              key: const ValueKey('pv_settings_ask_veda_button'),
+              icon: Icons.auto_awesome_outlined,
+              title: 'Ask Veda button',
+              subtitle: 'The round button at the bottom right of every screen',
+              value: !FabState.instance.hiddenByHer,
+              onChanged: (on) {
+                FabState.instance.setHiddenByHer(!on);
+                pvSnack(
+                  context,
+                  on
+                      ? 'Ask Veda button shown.'
+                      : 'Ask Veda button hidden. Turn it back on here any time.',
+                );
+              },
+            )),
+          ),
         ],
       ),
       PvSettingsSection(

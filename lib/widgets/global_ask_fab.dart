@@ -13,6 +13,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'pv_feedback.dart';
 
 import '../screens/post_pregnancy/askveda_screen.dart' as pp;
@@ -89,8 +90,39 @@ const double kAskFabReserveNormal = kAskFabBottomOffset + kAskFabSize + 12;
 
 /// Shared, tiny reactive state the observer writes and the FAB reads.
 class FabState extends ChangeNotifier {
-  FabState._();
+  FabState._() {
+    _loadHidden();
+  }
   static final FabState instance = FabState._();
+
+  /// ⚠️ HER CHOICE TO HIDE IT (2026-10-02, the user: "add a button in settings
+  /// to hide it, for the whole app"). One switch, under Settings > Preferences on
+  /// every stage, remembered on the phone. The build flags below decide whether
+  /// the button exists at all; this decides whether she wants it.
+  static const String kHiddenKey = 'pv_ask_fab_hidden';
+  bool _hiddenByHer = false;
+  bool get hiddenByHer => _hiddenByHer;
+
+  Future<void> _loadHidden() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final v = prefs.getBool(kHiddenKey) ?? false;
+      if (v != _hiddenByHer) {
+        _hiddenByHer = v;
+        notifyListeners();
+      }
+    } catch (_) {/* shown, as by default */}
+  }
+
+  Future<void> setHiddenByHer(bool hidden) async {
+    if (hidden == _hiddenByHer) return;
+    _hiddenByHer = hidden;
+    notifyListeners();
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool(kHiddenKey, hidden);
+    } catch (_) {/* the switch still holds for this session */}
+  }
 
   bool _appLive = false; // false during splash, before the shell mounts
   bool _inParenting = false;
@@ -103,7 +135,12 @@ class FabState extends ChangeNotifier {
   /// question is one tap away without a floating button. Flip to `true`
   /// to bring it back; the placement, the mark and where it belongs are
   /// STILL-OPEN §63.11.
-  static const bool kAskFabEnabled = false;
+  //
+  // ⚠️ ON AGAIN, FOR THE WHOLE APP (2026-10-02, the user: "make Ask Veda visible
+  // for the whole app with a fixed position, bottom right, above the bottom
+  // navigation pill"). The look is the one that shipped; a new mark is still a
+  // separate decision (the concepts page).
+  static const bool kAskFabEnabled = true;
 
   /// ⚠️ BACK ON TRYING TO CONCEIVE ONLY (2026-09-30, the user: "if I'm on the
   /// trying to conceive side and I click the Ask Veda button … I can search
@@ -118,7 +155,10 @@ class FabState extends ChangeNotifier {
   static const bool kAskFabInTtc = false;
 
   bool get visible =>
-      (kAskFabEnabled || (kAskFabInTtc && _inTtc)) && _appLive && !_suppressed;
+      (kAskFabEnabled || (kAskFabInTtc && _inTtc)) &&
+      _appLive &&
+      !_suppressed &&
+      !_hiddenByHer;
   bool get inParenting => _inParenting;
   bool get inTtc => _inTtc;
 
@@ -309,7 +349,11 @@ class GlobalAskFab extends StatelessWidget {
         // pill floats at bottom:96, so sit above it there; otherwise clear the
         // bottom nav pill.
         final onPregToday = !FabState.instance.inParenting && AppNav.instance.index == AppNav.todayTab;
-        final bottom = onPregToday ? kAskFabRaisedOffset : kAskFabBottomOffset;
+        // ONE FIXED SPOT (2026-10-02): bottom right, above the nav pill, on every
+        // screen. Kept for revert: onPregToday ? kAskFabRaisedOffset : kAskFabBottomOffset.
+        // ignore: unused_local_variable
+        final raised = onPregToday;
+        const bottom = kAskFabBottomOffset;
         final pad = MediaQuery.of(context).padding.bottom;
 
         return Positioned(
