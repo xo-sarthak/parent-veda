@@ -537,11 +537,15 @@ List<ReadItem> v2ReadsFor(int week, int day) {
 /// where the decision is made, not in a footer.
 class V2ProductRail extends StatelessWidget {
   const V2ProductRail(
-      {super.key, required this.items, required this.p, this.onOpen});
+      {super.key, required this.items, required this.p, this.onOpen, this.onOpenItem});
 
   final List<Product> items;
   final V2Palette p;
   final VoidCallback? onOpen;
+
+  /// Opens the card's own product (2026-10-02). When given it wins over
+  /// [onOpen], which every card used to call alike.
+  final ValueChanged<Product>? onOpenItem;
 
   @override
   Widget build(BuildContext context) {
@@ -567,7 +571,8 @@ class V2ProductRail extends StatelessWidget {
           return SizedBox(
             width: 132,
             child: InkWell(
-              onTap: onOpen,
+              key: ValueKey('v2_product_${it.id}'),
+              onTap: onOpenItem == null ? onOpen : () => onOpenItem!(it),
               borderRadius: BorderRadius.circular(16),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Stack(children: [

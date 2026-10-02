@@ -57,6 +57,10 @@ import 'pregnancy/preg_chrome.dart' show PregOfferRow, PregRowCard;
 import 'pregnancy/preg_hero_extras.dart';
 import 'pregnancy/preg_more_screen.dart' show kPregTabMore, kPregTabProducts, kPregTabTools;
 import '../services/app_structure.dart';
+import '../ask_veda/pv_veda_links.dart' show kPvVedaTools;
+import 'ttc/ttc_tool_marks.dart' show TtcMarkLeading, TtcToolMark;
+import 'ttc/doors/ttc_tab_art.dart' show TtcTabMark;
+import 'products_screen.dart' show ProductDetailScreen;
 import '../services/home_content_controller.dart';
 import '../services/landing_focus.dart';
 import '../services/life_stage_store.dart';
@@ -1201,8 +1205,17 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
               // the browse treatment: "some things exist, swipe if curious".
               // Four rows with right-aligned prices read like an invoice; a
               // rail reads like a shelf, and takes a third of the height.
+              // Each card opens ITS product (2026-10-02, the user: "recommended
+              // products to be wired to products"). Kept for revert: every card
+              // ran `_open(context, 'shop')`, the Products tab.
               V2ProductRail(
-                  items: products, p: p, onOpen: () => _open(context, 'shop')),
+                  items: products,
+                  p: p,
+                  onOpen: () => _open(context, 'shop'),
+                  onOpenItem: (it) => Navigator.of(context).push(MaterialPageRoute<void>(
+                        settings: RouteSettings(name: 'product/${it.id}'),
+                        builder: (_) => ProductDetailScreen(product: it, controller: pregnancy),
+                      ))),
               const SizedBox(height: 28),
             ],
 
@@ -1214,7 +1227,10 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
             //
             // It is now a real tool section that adapts: recommended tools when
             // she has used none, her own most-used when she has. See _ToolsRow.
-            _ToolsRow(p: p, week: week, onOpen: (id) => _open(context, id)),
+            // Each tile opens ITS tool (2026-10-02). Kept for revert:
+            // onOpen: (id) => _open(context, id), which landed every tile on
+            // the Tools tab.
+            _ToolsRow(p: p, week: week, onOpen: (id) => _openTool(context, id)),
             const SizedBox(height: 28),
 
             // ---- TALK TO SOMEONE (2026-09-30, gap analysis P2) ---------------
@@ -1232,6 +1248,11 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
                 PregOfferRow(
                   key: ValueKey('preg_home_expert_${r.id}'),
                   mark: r.mark,
+                  // The TTC mark family (2026-10-02): the same drawn hand as the
+                  // Tools tab and the doors. Kept for revert: no `leading`, the
+                  // well with `r.mark`.
+                  leading: TtcMarkLeading(
+                      tab: r.ttcMark, tint: v2BlockTint(r.hue % 360, p)),
                   hue: r.hue,
                   title: r.title,
                   line: r.line,
@@ -1801,6 +1822,60 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
       .difference(DateTime(date.year, date.month, date.day))
       .inDays;
 
+  /// A "Tools for this week" tile opens THAT tool, not the Tools tab.
+  ///
+  /// ⚠️ ADDED 2026-10-02 (the user: "tools for this week are not wired well,
+  /// they all just open the tools page"). `_open` asks `homeFor()` which TAB owns
+  /// a surface and goes there, which is right for a section link and wrong for a
+  /// tile that names one tool: "Kick counter" put her on a list of twelve tools.
+  /// The seven that are tool screens open through `kPvVedaTools`, the one table
+  /// of pregnancy tools (Ask Veda's search opens them the same way, so the two
+  /// cannot drift). Symptoms, Can I? and Tests & scans are doors now, and open
+  /// theirs; Reports opens the Scans door on its Reports tab. Appointments keeps
+  /// `_open`, which already opens the calendar itself.
+  void _openTool(BuildContext context, String id) {
+    ToolUsageStore.instance.record(id);
+    const viaTable = {
+      'movement': 'movement',
+      'weight': 'weight',
+      'kegel': 'kegel',
+      'hospital_bag': 'hospital_bag',
+      'contractions': 'contractions',
+      'due_date': 'due_date',
+      'medication': 'medicines',
+    };
+    if (viaTable[id] case final toolId?) {
+      for (final t in kPvVedaTools) {
+        if (t.id != toolId) continue;
+        Navigator.of(context).push(MaterialPageRoute<void>(
+          settings: RouteSettings(name: t.route),
+          builder: (_) => t.build(pregnancy),
+        ));
+        return;
+      }
+    }
+    switch (id) {
+      case 'symptoms':
+        _openBracket(context, 'pregnancy_symptoms');
+      case 'can_i':
+        _openBracket(context, 'pregnancy_is_it_safe');
+      case 'tests_scans':
+        _openBracket(context, 'pregnancy_scans_tests');
+      case 'reports':
+        final door = pvDoorPageFor('pregnancy_scans_tests');
+        final b = bracketById('pregnancy_scans_tests');
+        if (door == null || b == null) return _open(context, id);
+        Navigator.of(context).push(MaterialPageRoute<void>(
+          // The doors' route name, which the Ask button reads (see _openBracket).
+          settings: const RouteSettings(name: 'bracket/scans'),
+          builder: (_) => PvDoorScreen(
+              page: door, bracket: b, pregnancy: pregnancy, initialGroup: kScansTabReports),
+        ));
+      default:
+        _open(context, id);
+    }
+  }
+
   void _open(BuildContext context, String surfaceId) {
     final h = homeFor(surfaceId);
     if (h == null) return;
@@ -2064,6 +2139,25 @@ class _ToolsRow extends StatelessWidget {
   /// they now look identical in both places rather than being drawn twice.
   ///
   /// The hues are unchanged: a hue belongs to a subject and follows it.
+  /// The TTC-family mark each tool wears on its tile (2026-10-02, the user:
+  /// "update marks/glyphs for Use these tools"). The same marks the pregnancy
+  /// Tools tab draws for the same tools, so a tool looks the same in both places.
+  static Widget _ttcMarkFor(String id, Color tint, double size) => switch (id) {
+        'due_date' => TtcMarkLeading(tab: TtcTabMark.windowRing, tint: tint, size: size),
+        'symptoms' => TtcMarkLeading(tool: TtcToolMark.symptoms, tint: tint, size: size),
+        'can_i' => TtcMarkLeading(tool: TtcToolMark.canI, tint: tint, size: size),
+        'tests_scans' => TtcMarkLeading(tab: TtcTabMark.vialReport, tint: tint, size: size),
+        'appointments' => TtcMarkLeading(tool: TtcToolMark.appointments, tint: tint, size: size),
+        'medication' => TtcMarkLeading(tool: TtcToolMark.medication, tint: tint, size: size),
+        'weight' => TtcMarkLeading(tool: TtcToolMark.weight, tint: tint, size: size),
+        'kegel' => TtcMarkLeading(tab: TtcTabMark.lotus, tint: tint, size: size),
+        'movement' => TtcMarkLeading(tab: TtcTabMark.heartHand, tint: tint, size: size),
+        'contractions' => TtcMarkLeading(tool: TtcToolMark.stopwatch, tint: tint, size: size),
+        'hospital_bag' => TtcMarkLeading(tool: TtcToolMark.hospitalBag, tint: tint, size: size),
+        'reports' => TtcMarkLeading(tool: TtcToolMark.records, tint: tint, size: size),
+        _ => TtcMarkLeading(tab: TtcTabMark.checklist, tint: tint, size: size),
+      };
+
   static const Map<String, (IntentMark, double)> _face = {
     'due_date': (IntentMark.calendarDay, 26),
     'symptoms': (IntentMark.bodyMark, 344),
@@ -2149,9 +2243,12 @@ class _ToolsRow extends StatelessWidget {
           AspectRatio(
             aspectRatio: 1,
             child: Container(
+              // White with the hairline, the disc carries the tint. Kept for
+              // revert: color: tint.
               decoration: BoxDecoration(
-                color: tint,
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: p.line),
               ),
               // ⚠️ INSET, BECAUSE THE MARKS ARE AUTHORED EDGE-TO-EDGE.
               //
@@ -2162,9 +2259,14 @@ class _ToolsRow extends StatelessWidget {
               // The padding is what makes the two sections look like one family,
               // and it is the whole reason a mark cannot simply replace an
               // `Icon`, which brings its own optical margin.
-              child: Padding(
-                padding: const EdgeInsets.all(13),
-                child: HubIntentArt(mark: mark, tint: tint),
+              // The TTC family's disc mark, centred (2026-10-02). Kept for
+              // revert: Padding(all 13, HubIntentArt(mark: mark, tint: tint)) on
+              // the tinted square.
+              child: LayoutBuilder(
+                builder: (context, c) => Center(
+                  key: ValueKey('preg_home_tool_mark_$id'),
+                  child: _ttcMarkFor(id, tint, c.maxWidth * 0.78),
+                ),
               ),
             ),
           ),
@@ -2187,18 +2289,22 @@ class _ToolsRow extends StatelessWidget {
 /// consult catalogue's own specialist id (`prepare_data.dart`), so a role that is
 /// renamed or removed there fails `test/preg_home_experts_test.dart`.
 class PregHomeExpertRole {
-  const PregHomeExpertRole(this.id, this.title, this.line, this.mark, this.hue);
+  const PregHomeExpertRole(this.id, this.title, this.line, this.mark, this.hue,
+      [this.ttcMark = TtcTabMark.twoBubbles]);
   final String id;
   final String title;
   final String line;
   final IntentMark mark;
   final double hue;
+
+  /// The drawn mark the row wears, from the TTC family (2026-10-02).
+  final TtcTabMark ttcMark;
 }
 
 /// Roles, never names. The four the PDF lists, in its order.
 const List<PregHomeExpertRole> kPregHomeExpertRoles = [
-  PregHomeExpertRole('sp_ob', 'Obstetrician', 'About your pregnancy, your scans and your tests', IntentMark.askDoctor, 206),
-  PregHomeExpertRole('sp_nutrition', 'Nutritionist', 'Eating well, weight, and conditions like gestational diabetes', IntentMark.plate, 104),
-  PregHomeExpertRole('sp_counsellor', 'Counsellor', 'Worry, low mood and the change of becoming a parent', IntentMark.moodArc, 160),
-  PregHomeExpertRole('sp_lactation', 'Lactation consultant', 'Feeding your baby, before and after the birth', IntentMark.feedMark, 344),
+  PregHomeExpertRole('sp_ob', 'Obstetrician', 'About your pregnancy, your scans and your tests', IntentMark.askDoctor, 206, TtcTabMark.doctorChat),
+  PregHomeExpertRole('sp_nutrition', 'Nutritionist', 'Eating well, weight, and conditions like gestational diabetes', IntentMark.plate, 104, TtcTabMark.bowl),
+  PregHomeExpertRole('sp_counsellor', 'Counsellor', 'Worry, low mood and the change of becoming a parent', IntentMark.moodArc, 160, TtcTabMark.twoBubbles),
+  PregHomeExpertRole('sp_lactation', 'Lactation consultant', 'Feeding your baby, before and after the birth', IntentMark.feedMark, 344, TtcTabMark.heartHand),
 ];
