@@ -77,21 +77,21 @@ const PpBandSet kPpTraditionsBands = PpBandSet([
     label: 'The first months',
     fromMonths: 0,
     toMonths: 4,
-    blurb: 'Chatti, namkaran, the cradle, the first outing.',
+    blurb: 'The sixth-day welcome, the naming, the cradle, the first outing.',
   ),
   PpBand(
     id: 'half_year',
     label: '4 months to 1 year',
     fromMonths: 4,
     toMonths: 12,
-    blurb: 'Annaprashan and the first solid meal.',
+    blurb: 'The first rice feeding and the first solid meal.',
   ),
   PpBand(
     id: 'first_years',
     label: '1 to 3 years',
     fromMonths: 12,
     toMonths: 36,
-    blurb: 'The first birthday, mundan, ear piercing.',
+    blurb: 'The first birthday, the first head shaving, ear piercing.',
   ),
   PpBand(
     id: 'older',
@@ -110,8 +110,8 @@ final PpSection kPpTraditionsSection = PpSection(
   id: 'parenting_traditional', // MUST match the hub's bracketId.
   title: 'Traditions',
   subtitle: 'Ceremonies & Milestones',
-  intro: 'The ceremonies Indian families do for a new baby, explained simply. '
-      'What actually happens, what you really need, what it costs, and what you '
+  intro: 'The ceremonies Indian families do for a new baby, in plain words. '
+      'What happens, what you need, what it costs, and what you '
       'can happily skip.',
   bandSet: kPpTraditionsBands,
   // ⚠️ THE AGE RULE, THE ONE FIX. The four chips came off and with them the
@@ -144,7 +144,7 @@ final PpSection kPpTraditionsSection = PpSection(
       icon: Icons.auto_awesome_outlined,
     ),
     PpSectionTool(
-      label: 'Dadi ke nuskhe, checked',
+      label: 'Home remedies from the elders, checked',
       blurb: 'The home remedies every family passes down, with an honest note '
           'on which ones are safe and which are not.',
       surfaceId: 'pp_nuskhe',
@@ -181,21 +181,21 @@ final PpArea _whatsNow = PpArea(
         // repetitive.
         PpVideoSlot(
           title: 'The ceremonies of the first year',
-          subtitle: 'What each one is for, when it usually happens, and what nobody tells you to arrange.',
+          subtitle: 'What each one is for, when it usually happens, and what to arrange ahead.',
           minutes: '6 MIN',
           slotId: 'traditions/first_year_ceremonies',
         ),
-        PpIntro('In the first weeks a lot of names get thrown around. Chatti, '
-            'namkaran, jhula, the first outing. Here they are in the order they '
+        PpIntro('In the first weeks you\'ll hear about a lot of ceremonies: the sixth-day welcome (chatti), '
+            'the naming (namkaran), the cradle (jhula), the first outing. Here they are in the order they '
             'usually come, with the day each one tends to fall on.'),
         PpChartCard(
           title: 'The usual order',
           subtitle: 'Counting from the day your baby was born',
           rows: [
-            ('Day 6 or 7', 'Chatti or chhathi, the sixth day welcome'),
-            ('Day 11 or 12', 'Namkaran, the naming'),
-            ('Day 11 to 40', 'Jhula or palna, the cradle ceremony'),
-            ('Around day 40', 'Nishkramana, the first outing'),
+            ('Day 6 or 7', 'The sixth-day welcome (chatti or chhathi)'),
+            ('Day 11 or 12', 'The naming (namkaran)'),
+            ('Day 11 to 40', 'The cradle ceremony (jhula or palna)'),
+            ('Around day 40', 'The first outing (nishkramana)'),
             ('No fixed day', 'Ear piercing, in families that do it early'),
           ],
           note: 'Every one of these days shifts by family and by region, and '
@@ -203,33 +203,33 @@ final PpArea _whatsNow = PpArea(
           hue: 32,
         ),
         PpCallout('If these first weeks are hard, move the ceremony. A ritual '
-            'done at two months instead of eleven days is not a smaller '
-            'ritual. Nothing is lost by waiting until you can enjoy it.'),
-        PpIndiaNote('In most joint families the date is picked by elders and '
-            'you hear about it rather than choose it. If the date lands badly, '
-            'say so early and give an alternative rather than a no. The page '
-            'on family expectations has the exact words.'),
-        PpLink('Chatti, the sixth day', pageId: 'chatti'),
-        PpLink('Namkaran, the naming ceremony', pageId: 'namkaran'),
-        PpLink('Jhula, the cradle ceremony', pageId: 'jhula'),
-        PpLink('Nishkramana, the first outing', pageId: 'nishkramana'),
+            'done at two months instead of eleven days counts just the same, '
+            'and nothing is lost by waiting until you can enjoy it.'),
+        PpIndiaNote('In most joint families the elders pick the date, and you '
+            'hear about it rather than choose it. If it lands badly, say so '
+            'early and offer another date instead of a no. The page on family '
+            'expectations has words you can use.'),
+        PpLink('The sixth-day welcome (chatti)', pageId: 'chatti'),
+        PpLink('The naming ceremony (namkaran)', pageId: 'namkaran'),
+        PpLink('The cradle ceremony (jhula)', pageId: 'jhula'),
+        PpLink('The first outing (nishkramana)', pageId: 'nishkramana'),
         PpLink('What to say when family wants it bigger',
             pageId: 'family_pressure'),
       ],
     ),
     PpPage(
       id: 'now_half_year',
-      title: 'Coming up: her first solid meal',
+      title: 'Coming up: the first solid meal',
       format: 'CHART-CARD',
       bands: ['half_year'],
       blocks: [
-        PpIntro('The big one in this stretch is annaprashan, the first taste of '
-            'solid food. It is the one ceremony that lines up almost exactly '
-            'with what a paediatrician would tell you anyway.'),
+        PpIntro('The big one in these months is the first rice feeding (annaprashan), the first taste of '
+            'solid food. It\'s the one ceremony that lines up almost exactly '
+            'with what your paediatrician would tell you anyway.'),
         PpChartCard(
           title: 'What falls in this stretch',
           rows: [
-            ('5 to 8 months', 'Annaprashan, the first solid food'),
+            ('5 to 8 months', 'The first rice feeding (annaprashan)'),
             ('Around 6 months', 'Solids start, ceremony or not'),
             ('Any time', 'Ear piercing, in families that wait this long'),
             ('At 12 months', 'The first birthday'),
@@ -238,49 +238,49 @@ final PpArea _whatsNow = PpArea(
               'medical one, which is not a coincidence.',
           hue: 96,
         ),
-        PpCallout('If the auspicious date lands at five months and your baby is '
-            'not sitting or interested yet, do the ceremony with a symbolic '
-            'lick and start real food when she is ready. The date and the diet '
-            'do not have to be the same decision.'),
-        PpLink('Annaprashan, the first solid meal', pageId: 'annaprashan'),
-        PpLink('What to actually feed, on the day and after',
+        PpCallout('Say the auspicious date lands at five months, and your baby '
+            'isn\'t sitting or interested in food yet. Do the ceremony with a '
+            'symbolic lick, and start real food when your baby is ready. The '
+            'date and the diet don\'t have to be the same decision.'),
+        PpLink('The first rice feeding (annaprashan)', pageId: 'annaprashan'),
+        PpLink('What to feed, on the day and after',
             pageId: 'annaprashan_food'),
         PpLink('Starting solids, step by step',
             surfaceId: 'pp_feeding',
-            blurb: 'The feeding journey, with textures, portions and first '
+            blurb: 'The feeding guide, with textures, portions and first '
                 'foods.'),
       ],
     ),
     PpPage(
       id: 'now_first_years',
-      title: 'Coming up: birthday, mundan, ears',
+      title: 'Coming up: birthday, first head shaving, ears',
       format: 'CHART-CARD',
       bands: ['first_years'],
       blocks: [
         PpIntro('Between one and three the ceremonies get bigger and more '
-            'public. This is also where the cost pressure lands hardest, so '
-            'the page on keeping it small is worth reading before you book '
+            'public. This is also when the pressure to spend is strongest, so '
+            'read the page on keeping it small before you book '
             'anything.'),
         PpChartCard(
           title: 'What falls in these two years',
           rows: [
             ('At 12 months', 'The first birthday'),
-            ('Year 1 or year 3', 'Mundan, the first head shaving'),
-            ('6 months to 5 years', 'Karnavedha, ear piercing'),
-            ('From about 2 years', 'Aksharabhyasam, the start of learning'),
+            ('Year 1 or year 3', 'The first head shaving (mundan)'),
+            ('6 months to 5 years', 'Ear piercing (karnavedha)'),
+            ('From about 2 years', 'The start of learning (aksharabhyasam)'),
           ],
-          note: 'Odd years are considered auspicious for mundan in most '
+          note: 'Odd years are considered auspicious for the head shaving in most '
               'families, which is why it is usually one or three and rarely '
               'two.',
           hue: 268,
         ),
-        PpCallout('A toddler has opinions now. Plan around the nap, keep the '
-            'ceremony short, and accept in advance that he may cry through the '
-            'important bit. That is not the ceremony going wrong.'),
-        PpLink('Mundan, the first head shaving', pageId: 'mundan'),
-        PpLink('Karnavedha, ear piercing', pageId: 'karnavedha'),
+        PpCallout('Toddlers have opinions. Plan around the nap, keep the '
+            'ceremony short, and expect some crying through the important '
+            'bit. That\'s normal, and the ceremony still counts.'),
+        PpLink('The first head shaving (mundan)', pageId: 'mundan'),
+        PpLink('Ear piercing (karnavedha)', pageId: 'karnavedha'),
         PpLink('The first birthday', pageId: 'first_birthday'),
-        PpLink('What a ceremony actually costs', pageId: 'what_it_costs'),
+        PpLink('What a ceremony really costs', pageId: 'what_it_costs'),
       ],
     ),
     PpPage(
@@ -295,21 +295,21 @@ final PpArea _whatsNow = PpArea(
         PpChartCard(
           title: 'What falls in these years',
           rows: [
-            ('2 to 5 years', 'Aksharabhyasam, the first letters'),
+            ('2 to 5 years', 'The first letters (aksharabhyasam)'),
             ('Often at Vijayadashami', 'The traditional day for it'),
-            ('Year 3, if not done at 1', 'Mundan, for families who waited'),
-            ('7 to 11 years', 'Navjote, in Parsi families'),
-            ('Around 11 years', 'Dastar Bandi, in Sikh families'),
+            ('Year 3, if not done at 1', 'The head shaving, for families who waited'),
+            ('7 to 11 years', 'The Parsi initiation (Navjote)'),
+            ('Around 11 years', 'The first turban (Dastar Bandi), in Sikh families'),
           ],
           note: 'If a ceremony on this list has already passed for your child, '
-              'nothing is owed. There is no making up for a missed date.',
+              'nothing is owed, and there\'s nothing to make up.',
           hue: 200,
         ),
-        PpCallout('Aksharabhyasam marks a beginning, not a test. A child who '
-            'traces a letter with help on the day and shows no interest for '
-            'another year is completely normal.'),
-        PpLink('Aksharabhyasam, the first letters', pageId: 'aksharabhyasam'),
-        PpLink('Mundan, the first head shaving', pageId: 'mundan'),
+        PpCallout('The first letters ceremony marks a beginning. It isn\'t a test. Many '
+            'children trace a letter with help on the day, then show no '
+            'interest for another year. That\'s completely normal.'),
+        PpLink('The first letters (aksharabhyasam)', pageId: 'aksharabhyasam'),
+        PpLink('The first head shaving (mundan)', pageId: 'mundan'),
         PpLink('Play that builds early learning',
             surfaceId: 'pp_activities',
             blurb: 'Age-matched play, with the reason each one helps.'),
@@ -320,19 +320,75 @@ final PpArea _whatsNow = PpArea(
     // explains the muhurat." Copy supplied, not generated.
     PpPage(
       id: 'how_date_chosen',
-      title: 'How the date gets chosen, and what to do when it does not suit the baby',
-      subtitle: 'The panchang, the muhurat, the pandit, the birth-star',
+      title: 'How the date gets chosen, and what to do when it doesn\'t suit your baby',
+      subtitle: 'The Hindu calendar, the auspicious time, the priest, the birth-star',
       format: 'ARTICLE',
-      comingSoon: true,
-      blocks: [],
+      
+      blocks: [
+        // Written 2026-10-02 (parenting gap analysis), filling the scaffold.
+        // REQUIRED_REVIEW.
+        PpIntro('In many families the Hindu calendar (panchang) sets the date of the naming, '
+            'the first rice feeding or the head shaving. The priest works out an auspicious time (muhurat) '
+            'from your baby\'s birth-star and the family\'s calendar. It\'s '
+            'a lovely tradition, and there\'s usually more than one good date.'),
+        PpArticle(heading: 'How it usually works', [
+          'The priest looks at the date, time and place of birth, the birth star (nakshatra) '
+              'and the lunar calendar, and suggests days that are considered '
+              'auspicious. Families often have a range: naming on day 11 or '
+              '12, rice feeding near six months, head shaving in the first or '
+              'third year, with flexibility around them.',
+        ]),
+        PpArticle(heading: 'When the date does not suit the baby', [
+          'Sometimes the auspicious time falls when your baby is unwell, too young for solid '
+              'food, in the middle of vaccines, or during extreme heat or a crowded '
+              'festival. It\'s fine to ask for another date. Most priests will '
+              'suggest the next auspicious window if you explain the reason.',
+          'For the first rice feeding, wait until your baby is about six months and ready '
+              'for food. An earlier date can still be kept, with a symbolic touch '
+              'of kheer to the lips and no solids fed.',
+        ]),
+        PpScript(heading: 'Words for the conversation', [
+          PpScriptLine(
+              say: 'The doctor wants us to wait until the vaccines are done. '
+                  'Is there an auspicious day in the next month?',
+              why: 'Asking for an alternative keeps the tradition and the baby\'s '
+                  'needs together.'),
+        ]),
+      ],
     ),
     PpPage(
       id: 'how_name_chosen',
       title: 'How Indian families choose the name',
-      subtitle: 'Rashi and nakshatra letters, gotra, numerology, and a name that survives school',
+      subtitle: 'Birth-star letters, family names, numerology, and a name that survives school',
       format: 'ARTICLE',
-      comingSoon: true,
-      blocks: [],
+      
+      blocks: [
+        // Written 2026-10-02 (parenting gap analysis), filling the scaffold.
+        // REQUIRED_REVIEW.
+        PpIntro('Choosing a name is one of the most loved decisions in an Indian '
+            'family, and often one with many voices. Here are the traditions '
+            'families draw on, and a few practical thoughts.'),
+        PpCards(heading: 'The traditions', [
+          PpCard('Birth sign and birth-star letters (rashi and nakshatra)', 'Many families pick a name starting '
+              'with a syllable linked to the baby\'s birth-star.'),
+          PpCard('Family and clan (gotra) names', 'Honouring a grandparent, a deity, or a '
+              'family tradition.'),
+          PpCard('Meaning', 'Names chosen for their meaning in Sanskrit, Tamil, '
+              'Arabic, Persian, Punjabi or another language of the family.'),
+          PpCard('Numerology', 'Some families check the name\'s number; others do '
+              'not.'),
+        ]),
+        PpCards(heading: 'Practical thoughts', [
+          PpCard('Say it aloud with the surname', 'At school roll call, and in '
+              'another language.'),
+          PpCard('Check the spelling once', 'It goes on the birth certificate, '
+              'Aadhaar and passport.'),
+          PpCard('A pet name is fine', 'Most children have a pet name at home and '
+              'a formal name for school.'),
+        ]),
+        PpLink('Find a name', surfaceId: 'pp_names',
+            blurb: 'Search names by meaning, letter and language.'),
+      ],
     ),
   ],
 );
@@ -344,8 +400,8 @@ final PpArea _whatsNow = PpArea(
 final PpArea _welcome = PpArea(
   id: 'welcome',
   mark: IntentMark.listMark,
-  title: 'Welcoming her home',
-  blurb: 'Chatti, namkaran, the cradle and the first outing.',
+  title: 'Welcoming your baby home',
+  blurb: 'The sixth-day welcome, the naming, the cradle and the first outing.',
   hue: 24,
   pages: [
     // -------------------------------------------------------------------------
@@ -353,20 +409,20 @@ final PpArea _welcome = PpArea(
     // -------------------------------------------------------------------------
     PpPage(
       id: 'chatti',
-      title: 'Chatti, the sixth day',
+      title: 'The sixth-day welcome (chatti)',
       subtitle: 'The first welcome, usually at home',
       format: 'CEREMONY',
       blocks: [
-        PpIntro('Chatti, or chhathi, is the sixth night after birth. It is the '
-            'first time the family formally welcomes the baby, and in many '
+        PpIntro('The sixth-day welcome (chatti, or chhathi) falls on the sixth night after birth. It is the '
+            'first time the family formally welcomes your baby, and in many '
             'homes it is also the night the name is chosen or first said.'),
         PpArticle(
           heading: 'What it is',
           [
-            'Historically the sixth night was the point at which a newborn was '
-            'considered likely to thrive, and the family marked it with a '
-            'small night gathering, sweets, and a lamp kept lit. The mother '
-            'usually stays resting through it.',
+            'Long ago, the sixth night was when a newborn was thought likely '
+            'to thrive. Families marked it with a small night gathering, '
+            'sweets, and a lamp kept lit. As the new mother, you usually rest '
+            'through it.',
             'It is a home ceremony almost everywhere. There is no venue, no '
             'invitation list and no fixed length. In many families it is an '
             'hour of singing after dinner and nothing more.',
@@ -374,7 +430,7 @@ final PpArea _welcome = PpArea(
         ),
         PpWhenLine('The sixth night after birth. Some families count the sixth '
             'day instead, and Punjabi and Gujarati families often keep the '
-            'whole night awake, which is where the name jagrata comes from.'),
+            'whole night awake. That is why it is also called a night vigil (jagrata).'),
         PpTable(
           heading: 'What it is called where',
           columns: ['Where', 'What it is called'],
@@ -394,47 +450,47 @@ final PpArea _welcome = PpArea(
                 'Most families keep one lamp burning through the night.'),
             PpStep('A clean cloth, a pen and paper are placed near the baby',
                 'The old idea is that the child\'s fate is written that night. '
-                'Families keep the custom for the sentiment, not the belief.'),
+                'Many families keep the custom for the love in it.'),
             PpStep('The women of the house sing',
-                'Sohar and badhai songs. This is usually the warmest part of '
+                'Traditional birth songs (sohar and badhai). This is usually the warmest part of '
                 'the evening and costs nothing.'),
             PpStep('Sweets are shared and something is given away',
                 'Often clothes or food to household help, or to a family who '
                 'needs it.'),
             PpStep('The name may be said aloud for the first time',
-                'In many families this is where namkaran actually happens, and '
-                'the eleventh day ceremony is skipped entirely.'),
+                'In many families this is the naming ceremony itself, and there is no '
+                'separate ceremony on the eleventh day.'),
           ],
         ),
         PpCards(
           heading: 'What you need',
           hue: 24,
           [
-            PpCard('A lamp', 'One diya. Kept away from the cot and never left '
+            PpCard('A lamp', 'One oil lamp. Kept away from the cot and never left '
                 'burning unattended in the same room as the baby.'),
             PpCard('Sweets', 'Whatever the house makes. Halwa, laddoo, kheer.'),
             PpCard('A clean new cloth for the baby',
                 'Washed before use, soft, nothing scratchy at the neck.'),
             PpCard('A pen and a blank page',
                 'Symbolic. Placed near the cot, not in it.'),
-            PpCard('Songs', 'A phone with the sohar your mother knows is '
-                'completely fine if nobody remembers the words.'),
+            PpCard('Songs', 'If nobody remembers the words, playing the birth songs '
+                'your mother knows on a phone is completely fine.'),
           ],
         ),
-        PpCallout('What actually matters is that the household stops for an '
-            'evening and marks that the baby is here. The lamp, the songs and '
-            'the sweets are the ceremony. Everything else is decoration.'),
+        PpCallout('What matters is that the household stops for an evening '
+            'to mark that your baby is here. The lamp, the songs and the '
+            'sweets are the ceremony. Everything else is extra.'),
         PpCards(
-          heading: 'Genuinely optional',
+          heading: 'Happily optional',
           hue: 340,
           [
-            PpCard('A priest', 'Most families do chatti without one.'),
+            PpCard('A priest', 'Most families do the sixth-day welcome without one.'),
             PpCard('Staying awake all night',
                 'A vigil with a six day old baby and a healing mother is a lot. '
                 'An hour of singing counts.'),
             PpCard('Inviting the extended family',
                 'A six day old baby has no immune reserve to spare. Small is '
-                'the safer version and it is also the traditional one.'),
+                'safer, and it\'s also the traditional way.'),
             PpCard('New clothes for everyone',
                 'Nothing about the ceremony requires anyone to shop.'),
           ],
@@ -444,10 +500,10 @@ final PpArea _welcome = PpArea(
         // the group small, excluding anyone unwell, handwashing before holding
         // and no kissing the face are the standard precautions.
         PpCallout(
-          'Keep the group small and ask anyone with a cough, cold or fever to '
-          'come another week. Everyone washes hands before holding her, and '
-          'nobody kisses her face or hands. A cold that is nothing in an adult '
-          'is not nothing in a six day old.',
+          'Keep the group small, and ask anyone with a cough, cold or fever to '
+          'come another week. Everyone washes hands before holding your baby, '
+          'and nobody kisses the face or hands. A cold that is mild in an adult '
+          'can be serious in a six day old.',
           kind: PpCalloutKind.safety,
           title: 'Six days old is very new',
         ),
@@ -455,23 +511,23 @@ final PpArea _welcome = PpArea(
         // any fever of 100.4F / 38C or above in a baby under 3 months needs to
         // be seen the same day, no waiting.
         PpCallout(
-          'A fever of 100.4F, or 38C, in a baby under three months is a same '
-          'day reason to see a doctor, whatever else seems fine. So is a baby '
-          'who has gone unusually floppy, is refusing feeds, or will not wake '
-          'properly. Do not wait for morning.',
+          'A fever of 100.4F, or 38C, in a baby under three months means '
+          'seeing a doctor the same day, even if all else seems fine. The same '
+          'goes for a baby who is unusually floppy, refusing feeds, or not '
+          'waking properly. Don\'t wait for morning.',
           kind: PpCalloutKind.doctor,
-          title: 'If she is unwell after the gathering',
+          title: 'If your baby is unwell after the gathering',
         ),
-        PpIndiaNote('If the mother is in jaapa and not up to a room full of '
-            'people, that is normal and it is allowed. She can be greeted, '
-            'stay in her room, and come out for ten minutes if she wants to.'),
+        PpIndiaNote('If you\'re in your forty days of rest and not up to a room full of people, '
+            'that\'s normal and it\'s allowed. Guests can greet you in your '
+            'room, and you can come out for ten minutes if you want to.'),
         PpVideoSlot(
-          title: 'What actually happens on chatti',
+          title: 'What happens at the sixth-day welcome',
           subtitle: 'A real family, a small home ceremony, start to finish.',
           minutes: '5 MIN',
           slotId: 'traditions/chatti',
         ),
-        PpLink('Namkaran, if the name is being said tonight', pageId: 'namkaran'),
+        PpLink('The naming ceremony, if the name is being said tonight', pageId: 'namkaran'),
         PpLink('Customs done with love that are not safe',
             pageId: 'newborn_customs'),
         // [single-source] The short line above stays word for word; the full
@@ -479,7 +535,7 @@ final PpArea _welcome = PpArea(
         // piercing and heat".
         PpLink('The full newborn-in-a-crowd rule, once',
             pageId: 'ceremony_day_safety',
-            blurb: 'Small group, washed hands, no kissing her face, and the '
+            blurb: 'Small group, washed hands, no kisses on the face, and the '
                 'fever that means a doctor today.'),
       ],
     ),
@@ -489,13 +545,13 @@ final PpArea _welcome = PpArea(
     // -------------------------------------------------------------------------
     PpPage(
       id: 'namkaran',
-      title: 'Namkaran, the naming ceremony',
-      subtitle: 'The day her name is said out loud',
+      title: 'The naming ceremony (namkaran)',
+      subtitle: 'The day your baby\'s name is said out loud',
       format: 'CEREMONY',
       blocks: [
-        PpIntro('Namkaran is the day your baby is formally given her name and '
-            'it is spoken in front of the people who love her. In most families '
-            'it happens in the first two weeks, at home, and takes under an '
+        PpIntro('The naming ceremony is the day your baby is formally named, with the '
+            'name said aloud in front of the family. In most families it '
+            'happens in the first two weeks, at home, and takes under an '
             'hour.'),
         PpArticle(
           heading: 'What it is, and where it comes from',
@@ -512,7 +568,7 @@ final PpArea _welcome = PpArea(
         ),
         PpWhenLine('Traditionally the eleventh or twelfth day after birth. '
             'Many families now do it any time in the first three months, often '
-            'once the mother is out of jaapa and up to hosting.'),
+            'once the mother is through her forty days of rest and up to hosting.'),
         PpTable(
           heading: 'What it is called where',
           columns: ['Where', 'What it is called'],
@@ -537,7 +593,7 @@ final PpArea _welcome = PpArea(
                 'something new.'),
             PpStep('A short prayer or blessing is said',
                 'A priest does this in some families. In many, the eldest '
-                'person present simply says a blessing in their own words.'),
+                'person present says a blessing in their own words.'),
             PpStep('The name is whispered in the baby\'s ear',
                 'Usually by the father or an aunt, three times. This is the '
                 'moment the whole ceremony is built around.'),
@@ -545,8 +601,8 @@ final PpArea _welcome = PpArea(
                 'Everyone repeats it. Some families write it on a plate of '
                 'rice with a small stick or a gold ring.'),
             PpStep('Sweets are shared and blessings are given',
-                'Elders bless the baby, often placing a hand on her head or '
-                'giving a small gift. Then it is over.'),
+                'Elders bless the baby, often with a hand on the head or a '
+                'small gift. Then it\'s done.'),
           ],
         ),
         PpCards(
@@ -554,28 +610,28 @@ final PpArea _welcome = PpArea(
           hue: 268,
           [
             PpCard('A name you have both agreed on',
-                'Agree the day before, not on the day. This is the single '
-                'biggest source of ceremony morning stress.'),
+                'Settle it the day before, not on the day. A last-minute name '
+                'debate causes more ceremony morning stress than anything.'),
             PpCard('A low table and a clean cloth',
                 'Any table, any clean cloth. It does not have to be new.'),
             PpCard('A lamp, flowers and rice',
-                'A diya, whatever flowers are available, a plate of raw rice '
+                'An oil lamp, whatever flowers are available, a plate of raw rice '
                 'if the name is being written.'),
             PpCard('Something new for the baby to wear',
                 'Washed once before the day. New fabric straight off a shelf '
                 'can be stiff and dyed.'),
             PpCard('Sweets to share',
-                'Made at home or bought. Nobody has ever judged the mithai.'),
+                'Made at home or bought. Nobody has ever judged the sweets.'),
             PpCard('A priest, only if your family wants one',
-                'Dakshina is usually between Rs 500 and Rs 2,100.'),
+                'The priest\'s fee (dakshina) is usually between Rs 500 and Rs 2,100.'),
           ],
         ),
-        PpCallout('What actually matters: the name is said out loud, and the '
+        PpCallout('What matters: the name is said out loud, and the '
             'people who matter hear it. The priest, the hall, the outfits and '
-            'the photographer are all optional, and a namkaran done by four '
-            'people in a bedroom is a complete namkaran.'),
+            'the photographer are all optional, and a naming done by four '
+            'people in a bedroom is a complete naming.'),
         PpCards(
-          heading: 'Genuinely optional',
+          heading: 'Happily optional',
           hue: 340,
           [
             PpCard('A specific auspicious letter',
@@ -606,11 +662,11 @@ final PpArea _welcome = PpArea(
         ),
         // REQUIRED_REVIEW: newborn gathering precautions, same claim as chatti.
         PpCallout(
-          'She is still very new. Keep the room airy, keep the group small, '
-          'and ask anyone with a cough or cold to come another day. Hands '
-          'washed before holding, and no kissing her face. If she is upset by '
-          'the noise, take her out of the room. The ceremony can wait ten '
-          'minutes and she cannot.',
+          'Your baby is still very new. Keep the room airy and the group small, '
+          'and ask anyone with a cough or cold to come another day. Hands are '
+          'washed before holding, and nobody kisses the baby\'s face. If the '
+          'noise is upsetting your baby, step out of the room together. The '
+          'ceremony can wait ten minutes.',
           kind: PpCalloutKind.safety,
           title: 'Keeping a two week old comfortable',
         ),
@@ -619,7 +675,7 @@ final PpArea _welcome = PpArea(
             'the family. It costs nothing, it satisfies almost everyone, and '
             'it is what most homes did before priests were bookable by phone.'),
         PpVideoSlot(
-          title: 'A namkaran, start to finish',
+          title: 'A naming ceremony, start to finish',
           subtitle: 'A small home ceremony, with the naming moment shown '
               'properly.',
           minutes: '6 MIN',
@@ -631,7 +687,7 @@ final PpArea _welcome = PpArea(
                 'together.'),
         PpLink('Make a naming announcement card',
             surfaceId: 'pp_memories',
-            blurb: 'Pick a template, add her name and a photo, share it.'),
+            blurb: 'Pick a template, add the name and a photo, share it.'),
         PpLink('Ceremony essentials, if you are buying',
             surfaceId: 'pp_products',
             blurb: 'Silver spoon sets, outfits, thali sets. Compare before you '
@@ -642,7 +698,7 @@ final PpArea _welcome = PpArea(
         // piercing and heat".
         PpLink('The full newborn-in-a-crowd rule, once',
             pageId: 'ceremony_day_safety',
-            blurb: 'Small group, washed hands, no kissing her face, and the '
+            blurb: 'Small group, washed hands, no kisses on the face, and the '
                 'fever that means a doctor today.'),
       ],
     ),
@@ -652,21 +708,21 @@ final PpArea _welcome = PpArea(
     // -------------------------------------------------------------------------
     PpPage(
       id: 'jhula',
-      title: 'Jhula, the cradle ceremony',
-      subtitle: 'The day she is placed in her cradle for the first time',
+      title: 'The cradle ceremony (jhula)',
+      subtitle: 'The day your baby first goes into the cradle',
       format: 'CEREMONY',
       blocks: [
-        PpIntro('The jhula, palna or thottil ceremony is the first time the '
-            'baby is placed in her cradle, with the family watching and '
+        PpIntro('The cradle ceremony (jhula, palna or thottil) is the first time your '
+            'baby is placed in the cradle, with the family watching and '
             'singing. In many south Indian families the naming happens in the '
             'same hour, in the cradle.'),
         PpArticle(
           heading: 'What it is',
           [
-            'It is a handover moment. Until now the baby has been in arms; the '
-            'cradle is the first place that belongs to her. The grandmother '
-            'usually places her in it, the family sings, and the cradle is '
-            'rocked for the first time.',
+            'It\'s a handover moment. Until now your baby has been in arms, and '
+            'the cradle is the first place that is the baby\'s own. Usually a '
+            'grandmother lays the baby down, the family sings, and the cradle '
+            'is rocked for the first time.',
             'It is short, it is warm, and it is one of the least expensive '
             'ceremonies there is. In a lot of homes it is folded into the '
             'naming and takes fifteen minutes.',
@@ -695,11 +751,11 @@ final PpArea _welcome = PpArea(
                 'Nothing that can fall in.'),
             PpStep('The baby is dressed and brought in by a grandmother or '
                 'aunt'),
-            PpStep('She is placed in the cradle for the first time',
-                'On her back, on a firm flat surface, with nothing loose '
-                'around her.'),
+            PpStep('Your baby goes into the cradle for the first time',
+                'Lying face up on a firm, flat mattress, with nothing loose '
+                'nearby.'),
             PpStep('The cradle is rocked gently while the family sings',
-                'A lori. In many families each aunt sings one line.'),
+                'A lullaby. In many families each aunt sings one line.'),
             PpStep('The name may be said here',
                 'In south Indian families the naming and the cradle are one '
                 'ceremony.'),
@@ -711,62 +767,63 @@ final PpArea _welcome = PpArea(
           hue: 24,
           [
             PpCard('A cradle',
-                'A cloth jhula, a wooden palna, or a modern cot. The ceremony '
+                'A cloth swing cradle, a wooden cradle, or a modern cot. The ceremony '
                 'does not care which.'),
             PpCard('Flowers or a garland',
-                'Tied on the outside, above where she lies, not draped across '
-                'her.'),
+                'Tied on the outside of the cradle, never draped across your '
+                'baby.'),
             PpCard('A firm flat mattress and one thin sheet',
                 'This is the only part of the cradle that is a safety matter, '
                 'not a style one.'),
-            PpCard('A lori somebody knows',
-                'Any lullaby. It is the voice that settles her, not the tune.'),
+            PpCard('A lullaby somebody knows',
+                'Any lullaby will do. Babies settle to a loved voice more than '
+                'a tune.'),
             PpCard('Sweets to share',
-                'Whatever the house makes. Nobody has ever judged the mithai.'),
+                'Whatever the house makes. Nobody has ever judged the sweets.'),
           ],
         ),
-        PpCallout('What actually matters is that she goes into a safe cradle '
-            'and somebody sings. Marigolds, a silver rattle and a videographer '
-            'are all fully optional.'),
+        PpCallout('What matters is a safe cradle and somebody singing. '
+            'Marigolds, a silver rattle and a videographer are all fully '
+            'optional.'),
         // REQUIRED_REVIEW: safe sleep in a cradle or cloth jhula. Claims to
         // confirm: firm flat mattress, on the back, no pillows or loose cloth,
         // nothing tied above that can fall in, do not swing hard or leave a
         // baby unattended in a hanging cloth jhula, and check the hook or
         // suspension of a hanging cradle before the first use.
         PpCallout(
-          'Before she goes in, check three things. The mattress is firm and '
-          'flat with no pillow, no quilt and no loose cloth around her. '
-          'Nothing is tied above her that could come loose and fall in. And if '
-          'it is a hanging cloth jhula, the hook and knots are tested with '
-          'your own weight pulling on them first. Rock it gently, never swing '
-          'it hard, and do not leave her sleeping in a hanging jhula '
+          'Before your baby goes in, check three things. The mattress is firm '
+          'and flat, with no pillow, no quilt and no loose cloth. Nothing is '
+          'tied above that could come loose and fall in. And for a hanging '
+          'cloth swing, test the hook and knots first by pulling on them with '
+          'your own weight. Rock it gently, never swing it hard, and do not '
+          'leave a baby sleeping in a hanging cloth swing '
           'unwatched.',
           kind: PpCalloutKind.safety,
           title: 'The cradle itself',
         ),
         PpCallout(
           'Rocking a baby hard, or shaking a cradle to stop crying, can injure '
-          'a young baby\'s brain. Slow and small is the whole technique. If '
-          'crying has pushed you past patience, put her down somewhere safe '
-          'and step out of the room for two minutes. That is the right move, '
-          'not a failure.',
+          'a young baby\'s brain. Keep every movement slow and small. If the '
+          'crying has pushed you past your patience, lay your baby down '
+          'somewhere safe and step out of the room for two minutes. That is '
+          'the right thing to do, and every parent needs it sometimes.',
           kind: PpCalloutKind.safety,
           title: 'Gently, always',
         ),
-        PpIndiaNote('A cloth jhula tied to a beam is what most of India uses '
+        PpIndiaNote('A cloth swing cradle tied to a beam is what most of India uses, '
             'and it works. The safety points are the same as any cot: firm '
-            'surface, on her back, nothing loose. A baby who sleeps in a jhula '
-            'is not sleeping worse than one in an imported cot.'),
+            'surface, baby on the back, nothing loose. A cloth swing is as good a '
+            'place to sleep as an imported cot.'),
         PpVideoSlot(
-          title: 'The cradle ceremony, and setting the jhula up safely',
-          subtitle: 'How it is done, and the three checks before she goes in.',
+          title: 'The cradle ceremony, and setting the cloth swing up safely',
+          subtitle: 'How it\'s done, and the three checks before your baby goes in.',
           minutes: '5 MIN',
           slotId: 'traditions/jhula',
         ),
-        PpLink('Namkaran, if you are doing both together', pageId: 'namkaran'),
-        PpLink('Lori and sleep sounds',
+        PpLink('The naming ceremony, if you are doing both together', pageId: 'namkaran'),
+        PpLink('Lullabies and sleep sounds',
             surfaceId: 'pp_sleep_sounds',
-            blurb: 'Lori, white noise and soft ragas, with a timer.'),
+            blurb: 'Lullabies, white noise and soft ragas, with a timer.'),
       ],
     ),
 
@@ -775,8 +832,8 @@ final PpArea _welcome = PpArea(
     // -------------------------------------------------------------------------
     PpPage(
       id: 'nishkramana',
-      title: 'Nishkramana, the first outing',
-      subtitle: 'The first time she leaves the house',
+      title: 'The first outing (nishkramana)',
+      subtitle: 'Your baby\'s first time out of the house',
       format: 'CEREMONY',
       blocks: [
         PpIntro('Nishkramana marks the first time the baby is taken out of the '
@@ -788,10 +845,10 @@ final PpArea _welcome = PpArea(
           [
             'For most of history the first weeks indoors were about keeping a '
             'newborn away from infection and weather, and the outing marked '
-            'the end of that quiet period. The ceremony is simply the family '
+            'the end of that resting time. The ceremony is the family '
             'stepping outside together with the baby for the first time.',
-            'This is where ParentVeda will be honest with you: the old custom '
-            'and current paediatric advice agree more than they disagree. '
+            'Here the old custom and current paediatric advice agree more '
+            'than they disagree. '
             'Keeping a very young baby away from crowds is sensible. The '
             'question is only whether the outing has to be to a crowded place '
             'on a fixed day.',
@@ -817,15 +874,15 @@ final PpArea _welcome = PpArea(
             PpStep('A time is chosen, usually early morning or evening',
                 'Which is also the sensible time. Midday sun and a six week '
                 'old are a poor combination.'),
-            PpStep('The baby is dressed and often has a small kajal dot placed '
+            PpStep('The baby is dressed and often has a small kohl (kajal) dot placed '
                 'behind the ear or on the foot',
                 'Behind the ear or on the sole, never near or in the eyes. The '
                 'safety page explains why.'),
             PpStep('The family steps out together',
-                'Traditionally the father or grandfather carries her over the '
-                'threshold.'),
-            PpStep('She is shown the sun, the moon or the sky',
-                'This is the actual moment. It takes about a minute.'),
+                'Traditionally the father or grandfather carries the baby over '
+                'the threshold.'),
+            PpStep('Your baby is shown the sun, the moon or the sky',
+                'This is the heart of it. It takes about a minute.'),
             PpStep('Some families visit a temple, a gurdwara, a church or a '
                 'river',
                 'Whatever the family\'s place is. Choose a quiet hour.'),
@@ -842,15 +899,15 @@ final PpArea _welcome = PpArea(
                 'India is hot. Overdressing a newborn is far more common than '
                 'underdressing one.'),
             PpCard('A carrier or the grandmother\'s arms',
-                'Whatever means she is held, not passed around a queue.'),
+                'Whatever keeps your baby held close, not passed down a queue.'),
             PpCard('Somewhere uncrowded to go',
                 'A terrace, a garden, a temple at an empty hour. A mall is not '
                 'the tradition.'),
           ],
         ),
-        PpCallout('The symbolic version is a real version. Opening a window at '
-            'sunrise, saying the blessing, and showing her the sky from your '
-            'own balcony is a complete nishkramana. Many families now do '
+        PpCallout('The symbolic version counts fully. Open a window at '
+            'sunrise, say the blessing, and show your baby the sky from your '
+            'own balcony. That is a complete nishkramana. Many families now do '
             'exactly this and go to the temple weeks later.'),
         // REQUIRED_REVIEW: newborn outings. Claims to confirm: avoiding
         // crowded indoor places and anyone unwell in the early weeks, shade
@@ -862,29 +919,29 @@ final PpArea _welcome = PpArea(
           'Direct midday sun is too much for a young baby\'s skin, and '
           'sunscreen is generally not recommended under six months, so shade '
           'and light cotton do the work. Avoid crowded indoor places, and keep '
-          'her out of the arms of anyone who is unwell.',
+          'your baby out of the arms of anyone who is unwell.',
           kind: PpCalloutKind.safety,
           title: 'Sun, crowds and the first trip out',
         ),
         PpCallout(
-          'If she develops a fever after an outing, a baby under three months '
-          'with a temperature of 100.4F or 38C needs a doctor the same day. '
-          'Also see a doctor for fast or laboured breathing, a baby who will '
-          'not feed, or one who has become unusually floppy or hard to wake.',
+          'If your baby gets a fever after an outing: under three months, a '
+          'temperature of 100.4F or 38C needs a doctor the same day. Also see '
+          'a doctor for fast or laboured breathing, a baby who won\'t feed, '
+          'or one who has become unusually floppy or hard to wake.',
           kind: PpCalloutKind.doctor,
-          title: 'If she is unwell afterwards',
+          title: 'If your baby is unwell afterwards',
         ),
-        PpIndiaNote('If your family holds to the fortieth day and the weather '
-            'is brutal, do the ceremony at dawn. Nobody in the tradition '
-            'intended a newborn to be carried through 42 degrees at noon to '
-            'satisfy a date.'),
+        PpIndiaNote('If your family keeps to the fortieth day and the weather '
+            'is harsh, do the ceremony at dawn. The tradition never meant a '
+            'newborn to be carried through 42 degrees at noon to keep a '
+            'date.'),
         PpVideoSlot(
           title: 'The first outing, done gently',
           subtitle: 'Both versions, the temple visit and the at home one.',
           minutes: '4 MIN',
           slotId: 'traditions/nishkramana',
         ),
-        PpLink('Her vaccinations, and what is due',
+        PpLink('Vaccinations, and what is due',
             surfaceId: 'pp_vaccines',
             blurb: 'The schedule, what each one is for, and reminders.'),
         PpLink('Customs done with love that are not safe',
@@ -894,7 +951,7 @@ final PpArea _welcome = PpArea(
         // piercing and heat".
         PpLink('The full newborn-in-a-crowd rule, once',
             pageId: 'ceremony_day_safety',
-            blurb: 'Small group, washed hands, no kissing her face, and the '
+            blurb: 'Small group, washed hands, no kisses on the face, and the '
                 'fever that means a doctor today.'),
       ],
     ),
@@ -914,19 +971,19 @@ final PpArea _welcome = PpArea(
 final PpArea _firstMeal = PpArea(
   id: 'first_meal',
   mark: IntentMark.feedMark,
-  title: 'Her first solid meal',
-  blurb: 'Annaprashan, and what to actually feed on the day.',
+  title: 'The first solid meal',
+  blurb: 'The first rice feeding, and what to feed on the day.',
   hue: 96,
   pages: [
     PpPage(
       id: 'annaprashan',
-      title: 'Annaprashan, the first solid food',
+      title: 'The first rice feeding (annaprashan)',
       subtitle: 'The first grain, usually around six months',
       format: 'CEREMONY',
       blocks: [
-        PpIntro('Annaprashan is the ceremony where a baby is given solid food '
-            'for the first time, usually a spoon of kheer or sweetened rice '
-            'fed by an uncle or grandfather. It is the most widely performed '
+        PpIntro('The first rice feeding is the ceremony where your baby has solid food '
+            'for the first time. Usually it\'s a spoon of kheer or sweetened '
+            'rice, fed by an uncle or grandfather. It is the most widely performed '
             'baby ceremony in India, and the one that best matches medical '
             'advice.'),
         PpArticle(
@@ -937,9 +994,9 @@ final PpArea _firstMeal = PpArea(
             'sits at around six months in almost every version of it.',
             'That is close to what paediatricians recommend anyway: milk only '
             'for about the first six months, then solids alongside continued '
-            'breastfeeding or formula. So annaprashan is a rare case where the '
-            'tradition and the guidance point at the same month, and you do '
-            'not have to choose between your family and your doctor.',
+            'breastfeeding or formula. So here the tradition and the guidance '
+            'point at the same month. You don\'t have to choose between your '
+            'family and your doctor.',
           ],
         ),
         PpWhenLine('Around six months. Traditionally an even month for boys, '
@@ -961,25 +1018,25 @@ final PpArea _firstMeal = PpArea(
           heading: 'How it usually goes',
           [
             PpStep('A time is fixed, usually late morning',
-                'Pick a slot right after a nap and before she is starving. A '
-                'tired or ravenous baby will not cooperate.'),
+                'Pick a slot right after a nap, before hunger sets in. A tired '
+                'or very hungry baby won\'t be in the mood.'),
             PpStep('The food is cooked, often kheer or plain sweet rice',
                 'Traditionally made by the grandmother. Cooked soft, mashed '
                 'smooth, and cooled properly.'),
-            PpStep('She is dressed and seated on a lap or in a decorated chair',
+            PpStep('Your baby is dressed and seated on a lap or a decorated chair',
                 'Upright and supported. Never lying back while being fed.'),
             PpStep('A short blessing is said'),
             PpStep('The first spoon is given, usually by the maternal uncle or '
                 'the grandfather',
-                'One small spoon, from a silver or steel spoon. She may taste '
-                'it, spit it out, or ignore it entirely. All three are fine.'),
+                'One small spoonful, from a silver or steel spoon. Your baby may '
+                'taste it, spit it out, or ignore it. All three are fine.'),
             PpStep('The family takes turns to feed a token spoon',
-                'This is where it can get carried away. One or two tokens is '
+                'This is where it can get carried away. One or two tokens are '
                 'plenty for a six month old.'),
-            PpStep('In some families, objects are placed in front of her to '
-                'choose from',
-                'A pen, a book, a coin, some clay. Whichever she reaches for '
-                'is said to suggest her path. It is a game, and it is a lovely '
+            PpStep('In some families, objects are placed in front of the baby '
+                'to choose from',
+                'A pen, a book, a coin, some clay. The one your baby reaches for '
+                'is said to hint at the path ahead. It\'s a game, and a lovely '
                 'photo.'),
           ],
         ),
@@ -988,29 +1045,29 @@ final PpArea _firstMeal = PpArea(
           hue: 96,
           [
             PpCard('A silver or steel bowl and spoon',
-                'Silver is traditional. Steel works identically. A soft '
-                'weaning spoon is kinder on her gums than metal.'),
+                'Silver is traditional. Steel works just as well. A soft '
+                'weaning spoon is kinder on little gums than metal.'),
             PpCard('The first food itself',
                 'Kheer, sweet rice, or plain mashed rice with dal water. See '
                 'the next page for what suits a six month old.'),
             PpCard('A bib and a cloth',
-                'Most of the first meal ends up on her chin.'),
-            PpCard('A chair or a lap she can sit upright in',
+                'Most of the first meal ends up on the chin.'),
+            PpCard('A chair or a lap to sit upright in',
                 'Upright and supported, never reclined. A high chair works, so '
                 'does a grandfather.'),
             PpCard('The choosing objects, if your family does that bit',
-                'Nothing small enough to go in her mouth. No coins within '
+                'Nothing small enough to fit in a baby\'s mouth. No coins within '
                 'reach.'),
             PpCard('New clothes, if you want them',
                 'Cotton, loose, nothing tight at the neck for a meal.'),
           ],
         ),
-        PpCallout('What actually matters is that she is upright, awake, calm, '
-            'and that the food is soft and cool. Whether she eats it is not '
-            'the measure of anything. Plenty of babies lick the spoon once at '
-            'their own annaprashan and that is a complete ceremony.'),
+        PpCallout('What matters is a baby who is upright, awake and calm, and '
+            'food that is soft and cool. How much gets eaten doesn\'t matter at '
+            'all. Plenty of babies lick the spoon once at their own '
+            'rice feeding, and that is a complete ceremony.'),
         PpCards(
-          heading: 'Genuinely optional',
+          heading: 'Happily optional',
           hue: 340,
           [
             PpCard('A temple or a hall',
@@ -1018,14 +1075,14 @@ final PpArea _firstMeal = PpArea(
                 'the same.'),
             PpCard('Twenty relatives each feeding a spoon',
                 'Two is a ceremony. Twenty is a lot of sugar and a lot of '
-                'hands near her mouth.'),
+                'hands near a small mouth.'),
             PpCard('Sweetened kheer specifically',
                 'The grain is the point. Plain rice, ragi or dal water is a '
                 'better first food and is still fully traditional.'),
             PpCard('An exact auspicious month',
-                'If the date lands before she can sit with support, do the '
-                'ceremony symbolically and start real solids when she is '
-                'ready.'),
+                'If the date lands before your baby can sit with support, do '
+                'the ceremony symbolically and start real solids when your baby '
+                'is ready.'),
           ],
         ),
         // REQUIRED_REVIEW: infant feeding claims. To confirm: honey is not to
@@ -1036,36 +1093,35 @@ final PpArea _firstMeal = PpArea(
         // food; food should be lukewarm and tested by the adult first.
         PpCallout(
           'Three rules for the food on the day. No honey, not even a drop, '
-          'until she is one year old. No added salt or sugar in the first '
+          'until your baby is one year old. No added salt or sugar in the first '
           'year. And test the temperature on your own wrist before the spoon '
-          'goes anywhere near her, because kheer holds heat far longer than it '
-          'looks like it does.',
+          'goes near the baby. Kheer holds heat far longer than it '
+          'looks.',
           kind: PpCalloutKind.safety,
           title: 'What goes in the bowl',
         ),
         PpCallout(
-          'If she coughs, gags repeatedly, goes silent and red, or brings up '
-          'the feed forcefully, stop and let her recover sitting upright. '
-          'Talk to your doctor before the ceremony if she was premature, has '
-          'reflux, has had trouble swallowing, or has not started solids yet '
-          'at seven months. A paediatrician can tell you in one visit whether '
-          'she is ready.',
+          'If your baby coughs, gags again and again, goes silent and red, or '
+          'brings up the feed forcefully, stop and let the baby recover sitting '
+          'upright. Talk to your doctor before the ceremony if your baby was '
+          'premature, has reflux, has had trouble swallowing, or has not started '
+          'solids yet at seven months. A paediatrician can tell you in one visit '
+          'whether your baby is ready.',
           kind: PpCalloutKind.doctor,
-          title: 'If feeding does not go smoothly',
+          title: 'If feeding doesn\'t go smoothly',
         ),
         PpIndiaNote('If your family fixes the date by the panchang and it '
-            'falls at five months, the middle ground almost everyone accepts '
-            'is a symbolic touch of the spoon on the day, and the first real '
-            'meals started at six months. You keep the date and she keeps her '
-            'gut.'),
+            'falls at five months, there\'s a middle ground almost everyone '
+            'accepts. Touch the spoon to the lips on the day, and start real '
+            'meals at six months. The date is kept, and so is a happy tummy.'),
         PpVideoSlot(
-          title: 'An annaprashan, and the first spoon',
-          subtitle: 'How the ceremony runs, and how to hold and feed her '
+          title: 'A first rice feeding, and the first spoon',
+          subtitle: 'How the ceremony runs, and how to hold and feed your baby '
               'safely during it.',
           minutes: '7 MIN',
           slotId: 'traditions/annaprashan',
         ),
-        PpLink('What to actually feed, on the day and after',
+        PpLink('What to feed, on the day and after',
             pageId: 'annaprashan_food'),
         PpLink('Starting solids, step by step',
             surfaceId: 'pp_feeding',
@@ -1081,20 +1137,20 @@ final PpArea _firstMeal = PpArea(
     ),
     PpPage(
       id: 'annaprashan_food',
-      title: 'What to actually feed, on the day and after',
+      title: 'What to feed, on the day and after',
       subtitle: 'The ceremony food, and the real food that follows it',
       format: 'CARDS',
       blocks: [
-        PpIntro('The ceremony gives her one spoon. The weeks after it are the '
-            'part that actually feeds her. Here is what suits a six month old, '
-            'and the short list of things that genuinely should not go in the '
+        PpIntro('The ceremony is one spoonful. The real feeding happens in '
+            'the weeks after it. Here is what suits a six month old, and the '
+            'short list of things that must stay out of the '
             'bowl.'),
         PpCards(
           heading: 'Good first foods, all of them traditional',
           hue: 96,
           [
             PpCard('Plain rice, cooked soft and mashed',
-                'The classic annaprashan food, and a fine first food. Thin it '
+                'The classic first rice feeding food, and a fine first food. Thin it '
                 'with dal water or milk.'),
             PpCard('Ragi porridge',
                 'Iron and calcium, easy to digest, and what most of south '
@@ -1117,7 +1173,7 @@ final PpArea _firstMeal = PpArea(
         // nuts, whole grapes, popcorn and hard raw pieces as choking hazards;
         // water in more than sips before 6 months.
         PpCards(
-          heading: 'Not before her first birthday',
+          heading: 'Not before the first birthday',
           hue: 8,
           [
             PpCard('Honey',
@@ -1125,8 +1181,8 @@ final PpArea _firstMeal = PpArea(
                 'a baby\'s gut cannot yet handle, and infant botulism is '
                 'serious. This includes honey in kheer and honey on a soother.'),
             PpCard('Added salt',
-                'Her kidneys are not ready for it. Cook her portion out before '
-                'you salt the family pot.'),
+                'A baby\'s kidneys aren\'t ready for it. Take the baby\'s portion '
+                'out before you salt the family pot.'),
             PpCard('Added sugar',
                 'Not needed, and it trains a preference early. Fruit is sweet '
                 'enough.'),
@@ -1140,10 +1196,10 @@ final PpArea _firstMeal = PpArea(
           ],
         ),
         PpCallout(
-          'Give food in small amounts at first and introduce one new thing '
-          'every two or three days, so that if something disagrees with her '
-          'you know what it was. Always seated upright, always with an adult '
-          'watching, never in a moving car or a rocking cradle.',
+          'Start with small amounts, and bring in one new food every two or '
+          'three days. That way, if something disagrees, you know which food '
+          'it was. Always seated upright, always with an adult watching, '
+          'never in a moving car or a rocking cradle.',
           kind: PpCalloutKind.safety,
           title: 'How to introduce anything new',
         ),
@@ -1158,19 +1214,19 @@ final PpArea _firstMeal = PpArea(
           title: 'Signs of a food reaction',
         ),
         PpCallout(
-          'Rice water or dal water instead of milk is not a step up. Until she '
-          'is one, milk still carries most of her nutrition and solids are '
-          'practice and iron. Do not cut feeds to make room for food.',
+          'Rice water or dal water in place of milk is not a step up. Until '
+          'the first birthday, milk still carries most of the nutrition, and '
+          'solids are practice and iron. Don\'t cut feeds to make room for food.',
           kind: PpCalloutKind.myth,
           title: '"Solids started, so reduce the milk"',
         ),
-        PpIndiaNote('If the kheer for the ceremony is being made by a '
-            'grandmother, ask for her portion to be lifted out before the '
-            'sugar and honey go in. It is an easy sentence to say in advance '
-            'and an awkward one to say in front of everyone on the day.'),
+        PpIndiaNote('If a grandmother is making the kheer for the ceremony, '
+            'ask for the baby\'s portion to be lifted out before the sugar and '
+            'honey go in. It\'s an easy thing to ask in advance, and an awkward '
+            'one to say in front of everyone on the day.'),
         PpLink('Starting solids, step by step', surfaceId: 'pp_feeding'),
-        PpLink('Recipes matched to her age', surfaceId: 'pp_food'),
-        PpLink('Annaprashan, the ceremony itself', pageId: 'annaprashan'),
+        PpLink('Recipes matched to your baby\'s age', surfaceId: 'pp_food'),
+        PpLink('The first rice feeding, the ceremony itself', pageId: 'annaprashan'),
       ],
     ),
   ],
@@ -1184,7 +1240,7 @@ final PpArea _milestones = PpArea(
   id: 'milestones',
   mark: IntentMark.stepsMark,
   title: 'Hair, ears and the first birthday',
-  blurb: 'Mundan, ear piercing, the first birthday, and the first letters.',
+  blurb: 'The head shaving, ear piercing, the first birthday, and the first letters.',
   hue: 268,
   pages: [
     // -------------------------------------------------------------------------
@@ -1192,23 +1248,23 @@ final PpArea _milestones = PpArea(
     // -------------------------------------------------------------------------
     PpPage(
       id: 'mundan',
-      title: 'Mundan, the first head shaving',
+      title: 'The first head shaving (mundan)',
       subtitle: 'Usually in the first or third year',
       format: 'CEREMONY',
       blocks: [
-        PpIntro('Mundan is the ceremony where a child\'s birth hair is shaved '
+        PpIntro('The head shaving (mundan) is the ceremony where a child\'s birth hair is shaved '
             'off for the first time. It is done at home, at a temple or at a '
-            'family shrine, and it is over in about ten minutes of actual '
-            'shaving.'),
+            'family shrine, and the shaving itself is over in about ten '
+            'minutes.'),
         PpArticle(
           heading: 'What it is',
           [
             'Birth hair is treated as belonging to the time before, and '
             'removing it marks a fresh start. In many families the hair is '
             'then offered at a temple or a river, or buried under a tree.',
-            'It is also, practically, a toddler having his head shaved by a '
+            'In practice, it is also a toddler having a head shave from a '
             'stranger while a crowd watches. Almost every child cries. That is '
-            'expected, it is not a bad omen, and it is not a reflection on '
+            'expected. It isn\'t a bad omen, and it says nothing about '
             'anybody.',
           ],
         ),
@@ -1234,20 +1290,20 @@ final PpArea _milestones = PpArea(
                 'Home, temple or a known salon. Ask about the blade before you '
                 'book, not on the day.'),
             PpStep('The child is fed and rested first',
-                'A hungry or tired toddler and a razor near his scalp is the '
-                'worst possible combination. Go after a nap.'),
-            PpStep('He sits on a lap, usually facing the parent',
-                'Held firmly and calmly, chest to chest, so his head is still '
-                'and he can hide his face.'),
+                'A hungry or tired toddler and a razor near the scalp are a '
+                'hard mix. Go after a nap.'),
+            PpStep('Your child sits on a lap, usually facing the parent',
+                'Held firmly and calmly, chest to chest. The head stays still, '
+                'and your child can hide against you.'),
             PpStep('A short blessing is said, and a first symbolic snip is '
                 'taken',
                 'Often by a grandfather or the maternal uncle.'),
             PpStep('The barber shaves the head',
                 'A fresh blade, opened in front of you. Five to ten minutes.'),
             PpStep('The head is washed and the hair collected',
-                'Lukewarm water. Check for nicks while you dry him.'),
+                'Lukewarm water. Check for nicks as you pat the head dry.'),
             PpStep('The hair is offered or buried, and sweets are shared',
-                'Then get him out of the crowd and let him recover.'),
+                'Then take your child away from the crowd for some calm.'),
           ],
         ),
         PpCards(
@@ -1258,25 +1314,25 @@ final PpArea _milestones = PpArea(
                 'Ask. The difference between one who does and one who does not '
                 'is the difference between five minutes and forty.'),
             PpCard('A fresh, sealed blade',
-                'Opened in front of you. This is not a preference, it is the '
-                'one non negotiable of the day.'),
+                'Opened in front of you. This is the one thing on the day you '
+                'never bend on.'),
             PpCard('Lukewarm water and a soft towel',
                 'For washing the head afterwards and checking it as you dry '
-                'him.'),
+                'it.'),
             PpCard('A cap or a soft cotton scarf for afterwards',
                 'A bare scalp burns fast in Indian sun.'),
             PpCard('Something distracting',
-                'A favourite snack, a song he likes, a phone if that is what '
-                'works. Nobody is judging on mundan day.'),
+                'A favourite snack, a loved song, a phone if that is what '
+                'works. Nobody is judging on the day of the head shaving.'),
             PpCard('A small pouch for the hair, if you are keeping it',
                 'Many families offer it, bury it, or keep a lock of it. All '
                 'three are done.'),
           ],
         ),
-        PpCallout('What actually matters is a clean blade, a still head and a '
-            'child who is fed and rested. The temple, the outfit and the '
-            'photographs are all optional, and a mundan done by a local barber '
-            'at home is exactly as complete as one at a famous temple.'),
+        PpCallout('What matters is a clean blade, a still head and a child '
+            'who is fed and rested. The temple, the outfit and the photographs '
+            'are all optional. A head shaving done by a local barber at home is '
+            'exactly as complete as one at a famous temple.'),
         // REQUIRED_REVIEW: shaving hygiene. Claims to confirm: a reused or
         // unsterilised blade carries a risk of bloodborne infection including
         // hepatitis B, hepatitis C and HIV, and of tetanus through a scalp
@@ -1285,43 +1341,43 @@ final PpArea _milestones = PpArea(
         PpCallout(
           'One blade, one child, opened in front of you. A reused or wiped '
           'down blade can pass on infections through a small scalp nick, and '
-          'scalp nicks are common. If a barber is reluctant to open a new '
-          'blade in front of you, do not use him. Check that his routine '
-          'tetanus shots are up to date before the day.',
+          'scalp nicks are common. If a barber won\'t open a new blade in '
+          'front of you, find another barber. Check that your child\'s '
+          'routine tetanus shots are up to date before the day.',
           kind: PpCalloutKind.safety,
           title: 'The blade is the whole safety question',
         ),
         PpCallout(
-          'After a mundan, keep the scalp out of direct sun and leave any '
-          'small nicks alone, clean and dry. See a doctor if a cut becomes '
-          'red, swollen, warm or starts to ooze, if he develops a fever in the '
-          'following days, or if a cut is deep or will not stop bleeding. Do '
-          'not put ash, turmeric, oil or any paste on a fresh cut.',
+          'After the head shaving, keep the scalp out of direct sun, and leave small '
+          'nicks alone, clean and dry. See a doctor if a cut turns red, '
+          'swollen or warm, or starts to ooze. See one too for a fever in the '
+          'following days, or a cut that is deep or won\'t stop bleeding. Don\'t '
+          'put ash, turmeric, oil or any paste on a fresh cut.',
           kind: PpCalloutKind.doctor,
-          title: 'If a nick does not settle',
+          title: 'If a nick doesn\'t settle',
         ),
         PpCallout(
           'Shaving a baby\'s head does not make the hair grow back thicker, '
           'darker or faster. Hair thickness is set by the follicle, and the '
           'new hair only looks coarser because it comes back with a blunt cut '
-          'end. Do the mundan for the meaning if you want to, and do not do it '
-          'for the hair.',
+          'end. Do the head shaving for its meaning if you want to, but not for the '
+          'hair.',
           kind: PpCalloutKind.myth,
           title: '"It will grow back thicker"',
         ),
-        PpIndiaNote('If your family is set on a particular temple and the '
-            'queue is four hours in May heat, the usual compromise is a first '
-            'symbolic snip at the temple and the actual shave at home in the '
-            'evening. Nobody has ever objected to that once it is done.'),
+        PpIndiaNote('Your family may be set on a particular temple, with a '
+            'four hour queue in May heat. The usual middle path is a first '
+            'symbolic snip at the temple, and the full shave at home in the '
+            'evening. Families are almost always happy with it afterwards.'),
         PpVideoSlot(
-          title: 'A mundan, and how to hold him through it',
-          subtitle: 'The hold that keeps his head still, and the blade check.',
+          title: 'The head shaving, and how to hold your child through it',
+          subtitle: 'The hold that keeps the head still, and the blade check.',
           minutes: '6 MIN',
           slotId: 'traditions/mundan',
         ),
         PpLink('At the ceremony itself: blades, piercing and heat',
             pageId: 'ceremony_day_safety'),
-        PpLink('If your family keeps kesh instead', pageId: 'sikh_naming'),
+        PpLink('If your family keeps uncut hair (kesh) instead', pageId: 'sikh_naming'),
         // [single-source] The fresh-sealed-blade rule lives once, on "On the
         // day: blades, piercing and heat".
         PpLink('The blade rule, once',
@@ -1336,30 +1392,29 @@ final PpArea _milestones = PpArea(
     // -------------------------------------------------------------------------
     PpPage(
       id: 'karnavedha',
-      title: 'Karnavedha, ear piercing',
+      title: 'Ear piercing (karnavedha)',
       subtitle: 'For girls and, in many families, for boys',
       format: 'CEREMONY',
       blocks: [
         PpIntro('Karnavedha is the ear piercing ceremony. Families differ '
-            'enormously on when to do it, from a few weeks old to five years, '
-            'and there is no single right answer. What does matter is how it '
-            'is done.'),
+            'a lot on when to do it, from a few weeks old to five years, and '
+            'there is no single right answer. What matters most is how it is '
+            'done.'),
         PpArticle(
           heading: 'What it is',
           [
-            'Ear piercing is done in most Indian communities for girls and in '
-            'many for boys as well, often on the same day as another ceremony '
-            'to save a second gathering. In the south it is frequently done '
-            'with the mundan or the naming.',
-            'It is a small procedure, not a medical event, but it is a wound. '
-            'The whole difference between an easy piercing and a bad month is '
-            'hygiene and aftercare, so this page spends most of its length '
-            'there.',
+            'Most Indian communities pierce the ears of girls, and many pierce '
+            'boys\' ears as well. It is often done on the same day as another '
+            'ceremony, to save a second gathering. In the south it often goes '
+            'with the head shaving or the naming.',
+            'It is a small procedure, but it still makes a wound. Clean tools '
+            'and good aftercare make the difference between an easy piercing '
+            'and a hard month, so most of this page is about those.',
           ],
         ),
         PpWhenLine('Anywhere from a few weeks to five years, depending on the '
-            'family. Waiting until a child is old enough to keep her hands '
-            'away and tell you if it hurts makes aftercare much easier.'),
+            'family. Aftercare is much easier once a child can leave the '
+            'ears alone and tell you if it hurts.'),
         PpTable(
           heading: 'What it is called where',
           columns: ['Where', 'What it is called'],
@@ -1377,19 +1432,19 @@ final PpArea _milestones = PpArea(
             PpStep('Choose who does it before you choose the date',
                 'A paediatrician, a clinic, or a jeweller or piercer known for '
                 'sterile technique. Many paediatricians will do it, and that '
-                'is the easiest way to be sure.'),
+                'is the easiest way to feel sure.'),
             PpStep('Check what is being used',
                 'A sterile single use needle, or a sealed sterile cartridge. '
                 'Gloves. Skin cleaned first. A reusable gun barrel that is '
                 'only wiped between customers is the version to avoid.'),
-            PpStep('Feed her first and go after a nap',
+            PpStep('Feed your child first and go after a nap',
                 'A calm child is a still child, and stillness is what keeps '
                 'the holes even.'),
-            PpStep('Hold her firmly and hand her straight to you afterwards',
-                'Chest to chest. It is over in seconds and the crying stops '
+            PpStep('Hold your child firmly, and take a cuddle straight after',
+                'Chest to chest. It is over in seconds, and the crying stops '
                 'faster than you expect.'),
             PpStep('Plain gold or medical grade studs go in',
-                'Small, light, flat backed. Not heavy jhumkas and not a wire '
+                'Small, light, flat backed. Not heavy hanging earrings and not a wire '
                 'thread that can catch.'),
             PpStep('Clean twice a day and do not remove the studs early',
                 'Follow whatever the piercer or doctor tells you. Usually '
@@ -1409,14 +1464,14 @@ final PpArea _milestones = PpArea(
             PpCard('Saline or the cleaning solution you are given',
                 'Twice a day for four to six weeks, or whatever the piercer '
                 'or doctor tells you.'),
-            PpCard('Clean hands, every single time you touch her ears',
-                'This is the whole of aftercare. Nothing else matters as '
+            PpCard('Clean hands, every time you touch the ears',
+                'This is most of aftercare. Nothing else matters as '
                 'much.'),
             PpCard('Two calm adults',
                 'One to hold, one to comfort. It is a two person job.'),
           ],
         ),
-        PpCallout('What actually matters is sterile equipment, light plain '
+        PpCallout('What matters is sterile equipment, light plain '
             'studs and clean hands for six weeks. The auspicious date, the '
             'gold weight and the ceremony around it are all optional.'),
         // REQUIRED_REVIEW: piercing hygiene and aftercare. Claims to confirm:
@@ -1425,39 +1480,38 @@ final PpArea _milestones = PpArea(
         // an infant, and that piercing on infected or broken skin should wait.
         // Also confirm the tetanus immunisation point.
         PpCallout(
-          'Delay the piercing if she is unwell, if the ear skin is broken or '
-          'infected, or if her routine immunisations are behind. Do not let '
-          'anyone pierce with a sewing needle, a thorn, a reused stud, or a '
-          'gun barrel that has only been wiped. Keep her hair, dupattas and '
-          'her own fingers away from the studs while they heal.',
+          'Delay the piercing if your child is unwell, if the ear skin is '
+          'broken or infected, or if routine immunisations are not up to date. '
+          'Don\'t let anyone pierce with a sewing needle, a thorn, a reused '
+          'stud, or a gun barrel that has only been wiped. Keep hair, dupattas '
+          'and little fingers away from the studs while they heal.',
           kind: PpCalloutKind.safety,
           title: 'When to wait, and what to refuse',
         ),
         PpCallout(
-          'See a doctor if an ear becomes red and swollen, feels hot, oozes '
-          'yellow or green, if she develops a fever, or if a stud sinks into '
-          'the earlobe. A stud that has embedded needs a doctor to remove it, '
-          'not a family member with tweezers. Raised lumpy scarring, called a '
-          'keloid, also needs a doctor to look at it early.',
+          'See a doctor if an ear turns red and swollen, feels hot, or oozes '
+          'yellow or green. See one too for a fever, or a stud sinking into '
+          'the earlobe. An embedded stud needs a doctor to remove it, not a '
+          'family member with tweezers. Raised, lumpy scarring (a keloid) '
+          'also needs a doctor to look at it early.',
           kind: PpCalloutKind.doctor,
-          title: 'If an ear does not settle',
+          title: 'If an ear doesn\'t settle',
         ),
         PpCallout(
           'Ear piercing does not improve eyesight, hearing, brain development '
-          'or behaviour. It is a cultural and aesthetic choice, made with love, '
-          'and there is no medical reason either to do it or to avoid it when '
-          'it is done cleanly.',
+          'or behaviour. It is a cultural choice, made with love. Done '
+          'cleanly, there is no medical reason either to do it or to avoid '
+          'it.',
           kind: PpCalloutKind.myth,
-          title: '"Piercing is good for her eyes"',
+          title: '"Piercing is good for the eyes"',
         ),
-        PpIndiaNote('If an elder offers to do it at home with a gold wire, it '
-            'is worth saying yes to the ceremony and no to the method. The '
-            'usual sentence that works: "Let us do the puja at home, and the '
-            'piercing itself at the clinic, and then we do not risk an '
-            'infection during the festival."'),
+        PpIndiaNote('If an elder offers to do it at home with a gold wire, say '
+            'yes to the ceremony and no to the method. A sentence that usually '
+            'works: "Let\'s do the puja at home and the piercing at the clinic. '
+            'Then we don\'t risk an infection during the festival."'),
         PpVideoSlot(
           title: 'Ear piercing, and the six weeks after',
-          subtitle: 'What sterile actually looks like, and how to clean the '
+          subtitle: 'What sterile looks like, and how to clean the '
               'ears at home.',
           minutes: '5 MIN',
           slotId: 'traditions/karnavedha',
@@ -1479,7 +1533,7 @@ final PpArea _milestones = PpArea(
     PpPage(
       id: 'first_birthday',
       title: 'The first birthday',
-      subtitle: 'The modern milestone, and how to keep it hers',
+      subtitle: 'The modern milestone, and how to keep it about your child',
       format: 'CEREMONY',
       blocks: [
         PpIntro('The first birthday is the newest ceremony in this section and '
@@ -1489,17 +1543,17 @@ final PpArea _milestones = PpArea(
           heading: 'What it is now',
           [
             'Traditionally the first year was marked quietly, sometimes with '
-            'the mundan, sometimes with a temple visit and food given away. '
+            'the head shaving, sometimes with a temple visit and food given away. '
             'The themed party with a cake and a photographer arrived in the '
             'last twenty years and is now the default in cities.',
-            'A one year old does not know it is her birthday. She knows there '
-            'are lights, loud music, forty faces and no nap. That is worth '
-            'holding in mind when you plan, because it decides whether the '
-            'photographs show a happy child or a distressed one.',
+            'A one year old doesn\'t know it\'s a birthday. What a one year old '
+            'notices is lights, loud music, forty faces and no nap. Keep that '
+            'in mind as you plan. It decides whether the photos show a happy '
+            'child or an upset one.',
           ],
         ),
         PpWhenLine('At twelve months, or on the nearest weekend, or on the '
-            'tithi rather than the date if your family counts it that way. '
+            'lunar date (tithi) rather than the calendar date if your family counts it that way. '
             'Any of those is correct.'),
         PpCards(
           heading: 'Simple traditions families still keep',
@@ -1518,56 +1572,54 @@ final PpArea _milestones = PpArea(
             PpCard('A handprint or footprint',
                 'Taken every year on the same date. Costs nothing and becomes '
                 'the thing you keep.'),
-            PpCard('Mundan on the same day',
+            PpCard('The head shaving on the same day',
                 'Common, and it saves a second gathering.'),
             PpCard('New clothes and a temple, church or gurdwara visit',
                 'Quiet, short, and easier on a one year old than a hall.'),
           ],
         ),
         PpSteps(
-          heading: 'How to plan it around her, not around the guests',
+          heading: 'How to plan it around your child, not the guests',
           [
-            PpStep('Pick the time from her nap, then tell people',
-                'Late morning or late afternoon. Never the slot that eats her '
-                'nap.'),
+            PpStep('Pick the time around the nap, then tell people',
+                'Late morning or late afternoon. Never the slot that eats into '
+                'the nap.'),
             PpStep('Keep it to about ninety minutes',
-                'Her tolerance for noise and strangers runs out long before '
-                'the buffet does.'),
-            PpStep('Have one quiet room she can be taken to',
+                'A one year old\'s patience for noise and strangers runs out '
+                'long before the buffet does.'),
+            PpStep('Have one quiet room to slip away to',
                 'A bedroom with the lights low. You will use it.'),
-            PpStep('Feed her before the party, properly',
-                'Party food at one year old is mostly sugar and mostly not for '
-                'her.'),
+            PpStep('Give a proper meal before the party',
+                'Party food is mostly sugar, and mostly not meant for a one '
+                'year old.'),
             PpStep('Do the cake early, not at the end',
-                'Get the moment done while she is still fresh.'),
-            PpStep('Let her be held by people she knows',
-                'A passed around baby at the two hour mark is a crying baby.'),
+                'Get the moment done while your child is still fresh.'),
+            PpStep('Keep your child with familiar people',
+                'A baby passed around for two hours is a crying baby.'),
           ],
         ),
-        PpCallout('What actually matters is that she is fed, rested and near '
-            'someone familiar. The theme, the balloon arch, the return gifts '
-            'and the photographer are for the adults, which is allowed, as '
-            'long as you know that is what they are.'),
+        PpCallout('What matters is a child who is fed, rested and near someone '
+            'familiar. The theme, the balloon arch, the return gifts and the '
+            'photographer are for the adults. That\'s allowed, as long as you '
+            'know who they are for.'),
         // REQUIRED_REVIEW: first birthday food and party safety. Claims to
         // confirm: no added sugar in the first year and cake in a tiny taste
         // at most, choking hazards from grapes, nuts, hard sweets and small
         // toy parts, candle and open flame safety, and hearing protection from
         // sustained loud music for infants.
         PpCallout(
-          'Cake is a taste, not a meal, and added sugar is still not '
-          'recommended in the first year. Keep grapes, nuts, hard sweets and '
-          'small toy parts away from the floor she crawls on. Keep candles, '
-          'sparklers and hot food out of her reach. And keep her away from the '
-          'speakers, because sustained loud music is genuinely too much for a '
-          'baby\'s ears.',
+          'Cake is a small taste. Added sugar is still not recommended in the '
+          'first year. Keep grapes, nuts, hard sweets and small toy parts off '
+          'the floor where your baby crawls. Keep candles, sparklers and hot '
+          'food out of reach. And keep your baby away from the speakers, '
+          'because long, loud music is too much for a baby\'s ears.',
           kind: PpCalloutKind.safety,
           title: 'Cake, choking and the speakers',
         ),
-        PpIndiaNote('If the family expectation is two hundred guests and your '
-            'budget is not, the version that works in most families is a small '
-            'ceremony at home in the morning and an open house in the evening '
-            'with tea and mithai. It reads as generous and it costs a '
-            'fraction.'),
+        PpIndiaNote('If the family expects two hundred guests and your budget '
+            'doesn\'t, try what works in most families. Hold a small ceremony '
+            'at home in the morning, and an open house in the evening with tea '
+            'and sweets. It feels generous and costs a fraction.'),
         PpVideoSlot(
           title: 'A first birthday that suits a one year old',
           subtitle: 'Timing, the cake moment, and the quiet room.',
@@ -1577,8 +1629,8 @@ final PpArea _milestones = PpArea(
         PpLink('Make an invite or a birthday card',
             surfaceId: 'pp_memories',
             blurb: 'Pick a template, add a photo, share it on WhatsApp.'),
-        PpLink('What a ceremony actually costs', pageId: 'what_it_costs'),
-        PpLink('Mundan, if you are doing both on the day', pageId: 'mundan'),
+        PpLink('What a ceremony really costs', pageId: 'what_it_costs'),
+        PpLink('The head shaving, if you are doing both on the day', pageId: 'mundan'),
       ],
     ),
 
@@ -1587,7 +1639,7 @@ final PpArea _milestones = PpArea(
     // -------------------------------------------------------------------------
     PpPage(
       id: 'aksharabhyasam',
-      title: 'Aksharabhyasam, the first letters',
+      title: 'The first letters (aksharabhyasam)',
       subtitle: 'The start of learning, usually between two and five',
       format: 'CEREMONY',
       blocks: [
@@ -1603,8 +1655,8 @@ final PpArea _milestones = PpArea(
             'rice, sand or on a slate, and the child repeats it. In many '
             'families it is done at a temple; in many others it is done at the '
             'kitchen table.',
-            'It is a beginning, and beginnings do not have standards. A child '
-            'who scribbles, refuses, or wanders off has still had his '
+            'It is a beginning, and beginnings have no standard to meet. A '
+            'child who scribbles, refuses or wanders off has still had a full '
             'aksharabhyasam.',
           ],
         ),
@@ -1628,11 +1680,11 @@ final PpArea _milestones = PpArea(
           [
             PpStep('A tray of raw rice, or sand, or a slate is set out'),
             PpStep('The child sits on a lap, usually a grandparent\'s'),
-            PpStep('An adult holds his finger and traces a letter',
+            PpStep('An adult holds the child\'s finger and traces a letter',
                 'Often the first letter of the alphabet, or a short syllable, '
                 'traced two or three times.'),
-            PpStep('He is asked to say it aloud',
-                'He may or may not. Either is fine.'),
+            PpStep('Your child is asked to say it aloud',
+                'It may happen, or not. Either is fine.'),
             PpStep('A book, a pencil and sometimes a small sweet are given',
                 'The gift of the first pencil is the part children remember.'),
             PpStep('Blessings, and that is it',
@@ -1646,32 +1698,31 @@ final PpArea _milestones = PpArea(
             PpCard('A tray and raw rice',
                 'Or clean sand, or a slate and chalk. Any of the three.'),
             PpCard('A pencil and a blank notebook',
-                'His own, kept afterwards. This is the keepsake.'),
+                'Your child\'s own, kept afterwards. This is the keepsake.'),
             PpCard('A lap and ten quiet minutes',
-                'Ideally a grandparent\'s lap. That is the part he will '
+                'Ideally a grandparent\'s lap. That is the part children '
                 'remember.'),
             PpCard('Sweets, if the family shares them',
                 'Anything the house makes. This ceremony has never needed a '
                 'caterer.'),
           ],
         ),
-        PpCallout('What actually matters is that an adult he loves sits with '
-            'him and shows him a letter, and that it feels good. Do not turn '
-            'it into a test, do not correct him, and do not let anyone ask him '
-            'to perform for the room.'),
+        PpCallout('What matters is a loved adult sitting close, showing a '
+            'letter, and the moment feeling good. Don\'t turn it into a test, '
+            'don\'t correct, and don\'t let anyone ask your child to perform '
+            'for the room.'),
         PpCallout(
           'This ceremony is not a signal to start formal reading drills. '
-          'Children learn letters at very different ages, and pushing a three '
-          'year old into worksheets after aksharabhyasam is the fastest way to '
-          'make him dislike them. Play, talk and being read to build reading '
-          'far more than tracing does.',
+          'Children learn letters at very different ages. Pushing a three '
+          'year old into worksheets after aksharabhyasam is the quickest way '
+          'to turn a child off them. Play, talk and being read to build '
+          'reading far more than tracing does.',
           kind: PpCalloutKind.myth,
-          title: '"Now he should start learning properly"',
+          title: '"Now the real studying starts"',
         ),
-        PpIndiaNote('If your family is spread out, doing this over a video '
-            'call with a grandparent guiding from the screen while you hold '
-            'his hand works beautifully, and it is what a lot of families '
-            'already do.'),
+        PpIndiaNote('If your family is spread out, try a video call. A '
+            'grandparent guides from the screen while you hold your child\'s '
+            'hand. It works beautifully, and a lot of families already do it.'),
         PpVideoSlot(
           title: 'Aksharabhyasam at home',
           subtitle: 'The rice tray version, in ten minutes.',
@@ -1680,7 +1731,7 @@ final PpArea _milestones = PpArea(
         ),
         PpLink('Play that builds early learning',
             surfaceId: 'pp_activities',
-            blurb: 'Age matched play, and what each one is actually building.'),
+            blurb: 'Age matched play, and what each one is building.'),
         PpLink('Reading with your child', surfaceId: 'pp_read'),
       ],
     ),
@@ -1722,16 +1773,14 @@ final PpArea _otherFaiths = PpArea(
         PpArticle(
           heading: 'What it is',
           [
-            'The most common practice is that on the seventh day the child is '
-            'named, the head is shaved, and an animal is sacrificed with the '
-            'meat divided between the family, relatives and those in need. '
-            'Some families also give the weight of the shaved hair in silver '
-            'to charity.',
-            'Practice varies between schools and between families, and this '
-            'page describes what is commonly done rather than what is '
-            'required. Your family\'s imam or religious guide is the right '
-            'person for the religious questions; this page is the practical '
-            'side.',
+            'Most commonly, on the seventh day the child is named and the head '
+            'is shaved. An animal is sacrificed, and the meat is divided '
+            'between the family, relatives and those in need. Some families '
+            'also give the weight of the shaved hair in silver to charity.',
+            'Practice varies between schools and between families. This page '
+            'describes what is commonly done, not what is required. Your '
+            'family\'s imam or religious guide is the right person for the '
+            'religious questions. This page is the practical side.',
           ],
         ),
         PpWhenLine('Most commonly the seventh day after birth. Many families '
@@ -1766,7 +1815,7 @@ final PpArea _otherFaiths = PpArea(
                 'Meaning matters a great deal in Muslim naming, so it is worth '
                 'looking up before the day.'),
             PpCard('A barber with a fresh sealed blade',
-                'Non negotiable, exactly as for any head shaving.'),
+                'Never skipped, exactly as for any head shaving.'),
             PpCard('Arrangements for the sacrifice, if you are doing it',
                 'Many families now arrange this through a butcher or a '
                 'charity, which is entirely accepted.'),
@@ -1776,28 +1825,28 @@ final PpArea _otherFaiths = PpArea(
                 'A newly shaved scalp needs shade.'),
           ],
         ),
-        PpCallout('What actually matters is the name, the child being welcomed, '
-            'and something being given to people who need it. If money is '
-            'tight, the giving can be small and the meal can be at home. No '
-            'family is failing a child by keeping it modest or by waiting.'),
+        PpCallout('What matters is the name, the welcome, and something given '
+            'to people who need it. If money is tight, the giving can be small '
+            'and the meal can be at home. Keeping it modest, or waiting, takes '
+            'nothing away from your child.'),
         // REQUIRED_REVIEW: newborn head shaving hygiene, same claim as the
         // mundan page: single use sealed blade, risk of bloodborne infection
         // and tetanus through a nick, and shade for a newly shaved scalp.
         PpCallout(
           'A newborn scalp is thin and nicks easily. One fresh sealed blade, '
-          'opened in front of you, and nothing else. Do not let ash, oil, '
-          'turmeric or any paste be put on the shaved head or on a nick, and '
-          'keep the scalp out of direct sun afterwards. If a nick becomes red '
-          'or the baby develops a fever, see a doctor.',
+          'opened in front of you, and nothing else. Don\'t let anyone put ash, '
+          'oil, turmeric or any paste on the shaved head or a nick, and keep '
+          'the scalp out of direct sun afterwards. If a nick turns red or your '
+          'baby gets a fever, see a doctor.',
           kind: PpCalloutKind.safety,
           title: 'Shaving a seven day old head',
         ),
         PpIndiaNote('If the family is spread across cities, many now do the '
-            'naming and shaving at home on the seventh day and the shared meal '
-            'weeks later when everyone can travel. That is a common and '
+            'naming and shaving at home on the seventh day. The shared meal '
+            'comes weeks later, when everyone can travel. That is a common and '
             'accepted split.'),
         PpVideoSlot(
-          title: 'Aqiqah, explained simply',
+          title: 'Aqiqah, in plain words',
           subtitle: 'What the day involves, and the practical arrangements.',
           minutes: '6 MIN',
           slotId: 'traditions/aqiqah',
@@ -1812,7 +1861,7 @@ final PpArea _otherFaiths = PpArea(
         // piercing and heat".
         PpLink('The full newborn-in-a-crowd rule, once',
             pageId: 'ceremony_day_safety',
-            blurb: 'Small group, washed hands, no kissing her face, and the '
+            blurb: 'Small group, washed hands, no kisses on the face, and the '
                 'fever that means a doctor today.'),
       ],
     ),
@@ -1828,13 +1877,13 @@ final PpArea _otherFaiths = PpArea(
         PpArticle(
           heading: 'What it is',
           [
-            'A date is softened, usually chewed or mashed, and a very small '
-            'amount is rubbed gently on the roof of the baby\'s mouth or the '
-            'gums by a respected elder, who then makes a prayer for the child. '
-            'It is a blessing, not a feed.',
+            'A date is softened, usually chewed or mashed. A respected elder '
+            'rubs a very small amount gently on the roof of the baby\'s mouth '
+            'or the gums, then makes a prayer for the child. It is a blessing, '
+            'not a feed.',
             'Practice differs on who does it and how, and families follow '
-            'their own guidance. What follows is the safety side, which is the '
-            'part an app can usefully add.',
+            'their own guidance. What follows is the safety side, which is '
+            'where we can help.',
           ],
         ),
         PpWhenLine('Usually within the first day or two of birth, and often '
@@ -1843,20 +1892,19 @@ final PpArea _otherFaiths = PpArea(
           heading: 'How it is done',
           [
             PpStep('Let the first breastfeed happen first',
-                'Nothing should delay or replace the first feeds. The colostrum '
-                'in those first hours matters more than any custom.'),
+                'Nothing should delay or replace the first feeds. The first '
+                'milk (colostrum) in those early hours matters more than any custom.'),
             PpStep('The date is softened until it is completely smooth',
                 'No lumps, no skin, no piece that could be swallowed whole.'),
             PpStep('Hands are washed thoroughly',
-                'This is the single most important step on this page.'),
+                'This is the most important step on this page.'),
             PpStep('A trace is rubbed on the gums',
                 'A trace, not a spoonful. The baby is held upright and awake.'),
             PpStep('The blessing is said, and it is done'),
           ],
         ),
-        PpCallout('What actually matters is that it is a trace, that hands are '
-            'clean, and that it does not replace a feed. Everything else is '
-            'family practice.'),
+        PpCallout('What matters is a trace, clean hands, and no feed '
+            'replaced. Everything else is family practice.'),
         // REQUIRED_REVIEW: this is the highest priority medical review on the
         // page. Claims to confirm: honey must not be substituted for the date
         // before 12 months because of infant botulism risk; anything placed in
@@ -1864,27 +1912,27 @@ final PpArea _otherFaiths = PpArea(
         // an unwell adult should not do it; nothing should be given that could
         // choke; and nothing should delay or replace early breastfeeding.
         PpCallout(
-          'Never substitute honey for the date. Honey must not be given to a '
-          'baby under one year at all, because it can carry spores that a '
-          'newborn gut cannot handle, and infant botulism is serious. Anyone '
-          'with a cough, cold, mouth ulcer or fever should not do the tahneek. '
-          'Wash hands first, use a trace with no lump in it, and never let it '
-          'delay a feed.',
+          'Never use honey in place of the date. Honey must not be given to a '
+          'baby under one year at all. It can carry spores that a newborn gut '
+          'can\'t handle, and infant botulism is serious. Anyone with a cough, '
+          'cold, mouth ulcer or fever should not do the tahneek. Wash hands '
+          'first, use a trace with no lump in it, and never let it delay a '
+          'feed.',
           kind: PpCalloutKind.safety,
           title: 'Honey is the one real danger here',
         ),
         PpCallout(
           'Call a doctor straight away if a newborn becomes floppy or unusually '
           'weak, has a weak cry, feeds poorly, or is constipated along with any '
-          'of these. Those are the signs that need seeing urgently in a young '
-          'baby, whatever the cause.',
+          'of these. In a young baby, these signs need seeing urgently, '
+          'whatever the cause.',
           kind: PpCalloutKind.doctor,
           title: 'When a newborn needs seeing urgently',
         ),
-        PpIndiaNote('Some families use a little jaggery, sugar water or ghutti '
-            'instead of a date. Those carry their own problems and the safety '
-            'page covers them, so it is worth reading before the day rather '
-            'than arguing about it in the room.'),
+        PpIndiaNote('Some families use a little jaggery, sugar water or herbal drops (ghutti) '
+            'instead of a date. Those carry their own problems, and the safety '
+            'page covers them. Read it before the day, so nobody has to debate '
+            'it in the room.'),
         PpVideoSlot(
           title: 'Tahneek, done safely',
           subtitle: 'The custom, and the three things to check first.',
@@ -1899,7 +1947,7 @@ final PpArea _otherFaiths = PpArea(
         // piercing and heat".
         PpLink('The full newborn-in-a-crowd rule, once',
             pageId: 'ceremony_day_safety',
-            blurb: 'Small group, washed hands, no kissing her face, and the '
+            blurb: 'Small group, washed hands, no kisses on the face, and the '
                 'fever that means a doctor today.'),
       ],
     ),
@@ -1937,8 +1985,8 @@ final PpArea _otherFaiths = PpArea(
                 'Most parishes ask for a short meeting or a preparation class '
                 'first.'),
             PpStep('Choose godparents and confirm the name',
-                'Some churches have requirements about godparents. Ask early '
-                'rather than the week before.'),
+                'Some churches have rules about godparents. Ask early, not '
+                'the week before.'),
             PpStep('The family gathers at the church'),
             PpStep('The priest or pastor blesses the water and says the '
                 'prayers'),
@@ -1963,8 +2011,8 @@ final PpArea _otherFaiths = PpArea(
                 'Traditionally white. A soft white cotton set is completely '
                 'acceptable and far more comfortable than a stiff gown.'),
             PpCard('A shawl or a change of clothes',
-                'She will get wet. A dry layer and a towel in the bag makes '
-                'the difference.'),
+                'There will be some water. A dry layer and a towel in the bag '
+                'make all the difference.'),
             PpCard('A candle, if the church asks you to bring one',
                 'Many parishes provide it. Check when you fix the date.'),
             PpCard('Lunch, of whatever size you want',
@@ -1972,21 +2020,21 @@ final PpArea _otherFaiths = PpArea(
                 'service is the ceremony.'),
           ],
         ),
-        PpCallout('What actually matters is the church, the water, the name '
-            'and the people who promise to look after her. The gown, the hall '
+        PpCallout('What matters is the church, the water, the name, and the '
+            'people who promise to look after your child. The gown, the hall '
             'and the cake are family choices with no religious weight at all.'),
         PpCallout(
-          'Churches can be cold and stone floors colder. Bring a warm layer '
-          'and a towel, ask for lukewarm rather than cold water if your baby '
-          'is very young, and dry her head straight away afterwards. Feed her '
-          'before the service, not during the drive.',
+          'Churches can be cold, and stone floors colder. Bring a warm layer '
+          'and a towel, and ask for lukewarm water if your baby is very young. '
+          'Dry the head straight away afterwards. Feed your baby before the '
+          'service, not during the drive.',
           kind: PpCalloutKind.safety,
-          title: 'Keeping her comfortable during the service',
+          title: 'Keeping your baby comfortable during the service',
         ),
-        PpIndiaNote('In much of Kerala, Goa and the north east the christening '
-            'lunch is the larger event and the service is short. If you want a '
-            'smaller day, the service is not the part to shorten, the lunch '
-            'is, and most families understand that immediately.'),
+        PpIndiaNote('In much of Kerala, Goa and the north east, the christening '
+            'lunch is the bigger event and the service is short. If you want a '
+            'smaller day, shorten the lunch rather than the service. Most '
+            'families understand that straight away.'),
         PpVideoSlot(
           title: 'A christening, start to finish',
           subtitle: 'What happens in the service, and what to bring.',
@@ -2002,13 +2050,13 @@ final PpArea _otherFaiths = PpArea(
         // piercing and heat".
         PpLink('The full newborn-in-a-crowd rule, once',
             pageId: 'ceremony_day_safety',
-            blurb: 'Small group, washed hands, no kissing her face, and the '
+            blurb: 'Small group, washed hands, no kisses on the face, and the '
                 'fever that means a doctor today.'),
       ],
     ),
     PpPage(
       id: 'sikh_naming',
-      title: 'Naam Karan at the Gurdwara, and kesh',
+      title: 'The Sikh naming (Naam Karan), and uncut hair',
       subtitle: 'In Sikh families',
       format: 'CEREMONY',
       blocks: [
@@ -2019,14 +2067,14 @@ final PpArea _otherFaiths = PpArea(
         PpArticle(
           heading: 'What it is',
           [
-            'The family attends the Gurdwara when they are ready, usually in '
-            'the first few weeks. Ardas is said, a hukamnama is read, and the '
-            'family chooses a name starting with that letter. Kaur is added '
-            'for a girl and Singh for a boy, and the name is announced to the '
-            'sangat, who respond with the jaikara.',
-            'It is a warm, short, inexpensive ceremony. Karah prasad is shared '
-            'and often langar follows, which is served to everyone present '
-            'regardless of who they are.',
+            'The family goes to the Gurdwara when ready, usually in the first '
+            'few weeks. Ardas is said, a hukamnama is read, and the family '
+            'chooses a name starting with that letter. Kaur is added for a '
+            'girl and Singh for a boy. The name is announced to the sangat, '
+            'who respond with the jaikara.',
+            'It is a warm, short, inexpensive ceremony. Karah prasad is shared, '
+            'and often langar follows, served to everyone present, whoever '
+            'they are.',
           ],
         ),
         PpWhenLine('When the mother and baby are well enough to attend, '
@@ -2056,48 +2104,48 @@ final PpArea _otherFaiths = PpArea(
                 'Including the baby if you wish, though it is not required for '
                 'an infant.'),
             PpCard('A shortlist of names for several letters',
-                'The most practical preparation there is. You will not know '
-                'the letter until the day.'),
+                'The most useful preparation there is. You won\'t know the '
+                'letter until the day.'),
             PpCard('Ingredients or an offering for karah prasad',
                 'Many families give this. The Gurdwara will tell you what is '
                 'usual there.'),
             PpCard('Nothing else',
-                'This ceremony genuinely requires no purchases.'),
+                'This ceremony needs nothing bought at all.'),
           ],
         ),
-        PpCallout('What actually matters is that the family attends, the '
+        PpCallout('What matters is that the family attends, the '
             'hukamnama is taken, and the child is named. There is no cost '
             'attached to any of it, and no version of this ceremony is more '
             'correct for being larger.'),
         PpArticle(
-          heading: 'Kesh, and why there is no mundan',
+          heading: 'Uncut hair (kesh), and why there is no head shaving',
           [
             'In Sikh practice kesh, uncut hair, is one of the articles of '
             'faith. So there is no head shaving ceremony for a child raised in '
-            'that practice, and a mundan is simply not part of the tradition.',
-            'Practically that means the hair is cared for rather than cut. It '
-            'is combed gently with a kangha, often oiled, and tied in a joora '
-            'on top of the head, covered with a patka once a child is old '
-            'enough. Later, usually around eleven, a Dastar Bandi marks the '
+            'that practice, and a head shaving is not part of the tradition.',
+            'In daily life, the hair is cared for rather than cut. It is '
+            'combed gently with a kangha, often oiled, and tied in a joora on '
+            'top of the head. Once a child is old enough, a patka covers it. '
+            'Later, usually around eleven, a Dastar Bandi marks the '
             'first turban and is a real celebration in its own right.',
             'If your family is Sikh and relatives from another tradition ask '
-            'about a mundan, the answer is simply that this family keeps kesh. '
-            'It is not a gap in the ceremonies; it is one of them.',
+            'about a head shaving, the answer is that this family keeps uncut hair. '
+            'Keeping uncut hair is one of the family\'s ceremonies in itself.',
           ],
         ),
         PpCallout(
-          'A child\'s joora should be tied loosely. Hair pulled tight day '
-          'after day at the same spot can cause soreness and thinning at the '
-          'hairline. Comb gently from the ends upward, oil if it helps, and '
-          'change where the parting sits from time to time.',
+          'Tie a child\'s joora loosely. Hair pulled tight at the same spot, '
+          'day after day, can cause soreness and thinning at the hairline. '
+          'Comb gently from the ends upward, oil if it helps, and move the '
+          'parting now and then.',
           kind: PpCalloutKind.safety,
-          title: 'Caring for a small child\'s kesh',
+          title: 'Caring for a small child\'s uncut hair',
         ),
         PpIndiaNote('Gurdwaras will normally do the naming without an '
             'appointment and without a fee. If someone quotes you a price for '
-            'a Naam Karan, that is not how it works.'),
+            'a Sikh naming, that isn\'t how it works.'),
         PpVideoSlot(
-          title: 'Naam Karan at the Gurdwara',
+          title: 'The Sikh naming at the Gurdwara',
           subtitle: 'The hukamnama, the naming, and what to prepare.',
           minutes: '5 MIN',
           slotId: 'traditions/sikh_naming',
@@ -2106,13 +2154,13 @@ final PpArea _otherFaiths = PpArea(
             surfaceId: 'pp_names',
             blurb: 'Filter by starting letter, which is exactly what this '
                 'ceremony needs.'),
-        PpLink('Mundan, for families who do it', pageId: 'mundan'),
+        PpLink('The head shaving (mundan), for families who do it', pageId: 'mundan'),
         // [single-source] The short line above stays word for word; the full
         // newborn-gathering block lives once, on "On the day: blades,
         // piercing and heat".
         PpLink('The full newborn-in-a-crowd rule, once',
             pageId: 'ceremony_day_safety',
-            blurb: 'Small group, washed hands, no kissing her face, and the '
+            blurb: 'Small group, washed hands, no kisses on the face, and the '
                 'fever that means a doctor today.'),
       ],
     ),
@@ -2133,11 +2181,10 @@ final PpArea _otherFaiths = PpArea(
             'blessing is said, the name is announced, and sweets are shared. '
             'Many families visit the temple with the baby for the first time '
             'on the same day or soon after.',
-            'Jain practice puts weight on restraint and on giving, so the '
-            'ceremonies tend to be deliberately modest and the money often '
-            'goes to daan instead of to the gathering. That is a choice worth '
-            'knowing about if relatives from other traditions expect '
-            'something larger.',
+            'Jain practice values restraint and giving, so the ceremonies '
+            'tend to be modest on purpose. The money often goes to charity '
+            'instead of the gathering. That helps to know if relatives from '
+            'other traditions expect something larger.',
           ],
         ),
         PpArticle(
@@ -2149,9 +2196,9 @@ final PpArea _otherFaiths = PpArea(
             'ceremony performed by priests at home.',
             'The large ceremony in a Parsi childhood comes later. Navjote, the '
             'initiation, is usually held between seven and eleven years old, '
-            'when the child receives the sudreh and kusti. It is worth knowing '
-            'that this is the milestone the family is saving and planning for, '
-            'rather than the first birthday.',
+            'when the child receives the sudreh and kusti. This, rather than '
+            'the first birthday, is the milestone families save and plan '
+            'for.',
           ],
         ),
         PpWhenLine('Jain naming: usually day ten to twelve. Parsi naming: in '
@@ -2167,31 +2214,30 @@ final PpArea _otherFaiths = PpArea(
             PpCard('A clean space at home, or the temple or agiary',
                 'Both traditions are comfortable with a home ceremony.'),
             PpCard('The name, agreed in advance',
-                'Deciding on the morning is the single biggest source of '
-                'ceremony day stress.'),
+                'Deciding on the morning causes more ceremony day stress than '
+                'anything else.'),
             PpCard('Sweets, and something given away',
                 'Giving is central to both, and it is the part nobody regrets '
                 'spending on.'),
           ],
         ),
-        PpCallout('What actually matters in both traditions is the name being '
-            'given and something being shared with others. Both are unusually '
-            'relaxed about scale, which is worth remembering if anyone tells '
-            'you otherwise.'),
+        PpCallout('What matters in both traditions is the name being given '
+            'and something being shared with others. Both are relaxed about '
+            'size, so hold on to that if anyone tells you otherwise.'),
         // REQUIRED_REVIEW: same newborn gathering precautions as the chatti and
         // namkaran pages.
         PpCallout(
           'These are still newborn gatherings. Keep the group small, keep '
-          'anyone unwell away, wash hands before holding her, and no kissing '
-          'her face. If incense or smoke fills the room, open a window and '
-          'take her out of it, because young lungs do not cope with smoke well.',
+          'anyone unwell away, wash hands before holding your baby, and no '
+          'kisses on the face. If incense or smoke fills the room, open a '
+          'window and take your baby out. Young lungs don\'t cope well with smoke.',
           kind: PpCalloutKind.safety,
           title: 'For any newborn ceremony at home',
         ),
         PpIndiaNote('If your community is small in your city, ask the local '
             'derasar or agiary rather than searching online. Practice varies a '
-            'lot between communities, and the people there will tell you '
-            'exactly what is done locally.'),
+            'lot between communities, and the people there can tell you '
+            'what is done locally.'),
         PpVideoSlot(
           title: 'Jain and Parsi welcomes',
           subtitle: 'What each involves, and what is prepared beforehand.',
@@ -2207,7 +2253,7 @@ final PpArea _otherFaiths = PpArea(
         // piercing and heat".
         PpLink('The full newborn-in-a-crowd rule, once',
             pageId: 'ceremony_day_safety',
-            blurb: 'Small group, washed hands, no kissing her face, and the '
+            blurb: 'Small group, washed hands, no kisses on the face, and the '
                 'fever that means a doctor today.'),
       ],
     ),
@@ -2218,8 +2264,26 @@ final PpArea _otherFaiths = PpArea(
       title: 'Interfaith families, and doing this far from home',
       subtitle: 'Two traditions in one house, or no pandit, agiary or gurdwara nearby',
       format: 'ARTICLE',
-      comingSoon: true,
-      blocks: [],
+      
+      blocks: [
+        // Written 2026-10-02 (parenting gap analysis), filling the scaffold.
+        // REQUIRED_REVIEW.
+        PpIntro('Many families bring two faiths or traditions into one home, or '
+            'live far from the family temple, gurdwara, agiary, mosque or '
+            'church. Ceremonies can still be meaningful, and often become more '
+            'personal.'),
+        PpArticle(heading: 'Two traditions in one house', [
+          'Some families hold two small ceremonies. Others blend them, with a '
+              'blessing from each side. Talk together first about what matters '
+              'most to each of you, then talk to the grandparents.',
+        ]),
+        PpArticle(heading: 'Far from home', [
+          'Many priests now conduct ceremonies over video call, and community '
+              'associations abroad often help. A grandparent can lead a short '
+              'ritual at home. The heart of most ceremonies is the family\'s '
+              'blessing, which travels anywhere.',
+        ]),
+      ],
     ),
   ],
 );
@@ -2242,14 +2306,14 @@ final PpArea _keepItSmall = PpArea(
   pages: [
     PpPage(
       id: 'what_it_costs',
-      title: 'What a ceremony actually costs',
+      title: 'What a ceremony really costs',
       subtitle: 'Honest ranges, so you can decide before anyone books anything',
       format: 'CHART-CARD',
       blocks: [
-        PpIntro('Nobody publishes this and everybody wants it. Here are the '
-            'realistic ranges for the pieces of a baby ceremony in an Indian '
-            'city, so you can see where the money actually goes before a '
-            'decision gets made for you.'),
+        PpIntro('Everybody wants these numbers and almost nobody shares them. '
+            'Here are realistic ranges for each part of a baby ceremony in an '
+            'Indian city. You can see where the money goes before a decision '
+            'gets made for you.'),
         // REQUIRED_REVIEW: cost figures. These are 2026 metro estimates and
         // need a sanity check before ship. They vary enormously by city, by
         // season and by community, and the copy says so, but a badly wrong
@@ -2258,8 +2322,8 @@ final PpArea _keepItSmall = PpArea(
           title: 'What each piece tends to cost',
           subtitle: 'City ranges. Smaller towns run well below these.',
           rows: [
-            ('Priest dakshina', 'Rs 500 to Rs 2,100'),
-            ('Pooja samagri and flowers', 'Rs 300 to Rs 1,500'),
+            ('The priest\'s fee', 'Rs 500 to Rs 2,100'),
+            ('Prayer items and flowers', 'Rs 300 to Rs 1,500'),
             ('Sweets for a home gathering', 'Rs 500 to Rs 3,000'),
             ('Catering, per plate', 'Rs 350 to Rs 1,200'),
             ('A hall for an afternoon', 'Rs 8,000 to Rs 60,000'),
@@ -2289,31 +2353,31 @@ final PpArea _keepItSmall = PpArea(
           hue: 44,
           [
             PpCard('The guest count',
-                'Every single cost above except the priest scales with it. '
-                'Cutting the list by twenty does more than negotiating '
+                'Every cost above except the priest grows with it. Cutting '
+                'the list by twenty saves more than bargaining over '
                 'everything else.'),
             PpCard('The hall',
-                'Booking a hall usually forces catering, decor and a longer '
-                'event. It is one decision that makes four.'),
+                'Booking a hall usually brings catering, decor and a longer '
+                'event with it. One decision becomes four.'),
             PpCard('Return gifts',
                 'A hundred guests at Rs 300 is Rs 30,000 of things nobody '
                 'remembers.'),
             PpCard('Two ceremonies instead of one',
-                'Mundan with the first birthday, naming with the cradle. '
-                'Combining is traditional, not a shortcut.'),
+                'Head shaving with the first birthday, naming with the cradle. '
+                'Combining them is traditional too.'),
             PpCard('Same day decisions',
                 'Everything bought on the morning costs more. Decide the list '
                 'a week ahead.'),
           ],
         ),
-        PpCallout('Please do not borrow money for a baby ceremony. There is no '
-            'tradition in this country that asks a family to go into debt to '
-            'welcome a child, and every one of these ceremonies has a version '
-            'that costs almost nothing.'),
-        PpIndiaNote('If relatives are contributing, agree who is paying for '
-            'what before anything is booked. The most common ceremony fight in '
-            'Indian families is not about the ritual, it is about an assumed '
-            'contribution that never got said out loud.'),
+        PpCallout('Please don\'t borrow money for a baby ceremony. No tradition '
+            'in this country asks a family to go into debt to welcome a child. '
+            'Every one of these ceremonies has a version that costs almost '
+            'nothing.'),
+        PpIndiaNote('If relatives are chipping in, agree who pays for what '
+            'before anything is booked. In Indian families, the most common '
+            'ceremony fight is over money someone assumed would come, and '
+            'nobody said out loud.'),
         PpLink('How to keep it small', pageId: 'keeping_it_small'),
         PpLink('What to say when family wants it bigger',
             pageId: 'family_pressure'),
@@ -2336,8 +2400,8 @@ final PpArea _keepItSmall = PpArea(
           heading: 'The one hour version, for any ceremony',
           [
             PpStep('Fix the guest list first, before the date',
-                'Grandparents, siblings, the two or three people who have '
-                'actually helped you this month. That is the list.'),
+                'Grandparents, siblings, and the two or three people who have '
+                'helped you this month. That is the list.'),
             PpStep('Do it at home, in the morning',
                 'Morning ceremonies end. Evening ones stretch, and stretching '
                 'is what costs money.'),
@@ -2345,8 +2409,8 @@ final PpArea _keepItSmall = PpArea(
                 'The naming, the first spoon, the cradle. That is the '
                 'ceremony. The rest is a gathering.'),
             PpStep('Serve one thing well',
-                'Chai and good mithai, or one hot dish. A buffet is a decision '
-                'you can simply not make.'),
+                'Chai and good sweets, or one hot dish. You can skip the buffet '
+                'altogether.'),
             PpStep('Skip printed invites',
                 'A card made on your phone, sent on WhatsApp, is now normal '
                 'even for large weddings.'),
@@ -2354,8 +2418,8 @@ final PpArea _keepItSmall = PpArea(
                 'Give one person that job. You will get better candid pictures '
                 'than a stranger takes.'),
             PpStep('Plan the ending',
-                'Say the finish time on the invite. Ceremonies that do not '
-                'announce an end do not have one.'),
+                'Put the finish time on the invite. Without one, ceremonies '
+                'tend to run on and on.'),
           ],
         ),
         PpTable(
@@ -2371,19 +2435,19 @@ final PpArea _keepItSmall = PpArea(
             ['New clothes for the adults', 'Something new for the baby'],
           ],
         ),
-        PpCallout('A small ceremony is not a compromised ceremony. The ritual '
-            'is identical, the blessing is identical, and the child does not '
-            'know the difference. The only thing that changes is who watches.'),
+        PpCallout('A small ceremony is a full ceremony. The ritual is the '
+            'same, the blessing is the same, and your child won\'t know the '
+            'difference. Only the number of people watching changes.'),
         PpCards(
-          heading: 'Small versions that families genuinely love',
+          heading: 'Small versions that families love',
           hue: 44,
           [
             PpCard('Naming at home, over a video call',
                 'Grandparents joining from another city, the name whispered '
                 'and announced. Common now and it works.'),
-            PpCard('Annaprashan at the kitchen table',
+            PpCard('The first rice feeding at the kitchen table',
                 'Grandfather, one spoon, three people, twenty photographs.'),
-            PpCard('Mundan at home in the evening',
+            PpCard('Head shaving at home in the evening',
                 'The barber comes to you, the child is calmer, and there is no '
                 'queue.'),
             PpCard('First birthday as a breakfast',
@@ -2394,11 +2458,10 @@ final PpArea _keepItSmall = PpArea(
                 'instead of return gifts.'),
           ],
         ),
-        PpIndiaNote('If you are the daughter in law and this is not your call '
-            'to make alone, the move that works is to offer a specific '
-            'alternative rather than a refusal. "Let us do it at home on '
-            'Sunday morning and I will make sure everyone gets fed properly" '
-            'lands very differently from "I do not want a big function".'),
+        PpIndiaNote('If you\'re the daughter in law and this isn\'t your call '
+            'alone, offer a clear alternative rather than a refusal. "Let\'s do '
+            'it at home on Sunday morning, and I\'ll make sure everyone eats '
+            'well" lands very differently from "I don\'t want a big function".'),
         PpVideoSlot(
           title: 'A complete ceremony in one hour, at home',
           subtitle: 'A real family doing the small version, start to finish.',
@@ -2407,7 +2470,7 @@ final PpArea _keepItSmall = PpArea(
         ),
         PpLink('What to say when family wants it bigger',
             pageId: 'family_pressure'),
-        PpLink('What a ceremony actually costs', pageId: 'what_it_costs'),
+        PpLink('What a ceremony really costs', pageId: 'what_it_costs'),
       ],
     ),
     PpPage(
@@ -2416,23 +2479,23 @@ final PpArea _keepItSmall = PpArea(
       subtitle: 'The exact words, for the conversations that are hard',
       format: 'SCRIPT BOX',
       blocks: [
-        PpIntro('Most ceremony stress is not about the ceremony. It is about '
-            'one conversation that nobody wants to start. Here are lines that '
-            'work, written to keep the relationship intact rather than to win.'),
+        PpIntro('Most ceremony stress comes from one conversation that nobody '
+            'wants to start. Here are lines that work. They are written to '
+            'keep the relationship close, rather than to win.'),
         PpScript(
           heading: 'When the guest list keeps growing',
           [
             PpScriptLine(
-              say: 'We want to keep it to family this time, because she is '
-                  'still so small. Let us do a bigger celebration at her '
-                  'birthday.',
+              say: 'We want to keep it to family this time, because the baby '
+                  'is still so small. Let\'s have a bigger celebration on the '
+                  'first birthday.',
               notThis: 'We are not inviting all those people.',
               why: 'It gives a reason that is about the baby, not about them, '
                   'and it offers a future occasion instead of a closed door.',
             ),
             PpScriptLine(
-              say: 'The doctor has said to keep gatherings small until her '
-                  'vaccinations are done. We are just being careful.',
+              say: 'The doctor has said to keep gatherings small until the '
+                  'baby\'s vaccinations are done. We are just being careful.',
               notThis: 'It is not safe, obviously.',
               why: 'A doctor is a neutral third party. Elders rarely argue '
                   'with one, and it takes the disagreement out of the family.',
@@ -2448,15 +2511,15 @@ final PpArea _keepItSmall = PpArea(
                   'most?',
               notThis: 'We cannot afford it.',
               why: 'Naming a number and asking for help turns a refusal into a '
-                  'shared decision, and elders almost always choose the ritual '
-                  'over the decor.',
+                  'shared decision. Elders almost always choose the ritual over '
+                  'the decor.',
             ),
             PpScriptLine(
-              say: 'We would rather put that money into her name than into a '
-                  'hall for one afternoon.',
+              say: 'We would rather put that money aside for the baby than '
+                  'into a hall for one afternoon.',
               notThis: 'That is a waste of money.',
-              why: 'It reframes the small version as a considered choice, '
-                  'which it is, instead of a shortfall.',
+              why: 'It shows the small version as a thought-through choice, '
+                  'which it is, and not as falling short.',
             ),
           ],
         ),
@@ -2475,18 +2538,18 @@ final PpArea _keepItSmall = PpArea(
               say: 'The paediatrician was very clear about no honey before one '
                   'year. Can we use a little dates paste instead? Everything '
                   'else stays the same.',
-              notThis: 'You cannot give her that, it is dangerous.',
-              why: 'It names the authority, offers a substitute, and keeps the '
-                  'grandmother\'s role in the ritual intact, which is usually '
-                  'what she is actually protecting.',
+              notThis: 'You cannot give the baby that, it is dangerous.',
+              why: 'It names the doctor, offers a swap, and keeps the '
+                  'grandmother\'s place in the ritual. That place usually '
+                  'matters most to the grandmother.',
             ),
             PpScriptLine(
-              say: 'We have stopped the kajal because the doctor found lead in '
+              say: 'We have stopped the kohl because the doctor found lead in '
                   'the ones sold in the market. I know it is not what we grew '
                   'up with.',
               notThis: 'That stuff is poison, why would you put it on a baby.',
               why: 'It blames the product, not the person offering it, and it '
-                  'acknowledges that the custom came from love.',
+                  'honours the love the custom came from.',
             ),
           ],
         ),
@@ -2494,21 +2557,21 @@ final PpArea _keepItSmall = PpArea(
           heading: 'When the date does not work for you',
           [
             PpScriptLine(
-              say: 'That week is too soon for her, but the following Sunday '
-                  'works for us and we would love your help organising it.',
+              say: 'That week is too soon for the baby, but the following Sunday '
+                  'works for us, and we would love your help organising it.',
               notThis: 'We cannot do that date.',
               why: 'An alternative plus an invitation to help is almost never '
                   'refused. A flat no almost always is.',
             ),
           ],
         ),
-        PpCallout('If a conversation is going badly, stop it rather than '
-            'finish it. "Let me think about it and we will talk tomorrow" is a '
-            'complete sentence, and most ceremony arguments settle themselves '
+        PpCallout('If a conversation is going badly, pause it rather than '
+            'push through. "Let me think about it and we\'ll talk tomorrow" is '
+            'enough. Most ceremony arguments settle '
             'overnight.'),
-        PpIndiaNote('Get your partner to say the difficult line to their own '
-            'parents. It is not fair, it is not modern, and it works better '
-            'than anything else on this page.'),
+        PpIndiaNote('Ask your partner to say the difficult line to their own '
+            'parents. It may not feel fair, but it works better than anything '
+            'else on this page.'),
         PpLink('How to keep it small', pageId: 'keeping_it_small'),
         PpLink('Customs done with love that are not safe',
             pageId: 'newborn_customs'),
@@ -2522,24 +2585,81 @@ final PpArea _keepItSmall = PpArea(
       title: 'If you would rather not do a ceremony at all',
       subtitle: 'Yes, that is alright. And how to hold the line kindly',
       format: 'SHORT ARTICLE',
-      comingSoon: true,
-      blocks: [],
+      
+      blocks: [
+        // Written 2026-10-02 (parenting gap analysis), filling the scaffold.
+        // REQUIRED_REVIEW.
+        // ⚠️ THE BRIEF ASKS FOR THE USER'S SIGN-OFF ON TONE BEFORE THIS SHIPS.
+        PpIntro('Some families choose not to hold a naming, head shaving or other '
+            'ceremony, for reasons of faith, money, health, distance or plain '
+            'preference. Yes, that is alright. A ceremony that doesn\'t happen '
+            'does your baby no harm.'),
+        PpArticle([
+          'Traditions are meant to bring a family together, not weigh on it. '
+              'You can mark the moment in a smaller way: a quiet prayer at home, a '
+              'meal with grandparents, a photo and a letter to your baby. Or '
+              'nothing at all.',
+          'When relatives disagree, it often comes from love and worry. Listening '
+              'first, then explaining kindly, usually works better than arguing.',
+        ]),
+        PpScript(heading: 'Words that hold the line kindly', [
+          PpScriptLine(
+              say: 'We have decided to keep it very simple this time. We would love '
+                  'you to come for lunch and bless the baby.',
+              notThis: 'We do not believe in all that.',
+              why: 'Inviting them in keeps the relationship warm.'),
+          PpScriptLine(
+              say: 'Maybe we will do it later, when the baby is a little older.',
+              why: 'Leaving a door open often ends the pressure.'),
+        ]),
+      ],
     ),
     PpPage(
       id: 'someone_elses_ceremony',
       title: 'Going to someone else\'s baby\'s ceremony',
-      subtitle: 'What to gift, the shagun, what to wear, whether to bring your own baby',
+      subtitle: 'What to gift, the gift money, what to wear, whether to bring your own baby',
       format: 'CARDS',
-      comingSoon: true,
-      blocks: [],
+      
+      blocks: [
+        // Written 2026-10-02 (parenting gap analysis), filling the scaffold.
+        // REQUIRED_REVIEW.
+        PpIntro('Going to a cousin\'s or friend\'s baby ceremony is lovely, and a '
+            'little planning helps when you are taking your own baby.'),
+        PpCards([
+          PpCard('The gift', 'Clothes a size bigger, a book, a silver item, or '
+              'gift money (shagun) in an envelope with an odd amount, like 501 or 1,101.'),
+          PpCard('What to wear', 'Comfortable traditional clothes. If you are '
+              'feeding, something that opens easily.'),
+          PpCard('Your own baby', 'Go at a quiet time, keep away from smoke and '
+              'crowds, and leave before your baby gets overtired.'),
+          PpCard('Holding the new baby', 'Wash your hands first, and wait to be '
+              'offered.'),
+        ]),
+      ],
     ),
     PpPage(
       id: 'twins_adopted_second',
       title: 'Twins, an adopted baby, or the second child',
       subtitle: 'No rule, and no debt',
       format: 'CARDS',
-      comingSoon: true,
-      blocks: [],
+      
+      blocks: [
+        // Written 2026-10-02 (parenting gap analysis), filling the scaffold.
+        // REQUIRED_REVIEW.
+        PpIntro('There is no rule and no debt. Every family fits traditions to '
+            'its own life. A ceremony is about welcoming a child, whatever the '
+            'way home and whatever the birth order.'),
+        PpCards([
+          PpCard('Twins', 'Many families hold one ceremony for both, with each baby '
+              'named in turn. It halves the cost and the tiredness.'),
+          PpCard('An adopted baby', 'Ceremonies can be held at any age. Many '
+              'families do a naming or welcome when the child comes home.'),
+          PpCard('The second child', 'A smaller ceremony is just as meaningful. '
+              'Give the older child a role, like handing over the plate.'),
+          PpCard('A late ceremony', 'If health, money or distance delayed it, it '
+              'can be done later. Nothing is lost.'),
+        ]),
+      ],
     ),
   ],
 );
@@ -2564,19 +2684,19 @@ final PpArea _notSafe = PpArea(
   id: 'not_safe',
   mark: IntentMark.checkMark,
   title: 'Customs done with love that are not safe',
-  blurb: 'The few that genuinely harm a baby, and what to do instead.',
+  blurb: 'The few that can harm a baby, and what to do instead.',
   hue: 8,
   pages: [
     PpPage(
       id: 'newborn_customs',
-      title: 'On a newborn: kajal, honey and the cord',
-      subtitle: 'Six customs worth stopping, and why',
+      title: 'On a newborn: kohl, honey and the cord',
+      subtitle: 'The customs worth stopping, and why',
       format: 'CARDS',
       blocks: [
-        PpIntro('Almost everything passed down in Indian homes is harmless and '
-            'a lot of it is genuinely good. A short list is not. These are the '
-            'ones worth knowing about, said plainly, with no judgement of '
-            'anyone who has been doing them.'),
+        PpIntro('Almost everything passed down in Indian homes is harmless, '
+            'and a lot of it is good. A short list is not. Here are the ones '
+            'worth knowing about, said plainly, with no judgement of anyone '
+            'who has been doing them.'),
         // [reformat] "add a labelled picture to the visual ones, because these
         // are 'do this, not that' that a photo settles faster than words."
         // Drawn in code; artwork can replace via `PpIllustration.asset`.
@@ -2584,7 +2704,7 @@ final PpArea _notSafe = PpArea(
           kind: PpIllustrationKind.newbornCustoms,
           title: 'The four you can see',
           labels: [
-            PpIllustrationLabel('Kajal', 'Never in the eye. If the family insists on a dot, the sole of the foot or behind the ear, and a fresh stick.'),
+            PpIllustrationLabel('Kohl (kajal)', 'Never in the eye. If the family insists on a dot, the sole of the foot or behind the ear, and a fresh stick.'),
             PpIllustrationLabel('The cord', 'Bare and dry. Nothing on it, folded nappy below it, until it falls off on its own.'),
             PpIllustrationLabel('The swaddle', 'Arms snug, hips and knees free to bend out, frog-leg. Never straight-legged and tight.'),
             PpIllustrationLabel('Head shape', 'It rounds itself. No pressing, no binding, no shaping between pillows.'),
@@ -2593,11 +2713,11 @@ final PpArea _notSafe = PpArea(
         PpArticle([
           'Every custom below is done out of love, usually by a grandmother '
           'who did the same for her own children and saw them grow up fine. '
-          'She is not being careless. The information simply was not available '
-          'when she was doing this, and some of these products are sold '
+          'She isn\'t being careless. This information wasn\'t around when she '
+          'was raising her family. Some of these products are also sold '
           'openly in shops, which makes them look approved.',
-          'So this is a page to read, not a page to hand to someone as proof. '
-          'The words that actually work in the room are on the family '
+          'So this is a page to read, not a page to hand someone as proof. '
+          'The words that work in the room are on the family '
           'conversation page.',
         ]),
         // REQUIRED_REVIEW: kajal / surma lead content. Claims to confirm:
@@ -2606,46 +2726,46 @@ final PpArea _notSafe = PpArea(
         // and it can also block tear ducts and irritate the eye. Confirm the
         // advice to raise past use with a doctor.
         PpCards(
-          heading: 'The eyes: kajal and surma',
+          heading: 'The eyes: kohl (kajal and surma)',
           hue: 8,
           [
             PpCard('What is done',
-                'Kajal is put in or around a baby\'s eyes, and often a dot on '
-                'the cheek or forehead, to protect from nazar and to make the '
-                'eyes look bigger and stronger.'),
+                'Kohl is put in or around a baby\'s eyes, often with a dot on '
+                'the cheek or forehead. It is meant to protect from the evil eye (nazar), and '
+                'to make the eyes look bigger and stronger.'),
             PpCard('Why it is not safe',
-                'Traditional and market kajal and surma have repeatedly been '
+                'Traditional and market kohl products have repeatedly been '
                 'found to contain lead. Lead is absorbed easily by a baby and '
                 'is toxic to a developing brain, and there is no amount of it '
                 'that is considered safe.'),
             PpCard('What to do instead',
                 'Nothing in or near the eyes. If the custom matters to your '
-                'family, a small dot behind the ear or on the sole of the foot '
-                'keeps the tradition and keeps it away from her eyes.'),
+                'family, put a small dot behind the ear or on the sole of the '
+                'foot. That keeps the tradition, well away from the eyes.'),
             PpCard('If you have been using it',
-                'Stop, and mention it at her next visit. Ask the doctor '
+                'Stop, and mention it at the next check-up. Ask the doctor '
                 'whether a lead test is worth doing, especially if it has been '
                 'used daily for months.'),
           ],
         ),
         // REQUIRED_REVIEW: honey and infant botulism, under 12 months.
         PpCards(
-          heading: 'The mouth: honey, ghutti and gripe water',
+          heading: 'The mouth: honey, herbal drops and gripe water',
           hue: 8,
           [
             PpCard('Honey, in any form, before one year',
                 'Honey can carry spores that a baby\'s gut cannot yet handle, '
                 'and infant botulism is a serious illness. This includes honey '
-                'on a finger, in kheer, and on a soother. After her first '
+                'on a finger, in kheer, and on a soother. After the first '
                 'birthday it is fine.'),
-            PpCard('Janam ghutti and unregulated ghutti mixtures',
+            PpCard('Herbal drops (janam ghutti) and other unregulated herbal mixtures',
                 'These are unregulated, the contents vary batch to batch, and '
                 'some have been found to contain heavy metals or opium '
                 'derivatives. A newborn gut does not need any of it.'),
             PpCard('Gripe water',
                 'Widely sold and widely given. There is no good evidence it '
-                'helps colic, some formulations have contained alcohol or '
-                'sugar, and it fills a small stomach that should be taking '
+                'helps colic. Some versions have contained alcohol or sugar, '
+                'and it fills a small stomach that needs '
                 'milk.'),
             PpCard('What to do instead',
                 'For the first six months, breast milk or formula and nothing '
@@ -2663,13 +2783,13 @@ final PpArea _notSafe = PpArea(
           hue: 8,
           [
             PpCard('What is done',
-                'Cow dung, ash, oil, turmeric, kajal or a coin is applied to '
+                'Cow dung, ash, oil, turmeric, kohl or a coin is applied to '
                 'the stump to help it dry and fall off faster.'),
             PpCard('Why it is not safe',
-                'Anything applied to the stump can introduce infection '
-                'directly into the bloodstream, and neonatal tetanus from '
-                'exactly this practice is still seen in India. It is one of '
-                'the most dangerous customs on this page.'),
+                'Anything put on the stump can carry infection straight into '
+                'the bloodstream. Newborn tetanus (neonatal tetanus) from this '
+                'practice is still seen in India. It is one of the most '
+                'dangerous customs on this page.'),
             PpCard('What to do instead',
                 'Nothing on it at all. Keep it clean, dry and open to air, and '
                 'fold the nappy down below it. It falls off on its own, '
@@ -2678,6 +2798,29 @@ final PpArea _notSafe = PpArea(
                 'Redness spreading onto the tummy, swelling, pus, a bad smell, '
                 'bleeding that does not stop, or a fever. Any of these needs a '
                 'doctor the same day.'),
+          ],
+        ),
+        // Added 2026-10-02 from the parenting gap analysis (P1, ADD TO OURS:
+        // What to Expect's amber teething necklace piece). In Indian homes the
+        // same question is the black thread and the taveez, so both are here.
+        // REQUIRED_REVIEW: strangulation and choking risk of neck cords and
+        // beads in infants.
+        PpCards(
+          heading: 'Teething necklaces, black threads and amulets',
+          hue: 8,
+          [
+            PpCard('What is done',
+                'An amber teething necklace, or a black thread or amulet (taveez) tied '
+                'round the neck to soothe teething or ward off the evil eye.'),
+            PpCard('Why it is not safe',
+                'Anything round a baby\'s neck can tighten and strangle, '
+                'especially in sleep, and beads that break off can choke. '
+                'There is no evidence amber eases teething at all.'),
+            PpCard('What to do instead',
+                'If the thread matters to your family, tie it loosely on the '
+                'wrist or ankle, check it daily, and take it off for sleep. '
+                'For teething, a cold, clean teething ring and gentle gum '
+                'rubbing with a clean finger.'),
           ],
         ),
         // REQUIRED_REVIEW: water before 6 months. Claims to confirm: exclusive
@@ -2692,14 +2835,14 @@ final PpArea _notSafe = PpArea(
                 'In summer, spoons of water, sugar water or gripe water are '
                 'given to a young baby who seems hot or thirsty.'),
             PpCard('Why it is not safe',
-                'Before six months, milk supplies all the water she needs, '
+                'Before six months, milk gives a baby all the water needed, '
                 'even in Indian summers. Water fills a very small stomach and '
-                'displaces milk, and in larger amounts it can dangerously '
-                'dilute the salts in her blood.'),
+                'pushes out milk. In larger amounts it can dangerously dilute '
+                'the salts in the blood.'),
             PpCard('What to do instead',
-                'Feed more often in hot weather. Keep her in light cotton, out '
-                'of direct sun, and in the coolest room. From six months, '
-                'sips of water with meals are fine and expected.'),
+                'Feed more often in hot weather. Dress your baby in light '
+                'cotton, out of direct sun, in the coolest room. From six '
+                'months, sips of water with meals are fine and expected.'),
           ],
         ),
         // REQUIRED_REVIEW: swaddling and hip dysplasia; also head shaping.
@@ -2709,54 +2852,54 @@ final PpArea _notSafe = PpArea(
           [
             PpCard('Tight swaddling with the legs straightened',
                 'Wrapping a baby tightly with the legs pulled straight and '
-                'pressed together is linked to hip problems, because a baby\'s '
-                'hip joint needs to sit bent and open to develop properly.'),
+                'pressed together is linked to hip problems. A baby\'s hip '
+                'joint needs to sit bent and open to develop properly.'),
             PpCard('What to do instead',
-                'Swaddle the arms if it settles her, and leave the legs loose '
-                'enough to bend up and out, like a frog. You should be able to '
-                'slide a hand in at her chest. Stop swaddling once she starts '
-                'trying to roll.'),
+                'Swaddle the arms if it settles your baby, and leave the legs '
+                'loose enough to bend up and out, like a frog. Check that a hand '
+                'slides in easily at the chest. Stop swaddling once your baby '
+                'starts trying to roll.'),
             PpCard('Shaping the head with pressure or a tight cloth',
                 'Pressing or binding a baby\'s head to round it does not work '
                 'and can be harmful. Skull shape from lying is common and '
                 'usually corrects itself.'),
             PpCard('What to do instead',
-                'Plenty of supervised tummy time while she is awake, and '
-                'change which end of the cot her head is at. If one side stays '
-                'flat, or her head looks lopsided, ask your paediatrician, '
-                'because it is very treatable when picked up early.'),
+                'Plenty of supervised tummy time while your baby is awake, and '
+                'switch which end of the cot the head goes. If one side stays '
+                'flat, or the head looks lopsided, ask your paediatrician. It '
+                'is very treatable when picked up early.'),
           ],
         ),
         PpCallout(
-          'One clean rule that covers most of this list: in the first six '
-          'months, nothing goes into her mouth, eyes, ears, nose or navel '
-          'except breast milk, formula, and medicine a doctor has prescribed. '
-          'Oil for a malish on her skin is fine. Everything else waits.',
+          'One rule covers most of this list. In the first six months, '
+          'nothing goes into a baby\'s mouth, eyes, ears, nose or navel except '
+          'breast milk, formula, and medicine a doctor has prescribed. Oil for '
+          'a massage on the skin is fine. Everything else waits.',
           kind: PpCalloutKind.safety,
           title: 'The rule that covers most of it',
         ),
         PpCallout(
-          'If any of these has been done, do not panic and do not blame '
-          'anybody. Stop it, and mention it at the next visit. Take her to a '
-          'doctor now, rather than at the next visit, if she has a fever under '
-          'three months, is feeding poorly, has gone floppy or unusually '
-          'sleepy, is breathing fast, or the cord area looks red or smells.',
+          'If any of these has been done, stay calm and blame nobody. Stop '
+          'it, and mention it at the next visit. Some signs mean seeing a '
+          'doctor now, not at the next visit. They are a fever under three '
+          'months, poor feeding, a baby gone floppy or unusually sleepy, fast '
+          'breathing, or a cord area that looks red or smells.',
           kind: PpCalloutKind.doctor,
           title: 'If something on this page has already been done',
         ),
-        PpIndiaNote('Most of the good ones are still good. Malish with warm '
-            'oil, being carried constantly, cosleeping, jhula, ajwain water '
-            'for the mother, ghee in her food from six months. This page is a '
-            'short list of exceptions, not a verdict on how your family raises '
-            'children.'),
+        PpIndiaNote('Most of the old ways are still good. Massage with warm '
+            'oil, being carried a lot, cosleeping, the cloth swing, carom seed water for '
+            'the mother, ghee in food from six months. This page is a short '
+            'list of exceptions. It says nothing about how well your family '
+            'raises children.'),
         PpVideoSlot(
-          title: 'Kajal, honey and the cord, explained calmly',
-          subtitle: 'The five minute version to watch with a grandmother, not '
-              'at her.',
+          title: 'Kohl, honey and the cord, explained calmly',
+          subtitle: 'The five minute version to watch together with a '
+              'grandmother.',
           minutes: '5 MIN',
           slotId: 'traditions/newborn_customs',
         ),
-        PpLink('Dadi ke nuskhe, checked one by one',
+        PpLink('Home remedies from the elders, checked one by one',
             surfaceId: 'pp_nuskhe',
             blurb: 'The home remedies, with an honest note on each.'),
         PpLink('What to say, without a fight', pageId: 'family_pressure'),
@@ -2768,8 +2911,8 @@ final PpArea _notSafe = PpArea(
       subtitle: 'The things that go wrong at ceremonies, and how to prevent them',
       format: 'CARDS',
       blocks: [
-        PpIntro('Ceremony days have their own small risks, and they are all '
-            'preventable with one decision made a week in advance. Here is the '
+        PpIntro('Ceremony days have their own small risks. Almost all of them '
+            'can be prevented with a decision made a week ahead. Here is the '
             'short list, ceremony by ceremony.'),
         // REQUIRED_REVIEW: blade hygiene, as on the mundan page.
         PpCards(
@@ -2779,14 +2922,14 @@ final PpArea _notSafe = PpArea(
             PpCard('One fresh sealed blade, opened in front of you',
                 'A reused or wiped down blade can pass on hepatitis B, '
                 'hepatitis C or HIV through a small scalp nick, and scalp '
-                'nicks are common at a mundan.'),
+                'nicks are common at head shavings.'),
             PpCard('Ask before you book, not on the morning',
-                'A barber who is used to mundans will say yes immediately. '
+                'A barber who is used to shaving babies will say yes immediately. '
                 'Hesitation is your answer.'),
             PpCard('Nothing on a nick',
                 'No ash, no turmeric, no oil, no paste. Clean water, kept dry, '
-                'and a doctor if it becomes red or swollen or she develops a '
-                'fever.'),
+                'and a doctor if it turns red or swollen, or a fever '
+                'starts.'),
           ],
         ),
         // REQUIRED_REVIEW: piercing hygiene, as on the karnavedha page.
@@ -2799,7 +2942,7 @@ final PpArea _notSafe = PpArea(
                 'gun barrel that has only been wiped.'),
             PpCard('Light plain studs, and clean hands for six weeks',
                 'Heavy earrings on an infant pull and tear a healing hole.'),
-            PpCard('Postpone if she is unwell or the skin is broken',
+            PpCard('Postpone if your child is unwell or the skin is broken',
                 'And see a doctor for spreading redness, heat, pus, fever, or '
                 'a stud that sinks into the lobe.'),
           ],
@@ -2812,63 +2955,63 @@ final PpArea _notSafe = PpArea(
           [
             PpCard('Do not let a ceremony delay a feed',
                 'No baby should be kept waiting for an auspicious moment. Feed '
-                'her, then do the ritual. Every priest in the country has seen '
+                'first, then do the ritual. Every priest in the country has seen '
                 'this and will wait.'),
             PpCard('Watch for overheating',
                 'Flushed, damp hair, breathing fast, unusually sleepy. Move '
-                'her somewhere cool, remove a layer, offer a feed. Fewer wet '
-                'nappies than usual means she needs more milk, not water, if '
-                'she is under six months.'),
-            PpCard('Keep her out of the crowd if she is under three months',
+                'your baby somewhere cool, remove a layer, offer a feed. Under '
+                'six months, fewer wet nappies than usual means more milk is '
+                'needed, not water.'),
+            PpCard('Under three months, keep your baby out of the crowd',
                 'Not passed around, not kissed on the face, and away from '
                 'anyone with a cough or a cold. A fever of 100.4F or 38C in a '
                 'baby that young needs a doctor the same day.'),
-            PpCard('Havan smoke, incense and firecrackers',
+            PpCard('Fire ritual (havan) smoke, incense and firecrackers',
                 'Smoke irritates young lungs, and firecrackers are far too '
-                'loud for a baby\'s ears. Keep her in another room with a '
-                'window open, or outside the smoke entirely.'),
+                'loud for a baby\'s ears. Keep your baby in another room with '
+                'a window open, or well away from the smoke.'),
           ],
         ),
         PpCards(
-          heading: 'The ordinary things that actually go wrong',
+          heading: 'The everyday things that go wrong',
           hue: 44,
           [
             PpCard('The nap gets skipped',
                 'This causes more ceremony day misery than everything else on '
                 'this page combined. Plan the time around it.'),
             PpCard('Nobody is watching the toddler',
-                'Diyas, hot food, coins, small pooja items on a low table. '
-                'Give one adult the single job of watching him.'),
+                'Oil lamps, hot food, coins, small prayer items on a low table. '
+                'Give one adult the single job of watching the toddler.'),
             PpCard('Stiff new clothes',
-                'Wash the new outfit once first. Zari and stiff seams scratch, '
+                'Wash the new outfit once first. Metallic thread work and stiff seams scratch, '
                 'and a baby who is itchy will cry through the whole ceremony.'),
             PpCard('No quiet room',
-                'Decide in advance which room she can be taken to. You will '
-                'need it at some point.'),
+                'Decide in advance which room your baby can be taken to. You '
+                'will need it at some point.'),
           ],
         ),
         PpCallout(
-          'The one decision that prevents most of this: ask about the blade or '
-          'the needle a week before, and fix the time around her nap and her '
+          'Two decisions prevent most of this. Ask about the blade or the '
+          'needle a week before, and fix the time around the nap and the '
           'feed. Everything else on this page follows from those two.',
           kind: PpCalloutKind.safety,
           title: 'Decide it a week early',
         ),
         PpCallout(
           'Go to a doctor the same day for a fever in a baby under three '
-          'months, spreading redness or pus at any cut or piercing, fast or '
-          'laboured breathing, a baby who has gone floppy or is hard to wake, '
-          'or a burn. For a burn, cool it under running water for twenty '
-          'minutes first, and do not put ghee, toothpaste or ice on it.',
+          'months, or spreading redness or pus at a cut or piercing. Go the '
+          'same day, too, for fast or laboured breathing, a baby gone floppy '
+          'or hard to wake, or a burn. Cool a burn under running water for '
+          'twenty minutes first. Don\'t put ghee, toothpaste or ice on it.',
           kind: PpCalloutKind.doctor,
           title: 'When to leave the ceremony and go',
         ),
-        PpIndiaNote('None of this needs to be announced to the room. Ask the '
-            'barber about the blade on the phone, tell the priest quietly that '
-            'she needs feeding first, and pick the quiet room yourself. The '
-            'ceremony runs exactly as everyone expects and she is fine.'),
-        PpLink('Mundan, in full', pageId: 'mundan'),
-        PpLink('Karnavedha, ear piercing, in full', pageId: 'karnavedha'),
+        PpIndiaNote('None of this needs announcing to the room. Ask the barber '
+            'about the blade on the phone, tell the priest softly that the baby '
+            'needs a feed first, and pick the quiet room yourself. The ceremony '
+            'runs as everyone expects, and your baby is fine.'),
+        PpLink('The head shaving, in full', pageId: 'mundan'),
+        PpLink('Ear piercing (karnavedha), in full', pageId: 'karnavedha'),
         PpLink('What to say, without a fight', pageId: 'family_pressure'),
         // The fever line here is Health's go-now list's; one list, cross-linked.
         PpLink('The signs that mean a doctor now, in full',
@@ -2883,10 +3026,41 @@ final PpArea _notSafe = PpArea(
     PpPage(
       id: 'mother_kept_apart',
       title: 'When the mother is kept apart',
-      subtitle: 'Jaapa seclusion, the puja and the kitchen, handled with care',
+      subtitle: 'The forty days apart, the prayers and the kitchen, handled with care',
       format: 'ARTICLE',
-      comingSoon: true,
-      blocks: [],
+      
+      blocks: [
+        // Written 2026-10-02 (parenting gap analysis), filling the scaffold.
+        // REQUIRED_REVIEW.
+        // ⚠️ THE BRIEF ASKS FOR THE USER'S SIGN-OFF ON TONE BEFORE THIS SHIPS.
+        PpIntro('In some families, a new mother is kept apart for a time after '
+            'birth. She may not enter the kitchen or the puja room, touch '
+            'certain things, or rest with the family. For some mothers this rest '
+            'is welcome. For others it feels isolating. Both feelings are valid.'),
+        PpArticle(heading: 'What the custom often protects', [
+          'Many of these practices began as a way to make sure the mother rested '
+              'and was protected from infection and heavy work after birth. That '
+              'purpose is a good one, and worth keeping.',
+        ]),
+        PpArticle(heading: 'When it does not feel right', [
+          'If the custom leaves you lonely, unable to bathe or eat well, or '
+              'separated from your baby, it is fine to ask for changes. Nothing in '
+              'medicine says a mother must be kept away from her baby, the '
+              'kitchen or her family.',
+          'You can keep the resting and let go of the rest: being looked after, '
+              'without being cut off.',
+        ]),
+        PpScript(heading: 'Words that keep the peace', [
+          PpScriptLine(
+              say: 'I love that you want me to rest. Can my husband sit with me and '
+                  'the baby in the evenings?',
+              why: 'Keeps the care, eases the isolation.'),
+        ]),
+        PpCallout('If feeling apart is leaving you low, tearful or anxious most '
+            'days, talk to your doctor. The custom matters less here than how '
+            'you are feeling.',
+            kind: PpCalloutKind.doctor),
+      ],
     ),
   ],
 );
@@ -2904,8 +3078,8 @@ final PpArea _notSafe = PpArea(
 const PpArea _firstFestivals = PpArea(
   id: 'first_festivals',
   mark: IntentMark.moonMark,
-  title: 'Her first festivals, done safely',
-  blurb: 'Diyas and cracker noise, colours on baby skin, fasting while '
+  title: 'The first festivals, done safely',
+  blurb: 'Oil lamps and cracker noise, colours on baby skin, fasting while '
       'nursing. The warmth, and the same-day safety.',
   hue: 44,
   pages: [
@@ -2914,8 +3088,31 @@ const PpArea _firstFestivals = PpArea(
       title: 'The baby\'s first festivals, done safely',
       subtitle: 'First Diwali, Holi, Eid, Christmas, Raksha Bandhan',
       format: 'CARDS',
-      comingSoon: true,
-      blocks: [],
+      
+      blocks: [
+        // Written 2026-10-02 (parenting gap analysis), filling the scaffold.
+        // REQUIRED_REVIEW.
+        PpIntro('A baby\'s first Diwali, Holi, Eid, Christmas or Raksha Bandhan '
+            'is a joy for the whole family. A few small changes keep it safe '
+            'and happy for your baby.'),
+        PpCards([
+          PpCard('Diwali', 'Oil lamps out of reach, a lit lamp never on the floor, and '
+              'the baby indoors and far from crackers. Loud crackers can harm small '
+              'ears, and smoke is hard on small lungs.'),
+          PpCard('Holi', 'Natural colours, gently, away from the face. Keep your '
+              'baby indoors when colours and water balloons are flying.'),
+          PpCard('Eid and big family meals', 'Lots of hands want a cuddle. Wash '
+              'hands, and no sweets or honey before one.'),
+          PpCard('Christmas and New Year', 'Small decorations, tinsel and batteries '
+              'out of reach.'),
+          PpCard('Raksha Bandhan', 'A soft thread on the wrist, loose, and taken '
+              'off for sleep.'),
+          PpCard('If you are fasting while breastfeeding', 'Eat and drink well in '
+              'the hours you can, and break the fast if you feel dizzy.'),
+        ]),
+        PpLink('Diwali, Holi and kite season, safely',
+            surfaceId: 'pp_page/parenting_safety/safety_festivals'),
+      ],
     ),
   ],
 );

@@ -88,7 +88,7 @@ class _LeapCalendarScreenState extends State<LeapCalendarScreen> {
             _pad(Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(14)),
-              child: Text("Timings are approximate: every baby's phases arrive weeks either side, and some are never noticed at all. A way to think about a fussy week, not a rule.",
+              child: Text("Timings are approximate: every baby's phases arrive weeks either side, and some are never noticed at all. A way to think about a fussy week, not a rule. The leaps are one popular idea, not proven science.",
                   style: ppBody(12.5, h: 1.5)),
             )),
 

@@ -35,6 +35,13 @@ import 'pp_child_profile.dart';
 import 'pp_common.dart';
 import 'pp_development_data.dart';
 import 'pp_grow_data.dart';
+import '../../theme/pv_fonts.dart';
+import '../brackets/hub/hub_intent_art.dart' show IntentMark;
+import '../doors/pv_list_row.dart' show PvListRow, PvMarkWell, PvRowGroup;
+import '../pregnancy/preg_tool_chrome.dart';
+import '../pregnancy/preg_tool_parts.dart' show PregFoldRow;
+import '../products/pv_store_chrome.dart' show PvCommit, PvSecondary, pvStorePalette;
+import 'pp_care_parts.dart' show PpCareStats, ppCareHeading;
 
 void _push(BuildContext c, Widget s) =>
     Navigator.of(c).push(MaterialPageRoute<void>(builder: (_) => s));
@@ -636,8 +643,110 @@ class GrowActivityScreen extends StatefulWidget {
 class _GrowActivityScreenState extends State<GrowActivityScreen> {
   bool _whyOpen = false;
 
+  // ---- the one ParentVeda look (2026-10-07) ------------------------------------
+  //  The activity on the shell every TTC and pregnancy tool wears: the care
+  //  tools' stat strip, the shell's headings, numbered steps, safety as a calm
+  //  card, the why as pregnancy's fold row, and one ink button. The "Watch
+  //  demo / not filmed yet" row is not drawn: it opened nothing.
+  //  `_buildBeforeShell` is the page before, kept for revert.
   @override
   Widget build(BuildContext context) {
+    final a = widget.activity;
+    final caps = capabilitiesOf(a);
+    final done = GrowStore.instance.isCompletedToday(a.id);
+    final p = pvStorePalette;
+    final body = pvManrope(fontSize: 14, height: 1.55, color: p.ink1);
+    return PregToolScaffold(
+      hue: 40,
+      eyebrow: 'Brain activities',
+      mark: IntentMark.playMark,
+      title: a.title,
+      intro: caps.isEmpty ? a.benefit : 'Builds ${[for (final c in caps) c.label.toLowerCase()].join(' and ')}.',
+      children: [
+        pregToolPad(PpCareStats([
+          ('${a.minutes} min', 'time'),
+          (a.difficulty, 'effort'),
+          (a.ageTag, 'age'),
+        ])),
+        if (a.materials.isNotEmpty) ...[
+          const SizedBox(height: 24),
+          pregToolPad(ppCareHeading('You need')),
+          const SizedBox(height: 8),
+          for (final m in a.materials)
+            pregToolPad(Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 8, right: 10),
+                  child: Container(width: 5, height: 5, decoration: BoxDecoration(color: p.ink1, shape: BoxShape.circle)),
+                ),
+                Expanded(child: Text(m, style: body)),
+              ]),
+            )),
+        ],
+        const SizedBox(height: 24),
+        pregToolPad(ppCareHeading('Steps')),
+        const SizedBox(height: 10),
+        for (var i = 0; i < a.steps.length; i++)
+          pregToolPad(Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Container(
+                width: 26,
+                height: 26,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(color: p.ink1, shape: BoxShape.circle),
+                child: Text('${i + 1}', style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w800, color: Colors.white)),
+              ),
+              const SizedBox(width: 12),
+              Expanded(child: Text(a.steps[i], style: body)),
+            ]),
+          )),
+        if (a.safety.isNotEmpty) ...[
+          const SizedBox(height: 14),
+          pregToolPad(Container(
+            padding: const EdgeInsets.all(15),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: p.line),
+            ),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('Keep it safe', style: pvManrope(fontSize: 14, fontWeight: FontWeight.w800, color: p.ink1)),
+              const SizedBox(height: 6),
+              for (final x in a.safety)
+                Padding(padding: const EdgeInsets.only(bottom: 4), child: Text(x, style: body)),
+            ]),
+          )),
+        ],
+        const SizedBox(height: 14),
+        pregToolPad(PregFoldRow(
+          keyPrefix: 'grow_why_${a.id}',
+          fold: 'why',
+          icon: Icons.lightbulb_outline_rounded,
+          title: 'Why this works',
+          body: Text(a.benefit, style: body),
+        )),
+        const SizedBox(height: 22),
+        pregToolPad(done
+            ? PvSecondary(label: 'Done today', icon: Icons.check_rounded, onTap: () {})
+            : PvCommit(
+                key: const ValueKey('grow_activity_done'),
+                label: 'We did it',
+                onTap: () async {
+                  await GrowStore.instance.complete(a.id);
+                  if (!context.mounted) return;
+                  Navigator.of(context).pushReplacement(
+                      MaterialPageRoute<void>(builder: (_) => GrowCompletedScreen(activity: a)));
+                },
+              )),
+      ],
+    );
+  }
+
+  // Kept for revert (2026-10-07): the page before the shared shell.
+  // ignore: unused_element
+  Widget _buildBeforeShell(BuildContext context) {
     final a = widget.activity;
     final version = GrowVersionStore.instance.version;
     final caps = capabilitiesOf(a, from: capabilitiesFor(version));
@@ -883,8 +992,142 @@ class GrowCompletedScreen extends StatelessWidget {
   const GrowCompletedScreen({super.key, required this.activity});
   final DevActivity activity;
 
+  // ---- the one ParentVeda look (2026-10-07) ------------------------------------
+  //  The acknowledgement on the same shell and hue as the activity it follows
+  //  (GrowActivityScreen.build): the words as the title and intro, what was
+  //  strengthened as hairline chips, the streak or the week as one white card,
+  //  and tomorrow as a list row. Same data and the same V2 / V3 split.
+  //  `_buildBeforeShell` is the page before, kept for revert.
   @override
   Widget build(BuildContext context) {
+    final v = GrowVersionStore.instance.version;
+    final store = GrowStore.instance;
+    final caps = capabilitiesOf(activity, from: capabilitiesFor(v));
+    final tomorrow = growTomorrow();
+    final isV2 = v == GrowVersion.v2;
+    final p = pvStorePalette;
+    Widget eyebrow(String t) => pregToolPad(Text(t.toUpperCase(),
+        style: pvManrope(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.4, color: p.action)));
+    final card = BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(18),
+      border: Border.all(color: p.line),
+    );
+
+    return PregToolScaffold(
+      hue: 40,
+      variant: 3,
+      eyebrow: 'Brain activities',
+      title: isV2 ? 'Great job' : "That's done",
+      intro: isV2
+          ? "Today's brain builder complete."
+          : 'You did ${activity.title.toLowerCase()} together. That is the whole of it.',
+      children: [
+        if (caps.isNotEmpty) ...[
+          eyebrow('You strengthened'),
+          const SizedBox(height: 10),
+          pregToolPad(Wrap(spacing: 8, runSpacing: 8, children: [
+            for (final c in caps)
+              Container(
+                height: 34,
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(color: p.line),
+                ),
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  Icon(c.icon, size: 15, color: p.ink2),
+                  const SizedBox(width: 6),
+                  Text(c.label, style: pvManrope(fontSize: 13, fontWeight: FontWeight.w700, color: p.ink1)),
+                ]),
+              ),
+          ])),
+          const SizedBox(height: 24),
+        ],
+        if (isV2)
+          // The brief's "progress animation", done as the number counting up.
+          pregToolPad(Container(
+            padding: const EdgeInsets.all(18),
+            decoration: card,
+            child: Row(children: [
+              Icon(Icons.local_fire_department_outlined, size: 24, color: p.ink1),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text('Current streak', style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w600, color: p.ink2)),
+                  const SizedBox(height: 3),
+                  TweenAnimationBuilder<double>(
+                    tween: Tween(begin: 0, end: store.streakDays.toDouble()),
+                    duration: const Duration(milliseconds: 650),
+                    curve: Curves.easeOutCubic,
+                    builder: (_, value, _) => Text(
+                      '${value.round()} ${store.streakDays == 1 ? 'day' : 'days'}',
+                      style: pvFraunces(fontSize: 22, fontWeight: FontWeight.w600, color: p.ink1),
+                    ),
+                  ),
+                ]),
+              ),
+              Semantics(
+                button: true,
+                label: 'How the streak works',
+                child: InkWell(
+                  onTap: () => showStreakInfo(context),
+                  borderRadius: BorderRadius.circular(999),
+                  child: Padding(
+                    padding: const EdgeInsets.all(6),
+                    child: Icon(Icons.info_outline_rounded, size: 18, color: p.ink2),
+                  ),
+                ),
+              ),
+            ]),
+          ))
+        else
+          pregToolPad(Container(
+            padding: const EdgeInsets.all(18),
+            decoration: card,
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('${store.daysThisWeek} of the last 7 days',
+                  style: pvManrope(fontSize: 15, fontWeight: FontWeight.w800, color: p.ink1)),
+              const SizedBox(height: 4),
+              Text('No streak to break. A quiet week costs you nothing.',
+                  style: pvManrope(fontSize: 12.5, height: 1.5, color: p.ink2)),
+              const SizedBox(height: 14),
+              Row(children: [
+                for (final on in store.weekPattern)
+                  Expanded(
+                    child: Container(
+                      height: 8,
+                      margin: const EdgeInsets.only(right: 5),
+                      decoration: BoxDecoration(
+                        color: on ? p.ink1 : p.line,
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                    ),
+                  ),
+              ]),
+            ]),
+          )),
+        const SizedBox(height: 26),
+        eyebrow(isV2 ? 'Next brain builder' : 'Ready for tomorrow'),
+        const SizedBox(height: 8),
+        pregToolPad(PvRowGroup(p: p, children: [
+          PvListRow(
+            key: const ValueKey('grow_completed_tomorrow'),
+            p: p,
+            leading: PvMarkWell(p: p, hue: 40, size: 40, mark: IntentMark.playMark),
+            title: tomorrow.title,
+            line: 'Tomorrow · ${tomorrow.minutes} min',
+            onTap: () => _push(context, GrowActivityScreen(activity: tomorrow)),
+          ),
+        ])),
+      ],
+    );
+  }
+
+  // Kept for revert (2026-10-07): the page before the shared shell.
+  // ignore: unused_element
+  Widget _buildBeforeShell(BuildContext context) {
     final v = GrowVersionStore.instance.version;
     final store = GrowStore.instance;
     final caps = capabilitiesOf(activity, from: capabilitiesFor(v));

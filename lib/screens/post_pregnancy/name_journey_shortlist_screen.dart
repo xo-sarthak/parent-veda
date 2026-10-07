@@ -13,6 +13,12 @@
 
 import 'package:flutter/material.dart';
 
+import '../../theme/pv_fonts.dart';
+import '../doors/pv_list_row.dart';
+import '../pregnancy/preg_chrome.dart' show PregNote;
+import '../pregnancy/preg_tool_chrome.dart';
+import '../products/pv_store_chrome.dart' show PvCommit, kPvInk, pvStorePalette;
+import '../v2/v2_palette.dart';
 import 'journal_v2/journal_capture_screens.dart';
 import 'name_journey_detail_screen.dart';
 import 'pp_common.dart';
@@ -25,8 +31,76 @@ class NameJourneyShortlistScreen extends StatelessWidget {
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
   void _push(BuildContext c, Widget s) => Navigator.of(c).push(MaterialPageRoute<void>(builder: (_) => s));
 
+  // ---- the one ParentVeda look (2026-10-07) ------------------------------------
+  //  The naming tool's shell (the front door, BabyNamingHomeScreen, wears it):
+  //  the field, the round back, the serif title, then the names as unboxed rows
+  //  and one ink button to compare. The journey ribbon stays in the page
+  //  before, `_buildBeforeShell`, kept for revert.
   @override
   Widget build(BuildContext context) {
+    final p = pvStorePalette;
+    return AnimatedBuilder(
+      animation: NameMatchStore.instance,
+      builder: (context, _) {
+        final store = NameMatchStore.instance;
+        final names = store.liked.map(babyNameByName).toList();
+        return PregToolScaffold(
+          hue: 268,
+          eyebrow: 'Names you love',
+          title: 'Your shortlist',
+          intro: 'Every name you swiped right on gathers here - no manual saving. Compare them, then choose.',
+          children: [
+            if (names.isEmpty)
+              pregToolPad(Column(
+                key: const ValueKey('pp_shortlist_empty'),
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Nothing here yet', style: pvManrope(fontSize: 16, fontWeight: FontWeight.w700, color: p.ink1)),
+                  const SizedBox(height: 6),
+                  Text('Head back and swipe a few names you love - the ones you like will appear here.',
+                      style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2)),
+                ],
+              ))
+            else ...[
+              pregToolPad(PvRowGroup(p: p, children: [
+                for (final n in names)
+                  PvListRow(
+                    key: ValueKey('pp_shortlist_row_${n.name}'),
+                    p: p,
+                    leading: nameLetterWell(p, n),
+                    title: n.name,
+                    line: n.meaningShort,
+                    meta: n.script,
+                    onTap: () => _push(context, NameJourneyDetailScreen(name: n.name)),
+                    // The crowned name keeps its star, in ink.
+                    trailing: n.name == store.crowned
+                        ? Row(mainAxisSize: MainAxisSize.min, children: [
+                            Icon(Icons.star_rounded, size: 16, color: kPvInk, semanticLabel: 'Your chosen name'),
+                            const SizedBox(width: 4),
+                            Icon(Icons.chevron_right_rounded, size: 20, color: p.ink3),
+                          ])
+                        : null,
+                  ),
+              ])),
+              if (names.length >= 2) ...[
+                const SizedBox(height: 22),
+                pregToolPad(PvCommit(
+                  key: const ValueKey('pp_shortlist_compare'),
+                  label: 'Compare these names',
+                  icon: Icons.compare_arrows_rounded,
+                  onTap: () => _push(context, const NameCompareScreen()),
+                )),
+              ],
+            ],
+          ],
+        );
+      },
+    );
+  }
+
+  // Kept for revert (2026-10-07): the page before the shared look.
+  // ignore: unused_element
+  Widget _buildBeforeShell(BuildContext context) {
     return Scaffold(
       backgroundColor: ppBg,
       body: SafeArea(
@@ -125,6 +199,21 @@ class NameJourneyShortlistScreen extends StatelessWidget {
       );
 }
 
+/// A name row's well: its first letter in the naming tool's tint (hue 268, the
+/// front door's), a contact list's well rather than one icon repeated on every
+/// row. Shared by the shortlist and the browse list (2026-10-07).
+Widget nameLetterWell(V2Palette p, BabyName n) => Container(
+      width: 44,
+      height: 44,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(color: v2BlockTint(268, p), borderRadius: BorderRadius.circular(12)),
+      child: ExcludeSemantics(
+        child: Text(n.name.isEmpty ? '' : n.name.characters.first.toUpperCase(),
+            textScaler: TextScaler.noScaling,
+            style: pvFraunces(fontSize: 20, fontWeight: FontWeight.w600, color: p.ink1)),
+      ),
+    );
+
 // =============================================================================
 //  NameCompareScreen - a calm side-by-side (never a recommendation)
 // =============================================================================
@@ -137,6 +226,96 @@ class NameCompareScreen extends StatelessWidget {
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
 
+  // ---- the one ParentVeda look (2026-10-07) ------------------------------------
+  //  The naming tool's shell; the decision note as a quiet line, not a lilac
+  //  block; the table on white with the page hairline. Rows grow with the text
+  //  size so three lines of meaning never spill. `_buildBeforeShell` is the
+  //  page before, kept for revert.
+  @override
+  Widget build(BuildContext context) {
+    final p = pvStorePalette;
+    final names = NameMatchStore.instance.liked.map(babyNameByName).take(6).toList();
+    final scaler = MediaQuery.textScalerOf(context);
+    final rowH = (scaler.scale(12) * 1.35 * 3 + 20).clamp(_rowH, 160.0);
+    final headH = (scaler.scale(20) * 1.1 + 18).clamp(44.0, 80.0);
+    return PregToolScaffold(
+      hue: 268,
+      variant: 3,
+      eyebrow: 'Compare',
+      title: 'See them side by side',
+      children: [
+        pregToolPad(PregNote(decisionCompare(names), icon: Icons.auto_awesome_outlined)),
+        const SizedBox(height: 20),
+        if (names.length < 2)
+          pregToolPad(Text('Add at least two names to your shortlist to compare them.',
+              style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2)))
+        else
+          pregToolPad(Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              SizedBox(height: headH),
+              for (final d in _dims)
+                SizedBox(
+                  width: _labelW,
+                  height: rowH,
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(d.$1.toUpperCase(),
+                        maxLines: 2,
+                        style: pvManrope(fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.6, color: p.ink3)),
+                  ),
+                ),
+            ]),
+            Expanded(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  for (final n in names)
+                    Container(
+                      width: _colW,
+                      margin: const EdgeInsets.only(right: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: p.line),
+                      ),
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        SizedBox(
+                          height: headH,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(n.name,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: pvFraunces(fontSize: 20, fontWeight: FontWeight.w600, color: p.ink1)),
+                            ),
+                          ),
+                        ),
+                        for (final d in _dims)
+                          Container(
+                            width: _colW,
+                            height: rowH,
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            decoration: BoxDecoration(border: Border(top: BorderSide(color: p.line))),
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(d.$2(n),
+                                  maxLines: 3,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: pvManrope(fontSize: 12, height: 1.35, color: p.ink1)),
+                            ),
+                          ),
+                      ]),
+                    ),
+                ]),
+              ),
+            ),
+          ])),
+      ],
+    );
+  }
+
   static final List<(String, String Function(BabyName))> _dims = [
     ('Meaning', (n) => n.meaningShort),
     ('Origin', (n) => n.origin),
@@ -148,8 +327,9 @@ class NameCompareScreen extends StatelessWidget {
     ('Nakshatra', (n) => n.nakshatra),
   ];
 
-  @override
-  Widget build(BuildContext context) {
+  // Kept for revert (2026-10-07): the page before the shared look.
+  // ignore: unused_element
+  Widget _buildBeforeShell(BuildContext context) {
     final names = NameMatchStore.instance.liked.map(babyNameByName).take(6).toList();
     return Scaffold(
       backgroundColor: ppBg,
@@ -246,8 +426,57 @@ class NameChosenScreen extends StatelessWidget {
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
 
+  // ---- the one ParentVeda look (2026-10-07) ------------------------------------
+  //  The naming tool's shell with the name as the page title; the invitation
+  //  to write its story on a white card with the hairline and one ink button.
+  //  `_buildBeforeShell` is the page before, kept for revert.
   @override
   Widget build(BuildContext context) {
+    final p = pvStorePalette;
+    final n = babyNameByName(name);
+    return PregToolScaffold(
+      hue: 268,
+      variant: 4,
+      eyebrow: "You've chosen",
+      title: n.name,
+      intro: '“${n.meaningFull}”',
+      children: [
+        pregToolPad(Text(n.script, style: pvFraunces(fontSize: 26, fontWeight: FontWeight.w600, color: p.ink3))),
+        const SizedBox(height: 20),
+        pregToolPad(Container(
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: p.line),
+          ),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            Text('A beautiful name deserves a beautiful story.',
+                style: pvFraunces(fontSize: 20, fontWeight: FontWeight.w600, height: 1.3, color: p.ink1)),
+            const SizedBox(height: 8),
+            Text('Write why you chose ${n.name} - what it means to your family, who suggested it, the memory behind it. It becomes Chapter One of ${n.name}\'s journal.',
+                style: pvManrope(fontSize: 14, height: 1.55, color: p.ink2)),
+            const SizedBox(height: 16),
+            PvCommit(
+              key: const ValueKey('pp_name_chosen_story'),
+              label: "Begin ${n.name}'s story",
+              icon: Icons.edit_note_rounded,
+              onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const WriteStoryScreen())),
+            ),
+          ]),
+        )),
+        const SizedBox(height: 16),
+        pregToolPad(PregNote(
+          '${n.name} will gently flow through ParentVeda - Child Profile, Journal, Storybook and Namkaran - so you never enter it again.',
+          icon: Icons.check_circle_outline_rounded,
+        )),
+      ],
+    );
+  }
+
+  // Kept for revert (2026-10-07): the page before the shared look.
+  // ignore: unused_element
+  Widget _buildBeforeShell(BuildContext context) {
     final n = babyNameByName(name);
     return Scaffold(
       backgroundColor: ppBg,

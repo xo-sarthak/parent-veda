@@ -88,12 +88,18 @@ import 'pp_development_data.dart';
 import 'pp_grow_activities.dart';
 import 'pp_home_activities_store.dart';
 import 'pp_home_changes.dart';
+import 'pp_feeding_data.dart' show FeedingStore;
+import 'pp_home_quick.dart';
+import 'pp_sleep_data.dart' show SleepStore;
+import 'pp_age_page_parts.dart';
+import 'pp_month_notes.dart';
+import 'journal_v2/pp_journal_screen.dart';
 import 'journal_v2/journal_capture_screens.dart';
 import 'reading_reader_screen.dart';
 import 'development_activity_screen.dart';
 import 'watch_player_screen.dart';
 import 'product_detail_screen.dart';
-import 'journal_v2/journal_home_screen.dart';
+// import 'journal_v2/journal_home_screen.dart'; // the demo journal, kept for revert
 import 'phase_map_screen.dart';
 // import 'family_profile_screen.dart'; // kept for revert — the avatar opens You since 2026-09-19
 import 'pp_hero_field.dart';
@@ -107,9 +113,36 @@ import 'pp_reading_data.dart';
 import 'pp_section_registry.dart';
 import '../../data/doors/pp_door_data.dart';
 import 'doors/pp_door_screen.dart';
-import 'pp_section_screen.dart' show PpSectionTool;
+import 'pp_section_screen.dart' show PpSectionTool, ppOpenPage;
 import 'pp_surface_router.dart';
 import 'pp_watch_data.dart';
+import '../../services/father_preview.dart';
+import 'pp_father_card.dart';
+import 'pp_home_reads.dart';
+import 'doors/pp_door_screen.dart' show ppShelfSpecFor, ppTabMarkFor;
+import '../doors/pv_shelf_card.dart';
+import '../doors/pv_list_row.dart';
+import 'pp_tile_order.dart';
+import '../../services/family_profile.dart';
+import 'pp_child_switch.dart';
+import 'pp_visit_card.dart';
+import 'video/pv_video_config.dart' show pvResolveVideoUrl;
+import 'pp_tip_links.dart';
+import 'pp_phase_film.dart';
+import '../ttc/doors/ttc_tab_art.dart' show TtcTabMark;
+import '../ttc/ttc_tool_marks.dart' show TtcMarkLeading;
+import '../v2/pv_insight_rail.dart';
+import '../reader/pv_reader_screen.dart';
+
+// ---- One type scale for the whole home (2026-10-07) ------------------------
+//
+// The user: "Make sure the font is the same throughout, font size too." Every
+// heading is `_Head`; every body line is [_kBody]; every meta line (minutes,
+// ages, "Tomorrow brings ...", captions) is [_kMeta]; every card title is
+// [_kCardTitle]. pvFraunces for titles, pvManrope for everything else.
+const double _kBody = 14;
+const double _kMeta = 12;
+const double _kCardTitle = 17;
 
 class PpHomeV3 extends StatefulWidget {
   const PpHomeV3({super.key, this.lang = AppLanguage.english});
@@ -130,7 +163,10 @@ class _PpHomeV3State extends State<PpHomeV3> {
   /// property of the data rather than a rule three siblings have to agree on.
   int? _openFaq;
 
-  /// Whether "This phase explained" is showing its full description.
+  /// Whether "This phase explained" is showing its full description. Read
+  /// only by the commented-out `_PhaseExplained` call since 2026-10-07 (the
+  /// full description opens in the reader now). Kept for revert.
+  // ignore: prefer_final_fields, unused_field
   bool _phaseExpanded = false;
 
   AppLanguage get lang => widget.lang;
@@ -148,16 +184,28 @@ class _PpHomeV3State extends State<PpHomeV3> {
     // Day-indexed, so it is stable all day and two people on the same day see
     // the same tip — which matters the first time one is screenshot into a
     // family group.
-    final tip = kDailyTips[
-        DateTime.now().difference(DateTime(2020)).inDays % kDailyTips.length];
+    // A tip for THIS child's age (gap analysis P2, 2026-10-07: "Ours rotates
+    // 14 tips for every age"); `dailyTip()` picks from the age windows and
+    // falls back to the general rotation only before a birth date exists.
+    // Still stable all day. Kept for revert:
+    //   kDailyTips[DateTime.now().difference(DateTime(2020)).inDays % kDailyTips.length]
+    final tip = dailyTip();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
+      // Filled from her profile, and linked to a door page (2026-10-07).
+      // Hand-matched links (pp_tip_links.dart); a keyword match made wrong
+      // ones. Kept for revert: final hit = ppTipHit(tip.title, tip.body);
+      final id = dailyTipId();
+      final link = id.startsWith('atip_') ? kPpTipLinks[id.substring(5)] : null;
+      final page = link == null ? null : ppPageTitleForSurface(link);
       showDailyTip(context,
-          line: tip.body,
-          heading: tip.title,
+          line: ppFillChild(tip.body),
+          heading: ppFillChild(tip.title),
           week: 0,
           day: ageMonths,
-          p: p);
+          p: p,
+          readLabel: page == null ? null : 'Read: $page',
+          onRead: page == null ? null : () => _openSurface(context, link!));
     });
   }
 
@@ -168,6 +216,9 @@ class _PpHomeV3State extends State<PpHomeV3> {
         ChildProfileStore.instance,
         V2PaletteStore.instance,
         PpHomeActivitiesStore.instance,
+        FatherPreview.instance, // the father's card (2026-10-07)
+        PpLastPageStore.instance, // Continue reading (2026-10-07)
+        FamilyProfileStore.instance, // tile order by her priorities (2026-10-07)
       ]),
       builder: (context, _) {
         final p = V2PaletteStore.instance.current;
@@ -182,10 +233,12 @@ class _PpHomeV3State extends State<PpHomeV3> {
             PpHomeActivitiesStore.instance.todays(child.ageInMonths);
         final changes = phaseChangesFor(phase);
         final reads = _readsForAge(child.ageInMonths, 3);
+        final doorReads = ppHomeDoorReads(5);
         final video = _video(phase);
         final products = _productsForAge(child.ageInMonths, 6);
         final faqs = phaseFaqs(phase.number, count: 3);
         final next = nextPhase(child);
+        final insights = ppHomeInsights();
 
         return Scaffold(
           backgroundColor: p.ground,
@@ -250,9 +303,91 @@ class _PpHomeV3State extends State<PpHomeV3> {
                   onProfile: () => openPvYou(context, stage: LifeStage.parenting),
                 ),
                 _Sheet(p: p, children: [
-                const SizedBox(height: 26),
+                const SizedBox(height: 22),
+                // ---- MY DAILY INSIGHTS · TODAY ------------------------------
+                //
+                // The user (2026-10-07): "On the home screen I would require
+                // the Today insight, the way we are having in Pregnancy and
+                // trying to conceive." Pregnancy's rail, in pregnancy's place
+                // (first thing under the hero), the same `PvInsightTile` with
+                // pregnancy's settings. The cards are this child's age tips
+                // (pp_home_reads.dart `ppHomeInsights`); each opens its linked
+                // door page, or the tip itself in the reader.
+                if (insights.isNotEmpty) ...[
+                  _pad(_Head(eyebrow: 'My daily insights', title: 'Today', p: p)),
+                  const SizedBox(height: 12),
+                  // ⚠️ TEXT SCALE CLAMPED AT 1.3 FOR THIS RAIL ONLY. The tile is
+                  // a fixed 100 x 112 (shared; three fit on a 360dp phone) and
+                  // a tip title is longer than pregnancy's values ("Back to
+                  // sleep, every sleep"): at 1.5x it ran 14px out of the
+                  // card. The full words are one tap away in the page.
+                  MediaQuery.withClampedTextScaling(
+                    maxScaleFactor: 1.3,
+                    child: KeyedSubtree(
+                    key: const ValueKey('pp_home_insights'),
+                    // The feed and sleep logs ride at the front of the rail
+                    // (the user, 2026-10-07), under one only, live from their
+                    // stores. pp_home_quick.dart has the lines.
+                    child: ListenableBuilder(
+                    listenable: Listenable.merge([FeedingStore.instance, SleepStore.instance]),
+                    builder: (context, _) => PvInsightRail(tiles: [
+                      if (ppHomeShowCareTiles()) ...[
+                        PvInsightTile(
+                          key: const ValueKey('pp_home_quick_feed'),
+                          eyebrow: 'Feed',
+                          value: ppHomeFeedLine(),
+                          hue: 206,
+                          art: PvInsightArt.note,
+                          showArt: false,
+                          centreValue: true,
+                          p: p,
+                          onTap: () => _openSurface(context, 'pp_feeding'),
+                        ),
+                        PvInsightTile(
+                          key: const ValueKey('pp_home_quick_sleep'),
+                          eyebrow: 'Sleep',
+                          value: ppHomeSleepLine(),
+                          hue: 268,
+                          art: PvInsightArt.note,
+                          showArt: false,
+                          centreValue: true,
+                          p: p,
+                          onTap: () => _openSurface(context, 'pp_sleep'),
+                        ),
+                      ],
+                      for (final c in insights)
+                        PvInsightTile(
+                          key: ValueKey('pp_insight_${c.id}'),
+                          eyebrow: c.eyebrow,
+                          value: c.value,
+                          hue: c.hue,
+                          art: PvInsightArt.note,
+                          showArt: false,
+                          centreValue: true,
+                          p: p,
+                          onTap: () => _openInsight(context, c),
+                        ),
+                    ]),
+                  ))),
+                  const SizedBox(height: 26),
+                ],
+                // Search first, then the last feed and sleep for an under-one
+                // (gap analysis P1, 2026-10-07; pp_home_quick.dart).
+                // A paired father's week, first (gap analysis P1, Behind · Partner).
+                if (FatherPreview.instance.on) ...[
+                  _pad(PpFatherCard(p: p, onSurface: (id) => _openSurface(context, id))),
+                  const SizedBox(height: 18),
+                ],
+                // No search bar on the parenting home, and the feed and sleep
+                // logs are in the rail above (the user, 2026-10-07). Kept for
+                // revert:
+                // _pad(PpHomeQuick(p: p, onSurface: (id) => _openSurface(context, id))),
+                // const SizedBox(height: 26),
+                // TTC's and pregnancy's heading for the door grid: "Explore by
+                // topic", no eyebrow (one ParentVeda, 2026-10-07). Kept for
+                // revert: eyebrow: 'Where to go', title: 'Start anywhere'.
                 _pad(_Head(
-                    eyebrow: 'Where to go', title: 'Start anywhere', p: p)),
+                    eyebrow: '', title: 'Explore by topic', p: p)),
                 const SizedBox(height: 14),
                 // ⚠️ WHAT TO BUY IS FIRST, and only first. The brief: "What to
                 // Buy should become the FIRST box among these 11. It does NOT
@@ -304,10 +439,11 @@ class _PpHomeV3State extends State<PpHomeV3> {
                 // Summary always, the full description on tap: the sections are
                 // several paragraphs each and printing them unasked would push
                 // every door below the fold.
-                _pad(_Head(
-                    eyebrow: 'This phase explained',
-                    title: 'What ${phase.ageLabel} looks like',
-                    p: p)),
+                // Pregnancy's heading for its film, "Your week, explained": a
+                // serif title, no eyebrow (one ParentVeda, 2026-10-07). Kept
+                // for revert: eyebrow 'This phase explained', title
+                // 'What ${phase.ageLabel} looks like'.
+                _pad(_Head(eyebrow: '', title: 'This phase, explained', p: p)),
                 const SizedBox(height: 14),
                 // ⚠️ VIDEO FIRST. The brief: "Currently the written description
                 // comes first while the video appears much further down the
@@ -317,26 +453,71 @@ class _PpHomeV3State extends State<PpHomeV3> {
                 //
                 // The video is the same phase-matched one the old "Watch"
                 // section showed (see `_video`). Only its place changed.
+                // The film as pregnancy plays its week film: edge to edge, in
+                // place, the title and "Why this matters now" under it
+                // (pp_phase_film.dart). Kept for revert: _pad(_PhaseVideoCard(
+                // video: video, p: p, onTap: () => _openVideo(context, video))).
                 if (video != null) ...[
-                  _pad(_PhaseVideoCard(
+                  PpPhaseFilm(
                       video: video,
+                      phase: phase.number,
                       p: p,
-                      onTap: () => _openVideo(context, video))),
-                  const SizedBox(height: 16),
+                      onUnavailable: () => _openVideo(context, video)),
+                  const SizedBox(height: 14),
+                  _pad(PpPhaseFilmCaption(video: video, p: p)),
+                  const SizedBox(height: 20),
                 ],
-                _pad(_PhaseExplained(
+                // The prose, segregated (2026-10-07; the user: "very text
+                // heavy, like text thrown"). The summary and three short
+                // labelled points; the rest of the phase opens in the reader
+                // behind "Read the full description" (pp_phase_film.dart
+                // `ppPhaseAsRead`), so no word is lost. Kept for revert:
+                //   _pad(_PhaseExplained(
+                //     phase: phase,
+                //     p: p,
+                //     expanded: _phaseExpanded,
+                //     onToggle: () =>
+                //         setState(() => _phaseExpanded = !_phaseExpanded),
+                //   )),
+                _pad(_PhaseAtAGlance(
                   phase: phase,
                   p: p,
-                  expanded: _phaseExpanded,
-                  onToggle: () =>
-                      setState(() => _phaseExpanded = !_phaseExpanded),
+                  onReadMore: () => ppOpenPhaseRead(context, phase),
+                )),
+                // The answers a parent opens the age page for, always shown:
+                // sleep and feeding now, the WHO ranges, call the doctor if,
+                // and the sources (gap analysis P1, 2026-10-07).
+                // A note for every month from 12 months, every three from
+                // three years (gap analysis P1, 2026-10-07; pp_month_notes.dart).
+                if (ppMonthNoteFor(ChildProfileStore.instance.devAgeInMonths) case final note?) ...[
+                  const SizedBox(height: 22),
+                  _pad(PpThisMonth(note: note, p: p)),
+                ],
+                // The next well-baby visit, when it is due or close (gap
+                // analysis P2, 2026-10-07; pp_visit_card.dart).
+                if (ppVisitCardFor() case final visit?) ...[
+                  const SizedBox(height: 22),
+                  _pad(PpVisitCard(visit: visit, p: p, onOpen: () => _openSurface(context, 'pp_vaccines'))),
+                ],
+                const SizedBox(height: 22),
+                _pad(PpAtThisAge(
+                  phase: phase,
+                  p: p,
+                  onGrowth: () => _openSurface(context, 'pp_growth'),
                 )),
                 const SizedBox(height: 16),
                 _ResourceRail(p: p, items: [
                   _Resource(
+                      label: "This month's checklist",
+                      hue: 28,
+                      icon: Icons.checklist_rtl_outlined,
+                      mark: TtcTabMark.checklist,
+                      onTap: () => _openSurface(context, 'pp_month_checklist')),
+                  _Resource(
                       label: 'What changes next',
                       hue: 42,
                       icon: Icons.timeline_outlined,
+                      mark: TtcTabMark.timelineDots,
                       onTap: () => Navigator.of(context).push(
                           MaterialPageRoute<void>(
                               settings:
@@ -346,12 +527,17 @@ class _PpHomeV3State extends State<PpHomeV3> {
                       label: 'Something changed?',
                       hue: 285,
                       icon: Icons.help_outline_rounded,
+                      mark: TtcTabMark.signpost,
                       onTap: () => _openSurface(context, 'pp_what_changed')),
                   _Resource(
                       label: 'When to call the doctor',
                       hue: 188,
                       icon: Icons.medical_services_outlined,
-                      onTap: () => _openSurface(context, 'pp_baby_ok_check')),
+                      mark: TtcTabMark.doctorChat,
+                      // This phase's own lines first (gap analysis P1, 2026-10-07).
+                      // Kept for revert: onTap: () => _openSurface(context, 'pp_baby_ok_check')),
+                      onTap: () => showPpCallDoctorSheet(context,
+                          phase: phase, p: p, onCheck: () => _openSurface(context, 'pp_baby_ok_check'))),
                 ]),
                 const SizedBox(height: 32),
 
@@ -376,7 +562,7 @@ class _PpHomeV3State extends State<PpHomeV3> {
                   const SizedBox(height: 6),
                   _pad(Text(phaseChangesLine(changes, phase),
                       style: pvManrope(
-                          fontSize: 13, height: 1.45, color: p.ink3))),
+                          fontSize: _kBody, height: 1.45, color: p.ink3))),
                 ],
                 const SizedBox(height: 14),
                 // Kept for revert:
@@ -456,7 +642,7 @@ class _PpHomeV3State extends State<PpHomeV3> {
                           ? 'All three done. Tomorrow brings three new ones.'
                           : 'Tomorrow brings three new ones.',
                       style: pvManrope(
-                          fontSize: 13, height: 1.45, color: p.ink3))),
+                          fontSize: _kMeta, height: 1.45, color: p.ink3))),
                 ],
                 const SizedBox(height: 32),
 
@@ -475,7 +661,52 @@ class _PpHomeV3State extends State<PpHomeV3> {
                 //         article: r,
                 //         p: p,
                 //         onTap: () => _openSurface(context, 'pp_read'))),
-                if (reads.isNotEmpty) ...[
+                // From the doors, in the child's band (gap analysis P1,
+                // 2026-10-07; pp_home_reads.dart), with "Continue reading"
+                // first. The ten-read rail below is now only the fallback.
+                if (PpLastPageStore.instance.last case final last?) ...[
+                  _pad(_Head(eyebrow: 'Read', title: 'Continue reading', p: p)),
+                  const SizedBox(height: 8),
+                  _pad(PvListRow(
+                    key: const ValueKey('pp_home_continue'),
+                    p: p,
+                    leading: PvMarkWell(p: p, hue: 268, size: 44, mark: ppTabMarkFor(Icons.menu_book_outlined)),
+                    title: last.page.title,
+                    line: last.section.title,
+                    onTap: () => ppOpenPage(context, last.section, last.page,
+                        onSurface: (ctx, id) => _openSurface(ctx, id)),
+                  )),
+                  const SizedBox(height: 26),
+                ],
+                if (doorReads.isNotEmpty) ...[
+                  _pad(_Head(eyebrow: 'Read', title: 'Recommended reads for today', p: p)),
+                  const SizedBox(height: 14),
+                  SizedBox(
+                    key: const ValueKey('pp_home_door_reads'),
+                    height: pvShelfRailHeight(MediaQuery.textScalerOf(context)),
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: 18),
+                      itemCount: doorReads.length,
+                      separatorBuilder: (_, _) => const SizedBox(width: 12),
+                      itemBuilder: (context, i) {
+                        final r = doorReads[i];
+                        final spec = ppShelfSpecFor(r.page);
+                        return PvShelfCard(
+                          p: p,
+                          hue: (200 + i * 40) % 360,
+                          kind: spec.kind,
+                          kindWord: spec.word,
+                          fact: spec.fact,
+                          title: r.page.title,
+                          onTap: () => ppOpenPage(context, r.section, r.page,
+                              onSurface: (ctx, id) => _openSurface(ctx, id)),
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                ] else if (reads.isNotEmpty) ...[
                   _pad(_Head(
                       eyebrow: 'Read',
                       title: 'Recommended reads for today',
@@ -622,16 +853,36 @@ class _PpHomeV3State extends State<PpHomeV3> {
                       title: 'At this age',
                       p: p)),
                   const SizedBox(height: 10),
-                  for (var i = 0; i < faqs.length; i++)
-                    _pad(_FaqRow(
-                      faq: faqs[i],
-                      p: p,
-                      open: _openFaq == i,
-                      // Tapping the open one closes it: a disclosure that cannot
-                      // be undone is a worse control than no disclosure.
-                      onTap: () =>
-                          setState(() => _openFaq = _openFaq == i ? null : i),
-                    )),
+                  // One white group, hairlines between the questions, no
+                  // tinted fill when one is open (2026-10-07; the user: "the
+                  // purple lavender background behind the drop-down, I don't
+                  // like it"). Kept for revert: each `_FaqRow` padded on its
+                  // own, as below, with the surfaceAlt fill in the row.
+                  //   for (var i = 0; i < faqs.length; i++)
+                  //     _pad(_FaqRow(faq: faqs[i], p: p, open: _openFaq == i,
+                  //       onTap: () => setState(() => _openFaq = _openFaq == i ? null : i))),
+                  _pad(Container(
+                    key: const ValueKey('pp_home_faqs'),
+                    clipBehavior: Clip.antiAlias,
+                    decoration: BoxDecoration(
+                      color: p.surface,
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(color: p.line),
+                    ),
+                    child: Column(children: [
+                      for (var i = 0; i < faqs.length; i++)
+                        _FaqRow(
+                          faq: faqs[i],
+                          p: p,
+                          open: _openFaq == i,
+                          last: i == faqs.length - 1,
+                          // Tapping the open one closes it: a disclosure that
+                          // cannot be undone is a worse control than none.
+                          onTap: () =>
+                              setState(() => _openFaq = _openFaq == i ? null : i),
+                        ),
+                    ]),
+                  )),
                   const SizedBox(height: 32),
                 ],
 
@@ -641,8 +892,10 @@ class _PpHomeV3State extends State<PpHomeV3> {
                 // It closes the screen because the last thing she should read is
                 // that there is a next, not that there is a product.
                 if (next != null) ...[
+                  // The name moved into the card (2026-10-07). Kept for
+                  // revert: title: next.name.
                   _pad(_Head(
-                      eyebrow: 'Looking ahead', title: next.name, p: p)),
+                      eyebrow: 'Looking ahead', title: 'What comes next', p: p)),
                   const SizedBox(height: 12),
                   _pad(_AheadCard(
                       next: next,
@@ -693,7 +946,21 @@ class _PpHomeV3State extends State<PpHomeV3> {
   //       for (final b in all)
   //         if (b.id != 'parenting_buying') b,
   //     ];
-  static List<Bracket> _tilesOrder(List<Bracket> all) => all;
+  // By age and her priorities (gap analysis P2, 2026-10-07; pp_tile_order.dart).
+  // Every tile stays; only the order moves. Kept for revert:
+  // static List<Bracket> _tilesOrder(List<Bracket> all) => all;
+  static List<Bracket> _tilesOrder(List<Bracket> all) {
+    // ⚠️ OFF BY DEFAULT: the user decided on 2026-09-18 (on the phone) that
+    // "the door positioning should be like the way it was", registry order,
+    // Sleep first. The gap analysis asks for age and priority order; that is
+    // the user's call, so it waits behind kPpTileOrderByAge (pp_tile_order.dart).
+    if (!kPpTileOrderByAge) return all;
+    final f = FamilyProfileStore.instance;
+    final order = ppTileOrder([for (final b in all) b.id],
+        ageInDays: ChildProfileStore.instance.ageInDays, priorities: f.priorities, birthMode: f.birthMode);
+    final byId = {for (final b in all) b.id: b};
+    return [for (final id in order) byId[id]!];
+  }
 
   // The single day-rotated pick. Superseded by PpHomeActivitiesStore, which
   // owns "three a day, Done stays, Change swaps". Kept for revert.
@@ -762,12 +1029,16 @@ class _PpHomeV3State extends State<PpHomeV3> {
   /// Falls back to the old rotation rather than showing nothing: an empty
   /// category is a content gap, and a home screen with a hole in it is worse
   /// than one showing a slightly off-age video.
+  // Only a film that can play (gap analysis P1, Behind · Age by age,
+  // 2026-10-07): "hide the phase video card until a film exists". In release
+  // the dev placeholders are off, so a video with no real URL draws no card.
+  // Kept for revert: the same two picks without the playable filter.
   WatchVideo? _video(AgePhase phase) {
-    final pool = watchByCategory(watchCategoryForPhase(phase));
+    bool plays(WatchVideo v) => pvResolveVideoUrl(v) != null;
+    final pool = watchByCategory(watchCategoryForPhase(phase)).where(plays).toList();
     if (pool.isNotEmpty) return pool[DateTime.now().day % pool.length];
-    return kWatchVideos.isEmpty
-        ? null
-        : kWatchVideos[DateTime.now().day % kWatchVideos.length];
+    final all = kWatchVideos.where(plays).toList();
+    return all.isEmpty ? null : all[DateTime.now().day % all.length];
   }
 
   // Day-rotated, age-blind. Kept for revert.
@@ -1078,7 +1349,9 @@ class _PpHomeV3State extends State<PpHomeV3> {
   void _openJournal(BuildContext context) =>
       Navigator.of(context).push(MaterialPageRoute<void>(
         settings: const RouteSettings(name: 'pp/journal'),
-        builder: (_) => const JournalV2Home(),
+        // The "Priya" demo, replaced 2026-10-07 by the real journal (from the
+        // fork's 57020be). Kept for revert: builder: (_) => const JournalV2Home(),
+        builder: (_) => const PpJournalScreen(),
       ));
 
   void _openCapture(BuildContext context, String prompt) =>
@@ -1086,6 +1359,19 @@ class _PpHomeV3State extends State<PpHomeV3> {
         settings: const RouteSettings(name: 'pp/journal/capture'),
         builder: (_) => QuickCaptureScreen(prompt: prompt),
       ));
+
+  /// An insight card opens its door page, or the tip itself in the one
+  /// reader when no page is linked. Never nothing.
+  void _openInsight(BuildContext context, PpHomeInsight c) {
+    if (c.link case final link?) {
+      _openSurface(context, link);
+      return;
+    }
+    Navigator.of(context).push(MaterialPageRoute<void>(
+      settings: RouteSettings(name: 'pp/tip/${c.id}'),
+      builder: (_) => PvReaderScreen(read: ppTipAsRead(c.id, c.tip), lang: AppLanguage.english),
+    ));
+  }
 
   void _openVideo(BuildContext context, WatchVideo video) =>
       Navigator.of(context).push(MaterialPageRoute<void>(
@@ -1170,7 +1456,7 @@ class _PpHomeV3State extends State<PpHomeV3> {
                   for (final para in change.paragraphs()) ...[
                     Text(para,
                         style: pvManrope(
-                            fontSize: 14.5,
+                            fontSize: _kBody,
                             fontWeight: FontWeight.w500,
                             height: 1.65,
                             color: p.ink1)),
@@ -1180,7 +1466,7 @@ class _PpHomeV3State extends State<PpHomeV3> {
                   // 3. More.
                   Text('MORE ON THIS',
                       style: pvManrope(
-                          fontSize: 11.5,
+                          fontSize: 11,
                           fontWeight: FontWeight.w800,
                           letterSpacing: 1.5,
                           color: p.action)),
@@ -1230,7 +1516,7 @@ class _PpHomeV3State extends State<PpHomeV3> {
                       'General guidance for this age. Your paediatrician knows '
                       'your child; nothing here replaces that.',
                       style: pvManrope(
-                          fontSize: 12, height: 1.5, color: p.ink3)),
+                          fontSize: _kMeta, height: 1.5, color: p.ink3)),
                 ],
               ),
             ),
@@ -1273,6 +1559,9 @@ String _bigAge(ChildProfileStore c) {
 /// The other unit, so the big number is never the only thing she is given —
 /// and so the two together always answer "how old" however she asks it.
 String _subAge(ChildProfileStore c) {
+  // Born early (2026-10-07): the corrected age is the other unit, because it
+  // is what the phase and the milestones on this page are read by.
+  if (c.correctionWeeks != null) return '${c.devAgeInMonths} months corrected';
   final d = c.ageInDays < 1 ? 1 : c.ageInDays;
   final w = c.ageInWeeks.round();
   if (d < 56) return w <= 0 ? 'First week' : (w == 1 ? 'Week 1' : 'Week $w');
@@ -1299,8 +1588,12 @@ class _Hero extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // No background of its own — the page carries it. This is only the type.
+    // ⚠️ THE HEIGHT FOLLOWS THE TEXT SIZE (2026-10-07). A fixed 300 clipped the
+    // hero at large text once the child switch joined it (41px at 1.3x).
+    final scale = MediaQuery.textScalerOf(context).scale(10) / 10;
+    final extra = (scale - 1).clamp(0.0, 1.0) * 240 + (child.children.length >= 2 ? 36 : 0);
     return SizedBox(
-      height: 300,
+      height: 300 + extra,
       child: Stack(children: [
         SafeArea(
           bottom: false,
@@ -1332,6 +1625,7 @@ class _Hero extends StatelessWidget {
                     initial: child.nameMid.isEmpty ? '' : child.nameMid[0],
                     onSaved: onSaved,
                     onProfile: onProfile,
+                    avatarOpensProfile: true,
                   ),
                 ),
                 const Spacer(),
@@ -1360,6 +1654,8 @@ class _Hero extends StatelessWidget {
                 // counting, weeks once weeks are, months after that. And the
                 // OTHER unit sits underneath, so the big number is never the
                 // only thing she is given.
+                // Two or more children: "Aarav ▾" (gap analysis P2, 2026-10-07).
+                PpChildSwitch(p: p),
                 Text(_bigAge(child),
                     style: pvFraunces(
                         fontSize: 42,
@@ -1496,13 +1792,14 @@ class _Head extends StatelessWidget {
   Widget build(BuildContext context) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(children: [
+          // An empty eyebrow draws nothing (the door grid's heading has none).
+          if (eyebrow.isNotEmpty || note != null) Row(children: [
             Expanded(
               child: Text(eyebrow.toUpperCase(),
                   style: pvManrope(
-                      fontSize: 11.5,
+                      fontSize: 11,
                       fontWeight: FontWeight.w800,
-                      letterSpacing: 1.5,
+                      letterSpacing: 1.4,
                       color: p.action)),
             ),
             if (note != null)
@@ -1513,7 +1810,7 @@ class _Head extends StatelessWidget {
                       letterSpacing: 1.2,
                       color: p.ink3)),
           ]),
-          const SizedBox(height: 6),
+          if (eyebrow.isNotEmpty || note != null) const SizedBox(height: 6),
           Text(title,
               style: pvFraunces(
                   fontSize: 24,
@@ -1783,8 +2080,10 @@ class _ProductRail extends StatelessWidget {
   final ValueChanged<PpProduct> onOpen;
 
   @override
+  // The rail grows with the text size (2026-10-07): a fixed 236 clipped the
+  // card's foot at large text.
   Widget build(BuildContext context) => SizedBox(
-        height: 236,
+        height: 236 + ((MediaQuery.textScalerOf(context).scale(10) / 10) - 1).clamp(0.0, 1.0) * 90,
         child: ListView.separated(
           scrollDirection: Axis.horizontal,
           padding: const EdgeInsets.symmetric(horizontal: 18),
@@ -1832,7 +2131,7 @@ class _ProductRail extends StatelessWidget {
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: pvManrope(
-                                fontSize: 13.5,
+                                fontSize: _kBody,
                                 fontWeight: FontWeight.w600,
                                 height: 1.3,
                                 color: p.ink1)),
@@ -1841,13 +2140,13 @@ class _ProductRail extends StatelessWidget {
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: pvManrope(
-                                fontSize: 12.5, height: 1.35, color: p.ink2)),
+                                fontSize: _kMeta, height: 1.35, color: p.ink2)),
                         const Spacer(),
                         Row(children: [
                           Expanded(
                             child: Text('₹${it.price}',
                                 style: pvManrope(
-                                    fontSize: 13.5,
+                                    fontSize: _kBody,
                                     fontWeight: FontWeight.w700,
                                     color: p.ink1)),
                           ),
@@ -2102,6 +2401,9 @@ class _Snapshot extends StatelessWidget {
 /// inventing a second one: a chevron that turns, `AnimatedSize` over the real
 /// child, and no fixed height. Two expanding sections on one screen that behave
 /// differently is the drift this app keeps having to undo.
+// Superseded 2026-10-07 by _PhaseAtAGlance (summary + three labelled points,
+// the full description in the reader). Kept for revert (2026-10-07).
+// ignore: unused_element
 class _PhaseExplained extends StatelessWidget {
   const _PhaseExplained({
     required this.phase,
@@ -2141,7 +2443,9 @@ class _PhaseExplained extends StatelessWidget {
                   ? Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        for (final sec in phase.sections) ...[
+                        // The At-this-age block draws feeding, sleep and the
+                        // doctor lines itself; not said twice (2026-10-07).
+                        for (final sec in phase.sections.where((x) => !ppAtThisAgeOwns(x.heading))) ...[
                           const SizedBox(height: 18),
                           Text(sec.heading,
                               style: pvFraunces(
@@ -2180,11 +2484,11 @@ class _PhaseExplained extends StatelessWidget {
             ),
             const SizedBox(height: 13),
             Row(children: [
-              Text(expanded ? 'Show less' : 'Read the full description',
+              Flexible(child: Text(expanded ? 'Show less' : 'Read the full description',
                   style: pvManrope(
                       fontSize: 13,
                       fontWeight: FontWeight.w800,
-                      color: p.action)),
+                      color: p.action))),
               const SizedBox(width: 5),
               AnimatedRotation(
                 turns: expanded ? 0.5 : 0,
@@ -2199,13 +2503,123 @@ class _PhaseExplained extends StatelessWidget {
       );
 }
 
+/// "This phase, explained", segregated (2026-10-07).
+///
+/// The user: "Under This phase explained it's very text heavy, like text
+/// thrown. Segregate it, represent it better." It was the summary and, on
+/// tap, eight sections of paragraphs unrolled in place. Now: the summary as
+/// the lead, then three labelled points, each a drawn mark, a small-caps
+/// label and a line or two, then "Read the full description", which opens
+/// the WHOLE phase in the one reader (`ppPhaseAsRead`). Nothing is cut; what
+/// does not fit lives one tap away, as on a summary card in a health app.
+///
+/// The three points are the questions a parent brings to an age: what is
+/// the child working on, is this normal, and what helps. The doctor lines
+/// are not one of them because `PpAtThisAge`, just below, never folds them.
+///
+/// Mobbin (adopted: a white summary card, a lead line, labelled rows with a
+/// small mark each, one link out): Withings Health Mate "Today's Missions",
+/// https://mobbin.com/screens/6852bc4c-c9d3-434d-b52f-54521e690076 ; Apple
+/// Health's summary card, https://mobbin.com/screens/97104df5-f817-4e56-80a0-0c46eee67e06
+class _PhaseAtAGlance extends StatelessWidget {
+  const _PhaseAtAGlance({required this.phase, required this.p, required this.onReadMore});
+
+  final AgePhase phase;
+  final V2Palette p;
+  final VoidCallback onReadMore;
+
+  /// The first sentence of a section, or null when the phase has none.
+  String? _firstSentence(String heading) {
+    for (final s in phase.sections) {
+      if (s.heading.toLowerCase() != heading || s.paragraphs.isEmpty) continue;
+      final para = s.paragraphs.first.trim();
+      final m = RegExp(r'^(.+?[.!?])(\s|$)').firstMatch(para);
+      return m == null ? para : m.group(1);
+    }
+    return null;
+  }
+
+  Widget _point(String key, TtcTabMark mark, double hue, String label, List<String> lines) => Padding(
+        key: ValueKey('pp_phase_point_$key'),
+        padding: const EdgeInsets.only(top: 14),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          TtcMarkLeading(tab: mark, tint: v2BlockTint(hue, p), size: 34),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(label.toUpperCase(),
+                  style: pvManrope(
+                      fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.4, color: p.ink2)),
+              const SizedBox(height: 4),
+              for (final l in lines)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 3),
+                  child: Text(l,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: pvManrope(fontSize: _kBody, height: 1.45, color: p.ink1)),
+                ),
+            ]),
+          ),
+        ]),
+      );
+
+  @override
+  Widget build(BuildContext context) {
+    final helps = _firstSentence('play that helps now') ?? _firstSentence('what helps');
+    return Container(
+      key: const ValueKey('pp_phase_glance'),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
+      decoration: BoxDecoration(
+        color: p.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: p.line),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(phase.summary,
+            maxLines: 4,
+            overflow: TextOverflow.ellipsis,
+            style: pvManrope(fontSize: _kBody, fontWeight: FontWeight.w500, height: 1.55, color: p.ink1)),
+        const SizedBox(height: 4),
+        if (phase.workingOn.isNotEmpty)
+          _point('working', TtcTabMark.sprout, 104, 'Working on now', phase.workingOn.take(3).toList()),
+        _point('normal', TtcTabMark.heartHand, 28, 'What is normal', [phase.reassurance]),
+        if (helps != null) _point('helps', TtcTabMark.sun, 42, 'What helps', [helps]),
+        const SizedBox(height: 12),
+        Divider(height: 1, thickness: 1, color: p.line),
+        InkWell(
+          key: const ValueKey('pp_phase_read_more'),
+          onTap: onReadMore,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 12),
+            child: Row(children: [
+              Expanded(
+                child: Text('Read the full description',
+                    style: pvManrope(fontSize: _kBody, fontWeight: FontWeight.w800, color: p.ink1)),
+              ),
+              Icon(Icons.chevron_right_rounded, size: 20, color: p.ink1),
+            ]),
+          ),
+        ),
+      ]),
+    );
+  }
+}
+
 class _FaqRow extends StatefulWidget {
   const _FaqRow(
-      {required this.faq, required this.p, this.open = false, this.onTap});
+      {required this.faq,
+      required this.p,
+      this.open = false,
+      this.last = false,
+      this.onTap});
 
   final PhaseFaq faq;
   final V2Palette p;
   final bool open;
+
+  /// The last row in the group draws no hairline under itself.
+  final bool last;
   final VoidCallback? onTap;
 
   @override
@@ -2213,8 +2627,66 @@ class _FaqRow extends StatefulWidget {
 }
 
 class _FaqRowState extends State<_FaqRow> {
+  /// A white row in a white group: the question in ink, a chevron that
+  /// turns, the answer under it, a hairline between rows. No fill changes
+  /// when a row opens (2026-10-07, the user did not like the lavender).
   @override
   Widget build(BuildContext context) {
+    final p = widget.p;
+    final open = widget.open;
+    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      InkWell(
+        onTap: widget.onTap,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 15, 14, 15),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Expanded(
+                child: Text(widget.faq.question,
+                    style: pvFraunces(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        height: 1.3,
+                        letterSpacing: -0.3,
+                        color: p.ink1)),
+              ),
+              const SizedBox(width: 10),
+              AnimatedRotation(
+                turns: open ? 0.5 : 0,
+                duration: const Duration(milliseconds: 180),
+                curve: Curves.easeOut,
+                child: Icon(Icons.keyboard_arrow_down_rounded,
+                    size: 21, color: p.ink1),
+              ),
+            ]),
+            AnimatedSize(
+              duration: const Duration(milliseconds: 180),
+              curve: Curves.easeOut,
+              alignment: Alignment.topCenter,
+              child: open
+                  ? Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: Text(widget.faq.answer,
+                          style: pvManrope(
+                              fontSize: _kBody,
+                              height: 1.6,
+                              color: p.ink2)),
+                    )
+                  // height: 0 is load-bearing; see _buildBefore below.
+                  : const SizedBox(width: double.infinity, height: 0),
+            ),
+          ]),
+        ),
+      ),
+      if (!widget.last)
+        Divider(height: 1, thickness: 1, color: p.line, indent: 16),
+    ]);
+  }
+
+  // The tinted-pill row (surfaceAlt fill when closed). Kept for revert
+  // (2026-10-07).
+  // ignore: unused_element
+  Widget _buildBefore(BuildContext context) {
     final p = widget.p;
     final open = widget.open;
     return Padding(
@@ -2290,8 +2762,88 @@ class _FaqRowState extends State<_FaqRow> {
   }
 }
 
+/// "Looking ahead", redrawn (2026-10-07).
+///
+/// The user: "Looking ahead ... purple left line, I don't like it. The
+/// representation should be better." A white card with a hairline, a drawn
+/// mark in its well, the next phase's age as meta, its name as the card
+/// title, one line (its tagline), and an ink "See what's next" link. No
+/// accent spine, no accent colour at all: the phase accents are all the
+/// brand purple (pp_phases_data.dart), which is exactly what the user saw.
+///
+/// Mobbin (adopted: a white status card, title, one line, an arrow out):
+/// Superpower's "We received your sample",
+/// https://mobbin.com/screens/5c8e11ba-1d6e-4802-be01-f0fd16217455 ; the
+/// next-stage peek as Oura's "Good to know in Week 40",
+/// https://mobbin.com/screens/4ccc949c-fa00-41db-a72e-67f4e19f214e
 class _AheadCard extends StatelessWidget {
   const _AheadCard({required this.next, required this.p, this.onTap});
+
+  final AgePhase next;
+  final V2Palette p;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) => InkWell(
+        key: const ValueKey('pp_home_ahead'),
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: p.surface,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: p.line),
+          ),
+          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            TtcMarkLeading(tab: TtcTabMark.sunrise, tint: v2BlockTint(42, p), size: 44),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text('NEXT · ${next.ageLabel.toUpperCase()}',
+                    style: pvManrope(
+                        fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.4, color: p.ink3)),
+                const SizedBox(height: 5),
+                Text(next.name,
+                    style: pvFraunces(
+                        fontSize: _kCardTitle,
+                        fontWeight: FontWeight.w600,
+                        height: 1.25,
+                        letterSpacing: -0.4,
+                        color: p.ink1)),
+                const SizedBox(height: 4),
+                Text(next.tagline,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: pvManrope(fontSize: _kBody, height: 1.45, color: p.ink2)),
+                if (onTap != null) ...[
+                  const SizedBox(height: 12),
+                  Row(children: [
+                    Flexible(
+                      child: Text("See what's next",
+                          style: pvManrope(
+                              fontSize: _kBody, fontWeight: FontWeight.w800, color: p.ink1)),
+                    ),
+                    const SizedBox(width: 4),
+                    Icon(Icons.arrow_forward_rounded, size: 16, color: p.ink1),
+                  ]),
+                ],
+              ]),
+            ),
+          ]),
+        ),
+      );
+}
+
+// The accent-spine card. Superseded 2026-10-07 by the white card above.
+// Kept for revert (2026-10-07).
+// ignore: unused_element
+class _AheadCardBefore extends StatelessWidget {
+  const _AheadCardBefore(
+      {required this.next,
+      required this.p,
+      // ignore: unused_element_parameter
+      this.onTap});
 
   final AgePhase next;
   final V2Palette p;
@@ -2389,11 +2941,13 @@ class _AheadCard extends StatelessWidget {
                     if (onTap != null) ...[
                       const SizedBox(height: 13),
                       Row(children: [
-                        Text('See what changes',
-                            style: pvManrope(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w800,
-                                color: accent)),
+                        Flexible(
+                          child: Text('See what changes',
+                              style: pvManrope(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w800,
+                                  color: accent)),
+                        ),
                         const SizedBox(width: 6),
                         Icon(Icons.arrow_forward_rounded,
                             size: 15, color: accent),
@@ -2546,7 +3100,7 @@ class _PhaseVideoCard extends StatelessWidget {
       Text(video.title,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
-          style: pvManrope(fontSize: 13, height: 1.45, color: p.ink3)),
+          style: pvManrope(fontSize: _kMeta, height: 1.45, color: p.ink3)),
     ]);
   }
 }
@@ -2556,11 +3110,16 @@ class _Resource {
       {required this.label,
       required this.hue,
       required this.icon,
-      required this.onTap});
+      required this.onTap,
+      this.mark});
   final String label;
   final double hue;
   final IconData icon;
   final VoidCallback onTap;
+
+  /// The TTC drawn mark, as pregnancy's "Tools for this week" tiles draw
+  /// theirs (2026-10-07). `icon` is kept for revert.
+  final TtcTabMark? mark;
 }
 
 /// The row of further resources under the phase text: compact cards, a
@@ -2596,16 +3155,21 @@ class _ResourceRail extends StatelessWidget {
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          width: 32,
-                          height: 32,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: v2BlockTint(it.hue, p),
-                            borderRadius: BorderRadius.circular(11),
+                        // The drawn mark, one ParentVeda (2026-10-07). Kept
+                        // for revert: the Material icon in a tinted square.
+                        if (it.mark case final m?)
+                          TtcMarkLeading(tab: m, tint: v2BlockTint(it.hue, p), size: 34)
+                        else
+                          Container(
+                            width: 32,
+                            height: 32,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: v2BlockTint(it.hue, p),
+                              borderRadius: BorderRadius.circular(11),
+                            ),
+                            child: Icon(it.icon, size: 18, color: p.ink2),
                           ),
-                          child: Icon(it.icon, size: 18, color: p.ink2),
-                        ),
                         const Spacer(),
                         Row(children: [
                           Expanded(
@@ -2613,7 +3177,7 @@ class _ResourceRail extends StatelessWidget {
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: pvManrope(
-                                    fontSize: 13.5,
+                                    fontSize: _kBody,
                                     fontWeight: FontWeight.w600,
                                     height: 1.3,
                                     color: p.ink1)),
@@ -2656,7 +3220,7 @@ class _ChangeCard extends StatelessWidget {
             const SizedBox(height: 10),
             Text(change.title,
                 style: pvFraunces(
-                    fontSize: 18,
+                    fontSize: _kCardTitle,
                     fontWeight: FontWeight.w600,
                     height: 1.25,
                     letterSpacing: -0.4,
@@ -2665,14 +3229,16 @@ class _ChangeCard extends StatelessWidget {
             Text(change.notice,
                 maxLines: 3,
                 overflow: TextOverflow.ellipsis,
-                style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2)),
+                style: pvManrope(fontSize: _kBody, height: 1.5, color: p.ink2)),
             const SizedBox(height: 12),
             Row(children: [
-              Text('See what changes',
-                  style: pvManrope(
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.w700,
-                      color: p.action)),
+              Flexible(
+                child: Text('See what changes',
+                    style: pvManrope(
+                        fontSize: _kBody,
+                        fontWeight: FontWeight.w700,
+                        color: p.action)),
+              ),
               const SizedBox(width: 4),
               Icon(Icons.chevron_right_rounded, size: 17, color: p.action),
             ]),
@@ -2731,14 +3297,14 @@ class _MoreRow extends StatelessWidget {
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: pvManrope(
-                              fontSize: 13.5,
+                              fontSize: _kBody,
                               fontWeight: FontWeight.w600,
                               height: 1.3,
                               color: p.ink1)),
                       const SizedBox(height: 3),
                       Text(sub,
                           style: pvManrope(
-                              fontSize: 13, height: 1.3, color: p.ink3)),
+                              fontSize: _kMeta, height: 1.3, color: p.ink3)),
                     ]),
               ),
               Icon(Icons.chevron_right_rounded, size: 20, color: p.ink3),
@@ -2775,12 +3341,12 @@ class _EmptyInvite extends StatelessWidget {
           ),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(line,
-                style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2)),
+                style: pvManrope(fontSize: _kBody, height: 1.5, color: p.ink2)),
             const SizedBox(height: 10),
             Row(children: [
               Text(cta,
                   style: pvManrope(
-                      fontSize: 12.5,
+                      fontSize: _kBody,
                       fontWeight: FontWeight.w700,
                       color: p.action)),
               const SizedBox(width: 4),
@@ -2790,6 +3356,21 @@ class _EmptyInvite extends StatelessWidget {
         ),
       );
 }
+
+/// The TTC drawn mark and well hue for a development area, one per area, so
+/// the home's activity cards speak the same mark language as the pregnancy
+/// home's tools rows (2026-10-07). Hues stay off the purple band.
+(TtcTabMark, double) ppActivityMark(String areaId) => switch (areaId) {
+      'cognitive' => (TtcTabMark.magnifier, 42),
+      'language' => (TtcTabMark.twoBubbles, 188),
+      'gross_motor' => (TtcTabMark.flagPath, 104),
+      'fine_motor' => (TtcTabMark.heartHand, 28),
+      'emotional' => (TtcTabMark.bigSmallHearts, 344),
+      'social' => (TtcTabMark.twoCircles, 206),
+      'creativity' => (TtcTabMark.sprout, 150),
+      'selfcare' => (TtcTabMark.bowl, 12),
+      _ => (TtcTabMark.openBook, 42),
+    };
 
 /// One of today's three activities.
 ///
@@ -2818,7 +3399,9 @@ class _TodayActivityCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final area = devAreaById(activity.areaId);
-    final hue = HSLColor.fromColor(area.accent).hue;
+    // The area accent's hue tinted the old square; the drawn mark carries its
+    // own hue now (ppActivityMark). Kept for revert:
+    //   final hue = HSLColor.fromColor(area.accent).hue;
     return AnimatedOpacity(
       duration: const Duration(milliseconds: 200),
       opacity: done ? 0.58 : 1,
@@ -2834,20 +3417,16 @@ class _TodayActivityCard extends StatelessWidget {
             onTap: onOpen,
             borderRadius: BorderRadius.circular(12),
             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Container(
-                width: 40,
-                height: 40,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: v2BlockTint(hue, p),
-                  borderRadius: BorderRadius.circular(13),
-                ),
-                child: switch (devMarkFor(area.id)) {
-                  final DevMark m =>
-                    V3DevMark(mark: m, accent: area.accent, size: 22),
-                  null => Icon(area.icon, size: 19, color: p.ink2),
-                },
-              ),
+              // The TTC drawn mark for the activity's area (2026-10-07; the
+              // user: "use the latest marks or glyphs; these seem outdated").
+              // Kept for revert: a 40dp tinted square holding
+              // V3DevMark(mark: devMarkFor(area.id), accent: area.accent)
+              // or Icon(area.icon), on v2BlockTint(hue, p).
+              TtcMarkLeading(
+                  key: ValueKey('pp_activity_mark_${area.id}'),
+                  tab: ppActivityMark(area.id).$1,
+                  tint: v2BlockTint(ppActivityMark(area.id).$2, p),
+                  size: 40),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -2860,7 +3439,7 @@ class _TodayActivityCard extends StatelessWidget {
                           children: [
                             Text(activity.title,
                                 style: pvFraunces(
-                                    fontSize: 18,
+                                    fontSize: _kCardTitle,
                                     fontWeight: FontWeight.w600,
                                     height: 1.25,
                                     letterSpacing: -0.4,
@@ -2876,10 +3455,10 @@ class _TodayActivityCard extends StatelessWidget {
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: pvManrope(
-                              fontSize: 13.5, height: 1.5, color: p.ink2)),
+                              fontSize: _kBody, height: 1.5, color: p.ink2)),
                       const SizedBox(height: 8),
                       Text('${activity.minutes} min  ·  ${activity.ageTag}',
-                          style: pvManrope(fontSize: 13, color: p.ink3)),
+                          style: pvManrope(fontSize: _kMeta, color: p.ink3)),
                     ]),
               ),
             ]),
@@ -2906,13 +3485,15 @@ class _TodayActivityCard extends StatelessWidget {
                 const SizedBox(width: 8),
                 Text('Done today',
                     style: pvManrope(
-                        fontSize: 13,
+                        fontSize: _kBody,
                         fontWeight: FontWeight.w700,
                         color: p.ink2)),
               ]),
             )
           else
-            Row(children: [
+            // A Wrap, not a Row (2026-10-07): at large text Change drops to the
+            // next line instead of running off the card.
+            Wrap(spacing: 10, runSpacing: 6, crossAxisAlignment: WrapCrossAlignment.center, children: [
               InkWell(
                 onTap: onDone,
                 borderRadius: BorderRadius.circular(999),
@@ -2928,13 +3509,12 @@ class _TodayActivityCard extends StatelessWidget {
                     const SizedBox(width: 7),
                     Text('Done',
                         style: pvManrope(
-                            fontSize: 13,
+                            fontSize: _kBody,
                             fontWeight: FontWeight.w700,
                             color: p.ink1)),
                   ]),
                 ),
               ),
-              const SizedBox(width: 10),
               InkWell(
                 onTap: onChange,
                 borderRadius: BorderRadius.circular(999),
@@ -2946,7 +3526,7 @@ class _TodayActivityCard extends StatelessWidget {
                     const SizedBox(width: 7),
                     Text('Change',
                         style: pvManrope(
-                            fontSize: 13,
+                            fontSize: _kBody,
                             fontWeight: FontWeight.w700,
                             color: p.ink2)),
                   ]),
@@ -3042,7 +3622,7 @@ class _ReadRail extends StatelessWidget {
                                         maxLines: 2,
                                         overflow: TextOverflow.ellipsis,
                                         style: pvManrope(
-                                            fontSize: 12.5,
+                                            fontSize: _kMeta,
                                             height: 1.4,
                                             color: p.ink2)),
                                   ),
@@ -3092,7 +3672,7 @@ class _JournalInvite extends StatelessWidget {
           ),
           child: Text(label,
               style: pvManrope(
-                  fontSize: 12, fontWeight: FontWeight.w700, color: p.ink2)),
+                  fontSize: _kMeta, fontWeight: FontWeight.w700, color: p.ink2)),
         ),
       );
 
@@ -3133,7 +3713,7 @@ class _JournalInvite extends StatelessWidget {
                         'A first smile, a milestone, a thought, or just how '
                         'today felt.',
                         style: pvManrope(
-                            fontSize: 13.5, height: 1.5, color: p.ink2)),
+                            fontSize: _kBody, height: 1.5, color: p.ink2)),
                     const SizedBox(height: 10),
                     Wrap(spacing: 6, runSpacing: 6, children: [
                       _chip('Photo', onPhoto),
@@ -3150,11 +3730,13 @@ class _JournalInvite extends StatelessWidget {
           onTap: onOpenAll,
           borderRadius: BorderRadius.circular(8),
           child: Row(mainAxisSize: MainAxisSize.min, children: [
-            Text('Open the journal',
-                style: pvManrope(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: p.action)),
+            Flexible(
+              child: Text('Open the journal',
+                  style: pvManrope(
+                      fontSize: _kBody,
+                      fontWeight: FontWeight.w700,
+                      color: p.action)),
+            ),
             const SizedBox(width: 4),
             Icon(Icons.chevron_right_rounded, size: 17, color: p.action),
           ]),

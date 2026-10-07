@@ -101,38 +101,39 @@ const PpArea _crying = PpArea(
         PpArticle(
           heading: 'Why there is so much of it',
           [
-            'A newborn cannot move away from what bothers her, cannot ask for '
-                'anything, and cannot wait. Crying is the only tool she has, so '
-                'she uses it for hunger, wind, tiredness, a wet nappy, too much '
-                'noise, and sometimes for a reason you will never identify.',
+            'A newborn can\'t move away from discomfort, can\'t ask for '
+                'anything and can\'t wait. Crying is the only tool a newborn '
+                'has, so it covers everything: hunger, wind, tiredness, a wet '
+                'nappy, too much noise. Sometimes it\'s for a reason you\'ll '
+                'never find.',
             'Researchers who plotted crying across large numbers of babies '
-                'found the same shape again and again: a rise through the first '
-                'weeks, a peak at around six to eight weeks, then a steady fall. '
-                'Some babies cry under two hours a day at that peak and some cry '
-                'five. Both sit inside normal.',
-            'Evenings are usually the worst of it. A long stretch of fussing '
-                'between about 5pm and 10pm is so common that most families have '
-                'a name for it, and it passes on its own without anything being '
-                'done about it.',
+                'found the same shape again and again. It rises through the '
+                'first weeks, peaks at around six to eight weeks, then falls '
+                'steadily. Some babies cry under two hours a day at that peak '
+                'and some cry five. Both are normal.',
+            'Evenings are usually the hardest. A long stretch of fussing '
+                'between about 5pm and 10pm is so common that most families '
+                'have a name for it. It passes on its own, without anything '
+                'being done about it.',
           ],
         ),
         PpSteps(
           heading: 'What to do in the moment',
           [
-            PpStep('Run through the basics first', 'Hungry, wind, nappy, too hot or too cold, overtired, '
-                    'too much going on around her. Most crying is one of these.'),
-            PpStep('Take her somewhere quieter', 'Dim the light, lower the voices, switch the television '
-                    'off. An overstimulated baby cannot settle in a busy room, '
-                    'however tired she is.'),
-            PpStep('Hold her close and move slowly', 'Upright against your chest, skin to skin if you can, '
+            PpStep('Run through the basics first', 'Hungry, wind, nappy, too hot or too cold, overtired, too much '
+                    'going on around your baby. Most crying is one of these.'),
+            PpStep('Find somewhere quieter', 'Dim the light, lower the voices, switch the television off. An '
+                    'overstimulated baby can\'t settle in a busy room, however '
+                    'tired.'),
+            PpStep('Hold your baby close and move slowly', 'Upright against your chest, skin to skin if you can, '
                     'with a slow steady sway or walk. Rhythm settles a baby far '
                     'better than variety does.'),
-            PpStep('Add one sound, not three', 'A long shhh near her ear, a fan, a tap running. White '
-                    'noise is close to what she heard inside you.'),
+            PpStep('Add one sound, not three', 'A long shhh close to the ear, a fan, a tap running. White '
+                    'noise is close to what your baby heard inside you.'),
             PpStep('Offer a feed if it is anywhere near due', 'Sucking calms babies even when they are not especially '
                     'hungry.'),
-            PpStep('If she is fed, clean and safe and still crying, holding her '
-                'is enough', 'You do not have to solve it. Some crying only needs '
+            PpStep('If your baby is fed, clean, safe and still crying, holding is '
+                'enough', 'You do not have to solve it. Some crying only needs '
                     'company.'),
           ],
         ),
@@ -141,25 +142,25 @@ const PpArea _crying = PpArea(
           hue: 206,
           [
             PpCard('Do not assume every cry is hunger',
-                'Feeding a baby who is actually overtired or windy adds '
-                'discomfort to discomfort, and it is the easiest mistake to '
-                'make because feeding sometimes works.'),
+                'Feeding a baby who is overtired or windy adds discomfort to '
+                'discomfort. It\'s the easiest mistake to make, because feeding '
+                'sometimes works.'),
             PpCard('Do not read it as a verdict on you',
                 'A baby who cries a lot is not evidence of a mother getting it '
                 'wrong. The two are not connected, and every study of this has '
                 'said so.'),
-            PpCard('Do not measure her against a good baby',
+            PpCard('Don\'t compare your baby with anyone else\'s',
                 'A cousin who slept through from week three tells you something '
                 'about that baby. It tells you nothing about yours.'),
           ],
         ),
         PpCallout(
-          'Call your paediatrician if the cry is high pitched, weak or very '
-          'different from usual, if there is any fever in a baby under three '
-          'months, if she is feeding poorly, if there are fewer wet nappies '
-          'than normal, or if she is floppy or hard to wake. Crying that starts '
-          'suddenly, will not settle at all and is unlike her also deserves a '
-          'call today.',
+          'Call your paediatrician if the cry is high pitched, weak or '
+          'very different from usual, or if there is any fever in a baby '
+          'under three months. Call too if your baby is feeding poorly, '
+          'has fewer wet nappies than normal, or is floppy or hard to '
+          'wake. Crying that starts suddenly, won\'t settle at all and '
+          'seems unlike your baby also needs a call today.',
           kind: PpCalloutKind.doctor,
           title: 'When crying needs a doctor',
         ),
@@ -171,10 +172,10 @@ const PpArea _crying = PpArea(
           slotId: 'behaviour/crying_curve',
         ),
         PpWhenLine('Most relevant from birth to about four months.'),
-        PpIndiaNote('In a joint family everyone will have a theory and most of '
-            'them will be about your milk. Crying at six weeks is a stage, not '
-            'a supply problem. If you are genuinely worried about feeding, '
-            'weigh her rather than argue about it.'),
+        PpIndiaNote('In a joint family everyone will have a theory, and most of '
+            'them will be about your milk. Crying at six weeks is a stage, '
+            'not a supply problem. If you\'re really worried about feeding, '
+            'get your baby weighed rather than arguing about it.'),
         PpCallout('If the crying has stopped feeling survivable, read "When the '
             'crying is too much" in this same door before the next hard '
             'evening, not during it.'),
@@ -193,21 +194,21 @@ const PpArea _crying = PpArea(
       bands: ['infant'],
       blocks: [
         PpIntro('Some babies drop off anywhere. Others fight it hard. A baby '
-            'who will not settle is usually overtired, taking in too much, or '
-            'simply not finished being held yet.'),
+            'who won\'t settle is usually overtired, taking in too much, or '
+            'not finished being held yet.'),
         PpArticle(
           heading: 'The three usual reasons',
           [
-            'Sleep pressure builds far faster in a baby than in you. Miss the '
-                'window by fifteen minutes and she is not sleepy any more, she is '
-                'wired: stiff legs, arched back, and a cry that gets louder the '
-                'more you rock her.',
-            'The second reason is the room. A baby cannot filter noise, light '
-                'and touch the way you can, so a bright room with three people '
-                'talking is not restful to her even when she is exhausted.',
-            'The third is contact. Being put down flat and alone is, to a very '
-                'new baby, information that something has gone wrong. Wanting '
-                'your body is not a habit she has picked up.',
+            'Sleep pressure builds far faster in a baby than in you. Miss '
+                'the window by fifteen minutes and your baby isn\'t sleepy any '
+                'more but wired. You\'ll see stiff legs, an arched back, and a '
+                'cry that gets louder the more you rock.',
+            'The second reason is the room. A baby can\'t filter noise, '
+                'light and touch the way you can. A bright room with three '
+                'people talking isn\'t restful, even to an exhausted baby.',
+            'The third is contact. To a very new baby, being put down flat '
+                'and alone means something has gone wrong. Wanting your body '
+                'isn\'t a habit your baby has picked up.',
           ],
         ),
         PpSteps(
@@ -215,15 +216,14 @@ const PpArea _crying = PpArea(
           [
             PpStep('Lower the room before you do anything else', 'Dim the light, drop your voice, move to the quietest '
                     'space you have.'),
-            PpStep('Wrap or hold firmly', 'A snug swaddle or a firm hold against your chest gives '
-                    'her back the boundary she lost at birth. Keep the hips loose '
-                    'and never anything near her face.'),
+            PpStep('Wrap or hold firmly', 'A snug swaddle or a firm hold against your chest gives back '
+                    'the boundary your baby lost at birth. Keep the hips loose and '
+                    'never put anything near the face.'),
             PpStep('Pick one rhythm and stay with it', 'Slow sway, patting, or walking. Same speed for several '
                     'minutes rather than something new every few seconds.'),
             PpStep('Add white noise', 'Steady and boring is the point. A fan, a shhh, a tap.'),
-            PpStep('Offer a feed if it is due', 'Comfort sucking is doing something real, not spoiling '
-                    'her.'),
-            PpStep('When she goes drowsy, stop adding things', 'This is where most of us wake the baby back up. Slow '
+            PpStep('Offer a feed if it is due', 'Comfort sucking does real work in calming your baby.'),
+            PpStep('When your baby goes drowsy, stop adding things', 'This is where most of us wake the baby back up. Slow '
                     'down, then be still.'),
           ],
         ),
@@ -233,32 +233,32 @@ const PpArea _crying = PpArea(
           [
             PpCard('Do not change method every thirty seconds',
                 'Rock, then dummy, then feed, then a different room, all inside '
-                'two minutes, and she never gets long enough with any one of '
+                'two minutes. Your baby never gets long enough with any one of '
                 'them to slow down.'),
             PpCard('Do not add stimulation to fix crying',
                 'Bouncing harder, singing louder or switching on a bright toy '
                 'usually makes an overtired baby worse.'),
             PpCard('Do not chase a perfect routine yet',
-                'Under three months the routine follows her. It is not the '
+                'Under three months the routine follows your baby. It isn\'t the '
                 'other way round for a while.'),
           ],
         ),
         PpCallout(
-          'Get her checked by your paediatrician rather than trying more '
-          'settling techniques if she '
-          'arches and screams during or after most feeds, vomits forcefully, '
-          'has blood or mucus in her stool, is not gaining weight, or if the '
-          'unsettledness arrived suddenly and stayed.',
+          'Get your baby checked by your paediatrician, rather than '
+          'trying more settling, if there is arching and screaming during '
+          'or after most feeds, or forceful vomiting. The same goes for '
+          'blood or mucus in the stool, weight that isn\'t going up, or '
+          'unsettledness that arrived suddenly and stayed.',
           kind: PpCalloutKind.doctor,
           title: 'When it is not a settling problem',
         ),
         PpWhenLine('Most relevant from birth to about six months.'),
-        PpLink('Something has changed in her sleeping or crying',
+        PpLink('Something has changed in sleeping or crying',
             surfaceId: 'pp_what_changed',
             blurb: 'Look up the change and see what it usually means.'),
         PpLink('Settling, naps and night waking',
             surfaceId: 'pp_sleep',
-            blurb: 'The full sleep door for her age.'),
+            blurb: 'The full sleep door for your baby\'s age.'),
         PpLink('Comfort feeding and feeding to sleep',
             surfaceId: 'pp_feeding',
             blurb: 'Whether it is a problem, and when it is not.'),
@@ -273,15 +273,15 @@ const PpArea _crying = PpArea(
       format: 'SHORT ARTICLE',
       bands: ['infant'],
       blocks: [
-        PpIntro('Picking up a crying baby does not spoil her. In the first six '
-            'months, coming when she calls is the thing that builds her sense '
+        PpIntro('Picking up a crying baby doesn\'t spoil anyone. In the first '
+            'six months, coming when your baby calls is what builds a sense '
             'that the world is safe.'),
         PpArticle(
           [
-            'A young baby has no way to soothe herself. When she cries and you '
-                'come, her body learns that distress ends. That learning is the '
-                'floor everything else is built on, including her ability to calm '
-                'herself as a toddler.',
+            'A young baby can\'t calm down alone yet. When your baby cries '
+                'and you come, the body learns that distress ends. That '
+                'learning is the floor everything else is built on, including '
+                'calming down alone as a toddler.',
             'The opposite worry, that a carried baby will always want to be '
                 'carried, does not hold up. Babies who are picked up promptly in '
                 'the early months tend to cry less by the end of the first year, '
@@ -292,33 +292,33 @@ const PpArea _crying = PpArea(
           ],
         ),
         PpCallout(
-          'The line you will hear is that you keep him in your godi too much '
-          'and he will get spoiled. Being held a great deal is not what spoils '
-          'a child. It is what a newborn is built for.',
+          'The line you\'ll hear is that you keep the baby in your arms '
+          'too much and it will spoil the child. Being held a great deal '
+          'isn\'t what spoils a child. It\'s what a newborn is built for.',
           kind: PpCalloutKind.myth,
         ),
         PpScript(
           heading: 'Words to use, when it is said in front of you',
           [
             PpScriptLine(
-              say: 'The doctor said holding him this much is exactly right at '
-                  'his age.',
+              say: 'The doctor said holding the baby this much is exactly right at '
+                  'this age.',
               notThis: 'You do not know anything about babies.',
               why: 'Naming the paediatrician ends the argument without turning '
                   'it into a question of respect.',
             ),
             PpScriptLine(
-              say: 'He is only this small for a few weeks. I want to hold him '
-                  'while he still lets me.',
+              say: 'Babies are only this small for a few weeks. I want to hold '
+                  'mine while I still can.',
               notThis: 'Please stop telling me what to do with my child.',
               why: 'Agreeing that it is temporary lets an elder step back '
                   'without losing face, which is usually what the argument is '
                   'really about.',
             ),
             PpScriptLine(
-              say: 'Would you hold him for a while? My arms are done.',
-              why: 'Turning the criticism into a request changes the room. It '
-                  'is also the help you actually need.',
+              say: 'Would you hold the baby for a while? My arms are done.',
+              why: 'Turning the criticism into a request changes the room. It\'s '
+                  'also the help you need.',
             ),
           ],
         ),
@@ -329,9 +329,9 @@ const PpArea _crying = PpArea(
           kind: PpCalloutKind.doctor,
         ),
         PpWhenLine('Most relevant from birth to about six months.'),
-        PpIndiaNote('In a shared home this advice comes from people who love '
-            'your baby and mean well. You do not need to win the argument. You '
-            'need to keep picking him up.'),
+        PpIndiaNote('In a shared home this advice comes from people who love your '
+            'baby and mean well. You don\'t need to win the argument. You '
+            'need to keep picking your baby up.'),
       ],
     ),
 
@@ -343,8 +343,8 @@ const PpArea _crying = PpArea(
       format: 'CARDS',
       bands: ['infant'],
       blocks: [
-        PpIntro('Babies arrive with a style already fitted. You did not cause '
-            'it and you do not have to correct it. Knowing your baby style '
+        PpIntro('Babies arrive with a style already fitted. You didn\'t cause it '
+            'and you don\'t have to correct it. Knowing your baby\'s style '
             'mainly makes the day easier to plan.'),
         PpCards(
           heading: 'Three rough styles',
@@ -352,9 +352,9 @@ const PpArea _crying = PpArea(
           [
             PpCard('The easy going baby',
                 'Feeds and sleeps fairly predictably, settles with a little '
-                'help, recovers from upset quickly. She needs the same care as '
-                'any baby, and it is worth checking she is not being overlooked '
-                'simply because she rarely complains.'),
+                'help, recovers from upset quickly. Needs the same care as any '
+                'baby, and it\'s worth checking that a baby who rarely complains '
+                'isn\'t being overlooked.'),
             PpCard('The spirited baby',
                 'Big reactions in both directions. Cries hard, laughs hard, '
                 'notices everything, needs more help winding down. Lower the '
@@ -363,8 +363,8 @@ const PpArea _crying = PpArea(
             PpCard('The slow to warm baby',
                 'Watches from the edge before joining in, dislikes sudden '
                 'change, takes longer with new people and new places. Give '
-                'warning, give time, and let her arrive at her own speed instead '
-                'of handing her over.'),
+                'warning, give time, and let your baby join in slowly instead '
+                'of being handed over.'),
             PpCard('Most babies, which is a mix',
                 'Most sit somewhere between these and shift with teeth, illness '
                 'and growth spurts. Use them as a rough map, never as a '
@@ -372,31 +372,33 @@ const PpArea _crying = PpArea(
           ],
         ),
         PpArticle(
-          heading: 'What this actually changes',
+          heading: 'What this changes day to day',
           [
-            'Temperament does not tell you what your child will be like at '
+            'Temperament doesn\'t tell you what your child will be like at '
                 'twenty. It tells you what will help this week: how much noise '
-                'she can take, how much warning she needs, how long she takes to '
-                'recover from being upset.',
-            'Where your style and hers sit far apart, the friction is real and '
-                'it is nobody fault. A quiet parent with a spirited baby is not '
-                'doing anything wrong, and neither is the baby.',
+                'your baby can take and how much warning is needed. It also '
+                'shows how long recovery from upset takes.',
+            'Where your style and your baby\'s sit far apart, the friction '
+                'is real and it\'s nobody\'s fault. A quiet parent with a '
+                'spirited baby isn\'t doing anything wrong, and neither is the '
+                'baby.',
           ],
         ),
         PpCallout('These are descriptions of behaviour, not labels for a child '
             'and not a diagnosis of anything. There is no such thing as a '
             'difficult baby.'),
         PpCallout(
-          'Temperament is about style, not skills. If she is not making eye '
-          'contact, not turning to your voice, not smiling socially by around '
-          'three months, or has lost something she was already doing, that is a '
-          'separate question and worth raising with your paediatrician.',
+          'Temperament is about style, not skills. Some things are a '
+          'separate question, worth raising with your paediatrician: no '
+          'eye contact, not turning to your voice, or no social smile by '
+          'around three months. The same goes for losing something your '
+          'baby could already do.',
           kind: PpCalloutKind.doctor,
         ),
         PpWhenLine('Useful from birth through the whole first year.'),
         PpLink('Age right things to do together',
             surfaceId: 'pp_activities',
-            blurb: 'Play and connection activities for her month.'),
+            blurb: 'Play and connection activities for your baby\'s month.'),
       ],
     ),
 
@@ -425,44 +427,42 @@ const PpArea _crying = PpArea(
                 'Hours of crying push almost every parent to anger, or panic, '
                     'or nothing at all. Your body has reached its limit and '
                     'needs a break. The break is the whole plan.'),
-            PpInteractiveItem('Put him down somewhere safe',
-                'On his back in his cot, or on a firm flat surface with '
-                    'nothing near his face. A baby put down safely and '
-                    'crying is completely fine for a few minutes.'),
+            PpInteractiveItem('Put your baby down somewhere safe',
+                'On the back in the cot, or on a firm flat surface with nothing '
+                    'near the face. A baby put down safely and crying is completely '
+                    'fine for a few minutes.'),
             PpInteractiveItem('Walk out of the room',
-                'Close the door if you need to. You are not abandoning him. '
-                    'You are keeping him safe.'),
+                'Close the door if you need to. You\'re not abandoning anyone. '
+                    'You\'re keeping your baby safe.'),
             PpInteractiveItem('Do one slow thing for two minutes',
-                'Splash your face, drink a glass of water, stand at a '
-                    'window, breathe out for longer than you breathe in.'),
+                'Splash your face, drink a glass of water, stand at a window, '
+                    'and let each breath out last longer than the breath in.'),
             PpInteractiveItem('Call someone before you go back in',
                 'Your partner, your mother, your sister, a friend, a '
                     'neighbour. Say the true sentence: I am finding this very '
                     'hard right now.'),
             PpInteractiveItem('Go back when your hands feel steady',
-                'Then hand him over if there is anyone to hand him to. '
-                    'Twenty-minute shifts through the worst evenings is a '
-                    'normal way to get through them.'),
-            PpInteractiveItem('Never shake him, not even lightly',
-                'A baby head is heavy and the neck is weak. Shaking can tear '
-                    'blood vessels inside the brain in seconds, and the '
-                    'damage is permanent. It happens to loving parents at the '
-                    'end of long nights, which is exactly why the steps '
-                    'before this matter.'),
+                'Then hand the baby over if there is anyone to hand over to. '
+                    'Twenty-minute shifts through the worst evenings is a normal '
+                    'way to get through them.'),
+            PpInteractiveItem('Never shake your baby, not even lightly',
+                'A baby\'s head is heavy and the neck is weak. Shaking can tear '
+                    'blood vessels inside the brain in seconds, and the damage is '
+                    'permanent. It happens to loving parents at the end of long '
+                    'nights, which is exactly why the steps before this matter.'),
             PpInteractiveItem('If it has already happened',
-                'If a baby has been shaken or has taken a hard knock to the '
-                    'head, he needs to be seen straight away even if he '
-                    'seems fine, and whoever takes him should say plainly '
-                    'what happened.'),
+                'If a baby has been shaken or has had a hard knock to the head, '
+                    'the baby needs to be seen straight away, even if all seems '
+                    'well. Whoever takes the baby should say plainly what happened.'),
           ],
-          closing: 'Tell your doctor today, not next week, if you are '
-              'frightened of what you might do, if you have thoughts of '
-              'harming yourself or the baby, if you feel nothing at all '
-              'towards him, or if you have already handled him more roughly '
-              'than you meant to. All four are common and treatable, and none '
-              'of them make you a bad mother. If you cannot reach a doctor '
-              'and you are frightened, go to the nearest hospital and say '
-              'exactly that sentence.',
+          closing: 'Tell your doctor today, not next week, if you\'re frightened of '
+              'what you might do, or have thoughts of harming yourself or the '
+              'baby. Tell them too if you feel nothing at all towards your '
+              'baby, or have already handled the baby more roughly than you '
+              'meant to. All four are common and treatable, and none of them '
+              'make you a bad mother. If you can\'t reach a doctor and you\'re '
+              'frightened, go to the nearest hospital and say exactly that '
+              'sentence.',
         ),
         /* kept for revert: the article the step-through replaced
         PpIntro('If the crying has pushed you to the edge, you are not a bad '
@@ -562,11 +562,12 @@ const PpArea _crying = PpArea(
             'crying because something is wrong, and these are the signs worth '
             'acting on rather than waiting out.'),
         PpCallout(
-          'Today, without waiting: any fever in a baby under three months, a '
-          'weak or moaning or high pitched cry, refusing feeds, far fewer wet '
-          'nappies, vomiting that shoots out, blood in the stool, breathing '
-          'that looks like hard work, floppiness or being hard to wake, a '
-          'swollen tender tummy, or crying that started suddenly and nothing '
+          'Today, without waiting: any fever in a baby under three '
+          'months, a weak, moaning or high pitched cry, refusing feeds, '
+          'or far fewer wet nappies. Also today: vomiting that shoots '
+          'out, blood in the stool, or breathing that looks like hard '
+          'work. The same for floppiness or being hard to wake, a swollen '
+          'tender tummy, or crying that started suddenly and nothing '
           'settles at all.',
           kind: PpCalloutKind.doctor,
           title: 'Same day',
@@ -586,11 +587,11 @@ const PpArea _crying = PpArea(
             PpCard('Long evening fussing',
                 'The 5pm to 10pm stretch is the most common crying in the '
                 'world. Uncomfortable for everyone, dangerous for nobody.'),
-            PpCard('Crying the moment she is put down',
+            PpCard('Crying the moment your baby is put down',
                 'A preference for your body, not a symptom.'),
             PpCard('Crying during a nappy change or a bath',
-                'Being undressed is genuinely unpleasant to a young baby. It '
-                'passes with age, not with technique.'),
+                'Young babies find being undressed really unpleasant. It passes '
+                'with age, not with technique.'),
             PpCard('Wind, straining and grunting',
                 'Newborn digestion is loud and dramatic. What matters is weight '
                 'gain and wet nappies, not the noise.'),
@@ -645,7 +646,7 @@ const PpArea _firstFeelings = PpArea(
     PpPage(
       id: 'first_tantrums',
       title: 'The first tantrums',
-      subtitle: 'Why they start now, and what actually shortens them.',
+      subtitle: 'Why they start now, and what shortens them.',
       format: 'ARTICLE',
       bands: _toddler,
       blocks: [
@@ -665,16 +666,16 @@ const PpArea _firstFeelings = PpArea(
             'things very much and having almost no way to say so. That gap is '
             'where tantrums live.'),
         PpArticle([
-          'A tantrum at this age is not manipulation and it is not a decision. '
-              'The part of the brain that manages strong feeling is years away '
-              'from being finished, so when the feeling is bigger than the '
-              'child, it simply comes out.',
-          'Which is why reasoning does not work in the moment. She cannot hear '
-              'you, not because she is refusing to, but because the thinking '
-              'part of her brain is offline until the feeling passes.',
+          'A tantrum at this age isn\'t manipulation and it isn\'t a '
+              'decision. The part of the brain that manages strong feeling is '
+              'years away from being finished. So when the feeling is bigger '
+              'than the child, it spills out.',
+          'Which is why reasoning doesn\'t work in the moment. Your child '
+              'can\'t hear you yet. The thinking part of the brain is offline '
+              'until the feeling passes.',
         ], heading: 'Why they do it'),
         PpSteps([
-          PpStep('Get down to her level',
+          PpStep('Get down to your child\'s level',
               'Standing over a small person having a big feeling makes it '
               'bigger.'),
           PpStep('Say the feeling, not the rule',
@@ -684,29 +685,29 @@ const PpArea _firstFeelings = PpArea(
               'You do not have to fix it or talk it through. Being there while '
               'it passes is the whole job.'),
           PpStep('Wait for the body to settle before saying anything else',
-              'Breathing slows, the crying changes pitch. That is when she can '
-              'hear you again.'),
+              'Breathing slows, the crying changes pitch. That\'s when your '
+              'child can hear you again.'),
           PpStep('Move on properly', 'No lecture afterwards. It is finished.'),
         ], heading: 'What to do in the moment'),
         PpCards([
           PpCard('Do not reason mid-tantrum',
-              'Every sentence you say while she is at full volume is one she '
-              'cannot process.'),
+              'Every sentence you say at full volume is one your child can\'t '
+              'take in.'),
           PpCard('Do not give in to end it',
-              'Not because giving in spoils her, but because it teaches that '
-              'the tantrum is the way to ask.'),
+              'Giving in doesn\'t spoil a child. The trouble is that it '
+              'teaches that the tantrum is the way to ask.'),
           PpCard('Do not laugh or film it',
-              'It is real to her, and being laughed at while overwhelmed is the '
-              'part children remember.'),
-          PpCard('Do not send her away alone',
+              'It\'s real to your child, and being laughed at while '
+              'overwhelmed is the part children remember.'),
+          PpCard('Don\'t send your child away alone',
               'At this age the feeling is too big to be alone with.'),
         ], heading: 'What not to do', hue: 12),
         PpScript([
           PpScriptLine(
             say: 'You really wanted that. I know.',
             notThis: 'Stop crying, it is not a big deal.',
-            why: 'The first tells her the feeling makes sense. The second tells '
-                'her it does not, which usually makes it louder.',
+            why: 'The first tells your child the feeling makes sense. The second '
+                'says it doesn\'t, which usually makes it louder.',
           ),
           PpScriptLine(
             say: 'I am right here. I will wait with you.',
@@ -716,17 +717,17 @@ const PpArea _firstFeelings = PpArea(
           ),
         ], heading: 'Words to use'),
         PpCallout(
-          'Worth raising with your paediatrician if tantrums come with holding '
-          'the breath until she goes limp or blue, if she hurts herself badly '
-          'and on purpose, or if they are so frequent and so long that most of '
-          'the day is spent in one.',
+          'Worth raising with your paediatrician if tantrums come with '
+          'holding the breath until your child goes limp or blue, or with '
+          'serious, deliberate self-injury. Raise it too if they are so '
+          'frequent and so long that most of the day is spent in one.',
           kind: PpCalloutKind.doctor,
           title: 'When to ask',
         ),
         PpWhenLine('From about 12 months, peaking through the second year.'),
         PpIndiaNote('In a joint family a tantrum has an audience, and half the '
-            'pressure you feel is theirs and not hers. It is fair to pick her '
-            'up and take her to another room, for your sake as much as hers.'),
+            'pressure you feel comes from them. It\'s fair to pick your '
+            'child up and go to another room, for both your sakes.'),
       ],
     ),
     PpPage(
@@ -765,9 +766,9 @@ const PpArea _firstFeelings = PpArea(
               'to do anyway.'),
           PpStep('Be short and clear',
               'No biting. Biting hurts. Two sentences, calm voice.'),
-          PpStep('Give her the word she was missing',
+          PpStep('Give the word that was missing',
               'You wanted the toy. Say: my turn.'),
-          PpStep('Move her to something else',
+          PpStep('Move your child to something else',
               'At this age separation from the situation works; a long '
               'explanation does not.'),
         ], heading: 'What to do in the moment'),
@@ -775,11 +776,11 @@ const PpArea _firstFeelings = PpArea(
           PpCard('Never bite back',
               'It is still advised in some families. It teaches that biting is '
               'what big people do when they are angry.'),
-          PpCard('Do not label her',
-              'She is a biter becomes something she believes about herself.'),
-          PpCard('Do not make her say sorry',
-              'A forced sorry teaches the word, not the meaning. Show her how '
-              'to help instead.'),
+          PpCard('Don\'t label your child',
+              'A label like "biter" turns into something a child believes.'),
+          PpCard('Don\'t make your child say sorry',
+              'A forced sorry teaches the word, not the meaning. Show how to '
+              'help instead.'),
         ], heading: 'What not to do', hue: 12),
         PpScript([
           PpScriptLine(
@@ -791,10 +792,10 @@ const PpArea _firstFeelings = PpArea(
           ),
         ], heading: 'Words to use'),
         PpCallout(
-          'Worth raising with your paediatrician if it is getting worse rather '
-          'than better after a few months, if it happens in a calm and '
-          'unprovoked way rather than in frustration, or if she is over three '
-          'and still biting often.',
+          'Worth raising with your paediatrician if it\'s getting worse '
+          'after a few months rather than better, or happens calmly and '
+          'unprovoked rather than in frustration. Raise it too if your '
+          'child is over three and still biting often.',
           kind: PpCalloutKind.doctor,
           title: 'When to ask',
         ),
@@ -807,7 +808,7 @@ const PpArea _firstFeelings = PpArea(
     ),
     PpPage(
       id: 'separation',
-      title: 'She cries every time I leave',
+      title: 'My child cries every time I leave',
       subtitle: 'Separation anxiety, and why it is a good sign.',
       format: 'ARTICLE',
       bands: _toddler,
@@ -815,34 +816,34 @@ const PpArea _firstFeelings = PpArea(
         PpIntro('It usually arrives around eight months, gets stronger through '
             'the second year, and it means the attachment is working.'),
         PpArticle([
-          'A baby who protests when you leave has understood two things: that '
-              'you are a specific and irreplaceable person, and that you carry '
-              'on existing when she cannot see you. Both are developmental wins '
-              'that happen to be extremely inconvenient.',
+          'A baby who protests when you leave has understood two things: '
+              'that you are a specific and irreplaceable person, and that you '
+              'go on existing out of sight. Both are developmental wins that '
+              'happen to be extremely inconvenient.',
         ], heading: 'Why they do it'),
         PpSteps([
           PpStep('Always say you are going',
               'Slipping away avoids the crying now and costs you trust later.'),
           PpStep('Keep the goodbye short and the same every time',
               'A ritual beats a long reassurance.'),
-          PpStep('Say when you will be back in her terms',
+          PpStep('Say when you\'ll be back, in your child\'s terms',
               'After your nap. Clock time means nothing yet.'),
           PpStep('Hand over to the same person where you can',
               'One familiar pair of arms is worth more than any distraction.'),
         ], heading: 'What to do'),
         PpCards([
           PpCard('Do not sneak out', 'It makes every future exit frightening.'),
-          PpCard('Do not come back in when she cries',
+          PpCard('Don\'t come back in at the crying',
               'It teaches that crying reopens the door, which makes the next '
               'goodbye longer.'),
-          PpCard('Do not tell her she is being silly',
+          PpCard('Don\'t call the fear silly',
               'The feeling is real even when the danger is not.'),
         ], heading: 'What not to do', hue: 12),
         PpCallout(
-          'Worth raising with your paediatrician if she cannot be settled by '
-          'anyone at all for long periods, if it appears suddenly in a child '
-          'who was fine, or if it is still severe enough at four or five to '
-          'stop her going to school.',
+          'Worth raising with your paediatrician if nobody at all can '
+          'settle your child for long periods, or if it appears suddenly '
+          'in a child who was fine. Raise it too if it\'s still severe '
+          'enough at four or five to stop school.',
           kind: PpCalloutKind.doctor,
           title: 'When to ask',
         ),
@@ -870,11 +871,11 @@ const PpArea _firstFeelings = PpArea(
           heading: 'The difference, in the moment',
           columns: ['', 'A tantrum', 'A meltdown'],
           rows: [
-            ['What set it off', 'A no. Something he wanted and did not get.',
+            ['What set it off', 'A no. Something your child wanted and didn\'t get.',
                 'Too much. Noise, people, tiredness, hunger stacked up.'],
-            ['Is he checking on you',
+            ['Is your child checking on you',
                 'Usually yes. There is a glance.',
-                'No. He is not really in the room with you.'],
+                'No. Your child isn\'t really in the room with you.'],
             ['What ends it',
                 'Time, and the answer not changing.',
                 'Less input. Fewer people, less light, less talking.'],
@@ -884,17 +885,17 @@ const PpArea _firstFeelings = PpArea(
           ],
         ),
         PpArticle(heading: 'Why the label matters', [
-          'A tantrum is communication: he wants something and this is his '
-              'strongest available argument. Holding the limit calmly is the '
-              'whole job.',
-          'A meltdown is not an argument at all. His nervous system has run '
-              'out of room, and there is nothing to hold a line against. '
+          'A tantrum is communication: your child wants something and '
+              'this is the strongest argument available. Holding the limit '
+              'calmly is the whole job.',
+          'A meltdown isn\'t an argument at all. The nervous system has '
+              'run out of room, and there is nothing to hold a line against. '
               'Treating it like a tantrum by being firmer adds one more thing '
               'to a system that is already full.',
-          'A child who has frequent meltdowns rather than tantrums, well past '
-              'the age most children have stopped, is worth mentioning to your '
-              'paediatrician. Not because it is a problem, but because sensory '
-              'overwhelm has real strategies and they help.',
+          'A child who has frequent meltdowns rather than tantrums, well '
+              'past the age most children have stopped, is worth mentioning '
+              'to your paediatrician. That isn\'t because something is wrong. '
+              'Sensory overwhelm has real strategies, and they help.',
         ]),
         PpWhenLine('One to five, with meltdowns lasting longer into '
             'childhood than tantrums do.'),
@@ -921,12 +922,12 @@ const PpArea _firstFeelings = PpArea(
             'only test that matters. Safe, calm, present, name it, reconnect.'),
         PpSteps([
           PpStep('1. Safe',
-              'Move anything hard, or move him. Nothing else matters until '
-              'this is done, and it takes four seconds.'),
+              'Move anything hard, or move your child. Nothing else matters '
+              'until this is done, and it takes four seconds.'),
           PpStep('2. Calm',
-              'Yours, not his. Sit down if you can. Your body is the '
-              'regulating thing in the room and it works whether or not he '
-              'looks at you.'),
+              'Yours, not your child\'s. Sit down if you can. Your body is the '
+              'regulating thing in the room, and it works even without eye '
+              'contact.'),
           PpStep('3. Present',
               'Close enough to touch, quiet enough to be ignored. Not talking. '
               'This step feels like doing nothing and is most of the work.'),
@@ -934,8 +935,8 @@ const PpArea _firstFeelings = PpArea(
               '"You wanted the biscuit. You are so upset." Not before the '
               'peak: nothing goes in during it.'),
           PpStep('5. Reconnect, and move on',
-              'A hug if he wants one, then the next ordinary thing. No '
-              'debrief, no lesson, no making him say sorry for the feeling.'),
+              'A hug if your child wants one, then the next ordinary thing. '
+              'No debrief, no lesson, no forced sorry for the feeling.'),
         ], heading: 'The five'),
         PpCards([
           PpCard('The answer does not change',
@@ -945,8 +946,9 @@ const PpArea _firstFeelings = PpArea(
               'Four to fifteen minutes is ordinary. Doing this right does not '
               'make it short, it makes it end properly.'),
           PpCard('You will lose it sometimes',
-              'Repair afterwards. "I shouted. That was not about you." He '
-              'learns more from that than from a tantrum handled perfectly.'),
+              'Repair afterwards. "I shouted. That was not about you." Your '
+              'child learns more from that than from a tantrum handled '
+              'perfectly.'),
         ], heading: 'Three things that make it work', hue: 128),
         PpWhenLine('One to four.'),
         PpLink('The exact words',
@@ -968,10 +970,10 @@ const PpArea _firstFeelings = PpArea(
           'Most of what makes a public tantrum unbearable is the audience, and '
               'most of the audience is not judging you. The ones who have had '
               'children remember it; the ones who have not do not matter.',
-          'The pressure to end it FAST is what causes the mistake. Giving in to '
-              'stop the noise works once and costs you every future outing, '
-              'because he has learned that the shop is where the answer '
-              'changes.',
+          'The pressure to end it fast is what causes the mistake. Giving '
+              'in to stop the noise works once and costs you every future '
+              'outing. Your child has learned that the shop is where the '
+              'answer changes.',
         ]),
         PpSteps([
           PpStep('Move, if you can, before you talk',
@@ -986,23 +988,23 @@ const PpArea _firstFeelings = PpArea(
               'Abandoning a half-full trolley is allowed. It is a bad twenty '
               'minutes, not a bad decision.'),
           PpStep('Say nothing to the audience',
-              'You owe nobody an explanation, and explaining in front of him '
-              'teaches him he is a problem being apologised for.'),
+              'You owe nobody an explanation. Explaining in front of your '
+              'child sends a message: you are a problem I\'m apologising for.'),
         ], heading: 'What to do'),
         PpCards([
           PpCard('Do not bargain to buy quiet',
-              'It is the single most expensive thing on this page.'),
-          PpCard('Do not threaten to leave him there',
-              'It ends it fast because it frightens him.'),
-          PpCard('Do not apologise for him to onlookers',
-              'He hears it, and it is the sentence he remembers.'),
+              'Of everything on this page, it costs you the most.'),
+          PpCard('Don\'t threaten to leave your child there',
+              'It works fast only because it\'s frightening.'),
+          PpCard('Don\'t apologise to onlookers',
+              'Your child hears it, and it\'s the sentence that stays.'),
         ], heading: 'What not to do', hue: 128),
         PpWhenLine('One to four.'),
-        PpIndiaNote('At a wedding or a family function there will be advice, '
-            'and somebody will offer to take him. Sometimes handing him to a '
-            'person he adores genuinely helps and is not a failure. Sometimes '
-            'a new pair of arms is one more input, and it is fine to say "give '
-            'us five minutes".'),
+        PpIndiaNote('At a wedding or a family function there will be advice, and '
+            'somebody will offer to take your child. Sometimes handing over '
+            'to a favourite person really helps and isn\'t a failure. '
+            'Sometimes a new pair of arms is one more input, and it\'s fine '
+            'to say "give us five minutes".'),
         PpLink('The words for exactly this',
             surfaceId: 'pp_scripts'),
       ],
@@ -1017,7 +1019,7 @@ const PpArea _firstFeelings = PpArea(
 const PpArea _theNoYear = PpArea(
   id: 'the_no_year',
   mark: IntentMark.questionMark,
-  title: 'She says no to everything',
+  title: 'No to everything',
   blurb: 'Defiance, big tantrums, and sharing.',
   hue: 268,
   bands: _olderToddlerAndUp,
@@ -1025,7 +1027,7 @@ const PpArea _theNoYear = PpArea(
     PpPage(
       id: 'defiance',
       title: 'Saying no to everything',
-      subtitle: 'What defiance at two actually is.',
+      subtitle: 'What defiance at two really is.',
       format: 'ARTICLE',
       bands: _olderToddlerAndUp,
       blocks: [
@@ -1037,16 +1039,16 @@ const PpArea _theNoYear = PpArea(
         // survives being written down.
         PpVideoSlot(
           title: 'When no is the answer to everything',
-          subtitle: 'Why two-year-olds refuse things they want, and what actually moves them.',
+          subtitle: 'Why two-year-olds refuse things they want, and what gets them moving.',
           minutes: '4 MIN',
           slotId: 'behaviour/the_no_year',
         ),
-        PpIntro('Around two, a child works out that she is a separate person '
-            'with her own opinion. No is her practising that.'),
+        PpIntro('Around two, children work out that they are separate people '
+            'with their own opinions. No is how they practise that.'),
         PpArticle([
-          'This is not the start of a discipline problem. It is the start of a '
-              'self. A child who never pushed back would be a worry; this one '
-              'is doing exactly what a two-year-old is supposed to do.',
+          'This is a self arriving, not a discipline problem starting. A '
+              'child who never pushed back would be more of a worry. This one '
+              'is doing exactly what a two-year-old is meant to do.',
           'The practical consequence is that most battles at this age are about '
               'autonomy rather than about the thing you are arguing over. Give '
               'the autonomy somewhere harmless to go and a lot of the fights '
@@ -1060,8 +1062,8 @@ const PpArea _theNoYear = PpArea(
           PpStep('Give a warning before a change',
               'Two minutes notice prevents more refusals than any '
               'negotiation.'),
-          PpStep('Let her do the bit she can do',
-              'Slowly and badly, but herself. It buys cooperation everywhere '
+          PpStep('Let your child do the easy bits alone',
+              'Slowly and messily, but alone. It buys cooperation everywhere '
               'else.'),
           PpStep('Hold the line on the few that matter',
               'Safety, kindness, and not much else. Everything is not a hill.'),
@@ -1071,12 +1073,12 @@ const PpArea _theNoYear = PpArea(
         // is the ziddi page's, referenced here rather than written twice.
         PpLink('Why the will arrives before the words',
             pageId: 'beh_ziddi',
-            blurb: 'The same discovery, seen from the ziddi side.'),
+            blurb: 'The same discovery, seen from the stubborn side.'),
         PpCards([
           PpCard('Do not ask a question you cannot accept no to',
               'Shall we go home now invites the answer you do not want.'),
           PpCard('Do not turn it into a contest',
-              'She has more time and less shame than you do.'),
+              'Your child has more time and less shame than you do.'),
           PpCard('Do not threaten what you will not do',
               'One unkept threat costs you the next ten.'),
         ], heading: 'What not to do', hue: 12),
@@ -1084,62 +1086,62 @@ const PpArea _theNoYear = PpArea(
           PpScriptLine(
             say: 'You can walk to the car, or I can carry you. You choose.',
             notThis: 'If you do not come now I am leaving you here.',
-            why: 'The first keeps her autonomy inside your boundary. The second '
-                'is a threat you will not carry out, and she knows it.',
+            why: 'The first keeps your child\'s autonomy inside your limit. The '
+                'second is a threat you won\'t carry out, and children know it.',
           ),
         ], heading: 'Words to use'),
         PpCallout(
-          'Worth raising with your paediatrician if the defiance is extreme and '
-          'constant across every setting, if she seems to have no happy periods '
-          'at all, or if she is losing skills she previously had.',
+          'Worth raising with your paediatrician if the defiance is '
+          'extreme and constant in every setting, or if there seem to be '
+          'no happy periods at all. Raise it too if skills your child had '
+          'are being lost.',
           kind: PpCalloutKind.doctor,
           title: 'When to ask',
         ),
         PpWhenLine('Peaks between 2 and 3 years, eases through the fourth.'),
-        PpIndiaNote('Itni zid kyun karti hai is the line most families reach '
-            'for, and it lands on the child as a judgement about who she is. '
-            'Zid at two is a stage, not a personality.'),
+        PpIndiaNote('"Why is this child so stubborn?" is the line most families reach for, '
+            'and it lands on the child as a judgement of character. Stubbornness at '
+            'two is a stage, not a personality.'),
       ],
     ),
     PpPage(
       id: 'sharing',
-      title: 'She will not share',
-      subtitle: 'Because she cannot yet, not because she will not.',
+      title: 'Not ready to share',
+      subtitle: 'Because the skill isn\'t there yet, not out of selfishness.',
       format: 'ARTICLE',
       bands: _olderToddlerAndUp,
       blocks: [
         PpIntro('Real sharing needs the ability to imagine how somebody else '
             'feels. That arrives properly around four, not two.'),
         PpArticle([
-          'What looks like selfishness at two is usually an accurate report of '
-              'what she understands: this is mine, and giving it away means '
-              'losing it forever. Turn-taking is the skill that actually works '
-              'at this age, because it comes with a promise that the toy comes '
-              'back.',
+          'What looks like selfishness at two is usually an honest report '
+              'of what your child understands: this is mine, and giving it '
+              'away means losing it forever. Turn-taking is what works at '
+              'this age, because the toy comes back.',
         ], heading: 'Why they do it'),
         PpSteps([
           PpStep('Teach turns instead of sharing',
-              'Your turn, then her turn. A timer helps, and it takes you out of '
-              'the argument.'),
-          PpStep('Let her finish',
+              'Your turn, then Riya\'s turn. A timer helps, and it takes you '
+              'out of the argument.'),
+          PpStep('Let your child finish',
               'Being made to hand over mid-play teaches that turns are '
               'unsafe.'),
           PpStep('Put the treasured things away before friends come',
-              'One or two special toys are allowed to be hers alone.'),
+              'One or two special toys can belong to your child alone.'),
           PpStep('Name what the other child feels',
-              'She is sad because she is waiting. That is the seed of the '
-              'skill.'),
+              'Your friend is sad because of the waiting. That is the seed of '
+              'the skill.'),
         ], heading: 'What to do'),
         PpCards([
-          PpCard('Do not force her to hand it over',
+          PpCard('Don\'t force your child to hand it over',
               'It teaches compliance to whoever is loudest, not generosity.'),
-          PpCard('Do not call her selfish',
-              'She is two. The word will stay long after the stage has gone.'),
+          PpCard('Don\'t call your child selfish',
+              'Two is very young. The word will stay long after the stage has gone.'),
         ], heading: 'What not to do', hue: 12),
         PpCallout(
-          'Worth raising with your paediatrician if by four or five she shows '
-          'no interest in other children at all, or does not seem to notice '
-          'when someone else is upset.',
+          'Worth raising with your paediatrician if by four or five your '
+          'child shows no interest in other children at all. The same if '
+          'someone else being upset seems to go unnoticed.',
           kind: PpCalloutKind.doctor,
           title: 'When to ask',
         ),
@@ -1306,6 +1308,39 @@ const PpArea _rulesAndOthers = PpArea(
     */
     // `siblings` moved out to `_siblings` below: it is reslotted into
     // Three to six.
+    // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+    PpPage(
+      id: 'beh_words_that_hurt',
+      title: 'Everyday phrases that hurt more than we mean, and what to say instead',
+      subtitle: 'Small changes in words, big changes in how your child feels',
+      format: 'ARTICLE',
+      blocks: [
+        PpIntro('Every parent says things in frustration they didn\'t mean. Some '
+            'everyday phrases, said often, can teach a child that feelings '
+            'are wrong or that love depends on behaving. Small swaps make a '
+            'big difference over time.'),
+        PpScript(heading: 'Swaps worth trying', [
+          PpScriptLine(say: 'You are upset. I am here.',
+              notThis: 'Stop crying, it is nothing.',
+              why: 'Those feelings are real to your child.'),
+          PpScriptLine(say: 'I love you. I do not like that behaviour.',
+              notThis: 'You are a bad boy.',
+              why: 'Your child is more than the behaviour.'),
+          PpScriptLine(say: 'Let us do it together.',
+              notThis: 'Why can\'t you be like your cousin?',
+              why: 'Comparisons breed shame, not effort.'),
+          PpScriptLine(say: 'We are leaving in five minutes.',
+              notThis: 'I will leave you here.',
+              why: 'Threats of leaving frighten young children deeply.'),
+          PpScriptLine(say: 'Boys and girls can both cry.',
+              notThis: 'Boys don\'t cry.',
+              why: 'Every child needs to express sadness.'),
+        ]),
+        PpCallout('If you said something you regret, a simple "I was angry '
+            'and I should not have said that. I love you" repairs more than '
+            'you think.'),
+      ],
+    ),
   ],
 );
 
@@ -1350,9 +1385,10 @@ const PpPage _siblings = PpPage(
           'The clever one and the naughty one both live up to it.'),
     ], heading: 'What not to do', hue: 12),
     PpCallout(
-      'Worth raising with your paediatrician if one child is genuinely '
-      'frightened of another, if there is real injury, or if the aggression '
-      'is one-way and constant rather than a squabble between equals.',
+      'Worth raising with your paediatrician if one child is really '
+      'frightened of another, or if there is real injury. The same '
+      'goes for aggression that is one-way and constant, rather than '
+      'a squabble between equals.',
       kind: PpCalloutKind.doctor,
       title: 'When to ask',
     ),
@@ -1381,38 +1417,38 @@ const PpPage _backTalk = PpPage(
   format: 'ARTICLE',
   bands: ['preschool'],
   blocks: [
-    PpIntro('Around four he gets words sharp enough to sting, and no idea yet '
-        'what they do. "I hate you." "You are not my friend." It lands hard. '
-        'It almost never means what it says.'),
-    PpArticle(heading: 'Why he does it', [
-      'A four-year-old feels something huge and grabs the biggest word he '
-          'has. "I hate you" is usually "I am so angry and I do not know '
-          'where to put it." He is finding out what words do, the same way '
-          'he once found out what a thrown spoon does. The sting you feel is '
-          'proof the words work, not proof he means them.',
+    PpIntro('Around four, children get words sharp enough to sting, and no '
+        'idea yet what they do. "I hate you." "You are not my friend." '
+        'It lands hard. It almost never means what it says.'),
+    PpArticle(heading: 'Why it happens', [
+      'A four-year-old feels something huge and grabs the biggest '
+          'word to hand. Often "I hate you" means "I am so angry and I do '
+          'not know where to put it". Children are finding out what words '
+          'do, the way they once found out what a thrown spoon does. The '
+          'sting you feel proves the words work, not that they are meant.',
     ]),
     PpSteps([
       PpStep('Do not flinch out loud',
-          'Your calm tells him the word is not a bomb. A big reaction just '
-          'shows him he has found a button.'),
+          'Your calm says the word isn\'t a bomb. A big reaction just '
+          'shows your child a button.'),
       PpStep('Name what is under it',
-          '"You are really angry we are leaving." That is the thing he could '
-          'not say.'),
+          '"You are really angry we are leaving." That\'s the thing your '
+          'child couldn\'t say.'),
       PpStep('Hold the line and the love together',
           '"You can be angry with me. I am still not letting you hit."'),
       PpStep('Do not argue the word',
-          '"You do not mean that" starts a fight he wins by saying it louder. '
-          'Let it sit.'),
+          '"You do not mean that" starts a fight your child wins by '
+          'saying it louder. Let it sit.'),
       PpStep('Come back to it small, later',
           '"Earlier you said you hated me. That is okay, you were cross. I '
           'still love you."'),
     ], heading: 'What to do'),
     PpCards([
       PpCard('Do not punish the feeling',
-          'You can hold what he does; punishing the feeling teaches him to '
-          'hide it, which is worse at fifteen.'),
+          'You can limit what your child does. Punishing the feeling '
+          'teaches hiding it, which is worse at fifteen.'),
       PpCard('Do not say it back', 'Not even as a joke.'),
-      PpCard('Do not make him say sorry for it',
+      PpCard('Don\'t demand a sorry for it',
           'A forced sorry teaches the word, not the meaning.'),
     ], heading: 'What not to do', hue: 232),
     PpScript([
@@ -1426,14 +1462,15 @@ const PpPage _backTalk = PpPage(
       ),
     ], heading: 'The words'),
     PpIndiaNote('In front of family, "I hate you" from a child lands like an '
-        'insult to the whole way you are raising him, and someone will say '
-        '"dekho, kaise baat karta hai." You do not owe the room a correction '
-        'on the spot. Handle it quietly, your way. A calm child a week later '
-        'persuades them more than a scolding today.'),
+        'insult to the whole way you are raising your child. Someone '
+        'will say "look how this child talks back". You don\'t owe the room '
+        'a correction on the spot. Handle it quietly, your way. A calm '
+        'child a week later persuades them more than a scolding today.'),
     PpCallout(
-      'Worth mentioning to your paediatrician if the rage behind it is '
-      'extreme and daily well past four, if it turns into hurting, or if he '
-      'seems flat and joyless rather than stormy.',
+      'Worth mentioning to your paediatrician if the rage behind it '
+      'is extreme and daily well past four, or if it turns into '
+      'hurting. Mention it too if your child seems flat and joyless '
+      'rather than stormy.',
       kind: PpCalloutKind.doctor,
       title: 'When to ask',
     ),
@@ -1475,60 +1512,225 @@ final PpArea _olderChild = PpArea(
 const PpArea _scared = PpArea(
   id: 'scared',
   mark: IntentMark.moonMark,
-  title: 'When he is scared, shy or clingy',
+  title: 'When your child is scared, shy or clingy',
   blurb: 'The fearful, shy or clingy child: the dark, the doctor, dogs, '
-      'strangers, and the "say hello, beta" moment.',
+      'strangers, and the "say hello, sweetheart" moment.',
   hue: 232,
   bands: _toddlerAndUp,
   pages: [
     PpPage(
       id: 'beh_scared_everything',
-      title: 'Why he is suddenly scared of everything',
+      title: 'Why everything is suddenly scary',
       format: 'ARTICLE',
       bands: _toddlerAndUp,
-      comingSoon: true,
-      blocks: [],
+      
+      blocks: [
+        // Written 2026-10-02 (parenting gap analysis), filling the scaffold.
+        // REQUIRED_REVIEW by a child psychologist.
+        PpIntro('One day your child loved the bath; the next, the bath brings '
+            'screams. Sudden fears are a normal part of growing up. They '
+            'show that understanding of the world has grown faster than the '
+            'sense of safety in it. Most pass in weeks or months.'),
+        PpArticle(heading: 'Why fears appear now', [
+          'Around eight to ten months, babies start to understand that things '
+              'can go wrong: that the vacuum is loud, that you can leave. '
+              'Toddlers add imagination, so a shadow can become a monster. '
+              'Preschoolers worry about things they hear adults talk about.',
+          'A fear is not a sign of a weak or spoilt child. Brave children feel '
+              'fear too; they have just had a calm adult beside them while '
+              'they faced it.',
+        ]),
+        PpSteps(heading: 'What helps', [
+          PpStep('Hold your child and name it', '"That was loud. You got a fright. I '
+              'have you."'),
+          PpStep('Do not force it, do not avoid it forever',
+              'Let your child watch the scary thing from your arms, then a '
+                  'little closer, at a pace that feels okay.'),
+          PpStep('Give simple, honest answers', 'To a preschooler\'s worries.'),
+          PpStep('Keep your own voice calm', 'Your child reads your face for how dangerous something is.'),
+        ]),
+        PpScript(heading: 'Words to borrow', [
+          PpScriptLine(say: 'You are scared of the mixer. It is loud. Let us '
+              'cover our ears together.',
+              notThis: 'Don\'t be silly, it is just a mixer.',
+              why: 'Naming the fear makes it smaller.'),
+        ]),
+        PpLink('When fear is worth checking',
+            surfaceId: 'pp_page/parenting_behaviour/beh_fear_worth_checking'),
+      ],
     ),
     PpPage(
       id: 'beh_fear_dark',
       title: 'Fear of the dark, and the monster under the bed',
-      subtitle: 'Night fears, and what actually helps at bedtime',
+      subtitle: 'Night fears, and what helps at bedtime',
       format: 'ARTICLE',
       bands: _toddlerAndUp,
-      comingSoon: true,
-      blocks: [],
+      
+      blocks: [
+        // Written 2026-10-02 (parenting gap analysis), filling the scaffold.
+        // REQUIRED_REVIEW by a child psychologist.
+        PpIntro('Fear of the dark usually starts between two and four, as '
+            'imagination takes off. The monster under the bed is very real '
+            'to your child. Arguing won\'t make it go away. What helps is '
+            'feeling safe enough to sleep.'),
+        PpCards(heading: 'What helps', [
+          PpCard('A night light', 'A soft, warm one, or the door left ajar '
+              'with the hall light on.'),
+          PpCard('Take the fear seriously', 'No teasing, and no "there is '
+              'nothing to be scared of". Say "I am here, you are safe."'),
+          PpCard('A brave toy', 'A soft toy whose job is to stand guard.'),
+          PpCard('Calm bedtimes', 'No scary stories, shows or games before '
+              'bed.'),
+          PpCard('Check the room together once', 'Then the checking is done. '
+              'Looking every night can feed the fear.'),
+          PpCard('After a nightmare', 'Hold your child close and offer comfort. Talk it over in the '
+              'morning, if your child wants to.'),
+        ]),
+        PpLink('Nightmares and night terrors',
+            surfaceId: 'pp_page/parenting_sleep/night_fears',
+            blurb: 'Two very different things, in the Sleep door.'),
+      ],
     ),
     PpPage(
       id: 'beh_fear_doctor',
       title: 'The doctor, the injection, the haircut',
       format: 'STEP-LIST',
       bands: _toddlerAndUp,
-      comingSoon: true,
-      blocks: [],
+      
+      blocks: [
+        // Written 2026-10-02 (parenting gap analysis), filling the scaffold.
+        // REQUIRED_REVIEW by a child psychologist.
+        PpIntro('Doctors, injections and haircuts mean being held still by '
+            'strangers, which is frightening at this age. A little '
+            'preparation and a lot of honesty make these visits much '
+            'easier.'),
+        PpSteps(heading: 'Before', [
+          PpStep('Play doctor at home', 'With a toy kit, taking turns being '
+              'the doctor and the patient.'),
+          PpStep('Tell your child what will happen', 'Plainly, the day before. "The doctor will listen to your chest '
+              'and look in your ears."'),
+          PpStep('Be honest about injections', '"It will pinch for a moment, '
+              'and I will hold you." Never "it will not hurt".'),
+          PpStep('For a haircut, go to a quiet salon at a quiet time',
+              'Or cut it at home during a favourite show.'),
+        ]),
+        PpSteps(heading: 'During and after', [
+          PpStep('Hold your child on your lap', 'A hug hold is calmer than lying '
+              'down.'),
+          PpStep('Feed or distract', 'Breastfeeding during an injection eases '
+              'pain for babies; a song or bubbles for toddlers.'),
+          PpStep('Praise the bravery, not the not-crying', '"You were so '
+              'brave. It is okay that you cried."'),
+        ]),
+      ],
     ),
     PpPage(
       id: 'beh_fear_dogs',
       title: 'Scared of dogs, lifts and loud noises',
       format: 'SHORT ARTICLE',
       bands: _toddlerAndUp,
-      comingSoon: true,
-      blocks: [],
+      
+      blocks: [
+        // Written 2026-10-02 (parenting gap analysis), filling the scaffold.
+        // REQUIRED_REVIEW by a child psychologist.
+        PpIntro('Dogs that bark, lifts that close, loud crackers and pressure '
+            'cookers: many toddlers are scared of these. It is normal, and '
+            'it usually fades with calm, gradual exposure.'),
+        PpSteps(heading: 'What helps', [
+          PpStep('Never force your child close', 'Let your child watch from a safe distance in your arms.'),
+          PpStep('Small steps', 'A calm dog across the park, then a friend\'s '
+              'gentle dog, over weeks.'),
+          PpStep('Warn your child before loud things', '"The cooker will whistle '
+              'soon."'),
+          PpStep('Teach safe rules for dogs', 'Never touch a street dog, or '
+              'any dog that is eating or sleeping.'),
+        ]),
+        PpCallout('A healthy wariness of street dogs keeps your child safe. Keep '
+            'that part.'),
+      ],
     ),
     PpPage(
       id: 'beh_shy_child',
-      title: 'The shy child, and "say hello, beta"',
+      title: 'The shy child, and "say hello, sweetheart"',
       format: 'ARTICLE',
       bands: _toddlerAndUp,
-      comingSoon: true,
-      blocks: [],
+      
+      blocks: [
+        // Written 2026-10-02 (parenting gap analysis), filling the scaffold.
+        // REQUIRED_REVIEW by a child psychologist.
+        PpIntro('"Say hello to aunty, sweetheart." For a shy child, this is torture. '
+            'Shyness is a temperament, not a fault. Many shy children grow '
+            'into thoughtful, kind adults who warm up slowly and deeply.'),
+        PpArticle([
+          'Shy children need time to watch before they join in. Pushing them '
+              'into the spotlight usually makes them cling more. Giving them '
+              'time, and some words for the situation, helps them warm up on '
+              'their own.',
+        ]),
+        PpScript(heading: 'Words to borrow', [
+          PpScriptLine(say: 'Give us a little time to warm up. The hello will come when '
+              'we\'re ready.',
+              notThis: 'Why are you so shy? Say namaste.',
+              why: 'Calling a child shy in front of others makes it stick.'),
+          PpScriptLine(say: 'You can wave instead of talking, if you like.',
+              why: 'A small step your child can manage.'),
+        ]),
+        PpSteps(heading: 'Helping your child warm up', [
+          PpStep('Arrive early at parties', 'Before the crowd.'),
+          PpStep('Practise greetings at home', 'With toys and role play.'),
+          PpStep('Invite one friend at a time', 'Small groups first.'),
+        ]),
+      ],
     ),
     PpPage(
       id: 'beh_fear_worth_checking',
       title: 'When fear or clinginess is worth checking',
       format: 'FLAGGED CALLOUT',
       bands: _toddlerAndUp,
-      comingSoon: true,
-      blocks: [],
+      
+      blocks: [
+        // Written 2026-10-02 (parenting gap analysis), filling the scaffold.
+        // REQUIRED_REVIEW by a child psychologist.
+        PpIntro('Most fears and clinginess are a normal part of growing up. A '
+            'few signs suggest a child is struggling more than usual and '
+            'would benefit from help. Asking is never an overreaction.'),
+        PpCards(heading: 'Worth talking to someone about', [
+          PpCard('Fear that stops ordinary life', 'Your child can\'t go to playschool, sleep, or leave the house '
+              'because of it.'),
+          PpCard('Clinginess that gets worse, not better', 'Over months, '
+              'especially after a change or upset.'),
+          PpCard('Panic', 'Shaking, sweating, or tummy aches before every '
+              'separation.'),
+          PpCard('Sad or irritable most days', 'For more than two weeks.'),
+          PpCard('No joy in play', 'Things your child loved stop being fun.'),
+          PpCard('Changes in sleep or eating', 'Much more or less than usual.'),
+          PpCard('Talking about being bad or unloved', 'Or about wishing not to be here.'),
+        ]),
+        PpCallout('Talk to your paediatrician, who can refer you to a child '
+            'psychologist. Young children respond well to help, and parents '
+            'are part of the treatment.',
+            kind: PpCalloutKind.doctor),
+      ],
+    ),
+    // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+    PpPage(
+      id: 'beh_comfort_object',
+      title: 'The blanket, the soft toy: comfort objects',
+      subtitle: 'A healthy way to feel safe',
+      format: 'SHORT ARTICLE',
+      blocks: [
+        PpIntro('Many babies and toddlers fall in love with a blanket, a '
+            'soft toy or even your old dupatta. It helps them feel safe when '
+            'you are not right there. It is a healthy step towards '
+            'independence, not a bad habit.'),
+        PpSteps([
+          PpStep('Let your child choose it', 'Children usually do.'),
+          PpStep('Keep a spare', 'Losing it can be a crisis.'),
+          PpStep('Wash it now and then', 'Even over protests.'),
+          PpStep('No loose objects in the cot under a year',
+              'From about a year, one small soft toy is fine.'),
+        ]),
+      ],
     ),
   ],
 );
@@ -1547,16 +1749,61 @@ const PpArea _habits = PpArea(
       title: 'Thumb-sucking, and when to just leave it',
       format: 'ARTICLE',
       bands: _toddlerAndUp,
-      comingSoon: true,
-      blocks: [],
+      
+      blocks: [
+        // Written 2026-10-02 (parenting gap analysis), filling the scaffold.
+        // REQUIRED_REVIEW by a child psychologist.
+        PpIntro('Sucking a thumb or fingers is one of the first ways babies '
+            'learn to calm themselves, and many start in the womb. In the '
+            'first years there is nothing to stop, and most children give '
+            'it up on their own between two and four.'),
+        PpArticle([
+          'Thumb-sucking only matters for teeth if it carries on strongly once '
+              'adult teeth come in, around five or six. Before then, scolding, '
+              'bitter nail paint or tying the hands just adds stress and makes '
+              'the habit stronger.',
+        ]),
+        PpSteps(heading: 'Helping an older child stop', [
+          PpStep('Notice when it happens', 'Tired, bored, upset?'),
+          PpStep('Offer something else', 'A soft toy to hold, or something '
+              'for the hands.'),
+          PpStep('Praise the times without it', 'Gently, without a chart.'),
+        ]),
+        PpCallout('Ask your dentist or doctor if thumb-sucking is still frequent '
+            'after five, or if you notice the front teeth changing shape.',
+            kind: PpCalloutKind.doctor),
+      ],
     ),
     PpPage(
       id: 'beh_head_banging',
       title: 'Head-banging and rocking',
       format: 'ARTICLE',
       bands: _toddlerAndUp,
-      comingSoon: true,
-      blocks: [],
+      
+      blocks: [
+        // Written 2026-10-02 (parenting gap analysis), filling the scaffold.
+        // REQUIRED_REVIEW by a child psychologist.
+        PpIntro('Some babies and toddlers rock, roll their heads or even bang '
+            'their heads against the cot, especially when falling asleep. It '
+            'looks alarming, but it is common, and most children are '
+            'soothing themselves. It usually stops by three or four.'),
+        PpArticle([
+          'Rhythmic movement calms the body, a bit like being rocked. Children '
+              'rarely hurt themselves. Paying it a lot of attention can make '
+              'it last longer.',
+        ]),
+        PpSteps(heading: 'What helps', [
+          PpStep('Keep the cot safe', 'Tighten screws, and move it away from '
+              'the wall. No bumpers.'),
+          PpStep('Plenty of movement in the day', 'Swings, dancing, rocking '
+              'games.'),
+          PpStep('A calm bedtime routine', 'With a song to sway to.'),
+        ]),
+        PpCallout('See your doctor if there are injuries, frequent head-banging '
+            'during the day, or other delays in talking or play. The same '
+            'goes if it started after your child was developing normally.',
+            kind: PpCalloutKind.doctor),
+      ],
     ),
     PpPage(
       id: 'beh_breath_holding',
@@ -1564,28 +1811,158 @@ const PpArea _habits = PpArea(
       subtitle: 'The reassurance parents need, and the one line for the doctor',
       format: 'ARTICLE',
       bands: _toddlerAndUp,
-      comingSoon: true,
-      blocks: [],
+      
+      blocks: [
+        // Written 2026-10-02 (parenting gap analysis), filling the scaffold.
+        // REQUIRED_REVIEW by a child psychologist.
+        PpIntro('A breath-holding spell is one of the most frightening things a '
+            'parent can see. Your child cries, holds the breath, turns blue '
+            'or pale, and may even go limp for a few seconds. Then the '
+            'breathing starts again. Spells are common between six months '
+            'and six years, and they are harmless.'),
+        PpArticle([
+          'They are a reflex, not a choice and not naughtiness. They are '
+              'triggered by anger, a fright or a sudden bump. The body always '
+              'restarts breathing on its own, and children outgrow them.',
+        ]),
+        PpSteps(heading: 'During a spell', [
+          PpStep('Lay your child on one side', 'Somewhere safe.'),
+          PpStep('Stay calm and stay close', 'It lasts under a minute.'),
+          PpStep('Don\'t shake or splash water', 'Or put anything in the mouth.'),
+          PpStep('Afterwards, comfort your child normally', 'And do not give in to '
+              'whatever triggered it.'),
+        ]),
+        PpCallout('See your doctor after the first spell, to make sure it is not '
+            'something else. Some children with spells have low iron, which '
+            'can be treated. Call 112 if breathing doesn\'t start within a '
+            'minute, or if there is jerking for longer than that.',
+            kind: PpCalloutKind.doctor),
+      ],
     ),
     PpPage(
       id: 'beh_nail_biting',
       title: 'Nail-biting and the other little habits',
       format: 'SHORT ARTICLE',
       bands: _toddlerAndUp,
-      comingSoon: true,
-      blocks: [],
+      
+      blocks: [
+        // Written 2026-10-02 (parenting gap analysis), filling the scaffold.
+        // REQUIRED_REVIEW by a child psychologist.
+        PpIntro('Nail-biting, hair-twirling, nose-picking and lip-chewing are '
+            'all common in young children, often when they are bored, tired '
+            'or worried. Most fade with time, especially when nobody makes '
+            'a fuss.'),
+        PpSteps(heading: 'Helping with nail biting', [
+          PpStep('Notice when it happens', 'Bored, worried, watching TV?'),
+          PpStep('Give the hands something to do', 'A squeeze ball or play '
+              'dough.'),
+          PpStep('Keep nails short', 'Less to bite.'),
+          PpStep('Praise the gaps, ignore the biting', 'Scolding makes it '
+              'more of a habit.'),
+        ]),
+      ],
     ),
     // The brief's judgement call 3, included on the user's call
     // (2026-09-13): normal, do not shame, redirect gently, when to mention
     // it. Copy supplied later, like the rest.
     PpPage(
       id: 'beh_self_touching',
-      title: 'Touching himself, and what to do about it',
+      title: 'Touching private parts, and what to do about it',
       subtitle: 'Normal, and the one thing not to do',
       format: 'ARTICLE',
       bands: _toddlerAndUp,
-      comingSoon: true,
-      blocks: [],
+      
+      blocks: [
+        // Written 2026-10-02 (parenting gap analysis), filling the scaffold.
+        // REQUIRED_REVIEW by a child psychologist.
+        PpIntro('Babies and toddlers discover every part of their bodies, '
+            'including their private parts. Touching them is normal, common, '
+            'and not sexual in the way adults think of it. It usually just '
+            'feels nice or soothing.'),
+        PpArticle([
+          'The aim is to teach privacy, not to stop it with shame. A '
+              'scolded child learns that the body is bad, and becomes less '
+              'likely to tell you about inappropriate touch from anyone.',
+        ]),
+        PpScript(heading: 'Words to borrow', [
+          PpScriptLine(say: 'That is your private part. We touch our private '
+              'parts in private, like in your room or the bathroom.',
+              notThis: 'Yuck. Dirty. Stop that.',
+              why: 'Privacy, not shame.'),
+        ]),
+        PpSteps(heading: 'What helps', [
+          PpStep('Redirect calmly', 'Give the hands something else to do.'),
+          PpStep('Use the real names for body parts', 'It helps body safety '
+              'too.'),
+          PpStep('Check comfort', 'Tight clothes, an itch or a nappy rash can '
+              'start it.'),
+        ]),
+        PpCallout('Mention it to your paediatrician if it\'s constant and gets in '
+            'the way of play, or if there is redness or discharge. Mention '
+            'it too if your child acts out adult sexual behaviour or knows '
+            'things a young child shouldn\'t. That can be a sign that '
+            'someone has harmed your child.',
+            kind: PpCalloutKind.doctor),
+        PpLink('Talking about bodies and safe touch',
+            surfaceId: 'pp_page/parenting_safety/safety_body_talk'),
+      ],
+    ),
+    // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+    PpPage(
+      id: 'beh_nappy_fights',
+      title: 'Nappy fights, undressing and poo play',
+      subtitle: 'The messy phases, handled calmly',
+      bands: ['toddler_1', 'toddler_2'],
+      format: 'CARDS',
+      blocks: [
+        PpIntro('Toddlers want control over their bodies, and nappies, '
+            'clothes and even poo are where they find it. These phases are '
+            'normal and they pass. A calm, matter-of-fact response works '
+            'far better than a big reaction.'),
+        PpCards(heading: 'Fighting nappy changes and washing', [
+          PpCard('Change standing up', 'Many toddlers hate lying down.'),
+          PpCard('Give your child a job', 'Holding the clean nappy or the wipes.'),
+          PpCard('Make it quick and fun', 'A song, a countdown, a funny face.'),
+          PpCard('Offer choices', 'This nappy or that one? Brush now or after '
+              'your song?'),
+        ]),
+        PpCards(heading: 'Taking off clothes and nappies', [
+          PpCard('Why', 'Your child has just learned how, and it feels free.'),
+          PpCard('What helps', 'Onesies that snap underneath, trousers over '
+              'the nappy, and lots of naked time when it is safe.'),
+          PpCard('It can be a potty sign', 'Readiness may be close.'),
+        ]),
+        PpCards(heading: 'Playing with poo', [
+          PpCard('Stay calm', 'A big reaction makes it interesting.'),
+          PpCard('Clean up together, plainly', '"Poo goes in the nappy."'),
+          PpCard('Offer messy play', 'Play dough, sand and water meet the same '
+              'need.'),
+        ]),
+      ],
+    ),
+    PpPage(
+      id: 'beh_eating_nonfood',
+      title: 'Eating mud, chalk or paper',
+      subtitle: 'Exploring, or something to check',
+      format: 'SHORT ARTICLE',
+      blocks: [
+        PpIntro('Babies and young toddlers put everything in their mouths, '
+            'and the occasional bit of mud is part of exploring. When a '
+            'child keeps eating things that are not food, like mud, chalk, '
+            'plaster, wool or paper, past about two years, it has a name: '
+            'pica.'),
+        PpArticle([
+          'Pica is sometimes linked to iron deficiency, which is common '
+              'in Indian children, and is more common in autistic children '
+              'and children with developmental differences. It can be '
+              'dangerous if a child swallows paint flakes, which may contain '
+              'lead, or things that can block the gut.',
+        ]),
+        PpCallout('Talk to your paediatrician if your child keeps eating non-food '
+            'things after about two, or eats anything harmful. A simple '
+            'blood test for iron and lead may help.',
+            kind: PpCalloutKind.doctor),
+      ],
     ),
   ],
 );
@@ -1604,7 +1981,7 @@ const PpArea _habits = PpArea(
 final PpSection kPpBehaviourSection = PpSection(
   id: 'parenting_behaviour',
   title: 'Behaviour',
-  intro: 'Why she does it, what to do in the moment, and the words to use.',
+  intro: 'Why children do it, what to do in the moment, and the words to use.',
   bandSet: kPpChildBands,
   // ⚠️ THE AGE RULE. "The four bands come out. The app knows his age, so
   // the library opens on his band and shows only that band's areas. No band

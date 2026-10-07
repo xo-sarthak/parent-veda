@@ -67,7 +67,7 @@ const _neverOnMore = [
   'WhatsApp updates',
   'What you see',
   'Preferences',
-  'Developer · debug only',
+  'Developer',
   'Notes for your doctor',
   'Your answers',
   'I got a positive test',
@@ -329,7 +329,7 @@ void main() {
         expect(find.byKey(ValueKey(k)), findsOneWidget, reason: k);
       }
       for (final w in [
-        'Developer · debug only',
+        'Developer',
         'Language',
         'Sign out',
         'Delete account',
@@ -367,8 +367,10 @@ void main() {
       // Tests run in debug, so the gate is open: Developer is drawn, and
       // below everything else.
       expect(kPvShowDeveloper, isTrue);
-      final dev = find.text('DEVELOPER · DEBUG ONLY');
-      expect(dev, findsOneWidget);
+      // 2026-10-07: the section ships in every build, titled plain Developer.
+      // The heading and its group label now read the same word.
+      final dev = find.text('DEVELOPER').first;
+      expect(find.text('DEVELOPER'), findsWidgets);
       expect(tester.getTopLeft(dev).dy,
           greaterThan(tester.getTopLeft(find.text('ParentVeda')).dy),
           reason: 'Developer sits under the footer, last');
@@ -377,7 +379,8 @@ void main() {
           .readAsStringSync()
           .replaceAll('\r\n', '\n');
       expect(src, contains('const bool kPvShowDeveloper = kDebugMode || kPvDevBuild;'));
-      expect(src, contains('developer: kPvShowDeveloper ? () => _developer(p) : null,'));
+      expect(src, contains('developer: kPvShipDeveloperSection ? () => _developer(p) : null,'));
+      expect(src, contains('const bool kPvShipDeveloperSection = true;'));
     });
 
     testWidgets('a choice made in Settings repaints Settings', (tester) async {

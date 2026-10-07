@@ -75,9 +75,12 @@ void main() {
         'how_date_chosen', 'how_name_chosen', 'first_festivals', 'skip_it',
         'someone_elses_ceremony', 'twins_adopted_second', 'interfaith_far_from_home', 'mother_kept_apart',
       ];
+      // All eight written 2026-10-02 (parenting gap analysis); skip_it and
+      // mother_kept_apart await the user's tone sign-off, per the ledger.
       for (final id in soon) {
-        expect(_page(id).comingSoon, isTrue, reason: id);
-        expect(ledger.contains(id), isTrue, reason: '$id is a coming-soon card nobody has logged as owed');
+        expect(_page(id).comingSoon, isFalse, reason: id);
+        expect(_page(id).blocks, isNotEmpty, reason: id);
+        expect(ledger.contains(id), isTrue, reason: '$id stays in the ledger');
       }
       expect(_listed('whats_now').sublist(4), ['how_date_chosen', 'how_name_chosen'], reason: 'next to what is coming up');
     });
@@ -139,7 +142,8 @@ void main() {
       await tester.pumpWidget(MaterialApp(home: PpDoorScreen(key: const ValueKey(1), door: door, onSurface: (_, _) {})));
       await tester.pumpAndSettle();
       expect(find.text('The first months, in order'), findsOneWidget);
-      expect(find.text('Coming up: birthday, mundan, ears'), findsNothing);
+      // 2026-10-07: title now English (was 'Coming up: birthday, mundan, ears').
+      expect(find.text('Coming up: birthday, first head shaving, ears'), findsNothing);
       expect(find.byIcon(Icons.lock_outline_rounded), findsNothing);
       expect(find.text('Find a name'), findsOneWidget);
       expect(find.text('Consult'), findsNothing);
@@ -147,7 +151,7 @@ void main() {
       _ageMonths(24);
       await tester.pumpWidget(MaterialApp(home: PpDoorScreen(key: const ValueKey(24), door: door, onSurface: (_, _) {})));
       await tester.pumpAndSettle();
-      expect(find.text('Coming up: birthday, mundan, ears'), findsOneWidget);
+      expect(find.text('Coming up: birthday, first head shaving, ears'), findsOneWidget);
       expect(find.text('The first months, in order'), findsNothing);
 
       _ageMonths(24);

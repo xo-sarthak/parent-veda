@@ -25,6 +25,8 @@ import 'pp_common.dart';
 import 'pp_products_data.dart';
 import 'product_detail_screen.dart';
 import '../../services/remote/ask_veda_service.dart';
+import 'pp_phase_faqs.dart' show phaseFaqs;
+import 'pp_phases_data.dart' show currentPhase, ppFillChild;
 
 // ---- design palette (identical to the pregnancy Ask Veda) --------------------
 const _vBgTop = Color(0xFFF8F4FD);
@@ -72,9 +74,9 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
   static const List<(String, IconData, List<String>)> _suggest = [
     ('Sleep', Icons.bedtime_outlined, [
       'Why does he wake every 2 hours at night?',
-      'Is the 4-month sleep regression normal?',
+      'Is this a sleep regression?',
       'How do I help him self-settle?',
-      'How many naps does he need at 4 months?',
+      'How many naps does he need now?',
     ]),
     ('Feeding', Icons.restaurant_outlined, [
       'When should I start solids?',
@@ -83,14 +85,14 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
       'What are good first foods?',
     ]),
     ('Development', Icons.psychology_outlined, [
-      'Is he on track at 4 months?',
+      'Is he on track for his age?',
       'How can I encourage rolling?',
       'Why is he suddenly so fussy?',
       'How do I support his language?',
     ]),
     ('Health', Icons.monitor_heart_outlined, [
       'What should I do for a fever?',
-      'The 4-month vaccines, explained',
+      'The vaccines due now, explained',
       'Could this be teething?',
     ]),
     ('For you', Icons.favorite_border, [
@@ -111,10 +113,23 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
     }
   }
 
+  // "For this age" leads (gap analysis P2, 2026-10-07): the current phase's
+  // own questions, from pp_phase_faqs.dart. Every question is filled from her
+  // profile, so a girl is never asked about as "he".
+  static const String _kForThisAge = 'For this age';
+
+  List<(String, IconData, List<String>)> get _sections => [
+        (_kForThisAge, Icons.child_care_outlined, [
+          for (final f in phaseFaqs(currentPhase().number, count: 4)) f.question,
+        ]),
+        ..._suggest,
+      ];
+
   void _roll() {
     _picked.clear();
-    for (final sec in _suggest) {
-      final qs = [...sec.$3]..shuffle(_rng);
+    for (final sec in _sections) {
+      final qs = [for (final q in sec.$3) ppFillChild(q)];
+      if (sec.$1 != _kForThisAge) qs.shuffle(_rng);
       _picked[sec.$1] = qs.take(3).toList();
     }
   }
@@ -338,7 +353,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
             ),
           ]),
           const SizedBox(height: 14),
-          for (final sec in _suggest) _suggestionSection(sec),
+          for (final sec in _sections) _suggestionSection(sec),
         ],
       );
 

@@ -205,7 +205,9 @@ void main() {
     test('the six landing tools survive as tool cards and the closing', () {
       final tools = [for (final t in door.tabs) ...t.tools];
       expect(tools.map((t) => t.surfaceId).toSet(),
-          {'pp_feeding', 'pp_food_chart', 'pp_baby_food_check', 'pp_food', 'pp_growth'});
+          // + the care logs, 2026-10-07 (gap analysis P1, Behind · Logging).
+          {'pp_feeding', 'pp_food_chart', 'pp_baby_food_check', 'pp_food', 'pp_growth',
+           'pp_feed_timer', 'pp_nappies', 'pp_pump', 'pp_care_history'});
       for (final t in tools) {
         expect(ppScreenForSurface(t.surfaceId), isNotNull, reason: t.label);
       }
@@ -232,7 +234,7 @@ void main() {
         addTearDown(tester.view.reset);
         await tester.pumpWidget(MaterialApp(home: PpDoorScreen(door: door, onSurface: (_, _) {})));
         await tester.pumpAndSettle();
-        expect(find.text('Log his feeds'), findsOneWidget, reason: 'month $months');
+        expect(find.text('Log a feed'), findsOneWidget, reason: 'month $months');
         expect(find.text('Talk to a lactation expert'), findsOneWidget);
         expect(find.text('A hot, painful lump in the breast'), findsOneWidget, reason: 'the red flag');
       }

@@ -81,6 +81,7 @@ import 'recipes_screen.dart';
 // Kept: the pre-redesign Recommendations row below is commented, not deleted.
 // ignore: unused_import
 import 'recommendations_screen.dart';
+import '../profile/pv_you_screen.dart' show kPvShowDeveloper;
 
 
 /// One row of the Explore drawer — and, since 2026-09-16, of the More sheet.
@@ -203,7 +204,7 @@ List<ExploreEntry> ppExploreEntries() => [
     //     'Documentary guides, stage by stage.', const CoursesScreen()),
     ExploreEntry(Icons.handshake_outlined, 'Find help',
         'Vetted local services near you.', const ProblemSolverScreen()),
-    ExploreEntry(Icons.local_florist_outlined, 'Dadi/Nani Nuskhe',
+    ExploreEntry(Icons.local_florist_outlined, 'Home remedies', // was 'Dadi/Nani Nuskhe' (English only, 2026-10-07)
         'Home remedies, safely.', const NuskheScreen()),
     ExploreEntry(Icons.savings_outlined, 'Investments & Savings',
         'Plan ahead for their future.', const InvestmentsScreen()),
@@ -221,12 +222,17 @@ List<ExploreEntry> ppExploreEntries() => [
     // visited on purpose, never pushed at anyone
     // (docs/BRAND-STUDIO.md §3). Moving the door does not change
     // that — it is still exactly one.
+    // ⚠️ INTERNAL TOOLS, NOT FOR PARENTS (gap analysis P2, 2026-10-07): a
+    // parent was shown "All 15 brand products, walked end to end." Behind the
+    // developer switch now, the same one as You > Developer.
+    if (kPvShowDeveloper) ...[
     ExploreEntry(Icons.new_releases_outlined, 'Launches',
         'New, and worth knowing about.',
         const LaunchHubScreen(stage: BrandStage.parenting)),
     ExploreEntry(Icons.workspace_premium_outlined, 'Brand Studio',
         'All 15 brand products, walked end to end.',
         const BrandShowcaseScreen()),
+    ],
     if (kDebugMode)
       ExploreEntry(Icons.science_outlined, 'Brand Studio (debug)',
           'Every campaign, and why it is blocked.',

@@ -15,9 +15,36 @@ import 'package:flutter/material.dart';
 import '../../care_partner/care_visibility.dart';
 import '../care_partner/care_partner_slot.dart';
 
+import '../../theme/pv_fonts.dart';
+import '../brackets/hub/hub_intent_art.dart' show IntentMark;
+import '../doors/pv_list_row.dart';
+import '../pregnancy/preg_tool_chrome.dart';
+import '../products/pv_store_chrome.dart' show PvCommit, PvSecondary;
+import '../ttc/ttc_tool_marks.dart';
+import '../v2/v2_palette.dart';
+import 'pp_breast_timer_screen.dart';
+import 'pp_care_history_screen.dart';
+import 'pp_care_log_data.dart';
+import 'pp_care_parts.dart';
+import 'pp_child_profile.dart';
 import 'pp_common.dart';
 import 'pp_feeding_data.dart';
+import 'pp_nappy_screen.dart';
+import 'pp_pump_screen.dart';
+import 'pp_search.dart' show openPpAskVeda;
 import 'pp_tools_kit.dart';
+
+/// ⚠️ THE SHARED TOOL SHELL (2026-10-07, parenting gap pass). The journey was
+/// drawn in the 2026-08 parenting kit (a purple number on a gradient card, a
+/// lavender panel behind a sentence): a different app one tap from the door.
+/// It now wears `PregToolScaffold` like every pregnancy and trying-to-conceive
+/// tool, with the care logs' parts (pp_care_parts.dart), and gains what the gap
+/// analysis asked of it (P1, Behind · Logging): a time row so a missed feed can
+/// be put in later, Pump as a fourth choice (left and right ml), "Last side:
+/// Left, 1h 40m ago" and which side to start on, and a way to the timer,
+/// nappies, pumping and the week. `false` draws the 2026-08 page
+/// (`_buildBeforeShell`), kept for revert.
+const bool kPpFeedingJourneyShell = true;
 
 class FeedingJourneyScreen extends StatefulWidget {
   const FeedingJourneyScreen({super.key});
@@ -30,7 +57,141 @@ class _FeedingJourneyScreenState extends State<FeedingJourneyScreen> {
   final _store = FeedingStore.instance;
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
+    _store.init();
+    PumpStore.instance.init();
+  }
+
+  @override
+  Widget build(BuildContext context) => kPpFeedingJourneyShell ? _buildShell(context) : _buildBeforeShell(context);
+
+  Widget _buildShell(BuildContext context) {
+    return AnimatedBuilder(
+      animation: Listenable.merge([_store, ChildProfileStore.instance]),
+      builder: (context, _) {
+        final p = V2PaletteStore.instance.current;
+        final today = _store.todays;
+        final last = _store.last;
+        final next = _store.nextExpected;
+        final side = ppNextBreastSide();
+        final lastSide = ppLastSideLine();
+        final tint = HSLColor.fromAHSL(1, 206, 0.52, 0.9).toColor();
+        Widget go(String key, String title, String line, TtcToolMark mark, Widget screen, String route) =>
+            pregToolPad(PvListRow(
+              key: ValueKey(key),
+              p: p,
+              leading: TtcMarkLeading(tool: mark, tint: tint, size: 40),
+              title: title,
+              line: line,
+              onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+                settings: RouteSettings(name: route),
+                builder: (_) => screen,
+              )),
+            ));
+        return PregToolScaffold(
+          hue: 206,
+          eyebrow: 'Feeding',
+          mark: IntentMark.feedMark,
+          title: 'Feeding journey',
+          intro: 'A rhythm you can see, not a log to fill. A couple of taps whenever you like.',
+          children: [
+            pregToolPad(PpCareStats([
+              ('${_store.countToday}', _store.countToday == 1 ? 'feed today' : 'feeds today'),
+              (last == null ? 'None yet' : ppCareAgo(last.time), 'last feed'),
+              (next == null ? 'Not yet' : '~${ppCareClock(next)}', 'next feed, roughly'),
+            ])),
+            if (side != null || lastSide != null) ...[
+              const SizedBox(height: 14),
+              if (side != null)
+                pregToolPad(Text(side.suggestion,
+                    key: const ValueKey('pp_feed_next_side'),
+                    style: pvManrope(fontSize: 15, fontWeight: FontWeight.w700, height: 1.4, color: p.ink1))),
+              if (lastSide != null)
+                pregToolPad(Text(lastSide,
+                    key: const ValueKey('pp_feed_last_side'),
+                    style: pvManrope(fontSize: 13.5, color: p.ink2))),
+            ],
+            const SizedBox(height: 18),
+            pregToolPad(PvCommit(key: const ValueKey('pp_feed_log'), label: 'Log a feed', onTap: _openLogSheet)),
+            const SizedBox(height: 10),
+            pregToolPad(PvSecondary(
+              key: const ValueKey('pp_feed_timer_open'),
+              label: 'Start the breastfeed timer',
+              icon: Icons.timer_outlined,
+              onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+                settings: const RouteSettings(name: 'pp_feed_timer'),
+                builder: (_) => const PpBreastTimerScreen(),
+              )),
+            )),
+            const SizedBox(height: 18),
+            pregToolPad(Text(_store.growthAwareInsight, style: pvManrope(fontSize: 14, height: 1.5, color: p.ink1))),
+            // If a lactation consultant introduced this family to ParentVeda,
+            // this is where she belongs. Renders nothing otherwise.
+            pregToolPad(const CarePartnerSlot(
+              surface: CareSurface.topic,
+              topic: CareTopic.breastfeeding,
+              stage: 'parenting',
+              padding: EdgeInsets.only(top: 14),
+            )),
+            const SizedBox(height: 26),
+            pregToolPad(ppCareHeading("Today's feeds")),
+            const SizedBox(height: 6),
+            if (today.isEmpty)
+              pregToolPad(Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Text('No feeds logged today yet. A couple of taps whenever you like keeps the rhythm.',
+                    key: const ValueKey('pp_feed_empty'),
+                    style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2)),
+              ))
+            else
+              for (final f in today)
+                pregToolPad(PpCareEntryRow(
+                  key: ValueKey('pp_feed_row_${f.id}'),
+                  title: _kindLabel(f.kind),
+                  when: f.time,
+                  detail: _detail(f),
+                  onRemove: () {
+                    _store.remove(f.id);
+                    ppCareSaved(context, 'Feed removed.', undo: () => _store.add(f));
+                  },
+                )),
+            const SizedBox(height: 26),
+            pregToolPad(ppCareHeading('What the pattern shows')),
+            const SizedBox(height: 10),
+            for (final line in _store.patterns)
+              pregToolPad(Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Text(line, style: pvManrope(fontSize: 14, height: 1.5, color: p.ink1)),
+              )),
+            const SizedBox(height: 22),
+            pregToolPad(ppCareHeading('Also keep track of')),
+            const SizedBox(height: 8),
+            go('pp_feed_go_nappies', 'Nappies', 'Wet and dirty, one tap each', TtcToolMark.records,
+                const PpNappyScreen(), 'pp_nappies'),
+            go('pp_feed_go_pump', 'Pumping', 'Left and right, in ml', TtcToolMark.nutrition, const PpPumpScreen(),
+                'pp_pump'),
+            go('pp_feed_go_history', 'The last 7 days', 'Day by day, and a summary for your doctor',
+                TtcToolMark.cycleReport, const PpCareHistoryScreen(), 'pp_care_history'),
+            const SizedBox(height: 22),
+            pregToolPad(ppCareHeading('Questions parents ask')),
+            const SizedBox(height: 4),
+            for (final q in const [
+              'How do I know my baby is getting enough milk?',
+              'What is cluster feeding, and is it normal?',
+              'How do I recognise early hunger cues?',
+              'When and how do I start solids?',
+            ])
+              pregToolPad(PpCareQuestionRow(question: q, onTap: () => openPpAskVeda(context, q))),
+            const SizedBox(height: 32),
+          ],
+        );
+      },
+    );
+  }
+
+  /// The 2026-08 page, kept for revert (`kPpFeedingJourneyShell = false`).
+  Widget _buildBeforeShell(BuildContext context) {
     return Scaffold(
       backgroundColor: ppBg,
       body: SafeArea(
@@ -219,7 +380,144 @@ class _FeedingJourneyScreenState extends State<FeedingJourneyScreen> {
       );
 
   // ---- log sheet ----------------------------------------------------------
-  void _openLogSheet() {
+  void _openLogSheet() => kPpFeedingJourneyShell ? _openShellSheet() : _openClassicSheet();
+
+  /// The shared sheet (pp_care_parts.dart): When first (defaults to now, can
+  /// be changed), then the kind, then what the kind needs. "Pump" saves to
+  /// the pump log, not the feed log: it is milk expressed, not a feed given.
+  void _openShellSheet() {
+    var when = DateTime.now();
+    String kind = 'breast';
+    FeedSideX side = ppNextBreastSide()?.lastSide == FeedSideX.left ? FeedSideX.right : FeedSideX.left;
+    BottleMilk milk = BottleMilk.expressed;
+    SolidTake take = SolidTake.ate;
+    int? minutes;
+    var amount = 0;
+    var left = 0;
+    var right = 0;
+    final food = TextEditingController();
+    showPpCareSheet(
+      context,
+      title: 'Log a feed',
+      saveLabel: 'Save feed',
+      body: (setSheet) {
+        Widget stepper(String label, int value, String k, ValueChanged<int> on) {
+          final p = V2PaletteStore.instance.current;
+          return Row(children: [
+            SizedBox(width: 72, child: Text(label, style: pvManrope(fontSize: 15, fontWeight: FontWeight.w700, color: p.ink1))),
+            IconButton.outlined(
+                key: ValueKey('pp_feed_${k}_minus'),
+                tooltip: 'Take away 10 ml',
+                onPressed: () => on((value - 10).clamp(0, 500)),
+                icon: Icon(Icons.remove_rounded, color: p.ink1)),
+            Expanded(
+                child: Center(
+                    child: Text('$value ml', style: pvFraunces(fontSize: 24, fontWeight: FontWeight.w600, color: p.ink1)))),
+            IconButton.outlined(
+                key: ValueKey('pp_feed_${k}_plus'),
+                tooltip: 'Add 10 ml',
+                onPressed: () => on((value + 10).clamp(0, 500)),
+                icon: Icon(Icons.add_rounded, color: p.ink1)),
+          ]);
+        }
+
+        return [
+          ppCareLabel('When'),
+          PpWhenRow(when: when, onChanged: (t) => setSheet(() => when = t)),
+          const SizedBox(height: 16),
+          ppCareLabel('How was this feed?'),
+          ppCareChoices<String>(
+            values: const ['breast', 'bottle', 'solids', 'pump'],
+            selected: kind,
+            label: (k) => switch (k) { 'breast' => 'Breast', 'bottle' => 'Bottle', 'solids' => 'Solids', _ => 'Pump' },
+            keyPrefix: 'pp_feed_kind',
+            onPick: (k) => setSheet(() => kind = k ?? kind),
+          ),
+          const SizedBox(height: 16),
+          if (kind == 'breast') ...[
+            ppCareLabel('Side'),
+            ppCareChoices<FeedSideX>(
+              values: FeedSideX.values,
+              selected: side,
+              label: (x) => switch (x) { FeedSideX.left => 'Left', FeedSideX.right => 'Right', FeedSideX.both => 'Both' },
+              keyPrefix: 'pp_feed_side',
+              onPick: (x) => setSheet(() => side = x ?? side),
+            ),
+            const SizedBox(height: 16),
+            ppCareLabel('How long, if you know'),
+            ppCareChoices<int>(
+              values: const [5, 10, 15, 20, 30],
+              selected: minutes,
+              label: (m) => '$m min',
+              allowNone: true,
+              keyPrefix: 'pp_feed_min',
+              onPick: (m) => setSheet(() => minutes = m),
+            ),
+          ] else if (kind == 'bottle') ...[
+            ppCareLabel('What was in the bottle?'),
+            ppCareChoices<BottleMilk>(
+              values: BottleMilk.values,
+              selected: milk,
+              label: (m) => switch (m) { BottleMilk.expressed => 'Expressed', BottleMilk.formula => 'Formula', BottleMilk.other => 'Other' },
+              keyPrefix: 'pp_feed_milk',
+              onPick: (m) => setSheet(() => milk = m ?? milk),
+            ),
+            const SizedBox(height: 16),
+            stepper('Amount', amount, 'amount', (v) => setSheet(() => amount = v)),
+          ] else if (kind == 'solids') ...[
+            ppCareLabel('What did they try?'),
+            TextField(
+              key: const ValueKey('pp_feed_food'),
+              controller: food,
+              decoration: const InputDecoration(hintText: 'Khichdi, mashed banana...', border: OutlineInputBorder()),
+            ),
+            const SizedBox(height: 16),
+            ppCareLabel('How did it go?'),
+            ppCareChoices<SolidTake>(
+              values: SolidTake.values,
+              selected: take,
+              label: (t) => switch (t) { SolidTake.ate => 'Ate well', SolidTake.tasted => 'Tasted', SolidTake.refused => 'Not today' },
+              keyPrefix: 'pp_feed_take',
+              onPick: (t) => setSheet(() => take = t ?? take),
+            ),
+          ] else ...[
+            stepper('Left', left, 'left', (v) => setSheet(() => left = v)),
+            const SizedBox(height: 10),
+            stepper('Right', right, 'right', (v) => setSheet(() => right = v)),
+            const SizedBox(height: 8),
+            Text('Saved to your pumping log, so whoever gives the bottle knows what there is.',
+                style: pvManrope(fontSize: 13, height: 1.45, color: V2PaletteStore.instance.current.ink2)),
+          ],
+        ];
+      },
+      onSave: () {
+        if (kind == 'pump') {
+          if (left == 0 && right == 0) {
+            ppCareSaved(context, 'Nothing saved: add how much from at least one side.');
+            return;
+          }
+          PumpStore.instance.log(time: when, leftMl: left == 0 ? null : left, rightMl: right == 0 ? null : right);
+          ppCareSaved(context, 'Pumping saved: ${left + right} ml, ${ppCareWhen(when).toLowerCase()}.');
+          return;
+        }
+        final k = switch (kind) { 'bottle' => FeedKind.bottle, 'solids' => FeedKind.solid, _ => FeedKind.breast };
+        _store.log(
+          time: when,
+          kind: k,
+          side: k == FeedKind.breast ? side : null,
+          durationMin: k == FeedKind.breast ? minutes : null,
+          milk: k == FeedKind.bottle ? milk : null,
+          amountMl: k == FeedKind.bottle && amount > 0 ? amount : null,
+          food: k == FeedKind.solid ? (food.text.trim().isEmpty ? 'Solid food' : food.text.trim()) : null,
+          take: k == FeedKind.solid ? take : null,
+        );
+        ppCareSaved(context, '${_kindLabel(k)} feed saved, ${ppCareWhen(when).toLowerCase()}.');
+      },
+    );
+  }
+
+  /// The 2026-08 sheet, kept for revert.
+  void _openClassicSheet() {
     FeedKind kind = FeedKind.breast;
     FeedSideX side = FeedSideX.left;
     BottleMilk milk = BottleMilk.expressed;

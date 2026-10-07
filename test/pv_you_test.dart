@@ -97,8 +97,13 @@ void main() {
         // ⚠️ PREGNANCY IS THE SHORT PROFILE TOO SINCE 2026-10-01 (the user:
         // "in pregnancy profile, settings need to be like the way it's in TTC
         // side"). Kept for revert: `stage == LifeStage.tryingToConceive`.
+        // ⚠️ AND PARENTING SINCE 2026-10-07 (the user: More's "Everything
+        // else" belongs in a Profile, "which you haven't created for the
+        // parenting side"). Kept for revert: trying or pregnancy only.
         final shortProfile =
-            stage == LifeStage.tryingToConceive || stage == LifeStage.pregnancy;
+            stage == LifeStage.tryingToConceive ||
+            stage == LifeStage.pregnancy ||
+            stage == LifeStage.parenting;
         expect(find.text(shortProfile ? 'Profile' : 'You'), findsWidgets);
         // ⚠️ TRYING TO CONCEIVE IS SHORT AND GROUPED (2026-09-27, the user's
         // choice after the launch walk): "Your details" folds into a "Your
@@ -171,7 +176,12 @@ void main() {
       await pumpTall(tester, const PvYouScreen(stage: LifeStage.pregnancy));
       expect(find.text('Add an older child'), findsOneWidget);
       await pumpTall(tester, const PvYouScreen(stage: LifeStage.parenting));
-      expect(find.text('Children'), findsOneWidget);
+      // Parenting draws the short profile too since 2026-10-07: the
+      // invitation is "Add a child" under Your journey. Kept for revert:
+      //   expect(find.text('Children'), findsOneWidget);
+      expect(find.text('Add a child'), findsOneWidget);
+      expect(find.text('Add your child and their page appears here.'),
+          findsOneWidget);
     });
 
     testWidgets('the partner card is on every stage', (tester) async {

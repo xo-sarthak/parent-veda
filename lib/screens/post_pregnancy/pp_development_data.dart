@@ -147,9 +147,42 @@ class LookAhead {
 }
 
 class CheckInQ {
-  const CheckInQ(this.areaId, this.text);
+  const CheckInQ(this.areaId, this.text, {this.redFlag = false, this.yesIsConcern = false});
   final String areaId;
+
+  /// The question, authored with he/him/his (filled for the child on screen
+  /// with `ppFillChild`). ALSO THE STORAGE KEY: never fill it before storing.
   final String text;
+
+  /// ⚠️ ONE OF THE "ACT EARLY" SIGNS (CDC/AAP 2022), added 2026-10-07 (gap
+  /// analysis P1: "The check-in never escalates"). A "not yet" here is worth a
+  /// word with the paediatrician on its own; elsewhere it takes three.
+  /// REQUIRED_REVIEW (paediatrician): which questions carry it.
+  final bool redFlag;
+
+  /// For "has he lost a skill": here YES is the answer to act on.
+  final bool yesIsConcern;
+}
+
+/// The question every band ends with. A loss of skills at any age is the one
+/// sign that always goes to the doctor (CDC "act early").
+const CheckInQ kCheckInLostSkill = CheckInQ('all',
+    'Has he lost a skill he used to have, like words, sounds or walking?',
+    redFlag: true, yesIsConcern: true);
+
+/// What the answers add up to: whether to suggest the paediatrician.
+/// Any red-flag "not yet", a lost skill, or three or more "not yet"s.
+bool checkInWorthAsking(List<CheckInQ> qs, bool? Function(String text) answer) {
+  var notYet = 0;
+  for (final q in qs) {
+    final a = answer(q.text);
+    if (a == null) continue;
+    final concern = q.yesIsConcern ? a == true : a == false;
+    if (!concern) continue;
+    if (q.redFlag) return true;
+    notYet++;
+  }
+  return notYet >= 3;
 }
 
 // ---- development areas ------------------------------------------------------
@@ -520,26 +553,26 @@ const List<(String, String)> kLookAheadPicks = [
 /// the key into an id.
 const List<CheckInQ> kCheckIns0to6 = [
   CheckInQ('gross_motor', 'Does he push up on his forearms during tummy time?'),
-  CheckInQ('social', 'Does he smile back when you smile at him?'),
-  CheckInQ('language', 'Does he turn toward your voice or new sounds?'),
+  CheckInQ('social', 'Does he smile back when you smile at him?', redFlag: true),
+  CheckInQ('language', 'Does he turn toward your voice or new sounds?', redFlag: true),
   CheckInQ('fine_motor', 'Does he bring his hands together at his chest?'),
   CheckInQ('cognitive', 'Does he follow a toy as you move it across his view?'),
   CheckInQ('emotional', 'Does he settle more easily in your arms?'),
 ];
 
 const List<CheckInQ> kCheckIns6to12 = [
-  CheckInQ('gross_motor', 'Can he sit without you holding him?'),
+  CheckInQ('gross_motor', 'Can he sit without you holding him?', redFlag: true),
   CheckInQ('social', 'Does he look for you when you leave the room?'),
-  CheckInQ('language', 'Does he babble strings of sounds, like ba-ba or da-da?'),
+  CheckInQ('language', 'Does he babble strings of sounds, like ba-ba or da-da?', redFlag: true),
   CheckInQ('fine_motor', 'Does he pass a toy from one hand to the other?'),
   CheckInQ('cognitive', 'Does he look for a toy after you hide it under a cloth?'),
   CheckInQ('emotional', 'Does he calm faster when you pick him up than when someone else does?'),
 ];
 
 const List<CheckInQ> kCheckIns1to2 = [
-  CheckInQ('gross_motor', 'Is he pulling up, cruising along furniture, or walking?'),
-  CheckInQ('social', 'Does he bring something over to show you?'),
-  CheckInQ('language', 'Does he use a few words, even unclear ones, that mean something?'),
+  CheckInQ('gross_motor', 'Is he pulling up, cruising along furniture, or walking?', redFlag: true),
+  CheckInQ('social', 'Does he bring something over to show you?', redFlag: true),
+  CheckInQ('language', 'Does he use a few words, even unclear ones, that mean something?', redFlag: true),
   CheckInQ('fine_motor', 'Does he pick up small pieces of food with finger and thumb?'),
   CheckInQ('cognitive', 'Does he follow a simple ask, like giving you the spoon?'),
   CheckInQ('emotional', 'Does he look at your face to check before trying something new?'),
@@ -548,7 +581,7 @@ const List<CheckInQ> kCheckIns1to2 = [
 const List<CheckInQ> kCheckIns2to3 = [
   CheckInQ('gross_motor', 'Does he run, and climb onto low furniture?'),
   CheckInQ('social', 'Does he play alongside other children, even without joining in?'),
-  CheckInQ('language', 'Does he put two words together, like more milk?'),
+  CheckInQ('language', 'Does he put two words together, like more milk?', redFlag: true),
   CheckInQ('fine_motor', 'Does he scribble, and turn the pages of a book?'),
   CheckInQ('cognitive', 'Does he pretend, like feeding a doll or talking on a phone?'),
   CheckInQ('emotional', 'Does he show a strong opinion about what he wants?'),
@@ -557,7 +590,7 @@ const List<CheckInQ> kCheckIns2to3 = [
 const List<CheckInQ> kCheckIns3plus = [
   CheckInQ('gross_motor', 'Does he jump with both feet, or pedal a tricycle?'),
   CheckInQ('social', 'Does he take turns in a game, even with reminders?'),
-  CheckInQ('language', 'Can someone outside the family understand most of what he says?'),
+  CheckInQ('language', 'Can someone outside the family understand most of what he says?', redFlag: true),
   CheckInQ('fine_motor', 'Does he hold a crayon in his fingers rather than his fist?'),
   CheckInQ('cognitive', 'Does he ask why, and want a real answer?'),
   CheckInQ('emotional', 'Can he name a feeling, like happy, sad or angry?'),
@@ -565,11 +598,17 @@ const List<CheckInQ> kCheckIns3plus = [
 
 /// The six questions that fit a child of [months].
 List<CheckInQ> checkInsForAge(int months) {
-  if (months < 6) return kCheckIns0to6;
-  if (months < 12) return kCheckIns6to12;
-  if (months < 24) return kCheckIns1to2;
-  if (months < 36) return kCheckIns2to3;
-  return kCheckIns3plus;
+  // Every band ends with the lost-skill question (2026-10-07).
+  final band = months < 6
+      ? kCheckIns0to6
+      : months < 12
+          ? kCheckIns6to12
+          : months < 24
+              ? kCheckIns1to2
+              : months < 36
+                  ? kCheckIns2to3
+                  : kCheckIns3plus;
+  return [...band, kCheckInLostSkill];
 }
 
 /// ⚠️ KEPT AS AN ALIAS, NOT DELETED. `kCheckIns` was the whole API and other

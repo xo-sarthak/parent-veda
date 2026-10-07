@@ -542,7 +542,9 @@ PvRead pvReadFromReadArticle(
     scaleSetter: _same(lede),
     author: _same(a.author),
     authorRole: _same(a.authorRole),
-    reviewed: a.authorRole.trim().isNotEmpty,
+    // No tick: nobody has clinically reviewed these parenting pieces (gap
+    // analysis P1, 2026-10-07). Was `a.authorRole.trim().isNotEmpty`.
+    reviewed: false,
     hue: 268,
     sections: [
       for (var i = 0; i < sections.length; i++) ...[
@@ -605,7 +607,9 @@ PvRead pvReadFromArticle(Article a) {
         : 'The full article is being written - it lands soon, reviewed by our medical panel.'),
     author: _same(a.author),
     authorRole: _same(a.authorRole),
-    reviewed: a.authorRole.trim().isNotEmpty,
+    // No tick: nobody has clinically reviewed these parenting pieces (gap
+    // analysis P1, 2026-10-07). Was `a.authorRole.trim().isNotEmpty`.
+    reviewed: false,
     hue: 268,
     sections: full
         ? [

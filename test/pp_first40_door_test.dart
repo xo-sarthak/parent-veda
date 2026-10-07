@@ -102,9 +102,14 @@ void main() {
 
     test('the three scaffolds in the ledger, the two windows into You, and the vaccines pointer', () {
       final ledger = File('docs/DOOR-CONTENT-OWED.md').readAsStringSync();
-      for (final id in ['f40_small_or_early', 'f40_for_husband', 'f40_ceremonies']) {
-        expect(_page(id).comingSoon, isTrue, reason: id);
+      for (final id in ['f40_small_or_early']) {
+        expect(_page(id).comingSoon, isFalse, reason: '$id filled 2026-10-02');
         expect(ledger.contains(id), isTrue, reason: '$id is a coming-soon card nobody has logged as owed');
+      }
+      // Filled 2026-10-02 from the parenting gap analysis.
+      for (final id in ['f40_for_husband', 'f40_ceremonies']) {
+        expect(_page(id).comingSoon, isFalse, reason: id);
+        expect(_page(id).blocks.first, isA<PpIntro>(), reason: id);
       }
       // Breasts and pregnant-again were scaffolds until the You brief made
       // You, Maa the one home; they open its pages now (pp_you_maa_door_test).
@@ -139,7 +144,8 @@ void main() {
       expect(find.byIcon(Icons.lock_outline_rounded), findsNothing, reason: 'every tab is for the whole forty days');
       expect(find.text('Consult'), findsNothing, reason: 'no closing card');
       final labels = [for (final t in door.tabs) t.label];
-      expect(labels[2], 'Maa ki dekhbhaal');
+      // 2026-10-07: tab label now English (was 'Maa ki dekhbhaal').
+      expect(labels[2], 'Your recovery');
 
       _ageDays(50);
       await tester.pumpWidget(MaterialApp(home: PpDoorScreen(key: const ValueKey(50), door: door, onSurface: (_, _) {})));

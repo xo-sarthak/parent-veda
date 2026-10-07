@@ -22,11 +22,36 @@
 //
 //  SEARCH HIDES EVERYTHING, per the brief — one unified result list with a
 //  category badge on each row, rather than twelve filtered rails.
+//
+//  ON THE ONE PARENTVEDA LOOK (2026-10-07). Both pages here (the home and "See
+//  more") now wear the shared tool shell (`PregToolScaffold`); the rails are
+//  the doors' shelf cards (`PvShelfCard`) with the save mark laid on the
+//  picture, the search results `PvListRow`s, the chips `PvChip`s. Mobbin:
+//  Substack's Explore, search, a row of topic chips, then titled rails with a
+//  save mark on each card (mobbin.com/screens/b2bdc07a-77a3-411b-9295-
+//  87ff60312072). The chips still NAVIGATE (scroll to the section, never
+//  filter); they sit in the sheet now rather than pinned, because the shell is
+//  one list (the pinned sliver build is kept below).
+//  Kept out, per the parenting trust rules: the star rating on every card
+//  (`pvRating`), the "Expert pick" badge and the "Top rated" sort that were
+//  read from it, and the "curated by child development experts" banner,
+//  because no real rating or expert panel stands behind them yet. What stays
+//  true: the "for you" rail is ranked by the child's age (`recommendedToday`).
 // =============================================================================
 
 import 'package:flutter/material.dart';
 
+import '../../theme/pv_fonts.dart';
 import '../../widgets/global_ask_fab.dart' show kAskFabReserve;
+import '../brackets/hub/hub_intent_art.dart' show IntentMark;
+import '../doors/pv_list_row.dart';
+import '../doors/pv_shelf_card.dart';
+import '../doors/pv_shelf_spec.dart' show PvShelfKind;
+import '../pregnancy/preg_tool_chrome.dart';
+import '../products/pv_store_chrome.dart' show PvChip, PvSecondary;
+import '../v2/v2_palette.dart';
+import 'pp_care_parts.dart' show ppCareHeading;
+import 'pp_child_profile.dart';
 
 import 'pp_common.dart';
 import 'pp_explore_kit.dart';
@@ -51,7 +76,150 @@ class RecoSection {
 
   List<RecoItem> get items =>
       kReco.where((r) => r.category == category).toList();
+
+  /// The section's drawn mark on the shared look, by meaning.
+  IntentMark get mark => switch (category) {
+        'Books' => IntentMark.bookMark,
+        'Activities' => IntentMark.blocksMark,
+        'Toys' => IntentMark.balloonMark,
+        'Videos' => IntentMark.playMark,
+        'Music' => IntentMark.audioMark,
+        'Outdoor' => IntentMark.sunMark,
+        'Experiences' => IntentMark.compassMark,
+        'Products' => IntentMark.bagMark,
+        'Events' => IntentMark.calendarDay,
+        'Travel' => IntentMark.nextStep,
+        'Restaurants' => IntentMark.forkMark,
+        'Birthday Ideas' => IntentMark.sweetMark,
+        _ => IntentMark.listMark,
+      };
+
+  /// A hue per section, so a rail's cards share a ground.
+  double get hue => (kRecoSections.indexOf(this) * 30 + 20) % 360;
 }
+
+/// "6m–3y": months read as a bigger number than they are.
+String recoAgeLabel(RecoItem r) {
+  String one(int m) => m < 12 ? '${m}m' : '${(m / 12).floor()}y';
+  return '${one(r.ageMin)}–${one(r.ageMax)}';
+}
+
+/// The shelf card for a recommendation, with the save mark on its picture
+/// (RecoStore owns saves; there is no second store).
+Widget recoShelfCard(BuildContext context, V2Palette p, RecoItem r, RecoSection s,
+        {required VoidCallback onTap, bool showCategory = false, double width = kPvShelfCardWidth}) =>
+    SizedBox(
+      width: width,
+      child: Stack(children: [
+        PvShelfCard(
+          key: ValueKey('reco_card_${r.id}'),
+          p: p,
+          hue: s.hue,
+          kind: PvShelfKind.read,
+          kindWord: showCategory ? s.title.split(' ').first : s.title,
+          fact: recoAgeLabel(r),
+          mark: s.mark,
+          title: r.title,
+          width: width,
+          onTap: onTap,
+        ),
+        Positioned(
+          right: 4,
+          top: 4,
+          child: Semantics(
+            button: true,
+            label: RecoStore.instance.isSaved(r.id) ? 'Remove from saved' : 'Save',
+            child: InkWell(
+              key: ValueKey('reco_save_${r.id}'),
+              onTap: () => RecoStore.instance.toggleSave(r.id),
+              borderRadius: BorderRadius.circular(999),
+              child: Padding(
+                padding: const EdgeInsets.all(3),
+                child: Container(
+                  width: 28,
+                  height: 28,
+                  alignment: Alignment.center,
+                  decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                  child: Icon(
+                      RecoStore.instance.isSaved(r.id) ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
+                      size: 16,
+                      color: p.ink1),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ]),
+    );
+
+/// A section heading with its "See all", on the shared look.
+Widget recoSectionHead(V2Palette p, String title, {Key? anchorKey, VoidCallback? onSeeMore, String? line}) =>
+    KeyedSubtree(
+      key: anchorKey,
+      child: pregToolPad(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+          Expanded(child: ppCareHeading(title)),
+          if (onSeeMore != null)
+            InkWell(
+              onTap: onSeeMore,
+              borderRadius: BorderRadius.circular(8),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                child: Text('See all',
+                    style: pvManrope(fontSize: 13, fontWeight: FontWeight.w700, color: p.ink1)
+                        .copyWith(decoration: TextDecoration.underline)),
+              ),
+            ),
+        ]),
+        if (line != null) ...[
+          const SizedBox(height: 4),
+          Text(line, style: pvManrope(fontSize: 13, height: 1.45, color: p.ink2)),
+        ],
+      ])),
+    );
+
+/// A recommendation as a list row on the shared look: the section's mark, the
+/// title, the one-line, then the section and the age (the category badge the
+/// brief asks for on search results), the save mark at the end.
+Widget recoListRow(V2Palette p, RecoItem r, RecoSection s, {required VoidCallback onTap}) => PvListRow(
+      key: ValueKey('reco_row_${r.id}'),
+      p: p,
+      leading: PvMarkWell(p: p, hue: s.hue, size: 40, mark: s.mark),
+      title: r.title,
+      line: r.summary,
+      meta: [s.title, recoAgeLabel(r), if (r.price != null) r.price!].join(' · '),
+      trailing: IconButton(
+        key: ValueKey('reco_row_save_${r.id}'),
+        tooltip: RecoStore.instance.isSaved(r.id) ? 'Remove from saved' : 'Save',
+        onPressed: () => RecoStore.instance.toggleSave(r.id),
+        icon: Icon(RecoStore.instance.isSaved(r.id) ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
+            size: 20, color: p.ink1),
+      ),
+      onTap: onTap,
+    );
+
+/// The search box every page on the shared look uses.
+Widget recoSearchField(V2Palette p, TextEditingController c, String hint, ValueChanged<String> onChanged,
+        {Key? key}) =>
+    TextField(
+      key: key,
+      controller: c,
+      onChanged: onChanged,
+      style: pvManrope(fontSize: 15, fontWeight: FontWeight.w500, color: p.ink1),
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: pvManrope(fontSize: 15, color: p.ink3),
+        filled: true,
+        fillColor: Colors.white,
+        prefixIcon: Icon(Icons.search_rounded, size: 20, color: p.ink3),
+        contentPadding: const EdgeInsets.symmetric(vertical: 14),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(999), borderSide: BorderSide(color: p.line)),
+        enabledBorder:
+            OutlineInputBorder(borderRadius: BorderRadius.circular(999), borderSide: BorderSide(color: p.line)),
+        focusedBorder:
+            OutlineInputBorder(borderRadius: BorderRadius.circular(999), borderSide: BorderSide(color: p.ink1)),
+      ),
+    );
 
 const Color _cWarm = ppAccentAmber;
 const Color _cGreen = ppAccentGreen;
@@ -137,8 +305,120 @@ class _RecoExploreScreenState extends State<RecoExploreScreen> {
         .toList();
   }
 
+  void _clearSearch() {
+    _search.clear();
+    setState(() => _q = '');
+    FocusScope.of(context).unfocus();
+  }
+
+  Widget _rail(BuildContext context, V2Palette p, String key, List<Widget> cards) => SizedBox(
+        height: pvShelfRailHeight(MediaQuery.textScalerOf(context)),
+        child: ListView.separated(
+          key: ValueKey('reco_rail_$key'),
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 18),
+          itemCount: cards.length,
+          separatorBuilder: (_, _) => const SizedBox(width: 12),
+          itemBuilder: (_, i) => cards[i],
+        ),
+      );
+
   @override
   Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: Listenable.merge([RecoStore.instance, ChildProfileStore.instance]),
+      builder: (context, _) {
+        final p = V2PaletteStore.instance.current;
+        final searching = _q.trim().isNotEmpty;
+        final name = ChildProfileStore.instance.nameMid;
+        return PregToolScaffold(
+          hue: 32,
+          eyebrow: 'Explore',
+          mark: IntentMark.listMark,
+          title: 'Recommendations',
+          intro: 'Books, toys, activities, outings and more. The first rail is ranked for $name\'s age; '
+              'the rest are every kind of thing, one rail each.',
+          scrollController: _scroll,
+          children: [
+            pregToolPad(recoSearchField(p, _search, 'Search books, toys, activities, products…',
+                (v) => setState(() => _q = v),
+                key: const ValueKey('reco_search'))),
+            if (searching) ...[
+              const SizedBox(height: 22),
+              if (_results.isEmpty) ...[
+                pregToolPad(Text('Nothing found. Try another search, or browse a category.',
+                    style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2))),
+                const SizedBox(height: 12),
+                pregToolPad(PvSecondary(
+                    key: const ValueKey('reco_clear'), label: 'Clear search', onTap: _clearSearch)),
+              ] else ...[
+                pregToolPad(Text(
+                    '${_results.length} result${_results.length == 1 ? '' : 's'} across every category'
+                        .toUpperCase(),
+                    style: pvManrope(
+                        fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.4, color: p.action))),
+                const SizedBox(height: 8),
+                pregToolPad(PvRowGroup(p: p, children: [
+                  for (final r in _results)
+                    recoListRow(p, r, _sectionFor(r), onTap: () => _push(RecoDetailScreen(item: r))),
+                ])),
+              ],
+            ] else ...[
+              const SizedBox(height: 12),
+              // Section shortcuts: a tap SCROLLS to the section, never filters.
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 18),
+                child: Row(children: [
+                  for (var i = 0; i < _targets.length; i++) ...[
+                    if (i > 0) const SizedBox(width: 8),
+                    KeyedSubtree(
+                      key: ValueKey('reco_chip_$i'),
+                      child: PvChip(
+                        label: _targets[i].label,
+                        selected: _active == i,
+                        onTap: () async {
+                          setState(() => _active = i);
+                          await _spy.jumpTo(i);
+                        },
+                      ),
+                    ),
+                  ],
+                ]),
+              ),
+              const SizedBox(height: 24),
+              recoSectionHead(p, 'Recommended for you',
+                  line: 'Chosen for this age and stage, across every kind of thing.'),
+              const SizedBox(height: 12),
+              _rail(context, p, 'for_you', [
+                for (final r in recommendedToday(count: 8))
+                  recoShelfCard(context, p, r, _sectionFor(r),
+                      showCategory: true, onTap: () => _push(RecoDetailScreen(item: r))),
+              ]),
+              for (var i = 0; i < kRecoSections.length; i++)
+                if (kRecoSections[i].items.isNotEmpty) ...[
+                  const SizedBox(height: 26),
+                  recoSectionHead(p, kRecoSections[i].title,
+                      anchorKey: _targets[i].key,
+                      onSeeMore: () => _push(RecoCategoryScreen(section: kRecoSections[i]))),
+                  const SizedBox(height: 12),
+                  _rail(context, p, kRecoSections[i].category, [
+                    for (final r in kRecoSections[i].items.take(6))
+                      recoShelfCard(context, p, r, kRecoSections[i],
+                          onTap: () => _push(RecoDetailScreen(item: r))),
+                  ]),
+                ],
+              const SizedBox(height: 24),
+            ],
+          ],
+        );
+      },
+    );
+  }
+
+  // Kept for revert (2026-10-07): the page before the shared look.
+  // ignore: unused_element
+  Widget _buildBeforeShell(BuildContext context) {
     final searching = _q.trim().isNotEmpty;
     return Scaffold(
       backgroundColor: ppBg,
@@ -512,6 +792,83 @@ class _RecoCategoryScreenState extends State<RecoCategoryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // "Top rated" sorted by the made-up rating (`pvRating`), so the shared
+    // look does not offer it; its sort branch stays in `_items` for revert.
+    final items = _items;
+    final s = widget.section;
+    return ListenableBuilder(
+      listenable: RecoStore.instance,
+      builder: (context, _) {
+        final p = V2PaletteStore.instance.current;
+        void open(RecoItem r) => Navigator.of(context)
+            .push(MaterialPageRoute<void>(builder: (_) => RecoDetailScreen(item: r)));
+        return PregToolScaffold(
+          hue: s.hue,
+          eyebrow: 'Recommendations',
+          title: s.title,
+          variant: 3,
+          children: [
+            pregToolPad(recoSearchField(p, _search, 'Search ${s.title.toLowerCase()}…',
+                (v) => setState(() => _q = v),
+                key: const ValueKey('reco_cat_search'))),
+            const SizedBox(height: 12),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 18),
+              child: Row(children: [
+                for (final label in const ['Recommended', 'Youngest first']) ...[
+                  KeyedSubtree(
+                    key: ValueKey('reco_sort_$label'),
+                    child: PvChip(label: label, selected: _sort == label, onTap: () => setState(() => _sort = label)),
+                  ),
+                  const SizedBox(width: 8),
+                ],
+                // Grid / list, per the brief.
+                KeyedSubtree(
+                  key: const ValueKey('reco_view_toggle'),
+                  child: PvChip(
+                    label: _grid ? 'List' : 'Grid',
+                    leading: _grid ? Icons.view_agenda_outlined : Icons.grid_view_rounded,
+                    selected: false,
+                    onTap: () => setState(() => _grid = !_grid),
+                  ),
+                ),
+              ]),
+            ),
+            const SizedBox(height: 18),
+            if (items.isEmpty) ...[
+              pregToolPad(Text('Nothing found. Try another search, or browse another category.',
+                  style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2))),
+              const SizedBox(height: 12),
+              pregToolPad(PvSecondary(
+                key: const ValueKey('reco_cat_clear'),
+                label: 'Clear',
+                onTap: () {
+                  _search.clear();
+                  setState(() => _q = '');
+                },
+              )),
+            ] else if (_grid)
+              LayoutBuilder(builder: (context, box) {
+                final w = (box.maxWidth - 36 - 12) / 2;
+                return pregToolPad(Wrap(spacing: 12, runSpacing: 14, children: [
+                  for (final r in items) recoShelfCard(context, p, r, s, width: w, onTap: () => open(r)),
+                ]));
+              })
+            else
+              pregToolPad(PvRowGroup(p: p, children: [
+                for (final r in items) recoListRow(p, r, s, onTap: () => open(r)),
+              ])),
+            const SizedBox(height: 24),
+          ],
+        );
+      },
+    );
+  }
+
+  // Kept for revert (2026-10-07): the page before the shared look.
+  // ignore: unused_element
+  Widget _buildBeforeShell(BuildContext context) {
     final items = _items;
     return Scaffold(
       backgroundColor: ppBg,

@@ -26,6 +26,15 @@ import 'remote/sync_registry.dart';
 import 'journal_sync.dart';
 import 'tools_store.dart';
 
+/// Tags that mark a parenting memory in this journal: whose it is, and which
+/// capture screen made it. Written by `PpJournalStore`
+/// (lib/screens/post_pregnancy/journal_v2/jv2_store.dart).
+const String kPpChildTag = 'pp_child:';
+const String kPpKindTag = 'pp_kind:';
+
+/// True for a memory written about a born child (the parenting journal).
+bool isChildMemory(JournalEntry e) => e.tags.any((t) => t.startsWith(kPpChildTag));
+
 class JournalStore extends ChangeNotifier {
   JournalStore._();
   static final JournalStore instance = JournalStore._();
@@ -48,6 +57,26 @@ class JournalStore extends ChangeNotifier {
   /// The paired partner's (father's) entries, pulled read-only for the merged
   /// view. Never persisted locally; refreshed from the cloud on each sync.
   final List<JournalEntry> _partner = [];
+
+  // ⚠️ SHARED CHILD MEMORIES (2026-10-07; gap analysis P1, Behind · Partner:
+  // "read only for her own notes"). The paired partner's memories of the
+  // CHILD (rows tagged kPpChildTag), read-only here. Her private journal is
+  // never shown to him, only what she filed under the child. No migration:
+  // 0009_pairing already lets a partner read journal_entries ("own or partner
+  // select"), and update/delete stay owner-only, so read-only is enforced by
+  // the database as well as the screen.
+  final List<JournalEntry> _partnerChild = [];
+
+  /// The partner's child memories, read-only.
+  List<JournalEntry> get partnerChildEntries => List.unmodifiable(_partnerChild);
+
+  @visibleForTesting
+  void partnerChildEntriesForTest(List<JournalEntry> list) {
+    _partnerChild
+      ..clear()
+      ..addAll(list);
+    notifyListeners();
+  }
 
   /// Whether the merged timeline includes the partner's entries (the mother can
   /// toggle this in the journal screen). Defaults on when a partner is paired.
@@ -151,12 +180,21 @@ class JournalStore extends ChangeNotifier {
       // Merged view: also pull the paired partner's (father's) journal, marked
       // read-only. RLS on father_journal_entries allows the partner to read.
       _partner.clear();
+      _partnerChild.clear();
       final partnerId = await SupabaseRepo.myPartnerId();
       if (partnerId != null) {
         final prows =
             await SupabaseRepo.fetchByUser('father_journal_entries', partnerId);
         _partner.addAll(
             prows.map((r) => journalEntryFromRow(r, isPartner: true)));
+        // The partner's memories of the child (see `_partnerChild`).
+        try {
+          final crows = await SupabaseRepo.fetchByUser('journal_entries', partnerId);
+          _partnerChild.addAll([
+            for (final r in crows)
+              if (journalEntryFromRow(r, isPartner: true) case final e when isChildMemory(e)) e,
+          ]);
+        } catch (_) {/* offline or not shared: her own memories still show */}
       }
 
       await _persist();
@@ -255,6 +293,19 @@ class JournalStore extends ChangeNotifier {
     }
   }
 
+  /// Tests only: forget every entry on this phone, without touching the
+  /// cloud or the files.
+  @visibleForTesting
+  void debugClearForTest() {
+    _manual.clear();
+    _partner.clear();
+    _partnerChild.clear();
+    _tombstones.clear();
+    _seen.clear();
+    _loaded = true;
+    notifyListeners();
+  }
+
   Future<void> deleteEntry(String id) async {
     for (final x in _manual.where((x) => x.id == id)) {
       for (final p in [...x.images, ...x.audios]) {
@@ -345,7 +396,9 @@ class JournalStore extends ChangeNotifier {
 
   List<JournalEntry> timeline(PregnancyController p) {
     final s = S(p.language);
-    final list = <JournalEntry>[..._manual];
+    // A parenting memory (tagged with its child, see jv2_store.dart) is not
+    // a pregnancy week's entry; left out so it is not filed under week 40.
+    final list = <JournalEntry>[..._manual.where((e) => !isChildMemory(e))];
     if (showPartnerEntries) list.addAll(_partner);
     list.addAll(_autoMilestones(p));
     list.addAll(_autoHealth(p, s));

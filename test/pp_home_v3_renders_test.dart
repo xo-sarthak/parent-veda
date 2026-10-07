@@ -47,19 +47,19 @@ void main() {
     // section below the fold is genuinely absent from the tree rather than
     // merely off-screen. Asserting without scrolling tests the scroll position,
     // not the screen.
-    // The eyebrow is rendered uppercase by the section head, so match on that.
+    // The heading is pregnancy's "This phase, explained" since 2026-10-07 (no eyebrow).
     for (var i = 0; i < 4; i++) {
       await tester.drag(find.byType(ListView).first, const Offset(0, -700));
       await tester.pump(const Duration(milliseconds: 250));
       if (find
-          .textContaining('THIS PHASE EXPLAINED', skipOffstage: false)
+          .textContaining('This phase, explained', skipOffstage: false)
           .evaluate()
           .isNotEmpty) {
         break;
       }
     }
 
-    expect(find.textContaining('THIS PHASE EXPLAINED', skipOffstage: false),
+    expect(find.textContaining('This phase, explained', skipOffstage: false),
         findsWidgets,
         reason: 'the section added for Current/V3 symmetry is not rendering');
     expect(tester.takeException(), isNull);

@@ -21,6 +21,7 @@ import '../../services/remote/child_scoped_store.dart';
 import '../../care_partner/care_journey.dart';
 import '../../services/remote/supabase_repo.dart';
 import '../../services/remote/sync_registry.dart';
+import '../../services/family_profile.dart';
 import 'pp_child_profile.dart';
 import 'pp_health_data.dart';
 
@@ -298,6 +299,31 @@ const List<Vaccine> kVaccines = [
           'It happens, and it is almost always far milder - fewer spots, shorter, and much less likely to cause complications. That is the vaccine doing its job, not failing.'),
     ],
   ),
+  // Added 2026-10-02 (gap analysis P1: "the schedule stops at two").
+  // REQUIRED_REVIEW (paediatrician): ages and the UIP/IAP notes.
+  Vaccine(
+    id: 'dtp',
+    name: 'DTP booster (diphtheria, tetanus, whooping cough)',
+    shortName: 'DTP booster',
+    protects: 'Tops up protection against diphtheria, tetanus and whooping cough before school.',
+    diseases: ['Diphtheria', 'Tetanus', 'Whooping cough (pertussis)'],
+    why: 'Protection from the baby shots fades over the years. The booster at four to six years carries it through the school years, when cuts, scrapes and crowded classrooms are part of every day.',
+    faqs: [
+      ('Is this free?', 'Under the government programme (UIP) the second DPT booster is given free at five to six years. Private clinics usually give it as DTaP or DTwP between four and six.'),
+      ('He had a lot of shots as a baby. Why more?', 'Some protection wears off with time. A booster reminds the immune system, and is far gentler than the illnesses it prevents.'),
+    ],
+  ),
+  Vaccine(
+    id: 'td',
+    name: 'Td or Tdap (tetanus, diphtheria, whooping cough)',
+    shortName: 'Td / Tdap',
+    protects: 'Keeps tetanus and diphtheria protection going into the teenage years.',
+    diseases: ['Tetanus', 'Diphtheria', 'Whooping cough (Tdap only)'],
+    why: 'The government programme gives Td at ten and at sixteen; private clinics often give Tdap at ten to twelve. It is the dose that keeps a deep cut from being a tetanus risk.',
+    faqs: [
+      ('Is this the same as a tetanus shot after an injury?', 'It covers tetanus, and a child who is up to date often needs nothing extra after a cut. The doctor treating the injury will ask when the last dose was, so keep this record.'),
+    ],
+  ),
 ];
 
 Vaccine vaccineById(String id) => kVaccines.firstWhere((v) => v.id == id, orElse: () => kVaccines.first);
@@ -415,10 +441,56 @@ const List<VaxVisit> kVaxVisits = [
     insight: 'Typhoid protection and the second hepatitis A dose - valuable cover for the exploring years ahead.',
     leadVaccineId: 'typhoid',
   ),
+  // Added 2026-10-02: the schedule used to end at two years.
+  VaxVisit(
+    id: 'yr5',
+    ageLabel: '4 to 6 years',
+    ageDays: 1461,
+    vaccineIds: ['dtp', 'mmr', 'varicella'],
+    status: VaxStatus.upcoming,
+    govtFree: false,
+    date: '',
+    insight: 'The school-entry boosters. The DTP booster is free at a government centre at five to six; the third MMR and second chickenpox doses are on the private (IAP) schedule. Ask which your paediatrician follows.',
+    leadVaccineId: 'dtp',
+  ),
+  VaxVisit(
+    id: 'yr10',
+    ageLabel: '10 years',
+    ageDays: 3652,
+    vaccineIds: ['td'],
+    status: VaxStatus.upcoming,
+    govtFree: true,
+    date: '',
+    insight: 'A look ahead: Td at ten (and again at sixteen) under the government programme, or Tdap at ten to twelve privately. HPV is also offered from nine; ask your paediatrician.',
+    leadVaccineId: 'td',
+  ),
 ];
 
 VaxVisit vaxVisitById(String id) => kVaxVisits.firstWhere((v) => v.id == id, orElse: () => kVaxVisits.first);
 
+/// When the reminder for the next visit should fire: that visit's date for
+/// THIS child, at 9am. Falls back to tomorrow morning when nothing is left.
+DateTime vaxDueDate() {
+  final next = VaxStore.instance.nextVisit;
+  if (next != null) return vaxVisitDate(next)!;
+  final t = DateTime.now().add(const Duration(days: 1));
+  return DateTime(t.year, t.month, t.day, 9, 0);
+}
+
+/// A visit's date for this child (date of birth plus the visit's age) at 9am,
+/// for the reminder scheduler.
+///
+/// ⚠️ FIXED 2026-10-02 (gap analysis P1). This parsed `VaxVisit.date`, a
+/// display string from one demo baby's calendar ('8 Mar 2027'), so every
+/// parent's vaccine alarm fired on that baby's dates. The labels were fixed
+/// earlier (VaxStore.dateLabelFor); the alarm was not. Never null now; the
+/// nullable type is kept so the two callers need no change.
+DateTime? vaxVisitDate(VaxVisit v) {
+  final d = ChildProfileStore.instance.dob.add(Duration(days: v.ageDays));
+  return DateTime(d.year, d.month, d.day, 9, 0);
+}
+
+/* Kept for revert: the demo-calendar versions.
 /// The due date for the current "due" visit (kept aligned with the app's 22 Jul
 /// scenario). Passed to the reminder scheduler.
 DateTime vaxDueDate() => DateTime(2026, 7, 22, 9, 0);
@@ -435,10 +507,16 @@ DateTime? vaxVisitDate(VaxVisit v) {
   if (d == null || m == null || y == null) return null;
   return DateTime(y, m, d, 9, 0);
 }
+*/
 
 // =============================================================================
 //  VaxStore - completed visits + reminders (in-memory, ChangeNotifier singleton)
 // =============================================================================
+/// Doses on the private (IAP) schedule that the government programme (UIP)
+/// does not give. REQUIRED_REVIEW (paediatrician): UIP gives MR, not MMR, and
+/// adds JE in endemic districts; this set is deliberately the clear cases only.
+const Set<String> kVaxPrivateOnly = {'hepa', 'typhoid', 'varicella'};
+
 class VaxStore extends ChangeNotifier {
   VaxStore._();
   static final VaxStore instance = VaxStore._();
@@ -450,6 +528,11 @@ class VaxStore extends ChangeNotifier {
   // schedule's own status is now read honestly.
   final Set<String> _done = {};
   final Set<String> _reminders = {};
+
+  // The day each dose was given, when the parent said (2026-10-07, gap
+  // analysis P1: "a dose can be ticked but not dated"). Syncs to the
+  // `done_at` column 0023 already has. Missing = ticked without a date.
+  final Map<String, DateTime> _givenOn = {};
 
   bool _loaded = false;
   static const _prefsKey = 'pp_vax';
@@ -473,6 +556,13 @@ class VaxStore extends ChangeNotifier {
         for (final e in (j['reminders'] as List? ?? [])) {
           _reminders.add(e.toString());
         }
+        final given = j['givenOn'];
+        if (given is Map) {
+          given.forEach((k, v) {
+            final d = DateTime.tryParse(v.toString());
+            if (d != null) _givenOn[k.toString()] = d;
+          });
+        }
       }
     } catch (_) {/* keep the schedule defaults */}
     _loaded = true;
@@ -492,6 +582,8 @@ class VaxStore extends ChangeNotifier {
         final id = (r['vaccine_id'] ?? '').toString();
         if (id.isEmpty) continue;
         if (r['done'] == true) _done.add(id);
+        final at = r['done_at'] == null ? null : DateTime.tryParse(r['done_at'].toString());
+        if (at != null) _givenOn.putIfAbsent(id, () => at.toLocal());
         if (r['reminder'] == true) _reminders.add(id);
       }
       // Push up anything only this device knows (parent-marked doses only).
@@ -512,6 +604,7 @@ class VaxStore extends ChangeNotifier {
       {
         'vaccine_id': visitId,
         'done': _done.contains(visitId),
+        'done_at': _givenOn[visitId]?.toUtc().toIso8601String(),
         'reminder': _reminders.contains(visitId),
       },
       onConflict: 'child_id,vaccine_id',
@@ -526,14 +619,21 @@ class VaxStore extends ChangeNotifier {
         jsonEncode({
           'done': _done.toList(),
           'reminders': _reminders.toList(),
+          'givenOn': {for (final e in _givenOn.entries) e.key: e.value.toIso8601String()},
         }),
       );
     } catch (_) {}
   }
 
   bool isDone(String visitId) => _done.contains(visitId);
-  void markDone(String visitId) {
+
+  /// The day it was given, when the parent said.
+  DateTime? givenOn(String visitId) => _givenOn[visitId];
+
+  /// [on] is the day it was given; null keeps any date already recorded.
+  void markDone(String visitId, {DateTime? on}) {
     _done.add(visitId);
+    if (on != null) _givenOn[visitId] = DateTime(on.year, on.month, on.day);
     // Health's vaccination section shows an invitation until a real dose is
     // marked; this is what flips it to her actual schedule.
     HealthStore.instance.markVaxEntered();
@@ -544,9 +644,13 @@ class VaxStore extends ChangeNotifier {
   }
 
   void markNotDone(String visitId) {
-    // never remove a natively-completed seed; only toggle parent-marked ones
-    if (kVaxVisits.firstWhere((v) => v.id == visitId).status != VaxStatus.done) {
+    // The seed-guard is stale (2026-10-07): `done` comes ONLY from the parent
+    // now (see statusOf), so it stopped her unticking the birth and 6-week
+    // visits, and Undo did nothing. Kept for revert:
+    // if (kVaxVisits.firstWhere((v) => v.id == visitId).status != VaxStatus.done) {
+    if (_done.contains(visitId)) {
       _done.remove(visitId);
+      _givenOn.remove(visitId);
       notifyListeners();
       _persist();
       // Still has a reminder? keep the row and just clear `done`.
@@ -631,14 +735,44 @@ class VaxStore extends ChangeNotifier {
       kVaxVisits.where((v) => v.ageDays <= 365).fold<int>(0, (a, v) => a + v.vaccineIds.length);
 
   /// The next visit that needs action - the due one, else the soonest upcoming.
+  // A visit the parent's chosen schedule does not include is not "next": a
+  // government-schedule family is never told a private-only visit is due.
   VaxVisit? get nextVisit {
     for (final v in kVaxVisits) {
-      if (statusOf(v) == VaxStatus.due) return v;
+      if (statusOf(v) == VaxStatus.due && !isOptionalVisit(v)) return v;
     }
     for (final v in kVaxVisits) {
-      if (statusOf(v) == VaxStatus.upcoming) return v;
+      if (statusOf(v) == VaxStatus.upcoming && !isOptionalVisit(v)) return v;
     }
     return null;
+  }
+
+  /// Private-schedule doses in [v] (empty when the visit is all government).
+  List<String> privateOnlyIn(VaxVisit v) =>
+      [for (final id in v.vaccineIds) if (kVaxPrivateOnly.contains(id)) id];
+
+  /// True when she chose the government schedule and every dose at this visit
+  /// is private-only. Shown, never hidden, but not counted as due or reminded.
+  bool isOptionalVisit(VaxVisit v) =>
+      FamilyProfileStore.instance.vaxSchedule == VaxSchedule.uip &&
+      v.vaccineIds.isNotEmpty &&
+      v.vaccineIds.every(kVaxPrivateOnly.contains);
+
+  /// The Tools row's subtitle, computed for this child (it was a fixed
+  /// "Next due in 3 weeks" for every child; gap analysis P1).
+  String get nextVisitSubtitle {
+    final v = nextVisit;
+    if (v == null) return 'Every visit recorded';
+    if (statusOf(v) == VaxStatus.due) return 'Due now: the ${v.ageLabel} visit';
+    final days = ChildProfileStore.instance.dob.add(Duration(days: v.ageDays)).difference(DateTime.now()).inDays;
+    final when = days <= 1
+        ? 'tomorrow'
+        : days < 14
+            ? 'in $days days'
+            : days < 60
+                ? 'in ${(days / 7).round()} weeks'
+                : 'on ${dateLabelFor(v)}';
+    return 'Next: ${v.ageLabel}, $when';
   }
 
   /// The due-now visit, if any (drives "Due today").

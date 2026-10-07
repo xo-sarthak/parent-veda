@@ -60,11 +60,11 @@ void main() {
       expect(_listed('on_track'), ['dev_range_is_wide', 'dev_worth_checking', 'dev_born_early']);
       expect(_page('dev_worth_checking').format, 'FLAGGED CALLOUT');
       expect(_page('dev_born_early').bands, isNot(contains('dev_2_3')), reason: 'only up to two years');
-      expect(door.tabs[0].tools.map((t) => t.surfaceId), ['pp_milestones', 'pp_dev_checkin']);
+      expect(door.tabs[0].tools.map((t) => t.surfaceId), ['pp_month_checklist', 'pp_milestones', 'pp_dev_checkin']);
       // Read, then the tool for it: the user's call, 2026-09-13.
-      expect(door.tabs[0].tools[0].afterPageId, 'dev_range_is_wide');
-      expect(door.tabs[0].tools[1].afterPageId, 'dev_worth_checking');
-      expect(door.tabs[0].footer, contains('not one he has missed'));
+      expect(door.tabs[0].tools[1].afterPageId, 'dev_range_is_wide');
+      expect(door.tabs[0].tools[2].afterPageId, 'dev_worth_checking');
+      expect(door.tabs[0].footer, contains('not one your child has missed'));
     });
 
     test('when will my baby: the eight reads, and the tab drops away after two', () {
@@ -90,7 +90,8 @@ void main() {
 
     test('what to do: the activities beside the reassurance, tummy time as a film, the one new page', () {
       expect(door.tabs[3].areaIds, ['help_develop', 'feelings_play']);
-      expect(door.tabs[3].tools.single.surfaceId, 'pp_development');
+      // Tummy time joined the activities hub, 2026-10-07 (gap analysis P2).
+      expect(door.tabs[3].tools.map((t) => t.surfaceId), ['pp_development', 'pp_tummy_time']);
       expect(_listed('help_develop'), [
         'dev_play_builds_brain', 'dev_tummy_time', 'dev_everyday_play', 'dev_sensory_play', 'dev_leaps_lens',
       ]);
@@ -99,7 +100,7 @@ void main() {
       expect(tummy.orderedBlocks.first, isA<PpVideoSlot>());
       expect(tummy.blocks.whereType<PpSteps>().single.steps, hasLength(6), reason: 'the steps stay under the film');
       final feelings = _page('dev_feelings_activities');
-      expect(feelings.comingSoon, isTrue);
+      expect(feelings.comingSoon, isFalse, reason: 'filled 2026-10-02');
       expect(feelings.title, 'Activities for feelings and getting on with others');
     });
 
@@ -163,13 +164,13 @@ void main() {
       for (final t in door.tabs) {
         expect(find.text(t.label), findsWidgets, reason: t.id);
       }
-      expect(find.text('Where he is right now'), findsOneWidget);
+      expect(find.text('Where your baby is right now'), findsOneWidget);
       expect(find.text('Talk to a specialist'), findsOneWidget);
       // The rail order on screen: read, tool, read, tool, read.
       double x(String t) => tester.getTopLeft(find.text(t).first).dx;
-      expect(x('The normal range is much wider than you think'), lessThan(x('Where he is right now')));
-      expect(x('Where he is right now'), lessThan(x('When something is genuinely worth checking')));
-      expect(x('When something is genuinely worth checking'), lessThan(x('A gentle check-in')));
+      expect(x('The normal range is much wider than you think'), lessThan(x('Where your baby is right now')));
+      expect(x('Where your baby is right now'), lessThan(x('When something is worth checking')));
+      expect(x('When something is worth checking'), lessThan(x('A gentle check-in')));
       expect(x('A gentle check-in'), lessThan(x('If your baby was born early')));
       // Land on the leaps the way a deep link does.
       await tester.pumpWidget(MaterialApp(

@@ -7,10 +7,35 @@
 //  situation, a browse-by-situation grid (real per-category counts, each opening
 //  that situation's list) and a "Popular this monsoon" shelf of real remedies.
 //  Reached from the Explore drawer. Cards and remedies open the remedy detail.
+//
+//  ON THE ONE PARENTVEDA LOOK (2026-10-07). The page now wears the shared tool
+//  shell (`PregToolScaffold`): the field, the round back, the drawn mark, one
+//  serif title. Situations and remedies are `PvListRow`s in a `PvRowGroup`.
+//  Mobbin: Yuka's ingredient list, a name with one coloured dot and one word
+//  under it (mobbin.com/screens/71fe4ea7-b315-4533-97c2-290aea20388e). The
+//  dot is pregnancy's verdict colour (`canIVerdictColor`), as on the Maa
+//  "Can I?" rows, so one colour means one thing in every stage:
+//    green  (CanIVerdict.safe)       gentle at the age the remedy names;
+//    amber  (CanIVerdict.moderation) age-gated, read the cautions first.
+//  ⚠️ The data carries no "helps / only comforts / unsafe" verdict yet (the
+//  Health door's blurb promises one, pp_door_health.dart). The dot is derived
+//  only from what the data holds (`Remedy.isCaution`); it never invents a
+//  verdict. The "not medical advice, a doctor comes first" line stays at the
+//  top. Kept out of the new build, per the parenting trust rules: the "panel
+//  of 5 ayurvedic practitioners" count and the "reviewed and signed off" claims,
+//  which no real review stands behind yet. The old build is kept below.
 // =============================================================================
 
 import 'package:flutter/material.dart';
 
+import '../../models/can_i_entry.dart' show CanIVerdict;
+import '../../theme/pv_fonts.dart';
+import '../brackets/hub/hub_intent_art.dart' show IntentMark;
+import '../can_i/can_i_widgets.dart' show canIVerdictColor;
+import '../doors/pv_list_row.dart';
+import '../pregnancy/preg_tool_chrome.dart';
+import '../v2/v2_palette.dart';
+import 'pp_care_parts.dart' show ppCareHeading;
 import 'pp_common.dart';
 import 'pp_nuskhe_data.dart';
 import 'pp_section_extras.dart';
@@ -42,8 +67,170 @@ class _NuskheScreenState extends State<NuskheScreen> {
   void _openRemedy(BuildContext context, Remedy r) => Navigator.of(context)
       .push(MaterialPageRoute<void>(builder: (_) => RemedyDetailScreen(remedy: r)));
 
+  /// The situation's drawn mark, by meaning (a nose for a cold, a thermometer
+  /// for fever). An unknown situation keeps its Material icon in the well.
+  static IntentMark? _situationMark(String name) => switch (name) {
+        'Cold & cough' => IntentMark.noseMark,
+        'Fever' => IntentMark.thermoMark,
+        'Stomach & colic' => IntentMark.tummyMark,
+        'Teething' => IntentMark.toothMark,
+        'Sleep issues' => IntentMark.sleepMark,
+        'Skin issues' => IntentMark.skinMark,
+        _ => null,
+      };
+
+  /// The dot and the word for a remedy, from the data alone.
+  static (CanIVerdict, String) _verdict(Remedy r) => r.isCaution
+      ? (CanIVerdict.moderation, '${r.ageWarning}, read the cautions')
+      : (CanIVerdict.safe, 'Gentle, ${r.age}');
+
+  Widget _dot(V2Palette p, CanIVerdict v) => Container(
+        width: 9,
+        height: 9,
+        decoration: BoxDecoration(color: canIVerdictColor(v, p), shape: BoxShape.circle),
+      );
+
+  Widget _remedyRow(BuildContext context, V2Palette p, Remedy r) {
+    final (v, word) = _verdict(r);
+    return PvListRow(
+      key: ValueKey('nuskhe_row_${r.id}'),
+      p: p,
+      leading: PvMarkWell(
+          p: p, hue: 140, size: 40, mark: _situationMark(r.category), icon: r.icon),
+      title: r.name,
+      line: r.oneLine,
+      meta: word,
+      trailing: _dot(p, v),
+      onTap: () => _openRemedy(context, r),
+    );
+  }
+
+  Widget _eyebrow(V2Palette p, String text) => Text(text.toUpperCase(),
+      style: pvManrope(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.4, color: p.action));
+
   @override
   Widget build(BuildContext context) {
+    final p = V2PaletteStore.instance.current;
+    final searching = _query.trim().isNotEmpty;
+    final results = searching ? searchRemedies(_query) : const <Remedy>[];
+
+    return PregToolScaffold(
+      hue: 140,
+      eyebrow: 'Home remedies from the elders', // was 'Dadi and Nani ke nuskhe' (2026-10-07)
+      mark: IntentMark.lampMark,
+      title: 'Home remedies, safely.',
+      intro: 'The remedies your grandmother swore by, each with clear notes on when not to use them.',
+      children: [
+        // The safety line comes first, before any remedy.
+        pregToolPad(Container(
+          key: const ValueKey('nuskhe_safety'),
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: p.line),
+          ),
+          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Icon(Icons.local_hospital_outlined, size: 20, color: p.ink1),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                'This is supportive home care, not medical advice. When you see a red flag, a doctor comes first.',
+                style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w600, height: 1.5, color: p.ink1),
+              ),
+            ),
+          ]),
+        )),
+        const SizedBox(height: 14),
+        pregToolPad(TextField(
+          key: const ValueKey('nuskhe_search'),
+          controller: _search,
+          onChanged: (v) => setState(() => _query = v),
+          style: pvManrope(fontSize: 15, fontWeight: FontWeight.w500, color: p.ink1),
+          decoration: InputDecoration(
+            hintText: "What's troubling your little one?",
+            hintStyle: pvManrope(fontSize: 15, color: p.ink3),
+            filled: true,
+            fillColor: Colors.white,
+            prefixIcon: Icon(Icons.search_rounded, size: 20, color: p.ink3),
+            contentPadding: const EdgeInsets.symmetric(vertical: 14),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(999), borderSide: BorderSide(color: p.line)),
+            enabledBorder:
+                OutlineInputBorder(borderRadius: BorderRadius.circular(999), borderSide: BorderSide(color: p.line)),
+            focusedBorder:
+                OutlineInputBorder(borderRadius: BorderRadius.circular(999), borderSide: BorderSide(color: p.ink1)),
+          ),
+        )),
+        const SizedBox(height: 14),
+        // The key to the dots, always on screen, so the colour is never the
+        // only carrier of the meaning.
+        pregToolPad(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          for (final (v, word) in const [
+            (CanIVerdict.safe, 'Gentle at the age shown'),
+            (CanIVerdict.moderation, 'Age-gated, read the cautions'),
+          ])
+            Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Row(children: [
+                _dot(p, v),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(word,
+                      style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w600, color: p.ink2)),
+                ),
+              ]),
+            ),
+        ])),
+        if (searching) ...[
+          const SizedBox(height: 22),
+          pregToolPad(_eyebrow(
+              p,
+              results.isEmpty
+                  ? 'No remedies match "${_query.trim()}"'
+                  : '${results.length} ${results.length == 1 ? 'remedy' : 'remedies'} for "${_query.trim()}"')),
+          const SizedBox(height: 8),
+          if (results.isEmpty)
+            pregToolPad(Text('Try a situation like "cold", "colic", "teething" or "sleep".',
+                style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2)))
+          else
+            pregToolPad(PvRowGroup(p: p, children: [
+              for (final r in results) _remedyRow(context, p, r),
+            ])),
+        ] else ...[
+          const SizedBox(height: 26),
+          pregToolPad(ppCareHeading('By situation')),
+          const SizedBox(height: 8),
+          pregToolPad(PvRowGroup(p: p, children: [
+            for (final c in kNuskheCategories)
+              PvListRow(
+                key: ValueKey('nuskhe_cat_${c.name}'),
+                p: p,
+                leading: PvMarkWell(p: p, hue: 140, size: 40, mark: _situationMark(c.name), icon: c.icon),
+                title: c.name,
+                meta: '${remedyCount(c.name)} ${remedyCount(c.name) == 1 ? 'remedy' : 'remedies'}',
+                onTap: () => _openList(context, c.name),
+              ),
+          ])),
+          const SizedBox(height: 26),
+          pregToolPad(ppCareHeading('Popular this monsoon')),
+          const SizedBox(height: 8),
+          pregToolPad(PvRowGroup(p: p, children: [
+            for (final r in popularRemedies) _remedyRow(context, p, r),
+          ])),
+          const SizedBox(height: 18),
+          pregToolPad(Text(
+              'A guide, not a diagnosis. If your baby seems unwell, or a remedy lists a red flag you are seeing, '
+              'call your paediatrician.',
+              style: pvManrope(fontSize: 12.5, height: 1.55, color: p.ink2))),
+          const SizedBox(height: 24),
+        ],
+      ],
+    );
+  }
+
+  // Kept for revert (2026-10-07): the page before the shared look.
+  // ignore: unused_element
+  Widget _buildBeforeShell(BuildContext context) {
     final searching = _query.trim().isNotEmpty;
     final results = searching ? searchRemedies(_query) : const <Remedy>[];
 

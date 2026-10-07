@@ -22,6 +22,11 @@ import '../product_guide/product_guide_chooser.dart';
 import 'product_detail_screen.dart';
 import 'watch_player_screen.dart';
 import 'watch_quicklearn_screen.dart';
+import '../../theme/pv_fonts.dart';
+import '../brackets/hub/hub_intent_art.dart' show IntentMark;
+import '../pregnancy/preg_tool_chrome.dart';
+import '../products/pv_store_chrome.dart' show PvCommit, PvSecondary, pvStorePalette;
+import 'pp_care_parts.dart' show PpCareStats, ppCareHeading;
 
 class FoodRecipeScreen extends StatefulWidget {
   const FoodRecipeScreen({super.key, required this.recipe});
@@ -40,8 +45,135 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 22), child: c);
   void _push(Widget s) => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => s));
 
+  // ---- the one ParentVeda look (2026-10-07) ------------------------------------
+  //  The recipe on the shell every TTC and pregnancy tool wears. Mobbin:
+  //  prep and cook time as the stat strip, after Kitchen Stories' time rings
+  //  (mobbin.com/screens/0b1f70cc-5c8c-46ae-9253-53d6d5eff547); Save beside the
+  //  one ink action, then ingredients as a plain list, after Noom
+  //  (mobbin.com/screens/b93dcf56-1078-493d-9977-469355ca45ee); numbered steps
+  //  in circles, after Yazio (mobbin.com/screens/b5bbdf6c-22f2-46f5-b6d1-7b60360ea8a1).
+  //  The old page is `_buildBeforeShell`, kept for revert.
   @override
   Widget build(BuildContext context) {
+    final p = pvStorePalette;
+    final body = pvManrope(fontSize: 14, height: 1.55, color: p.ink1);
+    Widget dot(String t) => pregToolPad(Padding(
+          padding: const EdgeInsets.only(bottom: 6),
+          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 8, right: 10),
+              child: Container(width: 5, height: 5, decoration: BoxDecoration(color: p.ink1, shape: BoxShape.circle)),
+            ),
+            Expanded(child: Text(t, style: body)),
+          ]),
+        ));
+    Widget head(String t) => pregToolPad(ppCareHeading(t));
+    return AnimatedBuilder(
+      animation: foodListenable,
+      builder: (context, _) {
+        final saved = FoodStore.instance.isSaved(r.id);
+        return PregToolScaffold(
+          hue: 96,
+          eyebrow: r.ageTag,
+          mark: IntentMark.cookMark,
+          title: r.title,
+          intro: ppFill(r.subtitle),
+          children: [
+            pregToolPad(PpCareStats([
+              ('${r.prepMin} min', 'prep'),
+              ('${r.cookMin} min', 'cook'),
+              (r.veg ? 'Veg' : 'Non-veg', r.difficulty.toLowerCase()),
+            ])),
+            const SizedBox(height: 16),
+            pregToolPad(Row(children: [
+              Expanded(
+                child: PvSecondary(
+                  key: const ValueKey('pp_recipe_save'),
+                  label: saved ? 'Saved' : 'Save',
+                  icon: saved ? Icons.bookmark_rounded : Icons.bookmark_outline_rounded,
+                  onTap: () => FoodStore.instance.toggleSave(r.id),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: PvCommit(
+                  key: const ValueKey('pp_recipe_shop'),
+                  label: 'Add to list',
+                  onTap: () {
+                    FoodStore.instance.addRecipeToShopping(r);
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text('Ingredients added to your shopping list'),
+                      behavior: SnackBarBehavior.floating,
+                    ));
+                  },
+                ),
+              ),
+            ])),
+            const SizedBox(height: 24),
+            head('Why it is good'),
+            const SizedBox(height: 6),
+            pregToolPad(Text(ppFill(r.why), style: body)),
+            const SizedBox(height: 24),
+            head('Ingredients'),
+            const SizedBox(height: 8),
+            for (final i in r.ingredients) dot(i),
+            if (_equipmentFor(r).isNotEmpty) ...[
+              const SizedBox(height: 16),
+              head('You will need'),
+              const SizedBox(height: 8),
+              for (final e in _equipmentFor(r)) dot(e),
+            ],
+            const SizedBox(height: 20),
+            head('Steps'),
+            const SizedBox(height: 10),
+            for (var i = 0; i < r.steps.length; i++)
+              pregToolPad(Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Container(
+                    width: 26,
+                    height: 26,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(color: p.ink1, shape: BoxShape.circle),
+                    child: Text('${i + 1}',
+                        style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w800, color: Colors.white)),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(child: Text(ppFill(r.steps[i]), style: body)),
+                ]),
+              )),
+            if (r.nutrients.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              head('What is in it'),
+              const SizedBox(height: 8),
+              for (final n in r.nutrients) dot('${n.name}, ${n.amount}. ${ppFill(n.note)}'),
+            ],
+            const SizedBox(height: 18),
+            head('Good to know'),
+            const SizedBox(height: 8),
+            dot('How often: ${r.frequency}'),
+            for (final x in r.storage) dot(x),
+            if (r.mistakes.isNotEmpty) ...[
+              const SizedBox(height: 18),
+              head('Easy to get wrong'),
+              const SizedBox(height: 8),
+              for (final m in r.mistakes) dot(ppFill(m)),
+            ],
+            if (r.substitutions.isNotEmpty) ...[
+              const SizedBox(height: 18),
+              head('Swaps'),
+              const SizedBox(height: 8),
+              for (final e in r.substitutions.entries) dot('${e.key}: ${e.value}'),
+            ],
+          ],
+        );
+      },
+    );
+  }
+
+  // Kept for revert (2026-10-07): the page before the shared shell.
+  // ignore: unused_element
+  Widget _buildBeforeShell(BuildContext context) {
     return Scaffold(
       backgroundColor: ppBg,
       body: SafeArea(
@@ -486,7 +618,8 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
                 onOpenNormal: () => _push(ProductDetailScreen(product: productById(r.relatedProductId!))),
               )
         ),
-      if (r.relatedCommunity != null) (Icons.groups_outlined, 'Community', r.relatedCommunity!, () => openPpTab(context, 3)),
+      // Community is out of parenting for now (2026-10-07). Kept for revert:
+      // if (r.relatedCommunity != null) (Icons.groups_outlined, 'Community', r.relatedCommunity!, () => openPpTab(context, 3)),
       (Icons.auto_awesome_outlined, 'Ask Veda', 'Ask about feeding at ${r.ageTag}', () => openPpTab(context, 1)),
     ];
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

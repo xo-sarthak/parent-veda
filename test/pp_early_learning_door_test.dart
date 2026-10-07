@@ -54,8 +54,10 @@ void main() {
         expect(t.tools.map((x) => x.surfaceId), isNot(contains('pp_activities')), reason: t.id);
       }
       expect(door.tabs[0].tools.single.surfaceId, 'pp_recos');
+      expect(door.tabs[0].tools.single.atEnd, isTrue, reason: 'the shop card comes after the free things');
       expect(door.tabs[3].tools.single.surfaceId, 'pp_milestones', reason: 'the one tracker, Development\'s');
-      expect(door.tabs[4].tools.single.surfaceId, 'pp_courses');
+      // No masterclass card until the course exists (gap analysis P2, 2026-10-07).
+      expect(door.tabs[4].tools, isEmpty);
     });
 
     test('stories and rhymes: the how-to, six collections, the new collection', () {
@@ -89,7 +91,7 @@ void main() {
 
     test('before letters and starting school: the split, and the one new page', () {
       expect(_listed('early_skills'), ['skills_prewriting', 'skills_numeracy', 'skills_literacy', 'skills_colours_shapes', 'skills_language']);
-      expect(_page('skills_language').comingSoon, isTrue);
+      expect(_page('skills_language').comingSoon, isFalse, reason: 'filled 2026-10-02');
       expect(_listed('school'), ['school_what_readiness', 'school_checklist', 'school_choosing', 'school_first_day', 'school_what_next']);
       final ledger = File('docs/DOOR-CONTENT-OWED.md').readAsStringSync();
       for (final p in _el.allPages.where((p) => p.comingSoon)) {

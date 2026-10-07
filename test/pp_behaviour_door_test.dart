@@ -62,7 +62,9 @@ void main() {
       expect(p.blocks.single, isA<PpInteractive>());
       final i = p.blocks.single as PpInteractive;
       expect(i.kind, PpInteractiveKind.night);
-      expect(i.items.map((x) => x.title), contains('Never shake him, not even lightly'));
+      // 2026-10-07 voice pass: door pages name no child pronoun, so "him"
+      // became "your baby" here and in pp_behaviour_content.dart together.
+      expect(i.items.map((x) => x.title), contains('Never shake your baby, not even lightly'));
       expect(i.closing, contains('Tell your doctor today'));
       expect(_page('crying_doctor').format, 'FLAGGED CALLOUT');
     });
@@ -89,17 +91,18 @@ void main() {
       expect(back.title, 'Back-talk, and "I hate you"');
       expect(back.bands, ['preschool']);
       expect(back.blocks.whereType<PpScript>().single.lines.first.say, 'You are allowed to be this angry with me.');
-      expect(back.blocks.whereType<PpIndiaNote>().single.text, contains('dekho, kaise baat karta hai'));
+      // 2026-10-07: the relatives' line is now in English (English-only doors).
+      expect(back.blocks.whereType<PpIndiaNote>().single.text, contains('look how this child talks back'));
       expect(back.blocks.whereType<PpSteps>().single.steps, hasLength(5));
     });
 
-    test('the two new areas are scaffolds, every one in the ledger', () {
-      expect(_listed('scared'), hasLength(6));
-      expect(_listed('habits'), hasLength(5), reason: 'four from the brief plus the self-touching page, on the user\'s call');
-      final ledger = File('docs/DOOR-CONTENT-OWED.md').readAsStringSync();
+    // Filled from the fork (5127abf) on the user's word, 2026-10-07.
+    test('the two new areas, filled 2026-10-02 from the parenting gap analysis', () {
+      expect(_listed('scared'), hasLength(7), reason: 'six from the brief plus comfort objects');
+      expect(_listed('habits'), hasLength(7), reason: 'five plus nappy fights and eating non-food');
       for (final id in [..._listed('scared'), ..._listed('habits')]) {
-        expect(_page(id).comingSoon, isTrue, reason: id);
-        expect(ledger.contains(id), isTrue, reason: '$id is a coming-soon card nobody has logged as owed');
+        expect(_page(id).comingSoon, isFalse, reason: id);
+        expect(_page(id).blocks.first, isA<PpIntro>(), reason: id);
       }
       expect(_page('beh_fear_worth_checking').format, 'FLAGGED CALLOUT');
     });
@@ -170,16 +173,18 @@ void main() {
       expect(find.text('Crying, the first year'), findsWidgets);
       expect(find.text('When the crying is too much'), findsOneWidget);
       // The toddler tabs are on the selector, locked, with the age they open.
-      expect(find.text('Tantrums and the ziddi years'), findsWidgets);
+      // 2026-10-07: tab label now English (was 'Tantrums and the ziddi years').
+      expect(find.text('Tantrums and the stubborn years'), findsWidgets);
       expect(find.text('Scared, shy or clingy'), findsWidgets);
       expect(find.textContaining('From 1 year'), findsNWidgets(4));
-      expect(find.byIcon(Icons.lock_outline_rounded), findsNWidgets(8), reason: 'the badge and the mark, per locked card');
+      expect(find.byIcon(Icons.lock_outline_rounded), findsNWidgets(4), reason: 'one lock per locked card (the quiet rail, 2026-10-07)');
       // Landing on a locked tab shows the panel, not its rails.
       await tester.pumpWidget(MaterialApp(
           home: PpDoorScreen(key: const ValueKey('locked'), door: door, onSurface: (_, _) {}, initialTabId: 'tantrums')));
       await tester.pumpAndSettle();
       expect(find.textContaining('This opens when'), findsOneWidget);
-      expect(find.text('How to handle a ziddi bachcha'), findsNothing);
+      // 2026-10-07: page title now English (was 'How to handle a ziddi bachcha').
+      expect(find.text('How to handle a stubborn child'), findsNothing);
       expect(find.text('Talk to a child psychologist'), findsOneWidget, reason: 'the closing still draws');
 
       _ageMonths(48);

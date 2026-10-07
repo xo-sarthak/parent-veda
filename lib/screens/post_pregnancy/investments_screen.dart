@@ -6,6 +6,26 @@
 //  learn-as-you-go strip, how-it-works, and the mandatory not-an-advisor
 //  disclaimers. Faithful build of Claude Design "post pregnancy - commerce.dc.html"
 //  · S21. Reached from the Explore drawer. ParentVeda never touches your money.
+//
+//  ON THE ONE PARENTVEDA LOOK (2026-10-07). The screen now wears the shared
+//  tool shell (`PregToolScaffold`): the tinted field, the round back, a drawn
+//  mark, eyebrow, serif title, one intro sentence, the white sheet. The dark
+//  purple goal card became a white hairline card with three chip rows
+//  (amount, goal, years) and the monthly figure under them; the ways to get
+//  there are `PvListRow`s; every disclaimer is kept, word for word.
+//
+//  ⚠️ LEFT OUT OF THE NEW BUILD, ON PURPOSE: the "2 of 6 done" count, the
+//  one-third progress bar and "+10 XP" on the learn card. Nothing tracked
+//  lessons; those were made-up numbers (the parenting trust rules). The old
+//  build below still has them, for revert only.
+//
+//  Mobbin: Lloyds "Add a savings goal" — target, then a row of year chips,
+//  then "You'll need to save" as a plain result card, one ink button
+//  https://mobbin.com/screens/313689d0-ee4f-4117-9942-0ef1006f55a3
+//  Taken: chips instead of tap-to-cycle words (every option visible, one tap
+//  each), the result as a quiet card under the inputs. Plum's "Capital at
+//  risk. Returns not guaranteed." in plain text under the options is the
+//  model for the disclaimer staying readable, not small print.
 // =============================================================================
 
 import 'dart:math' as math;
@@ -13,6 +33,12 @@ import 'pp_child_profile.dart';
 
 import 'package:flutter/material.dart';
 
+import '../../theme/pv_fonts.dart';
+import '../brackets/hub/hub_intent_art.dart' show IntentMark;
+import '../doors/pv_list_row.dart';
+import '../pregnancy/preg_tool_chrome.dart';
+import '../products/pv_store_chrome.dart' show PvChip, PvCommit, kPvLine, pvStorePalette;
+import 'pp_care_parts.dart' show ppCareHeading;
 import 'pp_common.dart';
 
 const Color _lav = Color(0xFFB79BDD);
@@ -95,8 +121,240 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
     return '${parts.join(',')},$last3';
   }
 
+  // ---- the one-ParentVeda build (2026-10-07) --------------------------------
+
+  /// The hue of the field and the wells: a warm gold, saving for later.
+  static const double _hue = 42;
+
+  /// A drawn mark per way, by meaning; null keeps the way's own line icon.
+  static const List<IntentMark?> _wayMarks = [
+    IntentMark.improveMark, // a monthly SIP: improving slowly
+    IntentMark.cuppedHands, // Sukanya Samriddhi: held safe
+    null, // digital gold: no drawn mark for gold, its line icon stays
+    IntentMark.schoolMark, // education plans
+  ];
+
+  Widget _eyebrowV2(String t) => Text(t.toUpperCase(),
+      style: pvManrope(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.4, color: pvStorePalette.action));
+
   @override
   Widget build(BuildContext context) {
+    final p = pvStorePalette;
+    final name = ChildProfileStore.instance.nameMid;
+    return PregToolScaffold(
+      hue: _hue,
+      mark: IntentMark.improveMark,
+      eyebrow: 'Plan ahead for $name',
+      title: 'Start small, for a big day.',
+      intro:
+          "Set a goal for $name's future and we'll explain the ways to get there - in plain language, with vetted partners. You stay in control of every rupee.",
+      children: [
+        pregToolPad(_goalCardV2()),
+
+        const SizedBox(height: 28),
+        pregToolPad(Container(key: _waysKey, alignment: Alignment.centerLeft, child: ppCareHeading('Ways to get there'))),
+        const SizedBox(height: 6),
+        pregToolPad(Text('Each vetted by ParentVeda for legitimacy. Tap to learn how it works.',
+            style: pvManrope(fontSize: 12.5, height: 1.45, color: p.ink2))),
+        const SizedBox(height: 10),
+        pregToolPad(PvRowGroup(p: p, children: [
+          for (var i = 0; i < _ways.length; i++) _wayRowV2(i),
+        ])),
+
+        const SizedBox(height: 26),
+        pregToolPad(_learnCardV2()),
+
+        const SizedBox(height: 26),
+        pregToolPad(ppCareHeading('How it works')),
+        const SizedBox(height: 12),
+        pregToolPad(Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          _howTileV2(1, 'Set a goal'),
+          const SizedBox(width: 10),
+          _howTileV2(2, 'Understand options'),
+          const SizedBox(width: 10),
+          _howTileV2(3, 'Invest via partner'),
+        ])),
+        const SizedBox(height: 12),
+        pregToolPad(Text.rich(
+          TextSpan(children: [
+            TextSpan(text: 'Execution happens on a vetted partner platform - ', style: pvManrope(fontSize: 12.5, height: 1.55, color: p.ink2)),
+            TextSpan(text: 'they', style: pvManrope(fontSize: 12.5, height: 1.55, fontWeight: FontWeight.w700, color: p.ink1)),
+            TextSpan(text: ' handle KYC and your money. ParentVeda never touches it.', style: pvManrope(fontSize: 12.5, height: 1.55, color: p.ink2)),
+          ]),
+        )),
+
+        // The disclaimer: a white hairline card, readable, never small print.
+        const SizedBox(height: 22),
+        pregToolPad(Container(
+          key: const ValueKey('investments_disclaimer'),
+          padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: kPvLine),
+          ),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            _eyebrowV2('Important'),
+            const SizedBox(height: 8),
+            Text.rich(TextSpan(children: [
+              TextSpan(text: 'ParentVeda is ', style: pvManrope(fontSize: 12.5, height: 1.6, color: p.ink2)),
+              TextSpan(
+                  text: 'not a SEBI-registered investment advisor',
+                  style: pvManrope(fontSize: 12.5, height: 1.6, fontWeight: FontWeight.w700, color: p.ink1)),
+              TextSpan(
+                  text:
+                      ' and does not provide financial advice. We curate and explain options for your awareness only; every decision is yours. Investments carry risk, including possible loss of capital. Please consult a qualified advisor before investing.',
+                  style: pvManrope(fontSize: 12.5, height: 1.6, color: p.ink2)),
+            ])),
+          ]),
+        )),
+
+        const SizedBox(height: 16),
+        pregToolPad(Text('We earn a referral fee from partner platforms - it never changes your returns or your cost.',
+            style: pvManrope(fontSize: 12, height: 1.55, color: p.ink3))),
+        const SizedBox(height: 8),
+      ],
+    );
+  }
+
+  /// The goal: three rows of chips, then the monthly figure. Same three
+  /// indices the old fill-in-the-blank sentence cycled through.
+  Widget _goalCardV2() {
+    final p = pvStorePalette;
+    Widget row(String label, List<Widget> chips) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          _eyebrowV2(label),
+          const SizedBox(height: 8),
+          Wrap(spacing: 8, runSpacing: 8, children: chips),
+        ]);
+    return Container(
+      key: const ValueKey('investments_goal_card'),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: kPvLine),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text('Set a goal', style: pvFraunces(fontSize: 20, fontWeight: FontWeight.w600, height: 1.2, color: p.ink1)),
+        const SizedBox(height: 14),
+        row('How much', [
+          for (var i = 0; i < _amounts.length; i++)
+            PvChip(label: _amounts[i].$1, selected: i == _amount, onTap: () => setState(() => _amount = i)),
+        ]),
+        const SizedBox(height: 14),
+        row('For', [
+          for (var i = 0; i < _goals.length; i++)
+            PvChip(
+                label: _goals[i].$1,
+                leading: _goals[i].$2,
+                selected: i == _goal,
+                onTap: () => setState(() => _goal = i)),
+        ]),
+        const SizedBox(height: 14),
+        row('In', [
+          for (var i = 0; i < _horizons.length; i++)
+            PvChip(label: _horizons[i].$1, selected: i == _horizon, onTap: () => setState(() => _horizon = i)),
+        ]),
+        const SizedBox(height: 16),
+        Divider(height: 1, thickness: 1, color: p.line),
+        const SizedBox(height: 14),
+        Text(
+            "${_amounts[_amount].$1} for ${ChildProfileStore.instance.nameMid}'s ${_goals[_goal].$3} in ${_horizons[_horizon].$1}",
+            style: pvManrope(fontSize: 12.5, height: 1.45, color: p.ink2)),
+        const SizedBox(height: 4),
+        Text("You'd set aside about", style: pvManrope(fontSize: 12, color: p.ink3)),
+        const SizedBox(height: 2),
+        Text.rich(TextSpan(children: [
+          TextSpan(
+              text: '₹${_inr(_monthly())}',
+              style: pvFraunces(fontSize: 28, fontWeight: FontWeight.w600, color: p.ink1)),
+          TextSpan(text: '/mo', style: pvManrope(fontSize: 13, fontWeight: FontWeight.w600, color: p.ink2)),
+        ])),
+        const SizedBox(height: 8),
+        Text('An illustration at an assumed 11% p.a., not a guarantee or a recommendation.',
+            style: pvManrope(fontSize: 11.5, height: 1.5, color: p.ink3)),
+        const SizedBox(height: 14),
+        PvCommit(
+          label: 'See ways',
+          onTap: () {
+            final ctx = _waysKey.currentContext;
+            if (ctx != null) {
+              Scrollable.ensureVisible(ctx, duration: const Duration(milliseconds: 400), curve: Curves.easeOut, alignment: 0.1);
+            }
+          },
+        ),
+      ]),
+    );
+  }
+
+  Widget _wayRowV2(int i) {
+    final p = pvStorePalette;
+    final (icon, title, desc, pill, _, note) = _ways[i];
+    return PvListRow(
+      p: p,
+      leading: PvMarkWell(p: p, hue: _hue, size: 40, mark: _wayMarks[i], icon: icon),
+      title: title,
+      line: desc,
+      lineMaxLines: 2,
+      meta: note == null ? pill : '$pill · $note',
+      onTap: () => _soon('$title - how it works, coming soon'),
+    );
+  }
+
+  /// The lessons strip, without the made-up progress (see the header).
+  Widget _learnCardV2() {
+    final p = pvStorePalette;
+    return Container(
+      key: const ValueKey('investments_learn_card'),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 6),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: kPvLine),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text('Learn as you go', style: pvFraunces(fontSize: 18, fontWeight: FontWeight.w600, color: p.ink1)),
+        const SizedBox(height: 6),
+        Text('Two-minute lessons that explain each option in plain language - no jargon.',
+            style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2)),
+        const SizedBox(height: 6),
+        PvListRow(
+          p: p,
+          leading: PvMarkWell(p: p, hue: _hue, size: 40, mark: IntentMark.playMark),
+          title: 'What is an SIP, really?',
+          line: '2 min',
+          onTap: () => _soon('Lesson: What is an SIP, really? - coming soon'),
+        ),
+      ]),
+    );
+  }
+
+  Widget _howTileV2(int n, String label) {
+    final p = pvStorePalette;
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: kPvLine),
+        ),
+        child: Column(children: [
+          Text('$n', style: pvFraunces(fontSize: 20, fontWeight: FontWeight.w600, color: p.ink1)),
+          const SizedBox(height: 6),
+          Text(label,
+              textAlign: TextAlign.center,
+              style: pvManrope(fontSize: 12, fontWeight: FontWeight.w700, height: 1.25, color: p.ink1)),
+        ]),
+      ),
+    );
+  }
+
+  // ---- the purple build, before the one-ParentVeda look ---------------------
+  // Kept for revert (2026-10-07). It still carries "2 of 6 done" and "+10 XP",
+  // which the new build leaves out.
+  // ignore: unused_element
+  Widget _buildBeforeShell(BuildContext context) {
     return Scaffold(
       backgroundColor: ppBg,
       body: ListView(

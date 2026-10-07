@@ -21,6 +21,12 @@ import 'name_journey_shortlist_screen.dart';
 import 'pp_common.dart';
 import 'pp_names_data.dart';
 import 'pp_names_v2_data.dart';
+import '../../theme/pv_fonts.dart';
+import '../brackets/hub/hub_intent_art.dart' show IntentMark;
+import '../doors/pv_list_row.dart';
+import '../pregnancy/preg_tool_chrome.dart';
+import '../products/pv_store_chrome.dart' show PvCommit, pvStorePalette;
+import 'name_list_screen.dart';
 
 class BabyNamingHomeScreen extends StatelessWidget {
   const BabyNamingHomeScreen({super.key});
@@ -28,8 +34,83 @@ class BabyNamingHomeScreen extends StatelessWidget {
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
   void _push(BuildContext c, Widget s) => Navigator.of(c).push(MaterialPageRoute<void>(builder: (_) => s));
 
+  // ---- the one ParentVeda look (2026-10-07) ------------------------------------
+  //  The shell every TTC and pregnancy tool wears. Three names from the
+  //  catalogue as cards, then one ink button, after Abode's name picker
+  //  (mobbin.com/screens/c8122ec2-03de-4b5b-aa27-01e903135f7a); the shortlist
+  //  and the full list as rows. The journey behind it is unchanged.
+  //  `_buildBeforeShell` is the page before, kept for revert.
   @override
   Widget build(BuildContext context) {
+    final p = pvStorePalette;
+    final day = DateTime.now().difference(DateTime(DateTime.now().year)).inDays;
+    final all = kBabyNames;
+    final picks = [for (var i = 0; i < 3 && all.isNotEmpty; i++) all[(day * 7 + i * 131) % all.length]];
+    return AnimatedBuilder(
+      animation: NameMatchStore.instance,
+      builder: (context, _) => PregToolScaffold(
+        hue: 268,
+        eyebrow: 'Plan and keep',
+        mark: IntentMark.pageMark,
+        title: 'Baby names',
+        intro: '${all.length} Indian names with their meaning, origin and Devanagari. Swipe through them '
+            'together; the ones you both love gather in one shortlist.',
+        children: [
+          for (final n in picks) ...[
+            pregToolPad(Container(
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: p.line),
+              ),
+              child: Row(children: [
+                Expanded(
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text(n.name, style: pvFraunces(fontSize: 22, fontWeight: FontWeight.w600, color: p.ink1)),
+                    const SizedBox(height: 2),
+                    Text(n.meaningShort, style: pvManrope(fontSize: 13.5, height: 1.45, color: p.ink2)),
+                  ]),
+                ),
+                const SizedBox(width: 10),
+                Text(n.script, style: pvManrope(fontSize: 18, fontWeight: FontWeight.w600, color: p.ink3)),
+              ]),
+            )),
+            const SizedBox(height: 8),
+          ],
+          const SizedBox(height: 10),
+          pregToolPad(PvCommit(
+            key: const ValueKey('pp_names_begin'),
+            label: 'Begin the journey',
+            onTap: () => _push(context, const NameJourneyFeedScreen()),
+          )),
+          const SizedBox(height: 22),
+          pregToolPad(PvRowGroup(p: p, children: [
+            PvListRow(
+              key: const ValueKey('pp_names_loved'),
+              p: p,
+              leading: PvMarkWell(p: p, hue: 344, size: 40, icon: Icons.favorite_border_rounded),
+              title: 'Names you love',
+              line: '${NameMatchStore.instance.likedCount} liked. Shortlist, compare and choose.',
+              onTap: () => _push(context, const NameJourneyShortlistScreen()),
+            ),
+            PvListRow(
+              key: const ValueKey('pp_names_all'),
+              p: p,
+              leading: PvMarkWell(p: p, hue: 268, size: 40, icon: Icons.list_alt_rounded),
+              title: 'Just show me names',
+              line: 'Every name, with filters for community and region.',
+              onTap: () => _push(context, const NameListScreen()),
+            ),
+          ])),
+        ],
+      ),
+    );
+  }
+
+  // Kept for revert (2026-10-07): the page before the shared shell.
+  // ignore: unused_element
+  Widget _buildBeforeShell(BuildContext context) {
     return Scaffold(
       backgroundColor: ppBg,
       body: Stack(children: [

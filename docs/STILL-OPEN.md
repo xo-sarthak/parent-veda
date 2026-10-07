@@ -10085,3 +10085,55 @@ not here. Owed:
     would mark the wrong one; she taps it again. The cloud copy is rewritten to English keys the next time the
     store writes. Held by `test/spiritual_prefs_migration_test.dart`, and `isNotInterested` and
     `toggleNotInterested` are now in the identity-call list of `test/localized_identity_test.dart`.
+
+## 82.0 Parenting gap pass — trust, voice, one look, logging, the age page, messages — 2026-10-07
+
+From the parenting gap analysis (theAsianparent and What to Expect vs ParentVeda; the PDF in
+`Downloads\competitor-walks\combined-parent\v1` is the source of truth). Every item and its state is in
+`docs/PARENTING-GAP-TRACKER.md`. Owed:
+
+  - **§82.1 The user runs three migrations.** `0093_children_sex_given.sql` (then flip `kChildSexGivenColumn` to true
+    in `pp_child_profile.dart`), `0094_pp_nappy_pump_tummy.sql`, `0095_pp_emergency_cards.sql`. Until each runs, its
+    writes fail silently and the data stays on the phone, as before.
+  - **§82.2 Door tiles in age and priority order: ON.** The user turned it on ("You can turn that switch on",
+    2026-10-07), reversing the 2026-09-18 registry order. `kPpTileOrderByAge` in `pp_tile_order.dart`.
+  - **§82.3 CLOSED 2026-10-07: shared child memories, read-only.** Each paired parent sees the other's memories of
+    the child in the parenting journal, marked "from your partner", with no Delete. Only rows tagged with the child
+    are shown; her private journal is not. No migration: `0009_pairing` already lets a partner select
+    `journal_entries` and keeps update/delete owner-only (BACKEND-PATTERNS §16bb). Neither WTE nor theAsianparent
+    shares a log between partners. Open: the policy is broader than the screen; if the private half ever needs
+    hard protection, add a tag condition to the policy.
+  - **§82.4 CLOSED 2026-10-07: Behaviour's fears and habits filled from the fork** on the user's word (14 pages),
+    and the whole file has had the voice pass (checker: 0 copied, 0 AI tells, 0 long sentences; the one pronoun hit
+    is a code comment). Mixed "do not" / "don't" remains between rewritten and untouched strings.
+  - **§82.5 CLOSED 2026-10-07: six buying guides** (car seat, cot, pram, carrier, high chair, first shoes) as
+    `PvRead`s in `lib/data/reads/pp_buying_guides.dart`, under What to buy > How to choose. No brands, no ranking
+    (test-held), `reviewed: false`. Owed: a clinician read of the car-seat and cot safety lines.
+  - **§82.6 Clinical review owed before launch.** Every `REQUIRED_REVIEW` added in this pass: the 40 Din by din lines,
+    the 12 visit cards, the two mood questions and their answers, `kVaxPrivateOnly` (UIP vs IAP), the 15-day
+    paternity leave figure, the 289 food ages, the 139 recipes (dietitian), and the names catalogue (Tamil names in
+    Devanagari use झ and ल for ழ and ள).
+  - **§82.7 Ask Veda has no parenting corpus yet.** The suggestions now come from the phase FAQs, filled from her
+    profile; answering them well needs the parenting pages ingested in `C:\Projects\parentveda-askveda`.
+  - **§82.8 The daily tip pop-up links 187 of 217 age tips to a door page.** The other 30 have no page that fits
+    (mosquito nets, cycling, shoes, praising effort); they need a page each, or stay unlinked.
+  - **§82.9 The names catalogue has no rashi letter.** The gap asks for it; the row format has none. It can be derived
+    from the first Devanagari syllable when someone wants it.
+  - **§82.10 Community is out of parenting for now** (the user, 2026-10-07: "you don't have to work upon community
+    for now"). The More entry, the recipe page's Community link and the "Room" rows are commented out, kept for
+    revert; the community screens still say Opening soon if reached.
+  - **§82.11 The one-ParentVeda pass, done 2026-10-07.** Tools, Brain activities and More are tab screens in the
+    TTC/pregnancy format; every tool, recipes, names, the reads and films libraries, Find help and the What changed
+    flow are on the shared tool shell, each with a Mobbin reference cited in its file. Later the same day: the
+    journal, home remedies (list and page), recommendations, yoga, personalise, investments and astrology joined
+    it. Still on the old chrome: invite-a-friend and Care Circle (shared with pregnancy) and the V1/V2 screens
+    kept for revert.
+  - **§82.12 Trust: the remedy reviewers (user's call).** Every remedy page showed "Reviewed & signed off by" one of
+    three named BAMS doctors (`pp_nuskhe_data.dart` `RemedyPanel`), and the remedy home claimed "a panel of 5
+    ayurvedic practitioners + an MBBS paediatrician". Nothing records those reviews, so the pages now say "Written
+    by our team from published guidance. Not yet reviewed by a doctor." (the old panel is commented out, kept for
+    revert). If the doctors are real, restore it. The Health door no longer promises "helps / only comforts /
+    unsafe": no remedy carries that verdict; adding one needs a clinician to mark each remedy.
+  - **§82.13 Made-up numbers removed (2026-10-07).** Investments' "2 of 6 done" and "+10 XP" (nothing tracks
+    lessons); astrology's invented birth line, "AI readings" and a profile tab that does not exist;
+    recommendations' and yoga's star ratings, "Expert pick" and "Top rated". All kept only in the revert builds.

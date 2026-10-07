@@ -10,6 +10,7 @@
 import 'package:flutter/material.dart';
 
 import 'pp_common.dart';
+import 'pp_expert_honesty.dart';
 import 'pp_experts_data.dart';
 import 'provider_profile_screen.dart';
 
@@ -31,8 +32,10 @@ class _ProviderResultsScreenState extends State<ProviderResultsScreen> {
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
 
-  List<Expert> get _base =>
-      widget.need != null ? expertsForNeed(widget.need!.category) : kFindHelpExperts;
+  // Placeholders out (gap analysis P1, 2026-10-07); a published expert stays.
+  List<Expert> get _base => [ for (final e in widget.need != null ? expertsForNeed(widget.need!.category) : kFindHelpExperts) if (!ppExpertIsPlaceholder(e)) e ];
+  // Kept for revert:
+  //   widget.need != null ? expertsForNeed(widget.need!.category) : kFindHelpExperts;
 
   List<Expert> get _experts {
     final list = [..._base];
@@ -68,6 +71,7 @@ class _ProviderResultsScreenState extends State<ProviderResultsScreen> {
   @override
   Widget build(BuildContext context) {
     final experts = _experts;
+    if (experts.isEmpty) return ppExpertsOpeningSoon();
     return Scaffold(
       backgroundColor: ppBg,
       body: SafeArea(

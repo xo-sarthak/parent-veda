@@ -62,6 +62,12 @@ Uri tagged(Uri uri) {
   return uri.replace(queryParameters: params);
 }
 
+/// The honesty line wherever a link out may earn us a commission (gap
+/// analysis P1, Behind · Trust, 2026-10-07; What to Expect's wording). Shown
+/// under every retailer button, on every stage, because the tag above goes on
+/// every link out.
+const String kPvCommissionLine = 'We may earn a commission from these links. It never changes what we suggest.';
+
 /// Send a parent out of the app.
 ///
 /// [campaign] attributes the click to a campaign when the journey started from

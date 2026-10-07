@@ -103,7 +103,7 @@ void main() {
         'overtired_baby',
       ]);
       for (final id in ['sleep_newborn', 'sleep_3_6', 'sleep_6_12', 'sleep_toddler', 'sleep_preschool']) {
-        expect(_page(id).title, 'Her sleep right now', reason: id);
+        expect(_page(id).title, 'Sleep at this age', reason: id);
         expect(_page(id).format, 'CHART', reason: id);
         expect(_page(id).bands, hasLength(1),
             reason: '$id must belong to exactly one band, so she sees one chart');
@@ -173,7 +173,7 @@ void main() {
           isTrue,
           reason: 'the routine page carries the wind-down section');
       expect(_page('malish').format, 'VIDEO');
-      expect(_page('own_space').title, 'Moving her to her own cot or room');
+      expect(_page('own_space').title, 'Moving to a separate cot or room');
       expect(_page('sleep_away_from_home').format, 'CAROUSEL');
     });
 
@@ -201,7 +201,7 @@ void main() {
     });
 
     test('collection 6: the worry set, snoring, the dummy page', () {
-      expect(_listed('worries'), ['worry_set', 'noisy_breathing', 'dummy_soother']);
+      expect(_listed('worries'), ['worry_set', 'noisy_breathing', 'dummy_soother', 'night_fears', 'sleep_talk_walk']);
       expect(_page('worry_set').format, 'CAROUSEL');
       expect(_page('dummy_soother').format, 'ARTICLE');
     });
@@ -300,7 +300,7 @@ void main() {
       for (final b in kPpSleepBands.bands) {
         final charts = _area('how_much')
             .pagesFor(b.id)
-            .where((p) => p.title == 'Her sleep right now');
+            .where((p) => p.title == 'Sleep at this age');
         expect(charts, hasLength(1), reason: '${b.id} must see exactly one chart');
       }
     });
@@ -450,7 +450,8 @@ void main() {
 
     test('the landing items survive as tool rows and the closing', () {
       final tools = [for (final t in door.tabs) ...t.tools];
-      expect(tools.map((t) => t.surfaceId).toSet(), {'pp_sleep', 'pp_sleep_sounds'});
+      // + the 7-day history, 2026-10-07 (gap analysis P2).
+      expect(tools.map((t) => t.surfaceId).toSet(), {'pp_sleep', 'pp_care_history', 'pp_sleep_sounds'});
       for (final t in tools) {
         expect(ppScreenForSurface(t.surfaceId), isNotNull, reason: t.label);
       }
@@ -484,10 +485,10 @@ void main() {
         expect(find.text(t.label), findsWidgets, reason: t.id);
       }
       expect(find.text('Track and understand sleep'), findsOneWidget);
-      expect(find.text('Her sleep right now'), findsOneWidget, reason: 'one chart, hers');
+      expect(find.text('Sleep at this age'), findsOneWidget, reason: 'one chart, hers');
       // Representation B on this door: a sentence with the label in it.
       expect(find.textContaining('Talk to a sleep expert'), findsOneWidget);
-      expect(find.textContaining('FOR YOUR BABY'), findsOneWidget, reason: 'the age line');
+      expect(find.textContaining('For your baby'), findsOneWidget, reason: 'the age line');
       for (final b in kPpSleepBands.bands) {
         expect(find.widgetWithText(GestureDetector, b.label), findsNothing,
             reason: 'no age chooser on the door');

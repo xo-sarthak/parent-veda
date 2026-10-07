@@ -63,6 +63,46 @@ enum LearningStyle { essentials, science, videos, stepByStep, detail }
 
 enum NotifyTopic { vaccinations, feeding, sleep, activities, articles, milestones, recipes, weekly }
 
+/// How the baby was born (onboarding, 2026-10-07; gap analysis P1, Behind ·
+/// Onboarding: "a C-section mother is not led to her pages"). Optional. The
+/// NAME is persisted.
+enum BirthMode { normal, cSection, assisted, notSaid }
+
+/// Who is filling this in. "Every profile was saved as the mother." Optional.
+enum CareRole { mother, father, grandparent, other }
+
+/// Which vaccine schedule the child's paediatrician follows (2026-10-07, gap
+/// analysis P1: "the tracker shows only the private schedule"). Government
+/// centres give the UIP free; private clinics follow the IAP, which adds a few
+/// vaccines. Null = not chosen; the tracker then shows both, as before.
+enum VaxSchedule { uip, iap, notSure }
+
+extension VaxScheduleX on VaxSchedule {
+  String get label => switch (this) {
+        VaxSchedule.uip => 'Government (free)',
+        VaxSchedule.iap => 'Private clinic',
+        VaxSchedule.notSure => 'Not sure',
+      };
+}
+
+extension BirthModeX on BirthMode {
+  String get label => switch (this) {
+        BirthMode.normal => 'Normal delivery',
+        BirthMode.cSection => 'C-section',
+        BirthMode.assisted => 'Assisted',
+        BirthMode.notSaid => 'Rather not say',
+      };
+}
+
+extension CareRoleX on CareRole {
+  String get label => switch (this) {
+        CareRole.mother => 'Mother',
+        CareRole.father => 'Father',
+        CareRole.grandparent => 'Grandparent',
+        CareRole.other => 'Other',
+      };
+}
+
 // ---- labels (UI-facing; content only) --------------------------------------
 //  TWO SHAPES IN ONE FILE, ON PURPOSE.
 //
@@ -390,6 +430,13 @@ class FamilyProfileStore extends ChangeNotifier with CloudSyncedStore {
   final Set<NotifyTopic> _notify = {};
   bool _premature = false;
   bool _nicu = false;
+  BirthMode? _birthMode;
+
+  /// Weeks of pregnancy at birth, when the parent said the baby came early and
+  /// knew the number. Drives corrected age (to 24 months). Null otherwise.
+  int? _bornWeeks;
+  CareRole? _role;
+  VaxSchedule? _vaxSchedule;
   bool _multiple = false;
   bool _onboarded = false;
   // ---- pregnancy-side signals (same engine, different vocabulary) ----
@@ -447,6 +494,15 @@ class FamilyProfileStore extends ChangeNotifier with CloudSyncedStore {
   Set<NotifyTopic> get notify => Set.unmodifiable(_notify);
   bool get premature => _premature;
   bool get nicu => _nicu;
+  BirthMode? get birthMode => _birthMode;
+  int? get bornWeeks => _bornWeeks;
+  CareRole? get role => _role;
+  VaxSchedule? get vaxSchedule => _vaxSchedule;
+
+  void setVaxSchedule(VaxSchedule s) {
+    _vaxSchedule = s;
+    _save(field: 'vaxSchedule', value: s.name);
+  }
   bool get multiple => _multiple;
   bool get onboarded => _onboarded;
 
@@ -777,6 +833,19 @@ class FamilyProfileStore extends ChangeNotifier with CloudSyncedStore {
     _save();
   }
 
+  /// The onboarding birth answers (2026-10-07). [bornWeeks] only when early;
+  /// passing [early] false clears it.
+  void setBirthDetails({BirthMode? mode, bool? early, int? bornWeeks, CareRole? role}) {
+    if (mode != null) _birthMode = mode;
+    if (early != null) {
+      _premature = early;
+      if (!early) _bornWeeks = null;
+    }
+    if (bornWeeks != null) _bornWeeks = bornWeeks;
+    if (role != null) _role = role;
+    _save();
+  }
+
   void markOnboarded() {
     _onboarded = true;
     _save();
@@ -863,6 +932,9 @@ class FamilyProfileStore extends ChangeNotifier with CloudSyncedStore {
         'premature': _premature,
         'nicu': _nicu,
         'multiple': _multiple,
+        'birthMode': _birthMode?.name,
+        'bornWeeks': _bornWeeks,
+        'vaxSchedule': _vaxSchedule?.name,
       };
 
   void _applyChildBucket(Map m) {
@@ -873,6 +945,9 @@ class FamilyProfileStore extends ChangeNotifier with CloudSyncedStore {
     _premature = m['premature'] == true;
     _nicu = m['nicu'] == true;
     _multiple = m['multiple'] == true;
+    _birthMode = _one(m['birthMode'], BirthMode.values);
+    _bornWeeks = m['bornWeeks'] is int ? m['bornWeeks'] as int : null;
+    _vaxSchedule = _one(m['vaxSchedule'], VaxSchedule.values);
     // Keep the legacy single-value fields in step with the sets they replaced.
     _feeding = _feedings.isEmpty ? null : _feedings.first;
     _sleep = _sleeps.isEmpty ? null : _sleeps.first;
@@ -906,6 +981,10 @@ class FamilyProfileStore extends ChangeNotifier with CloudSyncedStore {
     _premature = m['premature'] == true;
     _nicu = m['nicu'] == true;
     _multiple = m['multiple'] == true;
+    _birthMode = _one(m['birthMode'], BirthMode.values);
+    _bornWeeks = m['bornWeeks'] is int ? m['bornWeeks'] as int : null;
+    _role = _one(m['role'], CareRole.values);
+    _vaxSchedule = _one(m['vaxSchedule'], VaxSchedule.values);
     _onboarded = m['onboarded'] == true;
     // ⚠️ `tryParse`, NOT `parse`. A malformed stored value must leave her
     // profile loadable — the alternative is a throw during startup that empties
@@ -986,6 +1065,10 @@ class FamilyProfileStore extends ChangeNotifier with CloudSyncedStore {
         'premature': _premature,
         'nicu': _nicu,
         'multiple': _multiple,
+        'birthMode': _birthMode?.name,
+        'bornWeeks': _bornWeeks,
+        'role': _role?.name,
+        'vaxSchedule': _vaxSchedule?.name,
         'onboarded': _onboarded,
         'asked': _asked.map((e) => e.name).toList(),
         'feedings': _feedings.map((e) => e.name).toList(),

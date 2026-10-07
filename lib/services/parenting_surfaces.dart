@@ -86,7 +86,10 @@ final List<PpSurface> kPpSurfaces = [
   PpSurface('pp_yoga', _t(en: 'Yoga & recovery', hi: 'योग और रिकवरी')),
 
   // ---- Tradition -----------------------------------------------------------
-  PpSurface('pp_nuskhe', _t(en: 'Dadi–Nani remedies', hi: 'दादी–नानी के नुस्ख़े')),
+  PpSurface('pp_nuskhe', _t(en: 'Home remedies', hi: 'दादी–नानी के नुस्ख़े')),
+  // What to buy > How to choose (2026-10-07). English only, by policy: Hindi
+  // is owed, so `hi` repeats the English until a translation is asked for.
+  PpSurface('pp_buying_guides', _t(en: 'How to choose', hi: 'How to choose')),
   PpSurface('pp_names', _t(en: 'Baby names', hi: 'बच्चे के नाम')),
 ];
 

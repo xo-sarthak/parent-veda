@@ -94,6 +94,11 @@ void main() {
       'pregnancy_first_weeks',
       'pregnancy_getting_ready',
       'pregnancy_work_money',
+      // Parenting gap analysis new door, 2026-10-02.
+      'parenting_safety',
+      'parenting_family',
+      'parenting_special_care',
+      'parenting_papers',
     };
 
     test('every user-visible string has Hindi', () {

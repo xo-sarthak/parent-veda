@@ -399,8 +399,9 @@ void main() {
     // Pregnancy left this list on 2026-10-01: it draws the short profile now
     // (test/pv_you_pregnancy_test.dart). Kept for revert: it was the first of
     // these three.
+    // Parenting left it on 2026-10-07: it draws the short profile now
+    // (test/pp_profile_test.dart). Kept for revert: LifeStage.parenting first.
     for (final stage in [
-      LifeStage.parenting,
       LifeStage.skilling,
     ]) {
       testWidgets('${stage.name}: You, its sections, no bento', (tester) async {

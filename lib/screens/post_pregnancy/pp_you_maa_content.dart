@@ -90,7 +90,7 @@ const String _shopSurface = 'pp_products';
 
 final PpSection kPpYouMaaSection = PpSection(
   id: 'parenting_maternal', // MUST match the hub's bracketId
-  title: 'You, Maa',
+  title: 'You, the mother',
   subtitle: 'Because you matter too.',
   intro: 'Everyone is asking about the baby. This part of the app is only about '
       'you. Your body, your mind, your strength, your food, and getting back to '
@@ -113,6 +113,7 @@ final PpSection kPpYouMaaSection = PpSection(
     _movement, //            moving again, and being cleared to move
     _feedingYourself, //     eating like someone who is healing
     _healingKitchen, //      jaapa foods, kadha, gond laddoo
+    _canIFeeding, //         can I...? while breastfeeding (2026-10-02)
     _thePeopleAroundYou, //  visitors, the mother in law, asking for help
     _backToWork, //          returning, or choosing not to
     _theCircle, //           other mothers, and not doing this alone
@@ -148,7 +149,7 @@ final PpSection kPpYouMaaSection = PpSection(
 final PpArea _howAreYou = PpArea(
   id: 'how_are_you',
   mark: IntentMark.stepsMark,
-  title: 'How are you today, Maa?',
+  title: 'How are you today?',
   blurb: 'Pick the one that sounds most like today. We will start there.',
   hue: 288,
   pages: [
@@ -185,14 +186,14 @@ final PpArea _howAreYou = PpArea(
             surfaceId: _crisis,
             blurb: 'A phone number you can call this minute, and what to say.'),
         PpArticle([
-            'Most new mothers get sudden unwanted images or fears about harm '
-            'coming to the baby. They arrive uninvited, they horrify her, and '
-            'she does not want to act on them. That pattern is extremely '
-            'common, it has a name, and it responds well to help.',
-            'A different and much rarer thing is thoughts that start to feel '
-            'reasonable, or urges you are afraid you might follow, or hearing '
-            'or believing things others do not. That one is urgent and treatable '
-            'and needs a doctor today rather than a plan for next week.',
+            'Most new mothers get sudden, unwanted pictures in their mind of harm '
+            'coming to the baby. They arrive uninvited, they horrify you, and '
+            'you have no wish to act on them. This is very common, it has a '
+            'name, and it responds well to help.',
+            'Much rarer, and different, is when the thoughts start to feel '
+            'reasonable. Or there are urges you fear you might follow, or you '
+            'hear or believe things others do not. That is urgent and treatable. '
+            'It needs a doctor today, not a plan for next week.',
             'You do not have to work out which one you have. That is the '
             'doctor\'s job. Your job is only to tell someone.',
           ], heading: 'The difference that matters'),
@@ -216,8 +217,8 @@ final PpArea _howAreYou = PpArea(
           'asking. Both are real and both have help.',
           'Open the door below called "I do not feel like myself". Start with '
           'the short videos, where other mothers say the same sentence you just '
-          'read. Hearing it from someone else is often the thing that unlocks '
-          'saying it yourself.',
+          'read. Hearing it from someone else often makes it easier to say it '
+          'yourself.',
         ]),
         PpCallout('One thing that helps today: get outside the four walls for '
             'ten minutes, even to the balcony or the gate, and eat something '
@@ -237,12 +238,12 @@ final PpArea _howAreYou = PpArea(
             'things that are not, and it is worth knowing them by heart so you '
             'never have to wonder at 2am.'),
         PpCallout(
-          'Call your doctor now, do not wait for the next visit, if any of '
-          'these: bleeding soaking through a maternity pad in an hour, a clot '
-          'bigger than a lemon, fever, a red hot painful patch on one breast '
-          'with flu like aching, pain or swelling in one calf, a bad headache '
-          'with blurred vision, a wound that is oozing or opening, burning urine '
-          'with fever, or pain that is getting worse each day instead of better.',
+          'Call your doctor now if you have any of these. Do not wait for the '
+          'next visit. Bleeding that soaks a maternity pad in an hour. A clot '
+          'bigger than a lemon. Fever. A red, hot, painful patch on one breast '
+          'with flu like aching. Pain or swelling in one calf. A bad headache '
+          'with blurred vision. A wound that is oozing or opening. Burning urine '
+          'with fever. Pain that is getting worse each day instead of better.',
           kind: PpCalloutKind.doctor,
           title: 'The list worth memorising',
         ),
@@ -251,16 +252,16 @@ final PpArea _howAreYou = PpArea(
         // with visual change) is the single most safety critical block in the
         // section. A doctor must sign off the wording and the numbers before ship.
         PpArticle([
-          'If none of that is happening, the door below called "What is '
-          'happening to my body" has a page for each of the ordinary sore '
-          'things: the bleeding, the stitches, the C-section wound, the '
-          'afterpains, the engorged breasts, the night sweats.',
+          'If none of that is happening, open the door below called "What is '
+          'happening to my body". It has a page for each ordinary sore thing: '
+          'the bleeding, the stitches, the C-section wound, the afterpains, the '
+          'engorged breasts, the night sweats.',
           'Pick the one that is bothering you most today. You do not have to '
           'read them all.',
         ]),
-        PpIndiaNote('Sitting cross legged on the floor to feed, and then again '
-            'to eat, and then again to fold clothes, is a lot of getting up and '
-            'down on a healing body. A low stool and a cushion is not laziness.'),
+        PpIndiaNote('Sitting cross legged on the floor to feed, then to eat, '
+            'then to fold clothes, means a lot of getting up and down on a '
+            'healing body. A low stool and a cushion is not laziness.'),
       ],
     ),
     PpPage(
@@ -298,7 +299,7 @@ final PpArea _howAreYou = PpArea(
             'order.'),
         PpCallout('Nothing on the movement pages is about losing weight, and '
             'there is no before and after photo anywhere in this app. You are '
-            'rebuilding, not reversing.'),
+            'rebuilding your strength, at your own pace.'),
         PpArticle([
           'Go to the door called "Moving again, at your own pace". It starts '
           'with breath and gentle work, moves to reconnecting your deep core, '
@@ -322,25 +323,36 @@ final PpArea _howAreYou = PpArea(
         PpIntro('You are feeding someone every two hours and eating once a day '
             'standing at the kitchen counter. The tiredness is partly that, and '
             'it is fixable faster than you think.'),
-        PpCallout('Iron is the usual culprit in India, and a lot of mothers '
+        PpCallout('Low iron is often the reason in India, and many mothers '
             'finish pregnancy already low. Breathless on the stairs, dizzy '
-            'standing up, heart racing, pale inner eyelids, hair falling in '
-            'handfuls: ask your doctor for a haemoglobin test rather than '
-            'assuming it is only lack of sleep.'),
+            'standing up, a racing heart, pale inner eyelids, hair falling in '
+            'handfuls? Ask your doctor for a haemoglobin test. Do not assume '
+            'it is only lack of sleep.'),
         // REQUIRED_REVIEW: anaemia symptom list and the suggestion to request a
         // haemoglobin test. Correct and standard, but a clinician should confirm
         // the framing does not read as a diagnosis.
         PpArticle([
           'Two doors help here. "Have you eaten today?" has the short version '
-          'of what your body actually needs now, and why the advice is different '
+          'of what your body needs now, and why the advice is different '
           'if you are breastfeeding.',
-          '"The healing kitchen" has the real recipes: panjiri, gond ke laddoo, '
-          'methi laddoo, harira, and the one handed meals for the days when you '
-          'have exactly one free hand and eleven minutes.',
+          '"The healing kitchen" has the real recipes: roasted flour panjiri, edible gum laddoo, '
+          'fenugreek laddoo and the warm harira drink. It also has one handed meals for the days '
+          'when you have exactly one free hand and eleven minutes.',
         ]),
         PpLink('Recipes for you, not the baby',
             surfaceId: 'pp_food',
             blurb: 'The full recipe library, if you want to browse wider.'),
+        // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+        PpCards(heading: 'Burnout, and sharing the load', [
+          PpCard('The signs', 'Exhausted even after rest, short-tempered, '
+              'feeling nothing, or dreading the day.'),
+          PpCard('Write down everything you carry',
+              'Then split it with your husband: not "help me", but "this is '
+                  'yours".'),
+          PpCard('A real break', 'An hour that is fully yours, out of the '
+              'house if you can, every week.'),
+          PpCard('Fathers burn out too', 'Ask your husband, "How are you doing?"'),
+        ]),
       ],
     ),
     PpPage(
@@ -353,10 +365,9 @@ final PpArea _howAreYou = PpArea(
             'alone in it. Being surrounded by relatives is not the same as being '
             'understood by one.'),
         PpArticle([
-          'The loneliest part of early motherhood is usually not the hours by '
-          'yourself. It is being the only one awake at 3am, the only one who '
-          'knows what the baby needs, and the only one whose day nobody asks '
-          'about.',
+          'The loneliest part of early motherhood is often being the only one '
+          'awake at 3am. The only one who knows what the baby needs, and the '
+          'only one whose day nobody asks about.',
           'Two things help and they are different things. Other mothers at the '
           'same stage, who need no explanation. And one person in your own house '
           'who takes something off you without being asked twice.',
@@ -383,15 +394,15 @@ final PpArea _howAreYou = PpArea(
           'The door called "Going back, and finding yourself again" splits it '
           'into the practical and the emotional, because they need different '
           'answers. Milk stash, pumping without a room to pump in, what your '
-          'leave actually entitles you to, and who is going to hold your baby '
+          'leave entitles you to, and who is going to hold your baby '
           'at 10am.',
           'And separately: the guilt, which is almost universal and almost '
           'never proportionate.',
         ]),
         PpCallout('Start the milk stash and the childcare conversation about '
-            'four weeks before your return date, not in the last week. Almost '
-            'every mother who found it manageable started earlier than she '
-            'thought she needed to.'),
+            'four weeks before your return date, not in the last week. Mothers '
+            'who found it manageable almost always started earlier than they '
+            'thought they needed to.'),
       ],
     ),
   ],
@@ -483,6 +494,20 @@ final PpArea _yourBody = PpArea(
             'very wrong. Nobody at home can tell the difference between the two, '
             'and neither can we. Only a doctor can, and the visit costs you an '
             'afternoon.'),
+        // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+        PpCards(heading: 'Two rare ones worth knowing', [
+          PpCard('A blood clot',
+              'Pain, swelling, warmth or redness in one leg, usually the calf; '
+                  'or sudden breathlessness, chest pain or coughing blood. '
+                  'Clots are more likely after a caesarean, in the first six '
+                  'weeks. Go to hospital the same day, or call 112 for chest '
+                  'pain or breathlessness.'),
+          PpCard('A weak heart after birth (PPCM)',
+              'Breathlessness lying flat, swollen legs, a racing heart or '
+                  'extreme tiredness that is more than new-baby tiredness. '
+                  'Peripartum cardiomyopathy is rare and treatable when found '
+                  'early. Tell your doctor; it needs a heart check.'),
+        ]),
       ],
     ),
     PpPage(
@@ -511,8 +536,8 @@ final PpArea _yourBody = PpArea(
             ('Week 2 to 4', 'Light, pale, more like discharge'),
             ('Up to 6 weeks', 'Occasional spotting, then it stops'),
           ],
-          note: 'A gush when you stand up after lying down is normal. It has '
-              'simply been pooling.',
+          note: 'A gush when you stand up after lying down is normal. The blood '
+              'pooled while you were lying still.',
           hue: 12,
         ),
         // REQUIRED_REVIEW: the lochia timeline above. Widely taught and standard,
@@ -524,18 +549,18 @@ final PpArea _yourBody = PpArea(
             'Change the pad often even when it is not full, because sitting in '
             'it is how infections start in a hot climate.',
             'Doing too much makes it heavier. If your bleeding steps up on a day '
-            'you were on your feet a lot, that is your body sending you an '
-            'invoice. Sit down.',
+            'you were on your feet a lot, that is your body asking you to slow '
+            'down. Sit and rest.',
           ], heading: 'What helps'),
         PpCallout(
-          'Call your doctor if you soak a maternity pad in an hour, pass a clot '
-          'bigger than a lemon, the bleeding suddenly gets heavier again after '
-          'it had slowed, it smells bad, or it comes with fever.',
+          'Call your doctor if you soak a maternity pad in an hour, or pass a '
+          'clot bigger than a lemon. Call too if the bleeding suddenly gets '
+          'heavier again after it had slowed, smells bad, or comes with fever.',
           kind: PpCalloutKind.doctor,
           title: 'Not normal',
         ),
-        PpWhenLine('Expect six weeks, not six days. Two weeks in and still '
-            'bleeding is on time, not late.'),
+        PpWhenLine('Expect six weeks, not six days. Still bleeding two weeks in '
+            'is normal and right on time.'),
         PpIndiaNote('Old cloth is still used in many homes for this. If it is '
             'used, it has to be washed hot, dried in full sun and never reused '
             'damp. Disposable maternity pads for the first two weeks are worth '
@@ -577,24 +602,45 @@ final PpArea _yourBody = PpArea(
                     'the area clean.'),
             PpStep('Do not hold your bowels', 'The first motion is frightening but holding it makes it '
                     'harder. Support the area with a clean pad while you go.'),
-          ], heading: 'What actually helps'),
+          ], heading: 'What helps'),
         PpCallout(
           'See your doctor if the pain is getting worse rather than better after '
-          'day three, if there is a bad smell, if the wound looks like it is '
-          'opening, if there is pus, or if you have a fever. An infected '
-          'perineal wound is common enough and treats easily with antibiotics.',
+          'day three. See your doctor too for a bad smell, a wound that looks '
+          'like it is opening, pus, or a fever. An infected perineal wound is '
+          'common enough and treats easily with antibiotics.',
           kind: PpCalloutKind.doctor,
           title: 'When to get it looked at',
         ),
         PpWhenLine('Most of the sharp soreness settles within two weeks. Full '
             'healing of the tissue takes about six.'),
         PpIndiaNote('Squatting Indian toilets are hard work on a fresh perineum. '
-            'If your home has one, a low stool to hold and push up from makes '
-            'the difference, and it is worth asking for a western commode at the '
-            'hospital if you have a choice.'),
+            'If your home has one, a low stool to hold and push up from helps a '
+            'lot. At the hospital, ask for a western commode if you have a '
+            'choice.'),
         PpLink('Perineal care: spray, sitz bath and cushions',
             surfaceId: _shopSurface,
-            blurb: 'The three things that genuinely help, and what to skip.'),
+            blurb: 'The three things that really help, and what to skip.'),
+        // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+        PpSteps(heading: 'A sitz bath', [
+          PpStep('Use a clean basin or a tub with a few inches of warm water',
+              'Just enough to cover your bottom.'),
+          PpStep('Sit for 10 to 15 minutes, two or three times a day',
+              'It soothes stitches, piles and swelling.'),
+          PpStep('Plain warm water is enough',
+              'Ask your doctor before adding anything.'),
+          PpStep('Pat dry gently afterwards', 'Front to back.'),
+        ]),
+            // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+            PpArticle(heading: 'Passing urine after the birth', [
+              'Stinging when urine touches stitches or grazes is common for a '
+                  'few days. Pour warm water over the area as you go, or pass '
+                  'urine in the shower, and drink plenty so it is less '
+                  'concentrated.',
+              'Burning inside, needing to go very often, cloudy or smelly '
+                  'urine, or a fever can mean a urine infection, which needs a '
+                  'doctor. So does being unable to pass urine at all, or leaking '
+                  'all the time.',
+            ])
       ],
     ),
     PpPage(
@@ -610,8 +656,8 @@ final PpArea _yourBody = PpArea(
         PpArticle([
             'Six or seven separate layers were cut and closed, and they heal at '
             'different speeds. The skin looks closed within about a week, which '
-            'is misleading, because the muscle and the uterus underneath are '
-            'weeks behind it.',
+            'can mislead you. The muscle and the uterus underneath take weeks '
+            'longer.',
             'Trapped gas and the pain of it is often worse than the wound in the '
             'first few days. Walking is the fastest thing that shifts it.',
             'Numbness and a strange dead feeling around the scar is extremely '
@@ -653,22 +699,34 @@ final PpArea _yourBody = PpArea(
           ], heading: 'Looking after the wound'),
         PpCallout(
           'Call your doctor for fever, spreading redness around the wound, pus '
-          'or a bad smell, the wound opening, a hard painful lump under it, '
-          'sudden heavy bleeding, or pain and swelling in one calf. Do not wait '
-          'for your scheduled check.',
+          'or a bad smell, or the wound opening. Call too for a hard painful '
+          'lump under it, sudden heavy bleeding, or pain and swelling in one '
+          'calf. Do not wait for your scheduled check.',
           kind: PpCalloutKind.doctor,
           title: 'Wound and clot warnings',
         ),
         PpWhenLine('Skin closed in about a week. Deep healing about six to '
-            'twelve weeks. Full strength closer to six months, which nobody '
-            'tells you.'),
+            'twelve weeks. Full strength closer to six months, which few people '
+            'mention.'),
         PpIndiaNote('A caesarean is still spoken about in some families as '
             'though you did not really give birth, or took the easy route. You '
-            'had surgery to deliver your child. There is no easier route through '
-            'an operating theatre.'),
+            'had surgery to deliver your child, and that is giving birth. Nothing '
+            'about an operating theatre is easy.'),
         PpLink('C-section recovery: belts, cushions and scar care',
             surfaceId: _shopSurface,
             blurb: 'A binder helps early. Scar care starts later. Both explained.'),
+            // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+            PpSteps(heading: 'Breastfeeding after a caesarean', [
+              PpStep('Start as soon as you can', 'Often in the recovery room. '
+                  'Ask the nurse to help you bring your baby to the breast.'),
+              PpStep('Try the side-lying or rugby hold',
+                  'Both keep your baby\'s weight off your scar.'),
+              PpStep('A pillow over the scar', 'For when your baby lies across you.'),
+              PpStep('Your pain medicines are compatible with feeding',
+                  'Take them on time; pain makes feeding harder.'),
+              PpStep('Milk may come in a day later', 'Keep feeding often; it '
+                  'catches up.'),
+            ])
       ],
     ),
     PpPage(
@@ -697,8 +755,8 @@ final PpArea _yourBody = PpArea(
             PpCard('Slow breathing out through the cramp',
                 'The same breathing you used in labour. It works here too.'),
             PpCard('Ask about pain relief',
-                'There are painkillers that are safe while breastfeeding. Ask '
-                'your doctor which, rather than suffering through on principle.'),
+                'Some painkillers are safe while breastfeeding. Ask your doctor '
+                'which ones. There is no need to suffer through it.'),
           ], heading: 'What helps', hue: 12),
         PpWhenLine('Strongest in the first two to three days, mostly gone by '
             'the end of the first week.'),
@@ -778,10 +836,10 @@ final PpArea _yourBody = PpArea(
                     'start. Cold afterwards settles the swelling.'),
             PpStep('Soften the areola by hand first', 'Press gently inward around the nipple for a minute to '
                     'move fluid back. A softer areola means the baby can latch.'),
-            PpStep('Hand express a little if she cannot latch', 'Only enough to soften, not to empty. Emptying fully by '
+            PpStep('Hand express a little if your baby cannot latch', 'Only enough to soften, not to empty. Emptying fully by '
                     'pump tells your body to make even more.'),
-            PpStep('Cold cabbage leaves, if you want to', 'Chilled, in your bra, for twenty minutes. Old remedy, '
-                    'genuinely soothing, does no harm.'),
+            PpStep('Cold cabbage leaves, if you want to', 'Chilled, in your bra, for twenty minutes. An old remedy '
+                    'that soothes and does no harm.'),
           ], heading: 'Getting through engorgement'),
         PpCallout(
           'A red hot painful wedge on one breast, plus fever, shivering and '
@@ -810,6 +868,20 @@ final PpArea _yourBody = PpArea(
         PpLink('Nursing bras, pads and nipple cream',
             surfaceId: _shopSurface,
             blurb: 'Two bras is enough. Which cream is safe for the baby.'),
+        // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+        PpCards(heading: 'Leaking, and the colour of your milk', [
+          PpCard('Leaking', 'Very common in the early weeks, from the other '
+              'breast during a feed or when you hear a baby cry. Washable or '
+              'disposable nursing pads help; change them often to keep '
+              'nipples dry. It settles as supply adjusts.'),
+          PpCard('Yellow, then white', 'Colostrum is thick and yellow; mature '
+              'milk is thinner and bluish-white.'),
+          PpCard('Green, orange or pink tints', 'Often from food or drinks, '
+              'and harmless.'),
+          PpCard('Pink or rusty milk', 'Usually a little blood from a cracked '
+              'nipple, or "rusty pipe" in the first days, and safe for your baby. '
+              'If it lasts more than a few days, see your doctor.'),
+        ]),
       ],
     ),
     PpPage(
@@ -818,14 +890,14 @@ final PpArea _yourBody = PpArea(
       format: 'ARTICLE',
       bands: [_b0],
       blocks: [
-        PpIntro('You are going to be told to rest and simultaneously expected to '
-            'be up and running the house. This page is the argument you can '
-            'borrow when you need it.'),
+        PpIntro('You will be told to rest, and at the same time expected to be '
+            'up and running the house. This page gives you the words to use '
+            'when you need them.'),
         PpArticle([
-            'Healing costs energy. Closing a placental wound, shrinking a uterus, '
-            'rebuilding blood volume and producing around 700 millilitres of milk '
-            'a day is a serious metabolic workload happening quietly while you '
-            'stand in the kitchen.',
+            'Healing costs energy. Your body is closing a placental wound, '
+            'shrinking a uterus and rebuilding blood volume. It may also be making '
+            'around 700 millilitres of milk a day. That is heavy work, even while '
+            'you stand in the kitchen.',
             'Lying down also matters mechanically, not just for tiredness. '
             'Everything in your pelvis is held up by ligaments that are still '
             'soft from pregnancy hormones. Hours upright in the first fortnight '
@@ -845,19 +917,33 @@ final PpArea _yourBody = PpArea(
                 'If you are doing something, do one thing and then sit for '
                 'twenty minutes. Chains of small tasks are how a whole day '
                 'disappears on your feet.'),
-          ], heading: 'What resting actually looks like', hue: 12),
+          ], heading: 'What resting looks like', hue: 12),
         PpCallout('If your bleeding gets heavier on a busy day, that is not a '
             'coincidence. It is the clearest feedback your body gives you, and '
             'it is worth treating as an instruction.'),
         PpWhenLine('The first two weeks mostly lying down, weeks three to six '
             'gradually more upright. Not a rule, a direction.'),
-        PpIndiaNote('The traditional jaapa period, forty days of being fed and '
-            'kept off her feet, got this right long before anyone measured it. '
+        PpIndiaNote('The traditional forty days of rest (jaapa), forty days of being fed and '
+            'kept off your feet, got this right long before anyone measured it. '
             'Where families still do it, take it. Where they have stopped, this '
             'is the part worth keeping.'),
-        PpLink('Jaapa: your first 40 days',
+        PpLink('Your first 40 days',
             surfaceId: null,
             blurb: 'The whole tradition, day by day, in its own section.'),
+        // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+        PpCards(heading: 'Everyday questions in the first weeks', [
+          PpCard('Housework', 'Light tasks are fine. Nothing heavier than '
+              'your baby for six weeks after a caesarean.'),
+          PpCard('Stairs', 'Fine, slowly, from the start.'),
+          PpCard('Mosquito coils, incense sticks and incense smoke',
+              'Smoke is not good for you or the baby. Use nets or an electric '
+                  'repellent in a ventilated room.'),
+          PpCard('Washing your hair and bathing',
+              'Fine from the first days. Warm water is the comfort.'),
+          PpCard('Going out',
+              'A short walk is good for you. Busy markets can wait a few '
+                  'weeks.'),
+        ]),
       ],
     ),
     PpPage(
@@ -871,9 +957,9 @@ final PpArea _yourBody = PpArea(
             'All three are normal, and two of them you can improve.'),
         PpArticle([
             'Scar tissue forms in a disorganised mesh and then slowly reorganises '
-            'over about a year. In the middle of that it can stick to the layers '
-            'underneath, which is what causes pulling, a tugging feeling when you '
-            'stretch, and sometimes back pain that nobody connects to the scar.',
+            'over about a year. Along the way it can stick to the layers '
+            'underneath. That causes pulling, a tug when you stretch, and '
+            'sometimes back pain that nobody links to the scar.',
             'The numbness is cut nerves regrowing. Sensation usually returns in '
             'patches over six months to two years, and a small permanently numb '
             'strip is common and harmless.',
@@ -900,9 +986,9 @@ final PpArea _yourBody = PpArea(
         // criteria given for "fully closed". A physiotherapist should confirm the
         // technique description and the timing.
         PpCallout(
-          'See a doctor for a scar that is hot, red, opening, oozing or has a '
-          'hard painful lump under it, or if you get sharp pain shooting from '
-          'the scar. A raised, itchy, spreading scar can be treated, so ask '
+          'See a doctor for a scar that is hot, red, opening or oozing, or has a '
+          'hard painful lump under it. See a doctor too for sharp pain shooting '
+          'from the scar. A raised, itchy, spreading scar can be treated, so ask '
           'rather than assuming it is permanent.',
           kind: PpCalloutKind.doctor,
         ),
@@ -929,17 +1015,17 @@ final PpArea _yourBody = PpArea(
             'Nine months of a growing belly pulled your pelvis forward and '
             'switched your deep abdominal muscles off. Your lower back took over '
             'the job of holding you up and it has kept the habit.',
-            'Then add the postures of new motherhood: rounded over a feeding '
-            'baby forty minutes at a time, bending into a cot, carrying a '
-            'nine kilo child on one hip for a year. The pain is the result of '
-            'position, repeated.',
+            'Then add the postures of new motherhood. Rounded over a feeding '
+            'baby forty minutes at a time, bending into a cot, carrying a nine '
+            'kilo child on one hip for a year. The pain comes from those '
+            'positions, repeated.',
             'This is why core reconnection helps back pain more than painkillers '
             'do. It is not about a flat stomach. It is about giving your spine '
             'its support system back.',
           ], heading: 'What is happening'),
         PpCards([
             PpCard('Bring the baby to your breast, not your breast to the baby',
-                'Pillows under the baby until she is at nipple height. Your '
+                'Pillows under the baby until the mouth is level with your nipple. Your '
                 'shoulders stay down and back.'),
             PpCard('Back against something, always',
                 'A wall, a cushion, a headboard. Forty minutes unsupported is '
@@ -951,16 +1037,17 @@ final PpArea _yourBody = PpArea(
                 'Always the left hip means always the same twist. Alternate, or '
                 'use a carrier that spreads the load.'),
             PpCard('Get off the floor to feed, if you can',
-                'Cross legged on the floor with a rounded back is the single '
-                'most common cause of Indian postpartum back pain.'),
+                'Cross legged on the floor with a rounded back is the most '
+                'common cause of postpartum back pain in India.'),
           ], heading: 'The five changes that help most', hue: 12),
         PpLink('Start with core reconnection',
             surfaceId: 'pp_yoga',
             blurb: 'Gentle sessions that rebuild the muscles holding your spine.'),
         PpCallout(
-          'See a doctor for back pain that shoots down a leg, comes with '
-          'numbness or weakness in a leg, affects your control of urine or '
-          'bowels, wakes you at night, or comes with fever. Also for pain right '
+          'See a doctor for back pain that shoots down a leg, or comes with '
+          'numbness or weakness in a leg. See a doctor too if it affects your '
+          'control of urine or bowels, wakes you at night, or comes with fever. '
+          'Also for pain right '
           'over your tailbone that will not settle, which can be a bruised or '
           'broken coccyx from delivery.',
           kind: PpCalloutKind.doctor,
@@ -968,10 +1055,19 @@ final PpArea _yourBody = PpArea(
         PpWhenLine('Most mechanical back pain improves within four to eight '
             'weeks of changing positions and starting core work. Longer than '
             'three months, see a physiotherapist.'),
-        PpIndiaNote('The traditional strong oil massage on the back during jaapa '
-            'genuinely helps this, and a maalishwali who knows what she is doing '
-            'is worth keeping. It is a complement to rebuilding the muscles, not '
-            'a replacement.'),
+        PpIndiaNote('The traditional strong oil massage on the back during the forty days '
+            'does help this, and a skilled massage helper is worth keeping. Use it '
+            'alongside rebuilding the muscles, not instead of it.'),
+        // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+        PpArticle(heading: 'Pain at the front or back of the pelvis', [
+          'Pelvic girdle pain, felt at the pubic bone, the hips or the lower '
+              'back, often starts in pregnancy and can carry on after birth. '
+              'It hurts most when standing on one leg, climbing stairs or '
+              'turning in bed.',
+          'A women\'s health physiotherapist can help a great deal with '
+              'exercises and advice. Keep your knees together when getting '
+              'out of bed or a car, and avoid wide steps.',
+        ]),
       ],
     ),
     PpPage(
@@ -992,25 +1088,30 @@ final PpArea _yourBody = PpArea(
             'down, shoulders rounded, staring at a feeding baby.',
           ], heading: 'What is happening'),
         PpSteps([
-            PpStep('Scoop, do not pinch', 'Lift the baby with both hands flat under her, keeping '
+            PpStep('Scoop, do not pinch', 'Lift the baby with both hands flat underneath, keeping '
                     'your wrists straight, instead of gripping under the arms '
                     'with thumbs out.'),
-            PpStep('Support the baby on pillows, not on your wrist', 'Your hand should be resting, not holding.'),
+            PpStep('Support the baby on pillows, not on your wrist', 'Let your hand rest, not hold.'),
             PpStep('Wear a thumb splint for two weeks', 'A cheap thumb spica from a pharmacy, at night at least. '
                     'Rest is the treatment and a splint is how you get it.'),
-            PpStep('Look at the baby with your eyes, not your neck', 'Bring her up to eye level rather than folding down to '
-                    'her.'),
+            PpStep('Look at the baby with your eyes, not your neck', 'Bring your baby up to eye level rather than folding '
+                    'down.'),
             PpStep('Ice for ten minutes after a bad day', 'Over cloth, on the sore tendon, not on the joint.'),
           ], heading: 'What to change'),
         PpCallout(
           'See a doctor if it is not improving after two to three weeks of '
-          'splinting, if your fingers go numb or tingle at night, or if you '
-          'cannot grip. Both of these treat easily and there is no reason to '
-          'carry them for a year.',
+          'splinting. Go too if your fingers go numb or tingle at night, or if '
+          'you cannot grip. Both of these treat easily, and there is no reason '
+          'to carry them for a year.',
           kind: PpCalloutKind.doctor,
         ),
         PpWhenLine('Usually starts in weeks three to eight and settles in two to '
             'six weeks once the hold changes.'),
+        // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+        PpCallout('Shoulder pain is common from carrying a baby on one hip and '
+            'hunching over feeds. Swap sides, bring the baby up to you with a '
+            'pillow, and use a carrier that spreads the weight. If it lasts '
+            'more than a few weeks, see a physiotherapist.'),
       ],
     ),
     PpPage(
@@ -1036,22 +1137,22 @@ final PpArea _yourBody = PpArea(
                 'Wide toothed comb, no tight ponytails, no heat, no chemical '
                 'treatments for now.'),
             PpCard('Eating enough protein and iron',
-                'Low iron makes it worse and longer. This is the one nutritional '
-                'lever that genuinely matters here.'),
+                'Low iron makes it worse and longer. Of everything you eat, this '
+                'is what makes a real difference here.'),
             PpCard('Getting your haemoglobin and thyroid checked',
                 'If it is severe or still heavy past nine months, ask. Low '
                 'thyroid after birth is common and treatable.'),
             PpCard('Ignoring the oils and shampoos aimed at you',
                 'No oil regrows hair that has already entered the shedding '
                 'phase. Save the money.'),
-          ], heading: 'What actually helps', hue: 12),
+          ], heading: 'What helps', hue: 12),
         // REQUIRED_REVIEW: the suggestion to check haemoglobin and thyroid, and
         // the nine month threshold for doing so. Postpartum thyroiditis is real
         // and commonly missed, but a clinician should set the threshold.
         PpCallout(
-          'See a doctor if you can see patches of scalp, if the hair loss comes '
-          'in round bald spots, or if it is still heavy nine months after birth. '
-          'Those are different problems from this one.',
+          'See a doctor if you can see patches of scalp, or if the hair loss '
+          'comes in round bald spots. See a doctor too if it is still heavy nine '
+          'months after birth. Those are different problems from this one.',
           kind: PpCalloutKind.doctor,
         ),
         PpWhenLine('Usually starts around three months, peaks around four, and '
@@ -1078,8 +1179,8 @@ final PpArea _yourBody = PpArea(
             'of connective tissue down the middle. A growing uterus stretches '
             'that strip sideways, and after birth it is wider and slacker than '
             'it was. This is called diastasis recti.',
-            'What matters is not the width of the gap. It is whether the tissue '
-            'across it can hold tension. A slightly wider gap that is firm '
+            'The width of the gap matters less than whether the tissue across '
+            'it can hold tension. A slightly wider gap that is firm '
             'behaves better than a narrow one that domes and sinks.',
             'This is also why crunches, planks and sit ups are the wrong first '
             'move. They push outward against exactly the tissue you need to '
@@ -1147,8 +1248,8 @@ final PpArea _yourBody = PpArea(
             'will be most afraid of. It is manageable, and dreading it is what '
             'makes it worse.'),
         PpArticle([
-            'Everything conspires at once. Pregnancy hormones slowed your gut, '
-            'iron tablets harden stool, you lost fluid in delivery, painkillers '
+            'Everything happens at once. Pregnancy hormones slowed your gut, iron '
+            'tablets harden stool, and you lost fluid in delivery. Painkillers '
             'and anaesthesia slow things further, and you are afraid to push '
             'because of stitches or a wound.',
             'Piles either appeared during pushing or were already there from '
@@ -1157,11 +1258,11 @@ final PpArea _yourBody = PpArea(
           ], heading: 'What is happening'),
         PpSteps([
             PpStep('Ask for a stool softener', 'Not a laxative. A softener, from your doctor, taken '
-                    'daily for the first two weeks. This is the single most '
-                    'effective thing and most mothers are never offered it.'),
+                    'daily for the first two weeks. This helps more than '
+                    'anything else, and most mothers are never offered it.'),
             PpStep('Water, more than feels necessary', 'You lose a lot into milk. Keep a bottle where you feed '
                     'and finish it every session.'),
-            PpStep('Warm and soft first thing', 'Soaked munakka or figs overnight, a warm glass of water '
+            PpStep('Warm and soft first thing', 'Soaked raisins or figs overnight, a warm glass of water '
                     'on waking, dalia or oats rather than a dry paratha.'),
             PpStep('Do not hold it', 'Go when the urge comes. Waiting lets the stool dry '
                     'further, which is the whole problem.'),
@@ -1173,11 +1274,11 @@ final PpArea _yourBody = PpArea(
                     'safe while feeding.'),
           ], heading: 'What works, in order of how much it helps'),
         PpCallout(
-          'See a doctor for no bowel movement at all past four days, severe pain '
-          'with it, a lot of fresh blood rather than streaks, a pile that is '
-          'hard, dark and very painful, or any leaking of stool or wind you '
-          'cannot control. The last one is a pelvic floor injury, it is not '
-          'something to live with, and it is treatable.',
+          'See a doctor for no bowel movement at all past four days, or severe '
+          'pain with it. See a doctor too for a lot of fresh blood rather than '
+          'streaks, or a pile that is hard, dark and very painful. And see a '
+          'doctor for any leaking of stool or wind you cannot control. That '
+          'one is a pelvic floor injury, and it is treatable.',
           kind: PpCalloutKind.doctor,
         ),
         // REQUIRED_REVIEW: the four day threshold, the description of a
@@ -1198,21 +1299,21 @@ final PpArea _yourBody = PpArea(
       format: 'ARTICLE',
       bands: _later,
       blocks: [
-        PpIntro('Months in, the acute healing is done and what is left is the '
-            'slow half: a core that still does not fire properly and a scar that '
-            'still pulls. This is the stage almost nobody gets support for.'),
+        PpIntro('Months in, the first healing is done. What is left is the slow '
+            'half: a core that still does not fire properly, and a scar that '
+            'still pulls. Almost nobody gets support for this stage.'),
         PpArticle([
             'Deep muscle takes far longer to come back than skin. Your transverse '
-            'abdominis and pelvic floor learned to switch off during pregnancy, '
-            'and switching them back on is a skill you relearn, not a strength '
-            'you regain by working harder.',
+            'abdominis and pelvic floor learned to switch off during pregnancy. '
+            'Switching them back on is a skill you relearn, and working harder '
+            'does not bring it back.',
             'A caesarean scar keeps remodelling for a year or more. Around three '
-            'to six months is when tethering starts causing symptoms that seem '
-            'unrelated: a pulling ache, hip or back pain on one side, a numb '
-            'shelf that will not soften.',
+            'to six months, tethering can cause symptoms that seem unrelated. A '
+            'pulling ache, hip or back pain on one side, a numb shelf that will '
+            'not soften.',
             'If you have gone back to normal exercise and something feels off, '
-            'the answer is rarely to push harder. It is usually that a link in '
-            'the chain never came back online.',
+            'pushing harder rarely helps. Usually one part of the system has not '
+            'switched back on yet.',
           ], heading: 'What is happening'),
         PpCards([
             PpCard('Doming or a ridge when you sit up or lift',
@@ -1220,7 +1321,7 @@ final PpArea _yourBody = PpArea(
             PpCard('Leaking or heaviness when you run, jump or lift',
                 'The pelvic floor is part of the core. This is a load problem, '
                 'not a bladder problem.'),
-            PpCard('Back pain that returns whenever you carry her',
+            PpCard('Back pain that returns whenever you carry your baby',
                 'Your spine is still borrowing support it should not need to.'),
             PpCard('Holding your breath to lift anything',
                 'A reliable sign the deep system is not co-ordinating.'),
@@ -1252,16 +1353,16 @@ final PpArea _yourBody = PpArea(
             'forever, and the version of normal you arrive at is slightly '
             'different from the one you left.'),
         PpArticle([
-            'The six week check exists to confirm you are not bleeding, infected '
-            'or in danger. It was never a declaration that healing is finished, '
-            'although it gets read as one by everybody including employers.',
+            'The six week check is there to confirm you are not bleeding, infected '
+            'or in danger. It never meant healing is finished, even though '
+            'everybody, employers included, tends to read it that way.',
             'Most mothers say the fog lifts somewhere between four and nine '
             'months, and that the biggest single factor is sleep rather than '
             'anything they did with their body.',
-            'Some things last longer and are not problems: a slightly wider rib '
-            'cage, a foot half a size bigger, a softer belly, a scar that still '
-            'has opinions about the weather. Your body is not going to pretend '
-            'the last two years did not happen, and it should not have to.',
+            'Some things last longer and are not problems. A slightly wider rib '
+            'cage, a foot half a size bigger, a softer belly, a scar that aches '
+            'when the weather turns. Your body carries the last two years, and '
+            'that is allowed.',
           ], heading: 'The honest timeline'),
         PpChartCard(
           title: 'Roughly what settles when',
@@ -1283,12 +1384,11 @@ final PpArea _yourBody = PpArea(
             PpCard('Any leaking, heaviness or dragging',
                 'A pelvic floor physiotherapist, not more kegels on your own.'),
             PpCard('Pain during sex',
-                'Very treatable. It is not something to endure quietly for '
-                'years.'),
+                'Very treatable. There is no need to put up with it for years.'),
             PpCard('Periods that came back wildly heavy or not at all',
                 'Both are worth checking, especially if you are no longer '
                 'feeding.'),
-            PpCard('Low mood that has quietly become your baseline',
+            PpCard('Low mood that has slowly become your normal',
                 'Depression at nine months is still postpartum depression. Read '
                 '"I do not feel like myself".'),
           ], heading: 'Months on, these are worth an appointment', hue: 12),
@@ -1298,13 +1398,25 @@ final PpArea _yourBody = PpArea(
         // rather than saying "ask what to check".
         PpCallout(
           'See a doctor for pain that is new or worsening months after birth, '
-          'bleeding between periods, a lump anywhere, or breathlessness. Late '
-          'does not mean minor.',
+          'bleeding between periods, a lump anywhere, or breathlessness. Months '
+          'after birth, these still matter.',
           kind: PpCalloutKind.doctor,
         ),
         PpIndiaNote('Once the baby is sleeping and eating, questions about you '
             'stop entirely, and the next question is about the second baby. You '
             'are allowed to book an appointment purely about yourself.'),
+        // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+        PpCards(heading: 'Eyes and face after a long labour', [
+          PpCard('Bloodshot eyes',
+              'Tiny blood vessels can burst in the whites of the eyes from '
+                  'pushing. They look alarming but are harmless and fade in '
+                  'one to two weeks.'),
+          PpCard('A puffy face', 'Fluid from labour and drips settles over a '
+              'few days.'),
+          PpCard('See a doctor if',
+              'Your vision changes, your eye hurts, or you have a severe '
+                  'headache: that is not a pushing mark.'),
+        ]),
       ],
     ),
     // ⚠️ [NEW], a scaffold. "Postpartum thyroid trouble is common and often
@@ -1316,8 +1428,32 @@ final PpArea _yourBody = PpArea(
       subtitle: 'Common, often missed, and it looks like everything else',
       format: 'SHORT ARTICLE',
       bands: _cleared,
-      comingSoon: true,
-      blocks: [],
+      
+      blocks: [
+        // Written 2026-10-02 (parenting gap analysis), filling the scaffold.
+        // REQUIRED_REVIEW.
+        PpIntro('The thyroid often changes in the year after birth, and the signs '
+            'are easy to put down to tiredness or new-mother blues. It is common, '
+            'often missed, and easy to test for and treat.'),
+        PpCards(heading: 'Two patterns', [
+          PpCard('An overactive phase', 'Usually in the first few months: racing '
+              'heart, feeling hot and anxious, weight loss, shakiness, poor sleep.'),
+          PpCard('An underactive phase', 'Often later, around four to eight months: '
+              'heavy tiredness, low mood, feeling cold, weight gain, dry skin, '
+              'constipation, and more hair loss than usual.'),
+        ]),
+        PpArticle([
+          'Postpartum thyroiditis often settles within a year, but some mothers '
+              'need treatment for a while, and a few go on to need it long term. '
+              'It is more common if you have diabetes, a thyroid problem before, or '
+              'a family history.',
+          'If you already take thyroid medicine, your dose often needs checking '
+              'after birth. The medicine is safe while breastfeeding.',
+        ]),
+        PpCallout('Ask your doctor for a simple thyroid blood test (TSH) if you feel '
+            'any of these, especially low mood or exhaustion that is not lifting.',
+            kind: PpCalloutKind.doctor),
+      ],
     ),
     PpPage(
       id: 'body_skin_settling',
@@ -1329,10 +1465,10 @@ final PpArea _yourBody = PpArea(
             'marks all fade on their own, at their own speed. Very little you '
             'buy changes that timeline.'),
         PpArticle([
-            'Pregnancy raised the pigment in your skin, which is what caused the '
-            'dark line down the middle, darker patches on your face and darker '
-            'skin around the nipples and underarms. As hormones settle, most of '
-            'it lightens over six to twelve months.',
+            'Pregnancy raised the pigment in your skin. That caused the dark line '
+            'down the middle, darker patches on your face, and darker skin around '
+            'the nipples and underarms. As hormones settle, most of it lightens '
+            'over six to twelve months.',
             'Stretch marks are tears in the deeper layer of skin. They start '
             'pink, red or purple and gradually become silvery and flat. They do '
             'not disappear and nothing on a shelf makes them disappear. They do '
@@ -1350,7 +1486,7 @@ final PpArea _yourBody = PpArea(
             PpCard('A dermatologist, if melasma is not shifting past a year',
                 'There are real treatments. Some are not suitable while '
                 'breastfeeding, so say that you are feeding.'),
-          ], heading: 'What genuinely helps', hue: 12),
+          ], heading: 'What helps', hue: 12),
         PpCallout(
           'These are your body\'s working notes. You are not obliged to remove '
           'them, cover them or apologise for them, and no product advertisement '
@@ -1372,8 +1508,8 @@ final PpArea _yourBody = PpArea(
             'everything so much effort feeling. That usually has a cause you can '
             'find.'),
         PpArticle([
-            'Iron. Blood loss at delivery plus months of feeding on a diet that '
-            'is often lighter than it should be. Low iron feels exactly like '
+            'Iron. Blood loss at delivery, plus months of feeding on a diet that '
+            'is often too light. Low iron feels exactly like '
             'this, and it is the most commonly missed cause in Indian mothers.',
             'Thyroid. Roughly one in twenty women gets a thyroid disturbance in '
             'the year after birth. It causes tiredness, weight change, low mood '
@@ -1405,7 +1541,7 @@ final PpArea _yourBody = PpArea(
             PpCard('Stop drinking chai instead of eating',
                 'Tea with a meal also blocks iron absorption. Keep them an hour '
                 'apart.'),
-          ], heading: 'What to actually do', hue: 12),
+          ], heading: 'What to do', hue: 12),
         PpCallout(
           'See a doctor for breathlessness climbing one flight of stairs, a '
           'racing heart at rest, fainting, or tiredness that is getting worse '
@@ -1416,7 +1552,7 @@ final PpArea _yourBody = PpArea(
         PpIndiaNote('In a joint family the mother often eats last and least, '
             'from what is left. Six months of that is a nutritional deficit no '
             'amount of resting fixes. If this is your house, eating a proper '
-            'plate first is not selfishness, it is the reason you can keep going.'),
+            'plate first is not selfish. It is how you keep going.'),
         PpLink('Iron and recovery, in detail',
             surfaceId: null,
             blurb: 'On the "Have you eaten today?" pages.'),
@@ -1429,12 +1565,46 @@ final PpArea _yourBody = PpArea(
     // baby's sleep lives in Sleep; this is about protecting hers.
     PpPage(
       id: 'body_your_sleep',
-      title: 'Getting sleep when she will not let you',
+      title: 'Getting sleep when your baby will not let you',
       subtitle: 'Protecting one block of unbroken sleep, and the line to watch',
       format: 'ARTICLE',
       bands: _allBands,
-      comingSoon: true,
-      blocks: [],
+      
+      blocks: [
+        // Written 2026-10-02 (parenting gap analysis), filling the scaffold.
+        // REQUIRED_REVIEW.
+        PpIntro('New-parent tiredness is not ordinary tiredness. It is broken '
+            'sleep, night after night, and it affects mood, memory and '
+            'healing. You cannot fix it completely while your baby is small, '
+            'but you can protect one good stretch.'),
+        PpArticle(heading: 'Broken sleep is the problem, not short sleep', [
+          'Six hours in three pieces feels far worse than five hours in one. '
+              'Your body needs a few unbroken cycles to feel rested. So the aim '
+              'is one protected block, ideally four hours or more, every '
+              'night.',
+        ]),
+        PpSteps(heading: 'Splitting the nights', [
+          PpStep('Take shifts with your husband or mother',
+              'One of you sleeps, earplugs in, in another room, while the other '
+                  'is on duty.'),
+          PpStep('If you are breastfeeding', 'The other adult brings the baby '
+              'to you, then does the burping, changing and settling.'),
+          PpStep('Go to bed early', 'Right after the first night feed.'),
+          PpStep('One daytime nap when you can', 'Even twenty minutes.'),
+        ]),
+        PpSteps(heading: 'When you cannot sleep even when your baby does', [
+          PpStep('Put the phone in another room',
+              'The baby monitor is enough. Scrolling keeps the brain awake.'),
+          PpStep('A short wind-down', 'Same order every time: wash, a warm '
+              'drink, lights low.'),
+          PpStep('If you are lying awake worrying',
+              'Write the worries down, then put the paper away.'),
+        ]),
+        PpCallout('Being unable to sleep most nights, even when you have the '
+            'chance, or exhaustion with hopelessness, can be a sign of '
+            'postpartum anxiety or depression. Talk to your doctor.',
+            kind: PpCalloutKind.doctor),
+      ],
     ),
   ],
 );
@@ -1520,7 +1690,7 @@ final PpArea _yourMind = PpArea(
         ),
         PpVideoSlot(
           title: 'I am anxious every minute',
-          subtitle: 'Checking her breathing at 3am. A therapist on postpartum '
+          subtitle: 'Checking the breathing at 3am. A therapist on postpartum '
               'anxiety and how to interrupt the loop.',
           minutes: '6 MIN',
           slotId: 'you_maa/feel_anxious',
@@ -1544,8 +1714,8 @@ final PpArea _yourMind = PpArea(
         ),
         PpVideoSlot(
           title: 'I feel completely alone',
-          subtitle: 'A mother in a full house, on the loneliest year of her '
-              'life.',
+          subtitle: 'A mother in a full house, on the loneliest year of a '
+              'lifetime.',
           minutes: '5 MIN',
           slotId: 'you_maa/feel_alone',
           hue: 268,
@@ -1586,7 +1756,7 @@ final PpArea _yourMind = PpArea(
             ['When it starts', 'Day 2 to day 5', 'Any time in the first year'],
             ['How long', 'Lifts within 2 weeks', 'Stays, or gets heavier'],
             ['Good moments', 'Yes, in between', 'Few, or none that reach you'],
-            ['Sleep', 'Tired but you sleep', 'Cannot sleep even when she does'],
+            ['Sleep', 'Tired but you sleep', 'Cannot sleep even when baby does'],
             [
               'Feeling towards baby',
               'Overwhelmed but connected',
@@ -1609,44 +1779,57 @@ final PpArea _yourMind = PpArea(
             'fall further and faster in the days after birth than at any other '
             'point in your life. Add no sleep and a body in pain and the result '
             'is tears with no cause.',
-            'Postpartum depression is not a stronger version of that. It is a '
-            'different thing, it is an illness rather than a mood, and it '
-            'responds to treatment in the same way that anaemia or a thyroid '
-            'problem does. It affects a large number of Indian mothers and almost '
-            'none of them get treated, because it is called weakness at home.',
+            'Postpartum depression is a different thing from the blues. It is an '
+            'illness rather than a mood, and it responds to treatment the way '
+            'anaemia or a thyroid problem does. It affects a large number of '
+            'Indian mothers. Almost none of them get treated, because it is '
+            'called weakness at home.',
             'It also does not need a reason. A wanted baby, a supportive '
             'husband, a comfortable house and a healthy delivery do not protect '
-            'you from it, and having all four is one of the reasons mothers stay '
-            'quiet. There is nothing to justify.',
+            'you from it. Having all four is one of the reasons mothers stay '
+            'silent. You do not have to justify it.',
           ], heading: 'What is happening'),
-        PpCallout('Two weeks is the line worth remembering. If it has been more '
-            'than two weeks and it has not lifted, or if it is getting heavier '
-            'rather than lighter, that is the point at which you talk to '
-            'somebody. Not because you have failed a test. Because it is easier '
-            'to treat early.'),
+        PpCallout('Two weeks is the line to remember. Has it been more than two '
+            'weeks without lifting? Is it getting heavier rather than lighter? '
+            'Then talk to somebody. You have not failed a test. It is just '
+            'easier to treat early.'),
         PpCallout(
-          'Talk to a doctor today, not in two weeks, if you cannot look after '
-          'yourself or the baby, if you feel you would be better off gone, if '
-          'you are thinking about harming yourself or her, or if you are hearing '
-          'or believing things others around you do not.',
+          'Talk to a doctor today, not in two weeks, if any of these are true. '
+          'You cannot look after yourself or the baby. You feel you would be '
+          'better off gone. You are thinking about harming yourself or your '
+          'baby. You are hearing or believing things others around you do not.',
           kind: PpCalloutKind.doctor,
           title: 'Do not wait for these',
         ),
         PpLink('Get help now',
             surfaceId: _crisis,
             blurb: 'If any of that last part is true, start here.'),
-        PpIndiaNote('At home this is called nazar, drama, too much thinking, or '
+        PpIndiaNote('At home this is called the evil eye, drama, too much thinking, or '
             'the result of using a phone at night. None of those are treatments. '
             'You can be respectful about the advice and still go to the doctor.'),
         PpConsult(
           title: 'Talk to a maternal mental health counsellor',
           whoFor: 'For any mother whose low mood has lasted more than two weeks, '
-              'or who simply wants to say all of this to someone who is not '
-              'family. You can book anonymously if you would rather nobody knew, '
+              'or who wants to say all of this to someone who is not family. '
+              'You can book anonymously if you would rather nobody knew, '
               'and nothing appears on any shared account.',
           surfaceId: 'pp_experts',
           role: 'maternal_mental_health',
         ),
+        // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+        PpCards(heading: 'Less common, and important', [
+          PpCard('Bipolar disorder after birth',
+              'If you have had bipolar disorder before, or someone in your '
+                  'family has, the weeks after birth carry a higher risk of an '
+                  'episode. Signs include very high energy, little need for '
+                  'sleep, racing thoughts, or a deep low. Tell your doctor in '
+                  'pregnancy so there is a plan.'),
+          PpCard('A wave of sadness at let-down (D-MER)',
+              'Some mothers feel a sudden sadness, dread or panic just as the '
+                  'milk lets down, which passes within minutes. It is a '
+                  'hormone reflex, not depression, and not a sign you do not '
+                  'want to feed. Knowing what it is often helps.'),
+        ]),
       ],
     ),
     PpPage(
@@ -1655,21 +1838,22 @@ final PpArea _yourMind = PpArea(
       format: 'ARTICLE',
       bands: _allBands,
       blocks: [
-        PpIntro('Checking her breathing four times a night. Certain something '
-            'terrible is about to happen. Unable to hand her to anyone. This is '
-            'postpartum anxiety and it is as common as low mood, and much less '
-            'talked about.'),
+        PpIntro('Checking the baby\'s breathing four times a night. Certain '
+            'something terrible is about to happen. Unable to hand the baby to '
+            'anyone. This is postpartum anxiety. It is as common as low mood, '
+            'and much less talked about.'),
         PpArticle([
             'Some hypervigilance after birth is designed in. A brain that wakes '
-            'at the smallest sound kept babies alive for a very long time. What '
-            'has happened is that the dial has jammed at maximum and will not '
-            'come down when the danger is not there.',
-            'It shows up in the body as much as the mind: a racing heart, a tight '
-            'chest, no appetite, sleeping badly even when the baby finally '
-            'sleeps, needing to check something again after you already checked.',
-            'It also loves specific worries. Cot death, the milk not being '
-            'enough, dropping her on the stairs, someone else holding her wrong. '
-            'The specificity is a symptom, not evidence.',
+            'at the smallest sound kept babies alive for a very long time. Now '
+            'the dial has jammed at maximum, and it will not come down when the '
+            'danger is not there.',
+            'It shows up in the body as much as the mind. A racing heart, a '
+            'tight chest, no appetite. Sleeping badly even when the baby finally '
+            'sleeps. Needing to check again after you already checked.',
+            'It also fixes on specific worries. Cot death, the milk not being '
+            'enough, dropping the baby on the stairs, someone else holding the '
+            'baby wrong. How specific they are is part of the anxiety. It is not '
+            'evidence.',
           ], heading: 'What is happening'),
         PpCards([
             PpCard('Do name it out loud to one person',
@@ -1679,25 +1863,26 @@ final PpArea _yourMind = PpArea(
                 'In for four, out for seven, six times. It works on the physical '
                 'part directly, which then calms the thinking part.'),
             PpCard('Do set one check, not five',
-                'Decide that you check her once when you go to bed. Then, hard as '
+                'Decide that you check once when you go to bed. Then, hard as '
                 'it is, do not check again. Repeated checking feeds it.'),
             PpCard('Do not google the symptom',
-                'A search at 2am has never once reassured a new mother. Write the '
+                'A search at 2am rarely reassures a new mother. Write the '
                 'question down and ask a real doctor in daylight.'),
             PpCard('Do reduce the caffeine',
                 'Four cups of chai on no sleep produces something almost '
                 'indistinguishable from anxiety.'),
             PpCard('Do not build your day around avoiding it',
-                'Never letting anyone else hold her makes the fear bigger, not '
-                'smaller.'),
+                'Never letting anyone else hold the baby makes the fear bigger, '
+                'not smaller.'),
           ], heading: 'What helps, and what makes it worse', hue: 268),
         PpCallout('Anxiety and depression arrive together far more often than '
             'either arrives alone. If you are anxious and also flat, that is one '
             'thing, not two, and it is the same treatment.'),
         PpCallout(
           'See a doctor if the anxiety is stopping you eating, sleeping or '
-          'leaving the house, if you have panic attacks, or if it has lasted more '
-          'than a few weeks. It treats well, often with talking therapy alone.',
+          'leaving the house. See a doctor too for panic attacks, or if it has '
+          'lasted more than a few weeks. It treats well, often with talking '
+          'therapy alone.',
           kind: PpCalloutKind.doctor,
         ),
         PpIndiaNote('If your house is full of people offering opinions on every '
@@ -1720,7 +1905,7 @@ final PpArea _yourMind = PpArea(
       format: 'ARTICLE',
       bands: _allBands,
       blocks: [
-        PpIntro('An image of dropping her down the stairs. A thought about the '
+        PpIntro('An image of dropping the baby down the stairs. A thought about the '
             'knife on the counter. Something so ugly you have never said it to '
             'anyone. Read this page. It is almost certainly not what you are '
             'afraid it is.'),
@@ -1739,8 +1924,8 @@ final PpArea _yourMind = PpArea(
         PpArticle([
             'The large majority of new mothers get intrusive thoughts about harm '
             'coming to the baby. Studies that ask the question directly find it '
-            'in most of them. Almost nobody says it out loud, so every mother '
-            'who has one believes she is the only one.',
+            'in most of them. Almost nobody says it out loud, so each mother '
+            'who has one believes no one else does.',
             'They arrive because your brain has switched into threat scanning '
             'mode to keep a fragile person alive. It generates worst cases '
             'constantly. In some mothers those come through as vivid pictures '
@@ -1749,7 +1934,7 @@ final PpArea _yourMind = PpArea(
             'thought that disgusts you is the opposite of an intention. Mothers '
             'with intrusive thoughts are, if anything, over careful.',
             'Where it becomes a problem is the rituals it drives. Hiding the '
-            'knives. Not bathing her alone. Checking twenty times. That pattern '
+            'knives. Not bathing the baby alone. Checking twenty times. That pattern '
             'has a name, postpartum obsessive compulsive disorder, and it treats '
             'very well.',
           ], heading: 'What is happening'),
@@ -1770,8 +1955,8 @@ final PpArea _yourMind = PpArea(
         PpCallout(
           'Having these thoughts does not make you a danger to your child, and '
           'no doctor in India is going to take your baby away because you '
-          'described one. That fear is the single biggest reason mothers stay '
-          'silent, and it is not how any of this works.',
+          'described one. That fear is the biggest reason mothers stay silent, '
+          'and it is not how any of this works.',
           kind: PpCalloutKind.myth,
         ),
         PpConsult(
@@ -1806,8 +1991,8 @@ final PpArea _yourMind = PpArea(
             'serene.',
             'And it is often anger at the right target pointed at the wrong one. '
             'The husband who sleeps through the night, the relative with opinions '
-            'and no hands, the doctor who did not warn you. The wet towel is '
-            'rarely about the towel.',
+            'and no help to give, the doctor who did not warn you. The anger at '
+            'the towel is usually about something bigger.',
           ], heading: 'What is happening'),
         PpSteps([
             PpStep('Put the baby down safely and step out of the room', 'A cot or the floor, and ten steps away. A crying baby in '
@@ -1818,21 +2003,21 @@ final PpArea _yourMind = PpArea(
             PpStep('Say it out loud, to nobody', 'I am furious and I am not going to do anything about it '
                     'right now. Naming it takes the top off.'),
             PpStep('Come back when your hands are steady', 'Not before. Nothing is lost by two more minutes.'),
-            PpStep('Afterwards, ask what you actually needed', 'Sleep, food, an hour alone, someone to take her. Then '
+            PpStep('Afterwards, ask what you needed', 'Sleep, food, an hour alone, someone to take the baby. Then '
                     'ask for that specific thing rather than apologising.'),
           ], heading: 'In the moment it rises'),
         PpCallout(
           'If you have shaken, hit or roughly handled your baby, or you are '
-          'frightened that you might, tell a doctor today. Not because you are a '
-          'bad mother. Because this is the point at which you need real help and '
-          'it exists.',
+          'frightened that you might, tell a doctor today. This does not make '
+          'you a bad mother. It means you need real help now, and that help '
+          'exists.',
           kind: PpCalloutKind.doctor,
           title: 'When it needs help today',
         ),
         PpLink('Get help now', surfaceId: _crisis),
         PpCallout(
-          'Feeling rage at your baby does not mean you do not love her. Rage and '
-          'love live in the same house and always have. What matters is what your '
+          'Feeling rage at your baby does not mean you do not love your baby. '
+          'Rage and love can sit side by side. What matters is what your '
           'hands do, and you can control that even when you cannot control the '
           'feeling.',
           kind: PpCalloutKind.myth,
@@ -1866,7 +2051,7 @@ final PpArea _yourMind = PpArea(
           ], heading: 'Why this is the hardest one to say'),
         PpScript([
             PpScriptLine(
-              say: 'I love her completely and I am also struggling. Both are '
+              say: 'I love my baby completely and I am also struggling. Both are '
                   'true. I need help with the struggling part.',
               notThis: 'I am fine, just a bit tired.',
               why: 'Naming both stops the other person having to choose which '
@@ -1874,7 +2059,7 @@ final PpArea _yourMind = PpArea(
             ),
             PpScriptLine(
               say: 'I do not need you to fix it or explain it. I need you to '
-                  'take her for two hours.',
+                  'take the baby for two hours.',
               notThis: 'No no, I can manage.',
               why: 'A specific request is much easier to say yes to than a '
                   'general one.',
@@ -1886,10 +2071,10 @@ final PpArea _yourMind = PpArea(
               why: 'A question invites a no. A statement does not.',
             ),
           ], heading: 'Borrow these words when you need them'),
-        PpCallout('If the not okay part has lasted more than two weeks, is '
-            'getting heavier, or has started to feel like this is simply who you '
-            'are now, that is the moment to talk to somebody. Waiting until it '
-            'is unbearable is the most common mistake, and the most avoidable.'),
+        PpCallout('Has the not okay part lasted more than two weeks? Is it '
+            'getting heavier, or starting to feel like who you are now? Then '
+            'talk to somebody. Many mothers wait until it is unbearable, and '
+            'there is no need to.'),
         PpConsult(
           title: 'Talk to a maternal mental health counsellor',
           whoFor: 'For the mother who cannot say this at home because of what '
@@ -1907,17 +2092,17 @@ final PpArea _yourMind = PpArea(
       bands: _allBands,
       blocks: [
         PpIntro('You are called somebody\'s mother everywhere now, sometimes '
-            'including by your own family. The woman who had a name, a job, '
-            'opinions and plans has not gone anywhere, but she is very hard to '
-            'find on a Tuesday afternoon.'),
+            'including by your own family. The woman with a name, a job, '
+            'opinions and plans has not gone anywhere. You may just find '
+            'her hard to reach on a Tuesday afternoon.'),
         PpArticle([
-            'There is a real psychological transition here, as large as '
-            'adolescence, and it has a name: matrescence. The reason nobody warns '
-            'you is that pregnancy books stop at delivery.',
-            'It is a genuine loss running alongside a genuine gain. Grieving the '
+            'There is a real psychological change here, as large as '
+            'adolescence, and it has a name: matrescence. Few people warn you, '
+            'because pregnancy books stop at delivery.',
+            'It is a real loss running alongside a real gain. Grieving the '
             'freedom, the body, the work identity, the spontaneous evening, the '
             'version of your marriage that existed before, is not ingratitude. '
-            'You can mourn something you chose to give up.',
+            'You can miss something you chose to give up.',
             'It also settles. Most mothers say that somewhere in the second year '
             'the two selves stop competing and become one person who happens to '
             'have a child. It does not feel like that at four months.',
@@ -1928,22 +2113,22 @@ final PpArea _yourMind = PpArea(
                 'language app, a friend you call, twenty minutes of a series. '
                 'Same thing, most days.'),
             PpCard('Get your name used',
-                'Ask your husband and your friends to use it. Being beta ki mummy '
+                'Ask your husband and your friends to use it. Being "the baby\'s mummy" '
                 'in every sentence, all day, does something to you.'),
             PpCard('Wear clothes you chose',
                 'Not smart clothes. Clothes that feel like you and fit the body '
                 'you have today, rather than waiting for a body you had before.'),
             PpCard('Say one sentence a day that is not about the baby',
-                'To your partner, at dinner. It sounds trivial. Try it for a '
+                'To your partner, at dinner. It sounds small. Try it for a '
                 'week.'),
             PpCard('Write down who you were, once',
                 'What you liked, what you were good at, what you wanted. Not to '
                 'act on. So it exists somewhere outside your memory.'),
           ], heading: 'Small things that help you stay findable', hue: 268),
-        PpCallout('This is not a phase to push through with more positivity. It '
-            'is a transition, it takes a couple of years, and mothers who name it '
-            'do noticeably better through it than mothers who assume something is '
-            'wrong with them.'),
+        PpCallout('Forcing yourself to be positive will not hurry this. It is a '
+            'change that takes a couple of years. Mothers who name it cope '
+            'noticeably better than mothers who assume something is wrong with '
+            'them.'),
         PpVideoSlot(
           title: 'Finding yourself again',
           subtitle: 'A conversation with mothers two years in about who they '
@@ -1961,32 +2146,31 @@ final PpArea _yourMind = PpArea(
       bands: _allBands,
       blocks: [
         PpIntro('Guilty for resting. Guilty for working. Guilty for formula, for '
-            'crying, for enjoying an hour without her, for wanting the day to '
-            'end. The guilt is not information about your mothering.'),
+            'crying, for enjoying an hour without the baby, for wanting the day to '
+            'end. The guilt tells you nothing about how good a mother you are.'),
         PpArticle([
-            'Guilt is meant to be a signal that you have done harm. In new '
-            'motherhood it fires constantly with no harm attached, because the '
-            'standard being measured against is impossible: a mother who is '
-            'endlessly available, endlessly patient, produces perfect milk, keeps '
-            'the house running and never minds.',
+            'Guilt is meant to signal that you have done harm. In new motherhood '
+            'it fires all the time with no harm done, because the standard is '
+            'impossible. A mother who is always available and always patient, '
+            'makes perfect milk, runs the house and never minds.',
             'Comparison makes it worse in a very specific way now. You are seeing '
             'the edited ten seconds of forty other mothers, at 2am, on a phone, '
             'while feeding. That is not a fair sample of anything.',
             'And in a joint family the comparison is in the room. Your sister in '
-            'law whose baby slept through, your cousin who was back in shape in '
-            'two months, your mother in law who did all this without a washing '
+            'law whose baby slept through. Your cousin who was back in shape in '
+            'two months. Your mother in law who did all this without a washing '
             'machine. None of these are your circumstances.',
-          ], heading: 'Where it actually comes from'),
+          ], heading: 'Where it comes from'),
         PpCards([
             PpCard('Ask what harm was done',
-                'Actually ask it. If the answer is none, the guilt is a false '
+                'Really ask it. If the answer is none, the guilt is a false '
                 'alarm, and you do not have to act on a false alarm.'),
             PpCard('Ask whose voice it is',
                 'A lot of guilt turns out to be a specific person\'s sentence '
                 'that you are now saying to yourself.'),
             PpCard('Take the comparison off your phone',
-                'Mute the accounts that make you feel behind. Not forever, just '
-                'this year.'),
+                'Mute the accounts that make you feel you are failing. Not '
+                'forever, just this year.'),
             PpCard('Notice what guilt is asking of you',
                 'It usually asks you to give up rest, food or help. Those are '
                 'the three things you cannot afford to give up.'),
@@ -1994,10 +2178,10 @@ final PpArea _yourMind = PpArea(
                 'The relief of hearing me too is enormous and unavailable from '
                 'anybody else.'),
           ], heading: 'What to do with a guilty feeling', hue: 268),
-        PpCallout('Guilt that has become constant, or has turned into believing '
-            'you are a bad mother or that your baby would be better off with '
-            'someone else, is a symptom rather than a mood. That belongs on the '
-            '"Baby blues, or something more?" page and with a doctor.'),
+        PpCallout('Has the guilt become constant? Do you believe you are a bad '
+            'mother, or that your baby would be better off with someone else? '
+            'That is a symptom rather than a mood. Read the "Baby blues, or '
+            'something more?" page, and see a doctor.'),
         PpLink('Other mothers at your stage',
             surfaceId: _circleSurface,
             blurb: 'The 4th trimester circle. Moderated, and nobody performs '
@@ -2014,14 +2198,13 @@ final PpArea _yourMind = PpArea(
             'particular loneliness is one of the hardest parts of the first year, '
             'and it is not solved by more company.'),
         PpArticle([
-            'Company is not the same as being known. A house full of relatives '
-            'who ask about the baby, comment on the feeding and leave the night '
-            'shift to you can be lonelier than an empty one, because the '
-            'loneliness now comes with an audience.',
-            'The friendships you had also go quiet, not out of unkindness. Your '
-            'hours changed, your conversation changed, and the friends without '
-            'children genuinely cannot follow you here yet.',
-            'What actually helps is narrow and specific: other mothers at your '
+            'Company is not the same as being known. Relatives may ask about the '
+            'baby, comment on the feeding and leave the night shift to you. A '
+            'house like that can feel lonelier than an empty one.',
+            'The friendships you had also go quiet, and not out of unkindness. '
+            'Your hours changed, your conversation changed, and friends without '
+            'children cannot follow you here yet.',
+            'What helps is narrow and specific: other mothers at your '
             'exact stage, and one person in your own life who asks about you '
             'rather than the baby.',
           ], heading: 'Why a full house does not fix it'),
@@ -2040,8 +2223,8 @@ final PpArea _yourMind = PpArea(
                 'Most people do not know how to ask. A single honest message '
                 'usually brings someone back.'),
             PpCard('Say what you want from a visitor',
-                'Come and hold her while I shower is a real invitation. It also '
-                'filters out the ones who came to inspect.'),
+                '"Come and hold the baby while I shower" is a real invitation. '
+                'It also filters out the ones who came to inspect.'),
           ], heading: 'Things that work', hue: 268),
         PpLink('The 4th trimester circle',
             surfaceId: _circleSurface,
@@ -2077,38 +2260,38 @@ final PpArea _yourMind = PpArea(
             'and nobody wrote the rota. Most of the fighting in the first year is '
             'about workload and invisible work, dressed up as arguments about '
             'towels and phones.',
-            'Resentment builds in a predictable direction. You are awake at '
-            'night, tracking everything, and physically recovering. He is likely '
-            'to be sleeping, back at work, and to genuinely believe he is helping '
-            'a lot. Both of you are exhausted and neither feels seen.',
-            'The couples who come through it well are not the ones who fight '
-            'less. They are the ones who name the load out loud early and split '
-            'it explicitly rather than by default.',
-          ], heading: 'What is actually happening between you'),
+            'Resentment builds in a familiar way. You are awake at night, '
+            'tracking everything, and physically recovering. Your husband is '
+            'likely sleeping, back at work, and sure that is a lot of help. Both '
+            'of you are exhausted and neither feels seen.',
+            'Couples who come through it well do not fight less. They name the '
+            'load out loud early, and split it on purpose rather than by '
+            'default.',
+          ], heading: 'What is happening between you'),
         PpScript([
             PpScriptLine(
-              say: 'From 10pm to 2am she is yours, and I am not on call. I need '
-                  'to know I am off duty for four hours.',
+              say: 'From 10pm to 2am the baby is yours, and I am not on call. I '
+                  'need to know I am off duty for four hours.',
               notThis: 'You never help at night.',
               why: 'A shift can be agreed. A complaint can only be defended '
                   'against.',
             ),
             PpScriptLine(
-              say: 'I do not want you to help me with the baby. She is also '
-                  'yours. I want us to divide her.',
+              say: 'I do not want you to help me with the baby. Our baby is '
+                  'yours too. I want us to share the care.',
               notThis: 'Thanks for helping.',
-              why: 'The word help is the whole problem. It makes her your job and '
-                  'his favour.',
+              why: 'The word help is the problem. It makes the baby your job, '
+                  'and a favour from your husband.',
             ),
             PpScriptLine(
               say: 'When your mother says that about my feeding, I need you to '
-                  'answer her. Not me.',
+                  'answer. Not me.',
               notThis: 'Your mother is impossible.',
-              why: 'It asks for a specific action and avoids a fight about his '
-                  'family.',
+              why: 'It asks for a specific action and avoids a fight about your '
+                  'in-laws.',
             ),
             PpScriptLine(
-              say: 'Ask me how I am, before you ask how she slept.',
+              say: 'Ask me how I am, before you ask how the baby slept.',
               why: 'Small, and it changes the shape of the evening.',
             ),
           ], heading: 'Sentences that get somewhere'),
@@ -2118,26 +2301,39 @@ final PpArea _yourMind = PpArea(
             PpCard('Split by task, not by availability',
                 'Whoever is free ends up meaning whoever notices, which ends up '
                 'meaning you.'),
-            PpCard('Let him do it his way',
-                'Correcting the nappy, the swaddle and the burping is how a '
-                'father quietly becomes an assistant.'),
+            PpCard('Let your husband do it differently from you',
+                'Correcting the nappy, the swaddle and the burping slowly turns '
+                'a father into an assistant.'),
             PpCard('Say the good things out loud',
                 'Both of you are running on nothing. Noticing costs you a '
                 'sentence.'),
           ], heading: 'Things that protect a marriage this year', hue: 268),
-        PpCallout('If there is shouting that frightens you, controlling '
-            'behaviour, any physical roughness, or being stopped from seeing a '
-            'doctor or your own family, that is not first year strain. Tell your '
+        PpCallout('Shouting that frightens you, controlling behaviour, any '
+            'physical roughness, or being stopped from seeing a doctor or your '
+            'own family: that is not first year strain. Tell your '
             'doctor privately at your next visit. They are trained to ask and to '
             'help.'),
         PpConsult(
-          title: 'Talk to a counsellor, with or without him',
-          whoFor: 'For couples stuck in the same fight every week, or for a '
-              'mother who wants to work out on her own what she needs before she '
-              'raises it. You do not need his agreement to book for yourself.',
+          title: 'Talk to a counsellor, together or on your own',
+          whoFor: 'For couples stuck in the same fight every week. Or for you, '
+              'if you want to work out on your own what you need before you '
+              'raise it. You do not need your husband\'s agreement to book.',
           surfaceId: 'pp_experts',
           role: 'maternal_mental_health',
         ),
+        // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+        PpCards(heading: 'Keeping the two of you close', [
+          PpCard('Ten minutes a day', 'Tea together once the baby sleeps, no '
+              'phones. It counts.'),
+          PpCard('A date at home', 'A favourite meal, a film, a walk on the '
+              'terrace.'),
+          PpCard('Touch without expectation', 'A hug or a hand held, '
+              'without it having to lead anywhere.'),
+          PpCard('Accept a babysitting offer',
+              'An hour out while a grandparent takes over.'),
+          PpCard('Thank each other', 'For the night feed, the dishes, the '
+              'patience.'),
+        ]),
       ],
     ),
     PpPage(
@@ -2154,13 +2350,14 @@ final PpArea _yourMind = PpArea(
         // sign list below, the typical onset window, and the emergency framing. A
         // psychiatrist must confirm all four before ship.
         PpCallout(
-          'Go to a hospital today, or call your doctor immediately, if a mother '
-          'is: hearing or seeing things others do not, believing things that are '
-          'not true, unusually suspicious of people close to her, not sleeping at '
-          'all for a night or more without feeling tired, speaking very fast or '
-          'confusingly, wildly high one hour and desperate the next, behaving '
-          'completely unlike herself, or saying anything about harming herself or '
-          'the baby. Do not wait to see if it passes and do not leave her alone.',
+          'Go to a hospital today, or call your doctor immediately, if a new '
+          'mother has any of these. Hearing or seeing things others do not. '
+          'Believing things that are not true. Being unusually suspicious of '
+          'people close to her. Not sleeping at all for a night or more without '
+          'feeling tired. Speaking very fast or confusingly. Wildly high one hour '
+          'and desperate the next. Behaving completely unlike herself. Saying '
+          'anything about harming herself or the baby. Do not wait to see if it '
+          'passes, and do not leave her alone.',
           kind: PpCalloutKind.doctor,
           title: 'This is an emergency, and it is treatable',
         ),
@@ -2169,19 +2366,19 @@ final PpArea _yourMind = PpArea(
             blurb: 'A number to call, right now, at any hour.'),
         PpArticle([
             'It usually begins early, most often in the first two weeks, and it '
-            'can come on within hours. That speed is why the people around her '
-            'matter as much as she does. Show them this page.',
-            'It is not caused by weakness, by bad thoughts, by nazar or by '
-            'anything she did. The risk is higher if she or a close relative has '
-            'had bipolar disorder or a previous episode after a birth, and it is '
-            'worth telling her obstetrician if that is true before she delivers.',
+            'can come on within hours. That speed is why the family around a '
+            'mother matters so much. Show them this page.',
+            'It is not caused by weakness, by bad thoughts, by the evil eye or by '
+            'anything the mother did. The risk is higher after bipolar disorder, '
+            'or a previous episode after a birth, in her or a close relative. If '
+            'that is true, tell the obstetrician before delivery.',
             'With treatment, most mothers recover fully. The outcomes are good. '
-            'The thing that changes those outcomes is how quickly she is seen.',
+            'What changes those outcomes most is how quickly she is seen.',
           ], heading: 'What to know'),
         PpCallout(
-          'If you are reading this because you are worried about a mother in your '
-          'family: believe her behaviour over her reassurance, stay with her, and '
-          'take her in. Being wrong about this costs you an afternoon. Being late '
+          'Are you reading this because you are worried about a mother in your '
+          'family? Trust what she does over what she says. Stay with her, and '
+          'take her in. Being wrong about this costs you an afternoon. Waiting '
           'costs much more.',
           kind: PpCalloutKind.key,
         ),
@@ -2193,7 +2390,7 @@ final PpArea _yourMind = PpArea(
     ),
     PpPage(
       id: 'mind_getting_help',
-      title: 'How to actually get help, in India',
+      title: 'How to get help, in India',
       format: 'STEP-LIST',
       bands: _allBands,
       blocks: [
@@ -2241,8 +2438,8 @@ final PpArea _yourMind = PpArea(
           ], heading: 'What is not true', hue: 268),
         PpConsult(
           title: 'Maternal mental health counselling, one to one',
-          whoFor: 'For any mother who wants to talk to a trained person about how '
-              'she is feeling. Online or in person, and there is an anonymous '
+          whoFor: 'For you, if you want to talk to a trained person about how '
+              'you are feeling. Online or in person, and there is an anonymous '
               'booking option if privacy at home is a problem.',
           surfaceId: 'pp_experts',
           role: 'maternal_mental_health',
@@ -2258,6 +2455,43 @@ final PpArea _yourMind = PpArea(
         PpLink('Get help now',
             surfaceId: _crisis,
             blurb: 'If today is worse than that, start here instead.'),
+      ],
+    ),
+    // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+    PpPage(
+      id: 'mind_birth_trauma',
+      title: 'When the birth keeps replaying',
+      subtitle: 'Birth trauma and postpartum PTSD',
+      format: 'ARTICLE',
+      bands: _allBands,
+      blocks: [
+        PpIntro('For some mothers, the birth was frightening: an emergency, '
+            'fear for the baby, feeling unheard, or pain that went on too '
+            'long. Afterwards, the memories may keep coming back. This is '
+            'called birth trauma, and when it lingers it can become '
+            'postpartum PTSD. It is not weakness, and it can be treated.'),
+        PpCards(heading: 'Signs to notice', [
+          PpCard('Flashbacks or nightmares', 'Reliving the birth as if it is '
+              'happening again.'),
+          PpCard('Avoiding reminders', 'The hospital, talking about it, '
+              'sometimes even the baby\'s birthday.'),
+          PpCard('Always on edge', 'Jumpy, irritable, unable to relax or '
+              'sleep.'),
+          PpCard('Feeling numb or detached', 'Including from the baby.'),
+        ]),
+        PpSteps(heading: 'What helps', [
+          PpStep('Talk to your doctor',
+              'Trauma-focused talking therapy works well, and medicine may '
+                  'help.'),
+          PpStep('Ask for a birth debrief',
+              'Many hospitals will go through your notes with you, which '
+                  'answers questions that keep you awake.'),
+          PpStep('Tell your partner what you need',
+              'They may not know how frightening it was for you.'),
+        ]),
+        PpCallout('If you feel unsafe, or have thoughts of harming yourself, '
+            'get help today: call Tele-MANAS on 14416, free and any time.',
+            kind: PpCalloutKind.doctor),
       ],
     ),
   ],
@@ -2302,9 +2536,9 @@ final PpArea _pelvicFloor = PpArea(
             'is part of your core, working with your diaphragm and your deep '
             'abdominals every time you breathe or lift. And it is involved in '
             'sensation during sex.',
-            'So when it is weak or too tight, the symptoms look unrelated to each '
-            'other: leaking, a dragging feeling, back pain, a belly that will not '
-            'flatten, pain during sex, urgency. They are one system.',
+            'So when it is weak or too tight, the symptoms seem unrelated. '
+            'Leaking, a dragging feeling, back pain, a belly that will not '
+            'flatten, pain during sex, urgency. They all come from one system.',
             'It is skeletal muscle, like your bicep. That is the good news, '
             'because it means it trains. Women get meaningful improvement '
             'starting at six months, at two years, and at fifty.',
@@ -2321,8 +2555,8 @@ final PpArea _pelvicFloor = PpArea(
               'this before delivery day.',
           hue: 206,
         ),
-        PpCallout('Leaking is not the price of motherhood and not something to '
-            'quietly manage with pads for thirty years. It is a muscle problem '
+        PpCallout('Leaking is not the price of motherhood, and not something to '
+            'manage with pads for thirty years. It is a muscle problem '
             'with a muscle treatment, and it is one of the most treatable things '
             'in this entire section.'),
         PpWhenLine('Start with the breathing page from the first weeks. The '
@@ -2356,7 +2590,8 @@ final PpArea _pelvicFloor = PpArea(
                 'In that order. Both pages are in this section. Doing kegels '
                 'without finding the muscle first is why they fail.'),
             PpCard('Do the knack before you cough',
-                'Squeeze and lift a moment before you cough, sneeze or lift her. '
+                'Squeeze and lift a moment before you cough, sneeze or lift your '
+                'baby. '
                 'It works immediately, before any strength is gained.'),
             PpCard('Do not cut down your water',
                 'Concentrated urine irritates the bladder and makes urgency '
@@ -2369,14 +2604,14 @@ final PpArea _pelvicFloor = PpArea(
             PpCard('Do treat constipation seriously',
                 'Straining daily on the toilet undoes months of pelvic floor '
                 'work.'),
-          ], heading: 'What helps, and what quietly makes it worse', hue: 206),
-        PpCallout('Wearing a pad is a reasonable thing to do while you are '
-            'fixing this. It is not a reasonable thing to do instead of fixing '
-            'this.'),
+          ], heading: 'What helps, and what makes it worse', hue: 206),
+        PpCallout('Wearing a pad while you work on this is perfectly sensible. '
+            'Just do not let the pad replace the work.'),
         PpCallout(
-          'See a doctor for burning, blood in your urine, fever with back pain, '
-          'no warning at all before you leak, leaking large amounts, or if you '
-          'cannot pass urine properly. And see a pelvic floor physiotherapist '
+          'See a doctor for burning, blood in your urine, or fever with back '
+          'pain. See a doctor too for no warning at all before you leak, leaking '
+          'large amounts, or if you cannot pass urine properly. And see a pelvic '
+          'floor physiotherapist '
           'rather than trying harder if there is no improvement after three '
           'months of doing the exercises correctly.',
           kind: PpCalloutKind.doctor,
@@ -2387,7 +2622,7 @@ final PpArea _pelvicFloor = PpArea(
           title: 'Pelvic floor physiotherapy assessment',
           whoFor: 'For leaking that has not improved after three months of doing '
               'the work, or if you cannot tell whether you are squeezing the '
-              'right muscle. A physiotherapist checks what is actually happening '
+              'right muscle. A physiotherapist checks what is really happening '
               'rather than guessing, and gives you a programme for your body.',
           surfaceId: 'pp_experts',
           role: 'physio',
@@ -2413,30 +2648,30 @@ final PpArea _pelvicFloor = PpArea(
             'worse after a day on your feet, worse when constipated, better lying '
             'down. Many women can feel a soft bulge at the entrance.',
             'It gets worse with load and better with support. So the first '
-            'treatment is not harder exercise, it is less standing, no heavy '
-            'lifting, and getting your bowels soft.',
+            'treatment is less standing, no heavy lifting, and soft bowels. '
+            'Harder exercise comes later, if at all.',
           ], heading: 'What is happening'),
         PpCards([
             PpCard('Get off your feet in the second half of the day',
-                'Lying down for twenty minutes twice a day genuinely relieves '
+                'Lying down for twenty minutes twice a day really does relieve '
                 'it.'),
             PpCard('Stop lifting heavy things, properly',
                 'The water bucket, the toddler, the gas cylinder, the suitcase. '
                 'Ask, or split the load in two.'),
             PpCard('Fix the constipation first',
-                'Daily straining is the single biggest thing making it worse.'),
+                'Daily straining is the biggest thing making it worse.'),
             PpCard('Breathe out on effort',
                 'Never hold your breath and push down to lift. Exhale as you '
                 'lift.'),
             PpCard('Do the exercises, and see a physio',
                 'Both. The exercises help. A physiotherapist can tell you what '
-                'has actually moved and whether a support pessary would help.'),
+                'has moved and whether a support pessary would help.'),
           ], heading: 'What to do now', hue: 206),
         PpCallout(
           'See a doctor or a pelvic floor physiotherapist for a bulge you can '
-          'see or feel at the vaginal opening, difficulty passing urine or '
-          'stool, needing to push a bulge back to empty, pain, or heaviness that '
-          'is getting worse rather than better. This is not something to wait out '
+          'see or feel at the vaginal opening, or difficulty passing urine or '
+          'stool. Go too if you need to push a bulge back to empty, for pain, or '
+          'for heaviness that is getting worse. This is not something to wait out '
           'for years, and treatment does not have to mean surgery.',
           kind: PpCalloutKind.doctor,
           title: 'See someone about this',
@@ -2451,8 +2686,8 @@ final PpArea _pelvicFloor = PpArea(
         PpConsult(
           title: 'Pelvic floor physiotherapy assessment',
           whoFor: 'For heaviness, dragging or a bulge, at any point after birth. '
-              'An assessment tells you what has moved and what will actually '
-              'help, which is not the same for every mother.',
+              'An assessment tells you what has moved and what will help you, '
+              'which is not the same for every mother.',
           surfaceId: 'pp_experts',
           role: 'physio',
         ),
@@ -2476,8 +2711,8 @@ final PpArea _pelvicFloor = PpArea(
             'the first weeks. Anything that has not settled by about six weeks '
             'needs a professional, and there is real treatment: physiotherapy '
             'first, and surgery only in a minority.',
-            'This is the one symptom in this section where waiting genuinely '
-            'costs you. Please do not leave it.',
+            'Of everything in this section, this is where waiting costs you '
+            'most. Please do not leave it.',
           ], heading: 'Why to say it out loud'),
         PpCallout(
           'Tell your doctor if you cannot control wind or stool, have to rush to '
@@ -2526,18 +2761,18 @@ final PpArea _pelvicFloor = PpArea(
             'Dryness, which is the most common one by a distance. Breastfeeding '
             'keeps oestrogen low, and low oestrogen makes vaginal tissue thin and '
             'dry. It is a hormonal state, not a comment on desire. A water based '
-            'lubricant fixes most of it, generously and without embarrassment.',
+            'lubricant, used generously and without embarrassment, fixes most '
+            'of it.',
             'A tender scar. Tissue where you tore or were cut can stay sensitive '
             'for months and can heal slightly tight. Scar massage and, if needed, '
             'a physiotherapist resolves this.',
             'A pelvic floor that is too tight rather than too weak. After a '
             'painful birth these muscles often guard. Then penetration hurts, '
             'which makes them guard harder. Kegels are the wrong treatment here '
-            'and make it worse, which is a reason to be assessed rather than '
-            'guessing.',
+            'and make it worse, so get assessed rather than guessing.',
             'And not being ready. Fear of pain, exhaustion, feeling touched out '
-            'all day, and no privacy in a joint family are real physical '
-            'obstacles, not excuses.',
+            'all day, and no privacy in a joint family are real obstacles. '
+            'They are not excuses.',
           ], heading: 'The usual causes, and what fixes them'),
         PpSteps([
             PpStep('Wait until bleeding has stopped and you feel ready', 'Usually after the six week check. Being medically '
@@ -2556,9 +2791,9 @@ final PpArea _pelvicFloor = PpArea(
           ], heading: 'If you want to try again gently'),
         PpCallout(
           'See a doctor or a pelvic floor physiotherapist for pain that continues '
-          'past a few attempts, pain in a specific spot on a scar, bleeding after '
-          'sex, or pain deep inside. All of these have treatments, and none of '
-          'them require you to wait a year to see if it settles.',
+          'past a few attempts, or pain in one spot on a scar. Go too for '
+          'bleeding after sex, or pain deep inside. All of these have treatments, '
+          'and none of them need you to wait a year to see if it settles.',
           kind: PpCalloutKind.doctor,
         ),
         PpWhenLine('Most couples restart somewhere between six weeks and six '
@@ -2567,7 +2802,7 @@ final PpArea _pelvicFloor = PpArea(
         PpIndiaNote('If there is pressure at home to resume, or about a second '
             'child soon, that is worth saying out loud to your own doctor at your '
             'next visit. It is a medical matter as much as a private one, and '
-            'they can help you push back with an actual reason.'),
+            'they can help you push back with a real reason.'),
         PpConsult(
           title: 'Pelvic floor physiotherapy assessment',
           whoFor: 'For pain during sex after birth, a tender scar, or a pelvic '
@@ -2610,8 +2845,8 @@ final PpArea _pelvicFloor = PpArea(
             'Squeezing a muscle that is already gripping makes it grip harder. '
             'That is the one scenario where doing your exercises diligently makes '
             'you worse, and it is not rare after a difficult birth.',
-            'An assessment is a fifteen minute answer to a question you cannot '
-            'answer at home. That is genuinely the whole reason to go.',
+            'An assessment gives you a fifteen minute answer to a question you '
+            'cannot answer at home. That is the whole reason to go.',
           ], heading: 'Why more kegels is sometimes the wrong answer'),
         PpCards([
             PpCard('A conversation first',
@@ -2651,10 +2886,9 @@ final PpArea _pelvicFloor = PpArea(
       format: 'ACTIVITY',
       bands: _allBands,
       blocks: [
-        PpIntro('This is not a relaxation exercise, although it relaxes you. It '
-            'is the first exercise of your recovery, because your diaphragm and '
-            'your pelvic floor move together, and getting that rhythm back is '
-            'what everything else is built on.'),
+        PpIntro('It will relax you, and it is also the first exercise of your '
+            'recovery. Your diaphragm and your pelvic floor move together. '
+            'Everything else is built on getting that rhythm back.'),
         PpArticle([
             'When you breathe in, your diaphragm drops and your pelvic floor '
             'gently lengthens. When you breathe out, both come back up. That pair '
@@ -2679,7 +2913,7 @@ final PpArea _pelvicFloor = PpArea(
             'after birth. Do it while feeding and it costs you no extra time.'),
         PpCallout('If you have been holding your belly in for years, or since '
             'the baby, this will feel wrong at first. Letting the belly rise is '
-            'the exercise. Sucking it in is the habit you are undoing.'),
+            'the exercise. You are slowly undoing the habit of sucking it in.'),
         PpVideoSlot(
           title: 'Belly breathing, demonstrated',
           subtitle: 'Where to put your hands, what should move, and the two '
@@ -2769,9 +3003,9 @@ final PpArea _pelvicFloor = PpArea(
           hue: 206,
         ),
         PpCallout(
-          'If you genuinely cannot feel anything happening, or it hurts, stop and '
+          'If you really cannot feel anything happening, or it hurts, stop and '
           'see a pelvic floor physiotherapist rather than trying harder. Feeling '
-          'nothing is information, not failure.',
+          'nothing tells you something useful. You have not failed.',
           kind: PpCalloutKind.doctor,
         ),
         PpIndiaNote('You can do these sitting in a bus, standing in a queue, or '
@@ -2793,8 +3027,8 @@ final PpArea _pelvicFloor = PpArea(
             'Slow endurance fibres do the all day holding. Long holds train '
             'those, and they are what reduce heaviness and dragging.',
             'Fast fibres do the emergency closing. Quick flicks train those, and '
-            'they are what stops the leak when you cough, laugh or lift her '
-            'suddenly.',
+            'they are what stops the leak when you cough, laugh or lift your '
+            'baby suddenly.',
             'Once you can do both, the last piece is using it on purpose at the '
             'moment of effort. That is on the next page.',
           ], heading: 'Why both'),
@@ -2814,7 +3048,7 @@ final PpArea _pelvicFloor = PpArea(
         PpSteps([
             PpStep('Week one to two, lying down', 'Easiest, gravity is not against you.'),
             PpStep('Then sitting', 'Harder, and closer to real life.'),
-            PpStep('Then standing', 'Hardest, and the position you actually need it in.'),
+            PpStep('Then standing', 'Hardest, and the position you need it in most.'),
           ], heading: 'And in different positions'),
         PpWhenLine('Both sets, once or twice a day, from about eight weeks and '
             'ongoing. Keep going for at least three to six months.'),
@@ -2836,10 +3070,9 @@ final PpArea _pelvicFloor = PpArea(
       format: 'ACTIVITY',
       bands: _cleared,
       blocks: [
-        PpIntro('This is the exercise that turns three separate things into one '
-            'working system. It is also the real starting point for your '
-            'stomach, and it does more for a separated abdominal wall than any '
-            'crunch ever will.'),
+        PpIntro('This exercise turns three separate things into one working '
+            'system. It is also the real starting point for your stomach. It '
+            'does more for a separated abdominal wall than any crunch.'),
         PpArticle([
             'Your diaphragm at the top, your deep abdominal muscle wrapping '
             'around like a corset, and your pelvic floor at the base. They are '
@@ -2870,7 +3103,7 @@ final PpArea _pelvicFloor = PpArea(
             PpCard('No rib flare or tucking the pelvis',
                 'Ribs stay down, pelvis stays neutral, back not pressed flat.'),
             PpCard('Then take it into life',
-                'Do it as you stand up, lift her, or get out of bed. That is '
+                'Do it as you stand up, lift your baby, or get out of bed. That is '
                 'when it starts mattering.'),
           ], heading: 'What to watch for', hue: 206),
         PpWhenLine('From about six to eight weeks, once your kegels feel '
@@ -2891,14 +3124,14 @@ final PpArea _pelvicFloor = PpArea(
     ),
     PpPage(
       id: 'pf_ex_functional',
-      title: 'Using it when you lift, cough and carry her',
+      title: 'Using it when you lift, cough and carry your baby',
       format: 'ACTIVITY',
       bands: _later,
       blocks: [
         PpIntro('You do not leak while lying on the bed doing kegels. You leak '
             'while lifting a toddler off the floor with a cough coming. This is '
-            'the exercise that closes that gap, and it is the one most mothers '
-            'never get told about.'),
+            'the exercise that closes that gap, and most mothers are never told '
+            'about it.'),
         PpArticle([
             'It is called the knack: a deliberate squeeze and lift a moment '
             'before the effort, rather than during or after. Trained into the '
@@ -2908,7 +3141,7 @@ final PpArea _pelvicFloor = PpArea(
             'few weeks of consciously doing it at the same moments.',
           ], heading: 'What it is'),
         PpSteps([
-            PpStep('Before you lift her out of the cot', 'Breathe out, lift the pelvic floor, then lift her. '
+            PpStep('Before you lift your baby out of the cot', 'Breathe out, lift the pelvic floor, then lift. '
                     'Never hold your breath.'),
             PpStep('Before you cough or sneeze', 'You usually get half a second of warning. Use it.'),
             PpStep('Before you stand up from the floor', 'Which you do about fifty times a day, so it is excellent '
@@ -2918,7 +3151,7 @@ final PpArea _pelvicFloor = PpArea(
             PpStep('On the way up from a squat', 'Exhale and lift as you rise, not as you go down.'),
           ], heading: 'The moments to attach it to'),
         PpCards([
-            PpCard('Squats holding her',
+            PpCard('Squats holding your baby',
                 'Ten slow squats with the baby held at your chest, exhaling and '
                 'lifting as you rise. Functional and unavoidable practice.'),
             PpCard('Step ups on a stair',
@@ -2989,19 +3222,18 @@ const PpArea _movement = PpArea(
           'every ligament you have, doubled the blood in your body and shifted '
           'your centre of gravity. None of that is damage and none of it is a '
           'mistake to be corrected.',
-          'A body does not reverse that in six weeks, and nothing that claims '
-          'to is telling the truth. What actually happens is slower and less '
-          'dramatic: tissue reorganises, muscles relearn how to fire, and '
-          'somewhere between six months and two years you arrive at a body that '
-          'works well and is not identical to the one you had.',
+          'A body does not reverse that in six weeks, whatever anyone claims. '
+          'What happens is slower and gentler. Tissue reorganises and muscles '
+          'relearn how to fire. Somewhere between six months and two years, you '
+          'arrive at a body that works well and is a little different from before.',
           'So there is no weight anywhere in this part of the app. No target, '
           'no before and after, no photograph of somebody else at three months. '
-          'Not because weight is shameful to talk about, but because it is the '
-          'wrong measurement of whether your recovery is going well.',
-        ], heading: 'What actually happened to your body'),
+          'Weight is not shameful to talk about. It is just the wrong way to '
+          'measure whether your recovery is going well.',
+        ], heading: 'What happened to your body'),
         PpCards([
-          PpCard('Your back stops hurting when you carry her',
-              'The most reliable sign the deep system is coming back online.'),
+          PpCard('Your back stops hurting when you carry your baby',
+              'The most reliable sign the deep system is working again.'),
           PpCard('You can get up off the floor without bracing',
               'Fifty times a day. This is the strength that changes your life.'),
           PpCard('You stop leaking when you cough or sneeze',
@@ -3013,8 +3245,8 @@ const PpArea _movement = PpArea(
         ], heading: 'What we measure instead', hue: 152),
         PpCallout(
           'Losing weight is not a goal this app will ever set for you. If you '
-          'want to move, move because it makes carrying her easier and the day '
-          'lighter. Those reasons hold up on the days the mirror does not.',
+          'want to move, move because it makes carrying your baby easier and '
+          'the day lighter. Those reasons still hold on the hard days.',
         ),
         PpCallout(
           'The idea that a mother should look unpregnant within weeks is about '
@@ -3026,7 +3258,7 @@ const PpArea _movement = PpArea(
         PpIndiaNote('The comment will come, and usually from someone who loves '
             'you. You do not have to argue with it. "My doctor has not cleared '
             'me for that yet" ends the conversation, and for the first six weeks '
-            'it is simply true.'),
+            'it is true.'),
       ],
     ),
     PpPage(
@@ -3055,8 +3287,8 @@ const PpArea _movement = PpArea(
               'Around the room, to the balcony, down the corridor. Five minutes '
               'at a time is enough at the start.'),
           PpStep('Change position every hour you are awake',
-              'Sitting folded over a feeding baby for four hours is the single '
-              'biggest cause of the back and neck pain coming next month.'),
+              'Sitting folded over a feeding baby for four hours is the biggest '
+              'cause of the back and neck pain that comes next month.'),
           PpStep('Do the belly breathing, ten breaths, a few times a day',
               'It is on the pelvic floor pages. Safe from the first days, '
               'including after a caesarean, and it is the foundation of '
@@ -3074,15 +3306,15 @@ const PpArea _movement = PpArea(
             'loads your stomach or your pelvic floor until you are cleared.'),
         PpCallout(
           'Bleeding that increases or turns bright red again after you have been '
-          'more active is your body asking you to do less, not a reason to '
-          'worry. Rest for a day and start smaller.',
+          'more active is your body asking you to do less. It is not a reason '
+          'to panic. Rest for a day and start smaller.',
           kind: PpCalloutKind.safety,
         ),
         PpCallout(
           'Call your doctor now for pain, swelling, redness or warmth in one '
-          'calf, for sudden breathlessness or chest pain, or for a wound that '
-          'starts to gape or ooze after you have been walking. The first two are '
-          'clot symptoms and they are an emergency, not a wait and see.',
+          'calf, or for sudden breathlessness or chest pain. Call too for a '
+          'wound that starts to gape or ooze after you have been walking. The '
+          'first two are clot symptoms. They are an emergency, not a wait and see.',
           kind: PpCalloutKind.doctor,
           title: 'Stop and call, do not wait for the check',
         ),
@@ -3091,15 +3323,33 @@ const PpArea _movement = PpArea(
         // treat them as an emergency. Venous thromboembolism is a leading cause
         // of maternal death postpartum, so a clinician must confirm this wording
         // is both accurate and non alarming.
-        PpIndiaNote('Jaapa often means being kept in one room for forty days. '
-            'Rest and warmth are genuinely good for you. Not moving at all is '
-            'not, and it is the one part of the tradition that a doctor will '
-            'disagree with. Walking inside the house counts.'),
+        PpIndiaNote('The forty days of rest often mean being kept in one room. '
+            'Rest and warmth are good for you. Not moving at all is not, and it '
+            'is the one part of the tradition a doctor will disagree with. '
+            'Walking inside the house counts.'),
+        // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+        PpCards(heading: 'Can I...? in the first six weeks', [
+          PpCard('Lift my baby', 'Yes. After a caesarean, nothing much '
+              'heavier than your baby.'),
+          PpCard('Lie on my tummy', 'Yes, if it is comfortable. Sore breasts '
+              'may decide for you.'),
+          PpCard('Laugh, cough or sneeze', 'Yes. Holding a pillow to a '
+              'caesarean scar helps.'),
+          PpCard('Squat or sit cross-legged', 'Gently, if it does not pull at '
+              'stitches.'),
+          PpCard('Drive', 'After a caesarean, usually after about six weeks, '
+              'once you can brake hard without pain.'),
+          PpCard('Travel by train, bus or plane', 'Short trips are fine; long '
+              'journeys can wait a few weeks, and move often to prevent '
+              'clots.'),
+          PpCard('Ride pillion on a two-wheeler', 'Wait until stitches have '
+              'healed and you can sit comfortably, and never with the baby.'),
+        ]),
       ],
     ),
     PpPage(
       id: 'move_six_week_check',
-      title: 'The six week check, and what "cleared" actually means',
+      title: 'The six week check, and what "cleared" really means',
       format: 'ARTICLE',
       bands: _early,
       blocks: [
@@ -3107,18 +3357,19 @@ const PpArea _movement = PpArea(
             'most mothers walk out of it without asking the question they came '
             'in with. Here is what to ask, in words.'),
         PpArticle([
-          'The check exists to confirm you are not bleeding, not infected, that '
-          'your wound or stitches have healed, that your blood pressure is fine '
-          'and that you have contraception if you want it. It is a safety check.',
-          'It is not a declaration that healing is finished. Deep muscle, '
+          'The check is there to confirm you are not bleeding or infected, and '
+          'that your wound or stitches have healed. It checks your blood '
+          'pressure, and that you have contraception if you want it. It is a '
+          'safety check.',
+          'It does not mean healing is finished. Deep muscle, '
           'connective tissue and a caesarean scar are all still remodelling at '
           'six weeks and will be for months. "Cleared" means it is now safe to '
           'begin loading your body gradually. It does not mean you are back to '
           'where you were.',
           'And it is not automatic. Some mothers are told to wait longer, '
           'usually after a difficult birth, a third or fourth degree tear, or a '
-          'complicated caesarean. That is not a setback. It is a body being '
-          'given the time it actually needs.',
+          'complicated caesarean. That is not a setback. Your body is being '
+          'given the time it needs.',
         ], heading: 'What the check is for'),
         PpSteps([
           PpStep('"Am I cleared to start exercising?"',
@@ -3138,11 +3389,11 @@ const PpArea _movement = PpArea(
               'Ask now, before you need the answer.'),
         ], heading: 'The six things to ask before you leave the room'),
         PpCallout(
-          'If you had a third or fourth degree tear, a difficult forceps birth, '
-          'or a caesarean that did not heal cleanly, ask specifically for a '
-          'pelvic floor physiotherapy referral rather than a general "you are '
-          'fine". Those births carry a higher chance of problems that are much '
-          'easier to fix early.',
+          'Did you have a third or fourth degree tear, a difficult forceps '
+          'birth, or a caesarean that did not heal cleanly? Then ask for a '
+          'pelvic floor physiotherapy referral, not a general "you are fine". '
+          'Those births carry a higher chance of problems that are much easier '
+          'to fix early.',
           kind: PpCalloutKind.doctor,
         ),
         // REQUIRED_REVIEW: the six week timing itself, and the list of births
@@ -3155,6 +3406,18 @@ const PpArea _movement = PpArea(
             'decides the next six months.'),
         PpWhenLine('At about six weeks after birth, sooner if anything is '
             'worrying you. Do not wait for the appointment to report a symptom.'),
+        // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+        PpSteps(heading: 'Getting ready for your check-up', [
+          PpStep('Write down your questions', 'Bleeding, stitches, feeding, '
+              'sleep, mood, sex and contraception.'),
+          PpStep('Expect a blood pressure check and a look at your stitches '
+              'or scar'),
+          PpStep('Ask about your mood', 'The doctor should ask too. Answer '
+              'honestly.'),
+          PpStep('Ask about contraception', 'Before you need it.'),
+          PpStep('Keep the later checks', 'Some mothers need follow-up for '
+              'blood sugar, thyroid or blood pressure.'),
+        ]),
       ],
     ),
     PpPage(
@@ -3163,9 +3426,9 @@ const PpArea _movement = PpArea(
       format: 'ACTIVITY',
       bands: _allBands,
       blocks: [
-        PpIntro('Walking is the most underrated thing in postnatal recovery. It '
-            'costs nothing, needs no clearance in its gentle form, and it is the '
-            'exercise mothers actually keep doing.'),
+        PpIntro('Walking does more for postnatal recovery than it gets credit '
+            'for. It costs nothing, needs no clearance in its gentle form, and '
+            'it is the exercise mothers keep doing.'),
         PpArticle([
           'A walk does four things at once that matter right now. It moves blood '
           'through your legs, which lowers clot risk. It loads your bones gently '
@@ -3186,7 +3449,7 @@ const PpArea _movement = PpArea(
           PpStep('Walk tall, not folded over the pram',
               'Ribs stacked over hips, shoulders down. Pushing a pram hunched '
               'over is a common cause of the upper back pain in month three.'),
-          PpStep('Take her, or leave her, whichever gets you out',
+          PpStep('Take the baby, or go alone, whichever gets you out',
               'A walk with a sleeping baby in a carrier and a walk alone at 7pm '
               'are different medicines. Both count.'),
           PpStep('Skip the hills and the stairs at first',
@@ -3203,12 +3466,12 @@ const PpArea _movement = PpArea(
         ),
         PpIndiaNote('If going out alone is not realistic, or the heat makes it '
             'impossible, walking inside the house or up and down the terrace at '
-            '7am counts fully. So does a lap of the society compound while she '
-            'sleeps in the pram.'),
+            '7am counts fully. So does a lap of the society compound while the '
+            'baby sleeps in the pram.'),
         PpVideoSlot(
-          title: 'Your first walk out with her',
-          subtitle: 'How to carry her, how long to go, and how to know when to '
-              'turn back.',
+          title: 'Your first walk out with your baby',
+          subtitle: 'How to carry your baby, how long to go, and when to turn '
+              'back.',
           minutes: '6 MIN',
           slotId: 'youmaa/move_first_walk',
           hue: 152,
@@ -3226,16 +3489,16 @@ const PpArea _movement = PpArea(
             'there is this. Your deep core switched itself off over nine months '
             'and it does not switch back on by itself.'),
         PpArticle([
-          'Your deep core is four things working as one unit: your diaphragm at '
-          'the top, your pelvic floor at the bottom, your transverse abdominis '
-          'wrapping around like a corset, and the small muscles along your '
-          'spine. They fire together, a fraction of a second before you move.',
+          'Your deep core is four things working as one unit. Your diaphragm at '
+          'the top, your pelvic floor at the bottom, and your transverse '
+          'abdominis wrapping around like a corset. Then the small muscles along '
+          'your spine. They fire together, a fraction of a second before you move.',
           'Pregnancy stretched the corset and pushed the diaphragm up, and the '
           'timing between them fell apart. That is why a mother can be strong '
-          'and still have back pain, still leak, still dome. Strength is not the '
-          'missing piece. Co-ordination is.',
-          'So this exercise is not hard and it does not feel like much. It is '
-          'the most important thing in this area anyway.',
+          'and still have back pain, still leak, still dome. What is missing is '
+          'co-ordination.',
+          'So this exercise is easy and it does not feel like much. It is '
+          'still the most important thing in this area.',
         ], heading: 'What you are reconnecting'),
         PpSteps([
           PpStep('Lie on your back, knees bent, feet flat',
@@ -3262,11 +3525,11 @@ const PpArea _movement = PpArea(
         // physiotherapist should confirm the numbers and the cue wording.
         PpCards([
           PpCard('Your belly domes into a ridge',
-              'Too much effort, or the exercise is too advanced today. Go '
+              'Too much effort, or the exercise is too hard for today. Go '
               'gentler.'),
           PpCard('You hold your breath',
-              'The single most common mistake. If you cannot talk, you are '
-              'bracing, not connecting.'),
+              'The most common mistake. If you cannot talk, you are bracing, '
+              'not connecting.'),
           PpCard('Your buttocks or thighs tighten',
               'Put a hand on them. They should stay soft.'),
           PpCard('You feel pressure pushing downwards',
@@ -3287,7 +3550,7 @@ const PpArea _movement = PpArea(
         PpCallout(
           'If you cannot feel anything at all, or it causes pain, see a pelvic '
           'floor physiotherapist rather than practising harder. Feeling nothing '
-          'is a finding, and it is exactly what an assessment is for.',
+          'tells you something, and that is exactly what an assessment is for.',
           kind: PpCalloutKind.doctor,
         ),
       ],
@@ -3307,10 +3570,10 @@ const PpArea _movement = PpArea(
           'only about what to train and in what sequence.',
           'The rule underneath all of it is simple. Load the tissue in the '
           'middle before it can hold tension and it stretches further. Build the '
-          'tension first and the same load becomes useful. So the order is not '
-          'caution for its own sake, it is the mechanism.',
-          'The test for whether an exercise is right for you today is not how it '
-          'looks. It is what your midline does. Watch for a ridge, a dome or a '
+          'tension first and the same load becomes useful. That is why the '
+          'order matters.',
+          'To know whether an exercise is right for you today, watch what your '
+          'midline does. Look for a ridge, a dome or a '
           'dip appearing down the centre as you work. If it appears, that '
           'exercise is too much for now, not forever.',
         ], heading: 'The rule underneath everything here'),
@@ -3324,7 +3587,7 @@ const PpArea _movement = PpArea(
               'and connect before the effort, and always watch the midline.'),
           PpStep('Weeks eight to twelve: add position and gentle resistance',
               'Bird dog on hands and knees, side lying work, a squat holding '
-              'her. Still exhaling on effort.'),
+              'your baby. Still exhaling on effort.'),
           PpStep('Three months and beyond: real strength, carefully chosen',
               'Loaded carries, squats, rows, hip work. Everything except the '
               'exercises below, until a physiotherapist says otherwise.'),
@@ -3352,9 +3615,9 @@ const PpArea _movement = PpArea(
         // framed as a range rather than fixed weeks.
         PpCallout(
           'See a physiotherapist if the midline still domes after three months '
-          'of doing this properly, if there is back pain that will not settle, '
-          'or if you can push your fingers into a soft gap that is not '
-          'improving. That is an assessment, not a failure.',
+          'of doing this properly. Go too for back pain that will not settle, '
+          'or a soft gap you can push your fingers into that is not improving. '
+          'You have not failed. You need an assessment.',
           kind: PpCalloutKind.doctor,
         ),
         PpWhenLine('Three to six months of consistent gentle work is the usual '
@@ -3375,14 +3638,13 @@ const PpArea _movement = PpArea(
         PpArticle([
           'The skin closes in a couple of weeks. Underneath, the layers of '
           'muscle sheath, fat and fascia that were cut through are still knitting '
-          'at six weeks, still remodelling at six months, and still changing at '
-          'a year. That is normal healing, not slow healing.',
+          'at six weeks. They are still remodelling at six months, and still '
+          'changing at a year. That is normal healing, not slow healing.',
           'The scar also tethers. Layers that should glide over each other stick '
-          'instead, and the result shows up somewhere else entirely: a pulling '
-          'ache, one sided hip or back pain, a numb shelf above the scar, or a '
-          'deep core that will not switch on because the area around it is '
-          'guarded.',
-          'So caesarean recovery has two jobs, not one. Rebuild the deep core, '
+          'instead, and it shows up somewhere else entirely. A pulling ache, one '
+          'sided hip or back pain, or a numb shelf above the scar. Or a deep '
+          'core that will not switch on, because the area around it is guarded.',
+          'So caesarean recovery has two jobs. Rebuild the deep core, '
           'and free the scar. Doing only the first is why some mothers plateau.',
         ], heading: 'What is still going on under the skin'),
         PpSteps([
@@ -3399,8 +3661,8 @@ const PpArea _movement = PpArea(
               'days. Firm enough to move the skin, never enough to hurt.'),
           PpStep('Then the connection breath, exactly as on the deep core page',
               'This is where most caesarean mothers start feeling their stomach '
-              'again, and it usually takes a few weeks longer than it does after '
-              'a vaginal birth.'),
+              'again. Expect it to take a few more weeks than after a normal '
+              'delivery.'),
           PpStep('Then bridges, heel slides and supported squats',
               'Exhale on the effort. Watch the scar area for pulling rather than '
               'for pain.'),
@@ -3435,9 +3697,9 @@ const PpArea _movement = PpArea(
         ),
         PpConsult(
           title: 'Post caesarean recovery consult, one to one',
-          whoFor: 'For mothers six weeks or more after a caesarean whose scar '
-              'pulls, whose stomach still feels disconnected, or who want a '
-              'plan built around their own surgery rather than a general one. '
+          whoFor: 'For mothers six weeks or more after a caesarean. For a scar '
+              'that pulls, a stomach that still feels disconnected, or a plan '
+              'built around your own surgery rather than a general one. '
               'A physiotherapist assesses the scar, your breath and your deep '
               'core together.',
           surfaceId: 'pp_experts',
@@ -3463,32 +3725,31 @@ const PpArea _movement = PpArea(
       format: 'ACTIVITY',
       bands: _later,
       blocks: [
-        PpIntro('This is the stage nobody talks about, because it is not '
-            'dramatic. You are not recovering any more. You are building a body '
-            'that can carry a growing child without complaining.'),
+        PpIntro('Few people talk about this stage, because it is not dramatic. '
+            'You are not recovering any more. You are building a body that can '
+            'carry a growing child without aching.'),
         PpArticle([
-          'The job description has changed. You now lift a person who gets '
-          'heavier every month, off the floor, onto your hip, in and out of a '
-          'car seat, usually one handed and usually while holding something '
-          'else. That is a strength requirement, and treating it as one is what '
-          'stops the back pain.',
+          'Your days have changed. You lift a child who gets heavier every '
+          'month: off the floor, onto your hip, in and out of a car seat. '
+          'Usually one handed, and usually while holding something else. That '
+          'takes strength, and training for it is what stops the back pain.',
           'Strength training after birth is also the best thing available for '
           'your bones, which lose density during breastfeeding and rebuild '
           'afterwards. Two sessions a week does more for you at forty than any '
           'amount of cardio.',
-        ], heading: 'What you are actually training for'),
+        ], heading: 'What you are training for'),
         PpCards([
           PpCard('Squats and sit to stand',
-              'Getting off the floor with her. Start with bodyweight, then hold '
-              'her, then hold weight.'),
+              'Getting off the floor with your baby. Start with bodyweight, then '
+              'hold your baby, then hold weight.'),
           PpCard('Hip hinges and deadlifts',
-              'Picking her up off the floor with your hips instead of your '
-              'lower back. The single most useful pattern for a mother.'),
+              'Picking your child up off the floor with your hips, not your '
+              'lower back. The most useful pattern for a mother.'),
           PpCard('Rows and pulls',
               'The counterweight to hours spent rounded over a feeding baby.'),
           PpCard('Loaded carries',
-              'Walking with weight on one side, then the other. This is '
-              'literally your day, trained on purpose.'),
+              'Walking with weight on one side, then the other. This is your '
+              'everyday life, trained on purpose.'),
           PpCard('Step ups and single leg work',
               'Stairs, kerbs, standing on one leg to put a shoe on. Balance and '
               'hip strength together.'),
@@ -3528,6 +3789,18 @@ const PpArea _movement = PpArea(
         PpLink('Postpartum belts, and when they stop helping',
             surfaceId: _shopSurface,
             blurb: 'Useful for support early on. Not a substitute for this.'),
+        // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+        PpCards(heading: 'Sport and exercise while breastfeeding', [
+          PpCard('Walking, yoga, swimming, cycling',
+              'All fine. Swimming once bleeding has stopped and stitches have '
+                  'healed.'),
+          PpCard('Running and jumping', 'Once your pelvic floor is ready, '
+              'often from about three months. Leaks mean wait.'),
+          PpCard('Gym and weights', 'Start light, build slowly, breathe out '
+              'as you lift.'),
+          PpCard('Your milk', 'Exercise does not harm it. Feed before, wear a '
+              'supportive bra, and drink water.'),
+        ]),
       ],
     ),
     PpPage(
@@ -3536,19 +3809,19 @@ const PpArea _movement = PpArea(
       format: 'ARTICLE',
       bands: [_b3],
       blocks: [
-        PpIntro('Running is not banned and it is not the enemy. It is simply the '
-            'highest load you can put through a healing pelvic floor, so it is '
-            'the last thing to come back rather than the first.'),
+        PpIntro('Running is not banned and it is not the enemy. It is the '
+            'highest load you can put through a healing pelvic floor, so it '
+            'comes back last rather than first.'),
         PpArticle([
-          'Every running step lands two to three times your body weight through '
-          'a system that has spent a year being stretched, and after a vaginal '
-          'birth was stretched a great deal in one day. Going back too early is '
-          'the commonest route to leaking that becomes permanent and to '
-          'prolapse symptoms appearing at thirty five.',
+          'Every running step lands two to three times your body weight. It '
+          'lands on a system that has spent a year being stretched, and after a '
+          'vaginal birth was stretched a great deal in one day. Going back too '
+          'early is the commonest route to leaking that becomes permanent, and '
+          'to prolapse symptoms appearing at thirty five.',
           'The usual guidance is to wait until at least three months and '
-          'ideally six, and to pass a simple load test first. Not because '
-          'running is dangerous, but because passing the test takes a few weeks '
-          'and getting it wrong takes years.',
+          'ideally six, and to pass a simple load test first. Running is not '
+          'dangerous. Passing the test takes a few weeks, and getting it wrong '
+          'can take years to fix.',
         ], heading: 'Why this one waits'),
         PpSteps([
           PpStep('Walk thirty minutes briskly with no heaviness or leaking',
@@ -3571,8 +3844,8 @@ const PpArea _movement = PpArea(
         // physiotherapist before it ships as a self administered test.
         PpCallout(
           'See a pelvic floor physiotherapist before you start running if you '
-          'had a third or fourth degree tear, if you leak at all, if you feel '
-          'any heaviness or bulging, or if you have back or pelvic pain. An '
+          'had a third or fourth degree tear, or if you leak at all. Go too if '
+          'you feel any heaviness or bulging, or have back or pelvic pain. An '
           'assessment before is far cheaper than treatment after.',
           kind: PpCalloutKind.doctor,
         ),
@@ -3619,12 +3892,12 @@ const PpArea _feedingYourself = PpArea(
   id: 'feeding_yourself',
   mark: IntentMark.feedMark,
   title: 'Have you eaten today?',
-  blurb: 'What your body needs while it heals, and while it feeds her.',
+  blurb: 'What your body needs while it heals, and while it feeds your baby.',
   hue: 32,
   pages: [
     PpPage(
       id: 'eat_what_you_need',
-      title: 'What your body actually needs right now',
+      title: 'What your body needs right now',
       format: 'ARTICLE',
       bands: _allBands,
       blocks: [
@@ -3634,25 +3907,24 @@ const PpArea _feedingYourself = PpArea(
         // repetitive.
         PpVideoSlot(
           title: 'Eating when you have no hands free',
-          subtitle: 'What actually helps recovery and supply, and how to eat it one-handed.',
+          subtitle: 'What really helps recovery and supply, and how to eat it one-handed.',
           minutes: '5 MIN',
           slotId: 'you/eating_postpartum',
         ),
-        PpIntro('You are healing a wound the size of a plate inside you, '
-            'replacing lost blood, and if you are feeding her you are producing '
-            'most of a litre of milk a day. That is a serious job and it needs '
-            'to be fed.'),
+        PpIntro('You are healing a wound the size of a plate inside you and '
+            'replacing lost blood. If you are breastfeeding, you are also making '
+            'most of a litre of milk a day. That is a serious job, and you need '
+            'feeding too.'),
         PpArticle([
-          'Postpartum eating is not a diet and it is not a plan. It is the '
-          'simplest thing in this app: eat enough, eat warm, eat regularly, and '
-          'make sure protein and iron are actually in there rather than assumed.',
-          'The mistake almost every new mother makes is not eating the wrong '
-          'foods. It is eating too little and too rarely, standing up, once the '
-          'baby is finally down. Three days of that and the tiredness people '
-          'blame on sleep is really hunger.',
+          'Eating after birth is not a diet or a plan. It is the simplest thing '
+          'in this app: eat enough, eat warm, eat regularly. And make sure '
+          'protein and iron are really there, not assumed.',
+          'The usual problem is not the wrong foods. It is eating too little and '
+          'too rarely, standing up, once the baby is finally down. After three '
+          'days of that, the tiredness people blame on sleep is often hunger.',
         ], heading: 'The short version'),
         PpChartCard(
-          title: 'What actually matters, in order',
+          title: 'What matters most, in order',
           rows: [
             ('Enough food, at all',
                 'Three meals and two or three snacks. Skipping is the real risk.'),
@@ -3680,7 +3952,7 @@ const PpArea _feedingYourself = PpArea(
           'appetite will usually tell you, if you let it.',
           'And if you are not breastfeeding, you still need all of the above. '
           'Healing costs the same either way, and the mother who is not feeding '
-          'is usually the one told she does not need to eat much. She does.',
+          'is often told there is no need to eat much. There is.',
         ], heading: 'How much more, honestly'),
         // REQUIRED_REVIEW: the "few hundred extra calories a day" figure for a
         // breastfeeding mother, and the statement that a non breastfeeding
@@ -3689,16 +3961,15 @@ const PpArea _feedingYourself = PpArea(
         // or to state a range.
         PpCallout(
           'The one rule worth keeping: never let more than about four waking '
-          'hours pass without eating something. Not because of metabolism, but '
-          'because low blood sugar makes everything else about this day harder.',
+          'hours pass without eating something. Low blood sugar makes '
+          'everything else about the day harder.',
         ),
-        PpIndiaNote('If your family is cooking for you during jaapa, this is the '
-            'easiest it will ever be to eat well, and it is worth saying out '
-            'loud what you actually want. Ask for dal, curd and an egg as often '
-            'as you ask for laddoo.'),
+        PpIndiaNote('If your family is cooking for you during the forty days, eating well '
+            'will never be easier. Say out loud what you want. Ask for dal, '
+            'curd and an egg as often as you ask for sweets.'),
         PpLink('Recipes for you, not the baby',
             surfaceId: 'pp_food',
-            blurb: 'The jaapa foods, the laddoos and the one handed meals live '
+            blurb: 'The forty-day foods, the laddoos and the one handed meals live '
                 'in "The healing kitchen". This opens the wider library.'),
       ],
     ),
@@ -3716,38 +3987,38 @@ const PpArea _feedingYourself = PpArea(
           'What you eat changes the flavour slightly and changes very little '
           'else. Babies across the world are fed by mothers eating garlic, '
           'chilli, rajma, cabbage and fish, and their babies are fine.',
-          'The mother who cuts out half of Indian cooking to avoid gas in the '
-          'baby usually ends up more tired, less well fed, and with a baby whose '
-          'wind was never about her food in the first place. Newborn digestive '
-          'noise is newborn digestive noise.',
-        ], heading: 'What actually reaches your milk'),
+          'Cutting out half of Indian cooking to avoid gas in the baby usually '
+          'leaves you more tired and less well fed. And the baby\'s wind was '
+          'never about your food in the first place. Newborns are noisy '
+          'digesters.',
+        ], heading: 'What reaches your milk'),
         PpCards([
           PpCard('Rajma, chana and cabbage cause gas in the baby',
               'Gas does not pass into milk. The compounds that cause it in you '
-              'do not reach her.'),
+              'do not reach your baby.'),
           PpCard('Spicy food upsets the baby',
-              'Babies in every spice eating culture do fine. If she reacts to '
-              'one specific thing, that is worth noticing. A blanket ban is not.'),
-          PpCard('Sour or cold food will give her a cold',
+              'Babies in every spice eating culture do fine. If your baby reacts '
+              'to one specific thing, that is worth noticing. A blanket ban is not.'),
+          PpCard('Sour or cold food will give the baby a cold',
               'Colds come from viruses. Curd, buttermilk and fruit are among the '
               'most useful things you can eat.'),
           PpCard('You must drink milk to make milk',
-              'Cows make milk eating grass. Milk is a good source of protein and '
-              'calcium, and it is not a requirement.'),
+              'Cows make milk eating grass. Milk gives you useful protein and '
+              'calcium, but you do not need it.'),
           PpCard('Papaya, pineapple and brinjal are forbidden',
               'These are pregnancy beliefs carried forward. They are food.'),
         ], heading: 'The bans you will be given, and what is true', hue: 32),
         PpArticle([
-          'Two things do genuinely need care. Alcohol passes into milk, so if '
-          'you drink, feed first and then leave a couple of hours per drink '
-          'before the next feed. Caffeine passes in small amounts and a newborn '
-          'clears it slowly, so two or three cups of tea or coffee a day is '
-          'usually fine and six is worth cutting back.',
+          'Two things do need care. Alcohol passes into milk. If you drink, feed '
+          'first, then leave a couple of hours per drink before the next feed. '
+          'Caffeine passes in small amounts and a newborn clears it slowly. Two '
+          'or three cups of tea or coffee a day is usually fine; six is worth '
+          'cutting back.',
           'And a very small number of babies react to cow\'s milk protein in the '
           'mother\'s diet, with blood or mucus in the stool, eczema and real '
           'distress. That is a real thing, it is uncommon, and it is diagnosed '
           'by a doctor rather than guessed at by removing foods one by one.',
-        ], heading: 'The two that are actually worth care'),
+        ], heading: 'The two that are worth care'),
         // REQUIRED_REVIEW: the alcohol guidance (feed first, roughly two hours
         // per standard drink) and the caffeine ceiling (two to three cups
         // daily). Both are standard but the exact framing should be signed off,
@@ -3755,7 +4026,7 @@ const PpArea _feedingYourself = PpArea(
         // build at all.
         PpCallout(
           'See your paediatrician before cutting anything out of your diet for '
-          'the baby\'s sake. Blood or mucus in her stool, or eczema with real '
+          'the baby\'s sake. Blood or mucus in the baby\'s stool, or eczema with real '
           'distress, needs a doctor and a proper plan. Removing foods on a guess '
           'starves you and rarely finds the answer.',
           kind: PpCalloutKind.doctor,
@@ -3778,13 +4049,13 @@ const PpArea _feedingYourself = PpArea(
             'already low, and then lose more blood at delivery.'),
         PpArticle([
           'Anaemia after birth is not a minor footnote here. A large share of '
-          'Indian women are anaemic before they conceive, pregnancy draws on '
+          'Indian women are anaemic before they conceive. Pregnancy draws on '
           'those stores, and birth takes several hundred millilitres of blood on '
-          'top. The result is a mother who is told she is tired because of the '
-          'baby when she is actually short of the thing that carries oxygen.',
+          'top. So you may be told you are tired because of the baby, when you '
+          'are really short of what carries oxygen in your blood.',
           'It is worth checking rather than guessing, because the fix is simple '
-          'and the difference is large. Mothers who correct it usually describe '
-          'the change as getting their brain back, not just their energy.',
+          'and the difference is large. Mothers who correct it often say they '
+          'got their clear head back, as well as their energy.',
         ], heading: 'Why this is the first thing to look at'),
         PpCards([
           PpCard('Breathless climbing one flight of stairs',
@@ -3818,11 +4089,11 @@ const PpArea _feedingYourself = PpArea(
               'Vitamin C multiplies how much iron you absorb. Lemon on the dal, '
               'amla, orange, guava, tomato. Tea and coffee within an hour of a '
               'meal block it, and that habit alone undoes a lot of good eating.'),
-          PpStep('Cook in an iron kadhai',
-              'Especially anything sour or tomato based. It genuinely adds iron '
-              'to the food and it costs nothing.'),
+          PpStep('Cook in an iron pan',
+              'Especially anything sour or tomato based. It really does add iron '
+              'to the food, and it costs nothing.'),
           PpStep('Put iron rich foods in on purpose',
-              'Palak and other greens, beetroot, dates, raisins, jaggery, '
+              'Spinach and other greens, beetroot, dates, raisins, jaggery, '
               'ragi, chana, rajma, liver and red meat if you eat it.'),
           PpStep('If you are on tablets, take them and keep taking them',
               'The full course, not until you feel better. Stores take months '
@@ -3830,13 +4101,13 @@ const PpArea _feedingYourself = PpArea(
           PpStep('Do not stop iron because it constipates you',
               'Ask your doctor for a different form or a stool softener '
               'alongside. Stopping trades a small problem for a bigger one.'),
-        ], heading: 'How to actually get iron in'),
+        ], heading: 'How to get more iron in'),
         PpWhenLine('Worth checking at the six week visit, and again any time '
             'the exhaustion is not improving. Correcting stores takes about '
             'three months of consistent treatment, not two weeks.'),
         PpLink('The iron rich cooking',
             surfaceId: 'pp_food',
-            blurb: 'Dates, beetroot, palak and gur are written up as recipes in '
+            blurb: 'Dates, beetroot, spinach and jaggery are written up as recipes in '
                 '"The healing kitchen". This opens the wider library.'),
       ],
     ),
@@ -3846,7 +4117,7 @@ const PpArea _feedingYourself = PpArea(
       format: 'ARTICLE',
       bands: _allBands,
       blocks: [
-        PpIntro('Breastfeeding takes calcium out of your bones to put it in her '
+        PpIntro('Breastfeeding takes calcium out of your bones to put it in your '
             'milk, whatever you eat. Your body rebuilds it afterwards, and it '
             'rebuilds better if the raw material is there.'),
         PpArticle([
@@ -3855,19 +4126,19 @@ const PpArea _feedingYourself = PpArea(
           'reason to stop feeding. It does mean this is a bad year to eat '
           'almost no calcium, which is easy to do without noticing.',
           'The bigger gap in India is usually vitamin D rather than calcium. '
-          'Without it you absorb only a fraction of the calcium you eat, and '
-          'deficiency is extremely common here even in sunny cities, because '
-          'most women spend the day indoors and cover up outdoors. A mother in '
-          'jaapa confinement sees no sun at all for forty days.',
+          'Without it you absorb only a fraction of the calcium you eat. Low '
+          'vitamin D is very common here, even in sunny cities, because most '
+          'women spend the day indoors and cover up outdoors. In the forty days of '
+          'confinement you may see no sun at all for forty days.',
         ], heading: 'What is happening to your bones'),
         PpChartCard(
-          title: 'Where calcium actually comes from',
+          title: 'Where calcium comes from',
           rows: [
             ('Milk, curd, paneer, buttermilk', 'The easiest and the densest.'),
             ('Ragi', 'One of the richest non dairy sources there is.'),
-            ('Til, or sesame', 'Til laddoo and til chutney are real calcium.'),
+            ('Sesame', 'Sesame laddoo and sesame chutney are real calcium.'),
             ('Almonds and other nuts', 'Handy, and useful while feeding.'),
-            ('Green leafy vegetables', 'Sarson, methi leaves, drumstick leaves.'),
+            ('Green leafy vegetables', 'Mustard greens, fenugreek leaves, drumstick leaves.'),
             ('Small fish eaten with bones', 'If you eat fish, this is excellent.'),
           ],
           note: 'Two or three servings of the top group a day, or a deliberate '
@@ -3894,12 +4165,12 @@ const PpArea _feedingYourself = PpArea(
         // should be stated at all.
         PpCallout(
           'Ask your doctor about your bones, not the internet, if you have back '
-          'or hip pain that is not muscular, if you have had a fracture easily, '
-          'or if you are feeding beyond a year with very little dairy in your '
-          'diet.',
+          'or hip pain that is not muscular, or have had a fracture easily. '
+          'Ask too if you are feeding beyond a year with very little dairy in '
+          'your diet.',
           kind: PpCalloutKind.doctor,
         ),
-        PpIndiaNote('Forty days indoors is the part of jaapa most worth '
+        PpIndiaNote('Forty days indoors is the part of the tradition most worth '
             'negotiating. Ten minutes on the balcony in the morning sun is not '
             'breaking confinement and it is one of the few things in this whole '
             'list that is free.'),
@@ -3916,33 +4187,33 @@ const PpArea _feedingYourself = PpArea(
             'easiest thing on this whole list to fix.'),
         PpArticle([
           'Breast milk is around nine tenths water and you are making several '
-          'hundred millilitres of it a day. Your body signals for the '
-          'replacement hard, usually the second she starts feeding, which is '
-          'exactly when you cannot reach anything.',
+          'hundred millilitres of it a day. Your body asks hard for the water '
+          'back, usually the second the baby starts feeding, which is exactly '
+          'when you cannot reach anything.',
           'Drinking more water does not increase your supply, and this is worth '
           'knowing because a lot of mothers are told to force litres down. '
           'Drinking enough prevents the headache, the constipation and the '
-          'flattened afternoon. That is the actual benefit.',
+          'flattened afternoon. That is the real benefit.',
         ], heading: 'What is going on'),
         PpSteps([
           PpStep('Put a bottle wherever you feed, before you sit down',
-              'The single most effective habit in this area. A bottle with a '
-              'straw you can use one handed is better still.'),
+              'The habit that helps most here. A bottle with a straw you can '
+              'use one handed is better still.'),
           PpStep('Drink a glass at the start of every feed',
               'Attached to something you already do a dozen times a day, so it '
               'needs no remembering.'),
           PpStep('Check the colour, not the count',
               'Pale straw is fine. Dark yellow means drink more. This is more '
               'useful than counting glasses.'),
-          PpStep('Warm counts, and in jaapa it is easier to get',
-              'Warm water, jeera water, saunf water, thin buttermilk, coconut '
+          PpStep('Warm counts, and in the forty days it is easier to get',
+              'Warm water, cumin water, fennel water, thin buttermilk, coconut '
               'water, milk, soup. All of it is fluid.'),
           PpStep('Go easy on very sweet drinks and lots of tea',
               'Sweet drinks add up fast, and tea with meals blocks your iron.'),
-        ], heading: 'What actually works'),
+        ], heading: 'What works'),
         PpCallout(
           'Forcing large amounts of water does not make more milk, and a few '
-          'mothers who drink very large volumes actually feel their supply dip. '
+          'mothers who drink very large volumes even feel their supply dip. '
           'Drink to thirst and a little beyond. That is the whole rule.',
           kind: PpCalloutKind.myth,
         ),
@@ -3952,14 +4223,23 @@ const PpArea _feedingYourself = PpArea(
         // REQUIRED_REVIEW: the "glass at every feed" heuristic and the urine
         // colour guidance, and the claim that very high intake can reduce
         // supply. A lactation consultant should confirm all three.
-        PpIndiaNote('In a Delhi or Chennai summer, add to all of this. A mother '
-            'feeding in forty degree heat with a fan and no cooler is losing '
-            'fluid she is not accounting for. Nimbu paani with a pinch of salt '
-            'is genuinely useful on those days.'),
+        PpIndiaNote('In a Delhi or Chennai summer, add to all of this. Feeding '
+            'in forty degree heat with a fan and no cooler, you lose more fluid '
+            'than you realise. Lemon water with a pinch of salt really helps on '
+            'those days.'),
         PpLink('The drinks, as recipes',
             surfaceId: 'pp_food',
-            blurb: 'Jeera water, saunf water, ajwain water and the kadha are in '
+            blurb: 'Cumin water, fennel water, carom seed water and the herbal kadha are in '
                 '"The healing kitchen". This opens the wider library.'),
+        // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+        PpCards(heading: 'Drinks that count', [
+          PpCard('Water', 'A glass at every feed.'),
+          PpCard('Milk, turmeric milk', 'Warm and filling.'),
+          PpCard('Buttermilk, lassi and coconut water', 'Light and cooling in '
+              'summer.'),
+          PpCard('Soups and thin dal water', 'Fluid and food together.'),
+          PpCard('Fresh fruit smoothies', 'With curd or milk, little sugar.'),
+        ]),
       ],
     ),
     PpPage(
@@ -3968,11 +4248,11 @@ const PpArea _feedingYourself = PpArea(
       format: 'ARTICLE',
       bands: _allBands,
       blocks: [
-        PpIntro('There are days when eating is genuinely not possible in the '
-            'normal way. This page is for those, and it does not ask you to '
+        PpIntro('Some days, eating the normal way is just not possible. This '
+            'page is for those days, and it does not ask you to '
             'plan, prep or cook anything.'),
         PpArticle([
-          'Appetite after birth goes two ways. Some mothers are ravenous at 3am '
+          'Appetite after birth can go either way. Some mothers are ravenous at 3am '
           'and cannot get enough. Others feel completely uninterested in food '
           'for weeks, especially if the birth was hard, if pain is in the way, '
           'or if the days have flattened out.',
@@ -3983,39 +4263,38 @@ const PpArea _feedingYourself = PpArea(
         ], heading: 'Two different problems that look the same'),
         PpCards([
           PpCard('Keep food where you sit, not where you cook',
-              'A jar of laddoo, dry fruit, chana, a banana, next to the feeding '
+              'A jar of laddoos, dry fruit, roasted chana, a banana, next to the feeding '
               'chair. Whatever is within reach is what gets eaten.'),
           PpCard('Eat one handed on purpose',
               'Roti roll, paratha wrap, idli, boiled egg, banana, sandwich. '
               'Foods that survive being put down and picked up again.'),
           PpCard('Drink your meal when you cannot eat it',
-              'Milk with a banana, thick lassi, dal soup, sattu drink. Fewer '
-              'calories skipped than a skipped meal.'),
+              'Milk with a banana, thick lassi, dal soup, sattu drink. Far '
+              'better than skipping the meal.'),
           PpCard('Say yes when someone offers to bring food',
               'Every time. And answer honestly when they ask what you want.'),
           PpCard('Ask for one big thing rather than three small ones',
               'A pot of dal or khichdi that lasts three days is worth more than '
               'a fresh meal you have to wait for.'),
-          PpCard('Eat before you feed her, not after',
-              'After is theoretical. Before actually happens.'),
+          PpCard('Eat before you feed your baby, not after',
+              'After a feed, the moment rarely comes. Before, it happens.'),
         ], heading: 'What works when nothing works', hue: 32),
         PpCallout(
           'Talk to your doctor if you have not really eaten for several days, if '
-          'food makes you nauseous, if you are losing weight quickly, or if the '
-          'appetite went away at the same time as everything else did. The last '
-          'one is often the first sign of postpartum depression and it responds '
-          'well to help.',
+          'food makes you nauseous, or if you are losing weight quickly. Talk to '
+          'your doctor too if your appetite went at the same time as everything '
+          'else did. That is often the first sign of postpartum depression, and '
+          'it responds well to help.',
           kind: PpCalloutKind.doctor,
         ),
         // REQUIRED_REVIEW: the threshold for escalating loss of appetite
         // ("several days", rapid weight loss) and the link drawn between
         // appetite loss and postpartum depression. Both should be confirmed so
         // the page routes early enough without alarming.
-        PpIndiaNote('If the appetite went at the same time as everything else '
-            'did, open "I do not feel like myself" instead '
-            'of this area, and start with the page on baby blues and postpartum '
-            'depression. The one handed meals themselves are in "The healing '
-            'kitchen".'),
+        PpIndiaNote('If your appetite went at the same time as everything else, '
+            'open "I do not feel like myself" instead. Start with the page on '
+            'baby blues and postpartum depression. The one handed meals are in '
+            '"The healing kitchen".'),
       ],
     ),
     PpPage(
@@ -4029,31 +4308,31 @@ const PpArea _feedingYourself = PpArea(
             'a softer way of saying the usual thing.'),
         PpArticle([
           'You did not gain weight by accident. You grew a baby, a placenta, '
-          'litres of extra blood, more fluid in every tissue, an enlarged uterus '
-          'and a store of fat your body built on purpose to fuel feeding. Most '
-          'of that leaves in its own time. The part that is fat is there because '
-          'your body put it there for a reason that has not finished yet.',
-          'Eating too little while breastfeeding and healing is the one genuinely '
+          'litres of extra blood and more fluid in every tissue. You grew an '
+          'enlarged uterus, and a store of fat your body built on purpose to '
+          'fuel feeding. Most of that leaves in its own time. The fat is there '
+          'for a reason your body has not finished with yet.',
+          'Eating too little while breastfeeding and healing is the one really '
           'risky thing you could do this year. It slows healing, worsens '
           'anaemia, flattens your mood, and for some mothers it reduces supply. '
-          'A crash diet at three months postpartum is not discipline. It is a '
-          'body being asked to do two jobs on the fuel for none.',
+          'A crash diet at three months postpartum asks your body to do two '
+          'jobs with no fuel.',
           'Your body will change over the next year or two whether or not you '
           'manage it. Some of it will come back to where it was. Some of it will '
-          'not, and that is not a failure of effort. Wider ribs and a different '
+          'not, and that is no failure of effort. Wider ribs and a different '
           'shape are common and permanent for a lot of mothers.',
-        ], heading: 'What that weight actually is'),
+        ], heading: 'What that weight is'),
         PpCallout(
           'This app will never set you a weight goal, never show you a before '
           'and after, and never sell you anything on the basis of how you look. '
           'If you want to feel stronger, the movement pages are there. They are '
-          'about carrying her without pain, and that is genuinely what they are '
+          'about carrying your baby without pain, and that is all they are '
           'about.',
         ),
         PpCards([
           PpCard('You are eating enough to not be starving by evening',
-              'The floor, and most mothers are under it.'),
-          PpCard('Protein and iron are actually in the day',
+              'The minimum, and most mothers fall short of it.'),
+          PpCard('Protein and iron are really in the day',
               'Not assumed to be in there somewhere.'),
           PpCard('You are moving in a way you would repeat next week',
               'Sustainable beats intense, always, and especially now.'),
@@ -4061,14 +4340,14 @@ const PpArea _feedingYourself = PpArea(
               'Short sleep drives appetite and mood harder than any food rule.'),
         ], heading: 'What a good year of eating looks like instead', hue: 32),
         PpCallout(
-          'Breastfeeding makes you lose weight fast is true for some mothers and '
-          'not others, and it is not something you control. Two mothers eating '
-          'the same food and feeding the same baby end up in different places. '
-          'That is biology, not effort.',
+          '"Breastfeeding makes you lose weight fast" is true for some mothers '
+          'and not others, and you cannot control it. Two mothers eating the '
+          'same food and feeding the same way end up in different places. That '
+          'is biology, not effort.',
           kind: PpCalloutKind.myth,
         ),
-        PpIndiaNote('The belt will be recommended to you within days, often by '
-            'someone who wore one herself. Worn for a few hours for support '
+        PpIndiaNote('Someone will suggest a belt within days, often a relative '
+            'who wore one too. Worn for a few hours for support '
             'while your stomach feels unheld, it is fine and it feels good. Worn '
             'all day to make the stomach smaller, it lets the muscles switch off '
             'further and it does not change anything underneath.'),
@@ -4111,13 +4390,13 @@ const PpArea _healingKitchen = PpArea(
   id: 'healing_kitchen',
   mark: IntentMark.compassMark,
   title: 'The healing kitchen',
-  blurb: 'Jaapa food, the laddoos, the kadha, and where the tradition goes too '
+  blurb: 'The food of the forty days, the laddoos, the herbal kadha, and where the tradition goes too '
       'far.',
   hue: 42,
   pages: [
     PpPage(
       id: 'kitchen_jaapa',
-      title: 'What jaapa food is actually doing',
+      title: 'What the food of the forty days is really doing',
       format: 'ARTICLE',
       bands: _early,
       blocks: [
@@ -4126,104 +4405,104 @@ const PpArea _healingKitchen = PpArea(
             'for, because then you can keep the useful half and negotiate the '
             'rest.'),
         PpArticle([
-          'Jaapa food across India varies enormously in the details and agrees '
-          'on the shape: warm, cooked soft, calorie dense, heavy on ghee, nuts '
-          'and gum, spiced with ajwain, saunf, methi, sonth and haldi, and fed '
-          'to her frequently by somebody else. Nobody arrived at that by reading '
-          'a nutrition paper. It arrived by watching what helped.',
-          'And most of it maps onto what a healing, feeding body actually needs. '
-          'Calorie dense because she needs several hundred extra calories and no '
-          'time to eat them. Ghee and nuts because fat is dense energy and helps '
-          'her absorb the vitamins in everything else. Gond and til because they '
-          'are among the richest calcium sources in an Indian kitchen. Ajwain '
-          'and saunf because her gut is slow and sore. Warm and soft because '
-          'chewing and digesting are effort she does not have.',
-          'The one part with no mechanism behind it is the restriction: the '
-          'foods forbidden, the water withheld, the vegetables ruled out for '
-          'forty days. That half was never the nutrition. It is worth separating '
-          'from the half that is.',
+          'Forty-day food across India differs in the details and agrees on the '
+          'shape. Warm, cooked soft, calorie dense, heavy on ghee, nuts and gum. '
+          'Spiced with carom seeds, fennel, fenugreek, dry ginger and turmeric. And fed to the '
+          'new mother often, by somebody else. Families learnt this by watching '
+          'what helped, long before any nutrition paper.',
+          'Most of it matches what a healing, feeding body needs. Calorie dense, '
+          'because you need several hundred extra calories and have no time to '
+          'eat them. Ghee and nuts, because fat is dense energy and helps you '
+          'absorb the vitamins in everything else. Edible gum and sesame, because they '
+          'are among the richest calcium sources in an Indian kitchen. Carom seeds '
+          'and fennel, because your gut is slow and sore. Warm and soft, because '
+          'chewing and digesting take effort you do not have.',
+          'The one part with no reason to it is the restriction. The foods '
+          'forbidden, the water withheld, the vegetables ruled out for forty '
+          'days. That half was never the nutrition. It is worth separating from '
+          'the half that is.',
         ], heading: 'Why the tradition looks the way it does'),
         PpChartCard(
-          title: 'What the jaapa kitchen gets right',
+          title: 'What the forty-day kitchen gets right',
           rows: [
             ('Warm, soft, cooked food', 'Easy on a slow gut and a sore body.'),
-            ('Ghee, nuts and gond',
+            ('Ghee, nuts and edible gum',
                 'Dense calories, calcium and fat soluble vitamins.'),
-            ('Ajwain, saunf, sonth, jeera',
-                'Genuinely help wind, bloating and a sluggish gut.'),
-            ('Methi and til',
-                'Iron and calcium, in a form she will actually eat.'),
+            ('Carom seeds, fennel, dry ginger, cumin',
+                'Really do help wind, bloating and a sluggish gut.'),
+            ('Fenugreek and sesame',
+                'Iron and calcium, in a form you will happily eat.'),
             ('Fed frequently, by someone else',
-                'The single most useful part, and the least discussed.'),
+                'The most useful part, and the least discussed.'),
             ('Company in the kitchen',
-                'The women around her are also the reason she is not alone.'),
+                'The women around you are also why you are not alone.'),
           ],
           note: 'Keep all of this. The page on where it goes too far deals with '
               'the rest.',
           hue: 42,
         ),
         PpCallout(
-          'The part of jaapa worth protecting hardest is not any food. It is '
+          'The part of the forty days worth protecting hardest is not any food. It is '
           'that somebody else is cooking, so you eat without standing up. When '
           'the forty days end, that is the thing that disappears and the thing '
           'you will miss.',
         ),
-        PpIndiaNote('If you are doing jaapa away from home, or without family, '
-            'the shortcut most mothers use is a batch of laddoo and a big pot of '
-            'dal or khichdi twice a week. It is not the full tradition. It '
-            'covers most of what the tradition was doing.'),
+        PpIndiaNote('Doing the forty days away from home, or without family? Most mothers '
+            'make a batch of laddoos, and a big pot of dal or khichdi twice a '
+            'week. It is not the full tradition, but it covers most of what the '
+            'tradition was doing.'),
       ],
     ),
     PpPage(
       id: 'kitchen_gond_laddoo',
-      title: 'Gond ke laddoo',
+      title: 'Edible gum sweets (gond ke laddoo)',
       subtitle: 'The one worth making first.',
       format: 'RECIPE',
       bands: _early,
       blocks: [
-        PpIntro('Edible gum, ghee, dry fruit and gur, rolled into something you '
-            'can eat with one hand at 3am. It is the most useful single food in '
-            'the jaapa kitchen and it keeps for weeks.'),
+        PpIntro('Edible gum, ghee, dry fruit and jaggery, rolled into something you '
+            'can eat with one hand at 3am. It is the most useful food in the '
+            'forty-day kitchen, and it keeps for weeks.'),
         PpArticle([
-          'Gond is edible gum from a tree, and it puffs up like popcorn when it '
+          'Gond is an edible gum from a tree, and it puffs up like popcorn when it '
           'hits hot ghee. Traditionally it is given for joint strength and back '
           'recovery after birth. What it certainly does is carry a lot of '
           'calcium and a lot of energy in a small, sweet, portable form.',
           'Whether it strengthens joints is not something anyone has properly '
-          'measured. What it does reliably is keep a mother from going five '
-          'hours without eating, which is a real benefit and enough on its own.',
+          'measured. It does reliably stop you going five hours without eating, '
+          'which is a real benefit and enough on its own.',
         ], heading: 'Why this one'),
         PpChartCard(
-          title: 'What you need, for about twenty laddoo',
+          title: 'What you need, for about twenty sweets',
           rows: [
-            ('Gond, edible gum', '100 g'),
+            ('Edible gum (gond)', '100 g'),
             ('Whole wheat flour', '1 cup'),
-            ('Ghee', 'About 1 cup, some for frying the gond'),
+            ('Ghee', 'About 1 cup, some for frying the gum'),
             ('Gur or jaggery, grated', '1 to 1.5 cups, to taste'),
             ('Almonds, cashews, pistachio, chopped', '1 cup total'),
-            ('Makhana, optional', '1 cup, roasted and crushed'),
-            ('Elaichi powder', '1 tsp'),
-            ('Sonth, dry ginger powder', '1 tsp, optional'),
+            ('Fox nuts (makhana), optional', '1 cup, roasted and crushed'),
+            ('Cardamom powder', '1 tsp'),
+            ('Dry ginger powder', '1 tsp, optional'),
           ],
           hue: 42,
         ),
         PpSteps([
-          PpStep('Fry the gond in hot ghee, in small batches',
+          PpStep('Fry the gum in hot ghee, in small batches',
               'It puffs up several times its size. Do not crowd the pan. Lift '
               'it out when it has puffed and gone pale, and let it cool.'),
-          PpStep('Crush the cooled gond coarsely',
+          PpStep('Crush the cooled gum coarsely',
               'A rolling pin or a mixer on a single pulse. Some texture is '
               'good.'),
           PpStep('Roast the wheat flour in ghee on a low flame',
               'Ten to fifteen minutes, stirring, until it turns golden and '
               'smells nutty. This step decides the whole thing. Rushing it '
               'leaves a raw taste.'),
-          PpStep('Add the nuts and makhana and roast a minute more',
+          PpStep('Add the nuts and fox nuts and roast a minute more',
               'Then take the pan off the heat.'),
           PpStep('Let it cool until warm, then add the gur',
-              'Hot flour melts jaggery into syrup and the laddoo will not hold. '
+              'Hot flour melts jaggery into syrup and the laddoos will not hold. '
               'Warm is the right temperature.'),
-          PpStep('Add the gond, elaichi and sonth, and mix well',
+          PpStep('Add the gum, cardamom and dry ginger, and mix well',
               'Taste it. Add more gur now if it needs it.'),
           PpStep('Roll while still warm, and store airtight',
               'If it will not hold, add a spoon of warm ghee. Keeps three to '
@@ -4234,17 +4513,17 @@ const PpArea _healingKitchen = PpArea(
             'through the first forty days.'),
         PpCallout(
           'One or two a day is the amount that helps. Six a day is a lot of '
-          'jaggery and ghee, and it is where a good food starts working against '
-          'you. Nobody in the house will tell you to stop, so this is the page '
-          'that does.',
+          'jaggery and ghee, and that is where a good food starts working '
+          'against you. Nobody in the house may tell you to stop, so this page '
+          'does.',
           kind: PpCalloutKind.safety,
         ),
         PpCallout(
           'Ask your doctor before eating these daily if you had gestational '
-          'diabetes, if your sugar was high in pregnancy, or if you have been '
-          'told you are at risk of diabetes. Gur is still sugar, and a mother '
-          'who had gestational diabetes needs a check at about six to twelve '
-          'weeks after birth anyway.',
+          'diabetes, or your sugar was high in pregnancy. Ask too if you have '
+          'been told you are at risk of diabetes. Gur is still sugar. After '
+          'gestational diabetes you need a check at about six to twelve weeks '
+          'after birth anyway.',
           kind: PpCalloutKind.doctor,
         ),
         // REQUIRED_REVIEW: the "one or two a day" dose, and the gestational
@@ -4253,73 +4532,73 @@ const PpArea _healingKitchen = PpArea(
         // place the caution on the recipe page rather than only on a general
         // page nobody opens.
         PpVideoSlot(
-          title: 'Gond ke laddoo, start to finish',
-          subtitle: 'Including what the gond should look like when it is '
+          title: 'Edible gum sweets, start to finish',
+          subtitle: 'Including what the gum should look like when it is '
               'properly puffed, which is the step everyone gets wrong.',
           minutes: '9 MIN',
           slotId: 'youmaa/recipe_gond_laddoo',
           hue: 42,
         ),
         PpIndiaNote('Every family has its own version and yours is probably '
-            'better than this one. Ask for it before your mother or your saas '
+            'better than this one. Ask for it before your mother or your mother in law '
             'goes home. These recipes are the ones that get lost.'),
       ],
     ),
     PpPage(
       id: 'kitchen_methi_laddoo',
-      title: 'Methi laddoo, and the truth about methi for milk',
+      title: 'Fenugreek sweets (methi laddoo), and the truth about fenugreek for milk',
       format: 'RECIPE',
       bands: _early,
       blocks: [
-        PpIntro('Methi is the food most often pushed at a new mother in India, '
-            'usually for milk supply. It is genuinely good food. The milk claim '
-            'needs a more careful answer than you will be given.'),
+        PpIntro('Fenugreek (methi) is the food most often pressed on a new mother in India, '
+            'usually for milk supply. It is good food. The milk claim needs a '
+            'more careful answer than you will usually hear.'),
         PpArticle([
           'Fenugreek is the most studied galactagogue there is, and the studies '
           'are small, mixed and mostly poor quality. Some mothers report a '
           'noticeable increase within a couple of days. Others notice nothing. '
           'Nobody can predict which you will be.',
-          'What is not in doubt is that methi seeds are rich in iron and fibre, '
-          'that methi laddoo is warm dense food at a time when you need it, and '
-          'that eating properly supports supply regardless of any herb in it.',
-          'The important part is what a supply problem usually turns out to be. '
-          'Most low supply is about how often and how well the baby is removing '
-          'milk, not about what the mother ate. Three weeks of laddoo while a '
-          'shallow latch goes unfixed is three weeks lost.',
-        ], heading: 'What methi does and does not do'),
+          'Some things are not in doubt. Fenugreek seeds are rich in iron and fibre. '
+          'A fenugreek laddoo is warm, dense food when you need it. And eating '
+          'properly supports supply, whatever herb is in the food.',
+          'What matters most is what a supply problem usually turns out to be. '
+          'Most low supply is about how often and how well the baby removes '
+          'milk, not about what you ate. Three weeks of laddoos while a shallow '
+          'latch goes unfixed is three weeks lost.',
+        ], heading: 'What fenugreek does and does not do'),
         PpChartCard(
-          title: 'What you need, for about twenty laddoo',
+          title: 'What you need, for about twenty sweets',
           rows: [
-            ('Methi seeds, ground fine', '4 to 5 tbsp'),
+            ('Fenugreek seeds, ground fine', '4 to 5 tbsp'),
             ('Whole wheat flour', '1.5 cups'),
             ('Ghee', 'About 1 cup'),
             ('Gur or jaggery, grated', '1 to 1.5 cups'),
-            ('Milk, warm', '2 to 3 tbsp, to soak the methi'),
+            ('Milk, warm', '2 to 3 tbsp, to soak the fenugreek'),
             ('Almonds and cashews, chopped', '1 cup'),
-            ('Gond, fried and crushed, optional', '50 g'),
-            ('Elaichi and sonth', '1 tsp each'),
+            ('Edible gum, fried and crushed, optional', '50 g'),
+            ('Cardamom and dry ginger', '1 tsp each'),
           ],
           hue: 42,
         ),
         PpSteps([
-          PpStep('Soak the ground methi in warm milk for a few hours',
+          PpStep('Soak the ground fenugreek in warm milk for a few hours',
               'This is what takes the bitterness down. Skipping it is why some '
-              'methi laddoo are inedible.'),
-          PpStep('Roast the soaked methi in ghee on a low flame',
+              'fenugreek laddoos are inedible.'),
+          PpStep('Roast the soaked fenugreek in ghee on a low flame',
               'Five to seven minutes, until the raw smell goes. Keep the flame '
               'low or it turns bitter again.'),
           PpStep('Roast the wheat flour separately in ghee until golden',
               'Ten to fifteen minutes on low. Nutty, not brown.'),
-          PpStep('Combine, add the nuts and gond, and cool to warm',
+          PpStep('Combine, add the nuts and gum, and cool to warm',
               'Not hot, or the gur will melt and run.'),
-          PpStep('Add gur, elaichi and sonth, mix and roll',
+          PpStep('Add jaggery, cardamom and dry ginger, mix and roll',
               'Store airtight. Keeps about three weeks.'),
         ], heading: 'How to make it'),
-        PpWhenLine('One a day is the usual amount, from the early weeks. Methi '
+        PpWhenLine('One a day is the usual amount, from the early weeks. Fenugreek '
             'has a strong smell that comes through in your sweat and sometimes '
             'in your milk. That is harmless.'),
         PpCallout(
-          'Talk to your doctor before taking methi in large amounts or as a '
+          'Talk to your doctor before taking fenugreek in large amounts or as a '
           'supplement if you are diabetic or on any medicine for blood sugar. '
           'Fenugreek can lower blood sugar, which matters if something else is '
           'already doing that. It can also worsen reflux and cause wind.',
@@ -4331,7 +4610,7 @@ const PpArea _healingKitchen = PpArea(
         // both sign this page off, because it contradicts advice she is being
         // given at home.
         PpCallout(
-          'If your supply genuinely worries you, a feeding assessment is worth '
+          'If your supply really worries you, a feeding assessment is worth '
           'more than any food. Someone watching one full feed usually finds the '
           'answer in ten minutes.',
         ),
@@ -4345,7 +4624,7 @@ const PpArea _healingKitchen = PpArea(
           role: 'lactation',
         ),
         PpVideoSlot(
-          title: 'Methi laddoo without the bitterness',
+          title: 'Fenugreek sweets without the bitterness',
           subtitle: 'The soaking step, the roasting temperature, and how to know '
               'when the raw smell has gone.',
           minutes: '8 MIN',
@@ -4356,39 +4635,39 @@ const PpArea _healingKitchen = PpArea(
     ),
     PpPage(
       id: 'kitchen_panjiri_harira',
-      title: 'Panjiri and harira',
+      title: 'Roasted flour mix and a warm drink (panjiri and harira)',
       subtitle: 'The two that get made in the first week.',
       format: 'RECIPE',
       bands: _early,
       blocks: [
-        PpIntro('Panjiri is the loose version of a laddoo, eaten by the spoon. '
+        PpIntro('Panjiri is a roasted flour mix, the loose version of a laddoo, eaten by the spoon. '
             'Harira is the warm drink made in the first days. Both are made '
-            'early because in the first week chewing is more effort than it '
-            'sounds.'),
+            'early because, in the first week, chewing takes more effort than '
+            'you would think.'),
         PpChartCard(
-          title: 'Panjiri, for a jar that lasts two weeks',
+          title: 'Roasted flour mix (panjiri), for a jar that lasts two weeks',
           rows: [
             ('Whole wheat flour', '2 cups'),
             ('Ghee', '1 cup'),
-            ('Gur, grated, or boora', '1 to 1.5 cups'),
-            ('Gond, fried and crushed', '50 g'),
-            ('Melon seeds, magaz', '0.5 cup'),
-            ('Almonds, cashews, pista, chopped', '1 cup'),
-            ('Makhana, roasted and crushed', '1 cup'),
-            ('Sonth, elaichi, kali mirch', '1 tsp each'),
+            ('Jaggery, grated, or powdered sugar', '1 to 1.5 cups'),
+            ('Edible gum, fried and crushed', '50 g'),
+            ('Melon seeds', '0.5 cup'),
+            ('Almonds, cashews, pistachios, chopped', '1 cup'),
+            ('Fox nuts, roasted and crushed', '1 cup'),
+            ('Dry ginger, cardamom, black pepper', '1 tsp each'),
           ],
           hue: 42,
         ),
         PpSteps([
           PpStep('Roast the flour in ghee on low heat until golden',
               'Fifteen minutes, patiently. This is the whole recipe.'),
-          PpStep('Fry the gond separately until it puffs, then crush it',
-              'And roast the makhana and seeds until they crisp.'),
+          PpStep('Fry the gum separately until it puffs, then crush it',
+              'And roast the fox nuts and seeds until they crisp.'),
           PpStep('Mix everything off the heat and cool to warm',
               'Then add the gur and the spices.'),
           PpStep('Store in a jar and eat two spoons at a time',
               'With warm milk, or by itself. No rolling, no shaping.'),
-        ], heading: 'Panjiri, step by step'),
+        ], heading: 'Roasted flour mix (panjiri), step by step'),
         PpChartCard(
           title: 'Harira, one warm glass',
           rows: [
@@ -4396,7 +4675,7 @@ const PpArea _healingKitchen = PpArea(
             ('Whole wheat flour or almond powder', '2 tbsp'),
             ('Milk', '1 glass'),
             ('Gur or sugar', 'To taste'),
-            ('Sonth, haldi, kali mirch, elaichi', 'A pinch of each'),
+            ('Dry ginger, turmeric, black pepper, cardamom', 'A pinch of each'),
             ('Chopped almonds', 'A few'),
           ],
           hue: 42,
@@ -4404,7 +4683,7 @@ const PpArea _healingKitchen = PpArea(
         PpSteps([
           PpStep('Warm the ghee and roast the flour until it smells nutty',
               'Two or three minutes on a low flame.'),
-          PpStep('Add the sonth and haldi and stir for a few seconds',
+          PpStep('Add the dry ginger and turmeric and stir for a few seconds',
               'Then pour in the milk slowly, whisking so it does not lump.'),
           PpStep('Simmer for five minutes until it thickens slightly',
               'Add gur at the end, off the heat, so it does not split the '
@@ -4417,77 +4696,76 @@ const PpArea _healingKitchen = PpArea(
             'first forty days.'),
         PpCallout(
           'Skip harira if you are avoiding dairy, or make it with almond milk. '
-          'And keep the same limit as the laddoo: this is dense food, and two '
+          'And keep the same limit as the laddoos: this is dense food, and two '
           'spoons is a portion, not a starting point.',
           kind: PpCalloutKind.safety,
         ),
         PpVideoSlot(
-          title: 'Panjiri and harira, both in one go',
+          title: 'The flour mix and the warm drink, both in one go',
           subtitle: 'Made in the same pan, in about twenty minutes.',
           minutes: '11 MIN',
           slotId: 'youmaa/recipe_panjiri_harira',
           hue: 42,
         ),
         PpIndiaNote('In Punjab it is panjiri, in the south it is a different '
-            'preparation, in Maharashtra it is dink laddoo. The ingredients '
+            'preparation, in Maharashtra it is an edible gum laddoo (dink laddoo). The ingredients '
             'differ and the idea is identical. Use whichever your family makes.'),
       ],
     ),
     PpPage(
       id: 'kitchen_drinks',
-      title: 'Ajwain water, jeera water and the kadha',
+      title: 'Carom water, cumin water and the herbal drink (kadha)',
       format: 'RECIPE',
       bands: _allBands,
       blocks: [
-        PpIntro('These three are the most quietly useful things in the healing '
-            'kitchen. They cost almost nothing, they are warm, and they solve '
-            'the wind and bloating that nobody warned you about.'),
+        PpIntro('These three are the humble heroes of the healing kitchen. They '
+            'cost almost nothing, they are warm, and they ease the wind and '
+            'bloating that nobody warned you about.'),
         PpArticle([
           'After birth the gut is slow, stretched and full of air, and it stays '
-          'that way for a few weeks. Ajwain, jeera and saunf are carminatives, '
-          'which is a formal way of saying they help wind move. This is one of '
-          'the places where the traditional remedy and the pharmacology agree '
-          'without argument.',
-          'They are also the easiest way to get warm fluid into a mother who is '
-          'thirsty all day and cannot be bothered with plain water.',
+          'that way for a few weeks. Carom seeds, cumin and fennel are carminatives, '
+          'a formal way of saying they help wind move. Here the traditional '
+          'remedy and the science agree.',
+          'They are also the easiest way to get warm fluid in when you are '
+          'thirsty all day and tired of plain water.',
         ], heading: 'Why these work'),
         PpSteps([
-          PpStep('Ajwain water: one teaspoon of ajwain in a litre of water',
+          PpStep('Carom water: one teaspoon of carom seeds (ajwain) in a litre of water',
               'Boil for five minutes, strain into a flask, sip warm through the '
               'day. For bloating and wind, and traditionally for the uterus '
               'settling back.'),
-          PpStep('Jeera water: one teaspoon of jeera, same method',
-              'Milder than ajwain. Good all day, and easy to drink a lot of.'),
-          PpStep('Saunf water: one teaspoon of fennel, soaked or boiled',
+          PpStep('Cumin water: one teaspoon of cumin (jeera), same method',
+              'Milder than carom water. Good all day, and easy to drink a lot of.'),
+          PpStep('Fennel water: one teaspoon of fennel (saunf), soaked or boiled',
               'Sweeter. Best after meals, and it helps if you are constipated.'),
-          PpStep('Sonth, dry ginger, added to any of the three',
+          PpStep('Dry ginger, added to any of the three',
               'A quarter teaspoon. Warming, and it helps if you feel cold and '
               'achy, which many mothers do.'),
         ], heading: 'The three waters'),
         PpChartCard(
-          title: 'The postpartum kadha, one small cup',
+          title: 'The postpartum herbal drink (kadha), one small cup',
           rows: [
             ('Water', '2 cups, reduced to 1'),
-            ('Ajwain', '0.5 tsp'),
-            ('Saunf', '0.5 tsp'),
-            ('Sonth or fresh ginger', '0.5 tsp'),
-            ('Haldi', '0.25 tsp'),
-            ('Tulsi leaves', '4 or 5'),
-            ('Kali mirch', '2 or 3, crushed'),
-            ('Gur', 'A small piece, at the end'),
+            ('Carom seeds', '0.5 tsp'),
+            ('Fennel seeds', '0.5 tsp'),
+            ('Dry or fresh ginger', '0.5 tsp'),
+            ('Turmeric', '0.25 tsp'),
+            ('Holy basil (tulsi) leaves', '4 or 5'),
+            ('Black peppercorns', '2 or 3, crushed'),
+            ('Jaggery', 'A small piece, at the end'),
           ],
-          note: 'Simmer everything except the gur for ten minutes until it '
-              'reduces by half. Strain, add gur, drink warm. Once a day.',
+          note: 'Simmer everything except the jaggery for ten minutes until it '
+              'reduces by half. Strain, add jaggery, drink warm. Once a day.',
           hue: 42,
         ),
-        PpWhenLine('From the first days. Ajwain or jeera water through the day, '
-            'kadha once daily for the first few weeks. Stop the kadha if it '
+        PpWhenLine('From the first days. Carom or cumin water through the day, '
+            'the herbal drink once daily for the first few weeks. Stop it if it '
             'gives you heartburn, which it does to some mothers.'),
         PpCallout(
           'Warm water, in any of these forms, counts fully towards your fluid '
           'for the day. If plain water is being withheld from you because it is '
-          '"cold", ask for it warm rather than accepting less of it. A '
-          'dehydrated mother is not a well one.',
+          '"cold", ask for it warm rather than accepting less of it. You need '
+          'that water to stay well.',
           kind: PpCalloutKind.safety,
         ),
         // REQUIRED_REVIEW: the kadha ingredients and the once daily frequency,
@@ -4496,46 +4774,56 @@ const PpArea _healingKitchen = PpArea(
         // confirm quantities and confirm there is nothing here that interacts
         // with common postpartum medication.
         PpVideoSlot(
-          title: 'The three waters and the kadha',
+          title: 'The three waters and the herbal drink',
           subtitle: 'Made once, kept in a flask, drunk all day.',
           minutes: '6 MIN',
           slotId: 'youmaa/recipe_kadha',
           hue: 42,
         ),
+        // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+        PpCards(heading: 'More drinks for the first 40 days', [
+          PpCard('Cumin and fennel water', 'Light, and many mothers find it '
+              'settles the tummy.'),
+          PpCard('Fenugreek water', 'Traditionally for milk. Harmless in food '
+              'amounts.'),
+          PpCard('Dry fruit milk', 'Almonds, dates and a pinch of cardamom, '
+              'blended in warm milk.'),
+          PpCard('Dry ginger and edible gum drinks', 'Warming, and rich. In moderation.'),
+        ]),
       ],
     ),
     PpPage(
       id: 'kitchen_iron_foods',
-      title: 'Cooking for iron: dates, beetroot, palak and gur',
+      title: 'Cooking for iron: dates, beetroot, spinach and jaggery',
       format: 'RECIPE',
       bands: _allBands,
       blocks: [
         PpIntro('The iron page explains why this matters. This one is what to '
-            'actually cook, and the small tricks that decide whether the iron in '
-            'the food reaches your blood at all.'),
+            'cook, and the small tricks that decide whether the iron in the food '
+            'reaches your blood at all.'),
         PpArticle([
           'Iron from plants is absorbed much less easily than iron from meat, '
           'and what you eat alongside it changes the amount by several times. '
-          'That is the whole reason this page exists. The same plate of palak '
+          'That is the whole reason this page exists. The same plate of spinach '
           'can deliver a useful amount of iron or almost none, depending on '
           'whether there is lemon on it and tea beside it.',
         ], heading: 'Why the pairing matters more than the food'),
         PpCards([
-          PpCard('Khajoor and anjeer laddoo',
-              'Dates, figs, almonds and til blended and rolled, no sugar '
+          PpCard('Date and fig sweets (laddoos)',
+              'Dates, figs, almonds and sesame blended and rolled, no sugar '
               'needed. Two a day, and the easiest iron in the house.'),
-          PpCard('Beetroot and carrot sabzi, or beetroot paratha',
+          PpCard('Beetroot and carrot stir-fry, or beetroot paratha',
               'Grated beetroot is easier to eat than boiled. Squeeze lemon on '
               'it.'),
-          PpCard('Palak dal, palak paneer, methi thepla',
-              'Greens cooked with tomato and finished with lemon or amchur.'),
-          PpCard('Gur instead of sugar, wherever it fits',
-              'In your milk, in laddoo, in kadha, in chikki. Not a huge amount '
+          PpCard('Spinach dal, spinach paneer, fenugreek thepla',
+              'Greens cooked with tomato and finished with lemon or dry mango powder.'),
+          PpCard('Jaggery instead of sugar, wherever it fits',
+              'In your milk, in laddoos, in the herbal drink, in chikki. Not a huge amount '
               'of iron per spoon, but it adds up over a day.'),
           PpCard('Ragi malt or ragi porridge',
               'Iron and calcium together, and it goes down easily on a bad '
               'morning.'),
-          PpCard('Chana, rajma, sattu and til chikki',
+          PpCard('Chana, rajma, sattu and sesame chikki',
               'Sattu drink with lemon and salt is close to a perfect one '
               'handed meal.'),
           PpCard('Liver, red meat, fish and egg, if you eat them',
@@ -4544,12 +4832,12 @@ const PpArea _healingKitchen = PpArea(
         ], heading: 'The dishes worth putting in the week', hue: 42),
         PpSteps([
           PpStep('Put something sour with every iron rich meal',
-              'Lemon, amchur, tomato, tamarind, amla, guava, orange. Vitamin C '
+              'Lemon, dry mango powder, tomato, tamarind, amla, guava, orange. Vitamin C '
               'multiplies absorption several times over.'),
           PpStep('Keep tea and coffee away from meals',
               'An hour either side. The tannins block iron, and afternoon chai '
               'right after lunch is the commonest way Indian mothers lose it.'),
-          PpStep('Cook in an iron kadhai, especially anything sour',
+          PpStep('Cook in an iron pan, especially anything sour',
               'A measurable amount of iron transfers into the food.'),
           PpStep('Soak and sprout dals and chana where you can',
               'It breaks down the phytates that lock iron up.'),
@@ -4573,7 +4861,7 @@ const PpArea _healingKitchen = PpArea(
             'months. Refilling iron stores takes about three months of '
             'consistency, not two weeks.'),
         PpVideoSlot(
-          title: 'Khajoor and anjeer laddoo, no sugar',
+          title: 'Date and fig sweets, no sugar',
           subtitle: 'Five ingredients, one mixer, fifteen minutes, and they keep '
               'for three weeks.',
           minutes: '7 MIN',
@@ -4584,7 +4872,7 @@ const PpArea _healingKitchen = PpArea(
     ),
     PpPage(
       id: 'kitchen_one_handed',
-      title: 'Meals you can eat holding her',
+      title: 'Meals you can eat holding your baby',
       format: 'RECIPE',
       bands: _allBands,
       blocks: [
@@ -4597,13 +4885,13 @@ const PpArea _healingKitchen = PpArea(
           'and a bowl at 4am. Reheating is one hand. Cooking is not.',
         ], heading: 'The rule underneath all of them'),
         PpChartCard(
-          title: 'Khichdi that is actually a meal',
+          title: 'Khichdi that is a proper meal',
           rows: [
             ('Rice', '0.5 cup'),
             ('Moong dal', '0.5 cup'),
             ('Ghee', '2 tbsp'),
-            ('Jeera, hing, haldi, ajwain', 'A pinch of each'),
-            ('Grated carrot, beans, palak', '1 cup, whatever is in the house'),
+            ('Cumin, asafoetida, turmeric, carom seeds', 'A pinch of each'),
+            ('Grated carrot, beans, spinach', '1 cup, whatever is in the house'),
             ('Water', '4 cups, for a soft khichdi'),
             ('Salt', 'To taste'),
           ],
@@ -4613,13 +4901,13 @@ const PpArea _healingKitchen = PpArea(
         ),
         PpCards([
           PpCard('Dalia, savoury or sweet',
-              'Cracked wheat with vegetables and ghee, or with milk and gur. '
+              'Cracked wheat with vegetables and ghee, or with milk and jaggery. '
               'Cooks in one pot in fifteen minutes and reheats well.'),
-          PpCard('Roti roll with dal or sabzi inside',
+          PpCard('Roti roll with dal or vegetables inside',
               'Ask whoever is cooking to roll it. It changes a two handed meal '
               'into a one handed one.'),
           PpCard('Sattu drink',
-              'Roasted gram flour, water, lemon, salt or gur. Protein, iron, no '
+              'Roasted gram flour, water, lemon, salt or jaggery. Protein, iron, no '
               'cooking, thirty seconds.'),
           PpCard('Curd rice, with a spoon of ghee',
               'Cooling in summer, calcium, and it goes down when nothing else '
@@ -4629,17 +4917,17 @@ const PpArea _healingKitchen = PpArea(
           PpCard('Upma, poha or idli with sambar',
               'All reheat, all eat with a spoon, all take one hand.'),
           PpCard('Milk with a banana and soaked almonds',
-              'When you truly cannot manage food, this is not nothing.'),
+              'On days you cannot manage food, this still counts.'),
         ], heading: 'The rest of the list', hue: 42),
         PpSteps([
           PpStep('Cook one big thing every two days, not six small ones',
               'Khichdi, dal, dalia, a vegetable. Everything else is assembly.'),
           PpStep('Keep a snack box within arm\'s reach of where you feed',
-              'Laddoo, dry fruit, chana, banana, a bottle of water.'),
+              'A laddoo, dry fruit, roasted chana, a banana, a bottle of water.'),
           PpStep('Ask for food to be cut or rolled before it reaches you',
               'It is a small request and it doubles what you can eat.'),
-          PpStep('Eat before you feed her, not after',
-              'After is theoretical, as any mother of a cluster feeding newborn '
+          PpStep('Eat before you feed your baby, not after',
+              'After rarely comes, as any mother of a cluster feeding newborn '
               'will tell you.'),
         ], heading: 'How to set it up so it keeps happening'),
         PpWhenLine('From the day you come home, and honestly for the first year. '
@@ -4656,6 +4944,15 @@ const PpArea _healingKitchen = PpArea(
         PpIndiaNote('If you have help at home, this is the highest value thing '
             'to hand over. One pot of dal and one pot of khichdi, twice a week, '
             'is worth more to you than a swept floor.'),
+        // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+        PpCards(heading: 'More meals that feed a nursing mother well', [
+          PpCard('Dal khichdi with ghee', 'Easy to eat with a spoon.'),
+          PpCard('Paneer or egg paratha rolls', 'One hand, no plate.'),
+          PpCard('Fenugreek thepla (a soft spiced flatbread)', 'Keeps for days.'),
+          PpCard('Fish curry and rice', 'Good fats and protein.'),
+          PpCard('Ragi or oats porridge with nuts', 'A quick breakfast.'),
+          PpCard('Sprouts chaat or chana', 'Protein you can snack on.'),
+        ]),
       ],
     ),
     PpPage(
@@ -4670,23 +4967,22 @@ const PpArea _healingKitchen = PpArea(
         PpArticle([
           'Milk supply works on removal. The more milk that leaves the breast, '
           'and the more completely, the more your body makes. That is the '
-          'mechanism, and it is why a baby feeding often and well is the single '
+          'mechanism, and it is why a baby feeding often and well is the '
           'biggest driver of supply.',
           'Foods traditionally used for supply are called galactagogues. The '
           'evidence for all of them is thin. Some studies show a small effect, '
           'many show none, and almost all are small and poorly designed. That is '
           'not the same as saying they do nothing. It means nobody can promise '
           'you they will work.',
-          'What food does do reliably is keep you fed and hydrated, and a mother '
-          'who is severely under eating can see supply drop. So eat the shatavari '
-          'kheer if it helps you feel looked after, and eat properly regardless. '
-          'Just do not let three weeks pass on food alone if something is '
-          'genuinely wrong.',
-        ], heading: 'How supply actually works'),
+          'What food does reliably is keep you fed and hydrated. If you are '
+          'badly under eating, supply can drop. So eat the shatavari kheer if it '
+          'helps you feel looked after, and eat properly regardless. Just do not '
+          'let three weeks pass on food alone if something is really wrong.',
+        ], heading: 'How supply works'),
         PpChartCard(
           title: 'The usual suspects, and what is honestly known',
           rows: [
-            ('Methi, fenugreek',
+            ('Fenugreek (methi)',
                 'The most studied. Mixed results. Some mothers notice a '
                 'difference in a couple of days.'),
             ('Shatavari',
@@ -4694,12 +4990,12 @@ const PpArea _healingKitchen = PpArea(
                 'taken as a powder in milk.'),
             ('Oats and dalia',
                 'No direct evidence. Good iron, good calories, harmless.'),
-            ('Sabudana and rice preparations',
+            ('Sago (sabudana) and rice preparations',
                 'Traditional. Energy dense. No evidence for supply itself.'),
             ('Garlic',
                 'Changes the flavour of milk and some babies feed more '
                 'enthusiastically. That is the mechanism, if there is one.'),
-            ('Jeera, saunf, ajwain, til',
+            ('Cumin, fennel, carom seeds, sesame',
                 'Traditional across India. Good food, no strong evidence for '
                 'supply.'),
             ('Enough food and enough water',
@@ -4710,10 +5006,11 @@ const PpArea _healingKitchen = PpArea(
           hue: 42,
         ),
         PpCallout(
-          'See a lactation consultant or your paediatrician rather than eating '
-          'your way through this list if your baby is not gaining weight, has '
-          'few wet nappies, feeds for an hour and is still frantic, or if '
-          'feeding hurts. Those have causes, and the causes are fixable.',
+          'See a lactation consultant or your paediatrician, rather than eating '
+          'your way through this list, if any of these are true. Your baby is '
+          'not gaining weight, has few wet nappies, or feeds for an hour and is '
+          'still frantic. Or feeding hurts. Those have causes, and the causes '
+          'are fixable.',
           kind: PpCalloutKind.doctor,
         ),
         // REQUIRED_REVIEW: this page deliberately underclaims for every
@@ -4730,10 +5027,15 @@ const PpArea _healingKitchen = PpArea(
           surfaceId: 'pp_experts',
           role: 'lactation',
         ),
-        PpIndiaNote('If a supplement or a churna is being given to you daily, '
+        PpIndiaNote('If a supplement or a herbal powder is being given to you daily, '
             'take the packet to your doctor once. Food is food. A concentrated '
             'herbal preparation has a dose, and it is worth having it looked at '
             'while you are also on other medication.'),
+        // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+        PpCallout('Herbal tonics and supplements sold for milk supply, from '
+            'shatavari mixes to imported herbs, are not tested for safety in '
+            'breastfeeding. They can contain more than the label says. Ask your '
+            'doctor before taking any.'),
       ],
     ),
     PpPage(
@@ -4742,7 +5044,7 @@ const PpArea _healingKitchen = PpArea(
       format: 'ARTICLE',
       bands: _allBands,
       blocks: [
-        PpIntro('The jaapa kitchen gets most of it right, which is why the parts '
+        PpIntro('The forty-day kitchen gets most of it right, which is why the parts '
             'it gets wrong are so hard to argue with. Here is the short list, '
             'and none of it is a reason to reject the rest.'),
         PpArticle([
@@ -4751,27 +5053,27 @@ const PpArea _healingKitchen = PpArea(
           'them, because there was never a way to. Warm food and frequent '
           'feeding travelled in the same bundle as no water and no vegetables, '
           'and the bundle got passed on whole.',
-          'You are allowed to keep the useful half. That is not disrespect. It '
-          'is what every generation of women has quietly done.',
+          'You are allowed to keep the useful half. That is not disrespect. '
+          'Every generation of women has done the same, without saying so.',
         ], heading: 'Why the good and the useless arrive together'),
         PpCards([
-          PpCard('Ghee by the katori, several times a day',
-              'A spoon or two in your food is genuinely useful. Half a cup a '
-              'day is a great deal of fat and it is where mothers start feeling '
+          PpCard('Ghee by the bowlful, several times a day',
+              'A spoon or two in your food is useful. Half a cup a day is a '
+              'great deal of fat, and that is where mothers start feeling '
               'heavy, greasy and off their food entirely.'),
-          PpCard('Six or seven laddoo a day',
+          PpCard('Six or seven sweets (laddoos) a day',
               'That is a lot of jaggery. One or two does the job. This matters '
               'especially if your sugar was high in pregnancy.'),
           PpCard('No water, or only warm water in tiny amounts',
-              'Withholding fluid from a mother making a litre of milk a day is '
-              'the single most harmful item on this list. Ask for it warm '
-              'instead of accepting less.'),
+              'You are making a litre of milk a day. Being kept from water is '
+              'the most harmful item on this list. Ask for it warm instead of '
+              'accepting less.'),
           PpCard('No vegetables and no fruit for forty days',
               'This costs you fibre at exactly the moment constipation is '
               'universal, and vitamin C at exactly the moment it is what makes '
               'your iron absorb.'),
           PpCard('No sour food, no curd, no buttermilk',
-              'Curd is protein, calcium and comfort. Lemon is what unlocks your '
+              'Curd is protein, calcium and comfort. Lemon helps you absorb '
               'iron. Both are usually on the forbidden list.'),
           PpCard('Forty days without stepping outside at all',
               'Rest is good. No daylight for six weeks costs you vitamin D and '
@@ -4783,16 +5085,16 @@ const PpArea _healingKitchen = PpArea(
         ], heading: 'The seven that are worth pushing back on', hue: 12),
         PpCallout(
           'None of this means the people feeding you are wrong about everything. '
-          'They are mostly right and they are also doing the cooking. Pick the '
-          'one or two items above that actually apply in your house, and let the '
-          'rest go.',
+          'They are mostly right, and they are also doing the cooking. Pick the '
+          'one or two items above that apply in your house, and let the rest '
+          'go.',
         ),
         PpCallout(
-          'Heat foods and cold foods causing harm to a healing mother is a '
-          'classification, not a mechanism. There is no evidence that curd '
-          'causes a cold, that papaya harms a feeding mother, or that a banana '
-          'in the evening is dangerous. Where a food genuinely disagrees with '
-          'you, that is worth noticing. A list you were handed is not.',
+          'The idea of "heat" and "cold" foods harming a healing mother is a '
+          'way of sorting food, not a cause of harm. There is no evidence that '
+          'curd causes a cold, that papaya harms a feeding mother, or that a '
+          'banana in the evening is dangerous. If a food really disagrees with '
+          'you, notice that. A list you were handed is different.',
           kind: PpCalloutKind.myth,
         ),
         PpScript([
@@ -4804,7 +5106,7 @@ const PpArea _healingKitchen = PpArea(
                 'argument about tradition. Almost nobody argues with a wound.',
           ),
           PpScriptLine(
-            say: 'Can I have the water warm? I get very thirsty when I feed her.',
+            say: 'Can I have the water warm? I get very thirsty when I feed.',
             notThis: 'I am not drinking warm water, give me normal water.',
             why: 'Asking for it warm accepts the rule and gets you the fluid. '
                 'You are not trying to win, you are trying to drink.',
@@ -4812,7 +5114,7 @@ const PpArea _healingKitchen = PpArea(
           PpScriptLine(
             say: 'One laddoo in the morning is perfect. My sugar was borderline '
                 'so the doctor said to keep the sweets to one a day.',
-            notThis: 'Stop giving me so many laddoo.',
+            notThis: 'Stop giving me so many laddoos.',
             why: 'Naming a medical reason ends it in one sentence and nobody '
                 'feels rejected.',
           ),
@@ -4885,14 +5187,14 @@ const PpArea _thePeopleAroundYou = PpArea(
             'door, and every one of them is happy for you. It is also, right '
             'now, work you are doing on top of everything else.'),
         PpArticle([
-          'Nobody visiting means any harm. They also do not see what the visit '
-          'costs: you sit up, you cover up, you make conversation, you feed her '
-          'in front of people, you do not sleep in the gap you had planned to '
-          'sleep in, and then somebody asks for tea.',
-          'The mothers who come through the first month best are not the ones '
-          'who refuse visitors. They are the ones who decided in advance what a '
-          'visit looks like, and had one other person say it for them.',
-        ], heading: 'What a visit actually costs you'),
+          'Nobody visiting means any harm. They just do not see what a visit '
+          'costs you. You sit up, cover up, make conversation and feed in front '
+          'of people. You lose the sleep you had planned, and then somebody '
+          'asks for tea.',
+          'The mothers who cope best in the first month do not refuse visitors. '
+          'They decide in advance what a visit looks like, and have one other '
+          'person say it for them.',
+        ], heading: 'What a visit costs you'),
         PpSteps([
           PpStep('Pick two hours a day when visits happen',
               'Late afternoon works for most families. Outside those hours, the '
@@ -4901,7 +5203,7 @@ const PpArea _thePeopleAroundYou = PpArea(
               'Your partner, your mother, your sister. The message lands '
               'completely differently coming from anyone but you.'),
           PpStep('Set a length, out loud, at the start',
-              '"She has to feed at five" is a finishing time everybody accepts.'),
+              '"The baby has to feed at five" is a finishing time everybody accepts.'),
           PpStep('Have somewhere to disappear to',
               'One room that is yours. You leave to feed and you do not come '
               'back until you want to.'),
@@ -4909,9 +5211,9 @@ const PpArea _thePeopleAroundYou = PpArea(
               'When they ask what they can bring, answer with a real thing. '
               'Dal, fruit, a packet of pads.'),
           PpStep('Say no to holding the baby when you want to',
-              'Especially if she has just settled, and especially if the person '
-              'has a cough.'),
-        ], heading: 'What actually works'),
+              'Especially if the baby has just settled, and especially if the '
+              'person has a cough.'),
+        ], heading: 'What works'),
         PpScript([
           PpScriptLine(
             say: 'We are keeping visits to the evenings for the first few weeks. '
@@ -4921,7 +5223,7 @@ const PpArea _thePeopleAroundYou = PpArea(
                 'away and you still get your mornings.',
           ),
           PpScriptLine(
-            say: 'She is due a feed, I am going to take her inside. Do stay, '
+            say: 'The baby is due a feed, so we are going inside. Do stay, '
                 'have your tea.',
             notThis: 'Sorry, I have to go, sorry.',
             why: 'Leaves without apologising and without ending the visit for '
@@ -4932,14 +5234,14 @@ const PpArea _thePeopleAroundYou = PpArea(
                 'weeks, so we are doing two at a time.',
             notThis: 'The whole family cannot come, it is too much for me.',
             why: 'A medical reason ends the discussion. It is also true: a '
-                'newborn\'s immune system is genuinely new.',
+                'newborn\'s immune system is brand new.',
           ),
         ], heading: 'The words, if you want them'),
         PpCallout(
           'Anybody with a cough, a cold, a fever or a fresh vaccination in the '
-          'family should not hold a newborn, and should not kiss her at all. '
-          'This one is not about your comfort. In the first weeks an ordinary '
-          'adult cold can be a serious illness for her.',
+          'family should not hold a newborn, and should not kiss the baby at '
+          'all. This one is about safety. In the first weeks an ordinary adult '
+          'cold can be a serious illness for a newborn.',
           kind: PpCalloutKind.safety,
         ),
         // REQUIRED_REVIEW: the visitor infection guidance, particularly the "no
@@ -4958,23 +5260,22 @@ const PpArea _thePeopleAroundYou = PpArea(
       bands: _allBands,
       blocks: [
         PpIntro('Most new mothers ask for help in a way that makes it easy to '
-            'say no. Not because they are polite, but because the request comes '
-            'out wrapped in an apology and a question mark.'),
+            'say no. The request comes out wrapped in an apology and a question '
+            'mark.'),
         PpArticle([
-          'There is a difference between "if you are not busy, could you maybe '
-          'hold her for a bit, sorry" and "can you take her for an hour, I need '
-          'to sleep". The first is an offer to be declined. The second is a '
-          'request with a shape, and people say yes to it far more often.',
-          'The other thing that makes help not arrive is vagueness. "Let me know '
-          'if you need anything" is a genuinely kind sentence that puts the '
-          'entire job of working out what you need, and asking for it, back on '
-          'the person with no time and no bandwidth. Answer it with a specific '
-          'task and most people are relieved.',
+          'Compare two requests. "If you are not busy, could you maybe hold the '
+          'baby for a bit, sorry." And "Can you take the baby for an hour? I '
+          'need to sleep." The first is easy to decline. The second has a clear shape, '
+          'and people say yes to it far more often.',
+          'Help also fails to arrive when it is vague. "Let me know if you need '
+          'anything" is kindly meant. But it hands the work of deciding what you '
+          'need, and asking, back to you, with no time to spare. Answer it with '
+          'a specific task, and most people are relieved.',
         ], heading: 'Why the help does not arrive'),
         PpSteps([
           PpStep('Name the task, the time and the person',
-              '"Can you take her from four to five" beats "can you help with '
-              'the baby" every single time.'),
+              '"Can you take the baby from four to five" works far better than '
+              '"can you help with the baby".'),
           PpStep('Take the apology out of the front of the sentence',
               'You are recovering from birth. There is nothing to be sorry '
               'about.'),
@@ -4982,16 +5283,16 @@ const PpArea _thePeopleAroundYou = PpArea(
               'When someone asks what they can do, read one out. No thinking '
               'required in the moment.'),
           PpStep('Ask for the boring things, not the baby',
-              'Most people want to hold her. What you actually need is the '
-              'dishes, the medicines, the bank work, a pot of dal.'),
+              'Most people want to hold the baby. What you need is the dishes, '
+              'the medicines, the bank work, a pot of dal.'),
           PpStep('Say yes the first time, so there is a second time',
               'Declining help teaches people to stop offering, and the offers '
               'stop around week three anyway.'),
         ], heading: 'How to ask so the answer is yes'),
         PpScript([
           PpScriptLine(
-            say: 'Can you take her from four to five? I need to sleep.',
-            notThis: 'If you are free, maybe you could hold her for a bit? '
+            say: 'Can you take the baby from four to five? I need to sleep.',
+            notThis: 'If you are free, maybe you could hold the baby for a bit? '
                 'Sorry.',
             why: 'A time and a reason. There is nothing to decline and nothing '
                 'to negotiate.',
@@ -5003,18 +5304,17 @@ const PpArea _thePeopleAroundYou = PpArea(
                 'be told what to bring.',
           ),
           PpScriptLine(
-            say: 'I am going to lie down for an hour. Wake me only if she will '
-                'not settle.',
+            say: 'I am going to lie down for an hour. Wake me only if the baby '
+                'will not settle.',
             notThis: 'I might just rest for a few minutes if that is okay.',
             why: 'A statement, not a request for permission. You do not need '
                 'permission to sleep.',
           ),
         ], heading: 'Three sentences worth practising'),
         PpCallout(
-          'The list of what to hand over, in rough order of what buys you the '
-          'most: one long block of sleep, cooking, dishes, laundry, older '
-          'children, errands, and last of all holding the baby. Most people '
-          'offer the last one.',
+          'What to hand over, roughly in order of what helps you most. One long '
+          'block of sleep, cooking, dishes, laundry, older children, errands. '
+          'Last of all, holding the baby. Most people offer the last one.',
         ),
         PpIndiaNote('If you have paid help at home, the useful ask is usually '
             'cooking rather than cleaning. A pot of dal and a pot of khichdi '
@@ -5032,24 +5332,23 @@ const PpArea _thePeopleAroundYou = PpArea(
             'and it is hard for a reason that is not anybody being unkind. Two '
             'things are getting tangled and they are worth separating.'),
         PpArticle([
-          'She raised children, probably with far less help and far less '
-          'information than you have, and they lived. That gives her real '
-          'confidence and real standing. She is also, in most houses, the reason '
+          'Your mother in law raised children, probably with far less help and '
+          'information than you have, and they grew up well. That gives her real '
+          'confidence and real standing. In most houses, she is also the reason '
           'you are eating hot food twice a day right now.',
-          'And the advice she gives comes from a different decade of medicine. '
-          'Ghutti, honey on the lips, kajal, a tight binder, water for a newborn, '
+          'And her advice comes from a different decade of medicine. '
+          'Herbal drops (ghutti), honey on the lips, kohl (kajal), a tight binder, water for a newborn, '
           'a head shaped by hand, oil in the ears. These were normal and some of '
           'them are now known to be harmful. Neither of you is being '
           'unreasonable. You are working from different information.',
-          'The thing that turns that into a conflict is when advice arrives as '
-          'authority: not "we used to do this" but "give her this". The useful '
-          'move is not to win the argument about the past. It is to be clear '
-          'about who decides now, while making it obvious you are grateful for '
-          'the help.',
-        ], heading: 'What is actually going on'),
+          'It turns into conflict when advice arrives as an order. Not "we used '
+          'to do this" but "give the baby this". You do not need to win the '
+          'argument about the past. Be clear about who decides now, and show '
+          'you are grateful for the help.',
+        ], heading: 'What is going on'),
         PpCards([
           PpCard('Separate gratitude from authority',
-              'You can be genuinely thankful for the cooking and still be the '
+              'You can be thankful for the cooking and still be the '
               'one who decides what goes in the baby\'s mouth. Say both.'),
           PpCard('Let the doctor be the third party',
               '"The paediatrician said" is not a trick. It is true, it is '
@@ -5057,13 +5356,13 @@ const PpArea _thePeopleAroundYou = PpArea(
           PpCard('Pick your three, let the rest go',
               'Feeding, sleep safety and anything that goes into or onto the '
               'baby. Almost everything else is not worth the friction.'),
-          PpCard('Give her a job that is genuinely hers',
-              'Malish, the kadha, a lullaby, the laddoo. Real, valued, and not '
+          PpCard('Give your mother in law a job that is all hers',
+              'The massage, the herbal drink, a lullaby, the laddoos. Real, valued, and not '
               'a decision about the baby.'),
-          PpCard('Let your partner carry his own mother',
-              'The message from a son lands differently from the same message '
-              'from a daughter in law. This is the single most useful thing he '
-              'can do this year.'),
+          PpCard('Let your husband speak to his own mother',
+              'A message from a son lands differently from the same message '
+              'from a daughter in law. It may be the most useful thing your '
+              'husband can do this year.'),
           PpCard('Do not fight it at 3am',
               'Nothing said at 3am between exhausted people gets remembered '
               'accurately. Say it the next afternoon.'),
@@ -5074,29 +5373,29 @@ const PpArea _thePeopleAroundYou = PpArea(
                 'need you. On the feeding, though, I am going to follow what the '
                 'doctor told us.',
             notThis: 'That is not how it is done now.',
-            why: 'Keeps her standing intact and still draws the line. Very few '
+            why: 'Respects her place and still draws the line. Very few '
                 'people argue after being told they are needed.',
           ),
           PpScriptLine(
             say: 'The paediatrician has said nothing except milk until six '
                 'months, not even water. I am scared to do anything different.',
-            notThis: 'Ghutti is dangerous, please do not give it.',
-            why: 'Puts the rule on the doctor and your own fear rather than on '
-                'her judgement, which is the part that stings.',
+            notThis: 'Those herbal drops are dangerous, please do not give them.',
+            why: 'Puts the rule on the doctor and your own fear. It does not '
+                'question her judgement, which is the part that stings.',
           ),
           PpScriptLine(
-            say: 'Can you make the kadha? Nobody makes it like you and I am '
+            say: 'Can you make the herbal drink? Nobody makes it like you and I am '
                 'drinking it every day.',
-            why: 'A real job, genuinely valued. A person with a role of their '
-                'own reaches for other people\'s roles far less.',
+            why: 'A real job, and a valued one. Someone with a role of their own '
+                'reaches for other people\'s roles far less.',
           ),
         ], heading: 'Sentences that hold the line without a fight'),
         PpCallout(
           'Ask your paediatrician directly, in front of whoever is insisting, '
-          'about anything that goes into the baby: ghutti, honey, water, gripe '
-          'water, kajal, or an oil in the nose or ears. Honey before one year is '
-          'genuinely dangerous, and a doctor saying so in the room ends the '
-          'discussion permanently.',
+          'about anything that goes into the baby. Herbal drops, honey, water, gripe '
+          'water, kohl, or an oil in the nose or ears. Honey before one year is '
+          'dangerous, even a little. A doctor saying so in the room ends the '
+          'discussion for good.',
           kind: PpCalloutKind.doctor,
         ),
         // REQUIRED_REVIEW: the specific traditional practices named here
@@ -5105,16 +5404,17 @@ const PpArea _thePeopleAroundYou = PpArea(
         // the list and the strength of wording, since this page will be read
         // aloud in arguments.
         PpCallout(
-          'If she is genuinely making you miserable rather than merely '
-          'disagreeing with you, that is a different page. Constant criticism '
-          'after birth is one of the strongest drivers of postpartum depression '
-          'in Indian studies, and it is worth naming rather than absorbing.',
+          'Is your mother in law making you miserable, rather than just '
+          'disagreeing with you? '
+          'That is a different matter. Constant criticism after birth is one of '
+          'the strongest drivers of postpartum depression in Indian studies. '
+          'Name it rather than absorbing it.',
         ),
       ],
     ),
     PpPage(
       id: 'people_partner',
-      title: 'Your partner, and the work he cannot see',
+      title: 'Your partner, and the work that goes unseen',
       format: 'ARTICLE',
       bands: _allBands,
       blocks: [
@@ -5123,50 +5423,51 @@ const PpArea _thePeopleAroundYou = PpArea(
             'for the person who has to do the telling.'),
         PpArticle([
           'There are two kinds of work in a house with a newborn. The visible '
-          'kind: changing her, bathing her, washing bottles, cooking. And the '
-          'invisible kind: knowing when she last fed, when the vaccination is '
-          'due, that the nappies are running out, which cry means what, and that '
+          'kind: changing, bathing, washing bottles, cooking. And the invisible '
+          'kind. Knowing when the last feed was and when the vaccination is due. '
+          'Knowing the nappies are running out, which cry means what, and that '
           'somebody has to be awake.',
-          'The second kind is the one that does not get shared, and it is the '
-          'one that wears mothers down. A partner can do half the visible work '
-          'and the mother is still carrying the entire mental load, because she '
-          'is the one issuing the instructions.',
-          'The fix is not more helping. It is owning whole areas, start to '
-          'finish, including the noticing. "Nappies are his job" means he tracks '
-          'the stock, buys them, and you never think about nappies again.',
+          'The second kind does not get shared, and it is what wears mothers '
+          'down. A partner can do half the visible work while you still carry '
+          'the whole mental load, because you are the one giving the '
+          'instructions.',
+          'What works is your partner owning whole areas, start to finish, '
+          'including the noticing. If nappies are your partner\'s job, that '
+          'means tracking the stock and buying them. You never think about '
+          'nappies again.',
         ], heading: 'The work that never gets divided'),
         PpCards([
           PpCard('Hand over whole areas, not tasks',
               'Bath time, the night shift on Saturdays, all medical '
-              'appointments, all shopping. His to remember, not his to be '
-              'reminded of.'),
+              'appointments, all shopping. Your partner remembers them, '
+              'without being reminded.'),
           PpCard('Protect one block of your sleep, every night',
-              'Even four uninterrupted hours changes a mother\'s week. If she is '
-              'breastfeeding, he does the settling after the feed.'),
-          PpCard('Let him do it wrong',
+              'Even four uninterrupted hours changes your week. If you are '
+              'breastfeeding, your partner does the settling after the feed.'),
+          PpCard('Let your partner do it wrong',
               'A nappy on backwards is not worth taking the job back for. '
               'Correcting is how a partner learns to wait for instructions.'),
           PpCard('Say the specific thing at the specific time',
-              'He genuinely cannot tell that you have not eaten. Saying it is '
-              'not nagging.'),
+              'Your partner really cannot tell that you have not eaten. Saying '
+              'it is not nagging.'),
           PpCard('Ten minutes a day that is not about logistics',
               'Not a date night. Ten minutes on the bed, not discussing the '
               'schedule.'),
-          PpCard('He may also be struggling',
+          PpCard('Your partner may also be struggling',
               'Fathers get postnatal depression too, at meaningful rates, and '
               'almost nobody asks them.'),
-        ], heading: 'What actually changes things', hue: 322),
+        ], heading: 'What changes things', hue: 322),
         PpScript([
           PpScriptLine(
             say: 'I need you to own bath and bedtime completely. Not help with '
                 'it, own it, including remembering when it is.',
             notThis: 'You never help with anything.',
-            why: 'Names the actual problem, which is ownership rather than '
-                'effort, and gives him something he can succeed at.',
+            why: 'Names the real problem, which is ownership rather than '
+                'effort, and gives your partner something to succeed at.',
           ),
           PpScriptLine(
-            say: 'From ten to two, she is yours. Bring her to me only to feed. '
-                'I have to sleep.',
+            say: 'From ten to two, the baby is yours. Bring the baby to me only '
+                'to feed. I have to sleep.',
             notThis: 'I am so tired.',
             why: 'A specific window with a specific instruction. Tiredness is '
                 'information, this is a plan.',
@@ -5176,18 +5477,18 @@ const PpArea _thePeopleAroundYou = PpArea(
                 'thinking. Can you take the whole of the shopping and the '
                 'medicines?',
             notThis: 'Do I have to think of everything?',
-            why: 'Explains the invisible half in words, which most partners '
-                'have genuinely never had described to them.',
+            why: 'Puts the invisible half into words. Most partners have never '
+                'had it described to them.',
           ),
         ], heading: 'How to say it so it changes something'),
         PpIndiaNote('In a joint family the load often shifts sideways instead of '
-            'to the father: his mother does it, so he never learns. That is '
-            'comfortable for a few months and expensive later, when the '
-            'grandparents go home and he has never done a bedtime alone.'),
+            'to the father. The grandmother does it, so the father never learns. That is '
+            'comfortable for a few months and hard later, when the grandparents '
+            'go home and the father has never done a bedtime alone.'),
         PpCallout(
-          'If he is withdrawn, sleeping badly, irritable or drinking more, '
-          'suggest he talks to a doctor too. Paternal postnatal depression is '
-          'real, it is common, and in India it is asked about almost never.',
+          'Is your husband withdrawn, sleeping badly, irritable or drinking '
+          'more? Suggest a doctor visit for him too. Postnatal depression in '
+          'fathers is real and common, and in India almost nobody asks about it.',
           kind: PpCalloutKind.doctor,
         ),
       ],
@@ -5202,15 +5503,15 @@ const PpArea _thePeopleAroundYou = PpArea(
             'your life, most of it contradictory, all of it delivered with '
             'certainty. Here is a way to handle it that costs you nothing.'),
         PpArticle([
-          'Almost all unsolicited advice is really a person telling you what '
-          'they did, and looking for you to confirm it was right. Very little '
-          'of it is a genuine instruction, even when it is phrased as one. That '
-          'is why arguing with it goes so badly: you think you are discussing '
-          'the baby and they think you are judging their choices.',
+          'Most unasked-for advice is really a person telling you what they '
+          'did, and hoping you will agree it was right. Very little of it is a '
+          'real instruction, even when it sounds like one. That is why arguing '
+          'goes so badly. You think you are discussing the baby, and they think '
+          'you are judging their choices.',
           'Which means you do not have to agree, and you do not have to '
           'disagree. You have to acknowledge, and move on. Almost nobody follows '
           'up.',
-        ], heading: 'What advice actually is'),
+        ], heading: 'What advice really is'),
         PpSteps([
           PpStep('Sort it into three piles as it arrives',
               'Harmful, harmless, and helpful. Only the first pile needs '
@@ -5231,14 +5532,14 @@ const PpArea _thePeopleAroundYou = PpArea(
         PpScript([
           PpScriptLine(
             say: 'Thank you, I will keep that in mind.',
-            notThis: 'Actually that is not recommended any more.',
+            notThis: 'No, that is not recommended any more.',
             why: 'Ends it. It is not agreement and it is not a fight, and it '
                 'works on about eighty per cent of what you will hear.',
           ),
           PpScriptLine(
             say: 'Our doctor has been quite strict about that one, so we are '
-                'sticking to what she said.',
-            notThis: 'That is dangerous, actually.',
+                'sticking to the doctor\'s advice.',
+            notThis: 'That is dangerous, you know.',
             why: 'For the harmful pile. Firm, final, and it does not tell '
                 'anybody they harmed their own children.',
           ),
@@ -5251,10 +5552,10 @@ const PpArea _thePeopleAroundYou = PpArea(
           ),
         ], heading: 'Three replies that end it'),
         PpCallout(
-          'The only advice worth arguing about is the kind that could hurt her: '
-          'anything into her mouth before six months, anything that makes her '
-          'sleep surface unsafe, skipping a vaccination, or treating a fever in '
-          'a newborn at home. Everything else can be smiled at.',
+          'The only advice worth arguing about is the kind that could hurt your '
+          'baby. Anything in the mouth before six months. Anything that makes '
+          'the sleep surface unsafe. Skipping a vaccination, or treating a fever '
+          'in a newborn at home. Everything else can be smiled at.',
           kind: PpCalloutKind.safety,
         ),
         PpIndiaNote('The advice will also come from strangers in the lift, in '
@@ -5268,13 +5569,13 @@ const PpArea _thePeopleAroundYou = PpArea(
       bands: _allBands,
       blocks: [
         PpIntro('In most Indian homes a flat no to an elder is not really '
-            'available, and a page that tells you to set boundaries is useless. '
-            'These are the ways of saying no that actually work here.'),
+            'possible, and being told to "set boundaries" does not help. These '
+            'are the ways of saying no that work here.'),
         PpArticle([
           'A direct refusal in a joint family does not usually end the request. '
           'It moves it: to your partner, to a phone call, to a comment three '
-          'weeks later, to your own mother. So the useful skill is not refusing '
-          'harder. It is refusing in a form that closes the matter.',
+          'weeks later, to your own mother. So the skill is to refuse in a way '
+          'that closes the matter.',
           'Four forms do that reliably. Deferring to a doctor. Deferring to '
           'time. Offering a smaller version. And letting somebody else deliver '
           'it. None of them requires you to be confrontational, and all of them '
@@ -5291,25 +5592,25 @@ const PpArea _thePeopleAroundYou = PpArea(
               'Not the whole family at once, but two people on Sunday. You are '
               'agreeing to something, which is what most people needed.'),
           PpCard('Let your partner deliver it',
-              'The same sentence from him is a decision. From you it is an '
-              'attitude. That is unfair, and it is also useful.'),
+              'The same sentence from your husband is taken as a decision. From '
+              'you it is taken as attitude. That is unfair, and also useful.'),
           PpCard('Blame the baby, freely',
-              '"She will not settle if we go" is available and endlessly '
-              'renewable.'),
+              '"The baby will not settle if we go" works every time, and you '
+              'can use it again and again.'),
           PpCard('Do not explain twice',
               'A second explanation reopens the conversation. Say it once and '
               'then repeat the same sentence, unchanged.'),
         ], heading: 'The five that work, and one rule', hue: 322),
         PpScript([
           PpScriptLine(
-            say: 'The doctor asked us not to take her out for the first six '
+            say: 'The doctor asked us not to take the baby out for the first six '
                 'weeks, so we will come for the next one.',
             notThis: 'I do not want to come, I am too tired.',
             why: 'Not a refusal of them, a refusal by the doctor, with a '
                 'promise attached.',
           ),
           PpScriptLine(
-            say: 'Not this month. Let us plan it after her next vaccination.',
+            say: 'Not this month. Let us plan it after the next vaccination.',
             notThis: 'No, we cannot.',
             why: 'Later is much easier to accept than never, and it gives you '
                 'six weeks in which the plan usually dissolves.',
@@ -5327,74 +5628,73 @@ const PpArea _thePeopleAroundYou = PpArea(
           'passed around, to being photographed, and to advice. Those four are '
           'not negotiable, and none of them requires a reason.',
         ),
-        PpIndiaNote('"Log kya kahenge" has its own page in this area. If that is '
+        PpIndiaNote('"What will people say?" has its own page in this area. If that is '
             'the real reason a no feels impossible, that is the page to read '
             'rather than this one.'),
       ],
     ),
     PpPage(
       id: 'people_help_at_home',
-      title: 'Help at home: the maid, the cook, and the maalishwali',
+      title: 'Help at home: the maid, the cook, and the massage helper',
       format: 'ARTICLE',
       bands: _allBands,
       blocks: [
         PpIntro('If hiring help is possible for you at all, the first months '
-            'after birth are the single highest value time to do it. It is worth '
-            'thinking about what to hire for, because most families hire for the '
-            'wrong thing.'),
+            'after birth are when it helps most. Think about what to hire for, '
+            'because most families hire for the wrong thing.'),
         PpArticle([
           'The instinct is to hire someone to help with the baby. In practice '
           'the baby is the part most mothers want to do, and the part that is '
           'hardest to hand over anyway. What crushes a new mother is the house: '
           'three meals, dishes after each, laundry that has doubled, and a floor '
           'somebody keeps putting the baby on.',
-          'So if you can afford one person, hire a cook. If you can afford part '
-          'of a person, buy the cooking. A pot of dal and a pot of sabzi arriving '
-          'every day is the difference between eating and not eating, and eating '
-          'is the thing this whole area depends on.',
+          'So if you can afford one person, hire a cook. If you can afford a '
+          'little help, pay for the cooking. A pot of dal and a pot of vegetables '
+          'every day can decide whether you eat at all. Everything else here '
+          'depends on you eating.',
         ], heading: 'What to buy first, if you can buy anything'),
         PpCards([
           PpCard('A cook, or a tiffin service',
               'The highest value help there is right now. Warm food without '
               'anyone standing up.'),
           PpCard('Cleaning, two or three times a week',
-              'Especially the floor, once she is on it.'),
-          PpCard('A japa maid, for a fixed period',
+              'Especially the floor, once your baby is on it.'),
+          PpCard('A postnatal helper, for a fixed period',
               'Common in many cities: a live in or day helper for the first '
               'one to three months who does the baby\'s washing, the mother\'s '
-              'food and the malish. Agree the hours and the tasks in writing '
-              'before she starts.'),
-          PpCard('A maalishwali, if malish is part of your tradition',
-              'Ask for a gentle massage, ask her to stop if anything hurts, and '
-              'keep the belly binding loose enough to breathe in.'),
+              'food and the massage. Agree the hours and the tasks in writing '
+              'before the first day.'),
+          PpCard('A massage helper, if massage is part of your tradition',
+              'Ask for a gentle massage, ask for it to stop if anything hurts, '
+              'and keep the belly binding loose enough to breathe in.'),
           PpCard('Night help, if it is affordable and you can sleep with '
               'someone else in the house',
               'Rare and expensive, and for some mothers it is the thing that '
               'saves the year.'),
           PpCard('And the unpaid version: one relative, one job, agreed',
-              'Not "everybody helps". One person, one job, so it actually '
+              'Not "everybody helps". One person, one job, so it really '
               'happens.'),
-        ], heading: 'What to actually hire for', hue: 322),
+        ], heading: 'What to hire for', hue: 322),
         PpSteps([
-          PpStep('Agree the tasks and the hours before she starts',
+          PpStep('Agree the tasks and the hours before the first day',
               'Written down, even roughly. Most trouble with home help comes '
               'from scope, not from money.'),
-          PpStep('Ask about her health if she is handling the baby',
-              'Any cough or fever, and she should not be around a newborn.'),
+          PpStep('Ask about health if the helper is handling the baby',
+              'With any cough or fever, keep the helper away from a newborn.'),
           PpStep('Say clearly what you do not want done to the baby',
-              'No kajal, no honey, no oil in the nose or ears, no water. Say it '
+              'No kohl, no honey, no oil in the nose or ears, no water. Say it '
               'once, kindly, at the start rather than after.'),
           PpStep('Do not leave a newborn alone with anyone you have just met',
               'Not distrust, just sequence. Trust builds over a few weeks.'),
           PpStep('Pay properly and on time',
               'A woman doing the hardest weeks of your life with you deserves '
-              'that, and you want her to stay.'),
+              'that, and you want to keep good help.'),
         ], heading: 'Getting it right'),
         PpCallout(
-          'Tell whoever does your malish to stop if anything hurts, and see your '
+          'Tell whoever does your massage to stop if anything hurts. See your '
           'doctor before any belly binding or deep abdominal massage if you had '
-          'a caesarean, if you have stitches, or if you have any pain, fever or '
-          'increased bleeding afterwards.',
+          'a caesarean or have stitches. See your doctor too if you have any '
+          'pain, fever or increased bleeding afterwards.',
           kind: PpCalloutKind.doctor,
         ),
         // REQUIRED_REVIEW: guidance on postnatal malish and belly binding after
@@ -5402,14 +5702,26 @@ const PpArea _thePeopleAroundYou = PpArea(
         // against tight binding. A clinician should confirm, since malish is
         // near universal and the advice needs to be usable rather than
         // prohibitive.
-        PpIndiaNote('If hiring is not possible, this page still has one thing in '
-            'it: pick the single job that costs you the most and give that one '
-            'away, to whoever is around. For most mothers it is the cooking.'),
+        PpIndiaNote('If hiring is not possible, this page still has one idea for '
+            'you. Pick the one job that costs you the most, and give it to '
+            'whoever is around. For most mothers it is the cooking.'),
+        // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+        PpCards(heading: 'Choosing a postnatal helper, babysitter or postpartum doula', [
+          PpCard('Ask for references', 'From families the helper has worked '
+              'for, and call them.'),
+          PpCard('Police verification', 'Through your local police station or '
+              'its online service.'),
+          PpCard('Agree the basics', 'Safe sleep, hand washing, no honey or '
+              'herbal drops, no phone while holding the baby.'),
+          PpCard('A trial week', 'With you at home.'),
+          PpCard('A postpartum doula', 'Trained to support the mother: rest, '
+              'feeding, meals and confidence. Fewer in India, but growing.'),
+        ]),
       ],
     ),
     PpPage(
       id: 'people_log_kya_kahenge',
-      title: 'Log kya kahenge',
+      title: 'What will people say?',
       format: 'ARTICLE',
       bands: _allBands,
       blocks: [
@@ -5417,21 +5729,20 @@ const PpArea _thePeopleAroundYou = PpArea(
             'by you or by your doctor. They are made by an imagined room full of '
             'people who will have an opinion.'),
         PpArticle([
-          'It shows up everywhere and it is rarely named. Feeding her formula in '
+          'It shows up everywhere and it is rarely named. Giving formula in '
           'front of relatives. Going back to work at three months, or not going '
           'back at all. Not doing a function. Seeing a counsellor. Saying out '
           'loud that you are not enjoying this. Having a caesarean and being '
           'asked why you did not try harder.',
           'The cost is real and it is not vanity. In India, what people say gets '
           'back to your family, affects your parents, and sometimes affects your '
-          'marriage. Pretending it does not matter is not useful advice.',
-          'What is useful is separating the decisions where the opinion has a '
-          'real consequence from the ones where the consequence is only that '
-          'somebody thinks something. Most of them are the second kind, and the '
-          'second kind is survivable.',
-        ], heading: 'Where it actually shows up'),
+          'marriage. Pretending it does not matter would not help you.',
+          'What helps is sorting the decisions. In some, the opinion has a real '
+          'consequence. In others, the only result is that somebody thinks '
+          'something. Most are the second kind, and you can live with those.',
+        ], heading: 'Where it shows up'),
         PpCards([
-          PpCard('Ask what the actual consequence is',
+          PpCard('Ask what the real consequence is',
               'Say it out loud. Very often the answer is "an aunt will '
               'comment", and that is a price worth paying for sleep.'),
           PpCard('Notice who is really being protected',
@@ -5439,23 +5750,21 @@ const PpArea _thePeopleAroundYou = PpArea(
               'reputation. That is a real thing, and it is a different '
               'conversation from your own health.'),
           PpCard('Decide once, and stop reopening it',
-              'The exhaustion is rarely the decision. It is deciding again '
+              'What wears you out is rarely the decision. It is deciding again '
               'every time somebody raises an eyebrow.'),
           PpCard('Keep the medical ones out of it entirely',
               'Formula, a caesarean, a counsellor, an antidepressant, a '
               'termination of feeding. These are between you and your doctor '
               'and nobody is owed an explanation.'),
           PpCard('Find one person who does not judge you',
-              'One is enough. A sister, a friend, a mother from the circle. It '
-              'is remarkable how much less the room matters when one person in '
-              'it is on your side.'),
+              'One is enough. A sister, a friend, a mother from the circle. The '
+              'room matters far less when one person in it is on your side.'),
         ], heading: 'How to think about it', hue: 322),
         PpCallout(
-          'The one place this must never win is your mental health. If shame is '
-          'the reason you have not told anybody how you feel, or have not seen '
-          'anybody about it, that is the situation this whole section exists '
-          'for. Nobody outside your house needs to know, and a counsellor tells '
-          'nobody.',
+          'The one place this must never win is your mental health. Has shame '
+          'stopped you telling anybody how you feel, or seeing anybody about it? '
+          'That is exactly what this whole section is for. Nobody outside your '
+          'house needs to know, and a counsellor tells nobody.',
         ),
         PpScript([
           PpScriptLine(
@@ -5474,7 +5783,7 @@ const PpArea _thePeopleAroundYou = PpArea(
         ], heading: 'Two sentences worth having ready'),
         PpIndiaNote('This is one of the very few things in this app that is '
             'specific to here. A postpartum guide written elsewhere has no page '
-            'for it, which is exactly why it goes unnamed and keeps working.'),
+            'for it. That is why it goes unnamed, and keeps its hold.'),
       ],
     ),
     PpPage(
@@ -5488,22 +5797,21 @@ const PpArea _thePeopleAroundYou = PpArea(
             'couples than any other.'),
         PpArticle([
           'The usual advice is to wait until the bleeding has stopped and you '
-          'have had your six week check, mainly because until then the cervix is '
-          'still open and there is a wound inside where the placenta was. That '
-          'is about infection risk, not about morality, and it applies whether '
-          'you had a vaginal birth or a caesarean.',
-          'After that, the honest answer is whenever you both want to, which for '
-          'a lot of couples is considerably later than six weeks and that is '
-          'entirely normal. Exhaustion, pain, dryness, feeling touched out after '
-          'a whole day of being climbed on, and a body that does not feel like '
-          'yours are all real reasons and none of them is a problem with your '
-          'relationship.',
-          'Dryness in particular is physiological, not psychological. '
+          'have had your six week check. Until then the cervix is still open, '
+          'and there is a wound inside where the placenta was. That is about '
+          'infection risk, not morality. It applies after a vaginal birth or a '
+          'caesarean.',
+          'After that, the honest answer is whenever you both want to. For a '
+          'lot of couples that is well past six weeks, and that is normal. '
+          'Exhaustion, pain, dryness, feeling touched out after a day of being '
+          'climbed on, a body that does not feel like yours: all real reasons. '
+          'None of them is a problem with your relationship.',
+          'Dryness in particular is hormonal, not in your head. '
           'Breastfeeding keeps oestrogen low, and low oestrogen means less '
           'natural lubrication. Almost every feeding mother experiences it and '
-          'almost nobody is told about it in advance. A lubricant is the answer '
-          'and it is not a failure.',
-        ], heading: 'When, and how it usually actually goes'),
+          'almost nobody is told about it in advance. A lubricant is the answer, '
+          'and there is no shame in it.',
+        ], heading: 'When, and how it usually goes'),
         PpCallout(
           'The one that catches people out: breastfeeding is not reliable '
           'contraception, and you can ovulate before your first period returns. '
@@ -5513,11 +5821,10 @@ const PpArea _thePeopleAroundYou = PpArea(
           kind: PpCalloutKind.safety,
         ),
         PpArticle([
-          'There is a version of breastfeeding as contraception that is genuinely '
-          'effective, and it only works while three things are all true at once: '
-          'the baby is under six months, your periods have not returned, and she '
-          'is fully breastfed with no long gaps day or night. Miss any one of '
-          'those and the protection falls away quickly.',
+          'Breastfeeding can work as contraception, but only while three things '
+          'are all true at once. The baby is under six months. Your periods have '
+          'not returned. And the baby is fully breastfed, with no long gaps day '
+          'or night. Miss any one of those and the protection falls away quickly.',
           'Most mothers do not meet all three for long. A night stretch, a bottle, '
           'the start of solids, or a period appearing ends it. So it is worth '
           'treating as a temporary bridge rather than a plan.',
@@ -5529,9 +5836,9 @@ const PpArea _thePeopleAroundYou = PpArea(
         PpCallout(
           'Ask your doctor which contraception suits you while breastfeeding, '
           'and ask at the six week check rather than later. Several options are '
-          'considered compatible with feeding and several are not, the timing of '
-          'when each can be started varies, and it is a five minute conversation '
-          'that saves a great deal.',
+          'considered compatible with feeding and several are not. When each can '
+          'be started varies too. It is a five minute conversation that saves a '
+          'great deal.',
           kind: PpCalloutKind.doctor,
         ),
         // REQUIRED_REVIEW: this page deliberately does NOT name individual
@@ -5549,27 +5856,281 @@ const PpArea _thePeopleAroundYou = PpArea(
               'sex teaches the pelvic floor to tighten, which makes it worse.'),
           PpCard('Scar and stitch worry is normal',
               'Many mothers are afraid something will tear. Ask your doctor to '
-              'confirm the healing at the check, which for most women is the '
-              'reassurance that actually helps.'),
+              'confirm the healing at the check. For most women, that is the '
+              'reassurance that helps.'),
           PpCard('Touched out is a real thing',
               'After ten hours of being held onto, wanting nobody near you is '
-              'not rejection. Say it in those words, because he will not guess.'),
+              'not rejection. Say it in those words. Your partner will not guess.'),
           PpCard('Closeness that is not sex counts',
               'For most couples this comes back first, and it is what makes the '
               'rest come back at all.'),
         ], heading: 'What helps', hue: 322),
         PpCallout(
           'See your doctor or a pelvic floor physiotherapist for pain that '
-          'continues past the first few attempts, for bleeding afterwards, for a '
-          'scar or stitch line that catches, or for pain deep inside rather than '
-          'at the entrance. All of these are treatable and none of them is '
-          'something to endure quietly.',
+          'continues past the first few attempts, or for bleeding afterwards. '
+          'Go too for a scar or stitch line that catches, or pain deep inside '
+          'rather than at the entrance. All of these are treatable, and none of '
+          'them is something to put up with in silence.',
           kind: PpCalloutKind.doctor,
         ),
         PpIndiaNote('In a joint family with thin walls and a baby in the room, '
             'privacy is its own obstacle and it is not a small one. It is worth '
             'saying out loud to each other rather than each concluding the other '
             'is not interested.'),
+        // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+        PpArticle(heading: 'Low desire, and sex after a caesarean', [
+          'Many mothers have little interest in sex for months after birth. '
+              'Tiredness, hormones, breastfeeding, a changed body and a baby '
+              'who needs holding all day all play a part. It is normal, and '
+              'it usually returns. Talk about it, and keep closeness going in '
+              'other ways.',
+          'After a caesarean, the usual advice is to wait until your doctor '
+              'has checked you at about six weeks. The scar may feel tender; '
+              'positions that put no weight on your tummy help. Vaginal '
+              'dryness while breastfeeding is common: a water-based lubricant '
+              'helps.',
+        ]),
+        PpCallout('Pain during sex that does not ease, or low mood underneath '
+            'the low desire, is worth raising with your gynaecologist.',
+            kind: PpCalloutKind.doctor),
+      ],
+    ),
+    // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+    PpPage(
+      id: 'people_separated',
+      title: 'Parenting apart: separation, divorce and new families',
+      subtitle: 'Keeping your child\'s world steady',
+      format: 'ARTICLE',
+      bands: _allBands,
+      blocks: [
+        PpIntro('Some families separate, and some come together again in new '
+            'ways. Children cope best when the adults keep their world '
+            'predictable and keep them out of the middle. You do not have to '
+            'get it perfect.'),
+        PpSteps(heading: 'Co-parenting', [
+          PpStep('Keep routines the same in both homes where you can',
+              'Sleep, food and screen rules.'),
+          PpStep('Never use your child as a messenger',
+              'Talk to each other directly, or in writing.'),
+          PpStep('Plan festivals and birthdays early',
+              'Alternate, or share the day, and tell your child the plan.'),
+          PpStep('Speak kindly of the other parent in front of your child',
+              'Your child is half of each of you.'),
+        ]),
+        PpSteps(heading: 'Blending a new family', [
+          PpStep('Go slowly', 'Let relationships with a new partner and '
+              'step-siblings grow at the child\'s pace.'),
+          PpStep('The parent stays the parent',
+              'Discipline comes from the parent at first, not the new '
+                  'partner.'),
+          PpStep('Time alone with your child', 'Still matters most.'),
+        ]),
+        PpCallout('If you feel unsafe with a former partner, or there are '
+            'court matters about custody, get legal advice. The women\'s '
+            'helpline 181 can guide you.',
+            kind: PpCalloutKind.safety),
+      ],
+    ),
+
+  ],
+);
+
+// Added 2026-10-02 from the parenting gap analysis (P2/P3): What to Expect
+// and theAsianparent both carry a "can I...?" shelf for breastfeeding
+// mothers. Ours is seven pages, written for an Indian home.
+const PpArea _canIFeeding = PpArea(
+  id: 'can_i_feeding',
+  mark: IntentMark.questionMark,
+  title: 'Can I...? while breastfeeding',
+  blurb: 'Tea, medicines, illness, fasting, scans, beauty and travel.',
+  hue: 160,
+  pages: [
+    // The searchable lookup, as a card that opens it: this door keeps no
+    // tool rows (see pp_door_you_maa.dart), and a lookup is not a tracker.
+    PpPage(
+      id: 'cani_search',
+      title: 'Search 330+ "Can I...?" questions',
+      subtitle: 'Chai, medicines, fasting, mehendi, the gym, travel',
+      format: 'CARDS',
+      toolSurfaceId: 'pp_maa_can_i',
+      blocks: [],
+    ),
+    PpPage(
+      id: 'cani_caffeine',
+      title: 'Tea and coffee while breastfeeding',
+      format: 'ARTICLE',
+      bands: _allBands,
+      blocks: [
+        PpIntro('Yes, you can have your chai. A small amount of caffeine '
+            'passes into milk, and most babies are not bothered by moderate '
+            'amounts.'),
+        PpArticle([
+          'Most guidance says about 200 to 300 mg a day is fine. That is '
+              'roughly two to three cups of tea or two cups of coffee. Cola, '
+              'chocolate and energy drinks add up too.',
+          'Young or premature babies clear caffeine more slowly. If your baby '
+              'seems unusually jittery or wakeful, cut down for a few days and '
+              'see.',
+        ]),
+      ],
+    ),
+    PpPage(
+      id: 'cani_alcohol',
+      title: 'Alcohol, and whether to "pump and dump"',
+      format: 'ARTICLE',
+      bands: _allBands,
+      blocks: [
+        PpIntro('Not drinking is the safest choice while breastfeeding. If '
+            'you do have a drink on an occasion, timing matters more than '
+            'pumping.'),
+        PpArticle([
+          'Alcohol moves into breast milk at the same level as in your blood, '
+              'and leaves it the same way, as your body clears it. Pumping and '
+              'throwing the milk away does not speed this up.',
+          'If you have one drink, wait at least two to three hours before the '
+              'next feed. Feed just before drinking if you can. Never share a '
+              'bed or sofa with the baby after drinking.',
+        ]),
+        PpCallout('Regular drinking while breastfeeding can affect your baby\'s '
+            'sleep, feeding and development. If cutting down is hard, talk to '
+            'your doctor.',
+            kind: PpCalloutKind.doctor),
+      ],
+    ),
+    PpPage(
+      id: 'cani_medicines',
+      title: 'Medicines while breastfeeding',
+      subtitle: 'Most are fine; a few are not',
+      format: 'ARTICLE',
+      bands: _allBands,
+      blocks: [
+        PpIntro('Many mothers stop breastfeeding because they are told a '
+            'medicine is unsafe, when it was not. Most common medicines pass '
+            'into milk only in tiny amounts. Always tell every doctor, '
+            'dentist and chemist that you are breastfeeding.'),
+        PpCards(heading: 'Usually fine', [
+          PpCard('Paracetamol and ibuprofen', 'For pain and fever, at normal '
+              'doses.'),
+          PpCard('Most antibiotics', 'Like amoxicillin and cephalexin.'),
+          PpCard('Many allergy and asthma medicines', 'Inhalers and non-drowsy '
+              'antihistamines.'),
+          PpCard('Most vaccines', 'Including flu and COVID vaccines.'),
+          PpCard('Iron, calcium and vitamin D', 'As your doctor advises.'),
+        ]),
+        PpCards(heading: 'Ask first, or avoid', [
+          PpCard('Aspirin at pain-relief doses', 'Ask your doctor.'),
+          PpCard('Strong cough and cold mixtures',
+              'Decongestants can reduce milk; codeine is not advised.'),
+          PpCard('Some migraine, epilepsy and mental health medicines',
+              'Often still possible, with the right choice.'),
+          PpCard('Herbal and Ayurvedic tonics', 'Not tested; ask first.'),
+        ]),
+        PpCallout('Never stop a medicine you need, or stop breastfeeding, '
+            'without talking to your doctor. There is usually a safe option '
+            'that lets you do both.',
+            kind: PpCalloutKind.doctor),
+        PpLink('Search more Can I...? questions',
+            surfaceId: 'pp_maa_can_i',
+            blurb: 'Over 330 quick answers, including medicines A to Z.'),
+      ],
+    ),
+    PpPage(
+      id: 'cani_when_sick',
+      title: 'Breastfeeding when you are unwell',
+      format: 'ARTICLE',
+      bands: _allBands,
+      blocks: [
+        PpIntro('Yes, keep feeding when you have a cold, flu, tummy bug or '
+            'fever. By the time you feel ill, your baby has already been '
+            'exposed, and your milk now carries antibodies that help.'),
+        PpSteps([
+          PpStep('Wash your hands often', 'And cough into your elbow.'),
+          PpStep('Wear a mask if you have a cough', 'While feeding and holding '
+              'your baby.'),
+          PpStep('Drink more', 'Fever and illness dry you out, and that can '
+              'dip supply.'),
+          PpStep('Rest whenever someone can take the baby'),
+        ]),
+        PpCallout('A few illnesses and treatments need a doctor\'s advice '
+            'first, such as chickenpox near the birth, active TB, or some '
+            'cancer treatments. If you are very unwell, ask your doctor which '
+            'medicines are compatible with feeding.',
+            kind: PpCalloutKind.doctor),
+      ],
+    ),
+    PpPage(
+      id: 'cani_fasting',
+      title: 'Fasting while breastfeeding',
+      subtitle: 'Ramadan, Navratri, Karva Chauth and other fasting days',
+      format: 'ARTICLE',
+      bands: _allBands,
+      blocks: [
+        PpIntro('Many religions excuse breastfeeding mothers from fasting, '
+            'especially when the baby is young. If you choose to fast, a '
+            'little planning protects your milk and your health.'),
+        PpArticle([
+          'Under six months, when the baby lives only on your milk, many doctors '
+              'advise against a full fast, especially a waterless one. A short '
+              'or partial fast is easier on the body. Older babies who eat '
+              'food are less affected.',
+        ]),
+        PpSteps(heading: 'If you fast', [
+          PpStep('Eat a filling meal before the fast', 'Protein, whole grains '
+              'and fruit.'),
+          PpStep('Drink plenty in the hours you can', 'Water, milk, soups.'),
+          PpStep('Rest more, and keep feeding on demand'),
+          PpStep('Break the fast if you feel unwell', 'Faith allows for it.'),
+        ]),
+        PpCallout('Stop fasting and drink if you feel dizzy, faint or very '
+            'thirsty, or have dark urine or a headache. Stop too if the baby '
+            'has fewer wet nappies or seems unsettled and hungry.',
+            kind: PpCalloutKind.doctor),
+      ],
+    ),
+    PpPage(
+      id: 'cani_scans_beauty',
+      title: 'Scans, dental work, hair and beauty while breastfeeding',
+      format: 'CARDS',
+      bands: _allBands,
+      blocks: [
+        PpIntro('Ordinary life goes on while you breastfeed, and almost all '
+            'of it is fine. Here are the questions mothers ask most.'),
+        PpCards([
+          PpCard('X-rays, CT and MRI scans', 'Fine. Even with contrast dye, '
+              'you can usually carry on feeding.'),
+          PpCard('Dental work and local anaesthetic', 'Fine. Tell the dentist '
+              'you are feeding.'),
+          PpCard('Vaccines and injections', 'Almost all are fine.'),
+          PpCard('Hair colour, straightening and waxing', 'Fine. Ventilate the '
+              'room for strong chemicals.'),
+          PpCard('Facials, threading, manicures', 'Fine.'),
+          PpCard('Laser and chemical peels', 'Usually fine; check the '
+              'products with the clinic.'),
+          PpCard('Secondhand smoke', 'Not fine for either of you. Keep the '
+              'home smoke-free.'),
+        ]),
+      ],
+    ),
+    PpPage(
+      id: 'cani_travel',
+      title: 'Travel while breastfeeding',
+      format: 'CARDS',
+      bands: _allBands,
+      blocks: [
+        PpIntro('Breastfeeding makes travel easier: food is always ready and '
+            'the right temperature. A little planning helps.'),
+        PpCards([
+          PpCard('Flying', 'Fine. Feed during take-off and landing to ease your '
+              'baby\'s ears.'),
+          PpCard('Long drives', 'Stop every two hours to feed, never while '
+              'moving.'),
+          PpCard('Trains and buses', 'A dupatta or feeding cover if you want '
+              'privacy.'),
+          PpCard('Beaches and water parks', 'Fine for you; keep your baby in '
+              'the shade and well fed.'),
+          PpCard('Pumped milk when travelling', 'An insulated bag with ice '
+              'packs keeps it for up to 24 hours.'),
+        ]),
       ],
     ),
   ],
@@ -5621,22 +6182,21 @@ const PpArea _backToWork = PpArea(
       format: 'ARTICLE',
       bands: _later,
       blocks: [
-        PpIntro('Almost every mother who found the return manageable started '
-            'arranging it earlier than she thought she needed to. Four weeks is '
-            'the number that keeps coming up.'),
+        PpIntro('Mothers who found the return manageable almost always started '
+            'arranging it earlier than they thought they needed to. Four weeks '
+            'is the number that keeps coming up.'),
         PpArticle([
-          'There are really two returns happening at once. The logistical one, '
-          'which is childcare, milk, timings and travel, and the emotional one, '
-          'which is leaving her. They need completely different preparation and '
-          'they get tangled because they arrive on the same morning.',
-          'The logistical half is the half you can actually control, and getting '
-          'it settled early is what leaves room for the other half. A mother who '
-          'is still interviewing carers in her last week has no space left to '
-          'feel anything.',
+          'There are two returns happening at once. The practical one: '
+          'childcare, milk, timings and travel. And the emotional one: leaving '
+          'your baby. They need different preparation, and they get tangled '
+          'because they arrive on the same morning.',
+          'The practical half is the part you can control. Settling it early '
+          'leaves room for the other half. If you are still interviewing carers '
+          'in your last week, there is no space left to feel anything.',
         ], heading: 'The two returns'),
         PpSteps([
           PpStep('Four weeks out: settle childcare and start the trial',
-              'Whoever will be with her should start while you are still at '
+              'Whoever will care for your baby should start while you are still at '
               'home, for a few hours a day, building up. This one week of '
               'overlap is worth more than any other preparation.'),
           PpStep('Four weeks out: start the milk stash if you are feeding',
@@ -5661,15 +6221,14 @@ const PpArea _backToWork = PpArea(
               'one, and it costs almost nothing to arrange.'),
         ], heading: 'The four week countdown'),
         PpCallout(
-          'The single highest value item on that list is the overlap week, where '
-          'the carer works while you are still at home. It is the difference '
-          'between handing your baby to a stranger on Monday and handing her to '
-          'someone you have watched.',
+          'The most valuable item on that list is the overlap week, when the '
+          'carer works while you are still at home. On Monday you hand your baby '
+          'to someone you have watched, not to a stranger.',
         ),
         PpIndiaNote('If a grandparent is going to be the carer, do the overlap '
-            'anyway. It is not about trust. It is about her getting used to '
-            'being settled and fed by that person while you are still reachable, '
-            'and about agreeing what happens when she cries.'),
+            'anyway. It is not about trust. Your baby gets used to being settled '
+            'and fed by that person while you are still close by. And you agree '
+            'together what happens when your baby cries.'),
         PpWhenLine('Start about four weeks before your return date. Two weeks is '
             'possible and stressful. One week is where mothers describe it going '
             'badly.'),
@@ -5677,7 +6236,7 @@ const PpArea _backToWork = PpArea(
     ),
     PpPage(
       id: 'work_your_entitlement',
-      title: 'What your maternity leave actually entitles you to',
+      title: 'What your maternity leave entitles you to',
       format: 'ARTICLE',
       bands: _cleared,
       blocks: [
@@ -5685,23 +6244,23 @@ const PpArea _backToWork = PpArea(
             'and a lot of employers rely on that. Here is the shape of it, and '
             'where to check the details for your own situation.'),
         PpArticle([
-          'Paid maternity leave in India comes from the Maternity Benefit Act, '
-          'which was substantially amended in 2017 and now provides twenty six '
-          'weeks of paid leave for a mother\'s first two children, and twelve '
-          'weeks from the third onwards. Adopting mothers and commissioning '
-          'mothers have their own, shorter entitlement.',
+          'Paid maternity leave in India comes from the Maternity Benefit Act. '
+          'It was substantially amended in 2017. It now gives twenty six weeks '
+          'of paid leave for a mother\'s first two children, and twelve weeks '
+          'from the third onwards. Adopting mothers and commissioning mothers '
+          'have their own, shorter entitlement.',
           'It applies to establishments above a certain size, and there are '
-          'conditions, including a minimum period you must have worked before '
-          'the expected date. It also carries three things mothers often do not '
-          'know about: nursing breaks after you return, a work from home option '
-          'where the nature of the work allows it and the employer agrees, and a '
-          'creche requirement for larger establishments.',
+          'conditions. One is a minimum period you must have worked before the '
+          'expected date. It also includes three things mothers often miss. '
+          'Nursing breaks after you return. A work from home option, where the '
+          'work allows it and the employer agrees. And a creche requirement for '
+          'larger establishments.',
           'Two honest caveats. This is a summary and not legal advice, and the '
           'details differ by employer size, sector and state. And enforcement is '
-          'uneven, particularly in smaller firms and in informal work, where '
-          'many mothers have no practical entitlement at all. Knowing the rule '
-          'is still worth it, because a written request that cites it is treated '
-          'very differently from a verbal one that does not.',
+          'uneven, especially in smaller firms and informal work, where many '
+          'mothers have no real entitlement at all. Knowing the rule still '
+          'helps. A written request that cites it is treated very differently '
+          'from a verbal one.',
         ], heading: 'The shape of it'),
         // REQUIRED_REVIEW: this entire page is legal content and every figure on
         // it needs verification against the current text of the Maternity
@@ -5747,8 +6306,8 @@ const PpArea _backToWork = PpArea(
               'Emails, letters, the policy document. If something goes wrong '
               'later, the record is what you will have.'),
           PpCard('Find the woman who went before you',
-              'Somebody in your organisation has already done this. She knows '
-              'what actually happens, which is different from what is written.'),
+              'Somebody in your organisation has already done this, and knows '
+              'what really happens, which can differ from what is written.'),
         ], heading: 'How to ask', hue: 186),
         PpCallout(
           'If you are being pressured to resign, having your leave shortened, or '
@@ -5758,10 +6317,18 @@ const PpArea _backToWork = PpArea(
           'details it does not cover.',
         ),
         PpIndiaNote('If you work informally, are self employed, or run your own '
-            'thing, none of the above applies to you and there is no honest way '
-            'to pretend otherwise. What is worth doing instead is deciding your '
-            'own return date on purpose rather than drifting into it, and '
-            'telling the people who depend on you what it is.'),
+            'thing, none of the above applies to you, and we will not pretend '
+            'otherwise. What helps instead is choosing your return date on '
+            'purpose rather than drifting into it. Then tell the people who '
+            'depend on you.'),
+        // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+        PpArticle(heading: 'Child care leave and paternity leave', [
+          'Women in central government service can take Child Care Leave of '
+              'up to two years over their service, for children up to 18. '
+              'Single fathers in government service are also eligible. '
+              'Central government fathers get 15 days of paternity leave. '
+              'Many private employers have their own policies; ask HR.',
+        ]),
       ],
     ),
     PpPage(
@@ -5774,16 +6341,16 @@ const PpArea _backToWork = PpArea(
             'you need to start earlier than feels necessary. Both of those are '
             'the opposite of what most mothers assume.'),
         PpArticle([
-          'What you actually need on day one is roughly what she will drink '
-          'while you are away, and after that you are replacing each day with '
-          'what you pumped the day before. The freezer stash is a buffer for bad '
-          'days, not the supply itself. Two or three days of feeds is plenty and '
-          'a hundred bags is a source of stress.',
+          'On day one you need roughly what your baby will drink while you are '
+          'away. After that, each day you replace what you pumped the day '
+          'before. The freezer stash is a buffer for bad days, not the supply '
+          'itself. Two or three days of feeds is plenty. A hundred bags is just '
+          'stress.',
           'Milk works on removal, so the way to build a stash is one extra '
           'removal a day rather than pumping harder at existing feeds. Early '
           'morning is when most mothers get the most, because supply is highest '
           'after the long night gap.',
-        ], heading: 'How much you actually need'),
+        ], heading: 'How much you really need'),
         PpSteps([
           PpStep('Start about four weeks out, one session a day',
               'Usually in the morning, an hour after the first feed. Small '
@@ -5822,13 +6389,30 @@ const PpArea _backToWork = PpArea(
         ),
         PpLink('Pumps, bags and cooler bags, compared',
             surfaceId: _shopSurface,
-            blurb: 'Which pump, and what you actually need alongside it.'),
+            blurb: 'Which pump, and what you really need alongside it.'),
         PpWhenLine('Start about four weeks before your return. Aim for two or '
             'three days of feeds stored, not a freezer full.'),
         // REQUIRED_REVIEW: the "two or three days of feeds" target, the thirty
         // to forty millilitre expectation for an early pumping session, and the
         // sixty to ninety millilitre freezing portions. A lactation consultant
-        // should confirm all three numbers.
+        // should confirm all three numbers.,
+        // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+        PpTable(
+          heading: 'How long expressed milk keeps',
+          columns: ['Where', 'How long'],
+          rows: [
+            ['Room temperature (up to about 25 C)', 'Up to 4 hours'],
+            ['Room temperature in Indian summer heat', 'Fridge it within an '
+                'hour'],
+            ['Fridge, at the back', 'Up to 4 days'],
+            ['Freezer compartment of a fridge', 'About 2 weeks'],
+            ['Deep freezer', 'Up to 6 months'],
+            ['Thawed milk', 'Use within 24 hours, never refreeze'],
+          ],
+        ),
+        PpWhenLine('Thaw in the fridge or a bowl of warm water. Never in a '
+            'microwave or boiling water, which destroy goodness and make hot '
+            'spots.'),
       ],
     ),
     PpPage(
@@ -5841,16 +6425,15 @@ const PpArea _backToWork = PpArea(
             'would want to use, and no culture of asking. This page assumes all '
             'of that and works anyway.'),
         PpArticle([
-          'The advice written elsewhere assumes a lactation room with a lock, a '
-          'chair and a fridge. If you have that, use it. If you do not, the '
-          'problem is solvable with a hands free set, a cooler bag and about '
-          'twenty minutes twice a day, and a great many mothers do it in '
-          'exactly those conditions.',
-          'The part that decides whether it works is not equipment. It is having '
-          'the two slots in your calendar as actual blocked meetings, so they '
-          'survive a busy day. Pumping that happens only when there is time '
-          'stops happening in the second week.',
-        ], heading: 'Starting from what you actually have'),
+          'Most advice assumes a lactation room with a lock, a chair and a '
+          'fridge. If you have that, use it. If not, you can still manage with '
+          'a hands free set, a cooler bag and about twenty minutes twice a day. '
+          'A great many mothers do it in exactly those conditions.',
+          'What decides whether it works is not equipment. It is having the two '
+          'slots in your calendar as real blocked meetings, so they survive a '
+          'busy day. Pumping that happens only when there is time stops '
+          'happening in the second week.',
+        ], heading: 'Starting from what you have'),
         PpSteps([
           PpStep('Block two slots in your calendar and name them anything',
               'Twenty minutes each, mid morning and mid afternoon. Treat them '
@@ -5861,8 +6444,8 @@ const PpArea _backToWork = PpArea(
               'in writing, before you try to improvise.'),
           PpStep('Use a hands free or wearable pump if you can afford one',
               'It turns pumping into something you can do at a desk under a '
-              'dupatta, and it is the single item most working mothers say '
-              'changed it.'),
+              'dupatta. Working mothers name it more than anything else as '
+              'what made the difference.'),
           PpStep('Carry a cooler bag with ice packs',
               'Milk keeps safely in a good cooler bag with ice for a working '
               'day, so an office fridge is convenient rather than essential.'),
@@ -5870,9 +6453,9 @@ const PpArea _backToWork = PpArea(
               'Kurta over leggings, front open shirt, a dupatta or a nursing '
               'cover. Leaks happen, and a spare top ends the panic.'),
           PpStep('Wash parts once at work, sterilise at home',
-              'Hot water and soap in the office, or a wet bag and one wash at '
-              'the end of the day. Nobody sterilises at work.'),
-          PpStep('Feed her yourself in the morning and evening',
+              'Hot water and soap in the office, or a wet bag and one wash when '
+              'you get home. Nobody sterilises at work.'),
+          PpStep('Feed your baby yourself in the morning and evening',
               'Direct feeds before you leave and as soon as you are back, plus '
               'night feeds, keep supply up more than any amount of pumping.'),
         ], heading: 'The system that works'),
@@ -5897,22 +6480,22 @@ const PpArea _backToWork = PpArea(
         // needs a clinician or lactation consultant to set it. These numbers
         // must be confirmed before ship, because a mother will act on them.
         PpCallout(
-          'Milk that smells sour or looks curdled after shaking should be thrown '
-          'away. Separated milk with a fat layer on top is normal and just needs '
+          'Throw away milk that smells sour or looks curdled after shaking. '
+          'Separated milk with a fat layer on top is normal and just needs '
           'swirling. If you are unsure, ask your paediatrician rather than '
           'guessing.',
           kind: PpCalloutKind.doctor,
         ),
-        PpIndiaNote('If there is genuinely nowhere and asking is not realistic, '
-            'a lot of mothers use the car, a locked meeting room booked in '
-            'someone else\'s name, or the drive itself with a wearable pump. '
-            'None of that is ideal and all of it is better than stopping because '
-            'the office had no room.'),
+        PpIndiaNote('If there is really nowhere, and asking is not realistic, '
+            'many mothers use the car or a locked meeting room booked in '
+            'someone else\'s name. Some pump on the drive with a wearable pump. '
+            'None of that is ideal. All of it beats stopping because the office '
+            'had no room.'),
       ],
     ),
     PpPage(
       id: 'work_childcare',
-      title: 'Who will hold her at ten in the morning',
+      title: 'Who will hold your baby at ten in the morning',
       format: 'ARTICLE',
       bands: _later,
       blocks: [
@@ -5920,11 +6503,10 @@ const PpArea _backToWork = PpArea(
             'more of your time than the work arrangements are. Get this right '
             'and everything else is logistics.'),
         PpArticle([
-          'In India most families end up with one of four arrangements, and they '
-          'have genuinely different trade offs rather than one being correct. '
-          'What matters is not which you pick. It is that you picked it '
-          'deliberately, with a trial period, and with a plan for what happens '
-          'when it does not work.',
+          'In India most families end up with one of four arrangements. Each '
+          'has real trade offs, and no single one is correct. What matters is '
+          'choosing on purpose, with a trial period, and with a plan for when '
+          'it does not work.',
         ], heading: 'The honest comparison'),
         PpTable(
           columns: ['Arrangement', 'What it is good at', 'The real cost'],
@@ -5936,10 +6518,10 @@ const PpArea _backToWork = PpArea(
                   'to correct family'
             ],
             [
-              'A hired nanny or aaya at home',
-              'One to one, her own routine, her own home',
-              'Hardest to verify, no cover when she is ill, and you are her '
-                  'only supervision'
+              'A hired nanny at home',
+              'One to one, your baby\'s own routine, at home',
+              'Hardest to verify, no cover when the nanny is ill, and you are '
+                  'the only supervision'
             ],
             [
               'A creche or daycare',
@@ -5959,9 +6541,9 @@ const PpArea _backToWork = PpArea(
               'For any creche. What it looks like on a normal Tuesday '
               'afternoon is the real answer.'),
           PpStep('Ask the ratio, and count the adults yourself',
-              'How many children per adult in her age group, and who is with '
-              'them at nap time.'),
-          PpStep('Ask what happens when she cries and will not settle',
+              'How many children per adult in your baby\'s age group, and who '
+              'is with them at nap time.'),
+          PpStep('Ask what happens when a baby cries and will not settle',
               'The answer to this question tells you more than any brochure.'),
           PpStep('Check for a first aid trained adult and what they do in an '
               'emergency',
@@ -5972,21 +6554,21 @@ const PpArea _backToWork = PpArea(
               'Documents, a previous family you can call, and police '
               'verification where it is available.'),
           PpStep('Agree the non negotiables out loud on day one',
-              'Nothing in her mouth that you have not agreed, no honey, no '
-              'kajal, no screen, and how she sleeps.'),
+              'Nothing in the mouth that you have not agreed, no honey, no '
+              'kohl, no screen, and how your baby sleeps.'),
         ], heading: 'How to choose, whichever you choose'),
         PpCallout(
           'Never leave a young baby alone with anyone whose full name and '
-          'address you do not have, and never with anyone you have not watched '
-          'with her for several hours. This one has no exceptions and it is not '
-          'about trust.',
+          'address you do not have. Never with anyone you have not watched with '
+          'your baby for several hours. This one has no exceptions, whoever it '
+          'is.',
           kind: PpCalloutKind.safety,
         ),
         PpCallout(
           'Expect more coughs and colds in the first few months of any group '
-          'setting. That is normal and not a sign you chose wrong. Talk to your '
-          'paediatrician about which symptoms mean keeping her home, and make '
-          'sure her vaccinations are up to date before she starts.',
+          'setting. That is normal, and it does not mean you chose wrong. Ask '
+          'your paediatrician which symptoms mean keeping your baby home. Make '
+          'sure vaccinations are up to date before the first day.',
           kind: PpCalloutKind.doctor,
         ),
         PpIndiaNote('The grandparent arrangement is the most common here and the '
@@ -6006,49 +6588,48 @@ const PpArea _backToWork = PpArea(
             'who go back feel guilty for leaving. Mothers who stay feel guilty '
             'for stopping. That is not a coincidence.'),
         PpArticle([
-          'The guilt is not evidence that you are doing something harmful. It is '
-          'produced by a story that says a good mother is continuously present, '
-          'a story nobody applies to fathers, and one that would have baffled '
-          'every generation of women who worked in fields and factories with '
-          'their children nearby.',
-          'The research question you are actually worried about has been studied '
-          'a great deal. What predicts how children do is the quality of care '
-          'they get and the stability of the people giving it, far more than '
-          'whether their mother is in the building. A child with a warm, '
-          'consistent carer and a mother who returns to her every evening is not '
-          'a child at risk.',
-          'And the version of you that goes to work is often the version she '
-          'gets more of in the evening. That is not a consolation. For a lot of '
-          'mothers it is simply the truth.',
-        ], heading: 'Where the guilt actually comes from'),
+          'The guilt is not evidence that you are doing harm. It comes from a '
+          'story that says a good mother is always present. Nobody applies that '
+          'story to fathers. And it would have baffled the generations of women '
+          'who worked in fields and factories with their children nearby.',
+          'The question you are worried about has been studied a great deal. '
+          'How children do depends on the quality of care and the stability of '
+          'the people giving it. That matters far more than whether their mother '
+          'is in the building. A child with a warm, steady carer and a mother '
+          'who comes home every evening is not a child at risk.',
+          'And the version of you that goes to work is often the version your '
+          'baby gets more of in the evening. For a lot of mothers, that is how '
+          'it really works out.',
+        ], heading: 'Where the guilt comes from'),
         PpCards([
           PpCard('Guilt at the door in the morning',
               'Almost always worst in the first ten days. It usually settles '
               'into ordinary sadness, which is easier to carry.'),
-          PpCard('She cries when you leave',
+          PpCard('Your baby cries when you leave',
               'Most babies settle within minutes. Ask the carer to message you '
               'ten minutes later. Once, not every day.'),
-          PpCard('She reaches for the carer instead of you',
-              'That is attachment working, not attachment lost. A baby who has '
-              'a second safe adult is a lucky baby.'),
+          PpCard('Your baby reaches for the carer instead of you',
+              'That is healthy attachment. A baby with a second safe adult is '
+              'a lucky baby.'),
           PpCard('You are relieved to be at work',
               'Very common, deeply guilt inducing, and it means nothing bad '
               'about you at all.'),
           PpCard('You missed something for the first time',
-              'A first step, a first word. It genuinely hurts. It also does not '
-              'change your relationship with her.'),
+              'A first step, a first word. It really hurts. It also does not '
+              'change your relationship with your child.'),
         ], heading: 'The shapes it takes', hue: 186),
         PpCallout(
           'Do not use the goodbye to make yourself feel better. A quick, warm, '
-          'confident goodbye with a consistent little phrase is easier for her '
-          'than a long one, and far easier than slipping out unseen.',
+          'confident goodbye with the same little phrase each time is easier '
+          'for your baby than a long one. It is far easier than slipping out '
+          'unseen.',
         ),
         PpCallout(
           'Talk to your doctor if the guilt has turned into dread, crying most '
-          'days, being unable to concentrate at work, or a conviction that she '
-          'is better off without you. That last one in particular is a symptom '
-          'of postpartum depression rather than a thought about childcare, and '
-          'it responds well to treatment.',
+          'days, or being unable to concentrate at work. Talk to your doctor too '
+          'if you are convinced your baby is better off without you. That one '
+          'is a symptom of postpartum depression, not a thought about childcare, '
+          'and it responds well to treatment.',
           kind: PpCalloutKind.doctor,
         ),
         PpIndiaNote('You will also be told you are being selfish, sometimes by '
@@ -6071,7 +6652,7 @@ const PpArea _backToWork = PpArea(
               'A Wednesday start gives you a three day week and a weekend to '
               'recover in.'),
           PpStep('Lay everything out the night before',
-              'Clothes, pump parts, bags, her things, your lunch. Mornings with '
+              'Clothes, pump parts, bags, the baby\'s things, your lunch. Mornings with '
               'a baby have no slack in them at all.'),
           PpStep('Expect the first morning to go badly, and plan for it',
               'Leave twenty minutes earlier than you need. Something will '
@@ -6085,7 +6666,7 @@ const PpArea _backToWork = PpArea(
           PpStep('Protect the two pumping slots from day one',
               'Skipping them in the first week to look committed is how supply '
               'drops in the second.'),
-          PpStep('Come home and do nothing but be with her',
+          PpStep('Come home and do nothing but be with your baby',
               'The house can wait a week. This hour is what the whole '
               'arrangement is for.'),
         ], heading: 'How to get through it'),
@@ -6094,31 +6675,42 @@ const PpArea _backToWork = PpArea(
           'become ordinary, usually by the second or third week. The second is '
           'how much it takes out of you to be pleasant and competent for eight '
           'hours after months of not having to be either.',
-          'It is also common to feel two contradictory things at once: relief at '
-          'being a person with a name and a role again, and grief at not being '
-          'the one who is with her. Both are allowed to be true.',
+          'It is also common to feel two opposite things at once. Relief at '
+          'being a person with a name and a role again. And grief at not being '
+          'the one who is with your baby. Both are allowed to be true.',
         ], heading: 'What nobody warns you about'),
         PpCallout(
           'Feeding often changes in the first fortnight back. Many babies '
           'reverse cycle, feeding less in the day and much more in the evening '
-          'and at night. That is normal, it is her getting what she needs, and '
-          'it usually settles.',
+          'and at night. That is normal, it is your baby getting what is '
+          'needed, and it usually settles.',
         ),
         PpCallout(
-          'Talk to your doctor if by the end of the first month back you are '
-          'still crying daily, not sleeping even when she does, or dreading each '
-          'morning in a way that is not lifting. A hard first week is normal. A '
-          'hard month is worth help.',
+          'Talk to your doctor if, by the end of the first month back, you are '
+          'still crying daily or not sleeping even when your baby does. Talk to '
+          'your doctor too if the dread each morning is not lifting. A hard '
+          'first week is normal. A hard month is worth help.',
           kind: PpCalloutKind.doctor,
         ),
         PpVideoSlot(
           title: 'Three mothers on their first week back',
           subtitle: 'A software engineer, a teacher and a doctor, on what '
-              'actually happened and what they would do differently.',
+              'really happened and what they would do differently.',
           minutes: '12 MIN',
           slotId: 'youmaa/work_mother_story',
           hue: 186,
         ),
+        // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+        PpCards(heading: 'Making the juggle easier', [
+          PpCard('One family calendar', 'Vaccines, doctor visits and work '
+              'trips in one place both of you can see.'),
+          PpCard('A backup for the backup', 'Who steps in when the carer is '
+              'ill, or your partner is.'),
+          PpCard('Mornings the night before', 'Bag packed, clothes out, '
+              'bottles ready.'),
+          PpCard('Talk to your manager early', 'About feeding breaks and '
+              'flexible hours.'),
+        ]),
       ],
     ),
     PpPage(
@@ -6131,18 +6723,17 @@ const PpArea _backToWork = PpArea(
             'mothers, sometimes freely and sometimes not. This page is about '
             'making it deliberately rather than drifting into it.'),
         PpArticle([
-          'There is a version of this that is a genuine choice, and a version '
-          'that is what is left after the childcare did not work out, the '
-          'commute was impossible, the employer was unhelpful and the family '
-          'assumed. Those two feel completely different a year later, even when '
-          'they look identical from outside.',
+          'Sometimes this is a real choice. Sometimes it is what is left after '
+          'the childcare did not work out, the commute was impossible, the '
+          'employer was unhelpful and the family assumed. Those two feel very '
+          'different a year later, even when they look the same from outside.',
           'So the useful thing is to name which one it is, out loud, to '
           'yourself. If it is a choice, it is one worth making without apology. '
           'If it is not, it is worth knowing that, because it changes what you '
           'do next.',
         ], heading: 'Two different decisions that look the same'),
         PpCards([
-          PpCard('Say what the decision actually is',
+          PpCard('Say what the decision really is',
               'Leaving for now, or leaving this job, or leaving this field. '
               'They have very different consequences and they get blurred.'),
           PpCard('Keep one professional thread alive',
@@ -6155,13 +6746,13 @@ const PpArea _backToWork = PpArea(
               'time and everybody notices later.'),
           PpCard('Agree it is a decision with a review date',
               '"For a year, and then we look again" is very different from '
-              '"she stopped working".'),
+              '"I stopped working".'),
           PpCard('Do not accept it being decided for you in a conversation you '
               'were not in',
               'This is your career. It is reasonable to say that plainly.'),
           PpCard('Notice if you are grieving it',
-              'Leaving work you loved is a real loss, and it often arrives late '
-              'rather than at the time.'),
+              'Leaving work you loved is a real loss, and it often hits you '
+              'months afterwards rather than at the time.'),
         ], heading: 'What to sort out either way', hue: 186),
         PpCallout(
           'Full time mothering is work. It is unpaid, largely unrecognised, and '
@@ -6169,10 +6760,10 @@ const PpArea _backToWork = PpArea(
           'in this section treats it as the option for mothers who could not '
           'manage the other one.',
         ),
-        PpIndiaNote('In many families this is not framed as a decision at all, '
-            'and the assumption is simply made. If that is what happened in '
-            'yours, it is still worth having the conversation, even after the '
-            'fact, and even if the outcome does not change.'),
+        PpIndiaNote('In many families this is not treated as a decision at all. '
+            'It is just assumed. If that happened in yours, it is still worth '
+            'having the conversation, even after the fact, and even if the '
+            'outcome does not change.'),
       ],
     ),
     PpPage(
@@ -6182,20 +6773,18 @@ const PpArea _backToWork = PpArea(
       bands: _later,
       blocks: [
         PpIntro('At some point the healing is done, the feeding is settled, and '
-            'a quieter question arrives: where did the rest of you go, and is '
-            'she coming back.'),
+            'a gentler question arrives. Where did the rest of you go, and will '
+            'that part of you come back?'),
         PpArticle([
           'For months you were called somebody\'s mother by people who knew your '
           'name. Your day was organised entirely around another person\'s needs. '
-          'Everything you used to do for no reason at all, reading, music, '
-          'friends, a walk with nowhere to be, quietly stopped, and nobody '
-          'noticed including you.',
-          'The version of yourself you are looking for is not exactly the one '
-          'you had. That is genuinely the hard part, and it is not a defeat. '
-          'Most mothers describe arriving somewhere new rather than going back, '
-          'usually around a year, often later, and almost always in small pieces '
-          'rather than all at once.',
-        ], heading: 'What actually changed'),
+          'Everything you did just for you, reading, music, friends, a walk with '
+          'nowhere to be, slowly stopped. Nobody noticed, including you.',
+          'The self you are looking for is not exactly the one you had. That is '
+          'the hard part, and it is not a defeat. Most mothers describe arriving '
+          'somewhere new rather than going back. Usually around a year, often '
+          'later, and almost always in small pieces.',
+        ], heading: 'What changed'),
         PpCards([
           PpCard('Take back one small thing that is only yours',
               'Twenty minutes, three times a week. A book, a run, a class, a '
@@ -6205,16 +6794,16 @@ const PpArea _backToWork = PpArea(
               'in the week and tell somebody it is happening.'),
           PpCard('Answer questions about yourself with something else',
               'When someone asks how you are, try answering about you rather '
-              'than about her. It is surprisingly hard and worth practising.'),
+              'than about the baby. It is surprisingly hard, and worth practising.'),
           PpCard('Keep two friendships alive on purpose',
-              'Not the whole circle. Two, with actual effort, including one who '
+              'Not the whole circle. Two, with real effort, including one who '
               'is not a mother.'),
           PpCard('Do one thing you are bad at',
               'Being a beginner at something is the fastest way back to feeling '
               'like a person rather than a function.'),
-          PpCard('Be somewhere without her, occasionally',
-              'The first time is awful. The fourth time is not.'),
-        ], heading: 'What actually helps', hue: 186),
+          PpCard('Be somewhere without your baby, now and then',
+              'The first time is awful. By the fourth time, it is easier.'),
+        ], heading: 'What helps', hue: 186),
         PpCallout(
           'Friendships will change, and some will end. Friends without children '
           'often drift, and mothers you barely knew become close. That is normal '
@@ -6229,7 +6818,7 @@ const PpArea _backToWork = PpArea(
           slotId: 'youmaa/work_finding_self',
           hue: 186,
         ),
-        PpLink('Something for you, not for her',
+        PpLink('Something for you, not for the baby',
             surfaceId: 'pp_courses',
             blurb: 'Courses and classes, including ones with nothing to do with '
                 'babies.'),
@@ -6275,8 +6864,7 @@ const PpArea _theCircle = PpArea(
   id: 'the_circle',
   mark: IntentMark.improveMark,
   title: 'You are not the only one',
-  blurb: 'Other mothers at the same stage as you, and what they are actually '
-      'good for.',
+  blurb: 'Other mothers at the same stage as you, and how they can help.',
   hue: 258,
   pages: [
     PpPage(
@@ -6299,18 +6887,17 @@ const PpArea _theCircle = PpArea(
             'the age of yours. Not a forum, not a feed, and not a place anyone '
             'is selling anything.'),
         PpArticle([
-          'The reason it is grouped by stage rather than by topic is that the '
-          'thing that helps most is talking to someone in the same week as you. '
-          'A mother eleven days in and a mother of a two year old are having '
-          'completely different problems, and general parenting groups mix them '
-          'into advice that does not fit.',
-          'So the circles are banded the way this whole section is: the first six '
-          'weeks, six weeks to three months, three to six months, and mothers '
-          'going back to work. You move with your baby.',
+          'It is grouped by stage rather than topic, because what helps most is '
+          'talking to someone in the same week as you. A mother eleven days in '
+          'and a mother of a two year old have very different problems. General '
+          'parenting groups mix them into advice that does not fit.',
+          'So the circles follow the same stages as this whole section. The '
+          'first six weeks, six weeks to three months, three to six months, and '
+          'mothers going back to work. You move with your baby.',
         ], heading: 'How it is put together'),
         PpCards([
           PpCard('Small, so it is not a feed',
-              'A group you can actually read, with faces that repeat.'),
+              'A group you can really keep up with, with faces that repeat.'),
           PpCard('Grouped by your stage, not by topic',
               'Everyone in your circle is roughly where you are.'),
           PpCard('Moderated by a real person',
@@ -6339,7 +6926,7 @@ const PpArea _theCircle = PpArea(
     ),
     PpPage(
       id: 'circle_what_helps',
-      title: 'What other mothers are actually good for',
+      title: 'How other mothers can help',
       format: 'ARTICLE',
       bands: _allBands,
       blocks: [
@@ -6347,24 +6934,22 @@ const PpArea _theCircle = PpArea(
             'nothing. It is worth being precise about what it does well, because '
             'it also does some things badly.'),
         PpArticle([
-          'The single thing other mothers give you that nothing else can is the '
-          'sentence "me too, at exactly this age". Not advice. Recognition. A '
-          'great deal of the distress of early motherhood is the private '
-          'conviction that everyone else is managing and you alone are not, and '
-          'that conviction does not survive contact with five honest women in '
-          'the same month.',
-          'They are also, practically, the best source in existence for things '
-          'no professional knows: which paediatrician actually answers the '
-          'phone, which carrier works for a small baby in this heat, what to say '
-          'to your employer, and whether the thing your baby is doing at 4am is '
-          'a thing.',
-        ], heading: 'What it genuinely does'),
+          'Other mothers give you something nothing else can: "me too, at '
+          'exactly this age". Not advice. Recognition. Much of the distress of '
+          'early motherhood is a private belief that everyone else is managing '
+          'and you alone are not. That belief fades fast around five honest '
+          'women in the same month.',
+          'They are also the best source for things no professional knows. '
+          'Which paediatrician answers the phone, which carrier works for a '
+          'small baby in this heat, and what to say to your employer. And '
+          'whether what your baby is doing at 4am happens to others too.',
+        ], heading: 'What it does well'),
         PpTable(
           columns: ['Ask other mothers', 'Ask a professional'],
           rows: [
             ['Is this normal at this age', 'Is this normal for my baby'],
             ['How did you survive the first month', 'Why is feeding painful'],
-            ['Which creche did you use', 'Is her weight gain fine'],
+            ['Which creche did you use', 'Is my baby gaining enough weight'],
             ['What do I say to my mother in law', 'Should I be on medication'],
             ['Did you feel like this too', 'I am having frightening thoughts'],
             ['Which pump was worth it', 'My bleeding has increased'],
@@ -6404,8 +6989,8 @@ const PpArea _theCircle = PpArea(
       bands: _allBands,
       blocks: [
         PpIntro('Most mothers do not have a ready made group and are not going '
-            'to build one from nothing. What actually works is smaller and less '
-            'ambitious than making friends.'),
+            'to build one from nothing. What works is smaller and simpler than '
+            'making friends.'),
         PpArticle([
           'Friendship after birth is mostly a numbers game played at very low '
           'energy. You do not need a group. You need two or three women whose '
@@ -6415,7 +7000,7 @@ const PpArea _theCircle = PpArea(
           'approach is also lonely and also assuming everyone else has this '
           'sorted. The first person to say something is doing everyone a '
           'favour.',
-        ], heading: 'What you are actually looking for'),
+        ], heading: 'What you are looking for'),
         PpCards([
           PpCard('The mothers from your antenatal class or hospital',
               'Same due month, same hospital, same confusion. The easiest group '
@@ -6429,12 +7014,12 @@ const PpArea _theCircle = PpArea(
           PpCard('A postnatal yoga or exercise class',
               'Doing a thing together is far easier than meeting to talk.'),
           PpCard('Cousins, and cousins of friends',
-              'The most underused source in Indian families. Someone in your '
+              'Often overlooked in Indian families. Someone in your '
               'extended family had a baby in the last year.'),
           PpCard('One person you already know, upgraded',
               'Often faster than finding anyone new. A school friend you have '
               'not spoken to in years is one message away.'),
-        ], heading: 'Where the people actually are', hue: 258),
+        ], heading: 'Where the people are', hue: 258),
         PpSteps([
           PpStep('Say the honest sentence first',
               '"I am finding this harder than I expected" opens more doors than '
@@ -6457,7 +7042,7 @@ const PpArea _theCircle = PpArea(
           'building a community. You are looking for the small number of women '
           'you can send a photograph to at 2am without explaining it.',
         ),
-        PpIndiaNote('If you have moved to your mother\'s house for jaapa, you '
+        PpIndiaNote('If you have moved to your mother\'s house for the forty days, you '
             'will make friends there and then leave. It still counts, and a '
             'group chat survives the move perfectly well.'),
       ],
@@ -6472,15 +7057,15 @@ const PpArea _theCircle = PpArea(
             'some that work, and they are all shorter and more honest than the '
             'one you were drafting.'),
         PpArticle([
-          'Almost every mother writes her first message, reads it back, decides '
-          'it sounds like complaining, and deletes it. The message she deleted '
-          'was the useful one. Groups are made of people saying the thing they '
+          'Almost every mother writes a first message, reads it back, decides '
+          'it sounds like complaining, and deletes it. The deleted message was '
+          'the useful one. Groups are made of people saying the thing they '
           'nearly did not say.',
         ], heading: 'Why the first one is hard'),
         PpScript([
           PpScriptLine(
-            say: 'Three weeks in. Nobody warned me about the crying, mine not '
-                'hers. How is everyone doing?',
+            say: 'Three weeks in. Nobody warned me about the crying, mine, not '
+                'the baby\'s. How is everyone doing?',
             notThis: 'Hi everyone, happy to be here, hope you are all well.',
             why: 'Says something true, and asks a question. The polite version '
                 'gets three heart emojis and no conversation.',
@@ -6499,10 +7084,10 @@ const PpArea _theCircle = PpArea(
           ),
           PpScriptLine(
             say: 'That happened to me too and I thought I was the only one.',
-            why: 'The single most useful sentence anyone says in a group like '
-                'this. If you can only manage one, make it this one.',
+            why: 'The most useful sentence anyone says in a group like this. '
+                'If you can only manage one, make it this one.',
           ),
-        ], heading: 'Messages that actually start something'),
+        ], heading: 'Messages that start something'),
         PpCards([
           PpCard('You do not have to be having a good time to belong',
               'The mothers who say the hard things are the reason the group is '
@@ -6510,13 +7095,13 @@ const PpArea _theCircle = PpArea(
           PpCard('You do not have to answer everything',
               'Reading is participating. Nobody is counting.'),
           PpCard('Do not give medical advice, even when you are sure',
-              '"That happened to us, we saw the doctor and she said" is the '
+              '"That happened to us, we saw the doctor and were told" is the '
               'safe shape.'),
           PpCard('Photographs of your worst day are allowed',
               'A messy room and an exhausted face does more for everyone in '
               'that group than a good one does.'),
           PpCard('Leave a group that makes you feel worse',
-              'Quietly, without explaining. Not every group is your group.'),
+              'Without a word, without explaining. Not every group is your group.'),
         ], heading: 'How to be in it', hue: 258),
         PpIndiaNote('If English is not what you are comfortable writing in, '
             'write in whatever you speak at home. Nobody in a mothers\' group at '
@@ -6542,7 +7127,7 @@ const PpArea _theCircle = PpArea(
           PpCard('No medical advice presented as fact',
               'Sharing what happened to you is welcome. Telling another mother '
               'what to do about a symptom is not.'),
-          PpCard('No photographs of another mother or her baby',
+          PpCard('No photographs of another mother or another baby',
               'Yours are yours. Nobody else\'s are yours to post.'),
           PpCard('No judgement on feeding, birth or working',
               'Formula, caesarean, epidural, going back at three months. These '
@@ -6552,16 +7137,15 @@ const PpArea _theCircle = PpArea(
         ], heading: 'The ground rules', hue: 258),
         PpArticle([
           'The rule that matters most is the one about distress. If a mother '
-          'writes something that suggests she is in real trouble, the circle is '
-          'not the answer and warm replies are not the answer. She gets routed '
-          'to real help immediately, and the moderator does that rather than '
-          'waiting for somebody to notice.',
+          'writes something that suggests real trouble, warm replies in the '
+          'circle are not enough. The moderator routes that mother to real help '
+          'immediately, rather than waiting for somebody to notice.',
           'That applies to you too, if you are the one writing it. Nobody in the '
           'circle will tell you to calm down and nobody will send you an '
           'article.',
         ], heading: 'What happens when someone is in trouble'),
         PpCallout(
-          'If you are having thoughts of harming yourself or your baby, or '
+          'If thoughts of harming yourself or your baby come to you, or '
           'thoughts that frighten you, do not wait for a reply in a group. Tell '
           'one person in the room today and tell your doctor in plain words. '
           'India has a free helpline you can call at any hour, and it is one tap '
@@ -6600,14 +7184,13 @@ const PpArea _theCircle = PpArea(
             'asleep.'),
         PpArticle([
           'Nobody posts the fourth hour of crying. Nobody posts the argument at '
-          'midnight, the untouched plate, the feed that hurt so much she cried '
-          'through it. What reaches you is a filtered selection of everyone '
-          'else\'s best ninety seconds, arriving at the exact hour when your own '
-          'defences are lowest.',
-          'This is not a reason to feel weak about it. Comparing yourself to '
-          'that is the normal function of a human brain given that input. The '
-          'only real defence is to change the input.',
-        ], heading: 'What you are actually looking at'),
+          'midnight, the untouched plate, or the feed that hurt so much it made '
+          'them cry. What reaches you is everyone else\'s best ninety seconds, '
+          'arriving at the exact hour when your defences are lowest.',
+          'Comparing yourself is what any human brain does with that input, so '
+          'there is nothing weak about it. The real defence is to change what '
+          'you see.',
+        ], heading: 'What you are looking at'),
         PpCards([
           PpCard('Mute rather than unfollow',
               'No awkwardness, no explanation, and you can undo it in a year.'),
@@ -6623,13 +7206,12 @@ const PpArea _theCircle = PpArea(
           PpCard('Remember the milestone posts are a selection',
               'The mothers whose babies sleep through post about it. The '
               'mothers whose babies do not, do not.'),
-        ], heading: 'What actually helps', hue: 258),
+        ], heading: 'What helps', hue: 258),
         PpCallout(
-          'If comparison has turned into a settled belief that you are failing '
-          'her, that is not about anyone\'s posts. Read the page on guilt and '
-          'the comparison trap in "I do not feel like myself", because that '
-          'belief is one of the most common and most treatable symptoms there '
-          'is.',
+          'Has comparison turned into a settled belief that you are failing your '
+          'baby? That is not about anyone\'s posts. Read the page on guilt and '
+          'the comparison trap in "I do not feel like myself". That belief is '
+          'one of the most common and most treatable symptoms there is.',
         ),
         PpIndiaNote('The family WhatsApp group is often harder than any of this, '
             'because you cannot mute your relatives without it being noticed. '

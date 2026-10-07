@@ -10,6 +10,8 @@
 
 import 'dart:convert';
 
+import 'pp_names_catalogue.dart';
+
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -64,8 +66,9 @@ class BabyName {
   final bool mutual; // true → liking it in the deck triggers "It's a match!"
 }
 
-// The deck. Boy names (the mock's quiz picks "Boy"); Aarav is the hero.
-const List<BabyName> kBabyNames = [
+// The hand-written deck. Aarav is the hero. Since 2026-10-02 the full
+// catalogue is kBabyNames below: these first, then pp_names_catalogue.dart.
+const List<BabyName> kBabyNamesAuthored = [
   BabyName(
     name: 'Aarav',
     famous:
@@ -417,6 +420,149 @@ const List<BabyName> kBabyNames = [
   ),
 ];
 
+/// Every name the finder offers: the hand-written ones, then the catalogue
+/// (pp_names_catalogue.dart) expanded, minus any name already written by hand.
+final List<BabyName> kBabyNames = _buildNames();
+
+List<BabyName> _buildNames() {
+  final seen = {for (final n in kBabyNamesAuthored) n.name.toLowerCase()};
+  final rows = <List<String>>[];
+  for (final line in kNameCatalogueRaw.split('\n')) {
+    final p = line.split('|');
+    if (p.length != 8) continue;
+    if (!seen.add(p[0].toLowerCase())) continue;
+    rows.add(p);
+  }
+  final out = <BabyName>[...kBabyNamesAuthored];
+  for (var i = 0; i < rows.length; i++) {
+    out.add(_expand(rows[i], _similarFor(rows, i)));
+  }
+  return out;
+}
+
+List<(String, String)> _similarFor(List<List<String>> rows, int i) {
+  final me = rows[i];
+  final out = <(String, String)>[];
+  for (var d = 1; d < rows.length && out.length < 3; d++) {
+    for (final j in [i + d, i - d]) {
+      if (j < 0 || j >= rows.length || out.length >= 3) continue;
+      final o = rows[j];
+      if (o[2] == me[2] && o[3] == me[3]) out.add((o[0], o[6].split(';').first.toLowerCase()));
+    }
+  }
+  return out;
+}
+
+BabyName _expand(List<String> p, List<(String, String)> similar) {
+  final name = p[0];
+  final gender = switch (p[2]) { 'g' => 'girl', 'u' => 'unisex', _ => 'boy' };
+  final community = p[3];
+  final region = p[4];
+  final origin = p[5];
+  final meaning = p[6];
+  final pop = switch (p[7]) { 'T' => 'Trending', 'R' => 'Rare', _ => 'Classic' };
+  final originFirst = origin.split('·').first.trim();
+  final devotional = RegExp(r'\b(god|lord|goddess|divine|guru|prophet|sacred|holy|faith|worship|devot)', caseSensitive: false).hasMatch(meaning);
+  final feel = devotional
+      ? 'Devotional · $originFirst'
+      : switch (pop) { 'Trending' => 'Modern · $originFirst', 'Rare' => 'Rare · $originFirst', _ => 'Classic · $originFirst' };
+  final where = region == 'Pan-India' ? 'across India' : 'especially in ${region.toLowerCase()} India';
+  final who = community == 'Secular' ? 'families of many faiths' : '$community families';
+  return BabyName(
+    name: name,
+    script: p[1],
+    pron: ppNamePron(name),
+    meaningShort: '$meaning.',
+    meaningFull: '$meaning.',
+    feel: feel,
+    origin: origin,
+    syllables: ppNameSyllables(name),
+    numerology: ppChaldean(name),
+    perspective: '$name is a $originFirst name meaning "${meaning.split(';').first.toLowerCase()}". '
+        '${pop == 'Trending' ? 'It has grown popular in recent years.' : pop == 'Rare' ? 'It is uncommon, so few classmates will share it.' : 'A name that has stayed in use for generations.'}',
+    famous: 'A $originFirst name chosen by $who, $where.',
+    nakshatra: ppRashiNote(name),
+    popularity: pop,
+    gender: gender,
+    community: community,
+    region: region,
+    similar: similar,
+    rare: pop == 'Rare',
+  );
+}
+
+/// Vowel groups, roughly: "Aarav" 2, "Ishaanvi" 3.
+int ppNameSyllables(String name) {
+  final n = RegExp(r'[aeiouy]+').allMatches(name.toLowerCase().replaceAll(RegExp(r'[^a-z]'), '')).length;
+  return n < 1 ? 1 : n;
+}
+
+/// A rough sounding-out: "aa-rav", "i-shaan-vi". Digraphs stay together.
+String ppNamePron(String name) {
+  final s = name.toLowerCase().replaceAll(RegExp(r'[^a-z]'), '');
+  final m = RegExp(r'(?:chh|sh|ch|th|dh|bh|kh|gh|ph|[^aeiouy])*[aeiouy]+(?:[^aeiouy]+$)?').allMatches(s);
+  final parts = [for (final x in m) x.group(0)!];
+  final joined = parts.join();
+  if (parts.isEmpty || joined.length != s.length) return s;
+  return parts.join('-');
+}
+
+/// The Chaldean number, 1 to 9, offered as tradition.
+int ppChaldean(String name) {
+  const v = {
+    'a': 1, 'i': 1, 'j': 1, 'q': 1, 'y': 1, 'b': 2, 'k': 2, 'r': 2, 'c': 3, 'g': 3, 'l': 3, 's': 3,
+    'd': 4, 'm': 4, 't': 4, 'e': 5, 'h': 5, 'n': 5, 'x': 5, 'u': 6, 'v': 6, 'w': 6, 'o': 7, 'z': 7,
+    'f': 8, 'p': 8,
+  };
+  var sum = 0;
+  for (final ch in name.toLowerCase().split('')) {
+    sum += v[ch] ?? 0;
+  }
+  while (sum > 9) {
+    sum = sum.toString().split('').fold(0, (a, c) => a + int.parse(c));
+  }
+  return sum == 0 ? 9 : sum;
+}
+
+/// The rashi traditionally matched to a name's first sound (the "naam akshar"
+/// chart), stated as tradition. Several sounds sit under two rashis; both are
+/// named rather than one guessed.
+String ppRashiNote(String name) {
+  final n = name.toLowerCase();
+  String? r;
+  const two = {
+    'chh': 'Mithun (Gemini)', 'bh': 'Dhanu (Sagittarius)', 'dh': 'Dhanu (Sagittarius)', 'ph': 'Dhanu (Sagittarius)',
+    'kh': 'Makar (Capricorn)', 'gh': 'Mithun (Gemini)', 'sh': 'Kumbh (Aquarius)', 'th': 'Kanya (Virgo) or Meen (Pisces)',
+    'ch': 'Mesh (Aries) or Meen (Pisces)',
+  };
+  for (final e in two.entries) {
+    if (n.startsWith(e.key)) {
+      r = e.value;
+      break;
+    }
+  }
+  r ??= switch (n.isEmpty ? '' : n[0]) {
+    'a' || 'e' || 'l' => 'Mesh (Aries)',
+    'b' || 'v' || 'w' || 'u' || 'i' || 'o' => 'Vrishabh (Taurus)',
+    'k' || 'q' => 'Mithun (Gemini)',
+    'h' => 'Kark (Cancer)',
+    'd' => 'Kark (Cancer) or Meen (Pisces)',
+    'm' => 'Simha (Leo)',
+    't' => 'Simha (Leo) or Tula (Libra)',
+    'p' => 'Kanya (Virgo)',
+    'n' => 'Kanya (Virgo) or Vrishchik (Scorpio)',
+    'r' => 'Tula (Libra)',
+    'y' => 'Vrishchik (Scorpio)',
+    'f' => 'Dhanu (Sagittarius)',
+    'j' => 'Makar (Capricorn)',
+    'g' || 's' => 'Kumbh (Aquarius)',
+    'z' => 'Meen (Pisces)',
+    _ => null,
+  };
+  if (r == null) return 'No traditional rashi letter for this sound.';
+  return "By the traditional naam akshar chart, a name starting '${name.substring(0, n.startsWith(RegExp('chh')) ? 3 : RegExp('^(bh|dh|ph|kh|gh|sh|th|ch)').hasMatch(n) ? 2 : 1)}' sits under $r. A family custom, not a fact about the child.";
+}
+
 /// Lookup by name (used by detail/similar links). Falls back to Aarav.
 BabyName babyNameByName(String name) =>
     kBabyNames.firstWhere((n) => n.name == name, orElse: () => kBabyNames.first);
@@ -425,7 +571,7 @@ BabyName babyNameByName(String name) =>
 //  Filter options + query for the "who are we naming" step.
 // -----------------------------------------------------------------------------
 const List<String> kNameGenders = ['Boy', 'Girl', 'Both'];
-const List<String> kNameCommunities = ['Any', 'Hindu', 'Muslim', 'Sikh', 'Christian', 'Secular'];
+const List<String> kNameCommunities = ['Any', 'Hindu', 'Muslim', 'Sikh', 'Christian', 'Jain', 'Parsi', 'Buddhist', 'Secular'];
 const List<String> kNameRegions = ['Any', 'Pan-India', 'North', 'South', 'East', 'West'];
 
 /// The catalogue filtered by who the parents are naming + region/religion.

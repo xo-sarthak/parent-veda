@@ -36,7 +36,8 @@ import 'pp_food_data.dart';
 import 'health_home_screen.dart';
 import 'wallet_home_screen.dart';
 import 'journal_v2/journal_capture_screens.dart';
-import 'journal_v2/journal_home_screen.dart';
+// import 'journal_v2/journal_home_screen.dart'; // the demo journal, kept for revert
+import 'journal_v2/pp_journal_screen.dart';
 import 'my_child_screen.dart';
 import 'pp_common.dart';
 import 'pp_products_data.dart';
@@ -412,7 +413,7 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
           decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: ppHair)),
           clipBehavior: Clip.antiAlias,
           child: Column(children: [
-            _win("Logged today's memory", done: true, onTap: () => _push(const JournalV2Home())),
+            _win("Logged today's memory", done: true, onTap: () => _push(const PpJournalScreen()) /* was JournalV2Home (demo), kept for revert */),
             _win("Read today's article", done: true, onTap: () => _push(const ArticleReaderScreen())),
             _win('Completed tummy time', done: false, onTap: () => _push(const GrowthActivityScreen(activity: kActTummyTime))),
             _win("Finished today's activity", done: false, onTap: () => _push(const GrowthActivityScreen()), last: true),
@@ -451,7 +452,7 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
         const SizedBox(height: 14),
         _pad(Row(children: [
           _qa(Icons.auto_awesome_outlined, 'Ask Veda', () => openPpTab(context, 1)),
-          _qa(Icons.menu_book_outlined, 'Journal', () => _push(const JournalV2Home())),
+          _qa(Icons.menu_book_outlined, 'Journal', () => _push(const PpJournalScreen()) /* was JournalV2Home (demo), kept for revert */),
           _qa(Icons.compare_arrows_rounded, 'Compare', () => _push(const ProductsCompareScreen())),
           // Was: _push(const HealthGuideScreen()) - now opens the Health ecosystem.
           // Then, with the Health Wallet versions, the wrapper rather than V1
@@ -649,7 +650,7 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
               // the real profile now, and an unrecorded measurement says so
               // rather than inventing a figure.
               _detailRow('Date of birth', [TextSpan(text: _dobLabel(ChildProfileStore.instance.dob))], top: true),
-              _detailRow('Sex', [TextSpan(text: ChildProfileStore.instance.isBoy ? 'Boy' : 'Girl')], top: true),
+              _detailRow('Sex', [TextSpan(text: ChildProfileStore.instance.sexLabel)], top: true),
               _detailRow('Weight', _measureSpans(ChildProfileStore.instance.weightKg, 1, 'kg', GrowthMetric.weight), top: true),
               _detailRow('Height', _measureSpans(ChildProfileStore.instance.heightCm, 0, 'cm', GrowthMetric.height), top: true),
               _detailRow('Head', _measureSpans(ChildProfileStore.instance.headCm, 0, 'cm', GrowthMetric.head), top: true, bottom: true),

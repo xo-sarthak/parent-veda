@@ -39,6 +39,7 @@ import '../post_pregnancy/pp_experts_data.dart';
 import '../post_pregnancy/pp_learning_data.dart';
 import '../post_pregnancy/pp_yoga_data.dart';
 import '../ttc/ttc_garbh_course_screen.dart' show TtcCourseSessionScreen;
+import '../post_pregnancy/pp_expert_honesty.dart' show ppProgramIsPlaceholder;
 
 /// The free garbh course's id IS the TTC catalogue's — `kTtcOfferingGarbhCourse`
 /// — so the four places that push `TtcOfferingScreen` for it land on the
@@ -151,6 +152,9 @@ class PvLearnCatalog {
 
   /// Parenting: `LearningProgram` (+ its `Course` for the curriculum).
   static PvOfferingView _fromLearning(LearningProgram p) {
+    // Bundled and unpublished: shown as Opening soon, with no seats, start
+    // date or rating (pp_expert_honesty.dart).
+    final soon = ppProgramIsPlaceholder(p.id);
     final kind = switch (p.kind) {
       LearningKind.recordedCourse => PvLearnKind.course,
       LearningKind.masterclass => PvLearnKind.masterclass,
@@ -202,7 +206,7 @@ class PvLearnCatalog {
           live ? 'when' : 'format',
         ),
         PvLearnFact(p.durationLabel, 'length'),
-        if (p.seatsLeft != null)
+        if (p.seatsLeft != null && !soon)
           PvLearnFact('${p.seatsLeft}', 'seats left')
         else
           const PvLearnFact('Recording', 'included'),
@@ -212,8 +216,8 @@ class PvLearnCatalog {
         PvLearnFact(p.durationLabel, 'long'),
         if (p.sessionTimes.isNotEmpty)
           PvLearnFact(p.sessionTimes.first, 'live calls'),
-        if (p.startLabel != null) PvLearnFact(p.startLabel!, 'starts'),
-        if (p.seatsLeft != null) PvLearnFact('${p.seatsLeft}', 'seats left'),
+        if (p.startLabel != null && !soon) PvLearnFact(p.startLabel!, 'starts'),
+        if (p.seatsLeft != null && !soon) PvLearnFact('${p.seatsLeft}', 'seats left'),
       ],
     };
     return PvOfferingView(
@@ -240,13 +244,14 @@ class PvLearnCatalog {
       sessions: sessions,
       rhythm: p.sessionTimes,
       startLabel: p.startLabel,
-      seatsLeft: p.seatsLeft,
+      seatsLeft: soon ? null : p.seatsLeft,
       durationLabel: p.durationLabel.isNotEmpty
           ? p.durationLabel
           : (kind == PvLearnKind.course && lessons.isNotEmpty
                 ? _lessonsLine(lessons.length)
                 : ''),
-      rating: p.rating > 0 ? p.rating : null,
+      // No made-up rating on an unmade programme (gap analysis P1).
+      rating: !soon && p.rating > 0 ? p.rating : null,
       reviewsLabel: p.reviewsLabel,
       reviews: expert == null ? const [] : _expertReviews(expert),
       recordingIncluded: kind == PvLearnKind.masterclass && !live,

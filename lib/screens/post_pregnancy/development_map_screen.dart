@@ -10,6 +10,13 @@
 import 'package:flutter/material.dart';
 
 import 'pp_common.dart';
+import 'pp_care_parts.dart' show ppCareHeading;
+import 'pp_phases_data.dart' show ppFillChild;
+import '../../theme/pv_fonts.dart';
+import '../brackets/hub/hub_intent_art.dart' show IntentMark;
+import '../pregnancy/preg_tool_chrome.dart';
+import '../products/pv_store_chrome.dart' show kPvInk, pvStorePalette;
+import '../v2/v2_palette.dart' show V2Palette;
 
 class DevelopmentMapScreen extends StatelessWidget {
   const DevelopmentMapScreen({super.key});
@@ -30,8 +37,191 @@ class DevelopmentMapScreen extends StatelessWidget {
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
 
+  // ---- the one ParentVeda look (2026-10-07) ------------------------------------
+  //  The map on the shell every TTC and pregnancy tool wears, the hue of the
+  //  Development tools (What changed): the rail in ink, each band a white
+  //  hairline card, "you are here" as the one ink pill and an ink edge, the past
+  //  quieter. Same bands, same sheet on tap. `_buildBeforeShell` is the page
+  //  before, kept for revert.
   @override
   Widget build(BuildContext context) {
+    final p = pvStorePalette;
+    return PregToolScaffold(
+      hue: 285,
+      eyebrow: 'The Development Map',
+      mark: IntentMark.timelineRail,
+      title: 'Birth to five',
+      intro: 'The whole early journey, as one gentle map. Ages are guides, not deadlines - every child walks it at their own pace.',
+      children: [
+        pregToolPad(Column(children: [
+          for (int i = 0; i < _bands.length; i++)
+            _shellBand(context, p, i, first: i == 0, last: i == _bands.length - 1),
+        ])),
+      ],
+    );
+  }
+
+  Widget _here() => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+        decoration: BoxDecoration(color: kPvInk, borderRadius: BorderRadius.circular(999)),
+        child: Text('YOU ARE HERE',
+            style: pvManrope(fontSize: 9.5, fontWeight: FontWeight.w800, letterSpacing: 0.6, color: Colors.white)),
+      );
+
+  Widget _shellBand(BuildContext context, V2Palette p, int i, {bool first = false, bool last = false}) {
+    final b = _bands[i];
+    final isCurrent = i == _current;
+    final isPast = i < _current;
+    return IntrinsicHeight(
+      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        SizedBox(
+          width: 30,
+          child: Column(children: [
+            SizedBox(height: 4, child: first ? null : Container(width: 2, color: p.line)),
+            if (isCurrent)
+              Container(
+                width: 26,
+                height: 26,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                    shape: BoxShape.circle, color: Colors.white, border: Border.all(color: kPvInk, width: 2)),
+                child: Container(
+                    width: 10, height: 10, decoration: const BoxDecoration(color: kPvInk, shape: BoxShape.circle)),
+              )
+            else if (isPast)
+              Container(
+                width: 22,
+                height: 22,
+                alignment: Alignment.center,
+                decoration: const BoxDecoration(color: kPvInk, shape: BoxShape.circle),
+                child: const Icon(Icons.check_rounded, size: 13, color: Colors.white),
+              )
+            else
+              Container(
+                width: 18,
+                height: 18,
+                decoration: BoxDecoration(
+                    shape: BoxShape.circle, color: Colors.white, border: Border.all(color: p.ink3, width: 1.5)),
+              ),
+            if (!last) Expanded(child: Container(width: 2, color: p.line)),
+          ]),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 14),
+            child: Material(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(18),
+              child: InkWell(
+                key: ValueKey('devmap_band_$i'),
+                onTap: () => _shellSheet(context, p, i),
+                borderRadius: BorderRadius.circular(18),
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(color: isCurrent ? kPvInk : p.line, width: isCurrent ? 1.6 : 1),
+                  ),
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Row(children: [
+                      Expanded(
+                        child: Text(b.$1.toUpperCase(),
+                            style: pvManrope(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 1.2,
+                                color: isPast ? p.ink3 : p.action)),
+                      ),
+                      if (isCurrent) _here(),
+                    ]),
+                    const SizedBox(height: 6),
+                    Text(b.$2,
+                        style: pvFraunces(
+                            fontSize: 18, fontWeight: FontWeight.w600, height: 1.2, color: isPast ? p.ink2 : p.ink1)),
+                    const SizedBox(height: 6),
+                    Text(ppFillChild(b.$3),
+                        style: pvManrope(fontSize: 13, height: 1.5, color: isPast ? p.ink3 : p.ink2),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis),
+                    const SizedBox(height: 10),
+                    Wrap(spacing: 6, runSpacing: 6, children: [
+                      for (final s in b.$4.take(3))
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(999),
+                              border: Border.all(color: p.line)),
+                          child: Text(s,
+                              style: pvManrope(fontSize: 11.5, fontWeight: FontWeight.w600, color: p.ink2)),
+                        ),
+                    ]),
+                  ]),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ]),
+    );
+  }
+
+  void _shellSheet(BuildContext context, V2Palette p, int i) {
+    final b = _bands[i];
+    final isCurrent = i == _current;
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: p.ground,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+      builder: (ctx) => SafeArea(
+        top: false,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 30),
+          child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Center(
+                child: Container(
+                    width: 38, height: 4, decoration: BoxDecoration(color: p.line, borderRadius: BorderRadius.circular(999)))),
+            const SizedBox(height: 16),
+            Row(children: [
+              Flexible(
+                child: Text(b.$1.toUpperCase(),
+                    style: pvManrope(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.4, color: p.action)),
+              ),
+              if (isCurrent) ...[const SizedBox(width: 10), _here()],
+            ]),
+            const SizedBox(height: 10),
+            Text(b.$2, style: pvFraunces(fontSize: 24, fontWeight: FontWeight.w600, height: 1.2, color: p.ink1)),
+            const SizedBox(height: 10),
+            Text(ppFillChild(b.$3), style: pvManrope(fontSize: 14.5, height: 1.6, color: p.ink1)),
+            const SizedBox(height: 20),
+            ppCareHeading('What tends to blossom'),
+            const SizedBox(height: 12),
+            for (final s in b.$4)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 9),
+                child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 7, right: 12),
+                    child: Container(
+                        width: 5, height: 5, decoration: BoxDecoration(color: p.ink1, shape: BoxShape.circle)),
+                  ),
+                  Expanded(child: Text(s, style: pvManrope(fontSize: 14, height: 1.45, color: p.ink1))),
+                ]),
+              ),
+            const SizedBox(height: 12),
+            Text('Many children grow into these across this window - some sooner, some later, and all of it normal.',
+                style: pvManrope(fontSize: 12.5, height: 1.5, color: p.ink3)),
+          ]),
+        ),
+      ),
+    );
+  }
+
+  // Kept for revert (2026-10-07): the page before the shared shell.
+  // ignore: unused_element
+  Widget _buildBeforeShell(BuildContext context) {
     return Scaffold(
       backgroundColor: ppBg,
       body: SafeArea(

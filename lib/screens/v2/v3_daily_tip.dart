@@ -106,6 +106,10 @@ Future<void> showDailyTip(
   /// are better than a generic label — "End tummy time happy" says more in four
   /// words than any heading we could write above it.
   String? heading,
+  /// An optional link under the line (parenting, 2026-10-07: "one tip ...
+  /// linked to a door page"). Absent, the card is exactly as before.
+  String? readLabel,
+  VoidCallback? onRead,
 }) async {
   if (!kDailyTipEnabled || _dailyTipShown || line.trim().isEmpty) return;
   _dailyTipShown = true;
@@ -126,7 +130,7 @@ Future<void> showDailyTip(
     // off to a staggered one feels like arriving.
     transitionDuration: const Duration(milliseconds: 220),
     pageBuilder: (_, _, _) =>
-        _TipDialog(line: line, week: week, day: day, p: p, heading: heading),
+        _TipDialog(line: line, week: week, day: day, p: p, heading: heading, readLabel: readLabel, onRead: onRead),
     transitionBuilder: (context, anim, _, child) {
       final e = CurvedAnimation(parent: anim, curve: Curves.easeOutCubic);
       return FadeTransition(
@@ -146,8 +150,12 @@ class _TipDialog extends StatefulWidget {
       required this.week,
       required this.day,
       required this.p,
-      this.heading});
+      this.heading,
+      this.readLabel,
+      this.onRead});
 
+  final String? readLabel;
+  final VoidCallback? onRead;
   final String line;
   final int week;
   final int day;
@@ -393,6 +401,18 @@ class _TipDialogState extends State<_TipDialog>
                       _rise(
                         _step(0.45, 1.0),
                         Row(children: [
+                          if (widget.onRead case final read?)
+                            Flexible(
+                              child: TextButton(
+                                key: const ValueKey('v3_tip_read'),
+                                onPressed: () {
+                                  Navigator.of(context).maybePop();
+                                  read();
+                                },
+                                child: Text(widget.readLabel ?? 'Read more',
+                                    style: pvManrope(fontSize: 14.5, fontWeight: FontWeight.w800, color: p.ink1)),
+                              ),
+                            ),
                           const Spacer(),
                           TextButton(
                             onPressed: () => Navigator.of(context).maybePop(),

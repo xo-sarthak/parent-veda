@@ -41,7 +41,12 @@ import '../belly_skin/bump_ritual_screen.dart';
 import '../dear_baby_vault_screen.dart';
 import '../journal_screen.dart';
 import '../memories/memories_home_screen.dart';
+import '../care_partner/care_circle_screen.dart' show CareCircleScreen;
+import '../post_pregnancy/astrology_screen.dart' show AstrologyScreen;
+import '../post_pregnancy/family_profile_screen.dart' show FamilyProfileScreen;
+import '../post_pregnancy/investments_screen.dart' show InvestmentsScreen;
 import '../post_pregnancy/my_bookings_screen.dart';
+import '../referral/invite_friends_screen.dart' show InviteFriendsScreen;
 import '../post_pregnancy/provider_results_screen.dart';
 import '../pregnancy_profile_screen.dart';
 import '../pregnancy/preg_twins.dart';
@@ -49,6 +54,8 @@ import '../pregnancy/preg_due_date_screen.dart' show openPregDueDate;
 import '../pregnancy/preg_ended_screen.dart' show openPregEnded;
 import '../pregnancy/preg_messages_screen.dart' show openPregMessages;
 import '../../services/preg_messages_store.dart' show PregMessagesStore;
+import '../../services/pp_messages_store.dart' show PpMessagesStore;
+import '../post_pregnancy/pp_messages_screen.dart' show openPpMessages;
 import '../../data/doors/pv_door_after_loss.dart' show kPregEndedRowTitle, kPregEndedRowSub;
 import '../../services/pregnancy_ended_store.dart';
 import '../products/pv_orders_screen.dart';
@@ -244,6 +251,7 @@ class PvYouStageContent {
     this.supportThings = const [],
     this.shortProfile = false,
     this.keepsakeThings = const [],
+    this.setupThings = const [],
   });
   final LifeStage stage;
 
@@ -315,6 +323,16 @@ class PvYouStageContent {
   /// Her own keepsakes, drawn under "Your things" after the tiles (pregnancy:
   /// the Dear Baby vault, the Journal, the Bump journey).
   final List<PvYouThing> keepsakeThings;
+
+  // ⚠️ ADDITIVE (2026-10-07, the parenting profile). The user: "Under More >
+  // Everything else ... a lot of it can go inside the Profile section". The
+  // rows that tune the family's own account (what the app leads with, the
+  // care circle, invites, savings, astrology) left More for a group of their
+  // own on the short profile, "Your family's setup". Parenting only; every
+  // other stage leaves it empty and draws as before.
+
+  /// Rows under "Your family's setup" on the short profile.
+  final List<PvYouThing> setupThings;
 }
 
 // ---- helpers ------------------------------------------------------------------
@@ -505,11 +523,67 @@ PvYouThing _pregMessages() => PvYouThing(
   },
 );
 
+/// The parenting Messages row: what the app has sent, and the switches.
+PvYouThing _ppMessages() => PvYouThing(
+  icon: Icons.mail_outline_rounded,
+  title: 'Messages',
+  subtitle: 'What we have sent you, and when we send it',
+  dot: () => PpMessagesStore.instance.unreadCount > 0,
+  listen: PpMessagesStore.instance,
+  open: openPpMessages,
+);
+
 PvYouThing _findHelp() => PvYouThing(
   icon: Icons.location_on_outlined,
   title: 'Find help near you',
   subtitle: 'Lactation, paediatrics and night help',
   open: (c) => _push(c, const ProviderResultsScreen(), 'pp/providers'),
+);
+
+// ---- Parenting: "Your family's setup" (2026-10-07) ---------------------------------
+//
+// The five rows that left More > Everything else for the parenting profile.
+// Same destinations as the Explore rows they replace (explore_drawer.dart);
+// the titles are in plain English with "and" for "&".
+
+PvYouThing _ppPersonalize() => PvYouThing(
+  icon: Icons.tune_rounded,
+  art: ttcArtTab(TtcTabMark.signpost),
+  title: 'Personalize ParentVeda',
+  subtitle: 'Tune what you see, for your family',
+  open: (c) => _push(c, const FamilyProfileScreen(), 'pp/family_profile'),
+);
+
+PvYouThing _ppCareCircle() => PvYouThing(
+  icon: Icons.diversity_1_outlined,
+  art: ttcArtTab(TtcTabMark.heartHand),
+  title: 'Your Care Circle',
+  subtitle: 'The people supporting you through this',
+  open: (c) => _push(c, const CareCircleScreen(), 'pp/care_circle'),
+);
+
+PvYouThing _ppInvite() => PvYouThing(
+  icon: Icons.card_giftcard_outlined,
+  art: ttcArtTab(TtcTabMark.twoBubbles),
+  title: 'Invite a friend',
+  subtitle: 'You both get a free consultation',
+  open: (c) => _push(c, const InviteFriendsScreen(), 'pp/invite'),
+);
+
+PvYouThing _ppInvestments() => PvYouThing(
+  icon: Icons.savings_outlined,
+  art: ttcArtTab(TtcTabMark.wallet),
+  title: 'Investments and savings',
+  subtitle: 'Plan ahead for your child\'s future',
+  open: (c) => _push(c, const InvestmentsScreen(), 'pp/investments'),
+);
+
+PvYouThing _ppAstrology() => PvYouThing(
+  icon: Icons.auto_awesome_outlined,
+  art: ttcArtTab(TtcTabMark.sunrise),
+  title: 'Astrology and numerology',
+  subtitle: 'Optional cosmic notes',
+  open: (c) => _push(c, const AstrologyScreen(), 'pp/astrology'),
 );
 
 // ---- TTC rows for the profile and Settings (2026-09-29) --------------------------
@@ -1054,6 +1128,9 @@ final PvYouStageContent _pregnancy = PvYouStageContent(
 
 final PvYouStageContent _parenting = PvYouStageContent(
   stage: LifeStage.parenting,
+  // The parenting inbox (2026-10-07, gap analysis P1 "an app that speaks
+  // first"), in Settings, Notifications, as TTC's and pregnancy's are.
+  notificationThings: [_ppMessages()],
   clock: () {
     final s = ChildProfileStore.instance;
     if (!s.hasRealChild) return 'Parenting';
@@ -1070,12 +1147,16 @@ final PvYouStageContent _parenting = PvYouStageContent(
   details: [
     PvYouDetail(
       label: 'What matters most right now',
+      // Drawn marks for the short profile (2026-10-07); the long You never
+      // reads `art`, so it draws as before.
+      art: ttcArtTab(TtcTabMark.pin),
       value: () =>
           _list(FamilyProfileStore.instance.priorities, (x) => x.label),
       edit: (c) => _editQuestion(c, 'parenting', 'pp_priorities'),
     ),
     PvYouDetail(
       label: 'How you like to learn',
+      art: ttcArtTab(TtcTabMark.openBook),
       value: () => _list(FamilyProfileStore.instance.learnings, (x) => x.label),
       edit: (c) => _push(
         c,
@@ -1085,6 +1166,7 @@ final PvYouStageContent _parenting = PvYouStageContent(
     ),
     PvYouDetail(
       label: 'Reminders you want',
+      art: ttcArtTab(TtcTabMark.clock),
       value: () => _list(FamilyProfileStore.instance.notify, (x) => x.label),
       edit: (c) => _push(
         c,
@@ -1094,13 +1176,33 @@ final PvYouStageContent _parenting = PvYouStageContent(
       note: 'Only what you choose — never noise.',
     ),
   ],
-  tiles: [_saved(), _memories(), _orders()],
+  // Kept for revert (2026-10-07): tiles: [_saved(), _memories(), _orders()],
+  // Marks for the short profile. Orders stays in the list for the older
+  // callers; the short profile draws its own "Your orders" tile instead.
+  tiles: [
+    _saved(art: ttcArtMore(TtcMoreMark.bookmark)),
+    _memories(art: ttcArtMore(TtcMoreMark.film)),
+    _orders(),
+  ],
   things: [
     _bookings(),
     _addresses(),
     _doctorNotes(LifeStage.parenting),
     _findHelp(),
   ],
+  // ⚠️ THE SHORT PROFILE FOR PARENTING (2026-10-07, the user: "a lot of it
+  // can go inside the Profile section, which you haven't created for the
+  // parenting side"). Pregnancy's shape, parenting's rows. `things` above
+  // stays as the list the older callers read. Where each former row went:
+  // Bookings is the tile under the hero, Addresses are in Settings > Account,
+  // the doctor note has its own group, and Find help stays on More (it is
+  // something the app offers, not something about her). The children and
+  // "Add a child" sit under Your journey.
+  shortProfile: true,
+  profileThings: [
+    _doctorNotes(LifeStage.parenting, art: ttcArtTab(TtcTabMark.doctorChat)),
+  ],
+  setupThings: [_ppPersonalize(), _ppCareCircle(), _ppInvite(), _ppInvestments(), _ppAstrology()],
   childrenInvitation: 'Add your child and their page appears here.',
   whatWeStore: [
     'Your name, phone and email, and the partner you paired with.',

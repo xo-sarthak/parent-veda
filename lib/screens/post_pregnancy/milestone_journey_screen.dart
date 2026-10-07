@@ -21,6 +21,12 @@ import 'pp_common.dart';
 import 'pp_development_data.dart';
 import 'pp_milestones_data.dart';
 import 'pp_tools_kit.dart';
+import '../../theme/pv_fonts.dart';
+import '../brackets/hub/hub_intent_art.dart' show IntentMark;
+import '../pregnancy/preg_tool_chrome.dart';
+import '../products/pv_store_chrome.dart' show PvCommit, pvStorePalette;
+import 'pp_care_parts.dart' show ppCareHeading;
+import 'pp_phases_data.dart' show ppFillChild;
 
 // ⚠️ THE FOUR AREAS OF GROWING, AS A CLOSER LOOK INSIDE THE TRACKER. The
 // Development brief (reissued): "Brain, Physical, Language and Emotional sit
@@ -49,8 +55,100 @@ class MilestoneJourneyScreen extends StatefulWidget {
 class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
   final _store = MilestoneStore.instance;
 
+  // ---- the one ParentVeda look (2026-10-07) ------------------------------------
+  //  The shell every TTC and pregnancy tool wears, its headings and its ink
+  //  button. The flip cards, the rows and the area chips are the same widgets;
+  //  `_buildBeforeShell` is the page before, kept for revert.
+  //
+  //  Mobbin audit (2026-10-07): tick rows under a heading, after Walmart's
+  //  registry checklist (mobbin.com/screens/5386a11c-1fb9-4dd5-aabf-7d36dd5a6652).
+  //  DECLINED: the progress bars and "3/7" counts of Finch
+  //  (mobbin.com/screens/2180f7a4-b1a4-4615-8e1d-4d97d458de9b) and Peloton.
+  //  This page promises no score; a count of milestones is one.
   @override
   Widget build(BuildContext context) {
+    final p = pvStorePalette;
+    Widget lead(String t) => pregToolPad(Text(t, style: pvManrope(fontSize: 14, height: 1.55, color: p.ink2)));
+    return AnimatedBuilder(
+      animation: _store,
+      builder: (context, _) {
+        final emerging = _store.emerging;
+        final soon = _store.comingSoon;
+        final settled = <Milestone>[..._store.achieved, ..._store.foundations];
+        return PregToolScaffold(
+          hue: 28,
+          eyebrow: 'Development',
+          mark: IntentMark.stepsMark,
+          title: 'Milestones',
+          intro: 'Moments to notice and celebrate, never a test to pass.',
+          children: [
+            pregToolPad(PvCommit(
+              key: const ValueKey('pp_milestone_log'),
+              label: 'I saw something new',
+              onTap: _openQuickLog,
+            )),
+            const SizedBox(height: 26),
+            pregToolPad(ppCareHeading('Emerging now')),
+            const SizedBox(height: 6),
+            lead('Skills that often show around ${ChildProfileStore.instance.ageLabel}. Tap a card to turn it over.'),
+            const SizedBox(height: 12),
+            if (emerging.isEmpty)
+              lead('A quiet stretch, a lovely time to simply enjoy each other. New skills will surface soon.')
+            else
+              pregToolPad(Column(children: [
+                for (final m in emerging)
+                  MilestoneFlipCard(
+                    milestone: m,
+                    observed: _store.isObserved(m.id),
+                    observedLabel: _store.isObserved(m.id) ? _obsDateLabel(m.id) : null,
+                    onSeen: () => _openObserveSheet(m),
+                    onDetail: () => _openDetail(m),
+                  ),
+              ])),
+            if (settled.isNotEmpty) ...[
+              const SizedBox(height: 26),
+              pregToolPad(ppCareHeading('Usually settled by now')),
+              const SizedBox(height: 6),
+              lead('Typical windows that have already passed. Most children have these; some arrive later and still '
+                  'arrive. Tap the circle if you have seen it.'),
+              const SizedBox(height: 12),
+              pregToolPad(Column(children: [for (final m in settled) _settledRow(m)])),
+            ],
+            const SizedBox(height: 26),
+            pregToolPad(ppCareHeading('Explore by area')),
+            const SizedBox(height: 6),
+            lead('Development happens across all of these at once.'),
+            const SizedBox(height: 12),
+            _domainRow(),
+            const SizedBox(height: 26),
+            pregToolPad(ppCareHeading('Coming soon')),
+            const SizedBox(height: 6),
+            lead('A soft look ahead: you may begin noticing these in the months to come. Never a deadline.'),
+            const SizedBox(height: 12),
+            pregToolPad(Column(children: [for (final m in soon.take(4)) _soonRow(m)])),
+            const SizedBox(height: 14),
+            pregToolPad(Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: p.line),
+              ),
+              child: Text(
+                  ppFillChild('A row you have not ticked is not a row he has missed. If a skill he had has gone away, '
+                      'or something has felt off for a while, that is worth mentioning to your paediatrician, not '
+                      'because of anything on this page, but because you noticed it.'),
+                  style: pvManrope(fontSize: 13.5, height: 1.55, color: p.ink1)),
+            )),
+          ],
+        );
+      },
+    );
+  }
+
+  // Kept for revert (2026-10-07): the page before the shared shell.
+  // ignore: unused_element
+  Widget _buildBeforeShell(BuildContext context) {
     return Scaffold(
       backgroundColor: ppBg,
       body: SafeArea(

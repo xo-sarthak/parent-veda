@@ -107,7 +107,7 @@ class PpSoundTrack {
 const List<PpSoundCategory> kPpSoundCategories = [
   PpSoundCategory(
     id: 'lori',
-    label: 'Lullabies and lori',
+    label: 'Lullabies', // was 'Lullabies and lori' (2026-10-07)
     blurb: 'The songs Indian families have always sung babies down with.',
     hue: 268,
     tracks: [

@@ -19,7 +19,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'recipes_screen.dart';
+// import 'recipes_screen.dart'; // kept for revert with the pp_food line
 
 import 'pp_section_registry.dart';
 import 'pp_section_screen.dart';
@@ -27,9 +27,19 @@ import 'askveda_screen.dart';
 import 'leap_calendar_screen.dart';
 import '../memories/memories_home_screen.dart';
 import 'health_doctor_visit_screen.dart';
-import 'health_emergency_screen.dart';
+// import 'health_emergency_screen.dart'; // kept for revert with the pp_emergency_card route
+import 'wallet_v2_screens.dart' show WalletEmergencyCardScreen;
+import 'pp_mood_check_screen.dart';
 import 'health_home_screen.dart';
 import 'pp_baby_food_check_screen.dart';
+import 'pp_maa_can_i_screen.dart';
+import 'pp_search.dart';
+import 'pp_nappy_screen.dart';
+import 'pp_pump_screen.dart';
+import 'pp_breast_timer_screen.dart';
+import 'pp_care_history_screen.dart';
+import 'pp_tummy_time_screen.dart';
+import 'pp_month_checklist_screen.dart';
 import 'pp_baby_ok_check_screen.dart';
 import 'pp_fever_check_screen.dart';
 import 'pp_crisis_path_screen.dart';
@@ -74,6 +84,8 @@ import 'vax_tracker_screen.dart';
 import 'watch_home_screen.dart';
 import 'what_changed_screen.dart';
 import 'yoga_home_screen.dart';
+import 'pp_recipes_screen.dart';
+import 'pp_buying_guides_screen.dart';
 
 /// ⚠️ A SECTION IS A SURFACE TOO, AND IT RESOLVES BEFORE THE HAND-WRITTEN LIST.
 ///
@@ -333,10 +345,31 @@ Widget? _ppScreenFor(String id) => switch (id) {
       // them by name and the links resolved to nothing. Reachable from one place
       // is not the same as routable.
       'pp_health_home' => const HealthHomeScreen(),
-      'pp_emergency_card' => const HealthEmergencyScreen(),
+      // The Wallet card, with its real QR (gap analysis P1, 2026-10-07); its
+      // Edit opens the editor. Kept for revert:
+      // 'pp_emergency_card' => const HealthEmergencyScreen(),
+      'pp_emergency_card' => const WalletEmergencyCardScreen(),
+      // You, Maa: the two-question mood check-in (2026-10-07).
+      'pp_mood_check' => const PpMoodCheckScreen(),
+      // What to buy › How to choose (2026-10-07).
+      'pp_buying_guides' => const PpBuyingGuidesScreen(),
       'pp_doctor_visit' => const HealthDoctorVisitScreen(),
       'pp_fever_check' => const PpFeverCheckScreen(),
       'pp_baby_food_check' => const PpBabyFoodCheckScreen(),
+      // The mother's "Can I...? while feeding" (fork 2026-10-02, taken 2026-10-07).
+      'pp_maa_can_i' => const PpMaaCanIScreen(),
+      // The whole-stage search (pp_search.dart, 2026-10-07).
+      'pp_search' => const PpSearchScreen(),
+      // The care logs (gap analysis P1, 2026-10-07): nappies, pumping, the
+      // breastfeed timer, the 7-day history and tummy time. Stores and
+      // backend from the fork's f3e0a27 (0094); screens on the shared shell.
+      'pp_nappies' => const PpNappyScreen(),
+      'pp_pump' => const PpPumpScreen(),
+      'pp_feed_timer' => const PpBreastTimerScreen(),
+      'pp_care_history' => const PpCareHistoryScreen(),
+      'pp_tummy_time' => const PpTummyTimeScreen(),
+      // Everything for this month on one page (gap analysis P1, 2026-10-07).
+      'pp_month_checklist' => const PpMonthChecklistScreen(),
 
       // ⚠️ AN ALIAS, ON PURPOSE. First 40 Days links to "You, Maa" eight times
       // and naturally wrote `pp_you_maa`. The section's real id is
@@ -356,7 +389,9 @@ Widget? _ppScreenFor(String id) => switch (id) {
       // Nothing failed, which is why it survived: the retired screen still
       // compiles and still works. A deprecation that only lives in a comment is
       // a deprecation the next router entry will ignore.
-      'pp_food' => const RecipesScreen(),
+      // One recipes browse (2026-10-07, pp_recipes_screen.dart). Kept for revert:
+      // 'pp_food' => const RecipesScreen(),
+      'pp_food' => const PpRecipesScreen(),
       'pp_growth' => const GrowthJourneyScreen(),
       'pp_vaccines' => const VaxTrackerScreen(),
       'pp_what_changed' => const WhatChangedScreen(),

@@ -927,16 +927,27 @@ void openTtc(BuildContext context) {
 /// Returns false only when we are in the second case and no shell is registered
 /// (a widget test, or a build where `main.dart` has not run), so the caller can
 /// say something true rather than appear to do nothing.
+/// The stage homes that can sit at the root in place of the pregnancy shell
+/// (see `splash_screen.dart` `_routeFor`).
+const Set<String> kNonPregnancyRootRoutes = {ttcHomeRoute, 'pp/my_child', 'skilling'};
+
 bool leaveTtcForPregnancy(NavigatorState nav) {
-  var ttcWasRoot = false;
+  // ⚠️ NOT ONLY TTC CAN BE THE ROOT (fixed 2026-10-07; the user: "if I
+  // click on pregnancy it takes me to parenting only"). A family that opens
+  // the app in parenting (or skilling) gets that home as the FIRST route, the
+  // splash replaced by it. Popping to the root then lands on parenting again
+  // and nothing changes. Any stage home at the root means the pregnancy shell
+  // is not underneath, so it is rebuilt. Kept for revert:
+  //   ttcWasRoot = r.settings.name == ttcHomeRoute;
+  var otherStageWasRoot = false;
   nav.popUntil((r) {
     if (r.isFirst) {
-      ttcWasRoot = r.settings.name == ttcHomeRoute;
+      otherStageWasRoot = kNonPregnancyRootRoutes.contains(r.settings.name);
       return true;
     }
     return false;
   });
-  if (!ttcWasRoot) return true; // the live pregnancy shell is back on screen
+  if (!otherStageWasRoot) return true; // the live pregnancy shell is back on screen
   return AppShell.openPregnancy(nav);
 }
 

@@ -22,7 +22,8 @@ void main() {
     await tester.pumpWidget(const MaterialApp(home: GrowthJourneyScreen()));
     await tester.pumpAndSettle();
 
-    expect(find.text('Growth journey'), findsOneWidget);
+    // The shared tool shell (2026-10-07): the title is Growth.
+    expect(find.text('Growth'), findsWidgets);
     // Chart renders (custom-painted).
     expect(find.byType(CustomPaint), findsWidgets);
 
@@ -73,7 +74,8 @@ void main() {
     await tester.pumpWidget(const MaterialApp(home: MilestoneJourneyScreen()));
     await tester.pumpAndSettle();
 
-    expect(find.text('Development journey'), findsOneWidget);
+    // The shared tool shell (2026-10-07): the title is Milestones.
+    expect(find.text('Milestones'), findsWidgets);
     // ⚠️ `findsWidgets`, NOT `findsOneWidget`, AND THE REASON IS A LESSON
     // ABOUT LAZY LISTS RATHER THAN A LOOSENED ASSERTION.
     //

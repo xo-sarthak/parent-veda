@@ -115,7 +115,7 @@ void main() {
         (tester) async {
       await pump(tester, profile);
       for (final w in [
-        'Developer · debug only',
+        'Developer',
         'Language',
         'Sign out',
         'Delete account',
@@ -126,8 +126,11 @@ void main() {
       }
     });
 
+    // Parenting draws the short profile too since 2026-10-07
+    // (test/pp_profile_test.dart), so skilling is the stage that keeps the
+    // long You. Kept for revert: LifeStage.parenting here.
     testWidgets('the other stages keep the screen they had', (tester) async {
-      await pump(tester, const PvYouScreen(stage: LifeStage.parenting));
+      await pump(tester, const PvYouScreen(stage: LifeStage.skilling));
       expect(find.byKey(const ValueKey('pv_profile_hero')), findsNothing);
       expect(find.text('PREFERENCES'), findsOneWidget);
     });

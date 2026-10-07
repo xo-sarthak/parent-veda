@@ -119,7 +119,10 @@ class _RecoCategoryScreenState extends State<RecoCategoryScreen> {
 
             // ---- deals of the day ----
             const SizedBox(height: 26),
-            recoDealsSection(category),
+            // Mock deals with struck-through prices that were never real (gap
+            // analysis P1, Behind · Trust, 2026-10-07). Back when a real price
+            // feed exists. Kept for revert:
+            // recoDealsSection(category),
           ],
         ),
       ),

@@ -103,7 +103,12 @@ void main() {
       // any visible sign, which is the quietest possible way to break a screen
       // whose whole promise is that it is not a score.
       for (final months in [2, 8, 18, 30, 48]) {
-        final qs = checkInsForAge(months);
+        // Since 2026-10-07 every band ends with the lost-skill question (gap
+        // analysis P2, escalation). It carries its own area id, 'all', so the
+        // six domains are still counted exactly once each.
+        final all = checkInsForAge(months);
+        expect(all.last, same(kCheckInLostSkill));
+        final qs = all.where((q) => q.areaId != 'all').toList();
         expect(qs.length, 6, reason: 'band at $months months has ${qs.length}');
         expect(qs.map((q) => q.areaId).toSet().length, 6,
             reason: 'band at $months months repeats or misses an area');

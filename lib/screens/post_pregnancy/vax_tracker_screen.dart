@@ -24,12 +24,16 @@ import 'pp_vaccine_data.dart';
 import 'vax_detail_screen.dart';
 import 'vax_timeline_screen.dart';
 
+export 'pp_vax_tracker_screen.dart' show VaxTrackerScreen, ppVaxMarkGiven;
+
 const Color _green = Color(0xFF1F8A5B);
 const Color _greenTint = Color(0xFFEAF4EE);
 const Color _ringTrack = Color(0xFFECE5F2);
 
-class VaxTrackerScreen extends StatelessWidget {
-  const VaxTrackerScreen({super.key});
+// Superseded 2026-10-07 by the shell tracker in pp_vax_tracker_screen.dart
+// (exported below under the old name). Kept for revert.
+class VaxTrackerClassic extends StatelessWidget {
+  const VaxTrackerClassic({super.key});
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
   void _push(BuildContext c, Widget s) => Navigator.of(c).push(MaterialPageRoute<void>(builder: (_) => s));
@@ -185,7 +189,7 @@ class VaxTrackerScreen extends StatelessWidget {
 
               const SizedBox(height: 22),
               _pad(Text(
-                'A reminder & record companion, not medical advice. Your paediatrician designs any catch-up. Reviewed by Dr. Ananya Rao · schedule v2026.1',
+                "Based on the Indian Academy of Paediatrics schedule (2023) and the government's Universal Immunisation Programme. Your paediatrician may use a different brand or timing; follow them. A reminder and record, not medical advice.",
                 textAlign: TextAlign.center,
                 style: ppBody(12, color: ppMuted, h: 1.55),
               )),

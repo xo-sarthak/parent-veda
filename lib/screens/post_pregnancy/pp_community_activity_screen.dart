@@ -14,12 +14,15 @@ import '../../services/community_store.dart';
 import 'community_screen.dart';
 import 'pp_common.dart';
 import 'pp_post_detail_screen.dart';
+import 'pp_opening_soon.dart';
 
 class PpMyActivityScreen extends StatelessWidget {
   const PpMyActivityScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // Seeded until real (gap analysis P1, 2026-10-07): see pp_opening_soon.dart.
+    if (!kPpCommunityOpen) return ppCommunityOpeningSoon();
     final store = CommunityStore.instance;
     return Scaffold(
       backgroundColor: ppBg,
@@ -89,6 +92,8 @@ class PpMyBookmarksScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Seeded until real (gap analysis P1, 2026-10-07): see pp_opening_soon.dart.
+    if (!kPpCommunityOpen) return ppCommunityOpeningSoon();
     final store = CommunityStore.instance;
     return Scaffold(
       backgroundColor: ppBg,

@@ -117,8 +117,10 @@ class V3SpineChip extends StatelessWidget {
                 ? Colors.white.withValues(alpha: 0.10)
                 : Colors.white.withValues(alpha: 0.34),
           ),
+          // Flexible (2026-10-07): a long label at large text ("PHASE 4 OF 20 ·
+          // 3 TO 4 MONTHS") wraps instead of running off the chip.
           child: Row(mainAxisSize: MainAxisSize.min, children: [
-            text,
+            Flexible(child: text),
             const SizedBox(width: 4),
             Icon(Icons.chevron_right_rounded, size: 15, color: fg),
           ]),
@@ -146,7 +148,15 @@ class V3HeroChrome extends StatefulWidget {
     required this.onSaved,
     required this.onProfile,
     this.initial = '',
+    this.avatarOpensProfile = false,
   });
+
+  /// True: the avatar opens [onProfile] (her Profile and Settings), as the
+  /// pregnancy and TTC avatars do; the stage switch is in Settings > Developer.
+  /// False keeps the three-doors menu for the screens that still want it.
+  /// Parenting asks for true (the user, 2026-10-07: "i still dont see profile
+  /// section and settings option in parenting").
+  final bool avatarOpensProfile;
 
   final V3HeroTone tone;
   final V2Palette p;
@@ -226,7 +236,9 @@ class _V3HeroChromeState extends State<V3HeroChrome> {
               : Text(initial.toUpperCase(),
                   style: pvJakarta(
                       fontSize: 15, fontWeight: FontWeight.w700, color: fg)),
-          () => showStageDoorMenu(context, _avatarKey),
+          widget.avatarOpensProfile
+              ? widget.onProfile!
+              : () => showStageDoorMenu(context, _avatarKey),
           boxKey: _avatarKey,
         ),
     ]);

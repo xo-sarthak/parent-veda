@@ -152,6 +152,34 @@ class AgePhase {
 
   bool covers(double months) => months >= startMonth && months < endMonth;
 
+  /// This phase with every child pronoun filled for [c] (see `kPhases`).
+  AgePhase filledFor(ChildProfileStore c) {
+    String f(String t) => ppFillChild(t, c);
+    return AgePhase(
+      number: number,
+      name: f(name),
+      ageLabel: ageLabel,
+      startMonth: startMonth,
+      endMonth: endMonth,
+      tagline: f(tagline),
+      summary: f(summary),
+      workingOn: [for (final w in workingOn) f(w)],
+      reassurance: f(reassurance),
+      milestones: [for (final m in milestones) PhaseMilestone(m.domain, f(m.text))],
+      sections: [for (final sec in sections) PhaseSection(f(sec.heading), [for (final x in sec.paragraphs) f(x)])],
+      accent: accent,
+      source: source,
+      checkpoint: checkpoint,
+      screeningNote: screeningNote == null ? null : f(screeningNote!),
+      indianNote: indianNote == null ? null : f(indianNote!),
+      videoId: videoId,
+      watchCategory: watchCategory,
+      readCollection: readCollection,
+      articleIds: articleIds,
+      productIds: productIds,
+    );
+  }
+
   /// 0..1 through THIS phase. Used by the continuous progress bar.
   double progressAt(double months) {
     if (endMonth <= startMonth) return 0;
@@ -186,7 +214,60 @@ const Color _c5 = ppPurple;
 // const Color _c4 = Color(0xFFC98A2B);  // amber
 // const Color _c5 = Color(0xFFCB6F94);  // rose
 
-const List<AgePhase> kPhases = [
+/// ⚠️ ABOUT HER CHILD, NOT "HIM" (gap analysis P1, Behind · Age by age,
+/// 2026-10-07): "A girl's mother is told about 'him' on every age page ...
+/// fill it from the child's profile; use the child's name where it reads
+/// naturally. If sex is not given, use the name or 'your baby'."
+///
+/// The phases are AUTHORED with he/him/his for the child (every one in this
+/// file means the child; there is no she or her and no father in them, which
+/// is what makes a word swap safe here and NOT on the door pages). Every screen
+/// reads `kPhases`, `currentPhase()`, `nextPhase()`, `phaseByNumber()` or
+/// `phaseWindow()`, so the swap happens once, below: `kPhases` is now the
+/// authored list filled for the active child, cached until the name or sex
+/// changes. `kPhasesAuthored` is the text as written.
+List<AgePhase> get kPhases {
+  final c = ChildProfileStore.instance;
+  final key = '${c.sexGiven}|${c.isBoy}|${c.name}';
+  if (key != _phasesKey) {
+    _phasesKey = key;
+    _phasesFilled = [for (final ph in kPhasesAuthored) ph.filledFor(c)];
+  }
+  return _phasesFilled!;
+}
+
+String? _phasesKey;
+List<AgePhase>? _phasesFilled;
+
+final RegExp _kChildPronoun = RegExp(r"\b(he|him|his|himself)\b", caseSensitive: false);
+
+/// One authored sentence, about this child: he/him/his become she/her/her for
+/// a girl, and the name (or "your baby") when the parent did not say.
+String ppFillChild(String text, [ChildProfileStore? child]) {
+  final c = child ?? ChildProfileStore.instance;
+  if (c.sexGiven && c.isBoy) return text;
+  return text.replaceAllMapped(_kChildPronoun, (m) {
+    final w = m[0]!;
+    final low = w.toLowerCase();
+    // Keep the author's casing: "he", "He", or "HE" for emphasis.
+    final allCaps = w.length > 1 && w == w.toUpperCase();
+    final cap = w[0] == w[0].toUpperCase();
+    String keep(String r) => allCaps ? r.toUpperCase() : (cap ? r[0].toUpperCase() + r.substring(1) : r);
+    if (c.sexGiven) {
+      // A girl.
+      return keep(switch (low) { 'he' => 'she', 'him' => 'her', 'his' => 'her', _ => 'herself' });
+    }
+    final r = switch (low) {
+      'he' => c.they,
+      'him' => c.them,
+      'his' => c.their,
+      _ => 'themselves',
+    };
+    return keep(r);
+  });
+}
+
+const List<AgePhase> kPhasesAuthored = [
   // ---- 1 ------------------------------------------------------------------
   AgePhase(
     number: 1,
@@ -219,6 +300,26 @@ const List<AgePhase> kPhases = [
       PhaseSection('What helps', [
         'Skin to skin, as often as you can. It regulates his temperature and heart rate measurably, and it is the one thing that reliably calms both of you.',
         'Accept every offer of help with everything except feeding him. Your job this month is him; everything else can be someone else\'s.',
+      ]),
+      // Added 2026-10-02 from the parenting gap analysis: the age guides
+      // of both competitors carry these for every age. REQUIRED_REVIEW.
+      PhaseSection('Feeding now', [
+        'Feed whenever he shows hunger: rooting, sucking his hands, turning towards you. That is usually 8 to 12 times in 24 hours, and some feeds will come close together in the evening. Nothing but breast milk or formula, not even water or herbal drops.',
+      ]),
+      PhaseSection('Sleep now', [
+        'Newborns sleep 14 to 17 hours a day in short stretches, with no difference between day and night yet. On his back, in his own cot or crib beside your bed, with nothing soft around him.',
+      ]),
+      PhaseSection('Play that helps now', [
+        'Your face is his favourite thing. Hold him about 20 to 30 cm from you and talk, sing and smile. Short bursts of tummy time on your chest count from the first days.',
+      ]),
+      PhaseSection('Keeping him safe now', [
+        'Support his head every time you lift him. Never leave him on a bed or sofa. Ask everyone to wash their hands before holding him, and keep sick visitors away.',
+      ]),
+      PhaseSection('When to call the doctor', [
+        'Any fever of 38 C or more, poor feeding, fewer than six wet nappies a day after day five, yellow skin spreading to the tummy or legs, fast or noisy breathing, or a baby who is unusually floppy or hard to wake. Go the same day.',
+      ]),
+      PhaseSection('And you', [
+        'You are healing too. Eat, drink water at every feed, sleep when you can, and let others do the rest. Feeling weepy in the first two weeks is common; feeling hopeless or unable to cope is worth telling your doctor.',
       ]),
     ],
     indianNote:
@@ -259,6 +360,26 @@ const List<AgePhase> kPhases = [
       PhaseSection('The first real smile', [
         'Somewhere in here he will smile at you on purpose — not the fleeting reflex smiles of the first weeks, but one aimed at your face and held. Most parents remember it.',
       ]),
+      // Added 2026-10-02 from the parenting gap analysis: the age guides
+      // of both competitors carry these for every age. REQUIRED_REVIEW.
+      PhaseSection('Feeding now', [
+        'Growth spurts around three and six weeks bring days of almost constant feeding. That is him building your supply, not a sign your milk is not enough. Wet nappies and weight gain tell you he is getting enough.',
+      ]),
+      PhaseSection('Sleep now', [
+        'Still short stretches, but he may start to have one longer sleep. Daylight and noise in the day, dim and quiet at night, help his body clock begin to settle.',
+      ]),
+      PhaseSection('Play that helps now', [
+        'Talk to him through the day, describing what you are doing. Copy his little sounds back. Show him high-contrast pictures, black and white, and let him follow a rattle with his eyes.',
+      ]),
+      PhaseSection('Keeping him safe now', [
+        'The evening crying peak is around six weeks. If it all gets too much, put him down safely in his cot and step away for a few minutes. Never shake a baby.',
+      ]),
+      PhaseSection('When to call the doctor', [
+        'Crying that sounds different, high-pitched or weak, vomiting that is green or forceful, a fever, or a baby who will not feed. The first vaccines are due at six weeks.',
+      ]),
+      PhaseSection('And you', [
+        'Your six-week check is about you, not only the baby. Bring your questions about bleeding, stitches, mood, sex and contraception.',
+      ]),
     ],
   ),
 
@@ -294,6 +415,26 @@ const List<AgePhase> kPhases = [
       PhaseSection('Why this visit matters', [
         'The two-month well visit is the first full developmental check, and the first big vaccination appointment. Bring anything you have been wondering about, however small it sounds — this is what the visit is for.',
       ]),
+      // Added 2026-10-02 from the parenting gap analysis: the age guides
+      // of both competitors carry these for every age. REQUIRED_REVIEW.
+      PhaseSection('Feeding now', [
+        'Feeds become a little more efficient and may space out. He still needs only milk. Watch his cues rather than the clock.',
+      ]),
+      PhaseSection('Sleep now', [
+        'Around 14 to 16 hours in 24. Some babies sleep a five or six hour stretch at night now; many do not yet, and both are normal.',
+      ]),
+      PhaseSection('Play that helps now', [
+        'Tummy time a few times a day, a few minutes at a time. Lie down face to face with him on the floor. Smile and wait: he is learning to take turns in a conversation.',
+      ]),
+      PhaseSection('Keeping him safe now', [
+        'He may roll sooner than you expect. Change him on the floor, and keep one hand on him whenever he is up high.',
+      ]),
+      PhaseSection('When to call the doctor', [
+        'If he does not smile at you, does not follow your face with his eyes, or does not startle at loud sounds, mention it at the visit. Fever after vaccines is common; a fever over 39 C or lasting more than two days needs a check.',
+      ]),
+      PhaseSection('And you', [
+        'If you are going back to work in the coming months, it is a good time to start thinking about childcare and a milk plan, without rushing.',
+      ]),
     ],
     indianNote:
         'Under the National Immunization Schedule the 6-week doses are due around now: pentavalent-1, OPV-1, rotavirus-1 and PCV-1. A mild fever afterwards is common and expected.',
@@ -327,6 +468,26 @@ const List<AgePhase> kPhases = [
     sections: [
       PhaseSection('Hands are the first toy', [
         'He does not know his hands are his yet. Watching them, then working out that HE is moving them, is one of the first pieces of self-knowledge he will ever assemble.',
+      ]),
+      // Added 2026-10-02 from the parenting gap analysis: the age guides
+      // of both competitors carry these for every age. REQUIRED_REVIEW.
+      PhaseSection('Feeding now', [
+        'Milk only, still. Many babies get more distracted at the breast now; feeding in a quiet, dim room helps.',
+      ]),
+      PhaseSection('Sleep now', [
+        'Day naps may become more regular: often three or four. Learning to settle a little on his own begins to be possible; there is no rush.',
+      ]),
+      PhaseSection('Play that helps now', [
+        'Give him safe things to hold and look at his hands. Hang a toy he can bat at. Read picture books aloud; the rhythm of your voice is what he loves.',
+      ]),
+      PhaseSection('Keeping him safe now', [
+        'Everything goes to his mouth soon. Clear small things from the floor and the bed, and check toys for loose parts.',
+      ]),
+      PhaseSection('When to call the doctor', [
+        'If he cannot hold his head steady when held upright, does not bring his hands to his mouth, or does not push up on his arms during tummy time, ask at his next visit.',
+      ]),
+      PhaseSection('And you', [
+        'Hair fall around now is common and temporary; it is hormones settling. Eat well and be patient with yourself.',
       ]),
     ],
   ),
@@ -368,6 +529,26 @@ const List<AgePhase> kPhases = [
       PhaseSection('The fussy-patch pattern', [
         'You may notice a few days where he seems off — clingier, harder to settle, sleeping worse — and then a new skill appears. That pattern is real and worth knowing, though it does not run to any fixed schedule and no two babies follow the same one.',
       ]),
+      // Added 2026-10-02 from the parenting gap analysis: the age guides
+      // of both competitors carry these for every age. REQUIRED_REVIEW.
+      PhaseSection('Feeding now', [
+        'Milk is still everything he needs. Interest in your food is not a sign to start solids yet; wait for about six months and the readiness signs.',
+      ]),
+      PhaseSection('Sleep now', [
+        'The four-month sleep change can bring more night waking for a while. A calm, predictable bedtime routine helps it pass.',
+      ]),
+      PhaseSection('Play that helps now', [
+        'Offer toys just out of reach to encourage reaching. Laugh with him, sing action songs, and let him feel different textures.',
+      ]),
+      PhaseSection('Keeping him safe now', [
+        'Stop swaddling once he shows signs of rolling. Keep cords, chargers and dupattas away from his reach.',
+      ]),
+      PhaseSection('When to call the doctor', [
+        'If he does not laugh or coo, does not hold toys, or seems stiff or very floppy, tell your doctor. The 14-week vaccines are around now.',
+      ]),
+      PhaseSection('And you', [
+        'Many mothers start to feel more like themselves now, and some feel worse. If low mood or anxiety are hanging on, it is not too late to ask for help.',
+      ]),
     ],
     indianNote:
         'The 14-week NIS doses fall around now: pentavalent-3, OPV-3, rotavirus-3, PCV-booster and IPV-2.',
@@ -401,6 +582,26 @@ const List<AgePhase> kPhases = [
     sections: [
       PhaseSection('Mouthing is investigation', [
         'His mouth has far more nerve endings than his hands do at this age, so it is genuinely his best tool for working out what something is. It is not a habit to stop — it is how he learns texture, temperature and shape.',
+      ]),
+      // Added 2026-10-02 from the parenting gap analysis: the age guides
+      // of both competitors carry these for every age. REQUIRED_REVIEW.
+      PhaseSection('Feeding now', [
+        'Watch for readiness for solids: sitting with support, good head control, interest in food, and losing the tongue-thrust. Most babies are ready around six months, not before.',
+      ]),
+      PhaseSection('Sleep now', [
+        'Around 12 to 15 hours in 24, with two or three naps. Rolling in his sleep is fine once he can roll both ways by himself.',
+      ]),
+      PhaseSection('Play that helps now', [
+        'Let him roll and stretch on a clean mat. Play peekaboo. Give him spoons, cups and rattles to bang and mouth.',
+      ]),
+      PhaseSection('Keeping him safe now', [
+        'He can roll off anything now. Never leave him on a bed, sofa or changing table. Lower the cot mattress before he can sit.',
+      ]),
+      PhaseSection('When to call the doctor', [
+        'If he does not reach for things, does not roll in either direction, or does not respond to sounds around him, mention it to your doctor.',
+      ]),
+      PhaseSection('And you', [
+        'Starting solids is a whole new job. Keep it simple: one family pot, his portion taken out before salt and chilli.',
       ]),
     ],
   ),
@@ -440,9 +641,29 @@ const List<AgePhase> kPhases = [
         'Iron is the reason food matters now. He was born with stores that carry him to about six months, and they are running down at exactly the age his brain needs iron most — which is why first foods should lead with iron rather than fruit.',
         'One new single food at a time, a few days apart, so a reaction is traceable. Textures should progress faster than most parents are told: lumps by eight months matter.',
       ]),
+      // Added 2026-10-02 from the parenting gap analysis: the age guides
+      // of both competitors carry these for every age. REQUIRED_REVIEW.
+      PhaseSection('Feeding now', [
+        'Start with soft, mashed foods once or twice a day: dal, khichdi, ragi, mashed banana, vegetables. Milk stays his main food for now. Introduce common allergens like egg and peanut early, one at a time.',
+      ]),
+      PhaseSection('Sleep now', [
+        'Two or three naps, and a night that may still include feeds. Teething can disturb sleep; it does not cause high fever.',
+      ]),
+      PhaseSection('Play that helps now', [
+        'Sit him with cushions around and give him toys to pass from hand to hand. Read the same books again and again; repetition is how he learns.',
+      ]),
+      PhaseSection('Keeping him safe now', [
+        'Start babyproofing: socket covers, cords out of reach, small things off the floor. Cut soft food into safe sizes, and always stay with him while he eats.',
+      ]),
+      PhaseSection('When to call the doctor', [
+        'If he cannot sit with support, shows no interest in sounds or faces, or chokes repeatedly on food, talk to your doctor.',
+      ]),
+      PhaseSection('And you', [
+        'If you are going back to work, a trial week with his carer before you start makes the first real day far easier.',
+      ]),
     ],
     indianNote:
-        'Annaprashan — the first-rice ceremony — traditionally falls around now and lines up well with the WHO guidance to start complementary foods at six months. Ragi, moong dal and well-mashed rice with a little ghee are excellent first foods. No salt, no sugar, and no honey before one year.',
+        'The first rice feeding (annaprashan) traditionally falls around now and lines up well with the WHO guidance to start complementary foods at six months. Ragi, moong dal and well-mashed rice with a little ghee are excellent first foods. No salt, no sugar, and no honey before one year.',
   ),
 
   // ---- 8 ------------------------------------------------------------------
@@ -473,6 +694,26 @@ const List<AgePhase> kPhases = [
     sections: [
       PhaseSection('Babble is rehearsal', [
         'He is practising the physical shapes of speech — tongue, lips, breath — long before any of it means anything. Answering his babble as though it were conversation is the single most useful thing you can do for his language.',
+      ]),
+      // Added 2026-10-02 from the parenting gap analysis: the age guides
+      // of both competitors carry these for every age. REQUIRED_REVIEW.
+      PhaseSection('Feeding now', [
+        'Two to three meals a day, with thicker textures and soft lumps. Let him try to feed himself with his fingers; mess is learning. Water in an open cup with meals.',
+      ]),
+      PhaseSection('Sleep now', [
+        'Two naps for many babies. Separation can make bedtimes harder; a short, warm goodbye routine helps.',
+      ]),
+      PhaseSection('Play that helps now', [
+        'Babble back to him like a real conversation. Name everything he looks at. Roll a ball between you.',
+      ]),
+      PhaseSection('Keeping him safe now', [
+        'Teeth mean a toothbrush: a grain-of-rice smear of fluoride toothpaste, twice a day. Keep hot tea and food well away from his reach.',
+      ]),
+      PhaseSection('When to call the doctor', [
+        'If he does not babble with consonant sounds like ba or da, or does not look when you call his name, raise it at the nine-month visit.',
+      ]),
+      PhaseSection('And you', [
+        'A break of even an hour a week, fully yours, helps more than it sounds.',
       ]),
     ],
     indianNote:
@@ -507,6 +748,26 @@ const List<AgePhase> kPhases = [
     sections: [
       PhaseSection('Why peekaboo works now', [
         'Before object permanence, a hidden face is simply gone and there is nothing funny about it. Once he knows you are still there behind your hands, the reappearance becomes a joke — and he will want it a hundred times.',
+      ]),
+      // Added 2026-10-02 from the parenting gap analysis: the age guides
+      // of both competitors carry these for every age. REQUIRED_REVIEW.
+      PhaseSection('Feeding now', [
+        'Three meals a day, plus milk. Offer a variety of colours and textures, and family food mashed or chopped soft. He decides how much.',
+      ]),
+      PhaseSection('Sleep now', [
+        'Separation anxiety can bring night waking. Reassure him briefly, keep it calm and boring, and he usually settles again.',
+      ]),
+      PhaseSection('Play that helps now', [
+        'Peekaboo, hiding a toy under a cloth, nesting cups and stacking. Let him crawl and explore safely.',
+      ]),
+      PhaseSection('Keeping him safe now', [
+        'Once he crawls, gates on stairs, guards on windows, and everything low and dangerous moved up or locked away. Get down to his level and look.',
+      ]),
+      PhaseSection('When to call the doctor', [
+        'If he cannot sit without support, does not bear weight on his legs, or has stopped doing something he could do, tell your doctor.',
+      ]),
+      PhaseSection('And you', [
+        'Crawling babies are exhausting. Take shortcuts where you can, and accept help.',
       ]),
     ],
   ),
@@ -545,6 +806,26 @@ const List<AgePhase> kPhases = [
       PhaseSection('What a screening actually is', [
         'A short structured questionnaire, usually filled in by you, about what he is doing day to day. It takes a few minutes and it is designed to catch things early enough to help easily.',
       ]),
+      // Added 2026-10-02 from the parenting gap analysis: the age guides
+      // of both competitors carry these for every age. REQUIRED_REVIEW.
+      PhaseSection('Feeding now', [
+        'Three meals and a snack or two, alongside milk. Soft finger foods help him practise his pincer grasp. The MMR vaccine is due around now.',
+      ]),
+      PhaseSection('Sleep now', [
+        'Around 12 to 14 hours in 24, usually with two naps.',
+      ]),
+      PhaseSection('Play that helps now', [
+        'Clap, wave and point together. Give him things to put in and take out of a box. Read books with flaps and textures.',
+      ]),
+      PhaseSection('Keeping him safe now', [
+        'Pulling to stand means furniture becomes a ladder: anchor the TV and cupboard, and keep chairs away from windows and the balcony.',
+      ]),
+      PhaseSection('When to call the doctor', [
+        'The nine-month visit is a good time for a developmental check. Mention any worries, however small.',
+      ]),
+      PhaseSection('And you', [
+        'Keep your own vitamin D and iron in mind if you are still breastfeeding and feeling tired.',
+      ]),
     ],
     screeningNote:
         'AAP recommends a developmental screening for every child at this visit. Worth asking your paediatrician about it if it is not offered.',
@@ -581,6 +862,26 @@ const List<AgePhase> kPhases = [
       PhaseSection('Pointing is language', [
         'Pointing to share something — not just to demand it — is one of the strongest early language signals there is. It means he wants you to see what he sees, which is the whole basis of conversation.',
       ]),
+      // Added 2026-10-02 from the parenting gap analysis: the age guides
+      // of both competitors carry these for every age. REQUIRED_REVIEW.
+      PhaseSection('Feeding now', [
+        'He can pick up small pieces now: soft peas, rice, bits of paneer. Keep shapes safe: no whole nuts, whole grapes or hard pieces.',
+      ]),
+      PhaseSection('Sleep now', [
+        'Teething and new skills can unsettle sleep for a few nights. Keep the routine steady.',
+      ]),
+      PhaseSection('Play that helps now', [
+        'Point at things and name them. Let him feed himself with a spoon, badly. Sing rhymes with actions.',
+      ]),
+      PhaseSection('Keeping him safe now', [
+        'Cruising along furniture means bumps: soften sharp corners. Keep the bathroom door shut and buckets empty.',
+      ]),
+      PhaseSection('When to call the doctor', [
+        'If he does not point, wave or respond to his name, or does not pull to stand, ask your doctor.',
+      ]),
+      PhaseSection('And you', [
+        'Plan his first birthday around his nap time; a happy, rested one-year-old makes the best guest of honour.',
+      ]),
     ],
   ),
 
@@ -612,6 +913,26 @@ const List<AgePhase> kPhases = [
     sections: [
       PhaseSection('Why not to rush walking', [
         'Cruising builds the balance and hip strength that independent walking needs. Walkers and jumpers do not speed it up and can delay it — floor time and furniture do the work.',
+      ]),
+      // Added 2026-10-02 from the parenting gap analysis: the age guides
+      // of both competitors carry these for every age. REQUIRED_REVIEW.
+      PhaseSection('Feeding now', [
+        'Family food, cut small and less salty. Move from bottle to cup over the coming months. He may eat a lot one day and very little the next.',
+      ]),
+      PhaseSection('Sleep now', [
+        'Many babies drop to one nap closer to 15 to 18 months; for now two naps is still common.',
+      ]),
+      PhaseSection('Play that helps now', [
+        'Push toys, stacking blocks, and lots of talking. Let him help with simple jobs.',
+      ]),
+      PhaseSection('Keeping him safe now', [
+        'Standing and first steps: watch stairs, balconies and water. Never leave him alone in a bath, even for a second.',
+      ]),
+      PhaseSection('When to call the doctor', [
+        'If he does not stand with support, does not say any words like mama or dada, or does not point to things, tell your doctor.',
+      ]),
+      PhaseSection('And you', [
+        'One year of parenting. Take a moment to notice how much you have both learned.',
       ]),
     ],
   ),
@@ -650,9 +971,29 @@ const List<AgePhase> kPhases = [
       PhaseSection('Milk changes now', [
         'Formula is no longer needed and whole cow milk is fine — but cap it around 500 ml a day. More than that crowds out iron-rich food, and toddler iron deficiency is common in India for exactly this reason.',
       ]),
+      // Added 2026-10-02 from the parenting gap analysis: the age guides
+      // of both competitors carry these for every age. REQUIRED_REVIEW.
+      PhaseSection('Feeding now', [
+        'Whole cow milk as a drink is fine from now, about two cups a day, not more, so he still eats food. Three meals and two snacks, family food cut small.',
+      ]),
+      PhaseSection('Sleep now', [
+        'Around 11 to 14 hours in 24. A calm, predictable bedtime matters more than the exact time.',
+      ]),
+      PhaseSection('Play that helps now', [
+        'Let him walk holding your hands, push a toy cart, and scribble with a fat crayon. Read and name pictures together.',
+      ]),
+      PhaseSection('Keeping him safe now', [
+        'He climbs. Anchor furniture, keep windows guarded, and medicines and cleaners locked away.',
+      ]),
+      PhaseSection('When to call the doctor', [
+        'If he is not walking by 18 months or has no words by 16 months, talk to your doctor. Anaemia is common now; ask about a check.',
+      ]),
+      PhaseSection('And you', [
+        'If you are thinking about another baby, your body benefits from waiting at least 18 months to two years after a birth.',
+      ]),
     ],
     indianNote:
-        'The 12-month NIS window covers Hepatitis A and, in many private schedules, the first varicella dose. Mundan is traditionally performed anywhere between one and three years.',
+        'The 12-month NIS window covers Hepatitis A and, in many private schedules, the first varicella dose. The first head shaving (mundan) is traditionally done anywhere between one and three years.',
   ),
 
   // ---- 14 -----------------------------------------------------------------
@@ -689,6 +1030,26 @@ const List<AgePhase> kPhases = [
     sections: [
       PhaseSection('Imitation is the engine', [
         'Copying you doing real things — wiping, stirring, sweeping — teaches sequences he could not learn from a toy version. A safe real object beats a plastic one almost every time.',
+      ]),
+      // Added 2026-10-02 from the parenting gap analysis: the age guides
+      // of both competitors carry these for every age. REQUIRED_REVIEW.
+      PhaseSection('Feeding now', [
+        'Fussy patches are normal. Keep offering a variety without pressure; it can take ten or more tries before a new food is accepted.',
+      ]),
+      PhaseSection('Sleep now', [
+        'Many toddlers move to one afternoon nap between 15 and 18 months.',
+      ]),
+      PhaseSection('Play that helps now', [
+        'Simple pretend play, stacking, and lots of chances to climb and walk outdoors. Name his feelings for him: you are angry, you wanted that.',
+      ]),
+      PhaseSection('Keeping him safe now', [
+        'Car seat, rear-facing, every journey. Hot drinks out of reach, and the kitchen gated if you can.',
+      ]),
+      PhaseSection('When to call the doctor', [
+        'Losing words or skills, not following simple instructions, or not showing you things he finds interesting are worth a check.',
+      ]),
+      PhaseSection('And you', [
+        'Tantrums are coming. Plan your own calm-down routine as well as his.',
       ]),
     ],
   ),
@@ -727,6 +1088,26 @@ const List<AgePhase> kPhases = [
     sections: [
       PhaseSection('The 18-month screening', [
         'AAP recommends both a general developmental screening and an autism-specific screening at this visit, for every child. Universal screening exists so that support, if it is ever needed, starts early — when it works best.',
+      ]),
+      // Added 2026-10-02 from the parenting gap analysis: the age guides
+      // of both competitors carry these for every age. REQUIRED_REVIEW.
+      PhaseSection('Feeding now', [
+        'He can use a spoon and an open cup, with mess. Eat together when you can; he learns by copying.',
+      ]),
+      PhaseSection('Sleep now', [
+        'One nap of one to three hours is typical. Night waking with separation can return for a while.',
+      ]),
+      PhaseSection('Play that helps now', [
+        'Pretend play, books, music, and messy play with water and sand. Give him simple choices: this shirt or that one.',
+      ]),
+      PhaseSection('Keeping him safe now', [
+        'Water safety: buckets, tanks and pools. He moves fast and silently.',
+      ]),
+      PhaseSection('When to call the doctor', [
+        'The 18-month visit includes a development check and boosters. Ask about a screen for speech and social skills.',
+      ]),
+      PhaseSection('And you', [
+        'Comparisons with other children are everywhere. Your child\'s own path is the one that matters.',
       ]),
     ],
     screeningNote:
@@ -768,6 +1149,26 @@ const List<AgePhase> kPhases = [
       PhaseSection('Tantrums, and why', [
         'He now knows what he wants and can picture it clearly, but has almost none of the language to negotiate for it and none of the brain machinery to manage the frustration. That gap is the tantrum. It closes with language, not with discipline.',
       ]),
+      // Added 2026-10-02 from the parenting gap analysis: the age guides
+      // of both competitors carry these for every age. REQUIRED_REVIEW.
+      PhaseSection('Feeding now', [
+        'Two-year-olds eat less than you expect. Offer meals at regular times, keep milk to about two cups, and limit juice and biscuits.',
+      ]),
+      PhaseSection('Sleep now', [
+        'Around 11 to 14 hours in 24, with one nap. Moving from cot to bed can wait until he climbs out or is closer to three.',
+      ]),
+      PhaseSection('Play that helps now', [
+        'Kicking a ball, running, simple puzzles, and lots of talk. Read every day, and let him finish familiar lines.',
+      ]),
+      PhaseSection('Keeping him safe now', [
+        'Tantrums: keep him safe and stay nearby, without giving in or punishing. Never leave him alone near roads or water.',
+      ]),
+      PhaseSection('When to call the doctor', [
+        'No two-word phrases by two, walking only on tiptoe, or no pretend play are worth discussing with your doctor.',
+      ]),
+      PhaseSection('And you', [
+        'Big feelings in a toddler can stir big feelings in us. It is fine to take a breath before you respond.',
+      ]),
     ],
     screeningNote:
         'AAP recommends a second autism-specific screening at this visit.',
@@ -807,6 +1208,26 @@ const List<AgePhase> kPhases = [
     sections: [
       PhaseSection('The 30-month visit', [
         'This checkpoint was added in the 2022 revision because the gap between two and three years was too wide to leave unwatched. It carries a universal developmental screening.',
+      ]),
+      // Added 2026-10-02 from the parenting gap analysis: the age guides
+      // of both competitors carry these for every age. REQUIRED_REVIEW.
+      PhaseSection('Feeding now', [
+        'He eats most family food. A balanced plate across the day matters more than any single meal.',
+      ]),
+      PhaseSection('Sleep now', [
+        'One nap, though some children start to drop it closer to three. Quiet time can replace it.',
+      ]),
+      PhaseSection('Play that helps now', [
+        'Pretend games, drawing, building, outdoor running. Play with other children begins in earnest.',
+      ]),
+      PhaseSection('Keeping him safe now', [
+        'Teach simple rules: hold hands near roads, no touching the stove. He will still need reminding for years.',
+      ]),
+      PhaseSection('When to call the doctor', [
+        'If strangers cannot understand any of his speech, he does not use two or three word sentences, or he falls a lot, ask your doctor.',
+      ]),
+      PhaseSection('And you', [
+        'Potty training may be on your mind. Readiness matters more than age; there is no rush.',
       ]),
     ],
     screeningNote:
@@ -848,6 +1269,26 @@ const List<AgePhase> kPhases = [
       PhaseSection('Independence, loudly', [
         '"I do it" belongs to this stretch. Letting him do the slow, imperfect version of things builds the competence that makes the next year easier — and it is almost always faster than the argument.',
       ]),
+      // Added 2026-10-02 from the parenting gap analysis: the age guides
+      // of both competitors carry these for every age. REQUIRED_REVIEW.
+      PhaseSection('Feeding now', [
+        'Let him serve himself and help prepare simple food. Children who help cook are more willing to try.',
+      ]),
+      PhaseSection('Sleep now', [
+        'Around 10 to 13 hours, with or without a nap. Bad dreams and fears of the dark can begin; a night light helps.',
+      ]),
+      PhaseSection('Play that helps now', [
+        'Simple board games, stories with questions, and helping with chores. Let him try, and fail, and try again.',
+      ]),
+      PhaseSection('Keeping him safe now', [
+        'Talk about safe touch and private parts using the real words. Teach him your phone number as a song.',
+      ]),
+      PhaseSection('When to call the doctor', [
+        'Ongoing trouble with stairs, very unclear speech, or not playing alongside other children are worth a check.',
+      ]),
+      PhaseSection('And you', [
+        'If preschool is coming, visit a few and trust your gut about where he will be happy.',
+      ]),
     ],
   ),
 
@@ -885,6 +1326,26 @@ const List<AgePhase> kPhases = [
     sections: [
       PhaseSection('Why the questions', [
         'The why phase is not testing your patience — he has just worked out that things have causes, and that you might know them. Answering shortly and honestly, including "I don\'t know, shall we find out", does more than a perfect answer.',
+      ]),
+      // Added 2026-10-02 from the parenting gap analysis: the age guides
+      // of both competitors carry these for every age. REQUIRED_REVIEW.
+      PhaseSection('Feeding now', [
+        'Three meals and two snacks, with water as the main drink. Watch the packaged snacks: they fill small stomachs fast.',
+      ]),
+      PhaseSection('Sleep now', [
+        'About 10 to 13 hours a night. A consistent bedtime routine helps through the busy preschool years.',
+      ]),
+      PhaseSection('Play that helps now', [
+        'Answer his whys, or say "let us find out together". Pretend play, drawing, puzzles, and outdoor play every day.',
+      ]),
+      PhaseSection('Keeping him safe now', [
+        'A helmet on the cycle, a booster seat in the car, and the lost-in-a-crowd plan practised.',
+      ]),
+      PhaseSection('When to call the doctor', [
+        'Get his eyes and hearing checked before school. Ask about any worries with speech, behaviour or making friends.',
+      ]),
+      PhaseSection('And you', [
+        'The questions can be endless. It is fine to say "I need a quiet minute" and take it.',
       ]),
     ],
     indianNote:
@@ -926,6 +1387,26 @@ const List<AgePhase> kPhases = [
       PhaseSection('What schools actually look for', [
         'Sitting for a short activity, following a two-step instruction, managing the toilet independently, and separating from you without distress. Letters and counting are the easy part.',
       ]),
+      // Added 2026-10-02 from the parenting gap analysis: the age guides
+      // of both competitors carry these for every age. REQUIRED_REVIEW.
+      PhaseSection('Feeding now', [
+        'A healthy tiffin, a good breakfast, and water through the day. Involve him in choosing between two healthy options.',
+      ]),
+      PhaseSection('Sleep now', [
+        'About 10 to 13 hours. School mornings are easier with an early, fixed bedtime and screens off an hour before.',
+      ]),
+      PhaseSection('Play that helps now', [
+        'Games with rules, drawing, building and lots of outdoor play. Reading together every day is the best school preparation there is.',
+      ]),
+      PhaseSection('Keeping him safe now', [
+        'Road sense, swimming lessons, safe adults he can go to, and body safety talks. Check the school van and its driver.',
+      ]),
+      PhaseSection('When to call the doctor', [
+        'Booster vaccines are due between four and six. Ask the doctor about anything a teacher notices, early.',
+      ]),
+      PhaseSection('And from five to six', [
+        'Between five and six, most children ride a bicycle with or without trainers, write their name, tell longer stories, follow multi-step instructions and manage more feelings with words. Friendships matter more and more. Keep reading together even once he can read alone, and protect plenty of free play: it is where confidence grows.',
+      ]),
     ],
   ),
 ];
@@ -941,14 +1422,16 @@ int phaseIndexForMonths(double months) {
   return months < kPhases.first.startMonth ? 0 : kPhases.length - 1;
 }
 
+// The phase reads CORRECTED age for a baby born early (devAgeInMonths,
+// 2026-10-07); for everyone else it is the same as ageInMonths.
 AgePhase currentPhase([ChildProfileStore? child]) {
   final c = child ?? ChildProfileStore.instance;
-  return kPhases[phaseIndexForMonths(c.ageInMonths.toDouble())];
+  return kPhases[phaseIndexForMonths(c.devAgeInMonths.toDouble())];
 }
 
 AgePhase? nextPhase([ChildProfileStore? child]) {
   final c = child ?? ChildProfileStore.instance;
-  final i = phaseIndexForMonths(c.ageInMonths.toDouble());
+  final i = phaseIndexForMonths(c.devAgeInMonths.toDouble());
   return i + 1 < kPhases.length ? kPhases[i + 1] : null;
 }
 

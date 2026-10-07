@@ -59,7 +59,7 @@ final PpDoor kPpBehaviourDoor = PpDoor(
     ),
     PpDoorTab(
       id: 'tantrums',
-      label: 'Tantrums and the ziddi years',
+      label: 'Tantrums and the stubborn years',
       icon: Icons.whatshot_outlined,
       hue: 344,
       areaIds: ['ziddi', 'first_feelings', 'the_no_year'],

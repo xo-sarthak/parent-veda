@@ -2807,6 +2807,13 @@ class _WindowLine extends StatelessWidget {
     // for "Egg retrieval in 3 days" — that belongs to the treatment screen,
     // which is where the dates live and where they are edited. A headline that
     // opens somewhere unrelated to what it says is a door in the wrong wall.
+    // ⚠️ SAY WHICH DAY (2026-10-07). The hero describes the day tapped on the
+    // week strip; Cycle companion and the Cycle report describe today. On any
+    // other day the lead says so, so the two are never read against each
+    // other as a contradiction.
+    final now = DateTime.now();
+    final isToday = selected.year == now.year && selected.month == now.month && selected.day == now.day;
+    final cue = isToday ? lead : (lead.isEmpty ? 'On ${_fmt(selected)}' : 'On ${_fmt(selected)} · $lead');
     const treatment = {
       TtcHeroState.clinicHolds,
       TtcHeroState.treatmentToday,
@@ -2817,12 +2824,12 @@ class _WindowLine extends StatelessWidget {
 
     // "Waiting to hear" opens the result, since that is what it asks for.
     if (line.state == TtcHeroState.treatmentTestDay && line.days > 0) {
-      return _block(lead, big, sub,
+      return _block(cue, big, sub,
           onTapOverride: () => openTtcTreatmentResult(context));
     }
     // S1: a planned round's first date in the small line (§3a).
     if (line.upcomingOn != null) {
-      return _block(lead, big, ttcRoundUpcomingLine(line),
+      return _block(cue, big, ttcRoundUpcomingLine(line),
           openTreatment: true);
     }
 
@@ -2860,7 +2867,7 @@ class _WindowLine extends StatelessWidget {
           onTapOverride: () => openTtcSurface(context, 'ttc_chat/should_test'));
     }
 
-    return _block(lead, big, sub,
+    return _block(cue, big, sub,
         openTreatment: treatment.contains(line.state));
   }
 

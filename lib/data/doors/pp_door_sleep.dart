@@ -58,6 +58,15 @@ final PpDoor kPpSleepDoor = PpDoor(
           surfaceId: 'pp_sleep',
           icon: Icons.show_chart_rounded,
         ),
+        // The week, not just today (gap analysis P2, Behind · Logging,
+        // 2026-10-07): sleep per day over 7 days, and the doctor summary.
+        PpDoorTool(
+          label: 'The last 7 days',
+          blurb: 'Total sleep each day this week, and a summary for your '
+              'doctor.',
+          surfaceId: 'pp_care_history',
+          icon: Icons.calendar_month_outlined,
+        ),
       ],
     ),
     PpDoorTab(
@@ -70,7 +79,7 @@ final PpDoor kPpSleepDoor = PpDoor(
     ),
     PpDoorTab(
       id: 'getting',
-      label: 'Getting her to sleep',
+      label: 'Getting to sleep',
       icon: Icons.self_improvement_outlined,
       hue: 26,
       areaIds: ['getting_to_sleep'],
@@ -94,7 +103,7 @@ final PpDoor kPpSleepDoor = PpDoor(
         // same data.
         PpDoorTool(
           label: 'Sleep Sounds',
-          blurb: 'Lori, white noise, rain, soft ragas and bedtime stories, '
+          blurb: 'Lullabies, white noise, rain, soft ragas and bedtime stories, '
               'with a timer that switches itself off.',
           surfaceId: 'pp_sleep_sounds',
           icon: Icons.music_note_outlined,

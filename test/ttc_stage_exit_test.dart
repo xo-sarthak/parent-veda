@@ -130,6 +130,29 @@ void main() {
   });
 
   // ===========================================================================
+  // The user, 2026-10-07: "if I click on pregnancy it takes me to parenting
+  // only". A family that opens the app in parenting has the parenting home at
+  // the root; popping to it changed nothing.
+  group('booted straight into parenting', () {
+    testWidgets('Pregnancy rebuilds the shell instead of staying put', (tester) async {
+      registerShell();
+      final key = GlobalKey<NavigatorState>();
+      await tester.pumpWidget(MaterialApp(
+        navigatorKey: key,
+        onGenerateRoute: (_) => MaterialPageRoute<void>(
+          settings: const RouteSettings(name: 'pp/my_child'),
+          builder: (_) => const Scaffold(body: Text('parenting home')),
+        ),
+      ));
+      expect(leaveTtcForPregnancy(key.currentState!), isTrue);
+      await tester.pumpAndSettle();
+      expect(find.byType(_FakeShell), findsOneWidget);
+      expect(find.text('parenting home'), findsNothing);
+      expect(built, 1);
+    });
+  });
+
+  // ===========================================================================
   group('entered through the door on the pregnancy Home', () {
     testWidgets('we pop back to the LIVE shell, not a fresh one',
         (tester) async {

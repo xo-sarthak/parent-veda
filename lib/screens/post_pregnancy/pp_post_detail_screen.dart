@@ -14,6 +14,7 @@ import '../../services/community_store.dart';
 import 'community_screen.dart';
 import 'pp_common.dart';
 import 'pp_community_detail_screen.dart';
+import 'pp_opening_soon.dart';
 
 class PpPostDetailScreen extends StatefulWidget {
   const PpPostDetailScreen({super.key, required this.post});
@@ -41,6 +42,8 @@ class _PpPostDetailScreenState extends State<PpPostDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Seeded until real (gap analysis P1, 2026-10-07): see pp_opening_soon.dart.
+    if (!kPpCommunityOpen) return ppCommunityOpeningSoon();
     final store = CommunityStore.instance;
     final post = widget.post;
     return Scaffold(

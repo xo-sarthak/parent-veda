@@ -185,7 +185,7 @@ class _PvDoctorNotesScreenState extends State<PvDoctorNotesScreen> {
         out.add((
           child.active.name,
           [
-            'Born ${_d(child.dob)} · ${child.ageLabel} · ${child.isBoy ? 'boy' : 'girl'}',
+            'Born ${_d(child.dob)} · ${child.ageLabel} ${child.sexGiven ? (child.isBoy ? ' · boy' : ' · girl') : ''}',
             if (fam.premature) 'Born early',
             if (fam.nicu) 'NICU stay',
             if (fam.multiple) 'A twin or multiple',

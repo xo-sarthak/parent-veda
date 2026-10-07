@@ -39,6 +39,7 @@ import '../services/expert_store.dart';
 import 'booking_models.dart';
 import 'booking_store.dart';
 import '../data/mind_mood_data.dart';
+import '../screens/post_pregnancy/pp_expert_honesty.dart';
 
 class BookingCatalog {
   BookingCatalog._();
@@ -66,6 +67,9 @@ class BookingCatalog {
     // then cannot be booked — visible and inert, the same defect the merged
     // programmes call fixed one line above.
     for (final e in mergedExperts()) {
+      // A bundled parenting expert is fiction: never a bookable consult (gap
+      // analysis P1, 2026-10-07). A panel-published one is real and books.
+      if (ppExpertIsPlaceholder(e)) continue;
       final o = _fromExpert(e);
       if (o != null) list.add(o);
     }

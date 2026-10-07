@@ -21,6 +21,7 @@ import '../../services/community_store.dart';
 import '../../widgets/mic_dictation_button.dart';
 import 'community_screen.dart';
 import 'pp_common.dart';
+import 'pp_opening_soon.dart';
 
 class PpCreatePostScreen extends StatefulWidget {
   const PpCreatePostScreen({super.key, this.initialCommunityId});
@@ -97,6 +98,8 @@ class _PpCreatePostScreenState extends State<PpCreatePostScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Seeded until real (gap analysis P1, 2026-10-07): see pp_opening_soon.dart.
+    if (!kPpCommunityOpen) return ppCommunityOpeningSoon();
     final store = CommunityStore.instance;
     final joined = ppJoinedCommunities();
     const types = [

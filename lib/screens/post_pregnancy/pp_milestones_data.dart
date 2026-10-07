@@ -234,6 +234,144 @@ const List<Milestone> kMilestones = [
     variation: 'Appetite and enthusiasm swing day to day — trust the week, not the meal.',
     discuss: 'A wide window; mention only if there is no interest in self-feeding by around 12–14 months.',
   ),
+  // ===========================================================================
+  //  After the first birthday, to five years (added 2026-10-07)
+  // ---------------------------------------------------------------------------
+  //  Parenting gap analysis, P1 (Development door): "Our tracker has 19
+  //  milestones, all before one ... Extend the tracker to 5 years." The ages
+  //  follow the CDC and AAP 2022 checkpoints (15, 18, 24 and 30 months, 3, 4 and
+  //  5 years), where about three in four children can do the thing; each
+  //  "discuss" line is the calm "act early" point. Neutral words for the child,
+  //  because the same card reaches every family. REQUIRED_REVIEW (paediatrician).
+  // ===========================================================================
+  Milestone(
+    id: 'gm_walk', domain: DevDomain.grossMotor, title: 'Walking on their own', loMonths: 11, hiMonths: 16,
+    desc: 'The first steps alone, wide and wobbly, usually with arms up for balance. Falls are part of it.',
+    why: 'Walking frees the hands to carry and explore, and changes how your toddler sees the whole house.',
+    encourage: ['Bare feet on a safe floor help balance', 'Hold both hands, then one, then stand back a little', 'Push toys and a sturdy chair to cruise along'],
+    variation: 'Walking anywhere from about 9 to 18 months is normal. Some children crawl for longer and then walk quickly.',
+    discuss: 'Mention it if your toddler is not walking at all by 18 months, or always falls to one side.',
+  ),
+  Milestone(
+    id: 'gm_run_climb', domain: DevDomain.grossMotor, title: 'Running and climbing', loMonths: 18, hiMonths: 26,
+    desc: 'Walking turns into running, and the sofa becomes a mountain. Climbing up comes before climbing down.',
+    why: 'Running and climbing build strength, balance and a sense of where the body is in space.',
+    encourage: ['Daily time outdoors, in a park or a safe open space', 'Low steps to climb with you close by', 'Chasing games in a safe room'],
+    variation: 'Some toddlers are climbers from the start; others are careful watchers. Both develop well.',
+    discuss: 'Mention it if your toddler cannot run at all by about two and a half, or seems to lose balance much more than other children.',
+  ),
+  Milestone(
+    id: 'gm_jump_pedal', domain: DevDomain.grossMotor, title: 'Jumping, and pedalling a tricycle', loMonths: 30, hiMonths: 42,
+    desc: 'Jumping with both feet off the ground, then pedalling a tricycle and going up stairs one foot per step.',
+    why: 'These need both sides of the body to work together, the same coordination used later in sport and writing.',
+    encourage: ['Jump over a line drawn in chalk', 'A tricycle or a ride-on in a safe space', 'Stairs together, holding the rail'],
+    variation: 'Pedalling can take a while to click, and many children push with their feet first. That is fine.',
+    discuss: 'Mention it if your child cannot jump at all by about three and a half, or trips and falls very often.',
+  ),
+  Milestone(
+    id: 'gm_hop_catch', domain: DevDomain.grossMotor, title: 'Hopping and catching', loMonths: 42, hiMonths: 60,
+    desc: 'Hopping on one foot for a moment, catching a big ball, and later skipping.',
+    why: 'Balance on one foot and timing a catch are skills for play with other children at school.',
+    encourage: ['Hopscotch drawn on the floor', 'Throw and catch a soft, large ball', 'Dance games that stop and start'],
+    variation: 'Catching is often still hit and miss at four. Hopping usually comes first.',
+    discuss: 'Mention it if your child avoids running games entirely or seems much clumsier than other children of the same age.',
+  ),
+  Milestone(
+    id: 'fm_scribble', domain: DevDomain.fineMotor, title: 'Scribbling and stacking', loMonths: 15, hiMonths: 24,
+    desc: 'Holding a crayon in a fist and scribbling, and stacking two, then four or more blocks.',
+    why: 'Controlling a crayon and a block is the start of drawing, feeding with a spoon and, much later, writing.',
+    encourage: ['Thick crayons and big sheets of paper', 'Steel bowls and boxes to stack and knock down', 'Let your toddler feed with a spoon, mess and all'],
+    variation: 'Some toddlers love drawing; others would rather build or pour. Any of these grow the same hand skills.',
+    discuss: 'Mention it if your toddler cannot hold a crayon or pick up small objects with fingers by about two.',
+  ),
+  Milestone(
+    id: 'fm_draw_circle', domain: DevDomain.fineMotor, title: 'Drawing a circle', loMonths: 30, hiMonths: 42,
+    desc: 'Copying a circle after you show how, and holding the crayon in the fingers rather than a fist.',
+    why: 'A controlled shape shows the small hand muscles and the eyes are working together.',
+    encourage: ['Draw together and take turns', 'Play dough to roll and pinch', 'Threading big beads on a string'],
+    variation: 'Grip changes slowly. A fist grip at three is still common.',
+    discuss: 'Mention it if your child avoids using the hands for play or cannot copy any line by about four.',
+  ),
+  Milestone(
+    id: 'fm_scissors_person', domain: DevDomain.fineMotor, title: 'Cutting, and drawing a person', loMonths: 42, hiMonths: 60,
+    desc: 'Using child scissors to cut along a line, and drawing a person with a head and a few body parts.',
+    why: 'These are the hand skills and planning that school work builds on.',
+    encourage: ['Child scissors and old newspapers', 'Ask your child to draw the family and tell you about it', 'Buttons and zips on real clothes'],
+    variation: 'Drawings vary a lot at this age. More detail comes with time and interest.',
+    discuss: 'Mention it if your child cannot use any fine hand skill by about five, or gets very upset when asked to try.',
+  ),
+  Milestone(
+    id: 'lang_words', domain: DevDomain.language, title: 'First words with meaning', loMonths: 12, hiMonths: 18,
+    desc: 'A few words that mean something, even unclear ones: a sound for milk, a name for a pet, "no".',
+    why: 'Words are the doorway to telling you what your toddler needs, and to fewer frustrated tears.',
+    encourage: ['Name things as you hand them over', 'Wait a moment so there is room to answer', 'Talk in your home language; every language counts'],
+    variation: 'Children growing up with two or three languages may start a little later and catch up. That is normal.',
+    discuss: 'Mention it if there are no words at all by about 16 months, or words that were there have gone.',
+  ),
+  Milestone(
+    id: 'lang_two_words', domain: DevDomain.language, title: 'Putting two words together', loMonths: 20, hiMonths: 30,
+    desc: 'Two words joined into an idea: "more milk", "papa gone", "big car".',
+    why: 'Joining words is the start of grammar, and of telling you what happened, not only what is wanted.',
+    encourage: ['Add one word to what your toddler says', 'Read picture books and name what you see', 'Sing rhymes with actions'],
+    variation: 'Some children save up words and then talk in short sentences quite suddenly.',
+    discuss: 'Mention it if there are no two-word phrases by about two years, or few words at all. Early help works best.',
+  ),
+  Milestone(
+    id: 'lang_sentences', domain: DevDomain.language, title: 'Talking in sentences', loMonths: 30, hiMonths: 42,
+    desc: 'Short sentences, back-and-forth conversation, and lots of "why" and "what" questions.',
+    why: 'Conversation is how your child learns to explain, ask and think out loud.',
+    encourage: ['Ask open questions about the day', 'Let your child finish without rushing to help', 'Tell stories about when you were small'],
+    variation: 'Clear speech takes years. Some sounds, like r or th, can be hard until five or later.',
+    discuss: 'Mention it if strangers understand very little of what your child says by about three, or there is a stammer that upsets your child.',
+  ),
+  Milestone(
+    id: 'lang_story', domain: DevDomain.language, title: 'Telling a short story', loMonths: 42, hiMonths: 60,
+    desc: 'Telling you what happened, in order, with a beginning and an end, and answering questions about a story.',
+    why: 'Storytelling is a big step towards reading and writing, and towards being understood at school.',
+    encourage: ['Ask "what happened next?" at bedtime', 'Let your child retell a favourite story', 'Make up stories together with toys'],
+    variation: 'Stories at four can be long and wander. Order and endings come with practice.',
+    discuss: 'Mention it if your child cannot tell you about the day at all by about four and a half.',
+  ),
+  Milestone(
+    id: 'cog_pretend', domain: DevDomain.cognitive, title: 'Pretend play', loMonths: 18, hiMonths: 30,
+    desc: 'Feeding a doll, talking on a toy phone, stirring an empty pot. Things start to stand for other things.',
+    why: 'Pretending is thinking: imagining, planning and understanding how the world works.',
+    encourage: ['Join in and let your toddler lead', 'Steel utensils, a dupatta and old bags for play', 'Pretend together during daily jobs'],
+    variation: 'Pretend play can start simply and grow richer over months. Any kind counts.',
+    discuss: 'Mention it if there is no pretend play at all by about two and a half, or play is the same repeated action all day.',
+  ),
+  Milestone(
+    id: 'cog_sort_count', domain: DevDomain.cognitive, title: 'Sorting, and counting a few things', loMonths: 30, hiMonths: 48,
+    desc: 'Sorting by colour or shape, understanding "one" and "more", and counting a few objects.',
+    why: 'Sorting and counting are the first steps in maths, and they grow from everyday life.',
+    encourage: ['Sort laundry, spoons or vegetables together', 'Count stairs out loud', 'Ask "which one is bigger?"'],
+    variation: 'Children can recite numbers long before they can count objects. Both are on the way.',
+    discuss: 'Mention it if your child shows no interest in how things go together or work by about four.',
+  ),
+  Milestone(
+    id: 'soc_play_with', domain: DevDomain.social, title: 'Playing with other children', loMonths: 24, hiMonths: 42,
+    desc: 'Playing beside other children first, then with them: chasing, sharing a game, taking turns with help.',
+    why: 'Playing together builds the friendship and turn-taking skills school relies on.',
+    encourage: ['Short playdates with one child', 'Games that need turns, like rolling a ball', 'Name the feeling when sharing is hard'],
+    variation: 'Sharing stays hard for a long time. Playing side by side at two is exactly right.',
+    discuss: 'Mention it if your child shows no interest in other children or adults by about three, or avoids eye contact.',
+  ),
+  Milestone(
+    id: 'soc_feelings', domain: DevDomain.social, title: 'Naming feelings', loMonths: 36, hiMonths: 54,
+    desc: 'Saying "I am angry" or "she is sad", and starting to calm down with help.',
+    why: 'A feeling with a name is easier to manage, for children and for adults.',
+    encourage: ['Name your own feelings out loud', 'Read stories and ask how a character feels', 'Hug first, talk later'],
+    variation: 'Big feelings with few words are normal at three. Words grow through four and five.',
+    discuss: 'Mention it if anger, worry or sadness stop your child joining in with family or school for weeks.',
+  ),
+  Milestone(
+    id: 'self_dress_toilet', domain: DevDomain.selfCare, title: 'Dressing and using the toilet', loMonths: 30, hiMonths: 60,
+    desc: 'Taking off clothes, then putting them on, and using the toilet in the day with less and less help.',
+    why: 'Doing things alone builds confidence, and it matters for playschool and school.',
+    encourage: ['Clothes that are easy to pull on', 'Time to try before you help', 'A step stool and a small seat for the toilet'],
+    variation: 'Daytime dryness anywhere from two to four is normal. Night dryness can come years later.',
+    discuss: 'Mention it if there is no daytime control at all by about four, or a child who was dry starts wetting again.',
+  ),
 ];
 
 // ---- store ------------------------------------------------------------------
@@ -324,7 +462,8 @@ class MilestoneStore extends ChangeNotifier {
     } catch (_) {}
   }
 
-  int get _ageMonths => ChildProfileStore.instance.ageInMonths;
+  // Corrected age for a baby born early (2026-10-07).
+  int get _ageMonths => ChildProfileStore.instance.devAgeInMonths;
   String get name => ChildProfileStore.instance.name;
 
   bool isObserved(String id) => _observed.containsKey(id);

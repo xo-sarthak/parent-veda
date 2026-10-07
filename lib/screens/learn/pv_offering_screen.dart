@@ -32,6 +32,7 @@ import '../../data/learn/pv_learn_view.dart';
 import '../../services/life_stage_store.dart';
 import '../../services/pv_learn_progress_store.dart';
 import '../../theme/pv_fonts.dart';
+import '../post_pregnancy/pp_expert_honesty.dart' show ppProgramIsPlaceholder, ppProgramOpeningSoon;
 import '../post_pregnancy/pp_expert_link.dart' show openExpertProfile;
 import 'pv_learn_catalog.dart';
 import '../products/pv_review_block.dart';
@@ -42,10 +43,13 @@ import 'pv_lesson_screen.dart';
 import 'pv_offering_content.dart';
 
 void pvOpenOffering(BuildContext context, PvOfferingView v) {
+  // A bundled parenting programme with no lessons is not sold (gap analysis
+  // P1, 2026-10-07): it opens "Opening soon" instead of a price and a Buy.
+  final soon = v.stage == LifeStage.parenting && ppProgramIsPlaceholder(v.id);
   Navigator.of(context).push(
     MaterialPageRoute<void>(
       settings: RouteSettings(name: '$kPvOfferingRoutePrefix${v.id}'),
-      builder: (_) => PvOfferingScreen(view: v),
+      builder: (_) => soon ? ppProgramOpeningSoon(v.title, v.id) : PvOfferingScreen(view: v),
     ),
   );
 }

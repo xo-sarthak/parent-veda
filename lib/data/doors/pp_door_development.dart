@@ -43,8 +43,18 @@ final PpDoor kPpDevelopmentDoor = PpDoor(
       label: 'On track',
       icon: Icons.checklist_rtl_outlined,
       hue: 160,
-      areaIds: ['on_track'],
+      areaIds: ['on_track', 'age_by_age'],
       tools: [
+        // Development > Month by month checklist (gap analysis P1, 2026-10-07):
+        // milestones, play, sleep, feeding, safety, vaccines and the doctor
+        // lines for this age, on one page.
+        PpDoorTool(
+          label: "This month's checklist",
+          blurb: 'Everything for this age on one page: what is new, skills '
+              'coming in, what is due, and when to call the doctor.',
+          surfaceId: 'pp_month_checklist',
+          icon: Icons.checklist_rtl_outlined,
+        ),
         // ⚠️ THE ONE TRACKER. "Where he is right now" and "What is emerging"
         // were the same list shown two ways; the journey kept the flip-cards
         // and the search and gained the "usually settled by now" group. The
@@ -52,10 +62,10 @@ final PpDoor kPpDevelopmentDoor = PpDoor(
         //
         // ⚠️ READ, THEN THE TOOL FOR IT. The user's call (2026-09-13): the
         // rail goes "The normal range is much wider than you think" then the
-        // tracker, "When something is genuinely worth checking" then the
+        // tracker, "When something is worth checking" then the
         // check-in, then the born-early read. Educate, then hand over.
         PpDoorTool(
-          label: 'Where he is right now',
+          label: 'Where your baby is right now',
           blurb: 'His milestones as windows: usually settled by now, emerging '
               'now, and a soft look ahead. Never a score.',
           surfaceId: 'pp_milestones',
@@ -71,7 +81,7 @@ final PpDoor kPpDevelopmentDoor = PpDoor(
           afterPageId: 'dev_worth_checking',
         ),
       ],
-      footer: 'A box you have not ticked is not one he has missed. One baby '
+      footer: 'A box you have not ticked is not one your child has missed. One baby '
           'is not a range.',
     ),
     PpDoorTab(
@@ -106,6 +116,14 @@ final PpDoor kPpDevelopmentDoor = PpDoor(
           surfaceId: 'pp_development',
           icon: Icons.toys_outlined,
         ),
+        // Gap analysis P2 (2026-10-07): "a tummy time timer on the
+        // Development door with a soft daily total and no target".
+        PpDoorTool(
+          label: 'Tummy time',
+          blurb: 'A gentle timer and a daily total. No target, no streak.',
+          surfaceId: 'pp_tummy_time',
+          icon: Icons.timer_outlined,
+        ),
       ],
     ),
     PpDoorTab(
@@ -129,8 +147,10 @@ final PpDoor kPpDevelopmentDoor = PpDoor(
           icon: Icons.auto_awesome_outlined,
         ),
       ],
-      note: 'Which fussy-then-forward phase he may be in now. Every baby\'s '
-          'timing is his own, so this is a lens and never a law.',
+      // One popular idea, not science (gap analysis P3, 2026-10-07).
+      note: 'Which fussy-then-forward phase your baby may be in now. The leaps '
+          'are one popular idea, not proven science, and every baby\'s timing '
+          'is their own: a lens and never a law.',
     ),
     PpDoorTab(
       id: 'talk',

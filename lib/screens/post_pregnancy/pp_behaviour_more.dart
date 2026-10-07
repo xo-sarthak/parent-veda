@@ -529,7 +529,7 @@ const PpArea kBehScreens = PpArea(
               'A box of things by the sofa. People stop doing something when '
               'there is something else in reach.'),
           PpStep('Accept a different standard elsewhere',
-              'At dadi house it is different. Children handle that far better '
+              'At Grandma\'s house it is different. Children handle that far better '
               'than they handle their parents fighting about it.'),
         ], heading: 'What tends to work'),
         PpWhenLine('Any age, and easiest to set before he can ask.'),

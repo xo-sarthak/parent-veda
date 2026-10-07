@@ -186,7 +186,9 @@ void main() {
       () {
         // A product with a rating but no source figure must have NO percentage.
         final lull = store.byId('lull')!;
-        expect(lull.rating, greaterThan(0));
+        // Parenting seed ratings are hidden since 2026-10-07 (gap analysis P1),
+        // the TTC rule; the percentages must stay null either way.
+        expect(lull.rating, kPpShowSeedReviews ? greaterThan(0) : 0);
         expect(lull.parentsPct, isNull);
         expect(lull.expertsPct, isNull);
         // TTC's zeros become null, not 0%.
@@ -196,6 +198,17 @@ void main() {
         }
       },
     );
+
+    test('parenting shows no seed ratings, quotes or shares (gap analysis P1)', () {
+      if (kPpShowSeedReviews) return;
+      for (final p in store.forStage(LifeStage.parenting)) {
+        expect(p.rating, 0, reason: p.id);
+        expect(p.reviewCount, 0, reason: p.id);
+        expect(p.parentsPct, isNull, reason: p.id);
+        expect(p.expertsPct, isNull, reason: p.id);
+        expect(pvShowsSeedVoices(p), isFalse, reason: p.id);
+      }
+    });
 
     test('IMS Act: a review-only product has no buy path anywhere', () {
       final ro = store.all.where((p) => p.reviewOnly).toList();

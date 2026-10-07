@@ -13,8 +13,15 @@
 
 import 'package:flutter/material.dart';
 
+import '../../theme/pv_fonts.dart';
 import '../../widgets/global_ask_fab.dart' show kAskFabReserve;
+import '../doors/pv_list_row.dart';
+import '../pregnancy/preg_chrome.dart' show PregSectionHeading, pregGroupLabelStyle, pregPageTitleStyle;
+import '../pregnancy/preg_tool_chrome.dart' show pregToolPad;
+import '../products/pv_store_chrome.dart' show PvChip, PvCommit, kPvInk, kPvLine, kPvStar, pvStorePalette;
+import '../v2/v2_palette.dart';
 import 'pp_child_profile.dart';
+import 'pp_phases_data.dart' show ppFillChild;
 
 import 'pp_channels_data.dart';
 import 'pp_common.dart';
@@ -78,8 +85,503 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
       ? 'Expert ${_quick ? 'shorts' : 'videos'} on ${_topic.toLowerCase()} - keep scrolling for more.'
       : 'Picked for his age and where he is right now - the feed keeps going.';
 
+  // ---- the one ParentVeda look (2026-10-07) ------------------------------------
+  //  Pregnancy's Watch library (WatchLearnScreen) is the model: white ground,
+  //  an app bar carrying only the back arrow, the serif page title, ONE
+  //  section heading (PregSectionHeading), white cards on the hairline with
+  //  the thumbnail on top, ink chips, an ink "Watch now". Same catalogue,
+  //  filters, modes, endless feed and destinations.
+  //
+  //  The search results and the feed are ONE lazy list whose first rows (title,
+  //  intro, search) are the same in both, so typing the first letter no longer
+  //  swaps the list out from under the field (it was two ListViews, and the
+  //  field lost focus when the page switched between them).
+  //  `_buildBeforeShell` is the page before, kept for revert.
   @override
   Widget build(BuildContext context) {
+    final p = pvStorePalette;
+    return Scaffold(
+      backgroundColor: p.ground,
+      appBar: AppBar(
+        backgroundColor: p.ground,
+        surfaceTintColor: Colors.transparent,
+        foregroundColor: p.ink1,
+      ),
+      body: AnimatedBuilder(
+        animation: WatchStore.instance,
+        builder: (context, _) {
+          final store = WatchStore.instance;
+          final top = <Widget>[
+            pregToolPad(Semantics(header: true, child: Text('Learn something today', style: pregPageTitleStyle()))),
+            const SizedBox(height: 8),
+            pregToolPad(Text('Five minutes here should make you a better parent today - not just pass the time.',
+                style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2))),
+            const SizedBox(height: 16),
+            pregToolPad(_searchShell(p)),
+          ];
+          if (_query.trim().isNotEmpty) {
+            final rows = [...top, ..._searchShellRows(p)];
+            return ListView.builder(
+              padding: const EdgeInsets.only(top: 4, bottom: kAskFabReserve),
+              itemCount: rows.length,
+              itemBuilder: (_, i) => rows[i],
+            );
+          }
+          final header = [...top, ..._headerShell(p, store)];
+          return _feedShell(header);
+        },
+      ),
+    );
+  }
+
+  Widget _searchShell(V2Palette p) => Container(
+        height: 48,
+        decoration: BoxDecoration(
+          color: p.surface,
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: p.line),
+        ),
+        child: Row(children: [
+          const SizedBox(width: 14),
+          Icon(Icons.search_rounded, size: 19, color: p.ink2),
+          const SizedBox(width: 8),
+          Expanded(
+            child: TextField(
+              controller: _searchCtl,
+              onChanged: (v) => setState(() => _query = v),
+              textInputAction: TextInputAction.search,
+              style: pvManrope(fontSize: 15, color: p.ink1),
+              cursorColor: p.ink1,
+              decoration: InputDecoration(
+                isDense: true,
+                hintText: 'Search videos',
+                hintStyle: pvManrope(fontSize: 15, color: p.ink3),
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                disabledBorder: InputBorder.none,
+                errorBorder: InputBorder.none,
+                focusedErrorBorder: InputBorder.none,
+                filled: false,
+                contentPadding: EdgeInsets.zero,
+              ),
+            ),
+          ),
+          if (_searchCtl.text.isNotEmpty)
+            IconButton(
+              tooltip: 'Clear the search',
+              onPressed: () => setState(() {
+                _searchCtl.clear();
+                _query = '';
+              }),
+              icon: Icon(Icons.close_rounded, size: 18, color: p.ink2),
+              visualDensity: VisualDensity.compact,
+            )
+          else
+            const SizedBox(width: 14),
+        ]),
+      );
+
+  List<Widget> _searchShellRows(V2Palette p) {
+    final q = _query.trim().toLowerCase();
+    final items = kWatchAll
+        .where((v) => v.title.toLowerCase().contains(q) || v.topic.toLowerCase().contains(q))
+        .toList();
+    return [
+      const SizedBox(height: 26),
+      pregToolPad(const PregSectionHeading('Search results')),
+      const SizedBox(height: 12),
+      if (items.isEmpty)
+        pregToolPad(Text('No matches for "$_query" - try another word.', style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2)))
+      else
+        for (final v in items) pregToolPad(_feedCard(v)),
+    ];
+  }
+
+  // The endless feed, as before: lazily built, looping the catalogue, with a
+  // channel to explore after every few videos in Deep Learn.
+  Widget _feedShell(List<Widget> header) {
+    final p = pvStorePalette;
+    final base = _picksBase();
+    final channels = allWatchChannels();
+    final interstitialsOn = !_quick && channels.isNotEmpty;
+    return ListView.builder(
+      padding: const EdgeInsets.only(top: 4, bottom: kAskFabReserve),
+      itemBuilder: (context, index) {
+        if (index < header.length) return header[index];
+        final j = index - header.length;
+        if (_quick) {
+          final a = base[(j * 2) % base.length];
+          final b = base[(j * 2 + 1) % base.length];
+          return pregToolPad(Padding(
+            padding: const EdgeInsets.only(bottom: 18),
+            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Expanded(child: _shortCardShell(p, a)),
+              const SizedBox(width: 12),
+              Expanded(child: _shortCardShell(p, b)),
+            ]),
+          ));
+        }
+        if (interstitialsOn) {
+          const period = _feedGroup + 1;
+          if (j % period == period - 1) {
+            final k = (j ~/ period) % channels.length;
+            return pregToolPad(_channelShell(p, channels[k]));
+          }
+          final videoIndex = (j ~/ period) * _feedGroup + (j % period);
+          return pregToolPad(_feedCard(base[videoIndex % base.length]));
+        }
+        return pregToolPad(_feedCard(base[j % base.length]));
+      },
+    );
+  }
+
+  Widget _shortCardShell(V2Palette p, WatchVideo v) => InkWell(
+        onTap: () => _open(v),
+        borderRadius: BorderRadius.circular(16),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          AspectRatio(
+            aspectRatio: 9 / 14,
+            child: WatchThumb(seed: v.seed, height: 999, showPlay: true, progress: _liveProgress(v.id)),
+          ),
+          const SizedBox(height: 8),
+          Text(v.title,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: pvManrope(fontSize: 13, fontWeight: FontWeight.w700, height: 1.25, color: p.ink1)),
+          const SizedBox(height: 4),
+          PpExpertName(v.expert, suffix: ' · ${v.seconds}s',
+              style: pvManrope(fontSize: 11, color: p.ink3), maxLines: 1, overflow: TextOverflow.ellipsis),
+        ]),
+      );
+
+  List<Widget> _headerShell(V2Palette p, WatchStore store) {
+    final continues = store.continueWatching;
+    final h = <Widget>[
+      const SizedBox(height: 14),
+      // Wrapped, not a sideways strip: the whole set is scannable at once.
+      pregToolPad(Wrap(spacing: 6, runSpacing: 8, children: [
+        PvChip(label: 'All', selected: _topic == 'All', onTap: () => setState(() => _topic = 'All')),
+        PvChip(
+          key: const ValueKey('pp_watch_shorts'),
+          label: 'Shorts',
+          leading: Icons.bolt_rounded,
+          selected: false,
+          onTap: () => _push(const WatchShortsScreen()),
+        ),
+        for (final c in kWatchCategories)
+          PvChip(label: c.$1, leading: c.$2, selected: _topic == c.$1, onTap: () => setState(() => _topic = c.$1)),
+      ])),
+      const SizedBox(height: 18),
+      pregToolPad(_modeShell(p)),
+    ];
+
+    // A topic is selected: the page becomes that topic (see the page before).
+    if (_topic != 'All') {
+      h.addAll([
+        const SizedBox(height: 24),
+        pregToolPad(PregSectionHeading(_picksTitle(), lead: ppFillChild(_picksSubtitle()), link: 'Clear', onLink: () => setState(() => _topic = 'All'))),
+        const SizedBox(height: 14),
+      ]);
+      return h;
+    }
+
+    h.addAll([
+      const SizedBox(height: 26),
+      pregToolPad(PregSectionHeading('Today for ${ChildProfileStore.instance.nameMid}')),
+      const SizedBox(height: 12),
+      pregToolPad(_heroShell(p)),
+    ]);
+
+    if (continues.isNotEmpty) {
+      h.addAll([
+        const SizedBox(height: 26),
+        pregToolPad(const PregSectionHeading('Continue watching')),
+        const SizedBox(height: 12),
+        _railShell(p, continues),
+      ]);
+    }
+
+    h.addAll([
+      const SizedBox(height: 26),
+      pregToolPad(const PregSectionHeading('Expert collections', lead: 'Short, finishable learning paths - not endless playlists.')),
+      const SizedBox(height: 12),
+      _collectionsShell(p),
+      const SizedBox(height: 26),
+      pregToolPad(PvRowGroup(p: p, children: [
+        PvListRow(
+          key: const ValueKey('pp_watch_library'),
+          p: p,
+          leading: PvMarkWell(p: p, hue: 206, size: 40, icon: Icons.bookmark_outline_rounded),
+          title: 'Your library',
+          line: 'Saved, continue watching & collections',
+          onTap: () => _push(const WatchLibraryScreen()),
+        ),
+      ])),
+      const SizedBox(height: 28),
+      pregToolPad(PregSectionHeading(_picksTitle(), lead: ppFillChild(_picksSubtitle()))),
+      const SizedBox(height: 14),
+    ]);
+    return h;
+  }
+
+  /// Quick | Deep: a hairline track with the chosen side in ink.
+  Widget _modeShell(V2Palette p) => Container(
+        padding: const EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: p.line),
+        ),
+        child: Row(children: [
+          _segShell(p, 'Quick Learn', '30–90 sec', _quick, () => setState(() => _quick = true)),
+          _segShell(p, 'Deep Learn', '5–30 min', !_quick, () => setState(() => _quick = false)),
+        ]),
+      );
+
+  Widget _segShell(V2Palette p, String label, String sub, bool on, VoidCallback onTap) => Expanded(
+        child: Semantics(
+          button: true,
+          selected: on,
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(999),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
+              decoration: BoxDecoration(
+                color: on ? kPvInk : Colors.transparent,
+                borderRadius: BorderRadius.circular(999),
+              ),
+              child: Column(children: [
+                Text(label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: pvManrope(fontSize: 13, fontWeight: FontWeight.w700, color: on ? Colors.white : p.ink1)),
+                const SizedBox(height: 1),
+                Text(sub,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: pvManrope(fontSize: 10.5, color: on ? Colors.white70 : p.ink3)),
+              ]),
+            ),
+          ),
+        ),
+      );
+
+  Widget _heroShell(V2Palette p) {
+    final v = todaysVideo(quick: _quick);
+    return Material(
+      color: Colors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20), side: BorderSide(color: p.line)),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        key: const ValueKey('pp_watch_today'),
+        onTap: () => _open(v),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          WatchThumb(seed: v.seed, height: 188, radius: 0, duration: v.durationLabel, quick: v.quick),
+          Padding(
+            padding: const EdgeInsets.all(18),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+              Text('WHY THIS MATTERS TODAY', style: pregGroupLabelStyle()),
+              const SizedBox(height: 10),
+              Text(v.title, style: pvFraunces(fontSize: 21, fontWeight: FontWeight.w600, height: 1.2, color: p.ink1)),
+              const SizedBox(height: 8),
+              Text(ppFill(v.why), style: pvManrope(fontSize: 14, height: 1.55, color: p.ink2)),
+              const SizedBox(height: 12),
+              watchMeta(v, color: p.ink3),
+              const SizedBox(height: 16),
+              PvCommit(label: 'Watch now', icon: Icons.play_arrow_rounded, onTap: () => _open(v)),
+            ]),
+          ),
+        ]),
+      ),
+    );
+  }
+
+  /// A rail of pregnancy's Watch card: white, the hairline, the thumbnail on top.
+  Widget _railShell(V2Palette p, List<WatchVideo> vids) {
+    final s = MediaQuery.textScalerOf(context);
+    final height = (116 + 10 + s.scale(13.5) * 1.6 * 2 + 3 + s.scale(11.5) * 1.6 + 12 + 10).ceilToDouble();
+    return SizedBox(
+      height: height,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 18),
+        itemCount: vids.length,
+        separatorBuilder: (_, _) => const SizedBox(width: 12),
+        itemBuilder: (_, i) {
+          final v = vids[i];
+          return _cardShell(
+            p,
+            onTap: () => _open(v),
+            thumb: WatchThumb(seed: v.seed, height: 116, radius: 0, duration: v.durationLabel, progress: WatchStore.instance.progressOf(v.id), quick: v.quick),
+            lines: [
+              Text(v.title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w700, height: 1.3, color: p.ink1)),
+              const SizedBox(height: 3),
+              watchMeta(v, color: p.ink3),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _cardShell(V2Palette p, {required VoidCallback onTap, required Widget thumb, required List<Widget> lines}) => SizedBox(
+        width: 220,
+        child: Material(
+          color: Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18), side: const BorderSide(color: kPvLine)),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: onTap,
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              thumb,
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: lines),
+              ),
+            ]),
+          ),
+        ),
+      );
+
+  Widget _collectionsShell(V2Palette p) {
+    final cols = expertCollections();
+    final s = MediaQuery.textScalerOf(context);
+    final height = (116 + 10 + s.scale(14) * 1.6 + 4 + s.scale(11.5) * 1.6 + 5 + 30 + 3 + s.scale(11) * 1.6 + 3 + s.scale(11) * 1.6 + 12 + 14)
+        .ceilToDouble();
+    return SizedBox(
+      height: height,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 18),
+        itemCount: cols.length,
+        separatorBuilder: (_, _) => const SizedBox(width: 12),
+        itemBuilder: (_, i) {
+          final c = cols[i];
+          final mins = c.videoIds.map(watchVideoById).fold<int>(0, (a, v) => a + v.seconds) ~/ 60;
+          final prog = WatchStore.instance.collectionProgress(c);
+          // The expert behind the collection = whoever teaches its first video.
+          final lead = c.videoIds.isEmpty ? null : watchVideoById(c.videoIds.first).expert;
+          return _cardShell(
+            p,
+            onTap: () => _push(WatchCollectionScreen(collection: c)),
+            thumb: WatchThumb(seed: c.seed, height: 116, radius: 0, showPlay: false, progress: prog > 0 ? prog : null),
+            lines: [
+              Text(c.title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: pvManrope(fontSize: 14, fontWeight: FontWeight.w700, height: 1.3, color: p.ink1)),
+              const SizedBox(height: 4),
+              Text('${c.videoIds.length} videos · ~$mins min', style: pvManrope(fontSize: 11.5, color: p.ink3)),
+              const SizedBox(height: 5),
+              // Who it is from: the "i" opens their background, so a credential
+              // is something she can check, not take on faith.
+              if (lead != null)
+                Semantics(
+                  button: true,
+                  label: 'About ${lead.name}',
+                  excludeSemantics: true,
+                  child: InkWell(
+                    onTap: () => _openExpert(lead),
+                    borderRadius: BorderRadius.circular(8),
+                    child: SizedBox(
+                      height: 30,
+                      child: Row(children: [
+                        Flexible(
+                          child: Text(c.title == lead.name ? lead.credential : lead.name,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: pvManrope(fontSize: 11.5, fontWeight: FontWeight.w700, color: p.ink1)),
+                        ),
+                        const SizedBox(width: 4),
+                        const Icon(Icons.info_outline_rounded, size: 14, color: kPvInk),
+                      ]),
+                    ),
+                  ),
+                )
+              else
+                const SizedBox(height: 30),
+              const SizedBox(height: 3),
+              Row(children: [
+                if (lead != null) ...[
+                  const Icon(Icons.star_rounded, size: 12, color: kPvStar),
+                  const SizedBox(width: 3),
+                  Flexible(
+                    child: Text('${lead.rating} · ${lead.reviewsCount}',
+                        maxLines: 1, overflow: TextOverflow.ellipsis, style: pvManrope(fontSize: 11, color: p.ink3)),
+                  ),
+                ],
+              ]),
+              const SizedBox(height: 3),
+              Text(prog >= 1 ? 'Completed' : prog > 0 ? '${(prog * 100).round()}% done' : 'Not started',
+                  style: pvManrope(fontSize: 11, fontWeight: FontWeight.w700, color: prog > 0 ? p.ink1 : p.ink3)),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  /// A channel to explore, between videos: white, the hairline, Subscribe in ink.
+  Widget _channelShell(V2Palette p, WatchChannel channel) {
+    final e = channel.expert;
+    final subscribed = WatchStore.instance.isSubscribed(e.id);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Material(
+        color: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20), side: BorderSide(color: p.line)),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: () => _push(WatchChannelScreen(expertId: e.id)),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('CHANNEL TO EXPLORE', style: pregGroupLabelStyle()),
+              const SizedBox(height: 12),
+              Row(children: [
+                ClipOval(child: PvMarkWell(p: p, hue: 206, size: 44, icon: Icons.person_outline_rounded)),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    PpExpertName(e, style: pvManrope(fontSize: 14.5, fontWeight: FontWeight.w700, color: p.ink1), maxLines: 1, overflow: TextOverflow.ellipsis),
+                    const SizedBox(height: 3),
+                    Text(channel.statsLine, maxLines: 1, overflow: TextOverflow.ellipsis, style: pvManrope(fontSize: 12, color: p.ink3)),
+                  ]),
+                ),
+                const SizedBox(width: 10),
+                InkWell(
+                  onTap: () => WatchStore.instance.toggleSubscribe(e.id),
+                  borderRadius: BorderRadius.circular(999),
+                  child: Container(
+                    constraints: const BoxConstraints(minHeight: 36),
+                    padding: const EdgeInsets.symmetric(horizontal: 14),
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: subscribed ? Colors.white : kPvInk,
+                      borderRadius: BorderRadius.circular(999),
+                      border: Border.all(color: subscribed ? p.line : kPvInk),
+                    ),
+                    child: Text(subscribed ? 'Subscribed' : 'Subscribe',
+                        style: pvManrope(fontSize: 12, fontWeight: FontWeight.w800, color: subscribed ? p.ink2 : Colors.white)),
+                  ),
+                ),
+              ]),
+            ]),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Kept for revert (2026-10-07): the page before the shared look.
+  // ignore: unused_element
+  Widget _buildBeforeShell(BuildContext context) {
     return Scaffold(
       backgroundColor: ppBg,
       body: Stack(children: [
@@ -481,7 +983,9 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
   /// trust them. Credentials are only worth showing if you can check them.
   void _openExpert(Expert e) => showModalBottomSheet<void>(
         context: context,
-        backgroundColor: ppBg,
+        // White ground (2026-10-07, the one ParentVeda look). Kept for revert:
+        // backgroundColor: ppBg.
+        backgroundColor: pvStorePalette.ground,
         isScrollControlled: true,
         shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
         builder: (_) => SafeArea(
@@ -492,7 +996,8 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
               const SizedBox(height: 18),
               PpExpertName(e, style: ppFraunces(24, h: 1.15), underline: false),
               const SizedBox(height: 5),
-              Text(e.credential, style: ppBody(13.5, color: ppPurple, w: FontWeight.w700)),
+              // Ink, not violet (2026-10-07). Kept for revert: color: ppPurple.
+              Text(e.credential, style: ppBody(13.5, color: kPvInk, w: FontWeight.w700)),
               const SizedBox(height: 4),
               Text(e.backLabel, style: ppBody(12.5, color: ppMuted)),
               const SizedBox(height: 14),

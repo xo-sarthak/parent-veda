@@ -33,6 +33,7 @@ import 'main_scaffold.dart';
 import 'ttc/ttc_common.dart' show ttcHomeRoute;
 import 'ttc/ttc_home_version.dart';
 import '../theme/pv_fonts.dart';
+import '../services/father_preview.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({
@@ -180,6 +181,14 @@ class _SplashScreenState extends State<SplashScreen>
   /// The father branch wins first: a paired partner has his own shell, and his
   /// stage experience is reached inside it.
   Route<void> _homeFor(String role, String? stage) {
+    // After the birth his app follows the baby (gap analysis P1, Behind ·
+    // Partner, 2026-10-07): a paired father in the parenting stage lands on the
+    // parenting home, with his own top card, instead of the pregnancy father
+    // shell clamped at week 40. FatherPreview marks him as the partner.
+    if (role == 'father' && stage == LifeStage.parenting.id) {
+      FatherPreview.instance.on = true;
+      return _parentingRoute();
+    }
     if (role == 'father') return _fatherRoute();
     if (stage == LifeStage.tryingToConceive.id) return _ttcRoute();
     if (stage == LifeStage.parenting.id) return _parentingRoute();

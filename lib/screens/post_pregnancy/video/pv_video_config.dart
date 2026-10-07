@@ -13,6 +13,7 @@
 //      kUseDevVideos - a data change, not a code change.
 // =============================================================================
 
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/widgets.dart';
 
 import '../pp_watch_data.dart';
@@ -23,7 +24,12 @@ const bool kEnableNativeVideo = true;
 
 /// Use the dev placeholder URL below. Turn OFF once the backend supplies real
 /// WatchVideo.videoUrl values so nothing dev-only ships.
-const bool kUseDevVideos = true;
+///
+/// ⚠️ DEBUG BUILDS ONLY since 2026-10-07 (gap analysis P1, Behind · Age by age):
+/// every mapped film pointed at ONE sample clip, so a release build played the
+/// same stranger's video under every phase title. Release and profile builds
+/// now show the calm poster until a real URL arrives. Was `true`.
+const bool kUseDevVideos = kDebugMode;
 
 /// Invisible screenshot / screen-record protection (Android FLAG_SECURE, iOS
 /// capture detection). Off by default: needs the native hook (documented in

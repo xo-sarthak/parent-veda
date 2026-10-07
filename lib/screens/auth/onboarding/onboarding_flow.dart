@@ -227,6 +227,15 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
   DateTime? _childDob;
   int? _childAge;
   bool? _childIsBoy;
+
+  // The birth, optional (gap analysis P1, Behind · Onboarding, 2026-10-07):
+  // how the baby was born, whether early (and the weeks, if known), and who is
+  // filling this in. Parenting only; none of it blocks Continue.
+  BirthMode? _birthMode;
+  bool? _bornEarly; // null = not answered; false = no; true = early
+  int? _bornWeeks;
+  bool _earlyNotSure = false;
+  CareRole? _careRole;
   // questions
   final Map<String, Set<String>> _answers = {};
   int _q = 0;
@@ -1597,7 +1606,8 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
               child: card(
                 'parenting',
                 'Parent — 0 to 5',
-                'Sleep and leaps',
+                // Gap analysis P2 (2026-10-07): the promise the setup makes. Kept for revert: 'Sleep and leaps'.
+                'Sleep, feeding and every month',
                 Icons.child_care_rounded,
                 205,
                 ObArt.stageParenting,
@@ -1703,6 +1713,12 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
     );
   }
 
+  /// The name as it reads mid-question: "Meera", or "your baby".
+  String _obChildName() {
+    final n = _childName.text.trim();
+    return n.isEmpty ? 'your baby' : n;
+  }
+
   Widget _dateChild(V2Palette p, {required bool skilling}) {
     final ready = skilling ? _childAge != null : _childDob != null;
     return ObPage(
@@ -1800,11 +1816,92 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
             ],
           ),
         ),
+        if (!skilling) ...[
+          const SizedBox(height: 10),
+          ObField(
+            p: p,
+            label: 'How was ${_obChildName()} born? Optional',
+            child: Wrap(spacing: 8, runSpacing: 8, children: [
+              for (final m in BirthMode.values)
+                ObPill(
+                  p: p,
+                  label: m.label,
+                  selected: _birthMode == m,
+                  onTap: () => setState(() => _birthMode = m),
+                ),
+            ]),
+          ),
+          const SizedBox(height: 10),
+          ObField(
+            p: p,
+            label: 'Was ${_obChildName()} born early? Optional',
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Wrap(spacing: 8, runSpacing: 8, children: [
+                ObPill(
+                  p: p,
+                  label: 'No',
+                  selected: _bornEarly == false,
+                  onTap: () => setState(() {
+                    _bornEarly = false;
+                    _bornWeeks = null;
+                  }),
+                ),
+                ObPill(
+                  p: p,
+                  label: 'Yes, early',
+                  selected: _bornEarly == true,
+                  onTap: () => setState(() => _bornEarly = true),
+                ),
+                ObPill(
+                  p: p,
+                  label: 'Not sure',
+                  selected: _earlyNotSure,
+                  onTap: () => setState(() {
+                    _earlyNotSure = true;
+                    _bornEarly = null;
+                    _bornWeeks = null;
+                  }),
+                ),
+              ]),
+              if (_bornEarly == true) ...[
+                const SizedBox(height: 10),
+                Text('At how many weeks, if you know?',
+                    style: pvManrope(fontSize: 13, fontWeight: FontWeight.w600, color: p.ink2)),
+                const SizedBox(height: 6),
+                Wrap(spacing: 6, runSpacing: 6, children: [
+                  for (var w = 26; w <= 36; w++)
+                    ObPill(
+                      p: p,
+                      label: '$w',
+                      selected: _bornWeeks == w,
+                      onTap: () => setState(() => _bornWeeks = w),
+                    ),
+                ]),
+              ],
+            ]),
+          ),
+          const SizedBox(height: 10),
+          ObField(
+            p: p,
+            label: 'Who are you to ${_obChildName()}? Optional',
+            child: Wrap(spacing: 8, runSpacing: 8, children: [
+              for (final r in CareRole.values)
+                ObPill(
+                  p: p,
+                  label: r.label,
+                  selected: _careRole == r,
+                  onTap: () => setState(() => _careRole = r),
+                ),
+            ]),
+          ),
+        ],
         const SizedBox(height: 14),
         Text(
           skilling
               ? 'The age is what the activities are chosen by. Nothing else is needed.'
-              : 'The name is optional — the birthday is what the months and the leaps are counted from.',
+              // "and the leaps" dropped 2026-10-07: the app no longer counts by them.
+              : 'The name is optional. The birthday is what the weeks and months are counted from; '
+                  'the birth answers make sure the right pages come first.',
           style: pvManrope(fontSize: 12.5, height: 1.45, color: p.ink3),
         ),
       ],
@@ -2424,8 +2521,18 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
     if (stage == 'parenting' && _childDob != null) {
       await ChildProfileStore.instance.addChild(
         name: _childName.text,
+        // A skipped "Boy or girl" is NOT a boy (gap analysis P1, 2026-10-07):
+        // isBoy is only a stand-in for the WHO chart, sexGiven says so.
         isBoy: _childIsBoy ?? true,
+        sexGiven: _childIsBoy != null,
         dob: _childDob!,
+      );
+      // The birth answers, on this child (2026-10-07).
+      FamilyProfileStore.instance.setBirthDetails(
+        mode: _birthMode,
+        early: _bornEarly,
+        bornWeeks: _bornWeeks,
+        role: _careRole,
       );
     }
     if (stage == 'skilling' && _childAge != null) {
@@ -2438,6 +2545,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
       await ChildProfileStore.instance.addChild(
         name: _childName.text,
         isBoy: _childIsBoy ?? true,
+        sexGiven: _childIsBoy != null,
         dob: dob,
       );
     }

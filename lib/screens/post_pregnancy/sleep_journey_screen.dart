@@ -18,6 +18,25 @@ import '../../brand/presented_by.dart';
 import 'pp_common.dart';
 import 'pp_sleep_data.dart';
 import 'pp_tools_kit.dart';
+import '../../theme/pv_fonts.dart';
+import '../brackets/hub/hub_intent_art.dart' show IntentMark;
+import '../doors/pv_list_row.dart';
+import '../pregnancy/preg_tool_chrome.dart';
+import '../products/pv_store_chrome.dart' show PvCommit;
+import '../ttc/ttc_tool_marks.dart';
+import '../v2/v2_palette.dart';
+import 'pp_care_history_screen.dart';
+import 'pp_care_parts.dart';
+import 'pp_search.dart' show openPpAskVeda;
+
+/// ⚠️ THE SHARED TOOL SHELL (2026-10-07, parenting gap pass), as the Feeding
+/// journey: `PregToolScaffold`, plain numbers on white (no purple numeral on a
+/// gradient, no lavender panel), and what the gap analysis asked (Behind ·
+/// Logging): "Show sleep history ... a 7 day row of total sleep" and a time row
+/// so last night can be entered this morning, on its own date. The Pampers
+/// line (`PresentedBy`, sold, kept) stays where it was, under the title. `false`
+/// draws the 2026-08 page (`_buildBeforeShell`), kept for revert.
+const bool kPpSleepJourneyShell = true;
 
 class SleepJourneyScreen extends StatefulWidget {
   const SleepJourneyScreen({super.key});
@@ -30,7 +49,147 @@ class _SleepJourneyScreenState extends State<SleepJourneyScreen> {
   final _store = SleepStore.instance;
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
+    _store.init();
+  }
+
+  /// Total minutes slept on each of the last 7 days, oldest first; a stretch
+  /// counts on the day it started.
+  List<int> _week() {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    return [
+      for (var i = 6; i >= 0; i--)
+        _store.all.where((x) {
+          final d = DateTime(x.start.year, x.start.month, x.start.day);
+          return d == today.subtract(Duration(days: i));
+        }).fold(0, (sum, x) => sum + x.minutes),
+    ];
+  }
+
+  @override
+  Widget build(BuildContext context) => kPpSleepJourneyShell ? _buildShell(context) : _buildBeforeShell(context);
+
+  Widget _buildShell(BuildContext context) {
+    return AnimatedBuilder(
+      animation: Listenable.merge([_store, ChildProfileStore.instance]),
+      builder: (context, _) {
+        final p = V2PaletteStore.instance.current;
+        final today = _store.todays;
+        final last = _store.last;
+        final wake = _store.currentWakeMinutes;
+        final c = _store.ageContext;
+        final tint = HSLColor.fromAHSL(1, 250, 0.52, 0.9).toColor();
+        return PregToolScaffold(
+          hue: 250,
+          eyebrow: 'Sleep',
+          mark: IntentMark.moonMark,
+          title: 'Sleep journey',
+          intro: 'A picture of rest: patterns to understand, never a target to hit.',
+          children: [
+            // Renders nothing unless this exact tool is sponsored. The sponsor
+            // gets a line; the tool stays entirely ours.
+            pregToolPad(const PresentedBy(
+              slot: BrandSlot.sponsoredTool,
+              stage: BrandStage.parenting,
+              placementKey: 'sleep_journey',
+              padding: EdgeInsets.only(bottom: 12),
+            )),
+            pregToolPad(PpCareStats([
+              (_store.totalMinutesToday == 0 ? '0m' : ppDur(_store.totalMinutesToday), 'slept today'),
+              (last == null ? 'None yet' : ppDur(last.minutes), 'last stretch'),
+              (wake == null ? 'Not yet' : ppDur(wake), 'awake for'),
+            ])),
+            const SizedBox(height: 14),
+            pregToolPad(Text(_store.todaysInsight, style: pvManrope(fontSize: 14, height: 1.5, color: p.ink1))),
+            const SizedBox(height: 18),
+            pregToolPad(PvCommit(key: const ValueKey('pp_sleep_log'), label: 'Log sleep', onTap: _openLogSheet)),
+            const SizedBox(height: 26),
+            pregToolPad(ppCareHeading("Today's sleep")),
+            const SizedBox(height: 6),
+            if (today.isEmpty)
+              pregToolPad(Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Text('No sleep logged today yet. Add a nap or last night whenever it suits; even a rough time helps.',
+                    key: const ValueKey('pp_sleep_empty'),
+                    style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2)),
+              ))
+            else
+              for (final x in today)
+                pregToolPad(PpCareEntryRow(
+                  key: ValueKey('pp_sleep_row_${x.id}'),
+                  title: '${_kindLabel(x.kind)} · ${ppDur(x.minutes)}',
+                  when: x.start,
+                  detail: 'Woke ${ppCareClock(x.end)}${x.note == null ? '' : ' · ${x.note}'}',
+                  onRemove: () {
+                    _store.remove(x.id);
+                    ppCareSaved(context, 'Sleep removed.', undo: () => _store.add(x));
+                  },
+                )),
+            const SizedBox(height: 26),
+            pregToolPad(ppCareHeading('This week')),
+            const SizedBox(height: 12),
+            pregToolPad(PpWeekBars(values: _week(), unit: 'of sleep', format: (m) => ppDur(m))),
+            const SizedBox(height: 26),
+            pregToolPad(ppCareHeading('Typical for ${ChildProfileStore.instance.ageLabel}')),
+            const SizedBox(height: 4),
+            pregToolPad(Text('Ranges, never targets: every baby sits somewhere on them.',
+                style: pvManrope(fontSize: 13, color: p.ink2))),
+            const SizedBox(height: 14),
+            pregToolPad(PpCareStats([
+              (c.totalLabel, 'in 24 hours'),
+              (c.napsLabel, 'naps'),
+              (c.wakeLabel, 'awake between'),
+            ])),
+            const SizedBox(height: 12),
+            pregToolPad(Text(c.blurb, style: pvManrope(fontSize: 14, height: 1.55, color: p.ink1))),
+            const SizedBox(height: 26),
+            pregToolPad(ppCareHeading('Patterns worth noticing')),
+            const SizedBox(height: 4),
+            pregToolPad(Text('Things some families notice: never a cause, just something to watch.',
+                style: pvManrope(fontSize: 13, color: p.ink2))),
+            const SizedBox(height: 10),
+            for (final (title, line) in _store.correlations)
+              pregToolPad(Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(title, style: pvManrope(fontSize: 14.5, fontWeight: FontWeight.w700, color: p.ink1)),
+                  const SizedBox(height: 2),
+                  Text(line, style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2)),
+                ]),
+              )),
+            const SizedBox(height: 16),
+            pregToolPad(PvListRow(
+              key: const ValueKey('pp_sleep_go_history'),
+              p: p,
+              leading: TtcMarkLeading(tool: TtcToolMark.cycleReport, tint: tint, size: 40),
+              title: 'The last 7 days',
+              line: 'Sleep, feeds and nappies, and a summary for your doctor',
+              onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+                settings: const RouteSettings(name: 'pp_care_history'),
+                builder: (_) => const PpCareHistoryScreen(initial: PpCareMetric.sleep),
+              )),
+            )),
+            const SizedBox(height: 22),
+            pregToolPad(ppCareHeading('Questions parents ask')),
+            const SizedBox(height: 4),
+            for (final q in const [
+              'Why do babies wake through the night?',
+              'What is the 4-month sleep regression?',
+              'How do wake windows change with age?',
+              'What are safe sleep guidelines?',
+            ])
+              pregToolPad(PpCareQuestionRow(question: q, onTap: () => openPpAskVeda(context, q))),
+            const SizedBox(height: 32),
+          ],
+        );
+      },
+    );
+  }
+
+  /// The 2026-08 page, kept for revert (`kPpSleepJourneyShell = false`).
+  Widget _buildBeforeShell(BuildContext context) {
     return Scaffold(
       backgroundColor: ppBg,
       body: SafeArea(
@@ -293,7 +452,47 @@ class _SleepJourneyScreenState extends State<SleepJourneyScreen> {
       );
 
   // ---- log sheet ----------------------------------------------------------
-  void _openLogSheet() {
+  void _openLogSheet() => kPpSleepJourneyShell ? _openShellSheet() : _openClassicSheet();
+
+  /// Fell asleep and woke up, each with its own date, so last night can be
+  /// entered this morning without it landing on the wrong day.
+  void _openShellSheet() {
+    var end = DateTime.now();
+    var start = end.subtract(const Duration(minutes: 90));
+    var kind = SleepKind.nap;
+    showPpCareSheet(
+      context,
+      title: 'Log sleep',
+      saveLabel: 'Save sleep',
+      body: (setSheet) => [
+        ppCareLabel('Fell asleep'),
+        PpWhenRow(when: start, onChanged: (t) => setSheet(() => start = t)),
+        const SizedBox(height: 12),
+        ppCareLabel('Woke up'),
+        PpWhenRow(when: end, onChanged: (t) => setSheet(() => end = t)),
+        const SizedBox(height: 16),
+        ppCareLabel('What kind of sleep?'),
+        ppCareChoices<SleepKind>(
+          values: SleepKind.values,
+          selected: kind,
+          label: _kindLabel,
+          keyPrefix: 'pp_sleep_kind',
+          onPick: (k) => setSheet(() => kind = k ?? kind),
+        ),
+      ],
+      onSave: () {
+        if (!end.isAfter(start)) {
+          ppCareSaved(context, 'Nothing saved: woke up must be after fell asleep.');
+          return;
+        }
+        _store.log(start: start, end: end, kind: kind);
+        ppCareSaved(context, '${_kindLabel(kind)} saved: ${ppDur(end.difference(start).inMinutes)}.');
+      },
+    );
+  }
+
+  /// The 2026-08 sheet, kept for revert.
+  void _openClassicSheet() {
     final now = TimeOfDay.now();
     TimeOfDay start = _minus(now, 90);
     TimeOfDay end = now;

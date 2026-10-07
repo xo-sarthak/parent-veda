@@ -44,11 +44,21 @@ final PpDoor kPpYouMaaDoor = PpDoor(
   tabs: const [
     PpDoorTab(
       id: 'today',
-      label: 'How are you today, Maa?',
+      label: 'How are you today?',
       icon: Icons.favorite_border_rounded,
       hue: 288,
       areaIds: ['how_are_you', 'your_mind'],
       redFlagPageId: 'you_route_scary',
+      // The two-question check-in (gap analysis P2, 2026-10-07): no score,
+      // nothing saved, the crisis path pinned. The triage stays above it.
+      tools: [
+        PpDoorTool(
+          label: 'How have you been?',
+          blurb: 'Two questions about the last two weeks. No score, nothing saved.',
+          surfaceId: 'pp_mood_check',
+          icon: Icons.favorite_border_rounded,
+        ),
+      ],
       footer: 'Nothing here judges you, and nothing here will tell you that '
           'you are a danger to your baby.',
     ),
@@ -64,7 +74,7 @@ final PpDoor kPpYouMaaDoor = PpDoor(
       label: 'Moving and eating',
       icon: Icons.restaurant_outlined,
       hue: 96,
-      areaIds: ['movement', 'feeding_yourself', 'healing_kitchen'],
+      areaIds: ['movement', 'feeding_yourself', 'healing_kitchen', 'can_i_feeding'],
       footer: 'For your back, your mood and your sleep. Not for your weight, '
           'anywhere on this door.',
     ),

@@ -17,6 +17,13 @@ import 'pp_child_profile.dart';
 import 'pp_common.dart';
 import 'pp_what_changed_data.dart';
 import 'problem_solver_screen.dart';
+import '../../theme/pv_fonts.dart';
+import '../brackets/hub/hub_intent_art.dart' show IntentMark;
+import '../doors/pv_list_row.dart';
+import '../pregnancy/preg_tool_chrome.dart';
+import '../products/pv_store_chrome.dart' show PvCommit, kPvInk, pvStorePalette;
+import '../v2/v2_palette.dart' show V2Palette;
+import 'pp_care_parts.dart' show ppCareHeading;
 
 /// Replace `{baby}` with the child's first name (fallback: "your baby").
 String _fill(String s) {
@@ -27,6 +34,9 @@ String _fill(String s) {
 // =============================================================================
 //  Hub — search + most common + browse by area
 // =============================================================================
+/// The shared tool shell for What changed (2026-10-07). False draws the old page.
+const bool kPpWhatChangedShell = true;
+
 class WhatChangedScreen extends StatefulWidget {
   const WhatChangedScreen(
       {super.key, this.initialQuery, this.initialCategories});
@@ -93,6 +103,86 @@ class _WhatChangedScreenState extends State<WhatChangedScreen> {
         ? wcSearch(_query)
         : (scoped ?? const <WcConcern>[]);
 
+    // The shell every TTC and pregnancy tool wears (2026-10-07): search as a
+    // pill, concerns as PvListRow groups under the caps eyebrow, as the Tools
+    // tab draws them. `_buildBeforeShell` below is the page before.
+    if (kPpWhatChangedShell) return _shell(results, searching);
+    return _buildBeforeShell(results, searching);
+  }
+
+  Widget _shell(List<WcConcern> results, bool searching) {
+    final p = pvStorePalette;
+    Widget eyebrow(String t) => pregToolPad(Text(t.toUpperCase(),
+        style: pvManrope(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.4, color: p.action)));
+    Widget row(WcConcern c) => PvListRow(
+          key: ValueKey('wc_row_${c.id}'),
+          p: p,
+          leading: PvMarkWell(p: p, hue: 285, size: 40, icon: c.icon),
+          title: _fill(c.label),
+          line: c.category,
+          onTap: () => _open(c),
+        );
+    final common = wcCommon;
+    return PregToolScaffold(
+      hue: 285,
+      eyebrow: 'Development',
+      mark: IntentMark.nextStep,
+      title: 'Something changed?',
+      intro: _fill('Tell us what you are noticing about {baby}, and we will walk through the likely cause together.'),
+      children: [
+        pregToolPad(TextField(
+          key: const ValueKey('wc_search'),
+          controller: _search,
+          onChanged: (v) => setState(() => _query = v),
+          style: pvManrope(fontSize: 15, fontWeight: FontWeight.w500, color: p.ink1),
+          decoration: InputDecoration(
+            hintText: 'waking, rash, not eating...',
+            hintStyle: pvManrope(fontSize: 15, color: p.ink3),
+            filled: true,
+            fillColor: Colors.white,
+            prefixIcon: Icon(Icons.search_rounded, size: 20, color: p.ink3),
+            contentPadding: const EdgeInsets.symmetric(vertical: 14),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(999), borderSide: BorderSide(color: p.line)),
+            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(999), borderSide: BorderSide(color: p.line)),
+            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(999), borderSide: BorderSide(color: p.ink1)),
+          ),
+        )),
+        const SizedBox(height: 8),
+        if (searching) ...[
+          const SizedBox(height: 16),
+          if (results.isEmpty)
+            pregToolPad(Text('No match for "$_query" yet. Try a word like waking, rash or not eating.',
+                style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2)))
+          else ...[
+            eyebrow('${results.length} match${results.length == 1 ? '' : 'es'}'),
+            const SizedBox(height: 6),
+            pregToolPad(PvRowGroup(p: p, children: [for (final c in results) row(c)])),
+          ],
+        ] else ...[
+          if (common.isNotEmpty) ...[
+            const SizedBox(height: 20),
+            eyebrow('Most common'),
+            const SizedBox(height: 6),
+            pregToolPad(PvRowGroup(p: p, children: [for (final c in common) row(c)])),
+          ],
+          for (final cat in wcCategories) ...[
+            const SizedBox(height: 24),
+            eyebrow(cat),
+            const SizedBox(height: 6),
+            pregToolPad(PvRowGroup(p: p, children: [
+              for (final c in kWcConcerns.where((c) => c.category == cat)) row(c),
+            ])),
+          ],
+        ],
+        const SizedBox(height: 22),
+        pregToolPad(Text('A guided starting point, not a diagnosis. If something worries you, check with a doctor.',
+            style: pvManrope(fontSize: 12.5, height: 1.55, color: p.ink3))),
+      ],
+    );
+  }
+
+  // Kept for revert (2026-10-07): the page before the shared shell.
+  Widget _buildBeforeShell(List<WcConcern> results, bool searching) {
     return Scaffold(
       backgroundColor: ppBg,
       body: SafeArea(
@@ -305,8 +395,264 @@ class _WcFlowScreenState extends State<WcFlowScreen> {
   void _push(BuildContext context, Widget s) =>
       Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => s));
 
+  void _reset() => setState(() {
+        _showResult = false;
+        _step = 0;
+        for (int i = 0; i < _answers.length; i++) {
+          _answers[i] = null;
+        }
+      });
+
+  void _advance() => setState(() {
+        if (_step < _count - 1) {
+          _step++;
+        } else {
+          _showResult = true;
+        }
+      });
+
+  // ---- the one ParentVeda look (2026-10-07) ------------------------------------
+  //  The flow on the shell every TTC and pregnancy tool wears, the same field
+  //  and hue as the What changed list above it: the concern as the serif title,
+  //  the steps as an ink rail, options as white hairline cards, one ink button
+  //  in the flow (not floating, so it never sits over the last option), and the
+  //  result as one white card. The tone (urgent / worth checking / likely) keeps
+  //  its own colour on the label and the card's edge: a red-flag result must not
+  //  read like a benign one. The not-a-diagnosis line and the route to a doctor
+  //  are unchanged. `_buildBeforeShell` is the page before, kept for revert.
   @override
   Widget build(BuildContext context) {
+    final p = pvStorePalette;
+    return PregToolScaffold(
+      hue: 285,
+      variant: 3,
+      eyebrow: "You're looking into",
+      title: _fill(widget.concern.quote),
+      action: _showResult
+          ? Semantics(
+              button: true,
+              label: 'Start again',
+              child: InkWell(
+                key: const ValueKey('wc_flow_reset'),
+                onTap: _reset,
+                borderRadius: BorderRadius.circular(999),
+                child: Container(
+                  height: 38,
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(color: p.surface.withValues(alpha: 0.9), borderRadius: BorderRadius.circular(999)),
+                  child: Text('Reset', style: pvManrope(fontSize: 13, fontWeight: FontWeight.w700, color: kPvInk)),
+                ),
+              ),
+            )
+          : null,
+      children: [
+        pregToolPad(_shellJourney(p)),
+        if (_showResult) ..._shellResult(context, p) else ..._shellQuestion(p),
+        const SizedBox(height: 22),
+        pregToolPad(Text('A guided starting point, not a diagnosis. If something worries you, always check with a doctor.',
+            style: pvManrope(fontSize: 12.5, height: 1.55, color: p.ink3))),
+      ],
+    );
+  }
+
+  Widget _shellJourney(V2Palette p) => Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        for (int i = 0; i < _count; i++) ...[
+          if (i > 0)
+            Container(
+              width: 12,
+              height: 2,
+              margin: const EdgeInsets.only(top: 16),
+              color: (_showResult || i <= _step) ? kPvInk : p.line,
+            ),
+          Expanded(
+            child: Builder(builder: (_) {
+              final done = _showResult || i < _step;
+              final current = !_showResult && i == _step;
+              return Column(children: [
+                Container(
+                  width: 34,
+                  height: 34,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: done ? kPvInk : Colors.white,
+                    border: done ? null : Border.all(color: current ? kPvInk : p.line, width: current ? 1.6 : 1),
+                  ),
+                  child: done
+                      ? const Icon(Icons.check_rounded, size: 15, color: Colors.white)
+                      : Icon(_steps[i].icon, size: 15, color: current ? kPvInk : p.ink3),
+                ),
+                const SizedBox(height: 6),
+                Text(_steps[i].category,
+                    style: pvManrope(
+                        fontSize: 10,
+                        fontWeight: current || done ? FontWeight.w800 : FontWeight.w600,
+                        color: current || done ? p.ink1 : p.ink3),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis),
+              ]);
+            }),
+          ),
+        ],
+      ]);
+
+  List<Widget> _shellQuestion(V2Palette p) {
+    final s = _steps[_step];
+    final answered = _answers[_step] != null;
+    return [
+      const SizedBox(height: 26),
+      pregToolPad(Text('QUESTION ${_step + 1} OF $_count · ${s.category.toUpperCase()}',
+          style: pvManrope(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.4, color: p.action))),
+      const SizedBox(height: 8),
+      pregToolPad(ppCareHeading(_fill(s.prompt))),
+      const SizedBox(height: 16),
+      for (int i = 0; i < s.options.length; i++) pregToolPad(_shellOption(p, i, _fill(s.options[i]))),
+      const SizedBox(height: 10),
+      pregToolPad(PvCommit(
+        key: const ValueKey('wc_flow_next'),
+        label: _step < _count - 1 ? 'Continue' : 'See the likely cause',
+        onTap: answered ? _advance : null,
+      )),
+    ];
+  }
+
+  Widget _shellOption(V2Palette p, int i, String label) {
+    final sel = _answers[_step] == i;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Material(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        child: InkWell(
+          onTap: () => setState(() => _answers[_step] = i),
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: sel ? kPvInk : p.line, width: sel ? 1.6 : 1),
+            ),
+            child: Row(children: [
+              Container(
+                width: 22,
+                height: 22,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: sel ? kPvInk : Colors.transparent,
+                  border: Border.all(color: sel ? kPvInk : p.ink3, width: 1.5),
+                ),
+                child: sel ? const Icon(Icons.check_rounded, size: 13, color: Colors.white) : null,
+              ),
+              const SizedBox(width: 13),
+              Expanded(
+                  child: Text(label,
+                      style: pvManrope(
+                          fontSize: 14.5, height: 1.4, fontWeight: sel ? FontWeight.w700 : FontWeight.w500, color: p.ink1))),
+            ]),
+          ),
+        ),
+      ),
+    );
+  }
+
+  List<Widget> _shellResult(BuildContext context, V2Palette p) {
+    // The diagnosis depends on the parent's answers (red flags route to urgent
+    // results); the concern's own result is the benign fallback.
+    final r = wcResultFor(widget.concern, _answers);
+    final urgent = r.tone == WcTone.urgent;
+    final caution = r.tone == WcTone.caution;
+    final tone = urgent ? const Color(0xFFB3261E) : (caution ? const Color(0xFF8A5300) : p.action);
+    final label = urgent ? 'SEE A DOCTOR NOW' : (caution ? 'WORTH GETTING CHECKED' : 'MOST LIKELY CAUSE');
+    final labelIcon = urgent
+        ? Icons.warning_amber_rounded
+        : (caution ? Icons.info_outline_rounded : Icons.lightbulb_outline_rounded);
+    final body = pvManrope(fontSize: 14, height: 1.55, color: p.ink1);
+    Widget row(String key, IntentMark mark, double hue, String title, String line, Widget screen) => PvListRow(
+          key: ValueKey(key),
+          p: p,
+          leading: PvMarkWell(p: p, hue: hue, size: 40, mark: mark),
+          title: title,
+          line: line,
+          onTap: () => _push(context, screen),
+        );
+    return [
+      const SizedBox(height: 26),
+      pregToolPad(Container(
+        key: const ValueKey('wc_flow_result'),
+        padding: const EdgeInsets.all(18),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: urgent ? tone : p.line, width: urgent ? 1.6 : 1),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            Icon(labelIcon, size: 15, color: tone),
+            const SizedBox(width: 6),
+            Flexible(
+              child: Text(label,
+                  style: pvManrope(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.2, color: tone)),
+            ),
+          ]),
+          const SizedBox(height: 10),
+          Text(_fill(r.cause),
+              style: pvFraunces(fontSize: 22, fontWeight: FontWeight.w600, height: 1.2, color: p.ink1)),
+          const SizedBox(height: 8),
+          Text(_fill(r.explanation), style: body),
+          Padding(padding: const EdgeInsets.symmetric(vertical: 16), child: Container(height: 1, color: p.line)),
+          Text('What to try', style: pvManrope(fontSize: 14, fontWeight: FontWeight.w800, color: p.ink1)),
+          const SizedBox(height: 10),
+          for (int i = 0; i < r.todos.length; i++)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Container(
+                  width: 24,
+                  height: 24,
+                  alignment: Alignment.center,
+                  decoration: const BoxDecoration(color: kPvInk, shape: BoxShape.circle),
+                  child: Text('${i + 1}',
+                      style: pvManrope(fontSize: 12, fontWeight: FontWeight.w800, color: Colors.white)),
+                ),
+                const SizedBox(width: 12),
+                Expanded(child: Text(_fill(r.todos[i]), style: body)),
+              ]),
+            ),
+        ]),
+      )),
+
+      // escalation: the route to a doctor, unchanged in target and words.
+      const SizedBox(height: 16),
+      pregToolPad(PvRowGroup(p: p, children: [
+        row('wc_flow_escalate', IntentMark.askDoctor, 350,
+            urgent ? _fill('Get {baby} seen now') : 'Still worried?',
+            urgent ? 'Find a paediatrician or urgent care' : 'Talk to a paediatrician near you',
+            const ProblemSolverScreen()),
+      ])),
+
+      // cross-app: what helps, gathered from across ParentVeda.
+      const SizedBox(height: 26),
+      pregToolPad(ppCareHeading('Everything that helps, gathered')),
+      const SizedBox(height: 4),
+      pregToolPad(Text('Pulled from across ParentVeda, for exactly this.',
+          style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2))),
+      const SizedBox(height: 12),
+      pregToolPad(PvRowGroup(p: p, children: [
+        row('wc_flow_phase', IntentMark.timelineRail, 285, _fill('Where {baby} is right now'), 'The phase map',
+            const PhaseMapScreen()),
+        row('wc_flow_community', IntentMark.cuppedHands, 20, 'Parents going through this too', 'Community',
+            const CommunityScreen()),
+        row('wc_flow_expert', IntentMark.askDoctor, 206, 'Talk it through with a paediatrician', 'Ask an expert',
+            const ProblemSolverScreen()),
+      ])),
+    ];
+  }
+
+  // Kept for revert (2026-10-07): the page before the shared shell.
+  // ignore: unused_element
+  Widget _buildBeforeShell(BuildContext context) {
     return Scaffold(
       backgroundColor: ppBg,
       body: SafeArea(

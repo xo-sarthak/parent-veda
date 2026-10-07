@@ -139,6 +139,7 @@ import 'package:parentveda/screens/post_pregnancy/pp_nuskhe_data.dart';
 import 'package:parentveda/screens/post_pregnancy/watch_channel_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/watch_shorts_screen.dart';
 import 'package:parentveda/screens/learn/pv_lesson_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/pp_opening_soon.dart';
 
 void main() {
   healthTwoStateTests();
@@ -229,7 +230,7 @@ void main() {
     'Provider profile': const ProviderProfileScreen(),
     'Expert profile (Ananya)': ProviderProfileScreen(expert: expertById('ananya')),
     'Expert profile (Meera)': ProviderProfileScreen(expert: expertById('meera')),
-    'Dadi/Nani Nuskhe': const NuskheScreen(),
+    'Home remedies': const NuskheScreen(), // was Dadi/Nani Nuskhe (2026-10-07)
     'Remedy detail': const RemedyDetailScreen(),
     'Article archive': const ArticleArchiveScreen(),
     'Article reader': const ArticleReaderScreen(),
@@ -599,7 +600,8 @@ void main() {
     expect(find.text('HEALTHIER VERSION'), findsNothing);
     expect(find.text('Everyday'), findsNothing);
     // The replacement is present and reachable.
-    expect(find.text('WHY THIS IS GOOD FOR HIM'), findsOneWidget);
+    // The shared tool shell (2026-10-07): the heading is "Why it is good".
+    expect(find.text('Why it is good'), findsOneWidget);
     // And the equipment call-out lands with the ingredients.
     await tester.scrollUntilVisible(
       find.text('You will need'),
@@ -644,6 +646,14 @@ void main() {
     await tester.pumpWidget(const MaterialApp(home: CommunityScreen()));
     await tester.pumpAndSettle();
 
+    // Held behind Opening soon until the community is real (gap analysis P1,
+    // 2026-10-07; pp_opening_soon.dart). The seeded feed below the flag is
+    // still built when kPpCommunityOpen flips; until then the page is honest.
+    if (!kPpCommunityOpen) {
+      expect(find.byKey(const ValueKey('pp_community_opening_soon')), findsOneWidget);
+      expect(tester.takeException(), isNull);
+      return;
+    }
     expect(find.textContaining('now for this stage'), findsOneWidget); // subline
     expect(find.text('0–1 Year'), findsWidgets); // parenting room chip + post tag
 
@@ -803,12 +813,16 @@ void main() {
 
     // Nothing is pre-marked any more, so the spotlight falls on the earliest
     // visit she has not recorded - honest, and the thing to act on first.
-    expect(find.text('BCG · At birth'), findsWidgets);
-    await tester.tap(find.text('BCG · At birth').first);
+    // The shell tracker (2026-10-07) lists every visit as a row; the birth
+    // visit opens its detail.
+    final birth = find.byKey(const ValueKey('pp_vax_row_birth'));
+    await tester.ensureVisible(birth);
+    await tester.pumpAndSettle();
+    await tester.tap(birth);
     await tester.pumpAndSettle();
 
     // its detail (Learn Why + After-Care) opens
-    expect(find.text('BCG'), findsWidgets);
+    expect(find.byType(VaxDetailScreen), findsOneWidget);
     await tester.scrollUntilVisible(find.text('After the shot'), 300,
         scrollable: find.byType(Scrollable).first, maxScrolls: 40);
     expect(find.text('After the shot'), findsOneWidget);
@@ -936,6 +950,10 @@ void main() {
 
     await tester.scrollUntilVisible(find.text('Start discovering'), 200,
         scrollable: find.byType(Scrollable).first, maxScrolls: 20);
+    // The quiz moved onto the tool shell (2026-10-07): the button is built
+    // inside the list's cache before it is on screen; bring it fully on screen.
+    await tester.ensureVisible(find.text('Start discovering'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Start discovering'));
     await tester.pumpAndSettle();
 
@@ -943,6 +961,8 @@ void main() {
     expect(find.text('Discover names one by one'), findsOneWidget);
     await tester.scrollUntilVisible(find.text("Let's begin"), 200,
         scrollable: find.byType(Scrollable).first, maxScrolls: 20);
+    await tester.ensureVisible(find.text("Let's begin")); // 2026-10-07, as above
+    await tester.pumpAndSettle();
     await tester.tap(find.text("Let's begin"));
     await tester.pumpAndSettle();
 
@@ -963,6 +983,9 @@ void main() {
 
     await tester.scrollUntilVisible(find.text('Just show me names'), 200,
         scrollable: find.byType(Scrollable).first, maxScrolls: 20);
+    // The 2,031-name catalogue (2026-10-07) grew the feed; bring it fully on screen.
+    await tester.ensureVisible(find.text('Just show me names'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Just show me names'));
     await tester.pumpAndSettle();
 

@@ -43,13 +43,13 @@ void main() {
   final door = ppDoorFor('parenting_health')!;
 
   group('the map', () {
-    test('six tabs, on the brief\'s call, and every collection placed or named as merged', () {
-      expect(door.tabs, hasLength(6));
+    test('seven tabs (Medicines added 2026-10-07), and every collection placed or named as merged', () {
+      expect(door.tabs, hasLength(7));
       final placed = [for (final t in door.tabs) ...t.areaIds];
       expect({...placed, ...door.hiddenAreaIds}, {for (final a in _health.areas) a.id});
       expect(placed, hasLength(placed.toSet().length));
       expect(door.hiddenAreaIds, ['not_sure'], reason: 'the flow that IS the What Changed tool');
-      expect([for (final t in door.tabs) t.id], ['wrong', 'help', 'shots', 'growing', 'well', 'records']);
+      expect([for (final t in door.tabs) t.id], ['wrong', 'help', 'shots', 'growing', 'well', 'medicines', 'records']);
     });
 
     test('get help now: the canonical list pinned, the signs film, the speeds as a story, the three new pieces', () {
@@ -66,8 +66,11 @@ void main() {
       expect(speeds.blocks.single, isA<PpInteractive>());
       expect((speeds.blocks.single as PpInteractive).items, hasLength(9), reason: 'the nine rows of the table');
       expect(_page('health_choking_response').orderedBlocks.first, isA<PpVideoSlot>());
-      expect(_page('health_fit').comingSoon, isTrue);
-      expect(_page('health_accidents').comingSoon, isTrue);
+      // Filled 2026-10-02 from the parenting gap analysis.
+      expect(_page('health_fit').comingSoon, isFalse);
+      expect(_page('health_fit').orderedBlocks.first, isA<PpVideoSlot>());
+      expect(_page('health_accidents').comingSoon, isFalse);
+      expect(_page('health_accidents').blocks, isNotEmpty);
       expect(door.tabs[1].footer, contains('believe yourself'));
       expect(door.tabs[0].jumpToTabId, 'help', reason: 'panic is one tap from the default tab');
     });
@@ -91,7 +94,7 @@ void main() {
           PpIllustrationKind.rashGrid);
       expect(_page('skin_which_rash').blocks.whereType<PpIllustration>().single.labels, hasLength(8));
       expect(_page('skin_which_rash').blocks.whereType<PpCallout>().any((c) => c.title == 'The glass test'), isTrue);
-      expect(_page('ill_teething_fever').comingSoon, isTrue);
+      expect(_page('ill_teething_fever').comingSoon, isFalse, reason: 'filled 2026-10-02');
     });
 
     test('the dosing page is reframed: no numbers, the bottle and the mistakes', () {
@@ -112,7 +115,7 @@ void main() {
       }
       expect(_listed('vaccines'), isNot(contains('vax_schedule')));
       expect(door.tabs[2].tools.single.surfaceId, 'pp_vaccines');
-      expect(door.tabs[5].tools.map((t) => t.surfaceId).toSet(), {'pp_health_home', 'pp_emergency_card', 'pp_doctor_visit'});
+      expect(door.tabs[6].tools.map((t) => t.surfaceId).toSet(), {'pp_health_home', 'pp_emergency_card', 'pp_doctor_visit'});
       // the remedies pages open the one tool, filtered
       expect(_page('fever_remedies').toolSurfaceId, 'pp_nuskhe/Fever');
       expect(_page('cough_remedies').toolSurfaceId, 'pp_nuskhe/Cold & cough');
@@ -190,7 +193,10 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Go to a hospital now'), findsWidgets);
       expect(find.textContaining('believe yourself'), findsOneWidget);
-      expect(find.text('Coming soon'), findsWidgets, reason: 'the scaffolds hold their place');
+      // The tab's two scaffolds (health_fit, health_accidents) were filled
+      // 2026-10-02, so nothing on Get help now is coming soon any more.
+      expect(find.text('Coming soon'), findsNothing, reason: 'the scaffolds are filled');
+      expect(find.text('Common accidents, fast'), findsWidgets);
     });
   });
 }

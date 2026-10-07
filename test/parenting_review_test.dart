@@ -116,7 +116,9 @@ void main() {
   // ==========================================================================
   group('bottom nav — Brain replaces Ask Veda', () {
     test('the Brain tab opens Brain Development', () {
-      expect(nav.contains('const GrowHomeScreen()'), isTrue);
+      // The one-ParentVeda Brain tab since 2026-10-07 (pp_brain_tab.dart);
+      // GrowHomeScreen is kept for revert in a comment.
+      expect(nav.contains('const PpBrainTabScreen()'), isTrue);
       // The v2 label was 'Brain'; the 2026-09-16 V3 home design renamed the
       // tab "Brain activities" (two lines) and moved it to fourth. The v2
       // tuple is kept commented in pp_common.dart.

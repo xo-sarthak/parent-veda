@@ -104,7 +104,7 @@ const PpBandSet kPpHealthBands = PpBandSet([
     label: 'Newborn, 0 to 3 months',
     fromMonths: 0,
     toMonths: 3,
-    blurb: 'The age where a fever is never watched at home, and a few ordinary '
+    blurb: 'The age when a fever is never watched at home, and a few ordinary '
         'things look frightening.',
   ),
   PpBand(
@@ -119,15 +119,15 @@ const PpBandSet kPpHealthBands = PpBandSet([
     label: '1 to 3 years',
     fromMonths: 12,
     toMonths: 36,
-    blurb: 'The illness years. Creche, playgroup, and one thing after another.',
+    blurb: 'The illness years. Creche, playgroup, and one bug after another.',
   ),
   PpBand(
     id: 'hb_child',
     label: '3 to 5 years',
     fromMonths: 36,
     toMonths: 72,
-    blurb: 'Fewer bugs, longer sentences, and a child who can tell you where '
-        'it hurts.',
+    blurb: 'Fewer bugs, longer sentences, and a child who can show you where it '
+        'hurts.',
   ),
 ]);
 
@@ -140,7 +140,7 @@ final PpSection kPpHealthSection = PpSection(
   title: 'Health',
   subtitle: 'Is this normal, and does it need a doctor?',
   intro: 'When something is wrong, a fast and calm answer. When nothing is '
-      'wrong, the proof that nothing is wrong.',
+      'wrong, you\'ll know that too.',
   bandSet: kPpHealthBands,
   // ⚠️ THE AGE RULE. No chips; the door opens on his band.
   autoScope: true,
@@ -156,6 +156,10 @@ final PpSection kPpHealthSection = PpSection(
     _growth,
     _records,
     _prevention,
+    _medicines,
+    _teethEyesEars,
+    _newbornChecks,
+    _longTerm,
   ],
   tools: [
     // ⚠️ THE ONE GENUINELY NEW TOOL. The spec calls it the flagship and says
@@ -170,36 +174,36 @@ final PpSection kPpHealthSection = PpSection(
     PpSectionTool(
       label: 'Create your emergency card',
       blurb: 'Weight, blood group, allergies and two numbers, on one screen '
-          'anybody can open. Five minutes, once.',
+          'anyone can open. Five minutes, once.',
       surfaceId: 'pp_emergency_card',
       icon: Icons.contact_emergency_outlined,
     ),
     PpSectionTool(
       label: 'Fever check',
-      blurb: 'His age and his temperature, and a straight answer: see a doctor '
-          'now, or watch him at home. Ten seconds.',
+      blurb: 'Your child\'s age and temperature, and a clear answer: see a '
+          'doctor now, or watch at home. Ten seconds.',
       surfaceId: 'pp_fever_check',
       icon: Icons.thermostat_outlined,
     ),
     // ⚠️ EVERYTHING BELOW IS REUSED, NOT REBUILT.
     PpSectionTool(
-      label: 'His shots, and what is due next',
-      blurb: 'The IAP schedule, what he has had, and a reminder before the next '
-          'one is due.',
+      label: 'Vaccines, and what\'s due next',
+      blurb: 'The IAP schedule, what your child has had, and a reminder before '
+          'the next one is due.',
       surfaceId: 'pp_vaccines',
       icon: Icons.vaccines_outlined,
     ),
     PpSectionTool(
       label: 'Weight, height and head size',
-      blurb: 'Plot him over time and see his own curve rather than a single '
-          'number on a bad day.',
+      blurb: 'Plot your child\'s growth over time and see the curve it makes, '
+          'not one number on a bad day.',
       surfaceId: 'pp_growth',
       icon: Icons.straighten_outlined,
     ),
     PpSectionTool(
-      label: 'His health papers, in one place',
-      blurb: 'Prescriptions, reports, visits, medicines and allergies, so you '
-          'are not hunting through a drawer at the clinic.',
+      label: 'Your child\'s health papers, in one place',
+      blurb: 'Prescriptions, reports, visits, medicines and allergies, so '
+          'you\'re not hunting through a drawer at the clinic.',
       surfaceId: 'pp_health_home',
       icon: Icons.folder_shared_outlined,
     ),
@@ -207,8 +211,8 @@ final PpSection kPpHealthSection = PpSection(
     // to show" were one tool listed twice. One entry, above.
     PpSectionTool(
       label: 'Before you see the doctor',
-      blurb: 'Build the list of questions while you remember them, so the seven '
-          'minutes are not wasted.',
+      blurb: 'Write your questions down while you remember them, so the seven '
+          'minutes count.',
       surfaceId: 'pp_doctor_visit',
       icon: Icons.medical_information_outlined,
     ),
@@ -221,8 +225,8 @@ final PpSection kPpHealthSection = PpSection(
     ),
     PpSectionTool(
       label: 'Home remedies, marked honestly',
-      blurb: 'The nuskhe that help, the ones that only comfort, and the few that '
-          'are genuinely unsafe.',
+      blurb: 'The home remedies that help, the ones that only comfort, and the few '
+          'that aren\'t safe.',
       surfaceId: 'pp_nuskhe',
       icon: Icons.spa_outlined,
     ),
@@ -255,8 +259,8 @@ final PpArea _emergency = PpArea(
       format: 'RED FLAG',
       blocks: [
         PpIntro('This is the fastest page in the app. If any line below matches '
-            'what you are seeing, stop reading and go. Everything else in Health '
-            'will still be here when you are back.'),
+            'what you\'re seeing, stop reading and go. Everything else in '
+            'Health will be here when you\'re back.'),
         // REQUIRED_REVIEW: THE WHOLE OF THIS CALLOUT IS A RED FLAG LIST AND
         // MUST BE CONFIRMED BY A PAEDIATRICIAN BEFORE RELEASE. Specifically:
         //   * Fever of 100.4 F or 38 C in a baby under 3 months, treated as a
@@ -268,8 +272,8 @@ final PpArea _emergency = PpArea(
         //   * Any fit or seizure, including a first febrile fit.
         //   * Green or yellow vomit, and a swollen tender belly.
         PpCallout(
-          kPpGoNowSigns.join('. ') + '. Any of these is a hospital, now, not '
-              'a phone call first.',
+          kPpGoNowSigns.join('. ') + '. Any of these means hospital now, not a '
+              'phone call first.',
           kind: PpCalloutKind.doctor,
           title: 'Go to a hospital now',
         ),
@@ -296,14 +300,14 @@ final PpArea _emergency = PpArea(
         ),
         */
         PpCallout(
-          'Take three things with you and you save fifteen minutes at the worst '
-          'possible time: his medicines in their own boxes, his vaccination '
-          'card, and his most recent weight. Weight decides almost every dose he '
-          'will be given, so write it inside the emergency card tonight.',
+          'Take three things and you save fifteen minutes when it matters most: '
+          'your child\'s medicines in their boxes, the vaccination card, and '
+          'the latest weight. Weight decides almost every dose, so write it '
+          'in the emergency card tonight.',
           kind: PpCalloutKind.safety,
           title: 'What to pick up on the way out',
         ),
-        PpWhenLine('Any age. This page never age-bands, because a red flag at '
+        PpWhenLine('Any age. This page has no age bands, because a red flag at '
             'six weeks is a red flag at six years.'),
         // ⚠️ THE NUMBERS WERE QUESTIONED AND THEY ARE CORRECT, SO THEY STAY.
         //
@@ -322,13 +326,13 @@ final PpArea _emergency = PpArea(
         // Logged as D3 in docs/PARENTING-REVIEW.md for confirmation. The
         // REQUIRED_REVIEW flag stays until a clinician signs off the wording,
         // not the digits.
-        PpIndiaNote('These are the Indian numbers. 112 is the national emergency '
-            'line and reaches police, fire or ambulance. 108 reaches an '
-            'ambulance in most states, and 102 is the free ambulance used '
-            'mainly for mothers and infants. 1098 is Childline. In heavy city '
+        PpIndiaNote('These are the Indian numbers. 112 is the national '
+            'emergency line for police, fire or ambulance. 108 reaches an '
+            'ambulance in most states, and 102 is the free ambulance mainly '
+            'for mothers and infants. 1098 is Childline. In heavy city '
             'traffic a car often gets there first, so start moving while '
-            'somebody else makes the call. Know the nearest hospital with a '
-            'paediatric emergency, not just the nearest hospital.'),
+            'someone else calls. Know the nearest hospital with a children\'s '
+            'emergency, not only the nearest hospital.'),
         /* kept for revert: the signs film, now its own card
         PpVideoSlot(
           title: 'The signs that mean go now',
@@ -339,7 +343,7 @@ final PpArea _emergency = PpArea(
         ),
         */
         PpLink(
-          'Open his emergency card',
+          'Open the emergency card',
           surfaceId: 'pp_emergency_card',
           blurb: 'Blood group, allergies, weight and the two numbers to call.',
         ),
@@ -359,8 +363,8 @@ final PpArea _emergency = PpArea(
           minutes: '5 MIN',
           slotId: 'health/when_to_rush',
         ),
-        PpIntro('Five minutes, watched once on a calm day, so that at 2am you '
-            'recognise what you are looking at instead of reading about it.'),
+        PpIntro('Five minutes, watched once on a calm day, so at 2am you '
+            'recognise what you\'re seeing instead of reading about it.'),
         PpLink(
           'Go to a hospital now',
           pageId: 'health_go_now',
@@ -384,21 +388,30 @@ final PpArea _emergency = PpArea(
         PpInteractive(
           kind: PpInteractiveKind.checklist,
           title: 'The three speeds',
-          blurb: 'What you are seeing, and how fast to move. One at a time.',
+          blurb: 'What you\'re seeing, and how fast to move. One at a time.',
           hue: 12,
           items: [
-            PpInteractiveItem('Trouble breathing, a fit, unresponsive, blue lips', 'NOW. Hospital, and somebody calls on the way.'),
-            PpInteractiveItem('A newborn under three months with any fever', 'NOW. No home dose first; take him as he is.'),
-            PpInteractiveItem('Vomiting everything for more than eight hours', 'NOW. He cannot keep fluid in, and that is the emergency.'),
-            PpInteractiveItem('Loose motions with no urine and a dry mouth', 'NOW. That is dehydration, and ORS at home is no longer enough.'),
-            PpInteractiveItem('A fever that has run more than five days', 'SAME DAY. A blood test, not another guess.'),
-            PpInteractiveItem('Ear pain with fever, or discharge from an ear', 'SAME DAY. Usually treatable, and it hurts.'),
-            PpInteractiveItem('A rash with a fever he is otherwise well with', 'SAME DAY. And do the glass test first: if it does not fade, that is NOW.'),
-            PpInteractiveItem('A cold, a cough, a mild fever, still feeding', 'CAN WAIT. Fluids, rest, and a look each evening.'),
-            PpInteractiveItem('Teething, a nappy rash, one loose stool', 'CAN WAIT. Ordinary, and this area has a page for each.'),
+            PpInteractiveItem('Trouble breathing, a fit, unresponsive, blue lips', 'Now. Hospital, and someone '
+                'calls on the way.'),
+            PpInteractiveItem('A newborn under three months with any fever', 'Now. No home dose first; go '
+                'straight away.'),
+            PpInteractiveItem('Vomiting everything for more than eight hours', 'Now. No fluid is staying down, '
+                'and that is the emergency.'),
+            PpInteractiveItem('Loose motions with no urine and a dry mouth', 'Now. That is dehydration, and '
+                'ORS at home is no longer enough.'),
+            PpInteractiveItem('A fever that has run more than five days', 'Same day. A blood test, not '
+                'another guess.'),
+            PpInteractiveItem('Ear pain with fever, or discharge from an ear', 'Same day. Usually treatable, '
+                'and it hurts.'),
+            PpInteractiveItem('A rash with a fever, otherwise well', 'Same day. Do the glass test '
+                'first: if the rash does not fade, go now.'),
+            PpInteractiveItem('A cold, a cough, a mild fever, still feeding', 'Can wait. Fluids, rest, and a '
+                'look each evening.'),
+            PpInteractiveItem('Teething, a nappy rash, one loose stool', 'Can wait. Ordinary, and this '
+                'area has a page for each.'),
           ],
-          closing: 'If he seems wrong to you and none of these fit, that is a '
-              'reason on its own. Call.',
+          closing: 'If something seems wrong to you and none of these fit, '
+              'that\'s reason enough. Call.',
           closingPageId: 'health_go_now',
           closingLabel: 'The go-now list',
         ),
@@ -412,26 +425,26 @@ final PpArea _emergency = PpArea(
     // first-aid guidance before this ships. Signed off by a clinician.
     PpPage(
       id: 'health_choking_response',
-      title: 'If he chokes or can\'t breathe',
+      title: 'If your child chokes or can\'t breathe',
       subtitle: 'Back blows and chest thrusts, before you need them',
       format: 'VIDEO',
       blocks: [
         PpVideoSlot(
-          title: 'If he chokes: back blows and chest thrusts',
+          title: 'Choking: back blows and chest thrusts',
           subtitle: 'On a training doll, at real speed and then slowly: the '
-              'infant hold, the older child, and the moment to call.',
+              'infant hold, the older child, and when to call.',
           minutes: '5 MIN',
           slotId: 'feeding/back_blows_demo',
           hue: 12,
         ),
-        PpIntro('Read this once now, calmly, and watch the film. Then make '
-            'everyone who feeds him watch it too. In a real choking you will '
-            'not be reading anything.'),
+        PpIntro('Read this once now, calmly, and watch the film. Then ask '
+            'everyone who feeds your child to watch it too. In a real choking '
+            'you won\'t be reading.'),
         PpCallout(
-          'He is choking, not gagging, if he is SILENT: cannot cry, cannot '
-          'cough properly, may be going blue round the lips, face frightened '
-          'and no sound. If he is coughing loudly or crying, he has an airway: '
-          'do not slap his back, let him cough, stay with him.',
+          'It\'s choking, not gagging, when your child is silent: can\'t cry, '
+          'can\'t cough properly, lips may turn blue, face frightened, no '
+          'sound. If your child is coughing loudly or crying, air is getting '
+          'through: don\'t slap the back, let the cough work, and stay close.',
           kind: PpCalloutKind.safety,
           title: 'First: is it choking?',
         ),
@@ -439,36 +452,37 @@ final PpArea _emergency = PpArea(
           PpStep('Shout for help and have someone call an ambulance',
               'You start at the same time. Do not go looking for a phone '
                   'first.'),
-          PpStep('Under one: lay him face down along your forearm',
-              'Head lower than his bottom, your hand supporting his jaw, not '
-                  'his throat. Rest your arm on your thigh.'),
+          PpStep('Under one: lay your baby face down along your forearm',
+              'Head lower than the bottom, your hand supporting the jaw, not '
+                  'the throat. Rest your arm on your thigh.'),
           PpStep('Five firm back blows',
               'Heel of your hand between the shoulder blades. Firm, and '
                   'check after each one whether it has come out.'),
-          PpStep('If not: turn him face up, five chest thrusts',
+          PpStep('If not: turn your baby face up, five chest thrusts',
               'Two fingers on the breastbone just below the nipple line, '
                   'pushing down sharply. Not the tummy in a baby.'),
           PpStep('Repeat: five back blows, five chest thrusts',
-              'Until it comes out, or he goes limp.'),
+              'Until it comes out, or your child goes limp.'),
           PpStep('Over one: back blows, then abdominal thrusts',
-              'Lean him forward, five back blows. If not, stand behind him, '
-                  'fist above the navel, pull sharply in and up, five times. '
-                  'Repeat.'),
-          PpStep('If he goes limp: start CPR and keep the phone on speaker',
+              'Lean your child forward, five back blows. If not, stand at the '
+                  'back, fist above the navel, pull sharply in and up, five '
+                  'times. Repeat.'),
+          PpStep('If your child goes limp: start CPR and keep the phone on '
+              'speaker',
               'The ambulance call handler will talk you through it.'),
         ], heading: 'The sequence'),
         PpCallout(
-          'After any choking where you had to act, take him to a hospital '
-          'to be checked even if he seems completely fine. Abdominal thrusts '
-          'can injure; anything that went down the wrong way can too.',
+          'After any choking where you had to act, take your child to hospital '
+          'to be checked, even if all seems fine. Abdominal thrusts can '
+          'injure, and so can anything that went down the wrong way.',
           kind: PpCalloutKind.doctor,
           title: 'Afterwards, always',
         ),
         PpWhenLine('Learn it before the first finger food, around 8 months. A '
-            'hospital first-aid class takes one afternoon. Do it.'),
-        PpIndiaNote('Whoever is most often alone with him at mealtimes, the '
-            'maid, the grandmother, the older cousin, is the person who most '
-            'needs to have watched this. Show them, do not tell them.'),
+            'hospital first-aid class takes one afternoon. It\'s worth it.'),
+        PpIndiaNote('Whoever is most often alone with your child at mealtimes '
+            '(the maid, the grandmother, an older cousin) most needs to have '
+            'watched this. Show them; don\'t only tell them.'),
         PpLink(
           'Gagging vs choking, and how to cut food',
           surfaceId: 'pp_section/parenting_feeding/safety',
@@ -479,24 +493,148 @@ final PpArea _emergency = PpArea(
     // ⚠️ [new] SCAFFOLD. "If he has a fit: on his side, nothing in the mouth,
     // time it, ambulance-if." The brief says the copy will be supplied for
     // verbatim drop-in; the card holds its place. DOOR-CONTENT-OWED HL2.
+    //
+    // FILLED 2026-10-02 from the parenting gap analysis (P1: What to Expect's
+    // epilepsy piece, ADD TO OURS). The scaffold's brief is kept as the
+    // spine: on his side, nothing in the mouth, time it, ambulance-if. The
+    // film slot stays owed (HL2 in the ledger).
     PpPage(
       id: 'health_fit',
-      title: 'If he has a fit',
-      subtitle: 'On his side, nothing in the mouth, time it',
+      title: 'If your child has a fit',
+      subtitle: 'On the side, nothing in the mouth, time it',
       format: 'VIDEO',
-      comingSoon: true,
-      blocks: [],
+      blocks: [
+        PpVideoSlot(
+          title: 'A fit: the recovery position',
+          subtitle: 'On a training doll: clearing the space, turning the child '
+              'onto one side, and timing it.',
+          minutes: '3 MIN',
+          slotId: 'health/fit_recovery_position',
+          hue: 12,
+        ),
+        PpIntro('Watching your child have a fit is one of the most frightening '
+            'things a parent can see. Most fits stop on their own within a '
+            'few minutes and cause no harm. Your job: keep your child safe '
+            'until it passes, and watch the clock.'),
+        PpSteps(heading: 'While it is happening', [
+          PpStep('Lay your child on the floor, on one side',
+              'Move anything hard or sharp away. Put a cushion or folded cloth '
+              'under the head.'),
+          PpStep('Nothing in the mouth',
+              'Not a spoon, not your fingers. Nobody can swallow their tongue.'),
+          PpStep('Don\'t hold your child down',
+              'Let the movements happen. Loosen tight clothes at the neck.'),
+          PpStep('Look at the time',
+              'If someone else is there, ask them to video it on a phone. It '
+              'helps the doctor more than any description.'),
+          PpStep('Stay close until your child is fully awake',
+              'Sleepiness and confusion afterwards are normal. Keep your child '
+              'on one side.'),
+        ]),
+        PpCallout('Call 112 or go to hospital now if the fit lasts more than 5 '
+            'minutes, or it\'s the first one ever. Also go now if breathing is '
+            'a struggle or the lips turn blue, one fit follows another, or '
+            'your child doesn\'t wake properly afterwards. Any first fit needs '
+            'a doctor the same day.',
+            kind: PpCalloutKind.doctor),
+        PpArticle(heading: 'Fits with fever, and epilepsy', [
+          'Between six months and five years, a fit during a high fever is '
+              'common. It\'s called a febrile seizure. It looks frightening '
+              'but usually causes no lasting harm, and most children grow out '
+              'of them. The first one still needs a doctor, to make sure '
+              'nothing else is causing the fever.',
+          'Epilepsy is different: fits that happen more than once without a '
+              'fever or another clear cause. Some are big shaking fits; '
+              'others are quieter, like staring spells, sudden nodding or '
+              'brief jerks. Only a doctor, usually a paediatric neurologist, '
+              'can say whether it\'s epilepsy. Most children with it do well '
+              'on treatment.',
+        ]),
+        PpIndiaNote('Don\'t hold keys or a shoe to the nose, or pour water in '
+            'the mouth. These are common in India and can cause harm. Calmly '
+            'turning your child on one side is the right thing to do.'),
+      ],
     ),
     // ⚠️ [new] SCAFFOLD. "Common accidents, fast: swallowed something (button
     // battery / magnet = go now), a burn, a bad fall / head bump, something
     // in the eye. First-minutes only." DOOR-CONTENT-OWED HL3.
+    //
+    // FILLED 2026-10-02 from the parenting gap analysis (P1, ADD TO OURS:
+    // poisoning, head injuries, burns, eye injuries). First minutes only, as
+    // the scaffold's brief asked; prevention lives in the Keeping him safe
+    // door and is linked, not repeated.
     PpPage(
       id: 'health_accidents',
       title: 'Common accidents, fast',
       subtitle: 'The first minutes: swallowed, burned, fallen, in the eye',
       format: 'CARDS',
-      comingSoon: true,
-      blocks: [],
+      blocks: [
+        PpIntro('Take a breath. Most childhood accidents are small, and what '
+            'you do in the first few minutes matters most. Here\'s exactly '
+            'what to do, and when to go now.'),
+        PpSteps(heading: 'Your child has swallowed something', [
+          PpStep('Take anything left out of the mouth'),
+          PpStep('Don\'t try to make your child vomit',
+              'And don\'t give salt water. Take the bottle or wrapper with you.'),
+          PpStep('A button battery, a magnet, kapoor, acid or medicine: go to '
+              'hospital now',
+              'Even if all seems fine. A battery can burn through the food pipe '
+              'within two hours.'),
+          PpStep('A coin, with normal breathing and swallowing',
+              'Still see a doctor the same day; an X-ray may be needed.'),
+        ]),
+        PpCallout('AIIMS poison helpline: 1800-116-117. Emergency: 112.'),
+        PpSteps(heading: 'A burn or scald', [
+          PpStep('Cool it under cool running tap water for 20 minutes',
+              'Not ice, and not iced water. This helps more than anything else, '
+              'even if you start late.'),
+          PpStep('Take off clothes and jewellery near the burn',
+              'Unless they\'re stuck to the skin.'),
+          PpStep('Cover loosely with cling film or a clean cloth'),
+          PpStep('Nothing else on it',
+              'No toothpaste, ghee, butter, oil, turmeric or ice. They hold '
+              'the heat in and cause infection.'),
+        ]),
+        PpCallout('Go to hospital for a burn bigger than your child\'s palm, or '
+            'any burn on the face, hands, feet or private parts. Go too for '
+            'an electrical or chemical burn, a burn that looks white or '
+            'charred, or any burn in a baby under one.',
+            kind: PpCalloutKind.doctor),
+        PpSteps(heading: 'A fall or a bump on the head', [
+          PpStep('Hold your child, comfort, and look',
+              'Crying straight away is a good sign.'),
+          PpStep('Hold something cold on the bump',
+              'Ice wrapped in a cloth, for 10 minutes. A big egg-shaped lump '
+              'on the forehead is common and usually not serious.'),
+          PpStep('Watch closely for the next 24 hours',
+              'A nap is fine; check your child wakes and responds as usual.'),
+        ]),
+        PpCallout('Go now if your child was knocked out even briefly, vomits '
+            'more than once, is unusually sleepy or hard to wake, or has a '
+            'fit. Go now for clear fluid or blood from the nose or ears, or '
+            'if your child isn\'t acting normally. Go now after a fall from '
+            'higher than your child\'s own height, or for any head swelling in '
+            'a baby under one.',
+            kind: PpCalloutKind.doctor),
+        PpSteps(heading: 'Something in the eye', [
+          PpStep('Try to stop your child rubbing it',
+              'Hold the hands gently if you need to.'),
+          PpStep('Dust or sand: rinse with clean water',
+              'Pour gently from the inner corner outwards.'),
+          PpStep('A chemical, soap, lime or Holi colour: rinse for 15 minutes',
+              'Under gently running water, then see a doctor.'),
+          PpStep('Something stuck in the eye, or a poke or cut',
+              'Don\'t press it or try to remove it. Cover the eye lightly with a '
+              'paper cup and go to hospital.'),
+        ]),
+        PpCallout('See a doctor the same day for any eye injury where the eye '
+            'stays shut, red or watery, vision seems different, or there\'s '
+            'blood in the eye.',
+            kind: PpCalloutKind.doctor),
+        PpLink('How to stop most of these happening',
+            surfaceId: 'pp_section/parenting_safety',
+            blurb: 'The Keeping your child safe door, room by room.'),
+      ],
     ),
 
     /* ⚠️ REMOVED FROM THIS AREA BY FEEDBACK, KEPT FOR REVERT.
@@ -611,8 +749,8 @@ final PpArea _emergency = PpArea(
           heading: 'Four sentences',
         ),
         PpCallout(
-          'If you finish the call still frightened, say so in those words: "I am '
-          'still worried, I would rather bring him." A parent who is worried '
+          'If you finish the call still frightened, say so plainly. "I am still '
+          'worried, I would rather bring my child in." That is enough. A parent who is worried '
           'without being able to say why is a signal doctors are trained to take '
           'seriously.',
           kind: PpCalloutKind.doctor,
@@ -645,19 +783,19 @@ final PpArea _emergency = PpArea(
 final PpArea _fever = PpArea(
   id: 'fever',
   mark: IntentMark.bodyMark,
-  title: 'He has a fever',
-  blurb: 'What the number means, what to do tonight, and when it stops being '
+  title: 'Your child has a fever',
+  blurb: 'What the number means, what to do tonight, and when it\'s more than '
       'something to watch.',
   hue: 28,
   pages: [
     PpPage(
       id: 'fever_what_number',
-      title: 'What the number actually means',
+      title: 'What the number means',
       format: 'CHART',
       blocks: [
-        PpIntro('A fever is not an illness. It is the body turning the heat up '
-            'to fight one, and it is usually working. The number tells you less '
-            'than how he looks.'),
+        PpIntro('A fever is a sign, not an illness. It\'s the body turning the '
+            'heat up to fight an infection, and it\'s usually working. How '
+            'your child looks tells you more than the number.'),
         PpChartCard(
           title: 'Reading the number',
           subtitle: 'Measured under the arm, on a digital thermometer',
@@ -675,35 +813,35 @@ final PpArea _fever = PpArea(
             ('High fever', '102.2 F or 39 C and above'),
             ('Rare, and the number itself matters', '106 F or 41 C and above'),
           ],
-          note: 'A child of two playing with a toy at 103 F is less worrying '
-              'than a child of two who is limp at 100.6 F. Treat the child, not '
-              'the thermometer.',
+          note: 'A two-year-old playing with a toy at 103 F is less worrying '
+              'than a two-year-old who is limp at 100.6 F. Look at your child '
+              'first, then the thermometer.',
           hue: 28,
         ),
-        PpCallout('There is no temperature at which a fever damages the brain. '
-            'That belief is the reason families panic at a number, and it is not '
-            'true of ordinary infection fevers.'),
+        PpCallout('No temperature from a fever damages the brain. That belief '
+            'is why families panic at a number, and it isn\'t true of ordinary '
+            'infection fevers.'),
         PpCallout(
           'Under three months, any fever at all is a same day hospital visit, '
-          'whatever he looks like. A newborn with an infection can look almost '
-          'well until he suddenly does not.',
+          'however well your baby looks. A newborn with an infection can look '
+          'almost well, and then suddenly not.',
           kind: PpCalloutKind.doctor,
           title: 'The one age where the number decides on its own',
         ),
-        PpWhenLine('Check the temperature twice a day while he has a fever, and '
-            'again if he changes.'),
-        PpIndiaNote('In a 40 degree summer a baby who has been in a hot room, '
-            'wrapped, or just fed can read half a degree high. Unwrap him, wait '
-            'fifteen minutes and take it again before you act on it.'),
+        PpWhenLine('Check the temperature twice a day during a fever, and again '
+            'if anything changes.'),
+        PpIndiaNote('In a 40 degree summer, a baby who has been in a hot room, '
+            'wrapped, or just fed can read half a degree high. Unwrap, wait '
+            'fifteen minutes and check again before you act.'),
         PpLink(
           'Run the fever check',
           surfaceId: 'pp_fever_check',
-          blurb: 'His age and his temperature, and what to do about it.',
+          blurb: 'Your child\'s age and temperature, and what to do about it.',
         ),
         PpVideoSlot(
           title: 'Fever, explained in five minutes',
-          subtitle: 'Why it happens, what it is doing, and the three things that '
-              'actually change the decision.',
+          subtitle: 'Why it happens, what it\'s doing, and the three things that '
+              'change the decision.',
           minutes: '5 MIN',
           slotId: 'health/fever_explainer',
         ),
@@ -717,9 +855,9 @@ final PpArea _fever = PpArea(
       // the prose is kept below for revert.
       format: 'ILLUSTRATION',
       blocks: [
-        PpIntro('Half of the fever questions doctors get are really measurement '
-            'questions. Where you took it, and with what, changes the number by '
-            'a whole degree.'),
+        PpIntro('Half the fever questions doctors get are about measuring. '
+            'Where you took it, and with what, can change the number by a '
+            'whole degree.'),
         /* kept for revert: the prose the picture replaced
         PpArticle([
           'A digital thermometer under the arm is the right instrument for a '
@@ -745,19 +883,19 @@ final PpArea _fever = PpArea(
             PpIllustrationLabel('Under the arm, digital: the one for home',
                 'Tip fully covered, arm held gently down, wait for the beep '
                     'and a few seconds more. Every age.'),
-            PpIllustrationLabel('Forehead scanner: a quick look, then confirm',
-                'Drifts. Reads low if he is sweaty or near a fan. If it '
+            PpIllustrationLabel('Forehead scanner: a quick look, then check',
+                'It drifts. Reads low on sweaty skin or near a fan. If it '
                     'surprises you, check under the arm.'),
             PpIllustrationLabel('Ear: over one year only',
                 'Wax and a narrow canal make it unreliable in babies.'),
             PpIllustrationLabel('Mouth: over four or five',
-                'Only a child who can hold still, and nothing hot or cold to '
-                    'drink for fifteen minutes first.'),
+                'Only for a child who can hold still, and nothing hot or cold '
+                    'to drink for fifteen minutes first.'),
           ],
           caption: 'Never a mercury thermometer, and never a hand on the '
-              'forehead: a hand tells you he is warm, which you already knew. '
-              'Report the number you saw and where you took it; do not add a '
-              'degree to correct it.',
+              'forehead: a hand only tells you your child is warm. Report the '
+              'number you saw and where you took it; don\'t add a degree to '
+              'correct it.',
         ),
         PpTable(
           heading: 'Where to measure',
@@ -770,8 +908,8 @@ final PpArea _fever = PpArea(
             ],
             [
               'Forehead scanner',
-              'A fast look, older children',
-              'Reads low if he is sweaty, or has been near a fan or a heater',
+              'A quick look, older children',
+              'Reads low on sweaty skin, or near a fan or a heater',
             ],
             [
               'Ear',
@@ -786,18 +924,18 @@ final PpArea _fever = PpArea(
           ],
         ),
         PpCallout(
-          'Do not add a degree to an underarm reading to "correct" it. Report '
-          'the number you saw and say where you took it, and let the person you '
-          'are speaking to do the adjusting.',
+          'Don\'t add a degree to an underarm reading to "correct" it. Report '
+          'the number you saw and where you took it, and let the person '
+          'you\'re speaking to adjust it.',
           kind: PpCalloutKind.safety,
         ),
         // REQUIRED_REVIEW: the fifteen minute wait after a bath, a feed, or
         // being wrapped, and the advice not to convert an axillary reading.
         PpWhenLine('Wait fifteen minutes after a bath, a feed, or being tightly '
             'wrapped before you trust a reading.'),
-        PpIndiaNote('Keep one thermometer for the child and keep it where you '
-            'can find it at night. A thermometer in a drawer somewhere is the '
-            'reason so many families end up guessing.'),
+        PpIndiaNote('Keep one thermometer for your child, somewhere you can '
+            'find it at night. A thermometer lost in a drawer is why so many '
+            'families end up guessing.'),
       ],
     ),
     PpPage(
@@ -806,8 +944,8 @@ final PpArea _fever = PpArea(
       format: 'RED FLAG',
       bands: ['hb_nb'],
       blocks: [
-        PpIntro('This page exists on its own because it is the one fever rule '
-            'that has no home version. Under three months, fever is not watched '
+        PpIntro('This page stands on its own because it\'s the one fever rule '
+            'with no home version. Under three months, a fever is not watched '
             'at home.'),
         // REQUIRED_REVIEW: the entire rule. Confirm the age cutoff (3 months),
         // the threshold (100.4 F / 38 C), the instruction NOT to give
@@ -815,33 +953,33 @@ final PpArea _fever = PpArea(
         // temperature is equally significant at this age.
         PpCallout(
           'A temperature of 100.4 F or 38 C or above in a baby under three '
-          'months means being seen by a doctor today, not tomorrow, whatever '
-          'else he seems like. Go to the hospital or call your paediatrician on '
-          'the way. This is not a cautious rule, it is the rule.',
+          'months means being seen by a doctor today, not tomorrow. That '
+          'holds however well your baby seems. Go to the hospital, or call '
+          'your paediatrician on the way. This rule has no exceptions.',
           kind: PpCalloutKind.doctor,
           title: 'Any fever, any time, seen today',
         ),
         PpCards([
-          PpCard('Do not give paracetamol first',
-              'Bringing the temperature down before he is examined hides the '
-              'thing the doctor needs to see. Take him as he is.'),
+          PpCard('Don\'t give paracetamol first',
+              'Bringing the temperature down before the doctor sees your baby '
+              'hides what the doctor needs to see. Go as you are.'),
           PpCard('A low temperature counts too',
-              'A newborn who is unusually cold, below 97.5 F or 36.5 C, is as '
-              'significant as one who is hot.'),
-          PpCard('Say his age in days or weeks',
+              'A newborn who is unusually cold, below 97.5 F or 36.5 C, matters '
+              'as much as one who is hot.'),
+          PpCard('Give your baby\'s age in days or weeks',
               'A newborn is a different patient at day 5 and day 50, and it '
               'changes what happens next.'),
           PpCard('Take the vaccination card',
-              'What he has and has not had narrows the list quickly.'),
+              'Which vaccines your baby has and hasn\'t had narrows the list '
+                  'quickly.'),
         ], heading: 'Four things that matter at this age', hue: 12),
-        PpCallout('The reason is simple and worth knowing: a young baby has very '
-            'few ways of showing he is unwell, so a fever carries more weight '
-            'than it will at any later age.'),
+        PpCallout('Here\'s why: a young baby has very few ways to show illness, '
+            'so a fever carries more weight than at any later age.'),
         PpWhenLine('From birth to three months. After three months the rest of '
             'this area applies.'),
-        PpIndiaNote('If the family is telling you it is only the weather, or '
-            'teeth, or the malish oil, this is the one place to be firm. Teeth '
-            'do not cause fever in a six week old baby.'),
+        PpIndiaNote('If the family says it\'s only the weather, or teeth, or the '
+            'massage oil, this is the one place to be firm. Teeth don\'t cause '
+            'fever in a six week old baby.'),
       ],
     ),
     PpPage(
@@ -850,43 +988,43 @@ final PpArea _fever = PpArea(
       format: 'ARTICLE',
       blocks: [
         PpIntro('The goal is a comfortable child, not a normal thermometer. If '
-            'he is drinking, resting and not distressed, you do not have to do '
-            'anything at all.'),
+            'your child is drinking, resting and not distressed, you don\'t '
+            'have to do anything at all.'),
         PpArticle([
-          'Fluids matter more than anything else you will do. A fever burns '
-          'through water quickly, and most of the misery of a fever is really '
-          'the dryness that comes with it. Offer the breast more often if he is '
-          'still feeding, or small sips of water, milk, nimbu pani or ORS very '
-          'frequently rather than a big glass occasionally.',
-          'Take layers off. One thin cotton layer is right, even if he feels '
-          'cold and asks for a blanket, because the shivering is the fever '
-          'rising rather than the room being cold. A fan on low or a cooler is '
-          'fine. He does not need a cold room and he does not need to be '
-          'wrapped.',
-          'Let him sleep. There is no need to wake a sleeping child to take his '
-          'temperature or give him a dose. Sleep is doing more for him than the '
-          'reading would tell you.',
+          'Fluids matter more than anything else you\'ll do. A fever burns '
+          'through water quickly, and much of the misery is the dryness that '
+          'comes with it. Offer the breast more often if your child still '
+          'feeds. Or give small sips of water, milk, lemon water or ORS very '
+          'often, rather than a big glass now and then.',
+          'Take layers off. One thin cotton layer is right, even if your child '
+          'feels cold and asks for a blanket. The shivering is the fever '
+          'rising, not the room being cold. A fan on low or a cooler is fine. '
+          'No cold room is needed, and no wrapping up.',
+          'Let your child sleep. There\'s no need to wake a sleeping child for a '
+          'temperature or a dose. Sleep is doing more good than the reading '
+          'would tell you.',
         ]),
         PpSteps([
           PpStep('Offer fluid every twenty minutes',
-              'Small amounts, often. This is the single most useful thing you '
-              'will do all night.'),
-          PpStep('Strip him down to one thin layer',
+              'Small amounts, often. This helps more than anything else you\'ll '
+              'do all night.'),
+          PpStep('Strip down to one thin layer',
               'Cotton, loose. Cover with a sheet rather than a quilt.'),
-          PpStep('Sponge with lukewarm water only if he is uncomfortable',
-              'On the forehead, neck, armpits and groin. Stop if he starts '
-              'shivering, because shivering pushes the temperature back up.'),
-          PpStep('Consider paracetamol if he is miserable, not because of a number',
+          PpStep('Sponge with lukewarm water only for comfort',
+              'On the forehead, neck, armpits and groin. Stop if your child '
+              'starts shivering, because shivering pushes the temperature '
+              'back up.'),
+          PpStep('Consider paracetamol for misery, not for a number',
               'Comfort is the reason to give it. See the dosing page, and '
               'confirm the amount with your doctor.'),
           PpStep('Write down every dose and the time',
-              'It is the question you will be asked, and it is the mistake '
-              'families most often make when two adults are taking turns.'),
+              'You\'ll be asked about it, and it\'s the mistake families most '
+              'often make when two adults take turns.'),
         ]),
         PpCallout(
-          'Never sponge with cold water, ice, or anything containing alcohol or '
-          'spirit. Cold makes the body shiver and drives the core temperature '
-          'up, which is the opposite of what you wanted, and alcohol on skin can '
+          'Never sponge with cold water, ice, or anything with alcohol or '
+          'spirit in it. Cold makes the body shiver and drives the core '
+          'temperature up, the opposite of what you want. Alcohol on skin can '
           'be absorbed. Use lukewarm water or nothing.',
           kind: PpCalloutKind.safety,
           title: 'Cold sponging makes it worse',
@@ -898,36 +1036,36 @@ final PpArea _fever = PpArea(
           hue: 28,
           cards: [
             PpCarouselCard.myth('Cold water or ice brings a fever down fastest',
-                'It makes him shiver, and shivering drives the temperature '
-                    'up. Lukewarm water, or nothing.'),
+                'It causes shivering, and shivering drives the temperature up. '
+                    'Lukewarm water, or nothing.'),
             PpCarouselCard.myth('Rub spirit or alcohol on the skin',
-                'It is absorbed through a child\'s skin and it chills him. '
+                'It\'s absorbed through a child\'s skin and it chills the body. '
                     'Never.'),
-            PpCarouselCard.myth('Cover him up and sweat it out',
+            PpCarouselCard.myth('Cover up and sweat it out',
                 'Wrapping a hot child traps heat. One thin cotton layer, and '
                     'a sheet.'),
-            PpCarouselCard.myth('Wake him to sponge or to give a dose',
-                'Sleep is doing more for him than the reading would tell you. '
-                    'Let him sleep.'),
+            PpCarouselCard.myth('Wake your child to sponge or give a dose',
+                'Sleep is doing more good than the reading would tell you. Let '
+                    'your child sleep.'),
             PpCarouselCard.myth('A wet cloth on the forehead treats the fever',
-                'It comforts him, which is worth doing. It does not treat '
+                'It\'s soothing, which is worth doing. It doesn\'t treat '
                     'anything. Keep the fluids going.'),
           ],
         ),
         PpCallout(
-          'A fever that stays above 102 F after two doses of paracetamol given '
-          'correctly, a child who will not drink, or a fever running past five '
-          'days, all need a doctor rather than another dose.',
+          'A fever that stays above 102 F after two correct doses of '
+          'paracetamol needs a doctor, not another dose. So does a child who '
+          'won\'t drink, or a fever running past five days.',
           kind: PpCalloutKind.doctor,
         ),
         // REQUIRED_REVIEW: "two doses" and "past five days" as the points at
         // which home care stops, and the lukewarm sponging advice itself, which
         // some paediatricians now omit entirely.
-        PpWhenLine('Reassess every four to six hours, and any time he looks '
-            'different rather than just warm.'),
-        PpIndiaNote('Wet cloth on the forehead is a comfort, not a treatment, '
-            'and it is a perfectly good thing to do because it is soothing. Just '
-            'do not stop offering fluids because the cloth feels like action.'),
+        PpWhenLine('Check again every four to six hours, and any time your '
+            'child looks different, not only warm.'),
+        PpIndiaNote('A wet cloth on the forehead is a comfort, not a treatment, '
+            'and it\'s a good thing to do because it soothes. Only don\'t stop '
+            'offering fluids because the cloth feels like doing something.'),
       ],
     ),
     PpPage(
@@ -941,11 +1079,10 @@ final PpArea _fever = PpArea(
       // sign-off.
       format: 'RED FLAG',
       blocks: [
-        PpIntro('This page will not tell you a number, on purpose. The dose '
-            'is on the bottle and with your doctor. What this page does is '
-            'help you read that number for his weight, and show you the '
-            'handful of mistakes that turn an ordinary fever syrup into an '
-            'overdose.'),
+        PpIntro('This page won\'t give you a number, on purpose. The dose is on '
+            'the bottle and with your doctor. This page helps you read that '
+            'number for your child\'s weight. It also shows the few mistakes '
+            'that turn an ordinary fever syrup into an overdose.'),
         /* kept for revert: the mg-by-weight table; needs paediatric + legal sign-off
         PpTable(
           heading: 'Typical single doses, by weight',
@@ -989,26 +1126,25 @@ final PpArea _fever = PpArea(
         ),
         */
         PpSteps([
-          PpStep('Find his latest weight',
-              'The dose is by weight, not age. It is on his growth record, or '
-                  'weigh him with you and subtract.'),
+          PpStep('Find your child\'s latest weight',
+              'The dose goes by weight, not age. Check the growth record, or '
+                  'weigh yourself holding your child and subtract.'),
           PpStep('Find the strength on the label',
               'Drops, syrup and stronger syrup are different bottles of the '
                   'same drug. The mg per ml is printed on the front.'),
-          PpStep('Read his weight\'s row on that bottle\'s own table',
+          PpStep('Find your child\'s weight on that bottle\'s own table',
               'Every box carries one. Use that row, for that bottle, and '
                   'nothing you remember from a different bottle.'),
           PpStep('Use the syringe or cup that came in that box',
-              'A kitchen spoon is not a dose. A different box\'s syringe is '
-                  'not either.'),
+              'A kitchen spoon isn\'t a dose. Nor is a syringe from a different '
+                  'box.'),
           PpStep('Write the time down, and which drug',
-              'On the fridge, not in your head. It is the question you will '
-                  'be asked, and the mistake families make when two adults '
-                  'take turns.'),
-        ], heading: 'Reading the dose on the bottle for his weight'),
+              'On the fridge, not in your head. You\'ll be asked about it, and '
+                  'it\'s the mistake families make when two adults take turns.'),
+        ], heading: 'Reading the dose on the bottle for your child\'s weight'),
         PpCards([
           PpCard('Double dosing',
-              'Two adults, one night, nobody wrote it down. Paper on the '
+              'Two adults, one night, nobody wrote it down. A paper on the '
                   'fridge fixes it.'),
           PpCard('Two brands, the same medicine',
               'Crocin, Calpol, Dolo, Pyrigesic, Fepanil are all paracetamol. '
@@ -1020,50 +1156,49 @@ final PpArea _fever = PpArea(
               'Many cold-and-cough syrups already contain paracetamol. Read '
                   'the back before adding anything.'),
           PpCard('The wrong syringe',
-              'A 5 ml syringe from another box, read as 1 ml. Only the one '
+              'A 5 ml syringe from another box, read as 1 ml. Use only the one '
                   'that came with the bottle.'),
         ], heading: 'The mistakes that cause an overdose', hue: 12),
         PpArticle([
-          'The most dangerous mistake in Indian homes is not the milligrams, it '
-          'is the bottle. Paracetamol is sold as drops at 100 mg in 1 ml for '
-          'babies, as a syrup at 125 mg in 5 ml, and as a stronger syrup at 250 '
-          'mg in 5 ml. The drops are more than ten times as concentrated as the '
+          'The most dangerous mistake in Indian homes is the bottle, more than '
+          'the milligrams. Paracetamol drops for babies are 100 mg in 1 ml. '
+          'The syrup is 125 mg in 5 ml, and the stronger syrup is 250 mg in 5 '
+          'ml. The drops are more than ten times as concentrated as the '
           'syrup. Giving 5 ml of drops because a syrup dose was 5 ml is an '
           'overdose, and it happens.',
-          'So read the strength on the label every single time, use the dropper '
-          'or the cup that came in that box, and never a kitchen spoon. If you '
-          'buy a different brand next time, check the strength again, because '
-          'Crocin, Calpol, Dolo, Pyrigesic and Fepanil are all paracetamol at '
-          'different strengths in different bottles.',
+          'So read the strength on the label every time, and use the dropper or '
+          'cup from that box, never a kitchen spoon. If you buy a different '
+          'brand, check the strength again. Crocin, Calpol, Dolo, Pyrigesic '
+          'and Fepanil are all paracetamol, at different strengths in '
+          'different bottles.',
           'Paracetamol and ibuprofen are different drugs, so they can be '
-          'alternated if a doctor tells you to. Two products that both contain '
-          'paracetamol cannot be. A great many cold and cough combinations sold '
-          'over the counter already contain paracetamol, which is how a child '
-          'ends up with three doses when the family thinks he has had one.',
-        ], heading: 'The mistake that actually happens'),
+          'alternated if a doctor tells you to. Two products that both '
+          'contain paracetamol can\'t be. Many cold and cough mixes sold over '
+          'the counter already contain paracetamol. That\'s how a child ends '
+          'up with three doses when the family thinks there was one.',
+        ], heading: 'The mistake that happens most'),
         PpCallout(
-          'Never give aspirin to a child with a fever. In a viral illness it is '
+          'Never give aspirin to a child with a fever. In a viral illness it\'s '
           'linked to a rare but very serious liver and brain condition. And '
-          'never give mefenamic acid syrup, sold as Meftal P, on your own '
-          'judgement, however often it has been prescribed in the past. Use '
-          'paracetamol as the first choice and let a doctor decide anything '
-          'else.',
+          'never give mefenamic acid syrup (sold as Meftal P) on your own '
+          'judgement, however often it was prescribed before. Use paracetamol '
+          'first, and let a doctor decide anything else.',
           kind: PpCalloutKind.safety,
           title: 'Two drugs to leave alone',
         ),
         // REQUIRED_REVIEW: the aspirin and Reye syndrome statement, the
         // mefenamic acid warning, the syrup strengths quoted (100 mg/ml drops,
         // 125 mg/5 ml and 250 mg/5 ml syrups), and the brand list.
-        PpWhenLine('Only when he is uncomfortable. A fever with a cheerful child '
-            'needs no medicine at all.'),
+        PpWhenLine('Only when your child is uncomfortable. A fever with a '
+            'cheerful child needs no medicine at all.'),
         PpIndiaNote('A chemist will hand over a fever syrup without a '
-            'prescription and often a stronger one than a child needs. Ask which '
-            'drug is in it and at what strength, and if the answer is vague, buy '
-            'plain paracetamol instead.'),
+            'prescription, often stronger than a child needs. Ask which drug '
+            'is in it and at what strength. If the answer is vague, buy plain '
+            'paracetamol instead.'),
         PpLink(
-          'How to actually get medicine into him',
+          'How to get the medicine in',
           pageId: 'prev_medicine',
-          blurb: 'The dropper, the cheek, and what to do when he spits it out.',
+          blurb: 'The dropper, the cheek, and what to do when it gets spat out.',
         ),
       ],
     ),
@@ -1073,8 +1208,8 @@ final PpArea _fever = PpArea(
       format: 'RED FLAG',
       blocks: [
         PpIntro('Most fevers are viral and settle in two or three days. These '
-            'are the ones that do not, and the signs worth checking for once '
-            'each evening.'),
+            'are the ones that don\'t, and the signs worth checking once each '
+            'evening.'),
         // REQUIRED_REVIEW: every threshold in this callout, in particular the
         // five day duration, the "no urine in eight to twelve hours" figure,
         // and the febrile fit guidance below.
@@ -1086,42 +1221,43 @@ final PpArea _fever = PpArea(
           title: 'The go-now list',
         ),
         PpCallout(
-          'And for a fever specifically, call or go if: he is under three '
-          'months with any fever; he has not passed urine in eight to twelve '
-          'hours; he is very drowsy or very hard to console; the fever has '
-          'run more than five days; he has a stiff neck or hates the light; '
-          'or he simply looks wrong to you in a way you cannot explain.',
+          'And for a fever, call or go if your baby is under three months with '
+          'any fever. Call or go too if no urine has passed in eight to '
+          'twelve hours, or your child is very drowsy or very hard to '
+          'console. The same goes for a fever past five days, a stiff neck or '
+          'a dislike of light. And go if your child looks wrong to you in a '
+          'way you can\'t explain.',
           kind: PpCalloutKind.doctor,
           title: 'Any one of these means a doctor',
         ),
         PpCards([
           PpCard('A fit with a fever',
-              'A febrile fit is frightening and usually harmless. Put him on his '
-              'side on the floor, do not put anything in his mouth, note the '
-              'time, and get him seen the same day. A first fit always gets '
+              'A febrile fit is frightening and usually harmless. Lay your '
+              'child on one side on the floor, put nothing in the mouth, note '
+              'the time, and get seen the same day. A first fit always gets '
               'checked.'),
           PpCard('Fever that goes and comes back',
               'A fever that settles for a day and returns is worth a visit, '
               'especially in dengue and typhoid season.'),
           PpCard('Fever with no other symptom at all',
-              'After three days with nothing else to explain it, a urine test is '
-              'often the thing that finds the answer.'),
+              'After three days with nothing else to explain it, a urine test '
+              'often finds the answer.'),
           PpCard('Fever after a foreign trip or a village stay',
-              'Say where he has been. It changes what gets tested.'),
+              'Say where your child has been. It changes what gets tested.'),
         ], heading: 'Four that need naming', hue: 12),
-        PpCallout('You do not need to meet a threshold to be allowed to worry. '
-            'If he looks wrong to you, that is a reason on its own, and it is a '
-            'reason paediatricians respect.'),
-        PpWhenLine('Look him over properly once each evening while the fever '
-            'lasts, rather than checking the thermometer hourly.'),
+        PpCallout('You don\'t need to meet a threshold to be allowed to worry. '
+            'If your child looks wrong to you, that\'s reason enough, and '
+            'paediatricians respect it.'),
+        PpWhenLine('Look your child over properly once each evening while the '
+            'fever lasts, instead of checking the thermometer hourly.'),
         PpIndiaNote('In dengue season, ask about the platelet count rather than '
             'assuming a low one means hospital. Falling platelets matter; a '
-            'single number on a report usually does not.'),
+            'single number on a report usually doesn\'t.'),
         PpConsult(
           title: 'Talk to a paediatrician tonight',
-          whoFor: 'For the fever that has you awake at 1am and does not look '
-              'like an emergency but does not feel fine either. A real '
-              'paediatrician, on a call, who can tell you whether this waits '
+          whoFor: 'For the fever that has you awake at 1am. It doesn\'t look '
+              'like an emergency, but it doesn\'t feel fine either. A real '
+              'paediatrician, on a call, who can tell you whether it can wait '
               'until morning.',
           surfaceId: 'pp_experts',
           role: 'pediatrician',
@@ -1144,7 +1280,7 @@ final PpArea _fever = PpArea(
               'Soothing, harmless, and it gives you something to do. It will not '
               'bring the temperature down much, and that is fine.'),
           PpCard('Safe: extra fluids, nimbu pani, coconut water, dal ka pani',
-              'Genuinely useful. Fluid loss is most of what makes a feverish '
+              'Really useful. Fluid loss is most of what makes a feverish '
               'child miserable.'),
           PpCard('Safe: tulsi or ginger in warm water, over one year',
               'Comforting for an older child with a sore throat. Not a treatment '
@@ -1158,7 +1294,7 @@ final PpArea _fever = PpArea(
           PpCard('Stop: honey under one year',
               'Honey can carry spores that a baby under one cannot handle. Not '
               'in water, not on a nipple, not on a finger.'),
-          PpCard('Stop: any syrup or churan from the chemist without a name',
+          PpCard('Stop: any syrup or digestive powder from the chemist without a name',
               'If nobody can tell you which drug is in it and how much, it does '
               'not go into a feverish child.'),
         ], heading: 'Marked plainly', hue: 28),
@@ -1185,27 +1321,25 @@ final PpArea _fever = PpArea(
     ),
     PpPage(
       id: 'fever_long',
-      title: 'A fever that will not settle: dengue, typhoid and malaria',
+      title: 'A fever that won\'t settle: dengue, typhoid and malaria',
       format: 'ARTICLE',
       blocks: [
-        PpIntro('Most fevers are done in three days. Once one runs longer than '
-            'that, the question changes from how to bring it down to what is '
-            'causing it.'),
+        PpIntro('Most fevers are over in three days. Once one runs longer, the '
+            'question changes from how to bring it down to what\'s causing it.'),
         PpArticle([
-          'Dengue usually arrives suddenly with a high fever, aching limbs, sore '
-          'eyes and a flat red rash that comes later. The dangerous phase is not '
-          'the fever itself, it is the day or two after the fever falls, when a '
-          'child can become suddenly unwell. So a child whose dengue fever has '
-          'just broken is a child to watch more carefully, not less.',
-          'Typhoid builds instead of arriving. The fever climbs a little higher '
-          'each day for a week, often with a sore tummy, a coated tongue and no '
-          'appetite. It comes from contaminated food or water, it is common in '
-          'much of India, and there is a vaccine on the IAP schedule that is '
-          'worth asking about.',
-          'Malaria comes and goes rather than staying: a fever with shaking '
-          'chills and sweating, settling and returning. It matters where he has '
-          'been in the last month, so say it without being asked. All three are '
-          'diagnosed by a blood test, not by how the fever looks, and any fever '
+          'Dengue usually arrives suddenly with a high fever, aching limbs, '
+          'sore eyes and a flat red rash that comes later. The dangerous '
+          'phase is the day or two after the fever falls, when a child can '
+          'become suddenly unwell. So when a dengue fever has just broken, '
+          'watch your child more carefully, not less.',
+          'Typhoid builds slowly. The fever climbs a little higher each day for '
+          'a week, often with a sore tummy, a coated tongue and no appetite. '
+          'It comes from contaminated food or water and is common in much of '
+          'India. There\'s a vaccine on the IAP schedule worth asking about.',
+          'Malaria comes and goes: a fever with shaking chills and sweating, '
+          'settling and returning. Where your child has been in the last '
+          'month matters, so say it without being asked. All three are '
+          'diagnosed by a blood test, not by how the fever looks. Any fever '
           'past the third day deserves that test rather than another guess.',
         ]),
         PpTable(
@@ -1240,17 +1374,17 @@ final PpArea _fever = PpArea(
           ],
         ),
         PpCallout(
-          'In dengue, avoid ibuprofen and any painkiller of that family unless a '
-          'doctor has specifically told you to use it, because they affect '
-          'bleeding. Paracetamol is the one to use, and a doctor should be '
-          'guiding it by then anyway.',
+          'In dengue, avoid ibuprofen and any painkiller of that family unless '
+          'a doctor has told you to use it, because they affect bleeding. '
+          'Paracetamol is the one to use, and by then a doctor will usually '
+          'be guiding it anyway.',
           kind: PpCalloutKind.safety,
         ),
         PpCallout(
-          'Any fever running past the fifth day, any fever that returns after '
-          'settling, and any fever with severe tummy pain, bleeding gums, black '
-          'stools or a child who is suddenly quiet, is a hospital visit rather '
-          'than a phone call.',
+          'These need a hospital visit, not a phone call: any fever past the '
+          'fifth day, or one that returns after settling. The same goes for a '
+          'fever with severe tummy pain, bleeding gums, black stools, or a '
+          'child who is suddenly quiet.',
           kind: PpCalloutKind.doctor,
         ),
         // REQUIRED_REVIEW: the whole page. Confirm the dengue critical phase
@@ -1259,16 +1393,28 @@ final PpArea _fever = PpArea(
         // three" trigger, and the "past the fifth day" escalation.
         PpWhenLine('Think about this once a fever has run more than three days, '
             'or in monsoon and the weeks after it.'),
-        PpIndiaNote('Dengue peaks after the monsoon. The single most useful '
-            'thing you can do is empty standing water at home weekly: coolers, '
-            'plant trays, the terrace bucket, the money plant bottle. The '
-            'mosquito that carries dengue bites in the daytime, so daytime '
-            'repellent and full sleeves matter more than a night net.'),
+        PpIndiaNote('Dengue peaks after the monsoon. What helps most is '
+            'emptying standing water at home weekly: coolers, plant trays, '
+            'the terrace bucket, the money plant bottle. The dengue mosquito '
+            'bites in the daytime, so daytime repellent and full sleeves '
+            'matter more than a night net.'),
         PpLink(
-          'What is due on his vaccination schedule',
+          'What\'s due on the vaccination schedule',
           surfaceId: 'pp_vaccines',
-          blurb: 'Typhoid conjugate is on the IAP list. Check where he is.',
+          blurb: 'Typhoid conjugate is on the IAP list. Check where your child '
+              'is.',
         ),
+    // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+        PpCallout('In dengue, your doctor watches the platelet count with blood '
+            'tests. Papaya leaf juice, kiwis and goat\'s milk are widely '
+            'shared as platelet boosters, but there\'s no good evidence they '
+            'change how a child recovers. What matters most is fluids, rest, '
+            'paracetamol only (never ibuprofen or aspirin in dengue), and '
+            'watching for warning signs. These are tummy pain, repeated '
+            'vomiting, bleeding gums, or a child who turns cold and drowsy as '
+            'the fever falls. Go to hospital for any of these.',
+            kind: PpCalloutKind.doctor,
+            title: 'Platelets and papaya leaves'),
       ],
     ),
   ],
@@ -1288,8 +1434,8 @@ final PpArea _coughCold = PpArea(
   id: 'cough_cold',
   mark: IntentMark.listMark,
   title: 'Cough, cold and a blocked nose',
-  blurb: 'Why it keeps coming back, what actually helps, and the syrups to '
-      'leave on the shelf.',
+  blurb: 'Why it keeps coming back, what helps, and the syrups to leave on the '
+      'shelf.',
   hue: 200,
   pages: [
     PpPage(
@@ -1297,26 +1443,24 @@ final PpArea _coughCold = PpArea(
       title: 'The common cold, and why it keeps coming back',
       format: 'ARTICLE',
       blocks: [
-        PpIntro('If it feels like he has been ill since he started creche, he '
-            'probably has. This is the most normal thing in small childhood and '
-            'the most exhausting.'),
+        PpIntro('If it feels like your child has been ill since starting '
+            'creche, that\'s probably true. It\'s the most normal thing in '
+            'early childhood, and the most exhausting.'),
         PpArticle([
-          'A young child catches somewhere between six and twelve colds a year, '
-          'and more than that in the first year of creche or playgroup. There '
-          'are hundreds of viruses that cause the common cold and he has met '
-          'almost none of them, so each new one is a fresh illness rather than '
-          'the old one coming back. This is his immune system doing its '
-          'apprenticeship, and it does get better.',
-          'A cold runs roughly like this: a day of being off colour, two or '
-          'three days of a running nose and possibly a fever, then a week of a '
-          'thick nose and a cough that will not quit. The cough is the part that '
-          'frightens families, and it is the part that lasts longest. A cough '
-          'that is slowly improving over two or three weeks after a cold is '
-          'still an ordinary cough.',
-          'There is no medicine that shortens a cold. Not an antibiotic, which '
-          'does nothing at all to a virus, and not a cough syrup. What helps is '
-          'fluid, a clear nose, an upright position for sleeping, and time. That '
-          'is an unsatisfying answer and it is the true one.',
+          'A young child catches between six and twelve colds a year, and more '
+          'in the first year of creche or playgroup. Hundreds of viruses '
+          'cause the common cold, and your child has met almost none of them. '
+          'So each one is a fresh illness, not the old one coming back. The '
+          'immune system is learning, and it does get better.',
+          'A cold runs roughly like this: a day off colour, then two or three '
+          'days of a running nose and maybe a fever. Then comes a week of a '
+          'thick nose and a lingering cough. The cough frightens families '
+          'most, and it lasts longest. A cough that\'s slowly improving over '
+          'two or three weeks after a cold is still an ordinary cough.',
+          'No medicine shortens a cold. An antibiotic does nothing to a virus, '
+          'and a cough syrup doesn\'t help either. What helps is fluid, a '
+          'clear nose, sleeping a little upright, and time. It\'s an '
+          'unsatisfying answer, and it\'s the true one.',
         ]),
         PpChartCard(
           title: 'What is normal, roughly',
@@ -1330,32 +1474,59 @@ final PpArea _coughCold = PpArea(
             ('When the fever should stop', 'Within 3 days, usually'),
             ('Green mucus means', 'The cold is a few days old, nothing more'),
           ],
-          note: 'Green or yellow mucus is not a sign he needs an antibiotic. It '
-              'is what mucus does after a few days.',
+          note: 'Green or yellow mucus isn\'t a sign your child needs an '
+              'antibiotic. It\'s what mucus does after a few days.',
           hue: 200,
         ),
-        PpCallout('Judge a cold by the child, not by the nose. A child who is '
-            'eating, drinking and playing with a river of snot is fine. A child '
-            'who is quiet and off his feeds with a small sniffle is the one to '
-            'look at twice.'),
+        PpCallout('Judge a cold by the child, not the nose. A child who is '
+            'eating, drinking and playing with a river of snot is fine. A '
+            'child who is quiet and off feeds with a small sniffle is the one '
+            'to look at twice.'),
         PpCallout(
-          'See a doctor if he is breathing fast or working hard to breathe, if '
-          'the fever comes back after settling, if he is under three months, if '
-          'he is pulling at an ear with a fever, or if he is getting worse after '
-          'day five rather than better.',
+          'See a doctor for fast or hard breathing, or a fever that comes back '
+          'after settling. See one too if your baby is under three months, or '
+          'there\'s ear pulling with a fever. And see one if your child is '
+          'getting worse after day five, not better.',
           kind: PpCalloutKind.doctor,
         ),
         PpWhenLine('Expect a cold every few weeks through the first two years of '
             'creche, and fewer each year after that.'),
-        PpIndiaNote('Not every cold is caused by the cooler, the fan, the bath, '
-            'or wet hair. Colds are caused by viruses, which travel on hands and '
-            'in crowded rooms. Washing hands at the door does far more than '
+        PpIndiaNote('Colds aren\'t caused by the cooler, the fan, the bath, or '
+            'wet hair. Viruses cause them, and they travel on hands and in '
+            'crowded rooms. Washing hands at the door does far more than '
             'closing a window.'),
         PpLink(
           'Home remedies for cough and cold',
           pageId: 'cough_remedies',
           blurb: 'What helps, what only comforts, and what to stop.',
         ),
+    // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+        PpCards(heading: 'Cold, flu or a sore throat?', [
+          PpCard('A cold',
+              'Runny nose and sneezing, mild fever if any, and still fairly '
+                  'playful.'),
+          PpCard('Flu',
+              'Comes on suddenly: high fever, body aches, tiredness, cough, '
+                  'sometimes vomiting. Your child looks properly unwell for '
+                  'several days. A yearly flu vaccine from six months '
+                  'protects against it.'),
+          PpCard('A sore throat',
+              'Refusing food, drooling more, or crying when swallowing. Most '
+                  'are viral. A doctor may check for strep, a bacterial '
+                  'throat infection more common after three, which needs '
+                  'antibiotics.'),
+        ]),
+        PpSteps(heading: 'Stopping it going round the family', [
+          PpStep('Wash hands often, especially after wiping noses'),
+          PpStep('Throw tissues away straight after use'),
+          PpStep('Separate cups, spoons and towels'),
+          PpStep('Flu vaccines for the adults too',
+              'Especially grandparents and anyone near a newborn.'),
+        ]),
+        PpCallout('See a doctor if a toddler with flu is breathing fast, very '
+            'sleepy, not drinking, or gets better and then suddenly worse. '
+            'Under two, flu is more likely to need care.',
+            kind: PpCalloutKind.doctor),
       ],
     ),
     PpPage(
@@ -1365,72 +1536,73 @@ final PpArea _coughCold = PpArea(
       // Parents get this wrong from text." The slot is hoisted; the steps stay.
       format: 'VIDEO',
       blocks: [
-        PpIntro('A small baby breathes through his nose, so a blocked one means '
-            'he cannot feed and cannot sleep. This is the single most useful '
-            'thing you can do for a cold, and it takes two minutes.'),
+        PpIntro('Small babies breathe through the nose, so a blocked one means '
+            'no feeding and no sleep. Clearing it helps a cold more than '
+            'anything else, and takes two minutes.'),
         PpSteps([
-          PpStep('Lay him on his back with his head slightly turned',
-              'On your lap or on the bed. Somebody holding him helps.'),
+          PpStep('Lay your baby on the back, head turned slightly',
+              'On your lap or on the bed. Someone holding your baby helps.'),
           PpStep('Two or three drops of saline in each nostril',
               'Plain saline nasal drops from any chemist, or the ones your '
-              'paediatrician recommended. This is salt water, not medicine.'),
+              'paediatrician recommended. It\'s salt water, not medicine.'),
           PpStep('Wait thirty seconds',
-              'The saline is loosening thick mucus. Skipping this is why the '
-              'aspirator does not seem to work.'),
+              'The saline loosens thick mucus. Skip this and the aspirator '
+              'won\'t seem to work.'),
           PpStep('Suction gently with a bulb or a nasal aspirator',
               'Squeeze the bulb first, then place it, then release. One or two '
-              'goes per nostril and no more.'),
+              'goes per nostril, no more.'),
           PpStep('Wipe, and put a little coconut oil under the nose',
               'A sore red upper lip is half the misery of a cold by day three.'),
           PpStep('Do it before a feed and before sleep, not after',
-              'Right after a feed it makes him vomit.'),
+              'Right after a feed it can cause vomiting.'),
         ], heading: 'Saline, then suction'),
         PpCallout(
-          'Suction no more than three or four times a day, and stop if the '
-          'inside of the nose starts to bleed or he fights hard. An irritated '
-          'nose swells and blocks more. Gentle and occasional beats thorough.',
+          'Suction no more than three or four times a day. Stop if the inside '
+          'of the nose starts to bleed or your baby fights hard. An irritated '
+          'nose swells and blocks more. Gentle and occasional works better '
+          'than thorough.',
           kind: PpCalloutKind.safety,
         ),
         PpArticle([
-          'For sleeping, raise the head end of the mattress a little by putting '
-          'a folded towel under the mattress, never a pillow under the baby. A '
-          'pillow in the cot is a suffocation risk and it does not work anyway, '
-          'because he rolls off it.',
+          'For sleep, raise the head end a little with a folded towel under the '
+          'mattress, never a pillow under your baby. A pillow in the cot is a '
+          'suffocation risk, and it doesn\'t work anyway, because babies roll '
+          'off it.',
           'Steam helps some children and burns others. If you use it, run a hot '
-          'shower and sit in the steamy bathroom with him. Never hold a small '
-          'child over a bowl of boiling water or a steamer, because scalds from '
-          'exactly this are common enough that emergency doctors recognise them '
-          'on sight.',
+          'shower and sit in the steamy bathroom together. Never hold a small '
+          'child over a bowl of boiling water or a steamer. Scalds from '
+          'exactly this are so common that emergency doctors know them on '
+          'sight.',
         ], heading: 'Sleeping and steam'),
         // REQUIRED_REVIEW: saline drop counts, the three to four times a day
         // suction limit, no pillow under a baby, and the steam scald warning.
         PpWhenLine('Any age, from the first cold. Most useful under one year, '
-            'when he cannot blow his own nose.'),
-        PpIndiaNote('Do not put mustard oil, garlic oil or breast milk into a '
-            'baby nose to clear it. Saline is the only thing that belongs in '
+            'while your baby still can\'t blow a nose.'),
+        PpIndiaNote('Don\'t put mustard oil, garlic oil or breast milk in a '
+            'baby\'s nose to clear it. Saline is the only thing that belongs '
             'there, and oil in the nose can reach the lungs.'),
         PpVideoSlot(
           title: 'Saline drops and a nasal aspirator, step by step',
-          subtitle: 'Shown on a real baby, including how to hold him and how '
-              'much suction is enough.',
+          subtitle: 'Shown on a real baby, including how to hold your baby and '
+              'how much suction is enough.',
           minutes: '4 MIN',
           slotId: 'health/nose_saline',
         ),
         PpLink(
           'Compare nasal aspirators',
           surfaceId: 'pp_compare/First aid',
-          blurb: 'Bulb, tube and battery types, and what each is actually like '
-              'to use at 3am.',
+          blurb: 'Bulb, tube and battery types, and what each is like to use at '
+              '3am.',
         ),
       ],
     ),
     PpPage(
       id: 'cough_syrups',
-      title: 'Cough syrups: what is safe and what is not',
+      title: 'Cough syrups: what\'s safe and what isn\'t',
       format: 'RED FLAG',
       blocks: [
-        PpIntro('This is the shelf where a well meant purchase can do real harm. '
-            'The short version: most cough syrups do not help a small child, and '
+        PpIntro('This is the shelf where a well meant purchase can do real '
+            'harm. In short: most cough syrups don\'t help a small child, and '
             'a few are dangerous.'),
         // REQUIRED_REVIEW: EVERY AGE CUTOFF ON THIS PAGE.
         //   * No over-the-counter cough and cold combination under 4 years
@@ -1440,11 +1612,11 @@ final PpArea _coughCold = PpArea(
         //   * Promethazine (Phenergan) not under 2 years.
         //   * Honey only over 12 months.
         PpCallout(
-          'Do not give an over the counter cough and cold combination to a child '
-          'under four. They have not been shown to help at this age and they '
-          'carry real risks, including drowsiness deep enough to affect '
-          'breathing. If your paediatrician has prescribed something specific '
-          'for your child, follow her, not this page.',
+          'Don\'t give an over the counter cough and cold mix to a child under '
+          'four. They haven\'t been shown to help at this age, and they carry '
+          'real risks, including drowsiness deep enough to affect breathing. '
+          'If your paediatrician has prescribed something for your child, '
+          'follow that advice, not this page.',
           kind: PpCalloutKind.doctor,
           title: 'Under four, the answer is usually no syrup',
         ),
@@ -1486,23 +1658,23 @@ final PpArea _coughCold = PpArea(
         ),
         PpCallout(
           'Check every syrup in the house for paracetamol before you give a '
-          'fever dose. Combination cold syrups very often contain it, and that '
-          'is how a child receives a double dose while the family believes he '
-          'has had one. Read the ingredients on the box, not the name on the '
+          'fever dose. Combination cold syrups very often contain it, and '
+          'that\'s how a child gets a double dose while the family believes it '
+          'was one. Read the ingredients on the box, not the name on the '
           'front.',
           kind: PpCalloutKind.safety,
           title: 'The hidden paracetamol',
         ),
-        PpWhenLine('A cough that is slowly improving needs nothing. A cough '
+        PpWhenLine('A cough that\'s slowly improving needs nothing. A cough '
             'getting worse after five days, or with fast breathing, needs a '
-            'doctor rather than a syrup.'),
+            'doctor, not a syrup.'),
         PpIndiaNote('A chemist will sell you any of these without a '
             'prescription, and will often recommend one. Ask which drug is in '
-            'it. If the answer is "it is for cough", put it back.'),
+            'it. If the answer is "it\'s for cough", put it back.'),
         PpLink(
           'Compare cough and cold products for safety',
           surfaceId: 'pp_compare/First aid',
-          blurb: 'Read the ingredient list rather than the label claim.',
+          blurb: 'Read the ingredient list, not the label claim.',
         ),
       ],
     ),
@@ -1515,7 +1687,7 @@ final PpArea _coughCold = PpArea(
       blocks: [],
       /* kept for revert: the per-illness remedy cards; the tool is the one source
         PpIntro('This is where Indian families start, and often they are right '
-            'to. Here is what genuinely helps, what is comfort, and the two to '
+            'to. Here is what really helps, what is comfort, and the two to '
             'stop.'),
         PpCards([
           PpCard('Helps: honey, over one year old',
@@ -1564,31 +1736,31 @@ final PpArea _coughCold = PpArea(
       title: 'When a cough is more than a cold',
       format: 'ARTICLE',
       blocks: [
-        PpIntro('Almost every cough is a cold. The few that are not announce '
-            'themselves in the breathing rather than in the cough, and that is '
-            'the thing worth learning to look at.'),
+        PpIntro('Almost every cough is a cold. The few that aren\'t show it in '
+            'the breathing more than in the cough, and that\'s worth learning '
+            'to look at.'),
         PpArticle([
-          'Take his shirt off and watch his chest for a full minute while he is '
-          'calm or asleep. You are looking for three things: how fast he is '
-          'breathing, whether the skin is sucking in under the ribs or at the '
-          'base of the throat, and whether there is a small grunt at the end of '
-          'each breath. Any of the three is worth a doctor today, whatever the '
+          'Take your child\'s shirt off and watch the chest for a full minute, '
+          'while calm or asleep. You\'re looking for three things. Is the '
+          'breathing fast? Is the skin sucking in under the ribs or at the '
+          'base of the throat? Is there a small grunt at the end of each '
+          'breath? Any one of the three means a doctor today, whatever the '
           'cough sounds like.',
-          'A wheeze is a whistling sound as he breathes out, and it usually '
-          'means the small airways are narrowed. In babies under one this is '
-          'often bronchiolitis, a viral illness that peaks around day three to '
-          'five and then slowly settles. In older children a repeated wheeze '
-          'with colds, at night, or on running about is worth asking a doctor '
-          'about properly rather than treating each time as a fresh cold.',
-          'A barking cough like a seal, worse at night, with a harsh noise as he '
-          'breathes in, is croup. Cool night air often settles it within '
-          'minutes, so stepping outside or opening a window is a reasonable '
-          'first thing to do while you decide. If the noisy breathing continues '
-          'when he is calm and sitting still, that is a hospital.',
+          'A wheeze is a whistling sound on breathing out, and it usually means '
+          'the small airways are narrowed. In babies under one it\'s often '
+          'bronchiolitis, a viral illness that peaks around day three to five '
+          'and then slowly settles. In older children, a wheeze that keeps '
+          'returning with colds, at night, or when running about is worth a '
+          'proper talk with a doctor. Don\'t treat each one as a fresh cold.',
+          'A barking cough like a seal, worse at night, with a harsh noise on '
+          'breathing in, is croup. Cool night air often settles it within '
+          'minutes, so stepping outside or opening a window is a sensible '
+          'first step. If the noisy breathing carries on while your child is '
+          'calm and sitting still, go to hospital.',
         ]),
         PpChartCard(
           title: 'Breathing too fast, roughly',
-          subtitle: 'Counted over a full minute, while he is settled',
+          subtitle: 'Counted over a full minute, while your child is settled',
           // REQUIRED_REVIEW: EVERY THRESHOLD. These are the standard WHO fast
           // breathing cutoffs and must be confirmed, along with the instruction
           // to count for a full minute at rest rather than while crying.
@@ -1598,31 +1770,47 @@ final PpArea _coughCold = PpArea(
             ('1 to 5 years', 'More than 40 breaths a minute'),
             ('At any age', 'Ribs sucking in, or a grunt on each breath'),
           ],
-          note: 'Count while he is calm. A crying child breathes fast and it '
-              'tells you nothing.',
+          note: 'Count while your child is calm. A crying child breathes fast, '
+              'and that tells you nothing.',
           hue: 12,
         ),
         PpCallout(
           'Fast breathing, skin sucking in under the ribs, grunting, blue lips, '
-          'or a child too breathless to feed or to finish a sentence, all mean '
-          'being seen now. Do not wait for the morning clinic.',
+          'or a child too breathless to feed or finish a sentence, all mean '
+          'being seen now. Don\'t wait for the morning clinic.',
           kind: PpCalloutKind.doctor,
-          title: 'Breathing is the signal, not the cough',
+          title: 'Watch the breathing more than the cough',
         ),
-        PpWhenLine('Look at his breathing once each evening during any chest '
-            'illness, and again if he changes.'),
+        PpWhenLine('Look at the breathing once each evening during any chest '
+            'illness, and again if anything changes.'),
         PpIndiaNote('If a doctor has given an inhaler with a spacer, use the '
-            'spacer. Inhalers are not addictive and they are not a last resort, '
-            'and a spacer gets far more of the drug into a small child than a '
+            'spacer. Inhalers aren\'t addictive and they aren\'t a last resort. '
+            'A spacer gets far more of the drug into a small child than a '
             'nebuliser hired by the day.'),
         PpConsult(
           title: 'Talk to a paediatrician about a cough that keeps coming back',
-          whoFor: 'For the child whose every cold goes to his chest, or who '
-              'wheezes at night, where you want somebody to look at the whole '
-              'pattern rather than treat this week again.',
+          whoFor: 'For a child whose every cold goes to the chest, or who '
+              'wheezes at night. You want someone to look at the whole '
+              'pattern, not treat this week again.',
           surfaceId: 'pp_experts',
           role: 'pediatrician',
         ),
+    // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+        PpCards(heading: 'Three you may hear about', [
+          PpCard('Croup',
+              'A barking, seal-like cough and a hoarse voice, worse at night, '
+                  'sometimes with a harsh noise when breathing in. Sitting up '
+                  'together in cool night air often helps. Go to hospital if '
+                  'the noise happens at rest or breathing is a struggle.'),
+          PpCard('RSV and bronchiolitis',
+              'A common winter virus that starts like a cold. In babies, '
+                  'especially under six months or born early, it can cause '
+                  'fast breathing, wheezing and trouble feeding. Watch the '
+                  'breathing and feeds closely.'),
+          PpCard('Wheezing that keeps coming back',
+              'A whistling sound on breathing out, again and again, may be '
+                  'asthma. Ask your paediatrician.'),
+        ]),
       ],
     ),
   ],
@@ -1642,8 +1830,8 @@ final PpArea _tummy = PpArea(
   id: 'tummy',
   mark: IntentMark.blocksMark,
   title: 'Loose motions, vomiting and a hard tummy',
-  blurb: 'Keeping fluid in him, spotting dehydration early, and what a tummy '
-      'bug actually needs.',
+  blurb: 'Keeping fluids going, spotting dehydration early, and what a tummy '
+      'bug needs.',
   hue: 140,
   pages: [
     PpPage(
@@ -1651,55 +1839,53 @@ final PpArea _tummy = PpArea(
       title: 'Loose motions',
       format: 'ARTICLE',
       blocks: [
-        PpIntro('A tummy bug is unpleasant and usually harmless. The only thing '
-            'that makes it dangerous is fluid running out faster than it goes '
-            'in, and that is entirely in your hands.'),
+        PpIntro('A tummy bug is unpleasant and usually harmless. It turns '
+            'dangerous only when fluid runs out faster than it goes in, and '
+            'that part is in your hands.'),
         PpArticle([
-          'Most loose motions are viral, they last three to seven days, and no '
-          'medicine shortens them. Antibiotics do not help a viral tummy bug and '
-          'usually make the stools worse. What matters is fluid, and then more '
+          'Most loose motions are viral. They last three to seven days, and no '
+          'medicine shortens them. Antibiotics don\'t help a viral tummy bug '
+          'and usually make the stools worse. What matters is fluid, and more '
           'fluid, in small amounts, all day.',
-          'Keep feeding him. This is the part families most often get wrong, '
-          'because it feels sensible to rest the stomach. It is not: a gut that '
-          'is fed recovers faster. Keep breastfeeding on demand, keep the '
-          'formula at its normal strength, and offer ordinary food, khichdi, '
-          'curd rice, dalia, banana, as soon as he will take it. Do not dilute '
-          'milk and do not stop it.',
-          'Skip the fruit juices and the fizzy drinks. They are sugary enough to '
-          'pull water into the gut and make the stools worse. Skip anti-motion '
-          'medicines entirely in small children unless a doctor prescribes one, '
-          'because stopping the gut is not the same as treating the infection.',
+          'Keep feeding. Families often get this wrong, because resting the '
+          'stomach feels sensible. But a gut that is fed recovers faster. '
+          'Keep breastfeeding on demand, keep formula at normal strength, and '
+          'offer ordinary food (khichdi, curd rice, dalia, banana) as soon as '
+          'your child will take it. Don\'t dilute milk and don\'t stop it.',
+          'Skip fruit juices and fizzy drinks. They\'re sugary enough to pull '
+          'water into the gut and make the stools worse. Skip anti-motion '
+          'medicines in small children unless a doctor prescribes one. '
+          'Stopping the gut doesn\'t treat the infection.',
         ]),
         PpCards([
           PpCard('Give after every loose stool',
-              'ORS, in small sips, until he refuses. This is the whole '
+              'ORS, in small sips, until your child refuses. This is the whole '
               'treatment.'),
           PpCard('Zinc, if the doctor advises it',
               'A course of zinc shortens the illness and is standard advice in '
-              'India. Ask, do not self dose.'),
+              'India. Ask; don\'t give it on your own.'),
           PpCard('Keep the milk going',
-              'Breast, formula at normal strength, or cow milk if that is his '
-              'usual. Not diluted.'),
+              'Breast, formula at normal strength, or cow milk if that\'s usual. '
+              'Not diluted.'),
           PpCard('Wash hands after every nappy',
-              'Tummy bugs travel through the whole household in a day '
-              'otherwise.'),
+              'Otherwise tummy bugs go through the whole household in a day.'),
         ], heading: 'Four things that help', hue: 140),
         PpCallout(
-          'Go to a doctor if there is blood or mucus in the stool, if he is '
-          'vomiting everything and cannot keep ORS down, if there is no urine '
-          'for eight hours, if he is drowsy or floppy, if his belly is swollen '
-          'and tender, or if he is under six months.',
+          'Go to a doctor for blood or mucus in the stool, or vomiting '
+          'everything with no ORS staying down. Go too for no urine in eight '
+          'hours, drowsiness or floppiness, or a swollen, tender belly. And '
+          'go if your baby is under six months.',
           kind: PpCalloutKind.doctor,
         ),
         // REQUIRED_REVIEW: the 3 to 7 day duration, zinc as standard adjunct
         // therapy in India and whether we should state a dose range at all, the
         // "no urine for eight hours" figure, and the "under six months" cutoff.
         PpWhenLine('Most settle within a week. Anything past seven days, or a '
-            'child losing weight, needs to be looked at.'),
+            'child losing weight, needs a doctor\'s look.'),
         PpIndiaNote('Boiled and cooled water, home cooked food, and no street '
-            'food or cut fruit while he is ill. In summer and monsoon, tummy '
-            'bugs run through neighbourhoods, so if the family is ill too, that '
-            'is information worth telling the doctor.'),
+            'food or cut fruit during the illness. In summer and monsoon, '
+            'tummy bugs run through neighbourhoods. If the family is ill too, '
+            'tell the doctor.'),
         PpLink(
           'How to make and give ORS',
           pageId: 'tummy_ors',
@@ -1716,53 +1902,50 @@ final PpArea _tummy = PpArea(
       format: 'VIDEO',
       blocks: [
         PpIntro('Oral rehydration salts save more children than almost anything '
-            'else in medicine, and only when they are mixed correctly. Made too '
+            'else in medicine, but only when mixed correctly. Made too '
             'strong, ORS makes dehydration worse.'),
         PpSteps([
           PpStep('One full packet into one litre of clean water',
               'Not half a packet in half a bottle by eye, and not a spoonful in '
               'a glass. Boiled and cooled water, or bottled.'),
-          PpStep('Stir until it is fully dissolved',
-              'Taste it yourself. It should be barely salty. If it tastes like '
-              'sea water, it is too strong, throw it away and start again.'),
+          PpStep('Stir until fully dissolved',
+              'Taste it yourself. It needs to be barely salty. If it tastes '
+              'like sea water, it\'s too strong: throw it away and start '
+              'again.'),
           PpStep('Give small amounts very often',
               'A teaspoon or two every minute or two for a small child, a few '
-              'sips every five minutes for an older one. Volume comes from '
-              'frequency, not from big glasses.'),
+              'sips every five minutes for an older one. The amount adds up '
+              'through frequency, not big glasses.'),
           PpStep('Keep going after every loose stool and every vomit',
-              'The rule of thumb is a quarter to half a cup after each loose '
-              'stool for a child under two, and up to a full cup for an older '
-              'child.'),
-          PpStep('Throw away what is left after 24 hours',
+              'As a rough guide, give a quarter to half a cup after each loose '
+              'stool under two. An older child can have up to a full cup.'),
+          PpStep('Throw away what\'s left after 24 hours',
               'Make a fresh litre the next day. Keep it covered and cool in '
               'between.'),
         ], heading: 'The five steps'),
         PpCallout(
           'Never add sugar, salt, glucose powder or a flavoured drink to ORS to '
-          'make it taste better, and never mix it into milk or juice. The '
-          'balance of salt and sugar is the thing that makes it work. If he '
-          'refuses the taste, chill it or freeze the made up solution into ice '
-          'lollies.',
+          'improve the taste, and never mix it into milk or juice. The '
+          'balance of salt and sugar is what makes it work. If your child '
+          'refuses the taste, chill it, or freeze it into ice lollies.',
           kind: PpCalloutKind.safety,
-          title: 'Do not improve the recipe',
+          title: 'Don\'t improve the recipe',
         ),
         PpArticle([
-          'If there is no ORS packet in the house and the chemist is shut, the '
-          'home version is six level teaspoons of sugar and half a level '
-          'teaspoon of salt in one litre of clean water. It is a stopgap and it '
-          'is much easier to get wrong, so buy packets and keep four of them in '
-          'the house permanently. They cost very little and they never come to '
-          'hand in the middle of the night otherwise.',
-          'Bottled sports drinks and packaged nimbu pani are not ORS. They have '
-          'far too much sugar and far too little salt, and in a child with loose '
-          'motions they make things worse rather than better. Coconut water and '
-          'rice kanji with a pinch of salt are decent home fluids alongside ORS, '
-          'not instead of it.',
+          'No ORS packet at home and the chemist shut? The home version is six '
+          'level teaspoons of sugar and half a level teaspoon of salt in one '
+          'litre of clean water. It\'s a stopgap and much easier to get wrong. '
+          'So buy packets and always keep four at home. They cost very '
+          'little, and at midnight they\'re hard to find.',
+          'Bottled sports drinks and packaged lemon drinks aren\'t ORS. They have '
+          'far too much sugar and far too little salt, and with loose motions '
+          'they make things worse. Coconut water and rice kanji with a pinch '
+          'of salt are decent home fluids alongside ORS, not instead of it.',
         ], heading: 'If there is no packet'),
         PpCallout(
-          'If he vomits the ORS straight back, wait ten minutes and start again '
-          'with a teaspoon at a time. If he cannot keep anything down for more '
-          'than a few hours, or has passed no urine in eight hours, he needs a '
+          'If the ORS comes straight back up, wait ten minutes and start again, '
+          'a teaspoon at a time. If nothing stays down for more than a few '
+          'hours, or no urine has passed in eight hours, your child needs a '
           'doctor and possibly a drip.',
           kind: PpCalloutKind.doctor,
         ),
@@ -1771,13 +1954,13 @@ final PpArea _tummy = PpArea(
         // (quarter to half a cup under two), and the 24 hour discard rule.
         PpWhenLine('From the first loose stool, at any age, alongside normal '
             'milk and food.'),
-        PpIndiaNote('Keep ORS packets in the emergency drawer along with the '
-            'thermometer, not in the kitchen where they migrate. In a power cut '
-            'or a monsoon night, the chemist is not the plan.'),
+        PpIndiaNote('Keep ORS packets in the emergency drawer with the '
+            'thermometer, not in the kitchen where they wander off. In a '
+            'power cut or a monsoon night, the chemist isn\'t the plan.'),
         PpVideoSlot(
           title: 'Mixing and giving ORS',
-          subtitle: 'The packet, the litre, the spoon, and what to do when he '
-              'refuses it.',
+          subtitle: 'The packet, the litre, the spoon, and what to do when your '
+              'child refuses it.',
           minutes: '4 MIN',
           slotId: 'health/ors_mixing',
         ),
@@ -1791,9 +1974,9 @@ final PpArea _tummy = PpArea(
       // is kept below for revert.
       format: 'ILLUSTRATION',
       blocks: [
-        PpIntro('This is the one thing to check every few hours in a child with '
-            'loose motions or vomiting. It is quicker than a thermometer and it '
-            'tells you far more.'),
+        PpIntro('Check this every few hours in a child with loose motions or '
+            'vomiting. It\'s quicker than a thermometer and tells you far '
+            'more.'),
         /* kept for revert: the chart the picture replaced
         PpChartCard(
           title: 'The signs, in order of usefulness',
@@ -1808,7 +1991,7 @@ final PpArea _tummy = PpArea(
             ('Skin', 'Pinched skin on the belly stays up for a moment'),
             ('How he is', 'Quiet, floppy, hard to rouse, or very irritable'),
           ],
-          note: 'Wet nappies are the single most useful thing to count. Note a '
+          note: 'Wet nappies are the most useful thing to count. Note a '
               'time, and check whether one has been wet since.',
           hue: 140,
         ),
@@ -1821,30 +2004,30 @@ final PpArea _tummy = PpArea(
             PpIllustrationLabel('Eyes: sunken, and crying without tears'),
             PpIllustrationLabel('Mouth and tongue: dry and sticky rather than wet'),
             PpIllustrationLabel('Nappies: fewer wet ones, or none in 6 to 8 hours',
-                'The single most useful thing to count. Note a time.'),
+                'The most useful thing to count. Note a time.'),
             PpIllustrationLabel('Skin: pinched on the belly, it stays up for a moment'),
-            PpIllustrationLabel('How he is: quiet, floppy, hard to rouse, or very irritable'),
+            PpIllustrationLabel('Your child\'s mood: quiet, floppy, hard to '
+                'rouse, or very irritable'),
           ],
-          caption: 'Count nappies rather than judging by how he looks. A '
-              'dehydrated child can look reasonably alright right up until he '
-              'suddenly does not.',
+          caption: 'Count nappies rather than judging by looks. A dehydrated '
+              'child can look fairly alright, then suddenly not.',
         ),
-        PpCallout('Count nappies rather than judging by how he looks. A '
-            'dehydrated child can look reasonably alright right up until he '
-            'suddenly does not, which is why the count is worth more than an '
-            'impression.'),
+        PpCallout('Count nappies rather than judging by looks. A dehydrated '
+            'child can look fairly alright, then suddenly not. That\'s why the '
+            'count is worth more than an impression.'),
         PpCallout(
-          'No urine in eight hours, a sunken soft spot, a child too drowsy to '
-          'drink, sunken eyes, cold hands and feet, or fast breathing, all mean '
-          'going to a hospital now rather than trying more ORS at home.',
+          'These all mean going to a hospital now: no urine in eight hours, a '
+          'sunken soft spot, or a child too drowsy to drink. So do sunken '
+          'eyes, cold hands and feet, or fast breathing. Don\'t keep trying '
+          'more ORS at home.',
           kind: PpCalloutKind.doctor,
           title: 'When ORS is no longer enough',
         ),
         PpWhenLine('Check every four to six hours through any tummy bug, and at '
             'least once at night.'),
         PpIndiaNote('In peak summer a child dehydrates faster, and so does an '
-            'exclusively breastfed baby in a hot room. Extra breastfeeds are the '
-            'correct answer under six months, not water.'),
+            'exclusively breastfed baby in a hot room. Under six months, the '
+            'answer is extra breastfeeds, not water.'),
         PpLink(
           'How to make and give ORS',
           pageId: 'tummy_ors',
@@ -1857,46 +2040,65 @@ final PpArea _tummy = PpArea(
       title: 'Vomiting',
       format: 'ARTICLE',
       blocks: [
-        PpIntro('Vomiting frightens parents more than loose motions and is '
-            'usually the same illness from the other end. The plan is the same: '
-            'small amounts of fluid, very often.'),
+        PpIntro('Vomiting frightens parents more than loose motions, and it\'s '
+            'usually the same illness from the other end. The plan is the '
+            'same: small amounts of fluid, very often.'),
         PpArticle([
           'A tummy bug often starts with vomiting for half a day to a day, then '
-          'moves to loose motions. During the vomiting phase, big drinks come '
-          'straight back, so go small: a teaspoon of ORS every one or two '
-          'minutes for an hour is far more effective than a glass every hour, '
-          'because a small volume gets absorbed before the stomach objects.',
-          'If he vomits, wait ten minutes and start again at a teaspoon. Do not '
-          'stop offering. Keep breastfeeding, in shorter and more frequent '
-          'feeds. Solid food can wait a few hours if he does not want it, but '
-          'fluid cannot.',
+          'moves to loose motions. While the vomiting lasts, big drinks come '
+          'straight back, so go small. A teaspoon of ORS every one or two '
+          'minutes for an hour works far better than a glass every hour. A '
+          'small amount gets absorbed before the stomach objects.',
+          'After a vomit, wait ten minutes and start again at a teaspoon. Don\'t '
+          'stop offering. Keep breastfeeding, in shorter, more frequent '
+          'feeds. Solid food can wait a few hours if your child doesn\'t want '
+          'it, but fluid can\'t.',
           'Spitting up after feeds in a baby under six months is a different '
-          'thing entirely and is usually not vomiting at all. A baby who brings '
-          'up a mouthful after most feeds, is gaining weight and is otherwise '
-          'happy, is a laundry problem rather than a medical one.',
+          'thing, and usually not vomiting at all. A baby who brings up a '
+          'mouthful after most feeds, is gaining weight and is otherwise '
+          'happy, has a laundry problem, not a medical one.',
         ]),
         PpCallout(
-          'Go to a doctor for: green or bright yellow vomit, blood in the vomit, '
-          'vomiting with a swollen hard belly, vomiting after a fall or a knock '
-          'to the head, forceful vomiting shooting across the room in a baby '
-          'under three months, no urine in eight hours, or vomiting everything '
-          'for more than eight hours.',
+          'Go to a doctor for green or bright yellow vomit, or blood in the '
+          'vomit. Go too for vomiting with a swollen hard belly, or after a '
+          'fall or a knock to the head. In a baby under three months, go for '
+          'forceful vomiting that shoots across the room. And go for no urine '
+          'in eight hours, or vomiting everything for more than eight hours.',
           kind: PpCalloutKind.doctor,
         ),
         PpCallout(
-          'Do not give an anti vomiting medicine on your own, and do not accept '
-          'one over a chemist counter. In small children these have real side '
-          'effects and they hide the picture. Small sips of ORS instead.',
+          'Don\'t give an anti vomiting medicine on your own, and don\'t accept '
+          'one over a chemist\'s counter. In small children these have real '
+          'side effects and they hide the picture. Small sips of ORS instead.',
           kind: PpCalloutKind.safety,
         ),
         // REQUIRED_REVIEW: the teaspoon-every-two-minutes rehydration rate,
         // green or bile stained vomit as a red flag, projectile vomiting under
         // three months as a red flag, and the eight hour limits.
-        PpWhenLine('The vomiting phase of a tummy bug is usually over within a '
+        PpWhenLine('The vomiting part of a tummy bug is usually over within a '
             'day. Longer than that needs a doctor.'),
-        PpIndiaNote('Stop the ghee, the fried food and the heavy milk sweets '
-            'while his stomach settles, and come back to normal home food within '
-            'a day or two rather than keeping him on plain khichdi for a week.'),
+        PpIndiaNote('Stop the ghee, fried food and heavy milk sweets while the '
+            'stomach settles. Then come back to normal home food within a day '
+            'or two, rather than plain khichdi for a week.'),
+    // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+        PpArticle(heading: 'Spitting up, and when it\'s reflux', [
+          'Most babies spit up, often after every feed, because the valve at '
+              'the top of the stomach is still weak. If your baby is gaining '
+              'weight and is happy, it\'s laundry, not illness, and it usually '
+              'stops by about a year.',
+          'Talk to your doctor about spitting up that\'s forceful or shoots '
+              'across the room, poor weight gain, refused feeds, or arching '
+              'and screaming with feeds. Talk to them too about blood or '
+              'green in the vomit, or a lot of spitting up after a year. This '
+              'may be reflux disease (GERD), which can be treated.',
+        ]),
+        PpCards(heading: 'What helps with spitting up', [
+          PpCard('Smaller, more frequent feeds', 'A full stomach overflows.'),
+          PpCard('Burp during and after feeds', 'Not only at the end.'),
+          PpCard('Hold your baby upright for 20 minutes after', 'On your shoulder.'),
+          PpCard('Still on the back for sleep',
+              'Never raise the cot or prop your baby on pillows for reflux.'),
+        ]),
       ],
     ),
     PpPage(
@@ -1905,53 +2107,52 @@ final PpArea _tummy = PpArea(
       format: 'ARTICLE',
       blocks: [
         PpIntro('Constipation is about how hard the stool is and how much it '
-            'hurts, not about how many days it has been. A baby can go a week '
-            'and be perfectly fine.'),
+            'hurts, not how many days it\'s been. A baby can go a week and be '
+            'perfectly fine.'),
         PpArticle([
-          'A fully breastfed baby over six weeks old can genuinely go five to '
-          'seven days without a stool, and as long as the stool is soft when it '
-          'arrives and he is comfortable and feeding, nothing is wrong. Breast '
-          'milk leaves very little waste behind. Straining, going red and '
-          'grunting is also normal in small babies, who are learning to push '
-          'while lying flat.',
+          'A fully breastfed baby over six weeks old can go five to seven days '
+          'without a stool. If the stool is soft when it comes, and your baby '
+          'is comfortable and feeding, nothing is wrong. Breast milk leaves '
+          'very little waste. Straining, going red and grunting is also '
+          'normal in small babies, who are learning to push while lying flat.',
           'Real constipation looks like hard pellet stools, pain, a child who '
-          'holds on and refuses to go, or a streak of bright blood from a small '
-          'tear. In an older child it usually starts after an illness, a change '
-          'of routine, or one painful poo that he then spends a fortnight '
-          'avoiding.',
-          'What helps: more water through the day, fruit that actually works, '
-          'papaya, pear, prune, orange, and less of the things that bind, banana '
-          'in large amounts, a great deal of milk, and a lot of refined flour. A '
-          'child over one drinking more than about half a litre of milk a day '
-          'often improves simply by drinking less of it and eating more.',
+          'holds on and refuses to go, or a streak of bright blood from a '
+          'small tear. In an older child it usually starts after an illness, '
+          'a change of routine, or one painful poo that is then avoided for a '
+          'fortnight.',
+          'What helps: more water through the day, and fruit that works '
+          '(papaya, pear, prune, orange). Cut back on what binds: lots of '
+          'banana, a great deal of milk, and a lot of refined flour. A child '
+          'over one drinking more than about half a litre of milk a day often '
+          'improves by drinking less and eating more.',
         ]),
         PpSteps([
           PpStep('Water first, all day', 'Small amounts often, over one year.'),
           PpStep('Two fruits that move things',
-              'Papaya, pear, prune or soaked kishmish water. Every day, not '
+              'Papaya, pear, prune or soaked raisin water. Every day, not '
               'once.'),
           PpStep('Bicycle legs and a warm tummy rub',
               'Gentle, clockwise, after a bath. Comforting and mildly '
               'effective.'),
           PpStep('A relaxed time on the potty after a meal',
-              'Feet supported on a stool, no rush, no watching. A child who has '
-              'to hold his own weight cannot push.'),
+              'Feet supported on a stool, no rush, no watching. Without a '
+              'footrest, a child can\'t push well.'),
           PpStep('Ask the doctor before any laxative or suppository',
-              'These are sometimes exactly right and they are not a home '
+              'These are sometimes exactly right, and they\'re not a home '
               'decision, especially in babies.'),
         ]),
         PpCallout(
           'Never put a thermometer, a matchstick, soap or a cotton bud into a '
-          'child\'s bottom to make him pass stool. It is a common home practice, '
-          'it can tear the skin, and a child who learns that passing stool means '
-          'being held down will hold on harder.',
+          'child\'s bottom to bring out stool. It\'s a common home practice, '
+          'and it can tear the skin. A child who learns that passing stool '
+          'means being held down will hold on harder.',
           kind: PpCalloutKind.safety,
         ),
         PpCallout(
-          'See a doctor if a newborn has not passed stool in the first two days '
-          'of life, if there is blood beyond a small streak, if there is a '
-          'swollen tender belly with vomiting, if he is losing weight, or if the '
-          'constipation started in the first weeks of life.',
+          'See a doctor if a newborn hasn\'t passed stool in the first two days '
+          'of life, or there\'s blood beyond a small streak. See one too for a '
+          'swollen, tender belly with vomiting, weight loss, or constipation '
+          'that started in the first weeks of life.',
           kind: PpCalloutKind.doctor,
         ),
         // REQUIRED_REVIEW: "up to 5 to 7 days without a stool in a breastfed
@@ -1960,9 +2161,9 @@ final PpArea _tummy = PpArea(
         // rectal stimulation.
         PpWhenLine('At any age. Most common at the move to solids, at potty '
             'training, and after any illness.'),
-        PpIndiaNote('Janam ghutti and gripe water are commonly given for a hard '
-            'tummy and there is no good evidence they help. Water, fruit and '
-            'time do, and an unlabelled churan given daily to a baby is a real '
+        PpIndiaNote('Herbal drops (janam ghutti) and gripe water are often given for a hard '
+            'tummy, and there\'s no good evidence they help. Water, fruit and '
+            'time do. An unlabelled digestive powder (churan) given daily to a baby is a real '
             'risk.'),
         // Boundary: Feeding owns constipation when solids start.
         PpLink(
@@ -1970,6 +2171,14 @@ final PpArea _tummy = PpArea(
           surfaceId: 'pp_page/parenting_feeding/solids_constipation',
           blurb: 'The first month of food, and why the poo changes. In Feeding.',
         ),
+    // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+        PpArticle(heading: 'What toddler poo looks like', [
+          'Once your child eats family food, the poo changes: thicker, browner, '
+              'smellier, sometimes with bits of carrot, corn or tomato skin. '
+              'That\'s normal; little teeth don\'t chew everything. Anywhere '
+              'from three times a day to once in three days can be normal, as '
+              'long as it\'s soft and passes easily.',
+        ]),
       ],
     ),
     PpPage(
@@ -1978,40 +2187,41 @@ final PpArea _tummy = PpArea(
       format: 'ARTICLE',
       bands: ['hb_nb', 'hb_infant'],
       blocks: [
-        PpIntro('Long inconsolable crying in the evening, in a baby who is '
-            'otherwise feeding and growing, is one of the hardest ordinary '
-            'things in early parenting. It is not your fault and it does end.'),
+        PpIntro('Long, inconsolable crying in the evening, in a baby who is '
+            'feeding and growing, is one of the hardest ordinary things in '
+            'early parenting. It isn\'t your fault, and it does end.'),
         PpArticle([
-          'Colic is a description rather than a diagnosis: crying for long '
-          'stretches, often in the late afternoon and evening, in a healthy '
-          'baby. It typically starts around two to three weeks, peaks around six '
-          'weeks, and has largely gone by three to four months. Nobody is '
-          'certain what causes it. It is not caused by anything the mother ate, '
-          'and it is not a sign of a bad feed or a bad parent.',
-          'What helps is motion, contact and sound: carrying him upright against '
-          'you, a sling, walking, a soft rhythmic shush, a firm hand on the '
-          'back. Winding him properly after feeds helps some babies. A warm bath '
-          'helps others. Nothing works every night, which is exhausting and is '
-          'also normal.',
-          'The most important part of this page is the part about you. Crying '
-          'that does not stop is built to be unbearable, and it works. If you '
-          'feel your patience going, put him down somewhere safe, walk into '
-          'another room, and take five minutes. A baby crying in a safe cot is '
-          'fine. A shaken baby is not, and it takes only a moment.',
+          'Colic is a description, not a diagnosis: long stretches of crying, '
+          'often in the late afternoon and evening, in a healthy baby. It '
+          'usually starts around two to three weeks, peaks around six weeks, '
+          'and has mostly gone by three to four months. Nobody is sure what '
+          'causes it. Nothing you ate caused it, and it\'s no sign of a bad '
+          'feed or a bad parent.',
+          'What helps is motion, contact and sound: carrying your baby upright '
+          'against you, a sling, walking, a soft rhythmic shush, a firm hand '
+          'on the back. Winding well after feeds helps some babies. A warm '
+          'bath helps others. Nothing works every night, which is exhausting, '
+          'and also normal.',
+          'The most important part of this page is about you. Crying that '
+          'doesn\'t stop is hard to bear, for everyone. If you feel your '
+          'patience going, put your baby down somewhere safe, walk into '
+          'another room, and take five minutes. A baby crying in a safe cot '
+          'is fine. Shaking a baby causes serious harm, and it takes only a '
+          'moment.',
         ]),
         PpCallout(
-          'Never shake a baby, however desperate the night has become. Put him '
-          'down safely on his back in his cot, step out of the room, breathe, '
-          'and go back in when you can. Hand him to someone else if there is '
-          'someone else. This is the right thing to do, not a failure.',
+          'Never shake a baby, however desperate the night has become. Lay your '
+          'baby down safely on the back in the cot, step out of the room, '
+          'breathe, and go back in when you can. Hand over to someone else if '
+          'someone is there. This is the right thing to do, not a failure.',
           kind: PpCalloutKind.safety,
           title: 'The one rule of a bad night',
         ),
         PpCallout(
-          'Crying that is new and sudden in a baby who was settled, a shrill or '
-          'weak cry, crying with a fever, with vomiting, with blood in the '
-          'stool, with poor feeding or with poor weight gain, is not colic and '
-          'needs a doctor today.',
+          'New, sudden crying in a baby who was settled needs a doctor today; '
+          'it isn\'t colic. So does a shrill or weak cry, or crying with a '
+          'fever, vomiting, blood in the stool, poor feeding or poor weight '
+          'gain.',
           kind: PpCalloutKind.doctor,
         ),
         // REQUIRED_REVIEW: the colic timeline (onset 2 to 3 weeks, peak around
@@ -2019,11 +2229,11 @@ final PpArea _tummy = PpArea(
         // diet is not a cause.
         PpWhenLine('Usually from two or three weeks to three or four months. '
             'Rarely beyond that.'),
-        PpIndiaNote('Gripe water, janam ghutti and a drop of brandy are all '
-            'given for colic and none of them should be. Alcohol in any amount '
-            'is dangerous in a baby, and unlabelled ghutti has caused real harm. '
-            'Malish, a sling and a walk are the safe versions of the same '
-            'instinct.'),
+        PpIndiaNote('Gripe water, herbal drops (janam ghutti) and a drop of brandy are all '
+            'given for colic. Please don\'t use any of them. Alcohol in any '
+            'amount is dangerous for a baby, and unlabelled herbal drops have caused '
+            'real harm. Massage, a sling and a walk are the safe versions of '
+            'the same instinct.'),
         PpLink(
           'Gentle settling, in more detail',
           surfaceId: 'pp_section/parenting_sleep',
@@ -2061,7 +2271,7 @@ final PpArea _skin = PpArea(
       format: 'ILLUSTRATION',
       blocks: [
         PpIntro('Most baby rashes are harmless and look alarming. This compares '
-            'the common ones so you can tell which page to read next. It cannot '
+            'the common ones so you know which page to read next. It can\'t '
             'tell you which one your child has.'),
         /* kept for revert: the comparison table the grid replaced
         PpTable(
@@ -2124,9 +2334,11 @@ final PpArea _skin = PpArea(
           title: 'Which one is it?',
           labels: [
             PpIllustrationLabel('Baby acne: small pimples, no itch',
-                'Cheeks and forehead in the first weeks. Nothing; gone by three months.'),
+                'Cheeks and forehead in the first weeks. Needs nothing; gone by '
+                    'three months.'),
             PpIllustrationLabel('Heat rash: tiny pinpoint bumps',
-                'Neck folds, back, chest, under clothes. Cool him, loose cotton, less oil.'),
+                'Neck folds, back, chest, under clothes. Keep your baby cool, '
+                    'loose cotton, less oil.'),
             PpIllustrationLabel('Eczema: dry, rough, itchy patches',
                 'Cheeks first, then elbow and knee creases. Heavy moisturiser; a doctor for a flare.'),
             PpIllustrationLabel('Cradle cap: greasy yellow scales',
@@ -2136,32 +2348,35 @@ final PpArea _skin = PpArea(
             PpIllustrationLabel('HFMD: small blisters, mouth ulcers, fever',
                 'Hands, feet, round the mouth, bottom. Fluids and pain relief; it passes.'),
             PpIllustrationLabel('Chickenpox: itchy spots that blister then crust, in crops',
-                'Trunk first, then everywhere. Comfort, and keep him away from newborns.'),
+                'Trunk first, then everywhere. Comfort, and keep away from '
+                    'newborns.'),
             PpIllustrationLabel('Hives: raised welts that move about and fade',
-                'Anywhere, hour to hour. Usually settles; breathing trouble is urgent.'),
+                'Anywhere, changing hour to hour. Usually settles; breathing '
+                    'trouble is urgent.'),
           ],
-          caption: 'None of these is the one that cannot wait. That one is '
-              'below: small flat spots that do not fade under a pressed glass.',
+          caption: 'None of these is the one that can\'t wait. That one is '
+              'below: small flat spots that don\'t fade under a pressed glass.',
         ),
         PpCallout(
-          'One rash cannot wait. Small flat red or purple spots that do NOT fade '
-          'when you press the side of a clear glass firmly onto them, especially '
-          'with a fever, a stiff neck or a very drowsy child, mean going to a '
-          'hospital immediately. Do the glass test on any new rash with a fever.',
+          'One rash can\'t wait. Small flat red or purple spots that don\'t fade '
+          'when you press the side of a clear glass firmly on them mean going '
+          'to a hospital immediately. This matters most with a fever, a stiff '
+          'neck or a very drowsy child. Do the glass test on any new rash '
+          'with a fever.',
           kind: PpCalloutKind.doctor,
           title: 'The glass test',
         ),
         // REQUIRED_REVIEW: the glass test description and the non-blanching
         // rash red flag, plus each row of the comparison table.
         PpCallout('Take a clear photo in daylight when you first see a rash. '
-            'Rashes change fast, and the photo is often what lets a doctor '
-            'answer without a visit.'),
+            'Rashes change fast, and the photo often lets a doctor answer '
+            'without a visit.'),
         PpWhenLine('Any age. Newborn rashes are almost all harmless; a new rash '
             'with a fever in any child is the one to look at properly.'),
-        PpIndiaNote('Heat rash is by far the most common summer rash in India '
-            'and it is very often made worse by a daily oil malish in a hot '
-            'room. Malish in the cool of the morning, and lighter oil, usually '
-            'fixes it in two days.'),
+        PpIndiaNote('Heat rash is by far the most common summer rash in India, '
+            'and a daily oil massage in a hot room often makes it worse. '
+            'Massage in the cool of the morning, with lighter oil, usually '
+            'clears it in two days.'),
         PpVideoSlot(
           title: 'Telling the common baby rashes apart',
           subtitle: 'Eczema, heat rash, HFMD, nappy rash and cradle cap, shown '
@@ -2176,61 +2391,60 @@ final PpArea _skin = PpArea(
       title: 'Hand, foot and mouth disease',
       format: 'ARTICLE',
       blocks: [
-        PpIntro('HFMD sweeps through creches and playgroups every year. It looks '
-            'much worse than it is, and the hard part is not the rash, it is '
-            'getting fluid into a child with a sore mouth.'),
+        PpIntro('HFMD sweeps through creches and playgroups every year. It '
+            'looks much worse than it is. The hard part is getting fluid into '
+            'a child with a sore mouth.'),
         PpArticle([
-          'It starts with a fever and a child who is off his food, then small '
-          'blisters appear on the palms, the soles, around the mouth and often '
-          'on the bottom, along with ulcers inside the mouth. The mouth ulcers '
-          'are the painful part and they are the reason he stops drinking. It is '
-          'caused by a virus, so there is no medicine that treats it and no '
-          'antibiotic that helps.',
-          'It runs about seven to ten days. The fever goes first, the blisters '
-          'dry over the following week, and some children lose a fingernail or '
-          'toenail a month or two later, which grows back and needs nothing. He '
-          'is most infectious in the first week, and it spreads through saliva, '
-          'through the blister fluid and through stool, which is why handwashing '
-          'after nappies matters as much as anything.',
+          'It starts with a fever and a child who is off food. Then small '
+          'blisters appear on the palms, the soles, around the mouth and '
+          'often on the bottom, with ulcers inside the mouth. The mouth '
+          'ulcers hurt most, and they\'re why your child stops drinking. A '
+          'virus causes it, so no medicine treats it and no antibiotic helps.',
+          'It runs about seven to ten days. The fever goes first and the '
+          'blisters dry over the next week. Some children lose a fingernail '
+          'or toenail a month or two later; it grows back and needs nothing. '
+          'The first week is the most infectious. It spreads through saliva, '
+          'blister fluid and stool, so handwashing after nappies matters as '
+          'much as anything.',
           'Treatment is comfort. Cold things go down best: chilled milk, curd, '
-          'ice cream, cold coconut water, kulfi. Avoid salty, spicy, citrus and '
-          'anything crunchy while the mouth hurts. Paracetamol for pain, in the '
-          'ranges your doctor has confirmed, makes the difference between a '
-          'child who drinks and one who does not.',
+          'ice cream, cold coconut water, kulfi. Avoid salty, spicy, citrus '
+          'and crunchy food while the mouth hurts. Paracetamol for pain, in '
+          'the range your doctor has confirmed, can make the difference '
+          'between drinking and not.',
         ]),
         PpCards([
           PpCard('Cold and soft, for three days',
               'Curd, kheer, ice cream, cold milk, mashed banana. Calories can '
-              'wait, fluid cannot.'),
+              'wait, fluid can\'t.'),
           PpCard('Nothing citrus, salty or crunchy',
-              'Orange juice on a mouth ulcer is the reason he refuses the next '
-              'thing you offer too.'),
+              'Orange juice on a mouth ulcer is why the next thing you offer '
+              'gets refused too.'),
           PpCard('A soft cloth instead of a brush',
               'Wipe the teeth gently for a few days rather than brushing.'),
-          PpCard('Keep him home while he has fever and fresh blisters',
-              'Usually about a week. Tell the creche, because they will want to '
-              'warn other families.'),
+          PpCard('Keep your child home during fever and fresh blisters',
+              'Usually about a week. Tell the creche, so they can warn other '
+              'families.'),
         ], heading: 'Getting through the week', hue: 340),
         PpCallout(
-          'See a doctor if he has passed no urine in eight hours, will not drink '
-          'anything at all, is very drowsy, has a fever past five days, or has '
-          'blisters that turn into large red swollen areas. Dehydration from a '
-          'sore mouth is the only common complication and it is preventable.',
+          'See a doctor for no urine in eight hours, refusing all drinks, great '
+          'drowsiness, or a fever past five days. See one too if blisters '
+          'turn into large red swollen areas. Dehydration from a sore mouth '
+          'is the only common complication, and it\'s preventable.',
           kind: PpCalloutKind.doctor,
         ),
         // REQUIRED_REVIEW: the 7 to 10 day course, the infectious period, nail
         // shedding weeks later, the "no urine in eight hours" trigger, and the
         // advice on returning to creche.
         PpWhenLine('Most common between six months and five years. Adults catch '
-            'it occasionally and get it mildly.'),
+            'it now and then, mildly.'),
         PpIndiaNote('It runs in waves through Indian creches in the monsoon and '
-            'again after it. A child can catch it more than once, because '
-            'several different viruses cause it, so a second bout is not a sign '
-            'that anything is wrong with his immunity.'),
+            'again after it. Several different viruses cause it, so a child '
+            'can catch it more than once. A second bout doesn\'t mean the '
+            'immune system is weak.'),
         PpLink(
           'Compare soothing creams and lotions',
           surfaceId: 'pp_compare/Lotions',
-          blurb: 'What is worth putting on drying blisters, and what is not.',
+          blurb: 'What\'s worth putting on drying blisters, and what isn\'t.',
         ),
       ],
     ),
@@ -2239,64 +2453,63 @@ final PpArea _skin = PpArea(
       title: 'Nappy rash',
       format: 'ARTICLE',
       blocks: [
-        PpIntro('Almost every baby gets it at some point. It is usually a wet '
-            'skin problem rather than an infection, and it usually clears in two '
-            'or three days once the skin gets air.'),
+        PpIntro('Almost every baby gets it at some point. It\'s usually wet skin '
+            'rather than an infection, and it usually clears in two or three '
+            'days once the skin gets air.'),
         PpArticle([
-          'The cause is simple: skin that stays wet, plus the ammonia in urine '
-          'and the enzymes in stool, plus rubbing. So the treatment is simple '
-          'too: change more often, clean gently with water rather than scrubbing '
-          'with a wipe, dry properly, and put a thick barrier layer between the '
-          'skin and the nappy at every change.',
-          'Nappy free time is the single most effective thing. Twenty minutes '
-          'twice a day on a towel or a waterproof mat, no nappy, does more than '
-          'any cream. It is inconvenient and it works.',
-          'If the rash is bright red with a clear edge, with small spots '
-          'scattered outside the main patch, and it is not settling with a '
-          'barrier cream, it may be a thrush rash rather than a plain one and it '
-          'needs a different cream from a doctor. That is worth knowing, because '
-          'families often escalate the barrier cream when the problem has '
+          'The cause is skin that stays wet, plus the ammonia in urine and the '
+          'enzymes in stool, plus rubbing. So the treatment is easy too: '
+          'change more often and clean gently with water instead of scrubbing '
+          'with a wipe. Dry properly, and put a thick barrier layer between '
+          'skin and nappy at every change.',
+          'Nappy free time works best of all. Twenty minutes twice a day on a '
+          'towel or a waterproof mat, no nappy, does more than any cream. '
+          'It\'s inconvenient, and it works.',
+          'A rash that\'s bright red with a clear edge, with small spots '
+          'scattered outside the main patch, may be thrush. If it isn\'t '
+          'settling with a barrier cream, it needs a different cream from a '
+          'doctor. Families often add more barrier cream when the problem has '
           'changed.',
         ]),
         PpSteps([
-          PpStep('Change as soon as it is soiled',
+          PpStep('Change as soon as it\'s soiled',
               'Especially after a stool. This is most of the treatment.'),
           PpStep('Clean with water and cotton, not a scented wipe',
-              'Wipes on already sore skin sting and delay healing.'),
+              'Wipes on sore skin sting and slow healing.'),
           PpStep('Pat dry, and let the air do the rest',
-              'Do not rub. Wait until the skin is properly dry before the '
-              'cream.'),
+              'Don\'t rub. Wait until the skin is properly dry before the cream.'),
           PpStep('A thick barrier layer every change',
-              'Zinc oxide based. It should look like icing, not like a rubbed in '
+              'Zinc oxide based. It should look like icing, not a rubbed in '
               'moisturiser.'),
           PpStep('Nappy free time, twice a day',
               'Twenty minutes on a towel. The best thing on this list.'),
         ]),
         PpCallout(
-          'Do not use talcum powder in the nappy area. Powder cakes in the folds '
-          'when it gets wet and makes the rubbing worse, and fine powder near a '
-          'baby face is not good for his lungs. Use a barrier cream instead.',
+          'Don\'t use talcum powder in the nappy area. Wet powder cakes in the '
+          'folds and makes the rubbing worse, and fine powder near a baby\'s '
+          'face isn\'t good for the lungs. Use a barrier cream instead.',
           kind: PpCalloutKind.safety,
         ),
         PpCallout(
-          'See a doctor if the rash is not improving after three days of proper '
-          'care, if there are blisters, open sores, yellow crusts or pus, if it '
-          'spreads beyond the nappy area, or if he has a fever with it.',
+          'See a doctor if the rash isn\'t improving after three days of proper '
+          'care, or there are blisters, open sores, yellow crusts or pus. See '
+          'one too if it spreads beyond the nappy area, or comes with a '
+          'fever.',
           kind: PpCalloutKind.doctor,
         ),
         // REQUIRED_REVIEW: the three day improvement window, the description of
         // a candidal nappy rash, and the advice against talcum powder.
         PpWhenLine('Any age in nappies. Most common around six to twelve months, '
             'during teething, and during any illness with loose stools.'),
-        PpIndiaNote('In summer, cloth nappies and langots are cooler but need '
-            'changing sooner, because cotton holds the wet against the skin. If '
-            'you use cloth, change at the first sign of damp and skip the '
+        PpIndiaNote('In summer, cloth nappies are cooler but need '
+            'changing sooner, because cotton holds the wet against the skin. '
+            'With cloth, change at the first sign of damp and skip the '
             'plastic cover during the day.'),
         PpLink(
           'Compare nappy rash creams',
           surfaceId: 'pp_compare/Rash creams',
           blurb: 'Which are true barriers, which are medicated, and which are '
-              'just moisturiser.',
+              'only moisturiser.',
         ),
       ],
     ),
@@ -2306,45 +2519,46 @@ final PpArea _skin = PpArea(
       format: 'ARTICLE',
       blocks: [
         PpIntro('Dry, rough, itchy skin that comes and goes is one of the '
-            'commonest things in small children. It is managed rather than '
-            'cured, and the management is mostly moisturiser.'),
+            'commonest things in small children. It\'s managed rather than '
+            'cured, and managing it is mostly moisturiser.'),
         PpArticle([
-          'Eczema is a skin barrier that leaks water and lets irritants in. It '
-          'usually shows first on the cheeks in a baby, then moves to the folds '
-          'of the elbows and knees as he grows. It is itchy, and the scratching '
-          'is what turns a dry patch into a weeping one, so most of the work is '
-          'keeping the skin comfortable enough not to be scratched.',
-          'The routine that works is dull and relentless: a short lukewarm bath, '
-          'a gentle non soap cleanser, pat dry, and a thick moisturiser within '
-          'three minutes while the skin is still damp, twice a day and more in '
-          'winter. Thick means an ointment or a heavy cream rather than a '
-          'lotion. Use a great deal more than feels reasonable.',
+          'Eczema is a skin barrier that leaks water and lets irritants in. In '
+          'babies it usually shows first on the cheeks, then moves to the '
+          'elbow and knee folds with age. It itches, and scratching turns a '
+          'dry patch into a weeping one. So most of the work is keeping the '
+          'skin comfortable enough not to scratch.',
+          'The routine that works is dull and steady. Give a short lukewarm '
+          'bath with a gentle non soap cleanser, and pat dry. Then put on a '
+          'thick moisturiser within three minutes, while the skin is damp. '
+          'Twice a day, and more in winter. Thick means an ointment or a '
+          'heavy cream, not a lotion. Use much more than feels reasonable.',
           'When a patch flares up, red and angry, a doctor will often prescribe '
-          'a short course of a mild steroid cream. Families are frightened of '
-          'these and then use too little for too long, which is exactly the '
-          'wrong way round. Used as prescribed, for a few days on a flare, they '
-          'are safe and they end the flare quickly.',
+          'a short course of a mild steroid cream. Families fear these and '
+          'use too little for too long, which is the wrong way round. Used as '
+          'prescribed, for a few days on a flare, they\'re safe and end the '
+          'flare quickly.',
         ]),
         PpCards([
           PpCard('Moisturise twice a day, always',
-              'Even on good days. The daily routine is what prevents flares, not '
-              'the cream you reach for during one.'),
+              'Even on good days. The daily routine prevents flares; the cream '
+              'you reach for during one doesn\'t.'),
           PpCard('Short lukewarm baths, not hot',
               'Hot water strips the skin. Five to ten minutes is plenty.'),
           PpCard('Cotton, and no wool against the skin',
               'And wash new clothes before the first wear.'),
-          PpCard('Keep his nails short',
-              'Scratching does more damage than the eczema does. Cotton mittens '
-              'at night help small babies.'),
+          PpCard('Keep nails short',
+              'Scratching does more damage than the eczema. Cotton mittens at '
+              'night help small babies.'),
           PpCard('Find the trigger, gently',
               'Heat, sweat, soap, dust, a new detergent. Food is a much rarer '
-              'trigger than families assume.'),
+              'trigger than families think.'),
         ], heading: 'The routine', hue: 340),
         PpCallout(
           'See a doctor if the skin is weeping, crusted yellow, blistered or '
-          'suddenly painful, which can mean an infection, if a flare is not '
-          'settling with your usual care, or if the itching is keeping him awake '
-          'at night. Eczema that costs sleep is under treated, not incurable.',
+          'suddenly painful, which can mean an infection. See one too if a '
+          'flare isn\'t settling with your usual care, or the itching keeps '
+          'your child awake at night. Eczema that costs sleep is under '
+          'treated, not incurable.',
           kind: PpCalloutKind.doctor,
         ),
         // REQUIRED_REVIEW: the "moisturise within three minutes of a bath"
@@ -2352,14 +2566,14 @@ final PpArea _skin = PpArea(
         // food triggers are less common than assumed.
         PpWhenLine('Often starts between two and six months. Many children grow '
             'out of it by school age.'),
-        PpIndiaNote('Mustard oil and heavy malish oils irritate eczema in a lot '
-            'of babies, and so does turmeric paste on broken skin. Use a plain '
-            'thick moisturiser on the affected patches and keep the malish for '
-            'the rest of him.'),
+        PpIndiaNote('Mustard oil and heavy massage oils irritate eczema in many '
+            'babies, and so does turmeric paste on broken skin. Use a plain '
+            'thick moisturiser on the patches, and keep the massage for the '
+            'rest of the body.'),
         PpLink(
           'Compare moisturisers and barrier creams',
           surfaceId: 'pp_compare/Rash creams',
-          blurb: 'Ointment, cream or lotion, and what actually stays on.',
+          blurb: 'Ointment, cream or lotion, and what stays on.',
         ),
       ],
     ),
@@ -2369,47 +2583,47 @@ final PpArea _skin = PpArea(
       format: 'ARTICLE',
       blocks: [
         PpIntro('Tiny bumps in the neck folds, across the back and under the '
-            'clothes, in a baby who is hot. The most common rash in the country '
-            'and the easiest to fix.'),
+            'clothes, in a baby who is hot. The most common rash in the '
+            'country, and the easiest to fix.'),
         PpArticle([
-          'Heat rash happens when sweat cannot escape, so the sweat ducts block '
-          'and small bumps appear where the skin is covered or folded: the neck, '
-          'the upper back, the chest, under the arms, around the nappy waistband '
-          'and under the chin where he dribbles.',
-          'It clears in a day or two if he simply gets cooler: loose cotton and '
-          'nothing under it, a cooler or a fan, a lukewarm bath twice a day, '
-          'drying the folds properly afterwards, and skipping the oil malish '
-          'until it settles. It does not need a medicated cream, and thick '
-          'creams often make it last longer by blocking the skin further.',
+          'Heat rash happens when sweat can\'t escape. The sweat ducts block, '
+          'and small bumps appear where skin is covered or folded. Look at '
+          'the neck, upper back, chest and under the arms. Look too around '
+          'the nappy waistband, and under the chin where dribble collects.',
+          'It clears in a day or two once your baby is cooler. Loose cotton '
+          'with nothing under it, a cooler or a fan, a lukewarm bath twice a '
+          'day, folds dried properly, and no oil massage until it settles. It '
+          'doesn\'t need a medicated cream, and thick creams often make it '
+          'last longer by blocking the skin further.',
         ]),
         PpSteps([
-          PpStep('Cool him first', 'A fan, a cooler, or a lukewarm bath.'),
+          PpStep('Cool your baby first', 'A fan, a cooler, or a lukewarm bath.'),
           PpStep('One loose cotton layer, nothing synthetic',
               'And no vest under the kurta in May.'),
           PpStep('Dry the folds properly',
               'Neck, groin, behind the knees. This is where it starts.'),
-          PpStep('Pause the oil malish for two days',
+          PpStep('Pause the oil massage for two days',
               'Or move it to early morning and use much less.'),
           PpStep('Skip the powder',
               'Talc cakes in a sweaty fold and blocks the ducts further.'),
         ]),
-        PpCallout('If it is not settling in two or three days of keeping him '
-            'cool, it is probably not heat rash. The rash comparison page is the '
-            'next stop.'),
+        PpCallout('If it isn\'t settling after two or three days of keeping '
+            'cool, it\'s probably not heat rash. The rash comparison page is '
+            'the next stop.'),
         PpCallout(
-          'A doctor should look if the bumps become pus filled, if the skin '
-          'around them is red, hot and spreading, or if he has a fever with it. '
-          'Scratched heat rash does sometimes become infected.',
+          'A doctor should look if the bumps fill with pus, the skin around '
+          'them is red, hot and spreading, or there\'s a fever with it. '
+          'Scratched heat rash can become infected.',
           kind: PpCalloutKind.doctor,
         ),
         // REQUIRED_REVIEW: the two to three day resolution window and the
         // advice to pause oil massage.
         PpWhenLine('From the first summer onwards, and in humid coastal weather '
             'all year.'),
-        PpIndiaNote('A daily oil malish in a hot unairconditioned room is the '
-            'single most common cause of heat rash in Indian babies. Malish is '
-            'good for him; malish at 2pm in June is not. Move it to early '
-            'morning and use a lighter oil in summer.'),
+        PpIndiaNote('A daily oil massage in a hot room without AC is the most '
+            'common cause of heat rash in Indian babies. Massage is good for '
+            'your baby; a massage at 2pm in June isn\'t. Move it to early morning '
+            'and use a lighter oil in summer.'),
       ],
     ),
     PpPage(
@@ -2420,47 +2634,48 @@ final PpArea _skin = PpArea(
       blocks: [
         PpIntro('Newborn skin does a series of strange things in the first '
             'weeks, and almost all of them need nothing at all. Here are the '
-            'ones that fill up a paediatrician\'s morning.'),
+            'ones that fill a paediatrician\'s morning.'),
         PpCards([
           PpCard('Peeling skin in the first two weeks',
               'Especially on the hands and feet, and more in a baby born a '
-              'little late. It needs no cream and it stops on its own.'),
+              'little late. It needs no cream, and it stops on its own.'),
           PpCard('Baby acne on the cheeks',
               'Small red or white pimples at two to four weeks, from your '
-              'hormones still in his system. Do not squeeze, do not apply '
-              'anything. Gone by three months.'),
+              'hormones still in your baby\'s system. Don\'t squeeze, don\'t '
+              'apply anything. Gone by three months.'),
           PpCard('Cradle cap on the scalp',
               'Greasy yellow scales. Soften with a little coconut oil for an '
-              'hour, comb gently with a soft brush during the bath, wash out. '
+              'hour, comb gently with a soft brush in the bath, wash out. '
               'Never pick it off dry.'),
           PpCard('Milia, tiny white spots on the nose',
-              'Blocked pores. They vanish in a few weeks by themselves.'),
+              'Blocked pores. They vanish in a few weeks on their own.'),
           PpCard('Mongolian spots, blue grey patches',
-              'Usually on the back or the bottom, present from birth, entirely '
+              'Usually on the back or the bottom, there from birth, completely '
               'harmless, and they fade over the early years.'),
           PpCard('Erythema toxicum, blotchy red patches with a pale centre',
-              'Alarming in week one, common, and gone within days. The name is '
-              'much worse than the rash.'),
+              'Alarming in week one, common, and gone within days. The name '
+              'sounds much worse than the rash.'),
         ], heading: 'Six that need nothing', hue: 340),
         PpCallout(
-          'A doctor should see: any blisters or pus filled spots in a newborn, a '
-          'rash with a fever at this age, yellowing of the skin or the whites of '
-          'the eyes, or a rash that does not fade under a pressed glass. In a '
-          'baby under three months, a rash with a fever is a same day visit.',
+          'A doctor needs to see any blisters or pus filled spots in a newborn, '
+          'or a rash with a fever at this age. The same goes for yellowing of '
+          'the skin or the whites of the eyes. And any rash that doesn\'t fade '
+          'under a pressed glass. In a baby under three months, a rash with a '
+          'fever is a same day visit.',
           kind: PpCalloutKind.doctor,
         ),
         // REQUIRED_REVIEW: every timeline in the cards, and the newborn rash
         // red flags, especially blistering or pustular rashes in a newborn.
         PpWhenLine('Birth to about three months. After that these mostly stop '
             'appearing.'),
-        PpIndiaNote('Do not apply besan, malai, haldi paste or kajal to newborn '
-            'skin or eyes. Kajal in particular has repeatedly been found to '
-            'contain lead, and a newborn absorbs it. Plain oil for the malish '
-            'and nothing on the face.'),
+        PpIndiaNote('Don\'t put gram flour, milk cream, turmeric paste or kohl (kajal) on newborn '
+            'skin or eyes. Kohl has often been found to contain lead, and a '
+            'newborn absorbs it. Plain oil for the massage, and nothing on the '
+            'face.'),
         PpLink(
           'Newborn jaundice, and the yellow that matters',
           pageId: 'ill_jaundice',
-          blurb: 'When yellow skin is ordinary and when it is not.',
+          blurb: 'When yellow skin is ordinary and when it isn\'t.',
         ),
       ],
     ),
@@ -2470,38 +2685,38 @@ final PpArea _skin = PpArea(
       format: 'ARTICLE',
       blocks: [
         PpIntro('Itchy spots arriving in crops over a few days, with a fever at '
-            'the start. Most children get through it uncomfortably and '
-            'completely, and there is a vaccine that prevents it.'),
+            'the start. Most children get through it uncomfortably but fully, '
+            'and a vaccine prevents it.'),
         PpArticle([
           'It begins with a fever and a child who feels rotten a day before any '
-          'spot appears. Then flat red spots come, turn into small blisters, and '
-          'crust over, in waves, so at any moment he will have all three stages '
-          'on him at once. That mixture is the thing that distinguishes '
-          'chickenpox from most other rashes.',
-          'He is infectious from a day or two before the rash until every '
-          'blister has crusted, usually about five to seven days. Keep him away '
-          'from newborn babies, from anyone pregnant who has not had chickenpox, '
-          'and from anyone on chemotherapy or steroids, because in those three '
-          'groups it is genuinely dangerous.',
+          'spot appears. Then flat red spots come, turn into small blisters, '
+          'and crust over, in waves. So at any moment you\'ll see all three '
+          'stages at once. That mix sets chickenpox apart from most other '
+          'rashes.',
+          'It\'s infectious from a day or two before the rash until every '
+          'blister has crusted, usually about five to seven days. Keep your '
+          'child away from newborns, anyone pregnant who hasn\'t had '
+          'chickenpox, and anyone on chemotherapy or steroids. For those '
+          'three groups it\'s dangerous.',
           'Treatment is comfort: calamine on the itch, cool lukewarm baths, '
           'short nails, cotton clothes, and paracetamol for the fever in the '
-          'range your doctor confirms. An antiviral is sometimes given to older '
-          'children or in a severe case, and that is a doctor\'s decision '
-          'rather than a request.',
+          'range your doctor confirms. An antiviral is sometimes given to '
+          'older children or in a severe case. That\'s the doctor\'s decision, '
+          'not a request.',
         ]),
         PpCallout(
-          'Never give ibuprofen or any similar painkiller in chickenpox unless a '
-          'doctor has specifically told you to. It has been linked with serious '
-          'skin infections in this illness. Paracetamol is the one to use, and '
+          'Never give ibuprofen or any similar painkiller in chickenpox unless '
+          'a doctor has told you to. It\'s been linked with serious skin '
+          'infections in this illness. Paracetamol is the one to use, and '
           'never aspirin at all.',
           kind: PpCalloutKind.safety,
           title: 'Paracetamol only',
         ),
         PpCallout(
-          'See a doctor if a spot becomes large, red, hot and swollen, if he has '
-          'a high fever after day four, if he is very drowsy, unsteady on his '
-          'feet or has a stiff neck, if he is breathing fast, or if he is a '
-          'baby under a month old. Also call if anyone in the house is pregnant '
+          'See a doctor if a spot becomes large, red, hot and swollen, or '
+          'there\'s a high fever after day four. See one too for great '
+          'drowsiness, unsteady walking, a stiff neck, fast breathing, or a '
+          'baby under a month old. Also call if anyone at home is pregnant '
           'and has never had chickenpox.',
           kind: PpCalloutKind.doctor,
         ),
@@ -2510,15 +2725,16 @@ final PpArea _skin = PpArea(
         // high risk contacts.
         PpWhenLine('Most common between two and eight years. The varicella '
             'vaccine is on the IAP schedule and prevents most cases.'),
-        PpIndiaNote('Chickenpox peaks in the Indian spring and early summer, and '
-            'traditional practice keeps a child indoors with neem leaves. The '
-            'neem is harmless and comforting. Do not put haldi or besan on open '
-            'blisters, which invites infection, and do not skip the vaccine on '
-            'the grounds that everyone gets it anyway.'),
+        PpIndiaNote('Chickenpox peaks in the Indian spring and early summer, '
+            'and tradition keeps a child indoors with neem leaves. The neem '
+            'is harmless and comforting. Don\'t put turmeric or gram flour on open '
+            'blisters, which invites infection. And don\'t skip the vaccine '
+            'because everyone gets it anyway.'),
         PpLink(
-          'Is the chickenpox vaccine on his list?',
+          'Is the chickenpox vaccine on your child\'s list?',
           surfaceId: 'pp_vaccines',
-          blurb: 'Varicella sits on the IAP schedule. Check where he is.',
+          blurb: 'Varicella sits on the IAP schedule. Check where your child '
+              'is.',
         ),
       ],
     ),
@@ -2542,39 +2758,38 @@ final PpArea _otherIllness = PpArea(
       format: 'ARTICLE',
       bands: ['hb_infant', 'hb_toddler'],
       blocks: [
-        PpIntro('Teething is blamed for a great deal it does not cause, and that '
-            'is the real risk of it: a genuine illness gets waved away as teeth '
-            'for three days.'),
+        PpIntro('Teething gets blamed for a lot it doesn\'t cause, and that\'s '
+            'the real risk: a real illness gets waved away as teeth for three '
+            'days.'),
         PpArticle([
-          'A first tooth usually arrives somewhere between four and ten months, '
-          'and the whole set is in by about two and a half to three years. Late '
-          'teeth are common and almost never a problem. Around a tooth coming '
-          'through you can expect drooling, chewing on everything, a swollen '
-          'sore gum, some crankiness and a few disturbed nights.',
-          'Teething does not cause a high fever, loose motions, vomiting, a '
-          'cough, a rash on the body, or a child who is genuinely ill. It is '
-          'true that babies get more infections at exactly the age they are '
-          'teething, which is why the two look connected. If he has a '
-          'temperature above 38 C, treat it as a fever and read the fever pages, '
-          'not this one.',
-          'What helps is pressure and cold: a chilled teething ring from the '
-          'fridge, a clean cold spoon, a firm rubber toy, or a clean finger '
-          'rubbed on the gum. For an older baby, cold cucumber sticks or chilled '
-          'curd. Extra cuddles do more than anything sold for the purpose.',
+          'A first tooth usually arrives between four and ten months, and the '
+          'whole set is in by about two and a half to three years. Late teeth '
+          'are common and almost never a problem. Around a new tooth, expect '
+          'drooling, chewing on everything, a swollen sore gum, some '
+          'crankiness and a few broken nights.',
+          'Teething doesn\'t cause a high fever, loose motions, vomiting, a '
+          'cough, a rash on the body, or a child who is clearly ill. Babies '
+          'do get more infections at the age they\'re teething, which is why '
+          'the two look connected. If your child\'s temperature is above 38 C, '
+          'treat it as a fever and read the fever pages, not this one.',
+          'What helps is pressure and cold. Try a chilled teething ring from '
+          'the fridge, a clean cold spoon, a firm rubber toy, or a clean '
+          'finger rubbed on the gum. For an older baby, cold cucumber sticks '
+          'or chilled curd. Extra cuddles do more than anything sold for '
+          'teething.',
         ]),
         PpCallout(
-          'Do not use a teething gel containing an anaesthetic, and do not use '
-          'a homeopathic teething powder or tablet of unknown ingredients. '
-          'Several have been withdrawn after harming babies. Cold, pressure and '
-          'a chewy toy are the safe versions.',
+          'Don\'t use a teething gel with an anaesthetic in it, or a homeopathic '
+          'teething powder or tablet of unknown ingredients. Several have '
+          'been withdrawn after harming babies. Cold, pressure and a chewy '
+          'toy are the safe versions.',
           kind: PpCalloutKind.safety,
           title: 'What not to put on the gum',
         ),
         PpCallout(
-          'Anything more than a mildly warm forehead, a child who is off his '
-          'feeds, loose motions or a rash is an illness rather than teeth, and '
-          'gets looked at as one. Call your doctor rather than waiting for the '
-          'tooth.',
+          'More than a mildly warm forehead, going off feeds, loose motions or '
+          'a rash is an illness, not teeth, and needs a look. Call your '
+          'doctor rather than waiting for the tooth.',
           kind: PpCalloutKind.doctor,
         ),
         // REQUIRED_REVIEW: the 4 to 10 month first tooth window, the statement
@@ -2583,14 +2798,34 @@ final PpArea _otherIllness = PpArea(
         PpWhenLine('First tooth usually between four and ten months. Start '
             'brushing with a soft brush and a smear of fluoride paste as soon as '
             'one appears.'),
-        PpIndiaNote('Amber teething necklaces and any thread or chain around a '
-            'baby neck are a strangulation and choking risk, whatever they are '
-            'said to do. A chilled teether does the same job with no risk.'),
+        PpIndiaNote('Amber teething necklaces, or any thread or chain around a '
+            'baby\'s neck, are a strangulation and choking risk, whatever '
+            'they\'re said to do. A chilled teether does the same job with no '
+            'risk.'),
         PpLink(
-          'Teething nuskhe, marked',
+          'Teething home remedies, marked',
           surfaceId: 'pp_nuskhe',
           blurb: 'Three teething remedies, marked safe, comfort only or unsafe.',
         ),
+    // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+        PpCards(heading: 'Gels, teethers and keeping them clean', [
+          PpCard('Numbing gels',
+              'Gels with benzocaine or lidocaine aren\'t advised for babies. '
+                  'They can numb the throat and, rarely, cause a serious '
+                  'blood reaction. Homeopathic teething tablets aren\'t proven '
+                  'safe either.'),
+          PpCard('What works instead',
+              'A clean, chilled (not frozen) teething ring, rubbing the gum '
+                  'with a clean finger, and paracetamol only if the doctor '
+                  'advises it for a bad night.'),
+          PpCard('Check teethers for mould',
+              'Squeeze toys with a hole can grow black mould inside. Choose '
+                  'solid teethers, wash them daily, and throw away any that '
+                  'look dark inside or smell.'),
+          PpCard('No necklaces or threads',
+              'Amber necklaces and teething threads round the neck can '
+                  'strangle or choke a baby.'),
+        ]),
       ],
     ),
     PpPage(
@@ -2602,44 +2837,46 @@ final PpArea _otherIllness = PpArea(
         // Placed on the page in the area that most needs showing rather
         // than telling; the renderer hoists it to the top.
         PpVideoSlot(
-          title: 'Is it an ear infection, and how would I know',
-          subtitle: 'The signs that separate a grumpy teething night from an ear that needs seeing, shown on a real child.',
+          title: 'Is it an ear infection, and how would I know?',
+          subtitle: 'The signs that tell a grumpy teething night from an ear '
+              'that needs seeing, shown on a real child.',
           minutes: '5 MIN',
           slotId: 'health/ear_pain',
         ),
         PpIntro('Ear pain is the classic 2am problem: it wakes a child who was '
-            'fine, it hurts a great deal, and it usually appears a few days '
-            'into a cold.'),
+            'fine, it hurts a lot, and it usually comes a few days into a '
+            'cold.'),
         PpArticle([
           'A young child\'s ear tube is short and almost flat, so fluid from a '
-          'cold sits behind the eardrum easily and gets infected. That is why '
+          'cold easily sits behind the eardrum and gets infected. That\'s why '
           'ear infections cluster in the first three years and then become '
-          'rarer. A baby cannot tell you, so watch for pulling or batting at one '
-          'ear, crying that is much worse lying flat, refusing to feed on one '
-          'side, or a fever three days into a cold.',
-          'The immediate thing to do is pain relief, in the dose your doctor has '
-          'confirmed, and holding him upright. Warmth on the ear helps some '
-          'children. Then get him seen, because someone has to look inside the '
-          'ear to know what is going on, and no app can do that.',
-          'Not every ear infection needs an antibiotic. Many settle by '
-          'themselves in two or three days, and a good paediatrician will often '
-          'give pain relief and review, or give a prescription to fill only if '
-          'he is no better in 48 hours. That is careful medicine rather than '
-          'neglect, and it is worth knowing before you push for a prescription.',
+          'rarer. Babies can\'t tell you, so watch for pulling or batting at '
+          'one ear. Watch too for crying that\'s much worse lying flat, '
+          'refusing to feed on one side, or a fever three days into a cold.',
+          'First, give pain relief in the dose your doctor has confirmed, and '
+          'hold your child upright. Warmth on the ear helps some children. '
+          'Then get the ear seen, because someone has to look inside to know '
+          'what\'s going on, and no app can do that.',
+          'Not every ear infection needs an antibiotic. Many settle on their '
+          'own in two or three days. A good paediatrician will often give '
+          'pain relief and review, or a prescription to fill only if there\'s '
+          'no improvement in 48 hours. That\'s careful medicine, not neglect, '
+          'and worth knowing before you push for a prescription.',
         ]),
         PpCallout(
-          'Never put oil, garlic, warm water, breast milk or ear drops of any '
-          'kind into a painful ear before it has been examined. If the eardrum '
-          'has burst, anything poured in goes deeper than you can see. Give pain '
-          'relief by mouth instead and keep the outside dry.',
+          'Never put oil, garlic, warm water, breast milk or any ear drops into '
+          'a painful ear before it has been examined. If the eardrum has '
+          'burst, anything poured in goes deeper than you can see. Give pain '
+          'relief by mouth instead, and keep the outside dry.',
           kind: PpCalloutKind.safety,
         ),
         PpCallout(
           'See a doctor the same day for ear pain with a fever, any discharge '
-          'from the ear, pain that wakes him repeatedly, swelling or redness of '
-          'the bone behind the ear, or an ear problem in a baby under six '
-          'months. Repeated infections, or hearing that seems dulled after one, '
-          'should be checked properly.',
+          'from the ear, or pain that wakes your child again and again. Go '
+          'the same day too for swelling or redness of the bone behind the '
+          'ear, or an ear problem in a baby under six months. Repeated '
+          'infections, or hearing that seems dulled after one, need a proper '
+          'check.',
           kind: PpCalloutKind.doctor,
         ),
         // REQUIRED_REVIEW: the watchful waiting approach to antibiotics and the
@@ -2647,10 +2884,28 @@ final PpArea _otherIllness = PpArea(
         // swelling as an urgent sign.
         PpWhenLine('Commonest between six months and three years, usually a few '
             'days into a cold.'),
-        PpIndiaNote('Ear drops are sold freely over the counter here and are '
-            'frequently given before anyone has looked in the ear. Ask the '
-            'doctor to look first. Also keep bath and pool water out of an ear '
-            'that has been discharging.'),
+        PpIndiaNote('Ear drops are sold freely over the counter here, and are '
+            'often given before anyone has looked in the ear. Ask the doctor '
+            'to look first. Keep bath and pool water out of an ear that has '
+            'been discharging.'),
+    // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+        PpArticle(heading: 'When ear infections keep coming back', [
+          'Some children get ear infections again and again, often with colds, '
+              'and fluid can stay behind the eardrum for weeks afterwards. '
+              'Fluid on its own often clears without treatment. But it can '
+              'dull hearing for a while, which matters while your child is '
+              'learning to talk.',
+          'For many infections in a year, or fluid that stays three months or '
+              'more with hearing loss, an ENT specialist may suggest '
+              'grommets. These are tiny tubes placed in the eardrum under a '
+              'short anaesthetic, letting air in and fluid out. They fall out '
+              'on their own within a year or so.',
+        ]),
+        PpCards(heading: 'Things that lower the risk', [
+          PpCard('No smoke around your child', 'Smoke at home raises ear infections.'),
+          PpCard('Feed upright', 'Not lying flat with a bottle.'),
+          PpCard('Vaccines on time', 'The pneumococcal and flu vaccines help.'),
+        ]),
       ],
     ),
     PpPage(
@@ -2658,35 +2913,35 @@ final PpArea _otherIllness = PpArea(
       title: 'Sticky eyes and eye discharge',
       format: 'ARTICLE',
       blocks: [
-        PpIntro('Crusty lashes in the morning are common and usually minor. The '
-            'thing that decides how serious it is, is whether the white of the '
-            'eye is red and whether there is swelling around it.'),
+        PpIntro('Crusty lashes in the morning are common and usually minor. '
+            'What decides how serious it is: whether the white of the eye is '
+            'red, and whether there\'s swelling around it.'),
         PpArticle([
-          'In a baby under a year, a persistently watery eye with a little '
-          'yellow crust and a white, calm eyeball is very often a blocked tear '
-          'duct. It clears on its own in most babies before their first '
-          'birthday. Wipe from the inner corner outwards with clean cotton and '
-          'cooled boiled water, a fresh piece for each wipe, and a gentle massage '
-          'along the side of the nose helps.',
-          'If the white of the eye is red and there is discharge, that is '
+          'In a baby under a year, a watery eye that lasts, with a little '
+          'yellow crust and a white, calm eyeball, is very often a blocked '
+          'tear duct. It clears on its own in most babies before the first '
+          'birthday. Wipe from the inner corner outwards with clean cotton '
+          'and cooled boiled water, a fresh piece for each wipe. A gentle '
+          'massage along the side of the nose helps.',
+          'If the white of the eye is red and there\'s discharge, that\'s '
           'conjunctivitis, usually viral and usually with a cold. It spreads '
-          'very easily, so separate towels and handwashing matter more than any '
-          'drop. Most cases settle in a week without antibiotic drops, which are '
-          'given far more often than they are needed.',
+          'very easily, so separate towels and handwashing matter more than '
+          'any drop. Most cases settle in a week without antibiotic drops, '
+          'which are given far more often than needed.',
         ]),
         PpCallout(
-          'See a doctor for: a swollen, red or painful eyelid or the skin around '
-          'the eye, an eye he cannot open, a child who shies away from light, '
-          'any change in vision, an eye injury, thick discharge in a newborn in '
-          'the first month, or discharge that is not settling in a week.',
+          'See a doctor for: a swollen, red or painful eyelid or skin around '
+          'the eye, an eye that won\'t open, or shying away from light. Go too '
+          'for any change in vision, an eye injury, thick discharge in a '
+          'newborn in the first month, or discharge that isn\'t settling in a '
+          'week.',
           kind: PpCalloutKind.doctor,
           title: 'When an eye is more than sticky',
         ),
         PpCallout(
-          'Do not use anyone else\'s eye drops, and do not use a steroid eye '
-          'drop bought over a counter. Steroid drops in the wrong eye condition '
-          'can damage sight. Clean with cooled boiled water and get it looked '
-          'at.',
+          'Don\'t use anyone else\'s eye drops, or a steroid eye drop bought over '
+          'a counter. Steroid drops in the wrong eye condition can damage '
+          'sight. Clean with cooled boiled water and get it looked at.',
           kind: PpCalloutKind.safety,
         ),
         // REQUIRED_REVIEW: blocked tear duct resolving by 12 months, the
@@ -2694,10 +2949,21 @@ final PpArea _otherIllness = PpArea(
         // conjunctivitis needs no antibiotic drop.
         PpWhenLine('Blocked tear ducts appear in the first weeks and usually '
             'clear by one year. Conjunctivitis runs about a week.'),
-        PpIndiaNote('Do not put kajal, surma, rose water, breast milk or honey '
-            'into a child\'s eye. Kajal has repeatedly been found to contain '
-            'lead and is applied to babies daily in many homes. Cooled boiled '
-            'water on clean cotton is all an eye needs.'),
+        PpIndiaNote('Don\'t put kohl (kajal or surma), rose water, breast milk or honey '
+            'in a child\'s eye. Kohl has often been found to contain lead, '
+            'and many homes put it on babies daily. Cooled boiled water on '
+            'clean cotton is all an eye needs.'),
+    // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+        PpArticle(heading: 'Pink eye in toddlers', [
+          'Pink eye (conjunctivitis) makes the white of the eye red, with '
+              'sticky yellow or watery discharge and crusty lashes in the '
+              'morning. In toddlers a virus or bacteria usually causes it, '
+              'and it spreads easily at playschool. Wash hands often and keep '
+              'a separate towel for your child.',
+          'Wipe each eye from the inner corner outwards with cotton wool dipped '
+              'in boiled and cooled water, a fresh piece each time. Don\'t use '
+              'breast milk, rose water or leftover eye drops.',
+        ]),
       ],
     ),
     PpPage(
@@ -2706,43 +2972,43 @@ final PpArea _otherIllness = PpArea(
       format: 'ARTICLE',
       bands: ['hb_nb'],
       blocks: [
-        PpIntro('Most newborns go a little yellow in the first week and it '
-            'passes. A few need treatment, and the difference is mostly about '
+        PpIntro('Most newborns go a little yellow in the first week, and it '
+            'passes. A few need treatment, and the difference is mostly '
             'timing and how far down the body the yellow reaches.'),
         PpArticle([
           'Ordinary newborn jaundice appears around day two or three, peaks '
-          'around day four or five, and fades over the following week. It '
-          'happens because a newborn liver is still learning to clear bilirubin, '
-          'a normal breakdown product. It usually starts at the face and moves '
-          'down the body as it rises, so yellow that has reached the chest, the '
-          'belly, the legs or the palms and soles is worth a same day check.',
-          'Check him in daylight rather than under a tube light, which makes '
-          'everything look yellow. Press a finger gently on the tip of his nose '
-          'or his forehead for a second and look at the skin as you lift it. '
-          'Look at the whites of his eyes and the inside of his mouth too.',
+          'around day four or five, and fades over the next week. It happens '
+          'because a newborn\'s liver is still learning to clear bilirubin, a '
+          'normal breakdown product. It usually starts at the face and moves '
+          'down as it rises. Yellow that has reached the chest, belly, legs, '
+          'or palms and soles is worth a same day check.',
+          'Check your baby in daylight, not under a tube light, which makes '
+          'everything look yellow. Press a finger gently on the tip of the '
+          'nose or the forehead for a second, and look at the skin as you '
+          'lift it. Look at the whites of the eyes and inside the mouth too.',
           'Feeding is the treatment for the ordinary kind: frequent feeds move '
-          'bilirubin out through the stool. A sleepy, poorly feeding jaundiced '
-          'baby is the pattern that worries doctors, because the two feed each '
-          'other. Phototherapy, the blue light, is safe, common and effective, '
-          'and needing it is not a failure of anything.',
+          'bilirubin out through the stool. A sleepy, poorly feeding '
+          'jaundiced baby is the pattern that worries doctors, because each '
+          'makes the other worse. Phototherapy, the blue light, is safe, '
+          'common and effective, and needing it isn\'t anyone\'s failure.',
         ]),
         PpCallout(
-          'Go the same day if: the yellow appears in the first 24 hours of life, '
-          'it reaches the legs, palms or soles, it is still there after two '
-          'weeks, he is very sleepy or feeding poorly, he has few wet nappies, '
-          'his stools are pale or chalky white, or his urine is dark. Jaundice '
-          'in the first day and jaundice past two weeks are the two that always '
-          'get a doctor.',
+          'Go the same day if: the yellow appears in the first 24 hours of '
+          'life, reaches the legs, palms or soles, or is still there after '
+          'two weeks. Go the same day too for a very sleepy baby, poor '
+          'feeding, few wet nappies, pale or chalky white stools, or dark '
+          'urine. Jaundice in the first day and jaundice past two weeks '
+          'always get a doctor.',
           kind: PpCalloutKind.doctor,
           title: 'The yellow that needs a doctor',
         ),
         PpCallout(
-          'Do not treat jaundice by putting a baby in direct sunlight. It is a '
-          'common home practice, it does not work at the intensities involved, '
-          'and it risks sunburn and overheating in an Indian summer. Feed him '
-          'frequently and get him weighed and checked instead.',
+          'Don\'t treat jaundice by putting a baby in direct sunlight. It\'s a '
+          'common home practice, it doesn\'t work at that strength, and it '
+          'risks sunburn and overheating in an Indian summer. Feed often and '
+          'get your baby weighed and checked instead.',
           kind: PpCalloutKind.safety,
-          title: 'Sunlight is not phototherapy',
+          title: 'Sunlight isn\'t phototherapy',
         ),
         // REQUIRED_REVIEW: the whole jaundice timeline (onset day 2 to 3, peak
         // day 4 to 5), the cephalocaudal progression, jaundice in the first 24
@@ -2750,53 +3016,55 @@ final PpArea _otherIllness = PpArea(
         // the statement about sunlight.
         PpWhenLine('Watch through the first two weeks, and check once a day in '
             'daylight during the first week.'),
-        PpIndiaNote('Jaundice is often called peela and treated at home with '
-            'sunlight, with certain leaves, or by stopping breastfeeding. '
-            'Stopping breastfeeding makes it worse, because feeding is what '
-            'clears it. Keep feeding, and get the level checked if the yellow is '
+        PpIndiaNote('Jaundice is often just called yellowness and treated at home with '
+            'sunlight, certain leaves, or by stopping breastfeeding. Stopping '
+            'breastfeeding makes it worse, because feeding is what clears it. '
+            'Keep feeding, and get the level checked if the yellow is '
             'spreading.'),
       ],
     ),
     PpPage(
       id: 'ill_allergies',
-      title: 'Allergies, and what an allergy is not',
+      title: 'Allergies, and what an allergy isn\'t',
       format: 'ARTICLE',
       blocks: [
-        PpIntro('Almost everything a child reacts to is not an allergy. Knowing '
-            'the difference matters, because families cut out foods for years '
-            'on the strength of one bad afternoon.'),
+        PpIntro('Most things a child reacts to aren\'t allergies. Knowing the '
+            'difference matters, because families cut out foods for years '
+            'after one bad afternoon.'),
         PpArticle([
           'A true food allergy shows up fast, usually within minutes to two '
-          'hours of eating: hives, swelling of the lips or eyes, vomiting, '
-          'sudden loose motions, a cough or a wheeze. It happens every time that '
-          'food is eaten, not sometimes. The common culprits are milk, egg, '
-          'peanut and tree nuts, wheat, soya, fish and shellfish.',
-          'What is usually not an allergy: a rash around the mouth from a acidic '
-          'food like tomato or citrus, which is irritation; loose stools after a '
-          'lot of juice; a cold that comes with the change of season; and a '
-          'child who dislikes a food. Lactose intolerance is also not a milk '
-          'allergy, it is a different mechanism and it does not need adrenaline.',
-          'Delaying allergenic foods does not prevent allergy. The evidence '
-          'moved the other way some years ago: introducing egg and peanut in '
-          'suitable forms in the first year, once solids have started, reduces '
-          'the chance of an allergy rather than raising it. Peanut goes in as '
-          'thinned peanut butter or peanut powder, never whole nuts, which are a '
-          'choking risk under five.',
+          'hours of eating. Look for hives, swelling of the lips or eyes, '
+          'vomiting, sudden loose motions, a cough or a wheeze. It happens '
+          'every time that food is eaten, not sometimes. The common culprits '
+          'are milk, egg, peanut and tree nuts, wheat, soya, fish and '
+          'shellfish.',
+          'Some things usually aren\'t allergies. A rash around the mouth from '
+          'acidic food like tomato or citrus is irritation. Loose stools '
+          'after a lot of juice, a cold with the change of season, or '
+          'disliking a food aren\'t allergies either. Nor is lactose '
+          'intolerance a milk allergy. It works differently and doesn\'t need '
+          'adrenaline.',
+          'Delaying allergenic foods doesn\'t prevent allergy. The evidence '
+          'moved the other way some years ago. Introducing egg and peanut in '
+          'suitable forms in the first year, once solids have started, lowers '
+          'the chance of an allergy. Peanut goes in as thinned peanut butter '
+          'or peanut powder, never whole nuts, which are a choking risk under '
+          'five.',
         ]),
         PpCallout(
           'Swelling of the lips, tongue or face, difficulty breathing, a hoarse '
-          'voice, repeated vomiting with a rash, or a child who goes pale and '
-          'floppy after eating, is a medical emergency. Go to a hospital '
-          'immediately and say what he ate. Do not wait to see whether it '
-          'settles.',
+          'voice, repeated vomiting with a rash, or turning pale and floppy '
+          'after eating, is a medical emergency. Go to a hospital immediately '
+          'and say what your child ate. Don\'t wait to see whether it settles.',
           kind: PpCalloutKind.doctor,
-          title: 'The reaction that cannot wait',
+          title: 'The reaction that can\'t wait',
         ),
         PpCallout(
-          'Do not remove a major food from a small child\'s diet on suspicion '
-          'alone. Milk, wheat and egg carry a lot of what he needs, and a long '
-          'exclusion has its own cost. Write down what he ate, what happened and '
-          'how fast, and take that list to be assessed properly.',
+          'Don\'t remove a major food from a small child\'s diet on suspicion '
+          'alone. Milk, wheat and egg carry a lot of what your child needs, '
+          'and a long exclusion has its own cost. Write down what was eaten, '
+          'what happened and how fast, and take that list to be assessed '
+          'properly.',
           kind: PpCalloutKind.safety,
         ),
         // REQUIRED_REVIEW: the minutes to two hours reaction window, the early
@@ -2804,15 +3072,15 @@ final PpArea _otherIllness = PpArea(
         // limit, and the anaphylaxis sign list.
         PpWhenLine('Most food allergies appear in the first two years, at or '
             'soon after the food is first eaten.'),
-        PpIndiaNote('Allergy testing is sold widely here as a panel of dozens of '
-            'foods, and a positive line on such a panel does not mean an allergy '
-            'in a child who eats that food happily. Test on the basis of a '
+        PpIndiaNote('Allergy testing is sold widely here as a panel of dozens '
+            'of foods. A positive line on such a panel doesn\'t mean an '
+            'allergy in a child who eats that food happily. Test because of a '
             'story, not instead of one.'),
         PpConsult(
           title: 'Talk to a paediatrician about a suspected allergy',
-          whoFor: 'For the family that has already cut out three foods and is '
-              'not sure any of it was necessary, and wants somebody to look at '
-              'the actual history before more disappears from his plate.',
+          whoFor: 'For the family that has already cut out three foods and '
+              'isn\'t sure any of it was needed. Someone looks at the real '
+              'history before more disappears from your child\'s plate.',
           surfaceId: 'pp_experts',
           role: 'pediatrician',
         ),
@@ -2823,6 +3091,19 @@ final PpArea _otherIllness = PpArea(
           surfaceId: 'pp_page/parenting_feeding/safety_allergy',
           blurb: 'Mild against call-now, as a picture. In Feeding.',
         ),
+    // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+        PpArticle(heading: 'Cow\'s milk allergy in babies', [
+          'Cow\'s milk protein allergy is the most common food allergy in '
+              'babies. It can show as vomiting, blood or mucus in the poo, '
+              'eczema, a lot of crying, or poor weight gain. It can affect '
+              'formula-fed babies, and sometimes breastfed babies, through '
+              'milk protein in your diet.',
+          'Only a doctor should diagnose it. Don\'t stop breastfeeding or switch '
+              'formulas on your own. If it\'s confirmed, you may be asked to '
+              'cut out dairy for a while if you\'re breastfeeding, or a '
+              'special formula may be prescribed. Most children outgrow it by '
+              'school age.',
+        ]),
       ],
     ),
     // ⚠️ [new] SCAFFOLD. "Teething, and why it does not cause a high fever:
@@ -2830,10 +3111,102 @@ final PpArea _otherIllness = PpArea(
     // place. DOOR-CONTENT-OWED HL4.
     PpPage(
       id: 'ill_teething_fever',
-      title: 'Teething, and why it does not cause a high fever',
+      title: 'Teething, and why it doesn\'t cause a high fever',
       format: 'CAROUSEL',
-      comingSoon: true,
-      blocks: [],
+      
+      blocks: [
+        // Written 2026-10-02 (parenting gap analysis), filling the scaffold.
+        // REQUIRED_REVIEW.
+        PpCarousel(
+          eyebrow: 'Myth vs truth',
+          hue: 28,
+          coverTitle: 'Teething and fever',
+          coverBlurb: 'What teething does, and what it doesn\'t.',
+          cards: [
+            PpCarouselCard.myth('Teething causes a high fever',
+                'Teething may warm your baby slightly, but not above about 38 '
+                    'C. A real fever means something else, often a virus. '
+                    'Treat it as a fever.'),
+            PpCarouselCard.myth('Teething causes loose motions',
+                'Drooling and mouthing can loosen stools a little, but real '
+                    'diarrhoea is usually an infection from putting things in the '
+                    'mouth. Give ORS and watch for dehydration.'),
+            PpCarouselCard.myth('A teething baby needs medicine',
+                'Usually not. A clean, chilled teething ring and gum rubbing help. '
+                    'Avoid numbing gels for babies.'),
+            PpCarouselCard('When to call the doctor',
+                'A temperature of 38 C or more, any fever under three months, '
+                    'loose motions with dehydration, or a baby who seems '
+                    'unwell. Don\'t put it down to teeth.'),
+          ],
+        ),
+      ],
+    ),
+    // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+    PpPage(
+      id: 'ill_uti',
+      title: 'Urine infections in babies and toddlers',
+      subtitle: 'Often only a fever, with no other sign',
+      format: 'ARTICLE',
+      blocks: [
+        PpIntro('Urine infections are common in young children and easy to '
+            'miss, because babies can\'t tell you it hurts. Often the only '
+            'sign is a fever with no cold or cough. They\'re easily treated '
+            'once found.'),
+        PpCards(heading: 'Signs to watch for', [
+          PpCard('A fever with no other cause', 'Especially in a baby.'),
+          PpCard('Crying when passing urine', 'Or holding it in.'),
+          PpCard('Smelly or cloudy urine', 'Or blood in it.'),
+          PpCard('Going more often, or accidents', 'After being dry.'),
+          PpCard('Tummy pain, vomiting, or poor feeding', 'Or seeming unwell.'),
+        ]),
+        PpArticle([
+          'The doctor will test a clean urine sample. Antibiotics clear most '
+              'infections quickly. Finish the whole course, even when your '
+              'child seems better.',
+        ]),
+        PpSteps(heading: 'Lowering the risk', [
+          PpStep('Wipe girls from front to back'),
+          PpStep('Change nappies often'),
+          PpStep('Plenty of water once your child eats food'),
+          PpStep('Treat constipation', 'A full bowel presses on the bladder.'),
+          PpStep('No bubble baths or soap inside the private parts'),
+        ]),
+        PpCallout('See a doctor the same day for a fever with no clear cause in '
+            'a baby. Go urgently for a baby under three months, or a child '
+            'who is very unwell, vomiting, or has pain in the back or side.',
+            kind: PpCalloutKind.doctor),
+      ],
+    ),
+    PpPage(
+      id: 'ill_thrush',
+      title: 'White patches in the mouth: is it thrush?',
+      subtitle: 'Milk, or a yeast infection',
+      bands: ['hb_nb', 'hb_infant'],
+      format: 'ARTICLE',
+      blocks: [
+        PpIntro('A white coating on a baby\'s tongue is very common, and is '
+            'usually milk. Thrush is a yeast infection, also common and '
+            'easily treated.'),
+        PpCards(heading: 'Telling them apart', [
+          PpCard('Milk',
+              'Only on the tongue, and wipes off easily with a soft cloth.'),
+          PpCard('Thrush',
+              'White patches on the cheeks, gums and lips too, that don\'t wipe '
+                  'off and may bleed a little if rubbed. Feeds may be fussy.'),
+        ]),
+        PpArticle([
+          'Thrush is treated with antifungal drops or gel from the doctor. If '
+              'you\'re breastfeeding, your nipples may need treating too, as '
+              'the yeast passes back and forth. Signs in you are sore, shiny '
+              'or itchy nipples, or a deep stabbing pain while feeding.',
+          'Boil bottle teats, soothers and pump parts daily while it clears.',
+        ]),
+        PpCallout('See your doctor if the patches don\'t clear, feeds are '
+            'refused, or there\'s a nappy rash with red spots around it, which '
+            'can be the same yeast.',
+            kind: PpCalloutKind.doctor),
+      ],
     ),
   ],
 );
@@ -2850,8 +3223,8 @@ final PpArea _otherIllness = PpArea(
 final PpArea _notSure = PpArea(
   id: 'not_sure',
   mark: IntentMark.lampMark,
-  title: 'Not sure what is wrong?',
-  blurb: 'Start from what changed, or from the worry you cannot name.',
+  title: 'Not sure what\'s wrong?',
+  blurb: 'Start from what changed, or from the worry you can\'t name.',
   hue: 250,
   pages: [
     PpPage(
@@ -2865,30 +3238,30 @@ final PpArea _notSure = PpArea(
         PpCards([
           PpCard('Illness',
               'A warm or low grade fever, a runny nose and congestion, tugging '
-              'at his ears.'),
+              'at the ears.'),
           PpCard('Skin',
               'A new rash appeared, dry rough patches, a sore red nappy area.'),
           PpCard('Tummy',
-              'Has not pooped in a few days, runnier and more frequent poops, '
-              'gassy and pulling his legs up.'),
+              'No poo in a few days, runnier and more frequent poos, gassy and '
+              'pulling the legs up.'),
           PpCard('Everything else',
               'Sleep, feeding, mood and behaviour changes all live in the same '
               'walkthrough, twenty nine of them in total.'),
-        ], heading: 'The health ones you will find in there', hue: 250),
+        ], heading: 'The health ones you\'ll find there', hue: 250),
         PpSteps([
           PpStep('Pick what changed', 'From the list, in plain words.'),
           PpStep('Read the likely reasons',
               'Usually two or three, most likely first, with what to do about '
               'each.'),
           PpStep('Follow the link into the full page',
-              'A low fever leads to the fever check, a new rash leads to the '
-              'rash comparison, loose poops lead to ORS.'),
-          PpStep('If it does not fit, hand over',
+              'A low fever leads to the fever check, a new rash to the rash '
+              'comparison, loose poos to ORS.'),
+          PpStep('If it doesn\'t fit, hand over',
               'The next page finds the right kind of doctor, or a '
               'paediatrician will talk to you tonight.'),
         ], heading: 'How it goes'),
         PpCallout('A guided starting point, not a diagnosis. If something '
-            'worries you, always check with a doctor.'),
+            'worries you, check with a doctor.'),
         PpWhenLine('Any age, any time. Best when something changed in the last '
             'day or two.'),
         PpLink(
@@ -2905,44 +3278,45 @@ final PpArea _notSure = PpArea(
     ),
     PpPage(
       id: 'ns_problem_solver',
-      title: 'Something is off and you cannot name it',
+      title: 'Something is off and you can\'t name it',
       format: 'TOOL',
       blocks: [
         // ⚠️ ADDED IN THE S03 PASS — this area had no video at all.
         // Placed on the page in the area that most needs showing rather
         // than telling; the renderer hoists it to the top.
         PpVideoSlot(
-          title: 'When something is off and you cannot name it',
-          subtitle: 'A paediatrician on what to watch for over 24 hours, and what is worth a call before that.',
+          title: 'When something is off and you can\'t name it',
+          subtitle: 'A paediatrician on what to watch for over 24 hours, and '
+              'what\'s worth a call before that.',
           minutes: '6 MIN',
           slotId: 'health/something_off',
         ),
-        PpIntro('Off his feeds, not himself, crying more, sleeping oddly, and no '
-            'single symptom to point at. That instinct is worth taking '
-            'seriously, and it is a hard thing to search for.'),
+        PpIntro('Off feeds, not quite right, crying more, sleeping oddly, and '
+            'no single symptom to point at. That instinct is worth taking '
+            'seriously, and it\'s hard to search for.'),
         PpArticle([
-          'This walkthrough asks a short series of questions rather than making '
-          'you pick a symptom you are not sure of, and it ends somewhere '
-          'specific: what is likely going on, what to do about it now, and which '
-          'kind of professional to see. In India that last part is often the '
-          'real problem. Paediatrician, ENT, dermatologist, dentist, '
-          'occupational therapist, lactation consultant: knowing which door to '
-          'knock on saves a fortnight.',
+          'This walkthrough asks a few short questions instead of making you '
+          'pick a symptom you\'re unsure of. It ends somewhere specific: '
+          'what\'s likely going on, what to do now, and which kind of '
+          'professional to see. In India that last part is often the real '
+          'problem. Paediatrician, ENT, dermatologist, dentist, occupational '
+          'therapist, lactation consultant: knowing which door to knock on '
+          'saves a fortnight.',
           'If what you describe crosses into something urgent, it says so and '
-          'stops asking questions. That is the point of a triage flow rather '
+          'stops asking questions. That\'s what a triage flow is for, rather '
           'than a search box.',
         ]),
         PpCallout('A parent who is worried without being able to say why is a '
-            'signal doctors are trained to take seriously. You do not need to '
-            'have identified a symptom to be allowed to ask.'),
+            'signal doctors are trained to take seriously. You don\'t need to '
+            'have named a symptom to be allowed to ask.'),
         PpCallout(
-          'If he is drowsy and hard to rouse, breathing hard, not passing urine, '
-          'or you simply feel that something is badly wrong, do not work through '
-          'a flow. Go to a hospital.',
+          'If your child is drowsy and hard to rouse, breathing hard, or not '
+          'passing urine, or you feel something is badly wrong, don\'t work '
+          'through a flow. Go to a hospital.',
           kind: PpCalloutKind.doctor,
         ),
         PpWhenLine('Any age. Use it when the worry has lasted more than a day '
-            'and has not resolved itself.'),
+            'and hasn\'t settled.'),
         // ⚠️ TWO FIXES IN ONE BLOCK, AND THE SECOND ONE IS THE IMPORTANT
         // ONE.
         //
@@ -2957,14 +3331,14 @@ final PpArea _notSure = PpArea(
         PpLink(
           'Work out which help you need',
           surfaceId: 'pp_find_help_triage',
-          blurb: 'Two questions, then the right kind of expert for what you '
-              'are seeing.',
+          blurb: 'Two questions, then the right kind of expert for what you\'re '
+              'seeing.',
         ),
         PpConsult(
           title: 'Speak to a paediatrician tonight',
-          whoFor: 'For the evening when he is not right, it is not an emergency, '
-              'and morning feels a long way off. A real paediatrician on a call '
-              'who can tell you whether this waits.',
+          whoFor: 'For the evening when your child isn\'t right, it isn\'t an '
+              'emergency, and morning feels a long way off. A real '
+              'paediatrician on a call who can tell you whether it can wait.',
           surfaceId: 'pp_experts',
           role: 'pediatrician',
         ),
@@ -2986,14 +3360,14 @@ final PpArea _notSure = PpArea(
 final PpArea _vaccines = PpArea(
   id: 'vaccines',
   mark: IntentMark.checkMark,
-  title: 'Is he up to date on his shots?',
+  title: 'Is your child up to date on vaccines?',
   blurb: 'The IAP schedule, what each one is for, what happens after, and what '
       'it costs.',
   hue: 180,
   pages: [
     PpPage(
       id: 'vax_schedule',
-      title: 'What is due, and when',
+      title: 'What\'s due, and when',
       // [merge] "This is the tool's own schedule view. Don't keep a separate
       // chart; it is the tool."
       format: 'TOOL',
@@ -3032,7 +3406,7 @@ final PpArea _vaccines = PpArea(
         ),
         PpCallout('Keep the physical vaccination card. It is the document '
             'schools, visas and hospitals ask for, the app is the reminder '
-            'rather than the record, and a lost card is genuinely difficult to '
+            'rather than the record, and a lost card is very difficult to '
             'reconstruct.'),
         PpWhenLine('Most visits fall in the first eighteen months. After the '
             'four to six year boosters there is very little until adolescence.'),
@@ -3055,8 +3429,7 @@ final PpArea _vaccines = PpArea(
       format: 'CARDS',
       blocks: [
         PpIntro('Twelve names on a card and no explanation is why families ask '
-            'whether some can be skipped. Here is what each one actually '
-            'prevents.'),
+            'whether some can be skipped. Here\'s what each one prevents.'),
         PpCards([
           PpCard('BCG',
               'Protects against the severe forms of tuberculosis in small '
@@ -3069,85 +3442,98 @@ final PpArea _vaccines = PpArea(
               'Five in one: diphtheria, tetanus, whooping cough, hepatitis B and '
               'Hib, which causes meningitis in babies.'),
           PpCard('Polio, oral and injected',
-              'India is polio free and stays that way only while children keep '
+              'India is polio free, and stays that way only while children keep '
               'being vaccinated.'),
           PpCard('PCV, pneumococcal',
               'The commonest cause of serious pneumonia and meningitis in small '
               'children. Not part of every state programme, and worth paying '
               'for.'),
           PpCard('Rotavirus',
-              'Drops rather than a jab. Prevents the severe diarrhoea that '
-              'hospitalises babies, which is a large problem in India.'),
+              'Drops rather than a jab. Prevents the severe diarrhoea that puts '
+              'babies in hospital, a large problem in India.'),
           PpCard('MMR',
-              'Measles, mumps and rubella. Measles is still common here and is '
-              'genuinely dangerous.'),
+              'Measles, mumps and rubella. Measles is still common here, and '
+              'it\'s dangerous.'),
           PpCard('Typhoid conjugate',
-              'Typhoid is widespread in India and this is one of the clearest '
+              'Typhoid is widespread in India, and this is one of the clearest '
               'reasons the Indian schedule differs from a Western one.'),
           PpCard('Hepatitis A',
               'Spreads through food and water. Also very much an India '
               'specific addition.'),
           PpCard('Varicella',
-              'Chickenpox. Often skipped on the grounds that everyone gets it, '
-              'and the complications are the reason not to.'),
+              'Chickenpox. Often skipped because everyone gets it, and the '
+              'complications are the reason not to.'),
           PpCard('Influenza',
               'Yearly, from six months. Most useful in children with asthma or '
               'other ongoing conditions.'),
         ], heading: 'Eleven names, in plain words', hue: 180),
-        PpCallout('There is no such thing as an optional vaccine in the sense '
-            'families mean. There are vaccines the government pays for and '
-            'vaccines you pay for. That is a funding line, not a medical one.'),
+        PpCallout('There\'s no such thing as an optional vaccine in the way '
+            'families mean it. There are vaccines the government pays for and '
+            'vaccines you pay for. That\'s a funding line, not a medical one.'),
         PpCallout(
-          'If your child has an immune condition, is on steroids or '
-          'chemotherapy, or has had a severe reaction to a previous dose, some '
-          'vaccines are given differently or not at all. That is a conversation '
-          'with your paediatrician, and it is the only real exception list.',
+          'If your child has an immune condition, or is on steroids or '
+          'chemotherapy, some vaccines are given differently or not at all. '
+          'The same applies after a severe reaction to an earlier dose. '
+          'That\'s a talk with your paediatrician, and it\'s the only real '
+          'exception list.',
           kind: PpCalloutKind.doctor,
         ),
         // REQUIRED_REVIEW: every description here, and in particular the
         // statement that pneumococcal and rotavirus are not in every state
         // programme, which changes over time.
-        PpWhenLine('Read once, before the six week visit, so the questions '
-            'happen before the needles do.'),
-        PpIndiaNote('If a relative is arguing that vaccines cause autism, that '
-            'claim came from a single fraudulent paper that was withdrawn and '
-            'whose author lost his licence. It has been tested repeatedly since, '
-            'in millions of children, and it is not true.'),
+        PpWhenLine('Read once, before the six week visit, so your questions '
+            'come before the needles do.'),
+        PpIndiaNote('If a relative says vaccines cause autism, that claim came '
+            'from one fraudulent paper. It was withdrawn, and its author was '
+            'struck off. It has been tested again and again since, in '
+            'millions of children, and it isn\'t true.'),
+    // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+        PpCards(heading: 'At birth, and the people around your baby', [
+          PpCard('Vitamin K injection',
+              'Given at birth, it helps the blood clot and prevents a rare but '
+                  'serious bleeding problem in newborns. It isn\'t a vaccine, '
+                  'and it\'s safe.'),
+          PpCard('Cocooning',
+              'A young baby can\'t have every vaccine yet, so vaccinate the '
+                  'people around. That means flu vaccines for the family. It '
+                  'also means whooping cough (Tdap) for you in pregnancy, and '
+                  'for close carers where the doctor advises.'),
+        ]),
       ],
     ),
     PpPage(
       id: 'vax_after',
-      title: 'After a shot: what is normal',
+      title: 'After a vaccine: what\'s normal',
       format: 'ARTICLE',
       blocks: [
-        PpIntro('Almost every baby is a bit miserable for a day after his '
-            'injections. Here is the ordinary version, and the small list that '
-            'is not ordinary.'),
+        PpIntro('Almost every baby is a bit miserable for a day after '
+            'injections. Here\'s the ordinary version, and the short list that '
+            'isn\'t ordinary.'),
         PpArticle([
-          'Expect a sore red lump at the injection site, a mild fever, more '
-          'sleep than usual or less, crankiness, and a poor appetite, mostly in '
-          'the first 24 to 48 hours. The BCG site behaves differently: it often '
-          'becomes a small raised spot at two to six weeks, may ooze a little, '
-          'and heals into a scar. That is the vaccine working, not an infection, '
-          'and it should be left alone and kept dry.',
-          'What helps is a normal day: extra feeds, cuddles, a cool cloth on the '
-          'thigh, and moving the leg gently. Paracetamol is reasonable if he is '
-          'genuinely uncomfortable, in the range your doctor has confirmed. Do '
-          'not give it routinely before the appointment to prevent a fever, '
-          'because it is not needed and there is some evidence it slightly '
-          'blunts the response.',
-          'Some reactions are simply the schedule catching up: MMR can cause a '
-          'mild fever and sometimes a faint rash around seven to twelve days '
-          'afterwards rather than on the day, which surprises families who have '
-          'stopped watching by then.',
+          'Expect a sore red lump where the injection went in, and a mild '
+          'fever. More or less sleep than usual, crankiness and a poor '
+          'appetite are common too, mostly in the first 24 to 48 hours. The '
+          'BCG site is different. It often becomes a small raised spot at two '
+          'to six weeks, may ooze a little, and heals into a scar. That\'s the '
+          'vaccine working, not an infection; leave it alone and keep it dry.',
+          'What helps is a normal day: extra feeds, cuddles, a cool cloth on '
+          'the thigh, and moving the leg gently. Paracetamol is reasonable if '
+          'your child is clearly uncomfortable, in the range your doctor has '
+          'confirmed. Don\'t give it routinely before the appointment to '
+          'prevent a fever. It isn\'t needed, and there\'s some evidence it '
+          'slightly blunts the response.',
+          'Some reactions come later. MMR can cause a mild fever and sometimes '
+          'a faint rash around seven to twelve days afterwards, not on the '
+          'day. That surprises families who have stopped watching by then.',
         ]),
         PpCallout(
-          'Call a doctor for: a fever above 40 C, a fit, crying that goes on '
-          'inconsolably for more than three hours, a swollen area larger than a '
-          'few centimetres or spreading redness after 48 hours, unusual floppiness '
-          'or paleness, or any difficulty breathing or facial swelling, which is '
-          'immediate. Severe reactions are rare and they are treatable, which is '
-          'why the clinic asks you to wait fifteen minutes afterwards.',
+          'Call a doctor for: a fever above 40 C, a fit, or crying that goes on '
+          'inconsolably for more than three hours. Call too for swelling '
+          'larger than a few centimetres, spreading redness after 48 hours, '
+          'or unusual floppiness or paleness. Any difficulty breathing or '
+          'facial swelling is immediate. Severe reactions are rare and '
+          'treatable, which is why the clinic asks you to wait fifteen '
+          'minutes afterwards.',
           kind: PpCalloutKind.doctor,
         ),
         // REQUIRED_REVIEW: the 24 to 48 hour reaction window, the BCG lesion
@@ -3156,13 +3542,13 @@ final PpArea _vaccines = PpArea(
         // paracetamol.
         PpWhenLine('Watch for 48 hours after most vaccines, and again around day '
             'seven to twelve after MMR.'),
-        PpIndiaNote('Do not apply haldi, oil or a hot compress to the injection '
-            'site, and do not rub it. A cool cloth and gentle movement of the '
-            'leg is all it needs. If the clinic asks you to wait fifteen minutes '
-            'in the waiting room, wait.'),
+        PpIndiaNote('Don\'t put turmeric, oil or a hot compress on the injection '
+            'site, and don\'t rub it. A cool cloth and gentle leg movement is '
+            'all it needs. If the clinic asks you to wait fifteen minutes in '
+            'the waiting room, wait.'),
         PpVideoSlot(
           title: 'The day after a vaccination',
-          subtitle: 'What is normal, what to do for the sore leg, and the short '
+          subtitle: 'What\'s normal, what to do for the sore leg, and the short '
               'list that means calling the clinic.',
           minutes: '4 MIN',
           slotId: 'health/after_vaccine_care',
@@ -3171,35 +3557,35 @@ final PpArea _vaccines = PpArea(
     ),
     PpPage(
       id: 'vax_catch_up',
-      title: 'If you are behind',
+      title: 'If a vaccine was missed',
       format: 'ARTICLE',
       blocks: [
         PpIntro('A missed dose is a delay, not a disaster, and almost never a '
-            'reason to start again. This comes up constantly and worries '
-            'families far more than it should.'),
+            'reason to start again. This comes up all the time and worries '
+            'families far more than it needs to.'),
         PpArticle([
-          'The schedule has minimum gaps between doses rather than fixed dates, '
-          'so if a dose is late, the answer is usually to give it now and '
-          'continue from there. A course that was interrupted is picked up where '
-          'it stopped. Very few vaccines have to be restarted from the '
-          'beginning, and your paediatrician will tell you if one of his does.',
-          'Some vaccines have an upper age limit: rotavirus in particular has to '
-          'be started and finished within a window in infancy, and if that '
-          'window has passed it cannot be given later. That is a real reason not '
-          'to let the early visits drift, and a good reason to book the catch up '
-          'appointment this week rather than next month.',
-          'Bring the vaccination card, or a photo of it, even if it is '
-          'incomplete. A doctor can rebuild a schedule from a partial record far '
-          'more easily than from memory, and where nothing at all was recorded '
-          'there is a standard catch up plan by age.',
+          'The schedule has minimum gaps between doses rather than fixed dates. '
+          'So if a dose is late, the answer is usually to give it now and '
+          'carry on from there. An interrupted course is picked up where it '
+          'stopped. Very few vaccines have to be restarted, and your '
+          'paediatrician will tell you if one of your child\'s does.',
+          'Some vaccines have an upper age limit. Rotavirus in particular has '
+          'to be started and finished within a window in infancy, and once '
+          'that window has passed it can\'t be given. That\'s a real reason not '
+          'to let the early visits drift, and to book the catch up visit this '
+          'week, not next month.',
+          'Bring the vaccination card, or a photo of it, even if it\'s '
+          'incomplete. A doctor can rebuild a schedule from a partial record '
+          'far more easily than from memory. And where nothing was recorded '
+          'at all, there\'s a standard catch up plan by age.',
         ]),
-        PpCallout('Late is fine. Never is not. Book the appointment, take '
-            'whatever record you have, and let the doctor work out the '
-            'sequence.'),
+        PpCallout('Late is fine. Never isn\'t. Book the appointment, take '
+            'whatever record you have, and let the doctor work out the order.'),
         PpCallout(
-          'If he has missed doses and is now unwell, an ordinary cold or a mild '
-          'fever is not a reason to postpone again. Ask the clinic rather than '
-          'assuming. Only a significant illness usually delays a vaccination.',
+          'If doses were missed and your child is now unwell, an ordinary cold '
+          'or a mild fever isn\'t a reason to put it off again. Ask the clinic '
+          'rather than assuming. Usually only a significant illness delays a '
+          'vaccination.',
           kind: PpCalloutKind.doctor,
         ),
         // REQUIRED_REVIEW: the "restart is rarely needed" statement, the
@@ -3207,15 +3593,26 @@ final PpArea _vaccines = PpArea(
         // a contraindication.
         PpWhenLine('Any time you notice a gap. The sooner the better for the '
             'ones with an age limit.'),
-        PpIndiaNote('Moving city, a long stay at nani\'s house and the pandemic '
-            'years put a lot of Indian children behind. Government hospitals and '
-            'urban health centres will complete a schedule regardless of where '
-            'the earlier doses were given.'),
+        PpIndiaNote('Moving city, a long stay with grandparents and the pandemic '
+            'years left a lot of Indian children with gaps. Government '
+            'hospitals and urban health centres will complete a schedule '
+            'wherever the earlier doses were given.'),
         PpLink(
-          'Check what he has had and what is missing',
+          'Check what your child has had and what\'s missing',
           surfaceId: 'pp_vaccines',
-          blurb: 'The list, and what is overdue.',
+          blurb: 'The list, and what\'s overdue.',
         ),
+    // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+        PpArticle(heading: 'Is it okay to delay or space out vaccines?', [
+          'The schedule is timed to protect babies at the age they\'re most at '
+              'risk, so delaying leaves your child unprotected for longer. '
+              'Several vaccines on the same day is safe: a baby\'s immune '
+              'system handles far more every day from the world around it.',
+          'A mild cold or a low fever isn\'t a reason to skip a vaccine. If your '
+              'child is properly unwell, your doctor may wait a few days. If '
+              'you\'re worried about any vaccine, ask your paediatrician '
+              'rather than spacing them out on your own.',
+        ]),
       ],
     ),
     PpPage(
@@ -3223,8 +3620,8 @@ final PpArea _vaccines = PpArea(
       title: 'Government hospital or private clinic, and what it costs',
       format: 'TABLE',
       blocks: [
-        PpIntro('This is asked far more often than it is answered honestly. '
-            'Both routes are real, both are used by careful families, and the '
+        PpIntro('People ask this far more often than they get an honest answer. '
+            'Both routes are real, careful families use both, and the '
             'difference is mostly which vaccines are covered and how long you '
             'wait.'),
         PpTable(
@@ -3240,7 +3637,7 @@ final PpArea _vaccines = PpArea(
               'Roughly Rs 500 to Rs 5,000 per visit depending on the vaccines',
             ],
             [
-              'What is covered',
+              'What\'s covered',
               'BCG, Hepatitis B, Pentavalent, Polio, MR, and more in some states',
               'Everything on the IAP list, including PCV, Rotavirus, Typhoid, '
                   'Hepatitis A, Varicella',
@@ -3268,23 +3665,22 @@ final PpArea _vaccines = PpArea(
             ],
           ],
         ),
-        PpCallout('Mixing the two is completely normal and completely fine. Many '
-            'families take the free core vaccines at the government centre and '
-            'pay privately for the ones the programme does not cover. Keep one '
-            'card for both.'),
+        PpCallout('Mixing the two is completely normal and completely fine. '
+            'Many families take the free core vaccines at the government '
+            'centre and pay privately for the ones the programme doesn\'t '
+            'cover. Keep one card for both.'),
         PpCallout(
-          'Ask two questions wherever you go: which vaccine is being given '
-          'today, and is it recorded on the card with the date and the batch '
-          'number. Those two answers are what make a schedule reconstructable '
-          'later.',
+          'Ask two questions wherever you go: which vaccine is given today, and '
+          'is it on the card with the date and the batch number. Those two '
+          'answers are what let anyone rebuild the schedule later.',
           kind: PpCalloutKind.safety,
         ),
         PpWhenLine('Decide once, before the six week visit, and stay flexible '
             'after that.'),
         PpIndiaNote('Government immunisation days are usually fixed days of the '
-            'week at the urban health centre or anganwadi. Ask the ASHA worker '
-            'or the centre directly, because the day varies by area and a wasted '
-            'trip with a baby is a real cost.'),
+            'week at the urban health centre or anganwadi. Ask the ASHA '
+            'worker or the centre directly. The day varies by area, and a '
+            'wasted trip with a baby is a real cost.'),
         PpLink(
           'Find a clinic or paediatrician near you',
           surfaceId: 'pp_find_help',
@@ -3307,35 +3703,36 @@ final PpArea _vaccines = PpArea(
 final PpArea _growth = PpArea(
   id: 'growth',
   mark: IntentMark.scaleMark,
-  title: 'Is he growing well?',
-  blurb: 'Weight, height, head size and percentiles, and the pressure to make '
-      'him fatter.',
+  title: 'Is your child growing well?',
+  blurb: 'Weight, height, head size and percentiles, and the pressure to fatten '
+      'your child up.',
   hue: 44,
   pages: [
     PpPage(
       id: 'growth_normal',
-      title: 'The pressure to make him mota',
+      title: 'The pressure to make your baby chubby',
       format: 'ARTICLE',
       blocks: [
-        PpIntro('Almost every Indian mother is told her baby is too thin, '
-            'usually by somebody who loves the baby. Here is what actually '
-            'counts as growing well.'),
+        PpIntro('Almost every Indian mother hears that the baby is too thin, '
+            'usually from someone who loves the baby. Here\'s what counts as '
+            'growing well.'),
         PpArticle([
-          'A growth chart is not a target and there is no prize for a high '
-          'percentile. A child at the tenth percentile who is following his own '
-          'line, feeding, active and meeting his milestones is growing '
-          'perfectly. A child at the ninetieth percentile who has dropped across '
-          'two lines is the one a doctor looks at. The shape of his own curve '
-          'over time is the whole signal; a single weight is almost noise.',
+          'A growth chart isn\'t a target, and there\'s no prize for a high '
+          'percentile. A child at the tenth percentile who follows the same '
+          'line, feeds well, is active and meets milestones is growing '
+          'perfectly. A child at the ninetieth percentile who has dropped '
+          'across two lines is the one a doctor looks at. The shape of your '
+          'child\'s curve over time is the signal; a single weight is almost '
+          'noise.',
           'Weight gain is fastest in the first months and slows sharply after '
           'that. A baby who gained a kilo a month at two months and gains a '
-          'third of that at nine months has not stopped growing, he has moved '
-          'into the ordinary next phase. Around the first birthday most toddlers '
-          'eat noticeably less and become fussy, which is normal and reliably '
-          'terrifies the family.',
-          'Compare him with himself, not with the neighbour\'s baby or with his '
-          'cousin. Children are built differently, and the neighbour is not '
-          'weighing her baby on the same scales.',
+          'third of that at nine months hasn\'t stopped growing. It\'s the '
+          'ordinary next phase. Around the first birthday most toddlers eat '
+          'noticeably less and get fussy. That\'s normal, and it reliably '
+          'frightens the family.',
+          'Compare your child\'s chart with its own past, not with the '
+          'neighbour\'s baby or a cousin. Children are built differently, and '
+          'the neighbour isn\'t weighing on the same scales.',
         ]),
         PpChartCard(
           title: 'Rough expectations, and they are rough',
@@ -3347,75 +3744,75 @@ final PpArea _growth = PpArea(
             ('Back to birth weight by', 'Day 10 to 14'),
             ('Weight gain, 0 to 3 months', 'About 150 to 200 g a week'),
             ('Weight gain, 3 to 6 months', 'About 100 to 150 g a week'),
-            ('Doubles his birth weight by', 'About 5 months'),
-            ('Triples his birth weight by', 'About 12 months'),
+            ('Doubles birth weight by', 'About 5 months'),
+            ('Triples birth weight by', 'About 12 months'),
             ('Head circumference', 'Measured at every visit in the first year'),
           ],
           note: 'These are averages across many babies. Yours is one baby, and '
-              'his own line over time matters more than any row here.',
+              'the line over time matters more than any row here.',
           hue: 44,
         ),
-        PpCallout('The two questions worth asking at every visit: is he '
-            'following his own curve, and is he well in himself. Everything '
-            'else is conversation.'),
+        PpCallout('The two questions worth asking at every visit: is my child '
+            'following the same curve, and is my child well in every other '
+            'way. Everything else is conversation.'),
         PpWhenLine('Weigh at the vaccination visits in the first year, then '
-            'every few months. Weighing at home every week creates worry rather '
-            'than information.'),
-        PpIndiaNote('Do not start biscuits, cerelac, ghee spoonfuls or a bottle '
-            'top up in order to satisfy a relative. If you genuinely think he is '
-            'not gaining, take him to be weighed on the clinic scales and let '
-            'the chart answer it. That is a much better argument at home than '
+            'every few months. Weighing at home every week creates worry, not '
+            'information.'),
+        PpIndiaNote('Don\'t start biscuits, cerelac, ghee spoonfuls or a bottle '
+            'top up to satisfy a relative. If you really think your baby '
+            'isn\'t gaining, get weighed on the clinic scales and let the '
+            'chart answer. That settles the argument at home better than '
             'anything you can say.'),
         PpLink(
-          'Plot his weight and height',
+          'Plot weight and height',
           surfaceId: 'pp_growth',
-          blurb: 'His own curve over time, on a real chart.',
+          blurb: 'Your child\'s own curve over time, on a real chart.',
         ),
       ],
     ),
     PpPage(
       id: 'growth_percentiles',
-      title: 'What a percentile actually means',
+      title: 'What a percentile means',
       format: 'ARTICLE',
       blocks: [
         // ⚠️ ADDED IN THE S03 PASS — this area had no video at all.
         // Placed on the page in the area that most needs showing rather
         // than telling; the renderer hoists it to the top.
         PpVideoSlot(
-          title: 'What a percentile actually means',
-          subtitle: 'Why the 25th is not a worse score than the 75th, drawn on a real chart.',
+          title: 'What a percentile means',
+          subtitle: 'Why the 25th isn\'t a worse score than the 75th, drawn on a '
+              'real chart.',
           minutes: '4 MIN',
           slotId: 'health/percentiles',
         ),
         PpIntro('Percentiles cause more anxiety than any other number in '
             'paediatrics, mostly because they sound like marks out of a '
-            'hundred. They are not.'),
+            'hundred. They aren\'t.'),
         PpArticle([
-          'A percentile is a position in a crowd, not a score. If he is on the '
-          'twenty fifth percentile for weight, it means that out of a hundred '
-          'healthy children his age, about twenty five weigh less and about '
-          'seventy five weigh more. Somebody has to be on the twenty fifth '
-          'percentile. It is not a fail.',
-          'What a paediatrician watches is the line, not the point. A child who '
-          'has tracked along the twenty fifth percentile since birth is doing '
-          'exactly what he should. A child who was on the seventy fifth and has '
-          'crossed down through two percentile lines over a few months is worth '
-          'looking into, even though his weight is still higher than the first '
-          'child\'s.',
-          'Head circumference is plotted for a different reason: it follows '
-          'brain growth in the first two years, and a head that is growing much '
-          'faster or much slower than expected is a thing to catch early. That '
-          'is why the tape measure comes out at visits that otherwise seem to be '
-          'about vaccines.',
+          'A percentile is a place in a crowd, not a score. On the twenty fifth '
+          'percentile for weight, out of a hundred healthy children that age, '
+          'about twenty five weigh less and about seventy five weigh more. '
+          'Somebody has to be on the twenty fifth percentile. It isn\'t a '
+          'fail.',
+          'A paediatrician watches the line, not the point. A child who has '
+          'tracked along the twenty fifth percentile since birth is doing '
+          'exactly what\'s expected. A child who was on the seventy fifth and '
+          'has crossed down through two lines over a few months is worth '
+          'looking into. That\'s true even though the weight is still higher '
+          'than the first child\'s.',
+          'Head size is plotted for a different reason: it follows brain growth '
+          'in the first two years. A head growing much faster or much slower '
+          'than expected is worth catching early. That\'s why the tape measure '
+          'comes out at visits that seem to be about vaccines.',
         ]),
         PpCallout('One measurement means very little. Three over six months '
-            'mean a great deal. That is the entire logic of a growth chart.'),
+            'mean a great deal. That\'s the whole logic of a growth chart.'),
         PpCallout(
-          'Ask a doctor about: crossing downward through two percentile lines, '
-          'no weight gain over two months in a baby, weight loss at any age, a '
-          'head measurement that jumps or stalls, or a child whose height has '
-          'clearly stopped moving. Take the chart with you rather than the '
-          'latest number.',
+          'Ask a doctor about: crossing down through two percentile lines, no '
+          'weight gain over two months in a baby, or weight loss at any age. '
+          'Ask too about a head measurement that jumps or stalls, or height '
+          'that has clearly stopped moving. Take the chart with you, not only '
+          'the latest number.',
           kind: PpCalloutKind.doctor,
         ),
         // REQUIRED_REVIEW: "crossing two centile lines" as the trigger, "no
@@ -3423,10 +3820,15 @@ final PpArea _growth = PpArea(
         // rationale.
         PpWhenLine('Plotted at every growth check through the first two years, '
             'and yearly after that.'),
-        PpIndiaNote('Indian charts and international charts differ slightly, and '
-            'a clinic may use either. Use the same chart each time. A child who '
-            'appears to jump percentiles between two clinics has usually only '
-            'changed charts.'),
+        PpIndiaNote('Indian charts and international charts differ slightly, '
+            'and a clinic may use either. Use the same chart each time. A '
+            'child who seems to jump percentiles between two clinics has '
+            'usually only changed charts.'),
+    // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+        PpWhenLine('At birth, most full-term babies in India weigh between '
+            'about 2.5 and 4 kg. Under 2.5 kg is called low birth weight, and '
+            'those babies get closer follow-up. Weight drops a little in the '
+            'first days, then comes back by about two weeks.'),
       ],
     ),
     PpPage(
@@ -3434,46 +3836,44 @@ final PpArea _growth = PpArea(
       title: 'Growth that needs a doctor',
       format: 'RED FLAG',
       blocks: [
-        PpIntro('Most growth worry is unnecessary. This is the short list that '
-            'is not, so you know what you are actually watching for.'),
+        PpIntro('Most growth worry isn\'t needed. This is the short list that '
+            'matters, so you know what you\'re watching for.'),
         // REQUIRED_REVIEW: EVERY THRESHOLD IN THIS CALLOUT. Confirm the day 14
         // birth weight regain, "no weight gain in two months under one year",
         // any weight loss after the newborn period, and crossing two centile
         // lines downward.
         PpCallout(
-          'See a paediatrician if: he has not regained his birth weight by two '
-          'weeks; he has not gained weight in two months in the first year; he '
-          'has lost weight at any point after the newborn period; he has crossed '
-          'downward through two percentile lines; his height has clearly '
-          'stalled; his head is growing much faster or much slower than his '
-          'chart; or he is persistently pale, very tired, or losing skills he '
-          'had.',
+          'See a paediatrician if birth weight isn\'t back by two weeks, or '
+          'there\'s no weight gain over two months in the first year. See one '
+          'too for weight loss at any point after the newborn period. Also go '
+          'for crossing down through two percentile lines, height that has '
+          'clearly stalled, or a head growing much faster or slower than the '
+          'chart. And go if your child is often pale, very tired, or losing '
+          'skills already learned.',
           kind: PpCalloutKind.doctor,
-          title: 'Seven reasons to have him checked',
+          title: 'Seven reasons for a check',
         ),
         PpCards([
           PpCard('Take the chart, not the number',
-              'The line over months is the thing that answers the question. A '
-              'single weight on a phone is not.'),
-          PpCard('Say what he actually eats in a day',
-              'Write it down for two days before the visit. Memory rounds '
-              'upward.'),
+              'The line over months answers the question. A single weight on a '
+              'phone doesn\'t.'),
+          PpCard('Say what your child eats in a day',
+              'Write it down for two days before the visit. Memory rounds up.'),
           PpCard('Mention how much milk',
-              'A toddler drinking a great deal of milk often eats very little '
-              'else and can become anaemic on it.'),
+              'A toddler drinking a lot of milk often eats very little else, '
+              'and can become anaemic.'),
           PpCard('Mention any illness that month',
               'Children lose weight during illness and regain it after. Context '
               'changes the reading.'),
         ], heading: 'What to bring', hue: 44),
         PpCallout('Growth is one of the most useful health signals there is, '
-            'precisely because it is slow. It rarely needs urgency and it '
-            'rewards attention.'),
+            'because it\'s slow. It rarely needs urgency, and it rewards '
+            'attention.'),
         PpWhenLine('At every growth check, and any time the chart is going '
-            'sideways rather than up.'),
+            'sideways instead of up.'),
         PpIndiaNote('Anaemia is common in Indian toddlers and shows up as '
-            'tiredness, pallor and poor appetite rather than as a dramatic '
-            'symptom. Ask about it at the one year visit; a simple blood test '
-            'answers it.'),
+            'tiredness, pallor and poor appetite, not a dramatic symptom. Ask '
+            'about it at the one year visit; a simple blood test answers it.'),
         PpLink(
           'Developmental milestones live in Development',
           surfaceId: 'pp_section/parenting_development',
@@ -3496,9 +3896,9 @@ final PpArea _growth = PpArea(
 final PpArea _records = PpArea(
   id: 'records',
   mark: IntentMark.reportPage,
-  title: 'Keeping his papers together',
+  title: 'Keeping your child\'s papers together',
   blurb: 'Prescriptions, reports, visits and medicines in one place, and '
-      'getting more out of a short appointment.',
+      'getting more from a short appointment.',
   hue: 210,
   pages: [
     // ⚠️ MOVED HERE FROM THE EMERGENCY AREA, NOT DELETED. Feedback
@@ -3594,10 +3994,10 @@ final PpArea _records = PpArea(
           'different appointments.',
           'It also matters when you change doctors, change cities, or end up at '
           'a hospital where nobody knows him. Handing over a clear history is '
-          'the single most useful thing a parent can do in that room.',
+          'the most useful thing a parent can do in that room.',
         ]),
         PpCallout('A record is a private thing. Share what is relevant with the '
-            'doctor in front of you rather than handing over everything, and '
+            'doctor in front of you, not everything. And '
             'keep the emergency card as the one thing that is meant to be '
             'shown.'),
         PpWhenLine('Set it up once. Add to it on the day, at the clinic, not '
@@ -3623,74 +4023,166 @@ final PpArea _records = PpArea(
         // than telling; the renderer hoists it to the top.
         PpVideoSlot(
           title: 'Seven minutes with the doctor, used well',
-          subtitle: 'What to bring, what to ask first, and the one question parents leave for the doorway.',
+          subtitle: 'What to bring, what to ask first, and the question parents '
+              'leave for the doorway.',
           minutes: '5 MIN',
           slotId: 'health/doctor_visit',
         ),
-        PpIntro('A busy paediatric OPD gives you a few minutes. Preparation is '
-            'the difference between leaving with answers and remembering your '
-            'real question in the car park.'),
+        PpIntro('A busy paediatric OPD gives you a few minutes. Being prepared '
+            'means leaving with answers, not remembering your real question '
+            'in the car park.'),
         PpSteps([
           PpStep('Write the questions down as they occur to you',
               'Over the days before, not in the waiting room. Three is a good '
-              'number, and put the most important one first.'),
-          PpStep('Start with your single biggest worry',
-              'Doctors organise the whole consultation around the first thing '
-              'they hear, so lead with what actually frightens you.'),
+              'number; put the most important one first.'),
+          PpStep('Start with your biggest worry',
+              'Doctors shape the whole visit around the first thing they hear, '
+              'so lead with what frightens you most.'),
           PpStep('Bring the numbers',
               'Current weight, temperatures you recorded, how many days, what '
               'medicine and when.'),
           PpStep('Ask what to watch for at home',
-              '"What would make me bring him back?" is the single most useful '
-              'question in paediatrics, and it is rarely asked.'),
-          PpStep('Ask what happens if it does not settle',
-              'A plan for the failure case saves the next appointment.'),
+              '"What would make me bring my child back?" is one of the most '
+              'useful questions in paediatrics, and it\'s rarely asked.'),
+          PpStep('Ask what happens if it doesn\'t settle',
+              'A plan for if it doesn\'t work saves the next appointment.'),
           PpStep('Write down the answer before you leave the building',
-              'Or record it on your phone with permission. Nobody remembers a '
+              'Or record it on your phone, with permission. Nobody remembers a '
               'dosing instruction accurately by evening.'),
         ], heading: 'Six things'),
         PpScript(
           [
             PpScriptLine(
-              say: 'What would make me bring him back?',
+              say: 'What would make me bring my child back?',
               notThis: 'Okay doctor, thank you.',
-              why: 'It turns a consultation into a plan, and it is the question '
-                  'doctors most wish parents asked.',
+              why: 'It turns a visit into a plan, and doctors wish parents '
+                  'asked it more.',
             ),
             PpScriptLine(
               say: 'Is there anything we should test, or are we watching for '
                   'now?',
               notThis: 'Should we do some tests, just to be safe?',
-              why: 'It asks for her reasoning rather than pushing for a test, '
-                  'and you usually get a much better answer.',
+              why: 'It asks for the doctor\'s reasoning instead of pushing for a '
+                  'test, and you usually get a much better answer.',
             ),
             PpScriptLine(
-              say: 'Does he actually need an antibiotic for this?',
+              say: 'Does my child need an antibiotic for this?',
               notThis: 'Please give something strong, we have a wedding on '
                   'Saturday.',
               why: 'It gives the doctor room to say no, which is often the '
-                  'correct answer and is harder to give under pressure.',
+                  'right answer and harder to give under pressure.',
             ),
           ],
           heading: 'Three questions worth memorising',
         ),
         PpCallout(
-          'If you leave and are still worried, that is a reason to go back, not '
-          'a reason to feel foolish. Paediatricians expect return visits in a '
-          'child who is not settling, and they would far rather see him twice.',
+          'If you leave and you\'re still worried, go back. That isn\'t foolish. '
+          'Paediatricians expect return visits for a child who isn\'t '
+          'settling, and would far rather see your child twice.',
           kind: PpCalloutKind.doctor,
         ),
-        PpWhenLine('Ten minutes of preparation before any appointment that is '
+        PpWhenLine('Ten minutes of preparation before any appointment that\'s '
             'about more than a vaccination.'),
-        PpIndiaNote('If more than one adult takes him to appointments, keep the '
-            'question list where all of them can see it. A grandmother who took '
-            'him last week holds half the history.'),
+        PpIndiaNote('If more than one adult takes your child to appointments, '
+            'keep the question list where everyone can see it. A grandmother '
+            'who went last week holds half the history.'),
         PpLink(
           'Build the question list now',
           surfaceId: 'pp_doctor_visit',
-          blurb: 'Add questions as they occur to you, and take the list in with '
+          blurb: 'Add questions as they come to you, and take the list in with '
               'you.',
         ),
+    // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+        PpCards(heading: 'Making the visit easier', [
+          PpCard('Dress for the visit',
+              'Clothes that open at the front and come off quickly. A spare '
+                  'nappy, and a cloth for the weighing scale.'),
+          PpCard('Feed before, or during',
+              'A fed baby is calmer. Feeding during a vaccine is a comfort.'),
+          PpCard('Bring the vaccine card and growth chart', 'Every time.'),
+        ]),
+      ],
+    ),
+    // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+    PpPage(
+      id: 'rec_checkups_by_age',
+      title: 'Check-ups, age by age',
+      subtitle: 'What the doctor looks at, and what to ask',
+      format: 'TABLE',
+      blocks: [
+        PpIntro('Most check-ups in India happen at the vaccine visits. Each one '
+            'is a chance to check growth and development, not only to get a '
+            'vaccine. Here\'s what usually happens at each, and what\'s worth '
+            'asking.'),
+        PpTable(
+          columns: ['When', 'What usually happens', 'Worth asking'],
+          rowMonths: [(0, 1), (1, 3), (3, 6), (6, 9), (9, 12), (12, 15),
+              (15, 18), (18, 24), (24, 72)],
+          rows: [
+            ['First week', 'Weight check, jaundice, feeding, the cord, and '
+                'the newborn screening results.', 'Is my baby feeding enough? Is '
+                'the yellow normal?'],
+            ['6 to 14 weeks', 'Weight, length, head size, and the first '
+                'vaccines at 6, 10 and 14 weeks.', 'Is the growth on track? What '
+                'do I watch for after the vaccines?'],
+            ['6 months', 'Growth, rolling and sitting, starting solids, and '
+                'flu and other vaccines due.', 'How do I start food? Does my '
+                'baby need iron?'],
+            ['9 months', 'Growth, crawling and babbling, the MMR vaccine.',
+                'How are speech and movement coming along?'],
+            ['12 months', 'Growth, standing and first words, hepatitis A, '
+                'and often a check for anaemia.', 'Are the iron levels okay? Can '
+                'my child have cow\'s milk now?'],
+            ['15 months', 'Growth, walking, and MMR, varicella and PCV '
+                'boosters.', 'How is the talking coming along?'],
+            ['18 months', 'Development check, and DTP, Hib and polio '
+                'boosters.', 'Is a developmental screen a good idea?'],
+            ['2 years', 'Growth, speech and play, and typhoid vaccine if '
+                'due.', 'Teeth, eyes, and diet.'],
+            ['Every year after', 'Growth, vision, hearing, teeth, and boosters '
+                'between 4 and 6 years.', 'Anything about school, sleep or '
+                'behaviour.'],
+          ],
+        ),
+        // REQUIRED_REVIEW: vaccine timings follow the IAP schedule; confirm
+        // against the current IAP chart.
+        PpWhenLine('Your doctor\'s own schedule may differ slightly. Follow the '
+            'dates on your child\'s vaccine card.'),
+      ],
+    ),
+    PpPage(
+      id: 'rec_surgery',
+      title: 'If your child needs an operation',
+      subtitle: 'Getting your child, and you, ready',
+      format: 'STEPS',
+      blocks: [
+        PpIntro('Hearing that your child needs surgery, even a small one, is '
+            'frightening. Children cope much better when they know what to '
+            'expect and you\'re calm beside them. Most children\'s operations '
+            'are short and routine.'),
+        PpSteps(heading: 'Before', [
+          PpStep('Ask the questions on your mind',
+              'Why it\'s needed, how long it takes, the anaesthetic, and how '
+                  'long the hospital stay is.'),
+          PpStep('Follow the fasting time exactly',
+              'No food or milk for the hours the hospital gives. It keeps your '
+                  'child safe under anaesthesia.'),
+          PpStep('Explain it in plain words, a day or two before for a toddler',
+              '"The doctor will help your ear get better while you have a '
+                  'special sleep."'),
+          PpStep('Pack a comfort toy', 'And something to do while waiting.'),
+        ]),
+        PpSteps(heading: 'After', [
+          PpStep('Expect grogginess and crankiness', 'It passes in hours.'),
+          PpStep('Give pain medicine as advised, on time',
+              'Not only when there are tears.'),
+          PpStep('Know the warning signs before you go home',
+              'Fever, bleeding, vomiting, or pain that gets worse.'),
+        ]),
+        PpCallout('Call the hospital or your doctor for a fever, bleeding, '
+            'repeated vomiting, refusing drinks, or seeming more unwell after '
+            'coming home.',
+            kind: PpCalloutKind.doctor),
       ],
     ),
   ],
@@ -3704,91 +4196,105 @@ final PpArea _records = PpArea(
 //  own, or dropped".
 // =============================================================================
 
-final PpArea _prevention = PpArea(
+// The prevention area as written; the medicine pages are split out of it
+// into their own area below (2026-10-07).
+final PpArea _preventionAll = PpArea(
   id: 'prevention',
   mark: IntentMark.improveMark,
-  title: 'Keeping him well',
-  blurb: 'The dull things that genuinely cut illness, and the seasons that '
-      'bring it.',
+  title: 'Keeping your child well',
+  blurb: 'The dull things that really cut illness, and the seasons that bring '
+      'it.',
   hue: 100,
   pages: [
     PpPage(
       id: 'prev_handwashing',
-      title: 'The dull things that actually work',
+      title: 'The dull things that work',
       format: 'ARTICLE',
       blocks: [
-        PpIntro('Nothing in this section prevents illness as effectively as '
-            'washing hands, and nothing is more boring to be told. Here is the '
-            'short version, once.'),
+        PpIntro('Nothing in this section prevents illness as well as washing '
+            'hands, and nothing is more boring to hear. Here\'s the short '
+            'version, once.'),
         PpArticle([
           'Most childhood infections travel on hands and then into a mouth. '
-          'Twenty seconds of soap and water at the right moments cuts colds and '
-          'cuts tummy bugs measurably, which is more than any tonic, any '
-          'supplement and any air purifier will do for him.',
+          'Twenty seconds of soap and water at the right moments cuts colds '
+          'and tummy bugs measurably. That\'s more than any tonic, supplement '
+          'or air purifier will do.',
           'The moments that matter: coming home from outside, before eating, '
-          'after the toilet or a nappy, after playing with a pet, and after '
-          'anyone in the house has been coughing. Teach it as a habit at the '
-          'door rather than as a rule, because a habit survives and a rule needs '
-          'enforcing.',
+          'and after the toilet or a nappy. Also after playing with a pet, '
+          'and after anyone at home has been coughing. Teach it as a habit at '
+          'the door, not a rule. A habit lasts; a rule needs enforcing.',
         ]),
         PpCards([
           PpCard('Wash at the door, every time',
-              'Yours and his. This one habit does most of the work.'),
+              'Yours and your child\'s. This one habit does most of the work.'),
           PpCard('Cough into the elbow',
               'Teachable from about two, and it works.'),
           PpCard('Own towel, own glass, own handkerchief',
-              'Especially when somebody in the house is ill.'),
-          PpCard('Do not share a spoon or pre chew his food',
+              'Especially when someone at home is ill.'),
+          PpCard('Don\'t share a spoon or pre chew your child\'s food',
               'It passes on the bacteria that cause tooth decay, along with '
               'whatever else is going around.'),
-          PpCard('Keep him home when he is infectious',
-              'It is the neighbourly thing and it also stops the illness coming '
-              'back around the creche to him.'),
+          PpCard('Keep your child home while infectious',
+              'It\'s the neighbourly thing, and it stops the illness coming back '
+              'round the creche to your child.'),
         ], heading: 'Five habits worth the effort', hue: 100),
-        PpCallout('Hand sanitiser is a stand in for soap when there is no water, '
-            'not an upgrade on it. Keep it out of reach: swallowing it makes a '
-            'small child genuinely unwell.'),
-        PpWhenLine('From the moment he starts crawling, and taught properly from '
+        PpCallout('Hand sanitiser stands in for soap when there\'s no water; it '
+            'isn\'t better than soap. Keep it out of reach: swallowing it '
+            'makes a small child properly unwell.'),
+        PpWhenLine('From the first crawling days, and taught properly from '
             'about eighteen months.'),
         PpIndiaNote('In a joint household the most useful habit is a wash '
-            'station at the entrance, so everyone who comes back from work or '
-            'from the market washes before picking up the baby. That is easier '
-            'to establish than asking each person separately.'),
+            'station at the entrance. Everyone back from work or the market '
+            'washes before picking up the baby. That\'s easier to set up than '
+            'asking each person separately.'),
+    // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+        PpCards(heading: 'A healthy home, without obsessing', [
+          PpCard('Shoes off at the door', 'Keeps road dirt off the floor your '
+              'baby crawls on.'),
+          PpCard('Wash toys and teethers weekly',
+              'More often after an illness.'),
+          PpCard('The five-second rule',
+              'A piece of food that fell on a clean floor at home is usually '
+                  'fine. On the road or in a public place, throw it away.'),
+          PpCard('Clean the kitchen, not the whole house',
+              'Raw meat, cutting boards and leftovers matter more than '
+                  'disinfecting every surface. Some ordinary dirt is fine.'),
+        ]),
       ],
     ),
     PpPage(
       id: 'prev_immunity',
-      title: 'Building immunity, and the tonics that will not',
+      title: 'Building immunity, and the tonics that won\'t',
       format: 'ARTICLE',
       blocks: [
-        PpIntro('The immunity market in India is enormous and almost none of it '
-            'does anything. The things that genuinely help are cheap, dull and '
-            'already in your kitchen.'),
+        PpIntro('The immunity market in India is huge, and almost none of it '
+            'does anything. What really helps is cheap, dull and already in '
+            'your kitchen.'),
         PpArticle([
           'A child\'s immune system is built by exposure, sleep, food and '
-          'vaccination. There is no supplement that raises immunity in a well '
-          'fed child, and the syrups, chyawanprash formulations and multivitamin '
-          'tonics sold for it have not been shown to reduce how often children '
-          'fall ill. Where a real deficiency exists, iron, vitamin D or vitamin '
-          'B12, the correct answer is a test and a treatment from a doctor, not '
-          'a general tonic.',
+          'vaccination. No supplement raises immunity in a well fed child. '
+          'The syrups, chyawanprash formulations and multivitamin tonics sold '
+          'for it haven\'t been shown to cut how often children fall ill. '
+          'Where a real deficiency exists (iron, vitamin D or vitamin B12), '
+          'the answer is a test and treatment from a doctor, not a general '
+          'tonic.',
           'What does help: a varied home diet with iron rich foods, enough '
-          'sleep, time outdoors, and completing the vaccination schedule. Iron '
-          'matters particularly in Indian toddlers, where anaemia is common, and '
-          'it comes from dal, ragi, green leafy vegetables, jaggery, egg and '
-          'meat. Vitamin C rich food eaten alongside, a little lemon, amla or '
-          'tomato, helps the iron get absorbed.',
-          'Vitamin D is the genuine exception. Indian children are commonly '
-          'short of it despite the sunshine, because of skin cover, indoor time '
-          'and pollution, and many paediatricians supplement it routinely in the '
-          'first years. That is a prescription rather than a purchase, so ask '
-          'yours what she recommends for him.',
+          'sleep, time outdoors, and finishing the vaccination schedule. Iron '
+          'matters especially for Indian toddlers, where anaemia is common. '
+          'It comes from dal, ragi, green leafy vegetables, jaggery, egg and '
+          'meat. Vitamin C rich food eaten alongside (a little lemon, amla or '
+          'tomato) helps the iron get absorbed.',
+          'Vitamin D is the real exception. Indian children are often short of '
+          'it despite the sunshine, because of skin cover, indoor time and '
+          'pollution. Many paediatricians supplement it routinely in the '
+          'first years. That\'s a prescription, not a purchase, so ask your '
+          'paediatrician what they recommend for your child.',
         ]),
         PpCallout(
-          'Do not give a daily multivitamin, an iron syrup or a growth tonic on '
-          'your own. Iron overdose is one of the more common serious poisonings '
-          'in small children, and vitamin A and D can build up. If you think he '
-          'needs something, ask for a test first.',
+          'Don\'t give a daily multivitamin, an iron syrup or a growth tonic on '
+          'your own. Iron overdose is one of the more common serious '
+          'poisonings in small children, and vitamins A and D can build up. '
+          'If you think your child needs something, ask for a test first.',
           kind: PpCalloutKind.doctor,
           title: 'Supplements are prescriptions, not groceries',
         ),
@@ -3797,12 +4303,12 @@ final PpArea _prevention = PpArea(
         // supplementation practice in India, and the iron overdose warning.
         PpWhenLine('Food and sleep from the start. Any supplement only after a '
             'doctor has said so.'),
-        PpIndiaNote('Frequent colds in a creche child are not a sign of weak '
-            'immunity, and they are the single commonest reason a family starts '
-            'a tonic. Six to twelve colds a year at this age is the ordinary '
+        PpIndiaNote('Frequent colds in a creche child aren\'t a sign of weak '
+            'immunity, and they\'re the commonest reason families start a '
+            'tonic. Six to twelve colds a year at this age is the ordinary '
             'number, and it falls every year on its own.'),
         PpLink(
-          'Iron rich meals he will actually eat',
+          'Iron rich meals your child will eat',
           surfaceId: 'pp_food',
           blurb: 'Recipes from the Food companion, sorted by age.',
         ),
@@ -3814,46 +4320,45 @@ final PpArea _prevention = PpArea(
       format: 'ARTICLE',
       blocks: [
         PpIntro('Every Indian family knows the monsoon brings illness. Knowing '
-            'which illnesses, and which precautions actually matter, makes the '
-            'season much less of a lottery.'),
+            'which illnesses, and which precautions matter, makes the season '
+            'much less of a lottery.'),
         PpArticle([
-          'The monsoon and the weeks after it bring three separate problems: '
-          'mosquito borne illness, dengue, chikungunya and malaria; water and '
-          'food borne illness, typhoid, hepatitis A and the ordinary tummy bugs; '
-          'and the viral fevers and chest infections that come with damp and '
-          'crowding indoors. They need different precautions, which is why one '
-          'general instruction to be careful achieves so little.',
-          'For mosquitoes, the highest value action is emptying standing water '
-          'at home once a week: cooler trays, plant saucers, the terrace bucket, '
-          'the money plant bottle, the fridge tray. The dengue mosquito breeds '
-          'in clean water and bites during the day, so daytime full sleeves and '
+          'The monsoon and the weeks after it bring three separate problems. '
+          'There\'s mosquito borne illness (dengue, chikungunya and malaria). '
+          'There\'s water and food borne illness (typhoid, hepatitis A and '
+          'ordinary tummy bugs). And there are the viral fevers and chest '
+          'infections that come with damp and crowding indoors. Each needs '
+          'different precautions, which is why a general "be careful" '
+          'achieves so little.',
+          'For mosquitoes, what helps most is emptying standing water at home '
+          'once a week: cooler trays, plant saucers, the terrace bucket, the '
+          'money plant bottle, the fridge tray. The dengue mosquito breeds in '
+          'clean water and bites during the day. So daytime full sleeves and '
           'a child safe repellent matter more than a night net.',
-          'For water and food, boiled or filtered water, home cooked food, no '
-          'cut fruit from a cart, and washing vegetables well. Hepatitis A and '
-          'typhoid both have vaccines on the IAP schedule, which is the most '
-          'reliable protection of all and one many families skip.',
+          'For water and food: boiled or filtered water, home cooked food, no '
+          'cut fruit from a cart, and well washed vegetables. Hepatitis A and '
+          'typhoid both have vaccines on the IAP schedule. That\'s the most '
+          'reliable protection of all, and many families skip it.',
         ]),
         PpCards([
           PpCard('Empty standing water weekly',
-              'Set a day. This is the single most effective dengue precaution '
-              'there is.'),
+              'Set a day. This is the best dengue precaution there is.'),
           PpCard('Full sleeves in the daytime',
               'The dengue mosquito bites in daylight, not at night.'),
           PpCard('Boiled or filtered water, always',
               'Including for making up formula and for brushing teeth in a bad '
               'water area.'),
           PpCard('Dry the feet and the folds',
-              'Damp skin in humidity gets fungal rashes fast, especially in the '
-              'nappy area and between the toes.'),
+              'Damp skin in humid weather gets fungal rashes fast, especially '
+              'in the nappy area and between the toes.'),
           PpCard('Check the typhoid and hepatitis A doses',
-              'Both are on the schedule. Both are commonly missed.'),
+              'Both are on the schedule. Both are often missed.'),
         ], heading: 'Five that earn their place', hue: 100),
         PpCallout(
-          'Any fever in the monsoon that lasts past the third day, or that '
-          'settles and returns, should be seen by a doctor and usually tested '
-          'rather than watched further. This is the season where that rule '
-          'matters most, because dengue and typhoid both hide behind an '
-          'ordinary looking fever.',
+          'Any monsoon fever that lasts past the third day, or settles and '
+          'returns, needs a doctor and usually a test. Don\'t keep watching '
+          'it. This is the season when that rule matters most, because dengue '
+          'and typhoid both hide inside an ordinary looking fever.',
           kind: PpCalloutKind.doctor,
         ),
         PpWhenLine('From the first rains until about a month after they stop, '
@@ -3861,6 +4366,22 @@ final PpArea _prevention = PpArea(
         PpIndiaNote('Fogging in the colony kills adult mosquitoes for a day and '
             'does nothing about the ones breeding on your own balcony. The '
             'bucket matters more than the fogging machine.'),
+    // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+        PpCards(heading: 'Repellents, water and floods', [
+          PpCard('Mosquito repellents',
+              'For babies under six months, use nets and full sleeves rather '
+                  'than creams. After that, a repellent made for children, on '
+                  'clothes and exposed skin only, never on the hands or face. '
+                  'Keep vaporiser refills and coils out of reach.'),
+          PpCard('Safe water',
+              'Boil drinking water for a full minute, or use a reliable '
+                  'filter, and keep it covered. In floods, assume all tap '
+                  'water is unsafe.'),
+          PpCard('If floods come',
+              'Keep a bag ready with your child\'s medicines, documents, ORS, '
+                  'dry food and water. Never allow play in flood water, which '
+                  'can hide open drains and carry disease.'),
+        ]),
       ],
     ),
     PpPage(
@@ -3868,53 +4389,59 @@ final PpArea _prevention = PpArea(
       title: 'Air pollution and small lungs',
       format: 'ARTICLE',
       blocks: [
-        PpIntro('In a lot of Indian cities this is a bigger health question for '
-            'a child than any single illness, and it is one of the few where '
-            'household choices genuinely change the exposure.'),
+        PpIntro('In many Indian cities this is a bigger health question for a '
+            'child than any single illness. It\'s also one of the few where '
+            'household choices really change the exposure.'),
         PpArticle([
-          'Small children breathe faster than adults, their airways are '
-          'narrower, and their lungs are still being built until well into '
-          'childhood, so the same air does more to them. The effects that show '
-          'up are more coughs and colds, more wheezing, worse asthma where it '
-          'exists, and lower lung growth over years rather than a dramatic '
-          'single event.',
-          'Indoor air is the part you control. The largest indoor sources in '
-          'Indian homes are cooking smoke where a chulha or a poorly ventilated '
-          'kitchen is used, mosquito coils, incense, and cigarette smoke. A '
-          'mosquito coil burned in a closed room overnight beside a baby is a '
-          'significant exposure, and a liquid vaporiser or a net is a much '
-          'better choice.',
-          'Outdoors, the honest advice is to check the air quality on bad days '
-          'and shift outdoor play to the times when it is lowest, usually late '
-          'morning and afternoon rather than early morning in winter, when smog '
-          'settles. On genuinely bad days, indoor play is the right call, and a '
-          'purifier in the room he sleeps in is worth it if you can afford one. '
-          'Masks do not fit small children and are not the answer for them.',
+          'Small children breathe faster than adults, have narrower airways, '
+          'and their lungs keep developing well into childhood. So the same '
+          'air does more harm. What shows up is more coughs and colds, more '
+          'wheezing, worse asthma where it exists, and lower lung growth over '
+          'years. It\'s slow, not one dramatic event.',
+          'Indoor air is the part you control. The biggest indoor sources in '
+          'Indian homes are cooking smoke (from a wood or coal stove or a poorly '
+          'ventilated kitchen), mosquito coils, incense, and cigarette smoke. '
+          'A mosquito coil burned overnight in a closed room beside a baby is '
+          'a big exposure. A liquid vaporiser or a net is a much better '
+          'choice.',
+          'Outdoors, check the air quality on bad days and move outdoor play to '
+          'when it\'s lowest. That\'s usually late morning and afternoon, not '
+          'early morning in winter, when smog settles. On really bad days, '
+          'play indoors. A purifier in the room your child sleeps in is worth '
+          'it if you can afford one. Masks don\'t fit small children and '
+          'aren\'t the answer for them.',
         ]),
         PpCallout(
           'Nobody smokes in the house or the car, and nobody smokes and then '
-          'holds the baby. Smoke stays on clothes and hair and reaches him '
-          'anyway. Smoking outside on the balcony is the minimum, and it is '
-          'still not nothing.',
+          'holds the baby. Smoke stays on clothes and hair and reaches your '
+          'baby anyway. Smoking outside on the balcony is the minimum, and '
+          'even that still carries some risk.',
           kind: PpCalloutKind.safety,
           title: 'The one that matters most',
         ),
         PpCallout(
-          'A child who coughs at night most weeks, wheezes with every cold, gets '
-          'breathless running about, or misses school repeatedly for chest '
-          'illness, should be assessed for asthma rather than treated cold by '
-          'cold. It is common, it is manageable, and it is under diagnosed here.',
+          'A child who coughs at night most weeks, wheezes with every cold, '
+          'gets breathless running about, or misses school often for chest '
+          'illness, needs an asthma check. Ask your doctor; don\'t treat it '
+          'cold by cold. Asthma is common and manageable, and it\'s under '
+          'diagnosed here.',
           kind: PpCalloutKind.doctor,
         ),
         // REQUIRED_REVIEW: the claims about children's relative exposure, the
         // mosquito coil comparison, the advice on outdoor timing in winter smog,
         // and the statement that masks are unsuitable for small children.
-        PpWhenLine('All year in a polluted city, and particularly through the '
+        PpWhenLine('All year in a polluted city, and especially through the '
             'winter smog months.'),
-        PpIndiaNote('If the kitchen is closed and there is no chimney or exhaust, '
-            'keep the baby out of it while cooking and open a window. Cooking '
-            'smoke exposure in the first years is one of the better documented '
-            'risks to Indian children\'s lungs.'),
+        PpIndiaNote('If the kitchen is closed with no chimney or exhaust, keep '
+            'the baby out while cooking and open a window. Cooking smoke in '
+            'the first years is one of the better documented risks to Indian '
+            'children\'s lungs.'),
+    // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+        PpCallout('Vaping isn\'t safe around children either. E-cigarette vapour '
+            'carries nicotine and chemicals onto skin, clothes and surfaces, '
+            'and refill liquids can poison a child who swallows them. Keep '
+            'the home and car smoke- and vape-free.',
+            kind: PpCalloutKind.safety),
       ],
     ),
     PpPage(
@@ -3924,22 +4451,23 @@ final PpArea _prevention = PpArea(
       // positioning. Done wrong, this chokes babies." The slot is hoisted.
       format: 'VIDEO',
       blocks: [
-        PpIntro('Half of a prescription that never reaches the child is a '
-            'prescription that did not work. Technique matters more than '
-            'families expect, and it is easily learned.'),
+        PpIntro('A prescription that never reaches the child doesn\'t work. '
+            'Technique matters more than families expect, and it\'s easy to '
+            'learn.'),
         PpSteps([
           PpStep('Read the label and the strength, every time',
-              'Which drug, what strength, how much, how often. Even the bottle '
-              'you have used before, because brands change.'),
+              'Which drug, what strength, how much, how often. Even a bottle '
+              'you\'ve used before, because brands change.'),
           PpStep('Use the syringe or the cup that came in the box',
-              'Never a kitchen spoon. A teaspoon in one house is not a teaspoon '
+              'Never a kitchen spoon. A teaspoon in one house isn\'t a teaspoon '
               'in the next.'),
-          PpStep('Sit him upright, never lying flat',
-              'On your lap, head slightly raised. Flat means it goes down the '
+          PpStep('Sit your child upright, never lying flat',
+              'On your lap, head slightly raised. Lying flat, it goes down the '
               'wrong way.'),
           PpStep('Aim into the inside of the cheek, not the throat',
-              'Slowly, a little at a time, letting him swallow between. Squirting '
-              'it at the back of the mouth makes him gag and often vomit.'),
+              'Slowly, a little at a time, with time to swallow in between. '
+              'Squirting it at the back of the mouth causes gagging and often '
+              'vomiting.'),
           PpStep('For an older child, offer a choice rather than a fight',
               'Which cup, sitting where, and something to drink after. Holding a '
               'child down works once and makes the next six doses harder.'),
@@ -3947,40 +4475,58 @@ final PpArea _prevention = PpArea(
               'Especially when two adults are sharing the night.'),
         ], heading: 'Six steps'),
         PpCallout(
-          'Never mix medicine into a full bottle or a full glass of milk. If he '
-          'does not finish it, you have no idea how much he received. Give the '
-          'dose on its own, then offer the drink.',
+          'Never mix medicine into a full bottle or a full glass of milk. If it '
+          'isn\'t finished, you have no idea how much went in. Give the dose '
+          'on its own, then offer the drink.',
           kind: PpCalloutKind.safety,
         ),
         PpArticle([
-          'If he vomits immediately after a dose, do not automatically repeat '
-          'it. Doubling by accident is a real risk, and the right answer depends '
-          'on the drug and on how long ago it was, so ask the pharmacist or the '
-          'clinic before giving it again.',
-          'Finish the course of an antibiotic exactly as prescribed, even after '
-          'he is better on day three, and never save the leftover half bottle '
-          'for the next illness. Old antibiotics in a cupboard are how a family '
-          'ends up treating the wrong thing with the wrong drug at the wrong '
-          'dose. Store medicines locked away and out of sight, because '
-          'accidental swallowing is the commonest childhood poisoning there is.',
+          'If your child vomits straight after a dose, don\'t automatically '
+          'repeat it. Doubling by accident is a real risk. The right answer '
+          'depends on the drug and how long ago it was given, so ask the '
+          'pharmacist or clinic before giving it again.',
+          'Finish an antibiotic course exactly as prescribed, even if your '
+          'child is better on day three, and never save the leftover half '
+          'bottle for next time. Old antibiotics in a cupboard lead to the '
+          'wrong drug, at the wrong dose, for the wrong illness. Store '
+          'medicines locked away and out of sight. Accidental swallowing is '
+          'the commonest childhood poisoning there is.',
         ], heading: 'Two things that go wrong'),
+        // Added 2026-10-02 from the parenting gap analysis (P1, ADD TO OURS:
+        // What to Expect's medication safety piece).
+        PpCards(heading: 'The mistakes that are easy to make', [
+          PpCard('Two people, one dose',
+              'Grandmother gives the syrup, then you do. Write the time and dose '
+                  'on a paper by the medicine, or in your phone, every time.'),
+          PpCard('The same medicine twice',
+              'Many cold and fever syrups already contain paracetamol. Check the '
+                  'ingredients before giving two products together.'),
+          PpCard('Cough and cold mixtures under two',
+              'Not advised for babies and toddlers unless your doctor has '
+                  'prescribed one. Saline drops and fluids help more.'),
+          PpCard('Old prescriptions',
+              'A syrup from a past illness, or a sibling\'s, may be the wrong '
+                  'medicine or the wrong dose now. Check the expiry, and ask.'),
+          PpCard('Calling it a sweet',
+              'Children look for more when you\'re not watching. Call medicine '
+                  'medicine, and keep it locked away.'),
+        ]),
         PpCallout(
-          'If he has swallowed a medicine he was not given, call a doctor or go '
-          'to a hospital immediately and take the bottle with you. Do not wait '
-          'to see if anything happens, and do not make him vomit.',
+          'If your child has swallowed a medicine that wasn\'t given, call a '
+          'doctor or go to a hospital immediately, and take the bottle. Don\'t '
+          'wait to see if anything happens, and don\'t try to cause vomiting.',
           kind: PpCalloutKind.doctor,
         ),
-        PpWhenLine('Every medicine, every age. Most important under two, when he '
-            'cannot cooperate.'),
-        PpIndiaNote('Do not accept a strip of tablets cut in half as a child '
-            'dose, and do not give an adult tablet broken into pieces unless a '
-            'doctor has told you exactly how. Paediatric syrups and drops exist '
-            'precisely because a fraction of an adult tablet is not a reliable '
-            'dose.'),
+        PpWhenLine('Every medicine, every age. Most important under two, before '
+            'a child can cooperate.'),
+        PpIndiaNote('Don\'t accept a strip of tablets cut in half as a child '
+            'dose. Don\'t give an adult tablet broken into pieces unless a '
+            'doctor has told you exactly how. Children\'s syrups and drops '
+            'exist because a piece of an adult tablet isn\'t a reliable dose.'),
         PpVideoSlot(
           title: 'Giving medicine safely, demonstrated',
           subtitle: 'The syringe, the cheek, the upright hold, and what to do '
-              'when he spits it out.',
+              'when it gets spat out.',
           minutes: '5 MIN',
           slotId: 'health/giving_medicine',
         ),
@@ -3988,78 +4534,77 @@ final PpArea _prevention = PpArea(
     ),
     PpPage(
       id: 'prev_sick_home',
-      title: 'When to keep him home',
+      title: 'When to keep your child home',
       format: 'CARDS',
       blocks: [
         PpIntro('Creche and playschool are where illness circulates, and the '
-            'guidance is usually vague. Here is a workable version you can also '
-            'show to whoever is asking you to send him in.'),
+            'guidance is usually vague. Here\'s a workable version you can '
+            'also show anyone asking you to send your child in.'),
         PpCards([
-          PpCard('Keep him home: any fever',
+          PpCard('Keep at home: any fever',
               'Until 24 hours after the fever has gone without medicine. A dose '
-              'of paracetamol before drop off is not the same as being well.'),
-          PpCard('Keep him home: vomiting or loose motions',
-              'Until 24 to 48 hours after the last episode. This is the one that '
-              'spreads fastest.'),
-          PpCard('Keep him home: HFMD with fever and fresh blisters',
+              'of paracetamol before drop off isn\'t the same as being well.'),
+          PpCard('Keep at home: vomiting or loose motions',
+              'Until 24 to 48 hours after the last episode. This one spreads '
+              'fastest.'),
+          PpCard('Keep at home: HFMD with fever and fresh blisters',
               'Usually about a week. Tell the creche so they can warn others.'),
-          PpCard('Keep him home: chickenpox, until every blister has crusted',
+          PpCard('Keep at home: chickenpox, until every blister has crusted',
               'Roughly five to seven days from the first spot.'),
-          PpCard('Keep him home: red weeping eyes',
+          PpCard('Keep at home: red weeping eyes',
               'Conjunctivitis moves through a class in days.'),
-          PpCard('He can go: a plain runny nose, no fever, himself again',
-              'Waiting for a child to have no snot at all in winter means '
-              'waiting until March.'),
+          PpCard('Fine to go: a plain runny nose, no fever, back to normal',
+              'Waiting for no snot at all in winter means waiting until March.'),
         ], heading: 'The honest version', hue: 100),
-        PpCallout('The test is not whether he has a symptom, it is whether he is '
-            'infectious and whether he is well enough to take part in the day. '
-            'Those two questions answer almost every case.'),
+        PpCallout('Two questions answer almost every case: is your child '
+            'infectious, and well enough to join in the day? A single symptom '
+            'on its own doesn\'t decide it.'),
         PpCallout(
-          'Tell the creche what he has, particularly for HFMD, chickenpox, '
+          'Tell the creche what your child has, especially HFMD, chickenpox, '
           'conjunctivitis and any tummy bug. A pregnant teacher or a baby '
-          'sibling elsewhere in the building may need to know, and a doctor may '
-          'need to be told about them too.',
+          'sibling elsewhere in the building may need to know, and may need '
+          'to tell a doctor too.',
           kind: PpCalloutKind.doctor,
         ),
         // REQUIRED_REVIEW: every exclusion period on this page, in particular
         // the 24 hour fever free rule, the 24 to 48 hours after vomiting or
         // diarrhoea, and the chickenpox crusting period.
-        PpWhenLine('From the first term at creche, usually somewhere between one '
-            'and three years.'),
-        PpIndiaNote('Sending a child in on paracetamol so that a working day is '
-            'not lost is extremely common and it is how a whole class gets ill. '
-            'If leave is genuinely impossible, say so plainly to the creche and '
+        PpWhenLine('From the first term at creche, usually between one and '
+            'three years.'),
+        PpIndiaNote('Sending a child in on paracetamol so a working day isn\'t '
+            'lost is very common, and it\'s how a whole class gets ill. If '
+            'leave really isn\'t possible, say so plainly to the creche and '
             'work something out, rather than masking a fever.'),
       ],
     ),
     PpPage(
       id: 'prev_antibiotics',
-      title: 'Antibiotics, and why the chemist should not decide',
+      title: 'Antibiotics, and why the chemist shouldn\'t decide',
       format: 'ARTICLE',
       blocks: [
         PpIntro('India uses more antibiotics in children than almost anywhere, '
-            'and most of those courses were never needed. This page is the one '
-            'to read before you ask for one.'),
+            'and most of those courses were never needed. Read this before '
+            'you ask for one.'),
         PpArticle([
-          'Antibiotics kill bacteria. They do absolutely nothing to a virus, and '
-          'colds, flu, most sore throats, most coughs, most fevers, bronchiolitis '
-          'and ordinary loose motions are all viral. Giving an antibiotic for '
-          'those does not shorten the illness by an hour. What it does is upset '
-          'his gut for weeks, sometimes cause a rash or diarrhoea, and make the '
-          'bacteria he does carry harder to treat the next time he genuinely '
-          'needs one.',
-          'That last part is not an abstraction in India. Resistant infections '
-          'are already common here, and a child who has had many unnecessary '
-          'courses is more likely to be carrying bacteria that the usual drugs '
-          'will not touch when he is admitted with something serious. The person '
-          'this protects is your own child, later.',
-          'So the useful thing to do in the consulting room is the opposite of '
-          'what is usual: rather than asking for something strong, ask whether '
-          'he actually needs an antibiotic at all, and what she is expecting the '
-          'illness to do over the next two days. A doctor who says "this is '
-          'viral, give paracetamol and bring him back if he is worse on Friday" '
-          'is practising better medicine than one who reaches for a bottle, and '
-          'she is far more likely to say it if you have not asked for one.',
+          'Antibiotics kill bacteria. They do nothing at all to a virus. Colds, '
+          'flu, most sore throats, most coughs, most fevers, bronchiolitis '
+          'and ordinary loose motions are all viral. An antibiotic for those '
+          'doesn\'t shorten the illness by an hour. It upsets the gut for '
+          'weeks, sometimes causes a rash or diarrhoea, and makes your '
+          'child\'s bacteria harder to treat when an antibiotic is really '
+          'needed.',
+          'In India that last part is real. Resistant infections are already '
+          'common here. A child who has had many unneeded courses is more '
+          'likely to carry bacteria the usual drugs won\'t touch, at the '
+          'moment of a serious illness. The person this protects is your own '
+          'child, later.',
+          'So in the consulting room, do the opposite of what\'s usual. Instead '
+          'of asking for something strong, ask whether an antibiotic is '
+          'needed at all, and what the doctor expects over the next two days. '
+          'A doctor who says "this is viral, give paracetamol and come back '
+          'if it\'s worse on Friday" is practising better medicine. Doctors '
+          'are far more likely to say it if you haven\'t asked for a '
+          'prescription.',
         ]),
         PpCards([
           PpCard('Viral, so no antibiotic',
@@ -4076,18 +4621,18 @@ final PpArea _prevention = PpArea(
               'for the wrong illness.'),
         ], heading: 'Roughly, which is which', hue: 100),
         PpCallout(
-          'Do not buy an antibiotic over a chemist counter without a '
-          'prescription, and do not repeat an old one because the symptoms look '
-          'similar. If a course is prescribed, finish it exactly as written and '
-          'throw away what remains.',
+          'Don\'t buy an antibiotic over a chemist\'s counter without a '
+          'prescription, and don\'t repeat an old one because the symptoms '
+          'look similar. If a course is prescribed, finish it exactly as '
+          'written and throw away what\'s left.',
           kind: PpCalloutKind.safety,
           title: 'The chemist counter rule',
         ),
         PpCallout(
-          'Antibiotics genuinely save lives, and the point of this page is not '
-          'to make you refuse one. If your paediatrician has examined him and '
-          'prescribed a course, give it, all of it, and ask her why if you want '
-          'to understand the reasoning.',
+          'Antibiotics save lives, and this page isn\'t asking you to refuse '
+          'one. If your paediatrician has examined your child and prescribed '
+          'a course, give it, all of it. Ask why if you want to understand '
+          'the reasoning.',
           kind: PpCalloutKind.doctor,
           title: 'And when one is prescribed, give it',
         ),
@@ -4097,19 +4642,561 @@ final PpArea _prevention = PpArea(
         PpWhenLine('Worth reading once, before the next fever, rather than in '
             'the queue at the clinic.'),
         PpIndiaNote('Many Indian chemists will sell antibiotics without a '
-            'prescription and some will recommend one. It is not their fault '
-            'that the system works this way, and it is still not a safe way to '
+            'prescription, and some will recommend one. The system works this '
+            'way through no fault of theirs, and it\'s still not a safe way to '
             'treat a child. Ask for the drug name and take it to a doctor '
             'instead.'),
         PpConsult(
           title: 'Ask a paediatrician whether this needs an antibiotic',
-          whoFor: 'For the parent who has been handed a prescription, or told to '
-              'buy something at the chemist, and wants a second opinion from a '
-              'paediatrician before starting a course.',
+          whoFor: 'For the parent who has been handed a prescription, or told '
+              'to buy something at the chemist, and wants a paediatrician\'s '
+              'second opinion before starting a course.',
           surfaceId: 'pp_experts',
           role: 'pediatrician',
         ),
       ],
     ),
+    // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+    PpPage(
+      id: 'prev_private_parts',
+      title: 'Keeping private parts clean',
+      subtitle: 'Gentle, easy, and nothing inside',
+      format: 'STEPS',
+      blocks: [
+        PpIntro('Caring for a child\'s private parts is easy: plain water, '
+            'gentle hands, and no pulling or scrubbing. Here are the few '
+            'things worth knowing.'),
+        PpSteps(heading: 'For a boy', [
+          PpStep('Wash the outside with plain water at bath time'),
+          PpStep('Don\'t pull back the foreskin',
+              'In most boys it\'s stuck to the tip until several years old, '
+                  'sometimes until the teens. It loosens on its own. Forcing '
+                  'it causes pain, bleeding and scarring.'),
+          PpStep('Once it moves back easily on its own',
+              'Teach your son to slide it back gently, rinse, and slide it '
+                  'forward again.'),
+          PpStep('After a circumcision',
+              'Keep it clean and dry while it heals, as the doctor shows you.'),
+        ]),
+        PpSteps(heading: 'For a girl', [
+          PpStep('Always wipe from front to back',
+              'Away from the vagina, to keep germs from the bottom out.'),
+          PpStep('Wash only the outside with plain water',
+              'No soap inside, no powder, no douching.'),
+          PpStep('A little white discharge is normal',
+              'Especially in the first weeks after birth.'),
+          PpStep('Cotton underwear, changed daily', 'Once your daughter wears them.'),
+        ]),
+        PpCallout('See a doctor for swelling, redness or pain, a foreskin that '
+            'balloons when passing urine, a smelly or coloured discharge, '
+            'blood, or crying when passing urine.',
+            kind: PpCalloutKind.doctor),
+      ],
+    ),
+    PpPage(
+      id: 'prev_head_lice',
+      title: 'Head lice, and getting rid of them',
+      subtitle: 'Common, harmless, and annoying',
+      bands: ['hb_toddler', 'hb_child'],
+      format: 'STEPS',
+      blocks: [
+        PpIntro('Head lice spread easily among children who play head to head, '
+            'at playschool and at family functions. They have nothing to do '
+            'with being dirty, and they don\'t carry disease. They itch, and '
+            'that\'s all.'),
+        PpSteps([
+          PpStep('Check with a fine-toothed lice comb',
+              'On wet, conditioned hair, section by section, wiping the comb '
+                  'on a white tissue.'),
+          PpStep('Comb thoroughly every three to four days for two weeks',
+              'This catches newly hatched lice before they lay eggs. It works '
+                  'well on its own.'),
+          PpStep('Ask your doctor before using a lice lotion',
+              'Some aren\'t suitable for young children. Never use kerosene, '
+                  'which is dangerous.'),
+          PpStep('Check the whole family', 'And treat anyone who has them.'),
+          PpStep('Wash pillow covers and combs in hot water'),
+        ]),
+        PpWhenLine('No need to miss playschool. Tell the teacher so other '
+            'parents can check too.'),
+      ],
+    ),
+    PpPage(
+      id: 'prev_nails_ears',
+      title: 'Cutting nails and cleaning ears',
+      subtitle: 'Two small jobs that worry new parents',
+      format: 'STEPS',
+      blocks: [
+        PpIntro('Tiny nails and tiny ears can make anyone nervous. Both jobs '
+            'are easier than they look, with the right timing.'),
+        PpSteps(heading: 'Nails', [
+          PpStep('Cut during sleep or a feed', 'Or right after a bath, when '
+              'nails are soft.'),
+          PpStep('Use baby nail clippers or a file',
+              'Press the finger pad away from the nail and cut straight '
+                  'across.'),
+          PpStep('Toenails straight across too', 'Not curved, to avoid '
+              'ingrown nails.'),
+          PpStep('If you nick the skin',
+              'Press with a clean cloth. It stops quickly. Don\'t put a plaster '
+                  'on a baby\'s finger; it\'s a choking risk.'),
+        ]),
+        PpSteps(heading: 'Ears', [
+          PpStep('Clean only the outer ear',
+              'With a soft cloth after the bath.'),
+          PpStep('Nothing inside the ear',
+              'Not cotton buds, oil or hairpins. Ear wax protects the ear and '
+                  'moves out on its own. Buds push it deeper.'),
+          PpStep('No oil drops unless a doctor advises',
+              'Warm oil in the ear is a common habit, but it can cause '
+                  'infection.'),
+        ]),
+        PpCallout('See a doctor for ear pulling with a fever, discharge or '
+            'bleeding from the ear, or wax that seems to be blocking hearing.',
+            kind: PpCalloutKind.doctor),
+      ],
+    ),
+    PpPage(
+      id: 'prev_allergy_probiotics',
+      title: 'Allergy medicines and probiotics: are they needed?',
+      subtitle: 'What the evidence says for young children',
+      format: 'ARTICLE',
+      blocks: [
+        PpIntro('Chemists and relatives often suggest an allergy syrup for a '
+            'runny nose, or a probiotic for a tummy upset. Some are useful, '
+            'and many aren\'t needed. Here\'s the honest picture.'),
+        PpArticle(heading: 'Allergy medicines', [
+          'Antihistamine syrups can help a child with a real allergy, like hay '
+              'fever, hives or an itchy allergic rash. They don\'t help an '
+              'ordinary cold. The older drowsy types aren\'t advised for '
+              'children under two, and should never be used to make a child '
+              'sleep.',
+          'Give an allergy medicine only when a doctor has advised it for your '
+              'child, at the dose the doctor gave. Newer non-drowsy types are '
+              'often preferred for older children.',
+        ]),
+        PpArticle(heading: 'Probiotics', [
+          'Probiotics are live "good" bacteria, found in some sachets, drops '
+              'and curd. Some types may shorten diarrhoea a little or help '
+              'with colic in some babies, but the evidence is mixed and '
+              'differs by product. They\'re generally safe for healthy '
+              'children.',
+          'Home-set curd is an easy, everyday source once your child eats food. '
+              'A probiotic doesn\'t replace ORS in diarrhoea.',
+        ]),
+        PpCallout('Any reaction with swelling of the lips or face, trouble '
+            'breathing, or a floppy, pale child after a food or medicine is '
+            'an emergency. Call 112 or go to hospital.',
+            kind: PpCalloutKind.doctor),
+      ],
+    ),
   ],
+);
+
+// Added 2026-10-02 from the parenting gap analysis (P2/P3).
+final PpArea _teethEyesEars = PpArea(
+  id: 'teeth_eyes_ears',
+  mark: IntentMark.headMark,
+  title: 'Teeth, eyes and ears',
+  blurb: 'First teeth, brushing, the dentist, eye checks and hearing.',
+  hue: 206,
+  pages: [
+    PpPage(
+      id: 'teeth_when',
+      title: 'When baby teeth come, and in what order',
+      subtitle: 'A rough guide, with a wide normal range',
+      format: 'TABLE',
+      blocks: [
+        PpIntro('Most babies get a first tooth around six months, but anywhere '
+            'from three to fifteen months is normal, and a few are even born '
+            'with one. By about three years, most children have all twenty '
+            'baby teeth.'),
+        PpTable(
+          columns: ['Teeth', 'Usually come around'],
+          rows: [
+            ['Bottom front two', '6 to 10 months'],
+            ['Top front two', '8 to 12 months'],
+            ['Teeth beside the front ones', '9 to 16 months'],
+            ['First back teeth (molars)', '13 to 19 months'],
+            ['Pointed teeth (canines)', '16 to 23 months'],
+            ['Second molars', '23 to 33 months'],
+          ],
+        ),
+        PpArticle([
+          'Baby teeth matter even though they fall out. They hold space for the '
+              'adult teeth and help with chewing and clear speech. A decayed '
+              'baby tooth can hurt and get infected.',
+        ]),
+        PpCallout('If there are no teeth at all by about 18 months, mention it '
+            'to your paediatrician or a dentist.',
+            kind: PpCalloutKind.doctor),
+      ],
+    ),
+    PpPage(
+      id: 'teeth_brushing',
+      title: 'Brushing teeth and preventing cavities',
+      subtitle: 'From the first tooth',
+      format: 'STEPS',
+      blocks: [
+        PpIntro('Tooth decay is one of the most common health problems in '
+            'young Indian children, and almost all of it is preventable. The '
+            'habits start with the very first tooth.'),
+        PpSteps(heading: 'Brushing', [
+          PpStep('Before teeth, wipe the gums', 'With a clean, soft cloth '
+              'once a day.'),
+          PpStep('From the first tooth, brush twice a day',
+              'A soft baby toothbrush, with a smear of fluoride toothpaste '
+                  'the size of a grain of rice.'),
+          PpStep('From three years, a pea-sized amount',
+              'Teach your child to spit, not rinse.'),
+          PpStep('You brush until about seven or eight',
+              'Your child can have a go, then you finish. Young children can\'t '
+                  'clean well alone.'),
+        ]),
+        PpCards(heading: 'What causes cavities', [
+          PpCard('Sleeping with a bottle or at the breast with teeth',
+              'Milk pools around the teeth all night. Finish feeds, then '
+                  'brush or wipe.'),
+          PpCard('Sipping all day',
+              'Juice, sweet milk or tea in a bottle or sippy cup keeps teeth '
+                  'bathed in sugar. Water between meals.'),
+          PpCard('Sticky sweets and biscuits',
+              'With meals rather than as constant snacks.'),
+          PpCard('Sharing spoons',
+              'Cavity germs pass from adult mouths to a child\'s. Give your '
+                  'child a separate spoon.'),
+        ]),
+        PpWhenLine('Move from a bottle to an open cup by around a year, and '
+            'only water in a bottle at night, if any.'),
+      ],
+    ),
+    PpPage(
+      id: 'teeth_dentist',
+      title: 'The first visit to the dentist',
+      subtitle: 'By the first birthday',
+      format: 'STEPS',
+      blocks: [
+        PpIntro('Most dentists suggest a first visit by the first birthday, or '
+            'within six months of the first tooth. It\'s short and gentle, and '
+            'it catches problems early.'),
+        PpSteps([
+          PpStep('Choose a paediatric dentist if you can',
+              'They\'re trained to work with small children.'),
+          PpStep('Expect a quick look, on your lap',
+              'The dentist checks the teeth and gums and shows you how to '
+                  'brush.'),
+          PpStep('Talk about it positively',
+              'No "it won\'t hurt". Try "the dentist will count your teeth".'),
+          PpStep('Go every six months after that', 'Or as the dentist '
+              'advises.'),
+        ]),
+        PpCallout('See a dentist or your doctor soon for white or brown spots on the teeth, '
+            'a black tooth, swelling of the gum, or toothache.',
+            kind: PpCalloutKind.doctor),
+      ],
+    ),
+    PpPage(
+      id: 'eyes_checks',
+      title: 'Eyes: crossed eyes, check-ups and glasses',
+      subtitle: 'What\'s normal, and what to get checked',
+      format: 'ARTICLE',
+      blocks: [
+        PpIntro('A newborn\'s eyes often wander or look crossed, because the '
+            'muscles are still learning to work together. That\'s normal in '
+            'the first few months. After that, a few signs are worth a check, '
+            'because eye problems are easiest to fix when found early.'),
+        PpCards(heading: 'Worth an eye check', [
+          PpCard('Eyes still turning in or out after 4 months',
+              'A squint needs treatment early so the weaker eye keeps '
+                  'developing.'),
+          PpCard('A white or odd reflection in the pupil',
+              'In photos or light. See a doctor promptly.'),
+          PpCard('Squinting or sitting very close to the TV', 'Or tilting the head to look at '
+              'things.'),
+          PpCard('Rubbing eyes a lot, or watery red eyes', 'Often allergy, '
+              'sometimes more.'),
+          PpCard('Not following faces by 3 months', 'The eyes don\'t track your face '
+              'or a toy.'),
+        ]),
+        PpArticle(heading: 'If your child needs glasses', [
+          'Children as young as one can wear glasses. Choose flexible, '
+              'unbreakable frames with a strap for toddlers. Praise your '
+              'child for wearing them, and make them part of getting dressed. '
+              'Most children wear them happily once they see better.',
+        ]),
+        PpWhenLine('Ask for an eye check at routine visits, and a full eye test '
+            'before school starts, around three to four years.'),
+      ],
+    ),
+    PpPage(
+      id: 'eyes_screens',
+      title: 'Screens, outdoor play and short sight',
+      subtitle: 'Why time outside protects the eyes',
+      bands: ['hb_toddler', 'hb_child'],
+      format: 'ARTICLE',
+      blocks: [
+        PpIntro('Short sight (myopia) is rising fast among Indian children. A '
+            'lot of close-up screen time and too little time outdoors both '
+            'play a part. The good news: daily outdoor play is one of the '
+            'best protections we know.'),
+        PpSteps(heading: 'What helps', [
+          PpStep('Two hours outside a day, if you can',
+              'Daylight helps the eye grow the right shape. Parks, terraces '
+                  'and walks all count.'),
+          PpStep('Little or no screen time under two'),
+          PpStep('The 20-20-20 habit for older children',
+              'Every 20 minutes, look at something far away for 20 seconds.'),
+          PpStep('Screens at arm\'s length, not near the face'),
+        ]),
+        PpCallout('Squinting at the TV, holding books very close, headaches, or '
+            'a teacher noticing trouble seeing the board are reasons for an '
+            'eye test. Ask your paediatrician to refer you.',
+            kind: PpCalloutKind.doctor),
+      ],
+    ),
+    PpPage(
+      id: 'ears_hearing',
+      title: 'Hearing, from the newborn test onwards',
+      subtitle: 'Why hearing matters so much for talking',
+      format: 'ARTICLE',
+      blocks: [
+        PpIntro('Children learn to talk by hearing. A hearing problem found '
+            'early can be helped a great deal, so the newborn hearing test '
+            'matters, and so does watching how your child responds later.'),
+        PpArticle(heading: 'The newborn hearing test', [
+          'Many hospitals do a quick, painless hearing screen before discharge, '
+              'while the baby sleeps. Not passing often only means fluid or a '
+              'noisy room, and the test is repeated. Do go back for the '
+              'repeat. If it wasn\'t done, ask for it in the first month.',
+        ]),
+        PpCards(heading: 'Signs to get hearing checked', [
+          PpCard('No startle at loud sounds', 'In the first few months.'),
+          PpCard('Not turning to your voice', 'By about 6 months.'),
+          PpCard('Few sounds or words', 'By 12 to 15 months.'),
+          PpCard('Turning the TV up', 'Or often saying "what?".'),
+          PpCard('After many ear infections', 'Fluid can dull hearing for '
+              'weeks.'),
+        ]),
+        PpCallout('If you ever wonder whether your child hears you, ask for a '
+            'hearing test. No child is too young to be tested.',
+            kind: PpCalloutKind.doctor),
+      ],
+    ),
+  ],
+);
+
+final PpArea _newbornChecks = PpArea(
+  id: 'newborn_checks',
+  mark: IntentMark.calendarDay,
+  title: 'The first checks',
+  blurb: 'Apgar, newborn screening, and the first-week and first-month '
+      'visits.',
+  hue: 322,
+  pages: [
+    PpPage(
+      id: 'nb_screening',
+      title: 'The checks at birth',
+      subtitle: 'Apgar, vitamin K, screening and hearing',
+      bands: ['hb_nb', 'hb_infant'],
+      format: 'CARDS',
+      blocks: [
+        PpIntro('In the first hours and days, your baby has a few quick checks. '
+            'Most are routine and painless, or nearly so. They catch rare '
+            'problems early, when they\'re easiest to treat.'),
+        PpCards([
+          PpCard('Apgar score',
+              'A quick check at one and five minutes after birth: colour, '
+                  'heartbeat, breathing, muscle tone and response. A low '
+                  'first score that rises is common and usually fine. It '
+                  'doesn\'t predict future health or intelligence.'),
+          PpCard('Vitamin K injection',
+              'Helps the blood clot. Given once at birth.'),
+          PpCard('Newborn screening blood test',
+              'A few drops from the heel, after 24 hours, checking for rare '
+                  'conditions like low thyroid that can be treated if found '
+                  'early. Ask if your hospital does it; some charge for it.'),
+          PpCard('Pulse oximetry',
+              'A light sensor on the hand and foot to check oxygen, which can '
+                  'pick up some heart problems.'),
+          PpCard('Hearing screen', 'A quick test during sleep.'),
+          PpCard('Head-to-toe exam',
+              'Hips, heart, eyes, palate, spine, and the testes in boys.'),
+        ]),
+        PpWhenLine('Ask for the results before you leave hospital, and keep '
+            'them with the vaccine card.'),
+      ],
+    ),
+    PpPage(
+      id: 'nb_first_visits',
+      title: 'The first-week and first-month visits',
+      subtitle: 'Feeding, weight, jaundice and you',
+      bands: ['hb_nb', 'hb_infant'],
+      format: 'STEPS',
+      blocks: [
+        PpIntro('The first visit after going home, usually within the first '
+            'week, checks that feeding is working and your baby is getting '
+            'back to birth weight. The six-week visit brings the first '
+            'vaccines and a full check.'),
+        PpSteps([
+          PpStep('Weight', 'Back to birth weight by about two weeks.'),
+          PpStep('Jaundice', 'The doctor looks at the skin and eyes.'),
+          PpStep('Feeding and nappies',
+              'Note how many feeds and wet nappies in a day.'),
+          PpStep('The cord, the eyes and the skin'),
+          PpStep('You', 'Your bleeding, stitches, feeding, sleep and mood. '
+              'Bring your questions too.'),
+        ]),
+        PpCallout('Don\'t wait for the visit if your baby is feeding poorly, '
+            'very sleepy, or yellow on the tummy or legs. The same goes for a '
+            'fever, or fewer than six wet nappies a day after day five.',
+            kind: PpCalloutKind.doctor),
+      ],
+    ),
+  ],
+);
+
+final PpArea _longTerm = PpArea(
+  id: 'long_term',
+  mark: IntentMark.timelineRail,
+  title: 'Long-term conditions',
+  blurb: 'Asthma, weight and coeliac disease, explained calmly.',
+  hue: 28,
+  pages: [
+    PpPage(
+      id: 'lt_asthma',
+      title: 'Asthma and wheezing in young children',
+      subtitle: 'Signs, triggers and inhalers',
+      bands: ['hb_toddler', 'hb_child'],
+      format: 'ARTICLE',
+      blocks: [
+        PpIntro('Many young children wheeze with colds, and most grow out of '
+            'it. Some have asthma, which is common and very manageable. With '
+            'the right treatment, children with asthma run, play and sleep '
+            'like everyone else.'),
+        PpCards(heading: 'Signs to tell the doctor about', [
+          PpCard('Wheezing again and again', 'A whistling sound when '
+              'breathing out.'),
+          PpCard('A cough at night or with running', 'That keeps coming back.'),
+          PpCard('Getting breathless quickly', 'Compared with other children.'),
+          PpCard('Asthma or allergies in the family', 'Makes it more likely.'),
+        ]),
+        PpCards(heading: 'Common triggers', [
+          PpCard('Colds and viruses', 'The most common in young children.'),
+          PpCard('Smoke', 'Cigarettes, wood stoves, mosquito coils, incense sticks.'),
+          PpCard('Dust, mould and pets', 'Damp walls in the monsoon too.'),
+          PpCard('Polluted air', 'Especially in north Indian winters.'),
+        ]),
+        PpArticle(heading: 'Inhalers are the best treatment, even for babies', [
+          'Inhalers deliver a tiny dose straight to the lungs, with far fewer '
+              'side effects than syrups. Young children use them with a '
+              'spacer and a mask. They aren\'t addictive, and using one now '
+              'doesn\'t mean needing it for life.',
+          'A "reliever" opens the airways quickly during a wheeze. A '
+              '"preventer", used daily, calms the airways so attacks happen '
+              'less. Use them exactly as your doctor shows you.',
+        ]),
+        PpCallout('Go to hospital if breathing is a struggle, the ribs pull in, '
+            'your child can\'t speak or feed, the lips look blue, or the '
+            'reliever doesn\'t help.',
+            kind: PpCalloutKind.doctor),
+      ],
+    ),
+    PpPage(
+      id: 'lt_weight',
+      title: 'When weight climbs faster than height',
+      subtitle: 'Kind, family-wide changes, never a diet',
+      bands: ['hb_toddler', 'hb_child'],
+      format: 'ARTICLE',
+      blocks: [
+        PpIntro('In India, a chubby child is often seen as a healthy one, and '
+            'many grandparents worry more about thin children. But more young '
+            'children now carry extra weight, which can affect health later. '
+            'The answer is never a diet for a small child. It\'s small changes '
+            'for the whole family.'),
+        PpArticle([
+          'Your doctor will check weight against height and age on a growth '
+              'chart. A single heavy month isn\'t a problem. A steady climb '
+              'across the lines over time is worth acting on, gently.',
+        ]),
+        PpSteps(heading: 'What helps', [
+          PpStep('Change the house, not the child',
+              'The same healthy food for everyone, so nobody feels singled out.'),
+          PpStep('Water and milk, not juice or soft drinks'),
+          PpStep('Fewer packaged snacks and biscuits',
+              'Fruit, roasted chana, curd and nuts (crushed for little ones) '
+                  'instead.'),
+          PpStep('Stop when full is fine',
+              'No "finish your plate", and no food as a reward.'),
+          PpStep('An hour of active play a day', 'And less screen time.'),
+          PpStep('Regular sleep', 'Tired children eat more.'),
+        ]),
+        PpCallout('Never comment on your child\'s body or use the word fat, even '
+            'as a joke. Talk about strong bodies and energy, not weight.',
+            kind: PpCalloutKind.safety),
+        PpCallout('Ask your paediatrician if weight is rising across the chart '
+            'lines, or about loud snoring, getting breathless easily, or dark '
+            'patches on the neck.',
+            kind: PpCalloutKind.doctor),
+      ],
+    ),
+    PpPage(
+      id: 'lt_coeliac',
+      title: 'Coeliac disease: when wheat is the problem',
+      subtitle: 'More common in India than many think',
+      bands: ['hb_toddler', 'hb_child'],
+      format: 'ARTICLE',
+      blocks: [
+        PpIntro('Coeliac disease is a condition where gluten, found in wheat, '
+            'barley and rye, damages the gut. It\'s more common in north '
+            'India, where wheat is a staple. It\'s very treatable once found, '
+            'with a gluten-free diet.'),
+        PpCards(heading: 'Signs to mention to the doctor', [
+          PpCard('Poor weight gain or growth', 'After starting wheat.'),
+          PpCard('Loose, pale, smelly stools', 'That go on for weeks.'),
+          PpCard('A swollen tummy', 'With thin arms and legs.'),
+          PpCard('Anaemia that won\'t shift', 'Even with iron drops.'),
+          PpCard('Irritable and tired', 'More than usual, for weeks.'),
+        ]),
+        PpArticle([
+          'A blood test and sometimes a small gut biopsy confirm it. Don\'t stop '
+              'wheat before testing, as that can hide the result.',
+        ]),
+        PpCallout('Ask your paediatrician about testing if your child isn\'t '
+            'growing well and has tummy symptoms, especially if someone in '
+            'the family has coeliac disease.',
+            kind: PpCalloutKind.doctor),
+      ],
+    ),
+  ],
+);
+
+
+// ---- Medicines, safely (gap analysis P2, 2026-10-07) -------------------------
+// "Health > Medicines, safely: a tab of its own." The three medicine pages
+// already written in Prevention move here; their ids are unchanged, so every
+// link, save and search hit still finds them.
+const Set<String> _kMedicinePageIds = {'prev_medicine', 'prev_antibiotics', 'prev_allergy_probiotics'};
+
+PpArea _without(PpArea a, Set<String> drop) => PpArea(
+      id: a.id,
+      title: a.title,
+      blurb: a.blurb,
+      pages: [for (final p in a.pages) if (!drop.contains(p.id)) p],
+      bands: a.bands,
+      hue: a.hue,
+      mark: a.mark,
+      toolSurfaceId: a.toolSurfaceId,
+      cover: a.cover,
+      pinned: a.pinned,
+    );
+
+final PpArea _prevention = _without(_preventionAll, _kMedicinePageIds);
+
+final PpArea _medicines = PpArea(
+  id: 'medicines',
+  mark: IntentMark.pillMark,
+  title: 'Medicines, safely',
+  blurb: 'How to give a medicine, when an antibiotic is needed, and what to skip.',
+  hue: 206,
+  pages: [for (final p in _preventionAll.pages) if (_kMedicinePageIds.contains(p.id)) p],
 );

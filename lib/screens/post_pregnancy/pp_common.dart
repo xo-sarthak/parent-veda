@@ -20,7 +20,9 @@ import '../../theme/app_theme.dart';
 import '../../ask_veda/veda_core.dart';
 import '../product_guide/product_guide_chooser.dart';
 import 'askveda_screen.dart';
-import 'grow_home_screen.dart';
+// import 'grow_home_screen.dart'; // kept for revert with the GrowHomeScreen line
+import 'pp_brain_tab.dart';
+import 'pp_more_screen.dart';
 import 'pp_child_profile.dart';
 import 'community_screen.dart';
 import 'parenting_veda.dart';
@@ -32,7 +34,8 @@ import 'pp_products_data.dart';
 import 'product_detail_screen.dart';
 import 'products_discovery_screen.dart';
 import 'tools_hub_screen.dart';
-import 'pp_more_sheet.dart';
+// import 'pp_more_sheet.dart'; // kept for revert with showPpMoreSheet
+import 'pp_opening_soon.dart' show kPpCommunityOpen;
 
 // ---- palette ----------------------------------------------------------------
 // ⚠️ UNIFIED WITH THE PREGNANCY GROUND, 2026-08-17.
@@ -426,8 +429,14 @@ enum PpTab { home, products, tools, brain, more }
 /// (route 'pp/my_child') so the stack stays shallow, then push the target tab.
 /// `more` is the exception — it is a sheet over wherever she is, not a screen.
 void openPpTabTo(BuildContext context, PpTab tab) {
+  // More is a tab screen now, as in TTC and pregnancy (2026-10-07,
+  // pp_more_screen.dart). Kept for revert:
+  //   if (tab == PpTab.more) { showPpMoreSheet(context); return; }
   if (tab == PpTab.more) {
-    showPpMoreSheet(context);
+    final nav = Navigator.of(context);
+    nav.popUntil((r) => r.isFirst || r.settings.name == 'pp/my_child');
+    nav.push(MaterialPageRoute<void>(
+        settings: const RouteSettings(name: 'pp/more'), builder: (_) => const PpMoreScreen()));
     return;
   }
   final nav = Navigator.of(context);
@@ -442,7 +451,10 @@ void openPpTabTo(BuildContext context, PpTab tab) {
       // ("Ask Veda anything else") and from the Ask FAB. Only the tab moved.
       // Kept for revert:
       //   nav.push(MaterialPageRoute<void>(builder: (_) => const AskVedaScreen()));
-      nav.push(MaterialPageRoute<void>(builder: (_) => const GrowHomeScreen()));
+      // The one-ParentVeda Brain tab (2026-10-07, pp_brain_tab.dart). Kept for
+      // revert: nav.push(MaterialPageRoute<void>(builder: (_) => const GrowHomeScreen()));
+      nav.push(MaterialPageRoute<void>(
+          settings: const RouteSettings(name: 'pp/brain'), builder: (_) => const PpBrainTabScreen()));
     case PpTab.tools:
       nav.push(MaterialPageRoute<void>(builder: (_) => const ToolsHubScreen()));
     case PpTab.products:
@@ -525,7 +537,8 @@ class PpBottomNav extends StatelessWidget {
     (PpTab.products, Icons.shopping_basket_outlined, 'Products'),
     (PpTab.tools, Icons.handyman_outlined, 'Tools'),
     (PpTab.brain, Icons.psychology_outlined, 'Brain\nactivities'),
-    (PpTab.more, Icons.more_horiz_rounded, 'More'),
+    // The More glyph TTC and pregnancy use (2026-10-07). Kept for revert: Icons.more_horiz_rounded.
+    (PpTab.more, Icons.grid_view_outlined, 'More'),
   ];
 
   // ⚠️ NOW A THIN ADAPTER OVER `PvNavBar`.
@@ -733,7 +746,11 @@ void ppFaqSheet(BuildContext context, String question) {
 // A "go deeper" row (pill · text · →). Routes to the real surface for its pill
 // (FAQ → Ask Veda, Room → Community, Course → Courses) - never a dead end.
 Widget ppDeeperRow(BuildContext context, String pill, String text, {bool top = false, bool bottom = false}) =>
-    GestureDetector(
+    // A "Room" row opens the community, which is out of parenting for now
+    // (2026-10-07); the row is not drawn rather than leading nowhere.
+    pill == 'Room' && !kPpCommunityOpen
+        ? const SizedBox.shrink()
+        : GestureDetector(
       onTap: () {
         switch (pill) {
           case 'Course':

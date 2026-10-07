@@ -241,7 +241,7 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
 
           const SizedBox(height: 22),
           _pad(Text(
-            'A reminder & record tool, not medical advice. Your paediatrician designs any catch-up. Reviewed by Dr. Ananya Rao · schedule v2026.1',
+            "Based on the Indian Academy of Paediatrics schedule (2023) and the government's Universal Immunisation Programme. Your paediatrician may use a different brand or timing; follow them. A reminder and record, not medical advice.",
             textAlign: TextAlign.center,
             style: ppBody(12, color: ppMuted, h: 1.55),
           )),

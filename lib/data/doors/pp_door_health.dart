@@ -77,18 +77,18 @@ final PpDoor kPpHealthDoor = PpDoor(
           icon: Icons.badge_outlined,
         ),
       ],
-      footer: 'If he seems wrong to you and a screen says otherwise, believe '
+      footer: 'If your child seems wrong to you and a screen says otherwise, believe '
           'yourself.',
     ),
     PpDoorTab(
       id: 'shots',
-      label: 'His shots',
+      label: 'Vaccines',
       icon: Icons.vaccines_outlined,
       hue: 206,
       areaIds: ['vaccines'],
       tools: [
         PpDoorTool(
-          label: 'His shots, and what is due next',
+          label: 'Vaccines, and what is due next',
           blurb: 'What is done, what is due, an alarm, and a doctor-ready '
               'record. The IAP schedule.',
           surfaceId: 'pp_vaccines',
@@ -101,7 +101,7 @@ final PpDoor kPpHealthDoor = PpDoor(
       label: 'Growing well',
       icon: Icons.show_chart_outlined,
       hue: 152,
-      areaIds: ['growth'],
+      areaIds: ['growth', 'long_term'],
       tools: [
         // The same Growth journey as Feeding. Single source; it owns the
         // percentile reads.
@@ -116,32 +116,46 @@ final PpDoor kPpHealthDoor = PpDoor(
     ),
     PpDoorTab(
       id: 'well',
-      label: 'Keeping him well',
+      label: 'Keeping your child well',
       icon: Icons.spa_outlined,
       hue: 96,
-      areaIds: ['prevention'],
+      areaIds: ['prevention', 'teeth_eyes_ears'],
       tools: [
         // The single source every per-illness remedy card opens, filtered.
         PpDoorTool(
           label: 'Home remedies, marked honestly',
-          blurb: 'Every nuskha, marked helps, only comforts, or unsafe, with '
-              'when not to use it.',
+          // Matches what the remedy data holds (2026-10-07): an age and the
+          // cautions, not a helps / comforts / unsafe verdict, which no remedy
+          // carries yet. Kept for revert: 'Every nuskha, marked helps, only
+          // comforts, or unsafe, with when not to use it.'
+          blurb: 'Gentle home remedies by age, with the cautions, and when to '
+              'see a doctor instead.',
           surfaceId: 'pp_nuskhe',
           icon: Icons.eco_outlined,
         ),
       ],
     ),
+    // Medicines, a tab of its own (gap analysis P2, 2026-10-07).
+    PpDoorTab(
+      id: 'medicines',
+      label: 'Medicines, safely',
+      icon: Icons.medication_outlined,
+      hue: 206,
+      areaIds: ['medicines'],
+      footer: 'Never a dose from us. The dose comes from your doctor or the '
+          'label, by weight.',
+    ),
     PpDoorTab(
       id: 'records',
-      label: 'His records and the visit',
+      label: 'Records and the visit',
       icon: Icons.folder_open_outlined,
       hue: 268,
-      areaIds: ['records'],
+      areaIds: ['records', 'newborn_checks'],
       tools: [
         // The dashboard: status tiles, upcoming, the health timeline, and
         // his papers and ID documents. One tool, as the brief asks.
         PpDoorTool(
-          label: 'His health record, and his papers',
+          label: 'Health record and papers',
           blurb: 'The living record: visits, vaccinations, illnesses, '
               'prescriptions and documents in one place.',
           surfaceId: 'pp_health_home',

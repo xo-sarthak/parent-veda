@@ -59,7 +59,7 @@ class WatchThumb extends StatelessWidget {
                 height: quick ? 44 : 52,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.92), shape: BoxShape.circle, boxShadow: const [BoxShadow(color: Color(0x22000000), blurRadius: 12)]),
-                child: Icon(Icons.play_arrow_rounded, color: ppPurple, size: quick ? 24 : 28),
+                child: Icon(Icons.play_arrow_rounded, color: ppInk, size: quick ? 24 : 28),
               ),
             ),
           ),

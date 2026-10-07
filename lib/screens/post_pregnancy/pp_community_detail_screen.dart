@@ -15,6 +15,7 @@ import 'community_screen.dart';
 import 'pp_common.dart';
 import 'pp_create_post_screen.dart';
 import 'pp_post_detail_screen.dart';
+import 'pp_opening_soon.dart';
 
 class PpCommunityDetailScreen extends StatelessWidget {
   const PpCommunityDetailScreen({super.key, required this.community});
@@ -22,6 +23,8 @@ class PpCommunityDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Seeded until real (gap analysis P1, 2026-10-07): see pp_opening_soon.dart.
+    if (!kPpCommunityOpen) return ppCommunityOpeningSoon();
     final store = CommunityStore.instance;
     final gradient = [ppPurple, const Color(0xFF9B5DE0)];
     return Scaffold(

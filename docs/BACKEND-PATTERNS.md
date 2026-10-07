@@ -2453,6 +2453,159 @@ can come back from the other. For a checklist that is harmless; for a ledger it 
 **What stayed local on purpose:** "when did I last open it" (the since-last-visit note). That is about this device's
 visits; syncing it would make the note on a second phone claim ticks she made here a minute ago.
 
+## 16v. A timer is two timestamps, and an average skips the days nobody logged — care logs (0094, 2026-10-07)
+
+Written in the fork on 2026-10-02 as 16v with migration 0093; taken into main on
+2026-10-07, renumbered 0094 (main's 0093 is §16w) and extended to tummy time.
+Three small patterns from the nappy log, the pump log, the breastfeed timer, tummy
+time and the 7-day history (`lib/screens/post_pregnancy/pp_care_log_data.dart`).
+
+**Copy the shape of the nearest table.** `pp_nappy_logs`, `pp_pump_logs` and
+`pp_tummy_logs` are `pp_feed_logs` again: child-scoped, co-parented through
+`my_child_ids()`, `user_id` as attribution only. Pumping looks like the mother's
+own data, and the instinct is a per-user table. The question that decides it
+(§16u) is who needs to read it: the partner giving the 2am bottle needs "how much
+expressed milk is there", so it lives with the child. The cost: a mother cannot
+keep her pump log private from her co-parent. The gain: one rule for every log
+about the baby, and nothing new to reason about in RLS.
+
+**A running timer stores when it started, never how long it has run.**
+`BreastTimer` keeps `runningSince` plus seconds already banked per side, and
+computes `now - runningSince` on every repaint. A counter that ticks once a second
+is wrong the moment the OS suspends the app, which on a phone held by a feeding
+mother is most of the time. Timestamps survive suspension, a killed process (they
+are in prefs), and leaving the screen. The trade: the state is local only, because
+a half-finished feed is not a record yet; only "Done" writes a `FeedLog`, so
+everything downstream reads one table and learns nothing new. Tummy time is the
+other answer to the same question: a session is short and the screen is open, so
+the screen holds the start, and leaving mid-session saves what was done.
+
+**An average over a log averages over the days that have entries.**
+`PpCareHistory.doctorSummary` and the week bars (`PpWeekBars`) skip empty days. A
+day nobody logged is missing data, not a day the baby did not eat; counting it as
+zero turns a busy week into "feeds 3.1 a day" on a paediatrician's phone. The
+general fact: in a voluntary log, absence of a row means "unknown", and every
+aggregate has to decide that explicitly. The screens say so ("Average of the 4 days
+you logged"), so the reader knows the rule too.
+
+**Known, not new: the local cache is not keyed by child.** Every one of these
+stores (and the older feed and sleep stores they copy) keeps one list on the phone;
+the cloud copy is per child, the local one is not. A family that switches between
+two children on one phone sees both children's rows locally until the next sync.
+Fixing it is one more field on each row and a filter in `all`, for all five stores
+at once; it is written down rather than half-fixed in one of them.
+
+## 16w. A second column, not a nullable one — "Boy or girl" left unanswered (0093, 2026-10-07)
+
+Onboarding asked "Boy or girl — optional" and saved a skipped answer as a boy:
+`children.is_boy` is `boolean not null default true` (0021). The obvious repair is
+to make `is_boy` nullable. It is the wrong one, for a reason worth carrying:
+**every build already in people's hands reads that column as a plain boolean.** A
+null arriving there is a crash or a silent `false` on an old phone, and the growth
+charts need a sex to pick a WHO table anyway. So the fact goes in a NEW column,
+`sex_given boolean not null default true`, that old builds simply never read, and
+`is_boy` stays a stand-in the charts can use.
+
+The client is written to survive either order of deployment. `Child.toRow()` names
+`sex_given` only when `kChildSexGivenColumn` is true, because PostgREST rejects a
+row naming an unknown column, and a rejected fire-and-forget write is silent (the
+same trap §16 warns about for every column mismatch). Until the user runs 0093 and
+flips the flag, the answer lives on the phone; and because the cloud copy wins on
+sync, the merge keeps the phone's `sexGiven` whenever the cloud row has no such
+column. **Expand, then switch, then (one day) contract** is the general shape: add
+the column, let the client start writing it behind a flag, and only later stop
+writing the old meaning.
+
+## 16x. Tags instead of a table — the parenting journal on the person's journal (no migration, 2026-10-07)
+
+The fork made the parenting journal real with its own store in its own
+`shared_preferences` key, on the phone only. The person's journal already exists
+and already syncs (`JournalStore`, §16l: photo upload, tombstones, newest-wins). The
+family model (docs/FAMILY-MODEL.md) puts the journal on the PERSON, one story from
+trying to parenting. So a parenting memory is a `JournalEntry` in that store,
+carrying two tags: `pp_child:<id>` (whose memory) and `pp_kind:<kind>` (which
+capture screen made it). `PpJournalStore` is an adapter, not a store.
+
+The trade, named: a tag is a softer link than a `child_id` column; nothing stops a
+typo, and the server cannot index "this child's memories". It buys sync, photo
+upload and offline deletes today with zero backend change. If the server ever needs
+child-scoped journal queries, a `child_id` column can be backfilled from the tag in
+one statement. And the pregnancy view must not show them (a first smile filed under
+"Week 40"), so `JournalStore.timeline` leaves out anything tagged with a child: one
+store, two views, each filtering what is not its own.
+
+## 16y. Computed, not queued — the parenting messages (`PpMessagesStore`, no migration, 2026-10-07)
+
+The parenting app now speaks first: a note each week to eight weeks and each
+month after, a vaccine reminder three days ahead, a word when a new stage
+starts. It is the pregnancy pattern (§16s) again, on a different clock.
+
+- **Every message is derived from facts already stored** (birth date, the
+  vaccine record, her switches). Nothing is written to a queue. On each start
+  the store rebuilds the list of what *should* exist and compares it with what
+  was already delivered.
+- **Delivered freezes, pending is rebuilt.** A message she has seen is kept as
+  it was; one not yet due is recomputed every time. So correcting the birth
+  date moves every future message and leaves the past alone.
+- **The id is the moment** (`age:m4`, `vax:mo9`), so "already sent" is a set
+  lookup and nothing is ever sent twice.
+
+*The trade:* a server-side queue would let us send while the app is closed for
+weeks; this design costs us that, and buys zero backend, zero cron, and no way
+for a stale queue to tell a parent about a vaccine she already recorded.
+
+## 16z. Reuse the column that is already there — the date a vaccine was given
+
+`pp_vaccine_doses` (0023) has had a `done_at` column since it was made, and the
+app never wrote it. Recording *the day* a dose was given needed no migration,
+only the client writing a column the server already had. Before writing a
+migration, read the table: the cheapest schema change is the one that already
+ran.
+
+The schedule choice (government UIP or private IAP) went the other way: it is
+a fact about the family, so it rides in the family profile's synced blob, per
+child, next to the birth answers. One more key in a JSON blob, no column.
+
+## 16aa. One row per child, read whole — the emergency card (0095, 2026-10-07)
+
+The emergency card lived only in one phone's local blob. That fails the one
+person it exists for: the *other* parent, holding the phone at 2am. So it
+became child-scoped and co-parented, like the care logs, with two choices worth
+naming:
+
+- **`child_id` is the primary key.** There is exactly one card per child, so
+  saving is an upsert on `child_id`: idempotent, no ids to invent, no duplicate
+  cards possible.
+- **`card` is `jsonb`, not columns.** Nothing ever queries *inside* the card;
+  it is read whole and written whole. Columns would buy validation we do not
+  use and cost a migration for every field added later.
+
+On sync the cloud copy wins when there is one (the other parent may have
+edited it); a card only this phone has is pushed up. The cost: two parents
+editing offline at once, and the later save wins. For a card edited a few times
+a year, that is the right trade.
+
+## 16bb. Share by reading, not by copying — the child's memories between partners (no migration, 2026-10-07)
+
+The paired father now sees the mother's memories of their child, and she sees
+his, each read-only. The tempting build was a new co-parented table and a copy
+of every child memory into it. It was not needed:
+
+- **Pairing already granted the read.** `0009_pairing` gave `journal_entries`
+  the policy "own or partner select": a partner may SELECT the other's rows,
+  and UPDATE and DELETE stay owner-only. Read-only is enforced by the
+  database, not just hidden by the screen.
+- **The filter is on the client, by tag.** Child memories carry
+  `pp_child:<id>` (§16x). The app fetches the partner's rows and keeps only
+  those tagged with the shared child, so her private pregnancy journal never
+  reaches his screen even though the policy would allow the read.
+
+*The trade:* the policy is broader than the screen. It lets a partner read
+every journal row, and only the client narrows it to the child. That is
+acceptable inside a paired couple who chose to share; if the private half ever
+needed hard protection, the fix is a row-level condition on the tag, not a
+second table.
+
 ## 17. Reading list, in order
 
 1. `0001_create_profiles.sql` — the two layers (grant + RLS), own-row.
@@ -2511,5 +2664,17 @@ visits; syncing it would make the note on a second phone claim ticks she made he
     versus a process on a server; the model names, the app judges (§16g).
 24. `lib/services/nutrition_day_store.dart` — a day is a local date string,
     never a DateTime; a per-user blob that prunes itself (§16h).
-
-
+25. `0094_pp_nappy_pump_tummy.sql` → `lib/screens/post_pregnancy/pp_care_log_data.dart`
+    — a table chosen by who reads it, a timer made of timestamps, and an
+    average that knows missing from zero (§16v).
+26. `0093_children_sex_given.sql` → `Child.toRow` / `kChildSexGivenColumn` —
+    a new column instead of a nullable old one; expand, switch, contract (§16w).
+27. `lib/screens/post_pregnancy/journal_v2/jv2_store.dart` — an adapter that
+    tags rows in another feature's synced table instead of a new table (§16x).
+28. `lib/services/pp_messages_store.dart` — messages computed from stored facts,
+    delivered ones frozen, ids as moments (§16y).
+29. `VaxStore.markDone(on:)` → `done_at` in 0023 — a column that already
+    existed (§16z).
+30. `0095_pp_emergency_cards.sql` → `HealthStore._mergeEmergency` — one row per
+    child, read whole (§16aa).
+31. `JournalStore._partnerChild` — sharing by reading under an existing partner policy (§16bb).

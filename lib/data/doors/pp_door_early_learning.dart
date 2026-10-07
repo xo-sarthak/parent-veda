@@ -51,6 +51,8 @@ final PpDoor kPpEarlyLearningDoor = PpDoor(
               'this door works without any of it.',
           surfaceId: 'pp_recos',
           icon: Icons.shopping_bag_outlined,
+          // After the free things (gap analysis P2, 2026-10-07).
+          atEnd: true,
         ),
       ],
       footer: 'Never a worksheet. What comes before letters and numbers is '
@@ -83,7 +85,7 @@ final PpDoor kPpEarlyLearningDoor = PpDoor(
         // The one tracker, Development's. "Milestones and speech, the same
         // tracker used in Development. Kept in one place."
         PpDoorTool(
-          label: 'Where he is right now',
+          label: 'Where your baby is right now',
           blurb: 'Milestones, speech and what usually comes next. Kept in one '
               'place so nothing here has to guess.',
           surfaceId: 'pp_milestones',
@@ -97,15 +99,18 @@ final PpDoor kPpEarlyLearningDoor = PpDoor(
       icon: Icons.school_outlined,
       hue: 160,
       areaIds: ['school'],
-      tools: [
-        PpDoorTool(
-          label: 'The early learning masterclass',
-          blurb: 'A short course on play-based learning at home and what '
-              'school readiness actually asks of a child.',
-          surfaceId: 'pp_courses',
-          icon: Icons.play_lesson_outlined,
-        ),
-      ],
+      // The masterclass card is off until the course exists (gap analysis
+      // P2, 2026-10-07: "Remove the masterclass card until the course
+      // exists"). Kept for revert:
+      // tools: [
+      //   PpDoorTool(
+      //     label: 'The early learning masterclass',
+      //     blurb: 'A short course on play-based learning at home and what '
+      //         'school readiness actually asks of a child.',
+      //     surfaceId: 'pp_courses',
+      //     icon: Icons.play_lesson_outlined,
+      //   ),
+      // ],
     ),
   ],
   closing: const PpDoorClosing(

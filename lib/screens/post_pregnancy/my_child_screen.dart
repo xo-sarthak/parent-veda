@@ -31,7 +31,8 @@ import 'family_profile_screen.dart';
 import 'growth_journey_screen.dart';
 import 'health_timeline_screen.dart';
 import 'journal_v2/journal_capture_screens.dart';
-import 'journal_v2/journal_home_screen.dart';
+// import 'journal_v2/journal_home_screen.dart'; // the demo journal, kept for revert
+import 'journal_v2/pp_journal_screen.dart';
 import 'journal_v2/journal_storybook_screens.dart';
 import 'leap_calendar_screen.dart';
 import 'leap_definition_screen.dart';
@@ -2053,7 +2054,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
         accent: const Color(0xFF3E9A8C),
         child: Column(children: [
           _timelineRow(Icons.auto_stories_outlined, 'Memory timeline',
-              "${_child.name}'s journal, moment by moment", () => _push(const JournalV2Home())),
+              "${_child.name}'s journal, moment by moment", () => _push(const PpJournalScreen()) /* was JournalV2Home (demo), kept for revert */),
           ppRowDivider(),
           _timelineRow(Icons.monitor_heart_outlined, 'Health timeline',
               'Growth, visits & vaccines in one place', () => _push(const HealthTimelineScreen())),

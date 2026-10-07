@@ -137,6 +137,12 @@ const List<ReadCollection> kReadCollections = [
 ];
 
 // ---- catalog ----------------------------------------------------------------
+/// The honest byline for a piece no named clinician has reviewed: the same
+/// one the door pages carry. A doctor's name goes back only when a real,
+/// contracted clinician has read the piece (Behind · Trust, step 2).
+const String kPpEditorialAuthor = 'ParentVeda editorial';
+const String kPpEditorialRole = 'Written by our team';
+
 const List<ReadArticle> kReadArticles = [
   ReadArticle(
     id: 'sleepcycles',
@@ -147,8 +153,11 @@ const List<ReadArticle> kReadArticles = [
     ageTag: '3–6 mo',
     minutes: 6,
     seed: 1,
-    author: 'Dr. Ananya Rao',
-    authorRole: 'Paediatrician',
+    // Was signed 'Dr. Ananya Rao' (Paediatrician), a doctor our own code calls fictional
+    // (gap analysis P1, 2026-10-07). Kept for revert:
+    //   author: 'Dr. Ananya Rao', authorRole: 'Paediatrician',
+    author: kPpEditorialAuthor,
+    authorRole: kPpEditorialRole,
     kind: ReadKind.research,
     evidence: 'Aligned with paediatric sleep research on the maturation of infant sleep architecture around 3–4 months.',
     relatedVideoId: 'sleep4mo',
@@ -199,8 +208,11 @@ const List<ReadArticle> kReadArticles = [
     ageTag: '3–6 mo',
     minutes: 5,
     seed: 2,
-    author: 'Dr. Ananya Rao',
-    authorRole: 'Paediatrician',
+    // Was signed 'Dr. Ananya Rao' (Paediatrician), a doctor our own code calls fictional
+    // (gap analysis P1, 2026-10-07). Kept for revert:
+    //   author: 'Dr. Ananya Rao', authorRole: 'Paediatrician',
+    author: kPpEditorialAuthor,
+    authorRole: kPpEditorialRole,
     relatedVideoId: 'leap4brain',
     relatedVideoIds: ['q_play', 'q_talk', 'babbling'],
     relatedActivity: 'Reach for the ring',
@@ -237,8 +249,11 @@ const List<ReadArticle> kReadArticles = [
     ageTag: '6+ mo',
     minutes: 6,
     seed: 3,
-    author: 'Dr. Neha Sharma',
-    authorRole: 'Paediatrician',
+    // Was signed 'Dr. Neha Sharma' (Paediatrician), a doctor our own code calls fictional
+    // (gap analysis P1, 2026-10-07). Kept for revert:
+    //   author: 'Dr. Neha Sharma', authorRole: 'Paediatrician',
+    author: kPpEditorialAuthor,
+    authorRole: kPpEditorialRole,
     relatedRecipeId: 'ragipancake',
     relatedVideoId: 'solids101',
     relatedVideoIds: ['q_iron', 'q_play', 'q_soothe'],
@@ -278,8 +293,11 @@ const List<ReadArticle> kReadArticles = [
     ageTag: '1–3 yr',
     minutes: 5,
     seed: 4,
-    author: 'Dr. Tara Joshi',
-    authorRole: 'Child Psychologist',
+    // Was signed 'Dr. Tara Joshi' (Child Psychologist), a doctor our own code calls fictional
+    // (gap analysis P1, 2026-10-07). Kept for revert:
+    //   author: 'Dr. Tara Joshi', authorRole: 'Child Psychologist',
+    author: kPpEditorialAuthor,
+    authorRole: kPpEditorialRole,
     kind: ReadKind.bookSummary,
     relatedVideoId: 'q_soothe',
     relatedVideoIds: ['q_breathe', 'parentstory'],
@@ -319,8 +337,11 @@ const List<ReadArticle> kReadArticles = [
     ageTag: '0–12 mo',
     minutes: 5,
     seed: 5,
-    author: 'Dr. Neha Sharma',
-    authorRole: 'Paediatrician',
+    // Was signed 'Dr. Neha Sharma' (Paediatrician), a doctor our own code calls fictional
+    // (gap analysis P1, 2026-10-07). Kept for revert:
+    //   author: 'Dr. Neha Sharma', authorRole: 'Paediatrician',
+    author: kPpEditorialAuthor,
+    authorRole: kPpEditorialRole,
     kind: ReadKind.research,
     evidence: 'Consistent with standard paediatric guidance; not a substitute for your doctor.',
     relatedCommunity: 'Delhi Parents',
@@ -359,8 +380,11 @@ const List<ReadArticle> kReadArticles = [
     ageTag: '3–12 mo',
     minutes: 4,
     seed: 6,
-    author: 'Dr. Kabir Menon',
-    authorRole: 'Speech & Language',
+    // Was signed 'Dr. Kabir Menon' (Speech & Language), a doctor our own code calls fictional
+    // (gap analysis P1, 2026-10-07). Kept for revert:
+    //   author: 'Dr. Kabir Menon', authorRole: 'Speech & Language',
+    author: kPpEditorialAuthor,
+    authorRole: kPpEditorialRole,
     relatedActivity: 'Narrate your day',
     relatedVideoId: 'babbling',
     sections: [
@@ -394,8 +418,11 @@ const List<ReadArticle> kReadArticles = [
     ageTag: '0–6 mo',
     minutes: 3,
     seed: 7,
-    author: 'Dr. Meher Shah',
-    authorRole: 'Paediatric Physio',
+    // Was signed 'Dr. Meher Shah' (Paediatric Physio), a doctor our own code calls fictional
+    // (gap analysis P1, 2026-10-07). Kept for revert:
+    //   author: 'Dr. Meher Shah', authorRole: 'Paediatric Physio',
+    author: kPpEditorialAuthor,
+    authorRole: kPpEditorialRole,
     relatedActivity: 'Chest-to-chest tummy time',
     relatedVideoId: 'tummytime',
     sections: [
@@ -429,8 +456,11 @@ const List<ReadArticle> kReadArticles = [
     ageTag: '3–6 mo',
     minutes: 4,
     seed: 8,
-    author: 'Dr. Meher Shah',
-    authorRole: 'Paediatric Sleep',
+    // Was signed 'Dr. Meher Shah' (Paediatric Sleep), a doctor our own code calls fictional
+    // (gap analysis P1, 2026-10-07). Kept for revert:
+    //   author: 'Dr. Meher Shah', authorRole: 'Paediatric Sleep',
+    author: kPpEditorialAuthor,
+    authorRole: kPpEditorialRole,
     relatedProductId: 'dozy',
     relatedCommunity: 'Baby Sleep',
     sections: [
@@ -464,8 +494,11 @@ const List<ReadArticle> kReadArticles = [
     ageTag: 'All stages',
     minutes: 5,
     seed: 9,
-    author: 'Dr. Tara Joshi',
-    authorRole: 'Perinatal Mental Health',
+    // Was signed 'Dr. Tara Joshi' (Perinatal Mental Health), a doctor our own code calls fictional
+    // (gap analysis P1, 2026-10-07). Kept for revert:
+    //   author: 'Dr. Tara Joshi', authorRole: 'Perinatal Mental Health',
+    author: kPpEditorialAuthor,
+    authorRole: kPpEditorialRole,
     kind: ReadKind.bookSummary,
     relatedVideoId: 'mumwellness',
     relatedCommunity: 'Working Parents',
@@ -504,8 +537,11 @@ const List<ReadArticle> kReadArticles = [
     ageTag: 'All stages',
     minutes: 9,
     seed: 10,
-    author: 'Dr. Anjali Verma',
-    authorRole: 'Obstetrician & Gynaecologist',
+    // Was signed 'Dr. Anjali Verma' (Obstetrician & Gynaecologist), a doctor our own code calls fictional
+    // (gap analysis P1, 2026-10-07). Kept for revert:
+    //   author: 'Dr. Anjali Verma', authorRole: 'Obstetrician & Gynaecologist',
+    author: kPpEditorialAuthor,
+    authorRole: kPpEditorialRole,
     evidence: 'Aligned with standard obstetric guidance on caesarean recovery, wound healing and VBAC. General information for understanding, not a diagnosis, your own doctor knows your situation and your incision best.',
     sections: [
       ReadSection(paragraphs: [

@@ -25,7 +25,8 @@ import '../../theme/pv_fonts.dart';
 import '../post_pregnancy/family_profile_screen.dart';
 import '../post_pregnancy/growth_journey_screen.dart';
 import '../post_pregnancy/health_guide_screen.dart';
-import '../post_pregnancy/vaccination_screen.dart';
+// import '../post_pregnancy/vaccination_screen.dart'; // the demo, kept for revert
+import '../post_pregnancy/vax_tracker_screen.dart';
 import '../skilling/sk_child_store.dart';
 import 'pv_partner_screen.dart';
 import 'pv_you_chrome.dart';
@@ -88,7 +89,9 @@ class _PvChildScreenState extends State<PvChildScreen> {
   Future<void> _editBasics(Child c) async {
     final p = pvStorePalette;
     final name = TextEditingController(text: c.name);
-    var isBoy = c.isBoy;
+    // null = "Rather not say" (gap analysis P1, 2026-10-07): then nothing in
+    // the app calls the child he or she.
+    bool? isBoy = c.sexGiven ? c.isBoy : null;
     var dob = c.dob;
     final saved = await showModalBottomSheet<bool>(
       context: context,
@@ -143,16 +146,22 @@ class _PvChildScreenState extends State<PvChildScreen> {
                   const SizedBox(height: 12),
                   Wrap(
                     spacing: 8,
+                    runSpacing: 8,
                     children: [
                       PvChip(
                         label: 'Girl',
-                        selected: !isBoy,
+                        selected: isBoy == false,
                         onTap: () => setSheet(() => isBoy = false),
                       ),
                       PvChip(
                         label: 'Boy',
-                        selected: isBoy,
+                        selected: isBoy == true,
                         onTap: () => setSheet(() => isBoy = true),
+                      ),
+                      PvChip(
+                        label: 'Rather not say',
+                        selected: isBoy == null,
+                        onTap: () => setSheet(() => isBoy = null),
                       ),
                     ],
                   ),
@@ -185,7 +194,8 @@ class _PvChildScreenState extends State<PvChildScreen> {
     if (saved == true) {
       await ChildProfileStore.instance.update(
         name: name.text.trim().isEmpty ? c.name : name.text.trim(),
-        isBoy: isBoy,
+        isBoy: isBoy ?? c.isBoy,
+        sexGiven: isBoy != null,
         dob: dob,
       );
     }
@@ -301,7 +311,7 @@ class _PvChildScreenState extends State<PvChildScreen> {
                               ),
                               const SizedBox(height: 3),
                               Text(
-                                '${store.activeChildId == c.id ? store.ageLabel : ''} · ${c.isBoy ? 'boy' : 'girl'} · born ${_d(c.dob)}',
+                                '${store.activeChildId == c.id ? store.ageLabel : ''} · ${!c.sexGiven ? '' : c.isBoy ? 'boy · ' : 'girl · '}born ${_d(c.dob)}',
                                 style: pvManrope(fontSize: 12.5, color: p.ink3),
                               ),
                             ],
@@ -399,8 +409,12 @@ class _PvChildScreenState extends State<PvChildScreen> {
                         icon: Icons.vaccines_outlined,
                         title: 'Vaccinations',
                         subtitle: 'The schedule, and what is done',
+                        // Was the demo VaccinationScreen ("Aarav · 4
+                        // months"); the real tracker since 2026-10-02 (gap
+                        // analysis P1). Kept for revert:
+                        //   _push(const VaccinationScreen(), 'pp/vaccines'),
                         onTap: () =>
-                            _push(const VaccinationScreen(), 'pp/vaccines'),
+                            _push(const VaxTrackerScreen(), 'pp/vaccines'),
                       ),
                       PvYouRow(
                         icon: Icons.health_and_safety_outlined,

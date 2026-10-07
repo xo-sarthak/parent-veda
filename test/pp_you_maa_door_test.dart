@@ -42,14 +42,17 @@ void main() {
   final door = ppDoorFor('parenting_maternal')!;
 
   group('the map', () {
-    test('five tabs, every area placed once, the triage first, no tools', () {
+    test('five tabs, every area placed once, the triage first, one unscored check-in', () {
       expect([for (final t in door.tabs) t.id], ['today', 'body', 'moving_eating', 'people', 'going_back']);
       final placed = [for (final t in door.tabs) ...t.areaIds];
       expect({...placed, ...door.hiddenAreaIds}, {for (final a in _you.areas) a.id});
       expect(placed, hasLength(placed.toSet().length));
       expect(door.tabs.first.areaIds.first, 'how_are_you');
+      // One tool since 2026-10-07 (gap analysis P2): the two-question check-in,
+      // unscored and unsaved (test/pp_mood_check_test.dart). Still no tracker.
       for (final t in door.tabs) {
-        expect(t.tools, isEmpty, reason: '${t.id}: no tools, no scored tracker');
+        expect(t.tools.map((x) => x.surfaceId), t.id == 'today' ? ['pp_mood_check'] : isEmpty,
+            reason: '${t.id}: no scored tracker');
       }
       expect(_you.tools, isEmpty);
       expect(door.closing!.surfaceId, 'pp_experts/Maternal mental health');
@@ -89,8 +92,9 @@ void main() {
 
     test('the two scaffolds are in the ledger', () {
       final ledger = File('docs/DOOR-CONTENT-OWED.md').readAsStringSync();
-      for (final id in ['body_your_sleep', 'body_thyroid']) {
-        expect(_page(id).comingSoon, isTrue, reason: id);
+      expect(_page('body_your_sleep').comingSoon, isFalse, reason: 'filled 2026-10-02');
+      for (final id in ['body_thyroid']) {
+        expect(_page(id).comingSoon, isFalse, reason: '$id filled 2026-10-02');
         expect(ledger.contains(id), isTrue, reason: '$id is a coming-soon card nobody has logged as owed');
       }
       expect(_listed('your_body'), containsAll(['body_your_sleep', 'body_thyroid']));
@@ -158,11 +162,11 @@ void main() {
       _ageDays(10);
       await tester.pumpWidget(MaterialApp(home: PpDoorScreen(key: const ValueKey(10), door: door, onSurface: (_, _) {})));
       await tester.pumpAndSettle();
-      expect(find.text('READ THIS ONE FIRST'), findsOneWidget);
+      expect(find.text('Read this one first'), findsOneWidget);
       expect(find.text('I am having thoughts that frighten me'), findsOneWidget);
-      expect(find.byIcon(Icons.lock_outline_rounded), findsNWidgets(2), reason: 'Going back, badge and mark');
+      expect(find.byIcon(Icons.lock_outline_rounded), findsNWidgets(1), reason: 'Going back, one lock on its card (the quiet rail, 2026-10-07)');
       expect(find.text('Talk to someone about your own recovery'), findsOneWidget);
-      expect(find.textContaining('FOR YOU  '), findsOneWidget, reason: 'the hero speaks to her, not about the baby');
+      expect(find.textContaining('For you  '), findsOneWidget, reason: 'the hero speaks to her, not about the baby');
       await tester.pumpWidget(MaterialApp(
           home: PpDoorScreen(key: const ValueKey('locked'), door: door, onSurface: (_, _) {}, initialTabId: 'going_back')));
       await tester.pumpAndSettle();

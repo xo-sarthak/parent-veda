@@ -214,7 +214,7 @@ const List<DevActivity> kGrowExtraActivities = [
     ageTag: '6–9 mo',
     materials: [
       'A shallow basket',
-      'Six safe household objects — a wooden spoon, a steel katori, a loofah, a large pinecone',
+      'Six safe household objects — a wooden spoon, a small steel bowl, a loofah, a large pinecone',
     ],
     skills: ['Exploration', 'Texture', 'Choice-making', 'Concentration'],
     safety: [
@@ -304,7 +304,7 @@ const List<DevActivity> kGrowExtraActivities = [
     minutes: 8,
     difficulty: 'Easy',
     ageTag: '9–12 mo',
-    materials: ['A set of nesting cups, or four steel katoris of different sizes'],
+    materials: ['A set of nesting cups, or four steel bowls of different sizes'],
     skills: ['Size ordering', 'Problem solving', 'Fine motor', 'Persistence'],
     safety: ['Nothing with a chipped or sharp rim'],
     benefit:
@@ -527,7 +527,7 @@ const List<DevActivity> kGrowExtraActivities = [
         'Pretending an empty cup is full is abstract thinking arriving. The child who can do this is holding two ideas at once.',
     steps: [
       'Pour nothing into the cup with great seriousness.',
-      'Sip. Say "aah, garam".',
+      'Sip. Say "aah, hot".',
       'Offer him a cup.',
       'Follow whatever he invents next, even if it makes no sense.',
     ],
@@ -646,7 +646,7 @@ const List<DevActivity> kGrowExtraActivities = [
     minutes: 12,
     difficulty: 'Easy',
     ageTag: '2–3 yr',
-    materials: ['Atta dough, or shop playdough'],
+    materials: ['Roti dough, or shop playdough'],
     skills: ['Hand strength', 'Fine motor', 'Focus'],
     safety: ['Sit with him', 'Home dough is salty — discourage tasting'],
     benefit:

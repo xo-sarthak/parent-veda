@@ -55,7 +55,7 @@ final PpDoor kPpTraditionsDoor = PpDoor(
     ),
     PpDoorTab(
       id: 'welcome',
-      label: 'Welcoming her home',
+      label: 'Welcoming baby home',
       icon: Icons.home_outlined,
       hue: 26,
       areaIds: ['welcome'],
@@ -82,7 +82,7 @@ final PpDoor kPpTraditionsDoor = PpDoor(
       areaIds: ['keep_it_small', 'not_safe', 'first_festivals'],
       tools: [
         PpDoorTool(
-          label: 'Dadi ke nuskhe, checked',
+          label: 'Home remedies from the elders, checked',
           blurb: 'The home remedies every family passes down, with an honest '
               'note on which ones are safe and which are not.',
           surfaceId: 'pp_nuskhe',

@@ -16,6 +16,7 @@ import '../../services/notification_service.dart';
 import 'askveda_screen.dart';
 import 'pp_common.dart';
 import 'pp_vaccine_data.dart';
+import 'pp_vax_tracker_screen.dart' show ppVaxMarkGiven;
 
 const Color _green = Color(0xFF1F8A5B);
 const Color _flagBg = Color(0xFFFFF0F3);
@@ -191,7 +192,7 @@ class _VaxDetailScreenState extends State<VaxDetailScreen> {
                 child: Row(children: [
                   Expanded(
                     child: GestureDetector(
-                      onTap: () => done ? VaxStore.instance.markNotDone(_visit.id) : VaxStore.instance.markDone(_visit.id),
+                      onTap: () => done ? VaxStore.instance.markNotDone(_visit.id) : ppVaxMarkGiven(context, _visit),
                       behavior: HitTestBehavior.opaque,
                       child: Container(
                         height: 54,

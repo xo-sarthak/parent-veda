@@ -44,7 +44,7 @@ class _HealthDoctorVisitScreenState extends State<HealthDoctorVisitScreen> {
     final d = c.dob;
     return '${c.name} · ${c.ageLabel} '
         '(born ${d.day} ${_months[d.month - 1]} ${d.year}) · '
-        '${c.isBoy ? 'Boy' : 'Girl'}';
+        '${c.sexLabel}';
   }
 
   String _growthLine() {

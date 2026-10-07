@@ -12,8 +12,17 @@
 
 import 'package:flutter/material.dart';
 
+import '../../theme/pv_fonts.dart';
 import '../../widgets/global_ask_fab.dart' show kAskFabReserve;
+import '../doors/pv_list_row.dart';
+import '../doors/pv_shelf_card.dart';
+import '../doors/pv_shelf_spec.dart' show PvShelfKind;
+import '../pregnancy/preg_chrome.dart' show PregNote, PregSectionHeading, pregGroupLabelStyle, pregPageTitleStyle;
+import '../pregnancy/preg_tool_chrome.dart' show pregToolPad;
+import '../products/pv_store_chrome.dart' show PvChip, PvCommit, kPvInk, pvStorePalette;
+import '../v2/v2_palette.dart';
 import 'pp_child_profile.dart';
+import 'pp_phases_data.dart' show ppFillChild;
 
 import 'pp_common.dart';
 import 'pp_reading_data.dart';
@@ -84,8 +93,339 @@ class _ReadingHomeScreenState extends State<ReadingHomeScreen> {
     ];
   }
 
+  // ---- the one ParentVeda look (2026-10-07) ------------------------------------
+  //  A pushed library page as pregnancy draws one (WatchLearnScreen, the Learn
+  //  lists): white ground, an app bar carrying only the back arrow, the serif
+  //  page title, a stadium search, ONE section heading (PregSectionHeading),
+  //  ink chips, reads as unboxed rows (PvRowGroup, the Learn row), and rails
+  //  of PvShelfCard. Same reads, filters and destinations. `_buildBeforeShell`
+  //  is the page before, kept for revert.
   @override
   Widget build(BuildContext context) {
+    final p = pvStorePalette;
+    return Scaffold(
+      backgroundColor: p.ground,
+      appBar: AppBar(
+        backgroundColor: p.ground,
+        surfaceTintColor: Colors.transparent,
+        foregroundColor: p.ink1,
+      ),
+      body: AnimatedBuilder(
+        animation: readListenable,
+        builder: (context, _) {
+          final store = ReadingStore.instance;
+          return ListView(
+            padding: const EdgeInsets.only(top: 4, bottom: kAskFabReserve),
+            children: [
+              pregToolPad(Semantics(header: true, child: Text('What to read today', style: pregPageTitleStyle()))),
+              const SizedBox(height: 8),
+              pregToolPad(Text(
+                  'One good read, chosen for where you and ${ChildProfileStore.instance.nameMid} are right now - not a feed to scroll.',
+                  style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2))),
+              const SizedBox(height: 16),
+              pregToolPad(_searchShell(p)),
+              if (_query.trim().isNotEmpty)
+                ..._searchShellView(p, store)
+              else
+                ..._browseShell(p, store, store.continueReading, todaysRead()),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _searchShell(V2Palette p) => Container(
+        height: 48,
+        decoration: BoxDecoration(
+          color: p.surface,
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: p.line),
+        ),
+        child: Row(children: [
+          const SizedBox(width: 14),
+          Icon(Icons.search_rounded, size: 19, color: p.ink2),
+          const SizedBox(width: 8),
+          Expanded(
+            child: TextField(
+              controller: _searchCtl,
+              onChanged: (v) => setState(() => _query = v),
+              textInputAction: TextInputAction.search,
+              style: pvManrope(fontSize: 15, color: p.ink1),
+              cursorColor: p.ink1,
+              decoration: InputDecoration(
+                isDense: true,
+                hintText: 'Search reads',
+                hintStyle: pvManrope(fontSize: 15, color: p.ink3),
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                disabledBorder: InputBorder.none,
+                errorBorder: InputBorder.none,
+                focusedErrorBorder: InputBorder.none,
+                filled: false,
+                contentPadding: EdgeInsets.zero,
+              ),
+            ),
+          ),
+          if (_searchCtl.text.isNotEmpty)
+            IconButton(
+              tooltip: 'Clear the search',
+              onPressed: () => setState(() {
+                _searchCtl.clear();
+                _query = '';
+              }),
+              icon: Icon(Icons.close_rounded, size: 18, color: p.ink2),
+              visualDensity: VisualDensity.compact,
+            )
+          else
+            const SizedBox(width: 14),
+        ]),
+      );
+
+  /// One read as the Learn row: its cover as the well, the title, the teaser,
+  /// and where it sits (collection, minutes, how far she got).
+  Widget _readRow(V2Palette p, ReadingStore store, ReadArticle a) {
+    final inProgress = store.isInProgress(a.id);
+    final prog = inProgress ? store.progressOf(a.id) : null;
+    return PvListRow(
+      key: ValueKey('pp_read_row_${a.id}'),
+      p: p,
+      leading: SizedBox(width: 56, height: 56, child: ReadCover(seed: a.seed, height: 56, width: 56, radius: 12, progress: prog)),
+      title: a.title,
+      line: a.teaser,
+      lineMaxLines: 2,
+      meta: [
+        readCollectionById(a.collection).title,
+        '${a.minutes} min read',
+        if (prog != null) '${(prog * 100).round()}% read',
+      ].join(' · '),
+      onTap: () => _open(a),
+    );
+  }
+
+  Widget _rows(V2Palette p, ReadingStore store, Iterable<ReadArticle> items) =>
+      pregToolPad(PvRowGroup(p: p, children: [for (final a in items) _readRow(p, store, a)]));
+
+  /// A text link in ink with an arrow: "Explore more reads".
+  Widget _linkShell(String label, VoidCallback onTap) => pregToolPad(Align(
+        alignment: Alignment.centerLeft,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(8),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              Flexible(child: Text(label, style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w700, color: kPvInk))),
+              const SizedBox(width: 5),
+              const Icon(Icons.arrow_forward_rounded, size: 15, color: kPvInk),
+            ]),
+          ),
+        ),
+      ));
+
+  List<Widget> _searchShellView(V2Palette p, ReadingStore store) {
+    final q = _query.trim().toLowerCase();
+    final items = readCatalog.where((a) => a.title.toLowerCase().contains(q)).toList();
+    return [
+      const SizedBox(height: 26),
+      pregToolPad(const PregSectionHeading('Search results')),
+      const SizedBox(height: 10),
+      if (items.isEmpty)
+        pregToolPad(Text('No matches for "$_query" - try another word.', style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2)))
+      else
+        _rows(p, store, items),
+    ];
+  }
+
+  List<Widget> _browseShell(V2Palette p, ReadingStore store, List<ReadArticle> continues, ReadArticle today) {
+    final scaler = MediaQuery.textScalerOf(context);
+    return [
+      // The editorial start stands down once she narrows by collection or type.
+      if (!_filtering) ...[
+        const SizedBox(height: 22),
+        pregToolPad(_todayHeroShell(p, today)),
+        if (continues.isNotEmpty) ...[
+          const SizedBox(height: 28),
+          pregToolPad(const PregSectionHeading('Continue reading')),
+          const SizedBox(height: 12),
+          SizedBox(
+            height: pvShelfRailHeight(scaler),
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 18),
+              itemCount: continues.length,
+              separatorBuilder: (_, _) => const SizedBox(width: 12),
+              itemBuilder: (_, i) {
+                final a = continues[i];
+                return PvShelfCard(
+                  key: ValueKey('pp_read_continue_${a.id}'),
+                  p: p,
+                  hue: (30 + i * 26) % 360,
+                  kind: PvShelfKind.read,
+                  kindWord: '${(store.progressOf(a.id) * 100).round()}% read',
+                  fact: 'tap to continue',
+                  title: a.title,
+                  onTap: () => _open(a),
+                );
+              },
+            ),
+          ),
+        ],
+        const SizedBox(height: 28),
+        pregToolPad(PregSectionHeading('Chosen for you', lead: ppFillChild('For his age and your recent reads - never random.'))),
+        const SizedBox(height: 10),
+        _rows(p, store, forYou().take(5)),
+        // Five picks is a taster, not a library: the way through to the rest.
+        const SizedBox(height: 4),
+        _linkShell('Explore more reads', () => setState(() {
+              _collectionFilter = null;
+              _typeFilter = null;
+            })),
+      ],
+      const SizedBox(height: 26),
+      ..._collectionsShell(p, store),
+      const SizedBox(height: 30),
+      pregToolPad(PvRowGroup(p: p, children: [
+        PvListRow(
+          key: const ValueKey('pp_read_library'),
+          p: p,
+          leading: PvMarkWell(p: p, hue: 30, size: 40, icon: Icons.bookmark_outline_rounded),
+          title: 'Your library',
+          line: 'Saved reads, in-progress & completed',
+          onTap: () => _push(const ReadingLibraryScreen()),
+        ),
+      ])),
+    ];
+  }
+
+  Widget _chipRowShell<T>(List<(String, T?)> options, T? selected, ValueChanged<T?> onPick) {
+    final scaler = MediaQuery.textScalerOf(context);
+    return SizedBox(
+      height: (scaler.scale(13) * 1.4 + 18).clamp(36.0, 60.0),
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 18),
+        itemCount: options.length,
+        separatorBuilder: (_, _) => const SizedBox(width: 6),
+        itemBuilder: (_, i) => Center(
+          child: PvChip(
+            label: options[i].$1,
+            selected: selected == options[i].$2,
+            onTap: () => onPick(options[i].$2),
+          ),
+        ),
+      ),
+    );
+  }
+
+  List<Widget> _collectionsShell(V2Palette p, ReadingStore store) {
+    final results = filteredReads(collectionId: _collectionFilter, kind: _typeFilter);
+    final scaler = MediaQuery.textScalerOf(context);
+    return [
+      pregToolPad(PregSectionHeading(
+        'Collections',
+        lead: _filtering
+            ? '${results.length} ${results.length == 1 ? 'read' : 'reads'} · ${_activeLabel()}'
+            : 'Browse by topic, then narrow by type.',
+      )),
+      const SizedBox(height: 12),
+      _chipRowShell<String>([('All', null), for (final c in kReadCollections) (c.title, c.id)], _collectionFilter,
+          (v) => setState(() => _collectionFilter = v)),
+      const SizedBox(height: 8),
+      _chipRowShell<ReadKind>(const [
+        ('All', null),
+        ('Articles', ReadKind.article),
+        ('Book Summaries', ReadKind.bookSummary),
+        ('Research', ReadKind.research),
+      ], _typeFilter, (v) => setState(() => _typeFilter = v)),
+      const SizedBox(height: 16),
+      if (!_filtering)
+        // No filter yet: the collections to browse into, as a shelf.
+        SizedBox(
+          height: pvShelfRailHeight(scaler),
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 18),
+            itemCount: kReadCollections.length,
+            separatorBuilder: (_, _) => const SizedBox(width: 12),
+            itemBuilder: (_, i) {
+              final c = kReadCollections[i];
+              final mins = c.articleIds.map(readArticleById).fold<int>(0, (a, x) => a + x.minutes);
+              final prog = ReadingStore.instance.collectionProgress(c);
+              return PvShelfCard(
+                key: ValueKey('pp_read_collection_${c.id}'),
+                p: p,
+                hue: (200 + i * 34) % 360,
+                kind: PvShelfKind.read,
+                kindWord: '${c.articleIds.length} reads',
+                fact: prog >= 1 ? 'Completed' : prog > 0 ? '${(prog * 100).round()}% done' : '~$mins min',
+                title: c.title,
+                onTap: () => _push(ReadingCollectionScreen(collection: c)),
+              );
+            },
+          ),
+        )
+      else ...[
+        if (results.isEmpty)
+          pregToolPad(Text('No reads here yet - try another type or topic.', style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2)))
+        // No type chosen: grouped by type under a small caps label, a few each,
+        // so "All" is browsable rather than a wall.
+        else if (_typeFilter == null) ...[
+          for (final kind in ReadKind.values)
+            if (results.where((a) => a.kind == kind).isNotEmpty) ...[
+              pregToolPad(Text(readKindLabel(kind).toUpperCase(), style: pregGroupLabelStyle())),
+              const SizedBox(height: 8),
+              _rows(p, store, results.where((a) => a.kind == kind).take(4)),
+              if (results.where((a) => a.kind == kind).length > 4)
+                _linkShell('View more ${readKindLabel(kind).toLowerCase()}', () => setState(() => _typeFilter = kind)),
+              const SizedBox(height: 16),
+            ],
+        ] else
+          _rows(p, store, results),
+        if (_collectionFilter != null) ...[
+          const SizedBox(height: 4),
+          _linkShell('Open the full ${readCollectionById(_collectionFilter!).title} path',
+              () => _push(ReadingCollectionScreen(collection: readCollectionById(_collectionFilter!)))),
+        ],
+      ],
+    ];
+  }
+
+  Widget _todayHeroShell(V2Palette p, ReadArticle a) => Material(
+        color: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20), side: BorderSide(color: p.line)),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          key: const ValueKey('pp_read_today'),
+          onTap: () => _open(a),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            ReadCover(seed: a.seed, height: 168, radius: 0),
+            Padding(
+              padding: const EdgeInsets.all(18),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                Row(children: [
+                  Expanded(child: Text('TODAY’S READ', style: pregGroupLabelStyle())),
+                  const SizedBox(width: 8),
+                  Text('${a.minutes} min read', style: pvManrope(fontSize: 12, fontWeight: FontWeight.w600, color: p.ink3)),
+                ]),
+                const SizedBox(height: 10),
+                Text(a.title, style: pvFraunces(fontSize: 22, fontWeight: FontWeight.w600, height: 1.2, color: p.ink1)),
+                const SizedBox(height: 6),
+                Text(a.teaser, style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2)),
+                const SizedBox(height: 12),
+                PregNote(ppFill(a.whyToday), icon: Icons.wb_sunny_outlined),
+                const SizedBox(height: 16),
+                PvCommit(label: 'Start reading', onTap: () => _open(a)),
+              ]),
+            ),
+          ]),
+        ),
+      );
+
+  // Kept for revert (2026-10-07): the page before the shared look.
+  // ignore: unused_element
+  Widget _buildBeforeShell(BuildContext context) {
     return Scaffold(
       backgroundColor: ppBg,
       body: Stack(children: [

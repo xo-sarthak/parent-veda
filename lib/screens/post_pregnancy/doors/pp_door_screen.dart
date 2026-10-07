@@ -28,6 +28,7 @@
 //  the first tab is where somebody arriving should land.
 // =============================================================================
 
+import 'package:flutter/foundation.dart' show ValueListenable;
 import 'package:flutter/material.dart';
 
 import '../../../data/doors/pp_door_data.dart';
@@ -43,6 +44,18 @@ import '../pp_section_registry.dart';
 import '../pp_section_screen.dart';
 import 'pp_door_carousel.dart';
 import 'pp_door_chrome.dart';
+import '../../../data/doors/pv_door_data.dart' show PvDoorGroup;
+import '../../../services/pv_search_store.dart';
+import '../../../widgets/pv_feedback.dart';
+import '../../brackets/hub/hub_intent_art.dart' show IntentMark;
+import '../../doors/pv_door_chrome.dart' show PvDoorSheet, kPvDoorGutter;
+import '../../doors/pv_door_rail.dart';
+import '../../doors/pv_door_screen.dart' show kPvDoorBlockGap, kPvDoorHeadingGap, kPvDoorHeroQuietHeight;
+import '../../doors/pv_live_search.dart';
+import '../../doors/pv_shelf_card.dart';
+import '../../doors/pv_shelf_spec.dart' show PvShelfKind;
+import '../pp_din_by_din.dart';
+import '../pp_search.dart';
 
 // -----------------------------------------------------------------------------
 //  Rail geometry — the pregnancy door's numbers, so the sum is the same sum:
@@ -55,6 +68,20 @@ const double kPpRailGap = 10;
 /// How far the sheet is pulled up over a photographic hero. One number, used
 /// twice — see the pregnancy door for why the two uses must not drift.
 const double kPpDoorHeroOverlap = 38;
+
+/// ⚠️ THE TTC DOOR FORMAT, ON EVERY PARENTING DOOR (2026-10-07, the parenting
+/// gap pass: "keep the design consistent with TTC and pregnancy on every
+/// screen; it must look like ONE ParentVeda"). The pregnancy doors moved to it
+/// on 2026-10-02 (`pv_door_screen.dart`); this is the same thing on the
+/// parenting door: the quiet hero (the door's NAME as the title, one line
+/// under it, the white search pill that searches this door, the photograph
+/// parallaxing), the quiet tab rail across the seam (`PvDoorRail`, now with a
+/// lock for a tab her child has not reached), every card a `PvShelfCard`
+/// that says what it is (Article · 4 min read, Tool, Recipe, Activity), the
+/// pinned red flag folded into one white row, TTC's 24/12 rhythm, and no
+/// violet. `test/pp_door_ttc_format_test.dart` holds the numbers equal.
+/// Kept for revert: `false` draws the 2026-09 door (`_bodyClassic`).
+const bool kPpDoorTtcFormat = true;
 
 /// The format's mark, keyed on the brief's badge word. Small on the chip,
 /// large and quiet behind the card. Unknown words get the article mark rather
@@ -130,6 +157,35 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
   }();
 
   PpDoor get door => widget.door;
+
+  /// The hero's search field, its three states shared with every door
+  /// (`PvLiveSearch`). Searches this door first, then every door.
+  final PvLiveSearch _search = PvLiveSearch();
+
+  /// The hero's parallax reads this, as the pregnancy and TTC doors do.
+  final ScrollController _scroll = ScrollController();
+  final ValueNotifier<double> _offset = ValueNotifier(0);
+
+  void _onScroll() {
+    final o = _scroll.offset;
+    if (o != _offset.value) _offset.value = o;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _scroll.addListener(_onScroll);
+    PvSearchStore.instance.init();
+  }
+
+  @override
+  void dispose() {
+    _scroll.removeListener(_onScroll);
+    _scroll.dispose();
+    _offset.dispose();
+    _search.dispose();
+    super.dispose();
+  }
 
   /// The tabs for his age. See `PpDoorTab.toMonths`: a tab scoped to the
   /// first two years is not on the selector for a three-year-old.
@@ -213,10 +269,17 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
             if (area.inBand(_band))
               (
                 area,
-                [
-                  for (final p in area.pagesFor(_band))
-                    if (p.id != tab.redFlagPageId) p,
-                ],
+                // First 40 days: her day range first (2026-10-07,
+                // pp_din_by_din.dart). Every other area is untouched.
+                area.id == kPpDinTabId
+                    ? ppDinOrder([
+                        for (final p in area.pagesFor(_band))
+                          if (p.id != tab.redFlagPageId) p,
+                      ])
+                    : [
+                        for (final p in area.pagesFor(_band))
+                          if (p.id != tab.redFlagPageId) p,
+                      ],
               ),
       ];
 
@@ -246,12 +309,384 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
-        animation: Listenable.merge(
-            [ChildProfileStore.instance, V2PaletteStore.instance]),
-        builder: (context, _) => _body(context, V2PaletteStore.instance.current),
+        animation: Listenable.merge([
+          ChildProfileStore.instance,
+          V2PaletteStore.instance,
+          _search,
+          PvSearchStore.instance,
+        ]),
+        builder: (context, _) => kPpDoorTtcFormat
+            ? _body(context, V2PaletteStore.instance.current)
+            : _bodyClassic(context, V2PaletteStore.instance.current),
+      );
+
+  // ===========================================================================
+  //  The TTC door format (kPpDoorTtcFormat)
+  // ===========================================================================
+
+  /// The door's name, as the home tile says it.
+  String get _doorName =>
+      bracketById(door.sectionId)?.label.now ?? section.title;
+
+  /// "For Meera · 3 to 6 months": which age the door is showing. The one
+  /// thing a parenting hero says that a pregnancy hero does not.
+  String? get _ageLine {
+    final set = section.bandSet;
+    if (set == null) return null;
+    final band = set.active.label;
+    return door.aboutHer
+        ? 'For you  ·  $band'
+        : 'For ${ChildProfileStore.instance.nameMid}  ·  $band';
+  }
+
+  PvDoorGroup _groupOf(PpDoorTab t) => PvDoorGroup(
+        id: t.id,
+        label: t.label,
+        icon: t.icon,
+        hue: t.hue,
+        mark: ppTabMarkFor(t.icon),
       );
 
   Widget _body(BuildContext context, V2Palette p) {
+    final bracket = bracketById(door.sectionId);
+    final hub = hubFor(door.sectionId);
+    final tabs = _tabs;
+    final hue = bracket?.hue ?? tabs.first.hue;
+    final tint = v2BlockTint(hue, p);
+    final tab = tabs[_tab.clamp(0, tabs.length - 1)];
+    final rails = _railsFor(tab).isNotEmpty || tab.tools.isEmpty
+        ? _railsFor(tab)
+        : [(PpArea(id: tab.id, title: tab.label, blurb: ''), const <PpPage>[])];
+    final redFlag = tab.redFlagPageId == null
+        ? null
+        : section.pageById(tab.redFlagPageId!);
+
+    return PvLiveSearchScope(
+      search: _search,
+      child: Scaffold(
+        backgroundColor: p.ground,
+        body: Stack(children: [
+          Positioned.fill(
+            child: V3HeroField(
+                accent: tint,
+                ground: p.ground,
+                variant: 1,
+                chroma: v3FieldChroma(hue)),
+          ),
+          ListView(
+            controller: _scroll,
+            padding: EdgeInsets.zero,
+            children: [
+              _QuietHero(
+                scroll: _offset,
+                search: _search,
+                p: p,
+                tint: tint,
+                photo: door.heroImageUrl,
+                title: _doorName,
+                headline: hub?.hero.now ?? section.intro,
+                ageLine: _ageLine,
+                mark: bracketMarkFor(door.sectionId),
+                onSubmitted: (q) {
+                  final hits = ppSearch(q.trim(), sectionId: door.sectionId);
+                  if (hits.isNotEmpty) {
+                    openPpSearchHit(context, hits.first, query: q.trim());
+                  } else if (q.trim().isNotEmpty) {
+                    openPpSearch(context, query: q.trim());
+                  }
+                },
+              ),
+              PvDoorSheet(
+                p: p,
+                minHeight: pvLiveSearchSheetMin(context, _search),
+                children: [
+                  if (_search.searching)
+                    ..._liveResults(context, p)
+                  else if (_search.recalling &&
+                      PvSearchStore.instance.recent.isNotEmpty)
+                    ..._liveRecall(p)
+                  else ...[
+                    // ---- the rail, across the seam (the pregnancy door's) --
+                    SizedBox(
+                      height: PvDoorRail.cardHeight - PvDoorRail.overlap,
+                      child: OverflowBox(
+                        alignment: Alignment.bottomCenter,
+                        minHeight: PvDoorRail.cardHeight,
+                        maxHeight: PvDoorRail.cardHeight,
+                        child: PvDoorRail(
+                          groups: [for (final t in tabs) _groupOf(t)],
+                          counts: [for (final t in tabs) _countFor(t)],
+                          locked: [for (final t in tabs) _unlockMonths(t) != null],
+                          selected: _tab,
+                          p: p,
+                          onPick: (i) => setState(() => _tab = i),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    const SizedBox(height: kPvDoorBlockGap),
+
+                    if (_unlockMonths(tab) case final m?) ...[
+                      ppDoorPad(_LockedPanel(
+                        months: m,
+                        label: _lockLabel(m),
+                        aboutHer: door.aboutHer,
+                        p: p,
+                      )),
+                      const SizedBox(height: kPvDoorBlockGap),
+                    ] else ...[
+                      // Din by din: "Day N of 40" and today's line.
+                      if (ppDinToday(tab.id) case final today?) ...[
+                        ppDoorPad(PpDinTodayCard(day: today.day, line: today.line, p: p)),
+                        const SizedBox(height: kPvDoorBlockGap),
+                      ],
+                      if (tab.jumpToTabId case final target?) ...[
+                        ppDoorPad(_FlagRow(
+                          key: const ValueKey('pp_door_jump_row'),
+                          p: p,
+                          title: tab.jumpTitle ?? 'Is this an emergency?',
+                          line: null,
+                          onTap: () => setState(() => _tab = tabs
+                              .indexWhere((t) => t.id == target)
+                              .clamp(0, tabs.length - 1)),
+                        )),
+                        const SizedBox(height: kPvDoorBlockGap),
+                      ],
+                      // ⚠️ FOLDED INTO ONE WHITE ROW, AS PREGNANCY'S AND TTC'S
+                      // (2026-10-07). The page's own title and its first doctor
+                      // line; one tap opens the whole page. Never hidden.
+                      if (redFlag != null) ...[
+                        ppDoorPad(_FlagRow(
+                          key: const ValueKey('pp_door_flag_row'),
+                          p: p,
+                          title: redFlag.title,
+                          // You, Maa pins its frightening-thoughts route here;
+                          // the brief's words for it are "read this one
+                          // first", not a red flag, and a mother in that state
+                          // should meet those, with a hand, not a hospital.
+                          route: redFlag.format?.toUpperCase() == 'ROUTE',
+                          line: redFlag.format?.toUpperCase() == 'ROUTE'
+                              ? 'Read this one first'
+                              : _doctorLine(redFlag),
+                          onTap: () => _openPage(context, redFlag),
+                        )),
+                        const SizedBox(height: kPvDoorBlockGap),
+                      ],
+                      // A tab's note: one quiet grey line, no tinted slab
+                      // behind it (the one-ParentVeda rule).
+                      if (tab.note case final note?) ...[
+                        ppDoorPad(Text(note,
+                            style: pvManrope(
+                                fontSize: 13.5, height: 1.5, color: p.ink2))),
+                        const SizedBox(height: kPvDoorBlockGap),
+                      ],
+                      for (final (ri, (area, pages)) in rails.indexed) ...[
+                        ppDoorPad(Text(area.title,
+                            style: pvFraunces(
+                                fontSize: 21,
+                                fontWeight: FontWeight.w600,
+                                height: 1.2,
+                                letterSpacing: -0.45,
+                                color: p.ink1))),
+                        const SizedBox(height: kPvDoorHeadingGap),
+                        _shelf(context, p, [
+                          if (ri == 0)
+                            for (final tool in tab.tools)
+                              if (!tool.atEnd &&
+                                  (tool.afterPageId == null ||
+                                      !pages.any((x) => x.id == tool.afterPageId)))
+                                _ShelfItem.tool(tool),
+                          for (final page in [
+                            ...pages.where((x) => x.pinned),
+                            ...pages.where((x) => !x.pinned),
+                          ]) ...[
+                            _ShelfItem.page(page),
+                            if (ri == 0)
+                              for (final tool in tab.tools)
+                                if (tool.afterPageId == page.id)
+                                  _ShelfItem.tool(tool),
+                          ],
+                          // A shop card comes last (PpDoorTool.atEnd).
+                          if (ri == 0)
+                            for (final tool in tab.tools)
+                              if (tool.atEnd) _ShelfItem.tool(tool),
+                        ], area.hue),
+                        const SizedBox(height: kPvDoorBlockGap),
+                      ],
+                    ],
+
+                    if (tab.footer case final line?) ...[
+                      ppDoorPad(Text(line,
+                          style: pvFraunces(
+                              fontSize: 15.5,
+                              fontWeight: FontWeight.w500,
+                              height: 1.5,
+                              color: p.ink2))),
+                      const SizedBox(height: kPvDoorBlockGap),
+                    ],
+
+                    // The closing: one line with an ink link, or the consult
+                    // card as a shelf card of its own.
+                    if (door.closingLine case final line?) ...[
+                      ppDoorPad(InkWell(
+                        onTap: door.closing == null
+                            ? null
+                            : () => widget.onSurface(
+                                context, door.closing!.surfaceId),
+                        borderRadius: BorderRadius.circular(12),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          child: Text.rich(
+                            TextSpan(children: [
+                              TextSpan(text: line),
+                              if (door.closing != null)
+                                TextSpan(
+                                    text: '  ${door.closing!.label} \u2192',
+                                    style: pvManrope(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w800,
+                                        height: 1.5,
+                                        // One ink (was p.action, violet).
+                                        color: p.ink1)),
+                            ]),
+                            style: pvFraunces(
+                                fontSize: 15.5,
+                                fontWeight: FontWeight.w500,
+                                height: 1.5,
+                                color: p.ink2),
+                          ),
+                        ),
+                      )),
+                      const SizedBox(height: kPvDoorBlockGap),
+                    ] else if (door.closing case final c?) ...[
+                      ppDoorPad(PpDoorRow(
+                        p: p,
+                        hue: hue,
+                        icon: Icons.chat_bubble_outline_rounded,
+                        chip: 'Consult',
+                        title: c.label,
+                        blurb: c.blurb,
+                        onTap: () => widget.onSurface(context, c.surfaceId),
+                      )),
+                      const SizedBox(height: kPvDoorBlockGap),
+                    ],
+                    ppDoorPad(PpDoorDisclaimer(p: p, text: door.disclaimer)),
+                  ],
+                ],
+              ),
+            ],
+          ),
+        ]),
+      ),
+    );
+  }
+
+  /// The first doctor line of a page, its own words: the flag row's second
+  /// line, so the row and the page cannot disagree.
+  String? _doctorLine(PpPage page) => page.blocks
+      .whereType<PpCallout>()
+      .where((c) => c.kind == PpCalloutKind.doctor)
+      .map((c) => c.text)
+      .firstOrNull;
+
+  /// One shelf: a rail of `PvShelfCard`s at TTC's numbers.
+  Widget _shelf(BuildContext context, V2Palette p, List<_ShelfItem> items, double hue) {
+    if (items.isEmpty) return const SizedBox.shrink();
+    return SizedBox(
+      height: pvShelfRailHeight(MediaQuery.textScalerOf(context)),
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: kPvDoorGutter),
+        itemCount: items.length,
+        separatorBuilder: (_, _) => const SizedBox(width: 12),
+        itemBuilder: (context, i) {
+          final it = items[i];
+          final spec = it.page != null ? ppShelfSpecFor(it.page!) : ppShelfSpecForTool();
+          return PvShelfCard(
+            p: p,
+            hue: (hue + i * 22) % 360,
+            kind: spec.kind,
+            kindWord: spec.word,
+            fact: spec.fact,
+            title: it.title,
+            comingSoon: it.page?.comingSoon ?? false,
+            onTap: () => it.page != null
+                ? _openPage(context, it.page!)
+                : widget.onSurface(context, it.tool!.surfaceId),
+          );
+        },
+      ),
+    );
+  }
+
+  // ---- the live field's two states (the pregnancy door's, on this index) ----
+
+  List<Widget> _liveResults(BuildContext context, V2Palette p) {
+    final q = _search.query;
+    final hits = ppSearch(q, sectionId: door.sectionId);
+    final mine = [for (final h in hits) if (h.sectionId == door.sectionId) h];
+    final label = _doorName;
+    return [
+      const SizedBox(height: 22),
+      ppDoorPad(Text(
+        mine.isEmpty ? 'Nothing in $label by that name' : 'In $label',
+        style: pvFraunces(
+            fontSize: 22, fontWeight: FontWeight.w600, height: 1.15, color: p.ink1),
+      )),
+      const SizedBox(height: 6),
+      for (var i = 0; i < mine.length && i < 30; i++)
+        PpSearchHitRow(
+          key: ppSearchHitKey(i),
+          p: p,
+          hit: mine[i],
+          onTap: () {
+            _search.focus.unfocus();
+            openPpSearchHit(context, mine[i], query: q);
+          },
+        ),
+      const SizedBox(height: 14),
+      ppDoorPad(PvLiveSearchWayOn(
+        p: p,
+        icon: Icons.travel_explore_outlined,
+        title: 'Search everywhere for "$q"',
+        line: 'Every door of ParentVeda, not just $label.',
+        onTap: () {
+          pvCommitFeedback();
+          _search.focus.unfocus();
+          openPpSearch(context, query: q);
+        },
+      )),
+      const SizedBox(height: 10),
+      ppDoorPad(PvLiveSearchWayOn(
+        p: p,
+        icon: Icons.auto_awesome_outlined,
+        title: 'Ask Veda about "$q"',
+        line: 'In your own words, with your child\'s age in mind.',
+        onTap: () {
+          pvCommitFeedback();
+          _search.focus.unfocus();
+          openPpAskVeda(context, q);
+        },
+      )),
+      const SizedBox(height: 8),
+    ];
+  }
+
+  List<Widget> _liveRecall(V2Palette p) => [
+        const SizedBox(height: 22),
+        pvLiveSearchRecallHeading(p, 'Recent', onClear: PvSearchStore.instance.clear),
+        const SizedBox(height: 6),
+        for (final r in PvSearchStore.instance.recent)
+          ListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: kPvDoorGutter),
+            leading: Icon(Icons.history_rounded, color: p.ink3),
+            title: Text(r, style: pvManrope(fontSize: 15, color: p.ink1)),
+            onTap: () => _search.run(r),
+          ),
+      ];
+
+  /// The 2026-09 door, kept for revert (`kPpDoorTtcFormat = false`).
+  Widget _bodyClassic(BuildContext context, V2Palette p) {
     final bracket = bracketById(door.sectionId);
     final hub = hubFor(door.sectionId);
     final tabs = _tabs;
@@ -1008,4 +1443,411 @@ class _TabNote extends StatelessWidget {
         child: Text(note,
             style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2)),
       );
+}
+
+// =============================================================================
+//  The TTC door format's pieces, typed on parenting
+// =============================================================================
+
+/// What a parenting card says it is: one of the shared kinds, an honest word
+/// where the shared word would mislead, and one fact.
+///
+/// ⚠️ A "VIDEO" PAGE IS AN ARTICLE UNTIL ITS FILM EXISTS (gap analysis P1,
+/// Behind · Videos & audio: "A 'Video' chip on a page with no video is a small
+/// untruth on 21 pages, and on choking it is a safety gap"). Not one parenting
+/// video slot has a file yet, so every VIDEO page is an Article with its
+/// reading time. When films land, a page with a playable film says Video.
+({PvShelfKind kind, String? word, String? fact}) ppShelfSpecFor(PpPage page) {
+  final f = (page.format ?? 'ARTICLE').toUpperCase();
+  final read = ppReadMinutes(page);
+  final minutes = '$read min read';
+  if (page.toolSurfaceId != null || f == 'TOOL' || f == 'INTERACTIVE' || f == 'CHECKLIST') {
+    return (kind: PvShelfKind.tool, word: null, fact: null);
+  }
+  return switch (f) {
+    'RECIPE' => (kind: PvShelfKind.recipe, word: null, fact: null),
+    'AUDIO LIBRARY' || 'AUDIO' => (kind: PvShelfKind.audio, word: null, fact: null),
+    'CONSULT' || 'TALK' => (kind: PvShelfKind.talk, word: null, fact: null),
+    'ACTIVITY' => (kind: PvShelfKind.game, word: 'Activity', fact: null),
+    'STORY' => (kind: PvShelfKind.read, word: 'Story', fact: '$read min'),
+    'CHART' || 'CHART-CARD' || 'TABLE' || 'COMPARISON TABLE' =>
+      (kind: PvShelfKind.read, word: 'Chart', fact: null),
+    'CEREMONY' => (kind: PvShelfKind.read, word: 'Ceremony', fact: minutes),
+    _ => (kind: PvShelfKind.read, word: null, fact: minutes),
+  };
+}
+
+({PvShelfKind kind, String? word, String? fact}) ppShelfSpecForTool() =>
+    (kind: PvShelfKind.tool, word: null, fact: null);
+
+/// Reading time at 200 words a minute, never under one.
+int ppReadMinutes(PpPage page) {
+  var words = 0;
+  for (final b in page.blocks) {
+    final t = switch (b) {
+      PpIntro x => x.text,
+      PpArticle x => [x.heading ?? '', ...x.paragraphs].join(' '),
+      PpSteps x => [for (final st in x.steps) '${st.title} ${st.detail}'].join(' '),
+      PpCards x => [for (final c in x.cards) '${c.title} ${c.line}'].join(' '),
+      PpCallout x => x.text,
+      _ => '',
+    };
+    words += t.split(RegExp(r'\s+')).where((w) => w.isNotEmpty).length;
+  }
+  return (words / 200).ceil().clamp(1, 60);
+}
+
+/// A tab's line icon, as the drawn mark the shared rail draws (the TTC family's
+/// object where one exists, else the hub mark). Line icons are for controls;
+/// a row that goes somewhere wears a drawn mark (the three-level icon rule).
+IntentMark ppTabMarkFor(IconData icon) {
+  final c = icon.codePoint;
+  bool any(List<IconData> xs) => xs.any((x) => x.codePoint == c);
+  if (any([Icons.nightlight_outlined, Icons.nights_stay_outlined, Icons.dark_mode_outlined, Icons.bedtime_outlined])) {
+    return IntentMark.moonMark;
+  }
+  if (any([Icons.favorite_border_rounded, Icons.groups_outlined, Icons.diversity_2_outlined])) return IntentMark.cuppedHands;
+  if (any([Icons.water_drop_outlined])) return IntentMark.feedMark;
+  if (any([Icons.toys_outlined])) return IntentMark.playMark;
+  if (any([Icons.spa_outlined, Icons.self_improvement_outlined])) return IntentMark.lotusMark;
+  if (any([Icons.show_chart_outlined])) return IntentMark.chartLog;
+  if (any([Icons.shield_outlined])) return IntentMark.checkMark;
+  if (any([Icons.restaurant_outlined])) return IntentMark.plate;
+  if (any([Icons.soup_kitchen_outlined])) return IntentMark.cookMark;
+  if (any([Icons.emergency_outlined, Icons.forum_outlined, Icons.chat_bubble_outline_rounded])) return IntentMark.askDoctor;
+  if (any([Icons.work_outline_rounded])) return IntentMark.compassMark;
+  if (any([Icons.whatshot_outlined, Icons.thermostat_outlined, Icons.child_care_outlined])) return IntentMark.bodyMark;
+  if (any([Icons.wb_sunny_outlined])) return IntentMark.sunMark;
+  if (any([Icons.vaccines_outlined, Icons.medication_outlined])) return IntentMark.pillMark;
+  if (any([Icons.undo_rounded])) return IntentMark.improveMark;
+  if (any([Icons.timelapse_outlined])) return IntentMark.timelineRail;
+  if (any([Icons.stairs_outlined, Icons.directions_walk_outlined])) return IntentMark.stepsMark;
+  if (any([Icons.school_outlined])) return IntentMark.schoolMark;
+  if (any([Icons.repeat_rounded])) return IntentMark.cycleRing;
+  if (any([Icons.music_note_outlined])) return IntentMark.audioMark;
+  if (any([Icons.home_outlined, Icons.auto_awesome_outlined])) return IntentMark.lampMark;
+  if (any([Icons.gesture_rounded])) return IntentMark.moodArc;
+  if (any([Icons.folder_open_outlined])) return IntentMark.reportPage;
+  if (any([Icons.event_outlined, Icons.calendar_today_outlined, Icons.cake_outlined])) return IntentMark.calendarDay;
+  if (any([Icons.checklist_rtl_outlined])) return IntentMark.listMark;
+  if (any([Icons.auto_stories_outlined])) return IntentMark.bookMark;
+  // The four doors added 2026-10-07 (safety, papers, special care, family).
+  if (any([Icons.directions_car_outlined])) return IntentMark.seatMark;
+  if (any([Icons.medical_services_outlined])) return IntentMark.askDoctor;
+  if (any([Icons.badge_outlined])) return IntentMark.reportPage;
+  if (any([Icons.account_balance_outlined])) return IntentMark.listMark;
+  if (any([Icons.health_and_safety_outlined])) return IntentMark.checkMark;
+  if (any([Icons.savings_outlined])) return IntentMark.improveMark;
+  if (any([Icons.event_note_outlined])) return IntentMark.calendarDay;
+  if (any([Icons.looks_two_outlined])) return IntentMark.compareMark;
+  if (any([Icons.psychology_outlined])) return IntentMark.moodArc;
+  if (any([Icons.support_outlined, Icons.elderly_outlined, Icons.people_outline])) return IntentMark.cuppedHands;
+  if (any([Icons.child_friendly_outlined])) return IntentMark.feedMark;
+  if (any([Icons.man_outlined])) return IntentMark.stepsMark;
+  if (any([Icons.work_outline])) return IntentMark.compassMark;
+  return IntentMark.pageMark;
+}
+
+class _ShelfItem {
+  _ShelfItem.page(PpPage p)
+      : page = p,
+        tool = null;
+  _ShelfItem.tool(PpDoorTool t)
+      : tool = t,
+        page = null;
+  final PpPage? page;
+  final PpDoorTool? tool;
+  String get title => page?.title ?? tool!.label;
+}
+
+/// The pinned red flag (or a jump to the emergency tab), folded into one white
+/// row: the pregnancy door's `_PinnedRedFlagRow`, a hospital mark with a red
+/// dot, the title, one line of the page's own words, a chevron.
+class _FlagRow extends StatelessWidget {
+  const _FlagRow({
+    super.key,
+    required this.p,
+    required this.title,
+    required this.line,
+    required this.onTap,
+    this.route = false,
+  });
+  final V2Palette p;
+  final String title;
+  final String? line;
+  final VoidCallback onTap;
+
+  /// A route to read first (You, Maa), not a red flag: a hand, no red dot.
+  final bool route;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+        button: true,
+        label: '$title. ${line ?? 'Open'}',
+        excludeSemantics: true,
+        child: PvPress(
+          child: Material(
+            color: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+              side: BorderSide(color: p.line),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              onTap: () {
+                pvCommitFeedback();
+                onTap();
+              },
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(14, 12, 10, 12),
+                child: Row(children: [
+                  SizedBox(
+                    width: 26,
+                    height: 26,
+                    child: Stack(clipBehavior: Clip.none, children: [
+                      Icon(route ? Icons.volunteer_activism_outlined : Icons.local_hospital_outlined,
+                          size: 22, color: p.ink1),
+                      if (!route) Positioned(
+                        right: -1,
+                        top: -1,
+                        child: Container(
+                          width: 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFE5484D),
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white, width: 1.5),
+                          ),
+                        ),
+                      ),
+                    ]),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(title,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: pvManrope(
+                                fontSize: 14, fontWeight: FontWeight.w700, height: 1.3, color: p.ink1)),
+                        if (line != null && line!.isNotEmpty) ...[
+                          const SizedBox(height: 2),
+                          Text(line!,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: pvManrope(fontSize: 12.5, color: p.ink2)),
+                        ],
+                      ],
+                    ),
+                  ),
+                  Icon(Icons.chevron_right_rounded, size: 20, color: p.ink2),
+                ]),
+              ),
+            ),
+          ),
+        ),
+      );
+}
+
+/// The quiet hero: the pregnancy door's `_Hero._quiet`, on a parenting door,
+/// plus the age line. One height on every door (`kPvDoorHeroQuietHeight`).
+class _QuietHero extends StatelessWidget {
+  const _QuietHero({
+    required this.scroll,
+    required this.search,
+    required this.p,
+    required this.tint,
+    required this.title,
+    required this.headline,
+    required this.onSubmitted,
+    this.photo,
+    this.ageLine,
+    this.mark,
+  });
+
+  final ValueListenable<double> scroll;
+  final PvLiveSearch search;
+  final V2Palette p;
+  final Color tint;
+  final String title;
+  final String headline;
+  final ValueChanged<String> onSubmitted;
+  final String? photo;
+  final String? ageLine;
+  final BracketMark? mark;
+
+  static const double _kRate = 0.45;
+  static const double _kFade = 200;
+  static const double _kTopRoom = 58;
+  static const double _bleed = kPpDoorHeroOverlap + PvDoorRail.overlap;
+
+  @override
+  Widget build(BuildContext context) {
+    final top = MediaQuery.paddingOf(context).top;
+    const shadow = [Shadow(color: Color(0x59000000), blurRadius: 12)];
+    final onPhoto = photo != null;
+
+    final words = PvLiveSearchWords(
+      search: search,
+      child: ValueListenableBuilder<double>(
+        valueListenable: scroll,
+        builder: (context, o, child) =>
+            Opacity(opacity: (1 - o / _kFade).clamp(0.0, 1.0), child: child),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(title,
+                key: const ValueKey('pp_door_hero_title'),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: pvFraunces(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w600,
+                  height: 1.12,
+                  letterSpacing: -0.5,
+                  color: onPhoto ? Colors.white : p.ink1,
+                ).copyWith(shadows: onPhoto ? shadow : null)),
+            const SizedBox(height: 6),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 300),
+              child: Text(headline,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: pvManrope(
+                    fontSize: 14.5,
+                    height: 1.4,
+                    fontWeight: FontWeight.w500,
+                    color: onPhoto ? Colors.white.withValues(alpha: 0.95) : p.ink2,
+                  ).copyWith(shadows: onPhoto ? shadow : null)),
+            ),
+            if (ageLine != null) ...[
+              const SizedBox(height: 6),
+              Text(ageLine!,
+                  key: const ValueKey('pp_door_age_line'),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: pvManrope(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w700,
+                    color: onPhoto ? Colors.white : p.ink1,
+                  ).copyWith(shadows: onPhoto ? shadow : null)),
+            ],
+          ],
+        ),
+      ),
+    );
+
+    final field = PvLiveSearchField(
+      key: const ValueKey('pp_door_search'),
+      search: search,
+      p: p,
+      hint: 'Search $title',
+      onSubmitted: onSubmitted,
+    );
+
+    return Stack(clipBehavior: Clip.none, children: [
+      if (photo != null)
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: -_bleed,
+          child: ValueListenableBuilder<double>(
+            valueListenable: scroll,
+            builder: (context, o, child) => Transform.translate(
+              offset: Offset(0, (o * _kRate).clamp(0.0, double.infinity)),
+              child: child,
+            ),
+            child: Stack(fit: StackFit.expand, children: [
+              Image.network(
+                photo!,
+                fit: BoxFit.cover,
+                alignment: Alignment.topCenter,
+                errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                loadingBuilder: (context, child, progress) =>
+                    progress == null ? child : const SizedBox.shrink(),
+              ),
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    colors: [
+                      Colors.black.withValues(alpha: 0.52),
+                      Colors.black.withValues(alpha: 0.38),
+                      Colors.black.withValues(alpha: 0.12),
+                    ],
+                    stops: const [0, 0.62, 1],
+                  ),
+                ),
+              ),
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.black.withValues(alpha: 0.18),
+                      Colors.black.withValues(alpha: 0.0),
+                      Colors.black.withValues(alpha: 0.35),
+                      Colors.black.withValues(alpha: 0.35),
+                    ],
+                    stops: const [0, 0.25, 0.55, 1],
+                  ),
+                ),
+              ),
+            ]),
+          ),
+        ),
+      if (photo == null)
+        Positioned(
+          right: -26,
+          top: 52,
+          child: Opacity(
+            opacity: 0.5,
+            child: SizedBox(
+              width: 146,
+              height: 146,
+              child: mark == null ? const SizedBox.shrink() : V3BracketArt(mark: mark!, tint: tint),
+            ),
+          ),
+        ),
+      Padding(
+        padding: EdgeInsets.only(top: top),
+        child: Stack(alignment: Alignment.bottomLeft, children: [
+          const SizedBox(height: kPvDoorHeroQuietHeight, width: double.infinity),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, _kTopRoom, 22, 20 + PvDoorRail.overlap - 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [words, const SizedBox(height: 18), field],
+            ),
+          ),
+        ]),
+      ),
+      Positioned(
+        top: top + 8,
+        left: 20,
+        child: Material(
+          color: Colors.white.withValues(alpha: 0.55),
+          shape: const CircleBorder(),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            key: const ValueKey('pp_door_back'),
+            onTap: () => Navigator.of(context).maybePop(),
+            child: SizedBox(
+              width: 38,
+              height: 38,
+              child: Icon(Icons.arrow_back_rounded, size: 19, color: p.ink1),
+            ),
+          ),
+        ),
+      ),
+    ]);
+  }
 }

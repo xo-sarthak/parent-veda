@@ -35,7 +35,7 @@ import 'package:flutter/material.dart';
 import '../../theme/pv_fonts.dart';
 import '../memories/memories_home_screen.dart';
 import '../v2/v2_palette.dart';
-import 'community_screen.dart';
+// import 'community_screen.dart'; // kept for revert with the Community entry
 import 'courses_explore_screen.dart';
 import 'explore_drawer.dart';
 // import 'family_profile_screen.dart'; // kept for revert — the Settings row became You on 2026-09-19
@@ -54,9 +54,12 @@ import 'watch_home_screen.dart';
 /// settings screen; the pregnancy `ProfileScreen` needs a `PregnancyController`
 /// and would be the wrong screen for a parent of a toddler.
 List<ExploreEntry> _named() => [
-      ExploreEntry(Icons.people_outline_rounded, 'Community',
-          'Parents whose babies are the same age as ${ChildProfileStore.instance.nameMid}.',
-          const CommunityScreen()),
+      // Community is out of parenting for now (the user, 2026-10-07: "you
+      // don't have to work upon community for now. That feature can be
+      // commented from parenting"). Kept for revert:
+      // ExploreEntry(Icons.people_outline_rounded, 'Community',
+      //     'Parents whose babies are the same age as ${ChildProfileStore.instance.nameMid}.',
+      //     const CommunityScreen()),
       ExploreEntry(Icons.play_circle_outline, 'Watch',
           'Every video, phase by phase.', const WatchHomeScreen()),
       ExploreEntry(Icons.school_outlined, 'Learn',

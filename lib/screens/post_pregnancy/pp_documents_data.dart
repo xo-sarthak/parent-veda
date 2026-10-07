@@ -81,7 +81,11 @@ class BabyDocumentsStore extends ChangeNotifier {
   List<BabyDocument> get documents => List.unmodifiable(_docs);
 
   // ---- persistence (local-first, then cloud) -------------------------------
-  //  ⚠️ Flag #5 - HALF a fix. The ROW syncs; the FILES do not yet. The paths in
+  //  ⚠️ CLOSED 2026-10-07: the add sheet sends files through uploadAttachments
+  //  (pp_attachments.dart), which keeps a copy in the app's documents folder and
+  //  uploads it; the note below is the history. The parenting gap analysis read
+  //  it as still open.
+  //  Flag #5 - HALF a fix (history). The ROW syncs; the FILES do not yet. The paths in
   //  `attachments` are image_picker / file_picker temp paths, which the OS reaps
   //  on its own schedule, so a photographed birth certificate is already rotting
   //  on-device today. Completing this means routing the bytes through

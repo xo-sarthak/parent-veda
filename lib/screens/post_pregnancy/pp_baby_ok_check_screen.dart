@@ -44,7 +44,12 @@ import 'package:flutter/material.dart';
 
 import '../../theme/pv_fonts.dart';
 import '../v2/v2_palette.dart';
+import 'pp_care_log_data.dart';
 import 'pp_content.dart';
+import 'pp_nappy_screen.dart';
+import '../brackets/hub/hub_intent_art.dart' show IntentMark;
+import '../pregnancy/preg_tool_chrome.dart';
+import 'pp_phases_data.dart' show ppFillChild;
 
 /// One check: a question, the answers, and what each answer means.
 class _Check {
@@ -164,9 +169,69 @@ class _PpBabyOkCheckScreenState extends State<PpBabyOkCheckScreen> {
   Widget build(BuildContext context) => AnimatedBuilder(
         animation: V2PaletteStore.instance,
         builder: (context, _) =>
-            _body(context, V2PaletteStore.instance.current),
+            _shell(context, V2PaletteStore.instance.current),
       );
 
+  // The shell every TTC and pregnancy tool wears (2026-10-07). The cards and
+  // the closing line are unchanged; `_body` is the page before, kept for revert.
+  Widget _shell(BuildContext context, V2Palette p) {
+    return PregToolScaffold(
+      hue: 206,
+      eyebrow: 'Health',
+      mark: IntentMark.questionMark,
+      title: 'Is my baby OK?',
+      intro: 'Four things, thirty seconds. Nothing is saved and nothing is scored.',
+      children: [
+        // The emergency line, pinned before the questions (Mobbin audit,
+        // 2026-10-07): CVS Health's symptom check keeps "a medical emergency,
+        // call 911" beside its questions
+        // (mobbin.com/screens/d0cb8fa4-16aa-4fac-8a3b-b25a68236b5b); all the
+        // questions on one page is GoodRx's
+        // (mobbin.com/screens/10977dc0-cd6d-441b-a22c-4ec28a9d593a).
+        pregToolPad(Container(
+          key: const ValueKey('pp_baby_ok_emergency'),
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: const Color(0xFFFFF1F0),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Text(
+              ppFillChild('If he is struggling to breathe, turning blue, floppy or hard to wake, or has a fit, '
+                  'call 112 or 108 now, or go to the nearest hospital.'),
+              style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w600, height: 1.5, color: p.ink1)),
+        )),
+        const SizedBox(height: 18),
+        for (final c in _checks) ...[
+          pregToolPad(_CheckCard(
+            check: c,
+            answer: _answers[c.id],
+            onAnswer: (ok) => setState(() => _answers[c.id] = ok),
+          )),
+          const SizedBox(height: 12),
+        ],
+        const SizedBox(height: 8),
+        pregToolPad(Container(
+          padding: const EdgeInsets.fromLTRB(15, 15, 15, 16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: p.line),
+          ),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text('None of this replaces your own feeling',
+                style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w800, height: 1.55, color: p.ink1)),
+            const SizedBox(height: 6),
+            Text(
+                ppFillChild('If all four look fine and he still seems wrong to you, that is reason enough to '
+                    'have him seen. You do not need a number to be allowed to worry.'),
+                style: pvManrope(fontSize: 13.5, height: 1.6, color: p.ink1)),
+          ]),
+        )),
+      ],
+    );
+  }
+
+  // ignore: unused_element
   Widget _body(BuildContext context, V2Palette p) {
     return Scaffold(
       backgroundColor: p.ground,
@@ -253,6 +318,9 @@ class _CheckCard extends StatelessWidget {
         // The context comes BEFORE the buttons, because a question she cannot
         // answer accurately is worse than no question.
         Text(check.note, style: pvManrope(fontSize: 13, fontWeight: FontWeight.w500, height: 1.55, color: p.ink2)),
+        // The number, from her nappy log (gap analysis P1, 2026-10-07: "She
+        // answers the question with a number, not a guess").
+        if (check.id == 'nappies') ...[const SizedBox(height: 10), const _NappyCount()],
         const SizedBox(height: 14),
         _Option(
           label: check.expected,
@@ -342,6 +410,53 @@ class _Option extends StatelessWidget {
           ),
         ]),
       ),
+    );
+  }
+}
+
+/// Wet nappies in the last 24 hours from the nappy log, and the way to it.
+class _NappyCount extends StatelessWidget {
+  const _NappyCount();
+
+  @override
+  Widget build(BuildContext context) {
+    final store = NappyStore.instance..init();
+    return AnimatedBuilder(
+      animation: store,
+      builder: (context, _) {
+        final p = V2PaletteStore.instance.current;
+        final since = DateTime.now().subtract(const Duration(hours: 24));
+        final logged = store.all.where((n) => n.time.isAfter(since)).toList();
+        final wet = logged.where((n) => n.isWet).length;
+        return InkWell(
+          key: const ValueKey('pp_ok_nappy_count'),
+          borderRadius: BorderRadius.circular(12),
+          onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+            settings: const RouteSettings(name: 'pp_nappies'),
+            builder: (_) => const PpNappyScreen(),
+          )),
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(12, 10, 8, 10),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: p.line),
+            ),
+            child: Row(children: [
+              Icon(Icons.baby_changing_station_outlined, size: 20, color: p.ink1),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  logged.isEmpty
+                      ? 'Keep count with the nappy log: one tap at each change.'
+                      : 'Your nappy log: $wet wet in the last 24 hours.',
+                  style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w700, height: 1.4, color: p.ink1),
+                ),
+              ),
+              Icon(Icons.chevron_right_rounded, size: 20, color: p.ink2),
+            ]),
+          ),
+        );
+      },
     );
   }
 }

@@ -12,6 +12,8 @@ import 'package:parentveda/booking/booking_catalog.dart';
 import 'package:parentveda/booking/booking_models.dart';
 import 'package:parentveda/booking/booking_store.dart';
 import 'package:parentveda/data/mind_mood_data.dart';
+import 'package:parentveda/screens/post_pregnancy/pp_expert_honesty.dart';
+import 'package:parentveda/services/expert_store.dart';
 
 void main() {
   _mindMood();
@@ -36,8 +38,15 @@ void main() {
   });
 
   test('a doctor with availability is an in-app consult (Practo dropped)', () {
-    // Dr. Neha Sharma has timings, so she books in-app now.
-    final o = cat.offeringForCatalog('neha'); // expert id
+    // Was Dr. Neha Sharma, who is fiction (gap analysis P1, 2026-10-07): a
+    // bundled parenting placeholder is never bookable now. The mechanism is
+    // the same for any real expert with timings, e.g. one the panel publishes.
+    expect(cat.offeringForCatalog('neha'), isNull,
+        reason: 'a placeholder doctor must not be bookable');
+    final real = mergedExperts().where(
+        (e) => !ppExpertIsPlaceholder(e) && e.timings.trim().isNotEmpty);
+    if (real.isEmpty) return; // no real supply bundled; nothing else to derive
+    final o = cat.offeringForCatalog(real.first.id);
     expect(o, isNotNull, reason: 'a bookable doctor must derive a consult');
     expect(o!.kind, OfferingKind.consult);
     expect(o.format, SessionFormat.liveOneToOne);

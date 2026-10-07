@@ -530,6 +530,9 @@ String walletEmergencyText() {
     if ((e?.pediatrician ?? '').isNotEmpty) 'PAEDIATRICIAN: ${e!.pediatrician}',
     for (final c in (e?.contacts ?? const []))
       'CONTACT: ${c.name} ${c.phone}',
+    // Printed on every card (gap analysis P1, 2026-10-07): a stranger holding
+    // it may not know the numbers.
+    'EMERGENCY: 112 (any emergency), 108 (ambulance)',
   ];
   return lines.join('\n');
 }

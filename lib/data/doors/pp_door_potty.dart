@@ -50,7 +50,7 @@ final PpDoor kPpPottyDoor = PpDoor(
     ),
     PpDoorTab(
       id: 'su_su',
-      label: 'Catching the su-su',
+      label: 'Catching the wee early',
       icon: Icons.water_drop_outlined,
       hue: 206,
       areaIds: ['su_su_way'],

@@ -225,8 +225,14 @@ PvProduct _fromPp(pp.PpProduct p) {
     buyUrl: p.buyUrl,
     soldHere: p.parentVeda || p.brand == 'ParentVeda',
     reviewOnly: p.reviewOnly,
-    rating: p.rating,
-    reviewCount: p.reviews,
+    // ⚠️ NO SEED REVIEWS ON SHOW, the TTC rule carried to parenting (gap
+    // analysis P1, Behind · Trust, 2026-10-07: "Every product shows the same
+    // two Verified purchase reviews"; fake verified reviews are a consumer
+    // protection problem in India). The editorial band, reason and "before you
+    // buy" stay. A demo build can show them with the same define as TTC.
+    // Kept for revert: rating: p.rating, reviewCount: p.reviews,
+    rating: kPpShowSeedReviews ? p.rating : 0,
+    reviewCount: kPpShowSeedReviews ? p.reviews : 0,
     reco: g == null
         ? null
         : PvRecommend(
@@ -244,11 +250,13 @@ PvProduct _fromPp(pp.PpProduct p) {
       if (p.specs.isEmpty) ...[for (final s in g?.specs ?? const []) (s.label, s.value)],
     ],
     reviews: [
+      if (kPpShowSeedReviews)
       for (final e in g?.experiences ?? const [])
         PvParentReview(
             author: e.author, context: e.context, stars: e.stars, text: e.text),
     ],
     experts: [
+      if (kPpShowSeedReviews)
       for (final x in g?.experts ?? const [])
         PvExpertVoice(
             name: x.name,
@@ -259,8 +267,8 @@ PvProduct _fromPp(pp.PpProduct p) {
     ],
     // The Guide already showed these on its own hub; carried, never derived
     // here. A product without a Guide gets nothing.
-    parentsPct: p.parentsPct ?? g?.parentsPct,
-    expertsPct: p.expertsPct ?? g?.expertsPct,
+    parentsPct: kPpShowSeedReviews ? (p.parentsPct ?? g?.parentsPct) : null,
+    expertsPct: kPpShowSeedReviews ? (p.expertsPct ?? g?.expertsPct) : null,
     ingredients: [
       for (final i in g?.ingredients ?? const [])
         PvIngredient(
@@ -448,5 +456,16 @@ const bool kTtcShowSeedReviews = bool.fromEnvironment('PV_TTC_SEED_REVIEWS');
 /// [kTtcShowSeedReviews] (H13, 2026-09-28). The day a real, signed expert
 /// quote exists for a TTC product, it goes in the source record
 /// (`p.experts`), which this gate never hides.
-bool pvShowsSeedVoices(PvProduct p) =>
-    p.stage != LifeStage.tryingToConceive || kTtcShowSeedReviews;
+bool pvShowsSeedVoices(PvProduct p) => switch (p.stage) {
+      LifeStage.tryingToConceive => kTtcShowSeedReviews,
+      LifeStage.parenting => kPpShowSeedReviews,
+      _ => true,
+    };
+// Before parenting joined the gate (2026-10-07). Kept for revert:
+// bool pvShowsSeedVoices(PvProduct p) =>
+//     p.stage != LifeStage.tryingToConceive || kTtcShowSeedReviews;
+
+/// The parenting shelf's seed ratings, counts, parent quotes, expert quotes and
+/// "% parents / % experts": off until real ones exist (gap analysis P1,
+/// 2026-10-07). The same define as TTC turns both on for a demo build.
+const bool kPpShowSeedReviews = bool.fromEnvironment('PV_TTC_SEED_REVIEWS');

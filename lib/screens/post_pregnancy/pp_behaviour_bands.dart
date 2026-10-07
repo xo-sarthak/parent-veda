@@ -70,7 +70,7 @@ const PpArea kBehZiddi = PpArea(
   // broken, and it is the mark this app already uses for "getting better at
   // something" elsewhere. Meaning picks the mark, per hub_intent_art.dart.
   mark: IntentMark.improveMark,
-  title: 'The ziddi child',
+  title: 'The stubborn child',
   blurb: 'Stubbornness, and what to do with a will that has arrived before the '
       'words have.',
   hue: 344,
@@ -78,26 +78,26 @@ const PpArea kBehZiddi = PpArea(
   pages: [
     PpPage(
       id: 'beh_ziddi',
-      title: 'How to handle a ziddi bachcha',
+      title: 'How to handle a stubborn child',
       format: 'ARTICLE',
       bands: _bandBC,
       blocks: [
         PpVideoSlot(
-          title: 'Ziddi is not naughty',
+          title: 'Stubborn is not naughty',
           subtitle: 'A child psychologist on what stubbornness at two actually '
               'is, and why breaking it is the wrong goal.',
           minutes: '6 MIN',
           slotId: 'behaviour/ziddi_reframe',
         ),
         PpIntro('Somewhere around eighteen months a child works out that he is '
-            'a separate person with his own opinions. Ziddi is that discovery '
+            'a separate person with his own opinions. Stubbornness is that discovery '
             'arriving before he has the words, the patience or the sense of '
             'time to express it any other way.'),
         PpArticle(heading: 'Why it is happening', [
           'A two-year-old wants things with an intensity adults have mostly '
               'forgotten. He also has almost no ability to wait, no way to '
               'argue his case, and no concept of "later". When those three '
-              'meet a no, what comes out is what we call ziddi.',
+              'meet a no, what comes out is what we call being stubborn.',
           'It is worth being honest about the reframe, because it is not a '
               'trick: the trait underneath, knowing his own mind and holding '
               'on to it, is one you will spend his teenage years being '
@@ -129,7 +129,7 @@ const PpArea kBehZiddi = PpArea(
               'Not because it spoils him, but because it teaches that the '
               'answer changes if he pushes for long enough.'),
           PpCard('Do not label him',
-              '"Ziddi bachcha" said often enough stops being a description and '
+              '"Stubborn child" said often enough stops being a description and '
               'becomes an identity he lives up to.'),
           PpCard('Do not hit',
               'It ends the moment and teaches that the biggest person decides. '
@@ -166,7 +166,7 @@ const PpArea kBehZiddi = PpArea(
         PpWhenLine('Peaks between about eighteen months and three years, and '
             'eases as language arrives.'),
         PpIndiaNote('In a joint family you are often managing an audience as '
-            'well as a child, and "yeh toh bahut ziddi hai" gets said in front '
+            'well as a child, and "this one is so stubborn" gets said in front '
             'of him. You are allowed to handle it your way and explain later, '
             'and elders are usually more persuaded by a calm child a month on '
             'than by an argument today.'),
@@ -212,7 +212,7 @@ const PpArea kBehZiddi = PpArea(
         ], heading: 'What it is not', hue: 344),
         PpWhenLine('Works from about eighteen months, and keeps working for '
             'years with bigger choices.'),
-        PpLink('The whole ziddi picture',
+        PpLink('The whole stubborn picture',
             pageId: 'beh_ziddi',
             blurb: 'Why the will arrives before the words.'),
       ],
@@ -456,7 +456,7 @@ const PpArea kBehDiscipline = PpArea(
               'It undermines them, and it teaches him that adults can be '
               'overruled in public.'),
           PpStep('Accept a different house has different rules',
-              'Children handle "at dadi house it is different" much better than '
+              'Children handle "at Grandma\'s house it is different" much better than '
               'they handle their parents fighting about it.'),
         ], heading: 'What tends to work'),
         PpWhenLine('Any age, and it gets easier as they see the results.'),

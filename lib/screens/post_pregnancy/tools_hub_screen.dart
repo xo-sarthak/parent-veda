@@ -37,6 +37,7 @@ import '../../brand/launch_hub_screen.dart';
 import '../product_guide/product_guide_hub_screen.dart';
 import 'pp_common.dart';
 import 'products_compare_screen.dart';
+import 'pp_vaccine_data.dart' show VaxStore;
 import 'vax_tracker_screen.dart';
 // Redesigned tracker (vax_tracker_screen) is the live entry now; the old
 // VaccinationScreen is kept for revert.
@@ -45,13 +46,17 @@ import 'vax_tracker_screen.dart';
 // import 'leap_definition_screen.dart';
 // import 'pp_leaps_data.dart';
 import 'what_changed_screen.dart';
+
+export 'pp_tools_tab.dart' show ToolsHubScreen;
 // "Wonder Week Window" now opens the full leap page (LeapDefinitionScreen) for
 // the child's current leap — the standalone WonderWeekScreen is kept for revert
 // but no longer wired here.
 // import 'wonder_week_screen.dart';
 
-class ToolsHubScreen extends StatelessWidget {
-  const ToolsHubScreen({super.key});
+// Superseded 2026-10-07 by the one-ParentVeda Tools tab (pp_tools_tab.dart,
+// exported below under the old name). Kept for revert.
+class ToolsHubClassic extends StatelessWidget {
+  const ToolsHubClassic({super.key});
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
 
@@ -139,7 +144,9 @@ class ToolsHubScreen extends StatelessWidget {
               // _tracker(context, Icons.compare_arrows_rounded, const Color(0xFFEDEAF7), 'Compare products', 'Two picks, side by side', ppPurple,
               //     () => _push(context, const ProductsCompareScreen())),
               // const SizedBox(height: 10),
-              _tracker(context, Icons.vaccines_outlined, const Color(0xFFFBEAF0), 'Vaccination schedule', 'Next due in 3 weeks', ppCoral,
+              // Was a fixed 'Next due in 3 weeks' for every child; computed
+              // since 2026-10-02 (gap analysis P1).
+              _tracker(context, Icons.vaccines_outlined, const Color(0xFFFBEAF0), 'Vaccination schedule', VaxStore.instance.nextVisitSubtitle, ppCoral,
                   () => _push(context, const VaxTrackerScreen())),
               const SizedBox(height: 10),
               // Was: direct to the V1 finder - now opens the V1|V2 front door.

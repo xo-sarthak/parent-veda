@@ -253,7 +253,9 @@ void main() {
       // father branch is its first line — before any stage is consulted.
       final i = splash.indexOf('Route<void> _homeFor(');
       expect(i, greaterThan(0));
-      final body = splash.substring(i, splash.indexOf('}', i));
+      // The whole function (2026-10-07): a father in parenting now has his own
+      // braced branch first, so the first '}' no longer ends `_homeFor`.
+      final body = splash.substring(i, splash.indexOf('Route<void> _parentingRoute(', i));
       expect(body.indexOf("role == 'father'"), lessThan(body.indexOf('tryingToConceive')),
           reason: 'a father declaring "trying" would lose his Slate shell');
     });

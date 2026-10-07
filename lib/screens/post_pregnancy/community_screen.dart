@@ -19,6 +19,7 @@
 
 import 'dart:io';
 
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -34,6 +35,7 @@ import 'pp_community_detail_screen.dart';
 import 'pp_create_post_screen.dart';
 import 'pp_post_detail_screen.dart';
 import 'pp_section_extras.dart';
+import 'pp_opening_soon.dart';
 
 // The identity used while testing "Doctor mode" for the parenting side (until
 // real doctor logins exist). Display-only - the store's endorsement bookkeeping
@@ -816,6 +818,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
   @override
   void initState() {
     super.initState();
+    if (!kPpCommunityOpen) return; // no seeded auto-joins while closed
     if (_seededParentingAutos) return;
     // Auto-join the default parenting rooms once, AFTER the first frame (a
     // toggleJoin() during initState would fire notifyListeners mid-build).
@@ -835,6 +838,8 @@ class _CommunityScreenState extends State<CommunityScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Seeded until real (gap analysis P1, 2026-10-07): see pp_opening_soon.dart.
+    if (!kPpCommunityOpen) return ppCommunityOpeningSoon();
     return Scaffold(
       backgroundColor: ppBg,
       body: Stack(children: [
@@ -971,7 +976,9 @@ class _CommunityScreenState extends State<CommunityScreen> {
   Widget _utilityRow() => Padding(
         padding: const EdgeInsets.fromLTRB(20, 2, 10, 0),
         child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-          IconButton(
+          // A parent could post as a verified paediatrician with one tap
+          // (gap analysis P1). Debug builds only, never a release.
+          if (kDebugMode) IconButton(
             tooltip: 'Doctor mode (test)',
             visualDensity: VisualDensity.compact,
             color: _s.doctorMode ? ppPurple : ppInk,

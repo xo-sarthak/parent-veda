@@ -53,7 +53,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+// import 'package:url_launcher/url_launcher.dart'; // kept for revert: the buy link now goes through openOutbound
 
 import '../../data/products/pv_product_extras.dart' show kPvIllustrativePhotoIds;
 import '../../models/pv_product.dart';
@@ -72,6 +72,7 @@ import 'pv_review_block.dart';
 import 'pv_reviews_screen.dart';
 import 'pv_store_chrome.dart';
 import 'pv_store_marks.dart' show kPvStoreMarkHue;
+import '../../brand/outbound.dart' show openOutbound, kPvCommissionLine;
 
 /// The pack size, for the line under the price (2026-09-29). Derived, never
 /// stored: the size she picked, else the first size (whose price is shown),
@@ -303,13 +304,10 @@ class _PvProductScreenState extends State<PvProductScreen> {
     );
     if (go != true || !mounted) return;
     final url = p.buyUrl ?? '';
-    var ok = false;
-    try {
-      ok = await launchUrl(
-        Uri.parse(url),
-        mode: LaunchMode.externalApplication,
-      );
-    } catch (_) {}
+    // Through the one door out (2026-10-07): it adds the partner tag and the
+    // click event, so the commission line under the button is true. Kept for
+    // revert: launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication).
+    final ok = await openOutbound(url, productId: p.id);
     if (!ok && mounted) {
       pvSnack(context, 'Could not open ${p.retailer}. Please try again.');
     }
@@ -2172,13 +2170,20 @@ class _PvProductScreenState extends State<PvProductScreen> {
             const SizedBox(width: 12),
           ],
           Expanded(
-            child: PvCommit(
-              key: const ValueKey('pv_product_primary'),
-              label:
-                  'Buy on ${product.retailer.isEmpty ? 'retailer' : product.retailer}',
-              icon: Icons.open_in_new_rounded,
-              onTap: () => _buyAffiliate(product),
-            ),
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              PvCommit(
+                key: const ValueKey('pv_product_primary'),
+                label:
+                    'Buy on ${product.retailer.isEmpty ? 'retailer' : product.retailer}',
+                icon: Icons.open_in_new_rounded,
+                onTap: () => _buyAffiliate(product),
+              ),
+              const SizedBox(height: 6),
+              Text(kPvCommissionLine,
+                  key: const ValueKey('pv_product_commission'),
+                  textAlign: TextAlign.center,
+                  style: pvManrope(fontSize: 11, height: 1.4, color: p.ink3)),
+            ]),
           ),
         ],
       );

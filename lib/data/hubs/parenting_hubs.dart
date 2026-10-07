@@ -536,7 +536,7 @@ final HubConfig kPpBuying = HubConfig(
   coreQuestion: 'What do I actually need, and how do I choose between the '
       'options?',
   hero: _en('Buying for your child, without the overwhelm.'),
-  heroSupport: _en('What is genuinely worth it, what to skip, and how to '
+  heroSupport: _en('What is worth it, what to skip, and how to '
       'choose between real options.'),
   needsTitle: _en('What do you need?'),
   needs: [
@@ -547,6 +547,16 @@ final HubConfig kPpBuying = HubConfig(
       mark: IntentMark.listMark,
       hue: 12,
       surfaceId: 'pp_product_guide',
+    ),
+    // The buying guides (gap analysis P3, 2026-10-07): how to choose a car
+    // seat, cot, pram, carrier, high chair and first shoes. No brands.
+    HubNeed(
+      label: _en('How to choose'),
+      blurb: _en('What matters and what to skip, for a car seat, cot, pram, '
+          'carrier, high chair and first shoes.'),
+      mark: IntentMark.checkMark,
+      hue: 160,
+      surfaceId: 'pp_buying_guides',
     ),
     HubNeed(
       label: _en('Compare & choose'),
@@ -577,7 +587,7 @@ final HubConfig kPpTraditional = HubConfig(
   needs: [
     HubNeed(
       label: _en('Explore a tradition'),
-      blurb: _en('Annaprashan, mundan, malish and more. What they mean, '
+      blurb: _en('The first rice feeding, the first haircut, baby massage and more. What they mean, '
           'and what the evidence actually says.'),
       mark: IntentMark.lampMark,
       hue: 206,
@@ -602,6 +612,92 @@ final HubConfig kPpTraditional = HubConfig(
 
 );
 
+// -----------------------------------------------------------------------------
+//  Keeping him safe — 1 door, so the tile opens the section's door directly
+// -----------------------------------------------------------------------------
+//  Added 2026-10-02 from the parenting gap analysis. One need and no closing,
+//  for the reason kPpTraditional gives: a one-need hub never renders a hub
+//  screen, and the door carries its own closing offer.
+final HubConfig kPpSafety = HubConfig(
+  bracketId: 'parenting_safety',
+  template: HubTemplate.immediateAnswer,
+  coreQuestion: 'Is my home safe for him, and what do I do if something '
+      'happens?',
+  hero: _en('The small changes that prevent most accidents.'),
+  heroSupport: _en('Room by room, water, the road, and first aid before '
+      'help arrives.'),
+  needsTitle: _en('What do you need?'),
+  needs: [
+    HubNeed(
+      label: _en('Keep your child safe'),
+      blurb: _en('Babyproofing, water, car seats, heat and first aid.'),
+      mark: IntentMark.checkMark,
+      hue: 28,
+      surfaceId: 'pp_section/parenting_safety',
+    ),
+  ],
+);
+
+// Added 2026-10-02 from the parenting gap analysis. One need, no closing,
+// for the reason kPpTraditional gives: the door carries its own.
+final HubConfig kPpFamily = HubConfig(
+  bracketId: 'parenting_family',
+  template: HubTemplate.immediateAnswer,
+  coreQuestion: 'How do we help everyone in the house adjust to this child?',
+  hero: _en('Help for everyone in the house, not just the parents.'),
+  heroSupport: _en('A second baby, fathers, grandparents, siblings and who looks after him.'),
+  needsTitle: _en('What do you need?'),
+  needs: [
+    HubNeed(
+      label: _en('Help my family'),
+      blurb: _en('A second baby, fathers, grandparents, siblings and childcare.'),
+      mark: IntentMark.cuppedHands,
+      hue: 322,
+      surfaceId: 'pp_section/parenting_family',
+    ),
+  ],
+);
+
+// Added 2026-10-02 from the parenting gap analysis. One need, no closing,
+// for the reason kPpTraditional gives: the door carries its own.
+final HubConfig kPpSpecialCare = HubConfig(
+  bracketId: 'parenting_special_care',
+  template: HubTemplate.immediateAnswer,
+  coreQuestion: 'My child needs more care: what should I expect, and where is help?',
+  hero: _en('When your child needs a little more.'),
+  heroSupport: _en('Born early, twins, sensory and developmental needs, and help in India.'),
+  needsTitle: _en('What do you need?'),
+  needs: [
+    HubNeed(
+      label: _en('Find support'),
+      blurb: _en('The NICU, twins, early help and where to get it in India.'),
+      mark: IntentMark.compassMark,
+      hue: 344,
+      surfaceId: 'pp_section/parenting_special_care',
+    ),
+  ],
+);
+
+// Added 2026-10-02 from the parenting gap analysis. One need, no closing,
+// for the reason kPpTraditional gives: the door carries its own.
+final HubConfig kPpPapers = HubConfig(
+  bracketId: 'parenting_papers',
+  template: HubTemplate.immediateAnswer,
+  coreQuestion: 'Which documents, schemes and money steps does my child need?',
+  hero: _en('The forms, the schemes and the money, made simple.'),
+  heroSupport: _en('Birth certificate, Aadhaar, passport, schemes, insurance and saving.'),
+  needsTitle: _en('What do you need?'),
+  needs: [
+    HubNeed(
+      label: _en('Sort out papers and money'),
+      blurb: _en('Documents, schemes, insurance and saving.'),
+      mark: IntentMark.listMark,
+      hue: 42,
+      surfaceId: 'pp_section/parenting_papers',
+    ),
+  ],
+);
+
 /// Every parenting hub — all eleven brackets.
 final List<HubConfig> kParentingHubs = [
   kPpSleep,
@@ -615,4 +711,8 @@ final List<HubConfig> kParentingHubs = [
   kPpMaternal,
   kPpBuying,
   kPpTraditional,
+  kPpSafety,
+  kPpFamily,
+  kPpSpecialCare,
+  kPpPapers,
 ];

@@ -114,6 +114,7 @@ class PvShelfCard extends StatelessWidget {
     required this.title,
     required this.onTap,
     this.fact,
+    this.kindWord,
     this.paid = false,
     this.live = false,
     this.mark,
@@ -149,13 +150,18 @@ class PvShelfCard extends StatelessWidget {
   /// Not made yet: the same card a shade back, and not tappable.
   final bool comingSoon;
   final VoidCallback onTap;
+
+  /// The word on the grey line when the kind's own word would mislead
+  /// (parenting, 2026-10-07: a story is not an "Article", an activity is not a
+  /// "Game"). Null uses the kind's word, as every pregnancy card does.
+  final String? kindWord;
   final double width;
 
   Color get _ground => HSLColor.fromAHSL(1, hue % 360, 0.52, 0.9).toColor();
   Color get _artTint => HSLColor.fromAHSL(1, hue % 360, 0.6, 0.8).toColor();
 
   String get _line => [
-        pvShelfKindWord(kind),
+        kindWord ?? pvShelfKindWord(kind),
         if (fact != null && fact!.isNotEmpty) fact!,
       ].join(' · ');
 
@@ -262,7 +268,7 @@ class PvShelfCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final label = comingSoon ? '$title, ${pvShelfKindWord(kind)}, coming soon' : '$title, $_line';
+    final label = comingSoon ? '$title, ${kindWord ?? pvShelfKindWord(kind)}, coming soon' : '$title, $_line';
     final film = kind == PvShelfKind.video;
     return Semantics(
       button: !comingSoon,

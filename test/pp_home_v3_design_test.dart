@@ -31,7 +31,10 @@ import 'package:parentveda/screens/post_pregnancy/pp_home_changes.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_home_v3.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_more_sheet.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_phases_data.dart';
+import 'package:parentveda/screens/post_pregnancy/pp_child_profile.dart';
+import 'package:parentveda/screens/post_pregnancy/pp_tile_order.dart';
 import 'package:parentveda/services/bracket_resolver.dart';
+import 'package:parentveda/services/family_profile.dart';
 import 'package:parentveda/services/life_stage_store.dart';
 
 void main() {
@@ -178,8 +181,9 @@ void main() {
     test('the More sheet reaches every Explore drawer row exactly once', () {
       final sheet = ppMoreSheetEntries();
       final titles = sheet.map((e) => e.title).toList();
-      expect(titles.first, 'Community',
-          reason: 'Community lost its tab; it is first in More');
+      // Community is out of parenting for now (the user, 2026-10-07).
+      // Kept for revert: expect(titles.first, 'Community', ...).
+      expect(titles, isNot(contains('Community')));
       expect(titles.toSet().length, titles.length, reason: 'no duplicates');
       // Every drawer destination is in the sheet — by screen type, since the
       // sheet renames a few (Courses & Masterclasses → Learn).
@@ -210,20 +214,23 @@ void main() {
       }
     }
 
-    testWidgets('the tiles are in registry order — Sleep first, not What to buy',
+    testWidgets('the tiles follow the age and priority order (pp_tile_order.dart)',
         (tester) async {
-      // ⚠️ REVERSED 2026-09-18. The 2026-09-16 brief hoisted What to buy to
-      // the first tile; the user on the phone: "the door positioning should
-      // be like the way it was." Registry order, Sleep first.
+      // ⚠️ CHANGED 2026-10-07. Registry order (the user, 2026-09-18) gave way
+      // to age and priority order when the user turned kPpTileOrderByAge on:
+      // "You can turn that switch on." Every tile is still drawn; only the
+      // order moves, and it is the one ppTileOrder computes.
       await tester.pumpWidget(const MaterialApp(home: PpHomeV3()));
       await tester.pump(const Duration(milliseconds: 400));
       expect(tester.takeException(), isNull);
 
-      final labels = bracketsFor(LifeStage.parenting)
-          .map((b) => b.label.en)
-          .toList();
+      final all = bracketsFor(LifeStage.parenting);
+      final f = FamilyProfileStore.instance;
+      final order = ppTileOrder([for (final b in all) b.id],
+          ageInDays: ChildProfileStore.instance.ageInDays, priorities: f.priorities, birthMode: f.birthMode);
+      final byId = {for (final b in all) b.id: b.label.en};
+      final labels = [for (final id in order) byId[id]!];
       final first = labels.first;
-      expect(first.toLowerCase(), contains('sleep'));
       final firstPos = tester.getTopLeft(find.text(first).first);
       for (final l in labels) {
         if (l == first) continue;
@@ -266,11 +273,12 @@ void main() {
     testWidgets('the video sits above the phase text', (tester) async {
       await tester.pumpWidget(const MaterialApp(home: PpHomeV3()));
       await tester.pump(const Duration(milliseconds: 400));
-      await scrollUntil(tester, 'THIS PHASE EXPLAINED');
+      // Pregnancy's heading and film since 2026-10-07 (pp_phase_film.dart).
+      await scrollUntil(tester, 'This phase, explained');
       await tester.pump(const Duration(milliseconds: 200));
 
-      final head = find.textContaining('THIS PHASE EXPLAINED', skipOffstage: false);
-      final play = find.byIcon(Icons.play_arrow_rounded, skipOffstage: false);
+      final head = find.textContaining('This phase, explained', skipOffstage: false);
+      final play = find.byKey(const ValueKey('pp_phase_film'), skipOffstage: false);
       final readMore =
           find.textContaining('Read the full description', skipOffstage: false);
       expect(head, findsOneWidget);

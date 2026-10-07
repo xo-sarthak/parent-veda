@@ -46,6 +46,7 @@ class PvDoorRail extends StatefulWidget {
     required this.selected,
     required this.p,
     required this.onPick,
+    this.locked = const [],
   });
 
   final List<PvDoorGroup> groups;
@@ -53,6 +54,11 @@ class PvDoorRail extends StatefulWidget {
   final int selected;
   final V2Palette p;
   final ValueChanged<int> onPick;
+
+  /// Parenting's age rule (2026-10-07): a tab the child has not reached yet is
+  /// shown misted with a lock instead of the chevron, and still opens (to the
+  /// panel that says when). Empty for pregnancy and TTC, which never lock.
+  final List<bool> locked;
 
   // ⚠️ TTC'S DOOR RAIL, QUIETER (2026-10-02, the user: make the pregnancy
   // doors the same as TTC's). 150 wide so a fifth of the third card shows, 112
@@ -133,7 +139,10 @@ class _PvDoorRailState extends State<PvDoorRail> {
     final on = i == widget.selected;
     final tint = v2BlockTint(g.hue % 360, p);
     final count = i < widget.counts.length ? widget.counts[i] : '';
-    return PvPress(
+    final isLocked = i < widget.locked.length && widget.locked[i];
+    return Opacity(
+      opacity: isLocked && !on ? 0.62 : 1,
+      child: PvPress(
       key: pvDoorRailCardKey(i),
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
@@ -172,8 +181,11 @@ class _PvDoorRailState extends State<PvDoorRail> {
               // group's tint. Drawn, not a glyph, either way.
               if (PvDoorRail.bareMark)
                 SizedBox(
-                  width: PvDoorRail.markSize,
-                  height: PvDoorRail.markSize,
+                  // A locked card carries one more line (the age it opens),
+                  // so its mark is smaller: at 1.5x text the 38 mark, a label
+                  // and that line were 6pt over the 112 card.
+                  width: isLocked ? 28 : PvDoorRail.markSize,
+                  height: isLocked ? 28 : PvDoorRail.markSize,
                   // The TTC family's object where there is one (2026-10-02),
                   // else the tab's own mark, as before.
                   child: ttcFamilyMarkForIntent(g.mark, tint, forDoor: true) ??
@@ -207,7 +219,8 @@ class _PvDoorRailState extends State<PvDoorRail> {
                       // rather than the card clip it. Kept for revert:
                       // `maxLines: 2` always.
                       Text(g.label,
-                          maxLines: MediaQuery.textScalerOf(context).scale(10) > 13
+                          maxLines: isLocked ||
+                                  MediaQuery.textScalerOf(context).scale(10) > 13
                               ? 1
                               : 2,
                           overflow: TextOverflow.ellipsis,
@@ -220,7 +233,10 @@ class _PvDoorRailState extends State<PvDoorRail> {
                       // ⚠️ NO COUNT LINE (2026-10-02), as TTC's quiet tab card:
                       // the number of pieces under a tab is not what she
                       // chooses by. Kept for revert: `kPvDoorRailQuiet = false`.
-                      if (!kPvDoorRailQuiet && count.isNotEmpty) ...[
+                      // A locked tab keeps its one line, the age it opens
+                      // ("Locked · From 1 year"): that IS what she needs to
+                      // know about it (parenting, 2026-10-07).
+                      if ((!kPvDoorRailQuiet || isLocked) && count.isNotEmpty) ...[
                         const SizedBox(height: 3),
                         Text(count,
                             maxLines: 1,
@@ -234,12 +250,18 @@ class _PvDoorRailState extends State<PvDoorRail> {
                   ),
                 ),
                 const SizedBox(width: 6),
-                Icon(Icons.chevron_right_rounded, size: 20, color: p.ink2),
+                Icon(
+                    isLocked
+                        ? Icons.lock_outline_rounded
+                        : Icons.chevron_right_rounded,
+                    size: isLocked ? 17 : 20,
+                    color: p.ink2),
               ]),
             ],
           ),
         ),
       ),
+    ),
     );
   }
 }

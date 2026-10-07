@@ -9,11 +9,13 @@
 //  transparent *estimate*: a z-score against the WHO 50th-centile reference in
 //  pp_child_profile, using published coefficients of variation - honest and
 //  reassuring, not clinical software. Prototype-shaped: seeded, no persistence.
-//  Reference table covers 0–12 months (older ages clamp to 12 for now).
+//  Since 2026-10-02 the reference is the WHO LMS tables, birth to five years
+//  (pp_who_growth_lms.dart); it used to stop at 12 months and estimate the
+//  spread from a flat coefficient of variation.
 // =============================================================================
 
 import 'dart:convert';
-import 'dart:math' as math;
+// import 'dart:math' as math; // only the retired flat-CV estimate used it; kept for revert
 
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -23,6 +25,7 @@ import '../../services/remote/supabase_repo.dart';
 import '../../services/remote/sync_registry.dart';
 import 'pp_child_profile.dart';
 import 'pp_health_data.dart';
+import 'pp_who_growth_lms.dart';
 
 /// The metrics we chart. Head circumference is optional per measurement.
 enum GrowthMetric { weight, height, head }
@@ -198,6 +201,13 @@ class GrowthStore extends ChangeNotifier {
   /// The percentile (1–99) for [value] of [metric] at [ageMonths] for this
   /// child's sex, or null if the metric value is missing.
   int? percentile(GrowthMetric metric, double? value, double ageMonths) {
+    if (value == null || value <= 0) return null;
+    final z = whoZ(_who(metric), _child.isBoy, ageMonths, value);
+    if (z.isNaN) return null;
+    return whoPercentileOfZ(z).round().clamp(1, 99);
+  }
+
+  /* Kept for revert: the flat-CV estimate, 0-12 months only.
     if (value == null) return null;
     final median = _median(metric, ageMonths);
     final sd = _sd(metric, median);
@@ -207,6 +217,13 @@ class GrowthStore extends ChangeNotifier {
     final p = 1 / (1 + math.exp(-1.702 * z));
     return (p * 100).round().clamp(1, 99);
   }
+  */
+
+  static WhoIndicator _who(GrowthMetric m) => switch (m) {
+        GrowthMetric.weight => WhoIndicator.weight,
+        GrowthMetric.height => WhoIndicator.length,
+        GrowthMetric.head => WhoIndicator.head,
+      };
 
   /// Percentile of the latest measurement for [metric].
   int? latestPercentile(GrowthMetric metric) {
@@ -215,6 +232,20 @@ class GrowthStore extends ChangeNotifier {
     return percentile(metric, m.value(metric), m.ageMonthsAt(_child.dob));
   }
 
+  /// The shaded "typical range" (z -1 to +1, about the 16th to 84th centile)
+  /// for a metric at an age, read from the WHO LMS tables, so the band is
+  /// skewed where weight really is skewed.
+  (double lo, double mid, double hi) band(GrowthMetric metric, double ageMonths) {
+    final i = _who(metric);
+    final boy = _child.isBoy;
+    return (
+      whoValueAt(i, boy, ageMonths, -1),
+      whoValueAt(i, boy, ageMonths, 0),
+      whoValueAt(i, boy, ageMonths, 1),
+    );
+  }
+
+  /* Kept for revert: the 12-month median and the flat-CV spread.
   /// The WHO 50th-centile value for a metric at an age (reused reference table).
   double _median(GrowthMetric metric, double ageMonths) {
     final ref = expectedGrowth(ageMonths.round(), boy: _child.isBoy);
@@ -239,6 +270,7 @@ class GrowthStore extends ChangeNotifier {
     final sd = _sd(metric, mid);
     return (mid - sd, mid, mid + sd);
   }
+  */
 
   // ---- interpretation (reassuring, continuity over number) ----------------
   /// The emotional headline for the hero — never "65th percentile".
@@ -273,15 +305,77 @@ class GrowthStore extends ChangeNotifier {
   String get percentileMeaning =>
       'A percentile compares $name with other babies of the same age and sex. Being in, say, the 30th percentile does not mean unhealthy — perfectly healthy babies fall right across the range. What matters most is that $name keeps following his own curve.';
 
+  // The WHO's printed centile lines. Crossing two of them between two
+  // measurements is the standard "worth a look" rule.
+  static const _lines = [2.0, 9.0, 25.0, 50.0, 75.0, 91.0, 98.0];
+
+  int _linesBetween(double a, double b) {
+    final lo = a < b ? a : b;
+    final hi = a < b ? b : a;
+    return _lines.where((l) => l > lo && l < hi).length;
+  }
+
+  double? _exactPercentile(GrowthMetric metric, GrowthMeasurement m) {
+    final v = m.value(metric);
+    if (v == null || v <= 0) return null;
+    final z = whoZ(_who(metric), _child.isBoy, m.ageMonthsAt(_child.dob), v);
+    return z.isNaN ? null : whoPercentileOfZ(z);
+  }
+
+  /// Metrics whose latest point is below the 3rd or above the 97th centile,
+  /// or whose curve crossed two centile lines since the previous point.
+  /// REQUIRED_REVIEW (paediatrician): the thresholds are the common
+  /// screening ones, not a diagnosis.
+  Set<GrowthMetric> get worthShowing {
+    final out = <GrowthMetric>{};
+    final list = all;
+    if (list.isEmpty) return out;
+    for (final metric in GrowthMetric.values) {
+      final p = _exactPercentile(metric, list.first);
+      if (p == null) continue;
+      if (p < 3 || p > 97) out.add(metric);
+      if (list.length > 1) {
+        final q = _exactPercentile(metric, list[1]);
+        if (q != null && _linesBetween(p, q) >= 2) out.add(metric);
+      }
+    }
+    return out;
+  }
+
+  String _flagReason(GrowthMetric metric) {
+    final list = all;
+    final p = _exactPercentile(metric, list.first)!;
+    if (p < 3) return 'below the 3rd centile';
+    if (p > 97) return 'above the 97th centile';
+    final q = _exactPercentile(metric, list[1])!;
+    return p < q ? 'lower on the chart than last time, by more than one centile band' : 'higher on the chart than last time, by more than one centile band';
+  }
+
   /// Contextual AI-style observations.
   List<String> get insights {
     if (isEmpty) return const [];
     final out = <String>[];
-    final wp = latestPercentile(GrowthMetric.weight);
-    final hp = latestPercentile(GrowthMetric.height);
-    if (wp != null) out.add('Weight is tracking around the ${_ordinalBand(wp)} — comfortably within the healthy range.');
-    if (hp != null) out.add('Height is following the ${_ordinalBand(hp)}, growing in step with age.');
-    if (hasHead) out.add('Head growth is following its expected pattern.');
+    // final wp = latestPercentile(GrowthMetric.weight);
+    // final hp = latestPercentile(GrowthMetric.height);
+    // ⚠️ NO FIXED REASSURANCE (gap analysis P1, 2026-10-02). These lines said
+    // "comfortably within the healthy range" whatever the number was. Now a
+    // value outside the 3rd to 97th centile, or a curve that has crossed two
+    // centile lines, says so once and routes to the paediatrician; never a
+    // diagnosis. Kept for revert:
+    //   if (wp != null) out.add('Weight is tracking around the ${_ordinalBand(wp)} — comfortably within the healthy range.');
+    //   if (hp != null) out.add('Height is following the ${_ordinalBand(hp)}, growing in step with age.');
+    //   if (hasHead) out.add('Head growth is following its expected pattern.');
+    final flags = worthShowing;
+    for (final metric in GrowthMetric.values) {
+      final p = latestPercentile(metric);
+      if (p == null) continue;
+      final label = metric.label;
+      if (flags.contains(metric)) {
+        out.add('$label is ${_flagReason(metric)}. Worth showing your paediatrician at the next visit, with this chart.');
+      } else {
+        out.add('$label is following the ${_ordinalBand(p)}, inside the usual range for his age.');
+      }
+    }
     out.add('The shape of the curve matters more than any single point on it.');
     return out;
   }

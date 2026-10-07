@@ -22,6 +22,7 @@ import 'pp_child_profile.dart';
 // Cyclic with pp_vaccine_data (which imports this file) - fine in Dart, and it
 // keeps the timeline honest: doses she marked are part of her health story.
 import 'pp_vaccine_data.dart';
+import '../../services/remote/child_scoped_store.dart';
 
 enum HealthEventType { doctorVisit, vaccination, illness, medication, growthCheck, labTest, allergy, note, emergency, assessment }
 
@@ -556,6 +557,9 @@ class HealthStore extends ChangeNotifier {
       await _mergeTable('pp_reports', childId, _reports, _reportRow, _reportFrom, (r) => r.id);
       await _mergeTable('pp_doctor_visits', childId, _visits, _visitRow, _visitFrom, (v) => v.id);
       await _mergeQuestions(childId);
+      try {
+        await _mergeEmergency(childId);
+      } catch (_) {/* table not there yet (0095): keep the local card */}
       await _persist();
       notifyListeners();
     } catch (_) {/* offline - keep local */}
@@ -1048,6 +1052,32 @@ class HealthStore extends ChangeNotifier {
     _emergency = e;
     notifyListeners();
     _persist();
+    _pushEmergency();
+  }
+
+  // ---- the card in the cloud (0095, 2026-10-07) -------------------------------
+  // One row per child, co-parented: the other parent's phone shows the same
+  // card. Fire-and-forget; before 0095 is run the write fails silently and the
+  // card stays local, as it always was.
+  static const _emergencyTable = 'pp_emergency_cards';
+
+  void _pushEmergency() {
+    final card = _emergencyJson();
+    if (card == null) return;
+    ChildSync.pushKeyed(_emergencyTable, _childId,
+        {'card': card, 'updated_at': DateTime.now().toUtc().toIso8601String()},
+        onConflict: 'child_id');
+  }
+
+  /// Cloud wins when it has a card (the other parent may have edited it);
+  /// a card only this phone has goes up.
+  Future<void> _mergeEmergency(String childId) async {
+    final rows = await SupabaseRepo.fetchByChild(_emergencyTable, childId, orderBy: 'updated_at');
+    if (rows.isNotEmpty && rows.first['card'] is Map) {
+      _emergencyFrom(rows.first['card']);
+    } else if (_emergency != null) {
+      _pushEmergency();
+    }
   }
 
   void clearEmergency() {

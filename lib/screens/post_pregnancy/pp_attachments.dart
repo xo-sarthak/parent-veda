@@ -15,12 +15,17 @@
 //  partner-read policy (0014) already exists, the other parent's files resolve
 //  with no extra work.
 //
-//  Logged out or offline, upload() returns the original local path, so the app
-//  keeps working and the file can be backfilled later.
+//  Logged out or offline, upload() returns the path it was given, so the app
+//  keeps working and the file can be backfilled later. Since 2026-10-07 that
+//  path is a copy in the app's documents folder (`_keepLocal`), not the
+//  picker's cache, so the file survives until it is uploaded.
 // =============================================================================
+
+import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import '../../widgets/pv_feedback.dart';
 import '../../theme/pv_fonts.dart';
 import 'package:image_picker/image_picker.dart';
@@ -180,11 +185,35 @@ Future<List<Attachment>> uploadAttachments(
   final out = <Attachment>[];
   for (final a in items) {
     try {
-      final ref = await StorageService.upload(a.path, type);
+      // ⚠️ COPY OUT OF THE PICKER'S CACHE FIRST (gap analysis P1, 2026-10-07).
+      // Logged out or offline, `upload` hands back the path it was given, and
+      // the picker's path is a cache the OS deletes: a birth certificate kept
+      // that way vanished later. A copy in the app's own documents folder
+      // lasts; it is what gets uploaded, and what stays if the upload cannot.
+      final kept = await _keepLocal(a.path);
+      final ref = await StorageService.upload(kept, type);
       out.add(Attachment(a.kind, ref, a.name));
     } catch (_) {
       out.add(a); // keep it local rather than dropping it
     }
   }
   return out;
+}
+
+/// A copy of [path] in the app's documents folder, or [path] itself when the
+/// copy cannot be made (tests, odd platforms): never worse than before.
+Future<String> _keepLocal(String path) async {
+  try {
+    final src = File(path);
+    if (!src.existsSync()) return path;
+    final dir = Directory('${(await getApplicationDocumentsDirectory()).path}/attachments');
+    if (path.startsWith(dir.path)) return path;
+    if (!dir.existsSync()) dir.createSync(recursive: true);
+    final name = path.split(RegExp(r'[/\\]')).last;
+    final dest = '${dir.path}/${DateTime.now().microsecondsSinceEpoch}_$name';
+    await src.copy(dest);
+    return dest;
+  } catch (_) {
+    return path;
+  }
 }

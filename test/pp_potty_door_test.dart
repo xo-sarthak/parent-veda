@@ -72,8 +72,12 @@ void main() {
       expect(_listed('things_to_do'), hasLength(3));
       expect(_listed('staying_dry'), ['night_dryness', 'bedwetting', 'wiping_and_washing', 'school_and_public']);
       final ledger = File('docs/DOOR-CONTENT-OWED.md').readAsStringSync();
-      for (final id in ['no_star_charts', 'three_day_method', 'pull_ups', 'taking_longer']) {
-        expect(_page(id).comingSoon, isTrue, reason: id);
+      // no_star_charts and three_day_method were filled 2026-10-02.
+      for (final id in ['no_star_charts', 'three_day_method']) {
+        expect(_page(id).comingSoon, isFalse, reason: id);
+      }
+      for (final id in ['pull_ups', 'taking_longer']) {
+        expect(_page(id).comingSoon, isFalse, reason: '$id filled 2026-10-02');
         expect(ledger.contains(id), isTrue, reason: '$id is a coming-soon card nobody has logged as owed');
       }
     });
@@ -137,7 +141,7 @@ void main() {
       await tester.pumpWidget(MaterialApp(home: PpDoorScreen(key: const ValueKey(4), door: door, onSurface: (_, _) {})));
       await tester.pumpAndSettle();
       expect(find.text('How long this actually takes'), findsOneWidget, reason: 'the pinned timeline, for every stage');
-      expect(find.text('The signs she is ready'), findsNothing, reason: 'readiness is 1 to 6, locked with Starting out');
+      expect(find.text('Signs your child is ready'), findsNothing, reason: 'readiness is 1 to 6, locked with Starting out');
       expect(find.textContaining('From 1 year'), findsNWidgets(2), reason: 'Starting out, Accidents');
       expect(find.textContaining('From 3 years'), findsOneWidget, reason: 'Dry nights');
       expect(find.text('Talk to a paediatrician about it'), findsOneWidget);
@@ -146,15 +150,16 @@ void main() {
       await tester.pumpWidget(MaterialApp(
           home: PpDoorScreen(key: const ValueKey(24), door: door, onSurface: (_, _) {}, initialTabId: 'starting_out')));
       await tester.pumpAndSettle();
-      expect(find.text('Catching the su-su'), findsNothing, reason: 'grown past');
-      expect(find.text('The signs she is ready'), findsOneWidget, reason: 'readiness leads Starting out');
+      // 2026-10-07: tab label now English (was 'Catching the su-su').
+      expect(find.text('Catching the wee early'), findsNothing, reason: 'grown past');
+      expect(find.text('Signs your child is ready'), findsOneWidget, reason: 'readiness leads Starting out');
       expect(find.textContaining('From 3 years'), findsOneWidget);
 
       _ageMonths(50);
       await tester.pumpWidget(MaterialApp(
           home: PpDoorScreen(key: const ValueKey(50), door: door, onSurface: (_, _) {}, initialTabId: 'bumpy')));
       await tester.pumpAndSettle();
-      expect(find.text('She is holding it in'), findsOneWidget, reason: 'a four-year-old\'s mother reaches the withholding page');
+      expect(find.text('Holding it in'), findsOneWidget, reason: 'a four-year-old\'s mother reaches the withholding page');
       expect(find.byIcon(Icons.lock_outline_rounded), findsNothing);
     });
   });

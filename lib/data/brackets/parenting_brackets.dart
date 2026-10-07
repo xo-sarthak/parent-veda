@@ -401,4 +401,124 @@ final List<Bracket> kParentingBrackets = [
           BracketLayerSpec(state: LayerState.notApplicable, reason: 'None proposed'),
     },
   ),
+  // ---------------------------------------------------------------------------
+  //  12. Keeping him safe — added 2026-10-02 from the parenting gap analysis
+  // ---------------------------------------------------------------------------
+  //  Child safety was the largest block of P1 gaps against What to Expect and
+  //  theAsianparent. English only by the 2026-08-27 policy; `hi` repeats `en`
+  //  because the type requires it, the same as `_same(...)` elsewhere.
+  Bracket(
+    id: 'parenting_safety',
+    stage: LifeStage.parenting,
+    theme: 'safety',
+    hue: 28,
+    label: _t(en: 'Keeping your child safe', hi: 'Keeping your child safe'),
+    title: _t(en: 'Keeping your child safe', hi: 'Keeping your child safe'),
+    blurb: _t(
+        en: 'Home, water, road and first aid: the small changes that prevent '
+            'most accidents.',
+        hi: 'Home, water, road and first aid: the small changes that prevent '
+            'most accidents.'),
+    layers: {
+      BracketLayer.content: BracketLayerSpec(
+          state: LayerState.notReady,
+          reason: 'Section built in pp_safety_content.dart; opened by its door'),
+      BracketLayer.activities: BracketLayerSpec(
+          state: LayerState.notApplicable, reason: 'None proposed'),
+      BracketLayer.tools: BracketLayerSpec(
+          state: LayerState.notReady, reason: 'Home safety walk-through checklist'),
+      BracketLayer.products: BracketLayerSpec(
+          state: LayerState.notReady,
+          reason: 'Gates, socket covers, anti-tip straps, car seats'),
+      BracketLayer.course: BracketLayerSpec(
+          state: LayerState.notReady, reason: 'Baby and child first aid class'),
+      BracketLayer.consult: BracketLayerSpec.live(['pp_experts']),
+      BracketLayer.extras: BracketLayerSpec(
+          state: LayerState.notApplicable, reason: 'None proposed'),
+    },
+  ),
+  // Added 2026-10-02 from the parenting gap analysis (new door). English by
+  // the 2026-08-27 policy; `hi` repeats `en` because the type requires it.
+  Bracket(
+    id: 'parenting_family',
+    stage: LifeStage.parenting,
+    theme: 'family',
+    hue: 322,
+    label: _t(en: 'Family', hi: 'Family'),
+    title: _t(en: 'Your growing family', hi: 'Your growing family'),
+    blurb: _t(en: 'A second baby, fathers, grandparents, siblings and childcare.', hi: 'A second baby, fathers, grandparents, siblings and childcare.'),
+    layers: {
+      BracketLayer.content: BracketLayerSpec(
+          state: LayerState.notReady,
+          reason: 'Section built 2026-10-02; opened by its door'),
+      BracketLayer.activities: BracketLayerSpec(
+          state: LayerState.notApplicable, reason: 'None proposed'),
+      BracketLayer.tools: BracketLayerSpec(
+          state: LayerState.notApplicable, reason: 'None proposed'),
+      BracketLayer.products: BracketLayerSpec(
+          state: LayerState.notApplicable, reason: 'None proposed'),
+      BracketLayer.course: BracketLayerSpec(
+          state: LayerState.notApplicable, reason: 'None proposed'),
+      BracketLayer.consult: BracketLayerSpec(
+          state: LayerState.notCore, reason: 'Offered on the door'),
+      BracketLayer.extras: BracketLayerSpec(
+          state: LayerState.notApplicable, reason: 'None proposed'),
+    },
+  ),
+  // Added 2026-10-02 from the parenting gap analysis (new door). English by
+  // the 2026-08-27 policy; `hi` repeats `en` because the type requires it.
+  Bracket(
+    id: 'parenting_special_care',
+    stage: LifeStage.parenting,
+    theme: 'special_care',
+    hue: 344,
+    label: _t(en: 'Special care', hi: 'Special care'),
+    title: _t(en: 'Special care', hi: 'Special care'),
+    blurb: _t(en: 'Born early, twins, and children who need a little more.', hi: 'Born early, twins, and children who need a little more.'),
+    layers: {
+      BracketLayer.content: BracketLayerSpec(
+          state: LayerState.notReady,
+          reason: 'Section built 2026-10-02; opened by its door'),
+      BracketLayer.activities: BracketLayerSpec(
+          state: LayerState.notApplicable, reason: 'None proposed'),
+      BracketLayer.tools: BracketLayerSpec(
+          state: LayerState.notApplicable, reason: 'None proposed'),
+      BracketLayer.products: BracketLayerSpec(
+          state: LayerState.notApplicable, reason: 'None proposed'),
+      BracketLayer.course: BracketLayerSpec(
+          state: LayerState.notApplicable, reason: 'None proposed'),
+      BracketLayer.consult: BracketLayerSpec(
+          state: LayerState.notCore, reason: 'Offered on the door'),
+      BracketLayer.extras: BracketLayerSpec(
+          state: LayerState.notApplicable, reason: 'None proposed'),
+    },
+  ),
+  // Added 2026-10-02 from the parenting gap analysis (new door). English by
+  // the 2026-08-27 policy; `hi` repeats `en` because the type requires it.
+  Bracket(
+    id: 'parenting_papers',
+    stage: LifeStage.parenting,
+    theme: 'papers',
+    hue: 42,
+    label: _t(en: 'Papers and money', hi: 'Papers and money'),
+    title: _t(en: 'Papers and money', hi: 'Papers and money'),
+    blurb: _t(en: 'Documents, government schemes, insurance and saving, for India.', hi: 'Documents, government schemes, insurance and saving, for India.'),
+    layers: {
+      BracketLayer.content: BracketLayerSpec(
+          state: LayerState.notReady,
+          reason: 'Section built 2026-10-02; opened by its door'),
+      BracketLayer.activities: BracketLayerSpec(
+          state: LayerState.notApplicable, reason: 'None proposed'),
+      BracketLayer.tools: BracketLayerSpec(
+          state: LayerState.notApplicable, reason: 'None proposed'),
+      BracketLayer.products: BracketLayerSpec(
+          state: LayerState.notApplicable, reason: 'None proposed'),
+      BracketLayer.course: BracketLayerSpec(
+          state: LayerState.notApplicable, reason: 'None proposed'),
+      BracketLayer.consult: BracketLayerSpec(
+          state: LayerState.notCore, reason: 'Offered on the door'),
+      BracketLayer.extras: BracketLayerSpec(
+          state: LayerState.notApplicable, reason: 'None proposed'),
+    },
+  ),
 ];

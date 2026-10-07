@@ -108,6 +108,12 @@ const bool kPvDevBuild = bool.fromEnvironment('PV_DEV');
 /// Whether the team's affordances are on this build.
 const bool kPvShowDeveloper = kDebugMode || kPvDevBuild;
 
+/// The Developer section in Settings (the stage switch) ships in EVERY build
+/// (the user, 2026-10-07: "if I send the APK this feature as well gets
+/// shipped"). Only this section: the internal tools behind
+/// `kPvShowDeveloper` (Brand Studio, Launches) stay off a parent's phone.
+const bool kPvShipDeveloperSection = true;
+
 const String kPvYouRoute = 'you';
 
 /// Where "Contact us" writes (the address Help has always named).
@@ -635,7 +641,8 @@ class _PvYouScreenState extends State<PvYouScreen> {
                   // it is never in a release build, so it must read as apart
                   // from the screen she will get. Kept for revert: it sat above
                   // the "ParentVeda" line.
-                  if (kPvShowDeveloper && !ttcProfile)
+                  // Kept for revert: if (kPvShowDeveloper && !ttcProfile)
+                  if (kPvShipDeveloperSection && !ttcProfile)
                     SliverToBoxAdapter(child: _developer(p)),
                   SliverToBoxAdapter(
                     child: SizedBox(
@@ -1814,6 +1821,68 @@ class _PvYouScreenState extends State<PvYouScreen> {
     return 'Pregnancy';
   }
 
+  /// The parenting hero's one status line (2026-10-07): "Aarav's parent,
+  /// 4 months". Derived from the child she saved, never asked. With no child
+  /// yet, or the placeholder name, it says only what it knows.
+  String _ppStatus() {
+    try {
+      final s = ChildProfileStore.instance;
+      if (!s.hasRealChild) return 'Parenting';
+      final c = s.active;
+      final age = s.ageLabel;
+      if (c.name == Child.placeholder || c.name.trim().isEmpty) {
+        return age.isEmpty ? 'Parenting' : 'Parenting · your baby is $age';
+      }
+      return age.isEmpty ? '${c.name}\'s parent' : '${c.name}\'s parent, $age';
+    } catch (_) {
+      // Local-first: a store that has not loaded is a line without a name.
+    }
+    return 'Parenting';
+  }
+
+  /// Parenting's journey rows (2026-10-07): one row per child, opening that
+  /// child's own page (the same `PvChildScreen` the old chips opened), then
+  /// the stage's one action, "Add a child", on her side. With no child yet
+  /// the action row carries the invitation, so the group is never empty.
+  List<Widget> _ppJourneyRows(
+    LifeStage stage,
+    PvYouStageContent content,
+    Color tint,
+  ) {
+    final kids = ChildProfileStore.instance;
+    final real = kids.hasRealChild ? kids.children : const <Child>[];
+    final a = content.action;
+    return [
+      for (final c in real)
+        PvProfileRow(
+          key: ValueKey('pv_profile_child_${c.id}'),
+          mark: TtcTabArt(mark: TtcTabMark.sun, tint: tint),
+          title: c.name,
+          subtitle: _ageOf(c),
+          onTap: () => _push(
+            PvChildScreen(childId: c.id, stage: stage),
+            'you/child/${c.id}',
+          ),
+        ),
+      if (!widget.father && a != null)
+        PvProfileRow(
+          key: const ValueKey('pv_profile_add_child'),
+          mark: TtcTabArt(mark: TtcTabMark.bigSmallHearts, tint: tint),
+          title: a.label,
+          subtitle: real.isEmpty ? content.childrenInvitation : a.note,
+          onTap: () => a.run(context),
+        )
+      else if (real.isEmpty)
+        // His side with no child saved yet: say where they will appear.
+        PvProfileRow(
+          key: const ValueKey('pv_profile_journey_his'),
+          mark: TtcTabArt(mark: TtcTabMark.bigSmallHearts, tint: tint),
+          title: 'Your children',
+          subtitle: content.childrenInvitation,
+        ),
+    ];
+  }
+
   /// Two facts from her own dates, the pregnancy's version of TTC's glance:
   /// her due date and how long is left. Both are DERIVED from the one date the
   /// app holds, never a prediction beyond it. A date from a scan or her doctor
@@ -2027,7 +2096,13 @@ class _PvYouScreenState extends State<PvYouScreen> {
         name: _name,
         hasName: _hasName,
         // Kept for revert: status: _ttcStatus(),
-        status: stage == LifeStage.pregnancy ? _pregStatus() : _ttcStatus(),
+        // Kept for revert (2026-10-07, before parenting drew this profile):
+        //   status: stage == LifeStage.pregnancy ? _pregStatus() : _ttcStatus(),
+        status: switch (stage) {
+          LifeStage.pregnancy => _pregStatus(),
+          LifeStage.parenting => _ppStatus(),
+          _ => _ttcStatus(),
+        },
         partnerLine: partnerLine,
         partnerMark: TtcTabArt(mark: TtcTabMark.twoFigures, tint: tint),
         bandTint: tint,
@@ -2059,7 +2134,11 @@ class _PvYouScreenState extends State<PvYouScreen> {
         key: const ValueKey('pv_profile_journey'),
         title: 'Your journey',
         children: [
-          if (!him && a != null)
+          // Parenting (2026-10-07): the children themselves, each opening
+          // their own page, then "Add a child" (the stage's one action).
+          if (stage == LifeStage.parenting)
+            ..._ppJourneyRows(stage, content, tint)
+          else if (!him && a != null)
             PvProfileRow(
               key: stage == LifeStage.pregnancy
                   ? const ValueKey('pv_profile_baby_arrived')
@@ -2102,7 +2181,9 @@ class _PvYouScreenState extends State<PvYouScreen> {
       // as hers. Mobbin evidence in pv_you_chrome.dart, PvProfileTile.
       _ttcOrdersAndBookings(tint),
       // Kept for revert (2026-09-29): if (!him) _ttcGlance(),
-      if (!him)
+      // Parenting draws no glance (2026-10-07): the child's age is already
+      // the hero's line and each child's row, so a glance would repeat it.
+      if (!him && stage != LifeStage.parenting)
         (stage == LifeStage.pregnancy
             ? _pregGlance(top: 12)
             : _ttcGlance(top: 12)),
@@ -2219,6 +2300,18 @@ class _PvYouScreenState extends State<PvYouScreen> {
             ..._pregChildrenRows(stage, content, tint),
         ],
       ),
+      // ⚠️ YOUR FAMILY'S SETUP (2026-10-07, parenting only): the rows that
+      // tune the family's own account, moved here from More > Everything
+      // else so More holds only what the app offers. Every other stage
+      // leaves `setupThings` empty, so this draws nothing there.
+      if (content.setupThings.isNotEmpty)
+        PvProfileGroup(
+          key: const ValueKey('pv_profile_setup'),
+          title: 'Your family\'s setup',
+          children: [
+            for (final t in content.setupThings) _profileThingRow(p, t),
+          ],
+        ),
       PvProfileGroup(
         key: const ValueKey('pv_profile_things'),
         title: 'Your things',
@@ -2326,7 +2419,8 @@ class _PvYouScreenState extends State<PvYouScreen> {
     PvSettingsScreen(
       sections: () => _ttcSettingsSections(p, stage, content),
       // Gated exactly as the profile's Developer section always was.
-      developer: kPvShowDeveloper ? () => _developer(p) : null,
+      // Kept for revert: developer: kPvShowDeveloper ? () => _developer(p) : null,
+      developer: kPvShipDeveloperSection ? () => _developer(p) : null,
       listen: Listenable.merge([..._listenables, _tick]),
     ),
     kPvSettingsRoute,
@@ -2500,9 +2594,9 @@ class _PvYouScreenState extends State<PvYouScreen> {
     final ctl = PregnancyController.current;
     final current = LifeStageStore.instance.stage;
     return PvYouSection(
-      title: 'Developer · debug only',
+      title: 'Developer',
       lead:
-          'Version pills, the stage switch, a clean week-20 reset. Never in a release.',
+          'Version pills, the stage switch, a clean week-20 reset.',
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 6),

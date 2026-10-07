@@ -63,6 +63,7 @@ import 'ttc_cycle_palette.dart';
 // Kept for revert (2026-09-27): import 'ttc_phase_colours.dart';
 import 'ttc_strings.dart';
 import 'ttc_tool_marks.dart' show ttcToolHeaderMark;
+import 'ttc_cycle_headline.dart';
 
 /// Which of the four the screen is in.
 ///
@@ -108,7 +109,13 @@ class _TtcCycleCompanionScreenState extends State<TtcCycleCompanionScreen> {
             screen = TtcCompanionState.empty;
           } else if (!store.today.behaviour.showsFertilityWindow) {
             screen = TtcCompanionState.clinicHeld;
-          } else if (spans.isEmpty || engine.hasUnreliableHistory(state)) {
+          // ⚠️ IN STEP WITH THE HOME (2026-10-07). A gap in her log used to
+          // refuse here even when an LH or temperature signal let the engine,
+          // the home and the report place her fertile days, so this screen
+          // said "a gap" while the home gave a countdown. It refuses now only
+          // when the home has no estimate either. Kept for revert:
+          //   } else if (spans.isEmpty || engine.hasUnreliableHistory(state)) {
+          } else if (spans.isEmpty || (engine.hasUnreliableHistory(state) && ttcCycleHeadline() == null)) {
             screen = TtcCompanionState.noEstimate;
           } else {
             screen = TtcCompanionState.healthy;
@@ -216,12 +223,13 @@ class _Hero extends StatelessWidget {
           "Your period dates. We can't place your fertile days this month, "
               'and below is why.',
         ),
+      // The home's sentence leads (2026-10-07, ttc_cycle_headline.dart): the
+      // fertile days or the wait, in the same words as the home hero. Kept
+      // for revert: the two lines below without the headline.
       TtcCompanionState.healthy => (
           here?.phase.label ?? 'Your cycle',
-          here == null
-              ? 'Your period dates, and where you are in your cycle.'
-              : 'Where you are now, until ${ttcShortDate(here.lastDay)}. '
-                  'Your period dates are below.',
+          '${ttcCycleHeadline() == null ? '' : '${ttcCycleHeadline()}. '}'
+              '${here == null ? 'Your period dates, and where you are in your cycle.' : 'Where you are now, until ${ttcShortDate(here.lastDay)}. Your period dates are below.'}',
         ),
     };
 

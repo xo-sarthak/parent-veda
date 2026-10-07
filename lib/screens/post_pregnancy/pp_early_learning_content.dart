@@ -95,14 +95,14 @@ const PpBandSet kPpEarlyLearningBands = PpBandSet([
     label: '3 to 4 years',
     fromMonths: 36,
     toMonths: 48,
-    blurb: 'Lines before letters, counting things he can touch.',
+    blurb: 'Lines before letters, counting things small hands can touch.',
   ),
   PpBand(
     id: 'four',
     label: '4 to 6 years',
     fromMonths: 48,
     toMonths: 72,
-    blurb: 'Writing his name, first sums, getting ready for school.',
+    blurb: 'A first written name, first sums, getting ready for school.',
   ),
 ]);
 
@@ -121,9 +121,9 @@ final PpSection kPpEarlyLearningSection = PpSection(
   title: 'Early Learning',
   subtitle: 'Play, stories, habits and getting ready for school',
   intro:
-      'Everything a small child needs to learn, he learns by playing, helping '
-      'and being told stories. Here is what to do today, at his age, with what '
-      'is already in your house.',
+      'Small children learn almost everything by playing, helping and hearing '
+      'stories. Here is something to do today, right for your child\'s age, '
+      'with what is already in your house.',
   bandSet: kPpEarlyLearningBands,
   // ⚠️ THE AGE RULE. "Remove the five band tabs and the band chooser. App
   // knows the age. Open on his band, show only his band, hide the others."
@@ -149,13 +149,13 @@ final PpSection kPpEarlyLearningSection = PpSection(
     // activity surface would mean two answers to "what should we do today".
     PpSectionTool(
       label: 'Something to do today',
-      blurb: 'The activity picker, already set to his age. Two minutes to '
-          'find one, ten minutes to do it.',
+      blurb: 'The activity picker, already set to your child\'s age. Two '
+          'minutes to find one, ten minutes to do it.',
       surfaceId: 'pp_activities',
       icon: Icons.child_care_outlined,
     ),
     PpSectionTool(
-      label: 'Where he is right now',
+      label: 'Where your child is right now',
       blurb: 'Milestones, speech and what usually comes next. Kept in one '
           'place so nothing here has to guess.',
       surfaceId: 'pp_development',
@@ -163,15 +163,15 @@ final PpSection kPpEarlyLearningSection = PpSection(
     ),
     PpSectionTool(
       label: 'Story books, crayons and activity boxes',
-      blurb: 'Only where buying something genuinely helps. Everything in this '
+      blurb: 'Only where buying something really helps. Everything in this '
           'door works without any of it.',
       surfaceId: 'pp_recos',
       icon: Icons.shopping_bag_outlined,
     ),
     PpSectionTool(
       label: 'The early learning masterclass',
-      blurb: 'A short course on play-based learning at home and what school '
-          'readiness actually asks of a child.',
+      blurb: 'A short course on learning through play at home, and what school '
+          'readiness really asks of a child.',
       surfaceId: 'pp_courses',
       icon: Icons.school_outlined,
     ),
@@ -200,7 +200,7 @@ final PpSection kPpEarlyLearningSection = PpSection(
 const PpArea _today = PpArea(
   id: 'today',
   mark: IntentMark.stepsMark,
-  title: 'Something to do with him today',
+  title: 'Something to do together today',
   blurb: 'Thirty six things to do together, sorted by age, using what is '
       'already in your kitchen.',
   hue: 42,
@@ -213,44 +213,43 @@ const PpArea _today = PpArea(
       format: 'ACTIVITY',
       bands: ['baby'],
       blocks: [
-        PpIntro('The single most useful thing you can do with a small baby who '
+        PpIntro('One of the most useful things you can do with a small baby who '
             'is awake and content. Five minutes, a few times a day, is plenty.'),
         PpSteps([
           PpStep('Spread a dupatta or a thin quilt on the floor',
               'The floor is better than a bed. A soft surface makes the work '
-              'harder for him and is less safe.'),
-          PpStep('Lay him on his tummy, arms forward under his chest',
-              'Getting the elbows in front of the shoulders is what lets him '
-              'push up at all.'),
-          PpStep('Put one bright thing just out of his reach',
-              'A steel katori catches the light beautifully and costs nothing.'),
-          PpStep('Get down on the floor at his eye level and talk to him',
-              'Your face is the best toy in the room. He will lift his head '
-              'higher for you than for any object.'),
-          PpStep('Stop when he fusses, not when the timer says',
-              'Two good minutes beat ten miserable ones. Do it again after the '
+              'harder for your baby, and it is less safe.'),
+          PpStep('Lay your baby tummy down, arms forward under the chest',
+              'Getting the elbows in front of the shoulders is what makes '
+              'pushing up possible at all.'),
+          PpStep('Put one bright thing just out of reach',
+              'A small steel bowl catches the light beautifully and costs nothing.'),
+          PpStep('Get down on the floor at eye level and talk',
+              'Your face is the best toy in the room. Babies lift their heads '
+              'higher for a face than for any object.'),
+          PpStep('Stop when your baby fusses, not when the timer says',
+              'Two good minutes beat ten miserable ones. Try again after the '
               'next nappy change.'),
         ], heading: 'What happens'),
         PpCards([
           PpCard('A firm flat surface', 'A dupatta or a bedsheet on the floor.'),
           PpCard('One bright object',
-              'A steel katori, a red bangle, a folded orange cloth.'),
+              'A small steel bowl, a red bangle, a folded orange cloth.'),
           PpCard('Your face', 'The part that does most of the work.'),
         ], heading: 'What you need', hue: 42),
         PpArticle([
           'Tummy time builds the neck, shoulder and back muscles that every '
           'later movement sits on top of. Rolling, sitting, crawling and '
-          'eventually walking all begin with being able to hold the head up '
-          'against gravity.',
-          'It also does something less obvious. Lying on his tummy, he has to '
-          'sweep his eyes side to side to track the thing he wants, which is '
-          'the same eye movement he will one day use to follow a line of print.',
+          'walking all begin with holding the head up against gravity.',
+          'It does something less obvious too. Lying tummy down, your baby '
+          'sweeps the eyes side to side to follow whatever caught them. '
+          'It is the same eye movement that will one day follow a line of print.',
         ], heading: 'What it builds'),
-        PpWhenLine('From the first weeks, whenever he is awake and not just '
-            'fed. Aim for a few short goes a day rather than one long one.'),
-        PpIndiaNote('If malish is part of your day, tummy time slots in neatly '
-            'right after it. He is already undressed, warm and on the floor, '
-            'and the oil massage has left him loose and comfortable.'),
+        PpWhenLine('From the first weeks, whenever your baby is awake and not '
+            'just fed. A few short goes a day work better than one long one.'),
+        PpIndiaNote('If baby massage is part of your day, tummy time fits neatly '
+            'right after it. Your baby is already undressed, warm and on the '
+            'floor, and loose and comfortable after the oil massage.'),
         PpVideoSlot(
           title: 'How to position a baby for tummy time',
           subtitle: 'Where the arms go, and the rolled-cloth trick for a baby '
@@ -267,20 +266,20 @@ const PpArea _today = PpArea(
       format: 'ACTIVITY',
       bands: ['baby'],
       blocks: [
-        PpIntro('A newborn sees strong edges long before he sees soft colours. '
-            'Black on white is the first thing he can properly look at.'),
+        PpIntro('Newborns see strong edges long before soft colours. Black on '
+            'white is the first thing your baby can properly look at.'),
         PpSteps([
           PpStep('Draw thick black shapes on white paper',
               'Stripes, big spots, a chessboard square. A marker on the back of '
-              'an old greeting card is exactly as good as a bought set.'),
-          PpStep('Hold it about a hand-span from his face',
-              'Roughly 25cm. Further away and it is a blur to him.'),
-          PpStep('Wait until his eyes lock on to it',
-              'This can take several seconds. Do not wave it about while he is '
+              'an old greeting card is just as good as a bought set.'),
+          PpStep('Hold it about a hand-span from your baby\'s face',
+              'Roughly 25cm. Any further and it becomes a blur.'),
+          PpStep('Wait until the eyes lock on to it',
+              'This can take several seconds. Keep it still while your baby is '
               'still finding it.'),
           PpStep('Move it slowly to one side, then the other',
-              'Slow enough that his eyes can follow. If he loses it, stop and '
-              'start again from the middle.'),
+              'Slow enough for the eyes to follow. If your baby loses it, stop '
+              'and start again from the middle.'),
         ], heading: 'What happens'),
         PpCards([
           PpCard('Paper and a black marker', 'Or the back of an old carton.'),
@@ -289,15 +288,15 @@ const PpArea _today = PpArea(
         ], heading: 'What you need', hue: 42),
         PpArticle([
           'Newborn vision is blurry and low in contrast, so a pastel toy is '
-          'largely invisible to him. A hard black edge on white is the first '
-          'visual information he can actually use, and looking at it is how the '
-          'visual part of the brain wires itself up.',
+          'mostly invisible. A hard black edge on white is the first thing a '
+          'newborn\'s eyes can really use. Looking at it is how the seeing part '
+          'of the brain wires itself up.',
           'Tracking a slow-moving object left and right is the beginning of eye '
           'control. It arrives on its own, but it arrives sooner in a baby who '
           'is given something worth following.',
         ], heading: 'What it builds'),
-        PpWhenLine('From birth to about three months. After that his colour '
-            'vision has come in and bright colours interest him more.'),
+        PpWhenLine('From birth to about three months. After that colour vision '
+            'has come in, and bright colours are more interesting.'),
       ],
     ),
     PpPage(
@@ -308,44 +307,43 @@ const PpArea _today = PpArea(
       bands: ['baby'],
       blocks: [
         PpIntro('The oldest baby game in the world, and one of the most useful. '
-            'It teaches him that things which disappear come back.'),
+            'It teaches your baby that things which disappear come back.'),
         PpSteps([
           PpStep('Cover your face with your hands or the end of your dupatta'),
           PpStep('Wait one beat longer than feels natural',
-              'The pause is where the anticipation lives. Rushing it makes the '
-              'game less funny to him, not more.'),
+              'The pause is where the excitement builds. Rushing it makes the '
+              'game less funny, not more.'),
           PpStep('Drop the cloth and say the word',
               'Peekaboo, or a-boo, or whatever your family says. Use the same '
               'word every time.'),
-          PpStep('Let him do it back to you',
-              'Around nine or ten months he will start pulling the cloth off '
-              'your face himself. Act surprised every single time.'),
+          PpStep('Let your baby do it back to you',
+              'Around nine or ten months, your baby will start pulling the '
+              'cloth off your face. Act surprised every time.'),
           PpStep('Hide small things too',
-              'Put a spoon under a cloth in front of him and let him lift it. '
-              'Same lesson, different hands.'),
+              'Put a spoon under a cloth in front of your baby and wait for a '
+              'small hand to lift it. Same lesson, different hands.'),
         ], heading: 'What happens'),
         PpCards([
           PpCard('Your hands', 'That is the whole list.'),
-          PpCard('Or a dupatta', 'A thin one he can half see through is a '
-              'gentler start for a young baby.'),
+          PpCard('Or a dupatta', 'A thin one your baby can half see through is '
+              'a gentler start for a young baby.'),
         ], heading: 'What you need', hue: 42),
         PpArticle([
-          'This is object permanence, which is the understanding that a thing '
-          'still exists when he cannot see it. It is one of the biggest ideas a '
-          'baby ever has, and it arrives somewhere between eight and twelve '
-          'months.',
-          'It has a real everyday payoff. A baby who has understood that things '
-          'come back finds it easier when you leave the room, because your '
-          'going is no longer the same as your ending. Peekaboo is separation '
-          'practice disguised as a joke.',
+          'This is object permanence: knowing a thing still exists when you '
+          'cannot see it. It is one of the biggest ideas a baby ever has, and '
+          'it arrives somewhere between eight and twelve months.',
+          'It helps in everyday life too. A baby who knows things come back '
+          'finds it easier when you leave the room, because your going no '
+          'longer feels like your ending. Peekaboo is separation practice '
+          'dressed up as a joke.',
         ], heading: 'What it builds'),
-        PpWhenLine('From about four months, when he first smiles at it, right '
-            'through the first year. He will play it for months.'),
+        PpWhenLine('From about four months, when the first smiles at it come, '
+            'right through the first year. Babies play it for months.'),
       ],
     ),
     PpPage(
       id: 'act_narrate',
-      title: 'Naming things as you carry him',
+      title: 'Naming things as you carry your baby',
       subtitle: 'For 0 to 12 months',
       format: 'ACTIVITY',
       bands: ['baby'],
@@ -353,40 +351,39 @@ const PpArea _today = PpArea(
         PpIntro('The cheapest and most powerful language activity there is. You '
             'walk around your own house and say what you touch.'),
         PpSteps([
-          PpStep('Carry him on your hip and walk slowly around a room'),
+          PpStep('Carry your baby on your hip and walk slowly around a room'),
           PpStep('Touch a thing, then name it',
               'This is the fan. It is going round and round. This water is '
-              'thanda, feel it.'),
+              'cold, feel it.'),
           PpStep('Use both languages, freely',
-              'Say pankha and fan. A baby hearing two languages sorts them out '
+              'Say the word in your home language and in English. A baby hearing two languages sorts them out '
               'perfectly well and ends up with both.'),
           PpStep('Leave gaps',
-              'Stop talking for a few seconds. He may make a sound. Answer it '
-              'as though he said something, because he did.'),
+              'Stop talking for a few seconds. Your baby may make a sound. '
+              'Answer it as though it meant something, because it did.'),
           PpStep('Do it while you work',
-              "Chopping sabzi, folding clothes, hanging washing. It costs no "
+              "Chopping vegetables, folding clothes, hanging washing. It costs no "
               "extra time at all."),
         ], heading: 'What happens'),
         PpCards([
           PpCard('Nothing', 'Your house and your voice.'),
         ], heading: 'What you need', hue: 42),
         PpArticle([
-          'The number of words a baby hears in his first three years is one of '
-          'the strongest single predictors of his language later. Not flash '
-          'cards, not videos. Ordinary talk from a person who is right there '
-          'with him.',
-          'Naming while touching is stronger than naming alone, because the '
-          'word arrives attached to a real object he can feel and see at the '
+          'The number of words babies hear in their first three years strongly '
+          'predicts their language later. Not flash cards, not videos. '
+          'Ordinary talk from a person who is right there with them.',
+          'Naming while touching works better than naming alone. The word '
+          'arrives attached to a real object your baby can feel and see at the '
           'same moment. That is how the word sticks.',
-          'The gaps matter as much as the words. Leaving a pause and then '
-          'answering his babble teaches him that talking is a turn-taking '
-          'thing, which is the shape of every conversation he will ever have.',
+          'The gaps matter as much as the words. Pausing, then answering the '
+          'babble, teaches your baby that talking means taking turns. That is '
+          'the shape of every conversation to come.',
         ], heading: 'What it builds'),
-        PpWhenLine('From birth. It never stops being worth doing, it just turns '
+        PpWhenLine('From birth. It never stops being worth doing. It just turns '
             'into ordinary conversation.'),
-        PpIndiaNote('In a joint family this happens naturally and abundantly. '
-            'Dadi naming things in one language and you in another is not '
-            'confusing for him. It is two vocabularies for the price of one.'),
+        PpIndiaNote('In a joint family this happens naturally, all day long. '
+            'A grandmother naming things in one language and you in another will not '
+            'confuse your baby. It means two vocabularies for the price of one.'),
       ],
     ),
     PpPage(
@@ -396,41 +393,41 @@ const PpArea _today = PpArea(
       format: 'ACTIVITY',
       bands: ['baby'],
       blocks: [
-        PpIntro('The first experiment he will ever run. He moves his hand, a '
-            'sound happens, and he works out that he caused it.'),
+        PpIntro('Your baby\'s very first experiment. A hand moves, a sound '
+            'happens, and your baby works out who caused it.'),
         PpSteps([
-          PpStep('Sit him supported, or lay him on his back'),
-          PpStep('Put a light rattle or a small steel katori and spoon in his '
-              'hand'),
-          PpStep('Let him wave it and be startled by the noise',
+          PpStep('Sit your baby supported, or lying on the back'),
+          PpStep('Put a light rattle or a small steel bowl and spoon in your '
+              'baby\'s hand'),
+          PpStep('Let your baby wave it and be startled by the noise',
               'The startled face is the moment the connection is being made.'),
           PpStep('Do it again, and again, and again',
-              'Repetition is not boredom to a baby. It is how he confirms the '
-              'rule he just discovered.'),
+              'Repetition is not boredom to a baby. It is how babies check the '
+              'rule they just discovered.'),
           PpStep('Swap the object for something with a different sound',
               'A steel glass with two rajma beans inside, lid taped shut. A '
               'paper packet that crackles.'),
         ], heading: 'What happens'),
         PpCards([
-          PpCard('A small steel katori and spoon', 'Light enough for him to '
+          PpCard('A small steel bowl and spoon', 'Light enough for a baby to '
               'lift.'),
           PpCard('Or a sealed jar with two beans in it',
               'Tape the lid firmly. Check the tape before every use.'),
         ], heading: 'What you need', hue: 42),
         PpArticle([
-          'This is cause and effect, the idea that his own actions change the '
-          'world. Every bit of later problem solving is built on it, and it is '
-          'also where a sense of being able to do things begins.',
+          'This is cause and effect: the idea that my own actions change the '
+          'world. All later problem solving is built on it. It is also where '
+          'the feeling of being able to do things begins.',
           'Grasping, holding on while moving the arm, and letting go on purpose '
-          'are three separate skills, and this activity practises all three '
+          'are three separate skills. This activity practises all three '
           'without either of you noticing.',
         ], heading: 'What it builds'),
-        PpWhenLine('From about four months, when he can hold an object, to '
-            'around nine months, when posting and banging games take over.'),
+        PpWhenLine('From about four months, when your baby can hold an object, '
+            'to around nine months, when posting and banging games take over.'),
         PpCallout(
           'Anything you give a baby must be too big to pass through a toilet '
           'roll tube, with nothing that can come loose. Check sealed jars and '
-          'taped lids before every single use, and take it away if the tape '
+          'taped lids before every use, and take it away if the tape '
           'has lifted.',
           kind: PpCalloutKind.safety,
           title: 'The toilet roll test',
@@ -444,20 +441,20 @@ const PpArea _today = PpArea(
       format: 'ACTIVITY',
       bands: ['baby'],
       blocks: [
-        PpIntro('He does not know that the baby in the mirror is him. That is '
-            'exactly what makes it such good company.'),
+        PpIntro('Babies don\'t know the baby in the mirror is them. That is '
+            'what makes the mirror such good company.'),
         PpSteps([
-          PpStep('Hold him in front of a mirror, or prop one safely at floor '
-              'level'),
-          PpStep('Point at the reflection and name him',
-              'Look, baby! And that is Amma. Say his own name often.'),
-          PpStep('Make faces and let him watch both of you',
+          PpStep('Hold your baby in front of a mirror, or prop one safely at '
+              'floor level'),
+          PpStep('Point at the reflection and say your baby\'s name',
+              'Look, baby. And that is Mummy. Use your baby\'s own name often.'),
+          PpStep('Make faces and let your baby watch you both',
               'Stick your tongue out, open your mouth wide, smile slowly.'),
-          PpStep('Touch his nose, then the nose in the mirror',
-              'Name the parts as you go. Naak, nose, kaan, ears.'),
+          PpStep('Touch your baby\'s nose, then the nose in the mirror',
+              'Name the parts as you go. Nose, ears, eyes, mouth.'),
           PpStep('Try it during tummy time',
-              'A mirror propped against the wall gives him a reason to keep his '
-              'head up much longer.'),
+              'A mirror propped against the wall gives your baby a reason to '
+              'keep the head up much longer.'),
         ], heading: 'What happens'),
         PpCards([
           PpCard('Any mirror', 'A wardrobe mirror, a hand mirror you hold, the '
@@ -466,15 +463,15 @@ const PpArea _today = PpArea(
               'it, or use a fixed wall mirror.'),
         ], heading: 'What you need', hue: 42),
         PpArticle([
-          'Somewhere between fifteen and twenty four months, a child works out '
-          'that the reflection is himself. Long before that, the moving face is '
-          'wonderful social company, and watching a mouth make shapes feeds '
-          'straight into his own speech.',
-          'Naming body parts at a mirror is the easiest vocabulary he will ever '
-          'learn, because the object is right there and it belongs to him.',
+          'Somewhere between fifteen and twenty four months, children work out '
+          'that the reflection is their own. Long before that, the moving face '
+          'is wonderful company. Watching a mouth make shapes feeds straight '
+          'into your baby\'s own speech.',
+          'Naming body parts at a mirror is the easiest vocabulary there is. '
+          'The object is right there, and it belongs to your baby.',
         ], heading: 'What it builds'),
-        PpWhenLine('From about five months, when he holds his head steadily, '
-            'through the whole first year.'),
+        PpWhenLine('From about five months, once your baby holds the head '
+            'steadily, through the whole first year.'),
       ],
     ),
     PpPage(
@@ -485,42 +482,42 @@ const PpArea _today = PpArea(
       bands: ['baby'],
       blocks: [
         PpIntro('One basket, five or six things that feel completely different '
-            'from each other. He does the rest himself.'),
+            'from each other. Your baby does the rest.'),
         PpSteps([
-          PpStep('Find a basket or a steel tokri he can reach into'),
+          PpStep('Find a basket or a wide steel bowl your baby can reach into'),
           PpStep('Put in five or six safe things with very different textures',
               'A wooden spoon, a square of soft cloth, a silicone spatula, a '
               'loofah, a smooth stone too big to swallow, a crumpled paper.'),
-          PpStep('Sit him down with it and say nothing',
-              'This is the hard part. Let him choose, mouth, drop and choose '
-              'again without being directed.'),
-          PpStep('Name things only when he looks up at you',
-              'That look is him asking. Answer it, then go quiet again.'),
+          PpStep('Sit your baby down with it and say nothing',
+              'This is the hard part. Let your baby choose, mouth, drop and '
+              'choose again without being directed.'),
+          PpStep('Name things only when your baby looks up at you',
+              'That look is a question. Answer it, then go silent again.'),
           PpStep('Change two things in the basket each week',
               'Familiar plus new is more interesting than all new.'),
         ], heading: 'What happens'),
         PpCards([
-          PpCard('A basket or tokri', 'Low enough to reach into sitting down.'),
+          PpCard('A low basket', 'Low enough to reach into sitting down.'),
           PpCard('Five or six household textures',
-              'Nothing smaller than his fist. Nothing that sheds bits.'),
+              'Nothing smaller than your baby\'s fist. Nothing that sheds bits.'),
         ], heading: 'What you need', hue: 42),
         PpArticle([
-          'Touch is a whole channel of information, and a baby who has handled '
-          'rough, smooth, soft and cold builds a richer map of the physical '
-          'world than one who has only handled plastic.',
-          'Picking objects out of a container and dropping them back in is also '
-          'serious fine motor work, and it is the direct ancestor of holding a '
-          'crayon four years later.',
-          'The silence is deliberate. Uninterrupted concentration on a chosen '
-          'object is the thing that grows into an attention span, and an adult '
-          'voice arriving mid-thought is what breaks it.',
+          'Touch is a whole channel of information. A baby who has handled '
+          'rough, smooth, soft and cold builds a richer map of the world than '
+          'one who has only handled plastic.',
+          'Picking things out of a container and dropping them back in is '
+          'serious fine motor work. It leads straight to holding a crayon '
+          'four years later.',
+          'The silence is on purpose. Unbroken focus on a chosen object grows '
+          'into an attention span. An adult voice arriving mid-thought is what '
+          'breaks it.',
         ], heading: 'What it builds'),
-        PpWhenLine('From about six months, when he sits with support, to the '
-            'end of the first year.'),
+        PpWhenLine('From about six months, when your baby sits with support, to '
+            'the end of the first year.'),
         PpCallout(
-          'Everything in the basket goes in his mouth. That is not a problem to '
-          'stop, it is how he examines things. It does mean each item must pass '
-          'the toilet roll tube test and be washable.',
+          'Everything in the basket will go in your baby\'s mouth. That is how '
+          'babies examine things, so there is no need to stop it. It does mean '
+          'each item must pass the toilet roll tube test and be washable.',
           kind: PpCalloutKind.safety,
           title: 'It will all be mouthed',
         ),
@@ -536,15 +533,15 @@ const PpArea _today = PpArea(
         PpIntro('The first game with a rule in it, and the rule is the whole '
             'point: my turn, then your turn.'),
         PpSteps([
-          PpStep('Sit facing him with your legs open, close at first'),
-          PpStep('Roll a soft ball slowly to him and say his name'),
+          PpStep('Sit facing your baby with your legs open, close at first'),
+          PpStep('Roll a soft ball slowly across and say your baby\'s name'),
           PpStep('Wait',
-              'He may just hold it. That is fine. Waiting is the activity.'),
-          PpStep('Help his hands push it back the first few times',
+              'Your baby may just hold it. That is fine. Waiting is the activity.'),
+          PpStep('Help the little hands push it back the first few times',
               'Then stop helping and let it be clumsy.'),
           PpStep('Say the same two words every time',
-              "My turn, your turn. He will not say it back for a year, and he "
-              "is learning it now."),
+              "My turn, your turn. Your baby won't say it back for a year, "
+              "but is learning it now."),
         ], heading: 'What happens'),
         PpCards([
           PpCard('A soft ball', 'Or a rolled ball of cloth, or an empty plastic '
@@ -552,14 +549,14 @@ const PpArea _today = PpArea(
           PpCard('Floor space', 'A metre is enough to start.'),
         ], heading: 'What you need', hue: 42),
         PpArticle([
-          'Sitting up while reaching and pushing is real trunk work, and it '
-          'strengthens exactly the muscles he needs for crawling and standing.',
+          'Sitting up while reaching and pushing is real trunk work. It builds '
+          'the very muscles needed for crawling and standing.',
           'Underneath it is something bigger. Turn taking is the seed of every '
           'social skill that follows, from sharing a toy at two to waiting to '
-          'speak at six. It starts here, wordlessly, with a ball.',
+          'speak at six. It starts here, without words, with a ball.',
         ], heading: 'What it builds'),
-        PpWhenLine('From about eight months, once he sits steadily without '
-            'toppling, and for a long time afterwards.'),
+        PpWhenLine('From about eight months, once your baby sits steadily '
+            'without toppling, and for a long time afterwards.'),
       ],
     ),
 
@@ -571,33 +568,33 @@ const PpArea _today = PpArea(
       format: 'ACTIVITY',
       bands: ['one'],
       blocks: [
-        PpIntro('Your kitchen already contains the best stacking toy ever made. '
-            'It nests, it stacks, it makes a magnificent noise when it falls.'),
+        PpIntro('Your kitchen already has the best stacking toy ever made. '
+            'It nests, it stacks, it makes a wonderful noise when it falls.'),
         PpSteps([
-          PpStep('Take out four or five katoris of clearly different sizes'),
-          PpStep('Show him once, slowly, how the small one goes inside the big '
-              'one'),
-          PpStep('Push the pile towards him and let him try',
-              'He will get it wrong for weeks. Do not correct his hands.'),
-          PpStep('Build a tower and let him knock it down',
+          PpStep('Take out four or five steel bowls of clearly different sizes'),
+          PpStep('Show your toddler once, slowly, how the small one goes inside '
+              'the big one'),
+          PpStep('Push the pile across and let your toddler try',
+              'It will go wrong for weeks. Leave the little hands to it.'),
+          PpStep('Build a tower and let your toddler knock it down',
               'Knocking down comes before building. Both are learning.'),
-          PpStep('Add a spoon and a lid once he is bored',
+          PpStep('Add a spoon and a lid once the bowls get boring',
               'Now it is a posting game and a drum as well.'),
         ], heading: 'What happens'),
         PpCards([
-          PpCard('Four or five steel katoris', 'Different sizes, no sharp rims.'),
+          PpCard('Four or five steel bowls', 'Different sizes, no sharp rims.'),
           PpCard('Nothing else', 'Bought stacking cups do the same job. The '
-              'kitchen ones are heavier, which is actually better practice.'),
+              'kitchen ones are heavier, which makes them better practice.'),
         ], heading: 'What you need', hue: 42),
         PpArticle([
-          'Getting one bowl inside another is a size problem he has to solve by '
-          'trial and error, and it is the first ordering of the world by size. '
-          'That is genuine early mathematics, with no numbers in it at all.',
-          'Placing a bowl carefully on top of another without knocking it over '
-          'demands hand control, wrist rotation and the patience to let go '
+          'Getting one bowl inside another is a size problem, solved by trial '
+          'and error. It is the first ordering of the world by size. That is '
+          'real early maths, with no numbers in it at all.',
+          'Placing a bowl carefully on another without knocking it over '
+          'needs hand control, wrist turning and the patience to let go '
           'slowly. Those three things are what a pencil will one day need.',
         ], heading: 'What it builds'),
-        PpWhenLine('From about twelve months. He will nest before he stacks, '
+        PpWhenLine('From about twelve months. Nesting comes before stacking, '
             'usually by eighteen months.'),
       ],
     ),
@@ -615,34 +612,33 @@ const PpArea _today = PpArea(
           PpStep('Cut one slot in the lid, big enough for a bottle cap to drop '
               'through',
               'One slot only at first. Two shapes is a harder game for later.'),
-          PpStep('Give him a small pile of bottle caps or large buttons',
+          PpStep('Give your toddler a small pile of bottle caps or large buttons',
               'Everything must be too big to swallow. Bottle caps from a two '
               'litre bottle are about right.'),
-          PpStep('Show him once, then leave him to it'),
+          PpStep('Show how once, then step back'),
           PpStep('Open the box and tip it out together when it is full',
-              'The emptying is half the fun and it is where the counting talk '
-              'goes later.'),
+              'The emptying is half the fun, and it is where counting talk '
+              'comes in later.'),
         ], heading: 'What happens'),
         PpCards([
           PpCard('A carton and a lid', 'Any box that closes.'),
           PpCard('Bottle caps', 'Ten or twelve. Wash them first.'),
           PpCard('Adult scissors, used once',
-              'You cut the slot, not him. Then the scissors go away.'),
+              'You cut the slot, not your toddler. Then the scissors go away.'),
         ], heading: 'What you need', hue: 42),
         PpArticle([
-          'Lining a small object up with a small hole is fine motor work of a '
-          'precise kind, and it needs both eyes and hands to agree with each '
-          'other.',
-          'It is also object permanence again, one level up. He put it in, he '
-          'cannot see it, and he now knows with confidence that it is still in '
+          'Lining a small object up with a small hole is precise fine motor '
+          'work. It needs the eyes and hands to agree with each other.',
+          'It is also object permanence again, one level up. It went in, it '
+          'cannot be seen, and your toddler now knows for sure it is still in '
           'there. A year ago that was a mystery.',
         ], heading: 'What it builds'),
-        PpWhenLine('From about twelve months to eighteen months. After that he '
-            'wants two different shapes and two different slots.'),
+        PpWhenLine('From about twelve months to eighteen months. After that, '
+            'two different shapes and two different slots are more fun.'),
         PpCallout(
-          'A bottle cap is exactly the size that chokes a toddler if it is a '
-          'small one. Use caps from large bottles only, count them out and '
-          'count them back in, and put the box on a high shelf between goes.',
+          'A small bottle cap is exactly the size that can choke a toddler. Use '
+          'caps from large bottles only, count them out and count them back '
+          'in, and put the box on a high shelf between goes.',
           kind: PpCalloutKind.safety,
           title: 'Count them out, count them back',
         ),
@@ -655,34 +651,34 @@ const PpArea _today = PpArea(
       format: 'ACTIVITY',
       bands: ['one'],
       blocks: [
-        PpIntro('Two bowls, one pile of mixed caps, and the first time he ever '
-            'puts the world into categories.'),
+        PpIntro('Two bowls, one pile of mixed caps, and the first time your '
+            'toddler puts the world into groups.'),
         PpSteps([
           PpStep('Start with only two colours, and only a few of each',
               'Six red caps and six blue ones. More than that is a mess, not a '
               'game.'),
           PpStep('Put one red cap in the red bowl and one blue in the blue bowl',
-              'Then hand him the pile without instructions.'),
-          PpStep('Name the colour as each one lands, but do not correct him',
+              'Then hand over the pile without instructions.'),
+          PpStep('Name the colour as each one lands, without correcting',
               'If a red goes in the blue bowl, just say red as you would '
-              'anyway. He will fix it himself within a few weeks.'),
+              'anyway. Your toddler will fix it within a few weeks.'),
           PpStep('When two colours are easy, add a third'),
           PpStep('Then sort by something other than colour',
               'Big and small. Spoons and caps. Smooth and rough.'),
         ], heading: 'What happens'),
         PpCards([
-          PpCard('Two bowls', 'Katoris are perfect.'),
+          PpCard('Two bowls', 'Small steel bowls are perfect.'),
           PpCard('Twelve bottle caps in two colours',
               'Or buttons, or two kinds of dal in a bigger version for older '
               'children.'),
         ], heading: 'What you need', hue: 42),
         PpArticle([
-          'Sorting is the beginning of mathematical thinking. Before a child '
-          'can count things he has to see them as a group of the same kind of '
-          'thing, and that is precisely the skill this builds.',
+          'Sorting is the beginning of maths thinking. Before children can '
+          'count things, they have to see them as a group of the same kind. '
+          'That is exactly the skill this builds.',
           'Deciding that this one belongs here and that one does not is also '
-          'the first logical rule he applies on his own, without an adult '
-          'telling him the answer each time.',
+          'a first logical rule. Your toddler applies it alone, with no adult '
+          'giving the answer each time.',
         ], heading: 'What it builds'),
         PpWhenLine('From about eighteen months, when colour words start to '
             'mean something. Sorting by size works a little earlier.'),
@@ -695,40 +691,42 @@ const PpArea _today = PpArea(
       format: 'ACTIVITY',
       bands: ['one'],
       blocks: [
-        PpIntro('It will spill. That is not the activity failing, that is the '
-            'activity working. Put a tray under it and let him.'),
+        PpIntro('It will spill. That means the activity is working. Put a tray '
+            'under it and let your toddler pour.'),
         PpSteps([
-          PpStep('Sit him at a low table or on the floor with a steel tray'),
-          PpStep('Give him two small glasses, one with a little water in it',
+          PpStep('Sit your toddler at a low table or on the floor with a steel '
+              'tray'),
+          PpStep('Give two small glasses, one with a little water in it',
               'Start with two fingers of water only. A full glass is a flood '
-              'and a discouragement.'),
-          PpStep('Pour slowly once yourself, exaggerating the tilt'),
+              'and a letdown.'),
+          PpStep('Pour slowly once yourself, making the tilt big and clear'),
           PpStep('Hand it over and sit on your hands',
-              'Do not steady the glass for him. The wobble is the learning.'),
-          PpStep('Give him a cloth and let him wipe the spill',
+              'Don\'t steady the glass. The wobble is the learning.'),
+          PpStep('Give your toddler a cloth to wipe the spill',
               'Cleaning up is part of the work, not a punishment for it. '
-              'Toddlers genuinely enjoy the wiping.'),
+              'Toddlers love the wiping.'),
         ], heading: 'What happens'),
         PpCards([
-          PpCard('Two small steel glasses', 'Light ones he can lift when full.'),
+          PpCard('Two small steel glasses', 'Light ones a toddler can lift when '
+              'full.'),
           PpCard('A tray with a rim', 'A thali works. It contains the mess.'),
-          PpCard('A small cloth', 'His own, for wiping.'),
+          PpCard('A small cloth', 'Your toddler\'s own, for wiping.'),
         ], heading: 'What you need', hue: 42),
         PpArticle([
           'Pouring needs both hands to do different jobs while the eyes judge a '
           'moving level. Very few activities at this age ask for that much '
           'coordination at once.',
-          'It is also his first real job. A child who can pour his own water at '
-          'two is a child who has learned that he can do things for himself, '
-          'and that belief is worth more than the skill.',
-          'Watch how long he stays with it. Concentration this deep is rare and '
-          'valuable at eighteen months, and it is the same attention he will '
-          'need in a classroom later. Do not interrupt it to offer praise.',
+          'It is also a first real job. Two-year-olds who pour their own water '
+          'learn that they can do things for themselves. That belief is worth '
+          'more than the skill.',
+          'Watch how long the pouring lasts. Focus this deep is rare and '
+          'valuable at eighteen months, and it is the same attention a '
+          'classroom will need later. Don\'t interrupt it to offer praise.',
         ], heading: 'What it builds'),
         PpWhenLine('From about eighteen months. It stays useful right through '
             'to four, with the glasses getting bigger.'),
         PpIndiaNote('In most Indian homes this can happen at the tap during '
-            'the daily nahaana, with a mug and a bucket. No special setup '
+            'the daily bath, with a mug and a bucket. No special setup '
             'needed, and the floor is already wet.'),
         PpVideoSlot(
           title: 'Setting up a pouring tray',
@@ -746,39 +744,39 @@ const PpArea _today = PpArea(
       format: 'ACTIVITY',
       bands: ['one'],
       blocks: [
-        PpIntro('The first time he does to a toy what you do to him. It is a '
-            'much bigger moment than it looks.'),
+        PpIntro('The first time your toddler does to a toy what you do every '
+            'day. It is a much bigger moment than it looks.'),
         PpSteps([
-          PpStep('Give him a doll or a soft toy and a small katori and spoon'),
+          PpStep('Give your toddler a doll or a soft toy, a small bowl and a '
+              'spoon'),
           PpStep('Feed the doll yourself once, with sound effects',
-              'Aa aa aa, one more bite. Exactly as you feed him.'),
-          PpStep('Hand it over and follow his lead'),
+              'Aa aa aa, one more bite. Just the way you feed your toddler.'),
+          PpStep('Hand it over and follow your toddler\'s lead'),
           PpStep('Add the rest of the routine one piece at a time',
               'A cloth to burp it, a scrap of dupatta as a blanket, a pat and a '
               'hum to put it to sleep.'),
           PpStep('Join in as a character, not as a director',
-              "Say the doll is hungry. Do not say now feed the doll properly."),
+              "Say the doll is hungry. Don't say, now feed the doll properly."),
         ], heading: 'What happens'),
         PpCards([
           PpCard('Any soft toy or doll', 'A rolled towel with a knot for a head '
-              'works completely.'),
-          PpCard('A katori and spoon', 'Real ones. Toddlers prefer real.'),
+              'works perfectly.'),
+          PpCard('A small bowl and spoon', 'Real ones. Toddlers prefer real.'),
           PpCard('A scrap of cloth', 'Blanket, towel, sling. It becomes all '
               'three.'),
         ], heading: 'What you need', hue: 42),
         PpArticle([
           'Pretending is the mind holding two things at once: this is a cloth, '
-          'and this is a blanket. That ability to let one thing stand for '
-          'another is the same ability that later lets a written mark stand for '
-          'a sound.',
-          'Caring for a toy is also the first rehearsal of empathy. He is '
-          'practising being the one who notices that somebody else is hungry, '
+          'and this is a blanket. Letting one thing stand for another is the '
+          'same ability that later lets a written mark stand for a sound.',
+          'Caring for a toy is also the first practice of empathy. Your toddler '
+          'is learning to be the one who notices that somebody else is hungry, '
           'cold or sleepy.',
         ], heading: 'What it builds'),
         PpWhenLine('From about eighteen months. It grows into full role play '
             'between two and four.'),
         PpCallout('Boys need dolls as much as girls do. Caring for something '
-            'small is not a girls skill, and a boy who has practised it becomes '
+            'small is not a girls\' skill, and a boy who has practised it becomes '
             'a man who notices when someone needs help.'),
       ],
     ),
@@ -793,33 +791,32 @@ const PpArea _today = PpArea(
             'easiest thing in this whole door and one of the most useful.'),
         PpSteps([
           PpStep('Put on one song, the same one most days',
-              'Familiar beats new for a toddler. He is waiting for the part he '
-              'knows.'),
-          PpStep('Clap on the beat and let him copy'),
+              'Familiar beats new for a toddler. Half the joy is waiting for '
+              'the part that is coming.'),
+          PpStep('Clap on the beat and invite your toddler to copy'),
           PpStep('Add a body part each time',
               'Stamp your feet. Turn around. Hands up high. Sit down fast.'),
           PpStep('Stop the music suddenly and freeze',
-              'The stopping game is hilarious to a toddler and is real self '
+              'Toddlers find the stopping game hilarious, and it is real self '
               'control practice.'),
           PpStep('Sing it with no music too',
-              'Your voice, out of tune, is better for him than any recording.'),
+              'Your voice, out of tune, is better than any recording.'),
         ], heading: 'What happens'),
         PpCards([
-          PpCard('One song', 'A lori, a film song, a nursery rhyme. Any of it.'),
+          PpCard('One song', 'A lullaby, a film song, a nursery rhyme. Any of it.'),
           PpCard('A little floor space', 'And no audience.'),
         ], heading: 'What you need', hue: 42),
         PpArticle([
           'Rhythm and language sit close together in the brain. Children who '
-          'clap in time find the beats inside words more easily later, and that '
-          'is the exact skill that makes reading click.',
-          'Copying a movement you have just done is imitation, which is how a '
-          'toddler learns almost everything. Freezing when the music stops is '
-          'the beginning of being able to stop himself doing something, which '
-          'is the skill every classroom asks for.',
+          'clap in time find the beats inside words more easily later. That is '
+          'the exact skill that makes reading click.',
+          'Copying a movement you have just made is imitation, and toddlers '
+          'learn almost everything that way. Freezing when the music stops is '
+          'the beginning of self control. Every classroom asks for that skill.',
         ], heading: 'What it builds'),
-        PpWhenLine('From twelve months, as soon as he can stand and bounce. '
-            'It never stops working.'),
-        PpIndiaNote('Dadi humming while she works is the same activity. A child '
+        PpWhenLine('From twelve months, as soon as your toddler can stand and '
+            'bounce. It never stops working.'),
+        PpIndiaNote('A grandmother humming as she works is the same activity. A child '
             'growing up around live singing hears far more musical variety '
             'than one who only hears a speaker.'),
       ],
@@ -834,15 +831,15 @@ const PpArea _today = PpArea(
         PpIntro('Not reading the story. Just one page, one picture, one word, '
             'and a long pause afterwards.'),
         PpSteps([
-          PpStep('Sit him on your lap with a board book, or a magazine'),
+          PpStep('Sit your toddler on your lap with a board book, or a magazine'),
           PpStep('Point at one thing and name it',
-              'Cow. Gaay. That is the whole sentence.'),
+              'Cow. That is the whole sentence.'),
           PpStep('Wait. Count to five in your head',
-              'This pause is where his attempt at the word goes. If you fill '
-              'it, he has nowhere to speak.'),
+              'This pause is where your toddler\'s try at the word goes. If you '
+              'fill it, there is no room left to speak.'),
           PpStep('Accept any sound as the word',
               'Oo for cow counts. Say cow back, warmly, and move on.'),
-          PpStep('Let him turn the pages and skip about',
+          PpStep('Let your toddler turn the pages and skip about',
               'Finishing the book is not the goal at this age.'),
         ], heading: 'What happens'),
         PpCards([
@@ -851,16 +848,15 @@ const PpArea _today = PpArea(
           PpCard('Your lap', 'The closeness is doing half the work.'),
         ], heading: 'What you need', hue: 42),
         PpArticle([
-          'Pointing at a picture together is called joint attention, and it is '
-          'one of the strongest engines of early vocabulary. Both of you are '
-          'looking at the same thing, so he knows exactly which object the word '
-          'belongs to.',
-          'It also teaches him what a book is: something you hold, turn and '
-          'find things in. That familiarity is worth more at eighteen months '
-          'than knowing a single letter.',
+          'Pointing at a picture together is called joint attention. It is one '
+          'of the strongest engines of early vocabulary. You are both looking '
+          'at the same thing, so it is clear which object the word belongs to.',
+          'It also shows your toddler what a book is: something you hold, turn '
+          'and find things in. That comfort with books is worth more at '
+          'eighteen months than knowing a single letter.',
         ], heading: 'What it builds'),
         PpWhenLine('From about twelve months. Three minutes is a long time at '
-            'this age and completely enough.'),
+            'this age and plenty.'),
         PpLink(
           'Books worth having at this age',
           surfaceId: 'pp_read',
@@ -878,38 +874,38 @@ const PpArea _today = PpArea(
       format: 'ACTIVITY',
       bands: ['two'],
       blocks: [
-        PpIntro('The quietest ten minutes of your day. Something about moving '
-            'dal one spoonful at a time absorbs a two-year-old completely.'),
+        PpIntro('The calmest ten minutes of your day. Moving dal one spoonful '
+            'at a time absorbs a two-year-old completely.'),
         PpSteps([
-          PpStep('Put two katoris on a tray, one with half a cup of dal in it'),
-          PpStep('Give him a spoon that fits his hand',
+          PpStep('Put two small bowls on a tray, one with half a cup of dal in it'),
+          PpStep('Give your child a spoon that fits a small hand',
               'A small steel spoon, not a serving one.'),
           PpStep('Move one spoonful yourself, slowly, and then stop'),
-          PpStep('Let him work until he stops',
-              'Do not count, do not praise mid-way, do not tidy the spills as '
+          PpStep('Let your child keep going until the interest runs out',
+              'Don\'t count, don\'t praise mid-way, don\'t tidy the spills as '
               'they happen.'),
-          PpStep('Tip it back and let him do it again if he wants to',
-              'Repetition is the point. He is not achieving a task, he is '
+          PpStep('Tip it back and let your child go again, if wanted',
+              'Repetition is the point. The aim is not finishing a task. It is '
               'refining a movement.'),
         ], heading: 'What happens'),
         PpCards([
-          PpCard('Two katoris and a small spoon', 'From your own kitchen.'),
+          PpCard('Two small bowls and a small spoon', 'From your own kitchen.'),
           PpCard('Half a cup of dal or rice',
               'Chana dal is a good size to start. It goes back in the packet '
               'afterwards.'),
           PpCard('A tray', 'So the spills stay in one place.'),
         ], heading: 'What you need', hue: 42),
         PpArticle([
-          'The grip he uses on the spoon is almost exactly the grip he will use '
-          'on a pencil. Building it here, with no pressure and no letters, is '
-          'why children who do practical life work often write comfortably '
-          'later without ever being drilled.',
+          'The grip on the spoon is almost exactly the grip a pencil needs. '
+          'Building it here, with no pressure and no letters, is why children '
+          'who do everyday practical work often write comfortably later, '
+          'without ever being drilled.',
           'The deeper thing being built is concentration. A two-year-old who '
-          'stays with one self-chosen task for eight minutes is stretching an '
-          'attention span, and attention is the thing school will ask for '
-          'before it asks for anything academic.',
+          'stays with one chosen task for eight minutes is stretching an '
+          'attention span. School will ask for attention before it asks for '
+          'anything academic.',
         ], heading: 'What it builds'),
-        PpWhenLine('From about two years. Move from dal to water once his '
+        PpWhenLine('From about two years. Move from dal to water once the '
             'spills are small.'),
         PpVideoSlot(
           title: 'Practical life at your kitchen counter',
@@ -930,15 +926,15 @@ const PpArea _today = PpArea(
         PpIntro('A game you can play while cooking, without stopping cooking. '
             'One colour, one room, and a small person running.'),
         PpSteps([
-          PpStep('Name one colour and give him the whole room',
+          PpStep('Name one colour and give your child the whole room',
               'Go and find something red. Anything red.'),
-          PpStep('Accept whatever he brings',
+          PpStep('Accept whatever comes back',
               'If the orange dupatta arrives, say that is close, that is '
               'orange, and take it happily.'),
-          PpStep('Line up everything he finds',
-              'Five red things in a row is more satisfying to him than any '
+          PpStep('Line up everything your child finds',
+              'Five red things in a row feels better to a small child than any '
               'praise.'),
-          PpStep('Swap roles and let him set you the colour',
+          PpStep('Swap roles and let your child pick the colour for you',
               'Getting it wrong on purpose is very funny at this age.'),
           PpStep('Play the same game with shapes and sizes later',
               'Find something round. Find something bigger than this book.'),
@@ -948,14 +944,14 @@ const PpArea _today = PpArea(
         ], heading: 'What you need', hue: 42),
         PpArticle([
           'Colour words are abstract in a way object words are not. Red is not '
-          'a thing, it is a property shared by unrelated things, and hunting '
-          'for it across a room is how that idea lands.',
-          'Scanning a busy room for one feature is also visual discrimination, '
-          'the skill that later lets him spot the difference between two very '
-          'similar letters without anybody teaching him to.',
+          'a thing. It is something unrelated things share, and hunting for it '
+          'across a room is how that idea lands.',
+          'Scanning a busy room for one feature is also visual discrimination. '
+          'Later, it helps your child spot the difference between two very '
+          'similar letters, without anyone teaching it.',
         ], heading: 'What it builds'),
-        PpWhenLine('From about two years, once he has a few colour words. It '
-            'stays fun until four or five.'),
+        PpWhenLine('From about two years, once your child has a few colour '
+            'words. It stays fun until four or five.'),
       ],
     ),
     PpPage(
@@ -965,31 +961,32 @@ const PpArea _today = PpArea(
       format: 'ACTIVITY',
       bands: ['two'],
       blocks: [
-        PpIntro('Empty the dabba shelf onto the floor, separate the lids, and '
-            'hand the whole problem to him.'),
+        PpIntro('Empty the shelf of tins and boxes onto the floor, separate the lids, and '
+            'hand the whole problem to your child.'),
         PpSteps([
           PpStep('Choose four or five containers of clearly different sizes'),
           PpStep('Put the lids in one pile and the boxes in another'),
-          PpStep('Let him try lids on boxes until they fit',
-              'Wrong fits are the most useful attempts. He is learning by '
-              'elimination.'),
+          PpStep('Let your child try lids on boxes until they fit',
+              'Wrong fits are the most useful tries. This is learning by '
+              'ruling things out.'),
           PpStep('Add a screw-top jar once the press-on lids are easy',
               'Twisting is a different wrist movement and a harder one.'),
-          PpStep('Give him the job for real, at tidy-up time',
-              'Now it is helping, which he wants even more than a game.'),
+          PpStep('Make it a real job at tidy-up time',
+              'Now it is helping, and small children want that even more than '
+              'a game.'),
         ], heading: 'What happens'),
         PpCards([
-          PpCard('Four or five dabbas with lids',
+          PpCard('Four or five tins or boxes with lids',
               'Different sizes. Nothing glass, nothing sharp.'),
-          PpCard('One screw-top jar', 'For when he is ready for harder.'),
+          PpCard('One screw-top jar', 'For when your child is ready for harder.'),
         ], heading: 'What you need', hue: 42),
         PpArticle([
-          'Matching a lid to a box is a shape and size problem he has to hold '
-          'in his head while his hands test it, which is early spatial '
+          'Matching a lid to a box is a shape and size problem. Your child '
+          'holds it in mind while the hands test it. That is early spatial '
           'reasoning and early problem solving in one.',
-          'Screwing a lid on is a rotating wrist movement that almost nothing '
-          'else in a toddler day practises, and it feeds directly into every '
-          'later tool he uses, including a pencil.',
+          'Screwing a lid on is a turning wrist movement that little else in a '
+          'toddler\'s day practises. It feeds straight into every later tool, '
+          'including a pencil.',
         ], heading: 'What it builds'),
         PpWhenLine('From about two years for press-on lids, closer to three for '
             'screw tops.'),
@@ -1002,18 +999,18 @@ const PpArea _today = PpArea(
       format: 'ACTIVITY',
       bands: ['two'],
       blocks: [
-        PpIntro('Dry penne and a shoelace. It looks like nothing and it is one '
+        PpIntro('Dry penne and a shoelace. It looks like nothing, and it is one '
             'of the hardest fine motor jobs a two-year-old can do.'),
         PpSteps([
           PpStep('Tie a knot at one end of a shoelace or a stiff thread',
               'Stiff matters. A soft thread collapses and the whole thing '
               'becomes impossible.'),
-          PpStep('Put a bowl of dry penne or macaroni beside him'),
+          PpStep('Put a bowl of dry penne or macaroni within reach'),
           PpStep('Thread the first two yourself, then hand it over'),
-          PpStep('Say nothing while he struggles',
+          PpStep('Say nothing during the struggle',
               'The near-misses are where the coordination is being built. '
               'Taking over ends the learning instantly.'),
-          PpStep('Tie the ends and let him wear it or hang it up',
+          PpStep('Tie the ends so your child can wear it or hang it up',
               'Making something that lasts matters enormously at this age.'),
         ], heading: 'What happens'),
         PpCards([
@@ -1024,15 +1021,15 @@ const PpArea _today = PpArea(
         ], heading: 'What you need', hue: 42),
         PpArticle([
           'Threading needs the two hands to do different jobs at the same time '
-          'while the eyes guide both. That two-handed cooperation is a big step '
+          'while the eyes guide both. That two-handed teamwork is a big step '
           'up from anything at eighteen months.',
           'It is also a lesson in persistence. A child who keeps trying after '
           'six failed threads has practised something no worksheet teaches.',
         ], heading: 'What it builds'),
-        PpWhenLine('From about two and a half. Under that the hole is usually '
-            'too small a target and it ends in frustration.'),
+        PpWhenLine('From about two and a half. Before that the hole is usually '
+            'too small a target, and it ends in frustration.'),
         PpCallout(
-          'Dry pasta and straws are choking-sized and string is a strangling '
+          'Dry pasta and straws are choking-sized, and string is a strangling '
           'risk. Stay in the room for the whole activity, and put the string '
           'away on a high shelf the moment it ends.',
           kind: PpCalloutKind.safety,
@@ -1042,26 +1039,26 @@ const PpArea _today = PpArea(
     ),
     PpPage(
       id: 'act_pretend_shop',
-      title: 'Playing sabzi shop',
+      title: 'Playing vegetable shop',
       subtitle: 'For 2 to 3 years',
       format: 'ACTIVITY',
       bands: ['two'],
       blocks: [
-        PpIntro('You are the customer, he is the sabziwala, and the vegetables '
-            'are the ones you actually bought this morning.'),
+        PpIntro('You are the customer, your child is the vegetable seller, and the '
+            'vegetables are the ones you bought this morning.'),
         PpSteps([
           PpStep('Spread a cloth on the floor and lay out real vegetables',
-              'Onions, a lauki, some nimbu. Real is more interesting than '
+              'Onions, a bottle gourd, some lemons. Real is more interesting than '
               'plastic.'),
-          PpStep('Give him a bowl for a weighing pan and some bottle caps as '
+          PpStep('Hand over a bowl for a weighing pan and some bottle caps as '
               'coins'),
           PpStep('Be the customer and ask properly',
-              'Bhaiya, how much for the tamatar? Give me two.'),
-          PpStep('Let him set the prices and get them wrong',
-              'A tamatar can cost a hundred rupees. Do not correct the '
-              'economics, it is not the point.'),
+              'Excuse me, how much for the tomatoes? Give me two.'),
+          PpStep('Let your child set the prices and get them wrong',
+              'A tomato can cost a hundred rupees. Leave the maths alone. It '
+              'is not the point.'),
           PpStep('Swap roles halfway through',
-              'Being the customer makes him use different words entirely.'),
+              'Being the customer needs a whole different set of words.'),
         ], heading: 'What happens'),
         PpCards([
           PpCard('Real vegetables', 'Whatever came home in the bag today.'),
@@ -1069,18 +1066,29 @@ const PpArea _today = PpArea(
           PpCard('A cloth and a bowl', 'Shop and weighing pan.'),
         ], heading: 'What you need', hue: 42),
         PpArticle([
-          'Role play is the single richest language activity of the toddler '
-          'years. He has to use words he never uses otherwise, ask questions, '
-          'answer them, and stay in a role while doing it.',
-          'It is also social rehearsal. Greeting, asking politely, handing '
+          'Role play is one of the richest language activities of the toddler '
+          'years. Your child has to use new words, ask questions, answer them, '
+          'and stay in a role while doing it.',
+          'It is also social practice. Greeting, asking politely, handing '
           'over, saying thank you and ending an exchange are all being '
           'practised in a place where getting it wrong costs nothing.',
         ], heading: 'What it builds'),
-        PpWhenLine('From about two years. It gets more elaborate and much '
+        PpWhenLine('From about two years. It gets more detailed and much '
             'funnier through to four.'),
-        PpIndiaNote('Kitchen play, chai making and shop play are the three that '
-            'run longest in Indian homes, because he has watched all three '
-            'happen a thousand times. Familiar scripts make the best play.'),
+        PpIndiaNote('Kitchen play, chai making and shop play last longest in '
+            'Indian homes, because your child has watched all three happen a '
+            'thousand times. Familiar scripts make the best play.'),
+        // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+            PpCards(heading: 'More ways to learn about money', [
+              PpCard('Sort the coins', 'By size or colour, with you watching '
+                  'closely: coins are a choking risk under four.'),
+              PpCard('A piggy bank', 'For the gift money relatives hand over. Watching it '
+                  'fill teaches saving.'),
+              PpCard('Shop together', 'Let your child hand over the money and '
+                  'take the change.'),
+              PpCard('Wants and needs', 'Talk through one small choice: this '
+                  'toy, or save for that one.'),
+            ]),
       ],
     ),
     PpPage(
@@ -1090,45 +1098,45 @@ const PpArea _today = PpArea(
       format: 'ACTIVITY',
       bands: ['two'],
       blocks: [
-        PpIntro('Big paper, fat crayons, and absolutely no instructions about '
-            'what to draw. This is the beginning of writing, and it should look '
+        PpIntro('Big paper, fat crayons, and no instructions at all about what '
+            'to draw. This is the beginning of writing, and it is meant to look '
             'like nothing.'),
         PpSteps([
           PpStep('Tape a large sheet of newspaper or chart paper to the floor',
               'Bigger paper means bigger arm movements, which is what you want '
               'at this age.'),
-          PpStep('Give him two or three fat crayons and step back'),
-          PpStep('Do not ask what it is',
+          PpStep('Hand over two or three fat crayons and step back'),
+          PpStep('Don\'t ask what it is',
               'Say tell me about your picture, or just describe what you see. '
               'Lots of blue here. This one goes round and round.'),
-          PpStep('Let him scribble on a vertical surface too',
-              'Paper taped to a wall or a door builds shoulder strength, which '
-              'is where pencil control actually comes from.'),
+          PpStep('Try scribbling on a vertical surface too',
+              'Paper taped to a wall or a door builds shoulder strength, and '
+              'that is where pencil control comes from.'),
           PpStep('Keep one and put it up',
               'Not all of them. One at a time on the fridge means more than a '
               'drawer full.'),
         ], heading: 'What happens'),
         PpCards([
-          PpCard('Fat crayons', 'Chunky ones. Thin pencils force a grip his '
-              'hand is not ready for.'),
+          PpCard('Fat crayons', 'Chunky ones. Thin pencils force a grip small '
+              'hands are not ready for.'),
           PpCard('Big paper', 'Old newspaper, the back of a calendar, brown '
               'paper from a parcel.'),
           PpCard('Tape', 'So the paper does not chase the crayon.'),
         ], heading: 'What you need', hue: 42),
         PpArticle([
-          'Every letter he will ever write is made of lines and curves, and '
-          'both of those live in the shoulder and elbow long before they live '
-          'in the fingers. Big scribbling is how those muscles get built.',
-          'Scribbling is also his first understanding that a mark on paper can '
-          'mean something. Around three he will start telling you what a '
-          'scribble is, which is a genuinely enormous leap and the real start '
-          'of writing.',
+          'Every letter your child will write is made of lines and curves. Both '
+          'live in the shoulder and elbow long before they live in the '
+          'fingers. Big scribbling is how those muscles get built.',
+          'Scribbling is also the first sign that a mark on paper can mean '
+          'something. Around three, your child will start telling you what a '
+          'scribble is. That is an enormous leap, and the real start of '
+          'writing.',
         ], heading: 'Why scribbling is writing practice'),
-        PpWhenLine('From about eighteen months to two years. There is no age at '
-            'which a child should be made to draw a specific shape.'),
+        PpWhenLine('From about eighteen months to two years. No child, at any '
+            'age, needs to be made to draw a specific shape.'),
         PpCallout(
-          'Do not ask a two-year-old to copy a letter, and do not hold his hand '
-          'to make one. Give him bigger paper and let the scribble stay a '
+          'Don\'t ask a two-year-old to copy a letter, and don\'t hold the hand '
+          'to make one. Bring out bigger paper and let the scribble stay a '
           'scribble.',
           kind: PpCalloutKind.safety,
           title: 'No letters yet',
@@ -1137,41 +1145,41 @@ const PpArea _today = PpArea(
     ),
     PpPage(
       id: 'act_count_the_table',
-      title: 'Counting out the katoris',
+      title: 'Counting out the bowls',
       subtitle: 'For 2.5 to 3 years',
       format: 'ACTIVITY',
       bands: ['two'],
       blocks: [
-        PpIntro('Laying the table is a real job with real numbers in it, and he '
-            'would rather do a real job than any game.'),
+        PpIntro('Laying the table is a real job with real numbers in it. Small '
+            'children would rather do a real job than any game.'),
         PpSteps([
-          PpStep('Ask for a number of things you actually need',
+          PpStep('Ask for a number of things you really need',
               'We are four people. Bring four spoons.'),
           PpStep('Count them out together, touching each one',
               'One, two, three, four. Touching is what makes counting mean '
               'anything at this age.'),
-          PpStep('Let him carry them and place them',
-              'One at each place. He is now matching one thing to one person.'),
+          PpStep('Let your child carry them and place them',
+              'One at each place. That is matching one thing to one person.'),
           PpStep('Ask a question with a number in it',
-              'Is that enough? Dadi is coming, how many now?'),
-          PpStep('Do not correct a wrong count',
-              'Just count it again with him, touching. He will land on it '
-              'himself over a few weeks.'),
+              'Is that enough? Grandma is coming, how many now?'),
+          PpStep('Don\'t correct a wrong count',
+              'Just count it again together, touching. Your child will land on '
+              'it over a few weeks.'),
         ], heading: 'What happens'),
         PpCards([
-          PpCard('Your actual dinner', 'Katoris, spoons, plates.'),
+          PpCard('Your actual dinner', 'Bowls, spoons, plates.'),
           PpCard('One real job', 'That is the whole activity.'),
         ], heading: 'What you need', hue: 42),
         PpArticle([
           'Reciting one two three four is a song. Touching four objects and '
-          'knowing there are four is mathematics, and the two are completely '
-          'different things. This activity builds the second one.',
-          'Matching one spoon to one person is one-to-one correspondence, which '
-          'is the idea underneath every bit of arithmetic he will ever do. It '
-          'is far more valuable at three than counting to fifty.',
+          'knowing there are four is maths. The two are completely different, '
+          'and this activity builds the second one.',
+          'Matching one spoon to one person is called one-to-one '
+          'correspondence. It sits underneath all the arithmetic to come, and '
+          'it is far more valuable at three than counting to fifty.',
         ], heading: 'What it builds'),
-        PpWhenLine('From about two and a half, and it grows with him. At five '
-            'he can work out how many more are needed.'),
+        PpWhenLine('From about two and a half, and it grows with your child. At '
+            'five, it becomes working out how many more are needed.'),
       ],
     ),
     PpPage(
@@ -1181,22 +1189,21 @@ const PpArea _today = PpArea(
       format: 'ACTIVITY',
       bands: ['two'],
       blocks: [
-        PpIntro('Take a story he already knows and get up and be it. Ten '
-            'minutes, no props, a lot of roaring.'),
+        PpIntro('Take a story your child already knows, and get up and be it. '
+            'Ten minutes, no props, a lot of roaring.'),
         PpSteps([
-          PpStep('Pick a very short story he has heard many times',
+          PpStep('Pick a very short story your child has heard many times',
               'The lion and the mouse works well. So does anything with two '
               'animals in it.'),
           PpStep('Give each of you a part, and use your whole body'),
           PpStep('Do the sounds loudly',
-              'The roar, the squeak, the running feet. Sound is what he '
-              'remembers.'),
+              'The roar, the squeak, the running feet. Sound is what small '
+              'children remember.'),
           PpStep('Stop and ask what happens next',
-              'Let him tell you. If he gets the order wrong, follow his '
-              'version.'),
+              'Let your child tell you. If the order comes out wrong, follow '
+              'that version.'),
           PpStep('Swap parts and do it again',
-              'Being the other character forces him to remember different '
-              'lines.'),
+              'Playing the other character means remembering different lines.'),
         ], heading: 'What happens'),
         PpCards([
           PpCard('A story you both know', 'From this door, or any book.'),
@@ -1204,16 +1211,14 @@ const PpArea _today = PpArea(
               'as needed.'),
         ], heading: 'What you need', hue: 42),
         PpArticle([
-          'Retelling a story in order is sequencing, and sequencing is the '
-          'skeleton of both comprehension and of being able to explain '
-          'anything. It is the same skill he will use to tell you about his day '
-          'at school.',
-          'Speaking as a character stretches his language beyond his own daily '
-          'vocabulary, because a lion does not talk the way a three-year-old '
-          'talks.',
+          'Retelling a story in order is sequencing. Sequencing is the '
+          'backbone of understanding, and of explaining anything. It is the '
+          'same skill your child will use to tell you about a day at school.',
+          'Speaking as a character stretches language beyond everyday words, '
+          'because a lion does not talk the way a three-year-old talks.',
         ], heading: 'What it builds'),
-        PpWhenLine('From about two and a half, once he can hold a short story '
-            'in his head.'),
+        PpWhenLine('From about two and a half, once your child can hold a short '
+            'story in mind.'),
         PpLink(
           'Short stories that act out well',
           pageId: 'st_world_lion_mouse',
@@ -1231,26 +1236,26 @@ const PpArea _today = PpArea(
       bands: ['three'],
       blocks: [
         PpIntro('Every letter is made of six or seven basic strokes. Practise '
-            'the strokes, in the air and in the mud, and the letters arrive '
+            'the strokes, in the air and in the mud, and the letters come '
             'almost by themselves later.'),
         PpSteps([
           PpStep('Draw the shape hugely in the air with your whole arm first',
-              'A circle drawn with the shoulder, not the fingers. He copies '
-              'you standing up.'),
-          PpStep('Move it down to a tray of atta, rice or wet sand',
+              'A circle drawn with the shoulder, not the fingers. Your child '
+              'copies you, standing up.'),
+          PpStep('Move it down to a tray of flour, rice or wet sand',
               'Drawing with one finger in a tray is forgiving and endlessly '
-              'repeatable. No pencil pressure to worry about.'),
+              'repeatable. No pencil pressure to think about.'),
           PpStep('Then a fat crayon on big paper',
               'Straight down, across, a zigzag, a wave, a circle, a cross.'),
           PpStep('Keep every session under ten minutes',
-              'Stop while he still wants more. That is what brings him back '
-              'tomorrow.'),
-          PpStep('Never make him do it twice because it was untidy',
-              'Neatness is not a three-year-old skill and asking for it teaches '
-              'him he is bad at this.'),
+              'Stop while your child still wants more. That is what brings '
+              'your child back tomorrow.'),
+          PpStep('Never ask for a second go because it was untidy',
+              'Neatness is not a three-year-old skill. Asking for it teaches a '
+              'child, I am bad at this.'),
         ], heading: 'What happens'),
         PpCards([
-          PpCard('A tray of atta or rice', 'The best pre-writing surface there '
+          PpCard('A tray of flour or rice', 'The best pre-writing surface there '
               'is, and free.'),
           PpCard('Fat crayons and big paper', 'Nothing thinner yet.'),
           PpCard('A wall or door to work on',
@@ -1258,25 +1263,25 @@ const PpArea _today = PpArea(
               'holds a pencil steady.'),
         ], heading: 'What you need', hue: 42),
         PpArticle([
-          'Writing is not a hand skill, it is a whole-arm skill that ends at '
-          'the hand. A child pushed into small letters before his shoulder and '
-          'wrist are ready ends up gripping hard, tiring fast and hating it.',
+          'Writing is a whole-arm skill that ends at the hand. Children pushed '
+          'into small letters before the shoulder and wrist are ready end up '
+          'gripping hard, tiring fast and hating it.',
           'The strokes that matter are the vertical line, the horizontal line, '
           'the circle, the cross, the diagonal and the zigzag. Every letter and '
           'every number in every Indian script is built from those.',
         ], heading: 'What it builds'),
-        PpWhenLine('From three years, in short bursts. Formal letter writing '
-            'has no business starting before five for most children.'),
+        PpWhenLine('From three years, in short bursts. For most children, '
+            'formal letter writing has no place before five.'),
         PpVideoSlot(
           title: 'The strokes that come before letters',
-          subtitle: 'The six shapes, shown big in a tray of atta and on paper.',
+          subtitle: 'The six shapes, shown big in a tray of flour and on paper.',
           minutes: '6 MIN',
           slotId: 'learning/act/prewriting_lines',
         ),
         PpCallout(
           'If a preschool sends home writing worksheets for a three-year-old, '
-          'you are allowed to do ten minutes and stop. No evidence supports '
-          'early formal writing, and plenty shows it puts children off.',
+          'it is fine to do ten minutes and stop. No evidence supports early '
+          'formal writing, and plenty shows it puts children off.',
           kind: PpCalloutKind.myth,
           title: 'Earlier is not better',
         ),
@@ -1289,23 +1294,23 @@ const PpArea _today = PpArea(
       format: 'ACTIVITY',
       bands: ['three'],
       blocks: [
-        PpIntro('Numbers are everywhere in a normal day. You do not need a '
+        PpIntro('Numbers are everywhere in a normal day. You don\'t need a '
             'single worksheet to teach a three-year-old to count.'),
         PpSteps([
           PpStep('Count things you are already touching',
-              'Stairs as you climb, rotis as they come off the tawa, bangles on '
+              'Stairs as you climb, rotis as they come off the pan, bangles on '
               'a wrist, buttons as you do them up.'),
           PpStep('Touch each one as you say the number',
-              'The touch is what links the word to the quantity.'),
+              'The touch is what links the word to the amount.'),
           PpStep('Stop and ask how many',
-              'Say the numbers, then ask so how many rotis? Getting from '
+              'Say the numbers, then ask, so how many rotis? Getting from '
               'counting to knowing the total is a real leap.'),
           PpStep('Play give me three',
-              'Give me three spoons. This is much harder than counting and it '
+              'Give me three spoons. This is much harder than counting, and it '
               'is the skill that matters.'),
           PpStep('Count backwards while something happens',
-              'Five, four, three, two, one, and the light goes off. Backwards '
-              'counting is the seed of subtraction.'),
+              'Five, four, three, two, one, and the light goes off. Counting '
+              'backwards is the seed of subtraction.'),
         ], heading: 'What happens'),
         PpCards([
           PpCard('Whatever you are doing', 'Stairs, rotis, buttons, steps to '
@@ -1313,11 +1318,11 @@ const PpArea _today = PpArea(
         ], heading: 'What you need', hue: 42),
         PpArticle([
           'A child who can rattle off numbers to fifty may not be able to hand '
-          'you three spoons. The second is the real number sense, and it is '
-          'built by touching and giving, not by reciting.',
-          'Counting during a real activity also attaches numbers to purpose. He '
-          'learns that counting is something you do because you need to know '
-          'how many, which is why it exists.',
+          'you three spoons. The second is real number sense. It is built by '
+          'touching and giving, not by reciting.',
+          'Counting during a real activity also gives numbers a purpose. Your '
+          'child learns that we count because we need to know how many, which '
+          'is why counting exists.',
         ], heading: 'What it builds'),
         PpWhenLine('From about three. Most children reliably know how many up '
             'to four or five by four years old.'),
@@ -1333,37 +1338,38 @@ const PpArea _today = PpArea(
         PpIntro('A listening game, not a reading lesson. No cards, no letters '
             'on paper, just the sounds at the front of words.'),
         PpSteps([
-          PpStep('Make the sound, do not say the letter name',
-              'Say mmm, not em. The sound is what he will need for reading.'),
-          PpStep('Give two examples from his own life',
+          PpStep('Make the sound, don\'t say the letter name',
+              'Say mmm, not em. The sound is what reading will need.'),
+          PpStep('Give two examples from your child\'s own life',
               'Mmm for mummy, mmm for mango. What else starts with mmm?'),
           PpStep('Accept wrong answers cheerfully',
-              'If he says banana, say banana starts with buh, listen, mmm '
+              'If the answer is banana, say banana starts with buh, listen, mmm '
               'mango. And move on.'),
           PpStep('Play it in the car and in a queue',
               'It needs nothing at all, which is what makes it stick.'),
-          PpStep('Do the same with the sounds of his own name',
-              'His name is the most interesting word in the language to him.'),
+          PpStep('Do the same with the sounds of your child\'s own name',
+              'Small children find their own names the most interesting words '
+              'there are.'),
         ], heading: 'What happens'),
         PpCards([
           PpCard('Nothing', 'This is purely a listening game.'),
           PpCard('Not flash cards',
-              'Flash cards teach letter names, which is the least useful part '
+              'Flash cards teach letter names. That is the least useful part, '
               'and the part that makes children think reading is a test.'),
         ], heading: 'What you need', hue: 42),
         PpArticle([
           'Hearing that mango and mummy begin with the same sound is called '
-          'phonemic awareness, and it is the strongest single predictor of how '
-          'easily a child learns to read. It is entirely an ear skill.',
+          'phonemic awareness. It is the strongest single predictor of how '
+          'easily a child learns to read, and it is entirely an ear skill.',
           'It works in every language your family speaks. Doing it in Hindi as '
           'well as English is a bonus, not a confusion.',
         ], heading: 'What it builds'),
         PpWhenLine('From about three and a half. Rhyming usually comes easily '
             'first, first sounds a little later.'),
         PpCallout(
-          'If he does not react to sounds behind him, mishears often, or is '
-          'very hard to understand at three, ask your paediatrician for a '
-          'hearing check before assuming it is a learning issue. Fluid behind '
+          'Does your child miss sounds from behind, mishear often, or seem very '
+          'hard to understand at three? Ask your paediatrician for a hearing '
+          'check before assuming it is a learning issue. Fluid behind '
           'the ears after repeated colds is common and treatable.',
           kind: PpCalloutKind.doctor,
           title: 'Sound games need working ears',
@@ -1377,16 +1383,16 @@ const PpArea _today = PpArea(
       format: 'ACTIVITY',
       bands: ['three'],
       blocks: [
-        PpIntro('Red, blue, red, blue, and then a pause to see if he can guess '
-            'what comes next. Small game, big idea.'),
+        PpIntro('Red, blue, red, blue, and then a pause to see if your child '
+            'can guess what comes next. Small game, big idea.'),
         PpSteps([
           PpStep('Lay out a simple two-item pattern and say it aloud',
               'Cap, spoon, cap, spoon. Pointing as you say it.'),
           PpStep('Stop mid-pattern and wait',
-              'The pause is the question. Do not ask what comes next straight '
-              'away, let him fill it.'),
-          PpStep('Let him make one for you to continue',
-              'His will be wild. Continue it anyway, out loud.'),
+              'The pause is the question. Don\'t ask what comes next straight '
+              'away. Leave the gap for your child to fill.'),
+          PpStep('Let your child make one for you to continue',
+              'It will be wild. Continue it anyway, out loud.'),
           PpStep('Move to three-item patterns once two is easy',
               'Cap, cap, spoon. Cap, cap, spoon.'),
           PpStep('Find patterns in the house',
@@ -1399,11 +1405,11 @@ const PpArea _today = PpArea(
         ], heading: 'What you need', hue: 42),
         PpArticle([
           'Spotting a pattern and predicting what comes next is the core of '
-          'both mathematical and logical thinking. Everything from times tables '
-          'to grammar is pattern recognition wearing different clothes.',
-          'Saying the pattern out loud while pointing links the spoken sequence '
-          'to the visual one, which is exactly what he will do later when '
-          'reading a line of print.',
+          'maths and logical thinking. Everything from times tables to grammar '
+          'is pattern spotting in different clothes.',
+          'Saying the pattern aloud while pointing links the spoken order to '
+          'the one on the floor. That is exactly what reading a line of print '
+          'asks for later.',
         ], heading: 'What it builds'),
         PpWhenLine('From about three years for two-item patterns, closer to '
             'four for three-item ones.'),
@@ -1411,54 +1417,55 @@ const PpArea _today = PpArea(
     ),
     PpPage(
       id: 'act_dressing_self',
-      title: 'Buttons, zips and pouring his own water',
+      title: 'Buttons, zips and pouring water alone',
       subtitle: 'For 3 to 4 years',
       format: 'ACTIVITY',
       bands: ['three'],
       blocks: [
-        PpIntro('Slower than doing it for him, every single morning. It is '
+        PpIntro('Slower than doing it yourself, every single morning. It is '
             'still the most valuable ten minutes of the day.'),
         PpSteps([
           PpStep('Start at the end of the task, not the beginning',
-              'You pull the shirt on, he does the last button. Finishing feels '
-              'like succeeding.'),
+              'You pull the shirt on, your child does the last button. '
+              'Finishing feels like succeeding.'),
           PpStep('Practise buttons on a shirt laid flat on the floor first',
-              'Buttons on his own chest are much harder because he cannot see '
-              'them properly.'),
-          PpStep('Put water in a small jug he can lift',
-              'A jug and a glass on a low shelf means he can drink without '
-              'asking anyone.'),
+              'Buttons on your own chest are much harder, because you cannot '
+              'see them properly.'),
+          PpStep('Put water in a small jug your child can lift',
+              'A jug and a glass on a low shelf means a drink without asking '
+              'anyone.'),
           PpStep('Build in ten extra minutes rather than taking over',
-              'The rushing is what kills this. Waking him ten minutes earlier '
+              'The rushing is what kills this. Waking up ten minutes earlier '
               'is the whole solution.'),
-          PpStep('Let him wear the badly buttoned shirt out of the house',
-              'A crooked shirt he did himself is worth more than a neat one you '
+          PpStep('Let the badly buttoned shirt go out of the house',
+              'A crooked shirt your child did is worth more than a neat one you '
               'did.'),
         ], heading: 'What happens'),
         PpCards([
-          PpCard('His own clothes', 'Big buttons and elastic waists are the '
-              'kindest to start with.'),
-          PpCard('A small jug and glass', 'Kept somewhere he can reach.'),
+          PpCard('Your child\'s own clothes', 'Big buttons and elastic waists '
+              'are the kindest to start with.'),
+          PpCard('A small jug and glass', 'Kept somewhere within easy reach.'),
           PpCard('Ten extra minutes', 'The only real material this needs.'),
         ], heading: 'What you need', hue: 42),
         PpArticle([
-          'Buttons, zips and pouring are fine motor work of a demanding kind, '
-          'and they arrive attached to a reason he cares about, which is why '
-          'children practise them so willingly.',
-          'This is also the exact list a preschool will assume he can manage. '
-          'School readiness is far more about this page than about letters, and '
-          'it is the part families most often skip.',
+          'Buttons, zips and pouring are demanding fine motor work. They come '
+          'with a reason your child cares about, which is why children '
+          'practise them so willingly.',
+          'This is also the exact list a preschool will expect your child to '
+          'manage. School readiness is far more about this page than about '
+          'letters, and it is the part families most often skip.',
         ], heading: 'What it builds'),
         PpWhenLine('From about three years. Most children manage large buttons '
             'by four and shoelaces closer to six.'),
-        PpIndiaNote('In a joint family several loving hands will dress him '
-            'faster than he can. It helps to say out loud, once, that he is '
-            'learning to do it himself now, so everyone is on the same side.'),
+        PpIndiaNote('In a joint family, several loving hands can dress a child '
+            'faster than the child can. It helps to say out loud, once, that '
+            'your child is learning to do it alone now, so everyone is on the '
+            'same side.'),
       ],
     ),
     PpPage(
       id: 'act_junk_modelling',
-      title: 'Building something from the raddi',
+      title: 'Building something from the recycling',
       subtitle: 'For 3 to 4 years',
       format: 'ACTIVITY',
       bands: ['three'],
@@ -1466,33 +1473,33 @@ const PpArea _today = PpArea(
         PpIntro('Boxes, caps, newspaper and tape. No picture to copy and no '
             'right answer, which is the whole point.'),
         PpSteps([
-          PpStep('Keep a bag of clean raddi',
+          PpStep('Keep a bag of clean recycling',
               'Matchboxes, toothpaste cartons, bottle caps, cardboard tubes, '
               'old newspaper.'),
-          PpStep('Tip it out and ask what he wants to make',
-              'If he does not know, start sticking two things together '
-              'yourself and stay quiet.'),
-          PpStep('Give him tape rather than glue for speed',
+          PpStep('Tip it out and ask what your child wants to make',
+              'If there is no idea yet, start sticking two things together '
+              'yourself and stay silent.'),
+          PpStep('Offer tape rather than glue, for speed',
               'Waiting for glue to dry loses a three-year-old completely.'),
-          PpStep('Do not fix his construction',
-              'A wobbly robot he built beats a neat one you rescued.'),
+          PpStep('Don\'t fix what your child builds',
+              'A wobbly robot your child built beats a neat one you rescued.'),
           PpStep('Photograph it, then let it go in a week',
-              'Otherwise your house fills up. He is fine with this if he sees '
-              'the photo.'),
+              'Otherwise your house fills up. Most children are fine with this '
+              'once they see the photo.'),
         ], heading: 'What happens'),
         PpCards([
-          PpCard('Clean raddi', 'Cartons, tubes, caps, newspaper.'),
+          PpCard('Clean recycling', 'Cartons, tubes, caps, newspaper.'),
           PpCard('Tape and blunt scissors', 'Child scissors from three years, '
               'with you sitting there.'),
           PpCard('No craft kit', 'Bought kits come with a picture of the right '
               'answer, which is the opposite of what this is for.'),
         ], heading: 'What you need', hue: 42),
         PpArticle([
-          'Open-ended building is where imagination and planning meet. He has '
-          'to hold an idea in his head and then work out how to make the '
-          'materials do it, which is early engineering thinking.',
-          'It also builds tolerance for things not working. Towers fall, tape '
-          'does not hold, and he tries again. That is a genuinely important '
+          'Open-ended building is where imagination and planning meet. Your '
+          'child holds an idea in mind, then works out how to make the '
+          'materials do it. That is early engineering thinking.',
+          'It also builds patience with things not working. Towers fall, tape '
+          'does not hold, and your child tries again. That is an important '
           'thing to be practising at three.',
         ], heading: 'What it builds'),
         PpWhenLine('From about three. It grows straight into proper model '
@@ -1516,26 +1523,26 @@ const PpArea _today = PpArea(
           PpStep('Ask a why question at the end',
               'Why do you think the crocodile was sad? There is no wrong '
               'answer to a why.'),
-          PpStep('Ask what he would have done',
-              'This is where the value in the story becomes his rather than '
-              'yours.'),
-          PpStep('Let him tell the story back to somebody else',
+          PpStep('Ask what your child would have done',
+              'This is where the lesson in the story becomes your child\'s, '
+              'not yours.'),
+          PpStep('Let your child tell the story to somebody else',
               'Telling Papa at dinner is the strongest version of this whole '
               'activity.'),
         ], heading: 'What happens'),
         PpCards([
           PpCard('Any story', 'From the collections in this door, or a book.'),
-          PpCard('Four questions', 'What next, why, how did she feel, what '
-              'would you do.'),
+          PpCard('Four questions', 'What next, why, how did the crow feel, '
+              'what would you do.'),
         ], heading: 'What you need', hue: 42),
         PpArticle([
-          'Answering why questions about a story is comprehension, which is the '
-          'actual goal of reading. A child can decode every word on a page and '
-          'still not be a reader if he is not doing this.',
-          'Predicting what comes next also teaches him that stories have a '
-          'shape, and that shape is what will one day let him write one.',
+          'Answering why questions about a story is comprehension, and that is '
+          'the real goal of reading. A child can read every word on a page and '
+          'still not be a reader without this.',
+          'Guessing what comes next also shows your child that stories have a '
+          'shape. That shape is what will one day help your child write one.',
         ], heading: 'What it builds'),
-        PpWhenLine('From about three years, once his language is good enough to '
+        PpWhenLine('From about three years, once your child has enough words to '
             'answer a why. Before that, just tell the story.'),
       ],
     ),
@@ -1543,61 +1550,62 @@ const PpArea _today = PpArea(
     // ---- BAND: 4 to 6 years ------------------------------------------------
     PpPage(
       id: 'act_name_writing',
-      title: 'Writing his own name',
+      title: 'Writing my own name',
       subtitle: 'For 4 to 6 years',
       format: 'ACTIVITY',
       bands: ['four'],
       blocks: [
-        PpIntro('The first word worth writing, because it is his. Trace it, '
-            'then copy it, and let it be wobbly for a long time.'),
+        PpIntro('The first word worth writing, because it belongs to your child. '
+            'Trace it, then copy it, and let it be wobbly for a long time.'),
         PpSteps([
-          PpStep('Write his name once, large, in capitals or in your script',
+          PpStep('Write your child\'s name once, large, in capitals or in your '
+              'script',
               'One capital and the rest small is easier to read later, but '
-              'start with whatever his school uses.'),
-          PpStep('Let him trace over it with a finger first, then a crayon',
+              'start with whatever the school uses.'),
+          PpStep('Trace over it with a finger first, then a crayon',
               'Finger tracing on a big letter teaches the movement before the '
               'tool gets involved.'),
           PpStep('Move to copying underneath your version'),
           PpStep('Stop at five minutes, always',
-              'Short and daily beats long and weekly, and it protects him from '
-              'ever dreading it.'),
-          PpStep('Give him real reasons to write it',
-              'On his drawing, on a birthday card, on the label of his lunch '
-              'box. Purpose is what makes practice worth doing.'),
+              'Short and daily beats long and weekly, and it keeps your child '
+              'from ever dreading it.'),
+          PpStep('Find real reasons to write it',
+              'On a drawing, on a birthday card, on the lunch box label. '
+              'Purpose is what makes practice worth doing.'),
         ], heading: 'What happens'),
         PpCards([
           PpCard('Paper and a pencil', 'A triangular or chunky pencil is '
               'kinder on a young grip.'),
-          PpCard('His name written by you', 'Big, clear and always the same.'),
+          PpCard('The name, written by you', 'Big, clear and always the same.'),
         ], heading: 'What you need', hue: 42),
         PpArticle([
-          'His name is the most motivating word in the language for him, which '
-          'is why it is the standard place to start. He is learning letter '
+          'Children find their own name the most motivating word there is, '
+          'which is why it is the usual place to start. It teaches letter '
           'shapes, left-to-right movement and pencil control all at once.',
           'Expect reversed letters until at least six or seven. A backwards N '
           'is completely normal at this age and is not a sign of anything.',
         ], heading: 'What it builds'),
-        PpWhenLine('From about four years, if he is interested. If he is not '
-            'interested at four, wait. Five is early enough.'),
-        PpCallout('Interest is the signal, not the calendar. A child who is '
-            'pushed into writing before he wants to often ends up avoiding it '
-            'for years, and there is no prize for starting first.'),
+        PpWhenLine('From about four years, if your child is interested. If not '
+            'at four, wait. Five is early enough.'),
+        PpCallout('Interest is the signal, not the calendar. Children pushed '
+            'into writing before they want to often avoid it for years, and '
+            'there is no prize for starting first.'),
       ],
     ),
     PpPage(
       id: 'act_first_sums',
-      title: 'First sums with kaju and stones',
+      title: 'First sums with cashews and stones',
       subtitle: 'For 4 to 6 years',
       format: 'ACTIVITY',
       bands: ['four'],
       blocks: [
-        PpIntro('Adding and taking away with things he can touch and eat. No '
-            'plus signs, no book, no right answers to be wrong about.'),
+        PpIntro('Adding and taking away with things your child can touch and '
+            'eat. No plus signs, no book, no right answers to be wrong about.'),
         PpSteps([
-          PpStep('Put three kaju in his hand and two in yours'),
-          PpStep('Ask how many altogether, and let him push them together and '
+          PpStep('Put three cashews in your child\'s hand and two in yours'),
+          PpStep('Ask how many altogether, then push them together and '
               'count',
-              'Pushing the two piles into one is what addition actually is.'),
+              'Pushing the two piles into one is what addition really is.'),
           PpStep('Then take some away and ask how many are left',
               'Eating one is the most popular version of subtraction ever '
               'invented.'),
@@ -1605,21 +1613,21 @@ const PpArea _today = PpArea(
               'You had five, you ate two, now you have three. Story first, '
               'symbols much later.'),
           PpStep('Use it in real moments',
-              'Sharing biscuits between three cousins is a genuine division '
-              'problem and he will care about the answer.'),
+              'Sharing biscuits between three cousins is a real division '
+              'problem, and your child will care about the answer.'),
         ], heading: 'What happens'),
         PpCards([
-          PpCard('Small countable things', 'Kaju, kishmish, stones, bottle '
+          PpCard('Small countable things', 'Cashews, raisins, stones, bottle '
               'caps, beads.'),
           PpCard('No worksheet', 'Written sums come after the idea is solid, '
               'not before.'),
         ], heading: 'What you need', hue: 42),
         PpArticle([
-          'Doing sums with objects builds a picture in his head of what adding '
-          'and taking away mean. A child who only ever meets sums as symbols on '
-          'paper can get the answers right for a year and then fall apart when '
-          'the problems get harder.',
-          'Small numbers are enough. Being genuinely secure up to five, then '
+          'Doing sums with objects builds a picture in the mind of what adding '
+          'and taking away mean. Children who only meet sums as symbols on '
+          'paper can get answers right for a year, then struggle when the '
+          'problems get harder.',
+          'Small numbers are enough. Being really secure up to five, then '
           'ten, is worth far more than being shaky up to fifty.',
         ], heading: 'What it builds'),
         PpWhenLine('From about four years. Most children handle sums within '
@@ -1637,29 +1645,29 @@ const PpArea _today = PpArea(
             'nothing and it does more for reading than any app.'),
         PpSteps([
           PpStep('Say two words and ask if they sound the same at the end',
-              'Cat and mat. Ghar and dar.'),
-          PpStep('Ask him for one that rhymes with a word you give',
+              'Cat and mat. Sun and fun.'),
+          PpStep('Ask for a word that rhymes with one you give',
               'Nonsense words count. Bat, mat, zat is a correct answer.'),
           PpStep('Play the first-sound version too',
-              'Say a word without its first sound and let him guess. Say '
+              'Say a word without its first sound and ask what it is. Say '
               'AAT for cat.'),
           PpStep('Clap the parts of long words',
-              'Ba-nan-a. Cha-pa-ti. Three claps. This is syllable work and it '
+              'Ba-nan-a. Cha-pa-ti. Three claps. This is syllable work, and it '
               'is surprisingly hard.'),
-          PpStep('Make up silly rhyming songs about his day',
-              'Silliness is what keeps him playing, and playing is what makes '
-              'it work.'),
+          PpStep('Make up silly rhyming songs about the day',
+              'Silliness keeps children playing, and playing is what makes it '
+              'work.'),
         ], heading: 'What happens'),
         PpCards([
           PpCard('Nothing at all', 'Purely spoken.'),
         ], heading: 'What you need', hue: 42),
         PpArticle([
           'Rhyming, clapping syllables and hearing first sounds are the three '
-          'ear skills that reading is built on. Children who are strong in '
-          'these learn to read faster almost regardless of how they are taught.',
-          'Because it is all spoken, it works equally well in Hindi, in your '
-          'mother tongue and in English, and doing it in more than one is a '
-          'genuine advantage.',
+          'ear skills reading is built on. Children who are strong in these '
+          'learn to read faster, almost whatever way they are taught.',
+          'Because it is all spoken, it works just as well in Hindi, in your '
+          'mother tongue and in English. Doing it in more than one is a real '
+          'advantage.',
         ], heading: 'What it builds'),
         PpWhenLine('From about four years, though many children enjoy rhyme '
             'much earlier through songs.'),
@@ -1673,33 +1681,34 @@ const PpArea _today = PpArea(
       bands: ['four'],
       blocks: [
         PpIntro('Four little drawings, shuffled, and one child working out what '
-            'happened first. It looks like a puzzle and it is really thinking '
+            'happened first. It looks like a puzzle, and it is thinking '
             'practice.'),
         PpSteps([
           PpStep('Draw four rough pictures of a story you both know',
               'Stick figures are completely fine. Four boxes on one sheet, cut '
               'apart.'),
-          PpStep('Shuffle them and ask him to lay them out in order'),
-          PpStep('Ask him to tell the story from his own arrangement',
-              'If his order is different but the story he tells makes sense, '
-              'he is right.'),
+          PpStep('Shuffle them and ask your child to lay them out in order'),
+          PpStep('Ask your child to tell the story from that order',
+              'If the order is different but the story makes sense, your child '
+              'is right.'),
           PpStep('Do the same with a real routine',
               'Getting ready for school in four pictures. Now it is useful as '
               'well as fun.'),
-          PpStep('Let him draw the pictures himself once he can',
+          PpStep('Let your child draw the pictures once ready',
               'Drawing the sequence is harder and better than arranging one.'),
         ], heading: 'What happens'),
         PpCards([
           PpCard('Paper and a pen', 'Yours, for the four rough pictures.'),
-          PpCard('A story he knows well', 'From this door or a favourite book.'),
+          PpCard('A story your child knows well', 'From this door or a '
+              'favourite book.'),
         ], heading: 'What you need', hue: 42),
         PpArticle([
-          'Ordering events is the backbone of comprehension, of explaining '
-          'anything clearly, and eventually of writing. It is also how he will '
-          'one day understand cause and effect in history and in science.',
-          'A picture sequence of his own morning routine has a second use: it '
-          'lets him get ready without being told each step, which is exactly '
-          'the independence school will expect.',
+          'Ordering events is the backbone of understanding, of explaining '
+          'anything clearly, and later of writing. It is also how cause and '
+          'effect in history and science will one day make sense.',
+          'A picture sequence of your child\'s own morning routine has a '
+          'second use. It lets your child get ready without being told each '
+          'step, which is exactly the independence school will expect.',
         ], heading: 'What it builds'),
         PpWhenLine('From about four years for four pictures. Three pictures '
             'works from three and a half.'),
@@ -1707,46 +1716,45 @@ const PpArea _today = PpArea(
     ),
     PpPage(
       id: 'act_his_own_job',
-      title: 'A job that is his',
+      title: 'A job to own',
       subtitle: 'For 4 to 6 years',
       format: 'ACTIVITY',
       bands: ['four'],
       blocks: [
-        PpIntro('One small task that belongs to him and to nobody else, done '
-            'every day, with nobody redoing it afterwards.'),
+        PpIntro('One small task that belongs to your child and nobody else, '
+            'done every day, with nobody redoing it afterwards.'),
         PpSteps([
-          PpStep('Let him choose from two or three jobs you actually need done',
-              'Watering the tulsi, laying the napkins, filling the water '
+          PpStep('Offer a choice of two or three jobs you really need done',
+              'Watering the plants, laying the napkins, filling the water '
               'bottles, feeding the fish.'),
           PpStep('Do it together for the first week'),
           PpStep('Then hand it over completely and step back'),
-          PpStep('Do not redo it in front of him',
-              'A crooked napkin is the price of a child who believes he is '
-              'useful. Straighten it later if you must.'),
+          PpStep('Don\'t redo it in front of your child',
+              'A crooked napkin is the price of a child who feels useful. '
+              'Straighten it later if you must.'),
           PpStep('Notice it out loud when it is done, without making it a '
               'reward',
-              'The plants look happy today. Not: good boy, here is a sticker.'),
+              'The plants look happy today. Not: good job, here is a sticker.'),
         ], heading: 'What happens'),
         PpCards([
-          PpCard('One real job', 'Something the household genuinely needs.'),
+          PpCard('One real job', 'Something the household really needs.'),
           PpCard('No chart with stars',
               'A job done for a sticker stops the day the stickers stop. A job '
-              'that is simply his keeps going.'),
+              'that belongs to your child keeps going.'),
         ], heading: 'What you need', hue: 42),
         PpArticle([
-          'Contributing to the household is one of the strongest builders of '
-          'self worth in a young child, and it is different from being praised. '
-          'He is not being told he is good, he is finding out he is needed.',
-          'A daily task at the same time each day is also how a habit forms. He '
-          'is practising remembering something without being reminded, which is '
-          'the beginning of managing himself.',
+          'Helping run the home is one of the strongest builders of self worth '
+          'in a young child. It is different from praise. Your child is not '
+          'hearing, you are good. Your child is finding out, I am needed.',
+          'A daily task at the same time each day is also how a habit forms. '
+          'Your child is practising remembering without a reminder. That is '
+          'the beginning of managing oneself.',
         ], heading: 'What it builds'),
-        PpWhenLine('From about four years for a job he can own. Younger '
+        PpWhenLine('From about four years for a job your child can own. Younger '
             'children help alongside you rather than owning a task.'),
         PpIndiaNote('In many Indian homes a child is served rather than asked '
-            'to serve, often out of love. Giving him one small job is not '
-            'making him work, it is giving him a place in the running of the '
-            'house.'),
+            'to serve, often out of love. One small job is not making a child '
+            'work. It gives your child a place in the running of the house.'),
       ],
     ),
     PpPage(
@@ -1756,42 +1764,41 @@ const PpArea _today = PpArea(
       format: 'ACTIVITY',
       bands: ['four'],
       blocks: [
-        PpIntro('He picks one thing he loves and tells everyone about it for a '
-            'minute, standing up. It is the first speech he will ever give.'),
+        PpIntro('Your child picks one loved thing and tells everyone about it '
+            'for a minute, standing up. It is a very first speech.'),
         PpSteps([
-          PpStep('Let him choose the object himself',
-              'A stone, a toy car, a drawing. Interest is what carries him '
+          PpStep('Let your child choose the object',
+              'A stone, a toy car, a drawing. Interest is what carries a child '
               'through the nerves.'),
-          PpStep('Help him plan three things to say',
-              'What it is, where it came from, why he likes it. Three is '
+          PpStep('Plan three things to say together',
+              'What it is, where it came from, why it is special. Three is '
               'enough structure.'),
-          PpStep('Give him a real audience',
-              'Everyone at dinner, or Dadi on a video call. A real audience is '
+          PpStep('Find a real audience',
+              'Everyone at dinner, or a grandparent on a video call. A real audience is '
               'the whole point.'),
-          PpStep('Let people ask him one question each',
+          PpStep('Let people ask one question each',
               'Answering a question on the spot is the harder half of speaking.'),
-          PpStep('Do not correct his grammar afterwards',
+          PpStep('Don\'t correct the grammar afterwards',
               'Say what you found interesting instead. Correction now buys '
               'silence later.'),
         ], heading: 'What happens'),
         PpCards([
-          PpCard('One object he loves', 'His choice, not yours.'),
+          PpCard('One object your child loves', 'Chosen by your child, not you.'),
           PpCard('People willing to listen', 'The family at dinner is perfect.'),
         ], heading: 'What you need', hue: 42),
         PpArticle([
-          'Speaking to a group is a skill, not a personality trait, and it is '
+          'Speaking to a group is a skill, not a personality trait. It is '
           'built by doing it in a safe place many times. Starting at five with '
-          'your own family is as gentle a start as exists.',
-          'Organising three things into an order before speaking is also early '
-          'planning, and it is the same structure he will use to write a '
+          'your own family is as gentle a start as there is.',
+          'Putting three things in order before speaking is also early '
+          'planning. It is the same structure your child will use to write a '
           'paragraph in a few years.',
         ], heading: 'What it builds'),
         PpWhenLine('From about four and a half. Once a week is plenty, and a '
             'shy child may listen for months before joining in.'),
-        PpCallout('A shy child should never be made to perform. Let him tell '
-            'one person first, or tell it from your lap. Forcing it teaches him '
-            'that speaking up is frightening, which is the opposite of what '
-            'this is for.'),
+        PpCallout('Never make a shy child perform. Start with telling one '
+            'person, or telling it from your lap. Forcing it teaches that '
+            'speaking up is frightening, the opposite of what this is for.'),
       ],
     ),
   ],
@@ -1816,7 +1823,7 @@ const PpArea _montessori = PpArea(
   id: 'montessori',
   mark: IntentMark.blocksMark,
   title: 'Learning through play at home',
-  blurb: 'What the Montessori idea actually means in a normal Indian house, '
+  blurb: 'What the Montessori idea really means in a normal Indian house, '
       'without the school fees or the wooden kit.',
   hue: 160,
   bands: _fromOne,
@@ -1827,25 +1834,25 @@ const PpArea _montessori = PpArea(
       format: 'ARTICLE',
       bands: _fromOne,
       blocks: [
-        PpIntro('Stripped of the branding, the idea is small and free: give a '
-            'child real things, at his height, and let him finish the job '
-            'himself.'),
+        PpIntro('Take away the branding and the idea is small and free: give a '
+            'child real things, at child height, and let the child finish the '
+            'job.'),
         PpArticle([
           'Maria Montessori was a doctor who spent years watching what children '
-          'actually did when adults stopped directing them. What she found was '
-          'that small children choose serious, repetitive, useful work over '
-          'entertainment almost every time, if the work is within reach and '
-          'nobody takes over.',
+          'did when adults stopped directing them. She found that small '
+          'children choose serious, repetitive, useful work over entertainment '
+          'almost every time, if the work is within reach and nobody takes '
+          'over.',
           'That is the whole of it. Everything else, the wooden equipment, the '
-          'pink tower, the school fees, is one particular expression of the '
-          'idea. The idea itself costs nothing and travels into any home.',
-        ], heading: 'What it actually is'),
+          'pink tower, the school fees, is one way of doing the idea. The idea '
+          'itself costs nothing and fits into any home.',
+        ], heading: 'What it really is'),
         PpSteps([
           PpStep('Real objects, not toy versions',
               'A real jug and a real cloth. Toddlers work harder for real '
               'things because they have watched you use them.'),
-          PpStep('At his height, so he can start without asking',
-              'A low shelf, a stool at the basin, his glass on a low table.'),
+          PpStep('At child height, so your child can start without asking',
+              'A low shelf, a stool at the basin, a glass on a low table.'),
           PpStep('One job, with a beginning and an end',
               'Pour the water, wipe the spill, put it back. A finished task is '
               'deeply satisfying to a small child.'),
@@ -1856,23 +1863,23 @@ const PpArea _montessori = PpArea(
         ], heading: 'How to do it in your house'),
         PpCards([
           PpCard('Buying the kit and changing nothing else',
-              'The wooden materials are the least important part. The behaviour '
-              'is the method.'),
-          PpCard('Correcting his hands',
+              'The wooden materials are the least important part. How you '
+              'behave is the method.'),
+          PpCard('Correcting your child\'s hands',
               'Taking over to show the right way ends the concentration you '
               'were trying to build.'),
           PpCard('Twenty toys out at once',
               'Choice from three is freedom. Choice from twenty is noise, and '
-              'he will flit between all of them.'),
+              'your child will flit between all of them.'),
           PpCard('Turning it into a curriculum',
-              'The moment it becomes a syllabus with an outcome, it stops being '
-              'child-led and becomes drilling with wooden blocks.'),
+              'Once it becomes a syllabus with an outcome, it stops being led '
+              'by the child. It becomes drilling with wooden blocks.'),
         ], heading: 'What to avoid', hue: 160),
-        PpWhenLine('From about one year, when he can carry and place things, '
-            'through to six. The practical life part is strongest from two to '
-            'four.'),
+        PpWhenLine('From about one year, once your child can carry and place '
+            'things, through to six. The practical life part is strongest from '
+            'two to four.'),
         PpIndiaNote('Indian homes are already full of the right materials. '
-            'Steel katoris, a jhaadu, dal to spoon, a small lota, atta to '
+            'Steel bowls, a small broom, dal to spoon, a small water pot, dough to '
             'knead. A child who helps in an Indian kitchen is doing more '
             'practical life work than most Montessori classrooms offer.'),
         PpLink(
@@ -1891,7 +1898,7 @@ const PpArea _montessori = PpArea(
     ),
     PpPage(
       id: 'mont_yes_space',
-      title: 'Setting up a corner he is allowed to touch',
+      title: 'Setting up a corner your child can touch',
       format: 'STEP-LIST',
       bands: _fromOne,
       blocks: [
@@ -1901,43 +1908,43 @@ const PpArea _montessori = PpArea(
           PpStep('Pick one corner and clear it completely',
               'A metre square is enough. It does not need to be a whole room.'),
           PpStep('Put a low shelf there, or a stool on its side',
-              'It must be low enough that he can see and reach everything '
-              'without help.'),
+              'Low enough for your child to see and reach everything without '
+              'help.'),
           PpStep('Put out only three or four things',
               'A tray of pouring things, a basket of books, one puzzle, one '
               'basket of blocks. That is a full shelf.'),
           PpStep('Give each thing its own tray or basket',
-              'A defined container makes it obvious what belongs together and '
+              'A clear container makes it obvious what belongs together and '
               'where it goes back.'),
           PpStep('Rotate one item a week',
               'Put the rest away in a cupboard. Things that vanish for a month '
               'come back fascinating.'),
-          PpStep('Sit on the floor and check the view from his height',
+          PpStep('Sit on the floor and check the view from your child\'s height',
               'You will see cables, sharp corners and temptations you cannot '
               'see standing up.'),
-          PpStep('Make everything else in that corner genuinely safe',
+          PpStep('Make everything else in that corner fully safe',
               'Covered sockets, no cords, nothing heavy that can be pulled '
               'down, no small parts.'),
         ], heading: 'Setting it up'),
         PpCards([
           PpCard('A low shelf', 'Or a stool, a wooden crate, the bottom shelf '
-              'of an existing almirah.'),
-          PpCard('Three or four trays or baskets', 'Steel thalis work well.'),
+              'of an existing cupboard.'),
+          PpCard('Three or four trays or baskets', 'Steel plates work well.'),
           PpCard('Three or four activities', 'From this door. Nothing bought is '
               'needed.'),
         ], heading: 'What you need', hue: 160),
         PpArticle([
-          'The reason this works is that it removes the endless no. A child who '
-          'hears no forty times a day about touching things eventually stops '
-          'exploring or stops listening, and neither is what you want.',
-          'It also builds the beginning of independent choice. Being able to '
-          'walk over, pick something, use it and put it back without asking an '
-          'adult is a small piece of self direction, repeated many times a day.',
+          'This works because it removes the endless no. A child who hears no '
+          'forty times a day about touching things stops exploring, or stops '
+          'listening. Neither is what you want.',
+          'It also builds the start of independent choice. Walking over, '
+          'picking something, using it and putting it back without asking is '
+          'a small piece of self direction, repeated many times a day.',
         ], heading: 'Why a yes-space works'),
-        PpWhenLine('From about ten months, once he is moving around, and it '
-            'stays useful until five with the contents changing.'),
+        PpWhenLine('From about ten months, once your child is moving around. It '
+            'stays useful until five, with the contents changing.'),
         PpCallout(
-          'A yes-space is only a yes-space if it is genuinely safe when you are '
+          'A yes-space is only a yes-space if it is fully safe while you are '
           'in the kitchen for two minutes. Anchor any furniture that can tip, '
           'cover the sockets, and remove anything smaller than a toilet roll '
           'tube before you rely on it.',
@@ -1948,103 +1955,104 @@ const PpArea _montessori = PpArea(
     ),
     PpPage(
       id: 'mont_practical_life',
-      title: 'Letting him help with real work',
+      title: 'Letting your child help with real work',
       format: 'SHORT ARTICLE',
       bands: _fromTwo,
       blocks: [
-        PpIntro('Washing his own plate, kneading a small ball of atta, sweeping '
-            'up his own crumbs. The most underrated learning there is.'),
+        PpIntro('Washing a plate, kneading a small ball of dough, sweeping up '
+            'crumbs. The most underrated learning there is.'),
         PpArticle([
           'Practical life means the ordinary work of running a home, done by a '
-          'child at his own size. Montessori classrooms spend a great deal of '
-          'time on it, and Indian homes contain more of it than almost any '
-          'classroom could set up.',
-          'It is slow. He will wash the plate badly and you will do it again '
-          'later. What he is getting from it is not a clean plate, it is a '
-          'sequence of steps held in his head, a body learning to control '
-          'itself, and the settled feeling of having done something real.',
+          'child at child size. Montessori classrooms spend a lot of time on '
+          'it, and Indian homes hold more of it than almost any classroom '
+          'could set up.',
+          'It is slow. The plate gets washed badly, and you wash it again '
+          'later. The point was never a clean plate. Your child is holding a '
+          'set of steps in mind, a body is learning control, and there is the '
+          'settled feeling of having done something real.',
         ], heading: 'What it is'),
         PpSteps([
-          PpStep('Give him a job that is genuinely part of what you are doing',
+          PpStep('Choose a job that is really part of what you are doing',
               'Peeling garlic, tearing coriander, putting spoons away.'),
-          PpStep('Make his tools his size',
+          PpStep('Make the tools child-sized',
               'A small jug, a short-handled cloth, a low stool at the counter.'),
           PpStep('Show the whole thing once, slowly, with no talking',
-              'Words and hands at the same time split his attention. Do it '
-              'silently, then hand it over.'),
-          PpStep('Let him finish, however long it takes'),
+              'Words and hands at the same time split a small child\'s '
+              'attention. Do it silently, then hand it over.'),
+          PpStep('Let your child finish, however long it takes'),
           PpStep('Include the putting away',
               'The job is not done until the cloth is back on the hook. That '
               'part is where most of the order-building happens.'),
         ], heading: 'How to do it'),
         PpCards([
-          PpCard('Rescuing him', 'Stepping in at the first wobble is the most '
-              'common way this gets ruined.'),
-          PpCard('Praising every step', 'Constant good boy interrupts as surely '
-              'as criticism does.'),
+          PpCard('Rescuing too soon', 'Stepping in at the first wobble is the '
+              'most common way this gets ruined.'),
+          PpCard('Praising every step', 'A constant well done interrupts as '
+              'surely as criticism does.'),
           PpCard('Making it a chore chart',
-              'Once it is tracked and rewarded it stops being work he wanted to '
-              'do.'),
+              'Once it is tracked and rewarded, it stops being work your child '
+              'wanted to do.'),
         ], heading: 'What to avoid', hue: 160),
         PpWhenLine('From about two years for simple jobs, and it grows all the '
             'way through childhood.'),
         PpIndiaNote('Grandparents often object that a child should not work. It '
-            'usually helps to frame it as him learning, not helping, and to '
-            'start with jobs that look like play, such as tearing dhania or '
-            'shelling matar.'),
+            'usually helps to call it learning, not helping, and to start '
+            'with jobs that look like play, such as tearing coriander or '
+            'shelling peas.'),
       ],
     ),
     PpPage(
       id: 'mont_follow_the_child',
-      title: 'Following what he is already interested in',
+      title: 'Following what your child already loves',
       format: 'SHORT ARTICLE',
       bands: _fromOne,
       blocks: [
-        PpIntro('If he has spent four days obsessed with opening and closing the '
-            'gate, that is the lesson plan. You do not have to invent one.'),
+        PpIntro('Four days spent opening and closing the gate? That is the '
+            'lesson plan. You don\'t have to invent one.'),
         PpArticle([
           'Small children go through phases of intense interest in one thing: '
           'opening and shutting, putting things inside other things, throwing, '
           'lining objects up, carrying heavy loads about. Each phase is a piece '
           'of development running itself.',
-          'Following the child means noticing which phase he is in and giving '
-          'him more of it in a form you can live with. If he is throwing '
-          'everything, he needs to throw, so give him a basket of rolled socks '
-          'and a target rather than trying to stop the throwing.',
+          'Following the child means noticing the phase and offering more of '
+          'it, in a form you can live with. A child throwing everything needs '
+          'to throw. Offer a basket of rolled socks and a target, rather than '
+          'trying to stop the throwing.',
         ], heading: 'What it means'),
         PpSteps([
-          PpStep('Watch for three days without steering him',
-              'Note what he goes back to. That repetition is the signal.'),
-          PpStep('Name the underlying urge, not the object',
+          PpStep('Watch for three days without steering',
+              'Note what your child goes back to. That repetition is the '
+              'signal.'),
+          PpStep('Name the urge underneath, not the object',
               'Not obsessed with the gate. Interested in things that open and '
               'shut.'),
           PpStep('Offer two or three more things that feed the same urge',
-              'Dabbas with lids, a door hook, a purse with a zip, a posting '
+              'Tins with lids, a door hook, a purse with a zip, a posting '
               'box.'),
           PpStep('Let the phase run out on its own',
-              'It will end suddenly and be replaced. Trying to extend it once '
+              'It will end suddenly and be replaced. Trying to stretch it once '
               'it is over is pointless.'),
         ], heading: 'How to follow it'),
         PpCards([
-          PpCard('Deciding what he should be interested in this week',
-              'A plan you made is easier for you and much less absorbing for '
-              'him.'),
-          PpCard('Worrying that his interest is too narrow',
+          PpCard('Deciding what your child must be interested in this week',
+              'A plan you made is easier for you and far less absorbing for '
+              'your child.'),
+          PpCard('Worrying the interest is too narrow',
               'Deep and repetitive is how young children learn. Breadth comes '
               'later on its own.'),
         ], heading: 'What to avoid', hue: 160),
         PpWhenLine('From about ten months onwards. The phases are most obvious '
             'and most intense between one and three.'),
         PpLink(
-          'What is developing at his age right now',
+          'What is developing at your child\'s age right now',
           surfaceId: 'pp_development',
-          blurb: 'Milestones and leaps, which often explain the phase he is in.',
+          blurb: 'Milestones and leaps, which often explain the current phase.',
         ),
         PpConsult(
           title: 'The early learning masterclass',
-          whoFor: 'For a parent who wants the whole picture in one sitting: '
-              'how play-based learning actually works at home, and how to '
-              'answer the relatives who think he should be writing by now.',
+          whoFor: 'For a parent who wants the whole picture in one sitting. '
+              'how learning through play works at home, and how to answer '
+              'relatives who think a child must be writing by now.',
           surfaceId: 'pp_courses',
           role: 'early_learning',
         ),
@@ -2087,7 +2095,7 @@ const PpArea _montessori = PpArea(
 const PpArea _storyTime = PpArea(
   id: 'story_time',
   mark: IntentMark.moonMark,
-  title: 'Telling him a story tonight',
+  title: 'Telling a story tonight',
   blurb: 'How to read to a baby, how to tell a story with no book, and what to '
       'say afterwards.',
   hue: 268,
@@ -2108,34 +2116,34 @@ const PpArea _storyTime = PpArea(
           minutes: '4 MIN',
           slotId: 'early_learning/telling_a_story',
         ),
-        PpIntro('He does not follow the plot and it does not matter. What he is '
-            'getting is your voice, your closeness and the shape of language.'),
+        PpIntro('Your baby won\'t follow the plot, and that is fine. What your '
+            'baby gets is your voice, your closeness and the shape of language.'),
         PpArticle([
-          'A baby read to daily hears thousands more words than one who is not, '
-          'and book language is different from everyday speech. Books use words '
-          'you would never say while cooking, and that is precisely their value.',
-          'He will chew the book, turn three pages at once and lose interest '
-          'after ninety seconds. All of that is normal and none of it means it '
-          'is not working.',
+          'A baby read to daily hears thousands more words than one who is not. '
+          'Book language is different from everyday speech. Books use words '
+          'you would never say while cooking, and that is exactly their value.',
+          'Expect chewing, three pages turned at once and lost interest after '
+          'ninety seconds. All of that is normal, and none of it means it is '
+          'not working.',
         ], heading: 'Why it is worth doing this early'),
         PpSteps([
           PpStep('Choose board books or cloth books', 'They survive being '
               'eaten, which paper does not.'),
-          PpStep('Sit him on your lap so he can see your face and the page'),
-          PpStep('Do not read the words if he is not interested in them',
+          PpStep('Sit your baby on your lap, facing both you and the page'),
+          PpStep('Skip the words if your baby is not interested in them',
               'Point at pictures and talk about them instead. That counts '
               'fully as reading together.'),
           PpStep('Use a lot of voice',
               'High, low, slow, a whisper. Your voice is doing most of the '
               'work.'),
-          PpStep('Stop the moment he squirms',
+          PpStep('Stop the moment your baby squirms',
               'Two minutes a day for a year beats twenty minutes once.'),
         ], heading: 'How to do it'),
-        PpWhenLine('From birth, honestly. Newborns settle to a read-aloud '
-            'voice, and by six months he will reach for the book.'),
-        PpIndiaNote('Reading in the language you are most comfortable in is '
-            'better than reading in English badly. A warm, fluent Hindi voice '
-            'gives him more language than a hesitant English one.'),
+        PpWhenLine('From birth. Newborns settle to a read-aloud voice, and by '
+            'six months your baby will reach for the book.'),
+        PpIndiaNote('Reading in the language you are most at ease in beats '
+            'reading in English badly. A warm, fluent Hindi voice gives your '
+            'baby more language than a hesitant English one.'),
         PpLink(
           'Books for this age',
           surfaceId: 'pp_read',
@@ -2149,35 +2157,35 @@ const PpArea _storyTime = PpArea(
       format: 'STEP-LIST',
       bands: _fromOne,
       blocks: [
-        PpIntro('A told story beats a read one at this age, because you can see '
-            'his face and change the story to suit it. And you can do it in the '
-            'dark.'),
+        PpIntro('At this age a told story beats a read one. You can watch your '
+            'child\'s face and change the story to suit it. And you can do it '
+            'in the dark.'),
         PpSteps([
-          PpStep('Put him in the story',
-              'Once there was a boy called Arjun who had a red cycle. His '
-              'attention doubles immediately.'),
+          PpStep('Put your child in the story',
+              'Once there was a child called Arjun who had a red cycle. Use your '
+              'child\'s name and attention doubles at once.'),
           PpStep('Keep it to three things that happen',
-              'He went out, he met a dog, they came home. That is a complete '
-              'story for a two-year-old.'),
+              'Arjun went out, met a dog, and they came home. That is a '
+              'complete story for a two-year-old.'),
           PpStep('Use sounds rather than description',
-              'The gate went creeeak. The dog went bhow bhow. Sounds are what '
+              'The gate went creeeak. The dog went woof woof. Sounds are what '
               'a small child follows.'),
           PpStep('Slow down and drop your voice as it ends',
-              'The last three sentences should be almost a whisper if this is '
-              'a bedtime story.'),
+              'For a bedtime story, the last three sentences are almost a '
+              'whisper.'),
           PpStep('Tell the same story again tomorrow, the same way',
-              'Repetition is what he wants. Changing details will be objected '
-              'to, loudly.'),
+              'Repetition is what small children want. Changing details will '
+              'be objected to, loudly.'),
         ], heading: 'How to tell one'),
         PpCards([
           PpCard('Making it too long', 'Three minutes is a long story at two.'),
           PpCard('Making it a lesson', 'A story with a moral pinned on the end '
               'every night stops being a treat and starts being a lecture.'),
-          PpCard('Refusing to repeat it', 'The fortieth telling is doing more '
-              'for him than the first did.'),
+          PpCard('Refusing to repeat it', 'The fortieth telling does more for '
+              'your child than the first did.'),
         ], heading: 'What to avoid', hue: 268),
         PpWhenLine('From about eighteen months for a very simple told story. '
-            'By three he will want to tell you one back.'),
+            'By three, your child will want to tell you one back.'),
       ],
     ),
     PpPage(
@@ -2186,41 +2194,41 @@ const PpArea _storyTime = PpArea(
       format: 'SHORT ARTICLE',
       bands: _fromThree,
       blocks: [
-        PpIntro('The value in a story does not arrive by being announced. It '
-            'arrives in the two minutes of talking afterwards, if that talking '
-            'is a conversation rather than a test.'),
+        PpIntro('The lesson in a story does not land by being announced. It '
+            'lands in the two minutes of talking afterwards, if that talk is a '
+            'conversation rather than a test.'),
         PpArticle([
-          'A story that ends with and the moral is that we must always be '
-          'honest teaches a child to recognise the sentence, not the idea. A '
-          'story followed by what would you have done makes him do the thinking '
-          'himself, and thinking is what changes behaviour.',
+          'A story that ends with, and the moral is that we must always be '
+          'honest, teaches a child to recognise the sentence, not the idea. '
+          'Asking what would you have done makes your child do the thinking. '
+          'Thinking is what changes behaviour.',
           'Every story page in this door carries one question at the bottom for '
           'exactly this reason. One question is enough. Two becomes an exam.',
         ], heading: 'Why the question matters more than the moral'),
         PpSteps([
-          PpStep('Ask one open question, then be quiet',
-              'Why do you think he did that? Wait through the silence, it is '
-              'longer than feels comfortable.'),
-          PpStep('Accept his answer even when it is odd',
-              'A four-year-old may side with the crocodile. Ask him why rather '
-              'than correcting him.'),
+          PpStep('Ask one open question, then stay silent',
+              'Why do you think the jackal did that? Wait through the silence. '
+              'It is longer than feels comfortable.'),
+          PpStep('Accept the answer even when it is odd',
+              'A four-year-old may side with the crocodile. Ask why rather than '
+              'correcting.'),
           PpStep('Connect it to something real, lightly',
               'That is a bit like what happened with your cousin, no? One '
               'sentence, not a speech.'),
-          PpStep('Let it go if he does not want to talk',
-              'The story has still done its work. He is thinking about it even '
-              'when he will not discuss it.'),
+          PpStep('Let it go if your child does not want to talk',
+              'The story has still done its work. Children think about a story '
+              'even when they won\'t discuss it.'),
         ], heading: 'How to do it'),
         PpCards([
           PpCard('Turning it into a test',
-              'What was the moral, tell me properly, is the fastest way to make '
-              'him stop wanting stories.'),
+              'What was the moral, tell me properly, is the fastest way to end '
+              'your child\'s love of stories.'),
           PpCard('Using the story as a telling-off',
-              'You are just like that greedy jackal makes the story a weapon '
-              'and he will remember that, not the tale.'),
+              'You are just like that greedy jackal turns the story into a '
+              'weapon. That is what your child will remember, not the tale.'),
         ], heading: 'What to avoid', hue: 268),
-        PpWhenLine('From about three years, once he can answer a why. Before '
-            'that, just tell the story and stop.'),
+        PpWhenLine('From about three years, once your child can answer a why. '
+            'Before that, just tell the story and stop.'),
       ],
     ),
   ],
@@ -2273,7 +2281,7 @@ const PpArea _bedtimeTales = PpArea(
           'curled her trunk around him gently, the way she always did, and she '
           'said, come, we will go slowly.',
           'So they walked home together in the last of the light, past the tall '
-          'grass and the sleeping birds, and by the time they reached the '
+          'grass and the sleeping birds. By the time they reached the '
           'trees, the little elephant was already dreaming about the river.',
         ]),
         PpCards([
@@ -2303,14 +2311,14 @@ const PpArea _bedtimeTales = PpArea(
             'exact number of minutes you have left.'),
         PpArticle([
           'When it was time to sleep, the little girl did not want to go. So '
-          'her Amma said, all right, but first we must say goodnight to '
+          'her mother said, all right, but first we must say goodnight to '
           'everything, or how will they know it is night?',
           'So they said goodnight to the fan, going round and round more slowly '
           'now. Goodnight to the shoes by the door, lined up and waiting for '
           'the morning. Goodnight to the steel glasses, standing in a row.',
-          'They said goodnight to the tulsi on the balcony, and to the street '
-          'light outside, and to the dog who lives near the gate, who was '
-          'already asleep with his nose under his tail.',
+          'They said goodnight to the basil plant on the balcony, and to the street '
+          'light outside. They said goodnight to the dog who lives near the '
+          'gate. He was already asleep with his nose under his tail.',
           'And then they said goodnight to her toes, and her knees, and her '
           'hands, and her eyes. And by the time they reached her eyes, they '
           'were already closed.',
@@ -2320,11 +2328,11 @@ const PpArea _bedtimeTales = PpArea(
               'The day ends for everything, and ending it is peaceful rather '
               'than a loss.'),
           PpCard('How to tell it',
-              'Use the real things in your own house. Say goodnight to his '
-              'actual shoes and his actual fan.'),
+              'Use the real things in your own house. Say goodnight to your '
+              'child\'s own shoes and your own fan.'),
         ], heading: 'Before you switch off the light', hue: 232),
-        PpWhenLine('From about one year, and it becomes his own routine by '
-            'two.'),
+        PpWhenLine('From about one year, and it becomes your child\'s own '
+            'routine by two.'),
         PpAudioSlot(
           title: 'Listen to this story',
           category: 'Bedtime tale',
@@ -2340,14 +2348,14 @@ const PpArea _bedtimeTales = PpArea(
       format: 'STORY',
       blocks: [
         PpIntro('A story about the thing every child notices from a moving car '
-            'or a scooter, and finds slightly magical.'),
+            'or a scooter, and finds a little bit wonderful.'),
         PpArticle([
           "One night, a boy was coming home on the back of his Papa's scooter, "
           'holding on tight with both arms. He looked up and saw the moon '
           'sitting in the sky like a piece of chalk.',
           'They turned left at the big tree. The moon turned left too. They '
-          'went past the sabzi market, all shut up for the night, and the moon '
-          'came past the sabzi market as well.',
+          'went past the vegetable market, all shut up for the night, and the moon '
+          'came past the vegetable market as well.',
           'The boy said, Papa, the moon is following us. And his father said, '
           'yes, it does that. It walks people home.',
           'When they stopped at their own gate, the moon stopped too, resting '
@@ -2357,14 +2365,14 @@ const PpArea _bedtimeTales = PpArea(
         ]),
         PpCards([
           PpCard('The gentle idea in it',
-              'Something bright is watching over him even after the lights go '
+              'Something bright keeps watch, even after the lights go '
               'off.'),
           PpCard('How to tell it',
-              'Look at the moon together on the way home first. The story lands '
-              'much harder the same night.'),
+              'Look at the moon together on the way home first. The story means '
+              'much more the same night.'),
         ], heading: 'Before you switch off the light', hue: 232),
-        PpWhenLine('From about two years, when he starts noticing the moon on '
-            'his own.'),
+        PpWhenLine('From about two years, when your child starts noticing the '
+            'moon.'),
         PpAudioSlot(
           title: 'Listen to this story',
           category: 'Bedtime tale',
@@ -2440,8 +2448,8 @@ const PpArea _bedtimeTales = PpArea(
           PpCard('The gentle idea in it',
               'What you are looking for is often already where it belongs.'),
           PpCard('How to tell it',
-              'Let him guess where the blanket is at each stop. He will shout '
-              'the answer long before the end.'),
+              'Let your child guess where the blanket is at each stop. Expect '
+              'the answer shouted long before the end.'),
         ], heading: 'Before you switch off the light', hue: 232),
         PpWhenLine('From about eighteen months.'),
         PpAudioSlot(
@@ -2468,8 +2476,8 @@ const PpArea _bedtimeTales = PpArea(
           'about a bird who was rude to a bus. And at the end of that one, the '
           'small grey cat said, one more.',
           'Her mother said, all right, the last one. And this story was about a '
-          'small grey cat who lived on a windowsill, who was warm, and full of '
-          'milk, and safe, and whose eyes were getting heavier and heavier and '
+          'small grey cat who lived on a windowsill. She was warm, and full of '
+          'milk, and safe, and her eyes were getting heavier and heavier and '
           'heavier.',
           'And that story was so good that the small grey cat did not hear the '
           'end of it.',
@@ -2508,8 +2516,8 @@ const PpArea _bedtimeTales = PpArea(
           'In the afternoon he took a grandmother to the doctor, very slowly, '
           'over all the speed breakers, so carefully that she did not feel a '
           'single one.',
-          'And in the evening, when the sky went pink and all the horns were '
-          'shouting at each other, he took two brothers home from cricket, with '
+          'In the evening the sky went pink and all the horns were shouting at '
+          'each other. He took two brothers home from cricket, with '
           'the bat sticking straight out of the side.',
           'Then the driver parked him under the big tree near the gate, and '
           'switched off his lights, and patted his roof once. And the little '
@@ -2556,7 +2564,7 @@ const PpArea _bedtimeTales = PpArea(
         ]),
         PpCards([
           PpCard('The gentle idea in it',
-              'His body can let go of the day, one part at a time.'),
+              'A tired body can let go of the day, one part at a time.'),
           PpCard('How to tell it',
               'Touch each part very lightly as you name it, and get quieter '
               'with every paragraph.'),
@@ -2590,8 +2598,8 @@ const PpArea _bedtimeTales = PpArea(
           'But inside, it was dry. The blanket was warm. The window was shut, '
           'with just enough of a gap to let in that smell the mud makes when '
           'the first rain hits it.',
-          'And the boy lay in his bed and listened to the roof singing, and '
-          'thought that it was a very good thing to be inside, until he was not '
+          'And the boy lay in his bed and listened to the roof singing. He '
+          'thought it was a very good thing to be inside, until he was not '
           'thinking anything at all.',
         ]),
         PpCards([
@@ -2627,16 +2635,16 @@ const PpArea _bedtimeTales = PpArea(
           'another, with a rattle. It waited while the last scooter went home '
           'and the road went quiet.',
           'It waited while a small child had her dinner, and had her bath, and '
-          'brushed her teeth, and put on her night clothes, and got into bed, '
-          'and heard a story.',
+          'brushed her teeth. It waited while she put on her night clothes, got '
+          'into bed and heard a story.',
           'And when at last she closed her eyes, the star was still there, '
           'shining away very calmly, keeping the sky lit up until the morning '
           'came back.',
         ]),
         PpCards([
           PpCard('The gentle idea in it',
-              'Something steady is there through the night, whether or not he '
-              'is awake to see it.'),
+              'Something steady is there through the night, whether or not '
+              'anyone is awake to see it.'),
           PpCard('How to tell it',
               'This one is written to be told almost in a whisper the whole way '
               'through.'),
@@ -2738,7 +2746,7 @@ const PpArea _panchatantra = PpArea(
             'ones could not. Four minutes, with a very satisfying ending.'),
         PpArticle([
           'A lion lived in a forest and killed far more animals than he needed. '
-          'At last the animals came to him and offered a bargain: leave us in '
+          'At last the animals came to him with a bargain. Leave us in '
           'peace, and one of us will come to you every day, so you need never '
           'hunt again. The lion agreed.',
           'Each day one animal walked sadly to the lion. Then came the turn of '
@@ -2868,7 +2876,7 @@ const PpArea _panchatantra = PpArea(
           'fond of him anyway.',
           'One summer the pond began to dry up. The geese said they would fly '
           'to a bigger lake, and the tortoise begged to come. So they thought '
-          'of a plan: the geese would hold the two ends of a stick in their '
+          'of a plan. The geese would hold the two ends of a stick in their '
           'beaks, and the tortoise would bite the middle and hold on tight. But '
           'he must not open his mouth, not once, not for anything.',
           'Up they went. People in the village below looked up and pointed and '
@@ -3031,7 +3039,7 @@ const PpArea _panchatantra = PpArea(
         PpArticle([
           'There was a long dry spell, and a herd of elephants came looking for '
           'water. They found a lake in the middle of the sandy ground where '
-          'hundreds of hares had their burrows, and in going to and from it '
+          'hundreds of hares had their burrows. Going to and from it, '
           'they crushed many burrows and many hares.',
           'The hares did not know what to do. Then a small hare called Vijay '
           'said he would go and speak to them, and off he went alone.',
@@ -3120,7 +3128,7 @@ const PpArea _panchatantra = PpArea(
           'This went on happily for weeks. Then one night, from a nearby field, '
           'the donkey heard a she-donkey braying.',
           'He forgot everything. He lifted his head and brayed back at the top '
-          'of his voice, and every farmer in the fields knew at once that their '
+          'of his voice. Every farmer in the fields knew at once that their '
           'tiger was nothing but a donkey. They came with sticks, and that was '
           'the end of the good nights in the barley.',
         ]),
@@ -3159,9 +3167,9 @@ const PpArea _panchatantra = PpArea(
           'the channel to the river while there was still time. The second fish '
           'said, tomorrow is far away, and stayed. The third said, ponds like '
           'this have been here forever, and went to sleep.',
-          'The nets came at dawn. The second fish, seeing them, held his breath '
-          'and floated on his side pretending to be dead, and was thrown back '
-          'onto the bank, from where he flapped his way to the river. The third '
+          'The nets came at dawn. The second fish saw them, held his breath '
+          'and floated on his side pretending to be dead. He was thrown back '
+          'onto the bank, and from there he flapped his way to the river. The third '
           'fish was still explaining that nothing ever really happens when he '
           'was caught.',
         ]),
@@ -3195,7 +3203,6 @@ const PpArea _panchatantra = PpArea(
 //  stories about giving something up for somebody else, which is what a child
 //  takes from them in any case.
 // =============================================================================
-
 const PpArea _jataka = PpArea(
   id: 'jataka',
   mark: IntentMark.compassMark,
@@ -3233,13 +3240,13 @@ const PpArea _jataka = PpArea(
           'take it.',
           'They found the tree full of monkeys and surrounded it. There was one '
           'way out, a leap to a tree on the far bank, too far for most of the '
-          'troop. So the monkey king made that leap himself, tied a long creeper '
+          'troop. So the monkey king made that leap himself. He tied a long creeper '
           'to his feet and to the far tree, and found the creeper was a little '
           'too short. He stretched out his own body to make up the difference '
           'and held on.',
           'The whole troop ran across his back to safety, every one of them. '
-          'The king of the country watched, and when it was over he had the '
-          'monkey king lifted down gently and cared for, and he said he had '
+          'The king of the country watched. When it was over, he had the '
+          'monkey king lifted down gently and cared for. He said he had '
           'never seen anyone rule so well.',
         ]),
         PpCards([
@@ -3278,9 +3285,9 @@ const PpArea _jataka = PpArea(
           'Not long after, the queen of that country offered a great reward to '
           'anyone who could lead her to the golden deer she had dreamed of. The '
           'man thought about his family and his promise, and in the end he took '
-          'the reward and led the hunters to the river. But when the queen saw '
-          'the deer standing there quietly and heard the whole story, she was '
-          'so ashamed of what her reward had bought that she let him go and '
+          'the reward and led the hunters to the river. But the queen saw '
+          'the deer standing there quietly, and heard the whole story. She was '
+          'so ashamed of what her reward had bought that she let him go. She '
           'forbade anyone to hunt him for the rest of his life.',
         ]),
         PpCards([
@@ -3350,11 +3357,11 @@ const PpArea _jataka = PpArea(
       format: 'STORY',
       blocks: [
         PpIntro('A king who hunts, a bargain that seems fair, and the deer who '
-            'shows him what it actually costs.'),
+            'shows him what it really costs.'),
         PpArticle([
           'A king loved to hunt deer, and his hunts frightened the whole herd '
           'and injured many who were not even caught. So the leader of the '
-          'deer, a great banyan-coloured stag, made a bargain with him: leave '
+          'deer, a great banyan-coloured stag, made a bargain with him. Leave '
           'the herd in peace, and each day one deer will come to the palace on '
           'its own.',
           'Every day a deer went, chosen by lot, and the rest lived quietly. '
@@ -3406,9 +3413,9 @@ const PpArea _jataka = PpArea(
           'and he stood in his shed with his ears down. The keepers called '
           'doctors, who could find nothing wrong with him at all.',
           'At last a wise old minister came, looked around the empty shed and '
-          'asked, was there not a dog here? They sent messengers to find him, '
-          'and the day the dog came trotting back into the yard, the elephant '
-          'lifted him up with his trunk, put him on his own head, and then went '
+          'asked, was there not a dog here? They sent messengers to find him. '
+          'The day the dog came trotting back into the yard, the elephant '
+          'lifted him up with his trunk and put him on his own head. Then he went '
           'straight to his food.',
         ]),
         PpCards([
@@ -3521,10 +3528,10 @@ const PpArea _jataka = PpArea(
           'could not eat, could not roar, and lay in the shade in real misery.',
           'A woodpecker saw him and felt sorry for him. She said she would '
           'help, but she was not going to put her head inside a lion mouth '
-          'without a precaution, so she propped his jaws open with a stick, '
+          'without a precaution. So she propped his jaws open with a stick, '
           'went in, and worked the bone free.',
           'The lion recovered completely. Some weeks later the woodpecker, who '
-          'had eaten nothing all day, saw him with a fresh kill and came near, '
+          'had eaten nothing all day, saw him with a fresh kill. She came near, '
           'hoping he might remember her and leave a little.',
           'The lion looked at her coldly and said, you put your head inside my '
           'mouth once and came out alive. That is your reward, and it is more '
@@ -3570,8 +3577,8 @@ const PpArea _jataka = PpArea(
           'each one to a tree and ate it, until the pond was almost empty.',
           'Last of all came the crab. The crane picked him up, and the crab, '
           'being cautious, held on to the crane neck with his claws. When he '
-          'saw the pile of bones under the tree, he understood everything, and '
-          'he tightened his grip until the crane had to carry him back to the '
+          'saw the pile of bones under the tree, he understood everything. He '
+          'tightened his grip until the crane had to carry him back to the '
           'water and let him go.',
         ]),
         PpCards([
@@ -3644,7 +3651,6 @@ const PpArea _jataka = PpArea(
 //  delivered gets nothing from it. These are court stories with no animals to
 //  carry a younger listener through.
 // =============================================================================
-
 const PpArea _birbal = PpArea(
   id: 'birbal',
   mark: IntentMark.lampMark,
@@ -3827,21 +3833,21 @@ const PpArea _birbal = PpArea(
       format: 'STORY',
       blocks: [
         PpIntro('A man stands in a freezing river all night to win a prize, and '
-            'then has to be defended by Birbal to actually get it.'),
+            'then needs Birbal to defend him before he can get it.'),
         PpArticle([
           'One winter Akbar offered a bag of gold to anyone who could stand in '
           'the freezing river all night without a fire and without a blanket. A '
           'poor man said he would do it, and he did, shivering, until sunrise.',
           'When he came to collect the gold, one of the courtiers asked how he '
           'had survived. The man said honestly that he had kept his eyes on a '
-          'lamp burning in a window far away on the bank, and it had helped him '
+          'lamp burning in a window far away on the bank. It had helped him '
           'through the night.',
           'The courtiers said at once that this was cheating: he had used the '
           'warmth of the lamp. Akbar, not thinking, agreed, and the man was '
           'sent away with nothing.',
           'The next day Birbal did not come to court. Akbar went looking for '
-          'him and found him sitting outside, with a pot of khichdi hanging '
-          'from a tall pole and a small fire burning on the ground far below '
+          'him and found him sitting outside. A pot of khichdi hung '
+          'from a tall pole, and a small fire burned on the ground far below '
           'it. He said he was cooking his lunch. Akbar said, that fire is '
           'nowhere near the pot, it will never cook. Birbal said, if a lamp '
           'across a river can warm a man, this fire can certainly cook my '
@@ -3926,7 +3932,7 @@ const PpArea _birbal = PpArea(
         PpCards([
           PpCard('What it teaches',
               'Being loved and being the best-looking are different things, and '
-              'the first one is what people actually mean.'),
+              'the first one is what people really mean.'),
           PpCard('Talk about it',
               'Who thinks you are the most beautiful child in the world?'),
         ], heading: 'After the story', hue: 300),
@@ -3948,7 +3954,7 @@ const PpArea _birbal = PpArea(
         PpIntro('Nobody dares tell the emperor bad news, so Birbal has to find '
             'a way of saying it without saying it.'),
         PpArticle([
-          'Akbar had a parrot he loved above all his other birds, and he '
+          'Akbar had a parrot he loved above all his other birds. He '
           'announced that anyone who came and told him the parrot was dead '
           'would be severely punished.',
           'The parrot was old, and one morning the keeper found it stiff on the '
@@ -3988,7 +3994,7 @@ const PpArea _birbal = PpArea(
             'anybody being questioned at all.'),
         PpArticle([
           'A rich man came to court to say that a gold chain had been stolen '
-          'from his house, and that it had to be one of his ten servants, but '
+          'from his house. It had to be one of his ten servants, but '
           'he could not tell which.',
           'Birbal called all ten in and gave each of them a stick of exactly '
           'the same length. He said, these sticks are not ordinary. Tonight, '
@@ -4003,8 +4009,8 @@ const PpArea _birbal = PpArea(
         ]),
         PpCards([
           PpCard('What it teaches',
-              'A guilty person often gives himself away by trying too hard not '
-              'to.'),
+              'A guilty person is often given away by trying too hard not '
+              'to be.'),
           PpCard('Talk about it',
               'Why did the thief cut his stick? What would have happened if he '
               'had done nothing?'),
@@ -4029,7 +4035,7 @@ const PpArea _birbal = PpArea(
             'on him without raising his voice.'),
         PpArticle([
           'The court barber was jealous of Birbal and wanted him out of the '
-          'way. So one day, while shaving the emperor, he said quietly that he '
+          'way. So one day, while shaving the emperor, he spoke quietly. He '
           'had heard the emperor ancestors were unhappy in the next world and '
           'needed a wise man sent to advise them.',
           'Akbar was troubled and, foolishly, agreed that Birbal should be the '
@@ -4038,8 +4044,8 @@ const PpArea _birbal = PpArea(
           'In that month he had a long tunnel dug from the appointed spot to '
           'his own house. When the day came he went down as arranged, and came '
           'back a few weeks later, alive and with a magnificent new beard.',
-          'He told the court his ancestors were extremely well, and that they '
-          'had said only one thing: that they had no barber up there, and would '
+          'He told the court his ancestors were extremely well. They '
+          'had said only one thing. They had no barber up there, and would '
           'very much like the court barber to be sent next. The barber '
           'confessed everything before the emperor could open his mouth.',
         ]),
@@ -4073,7 +4079,6 @@ const PpArea _birbal = PpArea(
 //  of filler that does actual harm, because a parent would repeat it as
 //  heritage. The gap is named in the build report rather than hidden.
 // =============================================================================
-
 const PpArea _tenali = PpArea(
   id: 'tenali',
   mark: IntentMark.improveMark,
@@ -4114,9 +4119,9 @@ const PpArea _tenali = PpArea(
           'trunk. They found nothing. Then they thought the earth looked too '
           'obviously disturbed, so they watered it all down to hide their '
           'digging, and went away exhausted before dawn.',
-          'In the morning Tenali came out, looked at his beautifully dug and '
-          'watered garden, and told his wife that they now had the best '
-          'prepared soil in the city and had not lifted a finger.',
+          'In the morning Tenali came out and looked at his beautifully dug and '
+          'watered garden. He told his wife that they now had the best '
+          'prepared soil in the city, and had not lifted a finger.',
         ]),
         PpCards([
           PpCard('What it teaches',
@@ -4143,7 +4148,7 @@ const PpArea _tenali = PpArea(
             'shows the king why it was silly.'),
         PpArticle([
           'The city had too many rats, so the king gave every household a cat '
-          'and a measure of milk a day to feed it, and ordered that the cats be '
+          'and a measure of milk a day to feed it. He ordered that the cats be '
           'kept healthy and inspected regularly.',
           'Tenali took his cat home and gave it milk that was far too hot. The '
           'cat burnt its tongue, and after that it would not go near milk at '
@@ -4151,11 +4156,11 @@ const PpArea _tenali = PpArea(
           'When the inspectors came, Tenali cat was thin and the milk was '
           'untouched. He was called before the king and accused of starving it. '
           'He asked the king to place a bowl of milk in front of the cat there '
-          'and then, and the whole court watched the cat back away from it in '
+          'and then. The whole court watched the cat back away from it in '
           'horror.',
           'Tenali said, the cat has decided, your majesty, not I. And then he '
-          'said the thing he had come to say: the rats are gone, the milk is '
-          'costing the treasury a fortune every day, and perhaps it is time the '
+          'said the thing he had come to say. The rats are gone, the milk is '
+          'costing the treasury a fortune every day. Perhaps it is time the '
           'cats caught their own dinner. The king ended the order.',
         ]),
         PpCards([
@@ -4202,7 +4207,7 @@ const PpArea _tenali = PpArea(
               'Being greedy about something that costs you nothing usually ends '
               'in looking foolish.'),
           PpCard('Talk about it',
-              'Was the shopkeeper actually losing anything?'),
+              'Was the shopkeeper really losing anything?'),
         ], heading: 'After the story', hue: 12),
         PpWhenLine('From about four and a half.'),
         PpAudioSlot(
@@ -4223,8 +4228,8 @@ const PpArea _tenali = PpArea(
             'either way? Very carefully.'),
         PpArticle([
           'A neighbouring king who had lost one eye and one leg wanted his '
-          'portrait painted. Every painter who tried was in trouble: if they '
-          'painted him as he was, he was insulted, and if they painted him '
+          'portrait painted. Every painter who tried was in trouble. If they '
+          'painted him as he was, he was insulted. If they painted him '
           'whole, he said they were liars and flatterers.',
           'Several painters had already been punished when Tenali happened to '
           'be visiting that court, and he offered to solve it.',
@@ -4306,7 +4311,7 @@ const PpArea _tenali = PpArea(
             'you look at it properly.'),
         PpArticle([
           'Three travellers put all their money into one bag and gave it to the '
-          'innkeeper to keep, saying he must only hand it back when all three '
+          'innkeeper to keep. He must only hand it back, they said, when all three '
           'of them came to ask for it together.',
           'One of them came back alone the next morning, said the others had '
           'sent him, and the innkeeper gave him the bag. He disappeared with '
@@ -4324,7 +4329,7 @@ const PpArea _tenali = PpArea(
         PpCards([
           PpCard('What it teaches',
               'Blaming the nearest person is easier than finding the one who '
-              'actually did it.'),
+              'really did it.'),
           PpCard('Talk about it',
               'Who really took the money? Why were the two men shouting at the '
               'innkeeper?'),
@@ -4387,8 +4392,8 @@ const PpArea _worldTales = PpArea(
           'fast. He roared and pulled and only tangled himself worse, and the '
           'whole forest heard him.',
           'The mouse heard him too. She came running, and she began to chew '
-          'through the ropes with her small sharp teeth, one strand at a time, '
-          'until there was a hole big enough for a lion to walk out of. And the '
+          'through the ropes with her small sharp teeth, one strand at a time. '
+          'Soon there was a hole big enough for a lion to walk out of. And the '
           'lion never laughed at small friends again.',
         ]),
         PpCards([
@@ -4396,7 +4401,7 @@ const PpArea _worldTales = PpArea(
               'Nobody is too small to be useful, and a kindness usually comes '
               'back.'),
           PpCard('Talk about it',
-              'Act it out. You be the lion and let him be the mouse, then swap.'),
+              'Act it out. You be the lion and your child the mouse, then swap.'),
         ], heading: 'After the story', hue: 190),
         PpWhenLine('From about two and a half. This is usually the first moral '
             'story a child really follows.'),
@@ -4464,9 +4469,9 @@ const PpArea _worldTales = PpArea(
           'Halfway along, the hare looked back and could not even see his '
           'opponent. There was a shady tree and long grass, and he thought, I '
           'have hours. He lay down for a short rest and fell fast asleep.',
-          'The tortoise came past him, still walking, and did not stop. When '
-          'the hare woke up and ran the rest of the way as fast as his legs '
-          'would go, the tortoise was already sitting quietly at the finishing '
+          'The tortoise came past him, still walking, and did not stop. The '
+          'hare woke up and ran the rest of the way as fast as his legs '
+          'would go. But the tortoise was already sitting quietly at the finishing '
           'line, waiting for him.',
         ]),
         PpCards([
@@ -4576,11 +4581,11 @@ const PpArea _worldTales = PpArea(
           'The north wind and the sun were arguing about which of them was the '
           'stronger, and neither would give in.',
           'Then they saw a traveller walking along the road below in a heavy '
-          'coat, and they agreed on a test: whichever of them could get the '
+          'coat. They agreed on a test. Whichever of them could get the '
           'coat off him was the stronger.',
           'The north wind went first. He blew until the trees bent and the dust '
           'flew. But the harder he blew, the tighter the man pulled his coat '
-          'around him and held on to the collar, until in the end the wind gave '
+          'around him and held on to the collar. In the end the wind gave '
           'up, out of breath.',
           'Then the sun came out from behind a cloud and simply shone, gently '
           'at first and then warmly. Within a few minutes the traveller '
@@ -4625,7 +4630,7 @@ const PpArea _worldTales = PpArea(
           'onion. Then a man remembered two potatoes, and a boy brought a '
           'handful of dal, and somebody found a bunch of coriander going soft '
           'at home.',
-          'By evening the pot was full of thick, good soup, and the whole '
+          'By evening the pot was full of thick, good soup. The whole '
           'village sat around the fire eating it and saying what a remarkable '
           'stone it must be.',
         ]),
@@ -4637,7 +4642,7 @@ const PpArea _worldTales = PpArea(
               'somebody needed help?'),
         ], heading: 'After the story', hue: 190),
         PpWhenLine('From about four years. It is an excellent story to tell '
-            'while actually cooking.'),
+            'while you are cooking.'),
         PpAudioSlot(
           title: 'Listen to this story',
           category: 'World tales',
@@ -4665,7 +4670,7 @@ const PpArea _worldTales = PpArea(
           'everything he had, and it did not move. The second tried, and the '
           'third, and the fourth. The bundle did not even bend.',
           'Then the old man untied the string and gave each of them one single '
-          'stick, and every one of them snapped it between two fingers without '
+          'stick. Every one of them snapped it between two fingers without '
           'thinking about it. He said, that is all I wanted to show you. Now go '
           'and run the farm.',
         ]),
@@ -4674,7 +4679,7 @@ const PpArea _worldTales = PpArea(
               'People who stay together are much harder to knock over than '
               'people standing alone.'),
           PpCard('Talk about it',
-              'Try it with a handful of dry twigs or agarbatti sticks.'),
+              'Try it with a handful of dry twigs or incense sticks.'),
         ], heading: 'After the story', hue: 190),
         PpWhenLine('From about four years.'),
         PpAudioSlot(
@@ -4706,14 +4711,14 @@ const PpArea _worldTales = PpArea(
           'them was worth.',
           'The third time she brought up an old iron axe head with a chip in '
           'the blade, and his face lit up, because it was his. She gave it to '
-          'him, and then she gave him the gold one and the silver one as well, '
-          'and said that an honest man who is offered a fortune and says no '
+          'him, and then she gave him the gold one and the silver one as well. '
+          'She said that an honest man who is offered a fortune and says no '
           'twice ought to have something for it.',
         ]),
         PpCards([
           PpCard('What it teaches',
               'Telling the truth when a lie would pay very well is what honesty '
-              'actually means.'),
+              'really means.'),
           PpCard('Talk about it',
               'Was it hard for him to say no? Why do you think he did?'),
         ], heading: 'After the story', hue: 190),
@@ -4748,7 +4753,7 @@ const PpArea _worldTales = PpArea(
           'back to bed.',
           'In the morning each of them counted his sacks and found exactly the '
           'number he had started with, and neither could understand it. It went '
-          'on for three nights, until on the fourth they met each other in the '
+          'on for three nights. On the fourth, they met each other in the '
           'middle of the field in the dark, each with a sack on his shoulder, '
           'and understood everything.',
         ]),
@@ -4805,21 +4810,21 @@ const PpArea _habits = PpArea(
   pages: [
     PpPage(
       id: 'hab_brushing',
-      title: 'Brushing his teeth',
+      title: 'Brushing teeth',
       format: 'ARTICLE',
       bands: _fromOne,
       blocks: [
         PpIntro('The habit most likely to end in a wrestling match, and the one '
-            'that pays back most obviously. It gets easier once it stops being '
+            'that pays back most clearly. It gets easier once it stops being '
             'a negotiation.'),
         PpArticle([
-          'Decay in milk teeth is extremely common in India and it hurts, it '
-          'costs money, and it can affect the adult teeth coming in behind. '
+          'Decay in milk teeth is very common in India. It hurts, it costs '
+          'money, and it can affect the adult teeth coming in behind. '
           'Twice a day with a smear of fluoride toothpaste is the whole '
           'prevention.',
-          'What makes it hard is not the brushing, it is the fact that it '
-          'happens when everybody is tired. Making it the same fixed point in '
-          'the evening, before the tiredness peaks, solves most of it.',
+          'The hard part is not the brushing. It is that brushing happens when '
+          'everybody is tired. Making it a fixed point in the evening, before '
+          'the tiredness peaks, solves most of it.',
         ], heading: 'Why this one matters'),
         PpSteps([
           PpStep('Start the day the first tooth appears',
@@ -4828,51 +4833,54 @@ const PpArea _habits = PpArea(
           PpStep('Make it the same two moments every day',
               'After the morning bath and just before the bedtime story. A '
               'fixed slot beats a reminder.'),
-          PpStep('Let him brush first, then you finish',
-              'His turn matters to him. Your turn is the one that actually '
+          PpStep('Your child brushes first, then you finish',
+              'Their own turn matters to children. Your turn is the one that '
               'cleans the teeth, and children need help until about seven.'),
-          PpStep('Brush your own teeth beside him',
-              'Copying is the strongest force available to you at this age.'),
+          PpStep('Brush your own teeth alongside',
+              'Copying is the strongest force you have at this age.'),
           PpStep('Sing something two minutes long',
               'Time it with a song rather than a timer. It turns a chore into a '
               'routine.'),
         ], heading: 'How to build it'),
         PpCards([
-          PpCard('Chasing him around the house',
-              'It turns brushing into a game of catch, and he wins.'),
+          PpCard('Chasing your child around the house',
+              'It turns brushing into a game of catch, and your child wins.'),
           PpCard('Sweet drinks in a bottle at bedtime',
-              'Milk or juice pooling around the teeth all night is the single '
+              'Milk or juice pooling around the teeth all night is the '
               'biggest cause of early decay.'),
           PpCard('A star chart',
               'It works for a fortnight and then stops working, and the '
               'brushing often goes with it.'),
         ], heading: 'What to avoid', hue: 344),
-        PpCallout('Try this together. Play Find the Sugar Bugs: he brushes, '
-            'then you take a torch and look for any bugs he missed, and he '
-            'brushes those spots. It takes thirty seconds and it moves the job '
-            'from being told to being checked.'),
+        PpCallout('Try this together. Play Find the Sugar Bugs. Your child '
+            'brushes, then you take a torch and look for any bugs left behind, '
+            'and those spots get brushed again. It takes thirty seconds, and '
+            'the job moves from being told to being checked.'),
         PpWhenLine('From the first tooth, usually around six months. Supervise '
             'until about seven years.'),
         PpVideoSlot(
           title: "Brushing a toddler's teeth without a fight",
-          subtitle: 'How to hold him, where to stand, and what to do with a '
-              'child who clamps his mouth shut.',
+          subtitle: 'How to hold your toddler, where to stand, and what to do '
+              'when the mouth clamps shut.',
           minutes: '5 MIN',
           slotId: 'learning/habit/brushing',
         ),
         PpCallout(
-          'Brown or black marks on a tooth, a hole you can see, or pain when he '
-          'eats something cold all need a dentist rather than harder brushing. '
+          'Brown or black marks on a tooth, a hole you can see, or pain when '
+          'eating something cold all need a dentist, not harder brushing. '
           'If you do not have one, your paediatrician will tell you where to '
           'go. Decay does not reverse on its own.',
           kind: PpCalloutKind.doctor,
           title: 'When to see a dentist',
         ),
+        // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+            PpLink('Teeth: when they come, brushing and the first dentist',
+                surfaceId: 'pp_page/parenting_health/teeth_brushing'),
       ],
     ),
     PpPage(
       id: 'hab_handwashing',
-      title: 'Washing his hands',
+      title: 'Washing hands',
       format: 'ARTICLE',
       bands: _fromOne,
       blocks: [
@@ -4880,47 +4888,47 @@ const PpArea _habits = PpArea(
             'children take to easily because it involves water and mess.'),
         PpArticle([
           'Handwashing with soap before eating and after the toilet cuts '
-          'diarrhoea and respiratory infections substantially. In a country '
-          'where both are common in small children, this single habit does more '
-          'than most supplements.',
+          'diarrhoea and chest infections a lot. Both are common in small '
+          'children in India, and this one habit does more than most '
+          'supplements.',
           'The part that gets missed is the twenty seconds. A quick pass under '
           'the tap does very little, so the habit worth building is the length, '
           'not the act.',
         ], heading: 'Why this one matters'),
         PpSteps([
-          PpStep('Put a stool at the basin so he can reach the tap himself',
-              'A habit he needs help to start will not become automatic.'),
-          PpStep('Keep the soap where his hand lands',
-              'A bar in a dish at his height, not a bottle he has to ask for.'),
+          PpStep('Put a stool at the basin so the tap is within reach',
+              'A habit that needs help to start will not become automatic.'),
+          PpStep('Keep the soap where a small hand lands',
+              'A bar in a dish at child height, not a bottle to ask for.'),
           PpStep('Count or sing for twenty seconds',
               'One verse of any song. The song is the timer.'),
           PpStep('Name the four moments',
               'Before eating, after the toilet, after coming home, after '
-              'playing outside. Four is a rememberable number.'),
-          PpStep('Give him his own towel at his height',
-              'Wet hands wiped on clothes is where the habit quietly falls '
+              'playing outside. Four is easy to remember.'),
+          PpStep('Hang your child\'s own towel at child height',
+              'Wet hands wiped on clothes is where the habit slowly falls '
               'apart.'),
         ], heading: 'How to build it'),
         PpCards([
-          PpCard('Doing it for him',
-              'You washing his hands is not the same habit as him washing his '
-              'hands.'),
-          PpCard('Only mentioning it when he forgets',
-              'A habit built entirely out of corrections feels like being told '
+          PpCard('Doing it for your child',
+              'You washing the hands is a different habit from your child '
+              'washing them.'),
+          PpCard('Only mentioning it when it is forgotten',
+              'A habit built only out of corrections feels like being told '
               'off five times a day.'),
           PpCard('Sanitiser as the default',
               'Useful when out. Soap and water is better, and children swallow '
               'sanitiser more often than you would think.'),
         ], heading: 'What to avoid', hue: 344),
-        PpCallout('Try this together. Do the Pepper Trick once: float ground '
-            'kali mirch on a bowl of water, dip a clean finger in and nothing '
-            'happens, then dip a soapy finger and watch the pepper shoot to the '
+        PpCallout('Try this together. Do the Pepper Trick once. Float ground '
+            'black pepper on a bowl of water and dip a clean finger in: nothing '
+            'happens. Dip a soapy finger and watch the pepper shoot to the '
             'edges. Children talk about it for weeks.'),
-        PpWhenLine('From about eighteen months with help, and mostly on his own '
+        PpWhenLine('From about eighteen months with help, and mostly done alone '
             'by three.'),
         PpIndiaNote('Where water is stored rather than running, keep a small '
-            'lota and a soap dish by the storage drum at his height. The habit '
-            'depends entirely on him being able to do it without calling '
+            'lota and a soap dish by the storage drum, at child height. The '
+            'habit depends on your child doing it without calling '
             'anyone.'),
       ],
     ),
@@ -4930,48 +4938,48 @@ const PpArea _habits = PpArea(
       format: 'ARTICLE',
       bands: _fromTwo,
       blocks: [
-        PpIntro('Not because it looks good in front of guests, but because a '
-            'child who can ask for things pleasantly gets a warmer response '
-            'from the world all his life.'),
+        PpIntro('Not because it looks good in front of guests. A child who can '
+            'ask for things pleasantly gets a warmer response from the world, '
+            'for life.'),
         PpArticle([
-          'Politeness at three is entirely imitation. He is not being '
-          'considerate, he is copying the words he hears in situations that '
-          'look like this one, and that is exactly how it should start.',
-          'The considerateness grows in later, at four and five, when he begins '
-          'to understand that the other person has feelings about it. Trying to '
-          'force the understanding early usually produces a resentful mumble.',
+          'Politeness at three is all imitation. Your child is not being '
+          'considerate yet, only copying the words heard in moments like this '
+          'one. That is exactly how it is meant to start.',
+          'The care behind the words grows in later, at four and five, once '
+          'children understand that the other person has feelings about it. '
+          'Forcing that early usually produces a resentful mumble.',
         ], heading: 'Why this one matters'),
         PpSteps([
-          PpStep('Say it to him first, many times a day',
-              'Thank you for bringing my chappals. Please pass me that. He '
-              'learns the word from hearing it aimed at him.'),
-          PpStep('Say it to everybody in front of him',
+          PpStep('Say it to your child first, many times a day',
+              'Thank you for bringing my slippers. Please pass me that. '
+              'Children learn the words from hearing them aimed at themselves.'),
+          PpStep('Say it to everybody, where your child can hear',
               'To the delivery man, to the person who cleans your house, to the '
               'auto driver. Children notice exactly who you are polite to.'),
           PpStep('Model the sentence instead of demanding it',
               'Say you can say, please give me water, rather than say please.'),
-          PpStep('Give him the thing anyway, then model it',
-              'Withholding water until the magic word appears turns politeness '
-              'into a toll.'),
+          PpStep('Hand the thing over anyway, then model it',
+              'Holding back water until the magic word appears turns '
+              'politeness into a toll.'),
           PpStep('Notice it when it happens on its own',
-              'That was a nice way to ask. Once, quietly, not a fuss.'),
+              'That was a nice way to ask. Once, lightly, not a fuss.'),
         ], heading: 'How to build it'),
         PpCards([
           PpCard('Performing for guests',
               'Say thank you to auntie, say it properly, in front of people is '
-              'humiliating and it works against you.'),
+              'humiliating, and it works against you.'),
           PpCard('Only being polite to important people',
-              'He is watching, and he learns who you think deserves it.'),
+              'Your child is watching, and learns who you think deserves it.'),
           PpCard('Correcting the tone',
               'Say it nicely, again, turns a two-second exchange into a '
               'standoff.'),
         ], heading: 'What to avoid', hue: 344),
-        PpCallout('Try this together. Play Thank You at Dinner: each person '
+        PpCallout('Try this together. Play Thank You at Dinner. Each person '
             'says one thing they are thankful for and one person they want to '
-            'thank today. It takes two minutes and it makes the words ordinary '
+            'thank today. It takes two minutes, and the words become ordinary '
             'rather than ceremonial.'),
         PpWhenLine('From about two years for the words, and about four before '
-            'they are genuinely meant.'),
+            'they are really meant.'),
       ],
     ),
     PpPage(
@@ -4980,47 +4988,47 @@ const PpArea _habits = PpArea(
       format: 'ARTICLE',
       bands: _fromTwo,
       blocks: [
-        PpIntro('The habit parents most want and the one most often asked for '
-            'too early. A two-year-old is not being selfish, he is being two.'),
+        PpIntro('The habit parents most want, and the one most often asked for '
+            'too early. A two-year-old who won\'t share is not selfish, just two.'),
         PpArticle([
-          'Real sharing needs the child to understand that another person wants '
-          'something and to care about that more than about having it. That '
-          'arrives somewhere around three and a half or four, and no amount of '
-          'insisting brings it forward.',
-          'What can be built earlier is turn taking, which is completely '
+          'Real sharing needs a child to understand that another person wants '
+          'something, and to care about that more than about having it. That '
+          'arrives around three and a half or four. No amount of insisting '
+          'brings it forward.',
+          'What can be built earlier is turn taking, which is quite '
           'different. My turn, then your turn, with a clear end to each turn, '
-          'is manageable from about two and it is the road to sharing.',
+          'is manageable from about two. It is the road to sharing.',
         ], heading: 'Why this one matters'),
         PpSteps([
           PpStep('Use turns, not sharing, until about four',
-              'When you are finished, it is her turn. Not: give it to her now.'),
-          PpStep('Let him finish his turn',
-              'Ending a turn on his own terms is what teaches him that giving '
-              'it up is survivable.'),
+              'When you are finished, it is Riya\'s turn. Not: give it to Riya now.'),
+          PpStep('Let your child finish the turn',
+              'Ending a turn on their own terms is what teaches children that '
+              'giving something up is survivable.'),
           PpStep('Put away the two or three most precious things before guests '
               'arrive',
               'Nobody shares their favourite thing. Adults do not either.'),
           PpStep('Share out loud yourself',
-              'I have got two, you can have one. Narrate it so he can see the '
-              'thinking.'),
+              'I have got two, you can have one. Say it aloud so your child can '
+              'hear the thinking.'),
           PpStep('Notice it once, plainly, when it happens',
-              'You gave her a turn. She looked happy. No fuss, no reward.'),
+              'You gave Riya a turn. Riya looked happy. No fuss, no reward.'),
         ], heading: 'How to build it'),
         PpCards([
           PpCard('Grabbing the toy and handing it over',
-              'It teaches him that the bigger person takes what they want, '
-              'which is the opposite lesson.'),
-          PpCard('Calling him selfish',
-              'The word sticks, and a child who is told what he is tends to '
+              'It teaches that the bigger person takes what they want, which '
+              'is the opposite lesson.'),
+          PpCard('Calling your child selfish',
+              'The word sticks. Children who are told what they are tend to '
               'become it.'),
           PpCard('Forcing sharing in front of relatives',
-              'It is about your embarrassment at that moment, and he can feel '
-              'it.'),
+              'It is about your embarrassment at that moment, and your child can '
+              'feel it.'),
         ], heading: 'What to avoid', hue: 344),
         PpCallout('Try this together. Use a Turn Timer: a small sand timer or a '
             'two-minute song. When it ends, the toy moves. The timer becomes '
             'the one saying no, not you, and the fighting drops sharply.'),
-        PpWhenLine('Turn taking from about two years. Genuine sharing from '
+        PpWhenLine('Turn taking from about two years. Real sharing from '
             'about four, and unevenly even then.'),
         // ⚠️ THE OTHER VERSION, BY PAGE. Five habit pages also live in
         // Behaviour; the brief keeps both ("build the habit calmly" here,
@@ -5036,19 +5044,19 @@ const PpArea _habits = PpArea(
     ),
     PpPage(
       id: 'hab_tidying',
-      title: 'Putting his toys away',
+      title: 'Putting toys away',
       format: 'ARTICLE',
       bands: _fromOne,
       blocks: [
-        PpIntro('Tidying up is far more achievable than it looks, as long as '
+        PpIntro('Tidying up is far more doable than it looks, as long as '
             'there are fewer things out and a place for each of them.'),
         PpArticle([
           'A child cannot tidy a room with forty toys in it. The task is too '
-          'big to see the end of, and he simply stops. Reducing what is out '
+          'big to see the end of, so the child stops. Having less out '
           'solves more of this than any technique.',
           'Tidying is also a sequence: pick up, carry, put in the right place, '
-          'come back. That is real executive function practice, and it is why '
-          'it is genuinely hard at two and easy at five.',
+          'come back. That is real planning practice for the brain, which is '
+          'why it is hard at two and easy at five.',
         ], heading: 'Why this one matters'),
         PpSteps([
           PpStep('Keep only a few things out at a time',
@@ -5056,10 +5064,10 @@ const PpArea _habits = PpArea(
               'rotated weekly.'),
           PpStep('Give everything one obvious home',
               'One basket for blocks, one for cars. If you cannot say where a '
-              'thing lives, he certainly cannot.'),
-          PpStep('Tidy with him, not instead of him',
-              'You do the big things, he does the small ones. Alongside works '
-              'at this age, alone does not.'),
+              'thing lives, your child certainly cannot.'),
+          PpStep('Tidy together, not instead of your child',
+              'You do the big things, your child does the small ones. '
+              'Alongside works at this age, alone does not.'),
           PpStep('Make it the same moment every day',
               'Before dinner, or before the bedtime story. The story is the '
               'natural next thing, not a bribe.'),
@@ -5072,38 +5080,38 @@ const PpArea _habits = PpArea(
               'Mid-game and just before bed are the two worst. Give a warning '
               'first: two more minutes, then we tidy.'),
           PpCard('Threatening to throw the toys away',
-              'He knows you will not, and if you do, he learns that his things '
+              'Children know you won\'t. And if you do, they learn their things '
               'are not safe with you.'),
-          PpCard('Redoing it in front of him',
-              'It tells him his effort did not count.'),
+          PpCard('Redoing it in front of your child',
+              'It says the effort did not count.'),
         ], heading: 'What to avoid', hue: 344),
-        PpCallout('Try this together. Play Ten Things: he puts away ten things '
-            'while you count them out loud, and then he is done, whatever the '
-            'room looks like. A finishable job gets started.'),
-        PpWhenLine('From about eighteen months alongside you, and mostly on his '
-            'own by four or five.'),
+        PpCallout('Try this together. Play Ten Things. Your child puts away ten '
+            'things while you count them out loud, and then the job is done, '
+            'whatever the room looks like. A finishable job gets started.'),
+        PpWhenLine('From about eighteen months alongside you, and mostly alone '
+            'by four or five.'),
       ],
     ),
     PpPage(
       id: 'hab_eating_self',
-      title: 'Eating by himself',
+      title: 'Eating without help',
       format: 'ARTICLE',
       bands: _fromOne,
       blocks: [
         PpIntro('It is slower, it is messier, and it is one of the most '
             'important independence habits of the toddler years.'),
         PpArticle([
-          'A child who feeds himself decides when he has had enough, and that '
-          'ability to read his own fullness is protective for the rest of his '
-          'life. A child who is fed while distracted loses it early.',
+          'Children who feed themselves decide when they have had enough. That '
+          'sense of their own fullness protects them for life. A child who is '
+          'fed while distracted loses it early.',
           'Self feeding is also serious hand and mouth coordination practice, '
           'and it is one of the first things a preschool will expect.',
         ], heading: 'Why this one matters'),
         PpSteps([
-          PpStep('Let him use his hands first, properly',
-              'Hand feeding is how most of India eats and it is excellent '
+          PpStep('Let your child use hands first, properly',
+              'Hand feeding is how most of India eats, and it is excellent '
               'practice. Spoons can come later.'),
-          PpStep('Sit him at the family meal, at the same time as everyone',
+          PpStep('Bring your child to the family meal, at the same time as everyone',
               'Eating alone at four and being fed at eight is the pattern that '
               'stalls this.'),
           PpStep('Serve a small amount and offer more',
@@ -5111,29 +5119,29 @@ const PpArea _habits = PpArea(
           PpStep('Put a newspaper or a sheet under the chair',
               'Deciding in advance that mess is fine is what lets you stay '
               'relaxed.'),
-          PpStep('Stop when he stops, without persuading',
-              'One more bite, ten times over, is how a child learns to ignore '
-              'his own stomach.'),
+          PpStep('Stop when your child stops, without persuading',
+              'One more bite, ten times over, is how children learn to ignore '
+              'their own stomachs.'),
         ], heading: 'How to build it'),
         PpCards([
           PpCard('Feeding in front of a screen',
-              'He will eat more and notice less, and it is very hard to undo '
+              'Children eat more and notice less, and it is very hard to undo '
               'later.'),
-          PpCard('Chasing him around the house with the plate',
-              'Food becomes something that happens to him rather than something '
-              'he does.'),
-          PpCard('Comparing him to the child next door',
+          PpCard('Chasing your child around the house with the plate',
+              'Food becomes something done to your child, not something your '
+              'child does.'),
+          PpCard('Comparing with the child next door',
               'Appetites vary enormously, and comparison at the table sours '
               'meals for years.'),
         ], heading: 'What to avoid', hue: 344),
-        PpCallout('Try this together. Give him one Serving Job at every meal: '
-            'he puts the rotis in the casserole, or spoons the dahi into '
+        PpCallout('Try this together. Give your child one Serving Job at every '
+            'meal: rotis into the casserole, or curd spooned into '
             "everybody's bowls. Children eat noticeably better at a meal they "
             'helped serve.'),
         PpWhenLine('Hands from about eight months, a spoon with real success '
             'from about eighteen months to two years.'),
         PpLink(
-          'What he should be eating at this age',
+          'What your child can eat at this age',
           surfaceId: 'pp_food',
           blurb: 'Meals, portions and recipes by age.',
         ),
@@ -5150,39 +5158,39 @@ const PpArea _habits = PpArea(
             'build with one piece of furniture.'),
         PpArticle([
           'Mild dehydration in a small child shows up as crankiness, headache, '
-          'hard su-su and constipation long before anybody thinks about water. '
+          'dark wee and constipation, long before anybody thinks about water. '
           'It is one of the commonest hidden causes of a difficult afternoon.',
           'The reliable fix is access. A child who has to ask an adult every '
-          'time will drink far less than one who can pour his own.',
+          'time drinks far less than one who can pour a glass alone.',
         ], heading: 'Why this one matters'),
         PpSteps([
-          PpStep('Put a small jug and glass at his height',
+          PpStep('Put a small jug and glass at child height',
               'A low table or a bottom shelf. This one change does most of the '
               'work.'),
           PpStep('Attach it to things that already happen',
               'A glass after coming home, after the toilet, and at each meal. '
               'Fixed moments beat reminders.'),
-          PpStep('Send water out to play with him',
-              'A bottle that goes wherever he goes in summer.'),
-          PpStep('Drink water yourself in front of him, often'),
-          PpStep('Watch the su-su rather than counting glasses',
+          PpStep('Send water out to play too',
+              'In summer, a bottle goes wherever your child goes.'),
+          PpStep('Drink water yourself where your child can see, often'),
+          PpStep('Watch the wee rather than counting glasses',
               'Pale and often is right. Dark yellow and rare means more water.'),
         ], heading: 'How to build it'),
         PpCards([
           PpCard('Juice and sweet drinks to get fluids in',
-              'They train a preference for sweet and they are hard on the '
-              'teeth. Water should be the boring default.'),
-          PpCard('Nagging him to drink',
+              'They train a taste for sweet and they are hard on the '
+              'teeth. Let water be the boring default.'),
+          PpCard('Nagging your child to drink',
               'Access works, reminders do not.'),
         ], heading: 'What to avoid', hue: 344),
-        PpCallout('Try this together. Make a Water Station: his own steel glass '
-            'and a small jug on a low stool, refilled by him each morning. '
-            'Owning the station is what makes him use it.'),
-        PpWhenLine('From about two years for pouring his own. Water is offered '
+        PpCallout('Try this together. Make a Water Station: your child\'s own '
+            'steel glass and a small jug on a low stool, refilled by your child '
+            'each morning. Owning the station is what makes it get used.'),
+        PpWhenLine('From about two years for pouring alone. Water is offered '
             'from six months, alongside food.'),
         PpCallout(
-          'A child who is not passing su-su for many hours, is unusually '
-          'sleepy, has a dry mouth or is refusing all fluids needs a doctor the '
+          'Is your child not passing wee for many hours, unusually '
+          'sleepy, dry in the mouth or refusing all fluids? See a doctor the '
           'same day, especially with fever, vomiting or loose motions.',
           kind: PpCalloutKind.doctor,
           title: 'When it is more than a habit',
@@ -5195,26 +5203,25 @@ const PpArea _habits = PpArea(
       format: 'ARTICLE',
       bands: _fromOne,
       blocks: [
-        PpIntro('Late nights are normal in Indian homes and they are not always '
+        PpIntro('Late nights are normal in Indian homes, and they are not always '
             'a problem. What matters is that the last half hour is the same '
             'every night.'),
         PpArticle([
-          'The predictability matters more than the clock time. A child whose '
-          'evening runs in the same order every night falls asleep faster, '
-          'because his body starts winding down at the first step rather than '
-          'the last.',
-          'That said, sleep is when growth and memory consolidation happen, and '
-          'a chronically short-slept child is harder work in every other way '
-          'the next day.',
+          'Predictability matters more than the clock time. A child whose '
+          'evening runs in the same order every night falls asleep faster. '
+          'The body starts winding down at the first step, not the last.',
+          'That said, sleep is when growth happens and memories settle. A child '
+          'who is short of sleep night after night is harder work in every '
+          'other way the next day.',
         ], heading: 'Why this one matters'),
         PpSteps([
           PpStep('Pick four steps and never change their order',
               'Dinner, brush, pyjamas, story. Four is enough.'),
           PpStep('Dim the lights for the last half hour',
-              'A bright tube light tells his body it is still daytime.'),
+              'A bright tube light tells a small body it is still daytime.'),
           PpStep('Screens off well before bed',
-              'The end of the screen should not be the start of bedtime, or the '
-              'two become the same fight.'),
+              'If the end of the screen is the start of bedtime, the two '
+              'become the same fight.'),
           PpStep('Keep the same wake-up time even after a late night',
               'Wake time anchors the whole rhythm more than bedtime does.'),
           PpStep('Say what comes next, always',
@@ -5230,16 +5237,16 @@ const PpArea _habits = PpArea(
               'A shortened routine still works. Skipping it entirely usually '
               'costs you more time than it saves.'),
         ], heading: 'What to avoid', hue: 344),
-        PpCallout('Try this together. Make a Four Picture Card: draw the four '
-            'steps of bedtime and stick it at his height. He points at what '
-            'comes next instead of being told, which removes most of the '
-            'arguing.'),
+        PpCallout('Try this together. Make a Four Picture Card. Draw the four '
+            'steps of bedtime and stick it up at child height. Your child '
+            'points at what comes next instead of being told, which removes '
+            'most of the arguing.'),
         PpWhenLine('From about one year for a fixed routine. It stays useful '
             'through primary school.'),
         PpLink(
           'Everything about sleep at this age',
           surfaceId: 'pp_section/parenting_sleep',
-          blurb: 'How much he needs, night waking, and settling.',
+          blurb: 'How much sleep your child needs, night waking, and settling.',
         ),
       ],
     ),
@@ -5250,49 +5257,50 @@ const PpArea _habits = PpArea(
       bands: _fromTwo,
       blocks: [
         PpIntro('Warmth towards people is worth teaching. Being made to perform '
-            'for relatives is not, and the two get confused constantly.'),
+            'for relatives is not, and the two get mixed up all the time.'),
         PpArticle([
-          'Greeting is a small social skill with a large effect: a child who '
-          'looks up and says hello is met with warmth almost everywhere, and '
-          'that warmth shapes how he expects people to treat him.',
-          'But many children are genuinely uncomfortable with unfamiliar '
-          'adults, and being pushed at them makes it worse. The goal is a child '
-          'who greets people, not a child who obeys on cue.',
+          'Greeting is a small social skill with a large effect. A child who '
+          'looks up and says hello is met with warmth almost everywhere. That '
+          'warmth shapes how your child expects people to behave.',
+          'But many children are uneasy with unfamiliar adults, and being '
+          'pushed at them makes it worse. The goal is a child who greets '
+          'people, not a child who obeys on cue.',
         ], heading: 'Why this one matters'),
         PpSteps([
           PpStep('Greet people warmly yourself, every time',
-              'Including the guard, the maid and the delivery man. He is '
-              'learning who counts as a person to greet.'),
-          PpStep('Tell him who is coming before they arrive',
-              'Dadi mausi is coming. She has not seen you since you were a '
-              'baby. Preparation removes most of the freezing.'),
+              'Including the guard, the maid and the delivery man. Your child '
+              'is learning who counts as a person to greet.'),
+          PpStep('Say who is coming before they arrive',
+              'Grandma\'s sister is coming. She has not seen you since you were a '
+              'baby. Getting ready ahead removes most of the freezing.'),
           PpStep('Offer a choice of greeting',
               'Namaste, a hello, or a wave. All three count.'),
-          PpStep('Let him greet from behind your leg',
-              'Standing close to you and saying it quietly is a completely '
+          PpStep('A greeting from behind your leg is fine',
+              'Standing close to you and saying it softly is a completely '
               'successful greeting at three.'),
           PpStep('Never force a hug or a kiss',
-              'His body, his choice, and this is where that lesson starts.'),
+              'Your child\'s body, your child\'s choice. This is where that lesson '
+              'starts.'),
         ], heading: 'How to build it'),
         PpCards([
-          PpCard('Apologising for him in front of him',
-              'He is very shy, sorry, teaches him that this is who he is.'),
-          PpCard('Making him touch feet on command',
+          PpCard('Apologising for your child, within earshot',
+              'Very shy, sorry, hands your child a label to grow into.'),
+          PpCard('Making your child touch feet on command',
               'A tradition performed under pressure loses everything that made '
               'it warm.'),
           PpCard('Repeating say namaste four times',
               'The fourth time is about you, and everybody in the room can '
               'tell.'),
         ], heading: 'What to avoid', hue: 344),
-        PpCallout('Try this together. Play Doorbell Practice: he opens the door '
-            'for family, says the greeting and offers water. Having a job '
-            'removes the awkwardness completely.'),
+        PpCallout('Try this together. Play Doorbell Practice. Your child opens '
+            'the door for family, says the greeting and offers water. Having a '
+            'job removes the awkwardness completely.'),
         PpWhenLine('From about two years for the words. Comfort with '
             'unfamiliar adults often takes until four or five.'),
         PpIndiaNote('In a joint family the pressure to perform for visitors is '
-            'real and it comes from love. It usually helps to give him a job '
-            'instead: he carries the water tray in. Everyone is satisfied and '
-            'nobody is put on the spot.'),
+            'real, and it comes from love. It usually helps to give your child '
+            'a job instead, like carrying the water tray in. Everyone is happy '
+            'and nobody is put on the spot.'),
       ],
     ),
     PpPage(
@@ -5305,49 +5313,49 @@ const PpArea _habits = PpArea(
             'from watching how the people at home treat those who cannot do '
             'anything for them.'),
         PpArticle([
-          'Small children are naturally sympathetic. A two-year-old brings his '
-          'own blanket to a crying friend. What develops later is the ability '
-          'to notice somebody who is not making a noise about it.',
+          'Small children are naturally sympathetic. A two-year-old will bring '
+          'a blanket to a crying friend. What develops later is noticing '
+          'somebody who is not making a noise about it.',
           'Children read behaviour far more accurately than words. How you '
           'speak to the person who cleans your house teaches more about '
           'kindness than any story, including the ones in this door.',
         ], heading: 'Why this one matters'),
         PpSteps([
-          PpStep('Name feelings out loud, including strangers',
-              'That uncle looks tired. Your friend went quiet, maybe she is '
-              'sad. Noticing is the skill.'),
-          PpStep('Give him small kind jobs',
-              'Carrying something for Dadi, saving a biscuit for his sister, '
-              'putting water out for the birds in summer.'),
+          PpStep('Name feelings out loud, including strangers\'',
+              'That uncle looks tired. Your friend went silent, maybe your '
+              'friend is sad. Noticing is the skill.'),
+          PpStep('Hand your child small kind jobs',
+              'Carrying something for Grandma, saving a biscuit for a brother or '
+              'sister, putting water out for the birds in summer.'),
           PpStep('Describe rather than praise',
-              'You gave her your toy and she stopped crying, rather than good '
-              'boy. He learns the effect, not the approval.'),
-          PpStep('Be kind in front of him where it costs something',
+              'You gave Riya your toy and the crying stopped, rather than good '
+              'job. Your child learns the effect, not the approval.'),
+          PpStep('Be kind where your child can see, when it costs something',
               'Letting someone go first, being patient with a slow shopkeeper.'),
           PpStep('Use the stories, then stop talking',
               'One question after a story does more than a lecture ever will.'),
         ], heading: 'How to build it'),
         PpCards([
-          PpCard('Shaming him into it',
+          PpCard('Shaming your child into it',
               "Are you not ashamed, look how selfish you are, produces hiding, "
               'not kindness.'),
           PpCard('Rewarding kindness with money or treats',
               'It turns a good instinct into a transaction.'),
           PpCard('Being kind in public and harsh at home',
-              'He notices, and the home version is the one he learns.'),
+              'Children notice, and the home version is the one they learn.'),
         ], heading: 'What to avoid', hue: 344),
-        PpCallout('Try this together. Do One Kind Thing at dinner: everyone '
+        PpCallout('Try this together. Do One Kind Thing at dinner. Everyone '
             'says one kind thing they did or saw today. It makes kindness '
             'visible, which is most of the work.'),
-        PpWhenLine('From about three years, when he can name feelings. It grows '
-            'steadily from there.'),
+        PpWhenLine('From about three years, once your child can name feelings. '
+            'It grows steadily from there.'),
         PpLink(
           'Stories that carry this without a lecture',
           pageId: 'st_jat_monkey_bridge',
           blurb: 'The monkey king who went last.',
         ),
         PpLink(
-          'When he is unkind right now: hitting, or falling out with a friend',
+          'Unkind right now: hitting, or falling out with a friend',
           surfaceId: 'pp_page/parenting_behaviour/beh_friendships',
           blurb: 'The Behaviour side, for the moment itself.',
         ),
@@ -5355,17 +5363,17 @@ const PpArea _habits = PpArea(
     ),
     PpPage(
       id: 'hab_waiting',
-      title: 'Waiting for his turn',
+      title: 'Waiting for a turn',
       format: 'ARTICLE',
       bands: _fromTwo,
       blocks: [
-        PpIntro('Waiting is a skill with a physical location in the brain, and '
-            'it is genuinely hard until about four. It is buildable in small '
+        PpIntro('Waiting is a skill that lives in a real part of the brain, and '
+            'it is hard until about four. It can be built in small '
             'doses.'),
         PpArticle([
           'A two-year-old asked to wait ten minutes is being asked for '
-          'something he cannot do. A two-year-old asked to wait while you count '
-          'to five can just about manage it, and that is where it starts.',
+          'something not yet possible. Waiting while you count to five is just '
+          'about manageable, and that is where it starts.',
           'What makes waiting bearable is knowing how long. Time means nothing '
           'to a small child, so the wait has to be made visible: a timer, a '
           'song, a number of things.',
@@ -5373,29 +5381,29 @@ const PpArea _habits = PpArea(
         PpSteps([
           PpStep('Make the wait visible',
               'A sand timer, one song, or when this glass of water is finished.'),
-          PpStep('Start with waits he can win',
+          PpStep('Start with waits your child can win',
               'Ten seconds at two, a minute at three. Success is what builds '
               'the muscle.'),
-          PpStep('Give him something to do inside the wait',
+          PpStep('Give your child something to do inside the wait',
               'Hold this for me, count the spoons. An empty wait is much '
               'harder.'),
-          PpStep('Acknowledge the difficulty out loud',
+          PpStep('Say out loud that it is hard',
               'It is hard to wait. You are doing it though.'),
           PpStep('Keep your side of it exactly',
-              'When the song finishes, it is his turn, without fail. Waiting is '
-              'only worth doing if the end is reliable.'),
+              'When the song finishes, it is your child\'s turn, without fail. '
+              'Waiting is only worth it if the end is reliable.'),
         ], heading: 'How to build it'),
         PpCards([
           PpCard('Just wait, with no end in sight',
-              'An unbounded wait is the same as no for a small child.'),
+              'A wait with no end is the same as no, for a small child.'),
           PpCard('Giving in halfway',
               'It teaches that whining shortens the wait, which is a habit that '
               'is expensive later.'),
-          PpCard('Expecting patience when he is hungry or tired',
-              'The capacity is simply not there at that moment. Save it for '
+          PpCard('Expecting patience from a hungry or tired child',
+              'The patience is not there at that moment. Save the practice for '
               'another time.'),
         ], heading: 'What to avoid', hue: 344),
-        PpCallout('Try this together. Use a Turn Song: the same short song '
+        PpCallout('Try this together. Use a Turn Song. The same short song '
             'plays for each turn on the swing or the cycle. The song ends the '
             'turn instead of you, and the arguing drops away.'),
         PpWhenLine('Ten to thirty seconds from two years, a few minutes by four, '
@@ -5414,20 +5422,20 @@ const PpArea _habits = PpArea(
       bands: _fromThree,
       blocks: [
         PpIntro('Almost every young child lies, and almost none of it means '
-            'what parents fear. How you react is what decides whether it grows '
+            'what parents fear. How you react decides whether it grows '
             'or fades.'),
         PpArticle([
-          'A three-year-old saying he did not spill it is often not lying in '
-          'the adult sense. He is wishing, or telling you the version he would '
-          'prefer. Truth and wish are not yet cleanly separated at that age.',
+          'A three-year-old who says I did not spill it is often not lying in '
+          'the adult sense. It is a wish, or the version your child would '
+          'prefer. Truth and wish are not yet cleanly separate at that age.',
           'From four or five it becomes deliberate, and it is almost always to '
-          'avoid trouble. That means the size of the trouble is the strongest '
-          'lever you have: a child who is frightened of the consequence gets '
-          'better at hiding, not more honest.',
+          'avoid trouble. So the size of the trouble is the strongest lever '
+          'you have. A child frightened of the consequence gets better at '
+          'hiding, not more honest.',
         ], heading: 'Why this one matters'),
         PpSteps([
-          PpStep('Do not ask a question you already know the answer to',
-              'Did you break this, when you saw him break it, is an invitation '
+          PpStep('Don\'t ask a question you already know the answer to',
+              'Did you break this, when you saw it happen, is an invitation '
               'to lie. Say I saw the glass break, let us clean it up.'),
           PpStep('Make telling the truth cheap',
               'Thank you for telling me, now let us fix it. If honesty costs '
@@ -5438,18 +5446,18 @@ const PpArea _habits = PpArea(
           PpStep('Notice honesty out loud when it was hard',
               'That was hard to say and you said it. That is the whole reward '
               'needed.'),
-          PpStep('Never call him a liar',
+          PpStep('Never call your child a liar',
               'A label becomes an identity, and an identity is much harder to '
               'change than a behaviour.'),
         ], heading: 'How to build it'),
         PpCards([
-          PpCard('Interrogating him',
+          PpCard('Interrogating your child',
               'Repeated questioning teaches a child to hold a story, which is '
-              'a skill you did not want him to learn.'),
+              'a skill you did not want to teach.'),
           PpCard('A big punishment for the lie',
               'It raises the cost of honesty and makes the next lie better '
-              'constructed.'),
-          PpCard('Telling the story to relatives in front of him',
+              'built.'),
+          PpCard('Telling the story to relatives within your child\'s earshot',
               'Public shaming is remembered for years and changes nothing.'),
         ], heading: 'What to avoid', hue: 344),
         PpCallout('Try this together. Read The boy who cried wolf and ask one '
@@ -5463,7 +5471,7 @@ const PpArea _habits = PpArea(
           blurb: 'The boy who cried wolf.',
         ),
         PpLink(
-          'When he has just told you a lie',
+          'When your child has just told you a lie',
           surfaceId: 'pp_page/parenting_behaviour/beh_older_lying',
           blurb: 'The Behaviour side: what to say in the moment.',
         ),
@@ -5475,14 +5483,13 @@ const PpArea _habits = PpArea(
       format: 'ARTICLE',
       bands: _fromTwo,
       blocks: [
-        PpIntro('The habit here is not how much, it is when and how it ends. A '
+        PpIntro('The habit here is when and how it ends, more than how much. A '
             'predictable screen time causes far fewer fights than a generous '
             'unpredictable one.'),
         PpArticle([
-          'What makes screens hard is not the screen, it is the ending. A show '
-          'that stops when a parent decides feels arbitrary and produces a '
-          'tantrum. A show that stops at a point everybody agreed on in advance '
-          'usually does not.',
+          'The hard part of screens is the ending. A show that stops when a '
+          'parent decides feels random and brings on a tantrum. A show that '
+          'stops at a point everybody agreed on in advance usually does not.',
           'For the how much question and for the fights themselves, the '
           'Behaviour section is the right place. This page is only about '
           'building the habit shape.',
@@ -5492,11 +5499,11 @@ const PpArea _habits = PpArea(
               'After the evening bath, two episodes. Same time, same length, '
               'every day.'),
           PpStep('Agree the ending before it starts',
-              'Two episodes and then we switch it off. Say it, and have him say '
-              'it back.'),
+              'Two episodes and then we switch it off. Say it, and have your '
+              'child say it back.'),
           PpStep('Warn before the end',
-              'One minute left. An announced ending is a completely different '
-              'experience from a sudden one.'),
+              'One minute left. An announced ending feels completely different '
+              'from a sudden one.'),
           PpStep('Have the next thing ready',
               'Dinner on the table, or the blocks already out. An empty gap '
               'after a screen is where the crying goes.'),
@@ -5508,14 +5515,14 @@ const PpArea _habits = PpArea(
               'It is the fastest way to lose both the eating habit and the '
               'screen habit at once.'),
           PpCard('Taking it away as a punishment for something unrelated',
-              'It makes the screen enormous in his mind.'),
+              'It makes the screen enormous in your child\'s mind.'),
           PpCard('Endless autoplay',
               'A show that never ends by itself makes you the ending every '
               'time. Choose the episodes in advance.'),
         ], heading: 'What to avoid', hue: 344),
         PpCallout('Try this together. Make a Two Card: two paper tickets a day, '
-            'each worth one show. He hands one over to start. He holds the '
-            'ending in his own hand, which changes the whole feeling of it.'),
+            'each worth one show. Your child hands one over to start. Holding '
+            'the ending in a small hand changes the whole feeling of it.'),
         PpWhenLine('From about two years, when screens usually enter the '
             'picture. Under two, video calls with family are a different thing '
             'and are fine.'),
@@ -5529,50 +5536,51 @@ const PpArea _habits = PpArea(
     ),
     PpPage(
       id: 'hab_hygiene',
-      title: 'Looking after himself',
+      title: 'Bath, nails and hair, done alone',
       format: 'ARTICLE',
       bands: _fromThree,
       blocks: [
         PpIntro('Bathing, nails, hair, changing after playing outside. Small '
-            'things that add up to a child who takes care of his own body.'),
+            'things that, together, teach a child to care for a growing body.'),
         PpArticle([
-          'These jobs are usually done to a child for years and then suddenly '
-          'expected of him. Handing them over one at a time, early, avoids that '
+          'These jobs are usually done for a child for years, then suddenly '
+          'expected. Handing them over one at a time, early, avoids that '
           'cliff.',
-          'There is a second reason, and it is worth naming. A child who knows '
-          'his body is his own to look after is better placed to speak up about '
+          'There is a second reason, worth naming. Children who know their '
+          'bodies are theirs to look after are better placed to speak up about '
           'anything that feels wrong. Body ownership starts in ordinary places '
           'like this.',
         ], heading: 'Why this one matters'),
         PpSteps([
           PpStep('Hand over one job at a time',
-              'This month he soaps his own arms and legs. Next month, drying '
-              'himself.'),
+              'This month your child soaps arms and legs. Next month, drying '
+              'off.'),
           PpStep('Make the tools reachable',
-              'A stool, a low hook for his towel, his own comb where he can get '
-              'it.'),
+              'A stool, a low hook for the towel, a comb kept within easy '
+              'reach.'),
           PpStep('Attach each job to a fixed moment',
               'Nails on Sunday. Change clothes as soon as we come in from '
               'playing.'),
-          PpStep('Let him choose within limits',
-              'Which of these two shirts. Choice is what makes it his.'),
+          PpStep('Offer choices within limits',
+              'Which of these two shirts. Choice is what makes it your '
+              'child\'s own.'),
           PpStep('Use correct names for body parts',
-              'It makes him precise, it removes shame, and it matters if he '
-              'ever needs to tell you something.'),
+              'It makes your child precise, it removes shame, and it matters '
+              'if your child ever needs to tell you something.'),
         ], heading: 'How to build it'),
         PpCards([
           PpCard('Doing it all for speed',
               'Quicker today, and it delays the handover by a year.'),
-          PpCard('Making him feel dirty',
-              'Chhee, gandha, said often, attaches shame to his own body '
+          PpCard('Making your child feel dirty',
+              'Yuck, dirty, said often, attaches shame to the body itself '
               'rather than to the mud.'),
           PpCard('Nicknames for private parts',
-              'They make it harder for him to tell you clearly if something '
-              'happens.'),
+              'They make it harder for your child to tell you clearly if '
+              'something happens.'),
         ], heading: 'What to avoid', hue: 344),
         PpCallout('Try this together. Make a My Body Chart: four small drawings '
-            'of the jobs that are now his, at his height in the bathroom. He '
-            'checks the pictures rather than being told.'),
+            'of the jobs your child now owns, at child height in the bathroom. '
+            'Your child checks the pictures rather than being told.'),
         PpWhenLine('From about three years for the first jobs, most of them by '
             'six.'),
       ],
@@ -5586,45 +5594,45 @@ const PpArea _habits = PpArea(
         PpIntro('Small children want to help far more than older ones do. If '
             'you use that window at two and three, it does not close.'),
         PpArticle([
-          'The urge to join in with adult work is at its strongest between two '
+          'The urge to join in with adult work is strongest between two '
           'and four, exactly when the help is least useful. Families that '
-          'accept the slower, messier version during those years usually have a '
+          'accept the slower, messier version in those years usually have a '
           'child who still helps at eight.',
-          'Helping is also where a child learns that a household is a shared '
-          'thing rather than a service. That belief is very hard to install '
-          'later by asking.',
+          'Helping is also where a child learns that a household is shared, '
+          'not a service. That belief is very hard to put in later by '
+          'asking.',
         ], heading: 'Why this one matters'),
         PpSteps([
-          PpStep('Say yes when he offers, even when it is inconvenient',
+          PpStep('Say yes when your child offers, even when it is inconvenient',
               'A refused offer at three is not repeated at eight.'),
           PpStep('Give a real job, not a pretend one',
-              'Tearing dhania, putting spoons away, carrying his own plate to '
+              'Tearing coriander, putting spoons away, carrying a plate to '
               'the sink.'),
-          PpStep('Make his tools his size',
-              'A small jhaadu, a light jug, a low stool at the counter.'),
-          PpStep('Accept the standard he can manage',
+          PpStep('Make the tools child-sized',
+              'A small broom, a light jug, a low stool at the counter.'),
+          PpStep('Accept the standard your child can manage',
               'A crooked stack of spoons is a success.'),
-          PpStep('Thank him the way you would thank an adult',
+          PpStep('Say thank you the way you would to an adult',
               'That was a real help, thank you. Not a reward, just the truth.'),
         ], heading: 'How to build it'),
         PpCards([
           PpCard('Paying for chores',
-              'It converts belonging into employment, and the price goes up '
+              'It turns belonging into employment, and the price goes up '
               'every year.'),
           PpCard('Only asking the girls',
               'Children notice this immediately and it lasts a lifetime.'),
-          PpCard('Redoing his work while he watches',
-              'It tells him plainly that the help was not real.'),
+          PpCard('Redoing the work while your child watches',
+              'It says plainly that the help was not real.'),
         ], heading: 'What to avoid', hue: 344),
-        PpCallout('Try this together. Give him a Helper of the Day role: one '
-            'rotating job for the whole day, announced at breakfast. Children '
-            'take a named role far more seriously than an instruction.'),
-        PpWhenLine('From about two years alongside you. A job of his own from '
-            'about four.'),
+        PpCallout('Try this together. Give your child a Helper of the Day role: '
+            'one rotating job for the whole day, announced at breakfast. '
+            'Children take a named role far more seriously than an instruction.'),
+        PpWhenLine('From about two years alongside you. A job your child owns '
+            'from about four.'),
         PpLink(
           'The activity version of this',
           pageId: 'act_his_own_job',
-          blurb: 'A job that is his, in the activities above.',
+          blurb: 'A job to own, in the activities above.',
         ),
       ],
     ),
@@ -5652,7 +5660,7 @@ const PpArea _earlySkills = PpArea(
   id: 'early_skills',
   mark: IntentMark.bodyMark,
   title: 'Getting ready to read, write and count',
-  blurb: 'What actually comes before letters and numbers, and why the '
+  blurb: 'What really comes before letters and numbers, and why the '
       'worksheets can wait.',
   hue: 268,
   bands: _fromTwo,
@@ -5673,28 +5681,28 @@ const PpArea _earlySkills = PpArea(
           minutes: '5 MIN',
           slotId: 'early_learning/prewriting',
         ),
-        PpIntro('Writing sits on top of about four years of other work. If you '
-            'skip that work and start with letters, the letters are harder and '
+        PpIntro('Writing sits on top of about four years of other work. Skip '
+            'that work and start with letters, and the letters are harder, and '
             'they stay harder.'),
         PpArticle([
-          'Holding a pencil comfortably needs a strong shoulder, a stable '
-          'wrist, and fingers that can move independently of each other. None '
-          'of those are built by writing. They are built by hanging from things, '
-          'squeezing things, tearing, threading, pouring and playing with atta.',
-          'On top of that sits the ability to make the six shapes every letter '
-          'is built from: the down line, the across line, the circle, the '
-          'cross, the diagonal and the zigzag. A child who can draw those '
-          'confidently learns letters quickly. A child who cannot will struggle '
-          'with them however long he practises.',
-        ], heading: 'What it actually is'),
+          'Holding a pencil comfortably needs a strong shoulder, a steady '
+          'wrist, and fingers that can move on their own. None of those are '
+          'built by writing. They are built by hanging from things, '
+          'squeezing things, tearing, threading, pouring and playing with dough.',
+          'On top of that sits the six shapes every letter is built from: the '
+          'down line, the across line, the circle, the cross, the diagonal and '
+          'the zigzag. A child who draws those confidently learns letters '
+          'quickly. Without them, letters stay a struggle however long the '
+          'practice.',
+        ], heading: 'What it really is'),
         PpSteps([
           PpStep('Build the shoulder and hand first',
               'Hanging, climbing, carrying a heavy bucket, squeezing a wet '
-              'cloth, kneading atta, tearing newspaper.'),
+              'cloth, kneading dough, tearing newspaper.'),
           PpStep('Work big and vertical',
               'Paper taped to a wall, drawing in the air, chalk on the floor. '
               'Small paper on a table is the last stage, not the first.'),
-          PpStep('Use a tray of atta or wet sand',
+          PpStep('Use a tray of flour or wet sand',
               'One finger, no pressure, endlessly repeatable, and nothing to '
               'get wrong.'),
           PpStep('Do the six shapes, not letters',
@@ -5704,28 +5712,29 @@ const PpArea _earlySkills = PpArea(
         ], heading: 'How to do it'),
         PpCards([
           PpCard('Worksheet books at two and three',
-              'They ask for control the hand does not have yet, and the usual '
-              'result is a child who says he is bad at writing.'),
-          PpCard('Holding his hand and moving it',
-              'He learns nothing from a movement he did not make.'),
-          PpCard('Correcting his grip constantly',
+              'They ask for control the hand does not have yet. The usual '
+              'result is a child who says, I am bad at writing.'),
+          PpCard('Holding your child\'s hand and moving it',
+              'Children learn nothing from a movement they did not make.'),
+          PpCard('Correcting the grip constantly',
               'Grip settles between four and six on its own in a child who does '
-              'plenty of hand work. Nagging it does not speed it up.'),
+              'plenty of hand work. Nagging does not speed it up.'),
         ], heading: 'What to avoid', hue: 268),
         PpCallout(
           'This is readiness through play, not academics. There is no evidence '
           'that a child who writes at three reads or writes better at eight, '
-          'and there is good evidence that early pressure puts children off. '
-          'Play, and start formal writing when his hand is ready.',
+          'and good evidence that early pressure puts children off. '
+          'Play, and start formal writing when your child\'s hand is ready.',
           kind: PpCalloutKind.myth,
           title: 'Earlier is not better',
         ),
         PpWhenLine('Hand-strengthening play from two. The six shapes from '
-            'three. Letters from four or five, and only if he is interested.'),
+            'three. Letters from four or five, and only if your child is '
+            'interested.'),
         PpLink(
           'The activity for this',
           pageId: 'act_prewriting_lines',
-          blurb: 'Lines, zigzags and circles, in a tray of atta.',
+          blurb: 'Lines, zigzags and circles, in a tray of flour.',
         ),
         PpLink(
           'And the one before it',
@@ -5741,29 +5750,29 @@ const PpArea _earlySkills = PpArea(
       bands: _fromTwo,
       blocks: [
         PpIntro('Counting to fifty is a song. Knowing that four means four '
-            'things is mathematics. Almost all the value is in the second one.'),
+            'things is maths. Almost all the value is in the second one.'),
         PpArticle([
           'Number sense is built from four things: counting objects by '
           'touching them, matching one thing to one thing, knowing how many '
           'without recounting, and comparing more and less. All four are built '
           'with utensils and stones, not on paper.',
           'A child who is secure with numbers up to five, and then to ten, has '
-          'a far better foundation than one who can recite to a hundred. The '
-          'reciting looks more impressive to visitors and means considerably '
+          'a far better base than one who can recite to a hundred. The '
+          'reciting looks more impressive to visitors and means far '
           'less.',
-        ], heading: 'What it actually is'),
+        ], heading: 'What it really is'),
         PpSteps([
           PpStep('Count things you are touching, every day',
               'Stairs, rotis, bangles, buttons, steps to the gate.'),
           PpStep('Play give me three',
-              'Much harder than counting, and the skill that actually matters.'),
+              'Much harder than counting, and the skill that really matters.'),
           PpStep('Lay the table together',
               'One spoon for each person is one-to-one matching, which is the '
               'idea underneath arithmetic.'),
           PpStep('Compare, out loud, constantly',
               'Who has more? Which is bigger? Is this enough for everybody?'),
           PpStep('Add and take away with objects from four years',
-              'Kaju, stones, caps. The story of the sum first, the symbols much '
+              'Cashews, stones, caps. The story of the sum first, the symbols much '
               'later.'),
         ], heading: 'How to do it'),
         PpCards([
@@ -5771,10 +5780,10 @@ const PpArea _earlySkills = PpArea(
               'Reciting numbers without objects builds a party trick, not '
               'understanding.'),
           PpCard('Number writing at three',
-              'Same problem as letters. His hand is not ready and the idea does '
-              'not need paper.'),
-          PpCard('Testing him in front of people',
-              'Beta, count to twenty for auntie, is the fastest way to make '
+              'Same problem as letters. The hand is not ready, and the idea '
+              'does not need paper.'),
+          PpCard('Testing your child in front of people',
+              'Count to twenty for auntie, sweetheart, is the fastest way to make '
               'numbers feel like an exam.'),
         ], heading: 'What to avoid', hue: 268),
         PpCallout(
@@ -5793,7 +5802,7 @@ const PpArea _earlySkills = PpArea(
         PpLink(
           'And the next one',
           pageId: 'act_first_sums',
-          blurb: 'First sums with kaju and stones, from four.',
+          blurb: 'First sums with cashews and stones, from four.',
         ),
       ],
     ),
@@ -5813,12 +5822,12 @@ const PpArea _earlySkills = PpArea(
           'auto or a queue.',
           'The fourth piece is knowing what print is for. A child who has '
           'watched you follow words with a finger, turn pages, and read a shop '
-          'sign aloud understands that those marks carry meaning, which is the '
-          'idea the letters then attach to.',
-        ], heading: 'What it actually is'),
+          'sign aloud knows those marks carry meaning. The letters then attach '
+          'to that idea.',
+        ], heading: 'What it really is'),
         PpSteps([
           PpStep('Read aloud every day, in any language',
-              'The single strongest thing on this page.'),
+              'The strongest thing on this page.'),
           PpStep('Play rhyming games',
               'Which words sound the same? Nonsense words count.'),
           PpStep('Clap the parts of words',
@@ -5826,29 +5835,29 @@ const PpArea _earlySkills = PpArea(
           PpStep('Play first sounds from three and a half',
               'What starts with mmm. Use the sound, not the letter name.'),
           PpStep('Point at print in the real world',
-              'The bus number, the shop board, his name on his bag.'),
+              'The bus number, the shop board, the name on your child\'s bag.'),
         ], heading: 'How to do it'),
         PpCards([
           PpCard('Flash card drilling',
-              'It teaches letter names, which is the least useful part, and it '
-              'makes reading feel like a test he can fail.'),
+              'It teaches letter names, the least useful part, and it makes '
+              'reading feel like a test your child can fail.'),
           PpCard('Reading apps instead of a lap',
-              'The value of a story is largely in the person telling it and the '
+              'The value of a story is mostly in the person telling it and the '
               'talking around it.'),
-          PpCard('Pushing him to read words at three',
+          PpCard('Pushing your child to read words at three',
               'Most children are not ready before five or six, and being early '
               'has no lasting advantage.'),
         ], heading: 'What to avoid', hue: 268),
         PpCallout(
           'Readiness through play, not academics. A child who is read to daily '
-          'and plays sound games arrives at reading with everything he needs. A '
+          'and plays sound games arrives at reading with everything needed. A '
           'child drilled on flash cards arrives with letter names and no '
           'appetite.',
           kind: PpCalloutKind.myth,
           title: 'Flash cards are not reading',
         ),
         PpWhenLine('Reading aloud from birth. Rhyme from three. First sounds '
-            'from three and a half. Actual reading, for most children, from '
+            'from three and a half. Real reading, for most children, from '
             'five or six.'),
         PpLink(
           'The activity for this',
@@ -5856,12 +5865,12 @@ const PpArea _earlySkills = PpArea(
           blurb: 'What starts with mmm, a listening game.',
         ),
         PpCallout(
-          'If he is very hard to understand at three, mishears often, or does '
-          'not respond to sounds behind him, ask your paediatrician about a '
+          'Is your child very hard to understand at three, mishearing often, or '
+          'not responding to sounds from behind? Ask your paediatrician about a '
           'hearing check. Sound games cannot work through blocked ears, and '
           'fluid after repeated colds is common and treatable.',
           kind: PpCalloutKind.doctor,
-          title: 'When to get his hearing checked',
+          title: 'When to get hearing checked',
         ),
       ],
     ),
@@ -5871,20 +5880,19 @@ const PpArea _earlySkills = PpArea(
       format: 'ARTICLE',
       bands: _fromTwo,
       blocks: [
-        PpIntro('The quiet foundation under both mathematics and reading: '
+        PpIntro('The steady base under both maths and reading: '
             'noticing that things are alike, and that they are different.'),
         PpArticle([
-          'Sorting comes before counting. Before a child can count four spoons '
-          'he has to see them as four of the same kind of thing, and that '
-          'grouping is the skill that sorting games build.',
-          'Telling similar shapes apart is also exactly what reading demands '
-          'later, when he has to see that two letters differ only by which way '
-          'a stick points. A child who has matched lids to boxes for a year '
-          'finds that easy.',
-        ], heading: 'What it actually is'),
+          'Sorting comes before counting. Before a child can count four spoons, '
+          'the spoons have to be seen as four of the same kind of thing. '
+          'Sorting games build that grouping.',
+          'Telling similar shapes apart is also exactly what reading asks for '
+          'later, when two letters differ only by which way a stick points. A '
+          'child who has matched lids to boxes for a year finds that easy.',
+        ], heading: 'What it really is'),
         PpSteps([
           PpStep('Sort by one thing at a time',
-              'Colour first, then size, then shape. Two categories before '
+              'Colour first, then size, then shape. Two groups before '
               'three.'),
           PpStep('Use household objects, not a toy set',
               'Bottle caps, two kinds of dal, spoons and forks, big and small '
@@ -5894,19 +5902,19 @@ const PpArea _earlySkills = PpArea(
               'a triangle.'),
           PpStep('Play find something red around the house'),
           PpStep('Make patterns from about three',
-              'Cap, spoon, cap, spoon. Then stop and let him continue it.'),
+              'Cap, spoon, cap, spoon. Then stop and let your child continue it.'),
         ], heading: 'How to do it'),
         PpCards([
-          PpCard('Quizzing him on colours',
-              'What colour is this, repeatedly, turns a game into a test.'),
+          PpCard('Quizzing your child on colours',
+              'What colour is this, again and again, turns a game into a test.'),
           PpCard('Correcting every mistake',
-              'Just name it correctly in passing. He will sort it out himself '
+              'Just name it correctly in passing. Your child will sort it out '
               'within a few weeks.'),
         ], heading: 'What to avoid', hue: 268),
         PpCallout(
-          'All of this is play. There is nothing here a child needs to be sat '
-          'down and taught, and sitting him down is what makes it feel like '
-          'work.',
+          'All of this is play. Nothing here needs a child to be sat '
+          'down and taught, and sitting a child down is what makes it feel '
+          'like work.',
           kind: PpCalloutKind.key,
         ),
         PpWhenLine('Sorting by colour from about eighteen months. Shapes from '
@@ -5933,8 +5941,46 @@ const PpArea _earlySkills = PpArea(
       subtitle: 'The words to hold the line when the pressure starts at two',
       format: 'ARTICLE',
       bands: _fromOne,
-      comingSoon: true,
-      blocks: [],
+
+      blocks: [
+            // Written 2026-10-02 (parenting gap analysis), filling the scaffold.
+            // REQUIRED_REVIEW.
+            PpIntro('From about two, the pressure starts: ABC classes, English '
+                'worksheets, flash cards. Here is the honest picture, and the '
+                'words to hold the line when the family worries it is getting '
+                'late.'),
+            PpArticle(heading: 'Your mother tongue is an advantage', [
+              'Children who are fluent in their home language learn English, and '
+                  'reading, more easily, not less. The thinking and vocabulary '
+                  'built in one language carry over to the next. Many Indian '
+                  'children grow up with two or three languages, and that is a '
+                  'gift.',
+              'Speak to your child in the language you are most at ease in. '
+                  'Rich, warm talk in Hindi, Tamil or Bengali is worth far more '
+                  'than stilted English.',
+            ]),
+            PpArticle(heading: 'When to start letters', [
+              'Before about four or five, play builds what reading needs: '
+                  'listening to stories, rhymes, noticing sounds, holding a '
+                  'crayon, and talking a lot. Worksheets and drilling letters '
+                  'at two or three add little and can put a child off.',
+              'If letters spark curiosity, follow that lead. Point out the '
+                  'first letter of your child\'s name on signs, play with letter '
+                  'puzzles. Fun, never a test.',
+            ]),
+            PpCallout('Songs, stories and cooking together keep a mother '
+                'tongue alive: a lullaby at bedtime, nursery rhymes in your '
+                'language, naming spices as you cook.'),
+            PpScript(heading: 'When the family worries', [
+              PpScriptLine(
+                  say: 'We read to our child every day in both languages. '
+                      'Letters come easily later when the talking is strong.',
+                  notThis: 'Tuition has to start now, or it will be too '
+                      'late.',
+                  why: 'Talking first, letters later, is what the evidence '
+                      'shows.'),
+            ]),
+          ],
     ),
   ],
 );
@@ -5992,69 +6038,69 @@ const PpArea _school = PpArea(
   id: 'school',
   mark: IntentMark.cuppedHands,
   title: 'Getting ready for school',
-  blurb: 'What readiness actually means, how to choose a place, and how to '
-      'survive the first week.',
+  blurb: 'What readiness really means, how to choose a place, and how to '
+      'get through the first week.',
   hue: 206,
   bands: _fromThree,
   pages: [
     PpPage(
       id: 'school_what_readiness',
-      title: 'What school readiness actually means',
+      title: 'What school readiness really means',
       format: 'ARTICLE',
       bands: _fromThree,
       blocks: [
-        PpIntro('It is not reading. It is not writing. It is whether he can '
-            'manage himself for three hours in a room full of other children '
+        PpIntro('It is not reading. It is not writing. It is whether your child '
+            'can manage for three hours in a room full of other children, '
             'without you.'),
         PpArticle([
           'Ask any experienced preschool teacher which children have a good '
-          'first term, and the answer is never the ones who arrived knowing '
-          'their letters. It is the ones who can go to the toilet, eat their '
-          'own lunch, put on their own shoes, sit with a group for ten minutes '
-          'and ask an adult for help.',
+          'first term. It is never the ones who arrived knowing their letters. '
+          'It is the ones who can go to the toilet, eat their own lunch and put '
+          'on their own shoes. They can sit with a group for ten minutes and ask '
+          'an adult for help.',
           'That is not a lowering of the bar. Those skills are harder to build '
-          'than letter recognition and they take longer, which is exactly why '
-          'they should be what the year before school is spent on.',
+          'than letter recognition and they take longer. That is exactly why '
+          'the year before school is best spent on them.',
           'The academic part follows easily once a child is settled, confident '
-          'and able to attend. A child who is anxious, dependent and unable to '
-          'sit will not learn to read on schedule no matter how early he '
+          'and able to pay attention. An anxious child who cannot yet sit or '
+          'manage alone will not read on schedule, however early the letters '
           'started.',
         ], heading: 'The honest version'),
         PpCards([
-          PpCard('He can manage his own body',
+          PpCard('Can manage the body basics',
               'Toilet, hands, eating, shoes, water bottle.'),
-          PpCard('He can be apart from you',
+          PpCard('Can be apart from you',
               'A few hours with a familiar adult who is not a parent.'),
-          PpCard('He can be with other children',
+          PpCard('Can be with other children',
               'Not sharing perfectly, just able to be in a group without '
               'panic.'),
-          PpCard('He can follow two instructions',
+          PpCard('Can follow two instructions',
               'Put your bag on the hook and come and sit down.'),
-          PpCard('He can ask for what he needs',
-              'I need su-su. I do not like this. Help me.'),
-          PpCard('He can sit and attend for ten minutes',
-              'To a story, to a task he chose. This is built by not being '
+          PpCard('Can ask for what is needed',
+              'I need a wee. I do not like this. Help me.'),
+          PpCard('Can sit and pay attention for ten minutes',
+              'To a story, to a chosen task. This is built by not being '
               'interrupted at home.'),
-        ], heading: 'What actually matters', hue: 206),
+        ], heading: 'What really matters', hue: 206),
         PpCallout(
           'School readiness is independence and social skill, not early '
-          'academics. If a preschool tells you a three-year-old should be '
+          'academics. If a preschool tells you a three-year-old must be '
           'writing, that is a claim about their marketing, not about your '
           'child.',
           kind: PpCalloutKind.myth,
           title: 'The thing everybody gets wrong',
         ),
         PpWhenLine('Worth thinking about from about three, and worth working on '
-            'in the six months before he starts.'),
+            'in the six months before school starts.'),
         PpIndiaNote('In a joint family a child is often dressed, fed and '
-            'carried by four loving adults, which is lovely and does delay '
-            'exactly the skills school will ask for. One conversation with '
-            'everyone at home, six months before he starts, is usually all it '
+            'carried by four loving adults. That is lovely, and it does delay '
+            'exactly the skills school will ask for. One talk with everyone '
+            'at home, six months before school starts, is usually all it '
             'takes.'),
         PpVideoSlot(
           title: 'What readiness really means',
           subtitle: 'A preschool teacher on which children settle well, and '
-              'what she wishes parents had practised instead of letters.',
+              'what teachers wish parents had practised instead of letters.',
           minutes: '7 MIN',
           slotId: 'learning/school/readiness_explainer',
         ),
@@ -6066,17 +6112,17 @@ const PpArea _school = PpArea(
       format: 'CHECKLIST',
       bands: _fromThree,
       blocks: [
-        PpIntro('Go through this in the six months before he starts. It is a '
-            'list of things to practise, not a test he passes or fails.'),
+        PpIntro('Go through this in the six months before school starts. It is '
+            'a list of things to practise, not a test to pass or fail.'),
         PpTable(
           columns: ['What to practise', 'What it looks like when it is there'],
           rows: [
-            ['Toilet on his own', 'Tells an adult in time, manages his own '
-                'clothes, washes his hands afterwards'],
-            ['Eating his own lunch', 'Opens his box, eats without being fed, '
+            ['Toilet alone', 'Tells an adult in time, manages own '
+                'clothes, washes hands afterwards'],
+            ['Eating own lunch', 'Opens the box, eats without being fed, '
                 'finishes in about twenty minutes'],
-            ['Drinking from his bottle', 'Opens and closes it himself without '
-                'soaking his bag'],
+            ['Drinking from own bottle', 'Opens and closes it without '
+                'soaking the bag'],
             ['Shoes and socks', 'Gets them on, even if they are on the wrong '
                 'feet'],
             ['Being apart from you', 'A few hours with a grandparent or a '
@@ -6085,9 +6131,9 @@ const PpArea _school = PpArea(
                 'children around'],
             ['Two step instructions', 'Put this away and come here, done '
                 'without a reminder'],
-            ['Asking for help', 'Speaks to an unfamiliar adult when he needs '
-                'something'],
-            ['Saying his own name', 'Clearly enough for a stranger to '
+            ['Asking for help', 'Speaks to an unfamiliar adult when something '
+                'is needed'],
+            ['Saying own name', 'Clearly enough for a stranger to '
                 'understand'],
             ['Playing near other children', 'Alongside them without hitting or '
                 'panicking'],
@@ -6098,33 +6144,33 @@ const PpArea _school = PpArea(
           PpStep('Pick the two weakest and work only on those',
               'Ten at once is overwhelming for both of you.'),
           PpStep('Practise them in real life, not as drills',
-              'Lunch in his actual lunch box at home. Shoes on before every '
+              'Lunch in the real lunch box at home. Shoes on before every '
               'trip out.'),
           PpStep('Build in the extra ten minutes',
-              'Almost all of these fail because of rushing rather than '
-              'inability.'),
+              'Almost all of these fail because of rushing, not because a '
+              'child cannot.'),
           PpStep('Do a practice separation',
               'Two hours at a relative house, then half a day. Twice before '
               'school starts.'),
-          PpStep('Stop practising a week before he starts',
-              'The last week should be calm and unremarkable.'),
+          PpStep('Stop practising a week before school starts',
+              'Keep the last week calm and ordinary.'),
         ], heading: 'How to use this list'),
         PpCallout('Nothing on this list is about letters or numbers, and that '
-            'is deliberate. A child who arrives able to do these things learns '
-            'the academic part comfortably in his own time.'),
-        PpWhenLine('Start about six months before he begins. Most children have '
-            'most of this by three and a half to four.'),
+            'is on purpose. A child who arrives able to do these things learns '
+            'the academic part comfortably, in good time.'),
+        PpWhenLine('Start about six months before school begins. Most children '
+            'have most of this by three and a half to four.'),
         PpCallout(
-          'If he has almost none of this at four, is not speaking in sentences, '
-          'does not respond to his name, or cannot bear to be near other '
-          'children at all, talk to your paediatrician before school starts '
-          'rather than after. Support that begins early works better, and this '
-          'is a conversation, not a diagnosis.',
+          'Is your child at four doing almost none of this, not speaking in '
+          'sentences, not turning when called by name, or unable to bear being '
+          'near other children? Talk to your paediatrician before school '
+          'starts, not after. Support that begins early works better, and '
+          'this is a conversation, not a diagnosis.',
           kind: PpCalloutKind.doctor,
           title: 'When to ask someone first',
         ),
         PpLink(
-          'Where he is developmentally',
+          'Where your child is developmentally',
           surfaceId: 'pp_development',
           blurb: 'Milestones and speech, kept in one place.',
         ),
@@ -6144,29 +6190,28 @@ const PpArea _school = PpArea(
           'and academic. Play-based means the day is built around choosing, '
           'moving, making and talking. Academic means worksheets, writing '
           'practice and a syllabus for three-year-olds.',
-          'The research is not ambiguous about which is better for this age, '
-          'and it is also honest about the size of the difference: children '
-          'from academic preschools may be slightly ahead at five, and the gap '
-          'has gone by seven, while the difference in how much they enjoy '
-          'school tends to persist.',
-          'That said, the single biggest factor is the individual teacher and '
-          'whether she is warm. A warm teacher in an ordinary school beats a '
+          'The research is clear about which suits this age, and honest about '
+          'the size of the difference. Children from academic preschools may '
+          'score slightly higher at five, and the gap has gone by seven. The '
+          'difference in how much they enjoy school tends to last.',
+          'That said, the biggest factor of all is the teacher, and how warm '
+          'that teacher is. A warm teacher in an ordinary school beats a '
           'cold one in a beautiful building every time.',
-        ], heading: 'What you are actually choosing between'),
+        ], heading: 'What you are really choosing between'),
         PpSteps([
           PpStep('Visit during a working session, not at admission time',
               'Ask to stand at the back for fifteen minutes on an ordinary '
               'day. A school that refuses has told you something.'),
           PpStep('Watch the children, not the walls',
-              'Are they busy and talking, or waiting and quiet? Are they '
+              'Are they busy and talking, or waiting and silent? Are they '
               'moving? Do they go to the teacher easily?'),
           PpStep('Watch how a crying child is handled',
-              'This is the most informative thirty seconds of your visit.'),
+              'These are the most telling thirty seconds of your visit.'),
           PpStep('Ask what a normal day looks like, hour by hour',
               'Count how much of it is sitting.'),
           PpStep('Check the practical things',
               'Toilets, drinking water, how many adults per child, what '
-              'happens if he is unwell, who is at the gate.'),
+              'happens if a child is unwell, who is at the gate.'),
         ], heading: 'How to look'),
         PpCards([
           PpCard('How many children to one adult?',
@@ -6181,19 +6226,23 @@ const PpArea _school = PpArea(
           PpCard('How do you tell parents about the day?',
               'And how quickly can I speak to the teacher if I need to?'),
           PpCard('How long have the teachers been here?',
-              'High turnover is felt by the children more than anything else '
-              'on this list.'),
+              'Children feel teachers leaving more than anything else on '
+              'this list.'),
         ], heading: 'Six questions worth asking', hue: 206),
-        PpCallout('Be careful of a school that markets on what three-year-olds '
+        PpCallout('Be careful of a school that markets what three-year-olds '
             'will be able to write by March. It tells you what their day is '
             'built around.'),
         PpWhenLine('Most Indian children start playgroup at two and a half to '
             'three, and nursery at three to four. Starting later is not a '
             'disadvantage.'),
-        PpIndiaNote('Fees vary enormously and expensive is not the same as '
+        PpIndiaNote('Fees vary enormously, and expensive is not the same as '
             'better. A neighbourhood school with a warm teacher and a bit of '
-            'outdoor space is a genuinely good choice, and the money saved is '
+            'outdoor space is a good choice, and the money saved is '
             'worth more later.'),
+        // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+            PpCallout('Ask how much screen time and how many apps the '
+                'preschool uses. Young children learn best through play, '
+                'talk and hands-on activity; tablets add little at this age.'),
       ],
     ),
     PpPage(
@@ -6204,16 +6253,16 @@ const PpArea _school = PpArea(
       blocks: [
         PpIntro('Almost every child cries at drop-off, and almost every one of '
             'them stops within ten minutes of you leaving. Knowing that does '
-            'not make it easier, but it does make it survivable.'),
+            'not make it easier, but it does make it bearable.'),
         PpArticle([
-          'Separation distress at this age is a sign of a healthy attachment, '
-          'not a sign that something is wrong or that the school is bad. He '
-          'cries because he would rather be with you, which is exactly what a '
-          'well attached three-year-old should feel.',
+          'Crying at separation, at this age, shows a healthy bond. It does '
+          'not mean anything is wrong, or that the school is bad. Your child '
+          'cries out of wanting to be with you, which is what a securely '
+          'attached three-year-old feels.',
           'What matters is the shape of the goodbye. A short, confident, '
-          'entirely predictable goodbye settles a child faster than a long '
-          'loving one, because a drawn-out departure tells him there is '
-          'something here worth being afraid of.',
+          'predictable goodbye settles a child faster than a long loving one. '
+          'A drawn-out departure says there is something here worth being '
+          'afraid of.',
         ], heading: 'Why it happens'),
         PpSteps([
           PpStep('Visit the school together twice before the first day',
@@ -6221,14 +6270,14 @@ const PpArea _school = PpArea(
               'is half the battle.'),
           PpStep('Practise being apart in advance',
               'Two hours somewhere else, a few times, in the month before.'),
-          PpStep('Tell him exactly what will happen',
-              'I will leave you with Sunita didi, you will have snack and play, '
+          PpStep('Say exactly what will happen',
+              'I will leave you with Sunita, you will have snack and play, '
               'and I will come back after your lunch box is finished.'),
           PpStep('Invent one small goodbye ritual and never change it',
               'Two hugs and a wave from the gate. The same one every day.'),
           PpStep('Say goodbye and go',
-              'Do not sneak out and do not come back. Sneaking out makes him '
-              'watch you all morning for the rest of the term.'),
+              'Don\'t sneak out and don\'t come back. Sneaking out teaches your '
+              'child to watch for you all morning, for the rest of the term.'),
           PpStep('Come back exactly when you said',
               'Being early is fine. Being late once costs a week.'),
           PpStep('Ask the teacher how long the crying lasted',
@@ -6237,26 +6286,26 @@ const PpArea _school = PpArea(
         ], heading: 'The first two weeks'),
         PpCards([
           PpCard('A long emotional goodbye',
-              'It raises his alarm rather than lowering it.'),
-          PpCard('Leaving without telling him',
-              'It buys a quiet exit today and a much clingier child for weeks.'),
-          PpCard('Bribing him at the gate',
+              'It raises the alarm rather than lowering it.'),
+          PpCard('Leaving without saying goodbye',
+              'It buys a calm exit today and a much clingier child for weeks.'),
+          PpCard('Bribes at the gate',
               'It turns going to school into a daily negotiation.'),
-          PpCard('Threatening him with the teacher',
-              'Making the school frightening to gain compliance at home is very '
+          PpCard('Threatening with the teacher',
+              'Making the school frightening to get obedience at home is very '
               'hard to undo.'),
         ], heading: 'What to avoid', hue: 206),
-        PpCallout('Expect it to get worse in week three. A great many children '
-            'settle immediately, then protest once the novelty wears off and '
+        PpCallout('Expect it to get worse in week three. Many children '
+            'settle at once, then protest once the novelty wears off and '
             'they realise this is permanent. It passes.'),
         PpWhenLine('Most children settle within two to four weeks. Some take a '
             'term, and that is still within normal.'),
         PpCallout(
-          'If he is still deeply distressed after about six weeks, stops eating '
-          'or sleeping, becomes withdrawn at home, or is frightened of one '
-          'particular adult, talk to the teacher first and then to your '
-          'paediatrician. Persistent distress at that level is worth looking '
-          'at properly rather than waiting out.',
+          'Still deeply distressed after about six weeks? Not eating or '
+          'sleeping, withdrawn at home, or frightened of one particular adult? '
+          'Talk to the teacher first and then to your paediatrician. Distress '
+          'that lasts at that level is worth looking at properly, not waiting '
+          'out.',
           kind: PpCalloutKind.doctor,
           title: 'When it is more than settling in',
         ),
@@ -6274,37 +6323,36 @@ const PpArea _school = PpArea(
       format: 'SHORT ARTICLE',
       bands: ['four'],
       blocks: [
-        PpIntro('Once he is settled at school, the useful thing you do at home '
-            'changes shape. It stops being readiness and starts being the '
+        PpIntro('Once school is settled, the useful thing you do at home '
+            'changes shape. It stops being readiness and becomes the '
             'things school does not have time for.'),
         PpArticle([
-          'School will handle letters, numbers and the syllabus. What it '
-          'usually cannot do, with thirty children in a room, is give him time '
-          'to talk, to build something over three days, or to be listened to '
+          'School will handle letters, numbers and the syllabus. With thirty '
+          'children in a room, it usually cannot give your child time to talk, '
+          'to build something over three days, or to be listened to '
           'properly.',
-          'So the home job becomes the opposite of what it was. Less teaching, '
-          'more conversation, more making, more being read to well beyond the '
-          'age he can read himself, and one small responsibility that is '
-          'genuinely his.',
+          'So the home job flips. Less teaching, more conversation, more '
+          'making, and more reading aloud, long past the age of reading '
+          'alone. Plus one small responsibility that belongs to your child.',
         ], heading: 'The handover'),
         PpCards([
-          PpCard('Keep reading aloud to him',
-              'Long after he can read himself. Listening comprehension runs '
+          PpCard('Keep reading aloud',
+              'Long after your child can read alone. Understanding by ear runs '
               'years ahead of reading ability.'),
           PpCard('Talk at dinner, every day',
               'Vocabulary at eight is built more at the table than in the '
               'classroom.'),
-          PpCard('Protect unstructured time',
+          PpCard('Protect free time',
               'A child with three classes after school has no time to be bored, '
-              'and boredom is where his own ideas come from.'),
-          PpCard('Let him speak to people',
-              'Ordering his own dosa, greeting a neighbour, telling the family '
-              'about his day.'),
+              'and boredom is where a child\'s own ideas come from.'),
+          PpCard('Let your child speak to people',
+              'Ordering a dosa, greeting a neighbour, telling the family '
+              'about the day.'),
           PpCard('One real responsibility',
-              'A job of his own, kept up over months.'),
+              'A job your child owns, kept up over months.'),
         ], heading: 'What to do at home now', hue: 206),
         PpCallout('Resist the urge to fill the afternoon with classes. A child '
-            'who has time to play, potter and be bored is not falling behind.'),
+            'who has time to play, potter and be bored is not losing out.'),
         PpWhenLine('From about four and a half, once school is a settled part '
             'of the week.'),
         PpLink(
@@ -6324,7 +6372,7 @@ const PpArea _school = PpArea(
         PpLink(
           'Bags, boxes, bottles and shoes',
           surfaceId: 'pp_recos',
-          blurb: 'Only the few things that genuinely matter, and what makes one '
+          blurb: 'Only the few things that really matter, and what makes one '
               'lunch box easier for a four-year-old to open than another.',
         ),
       ],

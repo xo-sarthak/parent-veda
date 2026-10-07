@@ -43,6 +43,7 @@ import 'pp_child_profile.dart';
 import 'pp_content.dart';
 import 'pp_page_read.dart';
 import 'pp_story_screen.dart';
+import 'pp_home_reads.dart' show PpLastPageStore;
 
 /// ⚠️ THE ONE WAY A PAGE OPENS, FROM ANY SCREEN.
 ///
@@ -87,6 +88,8 @@ Widget ppPageScreen(
   PpPage page, {
   void Function(BuildContext, String)? onSurface,
 }) {
+  // "Continue reading" on the home (2026-10-07): every door page opens here.
+  PpLastPageStore.instance.opened(section.id, page.id);
   void openById(BuildContext ctx, String id) {
     final target = section.pageById(id);
     if (target == null) return;

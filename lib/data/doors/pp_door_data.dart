@@ -41,6 +41,10 @@ import 'pp_door_feeding.dart';
 import 'pp_door_first40.dart';
 import 'pp_door_health.dart';
 import 'pp_door_potty.dart';
+import 'pp_door_safety.dart';
+import 'pp_door_papers.dart';
+import 'pp_door_special_care.dart';
+import 'pp_door_family.dart';
 import 'pp_door_sleep.dart';
 import 'pp_door_traditions.dart';
 import 'pp_door_you_maa.dart';
@@ -52,6 +56,10 @@ export 'pp_door_feeding.dart';
 export 'pp_door_first40.dart';
 export 'pp_door_health.dart';
 export 'pp_door_potty.dart';
+export 'pp_door_safety.dart';
+export 'pp_door_papers.dart';
+export 'pp_door_special_care.dart';
+export 'pp_door_family.dart';
 export 'pp_door_sleep.dart';
 export 'pp_door_traditions.dart';
 export 'pp_door_you_maa.dart';
@@ -194,8 +202,14 @@ class PpDoorTool {
     required this.icon,
     this.chip = 'Tool',
     this.afterPageId,
+    this.atEnd = false,
   });
   final String label;
+
+  /// Drawn after every page on the first rail instead of before them. For a
+  /// shop card that should never come before the free things (gap analysis
+  /// P2, Early learning, 2026-10-07). Read by the door screen's rail.
+  final bool atEnd;
   final String blurb;
   final String surfaceId;
   final IconData icon;
@@ -203,7 +217,7 @@ class PpDoorTool {
   /// ⚠️ A TOOL THAT FOLLOWS ITS READ. Tools lead the first rail; this puts
   /// one after a named page instead, so a rail can go read, then the tool
   /// for it: "The normal range is much wider than you think", then Where he
-  /// is right now; "When something is genuinely worth checking", then A
+  /// is right now; "When something is worth checking", then A
   /// gentle check-in. The user's call on Development (2026-09-13): educate,
   /// then hand over the tool, per pair. Null keeps the tool at the front.
   final String? afterPageId;
@@ -237,6 +251,10 @@ final List<PpDoor> kPpDoors = [
   kPpFirst40Door,
   kPpYouMaaDoor,
   kPpTraditionsDoor,
+  kPpSafetyDoor,
+  kPpPapersDoor,
+  kPpSpecialCareDoor,
+  kPpFamilyDoor,
 ];
 
 PpDoor? ppDoorFor(String sectionId) {

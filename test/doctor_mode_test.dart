@@ -17,6 +17,7 @@ import 'package:parentveda/doctor/doctor_earnings.dart';
 import 'package:parentveda/doctor/doctor_roster.dart';
 import 'package:parentveda/doctor/doctor_session.dart';
 import 'package:parentveda/screens/doctor/doctor_scaffold.dart';
+import 'package:parentveda/services/expert_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -27,10 +28,16 @@ void main() {
 
   setUp(() {
     store.resetAll();
+    // Since 2026-10-07 a bundled parenting expert is bookable only once the
+    // panel has published them (pp_expert_honesty.dart: placeholders say
+    // Opening soon). This file is about a real, published doctor, so the
+    // experts are served as the panel would serve them.
+    ExpertStore.instance.setItemsForTest(ExpertStore.instance.all);
     DoctorSession.instance.enter('neha'); // Dr. Neha Sharma, a consult doctor
   });
   tearDown(() {
     store.resetAll();
+    ExpertStore.instance.resetForTest();
     DoctorSession.instance.exit();
   });
 

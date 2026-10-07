@@ -15,6 +15,11 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../theme/pv_fonts.dart';
+import '../pregnancy/preg_chrome.dart' show PregNote;
+import '../pregnancy/preg_tool_chrome.dart';
+import '../products/pv_store_chrome.dart' show PvChip, PvCommit, PvRoundIcon, PvSecondary, kPvInk, pvStorePalette;
+import '../v2/v2_palette.dart';
 import 'name_journey_detail_screen.dart';
 import 'name_journey_shortlist_screen.dart';
 import 'name_list_screen.dart';
@@ -202,8 +207,462 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
   void _openBrowse() => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const NameListScreen()));
   void _openDetail(BabyName n) => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => NameJourneyDetailScreen(name: n.name)));
 
+  // ---- the one ParentVeda look (2026-10-07) ------------------------------------
+  //  The quiz and the primer wear the naming tool's shell (the front door,
+  //  BabyNamingHomeScreen, wears it too): the field, the round back, the serif
+  //  title, ink chips and one ink button. The swipe deck keeps its gesture,
+  //  its nudge, its hand demo and its hearts; only the chrome moves onto the
+  //  white ground, the hairline cards and the ink buttons. The journey ribbon
+  //  and the lilac look stay in `_buildBeforeShell`, kept for revert.
   @override
   Widget build(BuildContext context) {
+    final p = pvStorePalette;
+    return switch (_phase) {
+      _Phase.quiz => _quizShell(p),
+      // The round back on the primer returns to the quiz, as the old "Back"
+      // did, instead of leaving the journey; the system back does the same.
+      _Phase.primer => PopScope(
+          canPop: false,
+          onPopInvokedWithResult: (didPop, _) {
+            if (!didPop) setState(() => _phase = _Phase.quiz);
+          },
+          child: _primerShell(p),
+        ),
+      _Phase.swipe => Scaffold(
+          backgroundColor: p.ground,
+          body: SafeArea(bottom: false, child: _swipeShell(p)),
+        ),
+    };
+  }
+
+  Widget _question(V2Palette p, String text) => Semantics(
+        header: true,
+        child: Text(text, style: pvFraunces(fontSize: 20, fontWeight: FontWeight.w600, height: 1.2, color: p.ink1)),
+      );
+
+  // ---- taste quiz, on the shell ----------------------------------------------
+  Widget _quizShell(V2Palette p) => PregToolScaffold(
+        hue: 268,
+        eyebrow: 'Taste quiz · about 30 seconds',
+        title: 'A couple of taps, and we\'ll tune your names',
+        intro: 'This only gently weights what you see first. It never hides names from you.',
+        children: [
+          pregToolPad(_question(p, 'Who are we naming?')),
+          const SizedBox(height: 12),
+          pregToolPad(Row(children: [
+            for (var i = 0; i < _genders.length; i++) ...[
+              if (i > 0) const SizedBox(width: 10),
+              Expanded(child: _whoShell(p, i)),
+            ],
+          ])),
+          const SizedBox(height: 26),
+          pregToolPad(Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+            Expanded(child: _question(p, 'The feeling you want')),
+            const SizedBox(width: 8),
+            Text('pick any', style: pvManrope(fontSize: 12, color: p.ink3)),
+          ])),
+          const SizedBox(height: 12),
+          pregToolPad(Wrap(spacing: 6, runSpacing: 8, children: [
+            PvChip(label: 'No preference', selected: _vibes.isEmpty, onTap: () => setState(_vibes.clear)),
+            for (final v in kNameVibes)
+              PvChip(
+                label: v.label,
+                selected: _vibes.contains(v.label),
+                leading: _vibes.contains(v.label) ? Icons.check_rounded : null,
+                onTap: () => setState(() => _vibes.contains(v.label) ? _vibes.remove(v.label) : _vibes.add(v.label)),
+              ),
+          ])),
+          const SizedBox(height: 26),
+          pregToolPad(_question(p, 'Region or tradition')),
+          const SizedBox(height: 4),
+          pregToolPad(Text('Optional - localise names by community and region.',
+              style: pvManrope(fontSize: 13, height: 1.45, color: p.ink2))),
+          const SizedBox(height: 12),
+          pregToolPad(Wrap(spacing: 6, runSpacing: 8, children: [
+            for (final c in kNameCommunities)
+              PvChip(label: c, selected: c == _community, onTap: () => setState(() => _community = c)),
+          ])),
+          const SizedBox(height: 10),
+          pregToolPad(Wrap(spacing: 6, runSpacing: 8, children: [
+            for (final r in kNameRegions)
+              PvChip(label: r, selected: r == _region, onTap: () => setState(() => _region = r)),
+          ])),
+          const SizedBox(height: 28),
+          pregToolPad(PvCommit(
+            key: const ValueKey('pp_names_quiz_start'),
+            label: 'Start discovering',
+            onTap: () => setState(() => _phase = _Phase.primer),
+          )),
+          const SizedBox(height: 6),
+          Center(
+            child: TextButton(
+              key: const ValueKey('pp_names_quiz_browse'),
+              onPressed: _openBrowse,
+              style: TextButton.styleFrom(foregroundColor: kPvInk, minimumSize: const Size(48, 48)),
+              child: Text('Just show me names',
+                  style: pvManrope(fontSize: 14, fontWeight: FontWeight.w700, color: kPvInk)),
+            ),
+          ),
+        ],
+      );
+
+  Widget _whoShell(V2Palette p, int i) {
+    final on = i == _who;
+    return Semantics(
+      button: true,
+      selected: on,
+      child: InkWell(
+        onTap: () => setState(() => _who = i),
+        borderRadius: BorderRadius.circular(16),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 6),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: on ? kPvInk : p.line, width: on ? 1.5 : 1),
+          ),
+          child: Column(children: [
+            Icon(_genders[i].$1, size: 24, color: on ? kPvInk : p.ink3),
+            const SizedBox(height: 8),
+            Text(_genders[i].$2,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: pvManrope(fontSize: 13, fontWeight: FontWeight.w700, color: p.ink1)),
+          ]),
+        ),
+      ),
+    );
+  }
+
+  // ---- primer, on the shell --------------------------------------------------
+  Widget _primerShell(V2Palette p) => PregToolScaffold(
+        hue: 268,
+        variant: 3,
+        eyebrow: 'How it works',
+        title: 'Discover names one by one',
+        intro: 'We\'ll show you one beautiful name at a time. Tell us how you feel about each - by tapping a button or swiping the card.',
+        children: [
+          pregToolPad(Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            _sampleShell(p, Icons.favorite, 'Love it', filled: true),
+            const SizedBox(width: 28),
+            _sampleShell(p, Icons.close_rounded, 'Skip', filled: false),
+          ])),
+          const SizedBox(height: 20),
+          pregToolPad(Text('We\'ll learn what you love and gradually tailor every suggestion.',
+              textAlign: TextAlign.center, style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2))),
+          const SizedBox(height: 26),
+          pregToolPad(PvCommit(
+            key: const ValueKey('pp_names_primer_begin'),
+            label: 'Let\'s begin',
+            onTap: _startSwiping,
+          )),
+        ],
+      );
+
+  Widget _sampleShell(V2Palette p, IconData icon, String label, {required bool filled}) =>
+      Column(mainAxisSize: MainAxisSize.min, children: [
+        Container(
+          width: 60,
+          height: 60,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: filled ? kPvInk : Colors.white,
+            shape: BoxShape.circle,
+            border: Border.all(color: filled ? kPvInk : p.line),
+          ),
+          child: Icon(icon, size: 26, color: filled ? Colors.white : p.ink2),
+        ),
+        const SizedBox(height: 8),
+        Text(label, style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w700, color: p.ink1)),
+      ]);
+
+  // ---- swipe feed, on the white ground ----------------------------------------
+  Widget _swipeShell(V2Palette p) {
+    final total = _deck.isEmpty ? 1 : _deck.length;
+    final progress = (_index / total).clamp(0.0, 1.0);
+    final feedback = _feedback;
+    return Stack(children: [
+      Padding(
+        padding: const EdgeInsets.fromLTRB(18, 8, 18, 20),
+        child: Column(children: [
+          Row(children: [
+            PvRoundIcon(
+              key: const ValueKey('pp_names_swipe_back'),
+              icon: Icons.arrow_back_rounded,
+              size: 40,
+              semanticLabel: 'Back',
+              onTap: () => Navigator.of(context).maybePop(),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(widget.collection?.title ?? 'For you',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: pvManrope(fontSize: 15, fontWeight: FontWeight.w700, color: p.ink1)),
+            ),
+            Semantics(
+              button: true,
+              label: '${_store.likedCount} in your shortlist',
+              excludeSemantics: true,
+              child: InkWell(
+                onTap: _openList,
+                borderRadius: BorderRadius.circular(999),
+                child: Container(
+                  constraints: const BoxConstraints(minHeight: 40),
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(999),
+                    border: Border.all(color: p.line),
+                  ),
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    const Icon(Icons.favorite, size: 14, color: kPvInk),
+                    const SizedBox(width: 6),
+                    Text('${_store.likedCount}', style: pvManrope(fontSize: 13, fontWeight: FontWeight.w800, color: p.ink1)),
+                  ]),
+                ),
+              ),
+            ),
+          ]),
+          const SizedBox(height: 14),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(999),
+            child: Container(
+              height: 4,
+              color: p.line,
+              child: FractionallySizedBox(
+                alignment: Alignment.centerLeft,
+                widthFactor: progress == 0 ? 0.02 : progress,
+                child: const ColoredBox(color: kPvInk),
+              ),
+            ),
+          ),
+          // gentle, reassuring feedback: a quiet line, not a tinted block
+          if (feedback != null) ...[
+            const SizedBox(height: 12),
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              child: KeyedSubtree(
+                key: ValueKey(feedback),
+                child: PregNote(feedback, icon: Icons.auto_awesome_outlined),
+              ),
+            ),
+          ],
+          Expanded(child: Padding(padding: const EdgeInsets.only(top: 16), child: _cardAreaShell(p))),
+          if (!_done) ...[
+            const SizedBox(height: 4),
+            Text('Swipe the card, or use the buttons below', style: pvManrope(fontSize: 11.5, color: p.ink3)),
+          ],
+          const SizedBox(height: 10),
+          // Three equal columns: a long label wraps under its button instead of
+          // pushing the row off the screen at a large text size.
+          Row(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Expanded(child: _labelledShell(p, 'Not for us', _actionShell(p, size: 58, filled: false, icon: Icons.close_rounded, iconColor: p.ink2, iconSize: 24, onTap: _done ? null : () => _flyOff('pass'), semantic: 'Not for us'))),
+            Expanded(child: _labelledShell(p, 'Undo', _actionShell(p, size: 44, filled: false, icon: Icons.undo_rounded, iconColor: kPvInk, iconSize: 18, onTap: _index > 0 ? _undo : null, semantic: 'Undo the last name'))),
+            Expanded(child: _labelledShell(p, 'We like this', _actionShell(p, size: 66, filled: true, icon: Icons.favorite, iconColor: Colors.white, iconSize: 28, onTap: _done ? null : () => _flyOff('like'), semantic: 'We like this'))),
+          ]),
+        ]),
+      ),
+      if (_interactions == 0 && !_done && !_showMatch)
+        Positioned.fill(child: IgnorePointer(child: _swipeHandHint())),
+      _feedbackOverlay(),
+      if (_showMatch && _matched != null) _matchOverlayShell(p, _matched!),
+    ]);
+  }
+
+  Widget _labelledShell(V2Palette p, String label, Widget button) => Column(mainAxisSize: MainAxisSize.min, children: [
+        button,
+        const SizedBox(height: 7),
+        Text(label, textAlign: TextAlign.center, maxLines: 2, style: pvManrope(fontSize: 11, fontWeight: FontWeight.w600, color: p.ink2)),
+      ]);
+
+  Widget _actionShell(V2Palette p, {required double size, required bool filled, required IconData icon, required Color iconColor, required double iconSize, required VoidCallback? onTap, String? semantic}) => Opacity(
+        opacity: onTap == null ? 0.4 : 1,
+        child: Semantics(
+          button: true,
+          label: semantic,
+          child: GestureDetector(
+            onTap: onTap,
+            behavior: HitTestBehavior.opaque,
+            child: Container(
+              width: size,
+              height: size,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: filled ? kPvInk : Colors.white,
+                shape: BoxShape.circle,
+                border: Border.all(color: filled ? kPvInk : p.line),
+              ),
+              child: Icon(icon, size: iconSize, color: iconColor),
+            ),
+          ),
+        ),
+      );
+
+  Widget _cardAreaShell(V2Palette p) {
+    if (_done) return _endCardShell(p);
+    final n = _current!;
+    final w = MediaQuery.of(context).size.width;
+    return Stack(children: [
+      // The deck behind: two white cards on the hairline, so the top one reads
+      // as one of many and movable.
+      Positioned(left: 12, right: 12, top: 22, bottom: 34, child: Transform.rotate(angle: -0.05, child: Container(decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24), border: Border.all(color: p.line))))),
+      Positioned(left: 8, right: 8, top: 12, bottom: 24, child: Container(decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24), border: Border.all(color: p.line)))),
+      Positioned(
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 12,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () => _openDetail(n),
+          onPanUpdate: _onPanUpdate,
+          onPanEnd: _onPanEnd,
+          child: Transform.translate(
+            offset: _drag + _hintOffset,
+            child: Transform.rotate(
+              angle: (_drag.dx + _hintOffset.dx) / w * 0.3,
+              child: Stack(children: [
+                _nameCardShell(p, n),
+                Positioned(top: 64, left: 24, child: _stamp('Loved', kPvInk, (_drag.dx / _threshold).clamp(0.0, 1.0), -0.22)),
+                Positioned(top: 64, right: 24, child: _stamp('Maybe not', p.ink3, (-_drag.dx / _threshold).clamp(0.0, 1.0), 0.22)),
+              ]),
+            ),
+          ),
+        ),
+      ),
+    ]);
+  }
+
+  Widget _nameCardShell(V2Palette p, BabyName n) => Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: p.line),
+        ),
+        padding: const EdgeInsets.all(24),
+        child: Column(children: [
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 5),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(color: p.line),
+              ),
+              child: Text(n.feel, maxLines: 1, overflow: TextOverflow.ellipsis,
+                  style: pvManrope(fontSize: 11, fontWeight: FontWeight.w700, color: p.ink2)),
+            ),
+          ),
+          Expanded(
+            // Scales down rather than spilling at a large text size.
+            child: Center(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width - 84),
+                  child: Column(mainAxisSize: MainAxisSize.min, children: [
+                    Text(n.name, textAlign: TextAlign.center,
+                        style: pvFraunces(fontSize: 52, fontWeight: FontWeight.w600, height: 1.0, color: p.ink1)),
+                    const SizedBox(height: 6),
+                    Text(n.script, textAlign: TextAlign.center,
+                        style: pvFraunces(fontSize: 22, height: 1.1, color: p.ink3)),
+                    const SizedBox(height: 16),
+                    Row(mainAxisSize: MainAxisSize.min, children: [
+                      Container(
+                        width: 30,
+                        height: 30,
+                        alignment: Alignment.center,
+                        decoration: const BoxDecoration(color: kPvInk, shape: BoxShape.circle),
+                        child: const Icon(Icons.volume_up_rounded, size: 15, color: Colors.white),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(n.pron, style: pvManrope(fontSize: 13, color: p.ink2)),
+                    ]),
+                    const SizedBox(height: 18),
+                    Text('"${n.meaningShort}"', textAlign: TextAlign.center,
+                        style: pvManrope(fontSize: 15, height: 1.5, color: p.ink1)),
+                  ]),
+                ),
+              ),
+            ),
+          ),
+          Text('Tap for the full story', style: pvManrope(fontSize: 12, color: p.ink3)),
+        ]),
+      );
+
+  Widget _endCardShell(V2Palette p) => Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24), border: Border.all(color: p.line)),
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+              const Icon(Icons.favorite, size: 30, color: kPvInk),
+              const SizedBox(height: 14),
+              Text("That's every name for now", textAlign: TextAlign.center,
+                  style: pvFraunces(fontSize: 24, fontWeight: FontWeight.w600, height: 1.15, color: p.ink1)),
+              const SizedBox(height: 8),
+              Text('${_store.likedCount} names are waiting in the ones you love. Skipped names are never gone; find them anytime in Browse.',
+                  textAlign: TextAlign.center, style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2)),
+              const SizedBox(height: 20),
+              PvCommit(label: 'See our shortlist', onTap: _openList),
+              const SizedBox(height: 4),
+              Center(
+                child: TextButton(
+                  onPressed: _openBrowse,
+                  style: TextButton.styleFrom(foregroundColor: kPvInk, minimumSize: const Size(48, 48)),
+                  child: Text('Browse all names', style: pvManrope(fontSize: 14, fontWeight: FontWeight.w700, color: kPvInk)),
+                ),
+              ),
+            ]),
+          ),
+        ),
+      );
+
+  Widget _matchOverlayShell(V2Palette p, BabyName n) => Positioned.fill(
+        child: GestureDetector(
+          onTap: _next,
+          behavior: HitTestBehavior.opaque,
+          child: Container(
+            color: Colors.black.withValues(alpha: 0.45),
+            alignment: Alignment.center,
+            padding: const EdgeInsets.all(24),
+            child: GestureDetector(
+              onTap: () {},
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 26),
+                decoration: BoxDecoration(color: p.ground, borderRadius: BorderRadius.circular(24)),
+                child: SingleChildScrollView(
+                  child: Column(mainAxisSize: MainAxisSize.min, children: [
+                    const Icon(Icons.favorite, size: 30, color: ppCoral),
+                    const SizedBox(height: 12),
+                    Text('You loved', style: pvManrope(fontSize: 13, fontWeight: FontWeight.w700, color: p.ink2)),
+                    const SizedBox(height: 4),
+                    Text(n.name, textAlign: TextAlign.center,
+                        style: pvFraunces(fontSize: 34, fontWeight: FontWeight.w600, height: 1.05, color: p.ink1)),
+                    const SizedBox(height: 8),
+                    Text('"${n.meaningShort}"', textAlign: TextAlign.center,
+                        style: pvManrope(fontSize: 14, height: 1.55, color: p.ink2)),
+                    const SizedBox(height: 22),
+                    Row(children: [
+                      Expanded(child: PvSecondary(label: 'Read its story', onTap: () => _openDetail(n))),
+                      const SizedBox(width: 10),
+                      Expanded(child: PvCommit(label: 'Keep going', onTap: _next)),
+                    ]),
+                  ]),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+  // Kept for revert (2026-10-07): the page before the shared look.
+  // ignore: unused_element
+  Widget _buildBeforeShell(BuildContext context) {
     return Scaffold(
       backgroundColor: ppBg,
       body: SafeArea(
@@ -571,7 +1030,9 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
                       height: 46,
                       alignment: Alignment.center,
                       decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle, boxShadow: [BoxShadow(color: Color(0x40000000), blurRadius: 12, offset: Offset(0, 4))]),
-                      child: const Icon(Icons.back_hand_rounded, size: 24, color: ppPurple),
+                      // Ink, not violet (2026-10-07, the one ParentVeda look).
+                      // Kept for revert: color: ppPurple.
+                      child: const Icon(Icons.back_hand_rounded, size: 24, color: kPvInk),
                     ),
                   ),
                   const SizedBox(width: 12),

@@ -24,6 +24,7 @@ import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_feedback.dart';
 import '../v2/v2_palette.dart';
 import 'pp_common.dart';
+import 'pp_expert_honesty.dart';
 import 'pp_experts_data.dart';
 import 'pp_learning_data.dart';
 import 'pp_yoga_data.dart';
@@ -67,6 +68,9 @@ class ProviderProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final e = expert ?? expertById('neha');
+    // A bundled parenting expert does not exist (gap analysis P1, 2026-10-07):
+    // no council number, hospital or Book on screen until the panel has them.
+    if (ppExpertIsPlaceholder(e)) return ppExpertsOpeningSoon();
     return _ProfileBody(e: e, screen: this);
   }
 

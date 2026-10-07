@@ -379,7 +379,7 @@ class _PpFeverCheckScreenState extends State<PpFeverCheckScreen> {
 
             const SizedBox(height: 22),
             Text(
-                'If he seems wrong to you and this screen says otherwise, '
+                'If your child seems wrong to you and this screen says otherwise, '
                 'believe yourself. You know him and this does not.',
                 style: pvManrope(fontSize: 13, fontWeight: FontWeight.w500, height: 1.6, color: p.ink3)),
           ],

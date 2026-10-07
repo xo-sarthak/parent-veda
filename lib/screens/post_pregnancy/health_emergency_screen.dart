@@ -227,6 +227,23 @@ class _HealthEmergencyScreenState extends State<HealthEmergencyScreen> {
     final allergies = TextEditingController(text: existing?.allergies ?? 'None recorded');
     final ped = TextEditingController(text: existing?.pediatrician ?? '');
     final meds = TextEditingController(text: existing?.medications ?? 'None');
+    // Two people to call (gap analysis P1, 2026-10-07): the card promised "the
+    // two numbers to call" and had nowhere to type them.
+    final had = existing?.contacts ?? const <EmergencyContact>[];
+    String at(int i, String Function(EmergencyContact) f) => i < had.length ? f(had[i]) : '';
+    final c1Name = TextEditingController(text: at(0, (c) => c.name));
+    final c1Phone = TextEditingController(text: at(0, (c) => c.phone));
+    final c2Name = TextEditingController(text: at(1, (c) => c.name));
+    final c2Phone = TextEditingController(text: at(1, (c) => c.phone));
+    List<EmergencyContact> contacts() => [
+          for (final (n, ph, i) in [(c1Name, c1Phone, 0), (c2Name, c2Phone, 1)])
+            if (n.text.trim().isNotEmpty || ph.text.trim().isNotEmpty)
+              (
+                name: n.text.trim(),
+                relation: at(i, (c) => c.relation),
+                phone: ph.text.trim(),
+              ),
+        ];
 
     showModalBottomSheet<void>(
       context: context,
@@ -251,6 +268,10 @@ class _HealthEmergencyScreenState extends State<HealthEmergencyScreen> {
               _tf(allergies, 'Allergies'),
               _tf(ped, 'Paediatrician (name · phone)'),
               _tf(meds, 'Current medications'),
+              _tf(c1Name, 'First person to call: name'),
+              _tf(c1Phone, 'First person to call: phone', phone: true),
+              _tf(c2Name, 'Second person to call: name'),
+              _tf(c2Phone, 'Second person to call: phone', phone: true),
               const SizedBox(height: 8),
               GestureDetector(
                 onTap: () {
@@ -263,7 +284,8 @@ class _HealthEmergencyScreenState extends State<HealthEmergencyScreen> {
                     allergies: allergies.text.trim(),
                     pediatrician: ped.text.trim(),
                     medications: meds.text.trim(),
-                    contacts: existing?.contacts ?? const [],
+                    // Kept for revert: contacts: existing?.contacts ?? const [],
+                    contacts: contacts(),
                   ));
                   Navigator.of(ctx).pop();
                 },
@@ -282,7 +304,7 @@ class _HealthEmergencyScreenState extends State<HealthEmergencyScreen> {
     );
   }
 
-  Widget _tf(TextEditingController c, String label) => Padding(
+  Widget _tf(TextEditingController c, String label, {bool phone = false}) => Padding(
         padding: const EdgeInsets.only(bottom: 12),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(label, style: ppBody(12, color: ppSoft, w: FontWeight.w700)),
@@ -292,6 +314,7 @@ class _HealthEmergencyScreenState extends State<HealthEmergencyScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: TextField(
               controller: c,
+              keyboardType: phone ? TextInputType.phone : null,
               style: ppBody(14, color: ppInk),
               decoration: const InputDecoration(isDense: true, filled: false, border: InputBorder.none, contentPadding: EdgeInsets.symmetric(vertical: 12)),
             ),

@@ -21,10 +21,14 @@ import 'screens/post_pregnancy/pp_growth_data.dart';
 import 'screens/post_pregnancy/pp_health_data.dart';
 import 'screens/post_pregnancy/pp_milestones_data.dart';
 import 'screens/post_pregnancy/pp_sleep_data.dart';
+import 'screens/post_pregnancy/pp_care_log_data.dart';
 import 'screens/post_pregnancy/pp_vaccine_data.dart';
 import 'screens/post_pregnancy/pp_journeys_data.dart';
 import 'booking/server_slots.dart';
 import 'services/pregnancy_ended_store.dart';
+import 'services/pp_messages_store.dart';
+import 'screens/post_pregnancy/pp_home_reads.dart' show PpLastPageStore;
+import 'screens/post_pregnancy/pp_messages_screen.dart' show ppOpenMessageFromPhone;
 import 'services/preg_messages_store.dart';
 import 'screens/pregnancy/preg_theme.dart' show pregThemeFrom;
 import 'services/life_stage_store.dart';
@@ -286,6 +290,12 @@ class _ParentVedaAppState extends State<ParentVedaApp>
           PregMessagesStore.phoneTapOpener = pregOpenMessageFromPhone;
           return PregMessagesStore.instance.init();
         })
+        // The parenting messages (2026-10-07), after the same wipe: monthly
+        // and weekly age notes, vaccines 3 days ahead, a new stage, an activity.
+        .then((_) {
+          PpMessagesStore.phoneTapOpener = ppOpenMessageFromPhone;
+          return PpMessagesStore.instance.init();
+        })
         // The IVF trigger reminders are re-armed here too, for the same
         // reason (they used to be wiped on every launch).
         .then((_) => TtcTreatmentStore.instance.rearmAfterStartup())
@@ -324,6 +334,13 @@ class _ParentVedaAppState extends State<ParentVedaApp>
     VaxStore.instance.init();
     FeedingStore.instance.init();
     SleepStore.instance.init();
+    // Nappies and pumping (0093), and a breastfeed timer left running.
+    NappyStore.instance.init();
+    PumpStore.instance.init();
+    BreastTimer.instance.init();
+    // Tummy time (0094), child-scoped like the rest (2026-10-07).
+    TummyStore.instance.init();
+    PpLastPageStore.instance.init(); // the home's Continue reading (2026-10-07)
     MilestoneStore.instance.init();
     BabyDocumentsStore.instance.init();
     // PARENTING (light): saved lists, progress and preferences. These sync one

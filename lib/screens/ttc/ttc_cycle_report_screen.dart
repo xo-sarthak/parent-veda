@@ -50,6 +50,7 @@ import 'ttc_symptom_log_screen.dart'
 import 'ttc_surface_router.dart';
 import 'ttc_strings.dart';
 import 'ttc_tool_chrome.dart';
+import 'ttc_cycle_headline.dart';
 
 class TtcCycleReportScreen extends StatefulWidget {
   const TtcCycleReportScreen({super.key, this.series});
@@ -513,6 +514,14 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
       (s) => s.status == TtcSpanStatus.here,
       orElse: () => spans.first,
     );
+    // ⚠️ NO "HERE" IS NOT THE PERIOD (2026-10-07). Past her usual length but
+    // not yet overdue, no part is marked here and the fallback above named the
+    // period ("You're in your period days") while the home said her period may
+    // start. And an earlier cycle has no "here" at all.
+    final hasHere = spans.any((s) => s.status == TtcSpanStatus.here);
+    // The home's sentence, word for word (ttc_cycle_headline.dart), so the
+    // report and the home cannot disagree about her fertile days.
+    final headline = _index == 0 ? ttcCycleHeadline() : null;
     final today = spans.any((s) => s.status == TtcSpanStatus.here)
         ? DateTime.now()
         : null;
@@ -532,7 +541,12 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
           TtcCycleColours.heroChromaScale(here.phase),
       variant: 2,
       eyebrow: t.reportTitle,
-      title: _heroLine(here.phase),
+      // Kept for revert: title: _heroLine(here.phase),
+      title: hasHere
+          ? _heroLine(here.phase)
+          : _index > 0
+              ? 'An earlier cycle'
+              : 'Your period may start any day',
       // An earlier cycle's stretches are worked out looking back from its own
       // length (2026-09-26), so they no longer shift and the words say so.
       // "Stretches" was our word; the four parts are named in plain words
@@ -541,7 +555,7 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
       intro: _index > 0
           ? 'One whole cycle, start to finish. Its four parts are worked out '
               'looking back, from how long this cycle ran.'
-          : 'One whole cycle, start to finish, split into four parts. The '
+          : '${headline == null ? '' : '$headline. '}One whole cycle, start to finish, split into four parts. The '
               'dates are estimates from what you log, and they shift as you '
               'log more.',
       // ⚠️ THE i DOES ONE THING ON EVERY STATE (tools pass, 2026-09-27): it

@@ -40,7 +40,7 @@ final PpDoor kPpFirst40Door = PpDoor(
   tabs: const [
     PpDoorTab(
       id: 'din_by_din',
-      label: 'Din by din',
+      label: 'Day by day',
       icon: Icons.calendar_today_outlined,
       hue: 26,
       areaIds: ['din_by_din'],
@@ -61,7 +61,7 @@ final PpDoor kPpFirst40Door = PpDoor(
     ),
     PpDoorTab(
       id: 'maa',
-      label: 'Maa ki dekhbhaal',
+      label: 'Your recovery',
       icon: Icons.favorite_border_rounded,
       hue: 344,
       areaIds: ['maa_ki_dekhbhaal'],
@@ -70,7 +70,7 @@ final PpDoor kPpFirst40Door = PpDoor(
     ),
     PpDoorTab(
       id: 'samjho',
-      label: 'Samjho your newborn',
+      label: 'Understanding your newborn',
       icon: Icons.child_care_outlined,
       hue: 44,
       areaIds: ['samjho', 'malish_jhula'],
@@ -83,14 +83,22 @@ final PpDoor kPpFirst40Door = PpDoor(
       areaIds: ['feeding_sleep_early', 'puchho', 'jaapa_course', 'jaapa_essentials'],
       tools: [
         PpDoorTool(
-          label: 'Log his feeds',
+          label: 'Log a feed',
           blurb: 'The shared feeding journey: every feed, both sides, and '
               'the pattern it makes.',
           surfaceId: 'pp_feeding',
           icon: Icons.water_drop_outlined,
         ),
+        // The nappy count "Is my baby OK?" asks for (gap analysis P1,
+        // 2026-10-07): a way to keep it, beside the feeds.
         PpDoorTool(
-          label: 'Weight, and his own curve',
+          label: 'Nappies',
+          blurb: 'One tap at each change, and the wet count for today.',
+          surfaceId: 'pp_nappies',
+          icon: Icons.baby_changing_station_outlined,
+        ),
+        PpDoorTool(
+          label: "Weight, and your baby's own curve",
           blurb: 'The shared growth journey. Is he getting enough, answered '
               'by the scale.',
           surfaceId: 'pp_growth',

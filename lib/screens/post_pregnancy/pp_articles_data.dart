@@ -19,8 +19,10 @@ class Article {
     required this.category,
     required this.age,
     required this.readMin,
-    this.author = 'Dr. Ananya Rao',
-    this.authorRole = 'Paediatrician',
+    // Was 'Dr. Ananya Rao' / 'Paediatrician', a fictional doctor (gap
+    // analysis P1, 2026-10-07). Kept for revert.
+    this.author = 'ParentVeda editorial',
+    this.authorRole = 'Written by our team',
     this.featured = false,
   });
 

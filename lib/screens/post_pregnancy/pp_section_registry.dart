@@ -30,6 +30,10 @@ import 'pp_feeding_content.dart';
 import 'pp_health_content.dart';
 import 'pp_first40_content.dart';
 import 'pp_potty_content.dart';
+import 'pp_safety_content.dart';
+import 'pp_family_content.dart';
+import 'pp_special_care_content.dart';
+import 'pp_papers_content.dart';
 import 'pp_sleep_content.dart';
 import 'pp_traditions_content.dart';
 import 'pp_you_maa_content.dart';
@@ -51,6 +55,10 @@ final List<PpSection> kPpSections = [
   kPpFeedingSection,
   kPpHealthSection,
   kPpEarlyLearningSection,
+  kPpSafetySection,
+  kPpFamilySection,
+  kPpSpecialCareSection,
+  kPpPapersSection,
   //
   // ⚠️ 'parenting_buying' IS ABSENT FOR A DIFFERENT REASON, AND THE TWO MUST NOT
   // BE CONFLATED.

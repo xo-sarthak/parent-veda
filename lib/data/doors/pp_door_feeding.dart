@@ -52,11 +52,41 @@ final PpDoor kPpFeedingDoor = PpDoor(
       tools: [
         // "Log his feeds = Feeding journey." One surface; no sponsor here.
         PpDoorTool(
-          label: 'Log his feeds',
+          label: 'Log a feed',
           blurb: 'A light record of feeds, bottles and solids, so a pattern '
               'can show itself. No scores, no streaks.',
           surfaceId: 'pp_feeding',
           icon: Icons.edit_note_outlined,
+        ),
+        // The care logs (gap analysis P1, 2026-10-07): a timer for each side,
+        // nappies, pumping and the last 7 days, each a Tool card here.
+        PpDoorTool(
+          label: 'Breastfeed timer',
+          blurb: 'Tap left or right to start, tap again to pause. Saves the '
+              'feed and remembers the last side.',
+          surfaceId: 'pp_feed_timer',
+          icon: Icons.timer_outlined,
+        ),
+        PpDoorTool(
+          label: 'Nappies',
+          blurb: 'One tap at each change. Wet nappies are the clearest sign '
+              'milk is going in.',
+          surfaceId: 'pp_nappies',
+          icon: Icons.baby_changing_station_outlined,
+        ),
+        PpDoorTool(
+          label: 'Pumping',
+          blurb: 'What you express, left and right, so whoever gives the '
+              'bottle knows what there is.',
+          surfaceId: 'pp_pump',
+          icon: Icons.water_drop_outlined,
+        ),
+        PpDoorTool(
+          label: 'The last 7 days',
+          blurb: 'Feeds, sleep, nappies and pumping, day by day, and a '
+              'summary for your doctor.',
+          surfaceId: 'pp_care_history',
+          icon: Icons.calendar_month_outlined,
         ),
       ],
     ),
@@ -76,7 +106,7 @@ final PpDoor kPpFeedingDoor = PpDoor(
           icon: Icons.event_note_outlined,
         ),
         PpDoorTool(
-          label: 'Can he eat this?',
+          label: 'Can my baby eat this?',
           blurb: 'Type a food, get a straight answer for his age. Honey, cow '
               'milk, nuts, salt, the lot.',
           surfaceId: 'pp_baby_food_check',
@@ -86,7 +116,7 @@ final PpDoor kPpFeedingDoor = PpDoor(
     ),
     PpDoorTab(
       id: 'cooking',
-      label: 'Cooking for him',
+      label: 'Cooking for your child',
       icon: Icons.soup_kitchen_outlined,
       hue: 44,
       areaIds: ['cooking'],
@@ -94,7 +124,7 @@ final PpDoor kPpFeedingDoor = PpDoor(
         // "Recipes for him = the Recipes tool." Recipe cards on the rail link
         // to it and never duplicate a recipe.
         PpDoorTool(
-          label: 'Recipes for him',
+          label: 'Recipes by age',
           blurb: 'Every baby and toddler recipe in the app, filtered by age, '
               'texture and what you have in the kitchen.',
           surfaceId: 'pp_food',
@@ -112,7 +142,7 @@ final PpDoor kPpFeedingDoor = PpDoor(
         // "Track his growth = Growth journey, which also owns the growth
         // reads." The growth-chart page on the rail opens this too.
         PpDoorTool(
-          label: 'Track his growth',
+          label: 'Track growth',
           blurb: 'Weight and height over time, plotted properly, so "is he '
               'too thin" has an actual answer.',
           surfaceId: 'pp_growth',

@@ -66,6 +66,9 @@ enum BracketMark {
   // Work, money and rights: a work bag. Nothing in the set said work, and a
   // rupee sign would make the tile about money alone.
   work,
+  // 2026-10-07: the four parenting doors added by the gap pass.
+  family,
+  care,
 }
 
 /// Maps a bracket id to its mark. Lives here rather than in the data table so
@@ -100,6 +103,12 @@ BracketMark? bracketMarkFor(String bracketId) => switch (bracketId) {
       'parenting_maternal' => BracketMark.fitness,
       'parenting_buying' => BracketMark.basket,
       'parenting_traditional' => BracketMark.lamp,
+      // The four doors the gap pass added (2026-10-07). They drew the
+      // Material fallback in the grid, the only tiles without a drawn mark.
+      'parenting_safety' => BracketMark.safety,
+      'parenting_family' => BracketMark.family,
+      'parenting_special_care' => BracketMark.care,
+      'parenting_papers' => BracketMark.work,
       // ---- TTC ----------------------------------------------------------
       // ⚠️ ALL SEVEN REUSE AN EXISTING MARK, and none of the reuses is a
       // shortage of ideas — each is the same idea arriving in a third stage:
@@ -319,6 +328,34 @@ class _BracketPainter extends CustomPainter {
       // A figure mid-stretch instead: head, and one thick sweep for the body.
       // Two elements, unmistakably a person, and still not a specific pose —
       // this bracket covers yoga, walking and everything between.
+      // A big figure and a small one, side by side: a family, not a couple,
+      // and no genders. Two heads, two soft bodies (2026-10-07).
+      case BracketMark.family:
+        canvas.drawCircle(Offset(38 * s, 30 * s), 11 * s, obj);
+        canvas.drawRRect(
+            RRect.fromRectAndRadius(Rect.fromLTWH(24 * s, 44 * s, 28 * s, 38 * s), Radius.circular(14 * s)), obj);
+        canvas.drawCircle(Offset(66 * s, 46 * s), 8 * s, soft);
+        canvas.drawRRect(
+            RRect.fromRectAndRadius(Rect.fromLTWH(56 * s, 57 * s, 20 * s, 25 * s), Radius.circular(10 * s)), soft);
+
+      // A heart held in a cupped hand: care that holds, not a medical cross
+      // (special care, early birth, additional needs). 2026-10-07.
+      case BracketMark.care:
+        final heart = Path()
+          ..moveTo(50 * s, 52 * s)
+          ..cubicTo(36 * s, 42 * s, 34 * s, 26 * s, 44 * s, 24 * s)
+          ..cubicTo(48 * s, 23 * s, 50 * s, 26 * s, 50 * s, 29 * s)
+          ..cubicTo(50 * s, 26 * s, 52 * s, 23 * s, 56 * s, 24 * s)
+          ..cubicTo(66 * s, 26 * s, 64 * s, 42 * s, 50 * s, 52 * s)
+          ..close();
+        canvas.drawPath(heart, obj);
+        canvas.drawPath(
+          Path()
+            ..moveTo(22 * s, 56 * s)
+            ..cubicTo(28 * s, 76 * s, 72 * s, 76 * s, 78 * s, 56 * s),
+          line(11, seed.withValues(alpha: 0.42)),
+        );
+
       case BracketMark.fitness:
         canvas.drawCircle(Offset(36 * s, 26 * s), 12 * s, obj);
         canvas.drawPath(

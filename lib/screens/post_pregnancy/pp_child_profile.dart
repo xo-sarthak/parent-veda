@@ -29,6 +29,7 @@
 //  uses for the week-20 no-due-date default.
 // =============================================================================
 
+import 'pp_who_growth_lms.dart';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -37,6 +38,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/remote/supabase_repo.dart';
 import '../../care_partner/care_journey.dart';
 import '../../services/remote/sync_registry.dart';
+import '../../services/family_profile.dart';
 
 /// Expected 50th-centile figures for a given age, used as a gentle reference
 /// (never a pass/fail). Values approximate the WHO boy standards.
@@ -47,43 +49,57 @@ class GrowthRef {
   final double headCm;
 }
 
-const Map<int, GrowthRef> _boyRef = {
-  0: GrowthRef(3.3, 49.9, 34.5),
-  1: GrowthRef(4.5, 54.7, 37.3),
-  2: GrowthRef(5.6, 58.4, 39.1),
-  3: GrowthRef(6.4, 61.4, 40.5),
-  4: GrowthRef(7.0, 63.9, 41.6),
-  5: GrowthRef(7.5, 65.9, 42.6),
-  6: GrowthRef(7.9, 67.6, 43.3),
-  7: GrowthRef(8.3, 69.2, 44.0),
-  8: GrowthRef(8.6, 70.6, 44.5),
-  9: GrowthRef(8.9, 72.0, 45.0),
-  10: GrowthRef(9.2, 73.3, 45.4),
-  11: GrowthRef(9.4, 74.5, 45.8),
-  12: GrowthRef(9.6, 75.7, 46.1),
-};
-
-const Map<int, GrowthRef> _girlRef = {
-  0: GrowthRef(3.2, 49.1, 33.9),
-  1: GrowthRef(4.2, 53.7, 36.5),
-  2: GrowthRef(5.1, 57.1, 38.3),
-  3: GrowthRef(5.8, 59.8, 39.5),
-  4: GrowthRef(6.4, 62.1, 40.6),
-  5: GrowthRef(6.9, 64.0, 41.5),
-  6: GrowthRef(7.3, 65.7, 42.2),
-  7: GrowthRef(7.6, 67.3, 42.8),
-  8: GrowthRef(7.9, 68.7, 43.4),
-  9: GrowthRef(8.2, 70.1, 43.8),
-  10: GrowthRef(8.5, 71.5, 44.2),
-  11: GrowthRef(8.7, 72.8, 44.6),
-  12: GrowthRef(8.9, 74.0, 44.9),
-};
+// ⚠️ REPLACED 2026-10-02 by the WHO tables in pp_who_growth_lms.dart, which
+// run to five years (these stopped at 12 months and clamped every older
+// child to a one-year-old). Kept for revert:
+// const Map<int, GrowthRef> _boyRef = {
+//   0: GrowthRef(3.3, 49.9, 34.5),
+//   1: GrowthRef(4.5, 54.7, 37.3),
+//   2: GrowthRef(5.6, 58.4, 39.1),
+//   3: GrowthRef(6.4, 61.4, 40.5),
+//   4: GrowthRef(7.0, 63.9, 41.6),
+//   5: GrowthRef(7.5, 65.9, 42.6),
+//   6: GrowthRef(7.9, 67.6, 43.3),
+//   7: GrowthRef(8.3, 69.2, 44.0),
+//   8: GrowthRef(8.6, 70.6, 44.5),
+//   9: GrowthRef(8.9, 72.0, 45.0),
+//   10: GrowthRef(9.2, 73.3, 45.4),
+//   11: GrowthRef(9.4, 74.5, 45.8),
+//   12: GrowthRef(9.6, 75.7, 46.1),
+// };
+//
+// const Map<int, GrowthRef> _girlRef = {
+//   0: GrowthRef(3.2, 49.1, 33.9),
+//   1: GrowthRef(4.2, 53.7, 36.5),
+//   2: GrowthRef(5.1, 57.1, 38.3),
+//   3: GrowthRef(5.8, 59.8, 39.5),
+//   4: GrowthRef(6.4, 62.1, 40.6),
+//   5: GrowthRef(6.9, 64.0, 41.5),
+//   6: GrowthRef(7.3, 65.7, 42.2),
+//   7: GrowthRef(7.6, 67.3, 42.8),
+//   8: GrowthRef(7.9, 68.7, 43.4),
+//   9: GrowthRef(8.2, 70.1, 43.8),
+//   10: GrowthRef(8.5, 71.5, 44.2),
+//   11: GrowthRef(8.7, 72.8, 44.6),
+//   12: GrowthRef(8.9, 74.0, 44.9),
+// };
+//
+// GrowthRef expectedGrowth(int months, {bool boy = true}) {
+//   final m = months.clamp(0, 12);
+//   final table = boy ? _boyRef : _girlRef;
+//   return table[m] ?? table[12]!;
+// }
 
 GrowthRef expectedGrowth(int months, {bool boy = true}) {
-  final m = months.clamp(0, 12);
-  final table = boy ? _boyRef : _girlRef;
-  return table[m] ?? table[12]!;
+  final a = months.clamp(0, kWhoMaxMonths).toDouble();
+  return GrowthRef(
+    _round1(whoLms(WhoIndicator.weight, boy, a).$2),
+    _round1(whoLms(WhoIndicator.length, boy, a).$2),
+    _round1(whoLms(WhoIndicator.head, boy, a).$2),
+  );
 }
+
+double _round1(double v) => (v * 10).round() / 10;
 
 /// One child. `id` is client-generated so the local row and the cloud row share
 /// an id (the house rule - makes sync a plain id-keyed merge).
@@ -97,11 +113,22 @@ class Child {
     required this.heightCm,
     required this.headCm,
     this.birthWeightKg = 0,
+    this.sexGiven = true,
   });
 
   final String id;
   String name;
   bool isBoy;
+
+  /// False when the parent skipped "Boy or girl". Then [isBoy] is only a
+  /// stand-in (the cloud column is `not null`), and nothing may call the child
+  /// "he" or "she": the pronoun getters on [ChildProfileStore] use the name or
+  /// "your baby" instead. Gap analysis P1 (2026-10-02): a skipped answer used
+  /// to be saved as a boy, and every page then said "him".
+  ///
+  /// Local only until the user runs the migration that adds `sex_given` to
+  /// public.children; see [kChildSexGivenColumn].
+  bool sexGiven;
   DateTime dob;
   double weightKg;
   double heightCm;
@@ -141,6 +168,7 @@ class Child {
         heightCm: heightCm,
         headCm: headCm,
         birthWeightKg: birthWeightKg,
+        sexGiven: sexGiven,
       );
 
   /// 'YYYY-MM-DD' for the `dob date` column (and the local cache).
@@ -157,6 +185,7 @@ class Child {
         'heightCm': heightCm,
         'headCm': headCm,
         'birthWeightKg': birthWeightKg,
+        'sexGiven': sexGiven,
       };
 
   factory Child.fromJson(Map<String, dynamic> j) => Child(
@@ -168,6 +197,7 @@ class Child {
         heightCm: (j['heightCm'] as num?)?.toDouble() ?? 0,
         headCm: (j['headCm'] as num?)?.toDouble() ?? 0,
         birthWeightKg: (j['birthWeightKg'] as num?)?.toDouble() ?? 0,
+        sexGiven: j['sexGiven'] != false,
       );
 
   // camelCase model <-> snake_case columns. `user_id` is NOT here: on insert
@@ -181,6 +211,9 @@ class Child {
         'weight_kg': weightKg,
         'height_cm': heightCm,
         'head_cm': headCm,
+        // Only once the column exists: PostgREST rejects a row naming an
+        // unknown column, and a rejected fire-and-forget write is silent.
+        if (kChildSexGivenColumn) 'sex_given': sexGiven,
       };
 
   factory Child.fromRow(Map<String, dynamic> r) => Child(
@@ -196,8 +229,15 @@ class Child {
         // written yet (STILL-OPEN), and a client that crashed on a missing
         // column would take the whole child list down with it.
         birthWeightKg: (r['birth_weight_kg'] as num?)?.toDouble() ?? 0,
+        // Missing column (migration not run) reads as "given", and the sync
+        // below then keeps the phone's own answer rather than this default.
+        sexGiven: r['sex_given'] != false,
       );
 }
+
+/// Flip to true once `supabase/migrations/0093_children_sex_given.sql` has
+/// been run. Until then `sex_given` is kept on this phone only.
+const bool kChildSexGivenColumn = false;
 
 class ChildProfileStore extends ChangeNotifier {
   ChildProfileStore._();
@@ -312,6 +352,7 @@ class ChildProfileStore extends ChangeNotifier {
     required String name,
     required bool isBoy,
     required DateTime dob,
+    bool sexGiven = true,
     double weightKg = 0,
     double heightCm = 0,
     double headCm = 0,
@@ -326,6 +367,7 @@ class ChildProfileStore extends ChangeNotifier {
       heightCm: heightCm,
       headCm: headCm,
       birthWeightKg: birthWeightKg,
+      sexGiven: sexGiven,
     );
     _children.add(c);
     _activeId = c.id;
@@ -387,6 +429,15 @@ class ChildProfileStore extends ChangeNotifier {
         ascending: true,
       );
       final byId = {for (final r in rows) r['id'].toString(): Child.fromRow(r)};
+      // A cloud row without `sex_given` (column not there yet) must not turn a
+      // child whose sex was not given back into a boy.
+      for (final r in rows) {
+        if (r.containsKey('sex_given')) continue;
+        final id = r['id'].toString();
+        for (final c in _children) {
+          if (c.id == id) byId[id]!.sexGiven = c.sexGiven;
+        }
+      }
 
       // Push up any child saved locally while logged out / offline.
       for (final c in _children) {
@@ -464,6 +515,34 @@ class ChildProfileStore extends ChangeNotifier {
   int get ageInDays => (ageInWeeks * 7).round();
   int get ageInMonths => (ageInWeeks / 4.345).floor();
 
+  // ---- corrected age (2026-10-07) -----------------------------------------
+  //  Gap analysis P2 (Behind · Onboarding): "We tell parents to use corrected
+  //  age and then show every page by the birthday." For a baby born early with
+  //  the weeks known (onboarding), development is read by CORRECTED age to 24
+  //  months: the phase, the month note and the milestones. Vaccines, the
+  //  messages' birthdays and the WHO growth points stay on the birthday, as
+  //  paediatricians do.
+
+  /// Weeks to take off, while it still applies (under 24 months, born early
+  /// with the weeks known). Null otherwise.
+  int? get correctionWeeks {
+    final w = FamilyProfileStore.instance.bornWeeks;
+    if (w == null || w >= 37 || ageInMonths >= 24) return null;
+    return 40 - w;
+  }
+
+  /// Age for development: corrected when [correctionWeeks] applies.
+  int get devAgeInMonths {
+    final c = correctionWeeks;
+    if (c == null) return ageInMonths;
+    final weeks = ageInWeeks - c;
+    return weeks <= 0 ? 0 : (weeks / 4.345).floor();
+  }
+
+  /// "8 months (6 months corrected)", or the plain label.
+  String get ageLabelWithCorrection =>
+      correctionWeeks == null ? ageLabel : '$ageLabel ($devAgeInMonths months corrected)';
+
   /// "4 months 1 week" / "6 weeks" — a warm, human age label.
   String get ageLabel {
     final months = ageInMonths;
@@ -484,17 +563,32 @@ class ChildProfileStore extends ChangeNotifier {
   //  "Aarav"), so a parent of a daughter read about somebody else's son. These
   //  follow the ACTIVE child, and switching children switches the copy.
 
-  /// "he" / "she"
-  String get they => isBoy ? 'he' : 'she';
+  //  When the sex was not given (Child.sexGiven false) each one falls back to
+  //  the name, or "your baby" while there is no name, so a sentence still
+  //  reads: "Hold Meera close", "your baby's own curve".
 
-  /// "his" / "her" - possessive determiner ("his own curve").
-  String get their => isBoy ? 'his' : 'her';
+  /// Whether a he/she may be used at all.
+  bool get sexGiven => active.sexGiven;
 
-  /// "him" / "her" - object pronoun ("hold him").
-  String get them => isBoy ? 'him' : 'her';
+  /// "he" / "she" / the name
+  String get they => !sexGiven ? active.nameMid : (isBoy ? 'he' : 'she');
 
-  /// Sentence-initial "He" / "She".
-  String get theyCap => isBoy ? 'He' : 'She';
+  /// "his" / "her" / "Meera's" - possessive determiner ("his own curve").
+  String get their => !sexGiven ? "${active.nameMid}'s" : (isBoy ? 'his' : 'her');
+
+  /// "him" / "her" / the name - object pronoun ("hold him").
+  String get them => !sexGiven ? active.nameMid : (isBoy ? 'him' : 'her');
+
+  /// Sentence-initial "He" / "She" / the name.
+  String get theyCap => !sexGiven ? _cap(active.nameMid) : (isBoy ? 'He' : 'She');
+
+  /// Sentence-initial "His" / "Her" / "Meera's".
+  String get theirCap => _cap(their);
+
+  /// "Boy", "Girl" or "Not given", for detail rows.
+  String get sexLabel => !sexGiven ? 'Not given' : (isBoy ? 'Boy' : 'Girl');
+
+  static String _cap(String s) => s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
 
   /// A one-line, non-judgemental read on where the child sits vs the reference.
   String get growthNote =>
@@ -510,6 +604,7 @@ class ChildProfileStore extends ChangeNotifier {
   Future<void> update({
     String? name,
     bool? isBoy,
+    bool? sexGiven,
     DateTime? dob,
     double? weightKg,
     double? heightCm,
@@ -523,7 +618,12 @@ class ChildProfileStore extends ChangeNotifier {
         : active;
 
     if (name != null && name.trim().isNotEmpty) c.name = name.trim();
-    if (isBoy != null) c.isBoy = isBoy;
+    if (isBoy != null) {
+      c.isBoy = isBoy;
+      c.sexGiven = sexGiven ?? true;
+    } else if (sexGiven != null) {
+      c.sexGiven = sexGiven;
+    }
     if (dob != null) c.dob = dob;
     if (weightKg != null) c.weightKg = weightKg;
     if (heightCm != null) c.heightCm = heightCm;

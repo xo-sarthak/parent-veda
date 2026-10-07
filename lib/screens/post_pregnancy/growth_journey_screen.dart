@@ -20,6 +20,16 @@ import 'pp_common.dart';
 import 'pp_health_data.dart';
 import 'pp_growth_data.dart';
 import 'pp_tools_kit.dart';
+import '../../theme/pv_fonts.dart';
+import '../brackets/hub/hub_intent_art.dart' show IntentMark;
+import '../doors/pv_list_row.dart';
+import '../pregnancy/preg_tool_chrome.dart';
+import '../products/pv_store_chrome.dart' show PvCommit, pvStorePalette;
+import '../v2/v2_palette.dart';
+import 'pp_care_parts.dart' show ppCareHeading, ppCareChoices;
+
+/// The shared tool shell for Growth (2026-10-07). False draws the old page.
+const bool kPpGrowthShell = true;
 
 class GrowthJourneyScreen extends StatefulWidget {
   const GrowthJourneyScreen({super.key});
@@ -32,8 +42,158 @@ class _GrowthJourneyScreenState extends State<GrowthJourneyScreen> {
   final _store = GrowthStore.instance;
   GrowthMetric _metric = GrowthMetric.weight;
 
+  // ---- the one ParentVeda look (2026-10-07) ------------------------------------
+  //  The user: the parenting tools "very inconsistent". Growth now wears the
+  //  shell every TTC and pregnancy tool wears (PregToolScaffold), the care
+  //  tools' stat strip, the store's chips for the metric, the ink line on the
+  //  chart, and PvListRow for the history. The store, the WHO maths and the add
+  //  sheet are unchanged. The old page is `_buildBeforeShell`, kept for revert.
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => kPpGrowthShell ? _buildShell(context) : _buildBeforeShell(context);
+
+  Widget _buildShell(BuildContext context) {
+    final p = pvStorePalette;
+    return AnimatedBuilder(
+      animation: _store,
+      builder: (context, _) {
+        final m = _store.latest;
+        return PregToolScaffold(
+          hue: 152,
+          eyebrow: 'Health',
+          mark: IntentMark.scaleMark,
+          title: 'Growth',
+          intro: 'Is $_childName growing in a healthy, expected way? That, not the number, is the question.',
+          // ⚠️ APPLE HEALTH'S ORDER (Mobbin audit, 2026-10-07): the metric
+          // switch first, then the latest value large with its date and one
+          // plain-language line, then the chart, then the log; after Apple
+          // Health's Blood Pressure (mobbin.com/screens/f6471b67-8921-4d71-826b-476849a1ec61).
+          // Kept for revert: the three-stat strip, headline and summary first.
+          children: [
+            if (_store.isEmpty) ...[
+              pregToolPad(Text('No measurements yet',
+                  style: pvFraunces(fontSize: 20, fontWeight: FontWeight.w600, height: 1.25, color: p.ink1))),
+              const SizedBox(height: 6),
+              pregToolPad(Text(_summaryLine(), style: pvManrope(fontSize: 14, height: 1.55, color: p.ink2))),
+              const SizedBox(height: 16),
+              pregToolPad(PvCommit(
+                key: const ValueKey('pp_growth_add'),
+                label: 'Add a measurement',
+                onTap: _openAddSheet,
+              )),
+            ] else ...[
+              pregToolPad(ppCareChoices<GrowthMetric>(
+                values: [for (final g in GrowthMetric.values) if (g != GrowthMetric.head || _store.hasHead) g],
+                selected: _metric,
+                label: (g) => g.label,
+                onPick: (g) {
+                  if (g != null) setState(() => _metric = g);
+                },
+                keyPrefix: 'pp_growth_metric',
+              )),
+              const SizedBox(height: 16),
+              if (m != null) ...[
+                pregToolPad(Text(_valueOf(m, _metric),
+                    key: const ValueKey('pp_growth_value'),
+                    style: pvFraunces(fontSize: 34, fontWeight: FontWeight.w600, height: 1.1, color: p.ink1))),
+                const SizedBox(height: 2),
+                pregToolPad(Text('Last measured ${ppShortDate(m.date)}',
+                    style: pvManrope(fontSize: 13, fontWeight: FontWeight.w600, color: p.ink3))),
+                const SizedBox(height: 10),
+                pregToolPad(Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: p.line),
+                  ),
+                  child: Text(_store.latestPercentilePhrase(_metric) ?? _store.headline,
+                      style: pvManrope(fontSize: 14, fontWeight: FontWeight.w600, height: 1.45, color: p.ink1)),
+                )),
+              ],
+              const SizedBox(height: 14),
+              pregToolPad(Container(
+                padding: const EdgeInsets.fromLTRB(12, 14, 12, 10),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: p.line),
+                ),
+                child: Column(children: [
+                  SizedBox(
+                    height: 190,
+                    child: CustomPaint(
+                      painter: _GrowthChartPainter(_store, _metric,
+                          line: p.ink1, band: p.ink1.withValues(alpha: 0.08), bandEdge: p.ink3),
+                      size: Size.infinite,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text('$_childName\'s own line, over the WHO typical range. Age in months along the bottom.',
+                      style: pvManrope(fontSize: 12, height: 1.4, color: p.ink3)),
+                ]),
+              )),
+              const SizedBox(height: 14),
+              pregToolPad(PvCommit(
+                key: const ValueKey('pp_growth_add'),
+                label: 'Add a measurement',
+                onTap: _openAddSheet,
+              )),
+              const SizedBox(height: 22),
+              pregToolPad(ppCareHeading('What the percentile means')),
+              const SizedBox(height: 6),
+              pregToolPad(Text(_store.percentileMeaning, style: pvManrope(fontSize: 14, height: 1.6, color: p.ink1))),
+              const SizedBox(height: 12),
+              pregToolPad(Text(_store.interpretation, style: pvManrope(fontSize: 14, height: 1.6, color: p.ink1))),
+              if (_store.insights.isNotEmpty) ...[
+                const SizedBox(height: 22),
+                pregToolPad(ppCareHeading('Worth knowing')),
+                const SizedBox(height: 6),
+                for (final line in _store.insights)
+                  pregToolPad(Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Text(line, style: pvManrope(fontSize: 14, height: 1.55, color: p.ink1)),
+                  )),
+              ],
+              const SizedBox(height: 22),
+              pregToolPad(ppCareHeading('Every measurement')),
+              const SizedBox(height: 6),
+              pregToolPad(PvRowGroup(p: p, children: [
+                for (final x in _store.all) _historyRow(p, x),
+              ])),
+            ],
+          ],
+        );
+      },
+    );
+  }
+
+  String _valueOf(GrowthMeasurement m, GrowthMetric g) => switch (g) {
+        GrowthMetric.weight => '${_trim(m.weightKg)} kg',
+        GrowthMetric.height => '${_trim(m.heightCm)} cm',
+        GrowthMetric.head => m.headCm == null ? 'Not measured' : '${_trim(m.headCm!)} cm',
+      };
+
+  Widget _historyRow(V2Palette p, GrowthMeasurement m) {
+    final ageM = m.ageMonthsAt(ChildProfileStore.instance.dob);
+    final wp = _store.percentile(GrowthMetric.weight, m.weightKg, ageM);
+    return PvListRow(
+      key: ValueKey('pp_growth_row_${m.id}'),
+      p: p,
+      leading: PvMarkWell(p: p, hue: 152, size: 40, mark: IntentMark.scaleMark),
+      title: '${_trim(m.weightKg)} kg, ${_trim(m.heightCm)} cm${m.headCm != null ? ', head ${_trim(m.headCm!)} cm' : ''}',
+      line: '${ppShortDate(m.date)}, ${ageM.round()} months${wp == null ? '' : ', around the ${(wp / 5).round() * 5}th centile'}',
+      trailing: IconButton(
+        tooltip: 'Remove',
+        icon: Icon(Icons.delete_outline_rounded, size: 20, color: p.ink3),
+        onPressed: () => ppConfirmRemove(context, 'Remove this measurement?', () => _store.remove(m.id)),
+      ),
+      onTap: () {},
+    );
+  }
+
+  // Kept for revert (2026-10-07): the page before the shared shell.
+  Widget _buildBeforeShell(BuildContext context) {
     return Scaffold(
       backgroundColor: ppBg,
       body: SafeArea(
@@ -388,9 +548,15 @@ class _GrowthJourneyScreenState extends State<GrowthJourneyScreen> {
 //  The chart: a calm "typical range" band + the child's own connected line.
 // =============================================================================
 class _GrowthChartPainter extends CustomPainter {
-  _GrowthChartPainter(this.store, this.metric);
+  _GrowthChartPainter(this.store, this.metric, {this.line = ppPurple, this.band, this.bandEdge});
   final GrowthStore store;
   final GrowthMetric metric;
+
+  /// The child's line and dots. The shell passes ink (2026-10-07); the old
+  /// page keeps the purple defaults.
+  final Color line;
+  final Color? band;
+  final Color? bandEdge;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -446,18 +612,18 @@ class _GrowthChartPainter extends CustomPainter {
       band.lineTo(dx(o.dx), dy(o.dy));
     }
     band.close();
-    canvas.drawPath(band, Paint()..color = const Color(0x33B98DE0)..style = PaintingStyle.fill);
+    canvas.drawPath(band, Paint()..color = this.band ?? const Color(0x33B98DE0)..style = PaintingStyle.fill);
 
     // median (dashed)
     final medPaint = Paint()
-      ..color = const Color(0xFFB98DE0)
+      ..color = bandEdge ?? const Color(0xFFB98DE0)
       ..strokeWidth = 1.5
       ..style = PaintingStyle.stroke;
     _dashedPolyline(canvas, [for (final o in midPts) Offset(dx(o.dx), dy(o.dy))], medPaint);
 
     // child's line
     final linePaint = Paint()
-      ..color = ppPurple
+      ..color = line
       ..strokeWidth = 2.5
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round
@@ -472,11 +638,11 @@ class _GrowthChartPainter extends CustomPainter {
     for (final p in pts) {
       final c = Offset(dx(p.dx), dy(p.dy));
       canvas.drawCircle(c, 5, Paint()..color = Colors.white);
-      canvas.drawCircle(c, 5, Paint()..color = ppPurple..style = PaintingStyle.stroke..strokeWidth = 2.5);
+      canvas.drawCircle(c, 5, Paint()..color = line..style = PaintingStyle.stroke..strokeWidth = 2.5);
     }
     // emphasise the latest point
     final last = Offset(dx(pts.last.dx), dy(pts.last.dy));
-    canvas.drawCircle(last, 5, Paint()..color = ppPurple);
+    canvas.drawCircle(last, 5, Paint()..color = line);
   }
 
   void _dashedPolyline(Canvas canvas, List<Offset> points, Paint paint, {double dash = 5, double gap = 4}) {
