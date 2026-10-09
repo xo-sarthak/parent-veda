@@ -558,7 +558,8 @@ PvYouThing _ppCareCircle() => PvYouThing(
   icon: Icons.diversity_1_outlined,
   art: ttcArtTab(TtcTabMark.heartHand),
   title: 'Your Care Circle',
-  subtitle: 'The people supporting you through this',
+  // Named, not 'through this' (ttc_explicit_labels_test, 2026-10-09).
+  subtitle: 'The people helping you raise your child',
   open: (c) => _push(c, const CareCircleScreen(), 'pp/care_circle'),
 );
 

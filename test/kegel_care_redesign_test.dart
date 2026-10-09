@@ -239,7 +239,15 @@ void main() {
           holdSeconds: 5, relaxSeconds: 5, repetitions: 10, feedback: 'easy');
       await open(t);
       expect(find.byIcon(Icons.check_rounded), findsOneWidget);
-      expect(find.text('1'), findsWidgets);
+      // The sessions count, read from the store: it carries the earlier tests'
+      // sessions (init loads once), so it is not 1 here. The old
+      // expect(find.text('1'), findsWidgets) only passed while the seven-day
+      // strip showed the 1st of a month (fixed 2026-10-09).
+      expect(
+          find.descendant(
+              of: find.byKey(const ValueKey('kg_journey_numbers')),
+              matching: find.text('${store.kegelSessions}')),
+          findsWidgets);
       expect(t.takeException(), isNull);
       await done(t);
     });
