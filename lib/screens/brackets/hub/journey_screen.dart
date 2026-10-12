@@ -272,7 +272,10 @@ class _JourneyScreenState extends State<JourneyScreen> {
     // the order the journey author wrote them. Reading first, because when a
     // step offers both, the article is the answer and the consult is the
     // escalation.
-    final reads = [for (final e in step.elements) if (e.type == SolutionType.read) e];
+    // An owed read is left out rather than drawn as a "coming soon" card
+    // (user, 2026-10-12). It stays in the journey data, so it shows the day it
+    // is written. Kept for revert: the list had no `!e.owed` filter.
+    final reads = [for (final e in step.elements) if (e.type == SolutionType.read && !e.owed) e];
     final rest = [for (final e in step.elements) if (e.type != SolutionType.read) e];
 
     return [

@@ -552,12 +552,13 @@ final PvDoorPage kMindDoor = PvDoorPage(
         ),
         // ⚠️ NO COPY IN THE BRIEF — "How to raise it, with Ask Veda to word
         // it." Listed, not written. See the header.
-        PvDoorReadTile.comingSoon(
-          title: 'Tell your doctor',
-          blurb: "How to bring it up at your next visit, and words to use if "
-              "you can't find your own.",
-          meta: '3 MIN',
-        ),
+        // Hidden 2026-10-12: no "coming soon" reads (user). Kept for revert:
+        // PvDoorReadTile.comingSoon(
+        //   title: 'Tell your doctor',
+        //   blurb: "How to bring it up at your next visit, and words to use if "
+        //       "you can't find your own.",
+        //   meta: '3 MIN',
+        // ),
       ],
     ),
 

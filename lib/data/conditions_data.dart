@@ -118,6 +118,7 @@ class ConditionEntry {
     this.showReadMore = false,
     this.showWatch = false,
     this.watchEpisodes = 1,
+    this.watchEpisodeTitles = const [],
     this.highAnxiety = false,
     this.pregSignal,
     this.shortAnswer,
@@ -198,6 +199,14 @@ class ConditionEntry {
   /// starts. Conditions managed over months earn a series; a one-visit scare
   /// does not.
   final int watchEpisodes;
+
+  /// The series as a playlist: (title, one line) for each part, in order.
+  ///
+  /// Read by the Watch section to draw the episode list under the lead film
+  /// (the Flo "Birth control 101" shape). Empty means no list, only the lead
+  /// card. When it is set its length must equal [watchEpisodes]; the condition
+  /// test holds that.
+  final List<(String, String)> watchEpisodeTitles;
 
   /// Miscarriage and preeclampsia. Governs tone: no product, no upsell, and
   /// — for miscarriage specifically — no cheerful language anywhere on the
@@ -333,6 +342,16 @@ final List<ConditionEntry> kCommonConditions = [
     showWatch: true,
     pregSignal: PregCondition.gestationalDiabetes,
     watchEpisodes: 4,
+    watchEpisodeTitles: [
+      ('What gestational diabetes is',
+          'Why pregnancy hormones can push blood sugar up.'),
+      ('The sugar test, step by step',
+          'What the glucose test involves, and what the numbers mean.'),
+      ('Living with it day to day',
+          'Meals, a walk after eating, and finger-prick checks.'),
+      ('Birth and after',
+          'What it means for delivery, your baby, and checks later on.'),
+    ],
   ),
   ConditionEntry(
     id: 'thyroid',
@@ -400,6 +419,12 @@ final List<ConditionEntry> kCommonConditions = [
     showWatch: true,
     pregSignal: PregCondition.thyroid,
     watchEpisodes: 2,
+    watchEpisodeTitles: [
+      ('Your thyroid in pregnancy',
+          'Why your baby relies on your thyroid hormone early on.'),
+      ('Tests and tablets',
+          'TSH checks, dose changes, and taking the tablet the right way.'),
+    ],
   ),
   ConditionEntry(
     id: 'anemia',
@@ -746,6 +771,14 @@ final List<ConditionEntry> kCommonConditions = [
     showWatch: true,
     pregSignal: PregCondition.hypertension,
     watchEpisodes: 3,
+    watchEpisodeTitles: [
+      ('High blood pressure in pregnancy',
+          "The kinds there are, and why it's watched closely."),
+      ('Checking it at home',
+          'Taking a reading the right way, and what to write down.'),
+      ('Signs to call about today',
+          'Headache, blurred vision, sudden swelling: when to go in.'),
+    ],
   ),
   ConditionEntry(
     id: 'ectopic',

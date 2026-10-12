@@ -83,7 +83,8 @@ class ConditionDetailScreen extends StatelessWidget {
           journey: _ConditionBlock.journey,
           foot: [
             if (entry.showMedicine) _ConditionBlock.medicine,
-            if (entry.showReadMore) _ConditionBlock.readMore,
+            // No "coming soon" reads (user, 2026-10-12: "basically no coming soon like that"). The two read cards were placeholders on every condition page. Kept for revert: 
+            // if (entry.showReadMore) _ConditionBlock.readMore,
           ],
           offerConsult: !entry.highAnxiety,
         );
@@ -395,10 +396,11 @@ class ConditionDetailScreen extends StatelessWidget {
               // ---- foot: only where genuinely relevant ---------------------------
               if (entry.showMedicine)
                 _MedicineAsk(entry: entry, pregnancy: pregnancy, p: p, lang: lang, store: store),
-              if (entry.showReadMore) ...[
-                const SizedBox(height: 26),
-                _ReadMoreSection(entry: entry, p: p, lang: lang),
-              ],
+              // No "coming soon" reads (user, 2026-10-12: "basically no coming soon like that"). The two read cards were placeholders on every condition page. Kept for revert: 
+              // if (entry.showReadMore) ...[
+              //   const SizedBox(height: 26),
+              //   _ReadMoreSection(entry: entry, p: p, lang: lang),
+              // ],
               // ⚠️ WATCH IS NO LONGER HERE — it moved to the top of the page,
               // above "What this is". See the note at its new call site for
               // why. Left as a marker rather than silently absent, because the
@@ -688,6 +690,8 @@ class _MedicineAsk extends StatelessWidget {
 // -----------------------------------------------------------------------------
 //  Foot section 2 — read more
 // -----------------------------------------------------------------------------
+// Unused since 2026-10-12 (the read cards were "coming soon"). Kept for revert.
+// ignore: unused_element
 class _ReadMoreSection extends StatelessWidget {
   const _ReadMoreSection({required this.entry, required this.p, required this.lang});
   final ConditionEntry entry;
@@ -744,6 +748,9 @@ class _WatchSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final series = entry.watchEpisodes > 1;
+    // The playlist: the lead card is part 1, the list under it is every part.
+    final parts = entry.watchEpisodeTitles;
+    final playlist = series && parts.length == entry.watchEpisodes;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -760,7 +767,9 @@ class _WatchSection extends StatelessWidget {
           // on a four-part series is a promise the card cannot keep, and the
           // first thing she would notice is that the app told her the wrong
           // length before she started.
-          title: (series
+          title: playlist
+              ? parts.first.$1
+              : (series
                   ? const LocalizedText(
                       en: 'Understanding this, start to finish',
                       hi: 'Understanding this, start to finish')
@@ -768,7 +777,9 @@ class _WatchSection extends StatelessWidget {
                       en: 'Explained in five minutes',
                       hi: 'Explained in five minutes'))
               .of(lang),
-          subtitle: const LocalizedText(
+          subtitle: playlist
+              ? parts.first.$2
+              : const LocalizedText(
                   en: "What's happening in your body, drawn in plain "
                       'pictures.',
                   hi: "What's happening in your body, drawn in plain "
@@ -780,10 +791,15 @@ class _WatchSection extends StatelessWidget {
           // running time here would read as "this one video is 40 minutes".
           duration: '5 MIN',
           episodeCount: entry.watchEpisodes,
+          listBelow: playlist,
           slotId: series
               ? 'condition_watch_series_${entry.id}'
               : 'condition_watch_${entry.id}',
         ),
+        if (playlist) ...[
+          const SizedBox(height: 10),
+          PvSeriesList(episodes: parts),
+        ],
       ],
     );
   }

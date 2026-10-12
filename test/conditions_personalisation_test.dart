@@ -252,7 +252,7 @@ void main() {
 
       final frame = t.getTopLeft(find.textContaining('does not replace')).dy;
       final video =
-          t.getTopLeft(find.textContaining('start to finish')).dy;
+          t.getTopLeft(find.text('What gestational diabetes is').first).dy;
       final what = t.getTopLeft(find.text('What this is')).dy;
 
       // ⚠️ THE FRAME STAYS FIRST. A video is the element most likely to be
@@ -271,7 +271,10 @@ void main() {
           ConditionDetailScreen(entry: _byId('gdm'), pregnancy: pregnancy));
       expect(_byId('gdm').watchEpisodes, 4);
       expect(find.text('1 / 4'), findsOneWidget);
-      expect(find.text('4-part series  ·  see all'), findsOneWidget);
+      // 2026-10-12: the series is a playlist, every part listed under the
+      // lead card, so the card no longer says "see all".
+      expect(find.text('4-part series'), findsOneWidget);
+      expect(find.text('IN THIS SERIES'), findsOneWidget);
 
       await _pump(
           t,

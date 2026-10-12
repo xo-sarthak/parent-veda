@@ -47,6 +47,7 @@ class PvVideoPlaceholder extends StatelessWidget {
     this.slotId,
     this.onTap,
     this.episodeCount = 1,
+    this.listBelow = false,
     this.flat = false,
     this.overlayTitle = false,
     this.still,
@@ -134,6 +135,12 @@ class PvVideoPlaceholder extends StatelessWidget {
   /// the least useful information: she does not need to see episode four to
   /// decide to start. One cover, an honest count, one tap.
   final int episodeCount;
+
+  /// True when a [PvSeriesList] is drawn right under this card. The card
+  /// then says "N-part series" without "see all", because every part is
+  /// already on the screen and a "see all" that leads nowhere is a broken
+  /// promise.
+  final bool listBelow;
 
   bool get _live => onTap != null;
 
@@ -410,7 +417,9 @@ class PvVideoPlaceholder extends StatelessWidget {
                         Icon(Icons.playlist_play_rounded,
                             size: 16, color: deep),
                         const SizedBox(width: 6),
-                        Text('$episodeCount-part series  ·  see all',
+                        Text(listBelow
+                                ? '$episodeCount-part series'
+                                : '$episodeCount-part series  ·  see all',
                             style: pvManrope(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w700,
@@ -663,6 +672,134 @@ class PvReadPlaceholder extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+
+/// A video series drawn as a playlist: one row per part, under the lead card.
+///
+/// The shape is Flo's "Birth control 101" (Mobbin, 2026-10-12): a small
+/// thumbnail with a play mark on the left, "Part N" and the title on the right,
+/// one line saying what the part covers. Udemy's lecture list adds the other
+/// half: the part that is on screen is marked, so she can see where the lead
+/// card sits in the series.
+///
+/// While the films are not made the rows do not tap, and the lead card above
+/// carries the one "coming soon" mark. Repeating it on every row would be four
+/// labels saying the same thing.
+class PvSeriesList extends StatelessWidget {
+  const PvSeriesList({
+    super.key,
+    required this.episodes,
+    this.hue = 268,
+    this.current = 0,
+    this.onTap,
+  });
+
+  /// (title, one line) for each part, in order.
+  final List<(String, String)> episodes;
+  final double hue;
+
+  /// Which part the lead card is showing.
+  final int current;
+
+  /// Opens part `i`. Null while the films are not made.
+  final void Function(int i)? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = V2PaletteStore.instance.current;
+    final tint = v2BlockTint(hue, p);
+    final deep = HSLColor.fromColor(tint)
+        .withSaturation(0.42)
+        .withLightness(0.52)
+        .toColor();
+    return Container(
+      decoration: BoxDecoration(
+        color: p.surface,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: p.line),
+      ),
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(14, 8, 14, 4),
+            child: Text('IN THIS SERIES',
+                style: pvManrope(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1.1,
+                    color: p.ink2)),
+          ),
+          for (var i = 0; i < episodes.length; i++)
+            Semantics(
+              label: 'Part ${i + 1} of ${episodes.length}: ${episodes[i].$1}',
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: onTap == null ? null : () => onTap!(i),
+                child: Container(
+                  color: i == current
+                      ? tint.withValues(alpha: 0.35)
+                      : Colors.transparent,
+                  padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: 72,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: tint,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        alignment: Alignment.center,
+                        child: Icon(Icons.play_arrow_rounded,
+                            size: 22, color: deep),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                                i == current
+                                    ? 'PART ${i + 1}  ·  SHOWN ABOVE'
+                                    : 'PART ${i + 1}',
+                                style: pvManrope(
+                                    fontSize: 10.5,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 0.8,
+                                    color: deep)),
+                            const SizedBox(height: 2),
+                            Text(episodes[i].$1,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: pvManrope(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700,
+                                    height: 1.3,
+                                    color: p.ink1)),
+                            const SizedBox(height: 2),
+                            Text(episodes[i].$2,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: pvManrope(
+                                    fontSize: 12.5,
+                                    height: 1.4,
+                                    color: p.ink2)),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
