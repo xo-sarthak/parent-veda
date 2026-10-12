@@ -72,6 +72,7 @@ import '../products/pv_orders_screen.dart';
 import '../referral/invite_friends_screen.dart';
 import '../reminders_screen.dart';
 import '../skilling/sk_child_store.dart';
+import '../skilling/skilling_preview_screen.dart';
 import '../ttc/ttc_strings.dart' show TtcLang, TtcPartnerMode, TtcS;
 import 'pv_account_actions.dart';
 import 'pv_child_screen.dart';
@@ -2622,6 +2623,15 @@ class _PvYouScreenState extends State<PvYouScreen> {
                       selected: _doorOf(current) == d,
                       onTap: () => _switchStage(d),
                     ),
+                  // Skilling is not a StageDoor on purpose (see
+                  // stage_gateway.dart), so the parent-facing menu stays at
+                  // three. This testing row is the one place a build can
+                  // reach it without redoing onboarding.
+                  PvChip(
+                    label: 'Skilling (6+)',
+                    selected: current == LifeStage.skilling,
+                    onTap: _switchToSkilling,
+                  ),
                 ],
               ),
               // The TTC "view as her / him" switch — the classic TTC
@@ -2709,6 +2719,22 @@ class _PvYouScreenState extends State<PvYouScreen> {
           child: DeveloperSwitches(),
         ),
       ],
+    );
+  }
+
+  /// Testing only: sets the stage to skilling and opens its home, the same
+  /// screen and route name the splash uses when the stored stage is skilling.
+  void _switchToSkilling() {
+    LifeStageStore.instance.setStage(LifeStage.skilling);
+    // A push, not a stack reset: the other three chips find their way back
+    // by popping to the root shell, so the root has to still be there.
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        settings: const RouteSettings(name: 'skilling'),
+        builder: (_) => SkillingPreviewScreen(
+          lang: PregnancyController.current?.language ?? AppLanguage.english,
+        ),
+      ),
     );
   }
 
