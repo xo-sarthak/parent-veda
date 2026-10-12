@@ -92,6 +92,8 @@ String ttcWindowForHim(String s) => !TtcPartnerMode.instance.on
         .replaceAll("you're", "she's")
         .replaceAll("You're", "She's")
         .replaceAll('the day you ovulate', 'the day she ovulates')
+        .replaceAll('where you are today', 'where she is today')
+        .replaceAll('inside you', 'inside her')
         .replaceAll(RegExp(r'\bYOUR\b'), 'HER')
         .replaceAll(RegExp(r'\bYour\b'), 'Her')
         .replaceAll(RegExp(r'\byour\b'), 'her');
@@ -165,7 +167,7 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
   /// sentences — "the longer the bar" means nothing on a curve. Switching view
   /// closes it rather than translating the step across, which would land her on
   /// step three of an explanation she has not started.
-  List<String> get _tourSteps => _view == _Across.list
+  List<String> get _tourSteps => (_view == _Across.list
       ? const [
           'Each row is one day of your fertile window.',
           'The longer the bar, the better the chance that day.',
@@ -179,7 +181,9 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
           'The shaded band is your fertile window: about six days, ending on '
               'the day you ovulate.',
           'The dot is ovulation. The dashes show where you are today.',
-        ];
+        ])
+      .map(ttcWindowForHim)
+      .toList();
 
   static const _terms = [
     (
@@ -311,7 +315,8 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
           Text(
               today.cycleDay == null
                   ? 'Today is $month'
-                  : 'Today is day ${today.cycleDay} of your cycle · $month',
+                  : ttcWindowForHim(
+                      'Today is day ${today.cycleDay} of your cycle · $month'),
               style: pvManrope(
                   fontSize: 12.5, fontWeight: FontWeight.w600, color: p.ink2)),
         ]),
@@ -571,8 +576,8 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
         // likely" what? It meant ovulation, and never said so).
         Text(
             w.cyclesAhead > 0
-                ? 'A guess from your usual cycle length. Nothing is logged '
-                    'for that cycle yet.'
+                ? ttcWindowForHim('A guess from your usual cycle length. '
+                    'Nothing is logged for that cycle yet.')
                 : status,
             style: pvManrope(
                 fontSize: 12.5, fontWeight: FontWeight.w700, color: p.ink1)),
@@ -590,9 +595,10 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
             style: pvManrope(fontSize: 14, height: 1.5, color: p.ink1)),
         const SizedBox(height: 10),
         Text(
-            'Why six days: sperm can live inside you for about five days, and '
-            'an egg for about one. So sex in the days before ovulation counts '
-            'too, and no single day has to be exactly right.',
+            ttcWindowForHim(
+                'Why six days: sperm can live inside you for about five days, '
+                'and an egg for about one. So sex in the days before ovulation '
+                'counts too, and no single day has to be exactly right.'),
             style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2)),
         const SizedBox(height: 16),
         // ⚠️ PAGING STOPS AT THIS CYCLE RATHER THAN WRAPPING. Paging past the
@@ -661,10 +667,11 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
             _view == _Across.list
                 ? 'A longer bar means a better day to try. The bars compare '
                     "these six days with each other. They aren't percentages."
-                : 'One whole cycle, from the first day of your period to the '
+                : ttcWindowForHim(
+                    'One whole cycle, from the first day of your period to the '
                     'day before the next. The shaded band is your six fertile '
                     "days. The line is highest on your best days. It isn't a "
-                    'percentage.',
+                    'percentage.'),
             style: pvManrope(fontSize: 12.5, height: 1.45, color: p.ink2)),
         const SizedBox(height: 16),
         // ⚠️ ONE `AnimatedSwitcher`, SIZED BY ITS CHILD, AND THE SLIDE IS
@@ -805,9 +812,10 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
                   color: p.action)),
           const SizedBox(height: 12),
           Text(
-              'About six days, ending on the day you ovulate. Sperm survive '
-              'about five days, and the egg about one. Because the window is '
-              'this wide, no single day has to be right.',
+              ttcWindowForHim(
+                  'About six days, ending on the day you ovulate. Sperm survive '
+                  'about five days, and the egg about one. Because the window '
+                  'is this wide, no single day has to be right.'),
               // Kept for revert (the seventh, margin day is gone, 2026-09-27):
               // 'about five days, and the egg about one. We add the day after as '
               // 'well, in case ovulation comes a day later than we estimate. '
@@ -849,7 +857,7 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
               padding: const EdgeInsets.only(top: 14),
               decoration:
                   BoxDecoration(border: Border(top: BorderSide(color: p.line))),
-              child: Text(_terms[_term!].$2,
+              child: Text(ttcWindowForHim(_terms[_term!].$2),
                   style:
                       pvManrope(fontSize: 13, height: 1.45, color: p.ink2)),
             ),
@@ -935,7 +943,7 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
   /// that moves.
   static String _dayNote(TtcFertileWindow w, DateTime date) {
     final days = date.difference(w.peakOn).inDays;
-    return switch (days) {
+    return ttcWindowForHim(switch (days) {
       // Kept for revert (2026-09-27, both Peak days are drawn the same now):
       //   0 => 'Ovulation is most likely today, give or take a day.',
       //   -1 => 'The day before ovulation. This is the highest of the six.',
@@ -950,7 +958,7 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
       _ when days < -3 =>
         'Still early in the window. Nothing has to be timed exactly today.',
       _ => 'Ovulation has passed, and the chance drops quickly.',
-    };
+    });
   }
 }
 
@@ -1100,8 +1108,9 @@ class _ListView extends StatelessWidget {
         const SizedBox(width: 8),
         Expanded(
           child: Text(
-              "Ovulation: the day you're likely to release an egg. Medium, "
-              'High and Peak compare the six days. Peak days are the best.',
+              ttcWindowForHim(
+                  "Ovulation: the day you're likely to release an egg. Medium, "
+                  'High and Peak compare the six days. Peak days are the best.'),
               style: pvManrope(fontSize: 11.5, height: 1.45, color: p.ink3)),
         ),
       ]),
@@ -1195,7 +1204,7 @@ class _CurveView extends StatelessWidget {
       // The axis caption, with the chevron the design puts after it — it reads
       // as "this is the span you are looking at", not as a button.
       Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-        Text('THE $len DAYS OF YOUR CYCLE',
+        Text(ttcWindowForHim('THE $len DAYS OF YOUR CYCLE'),
             style: pvManrope(
                 fontSize: 9,
                 fontWeight: FontWeight.w800,

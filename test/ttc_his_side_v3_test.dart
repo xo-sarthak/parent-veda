@@ -119,4 +119,27 @@ void main() {
     TtcPartnerMode.instance.on = false;
     expect(ttcWindowForHim('Your fertile days'), 'Your fertile days');
   });
+
+  test('the window screen speaks about her on his side, every line', () {
+    TtcPartnerMode.instance.on = true;
+    expect(ttcWindowForHim('Why six days: sperm can live inside you for about five days'),
+        'Why six days: sperm can live inside her for about five days');
+    expect(ttcWindowForHim('The dot is ovulation. The dashes show where you are today.'),
+        'The dot is ovulation. The dashes show where she is today.');
+    expect(ttcWindowForHim('THE 28 DAYS OF YOUR CYCLE'), 'THE 28 DAYS OF HER CYCLE');
+    expect(ttcWindowForHim('Today is day 9 of your cycle'), 'Today is day 9 of her cycle');
+    // Every string a user sees on the screen, other than her-only empty
+    // states, goes through the rewrite (source check, 2026-10-12).
+    final src = File('lib/screens/ttc/ttc_window_screen.dart').readAsStringSync();
+    for (final line in [
+      'Why six days: sperm can live inside you',
+      "Ovulation: the day you're likely to release an egg",
+      'One whole cycle, from the first day of your period',
+      'About six days, ending on the day you ovulate. Sperm survive',
+    ]) {
+      final at = src.indexOf(line);
+      expect(at, greaterThan(0), reason: line);
+      expect(src.substring(at - 80, at).contains('ttcWindowForHim('), isTrue, reason: line);
+    }
+  });
 }
