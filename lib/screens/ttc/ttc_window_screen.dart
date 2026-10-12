@@ -83,6 +83,19 @@ import 'ttc_treatment_screen.dart' show TtcTreatmentEntryCard;
 /// noted where they were. Kept for revert: const double kWindowHue = 273;
 const double kWindowHue = TtcCycleColours.fertileHue;
 
+/// Her window, read from his side (2026-10-10): the same facts about HER.
+/// Swaps only the forms that cannot go wrong ("your", "you're", "you
+/// ovulate"); a bare "you" can be an object ("tells you") and is left alone.
+String ttcWindowForHim(String s) => !TtcPartnerMode.instance.on
+    ? s
+    : s
+        .replaceAll("you're", "she's")
+        .replaceAll("You're", "She's")
+        .replaceAll('the day you ovulate', 'the day she ovulates')
+        .replaceAll(RegExp(r'\bYOUR\b'), 'HER')
+        .replaceAll(RegExp(r'\bYour\b'), 'Her')
+        .replaceAll(RegExp(r'\byour\b'), 'her');
+
 /// The Fertile window tool's opening line (launch sanity M3, 2026-09-28):
 /// what "fertile window" and "fertile days" mean, said once, in one
 /// sentence. The length comes from the two constants every date surface
@@ -93,9 +106,9 @@ String ttcWindowIntroLine() {
       ttcWindowOpensBeforeOvulation + ttcWindowClosesAfterOvulation + 1;
   const words = {5: 'five', 6: 'six', 7: 'seven'};
   final days = words[n] ?? '$n';
-  return 'Your fertile window is the $days days ending on the day you '
+  return ttcWindowForHim('Your fertile window is the $days days ending on the day you '
       'ovulate. These are your fertile days, the days you\'re most likely to '
-      'get pregnant, and they\'re coloured below.';
+      'get pregnant, and they\'re coloured below.');
 }
 
 /// Which picture the "Across this cycle" card is showing.
@@ -389,6 +402,17 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
   /// The window is withheld: say why in plain words, and put the one thing
   /// that brings it back on the card itself.
   Widget _withheld(TtcS t, TtcToday today) {
+    // HIS SIDE (2026-10-10): every empty state below offers HER action ("My
+    // period started", "Add the date"). From his side that would log her
+    // period into his copy, so he gets one line about her and no button.
+    if (TtcPartnerMode.instance.on) {
+      return const TtcEmpty(
+        icon: Icons.wb_twilight_rounded,
+        title: 'Her fertile days appear when she logs her period',
+        body: 'It comes from the period dates she logs. When she adds her '
+            'next period, her fertile days appear here for you too.',
+      );
+    }
     if (today.cycleDay == null ||
         today.noEstimate == TtcNoEstimate.noPeriodLogged) {
       return TtcEmpty(
@@ -459,7 +483,7 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
                 children: [
                   // Kept for revert: 'This cycle' : 'A cycle ahead'.
                   Text(
-                      (w.cyclesAhead == 0
+                      ttcWindowForHim(w.cyclesAhead == 0
                               ? 'Your fertile days this cycle'
                               : w.cyclesAhead == 1
                                   ? 'Your fertile days next cycle'
@@ -557,12 +581,12 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
         const SizedBox(height: 14),
         // ---- which day is best, and why, in words -------------------------
         Text(
-            hasBefore
+            ttcWindowForHim(hasBefore
                 ? 'Your best days are ${_d(before)} and ${_d(w.peakOn)}. '
                     "That's the day before you're likely to release an egg "
                     '(ovulation, the dot), and that day itself.'
                 : 'Your best day is ${_d(w.peakOn)}, the day you\'re likely '
-                    'to release an egg (ovulation, the dot).',
+                    'to release an egg (ovulation, the dot).'),
             style: pvManrope(fontSize: 14, height: 1.5, color: p.ink1)),
         const SizedBox(height: 10),
         Text(

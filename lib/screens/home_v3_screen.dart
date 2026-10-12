@@ -491,7 +491,10 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
                 onAvatar: () => openPvYou(context, stage: LifeStage.pregnancy),
                 onSaved: () => Navigator.of(context).push(MaterialPageRoute<void>(
                     settings: const RouteSettings(name: 'saved'),
-                    builder: (_) => const SavedScreen())),
+                    builder: (_) => const SavedScreen(stage: 'pregnancy'))),
+                onCalendar: () => Navigator.of(context).push(MaterialPageRoute<void>(
+                    settings: const RouteSettings(name: 'calendar'),
+                    builder: (_) => CalendarScreen(controller: pregnancy))),
               ),
             // ---- THE SHEET: everything under the fold ------------------------
             V3PregSheet(p: p, children: [

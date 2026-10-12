@@ -139,6 +139,7 @@ import 'ttc_profile_screen.dart';
 import 'ttc_ritual_screen.dart';
 import 'ttc_practice_card_parts.dart';
 import 'ttc_strings.dart';
+import 'ttc_partner_home.dart';
 import 'ttc_symptom_log_screen.dart';
 import 'ttc_surface_router.dart';
 // Kept for revert (2026-09-28): its `showTtcRowSheet` carried the myth,
@@ -365,6 +366,8 @@ class _TtcHomeV3State extends State<TtcHomeV3>
         // everything else in the sheet. The doors and the check card do not,
         // because doors that reshuffled as she walked the week would be a
         // menu moving under her thumb.
+        // His side of the same home (2026-10-10, ttc_partner_home.dart).
+        final him = TtcPartnerMode.instance.on;
         final phase = ttcHomePhaseOn(_selected);
         final checkMonths = TtcHomePrefs.instance.checkDismissed
             ? null
@@ -447,7 +450,7 @@ class _TtcHomeV3State extends State<TtcHomeV3>
                   // "Add your clinic's dates" share this one slot, strongest
                   // first, each said once (`ttcRoundNoticeNow`). Above the
                   // insights because each is about her, today.
-                  if (ttcRoundNoticeNow() != null) ...[
+                  if (!him && ttcRoundNoticeNow() != null) ...[
                     _pad(const TtcRoundHomeCard()),
                     const SizedBox(height: 24),
                   ],
@@ -458,7 +461,7 @@ class _TtcHomeV3State extends State<TtcHomeV3>
                   // opening the visit. Only on the day of a visit; draws
                   // nothing (and keeps its own spacing) on every other day.
                   // See ttc_visit_today_card.dart.
-                  _pad(const TtcVisitTodayCard()),
+                  if (!him) _pad(const TtcVisitTodayCard()),
 
                   // ---- THE DAILY INSIGHTS ----------------------------------
                   //
@@ -475,8 +478,9 @@ class _TtcHomeV3State extends State<TtcHomeV3>
                   // feel connected to the cards below rather than being two
                   // widgets that happen to share a screen.
                   _pad(_Head(
-                      eyebrow:
-                          hinglish ? 'Aaj ke liye' : 'My daily insights',
+                      eyebrow: hinglish
+                          ? 'Aaj ke liye'
+                          : (him ? 'Insights about her' : 'My daily insights'),
                       title: _dayTitle(_selected),
                       p: p)),
                   const SizedBox(height: 14),
@@ -502,7 +506,7 @@ class _TtcHomeV3State extends State<TtcHomeV3>
                   // for a while" message so the two agree. "Not now" is
                   // remembered. Above the doors because it is the one thing on
                   // this page that is about her, this month, and not a menu.
-                  if (checkMonths != null) ...[
+                  if (!him && checkMonths != null) ...[
                     _pad(TtcCheckCard(p: p, months: checkMonths)),
                     const SizedBox(height: 26),
                   ],
@@ -512,7 +516,12 @@ class _TtcHomeV3State extends State<TtcHomeV3>
                   // Until she has opened two steps of "Trying to conceive
                   // 101". It names the next step instead of counting them:
                   // the course has done its job as a way in once she is in.
-                  if (TtcHomePrefs.instance.offer101) ...[
+                  // HIS SIDE (2026-10-10): his block, where her next steps sit.
+                  if (him) ...[
+                    _pad(TtcPartnerHomeBlock(p: p)),
+                    const SizedBox(height: 32),
+                  ],
+                  if (!him && TtcHomePrefs.instance.offer101) ...[
                     _pad(Ttc101Card(
                         p: p, onAllSteps: () => openTtcTabV3(context, 1))),
                     const SizedBox(height: 26),
@@ -1647,6 +1656,11 @@ class _CycleHeader extends StatelessWidget {
           // for the blood test while an IVF-shaped round runs; a selected Sex
           // is ink with a white icon (§4.0), with a haptic and an Undo.
           // Kept for revert below: the two rows as they were.
+          // HIS SIDE (2026-10-10): nothing to log on his home; one line says
+          // why. See ttc_partner_home.dart.
+          if (TtcPartnerMode.instance.on)
+            TtcPartnerViewOnlyLine(p: p)
+          else
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -2589,6 +2603,14 @@ class _WindowLine extends StatelessWidget {
   ];
   static String _fmt(DateTime d) => '${d.day} ${_short[d.month - 1]}';
 
+  /// True when this cycle's window opens on one of its bleed days, which a
+  /// short cycle can do. Read from the resolver, like the period day itself.
+  static bool _windowOpensInPeriod(DateTime? day) {
+    final ctx = ttcDayContext(day ?? DateTime.now());
+    final opens = ctx.windowOpensCycleDay;
+    return opens != null && opens <= ctx.bleedDays;
+  }
+
   /// ⚠️ THE TALLEST THE BLOCK EVER GETS, AND IT IS FIXED — 2026-09-05.
   ///
   /// Reported: *"the homescreen hero is fixed in size i mean height wise"*. It
@@ -2684,7 +2706,7 @@ class _WindowLine extends StatelessWidget {
     // ⚠️ THE BIG SLOT TAKES THE ANSWER, NEVER THE SUBJECT. "end today", "in 3
     // days", "today and 2 more days". If it ever reads as a topic, the split
     // has been used backwards.
-    final (lead, big, sub) = switch (line.state) {
+    final (lead0, big, sub0) = switch (line.state) {
       TtcHeroState.startHere =>
         ('', t.headerStartHere, t.headerStartHereBody),
 
@@ -2708,10 +2730,23 @@ class _WindowLine extends StatelessWidget {
           t.headerCycleDayBig(line.days),
           t.headerClinicDatesPassed,
         ),
+      // 2026-10-10: the sub-line names WHY and what brings the days back.
+      // Kept for revert: the sub-line was `t.headerNoEstimateShort`.
       TtcHeroState.noEstimate => line.days > 0
           ? (t.leadYouAreOn, t.headerCycleDayBig(line.days),
-              t.headerNoEstimateShort)
+              t.headerNoEstimateWhy(TtcStore.instance.today.noEstimate))
           : ('', t.headerNoEstimate, t.headerNoEstimateBody),
+
+      // ---- her period days (2026-10-10) ----------------------------------
+      TtcHeroState.onPeriod => (
+          t.leadYourPeriod,
+          t.bigPeriodDay(line.days),
+          t.headerOnPeriodBody(
+            from: line.windowFrom == null ? null : _fmt(line.windowFrom!),
+            // A short cycle can open the window inside the bleed days.
+            overlaps: _windowOpensInPeriod(selected),
+          ),
+        ),
 
       // ---- the window ----------------------------------------------------
       TtcHeroState.windowOpensIn => (
@@ -2801,6 +2836,10 @@ class _WindowLine extends StatelessWidget {
             )
           : ('', t.headerPastCycle, t.headerBeforeFirstPeriodBody),
     };
+    // His side (2026-10-10): the same fact, in his voice.
+    final (lead, sub) = TtcPartnerMode.instance.on
+        ? ttcHeroForHim(line.state, lead0, sub0)
+        : (lead0, sub0);
 
     // ⚠️ THE TAP FOLLOWS THE SENTENCE. The hero has always opened the cycle
     // companion, which is the right destination for a window and the wrong one
@@ -2911,7 +2950,7 @@ class _WindowLine extends StatelessWidget {
 
   Widget _block(String lead, String big, String sub,
       {bool openTreatment = false, VoidCallback? onTapOverride}) {
-    return Builder(builder: (context) => GestureDetector(
+    return Builder(builder: (context) => PvPress(child: GestureDetector(
       onTap: onTapOverride ??
           (openTreatment
               ? () => openTtcSurface(context, 'ttc_treatment')
@@ -3086,7 +3125,7 @@ class _WindowLine extends StatelessWidget {
         ),
         ),
       ),
-    ));
+    )));
   }
 }
 
@@ -3850,7 +3889,7 @@ class _InsightRail extends StatelessWidget {
     // pill (`ttcHomeHidesQuickRow`). test/ttc_no_repetition_test.dart holds
     // it. Kept for revert: the round-step card, and the blood-test card on
     // every round.
-    final cards = <TtcInsightCard>[
+    final all = <TtcInsightCard>[
       // Day one of a new period: the read about it leads the rail
       // (2026-09-30), where the hero's pill used to be. Same condition.
       if (selected == today && ttcIsNewPeriodDayOne(selected))
@@ -4001,6 +4040,8 @@ class _InsightRail extends StatelessWidget {
         go: TtcInsightGo.products,
       ),
     ];
+    // His side (2026-10-10): her cycle and what is for both; never her logs.
+    final cards = TtcPartnerMode.instance.on ? ttcRailForHim(all) : all;
 
     return SizedBox(
       // ⚠️ 112, AND THE NUMBER IS MEASURED OFF THE REFERENCE RATHER THAN
@@ -5772,7 +5813,7 @@ class _RitualRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onOpen,
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -5826,7 +5867,7 @@ class _RitualRow extends StatelessWidget {
           Icon(Icons.chevron_right_rounded, size: 18, color: p.ink3),
         ]),
       ),
-    );
+    ));
   }
 }
 

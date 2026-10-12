@@ -153,12 +153,16 @@ Future<bool?> showObExistingAccountSheet(BuildContext context, String email) {
             const SizedBox(height: 10),
             Text(
               email.isEmpty
-                  ? 'This Google account was set up on ParentVeda before. '
-                        'We will open it as you left it. What you answered '
-                        'just now will not replace anything in it.'
-                  : '$email was set up on ParentVeda before. We will open '
-                        'it as you left it. What you answered just now will '
-                        'not replace anything in it.',
+                  // Plainer words 2026-10-10. Kept for revert: "This Google
+                  // account was set up on ParentVeda before. We will open it
+                  // as you left it. What you answered just now will not
+                  // replace anything in it."
+                  ? "You've used this Google account with us before, so we'll "
+                        'open it just as you left it. What you answered just '
+                        "now won't change anything in it."
+                  : "You've used $email with us before, so we'll "
+                        'open it just as you left it. What you answered just '
+                        "now won't change anything in it.",
               style: pvManrope(fontSize: 14.5, height: 1.5, color: p.ink2),
             ),
             const SizedBox(height: 22),
@@ -546,7 +550,8 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'For the whole journey — trying, expecting, raising.',
+                  // Kept for revert: 'For the whole journey — trying, expecting, raising.'
+                  'With you from trying for a baby to raising one.',
                   style: pvFraunces(
                     fontSize: 29,
                     fontWeight: FontWeight.w600,
@@ -557,8 +562,10 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'A few questions first, so the app you open is already yours. '
-                  'No account needed to start.',
+                  // Kept for revert: 'A few questions first, so the app you
+                  // open is already yours. No account needed to start.'
+                  'A few quick questions and your app is ready for you. '
+                  "You don't need an account to start.",
                   style: pvManrope(fontSize: 15, height: 1.5, color: p.ink2),
                 ),
                 if (invited) ...[
@@ -724,21 +731,20 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
               _privacyLine(
                 p,
                 'It works without an account.',
-                'Your week, your logs and your notes are saved on this phone '
-                    'first. Nothing waits on a signal.',
+                'Everything you add is saved on this phone first. It works '
+                    'even with no signal.',
               ),
               _privacyLine(
                 p,
                 'Nobody outside your home sees it.',
-                'Not an advertiser, not an employer, not an insurer. The only '
-                    'person who can see your logs is a partner you pair with '
-                    'yourself.',
+                'Not advertisers, not employers, not insurers. Only a '
+                    'partner you choose to link with can see what you log.',
               ),
               _privacyLine(
                 p,
                 'You can delete all of it.',
-                'One tap in You → Data and privacy, and it goes — from this '
-                    'phone and from our servers.',
+                'Go to You, then Data and privacy. One tap removes it from '
+                    'this phone and from our servers.',
               ),
             ],
           ),
@@ -928,7 +934,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
           eyebrow: 'Your name',
           title: 'What should we call you?',
           subtitle:
-              'It goes at the top of your home and nowhere else. You can skip it.',
+              "It's only shown at the top of your home. You can skip this if you like.",
         ),
         const SizedBox(height: 18),
         ObField(
@@ -1049,9 +1055,11 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
     art: ObArt.hello,
     title: _name0.isEmpty ? 'Good to have you here.' : 'Hello, $_name0.',
     body:
-        'From here the app is yours. What it shows you on a Tuesday morning '
-        'depends on what you tell us next — the week you are in, what you are '
-        'worried about, what you would rather not read.',
+        // Kept for revert: 'From here the app is yours. What it shows you on
+        // a Tuesday morning depends on what you tell us next — the week you
+        // are in, what you are worried about, what you would rather not read.'
+        'This is your space now. Tell us a little about where you are and '
+        "what's on your mind, and we'll show you what fits.",
     cta: 'Continue',
     onNext: _afterHello,
   );
@@ -1071,9 +1079,9 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
       final tri = w < 13 ? 'first' : (w < 27 ? 'second' : 'third');
       title = 'Week $w.';
       body =
-          'That puts you in the $tri trimester. From here every week has its '
-          'own page — what is changing, what is worth asking about, and what '
-          'you can safely ignore.';
+          "You're in your $tri trimester. Each week has its own page: "
+          "what's changing, what to ask your doctor, and what you don't "
+          'need to worry about.';
     } else {
       final dob = _childDob;
       final who = _childName.text.trim().isEmpty
@@ -1084,9 +1092,8 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
           ? '$who is ${age.$2} ${age.$2 == 1 ? 'week' : 'weeks'} old.'
           : '$who is ${age.$1} ${age.$1 == 1 ? 'month' : 'months'} old.';
       body =
-          'We will follow that with you — what changes this month, what is '
-          'normal at this age, and what other parents ask at exactly this '
-          'point.';
+          "We'll be right alongside you: what changes this month, what's "
+          'normal at this age, and what other parents are asking right now.';
     }
     return ObBeat(
       p: p,
@@ -1106,12 +1113,18 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
   Widget _beatPromise(V2Palette p) => ObBeat(
     p: p,
     art: ObArt.promise,
-    title: 'What we will never do.',
+    title: "What we'll never do.",
     body:
-        'We will never diagnose you, and we will never contradict your '
-        'doctor. When something needs a clinician we will say so plainly and '
-        'help you get ready for the appointment. If your doctor has told you '
-        'something different from what you read here, your doctor is right.',
+        // Kept for revert: 'We will never diagnose you, and we will never
+        // contradict your doctor. When something needs a clinician we will
+        // say so plainly and help you get ready for the appointment. If your
+        // doctor has told you something different from what you read here,
+        // your doctor is right.'
+        "We'll never tell you what's wrong with you. That's a doctor's "
+        "job, and we'll never go against yours. If something needs a "
+        "doctor, we'll say so clearly and help you get ready for the visit. "
+        'If your doctor says something different from what you read '
+        'here, go with your doctor.',
     cta: 'Good',
     onNext: () => setState(() {
       _q++;
@@ -1271,9 +1284,8 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
             ? 'Keep all of this.'
             : 'Keep all of this, $_name0.',
         subtitle:
-            'Your week, your answers and everything you log are on this phone '
-            'now. An account is what carries them to a new one — and what '
-            'lets your partner pair with you.',
+            'Everything so far is saved on this phone. An account keeps it '
+            'safe if you ever change phones, and lets your partner join you.',
       ),
       // ⚠️ "ALL OF THIS" HAD NOTHING UNDER IT — the user, 2026-09-22: "above
       // the Continue with Google button it's all white, seems very bland".
@@ -1460,7 +1472,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
         p: p,
         eyebrow: 'Who is using this',
         title: 'Which of you is this?',
-        subtitle: 'Whoever is not here gets their own app, paired to yours.',
+        subtitle: 'The other person gets their own app, linked to yours.',
       ),
       // ⚠️ THIS SCREEN WAS THE ONE THAT DID NOT GET THE TREATMENT — the user,
       // 2026-09-22, walking it: the welcome and the privacy screens carry a
@@ -1480,7 +1492,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
             child: ObGridCard(
               p: p,
               title: 'Mother',
-              subtitle: 'Trying, expecting or raising',
+              subtitle: 'Trying, pregnant or a parent',
               icon: Icons.favorite_border_rounded,
               art: ObArt.whoMother,
               artHeight: 132,
@@ -1507,7 +1519,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
       ),
       const SizedBox(height: 18),
       Text(
-        'We only ever hold a name its owner gave us.',
+        'We only keep a name that its owner gave us.',
         style: pvManrope(fontSize: 12.5, height: 1.4, color: p.ink3),
       ),
     ],
@@ -1570,7 +1582,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
           eyebrow: 'Where you are',
           title: 'Where are you right now?',
           subtitle:
-              'This sets your home. You can change it whenever life does.',
+              'This shapes your home. You can change it any time.',
         ),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1605,7 +1617,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
             Expanded(
               child: card(
                 'parenting',
-                'Parent — 0 to 5',
+                'Parent, 0 to 5',
                 // Gap analysis P2 (2026-10-07): the promise the setup makes. Kept for revert: 'Sleep and leaps'.
                 'Sleep, feeding and every month',
                 Icons.child_care_rounded,
@@ -1617,7 +1629,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
             Expanded(
               child: card(
                 'skilling',
-                'Skilling — 6 and up',
+                'Skilling, 6 and up',
                 'Skills and habits',
                 Icons.school_outlined,
                 150,
@@ -1701,7 +1713,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
         ),
         const SizedBox(height: 14),
         Text(
-          'Not sure? Your last period is enough to start — you can change it any time.',
+          'Not sure? The first day of your last period is enough to start. You can change it any time.',
           style: pvManrope(fontSize: 12.5, height: 1.45, color: p.ink3),
         ),
       ],
@@ -1797,7 +1809,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
         const SizedBox(height: 10),
         ObField(
           p: p,
-          label: 'Boy or girl — optional',
+          label: 'Boy or girl (optional)',
           child: Wrap(
             spacing: 8,
             children: [
@@ -1898,10 +1910,10 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
         const SizedBox(height: 14),
         Text(
           skilling
-              ? 'The age is what the activities are chosen by. Nothing else is needed.'
+              ? "We pick activities by age. That's all we need."
               // "and the leaps" dropped 2026-10-07: the app no longer counts by them.
-              : 'The name is optional. The birthday is what the weeks and months are counted from; '
-                  'the birth answers make sure the right pages come first.',
+              : 'The name is up to you. We count the weeks and months from the birthday, '
+                  'and the birth answers help us show the right pages first.',
           style: pvManrope(fontSize: 12.5, height: 1.45, color: p.ink3),
         ),
       ],
@@ -2190,11 +2202,11 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
         // one of the options has an "and" inside it already. A list whose
         // items may contain the conjunction cannot be joined with the
         // conjunction.
-        out.add('${labels.join(' · ')} — first on your home');
+        out.add('${labels.join(' · ')}, first on your home');
       } else if (q.id.endsWith('_diet')) {
         // The label is a title ("Vegetarian"); mid-sentence it is a word.
         out.add(
-          'Every recipe and food page respects '
+          'Every recipe and food page will be '
           '${labels.first.toLowerCase()}',
         );
       }
@@ -2239,13 +2251,13 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
           p: p,
           eyebrow: 'Staying in touch',
           title: 'How should we reach you?',
-          subtitle: 'Both optional. Neither is marketing.',
+          subtitle: 'Both are optional. We never send ads.',
         ),
         _reachRow(
           p,
           on: _reminders,
           title: 'Reminders on this phone',
-          sub: "The week's change, the morning it starts.",
+          sub: 'A short note on the morning something new begins.',
           onChanged: (v) => setState(() => _reminders = v),
           child: _reminders
               ? Container(
@@ -2347,7 +2359,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      "From your SIM, one tap. We'll send a code to confirm it's you. No marketing.",
+                      "One tap fills it in from your SIM. We'll send a code to check it's you. No ads.",
                       style: pvManrope(
                         fontSize: 12,
                         height: 1.4,
@@ -2398,7 +2410,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
       "Week ${((280 - (_edd ?? _today()).difference(_today()).inDays) ~/ 7) + 1} starts tomorrow — here's what to expect.",
     'parenting' => "A new month starts this week — here's what's changing.",
     'skilling' => "Today's ten-minute activity is ready.",
-    _ => 'Your window this cycle, the morning it opens.',
+    _ => 'Your fertile days this cycle, the morning they start.',
   };
 
   Widget _reachRow(
@@ -2473,12 +2485,12 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
     if (_otp.step != PhoneOtpStep.sent) {
       _say(switch (_otp.step) {
         PhoneOtpStep.rateLimited =>
-          'Too many codes for now — we saved the number and will confirm it later.',
+          "Too many codes for now. Your number's saved and we'll check it later.",
         PhoneOtpStep.offline =>
-          "No connection — we saved the number and will confirm it later.",
-        PhoneOtpStep.invalidPhone => 'That number does not look right.',
+          "No connection right now. Your number's saved and we'll check it later.",
+        PhoneOtpStep.invalidPhone => "That number doesn't look quite right. Could you check it?",
         _ =>
-          "Could not send a code — we saved the number and will confirm it later.",
+          "We couldn't send a code. Your number's saved and we'll check it later.",
       });
       return _otp.step != PhoneOtpStep.invalidPhone;
     }

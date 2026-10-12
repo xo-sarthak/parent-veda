@@ -35,7 +35,8 @@ void main() {
     test('every entry point pushes SavedScreen', () {
       for (final f in entryPoints) {
         final live = _codeLines(_read(f)).join('\n');
-        expect(live.contains('SavedScreen()'), isTrue, reason: f);
+        // Stage-scoped since 2026-10-10: `SavedScreen(stage: '...')`.
+        expect(RegExp(r"SavedScreen\((stage: '[a-z]+')?\)").hasMatch(live), isTrue, reason: f);
       }
     });
 

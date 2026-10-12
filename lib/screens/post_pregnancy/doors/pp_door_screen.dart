@@ -576,6 +576,14 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
               ),
             ],
           ),
+          // ---- the pinned bar: compact once the hero goes, the field on a
+          // solid band while she searches (2026-10-10). --------------------
+          PvDoorPinnedBar(
+            controller: _scroll,
+            search: _search,
+            p: p,
+            title: _doorName,
+          ),
         ]),
       ),
     );

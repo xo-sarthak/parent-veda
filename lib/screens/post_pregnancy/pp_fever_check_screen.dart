@@ -49,6 +49,7 @@ import 'package:flutter/material.dart';
 import 'pp_age_bands.dart';
 import 'pp_health_red_flags.dart';
 import '../../theme/pv_fonts.dart';
+import '../../widgets/pv_feedback.dart' show PvChoiceTile, kPvChoiceInk;
 import '../v2/v2_palette.dart';
 import 'pp_content.dart';
 
@@ -477,7 +478,22 @@ class _Choice extends StatelessWidget {
             _body(context, V2PaletteStore.instance.current),
       );
 
-  Widget _body(BuildContext context, V2Palette p) => GestureDetector(
+  // The wide answer is a row, so it is the shared row (2026-10-10, one MCQ
+  // look app-wide: `PvChoiceTile`, lib/widgets/pv_feedback.dart). The short
+  // side-by-side answers stay blocks, but a chosen ordinary one is now ink,
+  // not the violet action colour; a chosen concern keeps its alert colour.
+  Widget _body(BuildContext context, V2Palette p) => wide
+      ? PvChoiceTile(
+          label: label,
+          selected: selected,
+          onTap: onTap,
+          compact: true,
+          selectedEdge: concern ? ppAlertInk(p) : null,
+          selectedTint: concern ? ppAlertTint(p) : null,
+        )
+      : _block(context, p);
+
+  Widget _block(BuildContext context, V2Palette p) => GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -490,10 +506,12 @@ class _Choice extends StatelessWidget {
                 : p.surface,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
+                // Kept for revert (2026-10-10):
+                //   ? (concern ? ppAlertInk(p) : p.action)
                 color: selected
-                    ? (concern ? ppAlertInk(p) : p.action)
+                    ? (concern ? ppAlertInk(p) : kPvChoiceInk)
                     : p.line,
-                width: selected ? 1.4 : 1),
+                width: selected ? 1.6 : 1),
           ),
           child: Text(label,
               textAlign: wide ? TextAlign.start : TextAlign.center,

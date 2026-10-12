@@ -325,7 +325,7 @@ void main() {
         expect(find.textContaining('within a year'), findsOneWidget);
         await t.tap(find.text('Continue'));
         await t.pumpAndSettle();
-        expect(find.text('Are your cycles fairly regular?'), findsOneWidget);
+        expect(find.text('Are your periods fairly regular?'), findsOneWidget);
         // Skip is always there.
         await t.tap(find.text('Skip'));
         await t.pumpAndSettle();
@@ -334,7 +334,7 @@ void main() {
         // between question two and question three whichever way she leaves
         // two, by answering or by skipping. Asserted rather than tapped
         // past, because a promise the flow can route around is not one.
-        expect(find.text('What we will never do.'), findsOneWidget);
+        expect(find.text("What we'll never do."), findsOneWidget);
         await t.tap(find.text('Good'));
         await t.pumpAndSettle();
         await t.tap(find.text('Skip'));
@@ -363,7 +363,7 @@ void main() {
         ),
       );
       await t.pumpAndSettle();
-      await t.tap(find.text('Parent — 0 to 5'));
+      await t.tap(find.text('Parent, 0 to 5'));
       await t.pumpAndSettle();
       await t.tap(find.text('Continue')); // name
       await t.pumpAndSettle();
@@ -391,7 +391,7 @@ void main() {
       expect(find.text("I'm a doctor"), findsNothing);
       expect(find.text('Have a code?'), findsOneWidget);
       expect(
-        find.text('For the whole journey — trying, expecting, raising.'),
+        find.text('With you from trying for a baby to raising one.'),
         findsOneWidget,
       );
       // No progress indicator anywhere on the first screen.
@@ -465,7 +465,7 @@ void main() {
       // Each answer under the name of its question.
       expect(find.text('Trying for'), findsOneWidget);
       expect(find.text('Just starting'), findsOneWidget);
-      expect(find.text('Your cycles'), findsOneWidget);
+      expect(find.text('Your periods'), findsOneWidget);
       expect(find.text('Yes, mostly'), findsOneWidget);
       expect(find.text('Folic acid'), findsOneWidget);
       expect(find.text('Yes'), findsOneWidget);
@@ -523,7 +523,7 @@ void main() {
       await t.pumpAndSettle();
       expect(find.text('You already have an account.'), findsOneWidget);
       expect(find.textContaining('sarth@gmail.com'), findsOneWidget);
-      expect(find.textContaining('will not replace anything'), findsOneWidget);
+      expect(find.textContaining("won't change anything"), findsOneWidget);
       expect(find.text('Open my account'), findsOneWidget);
       expect(find.text('Use a different account'), findsOneWidget);
       await t.tap(find.text('Use a different account'));

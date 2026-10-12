@@ -43,6 +43,7 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/pv_fonts.dart';
+import '../../widgets/pv_feedback.dart' show PvChoiceTile;
 import '../v2/v2_palette.dart';
 import 'pp_care_log_data.dart';
 import 'pp_content.dart';
@@ -375,8 +376,26 @@ class _Option extends StatelessWidget {
   final bool concern;
   final VoidCallback onTap;
 
+  // The shared answer row (2026-10-10, one MCQ look app-wide): see
+  // `PvChoiceTile` in lib/widgets/pv_feedback.dart. A chosen ordinary answer
+  // is ink (was the violet action colour); a chosen concern keeps its alert
+  // edge and tint, and is still not coloured until it is chosen.
   @override
   Widget build(BuildContext context) {
+    final p = V2PaletteStore.instance.current;
+    return PvChoiceTile(
+      label: label,
+      selected: selected,
+      onTap: onTap,
+      compact: true,
+      selectedEdge: concern ? ppAlertInk(p) : null,
+      selectedTint: concern ? ppAlertTint(p) : null,
+    );
+  }
+
+  // Kept for revert (2026-10-10): the radio row in the action colour.
+  // ignore: unused_element
+  Widget _buildBefore(BuildContext context) {
     final p = V2PaletteStore.instance.current;
     // ⚠️ THE CONCERN OPTION IS NOT RED UNTIL IT IS CHOSEN. Colouring it in
     // advance makes one answer look like the wrong answer, which pushes an

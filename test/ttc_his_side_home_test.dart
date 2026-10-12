@@ -44,11 +44,15 @@ void main() {
   });
   tearDown(() => TtcPartnerMode.instance.on = false);
 
-  test('the V3 home sends him to his own Today', () {
+  // 2026-10-10: his Today is HER home with less on it (test/ttc_his_side_v3_test.dart).
+  // The Slate screen below is kept for revert and still renders; the tests
+  // that pump it directly keep it honest until it is deleted.
+  // Kept for revert: expected `const TtcPartnerTodayScreen()` in this file.
+  test('the V3 home is the same home for him, keyed by side', () {
     final src =
         File('lib/screens/ttc/ttc_home_version.dart').readAsStringSync();
-    expect(src, contains('if (TtcPartnerMode.instance.on)'));
-    expect(src, contains('const TtcPartnerTodayScreen()'));
+    expect(src, contains("today: TtcHomeV3("));
+    expect(src, contains("TtcPartnerMode.instance.on ? 'him' : 'her'"));
   });
 
   testWidgets('his Today: his insights, his one door, none of her actions',

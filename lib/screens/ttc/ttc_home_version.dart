@@ -130,9 +130,14 @@ class _TtcHomeBody extends StatelessWidget {
           //   },
           if (TtcHomeVersionStore.instance.version == TtcHomeVersion.v3)
             TtcTabHost(
-              today: TtcPartnerMode.instance.on
-                  ? const TtcPartnerTodayScreen()
-                  : const TtcHomeV3(),
+              // ⚠️ HIS SIDE IS HER HOME (2026-10-10, "it should not look like a
+              // different application"): TtcHomeV3 reads TtcPartnerMode itself.
+              // Keyed so the switch rebuilds it. Kept for revert:
+              //   today: TtcPartnerMode.instance.on
+              //       ? const TtcPartnerTodayScreen()
+              //       : const TtcHomeV3(),
+              today: TtcHomeV3(
+                  key: ValueKey('ttc_home_${TtcPartnerMode.instance.on ? 'him' : 'her'}')),
             )
           else if (TtcPartnerMode.instance.on)
             const TtcPartnerTodayScreen()

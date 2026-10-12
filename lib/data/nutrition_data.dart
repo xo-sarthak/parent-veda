@@ -22,6 +22,7 @@
 
 import '../localization/app_language.dart';
 import 'nutrition_recipes_more.dart';
+import 'nutrition/superfood_recipes.dart';
 
 LocalizedText _en(String s) => LocalizedText(en: s, hi: s);
 
@@ -2540,6 +2541,9 @@ final List<Recipe> kRecipes = [
   // the non-vegetarian mains that make the meal tiles real. See
   // nutrition_recipes_more.dart.
   ...kMoreRecipes,
+  // The week's superfood dishes the library lacked (2026-10-10). See
+  // nutrition/superfood_recipes.dart.
+  ...kSuperfoodRecipes,
 ];
 
 /// A clearly-named stub. The integrator wires this to whatever share/print

@@ -392,7 +392,11 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                     Icon(taken ? Icons.check_rounded : Icons.circle_outlined,
                         size: 16, color: taken ? Colors.white : _accent),
                     const SizedBox(width: 6),
-                    Text(taken ? s.medTakenDone : s.medTaken,
+                    // The check icon already says "taken"; the string's own
+                    // '✓' printed a second tick beside it (2026-10-10). The
+                    // string is kept as shipped, Hindi included. Was:
+                    // Text(taken ? s.medTakenDone : s.medTaken,
+                    Text(taken ? s.medTakenDone.replaceAll('✓', '').trim() : s.medTaken,
                         style: pvManrope(
                             fontSize: 12.5,
                             fontWeight: FontWeight.w800,
@@ -421,7 +425,8 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
         Padding(
           padding: const EdgeInsets.only(top: 8),
           child: Row(children: [
-            Icon(Icons.alarm_rounded,
+            // Line icon, as the rest of the app (2026-10-10). Was Icons.alarm_rounded.
+            Icon(Icons.alarm_outlined,
                 size: 16,
                 color: a.enabled ? pvStorePalette.ink2 : pvStorePalette.ink3),
             const SizedBox(width: 8),
@@ -696,7 +701,8 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(children: [
-          Icon(Icons.alarm_rounded, size: 18, color: pvStorePalette.ink2),
+          // Line icon, as the rest of the app (2026-10-10). Was Icons.alarm_rounded.
+          Icon(Icons.alarm_outlined, size: 18, color: pvStorePalette.ink2),
           const SizedBox(width: 8),
           Text(S.now.uiAlarms,
               style: pvJakarta(
@@ -717,7 +723,8 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
               border: Border.all(color: kPvLine),
             ),
             child: Row(children: [
-              Icon(Icons.alarm_rounded,
+              // Line icon, as the rest of the app (2026-10-10). Was Icons.alarm_rounded.
+              Icon(Icons.alarm_outlined,
                   size: 16,
                   color: alarms[i].enabled
                       ? pvStorePalette.ink2
@@ -784,7 +791,8 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                 onChanged();
               },
             ),
-            icon: const Icon(Icons.add_alarm_rounded, size: 18),
+            // Line icon, as the rest of the app (2026-10-10). Was Icons.add_alarm_rounded.
+            icon: const Icon(Icons.add_alarm_outlined, size: 18),
             label: Text(S.now.uiAddAlarm),
           ),
         ),
@@ -1088,8 +1096,11 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
           border: Border.all(color: kPvLine),
         ),
         child: Row(children: [
-          const Icon(Icons.event_rounded,
-              size: 18, color: AppTheme.neutral500),
+          // Line icon, as the rest of the app (2026-10-10). Was Icons.event_rounded.
+          // ink2, as the alarm rows' icons beside it (2026-10-10). Was
+          // AppTheme.neutral500, a second grey from a second palette.
+          Icon(Icons.event_outlined,
+              size: 18, color: pvStorePalette.ink2),
           const SizedBox(width: 10),
           Expanded(
             child: Text(label,
@@ -1177,7 +1188,8 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                   Padding(
                     padding: const EdgeInsets.only(bottom: 6),
                     child: Row(children: [
-                      Icon(Icons.alarm_rounded,
+                      // Line icon, as the rest of the app (2026-10-10). Was Icons.alarm_rounded.
+                      Icon(Icons.alarm_outlined,
                           size: 16,
                           color: a.enabled
                               ? pvStorePalette.ink2

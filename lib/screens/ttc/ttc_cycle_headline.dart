@@ -46,6 +46,7 @@ String? ttcCycleHeadline({DateTime? on}) {
     TtcHeroState.waiting => join(t.leadPeriodMayStart, t.bigInDays(line.days)),
     TtcHeroState.periodDue => join(t.leadPeriodMayStart, t.bigToday),
     TtcHeroState.periodLate => join(t.leadPastUsual, t.bigDays(line.days)),
+    TtcHeroState.onPeriod => join(t.leadYourPeriod, t.bigPeriodDay(line.days).toLowerCase()),
     _ => null,
   };
 }

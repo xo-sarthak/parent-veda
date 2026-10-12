@@ -299,7 +299,7 @@ class _PregLearnScreenState extends State<PregLearnScreen> {
   }
 
   void _openSaved() => Navigator.of(context).push(MaterialPageRoute<void>(
-        builder: (_) => const SavedScreen(),
+        builder: (_) => const SavedScreen(stage: 'pregnancy'),
         settings: const RouteSettings(name: 'saved'),
       ));
 

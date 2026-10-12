@@ -46,6 +46,7 @@ import 'vax_tracker_screen.dart';
 // import 'leap_definition_screen.dart';
 // import 'pp_leaps_data.dart';
 import 'what_changed_screen.dart';
+import '../../widgets/pv_feedback.dart';
 
 export 'pp_tools_tab.dart' show ToolsHubScreen;
 // "Wonder Week Window" now opens the full leap page (LeapDefinitionScreen) for
@@ -205,7 +206,7 @@ class ToolsHubClassic extends StatelessWidget {
     final titleColor = dark ? Colors.white : ppInk;
     final descColor = dark ? const Color(0xFFCFC7DA) : ppSoft;
     final tagColor = dark ? const Color(0xFFC7B2E0) : ppPurple;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -263,10 +264,10 @@ class ToolsHubClassic extends StatelessWidget {
             ]),
         ]),
       ),
-    );
+    ));
   }
 
-  Widget _tracker(BuildContext context, IconData icon, Color tint, String title, String sub, Color subColor, VoidCallback onTap) => GestureDetector(
+  Widget _tracker(BuildContext context, IconData icon, Color tint, String title, String sub, Color subColor, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -300,5 +301,5 @@ class ToolsHubClassic extends StatelessWidget {
             const Text('→', style: TextStyle(color: Color(0xFFC7BBD6))),
           ]),
         ),
-      );
+      ));
 }

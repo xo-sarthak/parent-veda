@@ -349,8 +349,39 @@ class ObTile extends StatelessWidget {
   final bool compact;
   final VoidCallback onTap;
 
+  // One answer row for every question flow (2026-10-10, "consistency for MCQ
+  // type ques"): the shared `PvChoiceTile` (lib/widgets/pv_feedback.dart).
+  // Onboarding keeps its Fraunces title and its icon well; the edge, the
+  // ring and the tick are now the same as everywhere else.
   @override
-  Widget build(BuildContext context) => ObPress(
+  Widget build(BuildContext context) => PvChoiceTile(
+    label: title,
+    subtitle: subtitle,
+    selected: selected,
+    onTap: onTap,
+    compact: compact,
+    titleStyle: pvFraunces(
+      fontSize: 17,
+      fontWeight: FontWeight.w600,
+      letterSpacing: -0.3,
+      color: p.ink1,
+    ),
+    leading: icon == null
+        ? null
+        : Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: p.ground,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, size: 20, color: p.ink2),
+          ),
+  );
+
+  // Kept for revert (2026-10-10): the onboarding-only tile.
+  // ignore: unused_element
+  Widget _buildBefore(BuildContext context) => ObPress(
     child: InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
@@ -730,8 +761,20 @@ class ObProgress extends StatelessWidget {
   final int step; // 1-based
   final int total;
 
+  // One progress line for every question flow (2026-10-10): the shared
+  // `PvQuestionProgress`, with the count on, since this block counts.
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => PvQuestionProgress(
+    done: step,
+    total: total,
+    startLabel: label,
+    goingLabel: label,
+    count: true,
+  );
+
+  // Kept for revert (2026-10-10): the onboarding-only bar.
+  // ignore: unused_element
+  Widget _buildBefore(BuildContext context) {
     final t = total <= 0 ? 0.0 : (step / total).clamp(0.0, 1.0);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

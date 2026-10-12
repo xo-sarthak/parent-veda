@@ -2,7 +2,7 @@
 //  Fixes from the user's walk of the trying-to-conceive app (2026-10-01).
 //
 //  Eight things the user listed; this holds the ones that are code:
-//   1. "I got a positive test" is near the top of the profile, not the bottom.
+//   1. "I'm pregnant" is near the top of the profile, not the bottom.
 //   3. An ovulation-test day with nothing logged has no dead band under it.
 //   4. A notice has a shadow and an edge you can see (it blended in).
 //   5. The ovulation page offers its two reads as the reader does at the foot
@@ -110,7 +110,7 @@ void main() {
       ]) {
         expect(journey, lessThan(top(t, below)), reason: 'journey is above $below');
       }
-      expect(find.text('I got a positive test'), findsOneWidget);
+      expect(find.text("I'm pregnant"), findsOneWidget);
     });
 
     testWidgets('pregnancy: the arrival row moves up too; the quiet row stays low',

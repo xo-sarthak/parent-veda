@@ -58,6 +58,7 @@ import '../../../widgets/pv_read_tile.dart';
 import '../../v2/v2_palette.dart';
 import 'hub_solution_cards.dart';
 import 'journey_config.dart';
+import '../../../widgets/pv_feedback.dart';
 
 class JourneyScreen extends StatefulWidget {
   const JourneyScreen({
@@ -235,7 +236,7 @@ class _JourneyScreenState extends State<JourneyScreen> {
                     color: p.ink2)),
           ),
           for (var i = 0; i < config.steps.length; i++)
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: () => _jumpTo(i),
               behavior: HitTestBehavior.opaque,
               child: Container(
@@ -253,7 +254,7 @@ class _JourneyScreenState extends State<JourneyScreen> {
                   Icon(Icons.arrow_downward_rounded, size: 15, color: p.ink3),
                 ]),
               ),
-            ),
+            )),
         ]),
       );
 

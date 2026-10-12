@@ -1623,13 +1623,19 @@ class _TtcDoorScreenState extends State<TtcDoorScreen> {
                 ),
 
                 // ---- the pinned bar, once the hero has gone (D2, MB19) ----
-                TtcDoorPinnedBar(
+                // The shared door bar since 2026-10-10: the same compact bar,
+                // and while she searches the field pinned on a solid band
+                // under the status bar instead of a status-bar strip over a
+                // field at 4%. Kept for revert:
+                //   TtcDoorPinnedBar(key: kTtcDoorPinnedBarKey, scroll: _offset,
+                //       search: _search, p: p, title: bracket.label.of(lang),
+                //       onSearch: () => _search.focus.requestFocus()),
+                PvDoorPinnedBar(
                   key: kTtcDoorPinnedBarKey,
-                  scroll: _offset,
+                  controller: _scroll,
                   search: _search,
                   p: p,
                   title: bracket.label.of(lang),
-                  onSearch: () => _search.focus.requestFocus(),
                 ),
               ],
             ),

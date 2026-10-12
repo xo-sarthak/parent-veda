@@ -373,9 +373,11 @@ class _TtcTabHostState extends State<TtcTabHost>
                         key: kTtcTabBarKey,
                         active: _to,
                         v3: true,
-                        // His Today drew the slate bar; now every tab of his
-                        // side does, instead of slate on one and violet on four.
-                        slate: TtcPartnerMode.instance.on,
+                        // ⚠️ ONE BAR FOR BOTH (2026-10-10, his side is her home
+                        // with less on it: "it should not look like a
+                        // different application"). Kept for revert:
+                        //   slate: TtcPartnerMode.instance.on,
+                        slate: false,
                       ),
                     ),
                   ),

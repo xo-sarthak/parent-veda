@@ -127,6 +127,25 @@ const Set<SavedKind> kTtcSavedKinds = {
   SavedKind.product,
 };
 
+/// What each other stage saves (2026-10-10, the user: Saved "shows stuff of
+/// other stages"). Every kind header renders on a stage's screen, so a kind
+/// that stage never saves was an empty section advertising another stage.
+/// Community is out while it is held back (gap analysis P1).
+const Map<String, Set<SavedKind>> kStageSavedKinds = {
+  'trying': kTtcSavedKinds,
+  'pregnancy': {
+    SavedKind.article, SavedKind.video, SavedKind.recipe, SavedKind.product,
+    SavedKind.question, SavedKind.readToBaby, SavedKind.tool,
+  },
+  'parenting': {
+    SavedKind.article, SavedKind.video, SavedKind.recipe, SavedKind.product,
+    SavedKind.tip, SavedKind.activity, SavedKind.tool,
+  },
+  'skilling': {
+    SavedKind.article, SavedKind.video, SavedKind.activity, SavedKind.product,
+  },
+};
+
 TtcTabMark _savedMark(SavedKind k) => switch (k) {
       SavedKind.video => TtcTabMark.sunrise,
       SavedKind.recipe => TtcTabMark.bowl,
@@ -204,15 +223,22 @@ class _SavedScreenState extends State<SavedScreen> {
 
   bool get _trying => widget.stage == 'trying';
 
+  /// One stage's Saved (2026-10-10: pregnancy and parenting showed every
+  /// stage's saves, which TTC stopped doing on 2026-09-30). The kinds stay
+  /// all of them off trying to conceive; only the stage is fixed.
+  bool get _scoped => widget.stage != null;
+
   /// The kinds this screen offers. On trying to conceive, the four that stage
   /// saves; the rest (questions, read to baby, tips, community, activities,
   /// tools) belong to other stages and are left out here, not deleted.
-  List<_KindCopy> get _shown => _trying
-      ? [
+  /// Kept for revert: `_trying ? [kTtcSavedKinds only] : _kinds`.
+  Set<SavedKind>? get _stageKinds => kStageSavedKinds[widget.stage];
+  List<_KindCopy> get _shown => _stageKinds == null
+      ? _kinds
+      : [
           for (final c in _kinds)
-            if (kTtcSavedKinds.contains(c.kind)) c,
-        ]
-      : _kinds;
+            if (_stageKinds!.contains(c.kind)) c,
+        ];
 
   @override
   Widget build(BuildContext context) {
@@ -224,12 +250,12 @@ class _SavedScreenState extends State<SavedScreen> {
         final stages = store.stagesPresent;
         // A stage that no longer has items (she unsaved them all) drops its chip.
         // Not on one stage's screen: that stage is the whole point of it.
-        if (!_trying && _stage != null && !stages.contains(_stage)) {
+        if (!_scoped && _stage != null && !stages.contains(_stage)) {
           _stage = null;
         }
         final all = [
           for (final i in store.items(stage: _stage))
-            if (!_trying || kTtcSavedKinds.contains(i.kind)) i,
+            if (_stageKinds == null || _stageKinds!.contains(i.kind)) i,
         ];
         final total = all.length;
 
@@ -302,7 +328,7 @@ class _SavedScreenState extends State<SavedScreen> {
                   ),
                 ),
               SliverToBoxAdapter(child: _kindChips(p, store)),
-              if (!_trying && stages.length > 1)
+              if (!_scoped && stages.length > 1)
                 SliverToBoxAdapter(child: _stageChips(p, stages)),
               const SliverToBoxAdapter(child: SizedBox(height: 6)),
               if (_kind == null)
@@ -343,7 +369,7 @@ class _SavedScreenState extends State<SavedScreen> {
 
   /// A kind's count on this screen: the stage's own when it is one stage's.
   int _countOf(SavedStore store, SavedKind k) =>
-      _trying ? store.items(kind: k, stage: _stage).length : store.count(k);
+      _scoped ? store.items(kind: k, stage: _stage).length : store.count(k);
 
   Widget _stageChips(V2Palette p, Set<String> stages) {
     const order = ['trying', 'pregnancy', 'parenting', 'skilling'];

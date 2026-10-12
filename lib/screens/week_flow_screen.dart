@@ -35,6 +35,9 @@ import '../services/pregnancy_controller.dart';
 import '../theme/app_theme.dart';
 import '../widgets/week_cards/week_overview_card.dart';
 import '../theme/pv_fonts.dart';
+import '../data/nutrition/superfood_recipes.dart';
+import '../data/nutrition_data.dart' show Recipe;
+import 'nutrition/door/recipe_cook_screen.dart' show openRecipe;
 
 // TESTING-ONLY: when the Dad mode switch is on AND we're on week 20, the weekly
 // flow re-voices its copy for the father (same content, read for/about her).
@@ -1421,7 +1424,7 @@ class WeekFlowView extends StatelessWidget {
                 lang: lang,
                 color: fatherSkin ? _fAccent2 : AppTheme.secondary500,
               ),
-              onTap: () => _push(context, _MotherDetailScreen(w: w, lang: lang)),
+              onTap: () => _push(context, _MotherDetailScreen(w: w, lang: lang, controller: controller)),
             ),
             const SizedBox(height: 14),
             // S5 - What's next.
@@ -1565,7 +1568,7 @@ void openWeekMotherDetail(BuildContext context, PregnancyController controller,
     int week, AppLanguage lang) {
   final w = controller.weekData(week);
   if (w == null) return;
-  _push(context, _MotherDetailScreen(w: w, lang: lang));
+  _push(context, _MotherDetailScreen(w: w, lang: lang, controller: controller));
 }
 
 /// Opens the "What's next" pop-up directly (the Home hero shortcut deep-links
@@ -2481,9 +2484,13 @@ const List<_Article> _motherArticle = [
 ];
 
 class _MotherDetailScreen extends StatefulWidget {
-  const _MotherDetailScreen({required this.w, required this.lang});
+  const _MotherDetailScreen({required this.w, required this.lang, this.controller});
   final WeekContent w;
   final AppLanguage lang;
+
+  /// Only for opening the week's superfood as a recipe (2026-10-10); both
+  /// call sites pass it. Null leaves the card as it was, with no link.
+  final PregnancyController? controller;
   @override
   State<_MotherDetailScreen> createState() => _MotherDetailScreenState();
 }
@@ -3215,7 +3222,31 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
 
   // "Indian superfood of the week" - a highlighted hero card (food + benefit +
   // how to eat it), gold-tinted to set it apart from the favour/avoid lists.
-  Widget _superfoodCard(Superfood sf, S s, AppLanguage lang) => Container(
+  // Opens the week's superfood as a recipe on the Nutrition door's recipe page
+  // (2026-10-10, the user's note "this week food idea tool should be in depth
+  // like recipe?"): ingredients, steps, and this week's reason, from the
+  // card's own benefit line. Matched on `.en`, the identity.
+  Widget _superfoodCard(Superfood sf, S s, AppLanguage lang) {
+    final recipe = recipeForSuperfood(sf.food.en);
+    final c = widget.controller;
+    final card = _superfoodCardBody(sf, s, lang, recipe: c == null ? null : recipe);
+    if (recipe == null || c == null) return card;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        key: const ValueKey('week_superfood_recipe'),
+        borderRadius: BorderRadius.circular(18),
+        onTap: () => openRecipe(context, recipe, c,
+            weekTitle: 'Why it helps in week ${widget.w.week}',
+            weekNote: [sf.benefit.en.trim(), sf.howToConsume.en.trim()]
+                .where((x) => x.isNotEmpty)
+                .join(' ')),
+        child: card,
+      ),
+    );
+  }
+
+  Widget _superfoodCardBody(Superfood sf, S s, AppLanguage lang, {Recipe? recipe}) => Container(
         width: double.infinity,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
@@ -3260,6 +3291,24 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
                       fontSize: 12.5, height: 1.45, color: const Color(0xFF6B5F7E))),
             ),
           ]),
+          // The way in, said on the card: a recipe and its kitchen time.
+          if (recipe != null) ...[
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              decoration: BoxDecoration(
+                  color: AppTheme.neutral900, borderRadius: BorderRadius.circular(99)),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                const Icon(Icons.restaurant_outlined, size: 15, color: Colors.white),
+                const SizedBox(width: 6),
+                Flexible(
+                  child: Text('See the recipe · ${recipe.minutes} min',
+                      style: pvManrope(
+                          fontSize: 12.5, fontWeight: FontWeight.w800, color: Colors.white)),
+                ),
+              ]),
+            ),
+          ],
         ]),
       );
 

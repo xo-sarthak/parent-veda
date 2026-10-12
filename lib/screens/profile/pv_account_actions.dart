@@ -24,20 +24,41 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../localization/app_language.dart';
 import '../../services/auth/delete_account.dart';
+import '../../services/app_shell.dart';
 import '../../services/auth/social_auth.dart';
 import '../../services/father_preview.dart';
+import '../../services/notification_service.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../services/remote/sync_registry.dart';
 import '../../theme/pv_fonts.dart';
+import '../../widgets/global_ask_fab.dart' show FabState;
 import '../auth/auth_flow_screen.dart';
 import 'pv_you_chrome.dart';
 
 Future<void> pvSignOut(BuildContext context) async {
   final nav = Navigator.of(context);
   final controller = PregnancyController.current;
+  // ⚠️ THREE SEPARATE TRIES, NOT ONE (2026-10-10). The three steps used to
+  // share one `try`, so the first failure skipped the rest. The one that
+  // fails in practice is `Supabase.instance`, which THROWS when the backend
+  // never initialised (offline first launch, a bad key, a widget test), and
+  // that skipped clearing the local flag, so the app still believed she was
+  // through onboarding. The general point: when steps are independent, one
+  // failure must not cancel the others, so each gets its own guard.
+  // Trade-off: no step can report why it failed. What it buys is that the
+  // local half, the half we own, always happens, and an uninitialised backend
+  // behaves exactly like being logged out.
   try {
     await SocialAuth.signOutGoogle();
+  } catch (_) {
+    /* best-effort: it already swallows its own plugin errors */
+  }
+  try {
     await Supabase.instance.client.auth.signOut();
+  } catch (_) {
+    /* no backend, or no network: the local sign-out below still happens */
+  }
+  try {
     await (await SharedPreferences.getInstance()).setBool(
       kAuthCompletedKey,
       false,
@@ -45,6 +66,23 @@ Future<void> pvSignOut(BuildContext context) async {
   } catch (_) {
     /* best-effort */
   }
+  // Signed out means silent (2026-10-10): no reminder rings for someone who
+  // has left. See NotificationService.silenceForSignOut.
+  try {
+    await NotificationService.instance.silenceForSignOut();
+  } catch (_) {/* best-effort */}
+  // The Ask Veda button stays off the sign-in screens.
+  FabState.instance.markAppSignedOut();
+  // ⚠️ THE WHOLE STACK GOES (2026-10-10). This used to push onboarding ON TOP
+  // of the signed-in app, so back returned into it; and with no pregnancy
+  // controller it popped to the first route, which is the stage's own home,
+  // so the tap appeared to do nothing. Now the stack is replaced by the
+  // cold-start splash, which reads the cleared flag and opens onboarding, and
+  // on finishing lands her in the home of the stage she picks. See
+  // AppShell.openSignedOut. The branches below are the fallback when nothing
+  // is registered (a widget test that pumped a screen directly), kept as
+  // they were.
+  if (AppShell.openSignedOut(nav)) return;
   if (controller == null) {
     nav.popUntil((r) => r.isFirst);
     return;
@@ -255,7 +293,13 @@ Future<void> pvDeleteAccount(BuildContext context) async {
         TextButton(
           onPressed: () {
             Navigator.of(ctx).pop();
-            nav.popUntil((r) => r.isFirst);
+            // Same landing as sign out (2026-10-10): the account is gone, so
+            // the app it belonged to must not stay on screen underneath.
+            // Kept for revert: nav.popUntil((r) => r.isFirst);
+            FabState.instance.markAppSignedOut();
+            if (!AppShell.openSignedOut(nav)) {
+              nav.popUntil((r) => r.isFirst);
+            }
           },
           child: Text(s.closeLabel),
         ),

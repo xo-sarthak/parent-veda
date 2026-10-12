@@ -17,6 +17,8 @@ import '../../data/prepare_data.dart';
 import 'prepare_common.dart';
 import 'prepare_video_screen.dart';
 import '../../localization/app_language.dart';
+import '../post_pregnancy/pp_yoga_data.dart';
+import '../post_pregnancy/yoga_class_screen.dart';
 
 // TODO: derive the current pregnancy month from the saved due date / week.
 // 30 weeks ≈ month 7, matching the rest of the Prepare tab's "Priya · 30 weeks".
@@ -93,6 +95,12 @@ class _PrenatalYogaScreenState extends State<PrenatalYogaScreen> {
                   width: double.infinity,
                   padding: const EdgeInsets.fromLTRB(20, 18, 20, 18),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    // What this is, before anything else (2026-10-10, the
+                    // user's note "no indication of it being a class/live"):
+                    // these are follow-along videos, not a class with a
+                    // teacher. The live classes have their own section below.
+                    _kindTag(Icons.play_circle_outline_rounded, 'SELF-GUIDED VIDEOS'),
+                    const SizedBox(height: 10),
                     Text(s.uiPregnancyYogaProgram, style: pvTitleStyle(18)),
                     const SizedBox(height: 6),
                     Text(s.uiMonthJourneySanaKapoor,
@@ -146,6 +154,23 @@ class _PrenatalYogaScreenState extends State<PrenatalYogaScreen> {
               for (int i = 0; i < sessions.length; i++)
                 _session(s, sessions[i], bottom: i == sessions.length - 1),
 
+            // ---- live classes, with a teacher --------------------------------
+            // The Move door's "Classes and tools" tab promised classes and
+            // opened only videos. The live pregnancy classes already exist
+            // (kYogaClasses, booked through YogaClassScreen); each says it is
+            // live, how (group or 1:1) and when, from the class's own data.
+            // Prices and seats stay on the booking page, decided server-side.
+            if (_liveClasses.isNotEmpty) ...[
+              const SizedBox(height: 28),
+              Text('Live classes, with a teacher', style: pvTitleStyle(16)),
+              const SizedBox(height: 4),
+              Text('A real teacher, at a set time. Tap one to see times and book.',
+                  style: pvBody(kSoft, 13)),
+              const SizedBox(height: 6),
+              for (int i = 0; i < _liveClasses.length; i++)
+                _liveClass(_liveClasses[i], bottom: i == _liveClasses.length - 1),
+            ],
+
             const SizedBox(height: 18),
             Text(s.uiEverySessionFilteredMonth,
                 style: pvBody(kSoft, 13).copyWith(fontStyle: FontStyle.italic, height: 1.6)),
@@ -189,6 +214,83 @@ class _PrenatalYogaScreenState extends State<PrenatalYogaScreen> {
     );
   }
 
+  /// The pregnancy categories' live classes: prenatal yoga and labour breathing.
+  static final List<YogaClass> _liveClasses = [
+    for (final c in kYogaClasses)
+      if (c.mode != YogaMode.recorded && (c.category == 'prenatal' || c.category == 'breathing')) c,
+  ];
+
+  /// A small boxed tag that says what a thing is, with its line icon.
+  static Widget _kindTag(IconData icon, String label) => Container(
+        padding: const EdgeInsets.fromLTRB(7, 3, 9, 3),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(color: kBorder),
+        ),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          Icon(icon, size: 14, color: kInk),
+          const SizedBox(width: 5),
+          Text(label,
+              style: pvBody(kInk, 10.5).copyWith(fontWeight: FontWeight.w800, letterSpacing: 0.8)),
+        ]),
+      );
+
+  /// "Tue, Thu, Sat · 8am IST" - the class's own schedule without the
+  /// leading "Live", which the tag already says.
+  static String _when(YogaClass c) =>
+      c.schedule.replaceFirst(RegExp(r'^Live\s*·\s*'), '');
+
+  Widget _liveClass(YogaClass c, {bool bottom = false}) {
+    final oneToOne = c.mode == YogaMode.liveOneToOne;
+    return GestureDetector(
+      key: ValueKey('preg_yoga_live_${c.id}'),
+      onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+          settings: RouteSettings(name: 'move/yoga/class/${c.id}'),
+          builder: (_) => YogaClassScreen(cls: c))),
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 15),
+        decoration: BoxDecoration(
+          border: Border(
+            top: const BorderSide(color: kHair),
+            bottom: bottom ? const BorderSide(color: kHair) : BorderSide.none,
+          ),
+        ),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Container(
+            width: 44,
+            height: 44,
+            alignment: Alignment.center,
+            decoration: const BoxDecoration(color: kPanel, shape: BoxShape.circle),
+            child: const Icon(Icons.videocam_outlined, size: 20, color: kInk),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              _kindTag(oneToOne ? Icons.person_outline_rounded : Icons.groups_outlined,
+                  oneToOne ? 'LIVE 1:1' : 'LIVE CLASS'),
+              const SizedBox(height: 6),
+              Text(c.title, style: pvBody(kInk, 15).copyWith(fontWeight: FontWeight.w600)),
+              const SizedBox(height: 3),
+              Row(children: [
+                const Icon(Icons.schedule_rounded, size: 14, color: kMuted),
+                const SizedBox(width: 5),
+                Expanded(child: Text(_when(c), style: pvBody(kMuted, 12))),
+              ]),
+              const SizedBox(height: 2),
+              Text('${c.durationLabel} · with ${c.instructorName}', style: pvBody(kMuted, 12)),
+            ]),
+          ),
+          const SizedBox(width: 6),
+          const Padding(
+            padding: EdgeInsets.only(top: 12),
+            child: Icon(Icons.chevron_right_rounded, size: 20, color: kMuted),
+          ),
+        ]),
+      ),
+    );
+  }
+
   Widget _session(S s, YogaSession y, {bool bottom = false}) {
     return GestureDetector(
       onTap: () => Navigator.of(context).push(MaterialPageRoute(
@@ -212,14 +314,20 @@ class _PrenatalYogaScreenState extends State<PrenatalYogaScreen> {
             height: 44,
             alignment: Alignment.center,
             decoration: const BoxDecoration(color: kPanel, shape: BoxShape.circle),
-            child: const Text('▸', style: TextStyle(color: kPurple, fontSize: 15)),
+            // A line icon in place of the '▸' glyph (2026-10-10), so a
+            // session reads as a video to play. Kept for revert:
+            // child: const Text('▸', style: TextStyle(color: kPurple, fontSize: 15)),
+            child: const Icon(Icons.play_arrow_rounded, size: 20, color: kPurple),
           ),
           const SizedBox(width: 14),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(y.title.now, style: pvBody(kInk, 15).copyWith(fontWeight: FontWeight.w600)),
               const SizedBox(height: 2),
-              Text('${y.duration.now} · ${y.focus.now}', style: pvBody(kMuted, 12)),
+              // "Video" first, so a session never reads as a live class.
+              // Kept for revert:
+              // Text('${y.duration.now} · ${y.focus.now}', style: pvBody(kMuted, 12)),
+              Text('Video · ${y.duration.now} · ${y.focus.now}', style: pvBody(kMuted, 12)),
             ]),
           ),
           const SizedBox(width: 10),

@@ -683,7 +683,7 @@ class _CanIDoorBodyState extends State<CanIDoorBody> {
           Navigator.of(context).push(
             MaterialPageRoute<void>(
               settings: const RouteSettings(name: 'saved'),
-              builder: (_) => const SavedScreen(),
+              builder: (_) => const SavedScreen(stage: 'pregnancy'),
             ),
           );
         },

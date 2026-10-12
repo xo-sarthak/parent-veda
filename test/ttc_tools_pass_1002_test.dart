@@ -245,8 +245,15 @@ void main() {
       expect(near.reminderAt.isAfter(n), isTrue);
       expect(scheduled, hasLength(1));
       expect(scheduled.single.when, near.reminderAt);
-      expect(scheduled.single.title.startsWith('Today:'), isTrue,
-          reason: 'a same-day reminder is not "Tomorrow"');
+      // After 9pm, 3 hours from now is tomorrow: the reminder rings tonight
+      // and rightly says "Tomorrow" (failed at 21:11 on 2026-10-10).
+      final at = n.add(const Duration(hours: 3));
+      final r = near.reminderAt;
+      final sameDay =
+          at.year == r.year && at.month == r.month && at.day == r.day;
+      expect(scheduled.single.title.startsWith(sameDay ? 'Today:' : 'Tomorrow:'),
+          isTrue,
+          reason: "the reminder names the visit's day as seen from when it rings");
       scheduled.clear();
       // 10 minutes from now: too soon for any.
       final tooSoon = store.add(

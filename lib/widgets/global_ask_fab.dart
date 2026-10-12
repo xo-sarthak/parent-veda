@@ -170,6 +170,17 @@ class FabState extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// The reverse of [markAppLive], called by sign out (2026-10-10). Sign out
+  /// replaces the stack with the splash and onboarding, which are exactly the
+  /// screens this flag exists to keep the button off; without this the button
+  /// floated over the sign-in screens because the flag was never lowered. The
+  /// next shell to mount raises it again.
+  void markAppSignedOut() {
+    if (!_appLive) return;
+    _appLive = false;
+    notifyListeners();
+  }
+
   void _update({bool? inParenting, bool? inTtc, bool? suppressed}) {
     var changed = false;
     if (inParenting != null && inParenting != _inParenting) {

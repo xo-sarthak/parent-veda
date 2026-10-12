@@ -2606,6 +2606,39 @@ acceptable inside a paired couple who chose to share; if the private half ever
 needed hard protection, the fix is a row-level condition on the tag, not a
 second table.
 
+## 16cc. Four patterns from 2026-10-10 (Ask Veda parenting corpus, sign-out, the TTC hero)
+
+**A namespace per exporter, and a prune that only touches it.** The parenting
+corpus (`lib/ask_veda/pp_veda_corpus.dart`) writes ids that all start `ppv`,
+and the service import runs `--prune-prefix ppv`. Prune means "delete what this
+file no longer contains", so its scope must equal exactly what this file owns:
+the older parenting ids (`ppart_`, `pprec_`, `know_`) share the domain, and a
+prefix of `pp` would have deleted them all. General rule: a sync that deletes by
+absence must be scoped to the writer's own keys, never to a shared table.
+
+**Scoping a query changes the cache key.** When Ask Veda began filtering
+parenting answers to parenting content (`scope_domain` in the service), the
+cache key gained `:s1`. An answer cached before the filter could point at the
+wrong stage, and the only way to never serve it again is to never look it up.
+Versioning the key is cheaper and safer than a purge. Only callers that SAY
+they are scoped (`stage: 'parenting'`) get the new key, so an older app build
+keeps its old behaviour instead of being changed by a field it never sent.
+
+**Independent steps get independent guards.** Sign-out had three steps (cloud
+session, local flag, navigation) in one `try`. With the backend uninitialised
+the first threw, and the local flag was never cleared: the app still thought
+she was signed in. One `try` per step means a failure in one cannot cancel the
+others. And sign-out now REPLACES the navigation history rather than pushing
+over it: pushing left the signed-in app one back-gesture away.
+
+**Two answers to one question will disagree; make the second ask the first.**
+The TTC hero computed the fertile window from cycle-day arithmetic while the
+day resolver (`ttc_day_context.dart`) already ruled that a bleed day is a period
+day. On short cycles the hero said "your fertile days end today" to someone
+bleeding. The fix was not better arithmetic in the hero; it was the hero asking
+the resolver (`ctx.isPeriodDay`). Same lesson as the truth hierarchy: one owner
+per fact.
+
 ## 17. Reading list, in order
 
 1. `0001_create_profiles.sql` — the two layers (grant + RLS), own-row.
@@ -2678,3 +2711,4 @@ second table.
 30. `0095_pp_emergency_cards.sql` → `HealthStore._mergeEmergency` — one row per
     child, read whole (§16aa).
 31. `JournalStore._partnerChild` — sharing by reading under an existing partner policy (§16bb).
+32. `lib/ask_veda/pp_veda_corpus.dart` + the service's `scope_domain` / `stage_key_for` — namespaced prune, versioned cache key; `pvSignOut` — independent guards (§16cc).

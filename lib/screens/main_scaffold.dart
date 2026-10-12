@@ -268,7 +268,17 @@ class _MainScaffoldState extends State<MainScaffold> with WidgetsBindingObserver
                 PvTab(Icons.handyman_outlined, s.toolsTab),
                 const PvTab(Icons.grid_view_outlined, 'More'),
               ];
-        return Scaffold(
+        // ⚠️ BACK ON A TAB GOES HOME FIRST (2026-10-10). The five tabs live in
+        // one IndexedStack inside ONE route, and that route is the first on
+        // the stack — so Android back on Tools had nothing to pop but the app
+        // itself. Back on any other tab now returns to Today; back on Today
+        // still leaves, the same rule the trying-to-conceive host already has.
+        return PopScope(
+          canPop: AppNav.instance.index == 0,
+          onPopInvokedWithResult: (didPop, _) {
+            if (!didPop && AppNav.instance.index != 0) AppNav.instance.go(0);
+          },
+          child: Scaffold(
           backgroundColor: AppTheme.scaffoldBackground,
           body: Stack(
             children: [
@@ -351,6 +361,7 @@ class _MainScaffoldState extends State<MainScaffold> with WidgetsBindingObserver
                           : const SizedBox.shrink(),
                 ),
             ],
+          ),
           ),
         );
       },

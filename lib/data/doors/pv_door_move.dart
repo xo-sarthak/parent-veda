@@ -59,9 +59,14 @@ const String kMoveTabRest = 'rest';
 const String kMoveTabClasses = 'classes';
 
 /// Each tool card's words, shared by the two tabs it sits on.
-const String _yogaTitle = 'Pregnancy yoga classes';
-const String _yogaBlurb = '22 short sessions, month by month, for where you '
-    'are now.';
+// Kept for revert (2026-10-10): 'Pregnancy yoga classes' / '22 short
+// sessions, month by month, for where you are now.' The title promised a
+// class and the screen opened videos, with nothing saying which was which
+// (the user's note: "no indication of it being a class/live"). The screen now
+// marks its videos as self-guided and lists the live classes on their own.
+const String _yogaTitle = 'Pregnancy yoga: videos and live classes';
+const String _yogaBlurb = '22 follow-along videos, month by month, and live '
+    'classes with a teacher.';
 const String _kegelTitle = 'Kegel Care: a guided daily routine';
 const String _kegelBlurb = 'It times each squeeze and rest, and builds up as '
     'your pregnancy goes on.';

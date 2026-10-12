@@ -28,6 +28,7 @@ import '../../theme/pv_fonts.dart';
 import '../products/pv_store_chrome.dart'
     show kPvLine, kPvStar, pvStorePalette, PvRoundIcon, PvCommit;
 import '../v2/v2_palette.dart';
+import '../../widgets/pv_feedback.dart';
 
 export '../products/pv_store_chrome.dart'
     show
@@ -1022,7 +1023,7 @@ class PvLearnHead extends StatelessWidget {
                 ),
               ),
               if (action != null)
-                GestureDetector(
+                PvPress(child: GestureDetector(
                   onTap: onAction,
                   child: Text(
                     action!,
@@ -1032,7 +1033,7 @@ class PvLearnHead extends StatelessWidget {
                       color: p.ink1,
                     ),
                   ),
-                ),
+                )),
             ],
           ),
           if (lead != null) ...[

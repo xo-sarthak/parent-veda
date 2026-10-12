@@ -89,7 +89,9 @@ int _selectedOf(WidgetTester tester) =>
 /// for the sheet (2026-10-02: the signs are folded, as TTC's doors fold them).
 Future<Finder> _openFlag(WidgetTester tester) async {
   final row = find.byKey(kPvDoorFlagRowKey);
-  await tester.ensureVisible(row);
+  // Mid-screen, not the top edge: since 2026-10-10 a door pins a bar there
+  // once the hero has gone, and a row at the very top sits under it.
+  await Scrollable.ensureVisible(tester.element(row), alignment: 0.5);
   await tester.pump();
   await tester.tap(row);
   await tester.pump();

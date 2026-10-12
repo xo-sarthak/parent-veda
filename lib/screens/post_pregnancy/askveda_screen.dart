@@ -13,8 +13,11 @@ import 'dart:math';
 import 'pp_child_profile.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show HapticFeedback;
 
+import '../../ask_veda/pv_veda_reveal.dart';
 import '../../theme/pv_fonts.dart';
+import '../products/pv_store_chrome.dart' show kPvInk, kPvLine;
 // import 'package:google_fonts/google_fonts.dart'; // fonts go through theme/pv_fonts.dart since 2026-09-17
 
 import '../../localization/app_language.dart';
@@ -25,28 +28,37 @@ import 'pp_common.dart';
 import 'pp_products_data.dart';
 import 'product_detail_screen.dart';
 import '../../services/remote/ask_veda_service.dart';
+import '../../ask_veda/pp_veda_corpus.dart' show openPpVedaDoc;
 import 'pp_phase_faqs.dart' show phaseFaqs;
 import 'pp_phases_data.dart' show currentPhase, ppFillChild;
 
-// ---- design palette (identical to the pregnancy Ask Veda) --------------------
-const _vBgTop = Color(0xFFF8F4FD);
-const _vBgMid = Color(0xFFF2EBF9);
-const _vBgBot = Color(0xFFEFE7F6);
-const _vPurple = Color(0xFF6D28D9);
-const _vPurple2 = Color(0xFF7C3AED);
+// ---- design palette ------------------------------------------------------------
+// ONE PARENTVEDA (2026-10-10, the Ask Veda reveal pass): the pregnancy Ask
+// Veda's white ground, ink and page hairline, so the three Ask Veda screens
+// look like one. Values only; every widget below is unchanged. Kept for
+// revert, the violet palette:
+//   _vBgTop 0xFFF8F4FD, _vBgMid 0xFFF2EBF9, _vBgBot 0xFFEFE7F6,
+//   _vPurple 0xFF6D28D9, _vPurple2 0xFF7C3AED, _vInk 0xFF241640,
+//   _vInk2 0xFF2A1B47, _vBody 0xFF352A4A, _vBody2 0xFF4A4263,
+//   _vMuted 0xFF948BA6, _vMuted2 0xFF9B8BB5, _vCardBorder 0x147C3AED,
+//   _vDivider 0xFFF4EEFA, _vCardShadow = [
+//     BoxShadow(color: Color(0x0D281646), blurRadius: 6, offset: Offset(0, 2)),
+//     BoxShadow(color: Color(0x14602EA0), blurRadius: 30, offset: Offset(0, 16), spreadRadius: -10)]
+const _vBgTop = Colors.white;
+const _vBgMid = Colors.white;
+const _vBgBot = Colors.white;
+const _vPurple = kPvInk;
+const _vPurple2 = kPvInk;
 const _vCoral = Color(0xFFF0476A);
-const _vInk = Color(0xFF241640);
-const _vInk2 = Color(0xFF2A1B47);
-const _vBody = Color(0xFF352A4A);
-const _vBody2 = Color(0xFF4A4263);
-const _vMuted = Color(0xFF948BA6);
-const _vMuted2 = Color(0xFF9B8BB5);
-const _vCardBorder = Color(0x147C3AED);
-const _vDivider = Color(0xFFF4EEFA);
-const List<BoxShadow> _vCardShadow = [
-  BoxShadow(color: Color(0x0D281646), blurRadius: 6, offset: Offset(0, 2)),
-  BoxShadow(color: Color(0x14602EA0), blurRadius: 30, offset: Offset(0, 16), spreadRadius: -10),
-];
+const _vInk = kPvInk;
+const _vInk2 = kPvInk;
+const _vBody = kPvInk;
+const _vBody2 = kPvInk;
+const _vMuted = Color(0xFF6F6B72);
+const _vMuted2 = Color(0xFF6F6B72);
+const _vCardBorder = kPvLine;
+const _vDivider = kPvLine;
+const List<BoxShadow> _vCardShadow = [];
 
 class AskVedaScreen extends StatefulWidget {
   const AskVedaScreen({super.key, this.initialQuery});
@@ -69,6 +81,11 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
   bool _loading = false;  // /ask is in flight
   bool _failed = false;   // backend unreachable → "connect to the internet"
   final Map<String, List<String>> _picked = {};
+
+  // How far the answer has arrived (2026-10-10, the reveal): 0 the answer is
+  // typing, 1 "What this means" is typing, 2 everything below has come in.
+  int _reveal = 0;
+  final _focus = FocusNode();
 
   // Stage-wise suggestions (icons, not emojis).
   static const List<(String, IconData, List<String>)> _suggest = [
@@ -138,6 +155,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
   void dispose() {
     _ctrl.dispose();
     _scroll.dispose();
+    _focus.dispose();
     super.dispose();
   }
 
@@ -162,10 +180,15 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
     final res = await AskVedaService.ask(
       t,
       childAgeMonths: ChildProfileStore.instance.ageInMonths,
+      // Scopes the answer and its cards to parenting content (the service's
+      // `scope_domain`, 2026-10-10), so every card is one this screen opens.
+      stage: 'parenting',
     );
     if (!mounted || _query != t) return; // ignore stale / superseded replies
+    if (res != null) HapticFeedback.lightImpact(); // the answer has landed
     setState(() {
       _loading = false;
+      _reveal = 0;
       if (res != null) {
         _feed = res;
       } else {
@@ -181,6 +204,18 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         _failed = false;
         _ctrl.clear();
       });
+
+  // Tap the asked question to change it: back to the field with her words in
+  // it, the keyboard up. The X still clears to a blank field.
+  void _editQuery() {
+    final q = _query ?? '';
+    _clearQuery();
+    _ctrl.text = q;
+    _ctrl.selection = TextSelection.collapsed(offset: q.length);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _focus.requestFocus();
+    });
+  }
 
   void _snack(String m) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(m), behavior: SnackBarBehavior.floating));
   void _open(Widget w) => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => w));
@@ -275,11 +310,10 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(28),
-          border: Border.all(color: const Color(0x1A7C3AED)),
-          boxShadow: const [
-            BoxShadow(color: Color(0x0D281646), blurRadius: 6, offset: Offset(0, 2)),
-            BoxShadow(color: Color(0x334D2EA0), blurRadius: 30, offset: Offset(0, 14), spreadRadius: -16),
-          ],
+          // The page hairline, no shadow (2026-10-10). Kept for revert: a
+          // violet hairline 0x1A7C3AED and two violet shadows (0x0D281646,
+          // 0x334D2EA0).
+          border: Border.all(color: kPvLine),
         ),
         child: result ? _pillResult() : _pillEdit(),
       );
@@ -290,6 +324,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         Expanded(
           child: TextField(
             controller: _ctrl,
+            focusNode: _focus,
             textInputAction: TextInputAction.search,
             onSubmitted: _send,
             cursorColor: _vPurple,
@@ -324,7 +359,14 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
   Widget _pillResult() => Row(children: [
         const Icon(Icons.search_rounded, size: 21, color: Color(0xFF9384B0)),
         const SizedBox(width: 11),
-        Expanded(child: Text(_query ?? '', maxLines: 1, overflow: TextOverflow.ellipsis, style: pvManrope(fontSize: 14.5, fontWeight: FontWeight.w600, color: _vInk))),
+        Expanded(
+          child: GestureDetector(
+            key: const ValueKey('veda_edit_query'),
+            behavior: HitTestBehavior.opaque,
+            onTap: _editQuery,
+            child: Text(_query ?? '', maxLines: 1, overflow: TextOverflow.ellipsis, style: pvManrope(fontSize: 14.5, fontWeight: FontWeight.w600, color: _vInk)),
+          ),
+        ),
         GestureDetector(onTap: _clearQuery, child: const Padding(padding: EdgeInsets.symmetric(horizontal: 4), child: Icon(Icons.close_rounded, size: 19, color: Color(0xFFB6A9CC)))),
         const SizedBox(width: 8),
         Container(width: 1, height: 20, color: const Color(0xFFEADFF5)),
@@ -395,24 +437,87 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
 
   // The 7 sections. 1-3 from the LLM; 4/6/7 (+ videos, community) always render —
   // an empty section shows "Coming soon" so the format never collapses.
-  List<Widget> _feedSections(AskVedaResult f) => [
-        _answerCard(f.answer),
-        if (f.meaning.isNotEmpty) _meaning(f.meaning),
-        if (f.actions.isNotEmpty) _actions(f.actions),
-        _moreInfo(f),
-        _communityComingSoon(),
-        _productsFeed(f),
-        _servicesFeed(f),
-        _disclaimer(),
-      ];
+  //
+  // THE ANSWER ARRIVES (2026-10-10, the user: "the way text gets written
+  // when we use ChatGPT/Claude on phone"). The answer types in, then "What
+  // this means" types in, then everything below fades up one after another
+  // (`pv_veda_reveal.dart`). Sections, order and taps unchanged. Kept for
+  // revert: the same list with no PvVedaFadeIn wrappers and no follow-ups.
+  List<Widget> _feedSections(AskVedaResult f) {
+    final rest = _reveal >= 2;
+    var i = 0;
+    Widget later(Widget w) => PvVedaFadeIn(show: rest, index: i++, child: w);
+    return [
+      _answerCard(f.answer),
+      if (f.meaning.isNotEmpty)
+        PvVedaFadeIn(show: _reveal >= 1, child: _meaning(f.meaning)),
+      if (f.actions.isNotEmpty) later(_actions(f.actions)),
+      later(_moreInfo(f)),
+      later(_communityComingSoon()),
+      later(_productsFeed(f)),
+      later(_servicesFeed(f)),
+      if (_followUps().isNotEmpty) later(_followUpsCard()),
+      later(_disclaimer()),
+    ];
+  }
 
+  void _answerDone() {
+    if (!mounted || _reveal > 0) return;
+    setState(() => _reveal = (_feed?.meaning.isNotEmpty ?? false) ? 1 : 2);
+  }
+
+  void _meaningDone() {
+    if (!mounted || _reveal > 1) return;
+    setState(() => _reveal = 2);
+  }
+
+  // ---- "You could also ask" (2026-10-10) ------------------------------------
+  // Perplexity's related questions, from this screen's own suggestion pool
+  // (this age's questions first, filled from her profile). Tapping one asks it.
+  List<String> _followUps() => pvVedaFollowUps(_query ?? '', [
+        for (final sec in _sections)
+          for (final q in sec.$3) ppFillChild(q),
+      ]);
+
+  Widget _followUpsCard() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        _sectionHead(Icons.forum_outlined, 'You could also ask'),
+        _card(
+          padding: EdgeInsets.zero,
+          child: Column(children: [
+            for (final (i, q) in _followUps().indexed)
+              InkWell(
+                key: ValueKey('veda_follow_$i'),
+                onTap: () => _send(q),
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(16, 14, 14, 14),
+                  decoration: BoxDecoration(
+                      border: i == 0 ? null : const Border(top: BorderSide(color: _vDivider))),
+                  child: Row(children: [
+                    const Icon(Icons.subdirectory_arrow_right_rounded, size: 18, color: _vMuted),
+                    const SizedBox(width: 12),
+                    Expanded(child: Text(q, style: pvManrope(fontSize: 14, fontWeight: FontWeight.w600, height: 1.35, color: _vInk))),
+                    const SizedBox(width: 8),
+                    const Icon(Icons.arrow_forward_rounded, size: 16, color: _vInk),
+                  ]),
+                ),
+              ),
+          ]),
+        ),
+      ]);
+
+  // The calm wait (2026-10-10). Kept for revert: a white card with a 2px
+  // CircularProgressIndicator and 'Asking Veda…' beside it.
   Widget _loadingCard() => _card(
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 28),
-        child: Row(children: [
-          const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: _vPurple2)),
-          const SizedBox(width: 14),
-          Text('Asking Veda…', style: pvManrope(fontSize: 14, fontWeight: FontWeight.w700, color: _vInk)),
-        ]),
+        padding: const EdgeInsets.fromLTRB(18, 20, 18, 22),
+        child: PvVedaThinking(
+          color: _vInk,
+          textStyle: pvManrope(fontSize: 14, fontWeight: FontWeight.w700, color: _vInk),
+          lines: [
+            'Looking through ParentVeda…',
+            'Thinking about ${ChildProfileStore.instance.nameMid} at ${ChildProfileStore.instance.ageLabel}…',
+            'Putting your answer together…',
+          ],
+        ),
       );
 
   Widget _offlineCard() => _card(
@@ -510,14 +615,30 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
           const SizedBox(height: 13),
           _contextChip(),
           const SizedBox(height: 14),
-          Text(answer, style: pvManrope(fontSize: 14.5, height: 1.6, fontWeight: FontWeight.w500, color: _vBody)),
+          // Types in (2026-10-10). Kept for revert:
+          //   Text(answer, style: pvManrope(fontSize: 14.5, height: 1.6, fontWeight: FontWeight.w500, color: _vBody)),
+          PvTypewriterText(answer,
+              key: ValueKey('veda_answer_$answer'),
+              onDone: _answerDone,
+              followBottomInset: 150, // clears the bottom bar
+              style: pvManrope(fontSize: 14.5, height: 1.6, fontWeight: FontWeight.w500, color: _vBody)),
         ]),
       );
 
   // S2 - What this means for you
   Widget _meaning(String meaning) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         _sectionHead(Icons.favorite_rounded, 'What this means for you'),
-        _card(padding: const EdgeInsets.fromLTRB(17, 17, 18, 17), child: Text(meaning, style: pvManrope(fontSize: 14.5, height: 1.62, color: _vBody2))),
+        // Types in after the answer. Kept for revert:
+        //   child: Text(meaning, style: pvManrope(fontSize: 14.5, height: 1.62, color: _vBody2))
+        _card(
+            padding: const EdgeInsets.fromLTRB(17, 17, 18, 17),
+            child: _reveal >= 1
+                ? PvTypewriterText(meaning,
+                    key: ValueKey('veda_meaning_$meaning'),
+                    onDone: _meaningDone,
+                    followBottomInset: 150,
+                    style: pvManrope(fontSize: 14.5, height: 1.62, color: _vBody2))
+                : const SizedBox(width: double.infinity)),
       ]);
 
   // S3 - Recommended next actions
@@ -690,6 +811,10 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
 
   // ---- deep-linking : open the exact content on TOP of Ask Veda -------------
   void _openItem(VedaFeedItem it) {
+    // The real page first: a card whose id is one of the parenting export's
+    // own (`ppv...`, `pp_veda_corpus.dart`) opens that door page, door, tool
+    // or guide itself. Anything older keeps the handling below.
+    if (openPpVedaDoc(context, it.docId)) return;
     final kind = (it.kind ?? '').toLowerCase();
     if (kind == 'product') {
       final prod = _matchProduct(it.title);

@@ -52,6 +52,7 @@ import 'package:flutter/services.dart';
 
 import '../../theme/pv_fonts.dart';
 import '../../ttc/ttc_chapter.dart' show TtcChapter;
+import '../../widgets/pv_feedback.dart' show PvQuestionProgress;
 import '../products/pv_store_chrome.dart' show pvSnack;
 import '../v2/v2_palette.dart';
 import '../v2/v3_hero_field.dart';
@@ -496,8 +497,19 @@ class TtcToolProgress extends StatelessWidget {
   final String startLabel;
   final String goingLabel;
 
+  // ⚠️ ONE PROGRESS LINE FOR EVERY QUESTION FLOW (2026-10-10, "consistency
+  // for that 'keep going' box"). Drawn by the shared `PvQuestionProgress`
+  // (lib/widgets/pv_feedback.dart), the same one onboarding and What changed
+  // use. The fill moved from ttcPurple to the one ink: a progress line reports,
+  // it does not invite a tap. The type keeps its name so call sites and tests
+  // that find it still do.
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => PvQuestionProgress(
+      done: done, total: total, startLabel: startLabel, goingLabel: goingLabel);
+
+  // Kept for revert (2026-10-10): the TTC-only line with the violet fill.
+  // ignore: unused_element
+  Widget _buildBefore(BuildContext context) {
     final p = V2PaletteStore.instance.current;
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(done == 0 ? startLabel : goingLabel,

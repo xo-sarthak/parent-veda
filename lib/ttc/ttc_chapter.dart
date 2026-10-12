@@ -913,5 +913,5 @@ String ttcChapterHisTitle(TtcChapter c) => switch (c) {
       TtcChapter.knowingYourRhythm => 'Before her fertile days',
       TtcChapter.tryingTogether => 'Her fertile days',
       TtcChapter.theWaitingDays => 'The wait before testing',
-      TtcChapter.aNewBeginning => 'A positive test',
+      TtcChapter.aNewBeginning => "You're pregnant", // was 'A positive test' (2026-10-10)
     };

@@ -14,6 +14,8 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest_all.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 import '../models/medication.dart';
 import '../models/reminder.dart';
 import '../localization/app_language.dart';
@@ -152,6 +154,7 @@ class NotificationService {
     String body = "Test notification - you're all set ✅",
     int id = 999001,
   }) async {
+    if (await _muted()) return; // signed out (2026-10-10)
     if (!_ready) await init();
     try {
       await _plugin.show(id, title, body, _details);
@@ -219,6 +222,7 @@ class NotificationService {
   }) async {
     if (!_ready) await init();
     if (!_ready) return;
+    if (await _muted()) return; // signed out (2026-10-10)
     try {
       final tzWhen = tz.TZDateTime.from(when, tz.local);
       if (!tzWhen.isAfter(tz.TZDateTime.now(tz.local))) return;
@@ -292,6 +296,7 @@ class NotificationService {
   Future<void> scheduleMedicationAlarms(Medication m) async {
     if (!_ready) await init();
     if (!_ready) return;
+    if (await _muted()) return; // signed out (2026-10-10)
     await cancelMedicationAlarms(m.id);
 
     final now = tz.TZDateTime.now(tz.local);
@@ -433,6 +438,7 @@ class NotificationService {
   }
 
   Future<void> schedule(Reminder r) async {
+    if (await _muted()) return; // signed out (2026-10-10)
     if (!_ready || !r.enabled) {
       debugPrint('[reminders] schedule skipped (ready=$_ready enabled=${r.enabled})');
       return;
@@ -469,6 +475,56 @@ class NotificationService {
     }
   }
 
+  // ---------------------------------------------------------------------------
+  //  Signed out means silent (2026-10-10)
+  // ---------------------------------------------------------------------------
+  //  The user: "I have signed out but I'm still getting the reminders. Makes no
+  //  sense." Sign-out now cancels everything scheduled AND mutes every
+  //  scheduling path, because cancelling alone is undone by the next app start:
+  //  ReminderStore re-arms every saved reminder on load.
+  //
+  //  ⚠️ MUTED = SIGN-OUT'S OWN FLAG *AND* NOT SIGNED IN. Gating on the sign-in
+  //  flag alone would silence every widget test and any path that schedules
+  //  before onboarding finishes. Requiring the flag sign-out sets means only a
+  //  real sign-out mutes, and any sign-in (five places write `auth_completed`)
+  //  opens the gate again with no call to remember. The stores then re-arm
+  //  through the sign-in resync (`SyncRegistry`). Her reminders are never
+  //  deleted; only the alarms stop. Local-first: signing out is not deleting.
+  static const String kSilencedKey = 'pv_notifications_silenced';
+
+  /// `kAuthCompletedKey` in auth_flow_screen.dart. Not imported, so a service
+  /// does not depend on a screen; test/pv_sign_out_mute_test.dart pins them.
+  static const String kAuthFlagKey = 'auth_completed';
+
+  bool _silencedHint = true; // checked once from storage, then trusted
+
+  Future<bool> _muted() async {
+    if (!_silencedHint) return false;
+    try {
+      final p = await SharedPreferences.getInstance();
+      final silenced = p.getBool(kSilencedKey) ?? false;
+      final signedIn = p.getBool(kAuthFlagKey) ?? false;
+      if (silenced && !signedIn) return true;
+      if (silenced) await p.remove(kSilencedKey); // signed in again
+      _silencedHint = false;
+      return false;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Sign-out: cancel every scheduled notification and stay quiet until she
+  /// signs in again.
+  Future<void> silenceForSignOut() async {
+    _silencedHint = true;
+    try {
+      await (await SharedPreferences.getInstance()).setBool(kSilencedKey, true);
+    } catch (_) {/* best-effort */}
+    try {
+      await _plugin.cancelAll();
+    } catch (_) {/* plugin not ready: nothing was scheduled through it */}
+  }
+
   Future<void> cancel(int id) async {
     try {
       await _plugin.cancel(id);
@@ -481,6 +537,7 @@ class NotificationService {
     try {
       await _plugin.cancelAll();
     } catch (_) {/* ignore */}
+    if (await _muted()) return; // signed out (2026-10-10)
     for (final r in reminders) {
       if (r.enabled) await schedule(r);
     }

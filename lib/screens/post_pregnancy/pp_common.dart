@@ -36,6 +36,7 @@ import 'products_discovery_screen.dart';
 import 'tools_hub_screen.dart';
 // import 'pp_more_sheet.dart'; // kept for revert with showPpMoreSheet
 import 'pp_opening_soon.dart' show kPpCommunityOpen;
+import '../../widgets/pv_feedback.dart';
 
 // ---- palette ----------------------------------------------------------------
 // ⚠️ UNIFIED WITH THE PREGNANCY GROUND, 2026-08-17.
@@ -568,7 +569,7 @@ class PpBottomNav extends StatelessWidget {
 //       const SnackBar(content: Text('Coming soon'), behavior: SnackBarBehavior.floating),
 //     );
 
-Widget ppBack(BuildContext context, String label) => GestureDetector(
+Widget ppBack(BuildContext context, String label) => PvPress(child: GestureDetector(
       onTap: () => Navigator.of(context).maybePop(),
       behavior: HitTestBehavior.opaque,
       child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -576,7 +577,7 @@ Widget ppBack(BuildContext context, String label) => GestureDetector(
         const SizedBox(width: 12),
         Flexible(child: Text(label, style: ppBody(14, color: ppSoft), maxLines: 1, overflow: TextOverflow.ellipsis)),
       ]),
-    );
+    ));
 
 Widget ppSectionDivider() => const Padding(
       padding: EdgeInsets.symmetric(vertical: 26),
@@ -588,7 +589,7 @@ Widget ppSectionDivider() => const Padding(
 // widget on the right. Tapping pops the current route.
 Widget ppCircleBack(BuildContext context, {String? eyebrow, Widget? trailing}) => Row(
       children: [
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () => Navigator.of(context).maybePop(),
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -598,7 +599,7 @@ Widget ppCircleBack(BuildContext context, {String? eyebrow, Widget? trailing}) =
             decoration: const BoxDecoration(color: ppPanel, shape: BoxShape.circle),
             child: const Icon(Icons.arrow_back, size: 17, color: ppInk),
           ),
-        ),
+        )),
         if (eyebrow != null) ...[
           const SizedBox(width: 12),
           Expanded(child: ppEyebrow(eyebrow, color: ppMuted, spacing: 1.4)),
@@ -619,7 +620,7 @@ Widget ppProductRow(BuildContext context, String title, String desc, String pric
   final product = productId != null ? productById(productId) : null;
   final shownTitle = product?.name ?? title;
   final shownPrice = product?.priceLabel ?? price;
-  return GestureDetector(
+  return PvPress(child: GestureDetector(
     onTap: () {
       if (product != null) {
         // If this product has a ParentVeda Product Guide, ask which view;
@@ -665,7 +666,7 @@ Widget ppProductRow(BuildContext context, String title, String desc, String pric
         Text(shownPrice, style: ppBody(13, color: ppInk, w: FontWeight.w700)),
       ]),
     ),
-  );
+  ));
 }
 
 // A "frequently-asked-question" answer sheet - shows the actual answer inline
@@ -720,7 +721,7 @@ void ppFaqSheet(BuildContext context, String question) {
             const SizedBox(height: 14),
             Text(answer, style: ppBody(14.5, color: ppInk, h: 1.6)),
             const SizedBox(height: 20),
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: () {
                 Navigator.of(ctx).pop();
                 Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => AskVedaScreen(initialQuery: question)));
@@ -733,7 +734,7 @@ void ppFaqSheet(BuildContext context, String question) {
                 const SizedBox(width: 6),
                 const Icon(Icons.arrow_forward, size: 14, color: ppPurple),
               ]),
-            ),
+            )),
             const SizedBox(height: 16),
             Text('General guidance for your child\'s stage - please confirm anything important with your paediatrician.', style: ppBody(11.5, color: ppMuted, h: 1.5)),
           ],
@@ -750,7 +751,7 @@ Widget ppDeeperRow(BuildContext context, String pill, String text, {bool top = f
     // (2026-10-07); the row is not drawn rather than leading nowhere.
     pill == 'Room' && !kPpCommunityOpen
         ? const SizedBox.shrink()
-        : GestureDetector(
+        : PvPress(child: GestureDetector(
       onTap: () {
         switch (pill) {
           case 'Course':
@@ -785,7 +786,7 @@ Widget ppDeeperRow(BuildContext context, String pill, String text, {bool top = f
           const Text('→', style: TextStyle(color: ppMuted)),
         ]),
       ),
-    );
+    ));
 
 // Soft purple card shadow.
 // =============================================================================
@@ -862,7 +863,7 @@ Widget ppCard({
     child: child,
   );
   if (onTap == null) return card;
-  return GestureDetector(onTap: onTap, behavior: HitTestBehavior.opaque, child: card);
+  return PvPress(child: GestureDetector(onTap: onTap, behavior: HitTestBehavior.opaque, child: card));
 }
 
 /// A section eyebrow in the pregnancy app's voice: uppercase Manrope, tight and
@@ -960,14 +961,14 @@ Widget ppCarousel({
                   style: ppFraunces(19, color: Colors.white, w: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis),
             ),
             if (onSeeAll != null)
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: onSeeAll,
                 behavior: HitTestBehavior.opaque,
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
                   Text(seeAll, style: pvManrope(fontSize: 12, fontWeight: FontWeight.w800, color: Colors.white)),
                   const Icon(Icons.chevron_right_rounded, size: 17, color: Colors.white),
                 ]),
-              ),
+              )),
           ]),
         ),
         SizedBox(

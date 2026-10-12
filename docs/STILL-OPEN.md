@@ -10137,3 +10137,20 @@ From the parenting gap analysis (theAsianparent and What to Expect vs ParentVeda
   - **§82.13 Made-up numbers removed (2026-10-07).** Investments' "2 of 6 done" and "+10 XP" (nothing tracks
     lessons); astrology's invented birth line, "AI readings" and a profile tab that does not exist;
     recommendations' and yoga's star ratings, "Expert pick" and "Top rated". All kept only in the revert builds.
+
+## 83.0 Notebook batch — 2026-10-10 (open decisions and parked items)
+
+- 83.1 His side TTC: BUILT 2026-10-10. His Today is her TtcHomeV3 with TtcPartnerMode (lib/screens/ttc/ttc_partner_home.dart): same header/strip/calendar/doors/reads; no logging (view-only line on the home and the calendar's day panel); rail keeps her cycle + shared cards, never her logs; hero in his voice; his block (mission, supporting her, tonight, her body, his half). Old Slate TtcPartnerTodayScreen kept for revert. OWED: his Learn/Tools/More already partner-aware (check on device); pregnancy his side (Father Mode) still old.
+- 83.2 Baby vault (`dear_baby_vault_screen.dart`): parts 1-4 BUILT 2026-10-10 (cover, keepsake paper cards with week seal + italic date + that week's size, trimester trail oldest first, Write / Say it aloud invitation on top; test/dear_baby_vault_test.dart). OWED: read aloud, "open your letters" at birth, keepsake PDF.
+- 83.3 DONE 2026-10-10: renamed "I'm pregnant" everywhere she reads it (You action, TTC home card, chat, chapter, milestone, timeline); the confirm says a home test can be wrong; new You row "Not pregnant after all?" (pregnancy) offers "The test was wrong" (engine undo, back to trying) or "My pregnancy ended" (After a loss). IVF round's "Record the positive test" kept: the clinic's beta is the confirmation.
+- 83.4 DONE 2026-10-10: calendar button top right of the pregnancy home (Messages, Calendar, Saved), as on TTC.
+- 83.5 Google Calendar: recommended "Add to calendar" (device intent, no OAuth). Full sync parked.
+- 83.6 `prenatal_yoga_screen.dart` hard-codes a ₹599 price (money is server-side). Decide: backend price or remove.
+- 83.7 Parenting Yoga cards show "Live group" with no schedule (shared widget). Decide.
+- 83.8 8 new superfood recipes have no chosen photo (`nut_r_<id>` in `read_images.dart`).
+- 83.9 DONE 2026-10-10: sign-out cancels every scheduled notification and mutes all scheduling paths until she signs in again (NotificationService.silenceForSignOut / _muted); reminders stay saved and re-arm via SyncRegistry on sign-in.
+- 83.10 Tap feedback second pass: ~1,400 GestureDetector taps without feedback, mostly older parenting screens (scan + wrap script in the 10-10 scratchpad).
+- 83.11 Ask Veda: answer reveal is paced, not streamed; real streaming needs a service endpoint. Parenting Ask Veda palette was moved to pregnancy's white/ink (beyond brief) — keep or revert.
+- 83.12 Phone OTP edge functions (`phone-otp-send`, `phone-otp-verify`) still undeployed; need MSG91 secrets. All other functions deployed (checked 10-10).
+- 83.13 Daily insights tab images: to discuss.
+- 83.14 Still to do from the notebook: recipes UI (Mobbin study first), flash cards for heavy tools, door UI consistency, a home-screen mark leading to Talk to someone, Ask Veda pregnancy review.

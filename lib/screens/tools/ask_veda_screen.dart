@@ -22,7 +22,9 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show HapticFeedback;
 
+import '../../ask_veda/pv_veda_reveal.dart';
 import '../../data/product_data.dart';
 import '../../data/veda_showcase.dart';
 import '../../data/veda_suggestions.dart';
@@ -105,6 +107,12 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
   bool _loading = false; // /ask is in flight
   bool _failed = false;  // backend unreachable → "connect to the internet"
 
+  // How far the answer has arrived (2026-10-10, the reveal): 0 the answer is
+  // typing, 1 "What this means" is typing, 2 everything below has come in.
+  // Presentation only; the whole feed is already in hand.
+  int _reveal = 0;
+  final _focus = FocusNode();
+
   // A fresh, shuffled subset of each section's suggestions per visit.
   final _rng = Random();
   final Map<String, List<LocalizedText>> _picked = {};
@@ -137,6 +145,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
   void dispose() {
     _ctrl.dispose();
     _scroll.dispose();
+    _focus.dispose();
     super.dispose();
   }
 
@@ -177,8 +186,10 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
       lang: p.language.isHindi ? 'hi' : 'en',
     );
     if (!mounted || _query != t) return; // ignore stale / superseded replies
+    if (res != null) HapticFeedback.lightImpact(); // the answer has landed
     setState(() {
       _loading = false;
+      _reveal = 0;
       if (res != null) {
         _feed = res;
       } else {
@@ -194,6 +205,19 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
       _loading = false;
       _failed = false;
       _ctrl.clear();
+    });
+  }
+
+  // Tap the asked question to change it: back to the field with her words in
+  // it, the keyboard up (the follow-up habit every assistant has). The X still
+  // clears to a blank field.
+  void _editQuery() {
+    final q = _query ?? '';
+    _clearQuery();
+    _ctrl.text = q;
+    _ctrl.selection = TextSelection.collapsed(offset: q.length);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _focus.requestFocus();
     });
   }
 
@@ -396,6 +420,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         Expanded(
           child: TextField(
             controller: _ctrl,
+            focusNode: _focus,
             textInputAction: TextInputAction.search,
             onSubmitted: _send,
             cursorColor: _vPurple,
@@ -436,11 +461,16 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         const Icon(Icons.search_rounded, size: 21, color: Color(0xFF9D959F)),
         const SizedBox(width: 11),
         Expanded(
-          child: Text(_query ?? '',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: pvManrope(
-                  fontSize: 14.5, fontWeight: FontWeight.w600, color: _vInk)),
+          child: GestureDetector(
+            key: const ValueKey('veda_edit_query'),
+            behavior: HitTestBehavior.opaque,
+            onTap: _editQuery,
+            child: Text(_query ?? '',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: pvManrope(
+                    fontSize: 14.5, fontWeight: FontWeight.w600, color: _vInk)),
+          ),
         ),
         GestureDetector(
           onTap: _clearQuery,
@@ -587,31 +617,100 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
   // revert, the always-render list:
   //   _feedMoreInfo(f), _feedCommunityComingSoon(), _feedProducts(f),
   //   _feedServices(f),
-  List<Widget> _feedSections(AskVedaResult f, S s) => [
-        _feedAnswerCard(f.answer, s),
-        if (f.meaning.isNotEmpty) _feedMeaning(f.meaning),
-        if (f.actions.isNotEmpty) _feedActions(f.actions),
-        if (f.content.isNotEmpty || f.videos.isNotEmpty)
-          _feedMoreInfo(f)
-        // ⚠️ BUILT, NOT LEFT OUT (2026-10-02, TTC's rule: "when the service
-        // sends no reading, we find our own"). The app's own search matches the
-        // question on the phone, so More information is never empty when the
-        // app has the page. Kept for revert: nothing here.
-        else if (_localHits().isNotEmpty)
-          _localMoreInfo(),
-        // _feedCommunityComingSoon(), // held back with the community, kept for revert
-        if (f.products.isNotEmpty) _feedProducts(f),
-        if (f.services.isNotEmpty) _feedServices(f),
-        _disclaimer(s),
-      ];
+  //
+  // ⚠️ THE ANSWER ARRIVES (2026-10-10, the user: "the way text gets written
+  // when we use ChatGPT/Claude on phone"). The answer types in, then "What
+  // this means" types in, then everything below fades up one after another
+  // (`pv_veda_reveal.dart`). The sections, their order and what each opens
+  // are unchanged; only their arrival is paced. Kept for revert: the same
+  // list with no PvVedaFadeIn wrappers and no follow-ups.
+  List<Widget> _feedSections(AskVedaResult f, S s) {
+    final hasMeaning = f.meaning.isNotEmpty;
+    final rest = _reveal >= 2;
+    var i = 0;
+    Widget later(Widget w) => PvVedaFadeIn(show: rest, index: i++, child: w);
+    return [
+      _feedAnswerCard(f.answer, s),
+      if (hasMeaning)
+        PvVedaFadeIn(show: _reveal >= 1, child: _feedMeaning(f.meaning)),
+      if (f.actions.isNotEmpty) later(_feedActions(f.actions)),
+      if (f.content.isNotEmpty || f.videos.isNotEmpty)
+        later(_feedMoreInfo(f))
+      // ⚠️ BUILT, NOT LEFT OUT (2026-10-02, TTC's rule: "when the service
+      // sends no reading, we find our own"). The app's own search matches the
+      // question on the phone, so More information is never empty when the
+      // app has the page. Kept for revert: nothing here.
+      else if (_localHits().isNotEmpty)
+        later(_localMoreInfo()),
+      // _feedCommunityComingSoon(), // held back with the community, kept for revert
+      if (f.products.isNotEmpty) later(_feedProducts(f)),
+      if (f.services.isNotEmpty) later(_feedServices(f)),
+      if (_followUps().isNotEmpty) later(_feedFollowUps()),
+      later(_disclaimer(s)),
+    ];
+  }
 
+  void _answerDone() {
+    if (!mounted || _reveal > 0) return;
+    setState(() => _reveal = (_feed?.meaning.isNotEmpty ?? false) ? 1 : 2);
+  }
+
+  void _meaningDone() {
+    if (!mounted || _reveal > 1) return;
+    setState(() => _reveal = 2);
+  }
+
+  // ---- "You could also ask" (2026-10-10) ------------------------------------
+  // Perplexity's related questions, from the suggestion pool this screen
+  // already shows (the service sends no follow-ups). Tapping one asks it.
+  List<String> _followUps() {
+    final lang = p.language;
+    return pvVedaFollowUps(_query ?? '', [
+      for (final sec in kVedaSuggestions)
+        if (sec.active)
+          for (final q in sec.questions) q.of(lang),
+    ]);
+  }
+
+  Widget _feedFollowUps() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        _sectionHead(Icons.forum_outlined, 'You could also ask'),
+        _card(
+          padding: EdgeInsets.zero,
+          child: Column(children: [
+            for (final (i, q) in _followUps().indexed)
+              InkWell(
+                key: ValueKey('veda_follow_$i'),
+                onTap: () => _send(q),
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(16, 14, 14, 14),
+                  decoration: BoxDecoration(
+                      border: i == 0 ? null : const Border(top: BorderSide(color: _vDivider))),
+                  child: Row(children: [
+                    const Icon(Icons.subdirectory_arrow_right_rounded, size: 18, color: _vMuted),
+                    const SizedBox(width: 12),
+                    Expanded(child: Text(q, style: pvManrope(fontSize: 14, fontWeight: FontWeight.w600, height: 1.35, color: _vInk))),
+                    const SizedBox(width: 8),
+                    const Icon(Icons.arrow_forward_rounded, size: 16, color: _vInk),
+                  ]),
+                ),
+              ),
+          ]),
+        ),
+      ]);
+
+  // The calm wait (2026-10-10). Kept for revert: a white card with a 2px
+  // CircularProgressIndicator and S.now.uiAskingVeda beside it.
   Widget _loadingCard() => _card(
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 28),
-        child: Row(children: [
-          const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: _vPurple2)),
-          const SizedBox(width: 14),
-          Text(S.now.uiAskingVeda, style: pvManrope(fontSize: 14, fontWeight: FontWeight.w700, color: _vInk)),
-        ]),
+        padding: const EdgeInsets.fromLTRB(18, 20, 18, 22),
+        child: PvVedaThinking(
+          color: _vInk,
+          textStyle: pvManrope(fontSize: 14, fontWeight: FontWeight.w700, color: _vInk),
+          lines: [
+            'Looking through ParentVeda…',
+            'Finding what fits week ${p.currentWeek}…',
+            'Putting your answer together…',
+          ],
+        ),
       );
 
   Widget _offlineCard() => _card(
@@ -663,14 +762,28 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
           const SizedBox(height: 13),
           _contextChip(s),
           const SizedBox(height: 14),
-          Text(answer, style: pvManrope(fontSize: 15, height: 1.66, fontWeight: FontWeight.w500, color: _vBody)),
+          // Types in (2026-10-10). Kept for revert:
+          //   Text(answer, style: pvManrope(fontSize: 15, height: 1.66, fontWeight: FontWeight.w500, color: _vBody)),
+          PvTypewriterText(answer,
+              key: ValueKey('veda_answer_$answer'),
+              onDone: _answerDone,
+              style: pvManrope(fontSize: 15, height: 1.66, fontWeight: FontWeight.w500, color: _vBody)),
         ]),
       );
 
   // S2 - What this means for you
   Widget _feedMeaning(String meaning) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         _sectionHead(Icons.favorite_rounded, 'What this means for you'),
-        _card(padding: const EdgeInsets.fromLTRB(17, 17, 18, 17), child: Text(meaning, style: pvManrope(fontSize: 14.5, height: 1.62, color: _vBody2))),
+        // Types in after the answer. Kept for revert:
+        //   child: Text(meaning, style: pvManrope(fontSize: 14.5, height: 1.62, color: _vBody2))
+        _card(
+            padding: const EdgeInsets.fromLTRB(17, 17, 18, 17),
+            child: _reveal >= 1
+                ? PvTypewriterText(meaning,
+                    key: ValueKey('veda_meaning_$meaning'),
+                    onDone: _meaningDone,
+                    style: pvManrope(fontSize: 14.5, height: 1.62, color: _vBody2))
+                : const SizedBox(width: double.infinity)),
       ]);
 
   // S3 - Recommended next actions

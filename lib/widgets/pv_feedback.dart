@@ -24,6 +24,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../theme/pv_fonts.dart';
+
 /// A 2% settle while the pointer is down.
 class PvPress extends StatefulWidget {
   const PvPress({super.key, required this.child, this.enabled = true});
@@ -152,5 +154,235 @@ class _PvTickState extends State<PvTick> with SingleTickerProviderStateMixin {
         ),
       ),
     );
+  }
+}
+
+// =============================================================================
+//  PvChoiceTile / PvQuestionProgress: one answer row and one progress line
+//  for every question flow (2026-10-10)
+// -----------------------------------------------------------------------------
+//  The user's notes: "consistency for MCQ type ques" and "consistency for that
+//  'keep going' box for ques". Before this, a chosen answer was an ink edge in
+//  onboarding, a lavender fill with a violet edge in What changed, a violet
+//  edge in the parenting checks, an ink slab in the mood check and a tinted
+//  panel in the TTC intro: five looks for one act. And the progress line over
+//  a run of questions was violet on the TTC tools, ink in onboarding, and a
+//  bare "Question 2 of 5" on What changed.
+//
+//  The shape, from Mobbin (Cash App's employment status
+//  https://mobbin.com/screens/48895749-349e-4c68-8c52-4fa0d2485e73 ,
+//  MacroFactor's program style
+//  https://mobbin.com/screens/d0e155ed-6da1-4e5f-a03a-675b24be45c9 ,
+//  LinkedIn's goal question
+//  https://mobbin.com/screens/266fba7e-51d8-468e-8a0b-c41257fa9acd , Ro's
+//  thin bar over its questionnaire
+//  https://mobbin.com/screens/07c64cc9-88c4-4ca1-ba72-254e1603748a ) and from
+//  our base UI (white ground, the one ink, no violet on a selection):
+//
+//    · AT REST: white card, hairline edge, an empty ring on the right. The ring
+//      says "this can be chosen" before anything is.
+//    · CHOSEN: the edge goes ink and thicker, the ring fills ink with a white
+//      tick. The card itself does NOT fill: a full-width ink slab of text is
+//      the loudest thing on a calm page, and the mark already says "this one".
+//
+//  ⚠️ `selectedEdge` / `selectedTint` EXIST FOR TRIAGE, AND ONLY FOR IT. The
+//  parenting checks colour a worrying answer once it is chosen (never before,
+//  so no answer looks like the wrong one). That is meaning, not decoration, so
+//  the shared tile carries it rather than flattening it away.
+//
+//  Compact Yes / No / Not sure answers laid out in a grid stay on
+//  `TtcToolOptions` (ttc_tool_chrome.dart): ink-filled blocks, decided by the
+//  user on 2026-09-06. A row and a block are two shapes; each has one look.
+// =============================================================================
+
+/// The one ink and one hairline every question control is drawn in.
+const Color kPvChoiceInk = Color(0xFF2F2C30);
+const Color kPvChoiceLine = Color(0xFFE4E2E5);
+const Color _kPvChoiceMuted = Color(0xFF6F6A73);
+
+/// One answer to a multiple-choice question, as a full-width row.
+class PvChoiceTile extends StatelessWidget {
+  const PvChoiceTile({
+    super.key,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+    this.subtitle,
+    this.leading,
+    this.titleStyle,
+    this.selectedEdge,
+    this.selectedTint,
+    this.compact = false,
+  });
+
+  final String label;
+  final String? subtitle;
+  final bool selected;
+  final VoidCallback? onTap;
+
+  /// An optional icon well or picture on the left.
+  final Widget? leading;
+
+  /// Overrides the label's style (onboarding sets its titles in Fraunces).
+  final TextStyle? titleStyle;
+
+  /// Triage only: see the header.
+  final Color? selectedEdge;
+  final Color? selectedTint;
+
+  /// Tighter vertical padding for long lists.
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    final mark = selectedEdge ?? kPvChoiceInk;
+    final edge = selected ? mark : kPvChoiceLine;
+    return Semantics(
+      button: true,
+      selected: selected,
+      child: PvPress(
+        enabled: onTap != null,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onTap == null
+                ? null
+                : () {
+                    HapticFeedback.selectionClick();
+                    onTap!();
+                  },
+            borderRadius: BorderRadius.circular(16),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 160),
+              curve: Curves.easeOutCubic,
+              width: double.infinity,
+              constraints: const BoxConstraints(minHeight: 56),
+              padding: EdgeInsets.fromLTRB(
+                  16, compact ? 12 : 15, 14, compact ? 12 : 15),
+              decoration: BoxDecoration(
+                color: selected ? (selectedTint ?? Colors.white) : Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: edge, width: selected ? 1.6 : 1.2),
+              ),
+              child: Row(children: [
+                if (leading != null) ...[leading!, const SizedBox(width: 14)],
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        label,
+                        style: titleStyle ??
+                            pvManrope(
+                              fontSize: 15,
+                              height: 1.35,
+                              fontWeight:
+                                  selected ? FontWeight.w700 : FontWeight.w600,
+                              color: kPvChoiceInk,
+                            ),
+                      ),
+                      if (subtitle != null) ...[
+                        const SizedBox(height: 3),
+                        Text(
+                          subtitle!,
+                          style: pvManrope(
+                              fontSize: 12.5,
+                              height: 1.4,
+                              color: _kPvChoiceMuted),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 160),
+                  width: 22,
+                  height: 22,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: selected ? mark : Colors.transparent,
+                    border: selected
+                        ? null
+                        : Border.all(color: kPvChoiceLine, width: 1.6),
+                  ),
+                  child: selected
+                      ? const Icon(Icons.check_rounded,
+                          size: 14, color: Colors.white)
+                      : null,
+                ),
+              ]),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// How far through a run of questions: a small label over a thin ink line.
+///
+/// `done == 0` shows [startLabel]; after the first answer, [goingLabel], the
+/// "KEEP GOING" the TTC tools say. [count] adds "3 of 8" on the right, which
+/// onboarding uses over its question block and the TTC tools deliberately do
+/// not (a counter on a health questionnaire reads as a debt).
+class PvQuestionProgress extends StatelessWidget {
+  const PvQuestionProgress({
+    super.key,
+    required this.done,
+    required this.total,
+    this.startLabel = 'A FEW SHORT QUESTIONS',
+    this.goingLabel = 'KEEP GOING',
+    this.count = false,
+  });
+
+  final int done;
+  final int total;
+  final String startLabel;
+  final String goingLabel;
+  final bool count;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = total <= 0 ? 0.0 : (done / total).clamp(0.0, 1.0);
+    final style = pvManrope(
+      fontSize: 11,
+      fontWeight: FontWeight.w800,
+      letterSpacing: 1.2,
+      color: _kPvChoiceMuted,
+    );
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Row(children: [
+        Expanded(
+          child: Text(
+            (done == 0 ? startLabel : goingLabel).toUpperCase(),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: style,
+          ),
+        ),
+        if (count)
+          Text('$done of $total',
+              style: style.copyWith(
+                  letterSpacing: 0, fontWeight: FontWeight.w700)),
+      ]),
+      const SizedBox(height: 8),
+      ClipRRect(
+        borderRadius: BorderRadius.circular(99),
+        child: TweenAnimationBuilder<double>(
+          tween: Tween(begin: 0, end: t),
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOutCubic,
+          builder: (context, v, _) => LinearProgressIndicator(
+            value: v,
+            minHeight: 4,
+            backgroundColor: const Color(0xFFEEECEF),
+            // Ink, not the accent: this reports, it does not invite a tap.
+            valueColor: const AlwaysStoppedAnimation(kPvChoiceInk),
+          ),
+        ),
+      ),
+    ]);
   }
 }

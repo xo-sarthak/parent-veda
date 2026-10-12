@@ -286,7 +286,7 @@ class TtcTransitionEngine {
       id: 'ttc_positive_test',
       stage: LifeStage.tryingToConceive,
       kind: TimelineKind.milestone,
-      titleEn: 'A positive test',
+      titleEn: "You're pregnant", // was 'A positive test' (2026-10-10)
       titleHi: 'Positive test',
       detailEn: 'The day this chapter ended and the next one began.',
       detailHi: 'Jis din ye chapter khatam hua aur agla shuru hua.',

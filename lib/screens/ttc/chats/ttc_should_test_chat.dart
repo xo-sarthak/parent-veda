@@ -411,7 +411,7 @@ class TtcShouldTestChat extends TtcChatScript {
               'or heavy bleeding, see a doctor straight away.',
         ],
         [
-          TtcChatChoice('Record my positive test', action: _recordPositive),
+          TtcChatChoice("I'm pregnant", action: _recordPositive), // was 'Record my positive test' (2026-10-10)
           // Kept for revert (2026-09-28, explicit labels): 'Log it for today'
           const TtcChatChoice('Log the test for today', open: kTtcLogResult),
           const TtcChatChoice('Done', done: true),

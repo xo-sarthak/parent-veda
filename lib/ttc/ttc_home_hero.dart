@@ -150,6 +150,10 @@ enum TtcHeroState {
   /// "late" and factually just Thursday.
   periodExpectedBy,
 
+  /// A bleed day of the current cycle: "Your period / Day 2", with her likely
+  /// fertile days as the sub-line. Added 2026-10-10, see `_heroLine`.
+  onPeriod,
+
   // ---------------------------------------------------------------------------
   //  A treatment ROUND's steps — 2026-09-26 (docs/TTC-TREATMENT-FLOW.md §3a)
   // ---------------------------------------------------------------------------
@@ -477,6 +481,7 @@ TtcHeroLine _heroLine(DateTime? on) {
   final cycleDay = day.difference(anchor).inDays + 1;
   final future = day.isAfter(now);
 
+
   // ---- no window to speak of, for two different reasons --------------------
   //
   // ⚠️ THE CYCLE DAY TRAVELS WITH BOTH. It rides in `days` rather than in
@@ -489,6 +494,28 @@ TtcHeroLine _heroLine(DateTime? on) {
     return today.clinicInvolved
         ? TtcHeroLine(TtcHeroState.clinicHolds, days: cycleDay)
         : TtcHeroLine(TtcHeroState.noEstimate, days: cycleDay);
+  }
+
+  // ---- her period days -------------------------------------------------------
+  //
+  // ⚠️ THE PERIOD WINS AN OVERLAP — 2026-10-10. Reported on a phone: "fertile
+  // day end today but we are in our periods". The resolver has always phased a
+  // bleed day as `period` (`ttc_day_context.dart`, rule 4: "period wins an
+  // overlap"), so the calendar and the cards were right; the hero compared the
+  // window's cycle days directly below and never asked. On a short cycle the
+  // window's arithmetic can start inside the bleed days, so the biggest line on
+  // the screen said "Your fertile days end today" to someone bleeding. It now
+  // asks the same resolver, and the window rides in the sub-line instead.
+  //
+  // Only where the window would CLAIM the day: "open in 8 days" on day 2 is
+  // true and useful, "open" or "end today" on a bleed day is the contradiction.
+  // A clinic-held cycle never reaches here with a window (see above).
+  if (ctx.isPeriodDay && cycleDay >= opensDay) {
+    return TtcHeroLine(TtcHeroState.onPeriod,
+        days: cycleDay,
+        cycleDay: cycleDay,
+        windowFrom: ctx.windowOpensOn,
+        windowTo: ctx.windowClosesOn);
   }
 
   // ---- the window, compared on CYCLE DAYS ----------------------------------

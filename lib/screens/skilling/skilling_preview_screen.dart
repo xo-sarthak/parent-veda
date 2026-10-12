@@ -277,7 +277,7 @@ class _Hero extends StatelessWidget {
                       onSaved: () =>
                           Navigator.of(context).push(MaterialPageRoute<void>(
                               settings: const RouteSettings(name: 'saved'),
-                              builder: (_) => const SavedScreen())),
+                              builder: (_) => const SavedScreen(stage: 'skilling'))),
                       onProfile: () =>
                           openPvYou(context, stage: LifeStage.skilling),
                     ),

@@ -152,7 +152,7 @@ const Map<String, (TtcRowHome, String)> kTtcFormerYouRows = {
   'Notes for your doctor': (TtcRowHome.profile, 'Notes for your doctor'),
   // The row that opened her answers is now the section that shows them.
   'Your answers': (TtcRowHome.profile, 'YOUR ANSWERS'),
-  'I got a positive test': (TtcRowHome.profile, 'I got a positive test'),
+  "I'm pregnant": (TtcRowHome.profile, "I'm pregnant"), // was 'I got a positive test' (2026-10-10)
   'Your partner': (TtcRowHome.profile, 'Your partner'),
   // Settings: how the app behaves for her, her account, help.
   'Messages': (TtcRowHome.settings, 'Messages'),

@@ -138,6 +138,21 @@ FilterChip _filterChip(String label, bool selected, ValueChanged<bool> onSelecte
       shape: const StadiumBorder(),
     );
 
+/// A row of choice chips that starts at the left edge, under its label.
+///
+/// ALIGNMENT PASS (2026-10-10). Both editor sheets lay out in a plain
+/// Column, whose cross-axis default is CENTRE. A Wrap is only as wide as its
+/// widest run, so the Column centred it: the Repeat / day chips sat in the
+/// middle of the sheet while their label (an Align centerLeft) and every
+/// field below hugged the left. Giving the Wrap the full width lets it start
+/// where everything else does, and a narrow phone still wraps instead of
+/// overflowing. Kept for revert: Wrap(spacing: 8, runSpacing: 8, ...) at
+/// each call site.
+Widget _chipWrap(List<Widget> chips) => SizedBox(
+      width: double.infinity,
+      child: Wrap(spacing: 8, runSpacing: 8, children: chips),
+    );
+
 IconData _categoryIcon(String c) {
   switch (c) {
     case 'kegel':
@@ -657,7 +672,7 @@ class _ReminderEditorState extends State<_ReminderEditor> {
           // Repeat (Once / Daily / Weekly / Custom-specific-days)
           _groupLabel(s.rmdRepeat),
           const SizedBox(height: 8),
-          Wrap(spacing: 8, runSpacing: 8, children: [
+          _chipWrap([
             _repeatChip(s.rmdOnce, ReminderRepeat.once),
             _repeatChip(s.rmdDaily, ReminderRepeat.daily),
             _repeatChip(s.rmdWeekly, ReminderRepeat.weekly),
@@ -705,7 +720,7 @@ class _ReminderEditorState extends State<_ReminderEditor> {
             const SizedBox(height: 12),
             _groupLabel(s.rmdOnDay),
             const SizedBox(height: 8),
-            Wrap(spacing: 8, runSpacing: 8, children: [
+            _chipWrap([
               for (var wd = 1; wd <= 7; wd++)
                 _choiceChip(s.rmdWeekdayShort(wd), _weekday == wd,
                     (_) => setState(() => _weekday = wd)),
@@ -716,7 +731,7 @@ class _ReminderEditorState extends State<_ReminderEditor> {
             const SizedBox(height: 12),
             _groupLabel(s.mrOnDays),
             const SizedBox(height: 8),
-            Wrap(spacing: 8, runSpacing: 8, children: [
+            _chipWrap([
               for (var wd = 1; wd <= 7; wd++)
                 _filterChip(s.rmdWeekdayShort(wd), _weekdays.contains(wd),
                     (sel) => setState(() {
@@ -847,7 +862,9 @@ class _MedReminderEditorState extends State<_MedReminderEditor> {
         : {DateTime.monday};
     final def = S(widget.controller.language).mrDefaultTitle;
     _noteCtrl = TextEditingController(
-        text: (e != null && e.title != def) ? e.title : '');
+        text: (e != null && e.title != def && !S.mrLegacyDefaultTitles.contains(e.title))
+            ? e.title
+            : '');
   }
 
   static _MedFreq _freqFromReminder(Reminder? e) {
@@ -1038,7 +1055,7 @@ class _MedReminderEditorState extends State<_MedReminderEditor> {
             const SizedBox(height: 12),
             _groupLabel(s.rmdOnDay),
             const SizedBox(height: 8),
-            Wrap(spacing: 8, runSpacing: 8, children: [
+            _chipWrap([
               for (var wd = 1; wd <= 7; wd++)
                 _choiceChip(s.rmdWeekdayShort(wd), _weekday == wd,
                     (_) => setState(() => _weekday = wd)),
@@ -1049,7 +1066,7 @@ class _MedReminderEditorState extends State<_MedReminderEditor> {
             const SizedBox(height: 12),
             _groupLabel(s.mrOnDays),
             const SizedBox(height: 8),
-            Wrap(spacing: 8, runSpacing: 8, children: [
+            _chipWrap([
               for (var wd = 1; wd <= 7; wd++)
                 _filterChip(s.rmdWeekdayShort(wd), _weekdays.contains(wd),
                     (sel) => setState(() {

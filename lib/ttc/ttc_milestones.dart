@@ -177,7 +177,7 @@ const List<TtcMilestone> ttcMilestones = [
     id: 'positive_test',
     iconKey: 'star',
     isOutcome: true,
-    titleEn: 'A positive test',
+    titleEn: "You're pregnant", // was 'A positive test' (2026-10-10)
     titleHi: 'Positive test',
     bodyEn: 'A beautiful new chapter begins, and nothing you built here is lost.',
     bodyHi:

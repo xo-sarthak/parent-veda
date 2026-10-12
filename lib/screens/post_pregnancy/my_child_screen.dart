@@ -300,7 +300,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
       // One Saved screen for the whole app since 2026-09-16. Kept for revert:
       // _headerIcon(Icons.bookmark_border_rounded,
       //     () => _push(const PpSavedHubScreen())),
-      _headerIcon(Icons.bookmark_border_rounded, () => _push(const SavedScreen())),
+      _headerIcon(Icons.bookmark_border_rounded, () => _push(const SavedScreen(stage: 'parenting'))),
       const SizedBox(width: 6),
       _headerIcon(Icons.search_rounded, () => _push(const RecoSearchScreen())),
       const SizedBox(width: 6),

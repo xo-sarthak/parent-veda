@@ -33,17 +33,32 @@ import '../../products/pv_store_chrome.dart' show pvSnack;
 
 const String kRecipeRoute = 'nutrition/recipe';
 
-void openRecipe(BuildContext context, Recipe r, PregnancyController c) {
+void openRecipe(BuildContext context, Recipe r, PregnancyController c,
+    {String? weekTitle, String? weekNote}) {
   Navigator.of(context).push(MaterialPageRoute<void>(
     settings: const RouteSettings(name: kRecipeRoute),
-    builder: (_) => RecipeCookScreen(recipe: r, pregnancy: c),
+    builder: (_) => RecipeCookScreen(recipe: r, pregnancy: c, weekTitle: weekTitle, weekNote: weekNote),
   ));
 }
 
 class RecipeCookScreen extends StatefulWidget {
-  const RecipeCookScreen({super.key, required this.recipe, required this.pregnancy});
+  const RecipeCookScreen({
+    super.key,
+    required this.recipe,
+    required this.pregnancy,
+    this.weekTitle,
+    this.weekNote,
+  });
   final Recipe recipe;
   final PregnancyController pregnancy;
+
+  /// Set when the page opens from a week's superfood (2026-10-10): the
+  /// heading ("Why it helps in week 20") and the week's own words for it,
+  /// from weekContent.json. They sit under the dish's "why now", and the
+  /// page then also closes on the doctor line. Null from the library, where
+  /// the page is as it was.
+  final String? weekTitle;
+  final String? weekNote;
 
   @override
   State<RecipeCookScreen> createState() => _RecipeCookScreenState();
@@ -140,6 +155,33 @@ class _RecipeCookScreenState extends State<RecipeCookScreen> {
                       style: pvFraunces(fontSize: 28, fontWeight: FontWeight.w600, height: 1.1, letterSpacing: -0.6, color: p.ink1)),
                   const SizedBox(height: 8),
                   Text(r.whyNow.en, style: pvManrope(fontSize: 15, height: 1.5, color: p.ink1)),
+                  // The week's reason, labelled with its own line icon (Oura's
+                  // "Advisor" block on a meal, MOBBIN 2026-10-10): the dish's
+                  // general "why now" above, this week's below.
+                  if (widget.weekNote case final note? when note.trim().isNotEmpty) ...[
+                    const SizedBox(height: 14),
+                    Container(
+                      key: const ValueKey('recipe_week_note'),
+                      width: double.infinity,
+                      padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: p.line),
+                      ),
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Row(children: [
+                          Icon(Icons.event_note_outlined, size: 16, color: p.ink2),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(widget.weekTitle ?? 'Why it helps this week',
+                                style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w800, color: p.ink2)),
+                          ),
+                        ]),
+                        const SizedBox(height: 6),
+                        Text(note.trim(), style: pvManrope(fontSize: 14, height: 1.5, color: p.ink1)),
+                      ]),
+                    ),
+                  ],
                   const SizedBox(height: 14),
                   // ⚠️ THE NUMBERS ONCE, SMALL, HERE — and the recipe next.
                   // The page opened with "Strong in", then "Did you know",
@@ -298,6 +340,29 @@ class _RecipeCookScreenState extends State<RecipeCookScreen> {
                         const SizedBox(height: 4),
                         Text(fact, style: pvManrope(fontSize: 14.5, height: 1.5, color: p.ink1)),
                       ]),
+                    ),
+                  ],
+                  // The doctor line, on the page a week's food idea opens: a
+                  // food idea is general, and her own doctor's advice wins.
+                  if (widget.weekNote != null) ...[
+                    const SizedBox(height: 18),
+                    Row(
+                      key: const ValueKey('recipe_week_doctor_line'),
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 2),
+                          child: Icon(Icons.medical_services_outlined, size: 16, color: p.ink3),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                              'A food idea for the week, not a prescription. If you have diabetes in '
+                              'pregnancy, a food allergy, or your doctor has asked you to limit '
+                              'something, follow their advice first.',
+                              style: pvManrope(fontSize: 12.5, height: 1.5, color: p.ink2)),
+                        ),
+                      ],
                     ),
                   ],
                 ]),

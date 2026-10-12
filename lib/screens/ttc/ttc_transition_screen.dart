@@ -555,7 +555,7 @@ class _TtcPositiveTestScreenState extends State<TtcPositiveTestScreen> {
     return TtcToolScaffold(
       hue: _hue,
       variant: 3,
-      eyebrow: 'A positive test',
+      eyebrow: "You're pregnant", // was 'A positive test' (2026-10-10)
       title: 'Before anything changes',
       intro: 'Your home will become the pregnancy home. Everything you wrote '
           'here comes with you, and you can undo the move on the next screen. '

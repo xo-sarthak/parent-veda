@@ -18,6 +18,7 @@ import 'pp_common.dart';
 import 'pp_what_changed_data.dart';
 import 'problem_solver_screen.dart';
 import '../../theme/pv_fonts.dart';
+import '../../widgets/pv_feedback.dart' show PvChoiceTile, PvQuestionProgress;
 import '../brackets/hub/hub_intent_art.dart' show IntentMark;
 import '../doors/pv_list_row.dart';
 import '../pregnancy/preg_tool_chrome.dart';
@@ -502,8 +503,17 @@ class _WcFlowScreenState extends State<WcFlowScreen> {
     final answered = _answers[_step] != null;
     return [
       const SizedBox(height: 26),
-      pregToolPad(Text('QUESTION ${_step + 1} OF $_count · ${s.category.toUpperCase()}',
-          style: pvManrope(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.4, color: p.action))),
+      // One progress line for every question flow (2026-10-10). Kept for
+      // revert: the violet "QUESTION 2 OF 5 · SLEEP" eyebrow with no line —
+      //   pregToolPad(Text('QUESTION ${_step + 1} OF $_count · ${s.category.toUpperCase()}',
+      //       style: pvManrope(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.4, color: p.action))),
+      pregToolPad(PvQuestionProgress(
+        done: _step + 1,
+        total: _count,
+        startLabel: s.category,
+        goingLabel: s.category,
+        count: true,
+      )),
       const SizedBox(height: 8),
       pregToolPad(ppCareHeading(_fill(s.prompt))),
       const SizedBox(height: 16),
@@ -517,7 +527,20 @@ class _WcFlowScreenState extends State<WcFlowScreen> {
     ];
   }
 
-  Widget _shellOption(V2Palette p, int i, String label) {
+  // The shared answer row (2026-10-10, one MCQ look app-wide): see
+  // `PvChoiceTile` in lib/widgets/pv_feedback.dart.
+  Widget _shellOption(V2Palette p, int i, String label) => Padding(
+        padding: const EdgeInsets.only(bottom: 10),
+        child: PvChoiceTile(
+          label: label,
+          selected: _answers[_step] == i,
+          onTap: () => setState(() => _answers[_step] = i),
+        ),
+      );
+
+  // Kept for revert (2026-10-10): the radio-on-the-left row.
+  // ignore: unused_element
+  Widget _shellOptionBefore(V2Palette p, int i, String label) {
     final sel = _answers[_step] == i;
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),

@@ -43,6 +43,7 @@ import 'ttc_tab_host.dart' show TtcTabs, TtcTabScope;
 import 'ttc_tools_screen.dart';
 import '../../theme/pv_fonts.dart';
 import '../v2/v2_palette.dart' show V2PaletteStore;
+import '../../widgets/pv_feedback.dart';
 
 // ---- palette (same hexes as pregnancy & parenting) --------------------------
 // ⚠️ Unified with the pregnancy ground — see pp_common.dart for the
@@ -424,11 +425,11 @@ class TtcCard extends StatelessWidget {
       child: child,
     );
     if (onTap == null) return card;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: card,
-    );
+    ));
   }
 }
 
@@ -1257,7 +1258,7 @@ class TtcHeader extends StatelessWidget {
       ?trailing,
       ...[
         if (trailing != null) const SizedBox(width: 10),
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () => openTtcProfile(context),
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -1269,7 +1270,7 @@ class TtcHeader extends StatelessWidget {
                 shape: BoxShape.circle),
             child: Icon(Icons.person_outline_rounded, size: 19, color: ink),
           ),
-        ),
+        )),
       ],
     ]);
   }
@@ -1382,7 +1383,7 @@ class TtcHeroShortcut extends StatelessWidget {
   Widget build(BuildContext context) {
     if (onLight) {
       return Expanded(
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: Column(children: [
@@ -1403,11 +1404,11 @@ class TtcHeroShortcut extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: ttcBody(11, color: ttcInk, w: FontWeight.w700)),
           ]),
-        ),
+        )),
       );
     }
     return Expanded(
-      child: GestureDetector(
+      child: PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Column(children: [
@@ -1430,7 +1431,7 @@ class TtcHeroShortcut extends StatelessWidget {
                   color: Colors.white.withValues(alpha: 0.95),
                   w: FontWeight.w700)),
         ]),
-      ),
+      )),
     );
   }
 }
@@ -1475,7 +1476,7 @@ class TtcBackBar extends StatelessWidget {
     // odd one out when it was in fact the only screen matching the rest of the
     // app.
     return Row(children: [
-      GestureDetector(
+      PvPress(child: GestureDetector(
         onTap: () => Navigator.of(context).maybePop(),
         behavior: HitTestBehavior.opaque,
         child: const Padding(
@@ -1483,7 +1484,7 @@ class TtcBackBar extends StatelessWidget {
           padding: EdgeInsets.fromLTRB(2, 8, 14, 8),
           child: Icon(Icons.arrow_back, size: 22, color: ttcTitleInk),
         ),
-      ),
+      )),
       Expanded(child: Text(title, style: ttcJakarta(17))),
       ?trailing,
     ]);

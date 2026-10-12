@@ -53,6 +53,7 @@ import '../../services/stage_gateway.dart' show showStageDoorMenu;
 import '../../theme/pv_fonts.dart';
 import 'pv_day_strip.dart';
 import 'v2_palette.dart';
+import '../../widgets/pv_feedback.dart';
 
 /// The field's hue behind the pregnancy fold — KEPT FOR REVERT. It fed
 /// `V3HeroField`, whose equalised-chroma recipe turns a warm hue into khaki
@@ -165,6 +166,7 @@ class V3PregHero extends StatefulWidget {
     this.onDetails,
     this.onAvatar,
     this.onSaved,
+    this.onCalendar,
     this.onMessages,
     this.unreadMessages = 0,
     this.timeLeft,
@@ -195,6 +197,11 @@ class V3PregHero extends StatefulWidget {
   /// The avatar. Null: the stage-door menu, as the shared chrome does.
   final VoidCallback? onAvatar;
   final VoidCallback? onSaved;
+
+  /// The calendar, top right, as on trying to conceive (2026-10-10, the user:
+  /// "the most appropriate position is ... the top right"). It lost its tab
+  /// on 2026-09-29 and was left with no entrance on the home.
+  final VoidCallback? onCalendar;
 
   /// The Messages inbox, top right beside Saved (2026-09-30: the inbox was on More
   /// only, so a mother had to know it existed). Null draws no envelope.
@@ -321,6 +328,18 @@ class _V3PregHeroState extends State<V3PregHero> {
                       ]),
                       const SizedBox(width: 8),
                     ],
+                    if (widget.onCalendar != null) ...[
+                      _Round(
+                        p: p,
+                        semantic: 'Calendar',
+                        onTap: widget.onCalendar!,
+                        child: Icon(Icons.calendar_today_rounded, size: 17, color: p.ink2),
+                      ),
+                    ],
+                    // ⚠️ TWO BUTTONS, AS ON TTC (2026-10-10). A third round
+                    // button overflowed the row by 46pt on a 360pt phone, so
+                    // with the calendar here Saved lives in You (stage-scoped).
+                    if (widget.onCalendar == null)
                     _Round(
                       p: p,
                       semantic: 'Saved',
@@ -355,7 +374,7 @@ class _V3PregHeroState extends State<V3PregHero> {
           // the field, which is the same peach — so the "disc" is the glow
           // the illustrator painted, and the words sit on it.
           Center(
-            child: GestureDetector(
+            child: PvPress(child: GestureDetector(
               onTap: widget.onDetails,
               behavior: HitTestBehavior.opaque,
               child: SizedBox(
@@ -383,7 +402,7 @@ class _V3PregHeroState extends State<V3PregHero> {
                         const SizedBox(height: 3),
                         // Its own tap target inside the figure's: the (i) and
                         // the past-due line must not open the week page.
-                        GestureDetector(
+                        PvPress(child: GestureDetector(
                           key: const ValueKey('preg_hero_time_left'),
                           behavior: HitTestBehavior.opaque,
                           onTap: widget.pastDueCount != null ? widget.onPastDue : widget.onHowCounted,
@@ -402,7 +421,7 @@ class _V3PregHeroState extends State<V3PregHero> {
                               Icon(Icons.chevron_right_rounded, size: 16, color: p.ink3),
                             ],
                           ]),
-                        ),
+                        )),
                       ],
                     ]),
                   ),
@@ -426,7 +445,7 @@ class _V3PregHeroState extends State<V3PregHero> {
                     ),
                 ]),
               ),
-            ),
+            )),
           ),
           if (widget.footer != null) ...[
             const SizedBox(height: 4),

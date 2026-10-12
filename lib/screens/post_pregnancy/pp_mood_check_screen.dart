@@ -31,6 +31,7 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/pv_fonts.dart';
+import '../../widgets/pv_feedback.dart' show PvChoiceTile;
 import '../brackets/hub/hub_intent_art.dart' show IntentMark;
 import '../mind_mood/mm_crisis_path.dart' show MmCrisisPathScreen;
 import '../pregnancy/preg_tool_chrome.dart';
@@ -139,7 +140,21 @@ class _PpMoodCheckScreenState extends State<PpMoodCheckScreen> {
     );
   }
 
-  Widget _answer(int q, bool value, String title, String line) {
+  // The shared answer row (2026-10-10, one MCQ look app-wide): see
+  // `PvChoiceTile` in lib/widgets/pv_feedback.dart. Was an ink slab when
+  // chosen; now the ink edge and tick every question flow uses. Same key.
+  Widget _answer(int q, bool value, String title, String line) =>
+      PvChoiceTile(
+        key: ValueKey('pp_mood_q${q}_${value ? 'yes' : 'no'}'),
+        label: title,
+        subtitle: line,
+        selected: _answers[q] == value,
+        onTap: () => setState(() => _answers[q] = value),
+      );
+
+  // Kept for revert (2026-10-10): the ink-filled answer.
+  // ignore: unused_element
+  Widget _answerBefore(int q, bool value, String title, String line) {
     final p = pvStorePalette;
     final on = _answers[q] == value;
     return Material(

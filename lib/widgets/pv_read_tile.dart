@@ -40,6 +40,7 @@ import 'package:flutter/material.dart';
 
 import '../screens/v2/v2_palette.dart';
 import '../theme/pv_fonts.dart';
+import 'pv_feedback.dart';
 
 class PvReadTile extends StatelessWidget {
   const PvReadTile({
@@ -90,7 +91,7 @@ class PvReadTile extends StatelessWidget {
         // A shade back, not greyed out — it is a real thing that is not here
         // yet, not a disabled control.
         opacity: _live ? 1 : 0.72,
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: Column(
@@ -163,7 +164,7 @@ class PvReadTile extends StatelessWidget {
               ],
             ],
           ),
-        ),
+        )),
       ),
     );
   }

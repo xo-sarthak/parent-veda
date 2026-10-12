@@ -76,6 +76,9 @@ import '../ttc/ttc_surface_router.dart' show openTtcSurface;
 import '../ttc/ttc_tools_screen.dart'
     show TtcTool, ttcToolById, ttcMovedToMoreById, kTtcMoreExpertsTitle;
 import '../ttc/ttc_transition_screen.dart' show recordPositiveTest;
+import '../../ttc/ttc_transition.dart' show TtcTransitionEngine;
+import '../../theme/pv_fonts.dart' show pvHeadStyle, pvManrope;
+import '../v2/v2_palette.dart' show V2PaletteStore;
 import 'pv_details_screen.dart';
 import 'pv_doctor_notes_screen.dart';
 import 'pv_you_sheets.dart';
@@ -401,12 +404,12 @@ PvYouThing _saved({Widget Function(Color)? art, String? stage}) => PvYouThing(
   icon: Icons.bookmark_outline_rounded,
   art: art,
   title: 'Saved',
-  count: () => stage == 'trying'
-      ? [
-          for (final i in SavedStore.instance.items(stage: stage))
-            if (kTtcSavedKinds.contains(i.kind)) i,
-        ].length
-      : SavedStore.instance.items().length,
+  // Every stage counts only its own kinds now (2026-10-10). Kept for revert:
+  // trying filtered by kTtcSavedKinds, every other stage counted everything.
+  count: () => [
+        for (final i in SavedStore.instance.items(stage: stage))
+          if (kStageSavedKinds[stage]?.contains(i.kind) ?? true) i,
+      ].length,
   open: (c) => _push(c, SavedScreen(stage: stage), 'saved'),
 );
 
@@ -508,6 +511,90 @@ PvYouThing _pregEnded() => PvYouThing(
     if (ctl != null) openPregEnded(c, ctl);
   },
 );
+
+/// ⚠️ "NOT PREGNANT AFTER ALL?" (2026-10-10, the user: "not always a positive
+/// test means pregnant ... sometimes it's a false positive ... we need to tackle
+/// those edge cases"). The transition's undo lived only on the screen right
+/// after it; days later the only way back was the loss path, which is the
+/// wrong words for a test that was simply wrong. This row asks which it was,
+/// because the two need different care: a wrong test goes back to trying with
+/// nothing lost; a very early pregnancy that stopped is a loss, and gets the
+/// After a loss door.
+PvYouThing _notPregnant() => PvYouThing(
+  icon: Icons.undo_rounded,
+  title: 'Not pregnant after all?',
+  subtitle: 'If a test was wrong, you can go back to trying.',
+  open: _openNotPregnant,
+);
+
+Future<void> _openNotPregnant(BuildContext c) async {
+  final p = V2PaletteStore.instance.current;
+  final choice = await showModalBottomSheet<String>(
+    context: c,
+    backgroundColor: p.surface,
+    showDragHandle: true,
+    builder: (ctx) => SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(22, 0, 22, 18),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Not pregnant after all?',
+                style: pvHeadStyle(size: 21, color: p.ink1)),
+            const SizedBox(height: 10),
+            Text(
+              'A positive test is not always confirmed. Sometimes the test was '
+              'wrong or misread. Sometimes it was a very early pregnancy that did '
+              'not continue, which is a loss, and a common one. Neither is '
+              'anything you did. Your doctor can tell you which it was.',
+              style: pvManrope(fontSize: 14, height: 1.55, color: p.ink2),
+            ),
+            const SizedBox(height: 18),
+            for (final (id, label, filled) in const [
+              ('wrong', 'The test was wrong. Go back to trying', true),
+              ('ended', 'My pregnancy ended', false),
+              ('cancel', 'Not now', false),
+            ]) ...[
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: filled
+                    ? FilledButton(
+                        style: FilledButton.styleFrom(
+                            backgroundColor: p.ink1, foregroundColor: Colors.white),
+                        onPressed: () => Navigator.of(ctx).pop(id),
+                        child: Text(label))
+                    : OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                            foregroundColor: p.ink1,
+                            side: BorderSide(color: p.line)),
+                        onPressed: () => Navigator.of(ctx).pop(id),
+                        child: Text(label)),
+              ),
+              const SizedBox(height: 10),
+            ],
+          ],
+        ),
+      ),
+    ),
+  );
+  if (!c.mounted) return;
+  switch (choice) {
+    case 'wrong':
+      // Told before it happens (the sheet), confirmed after (the snackbar).
+      await const TtcTransitionEngine().undo();
+      if (!c.mounted) return;
+      ScaffoldMessenger.of(c).showSnackBar(const SnackBar(
+        behavior: SnackBarBehavior.floating,
+        content: Text('Back to trying. Everything you logged is still here.'),
+      ));
+      openStageDoor(c, StageDoor.tryingToConceive);
+    case 'ended':
+      final ctl = PregnancyController.current;
+      if (ctl != null) openPregEnded(c, ctl);
+  }
+}
 
 /// The Messages row for Settings, Notifications: what the app has sent her,
 /// the same words as TTC's. A dot, never a number (Y1).
@@ -651,9 +738,11 @@ final PvYouStageContent _trying = PvYouStageContent(
     ].join(' · ');
   },
   action: PvYouAction(
-    label: 'I got a positive test',
+    // Kept for revert: 'I got a positive test' / 'Carries everything you have
+    // logged into pregnancy.' (2026-10-10: a test can be wrong).
+    label: "I'm pregnant",
     icon: Icons.favorite_rounded,
-    note: 'Carries everything you have logged into pregnancy.',
+    note: 'Moves you to pregnancy with everything you have logged. You can come back.',
     run: (c) async {
       await recordPositiveTest(c);
     },
@@ -949,7 +1038,7 @@ final PvYouStageContent _trying = PvYouStageContent(
   // user). Kept for revert: journeyThings: [_movedThing('map')],
   journeyThings: const [],
   journeyCaption:
-      'Where you are across the four chapters, the "I got a positive test" button, and your journey map with its family timeline',
+      'Where you are across the four chapters, the "I\'m pregnant" button, and your journey map with its family timeline',
   // What Saved holds on this stage since 2026-09-30 (kTtcSavedKinds). Kept
   // for revert: 'What you bookmarked: reads, tests, answers and cards',
   tilesCaption: 'Articles, videos, recipes and products you bookmarked',
@@ -1083,7 +1172,7 @@ final PvYouStageContent _pregnancy = PvYouStageContent(
   // older callers read three tiles) and the short profile leaves it out,
   // because its own "Your orders" tile sits under the hero.
   tiles: [
-    _saved(art: ttcArtMore(TtcMoreMark.bookmark)),
+    _saved(art: ttcArtMore(TtcMoreMark.bookmark), stage: 'pregnancy'),
     _memories(art: ttcArtMore(TtcMoreMark.film)),
     _orders(),
   ],
@@ -1095,6 +1184,7 @@ final PvYouStageContent _pregnancy = PvYouStageContent(
     _addresses(),
     _doctorNotes(LifeStage.pregnancy),
     _findHelp(),
+    _notPregnant(),
     // ⚠️ LAST, AND QUIET ON PURPOSE: see `_pregEnded`.
     _pregEnded(),
   ],
@@ -1181,7 +1271,7 @@ final PvYouStageContent _parenting = PvYouStageContent(
   // Marks for the short profile. Orders stays in the list for the older
   // callers; the short profile draws its own "Your orders" tile instead.
   tiles: [
-    _saved(art: ttcArtMore(TtcMoreMark.bookmark)),
+    _saved(art: ttcArtMore(TtcMoreMark.bookmark), stage: 'parenting'),
     _memories(art: ttcArtMore(TtcMoreMark.film)),
     _orders(),
   ],
@@ -1239,7 +1329,7 @@ final PvYouStageContent _skilling = PvYouStageContent(
     ),
   ],
   tiles: [
-    _saved(),
+    _saved(stage: 'skilling'),
     PvYouThing(
       icon: Icons.auto_awesome_outlined,
       title: 'Her keepsakes',

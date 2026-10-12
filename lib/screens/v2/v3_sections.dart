@@ -36,6 +36,7 @@ import '../../theme/pv_fonts.dart';
 import 'v2_palette.dart';
 import 'v3_hero_chrome.dart';
 import 'v2_sections.dart' show v2CoverTint, v2ReadCover;
+import '../../widgets/pv_feedback.dart';
 
 // -----------------------------------------------------------------------------
 //  The merged hero
@@ -321,7 +322,7 @@ class V3Hero extends StatelessWidget {
                             color: Colors.white)),
                     if (sizeLine case final line?) ...[
                       const SizedBox(height: 6),
-                      GestureDetector(
+                      PvPress(child: GestureDetector(
                         onTap: onSize,
                         behavior: HitTestBehavior.opaque,
                         child: Text(line,
@@ -332,7 +333,7 @@ class V3Hero extends StatelessWidget {
                                 height: 1.35,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.white.withValues(alpha: 0.9))),
-                      ),
+                      )),
                     ],
                     if (onThisWeek != null) ...[
                       const SizedBox(height: 14),

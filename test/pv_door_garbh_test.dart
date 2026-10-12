@@ -278,7 +278,8 @@ void main() {
       await pump(tester);
       expect(find.byKey(const ValueKey('garbh_today_shravan')), findsOneWidget);
       final card = find.byKey(const ValueKey('garbh_today_shravan'));
-      await tester.ensureVisible(card);
+      // Mid-screen: the door's pinned bar covers the top edge (2026-10-10).
+      await Scrollable.ensureVisible(tester.element(card), alignment: 0.5);
       await tester.pump();
       await tester.tap(card);
       await tester.pump();

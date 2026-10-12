@@ -293,7 +293,7 @@ class _PpHomeV3State extends State<PpHomeV3> {
                   //     builder: (_) => const PpSavedHubScreen())),
                   onSaved: () => Navigator.of(context).push(MaterialPageRoute(
                       settings: const RouteSettings(name: 'saved'),
-                      builder: (_) => const SavedScreen())),
+                      builder: (_) => const SavedScreen(stage: 'parenting'))),
                   // Was the family profile editor; kept for revert. Since
                   // 2026-09-19 the avatar opens You, and the editor is one
                   // row inside it (Preferences · Personalise).

@@ -17,7 +17,9 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show HapticFeedback;
 
+import '../../ask_veda/pv_veda_reveal.dart';
 import '../../services/remote/ask_veda_service.dart';
 import '../../ttc/ttc_chapter.dart';
 import '../../ttc/ttc_chapter_data.dart';
@@ -90,6 +92,12 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
   bool _loading = false;
   bool _failed = false;
 
+  // How far the answer has arrived (2026-10-10, the reveal): 0 the answer is
+  // typing, 1 "What this means" is typing, 2 everything below has come in.
+  // Presentation only; the whole feed is already in hand.
+  int _reveal = 0;
+  final _focus = FocusNode();
+
   @override
   void initState() {
     super.initState();
@@ -105,6 +113,7 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
   void dispose() {
     _ctrl.dispose();
     _scroll.dispose();
+    _focus.dispose();
     super.dispose();
   }
 
@@ -156,8 +165,10 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
       lang: TtcS.current().hinglish ? 'hi' : 'en',
     );
     if (!mounted || _query != t) return;
+    if (res != null) HapticFeedback.lightImpact(); // the answer has landed
     setState(() {
       _loading = false;
+      _reveal = 0;
       if (res != null) {
         _feed = res;
       } else {
@@ -174,6 +185,20 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
         _ctrl.clear();
         _typed = '';
       });
+
+  // Tap the asked question to change it: back to the field with her words in
+  // it (the stage search runs on them again), the keyboard up. The X still
+  // clears to a blank field.
+  void _editQuery() {
+    final q = _query ?? '';
+    _clear();
+    _ctrl.text = q;
+    _ctrl.selection = TextSelection.collapsed(offset: q.length);
+    setState(() => _typed = q);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _focus.requestFocus();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -230,6 +255,7 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
           Expanded(
             child: TextField(
               controller: _ctrl,
+              focusNode: _focus,
               textInputAction: TextInputAction.search,
               onSubmitted: _send,
               onChanged: (v) => setState(() => _typed = v),
@@ -278,10 +304,15 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
           const Icon(Icons.search_rounded, size: 20, color: ttcMuted),
           const SizedBox(width: 11),
           Expanded(
-            child: Text(_query ?? '',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: ttcBody(14, color: ttcInk, w: FontWeight.w600)),
+            child: GestureDetector(
+              key: const ValueKey('veda_edit_query'),
+              behavior: HitTestBehavior.opaque,
+              onTap: _editQuery,
+              child: Text(_query ?? '',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: ttcBody(14, color: ttcInk, w: FontWeight.w600)),
+            ),
           ),
           GestureDetector(
             onTap: _clear,
@@ -477,14 +508,44 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
                 : _sections(_feed!, t),
       );
 
-  List<Widget> _sections(AskVedaResult f, TtcS t) => [
+  // ⚠️ THE ANSWER ARRIVES (2026-10-10, the user: "the way text gets written
+  // when we use ChatGPT/Claude on phone"). The answer types in, then "What
+  // this means" types in, then each group below fades up in turn
+  // (`pv_veda_reveal.dart`). Sections, order and taps unchanged; each group
+  // is the same widgets as before, now inside a PvVedaFadeIn. Kept for
+  // revert: the flat list (`...[_head(...), TtcCard(...)]` per section).
+  List<Widget> _sections(AskVedaResult f, TtcS t) {
+    final rest = _reveal >= 2;
+    var n = 0;
+    Widget later(List<Widget> group) => PvVedaFadeIn(
+          show: rest,
+          index: n++,
+          child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: group),
+        );
+    final follow = _followUps(t);
+    return [
         _answerCard(f.answer, t),
-        if (f.meaning.isNotEmpty) ...[
-          _head(Icons.favorite_outline_rounded,
-              t.hinglish ? 'Tumhare liye iska matlab' : 'What this means for you'),
-          TtcCard(child: Text(f.meaning, style: ttcBody(13.5, h: 1.6))),
-        ],
-        if (f.actions.isNotEmpty) ...[
+        if (f.meaning.isNotEmpty)
+          PvVedaFadeIn(
+            show: _reveal >= 1,
+            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+              _head(Icons.favorite_outline_rounded,
+                  t.hinglish ? 'Tumhare liye iska matlab' : 'What this means for you'),
+              // Types in after the answer. Kept for revert:
+              //   TtcCard(child: Text(f.meaning, style: ttcBody(13.5, h: 1.6))),
+              TtcCard(
+                  child: _reveal >= 1
+                      ? PvTypewriterText(f.meaning,
+                          key: ValueKey('veda_meaning_${f.meaning}'),
+                          onDone: _meaningDone,
+                          followBottomInset: _composerInset,
+                          style: ttcBody(13.5, h: 1.6))
+                      : const SizedBox(width: double.infinity)),
+            ]),
+          ),
+        if (f.actions.isNotEmpty) later([
           _head(Icons.task_alt_rounded,
               t.hinglish ? 'Aage kya kar sakte ho' : 'What you can do next'),
           TtcCard(
@@ -506,7 +567,8 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
               ],
             ]),
           ),
-        ],
+        ]),
+        later([
         _head(Icons.menu_book_outlined,
             t.hinglish ? 'Aur jaankari' : 'More information'),
         // ⚠️ BUILT, NOT "COMING SOON" (2026-09-26, TTC gap plan: neither
@@ -524,6 +586,8 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
           for (final r in _matchingReads()) _readCard(r)
         else
           for (final it in _shownContent(f)) _itemCard(it),
+        ]),
+        later([
         _head(Icons.play_circle_outline_rounded,
             t.hinglish ? 'Videos' : 'Videos'),
         if (f.videos.isEmpty)
@@ -533,6 +597,7 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
               : 'Videos on this topic are coming soon')
         else
           for (final it in f.videos) _itemCard(it),
+        ]),
         // Community held back for launch (2026-09-26, TTC gap plan §7.1),
         // kept for revert:
         // _head(Icons.forum_outlined,
@@ -540,6 +605,7 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
         // _comingSoon(t.hinglish
         //     ? 'Community insights jaldi aayenge'
         //     : 'Community insights are coming soon'),
+        later([
         _head(Icons.redeem_outlined, t.hinglish ? 'Products' : 'Products'),
         // Built instead of "coming soon" (2026-09-26): the shelf we already
         // have, with its reasons. Kept for revert:
@@ -552,6 +618,8 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
               () => openTtcSurface(context, 'ttc_products'))
         else
           for (final it in f.products) _itemCard(it),
+        ]),
+        later([
         _head(Icons.verified_user_outlined, t.hinglish ? 'Services' : 'Services'),
         // Built instead of "coming soon" (2026-09-26). Kept for revert:
         // _comingSoon(t.hinglish
@@ -567,9 +635,71 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
                   )))
         else
           for (final it in f.services) _itemCard(it),
+        ]),
+        if (follow.isNotEmpty) later([
+          _head(Icons.forum_outlined, 'You could also ask'),
+          _followUpsCard(follow),
+        ]),
+        later([
         const SizedBox(height: 18),
         _disclaimer(t),
+        ]),
       ];
+  }
+
+  void _answerDone() {
+    if (!mounted || _reveal > 0) return;
+    setState(() => _reveal = (_feed?.meaning.isNotEmpty ?? false) ? 1 : 2);
+  }
+
+  void _meaningDone() {
+    if (!mounted || _reveal > 1) return;
+    setState(() => _reveal = 2);
+  }
+
+  // ---- "You could also ask" (2026-10-10) ------------------------------------
+  // Perplexity's related questions, from the questions this chapter already
+  // offers on the empty screen (the service sends no follow-ups). Tapping
+  // one asks it.
+  List<String> _followUps(TtcS t) => pvVedaFollowUps(
+        _query ?? '',
+        ttcChapterContent[TtcStore.instance.displayChapter]
+                ?.askVeda(t.hinglish) ??
+            const <String>[],
+      );
+
+  Widget _followUpsCard(List<String> qs) => Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: ttcLine),
+        ),
+        child: Column(children: [
+          for (final (i, q) in qs.indexed) ...[
+            if (i > 0) const Divider(height: 1, thickness: 1, color: ttcLine),
+            InkWell(
+              key: ValueKey('veda_follow_$i'),
+              onTap: () => _send(q),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(14, 13, 12, 13),
+                child: Row(children: [
+                  const Icon(Icons.subdirectory_arrow_right_rounded,
+                      size: 18, color: ttcMuted),
+                  const SizedBox(width: 11),
+                  Expanded(
+                    child: Text(q,
+                        style: ttcBody(13.5,
+                            color: ttcTitleInk, w: FontWeight.w600, h: 1.35)),
+                  ),
+                  const SizedBox(width: 8),
+                  const Icon(Icons.arrow_forward_rounded,
+                      size: 15, color: ttcTitleInk),
+                ]),
+              ),
+            ),
+          ],
+        ]),
+      );
 
   Widget _head(IconData icon, String title) => Padding(
         padding: const EdgeInsets.fromLTRB(2, 24, 2, 11),
@@ -591,20 +721,32 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
                 style: ttcJakarta(15.5)),
           ]),
           const SizedBox(height: 12),
-          Text(answer, style: ttcBody(14, h: 1.62, color: ttcInk)),
+          // Types in (2026-10-10). Kept for revert:
+          //   Text(answer, style: ttcBody(14, h: 1.62, color: ttcInk)),
+          PvTypewriterText(answer,
+              key: ValueKey('veda_answer_$answer'),
+              onDone: _answerDone,
+              followBottomInset: _composerInset,
+              style: ttcBody(14, h: 1.62, color: ttcInk)),
         ]),
       );
 
+  // The calm wait (2026-10-10): soft dots, a status line that moves on, and
+  // faint lines where the answer will land. Kept for revert, the spinner row:
+  //   Row(children: [SizedBox(17x17, CircularProgressIndicator(strokeWidth: 2,
+  //     color: ttcPurple)), SizedBox(width: 13),
+  //     Text(t.hinglish ? 'Veda soch raha hai…' : 'Asking Veda…', ...)])
   Widget _loadingCard(TtcS t) => TtcCard(
-        child: Row(children: [
-          const SizedBox(
-              width: 17,
-              height: 17,
-              child: CircularProgressIndicator(strokeWidth: 2, color: ttcPurple)),
-          const SizedBox(width: 13),
-          Text(t.hinglish ? 'Veda soch raha hai…' : 'Asking Veda…',
-              style: ttcBody(13.5, color: ttcTitleInk, w: FontWeight.w600)),
-        ]),
+        child: PvVedaThinking(
+          color: ttcTitleInk,
+          textStyle: ttcBody(13.5, color: ttcTitleInk, w: FontWeight.w600),
+          barColor: ttcPanel,
+          lines: const [
+            'Looking through ParentVeda…',
+            'Checking where you are on your journey…',
+            'Putting your answer together…',
+          ],
+        ),
       );
 
   Widget _offlineCard(TtcS t) => TtcCard(

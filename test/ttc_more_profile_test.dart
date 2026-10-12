@@ -70,7 +70,7 @@ const _neverOnMore = [
   'Developer',
   'Notes for your doctor',
   'Your answers',
-  'I got a positive test',
+  "I'm pregnant",
   // 2026-09-29: what she HAS bought or booked is on her profile.
   'Your orders',
   'Your bookings',
@@ -523,7 +523,7 @@ void main() {
       expect(row, findsOneWidget);
       expect(
           find.descendant(
-              of: row, matching: find.text('I got a positive test')),
+              of: row, matching: find.text("I'm pregnant")),
           findsOneWidget);
     });
 
@@ -748,7 +748,7 @@ void main() {
         for (final g in content.groups!)
           for (final t in g.things) t.title,
         for (final t in content.journeyThings) t.title,
-        'I got a positive test',
+        "I'm pregnant",
         'Your partner',
         'Language',
         'Reminders',
@@ -818,7 +818,7 @@ void main() {
       expect(tester.takeException(), isNull);
       expect(find.text('Notes for your doctor'), findsNothing);
       expect(find.text('YOUR ANSWERS'), findsNothing);
-      expect(find.text('I got a positive test'), findsNothing);
+      expect(find.text("I'm pregnant"), findsNothing);
       expect(find.byKey(kPvProfileSettingsRowKey), findsOneWidget);
       // V3: no glance of her cycle, no cycle day, no Edit of her name; his
       // journey row says how his side moves.

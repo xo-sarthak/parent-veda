@@ -270,6 +270,12 @@ void main() {
             reason: '$why: hero window start');
         expect(line.windowTo, ctx.lookingBack ? ctx.windowClosesOn : null,
             reason: '$why: hero window end');
+      // 2026-10-10: a bleed day is the hero's own state now, so a window state
+      // on a period day is the bug, not an allowed overlap. Kept for revert:
+      // the open/last-day case also accepted TtcDayPhase.period.
+      case TtcHeroState.onPeriod:
+        expect(ctx.phase, TtcDayPhase.period, reason: why);
+        expect(ctx.isPeriodDay, isTrue, reason: why);
       case TtcHeroState.windowOpensIn:
         expect(ctx.phase, isIn([TtcDayPhase.beforeWindow, TtcDayPhase.period]),
             reason: why);
@@ -277,7 +283,7 @@ void main() {
       case TtcHeroState.windowOpen || TtcHeroState.windowLastDay:
         expect(ctx.inWindow, isTrue, reason: why);
         // A bleed day inside the window reads as her period (rule 4).
-        expect(ctx.phase, isIn([TtcDayPhase.window, TtcDayPhase.period]),
+        expect(ctx.phase, TtcDayPhase.window,
             reason: why);
         if (line.state == TtcHeroState.windowOpen) {
           expect(line.days, ctx.windowDaysLeft, reason: why);

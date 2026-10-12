@@ -46,6 +46,13 @@ class ReminderStore extends ChangeNotifier {
     // 2) Sync with the cloud, THEN schedule notifications for the full merged
     //    set (so reminders synced from the cloud also get OS notifications).
     await _syncFromCloud();
+    await rearmNotifications();
+    // After a sign-in the alarms come back with her (2026-10-10, sign-out mutes).
+    SyncRegistry.register(rearmNotifications);
+  }
+
+  /// Schedules every saved reminder with the OS. Also run after a sign-in.
+  Future<void> rearmNotifications() async {
     await NotificationService.instance.init();
     await NotificationService.instance.syncAll(_items);
     // syncAll schedules a customDays reminder at its FIRST time only; re-arm the

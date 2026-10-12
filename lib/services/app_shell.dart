@@ -60,11 +60,39 @@ class AppShell {
   AppShell._();
 
   static ShellRouteBuilder? _pregnancy;
+  static ShellRouteBuilder? _signedOut;
 
   /// Called once from `main.dart`'s `initState`. Registration rather than a
   /// constant because the route closes over controllers that only exist there.
-  static void register({required ShellRouteBuilder pregnancy}) {
+  ///
+  /// [signedOut] (2026-10-10) builds the first-run route, the splash that
+  /// reads the auth flag and opens onboarding. Optional so a test that only
+  /// needs the pregnancy door does not have to invent one.
+  static void register({
+    required ShellRouteBuilder pregnancy,
+    ShellRouteBuilder? signedOut,
+  }) {
     _pregnancy = pregnancy;
+    if (signedOut != null) _signedOut = signedOut;
+  }
+
+  /// Replaces the ENTIRE stack with the first-run route after a sign-out.
+  ///
+  /// ⚠️ WHY THE WHOLE STACK (2026-10-10, "test signout button"). Sign out used
+  /// to PUSH onboarding on top of the signed-in app, so the back gesture
+  /// popped her straight back into the app she had just left, signed out but
+  /// with everything still on screen. And from a stage whose shell has no
+  /// pregnancy controller it popped to the first route, which is that
+  /// stage's own home, so nothing visible happened at all. The same
+  /// `(_) => false` predicate as [openPregnancy]: nothing survives, so back on
+  /// the sign-in screen leaves the app rather than re-entering it.
+  ///
+  /// Returns false when nothing is registered, so the caller can fall back.
+  static bool openSignedOut(NavigatorState nav) {
+    final build = _signedOut;
+    if (build == null) return false;
+    nav.pushAndRemoveUntil(build(), (_) => false);
+    return true;
   }
 
   /// False in a widget test that pumped a screen directly, and in any build
@@ -88,5 +116,8 @@ class AppShell {
   }
 
   @visibleForTesting
-  static void resetForTest() => _pregnancy = null;
+  static void resetForTest() {
+    _pregnancy = null;
+    _signedOut = null;
+  }
 }

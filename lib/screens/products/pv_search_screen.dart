@@ -36,6 +36,7 @@ import '../../theme/pv_fonts.dart';
 import '../v2/v2_palette.dart';
 import 'pv_shelf_screen.dart';
 import 'pv_store_chrome.dart';
+import '../../widgets/pv_feedback.dart';
 
 /// Words she is likely to type, per stage — needs, not product names. A
 /// starting point, not a chart; every word here returns results today.
@@ -325,7 +326,7 @@ class _PvSearchScreenState extends State<PvSearchScreen> {
           ),
         ),
         if (action != null)
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: onAction,
             child: Text(
               action,
@@ -335,7 +336,7 @@ class _PvSearchScreenState extends State<PvSearchScreen> {
                 color: p.ink2,
               ),
             ),
-          ),
+          )),
       ],
     ),
   );

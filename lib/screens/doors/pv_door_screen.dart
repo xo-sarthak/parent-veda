@@ -1015,6 +1015,14 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
                     ),
                   ],
                 ),
+                // ---- the pinned bar: compact once the hero goes, the field
+                // on a solid band while she searches (2026-10-10). ----------
+                PvDoorPinnedBar(
+                  controller: _scroll,
+                  search: _search,
+                  p: p,
+                  title: bracket.label.of(lang),
+                ),
               ],
             ),
           ),
@@ -1947,7 +1955,7 @@ class _PinnedRedFlag extends StatelessWidget {
   // The dot is the only colour, and it is the one signal that says "call".
   // The old well stays below for revert.
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
     onTap: flag.seeAll ? onTap : null,
     behavior: HitTestBehavior.opaque,
     child: Column(
@@ -1967,7 +1975,7 @@ class _PinnedRedFlag extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         for (final line in flag.lines)
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: line.conditionId == null
                 ? null
                 : () => onLine(line.conditionId!),
@@ -2010,7 +2018,7 @@ class _PinnedRedFlag extends StatelessWidget {
                 ],
               ),
             ),
-          ),
+          )),
         if (flag.footer case final footer?) ...[
           const SizedBox(height: 8),
           Text(
@@ -2033,7 +2041,7 @@ class _PinnedRedFlag extends StatelessWidget {
         Container(height: 1, color: p.line),
       ],
     ),
-  );
+  ));
 
   // Kept for revert — the pink well, 2026-09-10 → 2026-09-18.
   // ignore: unused_element

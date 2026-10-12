@@ -201,7 +201,7 @@ void main() {
     test('at most one per stage, none for skilling', () {
       expect(
         pvYouContentFor(LifeStage.tryingToConceive).action?.label,
-        'I got a positive test',
+        "I'm pregnant",
       );
       expect(
         pvYouContentFor(LifeStage.pregnancy).action?.label,

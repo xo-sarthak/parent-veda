@@ -62,6 +62,8 @@ import 'ttc_cycle_palette.dart';
 import 'ttc_appointments_screen.dart'
     show TtcApptEntry, openTtcAppointment;
 import 'ttc_symptom_log_screen.dart' show TtcSymptomLogScreen;
+import 'ttc_partner_home.dart' show TtcPartnerViewOnlyLine;
+import '../v2/v2_palette.dart' show V2PaletteStore;
 // `logTtcPeriod` was the day card's period button until 2026-09-27; kept for
 // revert: import 'ttc_today_screen.dart' show logTtcPeriod;
 import 'ttc_round_strings.dart';
@@ -1237,6 +1239,10 @@ class _DayPanel extends StatelessWidget {
           //   _line(_timelineIcon(e.kind), ttcSoft, e.title(hi)),
         ],
         const SizedBox(height: 6),
+        // His side (2026-10-10): he sees her calendar, he never edits it.
+        if (TtcPartnerMode.instance.on)
+          TtcPartnerViewOnlyLine(p: V2PaletteStore.instance.current)
+        else
         Row(children: [
           Expanded(
             child: _action(

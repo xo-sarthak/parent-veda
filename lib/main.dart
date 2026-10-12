@@ -194,6 +194,14 @@ class _ParentVedaAppState extends State<ParentVedaApp>
         builder: (_) => MainScaffold(
             pregnancy: _controller, home: _home, father: _father),
       ),
+      // Where sign out lands (2026-10-10): the same splash a cold start opens,
+      // which reads the now-cleared flag and opens onboarding, and on finishing
+      // lands her in the home of the stage she picks.
+      signedOut: () => MaterialPageRoute<void>(
+        settings: const RouteSettings(name: 'splash'),
+        builder: (_) => SplashScreen(
+            pregnancy: _controller, home: _home, father: _father),
+      ),
     );
     // Warm up the baby-voice engine (loads persisted mute state).
     BabyVoiceService.instance.init();

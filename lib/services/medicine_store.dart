@@ -27,6 +27,13 @@ class MedicineStore extends ChangeNotifier {
   final List<MedicationLog> _logs = [];
   bool _loaded = false;
 
+  /// Arms every medication's alarms. Also run after a sign-in.
+  Future<void> rearmNotifications() async {
+    try {
+      await NotificationService.instance.syncMedicationAlarms(_meds);
+    } catch (_) {/* notifications not ready - alarms arm on next add/edit */}
+  }
+
   Future<void> init() async {
     if (_loaded) return;
     // 1) Local cache first.
@@ -49,9 +56,9 @@ class MedicineStore extends ChangeNotifier {
     notifyListeners();
 
     // Re-arm medication alarms over the rolling horizon (best-effort).
-    try {
-      await NotificationService.instance.syncMedicationAlarms(_meds);
-    } catch (_) {/* notifications not ready - alarms arm on next add/edit */}
+    await rearmNotifications();
+    // After a sign-in the alarms come back with her (2026-10-10, sign-out mutes).
+    SyncRegistry.register(rearmNotifications);
 
     // 2) Then sync with the cloud (no-op if logged out).
     await _syncFromCloud();

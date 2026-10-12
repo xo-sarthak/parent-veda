@@ -939,4 +939,28 @@ void main() {
           isNot(contains(ttcHomeHeroLine().state)));
     });
   });
+
+  // ===========================================================================
+  // 2026-10-10, reported: "fertile day end today but we are in our periods".
+  group('a bleed day is her period, never a fertile-days headline', () {
+    test('a short cycle whose window opens inside the bleed days', () {
+      // 21-day cycles, a 7-day bleed: the window's arithmetic starts inside it.
+      var seen = 0;
+      for (var cycleDay = 1; cycleDay <= 7; cycleDay++) {
+        final start = DateTime.now().subtract(Duration(days: cycleDay - 1));
+        CycleStore.instance
+          ..resetForTest()
+          ..logPeriodStart(start.subtract(const Duration(days: 42)))
+          ..logPeriodStart(start.subtract(const Duration(days: 21)))
+          ..logPeriodStart(start)
+          ..logBleedDays(start, 7);
+        final line = ttcHomeHeroLine();
+        expect(line.state,
+            isNot(isIn([TtcHeroState.windowOpen, TtcHeroState.windowLastDay])),
+            reason: 'cycle day $cycleDay is a bleed day');
+        if (line.state == TtcHeroState.onPeriod) seen++;
+      }
+      expect(seen, greaterThan(0), reason: 'the window never reached the bleed days');
+    });
+  });
 }

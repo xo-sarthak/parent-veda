@@ -12,6 +12,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:parentveda/screens/doors/pv_live_search.dart';
+import 'package:parentveda/screens/v2/v2_palette.dart';
 
 void main() {
   group('the three states', () {
@@ -63,6 +64,94 @@ void main() {
       expect(scope.canPop, isFalse, reason: 'the first Back stays on the page');
       scope.onPopInvokedWithResult!(false, null);
       expect(s.idle, isTrue, reason: 'and returns the page to idle');
+    });
+  });
+
+  group('the pinned bar (2026-10-10)', () {
+    Future<(PvLiveSearch, ScrollController)> pump(WidgetTester tester) async {
+      final s = PvLiveSearch();
+      final c = ScrollController();
+      addTearDown(s.dispose);
+      addTearDown(c.dispose);
+      final p = V2PaletteStore.instance.current;
+      await tester.pumpWidget(MaterialApp(
+        home: MediaQuery(
+          data: const MediaQueryData(
+              size: Size(400, 800), padding: EdgeInsets.only(top: 30)),
+          child: PvLiveSearchScope(
+            search: s,
+            child: Scaffold(
+              body: Stack(children: [
+                ListView(controller: c, padding: EdgeInsets.zero, children: [
+                  const SizedBox(height: 260),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: PvLiveSearchField(
+                        key: const ValueKey('hero-field'),
+                        search: s,
+                        p: p,
+                        hint: 'Search Food'),
+                  ),
+                  const SizedBox(height: 2000),
+                ]),
+                PvDoorPinnedBar(controller: c, search: s, p: p, title: 'Food'),
+              ]),
+            ),
+          ),
+        ),
+      ));
+      await tester.pump();
+      return (s, c);
+    }
+
+    testWidgets('focus moves the one field onto a solid band under the status bar',
+        (tester) async {
+      final (s, c) = await pump(tester);
+      final bar = find.byType(PvDoorPinnedBar);
+      expect(find.descendant(of: bar, matching: find.byType(TextField)), findsNothing);
+
+      await tester.tap(find.byType(TextField));
+      await tester.pumpAndSettle();
+      expect(s.focus.hasFocus, isTrue, reason: 'the move keeps focus');
+      final inBar = find.descendant(of: bar, matching: find.byType(TextField));
+      expect(inBar, findsOneWidget, reason: 'the field rides in the bar');
+      expect(find.byType(TextField), findsOneWidget, reason: 'one field, moved');
+      expect(tester.getTopLeft(inBar.first).dy, greaterThanOrEqualTo(30 + 10),
+          reason: 'clear of the status bar, not hugging it');
+      expect(tester.getRect(find.byKey(s.fieldKey)).top, 40);
+      expect(tester.getRect(find.byKey(s.fieldKey)).left, 20,
+          reason: 'the hero gutters, so the slide is straight up');
+      expect(c.offset, closeTo(260 - 40, 0.5),
+          reason: 'the list brings the empty slot under the pinned field');
+
+      await tester.enterText(inBar, 'iron');
+      await tester.pump();
+      expect(s.query, 'iron', reason: 'typing still reaches the search');
+
+      s.release();
+      await tester.pumpAndSettle();
+      expect(find.descendant(of: bar, matching: find.byType(TextField)), findsNothing);
+      expect(find.descendant(of: find.byKey(const ValueKey('hero-field')),
+          matching: find.byType(TextField)), findsOneWidget,
+          reason: 'released, the field is back in the hero');
+      expect(c.offset, 0, reason: 'and the list is back where she was');
+    });
+
+    testWidgets('scrolled idle, the compact bar fades in with back and the name',
+        (tester) async {
+      final (_, c) = await pump(tester);
+      double opacity() => tester
+          .widget<Opacity>(find
+              .descendant(of: find.byType(PvDoorPinnedBar), matching: find.byType(Opacity))
+              .first)
+          .opacity;
+      expect(opacity(), 0);
+      c.jumpTo(600);
+      await tester.pump();
+      await tester.pump();
+      expect(opacity(), 1);
+      expect(find.byTooltip('Back'), findsOneWidget);
+      expect(find.byTooltip('Search Food'), findsOneWidget);
     });
   });
 

@@ -68,7 +68,7 @@ class ObQuestion {
 /// the build if a question has none.
 const Map<String, String> kObSummaryLabels = {
   'ttc_duration': 'Trying for',
-  'ttc_cycles': 'Your cycles',
+  'ttc_cycles': 'Your periods',
   'ttc_folic': 'Folic acid',
   'preg_parity': 'This pregnancy',
   'preg_priorities': 'Most help with',
@@ -106,49 +106,49 @@ final List<ObQuestion> _trying = [
   ObQuestion(
     id: 'ttc_duration',
     title: 'How long have you been trying?',
-    subtitle: 'There is no wrong answer — this only sets the tone.',
+    subtitle: "There's no wrong answer. It just helps us talk to you in the right way.",
     options: const [
       ObOption(
         'starting',
         'Just starting',
-        'Most couples conceive within a year of trying. The first months are for learning your cycle, not for worrying.',
+        'Most couples get pregnant within a year of trying. The first months are for getting to know your cycle, not for worrying.',
       ),
       ObOption(
         'months',
         'A few months',
-        'A few months is normal. Three months of dates tells you more about your window than any article can.',
+        'A few months is normal. Three months of period dates tells you more about your fertile days than any article can.',
       ),
       ObOption(
         'six',
         'Six months or more',
-        'Still within the range most couples fall in. If you are over 35, six months is when a doctor is worth a visit — calmly, not urgently.',
+        "This is still normal for many couples. If you're over 35, six months is a good time to see a doctor. It's a calm check, not an emergency.",
       ),
       ObOption(
         'year',
         'Over a year',
-        'A year is the point where guidelines suggest a check for both of you. Nothing is wrong with asking; most causes are findable and many are simple.',
+        "After a year, doctors suggest a check-up for both of you. It's fine to ask. Most causes can be found, and many are simple.",
       ),
     ],
     apply: (s, c) => s.setOther('ttc_duration', c.join(',')),
   ),
   ObQuestion(
     id: 'ttc_cycles',
-    title: 'Are your cycles fairly regular?',
+    title: 'Are your periods fairly regular?',
     options: const [
       ObOption(
         'yes',
         'Yes, mostly',
-        'Regular usually means 21 to 35 days, give or take a couple. The cycle tool will find your window from your own dates.',
+        'Regular usually means a period every 21 to 35 days. The app will work out your fertile days from your own dates.',
       ),
       ObOption(
         'no',
         'Not really',
-        'Irregular cycles are common and often have an ordinary reason. Recording the dates is the single most useful thing to do before a doctor looks.',
+        'Irregular periods are common and often have a simple reason. Writing down the dates is the most useful thing to do before you see a doctor.',
       ),
       ObOption(
         'unsure',
         'Not sure',
-        'That is fine — nobody is asked to know this. Log the first day of your next period and the app starts working it out with you.',
+        "That's completely fine, lots of people don't. Note the first day of your next period and we'll work it out together.",
       ),
     ],
     apply: (s, c) => s.setOther('ttc_cycles', c.join(',')),
@@ -156,17 +156,17 @@ final List<ObQuestion> _trying = [
   ObQuestion(
     id: 'ttc_folic',
     title: 'Is anyone taking folic acid yet?',
-    subtitle: 'The one supplement every guideline agrees on.',
+    subtitle: 'The one vitamin doctors everywhere agree on.',
     options: const [
       ObOption(
         'yes',
         'Yes',
-        'Good — 400 micrograms a day is the usual dose, and it matters most in the weeks before a test turns positive.',
+        'Good. The usual dose is 400 micrograms a day. It matters most in the weeks before a test turns positive.',
       ),
       ObOption(
         'no',
         'Not yet',
-        'Worth starting now: 400 micrograms a day. It matters most in the weeks before you would know — which is exactly why it is asked here.',
+        "It's worth starting now, at 400 micrograms a day. It matters most in the early weeks, before you'd even know you're pregnant.",
       ),
     ],
     apply: (s, c) => s.setOther('ttc_folic', c.join(',')),
@@ -183,12 +183,12 @@ final List<ObQuestion> _pregnancy = [
       ObOption(
         'first',
         'My first',
-        'Then every word gets explained before it is used. Nothing here assumes you know what a scan name means.',
+        "Then we'll explain every word as we go. You don't need to know what any scan is called.",
       ),
       ObOption(
         'subsequent',
         "I've been pregnant before",
-        "Then we skip the basics where you've been here already, and lead with what is different this time.",
+        "Then we'll skip the basics you already know and start with what's different this time.",
       ),
     ],
     apply: (s, c) => s.setParity(
@@ -198,10 +198,10 @@ final List<ObQuestion> _pregnancy = [
   ObQuestion(
     id: 'preg_priorities',
     title: 'What would you most like help with?',
-    subtitle: 'Pick as many as you like. Your home leads with these.',
+    subtitle: 'Pick as many as you like. Your home will show these first.',
     multi: true,
     multiGiveBack:
-        'Your home will lead with these — you can change them any time from Profile.',
+        'Your home will show these first. You can change them any time in Profile.',
     options: const [
       ObOption('nutrition', 'Eating well', ''),
       ObOption('sleep', 'Sleeping', ''),
@@ -221,32 +221,32 @@ final List<ObQuestion> _pregnancy = [
   ObQuestion(
     id: 'preg_diet',
     title: 'How do you eat?',
-    subtitle: 'Every recipe and food page respects this.',
+    subtitle: "We'll match every recipe and food page to this.",
     options: const [
       ObOption(
         'vegetarian',
         'Vegetarian',
-        'Every recipe and food page will be vegetarian — iron and protein sources included, since those are the ones to watch.',
+        'Every recipe and food page will be vegetarian, with good sources of iron and protein, since those need the most care.',
       ),
       ObOption(
         'eggetarian',
         'Eggetarian',
-        'Eggs stay in; meat and fish stay out. Fully cooked eggs are one of the easiest proteins in pregnancy.',
+        'Eggs are in; meat and fish are out. Well-cooked eggs are one of the easiest proteins in pregnancy.',
       ),
       ObOption(
         'nonVegetarian',
         'Non-vegetarian',
-        "Everything is on the table. The food pages will say which fish and how well-cooked, without a lecture.",
+        "Everything is on the menu. The food pages will tell you which fish to pick and how well to cook things, without a lecture.",
       ),
       ObOption(
         'jain',
         'Jain',
-        'No root vegetables, no eggs — the recipe set is filtered for it, and the iron pages lean on what fits.',
+        'No root vegetables and no eggs. The recipes will fit this, and the iron tips will use foods you eat.',
       ),
       ObOption(
         'vegan',
         'Vegan',
-        'Plant-based throughout. B12 is the one thing to plan for; the food pages will keep saying so, gently.',
+        'All plant-based. Vitamin B12 is the one thing to plan for, and the food pages will gently remind you.',
       ),
     ],
     apply: (s, c) {
@@ -266,22 +266,22 @@ List<ObQuestion> _parenting(String name) => [
       ObOption(
         'breastfeeding',
         'Breastfeeding',
-        'The feeding pages lead with positions, supply and the 30-day journey — and nothing here will push formula at you.',
+        "The feeding pages will start with holds, milk supply and the 30-day guide. We'll never push formula on you.",
       ),
       ObOption(
         'formula',
         'Formula',
-        'The feeding pages lead with amounts by age, safe preparation and bottle hygiene — and nothing here will guilt you.',
+        "The feeding pages will start with how much to give by age, how to make it safely and how to keep bottles clean. We'll never make you feel guilty.",
       ),
       ObOption(
         'mixed',
         'Both',
-        'Mixed feeding is common and works. The pages cover both without treating one as the fallback.',
+        'Doing both is common, and it works. The pages cover both, and neither is treated as second best.',
       ),
       ObOption(
         'solids',
         'Solids have started',
-        'Then first foods, textures and what to hold back on lead the feeding pages.',
+        'Then the feeding pages will start with first foods, textures and what to wait on for now.',
       ),
     ],
     apply: (s, c) => s.setFeeding(
@@ -297,27 +297,27 @@ List<ObQuestion> _parenting(String name) => [
       ObOption(
         'well',
         'Mostly fine',
-        'Good. The sleep pages will stay out of the way and show up when a leap or a regression is due.',
+        'Good. The sleep pages will stay quiet, and show up at the ages when sleep often changes.',
       ),
       ObOption(
         'nightWaking',
         'Waking a lot at night',
-        'Night waking is the most common thing parents ask about, and at most ages it is what sleep looks like. The sleep door starts with what is normal for this month.',
+        "Waking at night is what parents ask about most, and at most ages it's normal. The sleep pages start with what's normal this month.",
       ),
       ObOption(
         'shortNaps',
         'Short naps',
-        'Short naps are usual in the early months — nap length grows with age. The sleep door has the rhythm by month.',
+        'Short naps are normal in the early months, and naps get longer with age. The sleep pages show what to expect each month.',
       ),
       ObOption(
         'earlyWaking',
         'Waking very early',
-        'Early waking usually has a bedtime or a light reason before it has a sleep problem. The sleep door starts there.',
+        'Waking early is usually about bedtime or light in the room, not a sleep problem. The sleep pages start there.',
       ),
       ObOption(
         'unsure',
         'Hard to say',
-        'That is an honest answer. Log a few nights and the pattern shows itself.',
+        "That's an honest answer. Jot down a few nights and a pattern will start to show.",
       ),
     ],
     apply: (s, c) => s.setSleep(
@@ -332,7 +332,7 @@ List<ObQuestion> _parenting(String name) => [
     subtitle: 'Pick as many as you like.',
     multi: true,
     multiGiveBack:
-        'Your home leads with these. Change them any time from Profile.',
+        'Your home will show these first. You can change them any time in Profile.',
     options: const [
       ObOption('sleep', 'Sleep', ''),
       ObOption('feeding', 'Feeding', ''),
@@ -360,7 +360,7 @@ List<ObQuestion> _skilling(String name) => [
     subtitle: 'Pick as many as you like.',
     multi: true,
     multiGiveBack:
-        'The first activities will start from these — and widen from there.',
+        'The first activities will start with these, then grow from there.',
     options: const [
       ObOption('stories', 'Stories', ''),
       ObOption('building', 'Building things', ''),
@@ -378,17 +378,17 @@ List<ObQuestion> _skilling(String name) => [
       ObOption(
         '10',
         'About 10 minutes',
-        'Ten focused minutes is enough — every activity here fits in one.',
+        'Ten minutes is enough. Every activity here fits in ten minutes.',
       ),
       ObOption(
         '20',
         'About 20 minutes',
-        'Twenty minutes fits an activity and the talk around it, which is where most of the learning is.',
+        'Twenty minutes fits an activity and a chat about it, which is where most of the learning happens.',
       ),
       ObOption(
         'more',
         'More, when we can',
-        'Then the longer projects unlock too — and the short ones are still there for the busy days.',
+        'Then you can try the longer projects too. The short ones are still there for busy days.',
       ),
     ],
     apply: (s, c) => s.setOther('sk_time', c.join(',')),

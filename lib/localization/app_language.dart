@@ -2456,7 +2456,14 @@ class S {
   String get mrNoteHint =>
       _p('e.g. Iron tablet after lunch', 'जैसे: दोपहर के खाने के बाद Iron टैबलेट');
   String get mrDefaultTitle =>
-      _p('Medication reminder 💊', 'दवा का रिमाइंडर 💊');
+      // No decorative emoji (2026-10-10). Kept for revert: both ended ' 💊'.
+      _p('Medication reminder', 'दवा का रिमाइंडर');
+
+  /// The emoji titles saved before 2026-10-10, still a default, not her note.
+  static const List<String> mrLegacyDefaultTitles = [
+    'Medication reminder 💊',
+    'दवा का रिमाइंडर 💊',
+  ];
   String get mrSave => _p('Save reminder', 'रिमाइंडर सेव करें');
   String get mrDelete => _p('Delete', 'हटाएँ');
   String get mrEmpty => _p('No reminders yet - tap the bell to add one.',

@@ -32,6 +32,7 @@ import '../../localization/app_language.dart';
 import '../../theme/pv_fonts.dart';
 import '../../ttc/ttc_fertility_help_rules.dart';
 import '../../ttc/ttc_fertility_help_store.dart';
+import '../../widgets/pv_feedback.dart' show PvChoiceTile;
 import '../v2/v2_palette.dart';
 import 'ttc_fertility_help_summary.dart';
 import 'ttc_strings.dart';
@@ -749,8 +750,15 @@ class _Option extends StatelessWidget {
   final bool selected;
   final VoidCallback onTap;
 
+  // The shared answer row (2026-10-10, one MCQ look app-wide): see
+  // `PvChoiceTile` in lib/widgets/pv_feedback.dart.
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) =>
+      PvChoiceTile(label: label, selected: selected, onTap: onTap);
+
+  // Kept for revert (2026-10-10): the ink-edge row with a bare tick.
+  // ignore: unused_element
+  Widget _buildBefore(BuildContext context) => GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(

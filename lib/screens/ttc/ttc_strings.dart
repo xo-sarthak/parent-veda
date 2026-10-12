@@ -24,6 +24,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../ttc/ttc_chapter.dart' show TtcNoEstimate;
+
 /// Whether the TTC stage is running in the PARTNER's experience.
 ///
 /// The real path is pairing - the partner signs up, enters her code, and lands
@@ -705,6 +707,31 @@ class TtcS {
 
   String get headerWindowLastDay =>
       _p('Your fertile days end today', 'Aaj fertile din khatam');
+  // 2026-10-10: her period days lead the hero (TtcHeroState.onPeriod). English only.
+  String get leadYourPeriod => 'Your period';
+  String bigPeriodDay(int day) => 'Day $day';
+
+  /// The sub-line on a period day: when her fertile days are likely, in words
+  /// that say we are estimating ("around"), because here we are.
+  String headerOnPeriodBody({String? from, bool overlaps = false}) => from == null
+      ? 'Rest if you need to. Your likely fertile days will show here as you log more.'
+      : overlaps
+          ? 'With a shorter cycle, your fertile days can begin before your period ends, from around $from.'
+          : 'Your fertile days usually come after your period, from around $from.';
+
+  /// Why there is no estimate, and what would bring one back (2026-10-10:
+  /// "not knowing fertile days in TTC can be confusing"). The old one-line
+  /// refusal said that we could not, never what she could do about it.
+  String headerNoEstimateWhy(TtcNoEstimate why) => switch (why) {
+        TtcNoEstimate.notEnoughHistory =>
+          'Your fertile days show once one more period is logged. Log it on the day it starts.',
+        TtcNoEstimate.historyLooksOff =>
+          'One gap between your logged periods looks longer than a cycle. Check those dates in the calendar and your fertile days come back.',
+        TtcNoEstimate.cycleOverdue =>
+          "This cycle has run longer than your usual one, so we can't place your fertile days. If your period has started, log it.",
+        _ => headerNoEstimateShort,
+      };
+
   String get headerWindowLastDayBody => _p(
       "The last fertile day this cycle. If today doesn't suit you, that's okay. Nothing is lost.",
       'Is cycle ke window ka aakhri din. Agar aaj theek nahi lagta, koi nuksaan nahi.');
@@ -1269,19 +1296,26 @@ class TtcS {
       'Yahan kuch becha nahi jaata. Prices Indian andaaze hain taaki salaah kaam ki rahe, aur koi link payment nahi leta.');
 
   // ---- the transition -------------------------------------------------------
-  String get transitionRecord => _p('Record a positive test', 'Positive test record karein');
+  // 2026-10-10, the user: "not always a positive test means pregnant". The
+  // label says what she tells us, not what a stick said. Kept for revert:
+  // 'Record a positive test'. Hindi unchanged.
+  String get transitionRecord => _p("I'm pregnant", 'Positive test record karein');
   // Change 5 (2026-09-28): the caption names the moment. Hindi unchanged.
   // Kept for revert: 'Whenever it happens, this is where you tell us.
   // Nothing restarts.'
   String get transitionRecordBody => _p(
-      'Tap when a test comes back positive. Nothing restarts.',
+      // Kept for revert: 'Tap when a test comes back positive. Nothing restarts.'
+      "Tell us when you know. A home test can sometimes be wrong, and you can always come back.",
       'Jab bhi ho, yahan bata dijiye. Kuch phir se shuru nahi hoga.');
   String get transitionConfirmTitle =>
-      _p('Is the test positive?', 'Kya test positive hai?');
+      // Kept for revert: 'Is the test positive?'
+      _p('Move to pregnancy?', 'Kya test positive hai?');
   String get transitionConfirmBody => _p(
-      "We'll date the pregnancy from your last period and move you to the pregnancy part of the app. Everything you've written here comes with you. You can undo this.",
+      // Kept for revert: the first paragraph alone, ending 'You can undo this.'
+      "We'll date the pregnancy from your last period and move you to the pregnancy part of the app. Everything you've written here comes with you.\n\nA home test can occasionally be wrong. A blood test or a scan with your doctor confirms it. If it turns out you're not pregnant, \"Not pregnant after all?\" in You brings you back, with nothing lost.",
       'Hum pregnancy ki ginti aapke aakhri period se karenge, aapko pregnancy ke safar mein le jayenge, aur yahan aapne jo bhi likha hai wo sab rakhenge. Aap ise wapas bhi kar sakti hain.');
-  String get transitionYes => _p("Yes, it's positive", 'Haan, positive hai');
+  // Kept for revert: "Yes, it's positive".
+  String get transitionYes => _p("Yes, I'm pregnant", 'Haan, positive hai');
   String get transitionNotYet => _p('Not yet', 'Abhi nahi');
 
   String get transitionTitle =>

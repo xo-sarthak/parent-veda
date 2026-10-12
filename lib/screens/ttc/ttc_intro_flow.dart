@@ -59,6 +59,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../data/reads/read_images.dart' show pvFilmStillFor;
 import '../../theme/pv_fonts.dart';
+import '../../widgets/pv_feedback.dart' show PvChoiceTile;
 import '../../widgets/pv_placeholders.dart';
 import '../../ttc/cycle_store.dart';
 import '../../ttc/ttc_care_pathway.dart';
@@ -542,8 +543,15 @@ class _Choice extends StatelessWidget {
   final bool selected;
   final VoidCallback onTap;
 
+  // The shared answer row (2026-10-10, one MCQ look app-wide): see
+  // `PvChoiceTile` in lib/widgets/pv_feedback.dart.
   @override
-  Widget build(BuildContext context) => InkWell(
+  Widget build(BuildContext context) => PvChoiceTile(
+      label: label, subtitle: sub, selected: selected, onTap: onTap);
+
+  // Kept for revert (2026-10-10): the tinted-panel choice.
+  // ignore: unused_element
+  Widget _buildBefore(BuildContext context) => InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(18),
         child: Container(
