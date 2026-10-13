@@ -166,4 +166,60 @@ void main() {
       expect(ttcFactsFor(future).isExpectedPeriod, isFalse);
     });
   });
+
+  // ===========================================================================
+  //  2026-10-13: the answer first, one scroll of weeks, estimates striped
+  // ===========================================================================
+  group('the calendar after the Mobbin pass', () {
+    testWidgets('a sentence above the grid says where she is and what is next',
+        (tester) async {
+      logCleanHistory();
+      await pumpCalendar(tester);
+      expect(find.byKey(const ValueKey('ttc_calendar_summary')), findsOneWidget);
+      final line = ttcCalendarSummaryLine()!;
+      expect(line, contains('fertile days'));
+      expect(line.contains('%'), isFalse, reason: 'never a probability');
+    });
+
+    testWidgets('and nothing when there is nothing to estimate from',
+        (tester) async {
+      await pumpCalendar(tester);
+      expect(find.byKey(const ValueKey('ttc_calendar_summary')), findsNothing);
+    });
+
+    testWidgets('the weeks scroll, and the arrow steps a month', (tester) async {
+      logCleanHistory();
+      await pumpCalendar(tester);
+      expect(find.byKey(const ValueKey('ttc_calendar_weeks')), findsOneWidget);
+      final n = DateTime.now();
+      final next = DateTime(n.year, n.month + 1);
+      // The next month's 1st is labelled in the run, not on a new page.
+      expect(
+          find.byKey(ValueKey('ttc_cal_month_label_${next.year}_${next.month}')),
+          findsOneWidget);
+      await tester.tap(find.byIcon(Icons.chevron_right_rounded).first);
+      await tester.pumpAndSettle();
+      final title = tester.widget<Text>(
+          find.byKey(const ValueKey('ttc_calendar_month_title')));
+      expect(title.data, endsWith('${next.year}'));
+      const names = ['January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'];
+      expect(title.data, startsWith(names[next.month - 1]));
+    });
+
+    testWidgets('fertile days still ahead are striped, and the key says so',
+        (tester) async {
+      logCleanHistory();
+      await pumpCalendar(tester);
+      expect(find.byKey(const ValueKey('ttc_cal_estimate_stripes')),
+          findsWidgets);
+      expect(find.text(kTtcCalendarEstimateKey), findsOneWidget);
+    });
+
+    test('today is not "ahead"; tomorrow is', () {
+      final n = DateTime.now();
+      expect(ttcIsAhead(n), isFalse);
+      expect(ttcIsAhead(DateTime(n.year, n.month, n.day + 1)), isTrue);
+    });
+  });
 }

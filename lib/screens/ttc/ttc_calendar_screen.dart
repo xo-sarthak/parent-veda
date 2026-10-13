@@ -69,6 +69,7 @@ import '../v2/v2_palette.dart' show V2PaletteStore;
 import 'ttc_round_strings.dart';
 import 'ttc_strings.dart';
 import 'ttc_timeline_screen.dart';
+import 'ttc_window_screen.dart' show ttcWindowForHim;
 import 'ttc_treatment_screen.dart' show openTtcTreatment;
 
 class TtcCalendarScreen extends StatefulWidget {
@@ -94,6 +95,61 @@ class _TtcCalendarScreenState extends State<TtcCalendarScreen> {
   static DateTime _monthOf(DateTime d) => DateTime(d.year, d.month);
   static DateTime _dayOf(DateTime d) => DateTime(d.year, d.month, d.day);
 
+  // ⚠️ ONE SCROLLING RUN OF WEEKS, NOT A PAGE PER MONTH (2026-10-13, Mobbin:
+  // Fitbit and Ultrahuman). Paging cut a fertile window that crossed a month
+  // in two, which is why `_BoundaryNote` had to exist. Here the weeks run on,
+  // so the band is never cut. A year either side of today; the arrows and the
+  // "Today" chip jump by animating the same scroll.
+  late final DateTime _origin = _startOfWeekCovering(
+      DateTime(DateTime.now().year, DateTime.now().month - 12, 1));
+  late final int _weekCount = DateTime(
+                  DateTime.now().year, DateTime.now().month + 13, 0)
+              .difference(_origin)
+              .inDays ~/
+          7 +
+      1;
+  late final ScrollController _weeks = ScrollController(
+      initialScrollOffset: _offsetOfWeek(_weekIndexOf(_dayOf(DateTime.now()))))
+    ..addListener(_trackMonth);
+
+  static DateTime _startOfWeekCovering(DateTime d) =>
+      DateTime(d.year, d.month, d.day - d.weekday % 7);
+
+  int _weekIndexOf(DateTime d) => DateTime(d.year, d.month, d.day)
+          .difference(_origin)
+          .inDays ~/
+      7;
+
+  /// Puts week [i] one row below the top, so the week before stays in view.
+  double _offsetOfWeek(int i) =>
+      ((i - 1).clamp(0, _weekCount) * _kWeekRowHeight).toDouble();
+
+  /// The month named in the header is the month of the second visible row,
+  /// the row today sits on when the calendar opens.
+  void _trackMonth() {
+    final top = (_weeks.offset / _kWeekRowHeight).floor();
+    final mid = DateTime(_origin.year, _origin.month, _origin.day + (top + 1) * 7 + 3);
+    final m = _monthOf(mid);
+    if (m != _month) setState(() => _month = m);
+  }
+
+  void _jumpToMonth(int delta) {
+    final target = DateTime(_month.year, _month.month + delta, 1);
+    // Land the 1st's week on the top row: the "second row" rule then names
+    // the target month, and the month starts where the eye starts.
+    final i = _weekIndexOf(target);
+    _weeks.animateTo(
+        (i.clamp(0, _weekCount) * _kWeekRowHeight).toDouble(),
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeOutCubic);
+  }
+
+  @override
+  void dispose() {
+    _weeks.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
@@ -116,14 +172,23 @@ class _TtcCalendarScreenState extends State<TtcCalendarScreen> {
           // for revert: header: const TtcHeader(), then
           // ttcSectionTitle(t.calendarTitle, eyebrow: t.tabCalendar).
           header: _CalendarTop(
-            onToday: () => setState(() {
+            onToday: () {
               final n = DateTime.now();
-              _month = DateTime(n.year, n.month);
-              _selected = DateTime(n.year, n.month, n.day);
-            }),
+              setState(() {
+                _month = DateTime(n.year, n.month);
+                _selected = DateTime(n.year, n.month, n.day);
+              });
+              _weeks.animateTo(_offsetOfWeek(_weekIndexOf(_dayOf(n))),
+                  duration: const Duration(milliseconds: 250),
+                  curve: Curves.easeOutCubic);
+            },
           ),
           children: [
-            // What this calendar is showing her, first (tools pass,
+            // The answer first (2026-10-13, Mobbin: Oura, Apple Health): one
+            // sentence saying where she is and what is next, so the grid is
+            // for looking closer, not for working it out.
+            const TtcCalendarSummary(),
+            // What this calendar is showing her (tools pass,
             // 2026-09-27). See [_CalendarIntro].
             _CalendarIntro(
               hasEstimate: const TtcChapterEngine()
@@ -131,19 +196,24 @@ class _TtcCalendarScreenState extends State<TtcCalendarScreen> {
                   null,
             ),
             const SizedBox(height: 18),
-            _MonthGrid(
+            // Kept for revert (2026-10-13, the paged month became one scroll):
+            //   _MonthGrid(month: _month, selected: _selected,
+            //       onSelect: (d) => setState(() => _selected = d),
+            //       onMonth: (delta) => setState(() {
+            //         _month = DateTime(_month.year, _month.month + delta);
+            //       }),
+            //       t: t),
+            //   _BoundaryNote(month: _month, t: t),
+            //   const SizedBox(height: 14),
+            _WeeksGrid(
               month: _month,
+              origin: _origin,
+              weekCount: _weekCount,
+              controller: _weeks,
               selected: _selected,
               onSelect: (d) => setState(() => _selected = d),
-              onMonth: (delta) => setState(() {
-                _month = DateTime(_month.year, _month.month + delta);
-              }),
-              t: t,
+              onMonth: _jumpToMonth,
             ),
-            // A fertile run that crosses a month boundary used to vanish at the
-            // edge of the grid: four faint circles trailing off the bottom row
-            // and nothing saying the peak was in the next month.
-            _BoundaryNote(month: _month, t: t),
             const SizedBox(height: 14),
             _Legend(
               open: _legendOpen,
@@ -483,6 +553,8 @@ bool _sameDay(DateTime? a, DateTime b) =>
 
 // ---- the grid ---------------------------------------------------------------
 
+// Unused since 2026-10-13 (see _WeeksGrid). Kept for revert.
+// ignore: unused_element
 class _MonthGrid extends StatelessWidget {
   const _MonthGrid({
     required this.month,
@@ -635,6 +707,9 @@ class _MonthGrid extends StatelessWidget {
 }
 
 /// Says so when the fertile run does not fit inside the month on screen.
+// Unused since 2026-10-13: the weeks scroll, so a run is never cut. Kept
+// for revert.
+// ignore: unused_element
 class _BoundaryNote extends StatelessWidget {
   const _BoundaryNote({required this.month, required this.t});
 
@@ -771,6 +846,25 @@ class TtcFertileBand extends StatelessWidget {
             bottomRight: openRight ? Radius.zero : r,
           ),
         ),
+        // ⚠️ STRIPES MEAN "OUR ESTIMATE" (2026-10-13, Mobbin: Apple Health,
+        // Oura, Ultrahuman). Days still ahead are a prediction, so they carry
+        // light diagonal stripes; the colour underneath is unchanged, so the
+        // band reads exactly as before at a glance.
+        child: ttcIsAhead(date!)
+            ? ClipRRect(
+                borderRadius: BorderRadius.only(
+                  topLeft: openLeft ? Radius.zero : r,
+                  bottomLeft: openLeft ? Radius.zero : r,
+                  topRight: openRight ? Radius.zero : r,
+                  bottomRight: openRight ? Radius.zero : r,
+                ),
+                child: const CustomPaint(
+                  key: ValueKey('ttc_cal_estimate_stripes'),
+                  painter: TtcEstimateStripes(),
+                  size: Size.infinite,
+                ),
+              )
+            : null,
       ),
       ),
     );
@@ -864,7 +958,14 @@ class _DayCell extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
+            CustomPaint(
+              // A dashed ring for the expected period (2026-10-13, Mobbin:
+              // Oura, Flo): dashes read as "not yet" where a solid line read
+              // as a day already marked.
+              foregroundPainter: facts.isExpectedPeriod
+                  ? const TtcDashedRing(TtcCycleColours.period)
+                  : null,
+              child: Container(
               width: 30,
               height: 30,
               alignment: Alignment.center,
@@ -885,8 +986,10 @@ class _DayCell extends StatelessWidget {
                 shape: BoxShape.circle,
                 // The expected period is an OUTLINE, never a solid marker - it
                 // is a projection, not a fact about her body.
+                // Kept for revert: Border.all(color: TtcCycleColours.period,
+                // width: 1.6) when isExpectedPeriod. The ring is painted now.
                 border: facts.isExpectedPeriod
-                    ? Border.all(color: TtcCycleColours.period, width: 1.6)
+                    ? null
                     : isSelected && (facts.isPeriodStart || facts.isBleedDay)
                         ? Border.all(color: TtcCycleColours.today, width: 2)
                         : isToday && !isSelected
@@ -911,6 +1014,7 @@ class _DayCell extends StatelessWidget {
                       w: (isToday || facts.isOvulation)
                           ? FontWeight.w900
                           : FontWeight.w600)),
+            ),
             ),
             const SizedBox(height: 2),
             SizedBox(
@@ -1031,6 +1135,9 @@ class _Legend extends StatelessWidget {
             // says what to look for rather than showing a colour that no
             // longer exists.
             _row(TtcCycleColours.ovulation, t.calendarOvulation, bold: true),
+            _row(TtcCycleColours.fertileLevel(FertilityLevel.peak),
+                kTtcCalendarEstimateKey,
+                striped: true),
           ],
           // "Today" was missing entirely, while being the boldest ring drawn.
           // The Today key is gone (2026-09-30, "very out of touch"): the ring
@@ -1060,7 +1167,10 @@ class _Legend extends StatelessWidget {
 
   // Kept for revert: Padding(bottom: 10, Row(16px mark, 11, Expanded(label))).
   Widget _row(Color c, String label,
-          {bool filled = false, bool outline = false, bool bold = false}) =>
+          {bool filled = false,
+          bool outline = false,
+          bool bold = false,
+          bool striped = false}) =>
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 3),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -1071,6 +1181,22 @@ class _Legend extends StatelessWidget {
               child: bold
                   ? Text('14',
                       style: ttcBody(10, color: c, w: FontWeight.w900))
+                  : striped
+                  ? ClipOval(
+                      child: Container(
+                        width: 16,
+                        height: 16,
+                        color: c,
+                        child: const CustomPaint(painter: TtcEstimateStripes()),
+                      ),
+                    )
+                  // The expected period's dashed ring, as on the grid.
+                  : outline && c == TtcCycleColours.period
+                  ? const SizedBox(
+                      width: 10,
+                      height: 10,
+                      child: CustomPaint(
+                          painter: TtcDashedRing(TtcCycleColours.period)))
                   : Container(
                       width: filled ? 16 : 8,
                       height: filled ? 16 : 8,
@@ -1413,6 +1539,16 @@ const double _kCellHeight = 46;
 
 /// The word under the outlined day in the grid (tools pass, 2026-09-27).
 const String kTtcCalendarDueMark = 'Due';
+
+/// The legend's line for the striped days (2026-10-13).
+const String kTtcCalendarEstimateKey = 'Striped days are an estimate';
+
+/// A week row: the 10-point month label line, then the day cell.
+const double _kWeekRowHeight = _kMonthLabelHeight + _kCellHeight;
+const double _kMonthLabelHeight = 10;
+
+/// Six weeks in view, the same height the paged month took.
+const int _kWeeksInView = 6;
 
 // ---- the line above the grid (tools pass, 2026-09-27) ---------------------
 //
@@ -1821,4 +1957,301 @@ class _CalendarTop extends StatelessWidget {
           ),
         ),
       ]);
+}
+
+
+// ---- the summary line (2026-10-13) ------------------------------------------
+
+/// Today is after or on [d]? False for today itself: today is not "ahead".
+bool ttcIsAhead(DateTime d) {
+  final n = DateTime.now();
+  return DateTime(d.year, d.month, d.day).isAfter(DateTime(n.year, n.month, n.day));
+}
+
+/// The one sentence above the grid: where she is in the cycle and what is
+/// next, from the same resolver the home's hero and "Coming up" read, so the
+/// three cannot disagree. Nothing while a clinic round sets the dates (the
+/// round's own card speaks then) or when there is nothing to estimate from.
+String? ttcCalendarSummaryLine([DateTime? now]) {
+  final store = TtcStore.instance;
+  if (store.today.behaviour.countsToBeta) return null;
+  final round = TtcTreatmentStore.instance.cycle;
+  if (!round.isEmpty && !round.isClosed) return null;
+  final ctx = ttcDayContext(now ?? DateTime.now());
+  final today = ctx.today;
+  final opens = ctx.windowOpensOn, closes = ctx.windowClosesOn;
+  final due = ctx.periodDueOn;
+  String d(DateTime x) => ttcShortDate(x);
+  String? line;
+  if (ctx.isPeriodDay && ctx.cycleDay != null) {
+    // Period wins an overlap (resolver rule 4), here as on the grid.
+    line = opens != null && opens.isAfter(today)
+        ? "You're on your period, day ${ctx.cycleDay} of your cycle. "
+            'Your fertile days are expected from ${d(opens)}.'
+        : "You're on your period, day ${ctx.cycleDay} of your cycle.";
+  } else if (opens != null && closes != null && !closes.isBefore(today)) {
+    final toOpen = opens.difference(today).inDays;
+    if (toOpen > 0) {
+      line = 'Your fertile days are expected ${d(opens)} to ${d(closes)}, '
+          'starting ${toOpen == 1 ? 'tomorrow' : 'in $toOpen days'}. '
+          "You're most likely to ovulate on ${d(closes)}.";
+    } else {
+      final left = closes.difference(today).inDays;
+      line = left == 0
+          ? "Today is the last of your fertile days, and the day you're most "
+              'likely to ovulate.'
+          : 'Your fertile days are here, until ${d(closes)}, the day '
+              "you're most likely to ovulate.";
+    }
+  } else if (due != null && ctx.cycleDay != null) {
+    final away = due.difference(today).inDays;
+    line = away > 0
+        ? 'Your next period is expected around ${d(due)}, '
+            '${away == 1 ? 'tomorrow' : 'in $away days'}.'
+        : 'Your next period is due any day now.';
+  }
+  return line == null ? null : ttcWindowForHim(line);
+}
+
+class TtcCalendarSummary extends StatelessWidget {
+  const TtcCalendarSummary({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final line = ttcCalendarSummaryLine();
+    if (line == null) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: Text(line,
+          key: const ValueKey('ttc_calendar_summary'),
+          style: pvFraunces(
+              fontSize: 19,
+              fontWeight: FontWeight.w600,
+              height: 1.35,
+              color: ttcTitleInk)),
+    );
+  }
+}
+
+// ---- the scrolling weeks (2026-10-13) ---------------------------------------
+
+/// The calendar as one run of weeks, a year either side of today.
+///
+/// Fitbit's shape (Mobbin): the month's name sits in small capitals above its
+/// 1st, alternate months sit on a faint shade, and nothing breaks at a month's
+/// edge, so a fertile run that crosses into the next month stays one band.
+/// The header still names a month and its arrows still step by one; they
+/// scroll this list rather than swapping a page.
+class _WeeksGrid extends StatelessWidget {
+  const _WeeksGrid({
+    required this.month,
+    required this.origin,
+    required this.weekCount,
+    required this.controller,
+    required this.selected,
+    required this.onSelect,
+    required this.onMonth,
+  });
+
+  final DateTime month;
+  final DateTime origin;
+  final int weekCount;
+  final ScrollController controller;
+  final DateTime selected;
+  final ValueChanged<DateTime> onSelect;
+  final ValueChanged<int> onMonth;
+
+  static const _monthNames = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December',
+  ];
+
+  DateTime _at(int week, int col) =>
+      DateTime(origin.year, origin.month, origin.day + week * 7 + col);
+
+  @override
+  Widget build(BuildContext context) {
+    final today = DateTime.now();
+    Widget arrow(IconData icon, int delta, String label) => Semantics(
+          button: true,
+          label: label,
+          child: InkWell(
+            onTap: () => onMonth(delta),
+            customBorder: const CircleBorder(),
+            child: Container(
+              width: 40,
+              height: 40,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: ttcBorder),
+              ),
+              child: Icon(icon, size: 20, color: ttcInk),
+            ),
+          ),
+        );
+    return Column(children: [
+      Row(children: [
+        Expanded(
+          child: Text('${_monthNames[month.month - 1]} ${month.year}',
+              key: const ValueKey('ttc_calendar_month_title'),
+              style: pvFraunces(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: -0.4,
+                  color: ttcTitleInk)),
+        ),
+        arrow(Icons.chevron_left_rounded, -1, 'Previous month'),
+        const SizedBox(width: 8),
+        arrow(Icons.chevron_right_rounded, 1, 'Next month'),
+      ]),
+      const SizedBox(height: 18),
+      Row(children: [
+        for (final d in ['S', 'M', 'T', 'W', 'T', 'F', 'S'])
+          Expanded(
+            child: Text(d,
+                textAlign: TextAlign.center,
+                style: ttcBody(10.5, color: ttcMuted, w: FontWeight.w800)),
+          ),
+      ]),
+      const SizedBox(height: 4),
+      SizedBox(
+        height: _kWeekRowHeight * _kWeeksInView,
+        child: ListView.builder(
+          key: const ValueKey('ttc_calendar_weeks'),
+          controller: controller,
+          physics: const ClampingScrollPhysics(),
+          padding: EdgeInsets.zero,
+          itemExtent: _kWeekRowHeight,
+          itemCount: weekCount,
+          itemBuilder: (context, w) => _week(w, today),
+        ),
+      ),
+    ]);
+  }
+
+  Widget _week(int w, DateTime today) {
+    final days = [for (var c = 0; c < 7; c++) _at(w, c)];
+    DateTime prev(int c) => _at(w, c - 1);
+    DateTime next(int c) => _at(w, c + 1);
+    return Stack(children: [
+      // Alternate months on a faint shade, so a month reads as a block.
+      Positioned.fill(
+        child: Row(children: [
+          for (final d in days)
+            Expanded(
+              child: ColoredBox(
+                color: (d.year * 12 + d.month).isOdd
+                    ? ttcBorder.withValues(alpha: 0.28)
+                    : Colors.transparent,
+              ),
+            ),
+        ]),
+      ),
+      Positioned(
+        left: 0,
+        right: 0,
+        top: _kMonthLabelHeight,
+        height: _kCellHeight,
+        child: Row(children: [
+          for (var c = 0; c < 7; c++)
+            Expanded(
+              child: TtcFertileBand.shows(days[c])
+                  ? TtcFertileBand(
+                      date: days[c],
+                      before: prev(c),
+                      after: next(c),
+                      firstInRow: c == 0,
+                      lastInRow: c == 6,
+                    )
+                  : TtcRoundBandSlice.bandOf(days[c]) != null
+                      ? TtcRoundBandSlice(
+                          date: days[c],
+                          before: prev(c),
+                          after: next(c),
+                          firstInRow: c == 0,
+                          lastInRow: c == 6,
+                        )
+                      : const SizedBox(height: _kCellHeight),
+            ),
+        ]),
+      ),
+      Row(children: [
+        for (final d in days)
+          Expanded(
+            child: Column(children: [
+              SizedBox(
+                height: _kMonthLabelHeight,
+                child: d.day == 1
+                    ? Text(
+                        d.month == 1
+                            ? 'JAN ${d.year}'
+                            : _monthNames[d.month - 1]
+                                .substring(0, 3)
+                                .toUpperCase(),
+                        key: ValueKey('ttc_cal_month_label_${d.year}_${d.month}'),
+                        style: ttcBody(8,
+                            color: ttcMuted, w: FontWeight.w800, h: 1.2))
+                    : null,
+              ),
+              _DayCell(
+                date: d,
+                isToday: d.year == today.year &&
+                    d.month == today.month &&
+                    d.day == today.day,
+                isSelected: d == selected,
+                onTap: () => onSelect(d),
+              ),
+            ]),
+          ),
+      ]),
+    ]);
+  }
+}
+
+// ---- painters (2026-10-13) ----------------------------------------------------
+
+/// Light diagonal stripes over a fertile day still ahead: "our estimate".
+class TtcEstimateStripes extends CustomPainter {
+  const TtcEstimateStripes();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white.withValues(alpha: 0.55)
+      ..strokeWidth = 1.4;
+    const gap = 6.0;
+    for (var x = -size.height; x < size.width; x += gap) {
+      canvas.drawLine(Offset(x, size.height), Offset(x + size.height, 0), paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+/// A dashed ring round a day: the expected period, a projection.
+class TtcDashedRing extends CustomPainter {
+  const TtcDashedRing(this.color);
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.6;
+    final r = size.shortestSide / 2 - 0.8;
+    final c = size.center(Offset.zero);
+    const dashes = 14;
+    const sweep = 2 * 3.141592653589793 / dashes;
+    for (var i = 0; i < dashes; i++) {
+      canvas.drawArc(Rect.fromCircle(center: c, radius: r), i * sweep,
+          sweep * 0.6, false, paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant TtcDashedRing oldDelegate) =>
+      oldDelegate.color != color;
 }
