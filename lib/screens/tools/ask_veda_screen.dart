@@ -28,6 +28,7 @@ import '../../ask_veda/pv_veda_reveal.dart';
 import '../../data/product_data.dart';
 import '../../data/veda_showcase.dart';
 import '../../data/veda_suggestions.dart';
+import '../../data/preg_faqs.dart' show pregFaqSuggestions;
 import '../../localization/app_language.dart';
 import '../../models/product_models.dart';
 import '../../services/pregnancy_controller.dart';
@@ -136,9 +137,20 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
     _picked.clear();
     for (final sec in kVedaSuggestions) {
       final n = sec.active ? 4 : 3;
-      final qs = [...sec.questions]..shuffle(_rng);
+      final qs = [..._questionsFor(sec)]..shuffle(_rng);
       _picked[sec.title.en] = qs.take(n).toList();
     }
+  }
+
+  // ⚠️ HER MONTH'S QUESTIONS (2026-10-13). The Pregnancy card asks what the
+  // user's FAQ Library has for the month she is in (lib/data/preg_faqs.dart),
+  // and Ask Veda answers it for her week. The authored list stays for a week
+  // we do not know, and for revert. `.en` is the section's identity.
+  List<LocalizedText> _questionsFor(VedaSuggestionSection sec) {
+    if (sec.title.en != 'Pregnancy') return sec.questions;
+    final faqs = pregFaqSuggestions(p.currentWeek);
+    if (faqs.isEmpty) return sec.questions;
+    return [for (final q in faqs) LocalizedText(en: q, hi: q)];
   }
 
   @override
@@ -668,7 +680,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
     return pvVedaFollowUps(_query ?? '', [
       for (final sec in kVedaSuggestions)
         if (sec.active)
-          for (final q in sec.questions) q.of(lang),
+          for (final q in _questionsFor(sec)) q.of(lang),
     ]);
   }
 

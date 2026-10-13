@@ -37,6 +37,7 @@ import '../data/reads/pregnancy_reads.dart' show kPregnancyReads;
 import '../localization/app_language.dart';
 import '../models/pv_read.dart';
 import '../services/bracket_resolver.dart' show bracketById;
+import '../data/preg_faqs.dart' show PregFaq, PregFaqSection, kPregFaqsLive;
 import 'pv_veda_links.dart';
 
 /// The corpus domain: the same one the older pregnancy documents use, so a
@@ -72,6 +73,29 @@ String pvVedaReadBody(PvRead r) => _join([
       _join([_l(r.whenToSeeSomeone.title), _l(r.whenToSeeSomeone.body)]),
       _l(r.evidence),
     ]);
+
+/// An FAQ's whole text for Ask Veda, in the doc's order.
+String pvVedaAskBody(PregFaq f) => _join([
+      'Q: ${f.question}',
+      'Written for: ${f.applicability.isEmpty ? 'month ${f.month} of pregnancy' : f.applicability}'
+          ' (month ${f.month} of pregnancy).',
+      for (final p in f.parts)
+        _join([
+          if (p.heading.isNotEmpty) p.heading else _askLabel(p.section),
+          ...p.paragraphs,
+          _join(p.bullets.map((b) => '- $b'), sep: '\n'),
+        ], sep: '\n'),
+    ]);
+
+String _askLabel(PregFaqSection s) => switch (s) {
+      PregFaqSection.direct => 'Answer:',
+      PregFaqSection.why => 'Why this happens:',
+      PregFaqSection.whyMatters => 'Why it matters:',
+      PregFaqSection.forYou => 'What this means for you:',
+      PregFaqSection.doctor => 'When to speak to your doctor:',
+      PregFaqSection.perspective => 'ParentVeda perspective:',
+      PregFaqSection.takeaways => 'Quick takeaways:',
+    };
 
 Map<String, dynamic> _doc({
   required String docId,
@@ -123,6 +147,24 @@ List<Map<String, dynamic>> buildPregnancyVedaCorpus() {
         keywords: [r.kicker.en],
       ));
     }
+  }
+
+  // ---- the FAQ Library (2026-10-13) ---------------------------------------------------
+  // The user's Ask Veda FAQ Library, as KNOWLEDGE: the AI reads each one as fact
+  // and writes the answer fresh for where she is (lib/data/preg_faqs.dart). The
+  // question leads the body, because only the body is embedded and a question
+  // matches a question best. "Written for" names the stretch of pregnancy the
+  // doc was written for, so the model can say what it means at HER week instead
+  // of repeating month-one advice to a mother at week thirty. Held FAQs (awaiting
+  // clinical sign-off) are never exported.
+  for (final f in kPregFaqsLive) {
+    out.add(_doc(
+      docId: pvVedaAskId(f.id),
+      kind: 'pvask',
+      title: f.question,
+      body: pvVedaAskBody(f),
+      keywords: [f.category],
+    ));
   }
 
   // ---- doors ------------------------------------------------------------------------

@@ -10275,3 +10275,32 @@ the new What to Expect doc wins, the old bilingual companion kept for revert.
 - **Book covers** — docs say "(add cover art asset)"; the typographic cover shows meanwhile.
 - **Hindi for What to Expect** — the doc companion is English; Hindi readers lose the old translation.
 - **Quotes** — several docs drop them as unverifiable; the section is left out for those books.
+
+---
+
+## 88.0 Pregnancy FAQ Library — Ask Veda's knowledge, by month — 2026-10-13
+
+**Built.** `tools/preg_faqs/docx_to_dart.py` turns the Drive "Pregnancy FAQs" folder (Months 1–8, 365 FAQs)
+into `lib/data/preg_faqs/` (GENERATED); `lib/data/preg_faqs.dart` holds the model, the reader page and the
+month map.
+
+- **Ask Veda (both repos):** each live FAQ is a knowledge document `pvask_<id>` in the pregnancy export; the
+  service's rule 10 writes the answer for her week (decided: knowledge, not verbatim answers); pregnancy cache
+  key `:s2`.
+- **App:** an answer's card opens the FAQ in `PvReaderScreen` (`openPregFaq`); Ask Veda's Pregnancy
+  suggestions and "You could also ask" come from her month.
+
+**Owed:**
+- **Clinical sign-off for 39 held FAQs** (bleeding, ectopic, miscarriage signs, preeclampsia, results,
+  reduced movements, delivery mode, preterm, cord, itching, hospital deposits). Add each signed-off id to
+  `kPregFaqSignedOff`. Ishaan / clinical reviewer.
+- **The live load** (the user runs it): export, `import_corpus --prune-prefix pv`, ingest, Railway deploy.
+  Until then the app half shows suggestions and opens pages, but Ask Veda has not read the FAQs.
+- **Month 9 (weeks 36–40) not sent.** Weeks 36+ suggest Month 8's questions.
+- **8 related titles match no FAQ** ("Is placenta previa dangerous?", "Are there prayers or practices that help
+  me feel calm?", "Why do I feel bloated in early pregnancy?", "How much tea and coffee is safe?", "What can help
+  with nausea?"). Dropped from the related rail until the doc names a real question.
+- **The docs' Verification notes are not shown** on the page (writers' notes with search volumes); they stay in
+  the docs for review.
+- **The "Written for" line sits in the first chunk only.** A long FAQ splits into two chunks; the second
+  carries the facts without the month. Rule 10 and her stage note still frame the answer.

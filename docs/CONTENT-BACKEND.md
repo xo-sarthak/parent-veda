@@ -405,3 +405,33 @@ it tractable, and both generalise. **Replace a bracketed note with a line break,
 also separates the label it was glued to ("What Is It? (89 words)In these early weeks"). And **audit by
 difference**: list every source line whose words never reached the output, and read that list. It must be
 only headings, labels and notes; on the first run it caught three editor's asides a keyword grep had missed.
+
+
+### The Pregnancy FAQ Library — knowledge, not canned answers (2026-10-13)
+
+365 questions across Months 1–8 (`tools/preg_faqs/docx_to_dart.py` → `lib/data/preg_faqs/`). Each FAQ already
+has the shape of an answer (Direct Answer, Why, What this means for you, When to speak to your doctor, Takeaways),
+which made one design tempting: on a close match, serve the FAQ verbatim and skip the model. Cheaper, identical
+every time, exactly the doc's words.
+
+**The user turned it down, and the reason is the design.** Ask Veda exists to answer *this* mother: "if the mother
+is in week 20, the answer needs to be personalized for her… I don't want those templated answers that are same
+for everyone." So the FAQs are **knowledge**: each live one is a `veda_knowledge` document (`pvask_<id>`), the
+model reads it as fact, and writes the answer for her week. The trade-off, named: every answer costs a model
+call (the cache still makes a repeat at the same week free), and the wording is the model's, not the doc's. What
+it buys: a Month 1 fact asked about at week 30 comes back as "that was in your first weeks; at 30 weeks…", not as
+month-one advice.
+
+**Telling the model what a document was written for.** The body opens `Q: <question>` (only the body is
+embedded, and a question matches a question best), then `Written for: Month 1 (weeks 1 to 4)`. The service's
+rule 10 says to use the facts and frame them for her stage, and that a different month is never a reason to
+refuse. This is the general move: **metadata the model needs belongs in the text it reads**, because the
+embedding and the prompt only ever see text.
+
+**Changing the prompt means changing the cache key.** The pregnancy key went `:s1` → `:s2`. A cached answer is
+a frozen output of the old prompt and the old knowledge; without the bump, the improvement would be invisible
+for every question anyone had already asked.
+
+**A hold is enforced in data, not in a label.** 39 FAQs say "Clinical review: Yes". They are generated with
+`held: true` and filtered at every exit (export, reader, suggestions, related links) by one getter, `isLive`;
+`kPregFaqSignedOff` turns one on per line. A test walks all four exits.

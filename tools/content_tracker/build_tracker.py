@@ -130,10 +130,33 @@ ROWS = [
      'Docs say quotes could not be verified under the copyright limit.', PART,
      'The quotes section is simply left out for those books.', '—', '—'),
 
+    # ---------------- Pregnancy FAQs ----------------
+    ('Pregnancy FAQs', '326 FAQs as Ask Veda\'s knowledge (Months 1–8)',
+     'An FAQ library for the Ask Veda assistant, with answer, why, what it means, doctor line and takeaways.',
+     PART, 'Built in both the app and Ask Veda. Ask Veda reads each FAQ as fact and writes the answer for the '
+     'mother\'s own week. It goes live once the knowledge is loaded into the database and the service is deployed.',
+     'Run the load and the deploy (commands handed over).', 'Engineering'),
+    ('Pregnancy FAQs', 'Each FAQ as a page',
+     'Not asked by the docs; your decision.', DONE,
+     'Ask Veda → an answer\'s "More information" card opens the FAQ as a full page, with its related questions below.',
+     '—', '—'),
+    ('Pregnancy FAQs', 'Suggested questions by month',
+     'Not asked by the docs; your decision.', DONE,
+     'Ask Veda home: the Pregnancy card shows questions from her month; "You could also ask" too.', '—', '—'),
+    ('Pregnancy FAQs', '39 FAQs held for clinical sign-off',
+     'Docs mark them "Clinical review: Yes", most "holds for Ishaan\'s sign-off".', NOT,
+     'Held out of answers, pages and suggestions (your decision). Bleeding, miscarriage, preeclampsia, results, '
+     'reduced movements, delivery mode, preterm.', 'Sign-off, one FAQ at a time.', 'Ishaan / clinical reviewer'),
+    ('Pregnancy FAQs', 'Month 9 (weeks 36–40)', 'The library stops at Month 8.', NOT,
+     'Weeks 36+ see Month 8\'s questions.', 'The Month 9 doc.', 'Content team'),
+    ('Pregnancy FAQs', 'Related questions', 'Each FAQ lists 3 related questions by title.', PART,
+     'Matched to real FAQs; 8 titles name a question that does not exist, so they are left off.',
+     'Fix the 8 titles (listed in STILL-OPEN §88).', 'Content team'),
+    ('Pregnancy FAQs', 'Verification notes', 'Each FAQ ends with sources and checks.', PART,
+     'Not shown to mothers: they are writers\' notes (search volumes, "No discrepancies"). They stay in the docs.',
+     '—', '—'),
+
     # ---------------- Not started ----------------
-    ('Not started', 'Pregnancy FAQs (Months 1–8, about 365 Q&As)',
-     'Answers for the Ask Veda assistant.', NA, 'Mostly belongs in Ask Veda, which lives in a separate repository.',
-     'Access to the Ask Veda repository; a decision on also showing them on the week page.', 'Engineering / product'),
     ('Not started', 'Products (5 spreadsheets)', 'Product catalogue data.', NA, 'Needs a comparison with the store first.', 'The go-ahead.', 'Product'),
     ('Not started', 'Recipes, Instagram scraping', 'Both folders are empty.', NA, '—', 'The files.', 'Content team'),
 
@@ -180,6 +203,14 @@ DECISIONS = [
     ('13 Oct', 'All', '(Your rule) Marks and glyphs: use the app\'s latest ones.',
      'Applied: drawn marks replace Material icons and emoji on the week page, phase pages, activities, Read Next and books.'),
     ('13 Oct', 'All', '(Your rule) Keep the questions and answers in the tracker.', 'This page.'),
+    ('13 Oct', 'Check', '(You asked) After the compaction, is everything from the Drive so far in and maintained?',
+     'Yes: re-running all four converters changed nothing; Drive unchanged since 11 Oct; 122 tests passed.'),
+    ('13 Oct', 'Next', '(You asked) What is next in the Drive?', 'FAQs, with access to the Ask Veda repository.'),
+    ('13 Oct', 'FAQs', 'Should Ask Veda show the FAQ\'s own answer word for word on a close match, or always write fresh?',
+     'Always write fresh for where she is (her week); the FAQs are facts, not templates. AI cost is fine.'),
+    ('13 Oct', 'FAQs', 'Where else should the FAQs show?', 'Ask Veda\'s suggested questions by her month, and each FAQ as a page.'),
+    ('13 Oct', 'FAQs', 'What about FAQs marked for clinical review?', 'Hold them out until signed off (39 FAQs).'),
+    ('13 Oct', 'FAQs', 'Who loads the FAQs into the live database?', 'You run it; commands handed over.'),
 ]
 
 
@@ -199,14 +230,15 @@ def pdf():
                         f'and what is needed to finish. Updated {DATE}.', lead))
     st.append(Spacer(1, 8))
 
-    folders = ['Pregnancy week-wise', 'My Child phase-wise', 'Garbh Sanskar', 'Book summaries', 'Not started', 'Checks']
+    folders = ['Pregnancy week-wise', 'My Child phase-wise', 'Garbh Sanskar', 'Book summaries', 'Pregnancy FAQs', 'Not started', 'Checks']
     summary = [[Paragraph(x, head) for x in ('Folder', 'Done', 'Partly', 'Not done / not started', 'In one line')]]
     lines = {
         'Pregnancy week-wise': '18 of the docs are live on the week page. Week 19 and weeks 1–4, 24–40 are owed.',
         'My Child phase-wise': 'All 15 docs are live on the parenting home. Phases 16–20 are owed.',
         'Garbh Sanskar': 'Daily lines, stories and prayers are live. Ragas wait for audio.',
         'Book summaries': '40 of 41 companions are live on both shelves. One is missing from its file; Part 1 of Volume Four is owed.',
-        'Not started': 'FAQs and products are next. Recipes and Instagram are empty.',
+        'Pregnancy FAQs': '326 of 365 built into Ask Veda and the app; live after the database load. 39 wait for clinical sign-off.',
+        'Not started': 'Products is next. Recipes and Instagram are empty.',
         'Checks': 'Tone done. Plagiarism check not run yet.',
     }
     for f in folders:

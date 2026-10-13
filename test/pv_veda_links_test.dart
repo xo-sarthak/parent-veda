@@ -44,10 +44,11 @@ void main() {
   });
 
   group('the corpus', () {
-    test('is large and made of the four kinds, none editor-owned', () {
+    test('is large and made of the five kinds, none editor-owned', () {
       expect(corpus.length, greaterThan(300));
       final kinds = {for (final d in corpus) d['kind'] as String};
-      expect(kinds, {'pvread', 'pvfaq', 'pvdoor', 'pvtool'});
+      // 'pvask' since 2026-10-13: the user's FAQ Library (preg_faqs_test.dart).
+      expect(kinds, {'pvread', 'pvfaq', 'pvdoor', 'pvtool', 'pvask'});
       for (final k in kinds) {
         expect(ContentOwnership.isKindEditorOwned(k), isFalse,
             reason: '"$k" is editor-owned: the export would silently skip it');

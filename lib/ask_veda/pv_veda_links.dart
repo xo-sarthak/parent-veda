@@ -29,6 +29,11 @@
 //    pvdoor_<bracketId>__<slug>    one card on a door that is not itself a read
 //                                  (a tool, a checklist, a film, a library entry)
 //    pvtool_<toolId>               a tool on the Tools list
+//    pvask_<FAQ id>                one question from the user's FAQ Library
+//                                  (lib/data/preg_faqs.dart), opened as its
+//                                  own page. Not pvfaq_: that already means
+//                                  "a question inside a read" and resolves to
+//                                  the read (2026-10-13)
 //
 //  ⚠️ NONE OF THESE IS KIND 'read'. 'read' is the editor-owned reads table
 //  (`content_ownership.dart`); the export's ratchet would silently skip every
@@ -42,8 +47,10 @@ import '../data/doors/pv_door_data.dart';
 import '../data/reads/pregnancy_reads.dart' show kPregnancyReads, pregnancyReadById;
 import '../localization/app_language.dart';
 import '../screens/belly_skin/bump_ritual_screen.dart';
+import '../data/preg_faqs.dart' show PregFaq, pregFaqById, pregFaqRead, pregFaqReadById;
 import '../screens/doors/pv_door_router.dart'
-    show openPvDoorRead, openPvDoorTile;
+    show openPvDoorRead, openPvDoorSurface, openPvDoorTile;
+import '../screens/reader/pv_reader_screen.dart' show PvReaderScreen;
 import '../screens/doors/pv_door_screen.dart' show PvDoorScreen;
 import '../screens/journal_screen.dart';
 import '../screens/pregnancy/birth_plan_screen.dart';
@@ -65,6 +72,7 @@ const String kPvVedaReadPrefix = 'pvread_';
 const String kPvVedaFaqPrefix = 'pvfaq_';
 const String kPvVedaDoorPrefix = 'pvdoor_';
 const String kPvVedaToolPrefix = 'pvtool_';
+const String kPvVedaAskPrefix = 'pvask_';
 
 /// Every id this file makes starts with this, so the service can prune exactly
 /// this namespace (`import_corpus --prune-prefix pv`) and nothing older.
@@ -75,6 +83,7 @@ const String kPvVedaNamespace = 'pv';
 String pvVedaReadId(String readId) => '$kPvVedaReadPrefix$readId';
 String pvVedaFaqId(String readId, int n) => '$kPvVedaFaqPrefix${readId}_$n';
 String pvVedaToolId(String toolId) => '$kPvVedaToolPrefix$toolId';
+String pvVedaAskId(String faqId) => '$kPvVedaAskPrefix$faqId';
 
 /// A card's title as a stable key: lower case, runs of anything that is not a
 /// letter or a digit become one underscore.
@@ -203,11 +212,12 @@ PvVedaTool? pvVedaToolById(String id) {
 /// ask this, so "resolves" has one meaning.
 bool pvVedaDocResolves(String docId) => _resolve(docId) != null;
 
-enum _Kind { read, door, doorTile, tool }
+enum _Kind { read, door, doorTile, tool, ask }
 
 class _Target {
-  const _Target(this.kind, {this.readId, this.page, this.tile, this.tool});
+  const _Target(this.kind, {this.readId, this.page, this.tile, this.tool, this.faq});
   final _Kind kind;
+  final PregFaq? faq;
   final String? readId;
   final PvDoorPage? page;
   final PvDoorTile? tile;
@@ -257,6 +267,11 @@ _Target? _resolve(String rawId) {
     final tool = pvVedaToolById(id.substring(kPvVedaToolPrefix.length));
     return tool == null ? null : _Target(_Kind.tool, tool: tool);
   }
+  if (id.startsWith(kPvVedaAskPrefix)) {
+    // A held FAQ resolves to nothing, as if it did not exist.
+    final faq = pregFaqById(id.substring(kPvVedaAskPrefix.length));
+    return faq == null ? null : _Target(_Kind.ask, faq: faq);
+  }
   return null;
 }
 
@@ -284,8 +299,30 @@ bool openPvVedaDoc(BuildContext context, String docId, PregnancyController c) {
         settings: RouteSettings(name: t.tool!.route),
         builder: (_) => t.tool!.build(c),
       ));
+    case _Kind.ask:
+      openPregFaq(context, t.faq!, c);
   }
   return true;
+}
+
+/// An FAQ from the library, as a page in the one reader. Its related
+/// questions are its Read next rail, each opening the same way.
+void openPregFaq(BuildContext context, PregFaq faq, PregnancyController c) {
+  Navigator.of(context).push(MaterialPageRoute<void>(
+    // "read/" like every pregnancy read, so the Ask FAB knows the stage.
+    settings: RouteSettings(name: 'read/${pvVedaAskId(faq.id)}'),
+    builder: (_) => PvReaderScreen(
+      read: pregFaqRead(faq),
+      lang: c.language,
+      readTitle: (id) => pregFaqReadById(id)?.title,
+      resolveRead: pregFaqReadById,
+      openRead: (ctx, id) {
+        final next = pregFaqById(id.replaceFirst(kPvVedaAskPrefix, ''));
+        if (next != null) openPregFaq(ctx, next, c);
+      },
+      openSurface: (ctx, id) => openPvDoorSurface(ctx, id, c),
+    ),
+  ));
 }
 
 /// How many reads exist, for the exporter's report and a test.
