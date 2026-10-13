@@ -8,7 +8,9 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   test('the home hands the hero a calendar, and the hero draws it', () {
     final home = File('lib/screens/home_v3_screen.dart').readAsStringSync();
-    expect(home, contains('onCalendar: () => Navigator.of(context).push('));
+    // His side passes null (2026-10-13): her calendar edits her appointments.
+    expect(home, contains('onCalendar: him'));
+    expect(home, contains(': () => Navigator.of(context).push(MaterialPageRoute<void>('));
     expect(home, contains('builder: (_) => CalendarScreen(controller: pregnancy)'));
     final hero = File('lib/screens/v2/v3_preg_hero.dart').readAsStringSync();
     expect(hero, contains("semantic: 'Calendar'"));

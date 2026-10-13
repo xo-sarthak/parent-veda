@@ -46,6 +46,11 @@ import '../../theme/pv_fonts.dart';
 import '../../widgets/global_ask_fab.dart' show kAskFabReserve;
 import '../../widgets/pv_feedback.dart';
 import '../calendar_screen.dart';
+import '../../services/father_preview.dart';
+import '../father/father_read_aloud_screen.dart';
+import '../father/father_week_guide_screen.dart' show openFatherWeekGuide;
+import '../../data/doors/pv_door_partner.dart' show kPartnerSurfaceDoor;
+import '../doors/pv_door_router.dart' show openPvDoorSurface;
 import '../enterprise/employer_benefits_screen.dart';
 import '../journey_map_screen.dart';
 import '../learn/pv_learn_catalog.dart';
@@ -287,6 +292,8 @@ class _PregMoreScreenState extends State<PregMoreScreen> {
                 openPregMessages(context, _c);
               }, badge: PregMessagesStore.instance.unreadCount),
               // ⚠️ CALENDAR'S TAB MOVED HERE (2026-09-29): Learn took its slot.
+              // Her calendar edits her appointments: not on his side (2026-10-13).
+              if (!FatherPreview.instance.on)
               _row('preg_more_calendar', IntentMark.calendarDay, 206, 'Calendar',
                   'Your appointments, scans and what is coming up',
                   () => _push('calendar', () => CalendarScreen(controller: _c))),
@@ -296,6 +303,19 @@ class _PregMoreScreenState extends State<PregMoreScreen> {
               _row('preg_more_week', IntentMark.bodyMark, 24, 'Week by week',
                   'Your baby and your body, this week and every week',
                   () => _push('pregnancy/week', () => PregWeekScreen(pregnancy: _c, week: _c.currentWeek))),
+              // HIS SIDE (2026-10-13): his week, reading to the baby and the
+              // partner guide, where her calendar was.
+              if (FatherPreview.instance.on) ...[
+                _row('preg_more_his_week', IntentMark.nextStep, 206, 'Your part, every week',
+                    'One thing to do each week, and how she may be feeling',
+                    () => openFatherWeekGuide(context, _c)),
+                _row('preg_more_read_aloud', IntentMark.bookMark, 330, 'Read aloud',
+                    'A short read for tonight, for the baby to hear your voice',
+                    () => _push('father/read_aloud', () => FatherReadAloudScreen(controller: _c))),
+                _row('preg_more_partner_guide', IntentMark.pageMark, 24, 'The partner guide',
+                    'What to expect, how to help in labour, the first weeks at home',
+                    () => openPvDoorSurface(context, kPartnerSurfaceDoor, _c)),
+              ],
             ]),
 
             // ---- benefits -------------------------------------------------------

@@ -29,10 +29,10 @@ import '../widgets/pv_tab_bar.dart';
 // Calendar moved into More, Community held back (2026-09-29). Kept for revert:
 // import 'calendar_screen.dart';
 // import 'community_screen.dart';
-import 'father/father_daily_screen.dart';
-import 'father/father_journal_screen.dart';
-import 'father/father_learn_screen.dart';
-import 'father/father_read_aloud_screen.dart';
+// His old Slate tabs (2026-10-13), kept for revert: import 'father/father_daily_screen.dart';
+// His old Slate tabs (2026-10-13), kept for revert: import 'father/father_journal_screen.dart';
+// His old Slate tabs (2026-10-13), kept for revert: import 'father/father_learn_screen.dart';
+// His old Slate tabs (2026-10-13), kept for revert: import 'father/father_read_aloud_screen.dart';
 // import 'father/father_reads_screen.dart'; // kept for revert: the Reads tab is now FatherLearnScreen
 // Kept: the revert line in the tab list constructs HomeScreenB directly, and
 // TodayHomeScreen's Classic branch is the live path to it.
@@ -43,7 +43,7 @@ import 'today_home_screen.dart';
 import 'products/pv_store_chrome.dart';
 import 'products/pv_store_screen.dart';
 import 'tools_hub_screen.dart';
-import 'weekly_card_stack_screen.dart';
+// His old Slate tabs (2026-10-13), kept for revert: import 'weekly_card_stack_screen.dart';
 import '../services/usage_events.dart';
 import '../booking/prescription_watch.dart';
 import '../services/pregnancy_ended_store.dart';
@@ -186,22 +186,39 @@ class _MainScaffoldState extends State<MainScaffold> with WidgetsBindingObserver
         // The SAME nav-pill structure for both, just father (Slate) content +
         // colours in father mode. Today + Journey are shared; the other three
         // become the father's own sections (Reads · Read · Journal).
+        // ⚠️ HIS SIDE IS HER APP WITH LESS ON IT (2026-10-13, the user: same
+        // tabs as hers; Flo as the reference). His Today is her home keyed
+        // 'preg_home_him', which hides her logging and records and adds his
+        // block (preg_partner_home.dart). Learn, Products, Tools and More are
+        // hers; Tools and More trim what is hers alone. Kept for revert, the
+        // old Slate pages (Today, Journey, Learn, Read, Journal):
+              // // After a loss his Today stops showing the week too (gap
+              // // analysis: "stops the week content, the messages and the
+              // // partner's week"). Kept for revert: the line below alone.
+              // PregnancyEndedStore.instance.ended
+              // ? PregEndedHome(pregnancy: widget.pregnancy, forPartner: true)
+              // : FatherDailyScreen(controller: widget.pregnancy, embedded: true),
+              // WeeklyCardStackScreen(controller: widget.pregnancy),
+              // // Learn, not Reads (2026-09-30): the topics of the For partners door,
+              // // with the old list one tap in. Kept for revert:
+              // //   const FatherReadsScreen(),
+              // FatherLearnScreen(controller: widget.pregnancy),
+              // FatherReadAloudScreen(controller: widget.pregnancy),
+              // FatherJournalScreen(
+              // controller: widget.pregnancy, embedded: true),
+              // ]
         final pages = fatherMode
             ? [
-                // After a loss his Today stops showing the week too (gap
-                // analysis: "stops the week content, the messages and the
-                // partner's week"). Kept for revert: the line below alone.
                 PregnancyEndedStore.instance.ended
                     ? PregEndedHome(pregnancy: widget.pregnancy, forPartner: true)
-                    : FatherDailyScreen(controller: widget.pregnancy, embedded: true),
-                WeeklyCardStackScreen(controller: widget.pregnancy),
-                // Learn, not Reads (2026-09-30): the topics of the For partners door,
-                // with the old list one tap in. Kept for revert:
-                //   const FatherReadsScreen(),
-                FatherLearnScreen(controller: widget.pregnancy),
-                FatherReadAloudScreen(controller: widget.pregnancy),
-                FatherJournalScreen(
-                    controller: widget.pregnancy, embedded: true),
+                    : TodayHomeScreen(
+                        key: const ValueKey('preg_home_him'),
+                        pregnancy: widget.pregnancy,
+                        home: widget.home),
+                PregLearnScreen(pregnancy: widget.pregnancy),
+                const PvStoreScreen(chrome: PvStoreChrome.embedded),
+                ToolsHubScreen(controller: widget.pregnancy),
+                PregMoreScreen(pregnancy: widget.pregnancy),
               ]
             : [
                 // TodayHomeScreen is a WRAPPER, not a replacement: it opens
@@ -237,16 +254,17 @@ class _MainScaffoldState extends State<MainScaffold> with WidgetsBindingObserver
                 ToolsHubScreen(controller: widget.pregnancy),
                 PregMoreScreen(pregnancy: widget.pregnancy),
               ];
-        final tabs = fatherMode
-            ? const [
-                PvTab(Icons.home_rounded, 'Today'),
-                PvTab(Icons.explore_rounded, 'Journey'),
-                // Kept for revert: PvTab(Icons.menu_book_rounded, 'Reads'),
-                PvTab(Icons.menu_book_rounded, 'Learn'),
-                PvTab(Icons.auto_stories_rounded, 'Read'),
-                PvTab(Icons.edit_outlined, 'Journal'),
-              ]
-            : [
+        // His tabs are hers (2026-10-13). Kept for revert:
+        // final tabs = fatherMode
+        // ? const [
+        // PvTab(Icons.home_rounded, 'Today'),
+        // PvTab(Icons.explore_rounded, 'Journey'),
+        // // Kept for revert: PvTab(Icons.menu_book_rounded, 'Reads'),
+        // PvTab(Icons.menu_book_rounded, 'Learn'),
+        // PvTab(Icons.auto_stories_rounded, 'Read'),
+        // PvTab(Icons.edit_outlined, 'Journal'),
+        // ]
+        final tabs = [
                 // ⚠️ OUTLINED, LIKE PARENTING'S — 2026-09-16. The bar is one
                 // component (`PvNavBar`) on every screen of every stage, but
                 // this stage handed it filled `_rounded` glyphs while parenting
@@ -303,7 +321,8 @@ class _MainScaffoldState extends State<MainScaffold> with WidgetsBindingObserver
                     AppNav.instance.go(i);
                   },
                   // In Dad mode the nav pill takes the father (Slate) colours.
-                  father: fatherMode,
+                  // One bar for both (2026-10-13). Kept for revert: father: fatherMode,
+                  father: false,
                 ),
               ),
               // TESTING-ONLY switch, bottom-right, Today tab only. Remove

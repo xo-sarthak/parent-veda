@@ -18,6 +18,7 @@ import '../widgets/profile_ask_strip.dart';
 import 'belly_skin/bump_ritual_screen.dart';
 import 'can_i_screen.dart';
 import 'father/father_journal_screen.dart';
+import '../services/father_preview.dart';
 // father_stories_screen parked - the "Stories, Fables & Mythology" tile was
 // removed from Tools. Kept commented for revert.
 // import 'father/father_stories_screen.dart';
@@ -145,7 +146,11 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
     ));
   }
 
+  // HIS SIDE (2026-10-13): her trackers, her due date and her journal and
+  // bump photos are hers; he gets getting ready, read to baby, Ask Veda and
+  // his own journal. Same hub, less on it.
   List<_ToolGroup> _groups(S s) => [
+        if (!FatherPreview.instance.on)
         _ToolGroup('Track', 206, [
           _Tool(s.babyMovementTracker, Icons.favorite_border_rounded,
               AppTheme.secondary500,
@@ -214,6 +219,7 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
               line: 'Time your contractions and see when to go in',
               mark: IntentMark.timelineRail,
               priority: PregPriority.birthPrep),
+          if (!FatherPreview.instance.on)
           _Tool(s.ddcToolTitle, Icons.calendar_month_outlined, AppTheme.neutral900,
               () => _open('tools/due_date', () => DueDateCalculatorScreen(controller: controller)),
               line: 'Work out your due date, or update it after a scan',
@@ -226,10 +232,17 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
               priority: PregPriority.birthPrep),
         ]),
         _ToolGroup('Keep', 330, [
+          if (FatherPreview.instance.on)
+            _Tool('Your journal', Icons.menu_book_outlined, const Color(0xFF2F2C30),
+                () => _open('father/journal', () => FatherJournalScreen(controller: controller)),
+                line: "Yours. She won't see it unless you share it",
+                mark: IntentMark.bookMark),
+          if (!FatherPreview.instance.on)
           _Tool(s.jrTitle, Icons.menu_book_outlined, const Color(0xFF2F2C30),
               () => _open('journal', () => JournalScreen(controller: controller)),
               line: 'Write to yourself, or to your baby',
               mark: IntentMark.bookMark),
+          if (!FatherPreview.instance.on)
           _Tool(s.bumpTitle, Icons.pregnant_woman_rounded, const Color(0xFFCB6F94),
               () => _open('tools/bump', () => BumpRitualScreen(controller: controller)),
               line: 'A photo of your bump, week by week',

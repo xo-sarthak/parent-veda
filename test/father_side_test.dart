@@ -149,19 +149,23 @@ void main() {
       expect(t.takeException(), isNull);
     });
 
-    test('the partner bar uses it, and the old Reads list is still reachable', () {
-      final s = _code('lib/screens/main_scaffold.dart');
-      expect(s, contains('FatherLearnScreen(controller: widget.pregnancy)'));
-      expect(s, contains("PvTab(Icons.menu_book_rounded, 'Learn')"));
+    // 2026-10-13: his tabs are hers now (preg_his_side_test.dart). The partner
+    // guide his Learn tab listed is the door his home and More open.
+    test('his home and More reach the partner guide, and the old Reads list stays', () {
+      expect(_code('lib/screens/pregnancy/preg_partner_home.dart'),
+          contains('openPvDoorSurface(context, kPartnerSurfaceDoor, pregnancy)'));
+      expect(_code('lib/screens/pregnancy/preg_more_screen.dart'),
+          contains('openPvDoorSurface(context, kPartnerSurfaceDoor, _c)'));
       expect(_code('lib/screens/father/father_learn_screen.dart'), contains('const FatherReadsScreen()'));
     });
   });
 
   group('the small things that reach him', () {
     test("his Today shows this week's part and the way into the guide and the door", () {
-      final s = _code('lib/screens/father/father_daily_screen.dart');
-      expect(s, contains('_weekGuideCard(p)'));
-      expect(s, contains('openFatherWeekGuide(context, c)'));
+      // His Today is her home with his block since 2026-10-13.
+      final s = _code('lib/screens/pregnancy/preg_partner_home.dart');
+      expect(s, contains('corner?.oneMission'));
+      expect(s, contains('openFatherWeekGuide(context, pregnancy)'));
       expect(s, contains('kPartnerSurfaceDoor'));
     });
 

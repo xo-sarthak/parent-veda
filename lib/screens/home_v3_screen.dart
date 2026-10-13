@@ -68,6 +68,8 @@ import '../models/week_content.dart' show WeekContent;
 import '../services/pregnancy_controller.dart';
 import 'weekly_card_stack_screen.dart';
 import 'preg_daily_insights.dart';
+import 'pregnancy/preg_partner_home.dart';
+import '../services/father_preview.dart';
 import '../data/preg_daily_tips.dart' show pregDailyTipFor;
 // Kept for revert (2026-10-02, the cards no longer wear a corner glyph): import 'symptoms/door/symptoms_widgets.dart' show symptomLineMark;
 import '../data/symptoms/symptom_library.dart' show symptomById;
@@ -354,6 +356,9 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
     final day = home.dayFor(activeDay, week);
     final weekContent = pregnancy.weekData(week);
     final p = V2PaletteStore.instance.current;
+    // HIS SIDE (2026-10-13): her home with less on it, and one block of his
+    // own. See preg_partner_home.dart for what he sees and why.
+    final him = FatherPreview.instance.on;
     final reads = v2ReadsFor(week, activeDay);
     final video = v2VideoFor(week);
     // The three under "Watch These Videos This Week" — never the film above.
@@ -455,6 +460,8 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
                 onSelectDay: (d) => setState(() => _selected = d),
                 // A dot under a day she logged a symptom on.
                 markFor: (date, _) {
+                  // Her symptoms are hers: no dots on his strip.
+                  if (him) return null;
                   final key = SymptomStore.dateKey(date);
                   final any = SymptomStore.instance.logs.any((l) => l.dateKey == key);
                   if (!any) return null;
@@ -492,9 +499,13 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
                 onSaved: () => Navigator.of(context).push(MaterialPageRoute<void>(
                     settings: const RouteSettings(name: 'saved'),
                     builder: (_) => const SavedScreen(stage: 'pregnancy'))),
-                onCalendar: () => Navigator.of(context).push(MaterialPageRoute<void>(
-                    settings: const RouteSettings(name: 'calendar'),
-                    builder: (_) => CalendarScreen(controller: pregnancy))),
+                // Her calendar edits her appointments, so his side shows Saved
+                // in that corner instead.
+                onCalendar: him
+                    ? null
+                    : () => Navigator.of(context).push(MaterialPageRoute<void>(
+                        settings: const RouteSettings(name: 'calendar'),
+                        builder: (_) => CalendarScreen(controller: pregnancy))),
               ),
             // ---- THE SHEET: everything under the fold ------------------------
             V3PregSheet(p: p, children: [
@@ -621,7 +632,7 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
                     p: p),
               ),
               PvInsightRail(tiles: [
-                for (final c in pregInsightsFor(
+                for (final c in (him ? pregRailForHim : (List<PregInsight> l) => l)(pregInsightsFor(
                   date: _selected,
                   today: _today,
                   day: activeDay,
@@ -629,7 +640,7 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
                   homeDay: day,
                   weekContent: weekContent,
                   reads: reads,
-                ))
+                )))
                   PvInsightTile(
                     key: ValueKey('preg_insight_${c.id}'),
                     eyebrow: c.eyebrow,
@@ -656,6 +667,11 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
                   ),
               ]),
             ],
+            if (him && day != null)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(18, 30, 18, 0),
+                child: PregPartnerHomeBlock(p: p, pregnancy: pregnancy),
+              ),
             // ⚠️ THE PAGE IS THREE INSET COLUMNS WITH TWO FULL-BLEED THINGS
             // BETWEEN THEM, not one column any more.
             //
@@ -808,7 +824,8 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
             //
             // One block, not three cards. See v3_garbh.dart for what was wrong
             // and which principle each fix comes from.
-            if (day != null) ...[
+            // Her practice; his is "Talk to your baby" in his block (2026-10-13).
+            if (day != null && !him) ...[
               ListenableBuilder(
                 listenable: GarbhStore.instance,
                 builder: (context, _) {
@@ -962,6 +979,8 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
             // above is content she takes in, and these are the things she DOES.
             // Grouping them means the page has one "your turn" region rather
             // than actions scattered between articles.
+            // Her medicines are her record (2026-10-13): not on his side.
+            if (!him) ...[
             V3SectionHead(
                 // Rewritten 2026-09-29 (docs/PREG-VOICE.md). Was 'Medicine
                 // Reminder' over "Don't miss today's dose".
@@ -996,6 +1015,7 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
               },
             ),
             const SizedBox(height: 28),
+            ],
 
             // ---- MY JOURNAL --------------------------------------------------
             //
@@ -1023,6 +1043,8 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
             // ⚠️ ONLY THE TITLE LINE CHANGED (design option 1g: "the card
             // under it is untouched"). Was 'Something for your baby, when it
             // grows up'.
+            // Her journal is hers; his is in his block (2026-10-13).
+            if (!him) ...[
             V3SectionHead(
                 eyebrow: 'My journal',
                 // Rewritten 2026-09-29. Was 'Create a memory for your baby to
@@ -1090,6 +1112,7 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
                   builder: (_) => JournalScreen(controller: pregnancy))),
             ),
             const SizedBox(height: 28),
+            ],
 
             // ---- TODAY'S TIP — MOVED OUT OF THE PAGE ------------------------
             //
@@ -1233,7 +1256,9 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
             // Each tile opens ITS tool (2026-10-02). Kept for revert:
             // onOpen: (id) => _open(context, id), which landed every tile on
             // the Tools tab.
-            _ToolsRow(p: p, week: week, onOpen: (id) => _openTool(context, id)),
+            // Her trackers (2026-10-13): not on his side.
+            if (!him)
+              _ToolsRow(p: p, week: week, onOpen: (id) => _openTool(context, id)),
             const SizedBox(height: 28),
 
             // ---- TALK TO SOMEONE (2026-09-30, gap analysis P2) ---------------
