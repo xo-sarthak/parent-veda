@@ -230,11 +230,11 @@
      "hi": "एक तिल"
     },
     "length": {
-     "en": "about 2 mm",
+     "en": "0.2 cm",
      "hi": "लगभग 2 मिमी"
     },
     "weight": {
-     "en": "less than 1 g",
+     "en": "<1 gm",
      "hi": "1 ग्राम से कम"
     }
    },
@@ -459,15 +459,15 @@
    },
    "size": {
     "fruit": {
-     "en": "a pomegranate seed",
+     "en": "a pea",
      "hi": "अनार का एक दाना"
     },
     "length": {
-     "en": "about 4-6 mm",
+     "en": "0.6 cm",
      "hi": "लगभग 4-6 mm"
     },
     "weight": {
-     "en": "less than 1 g",
+     "en": "<1 gm",
      "hi": "1 g से कम"
     }
    },
@@ -676,11 +676,11 @@
      "hi": "एक ब्लूबेरी"
     },
     "length": {
-     "en": "about 10 mm",
+     "en": "0.9 to 1.3 cm",
      "hi": "लगभग 10 mm"
     },
     "weight": {
-     "en": "less than 1 g",
+     "en": "<1 gm",
      "hi": "1 g से कम"
     }
    },
@@ -885,11 +885,11 @@
    },
    "size": {
     "fruit": {
-     "en": "a rajma bean",
+     "en": "a raspberry",
      "hi": "राजमा का एक दाना"
     },
     "length": {
-     "en": "about 1.6 cm",
+     "en": "1.3 to 1.6 cm",
      "hi": "लगभग 1.6 cm"
     },
     "weight": {
@@ -1098,11 +1098,11 @@
    },
    "size": {
     "fruit": {
-     "en": "a green olive",
+     "en": "a grape",
      "hi": "एक हरा जैतून"
     },
     "length": {
-     "en": "about 2.3 cm",
+     "en": "2.2 to 2.3 cm",
      "hi": "लगभग 2.3 cm"
     },
     "weight": {
@@ -1315,7 +1315,7 @@
      "hi": "एक स्ट्रॉबेरी"
     },
     "length": {
-     "en": "about 3.1 cm",
+     "en": "3.1 to 3.2 cm",
      "hi": "लगभग 3.1 cm"
     },
     "weight": {
@@ -1528,7 +1528,7 @@
      "hi": "एक अंजीर"
     },
     "length": {
-     "en": "about 4.1 cm",
+     "en": "4.0 to 4.1 cm",
      "hi": "लगभग 4.1 cm"
     },
     "weight": {
@@ -1737,11 +1737,11 @@
    },
    "size": {
     "fruit": {
-     "en": "a lime",
+     "en": "a plum",
      "hi": "एक नींबू"
     },
     "length": {
-     "en": "about 5.4 cm",
+     "en": "5.0 to 5.4 cm",
      "hi": "लगभग 5.4 cm"
     },
     "weight": {
@@ -1954,11 +1954,11 @@
      "hi": "एक नींबू"
     },
     "length": {
-     "en": "about 7.4 cm",
+     "en": "7.0 to 7.5 cm",
      "hi": "लगभग 7.4 cm"
     },
     "weight": {
-     "en": "about 23 g",
+     "en": "about 25 g",
      "hi": "लगभग 23 g"
     }
    },
@@ -2167,11 +2167,11 @@
      "hi": "एक आड़ू"
     },
     "length": {
-     "en": "about 8.7 cm",
+     "en": "8.0 to 8.7 cm",
      "hi": "लगभग 8.7 cm"
     },
     "weight": {
-     "en": "about 43 g",
+     "en": "about 40 g",
      "hi": "लगभग 43 g"
     }
    },
@@ -2380,7 +2380,7 @@
      "hi": "एक सेब"
     },
     "length": {
-     "en": "about 10.1 cm",
+     "en": "9.0 to 10.5 cm",
      "hi": "लगभग 10.1 cm"
     },
     "weight": {
@@ -2593,7 +2593,7 @@
      "hi": "एक एवोकाडो"
     },
     "length": {
-     "en": "about 11.6 cm",
+     "en": "11.5 to 12.5 cm",
      "hi": "लगभग 11.6 cm"
     },
     "weight": {
@@ -2802,15 +2802,15 @@
    },
    "size": {
     "fruit": {
-     "en": "a pear",
+     "en": "a pomegranate",
      "hi": "एक नाशपाती"
     },
     "length": {
-     "en": "about 13 cm",
+     "en": "11.5 to 13.5 cm",
      "hi": "लगभग 13 cm"
     },
     "weight": {
-     "en": "about 140 g",
+     "en": "about 150 g",
      "hi": "लगभग 140 g"
     }
    },
@@ -3019,11 +3019,11 @@
    },
    "size": {
     "fruit": {
-     "en": "a sweet potato",
+     "en": "a bell pepper",
      "hi": "एक शकरकंद"
     },
     "length": {
-     "en": "about 14.2 cm",
+     "en": "14 to 15 cm",
      "hi": "लगभग 14.2 cm"
     },
     "weight": {
@@ -3457,11 +3457,11 @@
      "hi": "एक केला"
     },
     "length": {
-     "en": "about 25.7 cm",
+     "en": "24 to 25.5 cm",
      "hi": "लगभग 25.7 cm"
     },
     "weight": {
-     "en": "about 331 g",
+     "en": "about 300 g",
      "hi": "लगभग 331 g"
     }
    },
@@ -3678,11 +3678,11 @@
      "hi": "एक गाजर"
     },
     "length": {
-     "en": "about 26.7 cm",
+     "en": "25 to 27 cm",
      "hi": "लगभग 26.7 cm"
     },
     "weight": {
-     "en": "about 398 g",
+     "en": "350 to 360 g",
      "hi": "लगभग 398 g"
     }
    },
@@ -3891,15 +3891,15 @@
    },
    "size": {
     "fruit": {
-     "en": "a spaghetti squash",
+     "en": "a papaya",
      "hi": "एक लौकी"
     },
     "length": {
-     "en": "about 27.8 cm",
+     "en": "27 to 28 cm",
      "hi": "लगभग 27.8 cm"
     },
     "weight": {
-     "en": "about 475 g",
+     "en": "400 to 450 g",
      "hi": "लगभग 475 g"
     }
    },
@@ -4112,11 +4112,11 @@
      "hi": "एक बड़ा आम"
     },
     "length": {
-     "en": "about 28.9 cm",
+     "en": "28 to 30 cm",
      "hi": "लगभग 28.9 cm"
     },
     "weight": {
-     "en": "about 550 g",
+     "en": "480 to 500 g",
      "hi": "लगभग 550 g"
     }
    },

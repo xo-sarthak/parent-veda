@@ -1,4 +1,5 @@
 import '../localization/app_language.dart';
+import 'garbh_sheet.dart';
 
 // =============================================================================
 //  Spiritual Reading - seed content (a gentle, surface-level testing feature)
@@ -63,7 +64,10 @@ class SpiritualTradition {
   }
 }
 
-final List<SpiritualTradition> kSpiritualTraditions = [
+/// The traditions as authored (themes only, no scripture quoted). Every
+/// screen reads `kSpiritualTraditions`, which adds the user's Garbh Sanskar
+/// sheet on top; reverting is pointing that back at this list.
+final List<SpiritualTradition> _kSpiritualTraditionsAuthored = [
   // ===========================================================================
   //  HINDUISM
   // ===========================================================================
@@ -1979,3 +1983,66 @@ final List<SpiritualTradition> kSpiritualTraditions = [
     ],
   ),
 ];
+
+// =============================================================================
+//  The user's Garbh Sanskar sheet, added on top (2026-10-13)
+// -----------------------------------------------------------------------------
+//  ⚠️ THE NO-QUOTE RULE ABOVE IS NOW THE AUTHORED PART ONLY. The user chose, on
+//  2026-10-13, to carry the sheet's mantras, shabads, duas and verses with
+//  their text and meaning. Two limits stayed: the sheet's "Intent" column is
+//  not carried (it claims effects on the body), and Bible text is the World
+//  English Bible (public domain), never a copyrighted translation. Each read's
+//  body is the text, then what it means — the order a verse-of-the-day
+//  screen uses (Mobbin: Waking Up's daily quote, Open's practice card).
+// =============================================================================
+
+/// Every tradition, with the sheet's sections added to the four it covers.
+final List<SpiritualTradition> kSpiritualTraditions = [
+  for (final t in _kSpiritualTraditionsAuthored) _withSheet(t),
+];
+
+LocalizedText _same(String s) => LocalizedText(en: s, hi: s);
+
+SpiritualRead _mantraRead(GarbhMantra m) => SpiritualRead(
+      title: _same(m.name),
+      body: _same(m.meaning.isEmpty ? m.text : '${m.text}\n\nWhat it means: ${m.meaning}'),
+    );
+
+SpiritualRead _storyRead(GarbhSacredStory s) => SpiritualRead(
+      title: _same(s.title),
+      body: _same('${s.story}\n\nThe heart of it: ${s.moral}\n\nRetold from the ${s.source}.'),
+    );
+
+SpiritualTradition _withSheet(SpiritualTradition t) {
+  final mantras = kGarbhMantrasByTradition[t.id] ?? const <GarbhMantra>[];
+  final added = <SpiritualSection>[
+    if (mantras.isNotEmpty)
+      SpiritualSection(
+        title: _same(switch (t.id) {
+          'sikh' => 'Shabads and prayers',
+          'islam' => 'Duas and verses',
+          'christian' => 'Scripture and prayers',
+          _ => 'Mantras and prayers',
+        }),
+        reads: [for (final m in mantras) _mantraRead(m)],
+      ),
+    if (t.id == 'hindu') ...[
+      SpiritualSection(
+        title: _same('Sacred stories, retold'),
+        reads: [for (final s in kGarbhSacredStories) _storyRead(s)],
+      ),
+      SpiritualSection(
+        title: _same('Gita conversations, retold'),
+        reads: [for (final s in kGarbhGitaConversations) _storyRead(s)],
+      ),
+    ],
+  ];
+  if (added.isEmpty) return t;
+  return SpiritualTradition(
+    id: t.id,
+    name: t.name,
+    symbol: t.symbol,
+    blurb: t.blurb,
+    sections: [...t.sections, ...added],
+  );
+}

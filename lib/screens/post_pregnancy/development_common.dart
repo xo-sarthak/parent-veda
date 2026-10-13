@@ -102,9 +102,9 @@ class DevActivityCard extends StatelessWidget {
               Row(children: [
                 Icon(Icons.schedule_rounded, size: 12.5, color: ppMuted),
                 const SizedBox(width: 4),
-                Text('${activity.minutes} min', style: ppBody(11.5, color: ppMuted, w: FontWeight.w600)),
+                Text(activity.timeLabel, style: ppBody(11.5, color: ppMuted, w: FontWeight.w600)),
                 const SizedBox(width: 10),
-                Flexible(child: Text('${activity.difficulty} · ${area.name}', style: ppBody(11.5, color: ppMuted, w: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                Flexible(child: Text([if (activity.difficulty.isNotEmpty) activity.difficulty, area.name].join(' · '), style: ppBody(11.5, color: ppMuted, w: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis)),
               ]),
             ]),
           ),
@@ -138,7 +138,7 @@ class DevActivityRailCard extends StatelessWidget {
           const SizedBox(height: 12),
           Text(activity.title, style: ppJakarta(14).copyWith(height: 1.2), maxLines: 2, overflow: TextOverflow.ellipsis),
           const SizedBox(height: 6),
-          Text('${activity.minutes} min · ${activity.difficulty}', style: ppBody(11.5, color: ppMuted, w: FontWeight.w600)),
+          Text(activity.metaLine, style: ppBody(11.5, color: ppMuted, w: FontWeight.w600)),
         ]),
       ),
     );

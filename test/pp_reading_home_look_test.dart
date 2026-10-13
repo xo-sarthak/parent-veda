@@ -39,6 +39,10 @@ void main() {
       await t.tap(find.text('Book Summaries'));
       await t.pumpAndSettle();
       // Filtered: the count line names the filter.
+      // 31 book companions (2026-10-13) lengthen the list, so the count line
+      // can sit above the viewport after the scroll: scroll back up to it.
+      await t.scrollUntilVisible(find.textContaining('All topics · Book Summaries'), -300,
+          scrollable: find.byType(Scrollable).first, maxScrolls: 40);
       expect(find.textContaining('All topics · Book Summaries'), findsOneWidget);
       expect(t.takeException(), isNull);
     });

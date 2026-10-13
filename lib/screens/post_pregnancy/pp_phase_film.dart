@@ -25,6 +25,8 @@ import '../../theme/pv_fonts.dart';
 import '../reader/pv_reader_screen.dart';
 import 'pp_age_page_parts.dart' show kPpPhaseSources;
 import 'pp_phases_data.dart' show AgePhase;
+import '../../data/pp_phase_docs.dart' show ppPhaseDocFor;
+import 'pp_phase_doc_reads.dart' show ppOpenPhaseDocRead;
 import '../v2/v2_palette.dart';
 import '../v2/v2_sections.dart' show v2CoverTint;
 import 'pp_watch_data.dart' show WatchVideo;
@@ -187,8 +189,17 @@ PvRead ppPhaseAsRead(AgePhase phase) {
   );
 }
 
-/// Opens the full phase in the reader.
-void ppOpenPhaseRead(BuildContext context, AgePhase phase) =>
+/// Opens the full phase in the reader — the phase doc's page where the phase
+/// has one (2026-10-13, the doc is the source of truth), else the older read.
+void ppOpenPhaseRead(BuildContext context, AgePhase phase) {
+  if (ppPhaseDocFor(phase.number) case final doc?) {
+    ppOpenPhaseDocRead(context, doc, phase);
+    return;
+  }
+  _openAuthoredPhaseRead(context, phase);
+}
+
+void _openAuthoredPhaseRead(BuildContext context, AgePhase phase) =>
     Navigator.of(context).push(MaterialPageRoute<void>(
       settings: RouteSettings(name: 'pp/phase_read/${phase.number}'),
       builder: (_) => PvReaderScreen(read: ppPhaseAsRead(phase), lang: AppLanguage.english),

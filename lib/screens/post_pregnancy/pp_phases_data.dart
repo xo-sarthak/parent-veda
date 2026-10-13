@@ -36,6 +36,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../data/pp_phase_docs.dart';
 import 'pp_child_profile.dart';
 import 'pp_common.dart'; // ppPurple - the one brand colour every phase uses
 
@@ -231,9 +232,71 @@ List<AgePhase> get kPhases {
   final key = '${c.sexGiven}|${c.isBoy}|${c.name}';
   if (key != _phasesKey) {
     _phasesKey = key;
-    _phasesFilled = [for (final ph in kPhasesAuthored) ph.filledFor(c)];
+    // Was: [for (final ph in kPhasesAuthored) ph.filledFor(c)]. The phase
+    // docs now win where they exist (see `ppPhaseWithDoc`).
+    _phasesFilled = [for (final ph in kPhasesAuthored) ppPhaseWithDoc(ph).filledFor(c)];
   }
   return _phasesFilled!;
+}
+
+/// The doc domain as the AAP domain the older screens group by.
+PhaseDomain ppDocDomainAsPhase(PpDocDomain d) => switch (d) {
+      PpDocDomain.brain => PhaseDomain.cognitive,
+      PpDocDomain.physical => PhaseDomain.motor,
+      PpDocDomain.language => PhaseDomain.language,
+      PpDocDomain.emotional => PhaseDomain.social,
+      PpDocDomain.nutrition => PhaseDomain.adaptive,
+    };
+
+/// [p] with its phase doc laid over it, or [p] unchanged when it has none.
+///
+/// ⚠️ THE DOC IS THE SOURCE OF TRUTH (the user, 2026-10-13). Phases 1–15 have
+/// a doc (lib/data/pp_phase_docs.dart). Laying it over HERE, once, rather
+/// than in each screen means the hero, the phase map, the phase page, the
+/// at-a-glance card and the age page all say the same thing:
+///
+///   * name        — the doc's ("The Settling In", was "The fourth trimester")
+///   * summary     — the hero's opening paragraph
+///   * workingOn   — the Living Through This Phase card titles
+///   * milestones  — the Child Snapshot, one per domain
+///   * sections    — the authored "Feeding now" and "Sleep now" (the docs
+///                   give no numbers, and `PpAtThisAge` shows those), then
+///                   "When to call the doctor" as the doc's lines
+///
+/// What the docs do not cover stays as authored: the reassurance, the
+/// screening and India notes, the video and the reads. The authored text is
+/// untouched in `kPhasesAuthored`, so a revert is this one function.
+AgePhase ppPhaseWithDoc(AgePhase p) {
+  final doc = ppPhaseDocFor(p.number);
+  if (doc == null) return p;
+  final keep = {'feeding now', 'sleep now'};
+  return AgePhase(
+    number: p.number,
+    name: doc.name,
+    ageLabel: p.ageLabel,
+    startMonth: p.startMonth,
+    endMonth: p.endMonth,
+    tagline: p.tagline,
+    summary: doc.hero.first,
+    workingOn: [for (final c in doc.living) c.title],
+    reassurance: p.reassurance,
+    milestones: [for (final s in doc.snapshot) PhaseMilestone(ppDocDomainAsPhase(s.domain), s.title)],
+    sections: [
+      for (final s in p.sections)
+        if (keep.contains(s.heading.toLowerCase())) s,
+      PhaseSection('When to call the doctor', doc.doctor),
+    ],
+    accent: p.accent,
+    source: p.source,
+    checkpoint: p.checkpoint,
+    screeningNote: p.screeningNote,
+    indianNote: p.indianNote,
+    videoId: p.videoId,
+    watchCategory: p.watchCategory,
+    readCollection: p.readCollection,
+    articleIds: p.articleIds,
+    productIds: p.productIds,
+  );
 }
 
 String? _phasesKey;

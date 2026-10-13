@@ -8,6 +8,7 @@
 
 import '../models/read_item.dart';
 import '../localization/app_language.dart';
+import 'book_companions.dart';
 
 LocalizedText _t(String en, String hi) => LocalizedText(en: en, hi: hi);
 
@@ -17,7 +18,10 @@ LocalizedText _t(String en, String hi) => LocalizedText(en: en, hi: hi);
 /// work, and saying so is what keeps tool/hindi_audit.py honest.
 LocalizedText _same(String s) => LocalizedText(en: s, hi: s);
 
-final List<ReadItem> kReadItems = [
+/// The shelf as authored. Every reader reads `kReadItems`, which lays the
+/// user's book companion docs over it (2026-10-13). Reverting is pointing
+/// `kReadItems` back at this list.
+final List<ReadItem> _kReadItemsAuthored = [
   // ---- Articles ----
   ReadItem(
     id: 'managing_nausea',
@@ -701,6 +705,24 @@ final List<ReadItem> kReadItems = [
         'स्तनपान स्वाभाविक है, पर यह एक हुनर भी है जिसे आप और आपका शिशु साथ मिलकर सीखते हैं। जन्म से पहले शिशु को गोद में सही तरह पकड़ने और latch की बुनियादी बातें जान लेने से पहले हफ़्ते का बहुत सारा तनाव कम हो जाता है।\n\n'
         'अभी इसमें माहिर होने की ज़रूरत नहीं — बस आराम से जान-पहचान बना लें।'),
   ),
+];
+
+// =============================================================================
+//  The user's book companion docs, on the pregnancy shelf (2026-10-13)
+// -----------------------------------------------------------------------------
+//  A book already on the shelf keeps its entry (id, reason, why and their
+//  Hindi) and takes the doc's companion, author and reading time: the doc
+//  wins on what it covers. The older hand-written companion on
+//  `book_what_to_expect` is still in the list above, kept for revert.
+//  Pregnancy and newborn books not yet on the shelf are added after it.
+// =============================================================================
+final List<ReadItem> kReadItems = [
+  for (final r in _kReadItemsAuthored)
+    if (bookDocFor(r.id) case final d?) bookReadItem(d, base: r) else r,
+  for (final d in kBookDocList)
+    if (bookStage(d) != BookStage.parenting &&
+        !_kReadItemsAuthored.any((r) => r.id == bookShelfId(d)))
+      bookReadItem(d),
 ];
 
 // ---------------------------------------------------------------------------

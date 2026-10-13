@@ -107,7 +107,7 @@ import '../mind_mood/mm_feel_tab.dart' show mmSosFlowScreen;
 import '../mind_mood/mm_talk_tab.dart' show MmScreenerScreen;
 import '../mind_mood/mm_track_tab.dart';
 import '../../data/doors/pv_door_garbh.dart';
-import '../../data/garbh_data.dart' show kPuzzles, shravanById;
+import '../../data/garbh_data.dart' show garbhStoryForDay, kPuzzles, shravanById;
 import '../../data/read_to_baby_data.dart'
     show kReadAloudPieces, kRtbAffirmations;
 import '../../models/garbh_content.dart' show GarbhKind, GarbhPrompt;
@@ -448,6 +448,12 @@ Widget? pvDoorScreenFor(String id, PregnancyController c) => switch (id) {
   kGarbhSurfaceReadToday => GarbhSamvadDailyScreen(
     controller: c,
     onOpenLibrary: () {}, // the door's own rail is the library
+  ),
+  // Today's story (the user's sheet, 2026-10-13), on the same record-first screen.
+  kGarbhSurfaceStoryToday => GarbhSamvadDailyScreen(
+    controller: c,
+    piece: garbhStoryForDay(c.currentDay),
+    onOpenLibrary: () {},
   ),
   // ⚠️ THE SESSION ITSELF, since the pillars build — script, narration,
   // figure. Not the practice detail in front of it.
@@ -942,6 +948,7 @@ bool pvDoorSurfaceResolves(String id) => switch (id) {
   kGarbhSurfaceRitual ||
   kGarbhSurfaceListenToday ||
   kGarbhSurfaceReadToday ||
+  kGarbhSurfaceStoryToday ||
   kGarbhSurfaceRelax ||
   kGarbhSurfaceKriya ||
   kGarbhSurfaceJournal ||

@@ -18,6 +18,8 @@ import 'pp_reading_data.dart';
 import 'pp_watch_data.dart';
 import 'reading_common.dart';
 import '../../data/reads/read_adapters.dart';
+import '../../data/book_companions.dart' show bookDocFor, bookReadItem;
+import '../book_companion_screen.dart';
 import '../../localization/app_language.dart';
 import '../reader/pv_reader_screen.dart';
 
@@ -107,6 +109,11 @@ class _ReadingReaderScreenState extends State<ReadingReaderScreen> {
   @override
   Widget build(BuildContext context) {
     final a = widget.article;
+    // A book with a companion doc reads in the Book Companion, whichever
+    // parenting shelf, rail or search opened it (2026-10-13).
+    if (bookDocFor(a.id) case final d?) {
+      return BookCompanionScreen(item: bookReadItem(d));
+    }
     final t = _t;
     return PvReaderScreen(
       read: pvReadFromReadArticle(

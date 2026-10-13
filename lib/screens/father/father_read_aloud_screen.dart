@@ -12,6 +12,7 @@
 import 'package:flutter/material.dart';
 
 import '../../data/garbh_data.dart';
+import '../../data/garbh_sheet.dart' show garbhSheetDay;
 import '../../data/read_to_baby_data.dart';
 import '../../data/spiritual_reading_data.dart';
 import '../../services/pregnancy_controller.dart';
@@ -128,6 +129,14 @@ class _FatherReadAloudScreenState extends State<FatherReadAloudScreen>
   // ---- Content per section --------------------------------------------------
   // Affirmations: a distinct father slice (differs from the mother's full set).
   List<_FSP> _affirmations() => [
+        // Today's script from the user's Garbh Sanskar sheet leads the list
+        // (2026-10-13), the same words as his Today card.
+        (
+          title: 'Your words for today',
+          body: garbhSheetDay(widget.controller.currentDay).father,
+          saveKey: 'gsday_father_${garbhSheetDay(widget.controller.currentDay).day}',
+          group: 'Affirmations & Blessings'
+        ),
         for (final p in readAloudFatherAffirmations())
           (
             title: p.title.now,

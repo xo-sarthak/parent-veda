@@ -534,3 +534,11 @@ Added 2026-09-26 by the door data pass (TTC gap plan). Both new doors ship with 
 | TTC2 | Hero photograph for **Trying, but not pregnant yet?** (`ttc_not_yet`, `lib/ttc/focus/ttc_focus_not_yet.dart`) | Photo | Owed | Patience rather than sadness. Never a crying person, never a pregnancy test, never a baby. Something like a window at dusk, or two cups on a table. |
 
 - 2026-09-27: the TTC door hero photos are DONE for all nine doors (our own images, generated to the brief, checked by eye, mirrored to R2 as ttc_door_*.jpg). Possible redo: His side (the running shoes carry a swoosh-like mark).
+
+
+
+## Garbh Sanskar — Shravan audio (2026-10-13)
+
+The user's Garbh Sanskar.xlsx names 45 tracks for Shravan (Listen) and no recordings exist. The brief —
+ID, weeks, kind, raga, instrument, time of day, the mother's cue — is generated into
+`docs/GARBH-AUDIO-OWED.md` by `tools/garbh_content/xlsx_to_dart.py`. Nothing from that sheet is in the app.

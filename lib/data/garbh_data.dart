@@ -8,11 +8,15 @@
 
 import '../models/garbh_content.dart';
 import '../localization/app_language.dart';
+import 'garbh_sheet.dart';
 
 // ---------------------------------------------------------------------------
 //  Shravan - Sacred Listening (placeholder audio uses the bundled drone)
 // ---------------------------------------------------------------------------
 LocalizedText _t(String en, String hi) => LocalizedText(en: en, hi: hi);
+
+/// The same in both slots: the sheet is English (CLAUDE.md, new work is English).
+LocalizedText _same(String s) => LocalizedText(en: s, hi: s);
 
 // ⚠️ MINUTES ARE THE MANIFEST'S — Shravan to final, 2026-09-12. Each track
 // is a real recording now (`assets/audio/shravan_manifest.json`) and the
@@ -320,9 +324,43 @@ GarbhPractice? kriyaById(String id) {
 
 /// Today's connection card, rotating gently by day - from the set that matches
 /// the mother's [trimester] (affirmation / read-aloud script / visualization).
+///
+/// ⚠️ THE USER'S SHEET SINCE 2026-10-13. Garbh Sanskar.xlsx gives a mother's
+/// affirmation for every day of pregnancy, 1–280 (lib/data/garbh_sheet.dart),
+/// and the document is the source of truth — so today's card is today's
+/// line, not one of sixteen on a loop. The sixteen stay in the library.
+/// Kept for revert:
+///   final list = samvadForTrimester(trimester);
+///   return list[(day.clamp(1, 280) - 1) % list.length];
 GarbhPrompt promptForDay(int day, int trimester) {
-  final list = samvadForTrimester(trimester);
-  return list[(day.clamp(1, 280) - 1) % list.length];
+  final d = garbhSheetDay(day);
+  return GarbhPrompt(
+    'gsday_${d.day}',
+    _same(garbhOpening(d.mother)),
+    _same(d.mother),
+  );
+}
+
+/// Today's story from the user's sheet (2026-10-13), as a piece the record-
+/// first screen reads: the fable, then the line it closes on.
+GarbhPrompt garbhStoryForDay(int day) {
+  final d = garbhSheetDay(day);
+  return GarbhPrompt(
+    'gsstory_${d.day}',
+    _same(d.storyTitle),
+    _same('${d.story}\n\n${d.storyClose}'),
+  );
+}
+
+/// A short name for a long line: its first sentence, or its opening words
+/// when that sentence is long. A row title, never the text itself (see
+/// `GarbhPrompt.title`).
+String garbhOpening(String text, {int max = 56}) {
+  final first = RegExp(r'^.+?[.!?](?=\s|$)').firstMatch(text.trim())?.group(0) ?? text.trim();
+  if (first.length <= max) return first;
+  final cut = first.substring(0, max);
+  final space = cut.lastIndexOf(' ');
+  return '${(space > 20 ? cut.substring(0, space) : cut).replaceAll(RegExp(r'[,;:\s]+$'), '')}…';
 }
 
 // ===========================================================================

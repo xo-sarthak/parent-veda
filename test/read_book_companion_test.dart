@@ -70,7 +70,9 @@ void main() {
     // requires - a section exists, a cap is respected - and that must hold
     // identically in both languages. Asserting the rendered language would
     // make the contract depend on a setting.
-    expect(_book.readingTime.en, '8 min');
+    // The user's book companion doc since 2026-10-13 (the doc wins over the
+    // older hand-written companion): its reading time and its Take pointers.
+    expect(_book.readingTime.en, '5 min');
     expect(c.recommendedFor, isNotEmpty);
     expect(c.themes, isNotEmpty);
     expect(c.about.en, isNotEmpty);
@@ -80,7 +82,7 @@ void main() {
     expect(c.philosophy.en, isNotEmpty);
     expect(c.ideas.length, 5, reason: 'five ideas is a hard cap');
     expect(c.chapters.length, 6);
-    expect(c.perspective.en, isNotEmpty);
+    expect(c.takePoints, isNotEmpty, reason: 'the doc writes the Take as pointers');
     expect(c.quotes.length, 2);
     for (final i in c.ideas) {
       expect(i.body.en, isNotEmpty);
@@ -103,7 +105,7 @@ void main() {
     await _pump(tester);
     expect(find.text("What to Expect When You're Expecting"), findsWidgets);
     expect(find.text('Heidi Murkoff'), findsOneWidget);
-    expect(find.text('8 min'), findsOneWidget);
+    expect(find.text('5 min'), findsOneWidget);
     expect(find.text('RECOMMENDED FOR'), findsOneWidget);
     expect(find.text('THEMES'), findsOneWidget);
     expect(find.text('Read summary'), findsOneWidget);

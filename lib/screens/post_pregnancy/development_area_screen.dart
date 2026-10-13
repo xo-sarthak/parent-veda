@@ -402,7 +402,7 @@ class DevelopmentAreaScreen extends StatelessWidget {
               child: SizedBox(
                 width: 168,
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  _railThumb(Icons.toys_outlined, badge: '${a.minutes} min'),
+                  _railThumb(Icons.toys_outlined, badge: a.timeLabel),
                   const SizedBox(height: 8),
                   Text(a.title, style: ppJakarta(13.5), maxLines: 2, overflow: TextOverflow.ellipsis),
                   const SizedBox(height: 3),

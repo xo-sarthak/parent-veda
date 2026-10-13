@@ -12,6 +12,9 @@ import 'development_area_screen.dart';
 import '../../widgets/pv_placeholders.dart';
 import 'pp_common.dart';
 import 'pp_development_data.dart';
+// The app's drawn marks, in place of Material glyphs (the user, 2026-10-13).
+import '../ttc/doors/ttc_tab_art.dart' show TtcTabMark;
+import '../ttc/ttc_tool_marks.dart' show TtcMarkLeading, TtcToolMark;
 
 class DevelopmentActivityScreen extends StatelessWidget {
   const DevelopmentActivityScreen({super.key, required this.activity});
@@ -42,12 +45,20 @@ class DevelopmentActivityScreen extends StatelessWidget {
                 Text(activity.title, style: ppFraunces(25, h: 1.15)),
                 const SizedBox(height: 10),
                 Row(children: [
-                  Icon(Icons.schedule_rounded, size: 14, color: area.accent),
+                  TtcMarkLeading(tool: TtcToolMark.stopwatch, tint: area.accent, size: 18),
                   const SizedBox(width: 5),
-                  Text('${activity.minutes} min', style: ppBody(12.5, color: ppInk, w: FontWeight.w600)),
+                  // Was '${activity.minutes} min': a phase-doc activity gives no
+                  // duration and the screen does not invent one (2026-10-13).
+                  Text(activity.timeLabel, style: ppBody(12.5, color: ppInk, w: FontWeight.w600)),
                   const SizedBox(width: 12),
-                  Text('${activity.difficulty}  ·  ${activity.ageTag}', style: ppBody(12.5, color: ppSoft, w: FontWeight.w600)),
+                  Text([if (activity.difficulty.isNotEmpty) activity.difficulty, activity.ageTag].join('  ·  '),
+                      style: ppBody(12.5, color: ppSoft, w: FontWeight.w600)),
                 ]),
+                // The doc's opening paragraph: what the activity is.
+                if (activity.intro case final intro?) ...[
+                  const SizedBox(height: 12),
+                  Text(intro, style: ppBody(14, color: ppInk, h: 1.55)),
+                ],
               ]),
             ),
             const SizedBox(height: 18),
@@ -68,6 +79,14 @@ class DevelopmentActivityScreen extends StatelessWidget {
             const SizedBox(height: 20),
             _pad(_actions(area.accent)),
             const SizedBox(height: 20),
+
+            // ⚠️ A PHASE-DOC ACTIVITY READS IN THE DOC'S ORDER (the user,
+            // 2026-10-13: "the document is the source of truth"): what it
+            // builds, why ParentVeda recommends it, what you'll need, how to
+            // do it, things to remember, keep it safe, variations, linked
+            // milestones. Every other activity keeps the order below.
+            if (activity.fromPhaseDoc) ..._docOrder(area)
+            else ...[
 
             // skills
             _pad(Text('Skills this supports', style: ppJakarta(16))),
@@ -102,17 +121,19 @@ class DevelopmentActivityScreen extends StatelessWidget {
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(color: area.accent.withValues(alpha: 0.07), borderRadius: BorderRadius.circular(18)),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Row(children: [Icon(Icons.eco_outlined, size: 16, color: area.accent), const SizedBox(width: 8), ppEyebrow('Why it helps him grow', color: area.accent, spacing: 0.8)]),
+                Row(children: [TtcMarkLeading(tab: TtcTabMark.sprout, tint: area.accent, size: 22), const SizedBox(width: 8), ppEyebrow('Why it helps him grow', color: area.accent, spacing: 0.8)]),
                 const SizedBox(height: 10),
                 Text(activity.benefit, style: ppBody(14, color: ppInk, h: 1.6)),
               ]),
             )),
+            ],
             const SizedBox(height: 18),
             _pad(GestureDetector(
               onTap: () => _push(context, DevelopmentAreaScreen(area: area)),
               behavior: HitTestBehavior.opaque,
               child: Row(children: [
-                Text('See the ${area.name} journey', style: ppBody(13, color: ppPurple, w: FontWeight.w700)),
+                // Flexible: a long area name ran off a narrow screen.
+                Flexible(child: Text('See the ${area.name} journey', style: ppBody(13, color: ppPurple, w: FontWeight.w700))),
                 const SizedBox(width: 6),
                 const Icon(Icons.arrow_forward, size: 15, color: ppPurple),
               ]),
@@ -121,6 +142,92 @@ class DevelopmentActivityScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  /// The doc's blocks, in the doc's order (Mobbin: Duolingo ABC's labelled
+  /// blocks — a plain heading over each part; only the safety lines keep the
+  /// coral well every activity already has).
+  List<Widget> _docOrder(DevArea area) {
+    Widget head(String t) => _pad(Text(t, style: ppJakarta(16)));
+    Widget dots(List<String> items) => _pad(Column(children: [
+          for (final x in items)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 7, right: 12),
+                  child: Container(width: 5, height: 5, decoration: BoxDecoration(color: area.accent, shape: BoxShape.circle)),
+                ),
+                Expanded(child: Text(x, style: ppBody(14, color: ppInk, h: 1.5))),
+              ]),
+            ),
+        ]));
+    return [
+      head('What it builds'),
+      const SizedBox(height: 12),
+      _pad(Wrap(spacing: 8, runSpacing: 8, children: [
+        for (final s in activity.skills)
+          Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+              decoration: BoxDecoration(color: area.accent.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(999)),
+              child: Text(s, style: ppBody(12, color: area.accent, w: FontWeight.w700))),
+      ])),
+      const SizedBox(height: 20),
+      _pad(Container(
+        padding: const EdgeInsets.all(18),
+        decoration: BoxDecoration(color: area.accent.withValues(alpha: 0.07), borderRadius: BorderRadius.circular(18)),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            TtcMarkLeading(tab: TtcTabMark.sprout, tint: area.accent, size: 22),
+            const SizedBox(width: 8),
+            Flexible(child: ppEyebrow('Why ParentVeda recommends it', color: area.accent, spacing: 0.8)),
+          ]),
+          const SizedBox(height: 10),
+          Text(activity.benefit, style: ppBody(14, color: ppInk, h: 1.6)),
+        ]),
+      )),
+      const SizedBox(height: 22),
+      _pad(_materials()),
+      const SizedBox(height: 22),
+      head('How to do it'),
+      const SizedBox(height: 14),
+      _pad(Column(children: [
+        for (int i = 0; i < activity.steps.length; i++)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 14),
+            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Container(
+                  width: 26,
+                  height: 26,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(color: area.accent.withValues(alpha: 0.12), shape: BoxShape.circle),
+                  child: Text('${i + 1}', style: ppBody(12.5, color: area.accent, w: FontWeight.w800))),
+              const SizedBox(width: 13),
+              Expanded(child: Text(activity.steps[i], style: ppBody(14, color: ppInk, h: 1.5))),
+            ]),
+          ),
+      ])),
+      if (activity.remember.isNotEmpty) ...[
+        const SizedBox(height: 8),
+        head('Things to remember'),
+        const SizedBox(height: 12),
+        dots(activity.remember),
+      ],
+      const SizedBox(height: 12),
+      _pad(_safety()),
+      if (activity.variations case final v?) ...[
+        const SizedBox(height: 22),
+        head('Variations'),
+        const SizedBox(height: 10),
+        _pad(Text(v, style: ppBody(14, color: ppInk, h: 1.6))),
+      ],
+      if (activity.linkedMilestones.isNotEmpty) ...[
+        const SizedBox(height: 22),
+        head(activity.linkedMilestones.length == 1 ? 'The milestone it supports' : 'The milestones it supports'),
+        const SizedBox(height: 10),
+        dots(activity.linkedMilestones),
+      ],
+    ];
   }
 
   Widget _actions(Color accent) => AnimatedBuilder(
@@ -186,7 +293,7 @@ class DevelopmentActivityScreen extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(bottom: 8),
             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const Icon(Icons.check_circle_outline_rounded, size: 16, color: ppPurple),
+              const TtcMarkLeading(tab: TtcTabMark.checklist, tint: ppPurple, size: 20),
               const SizedBox(width: 12),
               Expanded(child: Text(m, style: ppBody(14, color: ppInk, h: 1.4))),
             ]),
@@ -197,7 +304,7 @@ class DevelopmentActivityScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(color: ppCoralTint, borderRadius: BorderRadius.circular(16)),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [const Icon(Icons.shield_outlined, size: 16, color: ppCoral), const SizedBox(width: 8), Text('Keep it safe', style: ppBody(12.5, color: ppInk, w: FontWeight.w800))]),
+          Row(children: [const TtcMarkLeading(tab: TtcTabMark.flagPath, tint: ppCoral, size: 22), const SizedBox(width: 8), Text('Keep it safe', style: ppBody(12.5, color: ppInk, w: FontWeight.w800))]),
           const SizedBox(height: 10),
           for (final s in activity.safety)
             Padding(

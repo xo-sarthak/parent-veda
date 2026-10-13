@@ -132,9 +132,13 @@ class _GarbhSamvadDailyScreenState extends State<GarbhSamvadDailyScreen> {
 
   GarbhPrompt get _todaysPiece {
     if (widget.piece case final p?) return p;
-    final pieces = samvadForTrimester(_trimester);
     final day = (widget.day ?? widget.controller.currentDay).clamp(1, 280);
-    return pieces[(day - 1) % pieces.length];
+    // Today's line from the user's sheet, by the same function the home row
+    // uses, so the row and this screen always name the same words
+    // (2026-10-13). Kept for revert:
+    //   final pieces = samvadForTrimester(_trimester);
+    //   return pieces[(day - 1) % pieces.length];
+    return promptForDay(day, _trimester);
   }
 
   Future<void> _toggleRecord() async {

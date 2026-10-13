@@ -11,6 +11,7 @@
 import 'package:flutter/material.dart';
 
 import '../data/garbh_data.dart';
+import '../data/garbh_sheet.dart' show garbhSheetDay;
 import '../data/read_to_baby_data.dart';
 import '../data/spiritual_reading_data.dart';
 import '../localization/app_language.dart';
@@ -1531,6 +1532,18 @@ class _SamvadScreenState extends State<SamvadScreen>
       ];
 
   List<_SP> _storyPieces() => [
+        // The user's sheet (2026-10-13): one story per day of pregnancy. Every
+        // story she has reached so far, today's first — revealed as she goes,
+        // like the week page's chips, never a list of 280 at once.
+        for (var d = widget.controller.currentDay.clamp(1, 280); d >= 1; d--)
+          (
+            title: garbhSheetDay(d).storyTitle,
+            body: '${garbhSheetDay(d).story}\n\n${garbhSheetDay(d).storyClose}',
+            saveKey: 'gsstory_$d',
+            group: 'Stories & Fables',
+            id: 'gsstory_$d',
+            readAloud: '${garbhSheetDay(d).story}\n\n${garbhSheetDay(d).storyClose}',
+          ),
         for (final p in readAloudByCategory(kRtbStories))
           (
             title: p.title.now,
@@ -1617,7 +1630,12 @@ class _SamvadScreenState extends State<SamvadScreen>
           );
         }
         final day = widget.controller.currentDay.clamp(1, 280);
-        final p = pieces[(day - 1) % pieces.length];
+        // A list that leads with the user's sheet (`gsstory_<today>`) already
+        // has today's piece first — the rotation would land on another day's
+        // (2026-10-13). Every other list keeps its rotation.
+        final p = pieces.first.id.startsWith('gsstory_')
+            ? pieces.first
+            : pieces[(day - 1) % pieces.length];
         return ListView(
           padding: const EdgeInsets.fromLTRB(18, 14, 18, 28),
           children: [

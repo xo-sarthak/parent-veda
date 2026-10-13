@@ -117,11 +117,21 @@ class DevActivity {
     required this.benefit,
     required this.steps,
     required this.seed,
+    this.intro,
+    this.remember = const [],
+    this.variations,
+    this.linkedMilestones = const [],
   });
   final String id;
   final String title;
   final String areaId;
+
+  /// 0 for an activity from the phase docs, which give no duration — the
+  /// screens then say [timeLabel]'s "At your pace" rather than a made-up
+  /// number (the doc is the source of truth, 2026-10-13).
   final int minutes;
+
+  /// Empty for a phase-doc activity, for the same reason.
   final String difficulty;
   final String ageTag;
   final List<String> materials;
@@ -130,6 +140,26 @@ class DevActivity {
   final String benefit;
   final List<String> steps;
   final int seed;
+
+  // ---- from the phase docs (pp_phase_docs.dart), null/empty elsewhere ----
+  /// The doc's opening paragraph: what the activity is.
+  final String? intro;
+
+  /// "Things to Remember".
+  final List<String> remember;
+  final String? variations;
+
+  /// "Linked Milestones", by milestone title.
+  final List<String> linkedMilestones;
+
+  /// "5 min", or "At your pace" when the source gives no duration.
+  String get timeLabel => minutes > 0 ? '$minutes min' : 'At your pace';
+
+  /// "5 min · Easy", leaving out whatever the source does not give.
+  String get metaLine => [timeLabel, if (difficulty.isNotEmpty) difficulty].join(' · ');
+
+  /// True for an activity that came from the phase docs.
+  bool get fromPhaseDoc => intro != null;
 }
 
 class BrainTopic {

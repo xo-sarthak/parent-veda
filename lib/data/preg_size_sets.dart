@@ -36,6 +36,8 @@
 //  the plan, §8 — and land as `imageKey` lookups later, keyed by `name`.
 // =============================================================================
 
+import 'preg_week_pages.dart' show pregWeekPageFor;
+
 /// Whether the fruit · kitchen · sweets toggle is offered. Off until each
 /// entry has its picture (2026-09-22, the user: a toggle whose images do not
 /// change is no toggle). The store answers `fruit` while it is off.
@@ -139,12 +141,31 @@ PregSizeItem? pregSizeFor(int week, PregSizeSet set) {
 /// The comparison for [week] in [set], falling back to the week content's own
 /// fruit (`snapshot.fruit.en`, the Western list) when the set has no entry.
 /// Null only when neither has anything.
+///
+/// ⚠️ THE WEEK DOC WINS ON FRUIT & VEG (2026-10-13, the user). A week with a
+/// content doc (`pregWeekPageFor`, weeks 5–18 and 20–23 so far) answers the
+/// doc's own comparison — "a raspberry" — in the fruit set, so the home, the
+/// week page and the journal never name two things for one week. The Indian
+/// table above stays the answer for every other week and for the other sets.
+/// `pregSizeFor` is left as the raw table on purpose.
 PregSizeItem? pregSizeOrFallback(int week, PregSizeSet set, String fallbackFruit) {
+  if (set == PregSizeSet.fruit) {
+    final doc = pregWeekPageFor(week)?.fruit.trim() ?? '';
+    if (doc.isNotEmpty) return PregSizeItem(pregDocFruit(doc));
+  }
   final own = pregSizeFor(week, set);
   if (own != null) return own;
   final f = fallbackFruit.trim();
   if (f.isEmpty) return null;
   return PregSizeItem(pregArticle(f));
+}
+
+/// "Raspberry" → "a raspberry", "Large mango" → "a large mango": the docs
+/// write a bare capitalised noun; the line reads it mid-sentence.
+String pregDocFruit(String fruit) {
+  final f = fruit.trim();
+  if (f.isEmpty) return f;
+  return pregArticle(f[0].toLowerCase() + f.substring(1));
 }
 
 /// "a peach", "an orange" — for a line that reads as one sentence. Leaves a

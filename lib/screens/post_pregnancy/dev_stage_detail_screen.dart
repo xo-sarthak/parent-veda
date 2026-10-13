@@ -159,7 +159,7 @@ class DevStageDetailScreen extends StatelessWidget {
                           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                             Text(act.title, style: ppBody(14, color: ppInk, w: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis),
                             const SizedBox(height: 2),
-                            Text('${act.minutes} min · ${act.difficulty}', style: ppBody(12, color: ppMuted)),
+                            Text(act.metaLine, style: ppBody(12, color: ppMuted)),
                           ]),
                         ),
                         const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),

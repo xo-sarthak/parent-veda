@@ -129,6 +129,8 @@ import 'pp_visit_card.dart';
 import 'video/pv_video_config.dart' show pvResolveVideoUrl;
 import 'pp_tip_links.dart';
 import 'pp_phase_film.dart';
+import 'pp_phase_doc_reads.dart' show ppOpenMilestoneRead;
+import '../../data/pp_phase_docs.dart' show ppPhaseDocFor;
 import '../ttc/doors/ttc_tab_art.dart' show TtcTabMark;
 import '../ttc/ttc_tool_marks.dart' show TtcMarkLeading;
 import '../v2/pv_insight_rail.dart';
@@ -583,7 +585,12 @@ class _PpHomeV3State extends State<PpHomeV3> {
                     _pad(_ChangeCard(
                         change: c,
                         p: p,
-                        onTap: () => _showChangeSheet(context, c, child, p))),
+                        // A doc card opens the doc's milestone page (2026-10-13);
+                        // the sheet stays for phases without a doc.
+                        onTap: () => switch ((c.doc, c.milestonePage)) {
+                              (final doc?, final page?) => ppOpenMilestoneRead(context, doc, page),
+                              _ => _showChangeSheet(context, c, child, p),
+                            })),
                     const SizedBox(height: 12),
                   ],
                 const SizedBox(height: 20),
@@ -1492,7 +1499,7 @@ class _PpHomeV3State extends State<PpHomeV3> {
                         icon: Icons.back_hand_outlined,
                         hue: 150,
                         title: activity.title,
-                        sub: 'Activity · ${activity.minutes} min',
+                        sub: 'Activity · ${activity.timeLabel}',
                         onTap: () {
                           Navigator.of(ctx).pop();
                           Navigator.of(context).push(MaterialPageRoute<void>(
@@ -1671,13 +1678,22 @@ class _Hero extends StatelessWidget {
                         letterSpacing: 0.3,
                         color: p.ink2)),
                 const SizedBox(height: 8),
-                Text(phase.name,
-                    style: pvFraunces(
-                        fontSize: 21,
-                        fontWeight: FontWeight.w600,
-                        height: 1.2,
-                        letterSpacing: -0.4,
-                        color: p.ink2)),
+                // One line, scaled down when long (2026-10-13): the phase docs'
+                // names run longer ("The World Comes Closer" was "Reaching
+                // out"), and a second line overflowed the hero's fixed height.
+                // Scaled, never cut — the doc's name is shown whole.
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(phase.name,
+                      maxLines: 1,
+                      style: pvFraunces(
+                          fontSize: 21,
+                          fontWeight: FontWeight.w600,
+                          height: 1.2,
+                          letterSpacing: -0.4,
+                          color: p.ink2)),
+                ),
                 const SizedBox(height: 14),
                 // ⚠️ THE PHASE CHIP LIVES HERE NOW, AND THE LINE THAT WAS HERE
                 // IS GONE. Both halves came from one review:
@@ -1862,7 +1878,7 @@ class _ActivityCard extends StatelessWidget {
             Row(children: [
               Icon(Icons.schedule_rounded, size: 15, color: p.ink3),
               const SizedBox(width: 6),
-              Text('${activity.minutes} min  ·  ${activity.ageTag}',
+              Text('${activity.timeLabel}  ·  ${activity.ageTag}',
                   style: pvManrope(
                       fontSize: 12.5,
                       fontWeight: FontWeight.w700,
@@ -2581,9 +2597,17 @@ class _PhaseAtAGlance extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: pvManrope(fontSize: _kBody, fontWeight: FontWeight.w500, height: 1.55, color: p.ink1)),
         const SizedBox(height: 4),
-        if (phase.workingOn.isNotEmpty)
-          _point('working', TtcTabMark.sprout, 104, 'Working on now', phase.workingOn.take(3).toList()),
-        _point('normal', TtcTabMark.heartHand, 28, 'What is normal', [phase.reassurance]),
+        // ⚠️ A PHASE WITH A DOC (1–15, 2026-10-13) says what the doc says:
+        // `workingOn` is its Living Through This Phase titles, under the
+        // doc's own label, and the older "What is normal" line (authored, not
+        // in the doc) steps aside. The summary is already the doc's hero.
+        if (ppPhaseDocFor(phase.number) != null)
+          _point('living', TtcTabMark.sprout, 104, 'Living through this phase', phase.workingOn.toList())
+        else ...[
+          if (phase.workingOn.isNotEmpty)
+            _point('working', TtcTabMark.sprout, 104, 'Working on now', phase.workingOn.take(3).toList()),
+          _point('normal', TtcTabMark.heartHand, 28, 'What is normal', [phase.reassurance]),
+        ],
         if (helps != null) _point('helps', TtcTabMark.sun, 42, 'What helps', [helps]),
         const SizedBox(height: 12),
         Divider(height: 1, thickness: 1, color: p.line),
@@ -3457,7 +3481,7 @@ class _TodayActivityCard extends StatelessWidget {
                           style: pvManrope(
                               fontSize: _kBody, height: 1.5, color: p.ink2)),
                       const SizedBox(height: 8),
-                      Text('${activity.minutes} min  ·  ${activity.ageTag}',
+                      Text('${activity.timeLabel}  ·  ${activity.ageTag}',
                           style: pvManrope(fontSize: _kMeta, color: p.ink3)),
                     ]),
               ),

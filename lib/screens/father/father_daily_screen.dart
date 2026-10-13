@@ -16,6 +16,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../data/father/father_read_data.dart';
 import '../../data/father/father_tales.dart';
 import '../../data/garbh_data.dart';
+import '../../data/garbh_sheet.dart' show garbhSheetDay;
 import '../../data/scan_guide_data.dart';
 import '../../data/scan_schedule.dart';
 // garbh_content (GarbhPrompt) parked - the father read-aloud now uses the shared
@@ -231,7 +232,22 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
   List<SamvadPiece> get _readAloudPool => samvadDailyPool(
       ReadToBabyStore.instance,
       garbhTrimester(widget.controller.currentWeek));
+  // ⚠️ HIS OWN WORDS SINCE 2026-10-13. The user's Garbh Sanskar sheet gives a
+  // father's script ("Paternal Echo") for every day of pregnancy, written to
+  // answer the mother's line for the same day — so his card reads today's
+  // script rather than mirroring her pool. The mirror is kept below
+  // (`_readAloudFromPool`) for revert.
   SamvadPiece? get _readAloudToday {
+    final d = garbhSheetDay(widget.controller.currentDay);
+    return SamvadPiece(
+      body: d.father,
+      group: 'Your words for today',
+      saveKey: 'gsday_father_${d.day}',
+    );
+  }
+
+  // ignore: unused_element
+  SamvadPiece? get _readAloudFromPool {
     final pool = _readAloudPool;
     if (pool.isEmpty) return null;
     final day = widget.controller.currentDay.clamp(1, 280);

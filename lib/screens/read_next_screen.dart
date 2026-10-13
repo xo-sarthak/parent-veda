@@ -30,6 +30,8 @@ import 'doors/pv_list_row.dart' show PvMarkWell;
 import 'pregnancy/preg_chrome.dart';
 import 'pregnancy/preg_tool_chrome.dart';
 import 'products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
+import 'ttc/doors/ttc_tab_art.dart' show TtcTabMark;
+import 'ttc/ttc_tool_marks.dart' show TtcMarkLeading;
 
 // ⚠️ ONE PARENTVEDA (2026-09-30, the pregnancy restyle) on the full Read
 // recommendations page: the serif page title under a back arrow (no emoji in
@@ -643,7 +645,8 @@ class ReadItemScreen extends StatelessWidget {
           return ListView(
             padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
             children: [
-              Center(child: Text(item.emoji, style: const TextStyle(fontSize: 56))),
+              // The app's drawn mark (2026-10-13). Was: Text(item.emoji, fontSize 56).
+              Center(child: readMark(item, 64)),
               const SizedBox(height: 12),
               Text(item.title.now,
                   textAlign: TextAlign.center,
@@ -788,7 +791,8 @@ class ReadNextHomeCard extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.fromLTRB(18, 12, 18, 12),
             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(hero.emoji, style: const TextStyle(fontSize: 34)),
+              // Was: Text(hero.emoji, fontSize 34).
+              readMark(hero, 40),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -1014,7 +1018,8 @@ class DailyReadsHomeCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(14),
                       ),
                       child:
-                          Text(r.emoji, style: const TextStyle(fontSize: 24)),
+                          // Was: Text(r.emoji, fontSize 24).
+                          readMark(r, 30),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -1168,7 +1173,8 @@ class _ReadSearchDelegate extends SearchDelegate<void> {
       children: [
         for (final r in results)
           ListTile(
-            leading: Text(r.emoji, style: const TextStyle(fontSize: 24)),
+            // Was: Text(r.emoji, fontSize 24).
+            leading: readMark(r, 34),
             title: Text(r.title.now),
             subtitle: Text('${r.category} · ${r.readingTime}',
                 style: text.labelSmall?.copyWith(color: AppTheme.neutral500)),
@@ -1181,3 +1187,18 @@ class _ReadSearchDelegate extends SearchDelegate<void> {
     );
   }
 }
+
+/// A read's mark: the app's drawn marks by kind of read, in place of the
+/// emoji the items carry (the user, 2026-10-13: the latest marks, never
+/// emoji). `ReadItem.emoji` stays in the data, unused here.
+Widget readMark(ReadItem r, double size) => TtcMarkLeading(
+      tab: switch (r.type) {
+        ReadType.book => TtcTabMark.openBook,
+        ReadType.research => TtcTabMark.chartLine,
+        ReadType.expert => TtcTabMark.doctorChat,
+        ReadType.reflection => TtcTabMark.heartHand,
+        ReadType.article => TtcTabMark.sprout,
+      },
+      tint: kPvInk,
+      size: size,
+    );

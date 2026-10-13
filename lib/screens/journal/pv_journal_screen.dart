@@ -38,7 +38,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 
 import '../../data/journal_prompts.dart';
-import '../../data/preg_size_sets.dart' show pregSizeFor;
+import '../../data/preg_size_sets.dart' show pregSizeOrFallback;
 import '../../data/reads/read_images.dart' show readImageFor;
 import '../../models/journal_entry.dart';
 import '../../services/bump_store.dart';
@@ -887,7 +887,7 @@ class _QuestionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final q = journalPromptFor(week, skip: skip);
-    final size = pregSizeFor(week, PregSizeSetStore.instance.set);
+    final size = pregSizeOrFallback(week, PregSizeSetStore.instance.set, ''); // doc fruit first (2026-10-13); was pregSizeFor
     final tri = week <= 13 ? 1 : (week <= 27 ? 2 : 3);
     final art = readImageFor('journal_question_t$tri');
     return Padding(
@@ -1133,7 +1133,7 @@ class _WeekSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = pregSizeFor(week, PregSizeSetStore.instance.set);
+    final size = pregSizeOrFallback(week, PregSizeSetStore.instance.set, ''); // doc fruit first (2026-10-13); was pregSizeFor
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 30, 20, 0),
       child: Column(
@@ -1846,7 +1846,7 @@ class _TheRestOfTheWeek extends StatelessWidget {
       for (final o in JournalStore.instance.timeline(p))
         if (o.id != entry.id && journalWeekOf(o, p) == week) o,
     ];
-    final size = pregSizeFor(week, PregSizeSetStore.instance.set);
+    final size = pregSizeOrFallback(week, PregSizeSetStore.instance.set, ''); // doc fruit first (2026-10-13); was pregSizeFor
     final range = journalWeekRange(p, week);
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 40, 20, 0),

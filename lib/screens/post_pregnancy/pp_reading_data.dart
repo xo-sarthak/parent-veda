@@ -20,6 +20,7 @@ import '../../services/read_store.dart';
 import '../../services/remote/cloud_synced_store.dart';
 import '../../services/saved_store.dart';
 import '../../care_partner/care_journey.dart';
+import 'pp_book_docs.dart';
 
 /// An expandable "ParentVeda tip" shown inline in the reader.
 class ReadTip {
@@ -662,7 +663,10 @@ const List<ReadArticle> kReadArticles = [
 /// is read as a mistake rather than an instruction.
 List<ReadArticle> get readCatalog {
   final live = ReadStore.instance.all;
-  return live.isEmpty ? kReadArticles : live;
+  // The book companion docs (2026-10-13) are bundled, never published live,
+  // so they join whichever list is in use. Was:
+  //   return live.isEmpty ? kReadArticles : live;
+  return [...(live.isEmpty ? kReadArticles : live), ...kPpBookArticles];
 }
 
 /// Listen to this wherever articles are rendered — it fires on reading-progress

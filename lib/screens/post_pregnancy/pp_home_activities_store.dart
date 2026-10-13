@@ -44,6 +44,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'pp_development_data.dart';
 import 'pp_grow_data.dart';
+import 'pp_phase_doc_activities.dart';
 
 /// How many activities the home shows each day. The brief says "at least 3".
 const int kPpHomeActivityCount = 3;
@@ -211,6 +212,10 @@ class PpHomeActivitiesStore extends ChangeNotifier {
     int cmp(DevActivity a, DevActivity b) {
       final ca = _onCooldown(a.id), cb = _onCooldown(b.id);
       if (ca != cb) return ca ? 1 : -1; // fresh before on-cooldown
+      // The child's own phase doc first (the user, 2026-10-13: "into
+      // Today, this phase first"), then any exact fit, then the band.
+      final pa = ppIsOwnPhaseDocActivity(a, ageMonths), pb = ppIsOwnPhaseDocActivity(b, ageMonths);
+      if (pa != pb) return pa ? -1 : 1;
       final ea = growSuitsAge(a, ageMonths), eb = growSuitsAge(b, ageMonths);
       if (ea != eb) return ea ? -1 : 1; // exact fit before widened band
       return _score(a.id, day).compareTo(_score(b.id, day));

@@ -105,6 +105,9 @@ const String kGarbhSurfaceRitual = 'garbh/ritual';
 const String kGarbhSurfaceRitualRail = 'garbh/ritual_rail';
 const String kGarbhSurfaceListenToday = 'garbh/listen/today';
 const String kGarbhSurfaceReadToday = 'garbh/read/today';
+
+/// Today's story from the user's Garbh Sanskar sheet (2026-10-13).
+const String kGarbhSurfaceStoryToday = 'garbh/read/story_today';
 const String kGarbhSurfaceRelax = 'garbh/relax';
 const String kGarbhSurfaceKriya = 'garbh/kriya';
 const String kGarbhSurfaceJournal = 'garbh/journal';
@@ -406,6 +409,14 @@ final PvDoorPage kGarbhDoor = PvDoorPage(
           title: "Today's passage to read aloud",
           blurb: 'Record it in your own voice, or listen to the narrator.',
           surfaceId: kGarbhSurfaceReadToday,
+        ),
+        // A different short fable for every day of pregnancy, from the user's
+        // Garbh Sanskar sheet (2026-10-13). Mobbin: Nibble's audio-article
+        // row — what it is, then one line, read in the same record-first way.
+        PvDoorReadTile(
+          title: "Today's story",
+          blurb: 'A short, gentle story to read to your baby, and the line it ends on.',
+          surfaceId: kGarbhSurfaceStoryToday,
         ),
       ],
     ),

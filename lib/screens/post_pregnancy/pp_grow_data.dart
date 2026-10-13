@@ -49,6 +49,7 @@ import 'pp_child_profile.dart';
 import 'pp_common.dart';
 import 'pp_development_data.dart';
 import 'pp_grow_activities.dart';
+import 'pp_phase_doc_activities.dart';
 
 // =============================================================================
 //  1. WHICH VERSION IS ON SCREEN
@@ -259,6 +260,8 @@ List<DevActivity> orphanedUnder(List<GrowCapability> pool) {
 final List<DevActivity> kGrowActivities = [
   ...kDevActivities,
   ...kGrowExtraActivities,
+  // The My Child phase docs' activities (2026-10-13; pp_phase_doc_activities.dart).
+  ...kPhaseDocActivities,
 ];
 
 DevActivity growActivityById(String id) => kGrowActivities.firstWhere(

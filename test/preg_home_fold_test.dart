@@ -382,7 +382,11 @@ void main() {
     test('the fallback is the week content\'s own fruit, with an article', () {
       expect(pregSizeOrFallback(3, PregSizeSet.fruit, 'peach')?.name, 'a peach');
       expect(pregSizeOrFallback(3, PregSizeSet.fruit, '')?.name, isNull);
-      expect(pregSizeOrFallback(14, PregSizeSet.fruit, 'peach')?.name, 'a guava');
+      expect(pregSizeOrFallback(14, PregSizeSet.fruit, 'peach')?.name, 'a peach',
+          reason: 'week 14 has a content doc, and its fruit wins (2026-10-13)');
+      // A week with no doc keeps the Indian table: week 19's mango.
+      expect(pregSizeOrFallback(19, PregSizeSet.fruit, 'peach')?.name, 'a mango');
+      expect(pregSizeOrFallback(14, PregSizeSet.kitchen, 'peach')?.name, pregSizeFor(14, PregSizeSet.kitchen)?.name);
     });
 
     test('the article', () {

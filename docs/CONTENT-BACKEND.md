@@ -276,6 +276,12 @@ monthly = (messages × cache-MISS-rate × ₹0.01) + ₹600 Render + (rare web-f
 ```
 The LLM is **a paisa an answer** (an 8B open model is ~50–100× cheaper than a frontier model), so the bill is driven by **volume × cache hit rate**, not model choice. The real risks are **abuse** (→ 20/day per-user limit + global daily spend cap / circuit-breaker) and cache-hit-rate (instrumented from day one). Whole-stack fixed cost: Supabase/Directus/website **free**; only AskVeda's Render (~$7 ≈ ₹600/mo) is paid.
 
+**2026-10-08: Claude is now the provider (`LLM_PROVIDER=anthropic`, Haiku 5.5).** At $0.10 / $0.50 per 1M tokens, one cache-miss answer (~3K tokens in, ~1K out including thinking) costs about **$0.0008 ≈ ₹0.07**, so the line above still holds. Opus 5.5 ($4 / $20) would be about **$0.03 ≈ ₹2.5** an answer, roughly 40× more. That is the trade-off behind the choice: the job is summarising *our own* retrieved content, which a small model does well, and the big model's extra reasoning would mostly be paid for and not used. Moving up is one line (`ANTHROPIC_MODEL`) plus the two price lines. What a provider switch must carry with it, as a general lesson:
+- **The spend cap must price the active model.** `settings.active_prices_per_1m_usd` picks the prices that match the provider. If they were left at Groq's, the circuit breaker would let roughly 50× the intended spend through before it tripped.
+- **Translate at the edge.** The prompt builders still produce OpenAI-style `[system, user]`. Only `app/llm.py` converts that into Claude's separate `system` field, so nothing else in the service changes shape.
+- **A refusal is a result, not an error.** Claude returns HTTP 200 with `stop_reason: "refusal"`. That is mapped to `NO_ANSWER`, so it goes down the gap → trusted-web path. Read as text, it would have been an empty answer, shown to the parent *and cached*. On Opus, Sonnet and Fable, `fallbacks: "default"` first retries a declined request on Anthropic's fallback model, all on the server. Haiku 5.5 has no server-side fallback, so the parameter is only sent where it exists.
+- **Groq is not deleted.** Setting `LLM_PROVIDER=groq` is the whole revert, and the probe names whichever key is actually wrong.
+
 ### Locked decisions
 Own repo `C:\Projects\parentveda-askveda` · **pgvector for both** index + cache (Chroma dropped — Render's disk is ephemeral) · **Groq** (Together = config swap) · benchmark Qwen-7B vs Llama-8B · Directus-webhook re-index · **app door first** (built + tested locally, free) with the **WhatsApp webhook scaffolded** until MSG91/Meta is live · gentle safety · 20/day + global cap.
 
@@ -364,3 +370,38 @@ and a resolver, and the failure when they disagree is silent**, so both live in 
 every exported id. The other one: **a prune must be scoped to the namespace the export owns**, because two exports
 can share a domain (`--prune-prefix pv`, never a plain `--prune`). Full run order and the two-repo contract:
 `docs/PREGNANCY-ASKVEDA-HANDOFF.md`.
+
+
+## Week pages from Word docs — generated code, not a runtime parse (2026-10-13)
+
+The week-wise content arrives as Word documents with a fixed seven-section layout. Three ways to get it into
+the app, and why the first:
+
+1. **Generate Dart at build time** (`tools/week_pages/docx_to_dart.py` → `lib/data/preg_week_pages/week_NN.dart`).
+   The page reads a `const` — no loading state on a page she opens every week, the compiler checks every
+   field, and tests can scan the text. Cost: a content change needs one command and an app release.
+2. **Ship JSON and parse at runtime.** Same release cost (the asset is bundled), plus an async load and no
+   compile-time check. Gains nothing here.
+3. **Directus → Supabase.** The only option that changes content without a release. Worth it when content
+   changes weekly; these pages change when a doc is revised. The model in `lib/data/preg_week_pages.dart` is
+   already the shape a `preg_week_pages` table would take, so moving later is a loader, not a redesign.
+
+**The converter is strict on purpose.** An unknown heading, an empty section, or a "fixed" line that changed
+wording stops the run and names the week. That strictness found a real change on its first run: from week 21
+the symptoms footer adds leaking fluid and reduced fetal movements, so the footer became a per-week field
+instead of one constant. The general fact: **a parser that skips what it does not recognise turns a content
+change into a silent hole; one that refuses turns it into a question.**
+
+**Builder notes are not content.** The docs carry instructions ("Tap opens a single-paragraph card closing with
+Got it", "(Fixed footer…)"). The converter drops them and a test fails the build if one ever reaches a string.
+
+
+### Parenting phase docs — the same pipeline, a messier source (2026-10-13)
+
+The My Child phase docs (`tools/phase_pages/docx_to_dart.py`) follow the week-page pattern, but the docs were
+revised many times by hand and their layout drifted: labels inline or on their own line, tips as list items
+or "✓" lines, revision notes in brackets, editor's asides between sections ("I would remove…"). Two moves made
+it tractable, and both generalise. **Replace a bracketed note with a line break, not nothing** — the break
+also separates the label it was glued to ("What Is It? (89 words)In these early weeks"). And **audit by
+difference**: list every source line whose words never reached the output, and read that list. It must be
+only headings, labels and notes; on the first run it caught three editor's asides a keyword grep had missed.

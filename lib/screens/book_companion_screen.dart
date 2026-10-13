@@ -30,6 +30,8 @@ import '../services/read_next_store.dart';
 import '../theme/app_theme.dart';
 import '../theme/pv_fonts.dart';
 import '../localization/app_language.dart';
+import 'ttc/doors/ttc_tab_art.dart' show TtcTabMark;
+import 'ttc/ttc_tool_marks.dart' show TtcMarkLeading;
 
 // ---- palette (light-only, matching the app) ---------------------------------
 const _bg = Color(0xFFFCFBFC);
@@ -44,10 +46,13 @@ const _panel = Color(0xFFF4F3F5);
 const double _maxReadWidth = 620;
 
 class BookCompanionScreen extends StatefulWidget {
-  const BookCompanionScreen({super.key, required this.item, required this.controller});
+  const BookCompanionScreen({super.key, required this.item, this.controller});
 
   final ReadItem item;
-  final PregnancyController controller;
+
+  /// Optional since 2026-10-13: the screen never read it, and the parenting
+  /// shelf (which has no pregnancy) now opens books here too.
+  final PregnancyController? controller;
 
   @override
   State<BookCompanionScreen> createState() => _BookCompanionScreenState();
@@ -76,9 +81,19 @@ class _BookCompanionScreenState extends State<BookCompanionScreen> {
     const _Section('overview', 'Overview'),
     if (c.ideas.isNotEmpty) const _Section('ideas', 'Ideas'),
     if (c.chapters.isNotEmpty) const _Section('chapters', 'Chapters'),
-    if (c.perspective.en.isNotEmpty) const _Section('take', 'ParentVeda Take'),
+    if (c.perspective.en.isNotEmpty || c.takePoints.isNotEmpty) const _Section('take', 'ParentVeda Take'),
     if (c.quotes.isNotEmpty) const _Section('quotes', 'Quotes'),
+    if (c.addendumTitle.en.isNotEmpty) _Section('more', _addendumChip(c.addendumTitle.en)),
   ];
+
+  /// The nav chip for the closing section, short enough for a chip.
+  static String _addendumChip(String title) {
+    final t = title.toLowerCase();
+    if (t.contains('doctor')) return 'Your doctor';
+    if (t.contains('help')) return 'Extra help';
+    if (t.contains('indian')) return 'In India';
+    return 'More';
+  }
 
   @override
   void initState() {
@@ -444,7 +459,7 @@ class _BookCompanionScreenState extends State<BookCompanionScreen> {
                 )),
             const SizedBox(height: 34),
           ],
-          if (c.perspective.en.isNotEmpty) ...[
+          if (c.perspective.en.isNotEmpty || c.takePoints.isNotEmpty) ...[
             _anchor('take'),
             _pad(_take()),
             const SizedBox(height: 34),
@@ -454,6 +469,11 @@ class _BookCompanionScreenState extends State<BookCompanionScreen> {
             _pad(_sectionTitle('Memorable lines')),
             const SizedBox(height: 18),
             for (final q in c.quotes) _pad(_quote(q.now)),
+          ],
+          if (c.addendumTitle.en.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            _anchor('more'),
+            _pad(_addendum()),
           ],
         ]),
       );
@@ -519,7 +539,8 @@ class _BookCompanionScreenState extends State<BookCompanionScreen> {
             border: Border.all(color: _line),
           ),
           child: Row(mainAxisSize: MainAxisSize.min, children: [
-            const Icon(Icons.menu_book_rounded, size: 12, color: _muted),
+            // The app's drawn mark (2026-10-13), was Icons.menu_book_rounded.
+            const TtcMarkLeading(tab: TtcTabMark.openBook, tint: _muted, size: 18),
             const SizedBox(width: 7),
             Flexible(
               child: Text(
@@ -570,7 +591,8 @@ class _BookCompanionScreenState extends State<BookCompanionScreen> {
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
-            const Icon(Icons.eco_rounded, size: 16, color: Color(0xFF3FA56A)),
+            // The app's drawn mark (2026-10-13), was Icons.eco_rounded.
+            const TtcMarkLeading(tab: TtcTabMark.sprout, tint: Color(0xFF3FA56A), size: 22),
             const SizedBox(width: 8),
             Text(
               S.now.uiParentvedaSTake,
@@ -583,12 +605,86 @@ class _BookCompanionScreenState extends State<BookCompanionScreen> {
             ),
           ]),
           const SizedBox(height: 14),
-          Text(
-            c.perspective.now,
-            style: pvFraunces(fontSize: 16, height: 1.65, color: _ink),
-          ),
+          // The docs' pointers (2026-10-13): one line each with the app's drawn
+          // mark — heart-in-hand for what works, the flag for what is worth
+          // knowing — in place of the docs' ❤️ / ⚠️. Mobbin: Klarna's expert
+          // review card, a short stacked list with a small leading mark.
+          if (c.takePoints.isNotEmpty)
+            for (final p in c.takePoints)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  TtcMarkLeading(
+                    tab: p.good ? TtcTabMark.heartHand : TtcTabMark.flagPath,
+                    tint: p.good ? const Color(0xFF3FA56A) : const Color(0xFFC98A2B),
+                    size: 30,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(p.text.now, style: pvManrope(fontSize: 14.5, height: 1.6, color: _ink)),
+                    ),
+                  ),
+                ]),
+              )
+          else
+            Text(
+              c.perspective.now,
+              style: pvFraunces(fontSize: 16, height: 1.65, color: _ink),
+            ),
         ]),
       );
+
+  /// The docs' closing section — "Talk to Your Doctor Before", "When to Seek
+  /// Extra Help", "Reading This in an Indian Context" (2026-10-13). A note,
+  /// then each point as a marked row (Mobbin: Google Health's "things to
+  /// remember", a mark beside each line).
+  Widget _addendum() {
+    final t = c.addendumTitle.en.toLowerCase();
+    final mark = t.contains('indian')
+        ? TtcTabMark.lotus
+        : (t.contains('doctor') || t.contains('help'))
+            ? TtcTabMark.doctorChat
+            : TtcTabMark.signpost;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: _line),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          TtcMarkLeading(tab: mark, tint: AppTheme.primary, size: 34),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(c.addendumTitle.now,
+                style: pvFraunces(fontSize: 19, height: 1.25, fontWeight: FontWeight.w600, color: AppTheme.neutral900)),
+          ),
+        ]),
+        if (c.addendumBody.en.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          Text(c.addendumBody.now, style: pvManrope(fontSize: 14.5, height: 1.65, color: _ink)),
+        ],
+        if (c.addendumPoints.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          for (final p in c.addendumPoints)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 8, right: 12),
+                  child: Container(width: 5, height: 5, decoration: const BoxDecoration(color: _soft, shape: BoxShape.circle)),
+                ),
+                Expanded(child: Text(p.now, style: pvManrope(fontSize: 14, height: 1.6, color: _ink))),
+              ]),
+            ),
+        ],
+      ]),
+    );
+  }
 
   // ---- Quotes: centred, oversized quote mark -------------------------------
   Widget _quote(String q) {

@@ -42,6 +42,15 @@ class BookChapter {
   final List<BookPointGroup> keyPoints;
 }
 
+/// One pointer in ParentVeda's Take: something the book does well ([good]),
+/// or something worth knowing before relying on it.
+@immutable
+class BookTakePoint {
+  const BookTakePoint({required this.good, required this.text});
+  final bool good;
+  final LocalizedText text;
+}
+
 /// A rich "book companion" — the structured summary a book ReadItem can carry so
 /// the reader renders About / Core Philosophy / Key Ideas / ParentVeda's Take /
 /// Chapter-by-chapter / Quotes instead of one flat blurb. All optional.
@@ -59,7 +68,23 @@ class BookCompanion {
     this.perspective = const LocalizedText(en: '', hi: ''),
     this.chapters = const [],
     this.quotes = const [],
+    this.takePoints = const [],
+    this.addendumTitle = const LocalizedText(en: '', hi: ''),
+    this.addendumBody = const LocalizedText(en: '', hi: ''),
+    this.addendumPoints = const [],
   });
+
+  /// ParentVeda's Take as pointers, from the book companion docs (2026-10-13):
+  /// what works ([BookTakePoint.good]) and what is worth knowing. When set,
+  /// the screen draws these instead of [perspective], which stays for the
+  /// companions written before the docs.
+  final List<BookTakePoint> takePoints;
+
+  /// The docs' closing section, when a book has one: "Talk to Your Doctor
+  /// Before", "When to Seek Extra Help", "Reading This in an Indian Context".
+  final LocalizedText addendumTitle;
+  final LocalizedText addendumBody;
+  final List<LocalizedText> addendumPoints;
   final List<LocalizedText> recommendedFor;
   final List<LocalizedText> themes;
 

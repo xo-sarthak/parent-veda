@@ -32,6 +32,7 @@ import 'package:flutter/material.dart';
 
 import '../data/preg_size_sets.dart';
 import '../data/preg_week_extras.dart';
+import '../data/preg_week_pages.dart';
 import '../data/symptoms/symptom_library.dart' show symptomById;
 import 'symptoms/door/symptoms_today_body.dart' show openSymptomRead;
 import '../models/week_content.dart';
@@ -44,6 +45,11 @@ import 'package:share_plus/share_plus.dart';
 import 'pregnancy/preg_twins.dart';
 import 'pregnancy/preg_chrome.dart' show pregSectionHeadingStyle;
 import 'products/pv_store_chrome.dart' show kPvInk, kPvLine;
+import 'brackets/hub/hub_intent_art.dart' show HubIntentArt, IntentMark;
+
+// The week-wise content docs, drawn in their own order (2026-10-13). A part
+// so it shares this page's tiles, notes and sources.
+part 'pregnancy/preg_week_doc_body.dart';
 
 const String kPregWeekRoute = 'pregnancy/week';
 
@@ -102,6 +108,7 @@ class _PregWeekScreenState extends State<PregWeekScreen> {
           final c = widget.pregnancy;
           final content = c.weekData(_week);
           final special = pregSpecialPageFor(_week);
+          final doc = pregWeekPageFor(_week);
           final top = MediaQuery.paddingOf(context).top;
           final artHeight = MediaQuery.sizeOf(context).height * 0.46;
 
@@ -192,6 +199,9 @@ class _PregWeekScreenState extends State<PregWeekScreen> {
                     padding: EdgeInsets.fromLTRB(20, 22, 20, 40 + MediaQuery.paddingOf(context).bottom),
                     child: special != null
                         ? _SpecialWeekBody(p: p, page: special)
+                        // A week with a content doc (weeks 5-18, 20-23 so far).
+                        : doc != null
+                            ? PregWeekDocBody(key: ValueKey(_week), p: p, page: doc, content: content)
                         : content == null
                             ? Text('Week $_week is on its way.',
                                 style: pvManrope(fontSize: 14, color: p.ink2))
@@ -815,9 +825,12 @@ class _Question extends StatelessWidget {
 
 /// Call your doctor if: calm, but its own bordered card.
 class _Urgent extends StatelessWidget {
-  const _Urgent({required this.p, required this.text});
+  const _Urgent({required this.p, required this.text, this.label = 'CALL YOUR DOCTOR IF'});
   final V2Palette p;
   final String text;
+
+  /// The small-caps line over the text; the week docs name their own.
+  final String label;
 
   @override
   Widget build(BuildContext context) => Container(
@@ -840,7 +853,7 @@ class _Urgent extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'CALL YOUR DOCTOR IF',
+                label,
                 style: pvManrope(
                   fontSize: 9.5,
                   fontWeight: FontWeight.w800,

@@ -32,6 +32,7 @@
 //  piece is something that already ships; this file only points at it.
 // =============================================================================
 
+import '../../data/pp_phase_docs.dart';
 import 'pp_development_data.dart';
 import 'pp_grow_data.dart';
 import 'pp_phases_data.dart';
@@ -45,21 +46,36 @@ class PhaseChange {
     required this.domain,
     required this.phase,
     required this.milestones,
+    this.doc,
+    this.snapshot,
   });
 
   final PhaseDomain domain;
   final AgePhase phase;
+
+  /// The phase doc and its Child Snapshot card, when the phase has a doc
+  /// (1–15, 2026-10-13). Then the card says the doc's words and opens the
+  /// doc's milestone page (`ppOpenMilestoneRead`) instead of the sheet.
+  final PpPhaseDoc? doc;
+  final PpSnapshot? snapshot;
+
+  /// The doc's milestone page for this card, when there is one.
+  PpMilestonePage? get milestonePage => switch (snapshot) {
+        final s? => doc?.milestoneFor(s.domain),
+        null => null,
+      };
 
   /// This domain's milestones for this phase, in the phase's own order.
   /// Never empty — a domain with none does not become a card.
   final List<PhaseMilestone> milestones;
 
   /// The card's title: the first milestone, as written.
-  String get title => milestones.first.text;
+  String get title => snapshot == null ? milestones.first.text : ppFillChild(snapshot!.title);
 
   /// The chip. The snapshot's existing category words, so the section keeps
-  /// the labels a parent has already learned.
-  String get category => switch (domain) {
+  /// the labels a parent has already learned. A doc card says the doc's
+  /// domain ("Nutrition", where the older label was "Self-care").
+  String get category => snapshot?.domain.label ?? switch (domain) {
         PhaseDomain.cognitive => 'Brain',
         PhaseDomain.motor => 'Physical',
         PhaseDomain.language => 'Language',
@@ -82,6 +98,8 @@ class PhaseChange {
   /// the AAP 75% threshold, said plainly, which is the only claim the data
   /// actually makes.
   String get notice {
+    // A doc card: the Child Snapshot's own line.
+    if (snapshot case final s?) return ppFillChild(s.line);
     if (milestones.length > 1) {
       final rest = milestones.skip(1).map((m) => _lower(m.text)).join(', and ');
       return 'Also: $rest.';
@@ -169,6 +187,21 @@ String _lower(String s) =>
 /// with no milestones, which the seed data does not contain — and the home
 /// renders an invitation rather than a blank in that case.
 List<PhaseChange> phaseChangesFor(AgePhase phase) {
+  // ⚠️ A PHASE WITH A DOC SHOWS THE DOC'S FIVE (the user, 2026-10-13: the
+  // Child Snapshot's fixed five domains, in its fixed order, each opening its
+  // milestone page). "Only what is changing" below is for phases 16–20.
+  if (ppPhaseDocFor(phase.number) case final doc?) {
+    return [
+      for (final s in doc.snapshot)
+        PhaseChange(
+          domain: ppDocDomainAsPhase(s.domain),
+          phase: phase,
+          milestones: [PhaseMilestone(ppDocDomainAsPhase(s.domain), s.title)],
+          doc: doc,
+          snapshot: s,
+        ),
+    ];
+  }
   final order = <PhaseDomain>[];
   final by = <PhaseDomain, List<PhaseMilestone>>{};
   for (final m in phase.milestones) {

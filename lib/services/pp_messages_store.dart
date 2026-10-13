@@ -259,7 +259,8 @@ List<PpMessage> ppMessageCandidates(PpMessageFacts f, DateTime now) {
       id: 'phase:${p.number}',
       kind: PpMessageKind.milestones,
       at: _at(day, 18),
-      title: 'A new stage: ${p.name}',
+      // The phase doc's name where there is one (2026-10-13). Was ${p.name}.
+      title: 'A new stage: ${ppPhaseWithDoc(p).name}',
       body: 'The skills that often start around now, and how to help, without a scoreboard.',
     ));
   }

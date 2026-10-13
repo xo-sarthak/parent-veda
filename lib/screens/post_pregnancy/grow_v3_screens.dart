@@ -174,7 +174,7 @@ class GrowV3Home extends StatelessWidget {
         Text(a.title, style: ppFraunces(24, h: 1.12)),
         const SizedBox(height: 10),
         Row(children: [
-          _meta(Icons.schedule_rounded, '${a.minutes} min'),
+          _meta(Icons.schedule_rounded, a.timeLabel),
           const SizedBox(width: 14),
           _meta(Icons.child_care_outlined, a.ageTag),
         ]),
@@ -350,7 +350,7 @@ class GrowV3Home extends StatelessWidget {
                 size: 17, color: ppAccentGreen),
             const SizedBox(width: 11),
             Expanded(child: Text(a.title, style: ppJakarta(13))),
-            Text('${a.minutes} min', style: ppBody(11.5, color: ppMuted)),
+            Text(a.timeLabel, style: ppBody(11.5, color: ppMuted)),
           ]),
         ),
       );
@@ -482,7 +482,7 @@ class GrowV3CapabilityScreen extends StatelessWidget {
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(a.title, style: ppJakarta(13.5)),
                 const SizedBox(height: 4),
-                Text('${a.minutes} min · ${a.ageTag}',
+                Text('${a.timeLabel} · ${a.ageTag}',
                     style: ppBody(11.5, color: ppMuted)),
               ]),
             ),

@@ -28,6 +28,8 @@ import 'pp_products_data.dart';
 import 'pp_tools_kit.dart';
 import 'products_discovery_screen.dart';
 import 'pp_phases_data.dart';
+import 'pp_phase_film.dart' show ppOpenPhaseRead;
+import '../../data/pp_phase_docs.dart' show ppPhaseDocFor;
 
 class PhaseDetailScreen extends StatelessWidget {
   const PhaseDetailScreen({super.key, required this.phase});
@@ -38,6 +40,12 @@ class PhaseDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = phase;
+    // ⚠️ A PHASE WITH A DOC (1–15, 2026-10-13). `kPhases` has already laid
+    // the doc over this phase: `workingOn` is its Living Through titles and
+    // `milestones` its Child Snapshot. Those are NOT the AAP 75% milestones,
+    // so they must not sit under the "three in four children" caption; they
+    // take the doc's own labels, and the full doc page is one tap away.
+    final hasDoc = ppPhaseDocFor(p.number) != null;
     return Scaffold(
       backgroundColor: ppBg,
       body: SafeArea(
@@ -74,6 +82,19 @@ class PhaseDetailScreen extends StatelessWidget {
             _pad(Text(p.tagline, style: ppBody(14.5, color: p.accent, w: FontWeight.w700))),
             const SizedBox(height: 14),
             _pad(Text(p.summary, style: ppBody(15, color: ppInk, h: 1.65))),
+            if (hasDoc) ...[
+              const SizedBox(height: 10),
+              _pad(GestureDetector(
+                key: const ValueKey('phase_detail_read_doc'),
+                onTap: () => ppOpenPhaseRead(context, p),
+                behavior: HitTestBehavior.opaque,
+                child: Row(children: [
+                  Flexible(child: Text('Read this phase in full', style: ppBody(13.5, color: ppPurple, w: FontWeight.w700))),
+                  const SizedBox(width: 6),
+                  const Icon(Icons.arrow_forward, size: 15, color: ppPurple),
+                ]),
+              )),
+            ],
 
             // The reassurance line — the thing a worried parent came for.
             const SizedBox(height: 18),
@@ -113,7 +134,7 @@ class PhaseDetailScreen extends StatelessWidget {
             )),
 
             const SizedBox(height: 24),
-            _pad(Text('What he is working on', style: ppJakarta(18))),
+            _pad(Text(hasDoc ? 'Living through this phase' : 'What he is working on', style: ppJakarta(18))),
             const SizedBox(height: 12),
             _pad(Column(children: [
               for (final w in p.workingOn)
@@ -134,14 +155,20 @@ class PhaseDetailScreen extends StatelessWidget {
 
             // ---- milestones by domain ----
             const SizedBox(height: 22),
-            _pad(Text('Most children can, by the end of this phase', style: ppJakarta(18))),
-            const SizedBox(height: 4),
-            _pad(Text(
-              'These are the milestones about three in four children reach by this age — not an average, and not a deadline.',
-              style: ppBody(12.5, color: ppMuted, h: 1.45),
-            )),
+            _pad(Text(hasDoc ? 'Child snapshot' : 'Most children can, by the end of this phase', style: ppJakarta(18))),
+            if (!hasDoc) ...[
+              const SizedBox(height: 4),
+              _pad(Text(
+                'These are the milestones about three in four children reach by this age — not an average, and not a deadline.',
+                style: ppBody(12.5, color: ppMuted, h: 1.45),
+              )),
+            ],
             const SizedBox(height: 14),
-            for (final d in PhaseDomain.values)
+            // The doc's fixed order (Brain, Physical, Language, Emotional,
+            // Nutrition) for a doc phase; the enum's order otherwise.
+            for (final d in hasDoc
+                ? const [PhaseDomain.cognitive, PhaseDomain.motor, PhaseDomain.language, PhaseDomain.social, PhaseDomain.adaptive]
+                : PhaseDomain.values)
               if (p.inDomain(d).isNotEmpty) _pad(_domainCard(p, d)),
 
             // ---- fuller description ----
@@ -287,7 +314,19 @@ class PhaseDetailScreen extends StatelessWidget {
           Row(children: [
             Icon(d.icon, size: 16, color: p.accent),
             const SizedBox(width: 9),
-            Expanded(child: Text(d.label, style: ppJakarta(14.5))),
+            // A doc phase says the doc's domain names (Brain … Nutrition).
+            Expanded(
+                child: Text(
+                    ppPhaseDocFor(p.number) == null
+                        ? d.label
+                        : switch (d) {
+                            PhaseDomain.cognitive => 'Brain',
+                            PhaseDomain.motor => 'Physical',
+                            PhaseDomain.language => 'Language',
+                            PhaseDomain.social => 'Emotional',
+                            PhaseDomain.adaptive => 'Nutrition',
+                          },
+                    style: ppJakarta(14.5))),
           ]),
           const SizedBox(height: 10),
           for (final m in p.inDomain(d))

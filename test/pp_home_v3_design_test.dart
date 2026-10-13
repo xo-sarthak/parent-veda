@@ -153,9 +153,17 @@ void main() {
       // Phase 1 has three milestones in three domains; later phases have up
       // to six across five. The section must shrink and grow with the data
       // rather than pad to a grid.
-      expect(phaseChangesFor(kPhases.first).length, 3);
+      // ⚠️ 2026-10-13: phases 1–15 have the user's phase docs, whose Child
+      // Snapshot is five fixed domains (the user: the doc is the source of
+      // truth), so they show five. The shrink-with-the-data rule still holds
+      // for phases 16–20, which have no doc yet. Was: phase 1 shows 3.
+      expect(phaseChangesFor(kPhases.first).length, 5);
       expect(phaseChangesLine(phaseChangesFor(kPhases.first), kPhases.first),
-          'Three things are changing at 0–4 weeks.');
+          'Five things are changing at 0–4 weeks.');
+      for (final p in kPhases.where((x) => x.number > 15)) {
+        expect(phaseChangesFor(p).length, p.milestones.map((m) => m.domain).toSet().length,
+            reason: 'phase ${p.number}: one card per domain with a milestone');
+      }
     });
 
     test('the sheet has a video for every card', () {

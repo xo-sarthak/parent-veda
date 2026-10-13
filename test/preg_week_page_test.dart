@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:parentveda/data/preg_week_extras.dart';
+import 'package:parentveda/data/preg_week_pages.dart';
 import 'package:parentveda/screens/preg_week_screen.dart';
 import 'package:parentveda/services/pregnancy_controller.dart';
 
@@ -50,11 +51,15 @@ void main() {
     });
   });
 
+  // A week WITHOUT a content doc keeps this older body. Was week 20 until
+  // week 20 got its doc (2026-10-13); week 30 has none yet. Doc weeks are
+  // held by test/preg_week_pages_test.dart.
   group('a week from 4 to 40 shows everything the week data holds', () {
-    testWidgets('week 20', (tester) async {
-      await pumpWeek(tester, 20);
-      expect(t('What happens in week 20'), findsOneWidget);
-      expect(t('Week 20 · Month 5 · Second trimester'), findsOneWidget);
+    testWidgets('week 30 (no content doc)', (tester) async {
+      expect(pregWeekPageFor(30), isNull, reason: 'pick another week once 30 has a doc');
+      await pumpWeek(tester, 30);
+      expect(t('What happens in week 30'), findsOneWidget);
+      expect(t('Week 30 · Month 7 · Third trimester'), findsOneWidget);
       expect(t('Your body this week'), findsOneWidget);
       expect(t('For you this week'), findsOneWidget);
       expect(t('DO THIS'), findsOneWidget);
@@ -65,7 +70,7 @@ void main() {
       expect(t('Asked this week'), findsOneWidget);
       expect(t('Where this comes from'), findsOneWidget);
       // Every symptom of the week is drawn.
-      final w = pregnancy.weekData(20)!;
+      final w = pregnancy.weekData(30)!;
       for (final s in w.mom.commonSymptoms) {
         expect(t(s.en.trim()), findsOneWidget, reason: s.en);
       }
@@ -75,7 +80,12 @@ void main() {
       for (var w = 4; w <= 40; w++) {
         await pumpWeek(tester, w);
         expect(t('What happens in week $w'), findsOneWidget, reason: 'week $w');
-        expect(t('CALL YOUR DOCTOR IF'), findsOneWidget, reason: 'week $w');
+        // A doc week has its own doctor lines; the older body has this card.
+        if (pregWeekPageFor(w) == null) {
+          expect(t('CALL YOUR DOCTOR IF'), findsOneWidget, reason: 'week $w');
+        } else {
+          expect(t('A GENTLE REMINDER'), findsOneWidget, reason: 'week $w');
+        }
       }
     });
   });
