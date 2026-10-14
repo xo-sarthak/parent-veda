@@ -40,7 +40,7 @@ Output: `research/questions/` — see the README written there by each run.
 |---|---|---|---|
 | `google_ac` | Google autocomplete, `gl=in` | ~0.4s/call | stem → `<why/how/is it safe…> stem`, `stem a…z`, then depth-2 on the question-shaped hits. The long tail lives here. ~400 suggestions per stem. |
 | `ddg_ac` | DuckDuckGo autocomplete, `kl=in-en` | ~0.5s/call | second, independent search signal; 8 per query |
-| `reddit` | PRAW (OAuth) **or** public RSS | OAuth 100/min; RSS **1/min** | titles only. Anonymous feeds are one request per clock minute per IP (measured 2026-09-18), so the RSS path is a slow fallback. Put creds in `tools/question_miner/.env` (gitignored): `REDDIT_CLIENT_ID`, `REDDIT_CLIENT_SECRET`, `REDDIT_USER_AGENT`. |
+| `reddit` | PRAW (OAuth) **or** public RSS | OAuth 100/min; RSS **1/min** | titles only. Anonymous feeds are one request per clock minute per IP (measured 2026-09-18), so the RSS path is a slow fallback — and a costly one: 2.5 hours of it earned this home IP a Reddit network-security block that also stopped app creation on the site. **Get the OAuth app first**, on a different network if the block is in place. Creds in `tools/question_miner/.env` (gitignored): `REDDIT_CLIENT_ID`, `REDDIT_CLIENT_SECRET`, `REDDIT_USER_AGENT`, plus `REDDIT_USERNAME` / `REDDIT_PASSWORD` for a script-type app. |
 | `babychakra` | sitemap.xml slugs | 1 call | `/community/question(s)/…` — the slug is the question; a few slugs are Devanagari as code points and are decoded |
 | `parentune` | `talks_all.xml` + `hi_talks.xml` slugs | 2 calls | 4,700 parent-talk titles, a lot of them Hinglish |
 | `mylo` | `questions-sitemap.xml` slugs | 1 call | 169 Hindi/Hinglish questions |

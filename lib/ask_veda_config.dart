@@ -20,7 +20,19 @@ class AskVedaConfig {
   /// That tunnels the phone's localhost:8000 to this PC over the cable, so no
   /// Wi-Fi, no LAN IP and no firewall rules are involved.
   /// (Wi-Fi alternative, if you ever want it: this PC's IP, e.g. http://192.168.1.6:8000)
-  static const String baseUrl = 'http://127.0.0.1:8000';
+  ///
+  /// 2026-10-08: a build can point somewhere else without editing this file:
+  ///   flutter build apk --dart-define=ASK_VEDA_URL=https://askveda.onrender.com
+  /// The deployed service is chosen at BUILD time, not at runtime, because the
+  /// URL is baked into a const. The trade-off: no app-side switch to flip if
+  /// the host moves (a new build is needed), in exchange for no settings screen
+  /// and nothing a user could point at a stranger's server. A plain `flutter
+  /// run` still gets localhost, so the USB dev setup above is unchanged.
+  /// Was: static const String baseUrl = 'http://127.0.0.1:8000';
+  static const String baseUrl = String.fromEnvironment(
+    'ASK_VEDA_URL',
+    defaultValue: 'http://127.0.0.1:8000',
+  );
 
   /// Master switch. If false, the app never calls the backend and simply uses
   /// the offline Ask Veda engine (so nothing can break).

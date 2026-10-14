@@ -12,6 +12,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import '../../ask_veda_config.dart';
+import '../profile_analytics.dart';
 
 /// One pointer card in a section — enough to display AND deep-link it.
 class VedaFeedItem {
@@ -148,6 +149,14 @@ class AskVedaService {
     if (!AskVedaConfig.enabled) return null;
     final q = question.trim();
     if (q.isEmpty) return null;
+    // Who is asking (2026-10-08). No screen passes a key, so every phone used
+    // to arrive as the service's shared fallback 'dev-user', and the 20 a day
+    // limit was 20 a day for EVERYONE together. The persisted install id is
+    // random, names no one, and is already what analytics counts per mother.
+    // Spoofable, yes: a determined caller can change it. The global spend cap
+    // on the service is the backstop for that, not this.
+    final installId = ProfileAnalytics.instance.installId;
+    final key = userKey ?? (installId == 'pending' ? null : 'install:$installId');
 
     try {
       final res = await http
@@ -155,7 +164,7 @@ class AskVedaService {
             Uri.parse('${AskVedaConfig.baseUrl}/ask'),
             headers: <String, String>{
               'Content-Type': 'application/json',
-              if (userKey != null) 'X-User-Key': userKey,
+              if (key != null) 'X-User-Key': key,
             },
             body: jsonEncode(<String, dynamic>{
               'question': q,
