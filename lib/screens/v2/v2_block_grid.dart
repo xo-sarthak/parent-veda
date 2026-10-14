@@ -30,6 +30,7 @@ import 'v2_block_art.dart';
 import 'v3_bracket_art.dart';
 import 'v3_skill_art.dart';
 import 'v2_palette.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 @immutable
 class V2Block {
@@ -163,7 +164,8 @@ class _Tile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
+    // The press settle (STILL-OPEN §63.8, 2026-10-14). Kept for revert: no PvPress.
+    return PvPress(child: Semantics(
       button: true,
       label: block.meta == null
           ? block.label
@@ -280,7 +282,7 @@ class _Tile extends StatelessWidget {
           ],
         ),
       ),
-    );
+    ));
   }
 
   Widget _icon() => Center(

@@ -437,6 +437,12 @@ class _TtcHomeV3State extends State<TtcHomeV3>
                   onCalendar: () => _openSurface(context, 'ttc_calendar'),
                   onProfile: () => openTtcProfile(context),
                   onMessages: () => _openSurface(context, 'ttc_messages'),
+                  // Talk to someone, from the header (2026-10-14): the consults,
+                  // as "See all consults" under Talk to experts.
+                  onTalk: () => Navigator.of(context).push(MaterialPageRoute<void>(
+                      settings: const RouteSettings(name: 'ttc/consults'),
+                      builder: (_) =>
+                          const TtcPrepareScreen(onlyCategory: 'consults'))),
                   unread: TtcMessagesStore.instance.unreadCount,
                 ),
                 _Sheet(p: p, children: [
@@ -1399,6 +1405,7 @@ class _CycleHeader extends StatelessWidget {
     required this.onCalendar,
     required this.onProfile,
     required this.onMessages,
+    required this.onTalk,
     required this.unread,
   });
 
@@ -1410,6 +1417,7 @@ class _CycleHeader extends StatelessWidget {
   /// number). Added 2026-09-26: the app now speaks first, and the envelope is
   /// where what it said waits.
   final VoidCallback onMessages;
+  final VoidCallback onTalk;
   final int unread;
 
   /// The day the whole page is describing. Owned by the screen, not by the
@@ -1482,7 +1490,8 @@ class _CycleHeader extends StatelessWidget {
               child: Align(
                 alignment: Alignment.centerLeft,
                 // Her photo when she has one (2026-09-30).
-                child: ListenableBuilder(
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                ListenableBuilder(
                   listenable: ProfilePhotoStore.instance..load(),
                   builder: (context, _) => _RoundButton(
                       icon: Icons.person_outline_rounded,
@@ -1491,6 +1500,16 @@ class _CycleHeader extends StatelessWidget {
                       semantic: t.profileTitle,
                       photoPath: ProfilePhotoStore.instance.path),
                 ),
+                // // TALK TO SOMEONE, FROM THE HEADER (2026-10-14, STILL-OPEN §83.14). On the
+                // left beside the avatar: the right already holds two buttons, and a third
+                // there overflowed a 360pt phone. Mobbin: a plain line chat mark in the
+                // app's header weight, never a coloured support badge.
+                _RoundButton(
+                    icon: Icons.forum_outlined,
+                    p: p,
+                    onTap: onTalk,
+                    semantic: 'Talk to someone'),
+                ]),
               ),
             ),
             // ⚠️ THE SELECTED DAY, NOT `now`. It read `DateTime.now()`, which

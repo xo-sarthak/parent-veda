@@ -121,7 +121,8 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
             const SizedBox(height: 12),
             _domainRow(),
             const SizedBox(height: 26),
-            pregToolPad(ppCareHeading('Coming soon')),
+            // Was 'Coming soon', which reads as a placeholder (2026-10-14).
+            pregToolPad(ppCareHeading('Up next')),
             const SizedBox(height: 6),
             lead('A soft look ahead: you may begin noticing these in the months to come. Never a deadline.'),
             const SizedBox(height: 12),
@@ -268,7 +269,8 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
                 ppToolPad(Row(children: [
                   const Icon(Icons.wb_twilight_rounded, size: 17, color: ppPurple),
                   const SizedBox(width: 8),
-                  Expanded(child: Text('Coming soon', style: ppJakarta(17))),
+                  // Was 'Coming soon' (2026-10-14).
+                  Expanded(child: Text('Up next', style: ppJakarta(17))),
                 ])),
                 const SizedBox(height: 6),
                 ppToolPad(Text('A soft look ahead — you may begin noticing these in the months to come. Never a deadline.', style: ppBody(13))),

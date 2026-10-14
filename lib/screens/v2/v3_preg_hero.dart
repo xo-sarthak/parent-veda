@@ -167,6 +167,7 @@ class V3PregHero extends StatefulWidget {
     this.onAvatar,
     this.onSaved,
     this.onCalendar,
+    this.onTalk,
     this.onMessages,
     this.unreadMessages = 0,
     this.timeLeft,
@@ -202,6 +203,9 @@ class V3PregHero extends StatefulWidget {
   /// "the most appropriate position is ... the top right"). It lost its tab
   /// on 2026-09-29 and was left with no entrance on the home.
   final VoidCallback? onCalendar;
+
+  /// Opens the experts list; null hides the mark.
+  final VoidCallback? onTalk;
 
   /// The Messages inbox, top right beside Saved (2026-09-30: the inbox was on More
   /// only, so a mother had to know it existed). Null draws no envelope.
@@ -263,13 +267,15 @@ class _V3PregHeroState extends State<V3PregHero> {
           // width (the wider of the two), and the date scales down before it would
           // overflow at a large text size. Kept for revert: the Row of two Spacers.
           Builder(builder: (context) {
-            final side = widget.onMessages != null ? 84.0 : 38.0;
+            // Kept for revert: widget.onMessages != null ? 84.0 : 38.0
+            final side = (widget.onMessages != null || widget.onTalk != null) ? 84.0 : 38.0;
             return Row(children: [
               SizedBox(
                 width: side,
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: _Round(
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  _Round(
                     p: p,
                     boxKey: _avatarKey,
                     semantic: 'You',
@@ -279,6 +285,20 @@ class _V3PregHeroState extends State<V3PregHero> {
                         : Text(widget.initial.toUpperCase(),
                             style: pvJakarta(fontSize: 14, fontWeight: FontWeight.w700, color: p.ink1)),
                   ),
+                  // TALK TO SOMEONE, FROM THE HEADER (2026-10-14, STILL-OPEN §83.14). On the
+                  // left beside the avatar: the right already holds two buttons, and a third
+                  // there overflowed a 360pt phone. Mobbin: a plain line chat mark in the
+                  // app's header weight, never a coloured support badge.
+                  if (widget.onTalk != null) ...[
+                    const SizedBox(width: 8),
+                    _Round(
+                      p: p,
+                      semantic: 'Talk to someone',
+                      onTap: widget.onTalk!,
+                      child: Icon(Icons.forum_outlined, size: 17, color: p.ink2),
+                    ),
+                  ],
+                  ]),
                 ),
               ),
               Expanded(

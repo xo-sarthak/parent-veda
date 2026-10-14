@@ -38,6 +38,7 @@ import 'symptoms/door/symptoms_today_body.dart' show openSymptomRead;
 import '../models/week_content.dart';
 import '../services/preg_size_set_store.dart';
 import '../services/pregnancy_controller.dart';
+import '../services/father_preview.dart';
 import '../theme/pv_fonts.dart';
 import 'v2/v2_palette.dart';
 import 'v2/v3_preg_hero.dart' show PregField, pregBabyArt;
@@ -301,6 +302,8 @@ class _WeekBody extends StatelessWidget {
     final truth = plan.mythBuster.truth.en.trim();
     final redFlags = plan.redFlags.en.trim();
     final partner = content.partner.whatYouCanDo.en.trim();
+    // HIS SIDE (2026-10-14): her body and her to-dos stay hers; his part leads.
+    final him = FatherPreview.instance.on;
     final symptoms = [
       for (final sym in content.mom.commonSymptoms)
         if (sym.en.trim().isNotEmpty) sym.en.trim(),
@@ -415,8 +418,16 @@ class _WeekBody extends StatelessWidget {
           _Note(p: p, label: 'DID YOU KNOW', text: fact),
         ],
 
+        // ---- his part (his side only) ------------------------------------------
+        if (him && partner.isNotEmpty) ...[
+          const SizedBox(height: 22),
+          h('Your part this week'),
+          const SizedBox(height: 6),
+          body(partner),
+        ],
+
         // ---- her body this week ----------------------------------------------
-        if (symptoms.isNotEmpty) ...[
+        if (symptoms.isNotEmpty && !him) ...[
           const SizedBox(height: 22),
           h('Your body this week'),
           const SizedBox(height: 8),
@@ -435,7 +446,7 @@ class _WeekBody extends StatelessWidget {
               },
             ),
         ],
-        if (forYou.isNotEmpty) ...[
+        if (forYou.isNotEmpty && !him) ...[
           const SizedBox(height: 18),
           h('For you this week'),
           const SizedBox(height: 6),
@@ -443,7 +454,7 @@ class _WeekBody extends StatelessWidget {
         ],
 
         // ---- do this, skip this ------------------------------------------------
-        if (doThis.isNotEmpty || skipThis.isNotEmpty) ...[
+        if ((doThis.isNotEmpty || skipThis.isNotEmpty) && !him) ...[
           const SizedBox(height: 18),
           h('This week'),
           const SizedBox(height: 8),
@@ -475,8 +486,8 @@ class _WeekBody extends StatelessWidget {
           _Urgent(p: p, text: redFlags),
         ],
 
-        // ---- for your partner --------------------------------------------------
-        if (partner.isNotEmpty) ...[
+        // ---- for your partner (her side; his leads the page) -------------------
+        if (partner.isNotEmpty && !him) ...[
           const SizedBox(height: 22),
           h('For your partner'),
           const SizedBox(height: 6),

@@ -303,6 +303,8 @@ class _PpHomeV3State extends State<PpHomeV3> {
                   //     settings: const RouteSettings(name: 'pp/profile'),
                   //     builder: (_) => const FamilyProfileScreen())),
                   onProfile: () => openPvYou(context, stage: LifeStage.parenting),
+                  // Talk to someone, from the header (2026-10-14).
+                  onTalk: () => _openSurface(context, 'pp_experts'),
                 ),
                 _Sheet(p: p, children: [
                 const SizedBox(height: 22),
@@ -1583,7 +1585,8 @@ class _Hero extends StatelessWidget {
       required this.p,
       required this.onSpine,
       required this.onSaved,
-      required this.onProfile});
+      required this.onProfile,
+      required this.onTalk});
 
   final AgePhase phase;
   final ChildProfileStore child;
@@ -1591,6 +1594,7 @@ class _Hero extends StatelessWidget {
   final VoidCallback onSpine;
   final VoidCallback onSaved;
   final VoidCallback onProfile;
+  final VoidCallback onTalk;
 
   @override
   Widget build(BuildContext context) {
@@ -1633,6 +1637,7 @@ class _Hero extends StatelessWidget {
                     onSaved: onSaved,
                     onProfile: onProfile,
                     avatarOpensProfile: true,
+                    onTalk: onTalk,
                   ),
                 ),
                 const Spacer(),

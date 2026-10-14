@@ -149,7 +149,12 @@ class V3HeroChrome extends StatefulWidget {
     required this.onProfile,
     this.initial = '',
     this.avatarOpensProfile = false,
+    this.onTalk,
   });
+
+  /// Talk to someone (2026-10-14, STILL-OPEN §83.14): opens the experts
+  /// list. Null hides it, like Saved.
+  final VoidCallback? onTalk;
 
   /// True: the avatar opens [onProfile] (her Profile and Settings), as the
   /// pregnancy and TTC avatars do; the stage switch is in Settings > Developer.
@@ -206,6 +211,15 @@ class _V3HeroChromeState extends State<V3HeroChrome> {
         );
 
     return Row(mainAxisSize: MainAxisSize.min, children: [
+      if (widget.onTalk != null) ...[
+        Semantics(
+          button: true,
+          label: 'Talk to someone',
+          child: button(Icon(Icons.forum_outlined, size: 18, color: fg),
+              widget.onTalk!),
+        ),
+        const SizedBox(width: 8),
+      ],
       if (onSaved != null) ...[
         button(Icon(Icons.bookmark_border_rounded, size: 19, color: fg),
             onSaved),

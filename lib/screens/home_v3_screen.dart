@@ -483,6 +483,11 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
                 onDetails: () => openPregWeek(context, pregnancy, _pageWeek(week)),
                 // The envelope, top right (2026-09-30).
                 onMessages: () => openPregMessages(context, pregnancy),
+                // Talk to someone, from the header (2026-10-14): all consults.
+                onTalk: () => Navigator.of(context).push(MaterialPageRoute<void>(
+                  settings: const RouteSettings(name: 'consults'),
+                  builder: (_) => ConsultationsScreen(lang: pregnancy.language),
+                )),
                 unreadMessages: PregMessagesStore.instance.unreadCount,
                 // "20 weeks to go" with an (i), and past the due date the
                 // count keeps going (2026-09-30, gap analysis). Counted for the

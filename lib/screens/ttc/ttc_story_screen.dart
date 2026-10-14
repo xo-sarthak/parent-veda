@@ -48,6 +48,7 @@ import '../../ttc/ttc_focus_data.dart';
 import '../../ttc/ttc_expert_signoff.dart' show ttcStoryReviewer;
 import 'ttc_illustrations.dart';
 import 'ttc_story_skin.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class TtcStoryScreen extends StatefulWidget {
   const TtcStoryScreen({
@@ -506,7 +507,8 @@ class _Chevron extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => Padding(
+  // The press settle (STILL-OPEN §63.8, 2026-10-14). Kept for revert: no PvPress.
+  Widget build(BuildContext context) => PvPress(child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8),
         child: Material(
           // White always — the chevrons sit across a band boundary on most
@@ -525,7 +527,7 @@ class _Chevron extends StatelessWidget {
                 child: Icon(icon, size: 24, color: TtcStoryPalette.ink)),
           ),
         ),
-      );
+      ));
 }
 
 /// The pill on a story's first slide: "REVIEWED BY · Dr Name, role" for a

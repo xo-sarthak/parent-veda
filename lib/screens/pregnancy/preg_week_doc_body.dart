@@ -69,6 +69,27 @@ class _PregWeekDocBodyState extends State<PregWeekDocBody> {
     final plan = widget.content?.actionPlan;
     final myth = plan?.mythBuster.myth.en.trim() ?? '';
     final truth = plan?.mythBuster.truth.en.trim() ?? '';
+    // HIS SIDE (2026-10-14): her page with less on it, as his home. Her body,
+    // symptoms and diet stay hers; the partner part leads, spoken to him.
+    final him = FatherPreview.instance.on;
+    final hisPart = <Widget>[
+      const SizedBox(height: 22),
+      _h('Your part this week', key: _partner),
+      const SizedBox(height: 10),
+      _Note(p: p, label: 'A NOTE FROM YOUR BABY', text: page.partnerNote),
+      const SizedBox(height: 14),
+      _sub('How she is doing'),
+      const SizedBox(height: 4),
+      _body(page.partnerHowMom),
+      const SizedBox(height: 14),
+      _sub('Scans and appointments coming up'),
+      const SizedBox(height: 6),
+      for (final s in page.partnerScans) _Bullet(p: p, text: s),
+      const SizedBox(height: 10),
+      _sub('How you can help'),
+      const SizedBox(height: 6),
+      for (final s in page.partnerHelp) _Bullet(p: p, text: s),
+    ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -100,12 +121,16 @@ class _PregWeekDocBodyState extends State<PregWeekDocBody> {
         // ---- jump links ---------------------------------------------------------
         const SizedBox(height: 14),
         _JumpLinks(p: p, links: [
+          if (him) ('Your part', () => _jump(_partner)),
           ('Baby', () => _jump(_baby)),
-          ('You', () => _jump(_you)),
-          ('Symptoms', () => _jump(_symptoms)),
-          ('Diet', () => _jump(_diet)),
-          ('Partner', () => _jump(_partner)),
+          if (!him) ...[
+            ('You', () => _jump(_you)),
+            ('Symptoms', () => _jump(_symptoms)),
+            ('Diet', () => _jump(_diet)),
+            ('Partner', () => _jump(_partner)),
+          ],
         ]),
+        if (him) ...hisPart,
 
         // ---- about your baby ----------------------------------------------------
         const SizedBox(height: 22),
@@ -147,6 +172,8 @@ class _PregWeekDocBodyState extends State<PregWeekDocBody> {
         Text(kPregWeekScienceFooter, style: pvManrope(fontSize: 12, height: 1.45, color: p.ink3)),
 
         // ---- you this week ------------------------------------------------------
+        // Her sections, through to sharing with her partner: not on his side.
+        if (!him) ...[
         const SizedBox(height: 24),
         _h('You this week', key: _you),
         for (final y in page.you) ...[
@@ -249,6 +276,7 @@ class _PregWeekDocBodyState extends State<PregWeekDocBody> {
                 style: pvManrope(fontSize: 13, fontWeight: FontWeight.w700, color: kPvInk)),
           ),
         ),
+        ],
 
         // ---- kept from the older page -------------------------------------------
         if (extra != null && extra.asked.isNotEmpty) ...[

@@ -109,4 +109,35 @@ void main() {
     expect(more, contains("if (!FatherPreview.instance.on)\n              _row('preg_more_calendar'"));
     expect(more, contains("'preg_more_partner_guide'"));
   });
+
+  test('his week page: her sections hidden, his part leads (2026-10-14)', () {
+    final doc = _code('lib/screens/pregnancy/preg_week_doc_body.dart');
+    expect(doc, contains('final him = FatherPreview.instance.on;'));
+    expect(doc, contains("if (him) ...hisPart,"));
+    expect(doc, contains("_h('Your part this week', key: _partner)"));
+    expect(doc, contains('if (!him) ...[\n        const SizedBox(height: 24),\n        _h(\'You this week\''));
+    final old = _code('lib/screens/preg_week_screen.dart');
+    expect(old, contains("if (symptoms.isNotEmpty && !him) ...["));
+    expect(old, contains("if (him && partner.isNotEmpty) ...["));
+    expect(old, contains("if (partner.isNotEmpty && !him) ...["));
+  });
+
+  test('Talk to someone sits in all three home headers (2026-10-14)', () {
+    expect(_code('lib/screens/v2/v3_preg_hero.dart'),
+        contains("semantic: 'Talk to someone'"));
+    expect(_code('lib/screens/home_v3_screen.dart'), contains('onTalk: () =>'));
+    final ttc = _code('lib/screens/ttc/ttc_home_v3.dart');
+    expect(ttc, contains('onTalk: () =>'));
+    expect(ttc, contains('onTap: onTalk,'));
+    expect(_code('lib/screens/v2/v3_hero_chrome.dart'),
+        contains("label: 'Talk to someone'"));
+    expect(_code('lib/screens/post_pregnancy/pp_home_v3.dart'),
+        contains("onTalk: () => _openSurface(context, 'pp_experts')"));
+  });
+
+  test('Milestones looks ahead under "Up next", never "Coming soon"', () {
+    final s = _code('lib/screens/post_pregnancy/milestone_journey_screen.dart');
+    expect(s, isNot(contains("'Coming soon'")));
+    expect(s, contains("'Up next'"));
+  });
 }

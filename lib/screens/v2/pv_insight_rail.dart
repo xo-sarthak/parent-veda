@@ -21,6 +21,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 import '../../theme/pv_fonts.dart';
 import 'v2_palette.dart';
@@ -135,7 +136,8 @@ class PvInsightTile extends StatelessWidget {
         .withLightness(0.34)
         .toColor();
 
-    return Semantics(
+    // The press settle (STILL-OPEN §63.8, 2026-10-14). Kept for revert: no PvPress.
+    return PvPress(child: Semantics(
       button: true,
       label: '$eyebrow: $value',
       child: InkWell(
@@ -249,7 +251,7 @@ class PvInsightTile extends StatelessWidget {
           ]),
         ),
       ),
-    );
+    ));
   }
 
   /// The size follows the length: the same slot holds "8" and "Cut back on
