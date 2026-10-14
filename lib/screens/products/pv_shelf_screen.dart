@@ -18,6 +18,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../data/products/pv_sheet_products.dart' show pvShortlistFirst;
 import '../../models/pv_product.dart';
 import '../../services/cart_store.dart';
 import '../../services/pv_catalog_store.dart';
@@ -104,6 +105,10 @@ class _PvShelfScreenState extends State<PvShelfScreen> {
     switch (_sort) {
       case PvSort.recommended:
         list.sort((a, b) {
+          // The team's shortlist leads, by its score (2026-10-13, the user:
+          // "sheets lead, old kept below"); the rest keep their order.
+          final s = pvShortlistFirst(a, b);
+          if (s != 0 || a.shortlist) return s;
           final ra = a.reco?.band.rank ?? 9;
           final rb = b.reco?.band.rank ?? 9;
           if (ra != rb) return ra.compareTo(rb);

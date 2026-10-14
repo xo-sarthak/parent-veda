@@ -46,6 +46,8 @@ import '../ttc/ttc_common.dart' show TtcBottomNav;
 import '../auth/onboarding/onboarding_chrome.dart' show ObPress;
 import '../v2/v2_palette.dart';
 import 'pv_product_screen.dart';
+import 'pv_shortlist_block.dart' show pvShortlistScoreLine;
+import '../brackets/hub/hub_intent_art.dart' show HubIntentArt, IntentMark;
 
 /// Which shell is underneath the store's tab-root screens.
 enum PvStoreChrome {
@@ -1152,6 +1154,16 @@ class PvProductCard extends StatelessWidget {
               count: product.reviewCount,
               size: 12,
             ),
+            // The team's score on its shortlist (2026-10-13, the user: scores
+            // are "essential to make judgment").
+            if (pvShortlistScoreLine(product).isNotEmpty)
+              Text(
+                pvShortlistScoreLine(product),
+                key: ValueKey('pv_score_${product.id}'),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: pvManrope(fontSize: 11.5, fontWeight: FontWeight.w700, color: p.ink1),
+              ),
             const SizedBox(height: 3),
             if (!product.reviewOnly) PvPriceLine(product: product, size: 14.5),
             if (compare) ...[
@@ -1418,6 +1430,24 @@ class _PvRetryImageState extends State<PvRetryImage> {
       );
 }
 
+/// The drawn mark for each of the team's sheet categories (2026-10-13), by
+/// what the category holds. A sheet category missing here falls back to the
+/// glyph, and `pv_sheet_products_test.dart` fails the build if one does.
+const Map<String, IntentMark> kPvSheetCategoryMarks = {
+  'pvs_sleep_and_posture': IntentMark.sleepMark,
+  'pvs_skincare_and_hygiene': IntentMark.skinMark,
+  'pvs_memory_keeping': IntentMark.pageMark,
+  'pvs_master_library': IntentMark.bookMark,
+  'pvs_apparel_and_wardrobe': IntentMark.bagMark,
+  'pvs_father_s_corner': IntentMark.cuppedHands,
+  'pvs_maternal_recovery': IntentMark.lotusMark,
+  'pvs_lactation_support': IntentMark.feedMark,
+  'pvs_sleep_and_bedding': IntentMark.moonMark,
+  'pvs_clothing_and_apparel': IntentMark.bodyMark,
+  'pvs_health_and_climate': IntentMark.thermoMark,
+  'pvs_mobility_and_soothing': IntentMark.seatMark,
+};
+
 class PvCategoryTile extends StatelessWidget {
   const PvCategoryTile({
     super.key,
@@ -1467,7 +1497,14 @@ class PvCategoryTile extends StatelessWidget {
         color: tint,
         borderRadius: BorderRadius.circular(18),
       ),
-      child: Icon(iconFor(category.id), size: 28, color: ink),
+      // The team's sheet categories (2026-10-13) draw the app's marks, never a
+      // Material glyph (the user: "use the latest ones that we are using").
+      // Kept for the others, unchanged: Icon(iconFor(category.id)…).
+      child: kPvSheetCategoryMarks.containsKey(category.id)
+          ? Padding(
+              padding: const EdgeInsets.all(8),
+              child: HubIntentArt(mark: kPvSheetCategoryMarks[category.id]!, tint: tint))
+          : Icon(iconFor(category.id), size: 28, color: ink),
     );
     final url = pvCategoryImageFor(category.id);
     final tile = url == null

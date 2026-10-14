@@ -283,6 +283,11 @@ class PvProduct {
     this.hue = 268,
     this.relatedIds = const [],
     this.compare = const {},
+    this.shortlist = false,
+    this.score,
+    this.confidence,
+    this.scoreParts = const [],
+    this.skills = const [],
   });
 
   /// Unique across the whole catalogue. Source ids are kept where they were
@@ -356,6 +361,31 @@ class PvProduct {
 
   /// Category-specific compare facts — the rows the compare table draws.
   final Map<String, String> compare;
+
+  // ---- the team's shortlist (2026-10-13, the Drive "Products" sheets) -------
+  //
+  // ⚠️ ADDITIVE, AND OFF FOR EVERY PRODUCT THAT WAS HERE BEFORE. The sheets
+  // name real products with no price, link or photo; the user's call: show
+  // them as ParentVeda's shortlist, leading their shelf, with "Price varies"
+  // and no buy button until those arrive (`lib/data/products/pv_sheet_products.dart`).
+
+  /// On the team's shortlist. Leads its shelf; the buy bar says the price and
+  /// where to buy are being added instead of offering a dead button.
+  final bool shortlist;
+
+  /// The team's ParentVeda score, 0–100 (the toy sheets). Shown, and ranks the
+  /// shelf (the user: "they are essential to make judgment").
+  final int? score;
+
+  /// The team's confidence in the pick, 1–5.
+  final int? confidence;
+
+  /// The score's parts where the team scored them part by part: development
+  /// value, safety, build quality, longevity, each out of 10.
+  final List<(String, int)> scoreParts;
+
+  /// What a toy builds ("Problem solving", "Fine motor"), from the sheet.
+  final List<String> skills;
 
   // ---- derived -------------------------------------------------------------
 

@@ -80,6 +80,47 @@ final Map<String, String> _byCategory = {
   'on_the_move': _c(
     'thumb/0/04/Dzieci_w_fotelikach_samochodowych.JPG/500px-Dzieci_w_fotelikach_samochodowych.JPG',
   ),
+  // ---- the team's product sheets (2026-10-13) ----
+  // Picked by eye from Commons contact sheets, the object itself and no
+  // people. Each differs from the store's own tile beside it: a birthing ball
+  // (the pillow already has Pregnancy Pillow), a feeding pillow (the pump has
+  // Breast Pump).
+  'pvs_sleep_and_posture': _c(
+    'thumb/e/ed/Dirty_exercise_ball.jpg/500px-Dirty_exercise_ball.jpg',
+  ),
+  'pvs_skincare_and_hygiene': _c(
+    'thumb/6/6e/Moisturizing_cream.jpg/500px-Moisturizing_cream.jpg',
+  ),
+  'pvs_memory_keeping': _c(
+    'thumb/b/bf/Excerpt_from_the_diary_and_notebook_of_Cicely_Williams_Wellcome_L0072309.jpg/500px-Excerpt_from_the_diary_and_notebook_of_Cicely_Williams_Wellcome_L0072309.jpg',
+  ),
+  'pvs_master_library': _c(
+    'thumb/c/ca/Old_Books_01.JPG/500px-Old_Books_01.JPG',
+  ),
+  'pvs_apparel_and_wardrobe': _c(
+    'thumb/a/a7/2008_Taipei_In_Style_Outdoor_Fashion_Show_Clothes_Racks.jpg/500px-2008_Taipei_In_Style_Outdoor_Fashion_Show_Clothes_Racks.jpg',
+  ),
+  'pvs_father_s_corner': _c(
+    'thumb/6/68/A_diaper_bag_inside.jpg/500px-A_diaper_bag_inside.jpg',
+  ),
+  'pvs_maternal_recovery': _c(
+    'thumb/e/e1/A_Sanitary_Towel_on_White_Background.jpg/500px-A_Sanitary_Towel_on_White_Background.jpg',
+  ),
+  'pvs_lactation_support': _c(
+    'thumb/a/a3/Breastfeeding_pillow.jpg/500px-Breastfeeding_pillow.jpg',
+  ),
+  'pvs_sleep_and_bedding': _c(
+    'thumb/f/f1/Baby_bed_2010.jpg/500px-Baby_bed_2010.jpg',
+  ),
+  'pvs_clothing_and_apparel': _c(
+    'thumb/9/9d/Menzis_bodysuit_for_newborns_%282019%29_01.jpg/500px-Menzis_bodysuit_for_newborns_%282019%29_01.jpg',
+  ),
+  'pvs_health_and_climate': _c(
+    'thumb/d/db/Air_Purifier_%28Levoit_LV-H133%29_%2849317867758%29.jpg/500px-Air_Purifier_%28Levoit_LV-H133%29_%2849317867758%29.jpg',
+  ),
+  'pvs_mobility_and_soothing': _c(
+    'thumb/f/f7/Bouncer_Bliss.jpg/500px-Bouncer_Bliss.jpg',
+  ),
 };
 
 /// The photo for a category, or null for one the map does not know (a

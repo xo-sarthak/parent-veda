@@ -10304,3 +10304,40 @@ month map.
   the docs for review.
 - **The "Written for" line sits in the first chunk only.** A long FAQ splits into two chunks; the second
   carries the facts without the month. Rule 10 and her stage note still frame the answer.
+- **Re-framing across months is model-dependent — RESOLVED 2026-10-13 by moving Ask Veda to gpt-oss-120b**
+  (it reframes "folic acid?" at week 28 and still declines "brown discharge?" at week 30). Original note: Checked 2026-10-13 on Groq's gpt-oss-20b
+  (Anthropic credit at $0, Railway on the free plan): at the FAQ's own stage the answer names her week; asked
+  from a later week, the small model still returns NO_ANSWER even when the facts settle it ("folic acid?" at
+  week 28), after rule 2 was given the exception. Correctly declined: "brown discharge?" at week 30 (early-
+  pregnancy facts only). Rerun both pairs on Haiku when credit is added.
+
+---
+
+## 89.0 Products sheets — the team's shortlist in the store, toys by score, kids' books by age — 2026-10-13
+
+**Built.** `tools/products/xlsx_to_dart.py` reads the Drive "Products" folder into
+`lib/data/products/sheet/{catalogue,toys}.dart` and `lib/data/kids_books/kids_books_list.dart` (GENERATED);
+`lib/data/products/pv_sheet_products.dart` adapts them into the one store.
+
+- **373 pregnancy / hospital-bag / nursery picks:** 12 new pregnancy categories plus 6 sheet shelves inside the
+  store's own categories (`kSheetSubIntoCategory`), where they lead (`pvShortlistFirst`). "Price varies", no buy
+  button (a fourth buy bar: "On ParentVeda's shortlist…"), the sheet's factors as "What the team looked for",
+  `weekFrom` = the buy-by week.
+- **281 toys** in Play & Development, ranked by score, score on card and page, part-scores where present.
+- **Master Library books** with a companion open the companion.
+- **285 children's books:** Reading (parenting) → "Books to read with your child", by age, goal chips.
+- 12 category photos picked by eye from Commons; a failed photo falls back to a drawn mark.
+
+**Decided (the user, 2026-10-13):** shortlist with no invented price; sheets lead, old products kept below; toy
+scores shown; kids' books on the Reading shelf; dopplers and herbal teas held.
+
+**Owed:**
+- **Prices, buy links and photos** for every sheet product. Product / content team.
+- **Held:** "Portable Fetal Dopplers" and "Herbal Anti-Nausea Teas" (20). Add the sub-category name to
+  `kSheetSubsSignedOff` after clinical review.
+- **Toy sheet clean-up:** PV-CRA-001..015 used twice (foil art and crayons); 83 toys "not yet verified"; some rows
+  look like product and brand are swapped; the Products Master has no ages (145 toys show for all ages).
+- **Kids' books:** the scoring sheets are empty; "Why Recommended" only repeats the theme (not shown).
+- **Ask Veda's product answers** read the Supabase `products` table, not this data; loading these products there
+  (migration 0083, §65.1) is what would let Ask Veda point to them.
+- **Category photos load from Wikimedia**, which throttles; the R2 mirror (§63.18) covers these too.

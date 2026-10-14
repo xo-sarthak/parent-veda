@@ -25,6 +25,7 @@ import 'pp_child_profile.dart';
 import 'pp_phases_data.dart' show ppFillChild;
 
 import 'pp_common.dart';
+import 'pp_kids_books_shelf.dart';
 import 'pp_reading_data.dart';
 import 'pp_section_extras.dart';
 import 'reading_collection_screen.dart';
@@ -285,6 +286,9 @@ class _ReadingHomeScreenState extends State<ReadingHomeScreen> {
       ],
       const SizedBox(height: 26),
       ..._collectionsShell(p, store),
+      // The team's children's book list, by her child's age (2026-10-13).
+      const SizedBox(height: 30),
+      PpKidsBooksShelf(p: p),
       const SizedBox(height: 30),
       pregToolPad(PvRowGroup(p: p, children: [
         PvListRow(

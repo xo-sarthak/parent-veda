@@ -56,6 +56,12 @@ import 'package:flutter/material.dart';
 // import 'package:url_launcher/url_launcher.dart'; // kept for revert: the buy link now goes through openOutbound
 
 import '../../data/products/pv_product_extras.dart' show kPvIllustrativePhotoIds;
+import '../../data/book_companions.dart' show bookReadItem;
+import '../../data/products/pv_sheet_products.dart' show sheetBookCompanionFor;
+import '../book_companion_screen.dart' show BookCompanionScreen;
+import '../ttc/doors/ttc_tab_art.dart' show TtcTabMark;
+import '../ttc/ttc_tool_marks.dart' show TtcMarkLeading;
+import 'pv_shortlist_block.dart';
 import '../../models/pv_product.dart';
 import '../../services/cart_store.dart';
 import '../../services/life_stage_store.dart';
@@ -320,6 +326,11 @@ class _PvProductScreenState extends State<PvProductScreen> {
     final p = pvStorePalette;
     final product = _product;
     if (product == null) return _gone(p);
+    // A shortlisted book that has a full ParentVeda companion opens the
+    // companion, not a thin product page (2026-10-13).
+    if (sheetBookCompanionFor(product) case final d?) {
+      return BookCompanionScreen(item: bookReadItem(d));
+    }
     final related = PvCatalogStore.instance.related(product);
     final similar = PvCatalogStore.instance
         .inCategory(product.categoryId)
@@ -336,6 +347,10 @@ class _PvProductScreenState extends State<PvProductScreen> {
               SliverToBoxAdapter(child: _gallery(p, product)),
               SliverToBoxAdapter(child: _title(p, product)),
               SliverToBoxAdapter(child: _price(p, product)),
+              // The team's shortlist (2026-10-13): its score, age, skills,
+              // buy-by week and what the team looked for — only the sheet's facts.
+              if (product.shortlist)
+                SliverToBoxAdapter(child: PvShortlistBlock(p: p, product: product)),
               if (product.variants.isNotEmpty)
                 SliverToBoxAdapter(child: _variants(p, product)),
               if (product.reco != null)
@@ -2071,6 +2086,23 @@ class _PvProductScreenState extends State<PvProductScreen> {
             child: Text(
               'Information only. India\'s IMS Act does not allow us to sell or link this — the honest facts above are why you came.',
               style: pvManrope(fontSize: 12, height: 1.4, color: p.ink2),
+            ),
+          ),
+        ],
+      );
+    } else if (product.shortlist && !product.soldHere && (product.buyUrl ?? '').isEmpty) {
+      // ⚠️ A FOURTH BAR, DECIDED BY THE DATA (2026-10-13). A shortlisted pick
+      // with no price or link yet: say so plainly instead of a button that
+      // goes nowhere (the affiliate branch below would open an empty URL).
+      body = Row(
+        key: const ValueKey('pv_shortlist_bar'),
+        children: [
+          TtcMarkLeading(tab: TtcTabMark.checklist, tint: p.ink2, size: 20),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              "On ParentVeda's shortlist. Price and where to buy are being added.",
+              style: pvManrope(fontSize: 12.5, height: 1.4, color: p.ink2),
             ),
           ),
         ],

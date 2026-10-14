@@ -133,9 +133,10 @@ ROWS = [
     # ---------------- Pregnancy FAQs ----------------
     ('Pregnancy FAQs', '326 FAQs as Ask Veda\'s knowledge (Months 1–8)',
      'An FAQ library for the Ask Veda assistant, with answer, why, what it means, doctor line and takeaways.',
-     PART, 'Built in both the app and Ask Veda. Ask Veda reads each FAQ as fact and writes the answer for the '
-     'mother\'s own week. It goes live once the knowledge is loaded into the database and the service is deployed.',
-     'Run the load and the deploy (commands handed over).', 'Engineering'),
+     PART, 'Built in the app and Ask Veda, and loaded into the database (13 Oct). Ask Veda reads each FAQ as fact and '
+     'writes the answer for the mother\'s own week; it now runs on a larger free model that does this reliably. '
+     'Answers go live when the Ask Veda server runs again (Railway is paused).',
+     'Restart the Ask Veda server.', 'Engineering'),
     ('Pregnancy FAQs', 'Each FAQ as a page',
      'Not asked by the docs; your decision.', DONE,
      'Ask Veda → an answer\'s "More information" card opens the FAQ as a full page, with its related questions below.',
@@ -157,7 +158,32 @@ ROWS = [
      '—', '—'),
 
     # ---------------- Not started ----------------
-    ('Not started', 'Products (5 spreadsheets)', 'Product catalogue data.', NA, 'Needs a comparison with the store first.', 'The go-ahead.', 'Product'),
+    # ---------------- Products ----------------
+    ('Products', '373 pregnancy, hospital-bag and nursery picks',
+     'Catalogue: 45 shelves of Budget and Premium picks, what to look for, and a week to buy by.', PART,
+     'Products → Pregnancy: 12 new categories, plus 6 shelves inside the store\'s own categories, where they lead. '
+     'Shown as ParentVeda\'s shortlist: "Price varies", no buy button, a plain cover (your decision). '
+     '"For you right now" offers each near its buy-by week.',
+     'Prices, buy links and photos per product.', 'Product / content team'),
+    ('Products', '281 toys, scored', 'Two toy sheets: score, age, skills, budget.', PART,
+     'Products → Parenting → Play & Development: ranked by score, the score on every card and page '
+     '(your decision), part-scores where the sheet has them.',
+     'Prices, links, photos; ages for the 145 toys from the Products Master, which has none.', 'Product / content team'),
+    ('Products', 'Toy sheet clean-up', 'Ids and verification in the toy sheets.', PART,
+     '30 rows reuse ids (PV-CRA-001..015 for both foil-art kits and crayons); 83 toys are marked not yet verified; '
+     'some rows look like product and brand are swapped. Shown as the sheet has them.',
+     'Renumber the ids; check the flagged rows.', 'Product team'),
+    ('Products', 'Fetal dopplers and herbal anti-nausea teas (20)', 'Two catalogue shelves.', NOT,
+     'Held for clinical review (your decision): home dopplers can falsely reassure; the app advises against '
+     'herbal mixes without a doctor.', 'A clinical decision on both shelves.', 'Ishaan / clinical reviewer'),
+    ('Products', 'Pregnancy books in the catalogue', 'Master Library books.', DONE,
+     'A book that has a ParentVeda companion opens the companion instead of a product page.', '—', '—'),
+    ('Products', '285 books to read with your child', 'Book Recommendations sheet: 291 rows.', DONE,
+     'Reading (parenting) → "Books to read with your child": by the child\'s age, goal chips, Essentials first. '
+     '14 rows with shifted columns were repaired; 6 duplicates merged.',
+     'Fill the empty scoring sheets if scores should show.', 'Content team'),
+    ('Products', 'New Product Categories sheet', 'A fifth sheet of toys.', NA,
+     'Every row is already in the 0–5 master, so it adds nothing.', '—', '—'),
     ('Not started', 'Recipes, Instagram scraping', 'Both folders are empty.', NA, '—', 'The files.', 'Content team'),
 
     # ---------------- Checks ----------------
@@ -211,6 +237,19 @@ DECISIONS = [
     ('13 Oct', 'FAQs', 'Where else should the FAQs show?', 'Ask Veda\'s suggested questions by her month, and each FAQ as a page.'),
     ('13 Oct', 'FAQs', 'What about FAQs marked for clinical review?', 'Hold them out until signed off (39 FAQs).'),
     ('13 Oct', 'FAQs', 'Who loads the FAQs into the live database?', 'You run it; commands handed over.'),
+    ('13 Oct', 'FAQs', '(You asked) What is the live load, and can git run first?',
+     'Export, import and embedding into Supabase; commit any time, push the Ask Veda repo only after the load.'),
+    ('13 Oct', 'FAQs', 'The small free model refused week-28 folic acid; Haiku has no credit. Switch Groq models?',
+     'Yes: gpt-oss-120b, same free-tier limits (1,000 requests a day, 8,000 tokens a minute).'),
+    ('13 Oct', 'Products', 'No price, link or photo in the sheets. How do products appear?',
+     'As ParentVeda\'s shortlist: brand, product, Budget/Premium tag, what to look for, "Price varies", no buy button.'),
+    ('13 Oct', 'Products', 'The store\'s made-up products where the sheets cover the same thing?',
+     'Sheets lead; the older products stay below. Nothing removed.'),
+    ('13 Oct', 'Products', 'Show the toy scores to parents?', 'Rank by them and show them: "essential to make judgment".'),
+    ('13 Oct', 'Products', 'Where do the 291 children\'s books go?', 'A parenting Reading shelf, by the child\'s age and goal.'),
+    ('13 Oct', 'Products', 'Fetal dopplers and herbal teas clash with the app\'s clinical advice. What then?',
+     'Hold both for clinical review.'),
+    ('13 Oct', 'All', '(Your rule) Keep the tracker document maintained for review.', 'Updated after every job.'),
 ]
 
 
@@ -230,15 +269,16 @@ def pdf():
                         f'and what is needed to finish. Updated {DATE}.', lead))
     st.append(Spacer(1, 8))
 
-    folders = ['Pregnancy week-wise', 'My Child phase-wise', 'Garbh Sanskar', 'Book summaries', 'Pregnancy FAQs', 'Not started', 'Checks']
+    folders = ['Pregnancy week-wise', 'My Child phase-wise', 'Garbh Sanskar', 'Book summaries', 'Pregnancy FAQs', 'Products', 'Not started', 'Checks']
     summary = [[Paragraph(x, head) for x in ('Folder', 'Done', 'Partly', 'Not done / not started', 'In one line')]]
     lines = {
         'Pregnancy week-wise': '18 of the docs are live on the week page. Week 19 and weeks 1–4, 24–40 are owed.',
         'My Child phase-wise': 'All 15 docs are live on the parenting home. Phases 16–20 are owed.',
         'Garbh Sanskar': 'Daily lines, stories and prayers are live. Ragas wait for audio.',
         'Book summaries': '40 of 41 companions are live on both shelves. One is missing from its file; Part 1 of Volume Four is owed.',
-        'Pregnancy FAQs': '326 of 365 built into Ask Veda and the app; live after the database load. 39 wait for clinical sign-off.',
-        'Not started': 'Products is next. Recipes and Instagram are empty.',
+        'Pregnancy FAQs': '326 of 365 loaded into Ask Veda; live when its server runs again. 39 wait for clinical sign-off.',
+        'Products': '654 products and 285 kids\' books in the app, as the team\'s shortlist. Prices, links and photos owed; 20 held.',
+        'Not started': 'Recipes and Instagram folders are empty.',
         'Checks': 'Tone done. Plagiarism check not run yet.',
     }
     for f in folders:

@@ -34,6 +34,7 @@ import '../../services/life_stage_store.dart';
 import '../../ttc/ttc_products_data.dart' as ttc;
 import '../product_data.dart' as preg_data;
 import 'pv_product_extras.dart';
+import 'pv_sheet_products.dart';
 
 // ---- categories -------------------------------------------------------------
 
@@ -117,7 +118,13 @@ List<PvCategory> buildPvCategories() => [
           guidance: _g(c),
           fromWeek: c.fromWeek,
           toWeek: c.toWeek,
+          // The team's sheet adds its own sub-category where it covers this
+          // one (2026-10-13); the older products sit under "All".
+          subs: sheetSubsInto(c.id),
+          subGuidance: sheetGuidanceInto(c.id),
         ),
+      // The team's own pregnancy, hospital-bag and nursery categories.
+      ...sheetCategories(),
       // Parenting — six categories with subcategories, guidance per sub.
       for (final c in pp.kPpCategories)
         PvCategory(
@@ -126,7 +133,9 @@ List<PvCategory> buildPvCategories() => [
           name: c.name,
           hue: _ppHue[c.name] ?? _huePlay,
           subs: [
-            for (final s in c.subs) PvSub(pvSlug(s.name), s.name, short: s.short)
+            for (final s in c.subs) PvSub(pvSlug(s.name), s.name, short: s.short),
+            // The team's toy sheets, by their own toy categories (2026-10-13).
+            if (pvSlug(c.name) == kSheetToyCategoryId) ...sheetToySubs(),
           ],
           subGuidance: {
             for (final s in c.subs)
@@ -430,6 +439,8 @@ List<PvProduct> buildPvCatalog() => [
       for (final p in ttc.ttcProducts) _enrich(_fromTtc(p)),
       for (final p in preg_data.kProducts) _enrich(_fromPreg(p)),
       for (final p in pp.productCatalog) _enrich(_fromPp(p)),
+      // The team's product sheets, as ParentVeda's shortlist (2026-10-13).
+      ...sheetProducts(),
     ];
 
 /// Ask Veda's TTC deep links carry the old id (`ttcprod_folic` → `folic`).
