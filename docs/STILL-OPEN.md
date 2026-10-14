@@ -9584,7 +9584,13 @@ Facts, numbers, doses, warnings, keys and the Hindi side were held; the free com
 (8-word overlap vs the captured Flo and What to Expect text) is 0 on every file. The made-up
 reviewer names are gone from TTC. The ledger is `docs/TTC-WARMTH-PASS.md`. Owed:
 
-- **§78.1 Expert sign-off.** The app now shows "REVIEWED BY" and a tick next to REAL roster
+- **§78.1 Expert sign-off.** UPDATED 2026-10-14: GATED, still open. Since launch sanity H14
+  (2026-09-28) no TTC piece shows "Reviewed by" or a tick: `lib/ttc/ttc_expert_signoff.dart`
+  shows the expert only when the piece's id is in `kTtcSignedOffReads` / `kTtcSignedOffStories`,
+  and both are empty, so every piece reads "By ParentVeda team". The names stay in the data, so
+  this closes piece by piece as sign-offs come back. Leftover: "Dr. Meera Krishnan"
+  (`ttc_focus_ivf.dart:576`) is an invented name the warmth pass missed; swap for a roster name. Original note: the app
+  showed "REVIEWED BY" and a tick next to REAL roster
   names (Dr Ruchika Sood 48 pieces, Parmeshwari 7, Akanksha Srivastava 4, Dr Kajal Sharma 2).
   True only once each reads her list: `docs/TTC-EXPERT-SIGNOFF.md`. His side (10 reads) says
   "By ParentVeda team", no tick, because the roster has no male-fertility specialist.
@@ -10140,7 +10146,7 @@ From the parenting gap analysis (theAsianparent and What to Expect vs ParentVeda
 
 ## 83.0 Notebook batch — 2026-10-10 (open decisions and parked items)
 
-- 83.1 His side TTC: BUILT 2026-10-10. His Today is her TtcHomeV3 with TtcPartnerMode (lib/screens/ttc/ttc_partner_home.dart): same header/strip/calendar/doors/reads; no logging (view-only line on the home and the calendar's day panel); rail keeps her cycle + shared cards, never her logs; hero in his voice; his block (mission, supporting her, tonight, her body, his half). Old Slate TtcPartnerTodayScreen kept for revert. OWED: his Learn/Tools/More already partner-aware (check on device); pregnancy his side (Father Mode) still old.
+- 83.1 His side TTC: BUILT 2026-10-10. Pregnancy his side BUILT 2026-10-13 (0b5477e), device check owed. His Today is her TtcHomeV3 with TtcPartnerMode (lib/screens/ttc/ttc_partner_home.dart): same header/strip/calendar/doors/reads; no logging (view-only line on the home and the calendar's day panel); rail keeps her cycle + shared cards, never her logs; hero in his voice; his block (mission, supporting her, tonight, her body, his half). Old Slate TtcPartnerTodayScreen kept for revert. OWED: his Learn/Tools/More already partner-aware (check on device); pregnancy his side (Father Mode) still old.
 - 83.2 Baby vault (`dear_baby_vault_screen.dart`): parts 1-4 BUILT 2026-10-10 (cover, keepsake paper cards with week seal + italic date + that week's size, trimester trail oldest first, Write / Say it aloud invitation on top; test/dear_baby_vault_test.dart). OWED: read aloud, "open your letters" at birth, keepsake PDF.
 - 83.3 DONE 2026-10-10: renamed "I'm pregnant" everywhere she reads it (You action, TTC home card, chat, chapter, milestone, timeline); the confirm says a home test can be wrong; new You row "Not pregnant after all?" (pregnancy) offers "The test was wrong" (engine undo, back to trying) or "My pregnancy ended" (After a loss). IVF round's "Record the positive test" kept: the clinic's beta is the confirmation.
 - 83.4 DONE 2026-10-10: calendar button top right of the pregnancy home (Messages, Calendar, Saved), as on TTC.
@@ -10153,7 +10159,7 @@ From the parenting gap analysis (theAsianparent and What to Expect vs ParentVeda
 - 83.11 Ask Veda: answer reveal is paced, not streamed; real streaming needs a service endpoint. Parenting Ask Veda palette was moved to pregnancy's white/ink (beyond brief) — keep or revert.
 - 83.12 Phone OTP edge functions (`phone-otp-send`, `phone-otp-verify`) still undeployed; need MSG91 secrets. All other functions deployed (checked 10-10).
 - 83.13 Daily insights tab images: to discuss.
-- 83.14 Still to do from the notebook: recipes UI (Mobbin study first), flash cards for heavy tools, door UI consistency, a home-screen mark leading to Talk to someone, Ask Veda pregnancy review.
+- 83.14 Still to do from the notebook: recipes UI (Mobbin study first), flash cards for heavy tools, door UI consistency, Ask Veda pregnancy review. DONE c1204b0 (2026-10-14): a home-screen mark leading to Talk to someone, on all three homes.
 
 
 ## 84.0 Pregnancy week-wise content docs, on the week Details page — 2026-10-13
