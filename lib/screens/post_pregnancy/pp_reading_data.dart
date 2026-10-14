@@ -214,7 +214,7 @@ const List<ReadArticle> kReadArticles = [
     //   author: 'Dr. Ananya Rao', authorRole: 'Paediatrician',
     author: kPpEditorialAuthor,
     authorRole: kPpEditorialRole,
-    relatedVideoId: 'leap4brain',
+    /* relatedVideoId: 'leap4brain', retired with the leaps 2026-10-14; new phase films to come */
     relatedVideoIds: ['q_play', 'q_talk', 'babbling'],
     relatedActivity: 'Reach for the ring',
     relatedCommunity: '0–1 Year',

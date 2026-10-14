@@ -240,7 +240,7 @@ const List<DevArea> kDevAreas = [
       'None of this needs flashcards or “brain-training”. It needs everyday moments where his actions clearly change something, and a calm narrator — you — putting words to what he is figuring out.',
     ],
     nextActivityId: 'peekaboo',
-    relatedVideoId: 'leap4brain',
+    /* relatedVideoId: 'leap4brain', retired with the leaps 2026-10-14; new phase films to come */
     journey: [
       DevStage('Notices contrast', 'mastered', 'He locks onto bold edges — black and white, a striped cushion, the line of your hairline against your face. Colour and fine detail come later; right now it is contrast that his eyes can actually resolve.', 'This is attention being built from nothing. Before he can learn anything about the world he has to be able to hold his gaze on one part of it, and a strong edge is the easiest thing to hold onto.'),
       DevStage('Follows a moving toy', 'mastered', 'His eyes travel with something as you move it across him, and after a while his head follows too. Slow and close works far better than fast and far.', 'Tracking is the first time he predicts rather than reacts — his eyes arrive where the toy is going, not where it was. That same prediction is what later lets him reach for it.'),
@@ -318,7 +318,7 @@ const List<DevArea> kDevAreas = [
     brainNote: 'Hand-eye coordination is being wired, every grab is his brain aiming and adjusting.',
     seed: 4,
     nextActivityId: 'reach_ring',
-    relatedVideoId: 'leap4brain',
+    /* relatedVideoId: 'leap4brain', retired with the leaps 2026-10-14; new phase films to come */
     journey: [
       DevStage('Hands to midline', 'mastered', 'He brings both hands together in front of his chest, usually finds them with his eyes, and often takes them straight to his mouth.', 'Working across the middle of the body is harder than it sounds and it is a prerequisite for anything two-handed. It is also how he discovers his hands are HIS, which is the beginning of a body he owns.'),
       DevStage('Reaching & grasping', 'current', 'Swiping near a toy becomes a deliberate reach, and then a closed fist around it. Aim is poor at first, and improves fast with practice.', 'Reaching is eye and hand agreeing about where something is. It is also his first tool for satisfying his own curiosity: until now, whatever he wanted to examine had to be brought to him.', activities: ['reach_ring', 'texture']),

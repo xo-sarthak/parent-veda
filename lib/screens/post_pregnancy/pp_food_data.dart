@@ -703,7 +703,7 @@ const List<FoodRecipe> kFoodRecipes = [
     healthierNote: 'Cooked in a little ghee, kept soft and moist, low salt, gentle on his tummy and easy to gum.',
     tags: {'protein', 'brain', 'breakfast', 'egg', 'non-veg'},
     ingredientKeys: {'egg', 'milk', 'tomato'},
-    relatedVideoId: 'leap4brain',
+    /* relatedVideoId: 'leap4brain', retired with the leaps 2026-10-14; new phase films to come */
   ),
   FoodRecipe(
     id: 'ragismoothie',

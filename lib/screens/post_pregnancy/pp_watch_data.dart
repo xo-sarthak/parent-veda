@@ -140,22 +140,23 @@ const List<WatchVideo> kWatchVideos = [
     relatedProductId: 'dozy',
     relatedCommunity: 'Parents on the 4-month regression',
   ),
-  WatchVideo(
-    id: 'leap4brain',
-    title: 'Inside the 4-month shift: the world of events',
-    topic: 'What the fussiness means',
-    category: 'Brain Development',
-    expertId: 'ananya',
-    ageTag: '3–6 mo',
-    seconds: 600,
-    quick: false,
-    why:
-        'The clinginess and broken naps aren’t a step back, they’re a leap forward. See what your baby is working out about cause and effect right now.',
-    seed: 2,
-    relatedArticle: 'Phase 4, decoded',
-    relatedActivity: 'Reach-for-the-ring',
-    relatedCommunity: 'Phase 4 support',
-  ),
+  // leap4brain: retired with the leaps 2026-10-14; new phase films to come. Kept for revert:
+  //WatchVideo(
+  //  id: 'leap4brain',
+  //  title: 'Inside the 4-month shift: the world of events',
+  //  topic: 'What the fussiness means',
+  //  category: 'Brain Development',
+  //  expertId: 'ananya',
+  //  ageTag: '3–6 mo',
+  //  seconds: 600,
+  //  quick: false,
+  //  why:
+  //      'The clinginess and broken naps aren’t a step back, they’re a leap forward. See what your baby is working out about cause and effect right now.',
+  //  seed: 2,
+  //  relatedArticle: 'Phase 4, decoded',
+  //  relatedActivity: 'Reach-for-the-ring',
+  //  relatedCommunity: 'Phase 4 support',
+  //),
   WatchVideo(
     id: 'solids101',
     title: 'Starting solids, calmly',
@@ -429,19 +430,20 @@ const List<WatchVideo> kWatchPodcasts = [
     why: 'Dr Ananya sits down for a longer, honest conversation about why sleep breaks at four months, and what genuinely helps.',
     seed: 31,
   ),
-  WatchVideo(
-    id: 'pod_leaps',
-    title: 'Inside the fussy leaps',
-    topic: 'The science of Wonder Weeks',
-    category: 'Brain Development',
-    expertId: 'kabir',
-    ageTag: '3–12 mo',
-    seconds: 1980,
-    quick: false,
-    isPodcast: true,
-    why: 'A relaxed deep-dive into what is happening in your baby\'s brain during each leap, and why the clinginess is progress.',
-    seed: 32,
-  ),
+  // pod_leaps: retired with the leaps 2026-10-14; new phase films to come. Kept for revert:
+  //WatchVideo(
+  //  id: 'pod_leaps',
+  //  title: 'Inside the fussy leaps',
+  //  topic: 'The science of Wonder Weeks',
+  //  category: 'Brain Development',
+  //  expertId: 'kabir',
+  //  ageTag: '3–12 mo',
+  //  seconds: 1980,
+  //  quick: false,
+  //  isPodcast: true,
+  //  why: 'A relaxed deep-dive into what is happening in your baby\'s brain during each leap, and why the clinginess is progress.',
+  //  seed: 32,
+  //),
   WatchVideo(
     id: 'pod_solids',
     title: 'Feeding without the fear',
@@ -510,7 +512,7 @@ const List<WatchCollection> kWatchCollections = [
     id: 'braindev',
     title: 'Brain Development',
     subtitle: 'What’s growing behind those big new expressions.',
-    videoIds: ['leap4brain', 'q_play', 'babbling'],
+    videoIds: [/* 'leap4brain', retired with the leaps 2026-10-14; new phase films to come */ 'q_play', 'babbling'],
     seed: 24,
   ),
   WatchCollection(
@@ -705,10 +707,10 @@ class WatchStore extends ChangeNotifier with CloudSyncedStore {
   // 0..1 progress; a value in (0,1) = "continue watching".
   final Map<String, double> _progress = {
     'sleep4mo': 0.45,
-    'leap4brain': 0.7,
+    // 'leap4brain': 0.7, // retired with the leaps 2026-10-14; new phase films to come
     'solids101': 0.2,
   };
-  final List<String> _recent = ['leap4brain', 'sleep4mo', 'q_play'];
+  final List<String> _recent = [/* 'leap4brain', retired with the leaps 2026-10-14; new phase films to come */ 'sleep4mo', 'q_play'];
 
   bool isSaved(String id) => SavedStore.instance.isSaved(SavedKind.video, id);
   void toggleSave(String id) {

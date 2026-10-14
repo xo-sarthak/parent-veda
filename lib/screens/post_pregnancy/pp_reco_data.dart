@@ -497,7 +497,7 @@ const List<RecoItem> kReco = [
     skills: ['Understanding development'], benefits: ['Parent confidence'],
     collections: [], tags: ['fussy', 'brain', 'parent', 'development'],
     subtype: 'Parent explainer', facets: {'type': ['explainer'], 'length': ['short']},
-    relatedVideoId: 'leap4brain', relatedArticleId: 'leap4',
+    /* relatedVideoId: 'leap4brain', retired with the leaps 2026-10-14; new phase films to come */ relatedArticleId: 'leap4',
   ),
   RecoItem(
     id: 'vd_sleep', category: 'Videos', title: 'The 4-month sleep shift, explained', summary: 'Why nights change - and what helps.',

@@ -9588,8 +9588,7 @@ reviewer names are gone from TTC. The ledger is `docs/TTC-WARMTH-PASS.md`. Owed:
   (2026-09-28) no TTC piece shows "Reviewed by" or a tick: `lib/ttc/ttc_expert_signoff.dart`
   shows the expert only when the piece's id is in `kTtcSignedOffReads` / `kTtcSignedOffStories`,
   and both are empty, so every piece reads "By ParentVeda team". The names stay in the data, so
-  this closes piece by piece as sign-offs come back. Leftover: "Dr. Meera Krishnan"
-  (`ttc_focus_ivf.dart:576`) is an invented name the warmth pass missed; swap for a roster name. Original note: the app
+  this closes piece by piece as sign-offs come back. Original note: the app
   showed "REVIEWED BY" and a tick next to REAL roster
   names (Dr Ruchika Sood 48 pieces, Parmeshwari 7, Akanksha Srivastava 4, Dr Kajal Sharma 2).
   True only once each reads her list: `docs/TTC-EXPERT-SIGNOFF.md`. His side (10 reads) says
@@ -10208,7 +10207,26 @@ the phase map's page; the "A new stage" message.
 **Owed:**
 - **Paediatric panel sign-off** on every phase's doctor lines, milestone pages and activities — the docs
   say "Needs paediatric panel sign-off". Shipped with the doctor lines on the user's word.
-- **Phases 16–20** (19 months to 5 years) have no doc; they keep the authored AAP text.
+- **DOC-ONLY PHASES, 2026-10-14 (the user: "I don't want those old leaps and phases anywhere in the
+  app wired").** `ppPhaseWithDoc` passes no authored text any more: no tagline, reassurance, Feeding
+  now / Sleep now, checkpoint, screening or India note. Screens draw nothing for an empty field.
+  The old Wonder Weeks leaps are unwired: the Development door tab "The leaps" is now "Phases" (id
+  `leaps` kept), surface `pp_leaps` opens `PhaseMapScreen`, the `dev_leaps_lens` read and the potty
+  door's link to it are commented out, and the leap screens stay in the tree for revert.
+- **Phases 16–20** (19 months to 5 years) have no doc. Until PH016–PH020 land in the Drive folder
+  they show their name, age and "This phase's guide is being written" (`kPhaseGuideComing`). Was:
+  the authored AAP text. ONE EXCEPTION, kept on purpose: the authored "When to call the doctor"
+  lines stay on 16–20, so a child of 19 months to 5 years never loses the route to a doctor. The
+  doc's own doctor lines replace them when it lands. The user to confirm.
+- **Leap films retired 2026-10-14** (the user: new phase films to come). "leap4brain" and
+  "Inside the fussy leaps" are commented out in `pp_watch_data.dart`, with every link to them
+  (activities, food, reading, reco), because `watchVideoById` falls back to the FIRST film on a
+  missing id and would have opened the wrong one. Brain Development now has no film: the change
+  sheet leaves its player out, and the Watch topic says new films are on the way.
+- **Still leap content, for the user:** the article "Phase 4, decoded" (`leap4` in
+  `pp_reading_data.dart`), in the Brain collection, "For you" and two recommendations.
+- **The age page lost Feeding now / Sleep now** for phases 1–15 (authored, not in the docs). If the
+  docs grow those sections, map them in `ppPhaseWithDoc`.
 - **PH015's Emotional activity "Naming All the Feelings"** is named on its milestone page but the doc never
   writes the activity; the page shows the name without a link until it is written.
 - **PH010 names differ** between the snapshot ("Pointing to Show Interest", "Sharing with You") and the

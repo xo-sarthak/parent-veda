@@ -947,7 +947,21 @@ class _DayCell extends StatelessWidget {
   Widget build(BuildContext context) {
     final facts = ttcFactsFor(date);
 
-    return GestureDetector(
+    // The full date as the cell's label (2026-10-14). The grid scrolls
+    // across months, so a bare "1" named two different days; a screen
+    // reader now says "1 Nov 2026", and the no-repetition sweep reads
+    // each cell as the day it is.
+    const months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+    ];
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      label: '${date.day} ${months[date.month - 1]} ${date.year}',
+      onTap: onTap,
+      excludeSemantics: true,
+      child: GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: SizedBox(
@@ -1053,6 +1067,7 @@ class _DayCell extends StatelessWidget {
             ),
           ],
         ),
+      ),
       ),
     );
   }

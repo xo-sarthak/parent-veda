@@ -81,7 +81,14 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
   }
 
   String _picksTitle() => _topic != 'All' ? _topic : (_quick ? 'Quick lessons for you' : 'Chosen for you');
-  String _picksSubtitle() => _topic != 'All'
+  // A topic with no films of its own yet (Brain Development, since the leap
+  // films were retired on 2026-10-14) still feeds the whole catalogue, so the
+  // line says so rather than calling those films the topic's.
+  bool get _topicEmpty => _topic != 'All' && !kWatchVideos.any((v) => v.category == _topic);
+
+  String _picksSubtitle() => _topicEmpty
+      ? 'New ${_topic.toLowerCase()} films are on the way. Meanwhile, these are worth a watch.'
+      : _topic != 'All'
       ? 'Expert ${_quick ? 'shorts' : 'videos'} on ${_topic.toLowerCase()} - keep scrolling for more.'
       : 'Picked for his age and where he is right now - the feed keeps going.';
 

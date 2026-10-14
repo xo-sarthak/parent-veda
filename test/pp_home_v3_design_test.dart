@@ -25,6 +25,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:parentveda/screens/post_pregnancy/explore_drawer.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_common.dart';
+import 'package:parentveda/screens/post_pregnancy/pp_development_data.dart' show watchCategoryForArea;
+import 'package:parentveda/screens/post_pregnancy/pp_watch_data.dart' show watchByCategory;
 import 'package:parentveda/screens/post_pregnancy/pp_grow_data.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_home_activities_store.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_home_changes.dart';
@@ -135,6 +137,12 @@ void main() {
         'milestone', () {
       for (final phase in kPhases) {
         final changes = phaseChangesFor(phase);
+        // A phase still waiting for its doc has no cards (doc-only phases,
+        // 2026-10-14); the home draws its invitation instead.
+        if (phaseAwaitingDoc(phase)) {
+          expect(changes, isEmpty, reason: 'phase ${phase.number}');
+          continue;
+        }
         expect(changes, isNotEmpty, reason: 'phase ${phase.number}');
         expect(changes.length, lessThanOrEqualTo(PhaseDomain.values.length));
         final domains = changes.map((c) => c.domain).toList();
@@ -144,7 +152,9 @@ void main() {
           expect(c.milestones.every((m) => m.domain == c.domain), isTrue);
           expect(c.title, isNotEmpty);
           expect(c.notice, isNotEmpty);
-          expect(c.paragraphs().length, 2);
+          // The authored reassurance line is gone on doc-only phases
+          // (2026-10-14), so a card has one paragraph. Was 2.
+          expect(c.paragraphs().length, phase.reassurance.isEmpty ? 1 : 2);
         }
       }
     });
@@ -169,6 +179,12 @@ void main() {
     test('the sheet has a video for every card', () {
       for (final phase in kPhases) {
         for (final c in phaseChangesFor(phase)) {
+          // Brain Development has no film since the leap films were retired
+          // (2026-10-14); the sheet then leaves the player out. Any other
+          // gap is a real one.
+          final none = watchByCategory(watchCategoryForArea(c.areaIds.first)).isEmpty &&
+              watchByCategory(watchCategoryForPhase(phase)).isEmpty;
+          if (none) continue;
           expect(c.video, isNotNull,
               reason: 'phase ${phase.number} ${c.category} has no video');
         }

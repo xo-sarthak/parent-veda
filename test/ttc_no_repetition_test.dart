@@ -390,6 +390,11 @@ const Map<String, String> _allowedLabels = {
 
 /// Label shapes that may repeat, with the reason.
 final Map<RegExp, String> _allowedLabelShapes = {
+  RegExp(r'^([1-9]|[12]\d|3[01])$'):
+      'A day on the calendar grid. Since 2026-10-13 (f7e746e) the weeks '
+          'scroll across months, so "1" is the first of each month shown; '
+          'the cells are different days, and each carries its full date as '
+          'its semantics label ("1 Nov 2026").',
   RegExp(r'^(S|M|T|W|F|TODAY) · \d{1,2}$'):
       'A date on the day strip. The strip spans seven weeks, so "T · 1" is '
           'the first of two months; the cells are different days.',
@@ -431,6 +436,13 @@ final List<(List<RegExp>, String)> _allowedDestinationRules = [
     "In a round the hero's headline is the round's step and opens the "
         'round; the pill under it (in the place of the one-tap row) names the '
         'blood test by date, or "See your round" when none is dated yet.',
+  ),
+  (
+    [RegExp(r'^(semantics: )?Talk to someone$'), RegExp(r'^See all consults$')],
+    'The user, 2026-10-14: a "Talk to someone" mark in every home header, '
+        'beside Messages and Calendar, so help is one tap from the top. It '
+        'is chrome, like those two; "See all consults" under Talk to experts '
+        'is the same page reached from the section that names it.',
   ),
   (
     [RegExp(r'^Cycle report$'), RegExp(r'^CYCLE REPORT · ')],
