@@ -1448,6 +1448,9 @@ final PpSection kPpDevelopmentSection = PpSection(
         ),
 
         // ---------------------------------------------------------------------
+        // The leaps read is retired with the leaps (the user, 2026-10-14):
+        // the Drive phase docs are the only phases. Kept for revert:
+        /*
         PpPage(
           id: 'dev_leaps_lens',
           title: 'Is my baby going through a leap?',
@@ -1520,6 +1523,7 @@ final PpSection kPpDevelopmentSection = PpSection(
                 blurb: 'Work through a specific change, step by step.'),
           ],
         ),
+        */
       ],
     ),
 
@@ -2378,9 +2382,11 @@ final PpSection kPpDevelopmentSection = PpSection(
       surfaceId: 'pp_development',
     ),
     PpSectionTool(
-      label: 'Your baby’s phase calendar',
-      blurb: 'Which window is open now, held as a helpful lens rather than a '
-          'law.',
+      // Was the leaps calendar ('Your baby’s phase calendar', 'Which window
+      // is open now, held as a helpful lens rather than a law.'); the
+      // surface opens the phases now (2026-10-14).
+      label: 'Your child’s phases',
+      blurb: 'Every phase from birth to five, and what each one brings.',
       surfaceId: 'pp_leaps',
     ),
     PpSectionTool(

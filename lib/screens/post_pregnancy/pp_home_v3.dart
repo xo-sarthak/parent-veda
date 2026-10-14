@@ -2611,7 +2611,9 @@ class _PhaseAtAGlance extends StatelessWidget {
         else ...[
           if (phase.workingOn.isNotEmpty)
             _point('working', TtcTabMark.sprout, 104, 'Working on now', phase.workingOn.take(3).toList()),
-          _point('normal', TtcTabMark.heartHand, 28, 'What is normal', [phase.reassurance]),
+          // Authored, so empty on every phase now (doc-only, 2026-10-14).
+          if (phase.reassurance.isNotEmpty)
+            _point('normal', TtcTabMark.heartHand, 28, 'What is normal', [phase.reassurance]),
         ],
         if (helps != null) _point('helps', TtcTabMark.sun, 42, 'What helps', [helps]),
         const SizedBox(height: 12),
@@ -2841,7 +2843,9 @@ class _AheadCard extends StatelessWidget {
                         letterSpacing: -0.4,
                         color: p.ink1)),
                 const SizedBox(height: 4),
-                Text(next.tagline,
+                // Doc-only phases carry no tagline (2026-10-14): the doc's own
+                // opening line instead. Was Text(next.tagline, ...).
+                Text(next.tagline.isNotEmpty ? next.tagline : next.summary,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: pvManrope(fontSize: _kBody, height: 1.45, color: p.ink2)),

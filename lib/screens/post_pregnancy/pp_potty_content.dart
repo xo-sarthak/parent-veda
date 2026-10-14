@@ -1423,10 +1423,11 @@ final PpSection kPpPottySection = PpSection(
             PpLink('A new baby, starting school: the behaviour side',
                 surfaceId: 'pp_section/parenting_behaviour',
                 blurb: 'Clinginess, going backwards, and the words to use.'),
-            PpLink('Is this a leap?',
-                surfaceId: 'pp_page/parenting_development/dev_leaps_lens',
-                blurb: 'The fussy-then-forward weeks that unsettle everything, '
-                    'potty included.'),
+            // The leaps read is retired (2026-10-14). Kept for revert:
+            // PpLink('Is this a leap?',
+            //     surfaceId: 'pp_page/parenting_development/dev_leaps_lens',
+            //     blurb: 'The fussy-then-forward weeks that unsettle everything, '
+            //         'potty included.'),
           ],
         ),
         PpPage(

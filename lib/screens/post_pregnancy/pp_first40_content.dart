@@ -398,7 +398,8 @@ final PpSection kPpFirst40Section = PpSection(
                 blurb: 'The schedule, an alarm, and a doctor-ready record.'),
             PpLink('What changes next for your baby',
                 surfaceId: 'pp_what_changed',
-                blurb: 'The leaps, growth spurts and sudden changes ahead.'),
+                // Was 'The leaps, growth spurts and sudden changes ahead.' (leaps retired 2026-10-14)
+                blurb: 'Growth spurts and sudden changes ahead.'),
           ],
         ),
         // ⚠️ [NEW], two scaffolds near the day-by-day guide. "The whole

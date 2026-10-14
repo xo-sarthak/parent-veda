@@ -153,7 +153,8 @@ class PhaseChange {
               'these by the end of ${phase.ageLabel}. They are the '
               '${category.toLowerCase()} changes of ${_lower(phase.name)}, '
               'and they arrive on their own timetable.',
-        phase.reassurance,
+        // Authored, so empty on doc-only phases (2026-10-14).
+        if (phase.reassurance.isNotEmpty) phase.reassurance,
       ];
 
   /// A read for "More on this": the phase's own articles first, then the

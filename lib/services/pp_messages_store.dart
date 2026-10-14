@@ -45,6 +45,7 @@ import 'dart:convert';
 import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../data/pp_phase_docs.dart' show ppPhaseDocFor;
 import '../screens/post_pregnancy/pp_child_profile.dart';
 import '../screens/post_pregnancy/pp_month_notes.dart';
 import '../screens/post_pregnancy/pp_phases_data.dart';
@@ -272,8 +273,12 @@ List<PpMessage> ppMessageCandidates(PpMessageFacts f, DateTime now) {
     final months = (day.difference(f.dob).inDays / 30.44).floor();
     final note = ppMonthNoteFor(months);
     final idx = phaseIndexForMonths(months.toDouble());
-    final play = kPhasesAuthored[idx].sections.where((s) => s.heading.toLowerCase().startsWith('play')).firstOrNull;
-    final line = note?.tryThis ?? play?.paragraphs.first;
+    // The phase doc's first activity, not the authored "Play" section: the
+    // docs are the only phase text (2026-10-14). Kept for revert:
+    // final play = kPhasesAuthored[idx].sections.where((s) => s.heading.toLowerCase().startsWith('play')).firstOrNull;
+    // final line = note?.tryThis ?? play?.paragraphs.first;
+    final docTry = ppPhaseDocFor(kPhasesAuthored[idx].number)?.activities.firstOrNull;
+    final line = note?.tryThis ?? (docTry == null ? null : '${docTry.title}: ${docTry.intro}');
     if (line == null) continue;
     final week = '${day.year}-${day.month}-${day.day}';
     out.add(PpMessage(

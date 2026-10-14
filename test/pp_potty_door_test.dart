@@ -109,9 +109,10 @@ void main() {
       expect(hold, contains('pp_what_changed'));
       final reg = _page('regressions').blocks.whereType<PpLink>().map((l) => l.surfaceId);
       expect(reg, contains('pp_section/parenting_behaviour'));
-      expect(reg, contains('pp_page/parenting_development/dev_leaps_lens'));
+      // The leaps read is retired (2026-10-14): no link to it.
+      expect(reg, isNot(contains('pp_page/parenting_development/dev_leaps_lens')));
       for (final s in ['pp_page/parenting_health/skin_which_rash', 'pp_page/parenting_health/tummy_constipation',
-          'pp_page/parenting_development/dev_leaps_lens', 'pp_section/parenting_behaviour']) {
+          'pp_section/parenting_behaviour']) {
         expect(ppScreenForSurface(s), isNotNull, reason: s);
       }
     });

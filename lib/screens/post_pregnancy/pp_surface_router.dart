@@ -24,7 +24,8 @@ import 'package:flutter/material.dart';
 import 'pp_section_registry.dart';
 import 'pp_section_screen.dart';
 import 'askveda_screen.dart';
-import 'leap_calendar_screen.dart';
+// import 'leap_calendar_screen.dart'; // retired 2026-10-14, kept for revert
+import 'phase_map_screen.dart';
 import '../memories/memories_home_screen.dart';
 import 'health_doctor_visit_screen.dart';
 // import 'health_emergency_screen.dart'; // kept for revert with the pp_emergency_card route
@@ -329,7 +330,10 @@ Widget? _ppScreenFor(String id) => switch (id) {
       // eighteen in-page links across three sections pointing at ids the router
       // had never heard of. Each one rendered as a live, tappable row that did
       // nothing. Nothing compiled wrong and nothing failed.
-      'pp_leaps' => const LeapCalendarScreen(),
+      // The old Wonder Weeks leaps are retired (the user, 2026-10-14): the
+      // surface id stays (door tools and reads link it) and lands on the
+      // phases, which the Drive docs feed. Was: const LeapCalendarScreen().
+      'pp_leaps' => const PhaseMapScreen(),
       'pp_ask_veda' => const AskVedaScreen(),
       'pp_compare' => const ProductsCompareScreen(),
       'pp_crisis_path' => const PpCrisisPathScreen(),

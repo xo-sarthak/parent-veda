@@ -117,7 +117,14 @@ class PhaseMapScreen extends StatelessWidget {
                 ],
               ]),
               const SizedBox(height: 3),
-              Text('${p.ageLabel} · ${p.tagline}',
+              // Doc-only phases carry no tagline (2026-10-14). Was
+              // '${p.ageLabel} · ${p.tagline}'.
+              Text(
+                  p.tagline.isNotEmpty
+                      ? '${p.ageLabel} · ${p.tagline}'
+                      : phaseAwaitingDoc(p)
+                          ? '${p.ageLabel} · Guide coming'
+                          : p.ageLabel,
                   style: ppBody(12.5, color: past ? ppMuted : ppSoft, h: 1.4),
                   maxLines: 1, overflow: TextOverflow.ellipsis),
             ]),

@@ -46,11 +46,14 @@ void main() {
     });
   });
 
+  // ⚠️ The live phases are DOC-ONLY since 2026-10-14 (the Drive docs; see
+  // pp_phase_docs_test.dart), so the checks on the authored AAP text below
+  // read `kPhasesAuthored`, the data kept for revert. Was `kPhases`.
   group('it follows the AAP framework it claims to', () {
     test('the AAP well-visit checkpoints all exist as phases', () {
       // 2m, 4m, 6m, 9m, 12m, 15m, 18m, 24m, 30m, 4y, 5y.
       for (final m in [2, 4, 6, 9, 12, 15, 18, 24, 30, 48, 59]) {
-        final p = kPhases[phaseIndexForMonths(m.toDouble())];
+        final p = kPhasesAuthored[phaseIndexForMonths(m.toDouble())];
         expect(p.checkpoint, isTrue,
             reason: 'month $m is an AAP checkpoint but lands in "${p.name}", '
                 'which is not marked as one');
@@ -61,7 +64,7 @@ void main() {
       // AAP recommends developmental screening at 9, 18 and 30 months, and
       // autism-specific screening at 18 and 24 months.
       for (final m in [9, 18, 24, 30]) {
-        final p = kPhases[phaseIndexForMonths(m.toDouble())];
+        final p = kPhasesAuthored[phaseIndexForMonths(m.toDouble())];
         expect(p.screeningNote, isNotNull,
             reason: 'month $m is a screening point but "${p.name}" says nothing '
                 'about it');
@@ -82,7 +85,7 @@ void main() {
 
   group('nothing here reads as a deadline', () {
     test('every phase has a reassurance line', () {
-      for (final p in kPhases) {
+      for (final p in kPhasesAuthored) {
         expect(p.reassurance.trim(), isNotEmpty,
             reason: '"${p.name}" has no reassurance — a milestone list without '
                 'one reads as a test the child can fail');
@@ -105,8 +108,9 @@ void main() {
       }
     });
 
-    test('every phase has milestones and something to work on', () {
-      for (final p in kPhases) {
+    test('every phase with a doc has milestones and something to work on', () {
+      // A phase waiting for its doc has neither, by design (2026-10-14).
+      for (final p in kPhases.where((x) => !phaseAwaitingDoc(x))) {
         expect(p.milestones, isNotEmpty, reason: '"${p.name}" has no milestones');
         expect(p.workingOn, isNotEmpty, reason: '"${p.name}" has nothing to work on');
       }

@@ -73,8 +73,11 @@ void main() {
     // The phase as shown is the authored one with its phase doc laid over it
     // (2026-10-13, `ppPhaseWithDoc`); a boy reads that as written.
     expect(_all(kPhases.first), _all(ppPhaseWithDoc(kPhasesAuthored.first)));
+    // The doc text says "your baby", so a girl's phase 1 reads the same; the
+    // cache is checked by identity instead (doc-only phases, 2026-10-14).
+    final before = kPhases;
     c.active.isBoy = false;
-    expect(_all(kPhases.first), isNot(_all(ppPhaseWithDoc(kPhasesAuthored.first))), reason: 'the cache follows the child');
+    expect(identical(kPhases, before), isFalse, reason: 'the cache follows the child');
   });
 
   test('currentPhase and phaseByNumber read the filled list', () {

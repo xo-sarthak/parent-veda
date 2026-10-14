@@ -78,8 +78,12 @@ class PhaseDetailScreen extends StatelessWidget {
             ])),
             const SizedBox(height: 12),
             _pad(Text(p.name, style: ppFraunces(30, h: 1.1))),
-            const SizedBox(height: 6),
-            _pad(Text(p.tagline, style: ppBody(14.5, color: p.accent, w: FontWeight.w700))),
+            // Doc-only phases (2026-10-14): the docs carry no tagline, so it
+            // draws only where one exists.
+            if (p.tagline.isNotEmpty) ...[
+              const SizedBox(height: 6),
+              _pad(Text(p.tagline, style: ppBody(14.5, color: p.accent, w: FontWeight.w700))),
+            ],
             const SizedBox(height: 14),
             _pad(Text(p.summary, style: ppBody(15, color: ppInk, h: 1.65))),
             if (hasDoc) ...[
@@ -97,6 +101,8 @@ class PhaseDetailScreen extends StatelessWidget {
             ],
 
             // The reassurance line — the thing a worried parent came for.
+            // Authored text, so empty on doc-only phases (2026-10-14).
+            if (p.reassurance.isNotEmpty) ...[
             const SizedBox(height: 18),
             _pad(Container(
               padding: const EdgeInsets.all(16),
@@ -110,6 +116,7 @@ class PhaseDetailScreen extends StatelessWidget {
                 Expanded(child: Text(p.reassurance, style: ppBody(13.5, color: ppInk, h: 1.6))),
               ]),
             )),
+            ],
 
             // ---- working on ----
             const SizedBox(height: 26),
@@ -133,6 +140,7 @@ class PhaseDetailScreen extends StatelessWidget {
               slotId: 'development/phase/${p.number}',
             )),
 
+            if (p.workingOn.isNotEmpty) ...[
             const SizedBox(height: 24),
             _pad(Text(hasDoc ? 'Living through this phase' : 'What he is working on', style: ppJakarta(18))),
             const SizedBox(height: 12),
@@ -152,8 +160,10 @@ class PhaseDetailScreen extends StatelessWidget {
                   ]),
                 ),
             ])),
+            ],
 
             // ---- milestones by domain ----
+            if (p.milestones.isNotEmpty) ...[
             const SizedBox(height: 22),
             _pad(Text(hasDoc ? 'Child snapshot' : 'Most children can, by the end of this phase', style: ppJakarta(18))),
             if (!hasDoc) ...[
@@ -170,6 +180,7 @@ class PhaseDetailScreen extends StatelessWidget {
                 ? const [PhaseDomain.cognitive, PhaseDomain.motor, PhaseDomain.language, PhaseDomain.social, PhaseDomain.adaptive]
                 : PhaseDomain.values)
               if (p.inDomain(d).isNotEmpty) _pad(_domainCard(p, d)),
+            ],
 
             // ---- fuller description ----
             for (final s in p.sections) ...[

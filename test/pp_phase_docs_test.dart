@@ -110,14 +110,30 @@ void main() {
       expect(p.milestones.map((m) => m.text), [for (final s in d.snapshot) s.title]);
       final doctor = p.sections.singleWhere((s) => s.heading == 'When to call the doctor');
       expect(doctor.paragraphs, d.doctor);
-      // What the docs do not cover stays: the age page's feeding and sleep.
-      expect(p.sections.map((s) => s.heading), containsAll(['Feeding now', 'Sleep now']));
-      expect(p.indianNote, kPhasesAuthored.first.indianNote);
+      // The docs are the only phase text (the user, 2026-10-14): nothing
+      // authored rides along. Was: Feeding now / Sleep now and the India note kept.
+      expect(p.sections.map((s) => s.heading), ['When to call the doctor']);
+      expect(p.tagline, isEmpty);
+      expect(p.reassurance, isEmpty);
+      expect(p.indianNote, isNull);
+      expect(p.screeningNote, isNull);
+      expect(p.checkpoint, isFalse);
     });
 
-    test('phases 16 to 20 are untouched', () {
-      for (final p in kPhasesAuthored.where((x) => x.number > 15)) {
-        expect(identical(ppPhaseWithDoc(p), p), isTrue, reason: 'phase ${p.number}');
+    test('a phase with no doc yet says its guide is being written, and nothing authored', () {
+      // Was: 'phases 16 to 20 are untouched' (the authored phase in full).
+      for (final a in kPhasesAuthored.where((x) => ppPhaseDocFor(x.number) == null)) {
+        final p = ppPhaseWithDoc(a);
+        expect(p.name, a.name, reason: 'phase ${a.number} keeps its name');
+        expect(p.ageLabel, a.ageLabel);
+        expect(p.summary, kPhaseGuideComing);
+        expect(p.workingOn, isEmpty);
+        expect(p.milestones, isEmpty);
+        // Only the route to a doctor stays until the doc brings its own.
+        expect(p.sections.map((s) => s.heading), ['When to call the doctor'], reason: 'phase ${a.number}');
+        expect(p.reassurance, isEmpty);
+        expect(p.indianNote, isNull);
+        expect(phaseAwaitingDoc(p), isTrue);
       }
     });
 

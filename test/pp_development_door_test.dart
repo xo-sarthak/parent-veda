@@ -18,6 +18,7 @@ import 'package:parentveda/data/doors/pp_door_data.dart';
 import 'package:parentveda/screens/post_pregnancy/doors/pp_door_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/leap_calendar_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/milestone_journey_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/phase_map_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_child_profile.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_content.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_leaps_data.dart';
@@ -93,7 +94,8 @@ void main() {
       // Tummy time joined the activities hub, 2026-10-07 (gap analysis P2).
       expect(door.tabs[3].tools.map((t) => t.surfaceId), ['pp_development', 'pp_tummy_time']);
       expect(_listed('help_develop'), [
-        'dev_play_builds_brain', 'dev_tummy_time', 'dev_everyday_play', 'dev_sensory_play', 'dev_leaps_lens',
+        // 'dev_leaps_lens' retired with the leaps, 2026-10-14.
+        'dev_play_builds_brain', 'dev_tummy_time', 'dev_everyday_play', 'dev_sensory_play',
       ]);
       final tummy = _page('dev_tummy_time');
       expect(tummy.format, 'VIDEO');
@@ -104,10 +106,14 @@ void main() {
       expect(feelings.title, 'Activities for feelings and getting on with others');
     });
 
-    test('the leaps and talk-and-check are tools alone, and the leaps drop after twenty months', () {
+    test('phases and talk-and-check are tools alone; phases run to five and open the phase map', () {
       expect(door.tabs[4].areaIds, isEmpty);
+      expect(door.tabs[4].label, 'Phases');
       expect(door.tabs[4].tools.single.surfaceId, 'pp_leaps');
-      expect(door.tabs[4].toMonths, 20);
+      // The leaps are retired (2026-10-14): no twenty-month cut-off, and the
+      // surface lands on the phases the Drive docs feed.
+      expect(door.tabs[4].toMonths, isNull);
+      expect(ppScreenForSurface('pp_leaps'), isA<PhaseMapScreen>());
       expect(door.tabs[5].tools.single.surfaceId, 'pp_what_changed');
       expect(door.closing!.surfaceId, 'pp_experts/Development expert');
       expect(door.closing!.blurb, contains('mock for now'));
@@ -176,11 +182,11 @@ void main() {
       await tester.pumpWidget(MaterialApp(
           home: PpDoorScreen(key: const ValueKey('leaps'), door: door, onSurface: (_, _) {}, initialTabId: 'leaps')));
       await tester.pumpAndSettle();
-      expect(find.text('Your baby\'s phase calendar'), findsOneWidget, reason: 'a tab of one tool still draws its rail');
-      expect(find.textContaining('lens and never a law'), findsOneWidget);
+      expect(find.text('Your child\'s phases'), findsOneWidget, reason: 'a tab of one tool still draws its rail');
+      expect(find.textContaining('lens and never a law'), findsNothing, reason: 'the leaps copy is retired');
     });
 
-    testWidgets('a three-year-old sees four: no "when will my baby", no leaps', (tester) async {
+    testWidgets('a three-year-old: no "when will my baby", no leaps, and the phases stay', (tester) async {
       _ageMonths(36);
       tester.view.physicalSize = const Size(1200, 7000);
       tester.view.devicePixelRatio = 1.0;
@@ -189,6 +195,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('When will my baby...'), findsNothing);
       expect(find.text('The leaps'), findsNothing);
+      expect(find.text('Phases'), findsWidgets, reason: 'the phases run to five years');
       expect(find.text('Talking'), findsWidgets);
     });
 

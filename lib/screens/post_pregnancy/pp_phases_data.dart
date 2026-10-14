@@ -263,34 +263,44 @@ PhaseDomain ppDocDomainAsPhase(PpDocDomain d) => switch (d) {
 ///                   give no numbers, and `PpAtThisAge` shows those), then
 ///                   "When to call the doctor" as the doc's lines
 ///
-/// What the docs do not cover stays as authored: the reassurance, the
-/// screening and India notes, the video and the reads. The authored text is
-/// untouched in `kPhasesAuthored`, so a revert is this one function.
+/// ⚠️ THE DOCS ARE THE ONLY PHASE TEXT (the user, 2026-10-14): "I don't want
+/// those old leaps and phases anywhere in the app wired." So nothing authored
+/// passes through any more: no tagline, reassurance, Feeding now / Sleep now,
+/// checkpoint, screening or India note. What a doc phase keeps from the
+/// authored list is structure only (number, age range, colour, source) and
+/// its links to other content (video, reads, products). Screens draw nothing
+/// for an empty field. A phase with no doc yet (16–20 on 2026-10-14) keeps
+/// its name and age and says its guide is being written; its doc lands with
+/// `tools/phase_pages/docx_to_dart.py` and shows here with no other change.
+/// The authored text is untouched in `kPhasesAuthored`, so a revert is this
+/// one function.
 AgePhase ppPhaseWithDoc(AgePhase p) {
   final doc = ppPhaseDocFor(p.number);
-  if (doc == null) return p;
-  final keep = {'feeding now', 'sleep now'};
+  // Was: `if (doc == null) return p;` (the authored phase in full).
+  if (doc == null) return _phaseAwaitingDoc(p);
+  // Kept for revert: the authored Feeding now / Sleep now rode along.
+  // final keep = {'feeding now', 'sleep now'};
   return AgePhase(
     number: p.number,
     name: doc.name,
     ageLabel: p.ageLabel,
     startMonth: p.startMonth,
     endMonth: p.endMonth,
-    tagline: p.tagline,
+    tagline: '', // was p.tagline
     summary: doc.hero.first,
     workingOn: [for (final c in doc.living) c.title],
-    reassurance: p.reassurance,
+    reassurance: '', // was p.reassurance
     milestones: [for (final s in doc.snapshot) PhaseMilestone(ppDocDomainAsPhase(s.domain), s.title)],
     sections: [
-      for (final s in p.sections)
-        if (keep.contains(s.heading.toLowerCase())) s,
+      // for (final s in p.sections)
+      //   if (keep.contains(s.heading.toLowerCase())) s,
       PhaseSection('When to call the doctor', doc.doctor),
     ],
     accent: p.accent,
     source: p.source,
-    checkpoint: p.checkpoint,
-    screeningNote: p.screeningNote,
-    indianNote: p.indianNote,
+    // checkpoint: p.checkpoint,
+    // screeningNote: p.screeningNote,
+    // indianNote: p.indianNote,
     videoId: p.videoId,
     watchCategory: p.watchCategory,
     readCollection: p.readCollection,
@@ -298,6 +308,41 @@ AgePhase ppPhaseWithDoc(AgePhase p) {
     productIds: p.productIds,
   );
 }
+
+/// The line a phase with no doc yet shows in place of its text.
+const String kPhaseGuideComing = "This phase's guide is being written.";
+
+/// [p] before its doc arrives: name, age and the "being written" line. No
+/// authored milestones, sections or notes (the user, 2026-10-14).
+AgePhase _phaseAwaitingDoc(AgePhase p) => AgePhase(
+      number: p.number,
+      name: p.name,
+      ageLabel: p.ageLabel,
+      startMonth: p.startMonth,
+      endMonth: p.endMonth,
+      tagline: '',
+      summary: kPhaseGuideComing,
+      workingOn: const [],
+      reassurance: '',
+      milestones: const [],
+      // ⚠️ THE ONE AUTHORED LINE THAT STAYS: when to call the doctor. A
+      // child of 19 months to 5 years must never lose the route to a doctor
+      // while the doc is being written; the doc's own lines replace these.
+      sections: [
+        for (final s in p.sections)
+          if (s.heading.toLowerCase() == 'when to call the doctor') s,
+      ],
+      accent: p.accent,
+      source: p.source,
+      videoId: p.videoId,
+      watchCategory: p.watchCategory,
+      readCollection: p.readCollection,
+      articleIds: p.articleIds,
+      productIds: p.productIds,
+    );
+
+/// Whether [p] (as `kPhases` holds it) is still waiting for its doc.
+bool phaseAwaitingDoc(AgePhase p) => ppPhaseDocFor(p.number) == null;
 
 String? _phasesKey;
 List<AgePhase>? _phasesFilled;

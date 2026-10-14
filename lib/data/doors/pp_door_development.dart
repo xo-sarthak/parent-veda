@@ -128,29 +128,36 @@ final PpDoor kPpDevelopmentDoor = PpDoor(
     ),
     PpDoorTab(
       id: 'leaps',
-      label: 'The leaps',
+      // ⚠️ THE LEAPS ARE RETIRED (the user, 2026-10-14): "I don't want those
+      // old leaps ... anywhere in the app wired." The tab now opens the
+      // phases the Drive docs feed, birth to five. The id stays 'leaps'
+      // because deep links and `initialTabId` use it.
+      // Kept for revert: label: 'The leaps', toMonths: 20,
+      label: 'Phases',
       icon: Icons.auto_awesome_outlined,
       hue: 296,
       areaIds: [],
-      toMonths: 20,
       tools: [
         // ⚠️ THE HONESTY REFRAME. The calendar used to print his own dates
         // ("3 Oct to 27 Oct") and "he is in Phase 4 right now"; it now says
         // "around 4 to 6 months, give or take" and "may be in", with the
         // caveat in the header rather than the footer. The ten names, the
         // sunny side and the nazar line are untouched.
+        // Kept for revert: label 'Your baby\'s phase calendar', blurb 'The ten
+        // fussy-then-forward phases, held as a way to think about it, not a rule.'
         PpDoorTool(
-          label: 'Your baby\'s phase calendar',
-          blurb: 'The ten fussy-then-forward phases, held as a way to think '
-              'about it, not a rule.',
+          label: 'Your child\'s phases',
+          blurb: 'Every phase from birth to five, and what each one brings.',
           surfaceId: 'pp_leaps',
           icon: Icons.auto_awesome_outlined,
         ),
       ],
       // One popular idea, not science (gap analysis P3, 2026-10-07).
-      note: 'Which fussy-then-forward phase your baby may be in now. The leaps '
-          'are one popular idea, not proven science, and every baby\'s timing '
-          'is their own: a lens and never a law.',
+      // Kept for revert: 'Which fussy-then-forward phase your baby may be in
+      // now. The leaps are one popular idea, not proven science, and every
+      // baby's timing is their own: a lens and never a law.'
+      note: 'The phase your child is in now, and the ones ahead. Every '
+          'child\'s timing is their own.',
     ),
     PpDoorTab(
       id: 'talk',

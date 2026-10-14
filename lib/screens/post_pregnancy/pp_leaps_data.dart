@@ -1,3 +1,7 @@
+// ⚠️ RETIRED 2026-10-14, KEPT FOR REVERT. The user: "I don't want those old
+// leaps ... anywhere in the app wired." Nothing opens this any more: the
+// surface `pp_leaps` lands on PhaseMapScreen, whose phases the Drive phase
+// docs feed. Do not wire it back without the user's word.
 // =============================================================================
 //  ParentVeda Leaps - the Wonder Weeks model + seed content
 // -----------------------------------------------------------------------------

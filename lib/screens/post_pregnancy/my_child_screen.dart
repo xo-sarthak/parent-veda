@@ -528,11 +528,14 @@ class _MyChildScreenState extends State<MyChildScreen> {
             style: ppJakarta(16, color: Colors.white),
             maxLines: 1,
             overflow: TextOverflow.ellipsis),
+        // Doc-only phases carry no tagline (2026-10-14).
+        if (phase.tagline.isNotEmpty) ...[
         const SizedBox(height: 3),
         Text(phase.tagline,
             style: ppBody(12, color: Colors.white.withValues(alpha: 0.82), h: 1.35),
             maxLines: 2,
             overflow: TextOverflow.ellipsis),
+        ],
         const SizedBox(height: 13),
         // The track, now with a tick per phase — the road has stops on it.
         LayoutBuilder(builder: (context, c) {
@@ -1575,6 +1578,8 @@ class _MyChildScreenState extends State<MyChildScreen> {
                 const SizedBox(height: 10),
               ],
             ],
+          // Nothing to expand on a phase still waiting for its doc.
+          if (phase.sections.isNotEmpty) ...[
           const SizedBox(height: 12),
           GestureDetector(
             onTap: () => setState(() => _leapExpanded = !_leapExpanded),
@@ -1585,6 +1590,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
               Icon(_leapExpanded ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded, size: 19, color: ppPurple),
             ]),
           ),
+          ],
         ]),
       ));
 
