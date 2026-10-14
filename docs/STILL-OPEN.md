@@ -10223,8 +10223,10 @@ the phase map's page; the "A new stage" message.
   (activities, food, reading, reco), because `watchVideoById` falls back to the FIRST film on a
   missing id and would have opened the wrong one. Brain Development now has no film: the change
   sheet leaves its player out, and the Watch topic says new films are on the way.
-- **Still leap content, for the user:** the article "Phase 4, decoded" (`leap4` in
-  `pp_reading_data.dart`), in the Brain collection, "For you" and two recommendations.
+- **"Phase 4, decoded" retired 2026-10-14** (the user): Wonder Weeks leap 4, which clashed with
+  the docs' Phase 4 "Finding a Rhythm". The article (`leap4`, `pp_reading_data.dart`), its search
+  copy in `kArticles`, and its links (Brain collection, For you, two recommendations) are commented
+  out; `readArticleById` falls back to the first article on a missing id.
 - **The age page lost Feeding now / Sleep now** for phases 1–15 (authored, not in the docs). If the
   docs grow those sections, map them in `ppPhaseWithDoc`.
 - **PH015's Emotional activity "Naming All the Feelings"** is named on its milestone page but the doc never

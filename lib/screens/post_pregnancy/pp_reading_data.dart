@@ -129,7 +129,7 @@ class ReadCollection {
 // ---- collections ------------------------------------------------------------
 const List<ReadCollection> kReadCollections = [
   ReadCollection(id: 'sleep', title: 'Understanding Sleep', subtitle: 'Why it changes, and how to work with it.', icon: Icons.bedtime_outlined, articleIds: ['sleepcycles', 'drowsy'], seed: 41),
-  ReadCollection(id: 'brain', title: 'Brain Development', subtitle: 'What’s growing behind those new expressions.', icon: Icons.psychology_outlined, articleIds: ['leap4', 'talking'], seed: 42),
+  ReadCollection(id: 'brain', title: 'Brain Development', subtitle: 'What’s growing behind those new expressions.', icon: Icons.psychology_outlined, articleIds: [/* 'leap4', retired with the leaps 2026-10-14 */ 'talking'], seed: 42),
   ReadCollection(id: 'feeding', title: 'Feeding & Nutrition', subtitle: 'From milk to first foods, calmly.', icon: Icons.restaurant_outlined, articleIds: ['solids'], seed: 43),
   ReadCollection(id: 'behaviour', title: 'Behaviour & Emotions', subtitle: 'Making sense of big feelings.', icon: Icons.favorite_border, articleIds: ['tantrums'], seed: 44),
   ReadCollection(id: 'health', title: 'Health & Illness', subtitle: 'Calm, clear guidance for the worried moments.', icon: Icons.monitor_heart_outlined, articleIds: ['fever'], seed: 45),
@@ -200,47 +200,48 @@ const List<ReadArticle> kReadArticles = [
       ),
     ],
   ),
-  ReadArticle(
-    id: 'leap4',
-    title: 'Phase 4, decoded: what the fussiness means',
-    teaser: 'The clinginess isn’t a step back. It’s a window opening.',
-    whyToday: 'Fussy, clingy, everything-off days often mean a mental leap. Knowing what he’s working on turns frustration into fascination.',
-    collection: 'brain',
-    ageTag: '3–6 mo',
-    minutes: 5,
-    seed: 2,
-    // Was signed 'Dr. Ananya Rao' (Paediatrician), a doctor our own code calls fictional
-    // (gap analysis P1, 2026-10-07). Kept for revert:
-    //   author: 'Dr. Ananya Rao', authorRole: 'Paediatrician',
-    author: kPpEditorialAuthor,
-    authorRole: kPpEditorialRole,
-    /* relatedVideoId: 'leap4brain', retired with the leaps 2026-10-14; new phase films to come */
-    relatedVideoIds: ['q_play', 'q_talk', 'babbling'],
-    relatedActivity: 'Reach for the ring',
-    relatedCommunity: '0–1 Year',
-    sections: [
-      ReadSection(paragraphs: [
-        'Some weeks, your baby seems to come undone, extra clingy, extra fussy, feeding and sleeping all over the place, for no reason you can name. Before you worry, consider the loveliest explanation: his brain is about to do something new.',
-      ]),
-      ReadSection(
-        heading: 'The world of events',
-        paragraphs: [
-          'Around four months, babies enter what’s often called Phase 4, “the world of events”. For the first time, your baby grasps that one thing leads smoothly to another: your hand reaches, and the toy moves. Cause, meet effect.',
-          'It sounds small. It is enormous. The whole world suddenly has a logic to it, and taking that in is genuinely disorienting, which is exactly why he clings a little tighter to the person who makes him feel safe: you.',
-        ],
-      ),
-      ReadSection(
-        heading: 'How to walk through it together',
-        paragraphs: [
-          'Phases pass, and a new skill usually appears on the far side, a first roll, a new sound, a longer gaze. Until then, more closeness helps, not less. Slow, narrated play, “here comes the ball… and it rolls”, gives his new understanding something to chew on.',
-        ],
-        tip: ReadTip(
-          'Narrate the cause and effect',
-          'During play, say the sequence out loud: “you pushed it… and it fell!” You’re handing him words for the very thing his brain is discovering.',
-        ),
-      ),
-    ],
-  ),
+  // 'Phase 4, decoded' (leap4): Wonder Weeks leap 4, retired with the leaps 2026-10-14. Kept for revert:
+  //ReadArticle(
+  //  id: 'leap4',
+  //  title: 'Phase 4, decoded: what the fussiness means',
+  //  teaser: 'The clinginess isn’t a step back. It’s a window opening.',
+  //  whyToday: 'Fussy, clingy, everything-off days often mean a mental leap. Knowing what he’s working on turns frustration into fascination.',
+  //  collection: 'brain',
+  //  ageTag: '3–6 mo',
+  //  minutes: 5,
+  //  seed: 2,
+  //  // Was signed 'Dr. Ananya Rao' (Paediatrician), a doctor our own code calls fictional
+  //  // (gap analysis P1, 2026-10-07). Kept for revert:
+  //  //   author: 'Dr. Ananya Rao', authorRole: 'Paediatrician',
+  //  author: kPpEditorialAuthor,
+  //  authorRole: kPpEditorialRole,
+  //  /* relatedVideoId: 'leap4brain', retired with the leaps 2026-10-14; new phase films to come */
+  //  relatedVideoIds: ['q_play', 'q_talk', 'babbling'],
+  //  relatedActivity: 'Reach for the ring',
+  //  relatedCommunity: '0–1 Year',
+  //  sections: [
+  //    ReadSection(paragraphs: [
+  //      'Some weeks, your baby seems to come undone, extra clingy, extra fussy, feeding and sleeping all over the place, for no reason you can name. Before you worry, consider the loveliest explanation: his brain is about to do something new.',
+  //    ]),
+  //    ReadSection(
+  //      heading: 'The world of events',
+  //      paragraphs: [
+  //        'Around four months, babies enter what’s often called Phase 4, “the world of events”. For the first time, your baby grasps that one thing leads smoothly to another: your hand reaches, and the toy moves. Cause, meet effect.',
+  //        'It sounds small. It is enormous. The whole world suddenly has a logic to it, and taking that in is genuinely disorienting, which is exactly why he clings a little tighter to the person who makes him feel safe: you.',
+  //      ],
+  //    ),
+  //    ReadSection(
+  //      heading: 'How to walk through it together',
+  //      paragraphs: [
+  //        'Phases pass, and a new skill usually appears on the far side, a first roll, a new sound, a longer gaze. Until then, more closeness helps, not less. Slow, narrated play, “here comes the ball… and it rolls”, gives his new understanding something to chew on.',
+  //      ],
+  //      tip: ReadTip(
+  //        'Narrate the cause and effect',
+  //        'During play, say the sequence out loud: “you pushed it… and it fell!” You’re handing him words for the very thing his brain is discovering.',
+  //      ),
+  //    ),
+  //  ],
+  //),
   ReadArticle(
     id: 'solids',
     title: 'Starting solids without the stress',
@@ -687,7 +688,7 @@ List<ReadArticle> articlesInCollection(String collectionId) =>
 ReadArticle todaysRead() => readArticleById('sleepcycles');
 
 /// Personalised picks (seeded order stands in for the recommendation engine).
-List<ReadArticle> forYou() => ['leap4', 'solids', 'talking', 'tummytime', 'fever', 'matrescence'].map(readArticleById).toList();
+List<ReadArticle> forYou() => [/* 'leap4', retired with the leaps 2026-10-14 */ 'solids', 'talking', 'tummytime', 'fever', 'matrescence'].map(readArticleById).toList();
 
 /// Articles of a given kind - for the READ type filter (All / Articles / Book
 /// Summaries / Research Summaries).

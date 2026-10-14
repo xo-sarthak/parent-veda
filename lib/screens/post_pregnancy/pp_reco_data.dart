@@ -338,7 +338,7 @@ const List<RecoItem> kReco = [
     skills: ['Object permanence', 'Social connection'], benefits: ['Social wiring', 'Self-recognition'],
     collections: ['indianbooks', 'sensory'], tags: ['peekaboo', 'mirror', 'faces', 'indian', 'flap'],
     subtype: 'Lift-the-flap book', facets: {'format': ['board'], 'language': ['bilingual'], 'theme': ['faces']},
-    relatedActivityId: 'peekaboo', relatedArticleId: 'leap4',
+    relatedActivityId: 'peekaboo', /* relatedArticleId: 'leap4', retired with the leaps 2026-10-14 */
   ),
   RecoItem(
     id: 'bk_emotions', category: 'Books', title: 'How Are You Feeling Today?', summary: 'Everyday emotions in simple pictures.',
@@ -497,7 +497,7 @@ const List<RecoItem> kReco = [
     skills: ['Understanding development'], benefits: ['Parent confidence'],
     collections: [], tags: ['fussy', 'brain', 'parent', 'development'],
     subtype: 'Parent explainer', facets: {'type': ['explainer'], 'length': ['short']},
-    /* relatedVideoId: 'leap4brain', retired with the leaps 2026-10-14; new phase films to come */ relatedArticleId: 'leap4',
+    /* relatedVideoId: 'leap4brain', retired with the leaps 2026-10-14; new phase films to come */ /* relatedArticleId: 'leap4', retired with the leaps 2026-10-14 */
   ),
   RecoItem(
     id: 'vd_sleep', category: 'Videos', title: 'The 4-month sleep shift, explained', summary: 'Why nights change - and what helps.',
