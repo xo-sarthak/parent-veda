@@ -39,12 +39,14 @@ import 'package:flutter/material.dart';
 import '../data/garbh_data.dart';
 import 'doors/pv_door_chrome.dart' show pvDoorPad;
 import 'garbh/garbh_daily_shell.dart';
+import 'garbh/garbh_marks.dart';
 import 'pregnancy/preg_chrome.dart' show pregFilledStyle;
 import 'products/pv_store_chrome.dart' show pvStorePalette;
 import '../localization/app_language.dart';
 import '../models/garbh_content.dart';
 import '../services/pregnancy_controller.dart';
 import '../theme/pv_fonts.dart';
+import '../widgets/pv_feedback.dart';
 
 const _accBuddhi = Color(0xFF2F2C30); // muted indigo, its own place on the wheel
 const _ink = Color(0xFF201C24); // V3 ink1
@@ -275,13 +277,15 @@ class GarbhBuddhiScreen extends StatelessWidget {
   }
 }
 
-/// A line icon for a puzzle (the emoji it carried is not drawn).
-IconData _puzzleIcon(String titleEn) => switch (titleEn) {
-      'Sudoku' => Icons.grid_on_rounded,
-      'Logic Puzzle' => Icons.extension_outlined,
-      'Memory Match' => Icons.style_outlined,
-      _ => Icons.search_rounded,
-    };
+// Kept for revert (2026-10-15): the line icon per puzzle. The tiles now wear
+// the drawn game marks (garbh_marks.dart `garbhGameMarkFor`), the user: "use
+// the marks, the glyphs we are using instead of the icons".
+// IconData _puzzleIcon(String titleEn) => switch (titleEn) {
+//       'Sudoku' => Icons.grid_on_rounded,
+//       'Logic Puzzle' => Icons.extension_outlined,
+//       'Memory Match' => Icons.style_outlined,
+//       _ => Icons.search_rounded,
+//     };
 
 /// Today's game: its name, one line, and Play. The mark sits in the card.
 class _TodayGame extends StatelessWidget {
@@ -302,13 +306,7 @@ class _TodayGame extends StatelessWidget {
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-                color: p.surfaceAlt, borderRadius: BorderRadius.circular(14)),
-            child: Icon(_puzzleIcon(puzzle.title.en), size: 22, color: p.ink1),
-          ),
+          garbhGameMark(garbhGameMarkFor(puzzle.title.en), size: 48),
           const SizedBox(width: 12),
           Text('TODAY',
               style: pvManrope(
@@ -332,7 +330,7 @@ class _TodayGame extends StatelessWidget {
             style: pregFilledStyle().copyWith(
                 minimumSize: const WidgetStatePropertyAll(Size.fromHeight(52))),
             onPressed: onPlay,
-            icon: const Icon(Icons.play_arrow_rounded),
+            icon: garbhKeyGlyph(GarbhGameMark.play, color: Colors.white, size: 16),
             label: Text('Play',
                 style: pvManrope(fontSize: 15, fontWeight: FontWeight.w800)),
           ),
@@ -351,19 +349,15 @@ class _GameRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = pvStorePalette;
-    return InkWell(
+    return PvPress(
+      child: GestureDetector(
       key: ValueKey('buddhi_game_${puzzle.title.en}'),
+      behavior: HitTestBehavior.opaque,
       onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 13, 12, 13),
         child: Row(children: [
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-                color: p.surfaceAlt, borderRadius: BorderRadius.circular(11)),
-            child: Icon(_puzzleIcon(puzzle.title.en), size: 19, color: p.ink1),
-          ),
+          garbhGameMark(garbhGameMarkFor(puzzle.title.en), size: 40),
           const SizedBox(width: 14),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -379,6 +373,7 @@ class _GameRow extends StatelessWidget {
           ),
           Icon(Icons.chevron_right_rounded, size: 22, color: p.ink3),
         ]),
+      ),
       ),
     );
   }

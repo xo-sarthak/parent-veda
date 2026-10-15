@@ -1207,6 +1207,38 @@ fill, no border.
 
 # 5. PATTERNS
 
+## 4.15 Audio player (2026-10-15)
+
+The one way a track plays, from Spotify, Shazam, Deezer and Calm's now-playing
+(MOBBIN-DISCOVERY §23). `RagaPlayer(large: true)`:
+
+- A square cover, radius 28, in the track's own tone (`shravanHueFor(id)`),
+  with the sound bars moving while it plays. A photograph replaces it when
+  there is one.
+- The title (serif) and the credit (ink2) under it, like an artist line. A
+  screen whose hero already names the track leaves the title out.
+- A scrubber with the elapsed time and the time left (`-m:ss`).
+- One ink play disc, 76. It flips to pause on the tap itself, before the audio
+  engine answers.
+- Previous / next only where moving between tracks is the point (the full
+  player). A screen that plays one track shows none: a control that leads
+  nowhere is a choice she does not need.
+- A list that plays rows carries a now-playing bar at its foot: the cover, the
+  title, Playing / Paused, play-pause and close. Tapping it opens the full
+  player. Leaving the list stops what it started.
+
+## 4.16 Recorder bar (2026-10-15)
+
+Recording is one bar that changes in place, never a big disc
+(Hinge, ABY Journal, ChatGPT, Bond):
+
+- Ready: the ink pill, 52 high, "Record in your voice".
+- Recording: the same space is a soft well (64 high): a slow pulsing dot,
+  moving bars, the time, a round ink stop. Nothing below it moves.
+- Recorded: the well plays it back (play / pause, "Your recording · m:ss",
+  "Again" as a text button), and "Keep this" is the ink pill under it.
+- "Starting…" shows the instant she taps, while the microphone opens.
+
 ## 5.1 One screen does one thing
 
 Settings is settings. The notes editor is notes. **The only exception is a home

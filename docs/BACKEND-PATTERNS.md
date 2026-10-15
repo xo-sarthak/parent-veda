@@ -2744,6 +2744,35 @@ carries data that the later state cannot reproduce: who, when, and which
 one. "Is it unlocked?" is derivable. "What was the baby's name on the day?"
 is not.
 
+## 16gg. One store owns playback, and every list asks the same source — the Shravan drone bug (no migration, 2026-10-15)
+
+**The bug.** The raga's own page asked `ShravanLibrary.playableFor(id)` and
+played the real recording. The "All ragas" list called
+`RagaAudioStore.toggle(a.asset ?? kGarbhRagaAsset)`, and `a.asset` is null on
+every raga, so every row played the bundled sample tone. Same raga, two
+answers, and no error anywhere: both calls succeed.
+
+**The mechanism.** Two callers each decided *what to play*. The library was the
+source of truth, but only one caller consulted it; the other had its own
+fallback baked in from before the library existed. A fallback written for
+"nothing exists yet" silently outlived the thing it was waiting for.
+
+**The pattern.** One store owns *playing* (`RagaAudioStore`: one player, one
+asset, play / pause / seek / stop), and one function owns *what a track is*
+(`ShravanLibrary.playableFor`). Every surface asks both, in that order. The
+list now resolves its source exactly as the player does, and the honesty note
+("the same sample tone") shows only while some raga truly has no recording.
+
+**A second rule fell out of it.** Whoever starts a sound stops it when it
+leaves: the player stops its track on dispose (only if the store still holds
+that track, so previous / next can hand over), and the list stops what it
+started when it closes. A sound with no visible owner is a sound she cannot
+find to stop.
+
+**The general fact.** A fallback is a second source of truth with an expiry
+date nobody wrote down. When the real source arrives, grep for every place
+that decided without it.
+
 ## 17. Reading list, in order
 
 1. `0001_create_profiles.sql` — the two layers (grant + RLS), own-row.
@@ -2819,3 +2848,4 @@ is not.
 32. `lib/ask_veda/pp_veda_corpus.dart` + the service's `scope_domain` / `stage_key_for` — namespaced prune, versioned cache key; `pvSignOut` — independent guards (§16cc).
 33. `lib/services/pv_sync_health.dart` — fire-and-forget, but report once (§16dd).
 34. `lib/services/dear_baby_vault_store.dart` — a stored event with a derived fallback (§16ff).
+35. `lib/screens/garbh_browse_screen.dart` `shravanBrowse` — one source for what plays (§16gg).

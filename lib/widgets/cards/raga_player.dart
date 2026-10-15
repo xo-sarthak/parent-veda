@@ -35,6 +35,8 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../../screens/products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
+import '../../screens/ttc/doors/ttc_tab_art.dart' show ttcTabGround, ttcTabInk;
+import '../../screens/v2/v2_palette.dart' show V2PaletteStore, v2BlockTint;
 import '../../services/raga_audio_store.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/pv_fonts.dart';
@@ -51,7 +53,40 @@ class RagaPlayer extends StatefulWidget {
     this.loop = true,
     this.onFinished,
     this.large = false,
+    this.credit,
+    this.coverHue = 42,
+    this.showTitle = false,
+    this.onPrevious,
+    this.onNext,
+    this.autoplay = false,
   });
+
+  // ---- The now-playing layout (2026-10-15, the Garbh pillars pass) -------
+  // The user: Shravan "looks off"; it should feel like "the audio playing
+  // applications, music playing applications". From the Mobbin look at
+  // Spotify, Shazam, Deezer, SiriusXM and Calm's now-playing: a big square
+  // cover, the title and the artist under it, a scrubber with times, and the
+  // play as one large disc between previous and next. Only the large card
+  // changes; the small one is as it was.
+
+  /// The recordist and piece, shown under the title like an artist line.
+  final String? credit;
+
+  /// The cover's tone (`shravanHueFor(id)`), so each raga has its own.
+  final double coverHue;
+
+  /// The daily screen's hero already names the raga, so it passes false
+  /// there; the full player passes true.
+  final bool showTitle;
+
+  /// Previous / next raga. Null hides them: the daily screen plays ONE track,
+  /// and a control that leads nowhere is a choice she does not need.
+  final VoidCallback? onPrevious;
+  final VoidCallback? onNext;
+
+  /// Start playing on arrival (the full player after previous / next, so
+  /// moving to the next raga keeps the music going, as every player does).
+  final bool autoplay;
 
   final String title;
   final String subtitle;
@@ -120,6 +155,26 @@ class _RagaPlayerState extends State<RagaPlayer>
       vsync: this,
       duration: const Duration(milliseconds: 900),
     )..repeat();
+    if (widget.autoplay) {
+      // After the outgoing player has let go of its track (its dispose stops
+      // it a frame later), so the two never fight over the one player.
+      Future<void>.delayed(const Duration(milliseconds: 160), () {
+        if (mounted && !_audio.isPlayingAsset(widget.asset)) _toggle();
+      });
+    }
+  }
+
+  /// What the disc shows the instant she taps it, before the platform
+  /// reports back: the tap answers the finger, not the audio engine.
+  bool? _want;
+
+  void _toggle() {
+    setState(() => _want = !(_want ?? _audio.isPlayingAsset(widget.asset)));
+    _audio.toggle(widget.asset,
+        title: widget.title,
+        isFile: widget.isFile,
+        isUrl: widget.isUrl,
+        loop: widget.loop);
   }
 
   @override
@@ -136,7 +191,12 @@ class _RagaPlayerState extends State<RagaPlayer>
     // teardown, where `notifyListeners` would rebuild widgets mid-unmount.
     if (_audio.owns(widget.asset)) {
       final store = _audio;
-      WidgetsBinding.instance.addPostFrameCallback((_) => store.stop());
+      final mine = widget.asset;
+      // Only if it is still THIS track a frame later: on previous / next the
+      // incoming player may already have taken the store over.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (store.owns(mine)) store.stop();
+      });
     }
     super.dispose();
   }
@@ -164,8 +224,153 @@ class _RagaPlayerState extends State<RagaPlayer>
   Widget _largeCard(BuildContext context, bool playing, Duration position,
       Duration duration, double totalSecs, double posSecs) {
     final p = pvStorePalette;
-    return Container(
+    if (_want != null && _want == playing) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) setState(() => _want = null);
+      });
+    }
+    final shown = _want ?? playing;
+    final tint = v2BlockTint(widget.coverHue % 360, V2PaletteStore.instance.current);
+    final left = duration - position;
+    Widget roundCtl(String label, IconData icon, VoidCallback? onTap, Key key) =>
+        Semantics(
+          button: true,
+          label: label,
+          child: PvPress(
+            child: GestureDetector(
+              key: key,
+              behavior: HitTestBehavior.opaque,
+              onTap: onTap,
+              child: SizedBox(
+                width: 56,
+                height: 56,
+                child: Icon(icon, size: 32, color: kPvInk),
+              ),
+            ),
+          ),
+        );
+    return SizedBox(
       key: const ValueKey('raga_player_large'),
+      width: double.infinity,
+      child: Column(
+      children: [
+        // The cover: the track's tone, its sound bars moving while it plays.
+        LayoutBuilder(builder: (context, box) {
+          final side = math.min(box.maxWidth, 280.0);
+          return AnimatedContainer(
+            duration: const Duration(milliseconds: 260),
+            width: side,
+            height: side,
+            decoration: BoxDecoration(
+              color: ttcTabGround(tint),
+              borderRadius: BorderRadius.circular(28),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: shown ? 0.10 : 0.05),
+                  blurRadius: shown ? 22 : 12,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
+            alignment: Alignment.center,
+            child: _Equalizer(
+                animation: _eq,
+                active: playing,
+                width: side * 0.5,
+                height: side * 0.34,
+                bars: 9,
+                barWidth: side * 0.032,
+                color: ttcTabInk(tint)),
+          );
+        }),
+        const SizedBox(height: 20),
+        if (widget.showTitle)
+          Text(widget.title,
+              textAlign: TextAlign.center,
+              style: pvFraunces(
+                  fontSize: 24, fontWeight: FontWeight.w600, height: 1.15, color: kPvInk)),
+        if (widget.credit != null && widget.credit!.trim().isNotEmpty) ...[
+          if (widget.showTitle) const SizedBox(height: 6),
+          Text(widget.credit!,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: pvManrope(fontSize: 13, height: 1.4, color: p.ink2)),
+        ],
+        const SizedBox(height: 10),
+        SliderTheme(
+          data: SliderTheme.of(context).copyWith(
+            trackHeight: 4,
+            activeTrackColor: kPvInk,
+            inactiveTrackColor: kPvLine,
+            thumbColor: kPvInk,
+            thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 7),
+            overlayShape: const RoundSliderOverlayShape(overlayRadius: 16),
+          ),
+          child: Slider(
+            value: posSecs.clamp(0, totalSecs <= 0 ? 1 : totalSecs),
+            max: totalSecs <= 0 ? 1 : totalSecs,
+            onChanged: (v) =>
+                _audio.seek(widget.asset, Duration(milliseconds: (v * 1000).round())),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 6),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(_fmt(position),
+                  style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w700, color: p.ink3)),
+              Text('-${_fmt(left.isNegative ? Duration.zero : left)}',
+                  style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w700, color: p.ink3)),
+            ],
+          ),
+        ),
+        const SizedBox(height: 8),
+        Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          if (widget.onPrevious != null) ...[
+            roundCtl('Previous raga', Icons.skip_previous_rounded, widget.onPrevious,
+                const ValueKey('raga_prev')),
+            const SizedBox(width: 22),
+          ],
+          Semantics(
+            button: true,
+            label: shown ? 'Pause' : 'Play',
+            child: PvPress(child: GestureDetector(
+              key: const ValueKey('raga_play'),
+              behavior: HitTestBehavior.opaque,
+              onTap: _toggle,
+              child: Container(
+                width: 76,
+                height: 76,
+                decoration: const BoxDecoration(color: kPvInk, shape: BoxShape.circle),
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 160),
+                  child: Icon(shown ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                      key: ValueKey(shown), color: Colors.white, size: 42),
+                ),
+              ),
+            )),
+          ),
+          if (widget.onNext != null) ...[
+            const SizedBox(width: 22),
+            roundCtl('Next raga', Icons.skip_next_rounded, widget.onNext,
+                const ValueKey('raga_next')),
+          ],
+        ]),
+      ],
+      ),
+    );
+  }
+
+  // Kept for revert (2026-10-15): the white card with 15 bars over an 84px
+  // disc, a slider and two times.
+  // ignore: unused_element
+  Widget _largeCardV1(BuildContext context, bool playing, Duration position,
+      Duration duration, double totalSecs, double posSecs) {
+    final p = pvStorePalette;
+    return Container(
+      key: const ValueKey('raga_player_large_v1'),
       padding: const EdgeInsets.fromLTRB(20, 22, 20, 14),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -335,7 +540,10 @@ class _Equalizer extends StatelessWidget {
     this.height = 26,
     this.bars = 5,
     this.color,
+    this.barWidth = 3.5,
   });
+
+  final double barWidth;
 
   final Animation<double> animation;
   final bool active;
@@ -364,7 +572,7 @@ class _Equalizer extends StatelessWidget {
                                       animation.value * 2 * math.pi + i * 1.1)))
                   : 0.28;
               return Container(
-                width: 3.5,
+                width: barWidth,
                 height: height * base.clamp(0.12, 1.0),
                 decoration: BoxDecoration(
                   color: color ?? AppTheme.primary400,

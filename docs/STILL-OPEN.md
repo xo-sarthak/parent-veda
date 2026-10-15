@@ -10368,3 +10368,33 @@ scores shown; kids' books on the Reading shelf; dopplers and herbal teas held.
 - **Ask Veda's product answers** read the Supabase `products` table, not this data; loading these products there
   (migration 0083, §65.1) is what would let Ask Veda point to them.
 - **Category photos load from Wikimedia**, which throttles; the R2 mirror (§63.18) covers these too.
+
+## 90.0 Garbh pillars pass — the player, the recorder, the marks, the calm room — 2026-10-15
+
+Asked: Shravan "looks off" and should feel like a music app; Samvad's big
+record disc "wastes space"; Buddhi should wear the app's drawn marks, on its
+tiles and inside every game; Kriya's breathing elevated; the same in the
+Garbh door; every screen easy, calm and responsive. Mobbin:
+MOBBIN-DISCOVERY §23. Tests: `test/garbh_pillars_ui_test.dart` plus the
+existing Garbh suites (updated on purpose where the old look was asserted).
+
+- 90.1 DONE: Shravan. The large player is a now-playing card (DESIGN-SYSTEM
+  §4.15). The raga page is the full player with previous / next. "All ragas"
+  rows show covers, play the library's recordings (they all played the sample
+  tone before) and carry a now-playing bar.
+- 90.2 DONE: Samvad. The 148px disc is a recorder bar (DESIGN-SYSTEM §4.16).
+- 90.3 DONE: Buddhi. Drawn game marks (`GarbhGameMark`) on the daily tiles,
+  the door's game tiles and the old Tools grid. Inside the games: no app bar,
+  a round back, at most two labelled actions (Restart, New) in the title row,
+  key glyphs with their words, drawn Memory faces, a plain how-to card, a calm
+  finish.
+- 90.4 DONE: Kriya. Breathing is a calm room (no app bar, the circle in the
+  Garbh tint, a breath count, one Finish, Pause). Practice pages and lists
+  wear drawn marks; the tinted "why" boxes are hairline cards; the old
+  pillar scaffold has the round back.
+- 90.5 OWED: photo covers per raga (the `garbh_listen_<id>` image key takes
+  over from the drawn cover the moment a photo exists).
+- 90.6 OWED, optional: the drawn Shravan cover could carry each raga's time of
+  day (morning / evening) as a small mark.
+- 90.7 Device walk owed: the home card and the door, each pillar and back;
+  play a raga in "All ragas" and leave (it stops); record, listen back, keep.

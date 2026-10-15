@@ -118,6 +118,7 @@ class PvShelfCard extends StatelessWidget {
     this.paid = false,
     this.live = false,
     this.mark,
+    this.art,
     this.imageUrl,
     this.comingSoon = false,
     this.width = kPvShelfCardWidth,
@@ -143,6 +144,10 @@ class PvShelfCard extends StatelessWidget {
 
   /// The tile's drawn mark, for a card with no photograph.
   final IntentMark? mark;
+
+  /// A tile's OWN drawn picture, which wins over [mark] (2026-10-15: the
+  /// Garbh games wear their game marks here, not the generic blocks).
+  final Widget? art;
 
   /// The photograph, when the tile has one.
   final String? imageUrl;
@@ -171,9 +176,10 @@ class PvShelfCard extends StatelessWidget {
           child: FractionallySizedBox(
             widthFactor: 0.56,
             heightFactor: 0.56,
-            child: mark != null
-                ? HubIntentArt(mark: mark!, tint: _artTint)
-                : Icon(pvShelfKindIcon(kind), size: 40, color: p.ink2),
+            child: art ??
+                (mark != null
+                    ? HubIntentArt(mark: mark!, tint: _artTint)
+                    : Icon(pvShelfKindIcon(kind), size: 40, color: p.ink2)),
           ),
         ),
       );

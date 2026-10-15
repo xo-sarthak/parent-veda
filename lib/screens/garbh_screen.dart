@@ -39,12 +39,14 @@ import 'garbh_relaxation_screen.dart';
 import 'garbh_samvad_daily.dart';
 import 'doors/pv_door_chrome.dart' show pvDoorPad;
 import 'garbh/garbh_daily_shell.dart';
+import 'garbh/garbh_marks.dart';
+import 'v2/v2_palette.dart' show V2PaletteStore, v2BlockTint;
 import 'doors/pv_door_chrome.dart' show kPvUrgentInk;
 import 'pregnancy/preg_chrome.dart' show pregFilledStyle, pregSectionHeadingStyle;
 import 'products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 import 'garbh_shravan_surfaces.dart';
 import '../data/samvad_mantras_data.dart';
-import '../widgets/pv_feedback.dart' show PvPress;
+import '../widgets/pv_feedback.dart' show PvPress, pvCommitFeedback;
 import '../widgets/pv_toast.dart';
 
 // --- warm palette ---
@@ -536,14 +538,54 @@ class _PillarScaffold extends StatelessWidget {
   const _PillarScaffold({required this.title, required this.child});
   final String title;
   final Widget child;
+  // ⚠️ THE SAME BACK AS EVERY GARBH SCREEN (2026-10-15, the Garbh pillars
+  // pass): a round button top-left and a serif title, not a Material app
+  // bar. The user: every screen "easy to navigate"; one way back, drawn one
+  // way. Kept for revert: Scaffold(appBar: AppBar(title: Text(title))).
   @override
-  Widget build(BuildContext context) => Scaffold(
-        backgroundColor: _cream,
-        appBar: AppBar(
-            backgroundColor: _cream, elevation: 0, foregroundColor: _ink, title: Text(title)),
-        body: child,
-      );
+  Widget build(BuildContext context) {
+    final top = MediaQuery.paddingOf(context).top;
+    return Scaffold(
+      backgroundColor: _cream,
+      body: Column(children: [
+        Padding(
+          padding: EdgeInsets.fromLTRB(12, top + 8, 18, 4),
+          child: Row(children: [
+            PvPress(
+              child: GestureDetector(
+                key: const ValueKey('pillar_back'),
+                behavior: HitTestBehavior.opaque,
+                onTap: () => Navigator.of(context).maybePop(),
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: const Color(0x1F000000)),
+                  ),
+                  child: const Icon(Icons.arrow_back_rounded, size: 20, color: _ink),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: pvFraunces(fontSize: 20, fontWeight: FontWeight.w600, color: _ink)),
+            ),
+          ]),
+        ),
+        Expanded(child: child),
+      ]),
+    );
+  }
 }
+
+/// A Kriya practice's drawn mark: its own where one is drawn, else the
+/// shared lotus, on the Garbh tint (2026-10-15).
+Widget _practiceMark(String id, double size) => garbhPracticeArt(id, size: size);
 
 class _WhyCard extends StatelessWidget {
   const _WhyCard({required this.label, required this.text, required this.accent});
@@ -553,17 +595,19 @@ class _WhyCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context).textTheme;
+    // A hairline white card, never a tinted box behind text (2026-10-15;
+    // kept for revert: accent at 8% fill, 22% border, the label in accent).
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: accent.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: accent.withValues(alpha: 0.22)),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0x1F000000)),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(label.toUpperCase(),
-            style: t.labelSmall?.copyWith(color: accent, letterSpacing: 0.5, fontWeight: FontWeight.w800)),
+            style: t.labelSmall?.copyWith(color: _muted, letterSpacing: 1.2, fontWeight: FontWeight.w800)),
         const SizedBox(height: 6),
         Text(text, style: t.bodyMedium?.copyWith(height: 1.45, color: _ink)),
       ]),
@@ -742,7 +786,9 @@ class ShravanScreen extends StatelessWidget {
           final v2 = ShravanVersionStore.instance.version == ShravanVersion.v2;
           return Stack(children: [
             v2
-                ? shravanBrowse(lang, _accShravan)
+                ? shravanBrowse(lang, _accShravan,
+                    onOpen: (a) => _push(context,
+                        ShravanDetailScreen(audio: a, controller: controller)))
                 : _ShravanLibrary(controller: controller),
             const Positioned(
               right: 18,
@@ -890,7 +936,9 @@ class ShravanScreen extends StatelessWidget {
           label: lang.isHindi ? 'सभी राग देखिए' : 'See all ragas',
           onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
               settings: const RouteSettings(name: 'garbh/browse'),
-              builder: (_) => shravanBrowse(lang, _accShravan))),
+              builder: (_) => shravanBrowse(lang, _accShravan,
+                  onOpen: (a) => _push(context,
+                      ShravanDetailScreen(audio: a, controller: controller))))),
         ),
         const SizedBox(height: 4),
         pvDoorPad(Align(
@@ -942,9 +990,111 @@ class _ShravanHero extends StatelessWidget {
 /// ⚠️ PUBLIC SINCE THE DOOR. Listen's rails open a track here by surface id
 /// (`garbh/listen/<audio id>`), so the card she taps is the track she gets —
 /// not the month list the library opens on.
-class ShravanDetailScreen extends StatelessWidget {
+// ⚠️ THE FULL PLAYER (2026-10-15, the Garbh pillars pass). The user: the
+// listening part should be "like the audio playing applications, music
+// playing applications". This is the page a raga opens on from the door and
+// the "All ragas" list: the cover, the title and who recorded it, the
+// scrubber, and previous / next through the ragas, which keep the music
+// going like any player. Back is top-left, as on every Garbh screen; there
+// is no shuffle, repeat or queue to manage (the calm rule).
+// Kept for revert: `_ShravanDetailV1` below (the emoji hero over the small
+// player inside the old app-bar scaffold).
+class ShravanDetailScreen extends StatefulWidget {
   const ShravanDetailScreen(
       {super.key, required this.audio, required this.controller});
+  final GarbhAudio audio;
+  final PregnancyController controller;
+
+  @override
+  State<ShravanDetailScreen> createState() => _ShravanDetailScreenState();
+}
+
+class _ShravanDetailScreenState extends State<ShravanDetailScreen> {
+  late GarbhAudio _audio = widget.audio;
+  bool _moved = false;
+
+  /// The ragas and nature sounds she can step through. The guided track is a
+  /// session, not a song, so it is not in the run.
+  List<GarbhAudio> get _run =>
+      kShravan.where((a) => a.kind != GarbhKind.guided).toList();
+
+  void _step(int by) {
+    final run = _run;
+    final i = run.indexWhere((a) => a.id == _audio.id);
+    if (i < 0) return;
+    pvCommitFeedback();
+    setState(() {
+      _audio = run[(i + by) % run.length];
+      _moved = true;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final p = V2PaletteStore.instance.current;
+    final top = MediaQuery.paddingOf(context).top;
+    final stepping = _run.any((a) => a.id == _audio.id);
+    return Scaffold(
+      backgroundColor: p.ground,
+      body: ListView(
+        padding: EdgeInsets.fromLTRB(0, top + 8, 0, 32),
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 0, 18, 0),
+            child: Row(children: [
+              PvPress(
+                child: GestureDetector(
+                  key: const ValueKey('shravan_player_back'),
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => Navigator.of(context).maybePop(),
+                  child: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: p.surface,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: p.line),
+                    ),
+                    child: Icon(Icons.arrow_back_rounded, size: 20, color: p.ink1),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text('SHRAVAN  ·  LISTENING',
+                  style: pvManrope(
+                      fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.3, color: p.ink3)),
+            ]),
+          ),
+          const SizedBox(height: 22),
+          pvDoorPad(ShravanTrackPlayer(
+            key: ValueKey('player_${_audio.id}'),
+            audio: _audio,
+            controller: widget.controller,
+            large: true,
+            showTitle: true,
+            onPrevious: stepping ? () => _step(-1) : null,
+            onNext: stepping ? () => _step(1) : null,
+            autoplay: _moved,
+          )),
+          const SizedBox(height: 14),
+          Center(child: GarbhPinChip(pinId: 'shravan_${_audio.id}')),
+          const SizedBox(height: 10),
+          Center(
+            child: TextButton(
+              onPressed: () => _push(context, const ShravanCreditsScreen()),
+              child: Text('Where these sounds come from',
+                  style: pvManrope(fontSize: 13, fontWeight: FontWeight.w600, color: p.ink2)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ignore: unused_element
+class _ShravanDetailV1 extends StatelessWidget {
+  const _ShravanDetailV1({required this.audio, required this.controller});
   final GarbhAudio audio;
   final PregnancyController controller;
   @override
@@ -2123,7 +2273,7 @@ class KriyaScreen extends StatelessWidget {
             style: pregFilledStyle().copyWith(
                 minimumSize: const WidgetStatePropertyAll(Size.fromHeight(54))),
             onPressed: begin,
-            icon: const Icon(Icons.play_arrow_rounded),
+            icon: garbhKeyGlyph(GarbhGameMark.play, color: Colors.white, size: 14),
             label: Text(s.gsStart,
                 style: pvManrope(fontSize: 15, fontWeight: FontWeight.w800)),
           ),
@@ -2342,7 +2492,9 @@ List<Widget> _kriyaPracticeBody(BuildContext context, S s, TextTheme text,
           style: text.labelMedium?.copyWith(color: _muted)),
       const SizedBox(height: 12),
     ],
-    Center(child: Text(practice.emoji, style: const TextStyle(fontSize: 52))),
+    // The practice's drawn mark (2026-10-15; kept for revert: practice.emoji
+    // at 52).
+    Center(child: _practiceMark(practice.id, 72)),
     const SizedBox(height: 10),
     Text(practice.title.now,
         textAlign: TextAlign.center,
@@ -2370,12 +2522,15 @@ List<Widget> _kriyaPracticeBody(BuildContext context, S s, TextTheme text,
     // together buries the symptoms that matter inside advice about posture.
     const KriyaStopIfCard(),
     const SizedBox(height: 16),
+    // The one ink pill (2026-10-15; kept for revert: a teal FilledButton).
     SizedBox(
       width: double.infinity,
       child: FilledButton.icon(
+        key: const ValueKey('kriya_begin'),
         style: FilledButton.styleFrom(
-            backgroundColor: _accKriya,
-            padding: const EdgeInsets.symmetric(vertical: 14)),
+            backgroundColor: _ink,
+            minimumSize: const Size.fromHeight(52),
+            shape: const StadiumBorder()),
         // ⚠️ `relax` IS A SESSION, NOT A BREATH — 2026-09-12. The guided
         // relaxation has its own screen now (script, narration, figure); every
         // other practice is a pattern on the shared circle.
@@ -2385,9 +2540,9 @@ List<Widget> _kriyaPracticeBody(BuildContext context, S s, TextTheme text,
                 ? GarbhRelaxationScreen(pregnancy: controller, daily: daily)
                 : _BreathingScreen(
                     practice: practice, lang: lang, daily: daily)),
-        icon: const Icon(Icons.play_arrow_rounded, color: Colors.white),
-        label:
-            Text(s.gsStart, style: text.labelLarge?.copyWith(color: Colors.white)),
+        icon: garbhKeyGlyph(GarbhGameMark.play, color: Colors.white, size: 14),
+        label: Text(s.gsStart,
+            style: pvManrope(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white)),
       ),
     ),
     if (daily) ...[
@@ -2461,19 +2616,12 @@ class _KriyaBreathingList extends StatelessWidget {
                 border: Border.all(color: _line),
               ),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                // Cover placeholder (emoji on a soft gradient).
+                // Cover: the practice's drawn mark (2026-10-15; kept for
+                // revert: p.emoji at 54 on a teal gradient).
                 Container(
                   height: 120,
                   alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(colors: [
-                      _accKriya.withValues(alpha: 0.28),
-                      _accKriya.withValues(alpha: 0.10),
-                    ]),
-                    borderRadius:
-                        const BorderRadius.vertical(top: Radius.circular(22)),
-                  ),
-                  child: Text(p.emoji, style: const TextStyle(fontSize: 54)),
+                  child: _practiceMark(p.id, 84),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(16),
@@ -2533,19 +2681,12 @@ class _KriyaBrainFitnessGrid extends StatelessWidget {
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Cover.
+                    // Cover: the game's drawn mark (2026-10-15; kept for
+                    // revert: p.emoji at 38 on a teal gradient).
                     Container(
                       height: 84,
                       alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(colors: [
-                          _accKriya.withValues(alpha: 0.24),
-                          _accKriya.withValues(alpha: 0.08),
-                        ]),
-                        borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(20)),
-                      ),
-                      child: Text(p.emoji, style: const TextStyle(fontSize: 38)),
+                      child: garbhGameMark(garbhGameMarkFor(p.title.en), size: 60),
                     ),
                     Expanded(
                       child: Padding(
@@ -2566,12 +2707,12 @@ class _KriyaBrainFitnessGrid extends StatelessWidget {
                                         color: _muted, height: 1.35)),
                               ),
                               Row(children: [
-                                Icon(Icons.play_circle_outline_rounded,
-                                    size: 16, color: _accKriya),
-                                const SizedBox(width: 5),
+                                garbhKeyGlyph(GarbhGameMark.play,
+                                    color: _ink, size: 12),
+                                const SizedBox(width: 6),
                                 Text(hinglish ? 'खेलिए' : 'Play',
                                     style: text.labelSmall?.copyWith(
-                                        color: _accKriya,
+                                        color: _ink,
                                         fontWeight: FontWeight.w800)),
                               ]),
                             ]),
@@ -2605,9 +2746,140 @@ class _BreathingScreen extends StatefulWidget {
 // four"), the way a person counts a breath — it used to count down.
 class _BreathingScreenState extends State<_BreathingScreen> {
   late final BreathPattern _pattern = widget.practice.toBreathPattern();
+  bool _running = true;
+  int _breaths = 0;
 
+  void _finish() {
+    pvCommitFeedback();
+    final s = S(widget.lang);
+    if (widget.daily) GarbhStore.instance.markDone('kriya');
+    Navigator.of(context).pop();
+    pvToast(context, '${s.gsWellDone} - ${s.gsWellDoneBody}', kind: PvToastKind.done);
+  }
+
+  // ⚠️ A CALM ROOM, NOT A FORM (2026-10-15, the Garbh pillars pass). From the
+  // Mobbin look at Finch, Life Reset, Breathwrk and stoic: no app bar, the
+  // circle alone in the middle with the word to do inside it, a quiet count
+  // under it, and ONE action at the foot. The user: every screen "easy to
+  // use and to understand", and this section "representing peace and
+  // calmness". The circle now wears the Garbh tint and ink, not the old teal.
+  // Kept for revert: `_oldBuild` below (the _PillarScaffold with a teal
+  // circle and an outlined Finish).
   @override
   Widget build(BuildContext context) {
+    final s = S(widget.lang);
+    final p = V2PaletteStore.instance.current;
+    final top = MediaQuery.paddingOf(context).top;
+    final bottom = MediaQuery.paddingOf(context).bottom;
+    final cycle = _pattern.cycleSeconds <= 0 ? 1 : _pattern.cycleSeconds;
+    return Scaffold(
+      backgroundColor: p.ground,
+      body: Column(children: [
+        Padding(
+          padding: EdgeInsets.fromLTRB(12, top + 8, 18, 0),
+          child: Row(children: [
+            PvPress(
+              child: GestureDetector(
+                key: const ValueKey('breath_back'),
+                behavior: HitTestBehavior.opaque,
+                onTap: () => Navigator.of(context).maybePop(),
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: p.surface,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: p.line),
+                  ),
+                  child: Icon(Icons.arrow_back_rounded, size: 20, color: p.ink1),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(widget.practice.title.now,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: pvFraunces(fontSize: 22, fontWeight: FontWeight.w600, color: p.ink1)),
+            ),
+          ]),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(28, 14, 28, 0),
+          child: Text(widget.practice.blurb.now,
+              textAlign: TextAlign.center,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+              style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2)),
+        ),
+        Expanded(
+          child: Center(
+            child: PvBreathTicker(
+              running: _running,
+              onTick: (e) {
+                final n = e ~/ cycle;
+                if (n != _breaths) setState(() => _breaths = n);
+              },
+              builder: (context, elapsed) => PvBreathingCircle(
+                pattern: _pattern,
+                elapsed: elapsed,
+                running: _running,
+                tint: v2BlockTint(kGarbhHue, p),
+                ink: p.ink1,
+                // Box breathing traces a square: the shape teaches the timing.
+                square: widget.practice.id == 'box',
+                size: 260,
+              ),
+            ),
+          ),
+        ),
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 240),
+          child: Text(
+            !_running
+                ? 'Paused. Breathe as you like.'
+                : (_breaths == 0
+                    ? 'Follow the circle'
+                    : (_breaths == 1 ? '1 breath' : '$_breaths breaths')),
+            key: ValueKey('$_running$_breaths'),
+            style: pvManrope(fontSize: 13, fontWeight: FontWeight.w600, color: p.ink3),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.fromLTRB(24, 16, 24, 8 + bottom),
+          child: Column(children: [
+            PvPress(
+              child: GestureDetector(
+                key: const ValueKey('breath_finish'),
+                behavior: HitTestBehavior.opaque,
+                onTap: _finish,
+                child: Container(
+                  height: 52,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: p.ink1,
+                    borderRadius: BorderRadius.circular(26),
+                  ),
+                  child: Text(s.gsFinish,
+                      style: pvManrope(
+                          fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white)),
+                ),
+              ),
+            ),
+            TextButton(
+              key: const ValueKey('breath_pause'),
+              onPressed: () => setState(() => _running = !_running),
+              child: Text(_running ? 'Pause' : 'Resume',
+                  style: pvManrope(fontSize: 14, fontWeight: FontWeight.w600, color: p.ink2)),
+            ),
+          ]),
+        ),
+      ]),
+    );
+  }
+
+  // ignore: unused_element
+  Widget _oldBuild(BuildContext context) {
     final s = S(widget.lang);
     return _PillarScaffold(
       title: widget.practice.title.now,

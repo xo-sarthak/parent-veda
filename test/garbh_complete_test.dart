@@ -20,6 +20,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:parentveda/data/garbh_data.dart';
+import 'package:parentveda/models/garbh_content.dart' show GarbhKind;
+import 'package:parentveda/services/shravan_library.dart';
 import 'package:parentveda/data/garbh_rebuild_data.dart';
 import 'package:parentveda/localization/app_language.dart';
 import 'package:parentveda/screens/garbh_browse_screen.dart';
@@ -253,8 +255,14 @@ void main() {
 
     testWidgets('the placeholder caveat is shown while it is still true',
         (t) async {
+      // Since 2026-10-15 the rows play the library's recordings, so the
+      // caveat is true only while some raga has none.
       await _pump(t, shravanBrowse(AppLanguage.english, Colors.black));
-      expect(find.textContaining('same sample tone'), findsOneWidget);
+      final missing = kShravan
+          .where((a) => a.kind != GarbhKind.guided)
+          .any((a) => ShravanLibrary.instance.trackFor(a.id) == null);
+      expect(find.textContaining('same sample tone'),
+          missing ? findsOneWidget : findsNothing);
       // ⚠️ AND IT REMOVES ITSELF once every raga has a file - nobody has to
       // remember to delete it, which is the only reason an honesty note like
       // this survives a content drop.

@@ -35,6 +35,7 @@
 
 import 'dart:async';
 import 'dart:io';
+import 'dart:math' as math;
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
@@ -54,6 +55,7 @@ import '../services/garbh_store.dart';
 import '../services/pregnancy_controller.dart';
 import '../theme/pv_fonts.dart';
 import 'garbh_journal_screen.dart';
+import '../widgets/pv_feedback.dart' show PvPress;
 import '../widgets/pv_toast.dart';
 
 const _ink = Color(0xFF201C24); // V3 ink1
@@ -101,6 +103,18 @@ class _GarbhSamvadDailyScreenState extends State<GarbhSamvadDailyScreen> {
 
   bool _recording = false;
   bool _busy = false;
+
+  /// Her recording is playing back (the listen-back control shows pause).
+  bool _hearing = false;
+  StreamSubscription<PlayerState>? _hearSub;
+
+  @override
+  void initState() {
+    super.initState();
+    _hearSub = _player.onPlayerStateChanged.listen((st) {
+      if (mounted) setState(() => _hearing = st == PlayerState.playing);
+    });
+  }
   String? _clipPath;
   int _elapsed = 0;
   Timer? _tick;
@@ -119,6 +133,7 @@ class _GarbhSamvadDailyScreenState extends State<GarbhSamvadDailyScreen> {
   @override
   void dispose() {
     _tick?.cancel();
+    _hearSub?.cancel();
     _rec.dispose();
     _player.dispose();
     // A narrator left reading to an empty room is the audio bug this app has
@@ -200,6 +215,12 @@ class _GarbhSamvadDailyScreenState extends State<GarbhSamvadDailyScreen> {
   Future<void> _playBack() async {
     final p = _clipPath;
     if (p == null) return;
+    // A second tap while it plays is pause, as on every player (2026-10-15).
+    if (_hearing) {
+      await _player.stop();
+      return;
+    }
+    setState(() => _hearing = true);
     await _player.stop();
     await _player.play(DeviceFileSource(p));
   }
@@ -529,65 +550,34 @@ class _GarbhSamvadDailyScreenState extends State<GarbhSamvadDailyScreen> {
                     fontSize: 21, fontWeight: FontWeight.w500, height: 1.55, color: p.ink1)),
           ]),
         )),
-        const SizedBox(height: 26),
-        Center(
-          child: _RecordDisc(
-            recording: _recording,
-            elapsed: _elapsed,
-            busy: _busy,
-            onTap: _toggleRecord,
-          ),
-        ),
-        if (_clipPath != null && !_recording) ...[
-          const SizedBox(height: 18),
-          // ⚠️ HEAR IT BEFORE KEEPING IT. Without playback the only way to find out
-          // what was recorded is to save it, and a mother who dislikes her own
-          // recording and cannot check first will not record a second time.
-          pvDoorPad(Row(children: [
-            Expanded(
-              child: OutlinedButton.icon(
-                key: const ValueKey('samvad_listen'),
-                onPressed: _playBack,
-                style: OutlinedButton.styleFrom(
-                    foregroundColor: kPvInk,
-                    side: const BorderSide(color: kPvLine, width: 1.5),
-                    shape: const StadiumBorder(),
-                    minimumSize: const Size.fromHeight(48)),
-                icon: const Icon(Icons.play_arrow_rounded, size: 19),
-                label: const Text('Listen back'),
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: OutlinedButton.icon(
-                key: const ValueKey('samvad_again'),
-                onPressed: () => setState(() {
-                  _clipPath = null;
-                  _elapsed = 0;
-                }),
-                style: OutlinedButton.styleFrom(
-                    foregroundColor: p.ink2,
-                    side: const BorderSide(color: kPvLine, width: 1.5),
-                    shape: const StadiumBorder(),
-                    minimumSize: const Size.fromHeight(48)),
-                icon: const Icon(Icons.refresh_rounded, size: 19),
-                label: const Text('Again'),
-              ),
-            ),
-          ])),
-          const SizedBox(height: 10),
-          pvDoorPad(SizedBox(
-            width: double.infinity,
-            child: FilledButton(
-              key: const ValueKey('samvad_keep'),
-              onPressed: _save,
-              style: pregFilledStyle().copyWith(
-                  minimumSize: const WidgetStatePropertyAll(Size.fromHeight(52))),
-              child: Text('Keep this',
-                  style: pvManrope(fontSize: 15, fontWeight: FontWeight.w800)),
-            ),
-          )),
-        ],
+        const SizedBox(height: 16),
+        // ⚠️ A RECORDER BAR, NOT A DISC (2026-10-15, the Garbh pillars pass).
+        // The user: the big black 148px disc in the centre "does not look good"
+        // and "feels like wastage of space". From the Mobbin look at Hinge's
+        // voice prompt and the voice-note bars of ABY Journal, ChatGPT and
+        // Bond: ONE bar under the passage that changes in place. Ready, it is
+        // the ink pill "Record in your voice"; recording, the same space is a
+        // soft well with moving bars, the time and a round stop; recorded, it
+        // plays back with "Again" beside it and "Keep this" under it. The
+        // passage she is reading stays on screen the whole time. Kept for
+        // revert: `_RecordDisc` and the outlined Listen back / Again row.
+        pvDoorPad(_SamvadRecorder(
+          recording: _recording,
+          busy: _busy,
+          elapsed: _elapsed,
+          hasClip: _clipPath != null && !_recording,
+          hearing: _hearing,
+          onRecord: _toggleRecord,
+          onListen: _playBack,
+          onAgain: () {
+            _player.stop();
+            setState(() {
+              _clipPath = null;
+              _elapsed = 0;
+            });
+          },
+          onKeep: _save,
+        )),
         const SizedBox(height: 8),
         // ---- the narrator, quiet and secondary ---------------------------------
         //
@@ -689,6 +679,9 @@ class _RecordButton extends StatelessWidget {
 /// ⚠️ A FILLED BUTTON, STILL: the rebuild's rule is that recording is the one
 /// filled control on this screen and the narrator is a text link
 /// (`garbh_rebuild_pass2_test.dart` holds it by widget type).
+///
+/// Kept for revert (2026-10-15): `_SamvadRecorder` replaced it.
+// ignore: unused_element
 class _RecordDisc extends StatelessWidget {
   const _RecordDisc({
     required this.recording,
@@ -748,4 +741,294 @@ class _RecordDisc extends StatelessWidget {
       ),
     );
   }
+}
+
+/// The recorder: one bar that changes in place (2026-10-15). See the note in
+/// the screen's build for the why. Height is held across states (52 for the
+/// pill, 64 for the well) so nothing under it jumps while she reads.
+///
+/// ⚠️ THE READY STATE IS STILL A FILLED BUTTON keyed `samvad_record` saying
+/// "Record in your voice": recording is the one filled control on this
+/// screen and the narrator a text link (`garbh_rebuild_pass2_test.dart`).
+class _SamvadRecorder extends StatelessWidget {
+  const _SamvadRecorder({
+    required this.recording,
+    required this.busy,
+    required this.elapsed,
+    required this.hasClip,
+    required this.hearing,
+    required this.onRecord,
+    required this.onListen,
+    required this.onAgain,
+    required this.onKeep,
+  });
+
+  final bool recording;
+  final bool busy;
+  final int elapsed;
+  final bool hasClip;
+  final bool hearing;
+  final VoidCallback onRecord;
+  final VoidCallback onListen;
+  final VoidCallback onAgain;
+  final VoidCallback onKeep;
+
+  String get _time {
+    final m = elapsed ~/ 60;
+    final s = (elapsed % 60).toString().padLeft(2, '0');
+    return '$m:$s';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final p = pvStorePalette;
+    final Widget body;
+    if (recording || (busy && !hasClip)) {
+      // Recording (or the instant after the tap, while the mic opens).
+      body = _well(
+        key: const ValueKey('rec'),
+        p: p,
+        children: [
+          const SizedBox(width: 6),
+          _Pulse(active: recording),
+          const SizedBox(width: 12),
+          Expanded(child: _Bars(active: recording)),
+          const SizedBox(width: 12),
+          Text(recording ? _time : 'Starting…',
+              key: recording ? const ValueKey('samvad_timer') : null,
+              style: pvManrope(fontSize: 15, fontWeight: FontWeight.w700, color: kPvInk)),
+          const SizedBox(width: 10),
+          Semantics(
+            button: true,
+            label: 'Stop recording',
+            child: PvPress(
+              child: GestureDetector(
+                key: const ValueKey('samvad_record'),
+                behavior: HitTestBehavior.opaque,
+                onTap: recording ? onRecord : null,
+                child: Container(
+                  width: 48,
+                  height: 48,
+                  decoration: const BoxDecoration(color: kPvInk, shape: BoxShape.circle),
+                  child: const Icon(Icons.stop_rounded, color: Colors.white, size: 24),
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+    } else if (hasClip) {
+      // Recorded: hear it, record again, or keep it.
+      body = Column(key: const ValueKey('clip'), children: [
+        _well(p: p, children: [
+          Semantics(
+            button: true,
+            label: hearing ? 'Pause' : 'Listen back',
+            child: PvPress(
+              child: GestureDetector(
+                key: const ValueKey('samvad_listen'),
+                behavior: HitTestBehavior.opaque,
+                onTap: onListen,
+                child: Container(
+                  width: 48,
+                  height: 48,
+                  decoration: const BoxDecoration(color: kPvInk, shape: BoxShape.circle),
+                  child: Icon(hearing ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                      color: Colors.white, size: 26),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(hearing ? 'Playing your voice' : 'Listen back',
+                      style: pvManrope(
+                          fontSize: 14, fontWeight: FontWeight.w700, color: kPvInk)),
+                  Text('Your recording · $_time',
+                      style: pvManrope(fontSize: 12, color: p.ink3)),
+                ]),
+          ),
+          TextButton(
+            key: const ValueKey('samvad_again'),
+            onPressed: onAgain,
+            style: TextButton.styleFrom(minimumSize: const Size(48, 48)),
+            child: Text('Again',
+                style: pvManrope(fontSize: 14, fontWeight: FontWeight.w700, color: p.ink2)),
+          ),
+        ]),
+        const SizedBox(height: 10),
+        SizedBox(
+          width: double.infinity,
+          child: FilledButton(
+            key: const ValueKey('samvad_keep'),
+            onPressed: onKeep,
+            style: pregFilledStyle().copyWith(
+                minimumSize: const WidgetStatePropertyAll(Size.fromHeight(52))),
+            child: Text('Keep this',
+                style: pvManrope(fontSize: 15, fontWeight: FontWeight.w800)),
+          ),
+        ),
+      ]);
+    } else {
+      // Ready: the one ink pill.
+      body = SizedBox(
+        key: const ValueKey('ready'),
+        width: double.infinity,
+        child: FilledButton.icon(
+          key: const ValueKey('samvad_record'),
+          onPressed: busy ? null : onRecord,
+          style: pregFilledStyle().copyWith(
+              minimumSize: const WidgetStatePropertyAll(Size.fromHeight(52))),
+          icon: const Icon(Icons.mic_none_rounded, size: 20),
+          label: Text('Record in your voice',
+              style: pvManrope(fontSize: 15, fontWeight: FontWeight.w800)),
+        ),
+      );
+    }
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 220),
+      switchInCurve: Curves.easeOut,
+      child: body,
+    );
+  }
+
+  Widget _well({Key? key, required dynamic p, required List<Widget> children}) =>
+      Container(
+        key: key,
+        height: 64,
+        padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF6F4F1),
+          borderRadius: BorderRadius.circular(32),
+          border: Border.all(color: kPvLine),
+        ),
+        child: Row(children: children),
+      );
+}
+
+/// A slow breathing dot: "this is recording", without a red alarm light.
+class _Pulse extends StatefulWidget {
+  const _Pulse({required this.active});
+  final bool active;
+  @override
+  State<_Pulse> createState() => _PulseState();
+}
+
+class _PulseState extends State<_Pulse> with SingleTickerProviderStateMixin {
+  late final AnimationController _c =
+      AnimationController(vsync: this, duration: const Duration(milliseconds: 1400));
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _sync();
+  }
+
+  @override
+  void didUpdateWidget(covariant _Pulse old) {
+    super.didUpdateWidget(old);
+    _sync();
+  }
+
+  void _sync() {
+    if (widget.active && !MediaQuery.of(context).disableAnimations) {
+      if (!_c.isAnimating) _c.repeat(reverse: true);
+    } else {
+      _c.stop();
+    }
+  }
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AnimatedBuilder(
+        animation: _c,
+        builder: (_, _) => Container(
+          width: 12,
+          height: 12,
+          decoration: BoxDecoration(
+            color: const Color(0xFFB4554A).withValues(alpha: 0.55 + 0.45 * _c.value),
+            shape: BoxShape.circle,
+          ),
+        ),
+      );
+}
+
+/// Soft moving bars while her voice is being kept.
+class _Bars extends StatefulWidget {
+  const _Bars({required this.active});
+  final bool active;
+  @override
+  State<_Bars> createState() => _BarsState();
+}
+
+class _BarsState extends State<_Bars> with SingleTickerProviderStateMixin {
+  late final AnimationController _c =
+      AnimationController(vsync: this, duration: const Duration(milliseconds: 1100));
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _sync();
+  }
+
+  @override
+  void didUpdateWidget(covariant _Bars old) {
+    super.didUpdateWidget(old);
+    _sync();
+  }
+
+  void _sync() {
+    if (widget.active && !MediaQuery.of(context).disableAnimations) {
+      if (!_c.isAnimating) _c.repeat();
+    } else {
+      _c.stop();
+    }
+  }
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(
+        builder: (context, box) {
+          final n = (box.maxWidth / 7).floor().clamp(4, 40);
+          return AnimatedBuilder(
+            animation: _c,
+            builder: (_, _) => Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                for (var i = 0; i < n; i++)
+                  Container(
+                    width: 3,
+                    height: 6 +
+                        (widget.active
+                            ? 18 *
+                                (0.5 +
+                                    0.5 *
+                                        math.sin(_c.value * 2 * math.pi + i * 0.7) *
+                                        math.cos(i * 1.3))
+                                    .abs()
+                            : 0),
+                    decoration: BoxDecoration(
+                      color: kPvInk.withValues(alpha: widget.active ? 0.7 : 0.25),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+              ],
+            ),
+          );
+        },
+      );
 }

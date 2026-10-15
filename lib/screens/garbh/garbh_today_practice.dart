@@ -45,6 +45,7 @@ import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_feedback.dart';
 import '../doors/pv_door_screen.dart' show PvDoorScreen, PvDoorTabSwitch;
 import '../garbh_buddhi_screen.dart' show GarbhBuddhiScreen, buddhiTodayLine;
+import 'garbh_marks.dart' show garbhPillarMark;
 import '../garbh_samvad_daily.dart' show GarbhSamvadDailyScreen;
 import '../garbh_screen.dart' show KriyaScreen, ShravanScreen, gameForPuzzle;
 import '../v2/v2_palette.dart';
@@ -320,13 +321,16 @@ class GarbhPracticeRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final photo = item.image;
     return Row(children: [
+      // The row settles under her finger (PvPress) like every other tap;
+      // was an InkWell ripple (kept for revert: InkWell(onTap, borderRadius 12)).
       Expanded(
-        child: InkWell(
+        child: PvPress(
+          child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
           onTap: () {
             pvCommitFeedback();
             onOpen();
           },
-          borderRadius: BorderRadius.circular(12),
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 12),
             child: Row(children: [
@@ -340,13 +344,16 @@ class GarbhPracticeRow extends StatelessWidget {
                   height: 54,
                   color: item.accent.withValues(alpha: 0.14),
                   alignment: Alignment.center,
+                  // The fallback is the pillar's drawn mark, not a Material
+                  // icon (2026-10-15). Kept for revert:
+                  //   Icon(item.icon, size: 22, color: item.accent)
                   child: photo == null
-                      ? Icon(item.icon, size: 22, color: item.accent)
+                      ? garbhPillarMark(item.pillarId, size: 54)
                       : Image.network(photo,
                           width: 54,
                           height: 54,
                           fit: BoxFit.cover,
-                          errorBuilder: (_, _, _) => Icon(item.icon, size: 22, color: item.accent)),
+                          errorBuilder: (_, _, _) => garbhPillarMark(item.pillarId, size: 54)),
                 ),
               ),
               const SizedBox(width: 12),
@@ -377,6 +384,7 @@ class GarbhPracticeRow extends StatelessWidget {
                 ]),
               ),
             ]),
+          ),
           ),
         ),
       ),

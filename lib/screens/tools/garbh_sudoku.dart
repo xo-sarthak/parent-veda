@@ -31,6 +31,7 @@ import 'package:flutter/material.dart';
 import '../../services/garbh_store.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../theme/pv_fonts.dart';
+import '../garbh/garbh_marks.dart' show GarbhGameMark;
 import 'games/game_chrome.dart';
 import 'games/sudoku_engine.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
@@ -196,8 +197,9 @@ class _SudokuGameState extends State<SudokuGame> {
             padding: const EdgeInsets.symmetric(horizontal: 18),
             child: Row(children: [
               GarbhGameKey(
+                  key: const ValueKey('sudoku_pencil'),
                   label: 'Pencil',
-                  icon: Icons.edit_outlined,
+                  glyph: GarbhGameMark.pencil,
                   selected: _pencil,
                   width: 56,
                   onTap: () => setState(() => _pencil = !_pencil)),

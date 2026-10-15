@@ -26,6 +26,7 @@ import 'package:flutter/material.dart';
 import '../../services/garbh_store.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../theme/pv_fonts.dart';
+import '../garbh/garbh_marks.dart' show GarbhGameMark, garbhKeyGlyph;
 import 'games/game_chrome.dart';
 import 'games/nonogram_engine.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
@@ -196,22 +197,25 @@ class _LogicGameState extends State<LogicGame> {
             padding: const EdgeInsets.symmetric(horizontal: 18),
             child: Row(children: [
               GarbhGameKey(
+                  key: const ValueKey('logic_fill'),
                   label: 'Fill',
-                  icon: Icons.square_rounded,
+                  glyph: GarbhGameMark.fill,
                   selected: !_cross,
                   width: 56,
                   onTap: () => setState(() => _cross = false)),
               const SizedBox(width: 8),
               GarbhGameKey(
+                  key: const ValueKey('logic_cross'),
                   label: 'Cross',
-                  icon: Icons.close_rounded,
+                  glyph: GarbhGameMark.cross,
                   selected: _cross,
                   width: 56,
                   onTap: () => setState(() => _cross = true)),
               const Spacer(),
               GarbhGameKey(
+                  key: const ValueKey('logic_hint'),
                   label: 'Hint',
-                  icon: Icons.lightbulb_outline_rounded,
+                  glyph: GarbhGameMark.hint,
                   width: 56,
                   onTap: _hint),
             ]),
@@ -249,8 +253,8 @@ class _LogicGameState extends State<LogicGame> {
         ),
         alignment: Alignment.center,
         child: m == 2
-            ? Icon(Icons.close_rounded,
-                size: cell * 0.5, color: kGameMuted.withValues(alpha: 0.7))
+            ? garbhKeyGlyph(GarbhGameMark.cross,
+                size: cell * 0.42, color: kGameMuted.withValues(alpha: 0.6))
             : null,
       ),
     ));

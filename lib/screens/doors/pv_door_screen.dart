@@ -70,6 +70,7 @@ import 'pv_door_tiles.dart';
 import 'pv_shelf_card.dart';
 import 'pv_shelf_spec.dart';
 import '../ttc/doors/ttc_door_card.dart' show showTtcDoorFlagSheet;
+import '../garbh/garbh_marks.dart' show garbhGameMark, garbhGameMarkFor;
 import 'pv_door_router.dart';
 import '../search/pv_search_screen.dart';
 import '../tools/ask_veda_screen.dart';
@@ -1732,6 +1733,12 @@ class _ShelfCard extends StatelessWidget {
       paid: spec.paid,
       live: spec.live,
       mark: pvDoorTileMark(tile) ?? pvDoorFormatMark(tile.format),
+      // A Garbh game shows its own drawn game mark (2026-10-15).
+      art: tile is PvDoorGameTile
+          ? LayoutBuilder(
+              builder: (_, box) => garbhGameMark(garbhGameMarkFor(tile.title),
+                  size: box.biggest.shortestSide))
+          : null,
       imageUrl: tile.comingSoon ? null : pvDoorTilePhoto(tile),
       title: tile.title,
       comingSoon: tile.comingSoon,

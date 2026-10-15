@@ -35,6 +35,7 @@ import '../services/shravan_library.dart';
 import '../theme/pv_fonts.dart';
 import '../widgets/cards/raga_player.dart';
 import 'doors/pv_door_chrome.dart';
+import 'garbh/garbh_marks.dart' show shravanHueFor;
 import 'garbh_relaxation_screen.dart';
 import 'v2/v2_palette.dart';
 
@@ -63,12 +64,23 @@ class ShravanTrackPlayer extends StatefulWidget {
     /// The session layout (2026-10-02): the daily screen draws one big ink play
     /// disc. Off, the player is as it was, which the library detail still uses.
     this.large = false,
+    this.showTitle = false,
+    this.onPrevious,
+    this.onNext,
+    this.autoplay = false,
   });
 
   final GarbhAudio audio;
   final PregnancyController controller;
   final bool daily;
   final bool large;
+
+  /// The full player (library) names the track under its cover; the daily
+  /// screen does not, its hero already does (2026-10-15).
+  final bool showTitle;
+  final VoidCallback? onPrevious;
+  final VoidCallback? onNext;
+  final bool autoplay;
 
   @override
   State<ShravanTrackPlayer> createState() => _ShravanTrackPlayerState();
@@ -144,6 +156,12 @@ class _ShravanTrackPlayerState extends State<ShravanTrackPlayer> {
                 title: audio.title.now,
                 subtitle: '${audio.minutes} min',
                 large: widget.large,
+                coverHue: shravanHueFor(audio.id),
+                showTitle: widget.showTitle,
+                credit: widget.large ? audio.subtitle.now : null,
+                onPrevious: widget.onPrevious,
+                onNext: widget.onNext,
+                autoplay: widget.autoplay,
                 onFinished: _finished),
             const SizedBox(height: 8),
             Text(s.gsSampleAudio,
@@ -162,22 +180,26 @@ class _ShravanTrackPlayerState extends State<ShravanTrackPlayer> {
             isUrl: !playable.isFile,
             loop: false,
             large: widget.large,
+            coverHue: shravanHueFor(audio.id),
+            showTitle: widget.showTitle,
+            // The credit sits under the cover like an artist line (2026-10-15).
+            credit: widget.large ? track.attribution : null,
+            onPrevious: widget.onPrevious,
+            onNext: widget.onNext,
+            autoplay: widget.autoplay,
             onFinished: _finished,
           ),
           const SizedBox(height: 10),
-          // In the session layout the credit and the pill STACK (2026-10-02): side
-          // by side the pill is wider than the line has room for at a large text
-          // size on a narrow phone, once the manifest has loaded.
+          // In the session layout the credit is in the player now; only the
+          // offline pill sits under it, centred. Kept for revert: the
+          // attribution Text here, then the pill.
           if (widget.large) ...[
-            Text(track.attribution,
-                style: pvManrope(fontSize: 12.5, height: 1.4, color: _muted)),
-            const SizedBox(height: 8),
-            _OfflinePill(
+            Center(child: _OfflinePill(
               cached: cached,
               downloading: downloading,
               onTap: () =>
                   cached ? lib.removeDownload(audio.id) : lib.download(audio.id),
-            ),
+            )),
           ] else
             Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Expanded(

@@ -40,6 +40,8 @@ import '../../services/pregnancy_controller.dart';
 import '../../theme/pv_fonts.dart';
 import 'games/game_chrome.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../ttc/doors/ttc_tab_art.dart' show TtcTabArt, TtcTabMark;
+import '../v2/v2_palette.dart' show V2PaletteStore, v2BlockTint;
 
 export 'garbh_nonogram.dart' show LogicGame;
 export 'garbh_sudoku.dart' show SudokuGame;
@@ -389,8 +391,24 @@ List<List<String>> generateWordSearch(List<String> words, int n, Random rng) {
 //  4 · MEMORY MATCH (4×4, 8 calm pairs, moves counted quietly)
 // ===========================================================================
 
-/// Eight line icons — the app's rule, no decorative emoji — each a small
-/// calm thing.
+/// The eight faces, drawn (2026-10-15, the user: glyphs "inside each and
+/// every game as well"). Each is a calm thing from the app's own mark family
+/// on its OWN hue, so a pair is found by shape AND colour: easier to read at
+/// a glance, which is the point of a quiet game. The count of pairs still
+/// reads from [kMemoryFaces], kept below for revert.
+const List<(TtcTabMark, double)> kMemoryFaceMarks = [
+  (TtcTabMark.lotus, 42),
+  (TtcTabMark.sun, 30),
+  (TtcTabMark.cloudRain, 205),
+  (TtcTabMark.sprout, 120),
+  (TtcTabMark.tulip, 345),
+  (TtcTabMark.bigSmallHearts, 10),
+  (TtcTabMark.sunrise, 60),
+  (TtcTabMark.jarLeaf, 165),
+];
+
+/// Kept for revert (2026-10-15): the eight Material line icons the faces
+/// were. Still the length of the set.
 const List<IconData> kMemoryFaces = [
   Icons.spa_outlined,
   Icons.nightlight_outlined,
@@ -522,9 +540,14 @@ class _MemoryMatchGameState extends State<MemoryMatchGame> {
                           width: matched ? 1.6 : 1),
                     ),
                     child: up
-                        ? Icon(kMemoryFaces[_cards[i]],
-                            size: 30,
-                            color: matched ? kGameAccentDeep : kGameInk)
+                        ? Padding(
+                            padding: const EdgeInsets.all(8),
+                            child: TtcTabArt(
+                              mark: kMemoryFaceMarks[_cards[i]].$1,
+                              tint: v2BlockTint(kMemoryFaceMarks[_cards[i]].$2,
+                                  V2PaletteStore.instance.current),
+                            ),
+                          )
                         : null,
                   ),
                 ));

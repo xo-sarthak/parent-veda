@@ -922,3 +922,61 @@ button".
 - The book card shows "Making your book…" with a spinner while the PDF
   builds.
 - Reduced motion skips the flap and stills the bars.
+
+## 23. Garbh Sanskar pillars — player, recorder, games, breathing (2026-10-15)
+
+**Trigger.** The user on the Garbh daily screens: Shravan "looks off" and
+should be "like the audio playing applications"; Samvad's big black record
+button "does not look good" and "feels like wastage of space"; Buddhi's games
+should use the drawn marks "inside each and every game as well"; Kriya's
+breathing elevated if Mobbin shows better. Then: every screen "easy to use and
+to understand", calm, responsive; and the same inside the Garbh door.
+
+**Queries** (ios): "music player now playing screen with large album artwork,
+track title, progress scrubber, and play pause skip controls"; "meditation or
+sleep sounds library list with track rows, durations, and a persistent mini
+player bar at the bottom"; "voice note recording inline in a card with a small
+mic button, a prompt to read aloud, and a waveform while recording"; "brain
+training puzzle games hub with tiles ... each with a simple drawn icon";
+"sudoku game board screen with number pad"; "word search puzzle game grid";
+"guided breathing exercise screen with an expanding circle".
+
+**Adopted.**
+- Player: [Spotify](https://mobbin.com/screens/6cb0a8f6-977e-4b9a-b137-04bc8f4b9d24),
+  [Shazam](https://mobbin.com/screens/91f80d92-c604-4a43-8e86-3c1e90d2f1d8),
+  [Deezer](https://mobbin.com/screens/263c3ff4-b773-4ff7-ad24-ac62c1d79f7e),
+  [Calm](https://mobbin.com/screens/c79512c8-b63b-4807-913a-c09615ff69ee):
+  the cover, title and artist, the scrubber with times, one big play disc.
+- List and bar: [Calm](https://mobbin.com/screens/2deebcbc-5868-46ca-9142-39b5a38bfd28)
+  and [Me+](https://mobbin.com/screens/a5eecade-e8f5-4ef0-9d3f-d3934a82a33f):
+  rows with art, a pinned now-playing bar with play-pause and close.
+- Recorder: [Hinge](https://mobbin.com/screens/3e9f1876-9de3-435d-bbdf-b7ec7b0eb8e5)
+  (the time and waveform in a soft well),
+  [ABY Journal](https://mobbin.com/screens/2d1b5587-06f3-4286-bebc-5fb625fe0cae)
+  and [Bond](https://mobbin.com/screens/196ff693-5766-4457-86ed-372054338869)
+  (a voice-note bar in place of a big control).
+- Games: [Apple News Puzzles](https://mobbin.com/screens/a2319e2f-b25d-41ff-8b15-b0f9d35dc619)
+  and [Duolingo](https://mobbin.com/screens/a01507b1-1677-4f3e-9a23-50cdf6807b44):
+  each game its own drawn square mark.
+  [Opal](https://mobbin.com/screens/5090f051-642d-454c-90cb-61406ceb6b6b):
+  a minimal top, the way out as a text link ("Nevermind" → our "Close").
+- Breathing: [Finch](https://mobbin.com/screens/170f6c9c-3e74-4f2f-b29c-58290c4002d7),
+  [Life Reset](https://mobbin.com/screens/8cad3cd9-ead8-429c-8d48-a9fd14c76bc9),
+  [stoic](https://mobbin.com/screens/ea4a9e85-b8fa-4116-89cf-097d614e9cb2):
+  no app bar, the word inside the circle, a quiet count, one action at the
+  foot.
+
+**Declined.**
+- Dark full-bleed players: the app is a white ground.
+- Shuffle, repeat, queue editing, and previous / next on a screen that plays
+  one track: choices she does not need (the calm rule).
+- Two "different puzzle" buttons (New and Next): one remains.
+- Scores, timers, streaks in games (already refused by tests).
+- Confetti on finishing anything.
+
+**Responsiveness, as built.**
+- The play disc and the recorder answer the tap in the same frame
+  ("Starting…" while the mic opens).
+- Every tap is a `PvPress`.
+- Moving bars and pulses stop under reduced motion.
+- Leaving a list stops what it started.

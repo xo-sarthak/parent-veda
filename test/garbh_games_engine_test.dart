@@ -168,7 +168,9 @@ void main() {
       await pump(tester,
           SudokuGame(controller: PregnancyController(), markComplete: false));
       expect(find.text('9 × 9'), findsOneWidget);
-      expect(find.text('Pencil'), findsNothing); // an icon key, no label
+      // A drawn glyph WITH its word since 2026-10-15 (the ease rule: a glyph
+      // never stands alone where meaning matters). Was: findsNothing.
+      expect(find.text('Pencil'), findsOneWidget);
       expect(find.text('Check'), findsOneWidget);
       expect(find.text('Hint'), findsOneWidget);
       expect(tester.takeException(), isNull);
@@ -204,11 +206,11 @@ void main() {
         (tester) async {
       await pump(tester,
           LogicGame(controller: PregnancyController(), markComplete: false));
-      expect(find.byIcon(Icons.lightbulb_outline_rounded), findsOneWidget);
+      expect(find.byKey(const ValueKey('logic_hint')), findsOneWidget);
       expect(tester.takeException(), isNull);
       for (var i = 0; i < 40; i++) {
         if (find.text('Play again').evaluate().isNotEmpty) break;
-        await tester.tap(find.byIcon(Icons.lightbulb_outline_rounded));
+        await tester.tap(find.byKey(const ValueKey('logic_hint')));
         await tester.pump();
       }
       expect(find.text('Play again'), findsOneWidget);

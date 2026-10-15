@@ -22,6 +22,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:parentveda/data/garbh_data.dart';
+import 'package:parentveda/models/garbh_content.dart' show GarbhKind;
+import 'package:parentveda/services/shravan_library.dart';
 import 'package:parentveda/data/garbh_rebuild_data.dart';
 import 'package:parentveda/localization/app_language.dart';
 import 'package:parentveda/screens/garbh_browse_screen.dart';
@@ -98,7 +100,9 @@ void main() {
   group('the raga list', () {
     testWidgets('every raga row is tappable', (t) async {
       const accent = Color(0xFFBE9C4E);
-      final screen = shravanBrowse(AppLanguage.english, accent);
+      // The guided track opens its own page (2026-10-15), which is the
+      // caller's to push: every real caller passes `onOpen`.
+      final screen = shravanBrowse(AppLanguage.english, accent, onOpen: (_) {});
       await _pump(t, screen);
 
       for (final g in screen.groups) {
@@ -110,11 +114,16 @@ void main() {
 
     testWidgets('it says every raga currently plays the same sample',
         (t) async {
-      await _pump(t, shravanBrowse(AppLanguage.english, const Color(0xFFBE9C4E)));
       // ⚠️ TAPPING "OCEAN WAVES" AND HEARING A TANPURA IS NOT A MISSING
-      // FEATURE, IT IS THE APP SAYING SOMETHING UNTRUE. One bundled file backs
-      // all ten names, so the list says so rather than letting her work it out.
-      expect(find.textContaining('same sample tone'), findsOneWidget);
+      // FEATURE, IT IS THE APP SAYING SOMETHING UNTRUE. Since 2026-10-15 the
+      // rows play the library's recordings, so the list says "sample tone"
+      // exactly while some raga still has no recording, and not otherwise.
+      await _pump(t, shravanBrowse(AppLanguage.english, const Color(0xFFBE9C4E)));
+      final missing = kShravan
+          .where((a) => a.kind != GarbhKind.guided)
+          .any((a) => ShravanLibrary.instance.trackFor(a.id) == null);
+      expect(find.textContaining('same sample tone'),
+          missing ? findsOneWidget : findsNothing);
     });
 
     test('Samvad and Kriya rows stay untappable', () {
