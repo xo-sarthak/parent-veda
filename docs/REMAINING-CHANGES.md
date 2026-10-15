@@ -39,7 +39,18 @@ L = a day or more.
 
 ## Large
 
-11. **Recipes screen (L).** Study Mobbin first, then build (STILL-OPEN §83.14).
+11. **Recipes screen: PILOT BUILT 2026-10-15, waits on your look.**
+    - The Mobbin study is MOBBIN-DISCOVERY §21.
+    - The new recipe page and the new photo card are on ONE dish: Mixed dal khichdi (7–8 months),
+      from Drive "Recipes (not reviewed)". To see it: Feeding door → Recipes by age → the khichdi
+      card. It leads the First Foods, Lunch and Dinner rails.
+    - Every other dish keeps the old page and card, side by side with it, until you say yes.
+    - The photo is in (`assets/recipes/pp_7_8m_mixed_dal_khichdi.webp`, made in ChatGPT from the prompt below).
+    - After a yes:
+      - the other 27 of the band;
+      - the page and card on all dishes;
+      - a photo prompt per dish.
+    - STILL-OPEN §83.14a.
 12. **Keepsake PDF (L).** The pregnancy or baby keepsake, exported as a PDF.
 13. **Condition reads (L, content).** The condition pages owed their reads.
 14. **Investment explainers (L, content).** The money explainers for parents.
@@ -52,6 +63,42 @@ L = a day or more.
 truth, so every gap is listed here in one place: what the doc does not give, where the app shows
 something other than the doc and why, and what is wrong inside a doc. Fix the doc, tell me, and I
 pull it in. Detail and history stay in the STILL-OPEN section named on each block.
+
+### Recipes (not reviewed) — STILL-OPEN §83.14a
+- **In the folder:** one recipe doc, "7-8 month band (PROMPT4) FINAL", with 28 recipes.
+  - One is in the app (the pilot, REC-11).
+  - The other 27 come in after you approve the page. Six of them replace old near-duplicates (your
+    call): Suji kheer, Beetroot and carrot mash, Tomato and carrot soup, Oats porridge, Soft idli
+    pieces, Soft paneer cubes.
+- **Missing:** the four recipe docs the other files point to (Prompt 4 for 12–18m, 18–23m, 2–3y,
+  4–5y; 89–95 recipes each).
+- **Missing:** any recipe doc for 6 months, 9–11 months, 3–4 years or 5+.
+- **Not recipes:** the four "PROMPT3" files are ingredient and nutrient pages. They are parked.
+  - A recipe's "More on ParentVeda · INGREDIENT" link waits for them.
+  - Their own issues, to fix in the doc:
+    - `whole-grains` is created twice.
+    - Folate and Zinc pages are linked but never written.
+    - The "standard allergen line" is worded three ways.
+    - Several introduction ages look late and need the medical review: strawberry, guava,
+      mushroom, quinoa and others "from 2 / 4 years".
+    - Each file seems to end mid-sentence. Worth opening in Word to check.
+- **Doc issue, all:** "Editorial Review Pending, Medical Review Pending". None reviewed.
+- **Doc issue, 7–8m:** the doc's tail is cut off at "Standing…" (the standing review flags).
+- **Doc issue, REC-11:** "More on ParentVeda" names the article "First combination meals" and the
+  ingredient "Masoor dal". Neither exists in the app, so neither is linked.
+- **The khichdi photo: DONE 2026-10-15.** Made in ChatGPT from the prompt below and saved as
+  `assets/recipes/pp_7_8m_mixed_dal_khichdi.webp` (1200x900). The prompt is the template for the rest.
+
+  > A top-down 45° food photograph of a small serving of Indian baby khichdi for a 7–8-month-old:
+  > a soft, thick, pale-yellow mash of rice, moong dal and masoor dal with tiny soft flecks of
+  > orange carrot and green lauki, with a few glistening drops of ghee on top. It is in a small
+  > steel katori (baby bowl) on a light wooden board next to a small silicone baby spoon. There is
+  > a pinch of turmeric and a few grains of raw moong dal scattered lightly beside the bowl. Soft
+  > natural daylight from a window on the left, gentle shadows, warm and homely, an Indian home
+  > kitchen feel. Realistic, not styled restaurant food. The mash must look smooth and spoonable
+  > with no whole grains, no chillies, no tadka, no salt crystals and no garnish leaves. No text,
+  > no logos, no hands, no people. Square-ish 4:3 landscape frame, the dish centred with space
+  > around it, shallow depth of field, natural colours, high detail.
 
 ### My Child phases (PH001–PH020) — STILL-OPEN §85
 - **Missing:** PH016–PH020 (19 months to 5 years). Those phases say "This phase's guide is being
@@ -112,7 +159,7 @@ pull it in. Detail and history stay in the STILL-OPEN section named on each bloc
 ## Needs you, not code
 
 - **Ask Veda hosting.** The Railway trial ended and the service is down. Pick a host or plan.
-- **Supabase.** Run migration 0092. Grant the three `service_role` permissions Ask Veda needs.
+- **Supabase.** Run migrations 0092 and 0096 (the recipe-doc columns; nothing needs 0096 yet). Grant the three `service_role` permissions Ask Veda needs.
   Confirm 0088, 0089, 0090 and the expert-photos bucket.
 - **Phone OTP.** The `phone-otp-send` and `phone-otp-verify` functions are not deployed; they need
   the MSG91 secrets (STILL-OPEN §83.12).

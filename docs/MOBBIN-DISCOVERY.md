@@ -761,3 +761,109 @@ re-fetches on a changed source, `upload_to_r2.py` skips unchanged keys), then
 read back from the live bucket to confirm. Commons is honest but plain for
 regional home food: these are now CORRECT, not styled.
 
+## 21. Parenting recipes — the page and the card, piloted on one dish (2026-10-15)
+
+**Trigger.** REMAINING-CHANGES item 11, "Recipes screen (L). Study Mobbin
+first, then build". At the same time the user dropped a Drive folder,
+*Recipes (not reviewed)*, and asked for: a detailed recipe page, a look at
+how the tab that opens it should look, and the design proven on ONE recipe
+before it spreads ("if i like it then it can be applied elsewhere").
+
+**Queries** (ios): "recipe detail page with hero photo, cook time, servings,
+ingredients list and step by step method"; "recipe cooking steps list with
+numbered method, step timers and tips"; "recipe browse list with photo cards
+showing title, cook time and tags, filter chips at top"; "horizontal
+carousel of recipe cards on a home screen with photo, title and time"; "baby
+food recipe page with age suitability, texture stage, allergen notes and
+nutrients". Solid Starts is not in the library, and nothing in it shows a
+recipe page for a baby.
+
+**Found: the page.**
+- **The dish photo first, with back and save as rounds on it.** Lifesum,
+  [MyFitnessPal](https://mobbin.com/screens/d7116fe0-5bed-4092-a095-78d6571ed3f4),
+  [Instacart / NYT](https://mobbin.com/screens/0532323f-1c75-4311-be94-ef6890f7686f)
+  and [Yazio](https://mobbin.com/screens/a8ca1a9b-dcc3-45f6-accc-1a4d36309636).
+- **One facts strip.** [Postmates](https://mobbin.com/screens/8a91bdf8-1e0c-45e5-8c2d-951f1b101935):
+  Servings | Prep time | Cook time. HelloFresh adds Difficulty.
+- **The quantity in its own column.**
+  [Apple News](https://mobbin.com/screens/2f5f45a8-5799-4de9-9f70-a5c77675de43)
+  sets the amounts in a right-aligned column, and
+  [Crouton](https://mobbin.com/screens/57fada57-d4f0-4519-a6ba-b7aaedb514f3)
+  colours the amount.
+- **The method as numbered cards, with the minutes picked out.**
+  [Crouton](https://mobbin.com/screens/a1e36578-a1a5-434b-b191-95eb3ce53cae)
+  and [Kitchen Stories](https://mobbin.com/screens/85a4ace6-390e-40b5-a231-14f134af1752).
+- **A cook mode.** [HelloFresh](https://mobbin.com/screens/a8ce2bb8-cecc-423b-aaaf-53e3e00e333a)
+  shows "Step 2 of 6", Recime has "Cook step-by-step", and Julienne has a step
+  with its tip.
+- **Swaps next to the ingredient.**
+  [Withings](https://mobbin.com/screens/22c5973d-837a-46e0-b697-31fb4fc84a5c)
+  writes "Ingredient swaps: …" and
+  [Cherrypick](https://mobbin.com/screens/671ebdad-9d43-4387-8912-876466031535)
+  has "Easy Swaps".
+- **Nutrition low and plain.** Hers, Recime and MyFitnessPal put it near the
+  foot. Lifesum and MyFitnessPal pin one main action at the foot.
+
+**Found: the card.**
+- [Blinkit](https://mobbin.com/screens/3b5dabc7-926d-49cc-a278-fdf4bd416355),
+  [Noom](https://mobbin.com/screens/99817269-341f-4d2d-bf05-17162018a65b),
+  [NYT Cooking](https://mobbin.com/screens/304d5760-05ce-487a-8604-4c4f3e45fc1b),
+  [Kitchen Stories](https://mobbin.com/screens/9d70bed4-358d-4193-84b7-141143144964)
+  and [Yazio](https://mobbin.com/screens/abfb6d8a-d5c7-4db9-93c2-3ffce333f345)
+  all follow one layout:
+  - a photo on top at roughly 4:3, with the bookmark on the photo, top right;
+  - one mark on the photo, Blinkit's veg dot or Kitchen Stories' minutes;
+  - the title under the photo, two lines at most;
+  - one meta line: the time, then one fact.
+- Libraries lay the cards out in two columns. Homes put them in a rail
+  (CREME, Hers, Instacart).
+
+**Adopted** (`FoodRecipeScreen._buildDocPage`, `FoodPhotoCard`):
+- **The page, top to bottom:**
+  1. The photo, with back and save on it, and no fade.
+  2. The eyebrow ("7–8 MONTHS · LUNCH"), then the Newsreader title and its
+     line.
+  3. Diet, Serves and the meal role.
+  4. **Prep | Cook | Level | Texture**.
+  5. **The age-fit line, ours.** It sets the dish's age band against the
+     child's own age: "Right for Aarav now, at 7 months". The app derives it
+     and never asks.
+  6. Why this is good for him.
+  7. What you need: the amount in its own bold column, an Add / On-list
+     toggle per row (water has none), then the equipment as chips.
+  8. The method as numbered cards, with the minutes in bold.
+  9. What's in it, as tiles of nutrient and source food.
+  10. Good to know, as two tiles: How often and Storing.
+  11. **Take care, ruled on the left, never red.**
+  12. You can swap.
+  13. More on ParentVeda.
+  14. The byline.
+  15. The foot: **Add all to list | Cook step by step**.
+- **Cook mode is pregnancy's** `CookModeScreen`. It gained a `.steps`
+  constructor, so it now has one implementation and two sources.
+- **The card:**
+  - the photo, with the bookmark and the diet mark as white discs on it
+    (§20a);
+  - the title in two lines;
+  - "25 min · 7–8 months" under it.
+- **Shown on the doc-format dish only** (`FoodRecipe.docFormat`). Every other
+  dish keeps the shelf card in the same rail, so the two can be compared side
+  by side until the user approves.
+
+**Declined:**
+- **Calories and macro rings.** The doc has none, and the Food companion
+  does no calorie counting.
+- **A servings stepper.** Baby portions are fixed, and "1 tiny pinch" of haldi
+  does not scale.
+- **Ratings.** We have none to show.
+- **Ingredients as product cards.** §20 already declined these.
+- **Cherrypick's Ingredients / Method / Nutrition tabs.** One scroll reads
+  better with a baby on one arm, and Crouton, Hers and NYT use one scroll.
+
+**Owed:**
+- **The khichdi photo.** The user is making it in ChatGPT; the prompt is in
+  REMAINING-CHANGES.
+- **After approval:**
+  - the other 27 dishes of the 7–8 month band;
+  - the page and card on all 139 dishes;
+  - a photo for each dish.

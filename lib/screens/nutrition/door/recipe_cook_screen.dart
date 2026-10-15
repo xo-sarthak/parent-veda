@@ -476,8 +476,37 @@ class _RecipeCookScreenState extends State<RecipeCookScreen> {
 // -----------------------------------------------------------------------------
 
 class CookModeScreen extends StatefulWidget {
-  const CookModeScreen({super.key, required this.recipe});
-  final Recipe recipe;
+  const CookModeScreen({super.key, required Recipe this.recipe})
+      : cookTitle = null,
+        cookSteps = const [],
+        ingredientLines = const [],
+        enjoyLine = null,
+        photo = null;
+
+  /// Cook mode for any recipe that is just a title and its steps — the
+  /// parenting Food recipes (2026-10-15). Same screen, same wake lock, same
+  /// segmented bar; only the source of the words differs, so a second cook
+  /// mode was never needed.
+  const CookModeScreen.steps({
+    super.key,
+    required String title,
+    required List<String> steps,
+    this.ingredientLines = const [],
+    this.enjoyLine,
+    this.photo,
+  })  : recipe = null,
+        cookTitle = title,
+        cookSteps = steps;
+
+  final Recipe? recipe;
+  final String? cookTitle;
+  final List<String> cookSteps;
+  final List<String> ingredientLines;
+  final String? enjoyLine;
+  final Widget? photo;
+
+  List<String> get stepTexts => recipe == null ? cookSteps : [for (final s in recipe!.steps) s.en];
+  String get title => recipe?.name.en ?? cookTitle ?? '';
 
   @override
   State<CookModeScreen> createState() => _CookModeScreenState();
@@ -485,25 +514,28 @@ class CookModeScreen extends StatefulWidget {
 
 class _CookModeScreenState extends State<CookModeScreen> {
   int _step = 0;
-  bool get _done => _step >= widget.recipe.steps.length;
+  bool get _done => _step >= widget.stepTexts.length;
 
   @override
   void initState() {
     super.initState();
-    WakelockPlus.enable();
+    // Fire-and-forget like every platform nicety here: a phone (or a test)
+    // without the plugin must still cook, just with the screen allowed to sleep.
+    WakelockPlus.enable().catchError((_) {});
   }
 
   @override
   void dispose() {
-    WakelockPlus.disable();
+    WakelockPlus.disable().catchError((_) {});
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final p = V2PaletteStore.instance.current;
+    final steps = widget.stepTexts;
     final r = widget.recipe;
-    final url = nutritionRecipePhoto(r.id, r.name.en);
+    final url = r == null ? null : nutritionRecipePhoto(r.id, r.name.en);
     return Scaffold(
       backgroundColor: p.ground,
       body: SafeArea(
@@ -513,12 +545,12 @@ class _CookModeScreenState extends State<CookModeScreen> {
             child: Row(children: [
               Expanded(
                 child: Row(children: [
-                  for (var i = 0; i < r.steps.length; i++)
+                  for (var i = 0; i < steps.length; i++)
                     Expanded(
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 260),
                         height: 4,
-                        margin: EdgeInsets.only(right: i == r.steps.length - 1 ? 0 : 5),
+                        margin: EdgeInsets.only(right: i == steps.length - 1 ? 0 : 5),
                         decoration: BoxDecoration(
                             color: i <= _step ? p.ink1 : p.line, borderRadius: BorderRadius.circular(999)),
                       ),
@@ -573,7 +605,7 @@ class _CookModeScreenState extends State<CookModeScreen> {
                     }
                   },
                   style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
-                  child: Text(_done ? 'Done' : (_step == r.steps.length - 1 ? 'Finish' : 'Next')),
+                  child: Text(_done ? 'Done' : (_step == steps.length - 1 ? 'Finish' : 'Next')),
                 ),
               ),
             ]),
@@ -587,10 +619,10 @@ class _CookModeScreenState extends State<CookModeScreen> {
         key: ValueKey(_step),
         padding: const EdgeInsets.fromLTRB(20, 26, 20, 0),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('STEP ${_step + 1} OF ${widget.recipe.steps.length}',
+          Text('STEP ${_step + 1} OF ${widget.stepTexts.length}',
               style: pvManrope(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.3, color: p.ink3)),
           const SizedBox(height: 14),
-          Text(widget.recipe.steps[_step].en,
+          Text(widget.stepTexts[_step],
               style: pvFraunces(fontSize: 26, fontWeight: FontWeight.w500, height: 1.35, letterSpacing: -0.3, color: p.ink1)),
         ]),
       );
@@ -602,15 +634,15 @@ class _CookModeScreenState extends State<CookModeScreen> {
           Expanded(
             child: ClipRRect(
               borderRadius: BorderRadius.circular(22),
-              child: url == null
+              child: widget.photo ?? (url == null
                   ? ColoredBox(color: p.surfaceAlt, child: Center(child: Icon(Icons.restaurant_outlined, size: 56, color: p.ink3)))
-                  : CanIPhoto(url: url, fallback: ColoredBox(color: p.surfaceAlt)),
+                  : CanIPhoto(url: url, fallback: ColoredBox(color: p.surfaceAlt))),
             ),
           ),
           const SizedBox(height: 22),
           Text('Enjoy it.', style: pvFraunces(fontSize: 30, fontWeight: FontWeight.w600, height: 1.1, color: p.ink1)),
           const SizedBox(height: 6),
-          Text('${widget.recipe.name.en} · ${widget.recipe.whyNow.en}',
+          Text(widget.recipe == null ? (widget.enjoyLine ?? widget.title) : '${widget.recipe!.name.en} · ${widget.recipe!.whyNow.en}',
               style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2)),
           const SizedBox(height: 16),
         ]),
@@ -624,14 +656,19 @@ class _CookModeScreenState extends State<CookModeScreen> {
       builder: (ctx) => Padding(
         padding: EdgeInsets.fromLTRB(20, 18, 20, 20 + MediaQuery.paddingOf(ctx).bottom),
         child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('INGREDIENTS · ${widget.recipe.defaultServings} SERVINGS',
+          Text(widget.recipe == null ? 'INGREDIENTS' : 'INGREDIENTS · ${widget.recipe!.defaultServings} SERVINGS',
               style: pvManrope(fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.3, color: p.ink3)),
           const SizedBox(height: 10),
-          for (final i in widget.recipe.ingredients)
+          for (final line in widget.ingredientLines)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 5),
+              child: Text(line, style: pvManrope(fontSize: 14, color: p.ink1)),
+            ),
+          for (final i in widget.recipe?.ingredients ?? const <RecipeIngredient>[])
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 5),
               child: Text(
-                  '${(i.qtyPerServing * widget.recipe.defaultServings).toStringAsFixed(1).replaceAll(RegExp(r'\.0$'), '')} ${i.unit}  ${i.name.en}',
+                  '${(i.qtyPerServing * widget.recipe!.defaultServings).toStringAsFixed(1).replaceAll(RegExp(r'\.0$'), '')} ${i.unit}  ${i.name.en}',
                   style: pvManrope(fontSize: 14, color: p.ink1)),
             ),
         ]),

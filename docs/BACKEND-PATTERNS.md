@@ -2675,6 +2675,42 @@ in two hundred empty closures.
 Wired: `CloudSyncedStore._pushNow`, `SavedStore._push`, `TtcSyncedStore`'s
 debounced push, `PvOrderStore`'s order insert.
 
+## 16ee. Who owns the data decides which copy is served — `foodCatalog` (0096, 2026-10-15)
+
+**The problem.** A content store loads three layers: the bundled Dart seed,
+a cached copy, and the network. `ContentStore` replaces its items with
+whatever the network returns. That is right for an `editor`-owned type,
+where the table is the truth. Recipes, though, are `ContentOwner.bundled`:
+the Dart file is the truth, and the table is a copy exported for Ask Veda.
+`foodCatalog` still served the live rows whenever there were any. The seed
+export holds the first 28 dishes, so wherever that table was seeded, a phone
+that had reached Supabase once showed those 28 and quietly hid every dish
+added to the Dart since: 111 of them, and the new 7–8 month recipes.
+Nothing failed and nothing logged. The library just got smaller.
+
+**The pattern.** The reader asks who owns the data before it decides which
+copy to show. `ContentOwnership.isEditorOwned('recipes')` is false, so
+`foodCatalog` returns the bundled list. The store keeps loading and caching
+either way, so the day recipes flip to `editor`, the live rows take over and
+nothing else has to change.
+
+**The trade-off.** While recipes are bundled, a row edited in Directus does
+not reach the app. That is the meaning of "bundled", and now it is enforced
+instead of left to luck. The alternative was `mergedExperts`' merge, where a
+live row wins by id and the bundled list fills the gaps. It would have fixed
+the shrinking. But it would also let a stale exported copy override a
+corrected Dart dish, which is the very inversion the ownership flag exists to
+stop.
+
+**The general fact.** A source-of-truth flag that only the *writers* read is
+a comment, not a rule. Every *reader* has to consult it too, or the most
+recent copy wins by default. That is rarely the most correct copy.
+
+**0096** adds the recipe-doc columns (`photo`, `amounts`, `texture`,
+`meal_role`, `also_in`, `doc_id`) so that an exported row can carry the same
+page as the bundled dish. The mapper reads each one forgivingly, so a row from
+before the migration still decodes.
+
 ## 17. Reading list, in order
 
 1. `0001_create_profiles.sql` — the two layers (grant + RLS), own-row.

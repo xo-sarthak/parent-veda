@@ -167,3 +167,146 @@ class FoodListCard extends StatelessWidget {
         ),
       ));
 }
+
+// =============================================================================
+//  The doc-format recipe pieces (2026-10-15, the 7–8 month pilot)
+// -----------------------------------------------------------------------------
+//  Mobbin, §21 of docs/MOBBIN-DISCOVERY.md: every recipe app leads its card and
+//  its page with the dish itself (Blinkit, Noom, NYT Cooking, Kitchen Stories,
+//  Lifesum, MyFitnessPal), the bookmark on the photo, the title under it, and
+//  one line of time and one fact. These render only for dishes that carry the
+//  doc format (FoodRecipe.docFormat); every other dish keeps its shelf card
+//  until the user has approved the pilot.
+// =============================================================================
+
+/// '7 to 8 mo' -> '7–8 months', '12 mo+' -> '12 months+'. Display only: the
+/// tag itself is what ppRecipeAgeRange parses, so it is never rewritten.
+String foodAgeLabel(String tag) => tag
+    .replaceAll(' to ', '–')
+    .replaceAll(RegExp(r'\s*mo\b'), ' months');
+
+/// The dish photo when there is one, the warm tinted thumb when there is not
+/// (or when the asset has not been dropped in yet), so a missing file is a
+/// placeholder and never a red error box.
+class FoodPhoto extends StatelessWidget {
+  const FoodPhoto({super.key, required this.recipe, required this.height, this.radius = 16});
+  final FoodRecipe recipe;
+  final double height;
+  final double radius;
+
+  @override
+  Widget build(BuildContext context) {
+    // `double.infinity` means "fill the box I am given" (cook mode's closing
+    // picture). The thumb sizes its motif from the height, so resolve it first.
+    if (!height.isFinite) {
+      return LayoutBuilder(
+        builder: (context, box) => FoodPhoto(recipe: recipe, height: box.maxHeight, radius: radius),
+      );
+    }
+    final thumb = FoodThumb(seed: recipe.seed, height: height, radius: radius);
+    final path = recipe.photo;
+    if (path == null) return thumb;
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(radius),
+      child: Image.asset(
+        path,
+        height: height,
+        width: double.infinity,
+        fit: BoxFit.cover,
+        errorBuilder: (_, _, _) => thumb,
+      ),
+    );
+  }
+}
+
+/// A white disc that sits on a photo (the §20a rule: marks on a photograph are
+/// white discs, never tinted pills).
+Widget foodPhotoDisc({required Widget child, double size = 30}) => Container(
+      width: size,
+      height: size,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.94),
+        shape: BoxShape.circle,
+        boxShadow: const [BoxShadow(color: Color(0x1F000000), blurRadius: 6)],
+      ),
+      child: child,
+    );
+
+/// The recipe card that opens the doc-format page: photo 4:3, bookmark top
+/// right and the diet mark bottom left on the photo, the title in two lines,
+/// then "25 min · 7–8 months". Works in a rail and in the two-column grid.
+class FoodPhotoCard extends StatelessWidget {
+  const FoodPhotoCard({super.key, required this.recipe, required this.onTap, this.width = 196, this.photoHeight});
+  final FoodRecipe recipe;
+  final VoidCallback onTap;
+  final double width;
+
+  /// Defaults to 4:3 of [width]. A rail that also holds shelf cards passes
+  /// their picture height, so the photos line up across one row.
+  final double? photoHeight;
+
+  @override
+  Widget build(BuildContext context) {
+    final r = recipe;
+    final h = photoHeight ?? width * 0.75;
+    return SizedBox(
+      width: width,
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Stack(children: [
+          PvPress(child: GestureDetector(
+            onTap: onTap,
+            behavior: HitTestBehavior.opaque,
+            child: FoodPhoto(recipe: r, height: h),
+          )),
+          Positioned(
+            left: 8,
+            bottom: 8,
+            child: IgnorePointer(child: foodPhotoDisc(size: 26, child: foodDietMark(r.diet, size: 12))),
+          ),
+          Positioned(
+            top: 8,
+            right: 8,
+            child: AnimatedBuilder(
+              animation: FoodStore.instance,
+              builder: (context, _) {
+                final saved = FoodStore.instance.isSaved(r.id);
+                return Semantics(
+                  button: true,
+                  label: saved ? 'Saved. Tap to remove' : 'Save recipe',
+                  child: PvPress(child: GestureDetector(
+                    key: ValueKey('food_photo_card_save_${r.id}'),
+                    onTap: () => FoodStore.instance.toggleSave(r.id),
+                    behavior: HitTestBehavior.opaque,
+                    child: foodPhotoDisc(
+                      child: Icon(saved ? Icons.bookmark_rounded : Icons.bookmark_outline_rounded, size: 17, color: ppInk),
+                    ),
+                  )),
+                );
+              },
+            ),
+          ),
+        ]),
+        PvPress(child: GestureDetector(
+          onTap: onTap,
+          behavior: HitTestBehavior.opaque,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 9),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(r.title, style: ppJakarta(14.5).copyWith(height: 1.25), maxLines: 2, overflow: TextOverflow.ellipsis),
+              const SizedBox(height: 4),
+              Row(children: [
+                Icon(Icons.schedule_rounded, size: 12.5, color: ppMuted),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: Text('${r.totalMin} min  ·  ${foodAgeLabel(r.ageTag)}',
+                      style: ppBody(12, color: ppMuted, w: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis),
+                ),
+              ]),
+            ]),
+          ),
+        )),
+      ]),
+    );
+  }
+}

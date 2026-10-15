@@ -105,6 +105,14 @@ class RecipeStore extends ContentStore<FoodRecipe> {
         relatedProductId: row['related_product_id'] as String?,
         relatedCommunity: row['related_community'] as String?,
         seed: _int(row['shuffle_seed'], 0),
+        // The Drive recipe-doc fields (0096). Missing columns read as empty,
+        // so a row from before the migration still decodes.
+        photo: row['photo'] as String?,
+        amounts: _strings(row['amounts']),
+        texture: row['texture'] as String?,
+        mealRole: row['meal_role'] as String?,
+        alsoIn: _stringSet(row['also_in']),
+        docId: row['doc_id'] as String?,
       );
 
   @override
@@ -144,5 +152,11 @@ class RecipeStore extends ContentStore<FoodRecipe> {
         'related_product_id': r.relatedProductId,
         'related_community': r.relatedCommunity,
         'shuffle_seed': r.seed,
+        'photo': r.photo,
+        'amounts': r.amounts,
+        'texture': r.texture,
+        'meal_role': r.mealRole,
+        'also_in': r.alsoIn.toList(growable: false),
+        'doc_id': r.docId,
       };
 }

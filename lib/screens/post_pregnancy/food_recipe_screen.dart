@@ -30,6 +30,10 @@ import '../products/pv_store_chrome.dart' show PvCommit, PvSecondary, pvStorePal
 import 'pp_care_parts.dart' show PpCareStats, ppCareHeading;
 import '../../widgets/pv_feedback.dart' show PvPress;
 import '../../widgets/pv_toast.dart';
+import '../nutrition/door/recipe_cook_screen.dart' show CookModeScreen;
+import '../v2/v2_palette.dart';
+import 'pp_child_profile.dart';
+import 'pp_recipes_screen.dart' show ppRecipeAgeRange;
 import '../saved_toast.dart';
 
 class FoodRecipeScreen extends StatefulWidget {
@@ -59,6 +63,9 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
   //  The old page is `_buildBeforeShell`, kept for revert.
   @override
   Widget build(BuildContext context) {
+    // The Drive doc format gets the new page (2026-10-15 pilot); every other
+    // dish keeps the page below until the user has approved it on one.
+    if (r.docFormat) return _buildDocPage(context);
     final p = pvStorePalette;
     final body = pvManrope(fontSize: 14, height: 1.55, color: p.ink1);
     Widget dot(String t) => pregToolPad(Padding(
@@ -597,7 +604,7 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
       ]);
 
   // ---- related (ecosystem) ------------------------------------------------
-  Widget _related() {
+  Widget _related({String title = 'Connected in ParentVeda'}) {
     final rows = <(IconData, String, String, VoidCallback)>[
       if (r.relatedArticle != null) (Icons.menu_book_outlined, 'Article', r.relatedArticle!, () => _push(const ArticleReaderScreen())),
       if (r.relatedVideoId != null)
@@ -627,7 +634,7 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
       (Icons.auto_awesome_outlined, 'Ask Veda', 'Ask about feeding at ${r.ageTag}', () => openPpTab(context, 1)),
     ];
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text('Connected in ParentVeda', style: ppJakarta(17)),
+      Text(title, style: title == 'Connected in ParentVeda' ? ppJakarta(17) : pvFraunces(fontSize: 21, fontWeight: FontWeight.w600, color: ppInk)),
       const SizedBox(height: 14),
       for (final row in rows)
         PvPress(child: GestureDetector(
@@ -653,4 +660,439 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
         )),
     ]);
   }
+  // ===========================================================================
+  //  THE DOC-FORMAT PAGE (2026-10-15) — piloted on Mixed dal khichdi
+  // ---------------------------------------------------------------------------
+  //  Mobbin §21 (docs/MOBBIN-DISCOVERY.md). What every recipe app agrees on:
+  //  the dish photo first, back and save as rounds ON it (Lifesum, NYT,
+  //  Instacart, Yazio); the title in a serif and one line under it; ONE facts
+  //  strip (Postmates' Servings | Prep | Cook, HelloFresh's Difficulty);
+  //  quantities in their own column (Apple News, Crouton); numbered steps as
+  //  cards with the minutes picked out (Crouton, Kitchen Stories); a cook
+  //  mode (Recime, HelloFresh, and ours from pregnancy); nutrition low and
+  //  plain (MyFitnessPal, Hers); one action pinned at the foot (Lifesum).
+  //
+  //  Ours, because this is a baby's food and no app in the library covers it:
+  //  the AGE the dish is written for, set against the child's own age — the
+  //  app derives it and never asks; the TEXTURE in the facts; and "Take care"
+  //  as a calm block ruled on the left, never red.
+  //
+  //  Declined: calories and macro rings (no calorie counting, and the doc has
+  //  none); a servings stepper (baby portions are fixed, and "1 tiny pinch"
+  //  does not scale); ratings (we have none to show); Cherrypick's
+  //  Ingredients / Method / Nutrition tabs (one scroll reads better with a
+  //  baby on one arm).
+  // ===========================================================================
+
+  Widget _buildDocPage(BuildContext context) {
+    final p = pvStorePalette;
+    return AnimatedBuilder(
+      animation: foodListenable,
+      builder: (context, _) => Scaffold(
+        backgroundColor: Colors.white,
+        bottomNavigationBar: _docBar(p),
+        body: ListView(
+          key: const ValueKey('pp_recipe_doc_page'),
+          padding: EdgeInsets.zero,
+          children: [
+            _docHero(context),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 18, 20, 0),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text('${foodAgeLabel(r.ageTag)} · ${r.category}'.toUpperCase(),
+                    style: pvManrope(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.2, color: p.ink3)),
+                const SizedBox(height: 8),
+                Text(r.title,
+                    style: pvFraunces(fontSize: 30, fontWeight: FontWeight.w600, height: 1.12, letterSpacing: -0.3, color: p.ink1)),
+                const SizedBox(height: 8),
+                Text(ppFill(r.subtitle), style: pvManrope(fontSize: 15.5, height: 1.5, color: p.ink2)),
+                const SizedBox(height: 12),
+                _docMetaLine(p),
+                const SizedBox(height: 18),
+                _docFacts(p),
+                const SizedBox(height: 12),
+                _docAgeFit(p),
+                _docSection(p, 'Why this is good for him'),
+                Text(ppFill(r.why), style: _docBody(p)),
+                _docSection(p, 'What you need', side: 'Serves ${r.serves}'),
+                _docIngredients(p),
+                if (r.equipment.isNotEmpty) ...[
+                  const SizedBox(height: 16),
+                  Text('You’ll also need',
+                      style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w700, color: p.ink2)),
+                  const SizedBox(height: 8),
+                  Wrap(spacing: 8, runSpacing: 8, children: [
+                    for (final e in r.equipment) _docChip(p, Icons.soup_kitchen_outlined, _cap(e.replaceFirst(RegExp(r'^an? '), ''))),
+                  ]),
+                ],
+                _docSection(p, 'How to make it', sub: '${r.steps.length} steps. Cook step by step reads them one at a time.'),
+                for (var i = 0; i < r.steps.length; i++) _docStep(p, i),
+                if (r.nutrients.isNotEmpty) ...[
+                  _docSection(p, 'What’s in it'),
+                  _docNutrients(p),
+                ],
+                _docSection(p, 'Good to know'),
+                _docGoodToKnow(p),
+                if (r.mistakes.isNotEmpty) ...[
+                  _docSection(p, 'Take care'),
+                  _docTakeCare(p),
+                ],
+                if (r.substitutions.isNotEmpty) ...[
+                  _docSection(p, 'You can swap'),
+                  for (final e in r.substitutions.entries) _docSwap(p, e.key, e.value),
+                ],
+                const SizedBox(height: 30),
+                _related(title: 'More on ParentVeda'),
+                const SizedBox(height: 18),
+                Text('By ParentVeda team', style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w600, color: p.ink3)),
+                const SizedBox(height: 28),
+              ]),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  TextStyle _docBody(V2Palette p) => pvManrope(fontSize: 15, height: 1.6, color: p.ink1);
+
+  String _cap(String s) => s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
+
+  Widget _docSection(V2Palette p, String title, {String? side, String? sub}) => Padding(
+        padding: const EdgeInsets.only(top: 30, bottom: 10),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+            Expanded(child: Text(title, style: pvFraunces(fontSize: 21, fontWeight: FontWeight.w600, color: p.ink1))),
+            if (side != null) Text(side, style: pvManrope(fontSize: 13, fontWeight: FontWeight.w600, color: p.ink2)),
+          ]),
+          if (sub != null) ...[
+            const SizedBox(height: 4),
+            Text(sub, style: pvManrope(fontSize: 13, height: 1.45, color: p.ink3)),
+          ],
+        ]),
+      );
+
+  // ---- the photo, with back and save on it ---------------------------------
+  Widget _docHero(BuildContext context) {
+    final w = MediaQuery.sizeOf(context).width;
+    final top = MediaQuery.paddingOf(context).top;
+    final saved = FoodStore.instance.isSaved(r.id);
+    return Stack(children: [
+      FoodPhoto(recipe: r, height: w * 0.75 + top, radius: 0),
+      Positioned(
+        top: top + 8,
+        left: 14,
+        child: Semantics(
+          button: true,
+          label: 'Back',
+          child: _round(Icons.arrow_back, () => Navigator.of(context).maybePop()),
+        ),
+      ),
+      Positioned(
+        top: top + 8,
+        right: 14,
+        child: Semantics(
+          button: true,
+          label: saved ? 'Saved. Tap to remove' : 'Save recipe',
+          child: KeyedSubtree(
+            key: const ValueKey('pp_recipe_save'),
+            child: _round(saved ? Icons.bookmark_rounded : Icons.bookmark_outline_rounded, () {
+              void flip() => FoodStore.instance.toggleSave(r.id);
+              flip();
+              final nav = Navigator.of(context);
+              pvSaveToast(context,
+                  nowSaved: !saved,
+                  undo: flip,
+                  where: 'Saved to your recipes',
+                  onView: () => nav.push(MaterialPageRoute<void>(builder: (_) => const FoodSavedScreen())));
+            }),
+          ),
+        ),
+      ),
+    ]);
+  }
+
+  // ---- diet · serves · meal role -------------------------------------------
+  Widget _docMetaLine(V2Palette p) {
+    final style = pvManrope(fontSize: 13, fontWeight: FontWeight.w600, color: p.ink2);
+    Widget sep() => Text('  ·  ', style: style);
+    return Wrap(crossAxisAlignment: WrapCrossAlignment.center, children: [
+      foodDietMark(r.diet, size: 14),
+      const SizedBox(width: 7),
+      Text(r.vegLabel, style: style),
+      sep(),
+      Text('Serves ${r.serves}', style: style),
+      if (r.mealRole != null) ...[sep(), Text(r.mealRole!, style: style)],
+    ]);
+  }
+
+  // ---- Prep | Cook | Level | Texture ---------------------------------------
+  Widget _docFacts(V2Palette p) {
+    Widget cell(String value, String label) => Expanded(
+          child: Column(children: [
+            Text(value,
+                style: pvJakarta(fontSize: 14.5, fontWeight: FontWeight.w700, color: p.ink1),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis),
+            const SizedBox(height: 3),
+            Text(label,
+                style: pvManrope(fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.8, color: p.ink3)),
+          ]),
+        );
+    Widget rule() => Container(width: 1, height: 28, color: p.line);
+    return Container(
+      key: const ValueKey('pp_recipe_doc_facts'),
+      padding: const EdgeInsets.symmetric(vertical: 14),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(16), border: Border.all(color: p.line)),
+      child: Row(children: [
+        cell('${r.prepMin} min', 'PREP'),
+        rule(),
+        cell(r.cookMin == 0 ? 'No-cook' : '${r.cookMin} min', 'COOK'),
+        rule(),
+        cell(r.difficulty, 'LEVEL'),
+        rule(),
+        if (r.texture != null) cell(r.texture!, 'TEXTURE') else cell(foodAgeLabel(r.ageTag), 'AGE'),
+      ]),
+    );
+  }
+
+  // ---- is it right for her child now? Derived, never asked -----------------
+  Widget _docAgeFit(V2Palette p) {
+    final c = ChildProfileStore.instance;
+    final months = c.devAgeInMonths;
+    final range = ppRecipeAgeRange(r.ageTag);
+    final made = 'Made for ${foodAgeLabel(r.ageTag)}';
+    final (IconData icon, String line) = range == null || (months >= range.$1 && months <= range.$2)
+        ? (Icons.check_circle_outline_rounded, 'Right for ${c.nameMid} now, at $months months.')
+        : months < range.$1
+            ? (Icons.schedule_rounded, '$made, and ${c.nameMid} is $months months. One to keep for when he gets there.')
+            : (Icons.trending_up_rounded, '$made, and ${c.nameMid} is $months months. Still a good meal; he may be ready for more texture now.');
+    return Container(
+      key: const ValueKey('pp_recipe_doc_agefit'),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(color: p.surfaceAlt, borderRadius: BorderRadius.circular(14)),
+      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Icon(icon, size: 18, color: p.ink1),
+        const SizedBox(width: 10),
+        Expanded(child: Text(line, style: pvManrope(fontSize: 13.5, height: 1.45, fontWeight: FontWeight.w600, color: p.ink1))),
+      ]),
+    );
+  }
+
+  // ---- ingredients: amount in its own column, Add on each row --------------
+  Widget _docIngredients(V2Palette p) {
+    final shop = FoodStore.instance.shopping;
+    return Column(children: [
+      for (var i = 0; i < r.ingredients.length; i++)
+        Container(
+          key: ValueKey('pp_recipe_ing_$i'),
+          padding: const EdgeInsets.symmetric(vertical: 11),
+          decoration: BoxDecoration(border: Border(bottom: BorderSide(color: p.line))),
+          child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+            SizedBox(
+              width: 118,
+              child: Text(i < r.amounts.length ? r.amounts[i] : '',
+                  style: pvJakarta(fontSize: 13.5, fontWeight: FontWeight.w700, height: 1.35, color: p.ink1)),
+            ),
+            const SizedBox(width: 10),
+            Expanded(child: Text(r.ingredients[i], style: pvManrope(fontSize: 14.5, height: 1.4, color: p.ink1))),
+            if (foodShoppable(r.ingredients[i])) ...[
+              const SizedBox(width: 10),
+              _docAddOne(p, r.ingredients[i], shop.containsKey(r.ingredients[i])),
+            ] else
+              const SizedBox(width: 42),
+          ]),
+        ),
+    ]);
+  }
+
+  Widget _docAddOne(V2Palette p, String line, bool on) => Semantics(
+        button: true,
+        label: on ? '$line is on your list. Tap to remove' : 'Add $line to your list',
+        child: PvPress(child: GestureDetector(
+          key: ValueKey('pp_recipe_add_$line'),
+          behavior: HitTestBehavior.opaque,
+          onTap: () {
+            if (on) {
+              FoodStore.instance.removeLine(line);
+            } else {
+              FoodStore.instance.addLines([line]);
+            }
+          },
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 160),
+            width: 32,
+            height: 32,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: on ? p.ink1 : Colors.white,
+              shape: BoxShape.circle,
+              border: Border.all(color: on ? p.ink1 : p.line, width: 1.2),
+            ),
+            child: Icon(on ? Icons.check_rounded : Icons.add_rounded, size: 17, color: on ? Colors.white : p.ink1),
+          ),
+        )),
+      );
+
+  Widget _docChip(V2Palette p, IconData icon, String label) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(999), border: Border.all(color: p.line)),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          Icon(icon, size: 15, color: p.ink2),
+          const SizedBox(width: 6),
+          Flexible(child: Text(label, style: pvManrope(fontSize: 13, fontWeight: FontWeight.w600, color: p.ink1))),
+        ]),
+      );
+
+  // ---- one card per step, the minutes picked out ---------------------------
+  static final RegExp _minutes = RegExp(r'(about )?\d+(\s*[–-]\s*\d+)?\s*(minutes?|min|hours?)\b');
+
+  Widget _docStep(V2Palette p, int i) {
+    final text = ppFill(r.steps[i]);
+    final spans = <TextSpan>[];
+    var at = 0;
+    for (final m in _minutes.allMatches(text)) {
+      if (m.start > at) spans.add(TextSpan(text: text.substring(at, m.start)));
+      spans.add(TextSpan(text: m.group(0), style: const TextStyle(fontWeight: FontWeight.w800)));
+      at = m.end;
+    }
+    if (at < text.length) spans.add(TextSpan(text: text.substring(at)));
+    return Container(
+      key: ValueKey('pp_recipe_step_$i'),
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.fromLTRB(14, 14, 16, 14),
+      decoration: BoxDecoration(color: p.surfaceAlt, borderRadius: BorderRadius.circular(16)),
+      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Container(
+          width: 26,
+          height: 26,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(color: p.ink1, shape: BoxShape.circle),
+          child: Text('${i + 1}', style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w800, color: Colors.white)),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Text.rich(TextSpan(children: spans), style: _docBody(p)),
+          ),
+        ),
+      ]),
+    );
+  }
+
+  // ---- what's in it: the nutrient and where it comes from, no numbers ------
+  Widget _docNutrients(V2Palette p) => LayoutBuilder(
+        builder: (context, box) {
+          final w = (box.maxWidth - 10) / 2;
+          return Wrap(spacing: 10, runSpacing: 10, children: [
+            for (final n in r.nutrients)
+              Container(
+                width: w,
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(borderRadius: BorderRadius.circular(14), border: Border.all(color: p.line)),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(n.name, style: pvJakarta(fontSize: 14, fontWeight: FontWeight.w700, color: p.ink1)),
+                  const SizedBox(height: 4),
+                  Text('From ${ppFill(n.note).replaceAll(RegExp(r'\.$'), '').toLowerCase()}',
+                      style: pvManrope(fontSize: 12.5, height: 1.4, color: p.ink2)),
+                ]),
+              ),
+          ]);
+        },
+      );
+
+  // ---- how often · storing ----------------------------------------------------
+  Widget _docGoodToKnow(V2Palette p) {
+    Widget tile(IconData icon, String label, String text) => Expanded(
+          child: Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(color: p.surfaceAlt, borderRadius: BorderRadius.circular(14)),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Icon(icon, size: 18, color: p.ink1),
+              const SizedBox(height: 8),
+              Text(label, style: pvManrope(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 0.8, color: p.ink3)),
+              const SizedBox(height: 4),
+              Text(text, style: pvManrope(fontSize: 13.5, height: 1.45, color: p.ink1)),
+            ]),
+          ),
+        );
+    return IntrinsicHeight(
+      child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        tile(Icons.event_repeat_outlined, 'HOW OFTEN', r.frequency),
+        const SizedBox(width: 10),
+        tile(Icons.kitchen_outlined, 'STORING', r.storage.join(' ')),
+      ]),
+    );
+  }
+
+  // ---- take care: calm, ruled on the left, never red ------------------------
+  Widget _docTakeCare(V2Palette p) => Container(
+        key: const ValueKey('pp_recipe_doc_takecare'),
+        padding: const EdgeInsets.fromLTRB(16, 4, 0, 4),
+        decoration: BoxDecoration(border: Border(left: BorderSide(color: p.ink1, width: 3))),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          for (final m in r.mistakes)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 5),
+              child: Text(ppFill(m), style: _docBody(p)),
+            ),
+        ]),
+      );
+
+  Widget _docSwap(V2Palette p, String from, String to) => Padding(
+        padding: const EdgeInsets.only(bottom: 10),
+        child: Row(children: [
+          Flexible(child: Text(_cap(from), style: pvManrope(fontSize: 14.5, fontWeight: FontWeight.w700, color: p.ink1))),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Icon(Icons.swap_horiz_rounded, size: 18, color: p.ink3),
+          ),
+          Flexible(child: Text(_cap(to), style: pvManrope(fontSize: 14.5, color: p.ink1))),
+        ]),
+      );
+
+  // ---- the pinned foot: add everything, or cook it --------------------------
+  Widget _docBar(V2Palette p) => Container(
+        padding: EdgeInsets.fromLTRB(20, 12, 20, 12 + MediaQuery.paddingOf(context).bottom),
+        decoration: BoxDecoration(color: Colors.white, border: Border(top: BorderSide(color: p.line))),
+        child: Row(children: [
+          Expanded(
+            child: PvSecondary(
+              key: const ValueKey('pp_recipe_shop'),
+              label: 'Add all to list',
+              icon: Icons.shopping_basket_outlined,
+              onTap: () {
+                FoodStore.instance.addRecipeToShopping(r);
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: const Text('Ingredients added to your shopping list'),
+                  behavior: SnackBarBehavior.floating,
+                  action: SnackBarAction(label: 'View', onPressed: () => _push(const FoodShoppingScreen())),
+                ));
+              },
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: PvCommit(
+              key: const ValueKey('pp_recipe_cook'),
+              label: 'Cook step by step',
+              onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+                settings: RouteSettings(name: 'pp/recipe/${r.id}/cook'),
+                builder: (_) => CookModeScreen.steps(
+                  title: r.title,
+                  steps: [for (final s in r.steps) ppFill(s)],
+                  ingredientLines: [
+                    for (var i = 0; i < r.ingredients.length; i++)
+                      i < r.amounts.length ? '${r.amounts[i]}  ${r.ingredients[i]}' : r.ingredients[i],
+                  ],
+                  enjoyLine: '${r.title} · cool it till just warm before he eats.',
+                  photo: FoodPhoto(recipe: r, height: double.infinity, radius: 0),
+                ),
+              )),
+            ),
+          ),
+        ]),
+      );
 }

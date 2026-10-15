@@ -33,6 +33,7 @@ import '../doors/pv_shelf_spec.dart' show PvShelfKind;
 import '../pregnancy/preg_tool_chrome.dart';
 import '../products/pv_store_chrome.dart' show PvChip, pvStorePalette;
 import '../v2/v2_palette.dart';
+import 'food_common.dart' show FoodPhotoCard;
 import 'food_recipe_screen.dart';
 import 'pp_child_profile.dart';
 import 'pp_food_data.dart';
@@ -162,9 +163,16 @@ class _PpRecipesScreenState extends State<PpRecipesScreen> {
               else
                 _grid(p, hits),
             ] else ...[
+              // `inCategory`, not `category ==`: a doc-format dish is tagged into
+              // several categories (the khichdi is Lunch, Dinner and a First
+              // Food), and the doc-format dishes lead their rails while the
+              // new card is being piloted (2026-10-15).
               for (final cat in kBrowseCategories)
                 if (cat != 'All')
-                  ..._rail(p, cat, [for (final r in pool) if (r.category == cat) r]),
+                  ..._rail(p, cat, [
+                    for (final r in pool) if (r.inCategory(cat) && r.docFormat) r,
+                    for (final r in pool) if (r.inCategory(cat) && !r.docFormat) r,
+                  ]),
               const SizedBox(height: 26),
               pregToolPad(PvRowGroup(p: p, children: [
                 PvListRow(
@@ -192,7 +200,9 @@ class _PpRecipesScreenState extends State<PpRecipesScreen> {
       pregToolPad(Text(cat, style: pvFraunces(fontSize: 20, fontWeight: FontWeight.w600, color: p.ink1))),
       const SizedBox(height: 10),
       SizedBox(
-        height: pvShelfRailHeight(MediaQuery.textScalerOf(context)),
+        // The photo card's title sits a few pixels lower than the shelf
+        // card's, so a rail holding one grows by that much and no more.
+        height: pvShelfRailHeight(MediaQuery.textScalerOf(context)) + (items.any((r) => r.docFormat) ? 14 : 0),
         child: ListView.separated(
           key: ValueKey('pp_recipes_rail_$cat'),
           scrollDirection: Axis.horizontal,
@@ -205,7 +215,17 @@ class _PpRecipesScreenState extends State<PpRecipesScreen> {
     ];
   }
 
-  Widget _card(V2Palette p, FoodRecipe r, int i, {double? width}) => PvShelfCard(
+  Widget _card(V2Palette p, FoodRecipe r, int i, {double? width}) => r.docFormat
+      // The new recipe card, on the doc-format dishes only until the user has
+      // seen it beside the shelf cards and approved it (2026-10-15 pilot).
+      ? FoodPhotoCard(
+          key: ValueKey('pp_recipe_${r.id}'),
+          recipe: r,
+          width: width ?? kPvShelfCardWidth,
+          photoHeight: width == null ? kPvShelfPictureHeight : null,
+          onTap: () => _open(r),
+        )
+      : PvShelfCard(
         key: ValueKey('pp_recipe_${r.id}'),
         p: p,
         hue: (80 + i * 26) % 360,

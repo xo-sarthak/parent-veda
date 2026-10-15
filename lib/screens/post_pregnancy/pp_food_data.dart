@@ -16,6 +16,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../services/content_ownership.dart';
 import '../../services/recipe_store.dart';
 import '../../services/remote/cloud_synced_store.dart';
 
@@ -67,7 +68,43 @@ class FoodRecipe {
     this.relatedVideoId,
     this.relatedProductId,
     this.relatedCommunity,
+    // ---- the Drive recipe-doc format (2026-10-15, the 7–8 month band) ----
+    // All optional with empty defaults, so the older dishes are untouched and
+    // the new page switches on per dish from its data, not from a flag.
+    this.photo,
+    this.amounts = const [],
+    this.texture,
+    this.mealRole,
+    this.alsoIn = const {},
+    this.docId,
   });
+
+  /// Asset path of a real photo of the dish, or null for the tinted thumb.
+  final String? photo;
+
+  /// The "How much" column, parallel to [ingredients] ('2 tbsp (about 16 g)').
+  /// Empty for the older dishes, whose quantities live inside the ingredient.
+  final List<String> amounts;
+
+  /// 'Soft mash', 'Soft' — the texture the band is at.
+  final String? texture;
+
+  /// 'Small meal', 'Small snack', 'Finger-food practice'.
+  final String? mealRole;
+
+  /// The other browse categories the doc lists this dish under. The doc writes
+  /// a page once and tags it into several categories (oats porridge is both a
+  /// First Food and a Breakfast); [category] stays the home one.
+  final Set<String> alsoIn;
+
+  /// The Drive doc's id ('7-8M-REC-11'), so every dish traces back to its page.
+  final String? docId;
+
+  /// True when this dish carries the doc format and gets the new page and card.
+  bool get docFormat => photo != null || amounts.isNotEmpty;
+
+  /// Whether the dish belongs in [cat]'s rail.
+  bool inCategory(String cat) => category == cat || alsoIn.contains(cat);
 
   final String id;
   final String title;
@@ -140,6 +177,12 @@ class FoodRecipe {
               ? 'veg'
               : 'nonveg';
 }
+
+/// Whether an ingredient line belongs on a shopping list. The doc-format
+/// dishes name their liquids as bare items ('Water', 'Water or milk feed'),
+/// and "buy water" on a list is noise, so a line that starts with water is
+/// left off. The older dishes start with a quantity, so they never match.
+bool foodShoppable(String line) => !line.trimLeft().toLowerCase().startsWith('water');
 
 /// One "nutrition focus of the day" - the educational strength.
 class NutritionFocus {
@@ -4858,6 +4901,59 @@ const List<FoodRecipe> kFoodRecipes = [
     tags: {'appe', 'banana', 'snack'},
     ingredientKeys: {'banana'},
   ),
+
+  // ---- Drive: "Recipes (not reviewed)" / 7-8 month band (PROMPT4) FINAL ----
+  // The pilot of the doc format and the new recipe page (2026-10-15). Copied
+  // from the doc as written; the doc's own status is "Editorial Review Pending
+  // — Medical Review Pending". The other 27 of the band follow once the user
+  // has approved the page on this one.
+  FoodRecipe(
+    id: 'pp_7_8m_mixed_dal_khichdi',
+    docId: '7-8M-REC-11',
+    photo: 'assets/recipes/pp_7_8m_mixed_dal_khichdi.webp',
+    title: 'Mixed dal khichdi',
+    subtitle: 'Two dals, rice and veg in one soft, balanced bowl.',
+    category: 'Lunch',
+    alsoIn: {'First Foods', 'Dinner'},
+    slot: 'Lunch',
+    ageTag: '7 to 8 mo',
+    veg: true,
+    vegan: true,
+    serves: 2,
+    mealRole: 'Small meal',
+    texture: 'Soft mash',
+    prepMin: 5,
+    cookMin: 20,
+    difficulty: 'Easy',
+    seed: 147,
+    highlight: 'Protein + iron',
+    why:
+        'This khichdi brings moong and masoor dal with rice and soft veg — protein, iron, energy and a little fat from ghee in one bowl. The everyday all-in-one meal of Indian baby food.',
+    nutrients: [
+      FoodNutrient('Protein', '', 'Moong and masoor dal.'),
+      FoodNutrient('Iron (from plants)', '', 'The dals.'),
+      FoodNutrient('Energy', '', 'Rice.'),
+    ],
+    frequency: 'Most days as a main meal.',
+    ingredients: ['Rice', 'Moong dal', 'Masoor dal (red lentil)', 'Soft vegetables, chopped', 'Water', 'Ghee'],
+    amounts: ['1 tbsp (about 12 g)', '½ tbsp (about 6 g)', '½ tbsp (about 6 g)', '2 tbsp (about 25 g)', '1 cup (240 ml)', '¼ tsp'],
+    equipment: ['a pressure cooker', 'a masher'],
+    steps: [
+      'Wash the rice and both dals together.',
+      'Add the veg and water; pressure cook till very soft.',
+      'Mash to a soft khichdi.',
+      'Stir in the ghee. Cool till just warm.',
+    ],
+    storage: ['Fresh; fridge up to 24 hours.'],
+    mistakes: [
+      'Cook everything fully soft. No salt.',
+      'If masoor dal is new, give a small amount first and watch for any reaction.',
+    ],
+    substitutions: {'masoor': 'all moong dal', 'rice': 'dalia'},
+    healthierNote: '',
+    tags: {'khichdi', 'dal', 'moong', 'masoor', 'rice', 'protein', 'iron', 'first foods', 'lunch', 'dinner'},
+    ingredientKeys: {'rice', 'moong dal', 'vegetables'},
+  ),
 ];
 
 // ---- nutrition focuses ------------------------------------------------------
@@ -4943,10 +5039,27 @@ const List<NutritionFocus> kNutritionFocuses = [
 /// catalogue falls back to the bundle. Unpublishing ONE dish — the actual
 /// editorial act — works exactly as expected; only unpublishing every dish is
 /// treated as a mistake rather than an instruction.
+/// ⚠️ THE OWNERSHIP RULE, NOT "WHATEVER THE NETWORK SAID LAST" (2026-10-15).
+///
+/// This used to serve the Supabase rows whenever there were any. But recipes
+/// are `ContentOwner.bundled`: the Dart file is the truth and the table is a
+/// copy exported for Ask Veda. The seed export holds the first 28 dishes, so
+/// wherever the table has been seeded, a phone that once reached Supabase
+/// served those 28 and silently hid every dish added to the Dart since (111
+/// of them, and the new 7–8 month recipes). Nothing fails and nothing logs;
+/// the catalogue just shrinks. The store keeps loading and caching either way,
+/// so the day recipes flip to `editor` the live rows take over with no other
+/// change.
 List<FoodRecipe> get foodCatalog {
+  if (!ContentOwnership.isEditorOwned('recipes')) return kFoodRecipes;
   final live = RecipeStore.instance.all;
   return live.isEmpty ? kFoodRecipes : live;
 }
+// Kept for revert: the network-first version.
+// List<FoodRecipe> get foodCatalog {
+//   final live = RecipeStore.instance.all;
+//   return live.isEmpty ? kFoodRecipes : live;
+// }
 
 /// Listen to this wherever dishes are rendered: it fires both when the user
 /// changes a preference (veg-only) and when freshly published content arrives.
@@ -5237,6 +5350,7 @@ class FoodStore extends ChangeNotifier with CloudSyncedStore {
   /// Add a recipe's ingredients to the shopping list (skips ones already there).
   void addRecipeToShopping(FoodRecipe r) {
     for (final ing in r.ingredients) {
+      if (!foodShoppable(ing)) continue;
       _shopping.putIfAbsent(ing, () => false);
     }
     notifyListeners();

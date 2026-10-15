@@ -260,6 +260,10 @@ flutter:
     # lib/screens/ttc/doors/ttc_door_hero.dart. A door with no file yet shows
     # its photograph, whole, in the same frame.
     - assets/doors/
+    # Parenting recipe photos (2026-10-15): <recipe id>.webp, 4:3, ~1200 px.
+    # Made from the per-recipe prompt in docs/REMAINING-CHANGES.md; a dish
+    # with no file yet shows its warm tinted thumb (FoodPhoto's errorBuilder).
+    - assets/recipes/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

@@ -10158,7 +10158,8 @@ From the parenting gap analysis (theAsianparent and What to Expect vs ParentVeda
 - 83.11 Ask Veda: answer reveal is paced, not streamed; real streaming needs a service endpoint. Parenting Ask Veda palette was moved to pregnancy's white/ink (beyond brief) — keep or revert.
 - 83.12 Phone OTP edge functions (`phone-otp-send`, `phone-otp-verify`) still undeployed; need MSG91 secrets. All other functions deployed (checked 10-10).
 - 83.13 Daily insights tab images: to discuss.
-- 83.14 Still to do from the notebook: recipes UI (Mobbin study first), flash cards for heavy tools, door UI consistency, Ask Veda pregnancy review. DONE c1204b0 (2026-10-14): a home-screen mark leading to Talk to someone, on all three homes.
+- 83.14 Still to do from the notebook: recipes UI (Mobbin study first; PILOT BUILT 2026-10-15, see 83.14a), flash cards for heavy tools, door UI consistency, Ask Veda pregnancy review. DONE c1204b0 (2026-10-14): a home-screen mark leading to Talk to someone, on all three homes.
+- 83.14a 2026-10-15 RECIPES, PILOT BUILT (waits on the user's look). Mobbin study in MOBBIN-DISCOVERY §21. New page (`FoodRecipeScreen._buildDocPage`) and new card (`FoodPhotoCard`), both switched on per dish by `FoodRecipe.docFormat`, so only Mixed dal khichdi (7-8M-REC-11, from Drive "Recipes (not reviewed)") wears them; the other 139 keep the old page and shelf card until approved. Cook mode shared with pregnancy (`CookModeScreen.steps`). The photo is in (ChatGPT, from the prompt in REMAINING-CHANGES; `assets/recipes/pp_7_8m_mixed_dal_khichdi.webp`). `foodCatalog` now honours `ContentOwner.bundled` (BACKEND-PATTERNS §16ee). Migration 0096 (recipe-doc columns) for the user to run; nothing needs it yet.
 
 
 ## 84.0 Pregnancy week-wise content docs, on the week Details page — 2026-10-13
