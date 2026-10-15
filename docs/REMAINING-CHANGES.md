@@ -33,7 +33,8 @@ L = a day or more.
    drags, keyboard dismiss, conditional taps). All 7,846 tests pass. Optional later: the 40
    conditional taps by hand. STILL-OPEN §83.10.
 7. **Add to calendar (M).** Scans and appointments into the phone's calendar.
-8. **Baby vault (M).** Read aloud for the letters, and "open your letters" at birth.
+8. **Baby vault: DONE 2026-10-15 (with item 12).** Read aloud on every letter, "open your letters" at
+   birth, and the letters book PDF, sealed until birth. Waits on a device check. STILL-OPEN §83.2.
 9. **Door consistency pass (M).** One layout and set of controls across every door (STILL-OPEN §83.14).
 10. **Flash cards for heavy tools (M).** A short card deck in front of tools that are a lot to take in.
 
@@ -51,7 +52,8 @@ L = a day or more.
       - the page and card on all dishes;
       - a photo prompt per dish.
     - STILL-OPEN §83.14a.
-12. **Keepsake PDF (L).** The pregnancy or baby keepsake, exported as a PDF.
+12. **Keepsake PDF: DONE 2026-10-15, folded into item 8.** It was the Baby vault's book: the letters
+    as a PDF, unlocked at birth.
 13. **Condition reads (L, content).** The condition pages owed their reads.
 14. **Investment explainers (L, content).** The money explainers for parents.
 15. **Ask Veda pregnancy review (L, two repos).** Walk the pregnancy answers. Fixes to the answers live
@@ -172,4 +174,6 @@ pull it in. Detail and history stay in the STILL-OPEN section named on each bloc
   phases change (Development door → Phases, a doc phase, a 2-year-old's "guide is being written"),
   and the tap feedback (press a card, scroll a list starting on a card, tap an icon inside a card:
   only the icon moves).
+- **Device check, Baby vault.** Write two letters, read one aloud, "Read them all", tap the sealed book;
+  then "Baby has arrived", the home card, the envelope, and download and share the book.
 - **Push.** `9223ce4` (tap feedback) and anything before it not yet pushed.

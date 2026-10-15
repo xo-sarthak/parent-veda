@@ -104,6 +104,7 @@ import 'phase_map_screen.dart';
 // import 'family_profile_screen.dart'; // kept for revert — the avatar opens You since 2026-09-19
 import 'pp_hero_field.dart';
 // import 'pp_saved_hub_screen.dart'; // kept for revert — SavedScreen replaced the hub 2026-09-16
+import '../dear_baby_vault_screen.dart' show DearBabyLettersReadyCard;
 import '../profile/pv_you_screen.dart';
 import '../saved_screen.dart';
 import 'pp_phase_faqs.dart';
@@ -308,6 +309,12 @@ class _PpHomeV3State extends State<PpHomeV3> {
                 ),
                 _Sheet(p: p, children: [
                 const SizedBox(height: 22),
+                // ---- HER LETTERS, READY TO OPEN (2026-10-15) -----------------
+                // The Dear Baby letters she wrote in pregnancy open at birth
+                // (STILL-OPEN §83.2). First on the sheet until she opens them,
+                // then gone: the one card on this home that is about her.
+                // It draws nothing for a family without letters.
+                DearBabyLettersReadyCard(p: p),
                 // ---- MY DAILY INSIGHTS · TODAY ------------------------------
                 //
                 // The user (2026-10-07): "On the home screen I would require

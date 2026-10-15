@@ -867,3 +867,58 @@ recipe page for a baby.
   - the other 27 dishes of the 7–8 month band;
   - the page and card on all 139 dishes;
   - a photo for each dish.
+
+## 22. The Dear Baby vault — read aloud, the opening at birth, the book (2026-10-15)
+
+**Trigger.** REMAINING-CHANGES items 8 (Baby vault) and 12 (Keepsake PDF),
+folded into one pass on the user's word (STILL-OPEN §83.2). The book
+"unlocks at birth". The user asked for "a Mobbin pass on each screen to make
+it look good" and said "it should feel responsive".
+
+**Queries** (ios): "sealed envelope or time capsule letter reveal screen with
+an open button, celebratory unlock moment"; "list of episodes where one row
+is playing with an animated equalizer icon and a play all button at the
+top"; "locked feature card with a lock icon and a line saying when it
+unlocks, inside a journal or memories app"; "export journal as a printed
+book or PDF preview screen with page thumbnails and a share or download
+button".
+
+**Found and adopted.**
+- **The opening.** [Swiggy](https://mobbin.com/screens/a27f73a1-e50e-40ec-9d7a-3f1329e8320d):
+  an envelope with sheets fanning up out of it. This is the shape of
+  `DearBabyOpeningScreen`.
+  [Tolan](https://mobbin.com/screens/434afe5a-4578-4531-a329-54663d478fcc)
+  gave the rest: an "unlocked" paper card, one ink pill ("Read now"), and a
+  quiet text link under it ("Continue"). Ours is "Read your letters" and
+  "Later".
+- **Reading aloud.** [Brink](https://mobbin.com/screens/a65bfc83-435f-431b-9bdc-995a03bc9aab):
+  the row being played turns its pill into a waveform. Ours turns "Read
+  aloud" into moving bars and "Reading · Stop".
+  [Queue](https://mobbin.com/screens/7b1325f5-ad37-4594-9fa9-bb3e2435b218):
+  a floating Play bar over the list. Ours is the "Reading letter 2 of 5 ·
+  Stop" bar while "Read them all aloud" runs.
+- **The sealed book.** [Substack](https://mobbin.com/screens/f80cc3bc-1256-4895-a146-6a42363672f3):
+  the mark with a lock badge, a title, and one line saying what opens it.
+  Ours: a book with a lock badge, "Your letters, as a book", and "It opens
+  the day you meet". It stays visible, never hidden.
+- **The book.** [Polarsteps](https://mobbin.com/screens/b7618c21-df09-46e5-99b5-62f2fa31498d)
+  ("Voilà, your Travel Book is ready!") over the pages, and
+  [Withings](https://mobbin.com/screens/dd65c67f-9b15-41fa-8e33-6c7fe30a70c6)'s
+  single Close / Share pair at the foot instead of an app bar of icons.
+
+**Declined.**
+- **Confetti.** It was on almost every unlock screen: Swiggy, Locals,
+  Trust Wallet, Ultrahuman. This is a mother's letters on the day she gave
+  birth, not a level-up. Calm is the house voice.
+- **Crouton's export settings** (paper size, text size, toggles). One book,
+  one format. Settings would be choices nobody needs.
+
+**Responsiveness, as built.**
+- Every tap settles under the finger (`PvPress`).
+- The seal and the download give a haptic.
+- The envelope's words and button flip on the tap itself, not when the
+  flap lands. A test caught the first version waiting for the animation.
+- The read pill shows "Reading" before the TTS engine starts.
+- The book card shows "Making your book…" with a spinner while the PDF
+  builds.
+- Reduced motion skips the flap and stills the bars.

@@ -11,6 +11,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../screens/post_pregnancy/pp_child_profile.dart';
+import '../../services/dear_baby_vault_store.dart';
 import '../../services/pv_order_store.dart';
 import '../../theme/pv_fonts.dart';
 import '../products/pv_checkout_screen.dart' show PvAddressForm;
@@ -164,11 +165,21 @@ Future<bool> showPvAddChildSheet(
                     label: arrival ? 'Open the parenting home' : 'Add child',
                     onTap: ok
                         ? () async {
-                            await ChildProfileStore.instance.addChild(
+                            final child = await ChildProfileStore.instance.addChild(
                               name: name.text.trim(),
                               isBoy: isBoy ?? true,
                               dob: dob!,
                             );
+                            // The birth opens the Dear Baby letters
+                            // (STILL-OPEN §83.2). Only the arrival does: an
+                            // older child added later is not this baby.
+                            if (arrival) {
+                              await DearBabyVaultStore.instance.markBorn(
+                                dob: dob!,
+                                childId: child.id,
+                                name: child.name,
+                              );
+                            }
                             if (ctx.mounted) Navigator.of(ctx).pop(true);
                           }
                         : null,

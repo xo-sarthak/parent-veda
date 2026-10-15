@@ -23,6 +23,8 @@ import 'package:flutter/material.dart';
 import '../../booking/booking_store.dart';
 import '../../models/pv_product.dart' show PvStageCopy;
 import '../../screens/post_pregnancy/pp_child_profile.dart';
+import '../../services/daily_store.dart';
+import '../../services/dear_baby_vault_store.dart';
 import '../../services/family_profile.dart';
 import '../../services/life_stage_store.dart';
 import '../../services/bump_store.dart';
@@ -133,6 +135,7 @@ class PvYouThing {
     this.subtitleNow,
     this.listen,
     this.art,
+    this.shown,
   });
 
   /// The drawn mark on TTC's profile (2026-09-29), for the section's tint.
@@ -158,6 +161,11 @@ class PvYouThing {
   /// What the row's [dot] or [subtitleNow] reads, so the screen repaints
   /// when it changes. Additive: rows without it are drawn exactly as before.
   final Listenable? listen;
+
+  /// Null draws the row always. Set only where the row has nothing behind it
+  /// for some families: the Dear Baby letters on parenting, for a family that
+  /// never wrote one in pregnancy (they joined at parenting).
+  final bool Function()? shown;
 }
 
 /// A You row that IS a Tools tile: its name, icon and line read from the
@@ -464,12 +472,31 @@ PvYouThing _dearBabyVault() => PvYouThing(
   art: ttcArtTab(TtcTabMark.heartHand),
   title: 'Dear Baby vault',
   subtitle: 'Letters that open when your baby is born',
-  open: (c) {
-    final ctl = PregnancyController.current;
-    if (ctl != null) {
-      _push(c, DearBabyVaultScreen(controller: ctl), 'dear_baby');
-    }
+  // Kept for revert (2026-10-15): opened only when a pregnancy controller
+  // was live. The vault now runs without one, so the row never dead-taps.
+  open: (c) => _push(c,
+      DearBabyVaultScreen(controller: PregnancyController.current), 'dear_baby'),
+);
+
+/// The same vault after the birth (STILL-OPEN §83.2): the letters she wrote
+/// in pregnancy, now opened, with their book. Parenting had no way back to
+/// them before this row.
+PvYouThing _dearBabyLetters() => PvYouThing(
+  icon: Icons.mail_outline_rounded,
+  art: ttcArtTab(TtcTabMark.heartHand),
+  title: 'Dear Baby letters',
+  subtitleNow: () {
+    final v = DearBabyVaultStore.instance;
+    v.init();
+    if (!v.opened) return 'Your letters are ready to open';
+    final name = v.childName;
+    return name == null ? 'Your letters, and their book' : 'Letters to $name, and their book';
   },
+  dot: () => DearBabyVaultStore.instance.unlocked && !DearBabyVaultStore.instance.opened,
+  listen: Listenable.merge([DearBabyVaultStore.instance, DailyStore.instance]),
+  shown: () => DailyStore.instance.talkEntries.isNotEmpty,
+  open: (c) => _push(c,
+      DearBabyVaultScreen(controller: PregnancyController.current), 'dear_baby'),
 );
 
 PvYouThing _pregJournal() => PvYouThing(
@@ -1293,6 +1320,8 @@ final PvYouStageContent _parenting = PvYouStageContent(
     _doctorNotes(LifeStage.parenting, art: ttcArtTab(TtcTabMark.doctorChat)),
   ],
   setupThings: [_ppPersonalize(), _ppCareCircle(), _ppInvite(), _ppInvestments(), _ppAstrology()],
+  // Her letters from pregnancy, opened at birth (2026-10-15).
+  keepsakeThings: [_dearBabyLetters()],
   childrenInvitation: 'Add your child and their page appears here.',
   whatWeStore: [
     'Your name, phone and email, and the partner you paired with.',

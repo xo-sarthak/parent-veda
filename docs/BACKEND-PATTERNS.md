@@ -2711,6 +2711,39 @@ recent copy wins by default. That is rarely the most correct copy.
 page as the bundled dish. The mapper reads each one forgivingly, so a row from
 before the migration still decodes.
 
+## 16ff. A stored event beats a derived state when the moment carries data — `DearBabyVaultStore` (no migration, 2026-10-15)
+
+**The problem.** The Dear Baby letters open "when your baby is born". The
+app already has a state that means born: the family's stage is parenting.
+Deriving "born" from it is free, and it can never disagree with the rest of
+the app. But a state answers *whether*, not *who* or *when*. The opening
+screen says "Welcome, Asha" and the book prints "opened the day you were
+born, 14 February". The stage knows neither. It also cannot tell a new baby
+from an older sibling: a family with a two-year-old who is pregnant again
+has a child record before this baby exists.
+
+**The pattern.** Record the event where it happens, and keep the derived
+state as a fallback. The arrival sheet (`showPvAddChildSheet(arrival:
+true)`) is the one funnel both "Baby has arrived" buttons go through, so it
+calls `DearBabyVaultStore.markBorn(dob, childId, name)`. `unlocked` is
+`bornOn != null || stage == parenting`. The fallback covers the paths that
+never pass through that sheet: onboarding straight into parenting, and the
+dev stage switch. `childName` reads the live child record by id first, so a
+rename shows, and falls back to the name stored at birth.
+
+**The trade-off.** Two sources of truth have to be kept in step. Here that
+is cheap, because the fallback only ever *adds* unlocks and never removes
+one. What it buys is a moment that keeps its data. It also gives a negative
+guarantee that matters more: the loss path ("My pregnancy ended") neither
+calls `markBorn` nor moves to parenting, so a mother who lost her baby can
+never be shown a birth moment.
+
+**The general fact.** Derive what is a pure function of state you already
+hold. Store what happened, at the point where it happened, when the moment
+carries data that the later state cannot reproduce: who, when, and which
+one. "Is it unlocked?" is derivable. "What was the baby's name on the day?"
+is not.
+
 ## 17. Reading list, in order
 
 1. `0001_create_profiles.sql` — the two layers (grant + RLS), own-row.
@@ -2785,3 +2818,4 @@ before the migration still decodes.
 31. `JournalStore._partnerChild` — sharing by reading under an existing partner policy (§16bb).
 32. `lib/ask_veda/pp_veda_corpus.dart` + the service's `scope_domain` / `stage_key_for` — namespaced prune, versioned cache key; `pvSignOut` — independent guards (§16cc).
 33. `lib/services/pv_sync_health.dart` — fire-and-forget, but report once (§16dd).
+34. `lib/services/dear_baby_vault_store.dart` — a stored event with a derived fallback (§16ff).

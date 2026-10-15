@@ -2331,7 +2331,8 @@ class _PvYouScreenState extends State<PvYouScreen> {
           // Her own keepsakes (pregnancy: letters to her baby, the journal,
           // the bump photos). Hers: his view never draws them.
           if (!him)
-            for (final t in content.keepsakeThings) _profileThingRow(p, t),
+            for (final t in content.keepsakeThings)
+              if (t.shown?.call() ?? true) _profileThingRow(p, t),
         ],
       ),
       // Her quiet rows (pregnancy: "If your pregnancy has ended"), last before
