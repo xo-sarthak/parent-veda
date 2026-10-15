@@ -54,6 +54,7 @@ import '../../localization/app_language.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../theme/pv_fonts.dart';
 import '../v2/v2_palette.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// The Nutrition door's hue, and this tab's.
 const double _hue = 104;
@@ -370,7 +371,7 @@ class _SearchBar extends StatelessWidget {
             ),
           ),
           if (controller.text.isNotEmpty)
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: onClear,
               behavior: HitTestBehavior.opaque,
               child: Container(
@@ -383,7 +384,7 @@ class _SearchBar extends StatelessWidget {
                 ),
                 child: Icon(Icons.close_rounded, size: 15, color: p.ink2),
               ),
-            ),
+            )),
         ]),
       );
 }
@@ -414,7 +415,7 @@ class _Pill extends StatelessWidget {
   final V2Palette p;
   final VoidCallback onTap;
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         // ⚠️ NO `alignment` ON THIS CONTAINER. With `alignment` set and no
@@ -438,7 +439,7 @@ class _Pill extends StatelessWidget {
                     fontSize: 13, fontWeight: FontWeight.w700, color: p.ink1)),
           ]),
         ),
-      );
+      ));
 }
 
 /// The food vocabulary's badge: a hairline capsule with a dot and the word.
@@ -581,7 +582,7 @@ class _ChipAnswer extends StatelessWidget {
               runSpacing: 6,
               children: [
                 _WeekStamp(week: week, p: p),
-                GestureDetector(
+                PvPress(child: GestureDetector(
                   onTap: () => onCraving(craving!),
                   behavior: HitTestBehavior.opaque,
                   child: Text('Craving it? Answered for your week',
@@ -589,7 +590,7 @@ class _ChipAnswer extends StatelessWidget {
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
                           color: p.ink1)),
-                ),
+                )),
               ],
             ),
           ],
@@ -640,7 +641,7 @@ class _CategoryGrid extends StatelessWidget {
           for (final cat in FoodCategory.values)
             SizedBox(
               width: w,
-              child: GestureDetector(
+              child: PvPress(child: GestureDetector(
                 onTap: () => onTap(cat),
                 behavior: HitTestBehavior.opaque,
                 child: AnimatedContainer(
@@ -681,7 +682,7 @@ class _CategoryGrid extends StatelessWidget {
                     ),
                   ]),
                 ),
-              ),
+              )),
             ),
         ],
       );
@@ -733,7 +734,7 @@ class _FoodList extends StatelessWidget {
                           color: p.ink1)),
                 ),
                 if (onClose != null)
-                  GestureDetector(
+                  PvPress(enabled: onClose != null, child: GestureDetector(
                     onTap: onClose,
                     behavior: HitTestBehavior.opaque,
                     child: Text('Close',
@@ -741,13 +742,13 @@ class _FoodList extends StatelessWidget {
                             fontSize: 12.5,
                             fontWeight: FontWeight.w700,
                             color: p.ink1)),
-                  ),
+                  )),
               ],
             ),
           ),
           for (final f in rows) ...[
             Container(height: 1, color: p.line),
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: () => onRow(f.id),
               behavior: HitTestBehavior.opaque,
               child: Container(
@@ -765,7 +766,7 @@ class _FoodList extends StatelessWidget {
                   _FoodCapsule(verdict: f.verdict, p: p, lang: lang),
                 ]),
               ),
-            ),
+            )),
             if (open == f.id)
               Padding(
                 padding: const EdgeInsets.only(bottom: 14),
@@ -817,7 +818,7 @@ class _CravingList extends StatelessWidget {
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           for (final c in rows) ...[
             if (c != rows.first) Container(height: 1, color: p.line),
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: () => onRow(c.id),
               behavior: HitTestBehavior.opaque,
               child: Container(
@@ -843,7 +844,7 @@ class _CravingList extends StatelessWidget {
                           color: p.ink1)),
                 ]),
               ),
-            ),
+            )),
             if (open == c.id)
               Padding(
                 padding: const EdgeInsets.only(bottom: 14),
@@ -930,7 +931,7 @@ class _CravingDetail extends StatelessWidget {
       if (offerLabel != null) ...[
         const SizedBox(height: 12),
         Row(mainAxisSize: MainAxisSize.min, children: [
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: onOffer,
             behavior: HitTestBehavior.opaque,
             child: Container(
@@ -950,7 +951,7 @@ class _CravingDetail extends StatelessWidget {
                         color: offerOpen ? p.ink1 : p.ink3)),
               ]),
             ),
-          ),
+          )),
         ]),
         if (offerOpen) ...[
           const SizedBox(height: 10),

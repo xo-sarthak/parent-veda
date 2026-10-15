@@ -41,6 +41,7 @@ import 'pp_learning_data.dart';
 import '../learn/pv_learn_screen.dart';
 import '../../services/life_stage_store.dart';
 import '../../data/learn/pv_learn_view.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // =============================================================================
 //  The three sections
@@ -325,7 +326,7 @@ class CourseCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final e = expertById(program.instructorId);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -370,7 +371,7 @@ class CourseCard extends StatelessWidget {
               style: ppBody(12, color: ppInk, w: FontWeight.w800)),
         ]),
       ]),
-    );
+    ));
   }
 }
 
@@ -384,7 +385,7 @@ class CourseResultRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final e = expertById(program.instructorId);
     final s = kCourseSections.firstWhere((x) => x.kind == program.kind);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -426,7 +427,7 @@ class CourseResultRow extends StatelessWidget {
           const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
         ]),
       ),
-    );
+    ));
   }
 }
 
@@ -823,7 +824,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
   /// One learning outcome. Expanded independently, per the brief.
   Widget _outcome(int i, String text) {
     final open = _openOutcomes.contains(i);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => setState(
           () => open ? _openOutcomes.remove(i) : _openOutcomes.add(i)),
       behavior: HitTestBehavior.opaque,
@@ -857,12 +858,12 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
           ],
         ]),
       ),
-    );
+    ));
   }
 
   Widget _module(int i, LearningSession s) {
     final open = _openModules.contains(i);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () =>
           setState(() => open ? _openModules.remove(i) : _openModules.add(i)),
       behavior: HitTestBehavior.opaque,
@@ -929,7 +930,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
           ],
         ]),
       ),
-    );
+    ));
   }
 
   Widget _tick(String text) => Padding(
@@ -969,7 +970,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
 
   Widget _faq(int i, String q, String a) {
     final open = _openFaqs.contains(i);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => setState(() => open ? _openFaqs.remove(i) : _openFaqs.add(i)),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -994,7 +995,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
           ],
         ]),
       ),
-    );
+    ));
   }
 
   /// Always visible, per the brief. Routes into the EXISTING detail screen,
@@ -1012,7 +1013,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
           ]),
           const SizedBox(width: 16),
           Expanded(
-            child: GestureDetector(
+            child: PvPress(child: GestureDetector(
               onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
                   builder: (_) => LearningDetailScreen(program: p))),
               behavior: HitTestBehavior.opaque,
@@ -1028,7 +1029,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                     style:
                         ppBody(14, color: Colors.white, w: FontWeight.w800)),
               ),
-            ),
+            )),
           ),
         ]),
       );

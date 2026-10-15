@@ -13,6 +13,7 @@ import '../../theme/pv_fonts.dart';
 import '../../localization/app_language.dart';
 import '../learn/pv_offering_screen.dart';
 import '../learn/pv_learn_catalog.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // ⚠️ FACADE since 2026-09-20 (docs/LEARNING-AUDIT.md). The class keeps its
 // name and constructor so every push of it lands on the unified learn
@@ -57,10 +58,10 @@ class MasterclassDetailScreenClassic extends StatelessWidget {
                   left: 20,
                   right: 20,
                   child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                    GestureDetector(
+                    PvPress(child: GestureDetector(
                       onTap: () => Navigator.of(context).maybePop(),
                       child: _circle(const Icon(Icons.arrow_back, size: 16, color: kInk)),
-                    ),
+                    )),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
                       decoration: BoxDecoration(
@@ -71,7 +72,7 @@ class MasterclassDetailScreenClassic extends StatelessWidget {
                   ]),
                 ),
                 Center(
-                  child: GestureDetector(
+                  child: PvPress(child: GestureDetector(
                     onTap: () => Navigator.of(context).push(MaterialPageRoute(
                         builder: (_) => PrepareVideoScreen(
                             lang: lang,
@@ -93,7 +94,7 @@ class MasterclassDetailScreenClassic extends StatelessWidget {
                         child: Text('▶', style: TextStyle(color: kPurple, fontSize: 22)),
                       ),
                     ),
-                  ),
+                  )),
                 ),
                 Positioned(
                   bottom: 16,

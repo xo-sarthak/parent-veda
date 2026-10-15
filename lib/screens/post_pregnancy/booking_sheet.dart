@@ -30,6 +30,7 @@ import 'my_bookings_screen.dart';
 import 'pp_common.dart';
 import '../learn/pv_learn_catalog.dart';
 import '../learn/pv_learn_flow.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // ⚠️ FACADE since 2026-09-20 (docs/LEARNING-AUDIT.md §4.4–4.5). An offering
 // the learn catalogue knows runs the unified flow — slot sheet, review
@@ -237,7 +238,7 @@ class _BookingSheetState extends State<_BookingSheet> {
         ]);
   }
 
-  Widget _slotRow(Slot s) => GestureDetector(
+  Widget _slotRow(Slot s) => PvPress(child: GestureDetector(
         onTap: () => _reserve(s),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -265,7 +266,7 @@ class _BookingSheetState extends State<_BookingSheet> {
             const Icon(Icons.chevron_right_rounded, size: 20, color: ppPurple),
           ]),
         ),
-      );
+      ));
 
   // ---- reserved: confirmation ----------------------------------------------
 
@@ -297,7 +298,7 @@ class _BookingSheetState extends State<_BookingSheet> {
         }),
         const SizedBox(height: 8),
         Center(
-          child: GestureDetector(
+          child: PvPress(child: GestureDetector(
             onTap: () => Navigator.of(context).pop(),
             behavior: HitTestBehavior.opaque,
             child: Padding(
@@ -305,13 +306,13 @@ class _BookingSheetState extends State<_BookingSheet> {
               child: Text('Done',
                   style: ppBody(13.5, color: ppSoft, w: FontWeight.w700)),
             ),
-          ),
+          )),
         ),
       ]);
 
   // ---- bits -----------------------------------------------------------------
 
-  Widget _primary(String label, VoidCallback? onTap) => GestureDetector(
+  Widget _primary(String label, VoidCallback? onTap) => PvPress(enabled: onTap != null, child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Opacity(
@@ -326,7 +327,7 @@ class _BookingSheetState extends State<_BookingSheet> {
                 style: ppBody(15, color: Colors.white, w: FontWeight.w700)),
           ),
         ),
-      );
+      ));
 
   Widget _note(String t) => Container(
         padding: const EdgeInsets.all(16),

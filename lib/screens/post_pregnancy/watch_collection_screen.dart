@@ -13,6 +13,7 @@ import 'pp_watch_data.dart';
 import 'watch_common.dart';
 import 'watch_player_screen.dart';
 import 'watch_quicklearn_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class WatchCollectionScreen extends StatelessWidget {
   const WatchCollectionScreen({super.key, required this.collection});
@@ -66,7 +67,7 @@ class WatchCollectionScreen extends StatelessWidget {
     final p = WatchStore.instance.progressOf(v.id);
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
-      child: GestureDetector(
+      child: PvPress(child: GestureDetector(
         onTap: () => _open(context, v),
         behavior: HitTestBehavior.opaque,
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -99,7 +100,7 @@ class WatchCollectionScreen extends StatelessWidget {
             ]),
           ),
         ]),
-      ),
+      )),
     );
   }
 }

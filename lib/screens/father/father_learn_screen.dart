@@ -28,6 +28,7 @@ import '../../theme/pv_fonts.dart';
 import '../doors/pv_door_screen.dart';
 import 'father_reads_screen.dart';
 import 'father_week_guide_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// One topic row: the door's tab it opens, and what is in it.
 class FatherLearnTopic {
@@ -137,7 +138,7 @@ class _Row extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -165,5 +166,5 @@ class _Row extends StatelessWidget {
             const Icon(Icons.chevron_right_rounded, color: kFMuted),
           ]),
         ),
-      );
+      ));
 }

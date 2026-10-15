@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'journal_screen.dart';
 import 'pp_common.dart';
 import 'pp_names_data.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 const Color _gold = Color(0xFFE9C877);
 
@@ -50,7 +51,7 @@ class _NameMatchesScreenState extends State<NameMatchesScreen> {
           children: [
             // top bar
             _pad(Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: () => Navigator.of(context).maybePop(),
                 behavior: HitTestBehavior.opaque,
                 child: Container(
@@ -60,8 +61,8 @@ class _NameMatchesScreenState extends State<NameMatchesScreen> {
                   decoration: const BoxDecoration(color: ppPanel, shape: BoxShape.circle),
                   child: const Icon(Icons.arrow_back, size: 17, color: ppInk),
                 ),
-              ),
-              GestureDetector(
+              )),
+              PvPress(child: GestureDetector(
                 onTap: () => _snack('Share your shortlist - coming soon'),
                 behavior: HitTestBehavior.opaque,
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -69,7 +70,7 @@ class _NameMatchesScreenState extends State<NameMatchesScreen> {
                   const SizedBox(width: 6),
                   const Icon(Icons.favorite, size: 13, color: ppPurple),
                 ]),
-              ),
+              )),
             ])),
 
             // header
@@ -146,7 +147,7 @@ class _NameMatchesScreenState extends State<NameMatchesScreen> {
                 const SizedBox(height: 4),
                 Text("Let's begin ${crowned!.name}'s journey together.", textAlign: TextAlign.center, style: ppBody(13, h: 1.55)),
                 const SizedBox(height: 16),
-                GestureDetector(
+                PvPress(child: GestureDetector(
                   onTap: () => _snack('${crowned.name} set as the chosen name'),
                   behavior: HitTestBehavior.opaque,
                   child: Container(
@@ -155,9 +156,9 @@ class _NameMatchesScreenState extends State<NameMatchesScreen> {
                     decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(14)),
                     child: Text("Use as ${crowned.name}'s name →", style: ppBody(14, color: Colors.white, w: FontWeight.w700)),
                   ),
-                ),
+                )),
                 const SizedBox(height: 10),
-                GestureDetector(
+                PvPress(child: GestureDetector(
                   onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const MyChildJournalScreen())),
                   behavior: HitTestBehavior.opaque,
                   child: Container(
@@ -170,7 +171,7 @@ class _NameMatchesScreenState extends State<NameMatchesScreen> {
                       Text('Write “The story behind my name”', style: ppBody(14, color: ppInk, w: FontWeight.w700)),
                     ]),
                   ),
-                ),
+                )),
               ]),
             )),
             ],
@@ -199,7 +200,7 @@ class _NameMatchesScreenState extends State<NameMatchesScreen> {
     );
   }
 
-  Widget _lovedRow(BabyName n) => GestureDetector(
+  Widget _lovedRow(BabyName n) => PvPress(child: GestureDetector(
         onTap: () {
           _store.crown(n.name);
           setState(() {});
@@ -217,5 +218,5 @@ class _NameMatchesScreenState extends State<NameMatchesScreen> {
             const Icon(Icons.favorite_border, size: 16, color: Color(0xFFD8C8EA)),
           ]),
         ),
-      );
+      ));
 }

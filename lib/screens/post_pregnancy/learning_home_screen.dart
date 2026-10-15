@@ -20,6 +20,7 @@ import 'pp_expert_link.dart';
 import 'pp_experts_data.dart';
 import 'pp_learning_data.dart';
 import 'pp_section_extras.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class LearningHomeScreen extends StatefulWidget {
   const LearningHomeScreen({super.key, this.instructorId, this.topic});
@@ -92,7 +93,7 @@ class _LearningHomeScreenState extends State<LearningHomeScreen> {
               // instructor deep-link banner
               if (instructorName != null) ...[
                 const SizedBox(height: 16),
-                _pad(GestureDetector(
+                _pad(PvPress(child: GestureDetector(
                   onTap: () => setState(() => _instructorId = null),
                   behavior: HitTestBehavior.opaque,
                   child: Container(
@@ -106,7 +107,7 @@ class _LearningHomeScreenState extends State<LearningHomeScreen> {
                       const Icon(Icons.close_rounded, size: 16, color: ppMuted),
                     ]),
                   ),
-                )),
+                ))),
               ],
 
               // search
@@ -182,7 +183,7 @@ class _LearningHomeScreenState extends State<LearningHomeScreen> {
                       for (final p in results.where((p) => p.kind == k).take(3)) _card(p),
                     ])),
                     if (results.where((p) => p.kind == k).length > 3)
-                      _pad(GestureDetector(
+                      _pad(PvPress(child: GestureDetector(
                         onTap: () => setState(() => _kind = k),
                         behavior: HitTestBehavior.opaque,
                         child: Padding(
@@ -194,7 +195,7 @@ class _LearningHomeScreenState extends State<LearningHomeScreen> {
                             const Icon(Icons.arrow_forward, size: 15, color: ppPurple),
                           ]),
                         ),
-                      ))
+                      )))
                     else
                       const SizedBox(height: 14),
                   ],
@@ -215,7 +216,7 @@ class _LearningHomeScreenState extends State<LearningHomeScreen> {
   // --- filters ----------------------------------------------------------
   Widget _kindPill(LearningKind? k, String label) {
     final on = _kind == k;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => setState(() => _kind = k),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -229,12 +230,12 @@ class _LearningHomeScreenState extends State<LearningHomeScreen> {
         ),
         child: Text(label, style: ppBody(12.5, color: on ? Colors.white : ppInk, w: FontWeight.w700)),
       ),
-    );
+    ));
   }
 
   Widget _topicChip(String? t, String label) {
     final on = _topic == t;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => setState(() => _topic = t),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -247,13 +248,13 @@ class _LearningHomeScreenState extends State<LearningHomeScreen> {
         ),
         child: Text(label, style: ppBody(12, color: on ? Colors.white : ppSoft, w: FontWeight.w700)),
       ),
-    );
+    ));
   }
 
   // --- a YouTube-style program card -------------------------------------
   Widget _card(LearningProgram p) {
     final a = p.accent;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _open(p),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -311,7 +312,7 @@ class _LearningHomeScreenState extends State<LearningHomeScreen> {
           ]),
         ]),
       ),
-    );
+    ));
   }
 
   String _metaLine(LearningProgram p) {
@@ -331,7 +332,7 @@ class _LearningHomeScreenState extends State<LearningHomeScreen> {
           const SizedBox(height: 6),
           Text('Try another topic or clear your filters.', textAlign: TextAlign.center, style: ppBody(13)),
           const SizedBox(height: 16),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => setState(() {
               _query = '';
               _search.clear();
@@ -345,7 +346,7 @@ class _LearningHomeScreenState extends State<LearningHomeScreen> {
               decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(14)),
               child: Text('Clear filters', style: ppBody(13, color: Colors.white, w: FontWeight.w700)),
             ),
-          ),
+          )),
         ]),
       );
 }

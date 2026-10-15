@@ -32,6 +32,7 @@ import '../v2/v2_palette.dart';
 import 'pp_common.dart';
 import 'pp_nuskhe_data.dart';
 import 'remedy_detail_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class RemedyListScreen extends StatelessWidget {
   const RemedyListScreen({super.key, required this.category});
@@ -227,7 +228,7 @@ class RemedyRow extends StatelessWidget {
     final caution = remedy.isCaution;
     final pillFg = caution ? ppCoral : ppBrown;
     final pillBg = caution ? ppCoralTint : ppPanel;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -275,7 +276,7 @@ class RemedyRow extends StatelessWidget {
           const Text('→', style: TextStyle(color: ppMuted)),
         ]),
       ),
-    );
+    ));
   }
 }
 

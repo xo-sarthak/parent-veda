@@ -19,6 +19,7 @@ import 'provider_profile_screen.dart';
 import '../../data/reads/read_adapters.dart';
 import '../../localization/app_language.dart';
 import '../reader/pv_reader_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class ArticleReaderScreen extends StatelessWidget {
   const ArticleReaderScreen({super.key, this.article});
@@ -178,7 +179,7 @@ class ArticleReaderScreen extends StatelessWidget {
 
             // related product - a typed cross-link that opens the actual product
             const SizedBox(height: 14),
-            _pad(GestureDetector(
+            _pad(PvPress(child: GestureDetector(
               onTap: () => Navigator.of(context)
                   .push(MaterialPageRoute<void>(builder: (_) => ProductDetailScreen(product: productById('dozy')))),
               behavior: HitTestBehavior.opaque,
@@ -201,7 +202,7 @@ class ArticleReaderScreen extends StatelessWidget {
                   const Text('→', style: TextStyle(color: ppMuted)),
                 ]),
               ),
-            )),
+            ))),
 
             const SizedBox(height: 22),
             _pad(Text("Articles are surfaced across ParentVeda - in AskVeda answers and each section's related rail. Every one is reviewed by our medical panel.",
@@ -289,7 +290,7 @@ class ArticleReaderScreen extends StatelessWidget {
         child: Text(text, style: ppBody(11, color: fg, w: FontWeight.w700)),
       );
 
-  Widget _circleBtn(IconData icon, VoidCallback onTap) => GestureDetector(
+  Widget _circleBtn(IconData icon, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         child: Container(
           width: 36,
@@ -298,7 +299,7 @@ class ArticleReaderScreen extends StatelessWidget {
           decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.9), shape: BoxShape.circle),
           child: Icon(icon, size: 17, color: ppInk),
         ),
-      );
+      ));
 
   Widget _avatar(double size) => Container(
         width: size,
@@ -308,7 +309,7 @@ class ArticleReaderScreen extends StatelessWidget {
         child: const PpStriped(height: 60, colorA: ppBorder, colorB: ppStripeB),
       );
 
-  Widget _keepRow(BuildContext context, Article a, {bool top = false, bool bottom = false}) => GestureDetector(
+  Widget _keepRow(BuildContext context, Article a, {bool top = false, bool bottom = false}) => PvPress(child: GestureDetector(
         onTap: () => _open(context, a),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -331,5 +332,5 @@ class ArticleReaderScreen extends StatelessWidget {
             ),
           ]),
         ),
-      );
+      ));
 }

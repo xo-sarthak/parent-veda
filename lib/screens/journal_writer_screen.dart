@@ -17,6 +17,7 @@ import '../services/memory_store.dart';
 import '../theme/pv_fonts.dart';
 import 'pregnancy/preg_chrome.dart' show pregPageTitleStyle;
 import 'products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
+import '../widgets/pv_feedback.dart' show PvPress;
 
 const int kMaxNotePhotos = 2;
 
@@ -305,7 +306,7 @@ class _PhotoStrip extends StatelessWidget {
                   Positioned(
                     top: 2,
                     right: 2,
-                    child: GestureDetector(
+                    child: PvPress(child: GestureDetector(
                       onTap: () => onRemove(p),
                       child: Container(
                         padding: const EdgeInsets.all(3),
@@ -316,7 +317,7 @@ class _PhotoStrip extends StatelessWidget {
                         child: const Icon(Icons.close_rounded,
                             size: 15, color: Colors.white),
                       ),
-                    ),
+                    )),
                   ),
                 ],
               ),
@@ -390,7 +391,7 @@ class _MicBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
     final s = S(lang);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       // The quieter button, in the one ink: an ink outline and ink words at
       // rest, filled ink with white words while it listens. A grey pill with
@@ -431,6 +432,6 @@ class _MicBar extends StatelessWidget {
           ],
         ),
       ),
-    );
+    ));
   }
 }

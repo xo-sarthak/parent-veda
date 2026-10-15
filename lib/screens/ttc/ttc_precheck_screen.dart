@@ -97,6 +97,7 @@ import 'ttc_surface_router.dart';
 import 'ttc_tool_chrome.dart';
 import 'ttc_tool_hues.dart';
 import 'ttc_tool_marks.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// Getting ready is 104 on the wheel — the tool keeps its door's colour.
 // ⚠️ READ FROM THE TOOLS GROUP (2026-09-29): "Plan and check" is 104 too, and
@@ -331,7 +332,7 @@ class _TtcPrecheckScreenState extends State<TtcPrecheckScreen> {
       Flexible(child: _stepsPill(p, t));
 
   Widget _stepsPill(V2Palette p, String Function(String, String) t) =>
-      GestureDetector(
+      PvPress(child: GestureDetector(
         key: const ValueKey('ttc_precheck_next_steps'),
         onTap: _openSummary,
         behavior: HitTestBehavior.opaque,
@@ -356,7 +357,7 @@ class _TtcPrecheckScreenState extends State<TtcPrecheckScreen> {
             ),
           ),
         ),
-      );
+      ));
 
   // Kept for revert (2026-09-27): the old back bar with its "GETTING READY"
   // crumb and the purple "My next 3 steps" link. `TtcToolScaffold`'s close
@@ -366,14 +367,14 @@ class _TtcPrecheckScreenState extends State<TtcPrecheckScreen> {
     padding: const EdgeInsets.fromLTRB(8, 4, 16, 6),
     child: Row(
       children: [
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () => Navigator.of(context).maybePop(),
           behavior: HitTestBehavior.opaque,
           child: Padding(
             padding: const EdgeInsets.all(10),
             child: Icon(Icons.arrow_back_rounded, size: 21, color: p.ink1),
           ),
-        ),
+        )),
         Expanded(
           child: Text(
             t('GETTING READY', 'TAIYAARI').toUpperCase(),
@@ -386,7 +387,7 @@ class _TtcPrecheckScreenState extends State<TtcPrecheckScreen> {
           ),
         ),
         if (_started)
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: _openSummary,
             behavior: HitTestBehavior.opaque,
             child: Padding(
@@ -403,7 +404,7 @@ class _TtcPrecheckScreenState extends State<TtcPrecheckScreen> {
                 ),
               ),
             ),
-          ),
+          )),
       ],
     ),
   );
@@ -734,7 +735,7 @@ class _TtcPrecheckScreenState extends State<TtcPrecheckScreen> {
       ),
       child: Column(
         children: [
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => setState(
               () => open ? _openSections.remove(s) : _openSections.add(s),
             ),
@@ -793,7 +794,7 @@ class _TtcPrecheckScreenState extends State<TtcPrecheckScreen> {
                 ],
               ),
             ),
-          ),
+          )),
           if (open)
             for (final item in items) _itemTile(p, lang, t, c, item),
         ],
@@ -820,7 +821,7 @@ class _TtcPrecheckScreenState extends State<TtcPrecheckScreen> {
       ),
       child: Column(
         children: [
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => setState(
               () => open ? _openItems.remove(item.id) : _openItems.add(item.id),
             ),
@@ -935,7 +936,7 @@ class _TtcPrecheckScreenState extends State<TtcPrecheckScreen> {
                 ],
               ),
             ),
-          ),
+          )),
           if (open)
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 18),
@@ -2158,7 +2159,7 @@ class _DoneButton extends StatelessWidget {
       checked: done,
       label: done ? 'Done: $title. Tap to take it off' : 'Mark $title done',
       excludeSemantics: true,
-      child: GestureDetector(
+      child: PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: SizedBox(
@@ -2169,7 +2170,7 @@ class _DoneButton extends StatelessWidget {
             child: _StatusDot(p: p, status: status),
           ),
         ),
-      ),
+      )),
     );
   }
 }
@@ -2225,7 +2226,7 @@ class _StatusChip extends StatelessWidget {
 
   // Kept for revert (2026-09-27): the purple chip.
   // ignore: unused_element
-  Widget _oldBuild(BuildContext context) => GestureDetector(
+  Widget _oldBuild(BuildContext context) => PvPress(child: GestureDetector(
     onTap: onTap,
     behavior: HitTestBehavior.opaque,
     child: Container(
@@ -2246,7 +2247,7 @@ class _StatusChip extends StatelessWidget {
         ),
       ),
     ),
-  );
+  ));
 }
 
 /// What the "open the tool" chip says, by the tool it opens (change 5,
@@ -2273,7 +2274,7 @@ class _LinkChip extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
     onTap: onTap,
     behavior: HitTestBehavior.opaque,
     child: Container(
@@ -2293,7 +2294,7 @@ class _LinkChip extends StatelessWidget {
         ),
       ),
     ),
-  );
+  ));
 }
 
 class _Button extends StatelessWidget {
@@ -2309,7 +2310,7 @@ class _Button extends StatelessWidget {
 
   // Kept for revert (2026-09-27): the purple filled button.
   // ignore: unused_element
-  Widget _oldBuild(BuildContext context) => GestureDetector(
+  Widget _oldBuild(BuildContext context) => PvPress(child: GestureDetector(
     onTap: onTap,
     behavior: HitTestBehavior.opaque,
     child: Container(
@@ -2329,7 +2330,7 @@ class _Button extends StatelessWidget {
         ),
       ),
     ),
-  );
+  ));
 }
 
 /// Shared with the summary screen.
@@ -2357,7 +2358,7 @@ class PrecheckButton extends StatelessWidget {
 
   // Kept for revert (2026-09-27): the purple filled button.
   // ignore: unused_element
-  Widget _oldBuild(BuildContext context) => GestureDetector(
+  Widget _oldBuild(BuildContext context) => PvPress(child: GestureDetector(
     onTap: onTap,
     behavior: HitTestBehavior.opaque,
     child: Container(
@@ -2378,5 +2379,5 @@ class PrecheckButton extends StatelessWidget {
         ),
       ),
     ),
-  );
+  ));
 }

@@ -20,6 +20,7 @@ import '../brackets/hub/hub_intent_art.dart' show IntentMark;
 import '../doors/pv_list_row.dart' show PvMarkWell;
 import '../pregnancy/preg_chrome.dart';
 import '../products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // Kept for revert: the soft shadow every card and chip cast before the
 // one-ParentVeda pass (2026-09-30), which draws hairlines instead.
@@ -225,7 +226,7 @@ class _SymptomCompanionScreenState extends State<SymptomCompanionScreen> {
         runSpacing: 8,
         children: [
           for (final c in _browseCats)
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: () =>
                   setState(() => _category = _category == c ? null : c),
               child: Container(
@@ -252,12 +253,12 @@ class _SymptomCompanionScreenState extends State<SymptomCompanionScreen> {
                               : AppTheme.neutral700)),
                 ]),
               ),
-            ),
+            )),
         ],
       );
 
   Widget _symRow(S s, AppLanguage lang, Symptom x) {
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => Navigator.of(context).push(MaterialPageRoute(
           builder: (_) => _SymptomDetail(symptom: x, controller: p))),
       child: Container(
@@ -289,7 +290,7 @@ class _SymptomCompanionScreenState extends State<SymptomCompanionScreen> {
           const Icon(Icons.chevron_right_rounded, color: AppTheme.neutral400),
         ]),
       ),
-    );
+    ));
   }
 
   // ⚠️ ONE PARENTVEDA (2026-09-30): a white card with the hairline, not a
@@ -320,7 +321,7 @@ class _SymptomCompanionScreenState extends State<SymptomCompanionScreen> {
           runSpacing: 8,
           children: [
             for (final x in urgent)
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: () => Navigator.of(context).push(MaterialPageRoute(
                     builder: (_) =>
                         _SymptomDetail(symptom: x, controller: p))),
@@ -337,7 +338,7 @@ class _SymptomCompanionScreenState extends State<SymptomCompanionScreen> {
                           fontWeight: FontWeight.w700,
                           color: kPvInk)),
                 ),
-              ),
+              )),
           ],
         ),
       ]),
@@ -574,7 +575,7 @@ class _SymptomDetail extends StatelessWidget {
                   for (final sev in const ['mild', 'moderate', 'severe'])
                     Padding(
                       padding: const EdgeInsets.only(right: 8),
-                      child: GestureDetector(
+                      child: PvPress(child: GestureDetector(
                         onTap: () => setSheet(() => severity = sev),
                         child: Container(
                           padding: const EdgeInsets.symmetric(
@@ -598,7 +599,7 @@ class _SymptomDetail extends StatelessWidget {
                                       ? Colors.white
                                       : AppTheme.neutral700)),
                         ),
-                      ),
+                      )),
                     ),
                 ]),
                 const SizedBox(height: 14),

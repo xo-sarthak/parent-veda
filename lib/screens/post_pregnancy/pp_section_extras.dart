@@ -11,6 +11,7 @@
 import 'package:flutter/material.dart';
 
 import 'pp_common.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// A calm white search field. The owning screen keeps the controller + state and
 /// rebuilds on [onChanged] (so the clear button appears/disappears).
@@ -41,14 +42,14 @@ Widget ppSearchField({
           ),
         ),
         if (controller.text.isNotEmpty)
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () {
               controller.clear();
               onChanged('');
             },
             behavior: HitTestBehavior.opaque,
             child: const Padding(padding: EdgeInsets.only(left: 6), child: Icon(Icons.close_rounded, size: 17, color: ppMuted)),
-          ),
+          )),
       ]),
     );
 
@@ -62,7 +63,7 @@ class PpAskVedaFab extends StatelessWidget {
   Widget build(BuildContext context) => Positioned(
         right: 18,
         bottom: bottom,
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: () => openPpTab(context, 1),
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -76,6 +77,6 @@ class PpAskVedaFab extends StatelessWidget {
             ),
             child: const Icon(Icons.auto_awesome, size: 24, color: Colors.white),
           ),
-        ),
+        )),
       );
 }

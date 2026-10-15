@@ -13,6 +13,7 @@
 import 'package:flutter/material.dart';
 
 import 'pp_common.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// One fully-explained play. Kept small and const so callers can pass a preset.
 class GrowthActivity {
@@ -205,7 +206,7 @@ class _GrowthActivityScreenState extends State<GrowthActivityScreen> {
             const SizedBox(height: 22),
             _pad(Row(children: [
               Expanded(
-                child: GestureDetector(
+                child: PvPress(child: GestureDetector(
                   onTap: () => setState(() => _done = !_done),
                   child: Container(
                     height: 50,
@@ -218,10 +219,10 @@ class _GrowthActivityScreenState extends State<GrowthActivityScreen> {
                     child: Text(_done ? 'Done ✓' : 'Mark as done',
                         style: ppBody(15, color: _done ? ppPurple : Colors.white, w: FontWeight.w700)),
                   ),
-                ),
+                )),
               ),
               const SizedBox(width: 12),
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: () => setState(() => _liked = !_liked),
                 child: Container(
                   width: 50,
@@ -230,7 +231,7 @@ class _GrowthActivityScreenState extends State<GrowthActivityScreen> {
                   decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: ppLine)),
                   child: Text(_liked ? '♥' : '♡', style: TextStyle(color: _liked ? ppCoral : ppMuted, fontSize: 20)),
                 ),
-              ),
+              )),
             ])),
 
             _pad(ppSectionDivider()),

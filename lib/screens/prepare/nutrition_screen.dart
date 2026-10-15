@@ -17,6 +17,7 @@ import '../../data/prepare_data.dart';
 import 'consultation_detail_screen.dart';
 import 'prepare_common.dart';
 import '../../localization/app_language.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // ---------------------------------------------------------------------------
 //  Step 1 - Assessment
@@ -99,7 +100,7 @@ class _NutritionScreenState extends State<NutritionScreen> {
         runSpacing: 10,
         children: [
           for (final o in options)
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: () => onTap(o.id),
               behavior: HitTestBehavior.opaque,
               child: Container(
@@ -113,7 +114,7 @@ class _NutritionScreenState extends State<NutritionScreen> {
                     style: pvBody(o.id == selected ? Colors.white : kInk, 13.5)
                         .copyWith(fontWeight: FontWeight.w600)),
               ),
-            ),
+            )),
         ],
       );
 }
@@ -153,7 +154,7 @@ class NutritionPlansScreen extends StatelessWidget {
     );
   }
 
-  Widget _planCard(BuildContext context, S s, NutritionPlan p) => GestureDetector(
+  Widget _planCard(BuildContext context, S s, NutritionPlan p) => PvPress(child: GestureDetector(
         onTap: () => Navigator.of(context).push(
             MaterialPageRoute<void>(builder: (_) => NutritionTrailerScreen(plan: p, lang: lang))),
         behavior: HitTestBehavior.opaque,
@@ -191,7 +192,7 @@ class NutritionPlansScreen extends StatelessWidget {
             ),
           ]),
         ),
-      );
+      ));
 }
 
 // ---------------------------------------------------------------------------

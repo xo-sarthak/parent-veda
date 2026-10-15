@@ -12,6 +12,7 @@ import 'pp_common.dart';
 import 'pp_experts_data.dart';
 import '../learn/pv_learn_catalog.dart';
 import '../learn/pv_learn_flow.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// Opens the mock booking sheet for [e]. Local only - no backend.
 // ⚠️ FACADE since 2026-09-20. A doctor with a consult offering books through
@@ -161,7 +162,7 @@ class _BookingSheetState extends State<_BookingSheet> {
         ]),
       );
 
-  Widget _choice(String label, bool on, VoidCallback onTap) => GestureDetector(
+  Widget _choice(String label, bool on, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -174,5 +175,5 @@ class _BookingSheetState extends State<_BookingSheet> {
           child: Text(label,
               style: ppBody(13.5, color: on ? Colors.white : ppInk, w: FontWeight.w700)),
         ),
-      );
+      ));
 }

@@ -19,6 +19,7 @@ import '../learn/pv_offering_screen.dart';
 import '../learn/pv_learn_catalog.dart';
 import '../../data/learn/pv_learn_view.dart';
 import 'pp_learning_data.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // ⚠️ FACADE since 2026-09-20 (docs/LEARNING-AUDIT.md). The class keeps its
 // name and constructor so every push of it lands on the unified learn
@@ -144,7 +145,7 @@ class CourseDetailScreenClassic extends StatelessWidget {
             )),
 
             const SizedBox(height: 18),
-            _pad(GestureDetector(
+            _pad(PvPress(child: GestureDetector(
               // preview = start on the referenced lesson (else the first one)
               onTap: () => _openLesson(context, startAt >= 0 ? startAt : 0),
               behavior: HitTestBehavior.opaque,
@@ -158,7 +159,7 @@ class CourseDetailScreenClassic extends StatelessWidget {
                   Text('Preview this course', style: ppBody(15, color: Colors.white, w: FontWeight.w700)),
                 ]),
               ),
-            )),
+            ))),
             const SizedBox(height: 12),
             _pad(Text('Lifetime access.', textAlign: TextAlign.center, style: ppBody(12, color: ppMuted))),
           ],
@@ -188,7 +189,7 @@ class CourseDetailScreenClassic extends StatelessWidget {
   Widget _metaDiv() => Container(width: 1, height: 30, color: ppLine, margin: const EdgeInsets.symmetric(horizontal: 12));
 
   Widget _lessonRow(BuildContext context, CourseLesson l, int i, {bool first = false, bool startHere = false, required Color accent}) {
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _openLesson(context, i),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -225,6 +226,6 @@ class CourseDetailScreenClassic extends StatelessWidget {
           const Icon(Icons.chevron_right_rounded, size: 18, color: ppMuted),
         ]),
       ),
-    );
+    ));
   }
 }

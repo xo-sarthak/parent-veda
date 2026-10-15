@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'pp_common.dart';
 import 'pp_watch_data.dart';
 import 'provider_profile_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class QuickLearnScreen extends StatefulWidget {
   const QuickLearnScreen({super.key, this.startId});
@@ -65,7 +66,7 @@ class _QuickLearnScreenState extends State<QuickLearnScreen> {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             child: Row(children: [
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: () => Navigator.of(context).maybePop(),
                 child: Container(
                   width: 34,
@@ -74,7 +75,7 @@ class _QuickLearnScreenState extends State<QuickLearnScreen> {
                   decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.15), shape: BoxShape.circle),
                   child: const Icon(Icons.arrow_back, size: 18, color: Colors.white),
                 ),
-              ),
+              )),
               const SizedBox(width: 12),
               Text('Quick Learn', style: ppBody(13, color: Colors.white, w: FontWeight.w700)),
               const Spacer(),
@@ -148,7 +149,7 @@ class _QuickLearnScreenState extends State<QuickLearnScreen> {
                 const SizedBox(height: 8),
                 Text(v.why, style: ppBody(13.5, color: Colors.white.withValues(alpha: 0.9), h: 1.5), maxLines: 3, overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 12),
-                GestureDetector(
+                PvPress(child: GestureDetector(
                   onTap: () => _push(ProviderProfileScreen(expert: v.expert)),
                   behavior: HitTestBehavior.opaque,
                   child: Row(children: [
@@ -162,7 +163,7 @@ class _QuickLearnScreenState extends State<QuickLearnScreen> {
                     const SizedBox(width: 10),
                     Flexible(child: Text(v.expert.name, style: ppBody(13, color: Colors.white, w: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis)),
                   ]),
-                ),
+                )),
               ]),
             ),
           ),
@@ -173,7 +174,7 @@ class _QuickLearnScreenState extends State<QuickLearnScreen> {
 
   void _push(Widget s) => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => s));
 
-  Widget _action(IconData i, String label, VoidCallback onTap) => GestureDetector(
+  Widget _action(IconData i, String label, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Column(children: [
@@ -187,7 +188,7 @@ class _QuickLearnScreenState extends State<QuickLearnScreen> {
           const SizedBox(height: 5),
           Text(label, style: ppBody(10, color: Colors.white, w: FontWeight.w600)),
         ]),
-      );
+      ));
 
   Widget _stopCard() => Center(
         child: Padding(
@@ -206,14 +207,14 @@ class _QuickLearnScreenState extends State<QuickLearnScreen> {
             Text('You learned something real today. Close the app, and go be with your baby - that’s the point.',
                 textAlign: TextAlign.center, style: ppBody(14, color: Colors.white.withValues(alpha: 0.85), h: 1.6)),
             const SizedBox(height: 24),
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: () => Navigator.of(context).maybePop(),
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
                 decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(999)),
                 child: Text('Done', style: ppBody(13.5, color: ppPurple, w: FontWeight.w700)),
               ),
-            ),
+            )),
           ]),
         ),
       );

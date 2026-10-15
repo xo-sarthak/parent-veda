@@ -26,6 +26,7 @@ import '../../widgets/global_ask_fab.dart' show kCallRoute;
 // import 'doctor_availability_screen.dart';
 import 'doctor_schedule_screen.dart';
 import 'doctor_prescription_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class DoctorHomeScreen extends StatelessWidget {
   const DoctorHomeScreen({super.key});
@@ -118,12 +119,12 @@ class DoctorHomeScreen extends StatelessWidget {
             //
             // Kept for revert:
             //   builder: (_) => const DoctorAvailabilityScreen(),
-            _pad(GestureDetector(
+            _pad(PvPress(child: GestureDetector(
               onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
                   builder: (_) => const DoctorScheduleScreen())),
               behavior: HitTestBehavior.opaque,
               child: _availabilityCard(),
-            )),
+            ))),
           ],
         ),
         );
@@ -310,7 +311,7 @@ class DoctorHomeScreen extends StatelessWidget {
           const SizedBox(height: 12),
           Row(children: [
             Expanded(
-              child: GestureDetector(
+              child: PvPress(child: GestureDetector(
                 onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
                     settings: const RouteSettings(name: kCallRoute),
                     // Through the green room, same as Appointments. This card
@@ -341,11 +342,11 @@ class DoctorHomeScreen extends StatelessWidget {
                             ppBody(14, color: Colors.white, w: FontWeight.w700)),
                   ]),
                 ),
-              ),
+              )),
             ),
             const SizedBox(width: 10),
             Expanded(
-              child: GestureDetector(
+              child: PvPress(child: GestureDetector(
                 onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
                     builder: (_) => DoctorPrescriptionScreen(
                         bookingId: b.id, title: b.title))),
@@ -365,7 +366,7 @@ class DoctorHomeScreen extends StatelessWidget {
                         style: ppBody(13.5, color: ppInk, w: FontWeight.w700)),
                   ]),
                 ),
-              ),
+              )),
             ),
           ]),
         ]),

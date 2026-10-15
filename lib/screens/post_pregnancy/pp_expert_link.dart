@@ -39,6 +39,7 @@ import 'package:flutter/material.dart';
 import 'pp_common.dart';
 import 'pp_experts_data.dart';
 import 'provider_profile_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// Opens an expert's profile. One route name, so navigation is legible in logs
 /// and `GlobalAskFab` can reason about where it is.
@@ -151,9 +152,9 @@ class PpExpertTapRow extends StatelessWidget {
   final Widget child;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         onTap: () => openExpertProfile(context, expert),
         behavior: HitTestBehavior.opaque,
         child: child,
-      );
+      ));
 }

@@ -14,6 +14,7 @@ import 'pp_common.dart';
 import 'pp_products_data.dart';
 import 'product_detail_screen.dart';
 import 'products_compare_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 const Color _bestRed = Color(0xFFC6295A);
 const Color _guideGreen = Color(0xFF1F8A5B);
@@ -111,7 +112,7 @@ class PpProductCard extends StatelessWidget {
       builder: (context, _) {
         final selected = PpCompareStore.instance.isSelected(product);
         return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => openProductWithGuideCheck(context,
                 id: product.id,
                 name: product.name,
@@ -168,9 +169,9 @@ class PpProductCard extends StatelessWidget {
                 Text(product.retailer, style: ppBody(10, color: ppMuted)),
               ]),
             ]),
-          ),
+          )),
           const SizedBox(height: 8),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => _onToggle(context),
             behavior: HitTestBehavior.opaque,
             child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -189,7 +190,7 @@ class PpProductCard extends StatelessWidget {
               Text(selected ? 'Added' : 'Compare',
                   style: ppBody(12, color: selected ? ppPurple : ppSoft, w: FontWeight.w600)),
             ]),
-          ),
+          )),
         ]);
       },
     );
@@ -284,7 +285,7 @@ class _PpCompareFabState extends State<PpCompareFab> with SingleTickerProviderSt
         _wasReady = ready;
         if (store.count == 0) return const SizedBox.shrink();
 
-        final bar = GestureDetector(
+        final bar = PvPress(child: GestureDetector(
           onTap: () => Navigator.of(context)
               .push(MaterialPageRoute<void>(builder: (_) => const ProductsCompareScreen())),
           child: Container(
@@ -316,7 +317,7 @@ class _PpCompareFabState extends State<PpCompareFab> with SingleTickerProviderSt
               ),
             ]),
           ),
-        );
+        ));
 
         return Positioned(
           right: 18,
@@ -395,7 +396,7 @@ class PpCompareToggle extends StatelessWidget {
       animation: PpCompareStore.instance,
       builder: (context, _) {
         final selected = PpCompareStore.instance.isSelected(product);
-        return GestureDetector(
+        return PvPress(child: GestureDetector(
           onTap: () => ppToggleCompare(context, product),
           behavior: HitTestBehavior.opaque,
           child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -414,7 +415,7 @@ class PpCompareToggle extends StatelessWidget {
             Text(selected ? 'Added' : 'Compare',
                 style: ppBody(12, color: selected ? ppPurple : ppSoft, w: FontWeight.w600)),
           ]),
-        );
+        ));
       },
     );
   }
@@ -459,7 +460,7 @@ class PpProductSnapshotCard extends StatelessWidget {
         const SizedBox(height: 14),
 
         // image + name + summary (tap → detail)
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () => Navigator.of(context)
               .push(MaterialPageRoute<void>(builder: (_) => ProductDetailScreen(product: product))),
           behavior: HitTestBehavior.opaque,
@@ -483,7 +484,7 @@ class PpProductSnapshotCard extends StatelessWidget {
               ]),
             ),
           ]),
-        ),
+        )),
         const SizedBox(height: 12),
 
         // rating + best for
@@ -551,7 +552,7 @@ class PpProductSnapshotCard extends StatelessWidget {
             Flexible(child: Text(product.priceLabel, style: ppJakarta(18), maxLines: 1, overflow: TextOverflow.ellipsis)),
             const SizedBox(width: 10),
             const Spacer(),
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: () => ppLaunchBuy(context, product),
               behavior: HitTestBehavior.opaque,
               child: Container(
@@ -565,7 +566,7 @@ class PpProductSnapshotCard extends StatelessWidget {
                   Text(ppBuyLabel(product), style: ppBody(13, color: Colors.white, w: FontWeight.w700)),
                 ]),
               ),
-            ),
+            )),
           ]),
         if (!ppCanBuy(product)) ...[
           const SizedBox(height: 12),

@@ -26,6 +26,7 @@ import 'package:flutter/material.dart';
 import '../../../localization/app_language.dart';
 import '../../../services/pregnancy_controller.dart';
 import '../../../theme/pv_fonts.dart';
+import '../../../widgets/pv_feedback.dart' show PvPress;
 
 const Color kGameAccent = Color(0xFF2F2C30); // Buddhi's indigo
 const Color kGameAccentDeep = Color(0xFF2F2C30);
@@ -181,7 +182,7 @@ class GarbhGameKey extends StatelessWidget {
   final double width;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         onTap: onTap,
         child: Container(
           width: width,
@@ -200,5 +201,5 @@ class GarbhGameKey extends StatelessWidget {
                       fontWeight: FontWeight.w700,
                       color: selected ? kGameAccentDeep : kGameInk)),
         ),
-      );
+      ));
 }

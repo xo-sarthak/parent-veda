@@ -16,6 +16,7 @@ import '../localization/app_language.dart';
 import '../services/pregnancy_controller.dart';
 import '../theme/app_theme.dart';
 import '../theme/pv_fonts.dart';
+import '../widgets/pv_feedback.dart' show PvPress;
 
 class Week5FullFlowView extends StatefulWidget {
   const Week5FullFlowView({super.key, required this.controller});
@@ -149,7 +150,7 @@ class _Week5FullFlowViewState extends State<Week5FullFlowView> {
               const SizedBox(height: 20),
               Align(
                 alignment: Alignment.centerLeft,
-                child: GestureDetector(
+                child: PvPress(child: GestureDetector(
                   onTap: () => Navigator.of(context).maybePop(),
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 11),
@@ -162,7 +163,7 @@ class _Week5FullFlowViewState extends State<Week5FullFlowView> {
                             fontWeight: FontWeight.w700,
                             color: Colors.white)),
                   ),
-                ),
+                )),
               ),
             ],
           ),
@@ -174,7 +175,7 @@ class _Week5FullFlowViewState extends State<Week5FullFlowView> {
   Widget _tapRow({required IconData icon, required String title, String? sub, required VoidCallback onTap}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
-      child: GestureDetector(
+      child: PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -207,7 +208,7 @@ class _Week5FullFlowViewState extends State<Week5FullFlowView> {
             const Icon(Icons.chevron_right_rounded, size: 20, color: AppTheme.neutral400),
           ]),
         ),
-      ),
+      )),
     );
   }
 
@@ -523,7 +524,7 @@ class _Week5FullFlowViewState extends State<Week5FullFlowView> {
           boxShadow: _shadow,
         ),
         child: Column(children: [
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => setState(() => open ? _openTips.remove(i) : _openTips.add(i)),
             behavior: HitTestBehavior.opaque,
             child: Padding(
@@ -543,7 +544,7 @@ class _Week5FullFlowViewState extends State<Week5FullFlowView> {
                     color: AppTheme.neutral400),
               ]),
             ),
-          ),
+          )),
           if (open)
             Padding(
               padding: const EdgeInsets.fromLTRB(52, 0, 16, 16),

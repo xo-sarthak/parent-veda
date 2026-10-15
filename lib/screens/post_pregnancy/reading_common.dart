@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 
 import 'pp_common.dart';
 import 'pp_reading_data.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 const List<(Color, Color)> _kCoverTints = [
   (Color(0xFFEDE7F6), Color(0xFFF6F1FB)), // lavender
@@ -61,7 +62,7 @@ Widget readSectionHeader(String title, {String? action, VoidCallback? onAction})
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Expanded(child: Text(title, style: ppJakarta(18))),
-        if (action != null) GestureDetector(onTap: onAction, behavior: HitTestBehavior.opaque, child: ppSeeAll(action)),
+        if (action != null) PvPress(enabled: onAction != null, child: GestureDetector(onTap: onAction, behavior: HitTestBehavior.opaque, child: ppSeeAll(action))),
       ],
     );
 
@@ -73,7 +74,7 @@ class ReadRailCard extends StatelessWidget {
   final double? progress;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: SizedBox(
@@ -86,7 +87,7 @@ class ReadRailCard extends StatelessWidget {
             readMeta(article),
           ]),
         ),
-      );
+      ));
 }
 
 class ReadListCard extends StatelessWidget {
@@ -96,7 +97,7 @@ class ReadListCard extends StatelessWidget {
   final double? progress;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Padding(
@@ -115,5 +116,5 @@ class ReadListCard extends StatelessWidget {
             ),
           ]),
         ),
-      );
+      ));
 }

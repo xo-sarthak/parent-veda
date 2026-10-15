@@ -31,6 +31,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/pv_fonts.dart';
 import 'v2/v2_palette.dart';
+import '../widgets/pv_feedback.dart' show PvPress;
 
 enum ShravanVersion {
   /// The month-by-month listening programme, grouped by pregnancy month.
@@ -94,7 +95,7 @@ class ShravanVersionPill extends StatelessWidget {
       );
 
   Widget _seg(String label, bool on, V2Palette p, VoidCallback onTap) =>
-      GestureDetector(
+      PvPress(child: GestureDetector(
         onTap: onTap,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
@@ -109,5 +110,5 @@ class ShravanVersionPill extends StatelessWidget {
                   letterSpacing: 0.6,
                   color: on ? p.onAction : p.ink3)),
         ),
-      );
+      ));
 }

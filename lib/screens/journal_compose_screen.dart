@@ -53,6 +53,7 @@ import '../theme/pv_fonts.dart';
 import '../widgets/mic_dictation_button.dart';
 import 'pregnancy/preg_chrome.dart' show PregNote, pregGroupLabelStyle;
 import 'products/pv_store_chrome.dart' show kPvInk, kPvLine;
+import '../widgets/pv_feedback.dart' show PvPress;
 
 /// ⚠️ THREE, AND THE CAP IS DELIBERATE RATHER THAN ARBITRARY. Review set it,
 /// and it holds up: a journal entry with twelve photos is an album, and the
@@ -507,7 +508,7 @@ class _Thumb extends StatelessWidget {
         Positioned(
           right: 4,
           top: 4,
-          child: GestureDetector(
+          child: PvPress(child: GestureDetector(
             onTap: onRemove,
             child: Container(
               padding: const EdgeInsets.all(3),
@@ -516,7 +517,7 @@ class _Thumb extends StatelessWidget {
               child: const Icon(Icons.close_rounded,
                   size: 14, color: Colors.white),
             ),
-          ),
+          )),
         ),
       ]);
 }
@@ -526,7 +527,7 @@ class _AddTile extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         onTap: onTap,
         child: Container(
           width: 96,
@@ -538,7 +539,7 @@ class _AddTile extends StatelessWidget {
           ),
           child: Icon(Icons.add_rounded, color: _ink3),
         ),
-      );
+      ));
 }
 
 /// Where this happened — typed, or filled from the phone and then edited.

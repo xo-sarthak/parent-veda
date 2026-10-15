@@ -35,6 +35,7 @@ import '../../theme/pv_fonts.dart';
 import '../v2/v2_palette.dart';
 import 'pp_content.dart';
 import 'pp_section_registry.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// The first `PpChartCard` on a page of [sectionId] tagged to [band].
 ///
@@ -186,7 +187,7 @@ class _AgeChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = V2PaletteStore.instance.current;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -216,6 +217,6 @@ class _AgeChip extends StatelessWidget {
                     color: selected ? Colors.white : p.ink2)),
           ]),
         ),
-      );
+      ));
   }
 }

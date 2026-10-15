@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'pp_common.dart';
 import 'pp_vaccine_data.dart';
 import 'vax_detail_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 const Color _green = Color(0xFF1F8A5B);
 const Color _greenTint = Color(0xFFEAF4EE);
@@ -65,7 +66,7 @@ class VaxTimelineScreen extends StatelessWidget {
         const SizedBox(width: 14),
         // card
         Expanded(
-          child: GestureDetector(
+          child: PvPress(child: GestureDetector(
             onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => VaxDetailScreen(visitId: v.id))),
             behavior: HitTestBehavior.opaque,
             child: Container(
@@ -106,7 +107,7 @@ class VaxTimelineScreen extends StatelessWidget {
                 ),
               ]),
             ),
-          ),
+          )),
         ),
       ]),
     );

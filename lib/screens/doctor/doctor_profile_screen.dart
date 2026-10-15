@@ -16,6 +16,7 @@ import '../post_pregnancy/pp_common.dart';
 import '../post_pregnancy/pp_experts_data.dart' show needLabel;
 import 'doctor_onboarding_screen.dart';
 import 'doctor_referral_kit_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// End the session properly: Supabase first, then the local identity.
 ///
@@ -52,7 +53,7 @@ Future<void> _signOut(BuildContext context) async {
             textAlign: TextAlign.center,
             style: ppBody(13, h: 1.6)),
         const SizedBox(height: 20),
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () => Navigator.of(ctx).pop(true),
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -65,9 +66,9 @@ Future<void> _signOut(BuildContext context) async {
             child: Text('Sign out',
                 style: ppBody(14, color: Colors.white, w: FontWeight.w800)),
           ),
-        ),
+        )),
         const SizedBox(height: 10),
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () => Navigator.of(ctx).pop(false),
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -79,7 +80,7 @@ Future<void> _signOut(BuildContext context) async {
             ),
             child: Text('Stay signed in', style: ppJakarta(14, color: ppPurple)),
           ),
-        ),
+        )),
       ]),
     ),
   );
@@ -141,7 +142,7 @@ class DoctorProfileScreen extends StatelessWidget {
         // Practice setup: profile, qualifications, council registration,
         // documents and payout details. Every step can be skipped while we are
         // testing - the point today is that the screens exist and can be walked.
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
               builder: (_) => const DoctorOnboardingScreen())),
           behavior: HitTestBehavior.opaque,
@@ -170,11 +171,11 @@ class DoctorProfileScreen extends StatelessWidget {
               const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
             ]),
           ),
-        ),
+        )),
         // The QR/link a doctor puts on their wall. This is the entry point to
         // the whole Care Partner platform - without it nothing downstream ever
         // fires.
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
               builder: (_) => const DoctorReferralKitScreen())),
           behavior: HitTestBehavior.opaque,
@@ -202,7 +203,7 @@ class DoctorProfileScreen extends StatelessWidget {
               const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
             ]),
           ),
-        ),
+        )),
         Row(children: [
           Container(
             width: 62,
@@ -282,7 +283,7 @@ class DoctorProfileScreen extends StatelessWidget {
         // Previously only the first existed, and in the standalone app it did
         // nothing: it cleared DoctorSession while main_doctor decided what to
         // show from a local flag that never heard about it.
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () => DoctorSession.standalone
               ? _signOut(context)
               : DoctorSession.instance.exit(),
@@ -301,7 +302,7 @@ class DoctorProfileScreen extends StatelessWidget {
                   style: ppBody(14, color: ppInk, w: FontWeight.w700)),
             ]),
           ),
-        ),
+        )),
         const SizedBox(height: 12),
         Center(
           child: Text(

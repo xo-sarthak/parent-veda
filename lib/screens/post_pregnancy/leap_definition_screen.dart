@@ -24,6 +24,7 @@ import 'pp_watch_data.dart';
 import 'product_detail_screen.dart';
 import 'reading_reader_screen.dart';
 import 'watch_player_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // The phase's own dates came off with the calendar's — see
 // leap_calendar_screen.dart. Kept for revert.
@@ -83,11 +84,11 @@ class LeapDefinitionScreen extends StatelessWidget {
               ),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                  GestureDetector(
+                  PvPress(child: GestureDetector(
                     onTap: () => Navigator.of(context).maybePop(),
                     behavior: HitTestBehavior.opaque,
                     child: Container(width: 34, height: 34, alignment: Alignment.center, decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.16), shape: BoxShape.circle), child: const Icon(Icons.arrow_back, size: 16, color: Colors.white)),
-                  ),
+                  )),
                   if (isCurrent)
                     Row(mainAxisSize: MainAxisSize.min, children: [
                       Container(width: 6, height: 6, decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle)),
@@ -199,7 +200,7 @@ class LeapDefinitionScreen extends StatelessWidget {
             const SizedBox(height: 12),
             if (video == null) _pad(_soonNote('A video for this phase is coming.')),
             if (video != null) ...[
-              _pad(GestureDetector(
+              _pad(PvPress(child: GestureDetector(
                 onTap: () => _push(context, WatchPlayerScreen(video: video)),
                 behavior: HitTestBehavior.opaque,
                 child: Container(
@@ -216,7 +217,7 @@ class LeapDefinitionScreen extends StatelessWidget {
                     const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
                   ]),
                 ),
-              )),
+              ))),
             ],
 
             // reads. Renders whether or not this leap has any yet, so every
@@ -230,7 +231,7 @@ class LeapDefinitionScreen extends StatelessWidget {
             if (articles.isNotEmpty) ...[
               const SizedBox(height: 12),
               for (final a in articles)
-                _pad(GestureDetector(
+                _pad(PvPress(child: GestureDetector(
                   onTap: () => _push(context, ReadingReaderScreen(article: a)),
                   behavior: HitTestBehavior.opaque,
                   child: Container(
@@ -248,7 +249,7 @@ class LeapDefinitionScreen extends StatelessWidget {
                       const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
                     ]),
                   ),
-                )),
+                ))),
             ],
 
             // products
@@ -260,7 +261,7 @@ class LeapDefinitionScreen extends StatelessWidget {
             if (products.isNotEmpty) ...[
               const SizedBox(height: 12),
               for (final p in products)
-                _pad(GestureDetector(
+                _pad(PvPress(child: GestureDetector(
                   onTap: () => _push(context, ProductDetailScreen(product: p)),
                   behavior: HitTestBehavior.opaque,
                   child: Container(
@@ -278,7 +279,7 @@ class LeapDefinitionScreen extends StatelessWidget {
                       const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
                     ]),
                   ),
-                )),
+                ))),
             ],
 
             const SizedBox(height: 22),

@@ -32,6 +32,7 @@ import '../theme/app_theme.dart';
 import '../widgets/storage_image.dart';
 import 'bump_book_screen.dart';
 import '../theme/pv_fonts.dart';
+import '../widgets/pv_feedback.dart' show PvPress;
 
 enum _BumpFilter { all, t1, t2, t3, captioned, favorites }
 
@@ -215,7 +216,7 @@ class _BumpJourneyScreenState extends State<BumpJourneyScreen> {
             ),
           ),
           if (all.length >= 2)
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: () => _openCompare(all),
               child: Container(
                 padding:
@@ -233,7 +234,7 @@ class _BumpJourneyScreenState extends State<BumpJourneyScreen> {
                           color: Colors.white)),
                 ]),
               ),
-            ),
+            )),
         ],
       ),
     );
@@ -242,7 +243,7 @@ class _BumpJourneyScreenState extends State<BumpJourneyScreen> {
   // Prominent entry into the animated flipbook keepsake.
   Widget _bookEntry(S s) {
     final en = p.language.isEnglish;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => Navigator.of(context).push(MaterialPageRoute(
         builder: (_) => BumpBookScreen(lang: p.language),
       )),
@@ -298,7 +299,7 @@ class _BumpJourneyScreenState extends State<BumpJourneyScreen> {
           const Icon(Icons.chevron_right_rounded, color: Colors.white),
         ]),
       ),
-    );
+    ));
   }
 
   Widget _captureThisWeek(S s) => Container(
@@ -345,7 +346,7 @@ class _BumpJourneyScreenState extends State<BumpJourneyScreen> {
         scrollDirection: Axis.horizontal,
         children: [
           for (final c in chips) ...[
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: () => setState(() => _filter = c.$1),
               behavior: HitTestBehavior.opaque,
               child: Container(
@@ -366,7 +367,7 @@ class _BumpJourneyScreenState extends State<BumpJourneyScreen> {
                             ? Colors.white
                             : AppTheme.neutral600)),
               ),
-            ),
+            )),
             const SizedBox(width: 8),
           ],
         ],
@@ -487,14 +488,14 @@ class _BumpJourneyScreenState extends State<BumpJourneyScreen> {
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
             child: b.caption.trim().isEmpty
-                ? GestureDetector(
+                ? PvPress(child: GestureDetector(
                     onTap: () => _editCaption(s, b),
                     child: Text(s.jrCaptionHint,
                         style: pvManrope(
                             fontSize: 13,
                             fontStyle: FontStyle.italic,
                             color: AppTheme.neutral400)),
-                  )
+                  ))
                 : Text(b.caption,
                     style: pvFraunces(
                         fontSize: 15,
@@ -680,7 +681,7 @@ class _BumpJourneyScreenState extends State<BumpJourneyScreen> {
                   runSpacing: 8,
                   children: [
                     for (final sug in s.bumpCaptionSuggestions)
-                      GestureDetector(
+                      PvPress(child: GestureDetector(
                         onTap: () => setSheet(() => captionCtrl.text = sug),
                         child: Container(
                           padding: const EdgeInsets.symmetric(
@@ -694,7 +695,7 @@ class _BumpJourneyScreenState extends State<BumpJourneyScreen> {
                                   fontWeight: FontWeight.w600,
                                   color: AppTheme.secondary700)),
                         ),
-                      ),
+                      )),
                   ],
                 ),
                 const SizedBox(height: 16),
@@ -724,7 +725,7 @@ class _BumpJourneyScreenState extends State<BumpJourneyScreen> {
     );
   }
 
-  Widget _stepBtn(IconData icon, VoidCallback onTap) => GestureDetector(
+  Widget _stepBtn(IconData icon, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         child: Container(
           width: 34,
@@ -735,7 +736,7 @@ class _BumpJourneyScreenState extends State<BumpJourneyScreen> {
               borderRadius: BorderRadius.circular(10)),
           child: Icon(icon, size: 18, color: AppTheme.primary700),
         ),
-      );
+      ));
 
   void _editCaption(S s, BumpPhoto b) {
     final ctrl = TextEditingController(text: b.caption);
@@ -913,7 +914,7 @@ class _BumpCompareScreenState extends State<_BumpCompareScreen> {
               scrollDirection: Axis.horizontal,
               children: [
                 for (final b in widget.photos) ...[
-                  GestureDetector(
+                  PvPress(child: GestureDetector(
                     onTap: () => onPick(b),
                     child: Container(
                       alignment: Alignment.center,
@@ -932,7 +933,7 @@ class _BumpCompareScreenState extends State<_BumpCompareScreen> {
                                   ? Colors.white
                                   : AppTheme.neutral600)),
                     ),
-                  ),
+                  )),
                   const SizedBox(width: 8),
                 ],
               ],

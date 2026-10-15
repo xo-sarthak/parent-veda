@@ -23,6 +23,7 @@ import 'pp_common.dart';
 import 'pp_vaccine_data.dart';
 import 'vax_detail_screen.dart';
 import 'vax_timeline_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 export 'pp_vax_tracker_screen.dart' show VaxTrackerScreen, ppVaxMarkGiven;
 
@@ -154,11 +155,11 @@ class VaxTrackerClassic extends StatelessWidget {
 
               // timeline preview
               const SizedBox(height: 26),
-              _pad(_railLabel('His journey', color: ppSoft, trailing: GestureDetector(
+              _pad(_railLabel('His journey', color: ppSoft, trailing: PvPress(child: GestureDetector(
                 onTap: () => _push(context, const VaxTimelineScreen()),
                 behavior: HitTestBehavior.opaque,
                 child: Text('Full timeline →', style: ppBody(12, color: ppPurple, w: FontWeight.w700)),
-              ))),
+              )))),
               const SizedBox(height: 14),
               _pad(Column(children: [
                 for (final v in _previewVisits(store)) _timelineRow(context, v, store),
@@ -166,7 +167,7 @@ class VaxTrackerClassic extends StatelessWidget {
 
               // doctor record
               const SizedBox(height: 18),
-              _pad(GestureDetector(
+              _pad(PvPress(child: GestureDetector(
                 onTap: () => _push(context, const DoctorRecordScreen()),
                 behavior: HitTestBehavior.opaque,
                 child: Container(
@@ -185,7 +186,7 @@ class VaxTrackerClassic extends StatelessWidget {
                     const Text('→', style: TextStyle(color: Color(0xFFC7BBD6))),
                   ]),
                 ),
-              )),
+              ))),
 
               const SizedBox(height: 22),
               _pad(Text(
@@ -280,7 +281,7 @@ class VaxTrackerClassic extends StatelessWidget {
   // ---- due today card -----------------------------------------------------
   Widget _dueCard(BuildContext context, VaxVisit v) {
     final lead = v.lead;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _push(context, VaxDetailScreen(visitId: v.id)),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -323,12 +324,12 @@ class VaxTrackerClassic extends StatelessWidget {
           ]),
         ]),
       ),
-    );
+    ));
   }
 
   Widget _alarmChip(BuildContext context, VaxVisit v) {
     final on = VaxStore.instance.hasReminder(v.id);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _alarmSheet(context, v),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -340,7 +341,7 @@ class VaxTrackerClassic extends StatelessWidget {
           Text(on ? 'Alarm set' : 'Set alarm', style: ppBody(11.5, color: ppPurple, w: FontWeight.w700)),
         ]),
       ),
-    );
+    ));
   }
 
   // ---- alarm / reminder scheduling (mirrors the vaccine detail's flow) -----
@@ -384,14 +385,14 @@ class VaxTrackerClassic extends StatelessWidget {
             _alarmOption('On the day', () => set(0, 'on the day')),
             if (VaxStore.instance.hasReminder(v.id)) ...[
               const SizedBox(height: 4),
-              Center(child: GestureDetector(
+              Center(child: PvPress(child: GestureDetector(
                 onTap: () {
                   VaxStore.instance.setReminder(v.id, false);
                   Navigator.of(ctx).pop();
                 },
                 behavior: HitTestBehavior.opaque,
                 child: Text('Remove alarm', style: ppBody(13, color: ppCoral, w: FontWeight.w700)),
-              )),
+              ))),
             ],
           ]),
         ),
@@ -399,7 +400,7 @@ class VaxTrackerClassic extends StatelessWidget {
     );
   }
 
-  Widget _alarmOption(String label, VoidCallback onTap) => GestureDetector(
+  Widget _alarmOption(String label, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -413,7 +414,7 @@ class VaxTrackerClassic extends StatelessWidget {
             const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
           ]),
         ),
-      );
+      ));
 
   Widget _pill(String t, {required Color fg, required Color bg}) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -436,7 +437,7 @@ class VaxTrackerClassic extends StatelessWidget {
       VaxStatus.due => (ppPurple, ppInk),
       VaxStatus.upcoming => (const Color(0xFFC7BBD6), ppInk),
     };
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _push(context, VaxDetailScreen(visitId: v.id)),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -455,7 +456,7 @@ class VaxTrackerClassic extends StatelessWidget {
           const Icon(Icons.chevron_right_rounded, size: 18, color: ppMuted),
         ]),
       ),
-    );
+    ));
   }
 }
 

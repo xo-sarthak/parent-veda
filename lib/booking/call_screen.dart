@@ -93,6 +93,7 @@ import '../services/remote/supabase_repo.dart';
 import '../theme/app_theme.dart';
 import '../localization/app_language.dart';
 import 'call_session.dart';
+import '../widgets/pv_feedback.dart' show PvPress;
 
 // ---- palette -----------------------------------------------------------------
 // A call screen is dark whatever the rest of the app does — video reads better
@@ -898,7 +899,7 @@ class _CallScreenState extends State<CallScreen> with WidgetsBindingObserver {
       Semantics(
         button: true,
         label: label,
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -912,7 +913,7 @@ class _CallScreenState extends State<CallScreen> with WidgetsBindingObserver {
                     fontSize: 14,
                     fontWeight: FontWeight.w600)),
           ),
-        ),
+        )),
       );
 
   String get _clockLabel {
@@ -938,13 +939,13 @@ class _CallScreenState extends State<CallScreen> with WidgetsBindingObserver {
 
       return Stack(fit: StackFit.expand, children: [
         // ---- the big picture ------------------------------------------------
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: _tapBackground,
           behavior: HitTestBehavior.opaque,
           child: mainTrack != null
               ? VideoTrackRenderer(mainTrack, fit: VideoViewFit.cover)
               : _emptyMain(),
-        ),
+        )),
 
         // Edge-only scrim so white chrome survives a bright frame. The middle
         // of the picture — the face — is left untouched.
@@ -1345,7 +1346,7 @@ class _CallScreenState extends State<CallScreen> with WidgetsBindingObserver {
                     Semantics(
                       button: true,
                       label: S.now.uiLeaveCall,
-                      child: GestureDetector(
+                      child: PvPress(child: GestureDetector(
                         onTap: _confirmLeave,
                         behavior: HitTestBehavior.opaque,
                         child: Container(
@@ -1358,7 +1359,7 @@ class _CallScreenState extends State<CallScreen> with WidgetsBindingObserver {
                           child: const Icon(Icons.call_end_rounded,
                               size: 25, color: Colors.white),
                         ),
-                      ),
+                      )),
                     ),
                   ]),
                 ),
@@ -1379,7 +1380,7 @@ class _CallScreenState extends State<CallScreen> with WidgetsBindingObserver {
         label: tip,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 4),
-          child: GestureDetector(
+          child: PvPress(child: GestureDetector(
             onTap: onTap,
             behavior: HitTestBehavior.opaque,
             child: Container(
@@ -1393,7 +1394,7 @@ class _CallScreenState extends State<CallScreen> with WidgetsBindingObserver {
               child: Icon(icon,
                   size: 23, color: on ? Colors.white : const Color(0xFF17151E)),
             ),
-          ),
+          )),
         ),
       );
 }

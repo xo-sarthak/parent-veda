@@ -20,6 +20,7 @@ import '../../widgets/journal/journal_create.dart';
 import '../../widgets/storage_image.dart';
 import '../../theme/pv_fonts.dart';
 import '../../localization/app_language.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 LocalizedText _t(String en, String hi) => LocalizedText(en: en, hi: hi);
 
@@ -92,7 +93,7 @@ class _FatherJournalScreenState extends State<FatherJournalScreen> {
             padding: const EdgeInsets.fromLTRB(16, 10, 18, 6),
             child: Row(children: [
               if (!widget.embedded) ...[
-                GestureDetector(
+                PvPress(child: GestureDetector(
                   onTap: () => Navigator.of(context).maybePop(),
                   behavior: HitTestBehavior.opaque,
                   child: Container(
@@ -107,7 +108,7 @@ class _FatherJournalScreenState extends State<FatherJournalScreen> {
                     child: const Icon(Icons.arrow_back_rounded,
                         color: kFInk, size: 20),
                   ),
-                ),
+                )),
                 const SizedBox(width: 13),
               ],
               Expanded(
@@ -220,7 +221,7 @@ class _FatherJournalScreenState extends State<FatherJournalScreen> {
   }
 
   Widget _circle(IconData icon, String label, VoidCallback onTap) => Expanded(
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: Column(children: [
@@ -238,7 +239,7 @@ class _FatherJournalScreenState extends State<FatherJournalScreen> {
             const SizedBox(height: 7),
             Text(label, style: _body(11.5, w: FontWeight.w600, c: kFMuted)),
           ]),
-        ),
+        )),
       );
 
   Widget _empty() => Center(
@@ -290,12 +291,12 @@ class _FatherJournalScreenState extends State<FatherJournalScreen> {
             child: Text(_dateLabel(e.date),
                 style: _body(11.5, w: FontWeight.w700, c: kFMuted)),
           ),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => FatherJournalStore.instance.deleteEntry(e.id),
             behavior: HitTestBehavior.opaque,
             child: const Icon(Icons.delete_outline_rounded,
                 size: 18, color: kFMuted),
-          ),
+          )),
         ]),
         if (images.isNotEmpty) ...[
           const SizedBox(height: 12),
@@ -321,7 +322,7 @@ class _FatherJournalScreenState extends State<FatherJournalScreen> {
         ],
         for (final path in audios) ...[
           const SizedBox(height: 10),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => _togglePlay(path),
             behavior: HitTestBehavior.opaque,
             child: Container(
@@ -339,7 +340,7 @@ class _FatherJournalScreenState extends State<FatherJournalScreen> {
                 Text(S.now.uiVoiceNote, style: _body(13.5, w: FontWeight.w600)),
               ]),
             ),
-          ),
+          )),
         ],
       ]),
     );

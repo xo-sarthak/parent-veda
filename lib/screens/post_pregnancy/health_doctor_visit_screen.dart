@@ -15,6 +15,7 @@ import 'pp_common.dart';
 import 'pp_growth_data.dart';
 import 'pp_health_data.dart';
 import 'pp_vaccine_data.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class HealthDoctorVisitScreen extends StatefulWidget {
   const HealthDoctorVisitScreen({super.key});
@@ -158,7 +159,7 @@ class _HealthDoctorVisitScreenState extends State<HealthDoctorVisitScreen> {
               _pad(_addQuestion()),
 
               const SizedBox(height: 24),
-              _pad(GestureDetector(
+              _pad(PvPress(child: GestureDetector(
                 onTap: () => Share.share(_shareText()),
                 behavior: HitTestBehavior.opaque,
                 child: Container(
@@ -171,7 +172,7 @@ class _HealthDoctorVisitScreenState extends State<HealthDoctorVisitScreen> {
                     Text('Share with paediatrician', style: ppBody(13.5, color: Colors.white, w: FontWeight.w700)),
                   ]),
                 ),
-              )),
+              ))),
             ],
           ),
         ),
@@ -197,7 +198,7 @@ class _HealthDoctorVisitScreenState extends State<HealthDoctorVisitScreen> {
           const Icon(Icons.help_outline_rounded, size: 16, color: ppPurple),
           const SizedBox(width: 12),
           Expanded(child: Text(q, style: ppBody(13.5, color: ppInk, h: 1.4))),
-          GestureDetector(onTap: () => _s.removeQuestion(i), behavior: HitTestBehavior.opaque, child: const Padding(padding: EdgeInsets.all(4), child: Icon(Icons.close_rounded, size: 16, color: ppMuted))),
+          PvPress(child: GestureDetector(onTap: () => _s.removeQuestion(i), behavior: HitTestBehavior.opaque, child: const Padding(padding: EdgeInsets.all(4), child: Icon(Icons.close_rounded, size: 16, color: ppMuted)))),
         ]),
       );
 
@@ -221,10 +222,10 @@ class _HealthDoctorVisitScreenState extends State<HealthDoctorVisitScreen> {
           ),
         ),
         const SizedBox(width: 10),
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: _submit,
           child: Container(width: 44, height: 44, alignment: Alignment.center, decoration: const BoxDecoration(color: ppPurple, shape: BoxShape.circle), child: const Icon(Icons.add_rounded, size: 22, color: Colors.white)),
-        ),
+        )),
       ]);
 
   void _submit() {

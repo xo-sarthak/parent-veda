@@ -767,7 +767,7 @@ class _TtcSymptomLogScreenState extends State<TtcSymptomLogScreen> {
                     // styled as a control that does not respond teaches the
                     // reader that taps do nothing. Purple is the app's
                     // interactive colour and this is genuinely interactive.
-                    GestureDetector(
+                    PvPress(child: GestureDetector(
                       onTap: () =>
                           Navigator.of(context).push(MaterialPageRoute<void>(
                         settings: const RouteSettings(
@@ -781,7 +781,7 @@ class _TtcSymptomLogScreenState extends State<TtcSymptomLogScreen> {
                           key: const ValueKey('ttc_log_show_hide'),
                           style: ttcBody(13.5,
                               color: ttcTitleInk, w: FontWeight.w800)),
-                    ),
+                    )),
                   ]),
                   // ⚠️ A HIDDEN CARD IS SAID, NOT SILENT (tool rebuild). A
                   // feature is never hidden without a trace: she hid it a
@@ -951,7 +951,7 @@ class _TtcSymptomLogScreenState extends State<TtcSymptomLogScreen> {
                                 style: ttcBody(11.5, color: ttcSoft, h: 1.4)),
                             if (ttcReadById(kTtcTempReadId) != null) ...[
                               const SizedBox(height: 6),
-                              GestureDetector(
+                              PvPress(child: GestureDetector(
                                 key: const ValueKey('ttc_temp_read_link'),
                                 behavior: HitTestBehavior.opaque,
                                 onTap: () => openTtcSurface(context,
@@ -961,7 +961,7 @@ class _TtcSymptomLogScreenState extends State<TtcSymptomLogScreen> {
                                         color: ttcTitleInk,
                                         w: FontWeight.w800,
                                         h: 1.35)),
-                              ),
+                              )),
                             ],
                           ]),
                     ),
@@ -1203,7 +1203,7 @@ class _Bubble extends StatelessWidget {
         .withLightness(0.42)
         .toColor();
 
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Column(children: [
@@ -1257,7 +1257,7 @@ class _Bubble extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: ttcBody(11.5, color: ttcInk, w: FontWeight.w600)),
       ]),
-    );
+    ));
   }
 }
 
@@ -1339,7 +1339,7 @@ class _LinkRow extends StatelessWidget {
   final IconData icon;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Row(children: [
@@ -1351,7 +1351,7 @@ class _LinkRow extends StatelessWidget {
           ),
           const Icon(Icons.chevron_right_rounded, size: 18, color: ttcTitleInk),
         ]),
-      );
+      ));
 }
 
 /// One gentle line under the feelings, with a way to something that helps.
@@ -1424,7 +1424,7 @@ class _Chip extends StatelessWidget {
         .withLightness(0.40)
         .toColor();
 
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
@@ -1481,7 +1481,7 @@ class _Chip extends StatelessWidget {
           ],
         ]),
       ),
-    );
+    ));
   }
 }
 
@@ -1686,7 +1686,7 @@ Future<void> _ttcMeasureSheet(
                           label:
                               '${shown.toStringAsFixed(dp)}. $kTtcMeasureTypeHint',
                           excludeSemantics: true,
-                          child: GestureDetector(
+                          child: PvPress(child: GestureDetector(
                             key: const ValueKey('ttc_measure_number'),
                             behavior: HitTestBehavior.opaque,
                             onTap: () => setSheet(() {
@@ -1714,7 +1714,7 @@ Future<void> _ttcMeasureSheet(
                                     ),
                                   ]),
                             ),
-                          ),
+                          )),
                         ),
                       ),
                     const SizedBox(width: 14),
@@ -1798,7 +1798,7 @@ Future<void> _ttcMeasureSheet(
                   ),
                   if (old != null) ...[
                     const SizedBox(height: 6),
-                    GestureDetector(
+                    PvPress(child: GestureDetector(
                       key: const ValueKey('ttc_measure_remove'),
                       behavior: HitTestBehavior.opaque,
                       onTap: () {
@@ -1815,7 +1815,7 @@ Future<void> _ttcMeasureSheet(
                             style: ttcBody(13,
                                 color: ttcMuted, w: FontWeight.w700)),
                       ),
-                    ),
+                    )),
                   ],
                 ]),
               ),
@@ -3452,7 +3452,7 @@ class _DayPicker extends StatelessWidget {
         button: true,
         label: '$label. Pick another day',
         excludeSemantics: true,
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           key: const ValueKey('ttc_log_day_name'),
           behavior: HitTestBehavior.opaque,
           onTap: onPick,
@@ -3478,7 +3478,7 @@ class _DayPicker extends StatelessWidget {
             //   const Icon(Icons.calendar_today_rounded,
             //       size: 13, color: ttcPurple),
           ]),
-        ),
+        )),
       ),
       if (caption != null || onToday != null) ...[
         const SizedBox(height: 1),
@@ -3496,14 +3496,14 @@ class _DayPicker extends StatelessWidget {
             if (caption != null && onToday != null)
               Text('  ·  ', style: ttcBody(11.5, color: ttcSoft)),
             if (onToday != null)
-              GestureDetector(
+              PvPress(enabled: onToday != null, child: GestureDetector(
                 key: const ValueKey('ttc_log_back_to_today'),
                 behavior: HitTestBehavior.opaque,
                 onTap: onToday,
                 child: Text(kTtcLogBackToToday,
                     style:
                         ttcBody(11.5, color: ttcTitleInk, w: FontWeight.w800)),
-              ),
+              )),
           ],
         ),
       ],
@@ -3926,7 +3926,7 @@ class _UnitSeg extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Expanded(
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -3941,7 +3941,7 @@ class _UnitSeg extends StatelessWidget {
                     color: on ? ttcTitleInk : ttcMuted,
                     w: on ? FontWeight.w800 : FontWeight.w600)),
           ),
-        ),
+        )),
       );
 }
 

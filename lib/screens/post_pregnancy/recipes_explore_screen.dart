@@ -39,6 +39,7 @@ import 'food_recipe_screen.dart';
 import 'pp_common.dart';
 import 'pp_explore_kit.dart';
 import 'pp_food_data.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // =============================================================================
 //  The ten sections
@@ -275,7 +276,7 @@ class _RecipesExploreScreenState extends State<RecipesExploreScreen> {
 
   /// The brief: "Tapping opens the existing Meal Planner feature. Do NOT
   /// redesign Meal Planner." So this is a link and nothing more.
-  Widget _mealPlannerCta() => GestureDetector(
+  Widget _mealPlannerCta() => PvPress(child: GestureDetector(
         onTap: () => _push(const FoodMealPlanScreen()),
         behavior: HitTestBehavior.opaque,
         child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -286,7 +287,7 @@ class _RecipesExploreScreenState extends State<RecipesExploreScreen> {
           const SizedBox(width: 2),
           const Icon(Icons.chevron_right_rounded, size: 18, color: ppPurple),
         ]),
-      );
+      ));
 
   // ---- sections ------------------------------------------------------------
 
@@ -335,7 +336,7 @@ class _RecipesExploreScreenState extends State<RecipesExploreScreen> {
     return out;
   }
 
-  Widget _card(FoodRecipe r, RecipeSection s) => GestureDetector(
+  Widget _card(FoodRecipe r, RecipeSection s) => PvPress(child: GestureDetector(
         onTap: () => _push(FoodRecipeScreen(recipe: r)),
         behavior: HitTestBehavior.opaque,
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -372,7 +373,7 @@ class _RecipesExploreScreenState extends State<RecipesExploreScreen> {
           Text('${r.prepMin + r.cookMin} min',
               style: ppBody(11, color: ppMuted)),
         ]),
-      );
+      ));
 
   // ---- search --------------------------------------------------------------
 
@@ -416,7 +417,7 @@ class RecipeResultRow extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -461,7 +462,7 @@ class RecipeResultRow extends StatelessWidget {
             const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
           ]),
         ),
-      );
+      ));
 }
 
 // =============================================================================

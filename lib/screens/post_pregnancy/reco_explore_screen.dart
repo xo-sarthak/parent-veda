@@ -57,6 +57,7 @@ import 'pp_common.dart';
 import 'pp_explore_kit.dart';
 import 'pp_reco_data.dart';
 import 'reco_detail_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // =============================================================================
 //  The twelve sections, in the brief's order
@@ -548,7 +549,7 @@ class _RecoExploreScreenState extends State<RecoExploreScreen> {
   Widget _card(RecoItem r, {bool showCategory = false}) {
     final s = _sectionFor(r);
     final saved = RecoStore.instance.isSaved(r.id);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _push(RecoDetailScreen(item: r)),
       behavior: HitTestBehavior.opaque,
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -597,7 +598,7 @@ class _RecoExploreScreenState extends State<RecoExploreScreen> {
               style: ppBody(10.5, color: ppSoft, w: FontWeight.w700)),
         ]),
       ]),
-    );
+    ));
   }
 
   /// "6m–3 yrs" rather than "6–36 months" — months read as a bigger number
@@ -680,7 +681,7 @@ class RecoResultRow extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -741,7 +742,7 @@ class RecoResultRow extends StatelessWidget {
             ),
           ]),
         ),
-      );
+      ));
 }
 
 // =============================================================================
@@ -892,7 +893,7 @@ class _RecoCategoryScreenState extends State<RecoCategoryScreen> {
                         style: ppFraunces(28, h: 1.05)),
                   ),
                   // Grid / list toggle, per the brief.
-                  GestureDetector(
+                  PvPress(child: GestureDetector(
                     onTap: () => setState(() => _grid = !_grid),
                     behavior: HitTestBehavior.opaque,
                     child: Container(
@@ -911,7 +912,7 @@ class _RecoCategoryScreenState extends State<RecoCategoryScreen> {
                           size: 18,
                           color: ppPurple),
                     ),
-                  ),
+                  )),
                 ]),
               ),
               const SizedBox(height: 14),
@@ -977,7 +978,7 @@ class _RecoCategoryScreenState extends State<RecoCategoryScreen> {
     );
   }
 
-  Widget _gridCard(RecoItem r) => GestureDetector(
+  Widget _gridCard(RecoItem r) => PvPress(child: GestureDetector(
         onTap: () => Navigator.of(context).push(
             MaterialPageRoute<void>(builder: (_) => RecoDetailScreen(item: r))),
         behavior: HitTestBehavior.opaque,
@@ -1002,5 +1003,5 @@ class _RecoCategoryScreenState extends State<RecoCategoryScreen> {
               maxLines: 1,
               overflow: TextOverflow.ellipsis),
         ]),
-      );
+      ));
 }

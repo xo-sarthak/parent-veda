@@ -25,6 +25,7 @@ import 'pp_courses_data.dart';
 import '../learn/pv_learn_screen.dart';
 import '../../services/life_stage_store.dart';
 import '../../data/learn/pv_learn_view.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // ⚠️ FACADE since 2026-09-20 (docs/LEARNING-AUDIT.md). The class keeps its
 // name and constructor so every push of it lands on the unified learn
@@ -121,14 +122,14 @@ class CoursesScreenClassic extends StatelessWidget {
                         ])),
                       ),
                       const SizedBox(width: 12),
-                      GestureDetector(
+                      PvPress(child: GestureDetector(
                         onTap: () => _openFunnel(context),
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 11),
                           decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(14)),
                           child: Text('Preview', style: ppBody(13, color: Colors.white, w: FontWeight.w700)),
                         ),
-                      ),
+                      )),
                     ]),
                   ]),
                 ),
@@ -259,7 +260,7 @@ class CoursesScreenClassic extends StatelessWidget {
 
   Widget _module(BuildContext context, IconData icon, String title, String meta,
       {bool locked = false, bool top = false}) {
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _openFunnel(context),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -285,10 +286,10 @@ class CoursesScreenClassic extends StatelessWidget {
           ),
         ]),
       ),
-    );
+    ));
   }
 
-  Widget _focusedCourse(BuildContext context, Course c) => GestureDetector(
+  Widget _focusedCourse(BuildContext context, Course c) => PvPress(child: GestureDetector(
         onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => CourseDetailScreen(course: c))),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -308,5 +309,5 @@ class CoursesScreenClassic extends StatelessWidget {
             const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
           ]),
         ),
-      );
+      ));
 }

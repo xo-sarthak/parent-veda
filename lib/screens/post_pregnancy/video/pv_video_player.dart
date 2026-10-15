@@ -27,6 +27,7 @@ import 'pv_screen_security.dart';
 import 'pv_video_analytics.dart';
 import 'pv_video_config.dart';
 import 'pv_video_repository.dart';
+import '../../../widgets/pv_feedback.dart' show PvPress;
 
 class PvVideoPlayer extends StatefulWidget {
   const PvVideoPlayer({
@@ -434,7 +435,7 @@ class PvVideoPlayerState extends State<PvVideoPlayer> {
     if (_completed) return _completeLayer();
     if (!_playedOnce) return _coverLayer();
 
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: _toggleControls,
       child: AnimatedOpacity(
@@ -459,7 +460,7 @@ class PvVideoPlayerState extends State<PvVideoPlayer> {
           ),
         ),
       ),
-    );
+    ));
   }
 
   // Opaque ParentVeda surface shown until real playback begins.
@@ -478,7 +479,7 @@ class PvVideoPlayerState extends State<PvVideoPlayer> {
         Center(
           child: loading
               ? const _Spinner()
-              : GestureDetector(
+              : PvPress(child: GestureDetector(
                   onTap: _startPlayback,
                   behavior: HitTestBehavior.opaque,
                   child: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -490,7 +491,7 @@ class PvVideoPlayerState extends State<PvVideoPlayer> {
                     const SizedBox(height: 12),
                     Text(v.durationLabel, style: ppBody(11.5, color: Colors.white, w: FontWeight.w700)),
                   ]),
-                ),
+                )),
         ),
       ]),
     );
@@ -522,7 +523,7 @@ class PvVideoPlayerState extends State<PvVideoPlayer> {
         children: [
           _seekBtn(Icons.replay_10_rounded, () => _seekBy(-10)),
           const SizedBox(width: 26),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: _togglePlay,
             behavior: HitTestBehavior.opaque,
             child: Container(
@@ -530,7 +531,7 @@ class PvVideoPlayerState extends State<PvVideoPlayer> {
               decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.94), shape: BoxShape.circle),
               child: Icon(_isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded, color: ppPurple, size: 38),
             ),
-          ),
+          )),
           const SizedBox(width: 26),
           _seekBtn(Icons.forward_10_rounded, () => _seekBy(10)),
         ],
@@ -551,14 +552,14 @@ class PvVideoPlayerState extends State<PvVideoPlayer> {
           Text('${_fmt(pos.inSeconds)} / ${_fmt(_durationSecs)}',
               style: ppBody(11, color: Colors.white, w: FontWeight.w600)),
           const Spacer(),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: _cycleSpeed,
             behavior: HitTestBehavior.opaque,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               child: Text('${_rateLabel(_rate)}x', style: ppBody(12.5, color: Colors.white, w: FontWeight.w800)),
             ),
-          ),
+          )),
           if (!widget.inline) ...[
             const SizedBox(width: 6),
             _iconBtn(_fullscreen ? Icons.fullscreen_exit_rounded : Icons.fullscreen_rounded, _toggleFullscreen),
@@ -653,7 +654,7 @@ class PvVideoPlayerState extends State<PvVideoPlayer> {
       );
 
   // ---- small pieces -------------------------------------------------------
-  Widget _roundBtn(IconData i, VoidCallback onTap) => GestureDetector(
+  Widget _roundBtn(IconData i, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -661,9 +662,9 @@ class PvVideoPlayerState extends State<PvVideoPlayer> {
           decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.32), shape: BoxShape.circle),
           child: Icon(i, size: 19, color: Colors.white),
         ),
-      );
+      ));
 
-  Widget _seekBtn(IconData i, VoidCallback onTap) => GestureDetector(
+  Widget _seekBtn(IconData i, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -671,15 +672,15 @@ class PvVideoPlayerState extends State<PvVideoPlayer> {
           decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.28), shape: BoxShape.circle),
           child: Icon(i, size: 26, color: Colors.white),
         ),
-      );
+      ));
 
-  Widget _iconBtn(IconData i, VoidCallback onTap) => GestureDetector(
+  Widget _iconBtn(IconData i, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Padding(padding: const EdgeInsets.all(4), child: Icon(i, size: 21, color: Colors.white)),
-      );
+      ));
 
-  Widget _pillBtn(IconData i, String label, VoidCallback onTap, {required bool filled}) => GestureDetector(
+  Widget _pillBtn(IconData i, String label, VoidCallback onTap, {required bool filled}) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -695,7 +696,7 @@ class PvVideoPlayerState extends State<PvVideoPlayer> {
             Text(label, style: ppBody(13, color: Colors.white, w: FontWeight.w700)),
           ]),
         ),
-      );
+      ));
 
   String _fmt(int s) => '${s ~/ 60}:${(s % 60).toString().padLeft(2, '0')}';
   String _rateLabel(double r) => r == r.roundToDouble() ? r.toInt().toString() : r.toString();
@@ -733,7 +734,7 @@ class _PvVideoPoster extends StatelessWidget {
       ),
       Positioned(
         top: 8, left: 8,
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: () => Navigator.of(context).maybePop(),
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -741,7 +742,7 @@ class _PvVideoPoster extends StatelessWidget {
             decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.28), shape: BoxShape.circle),
             child: const Icon(Icons.arrow_back_rounded, size: 18, color: Colors.white),
           ),
-        ),
+        )),
       ),
       Center(
         child: loading

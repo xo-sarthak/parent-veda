@@ -24,6 +24,7 @@ import '../../care_partner/partner_dashboard_store.dart';
 import '../../doctor/doctor_session.dart';
 import '../post_pregnancy/pp_common.dart';
 import 'doctor_referral_kit_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class DoctorImpactScreen extends StatefulWidget {
   const DoctorImpactScreen({super.key});
@@ -149,7 +150,7 @@ class _DoctorImpactScreenState extends State<DoctorImpactScreen> {
 
   /// The way to move every number above. Worded as an invitation when the
   /// dashboard is still empty, and as a quiet utility once it is not.
-  Widget _kitLink(BuildContext context, bool empty) => GestureDetector(
+  Widget _kitLink(BuildContext context, bool empty) => PvPress(child: GestureDetector(
         onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
             builder: (_) => const DoctorReferralKitScreen())),
         behavior: HitTestBehavior.opaque,
@@ -176,7 +177,7 @@ class _DoctorImpactScreenState extends State<DoctorImpactScreen> {
                 size: 16, color: empty ? Colors.white : ppSoft),
           ]),
         ),
-      );
+      ));
 
   /// The conversion chain. Shown as counts, not as a percentage per step:
   /// "42% install rate" invites a doctor to think they are being scored, and

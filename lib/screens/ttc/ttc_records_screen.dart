@@ -53,6 +53,7 @@ import 'ttc_record_edit_screen.dart' show openTtcRecordEdit;
 import 'ttc_records_v2.dart';
 import 'ttc_strings.dart';
 import 'ttc_tool_chrome.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// [addTestId] opens the add form on arrival with that library test chosen,
 /// from the test library's "Add my result" (tools pass, 2026-09-27). She lands
@@ -481,7 +482,7 @@ class _WhoseSegments extends StatelessWidget {
             ("Your partner's", true),
           ])
             Expanded(
-              child: GestureDetector(
+              child: PvPress(child: GestureDetector(
                 onTap: () => onPick(value),
                 behavior: HitTestBehavior.opaque,
                 child: Container(
@@ -498,7 +499,7 @@ class _WhoseSegments extends StatelessWidget {
                           color: whose == value ? ttcTitleInk : ttcSoft,
                           w: FontWeight.w800)),
                 ),
-              ),
+              )),
             ),
         ]),
       );
@@ -517,7 +518,7 @@ class _WhoseChip extends StatelessWidget {
   Widget build(BuildContext context) {
     const order = <bool?>[null, false, true];
     final label = whose == null ? 'Everyone' : ttcWhose(whose!);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () => onPick(order[(order.indexOf(whose) + 1) % order.length]),
       child: Container(
@@ -534,7 +535,7 @@ class _WhoseChip extends StatelessWidget {
           const Icon(Icons.expand_more_rounded, size: 15, color: ttcMuted),
         ]),
       ),
-    );
+    ));
   }
 }
 

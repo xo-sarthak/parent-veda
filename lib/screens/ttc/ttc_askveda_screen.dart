@@ -46,6 +46,7 @@ import 'ttc_strings.dart';
 import 'ttc_surface_router.dart';
 import 'ttc_stage_search.dart';
 import 'ttc_tests_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// What these lists have to clear at the bottom: the pinned composer, and
 /// nothing else.
@@ -229,11 +230,11 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
   Widget _topBar(TtcS t) => Padding(
         padding: const EdgeInsets.fromLTRB(ttcGutter, 8, ttcGutter, 8),
         child: Row(children: [
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => Navigator.of(context).maybePop(),
             behavior: HitTestBehavior.opaque,
             child: const Icon(Icons.arrow_back_rounded, size: 22, color: ttcInk),
-          ),
+          )),
           const SizedBox(width: 12),
           const Icon(Icons.auto_awesome_rounded, size: 17, color: ttcCoral),
           const SizedBox(width: 7),
@@ -277,7 +278,7 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
               ),
             ),
           ),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => _send(_ctrl.text),
             child: Container(
               width: 36,
@@ -288,7 +289,7 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
               child: const Icon(Icons.arrow_upward_rounded,
                   color: Colors.white, size: 18),
             ),
-          ),
+          )),
         ]),
       );
 
@@ -304,7 +305,7 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
           const Icon(Icons.search_rounded, size: 20, color: ttcMuted),
           const SizedBox(width: 11),
           Expanded(
-            child: GestureDetector(
+            child: PvPress(child: GestureDetector(
               key: const ValueKey('veda_edit_query'),
               behavior: HitTestBehavior.opaque,
               onTap: _editQuery,
@@ -312,12 +313,12 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: ttcBody(14, color: ttcInk, w: FontWeight.w600)),
-            ),
+            )),
           ),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: _clear,
             child: const Icon(Icons.close_rounded, size: 19, color: ttcMuted),
-          ),
+          )),
         ]),
       );
 
@@ -351,7 +352,7 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
               ]),
               const SizedBox(height: 13),
               for (final q in questions) ...[
-                GestureDetector(
+                PvPress(child: GestureDetector(
                   onTap: () => _send(q),
                   behavior: HitTestBehavior.opaque,
                   child: Container(
@@ -371,7 +372,7 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
                           size: 15, color: ttcTitleInk),
                     ]),
                   ),
-                ),
+                )),
                 const SizedBox(height: 9),
               ],
             ]),
@@ -768,7 +769,7 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
                   : "Ask Veda needs the internet to answer you. Please check your connection and try again.",
               style: ttcBody(13.5)),
           const SizedBox(height: 15),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () { if (_query != null) _send(_query!); },
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -778,7 +779,7 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
                   style: ttcBody(13,
                       color: Colors.white, w: FontWeight.w800)),
             ),
-          ),
+          )),
         ]),
       );
 

@@ -12,6 +12,7 @@ import 'growth_journey_screen.dart';
 import 'pp_child_profile.dart';
 import 'pp_common.dart';
 import 'pp_growth_data.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class HealthGrowthScreen extends StatelessWidget {
   const HealthGrowthScreen({super.key});
@@ -114,7 +115,7 @@ class HealthGrowthScreen extends StatelessWidget {
           Text('Add a weight and length from your next check-up and the curve builds itself from there.',
               style: ppBody(13, color: ppMuted, h: 1.5)),
           const SizedBox(height: 14),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const GrowthJourneyScreen())),
             behavior: HitTestBehavior.opaque,
@@ -125,7 +126,7 @@ class HealthGrowthScreen extends StatelessWidget {
               child: Text('Add a measurement',
                   style: ppBody(14, color: Colors.white, w: FontWeight.w700)),
             ),
-          ),
+          )),
         ]),
       );
 

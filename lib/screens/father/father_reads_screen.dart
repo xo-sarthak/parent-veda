@@ -23,6 +23,7 @@ import '../../theme/pv_fonts.dart';
 import '../../localization/app_language.dart';
 import '../../data/mind_mood_extras.dart';
 import '../mind_mood/mm_article_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 
 LocalizedText _t(String en, String hi) => LocalizedText(en: en, hi: hi);
@@ -101,7 +102,7 @@ class FatherReadsScreen extends StatelessWidget {
   /// Reads is not looking for a wellbeing section, and labelling it that way
   /// is the quickest way to make him scroll past the one thing here most
   /// likely to change how a hard week goes at home.
-  Widget _partnerSupportCard(BuildContext context) => GestureDetector(
+  Widget _partnerSupportCard(BuildContext context) => PvPress(child: GestureDetector(
         onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
             settings: const RouteSettings(name: 'mind_mood_partner_support'),
             builder: (_) => MmArticleScreen(article: kMmPartnerArticle))),
@@ -127,9 +128,9 @@ class FatherReadsScreen extends StatelessWidget {
             Text('4 MIN READ', style: _eyebrow(kFMuted)),
           ]),
         ),
-      );
+      ));
 
-  Widget _talesCard(BuildContext context) => GestureDetector(
+  Widget _talesCard(BuildContext context) => PvPress(child: GestureDetector(
         onTap: () => Navigator.of(context).push(MaterialPageRoute(
             builder: (_) => const FatherStoriesScreen())),
         behavior: HitTestBehavior.opaque,
@@ -166,9 +167,9 @@ class FatherReadsScreen extends StatelessWidget {
                 color: kFCream.withValues(alpha: 0.9)),
           ]),
         ),
-      );
+      ));
 
-  Widget _readCard(BuildContext context, ReadItem r) => GestureDetector(
+  Widget _readCard(BuildContext context, ReadItem r) => PvPress(child: GestureDetector(
         onTap: () => _openReader(context, r),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -203,7 +204,7 @@ class FatherReadsScreen extends StatelessWidget {
             const Icon(Icons.chevron_right_rounded, color: kFMuted),
           ]),
         ),
-      );
+      ));
 
   // Book summaries get a rating line + "Read summary" and "Buy Book" actions.
   Widget _bookCard(BuildContext context, ReadItem r) => Container(
@@ -591,7 +592,7 @@ class _FatherReadReaderState extends State<_FatherReadReader> {
           Widget modeChip(String label, _ReadMode m) {
             final active = _FatherReaderPrefs.mode == m;
             return Expanded(
-              child: GestureDetector(
+              child: PvPress(child: GestureDetector(
                 onTap: () {
                   setSheet(() => _FatherReaderPrefs.mode = m);
                   setState(() {});
@@ -611,7 +612,7 @@ class _FatherReadReaderState extends State<_FatherReadReader> {
                           fontWeight: FontWeight.w700,
                           color: active ? kFCream : pal.ink)),
                 ),
-              ),
+              )),
             );
           }
 

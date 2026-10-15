@@ -27,6 +27,7 @@ import 'ttc_ovulation_screen.dart';
 import 'ttc_strings.dart';
 import 'ttc_today_screen.dart' show logTtcPeriod;
 import 'ttc_treatment_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // =============================================================================
 //  Cycle Companion
@@ -517,7 +518,7 @@ Future<int?> _pickSignalDay(BuildContext context, int today, TtcS t) {
           Text(t.ovulationWhichDay, style: ttcJakarta(16)),
           const SizedBox(height: 16),
           for (final d in options)
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: () => Navigator.of(ctx).pop(d),
               behavior: HitTestBehavior.opaque,
               child: Container(
@@ -534,7 +535,7 @@ Future<int?> _pickSignalDay(BuildContext context, int today, TtcS t) {
                   style: ttcBody(13.5, color: ttcInk, w: FontWeight.w700),
                 ),
               ),
-            ),
+            )),
         ]),
       ),
     ),

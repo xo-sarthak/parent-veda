@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'pp_child_profile.dart';
 
 import 'pp_common.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class SnapshotExpandedScreen extends StatelessWidget {
   const SnapshotExpandedScreen({super.key});
@@ -30,7 +31,7 @@ class SnapshotExpandedScreen extends StatelessWidget {
         child: ListView(
           padding: const EdgeInsets.only(top: 12, bottom: 40),
           children: [
-            _pad(GestureDetector(
+            _pad(PvPress(child: GestureDetector(
               onTap: () => Navigator.of(context).maybePop(),
               behavior: HitTestBehavior.opaque,
               child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -38,11 +39,11 @@ class SnapshotExpandedScreen extends StatelessWidget {
                 const SizedBox(width: 12),
                 Flexible(child: Text('${ChildProfileStore.instance.name} · Snapshot of Today', style: ppBody(14, color: ppSoft), maxLines: 1, overflow: TextOverflow.ellipsis)),
               ]),
-            )),
+            ))),
 
             // video hero
             const SizedBox(height: 22),
-            _pad(GestureDetector(
+            _pad(PvPress(child: GestureDetector(
               onTap: () => _soon(context),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(22),
@@ -77,7 +78,7 @@ class SnapshotExpandedScreen extends StatelessWidget {
                   ),
                 ]),
               ),
-            )),
+            ))),
 
             const SizedBox(height: 22),
             _pad(Text('Where ${ChildProfileStore.instance.nameMid} is right now', style: ppFraunces(30, h: 1.15))),
@@ -115,7 +116,7 @@ class SnapshotExpandedScreen extends StatelessWidget {
             // details
             _pad(Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
               Text("${ChildProfileStore.instance.name}'s details", style: ppJakarta(18)),
-              GestureDetector(onTap: () => _soon(context), child: Text('Edit', style: ppBody(13, color: ppPurple, w: FontWeight.w700))),
+              PvPress(child: GestureDetector(onTap: () => _soon(context), child: Text('Edit', style: ppBody(13, color: ppPurple, w: FontWeight.w700)))),
             ])),
             const SizedBox(height: 16),
             _pad(Row(children: [

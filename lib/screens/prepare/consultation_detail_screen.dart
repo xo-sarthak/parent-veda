@@ -12,6 +12,7 @@ import 'prepare_common.dart';
 import '../../localization/app_language.dart';
 import '../learn/pv_offering_screen.dart';
 import '../learn/pv_learn_catalog.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // ⚠️ FACADE since 2026-09-20 (docs/LEARNING-AUDIT.md). The class keeps its
 // name and constructor so every push of it lands on the unified learn
@@ -200,7 +201,7 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreenClass
     if (expert == null) return const SizedBox.shrink();
     return Padding(
       padding: const EdgeInsets.only(top: 16),
-      child: GestureDetector(
+      child: PvPress(child: GestureDetector(
         onTap: () => openExpertProfile(context, expert),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -220,7 +221,7 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreenClass
             const Icon(Icons.chevron_right_rounded, size: 18, color: kPurple),
           ]),
         ),
-      ),
+      )),
     );
   }
 
@@ -246,7 +247,7 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreenClass
 
   Widget _slotChip(String label, int i) {
     final active = i == _slot;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => setState(() => _slot = i),
       child: Container(
         margin: const EdgeInsets.only(right: 10),
@@ -261,7 +262,7 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreenClass
             style: pvBody(active ? Colors.white : kInk, 13)
                 .copyWith(fontWeight: active ? FontWeight.w700 : FontWeight.w600)),
       ),
-    );
+    ));
   }
 
   Widget _review(Review r, {bool top = false, bool bottom = false}) => Container(

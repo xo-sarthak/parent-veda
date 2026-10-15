@@ -35,6 +35,7 @@ import '../../theme/pv_fonts.dart';
 import '../../localization/app_language.dart';
 import '../products/pv_store_chrome.dart' show PvCommit, kPvInk, pvStorePalette;
 import '../v2/v2_palette.dart' show V2Palette;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class MemoryPreviewScreen extends StatefulWidget {
   const MemoryPreviewScreen({
@@ -291,12 +292,12 @@ class _MemoryPreviewScreenState extends State<MemoryPreviewScreen> {
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
             child: Row(children: [
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: () => Navigator.of(context).maybePop(),
                 behavior: HitTestBehavior.opaque,
                 child: const Icon(Icons.arrow_back_rounded,
                     size: 22, color: _soft),
-              ),
+              )),
               const SizedBox(width: 12),
               Text(S.now.uiChooseTemplate,
                   style: pvFraunces(

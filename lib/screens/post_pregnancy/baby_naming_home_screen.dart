@@ -27,6 +27,7 @@ import '../doors/pv_list_row.dart';
 import '../pregnancy/preg_tool_chrome.dart';
 import '../products/pv_store_chrome.dart' show PvCommit, pvStorePalette;
 import 'name_list_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class BabyNamingHomeScreen extends StatelessWidget {
   const BabyNamingHomeScreen({super.key});
@@ -140,7 +141,7 @@ class BabyNamingHomeScreen extends StatelessWidget {
     final store = NameVersionStore.instance;
     Widget seg(String label, NameVersion v) {
       final on = store.version == v;
-      return GestureDetector(
+      return PvPress(child: GestureDetector(
         onTap: () => store.setVersion(v),
         behavior: HitTestBehavior.opaque,
         child: AnimatedContainer(
@@ -152,7 +153,7 @@ class BabyNamingHomeScreen extends StatelessWidget {
           ),
           child: Text(label, style: ppBody(12, color: on ? Colors.white : ppSoft, w: FontWeight.w700)),
         ),
-      );
+      ));
     }
 
     return Container(
@@ -178,7 +179,7 @@ class BabyNamingHomeScreen extends StatelessWidget {
         _pad(Text('A quick taste quiz, then you each swipe - only the names you both adore ever surface. Shortlist, compare and choose together.',
             style: ppBody(14.5, h: 1.6))),
         const SizedBox(height: 22),
-        _pad(GestureDetector(
+        _pad(PvPress(child: GestureDetector(
           onTap: () => _push(context, const NameFinderScreen()),
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -195,7 +196,7 @@ class BabyNamingHomeScreen extends StatelessWidget {
               const Text('→', style: TextStyle(color: Colors.white, fontSize: 16)),
             ]),
           ),
-        )),
+        ))),
         const SizedBox(height: 22),
         _pad(Container(
           padding: const EdgeInsets.all(16),
@@ -227,7 +228,7 @@ class BabyNamingHomeScreen extends StatelessWidget {
           style: ppBody(14.5, h: 1.6))),
 
       const SizedBox(height: 22),
-      _pad(GestureDetector(
+      _pad(PvPress(child: GestureDetector(
         onTap: () => _push(context, const NameJourneyFeedScreen()),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -259,13 +260,13 @@ class BabyNamingHomeScreen extends StatelessWidget {
             ),
           ]),
         ),
-      )),
+      ))),
 
       // shortlist shortcut
       const SizedBox(height: 14),
       _pad(AnimatedBuilder(
         animation: NameMatchStore.instance,
-        builder: (context, _) => GestureDetector(
+        builder: (context, _) => PvPress(child: GestureDetector(
           onTap: () => _push(context, const NameJourneyShortlistScreen()),
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -284,7 +285,7 @@ class BabyNamingHomeScreen extends StatelessWidget {
               const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
             ]),
           ),
-        ),
+        )),
       )),
 
       // "Discover by collection" removed - the collection categories now live

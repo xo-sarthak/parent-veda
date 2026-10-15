@@ -22,6 +22,7 @@ import '../../services/daily_store.dart';
 import '../../services/father_content_controller.dart';
 import '../../theme/app_theme.dart';
 import '../home/home_modules.dart' show HomeCard, LangToggle;
+import '../pv_feedback.dart' show PvPress;
 
 // Father Mode accent roles, drawn from the shared palette.
 const Color _slate = AppTheme.fatherSlate500;
@@ -508,7 +509,7 @@ class FatherSectionToggle extends StatelessWidget {
 
   Widget _seg(BuildContext context, String label, bool selected, VoidCallback onTap) {
     final text = Theme.of(context).textTheme;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
@@ -525,7 +526,7 @@ class FatherSectionToggle extends StatelessWidget {
                 color: selected ? Colors.white : AppTheme.neutral600,
                 fontWeight: FontWeight.w700)),
       ),
-    );
+    ));
   }
 }
 

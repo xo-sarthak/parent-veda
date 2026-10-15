@@ -18,6 +18,7 @@ import 'program_detail_screen.dart';
 import '../../localization/app_language.dart';
 import '../learn/pv_learn_screen.dart';
 import '../../services/life_stage_store.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // ⚠️ FACADE since 2026-09-20 (docs/LEARNING-AUDIT.md). The class keeps its
 // name and constructor so every push of it lands on the unified learn
@@ -156,7 +157,7 @@ class _CoursesCohortsScreenState extends State<CoursesCohortsScreenClassic> {
   // --- filters ----------------------------------------------------------
   Widget _kindPill(PrepKind? k, String label) {
     final on = _kind == k;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => setState(() => _kind = k),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -171,12 +172,12 @@ class _CoursesCohortsScreenState extends State<CoursesCohortsScreenClassic> {
         child: Text(label,
             style: pvBody(on ? Colors.white : kInk, 12.5).copyWith(fontWeight: FontWeight.w700)),
       ),
-    );
+    ));
   }
 
   Widget _topicChip(String? t, String label) {
     final on = _topic == t;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => setState(() => _topic = t),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -189,13 +190,13 @@ class _CoursesCohortsScreenState extends State<CoursesCohortsScreenClassic> {
         ),
         child: Text(label, style: pvBody(on ? Colors.white : kSoft, 12).copyWith(fontWeight: FontWeight.w700)),
       ),
-    );
+    ));
   }
 
   // --- a YouTube-style program card -------------------------------------
   Widget _card(PrepProgram p) {
     final a = p.accent;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _open(p),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -258,7 +259,7 @@ class _CoursesCohortsScreenState extends State<CoursesCohortsScreenClassic> {
           ]),
         ]),
       ),
-    );
+    ));
   }
 
   String _metaLine(PrepProgram p) {

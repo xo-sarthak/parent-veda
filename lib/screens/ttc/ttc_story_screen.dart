@@ -229,16 +229,16 @@ class _TtcStoryScreenState extends State<TtcStoryScreen> {
               Positioned.fill(
                 child: Row(children: [
                   Expanded(
-                    child: GestureDetector(
+                    child: PvPress(child: GestureDetector(
                       behavior: HitTestBehavior.translucent,
                       onTap: () => _go(-1),
-                    ),
+                    )),
                   ),
                   Expanded(
-                    child: GestureDetector(
+                    child: PvPress(child: GestureDetector(
                       behavior: HitTestBehavior.translucent,
                       onTap: () => _go(1),
-                    ),
+                    )),
                   ),
                 ]),
               ),

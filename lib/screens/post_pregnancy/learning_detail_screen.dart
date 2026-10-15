@@ -21,6 +21,7 @@ import 'pp_learning_data.dart';
 import 'provider_profile_screen.dart';
 import '../learn/pv_offering_screen.dart';
 import '../learn/pv_learn_catalog.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // ⚠️ FACADE since 2026-09-20 (docs/LEARNING-AUDIT.md). The class keeps its
 // name and constructor so every push of it lands on the unified learn
@@ -128,7 +129,7 @@ class _LearningDetailScreenState extends State<LearningDetailScreenClassic> {
               TextSpan(text: p.price, style: ppBody(16, color: ppInk, w: FontWeight.w700)),
               TextSpan(text: '  ·  ${p.priceNote}', style: ppBody(12, color: ppSoft)),
             ]))),
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: () => Navigator.of(ctx).pop(),
               behavior: HitTestBehavior.opaque,
               child: Container(
@@ -136,7 +137,7 @@ class _LearningDetailScreenState extends State<LearningDetailScreenClassic> {
                 decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(14)),
                 child: Text('Done', style: ppBody(14, color: Colors.white, w: FontWeight.w700)),
               ),
-            ),
+            )),
           ]),
           const SizedBox(height: 10),
           Text('Mock checkout - no payment is taken in this preview.',
@@ -163,7 +164,7 @@ class _LearningDetailScreenState extends State<LearningDetailScreenClassic> {
           Text('Reserve now, join the intake that suits you.', style: ppBody(13)),
           const SizedBox(height: 14),
           for (final d in dates)
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: () {
                 Navigator.of(ctx).pop();
                 _snack('Switched to the $d intake.');
@@ -180,7 +181,7 @@ class _LearningDetailScreenState extends State<LearningDetailScreenClassic> {
                   const Icon(Icons.chevron_right_rounded, size: 18, color: ppMuted),
                 ]),
               ),
-            ),
+            )),
         ]),
       ),
     );
@@ -283,14 +284,14 @@ class _LearningDetailScreenState extends State<LearningDetailScreenClassic> {
               const SizedBox(height: 26),
               _pad(Row(children: [
                 Expanded(child: Text(p.isLive ? 'Your coach' : 'Your instructor', style: ppJakarta(18))),
-                GestureDetector(
+                PvPress(child: GestureDetector(
                   onTap: _openExpert,
                   behavior: HitTestBehavior.opaque,
                   child: Text('View profile →', style: ppBody(12, color: ppPurple, w: FontWeight.w700)),
-                ),
+                )),
               ])),
               const SizedBox(height: 14),
-              _pad(GestureDetector(
+              _pad(PvPress(child: GestureDetector(
                 onTap: _openExpert,
                 behavior: HitTestBehavior.opaque,
                 child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -312,7 +313,7 @@ class _LearningDetailScreenState extends State<LearningDetailScreenClassic> {
                     ]),
                   ),
                 ]),
-              )),
+              ))),
 
               // recorded-course lessons (wrapped Course model)
               if (course != null) ...[
@@ -342,7 +343,7 @@ class _LearningDetailScreenState extends State<LearningDetailScreenClassic> {
                 const SizedBox(height: 14),
                 for (final s in p.sessions) ...[_pad(_sessionCard(s, a)), const SizedBox(height: 12)],
                 if (cta.showReschedule && cta.enabled)
-                  _pad(GestureDetector(
+                  _pad(PvPress(child: GestureDetector(
                     onTap: _reschedule,
                     behavior: HitTestBehavior.opaque,
                     child: Row(children: [
@@ -352,7 +353,7 @@ class _LearningDetailScreenState extends State<LearningDetailScreenClassic> {
                       const SizedBox(width: 4),
                       Icon(Icons.arrow_forward, size: 13, color: a),
                     ]),
-                  )),
+                  ))),
               ],
 
               // what this covers
@@ -465,7 +466,7 @@ class _LearningDetailScreenState extends State<LearningDetailScreenClassic> {
         ),
       );
 
-  Widget _lessonRow(CourseLesson l, int i, {bool first = false, required Color accent}) => GestureDetector(
+  Widget _lessonRow(CourseLesson l, int i, {bool first = false, required Color accent}) => PvPress(child: GestureDetector(
         onTap: () => _openLesson(i),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -490,7 +491,7 @@ class _LearningDetailScreenState extends State<LearningDetailScreenClassic> {
             const Icon(Icons.chevron_right_rounded, size: 18, color: ppMuted),
           ]),
         ),
-      );
+      ));
 
   Widget _sessionCard(LearningSession s, Color a) => Container(
         padding: const EdgeInsets.all(18),
@@ -528,7 +529,7 @@ class _LearningDetailScreenState extends State<LearningDetailScreenClassic> {
         ]),
       );
 
-  Widget _moreRow(LearningProgram m, {bool first = false}) => GestureDetector(
+  Widget _moreRow(LearningProgram m, {bool first = false}) => PvPress(child: GestureDetector(
         onTap: () => _openProgram(m),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -548,7 +549,7 @@ class _LearningDetailScreenState extends State<LearningDetailScreenClassic> {
             Text(m.price, style: ppBody(13, color: ppInk, w: FontWeight.w700)),
           ]),
         ),
-      );
+      ));
 
   Widget _ctaBar(LearningCta cta) => Container(
         padding: const EdgeInsets.fromLTRB(20, 14, 20, 22),
@@ -570,7 +571,7 @@ class _LearningDetailScreenState extends State<LearningDetailScreenClassic> {
             ),
             const SizedBox(width: 14),
             Expanded(
-              child: GestureDetector(
+              child: PvPress(child: GestureDetector(
                 onTap: () => _onCta(cta),
                 child: Container(
                   height: 52,
@@ -581,7 +582,7 @@ class _LearningDetailScreenState extends State<LearningDetailScreenClassic> {
                     Flexible(child: Text(cta.label, style: ppBody(15, color: cta.enabled ? Colors.white : ppMuted, w: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis)),
                   ]),
                 ),
-              ),
+              )),
             ),
           ]),
         ]),

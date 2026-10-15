@@ -21,6 +21,7 @@ import 'development_common.dart';
 import 'development_map_screen.dart';
 import 'pp_common.dart';
 import 'pp_development_data.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class DevelopmentHomeScreen extends StatelessWidget {
   const DevelopmentHomeScreen({super.key});
@@ -98,7 +99,7 @@ class DevelopmentHomeScreen extends StatelessWidget {
             // opens a single page directly instead of listing one row.
             if (forAge.length > activities.length) ...[
               const SizedBox(height: 14),
-              _pad(GestureDetector(
+              _pad(PvPress(child: GestureDetector(
                 onTap: () => _push(context, const DevelopmentAllActivitiesScreen()),
                 behavior: HitTestBehavior.opaque,
                 child: Row(children: [
@@ -107,7 +108,7 @@ class DevelopmentHomeScreen extends StatelessWidget {
                   const SizedBox(width: 6),
                   const Icon(Icons.arrow_forward_rounded, size: 15, color: ppPurple),
                 ]),
-              )),
+              ))),
             ],
 
             // check-in
@@ -153,7 +154,7 @@ class DevelopmentHomeScreen extends StatelessWidget {
           const SizedBox(height: 16),
           Row(children: [
             Flexible(
-              child: GestureDetector(
+              child: PvPress(child: GestureDetector(
                 onTap: () => _push(context, DevelopmentActivityScreen(activity: devActivityById(a.nextActivityId ?? 'narrate'))),
                 behavior: HitTestBehavior.opaque,
                 child: Container(
@@ -165,14 +166,14 @@ class DevelopmentHomeScreen extends StatelessWidget {
                     const Icon(Icons.arrow_forward, size: 15, color: Colors.white),
                   ]),
                 ),
-              ),
+              )),
             ),
           ]),
         ]),
       );
 
   // ---- development map cta ------------------------------------------------
-  Widget _mapCta(BuildContext context) => GestureDetector(
+  Widget _mapCta(BuildContext context) => PvPress(child: GestureDetector(
         onTap: () => _push(context, const DevelopmentMapScreen()),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -192,10 +193,10 @@ class DevelopmentHomeScreen extends StatelessWidget {
             Icon(Icons.chevron_right_rounded, size: 20, color: Colors.white.withValues(alpha: 0.8)),
           ]),
         ),
-      );
+      ));
 
   // ---- one of the four "how he grows" windows (matches My Child snapshot) --
-  Widget _domainCard(BuildContext context, IconData icon, String label, DevArea a) => GestureDetector(
+  Widget _domainCard(BuildContext context, IconData icon, String label, DevArea a) => PvPress(child: GestureDetector(
         onTap: () => _push(context, DevelopmentAreaScreen(area: a)),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -216,9 +217,9 @@ class DevelopmentHomeScreen extends StatelessWidget {
             Text(a.summary, style: ppBody(13, h: 1.5)),
           ]),
         ),
-      );
+      ));
 
-  Widget _checkinCta(BuildContext context) => GestureDetector(
+  Widget _checkinCta(BuildContext context) => PvPress(child: GestureDetector(
         onTap: () => _push(context, const DevelopmentCheckinScreen()),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -238,5 +239,5 @@ class DevelopmentHomeScreen extends StatelessWidget {
             const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
           ]),
         ),
-      );
+      ));
 }

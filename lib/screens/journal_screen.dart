@@ -26,6 +26,7 @@ import 'doors/pv_list_row.dart' show PvMarkWell;
 import 'journal_compose_screen.dart';
 import 'pregnancy/preg_chrome.dart' show pregGroupLabelStyle;
 import 'products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
+import '../widgets/pv_feedback.dart' show PvPress;
 
 export 'journal/pv_journal_screen.dart' show JournalScreen;
 
@@ -328,7 +329,7 @@ class _JournalScreenState extends State<JournalScreenClassic> {
         ]),
       );
 
-  Widget _seg(String label, bool sel, VoidCallback onTap) => GestureDetector(
+  Widget _seg(String label, bool sel, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: AnimatedContainer(
@@ -347,7 +348,7 @@ class _JournalScreenState extends State<JournalScreenClassic> {
                   fontWeight: FontWeight.w700,
                   color: sel ? Colors.white : pvStorePalette.ink1)),
         ),
-      );
+      ));
 
   void _setGroupBy(_GroupBy g) => setState(() {
         _groupBy = g;
@@ -460,7 +461,7 @@ class _JournalScreenState extends State<JournalScreenClassic> {
 
   Widget _groupHeader(String label, int count, bool open, VoidCallback onTap,
           {String? subLabel}) =>
-      GestureDetector(
+      PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -526,7 +527,7 @@ class _JournalScreenState extends State<JournalScreenClassic> {
             ),
           ]),
         ),
-      );
+      ));
 
   void _toggleGroup(String k, List<String> keys) => setState(() {
         if (!_groupsTouched) {
@@ -538,7 +539,7 @@ class _JournalScreenState extends State<JournalScreenClassic> {
         if (!_expanded.remove(k)) _expanded.add(k);
       });
 
-  Widget _chip(String label, bool sel, VoidCallback onTap) => GestureDetector(
+  Widget _chip(String label, bool sel, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -557,7 +558,7 @@ class _JournalScreenState extends State<JournalScreenClassic> {
                   fontWeight: FontWeight.w700,
                   color: sel ? Colors.white : pvStorePalette.ink1)),
         ),
-      );
+      ));
 
   // --- timeline (grouped by day) - replaced by _groupedList; kept for revert.
   // ignore: unused_element
@@ -787,7 +788,7 @@ class _JournalScreenState extends State<JournalScreenClassic> {
         separatorBuilder: (_, _) => const SizedBox(width: 8),
         itemBuilder: (_, i) {
           final playing = _playingPath == paths[i];
-          return GestureDetector(
+          return PvPress(child: GestureDetector(
             onTap: () => _playVoice(paths[i]),
             child: Container(
               alignment: Alignment.center,
@@ -810,7 +811,7 @@ class _JournalScreenState extends State<JournalScreenClassic> {
                         color: AppTheme.neutral900)),
               ]),
             ),
-          );
+          ));
         },
       ),
     );

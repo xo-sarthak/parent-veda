@@ -50,6 +50,7 @@ import 'pp_common.dart';
 import 'pp_development_data.dart';
 import 'pp_grow_activities.dart';
 import 'pp_phase_doc_activities.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // =============================================================================
 //  1. WHICH VERSION IS ON SCREEN
@@ -546,7 +547,7 @@ class GrowVersionPill extends StatelessWidget {
     final store = GrowVersionStore.instance;
     Widget seg(String label, GrowVersion v) {
       final on = store.version == v;
-      return GestureDetector(
+      return PvPress(child: GestureDetector(
         onTap: () => store.setVersion(v),
         behavior: HitTestBehavior.opaque,
         child: AnimatedContainer(
@@ -560,7 +561,7 @@ class GrowVersionPill extends StatelessWidget {
               style: ppBody(11.5,
                   color: on ? Colors.white : ppSoft, w: FontWeight.w700)),
         ),
-      );
+      ));
     }
 
     return ListenableBuilder(

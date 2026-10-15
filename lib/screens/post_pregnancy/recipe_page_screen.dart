@@ -19,6 +19,7 @@ import 'pp_child_profile.dart';
 
 import 'pp_common.dart';
 import 'pp_recipes_data.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class RecipePageScreen extends StatelessWidget {
   const RecipePageScreen({super.key, this.recipe});
@@ -47,7 +48,7 @@ class RecipePageScreen extends StatelessWidget {
           padding: const EdgeInsets.only(bottom: 40),
           children: [
             // video hero
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: () => _soon(context),
               child: SizedBox(
                 height: 230,
@@ -56,7 +57,7 @@ class RecipePageScreen extends StatelessWidget {
                   Positioned(
                     top: 14,
                     left: 20,
-                    child: GestureDetector(
+                    child: PvPress(child: GestureDetector(
                       onTap: () => Navigator.of(context).maybePop(),
                       child: Container(
                         width: 36,
@@ -65,7 +66,7 @@ class RecipePageScreen extends StatelessWidget {
                         decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.9), shape: BoxShape.circle),
                         child: const Icon(Icons.arrow_back, size: 18, color: ppInk),
                       ),
-                    ),
+                    )),
                   ),
                   if (r.healthier)
                     Positioned(
@@ -80,7 +81,7 @@ class RecipePageScreen extends StatelessWidget {
                   const Positioned.fill(child: Center(child: _Play(56))),
                 ]),
               ),
-            ),
+            )),
 
             // meta + title
             const SizedBox(height: 22),

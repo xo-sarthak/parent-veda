@@ -44,6 +44,7 @@ import 'pp_content.dart';
 import 'pp_page_read.dart';
 import 'pp_story_screen.dart';
 import 'pp_home_reads.dart' show PpLastPageStore;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// ⚠️ THE ONE WAY A PAGE OPENS, FROM ANY SCREEN.
 ///
@@ -922,7 +923,7 @@ class _V3Back extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Align(
         alignment: Alignment.centerLeft,
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: () => Navigator.of(context).maybePop(),
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -935,7 +936,7 @@ class _V3Back extends StatelessWidget {
             ),
             child: Icon(Icons.arrow_back_rounded, size: 19, color: p.ink1),
           ),
-        ),
+        )),
       );
 }
 
@@ -956,7 +957,7 @@ class _BandChip extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -988,7 +989,7 @@ class _BandChip extends StatelessWidget {
                     color: selected ? Colors.white : p.ink2)),
           ]),
         ),
-      );
+      ));
 }
 
 /* ⚠️ KEPT FOR REVERT — the row-shaped area tile the cover cards

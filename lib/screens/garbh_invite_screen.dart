@@ -33,6 +33,7 @@ import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../theme/pv_fonts.dart';
+import '../widgets/pv_feedback.dart' show PvPress;
 
 const _ink = Color(0xFF201C24); // V3 ink1
 const _muted = Color(0xFF2F2C30); // V3 ink3
@@ -224,7 +225,7 @@ class _Chip extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -241,5 +242,5 @@ class _Chip extends StatelessWidget {
                   fontWeight: on ? FontWeight.w800 : FontWeight.w600,
                   color: on ? Colors.white : _ink)),
         ),
-      );
+      ));
 }

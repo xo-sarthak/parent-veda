@@ -59,6 +59,7 @@ import 'pp_child_profile.dart';
 import 'pp_content_art.dart';
 import 'pp_interactive_screen.dart';
 import 'pp_story_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // =============================================================================
 //  THE BLOCKS
@@ -972,7 +973,7 @@ class PpContentPage extends StatelessWidget {
   /// filled grey disc.
   Widget _back(BuildContext context, V2Palette p) => Align(
         alignment: Alignment.centerLeft,
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: () => Navigator.of(context).maybePop(),
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -985,7 +986,7 @@ class PpContentPage extends StatelessWidget {
             ),
             child: Icon(Icons.arrow_back_rounded, size: 19, color: p.ink1),
           ),
-        ),
+        )),
       );
 
   /// ⚠️ SPACING IS A FUNCTION OF THE BLOCK, NOT A CONSTANT.
@@ -1835,7 +1836,7 @@ class PpBlockView extends StatelessWidget {
 /// them to be a filled circle.
 Widget ppV3Back(BuildContext context, V2Palette p) => Align(
       alignment: Alignment.centerLeft,
-      child: GestureDetector(
+      child: PvPress(child: GestureDetector(
         onTap: () => Navigator.of(context).maybePop(),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -1848,7 +1849,7 @@ Widget ppV3Back(BuildContext context, V2Palette p) => Align(
           ),
           child: Icon(Icons.arrow_back_rounded, size: 19, color: p.ink1),
         ),
-      ),
+      )),
     );
 
 /// A pastel off the same controlled wheel the pregnancy doors use, so a

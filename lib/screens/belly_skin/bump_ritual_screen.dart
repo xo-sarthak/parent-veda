@@ -74,6 +74,7 @@ import '../doors/pv_list_row.dart' show PvMarkWell;
 import '../pregnancy/preg_chrome.dart'
     show PregCard, PregSectionHeading, pregSectionHeadingStyle;
 import '../products/pv_store_chrome.dart' show kPvInk, kPvLine;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// This tab's hue — the soft amber the coverflow card wears.
 const double kBumpRitualHue = 26;
@@ -663,7 +664,7 @@ class _Cover extends StatelessWidget {
     child: Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: onOpen,
           behavior: HitTestBehavior.opaque,
           child: SizedBox(
@@ -691,7 +692,7 @@ class _Cover extends StatelessWidget {
               ],
             ),
           ),
-        ),
+        )),
         const SizedBox(width: 14),
         Expanded(
           child: Column(
@@ -915,7 +916,7 @@ class _GridTile extends StatelessWidget {
   final BumpPhoto photo;
   final VoidCallback onTap;
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
     onTap: onTap,
     behavior: HitTestBehavior.opaque,
     child: Column(
@@ -991,7 +992,7 @@ class _GridTile extends StatelessWidget {
         ],
       ],
     ),
-  );
+  ));
 }
 
 /// The moments still to come, in the same type the passed ones are written
@@ -1101,7 +1102,7 @@ class _BookRow extends StatelessWidget {
   final String line;
   final VoidCallback onTap;
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
     onTap: onTap,
     behavior: HitTestBehavior.opaque,
     child: PvDoorCard(
@@ -1139,7 +1140,7 @@ class _BookRow extends StatelessWidget {
         ],
       ),
     ),
-  );
+  ));
 }
 
 /// Nothing yet. What it becomes, stated — and the two features named rather
@@ -1270,7 +1271,7 @@ class _HairlineButton extends StatelessWidget {
     mainAxisSize: MainAxisSize.min,
     children: [
       Flexible(
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -1299,7 +1300,7 @@ class _HairlineButton extends StatelessWidget {
               ],
             ),
           ),
-        ),
+        )),
       ),
     ],
   );
@@ -1315,7 +1316,7 @@ class _QuietButton extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
     onTap: onTap,
     behavior: HitTestBehavior.opaque,
     child: Container(
@@ -1334,7 +1335,7 @@ class _QuietButton extends StatelessWidget {
         ),
       ),
     ),
-  );
+  ));
 }
 
 class _Sheet extends StatelessWidget {
@@ -1371,7 +1372,7 @@ class _SourceButton extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
     onTap: onTap,
     behavior: HitTestBehavior.opaque,
     child: Container(
@@ -1405,7 +1406,7 @@ class _SourceButton extends StatelessWidget {
         ],
       ),
     ),
-  );
+  ));
 }
 
 class _SheetRow extends StatelessWidget {
@@ -1422,7 +1423,7 @@ class _SheetRow extends StatelessWidget {
   final String line;
   final VoidCallback onTap;
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
     onTap: onTap,
     behavior: HitTestBehavior.opaque,
     child: Padding(
@@ -1455,7 +1456,7 @@ class _SheetRow extends StatelessWidget {
         ],
       ),
     ),
-  );
+  ));
 }
 
 /// "A line about this week? You can skip it." — returns the caption, '' for
@@ -1556,7 +1557,7 @@ class _CaptionSheetState extends State<_CaptionSheet> {
               runSpacing: 8,
               children: [
                 for (final s in _captionSuggestions)
-                  GestureDetector(
+                  PvPress(child: GestureDetector(
                     onTap: () => setState(() => _c.text = s),
                     behavior: HitTestBehavior.opaque,
                     child: Container(
@@ -1577,7 +1578,7 @@ class _CaptionSheetState extends State<_CaptionSheet> {
                         ],
                       ),
                     ),
-                  ),
+                  )),
               ],
             ),
             const SizedBox(height: 16),
@@ -1623,7 +1624,7 @@ class _WideHairlineButton extends StatelessWidget {
   final VoidCallback onTap;
   final Color? color;
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
     onTap: onTap,
     behavior: HitTestBehavior.opaque,
     child: Container(
@@ -1646,7 +1647,7 @@ class _WideHairlineButton extends StatelessWidget {
         ),
       ),
     ),
-  );
+  ));
 }
 
 // -----------------------------------------------------------------------------
@@ -1709,7 +1710,7 @@ class _PhotoScreenState extends State<_PhotoScreen> {
                 Positioned(
                   left: 14,
                   top: 16 + MediaQuery.paddingOf(context).top,
-                  child: GestureDetector(
+                  child: PvPress(child: GestureDetector(
                     onTap: () => Navigator.of(context).maybePop(),
                     child: Container(
                       width: 36,
@@ -1725,7 +1726,7 @@ class _PhotoScreenState extends State<_PhotoScreen> {
                         color: p.ink1,
                       ),
                     ),
-                  ),
+                  )),
                 ),
               ],
             ),
@@ -1939,7 +1940,7 @@ class _Action extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
     onTap: onTap,
     behavior: HitTestBehavior.opaque,
     child: Padding(
@@ -1959,7 +1960,7 @@ class _Action extends StatelessWidget {
         ],
       ),
     ),
-  );
+  ));
 }
 
 // -----------------------------------------------------------------------------
@@ -2250,7 +2251,7 @@ class _BackButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Row(
     children: [
-      GestureDetector(
+      PvPress(child: GestureDetector(
         onTap: () => Navigator.of(context).maybePop(),
         child: Container(
           width: 36,
@@ -2262,7 +2263,7 @@ class _BackButton extends StatelessWidget {
           ),
           child: Icon(Icons.arrow_back_rounded, size: 18, color: p.ink1),
         ),
-      ),
+      )),
     ],
   );
 }
@@ -2307,7 +2308,7 @@ class _Chips extends StatelessWidget {
           runSpacing: 8,
           children: [
             for (final x in photos)
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: () => onPick(x.id),
                 behavior: HitTestBehavior.opaque,
                 child: Container(
@@ -2340,7 +2341,7 @@ class _Chips extends StatelessWidget {
                     ],
                   ),
                 ),
-              ),
+              )),
           ],
         ),
       ],

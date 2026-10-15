@@ -23,6 +23,7 @@ import 'brand_models.dart';
 import 'brand_studio.dart';
 import '../theme/pv_fonts.dart';
 import '../localization/app_language.dart';
+import '../widgets/pv_feedback.dart' show PvPress;
 
 /// A quiet `Presented by <Brand>` line for a sponsored surface.
 ///
@@ -112,7 +113,7 @@ class _PresentedByState extends State<PresentedBy> {
     final tint = widget.color == null;
     return Padding(
       padding: widget.padding,
-      child: GestureDetector(
+      child: PvPress(child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () {
           BrandAnalytics.instance.event(c, BrandEvent.opened);
@@ -147,7 +148,7 @@ class _PresentedByState extends State<PresentedBy> {
                 size: 13, color: widget.color ?? const Color(0xFF8E86A0)),
           ]),
         ),
-      ),
+      )),
     );
   }
 }

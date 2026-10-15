@@ -798,7 +798,7 @@ class _TimelineRow extends StatelessWidget {
                   // no control; the day its window starts, it appears.
                   if (isDone || from <= pregnancy.currentWeek) ...[
                   const SizedBox(height: 7),
-                  GestureDetector(
+                  PvPress(child: GestureDetector(
                     onTap: () => isDone
                         ? ScansStore.instance.unmarkCompleted(s.id)
                         : ScansStore.instance.markCompleted(
@@ -813,7 +813,7 @@ class _TimelineRow extends StatelessWidget {
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
                             color: isDone ? p.ink3 : p.ink1)),
-                  ),
+                  )),
                   ],
                   // Her own booking outranks the window — if she has a date,
                   // that is the answer to "when", not the range.

@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'pp_child_profile.dart';
 
 import 'pp_common.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class BookDetailScreen extends StatelessWidget {
   const BookDetailScreen({super.key});
@@ -137,7 +138,7 @@ class BookDetailScreen extends StatelessWidget {
 
             // buy
             const SizedBox(height: 24),
-            _pad(GestureDetector(
+            _pad(PvPress(child: GestureDetector(
               onTap: () => _soon(context),
               child: Container(
                 height: 52,
@@ -145,7 +146,7 @@ class BookDetailScreen extends StatelessWidget {
                 decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(16)),
                 child: Text('Buy on Amazon · ₹299', style: ppBody(15, color: Colors.white, w: FontWeight.w700)),
               ),
-            )),
+            ))),
             const SizedBox(height: 14),
             _pad(Row(children: [
               Text('Also on', style: ppBody(13, color: ppMuted)),
@@ -220,12 +221,12 @@ class BookDetailScreen extends StatelessWidget {
         ]),
       );
 
-  Widget _store(BuildContext context, String label) => GestureDetector(
+  Widget _store(BuildContext context, String label) => PvPress(child: GestureDetector(
         onTap: () => _soon(context),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 7),
           decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), border: Border.all(color: ppBorder)),
           child: Text(label, style: ppBody(12, color: ppInk, w: FontWeight.w700)),
         ),
-      );
+      ));
 }

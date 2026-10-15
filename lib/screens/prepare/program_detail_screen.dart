@@ -21,6 +21,7 @@ import '../../theme/pv_fonts.dart';
 import '../../localization/app_language.dart';
 import '../learn/pv_offering_screen.dart';
 import '../learn/pv_learn_catalog.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // ⚠️ FACADE since 2026-09-20 (docs/LEARNING-AUDIT.md). The class keeps its
 // name and constructor so every push of it lands on the unified learn
@@ -147,7 +148,7 @@ class ProgramDetailScreenClassic extends StatelessWidget {
               const SizedBox(height: 18),
               _pad(ClipRRect(
                 borderRadius: BorderRadius.circular(22),
-                child: GestureDetector(
+                child: PvPress(child: GestureDetector(
                   onTap: () => _play(context, s.prepPreviewOf('${p.title}'),
                       subtitle: s.prepNinetySecPreview),
                   child: Stack(children: [
@@ -166,7 +167,7 @@ class ProgramDetailScreenClassic extends StatelessWidget {
                       ),
                     ),
                   ]),
-                ),
+                )),
               )),
 
               // badges
@@ -339,7 +340,7 @@ class ProgramDetailScreenClassic extends StatelessWidget {
 
   Widget _lessonRow(BuildContext context, S s, PrepLesson l,
           {bool first = false, required Color accent}) =>
-      GestureDetector(
+      PvPress(child: GestureDetector(
         onTap: () => _play(context, l.title.now, subtitle: s.prepMinutes(l.minutes)),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -371,7 +372,7 @@ class ProgramDetailScreenClassic extends StatelessWidget {
             const Icon(Icons.chevron_right_rounded, size: 18, color: kMuted),
           ]),
         ),
-      );
+      ));
 
   Widget _sessionCard(PrepSession s, Color a) => Container(
         padding: const EdgeInsets.all(18),

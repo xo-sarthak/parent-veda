@@ -86,6 +86,7 @@ import 'ttc_common.dart' show ttcTitleInk, ttcLine;
 import 'ttc_strings.dart';
 import 'ttc_tool_chrome.dart';
 import 'ttc_tool_hues.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// The bracket's own hue — Getting ready is 104, and a surface opened from that
 /// door keeps its colour.
@@ -594,7 +595,7 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
     final count = later.length + background.length;
 
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      GestureDetector(
+      PvPress(child: GestureDetector(
         onTap: () => setState(() => _showRest = !_showRest),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -641,7 +642,7 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
             ),
           ]),
         ),
-      ),
+      )),
       if (_showRest) ...[
         const SizedBox(height: 18),
         _groupHead(
@@ -1295,7 +1296,7 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
 
   Widget _statusButton(V2Palette p, TtcVaccineStore store, TtcVaccine v,
       TtcVaccineStatus s, bool on, String Function(String, String) t) {
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       key: ValueKey('ttc_vax_${v.id}_${s.name}'),
       // ⚠️ "HAD IT" ASKS WHEN (tools pass, 2026-09-27). It saved today's date,
       // so a jab three weeks ago started the wait today and the screen told
@@ -1330,7 +1331,7 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
                 fontWeight: on ? FontWeight.w800 : FontWeight.w600,
                 color: on ? Colors.white : ttcTitleInk)),
       ),
-    );
+    ));
   }
 
   /// "When did you have it?", with today already chosen.

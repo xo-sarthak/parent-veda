@@ -37,6 +37,7 @@ import '../theme/app_theme.dart';
 import 'home_focus_screen.dart';
 import 'home_v3_screen.dart';
 import 'home_screen_b.dart';
+import '../widgets/pv_feedback.dart' show PvPress;
 
 /// Which Today is on screen. Session-only on purpose — see [TodayVersionStore].
 enum TodayVersion { classic, focus, v3 }
@@ -230,7 +231,7 @@ class _TodayVersionPill extends StatelessWidget {
     final store = TodayVersionStore.instance;
     Widget seg(String label, TodayVersion v) {
       final on = store.version == v;
-      return GestureDetector(
+      return PvPress(child: GestureDetector(
         onTap: () => store.set(v),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -248,7 +249,7 @@ class _TodayVersionPill extends StatelessWidget {
             ),
           ),
         ),
-      );
+      ));
     }
 
     return Container(

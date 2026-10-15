@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import '../../doctor/doctor_availability.dart';
 import '../../doctor/doctor_session.dart';
 import '../post_pregnancy/pp_common.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class DoctorAvailabilityScreen extends StatefulWidget {
   const DoctorAvailabilityScreen({super.key});
@@ -110,7 +111,7 @@ class _DoctorAvailabilityScreenState extends State<DoctorAvailabilityScreen> {
   Widget _cell(String expertId, int weekday, int hour, int minute, String label) {
     final w = AvailWindow(weekday, hour, minute);
     final on = DoctorAvailability.instance.isOn(expertId, w);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => DoctorAvailability.instance.toggle(expertId, w),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -126,6 +127,6 @@ class _DoctorAvailabilityScreenState extends State<DoctorAvailabilityScreen> {
                 color: on ? Colors.white : ppSoft,
                 w: on ? FontWeight.w700 : FontWeight.w600)),
       ),
-    );
+    ));
   }
 }

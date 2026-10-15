@@ -22,6 +22,7 @@ import 'brand_store.dart';
 import 'brand_studio.dart';
 import 'sampling_screen.dart';
 import '../theme/pv_fonts.dart';
+import '../widgets/pv_feedback.dart' show PvPress;
 
 class SamplingCard extends StatefulWidget {
   const SamplingCard({
@@ -72,7 +73,7 @@ class _SamplingCardState extends State<SamplingCard> {
     final claimed = BrandStudioStore.instance.completed(c.id);
     return Padding(
       padding: widget.padding,
-      child: GestureDetector(
+      child: PvPress(child: GestureDetector(
         onTap: () => _open(c),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -137,7 +138,7 @@ class _SamplingCardState extends State<SamplingCard> {
                     color: const Color(0xFF8B8394))),
           ]),
         ),
-      ),
+      )),
     );
   }
 }

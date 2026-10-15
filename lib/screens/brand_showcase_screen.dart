@@ -33,6 +33,7 @@ import 'post_pregnancy/sleep_journey_screen.dart';
 import 'prepare/prepare_hub_screen.dart';
 import '../theme/pv_fonts.dart';
 import '../localization/app_language.dart';
+import '../widgets/pv_feedback.dart' show PvPress;
 
 const _bg = Color(0xFFFBF9FE);
 const _ink = Color(0xFF2F2C30);
@@ -307,7 +308,7 @@ class _BrandShowcaseScreenState extends State<BrandShowcaseScreen> {
                       fontSize: 11.5, fontWeight: FontWeight.w700, color: _soft)),
             ),
             if (p.built)
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: () => _showMe(p),
                 behavior: HitTestBehavior.opaque,
                 child: Container(
@@ -320,7 +321,7 @@ class _BrandShowcaseScreenState extends State<BrandShowcaseScreen> {
                           fontWeight: FontWeight.w800,
                           color: Colors.white)),
                 ),
-              )
+              ))
             else
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),

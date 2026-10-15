@@ -47,6 +47,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../theme/pv_fonts.dart';
 import '../v2/v2_palette.dart';
 import 'pp_content.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// One way to reach a person.
 class _Line {
@@ -268,7 +269,7 @@ class _CallButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = V2PaletteStore.instance.current;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -288,7 +289,7 @@ class _CallButton extends StatelessWidget {
                 style: pvManrope(fontSize: 15, fontWeight: FontWeight.w800, height: 1.55, color: p.ink2)),
           ]),
         ),
-      );
+      ));
   }
 }
 class _Say extends StatelessWidget {

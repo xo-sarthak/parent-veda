@@ -18,6 +18,7 @@ import 'pp_expert_link.dart';
 import 'pp_courses_data.dart';
 import '../learn/pv_lesson_screen.dart';
 import 'course_detail_screen.dart' show pvViewForCourse;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // ⚠️ FACADE since 2026-09-20 (docs/LEARNING-AUDIT.md). The class keeps its
 // name and constructor so every push of it lands on the unified learn
@@ -91,7 +92,7 @@ class CourseLessonScreenClassic extends StatelessWidget {
 
             // video-preview hero (no engine yet - honest tap)
             const SizedBox(height: 18),
-            _pad(GestureDetector(
+            _pad(PvPress(child: GestureDetector(
               onTap: () => _snack(context, "This lesson's film is in production - the outline below is final."),
               behavior: HitTestBehavior.opaque,
               child: ClipRRect(
@@ -110,7 +111,7 @@ class CourseLessonScreenClassic extends StatelessWidget {
                   ),
                 ]),
               ),
-            )),
+            ))),
 
             // honest "in review" notice - this template is new; the film isn't live
             const SizedBox(height: 18),
@@ -185,7 +186,7 @@ class CourseLessonScreenClassic extends StatelessWidget {
               _pad(ppSectionDivider()),
               _pad(Text('Up next', style: ppJakarta(16))),
               const SizedBox(height: 12),
-              _pad(GestureDetector(
+              _pad(PvPress(child: GestureDetector(
                 // pushReplacement keeps the lesson stack shallow when moving on
                 onTap: () => Navigator.of(context).pushReplacement(
                     MaterialPageRoute<void>(builder: (_) => CourseLessonScreen(course: course, index: index + 1))),
@@ -212,12 +213,12 @@ class CourseLessonScreenClassic extends StatelessWidget {
                     const Icon(Icons.chevron_right_rounded, size: 18, color: ppMuted),
                   ]),
                 ),
-              )),
+              ))),
             ],
 
             // back to the full course
             const SizedBox(height: 20),
-            _pad(GestureDetector(
+            _pad(PvPress(child: GestureDetector(
               onTap: () => Navigator.of(context).maybePop(),
               behavior: HitTestBehavior.opaque,
               child: Container(
@@ -230,7 +231,7 @@ class CourseLessonScreenClassic extends StatelessWidget {
                   Flexible(child: Text('Back to ${course.title}', style: ppBody(14, color: ppInk, w: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis)),
                 ]),
               ),
-            )),
+            ))),
             const SizedBox(height: 12),
             _pad(Text('Lifetime access. Full lessons unlock as they are filmed.',
                 textAlign: TextAlign.center, style: ppBody(12, color: ppMuted, h: 1.5))),

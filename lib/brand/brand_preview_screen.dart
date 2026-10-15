@@ -22,6 +22,7 @@ import 'brand_studio.dart';
 import 'needs_attention.dart';
 import '../theme/pv_fonts.dart';
 import '../localization/app_language.dart';
+import '../widgets/pv_feedback.dart' show PvPress;
 
 const _bg = Color(0xFFFBF9FE);
 const _ink = Color(0xFF2F2C30);
@@ -291,7 +292,7 @@ class _BrandPreviewScreenState extends State<BrandPreviewScreen> {
   // ---- flags ----------------------------------------------------------------
   Widget _flagRow(BrandFlag f) {
     final info = kBrandFlags[f]!;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () => showBrandFlagSheet(context, f),
       child: Container(
@@ -315,7 +316,7 @@ class _BrandPreviewScreenState extends State<BrandPreviewScreen> {
           const Icon(Icons.arrow_forward_rounded, size: 14, color: _red),
         ]),
       ),
-    );
+    ));
   }
 
   // ---- the whole placement map ----------------------------------------------

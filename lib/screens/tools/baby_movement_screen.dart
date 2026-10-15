@@ -55,6 +55,7 @@ import '../pregnancy/preg_chrome.dart';
 import '../pregnancy/preg_tool_chrome.dart';
 import '../pregnancy/preg_tool_parts.dart';
 import '../products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// The Tools tab's "Track" hue, so the marks here match the row she tapped.
 const double _kMovementHue = 206;
@@ -674,7 +675,7 @@ class _BabyMovementScreenState extends State<BabyMovementScreen>
         ),
         if (overflow > 0) ...[
           const SizedBox(height: 8),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => setState(() => _showAllTimes = !_showAllTimes),
             behavior: HitTestBehavior.opaque,
             child: Padding(
@@ -689,7 +690,7 @@ class _BabyMovementScreenState extends State<BabyMovementScreen>
                 ),
               ),
             ),
-          ),
+          )),
         ],
       ],
     );
@@ -703,7 +704,7 @@ class _BabyMovementScreenState extends State<BabyMovementScreen>
     final fill = _justLogged ? pvStorePalette.ink2 : kPvInk;
     return Semantics(
       button: true,
-      child: GestureDetector(
+      child: PvPress(child: GestureDetector(
         onTap: _logMovement,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 150),
@@ -759,7 +760,7 @@ class _BabyMovementScreenState extends State<BabyMovementScreen>
             ),
           ),
         ),
-      ),
+      )),
     );
   }
 

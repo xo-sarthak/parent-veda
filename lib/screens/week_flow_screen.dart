@@ -38,6 +38,7 @@ import '../theme/pv_fonts.dart';
 import '../data/nutrition/superfood_recipes.dart';
 import '../data/nutrition_data.dart' show Recipe;
 import 'nutrition/door/recipe_cook_screen.dart' show openRecipe;
+import '../widgets/pv_feedback.dart' show PvPress;
 
 // TESTING-ONLY: when the Dad mode switch is on AND we're on week 20, the weekly
 // flow re-voices its copy for the father (same content, read for/about her).
@@ -1656,7 +1657,7 @@ Widget _pageCounter(int current, int total) {
 Widget _carouselArrows({VoidCallback? onPrev, VoidCallback? onNext}) {
   Widget side(IconData icon, VoidCallback? onTap) {
     if (onTap == null) return const SizedBox(width: 46);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 8),
@@ -1674,7 +1675,7 @@ Widget _carouselArrows({VoidCallback? onPrev, VoidCallback? onNext}) {
         child: Icon(icon,
             size: 22, color: AppTheme.primary500.withValues(alpha: 0.85)),
       ),
-    );
+    ));
   }
 
   return Positioned.fill(
@@ -1783,7 +1784,7 @@ class _SectionBrief extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(18),
@@ -1846,7 +1847,7 @@ class _SectionBrief extends StatelessWidget {
           ],
         ]),
       ),
-    );
+    ));
   }
 }
 
@@ -1857,7 +1858,7 @@ Widget _whatsNextShortcut(
     BuildContext context, IconData icon, String label, Color color,
     VoidCallback onTap) {
   return Expanded(
-    child: GestureDetector(
+    child: PvPress(child: GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -1876,7 +1877,7 @@ Widget _whatsNextShortcut(
                   fontSize: 11.5, fontWeight: FontWeight.w700, color: color)),
         ]),
       ),
-    ),
+    )),
   );
 }
 
@@ -1980,7 +1981,7 @@ class _TrimesterTips extends StatelessWidget {
         ]),
       );
 
-  Widget _tipCard(BuildContext context, S s, TrimesterTip t) => GestureDetector(
+  Widget _tipCard(BuildContext context, S s, TrimesterTip t) => PvPress(child: GestureDetector(
         onTap: () => _showTip(context, s, t),
         child: Container(
           margin: const EdgeInsets.only(bottom: 10),
@@ -2032,7 +2033,7 @@ class _TrimesterTips extends StatelessWidget {
                 size: 20, color: AppTheme.neutral400),
           ]),
         ),
-      );
+      ));
 
   void _showTip(BuildContext context, S s, TrimesterTip t) {
     showDialog<void>(
@@ -2211,13 +2212,13 @@ Widget _mediaPlaceholder(BuildContext context, S s,
   return Padding(
     padding: const EdgeInsets.only(bottom: 18),
     child: video
-        ? GestureDetector(
+        ? PvPress(child: GestureDetector(
             onTap: () => ScaffoldMessenger.of(context)
               ..clearSnackBars()
               ..showSnackBar(
                   SnackBar(content: Text(s.wkVideoSoon))),
             child: frame,
-          )
+          ))
         : frame,
   );
 }
@@ -2339,7 +2340,7 @@ class _BabyDetailScreen extends StatelessWidget {
   // A Baby Science fact as a tappable row → opens a small pop-up with the fact.
   Widget _scienceRow(BuildContext context, S s, _Fact f, AppLanguage lang,
           [bool father = false]) =>
-      GestureDetector(
+      PvPress(child: GestureDetector(
         onTap: () => _showFact(context, s, f, lang),
         child: Container(
           margin: const EdgeInsets.only(bottom: 10),
@@ -2399,7 +2400,7 @@ class _BabyDetailScreen extends StatelessWidget {
             ),
           ]),
         ),
-      );
+      ));
 
   // The fact's full read in a centred pop-up (the old carousel hero, now on tap).
   void _showFact(BuildContext context, S s, _Fact f, AppLanguage lang) {
@@ -2557,7 +2558,7 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
     Widget seg(int i, IconData icon, String label) {
       final on = _section == i;
       return Expanded(
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: () => setState(() => _section = i),
           behavior: HitTestBehavior.opaque,
           child: AnimatedContainer(
@@ -2583,7 +2584,7 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
               ),
             ]),
           ),
-        ),
+        )),
       );
     }
 
@@ -2671,7 +2672,7 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
     Widget seg(int i, IconData icon, String label) {
       final on = _tab == i;
       return Expanded(
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: () => setState(() => _tab = i),
           behavior: HitTestBehavior.opaque,
           child: AnimatedContainer(
@@ -2695,7 +2696,7 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
                       color: on ? Colors.white : AppTheme.neutral600)),
             ]),
           ),
-        ),
+        )),
       );
     }
 
@@ -2718,7 +2719,7 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
   // Each topic shows a teaser; tap opens the fuller read.
   Widget _topicCard(_MotherTopic t, AppLanguage lang, S s,
           {bool father = false}) =>
-      GestureDetector(
+      PvPress(child: GestureDetector(
         onTap: () => _showTopicDialog(t, lang),
         child: Container(
           margin: const EdgeInsets.only(bottom: 12),
@@ -2768,7 +2769,7 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
             ),
           ]),
         ),
-      );
+      ));
 
   void _showTopicDialog(_MotherTopic t, AppLanguage lang) {
     final s = S(lang);
@@ -2877,7 +2878,7 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
 
   Widget _w5SymptomCard(S s, W5Symptom x, AppLanguage lang) {
     const accent = AppTheme.secondary500;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _showW5SymptomSheet(x, lang),
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
@@ -2921,7 +2922,7 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
           ),
         ]),
       ),
-    );
+    ));
   }
 
   void _showW5SymptomSheet(W5Symptom x, AppLanguage lang) {
@@ -2973,7 +2974,7 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
 
   Widget _symptomCard(S s, Symptom x, AppLanguage lang) {
     final meta = symptomCatMeta(x.category);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _showSymptomSheet(x, lang),
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
@@ -3017,7 +3018,7 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
           ),
         ]),
       ),
-    );
+    ));
   }
 
   void _showSymptomSheet(Symptom x, AppLanguage lang) {
@@ -3424,7 +3425,7 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
     Widget seg(int i, IconData icon, String label) {
       final on = _tab == i;
       return Expanded(
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: () => setState(() => _tab = i),
           behavior: HitTestBehavior.opaque,
           child: AnimatedContainer(
@@ -3450,7 +3451,7 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
               ),
             ]),
           ),
-        ),
+        )),
       );
     }
 
@@ -3603,7 +3604,7 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
   }
 
   Widget _milestoneCard(S s, _WeekMs m, AppLanguage lang, bool current) {
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _showMilestoneDialog(m, lang),
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
@@ -3660,7 +3661,7 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
           ),
         ]),
       ),
-    );
+    ));
   }
 
   Widget _tag(String t) => Container(
@@ -3789,7 +3790,7 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
 
   Widget _motherWeekCard(
       S s, AppLanguage lang, int week, MomJourney mom, bool current) {
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _showMotherWeekDialog(s, lang, week, mom),
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
@@ -3832,7 +3833,7 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
           ]),
         ]),
       ),
-    );
+    ));
   }
 
   void _showMotherWeekDialog(S s, AppLanguage lang, int week, MomJourney mom) {
@@ -3938,7 +3939,7 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
   }
 
   Widget _fScanCard(S s, AppLanguage lang, _FScan f) {
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _fScanDialog(s, lang, f),
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
@@ -3976,7 +3977,7 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
           ]),
         ]),
       ),
-    );
+    ));
   }
 
   void _fScanDialog(S s, AppLanguage lang, _FScan f) {
@@ -4057,7 +4058,7 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
   }
 
   Widget _scanCard(S s, JourneyMilestone m, AppLanguage lang) {
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _showScanDialog(m, lang),
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
@@ -4099,7 +4100,7 @@ class _WhatsNextScreenState extends State<_WhatsNextScreen> {
           ]),
         ]),
       ),
-    );
+    ));
   }
 
   void _showScanDialog(JourneyMilestone m, AppLanguage lang) {
@@ -4224,7 +4225,7 @@ class _VideoFeed extends StatelessWidget {
 /// videos screen). Playback is still a mock (snackbar) until real videos land.
 Widget _videoReelTile(BuildContext context, _Vid v, S s, AppLanguage lang,
     {double width = 141}) {
-  return GestureDetector(
+  return PvPress(child: GestureDetector(
       onTap: () => ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(s.wkVideoSoon))),
       child: SizedBox(
@@ -4316,7 +4317,7 @@ Widget _videoReelTile(BuildContext context, _Vid v, S s, AppLanguage lang,
           ]),
         ),
       ),
-    );
+    ));
 }
 
 // ---------------------------------------------------------------------------
@@ -4370,7 +4371,7 @@ class _ArticleFeed extends StatelessWidget {
   }
 
   Widget _card(BuildContext context, WeekArticle a) {
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => Navigator.of(context).push(
           MaterialPageRoute(builder: (_) => _ArticleReader(article: a))),
       child: Container(
@@ -4413,7 +4414,7 @@ class _ArticleFeed extends StatelessWidget {
           ]),
         ]),
       ),
-    );
+    ));
   }
 }
 
@@ -4567,7 +4568,7 @@ class _AllReadsScreen extends StatelessWidget {
         separatorBuilder: (_, _) => const SizedBox(height: 12),
         itemBuilder: (context, i) {
           final a = all[i];
-          return GestureDetector(
+          return PvPress(child: GestureDetector(
             onTap: () => _push(context, _ArticleReader(article: a)),
             child: Container(
               padding: const EdgeInsets.all(16),
@@ -4606,7 +4607,7 @@ class _AllReadsScreen extends StatelessWidget {
                     size: 20, color: AppTheme.neutral400),
               ]),
             ),
-          );
+          ));
         },
         ),
       ),
@@ -4790,7 +4791,7 @@ class _WeekNav extends StatelessWidget {
     final label = isPrev
         ? '← ${s.weekWord} $week'
         : '${s.weekWord} $week →';
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -4819,6 +4820,6 @@ class _WeekNav extends StatelessWidget {
           ],
         ),
       ),
-    );
+    ));
   }
 }

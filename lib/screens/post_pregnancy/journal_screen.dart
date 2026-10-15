@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'pp_child_profile.dart';
 
 import 'pp_common.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class MyChildJournalScreen extends StatelessWidget {
   const MyChildJournalScreen({super.key});
@@ -166,7 +167,7 @@ class MyChildJournalScreen extends StatelessWidget {
   }
 
   Widget _quick(BuildContext context, IconData icon, String label, {bool filled = false}) => Expanded(
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: () => _soon(context),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
@@ -181,6 +182,6 @@ class MyChildJournalScreen extends StatelessWidget {
               Text(label, style: ppBody(12, color: filled ? Colors.white : ppInk, w: FontWeight.w700)),
             ]),
           ),
-        ),
+        )),
       );
 }

@@ -36,6 +36,7 @@ import 'watch_library_screen.dart';
 import 'watch_player_screen.dart';
 import 'watch_quicklearn_screen.dart';
 import 'watch_shorts_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class WatchHomeScreen extends StatefulWidget {
   const WatchHomeScreen({super.key});
@@ -654,7 +655,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
   }
 
   /// One short in the 2-up grid: a tall thumbnail, title, then who it is from.
-  Widget _shortCard(WatchVideo v) => GestureDetector(
+  Widget _shortCard(WatchVideo v) => PvPress(child: GestureDetector(
         onTap: () => _open(v),
         behavior: HitTestBehavior.opaque,
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -668,7 +669,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
           PpExpertName(v.expert, suffix: ' · ${v.seconds}s',
               style: ppBody(11, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis),
         ]),
-      );
+      ));
 
   Widget _feedCard(WatchVideo v) => WatchListCard(video: v, onTap: () => _open(v), progress: _liveProgress(v.id));
 
@@ -706,7 +707,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
         const SizedBox(height: 22),
         _pad(Row(children: [
           Expanded(child: watchSectionHeader(_picksTitle())),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => setState(() => _topic = 'All'),
             behavior: HitTestBehavior.opaque,
             child: Row(children: [
@@ -714,7 +715,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
               const SizedBox(width: 3),
               const Icon(Icons.close_rounded, size: 15, color: ppPurple),
             ]),
-          ),
+          )),
         ])),
         const SizedBox(height: 4),
         _pad(Text(_picksSubtitle(), style: ppBody(12.5, color: ppMuted))),
@@ -808,7 +809,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
   Widget _filterChip(String label, IconData? icon, {required bool selected, required VoidCallback onTap, bool accent = false}) {
     final Color bg = selected ? ppPurple : Colors.white;
     final Color fg = selected ? Colors.white : (accent ? ppPurple : ppInk);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -837,14 +838,14 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
           Text(label, style: ppBody(12.5, color: fg, w: FontWeight.w700)),
         ]),
       ),
-    );
+    ));
   }
 
   // ---- channel interstitial (promotes a channel + Subscribe) --------------
   Widget _channelInterstitial(WatchChannel channel) {
     final e = channel.expert;
     final subscribed = WatchStore.instance.isSubscribed(e.id);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _push(WatchChannelScreen(expertId: e.id)),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -875,7 +876,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
               ]),
             ),
             const SizedBox(width: 10),
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: () => WatchStore.instance.toggleSubscribe(e.id),
               behavior: HitTestBehavior.opaque,
               child: Container(
@@ -888,11 +889,11 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
                 child: Text(subscribed ? 'Subscribed' : 'Subscribe',
                     style: ppBody(12, color: subscribed ? ppSoft : Colors.white, w: FontWeight.w800)),
               ),
-            ),
+            )),
           ]),
         ]),
       ),
-    );
+    ));
   }
 
   // ---- mode toggle --------------------------------------------------------
@@ -908,7 +909,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
       );
 
   Widget _seg(String label, String sub, bool on, VoidCallback onTap) => Expanded(
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: AnimatedContainer(
@@ -925,13 +926,13 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
               Text(sub, style: ppBody(10, color: ppMuted)),
             ]),
           ),
-        ),
+        )),
       );
 
   // ---- today's hero -------------------------------------------------------
   Widget _todaysHero() {
     final v = todaysVideo(quick: _quick);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _open(v),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -971,7 +972,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
           ),
         ]),
       ),
-    );
+    ));
   }
 
   // ---- rails --------------------------------------------------------------
@@ -1058,7 +1059,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
           final prog = WatchStore.instance.collectionProgress(c);
           // The expert behind the collection = whoever teaches its first video.
           final lead = c.videoIds.isEmpty ? null : watchVideoById(c.videoIds.first).expert;
-          return GestureDetector(
+          return PvPress(child: GestureDetector(
             onTap: () => _push(WatchCollectionScreen(collection: c)),
             behavior: HitTestBehavior.opaque,
             child: SizedBox(
@@ -1075,7 +1076,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
                 // it - the "i" opens their background rather than making you
                 // take "paediatrician" on faith.
                 if (lead != null)
-                  GestureDetector(
+                  PvPress(child: GestureDetector(
                     onTap: () => _openExpert(lead),
                     behavior: HitTestBehavior.opaque,
                     child: Row(children: [
@@ -1088,7 +1089,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
                       const SizedBox(width: 3),
                       const Icon(Icons.info_outline_rounded, size: 12, color: ppPurple),
                     ]),
-                  ),
+                  )),
                 const SizedBox(height: 3),
                 if (lead != null)
                   Row(children: [
@@ -1104,13 +1105,13 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
                     style: ppBody(11, color: prog > 0 ? ppPurple : ppMuted, w: FontWeight.w700)),
               ]),
             ),
-          );
+          ));
         },
       ),
     );
   }
 
-  Widget _libraryLink() => GestureDetector(
+  Widget _libraryLink() => PvPress(child: GestureDetector(
         onTap: () => _push(const WatchLibraryScreen()),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -1129,5 +1130,5 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
             const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
           ]),
         ),
-      );
+      ));
 }

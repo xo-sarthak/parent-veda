@@ -27,6 +27,7 @@ import '../../doctor/doctor_schedule.dart';
 import '../../doctor/doctor_schedule_store.dart';
 import '../../doctor/doctor_session.dart';
 import '../post_pregnancy/pp_common.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 const _dayNames = ['', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
@@ -285,7 +286,7 @@ class _DoctorScheduleScreenState extends State<DoctorScheduleScreen> {
         child: Row(children: [
           for (final (i, label) in [(0, 'Week'), (1, 'Rules'), (2, 'Time off')])
             Expanded(
-              child: GestureDetector(
+              child: PvPress(child: GestureDetector(
                 onTap: () => setState(() => _tab = i),
                 behavior: HitTestBehavior.opaque,
                 child: Container(
@@ -299,7 +300,7 @@ class _DoctorScheduleScreenState extends State<DoctorScheduleScreen> {
                       style: ppJakarta(13.5,
                           color: _tab == i ? ppTitleInk : ppSoft)),
                 ),
-              ),
+              )),
             ),
         ]),
       );
@@ -365,7 +366,7 @@ class _DoctorScheduleScreenState extends State<DoctorScheduleScreen> {
 
   Widget _dayChip(int d) {
     final on = _s.dayFor(d).isWorking;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _toggleDay(d),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -380,7 +381,7 @@ class _DoctorScheduleScreenState extends State<DoctorScheduleScreen> {
         child: Text(_dayNames[d],
             style: ppJakarta(12, color: on ? Colors.white : ppSoft)),
       ),
-    );
+    ));
   }
 
   /// Derived from the session's own start time, not its index — a third
@@ -412,7 +413,7 @@ class _DoctorScheduleScreenState extends State<DoctorScheduleScreen> {
               padding: const EdgeInsets.only(bottom: 8),
               child: Row(children: [
                 Expanded(
-                  child: GestureDetector(
+                  child: PvPress(child: GestureDetector(
                     onTap: () => _editSession(weekday, i),
                     behavior: HitTestBehavior.opaque,
                     child: Container(
@@ -434,7 +435,7 @@ class _DoctorScheduleScreenState extends State<DoctorScheduleScreen> {
                             style: ppBody(11, color: ppMuted)),
                       ]),
                     ),
-                  ),
+                  )),
                 ),
                 IconButton(
                   onPressed: () => _removeSession(weekday, i),
@@ -444,7 +445,7 @@ class _DoctorScheduleScreenState extends State<DoctorScheduleScreen> {
               ]),
             ),
           if (day.sessions.length < 3)
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: () => _editSession(weekday, day.sessions.length),
               behavior: HitTestBehavior.opaque,
               child: Row(children: [
@@ -452,7 +453,7 @@ class _DoctorScheduleScreenState extends State<DoctorScheduleScreen> {
                 const SizedBox(width: 6),
                 Text('Add a session', style: ppJakarta(12.5, color: ppPurple)),
               ]),
-            ),
+            )),
         ]),
       ),
     );
@@ -533,7 +534,7 @@ class _DoctorScheduleScreenState extends State<DoctorScheduleScreen> {
     return h == 1 ? '1 hour' : '$h hours';
   }
 
-  Widget _chip(String label, bool on, VoidCallback onTap) => GestureDetector(
+  Widget _chip(String label, bool on, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -546,7 +547,7 @@ class _DoctorScheduleScreenState extends State<DoctorScheduleScreen> {
           child: Text(label,
               style: ppJakarta(13, color: on ? Colors.white : ppSoft)),
         ),
-      );
+      ));
 
   Widget _stepper(String label, String value,
           {VoidCallback? onMinus, VoidCallback? onPlus, String? hint}) =>
@@ -577,7 +578,7 @@ class _DoctorScheduleScreenState extends State<DoctorScheduleScreen> {
         ),
       );
 
-  Widget _round(IconData icon, VoidCallback? onTap) => GestureDetector(
+  Widget _round(IconData icon, VoidCallback? onTap) => PvPress(enabled: onTap != null, child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -590,7 +591,7 @@ class _DoctorScheduleScreenState extends State<DoctorScheduleScreen> {
           ),
           child: Icon(icon, size: 17, color: onTap == null ? ppMuted : ppPurple),
         ),
-      );
+      ));
 
   // ---- time off -------------------------------------------------------------
 
@@ -620,7 +621,7 @@ class _DoctorScheduleScreenState extends State<DoctorScheduleScreen> {
         else
           for (var i = 0; i < _s.timeOff.length; i++) _timeOffRow(i),
         const SizedBox(height: 14),
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: _addTimeOff,
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -631,7 +632,7 @@ class _DoctorScheduleScreenState extends State<DoctorScheduleScreen> {
             child: Text('Add time off',
                 style: ppJakarta(13.5, color: Colors.white)),
           ),
-        ),
+        )),
       ]);
 
   Widget _timeOffRow(int i) {

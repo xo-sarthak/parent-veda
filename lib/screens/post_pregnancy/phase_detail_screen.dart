@@ -30,6 +30,7 @@ import 'products_discovery_screen.dart';
 import 'pp_phases_data.dart';
 import 'pp_phase_film.dart' show ppOpenPhaseRead;
 import '../../data/pp_phase_docs.dart' show ppPhaseDocFor;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class PhaseDetailScreen extends StatelessWidget {
   const PhaseDetailScreen({super.key, required this.phase});
@@ -88,7 +89,7 @@ class PhaseDetailScreen extends StatelessWidget {
             _pad(Text(p.summary, style: ppBody(15, color: ppInk, h: 1.65))),
             if (hasDoc) ...[
               const SizedBox(height: 10),
-              _pad(GestureDetector(
+              _pad(PvPress(child: GestureDetector(
                 key: const ValueKey('phase_detail_read_doc'),
                 onTap: () => ppOpenPhaseRead(context, p),
                 behavior: HitTestBehavior.opaque,
@@ -97,7 +98,7 @@ class PhaseDetailScreen extends StatelessWidget {
                   const SizedBox(width: 6),
                   const Icon(Icons.arrow_forward, size: 15, color: ppPurple),
                 ]),
-              )),
+              ))),
             ],
 
             // The reassurance line — the thing a worried parent came for.
@@ -287,7 +288,7 @@ class PhaseDetailScreen extends StatelessWidget {
                 for (final id in p.productIds.take(3))
                   PpProductCard(productById(id)),
               ])),
-            _pad(GestureDetector(
+            _pad(PvPress(child: GestureDetector(
               onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
                 settings: const RouteSettings(name: 'pp/products'),
                 builder: (_) => const ProductsDiscoveryScreen(),
@@ -299,7 +300,7 @@ class PhaseDetailScreen extends StatelessWidget {
                 const SizedBox(width: 6),
                 const Icon(Icons.arrow_forward_rounded, size: 15, color: ppPurple),
               ]),
-            )),
+            ))),
 
             const SizedBox(height: 22),
             _pad(Text(

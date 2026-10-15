@@ -32,6 +32,7 @@ import 'reading_collection_screen.dart';
 import 'reading_common.dart';
 import 'reading_library_screen.dart';
 import 'reading_reader_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class ReadingHomeScreen extends StatefulWidget {
   const ReadingHomeScreen({super.key, this.initialCollection});
@@ -520,7 +521,7 @@ class _ReadingHomeScreenState extends State<ReadingHomeScreen> {
       // Five picks is a taster, not a library. This is the way through to the
       // rest rather than leaving it looking like all there is.
       const SizedBox(height: 6),
-      _pad(GestureDetector(
+      _pad(PvPress(child: GestureDetector(
         onTap: () => setState(() {
           _collectionFilter = null;
           _typeFilter = null;
@@ -531,7 +532,7 @@ class _ReadingHomeScreenState extends State<ReadingHomeScreen> {
           const SizedBox(width: 5),
           const Icon(Icons.arrow_forward, size: 15, color: ppPurple),
         ]),
-      )),
+      ))),
     ];
   }
 
@@ -615,7 +616,7 @@ class _ReadingHomeScreenState extends State<ReadingHomeScreen> {
   Widget _chip(String label, bool on, VoidCallback onTap, {bool subtle = false}) {
     final Color bg = on ? ppPurple : Colors.white;
     final Color fg = on ? Colors.white : (subtle ? ppSoft : ppInk);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -628,7 +629,7 @@ class _ReadingHomeScreenState extends State<ReadingHomeScreen> {
         ),
         child: Text(label, style: ppBody(subtle ? 12 : 12.5, color: fg, w: FontWeight.w700)),
       ),
-    );
+    ));
   }
 
   // no-filter default: the collection cards (tap opens the full collection path)
@@ -643,7 +644,7 @@ class _ReadingHomeScreenState extends State<ReadingHomeScreen> {
             final c = kReadCollections[i];
             final mins = c.articleIds.map(readArticleById).fold<int>(0, (a, x) => a + x.minutes);
             final prog = ReadingStore.instance.collectionProgress(c);
-            return GestureDetector(
+            return PvPress(child: GestureDetector(
               onTap: () => _push(ReadingCollectionScreen(collection: c)),
               behavior: HitTestBehavior.opaque,
               child: Container(
@@ -660,7 +661,7 @@ class _ReadingHomeScreenState extends State<ReadingHomeScreen> {
                   Text(prog >= 1 ? 'Completed' : prog > 0 ? '${(prog * 100).round()}% done' : 'Start', style: ppBody(11, color: prog > 0 ? ppPurple : ppMuted, w: FontWeight.w700)),
                 ]),
               ),
-            );
+            ));
           },
         ),
       );
@@ -696,7 +697,7 @@ class _ReadingHomeScreenState extends State<ReadingHomeScreen> {
                 ),
             ])),
             if (results.where((a) => a.kind == kind).length > 4)
-              _pad(GestureDetector(
+              _pad(PvPress(child: GestureDetector(
                 onTap: () => setState(() => _typeFilter = kind),
                 behavior: HitTestBehavior.opaque,
                 child: Padding(
@@ -708,7 +709,7 @@ class _ReadingHomeScreenState extends State<ReadingHomeScreen> {
                     const Icon(Icons.arrow_forward, size: 15, color: ppPurple),
                   ]),
                 ),
-              ))
+              )))
             else
               const SizedBox(height: 12),
           ],
@@ -724,7 +725,7 @@ class _ReadingHomeScreenState extends State<ReadingHomeScreen> {
         ])),
       if (_collectionFilter != null) ...[
         const SizedBox(height: 4),
-        _pad(GestureDetector(
+        _pad(PvPress(child: GestureDetector(
           onTap: () => _push(ReadingCollectionScreen(collection: readCollectionById(_collectionFilter!))),
           behavior: HitTestBehavior.opaque,
           child: Row(children: [
@@ -732,12 +733,12 @@ class _ReadingHomeScreenState extends State<ReadingHomeScreen> {
             const SizedBox(width: 5),
             const Icon(Icons.arrow_forward, size: 15, color: ppPurple),
           ]),
-        )),
+        ))),
       ],
     ];
   }
 
-  Widget _todayHero(ReadArticle a) => GestureDetector(
+  Widget _todayHero(ReadArticle a) => PvPress(child: GestureDetector(
         onTap: () => _open(a),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -783,11 +784,11 @@ class _ReadingHomeScreenState extends State<ReadingHomeScreen> {
             ),
           ]),
         ),
-      );
+      ));
 
   Widget _continueCard(ReadArticle a) {
     final p = ReadingStore.instance.progressOf(a.id);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _open(a),
       behavior: HitTestBehavior.opaque,
       child: SizedBox(
@@ -800,10 +801,10 @@ class _ReadingHomeScreenState extends State<ReadingHomeScreen> {
           Text('${(p * 100).round()}% · tap to continue', style: ppBody(11.5, color: ppPurple, w: FontWeight.w700)),
         ]),
       ),
-    );
+    ));
   }
 
-  Widget _savedLink() => GestureDetector(
+  Widget _savedLink() => PvPress(child: GestureDetector(
         onTap: () => _push(const ReadingLibraryScreen()),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -822,5 +823,5 @@ class _ReadingHomeScreenState extends State<ReadingHomeScreen> {
             const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
           ]),
         ),
-      );
+      ));
 }

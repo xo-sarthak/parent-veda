@@ -91,6 +91,7 @@ import 'ttc_read_next.dart' show ttcToolReadNext;
 import 'ttc_tool_chrome.dart';
 import 'ttc_tool_marks.dart' show TtcToolArt, TtcToolMark;
 import 'ttc_tool_confirm.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// The read that sits under the list.
 const String kTtcMedicationRead = 'ttc_read_meds_and_conditions';
@@ -991,7 +992,7 @@ class _Pill extends StatelessWidget {
       button: true,
       label: semantics,
       excludeSemantics: true,
-      child: GestureDetector(
+      child: PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -1017,7 +1018,7 @@ class _Pill extends StatelessWidget {
             ],
           ]),
         ),
-      ),
+      )),
     );
   }
 }

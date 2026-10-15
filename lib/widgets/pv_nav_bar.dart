@@ -60,6 +60,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_theme.dart';
 import '../theme/pv_fonts.dart';
+import 'pv_feedback.dart' show PvPress;
 
 class PvNavItem {
   const PvNavItem(this.icon, this.label);
@@ -141,7 +142,7 @@ class PvNavBar extends StatelessWidget {
     // overflows at 1.3x scale is a crash for someone who needs bigger type —
     // which is exactly the person who set it.
     return Expanded(
-      child: GestureDetector(
+      child: PvPress(child: GestureDetector(
         // Kept for revert: onTap: () => activeIndex == i ? null : onTap(i),
         onTap: () => activeIndex == i ? onReselect?.call(i) : onTap(i),
         behavior: HitTestBehavior.opaque,
@@ -188,7 +189,7 @@ class PvNavBar extends StatelessWidget {
             ],
           ),
         ),
-      ),
+      )),
     );
   }
 }

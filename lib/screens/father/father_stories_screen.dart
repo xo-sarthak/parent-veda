@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import '../../data/father/father_tales.dart';
 import '../../theme/pv_fonts.dart';
 import '../../localization/app_language.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // ---- Slate palette (mirrors the Father Daily _slate look) -----------------
 const _bg = Color(0xFFF4EFE8);
@@ -55,7 +56,7 @@ class _FatherStoriesScreenState extends State<FatherStoriesScreen> {
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 10, 18, 8),
             child: Row(children: [
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: () => Navigator.of(context).maybePop(),
                 behavior: HitTestBehavior.opaque,
                 child: Container(
@@ -69,7 +70,7 @@ class _FatherStoriesScreenState extends State<FatherStoriesScreen> {
                   ),
                   child: const Icon(Icons.arrow_back_rounded, color: _ink, size: 20),
                 ),
-              ),
+              )),
               const SizedBox(width: 13),
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -115,7 +116,7 @@ class _FatherStoriesScreenState extends State<FatherStoriesScreen> {
   Widget _segment(FatherTaleKind k) {
     final active = _kind == k;
     return Expanded(
-      child: GestureDetector(
+      child: PvPress(child: GestureDetector(
         onTap: () => setState(() => _kind = k),
         behavior: HitTestBehavior.opaque,
         child: AnimatedContainer(
@@ -138,11 +139,11 @@ class _FatherStoriesScreenState extends State<FatherStoriesScreen> {
               style: _body(13, active ? _accent : _muted,
                   w: active ? FontWeight.w700 : FontWeight.w600)),
         ),
-      ),
+      )),
     );
   }
 
-  Widget _taleCard(FatherTale t) => GestureDetector(
+  Widget _taleCard(FatherTale t) => PvPress(child: GestureDetector(
         onTap: () => Navigator.of(context).push(
             MaterialPageRoute(builder: (_) => FatherTaleReadScreen(tale: t))),
         behavior: HitTestBehavior.opaque,
@@ -178,7 +179,7 @@ class _FatherStoriesScreenState extends State<FatherStoriesScreen> {
                 style: _body(13.5, _muted, h: 1.45)),
           ]),
         ),
-      );
+      ));
 }
 
 // =============================================================================
@@ -206,7 +207,7 @@ class FatherTaleReadScreen extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 10, 18, 8),
             child: Row(children: [
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: () => Navigator.of(context).maybePop(),
                 behavior: HitTestBehavior.opaque,
                 child: Container(
@@ -220,7 +221,7 @@ class FatherTaleReadScreen extends StatelessWidget {
                   ),
                   child: const Icon(Icons.arrow_back_rounded, color: _ink, size: 20),
                 ),
-              ),
+              )),
               const SizedBox(width: 13),
               Expanded(
                 child: Text(fatherTaleKindTag(tale.kind).now.toUpperCase(),

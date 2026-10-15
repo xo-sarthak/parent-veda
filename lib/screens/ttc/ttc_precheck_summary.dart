@@ -49,6 +49,7 @@ import 'ttc_precheck_screen.dart' show kPrecheckHue;
 import 'ttc_strings.dart';
 import 'ttc_surface_router.dart';
 import 'ttc_tool_chrome.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class TtcPrecheckSummaryScreen extends StatelessWidget {
   const TtcPrecheckSummaryScreen({super.key});
@@ -540,7 +541,7 @@ class _PriorityCard extends StatelessWidget {
   final VoidCallback onOpen;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         onTap: onOpen,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -589,7 +590,7 @@ class _PriorityCard extends StatelessWidget {
             ),
           ]),
         ),
-      );
+      ));
 }
 
 class _Group extends StatelessWidget {

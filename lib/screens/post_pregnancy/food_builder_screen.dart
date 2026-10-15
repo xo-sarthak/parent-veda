@@ -15,6 +15,7 @@ import 'food_recipe_screen.dart';
 import 'food_shopping_screen.dart';
 import 'pp_common.dart';
 import 'pp_food_data.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class FoodBuilderScreen extends StatefulWidget {
   const FoodBuilderScreen({super.key});
@@ -168,7 +169,7 @@ class _FoodBuilderScreenState extends State<FoodBuilderScreen> {
                 (s) => _diet == s, (s) => setState(() => _diet = s))),
 
             const SizedBox(height: 24),
-            _pad(GestureDetector(
+            _pad(PvPress(child: GestureDetector(
               onTap: _build,
               behavior: HitTestBehavior.opaque,
               child: Container(
@@ -181,7 +182,7 @@ class _FoodBuilderScreenState extends State<FoodBuilderScreen> {
                   Text('Suggest meals', style: ppBody(14, color: Colors.white, w: FontWeight.w700)),
                 ]),
               ),
-            )),
+            ))),
 
             if (_results != null) ...[
               const SizedBox(height: 28),
@@ -222,7 +223,7 @@ class _FoodBuilderScreenState extends State<FoodBuilderScreen> {
         runSpacing: 9,
         children: [
           for (final o in options)
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: () => tap(o),
               behavior: HitTestBehavior.opaque,
               child: Container(
@@ -234,7 +235,7 @@ class _FoodBuilderScreenState extends State<FoodBuilderScreen> {
                 ),
                 child: Text(o, style: ppBody(12.5, color: on(o) ? Colors.white : ppInk, w: FontWeight.w600)),
               ),
-            ),
+            )),
         ],
       );
 
@@ -245,7 +246,7 @@ class _FoodBuilderScreenState extends State<FoodBuilderScreen> {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18), border: Border.all(color: ppHair)),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () => _push(FoodRecipeScreen(recipe: r)),
           behavior: HitTestBehavior.opaque,
           child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -259,7 +260,7 @@ class _FoodBuilderScreenState extends State<FoodBuilderScreen> {
               ]),
             ),
           ]),
-        ),
+        )),
         const SizedBox(height: 12),
         Text('Why it fits: ${ppFill(r.why)}', style: ppBody(12.5, h: 1.5), maxLines: 3, overflow: TextOverflow.ellipsis),
         const SizedBox(height: 10),
@@ -272,7 +273,7 @@ class _FoodBuilderScreenState extends State<FoodBuilderScreen> {
           const SizedBox(height: 8),
           Text('Still need: ${s.missing.join(', ')}', style: ppBody(12.5, color: ppSoft)),
           const SizedBox(height: 10),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () {
               FoodStore.instance.addLines(s.missing);
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -294,7 +295,7 @@ class _FoodBuilderScreenState extends State<FoodBuilderScreen> {
                 Text('Add missing to list', style: ppBody(12, color: ppPurple, w: FontWeight.w700)),
               ]),
             ),
-          ),
+          )),
         ],
       ]),
     );

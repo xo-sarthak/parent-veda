@@ -31,6 +31,7 @@ import '../../theme/pv_fonts.dart';
 import '../conditions/condition_detail_screen.dart';
 import '../doors/pv_door_chrome.dart';
 import '../v2/v2_palette.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// The complications bracket's hue.
 const double _hue = 186;
@@ -128,7 +129,7 @@ class _SignRow extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: PvDoorCard(
@@ -166,5 +167,5 @@ class _SignRow extends StatelessWidget {
             Icon(Icons.chevron_right_rounded, size: 20, color: p.ink3),
           ]),
         ),
-      );
+      ));
 }

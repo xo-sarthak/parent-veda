@@ -27,6 +27,7 @@ import 'pp_child_profile.dart';
 import 'pp_common.dart';
 import 'pp_scripts_data.dart';
 import 'pp_tools_kit.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class ScriptsLibraryScreen extends StatefulWidget {
   const ScriptsLibraryScreen({super.key, this.onOpenPage});
@@ -174,7 +175,7 @@ class _ScriptsLibraryScreenState extends State<ScriptsLibraryScreen> {
             ),
           ),
           if (_query.isNotEmpty)
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: () => setState(() {
                 _search.clear();
                 _query = '';
@@ -184,7 +185,7 @@ class _ScriptsLibraryScreenState extends State<ScriptsLibraryScreen> {
                 padding: EdgeInsets.all(6),
                 child: Icon(Icons.close_rounded, size: 17, color: ppMuted),
               ),
-            ),
+            )),
         ]),
       );
 
@@ -196,7 +197,7 @@ class _ScriptsLibraryScreenState extends State<ScriptsLibraryScreen> {
           padding: EdgeInsets.zero,
           children: [
             for (final entry in _bandLabels.entries)
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: () => setState(() => _band = entry.key),
                 behavior: HitTestBehavior.opaque,
                 child: Container(
@@ -216,7 +217,7 @@ class _ScriptsLibraryScreenState extends State<ScriptsLibraryScreen> {
                           color: _band == entry.key ? Colors.white : ppInk,
                           w: FontWeight.w700)),
                 ),
-              ),
+              )),
           ],
         ),
       );
@@ -275,7 +276,7 @@ class _ScriptsLibraryScreenState extends State<ScriptsLibraryScreen> {
 
           if (s.pageId != null && widget.onOpenPage != null) ...[
             const SizedBox(height: 12),
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: () => widget.onOpenPage!(context, s.pageId!),
               behavior: HitTestBehavior.opaque,
               child: Row(children: [
@@ -285,7 +286,7 @@ class _ScriptsLibraryScreenState extends State<ScriptsLibraryScreen> {
                 const Icon(Icons.arrow_forward_rounded,
                     size: 14, color: ppPurple),
               ]),
-            ),
+            )),
           ],
         ]),
       );

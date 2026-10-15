@@ -13,6 +13,7 @@ import 'pp_watch_data.dart';
 import 'watch_home_screen.dart';
 import 'watch_player_screen.dart';
 import 'watch_quicklearn_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class SolveProblemScreen extends StatelessWidget {
   const SolveProblemScreen({super.key});
@@ -64,7 +65,7 @@ class SolveProblemScreen extends StatelessWidget {
             _pad(ppSectionDivider()),
             _pad(Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
               Text('Watch', style: ppJakarta(16)),
-              GestureDetector(onTap: () => _watch(context), child: Text('See all', style: ppBody(12, color: ppPurple, w: FontWeight.w600))),
+              PvPress(child: GestureDetector(onTap: () => _watch(context), child: Text('See all', style: ppBody(12, color: ppPurple, w: FontWeight.w600)))),
             ])),
             const SizedBox(height: 14),
             _pad(_video(context, watchVideoById('sleep4mo'))),
@@ -111,7 +112,7 @@ class SolveProblemScreen extends StatelessWidget {
         ]),
       );
 
-  Widget _video(BuildContext context, WatchVideo v, {bool top = false}) => GestureDetector(
+  Widget _video(BuildContext context, WatchVideo v, {bool top = false}) => PvPress(child: GestureDetector(
         onTap: () => _play(context, v),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -149,5 +150,5 @@ class SolveProblemScreen extends StatelessWidget {
             ),
           ]),
         ),
-      );
+      ));
 }

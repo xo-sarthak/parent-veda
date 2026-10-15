@@ -816,13 +816,13 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
         ]),
       );
 
-  Widget _iconBtn(_Skin s, IconData i, VoidCallback onTap) => GestureDetector(
+  Widget _iconBtn(_Skin s, IconData i, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Padding(
             padding: const EdgeInsets.all(10),
             child: Icon(i, size: 21, color: s.ink)),
-      );
+      ));
 
   /// ⚠️ NO AVATAR. The circle held a generic person glyph, which is a picture
   /// of nobody — it added 34dp and a shape without adding a fact. On a clinical
@@ -1011,7 +1011,7 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
         border: Border.all(color: s.rule),
       ),
       child: Column(children: [
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () {
             pvCommitFeedback();
             setState(() => _tocOpen = !_tocOpen);
@@ -1034,7 +1034,7 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
               ),
             ]),
           ),
-        ),
+        )),
         // Unfolds (2026-09-19) rather than appearing.
         AnimatedSize(
           duration: const Duration(milliseconds: 220),
@@ -1044,7 +1044,7 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
             if (_tocOpen)
               for (var i = 0; i < a.sections.length; i++)
                 if (a.sections[i].heading != null)
-                  GestureDetector(
+                  PvPress(child: GestureDetector(
                     onTap: () => _jumpTo(i),
                     behavior: HitTestBehavior.opaque,
                     child: Container(
@@ -1056,7 +1056,7 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
                           style: pvManrope(
                               fontSize: 14, height: 1.4, color: s.ink)),
                     ),
-                  ),
+                  )),
           ]),
         ),
       ]),
@@ -1078,7 +1078,7 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
       return Padding(
         key: key,
         padding: const EdgeInsets.only(bottom: 14),
-        child: _pad(GestureDetector(
+        child: _pad(PvPress(child: GestureDetector(
           onTap: () => setState(() => _openSections.add(index)),
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -1114,7 +1114,7 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
               ),
             ]),
           ),
-        )),
+        ))),
       );
     }
 
@@ -1130,14 +1130,14 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
           // A section that folded can fold again. One that never folds gets no
           // control, rather than a disabled one.
           if (sec.collapsible)
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: () => setState(() => _openSections.remove(index)),
               behavior: HitTestBehavior.opaque,
               child: Padding(
                 padding: const EdgeInsets.only(left: 8),
                 child: Icon(Icons.remove_rounded, size: 20, color: s.soft),
               ),
-            ),
+            )),
         ])),
       ));
     }
@@ -1414,7 +1414,7 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
     return Container(
       decoration:
           BoxDecoration(border: Border(bottom: BorderSide(color: s.rule))),
-      child: GestureDetector(
+      child: PvPress(child: GestureDetector(
         onTap: () {
           pvCommitFeedback();
           setState(() => open ? _openFaqs.remove(index) : _openFaqs.add(index));
@@ -1462,7 +1462,7 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
             ),
           ]),
         ),
-      ),
+      )),
     );
   }
 
@@ -1812,7 +1812,7 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
     if (title == null) return const SizedBox.shrink();
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
-      child: GestureDetector(
+      child: PvPress(child: GestureDetector(
         onTap: () => widget.openRead?.call(context, id),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -1835,7 +1835,7 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
             Icon(Icons.arrow_forward_rounded, size: 18, color: s.soft),
           ]),
         ),
-      ),
+      )),
     );
   }
 
@@ -1938,7 +1938,7 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
       PvReadMode.sepia => _t('Sepia', 'Sepia'),
       PvReadMode.dark => _t('Dark', 'Dark'),
     };
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _store.setMode(m),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -1966,6 +1966,6 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
                   color: on ? s.accent : s.soft)),
         ]),
       ),
-    );
+    ));
   }
 }

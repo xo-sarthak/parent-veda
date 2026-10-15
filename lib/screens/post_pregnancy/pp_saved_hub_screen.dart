@@ -37,6 +37,7 @@ import 'reading_home_screen.dart';
 import 'watch_home_screen.dart';
 import 'watch_player_screen.dart';
 import 'watch_quicklearn_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class PpSavedHubScreen extends StatelessWidget {
   const PpSavedHubScreen({super.key});
@@ -196,7 +197,7 @@ class PpSavedHubScreen extends StatelessWidget {
         _pad(Text(sub, style: ppBody(12.5, color: ppMuted))),
         const SizedBox(height: 12),
         if (count == 0)
-          _pad(GestureDetector(
+          _pad(PvPress(child: GestureDetector(
             onTap: onEmptyCta,
             behavior: HitTestBehavior.opaque,
             child: Container(
@@ -217,7 +218,7 @@ class PpSavedHubScreen extends StatelessWidget {
                     size: 14, color: ppPurple),
               ]),
             ),
-          ))
+          )))
         else
           ...children,
       ];
@@ -227,7 +228,7 @@ class PpSavedHubScreen extends StatelessWidget {
           {required VoidCallback onUnsave}) =>
       Padding(
         padding: const EdgeInsets.only(bottom: 10),
-        child: _pad(GestureDetector(
+        child: _pad(PvPress(child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -253,17 +254,17 @@ class PpSavedHubScreen extends StatelessWidget {
               ),
               // Unsaving from the list it is IN. Anything else means going back
               // to wherever it came from to undo a bookmark, which nobody does.
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: onUnsave,
                 behavior: HitTestBehavior.opaque,
                 child: const Padding(
                   padding: EdgeInsets.all(4),
                   child: Icon(Icons.bookmark_rounded, size: 18, color: ppPurple),
                 ),
-              ),
+              )),
             ]),
           ),
-        )),
+        ))),
       );
 }
 

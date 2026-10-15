@@ -52,6 +52,7 @@ import '../../services/saved_store.dart';
 import 'pp_watch_data.dart';
 import 'watch_player_screen.dart';
 import 'watch_quicklearn_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// Show the pop-up on EVERY app open instead of once a day.
 ///
@@ -336,7 +337,7 @@ class _DailyTipSheetState extends State<_DailyTipSheet> {
   /// Open-by-default would make this a lecture at 6am; buried entirely would
   /// make it decoration. A closed row with the words "why this works" is the
   /// honest middle — the evidence is one tap away for whoever wants it.
-  Widget _why(DailyTip tip) => GestureDetector(
+  Widget _why(DailyTip tip) => PvPress(child: GestureDetector(
         onTap: () => setState(() => _whyOpen = !_whyOpen),
         behavior: HitTestBehavior.opaque,
         child: AnimatedContainer(
@@ -378,7 +379,7 @@ class _DailyTipSheetState extends State<_DailyTipSheet> {
             ],
           ]),
         ),
-      );
+      ));
 
   /// The watch-day body: a thumbnail that plays, the title, who it is from.
   ///
@@ -388,7 +389,7 @@ class _DailyTipSheetState extends State<_DailyTipSheet> {
   Widget _videoBody(BuildContext context, WatchVideo v) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => _openVideo(context, v),
             behavior: HitTestBehavior.opaque,
             child: ClipRRect(
@@ -415,7 +416,7 @@ class _DailyTipSheetState extends State<_DailyTipSheet> {
                 ),
               ),
             ),
-          ),
+          )),
           const SizedBox(height: 14),
           Text(v.title, style: ppFraunces(24, h: 1.12)),
           const SizedBox(height: 8),
@@ -436,7 +437,7 @@ class _DailyTipSheetState extends State<_DailyTipSheet> {
           bool isVideo, String id, bool saved) =>
       Row(children: [
         Expanded(
-          child: GestureDetector(
+          child: PvPress(child: GestureDetector(
             onTap: () => isVideo
                 ? WatchStore.instance.toggleSave(video.id)
                 : DailyTipStore.instance.toggleSaved(id),
@@ -463,11 +464,11 @@ class _DailyTipSheetState extends State<_DailyTipSheet> {
                         w: FontWeight.w800)),
               ]),
             ),
-          ),
+          )),
         ),
         const SizedBox(width: 10),
         Expanded(
-          child: GestureDetector(
+          child: PvPress(child: GestureDetector(
             // Watch-day: the second button PLAYS rather than shares. Sharing a
             // video out of a pop-up before having watched it is not something
             // anybody does, and the sheet only has room for two.
@@ -494,11 +495,11 @@ class _DailyTipSheetState extends State<_DailyTipSheet> {
                         w: FontWeight.w800)),
               ]),
             ),
-          ),
+          )),
         ),
       ]);
 
-  Widget _dismiss(BuildContext context) => GestureDetector(
+  Widget _dismiss(BuildContext context) => PvPress(child: GestureDetector(
         onTap: () => Navigator.of(context).pop(),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -510,5 +511,5 @@ class _DailyTipSheetState extends State<_DailyTipSheet> {
           ),
           child: Text('Got it', style: ppJakarta(13.5, color: ppPurple)),
         ),
-      );
+      ));
 }

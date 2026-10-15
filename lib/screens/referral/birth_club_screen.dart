@@ -24,6 +24,7 @@ import '../../referral/referral_notifications.dart';
 import 'reward_celebration.dart';
 import 'invite_friends_screen.dart';
 import '../../localization/app_language.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// The ladder. Reached by inviting mothers who actually join.
 class ClubMilestone {
@@ -226,7 +227,7 @@ class _BirthClubScreenState extends State<BirthClubScreen> {
         const SizedBox(height: 12),
         for (final m in kClubMilestones) _milestone(m),
         const SizedBox(height: 18),
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () {
             ReferralAnalytics.birthClubJoined();
             Navigator.of(context).push(MaterialPageRoute<void>(
@@ -241,7 +242,7 @@ class _BirthClubScreenState extends State<BirthClubScreen> {
             child: Text('Invite mothers due in ${_monthName(key)}',
                 style: ppJakarta(14, color: Colors.white)),
           ),
-        ),
+        )),
       ];
 
   static String _monthName(String key) =>

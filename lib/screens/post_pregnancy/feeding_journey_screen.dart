@@ -33,6 +33,7 @@ import 'pp_nappy_screen.dart';
 import 'pp_pump_screen.dart';
 import 'pp_search.dart' show openPpAskVeda;
 import 'pp_tools_kit.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// ⚠️ THE SHARED TOOL SHELL (2026-10-07, parenting gap pass). The journey was
 /// drawn in the 2026-08 parenting kit (a purple number on a gradient card, a
@@ -349,11 +350,11 @@ class _FeedingJourneyScreenState extends State<FeedingJourneyScreen> {
             ]),
           ),
           const SizedBox(width: 8),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => ppConfirmRemove(context, 'Remove this feed?', () => _store.remove(f.id)),
             behavior: HitTestBehavior.opaque,
             child: const Padding(padding: EdgeInsets.only(left: 4), child: Icon(Icons.delete_outline_rounded, size: 20, color: ppMuted)),
-          ),
+          )),
         ]),
       );
 

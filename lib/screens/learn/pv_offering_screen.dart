@@ -41,6 +41,7 @@ import 'pv_learn_chrome.dart';
 import 'pv_learn_flow.dart';
 import 'pv_lesson_screen.dart';
 import 'pv_offering_content.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 void pvOpenOffering(BuildContext context, PvOfferingView v) {
   // A bundled parenting programme with no lessons is not sold (gap analysis
@@ -658,7 +659,7 @@ class _PvOfferingScreenState extends State<PvOfferingScreen> {
             style: pvManrope(fontSize: 14.5, height: 1.55, color: p.ink1),
           ),
           if (long)
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: () => setState(() => _aboutOpen = !_aboutOpen),
               child: Padding(
                 padding: const EdgeInsets.only(top: 6),
@@ -671,7 +672,7 @@ class _PvOfferingScreenState extends State<PvOfferingScreen> {
                   ),
                 ),
               ),
-            ),
+            )),
         ],
       ),
     );

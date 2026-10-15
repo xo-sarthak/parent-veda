@@ -27,6 +27,7 @@ import 'weekly_card_stack_screen.dart';
 import '../theme/pv_fonts.dart';
 import 'pregnancy/preg_chrome.dart';
 import 'products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
+import '../widgets/pv_feedback.dart' show PvPress;
 
 // ⚠️ ONE PARENTVEDA (2026-09-30, the pregnancy restyle): the serif page title
 // under a back arrow, the header as a white card with the hairline (no
@@ -248,7 +249,7 @@ class _JourneyMapScreenState extends State<JourneyMapScreen>
                               height: 1.4,
                               color: pvStorePalette.ink2)),
                       const SizedBox(height: 6),
-                      GestureDetector(
+                      PvPress(child: GestureDetector(
                         onTap: _showCatchUp,
                         behavior: HitTestBehavior.opaque,
                         child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -260,7 +261,7 @@ class _JourneyMapScreenState extends State<JourneyMapScreen>
                           Icon(Icons.chevron_right_rounded,
                               size: 16, color: pvStorePalette.ink2),
                         ]),
-                      ),
+                      )),
                     ]),
               ),
             ),
@@ -557,7 +558,7 @@ class _JourneyMapScreenState extends State<JourneyMapScreen>
       final auraAlpha = unlocked ? 0.40 : 0.12;
       final pingAlpha = unlocked ? 0.55 : 0.18;
       final pingScale = unlocked ? 0.95 : 0.42;
-      return GestureDetector(
+      return PvPress(child: GestureDetector(
         onTap: () => _onNodeTap(node),
         behavior: HitTestBehavior.opaque,
         child: AnimatedBuilder(
@@ -600,7 +601,7 @@ class _JourneyMapScreenState extends State<JourneyMapScreen>
           },
           child: disc,
         ),
-      );
+      ));
     } else if (node.isWeekCheckpoint) {
       final week = node.weekLabel!;
       final state = _weekState(week);

@@ -29,6 +29,7 @@ import 'brand_sampling.dart';
 import 'brand_store.dart';
 import '../theme/pv_fonts.dart';
 import '../localization/app_language.dart';
+import '../widgets/pv_feedback.dart' show PvPress;
 
 const _bg = Color(0xFFFBF9FE);
 const _ink = Color(0xFF2F2C30);
@@ -228,7 +229,7 @@ class _SamplingScreenState extends State<SamplingScreen> {
         ),
         const SizedBox(height: 12),
         // Never pre-ticked. An opt-in that starts ticked is not an opt-in.
-        GestureDetector(
+        PvPress(child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: () => setState(() => _consent = !_consent),
           child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -246,7 +247,7 @@ class _SamplingScreenState extends State<SamplingScreen> {
               ),
             ),
           ]),
-        ),
+        )),
         const SizedBox(height: 18),
         _cta(brand),
       ];
@@ -315,7 +316,7 @@ class _SamplingScreenState extends State<SamplingScreen> {
             for (var i = 1; i <= 5; i++)
               Padding(
                 padding: const EdgeInsets.only(right: 8),
-                child: GestureDetector(
+                child: PvPress(child: GestureDetector(
                   onTap: () => setState(() => _rating = i),
                   behavior: HitTestBehavior.opaque,
                   child: Icon(
@@ -327,7 +328,7 @@ class _SamplingScreenState extends State<SamplingScreen> {
                         ? const Color(0xFFE0A93B)
                         : const Color(0xFFC9C2D4),
                   ),
-                ),
+                )),
               ),
           ],
         ),

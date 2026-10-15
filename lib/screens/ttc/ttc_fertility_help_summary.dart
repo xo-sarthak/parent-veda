@@ -32,6 +32,7 @@ import 'ttc_fertility_help_screen.dart' show FertilityHelpButton;
 import 'ttc_strings.dart';
 import 'ttc_surface_router.dart';
 import 'ttc_common.dart' show ttcTitleInk, TtcSectionHeading;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class TtcFertilityHelpSummaryScreen extends StatelessWidget {
   const TtcFertilityHelpSummaryScreen({super.key});
@@ -61,7 +62,7 @@ class TtcFertilityHelpSummaryScreen extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.fromLTRB(8, 4, 16, 4),
                 child: Row(children: [
-                  GestureDetector(
+                  PvPress(child: GestureDetector(
                     onTap: () => Navigator.of(context).maybePop(),
                     behavior: HitTestBehavior.opaque,
                     child: Padding(
@@ -69,7 +70,7 @@ class TtcFertilityHelpSummaryScreen extends StatelessWidget {
                       child: Icon(Icons.arrow_back_rounded,
                           size: 21, color: p.ink1),
                     ),
-                  ),
+                  )),
                   Expanded(
                     child: Text(
                         t('FOR YOUR APPOINTMENT', 'APPOINTMENT KE LIYE'),
@@ -79,7 +80,7 @@ class TtcFertilityHelpSummaryScreen extends StatelessWidget {
                             letterSpacing: 1.1,
                             color: p.ink3)),
                   ),
-                  GestureDetector(
+                  PvPress(child: GestureDetector(
                     onTap: () => _copy(context, c, lang, t),
                     behavior: HitTestBehavior.opaque,
                     child: Padding(
@@ -87,7 +88,7 @@ class TtcFertilityHelpSummaryScreen extends StatelessWidget {
                       child:
                           Icon(Icons.copy_rounded, size: 19, color: p.ink2),
                     ),
-                  ),
+                  )),
                 ]),
               ),
               Expanded(

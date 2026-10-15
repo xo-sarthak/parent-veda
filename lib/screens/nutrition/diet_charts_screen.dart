@@ -33,6 +33,7 @@ import '../../services/pregnancy_controller.dart';
 import '../../theme/pv_fonts.dart';
 import '../v2/v2_palette.dart';
 import 'door/diet_chart_plan_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class DietChartsScreen extends StatefulWidget {
   const DietChartsScreen({super.key, required this.pregnancy});
@@ -231,7 +232,7 @@ class _DietChartsScreenState extends State<DietChartsScreen> {
                                   height: 1.5,
                                   color: p.ink2)),
                           const SizedBox(height: 12),
-                          GestureDetector(
+                          PvPress(child: GestureDetector(
                             onTap: () => setState(
                                 () => _filter = const ChartFilter()),
                             child: Text('Show everything',
@@ -239,7 +240,7 @@ class _DietChartsScreenState extends State<DietChartsScreen> {
                                     fontSize: 13,
                                     fontWeight: FontWeight.w800,
                                     color: p.ink1)),
-                          ),
+                          )),
                         ]),
                   )
                 else
@@ -311,7 +312,7 @@ class _YouAreHere extends StatelessWidget {
             ),
           ]),
           const SizedBox(height: 8),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: active ? onShowAll : onRestore,
             child: Text(
                 active
@@ -321,7 +322,7 @@ class _YouAreHere extends StatelessWidget {
                     fontSize: 12.5,
                     fontWeight: FontWeight.w800,
                     color: p.ink1)),
-          ),
+          )),
         ]),
       );
 }
@@ -351,7 +352,7 @@ class _AxisRow extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             child: Row(children: [
               for (final (text, selected, onTap) in chips) ...[
-                GestureDetector(
+                PvPress(child: GestureDetector(
                   onTap: onTap,
                   behavior: HitTestBehavior.opaque,
                   child: Container(
@@ -370,7 +371,7 @@ class _AxisRow extends StatelessWidget {
                                 selected ? FontWeight.w800 : FontWeight.w600,
                             color: selected ? p.ground : p.ink2)),
                   ),
-                ),
+                )),
                 const SizedBox(width: 8),
               ],
             ]),

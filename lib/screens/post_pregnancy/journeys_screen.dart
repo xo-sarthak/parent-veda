@@ -16,6 +16,7 @@ import '../../brand/presented_by.dart';
 import 'pp_common.dart';
 import 'provider_profile_screen.dart';
 import 'pp_journeys_data.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class JourneysScreen extends StatelessWidget {
   const JourneysScreen({super.key});
@@ -57,7 +58,7 @@ class JourneysScreen extends StatelessWidget {
     final started = store.hasStarted(j.id);
     final prog = store.progress(j);
 
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () => Navigator.of(context).push(
         MaterialPageRoute<void>(builder: (_) => JourneyDetailScreen(journey: j)),
@@ -105,7 +106,7 @@ class JourneysScreen extends StatelessWidget {
           ),
         ]),
       ),
-    );
+    ));
   }
 }
 
@@ -225,14 +226,14 @@ class JourneyDetailScreen extends StatelessWidget {
     );
 
     if (e == null) return card;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
         settings: RouteSettings(name: 'pp/expert/${e.id}'),
         builder: (_) => ProviderProfileScreen(expert: e),
       )),
       behavior: HitTestBehavior.opaque,
       child: card,
-    );
+    ));
   }
 
   Widget _startButton(BuildContext context) => SizedBox(
@@ -272,7 +273,7 @@ class JourneyDetailScreen extends StatelessWidget {
     final store = JourneyStore.instance;
     final done = store.isDone(journey.id, d.day);
     final isToday = started && d.day == today;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       behavior: HitTestBehavior.opaque,
       // Nothing is locked. A parent can read ahead, or go back, or dip in at
       // day 20 — the day number is a suggestion, never a gate.
@@ -306,7 +307,7 @@ class JourneyDetailScreen extends StatelessWidget {
           if (isToday) ppEyebrow('Today', color: ppPurple, spacing: 0.8),
         ]),
       ),
-    );
+    ));
   }
 }
 

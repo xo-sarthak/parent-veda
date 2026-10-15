@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'pp_attachments.dart';
 import 'pp_common.dart';
 import 'pp_documents_data.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class BabyDocumentsScreen extends StatefulWidget {
   const BabyDocumentsScreen({super.key});
@@ -81,7 +82,7 @@ class _BabyDocumentsScreenState extends State<BabyDocumentsScreen> {
   // the same add sheet, pre-selected to the right category with a suggested
   // title, so a parent lands straight in the attachment flow.
   Widget _quickAdd(IconData icon, String label, VoidCallback onTap) => Expanded(
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -99,10 +100,10 @@ class _BabyDocumentsScreenState extends State<BabyDocumentsScreen> {
               Text(label, style: ppJakarta(13.5), textAlign: TextAlign.center, maxLines: 2, overflow: TextOverflow.ellipsis),
             ]),
           ),
-        ),
+        )),
       );
 
-  Widget _addButton(String label, VoidCallback onTap) => GestureDetector(
+  Widget _addButton(String label, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -115,7 +116,7 @@ class _BabyDocumentsScreenState extends State<BabyDocumentsScreen> {
             Text(label, style: ppBody(13, color: ppPurple, w: FontWeight.w700)),
           ]),
         ),
-      );
+      ));
 
   Widget _empty(String msg) => Container(
         padding: const EdgeInsets.all(20),
@@ -123,7 +124,7 @@ class _BabyDocumentsScreenState extends State<BabyDocumentsScreen> {
         child: Text(msg, style: ppBody(13.5, color: ppMuted, h: 1.5)),
       );
 
-  Widget _docCard(BabyDocument d, int i) => GestureDetector(
+  Widget _docCard(BabyDocument d, int i) => PvPress(child: GestureDetector(
         onTap: () => _viewSheet(d, i),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -146,11 +147,11 @@ class _BabyDocumentsScreenState extends State<BabyDocumentsScreen> {
                   Text(d.date, style: ppBody(11, color: ppMuted)),
                 ]),
               ])),
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: () => _confirmDelete('Delete this document?', () => _store.removeDocument(i)),
                 behavior: HitTestBehavior.opaque,
                 child: const Padding(padding: EdgeInsets.only(left: 6), child: Icon(Icons.delete_outline_rounded, size: 20, color: ppMuted)),
-              ),
+              )),
             ]),
             if (d.attachments.isNotEmpty) ...[
               const SizedBox(height: 12),
@@ -158,7 +159,7 @@ class _BabyDocumentsScreenState extends State<BabyDocumentsScreen> {
             ],
           ]),
         ),
-      );
+      ));
 
   // ---- view a saved document (details + attachment chips) -----------------
   void _viewSheet(BabyDocument d, int index) {
@@ -176,7 +177,7 @@ class _BabyDocumentsScreenState extends State<BabyDocumentsScreen> {
             const SizedBox(height: 16),
             Row(children: [
               Expanded(child: Text(d.title, style: ppJakarta(18))),
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: () {
                   Navigator.of(ctx).pop();
                   _editSheet(d, index);
@@ -187,7 +188,7 @@ class _BabyDocumentsScreenState extends State<BabyDocumentsScreen> {
                   const SizedBox(width: 4),
                   Text('Edit', style: ppBody(12.5, color: ppPurple, w: FontWeight.w700)),
                 ]),
-              ),
+              )),
             ]),
             const SizedBox(height: 8),
             Row(children: [
@@ -244,21 +245,21 @@ class _BabyDocumentsScreenState extends State<BabyDocumentsScreen> {
                 Row(children: [
                   Expanded(child: Text(existing != null ? 'Edit document' : (presetTitle != null ? 'Add $presetTitle' : 'Add document'), style: ppJakarta(18))),
                   if (index != null)
-                    GestureDetector(
+                    PvPress(child: GestureDetector(
                       onTap: () {
                         _store.removeDocument(index);
                         Navigator.of(ctx).pop();
                       },
                       behavior: HitTestBehavior.opaque,
                       child: const Icon(Icons.delete_outline_rounded, size: 22, color: ppCoral),
-                    ),
+                    )),
                 ]),
                 const SizedBox(height: 16),
                 _tf(title, 'Document title (e.g. Passport)'),
                 _label('Category'),
                 Wrap(spacing: 8, runSpacing: 8, children: [
                   for (final c in kBabyDocCategories)
-                    GestureDetector(
+                    PvPress(child: GestureDetector(
                       onTap: () => setSheet(() => category = c),
                       behavior: HitTestBehavior.opaque,
                       child: Container(
@@ -270,13 +271,13 @@ class _BabyDocumentsScreenState extends State<BabyDocumentsScreen> {
                         ),
                         child: Text(c, style: ppBody(12, color: category == c ? Colors.white : ppInk, w: FontWeight.w700)),
                       ),
-                    ),
+                    )),
                 ]),
                 const SizedBox(height: 16),
                 _tf(notes, 'Notes (optional)', maxLines: 3),
                 _attachRow(atts, setSheet),
                 const SizedBox(height: 12),
-                GestureDetector(
+                PvPress(child: GestureDetector(
                   onTap: () {
                     if (title.text.trim().isEmpty) return;
                     final d = BabyDocument(
@@ -297,7 +298,7 @@ class _BabyDocumentsScreenState extends State<BabyDocumentsScreen> {
                     decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(14)),
                     child: Text('Save', style: ppBody(15, color: Colors.white, w: FontWeight.w700)),
                   ),
-                ),
+                )),
               ]),
             ),
           ),
@@ -320,7 +321,7 @@ class _BabyDocumentsScreenState extends State<BabyDocumentsScreen> {
             const SizedBox(height: 18),
             Row(children: [
               Expanded(
-                child: GestureDetector(
+                child: PvPress(child: GestureDetector(
                   onTap: () => Navigator.of(ctx).pop(),
                   behavior: HitTestBehavior.opaque,
                   child: Container(
@@ -329,11 +330,11 @@ class _BabyDocumentsScreenState extends State<BabyDocumentsScreen> {
                     decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14), border: Border.all(color: ppLine)),
                     child: Text('Cancel', style: ppBody(14, color: ppInk, w: FontWeight.w700)),
                   ),
-                ),
+                )),
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: GestureDetector(
+                child: PvPress(child: GestureDetector(
                   onTap: () {
                     onConfirm();
                     Navigator.of(ctx).pop();
@@ -345,7 +346,7 @@ class _BabyDocumentsScreenState extends State<BabyDocumentsScreen> {
                     decoration: BoxDecoration(color: ppCoral, borderRadius: BorderRadius.circular(14)),
                     child: Text('Delete', style: ppBody(14, color: Colors.white, w: FontWeight.w700)),
                   ),
-                ),
+                )),
               ),
             ]),
           ]),
@@ -381,7 +382,7 @@ class _BabyDocumentsScreenState extends State<BabyDocumentsScreen> {
         padding: const EdgeInsets.only(bottom: 14),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           _label('Attachments'),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () async {
               final picked = await showAttachmentPicker(context);
               if (picked.isEmpty) return;
@@ -401,7 +402,7 @@ class _BabyDocumentsScreenState extends State<BabyDocumentsScreen> {
                 Text('Add attachment', style: ppBody(13, color: ppPurple, w: FontWeight.w700)),
               ]),
             ),
-          ),
+          )),
           if (atts.isNotEmpty) ...[
             const SizedBox(height: 10),
             attachmentChips(atts, onRemove: (i) => setSheet(() => atts.removeAt(i))),

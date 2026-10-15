@@ -39,6 +39,7 @@ import '../../services/garbh_store.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../theme/pv_fonts.dart';
 import 'games/game_chrome.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 export 'garbh_nonogram.dart' show LogicGame;
 export 'garbh_sudoku.dart' show SudokuGame;
@@ -305,7 +306,7 @@ class _WordSearchGameState extends State<WordSearchGame> {
     final found = _foundCells.contains(i);
     final live = _drag.contains(i) || _first == i;
     return Expanded(
-      child: GestureDetector(
+      child: PvPress(child: GestureDetector(
         onTap: () => _tap(i),
         child: Container(
           margin: const EdgeInsets.all(1.5),
@@ -327,7 +328,7 @@ class _WordSearchGameState extends State<WordSearchGame> {
                 color: found ? Colors.white : kGameInk),
           ),
         ),
-      ),
+      )),
     );
   }
 }
@@ -504,7 +505,7 @@ class _MemoryMatchGameState extends State<MemoryMatchGame> {
               itemBuilder: (context, i) {
                 final up = _faceUp(i);
                 final matched = _matched.contains(i);
-                return GestureDetector(
+                return PvPress(child: GestureDetector(
                   onTap: () => _tap(i),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 180),
@@ -526,7 +527,7 @@ class _MemoryMatchGameState extends State<MemoryMatchGame> {
                             color: matched ? kGameAccentDeep : kGameInk)
                         : null,
                   ),
-                );
+                ));
               },
             ),
           ),

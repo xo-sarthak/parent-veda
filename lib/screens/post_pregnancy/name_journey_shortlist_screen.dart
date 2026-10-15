@@ -24,6 +24,7 @@ import 'name_journey_detail_screen.dart';
 import 'pp_common.dart';
 import 'pp_names_data.dart';
 import 'pp_names_v2_data.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class NameJourneyShortlistScreen extends StatelessWidget {
   const NameJourneyShortlistScreen({super.key});
@@ -130,7 +131,7 @@ class NameJourneyShortlistScreen extends StatelessWidget {
                   _pad(Column(children: [for (final n in names) _nameRow(context, n, crowned: n.name == store.crowned)])),
                   const SizedBox(height: 18),
                   if (names.length >= 2)
-                    _pad(GestureDetector(
+                    _pad(PvPress(child: GestureDetector(
                       onTap: () => _push(context, const NameCompareScreen()),
                       behavior: HitTestBehavior.opaque,
                       child: Container(
@@ -143,7 +144,7 @@ class NameJourneyShortlistScreen extends StatelessWidget {
                           Text('Compare these names', style: ppBody(14, color: Colors.white, w: FontWeight.w700)),
                         ]),
                       ),
-                    )),
+                    ))),
                 ],
               ],
             );
@@ -165,7 +166,7 @@ class NameJourneyShortlistScreen extends StatelessWidget {
         ]),
       );
 
-  Widget _nameRow(BuildContext context, BabyName n, {required bool crowned}) => GestureDetector(
+  Widget _nameRow(BuildContext context, BabyName n, {required bool crowned}) => PvPress(child: GestureDetector(
         onTap: () => _push(context, NameJourneyDetailScreen(name: n.name)),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -196,7 +197,7 @@ class NameJourneyShortlistScreen extends StatelessWidget {
             const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
           ]),
         ),
-      );
+      ));
 }
 
 /// A name row's well: its first letter in the naming tool's tint (hue 268, the
@@ -513,7 +514,7 @@ class NameChosenScreen extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text('Write why you chose ${n.name} - what it means to your family, who suggested it, the memory behind it. It becomes Chapter One of ${n.name}\'s journal.', style: ppBody(13.5, h: 1.6)),
                 const SizedBox(height: 18),
-                GestureDetector(
+                PvPress(child: GestureDetector(
                   onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const WriteStoryScreen())),
                   behavior: HitTestBehavior.opaque,
                   child: Container(
@@ -525,7 +526,7 @@ class NameChosenScreen extends StatelessWidget {
                       Flexible(child: Text("Begin ${n.name}'s story", maxLines: 1, overflow: TextOverflow.ellipsis, style: ppBody(14, color: Colors.white, w: FontWeight.w700))),
                     ]),
                   ),
-                ),
+                )),
               ]),
             )),
 

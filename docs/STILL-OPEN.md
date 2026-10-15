@@ -10154,7 +10154,7 @@ From the parenting gap analysis (theAsianparent and What to Expect vs ParentVeda
 - 83.7 Parenting Yoga cards show "Live group" with no schedule (shared widget). Decide.
 - 83.8 8 new superfood recipes have no chosen photo (`nut_r_<id>` in `read_images.dart`).
 - 83.9 DONE 2026-10-10: sign-out cancels every scheduled notification and mutes all scheduling paths until she signs in again (NotificationService.silenceForSignOut / _muted); reminders stay saved and re-arm via SyncRegistry on sign-in.
-- 83.10 Tap feedback second pass: ~1,400 GestureDetector taps without feedback, mostly older parenting screens (scan + wrap script in the 10-10 scratchpad).
+- 83.10 DONE 2026-10-15: tap feedback second pass. 1,338 plain taps wrapped in PvPress by a parser-driven pass (729 parenting, 180 TTC, 429 elsewhere); 1,372 in all. PvPress gained two rules (a scroll lets go past the touch slop; only the innermost press settles). 75 left alone on purpose: 40 onTap null by a condition, 15 drag / long-press / tap-down, 10 no onTap, 7 full-screen layers, 3 keyboard dismiss. Held by test/tap_feedback_guard_test.dart and test/pv_feedback_test.dart. DESIGN-SYSTEM 4.0c. OWED, optional: the 40 conditional ones could take PvPress(enabled: <condition>, ...) by hand.
 - 83.11 Ask Veda: answer reveal is paced, not streamed; real streaming needs a service endpoint. Parenting Ask Veda palette was moved to pregnancy's white/ink (beyond brief) — keep or revert.
 - 83.12 Phone OTP edge functions (`phone-otp-send`, `phone-otp-verify`) still undeployed; need MSG91 secrets. All other functions deployed (checked 10-10).
 - 83.13 Daily insights tab images: to discuss.
@@ -10217,7 +10217,7 @@ the phase map's page; the "A new stage" message.
   they show their name, age and "This phase's guide is being written" (`kPhaseGuideComing`). Was:
   the authored AAP text. ONE EXCEPTION, kept on purpose: the authored "When to call the doctor"
   lines stay on 16–20, so a child of 19 months to 5 years never loses the route to a doctor. The
-  doc's own doctor lines replace them when it lands. The user to confirm.
+  doc's own doctor lines replace them when it lands. CONFIRMED by the user 2026-10-14.
 - **Leap films retired 2026-10-14** (the user: new phase films to come). "leap4brain" and
   "Inside the fussy leaps" are commented out in `pp_watch_data.dart`, with every link to them
   (activities, food, reading, reco), because `watchVideoById` falls back to the FIRST film on a

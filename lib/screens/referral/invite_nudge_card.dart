@@ -20,6 +20,7 @@ import '../../referral/referral_store.dart';
 import '../post_pregnancy/pp_common.dart';
 import 'invite_friends_screen.dart';
 import '../../localization/app_language.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 enum InviteNudgeShape { banner, row }
 
@@ -71,7 +72,7 @@ class _InviteNudgeCardState extends State<InviteNudgeCard> {
     );
   }
 
-  Widget _banner(String reward) => GestureDetector(
+  Widget _banner(String reward) => PvPress(child: GestureDetector(
         onTap: _open,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -101,9 +102,9 @@ class _InviteNudgeCardState extends State<InviteNudgeCard> {
             const Icon(Icons.arrow_forward_rounded, size: 18, color: Colors.white),
           ]),
         ),
-      );
+      ));
 
-  Widget _row(String reward) => GestureDetector(
+  Widget _row(String reward) => PvPress(child: GestureDetector(
         onTap: _open,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -136,5 +137,5 @@ class _InviteNudgeCardState extends State<InviteNudgeCard> {
             const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
           ]),
         ),
-      );
+      ));
 }

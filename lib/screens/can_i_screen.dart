@@ -21,6 +21,7 @@ import '../theme/app_theme.dart';
 import 'can_i/can_i_answer.dart' as door;
 import 'can_i/can_i_door.dart';
 import 'tools/ask_veda_screen.dart';
+import '../widgets/pv_feedback.dart' show PvPress;
 
 // ---------------------------------------------------------------------------
 //  Verdict + category visual language
@@ -245,7 +246,7 @@ class _SearchBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -272,7 +273,7 @@ class _SearchBar extends StatelessWidget {
           ),
         ]),
       ),
-    );
+    ));
   }
 }
 
@@ -284,7 +285,7 @@ class _PopularChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -300,7 +301,7 @@ class _PopularChip extends StatelessWidget {
               style: text.labelLarge?.copyWith(fontWeight: FontWeight.w700)),
         ]),
       ),
-    );
+    ));
   }
 }
 
@@ -318,7 +319,7 @@ class _CategoryTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
@@ -360,7 +361,7 @@ class _CategoryTile extends StatelessWidget {
           ],
         ),
       ),
-    );
+    ));
   }
 }
 
@@ -423,7 +424,7 @@ class _EntryRow extends StatelessWidget {
     final text = Theme.of(context).textTheme;
     final s = S(lang);
     final v = _verdictVisual(entry.verdict);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
@@ -446,7 +447,7 @@ class _EntryRow extends StatelessWidget {
           const Icon(Icons.chevron_right_rounded, color: AppTheme.neutral400),
         ]),
       ),
-    );
+    ));
   }
 }
 

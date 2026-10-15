@@ -16,6 +16,7 @@ import 'package:flutter/material.dart';
 import 'pp_common.dart';
 import 'pp_recipes_data.dart';
 import 'recipe_page_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 const Color _clayA = Color(0xFFF6E9E2);
 const Color _clayB = Color(0xFFFBF3EE);
@@ -65,7 +66,7 @@ class PpRecipeRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _openRecipe(context, recipe),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -106,7 +107,7 @@ class PpRecipeRow extends StatelessWidget {
           ),
         ]),
       ),
-    );
+    ));
   }
 }
 
@@ -117,7 +118,7 @@ class PpRecipeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _openRecipe(context, recipe),
       behavior: HitTestBehavior.opaque,
       child: SizedBox(
@@ -178,6 +179,6 @@ class PpRecipeCard extends StatelessWidget {
           ]),
         ),
       ),
-    );
+    ));
   }
 }

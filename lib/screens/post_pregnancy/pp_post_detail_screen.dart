@@ -15,6 +15,7 @@ import 'community_screen.dart';
 import 'pp_common.dart';
 import 'pp_community_detail_screen.dart';
 import 'pp_opening_soon.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class PpPostDetailScreen extends StatefulWidget {
   const PpPostDetailScreen({super.key, required this.post});
@@ -126,7 +127,7 @@ class _PpPostDetailScreenState extends State<PpPostDetailScreen> {
                       ),
                     ),
                     const SizedBox(width: 10),
-                    GestureDetector(
+                    PvPress(child: GestureDetector(
                       onTap: _send,
                       behavior: HitTestBehavior.opaque,
                       child: Container(
@@ -138,7 +139,7 @@ class _PpPostDetailScreenState extends State<PpPostDetailScreen> {
                         child: const Icon(Icons.arrow_upward_rounded,
                             size: 20, color: Colors.white),
                       ),
-                    ),
+                    )),
                   ]),
                 ),
                 if (related.isNotEmpty) ...[
@@ -147,7 +148,7 @@ class _PpPostDetailScreenState extends State<PpPostDetailScreen> {
                     child: Text('Related discussions', style: ppJakarta(17)),
                   ),
                   for (final p in related)
-                    GestureDetector(
+                    PvPress(child: GestureDetector(
                       onTap: () => ppPush(context, PpPostDetailScreen(post: p)),
                       behavior: HitTestBehavior.opaque,
                       child: Padding(
@@ -167,7 +168,7 @@ class _PpPostDetailScreenState extends State<PpPostDetailScreen> {
                               size: 18, color: ppMuted),
                         ]),
                       ),
-                    ),
+                    )),
                 ],
                 if (suggested.isNotEmpty) ...[
                   Padding(
@@ -175,7 +176,7 @@ class _PpPostDetailScreenState extends State<PpPostDetailScreen> {
                     child: Text('Rooms you might like', style: ppJakarta(17)),
                   ),
                   for (final c in suggested)
-                    GestureDetector(
+                    PvPress(child: GestureDetector(
                       onTap: () =>
                           ppPush(context, PpCommunityDetailScreen(community: c)),
                       behavior: HitTestBehavior.opaque,
@@ -207,7 +208,7 @@ class _PpPostDetailScreenState extends State<PpPostDetailScreen> {
                                       style: ppBody(11.5, color: ppMuted)),
                                 ]),
                           ),
-                          GestureDetector(
+                          PvPress(child: GestureDetector(
                             onTap: () => store.toggleJoin(c.id),
                             behavior: HitTestBehavior.opaque,
                             child: Container(
@@ -229,10 +230,10 @@ class _PpPostDetailScreenState extends State<PpPostDetailScreen> {
                                           : Colors.white,
                                       w: FontWeight.w800)),
                             ),
-                          ),
+                          )),
                         ]),
                       ),
-                    ),
+                    )),
                 ],
               ],
             );

@@ -28,6 +28,7 @@ import 'pp_growth_data.dart';
 import 'pp_health_data.dart';
 import 'pp_vaccine_data.dart';
 import 'vax_tracker_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 // Redesigned tracker (vax_tracker_screen) is the live entry now; the old
 // VaccinationScreen is kept for revert.
 // import 'vaccination_screen.dart';
@@ -188,7 +189,7 @@ class HealthHomeScreen extends StatelessWidget {
       for (final t in tools) ...[
         if (t != tools.first) const SizedBox(width: 10),
         Expanded(
-          child: GestureDetector(
+          child: PvPress(child: GestureDetector(
             onTap: t.$4,
             behavior: HitTestBehavior.opaque,
             child: Column(children: [
@@ -205,7 +206,7 @@ class HealthHomeScreen extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: ppBody(10.5, color: ppInk, w: FontWeight.w700, h: 1.25)),
             ]),
-          ),
+          )),
         ),
       ],
     ]));
@@ -260,7 +261,7 @@ class HealthHomeScreen extends StatelessWidget {
           // from - "overall good" is worthless if a parent cannot see what it
           // is reading, and worse than worthless if she assumes we know more
           // than we do.
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => _explainSnapshot(context),
             behavior: HitTestBehavior.opaque,
             child: Column(children: [
@@ -281,7 +282,7 @@ class HealthHomeScreen extends StatelessWidget {
                 ),
               ]),
             ]),
-          ),
+          )),
           const SizedBox(height: 14),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -411,7 +412,7 @@ class HealthHomeScreen extends StatelessWidget {
       );
 
   // ---- timeline row -------------------------------------------------------
-  Widget _timelineRow(BuildContext context, HealthEvent e) => GestureDetector(
+  Widget _timelineRow(BuildContext context, HealthEvent e) => PvPress(child: GestureDetector(
         onTap: () => _push(context, const HealthTimelineScreen()),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -434,7 +435,7 @@ class HealthHomeScreen extends StatelessWidget {
             ),
           ]),
         ),
-      );
+      ));
 
   // ---- growth -------------------------------------------------------------
   /// Her own latest measurement. Was `kGrowth.last` + `kGrowthInterpretation`,
@@ -443,7 +444,7 @@ class HealthHomeScreen extends StatelessWidget {
     final store = GrowthStore.instance;
     final child = ChildProfileStore.instance;
     final pct = store.latestPercentilePhrase(GrowthMetric.weight);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _push(context, const GrowthJourneyScreen()),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -460,7 +461,7 @@ class HealthHomeScreen extends StatelessWidget {
           Text(child.growthNote, style: ppBody(13, h: 1.5), maxLines: 3, overflow: TextOverflow.ellipsis),
         ]),
       ),
-    );
+    ));
   }
 
   static String _trim(double v) =>
@@ -478,7 +479,7 @@ class HealthHomeScreen extends StatelessWidget {
   /// feature exists. See docs/PERSONALIZATION.md section 3.
   Widget _notEnteredYet(BuildContext context, IconData icon, String title,
           String body, String cta, VoidCallback onTap) =>
-      GestureDetector(
+      PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -505,7 +506,7 @@ class HealthHomeScreen extends StatelessWidget {
             ]),
           ]),
         ),
-      );
+      ));
 
   Widget _vaxPointer(IconData icon, Color color, String text) => Row(children: [
         Icon(icon, size: 15, color: color),
@@ -565,7 +566,7 @@ class HealthHomeScreen extends StatelessWidget {
               'Next up: ${next.lead.shortName} · ${next.ageLabel}'),
         ],
           const SizedBox(height: 14),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => _push(context, const VaxTrackerScreen()),
             behavior: HitTestBehavior.opaque,
             child: Container(
@@ -578,7 +579,7 @@ class HealthHomeScreen extends StatelessWidget {
                 const Icon(Icons.arrow_forward, size: 15, color: ppPurple),
               ]),
             ),
-          ),
+          )),
         ]),
     );
   }
@@ -601,7 +602,7 @@ class HealthHomeScreen extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: Column(children: [
         for (int i = 0; i < rows.length; i++)
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: rows[i].$3,
             behavior: HitTestBehavior.opaque,
             child: Container(
@@ -614,7 +615,7 @@ class HealthHomeScreen extends StatelessWidget {
                 const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
               ]),
             ),
-          ),
+          )),
       ]),
     );
   }
@@ -666,7 +667,7 @@ class HealthHomeScreen extends StatelessWidget {
               ]),
             ),
           const SizedBox(height: 4),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => openPpTab(context, 1),
             behavior: HitTestBehavior.opaque,
             child: Row(children: [
@@ -674,7 +675,7 @@ class HealthHomeScreen extends StatelessWidget {
               const SizedBox(width: 6),
               const Icon(Icons.arrow_forward, size: 14, color: ppPurple),
             ]),
-          ),
+          )),
           const SizedBox(height: 8),
           Text('Patterns from your records - general understanding, never a diagnosis.', style: ppBody(11, color: ppMuted, h: 1.5)),
         ]),
@@ -683,7 +684,7 @@ class HealthHomeScreen extends StatelessWidget {
   // ---- CTAs ---------------------------------------------------------------
   // RETIRED - these became the tools row. Kept for revert.
   // ignore: unused_element
-  Widget _bigCta(BuildContext context, IconData icon, Color accent, String title, String sub, VoidCallback onTap) => GestureDetector(
+  Widget _bigCta(BuildContext context, IconData icon, Color accent, String title, String sub, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -703,11 +704,11 @@ class HealthHomeScreen extends StatelessWidget {
             const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
           ]),
         ),
-      );
+      ));
 
   // RETIRED - the health guide is now the fourth tool. Kept for revert.
   // ignore: unused_element
-  Widget _healthGuideLink(BuildContext context) => GestureDetector(
+  Widget _healthGuideLink(BuildContext context) => PvPress(child: GestureDetector(
         onTap: () => _push(context, const HealthGuideScreen()),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -720,11 +721,11 @@ class HealthHomeScreen extends StatelessWidget {
             const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
           ]),
         ),
-      );
+      ));
 
   // ---- shared -------------------------------------------------------------
   Widget _sectionHeader(String title, [String? action, VoidCallback? onAction]) => Row(children: [
         Expanded(child: Text(title, style: ppJakarta(18))),
-        if (action != null) GestureDetector(onTap: onAction, behavior: HitTestBehavior.opaque, child: Text(action, style: ppBody(12, color: ppPurple, w: FontWeight.w700))),
+        if (action != null) PvPress(enabled: onAction != null, child: GestureDetector(onTap: onAction, behavior: HitTestBehavior.opaque, child: Text(action, style: ppBody(12, color: ppPurple, w: FontWeight.w700)))),
       ]);
 }

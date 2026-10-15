@@ -18,6 +18,7 @@ import '../services/pregnancy_controller.dart';
 import '../theme/app_theme.dart';
 import 'community_screen.dart';
 import '../theme/pv_fonts.dart';
+import '../widgets/pv_feedback.dart' show PvPress;
 
 const Color _proInk = Color(0xFF2F2C30);
 const Color _proPurple = Color(0xFF2F2C30);
@@ -206,7 +207,7 @@ class _CommunityProfileScreenState extends State<CommunityProfileScreen> {
 
   Widget _tabChip(String label, int index) {
     final active = _tab == index;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => setState(() => _tab = index),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 160),
@@ -223,7 +224,7 @@ class _CommunityProfileScreenState extends State<CommunityProfileScreen> {
                 fontWeight: FontWeight.w800,
                 color: active ? Colors.white : _proPurpleDeep)),
       ),
-    );
+    ));
   }
 
   Widget _avatar(double size) {
@@ -260,7 +261,7 @@ class _CommunityProfileScreenState extends State<CommunityProfileScreen> {
 
   Widget _followButton(
       S s, ExpertFollowStore ef, String author, bool following) {
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => ef.toggleFollow(author),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 9),
@@ -276,7 +277,7 @@ class _CommunityProfileScreenState extends State<CommunityProfileScreen> {
                 fontWeight: FontWeight.w800,
                 color: following ? _proInk : Colors.white)),
       ),
-    );
+    ));
   }
 
   Widget _stat(String value, String label) => Row(children: [

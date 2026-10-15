@@ -29,6 +29,7 @@ import '../theme/app_theme.dart';
 import '../widgets/mic_dictation_button.dart';
 import 'community_profile_screen.dart';
 import '../theme/pv_fonts.dart';
+import '../widgets/pv_feedback.dart' show PvPress;
 
 const Color _accent = AppTheme.primary500;
 const Color _like = AppTheme.secondary500;
@@ -446,7 +447,7 @@ Widget _endorsementBanner(BuildContext context, S s, CommunityPost post) {
           ),
           const SizedBox(height: 1),
           if (others > 0)
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: () => _showExpertsSheet(context, s, others),
               behavior: HitTestBehavior.opaque,
               child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -459,7 +460,7 @@ Widget _endorsementBanner(BuildContext context, S s, CommunityPost post) {
                 const Icon(Icons.chevron_right_rounded,
                     size: 15, color: Colors.white),
               ]),
-            )
+            ))
           else
             Text(s.cmEndorsed,
                 maxLines: 1,
@@ -775,7 +776,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                     color: Colors.white)),
           ),
           const SizedBox(width: 8),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => CommunityStore.instance.setDoctorMode(false),
             behavior: HitTestBehavior.opaque,
             child: Container(
@@ -789,13 +790,13 @@ class _CommunityScreenState extends State<CommunityScreen> {
                       fontWeight: FontWeight.w800,
                       color: Colors.white)),
             ),
-          ),
+          )),
         ]),
       );
 
   Widget _feedTabs(S s) {
     Widget chip(String label, bool active, VoidCallback onTap) => Expanded(
-          child: GestureDetector(
+          child: PvPress(child: GestureDetector(
             onTap: onTap,
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 180),
@@ -819,7 +820,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                       fontWeight: FontWeight.w700,
                       color: active ? Colors.white : _proInk.withValues(alpha: 0.55))),
             ),
-          ),
+          )),
         );
     return Container(
       margin: const EdgeInsets.fromLTRB(20, 6, 20, 2),
@@ -844,7 +845,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
       child: Align(
         alignment: Alignment.centerLeft,
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: () => setState(() => _expertsOnly = !_expertsOnly),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 160),
@@ -866,7 +867,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                       color: on ? Colors.white : _proPurpleDeep)),
             ]),
           ),
-        ),
+        )),
       ),
     );
   }
@@ -879,7 +880,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
       child: Align(
         alignment: Alignment.centerLeft,
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: () => setState(() => _needsVerifyOnly = !_needsVerifyOnly),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 160),
@@ -901,7 +902,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                       color: on ? Colors.white : _proPurpleDeep)),
             ]),
           ),
-        ),
+        )),
       ),
     );
   }
@@ -1405,7 +1406,7 @@ class _RecommendedCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
     final s = S(lang);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       child: Container(
         width: 210,
@@ -1482,7 +1483,7 @@ class _RecommendedCard extends StatelessWidget {
           ),
         ]),
       ),
-    );
+    ));
   }
 }
 
@@ -1589,7 +1590,7 @@ class _PulseCardView extends StatelessWidget {
           runSpacing: 8,
           children: [
             for (final o in card.options)
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 // .en: a vote is PERSISTED, and synced. Storing the rendered
                 // label would file the same answer under two names and let one
                 // mother's vote count twice if she switched language.
@@ -1606,11 +1607,11 @@ class _PulseCardView extends StatelessWidget {
                       style: text.labelMedium
                           ?.copyWith(color: color, fontWeight: FontWeight.w700)),
                 ),
-              ),
+              )),
           ],
         );
       case PulseType.trending:
-        return GestureDetector(
+        return PvPress(child: GestureDetector(
           onTap: () {
             final p = store.postById(card.linkPostId ?? '');
             if (p != null) {
@@ -1623,9 +1624,9 @@ class _PulseCardView extends StatelessWidget {
                     ?.copyWith(color: color, fontWeight: FontWeight.w800)),
             Icon(Icons.chevron_right_rounded, size: 18, color: color),
           ]),
-        );
+        ));
       case PulseType.expert:
-        return GestureDetector(
+        return PvPress(child: GestureDetector(
           onTap: () => ScaffoldMessenger.of(context)
               .showSnackBar(SnackBar(content: Text(s.cmComingSoon))),
           child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -1635,7 +1636,7 @@ class _PulseCardView extends StatelessWidget {
                 style: text.labelMedium
                     ?.copyWith(color: color, fontWeight: FontWeight.w800)),
           ]),
-        );
+        ));
       case PulseType.cohort:
       case PulseType.benchmark:
         return const SizedBox.shrink();
@@ -1681,16 +1682,16 @@ class CommunityPostCard extends StatelessWidget {
       // hint on its own line below (see the verification line near the actions).
       color: AppTheme.surface,
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        GestureDetector(
+        PvPress(enabled: onTap != null, child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: Padding(
             padding: const EdgeInsets.fromLTRB(14, 12, 8, 8),
             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: () => _openProfile(context),
                 child: _authorAvatar(post, size: 44),
-              ),
+              )),
               const SizedBox(width: 11),
               Expanded(
                 child: Column(
@@ -1706,7 +1707,7 @@ class CommunityPostCard extends StatelessWidget {
                           Expanded(
                             child: Row(children: [
                               Flexible(
-                                child: GestureDetector(
+                                child: PvPress(child: GestureDetector(
                                   onTap: () => _openProfile(context),
                                   child: Text(post.author,
                                       maxLines: 1,
@@ -1714,7 +1715,7 @@ class CommunityPostCard extends StatelessWidget {
                                       style: text.titleSmall?.copyWith(
                                           fontWeight: FontWeight.w800,
                                           color: _proInk)),
-                                ),
+                                )),
                               ),
                               if (_isExpertAuthor(post)) ...[
                                 const SizedBox(width: 3),
@@ -1788,7 +1789,7 @@ class CommunityPostCard extends StatelessWidget {
                         const SizedBox(height: 10),
                         Wrap(spacing: 8, runSpacing: 4, children: [
                           for (final t in post.topics)
-                            GestureDetector(
+                            PvPress(child: GestureDetector(
                               // tag = IDENTITY (topicTagId, always English) so
                               // the feed it opens matches the same posts in
                               // either language; label = what she reads.
@@ -1803,7 +1804,7 @@ class CommunityPostCard extends StatelessWidget {
                                       fontSize: 12.5,
                                       color: _proPurpleDeep,
                                       fontWeight: FontWeight.w600)),
-                            ),
+                            )),
                         ]),
                       ],
                       const SizedBox(height: 10),
@@ -1894,7 +1895,7 @@ class CommunityPostCard extends StatelessWidget {
               ),
             ]),
           ),
-        ),
+        )),
         const Divider(height: 1, thickness: 1, color: Color(0x12512D77)),
       ]),
     );
@@ -2119,7 +2120,7 @@ class _DoctorEndorseButtonState extends State<_DoctorEndorseButton>
     final s = S(widget.lang);
     final store = CommunityStore.instance;
     final endorsed = store.isDoctorEndorsed(widget.post.id);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: _onTap,
       behavior: HitTestBehavior.opaque,
       child: AnimatedBuilder(
@@ -2181,7 +2182,7 @@ class _DoctorEndorseButtonState extends State<_DoctorEndorseButton>
           );
         },
       ),
-    );
+    ));
   }
 }
 
@@ -2381,7 +2382,7 @@ class CommunityDetailScreen extends StatelessWidget {
               if (joined)
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 2),
-                  child: GestureDetector(
+                  child: PvPress(child: GestureDetector(
                     onTap: () => _push(
                         context,
                         CreatePostScreen(
@@ -2417,7 +2418,7 @@ class CommunityDetailScreen extends StatelessWidget {
                             size: 22, color: _accent),
                       ]),
                     ),
-                  ),
+                  )),
                 ),
               _sectionTitle(context, s.cmPosts),
               if (posts.isEmpty)
@@ -2915,7 +2916,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                     Positioned(
                       top: -7,
                       right: -7,
-                      child: GestureDetector(
+                      child: PvPress(child: GestureDetector(
                         onTap: () => setState(() => _photos.removeAt(i)),
                         child: Container(
                           decoration: const BoxDecoration(
@@ -2924,7 +2925,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                           child: const Icon(Icons.close_rounded,
                               size: 15, color: Colors.white),
                         ),
-                      ),
+                      )),
                     ),
                   ]),
               ],

@@ -35,6 +35,7 @@ import 'ttc_pcos_check_screen.dart' show PcosPrimaryButton, kPcosHue;
 import 'ttc_strings.dart';
 import 'ttc_surface_router.dart';
 import 'ttc_common.dart' show ttcTitleInk, TtcSectionHeading;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class TtcPcosCheckResultScreen extends StatelessWidget {
   const TtcPcosCheckResultScreen({super.key});
@@ -62,7 +63,7 @@ class TtcPcosCheckResultScreen extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.fromLTRB(8, 4, 16, 4),
                 child: Row(children: [
-                  GestureDetector(
+                  PvPress(child: GestureDetector(
                     onTap: () => Navigator.of(context).maybePop(),
                     behavior: HitTestBehavior.opaque,
                     child: Padding(
@@ -70,7 +71,7 @@ class TtcPcosCheckResultScreen extends StatelessWidget {
                       child: Icon(Icons.arrow_back_rounded,
                           size: 21, color: p.ink1),
                     ),
-                  ),
+                  )),
                   Expanded(
                     child: Text(t('YOUR PATTERN', 'AAPKA PATTERN'),
                         style: pvManrope(
@@ -416,7 +417,7 @@ class _NextCard extends StatelessWidget {
   final bool primary;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -454,7 +455,7 @@ class _NextCard extends StatelessWidget {
             ),
           ]),
         ),
-      );
+      ));
 }
 
 class _Disclaimer extends StatelessWidget {
@@ -513,7 +514,7 @@ class TtcPcosDoctorSummaryScreen extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.fromLTRB(8, 4, 16, 4),
                 child: Row(children: [
-                  GestureDetector(
+                  PvPress(child: GestureDetector(
                     onTap: () => Navigator.of(context).maybePop(),
                     behavior: HitTestBehavior.opaque,
                     child: Padding(
@@ -521,7 +522,7 @@ class TtcPcosDoctorSummaryScreen extends StatelessWidget {
                       child: Icon(Icons.arrow_back_rounded,
                           size: 21, color: p.ink1),
                     ),
-                  ),
+                  )),
                   Expanded(
                     child: Text(
                         t('FOR YOUR APPOINTMENT', 'APPOINTMENT KE LIYE'),
@@ -531,7 +532,7 @@ class TtcPcosDoctorSummaryScreen extends StatelessWidget {
                             letterSpacing: 1.1,
                             color: p.ink3)),
                   ),
-                  GestureDetector(
+                  PvPress(child: GestureDetector(
                     onTap: () => _copy(context, store, lang, t),
                     behavior: HitTestBehavior.opaque,
                     child: Padding(
@@ -539,7 +540,7 @@ class TtcPcosDoctorSummaryScreen extends StatelessWidget {
                       child:
                           Icon(Icons.copy_rounded, size: 19, color: p.ink2),
                     ),
-                  ),
+                  )),
                 ]),
               ),
               Expanded(

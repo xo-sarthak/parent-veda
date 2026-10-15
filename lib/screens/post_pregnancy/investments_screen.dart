@@ -40,6 +40,7 @@ import '../pregnancy/preg_tool_chrome.dart';
 import '../products/pv_store_chrome.dart' show PvChip, PvCommit, kPvLine, pvStorePalette;
 import 'pp_care_parts.dart' show ppCareHeading;
 import 'pp_common.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 const Color _lav = Color(0xFFB79BDD);
 const Color _dividerDark = Color(0xFF45414A);
@@ -481,7 +482,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
               ]),
             ),
             const SizedBox(width: 12),
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: () {
                 final ctx = _waysKey.currentContext;
                 if (ctx != null) Scrollable.ensureVisible(ctx, duration: const Duration(milliseconds: 400), curve: Curves.easeOut, alignment: 0.1);
@@ -492,7 +493,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                 decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(16)),
                 child: Text('See ways', style: ppBody(14, color: Colors.white, w: FontWeight.w700)),
               ),
-            ),
+            )),
           ]),
           const SizedBox(height: 12),
           Text('An illustration at an assumed 11% p.a., not a guarantee or a recommendation.',
@@ -500,7 +501,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
         ]),
       );
 
-  Widget _fill(String label, VoidCallback onTap) => GestureDetector(
+  Widget _fill(String label, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -508,11 +509,11 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
           padding: const EdgeInsets.only(bottom: 1),
           child: Text(label, style: ppFraunces(20, color: Colors.white, w: FontWeight.w500, h: 1.5)),
         ),
-      );
+      ));
 
   Widget _goalChip(int i) {
     final on = i == _goal;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => setState(() => _goal = i),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -524,13 +525,13 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
           Text(_goals[i].$1, style: ppBody(12, color: on ? Colors.white : ppSoft, w: on ? FontWeight.w700 : FontWeight.w600)),
         ]),
       ),
-    );
+    ));
   }
 
   // ---- ways rows -------------------------------------------------------------
   Widget _wayRow((IconData, String, String, String, Color, String?) w, {required bool last}) {
     final (icon, title, desc, pill, pillColor, note) = w;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _soon('$title - how it works, coming soon'),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -573,7 +574,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
           const Text('→', style: TextStyle(color: ppMuted)),
         ]),
       ),
-    );
+    ));
   }
 
   // ---- learn strip -----------------------------------------------------------
@@ -593,7 +594,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
             child: LinearProgressIndicator(value: 0.33, minHeight: 6, backgroundColor: ppPanelDiv, color: ppPurple),
           ),
           const SizedBox(height: 8),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => _soon('Lesson: What is an SIP, really? - coming soon'),
             behavior: HitTestBehavior.opaque,
             child: Padding(
@@ -618,7 +619,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                 Text('+10 XP', style: ppBody(11, color: ppBrown, w: FontWeight.w700)),
               ]),
             ),
-          ),
+          )),
         ]),
       );
 

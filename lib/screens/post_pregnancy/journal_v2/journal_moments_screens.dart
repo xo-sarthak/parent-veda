@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'journal_email.dart';
 import 'jv2_common.dart';
 import 'jv2_data.dart';
+import '../../../widgets/pv_feedback.dart' show PvPress;
 
 void _snack(BuildContext c, String m) =>
     ScaffoldMessenger.of(c).showSnackBar(SnackBar(content: Text(m), behavior: SnackBarBehavior.floating));
@@ -90,7 +91,7 @@ class MemoryDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _circleBtn(IconData icon, VoidCallback onTap) => GestureDetector(
+  Widget _circleBtn(IconData icon, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -100,9 +101,9 @@ class MemoryDetailScreen extends StatelessWidget {
           decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.92), shape: BoxShape.circle),
           child: Icon(icon, size: 18, color: ppInk),
         ),
-      );
+      ));
 
-  Widget _action(IconData icon, String label, VoidCallback onTap) => GestureDetector(
+  Widget _action(IconData icon, String label, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -110,7 +111,7 @@ class MemoryDetailScreen extends StatelessWidget {
           const SizedBox(width: 7),
           Text(label, style: ppBody(13, color: ppPurple, w: FontWeight.w700)),
         ]),
-      );
+      ));
 }
 
 // ---- Timeline ---------------------------------------------------------------
@@ -137,7 +138,7 @@ class _TimelineScreenState extends State<TimelineScreen> {
             height: 36,
             child: ListView(scrollDirection: Axis.horizontal, padding: const EdgeInsets.symmetric(horizontal: 24), children: [
               for (var i = 0; i < _tabs.length; i++)
-                GestureDetector(
+                PvPress(child: GestureDetector(
                   onTap: () => setState(() => _tab = i),
                   behavior: HitTestBehavior.opaque,
                   child: Container(
@@ -146,7 +147,7 @@ class _TimelineScreenState extends State<TimelineScreen> {
                     decoration: BoxDecoration(color: i == _tab ? ppPurple : ppPanel, borderRadius: BorderRadius.circular(999)),
                     child: Text(_tabs[i], style: ppBody(12, color: i == _tab ? Colors.white : ppSoft, w: FontWeight.w700)),
                   ),
-                ),
+                )),
             ]),
           ),
           const SizedBox(height: 20),
@@ -162,7 +163,7 @@ class _TimelineScreenState extends State<TimelineScreen> {
     );
   }
 
-  Widget _row(BuildContext context, JvMemory m) => GestureDetector(
+  Widget _row(BuildContext context, JvMemory m) => PvPress(child: GestureDetector(
         onTap: () => openMemory(context, m),
         behavior: HitTestBehavior.opaque,
         child: IntrinsicHeight(
@@ -188,7 +189,7 @@ class _TimelineScreenState extends State<TimelineScreen> {
             JvPhoto(seed: m.seed, height: 52, width: 52, radius: 12),
           ]),
         ),
-      );
+      ));
 
   Widget _milestoneRow(JvMilestone m, {required int seed}) => IntrinsicHeight(
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -242,7 +243,7 @@ class SearchScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 12),
-            GestureDetector(onTap: () => Navigator.of(context).maybePop(), child: Text('Cancel', style: ppBody(13, color: ppPurple, w: FontWeight.w700))),
+            PvPress(child: GestureDetector(onTap: () => Navigator.of(context).maybePop(), child: Text('Cancel', style: ppBody(13, color: ppPurple, w: FontWeight.w700)))),
           ])),
           const SizedBox(height: 14),
           SizedBox(
@@ -256,7 +257,7 @@ class SearchScreen extends StatelessWidget {
           _group(context, 'Stories', stories),
           _group(context, 'Letters', jvLetters),
           const SizedBox(height: 8),
-          Center(child: GestureDetector(onTap: () => _snack(context, 'Full search coming soon'), child: Text('See all results', style: ppBody(13, color: ppPurple, w: FontWeight.w700)))),
+          Center(child: PvPress(child: GestureDetector(onTap: () => _snack(context, 'Full search coming soon'), child: Text('See all results', style: ppBody(13, color: ppPurple, w: FontWeight.w700))))),
         ],
       ),
     );
@@ -272,7 +273,7 @@ class SearchScreen extends StatelessWidget {
   Widget _group(BuildContext context, String title, List<JvMemory> items) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         jvPad(Padding(padding: const EdgeInsets.only(top: 14, bottom: 8), child: Text(title, style: ppJakarta(13, color: ppMuted)))),
         for (final m in items)
-          jvPad(GestureDetector(
+          jvPad(PvPress(child: GestureDetector(
             onTap: () => openMemory(context, m),
             behavior: HitTestBehavior.opaque,
             child: Padding(
@@ -289,7 +290,7 @@ class SearchScreen extends StatelessWidget {
                 ),
               ]),
             ),
-          )),
+          ))),
       ]);
 }
 
@@ -308,7 +309,7 @@ class LettersScreen extends StatelessWidget {
           jvPad(Padding(padding: const EdgeInsets.only(top: 12, bottom: 4), child: Text('Words for them to read one day.', style: ppBody(13)))),
           const SizedBox(height: 8),
           for (final l in jvLetters)
-            jvPad(GestureDetector(
+            jvPad(PvPress(child: GestureDetector(
               onTap: () => openMemory(context, l),
               behavior: HitTestBehavior.opaque,
               child: Container(
@@ -327,7 +328,7 @@ class LettersScreen extends StatelessWidget {
                   Text(l.body.replaceAll('\n', ' '), style: ppFraunces(14, color: ppSoft, h: 1.6).copyWith(fontStyle: FontStyle.italic), maxLines: 2, overflow: TextOverflow.ellipsis),
                 ]),
               ),
-            )),
+            ))),
         ],
       ),
     );

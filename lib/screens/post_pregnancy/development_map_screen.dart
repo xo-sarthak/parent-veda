@@ -17,6 +17,7 @@ import '../brackets/hub/hub_intent_art.dart' show IntentMark;
 import '../pregnancy/preg_tool_chrome.dart';
 import '../products/pv_store_chrome.dart' show kPvInk, pvStorePalette;
 import '../v2/v2_palette.dart' show V2Palette;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class DevelopmentMapScreen extends StatelessWidget {
   const DevelopmentMapScreen({super.key});
@@ -263,7 +264,7 @@ class DevelopmentMapScreen extends StatelessWidget {
         ),
         const SizedBox(width: 14),
         Expanded(
-          child: GestureDetector(
+          child: PvPress(child: GestureDetector(
             onTap: () => _sheet(context, i),
             behavior: HitTestBehavior.opaque,
             child: Container(
@@ -292,7 +293,7 @@ class DevelopmentMapScreen extends StatelessWidget {
                 ]),
               ]),
             ),
-          ),
+          )),
         ),
       ]),
     );

@@ -16,6 +16,7 @@ import 'pp_common.dart';
 import 'pp_expert_link.dart';
 import 'pp_watch_data.dart';
 import 'watch_channel_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class WatchShortsScreen extends StatefulWidget {
   const WatchShortsScreen({super.key, this.startId});
@@ -75,7 +76,7 @@ class _WatchShortsScreenState extends State<WatchShortsScreen> {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             child: Row(children: [
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: () => Navigator.of(context).maybePop(),
                 child: Container(
                   width: 34,
@@ -84,7 +85,7 @@ class _WatchShortsScreenState extends State<WatchShortsScreen> {
                   decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.15), shape: BoxShape.circle),
                   child: const Icon(Icons.arrow_back, size: 18, color: Colors.white),
                 ),
-              ),
+              )),
               const SizedBox(width: 12),
               Text('Shorts', style: ppFraunces(20, color: Colors.white)),
             ]),
@@ -157,7 +158,7 @@ class _WatchShortsScreenState extends State<WatchShortsScreen> {
                 const SizedBox(height: 14),
                 Row(children: [
                   Expanded(
-                    child: GestureDetector(
+                    child: PvPress(child: GestureDetector(
                       onTap: () => _push(WatchChannelScreen(expertId: v.expertId)),
                       behavior: HitTestBehavior.opaque,
                       child: Row(children: [
@@ -171,10 +172,10 @@ class _WatchShortsScreenState extends State<WatchShortsScreen> {
                         const SizedBox(width: 10),
                         Flexible(child: PpExpertName(v.expert, style: ppBody(13, color: Colors.white, w: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis)),
                       ]),
-                    ),
+                    )),
                   ),
                   const SizedBox(width: 12),
-                  GestureDetector(
+                  PvPress(child: GestureDetector(
                     onTap: () => store.toggleSubscribe(v.expertId),
                     behavior: HitTestBehavior.opaque,
                     child: Container(
@@ -187,7 +188,7 @@ class _WatchShortsScreenState extends State<WatchShortsScreen> {
                       child: Text(subscribed ? 'Subscribed' : 'Subscribe',
                           style: ppBody(12, color: subscribed ? Colors.white : ppPurple, w: FontWeight.w800)),
                     ),
-                  ),
+                  )),
                 ]),
               ]),
             ),
@@ -197,7 +198,7 @@ class _WatchShortsScreenState extends State<WatchShortsScreen> {
     );
   }
 
-  Widget _action(IconData i, String label, VoidCallback onTap) => GestureDetector(
+  Widget _action(IconData i, String label, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Column(children: [
@@ -211,5 +212,5 @@ class _WatchShortsScreenState extends State<WatchShortsScreen> {
           const SizedBox(height: 5),
           Text(label, style: ppBody(10, color: Colors.white, w: FontWeight.w600)),
         ]),
-      );
+      ));
 }

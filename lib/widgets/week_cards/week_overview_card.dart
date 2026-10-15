@@ -31,6 +31,7 @@ import '../../theme/father_skin.dart';
 import '../cards/food_emoji.dart';
 import 'week_whatsapp_info_card.dart';
 import '../../theme/pv_fonts.dart';
+import '../pv_feedback.dart' show PvPress;
 
 const LinearGradient _pageGradient = LinearGradient(
   begin: Alignment.topCenter,
@@ -278,7 +279,7 @@ class _InfoDot extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final accent = father ? kFAccent : AppTheme.primary500;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -297,7 +298,7 @@ class _InfoDot extends StatelessWidget {
         ),
         child: Icon(Icons.info_outline_rounded, size: 19, color: accent),
       ),
-    );
+    ));
   }
 }
 
@@ -355,7 +356,7 @@ class _BabyFruitToggle extends StatelessWidget {
     final s = S(lang);
     final accent = father ? kFAccent : AppTheme.primary500;
     Widget seg(String label, bool on, VoidCallback onTap) => Expanded(
-          child: GestureDetector(
+          child: PvPress(child: GestureDetector(
             onTap: onTap,
             behavior: HitTestBehavior.opaque,
             child: AnimatedContainer(
@@ -382,7 +383,7 @@ class _BabyFruitToggle extends StatelessWidget {
                           ? Colors.white
                           : (father ? kFMuted : AppTheme.neutral600))),
             ),
-          ),
+          )),
         );
     return Container(
       padding: const EdgeInsets.all(5),
@@ -829,7 +830,7 @@ class WeekVideoCard extends StatelessWidget {
             animation: VideoStore.instance,
             builder: (context, _) {
               final saved = VideoStore.instance.isSaved(v.id);
-              return GestureDetector(
+              return PvPress(child: GestureDetector(
                 onTap: () => VideoStore.instance.toggle(v.id),
                 behavior: HitTestBehavior.opaque,
                 child: Padding(
@@ -841,12 +842,12 @@ class WeekVideoCard extends StatelessWidget {
                       color: accent,
                       size: 22),
                 ),
-              );
+              ));
             },
           ),
         ]),
         const SizedBox(height: 14),
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () => ScaffoldMessenger.of(context)
               .showSnackBar(SnackBar(content: Text(s.wkVideoSoon))),
           child: AspectRatio(
@@ -893,7 +894,7 @@ class WeekVideoCard extends StatelessWidget {
               ]),
             ),
           ),
-        ),
+        )),
         // "Why this matters" removed from the Watch-this-week section - just
         // the video now. Kept (commented) for revert.
         // const SizedBox(height: 12),

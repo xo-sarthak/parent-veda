@@ -44,6 +44,7 @@ import 'pregnancy/preg_chrome.dart' show pregFilledStyle, pregSectionHeadingStyl
 import 'products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 import 'garbh_shravan_surfaces.dart';
 import '../data/samvad_mantras_data.dart';
+import '../widgets/pv_feedback.dart' show PvPress;
 
 // --- warm palette ---
 // =============================================================================
@@ -269,7 +270,7 @@ class _LibraryTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
     final v = _pillarVisual(id);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(16),
@@ -311,7 +312,7 @@ class _LibraryTile extends StatelessWidget {
               color: v.accent.withValues(alpha: 0.7)),
         ]),
       ),
-    );
+    ));
   }
 }
 
@@ -326,7 +327,7 @@ class _RagaHero extends StatelessWidget {
   Widget build(BuildContext context) {
     final s = S(controller.language);
     final audio = shravanForTrimester(garbhTrimester(controller.currentWeek));
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(28),
@@ -384,7 +385,7 @@ class _RagaHero extends StatelessWidget {
           ]),
         ),
       ),
-    );
+    ));
   }
 }
 
@@ -462,7 +463,7 @@ class _PillarCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
     final v = _pillarVisual(pillar.id);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(16),
@@ -522,7 +523,7 @@ class _PillarCard extends StatelessWidget {
           ),
         ]),
       ),
-    );
+    ));
   }
 }
 
@@ -1056,7 +1057,7 @@ class _ShravanLibraryState extends State<_ShravanLibrary> {
                 final m = i + 1;
                 final selected = m == _month;
                 final isCurrent = m == currentMonth;
-                return GestureDetector(
+                return PvPress(child: GestureDetector(
                   onTap: () => setState(() => _month = m),
                   child: Container(
                     alignment: Alignment.center,
@@ -1080,7 +1081,7 @@ class _ShravanLibraryState extends State<_ShravanLibrary> {
                           fontWeight: FontWeight.w800),
                     ),
                   ),
-                );
+                ));
               },
             ),
           ),
@@ -1327,7 +1328,7 @@ class _UpliftingTab extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(18, 14, 18, 28),
       children: [
         for (final story in stories)
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => _push(context,
                 _VicharaReader(story: story, controller: controller, daily: daily)),
             child: Container(
@@ -1364,7 +1365,7 @@ class _UpliftingTab extends StatelessWidget {
                 ]),
               ]),
             ),
-          ),
+          )),
       ],
     );
   }
@@ -2448,7 +2449,7 @@ class _KriyaBreathingList extends StatelessWidget {
         // the right shape: a practice she should not do today is not a thing
         // to caution her about, it is a thing not to offer.
         for (final p in kKriya.where((x) => x.safeAtWeek(controller.currentWeek)))
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => _push(context,
                 KriyaDetailScreen(practice: p, controller: controller)),
             child: Container(
@@ -2495,7 +2496,7 @@ class _KriyaBreathingList extends StatelessWidget {
                 ),
               ]),
             ),
-          ),
+          )),
       ],
     );
   }
@@ -2519,7 +2520,7 @@ class _KriyaBrainFitnessGrid extends StatelessWidget {
       childAspectRatio: 0.82,
       children: [
         for (final p in kPuzzles)
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () =>
                 _push(context, _gameFor(p, controller, markComplete: false)),
             child: Container(
@@ -2577,7 +2578,7 @@ class _KriyaBrainFitnessGrid extends StatelessWidget {
                     ),
                   ]),
             ),
-          ),
+          )),
       ],
     );
   }

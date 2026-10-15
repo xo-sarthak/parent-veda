@@ -25,6 +25,7 @@ import 'brackets/hub/hub_intent_art.dart' show IntentMark;
 import 'doors/pv_list_row.dart' show PvMarkWell;
 import 'pregnancy/preg_chrome.dart' show PregCard, pregFilledStyle, pregGroupLabelStyle;
 import 'products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
+import '../widgets/pv_feedback.dart' show PvPress;
 
 /// A remembered line, in the tip form (DESIGN-SYSTEM §4.0 addendum): a left
 /// hairline in the ink, the group label, the line. What the gradient
@@ -470,7 +471,7 @@ class _TalkComposerScreenState extends State<TalkComposerScreen> {
             const SizedBox(height: 8),
             Text(s.talkSpeakHint, style: text.bodySmall),
             const SizedBox(height: 10),
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: _toggleMic,
               child: Container(
                 width: double.infinity,
@@ -497,7 +498,7 @@ class _TalkComposerScreenState extends State<TalkComposerScreen> {
                           fontWeight: FontWeight.w700)),
                 ]),
               ),
-            ),
+            )),
           ]),
         ),
       ),

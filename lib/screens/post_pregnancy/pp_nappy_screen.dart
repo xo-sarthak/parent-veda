@@ -232,7 +232,7 @@ class _PpNappyScreenState extends State<PpNappyScreen> {
                   button: true,
                   selected: colour == col,
                   label: nappyColourLabel(col),
-                  child: GestureDetector(
+                  child: PvPress(child: GestureDetector(
                     key: ValueKey('pp_nappy_colour_${col.name}'),
                     onTap: () => setSheet(() => colour = colour == col ? null : col),
                     child: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -242,7 +242,7 @@ class _PpNappyScreenState extends State<PpNappyScreen> {
                           textScaler: TextScaler.noScaling,
                           style: pvManrope(fontSize: 11, fontWeight: FontWeight.w600, color: p.ink2)),
                     ]),
-                  ),
+                  )),
                 ),
             ]),
             if (colour != null) ...[

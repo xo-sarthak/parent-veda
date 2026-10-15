@@ -25,6 +25,7 @@ import 'reco_common.dart';
 import 'reco_detail_screen.dart';
 import 'reco_library_screen.dart';
 import 'reco_search_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class RecommendationsScreen extends StatelessWidget {
   const RecommendationsScreen({super.key});
@@ -156,7 +157,7 @@ class RecommendationsScreen extends StatelessWidget {
     );
   }
 
-  Widget _iconBtn(IconData icon, VoidCallback onTap) => GestureDetector(
+  Widget _iconBtn(IconData icon, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -166,7 +167,7 @@ class RecommendationsScreen extends StatelessWidget {
           decoration: BoxDecoration(color: Colors.white, shape: BoxShape.circle, border: Border.all(color: ppHair)),
           child: Icon(icon, size: 20, color: ppInk),
         ),
-      );
+      ));
 
   Widget _ctxPill(IconData icon, String label) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
@@ -192,7 +193,7 @@ class RecommendationsScreen extends StatelessWidget {
           const SizedBox(width: 9),
           Expanded(child: Text(title, style: ppJakarta(17), maxLines: 2, overflow: TextOverflow.ellipsis)),
           if (onMore != null)
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: onMore,
               behavior: HitTestBehavior.opaque,
               child: Row(children: [
@@ -200,7 +201,7 @@ class RecommendationsScreen extends StatelessWidget {
                 const SizedBox(width: 2),
                 const Icon(Icons.chevron_right_rounded, size: 17, color: ppPurple),
               ]),
-            ),
+            )),
         ]),
         if (sub != null) ...[
           const SizedBox(height: 5),
@@ -238,7 +239,7 @@ class RecommendationsScreen extends StatelessWidget {
           separatorBuilder: (_, _) => const SizedBox(width: 12),
           itemBuilder: (_, i) {
             final c = kRecoCollections[i];
-            return GestureDetector(
+            return PvPress(child: GestureDetector(
               onTap: () => _push(context, RecoCollectionScreen(collection: c)),
               behavior: HitTestBehavior.opaque,
               child: Container(
@@ -256,12 +257,12 @@ class RecommendationsScreen extends StatelessWidget {
                   Text('${c.items.length} picks', style: ppBody(11, color: ppSoft, w: FontWeight.w700)),
                 ]),
               ),
-            );
+            ));
           },
         ),
       );
 
-  Widget _catChip(BuildContext context, String name, IconData icon) => GestureDetector(
+  Widget _catChip(BuildContext context, String name, IconData icon) => PvPress(child: GestureDetector(
         onTap: () => _push(context, RecoCategoryScreen(category: name)),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -273,7 +274,7 @@ class RecommendationsScreen extends StatelessWidget {
             Text(name, style: ppBody(12.5, color: ppInk, w: FontWeight.w600)),
           ]),
         ),
-      );
+      ));
 }
 
 /// Every item behind a rail, in one vertical list.

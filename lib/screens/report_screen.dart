@@ -282,14 +282,14 @@ class _ReportScreenState extends State<ReportScreen> {
                         : 'इन रिपोर्टों में साथ में पढ़ा जाने वाला कोई विषय नहीं है।',
                     style: text.bodyMedium?.copyWith(height: 1.5)),
                 const SizedBox(height: 12),
-                GestureDetector(
+                PvPress(child: GestureDetector(
                   onTap: () => setState(_picked.clear),
                   child: Text(
                       lang.isEnglish ? 'Show everything' : 'सब कुछ दिखाएँ',
                       style: text.labelLarge?.copyWith(
                           color: kPvInk, // was primary600
                           fontWeight: FontWeight.w800)),
-                ),
+                )),
               ]),
             ),
           ],
@@ -455,7 +455,7 @@ class _SearchBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -477,7 +477,7 @@ class _SearchBar extends StatelessWidget {
           ),
         ]),
       ),
-    );
+    ));
   }
 }
 

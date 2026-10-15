@@ -78,6 +78,7 @@ import 'ttc_tool_hues.dart';
 import 'ttc_surface_router.dart' show openTtcSurface;
 import '../../ttc/ttc_bmi_rules.dart';
 import '../../ttc/ttc_bmi_store.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// The hue a field's linked read opens in. 42 is the stage's warm read tone —
 /// the same one `ttc_read_stress_fertility` carries in its own definition, so
@@ -225,7 +226,7 @@ class _Header extends StatelessWidget {
   Widget build(BuildContext context) => SizedBox(
         height: 56,
         child: Row(children: [
-          GestureDetector(
+          PvPress(child: GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: onBack,
             child: const SizedBox(
@@ -234,7 +235,7 @@ class _Header extends StatelessWidget {
               child: Icon(Icons.chevron_left_rounded,
                   size: 24, color: ttcTitleInk),
             ),
-          ),
+          )),
           Text(crumb,
               style: pvManrope(
                   fontSize: 12.5,
@@ -243,7 +244,7 @@ class _Header extends StatelessWidget {
                   color: ttcMuted)),
           const Spacer(),
           if (onLookBack != null)
-            GestureDetector(
+            PvPress(enabled: onLookBack != null, child: GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: onLookBack,
               child: Container(
@@ -258,7 +259,7 @@ class _Header extends StatelessWidget {
                         fontWeight: FontWeight.w700,
                         color: ttcTitleInk)),
               ),
-            ),
+            )),
           const SizedBox(width: 6),
         ]),
       );
@@ -535,7 +536,7 @@ class _FieldRow extends StatelessWidget {
               style: ttcBody(12.5, color: ttcSoft, w: FontWeight.w600)),
         ],
         if (current != null)
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => TtcLogStore.instance.clear(tracker.id, field.id),
             behavior: HitTestBehavior.opaque,
             child: Padding(
@@ -543,7 +544,7 @@ class _FieldRow extends StatelessWidget {
               child: Text(t.trackerClear,
                   style: ttcBody(12.5, color: ttcMuted, w: FontWeight.w600)),
             ),
-          ),
+          )),
       ]),
       const SizedBox(height: 8),
       if (field.kind == TtcFieldKind.number) ...[
@@ -564,7 +565,7 @@ class _FieldRow extends StatelessWidget {
         // reading before she is allowed to log a number. It is an offer after
         // the fact — and it says what the piece is called, never anything
         // about the value she just chose.
-        GestureDetector(
+        PvPress(child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: () =>
               openTtcArticle(context, field.readId!, hue: kTtcTrackerReadHue),
@@ -596,7 +597,7 @@ class _FieldRow extends StatelessWidget {
               Icon(Icons.chevron_right_rounded, size: 17, color: ttcTitleInk),
             ]),
           ),
-        ),
+        )),
       ],
     ]);
   }
@@ -649,7 +650,7 @@ class _Segments extends StatelessWidget {
       return Row(children: [
         for (var i = 0; i < options.length; i++) ...[
           Expanded(
-            child: GestureDetector(
+            child: PvPress(child: GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: () => tap(i),
               // ⚠️ THE PCOS "WHERE DO I STAND" BLOCK, EXACTLY — 2026-09-04.
@@ -679,7 +680,7 @@ class _Segments extends StatelessWidget {
                             ? FontWeight.w800
                             : FontWeight.w600)),
               ),
-            ),
+            )),
           ),
           if (i < options.length - 1) const SizedBox(width: 6),
         ],
@@ -691,7 +692,7 @@ class _Segments extends StatelessWidget {
       runSpacing: 8,
       children: [
         for (var i = 0; i < options.length; i++)
-          GestureDetector(
+          PvPress(child: GestureDetector(
             behavior: HitTestBehavior.opaque,
             // Tapping the chosen option again clears it. One control, and no
             // separate undo to find.
@@ -712,7 +713,7 @@ class _Segments extends StatelessWidget {
                       color: i == chosen ? ttcTitleInk : ttcInk,
                       w: i == chosen ? FontWeight.w800 : FontWeight.w600)),
             ),
-          ),
+          )),
       ],
     );
   }
@@ -767,7 +768,7 @@ class _Stepper extends StatelessWidget {
       // hopeless for an absolute value: forty minutes of movement is eight taps
       // from zero. Typing is right for a number she already knows and clumsy
       // for a small adjustment.
-      GestureDetector(
+      PvPress(child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () => showTtcTypeNumber(context, tracker, field, current),
         child: Container(
@@ -806,7 +807,7 @@ class _Stepper extends StatelessWidget {
                         ttcBody(13, color: ttcMuted, w: FontWeight.w600)),
               ]),
       ),
-      ),
+      )),
       const SizedBox(width: 12),
       _StepButton(label: '+', onTap: () => _bump(field.step)),
     ]);
@@ -819,7 +820,7 @@ class _StepButton extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: onTap,
         child: Container(
@@ -833,7 +834,7 @@ class _StepButton extends StatelessWidget {
           child: Text(label,
               style: ttcBody(19, color: ttcTitleInk, w: FontWeight.w600)),
         ),
-      );
+      ));
 }
 
 // =============================================================================
@@ -913,7 +914,7 @@ class _FieldChip extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: onTap,
         child: Container(
@@ -929,7 +930,7 @@ class _FieldChip extends StatelessWidget {
               style: ttcBody(12.5,
                   color: on ? ttcTitleInk : ttcInk, w: FontWeight.w600)),
         ),
-      );
+      ));
 }
 
 /// Four weeks of one field.
@@ -1331,7 +1332,7 @@ class _NumberSheetState extends State<_NumberSheet> {
                     const SizedBox(height: 18),
                     SizedBox(
                       width: double.infinity,
-                      child: GestureDetector(
+                      child: PvPress(child: GestureDetector(
                         behavior: HitTestBehavior.opaque,
                         onTap: _save,
                         child: Container(
@@ -1347,7 +1348,7 @@ class _NumberSheetState extends State<_NumberSheet> {
                               style: ttcBody(13,
                                   color: ttcTitleInk, w: FontWeight.w800)),
                         ),
-                      ),
+                      )),
                     ),
                   ]),
             ),
@@ -1396,7 +1397,7 @@ class _Presets extends StatelessWidget {
             selected: on,
             label: label,
             excludeSemantics: true,
-            child: GestureDetector(
+            child: PvPress(child: GestureDetector(
               key: ValueKey('ttc_preset_${field.id}_${fmt(v)}'),
               behavior: HitTestBehavior.opaque,
               onTap: () => on
@@ -1417,7 +1418,7 @@ class _Presets extends StatelessWidget {
                         color: on ? ttcTitleInk : ttcInk,
                         w: on ? FontWeight.w800 : FontWeight.w600)),
               ),
-            ),
+            )),
           );
         }),
     ]);
@@ -1864,7 +1865,7 @@ class _DayStrip extends StatelessWidget {
               label: '${ttcRoundDate(d)}${has ? ', has an entry' : ''}',
               excludeSemantics: true,
               onTap: () => onPick(d),
-              child: GestureDetector(
+              child: PvPress(child: GestureDetector(
                 key: ValueKey('ttc_tracker_day_${TtcLogStore.dayKey(d)}'),
                 behavior: HitTestBehavior.opaque,
                 onTap: () => onPick(d),
@@ -1902,7 +1903,7 @@ class _DayStrip extends StatelessWidget {
                     ),
                   ),
                 ]),
-              ),
+              )),
             );
           }),
         ),
@@ -2132,7 +2133,7 @@ class _ScaleRow extends StatelessWidget {
             selected: i == chosen,
             label: options[i],
             excludeSemantics: true,
-            child: GestureDetector(
+            child: PvPress(child: GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: () => i == chosen
                   ? TtcLogStore.instance.clear(tracker.id, field.id, on: day)
@@ -2149,7 +2150,7 @@ class _ScaleRow extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: _blockText(i == chosen, size: 11.5)),
               ),
-            ),
+            )),
           ),
         ),
         if (i < options.length - 1) const SizedBox(width: 6),
@@ -2226,7 +2227,7 @@ class _NumberRow extends StatelessWidget {
           label: semantics,
           excludeSemantics: true,
           onTap: onTap,
-          child: GestureDetector(
+          child: PvPress(child: GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: onTap,
             child: Container(
@@ -2240,7 +2241,7 @@ class _NumberRow extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                       color: ttcTitleInk)),
             ),
-          ),
+          )),
         );
 
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -2257,7 +2258,7 @@ class _NumberRow extends StatelessWidget {
                     'Tap to type'
                 : '${field.labelEn}. Tap to type',
             excludeSemantics: true,
-            child: GestureDetector(
+            child: PvPress(child: GestureDetector(
               key: ValueKey('ttc_tracker_type_${field.id}'),
               behavior: HitTestBehavior.opaque,
               onTap: () => _showTypeSheet(context, tracker, field, day, current),
@@ -2300,7 +2301,7 @@ class _NumberRow extends StatelessWidget {
                             fontWeight: FontWeight.w700,
                             color: p.ink3)),
               ),
-            ),
+            )),
           ),
         ),
         const SizedBox(width: 10),

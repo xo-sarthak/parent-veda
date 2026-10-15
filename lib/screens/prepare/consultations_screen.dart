@@ -389,7 +389,7 @@ class _ConsultationsScreenState extends State<ConsultationsScreenClassic> {
     VoidCallback onTap, {
     bool bottom = false,
   }) {
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -489,6 +489,6 @@ class _ConsultationsScreenState extends State<ConsultationsScreenClassic> {
           ],
         ),
       ),
-    );
+    ));
   }
 }

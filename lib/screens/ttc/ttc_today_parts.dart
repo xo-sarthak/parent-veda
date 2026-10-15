@@ -49,6 +49,7 @@ import '../../ttc/ttc_chapter.dart';
 import '../../ttc/ttc_chapter_data.dart';
 import 'ttc_common.dart';
 import 'ttc_strings.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // ---- the chapter info sheet -------------------------------------------------
 
@@ -74,7 +75,7 @@ class TtcChapterInfoButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => showTtcChapterInfo(context, chapter, t),
       behavior: HitTestBehavior.opaque,
       child: Padding(
@@ -82,7 +83,7 @@ class TtcChapterInfoButton extends StatelessWidget {
         child: Icon(Icons.info_outline_rounded,
             size: 19, color: color ?? Colors.white.withValues(alpha: 0.85)),
       ),
-    );
+    ));
   }
 }
 
@@ -212,7 +213,7 @@ class TtcTodayRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Column(children: [
@@ -268,7 +269,7 @@ class TtcTodayRow extends StatelessWidget {
         ),
         if (!last) ttcDivider(),
       ]),
-    );
+    ));
   }
 }
 

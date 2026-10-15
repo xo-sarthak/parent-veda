@@ -32,6 +32,7 @@
 import 'package:flutter/material.dart';
 
 import 'pp_common.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// Which door was opened. The copy differs; the shape does not.
 enum NextBabyIntent { dueDate, ovulation }
@@ -110,7 +111,7 @@ class NextBabyScreen extends StatelessWidget {
     );
   }
 
-  Widget _primary(BuildContext context) => GestureDetector(
+  Widget _primary(BuildContext context) => PvPress(child: GestureDetector(
         onTap: () => _showComingSoon(context),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -123,9 +124,9 @@ class NextBabyScreen extends StatelessWidget {
           child: Text(_yes,
               style: ppBody(14, color: Colors.white, w: FontWeight.w800)),
         ),
-      );
+      ));
 
-  Widget _secondary(BuildContext context) => GestureDetector(
+  Widget _secondary(BuildContext context) => PvPress(child: GestureDetector(
         onTap: () => Navigator.of(context).pop(),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -137,7 +138,7 @@ class NextBabyScreen extends StatelessWidget {
           ),
           child: Text(_no, style: ppJakarta(14, color: ppPurple)),
         ),
-      );
+      ));
 
   /// The switch itself is not built yet, and saying so is better than a button
   /// that appears to do something.
@@ -187,7 +188,7 @@ class NextBabyScreen extends StatelessWidget {
                       'anywhere.',
               style: ppBody(13.5, h: 1.65)),
           const SizedBox(height: 20),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => Navigator.of(ctx).pop(),
             behavior: HitTestBehavior.opaque,
             child: Container(
@@ -200,7 +201,7 @@ class NextBabyScreen extends StatelessWidget {
               child: Text('Got it',
                   style: ppBody(13.5, color: Colors.white, w: FontWeight.w800)),
             ),
-          ),
+          )),
         ]),
       ),
     );

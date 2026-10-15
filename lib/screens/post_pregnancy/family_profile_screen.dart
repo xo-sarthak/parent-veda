@@ -35,6 +35,7 @@ import '../../widgets/global_ask_fab.dart' show kAskFabReserve;
 import '../profile/pv_you_chrome.dart'
     show PvYouTopBar, PvChip, kPvProfileGutter, kPvProfileGroupGap;
 import '../products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class FamilyProfileScreen extends StatelessWidget {
   const FamilyProfileScreen({super.key});
@@ -202,7 +203,7 @@ class FamilyProfileScreen extends StatelessWidget {
             padding: const EdgeInsets.only(top: 12, bottom: 44),
             children: [
               _pad(Row(children: [
-                GestureDetector(
+                PvPress(child: GestureDetector(
                   onTap: () => Navigator.of(context).maybePop(),
                   behavior: HitTestBehavior.opaque,
                   child: Container(
@@ -210,7 +211,7 @@ class FamilyProfileScreen extends StatelessWidget {
                     decoration: const BoxDecoration(color: ppPanel, shape: BoxShape.circle),
                     child: const Icon(Icons.arrow_back, size: 16, color: ppInk),
                   ),
-                ),
+                )),
                 Expanded(child: Center(child: ppEyebrow('ParentVeda Intelligence', color: ppMuted, spacing: 1.4))),
                 const SizedBox(width: 34),
               ])),
@@ -296,7 +297,7 @@ class FamilyProfileScreen extends StatelessWidget {
           Expanded(child: Text('$pct% personalised', style: ppJakarta(16), maxLines: 1, overflow: TextOverflow.ellipsis)),
           const SizedBox(width: 8),
           if (!_p.onboarded)
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const FamilyIntelligenceOnboarding())),
               behavior: HitTestBehavior.opaque,
               child: Container(
@@ -304,7 +305,7 @@ class FamilyProfileScreen extends StatelessWidget {
                 decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(999)),
                 child: Text(pct == 0 ? 'Start setup' : 'Continue', style: ppBody(12.5, color: Colors.white, w: FontWeight.w700)),
               ),
-            ),
+            )),
         ]),
         const SizedBox(height: 12),
         ClipRRect(
@@ -391,7 +392,7 @@ class FamilyProfileScreen extends StatelessWidget {
     if (saved != null) _p.setOther(field, saved);
   }
 
-  Widget _chip(String label, bool on, VoidCallback onTap) => GestureDetector(
+  Widget _chip(String label, bool on, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -409,5 +410,5 @@ class FamilyProfileScreen extends StatelessWidget {
             ),
           ]),
         ),
-      );
+      ));
 }

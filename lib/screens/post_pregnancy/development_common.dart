@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 
 import 'pp_common.dart';
 import 'pp_development_data.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// A supportive progress pill - "Growing", never a number.
 Widget devWordPill(DevWord w, Color accent) => Container(
@@ -32,7 +33,7 @@ Widget devSectionHeader(String title, {String? action, VoidCallback? onAction}) 
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Expanded(child: Text(title, style: ppJakarta(18))),
-        if (action != null) GestureDetector(onTap: onAction, behavior: HitTestBehavior.opaque, child: ppSeeAll(action)),
+        if (action != null) PvPress(enabled: onAction != null, child: GestureDetector(onTap: onAction, behavior: HitTestBehavior.opaque, child: ppSeeAll(action))),
       ],
     );
 
@@ -68,11 +69,11 @@ class DevAreaCard extends StatelessWidget {
         devProgressBar(area.word, area.accent),
       ]),
     );
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: width != null ? SizedBox(width: width, child: card) : card,
-    );
+    ));
   }
 }
 
@@ -85,7 +86,7 @@ class DevActivityCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final area = devAreaById(activity.areaId);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -112,7 +113,7 @@ class DevActivityCard extends StatelessWidget {
           const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
         ]),
       ),
-    );
+    ));
   }
 }
 
@@ -126,7 +127,7 @@ class DevActivityRailCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final area = devAreaById(activity.areaId);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -141,6 +142,6 @@ class DevActivityRailCard extends StatelessWidget {
           Text(activity.metaLine, style: ppBody(11.5, color: ppMuted, w: FontWeight.w600)),
         ]),
       ),
-    );
+    ));
   }
 }

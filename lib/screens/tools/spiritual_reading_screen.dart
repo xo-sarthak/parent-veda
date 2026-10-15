@@ -26,6 +26,7 @@ import '../pregnancy/preg_chrome.dart';
 import '../pregnancy/preg_tool_chrome.dart';
 import '../products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 import 'spiritual_marks.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // ⚠️ ONE PARENTVEDA (2026-09-30, the pregnancy restyle): a white ground, the
 // serif page title under a back arrow, white cards with the page hairline
@@ -192,7 +193,7 @@ class _SpiritualReadingScreenState extends State<SpiritualReadingScreen> {
       final selected = _religion == id;
       return Padding(
         padding: const EdgeInsets.only(right: 8),
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           key: ValueKey('spr_chip_${id ?? 'none'}'),
           onTap: () => _choose(id ?? _kAllTraditions),
           // The store's chip (`PvChip`): white with the hairline, the one
@@ -218,7 +219,7 @@ class _SpiritualReadingScreenState extends State<SpiritualReadingScreen> {
                       color: selected ? Colors.white : pvStorePalette.ink2)),
             ]),
           ),
-        ),
+        )),
       );
     }
 

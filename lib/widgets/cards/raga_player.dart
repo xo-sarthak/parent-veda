@@ -38,6 +38,7 @@ import '../../screens/products/pv_store_chrome.dart' show kPvInk, kPvLine, pvSto
 import '../../services/raga_audio_store.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/pv_fonts.dart';
+import '../pv_feedback.dart' show PvPress;
 
 class RagaPlayer extends StatefulWidget {
   const RagaPlayer({
@@ -183,7 +184,7 @@ class _RagaPlayerState extends State<RagaPlayer>
         Semantics(
           button: true,
           label: playing ? 'Pause' : 'Play',
-          child: GestureDetector(
+          child: PvPress(child: GestureDetector(
             key: const ValueKey('raga_play'),
             onTap: () => _audio.toggle(widget.asset,
                 title: widget.title,
@@ -197,7 +198,7 @@ class _RagaPlayerState extends State<RagaPlayer>
               child: Icon(playing ? Icons.pause_rounded : Icons.play_arrow_rounded,
                   color: Colors.white, size: 46),
             ),
-          ),
+          )),
         ),
         const SizedBox(height: 12),
         SliderTheme(
@@ -254,7 +255,7 @@ class _RagaPlayerState extends State<RagaPlayer>
         children: [
           Row(
             children: [
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: () => _audio.toggle(widget.asset,
                     title: widget.title,
                     isFile: widget.isFile,
@@ -282,7 +283,7 @@ class _RagaPlayerState extends State<RagaPlayer>
                     size: 30,
                   ),
                 ),
-              ),
+              )),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(

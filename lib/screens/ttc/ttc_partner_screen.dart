@@ -44,6 +44,7 @@ import 'ttc_round_strings.dart'
     show ttcPartnerRoundLine, kTtcPartnerRoundEyebrow;
 import 'ttc_strings.dart';
 import 'ttc_surface_router.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class TtcPartnerTodayScreen extends StatelessWidget {
   const TtcPartnerTodayScreen({super.key});
@@ -236,7 +237,7 @@ class _PracticeRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final done = ttcPracticeDoneToday(practice.kind);
 
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => openTtcSurface(context, 'ttc_practice/${practice.id}'),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -270,7 +271,7 @@ class _PracticeRow extends StatelessWidget {
               size: 17, color: ttcSlate),
         ]),
       ),
-    );
+    ));
   }
 }
 
@@ -284,7 +285,7 @@ class _ModePill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Widget seg(String label, bool active, VoidCallback onTap) =>
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: AnimatedContainer(
@@ -303,7 +304,7 @@ class _ModePill extends StatelessWidget {
                     color: active ? Colors.white : ttcMuted,
                     w: FontWeight.w800)),
           ),
-        );
+        ));
     return Material(
       elevation: 5,
       shadowColor: Colors.black26,
@@ -455,7 +456,7 @@ class _Hero extends StatelessWidget {
         const SizedBox(height: 12),
         // Dad's "Open her week ›" — the onward link sits under the summary,
         // not floating in the top corner.
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
             builder: (_) => const TtcJourneyMapScreen(),
             settings: const RouteSettings(name: 'ttc/journey'),
@@ -467,7 +468,7 @@ class _Hero extends StatelessWidget {
             const Icon(Icons.chevron_right_rounded,
                 size: 17, color: Colors.white),
           ]),
-        ),
+        )),
         // ⚠️ NO FIVE-STEP CHAPTER BAR AND NO "Next: The Waiting Days" LINE
         // (2026-09-27): both spoke in chapter names, which the user asked to
         // stop showing on their own. Her home dropped the same pair. Kept for
@@ -964,8 +965,8 @@ class _SlateCard extends StatelessWidget {
       child: child,
     );
     if (onTap == null) return card;
-    return GestureDetector(
-        onTap: onTap, behavior: HitTestBehavior.opaque, child: card);
+    return PvPress(enabled: onTap != null, child: GestureDetector(
+        onTap: onTap, behavior: HitTestBehavior.opaque, child: card));
   }
 }
 

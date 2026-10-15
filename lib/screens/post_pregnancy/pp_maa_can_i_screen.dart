@@ -34,6 +34,7 @@ import '../can_i/can_i_widgets.dart' show canIVerdictColor;
 import '../pregnancy/preg_tool_chrome.dart';
 import '../products/pv_store_chrome.dart' show PvChip, PvSecondary;
 import '../doors/pv_list_row.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 enum _Ans { yes, care, ask, avoid }
 
@@ -1557,7 +1558,7 @@ class _CatChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = V2PaletteStore.instance.current;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -1574,6 +1575,6 @@ class _CatChip extends StatelessWidget {
                 height: 1.2,
                 color: selected ? Colors.white : p.ink1)),
       ),
-    );
+    ));
   }
 }

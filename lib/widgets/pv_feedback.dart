@@ -21,12 +21,25 @@
 //  the device has none, so nothing here needs a platform check.
 // =============================================================================
 
+import 'package:flutter/gestures.dart' show kTouchSlop;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../theme/pv_fonts.dart';
 
 /// A 2% settle while the pointer is down.
+///
+/// ⚠️ TWO RULES FOR WHEN IT IS EVERYWHERE (tap feedback second pass,
+/// 2026-10-15, when every plain tap in the app got one):
+///
+///  * A SCROLL IS NOT A PRESS. A finger that starts a scroll on a card used to
+///    hold it at 98% until lift; the press now lets go once the pointer has
+///    moved past the touch slop, the distance Flutter itself uses to decide a
+///    drag is not a tap.
+///  * ONLY THE INNERMOST PRESS SETTLES. A `Listener` sees the pointer on every
+///    ancestor, so a save icon inside a pressable card settled the card too.
+///    Hit testing delivers the pointer-down innermost first, so the first
+///    PvPress to see it claims the pointer and the outer ones leave it.
 class PvPress extends StatefulWidget {
   const PvPress({super.key, required this.child, this.enabled = true});
   final Widget child;
@@ -36,15 +49,49 @@ class PvPress extends StatefulWidget {
   State<PvPress> createState() => _PvPressState();
 }
 
+/// Pointers an inner PvPress has already claimed.
+final Set<int> _pvPressClaimed = <int>{};
+
 class _PvPressState extends State<PvPress> {
   bool _down = false;
+  int? _pointer;
+  Offset _origin = Offset.zero;
+
+  void _onDown(PointerDownEvent e) {
+    if (!_pvPressClaimed.add(e.pointer)) return; // an inner press has it
+    _pointer = e.pointer;
+    _origin = e.position;
+    setState(() => _down = true);
+  }
+
+  void _onMove(PointerMoveEvent e) {
+    if (e.pointer != _pointer || !_down) return;
+    if ((e.position - _origin).distance > kTouchSlop) {
+      setState(() => _down = false);
+    }
+  }
+
+  void _onEnd(PointerEvent e) {
+    // Every PvPress the pointer passed through clears it, so the claim is
+    // gone before the next pointer-down whatever order the ends arrive in.
+    _pvPressClaimed.remove(e.pointer);
+    if (e.pointer != _pointer) return;
+    _pointer = null;
+    if (_down) setState(() => _down = false);
+  }
+
+  @override
+  void dispose() {
+    if (_pointer != null) _pvPressClaimed.remove(_pointer);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) => Listener(
-        onPointerDown:
-            widget.enabled ? (_) => setState(() => _down = true) : null,
-        onPointerUp: (_) => setState(() => _down = false),
-        onPointerCancel: (_) => setState(() => _down = false),
+        onPointerDown: widget.enabled ? _onDown : null,
+        onPointerMove: _onMove,
+        onPointerUp: _onEnd,
+        onPointerCancel: _onEnd,
         child: AnimatedScale(
           scale: _down ? 0.98 : 1,
           duration: const Duration(milliseconds: 120),

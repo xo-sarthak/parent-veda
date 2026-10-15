@@ -28,6 +28,7 @@ import '../../referral/referral_engine.dart';
 import '../../referral/referral_store.dart';
 import '../post_pregnancy/pp_common.dart';
 import '../../localization/app_language.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// Returns true when a code was accepted.
 Future<bool> showEnterCodeSheet(BuildContext context, {String? dueMonth}) async {
@@ -151,7 +152,7 @@ class _EnterCodeSheetState extends State<_EnterCodeSheet> {
           const SizedBox(height: 14),
           Row(children: [
             Expanded(
-              child: GestureDetector(
+              child: PvPress(child: GestureDetector(
                 onTap: _paste,
                 behavior: HitTestBehavior.opaque,
                 child: Container(
@@ -164,7 +165,7 @@ class _EnterCodeSheetState extends State<_EnterCodeSheet> {
                   ),
                   child: Text(S.now.uiPaste, style: ppJakarta(13, color: ppPurple)),
                 ),
-              ),
+              )),
             ),
             const SizedBox(width: 10),
             Expanded(
@@ -192,7 +193,7 @@ class _EnterCodeSheetState extends State<_EnterCodeSheet> {
             ),
           ]),
           const SizedBox(height: 10),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => Navigator.of(context).pop(false),
             behavior: HitTestBehavior.opaque,
             child: Padding(
@@ -200,7 +201,7 @@ class _EnterCodeSheetState extends State<_EnterCodeSheet> {
               child: Text(S.now.uiIDoNotHave,
                   style: ppJakarta(12.5, color: ppSoft)),
             ),
-          ),
+          )),
         ]),
       ),
     );

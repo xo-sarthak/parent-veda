@@ -79,6 +79,7 @@ import '../auth_flow_screen.dart'
 import 'onboarding_art.dart';
 import 'onboarding_chrome.dart';
 import 'onboarding_questions.dart';
+import '../../../widgets/pv_feedback.dart' show PvPress;
 
 /// ⚠️ `hello` IS KEPT AND IS NO LONGER REACHED. It is the V1 name-confirmation
 /// screen that followed Google sign-in; the name is now typed at `name` and
@@ -2729,7 +2730,7 @@ class _OtpSheetState extends State<_OtpSheet> {
           const SizedBox(height: 20),
           // Six boxes drawn over one invisible field, so the keyboard, paste and
           // the SMS auto-fill all land in one place.
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => _focus.requestFocus(),
             child: Stack(
               children: [
@@ -2780,7 +2781,7 @@ class _OtpSheetState extends State<_OtpSheet> {
                 ),
               ],
             ),
-          ),
+          )),
           const SizedBox(height: 12),
           Text(
             line,

@@ -45,6 +45,7 @@ import '../pregnancy/preg_chrome.dart';
 import '../pregnancy/preg_tool_chrome.dart';
 import '../product_guide/product_guide_chooser.dart';
 import '../products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// The Tools tab's "Get ready" hue, so the marks here match the row she tapped.
 const double _kReadyHue = 28;
@@ -612,7 +613,7 @@ class _PackToggle extends StatelessWidget {
   Widget build(BuildContext context) => Semantics(
         checked: packed,
         button: true,
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: AnimatedContainer(
@@ -625,7 +626,7 @@ class _PackToggle extends StatelessWidget {
             ),
             child: packed ? const Icon(Icons.check_rounded, size: 18, color: Colors.white) : null,
           ),
-        ),
+        )),
       );
 }
 
@@ -1090,7 +1091,7 @@ class _PersonalizeSheetState extends State<_PersonalizeSheet> {
     final chip = Semantics(
       button: true,
       selected: on,
-      child: GestureDetector(
+      child: PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -1107,7 +1108,7 @@ class _PersonalizeSheetState extends State<_PersonalizeSheet> {
                   fontWeight: on ? FontWeight.w800 : FontWeight.w600,
                   color: on ? Colors.white : pvStorePalette.ink1)),
         ),
-      ),
+      )),
     );
     return expand ? Expanded(child: chip) : chip;
   }

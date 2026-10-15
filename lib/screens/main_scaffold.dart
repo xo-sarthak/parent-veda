@@ -50,6 +50,7 @@ import '../services/pregnancy_ended_store.dart';
 import 'pregnancy/preg_ended_screen.dart' show PregEndedHome;
 import 'pregnancy/preg_learn_screen.dart';
 import 'pregnancy/preg_more_screen.dart';
+import '../widgets/pv_feedback.dart' show PvPress;
 
 /// The five pregnancy tabs, in nav order, as usage surfaces.
 ///
@@ -393,7 +394,7 @@ class _MainScaffoldState extends State<MainScaffold> with WidgetsBindingObserver
     final activeColor =
         father ? const Color(0xFF2E5266) : AppTheme.neutral900;
     Widget seg(String label, bool active, VoidCallback onTap) =>
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: AnimatedContainer(
@@ -410,7 +411,7 @@ class _MainScaffoldState extends State<MainScaffold> with WidgetsBindingObserver
                   color: active ? Colors.white : AppTheme.neutral400,
                 )),
           ),
-        );
+        ));
     return Material(
       elevation: 5,
       shadowColor: Colors.black26,

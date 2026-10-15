@@ -36,6 +36,7 @@
 import 'package:flutter/material.dart';
 
 import 'pp_common.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // =============================================================================
 //  1. EXPERT CURATED BANNER
@@ -204,7 +205,7 @@ class ExploreFilterChips extends StatelessWidget {
           separatorBuilder: (_, _) => const SizedBox(width: 9),
           itemBuilder: (_, i) {
             final on = labels[i] == selected;
-            return GestureDetector(
+            return PvPress(child: GestureDetector(
               onTap: () => onSelect(labels[i]),
               behavior: HitTestBehavior.opaque,
               child: AnimatedContainer(
@@ -228,7 +229,7 @@ class ExploreFilterChips extends StatelessWidget {
                           w: FontWeight.w700)),
                 ]),
               ),
-            );
+            ));
           },
         ),
       );
@@ -276,7 +277,7 @@ class ExploreNavChips extends StatelessWidget {
           separatorBuilder: (_, _) => const SizedBox(width: 16),
           itemBuilder: (_, i) {
             final on = i == activeIndex;
-            return GestureDetector(
+            return PvPress(child: GestureDetector(
               onTap: () => onTap(i),
               behavior: HitTestBehavior.opaque,
               child: SizedBox(
@@ -308,7 +309,7 @@ class ExploreNavChips extends StatelessWidget {
                           w: on ? FontWeight.w800 : FontWeight.w600)),
                 ]),
               ),
-            );
+            ));
           },
         ),
       );
@@ -352,7 +353,7 @@ class ExploreSectionHeader extends StatelessWidget {
           Row(children: [
             Expanded(child: Text(title, style: ppJakarta(17))),
             if (onSeeMore != null)
-              GestureDetector(
+              PvPress(enabled: onSeeMore != null, child: GestureDetector(
                 onTap: onSeeMore,
                 behavior: HitTestBehavior.opaque,
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -363,7 +364,7 @@ class ExploreSectionHeader extends StatelessWidget {
                   const Icon(Icons.chevron_right_rounded,
                       size: 18, color: ppPurple),
                 ]),
-              ),
+              )),
           ]),
           if (subtitle != null) ...[
             const SizedBox(height: 3),
@@ -443,7 +444,7 @@ class ExploreEmpty extends StatelessWidget {
                 style: ppBody(12.5, h: 1.5)),
             if (cta != null) ...[
               const SizedBox(height: 16),
-              GestureDetector(
+              PvPress(enabled: onCta != null, child: GestureDetector(
                 onTap: onCta,
                 behavior: HitTestBehavior.opaque,
                 child: Container(
@@ -457,7 +458,7 @@ class ExploreEmpty extends StatelessWidget {
                       style: ppBody(13,
                           color: Colors.white, w: FontWeight.w800)),
                 ),
-              ),
+              )),
             ],
           ]),
         ),
@@ -507,7 +508,7 @@ class ExploreBookmark extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -526,7 +527,7 @@ class ExploreBookmark extends StatelessWidget {
               size: 15,
               color: ppPurple),
         ),
-      );
+      ));
 }
 
 /// The image block on a card.

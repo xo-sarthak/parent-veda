@@ -23,6 +23,7 @@ import '../../models/week_content.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/father_skin.dart';
 import '../../theme/pv_fonts.dart';
+import '../pv_feedback.dart' show PvPress;
 
 /// WhatsApp brand green - used only as a small accent so the card reads as a
 /// WhatsApp-style weekly update.
@@ -183,7 +184,7 @@ class _WeekWhatsAppSheet extends StatelessWidget {
             ]),
       ),
       const SizedBox(width: 8),
-      GestureDetector(
+      PvPress(child: GestureDetector(
         onTap: () => Navigator.of(context).maybePop(),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -196,7 +197,7 @@ class _WeekWhatsAppSheet extends StatelessWidget {
           child: const Icon(Icons.close_rounded,
               size: 18, color: AppTheme.neutral600),
         ),
-      ),
+      )),
     ]);
   }
 

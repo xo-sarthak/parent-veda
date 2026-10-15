@@ -127,6 +127,7 @@ import '../../data/doors/pv_door_data.dart';
 import '../../theme/pv_fonts.dart';
 import '../brackets/hub/hub_intent_art.dart';
 import '../v2/v2_palette.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// ⚠️ THESE KEYS EXIST SO THE WIRING CAN BE ASSERTED, AND THAT IS THE ONLY
 /// REASON. A test can prove the door declares five groups and prove nothing at
@@ -1198,7 +1199,7 @@ class _PvDoorDots extends StatelessWidget {
                   selected: i == selected,
                   button: true,
                   label: groups[i].label,
-                  child: GestureDetector(
+                  child: PvPress(child: GestureDetector(
                     onTap: () => onPick(i),
                     behavior: HitTestBehavior.opaque,
                     // ⚠️ THE PAINTED DOT IS 5pt AND THE TARGET IS NOT. A 5pt
@@ -1221,7 +1222,7 @@ class _PvDoorDots extends StatelessWidget {
                         ),
                       ),
                     ),
-                  ),
+                  )),
                 ),
               );
             }),

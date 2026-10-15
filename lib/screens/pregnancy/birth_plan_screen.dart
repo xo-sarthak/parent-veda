@@ -49,6 +49,7 @@ import '../doors/pv_door_chrome.dart';
 import '../doors/pv_door_router.dart' show openPvDoorRead;
 import '../v2/v2_palette.dart';
 import '../products/pv_store_chrome.dart' show kPvInk;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// The Labour prep door's hue. Passed as a default rather than read from the
 /// bracket so this screen has no dependency on the brackets file.
@@ -139,7 +140,7 @@ class _BirthPlanScreenState extends State<BirthPlanScreen> {
                     style: pvManrope(
                         fontSize: kBpLead, height: 1.55, color: p.ink3))),
               if (!store.isEmpty)
-                pvDoorPad(GestureDetector(
+                pvDoorPad(PvPress(child: GestureDetector(
                   onTap: () => _confirmClear(context, p),
                   behavior: HitTestBehavior.opaque,
                   child: Text('Start again',
@@ -147,7 +148,7 @@ class _BirthPlanScreenState extends State<BirthPlanScreen> {
                           fontSize: kBpLead,
                           fontWeight: FontWeight.w700,
                           color: p.ink3)),
-                )),
+                ))),
               const SizedBox(height: 22),
               pvDoorPad(PvDoorDisclaimer(
                   p: p,
@@ -235,7 +236,7 @@ class _SectionCard extends StatelessWidget {
             style: pvManrope(fontSize: kBpLead, height: 1.5, color: p.ink3)),
         if (onOpenRead != null) ...[
           const SizedBox(height: 8),
-          GestureDetector(
+          PvPress(enabled: onOpenRead != null, child: GestureDetector(
             onTap: onOpenRead,
             behavior: HitTestBehavior.opaque,
             child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -251,7 +252,7 @@ class _SectionCard extends StatelessWidget {
                         color: deep)),
               ),
             ]),
-          ),
+          )),
         ],
         const SizedBox(height: 14),
         for (final q in section.questions) ...[
@@ -282,7 +283,7 @@ class _SectionCard extends StatelessWidget {
           const SizedBox(height: 14),
         ],
         // ---- the tick that matters --------------------------------------
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () => store.setDiscussed(section.id, !discussed),
           behavior: HitTestBehavior.opaque,
           child: AnimatedContainer(
@@ -323,7 +324,7 @@ class _SectionCard extends StatelessWidget {
               ),
             ]),
           ),
-        ),
+        )),
       ]),
     );
   }
@@ -349,7 +350,7 @@ class _Chip extends StatelessWidget {
         selected: chosen,
         button: true,
         label: label,
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: AnimatedContainer(
@@ -370,7 +371,7 @@ class _Chip extends StatelessWidget {
                     fontWeight: chosen ? FontWeight.w700 : FontWeight.w500,
                     color: p.ink1)),
           ),
-        ),
+        )),
       );
 }
 
@@ -453,7 +454,7 @@ class _ShareBar extends StatelessWidget {
             ),
           ],
         ),
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -478,6 +479,6 @@ class _ShareBar extends StatelessWidget {
               ],
             ),
           ),
-        ),
+        )),
       );
 }

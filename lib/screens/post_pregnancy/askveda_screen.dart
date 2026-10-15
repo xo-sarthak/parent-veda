@@ -31,6 +31,7 @@ import '../../services/remote/ask_veda_service.dart';
 import '../../ask_veda/pp_veda_corpus.dart' show openPpVedaDoc;
 import 'pp_phase_faqs.dart' show phaseFaqs;
 import 'pp_phases_data.dart' show currentPhase, ppFillChild;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // ---- design palette ------------------------------------------------------------
 // ONE PARENTVEDA (2026-10-10, the Ask Veda reveal pass): the pregnancy Ask
@@ -285,7 +286,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
               ),
             ),
           ]),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => openPpTab(context, 0), // My Child is the home tab now
             child: Container(
               width: 36,
@@ -299,7 +300,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
               ),
               child: Text('A', style: pvJakarta(fontSize: 15, fontWeight: FontWeight.w800, color: Colors.white)),
             ),
-          ),
+          )),
         ]),
       );
 
@@ -344,7 +345,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         ),
         MicDictateButton(controller: _ctrl, s: const S(AppLanguage.english), color: _vPurple),
         const SizedBox(width: 2),
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () => _send(_ctrl.text),
           child: Container(
             width: 38,
@@ -353,25 +354,25 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
             decoration: const BoxDecoration(color: _vPurple, shape: BoxShape.circle),
             child: const Icon(Icons.arrow_upward_rounded, color: Colors.white, size: 19),
           ),
-        ),
+        )),
       ]);
 
   Widget _pillResult() => Row(children: [
         const Icon(Icons.search_rounded, size: 21, color: Color(0xFF9384B0)),
         const SizedBox(width: 11),
         Expanded(
-          child: GestureDetector(
+          child: PvPress(child: GestureDetector(
             key: const ValueKey('veda_edit_query'),
             behavior: HitTestBehavior.opaque,
             onTap: _editQuery,
             child: Text(_query ?? '', maxLines: 1, overflow: TextOverflow.ellipsis, style: pvManrope(fontSize: 14.5, fontWeight: FontWeight.w600, color: _vInk)),
-          ),
+          )),
         ),
-        GestureDetector(onTap: _clearQuery, child: const Padding(padding: EdgeInsets.symmetric(horizontal: 4), child: Icon(Icons.close_rounded, size: 19, color: Color(0xFFB6A9CC)))),
+        PvPress(child: GestureDetector(onTap: _clearQuery, child: const Padding(padding: EdgeInsets.symmetric(horizontal: 4), child: Icon(Icons.close_rounded, size: 19, color: Color(0xFFB6A9CC))))),
         const SizedBox(width: 8),
         Container(width: 1, height: 20, color: const Color(0xFFEADFF5)),
         const SizedBox(width: 12),
-        GestureDetector(onTap: _clearQuery, child: const Icon(Icons.mic_none_rounded, size: 21, color: _vPurple)),
+        PvPress(child: GestureDetector(onTap: _clearQuery, child: const Icon(Icons.mic_none_rounded, size: 21, color: _vPurple))),
       ]);
 
   // ---- initial view : suggestions -------------------------------------------
@@ -414,14 +415,14 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         ]),
       );
 
-  Widget _qChip(String text) => GestureDetector(
+  Widget _qChip(String text) => PvPress(child: GestureDetector(
         onTap: () => _send(text),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
           decoration: BoxDecoration(color: _vPurple.withValues(alpha: 0.06), borderRadius: BorderRadius.circular(99), border: Border.all(color: const Color(0x1F7C3AED))),
           child: Text(text, style: pvManrope(fontSize: 12, fontWeight: FontWeight.w600, color: _vPurple)),
         ),
-      );
+      ));
 
   // ---- result view : the fixed 7 sections, all from the backend feed --------
   Widget _resultScroll() => ListView(
@@ -533,14 +534,14 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
           Text('Ask Veda needs a connection to give you a personalized, up-to-date answer. Please check your internet and try again.',
               style: pvManrope(fontSize: 13.5, height: 1.55, color: _vBody2)),
           const SizedBox(height: 16),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () { if (_query != null) _send(_query!); },
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 11),
               decoration: BoxDecoration(color: _vPurple, borderRadius: BorderRadius.circular(99)),
               child: Text('Retry', style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w800, color: Colors.white)),
             ),
-          ),
+          )),
         ]),
       );
 
@@ -594,10 +595,10 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         ),
       );
 
-  Widget _speakerButton() => GestureDetector(
+  Widget _speakerButton() => PvPress(child: GestureDetector(
         onTap: () => _snack('Listening to answers is coming soon'),
         child: Container(width: 32, height: 32, alignment: Alignment.center, decoration: const BoxDecoration(color: Color(0xFFF6F0FE), shape: BoxShape.circle), child: const Icon(Icons.volume_up_rounded, size: 18, color: _vPurple2)),
-      );
+      ));
 
   // S1 - Veda Answer
   Widget _answerCard(String answer) => _card(
@@ -704,7 +705,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
   Widget _feedItemCard(VedaFeedItem it) {
     final c = _kindColorStr(it.kind);
     final snippet = (it.snippet ?? '').trim();
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _openItem(it),
       child: Container(
         margin: const EdgeInsets.only(bottom: 11),
@@ -727,7 +728,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
           const Padding(padding: EdgeInsets.only(left: 4, top: 18), child: Icon(Icons.chevron_right_rounded, size: 20, color: Color(0xFFCBBFDD))),
         ]),
       ),
-    );
+    ));
   }
 
   // S5 - Community insights (on hold — needs its own build)
@@ -774,7 +775,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
 
   Widget _productPointerCard(VedaFeedItem it) {
     final prod = _matchProduct(it.title);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => prod != null ? _open(ProductDetailScreen(product: prod)) : openPpTab(context, 4),
       child: Container(
         width: 152,
@@ -797,7 +798,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
           ),
         ]),
       ),
-    );
+    ));
   }
 
   Widget _disclaimer() => Padding(

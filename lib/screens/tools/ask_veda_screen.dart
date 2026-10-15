@@ -55,6 +55,7 @@ import '../search/pv_search_screen.dart'
 import '../../theme/pv_fonts.dart';
 import '../pregnancy/preg_chrome.dart';
 import '../products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // ⚠️ ONE PARENTVEDA (2026-09-30, the pregnancy restyle): the trying-to-conceive
 // Ask Veda's shape, in the pregnancy pieces. A back arrow and "Ask Veda" in
@@ -384,7 +385,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
                     letterSpacing: -0.2,
                     color: _vInk)),
           ),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => Navigator.of(context).push(MaterialPageRoute(
                 builder: (_) => ProfileScreen(controller: p))),
             child: Container(
@@ -403,7 +404,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
                           fontWeight: FontWeight.w800,
                           color: Colors.white)),
             ),
-          ),
+          )),
         ],
       ),
     );
@@ -455,7 +456,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         // Real speech-to-text - dictates straight into the search field.
         MicDictateButton(controller: _ctrl, s: s, color: _vPurple),
         const SizedBox(width: 2),
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () => _send(_ctrl.text),
           child: Container(
             width: 38,
@@ -466,14 +467,14 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
             child: const Icon(Icons.arrow_upward_rounded,
                 color: Colors.white, size: 19),
           ),
-        ),
+        )),
       ]);
 
   Widget _pillResult(S s) => Row(children: [
         const Icon(Icons.search_rounded, size: 21, color: Color(0xFF9D959F)),
         const SizedBox(width: 11),
         Expanded(
-          child: GestureDetector(
+          child: PvPress(child: GestureDetector(
             key: const ValueKey('veda_edit_query'),
             behavior: HitTestBehavior.opaque,
             onTap: _editQuery,
@@ -482,24 +483,24 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
                 overflow: TextOverflow.ellipsis,
                 style: pvManrope(
                     fontSize: 14.5, fontWeight: FontWeight.w600, color: _vInk)),
-          ),
+          )),
         ),
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: _clearQuery,
           child: const Padding(
             padding: EdgeInsets.symmetric(horizontal: 4),
             child:
                 Icon(Icons.close_rounded, size: 19, color: Color(0xFFBCB7BE)),
           ),
-        ),
+        )),
         const SizedBox(width: 8),
         Container(width: 1, height: 20, color: const Color(0xFFEBE9EB)),
         const SizedBox(width: 12),
         // Ask again by voice → return to the search field (its mic does the STT).
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: _clearQuery,
           child: const Icon(Icons.mic_none_rounded, size: 21, color: _vPurple),
-        ),
+        )),
       ]);
 
   // ===========================================================================
@@ -570,7 +571,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
     );
   }
 
-  Widget _qChip(String text, bool active) => GestureDetector(
+  Widget _qChip(String text, bool active) => PvPress(child: GestureDetector(
         onTap: () => _send(text),
         // White with the hairline (kept for revert: the ink at 6% with a
         // violet hairline 0x1F7C3AED when active, 0xFFF4F3F5 when not).
@@ -587,7 +588,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
                   fontWeight: FontWeight.w600,
                   color: active ? _vPurple : _vMuted)),
         ),
-      );
+      ));
 
   // The "Opening soon" tag's look (`PregOfferTag`), with this screen's own
   // words. Kept for revert: a pink pill 0xFFFBEAF1 with coral words at 9.
@@ -738,14 +739,14 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
           Text(S.now.uiAskVedaNeedsConnection,
               style: pvManrope(fontSize: 13.5, height: 1.55, color: _vBody2)),
           const SizedBox(height: 16),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () { if (_query != null) _send(_query!); },
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 11),
               decoration: BoxDecoration(color: _vPurple, borderRadius: BorderRadius.circular(99)),
               child: Text(S.now.uiRetry, style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w800, color: Colors.white)),
             ),
-          ),
+          )),
         ]),
       );
 
@@ -855,7 +856,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
   Widget _feedItemCard(VedaFeedItem it) {
     final c = _kindColorStr(it.kind);
     final snippet = (it.snippet ?? '').trim();
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _openFeedItem(it),
       child: Container(
         margin: const EdgeInsets.only(bottom: 11),
@@ -878,7 +879,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
           const Padding(padding: EdgeInsets.only(left: 4, top: 18), child: Icon(Icons.chevron_right_rounded, size: 20, color: _vMuted)),
         ]),
       ),
-    );
+    ));
   }
 
   // S6 - Products
@@ -890,7 +891,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
           for (final it in f.products) _feedProductRow(it),
       ]);
 
-  Widget _feedProductRow(VedaFeedItem it) => GestureDetector(
+  Widget _feedProductRow(VedaFeedItem it) => PvPress(child: GestureDetector(
         onTap: _openProducts,
         child: Container(
           margin: const EdgeInsets.only(bottom: 11),
@@ -903,7 +904,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
             const Icon(Icons.chevron_right_rounded, size: 20, color: _vMuted),
           ]),
         ),
-      );
+      ));
 
   // S7 - Services
   Widget _feedServices(AskVedaResult f) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -934,7 +935,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
     return pvSearch(q, pvSearchIndex()).take(5).toList();
   }
 
-  Widget _localCard(PvSearchHit h) => GestureDetector(
+  Widget _localCard(PvSearchHit h) => PvPress(child: GestureDetector(
         key: ValueKey('veda_local_${h.title}'),
         onTap: () => openPvSearchHit(context, h, p, query: _query),
         child: Container(
@@ -982,7 +983,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
                 child: Icon(Icons.chevron_right_rounded, size: 20, color: _vMuted)),
           ]),
         ),
-      );
+      ));
 
   Widget _localMoreInfo() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         _sectionHead(Icons.library_books_rounded, 'More information'),
@@ -1225,7 +1226,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
 
   Widget _viewContentCard(VedaContentRef ref) {
     final c = _kindColor(ref.kind);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _openContentRef(ref),
       child: Container(
         margin: const EdgeInsets.only(bottom: 11),
@@ -1283,7 +1284,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
           ),
         ]),
       ),
-    );
+    ));
   }
 
   // A content card routes exactly like a source did, keyed by its kind.
@@ -1299,7 +1300,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _sectionHead(Icons.forum_rounded, s.vedaCommunityInsights),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: _openCommunityPage,
             behavior: HitTestBehavior.opaque,
             child: _card(
@@ -1316,7 +1317,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
                     size: 20, color: Color(0xFFCFCCD0)),
               ]),
             ),
-          ),
+          )),
         ],
       );
 
@@ -1457,7 +1458,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         ]),
       );
 
-  Widget _speakerButton(S s) => GestureDetector(
+  Widget _speakerButton(S s) => PvPress(child: GestureDetector(
         onTap: () => _snack(s.vedaVoiceSoon),
         child: Container(
           width: 32,
@@ -1467,7 +1468,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
               color: Color(0xFFF7F7F7), shape: BoxShape.circle),
           child: const Icon(Icons.volume_up_rounded, size: 18, color: _vPurple2),
         ),
-      );
+      ));
 
   Widget _illustration(String id) {
     final icon = switch (id) {
@@ -1660,7 +1661,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
             : isTool
                 ? 'Tool'
                 : 'Article';
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _openContent(label),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -1699,7 +1700,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
               size: 20, color: Color(0xFFCFCCD0)),
         ]),
       ),
-    );
+    ));
   }
 
   Widget _contentThumb(String type) {
@@ -1760,7 +1761,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _sectionHead(Icons.forum_rounded, s.vedaCommunityInsights),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: _openCommunityPage,
             behavior: HitTestBehavior.opaque,
             child: _card(
@@ -1780,7 +1781,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
                     size: 20, color: Color(0xFFCFCCD0)),
               ]),
             ),
-          ),
+          )),
         ],
       );
 
@@ -1841,7 +1842,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
 
   Widget _productCard(LocalizedText label, AppLanguage lang) {
     final prod = _matchProduct(label.en);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => prod != null ? _openProduct(prod) : _openProducts(),
       child: Container(
       width: 152,
@@ -1891,7 +1892,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         ),
       ]),
       ),
-    );
+    ));
   }
 
   // S7 - Services --------------------------------------------------------------
@@ -1959,7 +1960,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         ),
         const SizedBox(width: 10),
         first
-            ? GestureDetector(
+            ? PvPress(child: GestureDetector(
                 onTap: () => _snack(s.vedaVoiceSoon),
                 child: Container(
                   padding:
@@ -1980,8 +1981,8 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
                           fontWeight: FontWeight.w700,
                           color: Colors.white)),
                 ),
-              )
-            : GestureDetector(
+              ))
+            : PvPress(child: GestureDetector(
                 onTap: () => _snack(s.vedaVoiceSoon),
                 child: Container(
                   padding:
@@ -1997,7 +1998,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
                           fontWeight: FontWeight.w700,
                           color: _vPurple)),
                 ),
-              ),
+              )),
       ]),
     );
   }
@@ -2050,7 +2051,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
   // 7-section view (_viewContentCard); kept for revert.
   Widget _sourceCard(VedaSource src) {
     final c = _kindColor(src.kind);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _openSource(src),
       child: Container(
         margin: const EdgeInsets.only(bottom: 11),
@@ -2107,7 +2108,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
           ),
         ]),
       ),
-    );
+    ));
   }
 
   /// Tapping a retrieval source goes where it belongs (Google-style): products

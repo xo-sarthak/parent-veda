@@ -31,6 +31,7 @@ import '../post_pregnancy/pp_common.dart';
 import '../post_pregnancy/pp_experts_data.dart';
 import '../../widgets/global_ask_fab.dart' show kCallRoute;
 import 'doctor_prescription_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class DoctorAppointmentsScreen extends StatefulWidget {
   const DoctorAppointmentsScreen({super.key});
@@ -152,7 +153,7 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
             (2, 'Past', past),
           ])
             Expanded(
-              child: GestureDetector(
+              child: PvPress(child: GestureDetector(
                 onTap: () => setState(() => _tab = i),
                 behavior: HitTestBehavior.opaque,
                 child: Container(
@@ -166,7 +167,7 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
                       style: ppJakarta(12.5,
                           color: _tab == i ? ppTitleInk : ppSoft)),
                 ),
-              ),
+              )),
             ),
         ]),
       );
@@ -266,14 +267,14 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
             ),
             _statusPill(b, past: past, hasRx: hasRx),
             if (b.status == BookingStatus.upcoming)
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: () => _openActions(b),
                 behavior: HitTestBehavior.opaque,
                 child: const Padding(
                   padding: EdgeInsets.only(left: 6),
                   child: Icon(Icons.more_vert_rounded, size: 18, color: ppMuted),
                 ),
-              ),
+              )),
           ]),
           const SizedBox(height: 12),
           Row(children: [
@@ -437,7 +438,7 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
     VoidCallback? onTap,
     bool enabled = true,
   }) =>
-      GestureDetector(
+      PvPress(enabled: onTap != null, child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -463,7 +464,7 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
             ),
           ]),
         ),
-      );
+      ));
 
   Future<void> _cancelAsDoctor(Booking b) => _resolve(b, DoctorOutcome.cancelled);
 
@@ -536,7 +537,7 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
 
   Widget _action(String label, IconData icon,
           {required VoidCallback onTap, bool filled = false}) =>
-      GestureDetector(
+      PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -559,7 +560,7 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
             ),
           ]),
         ),
-      );
+      ));
 
   static String _time(DateTime d) {
     final h = d.hour % 12 == 0 ? 12 : d.hour % 12;

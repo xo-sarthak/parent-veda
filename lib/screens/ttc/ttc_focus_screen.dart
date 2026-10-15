@@ -78,6 +78,7 @@ import 'ttc_today_parts.dart' show showTtcRowSheet;
 import 'ttc_surface_router.dart';
 import 'ttc_read_blocks_view.dart' show ttcReadCustomBlock;
 import 'doors/ttc_door_screen.dart' show openTtcDoor;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // -----------------------------------------------------------------------------
 //  Rail geometry
@@ -2401,7 +2402,7 @@ class _CarouselDots extends StatelessWidget {
                   selected: i == selected,
                   button: true,
                   label: groups[i].label,
-                  child: GestureDetector(
+                  child: PvPress(child: GestureDetector(
                     onTap: () => onPick(i),
                     behavior: HitTestBehavior.opaque,
                     // ⚠️ THE PAINTED DOT IS 5pt AND THE TARGET IS NOT. A 5pt
@@ -2425,7 +2426,7 @@ class _CarouselDots extends StatelessWidget {
                         ),
                       ),
                     ),
-                  ),
+                  )),
                 ),
               );
             }),

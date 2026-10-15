@@ -64,6 +64,7 @@ import 'ttc_cycle_palette.dart';
 import 'ttc_strings.dart';
 import 'ttc_tool_marks.dart' show ttcToolHeaderMark;
 import 'ttc_cycle_headline.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// Which of the four the screen is in.
 ///
@@ -1377,7 +1378,7 @@ class _RowAction extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -1387,7 +1388,7 @@ class _RowAction extends StatelessWidget {
           child: Text(label,
               style: ttcBody(12.5, color: ink, w: FontWeight.w800)),
         ),
-      );
+      ));
 }
 
 /// Removes a logged period and offers it straight back.
@@ -2421,7 +2422,7 @@ class _Step extends StatelessWidget {
   final VoidCallback? onTap;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(enabled: onTap != null, child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -2439,7 +2440,7 @@ class _Step extends StatelessWidget {
           child: Icon(icon,
               size: 18, color: onTap == null ? ttcBorder : ttcTitleInk),
         ),
-      );
+      ));
 }
 
 class _Chip extends StatelessWidget {
@@ -2449,7 +2450,7 @@ class _Chip extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: AnimatedContainer(
@@ -2470,7 +2471,7 @@ class _Chip extends StatelessWidget {
                   color: on ? Colors.white : ttcTitleInk,
                   w: on ? FontWeight.w800 : FontWeight.w600)),
         ),
-      );
+      ));
 }
 
 // =============================================================================

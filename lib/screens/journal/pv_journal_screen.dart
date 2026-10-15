@@ -1457,11 +1457,11 @@ class _PhotoGrid extends StatelessWidget {
         itemCount: cells.length,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 3, mainAxisSpacing: 6, crossAxisSpacing: 6),
-        itemBuilder: (_, i) => GestureDetector(
+        itemBuilder: (_, i) => PvPress(child: GestureDetector(
           onTap: () => onOpen(cells[i].e),
           child: StorageImage(cells[i].path,
               fit: BoxFit.cover, borderRadius: BorderRadius.circular(10)),
-        ),
+        )),
       ),
     );
   }

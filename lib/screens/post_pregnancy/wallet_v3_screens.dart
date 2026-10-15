@@ -63,6 +63,7 @@ import 'wallet_v2_screens.dart'
         walletConnectionCard,
         walletEmpty,
         walletStatusCard;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 void _push(BuildContext c, Widget s) =>
     Navigator.of(c).push(MaterialPageRoute<void>(builder: (_) => s));
@@ -196,7 +197,7 @@ class WalletV3Home extends StatelessWidget {
 
   /// The disclosure the brief's version cannot offer, because its status card
   /// makes a claim this one does not.
-  Widget _whatThisMeans(BuildContext context) => GestureDetector(
+  Widget _whatThisMeans(BuildContext context) => PvPress(child: GestureDetector(
         onTap: () => showModalBottomSheet<void>(
           context: context,
           backgroundColor: Colors.transparent,
@@ -227,7 +228,7 @@ class WalletV3Home extends StatelessWidget {
                   'call. Not this page.',
                   style: ppBody(13.5, h: 1.65)),
               const SizedBox(height: 20),
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: () => Navigator.of(ctx).pop(),
                 behavior: HitTestBehavior.opaque,
                 child: Container(
@@ -241,7 +242,7 @@ class WalletV3Home extends StatelessWidget {
                       style:
                           ppBody(13.5, color: Colors.white, w: FontWeight.w800)),
                 ),
-              ),
+              )),
             ]),
           ),
         ),
@@ -254,12 +255,12 @@ class WalletV3Home extends StatelessWidget {
                 style: ppBody(12, color: ppSoft, w: FontWeight.w700)),
           ),
         ]),
-      );
+      ));
 
   Widget _row(BuildContext context, IconData icon, String title, String sub,
           Widget dest,
           {String? note}) =>
-      GestureDetector(
+      PvPress(child: GestureDetector(
         onTap: () => _push(context, dest),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -297,7 +298,7 @@ class WalletV3Home extends StatelessWidget {
             const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
           ]),
         ),
-      );
+      ));
 
   Widget _addRow(BuildContext context) {
     final actions = <(IconData, String, VoidCallback)>[
@@ -311,7 +312,7 @@ class WalletV3Home extends StatelessWidget {
     return Row(children: [
       for (var i = 0; i < actions.length; i++) ...[
         Expanded(
-          child: GestureDetector(
+          child: PvPress(child: GestureDetector(
             onTap: actions[i].$3,
             behavior: HitTestBehavior.opaque,
             child: Container(
@@ -328,7 +329,7 @@ class WalletV3Home extends StatelessWidget {
                     style: ppBody(11.5, color: ppInk, w: FontWeight.w700)),
               ]),
             ),
-          ),
+          )),
         ),
         if (i != actions.length - 1) const SizedBox(width: 10),
       ],

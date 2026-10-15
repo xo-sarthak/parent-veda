@@ -20,6 +20,7 @@ import 'brand_studio.dart';
 import 'outbound.dart';
 import '../theme/pv_fonts.dart';
 import '../localization/app_language.dart';
+import '../widgets/pv_feedback.dart' show PvPress;
 
 const _bg = Color(0xFFFBF9FE);
 const _ink = Color(0xFF2F2C30);
@@ -114,7 +115,7 @@ class _LaunchCard extends StatelessWidget {
     final c = campaign;
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
-      child: GestureDetector(
+      child: PvPress(child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () {
           BrandAnalytics.instance.event(c, BrandEvent.hubOpened);
@@ -168,7 +169,7 @@ class _LaunchCard extends StatelessWidget {
             ),
           ]),
         ),
-      ),
+      )),
     );
   }
 }
@@ -323,7 +324,7 @@ class LaunchDetailScreen extends StatelessWidget {
 
   Widget _resource(BuildContext context, BrandResource r) => Padding(
         padding: const EdgeInsets.only(bottom: 10),
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: () {
             BrandAnalytics.instance.event(c, BrandEvent.resourceOpened, meta: {'resource': r.label});
@@ -351,7 +352,7 @@ class LaunchDetailScreen extends StatelessWidget {
               const Icon(Icons.arrow_forward_rounded, size: 15, color: _soft),
             ]),
           ),
-        ),
+        )),
       );
 
   Widget _cta(BuildContext context) => SizedBox(

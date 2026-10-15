@@ -13,6 +13,7 @@ import 'pp_common.dart';
 import 'pp_reading_data.dart';
 import 'reading_common.dart';
 import 'reading_reader_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class ReadingCollectionScreen extends StatelessWidget {
   const ReadingCollectionScreen({super.key, required this.collection});
@@ -74,7 +75,7 @@ class ReadingCollectionScreen extends StatelessWidget {
     final done = store.isCompleted(r.id);
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
-      child: GestureDetector(
+      child: PvPress(child: GestureDetector(
         onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => ReadingReaderScreen(article: r))),
         behavior: HitTestBehavior.opaque,
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -101,7 +102,7 @@ class ReadingCollectionScreen extends StatelessWidget {
             ]),
           ),
         ]),
-      ),
+      )),
     );
   }
 }

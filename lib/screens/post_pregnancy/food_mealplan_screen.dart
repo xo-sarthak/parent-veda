@@ -12,6 +12,7 @@ import 'food_common.dart';
 import 'food_recipe_screen.dart';
 import 'pp_common.dart';
 import 'pp_food_data.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class FoodMealPlanScreen extends StatefulWidget {
   const FoodMealPlanScreen({super.key});
@@ -88,7 +89,7 @@ class _FoodMealPlanScreenState extends State<FoodMealPlanScreen> {
               ('Non-veg', 'nonveg'),
               ('Vegan', 'vegan'),
             ]) ...[
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: () => setState(() => _diet = value),
                 behavior: HitTestBehavior.opaque,
                 child: Container(
@@ -108,7 +109,7 @@ class _FoodMealPlanScreenState extends State<FoodMealPlanScreen> {
                           color: _diet == value ? Colors.white : ppInk,
                           w: FontWeight.w700)),
                 ),
-              ),
+              )),
             ],
           ],
         ),
@@ -127,7 +128,7 @@ class _FoodMealPlanScreenState extends State<FoodMealPlanScreen> {
   Widget _seg(String label, int days) {
     final on = _days == days;
     return Expanded(
-      child: GestureDetector(
+      child: PvPress(child: GestureDetector(
         onTap: () => setState(() => _days = days),
         behavior: HitTestBehavior.opaque,
         child: AnimatedContainer(
@@ -141,11 +142,11 @@ class _FoodMealPlanScreenState extends State<FoodMealPlanScreen> {
           ),
           child: Text(label, style: ppBody(13, color: on ? ppPurple : ppSoft, w: FontWeight.w700)),
         ),
-      ),
+      )),
     );
   }
 
-  Widget _regenButton() => GestureDetector(
+  Widget _regenButton() => PvPress(child: GestureDetector(
         onTap: () => setState(() => _regen++),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -158,7 +159,7 @@ class _FoodMealPlanScreenState extends State<FoodMealPlanScreen> {
             Text('Regenerate', style: ppBody(13.5, color: ppPurple, w: FontWeight.w700)),
           ]),
         ),
-      );
+      ));
 
   Widget _dayHeader(int d) => Text(
         d == 0 ? 'Today' : 'Day ${d + 1}',
@@ -176,7 +177,7 @@ class _FoodMealPlanScreenState extends State<FoodMealPlanScreen> {
     );
   }
 
-  Widget _slotRow(String slot, FoodRecipe r, {bool last = false}) => GestureDetector(
+  Widget _slotRow(String slot, FoodRecipe r, {bool last = false}) => PvPress(child: GestureDetector(
         onTap: () => _push(FoodRecipeScreen(recipe: r)),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -198,5 +199,5 @@ class _FoodMealPlanScreenState extends State<FoodMealPlanScreen> {
             const Icon(Icons.chevron_right_rounded, size: 18, color: ppMuted),
           ]),
         ),
-      );
+      ));
 }

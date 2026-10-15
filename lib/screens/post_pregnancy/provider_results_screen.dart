@@ -13,6 +13,7 @@ import 'pp_common.dart';
 import 'pp_expert_honesty.dart';
 import 'pp_experts_data.dart';
 import 'provider_profile_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 enum _Sort { rating, availability, price }
 
@@ -144,7 +145,7 @@ class _ProviderResultsScreenState extends State<ProviderResultsScreen> {
 
   Widget _chip(String label, _Sort mode) {
     final active = _sort == mode;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => setState(() => _sort = mode),
       child: Container(
         margin: const EdgeInsets.only(right: 9),
@@ -156,11 +157,11 @@ class _ProviderResultsScreenState extends State<ProviderResultsScreen> {
         ),
         child: Text(label, style: ppBody(13, color: active ? Colors.white : ppSoft, w: FontWeight.w700)),
       ),
-    );
+    ));
   }
 
   Widget _card(BuildContext context, Expert e, {bool top = false, bool bottom = false}) {
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => Navigator.of(context).push(
           MaterialPageRoute<void>(builder: (_) => ProviderProfileScreen(expert: e))),
       behavior: HitTestBehavior.opaque,
@@ -221,6 +222,6 @@ class _ProviderResultsScreenState extends State<ProviderResultsScreen> {
           ),
         ]),
       ),
-    );
+    ));
   }
 }

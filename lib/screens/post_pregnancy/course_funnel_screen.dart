@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'pp_common.dart';
 import '../learn/pv_offering_screen.dart';
 import '../learn/pv_learn_catalog.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // ⚠️ FACADE since 2026-09-20 (docs/LEARNING-AUDIT.md). The class keeps its
 // name and constructor so every push of it lands on the unified learn
@@ -94,7 +95,7 @@ class _CourseFunnelScreenState extends State<CourseFunnelScreenClassic> {
 
               // hero
               const SizedBox(height: 18),
-              _pad(GestureDetector(
+              _pad(PvPress(child: GestureDetector(
                 onTap: () => _soon(context),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(22),
@@ -112,7 +113,7 @@ class _CourseFunnelScreenState extends State<CourseFunnelScreenClassic> {
                     ),
                   ]),
                 ),
-              )),
+              ))),
 
               // badges + title
               const SizedBox(height: 20),
@@ -266,7 +267,7 @@ class _CourseFunnelScreenState extends State<CourseFunnelScreenClassic> {
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(16), border: Border.all(color: ppBorder)),
       clipBehavior: Clip.antiAlias,
       child: Column(children: [
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () => setState(() => open ? _openSections.remove(s.$1) : _openSections.add(s.$1)),
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -298,7 +299,7 @@ class _CourseFunnelScreenState extends State<CourseFunnelScreenClassic> {
               ),
             ]),
           ),
-        ),
+        )),
         if (open && s.$5.isNotEmpty)
           Container(
             color: ppBg,
@@ -309,7 +310,7 @@ class _CourseFunnelScreenState extends State<CourseFunnelScreenClassic> {
     );
   }
 
-  Widget _module(BuildContext context, (String, String, bool) m) => GestureDetector(
+  Widget _module(BuildContext context, (String, String, bool) m) => PvPress(child: GestureDetector(
         onTap: () => _soon(context),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -333,11 +334,11 @@ class _CourseFunnelScreenState extends State<CourseFunnelScreenClassic> {
             ),
           ]),
         ),
-      );
+      ));
 
   Widget _faq(int i, String q, String a) {
     final open = _openFaq == i;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => setState(() => _openFaq = open ? -1 : i),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -352,7 +353,7 @@ class _CourseFunnelScreenState extends State<CourseFunnelScreenClassic> {
           if (open) ...[const SizedBox(height: 8), Text(a, style: ppBody(13, h: 1.55))],
         ]),
       ),
-    );
+    ));
   }
 
   Widget _ctaBar(BuildContext context) => Container(
@@ -367,7 +368,7 @@ class _CourseFunnelScreenState extends State<CourseFunnelScreenClassic> {
           ]),
           const SizedBox(width: 14),
           Expanded(
-            child: GestureDetector(
+            child: PvPress(child: GestureDetector(
               onTap: () => _soon(context),
               child: Container(
                 height: 52,
@@ -375,7 +376,7 @@ class _CourseFunnelScreenState extends State<CourseFunnelScreenClassic> {
                 decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(16)),
                 child: Text('Get the course', style: ppBody(15, color: Colors.white, w: FontWeight.w700)),
               ),
-            ),
+            )),
           ),
         ]),
       );

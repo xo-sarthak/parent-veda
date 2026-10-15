@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'journal_email.dart';
 import 'jv2_common.dart';
 import 'jv2_data.dart';
+import '../../../widgets/pv_feedback.dart' show PvPress;
 
 // ---- Storybook (a single book's landing page) -------------------------------
 class StorybookScreen extends StatelessWidget {
@@ -29,7 +30,7 @@ class StorybookScreen extends StatelessWidget {
           jvPad(jvTopBar(
             context,
             title: ppFill(book.title),
-            trailing: GestureDetector(
+            trailing: PvPress(child: GestureDetector(
               onTap: () => emailMemoryToChild(context, _bookAsMemory(book)),
               behavior: HitTestBehavior.opaque,
               child: Container(
@@ -39,7 +40,7 @@ class StorybookScreen extends StatelessWidget {
                 decoration: const BoxDecoration(color: ppPanel, shape: BoxShape.circle),
                 child: const Icon(Icons.mail_outline_rounded, size: 17, color: ppPurple),
               ),
-            ),
+            )),
           )),
           const SizedBox(height: 26),
           Center(child: JvBookCover(width: 150, height: 200, title: ppFill(book.title).toUpperCase(), since: jvBornSince)),
@@ -56,7 +57,7 @@ class StorybookScreen extends StatelessWidget {
     );
   }
 
-  Widget _chapterRow(BuildContext context, JvChapter c, int i) => GestureDetector(
+  Widget _chapterRow(BuildContext context, JvChapter c, int i) => PvPress(child: GestureDetector(
         onTap: () => _openReader(context, i),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -76,7 +77,7 @@ class StorybookScreen extends StatelessWidget {
             const Icon(Icons.chevron_right_rounded, size: 18, color: ppMuted),
           ]),
         ),
-      );
+      ));
 
   void _openReader(BuildContext context, int chapterIndex) => Navigator.of(context)
       .push(MaterialPageRoute<void>(builder: (_) => StorybookReaderScreen(startPage: jvChapterPages[chapterIndex.clamp(0, jvChapterPages.length - 1)])));
@@ -181,13 +182,13 @@ class _StorybookReaderScreenState extends State<StorybookReaderScreen> {
                   padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
                   color: const Color(0xFFEDE4D3),
                   child: Row(children: [
-                    GestureDetector(onTap: () => Navigator.of(context).maybePop(), behavior: HitTestBehavior.opaque, child: const Icon(Icons.arrow_back, size: 22, color: ppInk)),
+                    PvPress(child: GestureDetector(onTap: () => Navigator.of(context).maybePop(), behavior: HitTestBehavior.opaque, child: const Icon(Icons.arrow_back, size: 22, color: ppInk))),
                     Expanded(child: Text(_pages[_page].$1, textAlign: TextAlign.center, style: ppJakarta(14, color: ppInk), maxLines: 1, overflow: TextOverflow.ellipsis)),
-                    GestureDetector(
+                    PvPress(child: GestureDetector(
                       onTap: () => setState(() => bookmarked ? _bookmarks.remove(_page) : _bookmarks.add(_page)),
                       behavior: HitTestBehavior.opaque,
                       child: Icon(bookmarked ? Icons.bookmark_rounded : Icons.bookmark_border_rounded, size: 22, color: bookmarked ? ppCoral : ppInk),
-                    ),
+                    )),
                   ]),
                 ),
               ),
@@ -297,7 +298,7 @@ class _StorybookReaderScreenState extends State<StorybookReaderScreen> {
     );
   }
 
-  Widget _navTab(String label, bool on, VoidCallback onTap) => GestureDetector(
+  Widget _navTab(String label, bool on, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Column(children: [
@@ -305,9 +306,9 @@ class _StorybookReaderScreenState extends State<StorybookReaderScreen> {
           const SizedBox(height: 6),
           Container(height: 2, width: 26, color: on ? ppPurple : Colors.transparent),
         ]),
-      );
+      ));
 
-  Widget _navRow(int seed, String? label, String title, int page, VoidCallback onTap) => GestureDetector(
+  Widget _navRow(int seed, String? label, String title, int page, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -327,9 +328,9 @@ class _StorybookReaderScreenState extends State<StorybookReaderScreen> {
             const Icon(Icons.chevron_right_rounded, size: 18, color: ppMuted),
           ]),
         ),
-      );
+      ));
 
-  Widget _ctrlBtn(IconData icon, String label, VoidCallback onTap) => GestureDetector(
+  Widget _ctrlBtn(IconData icon, String label, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -343,7 +344,7 @@ class _StorybookReaderScreenState extends State<StorybookReaderScreen> {
           const SizedBox(height: 5),
           Text(label, style: ppBody(10, color: ppSoft, w: FontWeight.w600)),
         ]),
-      );
+      ));
 
   // ---- paper wrapper (fills the screen in immersive mode) -------------------
   Widget _paper(Widget child) => AnimatedContainer(

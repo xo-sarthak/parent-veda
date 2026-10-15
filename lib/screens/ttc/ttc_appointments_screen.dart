@@ -88,6 +88,7 @@ import 'ttc_doctor_question_screen.dart';
 import 'ttc_strings.dart';
 import 'ttc_tool_chrome.dart';
 import 'ttc_tool_confirm.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 void openTtcAppointments(BuildContext context) {
   Navigator.of(context).push(MaterialPageRoute<void>(
@@ -1025,7 +1026,7 @@ class _TickButton extends StatelessWidget {
         label: label,
         onTap: onTap,
         excludeSemantics: true,
-        child: GestureDetector(
+        child: PvPress(enabled: onTap != null, child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: onTap,
           child: Padding(
@@ -1045,7 +1046,7 @@ class _TickButton extends StatelessWidget {
                   : null,
             ),
           ),
-        ),
+        )),
       );
 }
 

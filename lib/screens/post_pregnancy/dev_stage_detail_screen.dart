@@ -15,6 +15,7 @@ import 'development_activity_screen.dart';
 import '../../widgets/pv_placeholders.dart';
 import 'pp_common.dart';
 import 'pp_development_data.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class DevStageDetailScreen extends StatelessWidget {
   const DevStageDetailScreen({
@@ -145,7 +146,7 @@ class DevStageDetailScreen extends StatelessWidget {
               const SizedBox(height: 12),
               _pad(Column(children: [
                 for (final act in acts)
-                  GestureDetector(
+                  PvPress(child: GestureDetector(
                     onTap: () => _push(context, DevelopmentActivityScreen(activity: act)),
                     behavior: HitTestBehavior.opaque,
                     child: Container(
@@ -165,7 +166,7 @@ class DevStageDetailScreen extends StatelessWidget {
                         const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
                       ]),
                     ),
-                  ),
+                  )),
               ])),
             ],
 
@@ -187,7 +188,7 @@ class DevStageDetailScreen extends StatelessWidget {
                   separatorBuilder: (_, _) => const SizedBox(width: 12),
                   itemBuilder: (_, i) {
                     final pr = products[i];
-                    return GestureDetector(
+                    return PvPress(child: GestureDetector(
                       onTap: () => _push(context, ProductDetailScreen(product: pr)),
                       behavior: HitTestBehavior.opaque,
                       child: SizedBox(
@@ -204,7 +205,7 @@ class DevStageDetailScreen extends StatelessWidget {
                           Expanded(child: Text(pr.sub, style: ppBody(11.5, color: ppSoft, h: 1.35), maxLines: 2, overflow: TextOverflow.ellipsis)),
                         ]),
                       ),
-                    );
+                    ));
                   },
                 ),
               ),

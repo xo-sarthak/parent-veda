@@ -33,6 +33,7 @@ import '../v2/v2_palette.dart';
 import 'ttc_pcos_check_result.dart';
 import 'ttc_strings.dart';
 import 'ttc_common.dart' show ttcTitleInk;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// PCOS is 288 on the controlled wheel — a tool opened from that door keeps
 /// the door's colour.
@@ -118,14 +119,14 @@ class _TtcPcosCheckScreenState extends State<TtcPcosCheckScreen> {
       Padding(
         padding: const EdgeInsets.fromLTRB(8, 4, 16, 4),
         child: Row(children: [
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: _back,
             behavior: HitTestBehavior.opaque,
             child: Padding(
               padding: const EdgeInsets.all(10),
               child: Icon(Icons.arrow_back_rounded, size: 21, color: p.ink1),
             ),
-          ),
+          )),
           Expanded(
             child: Text(q.section.title.of(lang).toUpperCase(),
                 style: pvManrope(
@@ -274,14 +275,14 @@ class _Intro extends StatelessWidget {
     return Column(children: [
       Align(
         alignment: Alignment.centerLeft,
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: onBack,
           behavior: HitTestBehavior.opaque,
           child: Padding(
             padding: const EdgeInsets.all(18),
             child: Icon(Icons.arrow_back_rounded, size: 21, color: p.ink1),
           ),
-        ),
+        )),
       ),
       Expanded(
         child: ListView(
@@ -481,7 +482,7 @@ class _OptionTile extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -514,7 +515,7 @@ class _OptionTile extends StatelessWidget {
               Icon(Icons.check_rounded, size: 19, color: ttcTitleInk),
           ]),
         ),
-      );
+      ));
 }
 
 class _WhyWeAsk extends StatelessWidget {
@@ -535,7 +536,7 @@ class _WhyWeAsk extends StatelessWidget {
   Widget build(BuildContext context) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: onTap,
             behavior: HitTestBehavior.opaque,
             child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -548,7 +549,7 @@ class _WhyWeAsk extends StatelessWidget {
               Icon(open ? Icons.expand_less_rounded : Icons.expand_more_rounded,
                   size: 17, color: ttcTitleInk),
             ]),
-          ),
+          )),
           if (open) ...[
             const SizedBox(height: 9),
             Text(text,
@@ -596,7 +597,7 @@ class _PrimaryButton extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -613,7 +614,7 @@ class _PrimaryButton extends StatelessWidget {
                   fontWeight: FontWeight.w700,
                   color: Colors.white)),
         ),
-      );
+      ));
 }
 
 /// Shared with the result screen.
@@ -631,7 +632,7 @@ class PcosPrimaryButton extends StatelessWidget {
   final bool filled;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -649,5 +650,5 @@ class PcosPrimaryButton extends StatelessWidget {
                   fontWeight: FontWeight.w700,
                   color: filled ? Colors.white : p.ink1)),
         ),
-      );
+      ));
 }

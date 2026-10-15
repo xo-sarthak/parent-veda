@@ -16,6 +16,7 @@ import 'pp_common.dart';
 import 'pp_growth_data.dart';
 import 'pp_health_data.dart';
 import 'pp_vaccine_data.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class DoctorRecordScreen extends StatelessWidget {
   const DoctorRecordScreen({super.key});
@@ -96,7 +97,7 @@ class DoctorRecordScreen extends StatelessWidget {
                     : [for (final r in store.reports) _line(r.date, '${r.name}${r.summary.isNotEmpty ? ' - ${r.summary}' : ''}')]),
 
                 const SizedBox(height: 24),
-                _pad(GestureDetector(
+                _pad(PvPress(child: GestureDetector(
                   onTap: () => Share.share(_shareText(store, child, givenVisits, latest)),
                   behavior: HitTestBehavior.opaque,
                   child: Container(
@@ -109,7 +110,7 @@ class DoctorRecordScreen extends StatelessWidget {
                       Text('Share this record', style: ppBody(15, color: Colors.white, w: FontWeight.w700)),
                     ]),
                   ),
-                )),
+                ))),
                 const SizedBox(height: 14),
                 _pad(Text('A summary for your convenience - your paediatrician’s own records remain the source of truth.',
                     textAlign: TextAlign.center, style: ppBody(12, color: ppMuted, h: 1.55))),

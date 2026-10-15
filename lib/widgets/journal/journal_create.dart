@@ -23,6 +23,7 @@ import '../../services/pregnancy_controller.dart';
 import '../../theme/app_theme.dart';
 import '../mic_dictation_button.dart';
 import '../../theme/pv_fonts.dart';
+import '../pv_feedback.dart' show PvPress;
 
 /// A small, on-brand "saved" confirmation at the bottom of the screen.
 void _savedSnack(ScaffoldMessengerState m, String msg) {
@@ -405,7 +406,7 @@ class _VoiceRecordSheetState extends State<_VoiceRecordSheet> {
                 fontWeight: FontWeight.w700,
                 color: AppTheme.primary900)),
         const SizedBox(height: 20),
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: _toggle,
           child: Container(
             width: 88,
@@ -424,7 +425,7 @@ class _VoiceRecordSheetState extends State<_VoiceRecordSheet> {
                     ? Colors.white
                     : (widget.father ? _fatherAccent : AppTheme.primary500)),
           ),
-        ),
+        )),
         const SizedBox(height: 12),
         Text(
             _recording

@@ -145,11 +145,11 @@ Widget attachmentChips(List<Attachment> items, {void Function(int index)? onRemo
             ),
             if (onRemove != null) ...[
               const SizedBox(width: 6),
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: () => onRemove(i),
                 behavior: HitTestBehavior.opaque,
                 child: const Icon(Icons.close_rounded, size: 14, color: ppMuted),
-              ),
+              )),
             ],
           ]),
         ),

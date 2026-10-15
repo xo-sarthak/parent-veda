@@ -43,7 +43,7 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/pv_fonts.dart';
-import '../../widgets/pv_feedback.dart' show PvChoiceTile;
+import '../../widgets/pv_feedback.dart' show PvChoiceTile, PvPress;
 import '../v2/v2_palette.dart';
 import 'pp_care_log_data.dart';
 import 'pp_content.dart';
@@ -402,7 +402,7 @@ class _Option extends StatelessWidget {
     // anxious reader toward the other one. That is the opposite of what a
     // triage tool needs.
     final edge = selected ? (concern ? ppAlertInk(p) : p.action) : p.line;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -429,7 +429,7 @@ class _Option extends StatelessWidget {
           ),
         ]),
       ),
-    );
+    ));
   }
 }
 

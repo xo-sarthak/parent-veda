@@ -68,6 +68,7 @@ import 'reading_reader_screen.dart';
 import 'watch_category_screen.dart';
 import 'watch_player_screen.dart';
 import 'watch_quicklearn_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class MyChildScreen extends StatefulWidget {
   const MyChildScreen({super.key, this.home = false});
@@ -310,7 +311,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
     ]);
   }
 
-  Widget _headerIcon(IconData icon, VoidCallback onTap) => GestureDetector(
+  Widget _headerIcon(IconData icon, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -320,7 +321,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
           decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle, boxShadow: ppCardShadow),
           child: Icon(icon, size: 20, color: ppPurple),
         ),
-      );
+      ));
 
   // =========================================================================
   //  Leap hero — the child, the leap, and where they are in it, in one card
@@ -395,7 +396,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             // ---- identity: photo, name, AGE ONLY ---------------------------
             Row(children: [
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: () => showMultiChildSheet(context),
                 behavior: HitTestBehavior.opaque,
                 child: Container(
@@ -408,11 +409,11 @@ class _MyChildScreenState extends State<MyChildScreen> {
                   clipBehavior: Clip.antiAlias,
                   child: const PpStriped(height: 56),
                 ),
-              ),
+              )),
               const SizedBox(width: 13),
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  GestureDetector(
+                  PvPress(child: GestureDetector(
                     onTap: () => showMultiChildSheet(context),
                     behavior: HitTestBehavior.opaque,
                     child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -425,7 +426,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
                       const SizedBox(width: 4),
                       const Icon(Icons.keyboard_arrow_down_rounded, size: 20, color: w70),
                     ]),
-                  ),
+                  )),
                   const SizedBox(height: 3),
                   // Age only. The phase moved to its own block below.
                   Text(phase.ageLabel,
@@ -511,7 +512,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
     final next = nextPhase(_child);
     final idx = kPhases.indexWhere((p) => p.number == phase.number);
 
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _push(const PhaseMapScreen()),
       behavior: HitTestBehavior.opaque,
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -686,7 +687,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
           ),
         ]),
       ]),
-    );
+    ));
   }
 
   // SUPERSEDED 21 Jul by the _leapHero below. Kept, unmounted, for revert.
@@ -740,7 +741,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
         //      character line, the storm→sun progress bar and its status
         //      sentence — none carried real information) ---------------------
         Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => showMultiChildSheet(context),
             behavior: HitTestBehavior.opaque,
             child: Container(
@@ -753,11 +754,11 @@ class _MyChildScreenState extends State<MyChildScreen> {
               clipBehavior: Clip.antiAlias,
               child: const PpStriped(height: 56),
             ),
-          ),
+          )),
           const SizedBox(width: 13),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: () => showMultiChildSheet(context),
                 behavior: HitTestBehavior.opaque,
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -770,7 +771,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
                   const SizedBox(width: 4),
                   const Icon(Icons.keyboard_arrow_down_rounded, size: 20, color: w70),
                 ]),
-              ),
+              )),
               const SizedBox(height: 3),
               Text('${phase.ageLabel} · ${phase.name}',
                   style: ppBody(12.5, color: Colors.white.withValues(alpha: 0.9), w: FontWeight.w600),
@@ -782,7 +783,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
           // The leap page is now reached by this quieter chip rather than the
           // whole card being one tap target (the card holds interactive growth
           // controls now, so a card-wide tap would fight them).
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => _push(PhaseDetailScreen(phase: phase)),
             behavior: HitTestBehavior.opaque,
             child: Container(
@@ -794,7 +795,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
                 const Icon(Icons.arrow_forward, size: 12, color: Colors.white),
               ]),
             ),
-          ),
+          )),
         ]),
 
         // ---- the leap journey bar (in-hero) ----------------------------------
@@ -843,7 +844,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
     ));
   }
 
-  Widget _heroAction(IconData icon, String label, VoidCallback onTap) => GestureDetector(
+  Widget _heroAction(IconData icon, String label, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -851,7 +852,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
           const SizedBox(width: 4),
           Text(label, style: ppBody(11.5, color: Colors.white, w: FontWeight.w700)),
         ]),
-      );
+      ));
 
   // OPTION 1 — the leap journey as its own slim card below the hero. Trialled
   // against the in-hero version; the in-hero one won, so this is kept only for
@@ -960,7 +961,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
       status = 'The last stretch before school.';
     }
 
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _push(const PhaseMapScreen()),
       behavior: HitTestBehavior.opaque,
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -1042,7 +1043,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
           ),
         ]),
       ]),
-    );
+    ));
   }
 
   // RETIRED with the leap framework — the 10-dot strip. Kept for revert.
@@ -1068,7 +1069,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
           : 'Past the last big phase.';
     }
 
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _push(const LeapCalendarScreen()),
       behavior: HitTestBehavior.opaque,
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -1099,7 +1100,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
           ),
         ]),
       ]),
-    );
+    ));
   }
 
   Widget _leapDot(int i, int idx, Color currentColor) {
@@ -1154,7 +1155,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
   Widget _leapHeader(Leap leap) {
     final prog = leapProgress(_child);
     final a = leap.accent;
-    return _pad(GestureDetector(
+    return _pad(PvPress(child: GestureDetector(
       onTap: () => _push(LeapDefinitionScreen(leap: leap)),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -1209,7 +1210,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
               style: ppBody(11.5, color: Colors.white.withValues(alpha: 0.85))),
         ]),
       ),
-    ));
+    )));
   }
 
   // =========================================================================
@@ -1252,7 +1253,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
           Expanded(child: Text('Growth', style: ppJakarta(15))),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: _openGrowthEdit,
             behavior: HitTestBehavior.opaque,
             child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -1260,9 +1261,9 @@ class _MyChildScreenState extends State<MyChildScreen> {
               const SizedBox(width: 4),
               Text('Edit', style: ppBody(12.5, color: ppPurple, w: FontWeight.w700)),
             ]),
-          ),
+          )),
           const SizedBox(width: 14),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => _push(const GrowthJourneyScreen()),
             behavior: HitTestBehavior.opaque,
             child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -1270,7 +1271,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
               const SizedBox(width: 3),
               const Icon(Icons.arrow_forward, size: 13, color: ppPurple),
             ]),
-          ),
+          )),
         ]),
         const SizedBox(height: 12),
         Row(children: [
@@ -1313,7 +1314,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       _pad(Row(children: [
         Expanded(child: Text('Growth', style: ppJakarta(16))),
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: _openGrowthEdit,
           behavior: HitTestBehavior.opaque,
           child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -1321,7 +1322,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
             const SizedBox(width: 5),
             Text('Edit', style: ppBody(13, color: ppPurple, w: FontWeight.w700)),
           ]),
-        ),
+        )),
       ])),
       const SizedBox(height: 4),
       _pad(Text('His measurements, with the typical figure for a ${_child.ageInMonths}-month-old alongside.', style: ppBody(12.5, color: ppMuted))),
@@ -1334,7 +1335,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
         Expanded(child: _growthCard('Head', _m(_child.headCm, 0), 'cm', '~${e.headCm.toStringAsFixed(0)} cm')),
       ])),
       const SizedBox(height: 14),
-      _pad(GestureDetector(
+      _pad(PvPress(child: GestureDetector(
         onTap: () => _push(const GrowthJourneyScreen()),
         behavior: HitTestBehavior.opaque,
         child: Row(children: [
@@ -1342,7 +1343,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
           const SizedBox(width: 6),
           const Icon(Icons.arrow_forward, size: 15, color: ppPurple),
         ]),
-      )),
+      ))),
     ]);
   }
 
@@ -1438,7 +1439,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
         const SizedBox(height: 16),
         // Full-width primary action — the pregnancy HomePrimaryButton, in pp
         // purple. A quiet text link was the main reason this card read as minor.
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () => _openTipSheet(t),
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -1453,7 +1454,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
               const Icon(Icons.arrow_forward_rounded, size: 17, color: Colors.white),
             ]),
           ),
-        ),
+        )),
       ]),
     ));
   }
@@ -1507,16 +1508,16 @@ class _MyChildScreenState extends State<MyChildScreen> {
             const Icon(Icons.play_circle_outline_rounded, size: 16, color: ppPurple),
             const SizedBox(width: 7),
             Expanded(child: Text('This phase, in a video', style: ppJakarta(16))),
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: () => _push(WatchCategoryScreen(category: cat)),
               behavior: HitTestBehavior.opaque,
               child: Text('More videos', style: ppBody(12.5, color: ppPurple, w: FontWeight.w700)),
-            ),
+            )),
           ]),
         ),
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-          child: GestureDetector(
+          child: PvPress(child: GestureDetector(
             onTap: open,
             behavior: HitTestBehavior.opaque,
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -1553,7 +1554,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
               //   ),
               // ),
             ]),
-          ),
+          )),
         ),
       ]),
     ));
@@ -1581,7 +1582,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
           // Nothing to expand on a phase still waiting for its doc.
           if (phase.sections.isNotEmpty) ...[
           const SizedBox(height: 12),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => setState(() => _leapExpanded = !_leapExpanded),
             behavior: HitTestBehavior.opaque,
             child: Row(children: [
@@ -1589,7 +1590,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
               const SizedBox(width: 5),
               Icon(_leapExpanded ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded, size: 19, color: ppPurple),
             ]),
-          ),
+          )),
           ],
         ]),
       ));
@@ -1620,7 +1621,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
 
   // A flat domain row inside the snapshot card (was a floating sub-card; a card
   // of cards read as clutter next to the pregnancy home's single-card sections).
-  Widget _snapRow(IconData icon, String domain, String stage, String insight, String status, VoidCallback onTap) => GestureDetector(
+  Widget _snapRow(IconData icon, String domain, String stage, String insight, String status, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Padding(
@@ -1653,7 +1654,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
             ]),
           ]),
         ),
-      );
+      ));
 
   Color _statusColor(String s) {
     switch (s) {
@@ -1727,7 +1728,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
   Widget _milestoneRow(DevArea area, DevStage s) {
     final now = s.status == 'current';
     final a = area.accent;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _push(DevStageDetailScreen(area: area, stage: s, kindLabel: 'Milestone')),
       behavior: HitTestBehavior.opaque,
       child: Padding(
@@ -1759,7 +1760,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
           const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
         ]),
       ),
-    );
+    ));
   }
 
   // =========================================================================
@@ -1785,7 +1786,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
       railHeight: 176,
       items: [
         for (final r in picks)
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => _push(RecoDetailScreen(item: r)),
             behavior: HitTestBehavior.opaque,
             child: SizedBox(
@@ -1804,7 +1805,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
                 ),
               ]),
             ),
-          ),
+          )),
       ],
     ));
   }
@@ -1828,7 +1829,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
           _faqRow(faqs[i], i),
         ],
         ppRowDivider(),
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () => _push(const AskVedaScreen()),
           behavior: HitTestBehavior.opaque,
           child: Padding(
@@ -1849,14 +1850,14 @@ class _MyChildScreenState extends State<MyChildScreen> {
               const Icon(Icons.chevron_right_rounded, size: 20, color: ppPurple),
             ]),
           ),
-        ),
+        )),
       ]),
     ));
   }
 
   Widget _faqRow(PhaseFaq f, int i) {
     final open = _faqOpen == i;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => setState(() => _faqOpen = open ? -1 : i),
       behavior: HitTestBehavior.opaque,
       child: Padding(
@@ -1881,7 +1882,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
           ),
         ]),
       ),
-    );
+    ));
   }
 
   // =========================================================================
@@ -1914,7 +1915,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
           ],
         ]),
         const SizedBox(height: 12),
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () => _push(const StorybookReaderScreen()),
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -1927,12 +1928,12 @@ class _MyChildScreenState extends State<MyChildScreen> {
               const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
             ]),
           ),
-        ),
+        )),
       ]),
     ));
   }
 
-  Widget _journalTile(IconData icon, String label, VoidCallback onTap) => GestureDetector(
+  Widget _journalTile(IconData icon, String label, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         // Flat panel tiles rather than white+border, so they don't read as
@@ -1946,7 +1947,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
             Expanded(child: Text(label, style: ppBody(12.5, color: ppInk, w: FontWeight.w700), maxLines: 2, overflow: TextOverflow.ellipsis)),
           ]),
         ),
-      );
+      ));
 
   // =========================================================================
   //  Leap-related Watch rail
@@ -1967,7 +1968,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
       railHeight: 180,
       items: [
         for (final v in videos)
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => _push(v.quick ? QuickLearnScreen(startId: v.id) : WatchPlayerScreen(video: v)),
             behavior: HitTestBehavior.opaque,
             child: SizedBox(
@@ -1980,7 +1981,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
                 PpExpertName(v.expert, prefix: '${v.durationLabel} · ', style: ppBody(11, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis),
               ]),
             ),
-          ),
+          )),
       ],
     ));
   }
@@ -2001,7 +2002,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
       railHeight: 180,
       items: [
         for (final a in reads)
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => _push(ReadingReaderScreen(article: a)),
             behavior: HitTestBehavior.opaque,
             child: SizedBox(
@@ -2014,7 +2015,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
                 Text('${a.minutes} min · ${a.author}', style: ppBody(11, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis),
               ]),
             ),
-          ),
+          )),
       ],
     ));
   }
@@ -2025,7 +2026,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
   Widget _lookingAhead() {
     final next = nextPhase(_child);
     if (next == null) return const SizedBox.shrink();
-    return _pad(GestureDetector(
+    return _pad(PvPress(child: GestureDetector(
       onTap: () => _push(PhaseDetailScreen(phase: next)),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -2045,7 +2046,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
           const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
         ]),
       ),
-    ));
+    )));
   }
 
   // =========================================================================
@@ -2067,7 +2068,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
         ]),
       ));
 
-  Widget _timelineRow(IconData icon, String title, String sub, VoidCallback onTap) => GestureDetector(
+  Widget _timelineRow(IconData icon, String title, String sub, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Padding(
@@ -2092,7 +2093,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
             const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
           ]),
         ),
-      );
+      ));
 
   // ---- section header -----------------------------------------------------
   //  RETIRED — every section is now a ppSectionCard whose header lives inside
@@ -2145,7 +2146,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
                 _field('Name', nameCtl),
                 const SizedBox(height: 14),
                 // date of birth
-                GestureDetector(
+                PvPress(child: GestureDetector(
                   onTap: () async {
                     final picked = await showDatePicker(
                       context: ctx,
@@ -2166,7 +2167,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
                       Text('${dob.day} ${_monthsShort[dob.month - 1]} ${dob.year}', style: ppBody(13, color: ppSoft)),
                     ]),
                   ),
-                ),
+                )),
                 const SizedBox(height: 14),
                 Row(children: [
                   Expanded(child: _field('Weight (kg)', wCtl, number: true)),
@@ -2176,7 +2177,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
                   Expanded(child: _field('Head (cm)', headCtl, number: true)),
                 ]),
                 const SizedBox(height: 22),
-                GestureDetector(
+                PvPress(child: GestureDetector(
                   onTap: () {
                     _child.update(
                       name: nameCtl.text,
@@ -2194,7 +2195,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
                     decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(16)),
                     child: Text('Save', style: ppBody(15, color: Colors.white, w: FontWeight.w700)),
                   ),
-                ),
+                )),
               ]),
             ),
           ),

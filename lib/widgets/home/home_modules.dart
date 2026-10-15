@@ -25,6 +25,7 @@ import '../../screens/home_detail_screens.dart';
 import '../../theme/app_theme.dart';
 import '../cards/card_shell.dart';
 import '../cards/raga_player.dart';
+import '../pv_feedback.dart' show PvPress;
 
 // ---------------------------------------------------------------------------
 //  Shared soft module card
@@ -244,7 +245,7 @@ class HomeHeader extends StatelessWidget {
               builder: (context, _) {
                 final muted =
                     BabyVoiceService.instance.isMutedFor(VoiceScope.home);
-                return GestureDetector(
+                return PvPress(child: GestureDetector(
                   onTap: () => BabyVoiceService.instance
                       .toggleMuteFor(VoiceScope.home),
                   child: Container(
@@ -263,7 +264,7 @@ class HomeHeader extends StatelessWidget {
                       size: 22,
                     ),
                   ),
-                );
+                ));
               },
             ),
             const SizedBox(width: 10),
@@ -346,7 +347,7 @@ class LangToggle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
-    Widget seg(String label, bool selected, VoidCallback onTap) => GestureDetector(
+    Widget seg(String label, bool selected, VoidCallback onTap) => PvPress(child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: AnimatedContainer(
@@ -361,7 +362,7 @@ class LangToggle extends StatelessWidget {
                     color: selected ? Colors.white : AppTheme.neutral500,
                     fontWeight: FontWeight.w700)),
           ),
-        );
+        ));
     return Container(
       padding: const EdgeInsets.all(3),
       decoration: BoxDecoration(
@@ -387,7 +388,7 @@ class ModeToggle extends StatelessWidget {
     final text = Theme.of(context).textTheme;
     Widget seg(String label, IconData icon, bool selected, VoidCallback onTap) =>
         Expanded(
-          child: GestureDetector(
+          child: PvPress(child: GestureDetector(
             onTap: onTap,
             behavior: HitTestBehavior.opaque,
             child: AnimatedContainer(
@@ -412,7 +413,7 @@ class ModeToggle extends StatelessWidget {
                 ],
               ),
             ),
-          ),
+          )),
         );
     return Container(
       padding: const EdgeInsets.all(4),
@@ -1009,7 +1010,7 @@ class _InfoButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Tooltip(
       message: tooltip,
-      child: GestureDetector(
+      child: PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -1023,7 +1024,7 @@ class _InfoButton extends StatelessWidget {
           ),
           child: Icon(Icons.info_outline_rounded, size: 15, color: color),
         ),
-      ),
+      )),
     );
   }
 }
@@ -1317,7 +1318,7 @@ class _MoodTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
@@ -1345,6 +1346,6 @@ class _MoodTile extends StatelessWidget {
           ),
         ]),
       ),
-    );
+    ));
   }
 }

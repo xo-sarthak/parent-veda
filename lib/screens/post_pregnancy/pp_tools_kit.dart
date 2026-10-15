@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'pp_common.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // ---- section padding --------------------------------------------------------
 Widget ppToolPad(Widget c) =>
@@ -43,7 +44,7 @@ List<Widget> ppToolHeader(
 
 // ---- big primary "log" button ----------------------------------------------
 Widget ppLogButton(String label, VoidCallback onTap, {IconData icon = Icons.add_rounded}) =>
-    GestureDetector(
+    PvPress(child: GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -56,10 +57,10 @@ Widget ppLogButton(String label, VoidCallback onTap, {IconData icon = Icons.add_
           Text(label, style: ppBody(15, color: Colors.white, w: FontWeight.w700)),
         ]),
       ),
-    );
+    ));
 
 // A softer secondary action (outline).
-Widget ppGhostButton(String label, VoidCallback onTap, {IconData? icon}) => GestureDetector(
+Widget ppGhostButton(String label, VoidCallback onTap, {IconData? icon}) => PvPress(child: GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -71,7 +72,7 @@ Widget ppGhostButton(String label, VoidCallback onTap, {IconData? icon}) => Gest
           Text(label, style: ppBody(14, color: ppInk, w: FontWeight.w700)),
         ]),
       ),
-    );
+    ));
 
 // ---- section header (title · optional trailing) -----------------------------
 Widget ppSectionHead(String title, {String? trailing}) => Row(children: [
@@ -102,7 +103,7 @@ Widget ppInsightCard(String text, {String tag = 'Insight', IconData icon = Icons
     );
 
 // ---- "Learn while tracking" row (opens an inline answer, never a dead end) ---
-Widget ppLearnRow(BuildContext context, String title, {bool top = false, bool bottom = false}) => GestureDetector(
+Widget ppLearnRow(BuildContext context, String title, {bool top = false, bool bottom = false}) => PvPress(child: GestureDetector(
       onTap: () => ppFaqSheet(context, title),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -126,7 +127,7 @@ Widget ppLearnRow(BuildContext context, String title, {bool top = false, bool bo
           const Text('→', style: TextStyle(color: ppMuted)),
         ]),
       ),
-    );
+    ));
 
 // A whole "Learn while tracking" block: heading + rows.
 Widget ppLearnBlock(BuildContext context, List<String> titles) => Column(
@@ -159,7 +160,7 @@ Widget ppEmptyCard(IconData icon, String text) => Container(
 
 // ---- choice chip (used in log sheets) ---------------------------------------
 Widget ppChoiceChip(String label, bool on, VoidCallback onTap, {IconData? icon, bool expand = true}) {
-  final chip = GestureDetector(
+  final chip = PvPress(child: GestureDetector(
     onTap: onTap,
     behavior: HitTestBehavior.opaque,
     child: Container(
@@ -178,7 +179,7 @@ Widget ppChoiceChip(String label, bool on, VoidCallback onTap, {IconData? icon, 
             ])
           : Text(label, style: ppBody(12.5, color: on ? Colors.white : ppInk, w: FontWeight.w700)),
     ),
-  );
+  ));
   return expand ? Expanded(child: chip) : chip;
 }
 
@@ -236,7 +237,7 @@ void ppLogSheet(
               const SizedBox(height: 16),
               ...body(setSheet),
               const SizedBox(height: 20),
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: () {
                   onSave();
                   Navigator.of(ctx).pop();
@@ -248,7 +249,7 @@ void ppLogSheet(
                   decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(14)),
                   child: Text(saveLabel, style: ppBody(15, color: Colors.white, w: FontWeight.w700)),
                 ),
-              ),
+              )),
             ]),
           ),
         ),
@@ -272,7 +273,7 @@ void ppConfirmRemove(BuildContext context, String title, VoidCallback onConfirm)
           const SizedBox(height: 18),
           Row(children: [
             Expanded(
-              child: GestureDetector(
+              child: PvPress(child: GestureDetector(
                 onTap: () => Navigator.of(ctx).pop(),
                 behavior: HitTestBehavior.opaque,
                 child: Container(
@@ -281,11 +282,11 @@ void ppConfirmRemove(BuildContext context, String title, VoidCallback onConfirm)
                   decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14), border: Border.all(color: ppLine)),
                   child: Text('Cancel', style: ppBody(14, color: ppInk, w: FontWeight.w700)),
                 ),
-              ),
+              )),
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: GestureDetector(
+              child: PvPress(child: GestureDetector(
                 onTap: () {
                   onConfirm();
                   Navigator.of(ctx).pop();
@@ -297,7 +298,7 @@ void ppConfirmRemove(BuildContext context, String title, VoidCallback onConfirm)
                   decoration: BoxDecoration(color: ppCoral, borderRadius: BorderRadius.circular(14)),
                   child: Text('Remove', style: ppBody(14, color: Colors.white, w: FontWeight.w700)),
                 ),
-              ),
+              )),
             ),
           ]),
         ]),
@@ -311,7 +312,7 @@ Widget ppTimeField(String label, TimeOfDay value, VoidCallback onTap) => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ppFieldLabel(label),
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -323,7 +324,7 @@ Widget ppTimeField(String label, TimeOfDay value, VoidCallback onTap) => Column(
               Flexible(child: Text(ppFmtTod(value), style: ppBody(14, color: ppInk, w: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis)),
             ]),
           ),
-        ),
+        )),
       ],
     );
 

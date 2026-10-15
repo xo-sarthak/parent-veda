@@ -25,6 +25,7 @@ import 'product_guide_data.dart';
 import 'product_guide_screen.dart';
 import 'product_guide_style.dart';
 import '../../localization/app_language.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// Open a tapped product. If a Product Guide exists for it (by [id] or [name]),
 /// ask the parent which view they'd like; otherwise just [onOpenNormal].
@@ -106,7 +107,7 @@ Widget _choice(
   required bool featured,
   required VoidCallback onTap,
 }) =>
-    GestureDetector(
+    PvPress(child: GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -144,13 +145,13 @@ Widget _choice(
           const Icon(Icons.chevron_right_rounded, color: pgMuted),
         ]),
       ),
-    );
+    ));
 
 /// An inline banner for a product detail page: "there's a Guide for this".
 Widget productGuideBanner(BuildContext context, ProductGuide guide, {EdgeInsets padding = const EdgeInsets.symmetric(horizontal: 20)}) =>
     Padding(
       padding: padding,
-      child: GestureDetector(
+      child: PvPress(child: GestureDetector(
         onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => ProductGuideScreenClassic(guide: guide))),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -177,7 +178,7 @@ Widget productGuideBanner(BuildContext context, ProductGuide guide, {EdgeInsets 
             const Icon(Icons.arrow_forward_rounded, size: 16, color: pgPurple),
           ]),
         ),
-      ),
+      )),
     );
 
 // ---- facade (the retirement) -----------------------------------------------

@@ -26,6 +26,7 @@ import 'name_list_screen.dart';
 import 'pp_common.dart';
 import 'pp_names_data.dart';
 import 'pp_names_v2_data.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 const Color _feelBg = Color(0xFFEDE6F5);
 
@@ -482,7 +483,7 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
         child: Semantics(
           button: true,
           label: semantic,
-          child: GestureDetector(
+          child: PvPress(enabled: onTap != null, child: GestureDetector(
             onTap: onTap,
             behavior: HitTestBehavior.opaque,
             child: Container(
@@ -496,7 +497,7 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
               ),
               child: Icon(icon, size: iconSize, color: iconColor),
             ),
-          ),
+          )),
         ),
       );
 
@@ -630,7 +631,7 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
             color: Colors.black.withValues(alpha: 0.45),
             alignment: Alignment.center,
             padding: const EdgeInsets.all(24),
-            child: GestureDetector(
+            child: PvPress(child: GestureDetector(
               onTap: () {},
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 26),
@@ -655,7 +656,7 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
                   ]),
                 ),
               ),
-            ),
+            )),
           ),
         ),
       );
@@ -727,7 +728,7 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
           ])),
 
           const SizedBox(height: 30),
-          _pad(GestureDetector(
+          _pad(PvPress(child: GestureDetector(
             onTap: () => setState(() => _phase = _Phase.primer),
             behavior: HitTestBehavior.opaque,
             child: Container(
@@ -744,19 +745,19 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
                 const Icon(Icons.arrow_forward, size: 16, color: Colors.white),
               ]),
             ),
-          )),
+          ))),
           const SizedBox(height: 12),
-          _pad(Center(child: GestureDetector(
+          _pad(Center(child: PvPress(child: GestureDetector(
             onTap: _openBrowse,
             behavior: HitTestBehavior.opaque,
             child: Text('Just show me names', style: ppBody(13, color: ppPurple, w: FontWeight.w700)),
-          ))),
+          )))),
         ],
       );
 
   Widget _whoCard(int i) {
     final on = i == _who;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => setState(() => _who = i),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -772,12 +773,12 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
           Text(_genders[i].$2, style: ppJakarta(13)),
         ]),
       ),
-    );
+    ));
   }
 
   Widget _vibeChip(String label) {
     final on = _vibes.contains(label);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => setState(() => on ? _vibes.remove(label) : _vibes.add(label)),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -792,12 +793,12 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
           Text(label, style: ppBody(13, color: on ? Colors.white : ppInk, w: on ? FontWeight.w700 : FontWeight.w600)),
         ]),
       ),
-    );
+    ));
   }
 
   Widget _noPrefChip() {
     final on = _vibes.isEmpty;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => setState(_vibes.clear),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -809,10 +810,10 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
         ),
         child: Text('No preference', style: ppBody(13, color: on ? Colors.white : ppSoft, w: FontWeight.w700)),
       ),
-    );
+    ));
   }
 
-  Widget _pillChip(String label, bool on, VoidCallback onTap) => GestureDetector(
+  Widget _pillChip(String label, bool on, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -824,13 +825,13 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
           ),
           child: Text(label, style: ppBody(12.5, color: on ? ppPurple : ppSoft, w: on ? FontWeight.w700 : FontWeight.w600)),
         ),
-      );
+      ));
 
   // ---- primer (sets the mental model - one screen, not a tutorial) --------
   Widget _primerView() => ListView(
         padding: const EdgeInsets.only(top: 12, bottom: 40),
         children: [
-          _pad(GestureDetector(
+          _pad(PvPress(child: GestureDetector(
             onTap: () => setState(() => _phase = _Phase.quiz),
             behavior: HitTestBehavior.opaque,
             child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -838,7 +839,7 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
               const SizedBox(width: 12),
               Text('Back', style: ppBody(14, color: ppSoft)),
             ]),
-          )),
+          ))),
           const SizedBox(height: 30),
           Center(
             child: Container(
@@ -870,7 +871,7 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
           _pad(Text('We\'ll learn what you love and gradually tailor every suggestion.', textAlign: TextAlign.center, style: ppBody(13, color: ppSoft, h: 1.5))),
 
           const SizedBox(height: 30),
-          _pad(GestureDetector(
+          _pad(PvPress(child: GestureDetector(
             onTap: _startSwiping,
             behavior: HitTestBehavior.opaque,
             child: Container(
@@ -879,7 +880,7 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
               decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(16), boxShadow: const [BoxShadow(color: Color(0x8C6A30B6), blurRadius: 28, spreadRadius: -10, offset: Offset(0, 12))]),
               child: Text('Let\'s begin', style: ppBody(15, color: Colors.white, w: FontWeight.w700)),
             ),
-          )),
+          ))),
         ],
       );
 
@@ -940,14 +941,14 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
         padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
         child: Column(children: [
           Row(children: [
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: () => Navigator.of(context).maybePop(),
               behavior: HitTestBehavior.opaque,
               child: Container(width: 34, height: 34, alignment: Alignment.center, decoration: const BoxDecoration(color: ppPanel, shape: BoxShape.circle), child: const Icon(Icons.arrow_back, size: 17, color: ppInk)),
-            ),
+            )),
             const SizedBox(width: 12),
             Expanded(child: Text(widget.collection?.title ?? 'For you', style: ppJakarta(15), maxLines: 1, overflow: TextOverflow.ellipsis)),
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: _openList,
               behavior: HitTestBehavior.opaque,
               child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -955,7 +956,7 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
                 const SizedBox(width: 5),
                 Text('${_store.likedCount}', style: ppBody(12, color: ppPurple, w: FontWeight.w700)),
               ]),
-            ),
+            )),
           ]),
           const SizedBox(height: 14),
           Container(
@@ -1148,7 +1149,7 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
           const SizedBox(height: 8),
           Text('${_store.likedCount} names are waiting in the ones you love. Skipped names are never gone; find them anytime in Browse.', textAlign: TextAlign.center, style: ppBody(14, h: 1.5)),
           const SizedBox(height: 20),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: _openList,
             behavior: HitTestBehavior.opaque,
             child: Container(
@@ -1156,13 +1157,13 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
               decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(14)),
               child: Text('See our shortlist', style: ppBody(14, color: Colors.white, w: FontWeight.w700)),
             ),
-          ),
+          )),
           const SizedBox(height: 10),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: _openBrowse,
             behavior: HitTestBehavior.opaque,
             child: Text('Browse all names', style: ppBody(13, color: ppPurple, w: FontWeight.w700)),
-          ),
+          )),
         ]),
       );
 
@@ -1177,7 +1178,7 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
         child: Semantics(
           button: true,
           label: semantic,
-          child: GestureDetector(
+          child: PvPress(enabled: onTap != null, child: GestureDetector(
             onTap: onTap,
             behavior: HitTestBehavior.opaque,
             child: Container(
@@ -1194,7 +1195,7 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
               ),
               child: Icon(icon, size: iconSize, color: iconColor),
             ),
-          ),
+          )),
         ),
       );
 
@@ -1250,7 +1251,7 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
             color: const Color(0x8C4A3A6B),
             alignment: Alignment.center,
             padding: const EdgeInsets.all(32),
-            child: GestureDetector(
+            child: PvPress(child: GestureDetector(
               onTap: () {},
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 30),
@@ -1266,24 +1267,24 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
                   const SizedBox(height: 22),
                   Row(children: [
                     Expanded(
-                      child: GestureDetector(
+                      child: PvPress(child: GestureDetector(
                         onTap: () => _openDetail(n),
                         behavior: HitTestBehavior.opaque,
                         child: Container(height: 46, alignment: Alignment.center, decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(14)), child: Text('Read its story', style: ppBody(14, color: ppPurple, w: FontWeight.w700))),
-                      ),
+                      )),
                     ),
                     const SizedBox(width: 10),
                     Expanded(
-                      child: GestureDetector(
+                      child: PvPress(child: GestureDetector(
                         onTap: _next,
                         behavior: HitTestBehavior.opaque,
                         child: Container(height: 46, alignment: Alignment.center, decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(14)), child: Text('Keep going', style: ppBody(14, color: Colors.white, w: FontWeight.w700))),
-                      ),
+                      )),
                     ),
                   ]),
                 ]),
               ),
-            ),
+            )),
           ),
         ),
       );

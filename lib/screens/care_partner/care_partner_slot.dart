@@ -29,6 +29,7 @@ import '../../care_partner/care_visibility.dart';
 import '../post_pregnancy/pp_common.dart';
 import 'care_circle_screen.dart';
 import 'care_partner_card.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class CarePartnerSlot extends StatefulWidget {
   const CarePartnerSlot({
@@ -132,7 +133,7 @@ class _CarePartnerSlotState extends State<CarePartnerSlot> {
                   // A small, unlabelled dismiss. She is closing a card, not
                   // reporting a doctor - anything heavier would make the
                   // presence feel like something to defend against.
-                  GestureDetector(
+                  PvPress(child: GestureDetector(
                     onTap: () {
                       _presence.dismiss(
                           partner.id, widget.surface, widget.topic);
@@ -145,7 +146,7 @@ class _CarePartnerSlotState extends State<CarePartnerSlot> {
                       padding: EdgeInsets.fromLTRB(10, 8, 2, 8),
                       child: Icon(Icons.close_rounded, size: 15, color: ppSoft),
                     ),
-                  ),
+                  )),
                 ])
               : card,
         );

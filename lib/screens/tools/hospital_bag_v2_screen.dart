@@ -20,6 +20,7 @@ import '../../services/hospital_bag_v2_store.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../theme/app_theme.dart';
 import '../cart_screen.dart' show showSingleBuyNow;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 void _push(BuildContext c, Widget s) =>
     Navigator.of(c).push(MaterialPageRoute(builder: (_) => s));
@@ -630,7 +631,7 @@ class _PackToggle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final packed = item.packed;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => HospitalBagV2Store.instance.togglePacked(item.id),
       behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
@@ -652,7 +653,7 @@ class _PackToggle extends StatelessWidget {
                   fontWeight: FontWeight.w700)),
         ]),
       ),
-    );
+    ));
   }
 }
 

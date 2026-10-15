@@ -11,6 +11,7 @@ import 'pp_child_profile.dart';
 
 import 'pp_common.dart';
 import 'pp_health_data.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class HealthTimelineScreen extends StatelessWidget {
   const HealthTimelineScreen({super.key});
@@ -64,7 +65,7 @@ class HealthTimelineScreen extends StatelessWidget {
         ),
         const SizedBox(width: 14),
         Expanded(
-          child: GestureDetector(
+          child: PvPress(child: GestureDetector(
             onTap: () => _detail(context, e),
             behavior: HitTestBehavior.opaque,
             child: Container(
@@ -99,7 +100,7 @@ class HealthTimelineScreen extends StatelessWidget {
                 ],
               ]),
             ),
-          ),
+          )),
         ),
       ]),
     );

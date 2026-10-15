@@ -28,6 +28,7 @@ import 'pp_products_data.dart';
 import 'products_subcategory_screen.dart';
 import '../../data/products/pv_catalog_adapters.dart' show pvSlug;
 import '../products/pv_shelf_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class ProductsCategoryScreenClassic extends StatefulWidget {
   const ProductsCategoryScreenClassic({super.key, this.category = 'Sleep'});
@@ -82,7 +83,7 @@ class _ProductsCategoryScreenState extends State<ProductsCategoryScreenClassic> 
               const SizedBox(width: 14),
               Expanded(child: Text(_cat.name, style: ppFraunces(30, h: 1.1))),
               const SizedBox(width: 10),
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: () => setState(() => _noteOpen = !_noteOpen),
                 child: Container(
                   width: 34,
@@ -91,7 +92,7 @@ class _ProductsCategoryScreenState extends State<ProductsCategoryScreenClassic> 
                   decoration: const BoxDecoration(color: ppCoralTint, shape: BoxShape.circle),
                   child: const Icon(Icons.info_outline, size: 17, color: ppCoral),
                 ),
-              ),
+              )),
             ])),
             const SizedBox(height: 14),
             _pad(Text(_intro, style: ppBody(14))),
@@ -132,10 +133,10 @@ class _ProductsCategoryScreenState extends State<ProductsCategoryScreenClassic> 
               _pad(Row(children: [
                 Expanded(child: Text(s.name, style: ppJakarta(17), maxLines: 1, overflow: TextOverflow.ellipsis)),
                 const SizedBox(width: 10),
-                GestureDetector(
+                PvPress(child: GestureDetector(
                   onTap: () => _openSub(s.name),
                   child: Text('View all →', style: ppBody(12, color: ppPurple, w: FontWeight.w700)),
-                ),
+                )),
               ])),
               const SizedBox(height: 14),
               _pad(_grid(productsInSub(_cat.name, s.name))),
@@ -154,10 +155,10 @@ class _ProductsCategoryScreenState extends State<ProductsCategoryScreenClassic> 
   }
 
   Widget _breadcrumb(BuildContext context) => Row(children: [
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () => Navigator.of(context).maybePop(),
           child: Text('Products', style: ppBody(12, color: ppPurple, w: FontWeight.w600)),
-        ),
+        )),
         const SizedBox(width: 6),
         const Text('›', style: TextStyle(color: Color(0xFFC7BBD6))),
         const SizedBox(width: 6),
@@ -166,7 +167,7 @@ class _ProductsCategoryScreenState extends State<ProductsCategoryScreenClassic> 
 
   Widget _chip(String label) {
     final on = _activeSub == label;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => setState(() => _activeSub = label),
       child: Container(
         margin: const EdgeInsets.only(right: 9),
@@ -174,7 +175,7 @@ class _ProductsCategoryScreenState extends State<ProductsCategoryScreenClassic> 
         decoration: BoxDecoration(color: on ? ppPurple : ppPanel, borderRadius: BorderRadius.circular(999)),
         child: Text(label, style: ppBody(12, color: on ? Colors.white : ppSoft, w: on ? FontWeight.w700 : FontWeight.w600)),
       ),
-    );
+    ));
   }
 
   Widget _grid(List<PpProduct> items) {

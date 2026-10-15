@@ -29,6 +29,7 @@ import '../cards/food_emoji.dart';
 import '../cards/raga_player.dart';
 import '../memories/memories_section.dart';
 import 'week_overview_card.dart';
+import '../pv_feedback.dart' show PvPress;
 // import 'living_halo.dart'; // ring figure replaced by the striped Size hero
 //   (kept for revert: re-add this import + restore the old SizeRevealCard body).
 
@@ -313,7 +314,7 @@ class _FruitBabyToggle extends StatelessWidget {
       required VoidCallback onTap}) {
     final text = Theme.of(context).textTheme;
     final fg = selected ? Colors.white : AppTheme.neutral500;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
@@ -346,7 +347,7 @@ class _FruitBabyToggle extends StatelessWidget {
           ],
         ),
       ),
-    );
+    ));
   }
 }
 
@@ -621,7 +622,7 @@ class WeeklyVideoCard extends StatelessWidget {
         },
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () => ScaffoldMessenger.of(context)
               .showSnackBar(SnackBar(content: Text(s.wkVideoSoon))),
           child: AspectRatio(
@@ -682,7 +683,7 @@ class WeeklyVideoCard extends StatelessWidget {
               ]),
             ),
           ),
-        ),
+        )),
         const SizedBox(height: 14),
         Text(v.reason.of(lang), style: text.bodyLarge?.copyWith(height: 1.5)),
         const SizedBox(height: 10),
@@ -1183,7 +1184,7 @@ class _WeeklyJournalCta extends StatelessWidget {
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
     final s = S(lang);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => Navigator.of(context).push(MaterialPageRoute(
         builder: (_) => JournalWriterScreen(
           lang: lang,
@@ -1233,7 +1234,7 @@ class _WeeklyJournalCta extends StatelessWidget {
           ]),
         ]),
       ),
-    );
+    ));
   }
 }
 

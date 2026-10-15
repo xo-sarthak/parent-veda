@@ -39,6 +39,7 @@ import 'pp_common.dart';
 import 'pp_experts_data.dart';
 import 'prescription_view_screen.dart';
 import '../learn/pv_my_learning_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // ⚠️ FACADE since 2026-09-20 (docs/LEARNING-AUDIT.md). The class keeps its
 // name and constructor so every push of it lands on the unified learn
@@ -219,7 +220,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreenClassic> {
     final b = forBooking;
     final n = rx.items.where((i) => !i.isEmpty).length;
     return [
-      _pad(GestureDetector(
+      _pad(PvPress(child: GestureDetector(
         onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
             builder: (_) =>
                 PrescriptionViewScreen(prescription: rx, title: b.title))),
@@ -256,7 +257,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreenClassic> {
             const Icon(Icons.chevron_right_rounded, size: 20, color: ppPurple),
           ]),
         ),
-      )),
+      ))),
       const SizedBox(height: 18),
     ];
   }
@@ -361,7 +362,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreenClassic> {
         Row(children: [
           Expanded(child: _joinButton(b, joinable)),
           const SizedBox(width: 10),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => _confirmCancel(b),
             behavior: HitTestBehavior.opaque,
             child: Padding(
@@ -369,7 +370,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreenClassic> {
               child: Text('Cancel',
                   style: ppBody(12.5, color: ppSoft, w: FontWeight.w700)),
             ),
-          ),
+          )),
         ]),
       ]),
     );
@@ -508,7 +509,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreenClassic> {
         ]),
         if (rx != null) ...[
           const SizedBox(height: 10),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
                 builder: (_) =>
                     PrescriptionViewScreen(prescription: rx, title: b.title))),
@@ -528,7 +529,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreenClassic> {
                     style: ppBody(12.5, color: ppPurple, w: FontWeight.w700)),
               ]),
             ),
-          ),
+          )),
         ],
       ]),
     );
@@ -587,7 +588,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreenClassic> {
 
   /// The way out of an empty state. Quiet, not a hero button - this is an
   /// invitation, not a demand.
-  Widget _emptyCta(String label, VoidCallback onTap) => GestureDetector(
+  Widget _emptyCta(String label, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -603,7 +604,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreenClassic> {
             const Icon(Icons.arrow_forward_rounded, size: 14, color: ppPurple),
           ]),
         ),
-      );
+      ));
 
   /// "No history" and "cannot see your history" are different sentences, and
   /// this card used to say the first when it meant the second.
@@ -687,7 +688,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreenClassic> {
           const SizedBox(height: 18),
           Row(children: [
             Expanded(
-              child: GestureDetector(
+              child: PvPress(child: GestureDetector(
                 onTap: () => Navigator.of(context).pop(false),
                 child: Container(
                   height: 46,
@@ -697,11 +698,11 @@ class _MyBookingsScreenState extends State<MyBookingsScreenClassic> {
                   child: Text('Keep it',
                       style: ppBody(13.5, color: ppInk, w: FontWeight.w700)),
                 ),
-              ),
+              )),
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: GestureDetector(
+              child: PvPress(child: GestureDetector(
                 onTap: () => Navigator.of(context).pop(true),
                 child: Container(
                   height: 46,
@@ -712,7 +713,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreenClassic> {
                       style: ppBody(13.5,
                           color: Colors.white, w: FontWeight.w700)),
                 ),
-              ),
+              )),
             ),
           ]),
         ]),

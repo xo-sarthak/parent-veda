@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 
 import 'pp_common.dart';
 import 'pp_watch_data.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // Gentle thumbnail tints, varied by seed so a grid doesn't read as flat.
 const List<(Color, Color)> _kThumbTints = [
@@ -119,7 +120,7 @@ Widget watchSectionHeader(String title, {String? action, VoidCallback? onAction}
       children: [
         Expanded(child: Text(title, style: ppJakarta(18))),
         if (action != null)
-          GestureDetector(onTap: onAction, behavior: HitTestBehavior.opaque, child: ppSeeAll(action)),
+          PvPress(enabled: onAction != null, child: GestureDetector(onTap: onAction, behavior: HitTestBehavior.opaque, child: ppSeeAll(action))),
       ],
     );
 
@@ -132,7 +133,7 @@ class WatchRailCard extends StatelessWidget {
   final double? progress;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: SizedBox(
@@ -145,7 +146,7 @@ class WatchRailCard extends StatelessWidget {
             watchMeta(video),
           ]),
         ),
-      );
+      ));
 }
 
 /// A wide list card (thumbnail left, text right) - for feeds & "For you".
@@ -156,7 +157,7 @@ class WatchListCard extends StatelessWidget {
   final double? progress;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Padding(
@@ -178,5 +179,5 @@ class WatchListCard extends StatelessWidget {
             ),
           ]),
         ),
-      );
+      ));
 }

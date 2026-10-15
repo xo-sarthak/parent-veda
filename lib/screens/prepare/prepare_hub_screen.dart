@@ -38,6 +38,7 @@ import '../brackets/hub/hub_intent_art.dart' show IntentMark;
 import '../doors/pv_list_row.dart' show PvMarkWell;
 import '../pregnancy/preg_chrome.dart' show PregNote, PregSectionHeading, pregGroupLabelStyle;
 import '../products/pv_store_chrome.dart' show kPvLine, pvStorePalette;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// A caps string read as a sentence ("RECOMMENDED AT 30 WEEKS" becomes
 /// "Recommended at 30 weeks"), so a heading that was a grey caps label can
@@ -214,7 +215,7 @@ class PrepareHubScreen extends StatelessWidget {
     required String meta,
     required VoidCallback onTap,
   }) {
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       child: Container(
         width: 230,
@@ -251,7 +252,7 @@ class PrepareHubScreen extends StatelessWidget {
           ),
         ]),
       ),
-    );
+    ));
   }
 
   // A row that opens somewhere carries a drawn mark in its tint (2026-09-30).
@@ -259,7 +260,7 @@ class PrepareHubScreen extends StatelessWidget {
   // and a '→' glyph under the count where the chevron now is.
   Widget _tile(BuildContext context, IntentMark mark, double hue, String title, String sub, String count,
       {bool top = false, bool bottom = false, required VoidCallback onTap}) {
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -287,6 +288,6 @@ class PrepareHubScreen extends StatelessWidget {
           ]),
         ]),
       ),
-    );
+    ));
   }
 }

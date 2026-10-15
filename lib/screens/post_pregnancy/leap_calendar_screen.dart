@@ -18,6 +18,7 @@ import 'pp_child_profile.dart';
 import 'pp_common.dart';
 import 'pp_leaps_data.dart';
 import 'leap_definition_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // ⚠️ THE DATES CAME OFF, 2026-09-12. This screen printed each phase as his
 // own calendar window ("3 Oct – 27 Oct") and said "he is in Phase 4 right
@@ -137,7 +138,7 @@ class _LeapCalendarScreenState extends State<LeapCalendarScreen> {
     // final start = l.startDate(child.dob);
     // final end = l.endDate(child.dob);
     final a = l.accent;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _open(l),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -169,7 +170,7 @@ class _LeapCalendarScreenState extends State<LeapCalendarScreen> {
           Text(l.character, style: ppBody(10.5, color: now ? Colors.white.withValues(alpha: 0.8) : (past ? ppMuted : a), w: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis),
         ]),
       ),
-    );
+    ));
   }
 
   Widget _listRow(Leap l, int i, int curIdx) {
@@ -179,7 +180,7 @@ class _LeapCalendarScreenState extends State<LeapCalendarScreen> {
     // final start = l.startDate(child.dob);
     // final end = l.endDate(child.dob);
     final a = l.accent;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _open(l),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -217,6 +218,6 @@ class _LeapCalendarScreenState extends State<LeapCalendarScreen> {
           const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
         ]),
       ),
-    );
+    ));
   }
 }

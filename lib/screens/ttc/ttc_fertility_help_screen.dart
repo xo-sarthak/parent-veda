@@ -32,7 +32,7 @@ import '../../localization/app_language.dart';
 import '../../theme/pv_fonts.dart';
 import '../../ttc/ttc_fertility_help_rules.dart';
 import '../../ttc/ttc_fertility_help_store.dart';
-import '../../widgets/pv_feedback.dart' show PvChoiceTile;
+import '../../widgets/pv_feedback.dart' show PvChoiceTile, PvPress;
 import '../v2/v2_palette.dart';
 import 'ttc_fertility_help_summary.dart';
 import 'ttc_strings.dart';
@@ -99,14 +99,14 @@ class _TtcFertilityHelpScreenState extends State<TtcFertilityHelpScreen> {
   Widget _bar(V2Palette p, String Function(String, String) t) => Padding(
         padding: const EdgeInsets.fromLTRB(8, 4, 16, 6),
         child: Row(children: [
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: _back,
             behavior: HitTestBehavior.opaque,
             child: Padding(
               padding: const EdgeInsets.all(10),
               child: Icon(Icons.arrow_back_rounded, size: 21, color: p.ink1),
             ),
-          ),
+          )),
           Expanded(
             child: Text(t('IVF & IUI', 'IVF aur IUI'),
                 style: pvManrope(
@@ -758,7 +758,7 @@ class _Option extends StatelessWidget {
 
   // Kept for revert (2026-10-10): the ink-edge row with a bare tick.
   // ignore: unused_element
-  Widget _buildBefore(BuildContext context) => GestureDetector(
+  Widget _buildBefore(BuildContext context) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -788,7 +788,7 @@ class _Option extends StatelessWidget {
             if (selected) Icon(Icons.check_rounded, size: 19, color: ttcTitleInk),
           ]),
         ),
-      );
+      ));
 }
 
 class _Link extends StatelessWidget {
@@ -798,7 +798,7 @@ class _Link extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -821,7 +821,7 @@ class _Link extends StatelessWidget {
             Icon(Icons.arrow_forward_rounded, size: 17, color: p.ink3),
           ]),
         ),
-      );
+      ));
 }
 
 class _Button extends StatelessWidget {
@@ -837,7 +837,7 @@ class _Button extends StatelessWidget {
   final bool filled;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -855,7 +855,7 @@ class _Button extends StatelessWidget {
                   fontWeight: FontWeight.w700,
                   color: filled ? Colors.white : p.ink1)),
         ),
-      );
+      ));
 }
 
 /// Shared with the summary screen.

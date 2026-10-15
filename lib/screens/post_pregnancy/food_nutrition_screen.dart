@@ -13,6 +13,7 @@ import 'food_common.dart';
 import 'food_recipe_screen.dart';
 import 'pp_common.dart';
 import 'pp_food_data.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class FoodNutritionScreen extends StatelessWidget {
   const FoodNutritionScreen({super.key, required this.focus});
@@ -87,7 +88,7 @@ class FoodNutritionScreen extends StatelessWidget {
             ])),
 
             if (focus.article != null)
-              _pad(GestureDetector(
+              _pad(PvPress(child: GestureDetector(
                 onTap: () => _push(context, const ArticleReaderScreen()),
                 behavior: HitTestBehavior.opaque,
                 child: Container(
@@ -106,7 +107,7 @@ class FoodNutritionScreen extends StatelessWidget {
                     const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
                   ]),
                 ),
-              )),
+              ))),
           ],
         ),
       ),

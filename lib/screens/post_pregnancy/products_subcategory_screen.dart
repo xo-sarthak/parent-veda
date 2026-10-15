@@ -24,6 +24,7 @@ import 'pp_product_widgets.dart';
 import 'pp_products_data.dart';
 import '../../data/products/pv_catalog_adapters.dart' show pvSlug;
 import '../products/pv_shelf_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class ProductsSubcategoryScreenClassic extends StatefulWidget {
   const ProductsSubcategoryScreenClassic({super.key, this.category = 'Sleep', this.sub = 'Soothers & white noise'});
@@ -162,17 +163,17 @@ class _ProductsSubcategoryScreenState extends State<ProductsSubcategoryScreenCla
   }
 
   Widget _breadcrumb(BuildContext context) => Row(children: [
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () => Navigator.of(context).popUntil((r) => r.settings.name == 'pp/my_child' || r.isFirst),
           child: Text('Products', style: ppBody(12, color: ppPurple, w: FontWeight.w600)),
-        ),
+        )),
         const SizedBox(width: 6),
         const Text('›', style: TextStyle(color: Color(0xFFC7BBD6))),
         const SizedBox(width: 6),
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () => Navigator.of(context).maybePop(),
           child: Text(widget.category, style: ppBody(12, color: ppPurple, w: FontWeight.w600)),
-        ),
+        )),
         const SizedBox(width: 6),
         const Text('›', style: TextStyle(color: Color(0xFFC7BBD6))),
         const SizedBox(width: 6),
@@ -187,7 +188,7 @@ class _ProductsSubcategoryScreenState extends State<ProductsSubcategoryScreenCla
 
   Widget _brandChip(String b) {
     final on = _brand == b;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => setState(() => _brand = b),
       child: Container(
         margin: const EdgeInsets.only(right: 9),
@@ -195,11 +196,11 @@ class _ProductsSubcategoryScreenState extends State<ProductsSubcategoryScreenCla
         decoration: BoxDecoration(color: on ? ppPurple : ppPanel, borderRadius: BorderRadius.circular(999)),
         child: Text(b, style: ppBody(12, color: on ? Colors.white : ppSoft, w: on ? FontWeight.w700 : FontWeight.w600)),
       ),
-    );
+    ));
   }
 
   Widget _sortChip(String label, {required bool active, bool leadingSort = false, required VoidCallback onTap}) =>
-      GestureDetector(
+      PvPress(child: GestureDetector(
         onTap: onTap,
         child: Container(
           margin: const EdgeInsets.only(right: 9),
@@ -217,7 +218,7 @@ class _ProductsSubcategoryScreenState extends State<ProductsSubcategoryScreenCla
             Text(label, style: ppBody(12, color: active ? Colors.white : ppSoft, w: FontWeight.w600)),
           ]),
         ),
-      );
+      ));
 
   // One rich snapshot card per row. The first [_previewCount] lead; the rest
   // sit behind a "Browse all (N)" affordance until the parent taps to reveal.
@@ -227,7 +228,7 @@ class _ProductsSubcategoryScreenState extends State<ProductsSubcategoryScreenCla
     return Column(children: [
       for (final p in visible) PpProductSnapshotCard(p),
       if (!showAll)
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () => setState(() => _expanded = true),
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -241,7 +242,7 @@ class _ProductsSubcategoryScreenState extends State<ProductsSubcategoryScreenCla
               const Icon(Icons.arrow_forward_rounded, size: 15, color: ppPurple),
             ]),
           ),
-        ),
+        )),
     ]);
   }
 }

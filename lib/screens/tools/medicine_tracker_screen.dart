@@ -31,6 +31,7 @@ import '../doors/pv_list_row.dart' show PvMarkWell;
 import '../pregnancy/preg_chrome.dart';
 import '../pregnancy/preg_tool_chrome.dart';
 import '../products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class MedicineTrackerScreen extends StatefulWidget {
   const MedicineTrackerScreen({super.key, required this.controller});
@@ -210,7 +211,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
         alignment: WrapAlignment.center,
         children: [
           for (final k in kMedPresetKeys)
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: () => _medForm(s, k),
               child: Container(
                 padding:
@@ -234,7 +235,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                   ),
                 ]),
               ),
-            ),
+            )),
         ],
       );
 
@@ -264,7 +265,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
       child: Row(children: [
         for (int i = 0; i < tabs.length; i++)
           Expanded(
-            child: GestureDetector(
+            child: PvPress(child: GestureDetector(
               onTap: () => setState(() => _tab = i),
               behavior: HitTestBehavior.opaque,
               child: AnimatedContainer(
@@ -281,7 +282,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                         fontWeight: FontWeight.w700,
                         color: _tab == i ? Colors.white : pvStorePalette.ink2)),
               ),
-            ),
+            )),
           ),
       ]),
     );
@@ -370,7 +371,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                   ],
                 ),
               ),
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: () {
                   final wasTaken = taken;
                   store.toggleToday(m.id);
@@ -403,7 +404,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                             color: taken ? Colors.white : _accent)),
                   ]),
                 ),
-              ),
+              )),
                 ]),
                 ..._cardAlarms(store, m),
               ],
@@ -1006,7 +1007,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
       child: Row(children: [
         for (int i = 0; i < opts.length; i++)
           Expanded(
-            child: GestureDetector(
+            child: PvPress(child: GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: () => onPick(opts[i]),
               child: Container(
@@ -1024,7 +1025,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                             ? Colors.white
                             : AppTheme.neutral600)),
               ),
-            ),
+            )),
           ),
       ]),
     );
@@ -1034,7 +1035,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           for (int wd = 1; wd <= 7; wd++)
-            GestureDetector(
+            PvPress(child: GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: () {
                 if (selected.contains(wd)) {
@@ -1062,7 +1063,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                             ? Colors.white
                             : AppTheme.neutral600)),
               ),
-            ),
+            )),
         ],
       );
 
@@ -1115,14 +1116,14 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                   fontWeight: FontWeight.w700,
                   color: has ? pvStorePalette.ink1 : pvStorePalette.ink3)),
           if (has)
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: onClear,
               child: const Padding(
                 padding: EdgeInsets.only(left: 8),
                 child: Icon(Icons.close_rounded,
                     size: 16, color: AppTheme.neutral400),
               ),
-            ),
+            )),
         ]),
       ),
     );

@@ -32,6 +32,7 @@ import '../brackets/hub/hub_intent_art.dart';
 import '../doors/pv_list_row.dart' show PvMarkWell;
 import '../pregnancy/preg_chrome.dart';
 import '../products/pv_store_chrome.dart' show PvChip, kPvInk, kPvLine, pvStorePalette;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // Kept for the Roadmap rows (unreached, kept for revert); nothing live draws
 // in the teal since 2026-09-30.
@@ -168,7 +169,7 @@ class _ScansAppointmentsScreenState extends State<ScansAppointmentsScreen> {
             child: Semantics(
               button: true,
               selected: _tab == i,
-              child: GestureDetector(
+              child: PvPress(child: GestureDetector(
                 onTap: () => setState(() => _tab = i),
                 behavior: HitTestBehavior.opaque,
                 child: AnimatedContainer(
@@ -186,7 +187,7 @@ class _ScansAppointmentsScreenState extends State<ScansAppointmentsScreen> {
                           fontWeight: FontWeight.w700,
                           color: _tab == i ? Colors.white : pal.ink2)),
                 ),
-              ),
+              )),
             ),
           ),
       ]),
@@ -405,7 +406,7 @@ class _ScansAppointmentsScreenState extends State<ScansAppointmentsScreen> {
         Expanded(
           child: Padding(
             padding: const EdgeInsets.only(bottom: 10),
-            child: GestureDetector(
+            child: PvPress(enabled: onTap != null, child: GestureDetector(
               onTap: onTap,
               child: Container(
                 padding: const EdgeInsets.all(13),
@@ -440,7 +441,7 @@ class _ScansAppointmentsScreenState extends State<ScansAppointmentsScreen> {
                             color: AppTheme.neutral900)),
                 ]),
               ),
-            ),
+            )),
           ),
         ),
       ]),

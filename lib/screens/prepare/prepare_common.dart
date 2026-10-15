@@ -108,7 +108,7 @@ Widget pvLangToggle(AppLanguage lang) {
 Widget pvTopBar(BuildContext context,
     {required AppLanguage lang, String? title, String? backLabel}) {
   final left = backLabel != null
-      ? GestureDetector(
+      ? PvPress(child: GestureDetector(
           onTap: () => Navigator.of(context).maybePop(),
           behavior: HitTestBehavior.opaque,
           child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -116,7 +116,7 @@ Widget pvTopBar(BuildContext context,
             const SizedBox(width: 12),
             Text(backLabel, style: pvManrope(fontSize: 14, color: kSoft)),
           ]),
-        )
+        ))
       : Text(title ?? '', style: pvTitleStyle(15));
   return Row(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -404,11 +404,11 @@ class PvExpertRow extends StatelessWidget {
       ],
     );
     if (expert == null) return row;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => openExpertProfile(context, expert),
       behavior: HitTestBehavior.opaque,
       child: row,
-    );
+    ));
   }
 }
 

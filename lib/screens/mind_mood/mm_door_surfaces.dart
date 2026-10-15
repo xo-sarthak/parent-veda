@@ -30,6 +30,7 @@ import '../../theme/pv_fonts.dart';
 import '../doors/pv_door_chrome.dart';
 import '../v2/v2_palette.dart';
 import 'mm_talk_tab.dart' show showCounsellingBookingSheet;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // -----------------------------------------------------------------------------
 //  A hard-day reset
@@ -463,7 +464,7 @@ class _Pill extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -481,7 +482,7 @@ class _Pill extends StatelessWidget {
                   fontWeight: FontWeight.w700,
                   color: strong ? p.ink1 : p.ink2)),
         ),
-      );
+      ));
 }
 
 /// An Indian toll-free number as people read it: 1800-891-4416. Anything

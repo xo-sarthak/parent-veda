@@ -10,6 +10,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import 'journey_palette.dart';
+import '../pv_feedback.dart' show PvPress;
 
 /// A circular checkpoint sitting on the trail. Week nodes show their number;
 /// completed nodes get a soft glow, future nodes fade back. The CURRENT week
@@ -132,11 +133,11 @@ class JourneyNodeMarker extends StatelessWidget {
       );
     }
 
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: child,
-    );
+    ));
   }
 }
 
@@ -162,7 +163,7 @@ class MilestoneMarker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -190,7 +191,7 @@ class MilestoneMarker extends StatelessWidget {
           color: reached ? Colors.white : color,
         ),
       ),
-    );
+    ));
   }
 }
 
@@ -215,7 +216,7 @@ class JourneyNodeLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: ConstrainedBox(
@@ -250,7 +251,7 @@ class JourneyNodeLabel extends StatelessWidget {
           ),
         ),
       ),
-    );
+    ));
   }
 }
 
@@ -443,7 +444,7 @@ class DestinationMarker extends StatelessWidget {
       child: Text(emoji, style: TextStyle(fontSize: diameter * 0.46)),
     );
 
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: AnimatedBuilder(
@@ -469,6 +470,6 @@ class DestinationMarker extends StatelessWidget {
         },
         child: core,
       ),
-    );
+    ));
   }
 }

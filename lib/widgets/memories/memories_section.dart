@@ -16,6 +16,7 @@ import '../storage_image.dart';
 import '../../screens/photo_viewer_screen.dart';
 import '../../services/memory_store.dart';
 import '../../theme/app_theme.dart';
+import '../pv_feedback.dart' show PvPress;
 
 class MemoriesSection extends StatelessWidget {
   const MemoriesSection({super.key, required this.lang, required this.week});
@@ -126,7 +127,7 @@ class _EntryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
@@ -152,7 +153,7 @@ class _EntryCard extends StatelessWidget {
             const SizedBox(width: 10),
             Text(entry.dateIso, style: text.labelSmall),
             const Spacer(),
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: onDelete,
               behavior: HitTestBehavior.opaque,
               child: Padding(
@@ -160,7 +161,7 @@ class _EntryCard extends StatelessWidget {
                 child: Icon(Icons.delete_outline_rounded,
                     size: 20, color: AppTheme.neutral400),
               ),
-            ),
+            )),
           ]),
           if (entry.text.isNotEmpty) ...[
             const SizedBox(height: 10),
@@ -174,7 +175,7 @@ class _EntryCard extends StatelessWidget {
                 for (final p in entry.photoPaths)
                   Padding(
                     padding: const EdgeInsets.only(right: 10),
-                    child: GestureDetector(
+                    child: PvPress(child: GestureDetector(
                       onTap: () => Navigator.of(context).push(MaterialPageRoute(
                         builder: (_) => PhotoViewerScreen(
                           photo: PhotoMemory(
@@ -190,14 +191,14 @@ class _EntryCard extends StatelessWidget {
                         child: StorageImage(p,
                             width: 74, height: 74, fit: BoxFit.cover),
                       ),
-                    ),
+                    )),
                   ),
               ],
             ),
           ],
         ]),
       ),
-    );
+    ));
   }
 }
 
@@ -282,7 +283,7 @@ class _AddYourWeek extends StatelessWidget {
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
     final s = S(lang);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       child: Container(
         width: double.infinity,
@@ -318,7 +319,7 @@ class _AddYourWeek extends StatelessWidget {
                   ?.copyWith(color: AppTheme.neutral700, height: 1.4)),
         ]),
       ),
-    );
+    ));
   }
 }
 
@@ -339,7 +340,7 @@ class _WeekEntryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
     final s = S(lang);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       child: Container(
         width: double.infinity,
@@ -360,7 +361,7 @@ class _WeekEntryCard extends StatelessWidget {
             const SizedBox(width: 4),
             Text(s.tapToEdit, style: text.labelSmall),
             const SizedBox(width: 6),
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: onDelete,
               behavior: HitTestBehavior.opaque,
               child: Padding(
@@ -368,7 +369,7 @@ class _WeekEntryCard extends StatelessWidget {
                 child: Icon(Icons.delete_outline_rounded,
                     size: 20, color: AppTheme.neutral400),
               ),
-            ),
+            )),
           ]),
           if (entry.text.isNotEmpty) ...[
             const SizedBox(height: 10),
@@ -383,7 +384,7 @@ class _WeekEntryCard extends StatelessWidget {
                 for (final p in entry.photoPaths)
                   Padding(
                     padding: const EdgeInsets.only(right: 10),
-                    child: GestureDetector(
+                    child: PvPress(child: GestureDetector(
                       onTap: () => Navigator.of(context).push(MaterialPageRoute(
                         builder: (_) => PhotoViewerScreen(
                           photo: PhotoMemory(
@@ -399,14 +400,14 @@ class _WeekEntryCard extends StatelessWidget {
                         child: StorageImage(p,
                             width: 96, height: 96, fit: BoxFit.cover),
                       ),
-                    ),
+                    )),
                   ),
               ],
             ),
           ],
         ]),
       ),
-    );
+    ));
   }
 }
 

@@ -27,6 +27,7 @@ import '../brackets/hub/hub_intent_art.dart' show IntentMark;
 import '../pregnancy/preg_tool_chrome.dart';
 import '../products/pv_store_chrome.dart' show PvCommit, PvSecondary, pvStorePalette;
 import 'pp_care_parts.dart' show PpCareStats, ppCareHeading;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class FoodRecipeScreen extends StatefulWidget {
   const FoodRecipeScreen({super.key, required this.recipe});
@@ -263,7 +264,7 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
         ),
       ]);
 
-  Widget _round(IconData i, VoidCallback onTap) => GestureDetector(
+  Widget _round(IconData i, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         child: Container(
           width: 36,
@@ -272,7 +273,7 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
           decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.92), shape: BoxShape.circle, boxShadow: const [BoxShadow(color: Color(0x22000000), blurRadius: 8)]),
           child: Icon(i, size: 19, color: ppInk),
         ),
-      );
+      ));
 
   // ---- diet marker · serves · immunity ------------------------------------
   /// The demonstration, at the top where a cooking parent will see it.
@@ -386,7 +387,7 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
       );
 
   Widget _seg(String label, bool on, VoidCallback onTap) => Expanded(
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: AnimatedContainer(
@@ -396,7 +397,7 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
             decoration: BoxDecoration(color: on ? ppPurple : Colors.transparent, borderRadius: BorderRadius.circular(999)),
             child: Text(label, style: ppBody(12.5, color: on ? Colors.white : ppSoft, w: FontWeight.w700)),
           ),
-        ),
+        )),
       );
 
   // ---- ingredients + equipment, side by side ------------------------------
@@ -480,7 +481,7 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
           ),
       ]);
 
-  Widget _addToShopping() => GestureDetector(
+  Widget _addToShopping() => PvPress(child: GestureDetector(
         onTap: () {
           FoodStore.instance.addRecipeToShopping(r);
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -503,7 +504,7 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
             Text('Add ingredients to shopping list', style: ppBody(13.5, color: Colors.white, w: FontWeight.w700)),
           ]),
         ),
-      );
+      ));
 
   // ---- nutrition breakdown ------------------------------------------------
   Widget _nutrition() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -626,7 +627,7 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
       Text('Connected in ParentVeda', style: ppJakarta(17)),
       const SizedBox(height: 14),
       for (final row in rows)
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: row.$4,
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -646,7 +647,7 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
               const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
             ]),
           ),
-        ),
+        )),
     ]);
   }
 }

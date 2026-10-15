@@ -13,6 +13,7 @@ import 'pp_reco_data.dart';
 import 'pp_section_extras.dart';
 import 'reco_common.dart';
 import 'reco_detail_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class RecoSearchScreen extends StatefulWidget {
   const RecoSearchScreen({super.key});
@@ -111,7 +112,7 @@ class _RecoSearchScreenState extends State<RecoSearchScreen> {
     );
   }
 
-  Widget _chip(String label) => GestureDetector(
+  Widget _chip(String label) => PvPress(child: GestureDetector(
         onTap: () => _runExample(label),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -127,7 +128,7 @@ class _RecoSearchScreenState extends State<RecoSearchScreen> {
             Flexible(child: Text(label, style: ppBody(13, color: ppInk, w: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis)),
           ]),
         ),
-      );
+      ));
 
   Widget _emptyState(String q) => Container(
         padding: const EdgeInsets.symmetric(vertical: 40),

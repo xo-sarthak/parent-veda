@@ -56,7 +56,7 @@ import '../../data/reads/read_images.dart' show readImageFor;
 import '../../theme/pv_fonts.dart';
 import '../../ttc/ttc_daily_data.dart';
 import '../../ttc/ttc_meal_week_data.dart';
-import '../../widgets/pv_feedback.dart' show pvCommitFeedback;
+import '../../widgets/pv_feedback.dart' show pvCommitFeedback, PvPress;
 import '../doors/pv_list_row.dart' show PvRowGroup;
 import '../nutrition/nutrition_recipes_screen.dart' show RecipeDetailScreen;
 import '../products/pv_store_chrome.dart' show pvSnack;
@@ -1492,7 +1492,7 @@ class _DayStrip extends StatelessWidget {
                   ? todayLabel
                   : '${long[days[i].weekday - 1]} ${days[i].day}',
               excludeSemantics: true,
-              child: GestureDetector(
+              child: PvPress(child: GestureDetector(
                 key: ValueKey('ttc_food_day_$i'),
                 onTap: () => onPick(i),
                 behavior: HitTestBehavior.opaque,
@@ -1531,7 +1531,7 @@ class _DayStrip extends StatelessWidget {
                     ),
                   ]),
                 ),
-              ),
+              )),
             ),
           ),
         ],

@@ -25,6 +25,7 @@ import 'pp_food_data.dart';
 import 'pp_nutrition_data.dart';
 import 'food_recipe_screen.dart';
 import 'recipes_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class NutritionScreen extends StatefulWidget {
   const NutritionScreen({super.key});
@@ -129,7 +130,7 @@ class _NutritionScreenState extends State<NutritionScreen> {
                   _pad(ppSectionDivider()),
                   _pad(Row(children: [
                     Expanded(child: Text('Recipes that fit', style: ppJakarta(19))),
-                    GestureDetector(
+                    PvPress(child: GestureDetector(
                       onTap: () => _push(const RecipesScreen()),
                       behavior: HitTestBehavior.opaque,
                       child: Row(children: [
@@ -137,7 +138,7 @@ class _NutritionScreenState extends State<NutritionScreen> {
                         const SizedBox(width: 2),
                         const Icon(Icons.chevron_right_rounded, size: 17, color: ppPurple),
                       ]),
-                    ),
+                    )),
                   ])),
                   const SizedBox(height: 4),
                   _pad(Text('Ways to actually put the above on a plate.', style: ppBody(12.5, color: ppMuted))),
@@ -168,7 +169,7 @@ class _NutritionScreenState extends State<NutritionScreen> {
         child: Row(children: [
           for (final r in const ['Breast', 'Formula', 'Mixed'])
             Expanded(
-              child: GestureDetector(
+              child: PvPress(child: GestureDetector(
                 onTap: () => setState(() => _route = r),
                 behavior: HitTestBehavior.opaque,
                 child: AnimatedContainer(
@@ -182,7 +183,7 @@ class _NutritionScreenState extends State<NutritionScreen> {
                   child: Text(r,
                       style: ppBody(13, color: _route == r ? ppPurple : ppSoft, w: FontWeight.w700)),
                 ),
-              ),
+              )),
             ),
         ]),
       );
@@ -265,7 +266,7 @@ class _NutritionScreenState extends State<NutritionScreen> {
         separatorBuilder: (_, _) => const SizedBox(width: 12),
         itemBuilder: (_, i) {
           final r = picks[i];
-          return GestureDetector(
+          return PvPress(child: GestureDetector(
             onTap: () => _push(FoodRecipeScreen(recipe: r)),
             behavior: HitTestBehavior.opaque,
             child: SizedBox(
@@ -284,7 +285,7 @@ class _NutritionScreenState extends State<NutritionScreen> {
                 ),
               ]),
             ),
-          );
+          ));
         },
       ),
     );

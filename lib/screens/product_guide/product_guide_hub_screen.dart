@@ -26,6 +26,7 @@ import '../../localization/app_language.dart';
 import '../products/pv_store_chrome.dart';
 import '../products/pv_store_screen.dart';
 import '../../services/life_stage_store.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class ProductGuideHubScreenClassic extends StatefulWidget {
   const ProductGuideHubScreenClassic({super.key});
@@ -71,7 +72,7 @@ class _ProductGuideHubScreenState extends State<ProductGuideHubScreenClassic> {
           padding: const EdgeInsets.only(top: 12, bottom: 40),
           children: [
             _pad(Row(children: [
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: () => Navigator.of(context).maybePop(),
                 behavior: HitTestBehavior.opaque,
                 child: Container(
@@ -79,7 +80,7 @@ class _ProductGuideHubScreenState extends State<ProductGuideHubScreenClassic> {
                   decoration: const BoxDecoration(color: pgPanel, shape: BoxShape.circle),
                   child: const Icon(Icons.arrow_back, size: 16, color: pgInk),
                 ),
-              ),
+              )),
               Expanded(child: Center(child: Text(S.now.uiProductGuide, style: pgEyebrow(pgMuted)))),
               const SizedBox(width: 34),
             ])),
@@ -122,7 +123,7 @@ class _ProductGuideHubScreenState extends State<ProductGuideHubScreenClassic> {
   /// things you might do here, and dressing it as a hero would make the
   /// guides underneath it look secondary — which is the mistake the Tools tab
   /// had already made with its two banner cards.
-  Widget _compareRow() => GestureDetector(
+  Widget _compareRow() => PvPress(child: GestureDetector(
         onTap: () => Navigator.of(context).push(
             MaterialPageRoute<void>(builder: (_) => const ProductsCompareScreen())),
         behavior: HitTestBehavior.opaque,
@@ -147,7 +148,7 @@ class _ProductGuideHubScreenState extends State<ProductGuideHubScreenClassic> {
             const Icon(Icons.chevron_right_rounded, size: 20, color: pgMuted),
           ]),
         ),
-      );
+      ));
 
   Widget _searchBar() => Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -257,7 +258,7 @@ class _ProductGuideHubScreenState extends State<ProductGuideHubScreenClassic> {
     if (g.comingSoon) return _soonRow(g);
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
-      child: GestureDetector(
+      child: PvPress(child: GestureDetector(
         onTap: () => _open(g),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -289,7 +290,7 @@ class _ProductGuideHubScreenState extends State<ProductGuideHubScreenClassic> {
             const Icon(Icons.chevron_right_rounded, size: 20, color: Color(0xFFC7BBD6)),
           ]),
         ),
-      ),
+      )),
     );
   }
 }

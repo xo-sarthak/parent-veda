@@ -290,7 +290,7 @@ class _TtcExpandableTextState extends State<TtcExpandableText> {
         ),
         if (overflows) ...[
           const SizedBox(height: 7),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => setState(() => _open = !_open),
             behavior: HitTestBehavior.opaque,
             child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -301,7 +301,7 @@ class _TtcExpandableTextState extends State<TtcExpandableText> {
               Icon(_open ? Icons.expand_less_rounded : Icons.expand_more_rounded,
                   size: 17, color: ttcTitleInk),
             ]),
-          ),
+          )),
         ],
       ]);
     });

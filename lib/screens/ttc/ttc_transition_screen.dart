@@ -32,6 +32,7 @@ import 'ttc_treatment_round_screens.dart'
 import '../../services/pregnancy_controller.dart' show DueDateSource;
 import '../../theme/pv_fonts.dart';
 import 'ttc_tool_chrome.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// Asks first, then transitions. Returns true if the couple went through.
 ///
@@ -211,7 +212,7 @@ class TtcTransitionScreen extends StatelessWidget {
                 // flipped underneath her, so the app knew she was pregnant and
                 // still refused to show her the pregnancy. See
                 // `leaveTtcForPregnancy` for why this is a stack replacement.
-                GestureDetector(
+                PvPress(child: GestureDetector(
                   onTap: () => _toPregnancy(context),
                   behavior: HitTestBehavior.opaque,
                   child: Container(
@@ -224,7 +225,7 @@ class TtcTransitionScreen extends StatelessWidget {
                         style: ttcBody(14.5,
                             color: Colors.white, w: FontWeight.w800)),
                   ),
-                ),
+                )),
                 const SizedBox(height: 12),
 
                 // A keepsake, offered ONCE, here, and nowhere else in the stage.
@@ -252,7 +253,7 @@ class TtcTransitionScreen extends StatelessWidget {
                 // reach a positive test carrying a previous loss and will not
                 // want to announce anything for weeks. This waits to be found.
                 Center(
-                  child: GestureDetector(
+                  child: PvPress(child: GestureDetector(
                     onTap: () => Navigator.of(context).push(
                       MaterialPageRoute<void>(
                         builder: (_) => const MemoryPersonalizeScreen(
@@ -278,14 +279,14 @@ class TtcTransitionScreen extends StatelessWidget {
                         ),
                       ]),
                     ),
-                  ),
+                  )),
                 ),
                 const SizedBox(height: 4),
 
                 // Undo, in plain sight. A stage change you cannot reverse
                 // would be the cruellest bug in this product.
                 Center(
-                  child: GestureDetector(
+                  child: PvPress(child: GestureDetector(
                     onTap: () => _undo(context),
                     behavior: HitTestBehavior.opaque,
                     child: Padding(
@@ -294,7 +295,7 @@ class TtcTransitionScreen extends StatelessWidget {
                           style: ttcBody(12.5,
                               color: ttcMuted, w: FontWeight.w700)),
                     ),
-                  ),
+                  )),
                 ),
                 const SizedBox(height: 8),
               ],

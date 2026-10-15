@@ -23,6 +23,7 @@ import 'reading_reader_screen.dart';
 import 'reco_common.dart';
 import 'watch_player_screen.dart';
 import 'watch_quicklearn_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class RecoDetailScreen extends StatefulWidget {
   const RecoDetailScreen({super.key, required this.item});
@@ -199,7 +200,7 @@ class _RecoDetailScreenState extends State<RecoDetailScreen> {
                   final saved = RecoStore.instance.isSaved(it.id);
                   return Row(children: [
                     Expanded(
-                      child: GestureDetector(
+                      child: PvPress(child: GestureDetector(
                         onTap: () => RecoStore.instance.toggleSave(it.id),
                         behavior: HitTestBehavior.opaque,
                         child: Container(
@@ -212,11 +213,11 @@ class _RecoDetailScreenState extends State<RecoDetailScreen> {
                             Text(saved ? 'Saved' : 'Save', style: ppBody(14, color: saved ? Colors.white : ppPurple, w: FontWeight.w700)),
                           ]),
                         ),
-                      ),
+                      )),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
-                      child: GestureDetector(
+                      child: PvPress(child: GestureDetector(
                         onTap: _addToListSheet,
                         behavior: HitTestBehavior.opaque,
                         child: Container(
@@ -229,7 +230,7 @@ class _RecoDetailScreenState extends State<RecoDetailScreen> {
                             Flexible(child: Text('Add to list', maxLines: 1, overflow: TextOverflow.ellipsis, style: ppBody(14, color: Colors.white, w: FontWeight.w700))),
                           ]),
                         ),
-                      ),
+                      )),
                     ),
                   ]);
                 },
@@ -264,7 +265,7 @@ class _RecoDetailScreenState extends State<RecoDetailScreen> {
     return rows;
   }
 
-  Widget _linkRow(IconData icon, String tag, String title, VoidCallback onTap) => _pad(GestureDetector(
+  Widget _linkRow(IconData icon, String tag, String title, VoidCallback onTap) => _pad(PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -282,7 +283,7 @@ class _RecoDetailScreenState extends State<RecoDetailScreen> {
             const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
           ]),
         ),
-      ));
+      )));
 
   Widget _chip(String label, IconData icon) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -306,7 +307,7 @@ class _RecoDetailScreenState extends State<RecoDetailScreen> {
         ]),
       );
 
-  Widget _askRow(String q) => GestureDetector(
+  Widget _askRow(String q) => PvPress(child: GestureDetector(
         onTap: () => openPpTab(context, 1),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -320,7 +321,7 @@ class _RecoDetailScreenState extends State<RecoDetailScreen> {
             const Icon(Icons.chevron_right_rounded, size: 18, color: ppMuted),
           ]),
         ),
-      );
+      ));
 
   String _communityScore() {
     // a soft 4.x score derived from saves, so the community card isn't empty
@@ -350,7 +351,7 @@ class _RecoDetailScreenState extends State<RecoDetailScreen> {
                 Text('Add to a list', style: ppJakarta(18)),
                 const SizedBox(height: 14),
                 for (final name in store.listNames)
-                  GestureDetector(
+                  PvPress(child: GestureDetector(
                     onTap: () => store.toggleInList(name, it.id),
                     behavior: HitTestBehavior.opaque,
                     child: Container(
@@ -364,7 +365,7 @@ class _RecoDetailScreenState extends State<RecoDetailScreen> {
                         Text('${store.listCount(name)}', style: ppBody(12, color: ppMuted)),
                       ]),
                     ),
-                  ),
+                  )),
                 const SizedBox(height: 6),
                 Row(children: [
                   Expanded(child: Container(
@@ -376,7 +377,7 @@ class _RecoDetailScreenState extends State<RecoDetailScreen> {
                     ),
                   )),
                   const SizedBox(width: 10),
-                  GestureDetector(
+                  PvPress(child: GestureDetector(
                     onTap: () {
                       if (ctl.text.trim().isNotEmpty) {
                         store.createList(ctl.text);
@@ -392,7 +393,7 @@ class _RecoDetailScreenState extends State<RecoDetailScreen> {
                       decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(12)),
                       child: Text('Create', style: ppBody(13.5, color: Colors.white, w: FontWeight.w700)),
                     ),
-                  ),
+                  )),
                 ]),
               ]),
             ),

@@ -32,6 +32,7 @@ import 'pregnancy/preg_tool_chrome.dart';
 import 'products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 import 'ttc/doors/ttc_tab_art.dart' show TtcTabMark;
 import 'ttc/ttc_tool_marks.dart' show TtcMarkLeading;
+import '../widgets/pv_feedback.dart' show PvPress;
 
 // ⚠️ ONE PARENTVEDA (2026-09-30, the pregnancy restyle) on the full Read
 // recommendations page: the serif page title under a back arrow (no emoji in
@@ -241,7 +242,7 @@ class _HeroCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final s = S(controller.language);
     final text = Theme.of(context).textTheme;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _openItem(context, item, controller),
       // A white card with the hairline. Kept for revert: a gradient from
       // the ink at 16% to white with an ink hairline at 20%, a gold star and
@@ -299,7 +300,7 @@ class _HeroCard extends StatelessWidget {
           ),
         ]),
       ),
-    );
+    ));
   }
 }
 
@@ -316,7 +317,7 @@ class _ReadCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final s = S(controller.language);
     final status = ReadNextStore.instance.statusOf(item.id);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _openItem(context, item, controller),
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
@@ -368,7 +369,7 @@ class _ReadCard extends StatelessWidget {
           _SaveHeart(id: item.id),
         ]),
       ),
-    );
+    ));
   }
 }
 
@@ -380,7 +381,7 @@ class _BookCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final s = S(controller.language);
     final text = Theme.of(context).textTheme;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _openItem(context, item, controller),
       child: Container(
         width: 214,
@@ -467,7 +468,7 @@ class _BookCard extends StatelessWidget {
           ),
         ]),
       ),
-    );
+    ));
   }
 }
 
@@ -478,7 +479,7 @@ class _ExpertCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = S(controller.language);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _openItem(context, item, controller),
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
@@ -517,7 +518,7 @@ class _ExpertCard extends StatelessWidget {
               style: pvManrope(fontSize: 13.5, height: 1.45, color: pvStorePalette.ink2)),
         ]),
       ),
-    );
+    ));
   }
 }
 
@@ -786,7 +787,7 @@ class ReadNextHomeCard extends StatelessWidget {
                     color: AppTheme.neutral500, fontWeight: FontWeight.w700)),
           ]),
         ),
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () => _openItem(context, hero, controller),
           child: Padding(
             padding: const EdgeInsets.fromLTRB(18, 12, 18, 12),
@@ -808,7 +809,7 @@ class ReadNextHomeCard extends StatelessWidget {
               ),
             ]),
           ),
-        ),
+        )),
         const Divider(height: 1, color: AppTheme.outlineVariant),
         Row(children: [
           Expanded(

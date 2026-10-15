@@ -20,6 +20,7 @@ import 'yoga_common.dart';
 import 'yoga_instructor_screen.dart';
 import '../learn/pv_offering_screen.dart';
 import '../learn/pv_learn_catalog.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // ⚠️ FACADE since 2026-09-20 (docs/LEARNING-AUDIT.md). The class keeps its
 // name and constructor so every push of it lands on the unified learn
@@ -62,7 +63,7 @@ class YogaClassScreenClassic extends StatelessWidget {
                 children: [
                   _pad(Row(children: [
                     Expanded(child: ppBack(context, cls.categoryInfo.title)),
-                    GestureDetector(
+                    PvPress(child: GestureDetector(
                       onTap: () => store.toggleSave(cls.id),
                       behavior: HitTestBehavior.opaque,
                       child: Container(
@@ -73,7 +74,7 @@ class YogaClassScreenClassic extends StatelessWidget {
                         child: Icon(saved ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
                             size: 19, color: ppPurple),
                       ),
-                    ),
+                    )),
                   ])),
 
                   // hero
@@ -234,7 +235,7 @@ class YogaClassScreenClassic extends StatelessWidget {
   Widget _instructorRow(BuildContext context) {
     final tint = yogaTint(cls.seed + 2);
     final expert = expertByName(cls.instructorName);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => expert != null
           ? openExpertProfile(context, expert)
           : Navigator.of(context).push(MaterialPageRoute<void>(
@@ -260,7 +261,7 @@ class YogaClassScreenClassic extends StatelessWidget {
         const SizedBox(width: 10),
         const Icon(Icons.chevron_right_rounded, size: 22, color: ppPurple),
       ]),
-    );
+    ));
   }
 
   /// Who the trainer is, in enough depth to book them. For a one-to-one this
@@ -310,7 +311,7 @@ class YogaClassScreenClassic extends StatelessWidget {
               style: ppBody(9, color: ppMuted, w: FontWeight.w800).copyWith(letterSpacing: 0.7)),
           const SizedBox(height: 8),
           for (final o in others.take(3))
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: () => Navigator.of(context).pushReplacement(
                 MaterialPageRoute<void>(builder: (_) => YogaClassScreen(cls: o)),
               ),
@@ -328,7 +329,7 @@ class YogaClassScreenClassic extends StatelessWidget {
                   const Icon(Icons.chevron_right_rounded, size: 18, color: ppMuted),
                 ]),
               ),
-            ),
+            )),
         ],
       ]),
     );
@@ -463,7 +464,7 @@ class YogaClassScreenClassic extends StatelessWidget {
         ),
         const SizedBox(width: 14),
         Expanded(
-          child: GestureDetector(
+          child: PvPress(child: GestureDetector(
             onTap: () => _confirm(context, store),
             behavior: HitTestBehavior.opaque,
             child: Container(
@@ -481,7 +482,7 @@ class YogaClassScreenClassic extends StatelessWidget {
                 ),
               ]),
             ),
-          ),
+          )),
         ),
       ]),
     );
@@ -526,7 +527,7 @@ class YogaClassScreenClassic extends StatelessWidget {
                       : '${cls.title} is now in your library. Start whenever you\'re ready, and come back to it as often as you like.',
                   style: ppBody(14, h: 1.6)),
               const SizedBox(height: 20),
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: () => Navigator.of(ctx).pop(),
                 behavior: HitTestBehavior.opaque,
                 child: Container(
@@ -535,7 +536,7 @@ class YogaClassScreenClassic extends StatelessWidget {
                   decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(16)),
                   child: Text('Done', style: ppBody(15, color: Colors.white, w: FontWeight.w700)),
                 ),
-              ),
+              )),
             ]),
           ),
         ),

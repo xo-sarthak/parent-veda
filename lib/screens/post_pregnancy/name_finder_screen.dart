@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 
 import 'name_swipe_screen.dart';
 import 'pp_common.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 const List<(IconData, String)> _genders = [
   (Icons.male_rounded, 'Boy'),
@@ -78,7 +79,7 @@ class _NameFinderScreenState extends State<NameFinderScreen> {
 
             // optional nakshatra
             const SizedBox(height: 26),
-            _pad(GestureDetector(
+            _pad(PvPress(child: GestureDetector(
               onTap: () => ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('You can add the birth star later'), behavior: SnackBarBehavior.floating),
               ),
@@ -99,7 +100,7 @@ class _NameFinderScreenState extends State<NameFinderScreen> {
                   ])),
                 ]),
               ),
-            )),
+            ))),
           ],
         ),
 
@@ -128,7 +129,7 @@ class _NameFinderScreenState extends State<NameFinderScreen> {
             decoration: const BoxDecoration(
               gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x00FBF9FE), ppBg]),
             ),
-            child: GestureDetector(
+            child: PvPress(child: GestureDetector(
               onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const NameSwipeScreen())),
               behavior: HitTestBehavior.opaque,
               child: Container(
@@ -145,7 +146,7 @@ class _NameFinderScreenState extends State<NameFinderScreen> {
                   const Text('→', style: TextStyle(color: Colors.white, fontSize: 16)),
                 ]),
               ),
-            ),
+            )),
           ),
         ),
       ]),
@@ -154,7 +155,7 @@ class _NameFinderScreenState extends State<NameFinderScreen> {
 
   Widget _genderCard(int i) {
     final on = i == _gender;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => setState(() => _gender = i),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -170,12 +171,12 @@ class _NameFinderScreenState extends State<NameFinderScreen> {
           Text(_genders[i].$2, style: ppJakarta(13)),
         ]),
       ),
-    );
+    ));
   }
 
   Widget _feelChip(int i) {
     final on = i == _feel;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => setState(() => _feel = i),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -187,6 +188,6 @@ class _NameFinderScreenState extends State<NameFinderScreen> {
         ),
         child: Text(_feels[i], style: ppBody(13, color: on ? Colors.white : ppInk, w: on ? FontWeight.w700 : FontWeight.w600)),
       ),
-    );
+    ));
   }
 }

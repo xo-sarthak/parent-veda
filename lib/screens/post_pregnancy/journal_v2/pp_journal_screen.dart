@@ -26,6 +26,7 @@ import '../../../theme/pv_fonts.dart';
 import '../../brackets/hub/hub_intent_art.dart' show IntentMark;
 import '../../pregnancy/preg_tool_chrome.dart';
 import '../../products/pv_store_chrome.dart' show PvChip, PvCommit, pvStorePalette;
+import '../../../widgets/pv_feedback.dart' show PvPress;
 
 const _months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
@@ -213,11 +214,11 @@ class _PpJournalScreenState extends State<PpJournalScreen> {
               padding: const EdgeInsets.only(top: 12, bottom: 110),
               children: [
                 jvPad(Row(children: [
-                  GestureDetector(
+                  PvPress(child: GestureDetector(
                     onTap: () => Navigator.of(context).maybePop(),
                     behavior: HitTestBehavior.opaque,
                     child: const Padding(padding: EdgeInsets.all(4), child: Icon(Icons.arrow_back_rounded, color: ppInk)),
-                  ),
+                  )),
                 ])),
                 const SizedBox(height: 14),
                 jvPad(Text("$jvChild's journal", style: ppFraunces(30, h: 1.1))),
@@ -281,7 +282,7 @@ class _PpJournalScreenState extends State<PpJournalScreen> {
       JvKind.guided => 'A first',
       JvKind.moment => 'Moment',
     };
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _open(context, e, dob),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -309,7 +310,7 @@ class _PpJournalScreenState extends State<PpJournalScreen> {
           ),
         ]),
       ),
-    );
+    ));
   }
 
   // ---- the entry sheet, the one look (2026-10-07) ---------------------------

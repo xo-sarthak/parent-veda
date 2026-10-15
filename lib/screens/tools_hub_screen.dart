@@ -799,7 +799,7 @@ class ToolsHubScreenClassic extends StatelessWidget {
     );
   }
 
-  Widget _journeyHero(BuildContext context, S s) => GestureDetector(
+  Widget _journeyHero(BuildContext context, S s) => PvPress(child: GestureDetector(
     onTap: () => Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => JourneyMapScreen(controller: controller),
@@ -862,9 +862,9 @@ class ToolsHubScreenClassic extends StatelessWidget {
         ],
       ),
     ),
-  );
+  ));
 
-  Widget _tile(S s, _Tool t) => GestureDetector(
+  Widget _tile(S s, _Tool t) => PvPress(child: GestureDetector(
     onTap: t.onTap,
     child: Container(
       padding: const EdgeInsets.all(16),
@@ -938,7 +938,7 @@ class ToolsHubScreenClassic extends StatelessWidget {
         ],
       ),
     ),
-  );
+  ));
 }
 
 // Kept for revert (2026-10-02): the mapping lived here before the door tabs

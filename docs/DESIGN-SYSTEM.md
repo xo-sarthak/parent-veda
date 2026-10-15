@@ -659,6 +659,19 @@ timeline's ticks and Up-next card, the reader's foot tiles and helpful
 pills, the checklist rows, all of onboarding (`ObPress` is now an alias).
 New surfaces use these rather than a bare `InkWell`.
 
+**Everywhere, 2026-10-15 (second pass).** Every plain tap in the app is now a
+`PvPress(child: GestureDetector(...))`: 1,338 wrapped by a parser-driven
+pass, 1,372 in all. Two rules made that safe:
+- **A scroll is not a press.** The press lets go once the finger moves past
+  `kTouchSlop`, so a card a scroll started on does not stay shrunk.
+- **Only the innermost press settles.** The first PvPress to see a
+  pointer-down claims it; an icon inside a card settles alone.
+Left alone on purpose: full-screen layers (scrims, tap-to-dismiss backdrops,
+a page body), keyboard-dismiss wrappers, detectors that also drag or
+long-press, and those whose `onTap` is null by a condition. A handler that is
+only *typed* nullable gets `PvPress(enabled: handler != null, ...)`.
+`test/tap_feedback_guard_test.dart` fails on any new unwrapped tap.
+
 ## 4.0f One card family on every door — BUILT 2026-09-29, all nine TTC doors
 
 The user, with a reference picture (a PCOS page of soft tinted cards, each

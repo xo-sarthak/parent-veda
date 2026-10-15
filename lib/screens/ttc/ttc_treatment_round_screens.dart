@@ -93,6 +93,7 @@ import 'ttc_round_strings.dart';
 import 'ttc_tool_chrome.dart';
 import 'ttc_transition_screen.dart' show TtcTransitionScreen;
 import 'ttc_treatment_screen.dart' show TtcTreatmentScreen, openTtcTreatment;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // =============================================================================
 //  Openers
@@ -1703,7 +1704,7 @@ class TtcRoundTakenTick extends StatelessWidget {
     checked: taken,
     // Kept for revert (2026-09-28): 'Taken it? Tick here'
     label: taken ? 'Trigger taken. Reminders off.' : 'Trigger taken? Tap to tick',
-    child: GestureDetector(
+    child: PvPress(child: GestureDetector(
       onTap: () => TtcTreatmentStore.instance.setTriggerTaken(!taken),
       behavior: HitTestBehavior.opaque,
       child: Row(
@@ -1731,7 +1732,7 @@ class TtcRoundTakenTick extends StatelessWidget {
           ),
         ],
       ),
-    ),
+    )),
   );
 }
 

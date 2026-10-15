@@ -45,6 +45,7 @@ import '../pregnancy/preg_tool_chrome.dart'
 import '../products/pv_store_chrome.dart' show pvStorePalette;
 import '../ttc/doors/ttc_tab_art.dart' show TtcTabArt, TtcTabMark;
 import '../v2/v2_palette.dart' show v2BlockTint;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class MemoriesHomeScreen extends StatefulWidget {
   const MemoriesHomeScreen({super.key});
@@ -157,7 +158,7 @@ class _MemoriesHomeScreenState extends State<MemoriesHomeScreen> {
       button: true,
       label: '${type.label}. ${type.blurb}',
       excludeSemantics: true,
-      child: GestureDetector(
+      child: PvPress(child: GestureDetector(
         key: ValueKey('memories_type_${type.name}'),
         onTap: () => _start(type),
         behavior: HitTestBehavior.opaque,
@@ -193,7 +194,7 @@ class _MemoriesHomeScreenState extends State<MemoriesHomeScreen> {
             ],
           ]),
         ),
-      ),
+      )),
     );
   }
 
@@ -329,7 +330,7 @@ class _MemoriesHomeScreenState extends State<MemoriesHomeScreen> {
     );
   }
 
-  Widget _typeCard(MemoryType type, List<Color> bg, Color accent) => GestureDetector(
+  Widget _typeCard(MemoryType type, List<Color> bg, Color accent) => PvPress(child: GestureDetector(
         onTap: () => _start(type),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -366,19 +367,19 @@ class _MemoriesHomeScreenState extends State<MemoriesHomeScreen> {
             Icon(Icons.arrow_forward_rounded, size: 20, color: accent),
           ]),
         ),
-      );
+      ));
 
   Widget _thumb(SavedMemory m) {
     final t = kMemoryTemplates.firstWhere((t) => t.id == m.templateId,
         orElse: () => templatesFor(m.data.type).first);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _open(m),
       behavior: HitTestBehavior.opaque,
       child: MemoryCardPreview(template: t, data: m.data, maxWidth: 120),
-    );
+    ));
   }
 
-  Widget _back(BuildContext context) => GestureDetector(
+  Widget _back(BuildContext context) => PvPress(child: GestureDetector(
         onTap: () => Navigator.of(context).maybePop(),
         behavior: HitTestBehavior.opaque,
         child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -390,5 +391,5 @@ class _MemoriesHomeScreenState extends State<MemoriesHomeScreen> {
                   fontWeight: FontWeight.w700,
                   color: const Color(0xFF857D70))),
         ]),
-      );
+      ));
 }

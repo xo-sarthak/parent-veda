@@ -55,6 +55,7 @@ import 'ttc_tool_chrome.dart'
 // `logTtcPeriod`, now a comment.
 // import 'ttc_home_gap.dart' show showTtcPeriodCameNudge;
 import 'ttc_cycle_companion.dart' show showTtcHomePeriodSheet;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class TtcTodayScreen extends StatelessWidget {
   const TtcTodayScreen({super.key});
@@ -249,7 +250,7 @@ class _Hero extends StatelessWidget {
           // "Phase map ›". The Journey Map holds the sentence that answers
           // "does this repeat mean I am going backwards", so it should be one
           // tap from here rather than three.
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
               builder: (_) => const TtcJourneyMapScreen(),
               settings: const RouteSettings(name: 'ttc/map'),
@@ -262,7 +263,7 @@ class _Hero extends StatelessWidget {
               const Icon(Icons.chevron_right_rounded,
                   size: 15, color: ttcInk),
             ]),
-          ),
+          )),
         ]),
         const SizedBox(height: 9),
         TtcChapterBar(today: today, onLight: true),
@@ -443,7 +444,7 @@ class _RhythmCard extends StatelessWidget {
         // while the three screens that explain it sat in Tools.
         Row(children: [
           Expanded(
-            child: GestureDetector(
+            child: PvPress(child: GestureDetector(
               onTap: () => logTtcPeriod(context),
               behavior: HitTestBehavior.opaque,
               child: Row(children: [
@@ -457,9 +458,9 @@ class _RhythmCard extends StatelessWidget {
                           ttcBody(13, color: ttcTitleInk, w: FontWeight.w800)),
                 ),
               ]),
-            ),
+            )),
           ),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
               builder: (_) => const TtcCycleScreen(),
               settings: const RouteSettings(name: 'ttc/cycle'),
@@ -471,7 +472,7 @@ class _RhythmCard extends StatelessWidget {
               const Icon(Icons.chevron_right_rounded,
                   size: 17, color: ttcSoft),
             ]),
-          ),
+          )),
         ]),
 
         // The way IN to the care pathway.
@@ -484,7 +485,7 @@ class _RhythmCard extends StatelessWidget {
         const SizedBox(height: 12),
         ttcDivider(),
         const SizedBox(height: 12),
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () => openTtcTreatment(context),
           behavior: HitTestBehavior.opaque,
           child: Row(children: [
@@ -505,7 +506,7 @@ class _RhythmCard extends StatelessWidget {
             ),
             const Icon(Icons.chevron_right_rounded, size: 17, color: ttcMuted),
           ]),
-        ),
+        )),
       ]),
     );
   }
@@ -887,7 +888,7 @@ class _RitualCard extends StatelessWidget {
 
   Widget _ritualRow(
       BuildContext context, TtcRitualItem item, bool done, bool hi) {
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
         builder: (_) => TtcRitualScreen(chapter: chapter, focus: item.part),
         settings: const RouteSettings(name: 'ttc/ritual'),
@@ -896,7 +897,7 @@ class _RitualCard extends StatelessWidget {
       child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
         // Tapping the tick completes; tapping the row opens the ritual. Two
         // targets, because completing must never require reading first.
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () => TtcRitualStore.instance.toggle(item.part),
           behavior: HitTestBehavior.opaque,
           child: Padding(
@@ -915,7 +916,7 @@ class _RitualCard extends StatelessWidget {
                   : null,
             ),
           ),
-        ),
+        )),
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(item.part.title(hi),
@@ -928,7 +929,7 @@ class _RitualCard extends StatelessWidget {
           ]),
         ),
       ]),
-    );
+    ));
   }
 }
 

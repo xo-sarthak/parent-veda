@@ -43,6 +43,7 @@ import '../../services/remote/supabase_repo.dart';
 import '../post_pregnancy/pp_common.dart';
 import 'care_circle_screen.dart';
 import '../../localization/app_language.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class CareDebugScreen extends StatefulWidget {
   const CareDebugScreen({super.key});
@@ -279,7 +280,7 @@ class _CareDebugScreenState extends State<CareDebugScreen> {
         ]),
       );
 
-  Widget _tokenRow(Map<String, dynamic> p) => GestureDetector(
+  Widget _tokenRow(Map<String, dynamic> p) => PvPress(child: GestureDetector(
         onTap: () => setState(() => _token.text = '${p['token']}'),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -305,11 +306,11 @@ class _CareDebugScreenState extends State<CareDebugScreen> {
             const Icon(Icons.arrow_forward_rounded, size: 14, color: ppSoft),
           ]),
         ),
-      );
+      ));
 
   Widget _btn(String label, VoidCallback onTap) => Padding(
         padding: const EdgeInsets.only(bottom: 8),
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -321,10 +322,10 @@ class _CareDebugScreenState extends State<CareDebugScreen> {
                 border: Border.all(color: ppBorder)),
             child: Text(label, style: ppJakarta(12.5, color: ppPurple)),
           ),
-        ),
+        )),
       );
 
-  Widget _chip(String label, VoidCallback fire) => GestureDetector(
+  Widget _chip(String label, VoidCallback fire) => PvPress(child: GestureDetector(
         onTap: () {
           fire();
           _say('wrote "$label" '
@@ -337,5 +338,5 @@ class _CareDebugScreenState extends State<CareDebugScreen> {
               color: ppPanel, borderRadius: BorderRadius.circular(999)),
           child: Text(label, style: ppJakarta(11.5, color: ppPurple)),
         ),
-      );
+      ));
 }

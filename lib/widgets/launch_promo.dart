@@ -13,6 +13,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../data/promo_data.dart';
 import '../theme/pv_fonts.dart';
+import 'pv_feedback.dart' show PvPress;
 
 /// Guards so the pop-up appears only once per app process (an "on open" promo,
 /// not on every rebuild / tab change). Set false in tests to suppress it.
@@ -92,7 +93,7 @@ class _LaunchPromoDialogState extends State<_LaunchPromoDialog> {
             Positioned(
               top: 12,
               right: 12,
-              child: GestureDetector(
+              child: PvPress(child: GestureDetector(
                 onTap: () => Navigator.of(context).maybePop(),
                 behavior: HitTestBehavior.opaque,
                 child: Container(
@@ -106,7 +107,7 @@ class _LaunchPromoDialogState extends State<_LaunchPromoDialog> {
                   ),
                   child: const Icon(Icons.close_rounded, size: 19, color: Color(0xFF33383D)),
                 ),
-              ),
+              )),
             ),
 
             // page dots
@@ -148,7 +149,7 @@ class _Slide extends StatelessWidget {
   Widget build(BuildContext context) {
     // A real brand image, if supplied, fills the whole creative.
     if (slide.imageAsset != null) {
-      return GestureDetector(
+      return PvPress(child: GestureDetector(
         onTap: onCta,
         child: Stack(
           fit: StackFit.expand,
@@ -158,7 +159,7 @@ class _Slide extends StatelessWidget {
             Positioned(left: 20, right: 20, bottom: 40, child: _ctaButton()),
           ],
         ),
-      );
+      ));
     }
 
     // Placeholder creative: coloured header scoop + offer pills + CTA.
@@ -283,7 +284,7 @@ class _Slide extends StatelessWidget {
         ),
       );
 
-  Widget _ctaButton() => GestureDetector(
+  Widget _ctaButton() => PvPress(child: GestureDetector(
         onTap: onCta,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -312,5 +313,5 @@ class _Slide extends StatelessWidget {
             ],
           ),
         ),
-      );
+      ));
 }

@@ -44,6 +44,7 @@ import '../pregnancy/preg_tool_chrome.dart';
 import '../products/pv_store_chrome.dart' show kPvLine, pvStorePalette;
 import 'pp_care_parts.dart' show ppCareHeading;
 import 'pp_common.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 const Color _starTop = Color(0xFF4A3A6B);
 const Color _moon = Color(0xFFC9C3CF);
@@ -244,11 +245,11 @@ class _AstrologyScreenState extends State<AstrologyScreen> {
                     ]),
                   ),
                   const SizedBox(width: 12),
-                  GestureDetector(
+                  PvPress(child: GestureDetector(
                       key: const ValueKey('astro-toggle'),
                       onTap: () => setState(() => _on = !_on),
                       behavior: HitTestBehavior.opaque,
-                      child: ppSwitch(_on)),
+                      child: ppSwitch(_on))),
                 ]),
               ),
               Padding(

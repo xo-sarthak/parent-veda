@@ -26,6 +26,7 @@ import '../services/read_done_store.dart';
 import '../services/read_next_store.dart';
 import 'book_companion_screen.dart';
 import '../theme/pv_fonts.dart';
+import '../widgets/pv_feedback.dart' show PvPress;
 
 // ---- reader preferences (session-scoped, mirrors PP ReadingStore font/mode) --
 enum ReadReaderMode { light, sepia, dark }
@@ -289,11 +290,11 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
     );
   }
 
-  Widget _iconBtn(_RTheme t, IconData i, VoidCallback onTap, {Color? color}) => GestureDetector(
+  Widget _iconBtn(_RTheme t, IconData i, VoidCallback onTap, {Color? color}) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Padding(padding: const EdgeInsets.all(9), child: Icon(i, size: 21, color: color ?? t.ink)),
-      );
+      ));
 
   Widget _byline(_RTheme t) {
     final has = a.author.isNotEmpty;
@@ -554,7 +555,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         // The bar. Collapsed it reads as a standalone rounded bar; expanded it
         // becomes the head of one continuous object with the panel below.
-        GestureDetector(
+        PvPress(child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: () => setState(() => open ? _expandedIdeas.remove(index) : _expandedIdeas.add(index)),
           child: Container(
@@ -575,7 +576,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
               ),
             ]),
           ),
-        ),
+        )),
         if (open)
           Container(
             width: double.infinity,
@@ -685,7 +686,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
           ],
         ],
         const SizedBox(height: 11),
-        GestureDetector(
+        PvPress(child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: () => setState(() => open ? _expandedChapters.remove(index) : _expandedChapters.add(index)),
           child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -694,7 +695,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
             const SizedBox(width: 3),
             Icon(open ? Icons.expand_less_rounded : Icons.expand_more_rounded, size: 18, color: t.accent),
           ]),
-        ),
+        )),
       ]),
     );
   }
@@ -794,7 +795,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
           style: pvManrope(fontSize: 12.5, color: t.soft)),
       const SizedBox(height: 16),
       for (final na in next)
-        GestureDetector(
+        PvPress(child: GestureDetector(
           // Route the same way read_next_screen does: a book with a companion
           // belongs in the Book Companion experience, however it was reached.
           // Without this, the keep-reading chain was a back door into the old
@@ -832,7 +833,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
               Icon(Icons.chevron_right_rounded, size: 20, color: t.soft),
             ]),
           ),
-        ),
+        )),
     ]);
   }
 
@@ -858,7 +859,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
                 style: pvFraunces(fontSize: 20, fontWeight: FontWeight.w600, color: t.ink)),
             const SizedBox(height: 12),
             for (final e in entries)
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: () {
                   Navigator.of(ctx).pop();
                   final c = _keys[e.$1]?.currentContext;
@@ -875,7 +876,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
                   child: Text(e.$2,
                       style: pvManrope(fontSize: 15, fontWeight: FontWeight.w600, color: t.ink)),
                 ),
-              ),
+              )),
           ]),
         ),
       ),
@@ -946,7 +947,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
   Widget _modeChip(_RTheme t, String label, ReadReaderMode m, void Function(void Function()) setSheet) {
     final on = _prefs.mode == m;
     return Expanded(
-      child: GestureDetector(
+      child: PvPress(child: GestureDetector(
         onTap: () {
           _prefs.setMode(m);
           setSheet(() {});
@@ -964,7 +965,7 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
               style: pvManrope(
                   fontSize: 13, fontWeight: FontWeight.w700, color: on ? _t.accent : t.soft)),
         ),
-      ),
+      )),
     );
   }
 }

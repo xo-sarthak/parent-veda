@@ -51,6 +51,7 @@ import 'ttc_surface_router.dart';
 import 'ttc_strings.dart';
 import 'ttc_tool_chrome.dart';
 import 'ttc_cycle_headline.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class TtcCycleReportScreen extends StatefulWidget {
   const TtcCycleReportScreen({super.key, this.series});
@@ -1178,7 +1179,7 @@ class _Segment extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget seg(String label, bool on, VoidCallback tap) => GestureDetector(
+    Widget seg(String label, bool on, VoidCallback tap) => PvPress(child: GestureDetector(
           onTap: tap,
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -1191,7 +1192,7 @@ class _Segment extends StatelessWidget {
                 style: ttcBody(11,
                     color: on ? Colors.white : ttcMuted, w: FontWeight.w800)),
           ),
-        );
+        ));
 
     return Container(
       padding: const EdgeInsets.all(3),

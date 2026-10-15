@@ -29,6 +29,7 @@ import '../brackets/hub/hub_intent_art.dart' show IntentMark;
 import '../pregnancy/preg_chrome.dart';
 import '../pregnancy/preg_tool_chrome.dart';
 import '../products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 enum DdcMethod { lmp, conception, ivf, ultrasound, known }
 
@@ -204,7 +205,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
     return Column(
       children: [
         for (final it in items)
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => setState(() => _method = it.$1),
             child: Container(
               margin: const EdgeInsets.only(bottom: 10),
@@ -238,7 +239,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
                       size: 20, color: kPvInk),
               ]),
             ),
-          ),
+          )),
       ],
     );
   }
@@ -353,7 +354,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
         for (final o in opts)
           Padding(
             padding: const EdgeInsets.only(right: 8),
-            child: GestureDetector(
+            child: PvPress(child: GestureDetector(
               onTap: () => onPick(o.$1),
               child: Container(
                 padding:
@@ -372,7 +373,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
                             ? Colors.white
                             : pvStorePalette.ink1)),
               ),
-            ),
+            )),
           ),
       ]),
     ]);
@@ -416,7 +417,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
     ]);
   }
 
-  Widget _rnd(IconData icon, VoidCallback onTap) => GestureDetector(
+  Widget _rnd(IconData icon, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         child: Container(
           width: 32,
@@ -428,7 +429,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
               borderRadius: BorderRadius.circular(10)),
           child: Icon(icon, size: 18, color: kPvInk),
         ),
-      );
+      ));
 
   // ===========================================================================
   //  Result (the roadmap)

@@ -13,6 +13,7 @@ import 'watch_collection_screen.dart';
 import 'watch_common.dart';
 import 'watch_player_screen.dart';
 import 'watch_quicklearn_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class WatchLibraryScreen extends StatelessWidget {
   const WatchLibraryScreen({super.key});
@@ -61,7 +62,7 @@ class WatchLibraryScreen extends StatelessWidget {
                 ])),
 
                 const SizedBox(height: 8),
-                _pad(GestureDetector(
+                _pad(PvPress(child: GestureDetector(
                   onTap: () => ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Offline downloads coming soon'), behavior: SnackBarBehavior.floating),
                   ),
@@ -73,7 +74,7 @@ class WatchLibraryScreen extends StatelessWidget {
                     const Spacer(),
                     Text('Soon', style: ppBody(11, color: ppMuted, w: FontWeight.w700)),
                   ]),
-                )),
+                ))),
               ],
             );
           },
@@ -108,7 +109,7 @@ class WatchLibraryScreen extends StatelessWidget {
   Widget _collectionRow(BuildContext context, WatchCollection c) {
     final mins = c.videoIds.map(watchVideoById).fold<int>(0, (a, v) => a + v.seconds) ~/ 60;
     final prog = WatchStore.instance.collectionProgress(c);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => WatchCollectionScreen(collection: c))),
       behavior: HitTestBehavior.opaque,
       child: Padding(
@@ -126,7 +127,7 @@ class WatchLibraryScreen extends StatelessWidget {
           const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
         ]),
       ),
-    );
+    ));
   }
 
   // A parent's own collection. Reuses WatchCollectionScreen by wrapping the user
@@ -140,7 +141,7 @@ class WatchLibraryScreen extends StatelessWidget {
       videoIds: uc.videoIds,
       seed: 30,
     );
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => WatchCollectionScreen(collection: wc))),
       behavior: HitTestBehavior.opaque,
       child: Padding(
@@ -158,6 +159,6 @@ class WatchLibraryScreen extends StatelessWidget {
           const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
         ]),
       ),
-    );
+    ));
   }
 }

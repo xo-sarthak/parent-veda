@@ -12,6 +12,7 @@
 import 'package:flutter/material.dart';
 
 import '../pp_common.dart';
+import '../../../widgets/pv_feedback.dart' show PvPress;
 
 export '../pp_common.dart';
 
@@ -122,7 +123,7 @@ BoxDecoration jvCard({Color color = Colors.white, double radius = 22, Color? bor
     );
 
 /// Primary pill button (filled purple).
-Widget jvButton(String label, VoidCallback onTap, {bool filled = true, IconData? trailing}) => GestureDetector(
+Widget jvButton(String label, VoidCallback onTap, {bool filled = true, IconData? trailing}) => PvPress(child: GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -139,11 +140,11 @@ Widget jvButton(String label, VoidCallback onTap, {bool filled = true, IconData?
           if (trailing != null) ...[const SizedBox(width: 8), Icon(trailing, size: 18, color: filled ? Colors.white : ppPurple)],
         ]),
       ),
-    );
+    ));
 
 /// Round back button (34px) + optional centre title + optional trailing.
 Widget jvTopBar(BuildContext context, {String? title, Widget? trailing, VoidCallback? onBack}) => Row(children: [
-      GestureDetector(
+      PvPress(child: GestureDetector(
         onTap: onBack ?? () => Navigator.of(context).maybePop(),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -153,7 +154,7 @@ Widget jvTopBar(BuildContext context, {String? title, Widget? trailing, VoidCall
           decoration: const BoxDecoration(color: ppPanel, shape: BoxShape.circle),
           child: const Icon(Icons.arrow_back, size: 17, color: ppInk),
         ),
-      ),
+      )),
       if (title != null) Expanded(child: Text(title, textAlign: TextAlign.center, style: ppJakarta(16))) else const Spacer(),
       if (trailing != null) trailing else const SizedBox(width: 36),
     ]);
@@ -230,7 +231,7 @@ class JvBottomNav extends StatelessWidget {
     Widget tab(int i, IconData icon, String label) {
       final on = i == active;
       return Expanded(
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: () => onTab(i),
           behavior: HitTestBehavior.opaque,
           child: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -238,7 +239,7 @@ class JvBottomNav extends StatelessWidget {
             const SizedBox(height: 3),
             Text(label, style: ppBody(10, color: on ? ppPurple : ppMuted, w: on ? FontWeight.w700 : FontWeight.w500)),
           ]),
-        ),
+        )),
       );
     }
 
@@ -255,7 +256,7 @@ class JvBottomNav extends StatelessWidget {
         tab(0, Icons.auto_stories_outlined, 'Our Story'),
         tab(1, Icons.grid_view_rounded, 'Moments'),
         // centre add button
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: onAdd,
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -270,7 +271,7 @@ class JvBottomNav extends StatelessWidget {
             ),
             child: const Icon(Icons.add, size: 26, color: Colors.white),
           ),
-        ),
+        )),
         tab(2, Icons.mail_outline_rounded, 'Letters'),
         tab(3, Icons.search_rounded, 'Search'),
       ]),

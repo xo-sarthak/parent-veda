@@ -42,6 +42,7 @@ import '../brackets/hub/hub_intent_art.dart';
 import '../doors/pv_list_row.dart' show PvMarkWell;
 import '../pregnancy/preg_chrome.dart';
 import '../products/pv_store_chrome.dart' show PvChip, kPvInk, kPvLine, pvStorePalette;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // Kept for revert (2026-09-30): the teal accent and the soft card shadow.
 // const Color _accent = Color(0xFF2E9C8E); // calm teal (matches Scans / Journal)
@@ -215,7 +216,7 @@ class _TestsScansReportsScreenState extends State<TestsScansReportsScreen> {
             child: Semantics(
               button: true,
               selected: _section == i,
-              child: GestureDetector(
+              child: PvPress(child: GestureDetector(
                 onTap: () => setState(() => _section = i),
                 behavior: HitTestBehavior.opaque,
                 child: AnimatedContainer(
@@ -233,7 +234,7 @@ class _TestsScansReportsScreenState extends State<TestsScansReportsScreen> {
                           fontWeight: FontWeight.w700,
                           color: _section == i ? Colors.white : pal.ink2)),
                 ),
-              ),
+              )),
             ),
           ),
       ]),

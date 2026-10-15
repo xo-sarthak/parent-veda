@@ -27,6 +27,7 @@ import 'pp_common.dart';
 import 'pp_products_data.dart';
 import 'products_compare_screen.dart';
 import '../products/pv_product_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class ProductDetailScreenClassic extends StatelessWidget {
   const ProductDetailScreenClassic({super.key, this.product = fallback});
@@ -257,7 +258,7 @@ class ProductDetailScreenClassic extends StatelessWidget {
             Text('A peer-reviewed source behind the claims on this page. ParentVeda summarises it for you here; the full paper opens on the publisher\'s site.',
                 style: ppBody(13.5, color: ppSoft, h: 1.6)),
             const SizedBox(height: 18),
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: () {
                 Navigator.of(sheetCtx).pop();
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -275,7 +276,7 @@ class ProductDetailScreenClassic extends StatelessWidget {
                   Text('Read the full paper', style: ppBody(14, color: Colors.white, w: FontWeight.w700)),
                 ]),
               ),
-            ),
+            )),
           ]),
         ),
       ),
@@ -293,11 +294,11 @@ class ProductDetailScreenClassic extends StatelessWidget {
           padding: const EdgeInsets.only(top: 12, bottom: 40),
           children: [
             _pad(Row(children: [
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: () => Navigator.of(context).maybePop(),
                 behavior: HitTestBehavior.opaque,
                 child: const Icon(Icons.arrow_back, size: 20, color: ppSoft),
-              ),
+              )),
               const SizedBox(width: 12),
               Flexible(
                 child: Text('${product.category} › $_subShort',
@@ -381,7 +382,7 @@ class ProductDetailScreenClassic extends StatelessWidget {
                 animation: PpCompareStore.instance,
                 builder: (context, _) {
                   final inList = PpCompareStore.instance.selected.any((x) => x.id == product.id);
-                  return GestureDetector(
+                  return PvPress(child: GestureDetector(
                     onTap: () {
                       _ensureIn(context);
                       Navigator.of(context).push(
@@ -403,7 +404,7 @@ class ProductDetailScreenClassic extends StatelessWidget {
                                 color: inList ? Colors.white : ppPurple, w: FontWeight.w800)),
                       ]),
                     ),
-                  );
+                  ));
                 },
               ),
             ])),
@@ -610,7 +611,7 @@ class ProductDetailScreenClassic extends StatelessWidget {
                 final store = PpCompareStore.instance;
                 final inList = store.isSelected(product);
                 return Column(children: [
-                  GestureDetector(
+                  PvPress(child: GestureDetector(
                     onTap: () => _toggleCompare(context),
                     behavior: HitTestBehavior.opaque,
                     child: Container(
@@ -631,9 +632,9 @@ class ProductDetailScreenClassic extends StatelessWidget {
                           Text('${store.count} in compare', style: ppBody(11, color: ppMuted)),
                       ]),
                     ),
-                  ),
+                  )),
                   const SizedBox(height: 10),
-                  GestureDetector(
+                  PvPress(child: GestureDetector(
                     onTap: () {
                       _ensureIn(context);
                       Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const ProductsCompareScreen()));
@@ -648,7 +649,7 @@ class ProductDetailScreenClassic extends StatelessWidget {
                         const Text('→', style: TextStyle(color: ppMuted)),
                       ]),
                     ),
-                  ),
+                  )),
                 ]);
               },
             )),
@@ -664,7 +665,7 @@ class ProductDetailScreenClassic extends StatelessWidget {
             if (!ppCanBuy(product))
               _pad(const PpReviewOnlyNote())
             else ...[
-              _pad(GestureDetector(
+              _pad(PvPress(child: GestureDetector(
                 onTap: () => _buy(context),
                 behavior: HitTestBehavior.opaque,
                 child: Container(
@@ -680,7 +681,7 @@ class ProductDetailScreenClassic extends StatelessWidget {
                         style: ppBody(15, color: Colors.white, w: FontWeight.w700)),
                   ]),
                 ),
-              )),
+              ))),
               if (ppIsAffiliate(product)) ...[
                 const SizedBox(height: 12),
                 _pad(Center(
@@ -734,7 +735,7 @@ class ProductDetailScreenClassic extends StatelessWidget {
       );
 
   Widget _paper(BuildContext context, String tag, Color tagColor, String title, {bool top = false, bool bottom = false}) =>
-      GestureDetector(
+      PvPress(child: GestureDetector(
         onTap: () => _openResearch(context, tag, title),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -759,7 +760,7 @@ class ProductDetailScreenClassic extends StatelessWidget {
             const Icon(Icons.north_east_rounded, size: 15, color: ppMuted),
           ]),
         ),
-      );
+      ));
 
   Widget _review(String name, String who, String stars, String source, String quote,
       {bool top = false, bool bottom = false}) {
@@ -824,7 +825,7 @@ class _HowWeReviewState extends State<_HowWeReview> {
   bool _open = false;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         onTap: () => setState(() => _open = !_open),
         behavior: HitTestBehavior.opaque,
         child: AnimatedContainer(
@@ -860,7 +861,7 @@ class _HowWeReviewState extends State<_HowWeReview> {
             ],
           ]),
         ),
-      );
+      ));
 }
 
 // ---- facade (the retirement) -----------------------------------------------

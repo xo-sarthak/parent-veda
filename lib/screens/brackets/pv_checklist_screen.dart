@@ -166,7 +166,7 @@ class _PvChecklistScreenState extends State<PvChecklistScreen> {
                     style: pvManrope(
                         fontSize: 12.5, height: 1.55, color: p.ink3))),
               if (count > 0)
-                pvDoorPad(GestureDetector(
+                pvDoorPad(PvPress(child: GestureDetector(
                   onTap: () => store.clear(list.id),
                   behavior: HitTestBehavior.opaque,
                   child: Text('Clear all',
@@ -174,7 +174,7 @@ class _PvChecklistScreenState extends State<PvChecklistScreen> {
                           fontSize: 12.5,
                           fontWeight: FontWeight.w700,
                           color: p.ink3)),
-                )),
+                ))),
               const SizedBox(height: 22),
               pvDoorPad(PvDoorDisclaimer(p: p)),
               // Clearance for the pinned share bar, so the last row is

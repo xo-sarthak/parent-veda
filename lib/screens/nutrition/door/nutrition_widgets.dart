@@ -378,7 +378,7 @@ class GlassesRow extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           for (var i = 0; i < total; i++)
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: () {
                 HapticFeedback.selectionClick();
                 onTap(i);
@@ -389,7 +389,7 @@ class GlassesRow extends StatelessWidget {
                 height: 44,
                 child: CustomPaint(painter: _GlassPainter(filled: i < filled, p: p)),
               ),
-            ),
+            )),
         ],
       );
 }

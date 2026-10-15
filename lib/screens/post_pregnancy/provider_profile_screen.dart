@@ -312,7 +312,7 @@ class ProviderProfileScreen extends StatelessWidget {
                     stops: [0, 0.30],
                   ),
                 ),
-                child: GestureDetector(
+                child: PvPress(child: GestureDetector(
                   // In-app consult via the booking engine (calendar case). Falls
                   // back to the old sheet only for an expert not yet bridged.
                   onTap: () {
@@ -330,7 +330,7 @@ class ProviderProfileScreen extends StatelessWidget {
                     decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(16)),
                     child: Text('Book a consultation', style: ppBody(15, color: Colors.white, w: FontWeight.w700)),
                   ),
-                ),
+                )),
               ),
             ),
         ]),
@@ -540,7 +540,7 @@ class ProviderProfileScreen extends StatelessWidget {
 
   // A program the expert is hosting (masterclass / course / cohort). Informational
   // here - tapping opens the program's own page, where dates + reserve/buy live.
-  Widget _programRow(BuildContext context, LearningProgram p, {bool top = false}) => GestureDetector(
+  Widget _programRow(BuildContext context, LearningProgram p, {bool top = false}) => PvPress(child: GestureDetector(
         onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => LearningDetailScreen(program: p))),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -560,7 +560,7 @@ class ProviderProfileScreen extends StatelessWidget {
             Text(p.price, style: ppBody(13, color: ppInk, w: FontWeight.w700)),
           ]),
         ),
-      );
+      ));
 
   // A Prepare (pregnancy) programme she leads. Opens the programme's own page,
   // which owns dates, seats and the pay sheet — this row is a signpost, never a
@@ -569,7 +569,7 @@ class ProviderProfileScreen extends StatelessWidget {
   // `S.current` rather than a threaded controller: this screen is reached from
   // both stages and from a dozen call sites, several of which have no language
   // in scope. That is exactly the case `LocalizedText.now` documents.
-  Widget _prepProgramRow(BuildContext context, PrepProgram p, {bool top = false}) => GestureDetector(
+  Widget _prepProgramRow(BuildContext context, PrepProgram p, {bool top = false}) => PvPress(child: GestureDetector(
         onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
           settings: RouteSettings(name: 'prepare/program/${p.id}'),
           builder: (_) => ProgramDetailScreen(program: p, lang: S.current),
@@ -599,7 +599,7 @@ class ProviderProfileScreen extends StatelessWidget {
             Text(p.price, style: ppBody(13, color: ppInk, w: FontWeight.w700)),
           ]),
         ),
-      );
+      ));
 
   // A yoga / movement class she teaches.
   //
@@ -608,7 +608,7 @@ class ProviderProfileScreen extends StatelessWidget {
   // INCLUDING ones the parent had never opened — so tapping her second class
   // from her profile closed the profile and showed the first one. This screen
   // is reachable from anywhere, so there is no "back" it can assume.
-  Widget _yogaRow(BuildContext context, YogaClass c, {bool top = false}) => GestureDetector(
+  Widget _yogaRow(BuildContext context, YogaClass c, {bool top = false}) => PvPress(child: GestureDetector(
         onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
           settings: RouteSettings(name: 'pp/yoga/class/${c.id}'),
           builder: (_) => YogaClassScreen(cls: c),
@@ -629,11 +629,11 @@ class ProviderProfileScreen extends StatelessWidget {
             Text(c.price.split('·').first.trim(), style: ppBody(13, color: ppInk, w: FontWeight.w700)),
           ]),
         ),
-      );
+      ));
 
   // A link out to the expert's channel in Watch (their videos/shorts/podcasts).
   // Following/subscribing happens there - on the channel, not on this profile.
-  Widget _channelLink(BuildContext context, Expert e) => GestureDetector(
+  Widget _channelLink(BuildContext context, Expert e) => PvPress(child: GestureDetector(
         onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => WatchChannelScreen(expertId: e.id))),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -658,7 +658,7 @@ class ProviderProfileScreen extends StatelessWidget {
             const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
           ]),
         ),
-      );
+      ));
 }
 
 // =============================================================================

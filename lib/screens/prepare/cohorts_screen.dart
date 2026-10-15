@@ -12,6 +12,7 @@ import '../../localization/app_language.dart';
 import '../learn/pv_learn_screen.dart';
 import '../../services/life_stage_store.dart';
 import '../../data/learn/pv_learn_view.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // ⚠️ FACADE since 2026-09-20 (docs/LEARNING-AUDIT.md). The class keeps its
 // name and constructor so every push of it lands on the unified learn
@@ -61,7 +62,7 @@ class CohortsScreenClassic extends StatelessWidget {
 
             // featured cohort
             const SizedBox(height: 20),
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: () => open(featured),
               child: Container(
                 padding: const EdgeInsets.all(22),
@@ -108,7 +109,7 @@ class CohortsScreenClassic extends StatelessWidget {
                   ]),
                 ]),
               ),
-            ),
+            )),
 
             const SizedBox(height: 28),
             Text(s.uiMorePrograms, style: pvTitleStyle(16)),
@@ -143,7 +144,7 @@ class CohortsScreenClassic extends StatelessWidget {
     final meta = c.forWhen != null
         ? '${c.duration.now} · ${c.forWhen!.now}'
         : c.duration.now;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -166,6 +167,6 @@ class CohortsScreenClassic extends StatelessWidget {
           Text(meta, style: pvBody(kMuted, 12)),
         ]),
       ),
-    );
+    ));
   }
 }

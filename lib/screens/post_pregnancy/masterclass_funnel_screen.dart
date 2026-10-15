@@ -14,6 +14,7 @@ import 'pp_experts_data.dart';
 import 'provider_profile_screen.dart';
 import '../learn/pv_offering_screen.dart';
 import '../learn/pv_learn_catalog.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // ⚠️ FACADE since 2026-09-20 (docs/LEARNING-AUDIT.md). The class keeps its
 // name and constructor so every push of it lands on the unified learn
@@ -81,7 +82,7 @@ class _MasterclassFunnelScreenState extends State<MasterclassFunnelScreenClassic
 
               // intro video hero
               const SizedBox(height: 18),
-              _pad(GestureDetector(
+              _pad(PvPress(child: GestureDetector(
                 onTap: () => _soon(context),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(22),
@@ -103,7 +104,7 @@ class _MasterclassFunnelScreenState extends State<MasterclassFunnelScreenClassic
                     ),
                   ]),
                 ),
-              )),
+              ))),
 
               // title block
               const SizedBox(height: 20),
@@ -163,14 +164,14 @@ class _MasterclassFunnelScreenState extends State<MasterclassFunnelScreenClassic
               const SizedBox(height: 28),
               _pad(Row(children: [
                 Expanded(child: Text('Your expert', style: ppJakarta(18))),
-                GestureDetector(
+                PvPress(child: GestureDetector(
                   onTap: () => _openExpert(context, 'ananya'),
                   behavior: HitTestBehavior.opaque,
                   child: Text('View profile →', style: ppBody(12, color: ppPurple, w: FontWeight.w700)),
-                ),
+                )),
               ])),
               const SizedBox(height: 14),
-              _pad(GestureDetector(
+              _pad(PvPress(child: GestureDetector(
                 onTap: () => _openExpert(context, 'ananya'),
                 behavior: HitTestBehavior.opaque,
                 child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -194,7 +195,7 @@ class _MasterclassFunnelScreenState extends State<MasterclassFunnelScreenClassic
                     ]),
                   ),
                 ]),
-              )),
+              ))),
 
               // testimonial
               const SizedBox(height: 26),
@@ -285,7 +286,7 @@ class _MasterclassFunnelScreenState extends State<MasterclassFunnelScreenClassic
 
   Widget _faq(int i, String q, String a) {
     final open = _openFaq == i;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => setState(() => _openFaq = open ? -1 : i),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -303,7 +304,7 @@ class _MasterclassFunnelScreenState extends State<MasterclassFunnelScreenClassic
           ],
         ]),
       ),
-    );
+    ));
   }
 
   Widget _ctaBar(BuildContext context) => Container(
@@ -323,7 +324,7 @@ class _MasterclassFunnelScreenState extends State<MasterclassFunnelScreenClassic
           ]),
           const SizedBox(width: 14),
           Expanded(
-            child: GestureDetector(
+            child: PvPress(child: GestureDetector(
               onTap: () => _soon(context),
               child: Container(
                 height: 52,
@@ -331,7 +332,7 @@ class _MasterclassFunnelScreenState extends State<MasterclassFunnelScreenClassic
                 decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(16)),
                 child: Text('Reserve a seat', style: ppBody(15, color: Colors.white, w: FontWeight.w700)),
               ),
-            ),
+            )),
           ),
         ]),
       );

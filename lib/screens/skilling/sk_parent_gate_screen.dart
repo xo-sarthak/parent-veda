@@ -32,6 +32,7 @@ import '../v2/v2_palette.dart';
 import 'sk_bands.dart';
 import 'sk_child_store.dart';
 import 'sk_consent_verifier.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class SkParentGateScreen extends StatefulWidget {
   const SkParentGateScreen({super.key, this.onDone});
@@ -150,7 +151,7 @@ class _SkParentGateScreenState extends State<SkParentGateScreen> {
           children: [
             Align(
               alignment: Alignment.centerLeft,
-              child: GestureDetector(
+              child: PvPress(child: GestureDetector(
                 onTap: () => Navigator.of(context).maybePop(),
                 behavior: HitTestBehavior.opaque,
                 child: Container(
@@ -161,7 +162,7 @@ class _SkParentGateScreenState extends State<SkParentGateScreen> {
                       shape: BoxShape.circle, border: Border.all(color: p.line)),
                   child: Icon(Icons.arrow_back_rounded, size: 19, color: p.ink1),
                 ),
-              ),
+              )),
             ),
             const SizedBox(height: 18),
             Text('SKILLING  ·  FOR THE PARENT',

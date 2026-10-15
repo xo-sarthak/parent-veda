@@ -18,7 +18,7 @@ import 'pp_common.dart';
 import 'pp_what_changed_data.dart';
 import 'problem_solver_screen.dart';
 import '../../theme/pv_fonts.dart';
-import '../../widgets/pv_feedback.dart' show PvChoiceTile, PvQuestionProgress;
+import '../../widgets/pv_feedback.dart' show PvChoiceTile, PvQuestionProgress, PvPress;
 import '../brackets/hub/hub_intent_art.dart' show IntentMark;
 import '../doors/pv_list_row.dart';
 import '../pregnancy/preg_tool_chrome.dart';
@@ -193,7 +193,7 @@ class _WhatChangedScreenState extends State<WhatChangedScreen> {
           children: [
             // header
             _pad(Row(children: [
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: () => Navigator.of(context).maybePop(),
                 child: Container(
                   width: 34,
@@ -202,7 +202,7 @@ class _WhatChangedScreenState extends State<WhatChangedScreen> {
                   decoration: const BoxDecoration(color: ppPanel, shape: BoxShape.circle),
                   child: const Icon(Icons.arrow_back, size: 16, color: ppInk),
                 ),
-              ),
+              )),
               Expanded(child: Center(child: ppEyebrow('What Changed?', color: ppMuted, spacing: 1.4))),
               const SizedBox(width: 34),
             ])),
@@ -336,7 +336,7 @@ class _WhatChangedScreenState extends State<WhatChangedScreen> {
 
   Widget _concernRow(WcConcern c) => Padding(
         padding: const EdgeInsets.only(bottom: 10),
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: () => _open(c),
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -367,7 +367,7 @@ class _WhatChangedScreenState extends State<WhatChangedScreen> {
               const Icon(Icons.chevron_right_rounded, size: 20, color: Color(0xFFC7BBD6)),
             ]),
           ),
-        ),
+        )),
       );
 }
 
@@ -686,7 +686,7 @@ class _WcFlowScreenState extends State<WcFlowScreen> {
             children: [
               // header
               _pad(Row(children: [
-                GestureDetector(
+                PvPress(child: GestureDetector(
                   onTap: () => Navigator.of(context).maybePop(),
                   child: Container(
                     width: 34,
@@ -695,10 +695,10 @@ class _WcFlowScreenState extends State<WcFlowScreen> {
                     decoration: const BoxDecoration(color: ppPanel, shape: BoxShape.circle),
                     child: const Icon(Icons.arrow_back, size: 16, color: ppInk),
                   ),
-                ),
+                )),
                 Expanded(child: Center(child: ppEyebrow('What Changed?', color: ppMuted, spacing: 1.4))),
                 if (_showResult)
-                  GestureDetector(
+                  PvPress(child: GestureDetector(
                     onTap: () => setState(() {
                       _showResult = false;
                       _step = 0;
@@ -707,7 +707,7 @@ class _WcFlowScreenState extends State<WcFlowScreen> {
                       }
                     }),
                     child: Text('Reset', style: ppBody(12, color: ppPurple, w: FontWeight.w700)),
-                  )
+                  ))
                 else
                   const SizedBox(width: 34),
               ])),
@@ -834,7 +834,7 @@ class _WcFlowScreenState extends State<WcFlowScreen> {
     final sel = _answers[_step] == i;
     return Padding(
       padding: const EdgeInsets.only(bottom: 11),
-      child: GestureDetector(
+      child: PvPress(child: GestureDetector(
         onTap: () => setState(() => _answers[_step] = i),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -861,7 +861,7 @@ class _WcFlowScreenState extends State<WcFlowScreen> {
             Expanded(child: Text(label, style: ppBody(15, color: ppInk, w: sel ? FontWeight.w700 : FontWeight.w400))),
           ]),
         ),
-      ),
+      )),
     );
   }
 
@@ -947,7 +947,7 @@ class _WcFlowScreenState extends State<WcFlowScreen> {
 
       // escalation
       const SizedBox(height: 16),
-      _pad(GestureDetector(
+      _pad(PvPress(child: GestureDetector(
         onTap: () => _push(context, const ProblemSolverScreen()),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
@@ -965,7 +965,7 @@ class _WcFlowScreenState extends State<WcFlowScreen> {
             const Text('→', style: TextStyle(color: Color(0xFFC6295A))),
           ]),
         ),
-      )),
+      ))),
     ];
   }
 
@@ -983,7 +983,7 @@ class _WcFlowScreenState extends State<WcFlowScreen> {
 
   static const Color _lav = Color(0xFFB79BDD);
 
-  Widget _railCard(BuildContext context, IconData icon, String tag, String title, Color tagColor, {bool dark = false, required VoidCallback onTap}) => GestureDetector(
+  Widget _railCard(BuildContext context, IconData icon, String tag, String title, Color tagColor, {bool dark = false, required VoidCallback onTap}) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -1003,5 +1003,5 @@ class _WcFlowScreenState extends State<WcFlowScreen> {
             Text(title, style: ppJakarta(14, color: dark ? Colors.white : ppInk, w: FontWeight.w600).copyWith(height: 1.25), maxLines: 2, overflow: TextOverflow.ellipsis),
           ]),
         ),
-      );
+      ));
 }

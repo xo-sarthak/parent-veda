@@ -68,6 +68,7 @@ import 'ttc_strings.dart';
 import 'ttc_tool_marks.dart' show ttcToolHeaderMark;
 import 'ttc_today_screen.dart' show logTtcPeriod;
 import 'ttc_treatment_screen.dart' show TtcTreatmentEntryCard;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// ⚠️ 273, TAKEN FROM THE DESIGN, NOT FROM THE BRACKET. `accentHue` in
 /// `Fertility Window.dc.html` defaults to 273 and every colour on the screen is
@@ -1281,7 +1282,7 @@ class _DayChip extends StatelessWidget {
   Widget build(BuildContext context) => Semantics(
         button: true,
         selected: selected,
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: AnimatedContainer(
@@ -1318,7 +1319,7 @@ class _DayChip extends StatelessWidget {
                           color: p.ink1)),
                 ]),
           ),
-        ),
+        )),
       );
 }
 
@@ -1609,7 +1610,7 @@ class _Pill extends StatelessWidget {
   final bool selected;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -1646,7 +1647,7 @@ class _Pill extends StatelessWidget {
                     color: leading != null ? ttcTitleInk : p.ink1)),
           ]),
         ),
-      );
+      ));
 }
 
 /// A labelled step between cycles: "Next cycle", "Back to this cycle".
@@ -1666,7 +1667,7 @@ class _StepPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Semantics(
         button: true,
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -1692,7 +1693,7 @@ class _StepPill extends StatelessWidget {
               ],
             ]),
           ),
-        ),
+        )),
       );
 }
 
@@ -1759,7 +1760,7 @@ class _ViewToggle extends StatelessWidget {
         button: true,
         selected: on,
         label: semantic,
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: () => onChanged(v),
           behavior: HitTestBehavior.opaque,
           child: AnimatedContainer(
@@ -1790,7 +1791,7 @@ class _ViewToggle extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                     color: on ? ttcTitleInk : p.ink3)),
           ),
-        ),
+        )),
       );
     }
 

@@ -18,6 +18,7 @@ import 'phase_detail_screen.dart';
 import 'pp_child_profile.dart';
 import 'pp_common.dart';
 import 'pp_phases_data.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class PhaseMapScreen extends StatelessWidget {
   const PhaseMapScreen({super.key});
@@ -71,7 +72,7 @@ class PhaseMapScreen extends StatelessWidget {
     final now = i == currentIndex;
     final ink = past ? ppMuted : ppInk;
 
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => Navigator.of(context).push(
         MaterialPageRoute<void>(builder: (_) => PhaseDetailScreen(phase: p)),
       ),
@@ -133,6 +134,6 @@ class PhaseMapScreen extends StatelessWidget {
           const Icon(Icons.chevron_right_rounded, size: 19, color: ppMuted),
         ]),
       ),
-    );
+    ));
   }
 }

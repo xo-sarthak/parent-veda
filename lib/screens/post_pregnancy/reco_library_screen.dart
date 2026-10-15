@@ -16,6 +16,7 @@ import 'pp_tools_kit.dart';
 import 'reco_common.dart';
 import 'reco_detail_screen.dart';
 import 'recommendations_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class RecoLibraryScreen extends StatelessWidget {
   const RecoLibraryScreen({super.key});
@@ -125,7 +126,7 @@ class RecoLibraryScreen extends StatelessWidget {
 
   // The way OUT of an empty section. An empty state that only describes itself
   // is dead space; this gives her somewhere to go from every one of them.
-  Widget _exploreCta(BuildContext context) => GestureDetector(
+  Widget _exploreCta(BuildContext context) => PvPress(child: GestureDetector(
         onTap: () => Navigator.of(context).push(
           MaterialPageRoute<void>(builder: (_) => const RecommendationsScreen()),
         ),
@@ -136,7 +137,7 @@ class RecoLibraryScreen extends StatelessWidget {
           const SizedBox(width: 4),
           const Icon(Icons.arrow_forward_rounded, size: 15, color: ppPurple),
         ]),
-      );
+      ));
 
   Widget _sectionHead(String title, String sub) =>
       Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -145,7 +146,7 @@ class RecoLibraryScreen extends StatelessWidget {
         Text(sub, style: ppBody(12.5, color: ppMuted)),
       ]);
 
-  Widget _listRow(BuildContext context, String name, int count) => GestureDetector(
+  Widget _listRow(BuildContext context, String name, int count) => PvPress(child: GestureDetector(
         onTap: () => Navigator.of(context).push(
           MaterialPageRoute<void>(builder: (_) => RecoListScreen(name: name)),
         ),
@@ -179,7 +180,7 @@ class RecoLibraryScreen extends StatelessWidget {
             const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
           ]),
         ),
-      );
+      ));
 }
 
 // -----------------------------------------------------------------------------

@@ -19,6 +19,7 @@ import 'prepare_video_screen.dart';
 import '../../localization/app_language.dart';
 import '../post_pregnancy/pp_yoga_data.dart';
 import '../post_pregnancy/yoga_class_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // TODO: derive the current pregnancy month from the saved due date / week.
 // 30 weeks ≈ month 7, matching the rest of the Prepare tab's "Priya · 30 weeks".
@@ -184,7 +185,7 @@ class _PrenatalYogaScreenState extends State<PrenatalYogaScreen> {
   Widget _monthTab(S s, int m) {
     final active = m == _month;
     final isNow = m == _kCurrentMonth;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => setState(() => _month = m),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -211,7 +212,7 @@ class _PrenatalYogaScreenState extends State<PrenatalYogaScreen> {
           ],
         ]),
       ),
-    );
+    ));
   }
 
   /// The pregnancy categories' live classes: prenatal yoga and labour breathing.
@@ -242,7 +243,7 @@ class _PrenatalYogaScreenState extends State<PrenatalYogaScreen> {
 
   Widget _liveClass(YogaClass c, {bool bottom = false}) {
     final oneToOne = c.mode == YogaMode.liveOneToOne;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       key: ValueKey('preg_yoga_live_${c.id}'),
       onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
           settings: RouteSettings(name: 'move/yoga/class/${c.id}'),
@@ -288,11 +289,11 @@ class _PrenatalYogaScreenState extends State<PrenatalYogaScreen> {
           ),
         ]),
       ),
-    );
+    ));
   }
 
   Widget _session(S s, YogaSession y, {bool bottom = false}) {
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => Navigator.of(context).push(MaterialPageRoute(
           builder: (_) => PrepareVideoScreen(
               lang: widget.lang,
@@ -334,6 +335,6 @@ class _PrenatalYogaScreenState extends State<PrenatalYogaScreen> {
           pvPill(s.prepSafeForYou),
         ]),
       ),
-    );
+    ));
   }
 }

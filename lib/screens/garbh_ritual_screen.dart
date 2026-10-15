@@ -38,6 +38,7 @@ import '../data/garbh_rebuild_data.dart';
 import '../localization/app_language.dart';
 import '../services/pregnancy_controller.dart';
 import '../theme/pv_fonts.dart';
+import '../widgets/pv_feedback.dart' show PvPress;
 
 const _ink = Color(0xFF201C24); // V3 ink1
 const _muted = Color(0xFF2F2C30); // V3 ink3
@@ -129,7 +130,7 @@ class _JapaCounter extends StatelessWidget {
       builder: (context, _) => Row(children: [
         // ⚠️ A BIG TAP TARGET, because this is tapped 108 times. A small
         // control here is a small control pressed a hundred times in a row.
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: store.japaIncrement,
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -146,7 +147,7 @@ class _JapaCounter extends StatelessWidget {
                     fontWeight: FontWeight.w600,
                     color: Colors.white)),
           ),
-        ),
+        )),
         const SizedBox(width: 14),
         Expanded(
           child: Column(

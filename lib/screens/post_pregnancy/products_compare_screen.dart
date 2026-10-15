@@ -35,6 +35,7 @@ import 'pp_common.dart';
 import 'pp_product_widgets.dart';
 import 'pp_products_data.dart';
 import '../products/pv_compare_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class ProductsCompareScreenClassic extends StatelessWidget {
   const ProductsCompareScreenClassic({super.key});
@@ -70,7 +71,7 @@ class ProductsCompareScreenClassic extends StatelessWidget {
 
   // ---- back row (shared) --------------------------------------------------
   Widget _backRow(BuildContext context, String eyebrow, {bool showClear = false}) => _pad(Row(children: [
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () => Navigator.of(context).maybePop(),
           child: Container(
             width: 34,
@@ -79,18 +80,18 @@ class ProductsCompareScreenClassic extends StatelessWidget {
             decoration: const BoxDecoration(color: ppPanel, shape: BoxShape.circle),
             child: const Icon(Icons.arrow_back, size: 16, color: ppInk),
           ),
-        ),
+        )),
         const SizedBox(width: 12),
         Expanded(child: ppEyebrow(eyebrow, color: ppMuted, spacing: 1.2)),
         if (showClear)
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => PpCompareStore.instance.clear(),
             behavior: HitTestBehavior.opaque,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
               child: Text('Clear', style: ppBody(12.5, color: ppPurple, w: FontWeight.w700)),
             ),
-          ),
+          )),
       ]));
 
   // =========================================================================
@@ -121,7 +122,7 @@ class ProductsCompareScreenClassic extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: ppBody(14, color: ppSoft, h: 1.6))),
               const SizedBox(height: 28),
-              _pad(GestureDetector(
+              _pad(PvPress(child: GestureDetector(
                 onTap: () => openPpTab(context, 4),
                 behavior: HitTestBehavior.opaque,
                 child: Container(
@@ -130,7 +131,7 @@ class ProductsCompareScreenClassic extends StatelessWidget {
                   decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(16)),
                   child: Text('Browse Products', style: ppBody(15, color: Colors.white, w: FontWeight.w700)),
                 ),
-              )),
+              ))),
               const SizedBox(height: 22),
               _pad(Text('Only products in the same category can be compared, so every comparison stays meaningful.',
                   textAlign: TextAlign.center, style: ppBody(12, color: ppMuted, h: 1.55))),
@@ -191,7 +192,7 @@ class ProductsCompareScreenClassic extends StatelessWidget {
   }
 
   // an "Add another" placeholder that sits next to the single pick
-  Widget _addSlot(BuildContext context) => GestureDetector(
+  Widget _addSlot(BuildContext context) => PvPress(child: GestureDetector(
         onTap: () => _openPicker(context),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -216,9 +217,9 @@ class ProductsCompareScreenClassic extends StatelessWidget {
             Text('up to 3', style: ppBody(11, color: ppMuted)),
           ]),
         ),
-      );
+      ));
 
-  Widget _suggestionRow(BuildContext context, PpProduct p) => GestureDetector(
+  Widget _suggestionRow(BuildContext context, PpProduct p) => PvPress(child: GestureDetector(
         onTap: () => PpCompareStore.instance.toggle(p),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -260,7 +261,7 @@ class ProductsCompareScreenClassic extends StatelessWidget {
             ),
           ]),
         ),
-      );
+      ));
 
   // =========================================================================
   //  2-3 PRODUCTS - the full, dynamic side-by-side
@@ -322,7 +323,7 @@ class ProductsCompareScreenClassic extends StatelessWidget {
               // add another (up to 3)
               if (canAddMore) ...[
                 const SizedBox(height: 14),
-                _pad(GestureDetector(
+                _pad(PvPress(child: GestureDetector(
                   onTap: () => _openPicker(context),
                   behavior: HitTestBehavior.opaque,
                   child: Container(
@@ -338,7 +339,7 @@ class ProductsCompareScreenClassic extends StatelessWidget {
                       Text('Add another product', style: ppBody(13, color: ppPurple, w: FontWeight.w700)),
                     ]),
                   ),
-                )),
+                ))),
               ],
 
               // one fully column-divided comparison table: a header row of
@@ -485,7 +486,7 @@ class ProductsCompareScreenClassic extends StatelessWidget {
                     for (final o in options)
                       Padding(
                         padding: const EdgeInsets.only(bottom: 10),
-                        child: GestureDetector(
+                        child: PvPress(child: GestureDetector(
                           onTap: () {
                             if (replace != null) {
                               PpCompareStore.instance.replace(replace, o);
@@ -525,7 +526,7 @@ class ProductsCompareScreenClassic extends StatelessWidget {
                               Icon(replace == null ? Icons.add_circle_outline_rounded : Icons.swap_horiz_rounded, size: 20, color: ppPurple),
                             ]),
                           ),
-                        ),
+                        )),
                       ),
                   ],
                 ),
@@ -701,7 +702,7 @@ class ProductsCompareScreenClassic extends StatelessWidget {
         ]),
       );
 
-  Widget _miniIcon(IconData icon, VoidCallback onTap) => GestureDetector(
+  Widget _miniIcon(IconData icon, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -711,7 +712,7 @@ class ProductsCompareScreenClassic extends StatelessWidget {
           decoration: const BoxDecoration(color: ppPanel, shape: BoxShape.circle),
           child: Icon(icon, size: 15, color: ppSoft),
         ),
-      );
+      ));
 
   // ---- unified comparison table (2 divided columns, one row per attribute) -
   Widget _tRow(String? label, List<Widget> cells, {bool last = false, bool header = false}) => Container(
@@ -797,7 +798,7 @@ class ProductsCompareScreenClassic extends StatelessWidget {
         ]),
       );
     }
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       // Was: () => _soon(context) — a "Opening the store soon" snackbar. That
       // made the compare page the one buy surface a real affiliate link would
       // NOT switch on, because the tap never reached the router. It now shares
@@ -823,7 +824,7 @@ class ProductsCompareScreenClassic extends StatelessWidget {
               style: ppBody(14, color: primary ? Colors.white : ppInk, w: FontWeight.w800), maxLines: 1, overflow: TextOverflow.ellipsis),
         ]),
       ),
-    );
+    ));
   }
 }
 

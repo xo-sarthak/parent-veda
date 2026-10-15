@@ -41,6 +41,7 @@ import 'product_guide_votes.dart';
 import '../../localization/app_language.dart';
 import '../../data/products/pv_catalog_adapters.dart' show pvProductIdForGuide;
 import '../products/pv_product_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 
 class ProductGuideScreenClassic extends StatelessWidget {
@@ -108,7 +109,7 @@ class ProductGuideScreenClassic extends StatelessWidget {
   Widget _topBar(BuildContext context) => Padding(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
         child: Row(children: [
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => Navigator.of(context).maybePop(),
             behavior: HitTestBehavior.opaque,
             child: Container(
@@ -116,7 +117,7 @@ class ProductGuideScreenClassic extends StatelessWidget {
               decoration: const BoxDecoration(color: pgPanel, shape: BoxShape.circle),
               child: const Icon(Icons.arrow_back, size: 18, color: pgInk),
             ),
-          ),
+          )),
           Expanded(child: Center(child: Text(S.now.uiProductGuide, style: pgEyebrow(pgMuted)))),
           const SizedBox(width: 36),
         ]),
@@ -338,7 +339,7 @@ class ProductGuideScreenClassic extends StatelessWidget {
 
   Widget _vDiv() => Container(width: 1, height: 30, color: pgHair, margin: const EdgeInsets.symmetric(horizontal: 6));
 
-  Widget _voteBtn(String label, IconData icon, bool on, Color color, VoidCallback onTap) => GestureDetector(
+  Widget _voteBtn(String label, IconData icon, bool on, Color color, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -355,7 +356,7 @@ class ProductGuideScreenClassic extends StatelessWidget {
             Flexible(child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: pgBody(12.5, color: on ? Colors.white : pgInk, w: FontWeight.w700))),
           ]),
         ),
-      );
+      ));
 
   // ---- before you buy -----------------------------------------------------
   Widget _beforeYouBuy(ProductGuide g) => Container(
@@ -554,7 +555,7 @@ class ProductGuideScreenClassic extends StatelessWidget {
         MaterialPageRoute<void>(builder: (_) => const AskVedaScreen()),
       );
 
-  Widget _askVedaRow(BuildContext context, ProductGuide g) => GestureDetector(
+  Widget _askVedaRow(BuildContext context, ProductGuide g) => PvPress(child: GestureDetector(
         onTap: () => _askVeda(context, g),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -579,7 +580,7 @@ class ProductGuideScreenClassic extends StatelessWidget {
             const Icon(Icons.chevron_right_rounded, size: 20, color: pgPurple),
           ]),
         ),
-      );
+      ));
 
   Widget _experts(BuildContext context, ProductGuide g) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -604,7 +605,7 @@ class ProductGuideScreenClassic extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 22),
               children: [
                 for (final e in g.experts)
-                  GestureDetector(
+                  PvPress(child: GestureDetector(
                     // Opens the real video when the expert has one. The Brand
                     // Studio sponsors this exact surface, so a dead tap here
                     // meant live commercial inventory sitting on nothing.
@@ -633,7 +634,7 @@ class ProductGuideScreenClassic extends StatelessWidget {
                         Expanded(child: Text(e.hook, style: pgBody(12.5, h: 1.4), maxLines: 3, overflow: TextOverflow.ellipsis)),
                       ]),
                     ),
-                  ),
+                  )),
               ],
             ),
           ),
@@ -657,7 +658,7 @@ class ProductGuideScreenClassic extends StatelessWidget {
       for (final e in shown) pgExperienceCard(e),
       if (g.experiences.length > shown.length) ...[
         const SizedBox(height: 2),
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () => _push(context, _CommunityAllScreen(guide: g)),
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -666,7 +667,7 @@ class ProductGuideScreenClassic extends StatelessWidget {
             decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14), border: Border.all(color: pgHair)),
             child: Text('See all ${g.experiences.length} ratings  →', style: pgBody(13.5, color: pgPurple, w: FontWeight.w700)),
           ),
-        ),
+        )),
       ],
     ]));
   }
@@ -764,14 +765,14 @@ class ProductGuideScreenClassic extends StatelessWidget {
         Text(st.meaning, style: pgBody(13, color: pgSoft, h: 1.5)),
         if (st.detail.isNotEmpty) ...[
           const SizedBox(height: 10),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => _readMore(context, st),
             behavior: HitTestBehavior.opaque,
             child: Row(mainAxisSize: MainAxisSize.min, children: [
               Text(S.now.uiReadMore, style: pgBody(12.5, color: pgPurple, w: FontWeight.w700)),
               const Icon(Icons.chevron_right_rounded, size: 16, color: pgPurple),
             ]),
-          ),
+          )),
         ],
       ]),
     );
@@ -840,7 +841,7 @@ class ProductGuideScreenClassic extends StatelessWidget {
       const SizedBox(height: 12),
       _pad(Column(children: [
         for (final r in items)
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => _push(context, ProductGuideScreenClassic(guide: r)),
             behavior: HitTestBehavior.opaque,
             child: Container(
@@ -863,7 +864,7 @@ class ProductGuideScreenClassic extends StatelessWidget {
                 const Icon(Icons.chevron_right_rounded, color: Color(0xFFC7BBD6)),
               ]),
             ),
-          ),
+          )),
       ])),
     ]);
   }
@@ -945,7 +946,7 @@ class _CommunityAllScreenState extends State<_CommunityAllScreen> {
           padding: const EdgeInsets.fromLTRB(22, 12, 22, 40),
           children: [
             Row(children: [
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: () => Navigator.of(context).maybePop(),
                 behavior: HitTestBehavior.opaque,
                 child: Container(
@@ -953,7 +954,7 @@ class _CommunityAllScreenState extends State<_CommunityAllScreen> {
                   decoration: const BoxDecoration(color: pgPanel, shape: BoxShape.circle),
                   child: const Icon(Icons.arrow_back, size: 16, color: pgInk),
                 ),
-              ),
+              )),
               Expanded(child: Center(child: Text(S.now.uiAllRatings, style: pgEyebrow(pgMuted)))),
               const SizedBox(width: 34),
             ]),
@@ -992,7 +993,7 @@ class _CommunityAllScreenState extends State<_CommunityAllScreen> {
 
   Widget _chipF(String label, String value) {
     final on = _filter == value;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => setState(() => _filter = value),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -1004,7 +1005,7 @@ class _CommunityAllScreenState extends State<_CommunityAllScreen> {
         ),
         child: Text(label, style: pgBody(12.5, color: on ? Colors.white : pgInk, w: FontWeight.w600)),
       ),
-    );
+    ));
   }
 }
 

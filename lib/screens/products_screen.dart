@@ -36,6 +36,7 @@ import 'products/pv_shelf_screen.dart';
 import 'products/pv_store_chrome.dart';
 import 'products/pv_store_screen.dart';
 import '../services/life_stage_store.dart';
+import '../widgets/pv_feedback.dart' show PvPress;
 
 const Color _score = Color(0xFFE6A817); // warm gold for the score
 const Color _accent = AppTheme.primary500;
@@ -155,7 +156,7 @@ class _CategoryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final s = S(controller.language);
     final text = Theme.of(context).textTheme;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _push(context, ProductCategoryScreen(category: category, controller: controller)),
       child: Container(
         padding: const EdgeInsets.all(16),
@@ -212,7 +213,7 @@ class _CategoryCard extends StatelessWidget {
           ),
         ]),
       ),
-    );
+    ));
   }
 }
 
@@ -281,7 +282,7 @@ class _ProductCard extends StatelessWidget {
     final s = S(controller.language);
     final text = Theme.of(context).textTheme;
     final bv = _badgeVisual(product.badge);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _push(context, ProductDetailScreen(product: product, controller: controller)),
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
@@ -411,7 +412,7 @@ class _ProductCard extends StatelessWidget {
           ]),
         ]),
       ),
-    );
+    ));
   }
 }
 
@@ -1046,7 +1047,7 @@ class _HowWeReviewPregState extends State<_HowWeReviewPreg> {
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => setState(() => _open = !_open),
       behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
@@ -1077,7 +1078,7 @@ class _HowWeReviewPregState extends State<_HowWeReviewPreg> {
           ],
         ]),
       ),
-    );
+    ));
   }
 }
 

@@ -21,6 +21,7 @@ import '../../v2/v2_palette.dart' show V2Palette, v2BlockTint;
 import 'jv2_common.dart';
 import 'jv2_data.dart';
 import 'jv2_store.dart';
+import '../../../widgets/pv_feedback.dart' show PvPress;
 
 // =============================================================================
 //  THE ONE PARENTVEDA LOOK (2026-10-07)
@@ -230,7 +231,7 @@ void _showAddMemorySheetBeforeShell(BuildContext context) {
   );
 }
 
-Widget _sheetRow(IconData icon, String title, String sub, VoidCallback onTap, {bool last = false}) => GestureDetector(
+Widget _sheetRow(IconData icon, String title, String sub, VoidCallback onTap, {bool last = false}) => PvPress(child: GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -256,7 +257,7 @@ Widget _sheetRow(IconData icon, String title, String sub, VoidCallback onTap, {b
           const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
         ]),
       ),
-    );
+    ));
 
 // ---- media row (photo / video / voice) --------------------------------------
 //  Photo is real since 2026-10-02 (gallery or camera, kept by PpJournalStore).
@@ -264,7 +265,7 @@ Widget _sheetRow(IconData icon, String title, String sub, VoidCallback onTap, {b
 //  kept for revert below.
 Widget _mediaRow(BuildContext context, {String? photo, ValueChanged<String?>? onPhoto}) {
   Widget item(IconData icon, String label, VoidCallback onTap, {bool on = false}) => Expanded(
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: Column(children: [
@@ -272,7 +273,7 @@ Widget _mediaRow(BuildContext context, {String? photo, ValueChanged<String?>? on
             const SizedBox(height: 6),
             Text(on ? 'Photo added' : label, style: ppBody(11, color: ppSoft, w: FontWeight.w600)),
           ]),
-        ),
+        )),
       );
   void soon(String label) => ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('$label - coming soon'), behavior: SnackBarBehavior.floating),
@@ -437,7 +438,7 @@ class _GuidedMemoryScreenState extends State<GuidedMemoryScreen> {
             height: 40,
             child: ListView(scrollDirection: Axis.horizontal, padding: const EdgeInsets.symmetric(horizontal: 24), children: [
               for (var i = 0; i < _tabs.length; i++)
-                GestureDetector(
+                PvPress(child: GestureDetector(
                   onTap: () => setState(() => _tab = i),
                   behavior: HitTestBehavior.opaque,
                   child: Padding(
@@ -448,12 +449,12 @@ class _GuidedMemoryScreenState extends State<GuidedMemoryScreen> {
                       Container(height: 2, width: 22, color: i == _tab ? ppPurple : Colors.transparent),
                     ]),
                   ),
-                ),
+                )),
             ]),
           ),
           const SizedBox(height: 8),
           for (final g in jvGuided)
-            jvPad(GestureDetector(
+            jvPad(PvPress(child: GestureDetector(
               onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => QuickCaptureScreen(prompt: g.title))),
               behavior: HitTestBehavior.opaque,
               child: Container(
@@ -479,7 +480,7 @@ class _GuidedMemoryScreenState extends State<GuidedMemoryScreen> {
                   const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
                 ]),
               ),
-            )),
+            ))),
         ],
       ),
     );
@@ -568,10 +569,10 @@ class _QuickCaptureScreenState extends State<QuickCaptureScreen> {
             ),
             child: Column(children: [
               Row(children: [
-                GestureDetector(
+                PvPress(child: GestureDetector(
                   onTap: () => Navigator.of(context).maybePop(),
                   child: const Icon(Icons.close_rounded, size: 24, color: ppInk),
-                ),
+                )),
                 const Spacer(),
               ]),
               const SizedBox(height: 8),
@@ -597,7 +598,7 @@ class _QuickCaptureScreenState extends State<QuickCaptureScreen> {
             ]),
           ),
           const Spacer(),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Voice capture - coming soon'), behavior: SnackBarBehavior.floating),
             ),
@@ -612,7 +613,7 @@ class _QuickCaptureScreenState extends State<QuickCaptureScreen> {
               ),
               child: const Icon(Icons.mic_none_rounded, size: 34, color: Colors.white),
             ),
-          ),
+          )),
           const SizedBox(height: 14),
           Text('Tap to speak', style: ppBody(13, color: ppMuted)),
           const Spacer(),
@@ -715,7 +716,7 @@ class _WriteStoryScreenState extends State<WriteStoryScreen> {
           Padding(
             padding: const EdgeInsets.fromLTRB(24, 12, 24, 0),
             child: Row(children: [
-              GestureDetector(onTap: () => Navigator.of(context).maybePop(), child: const Icon(Icons.close_rounded, size: 24, color: ppInk)),
+              PvPress(child: GestureDetector(onTap: () => Navigator.of(context).maybePop(), child: const Icon(Icons.close_rounded, size: 24, color: ppInk))),
               const Spacer(),
             ]),
           ),
@@ -819,7 +820,7 @@ class _LetterScreenState extends State<LetterScreen> {
           Padding(
             padding: const EdgeInsets.fromLTRB(24, 12, 24, 0),
             child: Row(children: [
-              GestureDetector(onTap: () => Navigator.of(context).maybePop(), child: const Icon(Icons.close_rounded, size: 24, color: ppInk)),
+              PvPress(child: GestureDetector(onTap: () => Navigator.of(context).maybePop(), child: const Icon(Icons.close_rounded, size: 24, color: ppInk))),
               const Spacer(),
               Text('Letter to $jvChild', style: ppJakarta(14, color: ppSoft)),
               const Spacer(),

@@ -42,6 +42,7 @@ import 'ttc_common.dart';
 import 'ttc_home_version.dart';
 import 'ttc_journey_map_screen.dart';
 import 'ttc_strings.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // ⚠️ FACADE since 2026-09-19. Both the opener and the screen land on the
 // unified You screen (`lib/screens/profile/pv_you_screen.dart`) for the
@@ -282,7 +283,7 @@ class TtcProfileScreenClassic extends StatelessWidget {
                     children: [
                       Text(t.profileStageSwitchBody, style: ttcBody(12.5, h: 1.55)),
                       const SizedBox(height: 14),
-                      GestureDetector(
+                      PvPress(child: GestureDetector(
                         onTap: () => _toPregnancy(context),
                         behavior: HitTestBehavior.opaque,
                         child: Container(
@@ -297,7 +298,7 @@ class TtcProfileScreenClassic extends StatelessWidget {
                               style: ttcBody(13.5,
                                   color: ttcTitleInk, w: FontWeight.w800)),
                         ),
-                      ),
+                      )),
                     ]),
               ),
               const SizedBox(height: 24),
@@ -309,7 +310,7 @@ class TtcProfileScreenClassic extends StatelessWidget {
                     children: [
                       Text(t.profileSignOutBody, style: ttcBody(12.5, h: 1.55)),
                       const SizedBox(height: 14),
-                      GestureDetector(
+                      PvPress(child: GestureDetector(
                         onTap: () => _signOut(context),
                         behavior: HitTestBehavior.opaque,
                         child: Container(
@@ -332,7 +333,7 @@ class TtcProfileScreenClassic extends StatelessWidget {
                                         w: FontWeight.w800)),
                               ]),
                         ),
-                      ),
+                      )),
                     ]),
               ),
               ],
@@ -402,7 +403,7 @@ class _LangSegment extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget seg(String label, bool active, VoidCallback onTap) => GestureDetector(
+    Widget seg(String label, bool active, VoidCallback onTap) => PvPress(child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -416,7 +417,7 @@ class _LangSegment extends StatelessWidget {
                     color: active ? Colors.white : ttcSoft,
                     w: FontWeight.w800)),
           ),
-        );
+        ));
 
     return Container(
       padding: const EdgeInsets.all(3),
@@ -450,7 +451,7 @@ class _VersionSegment extends StatelessWidget {
           final store = TtcHomeVersionStore.instance;
           Widget seg(String label, TtcHomeVersion v) {
             final on = store.version == v;
-            return GestureDetector(
+            return PvPress(child: GestureDetector(
               onTap: () => store.set(v),
               behavior: HitTestBehavior.opaque,
               child: AnimatedContainer(
@@ -466,7 +467,7 @@ class _VersionSegment extends StatelessWidget {
                         color: on ? Colors.white : ttcMuted,
                         w: FontWeight.w800)),
               ),
-            );
+            ));
           }
 
           return Container(
@@ -497,7 +498,7 @@ class _ModeSegment extends StatelessWidget {
         builder: (context, _) {
           final him = TtcPartnerMode.instance.on;
           Widget seg(String label, bool on, VoidCallback tap) =>
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: tap,
                 behavior: HitTestBehavior.opaque,
                 child: AnimatedContainer(
@@ -517,7 +518,7 @@ class _ModeSegment extends StatelessWidget {
                           color: on ? Colors.white : ttcMuted,
                           w: FontWeight.w800)),
                 ),
-              );
+              ));
 
           return Container(
             padding: const EdgeInsets.all(3),

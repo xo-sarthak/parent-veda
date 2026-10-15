@@ -17,6 +17,7 @@ import 'package:flutter/material.dart';
 import 'veda_core.dart';
 import '../theme/pv_fonts.dart';
 import '../localization/app_language.dart';
+import '../widgets/pv_feedback.dart' show PvPress;
 
 /// The per-app palette for the shared result UI.
 class VedaViewTheme {
@@ -256,7 +257,7 @@ class VedaResultView extends StatelessWidget {
       );
 
   // ---- S5 -----------------------------------------------------------------
-  Widget _community(String line) => GestureDetector(
+  Widget _community(String line) => PvPress(enabled: onOpenCommunity != null, child: GestureDetector(
         onTap: onOpenCommunity,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -269,7 +270,7 @@ class VedaResultView extends StatelessWidget {
             if (onOpenCommunity != null) Icon(Icons.chevron_right_rounded, size: 20, color: theme.muted),
           ]),
         ),
-      );
+      ));
 
   // ---- S6 / S7 ------------------------------------------------------------
   Widget _list(String title, List<String> items, IconData icon, VoidCallback? onOpen) =>
@@ -277,7 +278,7 @@ class VedaResultView extends StatelessWidget {
         _eyebrow(title),
         const SizedBox(height: 12),
         for (final it in items)
-          GestureDetector(
+          PvPress(enabled: onOpen != null, child: GestureDetector(
             onTap: onOpen,
             behavior: HitTestBehavior.opaque,
             child: Container(
@@ -296,6 +297,6 @@ class VedaResultView extends StatelessWidget {
                 if (onOpen != null) Icon(Icons.chevron_right_rounded, size: 20, color: theme.muted),
               ]),
             ),
-          ),
+          )),
       ]);
 }

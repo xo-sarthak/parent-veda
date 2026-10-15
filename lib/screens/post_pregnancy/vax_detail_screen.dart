@@ -17,6 +17,7 @@ import 'askveda_screen.dart';
 import 'pp_common.dart';
 import 'pp_vaccine_data.dart';
 import 'pp_vax_tracker_screen.dart' show ppVaxMarkGiven;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 const Color _green = Color(0xFF1F8A5B);
 const Color _flagBg = Color(0xFFFFF0F3);
@@ -191,7 +192,7 @@ class _VaxDetailScreenState extends State<VaxDetailScreen> {
                 decoration: const BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x00FBF9FE), ppBg])),
                 child: Row(children: [
                   Expanded(
-                    child: GestureDetector(
+                    child: PvPress(child: GestureDetector(
                       onTap: () => done ? VaxStore.instance.markNotDone(_visit.id) : ppVaxMarkGiven(context, _visit),
                       behavior: HitTestBehavior.opaque,
                       child: Container(
@@ -204,10 +205,10 @@ class _VaxDetailScreenState extends State<VaxDetailScreen> {
                           Flexible(child: Text(done ? 'Done ✓' : 'Mark as done', maxLines: 1, overflow: TextOverflow.ellipsis, style: ppBody(15, color: Colors.white, w: FontWeight.w700))),
                         ]),
                       ),
-                    ),
+                    )),
                   ),
                   const SizedBox(width: 12),
-                  GestureDetector(
+                  PvPress(child: GestureDetector(
                     onTap: _reminderSheet,
                     behavior: HitTestBehavior.opaque,
                     child: Container(
@@ -217,7 +218,7 @@ class _VaxDetailScreenState extends State<VaxDetailScreen> {
                       decoration: BoxDecoration(color: reminded ? const Color(0xFFEDE6F5) : Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: reminded ? ppPurple : ppLine)),
                       child: Icon(reminded ? Icons.notifications_active_rounded : Icons.notifications_none_rounded, size: 22, color: reminded ? ppPurple : ppInk),
                     ),
-                  ),
+                  )),
                 ]),
               );
             },
@@ -229,7 +230,7 @@ class _VaxDetailScreenState extends State<VaxDetailScreen> {
 
   Widget _switchChip(Vaccine v) {
     final on = v.id == _vax.id;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => setState(() => _vax = v),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -238,7 +239,7 @@ class _VaxDetailScreenState extends State<VaxDetailScreen> {
         decoration: BoxDecoration(color: on ? ppPurple : Colors.white, borderRadius: BorderRadius.circular(999), border: Border.all(color: on ? ppPurple : ppLine)),
         child: Text(v.shortName, style: ppBody(12.5, color: on ? Colors.white : ppInk, w: FontWeight.w700)),
       ),
-    );
+    ));
   }
 
   Widget _bullet(String text, {IconData icon = Icons.arrow_right_rounded, bool small = false}) => Padding(
@@ -287,7 +288,7 @@ class _VaxDetailScreenState extends State<VaxDetailScreen> {
         ]),
       );
 
-  Widget _crossLink(String pill, String text, Widget screen) => GestureDetector(
+  Widget _crossLink(String pill, String text, Widget screen) => PvPress(child: GestureDetector(
         onTap: () => _push(screen),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -301,7 +302,7 @@ class _VaxDetailScreenState extends State<VaxDetailScreen> {
             const Text('→', style: TextStyle(color: ppMuted)),
           ]),
         ),
-      );
+      ));
 
   // ---- reminder scheduling ------------------------------------------------
   void _reminderSheet() {
@@ -343,14 +344,14 @@ class _VaxDetailScreenState extends State<VaxDetailScreen> {
             _reminderOption('On the day', () => set(0, 'on the day')),
             if (VaxStore.instance.hasReminder(_visit.id)) ...[
               const SizedBox(height: 4),
-              Center(child: GestureDetector(
+              Center(child: PvPress(child: GestureDetector(
                 onTap: () {
                   VaxStore.instance.setReminder(_visit.id, false);
                   Navigator.of(ctx).pop();
                 },
                 behavior: HitTestBehavior.opaque,
                 child: Text('Remove reminder', style: ppBody(13, color: ppCoral, w: FontWeight.w700)),
-              )),
+              ))),
             ],
           ]),
         ),
@@ -358,7 +359,7 @@ class _VaxDetailScreenState extends State<VaxDetailScreen> {
     );
   }
 
-  Widget _reminderOption(String label, VoidCallback onTap) => GestureDetector(
+  Widget _reminderOption(String label, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -372,5 +373,5 @@ class _VaxDetailScreenState extends State<VaxDetailScreen> {
             const Icon(Icons.chevron_right_rounded, size: 18, color: ppMuted),
           ]),
         ),
-      );
+      ));
 }

@@ -25,6 +25,7 @@ import 'pp_common.dart';
 import 'pp_food_data.dart';
 import 'pp_section_extras.dart';
 import 'sick_days_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class RecipesScreen extends StatefulWidget {
   const RecipesScreen({super.key});
@@ -231,7 +232,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
   }
 
   // ---- sick-mode doorway button --------------------------------------------
-  Widget _sickButton(BuildContext context) => GestureDetector(
+  Widget _sickButton(BuildContext context) => PvPress(child: GestureDetector(
         onTap: () => _push(context, const SickDaysScreen()),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -243,10 +244,10 @@ class _RecipesScreenState extends State<RecipesScreen> {
             Text('Sick mode', style: ppBody(10, color: ppPurple, w: FontWeight.w700)),
           ]),
         ),
-      );
+      ));
 
   // ---- today's meal card ----------------------------------------------------
-  Widget _mealCard(BuildContext context, String slot, FoodRecipe r) => GestureDetector(
+  Widget _mealCard(BuildContext context, String slot, FoodRecipe r) => PvPress(child: GestureDetector(
         onTap: () => _push(context, FoodRecipeScreen(recipe: r)),
         behavior: HitTestBehavior.opaque,
         child: SizedBox(
@@ -261,10 +262,10 @@ class _RecipesScreenState extends State<RecipesScreen> {
             foodMeta(r),
           ]),
         ),
-      );
+      ));
 
   // ---- nutrition focus card -------------------------------------------------
-  Widget _focusCard(BuildContext context, NutritionFocus f) => GestureDetector(
+  Widget _focusCard(BuildContext context, NutritionFocus f) => PvPress(child: GestureDetector(
         onTap: () => _push(context, FoodNutritionScreen(focus: f)),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -293,10 +294,10 @@ class _RecipesScreenState extends State<RecipesScreen> {
             ]),
           ]),
         ),
-      );
+      ));
 
   // ---- smart meal builder card ---------------------------------------------
-  Widget _builderCard(BuildContext context) => GestureDetector(
+  Widget _builderCard(BuildContext context) => PvPress(child: GestureDetector(
         onTap: () => _push(context, const FoodBuilderScreen()),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -323,12 +324,12 @@ class _RecipesScreenState extends State<RecipesScreen> {
             Icon(Icons.chevron_right_rounded, size: 20, color: Colors.white.withValues(alpha: 0.8)),
           ]),
         ),
-      );
+      ));
 
   // ---- filters --------------------------------------------------------------
   Widget _dietSeg(String label, String code) {
     final on = _diet == code;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => setState(() => _diet = code),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -337,13 +338,13 @@ class _RecipesScreenState extends State<RecipesScreen> {
         decoration: BoxDecoration(color: on ? ppPurple : ppPanel, borderRadius: BorderRadius.circular(12)),
         child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: ppBody(12.5, color: on ? Colors.white : ppSoft, w: on ? FontWeight.w700 : FontWeight.w600)),
       ),
-    );
+    ));
   }
 
   Widget _immunityChip() {
     final on = _immunity;
     const amber = Color(0xFFC98A2B);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => setState(() => _immunity = !_immunity),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -355,12 +356,12 @@ class _RecipesScreenState extends State<RecipesScreen> {
           Text('Immunity boosters', style: ppBody(12.5, color: on ? Colors.white : ppInk, w: FontWeight.w700)),
         ]),
       ),
-    );
+    ));
   }
 
   Widget _chip(String c) {
     final on = _category == c;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => setState(() => _category = c),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -368,13 +369,13 @@ class _RecipesScreenState extends State<RecipesScreen> {
         decoration: BoxDecoration(color: on ? ppPurple : ppPanel, borderRadius: BorderRadius.circular(999)),
         child: Text(c, style: ppBody(12, color: on ? Colors.white : ppSoft, w: on ? FontWeight.w700 : FontWeight.w600)),
       ),
-    );
+    ));
   }
 
   // ---- shopping + saved -----------------------------------------------------
   Widget _shoppingLink(BuildContext context) {
     final left = FoodStore.instance.shoppingLeft;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _push(context, const FoodShoppingScreen()),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -393,10 +394,10 @@ class _RecipesScreenState extends State<RecipesScreen> {
           const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
         ]),
       ),
-    );
+    ));
   }
 
-  Widget _savedLink(BuildContext context) => GestureDetector(
+  Widget _savedLink(BuildContext context) => PvPress(child: GestureDetector(
         onTap: () => _push(context, const FoodSavedScreen()),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -415,5 +416,5 @@ class _RecipesScreenState extends State<RecipesScreen> {
             const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
           ]),
         ),
-      );
+      ));
 }

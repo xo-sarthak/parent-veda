@@ -52,6 +52,7 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 import '../services/remote/supabase_repo.dart';
 import '../theme/app_theme.dart';
 import 'call_session.dart';
+import '../widgets/pv_feedback.dart' show PvPress;
 
 const _bg = Color(0xFF0E0D12);
 const _panel = Color(0xFF17151E);
@@ -1062,7 +1063,7 @@ class _GroupCallScreenState extends State<GroupCallScreen>
                     Semantics(
                       button: true,
                       label: 'Leave session',
-                      child: GestureDetector(
+                      child: PvPress(child: GestureDetector(
                         onTap: _confirmLeave,
                         behavior: HitTestBehavior.opaque,
                         child: Container(
@@ -1075,7 +1076,7 @@ class _GroupCallScreenState extends State<GroupCallScreen>
                           child: const Icon(Icons.call_end_rounded,
                               size: 25, color: Colors.white),
                         ),
-                      ),
+                      )),
                     ),
                   ]),
                 ),
@@ -1087,7 +1088,7 @@ class _GroupCallScreenState extends State<GroupCallScreen>
 
   Widget _round(IconData icon, VoidCallback? onTap, {bool on = true}) => Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4),
-        child: GestureDetector(
+        child: PvPress(enabled: onTap != null, child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: Opacity(
@@ -1105,12 +1106,12 @@ class _GroupCallScreenState extends State<GroupCallScreen>
                   color: on ? Colors.white : const Color(0xFF17151E)),
             ),
           ),
-        ),
+        )),
       );
 
   Widget _roundSmall(IconData icon, VoidCallback onTap,
           {String? badge, bool badgeHot = false}) =>
-      GestureDetector(
+      PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -1131,10 +1132,10 @@ class _GroupCallScreenState extends State<GroupCallScreen>
             ],
           ]),
         ),
-      );
+      ));
 
   Widget _pill(String label, VoidCallback onTap, {bool filled = false}) =>
-      GestureDetector(
+      PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -1148,7 +1149,7 @@ class _GroupCallScreenState extends State<GroupCallScreen>
                   fontSize: 14,
                   fontWeight: FontWeight.w600)),
         ),
-      );
+      ));
 
   // ---- sheets ---------------------------------------------------------------
 

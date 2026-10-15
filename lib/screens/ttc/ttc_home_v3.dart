@@ -5842,7 +5842,7 @@ class _RitualRow extends StatelessWidget {
           border: last ? null : Border(bottom: BorderSide(color: p.line)),
         ),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: onToggle,
             behavior: HitTestBehavior.opaque,
             child: Padding(
@@ -5865,7 +5865,7 @@ class _RitualRow extends StatelessWidget {
                     : null,
               ),
             ),
-          ),
+          )),
           Expanded(
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

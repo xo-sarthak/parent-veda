@@ -55,6 +55,7 @@ import '../models/garbh_content.dart';
 import '../data/garbh_rebuild_data.dart';
 import '../services/raga_audio_store.dart';
 import '../theme/pv_fonts.dart';
+import '../widgets/pv_feedback.dart' show PvPress;
 
 /// ⚠️ EVERY RAGA CURRENTLY PLAYS THE SAME BUNDLED DRONE.
 ///
@@ -276,7 +277,7 @@ class _PinButton extends StatelessWidget {
         return Semantics(
           label: on ? 'Remove from my daily' : 'Add to my daily',
           button: true,
-          child: GestureDetector(
+          child: PvPress(child: GestureDetector(
             onTap: () => store.togglePinned(id),
             behavior: HitTestBehavior.opaque,
             child: Padding(
@@ -286,7 +287,7 @@ class _PinButton extends StatelessWidget {
                   size: 17,
                   color: on ? const Color(0xFF2F2C30) : const Color(0xFF2F2C30)),
             ),
-          ),
+          )),
         );
       },
     );

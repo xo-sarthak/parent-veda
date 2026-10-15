@@ -44,6 +44,7 @@ import '../../theme/pv_fonts.dart';
 import '../v2/v2_palette.dart';
 import 'ttc_common.dart';
 import 'ttc_tool_chrome.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 const _weekdays = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 const _weekdayNames = [
@@ -114,7 +115,7 @@ class TtcDayStrip extends StatelessWidget {
               button: true,
               selected: on,
               label: ttcDoseDayName(day),
-              child: GestureDetector(
+              child: PvPress(child: GestureDetector(
                 key: ValueKey('ttc_dose_day_$i'),
                 onTap: () {
                   HapticFeedback.selectionClick();
@@ -155,7 +156,7 @@ class TtcDayStrip extends StatelessWidget {
                     ),
                   ),
                 ]),
-              ),
+              )),
             );
           }),
         ),
@@ -277,7 +278,7 @@ class TtcDoseRow extends StatelessWidget {
               button: true,
               checked: taken,
               label: taken ? '$name, taken. Tap to undo' : 'Mark $name taken',
-              child: GestureDetector(
+              child: PvPress(child: GestureDetector(
                 key: ValueKey('ttc_dose_tick_$name'),
                 onTap: () {
                   HapticFeedback.selectionClick();
@@ -289,7 +290,7 @@ class TtcDoseRow extends StatelessWidget {
                   height: 52,
                   child: Center(child: TtcDoseTick(on: taken)),
                 ),
-              ),
+              )),
             )
           else
             SizedBox(
@@ -506,7 +507,7 @@ class TtcDoseHeroAdd extends StatelessWidget {
   Widget build(BuildContext context) => Semantics(
         button: true,
         label: label,
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           key: const ValueKey('ttc_dose_hero_add'),
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
@@ -524,7 +525,7 @@ class TtcDoseHeroAdd extends StatelessWidget {
                   style: ttcBody(12, color: ttcTitleInk, w: FontWeight.w800)),
             ]),
           ),
-        ),
+        )),
       );
 }
 

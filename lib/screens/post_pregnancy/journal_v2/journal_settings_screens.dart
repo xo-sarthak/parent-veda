@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'journal_storybook_screens.dart';
 import 'jv2_common.dart';
 import 'jv2_data.dart';
+import '../../../widgets/pv_feedback.dart' show PvPress;
 
 void _snack(BuildContext c, String m) =>
     ScaffoldMessenger.of(c).showSnackBar(SnackBar(content: Text(m), behavior: SnackBarBehavior.floating));
@@ -23,7 +24,7 @@ class StorybookLibraryScreen extends StatelessWidget {
         children: [
           jvPad(jvTopBar(context, title: 'Storybooks')),
           const SizedBox(height: 18),
-          jvPad(GestureDetector(
+          jvPad(PvPress(child: GestureDetector(
             onTap: () => _snack(context, 'New storybook - coming soon'),
             behavior: HitTestBehavior.opaque,
             child: Container(
@@ -41,12 +42,12 @@ class StorybookLibraryScreen extends StatelessWidget {
                 ),
               ]),
             ),
-          )),
+          ))),
           const SizedBox(height: 24),
           jvPad(Text('Your storybooks', style: ppJakarta(14, color: ppMuted))),
           const SizedBox(height: 8),
           for (final b in jvStorybooks)
-            jvPad(GestureDetector(
+            jvPad(PvPress(child: GestureDetector(
               onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => StorybookScreen(book: b))),
               behavior: HitTestBehavior.opaque,
               child: Container(
@@ -68,7 +69,7 @@ class StorybookLibraryScreen extends StatelessWidget {
                   const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
                 ]),
               ),
-            )),
+            ))),
         ],
       ),
     );
@@ -132,7 +133,7 @@ class _HardcoverCustomizationScreenState extends State<HardcoverCustomizationScr
           const SizedBox(height: 12),
           jvPad(Row(children: [
             for (var i = 0; i < _covers.length; i++)
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: () => setState(() => _color = i),
                 child: Container(
                   margin: const EdgeInsets.only(right: 14),
@@ -140,25 +141,25 @@ class _HardcoverCustomizationScreenState extends State<HardcoverCustomizationScr
                   height: 42,
                   decoration: BoxDecoration(color: _covers[i], shape: BoxShape.circle, border: Border.all(color: i == _color ? ppInk : Colors.transparent, width: 2.5)),
                 ),
-              ),
+              )),
           ])),
           const SizedBox(height: 22),
           jvPad(Text('Cover image', style: ppJakarta(14))),
           const SizedBox(height: 12),
           jvPad(Row(children: [
             for (var i = 0; i < 3; i++)
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: () => setState(() => _image = i),
                 child: Container(
                   margin: const EdgeInsets.only(right: 12),
                   decoration: BoxDecoration(borderRadius: BorderRadius.circular(14), border: Border.all(color: i == _image ? ppPurple : Colors.transparent, width: 2)),
                   child: JvPhoto(seed: i, height: 52, width: 52, radius: 12),
                 ),
-              ),
-            GestureDetector(
+              )),
+            PvPress(child: GestureDetector(
               onTap: () => _snack(context, 'Add a photo - coming soon'),
               child: Container(width: 52, height: 52, alignment: Alignment.center, decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(14)), child: const Icon(Icons.add, size: 20, color: ppPurple)),
-            ),
+            )),
           ])),
           const SizedBox(height: 24),
           jvPad(_field('Title', _title)),
@@ -274,7 +275,7 @@ class JournalSettingsScreen extends StatelessWidget {
         child: Column(children: rows),
       );
 
-  Widget _row(BuildContext context, IconData icon, String label, String value) => GestureDetector(
+  Widget _row(BuildContext context, IconData icon, String label, String value) => PvPress(child: GestureDetector(
         onTap: () => _snack(context, '$label - coming soon'),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -289,5 +290,5 @@ class JournalSettingsScreen extends StatelessWidget {
             const Icon(Icons.chevron_right_rounded, size: 18, color: ppMuted),
           ]),
         ),
-      );
+      ));
 }

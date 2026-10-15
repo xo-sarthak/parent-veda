@@ -18,6 +18,7 @@ import 'package:flutter/material.dart';
 
 import '../../care_partner/care_partner_models.dart';
 import '../post_pregnancy/pp_common.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 enum CarePartnerCardShape {
   /// A single line — for a content page or the home.
@@ -48,8 +49,8 @@ class CarePartnerCard extends StatelessWidget {
       padding: padding,
       child: onTap == null
           ? body
-          : GestureDetector(
-              onTap: onTap, behavior: HitTestBehavior.opaque, child: body),
+          : PvPress(enabled: onTap != null, child: GestureDetector(
+              onTap: onTap, behavior: HitTestBehavior.opaque, child: body)),
     );
   }
 

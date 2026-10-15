@@ -67,6 +67,7 @@ import 'ttc_practice_card_parts.dart';
 import 'ttc_tool_chrome.dart';
 import 'ttc_surface_router.dart';
 import 'ttc_common.dart' show ttcTitleInk;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// The two hues Today's blocks take.
 ///
@@ -578,7 +579,7 @@ class _YourPracticeStrip extends StatelessWidget {
                   // this without it means finding the course and redoing
                   // session 8 to choose something else, which is a settings
                   // screen with extra steps.
-                  GestureDetector(
+                  PvPress(child: GestureDetector(
                     onTap: TtcGarbhCourseStore.instance.clearDailyPractice,
                     behavior: HitTestBehavior.opaque,
                     child: Text('Show a different practice each day instead',
@@ -586,7 +587,7 @@ class _YourPracticeStrip extends StatelessWidget {
                             fontSize: 12.5,
                             fontWeight: FontWeight.w800,
                             color: p.action)),
-                  ),
+                  )),
                 ]),
           ),
         ]),
@@ -808,7 +809,7 @@ class _Tick extends StatelessWidget {
                   // ignore: dead_code
                   if (false && action != null && onAction != null)
                     // ignore: dead_code
-                    GestureDetector(
+                    PvPress(enabled: onAction != null, child: GestureDetector(
                       onTap: onAction,
                       behavior: HitTestBehavior.opaque,
                       child: Padding(
@@ -819,7 +820,7 @@ class _Tick extends StatelessWidget {
                                 fontWeight: FontWeight.w800,
                                 color: ttcTitleInk)),
                       ),
-                    ),
+                    )),
                 ]),
           ),
         ]),

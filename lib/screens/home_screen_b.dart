@@ -72,6 +72,7 @@ import 'watch_learn_screen.dart';
 import 'week_flow_screen.dart';
 import '../theme/pv_fonts.dart';
 import 'journal_compose_screen.dart';
+import '../widgets/pv_feedback.dart' show PvPress;
 
 class HomeScreenB extends StatelessWidget {
   const HomeScreenB({super.key, required this.pregnancy, required this.home});
@@ -237,7 +238,7 @@ class HomeScreenB extends StatelessWidget {
   // father. The "40 weeks complete → parenting" hand-off isn't wired yet; this
   // is a preview doorway only, and the pregnancy app itself is untouched.
   Widget _postPregnancyDoorway(BuildContext context) {
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => Navigator.of(context).push(
         MaterialPageRoute(
           // Was `MyChildScreen(home: true)` directly. Now a wrapper that keeps
@@ -288,7 +289,7 @@ class HomeScreenB extends StatelessWidget {
           const Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 20),
         ]),
       ),
-    );
+    ));
   }
 
   // --- Trying-to-Conceive doorway --------------------------------------------
@@ -301,7 +302,7 @@ class HomeScreenB extends StatelessWidget {
   // route ('ttc/today') and imports only the TTC module's own entry point.
   Widget _ttcDoorway(BuildContext context) {
     final t = TtcS(pregnancy.language.isHinglish);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () {
         // TtcLang mirrors the app language into the TTC module, whose tabs are
         // separate pushed routes and so cannot read an InheritedWidget here.
@@ -356,7 +357,7 @@ class HomeScreenB extends StatelessWidget {
               color: Colors.white, size: 20),
         ]),
       ),
-    );
+    ));
   }
 
   // --- Skilling doorway (debug) ----------------------------------------------
@@ -387,7 +388,7 @@ class HomeScreenB extends StatelessWidget {
   // does: three doors on one shelf, not three different ideas. The gradient is
   // the cool sibling of the other two.
   Widget _skillingDoorway(BuildContext context) {
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => Navigator.of(context).push(
         MaterialPageRoute(
           builder: (_) => SkillingPreviewScreen(lang: pregnancy.language),
@@ -463,7 +464,7 @@ class HomeScreenB extends StatelessWidget {
               color: Colors.white, size: 20),
         ]),
       ),
-    );
+    ));
   }
 
   // --- brand header ----------------------------------------------------------
@@ -486,7 +487,7 @@ class HomeScreenB extends StatelessWidget {
         ),
         const Spacer(),
         // Saved hub - a bookmark right on Home, beside search.
-        GestureDetector(
+        PvPress(child: GestureDetector(
           // One Saved screen for the whole app since 2026-09-16
           // (docs/FAMILY-MODEL.md §6). Kept for revert:
           // onTap: () => Navigator.of(context).push(MaterialPageRoute(
@@ -506,9 +507,9 @@ class HomeScreenB extends StatelessWidget {
             child: const Icon(Icons.bookmark_border_rounded,
                 size: 20, color: AppTheme.primary600),
           ),
-        ),
+        )),
         const SizedBox(width: 10),
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () => showGlobalSearch(context, pregnancy),
           child: Container(
             width: 40,
@@ -522,11 +523,11 @@ class HomeScreenB extends StatelessWidget {
             child: const Icon(Icons.search_rounded,
                 size: 20, color: AppTheme.primary600),
           ),
-        ),
+        )),
         const SizedBox(width: 10),
         // Profile entry - Direction B has no Profile tab, so it lives here as
         // the avatar (it holds language, My Journal, Dear Baby, products…).
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () => Navigator.of(context).push(MaterialPageRoute(
             builder: (_) => ProfileScreen(controller: pregnancy),
           )),
@@ -549,7 +550,7 @@ class HomeScreenB extends StatelessWidget {
               ),
             ),
           ),
-        ),
+        )),
       ],
     );
   }
@@ -613,7 +614,7 @@ class HomeScreenB extends StatelessWidget {
     // Tapping anywhere on the hero opens the weekly view (current week). The
     // weekly stack is now PUSHED (the Journey tab was replaced by "Prepare",
     // so the mother reaches the week stack from this snapshot rather than a tab).
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () {
         pregnancy.selectWeek(pregnancy.currentWeek);
         Navigator.of(context).push(MaterialPageRoute(
@@ -735,13 +736,13 @@ class HomeScreenB extends StatelessWidget {
         ),
       ),
       ),
-    );
+    ));
   }
 
   // A soft, glassy shortcut that lives INSIDE the hero gradient.
   Widget _heroShortcut(IconData icon, String label, VoidCallback onTap) =>
       Expanded(
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: Column(children: [
@@ -766,7 +767,7 @@ class HomeScreenB extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                     color: Colors.white.withValues(alpha: 0.95))),
           ]),
-        ),
+        )),
       );
 
   // Old circular progress ring — replaced by TrimesterProgressBar. Kept
@@ -852,7 +853,7 @@ class HomeScreenB extends StatelessWidget {
     final s = S(lang);
     Widget item(IconData icon, String label, Color color, VoidCallback onTap) =>
         Expanded(
-          child: GestureDetector(
+          child: PvPress(child: GestureDetector(
             onTap: onTap,
             behavior: HitTestBehavior.opaque,
             child: Column(children: [
@@ -875,7 +876,7 @@ class HomeScreenB extends StatelessWidget {
                       fontWeight: FontWeight.w700,
                       color: AppTheme.primary900)),
             ]),
-          ),
+          )),
         );
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -911,7 +912,7 @@ class HomeScreenB extends StatelessWidget {
 
   Widget _mbCard(IconData icon, String label, Color color, VoidCallback onTap) {
     final s = S(pregnancy.language);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(16),
@@ -946,7 +947,7 @@ class HomeScreenB extends StatelessWidget {
                   fontSize: 11.5, fontWeight: FontWeight.w700, color: color)),
         ]),
       ),
-    );
+    ));
   }
 
   // Today's product recommendation - a horizontal CAROUSEL of product cards
@@ -990,7 +991,7 @@ class HomeScreenB extends StatelessWidget {
                       fontWeight: FontWeight.w700,
                       color: Colors.white)),
             ),
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: openShop,
               behavior: HitTestBehavior.opaque,
               child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -1002,7 +1003,7 @@ class HomeScreenB extends StatelessWidget {
                 const Icon(Icons.chevron_right_rounded,
                     size: 18, color: Colors.white),
               ]),
-            ),
+            )),
           ]),
         ),
         SizedBox(
@@ -1023,7 +1024,7 @@ class HomeScreenB extends StatelessWidget {
     final text = Theme.of(context).textTheme;
     final s = S(pregnancy.language);
     final affiliate = productIsAffiliate(p);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => Navigator.of(context).push(MaterialPageRoute(
           builder: (_) =>
               ProductDetailScreen(product: p, controller: pregnancy))),
@@ -1095,7 +1096,7 @@ class HomeScreenB extends StatelessWidget {
           ),
         ]),
       ),
-    );
+    ));
   }
 
   // ignore: unused_element
@@ -1167,7 +1168,7 @@ class HomeScreenB extends StatelessWidget {
   Widget _productCard(BuildContext context, Product p) {
     final s = S(pregnancy.language);
     final badge = _badgeMeta(p.badge);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       // Open this product's own page directly (so it can be viewed / bought),
       // not the generic recommended list.
       onTap: () => Navigator.of(context).push(MaterialPageRoute(
@@ -1253,7 +1254,7 @@ class HomeScreenB extends StatelessWidget {
           ]),
         ),
       ),
-    );
+    ));
   }
 
   ({String label, Color color})? _badgeMeta(ProductBadge b) {
@@ -1334,7 +1335,7 @@ class HomeScreenB extends StatelessWidget {
   Widget _ritualTile(
       BuildContext context, _Ritual r, HomeDay day, AppLanguage lang) {
     final done = home.isEngaged(r.module);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _openRitual(context, r.module, day, lang),
       child: Container(
         width: 84,
@@ -1397,7 +1398,7 @@ class HomeScreenB extends StatelessWidget {
           ],
         ),
       ),
-    );
+    ));
   }
 
   /// Opens the existing daily-moment module for [m] in a draggable sheet, and
@@ -1515,7 +1516,7 @@ class HomeScreenB extends StatelessWidget {
     final s = S(lang);
     Widget tile(IconData icon, Color color, String label, VoidCallback onTap) =>
         Expanded(
-          child: GestureDetector(
+          child: PvPress(child: GestureDetector(
             onTap: onTap,
             behavior: HitTestBehavior.opaque,
             child: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -1536,7 +1537,7 @@ class HomeScreenB extends StatelessWidget {
                       height: 1.15,
                       color: AppTheme.primary900)),
             ]),
-          ),
+          )),
         );
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
@@ -1871,7 +1872,7 @@ class HomeScreenB extends StatelessWidget {
   Widget _medRow(MedicineStore store, Medication m, Color green) {
     final taken = store.isTakenToday(m.id);
     final sub = [m.dose, m.time].where((x) => x.isNotEmpty).join(' · ');
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => store.toggleToday(m.id),
       behavior: HitTestBehavior.opaque,
       child: Padding(
@@ -1911,7 +1912,7 @@ class HomeScreenB extends StatelessWidget {
           ),
         ]),
       ),
-    );
+    ));
   }
 
   // Daily Garbh Sanskar - the 5 rituals, each showing TODAY's single item
@@ -2030,7 +2031,7 @@ class HomeScreenB extends StatelessWidget {
 
   Widget _garbhPillarRow(BuildContext context, String name, String tag,
       String todo, String emoji, Color accent, bool done, Widget Function() open) {
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => Navigator.of(context)
           .push(MaterialPageRoute(builder: (_) => open())),
       child: Container(
@@ -2100,12 +2101,12 @@ class HomeScreenB extends StatelessWidget {
           ),
         ]),
       ),
-    );
+    ));
   }
 
   // ignore: unused_element
   Widget _garbhCard(BuildContext context, S s) {
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => Navigator.of(context).push(
           MaterialPageRoute(builder: (_) => GarbhScreen(controller: pregnancy))),
       child: Container(
@@ -2150,7 +2151,7 @@ class HomeScreenB extends StatelessWidget {
           const Icon(Icons.chevron_right_rounded, color: AppTheme.neutral400),
         ]),
       ),
-    );
+    ));
   }
 
   Widget _circle(double size, Color color) => Container(

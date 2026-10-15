@@ -112,6 +112,7 @@ import 'ttc_strings.dart';
 import 'ttc_tool_chrome.dart';
 import 'ttc_tool_confirm.dart';
 import 'ttc_tool_marks.dart' show TtcToolArt, TtcToolMark;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// The clinical blue-grey this area wears.
 const double kTtcRecordsHue = 206;
@@ -435,7 +436,7 @@ class _GroupRow extends StatelessWidget {
                               '${ttcRecordDate(latest.takenOn)} · photo saved, '
                               'number not entered',
                               style: ttcBody(13, color: ttcSoft, h: 1.4)),
-                          GestureDetector(
+                          PvPress(child: GestureDetector(
                             behavior: HitTestBehavior.opaque,
                             onTap: () => showTtcTypeValue(context, latest),
                             child: Padding(
@@ -445,7 +446,7 @@ class _GroupRow extends StatelessWidget {
                                   style: ttcBody(13,
                                       color: ttcTitleInk, w: FontWeight.w800)),
                             ),
-                          ),
+                          )),
                         ]),
                   const SizedBox(height: 4),
                   Text(under,
@@ -2715,13 +2716,13 @@ class _AddSheetState extends State<_AddSheet> {
                               style: ttcBody(13,
                                   color: ttcTitleInk, w: FontWeight.w700)),
                         ),
-                        GestureDetector(
+                        PvPress(child: GestureDetector(
                           onTap: _capture,
                           behavior: HitTestBehavior.opaque,
                           child: Text('Add another',
                               style: ttcBody(12.5,
                                   color: ttcSoft, w: FontWeight.w800)),
-                        ),
+                        )),
                       ]),
                     )
                   else
@@ -2755,7 +2756,7 @@ class _AddSheetState extends State<_AddSheet> {
                     const SizedBox(height: 8),
                     Wrap(spacing: 8, runSpacing: 8, children: [
                       for (final s in _suggestions)
-                        GestureDetector(
+                        PvPress(child: GestureDetector(
                           key: ValueKey('ttc_rec_suggest_${s.id}'),
                           behavior: HitTestBehavior.opaque,
                           onTap: () {
@@ -2776,7 +2777,7 @@ class _AddSheetState extends State<_AddSheet> {
                                 style: ttcBody(12.5,
                                     color: ttcTitleInk, w: FontWeight.w700)),
                           ),
-                        ),
+                        )),
                     ]),
                   ],
                   const SizedBox(height: 12),
@@ -2877,7 +2878,7 @@ class _TwoWay extends StatelessWidget {
       );
 
   Widget _seg(String label, bool on, VoidCallback onTap) => Expanded(
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -2892,7 +2893,7 @@ class _TwoWay extends StatelessWidget {
                 style: ttcBody(13,
                     color: on ? ttcTitleInk : ttcSoft, w: FontWeight.w800)),
           ),
-        ),
+        )),
       );
 }
 
@@ -2964,7 +2965,7 @@ class _DateField extends StatelessWidget {
                   letterSpacing: 1.1,
                   color: ttcMuted)),
           const SizedBox(height: 6),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () async {
               final picked = await showDatePicker(
                 context: context,
@@ -2993,7 +2994,7 @@ class _DateField extends StatelessWidget {
                 Icon(Icons.calendar_today_outlined, size: 15, color: ttcMuted),
               ]),
             ),
-          ),
+          )),
         ],
       );
 }

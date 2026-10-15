@@ -15,6 +15,7 @@ import 'pp_common.dart';
 import 'pp_expert_link.dart';
 import 'pp_experts_data.dart';
 import 'pp_yoga_data.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// A class card's "· Aditi Verma" line, with the NAME tappable and nothing else.
 ///
@@ -145,7 +146,7 @@ class YogaBigCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tint = yogaTint(cls.seed);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: SizedBox(
@@ -181,7 +182,7 @@ class YogaBigCard extends StatelessWidget {
                 yogaModeBadge(cls.mode),
                 const Spacer(),
                 if (onSave != null)
-                  GestureDetector(
+                  PvPress(enabled: onSave != null, child: GestureDetector(
                     onTap: onSave,
                     behavior: HitTestBehavior.opaque,
                     child: Container(
@@ -192,7 +193,7 @@ class YogaBigCard extends StatelessWidget {
                       child: Icon(saved ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
                           size: 17, color: ppPurple),
                     ),
-                  ),
+                  )),
               ]),
             ),
             // recorded classes hint their play affordance in the centre
@@ -243,7 +244,7 @@ class YogaBigCard extends StatelessWidget {
           ]),
         ),
       ),
-    );
+    ));
   }
 }
 
@@ -257,7 +258,7 @@ class YogaListCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tint = yogaTint(cls.seed);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Padding(
@@ -293,6 +294,6 @@ class YogaListCard extends StatelessWidget {
           ),
         ]),
       ),
-    );
+    ));
   }
 }

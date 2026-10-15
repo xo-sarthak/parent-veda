@@ -32,6 +32,7 @@ import 'pp_common.dart';
 import 'pp_experts_data.dart';
 import 'problem_solver_screen.dart';
 import 'provider_results_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// One answer: what it says, and which need it routes to.
 ///
@@ -123,7 +124,7 @@ class _FindHelpTriageScreenState extends State<FindHelpTriageScreen> {
           children: [
             _pad(_who == null
                 ? ppBack(context, 'Back')
-                : GestureDetector(
+                : PvPress(child: GestureDetector(
                     onTap: () => setState(() => _who = null),
                     behavior: HitTestBehavior.opaque,
                     child: Row(children: [
@@ -134,7 +135,7 @@ class _FindHelpTriageScreenState extends State<FindHelpTriageScreen> {
                           style:
                               ppBody(13.5, color: ppSoft, w: FontWeight.w700)),
                     ]),
-                  )),
+                  ))),
             const SizedBox(height: 22),
             _pad(ppEyebrow('Finding the right person', color: ppPurple)),
             const SizedBox(height: 8),
@@ -168,12 +169,12 @@ class _FindHelpTriageScreenState extends State<FindHelpTriageScreen> {
 
             const SizedBox(height: 14),
             // The way out, on every screen.
-            _pad(GestureDetector(
+            _pad(PvPress(child: GestureDetector(
               onTap: () => _open(''),
               behavior: HitTestBehavior.opaque,
               child: Text('Or see every expert and choose yourself',
                   style: ppBody(13, color: ppMuted, w: FontWeight.w700)),
-            )),
+            ))),
           ],
         ),
       ),
@@ -181,7 +182,7 @@ class _FindHelpTriageScreenState extends State<FindHelpTriageScreen> {
   }
 
   Widget _option(String label, String hint, VoidCallback onTap) =>
-      GestureDetector(
+      PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -206,5 +207,5 @@ class _FindHelpTriageScreenState extends State<FindHelpTriageScreen> {
             const Icon(Icons.chevron_right_rounded, size: 20, color: ppSoft),
           ]),
         ),
-      );
+      ));
 }

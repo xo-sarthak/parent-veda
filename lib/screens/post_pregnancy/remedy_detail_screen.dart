@@ -43,6 +43,7 @@ import 'pp_care_parts.dart' show PpCareStats, ppCareHeading;
 import 'pp_common.dart';
 import 'pp_nuskhe_data.dart';
 import 'problem_solver_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class RemedyDetailScreen extends StatelessWidget {
   const RemedyDetailScreen({super.key, this.remedy});
@@ -332,10 +333,10 @@ class RemedyDetailScreen extends StatelessWidget {
           children: [
             // breadcrumb
             _pad(Row(children: [
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: () => Navigator.of(context).maybePop(),
                 child: Text('Nuskhe', style: ppBody(12, color: ppPurple, w: FontWeight.w600)),
-              ),
+              )),
               const SizedBox(width: 6),
               const Text('›', style: TextStyle(color: Color(0xFFC7BBD6))),
               const SizedBox(width: 6),
@@ -479,11 +480,11 @@ class RemedyDetailScreen extends StatelessWidget {
                 const SizedBox(height: 12),
                 for (final f in r.redFlags) _dont(f),
                 const SizedBox(height: 12),
-                GestureDetector(
+                PvPress(child: GestureDetector(
                   onTap: () => Navigator.of(context)
                       .push(MaterialPageRoute<void>(builder: (_) => const ProblemSolverScreen())),
                   child: Text('Find a paediatrician near you →', style: ppBody(13, color: _red, w: FontWeight.w700)),
-                ),
+                )),
               ]),
             )),
 
@@ -651,7 +652,7 @@ class RemedyDetailScreen extends StatelessWidget {
       );
 
   Widget _related(BuildContext context, String tag, String title, {bool top = false, bool bottom = false}) =>
-      GestureDetector(
+      PvPress(child: GestureDetector(
         onTap: () => _soon(context),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -674,7 +675,7 @@ class RemedyDetailScreen extends StatelessWidget {
             const Text('→', style: TextStyle(color: ppMuted)),
           ]),
         ),
-      );
+      ));
 }
 
 /// A demo-video seam: a striped placeholder with a play button. VIDEO ON HOLD -
@@ -685,7 +686,7 @@ class _VideoSlot extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: ClipRRect(
@@ -719,5 +720,5 @@ class _VideoSlot extends StatelessWidget {
             ]),
           ),
         ),
-      );
+      ));
 }

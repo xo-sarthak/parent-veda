@@ -17,6 +17,7 @@ import 'name_detail_screen.dart';
 import 'name_matches_screen.dart';
 import 'pp_common.dart';
 import 'pp_names_data.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 const Color _blendFg = Color(0xFF7A4600);
 const Color _blendBg = Color(0xFFF5EEE6);
@@ -229,7 +230,7 @@ class _NameSwipeScreenState extends State<NameSwipeScreen> with TickerProviderSt
           child: Column(children: [
             // filter bar
             Row(children: [
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: () => Navigator.of(context).maybePop(),
                 behavior: HitTestBehavior.opaque,
                 child: Container(
@@ -239,7 +240,7 @@ class _NameSwipeScreenState extends State<NameSwipeScreen> with TickerProviderSt
                   decoration: const BoxDecoration(color: ppPanel, shape: BoxShape.circle),
                   child: const Icon(Icons.arrow_back, size: 17, color: ppInk),
                 ),
-              ),
+              )),
               const SizedBox(width: 12),
               Expanded(
                 child: SingleChildScrollView(
@@ -275,7 +276,7 @@ class _NameSwipeScreenState extends State<NameSwipeScreen> with TickerProviderSt
                 ),
               ),
               const SizedBox(width: 10),
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: _openList,
                 behavior: HitTestBehavior.opaque,
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -283,7 +284,7 @@ class _NameSwipeScreenState extends State<NameSwipeScreen> with TickerProviderSt
                   const SizedBox(width: 5),
                   Text('${_store.likedCount} liked', style: ppBody(12, color: ppPurple, w: FontWeight.w700)),
                 ]),
-              ),
+              )),
             ]),
 
             // card stack
@@ -397,7 +398,7 @@ class _NameSwipeScreenState extends State<NameSwipeScreen> with TickerProviderSt
                 const SizedBox(height: 4),
                 Text(n.script, textAlign: TextAlign.center, style: ppFraunces(22, color: ppPurple, h: 1.1)),
                 const SizedBox(height: 16),
-                GestureDetector(
+                PvPress(child: GestureDetector(
                   onTap: () => _snack('Pronunciation audio - coming soon'),
                   behavior: HitTestBehavior.opaque,
                   child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -411,7 +412,7 @@ class _NameSwipeScreenState extends State<NameSwipeScreen> with TickerProviderSt
                     const SizedBox(width: 8),
                     Text(n.pron, style: ppBody(13)),
                   ]),
-                ),
+                )),
                 const SizedBox(height: 18),
                 Text('“${n.meaningShort}”', textAlign: TextAlign.center, style: ppBody(15, h: 1.5)),
               ]),
@@ -435,7 +436,7 @@ class _NameSwipeScreenState extends State<NameSwipeScreen> with TickerProviderSt
           const SizedBox(height: 8),
           Text('${_store.likedCount} names are waiting in your list.', textAlign: TextAlign.center, style: ppBody(14)),
           const SizedBox(height: 20),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: _openList,
             behavior: HitTestBehavior.opaque,
             child: Container(
@@ -443,14 +444,14 @@ class _NameSwipeScreenState extends State<NameSwipeScreen> with TickerProviderSt
               decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(14)),
               child: Text('See our list', style: ppBody(14, color: Colors.white, w: FontWeight.w700)),
             ),
-          ),
+          )),
           if (_rareOnly) ...[
             const SizedBox(height: 10),
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: _toRare,
               behavior: HitTestBehavior.opaque,
               child: Text('Clear filters', style: ppBody(13, color: ppPurple, w: FontWeight.w700)),
-            ),
+            )),
           ],
         ]),
       );
@@ -461,7 +462,7 @@ class _NameSwipeScreenState extends State<NameSwipeScreen> with TickerProviderSt
         child: Text(t, maxLines: 1, overflow: TextOverflow.ellipsis, style: ppBody(10.5, color: fg, w: FontWeight.w700)),
       );
 
-  Widget _filterChip(String t, {required bool on, required VoidCallback onTap}) => GestureDetector(
+  Widget _filterChip(String t, {required bool on, required VoidCallback onTap}) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -473,7 +474,7 @@ class _NameSwipeScreenState extends State<NameSwipeScreen> with TickerProviderSt
           ),
           child: Text(t, style: ppBody(11, color: on ? Colors.white : ppSoft, w: on ? FontWeight.w700 : FontWeight.w600)),
         ),
-      );
+      ));
 
   Widget _actionButton({
     required double size,
@@ -488,7 +489,7 @@ class _NameSwipeScreenState extends State<NameSwipeScreen> with TickerProviderSt
   }) =>
       Opacity(
         opacity: onTap == null ? 0.4 : 1,
-        child: GestureDetector(
+        child: PvPress(enabled: onTap != null, child: GestureDetector(
           key: btnKey,
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
@@ -506,7 +507,7 @@ class _NameSwipeScreenState extends State<NameSwipeScreen> with TickerProviderSt
             ),
             child: Icon(icon, size: iconSize, color: iconColor),
           ),
-        ),
+        )),
       );
 
   Widget _matchOverlay(BabyName n) => Positioned.fill(
@@ -517,7 +518,7 @@ class _NameSwipeScreenState extends State<NameSwipeScreen> with TickerProviderSt
             color: const Color(0x8C4A3A6B),
             alignment: Alignment.center,
             padding: const EdgeInsets.all(32),
-            child: GestureDetector(
+            child: PvPress(child: GestureDetector(
               onTap: () {}, // swallow taps on the card
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
@@ -539,7 +540,7 @@ class _NameSwipeScreenState extends State<NameSwipeScreen> with TickerProviderSt
                   const SizedBox(height: 20),
                   Row(children: [
                     Expanded(
-                      child: GestureDetector(
+                      child: PvPress(child: GestureDetector(
                         onTap: _openList,
                         behavior: HitTestBehavior.opaque,
                         child: Container(
@@ -548,11 +549,11 @@ class _NameSwipeScreenState extends State<NameSwipeScreen> with TickerProviderSt
                           decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(14)),
                           child: Text('See our list', style: ppBody(14, color: ppPurple, w: FontWeight.w700)),
                         ),
-                      ),
+                      )),
                     ),
                     const SizedBox(width: 10),
                     Expanded(
-                      child: GestureDetector(
+                      child: PvPress(child: GestureDetector(
                         onTap: _next,
                         behavior: HitTestBehavior.opaque,
                         child: Container(
@@ -561,12 +562,12 @@ class _NameSwipeScreenState extends State<NameSwipeScreen> with TickerProviderSt
                           decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(14)),
                           child: Text('Keep swiping', style: ppBody(14, color: Colors.white, w: FontWeight.w700)),
                         ),
-                      ),
+                      )),
                     ),
                   ]),
                 ]),
               ),
-            ),
+            )),
           ),
         ),
       );

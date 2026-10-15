@@ -42,6 +42,7 @@ import 'pp_child_profile.dart';
 import 'pp_common.dart';
 import 'pp_health_data.dart';
 import 'pp_wallet_data.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 void _push(BuildContext c, Widget s) =>
     Navigator.of(c).push(MaterialPageRoute<void>(builder: (_) => s));
@@ -117,7 +118,7 @@ class WalletV2Home extends StatelessWidget {
 
   Widget _upcoming(BuildContext context) {
     final due = WalletReminders.dueSoon();
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _push(context, const WalletRemindersScreen()),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -145,7 +146,7 @@ class WalletV2Home extends StatelessWidget {
           const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
         ]),
       ),
-    );
+    ));
   }
 
   Widget _quickActions(BuildContext context) {
@@ -177,7 +178,7 @@ class WalletV2Home extends StatelessWidget {
         runSpacing: spacing,
         children: [
           for (final a in actions)
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: a.$3,
               behavior: HitTestBehavior.opaque,
               child: Container(
@@ -198,7 +199,7 @@ class WalletV2Home extends StatelessWidget {
                       style: ppBody(11.5, color: ppInk, w: FontWeight.w700)),
                 ]),
               ),
-            ),
+            )),
         ],
       );
     });
@@ -238,7 +239,7 @@ class WalletV2Home extends StatelessWidget {
     ]);
   }
 
-  Widget _openTimeline(BuildContext context) => GestureDetector(
+  Widget _openTimeline(BuildContext context) => PvPress(child: GestureDetector(
         onTap: () => _push(context, const HealthTimelineScreen()),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -251,7 +252,7 @@ class WalletV2Home extends StatelessWidget {
           child: Text('Open timeline',
               style: ppBody(13.5, color: Colors.white, w: FontWeight.w800)),
         ),
-      );
+      ));
 }
 
 // =============================================================================
@@ -350,7 +351,7 @@ Widget walletEmpty(String title, String body, {String? cta, VoidCallback? onCta}
         Text(body, style: ppBody(12.5, h: 1.55)),
         if (cta != null) ...[
           const SizedBox(height: 14),
-          GestureDetector(
+          PvPress(enabled: onCta != null, child: GestureDetector(
             onTap: onCta,
             behavior: HitTestBehavior.opaque,
             child: Container(
@@ -363,7 +364,7 @@ Widget walletEmpty(String title, String body, {String? cta, VoidCallback? onCta}
               child: Text(cta,
                   style: ppBody(13, color: Colors.white, w: FontWeight.w800)),
             ),
-          ),
+          )),
         ],
       ]),
     );
@@ -487,7 +488,7 @@ class _WalletRemindersScreenState extends State<WalletRemindersScreen> {
               'other. Open a medicine to switch its reminder on.',
               style: ppBody(12.5, h: 1.55)),
           const SizedBox(height: 12),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => _push(
                 context, const HealthRecordsScreen(category: 'medications')),
             behavior: HitTestBehavior.opaque,
@@ -497,7 +498,7 @@ class _WalletRemindersScreenState extends State<WalletRemindersScreen> {
               Text('Open medicines',
                   style: ppBody(12, color: ppPurple, w: FontWeight.w700)),
             ]),
-          ),
+          )),
         ]),
       );
 }
@@ -611,7 +612,7 @@ class WalletEmergencyCardScreen extends StatelessWidget {
 
   Widget _actions(BuildContext context, String text) => Row(children: [
         Expanded(
-          child: GestureDetector(
+          child: PvPress(child: GestureDetector(
             onTap: () async {
               await Clipboard.setData(ClipboardData(text: text));
               if (!context.mounted) return;
@@ -629,11 +630,11 @@ class WalletEmergencyCardScreen extends StatelessWidget {
               child: Text('Copy details',
                   style: ppBody(13, color: Colors.white, w: FontWeight.w800)),
             ),
-          ),
+          )),
         ),
         const SizedBox(width: 10),
         Expanded(
-          child: GestureDetector(
+          child: PvPress(child: GestureDetector(
             onTap: () => _push(context, const HealthEmergencyScreen()),
             behavior: HitTestBehavior.opaque,
             child: Container(
@@ -646,7 +647,7 @@ class WalletEmergencyCardScreen extends StatelessWidget {
               child:
                   Text('Edit details', style: ppJakarta(13, color: ppPurple)),
             ),
-          ),
+          )),
         ),
       ]);
 }

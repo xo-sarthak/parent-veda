@@ -10,6 +10,7 @@
 import 'package:flutter/material.dart';
 
 import 'pp_common.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class GuidesToolsScreen extends StatelessWidget {
   const GuidesToolsScreen({super.key});
@@ -47,7 +48,7 @@ class GuidesToolsScreen extends StatelessWidget {
 
             // featured download
             const SizedBox(height: 22),
-            _pad(GestureDetector(
+            _pad(PvPress(child: GestureDetector(
               onTap: () => _soon(context),
               behavior: HitTestBehavior.opaque,
               child: Container(
@@ -91,7 +92,7 @@ class GuidesToolsScreen extends StatelessWidget {
                   ),
                 ]),
               ),
-            )),
+            ))),
 
             // grid
             const SizedBox(height: 20),
@@ -117,7 +118,7 @@ class GuidesToolsScreen extends StatelessWidget {
   }
 
   Widget _card(BuildContext context, String title, String price) {
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _soon(context),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -140,6 +141,6 @@ class GuidesToolsScreen extends StatelessWidget {
           ),
         ]),
       ),
-    );
+    ));
   }
 }

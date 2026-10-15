@@ -31,6 +31,7 @@ import 'products_compare_screen.dart';
 import 'products_subcategory_screen.dart';
 import '../products/pv_store_chrome.dart';
 import '../products/pv_store_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // Price / rating filter options (label, threshold).
 const List<(String, int)> _priceBands = [('Under ₹500', 500), ('Under ₹1,000', 1000), ('Under ₹2,000', 2000)];
@@ -196,7 +197,7 @@ class _ProductsDiscoveryScreenState extends State<ProductsDiscoveryScreenClassic
               const SizedBox(height: 18),
               _pad(Row(children: [
                 Expanded(child: Text('${results.length} ${results.length == 1 ? "product" : "products"}', style: ppJakarta(16))),
-                GestureDetector(onTap: _clearAll, behavior: HitTestBehavior.opaque, child: Text('Clear all', style: ppBody(12, color: ppPurple, w: FontWeight.w700))),
+                PvPress(child: GestureDetector(onTap: _clearAll, behavior: HitTestBehavior.opaque, child: Text('Clear all', style: ppBody(12, color: ppPurple, w: FontWeight.w700)))),
               ])),
               const SizedBox(height: 16),
               if (results.isEmpty)
@@ -231,7 +232,7 @@ class _ProductsDiscoveryScreenState extends State<ProductsDiscoveryScreenClassic
 
             // compare shortcut
             const SizedBox(height: 24),
-            _pad(GestureDetector(
+            _pad(PvPress(child: GestureDetector(
               onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const ProductsCompareScreen())),
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 15),
@@ -250,7 +251,7 @@ class _ProductsDiscoveryScreenState extends State<ProductsDiscoveryScreenClassic
                   const Text('→', style: TextStyle(color: ppPurple)),
                 ]),
               ),
-            )),
+            ))),
 
             const SizedBox(height: 22),
             _pad(Text('Named, verified-mother reviews on every product. Sponsored slots are always labelled. Your research stays on ParentVeda.',
@@ -278,7 +279,7 @@ class _ProductsDiscoveryScreenState extends State<ProductsDiscoveryScreenClassic
   }
 
   // ---- filter / sort buttons ---------------------------------------------
-  Widget _filterButton() => GestureDetector(
+  Widget _filterButton() => PvPress(child: GestureDetector(
         onTap: _openFilterSheet,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -306,9 +307,9 @@ class _ProductsDiscoveryScreenState extends State<ProductsDiscoveryScreenClassic
             ],
           ]),
         ),
-      );
+      ));
 
-  Widget _sortButton() => GestureDetector(
+  Widget _sortButton() => PvPress(child: GestureDetector(
         onTap: _openSortSheet,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -322,11 +323,11 @@ class _ProductsDiscoveryScreenState extends State<ProductsDiscoveryScreenClassic
             Flexible(child: Text(_sort, style: ppBody(13, color: ppInk, w: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis)),
           ]),
         ),
-      );
+      ));
 
   Widget _activeChips() {
     final chips = <Widget>[];
-    void add(String label, VoidCallback remove) => chips.add(GestureDetector(
+    void add(String label, VoidCallback remove) => chips.add(PvPress(child: GestureDetector(
           onTap: remove,
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -338,7 +339,7 @@ class _ProductsDiscoveryScreenState extends State<ProductsDiscoveryScreenClassic
               const Icon(Icons.close_rounded, size: 13, color: ppPurple),
             ]),
           ),
-        ));
+        )));
     for (final c in _concerns.toList()) {
       add(c, () => setState(() => _concerns.remove(c)));
     }
@@ -387,7 +388,7 @@ class _ProductsDiscoveryScreenState extends State<ProductsDiscoveryScreenClassic
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
       builder: (sheetCtx) {
         return StatefulBuilder(builder: (sheetCtx, setSheet) {
-          Widget chip(String label, bool on, VoidCallback onTap, {IconData? icon}) => GestureDetector(
+          Widget chip(String label, bool on, VoidCallback onTap, {IconData? icon}) => PvPress(child: GestureDetector(
                 onTap: () => setSheet(onTap),
                 behavior: HitTestBehavior.opaque,
                 child: Container(
@@ -405,7 +406,7 @@ class _ProductsDiscoveryScreenState extends State<ProductsDiscoveryScreenClassic
                     Text(label, style: ppBody(13, color: on ? Colors.white : ppInk, w: on ? FontWeight.w700 : FontWeight.w600)),
                   ]),
                 ),
-              );
+              ));
 
           Widget section(String title, Widget body) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 const SizedBox(height: 20),
@@ -430,7 +431,7 @@ class _ProductsDiscoveryScreenState extends State<ProductsDiscoveryScreenClassic
                     padding: const EdgeInsets.fromLTRB(24, 14, 24, 4),
                     child: Row(children: [
                       Expanded(child: Text('Filters', style: ppFraunces(24, h: 1.1))),
-                      GestureDetector(
+                      PvPress(child: GestureDetector(
                         onTap: () => setSheet(() {
                           tmpConcerns.clear();
                           tmpStage = null;
@@ -441,7 +442,7 @@ class _ProductsDiscoveryScreenState extends State<ProductsDiscoveryScreenClassic
                         }),
                         behavior: HitTestBehavior.opaque,
                         child: Text('Reset', style: ppBody(13, color: ppPurple, w: FontWeight.w700)),
-                      ),
+                      )),
                     ]),
                   ),
                   Expanded(
@@ -473,7 +474,7 @@ class _ProductsDiscoveryScreenState extends State<ProductsDiscoveryScreenClassic
                   Container(
                     padding: const EdgeInsets.fromLTRB(24, 12, 24, 16),
                     decoration: const BoxDecoration(border: Border(top: BorderSide(color: ppHair))),
-                    child: GestureDetector(
+                    child: PvPress(child: GestureDetector(
                       onTap: () {
                         setState(() {
                           _concerns
@@ -498,7 +499,7 @@ class _ProductsDiscoveryScreenState extends State<ProductsDiscoveryScreenClassic
                         decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(16)),
                         child: Text('Show $preview ${preview == 1 ? "product" : "products"}', style: ppBody(15, color: Colors.white, w: FontWeight.w700)),
                       ),
-                    ),
+                    )),
                   ),
                 ]),
               ),
@@ -542,7 +543,7 @@ class _ProductsDiscoveryScreenState extends State<ProductsDiscoveryScreenClassic
             child: Align(alignment: Alignment.centerLeft, child: Text('Sort by', style: ppFraunces(24, h: 1.1))),
           ),
           for (final s in _sorts)
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: () {
                 setState(() => _sort = s);
                 Navigator.of(sheetCtx).pop();
@@ -555,7 +556,7 @@ class _ProductsDiscoveryScreenState extends State<ProductsDiscoveryScreenClassic
                   if (_sort == s) const Icon(Icons.check_rounded, size: 18, color: ppPurple),
                 ]),
               ),
-            ),
+            )),
           const SizedBox(height: 12),
         ]),
       ),
@@ -566,7 +567,7 @@ class _ProductsDiscoveryScreenState extends State<ProductsDiscoveryScreenClassic
   // Category header (tap → category page) with its subcategories always shown,
   // laid out as an even 3-up row of tiles (tap → subcategory) - no dropdown.
   Widget _catRow(PpCategory cat) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () => _openCategory(cat.name),
           behavior: HitTestBehavior.opaque,
           child: Row(children: [
@@ -582,7 +583,7 @@ class _ProductsDiscoveryScreenState extends State<ProductsDiscoveryScreenClassic
             const SizedBox(width: 10),
             const Icon(Icons.arrow_forward, size: 16, color: ppMuted),
           ]),
-        ),
+        )),
         const SizedBox(height: 14),
         Row(children: [
           for (int i = 0; i < cat.subs.length; i++) ...[
@@ -592,7 +593,7 @@ class _ProductsDiscoveryScreenState extends State<ProductsDiscoveryScreenClassic
         ]),
       ]);
 
-  Widget _subTile(String category, PpSub s) => GestureDetector(
+  Widget _subTile(String category, PpSub s) => PvPress(child: GestureDetector(
         onTap: () => _openSub(category, s.name),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -615,7 +616,7 @@ class _ProductsDiscoveryScreenState extends State<ProductsDiscoveryScreenClassic
             ),
           ]),
         ),
-      );
+      ));
 }
 
 // ---- facade (the retirement) -----------------------------------------------

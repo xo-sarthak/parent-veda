@@ -20,6 +20,7 @@ import 'package:flutter/material.dart';
 
 import '../../theme/pv_fonts.dart';
 import '../v2/v2_palette.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 enum ScansHubVersion {
   /// Six doors, from the reconciliation Excel's six journey steps.
@@ -83,7 +84,7 @@ class ScansVersionPill extends StatelessWidget {
       );
 
   Widget _seg(String label, bool on, V2Palette p, VoidCallback onTap) =>
-      GestureDetector(
+      PvPress(child: GestureDetector(
         onTap: onTap,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
@@ -98,5 +99,5 @@ class ScansVersionPill extends StatelessWidget {
                   letterSpacing: 0.6,
                   color: on ? p.onAction : p.ink3)),
         ),
-      );
+      ));
 }

@@ -22,6 +22,7 @@ import '../../data/book_companions.dart' show bookDocFor, bookReadItem;
 import '../book_companion_screen.dart';
 import '../../localization/app_language.dart';
 import '../reader/pv_reader_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class _RTheme {
   const _RTheme(this.bg, this.ink, this.soft, this.panel, this.rule, this.accent);
@@ -203,11 +204,11 @@ class _ReadingReaderScreenState extends State<ReadingReaderScreen> {
         ]),
       );
 
-  Widget _iconBtn(_RTheme t, IconData i, VoidCallback onTap) => GestureDetector(
+  Widget _iconBtn(_RTheme t, IconData i, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Padding(padding: const EdgeInsets.all(9), child: Icon(i, size: 21, color: t.ink)),
-      );
+      ));
 
   Widget _byline(_RTheme t) => Row(children: [
         Container(
@@ -304,7 +305,7 @@ class _ReadingReaderScreenState extends State<ReadingReaderScreen> {
       );
 
   // ---- embedded mid-article video (single, striped placeholder + play) ----
-  Widget _embeddedVideo(_RTheme t, WatchVideo v) => GestureDetector(
+  Widget _embeddedVideo(_RTheme t, WatchVideo v) => PvPress(child: GestureDetector(
         onTap: () => _playVideo(v),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -329,7 +330,7 @@ class _ReadingReaderScreenState extends State<ReadingReaderScreen> {
             ),
           ]),
         ),
-      );
+      ));
 
   // ---- related videos at the end (multiple - shorts & more) ---------------
   List<WatchVideo> _relatedVideoList() {
@@ -359,7 +360,7 @@ class _ReadingReaderScreenState extends State<ReadingReaderScreen> {
     ]);
   }
 
-  Widget _relatedVideoCard(_RTheme t, WatchVideo v) => GestureDetector(
+  Widget _relatedVideoCard(_RTheme t, WatchVideo v) => PvPress(child: GestureDetector(
         onTap: () => _playVideo(v),
         behavior: HitTestBehavior.opaque,
         child: SizedBox(
@@ -374,12 +375,12 @@ class _ReadingReaderScreenState extends State<ReadingReaderScreen> {
             Text(v.title, style: pvManrope(fontSize: 13, height: 1.3, fontWeight: FontWeight.w600, color: t.ink), maxLines: 2, overflow: TextOverflow.ellipsis),
           ]),
         ),
-      );
+      ));
 
   // ---- expandable ParentVeda tip -----------------------------------------
   Widget _tipCard(_RTheme t, int index, ReadTip tip) {
     final open = _expandedTips.contains(index);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => setState(() => open ? _expandedTips.remove(index) : _expandedTips.add(index)),
       behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
@@ -399,7 +400,7 @@ class _ReadingReaderScreenState extends State<ReadingReaderScreen> {
           ],
         ]),
       ),
-    );
+    ));
   }
 
   // ---- myth vs fact -------------------------------------------------------
@@ -440,7 +441,7 @@ class _ReadingReaderScreenState extends State<ReadingReaderScreen> {
 
   Widget _completeButton(_RTheme t) {
     final done = _store.isCompleted(a.id);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => setState(() => _store.setProgress(a.id, 1.0)),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -453,7 +454,7 @@ class _ReadingReaderScreenState extends State<ReadingReaderScreen> {
           Text(done ? 'Read - nicely done' : 'Mark as read', style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w700, color: done ? t.accent : Colors.white)),
         ]),
       ),
-    );
+    ));
   }
 
   // ---- read next (articles only - keep reading) ---------------------------
@@ -465,7 +466,7 @@ class _ReadingReaderScreenState extends State<ReadingReaderScreen> {
       Text('Keep reading - more on this, one after another.', style: pvManrope(fontSize: 12.5, color: t.soft)),
       const SizedBox(height: 16),
       for (final na in next)
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () => Navigator.of(context).pushReplacement(MaterialPageRoute<void>(builder: (_) => ReadingReaderScreen(article: na))),
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -485,7 +486,7 @@ class _ReadingReaderScreenState extends State<ReadingReaderScreen> {
               Icon(Icons.chevron_right_rounded, size: 20, color: t.soft),
             ]),
           ),
-        ),
+        )),
     ]);
   }
 
@@ -509,7 +510,7 @@ class _ReadingReaderScreenState extends State<ReadingReaderScreen> {
             Text('In this read', style: pvFraunces(fontSize: 20, fontWeight: FontWeight.w600, color: t.ink)),
             const SizedBox(height: 12),
             for (final e in entries)
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: () {
                   Navigator.of(ctx).pop();
                   final key = _keys[e.$1];
@@ -521,7 +522,7 @@ class _ReadingReaderScreenState extends State<ReadingReaderScreen> {
                   padding: const EdgeInsets.symmetric(vertical: 11),
                   child: Text(e.$2, style: pvManrope(fontSize: 15, fontWeight: FontWeight.w600, color: t.ink)),
                 ),
-              ),
+              )),
           ]),
         ),
       ),
@@ -586,7 +587,7 @@ class _ReadingReaderScreenState extends State<ReadingReaderScreen> {
   Widget _modeChip(_RTheme t, String label, ReadMode m, void Function(void Function()) setSheet) {
     final on = _store.mode == m;
     return Expanded(
-      child: GestureDetector(
+      child: PvPress(child: GestureDetector(
         onTap: () {
           _store.setMode(m);
           setSheet(() {});
@@ -603,7 +604,7 @@ class _ReadingReaderScreenState extends State<ReadingReaderScreen> {
           ),
           child: Text(label, style: pvManrope(fontSize: 13, fontWeight: FontWeight.w700, color: on ? _t.accent : t.soft)),
         ),
-      ),
+      )),
     );
   }
 }

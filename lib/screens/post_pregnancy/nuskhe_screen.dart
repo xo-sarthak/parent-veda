@@ -41,6 +41,7 @@ import 'pp_nuskhe_data.dart';
 import 'pp_section_extras.dart';
 import 'remedy_detail_screen.dart';
 import 'remedy_list_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class NuskheScreen extends StatefulWidget {
   const NuskheScreen({super.key});
@@ -375,7 +376,7 @@ class _NuskheScreenState extends State<NuskheScreen> {
 
   Widget _cat(BuildContext context, NuskheCategory c) {
     final count = remedyCount(c.name);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _openList(context, c.name),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -395,6 +396,6 @@ class _NuskheScreenState extends State<NuskheScreen> {
           Text('$count ${count == 1 ? 'remedy' : 'remedies'}', style: ppBody(12, color: ppMuted)),
         ]),
       ),
-    );
+    ));
   }
 }

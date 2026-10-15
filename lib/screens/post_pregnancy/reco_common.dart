@@ -12,6 +12,7 @@ import '../../brand/brand_disclosure.dart';
 import 'pp_common.dart';
 import 'pp_deals_data.dart';
 import 'pp_reco_data.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// Heart-toggle bound to the RecoStore.
 class RecoSaveHeart extends StatelessWidget {
@@ -25,7 +26,7 @@ class RecoSaveHeart extends StatelessWidget {
         animation: RecoStore.instance,
         builder: (context, _) {
           final saved = RecoStore.instance.isSaved(id);
-          return GestureDetector(
+          return PvPress(child: GestureDetector(
             onTap: () => RecoStore.instance.toggleSave(id),
             behavior: HitTestBehavior.opaque,
             child: Container(
@@ -35,7 +36,7 @@ class RecoSaveHeart extends StatelessWidget {
               decoration: onLight ? BoxDecoration(color: Colors.white.withValues(alpha: 0.9), shape: BoxShape.circle) : null,
               child: Icon(saved ? Icons.favorite : Icons.favorite_border, size: size * 0.6, color: saved ? ppCoral : (onLight ? ppInk : ppMuted)),
             ),
-          );
+          ));
         },
       );
 }
@@ -94,7 +95,7 @@ class RecoRailCard extends StatelessWidget {
   final double width;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(enabled: onTap != null, child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: SizedBox(
@@ -124,7 +125,7 @@ class RecoRailCard extends StatelessWidget {
             ],
           ]),
         ),
-      );
+      ));
 }
 
 /// A list row (category / collection / search / library screens).
@@ -135,7 +136,7 @@ class RecoRow extends StatelessWidget {
   final VoidCallback? onTap;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(enabled: onTap != null, child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -163,7 +164,7 @@ class RecoRow extends StatelessWidget {
             ),
           ]),
         ),
-      );
+      ));
 }
 
 Widget _catChip(String category) => Container(

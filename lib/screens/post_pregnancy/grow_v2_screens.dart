@@ -42,6 +42,7 @@ import '../pregnancy/preg_tool_chrome.dart';
 import '../pregnancy/preg_tool_parts.dart' show PregFoldRow;
 import '../products/pv_store_chrome.dart' show PvCommit, PvSecondary, pvStorePalette;
 import 'pp_care_parts.dart' show PpCareStats, ppCareHeading;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 void _push(BuildContext c, Widget s) =>
     Navigator.of(c).push(MaterialPageRoute<void>(builder: (_) => s));
@@ -112,7 +113,7 @@ void showStreakInfo(BuildContext context) {
               style: ppBody(12.5, h: 1.6)),
         ),
         const SizedBox(height: 20),
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () => Navigator.of(ctx).pop(),
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -125,7 +126,7 @@ void showStreakInfo(BuildContext context) {
             child: Text('Got it',
                 style: ppBody(13.5, color: Colors.white, w: FontWeight.w800)),
           ),
-        ),
+        )),
       ]),
     ),
   );
@@ -276,7 +277,7 @@ class GrowV2Home extends StatelessWidget {
         Text(n == 0 ? 'Start today' : 'Keep it going',
             style: ppBody(11.5, color: const Color(0xFFA1743F))),
         const SizedBox(width: 8),
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () => showStreakInfo(context),
           behavior: HitTestBehavior.opaque,
           child: const Padding(
@@ -284,7 +285,7 @@ class GrowV2Home extends StatelessWidget {
             child: Icon(Icons.info_outline_rounded,
                 size: 16, color: Color(0xFFA1743F)),
           ),
-        ),
+        )),
       ]),
     );
   }
@@ -330,7 +331,7 @@ class GrowV2Home extends StatelessWidget {
         const SizedBox(height: 6),
         Text(growWhyToday(a), style: ppBody(13, h: 1.55)),
         const SizedBox(height: 18),
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () => _push(context, GrowActivityScreen(activity: a)),
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -343,7 +344,7 @@ class GrowV2Home extends StatelessWidget {
             child: Text('START ACTIVITY',
                 style: ppBody(13.5, color: Colors.white, w: FontWeight.w800)),
           ),
-        ),
+        )),
       ]),
     );
   }
@@ -354,7 +355,7 @@ class GrowV2Home extends StatelessWidget {
         Text(s, style: ppBody(11.5, color: ppSoft)),
       ]);
 
-  Widget _capTile(BuildContext context, GrowCapability c) => GestureDetector(
+  Widget _capTile(BuildContext context, GrowCapability c) => PvPress(child: GestureDetector(
         onTap: () => _push(context, GrowCapabilityScreen(cap: c)),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -383,9 +384,9 @@ class GrowV2Home extends StatelessWidget {
                 style: ppBody(11, color: ppMuted)),
           ]),
         ),
-      );
+      ));
 
-  Widget _moreActivities(BuildContext context) => GestureDetector(
+  Widget _moreActivities(BuildContext context) => PvPress(child: GestureDetector(
         onTap: () => _push(context, const GrowAllActivitiesScreen()),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -400,7 +401,7 @@ class GrowV2Home extends StatelessWidget {
             const Icon(Icons.arrow_forward_rounded, size: 17, color: ppPurple),
           ]),
         ),
-      );
+      ));
 
   // A feature is never hidden: the empty state invites rather than vanishing.
   Widget _emptyRecent() => Container(
@@ -415,7 +416,7 @@ class GrowV2Home extends StatelessWidget {
             style: ppBody(12.5, h: 1.5)),
       );
 
-  Widget _miniRow(BuildContext context, DevActivity a) => GestureDetector(
+  Widget _miniRow(BuildContext context, DevActivity a) => PvPress(child: GestureDetector(
         onTap: () => _push(context, GrowActivityScreen(activity: a)),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -433,7 +434,7 @@ class GrowV2Home extends StatelessWidget {
             Text('${a.minutes} min', style: ppBody(11.5, color: ppMuted)),
           ]),
         ),
-      );
+      ));
 }
 
 // =============================================================================
@@ -514,7 +515,7 @@ class GrowCapabilityScreen extends StatelessWidget {
     );
   }
 
-  Widget _row(BuildContext context, DevActivity a) => GestureDetector(
+  Widget _row(BuildContext context, DevActivity a) => PvPress(child: GestureDetector(
         onTap: () => _push(context, GrowActivityScreen(activity: a)),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -536,7 +537,7 @@ class GrowCapabilityScreen extends StatelessWidget {
             const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
           ]),
         ),
-      );
+      ));
 }
 
 // =============================================================================
@@ -596,7 +597,7 @@ class GrowAllActivitiesScreen extends StatelessWidget {
     );
   }
 
-  Widget _row(BuildContext context, DevActivity a) => GestureDetector(
+  Widget _row(BuildContext context, DevActivity a) => PvPress(child: GestureDetector(
         onTap: () => _push(context, GrowActivityScreen(activity: a)),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -618,7 +619,7 @@ class GrowAllActivitiesScreen extends StatelessWidget {
             const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
           ]),
         ),
-      );
+      ));
 }
 
 // =============================================================================
@@ -829,7 +830,7 @@ class _GrowActivityScreenState extends State<GrowActivityScreen> {
   // The brief lists a 30-second demo as optional. None are recorded, and
   // rendering a play button that does nothing would be the worse of the two
   // honest options.
-  Widget _demoRow(BuildContext context) => GestureDetector(
+  Widget _demoRow(BuildContext context) => PvPress(child: GestureDetector(
         onTap: () => ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
               content: Text('No demo filmed for this one yet.')),
@@ -850,7 +851,7 @@ class _GrowActivityScreenState extends State<GrowActivityScreen> {
             Text('Not filmed yet', style: ppBody(11, color: ppMuted)),
           ]),
         ),
-      );
+      ));
 
   Widget _bullet(String s) => Padding(
         padding: const EdgeInsets.only(bottom: 7),
@@ -907,7 +908,7 @@ class _GrowActivityScreenState extends State<GrowActivityScreen> {
         ]),
       );
 
-  Widget _why(DevActivity a) => GestureDetector(
+  Widget _why(DevActivity a) => PvPress(child: GestureDetector(
         onTap: () => setState(() => _whyOpen = !_whyOpen),
         behavior: HitTestBehavior.opaque,
         child: AnimatedContainer(
@@ -949,7 +950,7 @@ class _GrowActivityScreenState extends State<GrowActivityScreen> {
             ],
           ]),
         ),
-      );
+      ));
 
   Widget _completeButton(BuildContext context, DevActivity a, bool done) =>
       GestureDetector(
@@ -1220,7 +1221,7 @@ class GrowCompletedScreen extends StatelessWidget {
               ),
             ]),
           ),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => showStreakInfo(context),
             behavior: HitTestBehavior.opaque,
             child: const Padding(
@@ -1228,7 +1229,7 @@ class GrowCompletedScreen extends StatelessWidget {
               child: Icon(Icons.info_outline_rounded,
                   size: 17, color: Color(0xFFA1743F)),
             ),
-          ),
+          )),
         ]),
       );
 
@@ -1265,7 +1266,7 @@ class GrowCompletedScreen extends StatelessWidget {
       );
 
   Widget _tomorrow(BuildContext context, DevActivity a, bool isV2) =>
-      GestureDetector(
+      PvPress(child: GestureDetector(
         onTap: () => _push(context, GrowActivityScreen(activity: a)),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -1289,5 +1290,5 @@ class GrowCompletedScreen extends StatelessWidget {
             const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
           ]),
         ),
-      );
+      ));
 }

@@ -42,6 +42,7 @@ import '../pregnancy/preg_tool_chrome.dart'
 import '../products/pv_store_chrome.dart'
     show PvCommit, kPvInk, kPvLine, pvStorePalette;
 import '../v2/v2_palette.dart' show V2Palette;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class MemoryPersonalizeScreen extends StatefulWidget {
   const MemoryPersonalizeScreen({super.key, required this.type});
@@ -442,28 +443,28 @@ class _MemoryPersonalizeScreenState extends State<MemoryPersonalizeScreen> {
         Text(S.now.uiPinchZoomDragPosition,
             style: pvManrope(fontSize: 11.5, color: _soft)),
         Row(children: [
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => _pick(ImageSource.gallery),
             child: Text(S.now.uiReplace,
                 style: pvManrope(
                     fontSize: 12.5,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.primary500)),
-          ),
+          )),
           const SizedBox(width: 16),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => setState(() => _data.photo = null),
             child: Text(S.now.uiRemove,
                 style: pvManrope(
                     fontSize: 12.5, fontWeight: FontWeight.w700, color: _soft)),
-          ),
+          )),
         ]),
       ]),
     ]);
   }
 
   Widget _pickButton(String label, IconData icon, ImageSource source) =>
-      GestureDetector(
+      PvPress(child: GestureDetector(
         onTap: () => _pick(source),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -485,7 +486,7 @@ class _MemoryPersonalizeScreenState extends State<MemoryPersonalizeScreen> {
                     color: AppTheme.primary500)),
           ]),
         ),
-      );
+      ));
 
   // ---- bits -----------------------------------------------------------------
 
@@ -534,7 +535,7 @@ class _MemoryPersonalizeScreenState extends State<MemoryPersonalizeScreen> {
           color: Color(0xFFFBF7F2),
           border: Border(top: BorderSide(color: Color(0xFFEAE3D8))),
         ),
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: _preview,
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -554,10 +555,10 @@ class _MemoryPersonalizeScreenState extends State<MemoryPersonalizeScreen> {
                   size: 18, color: Colors.white),
             ]),
           ),
-        ),
+        )),
       );
 
-  Widget _back() => GestureDetector(
+  Widget _back() => PvPress(child: GestureDetector(
         onTap: () => Navigator.of(context).maybePop(),
         behavior: HitTestBehavior.opaque,
         child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -567,7 +568,7 @@ class _MemoryPersonalizeScreenState extends State<MemoryPersonalizeScreen> {
               style: pvManrope(
                   fontSize: 13.5, fontWeight: FontWeight.w700, color: _soft)),
         ]),
-      );
+      ));
 }
 
 /// The photo panned/zoomed inside its frame while the parent adjusts it.

@@ -31,6 +31,7 @@ import '../../services/community_store.dart';
 import 'ttc_care_circle_screen.dart';
 import 'ttc_common.dart';
 import 'ttc_strings.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class TtcCommunityScreen extends StatefulWidget {
   const TtcCommunityScreen({super.key, this.initialRoom});
@@ -157,7 +158,7 @@ class _TtcCommunityScreenState extends State<TtcCommunityScreen> {
 
             // ---- the feed -------------------------------------------------
             ttcSectionTitle(t.communityFeed,
-                trailing: GestureDetector(
+                trailing: PvPress(child: GestureDetector(
                   onTap: () => writeTtcPost(context, room: _room),
                   behavior: HitTestBehavior.opaque,
                   child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -167,7 +168,7 @@ class _TtcCommunityScreenState extends State<TtcCommunityScreen> {
                         style:
                             ttcBody(12, color: ttcTitleInk, w: FontWeight.w800)),
                   ]),
-                )),
+                ))),
             _RoomFilter(
               selected: _room,
               t: t,
@@ -250,7 +251,7 @@ Future<void> writeTtcPost(BuildContext context, {String? room}) async {
                     for (final c in kTtcCommunities)
                       Padding(
                         padding: const EdgeInsets.only(right: 8),
-                        child: GestureDetector(
+                        child: PvPress(child: GestureDetector(
                           onTap: () => setSheet(() => target = c.id),
                           behavior: HitTestBehavior.opaque,
                           child: Container(
@@ -267,7 +268,7 @@ Future<void> writeTtcPost(BuildContext context, {String? room}) async {
                                         : ttcSoft,
                                     w: FontWeight.w700)),
                           ),
-                        ),
+                        )),
                       ),
                   ],
                 ),
@@ -302,7 +303,7 @@ Future<void> writeTtcPost(BuildContext context, {String? room}) async {
               ),
               const SizedBox(height: 14),
 
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: () => setSheet(() => anonymous = !anonymous),
                 behavior: HitTestBehavior.opaque,
                 child: Row(children: [
@@ -335,12 +336,12 @@ Future<void> writeTtcPost(BuildContext context, {String? room}) async {
                         ]),
                   ),
                 ]),
-              ),
+              )),
               const SizedBox(height: 16),
 
               Row(children: [
                 Expanded(
-                  child: GestureDetector(
+                  child: PvPress(child: GestureDetector(
                     onTap: () => Navigator.of(ctx).pop(false),
                     behavior: HitTestBehavior.opaque,
                     child: Container(
@@ -354,12 +355,12 @@ Future<void> writeTtcPost(BuildContext context, {String? room}) async {
                           style:
                               ttcBody(14, color: ttcSoft, w: FontWeight.w800)),
                     ),
-                  ),
+                  )),
                 ),
                 const SizedBox(width: 11),
                 Expanded(
                   flex: 2,
-                  child: GestureDetector(
+                  child: PvPress(child: GestureDetector(
                     onTap: () => Navigator.of(ctx).pop(true),
                     behavior: HitTestBehavior.opaque,
                     child: Container(
@@ -372,7 +373,7 @@ Future<void> writeTtcPost(BuildContext context, {String? room}) async {
                           style: ttcBody(14,
                               color: Colors.white, w: FontWeight.w800)),
                     ),
-                  ),
+                  )),
                 ),
               ]),
             ]),
@@ -453,7 +454,7 @@ class _RoomCard extends StatelessWidget {
           ]),
         ),
         const SizedBox(width: 10),
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () => CommunityStore.instance.toggleJoin(community.id),
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -467,7 +468,7 @@ class _RoomCard extends StatelessWidget {
                     color: joined ? ttcTitleInk : Colors.white,
                     w: FontWeight.w800)),
           ),
-        ),
+        )),
       ]),
     );
   }
@@ -492,7 +493,7 @@ class _RoomFilter extends StatelessWidget {
       final on = selected == id;
       return Padding(
         padding: const EdgeInsets.only(right: 8),
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: () => onChanged(id),
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -505,7 +506,7 @@ class _RoomFilter extends StatelessWidget {
                 style: ttcBody(12,
                     color: on ? Colors.white : ttcSoft, w: FontWeight.w700)),
           ),
-        ),
+        )),
       );
     }
 
@@ -633,7 +634,7 @@ class _PostCard extends StatelessWidget {
     required bool on,
     required VoidCallback onTap,
   }) =>
-      GestureDetector(
+      PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -645,5 +646,5 @@ class _PostCard extends StatelessWidget {
                     color: on ? ttcCoral : ttcMuted, w: FontWeight.w700)),
           ],
         ]),
-      );
+      ));
 }

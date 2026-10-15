@@ -15,6 +15,7 @@ import 'community_screen.dart';
 import 'growth_activity_screen.dart';
 import 'pp_common.dart';
 import 'remedy_detail_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class WonderWeekScreen extends StatelessWidget {
   const WonderWeekScreen({super.key});
@@ -49,7 +50,7 @@ class WonderWeekScreen extends StatelessWidget {
                 ),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                    GestureDetector(
+                    PvPress(child: GestureDetector(
                       onTap: () => Navigator.of(context).maybePop(),
                       child: Container(
                         width: 34,
@@ -58,7 +59,7 @@ class WonderWeekScreen extends StatelessWidget {
                         decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.14), shape: BoxShape.circle),
                         child: const Icon(Icons.arrow_back, size: 16, color: Colors.white),
                       ),
-                    ),
+                    )),
                     Row(mainAxisSize: MainAxisSize.min, children: [
                       Container(width: 6, height: 6, decoration: const BoxDecoration(color: ppCoral, shape: BoxShape.circle)),
                       const SizedBox(width: 6),
@@ -199,7 +200,7 @@ class WonderWeekScreen extends StatelessWidget {
               decoration: const BoxDecoration(
                 gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x00FBF9FE), ppBg], stops: [0, 0.3]),
               ),
-              child: GestureDetector(
+              child: PvPress(child: GestureDetector(
                 onTap: () => _soon(context),
                 child: Container(
                   height: 52,
@@ -211,7 +212,7 @@ class WonderWeekScreen extends StatelessWidget {
                     Flexible(child: Text("Share “${ChildProfileStore.instance.nameMid}'s in Phase 4”", style: ppBody(14, color: Colors.white, w: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis)),
                   ]),
                 ),
-              ),
+              )),
             ),
           ),
         ]),
@@ -231,7 +232,7 @@ class WonderWeekScreen extends StatelessWidget {
 
   Widget _link(BuildContext context, String tag, Color tagFg, String title, VoidCallback onTap,
       {bool top = false, bool bottom = false}) {
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -256,7 +257,7 @@ class WonderWeekScreen extends StatelessWidget {
           const Text('→', style: TextStyle(color: ppMuted)),
         ]),
       ),
-    );
+    ));
   }
 
   Widget _seg(String label, String sub, {required int flex, Color? bg, Color? fg, Color? subFg, bool outline = false}) => Expanded(

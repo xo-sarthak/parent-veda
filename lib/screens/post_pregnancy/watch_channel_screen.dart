@@ -24,6 +24,7 @@ import 'provider_profile_screen.dart';
 import 'watch_common.dart';
 import 'watch_player_screen.dart';
 import 'watch_shorts_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class WatchChannelScreen extends StatefulWidget {
   const WatchChannelScreen({super.key, required this.expertId});
@@ -136,7 +137,7 @@ class _WatchChannelScreenState extends State<WatchChannelScreen> {
               const SizedBox(width: 10),
               Expanded(
                 flex: 2,
-                child: GestureDetector(
+                child: PvPress(child: GestureDetector(
                   onTap: () => _push(ProviderProfileScreen(expert: e)),
                   behavior: HitTestBehavior.opaque,
                   child: Container(
@@ -146,7 +147,7 @@ class _WatchChannelScreenState extends State<WatchChannelScreen> {
                     child: Text('View profile',
                         style: ppBody(13, color: ppPurple, w: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis),
                   ),
-                ),
+                )),
               ),
             ]),
           ]),
@@ -155,7 +156,7 @@ class _WatchChannelScreenState extends State<WatchChannelScreen> {
     ]);
   }
 
-  Widget _subscribeButton(Expert e, bool subscribed) => GestureDetector(
+  Widget _subscribeButton(Expert e, bool subscribed) => PvPress(child: GestureDetector(
         onTap: () => WatchStore.instance.toggleSubscribe(e.id),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -176,7 +177,7 @@ class _WatchChannelScreenState extends State<WatchChannelScreen> {
             ),
           ]),
         ),
-      );
+      ));
 
   // ---- tab bar ------------------------------------------------------------
   Widget _tabBar(WatchChannel channel) {
@@ -196,7 +197,7 @@ class _WatchChannelScreenState extends State<WatchChannelScreen> {
         separatorBuilder: (_, _) => const SizedBox(width: 10),
         itemBuilder: (_, i) {
           final on = i == _tab;
-          return GestureDetector(
+          return PvPress(child: GestureDetector(
             onTap: () => setState(() => _tab = i),
             behavior: HitTestBehavior.opaque,
             child: Container(
@@ -210,7 +211,7 @@ class _WatchChannelScreenState extends State<WatchChannelScreen> {
               child: Text('${_tabs[i]}${counts[i] > 0 ? '  ${counts[i]}' : ''}',
                   style: ppBody(12.5, color: on ? Colors.white : ppInk, w: FontWeight.w700)),
             ),
-          );
+          ));
         },
       ),
     );
@@ -258,7 +259,7 @@ class _WatchChannelScreenState extends State<WatchChannelScreen> {
     ];
   }
 
-  Widget _podcastRow(WatchVideo p) => GestureDetector(
+  Widget _podcastRow(WatchVideo p) => PvPress(child: GestureDetector(
         onTap: () => _openVideo(p),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -291,7 +292,7 @@ class _WatchChannelScreenState extends State<WatchChannelScreen> {
             const Icon(Icons.play_circle_outline_rounded, size: 26, color: ppPurple),
           ]),
         ),
-      );
+      ));
 
   List<Widget> _shorts(List<WatchVideo> shorts) {
     if (shorts.isEmpty) return [_empty('No shorts yet - quick clips are coming.')];
@@ -306,7 +307,7 @@ class _WatchChannelScreenState extends State<WatchChannelScreen> {
             runSpacing: gap,
             children: [
               for (final s in shorts)
-                GestureDetector(
+                PvPress(child: GestureDetector(
                   onTap: () => _push(WatchShortsScreen(startId: s.id)),
                   behavior: HitTestBehavior.opaque,
                   child: SizedBox(
@@ -317,7 +318,7 @@ class _WatchChannelScreenState extends State<WatchChannelScreen> {
                       Text(s.title, style: ppBody(12, color: ppInk, w: FontWeight.w600, h: 1.25), maxLines: 2, overflow: TextOverflow.ellipsis),
                     ]),
                   ),
-                ),
+                )),
             ],
           );
         }),
@@ -334,7 +335,7 @@ class _WatchChannelScreenState extends State<WatchChannelScreen> {
     ];
   }
 
-  Widget _courseCard(ChannelCourse c) => GestureDetector(
+  Widget _courseCard(ChannelCourse c) => PvPress(child: GestureDetector(
         onTap: () => openExpertCourses(context, widget.expertId),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -363,7 +364,7 @@ class _WatchChannelScreenState extends State<WatchChannelScreen> {
             const Padding(padding: EdgeInsets.only(right: 12), child: Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted)),
           ]),
         ),
-      );
+      ));
 
   double? _liveProgress(String id) {
     final p = WatchStore.instance.progressOf(id);

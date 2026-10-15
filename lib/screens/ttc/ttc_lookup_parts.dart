@@ -115,7 +115,7 @@ class TtcLookupTwoWay extends StatelessWidget {
           child: Semantics(
             button: true,
             selected: on,
-            child: GestureDetector(
+            child: PvPress(child: GestureDetector(
               onTap: () {
                 pvCommitFeedback();
                 onPick(value);
@@ -135,7 +135,7 @@ class TtcLookupTwoWay extends StatelessWidget {
                         fontWeight: FontWeight.w800,
                         color: on ? p.surface : p.ink2)),
               ),
-            ),
+            )),
           ),
         );
     return Container(

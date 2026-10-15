@@ -37,6 +37,7 @@ import 'package:flutter/material.dart';
 import '../../theme/pv_fonts.dart';
 import '../v2/v2_palette.dart';
 import 'pp_content.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class PpStoryScreen extends StatefulWidget {
   /// The dim ground. Not black: OLED black under white type is the harshest
@@ -215,16 +216,16 @@ class _PpStoryScreenState extends State<PpStoryScreen> {
                   Positioned.fill(
                     child: Row(children: [
                       Expanded(
-                        child: GestureDetector(
+                        child: PvPress(child: GestureDetector(
                           behavior: HitTestBehavior.translucent,
                           onTap: () => _go(-1),
-                        ),
+                        )),
                       ),
                       Expanded(
-                        child: GestureDetector(
+                        child: PvPress(child: GestureDetector(
                           behavior: HitTestBehavior.translucent,
                           onTap: () => _go(1),
-                        ),
+                        )),
                       ),
                     ]),
                   ),
@@ -257,7 +258,7 @@ class _PpStoryScreenState extends State<PpStoryScreen> {
                       right: 0,
                       bottom: 18,
                       child: Center(
-                        child: GestureDetector(
+                        child: PvPress(child: GestureDetector(
                           onTap: () => _openLinked(context),
                           behavior: HitTestBehavior.opaque,
                           child: Container(
@@ -279,7 +280,7 @@ class _PpStoryScreenState extends State<PpStoryScreen> {
                                       color: p.ink1)),
                             ]),
                           ),
-                        ),
+                        )),
                       ),
                     ),
                 ]),

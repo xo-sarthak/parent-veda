@@ -16,6 +16,7 @@ import 'pp_common.dart';
 import 'pp_reco_data.dart';
 import 'reco_common.dart';
 import 'reco_detail_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class RecoCategoryScreen extends StatefulWidget {
   const RecoCategoryScreen({super.key, required this.category});
@@ -95,7 +96,7 @@ class _RecoCategoryScreenState extends State<RecoCategoryScreen> {
                 const SizedBox(height: 14),
               ],
               if (_activeCount > 0)
-                _pad(GestureDetector(
+                _pad(PvPress(child: GestureDetector(
                   onTap: _clear,
                   behavior: HitTestBehavior.opaque,
                   child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -103,7 +104,7 @@ class _RecoCategoryScreenState extends State<RecoCategoryScreen> {
                     const SizedBox(width: 6),
                     Text('Clear filters ($_activeCount)', style: ppBody(12.5, color: ppPurple, w: FontWeight.w700)),
                   ]),
-                )),
+                ))),
               _pad(ppSectionDivider()),
             ],
 
@@ -137,7 +138,7 @@ class _RecoCategoryScreenState extends State<RecoCategoryScreen> {
 
   Widget _chip(String dim, String value, String label) {
     final on = _selected[dim]?.contains(value) ?? false;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _toggle(dim, value),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -152,7 +153,7 @@ class _RecoCategoryScreenState extends State<RecoCategoryScreen> {
           Text(label, style: ppBody(12.5, color: on ? Colors.white : ppInk, w: FontWeight.w600)),
         ]),
       ),
-    );
+    ));
   }
 
   Widget _noMatch() => Container(
@@ -171,7 +172,7 @@ class _RecoCategoryScreenState extends State<RecoCategoryScreen> {
           const SizedBox(height: 8),
           Text('Try removing a filter to see more.', textAlign: TextAlign.center, style: ppBody(12.5, color: ppMuted, h: 1.5)),
           const SizedBox(height: 16),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: _clear,
             behavior: HitTestBehavior.opaque,
             child: Container(
@@ -179,7 +180,7 @@ class _RecoCategoryScreenState extends State<RecoCategoryScreen> {
               decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(12)),
               child: Text('Clear filters', style: ppBody(13, color: Colors.white, w: FontWeight.w700)),
             ),
-          ),
+          )),
         ]),
       );
 }

@@ -14,6 +14,7 @@ import '../../doctor/doctor_earnings.dart';
 import '../../doctor/doctor_roster.dart';
 import '../../doctor/doctor_session.dart';
 import '../post_pregnancy/pp_common.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class DoctorEarningsScreen extends StatelessWidget {
   const DoctorEarningsScreen({super.key});
@@ -142,7 +143,7 @@ class DoctorEarningsScreen extends StatelessWidget {
               'you automatically at checkout via Razorpay once it is set up.',
               style: ppBody(12.5, color: ppSoft, h: 1.5)),
           const SizedBox(height: 12),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => ScaffoldMessenger.of(context)
               ..clearSnackBars()
               ..showSnackBar(const SnackBar(
@@ -157,7 +158,7 @@ class DoctorEarningsScreen extends StatelessWidget {
               child: Text('Set up payouts',
                   style: ppBody(13.5, color: Colors.white, w: FontWeight.w700)),
             ),
-          ),
+          )),
         ]),
       );
 

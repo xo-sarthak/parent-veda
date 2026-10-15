@@ -21,6 +21,7 @@ import 'name_journey_shortlist_screen.dart';
 import 'pp_common.dart';
 import 'pp_names_data.dart';
 import 'pp_section_extras.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class NameListScreen extends StatefulWidget {
   const NameListScreen({super.key});
@@ -283,7 +284,7 @@ class _NameListScreenState extends State<NameListScreen> {
                 const SizedBox(height: 14),
                 _pad(AnimatedBuilder(
                   animation: NameMatchStore.instance,
-                  builder: (context, _) => GestureDetector(
+                  builder: (context, _) => PvPress(child: GestureDetector(
                     onTap: () => _push(const NameJourneyShortlistScreen()),
                     behavior: HitTestBehavior.opaque,
                     child: Row(children: [
@@ -293,7 +294,7 @@ class _NameListScreenState extends State<NameListScreen> {
                       const SizedBox(width: 10),
                       Text('View & compare →', style: ppBody(12.5, color: ppPurple, w: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis),
                     ]),
-                  ),
+                  )),
                 )),
 
                 const SizedBox(height: 16),
@@ -323,7 +324,7 @@ class _NameListScreenState extends State<NameListScreen> {
       decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18), border: Border.all(color: ppHair)),
       child: Row(children: [
         Expanded(
-          child: GestureDetector(
+          child: PvPress(child: GestureDetector(
             onTap: () => _push(NameJourneyDetailScreen(name: n.name)),
             behavior: HitTestBehavior.opaque,
             child: Padding(
@@ -338,10 +339,10 @@ class _NameListScreenState extends State<NameListScreen> {
                 Text(n.meaningShort, style: ppBody(13, h: 1.4), maxLines: 1, overflow: TextOverflow.ellipsis),
               ]),
             ),
-          ),
+          )),
         ),
         // large, labelled like target - no gesture required
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () => NameMatchStore.instance.like(n.name),
           behavior: HitTestBehavior.opaque,
           child: Semantics(
@@ -360,7 +361,7 @@ class _NameListScreenState extends State<NameListScreen> {
               ),
             ),
           ),
-        ),
+        )),
         const SizedBox(width: 6),
       ]),
     );

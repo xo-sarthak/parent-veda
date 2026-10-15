@@ -39,6 +39,7 @@ import '../../ttc/ttc_daily_data.dart';
 import '../../ttc/ttc_read_store.dart';
 import 'ttc_common.dart';
 import 'ttc_strings.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// The three reading surfaces. Sepia is not decoration - it is the one most
 /// people actually keep, and dark is what a phone at 11pm needs.
@@ -335,7 +336,7 @@ class _TtcInsightScreenState extends State<TtcInsightScreen> {
                 Row(children: [
                   for (final m in TtcReadMode.values) ...[
                     Expanded(
-                      child: GestureDetector(
+                      child: PvPress(child: GestureDetector(
                         onTap: () {
                           setSheet(() {});
                           setState(() => _mode = m);
@@ -359,7 +360,7 @@ class _TtcInsightScreenState extends State<TtcInsightScreen> {
                                   color: _ReadPalette.of(m).ink,
                                   w: FontWeight.w700)),
                         ),
-                      ),
+                      )),
                     ),
                     if (m != TtcReadMode.values.last)
                       const SizedBox(width: 10),
@@ -392,14 +393,14 @@ class _TopBar extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(ttcGutter, 6, ttcGutter, 10),
       child: Row(children: [
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: onBack,
           behavior: HitTestBehavior.opaque,
           child: Padding(
             padding: const EdgeInsets.only(right: 12, top: 4, bottom: 4),
             child: Icon(Icons.arrow_back_rounded, size: 22, color: p.ink),
           ),
-        ),
+        )),
         const Spacer(),
         _icon(saved ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
             onSave),
@@ -409,14 +410,14 @@ class _TopBar extends StatelessWidget {
     );
   }
 
-  Widget _icon(IconData i, VoidCallback onTap) => GestureDetector(
+  Widget _icon(IconData i, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Padding(
           padding: const EdgeInsets.all(8),
           child: Icon(i, size: 21, color: p.ink),
         ),
-      );
+      ));
 }
 
 // ---- read next --------------------------------------------------------------
@@ -449,7 +450,7 @@ class _ReadNext extends StatelessWidget {
       ttcEyebrow(t.readNext, color: p.soft),
       const SizedBox(height: 12),
       for (final i in next) ...[
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () => Navigator.of(context).pushReplacement(
             MaterialPageRoute<void>(
               builder: (_) => TtcInsightScreen(insight: i),
@@ -486,7 +487,7 @@ class _ReadNext extends StatelessWidget {
               Icon(Icons.chevron_right_rounded, size: 20, color: p.soft),
             ]),
           ),
-        ),
+        )),
       ],
     ]);
   }

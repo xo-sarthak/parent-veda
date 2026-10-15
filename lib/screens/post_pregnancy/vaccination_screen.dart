@@ -17,6 +17,7 @@ import 'pp_common.dart';
 import 'vaccination_compare_screen.dart';
 import 'vaccine_detail_screen.dart';
 import 'vaccine_learn_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // Local status palette (green = free/done, brown = private-cost).
 const Color _green = Color(0xFF1F8A5B);
@@ -97,7 +98,7 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
 
           // educational insight
           const SizedBox(height: 14),
-          _pad(GestureDetector(
+          _pad(PvPress(child: GestureDetector(
             onTap: () => _push(const VaccineLearnScreen()),
             behavior: HitTestBehavior.opaque,
             child: Container(
@@ -114,13 +115,13 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
                 ),
               ]),
             ),
-          )),
+          ))),
 
           // DUE THIS MONTH
           const SizedBox(height: 28),
           _pad(_railLabel('Due this month', color: ppPurple)),
           const SizedBox(height: 14),
-          _pad(GestureDetector(
+          _pad(PvPress(child: GestureDetector(
             onTap: () => _push(const VaccineDetailScreen()),
             behavior: HitTestBehavior.opaque,
             child: Container(
@@ -158,15 +159,15 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
                 ]),
               ]),
             ),
-          )),
+          ))),
 
           // timeline
           const SizedBox(height: 26),
-          _pad(_railLabel('His timeline', color: ppSoft, trailing: GestureDetector(
+          _pad(_railLabel('His timeline', color: ppSoft, trailing: PvPress(child: GestureDetector(
             onTap: () => _push(const VaccinationCompareScreen()),
             behavior: HitTestBehavior.opaque,
             child: Text('Compare all →', style: ppBody(12, color: ppPurple, w: FontWeight.w700)),
-          ))),
+          )))),
           const SizedBox(height: 14),
           _pad(Column(children: [
             _timelineRow('MMR-1 · MR', 'at 9 months · upcoming'),
@@ -177,7 +178,7 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
           _pad(Container(
             decoration: const BoxDecoration(border: Border(top: BorderSide(color: ppHair), bottom: BorderSide(color: ppHair))),
             child: Column(children: [
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: () => setState(() => _showCompleted = !_showCompleted),
                 behavior: HitTestBehavior.opaque,
                 child: Padding(
@@ -199,7 +200,7 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
                     ),
                   ]),
                 ),
-              ),
+              )),
               if (_showCompleted)
                 Padding(
                   padding: const EdgeInsets.only(bottom: 12),
@@ -212,7 +213,7 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
 
           // export
           const SizedBox(height: 18),
-          _pad(GestureDetector(
+          _pad(PvPress(child: GestureDetector(
             onTap: () => _push(const DoctorRecordScreen()),
             behavior: HitTestBehavior.opaque,
             child: Container(
@@ -237,7 +238,7 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
                 const Text('→', style: TextStyle(color: Color(0xFFC7BBD6))),
               ]),
             ),
-          )),
+          ))),
 
           const SizedBox(height: 22),
           _pad(Text(
@@ -278,7 +279,7 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
         child: Text(t, style: ppBody(11, color: fg, w: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis),
       );
 
-  Widget _timelineRow(String title, String sub, {bool last = false}) => GestureDetector(
+  Widget _timelineRow(String title, String sub, {bool last = false}) => PvPress(child: GestureDetector(
         onTap: () => _push(const VaccineDetailScreen()),
         behavior: HitTestBehavior.opaque,
         child: IntrinsicHeight(
@@ -304,7 +305,7 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
             ),
           ]),
         ),
-      );
+      ));
 }
 
 class _CompletedRow extends StatelessWidget {

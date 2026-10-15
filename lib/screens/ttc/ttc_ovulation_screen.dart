@@ -68,6 +68,7 @@ import 'ttc_today_screen.dart' show logTtcPeriod;
 import 'ttc_tool_chrome.dart';
 import 'ttc_tools_screen.dart' show ttcToolById;
 import 'ttc_treatment_screen.dart' show TtcTreatmentEntryCard;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // ---- the keys: the daily log's own, never a second truth ----------------------
 
@@ -870,7 +871,7 @@ class _CycleStrip extends StatelessWidget {
                           : ''}',
                   excludeSemantics: true,
                   onTap: () => onPick(d),
-                  child: GestureDetector(
+                  child: PvPress(child: GestureDetector(
                     key: ValueKey('ttc_ov_day_$cd'),
                     behavior: HitTestBehavior.opaque,
                     onTap: () => onPick(d),
@@ -939,7 +940,7 @@ class _CycleStrip extends StatelessWidget {
                         ],
                       ),
                     ),
-                  ),
+                  )),
                 );
               },
             ),

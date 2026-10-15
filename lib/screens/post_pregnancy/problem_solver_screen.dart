@@ -19,6 +19,7 @@ import '../brackets/hub/hub_intent_art.dart' show IntentMark;
 import '../doors/pv_list_row.dart';
 import '../pregnancy/preg_tool_chrome.dart';
 import '../products/pv_store_chrome.dart' show pvStorePalette;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class ProblemSolverScreen extends StatefulWidget {
   const ProblemSolverScreen({super.key});
@@ -226,7 +227,7 @@ class _ProblemSolverScreenState extends State<ProblemSolverScreen> {
 
   Widget _needRow(FindHelpNeed need, {bool top = false, bool bottom = false}) {
     final count = expertsForNeed(need.category).length;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _openNeed(need),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -257,11 +258,11 @@ class _ProblemSolverScreenState extends State<ProblemSolverScreen> {
           const Text('→', style: TextStyle(color: ppMuted)),
         ]),
       ),
-    );
+    ));
   }
 
   Widget _expertRow(Expert e, {bool top = false, bool bottom = false}) {
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _openProfile(e),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -301,6 +302,6 @@ class _ProblemSolverScreenState extends State<ProblemSolverScreen> {
           const Text('→', style: TextStyle(color: ppMuted)),
         ]),
       ),
-    );
+    ));
   }
 }

@@ -36,6 +36,7 @@ import 'ttc_common.dart';
 import 'ttc_strings.dart';
 import 'ttc_tool_chrome.dart'
     show TtcHeroFieldCard, TtcHeroFieldTag, ttcChapterFieldHue;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// Which of the three faces of a chapter to open on.
 enum TtcChapterTab { me, us, next }
@@ -254,7 +255,7 @@ class _Tabs extends StatelessWidget {
       child: Row(children: [
         for (final tab in TtcChapterTab.values)
           Expanded(
-            child: GestureDetector(
+            child: PvPress(child: GestureDetector(
               onTap: () => onChanged(tab),
               behavior: HitTestBehavior.opaque,
               child: AnimatedContainer(
@@ -271,7 +272,7 @@ class _Tabs extends StatelessWidget {
                         color: tab == active ? ttcTitleInk : ttcSoft,
                         w: FontWeight.w800)),
               ),
-            ),
+            )),
           ),
       ]),
     );
@@ -392,7 +393,7 @@ class _AskVedaCard extends StatelessWidget {
         ]),
         const SizedBox(height: 13),
         for (var i = 0; i < questions.length; i++) ...[
-          GestureDetector(
+          PvPress(child: GestureDetector(
             // Opens the TTC Ask Veda with this question already running.
             onTap: () => openTtcAskVeda(context, initialQuery: questions[i]),
             behavior: HitTestBehavior.opaque,
@@ -414,7 +415,7 @@ class _AskVedaCard extends StatelessWidget {
                     size: 15, color: ttcTitleInk),
               ]),
             ),
-          ),
+          )),
           if (i < questions.length - 1) const SizedBox(height: 9),
         ],
       ]),

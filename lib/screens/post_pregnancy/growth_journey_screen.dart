@@ -27,6 +27,7 @@ import '../pregnancy/preg_tool_chrome.dart';
 import '../products/pv_store_chrome.dart' show PvCommit, pvStorePalette;
 import '../v2/v2_palette.dart';
 import 'pp_care_parts.dart' show ppCareHeading, ppCareChoices;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// The shared tool shell for Growth (2026-10-07). False draws the old page.
 const bool kPpGrowthShell = true;
@@ -449,11 +450,11 @@ class _GrowthJourneyScreenState extends State<GrowthJourneyScreen> {
           ]),
         ),
         const SizedBox(width: 8),
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () => ppConfirmRemove(context, 'Remove this measurement?', () => _store.remove(m.id)),
           behavior: HitTestBehavior.opaque,
           child: const Padding(padding: EdgeInsets.only(left: 4), child: Icon(Icons.delete_outline_rounded, size: 20, color: ppMuted)),
-        ),
+        )),
       ]),
     );
   }
@@ -474,7 +475,7 @@ class _GrowthJourneyScreenState extends State<GrowthJourneyScreen> {
         Text('Just the latest figures — we\'ll place them on the curve and update everything for you.', style: ppBody(13, h: 1.55)),
         const SizedBox(height: 16),
         ppFieldLabel('Measured on'),
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () async {
             final picked = await showDatePicker(
               context: context,
@@ -495,7 +496,7 @@ class _GrowthJourneyScreenState extends State<GrowthJourneyScreen> {
               Text('${date.day} ${ppMonthsShort[date.month - 1]} ${date.year}', style: ppBody(14, color: ppInk, w: FontWeight.w600)),
             ]),
           ),
-        ),
+        )),
         Row(children: [
           Expanded(child: _decimalField(weight, 'Weight (kg)')),
           const SizedBox(width: 12),

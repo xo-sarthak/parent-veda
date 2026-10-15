@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'article_archive_screen.dart';
 import 'pp_common.dart';
 import 'pp_names_data.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class NameDetailScreen extends StatefulWidget {
   const NameDetailScreen({super.key, this.name = 'Aarav'});
@@ -47,7 +48,7 @@ class _NameDetailScreenState extends State<NameDetailScreen> {
           children: [
             // top bar: back + heart
             _pad(Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: () => Navigator.of(context).maybePop(),
                 behavior: HitTestBehavior.opaque,
                 child: Container(
@@ -57,8 +58,8 @@ class _NameDetailScreenState extends State<NameDetailScreen> {
                   decoration: const BoxDecoration(color: ppPanel, shape: BoxShape.circle),
                   child: const Icon(Icons.arrow_back, size: 17, color: ppInk),
                 ),
-              ),
-              GestureDetector(
+              )),
+              PvPress(child: GestureDetector(
                 onTap: () => _toggleLike(n),
                 behavior: HitTestBehavior.opaque,
                 child: Container(
@@ -68,7 +69,7 @@ class _NameDetailScreenState extends State<NameDetailScreen> {
                   decoration: const BoxDecoration(color: ppCoralTint, shape: BoxShape.circle),
                   child: Icon(liked ? Icons.favorite : Icons.favorite_border, size: 16, color: ppCoral),
                 ),
-              ),
+              )),
             ])),
 
             // name hero
@@ -78,7 +79,7 @@ class _NameDetailScreenState extends State<NameDetailScreen> {
             Center(child: Text(n.script, style: ppFraunces(24, color: ppPurple, h: 1.1))),
             const SizedBox(height: 14),
             Center(
-              child: GestureDetector(
+              child: PvPress(child: GestureDetector(
                 onTap: () => ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Pronunciation audio - coming soon'), behavior: SnackBarBehavior.floating),
                 ),
@@ -92,7 +93,7 @@ class _NameDetailScreenState extends State<NameDetailScreen> {
                     Text(n.pron, style: ppBody(13, color: ppInk, w: FontWeight.w600)),
                   ]),
                 ),
-              ),
+              )),
             ),
 
             // popularity trend
@@ -171,7 +172,7 @@ class _NameDetailScreenState extends State<NameDetailScreen> {
 
             // learn
             const SizedBox(height: 22),
-            _pad(GestureDetector(
+            _pad(PvPress(child: GestureDetector(
               onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const ArticleArchiveScreen())),
               behavior: HitTestBehavior.opaque,
               child: Container(
@@ -191,7 +192,7 @@ class _NameDetailScreenState extends State<NameDetailScreen> {
                   const Text('→', style: TextStyle(color: ppMuted)),
                 ]),
               ),
-            )),
+            ))),
 
             const SizedBox(height: 20),
             _pad(Text('Meaning verified by our language reviewers. Numerology (Chaldean) offered as tradition, not a claim.',
@@ -243,7 +244,7 @@ class _NameDetailScreenState extends State<NameDetailScreen> {
         ),
       );
 
-  Widget _similarCard((String, String) s) => GestureDetector(
+  Widget _similarCard((String, String) s) => PvPress(child: GestureDetector(
         onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => NameDetailScreen(name: s.$1))),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -255,5 +256,5 @@ class _NameDetailScreenState extends State<NameDetailScreen> {
             Text(s.$2, style: ppBody(11, color: ppMuted)),
           ]),
         ),
-      );
+      ));
 }

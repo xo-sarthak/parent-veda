@@ -14,6 +14,7 @@ import 'journal_settings_screens.dart';
 import 'journal_storybook_screens.dart';
 import 'jv2_common.dart';
 import 'jv2_data.dart';
+import '../../../widgets/pv_feedback.dart' show PvPress;
 
 // ---- Welcome ----------------------------------------------------------------
 class JournalWelcomeScreen extends StatelessWidget {
@@ -28,7 +29,7 @@ class JournalWelcomeScreen extends StatelessWidget {
           child: Column(children: [
             Align(
               alignment: Alignment.centerLeft,
-              child: GestureDetector(onTap: () => Navigator.of(context).maybePop(), child: const Icon(Icons.arrow_back, size: 22, color: ppInk)),
+              child: PvPress(child: GestureDetector(onTap: () => Navigator.of(context).maybePop(), child: const Icon(Icons.arrow_back, size: 22, color: ppInk))),
             ),
             const Spacer(),
             const JvPhoto(seed: 0, height: 220, width: 220, radius: 110),
@@ -115,7 +116,7 @@ class JournalV2Home extends StatelessWidget {
 
             // continue reading
             const SizedBox(height: 22),
-            jvPad(GestureDetector(
+            jvPad(PvPress(child: GestureDetector(
               onTap: () => _push(context, const StorybookReaderScreen(startPage: 9)),
               behavior: HitTestBehavior.opaque,
               child: Container(
@@ -141,16 +142,16 @@ class JournalV2Home extends StatelessWidget {
                   const JvBookCover(width: 72, height: 96),
                 ]),
               ),
-            )),
+            ))),
 
             // recent moments
             const SizedBox(height: 26),
             jvPad(Row(children: [
               Expanded(child: Text('Recent moments', style: ppJakarta(18))),
-              GestureDetector(onTap: () => _push(context, const TimelineScreen()), behavior: HitTestBehavior.opaque, child: Text('View all', style: ppBody(12, color: ppPurple, w: FontWeight.w700))),
+              PvPress(child: GestureDetector(onTap: () => _push(context, const TimelineScreen()), behavior: HitTestBehavior.opaque, child: Text('View all', style: ppBody(12, color: ppPurple, w: FontWeight.w700)))),
             ])),
             const SizedBox(height: 14),
-            jvPad(GestureDetector(
+            jvPad(PvPress(child: GestureDetector(
               onTap: () => openMemory(context, jvFeatured),
               behavior: HitTestBehavior.opaque,
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -171,13 +172,13 @@ class JournalV2Home extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text('${jvFeatured.title} · ${jvFeatured.date}', style: ppBody(12, color: ppMuted)),
               ]),
-            )),
+            ))),
             const SizedBox(height: 14),
             for (final m in jvMemories.skip(1).take(2)) jvPad(_miniRow(context, m)),
 
             // keepsake storybook
             const SizedBox(height: 22),
-            jvPad(GestureDetector(
+            jvPad(PvPress(child: GestureDetector(
               onTap: () => _push(context, const StorybookLibraryScreen()),
               behavior: HitTestBehavior.opaque,
               child: Container(
@@ -204,7 +205,7 @@ class JournalV2Home extends StatelessWidget {
                   const JvBookCover(width: 64, height: 86),
                 ]),
               ),
-            )),
+            ))),
 
             const SizedBox(height: 22),
             jvPad(Text('Capture today. Cherish forever.', textAlign: TextAlign.center, style: ppBody(12, color: ppMuted))),
@@ -251,7 +252,7 @@ class JournalV2Home extends StatelessWidget {
     );
   }
 
-  Widget _iconBtn(IconData icon, VoidCallback onTap) => GestureDetector(
+  Widget _iconBtn(IconData icon, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -261,9 +262,9 @@ class JournalV2Home extends StatelessWidget {
           decoration: const BoxDecoration(color: ppPanel, shape: BoxShape.circle),
           child: Icon(icon, size: 19, color: ppInk),
         ),
-      );
+      ));
 
-  Widget _miniRow(BuildContext context, JvMemory m) => GestureDetector(
+  Widget _miniRow(BuildContext context, JvMemory m) => PvPress(child: GestureDetector(
         onTap: () => openMemory(context, m),
         behavior: HitTestBehavior.opaque,
         child: Padding(
@@ -281,5 +282,5 @@ class JournalV2Home extends StatelessWidget {
             const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
           ]),
         ),
-      );
+      ));
 }

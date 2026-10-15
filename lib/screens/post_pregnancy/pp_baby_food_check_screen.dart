@@ -55,6 +55,7 @@ import '../can_i/can_i_widgets.dart' show canIVerdictColor;
 import '../pregnancy/preg_tool_chrome.dart';
 import '../products/pv_store_chrome.dart' show PvSecondary;
 import '../doors/pv_list_row.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 enum _Verdict { yes, notYet, avoid }
 
@@ -2531,7 +2532,7 @@ class _AgeChip extends StatelessWidget {
             _body(context, V2PaletteStore.instance.current),
       );
 
-  Widget _body(BuildContext context, V2Palette p) => GestureDetector(
+  Widget _body(BuildContext context, V2Palette p) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -2548,5 +2549,5 @@ class _AgeChip extends StatelessWidget {
                       selected ? FontWeight.w800 : FontWeight.w600,
                   color: selected ? Colors.white : p.ink2)),
         ),
-      );
+      ));
 }

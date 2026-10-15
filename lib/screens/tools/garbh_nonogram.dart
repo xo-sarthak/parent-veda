@@ -28,6 +28,7 @@ import '../../services/pregnancy_controller.dart';
 import '../../theme/pv_fonts.dart';
 import 'games/game_chrome.dart';
 import 'games/nonogram_engine.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class LogicGame extends StatefulWidget {
   const LogicGame(
@@ -237,7 +238,7 @@ class _LogicGameState extends State<LogicGame> {
 
   Widget _cellBox(int i, double cell) {
     final m = _marks[i];
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _tap(i),
       child: Container(
         width: cell,
@@ -252,6 +253,6 @@ class _LogicGameState extends State<LogicGame> {
                 size: cell * 0.5, color: kGameMuted.withValues(alpha: 0.7))
             : null,
       ),
-    );
+    ));
   }
 }

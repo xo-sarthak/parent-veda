@@ -45,6 +45,7 @@ import 'booking_models.dart';
 import 'call_screen.dart';
 import 'call_session.dart';
 import 'group_call_screen.dart';
+import '../widgets/pv_feedback.dart' show PvPress;
 
 const _bg = Color(0xFF0E0D12);
 const _panel = Color(0xFF17151E);
@@ -414,7 +415,7 @@ class _CallPrejoinScreenState extends State<CallPrejoinScreen> {
       Padding(
         padding: const EdgeInsets.fromLTRB(18, 10, 18, 0),
         child: Row(children: [
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => Navigator.of(context).maybePop(),
             behavior: HitTestBehavior.opaque,
             child: const Padding(
@@ -422,7 +423,7 @@ class _CallPrejoinScreenState extends State<CallPrejoinScreen> {
               child: Icon(Icons.arrow_back_rounded,
                   color: Colors.white70, size: 22),
             ),
-          ),
+          )),
           const SizedBox(width: 6),
           Expanded(
             child: Text('Ready to join',
@@ -519,7 +520,7 @@ class _CallPrejoinScreenState extends State<CallPrejoinScreen> {
       Semantics(
         button: true,
         label: label,
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -537,13 +538,13 @@ class _CallPrejoinScreenState extends State<CallPrejoinScreen> {
             Text(label,
                 style: const TextStyle(color: Colors.white54, fontSize: 11.5)),
           ]),
-        ),
+        )),
       );
 
   Widget _wideButton(String label, VoidCallback? onTap) => Semantics(
         button: true,
         label: label,
-        child: GestureDetector(
+        child: PvPress(enabled: onTap != null, child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: Opacity(
@@ -561,10 +562,10 @@ class _CallPrejoinScreenState extends State<CallPrejoinScreen> {
                       fontWeight: FontWeight.w700)),
             ),
           ),
-        ),
+        )),
       );
 
-  Widget _quietButton(String label, VoidCallback onTap) => GestureDetector(
+  Widget _quietButton(String label, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Padding(
@@ -572,7 +573,7 @@ class _CallPrejoinScreenState extends State<CallPrejoinScreen> {
           child: Text(label,
               style: const TextStyle(color: Colors.white54, fontSize: 13.5)),
         ),
-      );
+      ));
 
   String? _startsIn() {
     final s = widget.startsUtc ?? _join?.startsUtc;

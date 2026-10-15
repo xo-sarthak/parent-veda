@@ -53,6 +53,7 @@ import 'doors/ttc_tab_art.dart';
 import 'ttc_common.dart';
 import 'ttc_tool_hues.dart';
 import 'ttc_tool_marks.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// Hairline card: white, one line, the stage's card radius.
 BoxDecoration precheckCard(V2Palette p) => BoxDecoration(
@@ -200,7 +201,7 @@ class PrecheckTick extends StatelessWidget {
       checked: done,
       label: done ? 'Done: $title. Tap to take it off' : 'Mark $title done',
       excludeSemantics: true,
-      child: GestureDetector(
+      child: PvPress(child: GestureDetector(
         onTap: () {
           HapticFeedback.selectionClick();
           onTap();
@@ -252,7 +253,7 @@ class PrecheckTick extends StatelessWidget {
             ),
           ),
         ),
-      ),
+      )),
     );
   }
 }

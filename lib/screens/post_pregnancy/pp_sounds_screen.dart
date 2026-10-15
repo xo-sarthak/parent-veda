@@ -38,6 +38,7 @@ import '../../theme/pv_fonts.dart';
 import '../v2/v2_palette.dart';
 import 'pp_content.dart';
 import 'pp_sounds_data.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class PpSoundsScreen extends StatefulWidget {
   const PpSoundsScreen({super.key});
@@ -188,7 +189,7 @@ class _TimerRow extends StatelessWidget {
           Row(children: [
             for (final (label, d) in _options) ...[
               Expanded(
-                child: GestureDetector(
+                child: PvPress(child: GestureDetector(
                   onTap: () => onPick(d),
                   behavior: HitTestBehavior.opaque,
                   child: Container(
@@ -221,7 +222,7 @@ class _TimerRow extends StatelessWidget {
                             height: 1.55,
                             color: current == d ? Colors.white : p.ink2)),
                   ),
-                ),
+                )),
               ),
               if (label != _options.last.$1) const SizedBox(width: 7),
             ],
@@ -369,7 +370,7 @@ class _NowPlaying extends StatelessWidget {
           border: Border(top: BorderSide(color: p.line)),
         ),
         child: Row(children: [
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: onToggle,
             child: Container(
               width: 44,
@@ -385,7 +386,7 @@ class _NowPlaying extends StatelessWidget {
                   color: p.surface,
                   size: 24),
             ),
-          ),
+          )),
           const SizedBox(width: 13),
           Expanded(
             child: Column(
@@ -401,14 +402,14 @@ class _NowPlaying extends StatelessWidget {
                 ]),
           ),
           const SizedBox(width: 8),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: onStop,
             behavior: HitTestBehavior.opaque,
             child: Padding(
               padding: const EdgeInsets.all(8),
               child: Icon(Icons.close_rounded, size: 20, color: p.ink3),
             ),
-          ),
+          )),
         ]),
       );
   }

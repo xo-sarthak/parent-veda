@@ -17,6 +17,7 @@ import 'name_journey_shortlist_screen.dart';
 import 'pp_common.dart';
 import 'pp_names_data.dart';
 import 'pp_names_v2_data.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class NameJourneyDetailScreen extends StatelessWidget {
   const NameJourneyDetailScreen({super.key, required this.name});
@@ -133,7 +134,7 @@ class NameJourneyDetailScreen extends StatelessWidget {
                 final liked = NameMatchStore.instance.isLiked(n.name);
                 return Row(children: [
                   Expanded(
-                    child: GestureDetector(
+                    child: PvPress(child: GestureDetector(
                       onTap: () => NameMatchStore.instance.like(n.name),
                       behavior: HitTestBehavior.opaque,
                       child: Container(
@@ -146,11 +147,11 @@ class NameJourneyDetailScreen extends StatelessWidget {
                           Flexible(child: Text(liked ? 'In your shortlist' : 'Add to shortlist', maxLines: 1, overflow: TextOverflow.ellipsis, style: ppBody(14, color: ppPurple, w: FontWeight.w700))),
                         ]),
                       ),
-                    ),
+                    )),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: GestureDetector(
+                    child: PvPress(child: GestureDetector(
                       onTap: () {
                         NameMatchStore.instance.crown(n.name);
                         _push(context, NameChosenScreen(name: n.name));
@@ -162,7 +163,7 @@ class NameJourneyDetailScreen extends StatelessWidget {
                         decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(15), boxShadow: const [BoxShadow(color: Color(0x8C6A30B6), blurRadius: 24, spreadRadius: -10, offset: Offset(0, 10))]),
                         child: Text('Choose this name', style: ppBody(14, color: Colors.white, w: FontWeight.w700)),
                       ),
-                    ),
+                    )),
                   ),
                 ]);
               },
@@ -187,7 +188,7 @@ class NameJourneyDetailScreen extends StatelessWidget {
         child: Text(t, maxLines: 1, overflow: TextOverflow.ellipsis, style: ppBody(10.5, color: fg, w: FontWeight.w700)),
       );
 
-  Widget _fact(String label, String value, {VoidCallback? onTap}) => GestureDetector(
+  Widget _fact(String label, String value, {VoidCallback? onTap}) => PvPress(enabled: onTap != null, child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -202,7 +203,7 @@ class NameJourneyDetailScreen extends StatelessWidget {
             Text(value, style: ppJakarta(14).copyWith(height: 1.25), maxLines: 2, overflow: TextOverflow.ellipsis),
           ]),
         ),
-      );
+      ));
 
   // The detailed "ParentVeda's perspective" - now the home for the removed
   // mythology/history + nakshatra content, woven together.
@@ -251,7 +252,7 @@ class NameJourneyDetailScreen extends StatelessWidget {
         ),
       ]);
 
-  Widget _linkChip(BuildContext context, String otherName) => GestureDetector(
+  Widget _linkChip(BuildContext context, String otherName) => PvPress(child: GestureDetector(
         onTap: () => _push(context, NameJourneyDetailScreen(name: otherName)),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -263,6 +264,6 @@ class NameJourneyDetailScreen extends StatelessWidget {
             const Icon(Icons.arrow_forward, size: 13, color: ppPurple),
           ]),
         ),
-      );
+      ));
 
 }

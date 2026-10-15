@@ -30,6 +30,7 @@ import 'package:flutter/material.dart';
 import '../../theme/pv_fonts.dart';
 import '../v2/v2_palette.dart';
 import 'pp_content.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class PpInteractiveScreen extends StatefulWidget {
   const PpInteractiveScreen({super.key, required this.block, this.onPage});
@@ -151,7 +152,7 @@ class _PpInteractiveScreenState extends State<PpInteractiveScreen> {
   Widget _nightBody(
       BuildContext context, Color ink, Color ink2, Color accent) {
     final item = _onClosing ? null : b.items[_index];
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: _advance,
       child: Stack(children: [
@@ -215,7 +216,7 @@ class _PpInteractiveScreenState extends State<PpInteractiveScreen> {
             ),
           ),
       ]),
-    );
+    ));
   }
 
   // ---- checklist: done / not yet, then the fix list --------------------------
@@ -383,7 +384,7 @@ class _Pill extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -398,5 +399,5 @@ class _Pill extends StatelessWidget {
               style: pvManrope(
                   fontSize: 14, fontWeight: FontWeight.w800, color: ink)),
         ),
-      );
+      ));
 }

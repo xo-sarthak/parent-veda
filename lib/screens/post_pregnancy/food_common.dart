@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 
 import 'pp_common.dart';
 import 'pp_food_data.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // Warm, food-friendly tints, varied by seed.
 const List<(Color, Color)> _kFoodTints = [
@@ -102,7 +103,7 @@ Widget foodSectionHeader(String title, {String? action, VoidCallback? onAction})
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Expanded(child: Text(title, style: ppJakarta(18))),
-        if (action != null) GestureDetector(onTap: onAction, behavior: HitTestBehavior.opaque, child: ppSeeAll(action)),
+        if (action != null) PvPress(enabled: onAction != null, child: GestureDetector(onTap: onAction, behavior: HitTestBehavior.opaque, child: ppSeeAll(action))),
       ],
     );
 
@@ -120,7 +121,7 @@ class FoodRailCard extends StatelessWidget {
   final double width;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: SizedBox(
@@ -133,7 +134,7 @@ class FoodRailCard extends StatelessWidget {
             foodMeta(recipe),
           ]),
         ),
-      );
+      ));
 }
 
 /// A wide list card (thumb left, text right). [warm] tints the subtitle for the
@@ -145,7 +146,7 @@ class FoodListCard extends StatelessWidget {
   final bool warm;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Padding(
@@ -164,5 +165,5 @@ class FoodListCard extends StatelessWidget {
             ),
           ]),
         ),
-      );
+      ));
 }

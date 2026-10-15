@@ -16,6 +16,7 @@ import 'askveda_screen.dart';
 import 'pp_common.dart';
 import 'product_detail_screen.dart';
 import 'vaccine_learn_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 const Color _green = Color(0xFF1F8A5B);
 const Color _flagBg = Color(0xFFFFF0F3);
@@ -161,7 +162,7 @@ class VaccineDetailScreen extends StatelessWidget {
             ),
             child: Row(children: [
               Expanded(
-                child: GestureDetector(
+                child: PvPress(child: GestureDetector(
                   onTap: () => _snack(context, 'Marked as done'),
                   behavior: HitTestBehavior.opaque,
                   child: Container(
@@ -174,10 +175,10 @@ class VaccineDetailScreen extends StatelessWidget {
                     ),
                     child: Text('Mark as done', style: ppBody(15, color: Colors.white, w: FontWeight.w700)),
                   ),
-                ),
+                )),
               ),
               const SizedBox(width: 12),
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: () => _reminderSheet(context),
                 behavior: HitTestBehavior.opaque,
                 child: Container(
@@ -187,7 +188,7 @@ class VaccineDetailScreen extends StatelessWidget {
                   decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: ppLine)),
                   child: const Icon(Icons.notifications_none_rounded, size: 22, color: ppInk),
                 ),
-              ),
+              )),
             ]),
           ),
         ),
@@ -240,7 +241,7 @@ class VaccineDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _reminderOption(String label, String date, VoidCallback onTap) => GestureDetector(
+  Widget _reminderOption(String label, String date, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -254,7 +255,7 @@ class VaccineDetailScreen extends StatelessWidget {
             Text(date, style: ppBody(12.5, color: ppMuted)),
           ]),
         ),
-      );
+      ));
 
   Widget _fact(String big, String small, Color bigColor) => Expanded(
         child: Container(
@@ -275,7 +276,7 @@ class VaccineDetailScreen extends StatelessWidget {
         Expanded(child: Text(t, style: ppBody(14, color: ppInk, h: 1.5))),
       ]);
 
-  Widget _productCard(BuildContext context, (String, String) p) => GestureDetector(
+  Widget _productCard(BuildContext context, (String, String) p) => PvPress(child: GestureDetector(
         onTap: () => _push(context, const ProductDetailScreen()),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -290,10 +291,10 @@ class VaccineDetailScreen extends StatelessWidget {
             Text(p.$2, style: ppBody(12, color: ppInk, w: FontWeight.w700)),
           ]),
         ),
-      );
+      ));
 
   Widget _crossLink(BuildContext context, String pill, String text, Widget screen, {bool top = false, bool bottom = false}) =>
-      GestureDetector(
+      PvPress(child: GestureDetector(
         onTap: () => _push(context, screen),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -318,5 +319,5 @@ class VaccineDetailScreen extends StatelessWidget {
             const Text('→', style: TextStyle(color: ppMuted)),
           ]),
         ),
-      );
+      ));
 }

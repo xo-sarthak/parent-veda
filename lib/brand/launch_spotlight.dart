@@ -25,6 +25,7 @@ import 'brand_studio.dart';
 import 'launch_hub_screen.dart';
 import '../theme/pv_fonts.dart';
 import '../localization/app_language.dart';
+import '../widgets/pv_feedback.dart' show PvPress;
 
 class LaunchSpotlight extends StatefulWidget {
   const LaunchSpotlight({
@@ -75,7 +76,7 @@ class _LaunchSpotlightState extends State<LaunchSpotlight> {
     final brand = c.brand;
     return Padding(
       padding: widget.padding,
-      child: GestureDetector(
+      child: PvPress(child: GestureDetector(
         onTap: () => _open(c),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -146,7 +147,7 @@ class _LaunchSpotlightState extends State<LaunchSpotlight> {
             ),
           ]),
         ),
-      ),
+      )),
     );
   }
 }

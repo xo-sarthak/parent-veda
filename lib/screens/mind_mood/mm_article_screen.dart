@@ -22,6 +22,7 @@ import '../v2/v2_palette.dart';
 import 'mm_talk_tab.dart' show showCounsellingBookingSheet;
 import '../../data/reads/read_adapters.dart';
 import '../reader/pv_reader_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class MmArticleScreen extends StatelessWidget {
   const MmArticleScreen({
@@ -177,7 +178,7 @@ class _LinkRow extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Row(children: [
@@ -188,7 +189,7 @@ class _LinkRow extends StatelessWidget {
           ),
           Icon(Icons.chevron_right_rounded, size: 20, color: p.ink1),
         ]),
-      );
+      ));
 }
 
 class _StructuredBlock extends StatelessWidget {

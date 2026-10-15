@@ -57,6 +57,7 @@ import '../widgets/figure_highlight.dart';
 import 'doors/pv_door_chrome.dart';
 import 'garbh_screen.dart' show KriyaStopIfCard;
 import 'v2/v2_palette.dart';
+import '../widgets/pv_feedback.dart' show PvPress;
 
 /// The file every Shravan track plays today. See the header.
 const String _kShravanAsset = 'audio/raga_drone.wav';
@@ -402,7 +403,7 @@ class _Chip extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         onTap: onTap,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
@@ -417,7 +418,7 @@ class _Chip extends StatelessWidget {
                   fontWeight: FontWeight.w700,
                   color: selected ? ink : p.ink2)),
         ),
-      );
+      ));
 }
 
 class _Pill extends StatelessWidget {
@@ -432,7 +433,7 @@ class _Pill extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -450,5 +451,5 @@ class _Pill extends StatelessWidget {
                   fontWeight: FontWeight.w700,
                   color: strong ? p.ink1 : p.ink2)),
         ),
-      );
+      ));
 }

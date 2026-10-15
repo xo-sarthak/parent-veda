@@ -45,6 +45,7 @@ import '../../services/whatsapp_prefs.dart';
 import '../../doctor/doctor_directory.dart';
 import '../../theme/pv_fonts.dart';
 import '../../localization/app_language.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // ---- Soft-solid palette (from the design) ---------------------------------
 const _bg = Color(0xFFFBF6FE);
@@ -1014,7 +1015,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
   Widget _stageBtn(String title, String sub, String key) {
     final active = _stage == key;
     return Expanded(
-      child: GestureDetector(
+      child: PvPress(child: GestureDetector(
         onTap: () => setState(() => _stage = key),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 180),
@@ -1044,7 +1045,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
                         .withValues(alpha: 0.7))),
           ]),
         ),
-      ),
+      )),
     );
   }
 
@@ -1675,7 +1676,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
               // she starts. Hidden once a code is already applied.
               if (!ReferralStore.instance.hasRedeemed &&
                   !ReferralLinks.hasPending)
-                GestureDetector(
+                PvPress(child: GestureDetector(
                   onTap: () async {
                     final due = _pickedDue;
                     final ok = await showEnterCodeSheet(
@@ -1697,7 +1698,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
                       ),
                     ),
                   ),
-                ),
+                )),
               const SizedBox(height: 12),
               SizedBox(
                 width: 200,
@@ -2087,7 +2088,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
   // "Don't know your due date?" link under the date field → opens the sheet.
   Widget _calcDueLink() => Align(
         alignment: Alignment.centerLeft,
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: _openDueDateCalc,
           behavior: HitTestBehavior.opaque,
           child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -2099,7 +2100,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
                     fontWeight: FontWeight.w700,
                     color: _purple)),
           ]),
-        ),
+        )),
       );
 
   // A sleek bottom sheet that reuses the Due Date Calculator's math (no roadmap,
@@ -2181,7 +2182,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
 
         Widget methodChip(DdcMethod m, String label) {
           final on = method == m;
-          return GestureDetector(
+          return PvPress(child: GestureDetector(
             onTap: () => setSheet(() => method = m),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 9),
@@ -2197,12 +2198,12 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
                       fontWeight: FontWeight.w700,
                       color: on ? const Color(0xFF5B2596) : _muted)),
             ),
-          );
+          ));
         }
 
         Widget pill(int v, String label, int selected, ValueChanged<int> onTap) {
           final on = selected == v;
-          return GestureDetector(
+          return PvPress(child: GestureDetector(
             onTap: () => setSheet(() => onTap(v)),
             child: Container(
               margin: const EdgeInsets.only(right: 8),
@@ -2219,10 +2220,10 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
                       fontWeight: FontWeight.w700,
                       color: on ? Colors.white : _muted)),
             ),
-          );
+          ));
         }
 
-        Widget rnd(IconData icon, VoidCallback onTap) => GestureDetector(
+        Widget rnd(IconData icon, VoidCallback onTap) => PvPress(child: GestureDetector(
               onTap: () => setSheet(onTap),
               child: Container(
                 width: 32,
@@ -2232,7 +2233,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
                     color: _fieldBg, borderRadius: BorderRadius.circular(10)),
                 child: Icon(icon, size: 18, color: _purple),
               ),
-            );
+            ));
 
         Widget stepRow(String l, int v, VoidCallback dec, VoidCallback inc) =>
             Row(children: [
@@ -2522,7 +2523,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
       );
 
   Widget _link(String text, VoidCallback onTap, {required Color color}) =>
-      GestureDetector(
+      PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Padding(
@@ -2531,7 +2532,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
               style: pvJakarta(
                   fontSize: 13, fontWeight: FontWeight.w700, color: color)),
         ),
-      );
+      ));
 
   Widget _footerSwitch(String lead, String action, VoidCallback onTap) =>
       Center(

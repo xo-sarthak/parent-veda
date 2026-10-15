@@ -18,6 +18,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/pv_fonts.dart';
 import '../localization/app_language.dart';
+import '../widgets/pv_feedback.dart' show PvPress;
 
 /// Everything currently flagged. The single list the preview screen renders.
 enum BrandFlag {
@@ -119,7 +120,7 @@ class NeedsAttentionFlag extends StatelessWidget {
     final info = kBrandFlags[flag]!;
     return Padding(
       padding: padding,
-      child: GestureDetector(
+      child: PvPress(child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () => showBrandFlagSheet(context, flag),
         child: Container(
@@ -147,7 +148,7 @@ class NeedsAttentionFlag extends StatelessWidget {
             ),
           ]),
         ),
-      ),
+      )),
     );
   }
 }

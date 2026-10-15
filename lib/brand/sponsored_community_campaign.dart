@@ -19,6 +19,7 @@ import 'brand_disclosure.dart';
 import 'brand_models.dart';
 import 'brand_studio.dart';
 import 'presented_by.dart';
+import '../widgets/pv_feedback.dart' show PvPress;
 
 class SponsoredCommunityCampaign extends StatefulWidget {
   const SponsoredCommunityCampaign({super.key});
@@ -50,7 +51,7 @@ class _SponsoredCommunityCampaignState extends State<SponsoredCommunityCampaign>
     // working correctly — not a gap to fill.
     if (c == null) return const SizedBox.shrink();
 
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
         BrandAnalytics.instance.event(c, BrandEvent.opened);
@@ -87,6 +88,6 @@ class _SponsoredCommunityCampaignState extends State<SponsoredCommunityCampaign>
         const SizedBox(height: 10),
         IndependenceNote(campaign: c),
       ]),
-    );
+    ));
   }
 }

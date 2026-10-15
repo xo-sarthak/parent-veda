@@ -33,6 +33,7 @@ import '../../services/pregnancy_controller.dart';
 import '../../theme/pv_fonts.dart';
 import 'games/game_chrome.dart';
 import 'games/sudoku_engine.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class SudokuGame extends StatefulWidget {
   const SudokuGame(
@@ -244,7 +245,7 @@ class _SudokuGameState extends State<SudokuGame> {
     final sameNumber = v != 0 && _sel != null && _board[_sel!] == v && !sel;
 
     return Expanded(
-      child: GestureDetector(
+      child: PvPress(child: GestureDetector(
         onTap: () => setState(() => _sel = i),
         child: Container(
           decoration: BoxDecoration(
@@ -277,7 +278,7 @@ class _SudokuGameState extends State<SudokuGame> {
                   ? null
                   : _NoteGrid(notes: _notes[i], size: _size),
         ),
-      ),
+      )),
     );
   }
 }
@@ -323,7 +324,7 @@ class _SizeChip extends StatelessWidget {
   final bool selected;
   final VoidCallback onTap;
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         onTap: onTap,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
@@ -338,7 +339,7 @@ class _SizeChip extends StatelessWidget {
                   fontWeight: FontWeight.w700,
                   color: selected ? kGameAccentDeep : kGameInk)),
         ),
-      );
+      ));
 }
 
 class _TextKey extends StatelessWidget {
@@ -346,7 +347,7 @@ class _TextKey extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         onTap: onTap,
         child: Container(
           height: 44,
@@ -360,5 +361,5 @@ class _TextKey extends StatelessWidget {
               style: pvManrope(
                   fontSize: 14, fontWeight: FontWeight.w700, color: kGameInk)),
         ),
-      );
+      ));
 }

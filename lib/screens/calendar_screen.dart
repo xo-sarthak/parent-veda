@@ -44,6 +44,7 @@ import 'products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 import 'v2/v2_palette.dart' show V2Palette;
 import 'weekly_card_stack_screen.dart';
 import '../theme/pv_fonts.dart';
+import '../widgets/pv_feedback.dart' show PvPress;
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key, required this.controller});
@@ -336,7 +337,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
         children: [
           for (int i = 0; i < tabs.length; i++)
             Expanded(
-              child: GestureDetector(
+              child: PvPress(child: GestureDetector(
                 onTap: () => setState(() => _tab = i),
                 behavior: HitTestBehavior.opaque,
                 child: AnimatedContainer(
@@ -353,7 +354,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                           fontWeight: FontWeight.w700,
                           color: _tab == i ? Colors.white : _pal.ink2)),
                 ),
-              ),
+              )),
             ),
         ],
       ),
@@ -384,7 +385,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
         scrollDirection: Axis.horizontal,
         children: [
           for (final c in chips) ...[
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: () => setState(() => _filter = c.$1),
               behavior: HitTestBehavior.opaque,
               child: Container(
@@ -403,7 +404,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         fontWeight: FontWeight.w700,
                         color: _filter == c.$1 ? Colors.white : _pal.ink1)),
               ),
-            ),
+            )),
             const SizedBox(width: 8),
           ],
         ],
@@ -453,7 +454,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
           Expanded(
             child: Padding(
               padding: const EdgeInsets.only(bottom: 10),
-              child: GestureDetector(
+              child: PvPress(child: GestureDetector(
                 onTap: () => _eventSheet(s, e),
                 // A white card with the hairline; "now" wears an ink ring,
                 // not a tint behind its words, and the row leads with the
@@ -512,7 +513,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     ],
                   ),
                 ),
-              ),
+              )),
             ),
           ),
         ],
@@ -658,7 +659,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     final bandRight = inCurrentWeek &&
         (col == 6 ||
             _weekAt(date.add(const Duration(days: 1))) != p.currentWeek);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () {
         setState(() => _selectedDay = date);
         // Task 2: if this date has events, scroll to its detail panel.
@@ -753,7 +754,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
           ),
         ],
       ),
-    );
+    ));
   }
 
   // --- TAB 3: Upcoming -------------------------------------------------------
@@ -843,7 +844,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     final n = DateTime(e.date.year, e.date.month, e.date.day)
         .difference(today)
         .inDays;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _eventSheet(s, e),
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
@@ -884,7 +885,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
           ],
         ),
       ),
-    );
+    ));
   }
 
   // --- sheets ----------------------------------------------------------------

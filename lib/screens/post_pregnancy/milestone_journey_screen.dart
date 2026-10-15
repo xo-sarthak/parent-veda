@@ -27,6 +27,7 @@ import '../pregnancy/preg_tool_chrome.dart';
 import '../products/pv_store_chrome.dart' show PvCommit, pvStorePalette;
 import 'pp_care_parts.dart' show ppCareHeading;
 import 'pp_phases_data.dart' show ppFillChild;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // ⚠️ THE FOUR AREAS OF GROWING, AS A CLOSER LOOK INSIDE THE TRACKER. The
 // Development brief (reissued): "Brain, Physical, Language and Emotional sit
@@ -306,7 +307,7 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
   // ---- hero: development snapshot -----------------------------------------
   /// "He just did something" — a direct entry that searches every milestone by
   /// name, so a parent can log what she saw without scrolling the whole map.
-  Widget _quickLog() => GestureDetector(
+  Widget _quickLog() => PvPress(child: GestureDetector(
         onTap: _openQuickLog,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -327,7 +328,7 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
             const Icon(Icons.search_rounded, size: 18, color: Colors.white),
           ]),
         ),
-      );
+      ));
 
   void _openQuickLog() {
     final ctl = TextEditingController();
@@ -381,7 +382,7 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
                         shrinkWrap: true,
                         children: [
                           for (final m in hits)
-                            GestureDetector(
+                            PvPress(child: GestureDetector(
                               onTap: () {
                                 Navigator.of(ctx).pop();
                                 _openDetail(m);
@@ -396,7 +397,7 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
                                   const Icon(Icons.chevron_right_rounded, size: 18, color: ppMuted),
                                 ]),
                               ),
-                            ),
+                            )),
                         ],
                       ),
                     ),
@@ -492,7 +493,7 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
 
   Widget _domainTile(DevDomain d) {
     final meta = kDomainMeta[d]!;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _openDomainSheet(d),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -510,14 +511,14 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
           Flexible(child: Text(meta.short, style: ppJakarta(12.5), maxLines: 2, overflow: TextOverflow.ellipsis)),
         ]),
       ),
-    );
+    ));
   }
 
   // ---- milestone card -----------------------------------------------------
   Widget _card(Milestone m) {
     final meta = kDomainMeta[m.domain]!;
     final observed = _store.isObserved(m.id);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _openDetail(m),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -556,7 +557,7 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
           else
             Row(children: [
               Expanded(
-                child: GestureDetector(
+                child: PvPress(child: GestureDetector(
                   onTap: () => _openObserveSheet(m),
                   behavior: HitTestBehavior.opaque,
                   child: Container(
@@ -565,10 +566,10 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
                     decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(12)),
                     child: Text("I've seen this", style: ppBody(13, color: Colors.white, w: FontWeight.w700)),
                   ),
-                ),
+                )),
               ),
               const SizedBox(width: 10),
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: () => _openDetail(m),
                 behavior: HitTestBehavior.opaque,
                 child: Container(
@@ -578,11 +579,11 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
                   decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: ppLine)),
                   child: Text('Learn more', style: ppBody(13, color: ppInk, w: FontWeight.w700)),
                 ),
-              ),
+              )),
             ]),
         ]),
       ),
-    );
+    ));
   }
 
   /* ⚠️ KEPT FOR REVERT — used only by the commented-out
@@ -628,7 +629,7 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
   Widget _settledRow(Milestone m) {
     final meta = kDomainMeta[m.domain]!;
     final ticked = _store.isObserved(m.id);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => ticked ? _openDetail(m) : _openObserveSheet(m),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -649,7 +650,7 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
           Icon(ticked ? Icons.check_circle_rounded : Icons.circle_outlined, size: 19, color: ticked ? ppPurple : ppBorder),
         ]),
       ),
-    );
+    ));
   }
 
   Widget _soonRow(Milestone m) {
@@ -728,7 +729,7 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
   /// hub's four tiles as the front of the section.
   Widget _lookCloser(BuildContext ctx, DevDomain d) {
     final area = devAreaById(_kAreaForDomain[d]!);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () {
         Navigator.of(ctx).pop();
         Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => DevelopmentAreaScreen(area: area)));
@@ -749,7 +750,7 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
           const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
         ]),
       ),
-    );
+    ));
   }
 
   // ---- milestone detail sheet ---------------------------------------------
@@ -809,11 +810,11 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
                         const Icon(Icons.check_circle_rounded, size: 20, color: ppPurple),
                         const SizedBox(width: 12),
                         Expanded(child: Text(_obsSubtitle(m.id), style: ppBody(13, color: ppInk, h: 1.4))),
-                        GestureDetector(
+                        PvPress(child: GestureDetector(
                           onTap: () => _store.unobserve(m.id),
                           behavior: HitTestBehavior.opaque,
                           child: Text('Undo', style: ppBody(12.5, color: ppMuted, w: FontWeight.w700)),
-                        ),
+                        )),
                       ]),
                     )
                   else
@@ -963,7 +964,7 @@ class _MilestoneFlipCardState extends State<MilestoneFlipCard> {
       ),
       clipBehavior: Clip.antiAlias,
       child: Column(children: [
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () => setState(() => _back = !_back),
           behavior: HitTestBehavior.opaque,
           child: AnimatedSwitcher(
@@ -990,7 +991,7 @@ class _MilestoneFlipCardState extends State<MilestoneFlipCard> {
                 _back ? const ValueKey('back') : const ValueKey('front'), meta,
                 back: _back),
           ),
-        ),
+        )),
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 15),
           child: widget.observed ? _noticed() : _seenButton(),
@@ -1009,12 +1010,12 @@ class _MilestoneFlipCardState extends State<MilestoneFlipCard> {
                   : 'Noticed ${widget.observedLabel}',
               style: ppBody(12.5, color: ppPurple, w: FontWeight.w700)),
         ),
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: widget.onDetail,
           behavior: HitTestBehavior.opaque,
           child: Text('Details',
               style: ppBody(12, color: ppMuted, w: FontWeight.w600)),
-        ),
+        )),
       ]);
 
   // ⚠️ OPENS THE MEMORY SHEET, NOT A CHECKBOX. Feedback: "if user clicks on it
@@ -1022,7 +1023,7 @@ class _MilestoneFlipCardState extends State<MilestoneFlipCard> {
   // `_openObserveSheet` already asks what she saw and keeps it with a date; a
   // tick that recorded only a boolean would throw away the one part she will
   // ever want to read again.
-  Widget _seenButton() => GestureDetector(
+  Widget _seenButton() => PvPress(child: GestureDetector(
         onTap: widget.onSeen,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -1033,7 +1034,7 @@ class _MilestoneFlipCardState extends State<MilestoneFlipCard> {
           child: Text('I have seen this',
               style: ppBody(13, color: Colors.white, w: FontWeight.w700)),
         ),
-      );
+      ));
 
   Widget _face(Key key, DomainMeta meta, {required bool back}) {
     final m = widget.milestone;
@@ -1062,12 +1063,12 @@ class _MilestoneFlipCardState extends State<MilestoneFlipCard> {
                 ),
                 const SizedBox(width: 10),
                 const Spacer(),
-                GestureDetector(
+                PvPress(child: GestureDetector(
                   onTap: widget.onDetail,
                   behavior: HitTestBehavior.opaque,
                   child: Text('Learn more',
                       style: ppBody(12, color: ppPurple, w: FontWeight.w700)),
-                ),
+                )),
               ]),
             ])
           : Row(children: [

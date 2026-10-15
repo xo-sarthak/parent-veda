@@ -32,6 +32,7 @@ import 'ttc_practice_card_parts.dart';
 import 'ttc_practice_player.dart';
 import 'ttc_common.dart' show ttcTitleInk;
 import 'ttc_tool_chrome.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// The hue for this area. 42 is the bracket's own, from `ttc_brackets.dart`.
 ///
@@ -308,7 +309,7 @@ class _TtcPracticeScreenState extends State<TtcPracticeScreen> {
             //  reading. A tinted row with a filled number is findable in a
             //  glance, which is the only interaction this list ever gets.
             for (var i = 0; i < pr.steps.length; i++) ...[
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: () => _setStepByHand(i),
                 behavior: HitTestBehavior.opaque,
                 child: AnimatedContainer(
@@ -355,7 +356,7 @@ class _TtcPracticeScreenState extends State<TtcPracticeScreen> {
                         ),
                       ]),
                 ),
-              ),
+              )),
             ],
 
             // ---- which side, where sides matter ----------------------
@@ -461,7 +462,7 @@ class _TtcPracticeScreenState extends State<TtcPracticeScreen> {
             // because a screen that celebrates makes the days she does not open
             // it into days she let something down. There is no streak; see
             // `ttc_mind_today.dart`.
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: () => ttcSetPracticeDone(pr.kind, !done),
               behavior: HitTestBehavior.opaque,
               child: AnimatedContainer(
@@ -484,7 +485,7 @@ class _TtcPracticeScreenState extends State<TtcPracticeScreen> {
                           color: done ? pal.ink1 : Colors.white)),
                 ]),
               ),
-            ),
+            )),
             // What the button does, under it (tools pass, 2026-09-27): it
             // was not clear that it feeds Today or that a second tap undoes.
             // Since the rebuild the timer marks it done on its own at the

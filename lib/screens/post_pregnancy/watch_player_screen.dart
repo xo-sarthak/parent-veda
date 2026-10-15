@@ -17,6 +17,7 @@ import 'provider_profile_screen.dart';
 import 'video/pv_video_player.dart';
 import 'watch_common.dart';
 import 'watch_quicklearn_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class WatchPlayerScreen extends StatefulWidget {
   const WatchPlayerScreen({super.key, required this.video});
@@ -117,7 +118,7 @@ class _WatchPlayerScreenState extends State<WatchPlayerScreen> {
       );
 
   Widget _action(IconData i, String label, VoidCallback onTap, {bool on = false}) => Expanded(
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: Column(children: [
@@ -131,7 +132,7 @@ class _WatchPlayerScreenState extends State<WatchPlayerScreen> {
             const SizedBox(height: 7),
             Text(label, style: ppBody(11, color: ppSoft, w: FontWeight.w600)),
           ]),
-        ),
+        )),
       );
 
   void _openMore() {
@@ -156,7 +157,7 @@ class _WatchPlayerScreenState extends State<WatchPlayerScreen> {
     );
   }
 
-  Widget _moreRow(BuildContext ctx, IconData i, String label) => GestureDetector(
+  Widget _moreRow(BuildContext ctx, IconData i, String label) => PvPress(child: GestureDetector(
         onTap: () {
           Navigator.of(ctx).pop();
           _soon('$label - coming soon');
@@ -170,7 +171,7 @@ class _WatchPlayerScreenState extends State<WatchPlayerScreen> {
             Text(label, style: ppBody(14.5, color: ppInk, w: FontWeight.w600)),
           ]),
         ),
-      );
+      ));
 
   // ---- add to collection --------------------------------------------------
   // A calm bottom sheet: tick a collection to add/remove this video, or open a
@@ -230,7 +231,7 @@ class _WatchPlayerScreenState extends State<WatchPlayerScreen> {
   Widget _collectionToggleRow(UserWatchCollection c) {
     final inIt = WatchStore.instance.collectionContains(c.id, v.id);
     final count = c.videoIds.length;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => inIt
           ? WatchStore.instance.removeFromCollection(c.id, v.id)
           : WatchStore.instance.addToCollection(c.id, v.id),
@@ -267,10 +268,10 @@ class _WatchPlayerScreenState extends State<WatchPlayerScreen> {
           ),
         ]),
       ),
-    );
+    ));
   }
 
-  Widget _createRow(VoidCallback onTap) => GestureDetector(
+  Widget _createRow(VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Padding(
@@ -287,7 +288,7 @@ class _WatchPlayerScreenState extends State<WatchPlayerScreen> {
             Text('Create new collection', style: ppBody(14.5, color: ppPurple, w: FontWeight.w700)),
           ]),
         ),
-      );
+      ));
 
   Widget _createField(TextEditingController c, VoidCallback onCreate) => Padding(
         padding: const EdgeInsets.symmetric(vertical: 6),
@@ -316,7 +317,7 @@ class _WatchPlayerScreenState extends State<WatchPlayerScreen> {
             ),
           ),
           const SizedBox(width: 10),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: onCreate,
             behavior: HitTestBehavior.opaque,
             child: Container(
@@ -326,7 +327,7 @@ class _WatchPlayerScreenState extends State<WatchPlayerScreen> {
               decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(12)),
               child: Text('Create', style: ppBody(13.5, color: Colors.white, w: FontWeight.w700)),
             ),
-          ),
+          )),
         ]),
       );
 
@@ -337,7 +338,7 @@ class _WatchPlayerScreenState extends State<WatchPlayerScreen> {
           final e = v.expert;
           final following = WatchStore.instance.isFollowing(e.id);
           return Row(children: [
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: () => _push(ProviderProfileScreen(expert: e)),
               child: Container(
                 width: 46,
@@ -346,10 +347,10 @@ class _WatchPlayerScreenState extends State<WatchPlayerScreen> {
                 clipBehavior: Clip.antiAlias,
                 child: const PpStriped(height: 50),
               ),
-            ),
+            )),
             const SizedBox(width: 12),
             Expanded(
-              child: GestureDetector(
+              child: PvPress(child: GestureDetector(
                 onTap: () => _push(ProviderProfileScreen(expert: e)),
                 behavior: HitTestBehavior.opaque,
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -357,10 +358,10 @@ class _WatchPlayerScreenState extends State<WatchPlayerScreen> {
                   const SizedBox(height: 2),
                   Text(e.credential, style: ppBody(12), maxLines: 1, overflow: TextOverflow.ellipsis),
                 ]),
-              ),
+              )),
             ),
             const SizedBox(width: 10),
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: () => WatchStore.instance.toggleFollow(e.id),
               behavior: HitTestBehavior.opaque,
               child: Container(
@@ -373,7 +374,7 @@ class _WatchPlayerScreenState extends State<WatchPlayerScreen> {
                 child: Text(following ? 'Following' : 'Follow',
                     style: ppBody(12.5, color: following ? ppSoft : Colors.white, w: FontWeight.w700)),
               ),
-            ),
+            )),
           ]);
         },
       );
@@ -418,7 +419,7 @@ class _WatchPlayerScreenState extends State<WatchPlayerScreen> {
         ),
         const SizedBox(width: 14),
         Expanded(
-          child: GestureDetector(
+          child: PvPress(enabled: onTap != null, child: GestureDetector(
             onTap: onTap,
             behavior: HitTestBehavior.opaque,
             child: Container(
@@ -442,7 +443,7 @@ class _WatchPlayerScreenState extends State<WatchPlayerScreen> {
                 if (!future) const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
               ]),
             ),
-          ),
+          )),
         ),
       ]),
     );

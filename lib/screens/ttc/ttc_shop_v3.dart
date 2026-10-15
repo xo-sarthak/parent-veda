@@ -86,6 +86,7 @@ import '../products/pv_product_screen.dart';
 import '../products/pv_shelf_screen.dart';
 import '../products/pv_store_chrome.dart';
 import '../products/pv_store_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// ⚠️ 320, WHICH IS THE DESIGN'S OWN HERO HUE — put back 2026-09-03.
 ///
@@ -970,7 +971,7 @@ class _FilterChip extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: onTap,
         child: Container(
@@ -988,7 +989,7 @@ class _FilterChip extends StatelessWidget {
                   color: on ? ttcTitleInk : ttcSoft,
                   w: on ? FontWeight.w800 : FontWeight.w600)),
         ),
-      );
+      ));
 }
 
 String _shelfThousands(int n) {
@@ -1148,11 +1149,11 @@ class TtcProductCard extends StatelessWidget {
           ]),
     );
 
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () => openTtcProductPage(context, product.id),
       child: card,
-    );
+    ));
   }
 }
 
@@ -1163,7 +1164,7 @@ class _CompareToggle extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: onTap,
         child: Container(
@@ -1189,7 +1190,7 @@ class _CompareToggle extends StatelessWidget {
             ),
           ]),
         ),
-      );
+      ));
 }
 
 class _CompareBar extends StatelessWidget {
@@ -1220,7 +1221,7 @@ class _CompareBar extends StatelessWidget {
                   style: ttcBody(12.5, color: ttcTitleInk, w: FontWeight.w700)),
             ),
             const SizedBox(width: 10),
-            GestureDetector(
+            PvPress(child: GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: () => showTtcCompare(context, picked),
               child: Container(
@@ -1234,7 +1235,7 @@ class _CompareBar extends StatelessWidget {
                     style: ttcBody(12.5,
                         color: Colors.white, w: FontWeight.w800)),
               ),
-            ),
+            )),
           ]),
           const SizedBox(height: 7),
           Row(children: [
@@ -1243,12 +1244,12 @@ class _CompareBar extends StatelessWidget {
                   'Two at a time, so the table stays easy to read.',
                   style: ttcBody(11, color: ttcMuted)),
             ),
-            GestureDetector(
+            PvPress(child: GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: onClear,
               child: Text('Clear',
                   style: ttcBody(11.5, color: ttcSoft, w: FontWeight.w800)),
-            ),
+            )),
           ]),
         ]),
       ),
@@ -1327,7 +1328,7 @@ Widget _comparePad(Widget c) =>
 Widget _compareBack(BuildContext context, String eyebrow,
         {bool showClear = false}) =>
     _comparePad(Row(children: [
-      GestureDetector(
+      PvPress(child: GestureDetector(
         onTap: () => Navigator.of(context).maybePop(),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -1338,7 +1339,7 @@ Widget _compareBack(BuildContext context, String eyebrow,
               const BoxDecoration(color: ttcPanel, shape: BoxShape.circle),
           child: const Icon(Icons.arrow_back, size: 16, color: ttcTitleInk),
         ),
-      ),
+      )),
       const SizedBox(width: 12),
       Expanded(
         child: Text(eyebrow.toUpperCase(),
@@ -1349,7 +1350,7 @@ Widget _compareBack(BuildContext context, String eyebrow,
                 color: ttcMuted)),
       ),
       if (showClear)
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: TtcCompareTray.instance.clear,
           behavior: HitTestBehavior.opaque,
           child: Padding(
@@ -1358,7 +1359,7 @@ Widget _compareBack(BuildContext context, String eyebrow,
                 style:
                     ttcBody(12.5, color: ttcTitleInk, w: FontWeight.w700)),
           ),
-        ),
+        )),
     ]));
 
 // =============================================================================
@@ -1399,7 +1400,7 @@ class _CompareEmpty extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: ttcBody(14, color: ttcSoft, h: 1.6))),
               const SizedBox(height: 26),
-              _comparePad(GestureDetector(
+              _comparePad(PvPress(child: GestureDetector(
                 onTap: () => Navigator.of(context).maybePop(),
                 behavior: HitTestBehavior.opaque,
                 child: Container(
@@ -1412,7 +1413,7 @@ class _CompareEmpty extends StatelessWidget {
                       style: ttcBody(14.5,
                           color: Colors.white, w: FontWeight.w700)),
                 ),
-              )),
+              ))),
             ],
           ),
         ),
@@ -1478,7 +1479,7 @@ class _CompareSuggestion extends StatelessWidget {
   final bool hi;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         onTap: () => TtcCompareTray.instance.toggle(product.id),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -1526,7 +1527,7 @@ class _CompareSuggestion extends StatelessWidget {
             ),
           ]),
         ),
-      );
+      ));
 }
 
 // =============================================================================
@@ -1731,7 +1732,7 @@ class _CompareBoth extends StatelessWidget {
                     for (var i = 0; i < pair.length; i++) ...[
                       if (i > 0) const SizedBox(width: 10),
                       Expanded(
-                        child: GestureDetector(
+                        child: PvPress(child: GestureDetector(
                           onTap: () =>
                               showTtcBuyInterstitial(context, pair[i]),
                           behavior: HitTestBehavior.opaque,
@@ -1757,7 +1758,7 @@ class _CompareBoth extends StatelessWidget {
                                         : ttcTitleInk,
                                     w: FontWeight.w800)),
                           ),
-                        ),
+                        )),
                       ),
                     ],
                   ]),
@@ -1799,7 +1800,7 @@ class _CompareOverview extends StatelessWidget {
                 Positioned(
                   right: 0,
                   top: 0,
-                  child: GestureDetector(
+                  child: PvPress(child: GestureDetector(
                     onTap: () =>
                         TtcCompareTray.instance.toggle(product.id),
                     behavior: HitTestBehavior.opaque,
@@ -1815,7 +1816,7 @@ class _CompareOverview extends StatelessWidget {
                       child: const Icon(Icons.close_rounded,
                           size: 14, color: ttcSoft),
                     ),
-                  ),
+                  )),
                 ),
             ]),
             const SizedBox(height: 10),
@@ -1841,13 +1842,13 @@ class _CompareOverview extends StatelessWidget {
             Text(product.priceEn,
                 style: ttcBody(13, color: ttcInk, w: FontWeight.w800)),
             const SizedBox(height: 8),
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: () => openTtcProductPage(context, product.id),
               behavior: HitTestBehavior.opaque,
               child: Text('See the full page',
                   style: ttcBody(11.5,
                       color: ttcTitleInk, w: FontWeight.w700)),
-            ),
+            )),
           ]),
     );
   }
@@ -2247,13 +2248,13 @@ class _TtcProductPageState extends State<TtcProductPageClassic> {
                     _VoiceCard(voice: v),
                     const SizedBox(height: 12),
                   ],
-                  GestureDetector(
+                  PvPress(child: GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     onTap: () => showTtcAllRatings(context, p),
                     child: Text('See all ${p.voices.length} ratings →',
                         style: ttcBody(12.5,
                             color: ttcTitleInk, w: FontWeight.w800)),
-                  ),
+                  )),
                 ],
               )),
 
@@ -2514,7 +2515,7 @@ class _VoteButton extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: onTap,
         child: Container(
@@ -2530,7 +2531,7 @@ class _VoteButton extends StatelessWidget {
               style: ttcBody(12.5,
                   color: on ? ttcTitleInk : ttcMuted, w: FontWeight.w800)),
         ),
-      );
+      ));
 }
 
 class _BestForChips extends StatelessWidget {
@@ -2644,7 +2645,7 @@ class _OutlinedPill extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: onTap,
         child: Container(
@@ -2659,7 +2660,7 @@ class _OutlinedPill extends StatelessWidget {
               style:
                   ttcBody(12.5, color: ttcTitleInk, w: FontWeight.w700)),
         ),
-      );
+      ));
 }
 
 /// ⚠️ THE ONE FILLED PILL IN THE FLOW, AND IT IS `ink1`, NOT VIOLET. The
@@ -2671,7 +2672,7 @@ class _FilledPill extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: onTap,
         child: Container(
@@ -2683,7 +2684,7 @@ class _FilledPill extends StatelessWidget {
           child: Text(label,
               style: ttcBody(12.5, color: Colors.white, w: FontWeight.w700)),
         ),
-      );
+      ));
 }
 
 class _VoiceCard extends StatelessWidget {
@@ -3644,7 +3645,7 @@ class _RatingsSheetState extends State<_RatingsSheet> {
                         '${all.length} from people trying, here',
                         style: ttcBody(13, color: ttcMuted, h: 1.4)),
                   ),
-                  GestureDetector(
+                  PvPress(child: GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     onTap: () => Navigator.of(context).maybePop(),
                     child: Container(
@@ -3658,7 +3659,7 @@ class _RatingsSheetState extends State<_RatingsSheet> {
                       child: Icon(Icons.close_rounded,
                           size: 17, color: ttcMuted),
                     ),
-                  ),
+                  )),
                 ]),
                 const SizedBox(height: 20),
                 for (var star = 5; star >= 1; star--) ...[
@@ -3824,14 +3825,14 @@ class _SearchBar extends StatelessWidget {
             ),
           ),
           if (controller.text.isNotEmpty)
-            GestureDetector(
+            PvPress(child: GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: onClear,
               child: Padding(
                 padding: const EdgeInsets.only(left: 8),
                 child: Icon(Icons.close_rounded, size: 17, color: ttcMuted),
               ),
-            ),
+            )),
         ]),
       );
 }
@@ -3846,7 +3847,7 @@ class _CompareEntry extends StatelessWidget {
     final picked = tray.products;
     final hi = TtcS.current().hinglish;
 
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       behavior: HitTestBehavior.opaque,
       // ⚠️ IT OPENS AT ANY COUNT NOW. This was `picked.length < 2 ? null :`
       // — a row that looked tappable and was not, which is exactly the
@@ -3891,7 +3892,7 @@ class _CompareEntry extends StatelessWidget {
               size: 20, color: picked.length < 2 ? ttcBorder : ttcMuted),
         ]),
       ),
-    );
+    ));
   }
 }
 
@@ -3941,7 +3942,7 @@ class _FiltersButton extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: onTap,
         child: Container(
@@ -3976,7 +3977,7 @@ class _FiltersButton extends StatelessWidget {
             ],
           ]),
         ),
-      );
+      ));
 }
 
 class _SortButton extends StatelessWidget {
@@ -3985,7 +3986,7 @@ class _SortButton extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: onTap,
         child: Container(
@@ -4006,7 +4007,7 @@ class _SortButton extends StatelessWidget {
             Icon(Icons.expand_more_rounded, size: 17, color: ttcMuted),
           ]),
         ),
-      );
+      ));
 }
 
 class _ActiveChip extends StatelessWidget {
@@ -4015,7 +4016,7 @@ class _ActiveChip extends StatelessWidget {
   final VoidCallback onRemove;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: onRemove,
         child: Container(
@@ -4034,7 +4035,7 @@ class _ActiveChip extends StatelessWidget {
             Icon(Icons.close_rounded, size: 14, color: ttcMuted),
           ]),
         ),
-      );
+      ));
 }
 
 /// What the sheet hands back.
@@ -4111,7 +4112,7 @@ class _FilterSheetState extends State<_FilterSheet> {
                         style: ttcFraunces(22,
                             w: FontWeight.w600, color: ttcTitleInk)),
                   ),
-                  GestureDetector(
+                  PvPress(child: GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     onTap: () => Navigator.of(context).maybePop(),
                     child: Container(
@@ -4124,7 +4125,7 @@ class _FilterSheetState extends State<_FilterSheet> {
                       child:
                           Icon(Icons.close_rounded, size: 17, color: ttcMuted),
                     ),
-                  ),
+                  )),
                 ]),
                 const SizedBox(height: 20),
                 ttcShopEyebrow('How strongly we recommend it'),
@@ -4169,7 +4170,7 @@ class _FilterSheetState extends State<_FilterSheet> {
                 ]),
                 const SizedBox(height: 24),
                 Row(children: [
-                  GestureDetector(
+                  PvPress(child: GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     onTap: () => setState(() {
                       _bands = {};
@@ -4188,10 +4189,10 @@ class _FilterSheetState extends State<_FilterSheet> {
                           style: ttcBody(12.5,
                               color: ttcSoft, w: FontWeight.w700)),
                     ),
-                  ),
+                  )),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: GestureDetector(
+                    child: PvPress(child: GestureDetector(
                       behavior: HitTestBehavior.opaque,
                       onTap: () => Navigator.of(context)
                           .pop(TtcShelfFilters(_bands, _evidence, _whose)),
@@ -4205,7 +4206,7 @@ class _FilterSheetState extends State<_FilterSheet> {
                             style: ttcBody(12.5,
                                 color: Colors.white, w: FontWeight.w800)),
                       ),
-                    ),
+                    )),
                   ),
                 ]),
               ]),
@@ -4223,7 +4224,7 @@ class _SheetChip extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: onTap,
         child: Container(
@@ -4241,7 +4242,7 @@ class _SheetChip extends StatelessWidget {
                   color: on ? ttcTitleInk : ttcSoft,
                   w: on ? FontWeight.w800 : FontWeight.w600)),
         ),
-      );
+      ));
 }
 
 Future<TtcShelfSort?> showTtcShelfSort(
@@ -4406,7 +4407,7 @@ class _CompareFab extends StatelessWidget {
     final n = tray.ids.length;
     final on = tray.has(product.id);
 
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
         if (!on) tray.toggle(product.id);
@@ -4447,7 +4448,7 @@ class _CompareFab extends StatelessWidget {
               style: ttcBody(12.5, color: ttcTitleInk, w: FontWeight.w800)),
         ]),
       ),
-    );
+    ));
   }
 }
 

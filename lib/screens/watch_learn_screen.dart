@@ -20,6 +20,7 @@ import 'brackets/hub/hub_intent_art.dart';
 import 'pregnancy/preg_chrome.dart';
 import 'products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 import 'v2/v2_palette.dart' show v2BlockTint;
+import '../widgets/pv_feedback.dart' show PvPress;
 
 // ⚠️ ONE PARENTVEDA (2026-09-30, the pregnancy restyle): white cards with the
 // page hairline, not shadows; the one serif section heading; the thumbnail is
@@ -264,7 +265,7 @@ class TodaysVideoCard extends StatelessWidget {
                           fontWeight: FontWeight.w800,
                           color: pvStorePalette.ink1)),
                   const Spacer(),
-                  GestureDetector(
+                  PvPress(child: GestureDetector(
                     onTap: () => Navigator.of(context).push(MaterialPageRoute(
                         builder: (_) =>
                             WatchLearnScreen(controller: controller))),
@@ -273,12 +274,12 @@ class TodaysVideoCard extends StatelessWidget {
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
                             color: pvStorePalette.ink1)),
-                  ),
+                  )),
                 ]),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-                child: GestureDetector(
+                child: PvPress(child: GestureDetector(
                   onTap: () => _openDetail(context, v, lang),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -319,7 +320,7 @@ class TodaysVideoCard extends StatelessWidget {
                       ]),
                     ],
                   ),
-                ),
+                )),
               ),
             ],
           ),
@@ -446,7 +447,7 @@ class WatchLearnScreen extends StatelessWidget {
   }
 
   Widget _smallCard(BuildContext context, S s, AppLanguage lang, PvVideo v) =>
-      GestureDetector(
+      PvPress(child: GestureDetector(
         onTap: () => _openDetail(context, v, lang),
         child: SizedBox(
           width: 220,
@@ -489,5 +490,5 @@ class WatchLearnScreen extends StatelessWidget {
             ),
           ),
         ),
-      );
+      ));
 }

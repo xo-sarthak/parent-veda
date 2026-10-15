@@ -22,6 +22,7 @@ import 'package:flutter/material.dart';
 import '../post_pregnancy/pp_common.dart';
 import 'doctor_earnings_screen.dart';
 import 'doctor_impact_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class DoctorImpactTab extends StatefulWidget {
   const DoctorImpactTab({super.key});
@@ -58,7 +59,7 @@ class _DoctorImpactTabState extends State<DoctorImpactTab> {
 
   Widget _seg(int i, String label) {
     final on = _view == i;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => setState(() => _view = i),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -71,6 +72,6 @@ class _DoctorImpactTabState extends State<DoctorImpactTab> {
         child: Text(label,
             style: ppJakarta(12.5, color: on ? ppPurple : ppSoft)),
       ),
-    );
+    ));
   }
 }

@@ -32,6 +32,7 @@ import '../theme/pv_fonts.dart';
 import '../localization/app_language.dart';
 import 'ttc/doors/ttc_tab_art.dart' show TtcTabMark;
 import 'ttc/ttc_tool_marks.dart' show TtcMarkLeading;
+import '../widgets/pv_feedback.dart' show PvPress;
 
 // ---- palette (light-only, matching the app) ---------------------------------
 const _bg = Color(0xFFFCFBFC);
@@ -381,7 +382,7 @@ class _BookCompanionScreenState extends State<BookCompanionScreen> {
 
   Widget _navChip(_Section s) {
     final on = _active == s.id;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       key: ValueKey('navchip-${s.id}'),
       behavior: HitTestBehavior.opaque,
       onTap: () => _jump(s.id),
@@ -404,7 +405,7 @@ class _BookCompanionScreenState extends State<BookCompanionScreen> {
           ),
         ),
       ),
-    );
+    ));
   }
 
   // ===========================================================================

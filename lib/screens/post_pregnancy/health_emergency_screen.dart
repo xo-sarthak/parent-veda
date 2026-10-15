@@ -12,6 +12,7 @@ import 'package:share_plus/share_plus.dart';
 
 import 'pp_common.dart';
 import 'pp_health_data.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class HealthEmergencyScreen extends StatefulWidget {
   const HealthEmergencyScreen({super.key});
@@ -46,11 +47,11 @@ class _HealthEmergencyScreenState extends State<HealthEmergencyScreen> {
                   const SizedBox(width: 8),
                   Expanded(child: ppEyebrow('Emergency Card', color: _red, spacing: 1.2)),
                   if (e != null)
-                    GestureDetector(
+                    PvPress(child: GestureDetector(
                       onTap: () => _editSheet(e),
                       behavior: HitTestBehavior.opaque,
                       child: Text('Edit', style: ppBody(13, color: ppPurple, w: FontWeight.w700)),
-                    ),
+                    )),
                 ])),
                 const SizedBox(height: 8),
                 _pad(Text('In case of emergency', style: ppFraunces(28, h: 1.12))),
@@ -79,7 +80,7 @@ class _HealthEmergencyScreenState extends State<HealthEmergencyScreen> {
           ]),
         ),
         const SizedBox(height: 16),
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () => _editSheet(null),
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -88,7 +89,7 @@ class _HealthEmergencyScreenState extends State<HealthEmergencyScreen> {
             decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(14)),
             child: Text('Create emergency card', style: ppBody(15, color: Colors.white, w: FontWeight.w700)),
           ),
-        ),
+        )),
       ]);
 
   List<Widget> _cardView(EmergencyProfile e) => [
@@ -146,7 +147,7 @@ class _HealthEmergencyScreenState extends State<HealthEmergencyScreen> {
         const SizedBox(height: 16),
         _pad(Row(children: [
           Expanded(
-            child: GestureDetector(
+            child: PvPress(child: GestureDetector(
               onTap: () => Share.share(_shareText(e)),
               behavior: HitTestBehavior.opaque,
               child: Container(
@@ -159,10 +160,10 @@ class _HealthEmergencyScreenState extends State<HealthEmergencyScreen> {
                   Text('Share card', style: ppBody(13, color: ppPurple, w: FontWeight.w700)),
                 ]),
               ),
-            ),
+            )),
           ),
           const SizedBox(width: 12),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => _confirmDelete(),
             behavior: HitTestBehavior.opaque,
             child: Container(
@@ -172,7 +173,7 @@ class _HealthEmergencyScreenState extends State<HealthEmergencyScreen> {
               decoration: BoxDecoration(borderRadius: BorderRadius.circular(14), border: Border.all(color: ppBorder)),
               child: const Icon(Icons.delete_outline_rounded, size: 20, color: ppCoral),
             ),
-          ),
+          )),
         ])),
       ];
 
@@ -273,7 +274,7 @@ class _HealthEmergencyScreenState extends State<HealthEmergencyScreen> {
               _tf(c2Name, 'Second person to call: name'),
               _tf(c2Phone, 'Second person to call: phone', phone: true),
               const SizedBox(height: 8),
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: () {
                   if (name.text.trim().isEmpty) return;
                   _store.setEmergency(EmergencyProfile(
@@ -296,7 +297,7 @@ class _HealthEmergencyScreenState extends State<HealthEmergencyScreen> {
                   decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(14)),
                   child: Text('Save', style: ppBody(15, color: Colors.white, w: FontWeight.w700)),
                 ),
-              ),
+              )),
             ]),
           ),
         ),
@@ -336,22 +337,22 @@ class _HealthEmergencyScreenState extends State<HealthEmergencyScreen> {
             const SizedBox(height: 18),
             Row(children: [
               Expanded(
-                child: GestureDetector(
+                child: PvPress(child: GestureDetector(
                   onTap: () => Navigator.of(ctx).pop(),
                   behavior: HitTestBehavior.opaque,
                   child: Container(height: 48, alignment: Alignment.center, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14), border: Border.all(color: ppLine)), child: Text('Cancel', style: ppBody(14, color: ppInk, w: FontWeight.w700))),
-                ),
+                )),
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: GestureDetector(
+                child: PvPress(child: GestureDetector(
                   onTap: () {
                     _store.clearEmergency();
                     Navigator.of(ctx).pop();
                   },
                   behavior: HitTestBehavior.opaque,
                   child: Container(height: 48, alignment: Alignment.center, decoration: BoxDecoration(color: ppCoral, borderRadius: BorderRadius.circular(14)), child: Text('Delete', style: ppBody(14, color: Colors.white, w: FontWeight.w700))),
-                ),
+                )),
               ),
             ]),
           ]),

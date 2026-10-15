@@ -15,6 +15,7 @@ import 'pp_development_data.dart';
 // The app's drawn marks, in place of Material glyphs (the user, 2026-10-13).
 import '../ttc/doors/ttc_tab_art.dart' show TtcTabMark;
 import '../ttc/ttc_tool_marks.dart' show TtcMarkLeading, TtcToolMark;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class DevelopmentActivityScreen extends StatelessWidget {
   const DevelopmentActivityScreen({super.key, required this.activity});
@@ -128,7 +129,7 @@ class DevelopmentActivityScreen extends StatelessWidget {
             )),
             ],
             const SizedBox(height: 18),
-            _pad(GestureDetector(
+            _pad(PvPress(child: GestureDetector(
               onTap: () => _push(context, DevelopmentAreaScreen(area: area)),
               behavior: HitTestBehavior.opaque,
               child: Row(children: [
@@ -137,7 +138,7 @@ class DevelopmentActivityScreen extends StatelessWidget {
                 const SizedBox(width: 6),
                 const Icon(Icons.arrow_forward, size: 15, color: ppPurple),
               ]),
-            )),
+            ))),
           ],
         ),
       ),
@@ -271,7 +272,7 @@ class DevelopmentActivityScreen extends StatelessWidget {
             const SizedBox(width: 12),
             */
             const Spacer(),
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: () => DevStore.instance.toggleSave(activity.id),
               behavior: HitTestBehavior.opaque,
               child: Container(
@@ -281,7 +282,7 @@ class DevelopmentActivityScreen extends StatelessWidget {
                 decoration: BoxDecoration(borderRadius: BorderRadius.circular(14), border: Border.all(color: ppBorder)),
                 child: Icon(saved ? Icons.bookmark_rounded : Icons.bookmark_border_rounded, size: 21, color: saved ? ppPurple : ppSoft),
               ),
-            ),
+            )),
           ]);
         },
       );

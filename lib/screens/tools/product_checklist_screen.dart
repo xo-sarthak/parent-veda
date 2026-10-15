@@ -61,6 +61,7 @@ import '../../theme/pv_fonts.dart';
 import '../ttc/doors/ttc_tab_art.dart' show TtcTabMark;
 import '../ttc/ttc_tool_marks.dart' show TtcMarkLeading, TtcToolMark;
 import '../v2/v2_palette.dart' show V2PaletteStore, v2BlockTint;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // Kept for revert (2026-09-30): the teal accent, the "bought" green and the
 // star glyph's amber. Everything they drew is the one ink or a neutral tag.
@@ -1406,7 +1407,7 @@ class _ChecklistDetailScreen extends StatelessWidget {
       child: Row(children: [
         _tick(context, c, store, listId, item, owned: owned, locked: bought),
         Expanded(
-          child: GestureDetector(
+          child: PvPress(child: GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: () {
               if (product != null) {
@@ -1450,7 +1451,7 @@ class _ChecklistDetailScreen extends StatelessWidget {
                         ],
                       ]),
                       const SizedBox(height: 4),
-                      GestureDetector(
+                      PvPress(child: GestureDetector(
                         behavior: HitTestBehavior.opaque,
                         onTap: () => _editNote(context, s, store, listId, item),
                         child: Row(children: [
@@ -1479,11 +1480,11 @@ class _ChecklistDetailScreen extends StatelessWidget {
                                     color: pal.ink2)),
                           ],
                         ]),
-                      ),
+                      )),
                     ]),
               ),
             ]),
-          ),
+          )),
         ),
         PopupMenuButton<String>(
           icon: Icon(Icons.more_vert_rounded, color: pal.ink3),
@@ -1875,7 +1876,7 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
           // a tick. Kept for revert: teal fill, and a teal tint once added.
           Semantics(
             button: true,
-            child: GestureDetector(
+            child: PvPress(child: GestureDetector(
               onTap: () {
                 if (added) {
                   store.removeItem(widget.checklistId, p.id);
@@ -1901,7 +1902,7 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
                           color: added ? kPvInk : Colors.white)),
                 ]),
               ),
-            ),
+            )),
           ),
         ]),
       ),

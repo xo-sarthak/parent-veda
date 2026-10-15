@@ -71,6 +71,7 @@ import 'ttc_strings.dart';
 import 'ttc_timeline_screen.dart';
 import 'ttc_window_screen.dart' show ttcWindowForHim;
 import 'ttc_treatment_screen.dart' show openTtcTreatment;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class TtcCalendarScreen extends StatefulWidget {
   const TtcCalendarScreen({super.key});
@@ -961,7 +962,7 @@ class _DayCell extends StatelessWidget {
       label: '${date.day} ${months[date.month - 1]} ${date.year}',
       onTap: onTap,
       excludeSemantics: true,
-      child: GestureDetector(
+      child: PvPress(child: GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: SizedBox(
@@ -1068,7 +1069,7 @@ class _DayCell extends StatelessWidget {
           ],
         ),
       ),
-      ),
+      )),
     );
   }
 

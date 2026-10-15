@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 
 import 'pp_common.dart';
 import 'pp_food_data.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class FoodShoppingScreen extends StatelessWidget {
   const FoodShoppingScreen({super.key});
@@ -67,7 +68,7 @@ class FoodShoppingScreen extends StatelessWidget {
                   // in when she has just added the wrong recipe's ingredients.
                   _pad(Row(children: [
                     if (lines.length - left > 0) ...[
-                      GestureDetector(
+                      PvPress(child: GestureDetector(
                         onTap: store.clearPurchased,
                         behavior: HitTestBehavior.opaque,
                         child: Row(children: [
@@ -75,14 +76,14 @@ class FoodShoppingScreen extends StatelessWidget {
                           const SizedBox(width: 8),
                           Text('Clear ${lines.length - left} purchased', style: ppBody(13, color: ppSoft, w: FontWeight.w700)),
                         ]),
-                      ),
+                      )),
                       const Spacer(),
                     ],
-                    GestureDetector(
+                    PvPress(child: GestureDetector(
                       onTap: store.clearShopping,
                       behavior: HitTestBehavior.opaque,
                       child: Text('Empty the list', style: ppBody(13, color: ppMuted, w: FontWeight.w700)),
-                    ),
+                    )),
                   ])),
                   const SizedBox(height: 16),
                   _pad(Text('Grocery delivery integration is coming - for now this is your checklist.', style: ppBody(11.5, color: ppMuted, h: 1.5))),
@@ -95,7 +96,7 @@ class FoodShoppingScreen extends StatelessWidget {
     );
   }
 
-  Widget _row(String line, bool purchased, {bool last = false}) => GestureDetector(
+  Widget _row(String line, bool purchased, {bool last = false}) => PvPress(child: GestureDetector(
         onTap: () => FoodStore.instance.togglePurchased(line),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -126,7 +127,7 @@ class FoodShoppingScreen extends StatelessWidget {
             //
             // 40x40 hit area on a 16px glyph: below 40 it competes with the
             // row's own tap-to-tick and she deletes what she meant to tick.
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: () => FoodStore.instance.removeLine(line),
               behavior: HitTestBehavior.opaque,
               child: const SizedBox(
@@ -134,8 +135,8 @@ class FoodShoppingScreen extends StatelessWidget {
                 height: 40,
                 child: Icon(Icons.close_rounded, size: 16, color: ppMuted),
               ),
-            ),
+            )),
           ]),
         ),
-      );
+      ));
 }

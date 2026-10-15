@@ -15,6 +15,7 @@ import 'pp_child_profile.dart';
 import 'pp_common.dart';
 import 'pp_experts_data.dart';
 import 'provider_profile_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class HealthGuideScreen extends StatelessWidget {
   const HealthGuideScreen({super.key});
@@ -40,7 +41,7 @@ class HealthGuideScreen extends StatelessWidget {
           children: [
             // top bar: back + Private
             _pad(Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: () => Navigator.of(context).maybePop(),
                 behavior: HitTestBehavior.opaque,
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -48,7 +49,7 @@ class HealthGuideScreen extends StatelessWidget {
                   const SizedBox(width: 10),
                   Text('My Child', style: ppBody(14, color: ppSoft)),
                 ]),
-              ),
+              )),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(color: _greenBg, borderRadius: BorderRadius.circular(999)),
@@ -94,11 +95,11 @@ class HealthGuideScreen extends StatelessWidget {
                     'Last winter ${ChildProfileStore.instance.nameMid} caught a cough after the first cold day. The first cold snap is forecast next week - keep him layered and watch for a runny nose.',
                     style: ppBody(15, color: ppInk, h: 1.55)),
                 const SizedBox(height: 12),
-                GestureDetector(
+                PvPress(child: GestureDetector(
                   onTap: () => _soon(context),
                   child: Text('See what helped last time →',
                       style: ppBody(13, color: ppPurple, w: FontWeight.w700)),
-                ),
+                )),
               ]),
             )),
 
@@ -180,7 +181,7 @@ class HealthGuideScreen extends StatelessWidget {
   }
 
   Widget _quick(BuildContext context, IconData icon, String label, {bool filled = false}) => Expanded(
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: () => _soon(context),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 15),
@@ -198,7 +199,7 @@ class HealthGuideScreen extends StatelessWidget {
                   style: ppBody(12, color: filled ? Colors.white : ppInk, w: FontWeight.w700)),
             ]),
           ),
-        ),
+        )),
       );
 
   Widget _entry(String title, String date, String trigger, String rx,
@@ -237,7 +238,7 @@ class HealthGuideScreen extends StatelessWidget {
     final languages = e.tags.take(2).join(' / ');
     void openProfile() => Navigator.of(context)
         .push(MaterialPageRoute<void>(builder: (_) => ProviderProfileScreen(expert: e)));
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: openProfile,
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -276,6 +277,6 @@ class HealthGuideScreen extends StatelessWidget {
           ),
         ]),
       ),
-    );
+    ));
   }
 }

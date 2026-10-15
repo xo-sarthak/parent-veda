@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'article_reader_screen.dart';
 import 'pp_articles_data.dart';
 import 'pp_common.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class ArticleArchiveScreen extends StatefulWidget {
   const ArticleArchiveScreen({super.key});
@@ -58,7 +59,7 @@ class _ArticleArchiveScreenState extends State<ArticleArchiveScreen> {
 
             // search
             const SizedBox(height: 18),
-            _pad(GestureDetector(
+            _pad(PvPress(child: GestureDetector(
               onTap: _soon,
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
@@ -70,7 +71,7 @@ class _ArticleArchiveScreenState extends State<ArticleArchiveScreen> {
                   Text('Search articles', style: ppBody(14, color: ppMuted)),
                 ]),
               ),
-            )),
+            ))),
 
             // topic chips
             const SizedBox(height: 16),
@@ -122,7 +123,7 @@ class _ArticleArchiveScreenState extends State<ArticleArchiveScreen> {
 
   Widget _topicChip(String t) {
     final on = _topic == t;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => setState(() => _topic = t),
       child: Container(
         margin: const EdgeInsets.only(right: 9),
@@ -130,12 +131,12 @@ class _ArticleArchiveScreenState extends State<ArticleArchiveScreen> {
         decoration: BoxDecoration(color: on ? ppPurple : ppPanel, borderRadius: BorderRadius.circular(999)),
         child: Text(t, style: ppBody(12, color: on ? Colors.white : ppSoft, w: on ? FontWeight.w700 : FontWeight.w600)),
       ),
-    );
+    ));
   }
 
   Widget _ageChip(String ag) {
     final on = _age == ag;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => setState(() => _age = ag),
       child: Container(
         margin: const EdgeInsets.only(right: 9),
@@ -147,10 +148,10 @@ class _ArticleArchiveScreenState extends State<ArticleArchiveScreen> {
         ),
         child: Text(ag, style: ppBody(12, color: on ? ppPurple : ppSoft, w: on ? FontWeight.w700 : FontWeight.w600)),
       ),
-    );
+    ));
   }
 
-  Widget _featured(Article a) => GestureDetector(
+  Widget _featured(Article a) => PvPress(child: GestureDetector(
         onTap: () => _open(a),
         behavior: HitTestBehavior.opaque,
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -163,9 +164,9 @@ class _ArticleArchiveScreenState extends State<ArticleArchiveScreen> {
           Text('${a.author} · ${a.readMin} min read', style: ppBody(13)),
           const SizedBox(height: 18),
         ]),
-      );
+      ));
 
-  Widget _row(Article a, {bool top = false, bool bottom = false}) => GestureDetector(
+  Widget _row(Article a, {bool top = false, bool bottom = false}) => PvPress(child: GestureDetector(
         onTap: () => _open(a),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -190,7 +191,7 @@ class _ArticleArchiveScreenState extends State<ArticleArchiveScreen> {
             ),
           ]),
         ),
-      );
+      ));
 
   Widget _catLine(Article a) => Row(children: [
         Text(a.category.toUpperCase(),

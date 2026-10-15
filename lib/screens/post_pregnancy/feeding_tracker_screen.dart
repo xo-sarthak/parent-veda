@@ -13,6 +13,7 @@ import 'package:flutter/services.dart';
 
 import 'pp_common.dart';
 import 'pp_trackers_data.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class FeedingTrackerScreen extends StatefulWidget {
   const FeedingTrackerScreen({super.key});
@@ -108,7 +109,7 @@ class _FeedingTrackerScreenState extends State<FeedingTrackerScreen> {
         ]),
       );
 
-  Widget _logButton() => GestureDetector(
+  Widget _logButton() => PvPress(child: GestureDetector(
         onTap: _openLogSheet,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -121,7 +122,7 @@ class _FeedingTrackerScreenState extends State<FeedingTrackerScreen> {
             Text('Log a feed', style: ppBody(15, color: Colors.white, w: FontWeight.w700)),
           ]),
         ),
-      );
+      ));
 
   Widget _empty() => Container(
         padding: const EdgeInsets.all(22),
@@ -168,11 +169,11 @@ class _FeedingTrackerScreenState extends State<FeedingTrackerScreen> {
             ]),
           ),
           const SizedBox(width: 8),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => _confirmDelete('Remove this feed?', () => _store.removeFeed(f.id)),
             behavior: HitTestBehavior.opaque,
             child: const Padding(padding: EdgeInsets.only(left: 4), child: Icon(Icons.delete_outline_rounded, size: 20, color: ppMuted)),
-          ),
+          )),
         ]),
       );
 
@@ -227,7 +228,7 @@ class _FeedingTrackerScreenState extends State<FeedingTrackerScreen> {
                 _tf(note, type == FeedType.solid ? 'What they ate' : 'Note (optional)', maxLines: 2),
 
                 const SizedBox(height: 20),
-                GestureDetector(
+                PvPress(child: GestureDetector(
                   onTap: () {
                     _store.logFeed(
                       time: DateTime.now(),
@@ -246,7 +247,7 @@ class _FeedingTrackerScreenState extends State<FeedingTrackerScreen> {
                     decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(14)),
                     child: Text('Save feed', style: ppBody(15, color: Colors.white, w: FontWeight.w700)),
                   ),
-                ),
+                )),
               ]),
             ),
           ),
@@ -269,7 +270,7 @@ class _FeedingTrackerScreenState extends State<FeedingTrackerScreen> {
             const SizedBox(height: 18),
             Row(children: [
               Expanded(
-                child: GestureDetector(
+                child: PvPress(child: GestureDetector(
                   onTap: () => Navigator.of(ctx).pop(),
                   behavior: HitTestBehavior.opaque,
                   child: Container(
@@ -278,11 +279,11 @@ class _FeedingTrackerScreenState extends State<FeedingTrackerScreen> {
                     decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14), border: Border.all(color: ppLine)),
                     child: Text('Cancel', style: ppBody(14, color: ppInk, w: FontWeight.w700)),
                   ),
-                ),
+                )),
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: GestureDetector(
+                child: PvPress(child: GestureDetector(
                   onTap: () {
                     onConfirm();
                     Navigator.of(ctx).pop();
@@ -294,7 +295,7 @@ class _FeedingTrackerScreenState extends State<FeedingTrackerScreen> {
                     decoration: BoxDecoration(color: ppCoral, borderRadius: BorderRadius.circular(14)),
                     child: Text('Remove', style: ppBody(14, color: Colors.white, w: FontWeight.w700)),
                   ),
-                ),
+                )),
               ),
             ]),
           ]),
@@ -310,7 +311,7 @@ class _FeedingTrackerScreenState extends State<FeedingTrackerScreen> {
       );
 
   Widget _typeChip(FeedType t, bool on, VoidCallback onTap) => Expanded(
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -326,11 +327,11 @@ class _FeedingTrackerScreenState extends State<FeedingTrackerScreen> {
               Text(_typeLabel(t), style: ppBody(12, color: on ? Colors.white : ppInk, w: FontWeight.w700)),
             ]),
           ),
-        ),
+        )),
       );
 
   Widget _sideChip(String label, bool on, VoidCallback onTap) => Expanded(
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -343,7 +344,7 @@ class _FeedingTrackerScreenState extends State<FeedingTrackerScreen> {
             ),
             child: Text(label, style: ppBody(13, color: on ? Colors.white : ppInk, w: FontWeight.w700)),
           ),
-        ),
+        )),
       );
 
   Widget _tf(TextEditingController c, String label, {int maxLines = 1, bool number = false}) => Padding(

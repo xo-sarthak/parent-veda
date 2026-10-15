@@ -57,6 +57,7 @@ import '../../widgets/pv_placeholders.dart';
 import '../v2/v2_palette.dart';
 import 'sk_grown_up_gate.dart';
 import 'sk_safety.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // =============================================================================
 //  THE BLOCKS
@@ -532,7 +533,7 @@ class SkContentPage extends StatelessWidget {
 /// control the child already knows from every screen; it does not need
 /// the activity buttons' size, and it must sit where every other back
 /// sits. Callers wrap it in a `Row` so the list cannot centre it.
-Widget skBack(BuildContext context, V2Palette p) => GestureDetector(
+Widget skBack(BuildContext context, V2Palette p) => PvPress(child: GestureDetector(
       onTap: () => Navigator.of(context).maybePop(),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -545,7 +546,7 @@ Widget skBack(BuildContext context, V2Palette p) => GestureDetector(
         ),
         child: Icon(Icons.arrow_back_rounded, size: 22, color: p.ink1),
       ),
-    );
+    ));
 
 /// One block, rendered the way the page would render it.
 class SkBlockView extends StatelessWidget {

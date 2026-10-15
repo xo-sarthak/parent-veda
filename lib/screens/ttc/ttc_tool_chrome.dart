@@ -52,7 +52,7 @@ import 'package:flutter/services.dart';
 
 import '../../theme/pv_fonts.dart';
 import '../../ttc/ttc_chapter.dart' show TtcChapter;
-import '../../widgets/pv_feedback.dart' show PvQuestionProgress;
+import '../../widgets/pv_feedback.dart' show PvQuestionProgress, PvPress;
 import '../products/pv_store_chrome.dart' show pvSnack;
 import '../v2/v2_palette.dart';
 import '../v2/v3_hero_field.dart';
@@ -623,7 +623,7 @@ class TtcToolPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
@@ -642,7 +642,7 @@ class TtcToolPill extends StatelessWidget {
                 fontWeight: on ? FontWeight.w800 : FontWeight.w600,
                 color: on ? Colors.white : ttcTitleInk)),
       ),
-    );
+    ));
   }
 }
 

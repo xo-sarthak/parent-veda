@@ -36,6 +36,7 @@ import 'pp_create_post_screen.dart';
 import 'pp_post_detail_screen.dart';
 import 'pp_section_extras.dart';
 import 'pp_opening_soon.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // The identity used while testing "Doctor mode" for the parenting side (until
 // real doctor logins exist). Display-only - the store's endorsement bookkeeping
@@ -478,7 +479,7 @@ void ppShowPostMenu(BuildContext context, CommunityPost post) {
 
 Widget _ppMenuRow(BuildContext ctx, IconData i, String label, VoidCallback onTap,
         {bool pop = true, VoidCallback? extra}) =>
-    GestureDetector(
+    PvPress(child: GestureDetector(
       onTap: () {
         if (pop) Navigator.of(ctx).pop();
         extra?.call();
@@ -493,7 +494,7 @@ Widget _ppMenuRow(BuildContext ctx, IconData i, String label, VoidCallback onTap
           Text(label, style: ppBody(14.5, color: ppInk, w: FontWeight.w600)),
         ]),
       ),
-    );
+    ));
 
 // ===========================================================================
 //  Post card (feed + detail) - X/Twitter-style
@@ -518,7 +519,7 @@ class PpCommunityPostCard extends StatelessWidget {
     final saved = _store.isSaved(post.id);
     final reposted = _store.isReposted(post.id);
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      GestureDetector(
+      PvPress(enabled: onTap != null, child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Padding(
@@ -552,7 +553,7 @@ class PpCommunityPostCard extends StatelessWidget {
                       ),
                     ]),
                   ),
-                  GestureDetector(
+                  PvPress(child: GestureDetector(
                     onTap: () => ppShowPostMenu(context, post),
                     behavior: HitTestBehavior.opaque,
                     child: const Padding(
@@ -560,7 +561,7 @@ class PpCommunityPostCard extends StatelessWidget {
                       child:
                           Icon(Icons.more_horiz_rounded, size: 18, color: ppMuted),
                     ),
-                  ),
+                  )),
                 ]),
                 if (community != null)
                   Padding(
@@ -661,7 +662,7 @@ class PpCommunityPostCard extends StatelessWidget {
             ),
           ]),
         ),
-      ),
+      )),
       const Divider(height: 1, thickness: 1, color: ppHair),
     ]);
   }
@@ -678,7 +679,7 @@ class _PpEngage extends StatelessWidget {
   final Color color;
   final VoidCallback onTap;
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Padding(
@@ -691,7 +692,7 @@ class _PpEngage extends StatelessWidget {
             ],
           ]),
         ),
-      );
+      ));
 }
 
 class PpPollBlock extends StatelessWidget {
@@ -1085,7 +1086,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                 style: ppBody(12.5, color: Colors.white, w: FontWeight.w700, h: 1.3)),
           ),
           const SizedBox(width: 8),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => _s.setDoctorMode(false),
             behavior: HitTestBehavior.opaque,
             child: Container(
@@ -1096,13 +1097,13 @@ class _CommunityScreenState extends State<CommunityScreen> {
               child: Text('Exit',
                   style: ppBody(12, color: Colors.white, w: FontWeight.w800)),
             ),
-          ),
+          )),
         ]),
       );
 
   Widget _feedTabs() {
     Widget chip(String label, bool active, VoidCallback onTap) => Expanded(
-          child: GestureDetector(
+          child: PvPress(child: GestureDetector(
             onTap: onTap,
             behavior: HitTestBehavior.opaque,
             child: AnimatedContainer(
@@ -1126,7 +1127,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                       color: active ? Colors.white : ppSoft,
                       w: FontWeight.w700)),
             ),
-          ),
+          )),
         );
     return Container(
       padding: const EdgeInsets.all(4),
@@ -1146,7 +1147,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
         alignment: Alignment.centerLeft,
         child: Padding(
           padding: const EdgeInsets.only(top: 10),
-          child: GestureDetector(
+          child: PvPress(child: GestureDetector(
             onTap: () => setState(() => _needsVerifyOnly = !_needsVerifyOnly),
             behavior: HitTestBehavior.opaque,
             child: AnimatedContainer(
@@ -1175,7 +1176,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                         w: FontWeight.w800)),
               ]),
             ),
-          ),
+          )),
         ),
       );
 
@@ -1200,7 +1201,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
   /// renders nothing at all when no campaign is live.
   Widget _sponsored() => const SponsoredCommunityCampaign();
 
-  Widget _composeFab() => GestureDetector(
+  Widget _composeFab() => PvPress(child: GestureDetector(
         onTap: _openCompose,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -1222,7 +1223,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
               size: 22,
               color: Colors.white),
         ),
-      );
+      ));
 
   void _communitySheet(Community c) {
     showModalBottomSheet<void>(
@@ -1360,7 +1361,7 @@ class _PpRecommendedCard extends StatelessWidget {
   final VoidCallback onJoin;
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       child: Container(
         width: 208,
@@ -1403,7 +1404,7 @@ class _PpRecommendedCard extends StatelessWidget {
                 style: ppBody(12, color: ppSoft, h: 1.35)),
           ),
           const SizedBox(height: 10),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: onJoin,
             behavior: HitTestBehavior.opaque,
             child: Container(
@@ -1426,10 +1427,10 @@ class _PpRecommendedCard extends StatelessWidget {
                         w: FontWeight.w800)),
               ]),
             ),
-          ),
+          )),
         ]),
       ),
-    );
+    ));
   }
 }
 

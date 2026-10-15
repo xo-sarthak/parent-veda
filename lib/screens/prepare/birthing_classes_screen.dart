@@ -15,6 +15,7 @@ import '../../widgets/pv_placeholders.dart';
 import '../../localization/app_language.dart';
 import '../learn/pv_offering_screen.dart';
 import '../learn/pv_learn_catalog.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// Who teaches the birthing course.
 ///
@@ -289,7 +290,7 @@ class BirthingClassesScreenClassic extends StatelessWidget {
   Widget _classRow(S s, BirthingClass c,
       {required bool enrolled, required bool bottom, required VoidCallback onPlay, required VoidCallback onEnroll}) {
     final unlocked = c.free || enrolled;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: unlocked ? onPlay : onEnroll,
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -328,6 +329,6 @@ class BirthingClassesScreenClassic extends StatelessWidget {
             const Icon(Icons.lock_outline_rounded, size: 16, color: Color(0xFFCAC6CB)),
         ]),
       ),
-    );
+    ));
   }
 }

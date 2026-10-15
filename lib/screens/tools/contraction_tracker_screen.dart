@@ -62,6 +62,7 @@ import '../pregnancy/preg_chrome.dart';
 import '../pregnancy/preg_tool_chrome.dart';
 import '../pregnancy/preg_tool_parts.dart' show PregFoldRow;
 import '../products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // Kept for revert: the phase colours before the one ink.
 // const Color _activeColor = Color(0xFFE8833A); // orange - active contraction
@@ -1582,7 +1583,7 @@ class _ChoicePill extends StatelessWidget {
         selected: selected,
         label: label,
         excludeSemantics: true,
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: AnimatedContainer(
@@ -1599,7 +1600,7 @@ class _ChoicePill extends StatelessWidget {
                     fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
                     color: selected ? Colors.white : pvStorePalette.ink1)),
           ),
-        ),
+        )),
       );
 }
 

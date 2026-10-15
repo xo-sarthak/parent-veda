@@ -28,6 +28,7 @@ import '../v2/v2_palette.dart';
 import 'pp_care_history_screen.dart';
 import 'pp_care_parts.dart';
 import 'pp_search.dart' show openPpAskVeda;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// ⚠️ THE SHARED TOOL SHELL (2026-10-07, parenting gap pass), as the Feeding
 /// journey: `PregToolScaffold`, plain numbers on white (no purple numeral on a
@@ -353,11 +354,11 @@ class _SleepJourneyScreenState extends State<SleepJourneyScreen> {
             ]),
           ),
           const SizedBox(width: 8),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => ppConfirmRemove(context, 'Remove this sleep?', () => _store.remove(s.id)),
             behavior: HitTestBehavior.opaque,
             child: const Padding(padding: EdgeInsets.only(left: 4), child: Icon(Icons.delete_outline_rounded, size: 20, color: ppMuted)),
-          ),
+          )),
         ]),
       );
 

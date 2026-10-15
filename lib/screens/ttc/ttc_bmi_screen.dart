@@ -71,6 +71,7 @@ import 'ttc_tool_hues.dart';
 import '../../ttc/ttc_cycle_report.dart' show kTtcWeightTracker, kTtcWeightField;
 import '../../ttc/ttc_log_store.dart';
 import 'ttc_common.dart' show ttcTitleInk, TtcSectionHeading;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// ⚠️ T6 (launch sanity, 2026-09-28): the tool wears its Tools group's
 /// colour, "Your body" (see ttc_tool_hues.dart). Kept for revert (2026-09-28):
@@ -1371,7 +1372,7 @@ class _Fold extends StatelessWidget {
   Widget build(BuildContext context) => Semantics(
         button: true,
         expanded: open,
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -1404,7 +1405,7 @@ class _Fold extends StatelessWidget {
                   ],
                 ]),
           ),
-        ),
+        )),
       );
 }
 
@@ -1456,7 +1457,7 @@ class _UnitToggle extends StatelessWidget {
   //     );
 
   // ignore: unused_element
-  Widget _seg(String label, bool on, VoidCallback tap) => GestureDetector(
+  Widget _seg(String label, bool on, VoidCallback tap) => PvPress(child: GestureDetector(
         onTap: tap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -1473,7 +1474,7 @@ class _UnitToggle extends StatelessWidget {
                   fontWeight: FontWeight.w700,
                   color: on ? Colors.white : p.ink2)),
         ),
-      );
+      ));
 }
 
 /// One saved measurement: date, BMI, weight, and a cross to remove it.
@@ -1551,7 +1552,7 @@ class _Next extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -1584,7 +1585,7 @@ class _Next extends StatelessWidget {
             ),
           ]),
         ),
-      );
+      ));
 }
 
 class _Button extends StatelessWidget {
@@ -1612,7 +1613,7 @@ class _Button extends StatelessWidget {
 
   // Kept for revert (2026-09-27): the purple filled button.
   // ignore: unused_element
-  Widget _oldBuild(BuildContext context) => GestureDetector(
+  Widget _oldBuild(BuildContext context) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -1630,7 +1631,7 @@ class _Button extends StatelessWidget {
                   fontWeight: FontWeight.w700,
                   color: filled ? Colors.white : p.ink1)),
         ),
-      );
+      ));
 }
 
 

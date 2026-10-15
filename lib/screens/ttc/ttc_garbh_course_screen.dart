@@ -42,6 +42,7 @@ import 'ttc_tool_chrome.dart';
 import '../learn/pv_offering_screen.dart';
 import '../learn/pv_learn_catalog.dart';
 import 'ttc_common.dart' show ttcTitleInk;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// Sage. The hue of "The practice" tab, which is where this course is reached
 /// from — see `ttc_focus_mind_body.dart`. The course is the deep end of that
@@ -962,7 +963,7 @@ class _TaughtPractice extends StatelessWidget {
         // ⚠️ THE FULL CARD IS ONE TAP AWAY AND IS NOT COPIED HERE. The steps and
         // the "skip it if" live on the practice card; reprinting them inside the
         // session is the second copy the whole area is built to avoid.
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () =>
               openTtcSurface(context, 'ttc_practice/${practice.id}'),
           behavior: HitTestBehavior.opaque,
@@ -983,7 +984,7 @@ class _TaughtPractice extends StatelessWidget {
             const SizedBox(width: 5),
             Icon(Icons.arrow_forward_rounded, size: 14, color: p.action),
           ]),
-        ),
+        )),
       ]);
 }
 
@@ -1095,7 +1096,7 @@ class _GettingReadyLinks extends StatelessWidget {
                 color: p.ink2)),
         const SizedBox(height: 10),
         for (final (title, readId) in _links)
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => openTtcSurface(context, 'ttc_read/$readId'),
             behavior: HitTestBehavior.opaque,
             child: Padding(
@@ -1113,7 +1114,7 @@ class _GettingReadyLinks extends StatelessWidget {
                 Icon(Icons.arrow_forward_rounded, size: 15, color: p.ink3),
               ]),
             ),
-          ),
+          )),
       ]);
 }
 
@@ -1261,7 +1262,7 @@ class _AssembleBlockState extends State<_AssembleBlock> {
       _TodayPreview(
           p: p, moveId: _move, breatheId: _breathe, couple: _couple),
       const SizedBox(height: 12),
-      GestureDetector(
+      PvPress(child: GestureDetector(
         onTap: () {
           store.setDailyPractice(
               moveId: _move, breatheId: _breathe, couple: _couple);
@@ -1281,7 +1282,7 @@ class _AssembleBlockState extends State<_AssembleBlock> {
                   fontWeight: FontWeight.w700,
                   color: Colors.white)),
         ),
-      ),
+      )),
 
       // ---- and here it is ---------------------------------------------------
       //
@@ -1334,7 +1335,7 @@ class _Pick extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Padding(
@@ -1370,7 +1371,7 @@ class _Pick extends StatelessWidget {
                     fontSize: 11, fontWeight: FontWeight.w700, color: p.ink3)),
           ]),
         ),
-      );
+      ));
 }
 
 /// One line of what Today will show once she saves, from her picks so far.
@@ -1523,7 +1524,7 @@ class _TimeRow extends StatelessWidget {
   final void Function(String) onPick;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         onTap: () async {
           final t = await showTimePicker(
             context: context,
@@ -1568,7 +1569,7 @@ class _TimeRow extends StatelessWidget {
             ),
           ]),
         ),
-      );
+      ));
 
   static TimeOfDay? _parse(String? hhmm) {
     if (hhmm == null) return null;

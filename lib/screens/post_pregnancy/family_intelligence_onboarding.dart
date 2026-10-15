@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'pp_child_profile.dart';
 import 'pp_common.dart';
 import '../../services/family_profile.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 const List<String> _months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -54,7 +55,7 @@ class _FamilyIntelligenceOnboardingState extends State<FamilyIntelligenceOnboard
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 10, 20, 6),
               child: Row(children: [
-                GestureDetector(
+                PvPress(child: GestureDetector(
                   onTap: () => _step == 0 ? Navigator.of(context).maybePop() : setState(() => _step--),
                   behavior: HitTestBehavior.opaque,
                   child: Container(
@@ -62,7 +63,7 @@ class _FamilyIntelligenceOnboardingState extends State<FamilyIntelligenceOnboard
                     decoration: const BoxDecoration(color: ppPanel, shape: BoxShape.circle),
                     child: Icon(_step == 0 ? Icons.close_rounded : Icons.arrow_back, size: 17, color: ppInk),
                   ),
-                ),
+                )),
                 const SizedBox(width: 12),
                 Expanded(
                   child: ClipRRect(
@@ -77,11 +78,11 @@ class _FamilyIntelligenceOnboardingState extends State<FamilyIntelligenceOnboard
                 ),
                 if (!isWelcome && !isDone) ...[
                   const SizedBox(width: 12),
-                  GestureDetector(
+                  PvPress(child: GestureDetector(
                     onTap: _next,
                     behavior: HitTestBehavior.opaque,
                     child: Text('Skip', style: ppBody(13, color: ppMuted, w: FontWeight.w700)),
-                  ),
+                  )),
                 ],
               ]),
             ),
@@ -95,7 +96,7 @@ class _FamilyIntelligenceOnboardingState extends State<FamilyIntelligenceOnboard
 
   Widget _footer(bool isWelcome, bool isDone) => Padding(
         padding: const EdgeInsets.fromLTRB(24, 6, 24, 18),
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: isDone ? _finish : _next,
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -111,7 +112,7 @@ class _FamilyIntelligenceOnboardingState extends State<FamilyIntelligenceOnboard
               const Text('→', style: TextStyle(color: Colors.white)),
             ]),
           ),
-        ),
+        )),
       );
 
   // ---- step content -------------------------------------------------------
@@ -179,7 +180,7 @@ class _FamilyIntelligenceOnboardingState extends State<FamilyIntelligenceOnboard
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       _head('About your child', 'The basics on ${_child.nameMid}', 'We use this to personalise development, growth and age-specific guidance.'),
       _pad(_label('Date of birth')),
-      _pad(GestureDetector(
+      _pad(PvPress(child: GestureDetector(
         onTap: () async {
           final picked = await showDatePicker(
             context: context,
@@ -202,7 +203,7 @@ class _FamilyIntelligenceOnboardingState extends State<FamilyIntelligenceOnboard
             Text(_child.ageLabel, style: ppBody(12.5, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis),
           ]),
         ),
-      )),
+      ))),
       _pad(_label('Sex (optional)')),
       _pad(Row(children: [
         _single('Boy', _child.isBoy, () => _child.update(isBoy: true)),
@@ -317,7 +318,7 @@ class _FamilyIntelligenceOnboardingState extends State<FamilyIntelligenceOnboard
       );
 
   Widget _single(String label, bool on, VoidCallback onTap) => Expanded(
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -330,10 +331,10 @@ class _FamilyIntelligenceOnboardingState extends State<FamilyIntelligenceOnboard
             ),
             child: Text(label, style: ppBody(14, color: on ? Colors.white : ppInk, w: FontWeight.w700)),
           ),
-        ),
+        )),
       );
 
-  Widget _toggle(String label, bool on, VoidCallback onTap) => GestureDetector(
+  Widget _toggle(String label, bool on, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -351,9 +352,9 @@ class _FamilyIntelligenceOnboardingState extends State<FamilyIntelligenceOnboard
             ),
           ]),
         ),
-      );
+      ));
 
-  Widget _wideChoice(String label, bool on, VoidCallback onTap) => GestureDetector(
+  Widget _wideChoice(String label, bool on, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -374,5 +375,5 @@ class _FamilyIntelligenceOnboardingState extends State<FamilyIntelligenceOnboard
             Expanded(child: Text(label, style: ppBody(14.5, color: ppInk, w: on ? FontWeight.w700 : FontWeight.w400))),
           ]),
         ),
-      );
+      ));
 }

@@ -26,6 +26,7 @@ import 'week_flow_screen.dart';
 import '../theme/pv_fonts.dart';
 import 'pregnancy/preg_chrome.dart' show pregFilledStyle;
 import 'products/pv_store_chrome.dart' show pvStorePalette;
+import '../widgets/pv_feedback.dart' show PvPress;
 
 // ⚠️ ONE PARENTVEDA (2026-09-30, the pregnancy restyle): this screen already
 // drew its chrome in the one ink. What changed: the pill that returns to the
@@ -118,7 +119,7 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
   Widget _v2Toggle() {
     final s = S(_c.language);
     final father = FatherPreview.instance.on; // Slate chrome on ALL weeks now
-    Widget seg(String label, bool on, VoidCallback onTap) => GestureDetector(
+    Widget seg(String label, bool on, VoidCallback onTap) => PvPress(child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: AnimatedContainer(
@@ -138,7 +139,7 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
                         ? Colors.white
                         : (father ? kFMuted : AppTheme.neutral500))),
           ),
-        );
+        ));
     return Center(
       child: Container(
         margin: const EdgeInsets.only(right: 6),
@@ -159,7 +160,7 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
   Widget _w5ToggleBar() {
     final father = FatherPreview.instance.on;
     final active = father ? kFAccent : AppTheme.neutral900;
-    Widget seg(String label, bool on, VoidCallback onTap) => GestureDetector(
+    Widget seg(String label, bool on, VoidCallback onTap) => PvPress(child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: AnimatedContainer(
@@ -177,7 +178,7 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
                         ? Colors.white
                         : (father ? kFMuted : AppTheme.neutral500))),
           ),
-        );
+        ));
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
       alignment: Alignment.center,
@@ -202,7 +203,7 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
     final father = FatherPreview.instance.on; // Slate chrome on ALL weeks now
     final tint = father ? kFAccent : AppTheme.neutral900;
     return Center(
-      child: GestureDetector(
+      child: PvPress(child: GestureDetector(
         onTap: AppNav.instance.goToday,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -222,7 +223,7 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
                     fontSize: 11.5, fontWeight: FontWeight.w700, color: tint)),
           ]),
         ),
-      ),
+      )),
     );
   }
 
@@ -280,7 +281,7 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
                   BabyVoiceService.instance.isMutedFor(VoiceScope.journey);
               return Padding(
                 padding: const EdgeInsets.only(right: 16),
-                child: GestureDetector(
+                child: PvPress(child: GestureDetector(
                   onTap: () => BabyVoiceService.instance
                       .toggleMuteFor(VoiceScope.journey),
                   behavior: HitTestBehavior.opaque,
@@ -301,7 +302,7 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
                           : (father ? kFAccent : AppTheme.neutral900),
                     ),
                   ),
-                ),
+                )),
               );
             },
           ),
@@ -631,7 +632,7 @@ class _Segment extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 220),
@@ -648,7 +649,7 @@ class _Segment extends StatelessWidget {
           ),
         ),
       ),
-    );
+    ));
   }
 }
 
@@ -1117,7 +1118,7 @@ class _WeekDot extends StatelessWidget {
     final accent = father ? kFAccent : AppTheme.neutral900;
     // Selected week - a filled disc with a soft glow (design).
     if (isSelected) {
-      return GestureDetector(
+      return PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Center(
@@ -1148,13 +1149,13 @@ class _WeekDot extends StatelessWidget {
             ),
           ),
         ),
-      );
+      ));
     }
     // Other weeks - a soft number; the current week gets a small accent dot.
     final color = locked
         ? AppTheme.neutral300
         : (isCurrent ? accent : (father ? kFMuted : AppTheme.neutral400));
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Center(
@@ -1181,7 +1182,7 @@ class _WeekDot extends StatelessWidget {
           ],
         ),
       ),
-    );
+    ));
   }
 }
 

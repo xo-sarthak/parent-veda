@@ -35,6 +35,7 @@ import 'ttc_round_strings.dart';
 import 'ttc_surface_router.dart' show openTtcSurface;
 import 'ttc_round_home_card.dart' show TtcRoundCheckInCard;
 import 'ttc_treatment_round_screens.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 void openTtcTreatment(BuildContext context) {
   Navigator.of(context).push(
@@ -391,7 +392,7 @@ class TtcTreatmentScreenClassic extends StatelessWidget {
               ttcToolPad(
                 Semantics(
                   button: true,
-                  child: GestureDetector(
+                  child: PvPress(child: GestureDetector(
                     key: const ValueKey('ttc_round_remove'),
                     onTap: () => _confirmClear(context, t),
                     behavior: HitTestBehavior.opaque,
@@ -408,7 +409,7 @@ class TtcTreatmentScreenClassic extends StatelessWidget {
                         ),
                       ),
                     ),
-                  ),
+                  )),
                 ),
               ),
 
@@ -681,7 +682,7 @@ class _TakenTick extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => TtcTreatmentStore.instance.setTriggerTaken(!taken),
       behavior: HitTestBehavior.opaque,
       child: Row(
@@ -722,7 +723,7 @@ class _TakenTick extends StatelessWidget {
           ),
         ],
       ),
-    );
+    ));
   }
 }
 
@@ -801,7 +802,7 @@ class _StepRow extends StatelessWidget {
             Semantics(
               button: true,
               label: 'Remove this date',
-              child: GestureDetector(
+              child: PvPress(child: GestureDetector(
                 key: ValueKey('ttc_legacy_clear_${step.name}'),
                 onTap: () {
                   final store = TtcTreatmentStore.instance;
@@ -820,7 +821,7 @@ class _StepRow extends StatelessWidget {
                   padding: EdgeInsets.only(left: 8),
                   child: Icon(Icons.close_rounded, size: 16, color: ttcMuted),
                 ),
-              ),
+              )),
             ),
         ],
       ),
@@ -1082,7 +1083,7 @@ class TtcPathChooser extends StatelessWidget {
               Text(t.pathwayChooseBody, style: ttcBody(12.5, h: 1.55)),
               const SizedBox(height: 16),
               for (final path in TtcPath.values) ...[
-                GestureDetector(
+                PvPress(child: GestureDetector(
                   onTap: () => TtcStore.instance.setPath(path),
                   behavior: HitTestBehavior.opaque,
                   child: Container(
@@ -1159,7 +1160,7 @@ class TtcPathChooser extends StatelessWidget {
                       ],
                     ),
                   ),
-                ),
+                )),
               ],
             ],
           ),
@@ -1245,7 +1246,7 @@ class _Question extends StatelessWidget {
       final on = value == v;
       return Padding(
         padding: const EdgeInsets.only(right: 8),
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           // Tapping the chosen one again clears it back to "not sure", so an
           // answer is never a trap.
           onTap: () => onChanged(on ? null : v),
@@ -1273,7 +1274,7 @@ class _Question extends StatelessWidget {
               ),
             ),
           ),
-        ),
+        )),
       );
     }
 

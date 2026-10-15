@@ -29,6 +29,7 @@ import '../../services/life_stage_store.dart';
 import '../../data/learn/pv_learn_view.dart';
 import '../learn/pv_offering_screen.dart';
 import '../learn/pv_learn_catalog.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // ⚠️ FACADE since 2026-09-20 (docs/LEARNING-AUDIT.md). The class keeps its
 // name and constructor so every push of it lands on the unified learn
@@ -304,7 +305,7 @@ class TtcOfferingScreenClassic extends StatelessWidget {
                           ]),
                     ),
                     if (entitlement == null)
-                      GestureDetector(
+                      PvPress(child: GestureDetector(
                         onTap: () => _buy(context),
                         behavior: HitTestBehavior.opaque,
                         child: Container(
@@ -317,7 +318,7 @@ class TtcOfferingScreenClassic extends StatelessWidget {
                               style: ttcBody(13.5,
                                   color: Colors.white, w: FontWeight.w800)),
                         ),
-                      )
+                      ))
                     else
                       Column(
                           crossAxisAlignment: CrossAxisAlignment.end,

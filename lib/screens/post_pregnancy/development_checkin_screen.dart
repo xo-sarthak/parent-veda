@@ -34,6 +34,7 @@ import 'pp_common.dart';
 import 'pp_development_data.dart';
 import 'pp_phases_data.dart' show ppFillChild;
 import 'pp_search.dart' show openPpAskVeda;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// The line the gap analysis asked for, word for word.
 const String kCheckInWorthAskingLine = 'It is worth asking your paediatrician about this at your next visit, '
@@ -275,7 +276,7 @@ class DevelopmentCheckinClassic extends StatelessWidget {
   }
 
   Widget _choice(String label, bool on, Color accent, VoidCallback onTap) => Expanded(
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -288,7 +289,7 @@ class DevelopmentCheckinClassic extends StatelessWidget {
             ),
             child: Text(label, style: ppBody(13, color: on ? accent : ppSoft, w: FontWeight.w700)),
           ),
-        ),
+        )),
       );
 
   Widget _reflection(BuildContext context, int yeses, int notYet) {
@@ -322,11 +323,11 @@ class DevelopmentCheckinClassic extends StatelessWidget {
         ],
         const SizedBox(height: 14),
         Row(children: [
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => openPpTab(context, 1),
             behavior: HitTestBehavior.opaque,
             child: Row(children: [Text('Ask Veda anything', style: ppBody(13, color: ppPurple, w: FontWeight.w700)), const SizedBox(width: 6), const Icon(Icons.arrow_forward, size: 14, color: ppPurple)]),
-          ),
+          )),
         ]),
       ]),
     );

@@ -45,6 +45,7 @@ import 'pp_child_profile.dart';
 import 'pp_common.dart';
 import 'pp_development_data.dart';
 import 'pp_grow_data.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 void _push(BuildContext c, Widget s) =>
     Navigator.of(c).push(MaterialPageRoute<void>(builder: (_) => s));
@@ -189,7 +190,7 @@ class GrowV3Home extends StatelessWidget {
         const SizedBox(height: 14),
         Text(growWhyToday(a), style: ppBody(13, h: 1.55)),
         const SizedBox(height: 18),
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () => _push(context, GrowActivityScreen(activity: a)),
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -203,7 +204,7 @@ class GrowV3Home extends StatelessWidget {
                 style: ppBody(13.5,
                     color: done ? ppSoft : Colors.white, w: FontWeight.w800)),
           ),
-        ),
+        )),
       ]),
     );
   }
@@ -265,7 +266,7 @@ class GrowV3Home extends StatelessWidget {
     );
   }
 
-  Widget _capTile(BuildContext context, GrowCapability c) => GestureDetector(
+  Widget _capTile(BuildContext context, GrowCapability c) => PvPress(child: GestureDetector(
         onTap: () => _push(context, GrowV3CapabilityScreen(cap: c)),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -294,11 +295,11 @@ class GrowV3Home extends StatelessWidget {
                 style: ppBody(11, color: ppMuted)),
           ]),
         ),
-      );
+      ));
 
   Widget _row(BuildContext context, IconData icon, String title, String sub,
           Widget dest) =>
-      GestureDetector(
+      PvPress(child: GestureDetector(
         onTap: () => _push(context, dest),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -321,7 +322,7 @@ class GrowV3Home extends StatelessWidget {
             const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
           ]),
         ),
-      );
+      ));
 
   Widget _empty() => Container(
         padding: const EdgeInsets.all(16),
@@ -335,7 +336,7 @@ class GrowV3Home extends StatelessWidget {
             style: ppBody(12.5, h: 1.5)),
       );
 
-  Widget _mini(BuildContext context, DevActivity a) => GestureDetector(
+  Widget _mini(BuildContext context, DevActivity a) => PvPress(child: GestureDetector(
         onTap: () => _push(context, GrowActivityScreen(activity: a)),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -353,7 +354,7 @@ class GrowV3Home extends StatelessWidget {
             Text(a.timeLabel, style: ppBody(11.5, color: ppMuted)),
           ]),
         ),
-      );
+      ));
 }
 
 // =============================================================================
@@ -467,7 +468,7 @@ class GrowV3CapabilityScreen extends StatelessWidget {
     );
   }
 
-  Widget _actRow(BuildContext context, DevActivity a) => GestureDetector(
+  Widget _actRow(BuildContext context, DevActivity a) => PvPress(child: GestureDetector(
         onTap: () => _push(context, GrowActivityScreen(activity: a)),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -493,9 +494,9 @@ class GrowV3CapabilityScreen extends StatelessWidget {
               const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
           ]),
         ),
-      );
+      ));
 
-  Widget _areaRow(BuildContext context, DevArea area) => GestureDetector(
+  Widget _areaRow(BuildContext context, DevArea area) => PvPress(child: GestureDetector(
         onTap: () => _push(context, DevelopmentAreaScreen(area: area)),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -511,5 +512,5 @@ class GrowV3CapabilityScreen extends StatelessWidget {
             const Icon(Icons.chevron_right_rounded, size: 19, color: ppMuted),
           ]),
         ),
-      );
+      ));
 }

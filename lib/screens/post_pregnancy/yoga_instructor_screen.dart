@@ -31,6 +31,7 @@ import 'package:flutter/material.dart';
 import 'pp_common.dart';
 import 'pp_yoga_data.dart';
 import 'yoga_common.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class YogaInstructorScreen extends StatelessWidget {
   const YogaInstructorScreen({super.key, required this.source});
@@ -136,7 +137,7 @@ class YogaInstructorScreen extends StatelessWidget {
     );
   }
 
-  Widget _classRow(BuildContext context, YogaClass c) => GestureDetector(
+  Widget _classRow(BuildContext context, YogaClass c) => PvPress(child: GestureDetector(
         // Pop back to the class list root only if tapping a DIFFERENT class, so
         // we don't stack duplicate detail screens.
         onTap: () => Navigator.of(context).maybePop(),
@@ -168,5 +169,5 @@ class YogaInstructorScreen extends StatelessWidget {
             yogaModeBadge(c.mode),
           ]),
         ),
-      );
+      ));
 }

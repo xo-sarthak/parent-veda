@@ -44,6 +44,7 @@ import '../doors/pv_door_router.dart' show openPvDoorSurface;
 import 'father_stories_screen.dart';
 import '../../theme/pv_fonts.dart';
 import '../../localization/app_language.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // ---- palettes ---------------------------------------------------------------
 LocalizedText _t(String en, String hi) => LocalizedText(en: en, hi: hi);
@@ -478,7 +479,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
   // ignore: unused_element
   Widget _quickCircles(_Pal p) {
     Widget circle(IconData icon, String label, VoidCallback onTap) => Expanded(
-          child: GestureDetector(
+          child: PvPress(child: GestureDetector(
             onTap: onTap,
             behavior: HitTestBehavior.opaque,
             child: Column(children: [
@@ -502,7 +503,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
               const SizedBox(height: 7),
               Text(label, style: _body(12, p.muted, w: FontWeight.w600)),
             ]),
-          ),
+          )),
         );
     return Padding(
       padding: const EdgeInsets.fromLTRB(26, 10, 26, 2),
@@ -546,7 +547,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
           Text(_t('ParentVeda', 'ParentVeda').now, style: _serif(18, p.ink)),
           const Spacer(),
           // Dev Slate/Teal palette toggle (moved here from the snapshot hero).
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => setState(() => _palIdx = _palIdx == 0 ? 1 : 0),
             behavior: HitTestBehavior.opaque,
             child: Container(
@@ -570,10 +571,10 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                         color: p.accent2, shape: BoxShape.circle)),
               ]),
             ),
-          ),
+          )),
           const SizedBox(width: 10),
           // Profile avatar (top-right, like the mother) → ProfileScreen.
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => Navigator.of(context).push(MaterialPageRoute(
                 builder: (_) =>
                     ProfileScreen(controller: widget.controller, father: true))),
@@ -588,7 +589,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                   _dadName.isNotEmpty ? _dadName[0].toUpperCase() : 'P',
                   style: _serif(16, p.cream)),
             ),
-          ),
+          )),
         ]),
       );
 
@@ -618,7 +619,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
           padding: const EdgeInsets.fromLTRB(4, 4, 4, 10),
           child: Text(S.now.uiWeeklySnapshot, style: _eyebrow(p.muted, 0.14)),
         ),
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () => AppNav.instance.goWeekly(),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(26),
@@ -709,7 +710,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
               ]),
             ),
           ),
-        ),
+        )),
       ]),
     );
   }
@@ -749,7 +750,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
   Widget _snapShortcut(
           _Pal p, IconData icon, String label, VoidCallback onTap) =>
       Expanded(
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: Column(children: [
@@ -771,7 +772,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                 style: _body(11, p.cream.withValues(alpha: 0.95),
                     w: FontWeight.w700)),
           ]),
-        ),
+        )),
       );
 
   // Parked - replaced by _weeklySnapshot above. Kept for revert.
@@ -811,7 +812,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
             ]),
           ),
           // palette toggle (two dots)
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => setState(() => _palIdx = _palIdx == 0 ? 1 : 0),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 7),
@@ -834,7 +835,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                         color: p.accent2, shape: BoxShape.circle)),
               ]),
             ),
-          ),
+          )),
         ]),
         const SizedBox(height: 13),
         ClipRRect(
@@ -1256,7 +1257,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
     final lang = widget.controller.language;
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
-      child: GestureDetector(
+      child: PvPress(child: GestureDetector(
         onTap: () => Navigator.of(context).push(MaterialPageRoute(
             builder: (_) =>
                 _FatherScanDetail(milestone: m, controller: widget.controller))),
@@ -1274,7 +1275,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
             ]),
           ),
           const SizedBox(width: 8),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => ScansStore.instance.markCompleted(
                 scanId: m.id,
                 journalTitle: m.title.of(lang),
@@ -1289,9 +1290,9 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
               child: Text(S.now.uiAlreadyDone,
                   style: _body(12, p.accent, w: FontWeight.w700)),
             ),
-          ),
+          )),
         ]),
-      ),
+      )),
     );
   }
 
@@ -1371,7 +1372,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
   Widget _fAllScanTile(_Pal p, JourneyMilestone m) {
     final lang = widget.controller.language;
     final done = ScansStore.instance.isCompleted(m.id);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       // Tap the tile → read the scan in depth; the check icon toggles "done".
       onTap: () => Navigator.of(context).push(MaterialPageRoute(
           builder: (_) =>
@@ -1399,7 +1400,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                       style: _body(12, p.muted)),
                 ]),
           ),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => done
                 ? ScansStore.instance.unmarkCompleted(m.id)
                 : ScansStore.instance.markCompleted(
@@ -1411,10 +1412,10 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                 done ? Icons.check_circle_rounded : Icons.circle_outlined,
                 color: done ? p.accent : p.muted,
                 size: 24),
-          ),
+          )),
         ]),
       ),
-    );
+    ));
   }
 
   // ---- card 5: stories & myth - REMOVED from the father's daily home (kept
@@ -1446,12 +1447,12 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                       child: Text(S.now.uiStoriesFablesMyth,
                           style: _eyebrow(p.accent2, 0.1)),
                     ),
-                    GestureDetector(
+                    PvPress(child: GestureDetector(
                       onTap: _showTaleCustomize,
                       behavior: HitTestBehavior.opaque,
                       child:
                           Icon(Icons.tune_rounded, size: 18, color: p.muted),
-                    ),
+                    )),
                   ]),
                   const SizedBox(height: 9),
                   Text(tale.title.now,
@@ -1485,7 +1486,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
         builder: (ctx, setSheet) {
           Widget tile(FatherTaleKind k) {
             final on = _taleKinds.contains(k);
-            return GestureDetector(
+            return PvPress(child: GestureDetector(
               onTap: () {
                 setSheet(() => on ? _taleKinds.remove(k) : _taleKinds.add(k));
                 setState(() {});
@@ -1514,7 +1515,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                       size: 22),
                 ]),
               ),
-            );
+            ));
           }
 
           return Padding(
@@ -1557,7 +1558,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                         style: _serif(19, p.ink, w: FontWeight.w600)),
                   ]),
             ),
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: _showJournalInfo,
               behavior: HitTestBehavior.opaque,
               child: Padding(
@@ -1565,7 +1566,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                 child:
                     Icon(Icons.info_outline_rounded, size: 19, color: p.muted),
               ),
-            ),
+            )),
           ]),
           const SizedBox(height: 16),
           Row(children: [
@@ -1622,7 +1623,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
   Widget _journalCircle(
           _Pal p, IconData icon, String label, VoidCallback onTap) =>
       Expanded(
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: Column(children: [
@@ -1637,7 +1638,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
             const SizedBox(height: 6),
             Text(label, style: _body(11, p.muted, w: FontWeight.w600)),
           ]),
-        ),
+        )),
       );
 
   void _openFatherJournal() => Navigator.of(context).push(MaterialPageRoute(
@@ -1727,7 +1728,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
   Widget _tab(_Pal p, IconData icon, String label,
       {bool active = false, VoidCallback? onTap}) {
     final c = active ? p.accent : p.muted;
-    return GestureDetector(
+    return PvPress(enabled: onTap != null, child: GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -1739,7 +1740,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                 fontWeight: active ? FontWeight.w700 : FontWeight.w600,
                 color: c)),
       ]),
-    );
+    ));
   }
 
   // ===========================================================================
@@ -1762,7 +1763,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                   Padding(
                     padding: const EdgeInsets.fromLTRB(20, 14, 20, 12),
                     child: Row(children: [
-                      GestureDetector(
+                      PvPress(child: GestureDetector(
                         onTap: _closeCard,
                         child: Container(
                           width: 38,
@@ -1776,7 +1777,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                           child: Icon(Icons.arrow_back_rounded,
                               color: p.ink, size: 20),
                         ),
-                      ),
+                      )),
                       const SizedBox(width: 13),
                       Expanded(
                           child: Text(d.eyebrow.toUpperCase(),
@@ -1796,7 +1797,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                         color: p.bg,
                         border: Border(top: BorderSide(color: p.line)),
                       ),
-                      child: GestureDetector(
+                      child: PvPress(child: GestureDetector(
                         onTap: _detailPrimary,
                         child: Container(
                           padding: const EdgeInsets.all(15),
@@ -1807,7 +1808,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                           child: Text(d.cta,
                               style: _body(15, p.cream, w: FontWeight.w600)),
                         ),
-                      ),
+                      )),
                     ),
                 ]),
         ),
@@ -1974,7 +1975,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
 
   // ignore: unused_element  (kept for revert - see PURE READ-ALOUD note above)
   Widget _recordBlock(_Pal p) => Column(children: [
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () => setState(() => _recording
               ? (_recording = false, _recorded = true)
               : (_recording = true)),
@@ -1996,7 +1997,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
             child: Icon(_recording ? Icons.stop_rounded : Icons.mic_none_rounded,
                 color: p.cream, size: 30),
           ),
-        ),
+        )),
         const SizedBox(height: 12),
         Text(
             _recording
@@ -2031,7 +2032,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
           ),
         ),
         const SizedBox(height: 12),
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: _saveEntry,
           child: Container(
             padding: const EdgeInsets.all(14),
@@ -2044,7 +2045,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
               Text(S.now.uiSaveEntry, style: _body(14.5, p.cream, w: FontWeight.w600)),
             ]),
           ),
-        ),
+        )),
         const SizedBox(height: 24),
         Text(S.now.uiRecentEntries, style: _eyebrow(p.muted, 0.12)),
         const SizedBox(height: 12),
@@ -2081,14 +2082,14 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
   Widget _momSheet(_Pal p) => IgnorePointer(
         ignoring: !_momOpen,
         child: Stack(children: [
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => setState(() => _momOpen = false),
             child: AnimatedOpacity(
               opacity: _momOpen ? 1 : 0,
               duration: const Duration(milliseconds: 300),
               child: Container(color: const Color(0x6B141E28)),
             ),
-          ),
+          )),
           Align(
             alignment: Alignment.bottomCenter,
             child: AnimatedSlide(
@@ -2142,7 +2143,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                       S.now.uiMomSDailySpace,
                       style: _body(14.5, p.ink.withValues(alpha: 0.85), h: 1.55)),
                   const SizedBox(height: 20),
-                  GestureDetector(
+                  PvPress(child: GestureDetector(
                     onTap: () {
                       setState(() => _momOpen = false);
                       _flash(_t("Mom's view lives in the other tab", 'माँ वाला रूप दूसरे टैब में है').now);
@@ -2157,9 +2158,9 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                       child: Text(S.now.uiOpenMomSView,
                           style: _body(15, Colors.white, w: FontWeight.w600)),
                     ),
-                  ),
+                  )),
                   const SizedBox(height: 10),
-                  GestureDetector(
+                  PvPress(child: GestureDetector(
                     onTap: () => setState(() => _momOpen = false),
                     child: Container(
                       width: double.infinity,
@@ -2168,7 +2169,7 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
                       child: Text(S.now.uiStayDadSView,
                           style: _body(14, p.muted, w: FontWeight.w600)),
                     ),
-                  ),
+                  )),
                 ]),
               ),
             ),
@@ -2214,8 +2215,8 @@ class _FatherDailyScreenState extends State<FatherDailyScreen> {
       );
 
   // ---- small shared builders ----
-  Widget _tap(VoidCallback onTap, Widget child) => GestureDetector(
-      onTap: onTap, behavior: HitTestBehavior.opaque, child: child);
+  Widget _tap(VoidCallback onTap, Widget child) => PvPress(child: GestureDetector(
+      onTap: onTap, behavior: HitTestBehavior.opaque, child: child));
 
   Widget _whiteCard(_Pal p, Widget child, {double pad = 18}) => Container(
         width: double.infinity,

@@ -63,6 +63,7 @@ import '../../services/reminder_store.dart';
 import 'pp_child_profile.dart';
 import 'pp_common.dart';
 import 'pp_health_data.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // =============================================================================
 //  1. WHICH VERSION IS ON SCREEN
@@ -549,7 +550,7 @@ class WalletVersionPill extends StatelessWidget {
     final store = WalletVersionStore.instance;
     Widget seg(String label, WalletVersion v) {
       final on = store.version == v;
-      return GestureDetector(
+      return PvPress(child: GestureDetector(
         onTap: () => store.setVersion(v),
         behavior: HitTestBehavior.opaque,
         child: AnimatedContainer(
@@ -563,7 +564,7 @@ class WalletVersionPill extends StatelessWidget {
               style: ppBody(11.5,
                   color: on ? Colors.white : ppSoft, w: FontWeight.w700)),
         ),
-      );
+      ));
     }
 
     return ListenableBuilder(

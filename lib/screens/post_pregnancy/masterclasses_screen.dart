@@ -21,6 +21,7 @@ import 'provider_profile_screen.dart';
 import '../learn/pv_learn_screen.dart';
 import '../../services/life_stage_store.dart';
 import '../../data/learn/pv_learn_view.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // ⚠️ FACADE since 2026-09-20 (docs/LEARNING-AUDIT.md). The class keeps its
 // name and constructor so every push of it lands on the unified learn
@@ -74,7 +75,7 @@ class MasterclassesScreenClassic extends StatelessWidget {
 
             // featured masterclass
             const SizedBox(height: 22),
-            _pad(GestureDetector(
+            _pad(PvPress(child: GestureDetector(
               onTap: () => _openFunnel(context),
               behavior: HitTestBehavior.opaque,
               child: Container(
@@ -105,7 +106,7 @@ class MasterclassesScreenClassic extends StatelessWidget {
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Text('The 4-Month Sleep Regression, Solved', style: ppJakarta(19)),
                       const SizedBox(height: 14),
-                      GestureDetector(
+                      PvPress(child: GestureDetector(
                         onTap: () => _openExpert(context, 'ananya'),
                         behavior: HitTestBehavior.opaque,
                         child: Row(children: [
@@ -127,7 +128,7 @@ class MasterclassesScreenClassic extends StatelessWidget {
                           const SizedBox(width: 10),
                           Text('90 min', style: ppBody(12, color: ppMuted, w: FontWeight.w600)),
                         ]),
-                      ),
+                      )),
                       const SizedBox(height: 16),
                       Row(children: [
                         Expanded(
@@ -151,7 +152,7 @@ class MasterclassesScreenClassic extends StatelessWidget {
                   ),
                 ]),
               ),
-            )),
+            ))),
 
             // more masterclasses
             const SizedBox(height: 28),
@@ -181,7 +182,7 @@ class MasterclassesScreenClassic extends StatelessWidget {
 
   Widget _row(BuildContext context, String title, String meta, String price,
       {required String expertId, bool top = false, bool bottom = false}) {
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _openExpert(context, expertId),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -206,6 +207,6 @@ class MasterclassesScreenClassic extends StatelessWidget {
           Text(price, style: ppBody(13, color: ppInk, w: FontWeight.w700)),
         ]),
       ),
-    );
+    ));
   }
 }

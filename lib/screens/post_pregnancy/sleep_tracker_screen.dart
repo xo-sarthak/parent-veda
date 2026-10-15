@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 
 import 'pp_common.dart';
 import 'pp_trackers_data.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class SleepTrackerScreen extends StatefulWidget {
   const SleepTrackerScreen({super.key});
@@ -108,7 +109,7 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen> {
         ]),
       );
 
-  Widget _logButton() => GestureDetector(
+  Widget _logButton() => PvPress(child: GestureDetector(
         onTap: _openLogSheet,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -121,7 +122,7 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen> {
             Text('Log sleep', style: ppBody(15, color: Colors.white, w: FontWeight.w700)),
           ]),
         ),
-      );
+      ));
 
   Widget _empty() => Container(
         padding: const EdgeInsets.all(22),
@@ -170,11 +171,11 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen> {
             ]),
           ),
           const SizedBox(width: 8),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => _confirmDelete('Remove this sleep?', () => _store.removeSleep(s.id)),
             behavior: HitTestBehavior.opaque,
             child: const Padding(padding: EdgeInsets.only(left: 4), child: Icon(Icons.delete_outline_rounded, size: 20, color: ppMuted)),
-          ),
+          )),
         ]),
       );
 
@@ -231,7 +232,7 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen> {
                 _tf(note, 'Note (optional)', maxLines: 2),
 
                 const SizedBox(height: 20),
-                GestureDetector(
+                PvPress(child: GestureDetector(
                   onTap: () {
                     final now = DateTime.now();
                     DateTime at(TimeOfDay t) => DateTime(now.year, now.month, now.day, t.hour, t.minute);
@@ -253,7 +254,7 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen> {
                     decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(14)),
                     child: Text('Save sleep', style: ppBody(15, color: Colors.white, w: FontWeight.w700)),
                   ),
-                ),
+                )),
               ]),
             ),
           ),
@@ -276,7 +277,7 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen> {
             const SizedBox(height: 18),
             Row(children: [
               Expanded(
-                child: GestureDetector(
+                child: PvPress(child: GestureDetector(
                   onTap: () => Navigator.of(ctx).pop(),
                   behavior: HitTestBehavior.opaque,
                   child: Container(
@@ -285,11 +286,11 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen> {
                     decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14), border: Border.all(color: ppLine)),
                     child: Text('Cancel', style: ppBody(14, color: ppInk, w: FontWeight.w700)),
                   ),
-                ),
+                )),
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: GestureDetector(
+                child: PvPress(child: GestureDetector(
                   onTap: () {
                     onConfirm();
                     Navigator.of(ctx).pop();
@@ -301,7 +302,7 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen> {
                     decoration: BoxDecoration(color: ppCoral, borderRadius: BorderRadius.circular(14)),
                     child: Text('Remove', style: ppBody(14, color: Colors.white, w: FontWeight.w700)),
                   ),
-                ),
+                )),
               ),
             ]),
           ]),
@@ -320,7 +321,7 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _label(label),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: onTap,
             behavior: HitTestBehavior.opaque,
             child: Container(
@@ -332,12 +333,12 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen> {
                 Text(_fmtTod(value), style: ppBody(14, color: ppInk, w: FontWeight.w600)),
               ]),
             ),
-          ),
+          )),
         ],
       );
 
   Widget _qualityChip(SleepQuality q, bool on, VoidCallback onTap) => Expanded(
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -350,7 +351,7 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen> {
             ),
             child: Text(_qualityLabel(q), style: ppBody(12.5, color: on ? Colors.white : ppInk, w: FontWeight.w700)),
           ),
-        ),
+        )),
       );
 
   Widget _tf(TextEditingController c, String label, {int maxLines = 1}) => Padding(

@@ -19,6 +19,7 @@ import 'package:flutter/material.dart';
 import 'pp_child_profile.dart';
 import 'pp_common.dart';
 import 'pp_phases_data.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// Present the switcher as a modal bottom sheet.
 Future<void> showMultiChildSheet(BuildContext context) => showModalBottomSheet<void>(
@@ -103,7 +104,7 @@ class MultiChildSheet extends StatelessWidget {
               ),
             ]),
             const SizedBox(height: 14),
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: () async {
                 final now = DateTime.now();
                 final picked = await showDatePicker(
@@ -132,7 +133,7 @@ class MultiChildSheet extends StatelessWidget {
                   ),
                 ]),
               ),
-            ),
+            )),
             const SizedBox(height: 14),
             Row(children: [
               Text('Optional', style: ppBody(11.5, color: ppMuted, w: FontWeight.w700)),
@@ -153,7 +154,7 @@ class MultiChildSheet extends StatelessWidget {
                 'record.',
                 style: ppBody(11.5, color: ppMuted, h: 1.45)),
             const SizedBox(height: 20),
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: () {
                 if (nameCtl.text.trim().isEmpty || dob == null) return;
                 Navigator.of(ctx).pop(true);
@@ -167,7 +168,7 @@ class MultiChildSheet extends StatelessWidget {
                 child: Text('Save',
                     style: ppBody(15, color: Colors.white, w: FontWeight.w700)),
               ),
-            ),
+            )),
           ]),
         ),
       ),
@@ -309,7 +310,7 @@ class MultiChildSheet extends StatelessWidget {
 
                 // add a child
                 const SizedBox(height: 6),
-                GestureDetector(
+                PvPress(child: GestureDetector(
                   onTap: () => _addChild(context),
                   behavior: HitTestBehavior.opaque,
                   child: Container(
@@ -333,7 +334,7 @@ class MultiChildSheet extends StatelessWidget {
                       ),
                     ]),
                   ),
-                ),
+                )),
               ]),
             ),
           ),
@@ -381,7 +382,7 @@ class MultiChildSheet extends StatelessWidget {
       );
     }
 
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () async {
         await _store.switchTo(c.id);
         if (!context.mounted) return;
@@ -396,7 +397,7 @@ class MultiChildSheet extends StatelessWidget {
         color: Colors.transparent,
         child: row,
       ),
-    );
+    ));
   }
 
   Widget _avatar() => Container(

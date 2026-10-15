@@ -48,6 +48,7 @@ import '../../widgets/breathing_circle.dart';
 import '../../widgets/figure_highlight.dart';
 import '../v2/v2_palette.dart';
 import 'ttc_mind_today_screen.dart' show kTtcMoveHue, kTtcBreatheHue;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // -----------------------------------------------------------------------------
 //  The two colours every player draws with
@@ -507,7 +508,7 @@ class TtcPracticeSessionState extends State<TtcPracticeSession> {
 
       // ---- pause / start, and nothing that scores ------------------------
       Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: _toggle,
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -545,7 +546,7 @@ class TtcPracticeSessionState extends State<TtcPracticeSession> {
                       color: _clock.running ? p.ink1 : Colors.white)),
             ]),
           ),
-        ),
+        )),
       ]),
 
       // ---- time left, once started (2026-09-27) ---------------------------

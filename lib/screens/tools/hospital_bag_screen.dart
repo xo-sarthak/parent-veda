@@ -35,6 +35,7 @@ import '../../services/reminder_store.dart';
 import '../../theme/app_theme.dart';
 import '../cart_screen.dart';
 import 'hospital_bag_v2_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class HospitalBagScreen extends StatefulWidget {
   const HospitalBagScreen({super.key, required this.controller});
@@ -131,7 +132,7 @@ class _VersionPill extends StatelessWidget {
   }
 
   Widget _seg(BuildContext context, String label, bool active, VoidCallback onTap) =>
-      GestureDetector(
+      PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: AnimatedContainer(
@@ -146,7 +147,7 @@ class _VersionPill extends StatelessWidget {
                   fontWeight: FontWeight.w800,
                   color: active ? Colors.white : AppTheme.neutral600)),
         ),
-      );
+      ));
 }
 
 // ===========================================================================
@@ -658,7 +659,7 @@ class _MyBagScreenState extends State<_MyBagScreen> {
     required VoidCallback onTap,
   }) {
     final color = on ? AppTheme.tertiary600 : AppTheme.neutral500;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
@@ -677,12 +678,12 @@ class _MyBagScreenState extends State<_MyBagScreen> {
                   fontSize: 12.5, fontWeight: FontWeight.w700, color: color)),
         ]),
       ),
-    );
+    ));
   }
 
   Widget _buyPill(S s, BagItem it) {
     final price = _vedaPrice(it) ?? 0;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _buyVeda(it),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 8),
@@ -700,7 +701,7 @@ class _MyBagScreenState extends State<_MyBagScreen> {
                   color: Colors.white)),
         ]),
       ),
-    );
+    ));
   }
 
   String _emojiFor(BagItem it) {

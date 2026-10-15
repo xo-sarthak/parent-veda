@@ -20,6 +20,7 @@ import 'pp_common.dart';
 import '../learn/pv_learn_screen.dart';
 import '../../services/life_stage_store.dart';
 import '../../data/learn/pv_learn_view.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 // ⚠️ FACADE since 2026-09-20 (docs/LEARNING-AUDIT.md). The class keeps its
 // name and constructor so every push of it lands on the unified learn
@@ -114,7 +115,7 @@ class CohortCoursesScreenClassic extends StatelessWidget {
                     TextSpan(text: '  ·  one-time', style: ppBody(13, color: ppSoft)),
                   ])),
                   const SizedBox(height: 16),
-                  GestureDetector(
+                  PvPress(child: GestureDetector(
                     onTap: () => _openFunnel(context),
                     child: Container(
                       height: 50,
@@ -122,7 +123,7 @@ class CohortCoursesScreenClassic extends StatelessWidget {
                       decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(16)),
                       child: Text('Join cohort', style: ppBody(15, color: Colors.white, w: FontWeight.w700)),
                     ),
-                  ),
+                  )),
                 ]),
               ),
             )),
@@ -158,7 +159,7 @@ class CohortCoursesScreenClassic extends StatelessWidget {
 
   Widget _row(BuildContext context, String title, String sub, String price,
       {bool top = false, bool bottom = false}) {
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _openFunnel(context),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -183,6 +184,6 @@ class CohortCoursesScreenClassic extends StatelessWidget {
           const Text('→', style: TextStyle(color: ppMuted)),
         ]),
       ),
-    );
+    ));
   }
 }

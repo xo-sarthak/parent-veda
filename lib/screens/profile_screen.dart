@@ -64,6 +64,7 @@ import 'saved_screen.dart';
 import '../theme/pv_fonts.dart';
 import '../services/auth/social_auth.dart';
 import '../services/auth/delete_account.dart';
+import '../widgets/pv_feedback.dart' show PvPress;
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen(
@@ -361,7 +362,7 @@ class ProfileScreenClassic extends StatelessWidget {
           const SizedBox(height: 14),
           // REFERRAL. A mother who finds ParentVeda useful is the cheapest and
           // most credible way another mother hears about it.
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
                 builder: (_) => InviteFriendsScreen(controller: controller))),
             behavior: HitTestBehavior.opaque,
@@ -400,7 +401,7 @@ class ProfileScreenClassic extends StatelessWidget {
                     size: 18, color: Colors.white),
               ]),
             ),
-          ),
+          )),
           const SizedBox(height: 14),
           // CARE CIRCLE. Renders nothing at all unless a doctor or hospital
           // actually introduced her to ParentVeda — see CarePartnerSlot.
@@ -412,7 +413,7 @@ class ProfileScreenClassic extends StatelessWidget {
           ),
           // --- WhatsApp updates (B2 opt-in) -------------------------------
           // Memories — make a keepsake card for the big milestones.
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
                 builder: (_) => const MemoriesHomeScreen())),
             behavior: HitTestBehavior.opaque,
@@ -446,7 +447,7 @@ class ProfileScreenClassic extends StatelessWidget {
                     size: 20, color: Color(0xFF2F2C30)),
               ]),
             ),
-          ),
+          )),
           _WhatsAppCard(controller: controller),
           const SizedBox(height: 16),
           // --- Reset to Week 20 (testing) ---------------------------------
@@ -1256,7 +1257,7 @@ class _Segmented extends StatelessWidget {
   Widget _seg(
       BuildContext context, String label, bool selected, VoidCallback onTap) {
     final text = Theme.of(context).textTheme;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
@@ -1273,7 +1274,7 @@ class _Segmented extends StatelessWidget {
           ),
         ),
       ),
-    );
+    ));
   }
 }
 

@@ -445,7 +445,7 @@ class _YogaHomeScreenState extends State<YogaHomeScreen> {
       );
 
   Widget _segLabel(String label, bool on, VoidCallback onTap) => Expanded(
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: Center(
@@ -455,7 +455,7 @@ class _YogaHomeScreenState extends State<YogaHomeScreen> {
               child: Text(label),
             ),
           ),
-        ),
+        )),
       );
 }
 
@@ -571,14 +571,14 @@ class _ClassCard extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: Text(cls.title,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: pvManrope(fontSize: 14, fontWeight: FontWeight.w700, height: 1.25, color: p.ink1)),
-        ),
+        )),
         const SizedBox(height: 4),
         _classMeta(p, cls),
       ]),

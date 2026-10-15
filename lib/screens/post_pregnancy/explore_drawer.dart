@@ -82,6 +82,7 @@ import 'recipes_screen.dart';
 // ignore: unused_import
 import 'recommendations_screen.dart';
 import '../profile/pv_you_screen.dart' show kPvShowDeveloper;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 
 /// One row of the Explore drawer — and, since 2026-09-16, of the More sheet.
@@ -330,7 +331,7 @@ class ExploreDrawer extends StatelessWidget {
 
   Widget _section(BuildContext context, IconData icon, String title, String desc, Widget screen,
           {bool top = false, VoidCallback? onTapOverride}) =>
-      GestureDetector(
+      PvPress(child: GestureDetector(
         onTap: onTapOverride ??
             () {
               final nav = Navigator.of(context);
@@ -366,5 +367,5 @@ class ExploreDrawer extends StatelessWidget {
             const Text('→', style: TextStyle(color: ppMuted)),
           ]),
         ),
-      );
+      ));
 }

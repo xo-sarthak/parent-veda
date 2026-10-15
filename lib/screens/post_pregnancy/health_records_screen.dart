@@ -15,6 +15,7 @@ import '../../services/notification_service.dart';
 import 'pp_attachments.dart';
 import 'pp_common.dart';
 import 'pp_health_data.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class HealthRecordsScreen extends StatefulWidget {
   const HealthRecordsScreen({super.key, required this.category});
@@ -121,7 +122,7 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
         ]),
       );
 
-  Widget _addButton(String label, VoidCallback onTap) => GestureDetector(
+  Widget _addButton(String label, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -134,7 +135,7 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
             Text(label, style: ppBody(13, color: ppPurple, w: FontWeight.w700)),
           ]),
         ),
-      );
+      ));
 
   List<Widget> _body() {
     switch (widget.category) {
@@ -192,7 +193,7 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
         child: Text(msg, style: ppBody(13.5, color: ppMuted, h: 1.5)),
       );
 
-  Widget _card(Widget child, {VoidCallback? onTap}) => GestureDetector(
+  Widget _card(Widget child, {VoidCallback? onTap}) => PvPress(enabled: onTap != null, child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -201,7 +202,7 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
           decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: ppHair)),
           child: child,
         ),
-      );
+      ));
 
   Widget _medCard(Medication m, int i) => _card(
         onTap: () => _medSheet(existing: m, index: i),
@@ -277,11 +278,11 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
             const SizedBox(height: 2),
             Text('${r.date}${r.doctor != null ? ' · ${r.doctor}' : ''}', style: ppBody(11.5, color: ppMuted)),
           ])),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => _confirmDelete('Delete this report?', () => _store.removeReport(i)),
             behavior: HitTestBehavior.opaque,
             child: const Padding(padding: EdgeInsets.only(left: 6), child: Icon(Icons.delete_outline_rounded, size: 20, color: ppMuted)),
-          ),
+          )),
         ]),
         if (r.values.isNotEmpty) ...[
           const SizedBox(height: 12),
@@ -643,19 +644,19 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
                 Row(children: [
                   Expanded(child: Text(title, style: ppJakarta(18))),
                   if (onDelete != null)
-                    GestureDetector(
+                    PvPress(child: GestureDetector(
                       onTap: () {
                         onDelete();
                         Navigator.of(ctx).pop();
                       },
                       behavior: HitTestBehavior.opaque,
                       child: const Icon(Icons.delete_outline_rounded, size: 22, color: ppCoral),
-                    ),
+                    )),
                 ]),
                 const SizedBox(height: 16),
                 ...fields(setSheet),
                 const SizedBox(height: 20),
-                GestureDetector(
+                PvPress(child: GestureDetector(
                   onTap: () {
                     if (onSave()) Navigator.of(ctx).pop();
                   },
@@ -666,7 +667,7 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
                     decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(14)),
                     child: Text('Save', style: ppBody(15, color: Colors.white, w: FontWeight.w700)),
                   ),
-                ),
+                )),
               ]),
             ),
           ),
@@ -689,7 +690,7 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
             const SizedBox(height: 18),
             Row(children: [
               Expanded(
-                child: GestureDetector(
+                child: PvPress(child: GestureDetector(
                   onTap: () => Navigator.of(ctx).pop(),
                   behavior: HitTestBehavior.opaque,
                   child: Container(
@@ -698,11 +699,11 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
                     decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14), border: Border.all(color: ppLine)),
                     child: Text('Cancel', style: ppBody(14, color: ppInk, w: FontWeight.w700)),
                   ),
-                ),
+                )),
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: GestureDetector(
+                child: PvPress(child: GestureDetector(
                   onTap: () {
                     onConfirm();
                     Navigator.of(ctx).pop();
@@ -714,7 +715,7 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
                     decoration: BoxDecoration(color: ppCoral, borderRadius: BorderRadius.circular(14)),
                     child: Text('Delete', style: ppBody(14, color: Colors.white, w: FontWeight.w700)),
                   ),
-                ),
+                )),
               ),
             ]),
           ]),
@@ -757,7 +758,7 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
         padding: const EdgeInsets.only(bottom: 12),
         child: Row(children: [
           Expanded(child: Text(label, style: ppBody(14, color: ppInk, w: FontWeight.w600))),
-          GestureDetector(onTap: () => onChanged(!value), behavior: HitTestBehavior.opaque, child: ppSwitch(value)),
+          PvPress(child: GestureDetector(onTap: () => onChanged(!value), behavior: HitTestBehavior.opaque, child: ppSwitch(value))),
         ]),
       );
 
@@ -767,7 +768,7 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
         padding: const EdgeInsets.only(bottom: 12),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           _label('Attachments'),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () async {
               final picked = await showAttachmentPicker(context);
               if (picked.isEmpty) return;
@@ -787,7 +788,7 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
                 Text('Add attachment', style: ppBody(13, color: ppPurple, w: FontWeight.w700)),
               ]),
             ),
-          ),
+          )),
           if (atts.isNotEmpty) ...[
             const SizedBox(height: 10),
             attachmentChips(atts, onRemove: (i) => setSheet(() => atts.removeAt(i))),
@@ -800,7 +801,7 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
         padding: const EdgeInsets.only(bottom: 12),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           _label('Reminder time'),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: onTap,
             behavior: HitTestBehavior.opaque,
             child: Container(
@@ -813,7 +814,7 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
                 const Icon(Icons.chevron_right_rounded, size: 18, color: ppMuted),
               ]),
             ),
-          ),
+          )),
         ]),
       );
 
@@ -822,7 +823,7 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
           for (final s in AllergyStatus.values)
             Padding(
               padding: const EdgeInsets.only(right: 8),
-              child: GestureDetector(
+              child: PvPress(child: GestureDetector(
                 onTap: () => onChanged(s),
                 behavior: HitTestBehavior.opaque,
                 child: Container(
@@ -834,7 +835,7 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
                   ),
                   child: Text(_allergyStatusLabel(s), style: ppBody(12, color: value == s ? Colors.white : ppInk, w: FontWeight.w700)),
                 ),
-              ),
+              )),
             ),
         ],
       );

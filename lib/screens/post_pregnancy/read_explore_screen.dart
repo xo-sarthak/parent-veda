@@ -39,6 +39,7 @@ import 'pp_explore_kit.dart';
 import 'pp_reading_data.dart';
 import 'reading_library_screen.dart';
 import 'reading_reader_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// The content-type row. "All" plus the three kinds that exist — nothing
 /// invented, nothing renamed.
@@ -249,7 +250,7 @@ class _ReadExploreScreenState extends State<ReadExploreScreen> {
     // The count respects the content-type filter, so a card cannot promise
     // twelve reads and open onto two.
     final n = _filtered(articlesInCollection(c.id)).length;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _push(TopicPlaylistScreen(collection: c, type: _type)),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -291,10 +292,10 @@ class _ReadExploreScreenState extends State<ReadExploreScreen> {
           ]),
         ]),
       ),
-    );
+    ));
   }
 
-  Widget _libraryRow() => GestureDetector(
+  Widget _libraryRow() => PvPress(child: GestureDetector(
         onTap: () => _push(const ReadingLibraryScreen()),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -318,7 +319,7 @@ class _ReadExploreScreenState extends State<ReadExploreScreen> {
             const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
           ]),
         ),
-      );
+      ));
 
   Widget _card(ReadArticle a) => ReadRailCard(
         article: a,
@@ -372,7 +373,7 @@ class ReadRailCard extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -405,7 +406,7 @@ class ReadRailCard extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis),
         ]),
-      );
+      ));
 }
 
 class ReadResultRow extends StatelessWidget {
@@ -415,7 +416,7 @@ class ReadResultRow extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -458,7 +459,7 @@ class ReadResultRow extends StatelessWidget {
             ),
           ]),
         ),
-      );
+      ));
 }
 
 // =============================================================================
@@ -611,7 +612,7 @@ class AllPlaylistsScreen extends StatelessWidget {
               for (final c in kReadCollections)
                 Padding(
                   padding: const EdgeInsets.fromLTRB(22, 0, 22, 10),
-                  child: GestureDetector(
+                  child: PvPress(child: GestureDetector(
                     onTap: () => Navigator.of(context).push(
                         MaterialPageRoute<void>(
                             builder: (_) =>
@@ -646,7 +647,7 @@ class AllPlaylistsScreen extends StatelessWidget {
                             size: 20, color: ppMuted),
                       ]),
                     ),
-                  ),
+                  )),
                 ),
               const SizedBox(height: 30),
             ],

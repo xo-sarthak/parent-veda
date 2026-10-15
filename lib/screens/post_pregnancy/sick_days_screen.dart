@@ -22,6 +22,7 @@ import '../doors/pv_list_row.dart';
 import '../pregnancy/preg_tool_chrome.dart';
 import '../products/pv_store_chrome.dart' show PvChip, kPvInk, pvStorePalette;
 import 'pp_care_parts.dart' show ppCareHeading;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class SickDaysScreen extends StatefulWidget {
   const SickDaysScreen({super.key});
@@ -162,7 +163,7 @@ class _SickDaysScreenState extends State<SickDaysScreen> {
             _pad(Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Expanded(child: Text('Sick-day meals', style: ppFraunces(32, h: 1.12))),
               const SizedBox(width: 12),
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 onTap: () => setState(() => _noteOpen = !_noteOpen),
                 child: Container(
                   width: 30,
@@ -171,7 +172,7 @@ class _SickDaysScreenState extends State<SickDaysScreen> {
                   decoration: BoxDecoration(color: Colors.white, shape: BoxShape.circle, border: Border.all(color: ppLine)),
                   child: const Icon(Icons.info_outline, size: 16, color: ppPurple),
                 ),
-              ),
+              )),
             ])),
             const SizedBox(height: 12),
             _pad(Text("Gentle, settling foods for when ${ChildProfileStore.instance.nameMid}'s under the weather - soft, mild, and easy on a poorly tummy. Pick what's troubling him.",
@@ -228,7 +229,7 @@ class _SickDaysScreenState extends State<SickDaysScreen> {
 
   Widget _sitChip(String s) {
     final on = _situation == s;
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => setState(() => _situation = s),
       child: Container(
         margin: const EdgeInsets.only(right: 9),
@@ -240,6 +241,6 @@ class _SickDaysScreenState extends State<SickDaysScreen> {
           Text(s, style: ppBody(13, color: on ? Colors.white : ppSoft, w: on ? FontWeight.w700 : FontWeight.w600)),
         ]),
       ),
-    );
+    ));
   }
 }

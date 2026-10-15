@@ -32,6 +32,7 @@ import 'food_shopping_screen.dart';
 import 'pp_common.dart';
 import 'pp_food_data.dart';
 import 'pp_section_extras.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class FoodHomeScreen extends StatefulWidget {
   const FoodHomeScreen({super.key});
@@ -186,12 +187,12 @@ class _FoodHomeScreenState extends State<FoodHomeScreen> {
             ]),
           ),
           const SizedBox(width: 10),
-          GestureDetector(onTap: store.toggleVeg, behavior: HitTestBehavior.opaque, child: ppSwitch(store.vegOnly)),
+          PvPress(child: GestureDetector(onTap: store.toggleVeg, behavior: HitTestBehavior.opaque, child: ppSwitch(store.vegOnly))),
         ]),
       );
 
   // ---- today's meal card --------------------------------------------------
-  Widget _mealCard(BuildContext context, String slot, FoodRecipe r) => GestureDetector(
+  Widget _mealCard(BuildContext context, String slot, FoodRecipe r) => PvPress(child: GestureDetector(
         onTap: () => _push(context, FoodRecipeScreen(recipe: r)),
         behavior: HitTestBehavior.opaque,
         child: SizedBox(
@@ -206,10 +207,10 @@ class _FoodHomeScreenState extends State<FoodHomeScreen> {
             foodMeta(r),
           ]),
         ),
-      );
+      ));
 
   // ---- nutrition focus card ----------------------------------------------
-  Widget _focusCard(BuildContext context, NutritionFocus f) => GestureDetector(
+  Widget _focusCard(BuildContext context, NutritionFocus f) => PvPress(child: GestureDetector(
         onTap: () => _push(context, FoodNutritionScreen(focus: f)),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -238,10 +239,10 @@ class _FoodHomeScreenState extends State<FoodHomeScreen> {
             ]),
           ]),
         ),
-      );
+      ));
 
   // ---- smart meal builder card -------------------------------------------
-  Widget _builderCard(BuildContext context) => GestureDetector(
+  Widget _builderCard(BuildContext context) => PvPress(child: GestureDetector(
         onTap: () => _push(context, const FoodBuilderScreen()),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -268,14 +269,14 @@ class _FoodHomeScreenState extends State<FoodHomeScreen> {
             Icon(Icons.chevron_right_rounded, size: 20, color: Colors.white.withValues(alpha: 0.8)),
           ]),
         ),
-      );
+      ));
 
   Widget _categories(BuildContext context) => Wrap(
         spacing: 10,
         runSpacing: 10,
         children: [
           for (final c in kFoodCategories)
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: () => _push(context, FoodCategoryScreen(category: c.$1)),
               behavior: HitTestBehavior.opaque,
               child: Container(
@@ -287,7 +288,7 @@ class _FoodHomeScreenState extends State<FoodHomeScreen> {
                   Text(c.$1, style: ppBody(12.5, color: ppInk, w: FontWeight.w600)),
                 ]),
               ),
-            ),
+            )),
         ],
       );
 
@@ -295,7 +296,7 @@ class _FoodHomeScreenState extends State<FoodHomeScreen> {
         animation: foodListenable,
         builder: (context, _) {
           final left = FoodStore.instance.shoppingLeft;
-          return GestureDetector(
+          return PvPress(child: GestureDetector(
             onTap: () => _push(context, const FoodShoppingScreen()),
             behavior: HitTestBehavior.opaque,
             child: Container(
@@ -314,11 +315,11 @@ class _FoodHomeScreenState extends State<FoodHomeScreen> {
                 const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
               ]),
             ),
-          );
+          ));
         },
       );
 
-  Widget _savedLink(BuildContext context) => GestureDetector(
+  Widget _savedLink(BuildContext context) => PvPress(child: GestureDetector(
         onTap: () => _push(context, const FoodSavedScreen()),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -337,5 +338,5 @@ class _FoodHomeScreenState extends State<FoodHomeScreen> {
             const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
           ]),
         ),
-      );
+      ));
 }

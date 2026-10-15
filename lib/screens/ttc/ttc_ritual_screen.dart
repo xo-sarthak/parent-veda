@@ -37,6 +37,7 @@ import 'ttc_practice_player.dart' show TtcPracticeSession;
 import 'ttc_surface_router.dart' show openTtcSurface;
 import 'ttc_strings.dart';
 import 'ttc_tool_chrome.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// Sand, the hue the Mind and body hub gives this ritual ("Do today's
 /// practice"), so the tile she tapped and the page she lands on match.
@@ -790,7 +791,7 @@ class _RitualPartCard extends StatelessWidget {
         Semantics(
           button: true,
           expanded: expanded,
-          child: GestureDetector(
+          child: PvPress(child: GestureDetector(
             onTap: onHeaderTap,
             behavior: HitTestBehavior.opaque,
             child: Padding(
@@ -827,7 +828,7 @@ class _RitualPartCard extends StatelessWidget {
                       color: ttcMuted),
               ]),
             ),
-          ),
+          )),
         ),
         if (expanded)
           Padding(
@@ -838,7 +839,7 @@ class _RitualPartCard extends StatelessWidget {
                   Text(item.text(hi),
                       style: ttcBody(14.5, color: ttcInk, h: 1.68)),
                   const SizedBox(height: 16),
-                  GestureDetector(
+                  PvPress(child: GestureDetector(
                     onTap: () => TtcRitualStore.instance.toggle(item.part),
                     behavior: HitTestBehavior.opaque,
                     child: Container(
@@ -862,7 +863,7 @@ class _RitualPartCard extends StatelessWidget {
                                 w: FontWeight.w800)),
                       ]),
                     ),
-                  ),
+                  )),
                   if (done) ...[
                     const SizedBox(height: 7),
                     Center(

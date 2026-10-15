@@ -22,6 +22,7 @@ import '../../widgets/mic_dictation_button.dart';
 import 'community_screen.dart';
 import 'pp_common.dart';
 import 'pp_opening_soon.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class PpCreatePostScreen extends StatefulWidget {
   const PpCreatePostScreen({super.key, this.initialCommunityId});
@@ -169,11 +170,11 @@ class _PpCreatePostScreenState extends State<PpCreatePostScreen> {
                             ]),
                       ),
                       const SizedBox(width: 8),
-                      GestureDetector(
+                      PvPress(child: GestureDetector(
                         onTap: () => setState(() => _wantVerify = !_wantVerify),
                         behavior: HitTestBehavior.opaque,
                         child: ppSwitch(_wantVerify),
-                      ),
+                      )),
                     ]),
                   ),
                   if (_wantVerify) ...[
@@ -270,7 +271,7 @@ class _PpCreatePostScreenState extends State<PpCreatePostScreen> {
                         Positioned(
                           top: -7,
                           right: -7,
-                          child: GestureDetector(
+                          child: PvPress(child: GestureDetector(
                             onTap: () => setState(() => _photos.removeAt(i)),
                             child: Container(
                               decoration: const BoxDecoration(
@@ -279,7 +280,7 @@ class _PpCreatePostScreenState extends State<PpCreatePostScreen> {
                               child: const Icon(Icons.close_rounded,
                                   size: 15, color: Colors.white),
                             ),
-                          ),
+                          )),
                         ),
                       ]),
                   ]),
@@ -337,7 +338,7 @@ class _PpCreatePostScreenState extends State<PpCreatePostScreen> {
     );
   }
 
-  Widget _chip(String label, bool active, VoidCallback onTap) => GestureDetector(
+  Widget _chip(String label, bool active, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -352,10 +353,10 @@ class _PpCreatePostScreenState extends State<PpCreatePostScreen> {
                   color: active ? Colors.white : ppInk,
                   w: active ? FontWeight.w700 : FontWeight.w600)),
         ),
-      );
+      ));
 
   Widget _outlineBtn(IconData icon, String label, VoidCallback onTap) =>
-      GestureDetector(
+      PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -369,5 +370,5 @@ class _PpCreatePostScreenState extends State<PpCreatePostScreen> {
             Text(label, style: ppBody(13.5, color: ppPurple, w: FontWeight.w700)),
           ]),
         ),
-      );
+      ));
 }

@@ -35,6 +35,7 @@ import 'package:flutter/material.dart';
 
 import '../screens/v2/v2_palette.dart';
 import '../theme/pv_fonts.dart';
+import 'pv_feedback.dart' show PvPress;
 
 /// A video, at the size and shape the real one will be.
 class PvVideoPlaceholder extends StatelessWidget {
@@ -157,7 +158,7 @@ class PvVideoPlaceholder extends StatelessWidget {
 
     return Semantics(
       label: _live ? 'Video: $title' : 'Video coming soon: $title',
-      child: GestureDetector(
+      child: PvPress(enabled: onTap != null, child: GestureDetector(
         onTap: onTap,
         child: Container(
           // ⚠️ NO BORDER, AND THE SHADOW DEFINES THE EDGE INSTEAD.
@@ -432,7 +433,7 @@ class PvVideoPlaceholder extends StatelessWidget {
             ],
           ),
         ),
-      ),
+      )),
     );
   }
 }
@@ -478,7 +479,7 @@ class PvAudioPlaceholder extends StatelessWidget {
 
     return Semantics(
       label: _live ? 'Play $title' : 'Audio coming soon: $title',
-      child: GestureDetector(
+      child: PvPress(enabled: onTap != null, child: GestureDetector(
         onTap: onTap,
         child: Container(
           padding: const EdgeInsets.all(10),
@@ -556,7 +557,7 @@ class PvAudioPlaceholder extends StatelessWidget {
             ),
           ]),
         ),
-      ),
+      )),
     );
   }
 }
@@ -596,7 +597,7 @@ class PvReadPlaceholder extends StatelessWidget {
 
     return Semantics(
       label: _live ? title : 'Article coming soon: $title',
-      child: GestureDetector(
+      child: PvPress(enabled: onTap != null, child: GestureDetector(
         onTap: onTap,
         child: Container(
           padding: const EdgeInsets.all(12),
@@ -672,7 +673,7 @@ class PvReadPlaceholder extends StatelessWidget {
             ],
           ),
         ),
-      ),
+      )),
     );
   }
 }

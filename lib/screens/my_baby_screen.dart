@@ -12,6 +12,7 @@ import '../localization/app_language.dart';
 import '../services/pregnancy_controller.dart';
 import '../theme/app_theme.dart';
 import 'weekly_card_stack_screen.dart';
+import '../widgets/pv_feedback.dart' show PvPress;
 
 class MyBabyScreen extends StatelessWidget {
   const MyBabyScreen({super.key, required this.controller});
@@ -48,7 +49,7 @@ class MyBabyScreen extends StatelessWidget {
           Text(s.myBabyTab,
               style: text.headlineLarge?.copyWith(fontWeight: FontWeight.w800)),
           const SizedBox(height: 18),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: openJourney,
             child: Container(
               width: double.infinity,
@@ -110,7 +111,7 @@ class MyBabyScreen extends StatelessWidget {
                 ]),
               ]),
             ),
-          ),
+          )),
         ],
       ),
     );

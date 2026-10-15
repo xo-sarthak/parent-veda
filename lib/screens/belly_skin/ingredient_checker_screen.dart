@@ -22,6 +22,7 @@ import '../../localization/app_language.dart';
 import '../../theme/pv_fonts.dart';
 import '../brackets/hub/hub_solution_cards.dart';
 import '../v2/v2_palette.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 const _lang = AppLanguage.english;
 
@@ -98,7 +99,7 @@ class IngredientCheckerScreen extends StatelessWidget {
               'free, every time.',
               style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2)),
           const SizedBox(height: 16),
-          GestureDetector(
+          PvPress(child: GestureDetector(
             onTap: () => _search(context),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
@@ -116,7 +117,7 @@ class IngredientCheckerScreen extends StatelessWidget {
                 ),
               ]),
             ),
-          ),
+          )),
           const SizedBox(height: 24),
           Text('Commonly checked',
               style: pvFraunces(
@@ -167,7 +168,7 @@ class _Chip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -184,7 +185,7 @@ class _Chip extends StatelessWidget {
                   fontSize: 13, fontWeight: FontWeight.w700, color: p.ink1)),
         ]),
       ),
-    );
+    ));
   }
 }
 
@@ -197,7 +198,7 @@ class _IngredientRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final v = _verdictVisual(ingredient.verdict);
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
@@ -224,7 +225,7 @@ class _IngredientRow extends StatelessWidget {
           Icon(Icons.chevron_right_rounded, size: 18, color: p.ink3),
         ]),
       ),
-    );
+    ));
   }
 }
 

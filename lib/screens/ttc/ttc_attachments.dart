@@ -42,6 +42,7 @@ import '../../services/remote/storage_service.dart';
 import '../../ttc/ttc_records_store.dart';
 import 'ttc_common.dart';
 import 'ttc_strings.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class TtcAttachments extends StatelessWidget {
   const TtcAttachments({super.key, required this.record, required this.t});
@@ -60,7 +61,7 @@ class TtcAttachments extends StatelessWidget {
         ]),
         const SizedBox(height: 10),
       ],
-      GestureDetector(
+      PvPress(child: GestureDetector(
         onTap: () => _add(context),
         behavior: HitTestBehavior.opaque,
         child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -69,7 +70,7 @@ class TtcAttachments extends StatelessWidget {
           Text(files.isEmpty ? t.recordsAttach : t.recordsAttachMore,
               style: ttcBody(12.5, color: ttcTitleInk, w: FontWeight.w700)),
         ]),
-      ),
+      )),
     ]);
   }
 
@@ -120,11 +121,11 @@ class _Chip extends StatelessWidget {
               style: ttcBody(11.5, color: ttcTitleInk, w: FontWeight.w600)),
         ),
         const SizedBox(width: 6),
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: onRemove,
           behavior: HitTestBehavior.opaque,
           child: const Icon(Icons.close_rounded, size: 14, color: ttcMuted),
-        ),
+        )),
       ]),
     );
   }
@@ -172,7 +173,7 @@ Future<List<String>> showTtcAttachmentPicker(
 
 Widget _pickRow(BuildContext ctx, IconData icon, String label,
         Future<void> Function(BuildContext) onTap) =>
-    GestureDetector(
+    PvPress(child: GestureDetector(
       onTap: () => onTap(ctx),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -191,7 +192,7 @@ Widget _pickRow(BuildContext ctx, IconData icon, String label,
           const Icon(Icons.chevron_right_rounded, size: 20, color: ttcMuted),
         ]),
       ),
-    );
+    ));
 
 // Every picker failure pops an empty list rather than throwing. A denied
 // permission is a normal outcome on a phone, not an error worth a dialog.

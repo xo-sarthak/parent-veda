@@ -49,7 +49,7 @@ import 'package:flutter/material.dart';
 import 'pp_age_bands.dart';
 import 'pp_health_red_flags.dart';
 import '../../theme/pv_fonts.dart';
-import '../../widgets/pv_feedback.dart' show PvChoiceTile, kPvChoiceInk;
+import '../../widgets/pv_feedback.dart' show PvChoiceTile, kPvChoiceInk, PvPress;
 import '../v2/v2_palette.dart';
 import 'pp_content.dart';
 
@@ -493,7 +493,7 @@ class _Choice extends StatelessWidget {
         )
       : _block(context, p);
 
-  Widget _block(BuildContext context, V2Palette p) => GestureDetector(
+  Widget _block(BuildContext context, V2Palette p) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -517,5 +517,5 @@ class _Choice extends StatelessWidget {
               textAlign: wide ? TextAlign.start : TextAlign.center,
               style: pvManrope(fontSize: 13, fontWeight: FontWeight.w500, height: 1.4, color: p.ink1)),
         ),
-      );
+      ));
 }

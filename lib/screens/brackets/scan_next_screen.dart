@@ -41,6 +41,7 @@ import '../v2/v2_palette.dart';
 import 'hub/hub_solution_cards.dart';
 import 'scan_detail_screen.dart';
 import 'scan_timeline_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 LocalizedText _en(String s) => LocalizedText(en: s, hi: s);
 
@@ -354,7 +355,7 @@ class _PreviewToggle extends StatelessWidget {
       );
 
   Widget _seg(String label, bool on, VoidCallback onTap) => Expanded(
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: onTap,
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 9),
@@ -370,7 +371,7 @@ class _PreviewToggle extends StatelessWidget {
                     fontWeight: on ? FontWeight.w800 : FontWeight.w600,
                     color: on ? p.ink1 : p.ink3)),
           ),
-        ),
+        )),
       );
 }
 

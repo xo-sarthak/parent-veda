@@ -10,6 +10,7 @@
 import 'package:flutter/material.dart';
 
 import 'pp_common.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class SleepBetterScreen extends StatelessWidget {
   const SleepBetterScreen({super.key});
@@ -125,7 +126,7 @@ class SleepBetterScreen extends StatelessWidget {
                   const TextSpan(text: '.'),
                 ]), style: ppBody(14, h: 1.6)),
                 const SizedBox(height: 14),
-                GestureDetector(
+                PvPress(child: GestureDetector(
                   onTap: () => _soon(context),
                   child: Container(
                     height: 48,
@@ -134,7 +135,7 @@ class SleepBetterScreen extends StatelessWidget {
                     decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(16)),
                     child: Text('See the cohort', style: ppBody(14, color: Colors.white, w: FontWeight.w700)),
                   ),
-                ),
+                )),
               ]),
             )),
 
@@ -147,7 +148,7 @@ class SleepBetterScreen extends StatelessWidget {
     );
   }
 
-  Widget _back(BuildContext context, String label) => GestureDetector(
+  Widget _back(BuildContext context, String label) => PvPress(child: GestureDetector(
         onTap: () => Navigator.of(context).maybePop(),
         behavior: HitTestBehavior.opaque,
         child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -155,7 +156,7 @@ class SleepBetterScreen extends StatelessWidget {
           const SizedBox(width: 12),
           Text(label, style: ppBody(14, color: ppSoft)),
         ]),
-      );
+      ));
 
   Widget _gap() => const Padding(padding: EdgeInsets.symmetric(vertical: 26), child: SizedBox(height: 1, child: ColoredBox(color: ppLine)));
 
@@ -208,14 +209,14 @@ class SleepBetterScreen extends StatelessWidget {
           const SizedBox(height: 12),
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             Text(price, style: ppBody(13, color: ppInk, w: FontWeight.w700)),
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: () => _soon(context),
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
                 decoration: BoxDecoration(borderRadius: BorderRadius.circular(14), border: Border.all(color: ppPurple)),
                 child: Text('Add', style: ppBody(13, color: ppPurple, w: FontWeight.w700)),
               ),
-            ),
+            )),
           ]),
         ]),
       );

@@ -16,6 +16,7 @@ import 'pp_common.dart';
 import 'pp_create_post_screen.dart';
 import 'pp_post_detail_screen.dart';
 import 'pp_opening_soon.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class PpCommunityDetailScreen extends StatelessWidget {
   const PpCommunityDetailScreen({super.key, required this.community});
@@ -84,7 +85,7 @@ class PpCommunityDetailScreen extends StatelessWidget {
                         Text(community.description.now,
                             style: ppBody(14, color: ppInk, h: 1.5)),
                         const SizedBox(height: 16),
-                        GestureDetector(
+                        PvPress(child: GestureDetector(
                           onTap: () => store.toggleJoin(community.id),
                           behavior: HitTestBehavior.opaque,
                           child: Container(
@@ -112,7 +113,7 @@ class PpCommunityDetailScreen extends StatelessWidget {
                                           w: FontWeight.w800)),
                                 ]),
                           ),
-                        ),
+                        )),
                       ]),
                 ),
                 const SizedBox(height: 14),
@@ -120,7 +121,7 @@ class PpCommunityDetailScreen extends StatelessWidget {
                 if (joined)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: GestureDetector(
+                    child: PvPress(child: GestureDetector(
                       onTap: () => ppPush(
                           context,
                           PpCreatePostScreen(
@@ -151,7 +152,7 @@ class PpCommunityDetailScreen extends StatelessWidget {
                               size: 21, color: ppPurple),
                         ]),
                       ),
-                    ),
+                    )),
                   ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(20, 22, 20, 6),

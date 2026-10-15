@@ -59,7 +59,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../data/reads/read_images.dart' show pvFilmStillFor;
 import '../../theme/pv_fonts.dart';
-import '../../widgets/pv_feedback.dart' show PvChoiceTile;
+import '../../widgets/pv_feedback.dart' show PvChoiceTile, PvPress;
 import '../../widgets/pv_placeholders.dart';
 import '../../ttc/cycle_store.dart';
 import '../../ttc/ttc_care_pathway.dart';
@@ -238,7 +238,7 @@ class _TtcIntroFlowState extends State<TtcIntroFlow> {
                   // ⚠️ SMALL AND QUIET, AND ALWAYS THERE. Every step of this
                   // flow can be left. A "skip" that only appears on the screens
                   // we do not mind losing is not an escape, it is a funnel.
-                  GestureDetector(
+                  PvPress(child: GestureDetector(
                     onTap: _skipAll,
                     behavior: HitTestBehavior.opaque,
                     child: Padding(
@@ -248,7 +248,7 @@ class _TtcIntroFlowState extends State<TtcIntroFlow> {
                           style: ttcBody(12.5,
                               color: ttcMuted, w: FontWeight.w700)),
                     ),
-                  ),
+                  )),
                 ]),
               ),
               Expanded(child: _current(t)),

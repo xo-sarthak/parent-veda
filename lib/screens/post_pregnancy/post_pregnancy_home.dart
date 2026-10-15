@@ -47,6 +47,7 @@ import 'snapshot_expanded_screen.dart';
 import 'solve_problem_screen.dart';
 import 'vax_detail_screen.dart';
 import 'vax_tracker_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 // Redesigned tracker (vax_tracker_screen) is the live entry now; the old
 // VaccinationScreen is kept for revert.
 // import 'vaccination_screen.dart';
@@ -164,13 +165,13 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
           ]),
         ),
         const SizedBox(width: 12),
-        GestureDetector(
+        PvPress(child: GestureDetector(
           onTap: () => _scaffoldKey.currentState?.openDrawer(),
           behavior: HitTestBehavior.opaque,
           child: const Icon(Icons.menu_rounded, size: 22, color: ppInk),
-        ),
+        )),
         const SizedBox(width: 14),
-        GestureDetector(
+        PvPress(child: GestureDetector(
           key: const ValueKey('child-photo'),
           onTap: _openChildDetails,
           behavior: HitTestBehavior.opaque,
@@ -181,11 +182,11 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
             clipBehavior: Clip.antiAlias,
             child: const PpStriped(height: 42),
           ),
-        ),
+        )),
       ]);
 
   // ---- 1 · hero (Today's Journey) ----------------------------------------
-  Widget _hero() => _pad(GestureDetector(
+  Widget _hero() => _pad(PvPress(child: GestureDetector(
         onTap: () => _push(const SnapshotExpandedScreen()),
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -229,7 +230,7 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
             ),
           ]),
         ),
-      ));
+      )));
 
   // ---- 2 · what matters today --------------------------------------------
   Widget _whatMatters() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -271,7 +272,7 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
         ),
       ]);
 
-  Widget _discoverCard(String tag, String title, String meta, VoidCallback onTap) => GestureDetector(
+  Widget _discoverCard(String tag, String title, String meta, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: SizedBox(
@@ -295,7 +296,7 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
             Text(meta, style: ppBody(12, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis),
           ]),
         ),
-      );
+      ));
 
   // ---- 5 · looking ahead --------------------------------------------------
   Widget _lookingAhead() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -316,7 +317,7 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
         ),
       ]);
 
-  Widget _aheadCard(String when, String title, IconData icon, VoidCallback onTap) => GestureDetector(
+  Widget _aheadCard(String when, String title, IconData icon, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -331,13 +332,13 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
             Text(title, style: ppJakarta(14).copyWith(height: 1.2), maxLines: 2, overflow: TextOverflow.ellipsis),
           ]),
         ),
-      );
+      ));
 
   // ---- child snapshot -----------------------------------------------------
   Widget _childSnapshot() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         _pad(_sectionHeader('Child snapshot', action: 'My Child →', onAction: () => _push(const MyChildScreen()))),
         const SizedBox(height: 14),
-        _pad(GestureDetector(
+        _pad(PvPress(child: GestureDetector(
           onTap: () => _push(const MyChildScreen()),
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -350,10 +351,10 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
               _domainRow(Icons.favorite_border, ppPurple, 'Emotional', 'Blossoming', last: true, onTap: () => _push(DevelopmentAreaScreen(area: devAreaById('emotional')))),
             ]),
           ),
-        )),
+        ))),
       ]);
 
-  Widget _domainRow(IconData icon, Color fg, String label, String status, {bool last = false, VoidCallback? onTap}) => GestureDetector(
+  Widget _domainRow(IconData icon, Color fg, String label, String status, {bool last = false, VoidCallback? onTap}) => PvPress(enabled: onTap != null, child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -374,13 +375,13 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
             ],
           ]),
         ),
-      );
+      ));
 
   // ---- today's focus ------------------------------------------------------
   Widget _todaysFocus() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         _pad(_sectionHeader("Today's focus")),
         const SizedBox(height: 14),
-        _pad(GestureDetector(
+        _pad(PvPress(child: GestureDetector(
           onTap: () => _push(const GrowthActivityScreen(activity: kActNarrate)),
           behavior: HitTestBehavior.opaque,
           child: Container(
@@ -402,7 +403,7 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
                   style: ppBody(14, h: 1.6)),
             ]),
           ),
-        )),
+        ))),
       ]);
 
   // ---- tiny wins ----------------------------------------------------------
@@ -421,7 +422,7 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
         )),
       ]);
 
-  Widget _win(String text, {required bool done, required VoidCallback onTap, bool last = false}) => GestureDetector(
+  Widget _win(String text, {required bool done, required VoidCallback onTap, bool last = false}) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -444,7 +445,7 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
             if (!done) const Icon(Icons.chevron_right_rounded, size: 18, color: ppMuted),
           ]),
         ),
-      );
+      ));
 
   // ---- quick actions ------------------------------------------------------
   Widget _quickActions() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -464,7 +465,7 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
       ]);
 
   Widget _qa(IconData icon, String label, VoidCallback onTap) => Expanded(
-        child: GestureDetector(
+        child: PvPress(child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: Column(children: [
@@ -472,16 +473,16 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
             const SizedBox(height: 8),
             Text(label, style: ppBody(11, color: ppInk, w: FontWeight.w600)),
           ]),
-        ),
+        )),
       );
 
   // ---- shared -------------------------------------------------------------
   Widget _sectionHeader(String title, {String? action, VoidCallback? onAction}) => Row(children: [
         Expanded(child: Text(title, style: ppJakarta(18))),
-        if (action != null) GestureDetector(onTap: onAction, behavior: HitTestBehavior.opaque, child: Text(action, style: ppBody(12, color: ppPurple, w: FontWeight.w700))),
+        if (action != null) PvPress(enabled: onAction != null, child: GestureDetector(onTap: onAction, behavior: HitTestBehavior.opaque, child: Text(action, style: ppBody(12, color: ppPurple, w: FontWeight.w700)))),
       ]);
 
-  Widget _bigRow(IconData icon, Color bg, Color fg, String title, String sub, VoidCallback onTap) => GestureDetector(
+  Widget _bigRow(IconData icon, Color bg, Color fg, String title, String sub, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -501,7 +502,7 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
             const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
           ]),
         ),
-      );
+      ));
 
   // ---- deals for the day (kept at the very bottom) -----------------------
   Widget _dealsSection() {
@@ -522,7 +523,7 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
           ]),
         ),
         const SizedBox(width: 10),
-        GestureDetector(onTap: () => openPpTab(context, 4), behavior: HitTestBehavior.opaque, child: ppSeeAll()),
+        PvPress(child: GestureDetector(onTap: () => openPpTab(context, 4), behavior: HitTestBehavior.opaque, child: ppSeeAll())),
       ])),
       const SizedBox(height: 14),
       SizedBox(
@@ -545,7 +546,7 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
   Widget _dealCard(String id, int disc) {
     final p = productById(id);
     final original = (p.price / (1 - disc / 100)).round();
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _push(ProductDetailScreen(product: p)),
       behavior: HitTestBehavior.opaque,
       child: SizedBox(
@@ -578,7 +579,7 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
           Text(p.retailer == 'In-app' ? 'ParentVeda · in-app' : 'via ${p.retailer}', style: ppBody(10, color: ppMuted)),
         ]),
       ),
-    );
+    ));
   }
 
   String _money(int n) {
@@ -610,11 +611,11 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
                   child: Text("${ChildProfileStore.instance.name}'s details",
                       style: ppJakarta(18), maxLines: 1, overflow: TextOverflow.ellipsis),
                 ),
-                GestureDetector(
+                PvPress(child: GestureDetector(
                   onTap: () => Navigator.of(ctx).pop(),
                   behavior: HitTestBehavior.opaque,
                   child: Container(width: 30, height: 30, alignment: Alignment.center, decoration: const BoxDecoration(color: ppPanel, shape: BoxShape.circle), child: const Icon(Icons.close_rounded, size: 16, color: ppSoft)),
-                ),
+                )),
               ]),
               const SizedBox(height: 16),
               Row(children: [
@@ -626,10 +627,10 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
                     Positioned(
                       right: -2,
                       bottom: -2,
-                      child: GestureDetector(
+                      child: PvPress(child: GestureDetector(
                         onTap: _soon,
                         child: Container(width: 24, height: 24, alignment: Alignment.center, decoration: BoxDecoration(color: ppPurple, shape: BoxShape.circle, border: Border.all(color: ppBg, width: 2)), child: const Icon(Icons.edit, size: 11, color: Colors.white)),
-                      ),
+                      )),
                     ),
                   ]),
                 ),
@@ -641,7 +642,7 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
                   const SizedBox(height: 2),
                   Text(ChildProfileStore.instance.ageLabel, style: ppBody(13), maxLines: 1, overflow: TextOverflow.ellipsis),
                 ])),
-                GestureDetector(onTap: _soon, behavior: HitTestBehavior.opaque, child: Text('Edit', style: ppBody(13, color: ppPurple, w: FontWeight.w700))),
+                PvPress(child: GestureDetector(onTap: _soon, behavior: HitTestBehavior.opaque, child: Text('Edit', style: ppBody(13, color: ppPurple, w: FontWeight.w700)))),
               ]),
               const SizedBox(height: 10),
               // These were hardcoded: "8 March 2026", "Boy", "6.4 kg · 50th",

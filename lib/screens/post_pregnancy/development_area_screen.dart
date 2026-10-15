@@ -30,6 +30,7 @@ import 'reading_reader_screen.dart';
 import 'watch_category_screen.dart';
 import 'watch_player_screen.dart';
 import 'watch_quicklearn_screen.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class DevelopmentAreaScreen extends StatelessWidget {
   const DevelopmentAreaScreen({super.key, required this.area});
@@ -264,7 +265,7 @@ class DevelopmentAreaScreen extends StatelessWidget {
       'next' => ('Coming next', ppSoft, Colors.white, ppHair),
       _ => ('Further ahead', ppMuted, Colors.white, ppHair),
     };
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: () => _push(context, DevStageDetailScreen(area: area, stage: s, kindLabel: 'Skill')),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -291,7 +292,7 @@ class DevelopmentAreaScreen extends StatelessWidget {
           const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
         ]),
       ),
-    );
+    ));
   }
 
   // ---- rails --------------------------------------------------------------
@@ -300,7 +301,7 @@ class DevelopmentAreaScreen extends StatelessWidget {
         children: [
           Text(title, style: ppJakarta(16)),
           if (onViewMore != null)
-            GestureDetector(
+            PvPress(child: GestureDetector(
               onTap: onViewMore,
               behavior: HitTestBehavior.opaque,
               child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -308,7 +309,7 @@ class DevelopmentAreaScreen extends StatelessWidget {
                 const SizedBox(width: 3),
                 const Icon(Icons.arrow_forward, size: 14, color: ppPurple),
               ]),
-            ),
+            )),
         ],
       ));
 
@@ -342,7 +343,7 @@ class DevelopmentAreaScreen extends StatelessWidget {
           separatorBuilder: (_, _) => const SizedBox(width: 12),
           itemBuilder: (_, i) {
             final v = videos[i];
-            return GestureDetector(
+            return PvPress(child: GestureDetector(
               onTap: () => _push(context, v.quick ? QuickLearnScreen(startId: v.id) : WatchPlayerScreen(video: v)),
               behavior: HitTestBehavior.opaque,
               child: SizedBox(
@@ -355,7 +356,7 @@ class DevelopmentAreaScreen extends StatelessWidget {
                   PpExpertName(v.expert, style: ppBody(11.5, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis),
                 ]),
               ),
-            );
+            ));
           },
         ),
       );
@@ -369,7 +370,7 @@ class DevelopmentAreaScreen extends StatelessWidget {
           separatorBuilder: (_, _) => const SizedBox(width: 12),
           itemBuilder: (_, i) {
             final a = reads[i];
-            return GestureDetector(
+            return PvPress(child: GestureDetector(
               onTap: () => _push(context, ReadingReaderScreen(article: a)),
               behavior: HitTestBehavior.opaque,
               child: SizedBox(
@@ -382,7 +383,7 @@ class DevelopmentAreaScreen extends StatelessWidget {
                   Text(a.author, style: ppBody(11.5, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis),
                 ]),
               ),
-            );
+            ));
           },
         ),
       );
@@ -396,7 +397,7 @@ class DevelopmentAreaScreen extends StatelessWidget {
           separatorBuilder: (_, _) => const SizedBox(width: 12),
           itemBuilder: (_, i) {
             final a = items[i];
-            return GestureDetector(
+            return PvPress(child: GestureDetector(
               onTap: () => _push(context, DevelopmentActivityScreen(activity: a)),
               behavior: HitTestBehavior.opaque,
               child: SizedBox(
@@ -411,7 +412,7 @@ class DevelopmentAreaScreen extends StatelessWidget {
                   ),
                 ]),
               ),
-            );
+            ));
           },
         ),
       );
@@ -425,7 +426,7 @@ class DevelopmentAreaScreen extends StatelessWidget {
           separatorBuilder: (_, _) => const SizedBox(width: 12),
           itemBuilder: (_, i) {
             final p = products[i];
-            return GestureDetector(
+            return PvPress(child: GestureDetector(
               onTap: () => _push(context, ProductDetailScreen(product: p)),
               behavior: HitTestBehavior.opaque,
               child: SizedBox(
@@ -438,7 +439,7 @@ class DevelopmentAreaScreen extends StatelessWidget {
                   Text('${p.brand} · ★ ${p.rating}', style: ppBody(11.5, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis),
                 ]),
               ),
-            );
+            ));
           },
         ),
       );
